@@ -216,7 +216,7 @@ static BOOL g_interrupting = NO;
 {
     OSStatus err = noErr;
     
-    err = NewAUGraph(&_graph);
+    err = NewAUGraph(&_auGraph);
     YAS_Require_NoErr(err, bail);
     
     err = [self openGraph];
@@ -226,9 +226,9 @@ static BOOL g_interrupting = NO;
     
 bail:
     if (err) {
-        if (_graph) {
+        if (_auGraph) {
             [self closeGraph];
-            DisposeAUGraph(_graph);
+            DisposeAUGraph(_auGraph);
         }
         return NO;
     }
@@ -269,12 +269,12 @@ bail:
     [self removeAllNodes];
     
     OSStatus err = noErr;
-    err = DisposeAUGraph(_graph);
+    err = DisposeAUGraph(_auGraph);
     YAS_Require_NoErr(err, bail);
     
 bail:
     
-    _graph = 0;
+    _auGraph = 0;
     
     [_identifier release];
     [_nodes release];
@@ -415,7 +415,7 @@ bail:
     
     OSStatus err = noErr;
     
-    err = AUGraphConnectNodeInput(_graph, sourceNode.node, sourceOutputNumber, destNode.node, destInputNumber);
+    err = AUGraphConnectNodeInput(_auGraph, sourceNode.node, sourceOutputNumber, destNode.node, destInputNumber);
     YAS_Require_NoErr(err, bail);
     
     connection = [[[YASAudioConnection alloc] init] autorelease];
@@ -435,7 +435,7 @@ bail:
     OSStatus err = noErr;
     [connection retain];
     
-    err = AUGraphDisconnectNodeInput(_graph, connection.destNode.node, connection.destInputNumber);
+    err = AUGraphDisconnectNodeInput(_auGraph, connection.destNode.node, connection.destInputNumber);
     YAS_Require_NoErr(err, bail);
     
     [_connections removeObject:connection];
@@ -448,7 +448,7 @@ bail:
 
 - (void)update
 {
-    OSStatus err = AUGraphUpdate(_graph, NULL);
+    OSStatus err = AUGraphUpdate(_auGraph, NULL);
     YAS_Verify_NoErr(err);
 }
 
@@ -457,15 +457,15 @@ bail:
     OSStatus err = noErr;
     Boolean isInitialized = false;
     
-    err = AUGraphIsInitialized(_graph, &isInitialized);
+    err = AUGraphIsInitialized(_auGraph, &isInitialized);
     YAS_Verify_NoErr(err);
     
     if (!isInitialized) {
-        err = AUGraphInitialize(_graph);
+        err = AUGraphInitialize(_auGraph);
         YAS_Verify_NoErr(err);
     }
     
-    err = AUGraphStart(_graph);
+    err = AUGraphStart(_auGraph);
     YAS_Verify_NoErr(err);
     
     return err;
@@ -476,11 +476,11 @@ bail:
     OSStatus err = noErr;
     Boolean isRunning = false;
     
-    err = AUGraphIsRunning(_graph, &isRunning);
+    err = AUGraphIsRunning(_auGraph, &isRunning);
     YAS_Verify_NoErr(err);
     
     if (isRunning) {
-        err = AUGraphStop(_graph);
+        err = AUGraphStop(_auGraph);
         YAS_Verify_NoErr(err);
     }
     
@@ -492,11 +492,11 @@ bail:
     OSStatus err = noErr;
     Boolean isInitialized = false;
     
-    err = AUGraphIsInitialized(_graph, &isInitialized);
+    err = AUGraphIsInitialized(_auGraph, &isInitialized);
     YAS_Verify_NoErr(err);
     
     if (isInitialized) {
-        err = AUGraphUninitialize(_graph);
+        err = AUGraphUninitialize(_auGraph);
         YAS_Verify_NoErr(err);
     }
 }
@@ -506,11 +506,11 @@ bail:
     OSStatus err = noErr;
     Boolean isOpen = false;
     
-    err = AUGraphIsOpen(_graph, &isOpen);
+    err = AUGraphIsOpen(_auGraph, &isOpen);
     YAS_Verify_NoErr(err);
     
     if (!isOpen) {
-        err = AUGraphOpen(_graph);
+        err = AUGraphOpen(_auGraph);
         YAS_Verify_NoErr(err);
     }
     
@@ -522,11 +522,11 @@ bail:
     OSStatus err = noErr;
     Boolean isOpen = false;
     
-    err = AUGraphIsOpen(_graph, &isOpen);
+    err = AUGraphIsOpen(_auGraph, &isOpen);
     YAS_Verify_NoErr(err);
     
     if (isOpen) {
-        err = AUGraphClose(_graph);
+        err = AUGraphClose(_auGraph);
         YAS_Verify_NoErr(err);
     }
     

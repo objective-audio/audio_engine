@@ -117,10 +117,10 @@ static OSStatus NotifyRenderCallback(void *							inRefCon,
         _identifier = [[YASAudioNode uniqueStringWithGraph:graph] retain];
         
         OSStatus err = noErr;
-        err = AUGraphAddNode(graph.graph, acd, &_node);
+        err = AUGraphAddNode(graph.auGraph, acd, &_node);
         YAS_Require_NoErr(err, bail);
         
-        err = AUGraphNodeInfo(graph.graph, _node, NULL, &_audioUnit);
+        err = AUGraphNodeInfo(graph.auGraph, _node, NULL, &_audioUnit);
         YAS_Require_NoErr(err, bail);
         
     bail:
@@ -136,7 +136,7 @@ static OSStatus NotifyRenderCallback(void *							inRefCon,
 {
     OSStatus err = noErr;
     if (_node && _graph) {
-        err = AUGraphRemoveNode(_graph.graph, _node);
+        err = AUGraphRemoveNode(_graph.auGraph, _node);
     }
     _node = 0;
     YAS_Verify_NoErr(err);
@@ -167,7 +167,7 @@ static OSStatus NotifyRenderCallback(void *							inRefCon,
     AURenderCallbackStruct callbackStruct;
     callbackStruct.inputProc = RenderCallback;
     callbackStruct.inputProcRefCon = renderInfo;
-    err = AUGraphSetNodeInputCallback(_graph.graph, _node, inputNumber, &callbackStruct);
+    err = AUGraphSetNodeInputCallback(_graph.auGraph, _node, inputNumber, &callbackStruct);
     YAS_Verify_NoErr(err);
 }
 
@@ -175,7 +175,7 @@ static OSStatus NotifyRenderCallback(void *							inRefCon,
 {
     OSStatus err = noErr;
     
-    err = AUGraphDisconnectNodeInput(_graph.graph, _node, inputNumber);
+    err = AUGraphDisconnectNodeInput(_graph.auGraph, _node, inputNumber);
     YAS_Verify_NoErr(err);
 }
 

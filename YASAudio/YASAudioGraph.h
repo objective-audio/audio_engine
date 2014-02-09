@@ -18,7 +18,7 @@
 @interface YASAudioGraph : NSObject
 
 @property (nonatomic, strong, readonly) NSString *identifier;
-@property (nonatomic, assign, readonly) AUGraph graph; /*!< 保持しているAUGraphです */
+@property (nonatomic, assign, readonly) AUGraph auGraph; /*!< 保持しているAUGraphです */
 @property (nonatomic, strong, readonly) YASAudioIONode *ioNode; /*!< RemoteIOのノード */
 @property (nonatomic, assign) BOOL running; /*!< グラフ動作中フラグです */
 
