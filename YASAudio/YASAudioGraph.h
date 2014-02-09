@@ -17,15 +17,15 @@
 
 @interface YASAudioGraph : NSObject
 
-@property (nonatomic, strong, readonly) NSString *identifier;
+@property (nonatomic, strong, readonly) NSString *identifier; /*!< グラフを識別するためのIDです */
 @property (nonatomic, assign, readonly) AUGraph auGraph; /*!< 保持しているAUGraphです */
 @property (nonatomic, strong, readonly) YASAudioIONode *ioNode; /*!< RemoteIOのノード */
 @property (nonatomic, assign) BOOL running; /*!< グラフ動作中フラグです */
 
-/*! 名前を指定して生成したグラフのインスタンスを返します。 */
+/*! 生成したグラフのインスタンスを返します。 */
 + (id)graph;
 
-/*! 名前を指定して初期化します。 */
+/*! 初期化します。 */
 - (id)init;
 
 /*! グラフを破棄する前に、グラフを無効にします。このメソッドを呼び出さないと解放されません。 */
