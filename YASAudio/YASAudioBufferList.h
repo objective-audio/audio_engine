@@ -18,7 +18,7 @@
 @property (nonatomic, assign, readonly) NSUInteger bufferSize; /*!< １つのバッファのバイトサイズ */
 
 /*! 初期化してインスタンスを返します */
-+ (id)audioBufferWithBufferCount:(NSUInteger)bufferCount channels:(NSUInteger)ch bufferSize:(NSUInteger)size;
++ (id)audioBufferListWithBufferCount:(NSUInteger)bufferCount channels:(NSUInteger)ch bufferSize:(NSUInteger)size;
 
 /*! 初期化します */
 - (id)initWithBufferCount:(NSUInteger)bufferCount channels:(NSUInteger)ch bufferSize:(NSUInteger)size;

@@ -160,7 +160,7 @@ static double const SAMPLE_AFP_SAMPLERATE = 44100.0;
             const UInt32 maxReadFrames = 44100;
             const UInt32 channels = format.mChannelsPerFrame;
             
-            self.audioBufferList = [YASAudioBufferList audioBufferWithBufferCount:1 channels:channels bufferSize:_totalFrames * format.mBytesPerFrame];
+            self.audioBufferList = [YASAudioBufferList audioBufferListWithBufferCount:1 channels:channels bufferSize:_totalFrames * format.mBytesPerFrame];
             SInt16 *ptr = [self.audioBufferList dataAtBufferIndex:0];
             
             while (readFrame < totalFrames) {

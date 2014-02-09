@@ -15,7 +15,7 @@
     AudioBufferList *_audioBufferList;
 }
 
-+ (id)audioBufferWithBufferCount:(NSUInteger)bufferCount channels:(NSUInteger)ch bufferSize:(NSUInteger)size
++ (id)audioBufferListWithBufferCount:(NSUInteger)bufferCount channels:(NSUInteger)ch bufferSize:(NSUInteger)size
 {
     return [[[YASAudioBufferList alloc] initWithBufferCount:bufferCount channels:ch bufferSize:size] autorelease];
 }
