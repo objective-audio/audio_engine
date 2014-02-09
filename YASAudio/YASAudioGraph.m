@@ -63,7 +63,7 @@ static BOOL g_interrupting = NO;
     });
 }
 
-+ (void)startAllAudioGraph
++ (void)_startAllAudioGraph
 {
     NSError *error = nil;
     if (![[AVAudioSession sharedInstance] setActive:YES error:&error]) {
@@ -71,16 +71,16 @@ static BOOL g_interrupting = NO;
     }
     
     for (YASAudioGraph *graph in g_graphs.allValues) {
-        if (graph.running) [graph startGraph];
+        if (graph.running) [graph _startGraph];
     }
     
     g_interrupting = NO;
 }
 
-+ (void)stopAllAudioGraph
++ (void)_stopAllAudioGraph
 {
     for (YASAudioGraph *graph in g_graphs.allValues) {
-        [graph stopGraph];
+        [graph _stopGraph];
     }
     
     NSError *error = nil;
@@ -89,7 +89,7 @@ static BOOL g_interrupting = NO;
     }
 }
 
-+ (void)addGraph:(YASAudioGraph *)graph
++ (void)_addGraph:(YASAudioGraph *)graph
 {
     if (graph) {
         
@@ -101,7 +101,7 @@ static BOOL g_interrupting = NO;
     }
 }
 
-+ (void)removeGraph:(YASAudioGraph *)graph
++ (void)_removeGraph:(YASAudioGraph *)graph
 {
     [g_graphRenderLock lock];
     
@@ -112,7 +112,7 @@ static BOOL g_interrupting = NO;
     [g_graphRenderLock unlock];
 }
 
-+ (YASAudioGraph *)graphForKey:(NSString *)key
++ (YASAudioGraph *)_graphForKey:(NSString *)key
 {
     YASAudioGraph *graph = nil;
     
@@ -127,12 +127,12 @@ static BOOL g_interrupting = NO;
 
 #pragma mark - AudioSessionの通知
 
-+ (void)didBecomeActiveNotification:(NSNotification *)notif
++ (void)_didBecomeActiveNotification:(NSNotification *)notif
 {
-    [self startAllAudioGraph];
+    [self _startAllAudioGraph];
 }
 
-+ (void)interruptionNotification:(NSNotification *)notif
++ (void)_interruptionNotification:(NSNotification *)notif
 {
     NSDictionary *info = notif.userInfo;
     NSNumber *typeNum = [info valueForKey:AVAudioSessionInterruptionTypeKey];
@@ -140,10 +140,10 @@ static BOOL g_interrupting = NO;
     
     if (interruptionType == AVAudioSessionInterruptionTypeBegan) {
         g_interrupting = YES;
-        [self stopAllAudioGraph];
+        [self _stopAllAudioGraph];
     } else if (interruptionType == AVAudioSessionInterruptionTypeEnded) {
         if ([UIApplication sharedApplication].applicationState == UIApplicationStateActive) {
-            [self startAllAudioGraph];
+            [self _startAllAudioGraph];
             g_interrupting = NO;
         }
     }
@@ -190,7 +190,7 @@ static BOOL g_interrupting = NO;
 
 + (void)audioNodeRender:(YASAudioNodeRenderInfo *)renderInfo
 {
-    YASAudioGraph *graph = [YASAudioGraph graphForKey:renderInfo.graphKey];
+    YASAudioGraph *graph = [YASAudioGraph _graphForKey:renderInfo.graphKey];
     
     if (graph) {
         
@@ -205,22 +205,22 @@ static BOOL g_interrupting = NO;
 
 #pragma mark - セットアップ
 
-- (BOOL)setupAUGraph
+- (BOOL)_setupAUGraph
 {
     OSStatus err = noErr;
     
     err = NewAUGraph(&_auGraph);
     YAS_Require_NoErr(err, bail);
     
-    err = [self openGraph];
+    err = [self _openGraph];
     YAS_Require_NoErr(err, bail);
     
-    _ioNode = [[self addIONode] retain];
+    _ioNode = [[self _addIONode] retain];
     
 bail:
     if (err) {
         if (_auGraph) {
-            [self closeGraph];
+            [self _closeGraph];
             DisposeAUGraph(_auGraph);
         }
         return NO;
@@ -244,11 +244,11 @@ bail:
         
         _identifier = [[YASAudioGraph _uniqueString] retain];
         
-        if (![self setupAUGraph]) {
+        if (![self _setupAUGraph]) {
             [self release];
             self = nil;
         } else {
-            [YASAudioGraph addGraph:self];
+            [YASAudioGraph _addGraph:self];
         }
     }
     
@@ -279,9 +279,9 @@ bail:
 
 - (void)invalidate
 {
-    [self stopGraph];
+    [self _stopGraph];
     
-    [YASAudioGraph removeGraph:self];
+    [YASAudioGraph _removeGraph:self];
 }
 
 #pragma mark - 更新
@@ -289,9 +289,9 @@ bail:
 - (void)_updateAUGraphRunning
 {
     if (_running) {
-        [self startGraph];
+        [self _startGraph];
     } else {
-        [self stopGraph];
+        [self _stopGraph];
     }
 }
 
@@ -348,7 +348,7 @@ bail:
     return newNode;
 }
 
-- (YASAudioIONode *)addIONode
+- (YASAudioIONode *)_addIONode
 {
     AudioComponentDescription acd;
     acd.componentType = kAudioUnitType_Output;
@@ -445,7 +445,7 @@ bail:
     YAS_Verify_NoErr(err);
 }
 
-- (OSStatus)startGraph
+- (OSStatus)_startGraph
 {
     OSStatus err = noErr;
     Boolean isInitialized = false;
@@ -464,7 +464,7 @@ bail:
     return err;
 }
 
-- (OSStatus)stopGraph
+- (OSStatus)_stopGraph
 {
     OSStatus err = noErr;
     Boolean isRunning = false;
@@ -494,7 +494,7 @@ bail:
     }
 }
 
-- (OSStatus)openGraph
+- (OSStatus)_openGraph
 {
     OSStatus err = noErr;
     Boolean isOpen = false;
@@ -510,7 +510,7 @@ bail:
     return err;
 }
 
-- (OSStatus)closeGraph
+- (OSStatus)_closeGraph
 {
     OSStatus err = noErr;
     Boolean isOpen = false;
