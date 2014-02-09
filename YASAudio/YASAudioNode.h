@@ -21,7 +21,7 @@ typedef void (^YASAudioNodeRenderCallbackBlock)(YASAudioNodeRenderInfo *renderIn
 @interface YASAudioNode : NSObject
 
 @property (nonatomic, assign, readonly) YASAudioGraph *graph; /*!< このノードが保持されているグラフです */
-@property (nonatomic, strong, readonly) NSString *identifier; /*!< ノードを識別するための名前です。AudioManagerでキーとしても使用されるので一意であること */
+@property (nonatomic, strong, readonly) NSString *identifier; /*!< ノードを識別するためのIDです */
 @property (nonatomic, assign, readonly) AUNode node; /*!< AUNodeを取得します */
 @property (nonatomic, assign, readonly) AudioUnit audioUnit; /*!< AudioUnitを取得します */
 
@@ -84,6 +84,7 @@ typedef void (^YASAudioNodeRenderCallbackBlock)(YASAudioNodeRenderInfo *renderIn
 
 @end
 
+#pragma mark - RemoteIOのノード
 
 @interface YASAudioIONode : YASAudioNode
 
