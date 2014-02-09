@@ -16,7 +16,6 @@
 static NSMutableDictionary *g_graphs = nil;
 static NSLock *g_graphRenderLock = nil;
 static NSMutableDictionary *g_renderInfos = nil;
-static BOOL g_notificationInitialized = NO;
 static BOOL g_interrupting = NO;
 
 @interface YASAudioGraph()
@@ -48,26 +47,20 @@ static BOOL g_interrupting = NO;
 
 + (void)initialize
 {
-    if (!g_graphs) {
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        
         g_graphs = [[NSMutableDictionary alloc] initWithCapacity:2];
-    }
-    
-    if (!g_graphRenderLock) {
+        
         g_graphRenderLock = [[NSLock alloc] init];
-    }
-    
-    if (!g_renderInfos) {
+        
         g_renderInfos = [[NSMutableDictionary alloc] initWithCapacity:2];
-    }
-    
-    if (!g_notificationInitialized) {
         
         NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
-        [center addObserver:self selector:@selector(didBecomeActiveNotification:) name:UIApplicationDidBecomeActiveNotification object:nil];
-        [center addObserver:self selector:@selector(interruptionNotification:) name:AVAudioSessionInterruptionNotification object:nil];
+        [center addObserver:self selector:@selector(_didBecomeActiveNotification:) name:UIApplicationDidBecomeActiveNotification object:nil];
+        [center addObserver:self selector:@selector(_interruptionNotification:) name:AVAudioSessionInterruptionNotification object:nil];
         
-        g_notificationInitialized = YES;
-    }
+    });
 }
 
 + (void)startAllAudioGraph
