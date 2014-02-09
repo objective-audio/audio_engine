@@ -1,0 +1,536 @@
+
+/**
+ *
+ *  YASAudioGraph.m
+ *
+ *  Created by Yuki Yasoshima
+ *
+ */
+
+#import "YASAudioGraph.h"
+#import "YASAudioNodeRenderInfo.h"
+#import "YASAudioUtilities.h"
+#import "YASAudioConnection.h"
+#import <AVFoundation/AVFoundation.h>
+
+static NSMutableDictionary *g_graphs = nil;
+static NSLock *g_graphRenderLock = nil;
+static NSMutableDictionary *g_renderInfos = nil;
+static BOOL g_notificationInitialized = NO;
+static BOOL g_interrupting = NO;
+
+@interface YASAudioGraph()
+@property (nonatomic, strong) YASAudioIONode *ioNode;
+@property (nonatomic, strong) NSMutableDictionary *nodes;
+@property (nonatomic, strong) NSMutableSet *connections;
+@end
+
+@implementation YASAudioGraph
+
+#pragma mark - グローバル／グラフのオブジェクト管理
+
++ (NSString *)_uniqueString
+{
+    NSString *result = nil;
+    
+    while (YES) {
+        
+        result = [[NSProcessInfo processInfo] globallyUniqueString];
+        
+        if (![g_graphs objectForKey:result]) {
+            break;
+        }
+        
+    }
+    
+    return result;
+}
+
++ (void)initialize
+{
+    if (!g_graphs) {
+        g_graphs = [[NSMutableDictionary alloc] initWithCapacity:2];
+    }
+    
+    if (!g_graphRenderLock) {
+        g_graphRenderLock = [[NSLock alloc] init];
+    }
+    
+    if (!g_renderInfos) {
+        g_renderInfos = [[NSMutableDictionary alloc] initWithCapacity:2];
+    }
+    
+    if (!g_notificationInitialized) {
+        
+        NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
+        [center addObserver:self selector:@selector(didBecomeActiveNotification:) name:UIApplicationDidBecomeActiveNotification object:nil];
+        [center addObserver:self selector:@selector(interruptionNotification:) name:AVAudioSessionInterruptionNotification object:nil];
+        
+        g_notificationInitialized = YES;
+    }
+}
+
++ (void)startAllAudioGraph
+{
+    NSError *error = nil;
+    if (![[AVAudioSession sharedInstance] setActive:YES error:&error]) {
+        NSLog(@"%s %@", __PRETTY_FUNCTION__, error);
+    }
+    
+    for (YASAudioGraph *graph in g_graphs.allValues) {
+        if (graph.running) [graph startGraph];
+    }
+    
+    g_interrupting = NO;
+}
+
++ (void)stopAllAudioGraph
+{
+    for (YASAudioGraph *graph in g_graphs.allValues) {
+        [graph stopGraph];
+    }
+    
+    NSError *error = nil;
+    if (![[AVAudioSession sharedInstance] setActive:NO error:&error]) {
+        NSLog(@"%s %@", __PRETTY_FUNCTION__, error);
+    }
+}
+
++ (void)addGraph:(YASAudioGraph *)graph
+{
+    if (graph) {
+        
+        [g_graphRenderLock lock];
+        
+        [g_graphs setObject:graph forKey:graph.identifier];
+        
+        [g_graphRenderLock unlock];
+    }
+}
+
++ (void)removeGraph:(YASAudioGraph *)graph
+{
+    [g_graphRenderLock lock];
+    
+    if (graph) {
+        [g_graphs removeObjectForKey:graph.identifier];
+    }
+    
+    [g_graphRenderLock unlock];
+}
+
++ (YASAudioGraph *)graphForKey:(NSString *)key
+{
+    YASAudioGraph *graph = nil;
+    
+    [g_graphRenderLock lock];
+    
+    graph = [[[g_graphs objectForKey:key] retain] autorelease];
+    
+    [g_graphRenderLock unlock];
+    
+    return graph;
+}
+
+#pragma mark - AudioSessionの通知
+
++ (void)didBecomeActiveNotification:(NSNotification *)notif
+{
+    [self startAllAudioGraph];
+}
+
++ (void)interruptionNotification:(NSNotification *)notif
+{
+    NSDictionary *info = notif.userInfo;
+    NSNumber *typeNum = [info valueForKey:AVAudioSessionInterruptionTypeKey];
+    AVAudioSessionInterruptionType interruptionType = [typeNum unsignedIntegerValue];
+    
+    if (interruptionType == AVAudioSessionInterruptionTypeBegan) {
+        g_interrupting = YES;
+        [self stopAllAudioGraph];
+    } else if (interruptionType == AVAudioSessionInterruptionTypeEnded) {
+        if ([UIApplication sharedApplication].applicationState == UIApplicationStateActive) {
+            [self startAllAudioGraph];
+            g_interrupting = NO;
+        }
+    }
+}
+
+#pragma mark - グローバル／レンダー
+
++ (BOOL)containsAudioNodeRenderInfoWithGraphKey:(NSString *)graphKey nodeKey:(NSString *)nodeKey
+{
+    NSMutableDictionary *graphInfos = [g_renderInfos objectForKey:graphKey];
+    
+    if (!graphInfos) {
+        return NO;
+    }
+    
+    YASAudioNodeRenderInfo *renderInfo = [graphInfos objectForKey:nodeKey];
+    
+    if (!renderInfo) {
+        return NO;
+    }
+    
+    return YES;
+}
+
++ (YASAudioNodeRenderInfo *)audioNodeRenderInfoWithGraphKey:(NSString *)graphKey nodeKey:(NSString *)nodeKey
+{
+    NSMutableDictionary *graphInfos = [g_renderInfos objectForKey:graphKey];
+    
+    if (!graphInfos) {
+        graphInfos = [NSMutableDictionary dictionaryWithCapacity:8];
+        [g_renderInfos setObject:graphInfos forKey:graphKey];
+    }
+    
+    YASAudioNodeRenderInfo *renderInfo = [graphInfos objectForKey:nodeKey];
+    
+    if (!renderInfo) {
+        renderInfo = [[YASAudioNodeRenderInfo alloc] initWithGraphKey:graphKey nodeKey:nodeKey];
+        [graphInfos setObject:renderInfo forKey:nodeKey];
+        [renderInfo release];
+    }
+    
+    return renderInfo;
+}
+
++ (void)audioNodeRender:(YASAudioNodeRenderInfo *)renderInfo
+{
+    YASAudioGraph *graph = [YASAudioGraph graphForKey:renderInfo.graphKey];
+    
+    if (graph) {
+        
+        YASAudioNode *node = [graph nodeForKey:renderInfo.nodeKey];
+        
+        if (node) {
+            [node render:renderInfo];
+        }
+        
+    }
+}
+
+#pragma mark - セットアップ
+
+- (BOOL)setupAUGraph
+{
+    OSStatus err = noErr;
+    
+    err = NewAUGraph(&_graph);
+    YAS_Require_NoErr(err, bail);
+    
+    err = [self openGraph];
+    YAS_Require_NoErr(err, bail);
+    
+    _ioNode = [[self addIONode] retain];
+    
+bail:
+    if (err) {
+        if (_graph) {
+            [self closeGraph];
+            DisposeAUGraph(_graph);
+        }
+        return NO;
+    }
+    return YES;
+}
+
++ (id)graph
+{
+    return [[[[self class] alloc] init] autorelease];
+}
+
+- (id)init
+{
+    self = [super init];
+    if (self) {
+        
+        _nodes = [[NSMutableDictionary alloc] init];
+        _connections = [[NSMutableSet alloc] init];
+        _running = NO;
+        
+        _identifier = [[YASAudioGraph _uniqueString] retain];
+        
+        if (![self setupAUGraph]) {
+            [self release];
+            self = nil;
+        } else {
+            [YASAudioGraph addGraph:self];
+        }
+    }
+    
+    return self;
+}
+
+- (void)dealloc
+{
+    [self _uninitializeGraph];
+    
+    [self removeAllNodes];
+    
+    OSStatus err = noErr;
+    err = DisposeAUGraph(_graph);
+    YAS_Require_NoErr(err, bail);
+    
+bail:
+    
+    _graph = 0;
+    
+    [_identifier release];
+    [_nodes release];
+    [_connections release];
+    [_ioNode release];
+    
+    [super dealloc];
+}
+
+- (void)invalidate
+{
+    [self stopGraph];
+    
+    [YASAudioGraph removeGraph:self];
+}
+
+#pragma mark - 更新
+
+- (void)_updateAUGraphRunning
+{
+    if (_running) {
+        [self startGraph];
+    } else {
+        [self stopGraph];
+    }
+}
+
+#pragma mark - アクセサ
+
+- (void)setRunning:(BOOL)running
+{
+    if (_running != running) {
+        _running = running;
+        [self _updateAUGraphRunning];
+    }
+}
+
+#pragma mark - ノード
+
+- (YASAudioNode *)_nodeForKeyFromNodesSynchronized:(id)key
+{
+    YASAudioNode *node = nil;
+    
+    @synchronized(self) {
+        node = [[[_nodes objectForKey:key] retain] autorelease];
+    }
+    
+    return node;
+}
+
+- (void)_setNodeToNodesSynchronized:(YASAudioNode *)node
+{
+    @synchronized(self) {
+        [_nodes setObject:node forKey:node.identifier];
+    }
+}
+
+- (void)_removeNodeFromNodesSynchronized:(YASAudioNode *)node
+{
+    @synchronized(self) {
+        [_nodes removeObjectForKey:node.identifier];
+    }
+}
+
+- (YASAudioNode *)addNodeWithType:(OSType)type subType:(OSType)subType
+{
+    AudioComponentDescription acd;
+    acd.componentType = type;
+    acd.componentSubType = subType;
+    acd.componentManufacturer = kAudioUnitManufacturer_Apple;
+    acd.componentFlags = 0;
+    acd.componentFlagsMask = 0;
+    
+    YASAudioNode *newNode = [[YASAudioNode alloc] initWithGraph:self acd:&acd];
+    [self _setNodeToNodesSynchronized:newNode];
+    [newNode release];
+    
+    return newNode;
+}
+
+- (YASAudioIONode *)addIONode
+{
+    AudioComponentDescription acd;
+    acd.componentType = kAudioUnitType_Output;
+    acd.componentSubType = kAudioUnitSubType_RemoteIO;
+    acd.componentManufacturer = kAudioUnitManufacturer_Apple;
+    acd.componentFlags = 0;
+    acd.componentFlagsMask = 0;
+    
+    YASAudioIONode *newNode = [[YASAudioIONode alloc] initWithGraph:self acd:&acd];
+    [self _setNodeToNodesSynchronized:newNode];
+    [newNode release];
+    
+    return newNode;
+}
+
+- (void)removeNode:(YASAudioNode *)node
+{
+    NSMutableSet *removeConSet = [[NSMutableSet alloc] init];
+    for (YASAudioConnection *connection in _connections) {
+        if ([node isEqual:connection.sourceNode] || [node isEqual:connection.destNode]) {
+            [removeConSet addObject:connection];
+        }
+    }
+    for (YASAudioConnection *connection in removeConSet) {
+        [_connections removeObject:connection];
+    }
+    [removeConSet release];
+    
+    [node remove];
+    [self _removeNodeFromNodesSynchronized:node];
+}
+
+- (void)removeAllNodes
+{
+    NSDictionary *tmpSet = nil;
+    
+    @synchronized(self) {
+        tmpSet = [_nodes copy];
+    }
+    
+    for (YASAudioNode *node in tmpSet.allValues) {
+        [self removeNode:node];
+    }
+    [tmpSet release];
+}
+
+- (YASAudioNode *)nodeForKey:(NSString *)key
+{
+    return [self _nodeForKeyFromNodesSynchronized:key];
+}
+
+#pragma mark - コネクション
+
+- (YASAudioConnection *)addConnectionWithSourceNode:(YASAudioNode *)sourceNode sourceOutputNumber:(UInt32)sourceOutputNumber destNode:(YASAudioNode *)destNode destInputNumber:(UInt32)destInputNumber
+{
+    YASAudioConnection *connection = nil;
+    
+    OSStatus err = noErr;
+    
+    err = AUGraphConnectNodeInput(_graph, sourceNode.node, sourceOutputNumber, destNode.node, destInputNumber);
+    YAS_Require_NoErr(err, bail);
+    
+    connection = [[[YASAudioConnection alloc] init] autorelease];
+    connection.sourceNode = sourceNode;
+    connection.sourceOutputNumber = sourceOutputNumber;
+    connection.destNode = destNode;
+    connection.destInputNumber = destInputNumber;
+    [_connections addObject:connection];
+    
+bail:
+    
+    return connection;
+}
+
+- (void)removeConnection:(YASAudioConnection *)connection
+{
+    OSStatus err = noErr;
+    [connection retain];
+    
+    err = AUGraphDisconnectNodeInput(_graph, connection.destNode.node, connection.destInputNumber);
+    YAS_Require_NoErr(err, bail);
+    
+    [_connections removeObject:connection];
+    
+bail:
+    [connection release];
+}
+
+#pragma mark - グラフ
+
+- (void)update
+{
+    OSStatus err = AUGraphUpdate(_graph, NULL);
+    YAS_Verify_NoErr(err);
+}
+
+- (OSStatus)startGraph
+{
+    OSStatus err = noErr;
+    Boolean isInitialized = false;
+    
+    err = AUGraphIsInitialized(_graph, &isInitialized);
+    YAS_Verify_NoErr(err);
+    
+    if (!isInitialized) {
+        err = AUGraphInitialize(_graph);
+        YAS_Verify_NoErr(err);
+    }
+    
+    err = AUGraphStart(_graph);
+    YAS_Verify_NoErr(err);
+    
+    return err;
+}
+
+- (OSStatus)stopGraph
+{
+    OSStatus err = noErr;
+    Boolean isRunning = false;
+    
+    err = AUGraphIsRunning(_graph, &isRunning);
+    YAS_Verify_NoErr(err);
+    
+    if (isRunning) {
+        err = AUGraphStop(_graph);
+        YAS_Verify_NoErr(err);
+    }
+    
+    return err;
+}
+
+- (void)_uninitializeGraph
+{
+    OSStatus err = noErr;
+    Boolean isInitialized = false;
+    
+    err = AUGraphIsInitialized(_graph, &isInitialized);
+    YAS_Verify_NoErr(err);
+    
+    if (isInitialized) {
+        err = AUGraphUninitialize(_graph);
+        YAS_Verify_NoErr(err);
+    }
+}
+
+- (OSStatus)openGraph
+{
+    OSStatus err = noErr;
+    Boolean isOpen = false;
+    
+    err = AUGraphIsOpen(_graph, &isOpen);
+    YAS_Verify_NoErr(err);
+    
+    if (!isOpen) {
+        err = AUGraphOpen(_graph);
+        YAS_Verify_NoErr(err);
+    }
+    
+    return err;
+}
+
+- (OSStatus)closeGraph
+{
+    OSStatus err = noErr;
+    Boolean isOpen = false;
+    
+    err = AUGraphIsOpen(_graph, &isOpen);
+    YAS_Verify_NoErr(err);
+    
+    if (isOpen) {
+        err = AUGraphClose(_graph);
+        YAS_Verify_NoErr(err);
+    }
+    
+    return err;
+}
+
+@end
