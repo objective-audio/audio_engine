@@ -204,11 +204,5 @@ static double const SAMPLE_AFP_SAMPLERATE = 44100.0;
     [_audioLoadQueue cancelAllOperations];
     [super invalidate];
 }
-/*
-- (id)retain
-{
-    NSLog(@"%s %@", __PRETTY_FUNCTION__, [NSThread callStackSymbols]);
-    return [super retain];
-}
-*/
+
 @end
