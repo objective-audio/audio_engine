@@ -4,7 +4,7 @@
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="3747"/>
     </dependencies>
     <scenes>
-        <!--Sample Effect View Controller - Effect-->
+        <!--Sample Effect View Controller - Effect & Mixer-->
         <scene sceneID="ufC-wZ-h7g">
             <objects>
                 <viewController id="vXZ-lx-hvc" customClass="YASSampleEffectViewController" sceneMemberID="viewController">
@@ -59,9 +59,9 @@
                                 </connections>
                             </slider>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="N5a-Rg-3I9">
-                                <rect key="frame" x="20" y="480" width="154" height="30"/>
+                                <rect key="frame" x="167" y="480" width="133" height="30"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <state key="normal" title="Add Delay Connection">
+                                <state key="normal" title="Add Delay Connect">
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <connections>
@@ -69,9 +69,9 @@
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="dbT-eR-ATF">
-                                <rect key="frame" x="20" y="518" width="182" height="30"/>
+                                <rect key="frame" x="138" y="518" width="162" height="30"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <state key="normal" title="Remove Delay Connection">
+                                <state key="normal" title="Remove Delay Connect">
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <connections>
@@ -79,7 +79,7 @@
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="AfP-cT-kCO">
-                                <rect key="frame" x="20" y="404" width="90" height="30"/>
+                                <rect key="frame" x="210" y="404" width="90" height="30"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <state key="normal" title="Setup Nodes">
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
@@ -89,7 +89,7 @@
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="uK0-OH-Tyi">
-                                <rect key="frame" x="20" y="442" width="105" height="30"/>
+                                <rect key="frame" x="195" y="442" width="105" height="30"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <state key="normal" title="Dispose Nodes">
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
@@ -129,17 +129,17 @@
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <constraints>
-                            <constraint firstItem="dbT-eR-ATF" firstAttribute="leading" secondItem="kh9-bI-dsS" secondAttribute="leading" constant="20" id="8YU-Q5-Jk1"/>
-                            <constraint firstItem="N5a-Rg-3I9" firstAttribute="top" secondItem="uK0-OH-Tyi" secondAttribute="bottom" constant="8" id="P7z-Tn-v11"/>
-                            <constraint firstItem="N5a-Rg-3I9" firstAttribute="leading" secondItem="kh9-bI-dsS" secondAttribute="leading" constant="20" id="R3v-4R-LhS"/>
-                            <constraint firstItem="uK0-OH-Tyi" firstAttribute="top" secondItem="AfP-cT-kCO" secondAttribute="bottom" constant="8" id="WKn-QE-lAq"/>
-                            <constraint firstItem="9m2-7F-IhO" firstAttribute="top" secondItem="dbT-eR-ATF" secondAttribute="bottom" constant="20" id="fLp-M3-Zqf"/>
-                            <constraint firstItem="uK0-OH-Tyi" firstAttribute="leading" secondItem="kh9-bI-dsS" secondAttribute="leading" constant="20" id="iQt-2K-sVr"/>
-                            <constraint firstItem="dbT-eR-ATF" firstAttribute="top" secondItem="N5a-Rg-3I9" secondAttribute="bottom" constant="8" id="jpe-7X-6ty"/>
-                            <constraint firstItem="AfP-cT-kCO" firstAttribute="leading" secondItem="kh9-bI-dsS" secondAttribute="leading" constant="20" id="mag-7W-c0U"/>
+                            <constraint firstItem="uK0-OH-Tyi" firstAttribute="top" secondItem="AfP-cT-kCO" secondAttribute="bottom" constant="8" id="8d5-XD-PF8"/>
+                            <constraint firstAttribute="trailing" secondItem="AfP-cT-kCO" secondAttribute="trailing" constant="20" id="FtX-v8-DVc"/>
+                            <constraint firstAttribute="trailing" secondItem="uK0-OH-Tyi" secondAttribute="trailing" constant="20" id="LkM-Hh-a7g"/>
+                            <constraint firstAttribute="trailing" secondItem="N5a-Rg-3I9" secondAttribute="trailing" constant="20" id="Q9d-kC-jzo"/>
+                            <constraint firstAttribute="trailing" secondItem="dbT-eR-ATF" secondAttribute="trailing" constant="20" id="TGY-6a-tBu"/>
+                            <constraint firstItem="9m2-7F-IhO" firstAttribute="top" secondItem="dbT-eR-ATF" secondAttribute="bottom" constant="20" id="U0b-MM-ZPh"/>
+                            <constraint firstItem="dbT-eR-ATF" firstAttribute="top" secondItem="N5a-Rg-3I9" secondAttribute="bottom" constant="8" id="pSa-ee-UYU"/>
+                            <constraint firstItem="N5a-Rg-3I9" firstAttribute="top" secondItem="uK0-OH-Tyi" secondAttribute="bottom" constant="8" id="sNh-4X-gOr"/>
                         </constraints>
                     </view>
-                    <navigationItem key="navigationItem" title="Effect" id="0f0-cA-kaD"/>
+                    <navigationItem key="navigationItem" title="Effect &amp; Mixer" id="0f0-cA-kaD"/>
                     <connections>
                         <outlet property="addDelayConnectionButton" destination="N5a-Rg-3I9" id="xyb-hl-jNO"/>
                         <outlet property="delayFeedbackSlider" destination="nNs-en-kAK" id="qta-dQ-2ID"/>
@@ -156,7 +156,7 @@
             </objects>
             <point key="canvasLocation" x="765" y="-1406"/>
         </scene>
-        <!--Table View Controller - Root View Controller-->
+        <!--Table View Controller - Root-->
         <scene sceneID="A8A-Ay-xdz">
             <objects>
                 <tableViewController id="gY4-d6-v5D" sceneMemberID="viewController">
@@ -174,7 +174,7 @@
                                             <rect key="frame" x="0.0" y="0.0" width="287" height="43"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <label opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="left" text="Effect" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="3bg-FS-4f9">
+                                                <label opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="left" text="Effect &amp; Mixer" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="3bg-FS-4f9">
                                                     <rect key="frame" x="15" y="0.0" width="270" height="43"/>
                                                     <autoresizingMask key="autoresizingMask"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="18"/>
@@ -231,7 +231,7 @@
                             </tableViewSection>
                         </sections>
                     </tableView>
-                    <navigationItem key="navigationItem" title="Root View Controller" id="V9d-Jb-0HN"/>
+                    <navigationItem key="navigationItem" title="Root" id="V9d-Jb-0HN"/>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="EF8-TZ-DJC" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
@@ -249,14 +249,14 @@
                         <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
-                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Input Volume" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="fsr-1q-naB">
+                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Input Volume" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="fsr-1q-naB">
                                 <rect key="frame" x="20" y="87" width="101" height="21"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <slider opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="0.5" minValue="0.0" maxValue="1" translatesAutoresizingMaskIntoConstraints="NO" id="QdM-fC-yj2">
+                            <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="0.5" minValue="0.0" maxValue="1" translatesAutoresizingMaskIntoConstraints="NO" id="QdM-fC-yj2">
                                 <rect key="frame" x="18" y="116" width="284" height="34"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <connections>
@@ -265,6 +265,13 @@
                             </slider>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="fsr-1q-naB" firstAttribute="top" secondItem="ezI-jy-IL4" secondAttribute="bottom" constant="23" id="CH9-HD-UHe"/>
+                            <constraint firstItem="fsr-1q-naB" firstAttribute="leading" secondItem="Ivj-vE-REg" secondAttribute="leading" constant="20" id="p8U-YZ-pRn"/>
+                            <constraint firstItem="QdM-fC-yj2" firstAttribute="leading" secondItem="Ivj-vE-REg" secondAttribute="leading" constant="20" id="qpv-0W-oox"/>
+                            <constraint firstAttribute="trailing" secondItem="QdM-fC-yj2" secondAttribute="trailing" constant="20" id="ssV-HU-Zsh"/>
+                            <constraint firstItem="QdM-fC-yj2" firstAttribute="top" secondItem="fsr-1q-naB" secondAttribute="bottom" constant="8" id="uRK-Gc-PDc"/>
+                        </constraints>
                     </view>
                     <navigationItem key="navigationItem" title="IO Through" id="Ogf-3t-wEK"/>
                     <connections>
@@ -307,7 +314,7 @@
                                     <action selector="stop:" destination="gBM-D5-4xL" eventType="touchUpInside" id="G1O-jf-jfE"/>
                                 </connections>
                             </button>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="uEe-yv-uYh">
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="uEe-yv-uYh">
                                 <rect key="frame" x="20" y="82" width="92" height="30"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <state key="normal" title="Load Rhythm">
@@ -317,7 +324,7 @@
                                     <action selector="loadRhythm:" destination="gBM-D5-4xL" eventType="touchUpInside" id="H80-16-NH2"/>
                                 </connections>
                             </button>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Ozb-wr-h4z">
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Ozb-wr-h4z">
                                 <rect key="frame" x="20" y="120" width="88" height="30"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <state key="normal" title="Load Strings">
@@ -327,18 +334,34 @@
                                     <action selector="loadStrings:" destination="gBM-D5-4xL" eventType="touchUpInside" id="OjQ-qf-OAO"/>
                                 </connections>
                             </button>
-                            <slider opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="0.5" minValue="0.0" maxValue="1" translatesAutoresizingMaskIntoConstraints="NO" id="yd1-tL-5KX">
-                                <rect key="frame" x="18" y="158" width="284" height="34"/>
+                            <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="0.5" minValue="0.0" maxValue="1" translatesAutoresizingMaskIntoConstraints="NO" id="yd1-tL-5KX">
+                                <rect key="frame" x="18" y="214" width="284" height="34"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <connections>
                                     <action selector="volume:" destination="gBM-D5-4xL" eventType="valueChanged" id="bng-CI-PiB"/>
                                 </connections>
                             </slider>
+                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Volume" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="nyA-pE-Z9M">
+                                <rect key="frame" x="20" y="185" width="57" height="21"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <constraints>
                             <constraint firstItem="6qP-Ej-qJ3" firstAttribute="top" secondItem="gag-Xb-N09" secondAttribute="bottom" constant="20" id="1aB-bb-cga"/>
+                            <constraint firstAttribute="trailing" secondItem="yd1-tL-5KX" secondAttribute="trailing" constant="20" id="6DY-gi-SAC"/>
+                            <constraint firstItem="nyA-pE-Z9M" firstAttribute="leading" secondItem="AAi-Xp-GVW" secondAttribute="leading" constant="20" id="C4H-2X-9Ei"/>
+                            <constraint firstItem="uEe-yv-uYh" firstAttribute="leading" secondItem="AAi-Xp-GVW" secondAttribute="leading" constant="20" id="CSd-8H-2eg"/>
+                            <constraint firstItem="yd1-tL-5KX" firstAttribute="leading" secondItem="AAi-Xp-GVW" secondAttribute="leading" constant="20" id="Hww-hY-NaJ"/>
+                            <constraint firstItem="Ozb-wr-h4z" firstAttribute="leading" secondItem="AAi-Xp-GVW" secondAttribute="leading" constant="20" id="JXR-DI-hir"/>
                             <constraint firstItem="6qP-Ej-qJ3" firstAttribute="top" secondItem="BHE-7G-0hm" secondAttribute="bottom" constant="20" id="Ldy-JX-yFq"/>
+                            <constraint firstItem="Ozb-wr-h4z" firstAttribute="top" secondItem="uEe-yv-uYh" secondAttribute="bottom" constant="8" id="Tmf-I5-iEJ"/>
+                            <constraint firstItem="yd1-tL-5KX" firstAttribute="top" secondItem="nyA-pE-Z9M" secondAttribute="bottom" constant="8" id="axh-Z9-6VV"/>
+                            <constraint firstItem="uEe-yv-uYh" firstAttribute="top" secondItem="2lr-Bh-o0B" secondAttribute="bottom" constant="18" id="dVc-VP-Bkb"/>
+                            <constraint firstItem="nyA-pE-Z9M" firstAttribute="top" secondItem="Ozb-wr-h4z" secondAttribute="bottom" constant="35" id="nOt-ZT-4Mx"/>
                             <constraint firstAttribute="trailing" secondItem="gag-Xb-N09" secondAttribute="trailing" constant="20" id="ymd-Cg-S22"/>
                             <constraint firstItem="BHE-7G-0hm" firstAttribute="leading" secondItem="AAi-Xp-GVW" secondAttribute="leading" constant="20" id="zeZ-fZ-kd8"/>
                         </constraints>
