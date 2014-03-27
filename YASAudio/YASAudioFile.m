@@ -70,7 +70,7 @@ static BOOL OpenExtAudioFileWithFileURL(ExtAudioFileRef *extAudioFile, NSURL *ur
     YAS_Verify_NoErr(err);
     return (err == noErr) ? YES : NO;
 }
-
+/*
 static BOOL OpenExtAudioFileWithPath(ExtAudioFileRef *extAudioFile, NSString *path)
 {
     NSURL *url = [[NSURL alloc] initFileURLWithPath:path];
@@ -78,7 +78,7 @@ static BOOL OpenExtAudioFileWithPath(ExtAudioFileRef *extAudioFile, NSString *pa
     [url release];
     return result;
 }
-
+*/
 static BOOL CreateExtAudioFileWithFileURL(ExtAudioFileRef *extAudioFile, NSURL *url, AudioFileTypeID fileType, AudioStreamBasicDescription *format)
 {
     OSStatus err = ExtAudioFileCreateWithURL((CFURLRef)url, fileType, format, NULL, kAudioFileFlags_EraseFile, extAudioFile);
@@ -124,7 +124,7 @@ static AudioFileTypeID GetFileType(AudioFileID fileID)
     YAS_Verify_NoErr(err);
     return fileType;
 }
-
+/*
 static BOOL GetExtAudioFileFormat(AudioStreamBasicDescription *format, ExtAudioFileRef extAudioFile)
 {
     UInt32 size = sizeof(AudioStreamBasicDescription);
@@ -133,7 +133,7 @@ static BOOL GetExtAudioFileFormat(AudioStreamBasicDescription *format, ExtAudioF
     if (err != noErr) return NO;
     return YES;
 }
-
+*/
 static BOOL GetAudioFileFormat(AudioStreamBasicDescription *format, AudioFileID fileID)
 {
     UInt32 size = sizeof(AudioStreamBasicDescription);
