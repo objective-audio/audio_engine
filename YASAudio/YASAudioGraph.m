@@ -12,6 +12,7 @@
 #import "YASAudioUtilities.h"
 #import "YASAudioConnection.h"
 #import <AVFoundation/AVFoundation.h>
+#import <UIKit/UIKit.h>
 
 static NSMutableDictionary *g_graphs = nil;
 static NSLock *g_graphRenderLock = nil;

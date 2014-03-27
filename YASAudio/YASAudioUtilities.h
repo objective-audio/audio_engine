@@ -3,7 +3,9 @@
  * YASAudioUtility.h
  */
 
+#import <Foundation/Foundation.h>
 #import <AudioToolbox/AudioToolbox.h>
+#import <CoreGraphics/CoreGraphics.h>
 
 #pragma mark -
 #pragma mark Error Handling

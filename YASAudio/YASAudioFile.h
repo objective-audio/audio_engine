@@ -12,6 +12,7 @@
  */
 
 #import <AudioToolbox/AudioToolbox.h>
+#import <Foundation/Foundation.h>
 
 @interface YASAudioFile : NSObject
 
