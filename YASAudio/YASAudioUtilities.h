@@ -6,6 +6,7 @@
 #import <Foundation/Foundation.h>
 #import <AudioToolbox/AudioToolbox.h>
 #import <CoreGraphics/CoreGraphics.h>
+#import <mach/mach_time.h>
 
 #pragma mark -
 #pragma mark Error Handling
@@ -234,4 +235,13 @@ static void YASGetSInt16InterleavedStereoFormat(AudioStreamBasicDescription *out
 static NSTimeInterval YASSecFromFrames(UInt32 frames, Float64 sampleRate)
 {
     return (Float64)frames / sampleRate;
+}
+
+static uint64_t YASNanoSecFromHosttime(uint64_t hostTime)
+{
+    static mach_timebase_info_data_t sTimebaseInfo;
+    if ( sTimebaseInfo.denom == 0 ) {
+        (void)mach_timebase_info(&sTimebaseInfo);
+    }
+    return hostTime * sTimebaseInfo.numer / sTimebaseInfo.denom;
 }
