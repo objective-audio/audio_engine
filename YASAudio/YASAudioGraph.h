@@ -49,8 +49,15 @@
 /*! グラフの接続を更新します。 */
 - (void)update;
 
+/*! グラフを停止します */
+- (OSStatus)stopGraph;
+
+@end
+
 
 #pragma mark - YASAudio内部でのみ使用されるメソッド
+
+@interface YASAudioGraph(inner)
 
 /*! ノードのレンダー情報オブジェクトが存在するかを調べます */
 + (BOOL)containsAudioNodeRenderInfoWithGraphKey:(NSString *)graphKey nodeKey:(NSString *)nodeKey;
