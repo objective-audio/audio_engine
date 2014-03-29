@@ -49,9 +49,6 @@
 /*! グラフの接続を更新します。 */
 - (void)update;
 
-/*! グラフを停止します */
-- (OSStatus)stopGraph;
-
 @end
 
 

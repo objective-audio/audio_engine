@@ -446,11 +446,6 @@ bail:
     YAS_Verify_NoErr(err);
 }
 
-- (OSStatus)stopGraph
-{
-    return [self _stopGraph];
-}
-
 - (OSStatus)_startGraph
 {
     OSStatus err = noErr;
