@@ -120,8 +120,8 @@ static BOOL g_interrupting = NO;
     [g_graphRenderLock lock];
     
     graph = [g_graphs objectForKey:key];
-    YASRetain(graph)
-    YASAutorelease(graph);
+    YASAudioRetain(graph)
+    YASAudioAutorelease(graph);
     
     [g_graphRenderLock unlock];
     
@@ -185,7 +185,7 @@ static BOOL g_interrupting = NO;
     if (!renderInfo) {
         renderInfo = [[YASAudioNodeRenderInfo alloc] initWithGraphKey:graphKey nodeKey:nodeKey];
         [graphInfos setObject:renderInfo forKey:nodeKey];
-        YASRelease(renderInfo);
+        YASAudioRelease(renderInfo);
     }
     
     return renderInfo;
@@ -219,7 +219,7 @@ static BOOL g_interrupting = NO;
     YAS_Require_NoErr(err, bail);
     
     _ioNode = [self _addIONode];
-    YASRetain(_ioNode);
+    YASAudioRetain(_ioNode);
     
 bail:
     if (err) {
@@ -235,7 +235,7 @@ bail:
 + (id)graph
 {
     id graph = [[[self class] alloc] init];
-    YASAutorelease(graph);
+    YASAudioAutorelease(graph);
     return graph;
 }
 
@@ -249,10 +249,10 @@ bail:
         _running = NO;
         
         _identifier = [YASAudioGraph _uniqueString];
-        YASRetain(_identifier);
+        YASAudioRetain(_identifier);
         
         if (![self _setupAUGraph]) {
-            YASRelease(self);
+            YASAudioRelease(self);
             self = nil;
         } else {
             [YASAudioGraph _addGraph:self];
@@ -276,11 +276,11 @@ bail:
     
     _auGraph = 0;
     
-    YASRelease(_identifier);
-    YASRelease(_nodes);
-    YASRelease(_connections);
-    YASRelease(_ioNode);
-    YASSuperDealloc;
+    YASAudioRelease(_identifier);
+    YASAudioRelease(_nodes);
+    YASAudioRelease(_connections);
+    YASAudioRelease(_ioNode);
+    YASAudioSuperDealloc;
 }
 
 - (void)invalidate
@@ -319,8 +319,8 @@ bail:
     
     @synchronized(self) {
         node = [_nodes objectForKey:key];
-        YASRetain(node);
-        YASAutorelease(node);
+        YASAudioRetain(node);
+        YASAudioAutorelease(node);
     }
     
     return node;
@@ -351,7 +351,7 @@ bail:
     
     YASAudioNode *newNode = [[YASAudioNode alloc] initWithGraph:self acd:&acd];
     [self _setNodeToNodesSynchronized:newNode];
-    YASRelease(newNode);
+    YASAudioRelease(newNode);
     
     return newNode;
 }
@@ -367,7 +367,7 @@ bail:
     
     YASAudioIONode *newNode = [[YASAudioIONode alloc] initWithGraph:self acd:&acd];
     [self _setNodeToNodesSynchronized:newNode];
-    YASRelease(newNode);
+    YASAudioRelease(newNode);
     
     return newNode;
 }
@@ -386,7 +386,7 @@ bail:
         [_connections removeObject:connection];
     }
     
-    YASRelease(removeConSet);
+    YASAudioRelease(removeConSet);
     
     [node remove];
     [self _removeNodeFromNodesSynchronized:node];
@@ -404,7 +404,7 @@ bail:
         [self removeNode:node];
     }
     
-    YASRelease(tmpSet);
+    YASAudioRelease(tmpSet);
 }
 
 - (YASAudioNode *)nodeForKey:(NSString *)key
@@ -429,7 +429,7 @@ bail:
     connection.destNode = destNode;
     connection.destInputNumber = destInputNumber;
     [_connections addObject:connection];
-    YASAutorelease(connection);
+    YASAudioAutorelease(connection);
     
 bail:
     
@@ -439,7 +439,7 @@ bail:
 - (void)removeConnection:(YASAudioConnection *)connection
 {
     OSStatus err = noErr;
-    YASRetain(connection);
+    YASAudioRetain(connection);
     
     err = AUGraphDisconnectNodeInput(_auGraph, connection.destNode.node, connection.destInputNumber);
     YAS_Require_NoErr(err, bail);
@@ -447,7 +447,7 @@ bail:
     [_connections removeObject:connection];
     
 bail:
-    YASRelease(connection);
+    YASAudioRelease(connection);
 }
 
 #pragma mark - グラフ

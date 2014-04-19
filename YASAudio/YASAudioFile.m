@@ -176,7 +176,7 @@ static NSDictionary *GetInfoDictionary(AudioFileID fileID)
     if (err != noErr) return nil;
     
     NSDictionary *dict = CFBridgingRelease(cfdict);
-    YASAutorelease(dict);
+    YASAudioAutorelease(dict);
     return dict;
 }
 
@@ -246,7 +246,7 @@ static BOOL CanOpenAudioFile(NSURL *url)
 {
     NSURL *url = [[NSURL alloc] initFileURLWithPath:path];
     id result = [self initWithURL:url];
-    YASRelease(url);
+    YASAudioRelease(url);
     
     return result;
 }
@@ -257,7 +257,7 @@ static BOOL CanOpenAudioFile(NSURL *url)
     if (self != nil) {
         
         _url = url;
-        YASRetain(_url);
+        YASAudioRetain(_url);
         
         _extAudioFileRef = NULL;
         _fileType = kAudioFileWAVEType;
@@ -318,8 +318,8 @@ static BOOL CanOpenAudioFile(NSURL *url)
 - (void) dealloc
 {
     if (_extAudioFileRef) [self close];
-    YASRelease(_url);
-    YASSuperDealloc
+    YASAudioRelease(_url);
+    YASAudioSuperDealloc
 }
 
 #pragma mark アクセサ

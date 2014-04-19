@@ -47,7 +47,7 @@ static double const SAMPLE_AFP_SAMPLERATE = 44100.0;
 {
     NSLock *loadingLock = [[NSLock alloc] init];
     self.loadingLock = loadingLock;
-    YASRelease(loadingLock);
+    YASAudioRelease(loadingLock);
     
     AudioStreamBasicDescription format;
     YASGetSInt16InterleavedStereoFormat(&format, SAMPLE_AFP_SAMPLERATE);
@@ -118,7 +118,7 @@ static double const SAMPLE_AFP_SAMPLERATE = 44100.0;
 {
     NSOperationQueue *queue = [[NSOperationQueue alloc] init];
     self.audioLoadQueue = queue;
-    YASRelease(queue);
+    YASAudioRelease(queue);
     
     _audioLoadQueue.maxConcurrentOperationCount = 1;
     
@@ -130,10 +130,10 @@ static double const SAMPLE_AFP_SAMPLERATE = 44100.0;
 
 - (void)dealloc
 {
-    YASRelease(_loadingLock);
-    YASRelease(_audioBufferList);
-    YASRelease(_audioLoadQueue);
-    YASSuperDealloc;
+    YASAudioRelease(_loadingLock);
+    YASAudioRelease(_audioBufferList);
+    YASAudioRelease(_audioLoadQueue);
+    YASAudioSuperDealloc;
 }
 
 - (void)setAudioFileURL:(NSURL *)url
@@ -184,7 +184,7 @@ static double const SAMPLE_AFP_SAMPLERATE = 44100.0;
             }
         }
         
-        YASRelease(audioFile);
+        YASAudioRelease(audioFile);
         
         self.playFrame = 0;
         
@@ -193,7 +193,7 @@ static double const SAMPLE_AFP_SAMPLERATE = 44100.0;
     }];
     
     [_audioLoadQueue addOperation:operation];
-    YASRelease(operation);
+    YASAudioRelease(operation);
 }
 
 - (void)play

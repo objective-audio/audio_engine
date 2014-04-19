@@ -18,7 +18,7 @@
 + (id)audioBufferListWithBufferCount:(NSUInteger)bufferCount channels:(NSUInteger)ch bufferSize:(NSUInteger)size
 {
     YASAudioBufferList *audioBufferList = [[YASAudioBufferList alloc] initWithBufferCount:bufferCount channels:ch bufferSize:size];
-    YASAutorelease(audioBufferList);
+    YASAudioAutorelease(audioBufferList);
     return audioBufferList;
 }
 
@@ -37,7 +37,7 @@
 - (void)dealloc
 {
     YASRemoveAudioBufferList(_audioBufferList);
-    YASSuperDealloc;
+    YASAudioSuperDealloc;
 }
 
 - (void *)dataAtBufferIndex:(NSUInteger)bufferIndex

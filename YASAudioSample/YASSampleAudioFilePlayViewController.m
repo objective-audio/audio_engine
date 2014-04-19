@@ -21,8 +21,8 @@
 
 - (void)dealloc
 {
-    YASRelease(_graph);
-    YASSuperDealloc;
+    YASAudioRelease(_graph);
+    YASAudioSuperDealloc;
 }
 
 - (void)viewDidAppear:(BOOL)animated

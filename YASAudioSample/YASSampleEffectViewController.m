@@ -29,7 +29,7 @@
 - (void)dealloc
 {
     self.graph = nil;
-    YASSuperDealloc;
+    YASAudioSuperDealloc;
 }
 
 - (void)viewDidAppear:(BOOL)animated

@@ -30,9 +30,9 @@
 
 - (void)dealloc
 {
-    YASRelease(_graphKey);
-    YASRelease(_nodeKey);
-    YASSuperDealloc;
+    YASAudioRelease(_graphKey);
+    YASAudioRelease(_nodeKey);
+    YASAudioSuperDealloc;
 }
 
 @end

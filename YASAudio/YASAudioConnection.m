@@ -13,9 +13,9 @@
 @implementation YASAudioConnection
 
 - (void)dealloc {
-    YASRelease(_sourceNode);
-    YASRelease(_destNode);
-    YASSuperDealloc;
+    YASAudioRelease(_sourceNode);
+    YASAudioRelease(_destNode);
+    YASAudioSuperDealloc;
 }
 
 @end

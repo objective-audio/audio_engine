@@ -115,7 +115,7 @@ static OSStatus NotifyRenderCallback(void *							inRefCon,
         
         _graph = graph;
         _identifier = [YASAudioNode uniqueStringWithGraph:graph];
-        YASRetain(_identifier);
+        YASAudioRetain(_identifier);
         
         OSStatus err = noErr;
         err = AUGraphAddNode(graph.auGraph, acd, &_node);
@@ -126,7 +126,7 @@ static OSStatus NotifyRenderCallback(void *							inRefCon,
         
     bail:
         if (err) {
-            YASRelease(self);
+            YASAudioRelease(self);
             self = nil;
         }
     }
@@ -145,10 +145,10 @@ static OSStatus NotifyRenderCallback(void *							inRefCon,
 
 - (void)_releaseVariables
 {
-    YASRelease(_renderCallbackBlock);
-    YASRelease(_notifyRenderCallbackBlock);
-    YASRelease(_outputChannelMapArray);
-    YASRelease(_identifier);
+    YASAudioRelease(_renderCallbackBlock);
+    YASAudioRelease(_notifyRenderCallbackBlock);
+    YASAudioRelease(_outputChannelMapArray);
+    YASAudioRelease(_identifier);
     _renderCallbackBlock = nil;
     _notifyRenderCallbackBlock = nil;
     _outputChannelMapArray = nil;
@@ -158,7 +158,7 @@ static OSStatus NotifyRenderCallback(void *							inRefCon,
 - (void)dealloc {
     [self remove];
     [self _releaseVariables];
-    YASSuperDealloc;
+    YASAudioSuperDealloc;
 }
 
 #pragma mark - AudioUnit全般
@@ -372,7 +372,7 @@ static OSStatus InputRenderCallback(void *							inRefCon,
 - (void)_releaseVariables
 {
     [super _releaseVariables];
-    YASRelease(_inputRenderCallbackBlock);
+    YASAudioRelease(_inputRenderCallbackBlock);
     _inputRenderCallbackBlock = NULL;
 }
 

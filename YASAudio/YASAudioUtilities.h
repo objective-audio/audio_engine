@@ -68,20 +68,20 @@ do                                                                      \
 #pragma mark -
 
 #if ! __has_feature(objc_arc)
-    #define YASAutorelease(__v) ([__v autorelease]);
-    #define YASRetain(__v) ([__v retain]);
-    #define YASRelease(__v) ([__v release]);
-    #define YASSuperDealloc [super dealloc];
-    #define YASDispatchQueueRelease(__v) (dispatch_release(__v));
+    #define YASAudioAutorelease(__v) ([__v autorelease]);
+    #define YASAudioRetain(__v) ([__v retain]);
+    #define YASAudioRelease(__v) ([__v release]);
+    #define YASAudioSuperDealloc [super dealloc];
+    #define YASAudioDispatchQueueRelease(__v) (dispatch_release(__v));
 #else
-    #define YASAutorelease(__v)
-    #define YASRetain(__v)
-    #define YASRelease(__v)
-    #define YASSuperDealloc
+    #define YASAudioAutorelease(__v)
+    #define YASAudioRetain(__v)
+    #define YASAudioRelease(__v)
+    #define YASAudioSuperDealloc
     #if OS_OBJECT_USE_OBJC
-        #define YASDispatchQueueRelease(__v)
+        #define YASAudioDispatchQueueRelease(__v)
     #else
-        #define YASDispatchQueueRelease(__v) (dispatch_release(__v));
+        #define YASAudioDispatchQueueRelease(__v) (dispatch_release(__v));
     #endif
 #endif
 
