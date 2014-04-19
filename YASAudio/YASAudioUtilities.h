@@ -63,6 +63,27 @@ do                                                                      \
 
 #endif
 
+#pragma mark -
+#pragma mark Automatic Reference Counting
+#pragma mark -
+
+#if ! __has_feature(objc_arc)
+    #define YASAutorelease(__v) ([__v autorelease]);
+    #define YASRetain(__v) ([__v retain]);
+    #define YASRelease(__v) ([__v release]);
+    #define YASSuperDealloc [super dealloc];
+    #define YASDispatchQueueRelease(__v) (dispatch_release(__v));
+#else
+    #define YASAutorelease(__v)
+    #define YASRetain(__v)
+    #define YASRelease(__v)
+    #define YASSuperDealloc
+    #if OS_OBJECT_USE_OBJC
+        #define YASDispatchQueueRelease(__v)
+    #else
+        #define YASDispatchQueueRelease(__v) (dispatch_release(__v));
+    #endif
+#endif
 
 #pragma mark -
 #pragma mark Prototypes

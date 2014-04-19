@@ -29,7 +29,7 @@
 - (void)dealloc
 {
     self.graph = nil;
-    [super dealloc];
+    YASSuperDealloc;
 }
 
 - (void)viewDidAppear:(BOOL)animated

@@ -8,6 +8,7 @@
 
 #import "YASSampleAudioFilePlayViewController.h"
 #import "YASSampleAudioFilePlayGraph.h"
+#import "YASAudioUtilities.h"
 
 @interface YASSampleAudioFilePlayViewController ()
 @property (nonatomic, strong) YASSampleAudioFilePlayGraph *graph;
@@ -20,8 +21,8 @@
 
 - (void)dealloc
 {
-    [_graph release];
-    [super dealloc];
+    YASRelease(_graph);
+    YASSuperDealloc;
 }
 
 - (void)viewDidAppear:(BOOL)animated

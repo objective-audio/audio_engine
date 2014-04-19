@@ -8,6 +8,7 @@
 
 #import "YASSampleIOViewController.h"
 #import "YASSampleIOGraph.h"
+#import "YASAudioUtilities.h"
 
 @interface YASSampleIOViewController ()
 @property (nonatomic, strong) YASSampleIOGraph *graph;
@@ -18,8 +19,8 @@
 
 - (void)dealloc
 {
-    [_graph release];
-    [super dealloc];
+    YASRelease(_graph);
+    YASSuperDealloc;
 }
 
 - (void)viewDidAppear:(BOOL)animated

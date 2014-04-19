@@ -38,21 +38,21 @@ static double const SAMPLE_IO_SAMPLERATE = 44100.0;
     YASGetFloat32NonInterleavedStereoFormat(&format, SAMPLE_IO_SAMPLERATE);
     
     __block YASSampleIOGraph *weakSelf = self;
-    __block YASAudioIONode *ioNode = self.ioNode;
+    __block YASAudioIONode *weakIONode = self.ioNode;
     
-    [ioNode setEnableInput:YES];
-    [ioNode setEnableOutput:YES];
+    [self.ioNode setEnableInput:YES];
+    [self.ioNode setEnableOutput:YES];
     
-    [ioNode setInputFormat:&format busNumber:0];
-    [ioNode setOutputFormat:&format busNumber:1];
+    [self.ioNode setInputFormat:&format busNumber:0];
+    [self.ioNode setOutputFormat:&format busNumber:1];
     
-    [ioNode setRenderCallback:0];
+    [self.ioNode setRenderCallback:0];
     
-    ioNode.renderCallbackBlock = ^(YASAudioNodeRenderInfo *renderInfo) {
+    self.ioNode.renderCallbackBlock = ^(YASAudioNodeRenderInfo *renderInfo) {
         
         OSStatus err = noErr;
         
-        err = AudioUnitRender(ioNode.audioUnit, renderInfo.ioActionFlags, renderInfo.inTimeStamp, 1, renderInfo.inNumberFrames, renderInfo.ioData);
+        err = AudioUnitRender(weakIONode.audioUnit, renderInfo.ioActionFlags, renderInfo.inTimeStamp, 1, renderInfo.inNumberFrames, renderInfo.ioData);
         
         Float32 vol = weakSelf.inputVolume;
         

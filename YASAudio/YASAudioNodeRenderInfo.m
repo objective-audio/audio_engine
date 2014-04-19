@@ -8,7 +8,7 @@
  */
 
 #import "YASAudioNodeRenderInfo.h"
-
+#import "YASAudioUtilities.h"
 
 @interface YASAudioNodeRenderInfo()
 @property (nonatomic, copy) NSString *graphKey;
@@ -30,9 +30,9 @@
 
 - (void)dealloc
 {
-    [_graphKey release];
-    [_nodeKey release];
-    [super dealloc];
+    YASRelease(_graphKey);
+    YASRelease(_nodeKey);
+    YASSuperDealloc;
 }
 
 @end

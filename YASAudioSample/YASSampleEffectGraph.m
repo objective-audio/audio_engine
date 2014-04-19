@@ -115,12 +115,11 @@ static double const SAMPLE_SAMPLERATE = 44100.0;
 
 - (void)dealloc
 {
-    [_mixerNode release];
-    [_delayNode release];
-    [_mixerToIOConnection release];
-    [_delayToMixerConnection release];
-    
-    [super dealloc];
+    YASRelease(_mixerNode);
+    YASRelease(_delayNode);
+    YASRelease(_mixerToIOConnection);
+    YASRelease(_delayToMixerConnection);
+    YASSuperDealloc;
 }
 
 - (void)setMixerVolume:(AudioUnitParameterValue)val atBusIndex:(AudioUnitElement)busIndex

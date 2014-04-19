@@ -8,13 +8,14 @@
  */
 
 #import "YASAudioConnection.h"
+#import "YASAudioUtilities.h"
 
 @implementation YASAudioConnection
 
 - (void)dealloc {
-    [_sourceNode release];
-    [_destNode release];
-    [super dealloc];
+    YASRelease(_sourceNode);
+    YASRelease(_destNode);
+    YASSuperDealloc;
 }
 
 @end

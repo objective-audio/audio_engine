@@ -32,7 +32,7 @@ static OSStatus CommonRenderCallback(void *							inRefCon,
     
     @autoreleasepool {
         
-        YASAudioNodeRenderInfo *renderInfo = (YASAudioNodeRenderInfo *)inRefCon;
+        YASAudioNodeRenderInfo *renderInfo = (__bridge YASAudioNodeRenderInfo *)inRefCon;
         
         renderInfo.ioActionFlags = ioActionFlags;
         renderInfo.inTimeStamp = inTimeStamp;
@@ -114,7 +114,8 @@ static OSStatus NotifyRenderCallback(void *							inRefCon,
     if (self) {
         
         _graph = graph;
-        _identifier = [[YASAudioNode uniqueStringWithGraph:graph] retain];
+        _identifier = [YASAudioNode uniqueStringWithGraph:graph];
+        YASRetain(_identifier);
         
         OSStatus err = noErr;
         err = AUGraphAddNode(graph.auGraph, acd, &_node);
@@ -125,7 +126,7 @@ static OSStatus NotifyRenderCallback(void *							inRefCon,
         
     bail:
         if (err) {
-            [self release];
+            YASRelease(self);
             self = nil;
         }
     }
@@ -144,16 +145,20 @@ static OSStatus NotifyRenderCallback(void *							inRefCon,
 
 - (void)_releaseVariables
 {
-    [_renderCallbackBlock release];
-    [_notifyRenderCallbackBlock release];
-    [_outputChannelMapArray release];
-    [_identifier release];
+    YASRelease(_renderCallbackBlock);
+    YASRelease(_notifyRenderCallbackBlock);
+    YASRelease(_outputChannelMapArray);
+    YASRelease(_identifier);
+    _renderCallbackBlock = nil;
+    _notifyRenderCallbackBlock = nil;
+    _outputChannelMapArray = nil;
+    _identifier = nil;
 }
 
 - (void)dealloc {
     [self remove];
     [self _releaseVariables];
-    [super dealloc];
+    YASSuperDealloc;
 }
 
 #pragma mark - AudioUnit全般
@@ -166,7 +171,7 @@ static OSStatus NotifyRenderCallback(void *							inRefCon,
     
     AURenderCallbackStruct callbackStruct;
     callbackStruct.inputProc = RenderCallback;
-    callbackStruct.inputProcRefCon = renderInfo;
+    callbackStruct.inputProcRefCon = (__bridge void *)(renderInfo);
     err = AUGraphSetNodeInputCallback(_graph.auGraph, _node, inputNumber, &callbackStruct);
     YAS_Verify_NoErr(err);
 }
@@ -185,7 +190,7 @@ static OSStatus NotifyRenderCallback(void *							inRefCon,
     
     YASAudioNodeRenderInfo *renderInfo = [YASAudioGraph audioNodeRenderInfoWithGraphKey:_graph.identifier nodeKey:_identifier];
     
-    err = AudioUnitAddRenderNotify(_audioUnit, NotifyRenderCallback, renderInfo);
+    err = AudioUnitAddRenderNotify(_audioUnit, NotifyRenderCallback, (__bridge void *)(renderInfo));
     YAS_Require_NoErr(err, bail);
     
 bail:
@@ -198,7 +203,7 @@ bail:
 {
     OSStatus err = noErr;
     
-    err = AudioUnitRemoveRenderNotify(_audioUnit, NotifyRenderCallback, self);
+    err = AudioUnitRemoveRenderNotify(_audioUnit, NotifyRenderCallback, (__bridge void *)(self));
     YAS_Require_NoErr(err, bail);
     
 bail:
@@ -367,7 +372,8 @@ static OSStatus InputRenderCallback(void *							inRefCon,
 - (void)_releaseVariables
 {
     [super _releaseVariables];
-    [_inputRenderCallbackBlock release];
+    YASRelease(_inputRenderCallbackBlock);
+    _inputRenderCallbackBlock = NULL;
 }
 
 #pragma mark - RemoteIO用
@@ -440,7 +446,7 @@ bail:
     
     AURenderCallbackStruct callbackStruct;
     callbackStruct.inputProc = InputRenderCallback;
-    callbackStruct.inputProcRefCon = renderInfo;
+    callbackStruct.inputProcRefCon = (__bridge void *)(renderInfo);
     
     err = AudioUnitSetProperty(self.audioUnit, kAudioOutputUnitProperty_SetInputCallback, kAudioUnitScope_Global, 0, &callbackStruct, sizeof(AURenderCallbackStruct));
     YAS_Require_NoErr(err, bail);

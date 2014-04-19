@@ -66,7 +66,9 @@ bail:
 
 static BOOL OpenExtAudioFileWithFileURL(ExtAudioFileRef *extAudioFile, NSURL *url)
 {
-    OSStatus err = ExtAudioFileOpenURL((CFURLRef)url, extAudioFile);
+    CFURLRef cfurl = CFBridgingRetain(url);
+    OSStatus err = ExtAudioFileOpenURL(cfurl, extAudioFile);
+    CFRelease(cfurl);
     YAS_Verify_NoErr(err);
     return (err == noErr) ? YES : NO;
 }
@@ -81,7 +83,9 @@ static BOOL OpenExtAudioFileWithPath(ExtAudioFileRef *extAudioFile, NSString *pa
 */
 static BOOL CreateExtAudioFileWithFileURL(ExtAudioFileRef *extAudioFile, NSURL *url, AudioFileTypeID fileType, AudioStreamBasicDescription *format)
 {
-    OSStatus err = ExtAudioFileCreateWithURL((CFURLRef)url, fileType, format, NULL, kAudioFileFlags_EraseFile, extAudioFile);
+    CFURLRef cfurl = CFBridgingRetain(url);
+    OSStatus err = ExtAudioFileCreateWithURL(cfurl, fileType, format, NULL, kAudioFileFlags_EraseFile, extAudioFile);
+    CFRelease(cfurl);
     YAS_Verify_NoErr(err);
     return (err == noErr) ? YES : NO;
 }
@@ -104,7 +108,9 @@ static AudioFileID GetAudioFileID(ExtAudioFileRef extAudioFile)
 
 static BOOL OpenAudioFileWithFileURL(AudioFileID *fileID, NSURL *url)
 {
-    OSStatus err = AudioFileOpenURL((CFURLRef)url, kAudioFileReadPermission , kAudioFileWAVEType, fileID);
+    CFURLRef cfurl = CFBridgingRetain(url);
+    OSStatus err = AudioFileOpenURL(cfurl, kAudioFileReadPermission , kAudioFileWAVEType, fileID);
+    CFRelease(cfurl);
     YAS_Verify_NoErr(err);
     return (err == noErr) ? YES : NO;
 }
@@ -163,12 +169,15 @@ static SInt64 GetFileLengthFrames(ExtAudioFileRef extAudioFile)
 
 static NSDictionary *GetInfoDictionary(AudioFileID fileID)
 {
-    NSDictionary *dict;
-    UInt32 size = sizeof(id);
-    OSStatus err = AudioFileGetProperty(fileID, kAudioFilePropertyInfoDictionary, &size, &dict);
+    CFDictionaryRef cfdict = NULL;
+    UInt32 size = sizeof(CFDictionaryRef);
+    OSStatus err = AudioFileGetProperty(fileID, kAudioFilePropertyInfoDictionary, &size, &cfdict);
     YAS_Verify_NoErr(err);
     if (err != noErr) return nil;
-    return [dict autorelease];
+    
+    NSDictionary *dict = CFBridgingRelease(cfdict);
+    YASAutorelease(dict);
+    return dict;
 }
 
 static BOOL CanOpenAudioFile(NSURL *url)
@@ -237,7 +246,7 @@ static BOOL CanOpenAudioFile(NSURL *url)
 {
     NSURL *url = [[NSURL alloc] initFileURLWithPath:path];
     id result = [self initWithURL:url];
-    [url release];
+    YASRelease(url);
     
     return result;
 }
@@ -247,7 +256,9 @@ static BOOL CanOpenAudioFile(NSURL *url)
     self = [super init];
     if (self != nil) {
         
-        _url = [url retain];
+        _url = url;
+        YASRetain(_url);
+        
         _extAudioFileRef = NULL;
         _fileType = kAudioFileWAVEType;
         GetDefaultWaveFileFormat(&_fileFormat, 2);
@@ -307,8 +318,8 @@ static BOOL CanOpenAudioFile(NSURL *url)
 - (void) dealloc
 {
     if (_extAudioFileRef) [self close];
-    [_url release];
-    [super dealloc];
+    YASRelease(_url);
+    YASSuperDealloc
 }
 
 #pragma mark アクセサ
