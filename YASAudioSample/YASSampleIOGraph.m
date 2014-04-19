@@ -37,22 +37,27 @@ static double const SAMPLE_IO_SAMPLERATE = 44100.0;
     AudioStreamBasicDescription format;
     YASGetFloat32NonInterleavedStereoFormat(&format, SAMPLE_IO_SAMPLERATE);
     
+#if __has_feature(objc_arc)
+    __weak YASSampleIOGraph *weakSelf = self;
+    __weak YASAudioIONode *ioNode = self.ioNode;
+#else
     __block YASSampleIOGraph *weakSelf = self;
-    __block YASAudioIONode *weakIONode = self.ioNode;
+    __block YASAudioIONode *ioNode = self.ioNode;
+#endif
     
-    [self.ioNode setEnableInput:YES];
-    [self.ioNode setEnableOutput:YES];
+    [ioNode setEnableInput:YES];
+    [ioNode setEnableOutput:YES];
     
-    [self.ioNode setInputFormat:&format busNumber:0];
-    [self.ioNode setOutputFormat:&format busNumber:1];
+    [ioNode setInputFormat:&format busNumber:0];
+    [ioNode setOutputFormat:&format busNumber:1];
     
-    [self.ioNode setRenderCallback:0];
+    [ioNode setRenderCallback:0];
     
-    self.ioNode.renderCallbackBlock = ^(YASAudioNodeRenderInfo *renderInfo) {
+    ioNode.renderCallbackBlock = ^(YASAudioNodeRenderInfo *renderInfo) {
         
         OSStatus err = noErr;
         
-        err = AudioUnitRender(weakIONode.audioUnit, renderInfo.ioActionFlags, renderInfo.inTimeStamp, 1, renderInfo.inNumberFrames, renderInfo.ioData);
+        err = AudioUnitRender(ioNode.audioUnit, renderInfo.ioActionFlags, renderInfo.inTimeStamp, 1, renderInfo.inNumberFrames, renderInfo.ioData);
         
         Float32 vol = weakSelf.inputVolume;
         

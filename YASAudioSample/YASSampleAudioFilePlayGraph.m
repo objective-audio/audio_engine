@@ -52,7 +52,12 @@ static double const SAMPLE_AFP_SAMPLERATE = 44100.0;
     AudioStreamBasicDescription format;
     YASGetSInt16InterleavedStereoFormat(&format, SAMPLE_AFP_SAMPLERATE);
     
+#if __has_feature(objc_arc)
+    __weak YASSampleAudioFilePlayGraph *weakSelf = self;
+#else
     __block YASSampleAudioFilePlayGraph *weakSelf = self;
+#endif
+    
     const YASAudioIONode *ioNode = self.ioNode;
     
     [ioNode setInputFormat:&format busNumber:0];
@@ -141,7 +146,12 @@ static double const SAMPLE_AFP_SAMPLERATE = 44100.0;
     [_audioLoadQueue cancelAllOperations];
     
     NSBlockOperation *operation = [[NSBlockOperation alloc] init];
+    
+#if __has_feature(objc_arc)
+    __weak NSBlockOperation *weakOperation = operation;
+#else
     __block NSBlockOperation *weakOperation = operation;
+#endif
     
     [operation setThreadPriority:0.3];
     
