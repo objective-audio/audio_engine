@@ -10,39 +10,39 @@
 
 @class YASAudioConnection;
 
-/*! オーディオグラフを管理します */
+//! オーディオグラフを管理します
 @interface YASAudioGraph : NSObject
 
-@property (nonatomic, strong, readonly) NSString *identifier; /*!< グラフを識別するためのIDです */
-@property (nonatomic, assign, readonly) AUGraph auGraph; /*!< 保持しているAUGraphです */
-@property (nonatomic, strong, readonly) YASAudioIONode *ioNode; /*!< RemoteIOのノード */
-@property (nonatomic, assign) BOOL running; /*!< グラフ動作中フラグです */
+@property (nonatomic, strong, readonly) NSString *identifier; //!< グラフを識別するためのIDです
+@property (nonatomic, assign, readonly) AUGraph auGraph; //!< 保持しているAUGraphです
+@property (nonatomic, strong, readonly) YASAudioIONode *ioNode; //!< RemoteIOのノード
+@property (nonatomic, assign) BOOL running; //!< グラフ動作中フラグです
 
-/*! グラフを生成してインスタンスを返します。 */
+//! グラフを生成してインスタンスを返します。
 + (id)graph;
 
-/*! 初期化します。 */
+//! 初期化します。
 - (id)init;
 
-/*! グラフを破棄する前に、グラフを無効にします。このメソッドを呼び出さないと解放されません。 */
+//! グラフを破棄する前に、グラフを無効にします。このメソッドを呼び出さないと解放されません。
 - (void)invalidate;
 
-/*! ノードを生成・追加して返します。Type（kAudioUnitType_〜）、SubType（kAudioUnitSubType_〜） */
+//! ノードを生成・追加して返します。Type（kAudioUnitType_〜）、SubType（kAudioUnitSubType_〜）
 - (YASAudioNode *)addNodeWithType:(OSType)type subType:(OSType)subType;
 
-/*! ノードを取り除きます */
+//! ノードを取り除きます
 - (void)removeNode:(YASAudioNode *)node;
 
-/*! ノードを取得します */
+//! ノードを取得します
 - (YASAudioNode *)nodeForKey:(NSString *)key;
 
-/*! ノードの接続情報を生成・追加して返します。 */
+//! ノードの接続情報を生成・追加して返します。
 - (YASAudioConnection *)addConnectionWithSourceNode:(YASAudioNode *)sourceNode sourceOutputNumber:(UInt32)sourceOutputNumber destNode:(YASAudioNode *)destNode destInputNumber:(UInt32)destInputNumber;
 
-/*! ノード接続情報を取り除きます。 */
+//! ノード接続情報を取り除きます。
 - (void)removeConnection:(YASAudioConnection *)connection;
 
-/*! グラフの接続を更新します。 */
+//! グラフの接続を更新します。
 - (void)update;
 
 @end
@@ -50,16 +50,16 @@
 
 #pragma mark - YASAudio内部でのみ使用されるメソッド
 
-/*! YASAudio内部でのみ使用されます */
+//! YASAudio内部でのみ使用されます
 @interface YASAudioGraph(inner)
 
-/*! ノードのレンダー情報オブジェクトが存在するかを調べます */
+//! ノードのレンダー情報オブジェクトが存在するかを調べます
 + (BOOL)containsAudioNodeRenderInfoWithGraphKey:(NSString *)graphKey nodeKey:(NSString *)nodeKey;
 
-/*! ノードのレンダー情報オブジェクトをグラフから取得します。オブジェクトが生成されていない場合には生成して返します。 */
+//! ノードのレンダー情報オブジェクトをグラフから取得します。オブジェクトが生成されていない場合には生成して返します。
 + (YASAudioNodeRenderInfo *)audioNodeRenderInfoWithGraphKey:(NSString *)graphKey nodeKey:(NSString *)nodeKey;
 
-/*! レンダー情報と一致するノードでオーディオのレンダーをします */
+//! レンダー情報と一致するノードでオーディオのレンダーをします
 + (void)audioNodeRender:(YASAudioNodeRenderInfo *)renderInfo;
 
 @end
