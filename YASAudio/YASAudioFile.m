@@ -6,6 +6,7 @@
 
 #import "YASAudioFile.h"
 #import "YASAudioUtilities.h"
+#import "YASAudioMacros.h"
 
 @implementation YASAudioFile {
     

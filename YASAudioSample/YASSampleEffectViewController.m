@@ -10,6 +10,7 @@
 #import "YASAudio.h"
 #import "YASSampleEffectGraph.h"
 #import <AVFoundation/AVFoundation.h>
+#import "YASAudioMacros.h"
 
 @interface YASSampleEffectViewController ()
 @property (nonatomic, strong) YASSampleEffectGraph *graph;

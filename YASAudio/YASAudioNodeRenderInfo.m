@@ -5,7 +5,7 @@
 //
 
 #import "YASAudioNodeRenderInfo.h"
-#import "YASAudioUtilities.h"
+#import "YASAudioMacros.h"
 
 @interface YASAudioNodeRenderInfo()
 @property (nonatomic, copy) NSString *graphKey;

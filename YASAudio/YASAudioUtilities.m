@@ -1,0 +1,148 @@
+
+//
+//  YASAudioUtilities.m
+//  Created by Yuki Yasoshima
+//
+
+#import <AudioToolbox/AudioToolbox.h>
+#import <mach/mach_time.h>
+
+void YASRemoveAudioBufferList(AudioBufferList *list)
+{
+    UInt32 i;
+	
+	if(list) {
+		for(i = 0; i < list->mNumberBuffers; i++) {
+			if(list->mBuffers[i].mData)
+				free(list->mBuffers[i].mData);
+		}
+		free(list);
+	}
+}
+
+AudioBufferList *YASAllocateAudioBufferList(UInt32 bufferCount, UInt32 ch, UInt32 size)
+{
+	AudioBufferList *list;
+	UInt32 i;
+	
+	list = (AudioBufferList*)calloc(1, sizeof(AudioBufferList) + bufferCount * sizeof(AudioBuffer));
+	if(list == NULL)
+		return NULL;
+	
+	list->mNumberBuffers = bufferCount;
+	for(i = 0; i < bufferCount; ++i) {
+		list->mBuffers[i].mNumberChannels = ch;
+		list->mBuffers[i].mDataByteSize = size;
+		list->mBuffers[i].mData = malloc(size);
+		if(list->mBuffers[i].mData == NULL) {
+            YASRemoveAudioBufferList(list);
+			return NULL;
+		}
+	}
+	return list;
+}
+
+void YASClearAudioBufferList(AudioBufferList *list)
+{
+    if (list) {
+        for (NSInteger i = 0; i < list->mNumberBuffers; i++) {
+            if (list->mBuffers && list->mBuffers[i].mData) {
+                memset(list->mBuffers[i].mData, 0, list->mBuffers[i].mDataByteSize);
+            }
+        }
+    }
+}
+
+void YASFillFloat32SinewaveToAudioBufferList(AudioBufferList *list, UInt32 cycle)
+{
+    if (!list || !list->mBuffers || list->mNumberBuffers == 0) return;
+    UInt32 frames = list->mBuffers[0].mDataByteSize / sizeof(Float32);
+    
+    double onePhase = (double)cycle / (double)frames * 2.0 * M_PI;
+    for (NSInteger i = 0; i < list->mNumberBuffers; i++) {
+        Float32 *ptr = list->mBuffers[i].mData;
+        UInt32 channels = list->mBuffers[i].mNumberChannels;
+        for (NSInteger j = 0; j < frames; j++) {
+            float val = sin(onePhase * j);
+            for (NSInteger ch = 0; ch < channels; ch++) {
+                ptr[j * channels + ch] = val * 0.1f;
+            }
+        }
+    }
+}
+
+void YASFillSInt16SinewaveToAudioBufferList(AudioBufferList *list, UInt32 cycle)
+{
+    if (!list || !list->mBuffers || list->mNumberBuffers == 0) return;
+    UInt32 frames = list->mBuffers[0].mDataByteSize / sizeof(Float32);
+    
+    double onePhase = (double)cycle / (double)frames * 2.0 * M_PI;
+    for (NSInteger i = 0; i < list->mNumberBuffers; i++) {
+        SInt16 *ptr = list->mBuffers[i].mData;
+        UInt32 channels = list->mBuffers[i].mNumberChannels;
+        for (NSInteger j = 0; j < frames; j++) {
+            float val = sin(onePhase * j) * INT16_MAX;
+            for (NSInteger ch = 0; ch < channels; ch++) {
+                ptr[j * channels + ch] = val * 0.1f;
+            }
+        }
+    }
+}
+
+CGFloat YASDBValueFromLinearValue(CGFloat val)
+{
+    return 20.0 * log10(val);
+}
+
+CGFloat YASLinearValueFromDBValue(CGFloat val)
+{
+    return pow(10.0, val / 20.0);
+}
+
+CGFloat YASTempoValueFromSeconds(CGFloat sec)
+{
+    return pow(2, -log2(sec)) * 60.0;
+}
+
+CGFloat YASSecondsFromTempoValue(CGFloat tempo)
+{
+    return pow(2, -log2(tempo / 60.0));
+}
+
+void YASGetFloat32NonInterleavedStereoFormat(AudioStreamBasicDescription *outFormat, Float64 sampleRate)
+{
+    outFormat->mSampleRate = sampleRate;
+    outFormat->mFormatID = kAudioFormatLinearPCM;
+    outFormat->mFormatFlags = kAudioFormatFlagsNativeFloatPacked | kAudioFormatFlagIsNonInterleaved;
+    outFormat->mBitsPerChannel = 32;
+    outFormat->mChannelsPerFrame = 2;
+    outFormat->mFramesPerPacket = 1;
+    outFormat->mBytesPerFrame = outFormat->mBitsPerChannel / 8;
+    outFormat->mBytesPerPacket = outFormat->mBytesPerFrame;
+}
+
+void YASGetSInt16InterleavedStereoFormat(AudioStreamBasicDescription *outFormat, Float64 sampleRate)
+{
+    outFormat->mSampleRate = sampleRate;
+    outFormat->mFormatID = kAudioFormatLinearPCM;
+    outFormat->mFormatFlags = kAudioFormatFlagsCanonical;
+    outFormat->mBitsPerChannel = 16;
+    outFormat->mChannelsPerFrame = 2;
+    outFormat->mFramesPerPacket = 1;
+    outFormat->mBytesPerFrame = outFormat->mBitsPerChannel / 8 * outFormat->mChannelsPerFrame;
+    outFormat->mBytesPerPacket = outFormat->mBytesPerFrame;
+}
+
+NSTimeInterval YASSecFromFrames(UInt32 frames, Float64 sampleRate)
+{
+    return (Float64)frames / sampleRate;
+}
+
+uint64_t YASNanoSecFromHosttime(uint64_t hostTime)
+{
+    mach_timebase_info_data_t sTimebaseInfo;
+    if ( sTimebaseInfo.denom == 0 ) {
+        (void)mach_timebase_info(&sTimebaseInfo);
+    }
+    return hostTime * sTimebaseInfo.numer / sTimebaseInfo.denom;
+}

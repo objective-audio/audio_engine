@@ -8,7 +8,7 @@
 
 #import "YASSampleAudioFilePlayViewController.h"
 #import "YASSampleAudioFilePlayGraph.h"
-#import "YASAudioUtilities.h"
+#import "YASAudioMacros.h"
 
 @interface YASSampleAudioFilePlayViewController ()
 @property (nonatomic, strong) YASSampleAudioFilePlayGraph *graph;

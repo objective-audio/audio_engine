@@ -7,7 +7,7 @@
 #import "YASAudioNode.h"
 #import "YASAudioGraph.h"
 #import "YASAudioNodeRenderInfo.h"
-#import "YASAudioUtilities.h"
+#import "YASAudioMacros.h"
 
 @interface YASAudioNode()
 @property (nonatomic, strong) NSArray *outputChannelMapArray;

@@ -6,6 +6,7 @@
 
 #import "YASAudioBufferList.h"
 #import "YASAudioUtilities.h"
+#import "YASAudioMacros.h"
 #import <AudioToolbox/AudioToolbox.h>
 
 @implementation YASAudioBufferList {

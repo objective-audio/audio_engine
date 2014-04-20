@@ -5,7 +5,7 @@
 //
 
 #import "YASAudioConnection.h"
-#import "YASAudioUtilities.h"
+#import "YASAudioMacros.h"
 
 @implementation YASAudioConnection
 

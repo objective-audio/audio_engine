@@ -7,8 +7,8 @@
 
 #import "YASAudioGraph.h"
 #import "YASAudioNodeRenderInfo.h"
-#import "YASAudioUtilities.h"
 #import "YASAudioConnection.h"
+#import "YASAudioMacros.h"
 #import <AVFoundation/AVFoundation.h>
 #import <UIKit/UIKit.h>
 

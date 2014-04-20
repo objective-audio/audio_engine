@@ -8,7 +8,7 @@
 
 #import "YASSampleIOViewController.h"
 #import "YASSampleIOGraph.h"
-#import "YASAudioUtilities.h"
+#import "YASAudioMacros.h"
 
 @interface YASSampleIOViewController ()
 @property (nonatomic, strong) YASSampleIOGraph *graph;

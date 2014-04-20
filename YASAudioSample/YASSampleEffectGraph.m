@@ -9,6 +9,7 @@
 #import "YASSampleEffectGraph.h"
 #import "YASAudio.h"
 #import <AVFoundation/AVFoundation.h>
+#import "YASAudioMacros.h"
 
 static double const SAMPLE_SAMPLERATE = 44100.0;
 
