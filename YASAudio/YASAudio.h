@@ -1,5 +1,8 @@
 
-/*! YASAudio.h */
+//
+// YASAudio.h
+// Created by Yuki Yasoshima
+//
 
 #import "YASAudioUtilities.h"
 #import "YASAudioGraph.h"
