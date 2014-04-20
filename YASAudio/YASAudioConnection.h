@@ -8,11 +8,7 @@
 
 @class YASAudioNode;
 
-/**
- *  オーディオグラフのノードの接続情報です。<br>
- *  生成はYASAudioGraphのaddConnection〜メソッドで行ってください。<br>
- */
-
+//! オーディオグラフのノードの接続情報です
 @interface YASAudioConnection : NSObject
 
 @property (nonatomic, strong) YASAudioNode *sourceNode; //!< 接続元のノードです
@@ -21,3 +17,8 @@
 @property (nonatomic, assign) UInt32 destInputNumber; //!< 接続先のバス番号です
 
 @end
+
+/**
+ * @class YASAudioConnection
+ * 直接生成はせず、YASAudioGraphのaddConnectionWithSourceNode:sourceOutputNumber:destNode:destInputNumber:メソッドから取得してください。<br>
+ */
