@@ -1,7 +1,10 @@
 
-/**
- * YASAudioUtility.h
- */
+//
+//  YASAudioUtilities.h
+//  Created by Yuki Yasoshima
+//
+
+/*! @file */
 
 #import <Foundation/Foundation.h>
 #import <AudioToolbox/AudioToolbox.h>
