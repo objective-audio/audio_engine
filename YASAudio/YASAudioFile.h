@@ -7,12 +7,7 @@
 #import <AudioToolbox/AudioToolbox.h>
 #import <Foundation/Foundation.h>
 
-/**
- *  オーディオファイルの読み書きを行います<br>
- *  読み込む場合は、初期化した後にopenを呼んでください<br>
- *  書き込む場合は、初期化した後にcreateを呼んでください。既にファイルが存在した場合は上書きされます
- */
-
+//! オーディオファイルの読み書きを行います
 @interface YASAudioFile : NSObject
 
 @property (nonatomic, strong, readonly) NSURL *url; //!< ファイルのURL
@@ -66,4 +61,10 @@
 - (void)write:(void *)inBuffer frames:(UInt32)inFrames;
 
 @end
+
+/**
+ * @class YASAudioFile
+ *  読み込む場合は、初期化した後にopenを呼んでください<br>
+ *  書き込む場合は、初期化した後にcreateを呼んでください。既にファイルが存在した場合は上書きされます
+ */
 
