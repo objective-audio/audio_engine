@@ -6,7 +6,7 @@
 
 #import <Foundation/Foundation.h>
 
-/*! AudioBufferListのラッパーです */
+//! AudioBufferListのラッパーです
 @interface YASAudioBufferList : NSObject
 
 @property (nonatomic, assign, readonly) NSUInteger bufferCount; //!< バッファの数
