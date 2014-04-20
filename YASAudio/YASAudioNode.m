@@ -105,7 +105,7 @@ static OSStatus NotifyRenderCallback(void *							inRefCon,
     return result;
 }
 
-- (id)initWithGraph:(YASAudioGraph *)graph acd:(AudioComponentDescription *)acd
+- (instancetype)initWithGraph:(YASAudioGraph *)graph acd:(AudioComponentDescription *)acd
 {
     self = [super init];
     if (self) {

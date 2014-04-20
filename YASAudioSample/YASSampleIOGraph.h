@@ -12,6 +12,6 @@
 
 @property (assign) CGFloat inputVolume;
 
-+ (id)sampleIOGraph;
++ (instancetype)sampleIOGraph;
 
 @end

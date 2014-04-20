@@ -13,7 +13,7 @@
 @property (assign, readonly) BOOL isPlaying;
 @property (assign) CGFloat volume;
 
-+ (id)sampleAudioFilePlayGraph;
++ (instancetype)sampleAudioFilePlayGraph;
 
 - (void)setAudioFileURL:(NSURL *)url;
 

@@ -22,7 +22,7 @@ static double const SAMPLE_SAMPLERATE = 44100.0;
 
 @implementation YASSampleEffectGraph
 
-+ (id)sampleGraph
++ (instancetype)sampleGraph
 {
     id sampleGraph = [[self class] graph];
     return sampleGraph;

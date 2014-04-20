@@ -72,7 +72,7 @@ typedef void (^YASAudioNodeRenderCallbackBlock)(YASAudioNodeRenderInfo *renderIn
 - (void)render:(YASAudioNodeRenderInfo *)renderInfo;
 
 //! 初期化します
-- (id)initWithGraph:(YASAudioGraph *)graph acd:(AudioComponentDescription *)acd;
+- (instancetype)initWithGraph:(YASAudioGraph *)graph acd:(AudioComponentDescription *)acd;
 
 //! AUGraphから取り除きます
 - (void)remove;

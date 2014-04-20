@@ -19,10 +19,10 @@
 @property (nonatomic, assign) BOOL running; //!< グラフ動作中フラグです
 
 //! グラフを生成してインスタンスを返します。
-+ (id)graph;
++ (instancetype)graph;
 
 //! 初期化します。
-- (id)init;
+- (instancetype)init;
 
 //! グラフを破棄する前に、グラフを無効にします。このメソッドを呼び出さないと解放されません。
 - (void)invalidate;

@@ -14,7 +14,7 @@
 
 @implementation YASAudioNodeRenderInfo
 
-- (id)initWithGraphKey:(NSString *)graphKey nodeKey:(NSString *)nodeKey
+- (instancetype)initWithGraphKey:(NSString *)graphKey nodeKey:(NSString *)nodeKey
 {
     self = [super init];
     if (self) {

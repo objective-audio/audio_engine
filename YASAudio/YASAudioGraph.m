@@ -230,14 +230,14 @@ bail:
     return YES;
 }
 
-+ (id)graph
++ (instancetype)graph
 {
     id graph = [[[self class] alloc] init];
     YASAudioAutorelease(graph);
     return graph;
 }
 
-- (id)init
+- (instancetype)init
 {
     self = [super init];
     if (self) {

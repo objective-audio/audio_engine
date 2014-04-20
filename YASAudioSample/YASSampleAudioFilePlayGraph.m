@@ -27,7 +27,7 @@ static double const SAMPLE_AFP_SAMPLERATE = 44100.0;
 
 @implementation YASSampleAudioFilePlayGraph
 
-+ (id)sampleAudioFilePlayGraph
++ (instancetype)sampleAudioFilePlayGraph
 {
     YASSampleAudioFilePlayGraph *sampleGraph = [YASSampleAudioFilePlayGraph graph];
     

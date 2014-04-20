@@ -13,14 +13,14 @@
     AudioBufferList *_audioBufferList;
 }
 
-+ (id)audioBufferListWithBufferCount:(NSUInteger)bufferCount channels:(NSUInteger)ch bufferSize:(NSUInteger)size
++ (instancetype)audioBufferListWithBufferCount:(NSUInteger)bufferCount channels:(NSUInteger)ch bufferSize:(NSUInteger)size
 {
     YASAudioBufferList *audioBufferList = [[YASAudioBufferList alloc] initWithBufferCount:bufferCount channels:ch bufferSize:size];
     YASAudioAutorelease(audioBufferList);
     return audioBufferList;
 }
 
-- (id)initWithBufferCount:(NSUInteger)bufferCount channels:(NSUInteger)ch bufferSize:(NSUInteger)size
+- (instancetype)initWithBufferCount:(NSUInteger)bufferCount channels:(NSUInteger)ch bufferSize:(NSUInteger)size
 {
     self = [super init];
     if (self) {

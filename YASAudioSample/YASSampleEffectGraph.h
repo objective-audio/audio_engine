@@ -10,7 +10,7 @@
 
 @interface YASSampleEffectGraph : YASAudioGraph
 
-+ (id)sampleGraph;
++ (instancetype)sampleGraph;
 
 - (void)setMixerVolume:(AudioUnitParameterValue)val atBusIndex:(AudioUnitElement)busIndex;
 - (void)setDelayMix:(AudioUnitParameterValue)val;

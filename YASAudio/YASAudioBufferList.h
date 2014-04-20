@@ -14,10 +14,10 @@
 @property (nonatomic, assign, readonly) NSUInteger bufferSize; //!< １つのバッファのバイトサイズ
 
 //! YASAudioBufferListのインスタンスを生成して返します
-+ (id)audioBufferListWithBufferCount:(NSUInteger)bufferCount channels:(NSUInteger)ch bufferSize:(NSUInteger)size;
++ (instancetype)audioBufferListWithBufferCount:(NSUInteger)bufferCount channels:(NSUInteger)ch bufferSize:(NSUInteger)size;
 
 //! 初期化します
-- (id)initWithBufferCount:(NSUInteger)bufferCount channels:(NSUInteger)ch bufferSize:(NSUInteger)size;
+- (instancetype)initWithBufferCount:(NSUInteger)bufferCount channels:(NSUInteger)ch bufferSize:(NSUInteger)size;
 
 //! バッファの先頭のポインタを取得します
 - (void *)dataAtBufferIndex:(NSUInteger)bufferIndex;

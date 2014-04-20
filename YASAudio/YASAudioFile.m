@@ -240,7 +240,7 @@ static BOOL CanOpenAudioFile(NSURL *url)
 
 #pragma mark メモリ管理
 
-- (id)initWithPath:(NSString *)path
+- (instancetype)initWithPath:(NSString *)path
 {
     NSURL *url = [[NSURL alloc] initFileURLWithPath:path];
     id result = [self initWithURL:url];
@@ -249,7 +249,7 @@ static BOOL CanOpenAudioFile(NSURL *url)
     return result;
 }
 
-- (id)initWithURL:(NSURL *)url
+- (instancetype)initWithURL:(NSURL *)url
 {
     self = [super init];
     if (self != nil) {
@@ -266,7 +266,7 @@ static BOOL CanOpenAudioFile(NSURL *url)
     return self;
 }
 
-- (id)init
+- (instancetype)init
 {
     NSParameterAssert(0);
     return nil;

@@ -18,11 +18,11 @@
 @property (nonatomic, assign) BOOL loop; //!< 読み込み時にループして読み出すフラグ
 
 //! パスを指定して初期化します
-- (id)initWithPath:(NSString *)path;
+- (instancetype)initWithPath:(NSString *)path;
 
 //! URLを指定して初期化します
 
-- (id)initWithURL:(NSURL *)url;
+- (instancetype)initWithURL:(NSURL *)url;
 
 //! オーディオファイルを読み込む場合にファイルを開きます
 - (BOOL)open;

@@ -30,7 +30,7 @@ NS_ENUM(NSUInteger, YASAudioNodeRenderType) {
 @property (nonatomic, assign) AudioBufferList *ioData; //!< オーディオデータ
 
 //! 初期化します。YASAudio内部でのみ使用されます
-- (id)initWithGraphKey:(NSString *)graphKey nodeKey:(NSString *)nodeKey;
+- (instancetype)initWithGraphKey:(NSString *)graphKey nodeKey:(NSString *)nodeKey;
 
 @end
 

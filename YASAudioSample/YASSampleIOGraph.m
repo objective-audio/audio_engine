@@ -15,7 +15,7 @@ static double const SAMPLE_IO_SAMPLERATE = 44100.0;
 
 @implementation YASSampleIOGraph
 
-+ (id)sampleIOGraph
++ (instancetype)sampleIOGraph
 {
     YASSampleIOGraph *sampleGraph = [YASSampleIOGraph graph];
     
