@@ -4,7 +4,6 @@
  *  @author Yuki Yasoshima
  */
 
-#import <Foundation/Foundation.h>
 #import <AudioToolbox/AudioToolbox.h>
 
 //! AudioBufferListを生成します
@@ -20,16 +19,16 @@ void YASClearAudioBufferList(AudioBufferList *list);
 void YASFillFloat32SinewaveToAudioBufferList(AudioBufferList *list, UInt32 cycle);
 
 //! リニア値をdB値に変換します
-CGFloat YASDBValueFromLinearValue(CGFloat val);
+double YASDBValueFromLinearValue(double val);
 
 //! dB値をリニア値に変換します
-CGFloat YASLinearValueFromDBValue(CGFloat val);
+double YASLinearValueFromDBValue(double val);
 
 //! 秒数をテンポに変換します
-CGFloat YASTempoValueFromSeconds(CGFloat sec);
+double YASTempoValueFromSeconds(double sec);
 
 //! テンポを秒数に変換します
-CGFloat YASSecondsFromTempoValue(CGFloat tempo);
+double YASSecondsFromTempoValue(double tempo);
 
 //! ASBDにFloat32・NonInterleavedのデータをセットします
 void YASGetFloat32NonInterleavedStereoFormat(AudioStreamBasicDescription *outFormat, Float64 sampleRate);
@@ -38,5 +37,5 @@ void YASGetFloat32NonInterleavedStereoFormat(AudioStreamBasicDescription *outFor
 void YASGetSInt16InterleavedStereoFormat(AudioStreamBasicDescription *outFormat, Float64 sampleRate);
 
 //! フレーム数を秒数に変換します
-NSTimeInterval YASSecFromFrames(UInt32 frames, Float64 sampleRate);
+Float64 YASSecFromFrames(UInt32 frames, Float64 sampleRate);
 

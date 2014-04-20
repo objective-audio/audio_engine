@@ -89,22 +89,22 @@ void YASFillSInt16SinewaveToAudioBufferList(AudioBufferList *list, UInt32 cycle)
     }
 }
 
-CGFloat YASDBValueFromLinearValue(CGFloat val)
+double YASDBValueFromLinearValue(double val)
 {
     return 20.0 * log10(val);
 }
 
-CGFloat YASLinearValueFromDBValue(CGFloat val)
+double YASLinearValueFromDBValue(double val)
 {
     return pow(10.0, val / 20.0);
 }
 
-CGFloat YASTempoValueFromSeconds(CGFloat sec)
+double YASTempoValueFromSeconds(double sec)
 {
     return pow(2, -log2(sec)) * 60.0;
 }
 
-CGFloat YASSecondsFromTempoValue(CGFloat tempo)
+double YASSecondsFromTempoValue(double tempo)
 {
     return pow(2, -log2(tempo / 60.0));
 }
@@ -133,7 +133,7 @@ void YASGetSInt16InterleavedStereoFormat(AudioStreamBasicDescription *outFormat,
     outFormat->mBytesPerPacket = outFormat->mBytesPerFrame;
 }
 
-NSTimeInterval YASSecFromFrames(UInt32 frames, Float64 sampleRate)
+Float64 YASSecFromFrames(UInt32 frames, Float64 sampleRate)
 {
     return (Float64)frames / sampleRate;
 }
