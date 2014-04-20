@@ -1,11 +1,8 @@
 
-/**
- *
- *  YASAudioFile.m
- *
- *  Created by Yuki Yasoshima
- *
- */
+//
+//  YASAudioFile.m
+//  Created by Yuki Yasoshima
+//
 
 #import "YASAudioFile.h"
 #import "YASAudioUtilities.h"

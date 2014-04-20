@@ -1,12 +1,7 @@
 
 /**
- *
  * @class YASAudioGraph
- *
- *  AUGraphを管理します
- *
  * @author Yuki Yasoshima
- *
  */
 
 #import <Foundation/Foundation.h>
@@ -15,6 +10,7 @@
 
 @class YASAudioConnection;
 
+/*! オーディオグラフを管理します */
 @interface YASAudioGraph : NSObject
 
 @property (nonatomic, strong, readonly) NSString *identifier; /*!< グラフを識別するためのIDです */
@@ -22,7 +18,7 @@
 @property (nonatomic, strong, readonly) YASAudioIONode *ioNode; /*!< RemoteIOのノード */
 @property (nonatomic, assign) BOOL running; /*!< グラフ動作中フラグです */
 
-/*! 生成したグラフのインスタンスを返します。 */
+/*! グラフを生成してインスタンスを返します。 */
 + (id)graph;
 
 /*! 初期化します。 */
@@ -54,6 +50,7 @@
 
 #pragma mark - YASAudio内部でのみ使用されるメソッド
 
+/*! YASAudio内部でのみ使用されます */
 @interface YASAudioGraph(inner)
 
 /*! ノードのレンダー情報オブジェクトが存在するかを調べます */

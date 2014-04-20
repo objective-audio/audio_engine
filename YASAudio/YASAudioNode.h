@@ -1,13 +1,7 @@
 
-/*!
- *
+/**
  * @class YASAudioNode
- *
- *  AUGraphのノードです。<br>
- * 生成はYASAudioGraphで行ってください。
- *
  * @author Yuki Yasoshima
- *
  */
 
 #import <Foundation/Foundation.h>
@@ -17,6 +11,11 @@
 
 /*! AudioUnitのレンダーコールバックの引数そのままを渡して処理するブロック */
 typedef void (^YASAudioNodeRenderCallbackBlock)(YASAudioNodeRenderInfo *renderInfo);
+
+/**
+ * AUGraphのノードです。<br>
+ * 生成はYASAudioGraphで行ってください。
+ */
 
 @interface YASAudioNode : NSObject
 

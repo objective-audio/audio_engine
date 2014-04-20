@@ -1,16 +1,12 @@
 
 /**
- *
- * @class YASAudioBuffer
- *
- *  AudioBufferListのラッパー
- *
+ * @class YASAudioBufferList
  * @author Yuki Yasoshima
- *
  */
 
 #import <Foundation/Foundation.h>
 
+/*! AudioBufferListのラッパーです */
 @interface YASAudioBufferList : NSObject
 
 @property (nonatomic, assign, readonly) NSUInteger bufferCount; /*!< バッファの数 */

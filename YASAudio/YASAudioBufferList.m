@@ -1,11 +1,8 @@
 
-/**
- *
- *  YASAudioBufferList.m
- *
- *  Created by Yuki Yasoshima
- *
- */
+//
+//  YASAudioBufferList.m
+//  Created by Yuki Yasoshima
+//
 
 #import "YASAudioBufferList.h"
 #import "YASAudioUtilities.h"

@@ -1,11 +1,8 @@
 
-/**
- *
- *  YASAudioNode.m
- *
- *  Created by Yuki Yasoshima
- *
- */
+//
+//  YASAudioNode.m
+//  Created by Yuki Yasoshima
+//
 
 #import "YASAudioNode.h"
 #import "YASAudioGraph.h"

@@ -1,13 +1,7 @@
 
 /**
- *
  * @class YASAudioNodeRenderInfo
- *
- *  ノードのレンダー情報です。レンダーコールバックの引数に使用されます。<br>
- *  YASAudio内部で生成されますので、生成の必要はありません。
- *
  * @author Yuki Yasoshima
- *
  */
 
 #import <Foundation/Foundation.h>
@@ -20,6 +14,11 @@ NS_ENUM(NSUInteger, YASAudioNodeRenderType) {
     YASAudioNodeRenderTypeNotify, /*!< 通知 */
     YASAudioNodeRenderTypeUnknown, /*!< 不明 */
 };
+
+/**
+ *  ノードのレンダー情報です。レンダーコールバックの引数に使用されます。<br>
+ *  YASAudio内部で生成されますので、生成の必要はありません。
+ */
 
 @interface YASAudioNodeRenderInfo : NSObject
 

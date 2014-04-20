@@ -1,11 +1,8 @@
 
-/**
- *
- *  YASAudioGraphConnection.m
- *
- *  Created by Yuki Yasoshima
- *
- */
+//
+//  YASAudioGraphConnection.m
+//  Created by Yuki Yasoshima
+//
 
 #import "YASAudioConnection.h"
 #import "YASAudioUtilities.h"

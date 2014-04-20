@@ -1,18 +1,17 @@
 
 /**
- *
  * @class YASAudioFile
- *
- *  オーディオファイルの読み書きを行います<br>
- *  読み込む場合は、初期化した後にopenを呼んでください<br>
- *  書き込む場合は、初期化した後にcreateを呼んでください。既にファイルが存在した場合は上書きされます<br>
- *
  * @author Yuki Yasoshima
- *
  */
 
 #import <AudioToolbox/AudioToolbox.h>
 #import <Foundation/Foundation.h>
+
+/**
+ *  オーディオファイルの読み書きを行います<br>
+ *  読み込む場合は、初期化した後にopenを呼んでください<br>
+ *  書き込む場合は、初期化した後にcreateを呼んでください。既にファイルが存在した場合は上書きされます
+ */
 
 @interface YASAudioFile : NSObject
 

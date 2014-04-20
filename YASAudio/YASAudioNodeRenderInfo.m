@@ -1,11 +1,8 @@
 
-/**
- *
- *  YASAudioNodeRenderInfo.m
- *
- *  Created by Yuki Yasoshima
- *
- */
+//
+//  YASAudioNodeRenderInfo.m
+//  Created by Yuki Yasoshima
+//
 
 #import "YASAudioNodeRenderInfo.h"
 #import "YASAudioUtilities.h"

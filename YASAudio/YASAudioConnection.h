@@ -1,18 +1,17 @@
 
 /**
- *
- * @class YASConnection
- *
- *  オーディオグラフのノードの接続情報です。<br>
- *  生成はYASAudioGraphで行ってください。<br>
- *
+ * @class YASAudioConnection
  * @author Yuki Yasoshima
- *
  */
 
 #import <Foundation/Foundation.h>
 
 @class YASAudioNode;
+
+/**
+ *  オーディオグラフのノードの接続情報です。<br>
+ *  生成はYASAudioGraphのaddConnection〜メソッドで行ってください。<br>
+ */
 
 @interface YASAudioConnection : NSObject
 
