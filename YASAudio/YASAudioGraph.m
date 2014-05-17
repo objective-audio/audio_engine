@@ -204,6 +204,11 @@ static BOOL g_interrupting = NO;
     }
 }
 
++ (BOOL)interrupting
+{
+    return g_interrupting;
+}
+
 #pragma mark - セットアップ
 
 - (BOOL)_setupAUGraph

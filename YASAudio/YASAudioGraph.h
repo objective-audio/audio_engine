@@ -45,6 +45,9 @@
 //! グラフの接続を更新します。
 - (void)update;
 
+//! 割り込み中フラグ
++ (BOOL)interrupting;
+
 @end
 
 
