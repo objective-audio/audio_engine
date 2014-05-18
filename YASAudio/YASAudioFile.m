@@ -253,10 +253,7 @@ static BOOL CanOpenAudioFile(NSURL *url)
 {
     self = [super init];
     if (self != nil) {
-        
-        _url = url;
-        YASAudioRetain(_url);
-        
+        _url = [url copy];
         _extAudioFileRef = NULL;
         _fileType = kAudioFileWAVEType;
         GetDefaultWaveFileFormat(&_fileFormat, 2);
