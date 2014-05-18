@@ -21,7 +21,6 @@
 - (instancetype)initWithPath:(NSString *)path;
 
 //! URLを指定して初期化します
-
 - (instancetype)initWithURL:(NSURL *)url;
 
 //! オーディオファイルを読み込む場合にファイルを開きます
