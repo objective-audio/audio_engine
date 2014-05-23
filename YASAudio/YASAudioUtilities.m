@@ -140,9 +140,9 @@ Float64 YASSecFromFrames(UInt32 frames, Float64 sampleRate)
 
 uint64_t YASNanoSecFromHosttime(uint64_t hostTime)
 {
-    mach_timebase_info_data_t sTimebaseInfo;
-    if ( sTimebaseInfo.denom == 0 ) {
-        (void)mach_timebase_info(&sTimebaseInfo);
+    static mach_timebase_info_data_t sTimebaseInfo = {0, 0};
+    if (sTimebaseInfo.denom == 0) {
+        mach_timebase_info(&sTimebaseInfo);
     }
     return hostTime * sTimebaseInfo.numer / sTimebaseInfo.denom;
 }
