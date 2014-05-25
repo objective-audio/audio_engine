@@ -42,4 +42,35 @@
     XCTAssertFalse(YASIsEqualFormat(&format1a, &format2), @"");
 }
 
+- (void)testAudioBufferList
+{
+    AudioBufferList *list1, *list2;
+    const UInt32 bufCount = 2;
+    const UInt32 size = 16;
+    
+    list1 = YASAllocateAudioBufferList(bufCount, 1, size);
+    list2 = YASAllocateAudioBufferList(bufCount, 1, size);
+    
+    YASFillFloat32SinewaveToAudioBufferList(list1, 1);
+    
+    for (NSInteger i = 0; i < bufCount; i++) {
+        XCTAssertFalse(memcmp(list1->mBuffers[i].mData, list2->mBuffers[i].mData, size) == 0, @"");
+    }
+    
+    YASFillFloat32SinewaveToAudioBufferList(list2, 1);
+    
+    for (NSInteger i = 0; i < bufCount; i++) {
+        XCTAssert(memcmp(list1->mBuffers[i].mData, list2->mBuffers[i].mData, size) == 0, @"");
+    }
+    
+    const UInt32 newSize = 4;
+    YASSetDataByteSizeToAudioBufferList(list1, newSize);
+    for (NSInteger i = 0; i < bufCount; i++) {
+        XCTAssert(list1->mBuffers[i].mDataByteSize == newSize, @"");
+    }
+    
+    YASRemoveAudioBufferList(list1);
+    YASRemoveAudioBufferList(list2);
+}
+
 @end
