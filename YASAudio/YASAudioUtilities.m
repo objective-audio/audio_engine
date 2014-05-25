@@ -133,6 +133,11 @@ void YASGetSInt16InterleavedStereoFormat(AudioStreamBasicDescription *outFormat,
     outFormat->mBytesPerPacket = outFormat->mBytesPerFrame;
 }
 
+BOOL YASIsEqualFormat(AudioStreamBasicDescription *list1, AudioStreamBasicDescription *list2)
+{
+    return memcmp(list1, list2, sizeof(AudioStreamBasicDescription)) == 0;
+}
+
 Float64 YASSecFromFrames(UInt32 frames, Float64 sampleRate)
 {
     return (Float64)frames / sampleRate;

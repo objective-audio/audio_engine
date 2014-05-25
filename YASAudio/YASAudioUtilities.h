@@ -36,6 +36,9 @@ void YASGetFloat32NonInterleavedStereoFormat(AudioStreamBasicDescription *outFor
 //! ASBDにSInt16・Interleavedのデータをセットします
 void YASGetSInt16InterleavedStereoFormat(AudioStreamBasicDescription *outFormat, Float64 sampleRate);
 
+//! AudioBufferListが同じかどうかを判定します
+BOOL YASIsEqualFormat(AudioStreamBasicDescription *list1, AudioStreamBasicDescription *list2);
+
 //! フレーム数を秒数に変換します
 Float64 YASSecFromFrames(UInt32 frames, Float64 sampleRate);
 
