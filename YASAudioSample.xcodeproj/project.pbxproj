@@ -28,7 +28,7 @@
 		B698D69C1883E052004BE657 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B698D6781883E052004BE657 /* Foundation.framework */; };
 		B698D69D1883E052004BE657 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B698D67C1883E052004BE657 /* UIKit.framework */; };
 		B698D6A51883E052004BE657 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = B698D6A31883E052004BE657 /* InfoPlist.strings */; };
-		B698D6A71883E052004BE657 /* YASAudioSampleTests.m in Sources */ = {isa = PBXBuildFile; fileRef = B698D6A61883E052004BE657 /* YASAudioSampleTests.m */; };
+		B698D6A71883E052004BE657 /* YASAudioUtilitiesTests.m in Sources */ = {isa = PBXBuildFile; fileRef = B698D6A61883E052004BE657 /* YASAudioUtilitiesTests.m */; };
 		B698D6C51883E11A004BE657 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B698D6C41883E11A004BE657 /* AudioToolbox.framework */; };
 		B698D6C71883E120004BE657 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B698D6C61883E120004BE657 /* AVFoundation.framework */; };
 		B6C19BDE18A71E7400521543 /* YASAudioBufferList.m in Sources */ = {isa = PBXBuildFile; fileRef = B6C19BD218A71E7400521543 /* YASAudioBufferList.m */; };
@@ -82,7 +82,7 @@
 		B698D69A1883E052004BE657 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
 		B698D6A21883E052004BE657 /* YASAudioSampleTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "YASAudioSampleTests-Info.plist"; sourceTree = "<group>"; };
 		B698D6A41883E052004BE657 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		B698D6A61883E052004BE657 /* YASAudioSampleTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = YASAudioSampleTests.m; sourceTree = "<group>"; };
+		B698D6A61883E052004BE657 /* YASAudioUtilitiesTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = YASAudioUtilitiesTests.m; sourceTree = "<group>"; };
 		B698D6C41883E11A004BE657 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
 		B698D6C61883E120004BE657 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		B6C19BD018A71E7400521543 /* YASAudio.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YASAudio.h; sourceTree = "<group>"; };
@@ -224,7 +224,7 @@
 		B698D6A01883E052004BE657 /* YASAudioSampleTests */ = {
 			isa = PBXGroup;
 			children = (
-				B698D6A61883E052004BE657 /* YASAudioSampleTests.m */,
+				B698D6A61883E052004BE657 /* YASAudioUtilitiesTests.m */,
 				B698D6A11883E052004BE657 /* Supporting Files */,
 			);
 			path = YASAudioSampleTests;
@@ -384,7 +384,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B698D6A71883E052004BE657 /* YASAudioSampleTests.m in Sources */,
+				B698D6A71883E052004BE657 /* YASAudioUtilitiesTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
