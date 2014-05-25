@@ -53,6 +53,34 @@ void YASClearAudioBufferList(AudioBufferList *list)
     }
 }
 
+void YASCopyAudioBufferList(AudioBufferList *fromList, AudioBufferList *toList)
+{
+    if ((!fromList || !toList) ||
+        (fromList->mNumberBuffers != toList->mNumberBuffers)) {
+        return;
+    }
+    
+    NSUInteger bufferCount = fromList->mNumberBuffers;
+    
+    for (NSInteger bufIndex = 0; bufIndex < bufferCount; bufIndex++) {
+        if ((toList->mBuffers[bufIndex].mNumberChannels != fromList->mBuffers[bufIndex].mNumberChannels) ||
+            (toList->mBuffers[bufIndex].mDataByteSize < fromList->mBuffers[bufIndex].mDataByteSize)) {
+            return;
+        }
+        toList->mBuffers[bufIndex].mDataByteSize = fromList->mBuffers[bufIndex].mDataByteSize;
+        memcpy(toList->mBuffers[bufIndex].mData, fromList->mBuffers[bufIndex].mData, fromList->mBuffers[bufIndex].mDataByteSize); 
+    }
+}
+
+void YASSetDataByteSizeToAudioBufferList(AudioBufferList *list, UInt32 dataByteSize)
+{
+    if (list) {
+        for (NSInteger i = 0; i < list->mNumberBuffers; i++) {
+            list->mBuffers[i].mDataByteSize = dataByteSize;
+        }
+    }
+}
+
 void YASFillFloat32SinewaveToAudioBufferList(AudioBufferList *list, UInt32 cycle)
 {
     if (!list || !list->mBuffers || list->mNumberBuffers == 0) return;

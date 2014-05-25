@@ -15,6 +15,12 @@ void YASRemoveAudioBufferList(AudioBufferList *list);
 //! AudioBufferListのバッファをゼロでクリアします
 void YASClearAudioBufferList(AudioBufferList *list);
 
+//! AudioBufferListの内容をコピーします
+void YASCopyAudioBufferList(AudioBufferList *fromList, AudioBufferList *toList);
+
+//! AudioBufferListのdataSizeをセットします
+void YASSetDataByteSizeToAudioBufferList(AudioBufferList *list, UInt32 dataByteSize);
+
 //! AudioBufferListにサイン波を書き込みます（デバッグ用）
 void YASFillFloat32SinewaveToAudioBufferList(AudioBufferList *list, UInt32 cycle);
 
