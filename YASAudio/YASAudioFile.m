@@ -37,7 +37,7 @@ static void GetDefaultClientFormat(AudioStreamBasicDescription *format, UInt32 c
 {
     format->mSampleRate = 44100.0;
     format->mFormatID = kAudioFormatLinearPCM;
-    format->mFormatFlags = kAudioFormatFlagsCanonical;
+    format->mFormatFlags = kAudioFormatFlagIsSignedInteger | kAudioFormatFlagsNativeEndian | kAudioFormatFlagIsPacked;
     format->mBitsPerChannel = 16;
     format->mChannelsPerFrame = ch;
     format->mFramesPerPacket = 1;

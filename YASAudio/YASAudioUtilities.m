@@ -153,7 +153,7 @@ void YASGetSInt16InterleavedStereoFormat(AudioStreamBasicDescription *outFormat,
 {
     outFormat->mSampleRate = sampleRate;
     outFormat->mFormatID = kAudioFormatLinearPCM;
-    outFormat->mFormatFlags = kAudioFormatFlagsCanonical;
+    outFormat->mFormatFlags = kAudioFormatFlagIsSignedInteger | kAudioFormatFlagsNativeEndian | kAudioFormatFlagIsPacked;
     outFormat->mBitsPerChannel = 16;
     outFormat->mChannelsPerFrame = 2;
     outFormat->mFramesPerPacket = 1;
