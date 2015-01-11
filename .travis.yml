@@ -1,0 +1,10 @@
+language: objective-c
+matrix:
+  include:
+    - xcode_project: YASAudio_Tests/YASAudio_Tests.xcodeproj
+      xcode_scheme: YASAudio_Mac_Tests
+    - xcode_project: YASAudio_Tests/YASAudio_Tests.xcodeproj
+      xcode_scheme: YASAudio_iOS_Tests
+      xcode_sdk: iphonesimulator
+notifications:
+  email: false
