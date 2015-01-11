@@ -1,0 +1,6 @@
+[submodule "Submodules/YASAudioMath"]
+	path = Submodules/YASAudioMath
+	url = https://github.com/objective-audio/YASAudioMath.git
+[submodule "Submodules/YASAudioUtility"]
+	path = Submodules/YASAudioUtility
+	url = https://github.com/objective-audio/YASAudioUtility.git
