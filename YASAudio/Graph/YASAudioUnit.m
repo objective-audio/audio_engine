@@ -1,0 +1,599 @@
+//
+//  YASAudioUnit.m
+//  Copyright (c) 2015 Yuki Yasoshima.
+//
+
+#import "YASAudioUnit.h"
+#import "YASAudioGraph.h"
+#import "YASMacros.h"
+#import "YASAudioUtility.h"
+#import "NSException+YASAudio.h"
+
+#if TARGET_OS_IPHONE
+OSType const YASAudioUnitSubType_DefaultIO = kAudioUnitSubType_RemoteIO;
+#elif TARGET_OS_MAC
+OSType const YASAudioUnitSubType_DefaultIO = kAudioUnitSubType_HALOutput;
+#endif
+
+#pragma mark - C Functions
+
+static unsigned long PackRenderID(UInt8 graphID, UInt16 unitID)
+{
+    return (graphID & 0xF) + ((unitID & 0xFF) << 8);
+}
+
+static void UnpackRenderID(unsigned long number, UInt8 *graphID, UInt16 *unitID)
+{
+    *graphID = number & 0xF;
+    *unitID = (number >> 8) & 0xFF;
+}
+
+static OSStatus CommonRenderCallback(void *							inRefCon,
+                                     AudioUnitRenderActionFlags *	ioActionFlags,
+                                     const AudioTimeStamp *			inTimeStamp,
+                                     UInt32							inBusNumber,
+                                     UInt32							inNumberFrames,
+                                     AudioBufferList *				ioData,
+                                     YASAudioUnitRenderType         renderType)
+{
+    @autoreleasepool {
+        UInt8 graphID;
+        UInt16 unitID;
+        unsigned long renderID = (unsigned long)inRefCon;
+        UnpackRenderID(renderID, &graphID, &unitID);
+        
+        YASAudioUnitRenderParameters renderParameters = {
+            .inRenderType = renderType,
+            .ioActionFlags = ioActionFlags,
+            .ioTimeStamp = inTimeStamp,
+            .inBusNumber = inBusNumber,
+            .inNumberFrames = inNumberFrames,
+            .ioData = ioData,
+        };
+        
+        [YASAudioGraph audioUnitRender:&renderParameters graphKey:@(graphID) unitKey:@(unitID)];
+    }
+    
+    return noErr;
+}
+
+static OSStatus RenderCallback(void *						inRefCon,
+                               AudioUnitRenderActionFlags * ioActionFlags,
+                               const AudioTimeStamp *		inTimeStamp,
+                               UInt32						inBusNumber,
+                               UInt32						inNumberFrames,
+                               AudioBufferList *			ioData)
+{
+    return CommonRenderCallback(inRefCon, ioActionFlags, inTimeStamp, inBusNumber, inNumberFrames, ioData, YASAudioUnitRenderTypeNormal);
+}
+
+static OSStatus ClearCallback(void *						inRefCon,
+                              AudioUnitRenderActionFlags *  ioActionFlags,
+                              const AudioTimeStamp *		inTimeStamp,
+                              UInt32						inBusNumber,
+                              UInt32						inNumberFrames,
+                              AudioBufferList *				ioData)
+{
+    if (ioData) {
+        YASAudioClearAudioBufferList(ioData);
+    }
+    return noErr;
+}
+
+static OSStatus EmptyCallback(void *						inRefCon,
+                              AudioUnitRenderActionFlags *	ioActionFlags,
+                              const AudioTimeStamp *		inTimeStamp,
+                              UInt32						inBusNumber,
+                              UInt32						inNumberFrames,
+                              AudioBufferList *				ioData)
+{
+    return noErr;
+}
+
+static OSStatus NotifyRenderCallback(void *							inRefCon,
+                                     AudioUnitRenderActionFlags *	ioActionFlags,
+                                     const AudioTimeStamp *			inTimeStamp,
+                                     UInt32							inBusNumber,
+                                     UInt32							inNumberFrames,
+                                     AudioBufferList *				ioData)
+{
+    return CommonRenderCallback(inRefCon, ioActionFlags, inTimeStamp, inBusNumber, inNumberFrames, ioData, YASAudioUnitRenderTypeNotify);
+}
+
+static OSStatus InputRenderCallback(void *							inRefCon,
+                                    AudioUnitRenderActionFlags *	ioActionFlags,
+                                    const AudioTimeStamp *			inTimeStamp,
+                                    UInt32							inBusNumber,
+                                    UInt32							inNumberFrames,
+                                    AudioBufferList *				ioData)
+{
+    return CommonRenderCallback(inRefCon, ioActionFlags, inTimeStamp, inBusNumber, inNumberFrames, ioData, YASAudioUnitRenderTypeInput);
+}
+
+#pragma mark -
+#pragma mark - YASAudioUnit
+
+@interface YASAudioUnit()
+
+@property (nonatomic, copy) NSNumber *key;
+@property (nonatomic, strong) YASWeakContainer *graphContainer;
+@property (nonatomic, assign, getter=isInitialized) BOOL initialized;
+
+@end
+
+@implementation YASAudioUnit {
+    AudioUnit _audioUnitInstance;
+}
+
+#pragma mark Memory Management
+
+- (instancetype)initWithGraph:(YASAudioGraph *)graph acd:(const AudioComponentDescription *)acd
+{
+    self = [super init];
+    if (self) {
+        self.graphContainer = graph.weakContainer;
+        [self _createAudioUnit:acd];
+    }
+    return self;
+}
+
+- (void)dealloc
+{
+    [self uninitialize];
+    [self _disposeAudioUnit];
+    
+    YASRelease(_renderCallbackBlock);
+    YASRelease(_notifyCallbackBlock);
+    YASRelease(_key);
+    YASRelease(_graphContainer);
+    
+    _renderCallbackBlock = nil;
+    _notifyCallbackBlock = nil;
+    _key = nil;
+    _graphContainer = nil;
+    
+    YASSuperDealloc;
+}
+
+#pragma mark Accessor
+
+- (YASAudioGraph *)graph
+{
+    return [_graphContainer autoreleasingObject];
+}
+
+- (AudioUnit)audioUnitInstance
+{
+    return _audioUnitInstance;
+}
+
+- (void)setRenderCallback:(const UInt32)inputNumber
+{
+    NSNumber *graphKey = self.graph.key;
+    NSNumber *unitKey = self.key;
+    
+    if (!graphKey || !unitKey) {
+        YASRaiseWithReason(([NSString stringWithFormat:@"%s - graph.key or unit.key is nil", __PRETTY_FUNCTION__]));
+        return;
+    }
+    
+    unsigned long renderID = PackRenderID(graphKey.unsignedCharValue, unitKey.unsignedShortValue);
+    
+    AURenderCallbackStruct callbackStruct;
+    callbackStruct.inputProc = RenderCallback;
+    callbackStruct.inputProcRefCon = (void *)renderID;
+    YASRaiseIfAUError(AudioUnitSetProperty(_audioUnitInstance, kAudioUnitProperty_SetRenderCallback, kAudioUnitScope_Input, inputNumber, &callbackStruct, sizeof(AURenderCallbackStruct)));
+}
+
+- (void)removeRenderCallback:(const UInt32)inputNumber
+{
+    AURenderCallbackStruct callbackStruct;
+    callbackStruct.inputProc = ClearCallback;
+    callbackStruct.inputProcRefCon = NULL;
+    YASRaiseIfAUError(AudioUnitSetProperty(_audioUnitInstance, kAudioUnitProperty_SetRenderCallback, kAudioUnitScope_Input, inputNumber, &callbackStruct, sizeof(AURenderCallbackStruct)));
+}
+
+- (void)addRenderNotify
+{
+    NSNumber *graphKey = self.graph.key;
+    NSNumber *unitKey = self.key;
+    
+    if (!graphKey || !unitKey) {
+        YASRaiseWithReason(([NSString stringWithFormat:@"%s - graph or unit key is nil", __PRETTY_FUNCTION__]));
+        return;
+    }
+    
+    unsigned long renderID = PackRenderID(graphKey.unsignedCharValue, unitKey.unsignedShortValue);
+    
+    YASRaiseIfAUError(AudioUnitAddRenderNotify(_audioUnitInstance, NotifyRenderCallback, (void *)renderID));
+}
+
+- (void)removeRenderNotify
+{
+    YASRaiseIfAUError(AudioUnitRemoveRenderNotify(_audioUnitInstance, NotifyRenderCallback, NULL));
+}
+
+- (void)setInputFormat:(const AudioStreamBasicDescription *)asbd busNumber:(const UInt32)bus
+{
+    YASRaiseIfAUError(AudioUnitSetProperty(_audioUnitInstance, kAudioUnitProperty_StreamFormat, kAudioUnitScope_Input, bus, asbd, sizeof(AudioStreamBasicDescription)));
+}
+
+- (void)setOutputFormat:(const AudioStreamBasicDescription *)asbd busNumber:(const UInt32)bus
+{
+    YASRaiseIfAUError(AudioUnitSetProperty(_audioUnitInstance, kAudioUnitProperty_StreamFormat, kAudioUnitScope_Output, bus, asbd, sizeof(AudioStreamBasicDescription)));
+}
+
+- (void)getInputFormat:(AudioStreamBasicDescription *)asbd busNumber:(const UInt32)bus
+{
+    UInt32 size = sizeof(AudioStreamBasicDescription);
+    YASRaiseIfAUError(AudioUnitGetProperty(_audioUnitInstance, kAudioUnitProperty_StreamFormat, kAudioUnitScope_Input, bus, asbd, &size));
+}
+
+- (void)getOutputFormat:(AudioStreamBasicDescription *)asbd busNumber:(const UInt32)bus
+{
+    UInt32 size = sizeof(AudioStreamBasicDescription);
+    YASRaiseIfAUError(AudioUnitGetProperty(_audioUnitInstance, kAudioUnitProperty_StreamFormat, kAudioUnitScope_Output, bus, asbd, &size));
+}
+
+- (void)setMaximumFramesPerSlice:(const UInt32)frames
+{
+    YASRaiseIfAUError(AudioUnitSetProperty(_audioUnitInstance, kAudioUnitProperty_MaximumFramesPerSlice, kAudioUnitScope_Global, 0, &frames, sizeof(UInt32)));
+}
+
+- (void)setParameter:(const AudioUnitParameterID)parameterID value:(const AudioUnitParameterValue)val scope:(const AudioUnitScope)scope element:(const AudioUnitElement)element
+{
+    YASRaiseIfAUError(AudioUnitSetParameter(_audioUnitInstance, parameterID, scope, element, val, 0));
+}
+
+- (Float32)getParameter:(const AudioUnitParameterID)parameterID scope:(const AudioUnitScope)scope element:(const AudioUnitElement)element
+{
+    Float32 result = 0;
+    YASRaiseIfAUError(AudioUnitGetParameter(_audioUnitInstance, parameterID, scope, element, &result));
+    return result;
+}
+
+#pragma mark for Mixer
+
+- (void)setElementCount:(const UInt32)count scope:(const AudioUnitScope)scope
+{
+    YASRaiseIfAUError(AudioUnitSetProperty(_audioUnitInstance, kAudioUnitProperty_ElementCount, scope, 0, &count, sizeof(UInt32)));
+}
+
+- (UInt32)elementCountForScope:(const AudioUnitScope)scope
+{
+    UInt32 count = 0;
+    UInt32 size = sizeof(UInt32);
+    YASRaiseIfAUError(AudioUnitGetProperty(_audioUnitInstance, kAudioUnitProperty_ElementCount, scope, 0, &count, &size));
+    
+    return count;
+}
+
+#pragma mark Setup Audio Unit
+
+- (void)_createAudioUnit:(const AudioComponentDescription *)acd
+{
+    AudioComponent component = AudioComponentFindNext(NULL, acd);
+    if (!component) {
+        YASRaiseWithReason(([NSString stringWithFormat:@"%s Can't create audio component.", __PRETTY_FUNCTION__]));
+    }
+    
+    YASRaiseIfAUError(AudioComponentInstanceNew(component, &_audioUnitInstance));
+}
+
+- (void)_disposeAudioUnit
+{
+    if (!_audioUnitInstance) {
+        return;
+    }
+    
+    YASRaiseIfAUError(AudioComponentInstanceDispose(_audioUnitInstance));
+    
+    _audioUnitInstance = NULL;
+}
+
+- (void)initialize
+{
+    if (_initialized) {
+        return;
+    }
+    
+    if (!_audioUnitInstance) {
+        YASRaiseWithReason(([NSString stringWithFormat:@"%s AudioUnit is null.", __PRETTY_FUNCTION__]));
+    }
+    
+    YASRaiseIfAUError(AudioUnitInitialize(_audioUnitInstance));
+    
+    _initialized = YES;
+}
+
+- (void)uninitialize
+{
+    if (!_initialized) {
+        return;
+    }
+    
+    if (!_audioUnitInstance) {
+        YASRaiseWithReason(([NSString stringWithFormat:@"%s AudioUnit is null.", __PRETTY_FUNCTION__]));
+    }
+    
+    YASRaiseIfAUError(AudioUnitUninitialize(_audioUnitInstance));
+    
+    _initialized = NO;
+}
+
+#pragma mark Render thread
+
+- (void)renderCallbackBlock:(YASAudioUnitRenderParameters *)renderParameters
+{
+    YASRaiseIfMainThread;
+    
+    YASAudioUnitCallbackBlock block = NULL;
+    
+    switch (renderParameters->inRenderType) {
+        case YASAudioUnitRenderTypeNormal:
+            block = self.renderCallbackBlock;
+            break;
+        case YASAudioUnitRenderTypeNotify:
+            block = self.notifyCallbackBlock;
+            break;
+            
+        default:
+            break;
+    }
+    
+    if (block) {
+        block(renderParameters);
+    }
+}
+
+- (void)audioUnitRender:(YASAudioUnitRenderParameters *)renderParameters
+{
+    YASRaiseIfMainThread;
+    
+    YASRaiseIfAUError(AudioUnitRender(_audioUnitInstance, renderParameters->ioActionFlags, renderParameters->ioTimeStamp, renderParameters->inBusNumber, renderParameters->inNumberFrames, renderParameters->ioData));
+}
+
+@end
+
+#pragma mark - YASAudioIOUnit
+
+@implementation YASAudioIOUnit
+
+#pragma mark Memory Management
+
+- (instancetype)initWithGraph:(YASAudioGraph *)graph acd:(const AudioComponentDescription *)acd
+{
+    self = [super initWithGraph:graph acd:acd];
+    if (self) {
+        [self setEnableInput:NO];
+        [self setEnableOutput:NO];
+    }
+    return self;
+}
+
+- (void)dealloc
+{
+    YASRelease(_inputCallbackBlock);
+    
+    _inputCallbackBlock = nil;
+    
+    YASSuperDealloc;
+}
+
+#pragma mark Render thread
+
+- (void)renderCallbackBlock:(YASAudioUnitRenderParameters *)renderParameters
+{
+    YASRaiseIfMainThread;
+    
+    switch (renderParameters->inRenderType) {
+
+        case YASAudioUnitRenderTypeInput:
+        {
+            YASAudioUnitCallbackBlock block = NULL;
+            block = self.inputCallbackBlock;
+            if (block) {
+                block(renderParameters);
+            }
+        }
+            break;
+            
+        default:
+            [super renderCallbackBlock:renderParameters];
+            break;
+    }
+}
+
+#pragma mark AudioUnit
+
+- (void)removeRenderCallback:(const UInt32)inputNumber
+{
+    if (inputNumber == 0) {
+        [super removeRenderCallback:0];
+    }
+}
+
+- (BOOL)isEnableOutput
+{
+    UInt32 enableIO = 0;
+    UInt32 size = sizeof(UInt32);
+    YASRaiseIfAUError(AudioUnitGetProperty(self.audioUnitInstance, kAudioOutputUnitProperty_EnableIO, kAudioUnitScope_Output, 0, &enableIO, &size));
+    
+    return enableIO;
+}
+
+- (BOOL)isEnableInput
+{
+    UInt32 enableIO = 0;
+    UInt32 size = sizeof(UInt32);
+    YASRaiseIfAUError(AudioUnitGetProperty(self.audioUnitInstance, kAudioOutputUnitProperty_EnableIO, kAudioUnitScope_Input, 1, &enableIO, &size));
+    
+    return enableIO;
+}
+
+- (void)setEnableOutput:(BOOL)b
+{
+    if (!self.hasOutput) {
+        return;
+    }
+    
+    if (self.isEnableOutput == b) {
+        return;
+    }
+    
+    if (self.isInitialized) {
+        YASRaiseWithReason(([NSString stringWithFormat:@"%s - AudioUnit is initialized.", __PRETTY_FUNCTION__]));
+        return;
+    }
+    
+    UInt32 enableIO = b ? 1 : 0;
+    YASRaiseIfAUError(AudioUnitSetProperty(self.audioUnitInstance, kAudioOutputUnitProperty_EnableIO, kAudioUnitScope_Output, 0, &enableIO, sizeof(UInt32)));
+}
+
+- (void)setEnableInput:(BOOL)b
+{
+    if (!self.hasInput) {
+        return;
+    }
+    
+    if (self.isEnableInput == b) {
+        return;
+    }
+    
+    if (self.isInitialized) {
+        YASRaiseWithReason(([NSString stringWithFormat:@"%s - AudioUnit is initialized.", __PRETTY_FUNCTION__]));
+        return;
+    }
+    
+    UInt32 enableIO = b ? 1 : 0;
+    YASRaiseIfAUError(AudioUnitSetProperty(self.audioUnitInstance, kAudioOutputUnitProperty_EnableIO, kAudioUnitScope_Input, 1, &enableIO, sizeof(UInt32)));
+}
+
+- (BOOL)hasOutput
+{
+#if TARGET_OS_IPHONE
+    return YES;
+#elif TARGET_OS_MAC
+    UInt32 hasIO = 0;
+    UInt32 size = sizeof(UInt32);
+    YASRaiseIfAUError(AudioUnitGetProperty(self.audioUnitInstance, kAudioOutputUnitProperty_HasIO, kAudioUnitScope_Output, 0, &hasIO, &size));
+    return hasIO;
+#endif
+}
+
+- (BOOL)hasInput
+{
+#if TARGET_IPHONE_SIMULATOR
+    return YES;
+#elif TARGET_OS_IPHONE
+    return [AVAudioSession sharedInstance].isInputAvailable;
+#elif TARGET_OS_MAC
+    UInt32 hasIO = 0;
+    UInt32 size = sizeof(UInt32);
+    YASRaiseIfAUError(AudioUnitGetProperty(self.audioUnitInstance, kAudioOutputUnitProperty_HasIO, kAudioUnitScope_Input, 1, &hasIO, &size));
+    return hasIO;
+#endif
+}
+
+- (BOOL)isRunning
+{
+    UInt32 isRunning = 0;
+    UInt32 size = sizeof(UInt32);
+    YASRaiseIfAUError(AudioUnitGetProperty(self.audioUnitInstance, kAudioOutputUnitProperty_IsRunning, kAudioUnitScope_Global, 0, &isRunning, &size));
+    
+    return isRunning != 0;
+}
+
+- (void)setInputCallback
+{
+    NSNumber *graphKey = [self graph].key;
+    NSNumber *unitKey = self.key;
+    
+    if (!graphKey || !unitKey) {
+        YASRaiseWithReason(([NSString stringWithFormat:@"%s - graph.key or unit.key is nil", __PRETTY_FUNCTION__]));
+        return;
+    }
+    
+    unsigned long renderID = PackRenderID(graphKey.unsignedCharValue, unitKey.unsignedShortValue);
+    
+    AURenderCallbackStruct callbackStruct;
+    callbackStruct.inputProc = InputRenderCallback;
+    callbackStruct.inputProcRefCon = (void *)renderID;
+    
+    YASRaiseIfAUError(AudioUnitSetProperty(self.audioUnitInstance, kAudioOutputUnitProperty_SetInputCallback, kAudioUnitScope_Global, 0, &callbackStruct, sizeof(AURenderCallbackStruct)));
+}
+
+- (void)removeInputCallback
+{
+    AURenderCallbackStruct callbackStruct;
+    callbackStruct.inputProc = EmptyCallback;
+    callbackStruct.inputProcRefCon = NULL;
+    
+    YASRaiseIfAUError(AudioUnitSetProperty(self.audioUnitInstance, kAudioOutputUnitProperty_SetInputCallback, kAudioUnitScope_Global, 0, &callbackStruct, sizeof(AURenderCallbackStruct)));
+}
+
+- (void)setChannelMap:(NSData *)mapData scope:(AudioUnitScope)scope
+{
+    const UInt32 *map = mapData.bytes;
+    UInt32 size = (UInt32)mapData.length;
+    YASRaiseIfAUError(AudioUnitSetProperty(self.audioUnitInstance, kAudioOutputUnitProperty_ChannelMap, scope, 0, map, size));
+}
+
+- (NSData *)channelMapForScope:(AudioUnitScope)scope
+{
+    AudioUnit audioUnit = self.audioUnitInstance;
+    UInt32 size = 0;
+    
+    YASRaiseIfAUError(AudioUnitGetPropertyInfo(audioUnit, kAudioOutputUnitProperty_ChannelMap, scope, 0, &size, NULL));
+    
+    if (size > 0) {
+        NSMutableData *mapData = [NSMutableData dataWithLength:size];
+        UInt32 *map = mapData.mutableBytes;
+        YASRaiseIfAUError(AudioUnitGetProperty(audioUnit, kAudioOutputUnitProperty_ChannelMap, scope, 0, map, &size));
+        return mapData;
+    } else {
+        return nil;
+    }
+}
+
+- (UInt32)channelMapCountForScope:(AudioUnitScope)scope
+{
+    UInt32 size = 0;
+    
+    YASRaiseIfAUError(AudioUnitGetPropertyInfo(self.audioUnitInstance, kAudioOutputUnitProperty_ChannelMap, scope, 0, &size, NULL));
+    
+    return size / sizeof(UInt32);
+}
+
+#if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
+- (void)setCurrentDevice:(const AudioDeviceID)currentDevice
+{
+    YASRaiseIfAUError(AudioUnitSetProperty(self.audioUnitInstance, kAudioOutputUnitProperty_CurrentDevice, kAudioUnitScope_Global, 0, &currentDevice, sizeof(AudioDeviceID)));
+}
+
+- (AudioDeviceID)currentDevice
+{
+    AudioDeviceID currentDevice = 0;
+    UInt32 size = sizeof(AudioDeviceID);
+    
+    YASRaiseIfAUError(AudioUnitGetProperty(self.audioUnitInstance, kAudioOutputUnitProperty_CurrentDevice, kAudioUnitScope_Global, 0, &currentDevice, &size));
+    
+    return currentDevice;
+}
+#endif
+
+- (void)start
+{
+    if (!self.isRunning) {
+        YASRaiseIfAUError(AudioOutputUnitStart(self.audioUnitInstance));
+    }
+}
+
+- (void)stop
+{
+    if (self.isRunning) {
+        YASRaiseIfAUError(AudioOutputUnitStop(self.audioUnitInstance));
+    }
+}
+
+@end
