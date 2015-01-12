@@ -7,15 +7,15 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		B62ED5A61A628681007DDE96 /* YASAudio_Tests.m in Sources */ = {isa = PBXBuildFile; fileRef = B62ED5A51A628681007DDE96 /* YASAudio_Tests.m */; };
-		B62ED5B61A62873A007DDE96 /* YASAudio_Tests.m in Sources */ = {isa = PBXBuildFile; fileRef = B62ED5A51A628681007DDE96 /* YASAudio_Tests.m */; };
+		B65BAA8A1A63853F00E7C3D8 /* YASAudio_Tests.m in Sources */ = {isa = PBXBuildFile; fileRef = B65BAA891A63853F00E7C3D8 /* YASAudio_Tests.m */; };
+		B65BAA8B1A63865000E7C3D8 /* YASAudio_Tests.m in Sources */ = {isa = PBXBuildFile; fileRef = B65BAA891A63853F00E7C3D8 /* YASAudio_Tests.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		B62ED5861A628554007DDE96 /* YASAudio_Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = YASAudio_Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		B62ED5A51A628681007DDE96 /* YASAudio_Tests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = YASAudio_Tests.m; path = ../../Tests/YASAudio_Tests.m; sourceTree = "<group>"; };
 		B62ED5AD1A62870F007DDE96 /* YASAudio_Mac_Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = YASAudio_Mac_Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B62ED5FD1A629B84007DDE96 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = Info.plist; path = YASAudio_Tests/Info.plist; sourceTree = SOURCE_ROOT; };
+		B65BAA891A63853F00E7C3D8 /* YASAudio_Tests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = YASAudio_Tests.m; path = YASAudio_Tests/YASAudio_Tests.m; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -56,7 +56,7 @@
 		B62ED5881A628554007DDE96 /* YASAudio_Tests */ = {
 			isa = PBXGroup;
 			children = (
-				B62ED5A51A628681007DDE96 /* YASAudio_Tests.m */,
+				B65BAA891A63853F00E7C3D8 /* YASAudio_Tests.m */,
 				B62ED5891A628554007DDE96 /* Supporting Files */,
 			);
 			name = YASAudio_Tests;
@@ -164,7 +164,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B62ED5A61A628681007DDE96 /* YASAudio_Tests.m in Sources */,
+				B65BAA8A1A63853F00E7C3D8 /* YASAudio_Tests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -172,7 +172,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B62ED5B61A62873A007DDE96 /* YASAudio_Tests.m in Sources */,
+				B65BAA8B1A63865000E7C3D8 /* YASAudio_Tests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
