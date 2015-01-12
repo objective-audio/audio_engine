@@ -24,6 +24,7 @@
 		B62ED5601A62812F007DDE96 /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
 		B62ED5621A62812F007DDE96 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		B62ED5651A62812F007DDE96 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		B65BAA881A63827500E7C3D8 /* YASMacros.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YASMacros.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -40,6 +41,7 @@
 		B62ED54C1A62812F007DDE96 = {
 			isa = PBXGroup;
 			children = (
+				B65BAA871A63827500E7C3D8 /* YASMacros */,
 				B62ED5571A62812F007DDE96 /* YASAudio_Mac */,
 				B62ED5561A62812F007DDE96 /* Products */,
 			);
@@ -74,6 +76,15 @@
 				B62ED55D1A62812F007DDE96 /* main.m */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		B65BAA871A63827500E7C3D8 /* YASMacros */ = {
+			isa = PBXGroup;
+			children = (
+				B65BAA881A63827500E7C3D8 /* YASMacros.h */,
+			);
+			name = YASMacros;
+			path = ../Submodules/YASMacros/YASMacros;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */

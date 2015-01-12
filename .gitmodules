@@ -4,3 +4,6 @@
 [submodule "Submodules/YASAudioUtility"]
 	path = Submodules/YASAudioUtility
 	url = https://github.com/objective-audio/YASAudioUtility.git
+[submodule "Submodules/YASMacros"]
+	path = Submodules/YASMacros
+	url = https://github.com/objective-audio/YASMacros.git
