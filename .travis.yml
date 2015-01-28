@@ -1,10 +1,14 @@
 language: objective-c
-matrix:
-  include:
-    - xcode_project: YASAudio_Tests/YASAudio_Tests.xcodeproj
-      xcode_scheme: YASAudio_Mac_Tests
-    - xcode_project: YASAudio_Tests/YASAudio_Tests.xcodeproj
-      xcode_scheme: YASAudio_iOS_Tests
-      xcode_sdk: iphonesimulator
+branches:
+  only:
+    - master
 notifications:
   email: false
+before_install:
+  - sudo easy_install cpp-coveralls
+script:
+  - xcodebuild -workspace YASAudio.xcworkspace -scheme YASAudio_iOS_Tests -configuration Debug OBJROOT=build -sdk iphonesimulator clean test
+  - xcodebuild -workspace YASAudio.xcworkspace -scheme YASAudio_Mac_Tests -configuration Debug OBJROOT=build -sdk macosx clean test
+  - xcodebuild -workspace YASAudio.xcworkspace -scheme YASAudio_iOS_NonARC_Tests -configuration Debug OBJROOT=build -sdk iphonesimulator clean test
+after_success:
+  - coveralls --exclude-pattern ".*Tests" --exclude-pattern ".*\.h" -e Submodules
