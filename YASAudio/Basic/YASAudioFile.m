@@ -374,7 +374,6 @@ static NSString *YASFileTypeFromAudioFileTypeID(AudioFileTypeID fileTypeID)
     self = [super init];
     if (self) {
         if (!fileURL) {
-            YASRaiseWithReason(([NSString stringWithFormat:@"%s - Argument is nil.", __PRETTY_FUNCTION__]));
             [NSError yas_error:outError code:YASAudioFileErrorCodeArgumentIsNil];
             YASRelease(self);
             return nil;

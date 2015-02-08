@@ -111,6 +111,46 @@ static OSStatus InputRenderCallback(void *							inRefCon,
 }
 
 #pragma mark -
+#pragma mark - YASAudioUnitParameterInfo
+
+@implementation YASAudioUnitParameterInfo
+
+- (instancetype)initWithAudioUnitParameterInfo:(const AudioUnitParameterInfo *)info
+{
+    self = [super init];
+    if (self) {
+        if (info->unitName != NULL) {
+            _unitName = YASRetain((__bridge NSString *)(info->unitName));
+        }
+        
+        if (info->cfNameString != NULL) {
+            _name = YASRetain((__bridge NSString *)(info->cfNameString));
+        }
+        
+        _hasClump = info->flags & kAudioUnitParameterFlag_HasClump;
+        _clumpID = info->clumpID;
+        _unit = info->unit;
+        _minValue = info->minValue;
+        _maxValue = info->maxValue;
+        _defaultValue = info->defaultValue;
+    }
+    return self;
+}
+
+- (void)dealloc
+{
+    YASRelease(_unitName);
+    YASRelease(_name);
+    
+    _unitName = nil;
+    _name = nil;
+    
+    YASSuperDealloc;
+}
+
+@end
+
+#pragma mark -
 #pragma mark - YASAudioUnit
 
 @interface YASAudioUnit()
@@ -215,22 +255,38 @@ static OSStatus InputRenderCallback(void *							inRefCon,
 
 - (void)setInputFormat:(const AudioStreamBasicDescription *)asbd busNumber:(const UInt32)bus
 {
+    if (!asbd) {
+        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Argument is nil.", __PRETTY_FUNCTION__]));
+    }
+    
     YASRaiseIfAUError(AudioUnitSetProperty(_audioUnitInstance, kAudioUnitProperty_StreamFormat, kAudioUnitScope_Input, bus, asbd, sizeof(AudioStreamBasicDescription)));
 }
 
 - (void)setOutputFormat:(const AudioStreamBasicDescription *)asbd busNumber:(const UInt32)bus
 {
+    if (!asbd) {
+        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Argument is nil.", __PRETTY_FUNCTION__]));
+    }
+    
     YASRaiseIfAUError(AudioUnitSetProperty(_audioUnitInstance, kAudioUnitProperty_StreamFormat, kAudioUnitScope_Output, bus, asbd, sizeof(AudioStreamBasicDescription)));
 }
 
 - (void)getInputFormat:(AudioStreamBasicDescription *)asbd busNumber:(const UInt32)bus
 {
+    if (!asbd) {
+        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Argument is nil.", __PRETTY_FUNCTION__]));
+    }
+    
     UInt32 size = sizeof(AudioStreamBasicDescription);
     YASRaiseIfAUError(AudioUnitGetProperty(_audioUnitInstance, kAudioUnitProperty_StreamFormat, kAudioUnitScope_Input, bus, asbd, &size));
 }
 
 - (void)getOutputFormat:(AudioStreamBasicDescription *)asbd busNumber:(const UInt32)bus
 {
+    if (!asbd) {
+        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Argument is nil.", __PRETTY_FUNCTION__]));
+    }
+    
     UInt32 size = sizeof(AudioStreamBasicDescription);
     YASRaiseIfAUError(AudioUnitGetProperty(_audioUnitInstance, kAudioUnitProperty_StreamFormat, kAudioUnitScope_Output, bus, asbd, &size));
 }
@@ -238,6 +294,14 @@ static OSStatus InputRenderCallback(void *							inRefCon,
 - (void)setMaximumFramesPerSlice:(const UInt32)frames
 {
     YASRaiseIfAUError(AudioUnitSetProperty(_audioUnitInstance, kAudioUnitProperty_MaximumFramesPerSlice, kAudioUnitScope_Global, 0, &frames, sizeof(UInt32)));
+}
+
+- (UInt32)maximumFramesPerSlice
+{
+    UInt32 frames = 0;
+    UInt32 size = sizeof(UInt32);
+    YASRaiseIfAUError(AudioUnitGetProperty(_audioUnitInstance, kAudioUnitProperty_MaximumFramesPerSlice, kAudioUnitScope_Global, 0, &frames, &size));
+    return frames;
 }
 
 - (void)setParameter:(const AudioUnitParameterID)parameterID value:(const AudioUnitParameterValue)val scope:(const AudioUnitScope)scope element:(const AudioUnitElement)element
@@ -250,6 +314,31 @@ static OSStatus InputRenderCallback(void *							inRefCon,
     Float32 result = 0;
     YASRaiseIfAUError(AudioUnitGetParameter(_audioUnitInstance, parameterID, scope, element, &result));
     return result;
+}
+
+- (YASAudioUnitParameterInfo *)parameterInfo:(const AudioUnitParameterID)parameterID scope:(const AudioUnitScope)scope
+{
+    AudioUnitParameterInfo info = {0};
+    UInt32 size = sizeof(AudioUnitParameterInfo);
+    
+    OSStatus err = noErr;
+    YASRaiseIfAUError(err = AudioUnitGetProperty(_audioUnitInstance, kAudioUnitProperty_ParameterInfo, scope, parameterID, &info, &size));
+    if (err != noErr) {
+        return nil;
+    }
+    
+    YASAudioUnitParameterInfo *parameterInfo = [[YASAudioUnitParameterInfo alloc] initWithAudioUnitParameterInfo:&info];
+    
+    if (info.flags & kAudioUnitParameterFlag_CFNameRelease) {
+        if (info.flags & kAudioUnitParameterFlag_HasCFNameString && info.cfNameString != NULL) {
+            CFRelease(info.cfNameString);
+        }
+        if (info.unit == kAudioUnitParameterUnit_CustomUnit && info.unitName != NULL) {
+            CFRelease(info.unitName);
+        }
+    }
+    
+    return YASAutorelease(parameterInfo);
 }
 
 #pragma mark for Mixer
@@ -360,16 +449,6 @@ static OSStatus InputRenderCallback(void *							inRefCon,
 @implementation YASAudioIOUnit
 
 #pragma mark Memory Management
-
-- (instancetype)initWithGraph:(YASAudioGraph *)graph acd:(const AudioComponentDescription *)acd
-{
-    self = [super initWithGraph:graph acd:acd];
-    if (self) {
-        [self setEnableInput:NO];
-        [self setEnableOutput:NO];
-    }
-    return self;
-}
 
 - (void)dealloc
 {

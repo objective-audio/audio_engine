@@ -55,8 +55,8 @@
 
 - (instancetype)initWithBitDepthFormat:(YASAudioBitDepthFormat)format sampleRate:(double)sampleRate channels:(UInt32)channels interleaved:(BOOL)interleaved
 {
-    if (format == YASAudioBitDepthFormatOther) {
-        YASRaiseWithReason(([NSString stringWithFormat:@"%s - common format is other format.", __PRETTY_FUNCTION__]));
+    if (format == YASAudioBitDepthFormatOther || channels == 0) {
+        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Invalid argument.", __PRETTY_FUNCTION__]));
         YASRelease(self);
         return nil;
     }

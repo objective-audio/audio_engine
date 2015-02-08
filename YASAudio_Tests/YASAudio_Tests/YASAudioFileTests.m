@@ -7,6 +7,7 @@
 #import "YASAudioFormat.h"
 #import "YASAudioPCMBuffer.h"
 #import "YASAudioFile.h"
+#import "NSError+YASAudio.h"
 #import "YASMacros.h"
 
 @interface YASAudioFile (YASAudioFileTests)
@@ -284,6 +285,38 @@
     XCTAssertEqualObjects([YASAudioFile _fileTypeFromAudioFileTypeID:kAudioFileWAVEType], YASAudioFileTypeWAVE);
     
     XCTAssertNil([YASAudioFile _fileTypeFromAudioFileTypeID:0]);
+}
+
+- (void)testCreateFailed
+{
+    NSError *error = nil;
+    
+    XCTAssertNil([[YASAudioFileReader alloc] initWithURL:nil bitDepthFormat:YASAudioBitDepthFormatFloat32 interleaved:YES error:&error]);
+    XCTAssertNotNil(error);
+    XCTAssertEqual(error.code, YASAudioFileErrorCodeArgumentIsNil);
+    
+    const Float64 sampleRate = 48000;
+    const UInt32 channels = 2;
+    const UInt32 bitDepth = 32;
+    const YASAudioBitDepthFormat bitDepthFormat = YASAudioBitDepthFormatFloat32;
+    const BOOL interleaved = YES;
+    NSString *fileName = @"test.wav";
+    NSString *filePath = [[self temporaryTestDirectory] stringByAppendingPathComponent:fileName];
+    NSURL *fileURL = [NSURL fileURLWithPath:filePath];
+    NSString *fileType = YASAudioFileTypeWAVE;
+    NSDictionary *settings = [NSDictionary yas_waveFileSettingsWithSampleRate:sampleRate numberOfChannels:channels bitDepth:bitDepth];
+    
+    XCTAssertNil([[YASAudioFileWriter alloc] initWithURL:nil fileType:fileType settings:settings bitDepthFormat:bitDepthFormat interleaved:interleaved error:nil]);
+    XCTAssertNotNil(error);
+    XCTAssertEqual(error.code, YASAudioFileErrorCodeArgumentIsNil);
+    
+    XCTAssertNil([[YASAudioFileWriter alloc] initWithURL:fileURL fileType:nil settings:settings bitDepthFormat:bitDepthFormat interleaved:interleaved error:nil]);
+    XCTAssertNotNil(error);
+    XCTAssertEqual(error.code, YASAudioFileErrorCodeArgumentIsNil);
+    
+    XCTAssertNil([[YASAudioFileWriter alloc] initWithURL:fileURL fileType:fileType settings:nil bitDepthFormat:bitDepthFormat interleaved:interleaved error:nil]);
+    XCTAssertNotNil(error);
+    XCTAssertEqual(error.code, YASAudioFileErrorCodeArgumentIsNil);
 }
 
 #pragma mark -

@@ -21,12 +21,13 @@ static BOOL _interrupting = NO;
 @interface YASAudioGraph()
 
 @property (nonatomic, copy, readonly) NSNumber *key;
-@property (nonatomic, strong) NSMutableDictionary *units;
-@property (nonatomic, strong) NSMutableSet *ioUnits;
 
 @end
 
-@implementation YASAudioGraph
+@implementation YASAudioGraph {
+    NSMutableDictionary *_units;
+    NSMutableSet *_ioUnits;
+}
 
 #pragma mark - Global
 
@@ -55,6 +56,7 @@ static BOOL _interrupting = NO;
     NSError *error = nil;
     if (![[AVAudioSession sharedInstance] setActive:YES error:&error]) {
         YASRaiseIfError(error);
+        return;
     }
 #endif
     
@@ -203,7 +205,7 @@ static BOOL _interrupting = NO;
     }
     
     if (unit) {
-        [self _setUnitToUnits:unit];
+        [self _addUnitToUnits:unit];
         YASRelease(unit);
         
         if (prepareBlock) {
@@ -231,33 +233,6 @@ static BOOL _interrupting = NO;
     };
     
     return [self addAudioUnitWithAudioComponentDescription:&acd prepareBlock:prepareBlock];
-}
-
-- (YASAudioIOUnit *)addAudioIOUnitWithEnableInput:(BOOL)enableInput enableOutput:(BOOL)enableOutput
-{
-    const AudioComponentDescription acd = {
-        .componentType = kAudioUnitType_Output,
-        .componentSubType = YASAudioUnitSubType_DefaultIO,
-        .componentManufacturer = kAudioUnitManufacturer_Apple,
-        .componentFlags = 0,
-        .componentFlagsMask = 0,
-    };
-    
-    YASAudioIOUnit *audioIOUnit = [[YASAudioIOUnit alloc] initWithGraph:self acd:&acd];
-    
-    if (audioIOUnit) {
-        [audioIOUnit setEnableOutput:enableOutput];
-        [audioIOUnit setEnableInput:enableInput];
-        [self _setUnitToUnits:audioIOUnit];
-        [audioIOUnit initialize];
-        YASRelease(audioIOUnit);
-    }
-    
-    if (self.isRunning && !self.class.isInterrupting) {
-        [audioIOUnit start];
-    }
-    
-    return audioIOUnit;
 }
 
 - (void)removeAudioUnit:(YASAudioUnit *)unit
@@ -301,11 +276,15 @@ static BOOL _interrupting = NO;
     }
 }
 
-- (void)_setUnitToUnits:(YASAudioUnit *)unit
+- (void)_addUnitToUnits:(YASAudioUnit *)unit
 {
-    if (!unit || !unit.key) {
+    if (!unit) {
         YASRaiseWithReason(([NSString stringWithFormat:@"%s - Argument is nil.", __PRETTY_FUNCTION__]));
         return;
+    }
+    
+    if (unit.key) {
+        YASRaiseWithReason(([NSString stringWithFormat:@"%s - unit.key is not nil.", __PRETTY_FUNCTION__]));
     }
     
     @synchronized(self) {
