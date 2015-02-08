@@ -42,7 +42,7 @@
     XCTAssertEqualObjects(stringValueArray[0], @"0");
     XCTAssertEqualObjects(stringValueArray[1], @"1");
     
-    XCTAssertThrows([array yas_arrayOfPropertyForKey:nil]);
+    XCTAssertNil([array yas_arrayOfPropertyForKey:nil]);
 }
 
 - (void)testArrayWithBlock

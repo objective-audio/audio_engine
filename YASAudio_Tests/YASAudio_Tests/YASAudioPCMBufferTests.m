@@ -31,12 +31,12 @@
     
     XCTAssertNotNil(buffer);
     XCTAssertEqualObjects(buffer.format, format);
-    XCTAssertNoThrow([buffer float32DataAtBufferIndex:0]);
-    XCTAssertNoThrow([buffer float32DataAtBufferIndex:1]);
-    XCTAssertThrows([buffer float32DataAtBufferIndex:2]);
-    XCTAssertThrows([buffer float64DataAtBufferIndex:0]);
-    XCTAssertThrows([buffer int16DataAtBufferIndex:0]);
-    XCTAssertThrows([buffer int32DataAtBufferIndex:0]);
+    XCTAssert([buffer float32DataAtBufferIndex:0]);
+    XCTAssert([buffer float32DataAtBufferIndex:1]);
+    XCTAssert(![buffer float32DataAtBufferIndex:2]);
+    XCTAssert(![buffer float64DataAtBufferIndex:0]);
+    XCTAssert(![buffer int16DataAtBufferIndex:0]);
+    XCTAssert(![buffer int32DataAtBufferIndex:0]);
     
     YASRelease(format);
     YASRelease(buffer);
@@ -47,11 +47,11 @@
     YASAudioFormat *format = [[YASAudioFormat alloc] initWithBitDepthFormat:YASAudioBitDepthFormatFloat32 sampleRate:48000 channels:1 interleaved:YES];
     YASAudioPCMBuffer *buffer = [[YASAudioPCMBuffer alloc] initWithPCMFormat:format frameCapacity:4];
     
-    XCTAssertNoThrow([buffer float32DataAtBufferIndex:0]);
-    XCTAssertThrows([buffer float64DataAtBufferIndex:0]);
-    XCTAssertThrows([buffer float32DataAtBufferIndex:1]);
-    XCTAssertThrows([buffer int16DataAtBufferIndex:0]);
-    XCTAssertThrows([buffer int32DataAtBufferIndex:0]);
+    XCTAssert([buffer float32DataAtBufferIndex:0]);
+    XCTAssert(![buffer float32DataAtBufferIndex:1]);
+    XCTAssert(![buffer float64DataAtBufferIndex:0]);
+    XCTAssert(![buffer int16DataAtBufferIndex:0]);
+    XCTAssert(![buffer int32DataAtBufferIndex:0]);
     
     YASRelease(format);
     YASRelease(buffer);
@@ -62,11 +62,11 @@
     YASAudioFormat *format = [[YASAudioFormat alloc] initWithBitDepthFormat:YASAudioBitDepthFormatFloat64 sampleRate:48000 channels:2 interleaved:NO];
     YASAudioPCMBuffer *buffer = [[YASAudioPCMBuffer alloc] initWithPCMFormat:format frameCapacity:4];
     
-    XCTAssertNoThrow([buffer float64DataAtBufferIndex:0]);
-    XCTAssertThrows([buffer float64DataAtBufferIndex:2]);
-    XCTAssertThrows([buffer float32DataAtBufferIndex:0]);
-    XCTAssertThrows([buffer int16DataAtBufferIndex:0]);
-    XCTAssertThrows([buffer int32DataAtBufferIndex:0]);
+    XCTAssert([buffer float64DataAtBufferIndex:0]);
+    XCTAssert(![buffer float64DataAtBufferIndex:2]);
+    XCTAssert(![buffer float32DataAtBufferIndex:0]);
+    XCTAssert(![buffer int16DataAtBufferIndex:0]);
+    XCTAssert(![buffer int32DataAtBufferIndex:0]);
     
     YASRelease(format);
     YASRelease(buffer);
@@ -77,11 +77,11 @@
     YASAudioFormat *format = [[YASAudioFormat alloc] initWithBitDepthFormat:YASAudioBitDepthFormatInt32 sampleRate:48000 channels:3 interleaved:YES];
     YASAudioPCMBuffer *buffer = [[YASAudioPCMBuffer alloc] initWithPCMFormat:format frameCapacity:4];
     
-    XCTAssertNoThrow([buffer int32DataAtBufferIndex:0]);
-    XCTAssertThrows([buffer int32DataAtBufferIndex:3]);
-    XCTAssertThrows([buffer int16DataAtBufferIndex:0]);
-    XCTAssertThrows([buffer float64DataAtBufferIndex:0]);
-    XCTAssertThrows([buffer float32DataAtBufferIndex:0]);
+    XCTAssert([buffer int32DataAtBufferIndex:0]);
+    XCTAssert(![buffer int32DataAtBufferIndex:3]);
+    XCTAssert(![buffer int16DataAtBufferIndex:0]);
+    XCTAssert(![buffer float64DataAtBufferIndex:0]);
+    XCTAssert(![buffer float32DataAtBufferIndex:0]);
     
     YASRelease(format);
     YASRelease(buffer);
@@ -92,11 +92,11 @@
     YASAudioFormat *format = [[YASAudioFormat alloc] initWithBitDepthFormat:YASAudioBitDepthFormatInt16 sampleRate:48000 channels:4 interleaved:NO];
     YASAudioPCMBuffer *buffer = [[YASAudioPCMBuffer alloc] initWithPCMFormat:format frameCapacity:4];
     
-    XCTAssertNoThrow([buffer int16DataAtBufferIndex:0]);
-    XCTAssertThrows([buffer int16DataAtBufferIndex:4]);
-    XCTAssertThrows([buffer int32DataAtBufferIndex:0]);
-    XCTAssertThrows([buffer float64DataAtBufferIndex:0]);
-    XCTAssertThrows([buffer float32DataAtBufferIndex:0]);
+    XCTAssert([buffer int16DataAtBufferIndex:0]);
+    XCTAssert(![buffer int16DataAtBufferIndex:4]);
+    XCTAssert(![buffer int32DataAtBufferIndex:0]);
+    XCTAssert(![buffer float64DataAtBufferIndex:0]);
+    XCTAssert(![buffer float32DataAtBufferIndex:0]);
     
     YASRelease(format);
     YASRelease(buffer);
@@ -119,7 +119,7 @@
     
     XCTAssertEqual(buffer.frameLength, 0);
     
-    XCTAssertThrows(buffer.frameLength = 5);
+    buffer.frameLength = 5;
     
     XCTAssertEqual(buffer.frameLength, 0);
     
@@ -225,7 +225,7 @@
         [self _fillDataToBuffer:fromBuffer];
         
         XCTAssertFalse([toBuffer copyDataFromBuffer:fromBuffer]);
-        XCTAssertThrows([toBuffer copyDataFromBuffer:nil]);
+        XCTAssertFalse([toBuffer copyDataFromBuffer:nil]);
         
         YASRelease(fromFormat);
         YASRelease(toFormat);
@@ -387,7 +387,7 @@
     YASAudioPCMBuffer *fromBuffer = [[YASAudioPCMBuffer alloc] initWithPCMFormat:fromFormat frameCapacity:frameLength];
     YASAudioPCMBuffer *toBuffer = [[YASAudioPCMBuffer alloc] initWithPCMFormat:toFormat frameCapacity:frameLength];
     
-    XCTAssertThrows([toBuffer copyDataFlexiblyFromBuffer:nil]);
+    XCTAssertFalse([toBuffer copyDataFlexiblyFromBuffer:nil]);
     XCTAssertFalse([toBuffer copyDataFlexiblyFromBuffer:fromBuffer]);
     
     YASRelease(fromFormat);
@@ -424,7 +424,7 @@
         XCTAssertTrue([self _compareBufferFlexibly:interleavedBuffer :nonInterleavedBuffer]);
         XCTAssertEqual(interleavedBuffer.frameLength, frameLength);
         
-        XCTAssertThrows([interleavedBuffer copyDataFlexiblyFromAudioBufferList:nil]);
+        XCTAssertFalse([interleavedBuffer copyDataFlexiblyFromAudioBufferList:nil]);
         
         YASRelease(interleavedFormat);
         YASRelease(nonInterleavedFormat);
@@ -459,7 +459,7 @@
         XCTAssertNoThrow([nonInterleavedBuffer copyDataFlexiblyToAudioBufferList:interleavedBuffer.mutableAudioBufferList]);
         XCTAssertTrue([self _compareBufferFlexibly:interleavedBuffer :nonInterleavedBuffer]);
         
-        XCTAssertThrows([interleavedBuffer copyDataFlexiblyToAudioBufferList:nil]);
+        XCTAssertFalse([interleavedBuffer copyDataFlexiblyToAudioBufferList:nil]);
         
         YASRelease(interleavedFormat);
         YASRelease(nonInterleavedFormat);
@@ -481,10 +481,10 @@
     YASRelease(buffer);
     buffer = nil;
     
-    XCTAssertThrows(buffer = [[YASAudioPCMBuffer alloc] initWithPCMFormat:format audioBufferList:NULL needsFree:NO]);
+    buffer = [[YASAudioPCMBuffer alloc] initWithPCMFormat:format audioBufferList:NULL needsFree:NO];
     XCTAssertNil(buffer);
     
-    XCTAssertThrows(buffer = [[YASAudioPCMBuffer alloc] initWithPCMFormat:nil audioBufferList:sourceBuffer.mutableAudioBufferList needsFree:NO]);
+    buffer = [[YASAudioPCMBuffer alloc] initWithPCMFormat:nil audioBufferList:sourceBuffer.mutableAudioBufferList needsFree:NO];
     XCTAssertNil(buffer);
     
     YASRelease(format);
