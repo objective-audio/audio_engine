@@ -125,52 +125,33 @@ typedef NS_ENUM(NSUInteger, YASAudioPCMBufferFreeType) {
 
 - (Float32 *)float32DataAtBufferIndex:(NSUInteger)index
 {
-#if DEBUG
-    if (_format.bitDepthFormat != YASAudioBitDepthFormatFloat32) {
-        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Invalid bit depth format.", __PRETTY_FUNCTION__]));
-    } else if (index >= self.audioBufferList->mNumberBuffers) {
-        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Out of range.", __PRETTY_FUNCTION__]));
-    }
-#endif
-    
-    return self.audioBufferList->mBuffers[index].mData;
+    return [self _dataWithBitDepthFormat:YASAudioBitDepthFormatFloat32 atBufferIndex:index];
 }
 
 - (Float64 *)float64DataAtBufferIndex:(NSUInteger)index
 {
-#if DEBUG
-    if (_format.bitDepthFormat != YASAudioBitDepthFormatFloat64) {
-        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Invalid bit depth format.", __PRETTY_FUNCTION__]));
-    } else if (index >= self.audioBufferList->mNumberBuffers) {
-        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Out of range.", __PRETTY_FUNCTION__]));
-    }
-#endif
-    
-    return self.audioBufferList->mBuffers[index].mData;
+    return [self _dataWithBitDepthFormat:YASAudioBitDepthFormatFloat64 atBufferIndex:index];
 }
 
 - (SInt16 *)int16DataAtBufferIndex:(NSUInteger)index
 {
-#if DEBUG
-    if (_format.bitDepthFormat != YASAudioBitDepthFormatInt16) {
-        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Invalid bit depth format.", __PRETTY_FUNCTION__]));
-    } else if (index >= self.audioBufferList->mNumberBuffers) {
-        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Out of range.", __PRETTY_FUNCTION__]));
-    }
-#endif
-    
-    return self.audioBufferList->mBuffers[index].mData;
+    return [self _dataWithBitDepthFormat:YASAudioBitDepthFormatInt16 atBufferIndex:index];
 }
 
 - (SInt32 *)int32DataAtBufferIndex:(NSUInteger)index
 {
-#if DEBUG
-    if (_format.bitDepthFormat != YASAudioBitDepthFormatInt32) {
+    return [self _dataWithBitDepthFormat:YASAudioBitDepthFormatInt32 atBufferIndex:index];
+}
+
+- (void *)_dataWithBitDepthFormat:(YASAudioBitDepthFormat)bitDepthFormat atBufferIndex:(NSUInteger)index
+{
+    if (_format.bitDepthFormat != bitDepthFormat) {
         YASRaiseWithReason(([NSString stringWithFormat:@"%s - Invalid bit depth format.", __PRETTY_FUNCTION__]));
+        return nil;
     } else if (index >= self.audioBufferList->mNumberBuffers) {
         YASRaiseWithReason(([NSString stringWithFormat:@"%s - Out of range.", __PRETTY_FUNCTION__]));
+        return nil;
     }
-#endif
     
     return self.audioBufferList->mBuffers[index].mData;
 }
