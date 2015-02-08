@@ -13,6 +13,22 @@ extern OSType const YASAudioUnitSubType_DefaultIO;
 
 typedef void (^YASAudioUnitCallbackBlock)(YASAudioUnitRenderParameters *renderParameters);
 
+@interface YASAudioUnitParameterInfo : NSObject
+
+@property (nonatomic, strong, readonly) NSString *unitName;
+@property (nonatomic, assign, readonly) BOOL hasClump;
+@property (nonatomic, assign, readonly) UInt32 clumpID;
+@property (nonatomic, strong, readonly) NSString *name;
+@property (nonatomic, assign, readonly) AudioUnitParameterUnit unit;
+@property (nonatomic, assign, readonly) AudioUnitParameterValue minValue;
+@property (nonatomic, assign, readonly) AudioUnitParameterValue maxValue;
+@property (nonatomic, assign, readonly) AudioUnitParameterValue defaultValue;
+
+- (instancetype)init NS_UNAVAILABLE;
+- (instancetype)initWithAudioUnitParameterInfo:(const AudioUnitParameterInfo *)info NS_DESIGNATED_INITIALIZER;
+
+@end
+
 @interface YASAudioUnit : YASWeakProvider
 
 @property (nonatomic, copy) YASAudioUnitCallbackBlock renderCallbackBlock;
@@ -33,8 +49,10 @@ typedef void (^YASAudioUnitCallbackBlock)(YASAudioUnitRenderParameters *renderPa
 - (void)getInputFormat:(AudioStreamBasicDescription *)outAsbd busNumber:(const UInt32)bus;
 - (void)getOutputFormat:(AudioStreamBasicDescription *)outAsbd busNumber:(const UInt32)bus;
 - (void)setMaximumFramesPerSlice:(const UInt32)frames;
+- (UInt32)maximumFramesPerSlice;
 - (void)setParameter:(const AudioUnitParameterID)parameterID value:(const AudioUnitParameterValue)val scope:(const AudioUnitScope)scope element:(const AudioUnitElement)element;
 - (Float32)getParameter:(const AudioUnitParameterID)parameterID scope:(const AudioUnitScope)scope element:(const AudioUnitElement)element;
+- (YASAudioUnitParameterInfo *)parameterInfo:(const AudioUnitParameterID)parameterID scope:(const AudioUnitScope)scope;
 
 - (void)setElementCount:(UInt32)count scope:(AudioUnitScope)scope;
 - (UInt32)elementCountForScope:(AudioUnitScope)scope;
