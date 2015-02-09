@@ -9,25 +9,9 @@
 
 extern OSType const YASAudioUnitSubType_DefaultIO;
 
-@class YASAudioGraph;
+@class YASAudioGraph, YASAudioUnitParameterInfo;
 
 typedef void (^YASAudioUnitCallbackBlock)(YASAudioUnitRenderParameters *renderParameters);
-
-@interface YASAudioUnitParameterInfo : NSObject
-
-@property (nonatomic, strong, readonly) NSString *unitName;
-@property (nonatomic, assign, readonly) BOOL hasClump;
-@property (nonatomic, assign, readonly) UInt32 clumpID;
-@property (nonatomic, strong, readonly) NSString *name;
-@property (nonatomic, assign, readonly) AudioUnitParameterUnit unit;
-@property (nonatomic, assign, readonly) AudioUnitParameterValue minValue;
-@property (nonatomic, assign, readonly) AudioUnitParameterValue maxValue;
-@property (nonatomic, assign, readonly) AudioUnitParameterValue defaultValue;
-
-- (instancetype)init NS_UNAVAILABLE;
-- (instancetype)initWithAudioUnitParameterInfo:(const AudioUnitParameterInfo *)info NS_DESIGNATED_INITIALIZER;
-
-@end
 
 @interface YASAudioUnit : YASWeakProvider
 
