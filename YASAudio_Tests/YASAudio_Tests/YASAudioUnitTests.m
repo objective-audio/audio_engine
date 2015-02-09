@@ -6,6 +6,7 @@
 #import <XCTest/XCTest.h>
 #import "YASAudioGraph.h"
 #import "YASAudioUnit.h"
+#import "YASAudioUnitParameterInfo.h"
 #import "YASAudioFormat.h"
 #import "YASAudioPCMBuffer.h"
 #import "YASMacros.h"

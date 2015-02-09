@@ -25,6 +25,7 @@
 		B65BAA721A636A5200E7C3D8 /* YASAudioUnit.m in Sources */ = {isa = PBXBuildFile; fileRef = B65BAA661A636A5200E7C3D8 /* YASAudioUnit.m */; };
 		B65BAA7A1A636A6F00E7C3D8 /* YASAudioUtility.c in Sources */ = {isa = PBXBuildFile; fileRef = B65BAA781A636A6F00E7C3D8 /* YASAudioUtility.c */; };
 		B66845BE1A660A5200D5A372 /* YASWeakSupport.m in Sources */ = {isa = PBXBuildFile; fileRef = B66845BD1A660A5200D5A372 /* YASWeakSupport.m */; };
+		B6E8272D1A88505900751441 /* YASAudioUnitParameterInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = B6E8272C1A88505900751441 /* YASAudioUnitParameterInfo.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -65,6 +66,8 @@
 		B65BAA7C1A636A9C00E7C3D8 /* YASMacros.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YASMacros.h; sourceTree = "<group>"; };
 		B66845BC1A660A5200D5A372 /* YASWeakSupport.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YASWeakSupport.h; sourceTree = "<group>"; };
 		B66845BD1A660A5200D5A372 /* YASWeakSupport.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YASWeakSupport.m; sourceTree = "<group>"; };
+		B6E8272B1A88505900751441 /* YASAudioUnitParameterInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YASAudioUnitParameterInfo.h; sourceTree = "<group>"; };
+		B6E8272C1A88505900751441 /* YASAudioUnitParameterInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YASAudioUnitParameterInfo.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -165,6 +168,8 @@
 				B65BAA641A636A5200E7C3D8 /* YASAudioGraph.m */,
 				B65BAA651A636A5200E7C3D8 /* YASAudioUnit.h */,
 				B65BAA661A636A5200E7C3D8 /* YASAudioUnit.m */,
+				B6E8272B1A88505900751441 /* YASAudioUnitParameterInfo.h */,
+				B6E8272C1A88505900751441 /* YASAudioUnitParameterInfo.m */,
 			);
 			path = Graph;
 			sourceTree = "<group>";
@@ -266,6 +271,7 @@
 				B65BAA6C1A636A5200E7C3D8 /* NSString+YASAudio.m in Sources */,
 				B65BAA7A1A636A6F00E7C3D8 /* YASAudioUtility.c in Sources */,
 				B65BAA711A636A5200E7C3D8 /* YASAudioGraph.m in Sources */,
+				B6E8272D1A88505900751441 /* YASAudioUnitParameterInfo.m in Sources */,
 				B62ED55C1A62812F007DDE96 /* AppDelegate.m in Sources */,
 				B65BAA721A636A5200E7C3D8 /* YASAudioUnit.m in Sources */,
 				B65BAA691A636A5200E7C3D8 /* NSError+YASAudio.m in Sources */,
