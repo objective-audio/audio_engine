@@ -66,12 +66,11 @@
     
     YASAudioGraph *audioGraph = self.audioGraph;
     
-    YASAudioIOUnit *audioIOUnit = (YASAudioIOUnit *)[audioGraph addAudioUnitWithType:kAudioUnitType_Output subType:kAudioUnitSubType_GenericOutput prepareBlock:^(YASAudioUnit *audioUnit) {
-        YASAudioIOUnit *ioUnit = (YASAudioIOUnit *)audioUnit;
-        [ioUnit setMaximumFramesPerSlice:maximumFrameLength];
+    YASAudioUnit *ioUnit = [audioGraph addAudioUnitWithType:kAudioUnitType_Output subType:kAudioUnitSubType_GenericOutput prepareBlock:^(YASAudioUnit *audioUnit) {
+        [audioUnit setMaximumFramesPerSlice:maximumFrameLength];
     }];
     
-    [audioIOUnit setRenderCallback:0];
+    [ioUnit setRenderCallback:0];
     
     const UInt32 mixerInputCount = 16;
     
@@ -108,7 +107,7 @@
     
     XCTestExpectation *ioExpectation = [self expectationWithDescription:@"IOUnit Render"];
     
-    audioIOUnit.renderCallbackBlock = ^(YASAudioUnitRenderParameters *renderParameters) {
+    ioUnit.renderCallbackBlock = ^(YASAudioUnitRenderParameters *renderParameters) {
         [ioExpectation fulfill];
         
         XCTAssertEqual(renderParameters->inNumberFrames, frameLength);
@@ -167,7 +166,7 @@
             .ioData = buffer.mutableAudioBufferList,
         };
         
-        [audioIOUnit audioUnitRender:&parameters];
+        [ioUnit audioUnitRender:&parameters];
         
         YASRelease(buffer);
     });

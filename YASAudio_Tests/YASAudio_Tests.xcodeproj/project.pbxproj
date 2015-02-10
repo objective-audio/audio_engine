@@ -341,7 +341,7 @@
 		B62ED57C1A628529007DDE96 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0620;
+				LastUpgradeCheck = 0630;
 				TargetAttributes = {
 					B62ED5851A628554007DDE96 = {
 						CreatedOnToolsVersion = 6.2;
@@ -502,6 +502,7 @@
 			buildSettings = {
 				GCC_GENERATE_TEST_COVERAGE_FILES = YES;
 				GCC_INSTRUMENT_PROGRAM_FLOW_ARCS = YES;
+				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CFLAGS = "-DUSE_GCOV_FLUSH";
 			};
 			name = Debug;
