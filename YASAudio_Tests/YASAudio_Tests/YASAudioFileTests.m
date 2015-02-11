@@ -339,8 +339,11 @@
     const BOOL interleaved = testData.interleaved;
     NSDictionary *settings = testData.settings;
     
+    YASAudioFormat *defaultProcessingFormat = [[YASAudioFormat alloc] initWithBitDepthFormat:bitDepthFormat sampleRate:fileSampleRate channels:channels interleaved:interleaved];
+    
     YASAudioFormat *processingFormat = [[YASAudioFormat alloc] initWithBitDepthFormat:bitDepthFormat sampleRate:processingSampleRate channels:channels interleaved:interleaved];
     
+    XCTAssertNotNil(defaultProcessingFormat);
     XCTAssertNotNil(processingFormat);
     
     // write
@@ -356,6 +359,8 @@
         
         XCTAssertNotNil(audioFile);
         XCTAssertNil(error);
+        
+        XCTAssertEqualObjects(audioFile.processingFormat, defaultProcessingFormat);
         
         audioFile.processingFormat = processingFormat;
         
@@ -422,6 +427,7 @@
         YASRelease(audioFile);
     }
     
+    YASRelease(defaultProcessingFormat);
     YASRelease(processingFormat);
 }
 
