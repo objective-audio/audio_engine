@@ -139,6 +139,8 @@ static OSStatus InputRenderCallback(void *							inRefCon,
     self = [super init];
     if (self) {
         self.graphContainer = graph.weakContainer;
+        _acd = *acd;
+        
         [self _createAudioUnit:acd];
     }
     return self;
@@ -342,14 +344,7 @@ static OSStatus InputRenderCallback(void *							inRefCon,
 }
 
 #pragma mark for IO
-/*
-- (void)removeRenderCallback:(const UInt32)inputNumber
-{
-    if (inputNumber == 0) {
-        [super removeRenderCallback:0];
-    }
-}
-*/
+
 - (BOOL)isEnableOutput
 {
     UInt32 enableIO = 0;
