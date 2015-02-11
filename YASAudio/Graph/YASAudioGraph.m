@@ -198,11 +198,7 @@ static BOOL _interrupting = NO;
 {
     YASAudioUnit *unit = nil;
     
-    if (acd->componentType == kAudioUnitType_Output) {
-        unit = [[YASAudioIOUnit alloc] initWithGraph:self acd:acd];
-    } else {
-        unit = [[YASAudioUnit alloc] initWithGraph:self acd:acd];
-    }
+    unit = [[YASAudioUnit alloc] initWithGraph:self acd:acd];
     
     if (unit) {
         [self _addUnitToUnits:unit];
@@ -214,8 +210,8 @@ static BOOL _interrupting = NO;
         
         [unit initialize];
         
-        if ([unit isKindOfClass:[YASAudioIOUnit class]] && self.isRunning && !self.class.isInterrupting) {
-            [(YASAudioIOUnit *)unit start];
+        if (acd->componentType == kAudioUnitType_Output && self.isRunning && !self.class.isInterrupting) {
+            [unit start];
         }
     }
     
@@ -292,7 +288,7 @@ static BOOL _interrupting = NO;
         if (key) {
             unit.key = key;
             _units[key] = unit;
-            if ([unit isKindOfClass:[YASAudioIOUnit class]]) {
+            if (unit.isOutputUnit) {
                 [_ioUnits addObject:unit];
             }
         }
@@ -301,14 +297,14 @@ static BOOL _interrupting = NO;
 
 - (void)_startAllIOs
 {
-    for (YASAudioIOUnit *ioUnit in _ioUnits) {
+    for (YASAudioUnit *ioUnit in _ioUnits) {
         [ioUnit start];
     }
 }
 
 - (void)_stopAllIOs
 {
-    for (YASAudioIOUnit *ioUnit in _ioUnits) {
+    for (YASAudioUnit *ioUnit in _ioUnits) {
         [ioUnit stop];
     }
 }

@@ -15,8 +15,21 @@ typedef void (^YASAudioUnitCallbackBlock)(YASAudioUnitRenderParameters *renderPa
 
 @interface YASAudioUnit : YASWeakProvider
 
+@property (nonatomic, assign, readonly) OSType type;
+@property (nonatomic, assign, readonly) OSType subType;
+@property (nonatomic, assign, readonly) BOOL isOutputUnit;
+
 @property (nonatomic, copy) YASAudioUnitCallbackBlock renderCallbackBlock;
 @property (nonatomic, copy) YASAudioUnitCallbackBlock notifyCallbackBlock;
+@property (nonatomic, copy) YASAudioUnitCallbackBlock inputCallbackBlock; // io unit only.
+@property (nonatomic, assign, getter=isEnableOutput) BOOL enableOutput; // io unit only. must call before running
+@property (nonatomic, assign, getter=isEnableInput) BOOL enableInput; // io unit only.　must call before running
+@property (nonatomic, assign, readonly) BOOL hasOutput; // io unit only.
+@property (nonatomic, assign, readonly) BOOL hasInput; // io unit only.
+@property (nonatomic, assign, readonly) BOOL isRunning; // io unit only.
+#if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
+@property (nonatomic, assign) AudioDeviceID currentDevice; // io unit only.
+#endif
 
 - (instancetype)init NS_UNAVAILABLE;
 - (instancetype)initWithGraph:(YASAudioGraph *)graph acd:(const AudioComponentDescription *)acd NS_DESIGNATED_INITIALIZER;
@@ -41,6 +54,15 @@ typedef void (^YASAudioUnitCallbackBlock)(YASAudioUnitRenderParameters *renderPa
 - (void)setElementCount:(UInt32)count scope:(AudioUnitScope)scope;
 - (UInt32)elementCountForScope:(AudioUnitScope)scope;
 
+- (void)setInputCallback; // io unit only.
+- (void)removeInputCallback; // io unit only.
+- (void)setChannelMap:(NSData *)mapData scope:(AudioUnitScope)scope; // io unit only.
+- (NSData *)channelMapForScope:(AudioUnitScope)scope; // io unit only.
+- (UInt32)channelMapCountForScope:(AudioUnitScope)scope; // io unit only.
+
+- (void)start; // io unit only.
+- (void)stop; // io unit only.
+
 #pragma mark Render thread
 
 - (void)renderCallbackBlock:(YASAudioUnitRenderParameters *)renderParameters;
@@ -54,28 +76,5 @@ typedef void (^YASAudioUnitCallbackBlock)(YASAudioUnitRenderParameters *renderPa
 
 - (void)initialize;
 - (void)uninitialize;
-
-@end
-
-@interface YASAudioIOUnit : YASAudioUnit
-
-@property (nonatomic, copy) YASAudioUnitCallbackBlock inputCallbackBlock;
-@property (nonatomic, assign, getter=isEnableOutput) BOOL enableOutput; // must call before running
-@property (nonatomic, assign, getter=isEnableInput) BOOL enableInput; // must call before running
-@property (nonatomic, assign, readonly) BOOL hasOutput;
-@property (nonatomic, assign, readonly) BOOL hasInput;
-@property (nonatomic, assign, readonly) BOOL isRunning;
-#if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
-@property (nonatomic, assign) AudioDeviceID currentDevice;
-#endif
-
-- (void)setInputCallback;
-- (void)removeInputCallback;
-- (void)setChannelMap:(NSData *)mapData scope:(AudioUnitScope)scope;
-- (NSData *)channelMapForScope:(AudioUnitScope)scope;
-- (UInt32)channelMapCountForScope:(AudioUnitScope)scope;
-
-- (void)start;
-- (void)stop;
 
 @end

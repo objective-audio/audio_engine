@@ -7,7 +7,7 @@
 #import "YASWeakSupport.h"
 #import "YASAudioTypes.h"
 
-@class YASAudioUnit, YASAudioIOUnit;
+@class YASAudioUnit;
 
 @interface YASAudioGraph : YASWeakProvider
 
