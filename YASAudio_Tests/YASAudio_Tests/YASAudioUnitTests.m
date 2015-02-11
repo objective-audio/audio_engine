@@ -44,16 +44,22 @@
     const UInt32 channels = 2;
     const UInt32 frameLength = 1024;
     const UInt32 maximumFrameLength = 4096;
+    const OSType type = kAudioUnitType_FormatConverter;
+    const OSType subType = kAudioUnitSubType_AUConverter;
     
     YASAudioFormat *outputFormat = [[YASAudioFormat alloc] initWithBitDepthFormat:YASAudioBitDepthFormatFloat32 sampleRate:outputSampleRate channels:channels interleaved:NO];
     YASAudioFormat *inputFormat = [[YASAudioFormat alloc] initWithBitDepthFormat:YASAudioBitDepthFormatInt16 sampleRate:inputSampleRate channels:channels interleaved:YES];
     
     YASAudioGraph *audioGraph = self.audioGraph;
     
-    YASAudioUnit *converterUnit = [audioGraph addAudioUnitWithType:kAudioUnitType_FormatConverter subType:kAudioUnitSubType_AUConverter prepareBlock:^(YASAudioUnit *audioUnit) {
+    YASAudioUnit *converterUnit = [audioGraph addAudioUnitWithType:type subType:subType prepareBlock:^(YASAudioUnit *audioUnit) {
         [audioUnit setMaximumFramesPerSlice:maximumFrameLength];
     }];
     
+    XCTAssertEqual(converterUnit.type, type);
+    XCTAssertEqual(converterUnit.subType, subType);
+    XCTAssertFalse(converterUnit.isOutputUnit);
+    XCTAssertTrue(converterUnit.audioUnitInstance != NULL);
     XCTAssertEqual([converterUnit maximumFramesPerSlice], maximumFrameLength);
     
     [converterUnit setRenderCallback:0];
