@@ -23,7 +23,7 @@ typedef void (^YASAudioUnitCallbackBlock)(YASAudioUnitRenderParameters *renderPa
 @property (nonatomic, copy) YASAudioUnitCallbackBlock notifyCallbackBlock;
 @property (nonatomic, copy) YASAudioUnitCallbackBlock inputCallbackBlock; // io unit only.
 @property (nonatomic, assign, getter=isEnableOutput) BOOL enableOutput; // io unit only. must call before running
-@property (nonatomic, assign, getter=isEnableInput) BOOL enableInput; // io unit only.　must call before running
+@property (nonatomic, assign, getter=isEnableInput) BOOL enableInput; // io unit only. must call before running
 @property (nonatomic, assign, readonly) BOOL hasOutput; // io unit only.
 @property (nonatomic, assign, readonly) BOOL hasInput; // io unit only.
 @property (nonatomic, assign, readonly) BOOL isRunning; // io unit only.
