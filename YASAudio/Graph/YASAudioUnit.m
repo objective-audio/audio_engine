@@ -295,9 +295,9 @@ static OSStatus InputRenderCallback(void *							inRefCon,
     YASRaiseIfAUError(AudioUnitSetParameter(_audioUnitInstance, parameterID, scope, element, val, 0));
 }
 
-- (Float32)getParameter:(const AudioUnitParameterID)parameterID scope:(const AudioUnitScope)scope element:(const AudioUnitElement)element
+- (AudioUnitParameterValue)getParameter:(const AudioUnitParameterID)parameterID scope:(const AudioUnitScope)scope element:(const AudioUnitElement)element
 {
-    Float32 result = 0;
+    AudioUnitParameterValue result = 0;
     YASRaiseIfAUError(AudioUnitGetParameter(_audioUnitInstance, parameterID, scope, element, &result));
     return result;
 }

@@ -48,7 +48,7 @@ typedef void (^YASAudioUnitCallbackBlock)(YASAudioUnitRenderParameters *renderPa
 - (void)setMaximumFramesPerSlice:(const UInt32)frames;
 - (UInt32)maximumFramesPerSlice;
 - (void)setParameter:(const AudioUnitParameterID)parameterID value:(const AudioUnitParameterValue)val scope:(const AudioUnitScope)scope element:(const AudioUnitElement)element;
-- (Float32)getParameter:(const AudioUnitParameterID)parameterID scope:(const AudioUnitScope)scope element:(const AudioUnitElement)element;
+- (AudioUnitParameterValue)getParameter:(const AudioUnitParameterID)parameterID scope:(const AudioUnitScope)scope element:(const AudioUnitElement)element;
 - (YASAudioUnitParameterInfo *)parameterInfo:(const AudioUnitParameterID)parameterID scope:(const AudioUnitScope)scope;
 
 - (void)setElementCount:(UInt32)count scope:(AudioUnitScope)scope;
