@@ -186,6 +186,30 @@
     XCTAssertNil(delayTimeInfo);
 }
 
+- (void)testPropertyData
+{
+    const Float64 sampleRate = 44100;
+    const UInt32 channels = 2;
+    const AudioUnitPropertyID propertyID = kAudioUnitProperty_StreamFormat;
+    const AudioUnitScope scope = kAudioUnitScope_Input;
+    const AudioUnitElement element = 0;
+    
+    YASAudioFormat *format = [[YASAudioFormat alloc] initWithBitDepthFormat:YASAudioBitDepthFormatFloat32 sampleRate:sampleRate channels:channels interleaved:NO];
+    NSData *setData = [NSData dataWithBytes:format.streamDescription length:sizeof(AudioStreamBasicDescription)];
+    YASRelease(format);
+    
+    YASAudioGraph *audioGraph = self.audioGraph;
+    
+    YASAudioUnit *converterUnit = [audioGraph addAudioUnitWithType:kAudioUnitType_FormatConverter subType:kAudioUnitSubType_AUConverter prepareBlock:NULL];
+    
+    XCTAssertNoThrow([converterUnit setPropertyData:setData propertyID:propertyID scope:scope element:element]);
+    
+    NSData *getData = nil;
+    XCTAssertNoThrow(getData = [converterUnit propertyDataWithPropertyID:propertyID scope:scope element:element]);
+    
+    XCTAssertEqualObjects(setData, getData);
+}
+
 #pragma mark -
 
 - (void)audioUnitRenderOnSubThreadWithAudioUnit:(YASAudioUnit *)audioUnit format:(YASAudioFormat *)format frameLength:(UInt32)frameLength wait:(NSTimeInterval)wait

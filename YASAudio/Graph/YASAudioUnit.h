@@ -41,6 +41,10 @@ typedef void (^YASAudioUnitCallbackBlock)(YASAudioUnitRenderParameters *renderPa
 - (void)removeRenderCallback:(const UInt32)inputNumber;
 - (void)addRenderNotify;
 - (void)removeRenderNotify;
+
+- (void)setPropertyData:(NSData *)data propertyID:(AudioUnitPropertyID)propertyID scope:(AudioUnitScope)scope element:(AudioUnitElement)element;
+- (NSData *)propertyDataWithPropertyID:(AudioUnitPropertyID)propertyID scope:(AudioUnitScope)scope element:(AudioUnitElement)element;
+
 - (void)setInputFormat:(const AudioStreamBasicDescription *)inAsbd busNumber:(const UInt32)bus;
 - (void)setOutputFormat:(const AudioStreamBasicDescription *)inAsbd busNumber:(const UInt32)bus;
 - (void)getInputFormat:(AudioStreamBasicDescription *)outAsbd busNumber:(const UInt32)bus;
