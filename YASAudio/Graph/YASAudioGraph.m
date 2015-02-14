@@ -13,6 +13,8 @@
 
 #if TARGET_OS_IPHONE
 #import <UIKit/UIKit.h>
+#elif TARGET_OS_MAC
+#import "YASAudioDeviceIO.h"
 #endif
 
 static NSMapTable *_graphs = nil;
@@ -27,6 +29,10 @@ static BOOL _interrupting = NO;
 @implementation YASAudioGraph {
     NSMutableDictionary *_units;
     NSMutableSet *_ioUnits;
+    
+#if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
+    NSMutableSet *_deviceIOs;
+#endif
 }
 
 #pragma mark - Global
@@ -145,6 +151,9 @@ static BOOL _interrupting = NO;
     if (self) {
         _units = [[NSMutableDictionary alloc] init];
         _ioUnits = [[NSMutableSet alloc] init];
+#if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
+        _deviceIOs = [[NSMutableSet alloc] init];
+#endif
         _running = NO;
         
         @synchronized(self.class) {
@@ -176,6 +185,11 @@ static BOOL _interrupting = NO;
     _key = nil;
     _units = nil;
     _ioUnits = nil;
+    
+#if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
+    YASRelease(_deviceIOs);
+    _deviceIOs = nil;
+#endif
     
     YASSuperDealloc;
 }
@@ -246,6 +260,48 @@ static BOOL _interrupting = NO;
     }
 }
 
+#if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
+
+- (YASAudioDeviceIO *)addAudioDeviceIOWithAudioDevice:(YASAudioDevice *)audioDevice
+{
+    if (!audioDevice) {
+        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Argument is nil.", __PRETTY_FUNCTION__]));
+        return nil;
+    }
+    
+    YASAudioDeviceIO *deviceIO = [[YASAudioDeviceIO alloc] initWithGraph:self];
+    
+    if (deviceIO) {
+        deviceIO.audioDevice = audioDevice;
+        @synchronized(self) {
+            [_deviceIOs addObject:deviceIO];
+        }
+        YASRelease(deviceIO);
+    }
+    
+    if (self.isRunning && !self.class.isInterrupting) {
+        [deviceIO start];
+    }
+    
+    return deviceIO;
+}
+
+- (void)removeAudioDeviceIO:(YASAudioDeviceIO *)audioDeviceIO
+{
+    if (!audioDeviceIO) {
+        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Argument is nil.", __PRETTY_FUNCTION__]));
+        return;
+    }
+    
+    [audioDeviceIO stop];
+    
+    @synchronized(self) {
+        [_deviceIOs removeObject:audioDeviceIO];
+    }
+}
+
+#endif
+
 - (void)removeAllUnits
 {
     @synchronized(self) {
@@ -254,6 +310,14 @@ static BOOL _interrupting = NO;
             [self removeAudioUnit:unit];
         }
         YASRelease(tmpDict);
+        
+#if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
+        NSSet *tmpSet = [_deviceIOs copy];
+        for (YASAudioDeviceIO *deviceIO in tmpSet) {
+            [self removeAudioDeviceIO:deviceIO];
+        }
+        YASRelease(tmpSet);
+#endif
     }
 }
 
@@ -300,6 +364,12 @@ static BOOL _interrupting = NO;
     for (YASAudioUnit *ioUnit in _ioUnits) {
         [ioUnit start];
     }
+    
+#if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
+    for (YASAudioDeviceIO *deviceIO in _deviceIOs) {
+        [deviceIO start];
+    }
+#endif
 }
 
 - (void)_stopAllIOs
@@ -307,6 +377,12 @@ static BOOL _interrupting = NO;
     for (YASAudioUnit *ioUnit in _ioUnits) {
         [ioUnit stop];
     }
+    
+#if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
+    for (YASAudioDeviceIO *deviceIO in _deviceIOs) {
+        [deviceIO stop];
+    }
+#endif
 }
 
 #pragma mark - AudioSession

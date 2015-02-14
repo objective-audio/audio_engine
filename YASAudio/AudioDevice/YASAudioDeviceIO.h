@@ -22,13 +22,18 @@ typedef void (^YASAudioDeviceIOCallbackBlock)(AudioBufferList *outData, const Au
 @property (nonatomic, assign, readonly) BOOL isRunning;
 
 - (instancetype)init NS_UNAVAILABLE;
-- (instancetype)initWithGraph:(YASAudioGraph *)graph NS_DESIGNATED_INITIALIZER;
 
 - (void)start;
 - (void)stop;
 
 - (const AudioBufferList *)inputAudioBufferListOnRender;
 - (const AudioTimeStamp *)inputTimeOnRender;
+
+@end
+
+@interface YASAudioDeviceIO (YASInternal)
+
+- (instancetype)initWithGraph:(YASAudioGraph *)graph;
 
 @end
 

@@ -29,6 +29,8 @@ typedef NS_ENUM(UInt32, YASAudioDeviceStreamDirection) {
 @property (nonatomic, readonly) YASAudioFormat *virtualFormat;
 @property (nonatomic, readonly) UInt32 startingChannel;
 
+- (instancetype)init NS_UNAVAILABLE;
+
 - (BOOL)isEqualToAudioDeviceStream:(YASAudioDeviceStream *)otherStream;
 
 @end

@@ -9,6 +9,10 @@
 
 @class YASAudioUnit;
 
+#if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
+@class YASAudioDeviceIO, YASAudioDevice;
+#endif
+
 @interface YASAudioGraph : YASWeakProvider
 
 @property (nonatomic, assign, getter=isRunning) BOOL running;
@@ -16,6 +20,11 @@
 - (YASAudioUnit *)addAudioUnitWithAudioComponentDescription:(const AudioComponentDescription *)acd prepareBlock:(void (^)(YASAudioUnit *audioUnit))prepareBlock;
 - (YASAudioUnit *)addAudioUnitWithType:(OSType)type subType:(OSType)subType prepareBlock:(void (^)(YASAudioUnit *audioUnit))prepareBlock;
 - (void)removeAudioUnit:(YASAudioUnit *)unit;
+
+#if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
+- (YASAudioDeviceIO *)addAudioDeviceIOWithAudioDevice:(YASAudioDevice *)audioDevice;
+- (void)removeAudioDeviceIO:(YASAudioDeviceIO *)audioDeviceIO;
+#endif
 
 + (BOOL)isInterrupting;
 
