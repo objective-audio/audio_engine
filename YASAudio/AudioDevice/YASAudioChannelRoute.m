@@ -46,6 +46,11 @@ NSString *const YASAudioDestinationChannelKey = @"destinationChannel";
 
 + (NSArray *)defaultChannelRoutesWithBus:(UInt32)bus format:(YASAudioFormat *)format
 {
+    if (!format) {
+        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Argument is nil.", __PRETTY_FUNCTION__]));
+        return nil;
+    }
+    
     if (format.isInterleaved) {
         YASRaiseWithReason(([NSString stringWithFormat:@"%s - Invalid format (interleaved).", __PRETTY_FUNCTION__]));
         return nil;
