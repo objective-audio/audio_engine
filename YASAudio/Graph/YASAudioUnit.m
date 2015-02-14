@@ -239,6 +239,31 @@ static OSStatus InputRenderCallback(void *							inRefCon,
     YASRaiseIfAUError(AudioUnitRemoveRenderNotify(_audioUnitInstance, NotifyRenderCallback, NULL));
 }
 
+- (void)setPropertyData:(NSData *)data propertyID:(AudioUnitPropertyID)propertyID scope:(AudioUnitScope)scope element:(AudioUnitElement)element
+{
+    if (data.length == 0) {
+        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Argument is nil.", __PRETTY_FUNCTION__]));
+    }
+    
+    const UInt32 size = (UInt32)data.length;
+    YASRaiseIfAUError(AudioUnitSetProperty(_audioUnitInstance, propertyID, scope, element, data.bytes, size));
+}
+
+- (NSData *)propertyDataWithPropertyID:(AudioUnitPropertyID)propertyID scope:(AudioUnitScope)scope element:(AudioUnitElement)element
+{
+    NSMutableData *data = nil;
+    
+    UInt32 size = 0;
+    YASRaiseIfAUError(AudioUnitGetPropertyInfo(_audioUnitInstance, propertyID, scope, element, &size, NULL));
+    
+    if (size > 0) {
+        data = [NSMutableData dataWithLength:size];
+        YASRaiseIfAUError(AudioUnitGetProperty(_audioUnitInstance, propertyID, scope, element, data.mutableBytes, &size));
+    }
+    
+    return data;
+}
+
 - (void)setInputFormat:(const AudioStreamBasicDescription *)asbd busNumber:(const UInt32)bus
 {
     if (!asbd) {
