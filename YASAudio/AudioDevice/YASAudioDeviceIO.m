@@ -170,7 +170,6 @@ static UInt32 YASAudioDeviceIOFrameCapacity = 4096;
     _isRunning = YES;
     
     if (!_audioDevice || !_ioProcID) {
-        YASLog(@"%s - Not initialized.", __PRETTY_FUNCTION__);
         return;
     }
     
@@ -186,7 +185,6 @@ static UInt32 YASAudioDeviceIOFrameCapacity = 4096;
     _isRunning = NO;
     
     if (!_audioDevice || !_ioProcID) {
-        YASLog(@"%s - Not initialized.", __PRETTY_FUNCTION__);
         return;
     }
     
