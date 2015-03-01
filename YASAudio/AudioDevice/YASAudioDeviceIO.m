@@ -155,7 +155,6 @@ static UInt32 YASAudioDeviceIOFrameCapacity = 4096;
     [self stop];
     
     if (!_audioDevice || !_ioProcID) {
-        YASLog(@"%s - Not initialized.", __PRETTY_FUNCTION__);
         return;
     }
     
