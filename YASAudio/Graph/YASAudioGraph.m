@@ -264,11 +264,6 @@ static BOOL _interrupting = NO;
 
 - (YASAudioDeviceIO *)addAudioDeviceIOWithAudioDevice:(YASAudioDevice *)audioDevice
 {
-    if (!audioDevice) {
-        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Argument is nil.", __PRETTY_FUNCTION__]));
-        return nil;
-    }
-    
     YASAudioDeviceIO *deviceIO = [[YASAudioDeviceIO alloc] initWithGraph:self];
     
     if (deviceIO) {
