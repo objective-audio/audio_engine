@@ -10,6 +10,7 @@
 #import "YASMacros.h"
 #import "YASAudioMath.h"
 #import "YASAudioUtility.h"
+#import "YASAudioFormat.h"
 #import <Accelerate/Accelerate.h>
 
 static const UInt32 kSineDataMaxCount = 4096;
@@ -19,9 +20,7 @@ static const UInt32 kSineDataMaxCount = 4096;
 @property (atomic, assign) Float64 throughVolume;
 @property (atomic, assign) Float64 sineFrequency;
 @property (atomic, assign) Float64 sineVolume;
-@property (atomic, assign) Float64 sampleRate;
-
-- (void)process:(AudioBufferList *)abl frameLength:(const UInt32)frameLength;
+@property (atomic, strong) YASAudioFormat *format;
 
 @end
 
@@ -43,41 +42,50 @@ static const UInt32 kSineDataMaxCount = 4096;
 - (void)dealloc
 {
     free(_sineData);
+    YASRelease(_format);
     YASSuperDealloc;
 }
 
-- (void)process:(AudioBufferList *)abl frameLength:(const UInt32)frameLength
+- (void)processWithOutputData:(AudioBufferList *)outputData inputData:(const AudioBufferList *)inputData frameLength:(const UInt32)frameLength
 {
-    if (!abl || frameLength == 0) {
+    if (!outputData || frameLength == 0) {
         return;
     }
     
-    const Float32 throughVol = self.throughVolume;
-    
-    for (UInt32 buf = 0; buf < abl->mNumberBuffers; buf++) {
-        Float32 *data = abl->mBuffers[buf].mData;
-        UInt32 length = frameLength * abl->mBuffers[buf].mNumberChannels;
-        cblas_sscal(length, throughVol, data, 1);
-    }
-    
-    const Float64 startPhase = _phase;
-    const Float64 sineVol = self.sineVolume;
-    const Float64 freq = self.sineFrequency;
-    const Float64 sampleRate = self.sampleRate;
-    Float64 endPhase = 0;
-    
-    if (frameLength < kSineDataMaxCount) {
-        endPhase = YASAudioVectorSinef(_sineData, frameLength, startPhase, freq / sampleRate * YAS_2_PI);
-    }
-    
-    _phase = endPhase;
-    
-    for (UInt32 buf = 0; buf < abl->mNumberBuffers; buf++) {
-        Float32 *data = abl->mBuffers[buf].mData;
-        const int stride = abl->mBuffers[buf].mNumberChannels;
-        const int length = frameLength;
-        for (UInt32 ch = 0; ch < stride; ch++) {
-            cblas_saxpy(length, sineVol, _sineData, 1, &data[ch], stride);
+    YASAudioFormat *format = self.format;
+    if (format && format.bitDepthFormat == YASAudioBitDepthFormatFloat32) {
+        if (inputData) {
+            UInt32 outFrameLength = frameLength;
+            YASAudioCopyAudioBufferListFlexibly(inputData, outputData, sizeof(Float32), &outFrameLength);
+            
+            const Float32 throughVol = self.throughVolume;
+            
+            for (UInt32 buf = 0; buf < outputData->mNumberBuffers; buf++) {
+                Float32 *data = outputData->mBuffers[buf].mData;
+                UInt32 length = frameLength * outputData->mBuffers[buf].mNumberChannels;
+                cblas_sscal(length, throughVol, data, 1);
+            }
+        }
+        
+        const Float64 sampleRate = format.sampleRate;
+        const Float64 startPhase = _phase;
+        const Float64 sineVol = self.sineVolume;
+        const Float64 freq = self.sineFrequency;
+        Float64 endPhase = 0;
+        
+        if (frameLength < kSineDataMaxCount) {
+            endPhase = YASAudioVectorSinef(_sineData, frameLength, startPhase, freq / sampleRate * YAS_2_PI);
+            
+            _phase = endPhase;
+            
+            for (UInt32 buf = 0; buf < outputData->mNumberBuffers; buf++) {
+                Float32 *data = outputData->mBuffers[buf].mData;
+                const int stride = outputData->mBuffers[buf].mNumberChannels;
+                const int length = frameLength;
+                for (UInt32 ch = 0; ch < stride; ch++) {
+                    cblas_saxpy(length, sineVol, _sineData, 1, &data[ch], stride);
+                }
+            }
         }
     }
 }
@@ -114,17 +122,9 @@ static const UInt32 kSineDataMaxCount = 4096;
     YASWeakContainer *container = self.deviceIO.weakContainer;
     
     self.deviceIO.renderCallbackBlock = ^(AudioBufferList *outData, const AudioTimeStamp *inTime, const UInt32 inFrameLength) {
-        if (outData) {
-            YASAudioDeviceIO *deviceIO = container.retainedObject;
-            const AudioBufferList *inputData = deviceIO.inputAudioBufferListOnRender;
-            if (inputData) {
-                UInt32 outFrameLength = inFrameLength;
-                YASAudioCopyAudioBufferListFlexibly(inputData, outData, sizeof(Float32), &outFrameLength);
-            }
-            YASRelease(deviceIO);
-            
-            [core process:outData frameLength:inFrameLength];
-        }
+        YASAudioDeviceIO *deviceIO = container.retainedObject;
+        [core processWithOutputData:outData inputData:deviceIO.inputAudioBufferListOnRender frameLength:inFrameLength];
+        YASRelease(deviceIO);
     };
     
     audioGraph.running = YES;
@@ -204,7 +204,7 @@ static const UInt32 kSineDataMaxCount = 4096;
 
 - (void)updateCoreSampleRate
 {
-    self.core.sampleRate = self.deviceIO.audioDevice.nominalSampleRate;
+    self.core.format = self.deviceIO.audioDevice.outputFormat;
 }
 
 #pragma mark -
