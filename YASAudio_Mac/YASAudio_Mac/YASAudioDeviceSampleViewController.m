@@ -11,6 +11,8 @@
 #import "YASAudioMath.h"
 #import "YASAudioUtility.h"
 #import "YASAudioFormat.h"
+#import "YASDecibelValueTransformer.h"
+#import "YASFrequencyValueFormatter.h"
 #import <Accelerate/Accelerate.h>
 
 static const UInt32 kSineDataMaxCount = 4096;
@@ -109,6 +111,15 @@ static const UInt32 kSineDataMaxCount = 4096;
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        YASDecibelValueTransformer *decibelValueFormatter = YASAutorelease([[YASDecibelValueTransformer alloc] init]);
+        [NSValueTransformer setValueTransformer:decibelValueFormatter forName:NSStringFromClass([YASDecibelValueTransformer class])];
+        
+        YASFrequencyValueFormatter *freqValueFormatter = YASAutorelease([[YASFrequencyValueFormatter alloc] init]);
+        [NSValueTransformer setValueTransformer:freqValueFormatter forName:NSStringFromClass([YASFrequencyValueFormatter class])];
+    });
     
     YASAudioGraph *audioGraph = [[YASAudioGraph alloc] init];
     self.audioGraph = audioGraph;

@@ -766,12 +766,19 @@
                                 </connections>
                             </slider>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Zrf-F7-Dkx">
-                                <rect key="frame" x="392" y="266" width="38" height="17"/>
+                                <rect key="frame" x="370" y="266" width="38" height="17"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Label" id="uWb-KV-Hia">
                                     <font key="font" metaFont="system"/>
                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
+                                <connections>
+                                    <binding destination="OQ8-jX-XhK" name="value" keyPath="core.throughVolume" id="IdM-y7-VEm">
+                                        <dictionary key="options">
+                                            <string key="NSValueTransformerName">YASDecibelValueTransformer</string>
+                                        </dictionary>
+                                    </binding>
+                                </connections>
                             </textField>
                             <scrollView horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hEe-Pt-hA3">
                                 <rect key="frame" x="20" y="20" width="408" height="83"/>
@@ -812,8 +819,64 @@
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Xg1-D9-j1R">
+                                <rect key="frame" x="370" y="213" width="38" height="17"/>
+                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Label" id="iiO-EP-wZK">
+                                    <font key="font" metaFont="system"/>
+                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                                <connections>
+                                    <binding destination="OQ8-jX-XhK" name="value" keyPath="core.sineVolume" id="ZAL-Es-vlF">
+                                        <dictionary key="options">
+                                            <string key="NSValueTransformerName">YASDecibelValueTransformer</string>
+                                        </dictionary>
+                                    </binding>
+                                </connections>
+                            </textField>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="jYu-EZ-4eU">
+                                <rect key="frame" x="370" y="160" width="38" height="17"/>
+                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Label" id="UPR-Az-lHa">
+                                    <font key="font" metaFont="system"/>
+                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                                <connections>
+                                    <binding destination="OQ8-jX-XhK" name="value" keyPath="core.sineFrequency" id="g1b-om-gpu">
+                                        <dictionary key="options">
+                                            <string key="NSValueTransformerName">YASFrequencyValueFormatter</string>
+                                        </dictionary>
+                                    </binding>
+                                </connections>
+                            </textField>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="LiP-aF-SXq">
+                                <rect key="frame" x="410" y="266" width="22" height="17"/>
+                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="dB" id="Pbx-vp-zAl">
+                                    <font key="font" metaFont="system"/>
+                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Noj-7R-Ct2">
+                                <rect key="frame" x="410" y="213" width="22" height="17"/>
+                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="dB" id="Znh-MS-EnE">
+                                    <font key="font" metaFont="system"/>
+                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="0f9-cl-iCO">
+                                <rect key="frame" x="410" y="160" width="21" height="17"/>
+                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Hz" id="7aH-fz-GzM">
+                                    <font key="font" metaFont="system"/>
+                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
                         </subviews>
                         <constraints>
+                            <constraint firstItem="jYu-EZ-4eU" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="tGb-ei-A30" secondAttribute="trailing" constant="20" id="25K-VJ-b6c"/>
+                            <constraint firstItem="Xg1-D9-j1R" firstAttribute="baseline" secondItem="Ksj-AZ-N9f" secondAttribute="baseline" id="3Tx-rr-rEE"/>
                             <constraint firstItem="7Wk-Fz-3pE" firstAttribute="top" secondItem="7LH-DV-YkR" secondAttribute="top" constant="20" id="3k9-0o-iH2"/>
                             <constraint firstItem="7Wk-Fz-3pE" firstAttribute="leading" secondItem="7LH-DV-YkR" secondAttribute="leading" constant="22" id="5Fs-Fu-yNk"/>
                             <constraint firstAttribute="trailing" secondItem="4Gv-GH-dhc" secondAttribute="trailing" constant="20" id="5mb-47-xap"/>
@@ -821,27 +884,37 @@
                             <constraint firstItem="s4c-Zs-zn2" firstAttribute="top" secondItem="4Gv-GH-dhc" secondAttribute="bottom" constant="16" id="ANa-dd-xkA"/>
                             <constraint firstItem="Zrf-F7-Dkx" firstAttribute="baseline" secondItem="s4c-Zs-zn2" secondAttribute="baseline" id="Azd-BZ-YEz"/>
                             <constraint firstItem="hEe-Pt-hA3" firstAttribute="top" secondItem="2x3-Yq-KRo" secondAttribute="bottom" constant="4" id="Bjq-78-8cO"/>
+                            <constraint firstItem="tGb-ei-A30" firstAttribute="baseline" secondItem="0f9-cl-iCO" secondAttribute="baseline" id="BsI-sg-QYq"/>
+                            <constraint firstItem="LiP-aF-SXq" firstAttribute="leading" secondItem="Zrf-F7-Dkx" secondAttribute="trailing" constant="6" id="ECG-x6-iMa"/>
                             <constraint firstItem="0ys-Ip-ugm" firstAttribute="leading" secondItem="7LH-DV-YkR" secondAttribute="leading" constant="20" symbolic="YES" id="Epu-Zl-KbT"/>
                             <constraint firstItem="tGb-ei-A30" firstAttribute="leading" secondItem="7LH-DV-YkR" secondAttribute="leading" constant="22" id="Ffq-4U-JRX"/>
                             <constraint firstItem="2x3-Yq-KRo" firstAttribute="top" secondItem="y7O-QJ-V6U" secondAttribute="bottom" constant="16" id="JRt-Er-Sf4"/>
                             <constraint firstItem="ZJ4-xZ-wZH" firstAttribute="top" secondItem="Ksj-AZ-N9f" secondAttribute="bottom" constant="3" id="NJ4-ER-OY1"/>
+                            <constraint firstItem="tGb-ei-A30" firstAttribute="baseline" secondItem="jYu-EZ-4eU" secondAttribute="baseline" id="O4D-h3-pd8"/>
                             <constraint firstItem="y7O-QJ-V6U" firstAttribute="leading" secondItem="7LH-DV-YkR" secondAttribute="leading" constant="20" id="OXV-9W-mn5"/>
+                            <constraint firstItem="0f9-cl-iCO" firstAttribute="leading" secondItem="jYu-EZ-4eU" secondAttribute="trailing" constant="6" id="PVA-7k-fUr"/>
                             <constraint firstAttribute="trailing" secondItem="hEe-Pt-hA3" secondAttribute="trailing" constant="22" id="PwM-5s-ZTc"/>
                             <constraint firstItem="4Gv-GH-dhc" firstAttribute="top" secondItem="7Wk-Fz-3pE" secondAttribute="bottom" constant="3" id="Rvz-2l-UmS"/>
+                            <constraint firstAttribute="trailing" secondItem="Noj-7R-Ct2" secondAttribute="trailing" constant="20" id="S3D-mv-UIb"/>
+                            <constraint firstItem="Noj-7R-Ct2" firstAttribute="leading" secondItem="Xg1-D9-j1R" secondAttribute="trailing" constant="6" id="XUo-6n-xdf"/>
                             <constraint firstItem="y7O-QJ-V6U" firstAttribute="top" secondItem="tGb-ei-A30" secondAttribute="bottom" constant="3" id="Yvd-kb-hd0"/>
                             <constraint firstItem="2x3-Yq-KRo" firstAttribute="leading" secondItem="7LH-DV-YkR" secondAttribute="leading" constant="24" id="ZZz-lM-tCi"/>
                             <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="7Wk-Fz-3pE" secondAttribute="trailing" constant="20" id="ZiO-3n-Umo"/>
                             <constraint firstAttribute="bottom" secondItem="hEe-Pt-hA3" secondAttribute="bottom" constant="20" id="aRM-e2-6Yb"/>
+                            <constraint firstItem="Noj-7R-Ct2" firstAttribute="baseline" secondItem="Ksj-AZ-N9f" secondAttribute="baseline" id="ayU-Ch-WXS"/>
                             <constraint firstAttribute="trailing" secondItem="y7O-QJ-V6U" secondAttribute="trailing" constant="20" id="bh8-ZQ-gI1"/>
                             <constraint firstItem="0ys-Ip-ugm" firstAttribute="top" secondItem="s4c-Zs-zn2" secondAttribute="bottom" constant="3" id="cUy-5Q-NJy"/>
+                            <constraint firstItem="LiP-aF-SXq" firstAttribute="baseline" secondItem="s4c-Zs-zn2" secondAttribute="baseline" id="fyp-TR-t3A"/>
+                            <constraint firstAttribute="trailing" secondItem="0f9-cl-iCO" secondAttribute="trailing" constant="21" id="gI4-Jc-tyu"/>
+                            <constraint firstAttribute="trailing" secondItem="LiP-aF-SXq" secondAttribute="trailing" constant="20" id="gxW-xO-zYI"/>
                             <constraint firstItem="Ksj-AZ-N9f" firstAttribute="top" secondItem="0ys-Ip-ugm" secondAttribute="bottom" constant="16" id="ia3-RO-Dap"/>
                             <constraint firstItem="ZJ4-xZ-wZH" firstAttribute="leading" secondItem="7LH-DV-YkR" secondAttribute="leading" constant="20" id="k3I-VL-NJU"/>
                             <constraint firstItem="Ksj-AZ-N9f" firstAttribute="leading" secondItem="7LH-DV-YkR" secondAttribute="leading" constant="22" id="kBq-YI-oot"/>
                             <constraint firstItem="Zrf-F7-Dkx" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="s4c-Zs-zn2" secondAttribute="trailing" constant="20" id="lxr-tN-yHk"/>
                             <constraint firstItem="hEe-Pt-hA3" firstAttribute="leading" secondItem="7LH-DV-YkR" secondAttribute="leading" constant="20" id="mBW-Is-2t8"/>
-                            <constraint firstAttribute="trailing" secondItem="Zrf-F7-Dkx" secondAttribute="trailing" constant="22" id="nSv-NB-dab"/>
                             <constraint firstItem="s4c-Zs-zn2" firstAttribute="leading" secondItem="7LH-DV-YkR" secondAttribute="leading" constant="22" id="qkj-CI-3lg"/>
                             <constraint firstItem="4Gv-GH-dhc" firstAttribute="leading" secondItem="7LH-DV-YkR" secondAttribute="leading" constant="20" id="rpx-Ej-5MH"/>
+                            <constraint firstItem="Xg1-D9-j1R" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="Ksj-AZ-N9f" secondAttribute="trailing" constant="20" id="w0W-qD-wbi"/>
                             <constraint firstAttribute="trailing" secondItem="0ys-Ip-ugm" secondAttribute="trailing" constant="20" symbolic="YES" id="wff-Hl-JTH"/>
                             <constraint firstAttribute="trailing" secondItem="ZJ4-xZ-wZH" secondAttribute="trailing" constant="20" id="x7C-NV-O4l"/>
                         </constraints>
