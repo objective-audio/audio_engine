@@ -209,10 +209,11 @@ static const UInt32 kSineDataMaxCount = 4096;
     if (selectedDevice && [allDevices containsObject:selectedDevice]) {
         self.deviceIO.audioDevice = selectedDevice;
         [self updateCoreSampleRate];
-        [self updateDeviceInfo];
     } else {
         self.deviceIO.audioDevice = nil;
     }
+    
+    [self updateDeviceInfo];
 }
 
 - (void)updateCoreSampleRate
