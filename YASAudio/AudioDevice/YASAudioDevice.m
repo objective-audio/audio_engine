@@ -327,16 +327,42 @@ static AudioObjectPropertyListenerBlock _globalListenerBlock;
 
 - (NSString *)description
 {
-    NSMutableString *result = [NSMutableString stringWithFormat:@"<%@: %p>\n", self.class, self];
-    NSDictionary *dict = @{@"01_audioDeviceID": @(_audioDeviceID),
-                           @"02_name": self.name,
-                           @"03_manufacture": self.manufacture,
-                           @"04_inputStreamCount": @(self.inputStreams.count),
-                           @"05_outputStreamCount": @(self.outputStreams.count),
-                           @"06_inputChannelCount": @(self.inputFormat.channelCount),
-                           @"07_outputChannelCount": @(self.outputFormat.channelCount),
-                           @"08_nominalSampleRate": @(self.nominalSampleRate)};
-    [result appendString:dict.description];
+    NSMutableString *result = [NSMutableString stringWithFormat:@"<%@: %p>\n{\n", self.class, self];
+    NSMutableArray *lines = [NSMutableArray array];
+    [lines addObject:[NSString stringWithFormat:@"AudioDeviceID = %@", @(_audioDeviceID)]];
+    [lines addObject:[NSString stringWithFormat:@"Name = %@", self.name]];
+    [lines addObject:[NSString stringWithFormat:@"Manufacture = %@", self.manufacture]];
+    [lines addObject:[NSString stringWithFormat:@"Nominal SampleRate = %@", @(self.nominalSampleRate)]];
+    if (self.inputFormat) {
+        [lines addObject:[NSString stringWithFormat:@"Input Format = %@", self.inputFormat]];
+    }
+    if (self.outputFormat) {
+        [lines addObject:[NSString stringWithFormat:@"Output Format = %@", self.outputFormat]];
+    }
+    if (self.inputStreams.count > 0) {
+        [lines addObject:[NSString stringWithFormat:@"Input Streams = %@", @(self.inputStreams.count)]];
+        NSMutableArray *streamLines = [NSMutableArray array];
+        for (YASAudioDeviceStream *stream in self.inputStreams) {
+            NSMutableString *streamLine = [NSMutableString stringWithFormat:@"{\n"];
+            [streamLine appendString:[stream.description stringByAppendingLinePrefix:@"    "]];
+            [streamLine appendString:@"\n}"];
+            [streamLines addObject:streamLine];
+        }
+        [lines addObject:[streamLines componentsJoinedByString:@",\n"]];
+    }
+    if (self.outputStreams.count > 0) {
+        [lines addObject:[NSString stringWithFormat:@"Output Streams = %@", @(self.outputStreams.count)]];
+        NSMutableArray *streamLines = [NSMutableArray array];
+        for (YASAudioDeviceStream *stream in self.outputStreams) {
+            NSMutableString *streamLine = [NSMutableString stringWithFormat:@"{\n"];
+            [streamLine appendString:[stream.description stringByAppendingLinePrefix:@"    "]];
+            [streamLine appendString:@"\n}"];
+            [streamLines addObject:streamLine];
+        }
+        [lines addObject:[streamLines componentsJoinedByString:@",\n"]];
+    }
+    [result appendString:[[lines componentsJoinedByString:@"\n"] stringByAppendingLinePrefix:@"    "]];
+    [result appendFormat:@"\n}"];
     return result;
 }
 

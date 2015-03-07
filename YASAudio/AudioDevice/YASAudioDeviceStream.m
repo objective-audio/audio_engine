@@ -12,6 +12,7 @@
 #import "YASAudioFormat.h"
 #import "YASMacros.h"
 #import "NSException+YASAudio.h"
+#import "NSString+YASAudio.h"
 
 NSString *const YASAudioDeviceStreamVirtualFormatDidChangeNotification = @"YASAudioDeviceStreamVirtualFormatDidChangeNotification";
 NSString *const YASAudioDeviceStreamIsActiveDidChangeNotification = @"YASAudioDeviceStreamIsActiveDidChangeNotification";
@@ -76,12 +77,14 @@ NSString *const YASAudioDeviceStreamStartingChannelDidChangeNotification = @"YAS
 
 - (NSString *)description
 {
-    NSMutableString *result = [NSMutableString stringWithFormat:@"<%@: %p>\n", self.class, self];
-    NSDictionary *dict = @{@"01_isActive": @(self.isActive),
-                           @"02_virtualFormat": self.virtualFormat,
-                           @"03_direction": self.direction == YASAudioDeviceStreamDirectionOutput ? @"output" : @"input",
-                           @"04_startingChannel": @(self.startingChannel)};
-    [result appendString:dict.description];
+    NSMutableString *result = [NSMutableString stringWithFormat:@"<%@: %p>\n{\n", self.class, self];
+    NSMutableArray *lines = [NSMutableArray array];
+    [lines addObject:[NSString stringWithFormat:@"isActive = %@", self.isActive ? @"true" : @"false"]];
+    [lines addObject:[NSString stringWithFormat:@"direction = %@", (self.direction == YASAudioDeviceStreamDirectionOutput) ? @"output" : @"input"]];
+    [lines addObject:[NSString stringWithFormat:@"startingChannel = %@", @(self.startingChannel)]];
+    [lines addObject:[NSString stringWithFormat:@"virtualFormat = %@", self.virtualFormat]];
+    [result appendString:[[lines componentsJoinedByString:@"\n"] stringByAppendingLinePrefix:@"    "]];
+    [result appendString:@"\n}"];
     return result;
 }
 
