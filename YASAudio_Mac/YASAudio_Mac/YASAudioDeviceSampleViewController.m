@@ -100,6 +100,7 @@ static const UInt32 kSineDataMaxCount = 4096;
 
 @property (nonatomic, strong) NSArray *deviceNames;
 @property (nonatomic, assign) NSUInteger selectedDeviceIndex;
+@property (nonatomic, copy) NSString *deviceInfo;
 
 @end
 
@@ -197,6 +198,7 @@ static const UInt32 kSineDataMaxCount = 4096;
     if (selectedDevice && [allDevices containsObject:selectedDevice]) {
         self.deviceIO.audioDevice = selectedDevice;
         [self updateCoreSampleRate];
+        [self updateDeviceInfo];
     } else {
         self.deviceIO.audioDevice = nil;
     }
@@ -205,6 +207,11 @@ static const UInt32 kSineDataMaxCount = 4096;
 - (void)updateCoreSampleRate
 {
     self.core.format = self.deviceIO.audioDevice.outputFormat;
+}
+
+- (void)updateDeviceInfo
+{
+    self.deviceInfo = self.deviceIO.audioDevice.description;
 }
 
 #pragma mark -
@@ -220,6 +227,7 @@ static const UInt32 kSineDataMaxCount = 4096;
     
     if ([self.deviceIO.audioDevice isEqualToAudioDevice:device]) {
         [self updateCoreSampleRate];
+        [self updateDeviceInfo];
     }
 }
 

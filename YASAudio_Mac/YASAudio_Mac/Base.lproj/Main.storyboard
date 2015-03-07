@@ -691,11 +691,11 @@
             <objects>
                 <viewController storyboardIdentifier="YASAudioDeviceSampleViewController" id="OQ8-jX-XhK" customClass="YASAudioDeviceSampleViewController" sceneMemberID="viewController">
                     <view key="view" id="7LH-DV-YkR">
-                        <rect key="frame" x="0.0" y="0.0" width="450" height="300"/>
+                        <rect key="frame" x="0.0" y="0.0" width="450" height="360"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s4c-Zs-zn2">
-                                <rect key="frame" x="20" y="206" width="122" height="17"/>
+                                <rect key="frame" x="20" y="266" width="122" height="17"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="IO Through volume" id="HZM-Cc-2wm">
                                     <font key="font" metaFont="system"/>
                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -703,7 +703,7 @@
                                 </textFieldCell>
                             </textField>
                             <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="4Gv-GH-dhc">
-                                <rect key="frame" x="18" y="236" width="415" height="26"/>
+                                <rect key="frame" x="18" y="296" width="415" height="26"/>
                                 <popUpButtonCell key="cell" type="push" title="Item 1" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="Xhs-jb-4BX" id="7Vn-2P-Z8s">
                                     <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="menu"/>
@@ -721,7 +721,7 @@
                                 </connections>
                             </popUpButton>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="7Wk-Fz-3pE">
-                                <rect key="frame" x="20" y="263" width="86" height="17"/>
+                                <rect key="frame" x="20" y="323" width="86" height="17"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Audio Device" id="aPu-eV-kOg">
                                     <font key="font" metaFont="system"/>
                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -729,14 +729,14 @@
                                 </textFieldCell>
                             </textField>
                             <slider verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="0ys-Ip-ugm">
-                                <rect key="frame" x="18" y="184" width="414" height="21"/>
+                                <rect key="frame" x="18" y="244" width="414" height="21"/>
                                 <sliderCell key="cell" continuous="YES" state="on" alignment="left" maxValue="1" tickMarkPosition="above" sliderType="linear" id="vEo-Pl-arz"/>
                                 <connections>
                                     <binding destination="OQ8-jX-XhK" name="value" keyPath="core.throughVolume" id="AQd-VN-x8V"/>
                                 </connections>
                             </slider>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Ksj-AZ-N9f">
-                                <rect key="frame" x="20" y="153" width="81" height="17"/>
+                                <rect key="frame" x="20" y="213" width="81" height="17"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Sine Volume" id="ZT1-C1-3Ki">
                                     <font key="font" metaFont="system"/>
                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -744,14 +744,14 @@
                                 </textFieldCell>
                             </textField>
                             <slider verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ZJ4-xZ-wZH">
-                                <rect key="frame" x="18" y="131" width="414" height="21"/>
+                                <rect key="frame" x="18" y="191" width="414" height="21"/>
                                 <sliderCell key="cell" continuous="YES" state="on" alignment="left" maxValue="1" tickMarkPosition="above" sliderType="linear" id="I0F-13-295"/>
                                 <connections>
                                     <binding destination="OQ8-jX-XhK" name="value" keyPath="core.sineVolume" id="few-ua-ojE"/>
                                 </connections>
                             </slider>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="tGb-ei-A30">
-                                <rect key="frame" x="20" y="100" width="100" height="17"/>
+                                <rect key="frame" x="20" y="160" width="100" height="17"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Sine Frequency" id="Vg5-GL-uxF">
                                     <font key="font" metaFont="system"/>
                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -759,15 +759,54 @@
                                 </textFieldCell>
                             </textField>
                             <slider verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="y7O-QJ-V6U">
-                                <rect key="frame" x="18" y="78" width="414" height="21"/>
+                                <rect key="frame" x="18" y="138" width="414" height="21"/>
                                 <sliderCell key="cell" continuous="YES" state="on" alignment="left" minValue="100" maxValue="4000" doubleValue="1000" tickMarkPosition="above" sliderType="linear" id="Bfm-so-WMo"/>
                                 <connections>
                                     <binding destination="OQ8-jX-XhK" name="value" keyPath="core.sineFrequency" id="krn-fg-fTk"/>
                                 </connections>
                             </slider>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Zrf-F7-Dkx">
-                                <rect key="frame" x="392" y="206" width="38" height="17"/>
+                                <rect key="frame" x="392" y="266" width="38" height="17"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Label" id="uWb-KV-Hia">
+                                    <font key="font" metaFont="system"/>
+                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <scrollView horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hEe-Pt-hA3">
+                                <rect key="frame" x="20" y="20" width="408" height="83"/>
+                                <clipView key="contentView" id="qTa-h0-7jp">
+                                    <rect key="frame" x="1" y="1" width="238" height="133"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                    <subviews>
+                                        <textView editable="NO" selectable="NO" importsGraphics="NO" findStyle="panel" continuousSpellChecking="YES" allowsUndo="YES" usesRuler="YES" usesFontPanel="YES" verticallyResizable="YES" allowsNonContiguousLayout="YES" quoteSubstitution="YES" dashSubstitution="YES" spellingCorrection="YES" smartInsertDelete="YES" id="bdx-ZF-yFR">
+                                            <rect key="frame" x="0.0" y="0.0" width="238" height="133"/>
+                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                            <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                            <size key="minSize" width="406" height="81"/>
+                                            <size key="maxSize" width="463" height="10000000"/>
+                                            <color key="insertionPointColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                            <size key="minSize" width="406" height="81"/>
+                                            <size key="maxSize" width="463" height="10000000"/>
+                                            <connections>
+                                                <binding destination="OQ8-jX-XhK" name="attributedString" keyPath="deviceInfo" id="1xj-KW-T42"/>
+                                            </connections>
+                                        </textView>
+                                    </subviews>
+                                    <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                </clipView>
+                                <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="YES" id="FAT-jM-xRm">
+                                    <rect key="frame" x="-100" y="-100" width="87" height="18"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                </scroller>
+                                <scroller key="verticalScroller" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="DSY-Bo-hIC">
+                                    <rect key="frame" x="223" y="1" width="16" height="133"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                </scroller>
+                            </scrollView>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2x3-Yq-KRo">
+                                <rect key="frame" x="22" y="107" width="113" height="17"/>
+                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Audio Device Info" id="gfG-z5-8Ou">
                                     <font key="font" metaFont="system"/>
                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -781,19 +820,25 @@
                             <constraint firstItem="tGb-ei-A30" firstAttribute="top" secondItem="ZJ4-xZ-wZH" secondAttribute="bottom" constant="16" id="8IP-l4-2ts"/>
                             <constraint firstItem="s4c-Zs-zn2" firstAttribute="top" secondItem="4Gv-GH-dhc" secondAttribute="bottom" constant="16" id="ANa-dd-xkA"/>
                             <constraint firstItem="Zrf-F7-Dkx" firstAttribute="baseline" secondItem="s4c-Zs-zn2" secondAttribute="baseline" id="Azd-BZ-YEz"/>
+                            <constraint firstItem="hEe-Pt-hA3" firstAttribute="top" secondItem="2x3-Yq-KRo" secondAttribute="bottom" constant="4" id="Bjq-78-8cO"/>
                             <constraint firstItem="0ys-Ip-ugm" firstAttribute="leading" secondItem="7LH-DV-YkR" secondAttribute="leading" constant="20" symbolic="YES" id="Epu-Zl-KbT"/>
                             <constraint firstItem="tGb-ei-A30" firstAttribute="leading" secondItem="7LH-DV-YkR" secondAttribute="leading" constant="22" id="Ffq-4U-JRX"/>
+                            <constraint firstItem="2x3-Yq-KRo" firstAttribute="top" secondItem="y7O-QJ-V6U" secondAttribute="bottom" constant="16" id="JRt-Er-Sf4"/>
                             <constraint firstItem="ZJ4-xZ-wZH" firstAttribute="top" secondItem="Ksj-AZ-N9f" secondAttribute="bottom" constant="3" id="NJ4-ER-OY1"/>
                             <constraint firstItem="y7O-QJ-V6U" firstAttribute="leading" secondItem="7LH-DV-YkR" secondAttribute="leading" constant="20" id="OXV-9W-mn5"/>
+                            <constraint firstAttribute="trailing" secondItem="hEe-Pt-hA3" secondAttribute="trailing" constant="22" id="PwM-5s-ZTc"/>
                             <constraint firstItem="4Gv-GH-dhc" firstAttribute="top" secondItem="7Wk-Fz-3pE" secondAttribute="bottom" constant="3" id="Rvz-2l-UmS"/>
                             <constraint firstItem="y7O-QJ-V6U" firstAttribute="top" secondItem="tGb-ei-A30" secondAttribute="bottom" constant="3" id="Yvd-kb-hd0"/>
+                            <constraint firstItem="2x3-Yq-KRo" firstAttribute="leading" secondItem="7LH-DV-YkR" secondAttribute="leading" constant="24" id="ZZz-lM-tCi"/>
                             <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="7Wk-Fz-3pE" secondAttribute="trailing" constant="20" id="ZiO-3n-Umo"/>
+                            <constraint firstAttribute="bottom" secondItem="hEe-Pt-hA3" secondAttribute="bottom" constant="20" id="aRM-e2-6Yb"/>
                             <constraint firstAttribute="trailing" secondItem="y7O-QJ-V6U" secondAttribute="trailing" constant="20" id="bh8-ZQ-gI1"/>
                             <constraint firstItem="0ys-Ip-ugm" firstAttribute="top" secondItem="s4c-Zs-zn2" secondAttribute="bottom" constant="3" id="cUy-5Q-NJy"/>
                             <constraint firstItem="Ksj-AZ-N9f" firstAttribute="top" secondItem="0ys-Ip-ugm" secondAttribute="bottom" constant="16" id="ia3-RO-Dap"/>
                             <constraint firstItem="ZJ4-xZ-wZH" firstAttribute="leading" secondItem="7LH-DV-YkR" secondAttribute="leading" constant="20" id="k3I-VL-NJU"/>
                             <constraint firstItem="Ksj-AZ-N9f" firstAttribute="leading" secondItem="7LH-DV-YkR" secondAttribute="leading" constant="22" id="kBq-YI-oot"/>
                             <constraint firstItem="Zrf-F7-Dkx" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="s4c-Zs-zn2" secondAttribute="trailing" constant="20" id="lxr-tN-yHk"/>
+                            <constraint firstItem="hEe-Pt-hA3" firstAttribute="leading" secondItem="7LH-DV-YkR" secondAttribute="leading" constant="20" id="mBW-Is-2t8"/>
                             <constraint firstAttribute="trailing" secondItem="Zrf-F7-Dkx" secondAttribute="trailing" constant="22" id="nSv-NB-dab"/>
                             <constraint firstItem="s4c-Zs-zn2" firstAttribute="leading" secondItem="7LH-DV-YkR" secondAttribute="leading" constant="22" id="qkj-CI-3lg"/>
                             <constraint firstItem="4Gv-GH-dhc" firstAttribute="leading" secondItem="7LH-DV-YkR" secondAttribute="leading" constant="20" id="rpx-Ej-5MH"/>
@@ -805,7 +850,7 @@
                 <customObject id="ifD-4p-0Qs" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
                 <userDefaultsController representsSharedInstance="YES" id="Z7O-My-q4E"/>
             </objects>
-            <point key="canvasLocation" x="623" y="724"/>
+            <point key="canvasLocation" x="623" y="754"/>
         </scene>
     </scenes>
 </document>
