@@ -75,6 +75,8 @@
     NSFileManager *fileManager = [[NSFileManager alloc] init];
     
     [fileManager createDirectoryAtPath:path withIntermediateDirectories:YES attributes:nil error:nil];
+    
+    YASRelease(fileManager);
 }
 
 - (void)removeAllFiles
@@ -89,6 +91,8 @@
     }
     
     [fileManager removeItemAtPath:path error:nil];
+    
+    YASRelease(fileManager);
 }
 
 - (void)setUp
@@ -105,11 +109,19 @@
 
 - (void)testWAVEFile
 {
+#if WAVEFILE_LIGHT_TEST
+    NSArray *sampleRates = @[@(44100.0), @(382000.0)];
+    NSArray *channels = @[@(1), @(2)];
+    NSArray *fileBitDepths = @[@(16), @(24)];
+    NSArray *bitDepthFormats = @[@(YASAudioBitDepthFormatFloat32), @(YASAudioBitDepthFormatInt16)];
+    NSArray *interleaveds = @[@(YES), @(NO)];
+#else
     NSArray *sampleRates = @[@(8000.0), @(44100.0), @(48000.0), @(382000.0)];
     NSArray *channels = @[@(1), @(2), @(3), @(6)];
     NSArray *fileBitDepths = @[@(16), @(24), @(32)];
     NSArray *bitDepthFormats = @[@(YASAudioBitDepthFormatFloat32), @(YASAudioBitDepthFormatFloat64), @(YASAudioBitDepthFormatInt16), @(YASAudioBitDepthFormatInt32)];
     NSArray *interleaveds = @[@(YES), @(NO)];
+#endif
     
     YASAudioFileTestData *testData = [[YASAudioFileTestData alloc] init];
     testData.frameLength = 8;
@@ -149,7 +161,11 @@
     testData.interleaved = NO;
     
     [self _commonAudioFileTest:testData isWriteAsync:NO];
+#if !WAVEFILE_LIGHT_TEST
     [self _commonAudioFileTest:testData isWriteAsync:YES];
+#endif
+    
+    YASRelease(testData);
 }
 
 - (void)testWaveFileSettingsInt16
@@ -420,6 +436,8 @@
             
             startIndex += frameLength;
         }
+        
+        YASRelease(audioBuffer);
         
         audioFile.fileFramePosition = 0;
         XCTAssertEqual(audioFile.fileFramePosition, 0);
