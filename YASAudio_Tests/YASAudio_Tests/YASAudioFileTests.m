@@ -75,6 +75,8 @@
     NSFileManager *fileManager = [[NSFileManager alloc] init];
     
     [fileManager createDirectoryAtPath:path withIntermediateDirectories:YES attributes:nil error:nil];
+    
+    YASRelease(fileManager);
 }
 
 - (void)removeAllFiles
@@ -89,6 +91,8 @@
     }
     
     [fileManager removeItemAtPath:path error:nil];
+    
+    YASRelease(fileManager);
 }
 
 - (void)setUp
@@ -158,6 +162,8 @@
     
     [self _commonAudioFileTest:testData isWriteAsync:NO];
     [self _commonAudioFileTest:testData isWriteAsync:YES];
+    
+    YASRelease(testData);
 }
 
 - (void)testWaveFileSettingsInt16
@@ -428,6 +434,8 @@
             
             startIndex += frameLength;
         }
+        
+        YASRelease(audioBuffer);
         
         audioFile.fileFramePosition = 0;
         XCTAssertEqual(audioFile.fileFramePosition, 0);
