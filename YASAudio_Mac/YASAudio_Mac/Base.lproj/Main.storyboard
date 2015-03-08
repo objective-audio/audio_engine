@@ -701,6 +701,9 @@
                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
+                                <connections>
+                                    <binding destination="OQ8-jX-XhK" name="textColor" keyPath="ioThroughTextColor" id="TXS-3r-jpQ"/>
+                                </connections>
                             </textField>
                             <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="4Gv-GH-dhc">
                                 <rect key="frame" x="18" y="296" width="415" height="26"/>
@@ -742,6 +745,9 @@
                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
+                                <connections>
+                                    <binding destination="OQ8-jX-XhK" name="textColor" keyPath="sineTextColor" id="6l2-IQ-Jr8"/>
+                                </connections>
                             </textField>
                             <slider verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ZJ4-xZ-wZH">
                                 <rect key="frame" x="18" y="191" width="414" height="21"/>
@@ -757,6 +763,9 @@
                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
+                                <connections>
+                                    <binding destination="OQ8-jX-XhK" name="textColor" keyPath="sineTextColor" id="P7y-lG-r2D"/>
+                                </connections>
                             </textField>
                             <slider verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="y7O-QJ-V6U">
                                 <rect key="frame" x="18" y="138" width="414" height="21"/>

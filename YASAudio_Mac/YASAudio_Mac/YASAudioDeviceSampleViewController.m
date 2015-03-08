@@ -103,6 +103,8 @@ static const UInt32 kSineDataMaxCount = 4096;
 @property (nonatomic, strong) NSArray *deviceNames;
 @property (nonatomic, assign) NSUInteger selectedDeviceIndex;
 @property (nonatomic, copy) NSString *deviceInfo;
+@property (nonatomic, strong) NSColor *ioThroughTextColor;
+@property (nonatomic, strong) NSColor *sineTextColor;
 
 @end
 
@@ -159,6 +161,9 @@ static const UInt32 kSineDataMaxCount = 4096;
     YASRelease(_deviceIO);
     YASRelease(_audioGraph);
     YASRelease(_deviceNames);
+    YASRelease(_deviceInfo);
+    YASRelease(_ioThroughTextColor);
+    YASRelease(_sineTextColor);
     YASSuperDealloc;
 }
 
@@ -208,7 +213,6 @@ static const UInt32 kSineDataMaxCount = 4096;
     
     if (selectedDevice && [allDevices containsObject:selectedDevice]) {
         self.deviceIO.audioDevice = selectedDevice;
-        [self updateCoreSampleRate];
     } else {
         self.deviceIO.audioDevice = nil;
     }
@@ -216,14 +220,16 @@ static const UInt32 kSineDataMaxCount = 4096;
     [self updateDeviceInfo];
 }
 
-- (void)updateCoreSampleRate
-{
-    self.core.format = self.deviceIO.audioDevice.outputFormat;
-}
-
 - (void)updateDeviceInfo
 {
-    self.deviceInfo = self.deviceIO.audioDevice.description;
+    YASAudioDevice *device = self.deviceIO.audioDevice;
+    NSColor *onColor = [NSColor blackColor];
+    NSColor *offColor = [NSColor lightGrayColor];
+    
+    self.core.format = device.outputFormat;
+    self.deviceInfo = device.description;
+    self.ioThroughTextColor = (device.inputFormat && device.outputFormat) ? onColor : offColor;
+    self.sineTextColor = device.outputFormat ? onColor : offColor;
 }
 
 #pragma mark -
@@ -238,7 +244,6 @@ static const UInt32 kSineDataMaxCount = 4096;
     YASAudioDevice *device = notification.object;
     
     if ([self.deviceIO.audioDevice isEqualToAudioDevice:device]) {
-        [self updateCoreSampleRate];
         [self updateDeviceInfo];
     }
 }
