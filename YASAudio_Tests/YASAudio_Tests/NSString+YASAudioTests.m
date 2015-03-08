@@ -90,4 +90,10 @@
     XCTAssertEqual(fcc, 0);
 }
 
+- (void)testStringByAppendingLinePrefix
+{
+    NSString *string = @"abc\ndef\nghi";
+    XCTAssertEqualObjects([string stringByAppendingLinePrefix:@"xyz"], @"xyzabc\nxyzdef\nxyzghi");
+}
+
 @end
