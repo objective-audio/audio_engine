@@ -22,13 +22,15 @@
 - (instancetype)init NS_UNAVAILABLE;
 - (instancetype)initWithStreamDescription:(const AudioStreamBasicDescription *)asbd;
 - (instancetype)initStandardFormatWithSampleRate:(double)sampleRate channels:(UInt32)channels;
-- (instancetype)initWithBitDepthFormat:(YASAudioBitDepthFormat)format sampleRate:(double)sampleRate channels:(UInt32)channels interleaved:(BOOL)interleaved;
+- (instancetype)initWithBitDepthFormat:(YASAudioBitDepthFormat)format
+                            sampleRate:(double)sampleRate
+                              channels:(UInt32)channels
+                           interleaved:(BOOL)interleaved;
 - (instancetype)initWithSettings:(NSDictionary *)settings;
 
 - (BOOL)isEqualToAudioFormat:(YASAudioFormat *)otherFormat;
 
 @end
-
 
 @interface NSDictionary (YASAudioFormat)
 

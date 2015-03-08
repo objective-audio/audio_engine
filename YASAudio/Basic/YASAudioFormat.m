@@ -11,7 +11,7 @@
 
 @implementation YASAudioFormat {
     AudioStreamBasicDescription _asbd;
-	YASAudioBitDepthFormat _bitDepthFormat;
+    YASAudioBitDepthFormat _bitDepthFormat;
 }
 
 - (instancetype)initWithStreamDescription:(const AudioStreamBasicDescription *)asbd
@@ -50,32 +50,37 @@
 
 - (instancetype)initStandardFormatWithSampleRate:(double)sampleRate channels:(UInt32)channels
 {
-    return [self initWithBitDepthFormat:YASAudioBitDepthFormatFloat32 sampleRate:sampleRate channels:channels interleaved:NO];
+    return [self initWithBitDepthFormat:YASAudioBitDepthFormatFloat32
+                             sampleRate:sampleRate
+                               channels:channels
+                            interleaved:NO];
 }
 
-- (instancetype)initWithBitDepthFormat:(YASAudioBitDepthFormat)format sampleRate:(double)sampleRate channels:(UInt32)channels interleaved:(BOOL)interleaved
+- (instancetype)initWithBitDepthFormat:(YASAudioBitDepthFormat)format
+                            sampleRate:(double)sampleRate
+                              channels:(UInt32)channels
+                           interleaved:(BOOL)interleaved
 {
     if (format == YASAudioBitDepthFormatOther || channels == 0) {
         YASRaiseWithReason(([NSString stringWithFormat:@"%s - Invalid argument.", __PRETTY_FUNCTION__]));
         YASRelease(self);
         return nil;
     }
-    
+
     AudioStreamBasicDescription asbd = {
-        .mSampleRate = sampleRate,
-        .mFormatID = kAudioFormatLinearPCM,
+        .mSampleRate = sampleRate, .mFormatID = kAudioFormatLinearPCM,
     };
-    
+
     if (format == YASAudioBitDepthFormatFloat32 || format == YASAudioBitDepthFormatFloat64) {
         asbd.mFormatFlags = kAudioFormatFlagsNativeFloatPacked;
     } else if (format == YASAudioBitDepthFormatInt16 || format == YASAudioBitDepthFormatInt32) {
         asbd.mFormatFlags = kAudioFormatFlagIsSignedInteger | kAudioFormatFlagsNativeEndian | kAudioFormatFlagIsPacked;
     }
-    
+
     if (!interleaved) {
         asbd.mFormatFlags |= kAudioFormatFlagIsNonInterleaved;
     }
-    
+
     if (format == YASAudioBitDepthFormatFloat64) {
         asbd.mBitsPerChannel = 64;
     } else if (format == YASAudioBitDepthFormatInt16) {
@@ -83,12 +88,12 @@
     } else {
         asbd.mBitsPerChannel = 32;
     }
-    
+
     asbd.mChannelsPerFrame = channels;
-    
+
     UInt32 size = sizeof(AudioStreamBasicDescription);
     AudioFormatGetProperty(kAudioFormatProperty_FormatInfo, 0, NULL, &size, &asbd);
-    
+
     return [self initWithStreamDescription:&asbd];
 }
 
@@ -163,25 +168,29 @@
 - (NSString *)description
 {
     NSMutableString *result = [NSMutableString stringWithFormat:@"<%@: %p>\n", self.class, self];
-    NSDictionary *asbdDict = @{@"bitDepthFormat": [self _bitDepthFormatString],
-                               @"sampleRate": @(_asbd.mSampleRate),
-                               @"bitsPerChannel": @(_asbd.mBitsPerChannel),
-                               @"bytesPerFrame": @(_asbd.mBytesPerFrame),
-                               @"bytesPerPacket": @(_asbd.mBytesPerPacket),
-                               @"channelsPerFrame": @(_asbd.mChannelsPerFrame),
-                               @"formatFlags": [self _formatFlagsString],
-                               @"formatID": [NSString yas_fileTypeStringWithHFSTypeCode:_asbd.mFormatID],
-                               @"framesPerPacket": @(_asbd.mFramesPerPacket)};
+    NSDictionary *asbdDict = @{
+        @"bitDepthFormat" : [self _bitDepthFormatString],
+        @"sampleRate" : @(_asbd.mSampleRate),
+        @"bitsPerChannel" : @(_asbd.mBitsPerChannel),
+        @"bytesPerFrame" : @(_asbd.mBytesPerFrame),
+        @"bytesPerPacket" : @(_asbd.mBytesPerPacket),
+        @"channelsPerFrame" : @(_asbd.mChannelsPerFrame),
+        @"formatFlags" : [self _formatFlagsString],
+        @"formatID" : [NSString yas_fileTypeStringWithHFSTypeCode:_asbd.mFormatID],
+        @"framesPerPacket" : @(_asbd.mFramesPerPacket)
+    };
     [result appendString:asbdDict.description];
     return result;
 }
 
 - (NSString *)_bitDepthFormatString
 {
-    NSDictionary *bitDepthFormats = @{@(YASAudioBitDepthFormatFloat32): @"YASAudioBitDepthFormatFloat32",
-                                    @(YASAudioBitDepthFormatFloat64): @"YASAudioBitDepthFormatFloat64",
-                                    @(YASAudioBitDepthFormatInt16): @"YASAudioBitDepthFormatInt16",
-                                    @(YASAudioBitDepthFormatInt32): @"YASAudioBitDepthFormatInt32"};
+    NSDictionary *bitDepthFormats = @{
+        @(YASAudioBitDepthFormatFloat32) : @"YASAudioBitDepthFormatFloat32",
+        @(YASAudioBitDepthFormatFloat64) : @"YASAudioBitDepthFormatFloat64",
+        @(YASAudioBitDepthFormatInt16) : @"YASAudioBitDepthFormatInt16",
+        @(YASAudioBitDepthFormatInt32) : @"YASAudioBitDepthFormatInt32"
+    };
     NSString *result = bitDepthFormats[@(_bitDepthFormat)];
     if (!result) {
         result = @"Unknown";
@@ -191,13 +200,15 @@
 
 - (NSString *)_formatFlagsString
 {
-    NSDictionary *flags = @{@(kAudioFormatFlagIsFloat): @"kAudioFormatFlagIsFloat",
-                            @(kAudioFormatFlagIsBigEndian): @"kAudioFormatFlagIsBigEndian",
-                            @(kAudioFormatFlagIsSignedInteger): @"kAudioFormatFlagIsSignedInteger",
-                            @(kAudioFormatFlagIsPacked): @"kAudioFormatFlagIsPacked",
-                            @(kAudioFormatFlagIsAlignedHigh): @"kAudioFormatFlagIsAlignedHigh",
-                            @(kAudioFormatFlagIsNonInterleaved): @"kAudioFormatFlagIsNonInterleaved",
-                            @(kAudioFormatFlagIsNonMixable): @"kAudioFormatFlagIsNonMixable"};
+    NSDictionary *flags = @{
+        @(kAudioFormatFlagIsFloat) : @"kAudioFormatFlagIsFloat",
+        @(kAudioFormatFlagIsBigEndian) : @"kAudioFormatFlagIsBigEndian",
+        @(kAudioFormatFlagIsSignedInteger) : @"kAudioFormatFlagIsSignedInteger",
+        @(kAudioFormatFlagIsPacked) : @"kAudioFormatFlagIsPacked",
+        @(kAudioFormatFlagIsAlignedHigh) : @"kAudioFormatFlagIsAlignedHigh",
+        @(kAudioFormatFlagIsNonInterleaved) : @"kAudioFormatFlagIsNonInterleaved",
+        @(kAudioFormatFlagIsNonMixable) : @"kAudioFormatFlagIsNonMixable"
+    };
     NSMutableString *result = [NSMutableString string];
     for (NSNumber *flag in flags) {
         if (_asbd.mFormatFlags & flag.unsignedIntegerValue) {
@@ -232,22 +243,22 @@
 - (void)yas_getStreamDescription:(AudioStreamBasicDescription *)outFormat
 {
     memset(outFormat, 0, sizeof(AudioStreamBasicDescription));
-    
+
     NSNumber *formatID = self[AVFormatIDKey];
     NSNumber *sampleRate = self[AVSampleRateKey];
     NSNumber *numberOfChannels = self[AVNumberOfChannelsKey];
     NSNumber *bitDepth = self[AVLinearPCMBitDepthKey];
-    
+
     outFormat->mFormatID = (UInt32)formatID.unsignedLongValue;
     outFormat->mSampleRate = (Float64)sampleRate.doubleValue;
     outFormat->mChannelsPerFrame = (UInt32)numberOfChannels.unsignedLongValue;
     outFormat->mBitsPerChannel = (UInt32)bitDepth.unsignedLongValue;
-    
+
     if (outFormat->mFormatID == kAudioFormatLinearPCM) {
         NSNumber *isBigEndian = self[AVLinearPCMIsBigEndianKey];
         NSNumber *isFloat = self[AVLinearPCMIsFloatKey];
         NSNumber *isNonInterleaved = self[AVLinearPCMIsNonInterleaved];
-        
+
         outFormat->mFormatFlags = kAudioFormatFlagIsPacked;
         if (isBigEndian.boolValue) {
             outFormat->mFormatFlags |= kAudioFormatFlagIsBigEndian;
@@ -261,9 +272,9 @@
             outFormat->mFormatFlags |= kAudioFormatFlagIsNonInterleaved;
         }
     }
-    
+
     UInt32 size = sizeof(AudioStreamBasicDescription);
-    
+
     AudioFormatGetProperty(kAudioFormatProperty_FormatInfo, 0, NULL, &size, outFormat);
 }
 

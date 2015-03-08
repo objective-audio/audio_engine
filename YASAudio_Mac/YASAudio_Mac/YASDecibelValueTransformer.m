@@ -51,7 +51,7 @@
         numberValue = @(YASAudioDecibelFromLinear(numberValue.doubleValue));
         return [self.numberFormatter stringFromNumber:numberValue];
     }
-    
+
     return nil;
 }
 

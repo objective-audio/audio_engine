@@ -11,7 +11,8 @@
 #import <AudioToolbox/AudioToolbox.h>
 #import "YASWeakSupport.h"
 
-typedef void (^YASAudioDeviceIOCallbackBlock)(AudioBufferList *outData, const AudioTimeStamp *inTime, const UInt32 inFrameLength);
+typedef void (^YASAudioDeviceIOCallbackBlock)(AudioBufferList *outData, const AudioTimeStamp *inTime,
+                                              const UInt32 inFrameLength);
 
 @class YASAudioDevice, YASAudioGraph;
 

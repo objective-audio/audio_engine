@@ -50,21 +50,21 @@ NSString *const YASAudioDestinationChannelKey = @"destinationChannel";
         YASRaiseWithReason(([NSString stringWithFormat:@"%s - Argument is nil.", __PRETTY_FUNCTION__]));
         return nil;
     }
-    
+
     if (format.isInterleaved) {
         YASRaiseWithReason(([NSString stringWithFormat:@"%s - Invalid format (interleaved).", __PRETTY_FUNCTION__]));
         return nil;
     }
-    
+
     UInt32 channelCount = format.channelCount;
     NSMutableArray *routes = [[NSMutableArray alloc] initWithCapacity:channelCount];
-    
+
     for (UInt32 ch = 0; ch < channelCount; ch++) {
         YASAudioChannelRoute *route = [[YASAudioChannelRoute alloc] initWithBus:bus channel:ch];
         [routes addObject:route];
         YASRelease(route);
     }
-    
+
     return YASAutorelease(routes);
 }
 

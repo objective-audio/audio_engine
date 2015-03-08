@@ -34,7 +34,8 @@ static Boolean YASOpenExtAudioFileWithFileURL(ExtAudioFileRef *extAudioFile, con
     return err == noErr;
 }
 
-static Boolean YASCreateExtAudioFileWithFileURL(ExtAudioFileRef *extAudioFile, const NSURL *url, const AudioFileTypeID fileType, const AudioStreamBasicDescription *asbd)
+static Boolean YASCreateExtAudioFileWithFileURL(ExtAudioFileRef *extAudioFile, const NSURL *url,
+                                                const AudioFileTypeID fileType, const AudioStreamBasicDescription *asbd)
 {
     CFURLRef cfurl = CFBridgingRetain(url);
     OSStatus err = ExtAudioFileCreateWithURL(cfurl, fileType, asbd, NULL, kAudioFileFlags_EraseFile, extAudioFile);
@@ -83,7 +84,7 @@ static SInt64 YASGetFileLengthFrames(const ExtAudioFileRef extAudioFile)
 static Boolean YASOpenAudioFileWithFileURL(AudioFileID *fileID, const NSURL *url)
 {
     CFURLRef cfurl = CFBridgingRetain(url);
-    OSStatus err = AudioFileOpenURL(cfurl, kAudioFileReadPermission , kAudioFileWAVEType, fileID);
+    OSStatus err = AudioFileOpenURL(cfurl, kAudioFileReadPermission, kAudioFileWAVEType, fileID);
     CFRelease(cfurl);
     return err == noErr;
 }
@@ -213,17 +214,17 @@ static NSString *YASFileTypeFromAudioFileTypeID(AudioFileTypeID fileTypeID)
 - (void)dealloc
 {
     [self _close];
-    
+
     YASRelease(_url);
     YASRelease(_fileFormat);
     YASRelease(_processingFormat);
     YASRelease(_fileType);
-    
+
     _url = nil;
     _fileFormat = nil;
     _processingFormat = nil;
     _fileType = nil;
-    
+
     YASSuperDealloc;
 }
 
@@ -236,7 +237,8 @@ static NSString *YASFileTypeFromAudioFileTypeID(AudioFileTypeID fileTypeID)
 - (SInt64)processingLength
 {
     const SInt64 fileLength = self.fileLength;
-    const Float64 processingPerFileRate = _processingFormat.streamDescription->mSampleRate / _fileFormat.streamDescription->mSampleRate;
+    const Float64 processingPerFileRate =
+        _processingFormat.streamDescription->mSampleRate / _fileFormat.streamDescription->mSampleRate;
     return fileLength * processingPerFileRate;
 }
 
@@ -276,18 +278,18 @@ static NSString *YASFileTypeFromAudioFileTypeID(AudioFileTypeID fileTypeID)
     if (!YASCanOpenAudioFile(_url)) {
         return NO;
     }
-    
+
     if (!YASOpenExtAudioFileWithFileURL(&_extAudioFile, _url)) {
-		_extAudioFile = NULL;
-		return NO;
-	};
-    
+        _extAudioFile = NULL;
+        return NO;
+    };
+
     AudioStreamBasicDescription asbd;
     if (!YASGetExtAudioFileFormat(&asbd, _extAudioFile)) {
         [self _close];
         return NO;
     }
-    
+
     AudioFileID audioFileID = YASGetAudioFileIDFromExtAudioFile(_extAudioFile);
     AudioFileTypeID audioFileTypeID = YASGetAudioFileType(audioFileID);
     self.fileType = YASFileTypeFromAudioFileTypeID(audioFileTypeID);
@@ -295,48 +297,56 @@ static NSString *YASFileTypeFromAudioFileTypeID(AudioFileTypeID fileTypeID)
         [self _close];
         return NO;
     }
-    
+
     YASAudioFormat *fileFormat = [[YASAudioFormat alloc] initWithStreamDescription:&asbd];
     self.fileFormat = fileFormat;
     YASRelease(fileFormat);
-    
-    YASAudioFormat *processingFormat = [[YASAudioFormat alloc] initWithBitDepthFormat:bitDepthFormat sampleRate:fileFormat.sampleRate channels:fileFormat.channelCount interleaved:interleaved];
+
+    YASAudioFormat *processingFormat = [[YASAudioFormat alloc] initWithBitDepthFormat:bitDepthFormat
+                                                                           sampleRate:fileFormat.sampleRate
+                                                                             channels:fileFormat.channelCount
+                                                                          interleaved:interleaved];
     self.processingFormat = processingFormat;
     YASRelease(processingFormat);
-    
+
     if (!YASSetClientFormat(_processingFormat.streamDescription, _extAudioFile)) {
         [self _close];
         return NO;
     }
-    
+
     return YES;
 }
 
-- (BOOL)_createWithSettings:(NSDictionary *)settings bitDepthFormat:(YASAudioBitDepthFormat)bitDepthFormat interleaved:(BOOL)interleaved
+- (BOOL)_createWithSettings:(NSDictionary *)settings
+             bitDepthFormat:(YASAudioBitDepthFormat)bitDepthFormat
+                interleaved:(BOOL)interleaved
 {
     YASAudioFormat *fileFormat = [[YASAudioFormat alloc] initWithSettings:settings];
     self.fileFormat = fileFormat;
     YASRelease(fileFormat);
-    
+
     AudioFileTypeID fileTypeID = YASAudioFileTypeIDFromFileType(_fileType);
     if (!fileTypeID) {
         return NO;
     }
-    
+
     if (!YASCreateExtAudioFileWithFileURL(&_extAudioFile, _url, fileTypeID, _fileFormat.streamDescription)) {
         _extAudioFile = NULL;
         return NO;
     }
-    
-    YASAudioFormat *processingFormat = [[YASAudioFormat alloc] initWithBitDepthFormat:bitDepthFormat sampleRate:fileFormat.sampleRate channels:fileFormat.channelCount interleaved:interleaved];
+
+    YASAudioFormat *processingFormat = [[YASAudioFormat alloc] initWithBitDepthFormat:bitDepthFormat
+                                                                           sampleRate:fileFormat.sampleRate
+                                                                             channels:fileFormat.channelCount
+                                                                          interleaved:interleaved];
     self.processingFormat = processingFormat;
     YASRelease(processingFormat);
-    
+
     if (!YASSetClientFormat(_processingFormat.streamDescription, _extAudioFile)) {
         [self _close];
         return NO;
     }
-    
+
     return YES;
 }
 
@@ -369,7 +379,10 @@ static NSString *YASFileTypeFromAudioFileTypeID(AudioFileTypeID fileTypeID)
     return [self initWithURL:fileURL bitDepthFormat:YASAudioBitDepthFormatFloat32 interleaved:NO error:outError];
 }
 
-- (instancetype)initWithURL:(NSURL *)fileURL bitDepthFormat:(YASAudioBitDepthFormat)format interleaved:(BOOL)interleaved error:(NSError **)outError
+- (instancetype)initWithURL:(NSURL *)fileURL
+             bitDepthFormat:(YASAudioBitDepthFormat)format
+                interleaved:(BOOL)interleaved
+                      error:(NSError **)outError
 {
     self = [super init];
     if (self) {
@@ -399,51 +412,51 @@ static NSString *YASFileTypeFromAudioFileTypeID(AudioFileTypeID fileTypeID)
         [NSError yas_error:outError code:YASAudioFileErrorCodeInvalidFormat];
         return NO;
     }
-    
+
     OSStatus err = noErr;
     UInt32 outFrameLength = 0;
     UInt32 remainFrames = frameLength;
-    
+
     AudioBufferList *ioBufferList = YASAudioAllocateAudioBufferListWithoutData(buffer.bufferCount, 0);
-    
+
     while (remainFrames) {
         UInt32 bytesPerFrame = buffer.format.streamDescription->mBytesPerFrame;
         UInt32 dataByteSize = remainFrames * bytesPerFrame;
         UInt32 dataIndex = outFrameLength * bytesPerFrame;
-        
+
         for (NSInteger i = 0; i < buffer.bufferCount; i++) {
             AudioBuffer *audioBuffer = &ioBufferList->mBuffers[i];
             audioBuffer->mNumberChannels = buffer.stride;
             audioBuffer->mDataByteSize = dataByteSize;
             audioBuffer->mData = &buffer.audioBufferList->mBuffers[i].mData[dataIndex];
         }
-        
+
         UInt32 ioFrames = remainFrames;
-        
+
         err = ExtAudioFileRead(self.extAudioFile, &ioFrames, ioBufferList);
         if (err != noErr) {
             [NSError yas_error:outError code:YASAudioFileErrorCodeReadFailed audioErrorCode:err];
             break;
         }
-        
+
         if (!ioFrames) {
             break;
         }
         remainFrames -= ioFrames;
         outFrameLength += ioFrames;
     }
-    
+
     free(ioBufferList);
-    
+
     buffer.frameLength = outFrameLength;
-    
+
     if (err == noErr) {
         err = ExtAudioFileTell(self.extAudioFile, self.fileFramePositionPointer);
         if (err != noErr) {
             [NSError yas_error:outError code:YASAudioFileErrorCodeTellFailed audioErrorCode:err];
         }
     }
-    
+
     return err == noErr;
 }
 
@@ -453,12 +466,25 @@ static NSString *YASFileTypeFromAudioFileTypeID(AudioFileTypeID fileTypeID)
 
 @implementation YASAudioFileWriter
 
-- (instancetype)initWithURL:(NSURL *)fileURL fileType:(NSString *)fileType settings:(NSDictionary *)settings error:(NSError **)outError
+- (instancetype)initWithURL:(NSURL *)fileURL
+                   fileType:(NSString *)fileType
+                   settings:(NSDictionary *)settings
+                      error:(NSError **)outError
 {
-    return [self initWithURL:fileURL fileType:fileType settings:settings bitDepthFormat:YASAudioBitDepthFormatFloat32 interleaved:NO error:outError];
+    return [self initWithURL:fileURL
+                    fileType:fileType
+                    settings:settings
+              bitDepthFormat:YASAudioBitDepthFormatFloat32
+                 interleaved:NO
+                       error:outError];
 }
 
-- (instancetype)initWithURL:(NSURL *)fileURL fileType:(NSString *)fileType settings:(NSDictionary *)settings bitDepthFormat:(YASAudioBitDepthFormat)format interleaved:(BOOL)interleaved error:(NSError **)outError
+- (instancetype)initWithURL:(NSURL *)fileURL
+                   fileType:(NSString *)fileType
+                   settings:(NSDictionary *)settings
+             bitDepthFormat:(YASAudioBitDepthFormat)format
+                interleaved:(BOOL)interleaved
+                      error:(NSError **)outError
 {
     self = [super init];
     if (self) {
@@ -494,26 +520,26 @@ static NSString *YASFileTypeFromAudioFileTypeID(AudioFileTypeID fileTypeID)
         [NSError yas_error:outError code:YASAudioFileErrorCodeInvalidFormat];
         return NO;
     }
-    
+
     OSStatus err = noErr;
-    
+
     if (isAsync) {
         err = ExtAudioFileWriteAsync(self.extAudioFile, buffer.frameLength, buffer.audioBufferList);
     } else {
         err = ExtAudioFileWrite(self.extAudioFile, buffer.frameLength, buffer.audioBufferList);
     }
-    
+
     if (err != noErr) {
         [NSError yas_error:outError code:YASAudioFileErrorCodeWriteFailed audioErrorCode:err];
     }
-    
+
     if (err == noErr) {
         err = ExtAudioFileTell(self.extAudioFile, self.fileFramePositionPointer);
         if (err != noErr) {
             [NSError yas_error:outError code:YASAudioFileErrorCodeTellFailed audioErrorCode:err];
         }
     }
-    
+
     return err == noErr;
 }
 
@@ -523,28 +549,28 @@ static NSString *YASFileTypeFromAudioFileTypeID(AudioFileTypeID fileTypeID)
 
 @implementation NSDictionary (YASAudioFile)
 
-+ (NSDictionary *)yas_waveFileSettingsWithSampleRate:(Float64)sampleRate 
-                                    numberOfChannels:(UInt32)channels 
++ (NSDictionary *)yas_waveFileSettingsWithSampleRate:(Float64)sampleRate
+                                    numberOfChannels:(UInt32)channels
                                             bitDepth:(UInt32)bitDepth
 {
-    return [self yas_linearPCMSettingsWithSampleRate:sampleRate 
-                                 numberOfChannels:channels 
-                                         bitDepth:bitDepth 
-                                      isBigEndian:NO 
-                                          isFloat:bitDepth >= 32 
-                                 isNonInterleaved:NO];
+    return [self yas_linearPCMSettingsWithSampleRate:sampleRate
+                                    numberOfChannels:channels
+                                            bitDepth:bitDepth
+                                         isBigEndian:NO
+                                             isFloat:bitDepth >= 32
+                                    isNonInterleaved:NO];
 }
 
-+ (NSDictionary *)yas_aiffFileSettingsWithSampleRate:(Float64)sampleRate 
-                                    numberOfChannels:(UInt32)channels 
++ (NSDictionary *)yas_aiffFileSettingsWithSampleRate:(Float64)sampleRate
+                                    numberOfChannels:(UInt32)channels
                                             bitDepth:(UInt32)bitDepth
 {
-    return [self yas_linearPCMSettingsWithSampleRate:sampleRate 
-                                 numberOfChannels:channels 
-                                         bitDepth:bitDepth 
-                                      isBigEndian:YES 
-                                          isFloat:bitDepth >= 32 
-                                 isNonInterleaved:NO];
+    return [self yas_linearPCMSettingsWithSampleRate:sampleRate
+                                    numberOfChannels:channels
+                                            bitDepth:bitDepth
+                                         isBigEndian:YES
+                                             isFloat:bitDepth >= 32
+                                    isNonInterleaved:NO];
 }
 
 + (NSDictionary *)yas_linearPCMSettingsWithSampleRate:(Float64)sampleRate
@@ -554,14 +580,16 @@ static NSString *YASFileTypeFromAudioFileTypeID(AudioFileTypeID fileTypeID)
                                               isFloat:(BOOL)isFloat
                                      isNonInterleaved:(BOOL)isNonInterleaved
 {
-    return @{AVFormatIDKey: @(kAudioFormatLinearPCM),
-             AVSampleRateKey: @(sampleRate),
-             AVNumberOfChannelsKey: @(channels),
-             AVLinearPCMBitDepthKey: @(bitDepth),
-             AVLinearPCMIsBigEndianKey: @(isBigEndian),
-             AVLinearPCMIsFloatKey: @(isFloat),
-             AVLinearPCMIsNonInterleaved: @(isNonInterleaved),
-             AVChannelLayoutKey: [NSData data]};
+    return @{
+        AVFormatIDKey : @(kAudioFormatLinearPCM),
+        AVSampleRateKey : @(sampleRate),
+        AVNumberOfChannelsKey : @(channels),
+        AVLinearPCMBitDepthKey : @(bitDepth),
+        AVLinearPCMIsBigEndianKey : @(isBigEndian),
+        AVLinearPCMIsFloatKey : @(isFloat),
+        AVLinearPCMIsNonInterleaved : @(isNonInterleaved),
+        AVChannelLayoutKey : [NSData data]
+    };
 }
 
 + (NSDictionary *)yas_aacSettingsWithSampleRate:(Float64)sampleRate
@@ -572,16 +600,18 @@ static NSString *YASFileTypeFromAudioFileTypeID(AudioFileTypeID fileTypeID)
                             encoderBitDepthHint:(UInt32)bitDepthHint
                      sampleRateConverterQuality:(AVAudioQuality)converterQuality
 {
-    return @{AVFormatIDKey: @(kAudioFormatMPEG4AAC),
-             AVSampleRateKey: @(sampleRate),
-             AVNumberOfChannelsKey: @(channels),
-             AVLinearPCMBitDepthKey: @(bitDepth),
-             AVLinearPCMIsBigEndianKey: @(NO),
-             AVLinearPCMIsFloatKey: @(NO),
-             AVEncoderAudioQualityKey: @(encoderQuality),
-             AVEncoderBitRateKey: @(bitRate),
-             AVEncoderBitDepthHintKey: @(bitDepthHint),
-             AVSampleRateConverterAudioQualityKey: @(converterQuality)};
+    return @{
+        AVFormatIDKey : @(kAudioFormatMPEG4AAC),
+        AVSampleRateKey : @(sampleRate),
+        AVNumberOfChannelsKey : @(channels),
+        AVLinearPCMBitDepthKey : @(bitDepth),
+        AVLinearPCMIsBigEndianKey : @(NO),
+        AVLinearPCMIsFloatKey : @(NO),
+        AVEncoderAudioQualityKey : @(encoderQuality),
+        AVEncoderBitRateKey : @(bitRate),
+        AVEncoderBitDepthHintKey : @(bitDepthHint),
+        AVSampleRateConverterAudioQualityKey : @(converterQuality)
+    };
 }
 
 @end

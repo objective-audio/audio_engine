@@ -9,9 +9,9 @@
 
 void YASAudioRemoveAudioBufferList(AudioBufferList *ioAbl)
 {
-    if(ioAbl) {
+    if (ioAbl) {
         for (UInt32 i = 0; i < ioAbl->mNumberBuffers; i++) {
-            if(ioAbl->mBuffers[i].mData) {
+            if (ioAbl->mBuffers[i].mData) {
                 free(ioAbl->mBuffers[i].mData);
             }
         }
@@ -21,22 +21,23 @@ void YASAudioRemoveAudioBufferList(AudioBufferList *ioAbl)
 
 void YASAudioRemoveAudioBufferListWithoutData(AudioBufferList *ioAbl)
 {
-    if(ioAbl) {
+    if (ioAbl) {
         free(ioAbl);
     }
 }
 
-AudioBufferList *YASAudioAllocateAudioBufferList(const UInt32 inBufferCount, const UInt32 inNumberChannels, const UInt32 inSize)
+AudioBufferList *YASAudioAllocateAudioBufferList(const UInt32 inBufferCount, const UInt32 inNumberChannels,
+                                                 const UInt32 inSize)
 {
-    AudioBufferList *abl = (AudioBufferList*)calloc(1, sizeof(AudioBufferList) + inBufferCount * sizeof(AudioBuffer));
+    AudioBufferList *abl = (AudioBufferList *)calloc(1, sizeof(AudioBufferList) + inBufferCount * sizeof(AudioBuffer));
     if (abl) {
         abl->mNumberBuffers = inBufferCount;
-        for(UInt32 i = 0; i < inBufferCount; ++i) {
+        for (UInt32 i = 0; i < inBufferCount; ++i) {
             abl->mBuffers[i].mNumberChannels = inNumberChannels;
             abl->mBuffers[i].mDataByteSize = inSize;
             if (inSize > 0) {
                 abl->mBuffers[i].mData = malloc(inSize);
-                if(abl->mBuffers[i].mData == NULL) {
+                if (abl->mBuffers[i].mData == NULL) {
                     YASAudioRemoveAudioBufferList(abl);
                     abl = NULL;
                     break;
@@ -65,45 +66,42 @@ void YASAudioClearAudioBufferList(AudioBufferList *ioAbl)
 
 Boolean YASAudioCopyAudioBufferListDirectly(const AudioBufferList *inFromList, AudioBufferList *ioToList)
 {
-    if ((!inFromList || !ioToList) ||
-        (inFromList->mNumberBuffers != ioToList->mNumberBuffers)) {
+    if ((!inFromList || !ioToList) || (inFromList->mNumberBuffers != ioToList->mNumberBuffers)) {
         return false;
     }
-    
+
     UInt32 bufferCount = inFromList->mNumberBuffers;
-    
+
     for (UInt32 bufIndex = 0; bufIndex < bufferCount; bufIndex++) {
         if ((ioToList->mBuffers[bufIndex].mNumberChannels != inFromList->mBuffers[bufIndex].mNumberChannels) ||
             (ioToList->mBuffers[bufIndex].mDataByteSize < inFromList->mBuffers[bufIndex].mDataByteSize)) {
             return false;
         }
     }
-    
+
     for (UInt32 bufIndex = 0; bufIndex < bufferCount; bufIndex++) {
         ioToList->mBuffers[bufIndex].mDataByteSize = inFromList->mBuffers[bufIndex].mDataByteSize;
-        memcpy(ioToList->mBuffers[bufIndex].mData, inFromList->mBuffers[bufIndex].mData, inFromList->mBuffers[bufIndex].mDataByteSize); 
+        memcpy(ioToList->mBuffers[bufIndex].mData, inFromList->mBuffers[bufIndex].mData,
+               inFromList->mBuffers[bufIndex].mDataByteSize);
     }
-    
+
     return true;
 }
 
-static Boolean YASGetDataInfoFromAudioBufferList(const AudioBufferList *inList, 
-                                                 UInt32 *outChannelCount, 
-                                                 UInt32 *outFrameLength, 
-                                                 void ***outDatas, 
-                                                 UInt32 **outStrides, 
+static Boolean YASGetDataInfoFromAudioBufferList(const AudioBufferList *inList, UInt32 *outChannelCount,
+                                                 UInt32 *outFrameLength, void ***outDatas, UInt32 **outStrides,
                                                  const UInt32 inSampleByteCount)
 {
     if (!inList || !outChannelCount || !outFrameLength || !inSampleByteCount || !outDatas || !outStrides) {
         assert(0);
         return false;
     }
-    
+
     const UInt32 bufferCount = inList->mNumberBuffers;
-    
+
     UInt32 channelCount = 0;
     UInt32 frameLength = 0;
-    
+
     for (UInt32 bufIndex = 0; bufIndex < bufferCount; bufIndex++) {
         const UInt32 stride = inList->mBuffers[bufIndex].mNumberChannels;
         const UInt32 frames = inList->mBuffers[bufIndex].mDataByteSize / stride / inSampleByteCount;
@@ -114,13 +112,13 @@ static Boolean YASGetDataInfoFromAudioBufferList(const AudioBufferList *inList,
         }
         channelCount += stride;
     }
-    
+
     *outChannelCount = channelCount;
     *outFrameLength = frameLength;
-    
+
     void **datas = calloc(channelCount, sizeof(void *));
     UInt32 *strides = calloc(channelCount, sizeof(UInt32));
-    
+
     channelCount = 0;
     for (UInt32 bufIndex = 0; bufIndex < bufferCount; bufIndex++) {
         const UInt32 stride = inList->mBuffers[bufIndex].mNumberChannels;
@@ -131,38 +129,38 @@ static Boolean YASGetDataInfoFromAudioBufferList(const AudioBufferList *inList,
             channelCount++;
         }
     }
-    
+
     *outDatas = datas;
     *outStrides = strides;
-    
+
     return true;
 }
 
-Boolean YASAudioCopyAudioBufferListFlexibly(const AudioBufferList *inFromList, 
-                                            AudioBufferList *outToList, 
-                                            const UInt32 inSampleByteCount, 
-                                            UInt32 *outFrameLength)
+Boolean YASAudioCopyAudioBufferListFlexibly(const AudioBufferList *inFromList, AudioBufferList *outToList,
+                                            const UInt32 inSampleByteCount, UInt32 *outFrameLength)
 {
     UInt32 srcChannelCount = 0;
     UInt32 srcFrameLength = 0;
     void **srcDatas = NULL;
     UInt32 *srcStrides = NULL;
-    
-    if (!YASGetDataInfoFromAudioBufferList(inFromList, &srcChannelCount, &srcFrameLength, &srcDatas, &srcStrides, inSampleByteCount)) {
+
+    if (!YASGetDataInfoFromAudioBufferList(inFromList, &srcChannelCount, &srcFrameLength, &srcDatas, &srcStrides,
+                                           inSampleByteCount)) {
         return false;
     }
-    
+
     UInt32 dstChannelCount = 0;
     UInt32 dstFrameLength = 0;
     void **dstDatas = NULL;
     UInt32 *dstStrides = NULL;
-    
-    if (!YASGetDataInfoFromAudioBufferList(outToList, &dstChannelCount, &dstFrameLength, &dstDatas, &dstStrides, inSampleByteCount)) {
+
+    if (!YASGetDataInfoFromAudioBufferList(outToList, &dstChannelCount, &dstFrameLength, &dstDatas, &dstStrides,
+                                           inSampleByteCount)) {
         free(srcDatas);
         free(srcStrides);
         return false;
     }
-    
+
     if (srcFrameLength > dstFrameLength || srcChannelCount > dstChannelCount) {
         free(srcDatas);
         free(srcStrides);
@@ -170,7 +168,7 @@ Boolean YASAudioCopyAudioBufferListFlexibly(const AudioBufferList *inFromList,
         free(dstStrides);
         return false;
     }
-    
+
     for (UInt32 ch = 0; ch < srcChannelCount; ch++) {
         const void *srcData = srcDatas[ch];
         void *dstData = dstDatas[ch];
@@ -192,21 +190,22 @@ Boolean YASAudioCopyAudioBufferListFlexibly(const AudioBufferList *inFromList,
                     const UInt32 sampleFrame = frame * inSampleByteCount;
                     const Byte *srcByteData = srcData;
                     Byte *dstByteData = dstData;
-                    memcpy(&dstByteData[sampleFrame * dstStride], &srcByteData[sampleFrame * srcStride], inSampleByteCount);
+                    memcpy(&dstByteData[sampleFrame * dstStride], &srcByteData[sampleFrame * srcStride],
+                           inSampleByteCount);
                 }
             }
         }
     }
-    
+
     if (outFrameLength) {
         *outFrameLength = srcFrameLength;
     }
-    
+
     free(srcDatas);
     free(srcStrides);
     free(dstDatas);
     free(dstStrides);
-    
+
     return true;
 }
 
@@ -244,11 +243,11 @@ Boolean YASAudioIsEqualAudioBufferListStructure(const AudioBufferList *inAbl1, c
     if (!inAbl1 || !inAbl2) {
         return false;
     }
-    
+
     if (inAbl1->mNumberBuffers != inAbl2->mNumberBuffers) {
         return false;
     }
-    
+
     for (UInt32 i = 0; i < inAbl1->mNumberBuffers; i++) {
         if (inAbl1->mBuffers[i].mData != inAbl2->mBuffers[i].mData) {
             return false;
@@ -256,7 +255,7 @@ Boolean YASAudioIsEqualAudioBufferListStructure(const AudioBufferList *inAbl1, c
             return false;
         }
     }
-    
+
     return true;
 }
 
@@ -275,8 +274,7 @@ Boolean YASAudioIsEqualAudioTimeStamp(const AudioTimeStamp *inTs1, const AudioTi
     if (YASAudioIsEqualData(inTs1, inTs2, sizeof(AudioTimeStamp))) {
         return true;
     } else {
-        return ((inTs1->mFlags == inTs2->mFlags) && 
-                (inTs1->mHostTime == inTs2->mHostTime) &&
+        return ((inTs1->mFlags == inTs2->mFlags) && (inTs1->mHostTime == inTs2->mHostTime) &&
                 (inTs1->mWordClockTime == inTs2->mWordClockTime) &&
                 YASAudioIsEqualDoubleWithAccuracy(inTs1->mSampleTime, inTs2->mSampleTime, 0.00001) &&
                 YASAudioIsEqualDoubleWithAccuracy(inTs1->mRateScalar, inTs2->mRateScalar, 0.00001) &&
@@ -284,6 +282,7 @@ Boolean YASAudioIsEqualAudioTimeStamp(const AudioTimeStamp *inTs1, const AudioTi
     }
 }
 
-Boolean YASAudioIsEqualASBD(const AudioStreamBasicDescription *inAsbd1, const AudioStreamBasicDescription *inAsbd2) {
+Boolean YASAudioIsEqualASBD(const AudioStreamBasicDescription *inAsbd1, const AudioStreamBasicDescription *inAsbd2)
+{
     return memcmp(inAsbd1, inAsbd2, sizeof(AudioStreamBasicDescription)) == 0;
 }

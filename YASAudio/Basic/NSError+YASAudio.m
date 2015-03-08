@@ -22,8 +22,10 @@ NSString *const YASAudioErrorCodeDescriptionKey = @"audio_error_code_description
     if (outError) {
         NSDictionary *dictionary = nil;
         if (audioErrorCode != noErr) {
-            dictionary = @{YASAudioErrorCodeNumberKey: @(audioErrorCode),
-                           YASAudioErrorCodeDescriptionKey: [self _descriptionForAudioErrorCode:audioErrorCode]};
+            dictionary = @{
+                YASAudioErrorCodeNumberKey : @(audioErrorCode),
+                YASAudioErrorCodeDescriptionKey : [self _descriptionForAudioErrorCode:audioErrorCode]
+            };
         }
         *outError = [NSError errorWithDomain:YASAudioErrorDomain code:code userInfo:dictionary];
     }

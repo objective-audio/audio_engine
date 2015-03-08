@@ -24,20 +24,20 @@
     if (self.length != 6) {
         return 0;
     }
-    
+
     NSString *quote = @"'";
     if (![[self substringToIndex:1] isEqualToString:quote] || ![[self substringFromIndex:5] isEqualToString:quote]) {
         return 0;
     }
-    
+
     NSString *fourCharFileType = [self substringWithRange:NSMakeRange(1, 4)];
-    
+
     if (fourCharFileType.length != 4) {
         return 0;
     }
-    
+
     OSType result = 0;
-    
+
     for (NSInteger i = 0; i < 4; i++) {
         unichar uc = [fourCharFileType characterAtIndex:i];
         if (uc > UINT8_MAX) {
@@ -58,7 +58,7 @@
     for (NSString *line in lines) {
         [indentedLines addObject:[NSString stringWithFormat:@"%@%@", prefix, line]];
     }
-    
+
     return [indentedLines componentsJoinedByString:@"\n"];
 }
 

@@ -36,7 +36,7 @@
         YASRaiseWithReason(([NSString stringWithFormat:@"%s - Argument is nil.", __PRETTY_FUNCTION__]));
         return nil;
     }
-    
+
     NSMutableArray *array = [[NSMutableArray alloc] initWithCapacity:self.count];
     for (id object in self) {
         id value = [object valueForKey:key];
@@ -51,15 +51,15 @@
 - (NSNumber *)yas_emptyNumberInLength:(NSUInteger)length
 {
     NSNumber *result = nil;
-    
+
     if (self.count >= length) {
         YASLog(@"%s - Overflow. count(%@) length(%@)", __PRETTY_FUNCTION__, @(self.count), @(length));
         return nil;
     }
-    
+
     NSNumber *max = [self valueForKeyPath:@"@max.self"];
     NSInteger next = max ? max.integerValue : -1;
-    
+
     while (!result) {
         next = (next + 1) % length;
         NSNumber *number = [[NSNumber alloc] initWithInteger:next];
@@ -69,7 +69,7 @@
             YASRelease(number);
         }
     }
-    
+
     return result;
 }
 

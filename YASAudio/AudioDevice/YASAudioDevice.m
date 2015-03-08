@@ -47,11 +47,11 @@ static AudioObjectPropertyListenerBlock _globalListenerBlock;
 {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        [self _updateAllDevices];
-        [self _addNotificationWithSelector:kAudioHardwarePropertyDevices];
-        [self _addNotificationWithSelector:kAudioHardwarePropertyDefaultSystemOutputDevice];
-        [self _addNotificationWithSelector:kAudioHardwarePropertyDefaultOutputDevice];
-        [self _addNotificationWithSelector:kAudioHardwarePropertyDefaultInputDevice];
+      [self _updateAllDevices];
+      [self _addNotificationWithSelector:kAudioHardwarePropertyDevices];
+      [self _addNotificationWithSelector:kAudioHardwarePropertyDefaultSystemOutputDevice];
+      [self _addNotificationWithSelector:kAudioHardwarePropertyDefaultOutputDevice];
+      [self _addNotificationWithSelector:kAudioHardwarePropertyDefaultInputDevice];
     });
 }
 
@@ -93,19 +93,20 @@ static AudioObjectPropertyListenerBlock _globalListenerBlock;
 + (void)_updateAllDevices
 {
     NSMutableDictionary *prevDevices = nil;
-    
+
     if (_allDevices) {
         prevDevices = [_allDevices copy];
         YASRelease(_allDevices);
         _allDevices = nil;
     }
-    
+
     YASRelease(_outputDevices);
     _outputDevices = nil;
     YASRelease(_inputDevices);
     _inputDevices = nil;
-    
-    @autoreleasepool {
+
+    @autoreleasepool
+    {
         NSData *data = [self _dataWithSelector:kAudioHardwarePropertyDevices];
         if (data) {
             AudioDeviceID *audioDeviceIDs = (AudioDeviceID *)data.bytes;
@@ -124,14 +125,16 @@ static AudioObjectPropertyListenerBlock _globalListenerBlock;
             }
             _allDevices = newDevices;
         }
-        
-        _outputDevices = YASRetain([[self allDevices] filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"outputStreams.@count > 0"]]);
-        _inputDevices = YASRetain([[self allDevices] filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"inputStreams.@count > 0"]]);
+
+        _outputDevices = YASRetain([[self allDevices]
+            filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"outputStreams.@count > 0"]]);
+        _inputDevices = YASRetain([[self allDevices]
+            filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"inputStreams.@count > 0"]]);
     }
-    
+
     YASRelease(prevDevices);
     prevDevices = nil;
-    
+
     [self _updateDefaultSystemOutputDevice];
     [self _updateDefaultOutputDevice];
     [self _updateDefaultInputDevice];
@@ -140,8 +143,9 @@ static AudioObjectPropertyListenerBlock _globalListenerBlock;
 + (void)_updateDefaultSystemOutputDevice
 {
     _defaultSystemOutputDevice = nil;
-    
-    @autoreleasepool {
+
+    @autoreleasepool
+    {
         NSData *data = [self _dataWithSelector:kAudioHardwarePropertyDefaultSystemOutputDevice];
         if (data) {
             AudioDeviceID *audioDeviceID = (AudioDeviceID *)data.bytes;
@@ -158,8 +162,9 @@ static AudioObjectPropertyListenerBlock _globalListenerBlock;
 + (void)_updateDefaultOutputDevice
 {
     _defaultOutputDevice = nil;
-    
-    @autoreleasepool {
+
+    @autoreleasepool
+    {
         NSData *data = [self _dataWithSelector:kAudioHardwarePropertyDefaultOutputDevice];
         if (data) {
             AudioDeviceID *audioDeviceID = (AudioDeviceID *)data.bytes;
@@ -176,8 +181,9 @@ static AudioObjectPropertyListenerBlock _globalListenerBlock;
 + (void)_updateDefaultInputDevice
 {
     _defaultInputDevice = nil;
-    
-    @autoreleasepool {
+
+    @autoreleasepool
+    {
         NSData *data = [self _dataWithSelector:kAudioHardwarePropertyDefaultInputDevice];
         if (data) {
             AudioDeviceID *audioDeviceID = (AudioDeviceID *)data.bytes;
@@ -193,15 +199,13 @@ static AudioObjectPropertyListenerBlock _globalListenerBlock;
 
 + (NSData *)_dataWithSelector:(AudioObjectPropertySelector)selector
 {
-    const AudioObjectPropertyAddress address = {
-        .mSelector = selector,
-        .mScope = kAudioObjectPropertyScopeGlobal,
-        .mElement = kAudioObjectPropertyElementMaster
-    };
-    
+    const AudioObjectPropertyAddress address = {.mSelector = selector,
+                                                .mScope = kAudioObjectPropertyScopeGlobal,
+                                                .mElement = kAudioObjectPropertyElementMaster};
+
     UInt32 size = 0;
     YASRaiseIfAUError(AudioObjectGetPropertyDataSize(kAudioObjectSystemObject, &address, 0, NULL, &size));
-    
+
     if (size > 0) {
         NSMutableData *data = [NSMutableData dataWithLength:size];
         void *bytes = data.mutableBytes;
@@ -214,24 +218,28 @@ static AudioObjectPropertyListenerBlock _globalListenerBlock;
 
 + (void)_setupGlobalListnerBlock
 {
-    AudioObjectPropertyListenerBlock listenerBlock = ^(UInt32 inNumberAddresses, const AudioObjectPropertyAddress *inAddresses) {
-        NSMutableArray *properties = [[NSMutableArray alloc] initWithCapacity:inNumberAddresses];
-        for (NSInteger i = 0; i < inNumberAddresses; i++) {
-            if (inAddresses[i].mSelector == kAudioHardwarePropertyDevices) {
-                [self _updateAllDevices];
-            } else if (inAddresses[i].mSelector == kAudioHardwarePropertyDefaultSystemOutputDevice) {
-                [self _updateDefaultSystemOutputDevice];
-            } else if (inAddresses[i].mSelector == kAudioHardwarePropertyDefaultOutputDevice) {
-                [self _updateDefaultOutputDevice];
-            } else if (inAddresses[i].mSelector == kAudioHardwarePropertyDefaultInputDevice) {
-                [self _updateDefaultInputDevice];
-            }
-            [properties addObject:@{YASAudioDeviceSelectorKey: [NSString yas_fileTypeStringWithHFSTypeCode:inAddresses[i].mSelector]}];
-            
-        }
-        [[NSNotificationCenter defaultCenter] postNotificationName:YASAudioHardwareDidChangeNotification object:nil userInfo:@{YASAudioDevicePropertiesKey: properties}];
-        YASRelease(properties);
-    };
+    AudioObjectPropertyListenerBlock listenerBlock =
+        ^(UInt32 inNumberAddresses, const AudioObjectPropertyAddress *inAddresses) {
+          NSMutableArray *properties = [[NSMutableArray alloc] initWithCapacity:inNumberAddresses];
+          for (NSInteger i = 0; i < inNumberAddresses; i++) {
+              if (inAddresses[i].mSelector == kAudioHardwarePropertyDevices) {
+                  [self _updateAllDevices];
+              } else if (inAddresses[i].mSelector == kAudioHardwarePropertyDefaultSystemOutputDevice) {
+                  [self _updateDefaultSystemOutputDevice];
+              } else if (inAddresses[i].mSelector == kAudioHardwarePropertyDefaultOutputDevice) {
+                  [self _updateDefaultOutputDevice];
+              } else if (inAddresses[i].mSelector == kAudioHardwarePropertyDefaultInputDevice) {
+                  [self _updateDefaultInputDevice];
+              }
+              [properties addObject:@{
+                  YASAudioDeviceSelectorKey : [NSString yas_fileTypeStringWithHFSTypeCode:inAddresses[i].mSelector]
+              }];
+          }
+          [[NSNotificationCenter defaultCenter] postNotificationName:YASAudioHardwareDidChangeNotification
+                                                              object:nil
+                                                            userInfo:@{YASAudioDevicePropertiesKey : properties}];
+          YASRelease(properties);
+        };
     _globalListenerBlock = [listenerBlock copy];
 }
 
@@ -240,25 +248,23 @@ static AudioObjectPropertyListenerBlock _globalListenerBlock;
     if (!_globalListenerBlock) {
         [self _setupGlobalListnerBlock];
     }
-    
-    const AudioObjectPropertyAddress address = {
-        .mSelector = selector,
-        .mScope = kAudioObjectPropertyScopeGlobal,
-        .mElement = kAudioObjectPropertyElementMaster
-    };
-    
-    YASRaiseIfAUError(AudioObjectAddPropertyListenerBlock(kAudioObjectSystemObject, &address, dispatch_get_main_queue(), _globalListenerBlock));
+
+    const AudioObjectPropertyAddress address = {.mSelector = selector,
+                                                .mScope = kAudioObjectPropertyScopeGlobal,
+                                                .mElement = kAudioObjectPropertyElementMaster};
+
+    YASRaiseIfAUError(AudioObjectAddPropertyListenerBlock(kAudioObjectSystemObject, &address, dispatch_get_main_queue(),
+                                                          _globalListenerBlock));
 }
 
 + (void)_removeNotificationWithSelector:(AudioObjectPropertySelector)selector
 {
-    const AudioObjectPropertyAddress address = {
-        .mSelector = selector,
-        .mScope = kAudioObjectPropertyScopeGlobal,
-        .mElement = kAudioObjectPropertyElementMaster
-    };
-    
-    YASRaiseIfAUError(AudioObjectRemovePropertyListenerBlock(kAudioObjectSystemObject, &address, dispatch_get_main_queue(), _globalListenerBlock));
+    const AudioObjectPropertyAddress address = {.mSelector = selector,
+                                                .mScope = kAudioObjectPropertyScopeGlobal,
+                                                .mElement = kAudioObjectPropertyElementMaster};
+
+    YASRaiseIfAUError(AudioObjectRemovePropertyListenerBlock(kAudioObjectSystemObject, &address,
+                                                             dispatch_get_main_queue(), _globalListenerBlock));
 }
 
 #pragma mark -
@@ -268,17 +274,19 @@ static AudioObjectPropertyListenerBlock _globalListenerBlock;
     self = [super init];
     if (self) {
         _audioDeviceID = audioDeviceID;
-        
+
         [self _updateInputStreams];
         [self _updateOutputStreams];
         [self _updateFormatWithScope:kAudioObjectPropertyScopeInput];
         [self _updateFormatWithScope:kAudioObjectPropertyScopeOutput];
-        
+
         [self _addNotificationWithSelector:kAudioDevicePropertyNominalSampleRate scope:kAudioObjectPropertyScopeGlobal];
         [self _addNotificationWithSelector:kAudioDevicePropertyStreams scope:kAudioObjectPropertyScopeInput];
         [self _addNotificationWithSelector:kAudioDevicePropertyStreams scope:kAudioObjectPropertyScopeOutput];
-        [self _addNotificationWithSelector:kAudioDevicePropertyStreamConfiguration scope:kAudioObjectPropertyScopeInput];
-        [self _addNotificationWithSelector:kAudioDevicePropertyStreamConfiguration scope:kAudioObjectPropertyScopeOutput];
+        [self _addNotificationWithSelector:kAudioDevicePropertyStreamConfiguration
+                                     scope:kAudioObjectPropertyScopeInput];
+        [self _addNotificationWithSelector:kAudioDevicePropertyStreamConfiguration
+                                     scope:kAudioObjectPropertyScopeOutput];
     }
     return self;
 }
@@ -290,13 +298,13 @@ static AudioObjectPropertyListenerBlock _globalListenerBlock;
     YASRelease(_inputFormat);
     YASRelease(_outputFormat);
     YASRelease(_listenerBlock);
-    
+
     _inputStreams = nil;
     _outputStreams = nil;
     _inputFormat = nil;
     _outputFormat = nil;
     _listenerBlock = nil;
-    
+
     YASSuperDealloc;
 }
 
@@ -389,15 +397,17 @@ static AudioObjectPropertyListenerBlock _globalListenerBlock;
 - (Float64)nominalSampleRate
 {
     Float64 result = 0.0;
-    
-    @autoreleasepool {
-        NSData *data = [self _dataWithSelector:kAudioDevicePropertyNominalSampleRate scope:kAudioObjectPropertyScopeGlobal];
+
+    @autoreleasepool
+    {
+        NSData *data =
+            [self _dataWithSelector:kAudioDevicePropertyNominalSampleRate scope:kAudioObjectPropertyScopeGlobal];
         if (data) {
             Float64 *sampleRate = (Float64 *)data.bytes;
             result = *sampleRate;
         }
     }
-    
+
     return result;
 }
 
@@ -411,8 +421,9 @@ static AudioObjectPropertyListenerBlock _globalListenerBlock;
         YASRelease(_inputStreams);
         _inputStreams = nil;
     }
-    
-    @autoreleasepool {
+
+    @autoreleasepool
+    {
         NSData *streamData = [self _dataWithSelector:kAudioDevicePropertyStreams scope:kAudioObjectPropertyScopeInput];
         if (streamData) {
             NSUInteger count = streamData.length / sizeof(AudioStreamID);
@@ -432,7 +443,7 @@ static AudioObjectPropertyListenerBlock _globalListenerBlock;
             _inputStreams = newStreams;
         }
     }
-    
+
     YASRelease(prevStreams);
     prevStreams = nil;
 }
@@ -445,8 +456,9 @@ static AudioObjectPropertyListenerBlock _globalListenerBlock;
         YASRelease(_outputStreams);
         _outputStreams = nil;
     }
-    
-    @autoreleasepool {
+
+    @autoreleasepool
+    {
         NSData *streamData = [self _dataWithSelector:kAudioDevicePropertyStreams scope:kAudioObjectPropertyScopeOutput];
         if (streamData) {
             NSUInteger count = streamData.length / sizeof(AudioStreamID);
@@ -466,7 +478,7 @@ static AudioObjectPropertyListenerBlock _globalListenerBlock;
             _outputStreams = newStreams;
         }
     }
-    
+
     YASRelease(prevStreams);
     prevStreams = nil;
 }
@@ -474,7 +486,7 @@ static AudioObjectPropertyListenerBlock _globalListenerBlock;
 - (void)_updateFormatWithScope:(AudioObjectPropertyScope)scope
 {
     YASAudioDeviceStream *stream = nil;
-    
+
     if (scope == kAudioObjectPropertyScopeInput) {
         stream = self.inputStreams.firstObject;
         self.inputFormat = nil;
@@ -482,24 +494,28 @@ static AudioObjectPropertyListenerBlock _globalListenerBlock;
         stream = self.outputStreams.firstObject;
         self.outputFormat = nil;
     }
-    
+
     YASAudioFormat *streamFormat = stream.virtualFormat;
-    
+
     if (!streamFormat) {
         return;
     }
-    
-    @autoreleasepool {
+
+    @autoreleasepool
+    {
         NSData *data = [self _dataWithSelector:kAudioDevicePropertyStreamConfiguration scope:scope];
         if (data.length > 0) {
             const AudioBufferList *configuration = data.bytes;
-            
+
             UInt32 channelCount = 0;
             for (NSInteger i = 0; i < configuration->mNumberBuffers; i++) {
                 channelCount += configuration->mBuffers[i].mNumberChannels;
             }
-            
-            YASAudioFormat *format = [[YASAudioFormat alloc] initWithBitDepthFormat:streamFormat.bitDepthFormat sampleRate:streamFormat.sampleRate channels:channelCount interleaved:NO];
+
+            YASAudioFormat *format = [[YASAudioFormat alloc] initWithBitDepthFormat:streamFormat.bitDepthFormat
+                                                                         sampleRate:streamFormat.sampleRate
+                                                                           channels:channelCount
+                                                                        interleaved:NO];
             if (scope == kAudioObjectPropertyScopeInput) {
                 self.inputFormat = format;
             } else if (scope == kAudioObjectPropertyScopeOutput) {
@@ -513,14 +529,11 @@ static AudioObjectPropertyListenerBlock _globalListenerBlock;
 - (NSData *)_dataWithSelector:(AudioObjectPropertySelector)selector scope:(AudioObjectPropertyScope)scope
 {
     const AudioObjectPropertyAddress address = {
-        .mSelector = selector,
-        .mScope = scope,
-        .mElement = kAudioObjectPropertyElementMaster
-    };
-    
+        .mSelector = selector, .mScope = scope, .mElement = kAudioObjectPropertyElementMaster};
+
     UInt32 size = 0;
     YASRaiseIfAUError(AudioObjectGetPropertyDataSize(_audioDeviceID, &address, 0, NULL, &size));
-    
+
     if (size > 0) {
         NSMutableData *data = [NSMutableData dataWithLength:size];
         void *bytes = data.mutableBytes;
@@ -533,46 +546,50 @@ static AudioObjectPropertyListenerBlock _globalListenerBlock;
 
 - (NSString *)_globalStringValueWithSelector:(AudioObjectPropertySelector)selector
 {
-    const AudioObjectPropertyAddress address = {
-        .mSelector = selector,
-        .mScope = kAudioObjectPropertyScopeGlobal,
-        .mElement = kAudioObjectPropertyElementMaster
-    };
-    
+    const AudioObjectPropertyAddress address = {.mSelector = selector,
+                                                .mScope = kAudioObjectPropertyScopeGlobal,
+                                                .mElement = kAudioObjectPropertyElementMaster};
+
     CFStringRef cfString = nil;
     UInt32 size = sizeof(CFStringRef);
-    
+
     YASRaiseIfAUError(AudioObjectGetPropertyData(_audioDeviceID, &address, 0, NULL, &size, &cfString));
-    
+
     return YASAutorelease((__bridge NSString *)cfString);
 }
 
 - (void)_setupListenerBlock
 {
     YASWeakContainer *weakContainer = self.weakContainer;
-    
+
     self.listenerBlock = ^(UInt32 inNumberAddresses, const AudioObjectPropertyAddress *inAddresses) {
-        YASAudioDevice *device = weakContainer.retainedObject;
-        if (device) {
-            NSMutableArray *properties = [[NSMutableArray alloc] initWithCapacity:inNumberAddresses];
-            for (NSInteger i = 0; i < inNumberAddresses; i++) {
-                if (inAddresses[i].mSelector == kAudioDevicePropertyStreams) {
-                    if (inAddresses[i].mScope == kAudioObjectPropertyScopeInput) {
-                        [device _updateInputStreams];
-                    } else if (inAddresses[i].mScope == kAudioObjectPropertyScopeOutput) {
-                        [device _updateOutputStreams];
-                    }
-                } else if (inAddresses[i].mSelector == kAudioDevicePropertyStreamConfiguration) {
-                    [device _updateFormatWithScope:inAddresses[i].mScope];
-                }
-                [properties addObject:@{YASAudioDeviceSelectorKey: [NSString yas_fileTypeStringWithHFSTypeCode:inAddresses[i].mSelector], YASAudioDeviceScopeKey: [NSString yas_fileTypeStringWithHFSTypeCode:inAddresses[i].mScope]}];
-            }
-            [[NSNotificationCenter defaultCenter] postNotificationName:YASAudioDeviceDidChangeNotification object:device userInfo:@{YASAudioDevicePropertiesKey: YASAutorelease([properties copy])}];
-            YASRelease(properties);
-            YASRelease(device);
-        } else {
-            YASLog(@"%s - Device is nil.", __PRETTY_FUNCTION__);
-        }
+      YASAudioDevice *device = weakContainer.retainedObject;
+      if (device) {
+          NSMutableArray *properties = [[NSMutableArray alloc] initWithCapacity:inNumberAddresses];
+          for (NSInteger i = 0; i < inNumberAddresses; i++) {
+              if (inAddresses[i].mSelector == kAudioDevicePropertyStreams) {
+                  if (inAddresses[i].mScope == kAudioObjectPropertyScopeInput) {
+                      [device _updateInputStreams];
+                  } else if (inAddresses[i].mScope == kAudioObjectPropertyScopeOutput) {
+                      [device _updateOutputStreams];
+                  }
+              } else if (inAddresses[i].mSelector == kAudioDevicePropertyStreamConfiguration) {
+                  [device _updateFormatWithScope:inAddresses[i].mScope];
+              }
+              [properties addObject:@{
+                  YASAudioDeviceSelectorKey : [NSString yas_fileTypeStringWithHFSTypeCode:inAddresses[i].mSelector],
+                  YASAudioDeviceScopeKey : [NSString yas_fileTypeStringWithHFSTypeCode:inAddresses[i].mScope]
+              }];
+          }
+          [[NSNotificationCenter defaultCenter]
+              postNotificationName:YASAudioDeviceDidChangeNotification
+                            object:device
+                          userInfo:@{YASAudioDevicePropertiesKey : YASAutorelease([properties copy])}];
+          YASRelease(properties);
+          YASRelease(device);
+      } else {
+          YASLog(@"%s - Device is nil.", __PRETTY_FUNCTION__);
+      }
     };
 }
 
@@ -581,14 +598,12 @@ static AudioObjectPropertyListenerBlock _globalListenerBlock;
     if (!_listenerBlock) {
         [self _setupListenerBlock];
     }
-    
+
     const AudioObjectPropertyAddress address = {
-        .mSelector = selector,
-        .mScope = scope,
-        .mElement = kAudioObjectPropertyElementMaster
-    };
-    
-    YASRaiseIfAUError(AudioObjectAddPropertyListenerBlock(_audioDeviceID, &address, dispatch_get_main_queue(), self.listenerBlock));
+        .mSelector = selector, .mScope = scope, .mElement = kAudioObjectPropertyElementMaster};
+
+    YASRaiseIfAUError(
+        AudioObjectAddPropertyListenerBlock(_audioDeviceID, &address, dispatch_get_main_queue(), self.listenerBlock));
 }
 
 - (void)_removeNotificationWithSelector:(AudioObjectPropertySelector)selector scope:(AudioObjectPropertyScope)scope
@@ -596,14 +611,12 @@ static AudioObjectPropertyListenerBlock _globalListenerBlock;
     if (!_listenerBlock) {
         return;
     }
-    
+
     const AudioObjectPropertyAddress address = {
-        .mSelector = selector,
-        .mScope = scope,
-        .mElement = kAudioObjectPropertyElementMaster
-    };
-    
-    YASRaiseIfAUError(AudioObjectRemovePropertyListenerBlock(_audioDeviceID, &address, dispatch_get_main_queue(), self.listenerBlock));
+        .mSelector = selector, .mScope = scope, .mElement = kAudioObjectPropertyElementMaster};
+
+    YASRaiseIfAUError(AudioObjectRemovePropertyListenerBlock(_audioDeviceID, &address, dispatch_get_main_queue(),
+                                                             self.listenerBlock));
 }
 
 @end
