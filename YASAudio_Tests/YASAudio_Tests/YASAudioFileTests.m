@@ -161,7 +161,9 @@
     testData.interleaved = NO;
     
     [self _commonAudioFileTest:testData isWriteAsync:NO];
+#if !WAVEFILE_LIGHT_TEST
     [self _commonAudioFileTest:testData isWriteAsync:YES];
+#endif
     
     YASRelease(testData);
 }
