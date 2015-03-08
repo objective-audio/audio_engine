@@ -49,8 +49,6 @@
 		B65BA9E61A62C27D00E7C3D8 /* YASAudioGraph.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YASAudioGraph.m; sourceTree = "<group>"; };
 		B65BA9E71A62C27D00E7C3D8 /* YASAudioUnit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YASAudioUnit.h; sourceTree = "<group>"; };
 		B65BA9E81A62C27D00E7C3D8 /* YASAudioUnit.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YASAudioUnit.m; sourceTree = "<group>"; };
-		B65BAA061A62C51000E7C3D8 /* YASAudioUtility.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = YASAudioUtility.c; sourceTree = "<group>"; };
-		B65BAA071A62C51000E7C3D8 /* YASAudioUtility.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YASAudioUtility.h; sourceTree = "<group>"; };
 		B65BAA091A62C6A600E7C3D8 /* NSArray+YASAudio.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSArray+YASAudio.h"; sourceTree = "<group>"; };
 		B65BAA0A1A62C6A600E7C3D8 /* NSArray+YASAudio.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSArray+YASAudio.m"; sourceTree = "<group>"; };
 		B65BAA0B1A62C6A600E7C3D8 /* NSDictionary+YASAudio.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSDictionary+YASAudio.h"; sourceTree = "<group>"; };
@@ -92,7 +90,6 @@
 			isa = PBXGroup;
 			children = (
 				B65BAA201A6366C500E7C3D8 /* YASMacros */,
-				B65BAA051A62C51000E7C3D8 /* YASAudioUtility */,
 				B65BA9DC1A62C27D00E7C3D8 /* YASAudio */,
 				B62ED5251A6280C0007DDE96 /* YASAudio_iOS */,
 				B62ED5241A6280C0007DDE96 /* Products */,
@@ -182,16 +179,6 @@
 				B6E827291A88504B00751441 /* YASAudioUnitParameterInfo.m */,
 			);
 			path = Graph;
-			sourceTree = "<group>";
-		};
-		B65BAA051A62C51000E7C3D8 /* YASAudioUtility */ = {
-			isa = PBXGroup;
-			children = (
-				B65BAA061A62C51000E7C3D8 /* YASAudioUtility.c */,
-				B65BAA071A62C51000E7C3D8 /* YASAudioUtility.h */,
-			);
-			name = YASAudioUtility;
-			path = ../Submodules/YASAudioUtility/YASAudioUtility;
 			sourceTree = "<group>";
 		};
 		B65BAA201A6366C500E7C3D8 /* YASMacros */ = {

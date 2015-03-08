@@ -48,38 +48,40 @@ static const UInt32 kSineDataMaxCount = 4096;
     YASSuperDealloc;
 }
 
-- (void)processWithOutputData:(AudioBufferList *)outputData inputData:(const AudioBufferList *)inputData frameLength:(const UInt32)frameLength
+- (void)processWithOutputData:(AudioBufferList *)outputData
+                    inputData:(const AudioBufferList *)inputData
+                  frameLength:(const UInt32)frameLength
 {
     if (!outputData || frameLength == 0) {
         return;
     }
-    
+
     YASAudioFormat *format = self.format;
     if (format && format.bitDepthFormat == YASAudioBitDepthFormatFloat32) {
         if (inputData) {
             UInt32 outFrameLength = frameLength;
             YASAudioCopyAudioBufferListFlexibly(inputData, outputData, sizeof(Float32), &outFrameLength);
-            
+
             const Float32 throughVol = self.throughVolume;
-            
+
             for (UInt32 buf = 0; buf < outputData->mNumberBuffers; buf++) {
                 Float32 *data = outputData->mBuffers[buf].mData;
                 UInt32 length = frameLength * outputData->mBuffers[buf].mNumberChannels;
                 cblas_sscal(length, throughVol, data, 1);
             }
         }
-        
+
         const Float64 sampleRate = format.sampleRate;
         const Float64 startPhase = _phase;
         const Float64 sineVol = self.sineVolume;
         const Float64 freq = self.sineFrequency;
         Float64 endPhase = 0;
-        
+
         if (frameLength < kSineDataMaxCount) {
             endPhase = YASAudioVectorSinef(_sineData, frameLength, startPhase, freq / sampleRate * YAS_2_PI);
-            
+
             _phase = endPhase;
-            
+
             for (UInt32 buf = 0; buf < outputData->mNumberBuffers; buf++) {
                 Float32 *data = outputData->mBuffers[buf].mData;
                 const int stride = outputData->mBuffers[buf].mNumberChannels;
@@ -113,50 +115,59 @@ static const UInt32 kSineDataMaxCount = 4096;
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    
+
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        YASDecibelValueTransformer *decibelValueFormatter = YASAutorelease([[YASDecibelValueTransformer alloc] init]);
-        [NSValueTransformer setValueTransformer:decibelValueFormatter forName:NSStringFromClass([YASDecibelValueTransformer class])];
-        
-        YASFrequencyValueFormatter *freqValueFormatter = YASAutorelease([[YASFrequencyValueFormatter alloc] init]);
-        [NSValueTransformer setValueTransformer:freqValueFormatter forName:NSStringFromClass([YASFrequencyValueFormatter class])];
+      YASDecibelValueTransformer *decibelValueFormatter = YASAutorelease([[YASDecibelValueTransformer alloc] init]);
+      [NSValueTransformer setValueTransformer:decibelValueFormatter
+                                      forName:NSStringFromClass([YASDecibelValueTransformer class])];
+
+      YASFrequencyValueFormatter *freqValueFormatter = YASAutorelease([[YASFrequencyValueFormatter alloc] init]);
+      [NSValueTransformer setValueTransformer:freqValueFormatter
+                                      forName:NSStringFromClass([YASFrequencyValueFormatter class])];
     });
-    
+
     YASAudioGraph *audioGraph = [[YASAudioGraph alloc] init];
     self.audioGraph = audioGraph;
     YASRelease(audioGraph);
-    
+
     self.deviceIO = [audioGraph addAudioDeviceIOWithAudioDevice:nil];
-    
+
     YASAudioDeviceSampleCore *core = [[YASAudioDeviceSampleCore alloc] init];
     self.core = core;
     YASRelease(core);
-    
+
     YASWeakContainer *container = self.deviceIO.weakContainer;
-    
-    self.deviceIO.renderCallbackBlock = ^(AudioBufferList *outData, const AudioTimeStamp *inTime, const UInt32 inFrameLength) {
-        YASAudioDeviceIO *deviceIO = container.retainedObject;
-        [core processWithOutputData:outData inputData:deviceIO.inputAudioBufferListOnRender frameLength:inFrameLength];
-        YASRelease(deviceIO);
+
+    self.deviceIO.renderCallbackBlock = ^(AudioBufferList *outData, const AudioTimeStamp *inTime,
+                                          const UInt32 inFrameLength) {
+      YASAudioDeviceIO *deviceIO = container.retainedObject;
+      [core processWithOutputData:outData inputData:deviceIO.inputAudioBufferListOnRender frameLength:inFrameLength];
+      YASRelease(deviceIO);
     };
-    
+
     audioGraph.running = YES;
-    
+
     [self updateDeviceNames];
-    
+
     YASAudioDevice *defaultDevice = [YASAudioDevice defaultOutputDevice];
     NSUInteger index = [[YASAudioDevice allDevices] indexOfObject:defaultDevice];
     self.selectedDeviceIndex = index;
-    
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(audioHardwareDidChange:) name:YASAudioHardwareDidChangeNotification object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(audioDeviceDidChange:) name:YASAudioDeviceDidChangeNotification object:nil];
+
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(audioHardwareDidChange:)
+                                                 name:YASAudioHardwareDidChangeNotification
+                                               object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(audioDeviceDidChange:)
+                                                 name:YASAudioDeviceDidChangeNotification
+                                               object:nil];
 }
 
 - (void)dealloc
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
-    
+
     YASRelease(_core);
     YASRelease(_deviceIO);
     YASRelease(_audioGraph);
@@ -173,9 +184,9 @@ static const UInt32 kSineDataMaxCount = 4096;
 {
     if (_selectedDeviceIndex != selectedDeviceIndex) {
         _selectedDeviceIndex = selectedDeviceIndex;
-        
+
         NSArray *allDevices = [YASAudioDevice allDevices];
-        
+
         if (selectedDeviceIndex < allDevices.count) {
             [self setDevice:allDevices[selectedDeviceIndex]];
         } else {
@@ -187,19 +198,19 @@ static const UInt32 kSineDataMaxCount = 4096;
 - (void)updateDeviceNames
 {
     NSArray *allDevices = [YASAudioDevice allDevices];
-    
+
     NSMutableArray *titles = [NSMutableArray arrayWithCapacity:allDevices.count];
-    
+
     for (YASAudioDevice *device in allDevices) {
         [titles addObject:device.name];
     }
-    
+
     [titles addObject:@"None"];
-    
+
     self.deviceNames = titles;
-    
+
     YASAudioDevice *device = self.deviceIO.audioDevice;
-    
+
     if (device) {
         self.selectedDeviceIndex = [allDevices indexOfObject:device];
     } else {
@@ -210,13 +221,13 @@ static const UInt32 kSineDataMaxCount = 4096;
 - (void)setDevice:(YASAudioDevice *)selectedDevice
 {
     NSArray *allDevices = [YASAudioDevice allDevices];
-    
+
     if (selectedDevice && [allDevices containsObject:selectedDevice]) {
         self.deviceIO.audioDevice = selectedDevice;
     } else {
         self.deviceIO.audioDevice = nil;
     }
-    
+
     [self updateDeviceInfo];
 }
 
@@ -225,7 +236,7 @@ static const UInt32 kSineDataMaxCount = 4096;
     YASAudioDevice *device = self.deviceIO.audioDevice;
     NSColor *onColor = [NSColor blackColor];
     NSColor *offColor = [NSColor lightGrayColor];
-    
+
     self.core.format = device.outputFormat;
     self.deviceInfo = device.description;
     self.ioThroughTextColor = (device.inputFormat && device.outputFormat) ? onColor : offColor;
@@ -242,7 +253,7 @@ static const UInt32 kSineDataMaxCount = 4096;
 - (void)audioDeviceDidChange:(NSNotification *)notification
 {
     YASAudioDevice *device = notification.object;
-    
+
     if ([self.deviceIO.audioDevice isEqualToAudioDevice:device]) {
         [self updateDeviceInfo];
     }

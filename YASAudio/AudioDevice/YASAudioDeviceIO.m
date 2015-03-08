@@ -20,7 +20,7 @@ static UInt32 YASAudioDeviceIOFrameCapacity = 4096;
 
 @class YASAudioPCMBuffer;
 
-@interface YASAudioDeviceIOCore : NSObject 
+@interface YASAudioDeviceIOCore : NSObject
 
 @property (nonatomic, strong) YASAudioPCMBuffer *inputBuffer;
 @property (nonatomic, strong) YASAudioPCMBuffer *outputBuffer;
@@ -33,10 +33,10 @@ static UInt32 YASAudioDeviceIOFrameCapacity = 4096;
 {
     YASRelease(_inputBuffer);
     YASRelease(_outputBuffer);
-    
+
     _inputBuffer = nil;
     _outputBuffer = nil;
-    
+
     YASSuperDealloc;
 }
 
@@ -67,12 +67,18 @@ static UInt32 YASAudioDeviceIOFrameCapacity = 4096;
         if (!graph) {
             YASRaiseWithReason(([NSString stringWithFormat:@"%s - Argument is nil.", __PRETTY_FUNCTION__]));
         }
-        
+
         self.graphContainer = graph.weakContainer;
         self.audioDevice = [YASAudioDevice defaultOutputDevice];
-        
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(audioHardwareDidChange:) name:YASAudioHardwareDidChangeNotification object:nil];
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(audioDeviceDidChange:) name:YASAudioDeviceDidChangeNotification object:nil];
+
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(audioHardwareDidChange:)
+                                                     name:YASAudioHardwareDidChangeNotification
+                                                   object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(audioDeviceDidChange:)
+                                                     name:YASAudioDeviceDidChangeNotification
+                                                   object:nil];
     }
     return self;
 }
@@ -80,19 +86,19 @@ static UInt32 YASAudioDeviceIOFrameCapacity = 4096;
 - (void)dealloc
 {
     [self uninitialize];
-    
+
     [[NSNotificationCenter defaultCenter] removeObserver:self];
-    
+
     YASRelease(_graphContainer);
     YASRelease(_renderCallbackBlock);
     YASRelease(_audioDevice);
     YASRelease(_core);
-    
+
     _graphContainer = nil;
     _renderCallbackBlock = nil;
     _audioDevice = nil;
     _core = nil;
-    
+
     YASSuperDealloc;
 }
 
@@ -101,78 +107,82 @@ static UInt32 YASAudioDeviceIOFrameCapacity = 4096;
     if (!_audioDevice || _ioProcID) {
         return;
     }
-    
+
     if (!_audioDevice.inputFormat && !_audioDevice.outputFormat) {
         YASLog(@"%s - Audio device do not have io.", __PRETTY_FUNCTION__);
         return;
     }
-    
+
     YASWeakContainer *container = self.weakContainer;
-    
-    YASRaiseIfAUError(AudioDeviceCreateIOProcIDWithBlock(&_ioProcID, self.audioDevice.audioDeviceID, NULL, ^(const AudioTimeStamp *inNow, const AudioBufferList *inInputData, const AudioTimeStamp *inInputTime, AudioBufferList *outOutputData, const AudioTimeStamp *inOutputTime) {
-        YASAudioClearAudioBufferList(outOutputData);
-        
-        YASAudioDeviceIO *deviceIO = container.retainedObject;
-        
-        YASAudioDeviceIOCore *core = deviceIO.core;
-        if (core) {
-            [core clearBuffers];
-            
-            YASAudioPCMBuffer *inputBuffer = core.inputBuffer;
-            [inputBuffer copyDataFlexiblyFromAudioBufferList:inInputData];
-            
-            const UInt32 inputFrameLength = inputBuffer.frameLength;
-            if (inputFrameLength > 0) {
-                deviceIO.inputData = inputBuffer.audioBufferList;
-                deviceIO.inputTime = inInputTime;
-            }
-            
-            YASAudioDeviceIOCallbackBlock renderCallbackBlock = deviceIO.renderCallbackBlock;
-            if (renderCallbackBlock) {
-                YASAudioPCMBuffer *outputBuffer = core.outputBuffer;
-                if (outputBuffer) {
-                    const UInt32 frameLength = YASAudioGetFrameLengthFromAudioBufferList(outOutputData, outputBuffer.format.sampleByteCount);
-                    if (frameLength > 0) {
-                        outputBuffer.frameLength = frameLength;
-                        renderCallbackBlock(outputBuffer.mutableAudioBufferList, inOutputTime, frameLength);
-                        [outputBuffer copyDataFlexiblyToAudioBufferList:outOutputData];
-                    }
-                } else if (deviceIO.inputData) {
-                    renderCallbackBlock(NULL, NULL, inputFrameLength);
-                }
-            }
-        }
-        
-        deviceIO.inputData = NULL;
-        YASRelease(deviceIO);
-    }));
-    
+
+    YASRaiseIfAUError(AudioDeviceCreateIOProcIDWithBlock(
+        &_ioProcID, self.audioDevice.audioDeviceID, NULL,
+        ^(const AudioTimeStamp *inNow, const AudioBufferList *inInputData, const AudioTimeStamp *inInputTime,
+          AudioBufferList *outOutputData, const AudioTimeStamp *inOutputTime) {
+          YASAudioClearAudioBufferList(outOutputData);
+
+          YASAudioDeviceIO *deviceIO = container.retainedObject;
+
+          YASAudioDeviceIOCore *core = deviceIO.core;
+          if (core) {
+              [core clearBuffers];
+
+              YASAudioPCMBuffer *inputBuffer = core.inputBuffer;
+              [inputBuffer copyDataFlexiblyFromAudioBufferList:inInputData];
+
+              const UInt32 inputFrameLength = inputBuffer.frameLength;
+              if (inputFrameLength > 0) {
+                  deviceIO.inputData = inputBuffer.audioBufferList;
+                  deviceIO.inputTime = inInputTime;
+              }
+
+              YASAudioDeviceIOCallbackBlock renderCallbackBlock = deviceIO.renderCallbackBlock;
+              if (renderCallbackBlock) {
+                  YASAudioPCMBuffer *outputBuffer = core.outputBuffer;
+                  if (outputBuffer) {
+                      const UInt32 frameLength =
+                          YASAudioGetFrameLengthFromAudioBufferList(outOutputData, outputBuffer.format.sampleByteCount);
+                      if (frameLength > 0) {
+                          outputBuffer.frameLength = frameLength;
+                          renderCallbackBlock(outputBuffer.mutableAudioBufferList, inOutputTime, frameLength);
+                          [outputBuffer copyDataFlexiblyToAudioBufferList:outOutputData];
+                      }
+                  } else if (deviceIO.inputData) {
+                      renderCallbackBlock(NULL, NULL, inputFrameLength);
+                  }
+              }
+          }
+
+          deviceIO.inputData = NULL;
+          YASRelease(deviceIO);
+        }));
+
     [self _updateCore];
 }
 
 - (void)uninitialize
 {
     [self stop];
-    
+
     if (!_audioDevice || !_ioProcID) {
         return;
     }
-    
+
     YASRaiseIfAUError(AudioDeviceDestroyIOProcID(self.audioDevice.audioDeviceID, _ioProcID));
-    
+
     _ioProcID = NULL;
-    
+
     [self _updateCore];
 }
 
 - (void)start
 {
     _isRunning = YES;
-    
+
     if (!_audioDevice || !_ioProcID) {
         return;
     }
-    
+
     YASRaiseIfAUError(AudioDeviceStart(self.audioDevice.audioDeviceID, _ioProcID));
 }
 
@@ -181,13 +191,13 @@ static UInt32 YASAudioDeviceIOFrameCapacity = 4096;
     if (!_isRunning) {
         return;
     }
-    
+
     _isRunning = NO;
-    
+
     if (!_audioDevice || !_ioProcID) {
         return;
     }
-    
+
     YASRaiseIfAUError(AudioDeviceStop(self.audioDevice.audioDeviceID, _ioProcID));
 }
 
@@ -195,14 +205,14 @@ static UInt32 YASAudioDeviceIOFrameCapacity = 4096;
 {
     if (![self.audioDevice isEqualToAudioDevice:audioDevice]) {
         BOOL isRunning = _isRunning;
-        
+
         [self uninitialize];
-        
+
         YASRelease(_audioDevice);
         _audioDevice = YASRetain(audioDevice);
-        
+
         [self initialize];
-        
+
         if (isRunning) {
             [self start];
         }
@@ -223,7 +233,7 @@ static UInt32 YASAudioDeviceIOFrameCapacity = 4096;
     if (![self.audioDevice isEqualToAudioDevice:notification.object]) {
         return;
     }
-    
+
     [self _updateCore];
 }
 
@@ -232,27 +242,29 @@ static UInt32 YASAudioDeviceIOFrameCapacity = 4096;
 - (void)_updateCore
 {
     self.core = nil;
-    
+
     if (!_audioDevice || !_ioProcID) {
         return;
     }
-    
+
     YASAudioDeviceIOCore *core = [[YASAudioDeviceIOCore alloc] init];
     YASAudioFormat *inputFormat = self.audioDevice.inputFormat;
     YASAudioFormat *outputFormat = self.audioDevice.outputFormat;
-    
+
     if (inputFormat) {
-        YASAudioPCMBuffer *inputBuffer = [[YASAudioPCMBuffer alloc] initWithPCMFormat:inputFormat frameCapacity:YASAudioDeviceIOFrameCapacity];
+        YASAudioPCMBuffer *inputBuffer =
+            [[YASAudioPCMBuffer alloc] initWithPCMFormat:inputFormat frameCapacity:YASAudioDeviceIOFrameCapacity];
         core.inputBuffer = inputBuffer;
         YASRelease(inputBuffer);
     }
-    
+
     if (outputFormat) {
-        YASAudioPCMBuffer *outputBuffer = [[YASAudioPCMBuffer alloc] initWithPCMFormat:outputFormat frameCapacity:YASAudioDeviceIOFrameCapacity];
+        YASAudioPCMBuffer *outputBuffer =
+            [[YASAudioPCMBuffer alloc] initWithPCMFormat:outputFormat frameCapacity:YASAudioDeviceIOFrameCapacity];
         core.outputBuffer = outputBuffer;
         YASRelease(outputBuffer);
     }
-    
+
     self.core = core;
     YASRelease(core);
 }

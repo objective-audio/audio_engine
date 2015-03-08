@@ -17,8 +17,11 @@
 
 @property (nonatomic, assign, getter=isRunning) BOOL running;
 
-- (YASAudioUnit *)addAudioUnitWithAudioComponentDescription:(const AudioComponentDescription *)acd prepareBlock:(void (^)(YASAudioUnit *audioUnit))prepareBlock;
-- (YASAudioUnit *)addAudioUnitWithType:(OSType)type subType:(OSType)subType prepareBlock:(void (^)(YASAudioUnit *audioUnit))prepareBlock;
+- (YASAudioUnit *)addAudioUnitWithAudioComponentDescription:(const AudioComponentDescription *)acd
+                                               prepareBlock:(void (^)(YASAudioUnit *audioUnit))prepareBlock;
+- (YASAudioUnit *)addAudioUnitWithType:(OSType)type
+                               subType:(OSType)subType
+                          prepareBlock:(void (^)(YASAudioUnit *audioUnit))prepareBlock;
 - (void)removeAudioUnit:(YASAudioUnit *)unit;
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
@@ -34,6 +37,8 @@
 
 @property (nonatomic, copy, readonly) NSNumber *key;
 
-+ (void)audioUnitRender:(YASAudioUnitRenderParameters *)renderParameters graphKey:(NSNumber *)graphKey unitKey:(NSNumber *)unitKey;
++ (void)audioUnitRender:(YASAudioUnitRenderParameters *)renderParameters
+               graphKey:(NSNumber *)graphKey
+                unitKey:(NSNumber *)unitKey;
 
 @end

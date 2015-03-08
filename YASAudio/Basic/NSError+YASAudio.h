@@ -9,8 +9,7 @@ extern NSString *const YASAudioErrorDomain;
 extern NSString *const YASAudioErrorCodeNumberKey;
 extern NSString *const YASAudioErrorCodeDescriptionKey;
 
-typedef NS_ENUM(NSInteger, YASAudioFileErrorCode)
-{
+typedef NS_ENUM(NSInteger, YASAudioFileErrorCode) {
     YASAudioFileErrorCodeInvalidFormat = 1000,
     YASAudioFileErrorCodeNotOpen,
     YASAudioFileErrorCodeNotCreate,

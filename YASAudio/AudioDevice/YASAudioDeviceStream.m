@@ -14,9 +14,12 @@
 #import "NSException+YASAudio.h"
 #import "NSString+YASAudio.h"
 
-NSString *const YASAudioDeviceStreamVirtualFormatDidChangeNotification = @"YASAudioDeviceStreamVirtualFormatDidChangeNotification";
-NSString *const YASAudioDeviceStreamIsActiveDidChangeNotification = @"YASAudioDeviceStreamIsActiveDidChangeNotification";
-NSString *const YASAudioDeviceStreamStartingChannelDidChangeNotification = @"YASAudioDeviceStreamStartingChannelDidChangeNotification";
+NSString *const YASAudioDeviceStreamVirtualFormatDidChangeNotification =
+    @"YASAudioDeviceStreamVirtualFormatDidChangeNotification";
+NSString *const YASAudioDeviceStreamIsActiveDidChangeNotification =
+    @"YASAudioDeviceStreamIsActiveDidChangeNotification";
+NSString *const YASAudioDeviceStreamStartingChannelDidChangeNotification =
+    @"YASAudioDeviceStreamStartingChannelDidChangeNotification";
 
 @interface YASAudioDeviceStream ()
 
@@ -44,9 +47,9 @@ NSString *const YASAudioDeviceStreamStartingChannelDidChangeNotification = @"YAS
 - (void)dealloc
 {
     YASRelease(_listenerBlock);
-    
+
     _listenerBlock = nil;
-    
+
     YASSuperDealloc;
 }
 
@@ -80,7 +83,9 @@ NSString *const YASAudioDeviceStreamStartingChannelDidChangeNotification = @"YAS
     NSMutableString *result = [NSMutableString stringWithFormat:@"<%@: %p>\n{\n", self.class, self];
     NSMutableArray *lines = [NSMutableArray array];
     [lines addObject:[NSString stringWithFormat:@"isActive = %@", self.isActive ? @"true" : @"false"]];
-    [lines addObject:[NSString stringWithFormat:@"direction = %@", (self.direction == YASAudioDeviceStreamDirectionOutput) ? @"output" : @"input"]];
+    [lines addObject:[NSString stringWithFormat:@"direction = %@",
+                                                (self.direction == YASAudioDeviceStreamDirectionOutput) ? @"output" :
+                                                                                                          @"input"]];
     [lines addObject:[NSString stringWithFormat:@"startingChannel = %@", @(self.startingChannel)]];
     [lines addObject:[NSString stringWithFormat:@"virtualFormat = %@", self.virtualFormat]];
     [result appendString:[[lines componentsJoinedByString:@"\n"] stringByAppendingLinePrefix:@"    "]];
@@ -96,60 +101,64 @@ NSString *const YASAudioDeviceStreamStartingChannelDidChangeNotification = @"YAS
 - (BOOL)isActive
 {
     BOOL result = NO;
-    
-    @autoreleasepool {
+
+    @autoreleasepool
+    {
         NSData *data = [self _dataWithSelector:kAudioStreamPropertyIsActive];
         if (data) {
             const UInt32 *isActive = (UInt32 *)data.bytes;
             result = *isActive > 0;
         }
     }
-    
+
     return result;
 }
 
 - (YASAudioFormat *)virtualFormat
 {
     YASAudioFormat *format = nil;
-    
-    @autoreleasepool {
+
+    @autoreleasepool
+    {
         NSData *data = [self _dataWithSelector:kAudioStreamPropertyVirtualFormat];
         if (data) {
             const AudioStreamBasicDescription *asbd = (AudioStreamBasicDescription *)data.bytes;
             format = [[YASAudioFormat alloc] initWithStreamDescription:asbd];
         }
     }
-    
+
     return YASAutorelease(format);
 }
 
 - (YASAudioDeviceStreamDirection)direction
 {
     YASAudioDeviceStreamDirection direction;
-    
-    @autoreleasepool {
+
+    @autoreleasepool
+    {
         NSData *data = [self _dataWithSelector:kAudioStreamPropertyDirection];
         if (data) {
             const UInt32 *dataPtr = (UInt32 *)data.bytes;
             direction = *dataPtr;
         }
     }
-    
+
     return direction;
 }
 
 - (UInt32)startingChannel
 {
     UInt32 startingChannel = 0;
-    
-    @autoreleasepool {
+
+    @autoreleasepool
+    {
         NSData *data = [self _dataWithSelector:kAudioStreamPropertyStartingChannel];
         if (data) {
             const UInt32 *dataPtr = (UInt32 *)data.bytes;
             startingChannel = *dataPtr;
         }
     }
-    
+
     return startingChannel;
 }
 
@@ -157,15 +166,13 @@ NSString *const YASAudioDeviceStreamStartingChannelDidChangeNotification = @"YAS
 
 - (NSData *)_dataWithSelector:(AudioObjectPropertySelector)selector
 {
-    const AudioObjectPropertyAddress address = {
-        .mSelector = selector,
-        .mScope = kAudioObjectPropertyScopeGlobal,
-        .mElement = kAudioObjectPropertyElementMaster
-    };
-    
+    const AudioObjectPropertyAddress address = {.mSelector = selector,
+                                                .mScope = kAudioObjectPropertyScopeGlobal,
+                                                .mElement = kAudioObjectPropertyElementMaster};
+
     UInt32 size = 0;
     YASRaiseIfAUError(AudioObjectGetPropertyDataSize(_audioStreamID, &address, 0, NULL, &size));
-    
+
     if (size > 0) {
         NSMutableData *data = [NSMutableData dataWithLength:size];
         void *bytes = data.mutableBytes;
@@ -179,21 +186,27 @@ NSString *const YASAudioDeviceStreamStartingChannelDidChangeNotification = @"YAS
 - (void)_setupListenerBlock
 {
     YASWeakContainer *weakContainer = self.weakContainer;
-    
+
     self.listenerBlock = ^(UInt32 inNumberAddresses, const AudioObjectPropertyAddress *inAddresses) {
-        YASAudioDeviceStream *stream = weakContainer.retainedObject;
-        if (stream) {
-            for (NSInteger i = 0; i < inNumberAddresses; i++) {
-                if (inAddresses[i].mSelector == kAudioStreamPropertyVirtualFormat) {
-                    [[NSNotificationCenter defaultCenter] postNotificationName:YASAudioDeviceStreamVirtualFormatDidChangeNotification object:stream];
-                } else if (inAddresses[i].mSelector == kAudioStreamPropertyIsActive) {
-                    [[NSNotificationCenter defaultCenter] postNotificationName:YASAudioDeviceStreamIsActiveDidChangeNotification object:stream];
-                } else if (inAddresses[i].mSelector == kAudioStreamPropertyStartingChannel) {
-                    [[NSNotificationCenter defaultCenter] postNotificationName:YASAudioDeviceStreamStartingChannelDidChangeNotification object:stream];
-                }
-            }
-            YASRelease(stream);
-        }
+      YASAudioDeviceStream *stream = weakContainer.retainedObject;
+      if (stream) {
+          for (NSInteger i = 0; i < inNumberAddresses; i++) {
+              if (inAddresses[i].mSelector == kAudioStreamPropertyVirtualFormat) {
+                  [[NSNotificationCenter defaultCenter]
+                      postNotificationName:YASAudioDeviceStreamVirtualFormatDidChangeNotification
+                                    object:stream];
+              } else if (inAddresses[i].mSelector == kAudioStreamPropertyIsActive) {
+                  [[NSNotificationCenter defaultCenter]
+                      postNotificationName:YASAudioDeviceStreamIsActiveDidChangeNotification
+                                    object:stream];
+              } else if (inAddresses[i].mSelector == kAudioStreamPropertyStartingChannel) {
+                  [[NSNotificationCenter defaultCenter]
+                      postNotificationName:YASAudioDeviceStreamStartingChannelDidChangeNotification
+                                    object:stream];
+              }
+          }
+          YASRelease(stream);
+      }
     };
 }
 
@@ -202,14 +215,13 @@ NSString *const YASAudioDeviceStreamStartingChannelDidChangeNotification = @"YAS
     if (!_listenerBlock) {
         [self _setupListenerBlock];
     }
-    
-    const AudioObjectPropertyAddress address = {
-        .mSelector = selector,
-        .mScope = kAudioObjectPropertyScopeGlobal,
-        .mElement = kAudioObjectPropertyElementMaster
-    };
-    
-    YASRaiseIfAUError(AudioObjectAddPropertyListenerBlock(_audioStreamID, &address, dispatch_get_main_queue(), self.listenerBlock));
+
+    const AudioObjectPropertyAddress address = {.mSelector = selector,
+                                                .mScope = kAudioObjectPropertyScopeGlobal,
+                                                .mElement = kAudioObjectPropertyElementMaster};
+
+    YASRaiseIfAUError(
+        AudioObjectAddPropertyListenerBlock(_audioStreamID, &address, dispatch_get_main_queue(), self.listenerBlock));
 }
 
 @end

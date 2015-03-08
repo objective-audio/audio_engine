@@ -47,20 +47,21 @@ Float32 YASAudioLinearFromDecibelf(Float32 decibel)
     return powf(10.0f, decibel / 20.0f);
 }
 
-Float32 YASAudioVectorSinef(Float32 *outData, const UInt32 count, const Float64 startPhase, const Float64 phasePerFrame) {
+Float32 YASAudioVectorSinef(Float32 *outData, const UInt32 count, const Float64 startPhase, const Float64 phasePerFrame)
+{
     if (!outData || count == 0) {
         return startPhase;
     }
-    
+
     Float64 phase = startPhase;
-    
+
     for (UInt32 i = 0; i < count; i++) {
         outData[i] = phase;
         phase = fmod(phase + phasePerFrame, YAS_2_PI);
     }
-    
+
     const int length = count;
     vvsinf(outData, outData, &length);
-    
+
     return phase;
 }

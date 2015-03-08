@@ -18,7 +18,7 @@ NSString *const YASAudioNSErrorException = @"YASAudioNSErrorException";
         [[NSException exceptionWithName:name reason:reason userInfo:nil] raise];
     } else {
         dispatch_sync(dispatch_get_main_queue(), ^{
-            [[NSException exceptionWithName:name reason:reason userInfo:nil] raise];
+          [[NSException exceptionWithName:name reason:reason userInfo:nil] raise];
         });
     }
 }
@@ -38,7 +38,9 @@ NSString *const YASAudioNSErrorException = @"YASAudioNSErrorException";
 + (void)yas_raiseIfAudioUnitError:(OSStatus)err
 {
     if (err != noErr) {
-        [self yas_raiseWithName:YASAudioAudioUnitErrorException reason:[NSString stringWithFormat:@"AudioUnit Error = %@ - %@", @(err), [self audioUnitErrorDescription:err]]];
+        [self yas_raiseWithName:YASAudioAudioUnitErrorException
+                         reason:[NSString stringWithFormat:@"AudioUnit Error = %@ - %@", @(err),
+                                                           [self audioUnitErrorDescription:err]]];
     }
 }
 

@@ -31,7 +31,10 @@
 - (void)clearDataWithStartFrame:(UInt32)frame length:(UInt32)length;
 
 - (BOOL)copyDataFromBuffer:(YASAudioPCMBuffer *)fromBuffer;
-- (BOOL)copyDataFromBuffer:(YASAudioPCMBuffer *)fromBuffer fromStartFrame:(UInt32)fromFrame toStartFrame:(UInt32)toFrame length:(UInt32)length;
+- (BOOL)copyDataFromBuffer:(YASAudioPCMBuffer *)fromBuffer
+            fromStartFrame:(UInt32)fromFrame
+              toStartFrame:(UInt32)toFrame
+                    length:(UInt32)length;
 
 - (BOOL)copyDataFlexiblyFromBuffer:(YASAudioPCMBuffer *)buffer;
 - (BOOL)copyDataFlexiblyFromAudioBufferList:(const AudioBufferList *)fromAudioBufferList;
@@ -41,6 +44,8 @@
 
 @interface YASAudioPCMBuffer (YASInternal)
 
-- (instancetype)initWithPCMFormat:(YASAudioFormat *)format audioBufferList:(AudioBufferList *)audioBufferList needsFree:(BOOL)needsFree;
+- (instancetype)initWithPCMFormat:(YASAudioFormat *)format
+                  audioBufferList:(AudioBufferList *)audioBufferList
+                        needsFree:(BOOL)needsFree;
 
 @end

@@ -12,11 +12,13 @@
 
 @implementation YASAudioMathTests
 
-- (void)setUp {
+- (void)setUp
+{
     [super setUp];
 }
 
-- (void)tearDown {
+- (void)tearDown
+{
     [super tearDown];
 }
 
@@ -95,19 +97,19 @@
     const Float64 startPhase = 0.1;
     const Float64 phasePerFrame = 1.0 / (Float64)count * 2.0 * M_PI;
     Float32 *data = calloc(count, sizeof(Float32));
-    
+
     YASAudioVectorSinef(data, count, startPhase, phasePerFrame);
-    
+
     Float64 phase = startPhase;
     for (UInt32 i = 0; i < count; i++) {
         Float32 value = sinf(phase);
         phase = fmod(phase + phasePerFrame, 2.0 * M_PI);
-        
-        Float32 vecValue =  data[i];
-        
+
+        Float32 vecValue = data[i];
+
         XCTAssertEqualWithAccuracy(value, vecValue, 0.0001);
     }
-    
+
     free(data);
 }
 

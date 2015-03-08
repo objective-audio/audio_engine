@@ -30,15 +30,18 @@
     const UInt32 sourceChannel = 1;
     const UInt32 destBus = 2;
     const UInt32 destChannel = 3;
-    
-    YASAudioChannelRoute *channelRoute = [[YASAudioChannelRoute alloc] initWithSourceBus:sourceBus sourceChannel:sourceChannel destinationBus:destBus destinationChannel:destChannel];
-    
+
+    YASAudioChannelRoute *channelRoute = [[YASAudioChannelRoute alloc] initWithSourceBus:sourceBus
+                                                                           sourceChannel:sourceChannel
+                                                                          destinationBus:destBus
+                                                                      destinationChannel:destChannel];
+
     XCTAssertNotNil(channelRoute);
     XCTAssertEqual(channelRoute.sourceBus, sourceBus);
     XCTAssertEqual(channelRoute.sourceChannel, sourceChannel);
     XCTAssertEqual(channelRoute.destinationBus, destBus);
     XCTAssertEqual(channelRoute.destinationChannel, destChannel);
-    
+
     YASRelease(channelRoute);
 }
 
@@ -46,15 +49,15 @@
 {
     const UInt32 bus = 4;
     const UInt32 channel = 5;
-    
+
     YASAudioChannelRoute *channelRoute = [[YASAudioChannelRoute alloc] initWithBus:bus channel:channel];
-    
+
     XCTAssertNotNil(channelRoute);
     XCTAssertEqual(channelRoute.sourceBus, bus);
     XCTAssertEqual(channelRoute.sourceChannel, channel);
     XCTAssertEqual(channelRoute.destinationBus, bus);
     XCTAssertEqual(channelRoute.destinationChannel, channel);
-    
+
     YASRelease(channelRoute);
 }
 
@@ -62,20 +65,26 @@
 {
     const UInt32 bus = 6;
     const UInt32 channels = 4;
-    
+
     XCTAssertNil([YASAudioChannelRoute defaultChannelRoutesWithBus:bus format:nil]);
-    
-    YASAudioFormat *interleavedFormat = [[YASAudioFormat alloc] initWithBitDepthFormat:YASAudioBitDepthFormatFloat32 sampleRate:44100 channels:channels interleaved:YES];
-    
+
+    YASAudioFormat *interleavedFormat = [[YASAudioFormat alloc] initWithBitDepthFormat:YASAudioBitDepthFormatFloat32
+                                                                            sampleRate:44100
+                                                                              channels:channels
+                                                                           interleaved:YES];
+
     XCTAssertNil([YASAudioChannelRoute defaultChannelRoutesWithBus:bus format:interleavedFormat]);
-    
-    YASAudioFormat *nonInterleavedFormat = [[YASAudioFormat alloc] initWithBitDepthFormat:YASAudioBitDepthFormatFloat32 sampleRate:44100 channels:channels interleaved:NO];
-    
+
+    YASAudioFormat *nonInterleavedFormat = [[YASAudioFormat alloc] initWithBitDepthFormat:YASAudioBitDepthFormatFloat32
+                                                                               sampleRate:44100
+                                                                                 channels:channels
+                                                                              interleaved:NO];
+
     NSArray *channelRoutes = [YASAudioChannelRoute defaultChannelRoutesWithBus:bus format:nonInterleavedFormat];
-    
+
     XCTAssertNotNil(channelRoutes);
     XCTAssertEqual(channelRoutes.count, channels);
-    
+
     for (UInt32 ch = 0; ch < channels; ch++) {
         YASAudioChannelRoute *channelRoute = channelRoutes[ch];
         XCTAssertTrue([channelRoute isKindOfClass:[YASAudioChannelRoute class]]);

@@ -36,7 +36,10 @@ extern NSString *const YASAudioFileTypeWAVE;
 - (instancetype)init NS_UNAVAILABLE;
 
 - (instancetype)initWithURL:(NSURL *)fileURL error:(NSError **)outError;
-- (instancetype)initWithURL:(NSURL *)fileURL bitDepthFormat:(YASAudioBitDepthFormat)format interleaved:(BOOL)interleaved error:(NSError **)outError;
+- (instancetype)initWithURL:(NSURL *)fileURL
+             bitDepthFormat:(YASAudioBitDepthFormat)format
+                interleaved:(BOOL)interleaved
+                      error:(NSError **)outError;
 
 - (BOOL)readIntoBuffer:(YASAudioPCMBuffer *)buffer error:(NSError **)outError;
 - (BOOL)readIntoBuffer:(YASAudioPCMBuffer *)buffer frameLength:(UInt32)frameLength error:(NSError **)outError;
@@ -47,8 +50,16 @@ extern NSString *const YASAudioFileTypeWAVE;
 
 - (instancetype)init NS_UNAVAILABLE;
 
-- (instancetype)initWithURL:(NSURL *)fileURL fileType:(NSString *)fileType settings:(NSDictionary *)settings error:(NSError **)outError;
-- (instancetype)initWithURL:(NSURL *)fileURL fileType:(NSString *)fileType settings:(NSDictionary *)settings bitDepthFormat:(YASAudioBitDepthFormat)format interleaved:(BOOL)interleaved error:(NSError **)outError;
+- (instancetype)initWithURL:(NSURL *)fileURL
+                   fileType:(NSString *)fileType
+                   settings:(NSDictionary *)settings
+                      error:(NSError **)outError;
+- (instancetype)initWithURL:(NSURL *)fileURL
+                   fileType:(NSString *)fileType
+                   settings:(NSDictionary *)settings
+             bitDepthFormat:(YASAudioBitDepthFormat)format
+                interleaved:(BOOL)interleaved
+                      error:(NSError **)outError;
 
 - (BOOL)writeSyncFromBuffer:(YASAudioPCMBuffer *)buffer error:(NSError **)outError;
 - (BOOL)writeAsyncFromBuffer:(YASAudioPCMBuffer *)buffer error:(NSError **)outError;
@@ -59,12 +70,12 @@ extern NSString *const YASAudioFileTypeWAVE;
 
 @interface NSDictionary (YASAudioFile)
 
-+ (NSDictionary *)yas_waveFileSettingsWithSampleRate:(Float64)sampleRate 
-                                    numberOfChannels:(UInt32)channels 
++ (NSDictionary *)yas_waveFileSettingsWithSampleRate:(Float64)sampleRate
+                                    numberOfChannels:(UInt32)channels
                                             bitDepth:(UInt32)bitDepth;
 
-+ (NSDictionary *)yas_aiffFileSettingsWithSampleRate:(Float64)sampleRate 
-                                    numberOfChannels:(UInt32)channels 
++ (NSDictionary *)yas_aiffFileSettingsWithSampleRate:(Float64)sampleRate
+                                    numberOfChannels:(UInt32)channels
                                             bitDepth:(UInt32)bitDepth;
 
 + (NSDictionary *)yas_linearPCMSettingsWithSampleRate:(Float64)sampleRate

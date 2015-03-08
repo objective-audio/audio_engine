@@ -49,7 +49,7 @@
     if ([value isKindOfClass:[NSNumber class]]) {
         return [self.numberFormatter stringFromNumber:value];
     }
-    
+
     return nil;
 }
 
