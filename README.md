@@ -1,6 +1,6 @@
 YASAudioEngine
 ==============
-
+[![MIT Lincese](http://img.shields.io/badge/license-MIT-blue.svg?style=flat)](LICENSE)
 [![Coverage Status](https://coveralls.io/repos/objective-audio/YASAudio/badge.svg?branch=master)](https://coveralls.io/r/objective-audio/YASAudio?branch=master)
 
 Requirements
