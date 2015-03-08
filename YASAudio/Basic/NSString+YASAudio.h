@@ -10,4 +10,6 @@
 + (NSString *)yas_fileTypeStringWithHFSTypeCode:(OSType)fcc;
 - (OSType)yas_HFSTypeCode;
 
+- (NSString *)stringByAppendingLinePrefix:(NSString *)prefix;
+
 @end

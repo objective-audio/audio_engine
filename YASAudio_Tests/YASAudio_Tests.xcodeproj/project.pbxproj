@@ -80,6 +80,11 @@
 		B66E53471A75CF0E008B9D4E /* NSNumber+YASAudioTests.m in Sources */ = {isa = PBXBuildFile; fileRef = B6998A151A64B5B80029942B /* NSNumber+YASAudioTests.m */; };
 		B6998A161A64B5B80029942B /* NSNumber+YASAudioTests.m in Sources */ = {isa = PBXBuildFile; fileRef = B6998A151A64B5B80029942B /* NSNumber+YASAudioTests.m */; };
 		B6998A171A64B5B80029942B /* NSNumber+YASAudioTests.m in Sources */ = {isa = PBXBuildFile; fileRef = B6998A151A64B5B80029942B /* NSNumber+YASAudioTests.m */; };
+		B6AE9F0D1A8F2EED00A4B935 /* YASAudioChannelRoute.m in Sources */ = {isa = PBXBuildFile; fileRef = B6AE9F061A8F2EED00A4B935 /* YASAudioChannelRoute.m */; };
+		B6AE9F0E1A8F2EED00A4B935 /* YASAudioDevice.m in Sources */ = {isa = PBXBuildFile; fileRef = B6AE9F081A8F2EED00A4B935 /* YASAudioDevice.m */; };
+		B6AE9F0F1A8F2EED00A4B935 /* YASAudioDeviceIO.m in Sources */ = {isa = PBXBuildFile; fileRef = B6AE9F0A1A8F2EED00A4B935 /* YASAudioDeviceIO.m */; };
+		B6AE9F101A8F2EED00A4B935 /* YASAudioDeviceStream.m in Sources */ = {isa = PBXBuildFile; fileRef = B6AE9F0C1A8F2EED00A4B935 /* YASAudioDeviceStream.m */; };
+		B6AE9F121A8F616100A4B935 /* YASAudioDeviceTests.m in Sources */ = {isa = PBXBuildFile; fileRef = B6AE9F111A8F616100A4B935 /* YASAudioDeviceTests.m */; };
 		B6D32C851A64B65000BBF478 /* NSNumber+YASAudio.m in Sources */ = {isa = PBXBuildFile; fileRef = B6D32C841A64B65000BBF478 /* NSNumber+YASAudio.m */; };
 		B6D32C861A64B65800BBF478 /* NSNumber+YASAudio.m in Sources */ = {isa = PBXBuildFile; fileRef = B6D32C841A64B65000BBF478 /* NSNumber+YASAudio.m */; };
 		B6E827251A884F5C00751441 /* YASAudioUnitParameterInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = B6E827241A884F5C00751441 /* YASAudioUnitParameterInfo.m */; };
@@ -130,6 +135,15 @@
 		B66845F91A66A10C00D5A372 /* YASAudioPCMBufferTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = YASAudioPCMBufferTests.m; path = YASAudio_Tests/YASAudioPCMBufferTests.m; sourceTree = SOURCE_ROOT; };
 		B66E534D1A75CF0E008B9D4E /* YASAudio_iOS_Tests copy.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "YASAudio_iOS_Tests copy.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		B6998A151A64B5B80029942B /* NSNumber+YASAudioTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSNumber+YASAudioTests.m"; path = "YASAudio_Tests/NSNumber+YASAudioTests.m"; sourceTree = SOURCE_ROOT; };
+		B6AE9F051A8F2EED00A4B935 /* YASAudioChannelRoute.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = YASAudioChannelRoute.h; path = AudioDevice/YASAudioChannelRoute.h; sourceTree = "<group>"; };
+		B6AE9F061A8F2EED00A4B935 /* YASAudioChannelRoute.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = YASAudioChannelRoute.m; path = AudioDevice/YASAudioChannelRoute.m; sourceTree = "<group>"; };
+		B6AE9F071A8F2EED00A4B935 /* YASAudioDevice.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = YASAudioDevice.h; path = AudioDevice/YASAudioDevice.h; sourceTree = "<group>"; };
+		B6AE9F081A8F2EED00A4B935 /* YASAudioDevice.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = YASAudioDevice.m; path = AudioDevice/YASAudioDevice.m; sourceTree = "<group>"; };
+		B6AE9F091A8F2EED00A4B935 /* YASAudioDeviceIO.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = YASAudioDeviceIO.h; path = AudioDevice/YASAudioDeviceIO.h; sourceTree = "<group>"; };
+		B6AE9F0A1A8F2EED00A4B935 /* YASAudioDeviceIO.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = YASAudioDeviceIO.m; path = AudioDevice/YASAudioDeviceIO.m; sourceTree = "<group>"; };
+		B6AE9F0B1A8F2EED00A4B935 /* YASAudioDeviceStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = YASAudioDeviceStream.h; path = AudioDevice/YASAudioDeviceStream.h; sourceTree = "<group>"; };
+		B6AE9F0C1A8F2EED00A4B935 /* YASAudioDeviceStream.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = YASAudioDeviceStream.m; path = AudioDevice/YASAudioDeviceStream.m; sourceTree = "<group>"; };
+		B6AE9F111A8F616100A4B935 /* YASAudioDeviceTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = YASAudioDeviceTests.m; path = YASAudio_Tests/YASAudioDeviceTests.m; sourceTree = SOURCE_ROOT; };
 		B6D32C831A64B65000BBF478 /* NSNumber+YASAudio.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSNumber+YASAudio.h"; sourceTree = "<group>"; };
 		B6D32C841A64B65000BBF478 /* NSNumber+YASAudio.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSNumber+YASAudio.m"; sourceTree = "<group>"; };
 		B6E827231A884F5C00751441 /* YASAudioUnitParameterInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YASAudioUnitParameterInfo.h; sourceTree = "<group>"; };
@@ -197,6 +211,7 @@
 				B662315E1A6A006200A98AFC /* YASAudioFileTests.m */,
 				B64F93CF1A7925700023F49B /* YASAudioGraphTests.m */,
 				B630CA261A83B2D000EDE110 /* YASAudioUnitTests.m */,
+				B6AE9F111A8F616100A4B935 /* YASAudioDeviceTests.m */,
 				B62ED5891A628554007DDE96 /* Supporting Files */,
 			);
 			name = YASAudio_Tests;
@@ -214,6 +229,7 @@
 		B65BAA8F1A63F6D900E7C3D8 /* YASAudio */ = {
 			isa = PBXGroup;
 			children = (
+				B6AE9F041A8F2ECA00A4B935 /* AudioDevice */,
 				B65BAA901A63F6D900E7C3D8 /* Basic */,
 				B65BAAA61A63F6D900E7C3D8 /* Graph */,
 			);
@@ -279,6 +295,21 @@
 			);
 			name = YASAudioUtility;
 			path = ../Submodules/YASAudioUtility/YASAudioUtility;
+			sourceTree = "<group>";
+		};
+		B6AE9F041A8F2ECA00A4B935 /* AudioDevice */ = {
+			isa = PBXGroup;
+			children = (
+				B6AE9F051A8F2EED00A4B935 /* YASAudioChannelRoute.h */,
+				B6AE9F061A8F2EED00A4B935 /* YASAudioChannelRoute.m */,
+				B6AE9F071A8F2EED00A4B935 /* YASAudioDevice.h */,
+				B6AE9F081A8F2EED00A4B935 /* YASAudioDevice.m */,
+				B6AE9F091A8F2EED00A4B935 /* YASAudioDeviceIO.h */,
+				B6AE9F0A1A8F2EED00A4B935 /* YASAudioDeviceIO.m */,
+				B6AE9F0B1A8F2EED00A4B935 /* YASAudioDeviceStream.h */,
+				B6AE9F0C1A8F2EED00A4B935 /* YASAudioDeviceStream.m */,
+			);
+			name = AudioDevice;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -435,6 +466,8 @@
 				B6D32C861A64B65800BBF478 /* NSNumber+YASAudio.m in Sources */,
 				B66845F61A669D2600D5A372 /* YASAudioFile.m in Sources */,
 				B66845C51A660B1100D5A372 /* YASWeakSupport.m in Sources */,
+				B6AE9F121A8F616100A4B935 /* YASAudioDeviceTests.m in Sources */,
+				B6AE9F0F1A8F2EED00A4B935 /* YASAudioDeviceIO.m in Sources */,
 				B65BAAB61A63F6D900E7C3D8 /* NSString+YASAudio.m in Sources */,
 				B66845F71A669D2900D5A372 /* YASAudioFormat.m in Sources */,
 				B66845AA1A655D8C00D5A372 /* NSException+YASAudio.m in Sources */,
@@ -446,8 +479,10 @@
 				B661861E1A7C7D2900C04586 /* YASAudioGraphTests.m in Sources */,
 				B64F93CA1A791E750023F49B /* YASAudioGraph.m in Sources */,
 				B66845AD1A655D9700D5A372 /* NSArray+YASAudio.m in Sources */,
+				B6AE9F0E1A8F2EED00A4B935 /* YASAudioDevice.m in Sources */,
 				B65BAA8E1A63F62600E7C3D8 /* NSString+YASAudioTests.m in Sources */,
 				B630CA281A83B2D000EDE110 /* YASAudioUnitTests.m in Sources */,
+				B6AE9F101A8F2EED00A4B935 /* YASAudioDeviceStream.m in Sources */,
 				B66845D21A669C8F00D5A372 /* YASAudioFormatTests.m in Sources */,
 				B66845B71A6605A800D5A372 /* NSArray+YASAudioTests.m in Sources */,
 				B6998A171A64B5B80029942B /* NSNumber+YASAudioTests.m in Sources */,
@@ -456,6 +491,7 @@
 				B66845B41A6570D300D5A372 /* NSDictionary+YASAudioTests.m in Sources */,
 				B66845B11A656F2000D5A372 /* NSError+YASAudioTests.m in Sources */,
 				B66845AE1A655D9B00D5A372 /* NSException+YASAudioTests.m in Sources */,
+				B6AE9F0D1A8F2EED00A4B935 /* YASAudioChannelRoute.m in Sources */,
 				B6E827261A884F5C00751441 /* YASAudioUnitParameterInfo.m in Sources */,
 				B66231601A6A006200A98AFC /* YASAudioFileTests.m in Sources */,
 			);

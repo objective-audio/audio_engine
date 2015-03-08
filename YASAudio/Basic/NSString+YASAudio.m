@@ -51,4 +51,15 @@
 #endif
 }
 
+- (NSString *)stringByAppendingLinePrefix:(NSString *)prefix
+{
+    NSArray *lines = [self componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]];
+    NSMutableArray *indentedLines = [NSMutableArray array];
+    for (NSString *line in lines) {
+        [indentedLines addObject:[NSString stringWithFormat:@"%@%@", prefix, line]];
+    }
+    
+    return [indentedLines componentsJoinedByString:@"\n"];
+}
+
 @end
