@@ -103,6 +103,7 @@ static const UInt32 kSineDataMaxCount = 4096;
 @property (nonatomic, strong) YASAudioDeviceSampleCore *core;
 
 @property (nonatomic, strong) NSArray *deviceNames;
+@property (nonatomic, assign) Float64 nominalSampleRate;
 @property (nonatomic, assign) NSUInteger selectedDeviceIndex;
 @property (nonatomic, copy) NSString *deviceInfo;
 @property (nonatomic, strong) NSColor *ioThroughTextColor;
@@ -239,6 +240,7 @@ static const UInt32 kSineDataMaxCount = 4096;
 
     self.core.format = device.outputFormat;
     self.deviceInfo = device.description;
+    self.nominalSampleRate = device.nominalSampleRate;
     self.ioThroughTextColor = (device.inputFormat && device.outputFormat) ? onColor : offColor;
     self.sineTextColor = device.outputFormat ? onColor : offColor;
 }

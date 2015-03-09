@@ -575,6 +575,11 @@ static AudioObjectPropertyListenerBlock _globalListenerBlock;
                   }
               } else if (inAddresses[i].mSelector == kAudioDevicePropertyStreamConfiguration) {
                   [device _updateFormatWithScope:inAddresses[i].mScope];
+              } else if (inAddresses[i].mSelector == kAudioDevicePropertyNominalSampleRate) {
+                  if (inAddresses[i].mScope == kAudioObjectPropertyScopeGlobal) {
+                      [device _updateFormatWithScope:kAudioObjectPropertyScopeOutput];
+                      [device _updateFormatWithScope:kAudioObjectPropertyScopeInput];
+                  }
               }
               [properties addObject:@{
                   YASAudioDeviceSelectorKey : [NSString yas_fileTypeStringWithHFSTypeCode:inAddresses[i].mSelector],

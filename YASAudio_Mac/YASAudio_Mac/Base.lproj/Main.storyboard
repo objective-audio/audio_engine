@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="7519.1" systemVersion="14D72i" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="B8D-0N-5wS">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="6254" systemVersion="14D72i" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="B8D-0N-5wS">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="7519.1"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="6254"/>
     </dependencies>
     <scenes>
         <!--Application-->
@@ -882,6 +882,29 @@
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="RHv-D2-lCa">
+                                <rect key="frame" x="370" y="323" width="38" height="17"/>
+                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Label" id="Knq-rx-ZNu">
+                                    <font key="font" metaFont="system"/>
+                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                    <connections>
+                                        <binding destination="OQ8-jX-XhK" name="value" keyPath="nominalSampleRate" id="N1h-dv-zyq">
+                                            <dictionary key="options">
+                                                <string key="NSValueTransformerName">YASFrequencyValueFormatter</string>
+                                            </dictionary>
+                                        </binding>
+                                    </connections>
+                                </textFieldCell>
+                            </textField>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="GhA-52-0D7">
+                                <rect key="frame" x="409" y="323" width="21" height="17"/>
+                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Hz" id="wze-f0-UjX">
+                                    <font key="font" metaFont="system"/>
+                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
                         </subviews>
                         <constraints>
                             <constraint firstItem="jYu-EZ-4eU" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="tGb-ei-A30" secondAttribute="trailing" constant="20" id="25K-VJ-b6c"/>
@@ -898,6 +921,7 @@
                             <constraint firstItem="0ys-Ip-ugm" firstAttribute="leading" secondItem="7LH-DV-YkR" secondAttribute="leading" constant="20" symbolic="YES" id="Epu-Zl-KbT"/>
                             <constraint firstItem="tGb-ei-A30" firstAttribute="leading" secondItem="7LH-DV-YkR" secondAttribute="leading" constant="22" id="Ffq-4U-JRX"/>
                             <constraint firstItem="2x3-Yq-KRo" firstAttribute="top" secondItem="y7O-QJ-V6U" secondAttribute="bottom" constant="16" id="JRt-Er-Sf4"/>
+                            <constraint firstItem="GhA-52-0D7" firstAttribute="leading" secondItem="RHv-D2-lCa" secondAttribute="trailing" constant="5" id="K8q-Hs-bkL"/>
                             <constraint firstItem="ZJ4-xZ-wZH" firstAttribute="top" secondItem="Ksj-AZ-N9f" secondAttribute="bottom" constant="3" id="NJ4-ER-OY1"/>
                             <constraint firstItem="tGb-ei-A30" firstAttribute="baseline" secondItem="jYu-EZ-4eU" secondAttribute="baseline" id="O4D-h3-pd8"/>
                             <constraint firstItem="y7O-QJ-V6U" firstAttribute="leading" secondItem="7LH-DV-YkR" secondAttribute="leading" constant="20" id="OXV-9W-mn5"/>
@@ -905,10 +929,11 @@
                             <constraint firstAttribute="trailing" secondItem="hEe-Pt-hA3" secondAttribute="trailing" constant="22" id="PwM-5s-ZTc"/>
                             <constraint firstItem="4Gv-GH-dhc" firstAttribute="top" secondItem="7Wk-Fz-3pE" secondAttribute="bottom" constant="3" id="Rvz-2l-UmS"/>
                             <constraint firstAttribute="trailing" secondItem="Noj-7R-Ct2" secondAttribute="trailing" constant="20" id="S3D-mv-UIb"/>
+                            <constraint firstItem="RHv-D2-lCa" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="7Wk-Fz-3pE" secondAttribute="trailing" constant="20" id="U2O-Pq-Nze"/>
+                            <constraint firstAttribute="trailing" secondItem="GhA-52-0D7" secondAttribute="trailing" constant="22" id="WHK-gL-ute"/>
                             <constraint firstItem="Noj-7R-Ct2" firstAttribute="leading" secondItem="Xg1-D9-j1R" secondAttribute="trailing" constant="6" id="XUo-6n-xdf"/>
                             <constraint firstItem="y7O-QJ-V6U" firstAttribute="top" secondItem="tGb-ei-A30" secondAttribute="bottom" constant="3" id="Yvd-kb-hd0"/>
                             <constraint firstItem="2x3-Yq-KRo" firstAttribute="leading" secondItem="7LH-DV-YkR" secondAttribute="leading" constant="24" id="ZZz-lM-tCi"/>
-                            <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="7Wk-Fz-3pE" secondAttribute="trailing" constant="20" id="ZiO-3n-Umo"/>
                             <constraint firstAttribute="bottom" secondItem="hEe-Pt-hA3" secondAttribute="bottom" constant="20" id="aRM-e2-6Yb"/>
                             <constraint firstItem="Noj-7R-Ct2" firstAttribute="baseline" secondItem="Ksj-AZ-N9f" secondAttribute="baseline" id="ayU-Ch-WXS"/>
                             <constraint firstAttribute="trailing" secondItem="y7O-QJ-V6U" secondAttribute="trailing" constant="20" id="bh8-ZQ-gI1"/>
@@ -923,9 +948,11 @@
                             <constraint firstItem="hEe-Pt-hA3" firstAttribute="leading" secondItem="7LH-DV-YkR" secondAttribute="leading" constant="20" id="mBW-Is-2t8"/>
                             <constraint firstItem="s4c-Zs-zn2" firstAttribute="leading" secondItem="7LH-DV-YkR" secondAttribute="leading" constant="22" id="qkj-CI-3lg"/>
                             <constraint firstItem="4Gv-GH-dhc" firstAttribute="leading" secondItem="7LH-DV-YkR" secondAttribute="leading" constant="20" id="rpx-Ej-5MH"/>
+                            <constraint firstItem="7Wk-Fz-3pE" firstAttribute="baseline" secondItem="RHv-D2-lCa" secondAttribute="baseline" id="ur6-Gk-17g"/>
                             <constraint firstItem="Xg1-D9-j1R" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="Ksj-AZ-N9f" secondAttribute="trailing" constant="20" id="w0W-qD-wbi"/>
                             <constraint firstAttribute="trailing" secondItem="0ys-Ip-ugm" secondAttribute="trailing" constant="20" symbolic="YES" id="wff-Hl-JTH"/>
                             <constraint firstAttribute="trailing" secondItem="ZJ4-xZ-wZH" secondAttribute="trailing" constant="20" id="x7C-NV-O4l"/>
+                            <constraint firstItem="GhA-52-0D7" firstAttribute="baseline" secondItem="7Wk-Fz-3pE" secondAttribute="baseline" id="xVW-uo-nUU"/>
                         </constraints>
                     </view>
                 </viewController>
