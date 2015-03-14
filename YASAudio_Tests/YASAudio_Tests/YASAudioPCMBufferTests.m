@@ -4,9 +4,7 @@
 //
 
 #import <XCTest/XCTest.h>
-#import "YASAudioFormat.h"
-#import "YASAudioPCMBuffer.h"
-#import "YASMacros.h"
+#import "YASAudio.h"
 
 @interface YASAudioPCMBufferTests : XCTestCase
 
@@ -568,8 +566,8 @@
     XCTAssertNil(buffer);
 
     XCTAssertThrows(buffer = [[YASAudioPCMBuffer alloc] initWithPCMFormat:nil
-                                          audioBufferList:sourceBuffer.mutableAudioBufferList
-                                                needsFree:NO]);
+                                                          audioBufferList:sourceBuffer.mutableAudioBufferList
+                                                                needsFree:NO]);
     XCTAssertNil(buffer);
 
     YASRelease(format);

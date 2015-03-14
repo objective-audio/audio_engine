@@ -4,11 +4,7 @@
 //
 
 #import <XCTest/XCTest.h>
-#import "YASAudioGraph.h"
-#import "YASAudioUnit.h"
-#import "YASAudioFormat.h"
-#import "YASAudioPCMBuffer.h"
-#import "YASMacros.h"
+#import "YASAudio.h"
 #import <AVFoundation/AVFoundation.h>
 
 @interface YASAudioGraph (YASAudioGraphTests)

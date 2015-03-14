@@ -4,9 +4,7 @@
 //
 
 #import <XCTest/XCTest.h>
-#import "YASAudioChannelRoute.h"
-#import "YASAudioFormat.h"
-#import "YASMacros.h"
+#import "YASAudio.h"
 
 @interface YASAudioDeviceTests : XCTestCase
 

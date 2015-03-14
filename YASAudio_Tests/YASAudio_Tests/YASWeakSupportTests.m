@@ -4,8 +4,7 @@
 //
 
 #import <XCTest/XCTest.h>
-#import "YASWeakSupport.h"
-#import "YASMacros.h"
+#import "YASAudio.h"
 
 @interface YASWeakSupportTests : XCTestCase
 
