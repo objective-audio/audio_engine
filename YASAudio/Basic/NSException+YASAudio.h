@@ -24,9 +24,3 @@ extern NSString *const YASAudioNSErrorException;
 #define YASRaiseIfMainThread [NSException yas_raiseIfMainThread]
 #define YASRaiseIfSubThread [NSException yas_raiseIfSubThread]
 #define YASRaiseIfAUError(__v) [NSException yas_raiseIfAudioUnitError:__v]
-
-#if DEBUG
-#define YASLog(...) NSLog(__VA_ARGS__)
-#else
-#define YASLog(...)
-#endif
