@@ -223,7 +223,7 @@
 
         XCTAssertTrue([toBuffer copyDataFromBuffer:fromBuffer]);
 
-        [self _compareBufferFlexibly:fromBuffer:toBuffer];
+        [self _compareBufferFlexiblyWithBuffer:fromBuffer otherBuffer:toBuffer];
 
         YASRelease(format);
         YASRelease(fromBuffer);
@@ -286,7 +286,7 @@
 
         XCTAssertFalse([toBuffer copyDataFromBuffer:fromBuffer fromStartFrame:0 toStartFrame:0 length:fromFrameLength]);
         XCTAssertTrue([toBuffer copyDataFromBuffer:fromBuffer fromStartFrame:0 toStartFrame:0 length:toFrameLength]);
-        XCTAssertFalse([self _compareBufferFlexibly:fromBuffer:toBuffer]);
+        XCTAssertFalse([self _compareBufferFlexiblyWithBuffer:fromBuffer otherBuffer:toBuffer]);
 
         YASRelease(format);
         YASRelease(fromBuffer);
@@ -381,7 +381,7 @@
         [self _fillDataToBuffer:fromBuffer];
 
         XCTAssertNoThrow([toBuffer copyDataFlexiblyFromBuffer:fromBuffer]);
-        XCTAssertTrue([self _compareBufferFlexibly:fromBuffer:toBuffer]);
+        XCTAssertTrue([self _compareBufferFlexiblyWithBuffer:fromBuffer otherBuffer:toBuffer]);
 
         YASRelease(format);
         YASRelease(fromBuffer);
@@ -419,7 +419,7 @@
         [self _fillDataToBuffer:fromBuffer];
 
         XCTAssertNoThrow([toBuffer copyDataFlexiblyFromBuffer:fromBuffer]);
-        XCTAssertTrue([self _compareBufferFlexibly:fromBuffer:toBuffer]);
+        XCTAssertTrue([self _compareBufferFlexiblyWithBuffer:fromBuffer otherBuffer:toBuffer]);
         XCTAssertEqual(toBuffer.frameLength, frameLength);
 
         YASRelease(fromFormat);
@@ -482,7 +482,7 @@
         [self _fillDataToBuffer:interleavedBuffer];
 
         XCTAssertNoThrow([nonInterleavedBuffer copyDataFlexiblyFromAudioBufferList:interleavedBuffer.audioBufferList]);
-        XCTAssertTrue([self _compareBufferFlexibly:interleavedBuffer:nonInterleavedBuffer]);
+        XCTAssertTrue([self _compareBufferFlexiblyWithBuffer:interleavedBuffer otherBuffer:nonInterleavedBuffer]);
         XCTAssertEqual(nonInterleavedBuffer.frameLength, frameLength);
 
         [interleavedBuffer clearData];
@@ -491,7 +491,7 @@
         [self _fillDataToBuffer:nonInterleavedBuffer];
 
         XCTAssertNoThrow([interleavedBuffer copyDataFlexiblyFromAudioBufferList:nonInterleavedBuffer.audioBufferList]);
-        XCTAssertTrue([self _compareBufferFlexibly:interleavedBuffer:nonInterleavedBuffer]);
+        XCTAssertTrue([self _compareBufferFlexiblyWithBuffer:interleavedBuffer otherBuffer:nonInterleavedBuffer]);
         XCTAssertEqual(interleavedBuffer.frameLength, frameLength);
 
         XCTAssertFalse([interleavedBuffer copyDataFlexiblyFromAudioBufferList:nil]);
@@ -529,7 +529,7 @@
 
         XCTAssertNoThrow(
             [interleavedBuffer copyDataFlexiblyToAudioBufferList:nonInterleavedBuffer.mutableAudioBufferList]);
-        XCTAssertTrue([self _compareBufferFlexibly:interleavedBuffer:nonInterleavedBuffer]);
+        XCTAssertTrue([self _compareBufferFlexiblyWithBuffer:interleavedBuffer otherBuffer:nonInterleavedBuffer]);
 
         [interleavedBuffer clearData];
         [nonInterleavedBuffer clearData];
@@ -538,7 +538,7 @@
 
         XCTAssertNoThrow(
             [nonInterleavedBuffer copyDataFlexiblyToAudioBufferList:interleavedBuffer.mutableAudioBufferList]);
-        XCTAssertTrue([self _compareBufferFlexibly:interleavedBuffer:nonInterleavedBuffer]);
+        XCTAssertTrue([self _compareBufferFlexiblyWithBuffer:interleavedBuffer otherBuffer:nonInterleavedBuffer]);
 
         XCTAssertFalse([interleavedBuffer copyDataFlexiblyToAudioBufferList:nil]);
 
@@ -675,7 +675,7 @@
     return YES;
 }
 
-- (BOOL)_compareBufferFlexibly:(YASAudioPCMBuffer *)buffer1:(YASAudioPCMBuffer *)buffer2
+- (BOOL)_compareBufferFlexiblyWithBuffer:(YASAudioPCMBuffer *)buffer1 otherBuffer:(YASAudioPCMBuffer *)buffer2
 {
     if (buffer1.format.channelCount != buffer2.format.channelCount) {
         return NO;
