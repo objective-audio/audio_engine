@@ -197,10 +197,12 @@
     [delayUnit setParameter:kDelayParam_DelayTime value:value scope:scope element:0];
     XCTAssertEqual([delayUnit getParameter:kDelayParam_DelayTime scope:scope element:0], value);
 
-    delayTimeInfo = [delayUnit parameterInfo:kDelayParam_DelayTime scope:kAudioUnitScope_Input];
+    delayTimeInfo = nil;
+    XCTAssertThrows(delayTimeInfo = [delayUnit parameterInfo:kDelayParam_DelayTime scope:kAudioUnitScope_Input]);
     XCTAssertNil(delayTimeInfo);
 
-    delayTimeInfo = [delayUnit parameterInfo:kDelayParam_DelayTime scope:kAudioUnitScope_Output];
+    delayTimeInfo = nil;
+    XCTAssertThrows(delayTimeInfo = [delayUnit parameterInfo:kDelayParam_DelayTime scope:kAudioUnitScope_Output]);
     XCTAssertNil(delayTimeInfo);
 }
 
