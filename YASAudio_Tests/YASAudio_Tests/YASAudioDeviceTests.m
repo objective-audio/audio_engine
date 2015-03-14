@@ -66,14 +66,14 @@
     const UInt32 bus = 6;
     const UInt32 channels = 4;
 
-    XCTAssertNil([YASAudioChannelRoute defaultChannelRoutesWithBus:bus format:nil]);
+    XCTAssertThrows([YASAudioChannelRoute defaultChannelRoutesWithBus:bus format:nil]);
 
     YASAudioFormat *interleavedFormat = [[YASAudioFormat alloc] initWithBitDepthFormat:YASAudioBitDepthFormatFloat32
                                                                             sampleRate:44100
                                                                               channels:channels
                                                                            interleaved:YES];
 
-    XCTAssertNil([YASAudioChannelRoute defaultChannelRoutesWithBus:bus format:interleavedFormat]);
+    XCTAssertThrows([YASAudioChannelRoute defaultChannelRoutesWithBus:bus format:interleavedFormat]);
 
     YASAudioFormat *nonInterleavedFormat = [[YASAudioFormat alloc] initWithBitDepthFormat:YASAudioBitDepthFormatFloat32
                                                                                sampleRate:44100
