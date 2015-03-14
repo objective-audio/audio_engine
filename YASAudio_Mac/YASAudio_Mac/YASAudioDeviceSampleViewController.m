@@ -4,13 +4,7 @@
 //
 
 #import "YASAudioDeviceSampleViewController.h"
-#import "YASAudioGraph.h"
-#import "YASAudioDevice.h"
-#import "YASAudioDeviceIO.h"
-#import "YASMacros.h"
-#import "YASAudioMath.h"
-#import "YASAudioUtility.h"
-#import "YASAudioFormat.h"
+#import "YASAudio.h"
 #import "YASDecibelValueTransformer.h"
 #import "YASFrequencyValueFormatter.h"
 #import <Accelerate/Accelerate.h>

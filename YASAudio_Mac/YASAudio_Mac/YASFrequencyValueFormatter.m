@@ -4,8 +4,7 @@
 //
 
 #import "YASFrequencyValueFormatter.h"
-#import "YASAudioMath.h"
-#import "YASMacros.h"
+#import "YASAudio.h"
 
 @interface YASFrequencyValueFormatter ()
 

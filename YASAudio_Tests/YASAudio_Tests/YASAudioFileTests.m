@@ -4,11 +4,7 @@
 //
 
 #import <XCTest/XCTest.h>
-#import "YASAudioFormat.h"
-#import "YASAudioPCMBuffer.h"
-#import "YASAudioFile.h"
-#import "NSError+YASAudio.h"
-#import "YASMacros.h"
+#import "YASAudio.h"
 
 @interface YASAudioFile (YASAudioFileTests)
 
