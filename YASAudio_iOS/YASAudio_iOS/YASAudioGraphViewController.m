@@ -44,11 +44,6 @@
     [self volumeSliderChanged:self.slider];
 }
 
-- (void)viewDidAppear:(BOOL)animated
-{
-    [super viewDidAppear:animated];
-}
-
 - (IBAction)volumeSliderChanged:(UISlider *)sender
 {
     const AudioUnitParameterValue value = sender.value;
