@@ -1,5 +1,5 @@
 //
-//  YASAudioChannelAssignment.m
+//  YASAudioChannelRoute.m
 //  Copyright (c) 2015 Yuki Yasoshima.
 //
 
