@@ -140,12 +140,14 @@ static OSStatus InputRenderCallback(void *inRefCon, AudioUnitRenderActionFlags *
     YASRelease(_inputCallbackBlock);
     YASRelease(_key);
     YASRelease(_graphContainer);
+    YASRelease(_name);
 
     _renderCallbackBlock = nil;
     _notifyCallbackBlock = nil;
     _inputCallbackBlock = nil;
     _key = nil;
     _graphContainer = nil;
+    _name = nil;
 
     YASSuperDealloc;
 }
@@ -617,6 +619,10 @@ static OSStatus InputRenderCallback(void *inRefCon, AudioUnitRenderActionFlags *
     if (!component) {
         YASRaiseWithReason(([NSString stringWithFormat:@"%s Can't create audio component.", __PRETTY_FUNCTION__]));
     }
+
+    CFStringRef nameRef = NULL;
+    YASRaiseIfAUError(AudioComponentCopyName(component, &nameRef));
+    _name = (__bridge NSString *)nameRef;
 
     YASRaiseIfAUError(AudioComponentInstanceNew(component, &_audioUnitInstance));
 }

@@ -15,6 +15,7 @@ typedef void (^YASAudioUnitCallbackBlock)(YASAudioUnitRenderParameters *renderPa
 
 @interface YASAudioUnit : YASWeakProvider
 
+@property (nonatomic, strong, readonly) NSString *name;
 @property (nonatomic, assign, readonly) OSType type;
 @property (nonatomic, assign, readonly) OSType subType;
 @property (nonatomic, assign, readonly) BOOL isOutputUnit;
