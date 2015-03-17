@@ -25,5 +25,6 @@
 #import "NSArray+YASAudio.h"
 #import "NSDictionary+YASAudio.h"
 #import "NSError+YASAudio.h"
+#import "NSException+YASAudio.h"
 #import "NSNumber+YASAudio.h"
 #import "NSString+YASAudio.h"
