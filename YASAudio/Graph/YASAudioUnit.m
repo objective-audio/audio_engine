@@ -9,6 +9,7 @@
 #import "YASMacros.h"
 #import "YASAudioUtility.h"
 #import "NSException+YASAudio.h"
+#import <AVFoundation/AVFoundation.h>
 
 #if TARGET_OS_IPHONE
 OSType const YASAudioUnitSubType_DefaultIO = kAudioUnitSubType_RemoteIO;
