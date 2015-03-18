@@ -10,3 +10,4 @@ ObjCSpaceAfterProperty: true
 ObjCSpaceBeforeProtocolList: true
 AllowShortFunctionsOnASingleLine: false
 AllowShortLoopsOnASingleLine: false
+ObjCBlockIndentWidth: 4
