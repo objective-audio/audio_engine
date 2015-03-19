@@ -75,10 +75,6 @@ static UInt32 YASAudioDeviceIOFrameCapacity = 4096;
                                                  selector:@selector(audioHardwareDidChange:)
                                                      name:YASAudioHardwareDidChangeNotification
                                                    object:nil];
-        [[NSNotificationCenter defaultCenter] addObserver:self
-                                                 selector:@selector(audioDeviceDidChange:)
-                                                     name:YASAudioDeviceDidChangeNotification
-                                                   object:nil];
     }
     return self;
 }
@@ -208,8 +204,21 @@ static UInt32 YASAudioDeviceIOFrameCapacity = 4096;
 
         [self uninitialize];
 
+        if (_audioDevice) {
+            [[NSNotificationCenter defaultCenter] removeObserver:self
+                                                            name:YASAudioDeviceDidChangeNotification
+                                                          object:_audioDevice];
+        }
+
         YASRelease(_audioDevice);
         _audioDevice = YASRetain(audioDevice);
+
+        if (audioDevice) {
+            [[NSNotificationCenter defaultCenter] addObserver:self
+                                                     selector:@selector(audioDeviceDidChange:)
+                                                         name:YASAudioDeviceDidChangeNotification
+                                                       object:audioDevice];
+        }
 
         [self initialize];
 
@@ -230,10 +239,6 @@ static UInt32 YASAudioDeviceIOFrameCapacity = 4096;
 
 - (void)audioDeviceDidChange:(NSNotification *)notification
 {
-    if (![self.audioDevice isEqualToAudioDevice:notification.object]) {
-        return;
-    }
-
     [self _updateCore];
 }
 
