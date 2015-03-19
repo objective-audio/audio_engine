@@ -50,7 +50,7 @@
     const NSUInteger count = 5;
 
     NSArray *array = [NSArray yas_arrayWithBlock:^id(NSUInteger idx, BOOL *stop) {
-      return @(idx);
+        return @(idx);
     } count:count];
 
     XCTAssertEqual(array.count, count);
@@ -61,10 +61,10 @@
     const NSUInteger stopCount = 3;
 
     NSArray *stopArray = [NSArray yas_arrayWithBlock:^id(NSUInteger idx, BOOL *stop) {
-      if (idx == stopCount - 1) {
-          *stop = YES;
-      }
-      return @(idx);
+        if (idx == stopCount - 1) {
+            *stop = YES;
+        }
+        return @(idx);
     } count:count];
 
     XCTAssertEqual(stopArray.count, stopCount);
