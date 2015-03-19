@@ -54,8 +54,8 @@
     XCTestExpectation *expectation = [self expectationWithDescription:nil];
 
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-      [NSException yas_raiseIfMainThread];
-      [expectation fulfill];
+        [NSException yas_raiseIfMainThread];
+        [expectation fulfill];
     });
 
     [self waitForExpectationsWithTimeout:1.0 handler:NULL];

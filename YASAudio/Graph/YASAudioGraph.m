@@ -41,20 +41,20 @@ static BOOL _interrupting = NO;
 {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-      _graphs = [[NSMapTable alloc] initWithKeyOptions:NSPointerFunctionsStrongMemory
-                                          valueOptions:NSPointerFunctionsWeakMemory
-                                              capacity:2];
+        _graphs = [[NSMapTable alloc] initWithKeyOptions:NSPointerFunctionsStrongMemory
+                                            valueOptions:NSPointerFunctionsWeakMemory
+                                                capacity:2];
         
 #if TARGET_OS_IPHONE
-      NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
-      [center addObserver:self
-                 selector:@selector(_didBecomeActiveNotification:)
-                     name:UIApplicationDidBecomeActiveNotification
-                   object:nil];
-      [center addObserver:self
-                 selector:@selector(_interruptionNotification:)
-                     name:AVAudioSessionInterruptionNotification
-                   object:nil];
+        NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
+        [center addObserver:self
+                   selector:@selector(_didBecomeActiveNotification:)
+                       name:UIApplicationDidBecomeActiveNotification
+                     object:nil];
+        [center addObserver:self
+                   selector:@selector(_interruptionNotification:)
+                       name:AVAudioSessionInterruptionNotification
+                     object:nil];
 #endif
     });
 }

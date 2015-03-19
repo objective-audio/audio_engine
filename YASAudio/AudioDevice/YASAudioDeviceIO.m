@@ -119,42 +119,42 @@ static UInt32 YASAudioDeviceIOFrameCapacity = 4096;
         &_ioProcID, self.audioDevice.audioDeviceID, NULL,
         ^(const AudioTimeStamp *inNow, const AudioBufferList *inInputData, const AudioTimeStamp *inInputTime,
           AudioBufferList *outOutputData, const AudioTimeStamp *inOutputTime) {
-          YASAudioClearAudioBufferList(outOutputData);
+            YASAudioClearAudioBufferList(outOutputData);
 
-          YASAudioDeviceIO *deviceIO = container.retainedObject;
+            YASAudioDeviceIO *deviceIO = container.retainedObject;
 
-          YASAudioDeviceIOCore *core = deviceIO.core;
-          if (core) {
-              [core clearBuffers];
+            YASAudioDeviceIOCore *core = deviceIO.core;
+            if (core) {
+                [core clearBuffers];
 
-              YASAudioPCMBuffer *inputBuffer = core.inputBuffer;
-              [inputBuffer copyDataFlexiblyFromAudioBufferList:inInputData];
+                YASAudioPCMBuffer *inputBuffer = core.inputBuffer;
+                [inputBuffer copyDataFlexiblyFromAudioBufferList:inInputData];
 
-              const UInt32 inputFrameLength = inputBuffer.frameLength;
-              if (inputFrameLength > 0) {
-                  deviceIO.inputData = inputBuffer.audioBufferList;
-                  deviceIO.inputTime = inInputTime;
-              }
+                const UInt32 inputFrameLength = inputBuffer.frameLength;
+                if (inputFrameLength > 0) {
+                    deviceIO.inputData = inputBuffer.audioBufferList;
+                    deviceIO.inputTime = inInputTime;
+                }
 
-              YASAudioDeviceIOCallbackBlock renderCallbackBlock = deviceIO.renderCallbackBlock;
-              if (renderCallbackBlock) {
-                  YASAudioPCMBuffer *outputBuffer = core.outputBuffer;
-                  if (outputBuffer) {
-                      const UInt32 frameLength =
-                          YASAudioGetFrameLengthFromAudioBufferList(outOutputData, outputBuffer.format.sampleByteCount);
-                      if (frameLength > 0) {
-                          outputBuffer.frameLength = frameLength;
-                          renderCallbackBlock(outputBuffer.mutableAudioBufferList, inOutputTime, frameLength);
-                          [outputBuffer copyDataFlexiblyToAudioBufferList:outOutputData];
-                      }
-                  } else if (deviceIO.inputData) {
-                      renderCallbackBlock(NULL, NULL, inputFrameLength);
-                  }
-              }
-          }
+                YASAudioDeviceIOCallbackBlock renderCallbackBlock = deviceIO.renderCallbackBlock;
+                if (renderCallbackBlock) {
+                    YASAudioPCMBuffer *outputBuffer = core.outputBuffer;
+                    if (outputBuffer) {
+                        const UInt32 frameLength = YASAudioGetFrameLengthFromAudioBufferList(
+                            outOutputData, outputBuffer.format.sampleByteCount);
+                        if (frameLength > 0) {
+                            outputBuffer.frameLength = frameLength;
+                            renderCallbackBlock(outputBuffer.mutableAudioBufferList, inOutputTime, frameLength);
+                            [outputBuffer copyDataFlexiblyToAudioBufferList:outOutputData];
+                        }
+                    } else if (deviceIO.inputData) {
+                        renderCallbackBlock(NULL, NULL, inputFrameLength);
+                    }
+                }
+            }
 
-          deviceIO.inputData = NULL;
-          YASRelease(deviceIO);
+            deviceIO.inputData = NULL;
+            YASRelease(deviceIO);
         }));
 
     [self _updateCore];

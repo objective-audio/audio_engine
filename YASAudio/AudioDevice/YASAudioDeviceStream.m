@@ -188,25 +188,25 @@ NSString *const YASAudioDeviceStreamStartingChannelDidChangeNotification =
     YASWeakContainer *weakContainer = self.weakContainer;
 
     self.listenerBlock = ^(UInt32 inNumberAddresses, const AudioObjectPropertyAddress *inAddresses) {
-      YASAudioDeviceStream *stream = weakContainer.retainedObject;
-      if (stream) {
-          for (NSInteger i = 0; i < inNumberAddresses; i++) {
-              if (inAddresses[i].mSelector == kAudioStreamPropertyVirtualFormat) {
-                  [[NSNotificationCenter defaultCenter]
-                      postNotificationName:YASAudioDeviceStreamVirtualFormatDidChangeNotification
-                                    object:stream];
-              } else if (inAddresses[i].mSelector == kAudioStreamPropertyIsActive) {
-                  [[NSNotificationCenter defaultCenter]
-                      postNotificationName:YASAudioDeviceStreamIsActiveDidChangeNotification
-                                    object:stream];
-              } else if (inAddresses[i].mSelector == kAudioStreamPropertyStartingChannel) {
-                  [[NSNotificationCenter defaultCenter]
-                      postNotificationName:YASAudioDeviceStreamStartingChannelDidChangeNotification
-                                    object:stream];
-              }
-          }
-          YASRelease(stream);
-      }
+        YASAudioDeviceStream *stream = weakContainer.retainedObject;
+        if (stream) {
+            for (NSInteger i = 0; i < inNumberAddresses; i++) {
+                if (inAddresses[i].mSelector == kAudioStreamPropertyVirtualFormat) {
+                    [[NSNotificationCenter defaultCenter]
+                        postNotificationName:YASAudioDeviceStreamVirtualFormatDidChangeNotification
+                                      object:stream];
+                } else if (inAddresses[i].mSelector == kAudioStreamPropertyIsActive) {
+                    [[NSNotificationCenter defaultCenter]
+                        postNotificationName:YASAudioDeviceStreamIsActiveDidChangeNotification
+                                      object:stream];
+                } else if (inAddresses[i].mSelector == kAudioStreamPropertyStartingChannel) {
+                    [[NSNotificationCenter defaultCenter]
+                        postNotificationName:YASAudioDeviceStreamStartingChannelDidChangeNotification
+                                      object:stream];
+                }
+            }
+            YASRelease(stream);
+        }
     };
 }
 

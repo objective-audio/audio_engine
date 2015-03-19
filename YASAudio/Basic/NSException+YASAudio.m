@@ -18,7 +18,7 @@ NSString *const YASAudioNSErrorException = @"YASAudioNSErrorException";
         [[NSException exceptionWithName:name reason:reason userInfo:nil] raise];
     } else {
         dispatch_sync(dispatch_get_main_queue(), ^{
-          [[NSException exceptionWithName:name reason:reason userInfo:nil] raise];
+            [[NSException exceptionWithName:name reason:reason userInfo:nil] raise];
         });
     }
 }

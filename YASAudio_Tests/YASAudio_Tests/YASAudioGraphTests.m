@@ -67,7 +67,7 @@
     YASAudioUnit *ioUnit = [audioGraph addAudioUnitWithType:kAudioUnitType_Output
                                                     subType:kAudioUnitSubType_GenericOutput
                                                prepareBlock:^(YASAudioUnit *audioUnit) {
-                                                 [audioUnit setMaximumFramesPerSlice:maximumFrameLength];
+                                                   [audioUnit setMaximumFramesPerSlice:maximumFrameLength];
                                                }];
 
     [ioUnit setRenderCallback:0];
@@ -77,7 +77,7 @@
     YASAudioUnit *mixerUnit = [audioGraph addAudioUnitWithType:kAudioUnitType_Mixer
                                                        subType:kAudioUnitSubType_MultiChannelMixer
                                                   prepareBlock:^(YASAudioUnit *audioUnit) {
-                                                    [audioUnit setMaximumFramesPerSlice:maximumFrameLength];
+                                                      [audioUnit setMaximumFramesPerSlice:maximumFrameLength];
                                                   }];
 
     [mixerUnit setOutputFormat:mixerFormat.streamDescription busNumber:0];
@@ -110,22 +110,22 @@
     XCTestExpectation *ioExpectation = [self expectationWithDescription:@"IOUnit Render"];
 
     ioUnit.renderCallbackBlock = ^(YASAudioUnitRenderParameters *renderParameters) {
-      [ioExpectation fulfill];
+        [ioExpectation fulfill];
 
-      XCTAssertEqual(renderParameters->inNumberFrames, frameLength);
-      XCTAssertEqual(renderParameters->inBusNumber, 0);
-      XCTAssertEqual(renderParameters->inRenderType, YASAudioUnitRenderTypeNormal);
-      XCTAssertEqual(*renderParameters->ioActionFlags, 0);
-      const AudioBufferList *ioData = renderParameters->ioData;
-      XCTAssertNotEqual(ioData, NULL);
-      XCTAssertEqual(ioData->mNumberBuffers, outputFormat.bufferCount);
-      for (UInt32 i = 0; i < outputFormat.bufferCount; i++) {
-          XCTAssertEqual(ioData->mBuffers[i].mNumberChannels, outputFormat.stride);
-          XCTAssertEqual(ioData->mBuffers[i].mDataByteSize,
-                         outputFormat.sampleByteCount * outputFormat.stride * renderParameters->inNumberFrames);
-      }
+        XCTAssertEqual(renderParameters->inNumberFrames, frameLength);
+        XCTAssertEqual(renderParameters->inBusNumber, 0);
+        XCTAssertEqual(renderParameters->inRenderType, YASAudioUnitRenderTypeNormal);
+        XCTAssertEqual(*renderParameters->ioActionFlags, 0);
+        const AudioBufferList *ioData = renderParameters->ioData;
+        XCTAssertNotEqual(ioData, NULL);
+        XCTAssertEqual(ioData->mNumberBuffers, outputFormat.bufferCount);
+        for (UInt32 i = 0; i < outputFormat.bufferCount; i++) {
+            XCTAssertEqual(ioData->mBuffers[i].mNumberChannels, outputFormat.stride);
+            XCTAssertEqual(ioData->mBuffers[i].mDataByteSize,
+                           outputFormat.sampleByteCount * outputFormat.stride * renderParameters->inNumberFrames);
+        }
 
-      [mixerUnit audioUnitRender:renderParameters];
+        [mixerUnit audioUnitRender:renderParameters];
     };
 
     NSMutableArray *mixerExpectations = [NSMutableArray arrayWithCapacity:mixerInputCount];
@@ -135,44 +135,45 @@
     }
 
     mixerUnit.renderCallbackBlock = ^(YASAudioUnitRenderParameters *renderParameters) {
-      const UInt32 bus = renderParameters->inBusNumber;
-      if (bus < mixerExpectations.count) {
-          XCTestExpectation *mixerExpectation = mixerExpectations[bus];
-          [mixerExpectation fulfill];
+        const UInt32 bus = renderParameters->inBusNumber;
+        if (bus < mixerExpectations.count) {
+            XCTestExpectation *mixerExpectation = mixerExpectations[bus];
+            [mixerExpectation fulfill];
 
-          XCTAssertEqual(renderParameters->inNumberFrames, frameLength);
-          XCTAssertEqual(renderParameters->inRenderType, YASAudioUnitRenderTypeNormal);
-          XCTAssertEqual(*renderParameters->ioActionFlags, 0);
-          const AudioBufferList *ioData = renderParameters->ioData;
-          XCTAssertNotEqual(ioData, NULL);
-          XCTAssertEqual(ioData->mNumberBuffers, outputFormat.bufferCount);
-          for (UInt32 i = 0; i < outputFormat.bufferCount; i++) {
-              XCTAssertEqual(ioData->mBuffers[i].mNumberChannels, outputFormat.stride);
-              XCTAssertEqual(ioData->mBuffers[i].mDataByteSize,
-                             outputFormat.sampleByteCount * outputFormat.stride * renderParameters->inNumberFrames);
-          }
-      }
+            XCTAssertEqual(renderParameters->inNumberFrames, frameLength);
+            XCTAssertEqual(renderParameters->inRenderType, YASAudioUnitRenderTypeNormal);
+            XCTAssertEqual(*renderParameters->ioActionFlags, 0);
+            const AudioBufferList *ioData = renderParameters->ioData;
+            XCTAssertNotEqual(ioData, NULL);
+            XCTAssertEqual(ioData->mNumberBuffers, outputFormat.bufferCount);
+            for (UInt32 i = 0; i < outputFormat.bufferCount; i++) {
+                XCTAssertEqual(ioData->mBuffers[i].mNumberChannels, outputFormat.stride);
+                XCTAssertEqual(ioData->mBuffers[i].mDataByteSize,
+                               outputFormat.sampleByteCount * outputFormat.stride * renderParameters->inNumberFrames);
+            }
+        }
     };
 
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-      AudioUnitRenderActionFlags actionFlags = 0;
-      AVAudioTime *audioTime = [AVAudioTime timeWithSampleTime:0 atRate:outputSampleRate];
-      AudioTimeStamp timeStamp = audioTime.audioTimeStamp;
+        AudioUnitRenderActionFlags actionFlags = 0;
+        AVAudioTime *audioTime = [AVAudioTime timeWithSampleTime:0 atRate:outputSampleRate];
+        AudioTimeStamp timeStamp = audioTime.audioTimeStamp;
 
-      YASAudioPCMBuffer *buffer = [[YASAudioPCMBuffer alloc] initWithPCMFormat:outputFormat frameCapacity:frameLength];
+        YASAudioPCMBuffer *buffer =
+            [[YASAudioPCMBuffer alloc] initWithPCMFormat:outputFormat frameCapacity:frameLength];
 
-      YASAudioUnitRenderParameters parameters = {
-          .inRenderType = YASAudioUnitRenderTypeNormal,
-          .ioActionFlags = &actionFlags,
-          .ioTimeStamp = &timeStamp,
-          .inBusNumber = 0,
-          .inNumberFrames = 1024,
-          .ioData = buffer.mutableAudioBufferList,
-      };
+        YASAudioUnitRenderParameters parameters = {
+            .inRenderType = YASAudioUnitRenderTypeNormal,
+            .ioActionFlags = &actionFlags,
+            .ioTimeStamp = &timeStamp,
+            .inBusNumber = 0,
+            .inNumberFrames = 1024,
+            .ioData = buffer.mutableAudioBufferList,
+        };
 
-      [ioUnit audioUnitRender:&parameters];
+        [ioUnit audioUnitRender:&parameters];
 
-      YASRelease(buffer);
+        YASRelease(buffer);
     });
 
     [self waitForExpectationsWithTimeout:1.0

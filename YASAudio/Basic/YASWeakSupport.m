@@ -79,17 +79,17 @@
     @autoreleasepool
     {
         [self enumerateKeysAndObjectsUsingBlock:^(id key, YASWeakContainer *container, BOOL *stop) {
-          if ([container isKindOfClass:[YASWeakContainer class]]) {
-              id obj = [container retainedObject];
-              if (obj) {
-                  result[key] = obj;
-              } else {
-                  YASLog(@"%s - Object is released.", __PRETTY_FUNCTION__);
-              }
-              YASRelease(obj);
-          } else {
-              YASRaiseWithReason(([NSString stringWithFormat:@"%s - Value is not container.", __PRETTY_FUNCTION__]));
-          }
+            if ([container isKindOfClass:[YASWeakContainer class]]) {
+                id obj = [container retainedObject];
+                if (obj) {
+                    result[key] = obj;
+                } else {
+                    YASLog(@"%s - Object is released.", __PRETTY_FUNCTION__);
+                }
+                YASRelease(obj);
+            } else {
+                YASRaiseWithReason(([NSString stringWithFormat:@"%s - Value is not container.", __PRETTY_FUNCTION__]));
+            }
         }];
     }
 
@@ -107,17 +107,17 @@
     @autoreleasepool
     {
         [self enumerateObjectsUsingBlock:^(YASWeakContainer *container, NSUInteger idx, BOOL *stop) {
-          if ([container isKindOfClass:[YASWeakContainer class]]) {
-              id obj = [container retainedObject];
-              if (obj) {
-                  [result addObject:obj];
-              } else {
-                  YASLog(@"%s - Object is released.", __PRETTY_FUNCTION__);
-              }
-              YASRelease(obj);
-          } else {
-              YASRaiseWithReason(([NSString stringWithFormat:@"%s - Value is not container.", __PRETTY_FUNCTION__]));
-          }
+            if ([container isKindOfClass:[YASWeakContainer class]]) {
+                id obj = [container retainedObject];
+                if (obj) {
+                    [result addObject:obj];
+                } else {
+                    YASLog(@"%s - Object is released.", __PRETTY_FUNCTION__);
+                }
+                YASRelease(obj);
+            } else {
+                YASRaiseWithReason(([NSString stringWithFormat:@"%s - Value is not container.", __PRETTY_FUNCTION__]));
+            }
         }];
     }
 
