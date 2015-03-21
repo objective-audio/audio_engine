@@ -8,6 +8,8 @@
 
 @interface YASAudioUnitParameterInfo : NSObject
 
+@property (nonatomic, assign, readonly) AudioUnitParameterID parameterID;
+@property (nonatomic, assign, readonly) AudioUnitScope scope;
 @property (nonatomic, strong, readonly) NSString *unitName;
 @property (nonatomic, assign, readonly) BOOL hasClump;
 @property (nonatomic, assign, readonly) UInt32 clumpID;
@@ -18,6 +20,8 @@
 @property (nonatomic, assign, readonly) AudioUnitParameterValue defaultValue;
 
 - (instancetype)init NS_UNAVAILABLE;
-- (instancetype)initWithAudioUnitParameterInfo:(const AudioUnitParameterInfo *)info NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithAudioUnitParameterInfo:(const AudioUnitParameterInfo *)info
+                                   parameterID:(const AudioUnitParameterID)parameterID
+                                         scope:(const AudioUnitScope)scope NS_DESIGNATED_INITIALIZER;
 
 @end
