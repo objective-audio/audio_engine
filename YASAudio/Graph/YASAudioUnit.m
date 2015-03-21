@@ -340,10 +340,9 @@ static OSStatus InputRenderCallback(void *inRefCon, AudioUnitRenderActionFlags *
     return result;
 }
 
-- (NSArray *)getGlobalParameterInfosWithScope:(const AudioUnitScope)scope
+- (NSArray *)getParameterInfosWithScope:(const AudioUnitScope)scope
 {
-    NSData *propertyData =
-        [self propertyDataWithPropertyID:kAudioUnitProperty_ParameterList scope:kAudioUnitScope_Global element:0];
+    NSData *propertyData = [self propertyDataWithPropertyID:kAudioUnitProperty_ParameterList scope:scope element:0];
 
     if (propertyData.length > 0) {
         NSInteger count = propertyData.length / sizeof(AudioUnitParameterID);
