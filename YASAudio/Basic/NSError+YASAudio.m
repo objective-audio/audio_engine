@@ -12,23 +12,22 @@ NSString *const YASAudioErrorCodeDescriptionKey = @"audio_error_code_description
 
 @implementation NSError (YASAudio)
 
-+ (void)yas_error:(NSError **)outError code:(NSInteger)code
++ (NSError *)yas_errorWithCode:(NSInteger)code
 {
-    return [self yas_error:outError code:code audioErrorCode:noErr];
+    return [self yas_errorWithCode:code audioErrorCode:noErr];
 }
 
-+ (void)yas_error:(NSError **)outError code:(NSInteger)code audioErrorCode:(OSStatus)audioErrorCode
++ (NSError *)yas_errorWithCode:(NSInteger)code audioErrorCode:(OSStatus)audioErrorCode
 {
-    if (outError) {
-        NSDictionary *dictionary = nil;
-        if (audioErrorCode != noErr) {
-            dictionary = @{
-                YASAudioErrorCodeNumberKey : @(audioErrorCode),
-                YASAudioErrorCodeDescriptionKey : [self _descriptionForAudioErrorCode:audioErrorCode]
-            };
-        }
-        *outError = [NSError errorWithDomain:YASAudioErrorDomain code:code userInfo:dictionary];
+    NSDictionary *dictionary = nil;
+    if (audioErrorCode != noErr) {
+        dictionary = @{
+            YASAudioErrorCodeNumberKey : @(audioErrorCode),
+            YASAudioErrorCodeDescriptionKey : [self _descriptionForAudioErrorCode:audioErrorCode]
+        };
     }
+
+    return [NSError errorWithDomain:YASAudioErrorDomain code:code userInfo:dictionary];
 }
 
 + (NSString *)_descriptionForAudioErrorCode:(OSStatus)audioErrorCode

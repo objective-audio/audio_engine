@@ -21,7 +21,7 @@ typedef NS_ENUM(NSInteger, YASAudioFileErrorCode) {
 
 @interface NSError (YASAudio)
 
-+ (void)yas_error:(NSError **)outError code:(NSInteger)code;
-+ (void)yas_error:(NSError **)outError code:(NSInteger)code audioErrorCode:(OSStatus)audioErrorCode;
++ (NSError *)yas_errorWithCode:(NSInteger)code;
++ (NSError *)yas_errorWithCode:(NSInteger)code audioErrorCode:(OSStatus)audioErrorCode;
 
 @end
