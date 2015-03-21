@@ -234,7 +234,6 @@ static BOOL _interrupting = NO;
 
     if (unit) {
         [self _addUnitToUnits:unit];
-        YASRelease(unit);
 
         if (prepareBlock) {
             prepareBlock(unit);
@@ -245,6 +244,8 @@ static BOOL _interrupting = NO;
         if (acd->componentType == kAudioUnitType_Output && self.isRunning && !self.class.isInterrupting) {
             [unit start];
         }
+
+        YASRelease(unit);
     }
 
     return unit;
@@ -269,6 +270,7 @@ static BOOL _interrupting = NO;
 {
     if (!unit || !unit.key) {
         YASRaiseWithReason(([NSString stringWithFormat:@"%s - unit or unit.key is nil.", __PRETTY_FUNCTION__]));
+        return;
     }
 
     [unit uninitialize];

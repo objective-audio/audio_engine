@@ -45,6 +45,7 @@
         }
     }
     NSArray *result = [array copy];
+    YASRelease(array);
     return YASAutorelease(result);
 }
 
