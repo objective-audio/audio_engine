@@ -24,11 +24,11 @@
 
 - (void)testEmptyNumberInLength
 {
-    NSArray *array = @[ @1 ];
+    NSArray *array = @[@1];
 
     XCTAssertEqualObjects([array yas_emptyNumberInLength:2], @0);
 
-    array = @[ @0 ];
+    array = @[@0];
 
     XCTAssertEqualObjects([array yas_emptyNumberInLength:2], @1);
     XCTAssertNil([array yas_emptyNumberInLength:1]);
@@ -36,7 +36,7 @@
 
 - (void)testArrayOfProperty
 {
-    NSArray *array = @[ @0, @1 ];
+    NSArray *array = @[@0, @1];
     NSArray *stringValueArray = [array yas_arrayOfPropertyForKey:@"stringValue"];
 
     XCTAssertEqualObjects(stringValueArray[0], @"0");

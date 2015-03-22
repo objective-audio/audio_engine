@@ -190,14 +190,14 @@
 {
     XCTAssertFalse([YASAudioGraph isInterrupting]);
 
-    NSDictionary *beganUserInfo = @{ AVAudioSessionInterruptionTypeKey : @(AVAudioSessionInterruptionTypeBegan) };
+    NSDictionary *beganUserInfo = @{ AVAudioSessionInterruptionTypeKey: @(AVAudioSessionInterruptionTypeBegan) };
     NSNotification *beganNotification =
         [[NSNotification alloc] initWithName:AVAudioSessionInterruptionNotification object:nil userInfo:beganUserInfo];
     [YASAudioGraph _interruptionNotification:beganNotification];
 
     XCTAssertTrue([YASAudioGraph isInterrupting]);
 
-    NSDictionary *endedUserInfo = @{ AVAudioSessionInterruptionTypeKey : @(AVAudioSessionInterruptionTypeEnded) };
+    NSDictionary *endedUserInfo = @{ AVAudioSessionInterruptionTypeKey: @(AVAudioSessionInterruptionTypeEnded) };
     NSNotification *endedNotification =
         [[NSNotification alloc] initWithName:AVAudioSessionInterruptionNotification object:nil userInfo:endedUserInfo];
 
@@ -208,7 +208,7 @@
 
 - (void)testBecomeActive
 {
-    NSDictionary *beganUserInfo = @{ AVAudioSessionInterruptionTypeKey : @(AVAudioSessionInterruptionTypeBegan) };
+    NSDictionary *beganUserInfo = @{ AVAudioSessionInterruptionTypeKey: @(AVAudioSessionInterruptionTypeBegan) };
     NSNotification *beganNotification =
         [[NSNotification alloc] initWithName:AVAudioSessionInterruptionNotification object:nil userInfo:beganUserInfo];
     [YASAudioGraph _interruptionNotification:beganNotification];

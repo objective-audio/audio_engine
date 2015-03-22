@@ -110,22 +110,22 @@
 - (void)testWAVEFile
 {
 #if WAVEFILE_LIGHT_TEST
-    NSArray *sampleRates = @[ @(44100.0), @(382000.0) ];
-    NSArray *channels = @[ @(1), @(2) ];
-    NSArray *fileBitDepths = @[ @(16), @(24) ];
-    NSArray *bitDepthFormats = @[ @(YASAudioBitDepthFormatFloat32), @(YASAudioBitDepthFormatInt16) ];
-    NSArray *interleaveds = @[ @(YES), @(NO) ];
+    NSArray *sampleRates = @[@(44100.0), @(382000.0)];
+    NSArray *channels = @[@(1), @(2)];
+    NSArray *fileBitDepths = @[@(16), @(24)];
+    NSArray *bitDepthFormats = @[@(YASAudioBitDepthFormatFloat32), @(YASAudioBitDepthFormatInt16)];
+    NSArray *interleaveds = @[@(YES), @(NO)];
 #else
-    NSArray *sampleRates = @[ @(8000.0), @(44100.0), @(48000.0), @(382000.0) ];
-    NSArray *channels = @[ @(1), @(2), @(3), @(6) ];
-    NSArray *fileBitDepths = @[ @(16), @(24), @(32) ];
+    NSArray *sampleRates = @[@(8000.0), @(44100.0), @(48000.0), @(382000.0)];
+    NSArray *channels = @[@(1), @(2), @(3), @(6)];
+    NSArray *fileBitDepths = @[@(16), @(24), @(32)];
     NSArray *bitDepthFormats = @[
         @(YASAudioBitDepthFormatFloat32),
         @(YASAudioBitDepthFormatFloat64),
         @(YASAudioBitDepthFormatInt16),
         @(YASAudioBitDepthFormatInt32)
     ];
-    NSArray *interleaveds = @[ @(YES), @(NO) ];
+    NSArray *interleaveds = @[@(YES), @(NO)];
 #endif
 
     YASAudioFileTestData *testData = [[YASAudioFileTestData alloc] init];
