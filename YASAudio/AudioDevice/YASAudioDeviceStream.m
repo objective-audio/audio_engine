@@ -132,7 +132,7 @@ NSString *const YASAudioDeviceStreamStartingChannelDidChangeNotification =
 
 - (YASAudioDeviceStreamDirection)direction
 {
-    YASAudioDeviceStreamDirection direction;
+    YASAudioDeviceStreamDirection direction = 0;
 
     @autoreleasepool
     {
