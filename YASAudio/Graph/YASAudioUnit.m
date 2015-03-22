@@ -105,8 +105,8 @@ static OSStatus InputRenderCallback(void *inRefCon, AudioUnitRenderActionFlags *
 
 @interface YASAudioUnit ()
 
+@property (nonatomic, copy) NSNumber *graphKey;
 @property (nonatomic, copy) NSNumber *key;
-@property (nonatomic, strong) YASWeakContainer *graphContainer;
 @property (nonatomic, assign, getter=isInitialized) BOOL initialized;
 
 @end
@@ -122,12 +122,24 @@ static OSStatus InputRenderCallback(void *inRefCon, AudioUnitRenderActionFlags *
 {
     self = [super init];
     if (self) {
-        self.graphContainer = graph.weakContainer;
         _acd = *acd;
-
+        self.graphKey = graph.key;
         [self _createAudioUnit:acd];
     }
     return self;
+}
+
+- (instancetype)initWithType:(OSType)type subType:(OSType)subType
+{
+    const AudioComponentDescription acd = {
+        .componentType = type,
+        .componentSubType = subType,
+        .componentManufacturer = kAudioUnitManufacturer_Apple,
+        .componentFlags = 0,
+        .componentFlagsMask = 0,
+    };
+
+    return [self initWithGraph:nil acd:&acd];
 }
 
 - (void)dealloc
@@ -139,14 +151,14 @@ static OSStatus InputRenderCallback(void *inRefCon, AudioUnitRenderActionFlags *
     YASRelease(_notifyCallbackBlock);
     YASRelease(_inputCallbackBlock);
     YASRelease(_key);
-    YASRelease(_graphContainer);
+    YASRelease(_graphKey);
     YASRelease(_name);
 
     _renderCallbackBlock = nil;
     _notifyCallbackBlock = nil;
     _inputCallbackBlock = nil;
     _key = nil;
-    _graphContainer = nil;
+    _graphKey = nil;
     _name = nil;
 
     YASSuperDealloc;
@@ -169,11 +181,6 @@ static OSStatus InputRenderCallback(void *inRefCon, AudioUnitRenderActionFlags *
     return _acd.componentType == kAudioUnitType_Output;
 }
 
-- (YASAudioGraph *)graph
-{
-    return [_graphContainer autoreleasingObject];
-}
-
 - (AudioUnit)audioUnitInstance
 {
     return _audioUnitInstance;
@@ -181,7 +188,7 @@ static OSStatus InputRenderCallback(void *inRefCon, AudioUnitRenderActionFlags *
 
 - (void)setRenderCallback:(const UInt32)inputNumber
 {
-    NSNumber *graphKey = self.graph.key;
+    NSNumber *graphKey = self.graphKey;
     NSNumber *unitKey = self.key;
 
     if (!graphKey || !unitKey) {
@@ -211,7 +218,7 @@ static OSStatus InputRenderCallback(void *inRefCon, AudioUnitRenderActionFlags *
 
 - (void)addRenderNotify
 {
-    NSNumber *graphKey = self.graph.key;
+    NSNumber *graphKey = self.graphKey;
     NSNumber *unitKey = self.key;
 
     if (!graphKey || !unitKey) {
@@ -509,7 +516,7 @@ static OSStatus InputRenderCallback(void *inRefCon, AudioUnitRenderActionFlags *
         return;
     }
 
-    NSNumber *graphKey = [self graph].key;
+    NSNumber *graphKey = self.graphKey;
     NSNumber *unitKey = self.key;
 
     if (!graphKey || !unitKey) {

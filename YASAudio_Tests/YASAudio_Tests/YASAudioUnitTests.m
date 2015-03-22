@@ -52,11 +52,12 @@
 
     YASAudioGraph *audioGraph = self.audioGraph;
 
-    YASAudioUnit *converterUnit = [audioGraph addAudioUnitWithType:type
-                                                           subType:subType
-                                                      prepareBlock:^(YASAudioUnit *audioUnit) {
-                                                          [audioUnit setMaximumFramesPerSlice:maximumFrameLength];
-                                                      }];
+    YASAudioUnit *converterUnit =
+        [[YASAudioUnit alloc] initWithType:kAudioUnitType_FormatConverter subType:kAudioUnitSubType_AUConverter];
+
+    [converterUnit setMaximumFramesPerSlice:maximumFrameLength];
+    [audioGraph addAudioUnit:converterUnit];
+    YASRelease(converterUnit);
 
     XCTAssertEqual(converterUnit.type, type);
     XCTAssertEqual(converterUnit.subType, subType);
@@ -116,11 +117,12 @@
 
     YASAudioGraph *audioGraph = self.audioGraph;
 
-    YASAudioUnit *converterUnit = [audioGraph addAudioUnitWithType:kAudioUnitType_FormatConverter
-                                                           subType:kAudioUnitSubType_AUConverter
-                                                      prepareBlock:^(YASAudioUnit *audioUnit) {
-                                                          [audioUnit setMaximumFramesPerSlice:maximumFrameLength];
-                                                      }];
+    YASAudioUnit *converterUnit =
+        [[YASAudioUnit alloc] initWithType:kAudioUnitType_FormatConverter subType:kAudioUnitSubType_AUConverter];
+
+    [converterUnit setMaximumFramesPerSlice:maximumFrameLength];
+    [audioGraph addAudioUnit:converterUnit];
+    YASRelease(converterUnit);
 
     [converterUnit setRenderCallback:0];
     [converterUnit addRenderNotify];
@@ -175,10 +177,7 @@
 
 - (void)testParameter
 {
-    YASAudioGraph *audioGraph = self.audioGraph;
-
-    YASAudioUnit *delayUnit =
-        [audioGraph addAudioUnitWithType:kAudioUnitType_Effect subType:kAudioUnitSubType_Delay prepareBlock:nil];
+    YASAudioUnit *delayUnit = [[YASAudioUnit alloc] initWithType:kAudioUnitType_Effect subType:kAudioUnitSubType_Delay];
 
     YASAudioUnitParameterInfo *delayTimeInfo =
         [delayUnit parameterInfo:kDelayParam_DelayTime scope:kAudioUnitScope_Global];
@@ -198,6 +197,8 @@
     delayTimeInfo = nil;
     XCTAssertThrows(delayTimeInfo = [delayUnit parameterInfo:kDelayParam_DelayTime scope:kAudioUnitScope_Output]);
     XCTAssertNil(delayTimeInfo);
+
+    YASRelease(delayUnit);
 }
 
 - (void)testPropertyData
@@ -215,11 +216,8 @@
     NSData *setData = [NSData dataWithBytes:format.streamDescription length:sizeof(AudioStreamBasicDescription)];
     YASRelease(format);
 
-    YASAudioGraph *audioGraph = self.audioGraph;
-
-    YASAudioUnit *converterUnit = [audioGraph addAudioUnitWithType:kAudioUnitType_FormatConverter
-                                                           subType:kAudioUnitSubType_AUConverter
-                                                      prepareBlock:NULL];
+    YASAudioUnit *converterUnit =
+        [[YASAudioUnit alloc] initWithType:kAudioUnitType_FormatConverter subType:kAudioUnitSubType_AUConverter];
 
     XCTAssertNoThrow([converterUnit setPropertyData:setData propertyID:propertyID scope:scope element:element]);
 
@@ -227,6 +225,8 @@
     XCTAssertNoThrow(getData = [converterUnit propertyDataWithPropertyID:propertyID scope:scope element:element]);
 
     XCTAssertEqualObjects(setData, getData);
+
+    YASRelease(converterUnit);
 }
 
 #pragma mark -
