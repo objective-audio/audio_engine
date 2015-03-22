@@ -225,45 +225,25 @@ static BOOL _interrupting = NO;
     }
 }
 
-- (YASAudioUnit *)addAudioUnitWithAudioComponentDescription:(const AudioComponentDescription *)acd
-                                               prepareBlock:(void (^)(YASAudioUnit *))prepareBlock
+- (void)addAudioUnit:(YASAudioUnit *)unit
 {
-    YASAudioUnit *unit = nil;
-
-    unit = [[YASAudioUnit alloc] initWithGraph:self acd:acd];
-
-    if (unit) {
-        [self _addUnitToUnits:unit];
-
-        if (prepareBlock) {
-            prepareBlock(unit);
-        }
-
-        [unit initialize];
-
-        if (acd->componentType == kAudioUnitType_Output && self.isRunning && !self.class.isInterrupting) {
-            [unit start];
-        }
-
-        YASRelease(unit);
+    if (!unit) {
+        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Argument is nil.", __PRETTY_FUNCTION__]));
+        return;
     }
 
-    return unit;
-}
+    if (unit.key) {
+        YASRaiseWithReason(([NSString stringWithFormat:@"%s - unit.key is already assigned.", __PRETTY_FUNCTION__]));
+        return;
+    }
 
-- (YASAudioUnit *)addAudioUnitWithType:(OSType)type
-                               subType:(OSType)subType
-                          prepareBlock:(void (^)(YASAudioUnit *))prepareBlock
-{
-    const AudioComponentDescription acd = {
-        .componentType = type,
-        .componentSubType = subType,
-        .componentManufacturer = kAudioUnitManufacturer_Apple,
-        .componentFlags = 0,
-        .componentFlagsMask = 0,
-    };
+    [self _addUnitToUnits:unit];
 
-    return [self addAudioUnitWithAudioComponentDescription:&acd prepareBlock:prepareBlock];
+    [unit initialize];
+
+    if (unit.isOutputUnit && self.isRunning && !self.class.isInterrupting) {
+        [unit start];
+    }
 }
 
 - (void)removeAudioUnit:(YASAudioUnit *)unit
@@ -280,6 +260,7 @@ static BOOL _interrupting = NO;
         [_units removeObjectForKey:unit.key];
         [_ioUnits removeObject:unit];
         unit.key = nil;
+        unit.graphKey = nil;
     }
 }
 
@@ -373,6 +354,7 @@ static BOOL _interrupting = NO;
     {
         NSNumber *key = [self _nextUnitKey];
         if (key) {
+            unit.graphKey = self.key;
             unit.key = key;
             _units[key] = unit;
             if (unit.isOutputUnit) {

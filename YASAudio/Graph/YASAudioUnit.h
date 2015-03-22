@@ -35,8 +35,8 @@ typedef void (^YASAudioUnitCallbackBlock)(YASAudioUnitRenderParameters *renderPa
 - (instancetype)init NS_UNAVAILABLE;
 - (instancetype)initWithGraph:(YASAudioGraph *)graph
                           acd:(const AudioComponentDescription *)acd NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithType:(OSType)type subType:(OSType)subType;
 
-- (YASAudioGraph *)graph;
 - (AudioUnit)audioUnitInstance;
 
 - (void)setRenderCallback:(const UInt32)inputNumber;
@@ -90,6 +90,7 @@ typedef void (^YASAudioUnitCallbackBlock)(YASAudioUnitRenderParameters *renderPa
 
 @interface YASAudioUnit (YASInternal)
 
+@property (nonatomic, copy) NSNumber *graphKey;
 @property (nonatomic, copy) NSNumber *key;
 
 - (void)initialize;

@@ -64,21 +64,21 @@
 
     YASAudioGraph *audioGraph = self.audioGraph;
 
-    YASAudioUnit *ioUnit = [audioGraph addAudioUnitWithType:kAudioUnitType_Output
-                                                    subType:kAudioUnitSubType_GenericOutput
-                                               prepareBlock:^(YASAudioUnit *audioUnit) {
-                                                   [audioUnit setMaximumFramesPerSlice:maximumFrameLength];
-                                               }];
+    YASAudioUnit *ioUnit =
+        [[YASAudioUnit alloc] initWithType:kAudioUnitType_Output subType:kAudioUnitSubType_GenericOutput];
+    [ioUnit setMaximumFramesPerSlice:maximumFrameLength];
+    [audioGraph addAudioUnit:ioUnit];
+    YASRelease(ioUnit);
 
     [ioUnit setRenderCallback:0];
 
     const UInt32 mixerInputCount = 16;
 
-    YASAudioUnit *mixerUnit = [audioGraph addAudioUnitWithType:kAudioUnitType_Mixer
-                                                       subType:kAudioUnitSubType_MultiChannelMixer
-                                                  prepareBlock:^(YASAudioUnit *audioUnit) {
-                                                      [audioUnit setMaximumFramesPerSlice:maximumFrameLength];
-                                                  }];
+    YASAudioUnit *mixerUnit =
+        [[YASAudioUnit alloc] initWithType:kAudioUnitType_Mixer subType:kAudioUnitSubType_MultiChannelMixer];
+    [mixerUnit setMaximumFramesPerSlice:maximumFrameLength];
+    [audioGraph addAudioUnit:mixerUnit];
+    YASRelease(mixerUnit);
 
     [mixerUnit setOutputFormat:mixerFormat.streamDescription busNumber:0];
 

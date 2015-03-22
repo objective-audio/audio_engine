@@ -17,11 +17,7 @@
 
 @property (nonatomic, assign, getter=isRunning) BOOL running;
 
-- (YASAudioUnit *)addAudioUnitWithAudioComponentDescription:(const AudioComponentDescription *)acd
-                                               prepareBlock:(void (^)(YASAudioUnit *audioUnit))prepareBlock;
-- (YASAudioUnit *)addAudioUnitWithType:(OSType)type
-                               subType:(OSType)subType
-                          prepareBlock:(void (^)(YASAudioUnit *audioUnit))prepareBlock;
+- (void)addAudioUnit:(YASAudioUnit *)unit;
 - (void)removeAudioUnit:(YASAudioUnit *)unit;
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
