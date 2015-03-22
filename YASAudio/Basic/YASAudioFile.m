@@ -387,13 +387,17 @@ static NSString *YASFileTypeFromAudioFileTypeID(AudioFileTypeID fileTypeID)
     self = [super init];
     if (self) {
         if (!fileURL) {
-            [NSError yas_error:outError code:YASAudioFileErrorCodeArgumentIsNil];
+            if (outError) {
+                *outError = [NSError yas_errorWithCode:YASAudioFileErrorCodeArgumentIsNil];
+            }
             YASRelease(self);
             return nil;
         }
         self.url = fileURL;
         if (![self _openWithBitDepthFormat:format interleaved:interleaved]) {
-            [NSError yas_error:outError code:YASAudioFileErrorCodeNotOpen];
+            if (outError) {
+                *outError = [NSError yas_errorWithCode:YASAudioFileErrorCodeNotOpen];
+            }
             YASRelease(self);
             return nil;
         }
@@ -409,7 +413,9 @@ static NSString *YASFileTypeFromAudioFileTypeID(AudioFileTypeID fileTypeID)
 - (BOOL)readIntoBuffer:(YASAudioPCMBuffer *)buffer frameLength:(const UInt32)frameLength error:(NSError **)outError
 {
     if (![buffer.format isEqualToAudioFormat:self.processingFormat]) {
-        [NSError yas_error:outError code:YASAudioFileErrorCodeInvalidFormat];
+        if (outError) {
+            *outError = [NSError yas_errorWithCode:YASAudioFileErrorCodeInvalidFormat];
+        }
         return NO;
     }
 
@@ -435,7 +441,9 @@ static NSString *YASFileTypeFromAudioFileTypeID(AudioFileTypeID fileTypeID)
 
         err = ExtAudioFileRead(self.extAudioFile, &ioFrames, ioBufferList);
         if (err != noErr) {
-            [NSError yas_error:outError code:YASAudioFileErrorCodeReadFailed audioErrorCode:err];
+            if (outError) {
+                *outError = [NSError yas_errorWithCode:YASAudioFileErrorCodeReadFailed audioErrorCode:err];
+            }
             break;
         }
 
@@ -453,7 +461,9 @@ static NSString *YASFileTypeFromAudioFileTypeID(AudioFileTypeID fileTypeID)
     if (err == noErr) {
         err = ExtAudioFileTell(self.extAudioFile, self.fileFramePositionPointer);
         if (err != noErr) {
-            [NSError yas_error:outError code:YASAudioFileErrorCodeTellFailed audioErrorCode:err];
+            if (outError) {
+                *outError = [NSError yas_errorWithCode:YASAudioFileErrorCodeTellFailed audioErrorCode:err];
+            }
         }
     }
 
@@ -489,14 +499,18 @@ static NSString *YASFileTypeFromAudioFileTypeID(AudioFileTypeID fileTypeID)
     self = [super init];
     if (self) {
         if (!fileURL || !fileType || !settings) {
-            [NSError yas_error:outError code:YASAudioFileErrorCodeArgumentIsNil];
+            if (outError) {
+                *outError = [NSError yas_errorWithCode:YASAudioFileErrorCodeArgumentIsNil];
+            }
             YASRelease(self);
             return nil;
         }
         self.url = fileURL;
         self.fileType = fileType;
         if (![self _createWithSettings:settings bitDepthFormat:format interleaved:interleaved]) {
-            [NSError yas_error:outError code:YASAudioFileErrorCodeNotCreate];
+            if (outError) {
+                *outError = [NSError yas_errorWithCode:YASAudioFileErrorCodeNotCreate];
+            }
             YASRelease(self);
             return nil;
         }
@@ -517,7 +531,9 @@ static NSString *YASFileTypeFromAudioFileTypeID(AudioFileTypeID fileTypeID)
 - (BOOL)_writeFromBuffer:(YASAudioPCMBuffer *)buffer isAsync:(BOOL)isAsync error:(NSError **)outError
 {
     if (![buffer.format isEqualToAudioFormat:self.processingFormat]) {
-        [NSError yas_error:outError code:YASAudioFileErrorCodeInvalidFormat];
+        if (outError) {
+            *outError = [NSError yas_errorWithCode:YASAudioFileErrorCodeInvalidFormat];
+        }
         return NO;
     }
 
@@ -530,13 +546,17 @@ static NSString *YASFileTypeFromAudioFileTypeID(AudioFileTypeID fileTypeID)
     }
 
     if (err != noErr) {
-        [NSError yas_error:outError code:YASAudioFileErrorCodeWriteFailed audioErrorCode:err];
+        if (outError) {
+            *outError = [NSError yas_errorWithCode:YASAudioFileErrorCodeWriteFailed audioErrorCode:err];
+        }
     }
 
     if (err == noErr) {
         err = ExtAudioFileTell(self.extAudioFile, self.fileFramePositionPointer);
         if (err != noErr) {
-            [NSError yas_error:outError code:YASAudioFileErrorCodeTellFailed audioErrorCode:err];
+            if (outError) {
+                *outError = [NSError yas_errorWithCode:YASAudioFileErrorCodeTellFailed audioErrorCode:err];
+            }
         }
     }
 
