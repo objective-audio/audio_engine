@@ -33,7 +33,7 @@
     NSError *error = nil;
     XCTAssertNoThrow([NSException yas_raiseIfError:error]);
 
-    [NSError yas_error:&error code:1];
+    error = [NSError yas_errorWithCode:1];
 
     XCTAssertNotNil(error);
     XCTAssertThrowsSpecificNamed([NSException yas_raiseIfError:error], NSException, YASAudioNSErrorException);

@@ -25,8 +25,7 @@
 
 - (void)testGetError
 {
-    NSError *error = nil;
-    [NSError yas_error:&error code:1];
+    NSError *error = [NSError yas_errorWithCode:1];
 
     XCTAssertNotNil(error);
     XCTAssertEqualObjects(error.domain, YASAudioErrorDomain);
@@ -35,8 +34,7 @@
 
 - (void)testGetErrorWithAudioErrorCode
 {
-    NSError *error = nil;
-    [NSError yas_error:&error code:1 audioErrorCode:kAudioUnitErr_InvalidProperty];
+    NSError *error = [NSError yas_errorWithCode:1 audioErrorCode:kAudioUnitErr_InvalidProperty];
 
     XCTAssertNotNil(error);
     XCTAssertEqualObjects(error.domain, YASAudioErrorDomain);
@@ -58,14 +56,14 @@
     const UInt32 errorCount = sizeof(audioUnitErrors) / sizeof(OSStatus);
 
     for (UInt32 i = 0; i < errorCount; i++) {
-        [NSError yas_error:&error code:1 audioErrorCode:audioUnitErrors[i]];
+        error = [NSError yas_errorWithCode:1 audioErrorCode:audioUnitErrors[i]];
         NSString *description = error.userInfo[YASAudioErrorCodeDescriptionKey];
         XCTAssertTrue([description hasPrefix:@"AudioUnit Error - "]);
 
         error = nil;
     }
 
-    [NSError yas_error:&error code:1 audioErrorCode:noErr];
+    error = [NSError yas_errorWithCode:1 audioErrorCode:noErr];
     NSString *description = error.userInfo[YASAudioErrorCodeDescriptionKey];
     XCTAssertEqual(description.length, 0);
 }
