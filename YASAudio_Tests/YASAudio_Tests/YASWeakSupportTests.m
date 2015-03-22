@@ -77,7 +77,7 @@
     YASWeakContainer *container0 = [provider0 weakContainer];
     YASWeakContainer *container1 = [provider1 weakContainer];
 
-    NSArray *containers = @[ container0, container1 ];
+    NSArray *containers = @[container0, container1];
 
     NSArray *unwrappedArray = nil;
 
@@ -114,7 +114,7 @@
     YASWeakContainer *container0 = [provider0 weakContainer];
     YASWeakContainer *container1 = [provider1 weakContainer];
 
-    NSDictionary *containers = @{ @0 : container0, @1 : container1 };
+    NSDictionary *containers = @{ @0: container0, @1: container1 };
 
     NSDictionary *unwrappedDictionary = nil;
 

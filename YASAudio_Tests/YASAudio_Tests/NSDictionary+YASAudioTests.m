@@ -24,15 +24,15 @@
 
 - (void)testEmptyNumberKeyInLength
 {
-    NSDictionary *dictionary = @{ @1 : @"1" };
+    NSDictionary *dictionary = @{ @1: @"1" };
 
     XCTAssertEqualObjects([dictionary yas_emptyNumberKeyInLength:2], @0);
 
-    dictionary = @{ @0 : @"0" };
+    dictionary = @{ @0: @"0" };
 
     XCTAssertEqualObjects([dictionary yas_emptyNumberKeyInLength:2], @1);
 
-    dictionary = @{ @0 : @"0" };
+    dictionary = @{ @0: @"0" };
 
     XCTAssertNil([dictionary yas_emptyNumberKeyInLength:1]);
 }
