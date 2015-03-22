@@ -58,6 +58,7 @@ typedef void (^YASAudioUnitCallbackBlock)(YASAudioUnitRenderParameters *renderPa
 - (void)getOutputFormat:(AudioStreamBasicDescription *)outAsbd busNumber:(const UInt32)bus;
 - (void)setMaximumFramesPerSlice:(const UInt32)frames;
 - (UInt32)maximumFramesPerSlice;
+
 - (void)setParameter:(const AudioUnitParameterID)parameterID
                value:(const AudioUnitParameterValue)val
                scope:(const AudioUnitScope)scope
@@ -65,6 +66,7 @@ typedef void (^YASAudioUnitCallbackBlock)(YASAudioUnitRenderParameters *renderPa
 - (AudioUnitParameterValue)getParameter:(const AudioUnitParameterID)parameterID
                                   scope:(const AudioUnitScope)scope
                                 element:(const AudioUnitElement)element;
+- (NSArray *)getGlobalParameterInfosWithScope:(const AudioUnitScope)scope;
 - (YASAudioUnitParameterInfo *)parameterInfo:(const AudioUnitParameterID)parameterID scope:(const AudioUnitScope)scope;
 
 - (void)setElementCount:(UInt32)count scope:(AudioUnitScope)scope;  // mixer only

@@ -334,6 +334,29 @@ static OSStatus InputRenderCallback(void *inRefCon, AudioUnitRenderActionFlags *
     return result;
 }
 
+- (NSArray *)getGlobalParameterInfosWithScope:(const AudioUnitScope)scope
+{
+    NSData *propertyData =
+        [self propertyDataWithPropertyID:kAudioUnitProperty_ParameterList scope:kAudioUnitScope_Global element:0];
+
+    if (propertyData.length > 0) {
+        NSInteger count = propertyData.length / sizeof(AudioUnitParameterID);
+        if (count > 0) {
+            const AudioUnitParameterID *ids = propertyData.bytes;
+            NSMutableArray *infos = [NSMutableArray arrayWithCapacity:count];
+            for (NSInteger i = 0; i < count; i++) {
+                YASAudioUnitParameterInfo *info = [self parameterInfo:ids[i] scope:scope];
+                if (info) {
+                    [infos addObject:info];
+                }
+            }
+            return infos;
+        }
+    }
+
+    return nil;
+}
+
 - (YASAudioUnitParameterInfo *)parameterInfo:(const AudioUnitParameterID)parameterID scope:(const AudioUnitScope)scope
 {
     AudioUnitParameterInfo info = {0};
@@ -346,7 +369,8 @@ static OSStatus InputRenderCallback(void *inRefCon, AudioUnitRenderActionFlags *
         return nil;
     }
 
-    YASAudioUnitParameterInfo *parameterInfo = [[YASAudioUnitParameterInfo alloc] initWithAudioUnitParameterInfo:&info];
+    YASAudioUnitParameterInfo *parameterInfo =
+        [[YASAudioUnitParameterInfo alloc] initWithAudioUnitParameterInfo:&info parameterID:parameterID scope:scope];
 
     if (info.flags & kAudioUnitParameterFlag_CFNameRelease) {
         if (info.flags & kAudioUnitParameterFlag_HasCFNameString && info.cfNameString != NULL) {

@@ -9,9 +9,14 @@
 @implementation YASAudioUnitParameterInfo
 
 - (instancetype)initWithAudioUnitParameterInfo:(const AudioUnitParameterInfo *)info
+                                   parameterID:(const AudioUnitParameterID)parameterID
+                                         scope:(const AudioUnitScope)scope
 {
     self = [super init];
     if (self) {
+        _parameterID = parameterID;
+        _scope = scope;
+
         if (info->unitName != NULL) {
             _unitName = YASRetain((__bridge NSString *)(info->unitName));
         }
