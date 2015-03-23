@@ -128,7 +128,7 @@ static OSStatus InputRenderCallback(void *inRefCon, AudioUnitRenderActionFlags *
     return self;
 }
 
-- (instancetype)initWithType:(OSType)type subType:(OSType)subType
+- (instancetype)initWithType:(const OSType)type subType:(const OSType)subType
 {
     const AudioComponentDescription acd = {
         .componentType = type,
