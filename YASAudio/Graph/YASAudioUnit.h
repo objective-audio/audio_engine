@@ -33,7 +33,7 @@ typedef void (^YASAudioUnitCallbackBlock)(YASAudioUnitRenderParameters *renderPa
 #endif
 
 - (instancetype)init NS_UNAVAILABLE;
-- (instancetype)initWithAcd:(const AudioComponentDescription *)acd NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithAudioComponentDescription:(const AudioComponentDescription *)acd NS_DESIGNATED_INITIALIZER;
 - (instancetype)initWithType:(OSType)type subType:(OSType)subType;
 
 - (AudioUnit)audioUnitInstance;
