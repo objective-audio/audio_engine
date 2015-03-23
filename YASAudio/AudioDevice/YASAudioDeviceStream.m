@@ -188,7 +188,7 @@ NSString *const YASAudioDeviceStreamStartingChannelDidChangeNotification =
     YASWeakContainer *weakContainer = self.weakContainer;
 
     self.listenerBlock = ^(UInt32 inNumberAddresses, const AudioObjectPropertyAddress *inAddresses) {
-        YASAudioDeviceStream *stream = weakContainer.retainedObject;
+        YASAudioDeviceStream *stream = [weakContainer retainedObject];
         if (stream) {
             for (NSInteger i = 0; i < inNumberAddresses; i++) {
                 if (inAddresses[i].mSelector == kAudioStreamPropertyVirtualFormat) {

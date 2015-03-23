@@ -117,7 +117,7 @@ static UInt32 YASAudioDeviceIOFrameCapacity = 4096;
           AudioBufferList *outOutputData, const AudioTimeStamp *inOutputTime) {
             YASAudioClearAudioBufferList(outOutputData);
 
-            YASAudioDeviceIO *deviceIO = container.retainedObject;
+            YASAudioDeviceIO *deviceIO = [container retainedObject];
 
             YASAudioDeviceIOCore *core = deviceIO.core;
             if (core) {
