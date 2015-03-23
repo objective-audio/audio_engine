@@ -201,6 +201,25 @@
     YASRelease(delayUnit);
 }
 
+- (void)testParameters
+{
+    YASAudioUnit *delayUnit = [[YASAudioUnit alloc] initWithType:kAudioUnitType_Effect subType:kAudioUnitSubType_Delay];
+
+    NSArray *parameterInfos = [delayUnit getParameterInfosWithScope:kAudioUnitScope_Global];
+
+    XCTAssertEqual(parameterInfos.count, 4);
+
+    NSArray *parameters =
+        @[@(kDelayParam_DelayTime), @(kDelayParam_Feedback), @(kDelayParam_LopassCutoff), @(kDelayParam_WetDryMix)];
+
+    for (YASAudioUnitParameterInfo *info in parameterInfos) {
+        XCTAssertTrue([info isKindOfClass:[YASAudioUnitParameterInfo class]]);
+        [parameters containsObject:@(info.parameterID)];
+    }
+
+    YASRelease(delayUnit);
+}
+
 - (void)testPropertyData
 {
     const Float64 sampleRate = 44100;
