@@ -118,7 +118,7 @@ static OSStatus InputRenderCallback(void *inRefCon, AudioUnitRenderActionFlags *
 
 #pragma mark Memory Management
 
-- (instancetype)initWithAcd:(const AudioComponentDescription *)acd
+- (instancetype)initWithAudioComponentDescription:(const AudioComponentDescription *)acd
 {
     self = [super init];
     if (self) {
@@ -138,7 +138,7 @@ static OSStatus InputRenderCallback(void *inRefCon, AudioUnitRenderActionFlags *
         .componentFlagsMask = 0,
     };
 
-    return [self initWithAcd:&acd];
+    return [self initWithAudioComponentDescription:&acd];
 }
 
 - (void)dealloc
