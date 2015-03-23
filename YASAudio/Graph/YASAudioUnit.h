@@ -65,7 +65,7 @@ typedef void (^YASAudioUnitCallbackBlock)(YASAudioUnitRenderParameters *renderPa
 - (AudioUnitParameterValue)getParameter:(const AudioUnitParameterID)parameterID
                                   scope:(const AudioUnitScope)scope
                                 element:(const AudioUnitElement)element;
-- (NSArray *)getGlobalParameterInfosWithScope:(const AudioUnitScope)scope;
+- (NSArray *)getParameterInfosWithScope:(const AudioUnitScope)scope;
 - (YASAudioUnitParameterInfo *)parameterInfo:(const AudioUnitParameterID)parameterID scope:(const AudioUnitScope)scope;
 
 - (void)setElementCount:(UInt32)count scope:(AudioUnitScope)scope;  // mixer only
