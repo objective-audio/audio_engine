@@ -118,12 +118,11 @@ static OSStatus InputRenderCallback(void *inRefCon, AudioUnitRenderActionFlags *
 
 #pragma mark Memory Management
 
-- (instancetype)initWithGraph:(YASAudioGraph *)graph acd:(const AudioComponentDescription *)acd
+- (instancetype)initWithAcd:(const AudioComponentDescription *)acd
 {
     self = [super init];
     if (self) {
         _acd = *acd;
-        self.graphKey = graph.key;
         [self _createAudioUnit:acd];
     }
     return self;
@@ -139,7 +138,7 @@ static OSStatus InputRenderCallback(void *inRefCon, AudioUnitRenderActionFlags *
         .componentFlagsMask = 0,
     };
 
-    return [self initWithGraph:nil acd:&acd];
+    return [self initWithAcd:&acd];
 }
 
 - (void)dealloc
