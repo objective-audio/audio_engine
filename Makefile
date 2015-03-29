@@ -10,4 +10,4 @@ setup-coverage:
 	sudo easy_install cpp-coveralls
 
 send-coverage:
-	coveralls --exclude-pattern ".*Tests" --exclude-pattern ".*\.h" -e Submodules -e YASAudio/Basic/NSException+YASAudio.m
+	coveralls --exclude-pattern ".*Tests" --exclude-pattern ".*\.h" -e Submodules -e YASAudio/Basic/NSException+YASAudio.m --exclude-pattern ".*YASAudioDevice.*"
