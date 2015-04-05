@@ -5,7 +5,12 @@
 
 #import <XCTest/XCTest.h>
 #import "YASAudio.h"
-#import <AVFoundation/AVFoundation.h>
+
+@interface YASAudioUnit ()
+
+@property (nonatomic, assign, getter=isInitialized) BOOL initialized;
+
+@end
 
 @interface YASAudioUnitTests : XCTestCase
 
@@ -57,7 +62,8 @@
 
     [converterUnit setMaximumFramesPerSlice:maximumFrameLength];
     [audioGraph addAudioUnit:converterUnit];
-    YASRelease(converterUnit);
+
+    XCTAssertTrue(converterUnit.isInitialized);
 
     XCTAssertEqual(converterUnit.type, type);
     XCTAssertEqual(converterUnit.subType, subType);
@@ -101,6 +107,12 @@
 
     YASRelease(outputFormat);
     YASRelease(inputFormat);
+
+    [audioGraph removeAudioUnit:converterUnit];
+
+    XCTAssertFalse(converterUnit.isInitialized);
+
+    YASRelease(converterUnit);
 }
 
 - (void)testRenderCallback
@@ -179,7 +191,7 @@
 {
     YASAudioUnit *delayUnit = [[YASAudioUnit alloc] initWithType:kAudioUnitType_Effect subType:kAudioUnitSubType_Delay];
 
-    YASAudioUnitParameterInfo *delayTimeInfo =
+    YASAudioUnitParameter *delayTimeInfo =
         [delayUnit parameterInfo:kDelayParam_DelayTime scope:kAudioUnitScope_Global];
 
     const AudioUnitParameterValue min = delayTimeInfo.minValue;
@@ -205,15 +217,15 @@
 {
     YASAudioUnit *delayUnit = [[YASAudioUnit alloc] initWithType:kAudioUnitType_Effect subType:kAudioUnitSubType_Delay];
 
-    NSArray *parameterInfos = [delayUnit getParameterInfosWithScope:kAudioUnitScope_Global];
+    NSDictionary *parameterInfos = [delayUnit getParameterInfosWithScope:kAudioUnitScope_Global];
 
     XCTAssertEqual(parameterInfos.count, 4);
 
     NSArray *parameters =
         @[@(kDelayParam_DelayTime), @(kDelayParam_Feedback), @(kDelayParam_LopassCutoff), @(kDelayParam_WetDryMix)];
 
-    for (YASAudioUnitParameterInfo *info in parameterInfos) {
-        XCTAssertTrue([info isKindOfClass:[YASAudioUnitParameterInfo class]]);
+    for (YASAudioUnitParameter *info in parameterInfos.allValues) {
+        XCTAssertTrue([info isKindOfClass:[YASAudioUnitParameter class]]);
         [parameters containsObject:@(info.parameterID)];
     }
 
@@ -248,6 +260,10 @@
     YASRelease(converterUnit);
 }
 
+- (void)testException
+{
+}
+
 #pragma mark -
 
 - (void)audioUnitRenderOnSubThreadWithAudioUnit:(YASAudioUnit *)audioUnit
@@ -257,7 +273,7 @@
 {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         AudioUnitRenderActionFlags actionFlags = 0;
-        AVAudioTime *audioTime = [AVAudioTime timeWithSampleTime:0 atRate:format.sampleRate];
+        YASAudioTime *audioTime = [YASAudioTime timeWithSampleTime:0 atRate:format.sampleRate];
         AudioTimeStamp timeStamp = audioTime.audioTimeStamp;
 
         YASAudioPCMBuffer *buffer = [[YASAudioPCMBuffer alloc] initWithPCMFormat:format frameCapacity:frameLength];

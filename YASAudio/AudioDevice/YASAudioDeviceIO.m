@@ -10,7 +10,7 @@
 #import "YASAudioDeviceIO.h"
 #import "YASAudioDevice.h"
 #import "YASAudioPCMBuffer.h"
-#import "YASAudioGraph.h"
+#import "YASAudioTime.h"
 #import "YASAudioFormat.h"
 #import "YASAudioUtility.h"
 #import "YASMacros.h"
@@ -50,26 +50,25 @@ static UInt32 YASAudioDeviceIOFrameCapacity = 4096;
 
 @interface YASAudioDeviceIO ()
 
-@property (nonatomic, strong) YASWeakContainer *graphContainer;
 @property (nonatomic, assign) AudioDeviceIOProcID ioProcID;
-@property (nonatomic, assign) const AudioBufferList *inputData;
-@property (nonatomic, assign) const AudioTimeStamp *inputTime;
+@property (nonatomic, strong) YASAudioPCMBuffer *inputBuffer;
+@property (nonatomic, strong) YASAudioTime *inputTime;
 @property (atomic, strong) YASAudioDeviceIOCore *core;
 
 @end
 
 @implementation YASAudioDeviceIO
 
-- (instancetype)initWithGraph:(YASAudioGraph *)graph
+- (instancetype)init
+{
+    return [self initWithAudioDevice:nil];
+}
+
+- (instancetype)initWithAudioDevice:(YASAudioDevice *)device
 {
     self = [super init];
     if (self) {
-        if (!graph) {
-            YASRaiseWithReason(([NSString stringWithFormat:@"%s - Argument is nil.", __PRETTY_FUNCTION__]));
-        }
-
-        self.graphContainer = graph.weakContainer;
-        self.audioDevice = [YASAudioDevice defaultOutputDevice];
+        self.audioDevice = device;
 
         [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(audioHardwareDidChange:)
@@ -85,14 +84,16 @@ static UInt32 YASAudioDeviceIOFrameCapacity = 4096;
 
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 
-    YASRelease(_graphContainer);
     YASRelease(_renderCallbackBlock);
     YASRelease(_audioDevice);
+    YASRelease(_inputBuffer);
+    YASRelease(_inputTime);
     YASRelease(_core);
 
-    _graphContainer = nil;
     _renderCallbackBlock = nil;
     _audioDevice = nil;
+    _inputBuffer = nil;
+    _inputTime = nil;
     _core = nil;
 
     YASSuperDealloc;
@@ -128,8 +129,12 @@ static UInt32 YASAudioDeviceIOFrameCapacity = 4096;
 
                 const UInt32 inputFrameLength = inputBuffer.frameLength;
                 if (inputFrameLength > 0) {
-                    deviceIO.inputData = inputBuffer.audioBufferList;
-                    deviceIO.inputTime = inInputTime;
+                    deviceIO.inputBuffer = inputBuffer;
+                    YASAudioTime *inputTime =
+                        [[YASAudioTime alloc] initWithAudioTimeStamp:inInputTime
+                                                          sampleRate:inputBuffer.format.sampleRate];
+                    deviceIO.inputTime = inputTime;
+                    YASRelease(inputTime);
                 }
 
                 YASAudioDeviceIOCallbackBlock renderCallbackBlock = deviceIO.renderCallbackBlock;
@@ -140,16 +145,21 @@ static UInt32 YASAudioDeviceIOFrameCapacity = 4096;
                             outOutputData, outputBuffer.format.sampleByteCount);
                         if (frameLength > 0) {
                             outputBuffer.frameLength = frameLength;
-                            renderCallbackBlock(outputBuffer.mutableAudioBufferList, inOutputTime, frameLength);
+                            YASAudioTime *time =
+                                [[YASAudioTime alloc] initWithAudioTimeStamp:inOutputTime
+                                                                  sampleRate:outputBuffer.format.sampleRate];
+                            renderCallbackBlock(outputBuffer, time);
+                            YASRelease(time);
                             [outputBuffer copyDataFlexiblyToAudioBufferList:outOutputData];
                         }
-                    } else if (deviceIO.inputData) {
-                        renderCallbackBlock(NULL, NULL, inputFrameLength);
+                    } else if (deviceIO.inputBuffer) {
+                        renderCallbackBlock(NULL, NULL);
                     }
                 }
             }
 
-            deviceIO.inputData = NULL;
+            deviceIO.inputBuffer = nil;
+            deviceIO.inputTime = nil;
             YASRelease(deviceIO);
         }));
 
@@ -276,12 +286,12 @@ static UInt32 YASAudioDeviceIOFrameCapacity = 4096;
 
 #pragma mark Render thread
 
-- (const AudioBufferList *)inputAudioBufferListOnRender
+- (YASAudioPCMBuffer *)inputBufferOnRender
 {
-    return self.inputData;
+    return self.inputBuffer;
 }
 
-- (const AudioTimeStamp *)inputTimeOnRender
+- (YASAudioTime *)inputTimeOnRender
 {
     return self.inputTime;
 }

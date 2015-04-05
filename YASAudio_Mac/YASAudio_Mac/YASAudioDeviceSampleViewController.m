@@ -42,17 +42,19 @@ static const UInt32 kSineDataMaxCount = 4096;
     YASSuperDealloc;
 }
 
-- (void)processWithOutputData:(AudioBufferList *)outputData
-                    inputData:(const AudioBufferList *)inputData
-                  frameLength:(const UInt32)frameLength
+- (void)processWithOutputBuffer:(YASAudioPCMBuffer *)outputBuffer inputBuffer:(YASAudioPCMBuffer *)inputBuffer
 {
+    UInt32 frameLength = outputBuffer.frameLength;
+    AudioBufferList *outputData = outputBuffer.mutableAudioBufferList;
+    const AudioBufferList *inputData = inputBuffer.audioBufferList;
+
     if (!outputData || frameLength == 0) {
         return;
     }
 
     YASAudioFormat *format = self.format;
     if (format && format.bitDepthFormat == YASAudioBitDepthFormatFloat32) {
-        if (inputData) {
+        if (inputData && inputBuffer.frameLength >= frameLength) {
             UInt32 outFrameLength = frameLength;
             YASAudioCopyAudioBufferListFlexibly(inputData, outputData, sizeof(Float32), &outFrameLength);
 
@@ -113,20 +115,23 @@ static const UInt32 kSineDataMaxCount = 4096;
 
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-      YASDecibelValueTransformer *decibelValueFormatter = YASAutorelease([[YASDecibelValueTransformer alloc] init]);
-      [NSValueTransformer setValueTransformer:decibelValueFormatter
-                                      forName:NSStringFromClass([YASDecibelValueTransformer class])];
+        YASDecibelValueTransformer *decibelValueFormatter = YASAutorelease([[YASDecibelValueTransformer alloc] init]);
+        [NSValueTransformer setValueTransformer:decibelValueFormatter
+                                        forName:NSStringFromClass([YASDecibelValueTransformer class])];
 
-      YASFrequencyValueFormatter *freqValueFormatter = YASAutorelease([[YASFrequencyValueFormatter alloc] init]);
-      [NSValueTransformer setValueTransformer:freqValueFormatter
-                                      forName:NSStringFromClass([YASFrequencyValueFormatter class])];
+        YASFrequencyValueFormatter *freqValueFormatter = YASAutorelease([[YASFrequencyValueFormatter alloc] init]);
+        [NSValueTransformer setValueTransformer:freqValueFormatter
+                                        forName:NSStringFromClass([YASFrequencyValueFormatter class])];
     });
 
     YASAudioGraph *audioGraph = [[YASAudioGraph alloc] init];
     self.audioGraph = audioGraph;
     YASRelease(audioGraph);
 
-    self.deviceIO = [audioGraph addAudioDeviceIOWithAudioDevice:nil];
+    YASAudioDeviceIO *deviceIO = [[YASAudioDeviceIO alloc] init];
+    self.deviceIO = deviceIO;
+    [audioGraph addAudioDeviceIO:deviceIO];
+    YASRelease(deviceIO);
 
     YASAudioDeviceSampleCore *core = [[YASAudioDeviceSampleCore alloc] init];
     self.core = core;
@@ -134,11 +139,10 @@ static const UInt32 kSineDataMaxCount = 4096;
 
     YASWeakContainer *container = self.deviceIO.weakContainer;
 
-    self.deviceIO.renderCallbackBlock = ^(AudioBufferList *outData, const AudioTimeStamp *inTime,
-                                          const UInt32 inFrameLength) {
-      YASAudioDeviceIO *deviceIO = container.retainedObject;
-      [core processWithOutputData:outData inputData:deviceIO.inputAudioBufferListOnRender frameLength:inFrameLength];
-      YASRelease(deviceIO);
+    self.deviceIO.renderCallbackBlock = ^(YASAudioPCMBuffer *outBuffer, YASAudioTime *when) {
+        YASAudioDeviceIO *deviceIO = [container retainedObject];
+        [core processWithOutputBuffer:outBuffer inputBuffer:[deviceIO inputBufferOnRender]];
+        YASRelease(deviceIO);
     };
 
     audioGraph.running = YES;

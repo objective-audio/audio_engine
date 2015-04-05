@@ -48,4 +48,13 @@
                   audioBufferList:(AudioBufferList *)audioBufferList
                         needsFree:(BOOL)needsFree;
 
+#if (!TARGET_OS_IPHONE && TARGET_OS_MAC)
+- (instancetype)initWithPCMFormat:(YASAudioFormat *)format
+                           buffer:(YASAudioPCMBuffer *)buffer
+              outputChannelRoutes:(NSArray *)channelRoutes;
+- (instancetype)initWithPCMFormat:(YASAudioFormat *)format
+                           buffer:(YASAudioPCMBuffer *)buffer
+               inputChannelRoutes:(NSArray *)channelRoutes;
+#endif
+
 @end

@@ -266,24 +266,18 @@ static BOOL _interrupting = NO;
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
 
-- (YASAudioDeviceIO *)addAudioDeviceIOWithAudioDevice:(YASAudioDevice *)audioDevice
+- (void)addAudioDeviceIO:(YASAudioDeviceIO *)deviceIO
 {
-    YASAudioDeviceIO *deviceIO = [[YASAudioDeviceIO alloc] initWithGraph:self];
-
     if (deviceIO) {
-        deviceIO.audioDevice = audioDevice;
         @synchronized(self)
         {
             [_deviceIOs addObject:deviceIO];
         }
-        YASRelease(deviceIO);
     }
 
     if (self.isRunning && !self.class.isInterrupting) {
         [deviceIO start];
     }
-
-    return deviceIO;
 }
 
 - (void)removeAudioDeviceIO:(YASAudioDeviceIO *)audioDeviceIO

@@ -1,12 +1,12 @@
 //
-//  YASAudioUnitParameterInfo.h
+//  YASAudioUnitParameter.h
 //  Copyright (c) 2015 Yuki Yasoshima.
 //
 
 #import <Foundation/Foundation.h>
 #import <AudioToolbox/AudioToolbox.h>
 
-@interface YASAudioUnitParameterInfo : NSObject
+@interface YASAudioUnitParameter : NSObject
 
 @property (nonatomic, assign, readonly) AudioUnitParameterID parameterID;
 @property (nonatomic, assign, readonly) AudioUnitScope scope;
@@ -18,6 +18,7 @@
 @property (nonatomic, assign, readonly) AudioUnitParameterValue minValue;
 @property (nonatomic, assign, readonly) AudioUnitParameterValue maxValue;
 @property (nonatomic, assign, readonly) AudioUnitParameterValue defaultValue;
+@property (nonatomic, assign) AudioUnitParameterValue value;
 
 - (instancetype)init NS_UNAVAILABLE;
 - (instancetype)initWithAudioUnitParameterInfo:(const AudioUnitParameterInfo *)info
