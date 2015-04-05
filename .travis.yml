@@ -8,7 +8,8 @@ before_install:
   - make setup-coverage
 script:
   - make test SCHEME=YASAudio_iOS_Tests SDK=iphonesimulator
-  - make test SCHEME=YASAudio_Mac_Tests SDK=macosx
   - make test SCHEME=YASAudio_iOS_NonARC_Tests SDK=iphonesimulator
+  - make test SCHEME=YASAudio_Mac_Tests SDK=macosx
+  - make test SCHEME=YASAudio_Mac_NonARC_Tests SDK=macosx
 after_success:
   - make send-coverage
