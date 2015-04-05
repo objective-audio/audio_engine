@@ -6,6 +6,12 @@
 #import <Foundation/Foundation.h>
 #import <AudioToolbox/AudioToolbox.h>
 
+typedef void (^YASAudioPCMBufferReadBlock)(const void *data, const UInt32 bufferIndex);
+typedef void (^YASAudioPCMBufferWriteBlock)(void *data, const UInt32 bufferIndex);
+typedef void (^YASAudioPCMBufferReadValueBlock)(Float64 value, const UInt32 bufferIndex, const UInt32 channel,
+                                                const UInt32 frame);
+typedef Float64 (^YASAudioPCMBufferWriteValueBlock)(const UInt32 bufferIndex, const UInt32 channel, const UInt32 frame);
+
 @class YASAudioFormat;
 
 @interface YASAudioPCMBuffer : NSObject <NSCopying>
@@ -21,6 +27,11 @@
 
 - (instancetype)init NS_UNAVAILABLE;
 - (instancetype)initWithPCMFormat:(YASAudioFormat *)format frameCapacity:(UInt32)frameCapacity;
+
+- (void)readData:(YASAudioPCMBufferReadBlock)readBlock;
+- (void)writeData:(YASAudioPCMBufferWriteBlock)writeBlock;
+- (void)enumerateReadValue:(YASAudioPCMBufferReadValueBlock)readValueBlock;
+- (void)enumerateWriteValue:(YASAudioPCMBufferWriteValueBlock)writeValueBlock;
 
 - (Float32 *)float32DataAtBufferIndex:(NSUInteger)index;
 - (Float64 *)float64DataAtBufferIndex:(NSUInteger)index;
