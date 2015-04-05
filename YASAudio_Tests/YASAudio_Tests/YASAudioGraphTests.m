@@ -5,7 +5,6 @@
 
 #import <XCTest/XCTest.h>
 #import "YASAudio.h"
-#import <AVFoundation/AVFoundation.h>
 
 @interface YASAudioGraph (YASAudioGraphTests)
 
@@ -156,7 +155,7 @@
 
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         AudioUnitRenderActionFlags actionFlags = 0;
-        AVAudioTime *audioTime = [AVAudioTime timeWithSampleTime:0 atRate:outputSampleRate];
+        YASAudioTime *audioTime = [YASAudioTime timeWithSampleTime:0 atRate:outputSampleRate];
         AudioTimeStamp timeStamp = audioTime.audioTimeStamp;
 
         YASAudioPCMBuffer *buffer =

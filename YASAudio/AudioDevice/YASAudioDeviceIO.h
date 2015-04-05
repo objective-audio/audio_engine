@@ -9,12 +9,10 @@
 
 #import <Foundation/Foundation.h>
 #import <AudioToolbox/AudioToolbox.h>
+#import "YASAudioTypes.h"
 #import "YASWeakSupport.h"
 
-typedef void (^YASAudioDeviceIOCallbackBlock)(AudioBufferList *outData, const AudioTimeStamp *inTime,
-                                              const UInt32 inFrameLength);
-
-@class YASAudioDevice, YASAudioGraph;
+@class YASAudioDevice, YASAudioGraph, YASAudioTime;
 
 @interface YASAudioDeviceIO : YASWeakProvider
 
@@ -22,19 +20,14 @@ typedef void (^YASAudioDeviceIOCallbackBlock)(AudioBufferList *outData, const Au
 @property (atomic, copy) YASAudioDeviceIOCallbackBlock renderCallbackBlock;
 @property (nonatomic, assign, readonly) BOOL isRunning;
 
-- (instancetype)init NS_UNAVAILABLE;
+- (instancetype)init;
+- (instancetype)initWithAudioDevice:(YASAudioDevice *)device NS_DESIGNATED_INITIALIZER;
 
 - (void)start;
 - (void)stop;
 
-- (const AudioBufferList *)inputAudioBufferListOnRender;
-- (const AudioTimeStamp *)inputTimeOnRender;
-
-@end
-
-@interface YASAudioDeviceIO (YASInternal)
-
-- (instancetype)initWithGraph:(YASAudioGraph *)graph;
+- (YASAudioPCMBuffer *)inputBufferOnRender;
+- (YASAudioTime *)inputTimeOnRender;
 
 @end
 

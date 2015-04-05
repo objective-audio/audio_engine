@@ -9,6 +9,8 @@
 #ifndef __YASAudio_YASAudioTypes_h
 #define __YASAudio_YASAudioTypes_h
 
+@class YASAudioPCMBuffer, YASAudioTime;
+
 typedef NS_ENUM(NSUInteger, YASAudioBitDepthFormat) {
     YASAudioBitDepthFormatOther = 0,
     YASAudioBitDepthFormatFloat32 = 1,
@@ -32,5 +34,11 @@ typedef struct YASAudioUnitRenderParameters {
     UInt32 inNumberFrames;
     AudioBufferList *ioData;
 } YASAudioUnitRenderParameters;
+
+typedef void (^YASAudioUnitCallbackBlock)(YASAudioUnitRenderParameters *renderParameters);
+typedef void (^YASAudioDeviceIOCallbackBlock)(YASAudioPCMBuffer *outBuffer, YASAudioTime *when);
+typedef void (^YASAudioNodeRenderBlock)(YASAudioPCMBuffer *buffer, NSNumber *bus, YASAudioTime *when, id nodeCore);
+typedef void (^YASAudioOfflineRenderCallbackBlock)(YASAudioPCMBuffer *buffer, YASAudioTime *when, BOOL *stop);
+typedef void (^YASAudioOfflineRenderCompletionBlock)(BOOL cancelled);
 
 #endif

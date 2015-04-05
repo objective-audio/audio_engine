@@ -10,7 +10,7 @@
 @class YASAudioUnit;
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
-@class YASAudioDeviceIO, YASAudioDevice;
+@class YASAudioDeviceIO;
 #endif
 
 @interface YASAudioGraph : YASWeakProvider
@@ -21,7 +21,7 @@
 - (void)removeAudioUnit:(YASAudioUnit *)unit;
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
-- (YASAudioDeviceIO *)addAudioDeviceIOWithAudioDevice:(YASAudioDevice *)audioDevice;
+- (void)addAudioDeviceIO:(YASAudioDeviceIO *)audioDeviceIO;
 - (void)removeAudioDeviceIO:(YASAudioDeviceIO *)audioDeviceIO;
 #endif
 

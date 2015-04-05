@@ -1,15 +1,15 @@
 //
-//  YASAudioGraphViewController.m
+//  YASAudioGraphSampleViewController.m
 //  Copyright (c) 2015 Yuki Yasoshima.
 //
 
-#import "YASAudioGraphViewController.h"
+#import "YASAudioGraphSampleViewController.h"
 #import "YASAudio.h"
 #import <AVFoundation/AVFoundation.h>
 
-@interface YASAudioGraphViewController ()
+@interface YASAudioGraphSampleViewController ()
 
-@property (nonatomic, assign) IBOutlet UISlider *slider;
+@property (nonatomic, strong) IBOutlet UISlider *slider;
 
 @property (nonatomic, strong) YASAudioGraph *audioGraph;
 @property (nonatomic, strong) YASAudioUnit *ioUnit;
@@ -17,17 +17,19 @@
 
 @end
 
-@implementation YASAudioGraphViewController
+@implementation YASAudioGraphSampleViewController
 
 - (void)dealloc
 {
     YASRelease(_audioGraph);
     YASRelease(_ioUnit);
     YASRelease(_mixerUnit);
+    YASRelease(_slider);
 
     _audioGraph = nil;
     _ioUnit = nil;
     _mixerUnit = nil;
+    _slider = nil;
 
     YASSuperDealloc;
 }
@@ -59,13 +61,16 @@
     self.audioGraph = audioGraph;
     YASRelease(audioGraph);
 
-    self.ioUnit = [audioGraph addAudioUnitWithType:kAudioUnitType_Output
-                                           subType:YASAudioUnitSubType_DefaultIO
-                                      prepareBlock:^(YASAudioUnit *audioUnit) {
-                                        [audioUnit setEnableInput:YES];
-                                        [audioUnit setEnableOutput:YES];
-                                        [audioUnit setMaximumFramesPerSlice:4096];
-                                      }];
+    YASAudioUnit *ioUnit =
+        [[YASAudioUnit alloc] initWithType:kAudioUnitType_Output subType:YASAudioUnitSubType_DefaultIO];
+    self.ioUnit = ioUnit;
+    YASRelease(ioUnit);
+
+    [ioUnit setEnableInput:YES];
+    [ioUnit setEnableOutput:YES];
+    [ioUnit setMaximumFramesPerSlice:4096];
+
+    [audioGraph addAudioUnit:ioUnit];
 
     [self.ioUnit setRenderCallback:0];
     [self.ioUnit setInputFormat:format.streamDescription busNumber:0];
@@ -73,11 +78,14 @@
 
     YASWeakContainer *ioContainer = self.ioUnit.weakContainer;
 
-    self.mixerUnit = [audioGraph addAudioUnitWithType:kAudioUnitType_Mixer
-                                              subType:kAudioUnitSubType_MultiChannelMixer
-                                         prepareBlock:^(YASAudioUnit *audioUnit) {
-                                           [audioUnit setMaximumFramesPerSlice:4096];
-                                         }];
+    YASAudioUnit *mixerUnit =
+        [[YASAudioUnit alloc] initWithType:kAudioUnitType_Mixer subType:kAudioUnitSubType_MultiChannelMixer];
+    self.mixerUnit = mixerUnit;
+    YASRelease(mixerUnit);
+
+    [mixerUnit setMaximumFramesPerSlice:4096];
+
+    [audioGraph addAudioUnit:mixerUnit];
 
     [self.mixerUnit setRenderCallback:0];
     [self.mixerUnit setElementCount:1 scope:kAudioUnitScope_Input];
@@ -87,16 +95,16 @@
     YASWeakContainer *mixerContainer = self.mixerUnit.weakContainer;
 
     self.ioUnit.renderCallbackBlock = ^(YASAudioUnitRenderParameters *renderParameters) {
-      YASAudioUnit *mixerUnit = mixerContainer.retainedObject;
-      [mixerUnit audioUnitRender:renderParameters];
-      YASRelease(mixerUnit);
+        YASAudioUnit *mixerUnit = [mixerContainer retainedObject];
+        [mixerUnit audioUnitRender:renderParameters];
+        YASRelease(mixerUnit);
     };
 
     self.mixerUnit.renderCallbackBlock = ^(YASAudioUnitRenderParameters *renderParameters) {
-      renderParameters->inBusNumber = 1;
-      YASAudioUnit *ioUnit = ioContainer.retainedObject;
-      [ioUnit audioUnitRender:renderParameters];
-      YASRelease(ioUnit);
+        renderParameters->inBusNumber = 1;
+        YASAudioUnit *ioUnit = [ioContainer retainedObject];
+        [ioUnit audioUnitRender:renderParameters];
+        YASRelease(ioUnit);
     };
 
     audioGraph.running = YES;

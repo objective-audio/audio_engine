@@ -6,6 +6,11 @@
 #import <XCTest/XCTest.h>
 #import "YASAudio.h"
 
+static UInt32 TestValue(UInt32 frame, UInt32 ch, UInt32 buf)
+{
+    return frame + 1024 * (ch + 1) + 512 * (buf + 1);
+}
+
 @interface YASAudioPCMBufferTests : XCTestCase
 
 @end
@@ -574,6 +579,124 @@
     YASRelease(sourceBuffer);
 }
 
+- (void)testCopyObject
+{
+    const UInt32 frameLength = 4;
+
+    YASAudioFormat *format = [[YASAudioFormat alloc] initStandardFormatWithSampleRate:48000 channels:2];
+
+    YASAudioPCMBuffer *sourceBuffer = [[YASAudioPCMBuffer alloc] initWithPCMFormat:format frameCapacity:frameLength];
+    [self _fillDataToBuffer:sourceBuffer];
+
+    YASAudioPCMBuffer *destBuffer = [sourceBuffer copy];
+
+    XCTAssertNotEqualObjects(sourceBuffer, destBuffer);
+    XCTAssertTrue([self _compareBufferFlexiblyWithBuffer:sourceBuffer otherBuffer:destBuffer]);
+
+    YASRelease(destBuffer);
+    YASRelease(sourceBuffer);
+    YASRelease(format);
+}
+
+#if (!TARGET_OS_IPHONE && TARGET_OS_MAC)
+
+- (void)testInitWithOutputChannelRoutes
+{
+    const UInt32 frameLength = 4;
+    const UInt32 sourceChannels = 2;
+    const UInt32 destChannels = 4;
+    const UInt32 bus = 0;
+    const UInt32 sampleRate = 48000;
+    const UInt32 destChannelIndices[2] = {3, 0};
+
+    YASAudioFormat *destFormat =
+        [[YASAudioFormat alloc] initStandardFormatWithSampleRate:sampleRate channels:destChannels];
+    YASAudioPCMBuffer *destBuffer = [[YASAudioPCMBuffer alloc] initWithPCMFormat:destFormat frameCapacity:frameLength];
+    [self _fillDataToBuffer:destBuffer];
+    YASRelease(destFormat);
+
+    NSMutableArray *channelRoutes = [[NSMutableArray alloc] initWithCapacity:2];
+    for (UInt32 i = 0; i < sourceChannels; i++) {
+        YASAudioChannelRoute *channelRoute = [[YASAudioChannelRoute alloc] initWithSourceBus:bus
+                                                                               sourceChannel:i
+                                                                              destinationBus:bus
+                                                                          destinationChannel:destChannelIndices[i]];
+        [channelRoutes addObject:channelRoute];
+        YASRelease(channelRoute);
+    }
+
+    YASAudioFormat *sourceFormat =
+        [[YASAudioFormat alloc] initStandardFormatWithSampleRate:sampleRate channels:sourceChannels];
+    YASAudioPCMBuffer *sourceBuffer =
+        [[YASAudioPCMBuffer alloc] initWithPCMFormat:sourceFormat buffer:destBuffer outputChannelRoutes:channelRoutes];
+    YASRelease(sourceFormat);
+    YASRelease(channelRoutes);
+
+    for (UInt32 ch = 0; ch < sourceChannels; ch++) {
+        Float32 *destPtr = [destBuffer float32DataAtBufferIndex:destChannelIndices[ch]];
+        Float32 *sourcePtr = [sourceBuffer float32DataAtBufferIndex:ch];
+        XCTAssertEqual(destPtr, sourcePtr);
+        for (UInt32 frame = 0; frame < frameLength; frame++) {
+            Float32 value = sourcePtr[frame];
+            Float32 testValue = TestValue(frame, 0, destChannelIndices[ch]);
+            XCTAssertEqual(value, testValue);
+        }
+    }
+
+    YASRelease(destBuffer);
+    YASRelease(sourceBuffer);
+}
+
+- (void)testInitWithInputChannelRoutes
+{
+    const UInt32 frameLength = 4;
+    const UInt32 sourceChannels = 4;
+    const UInt32 destChannels = 2;
+    const UInt32 bus = 0;
+    const UInt32 sampleRate = 48000;
+    const UInt32 sourceChannelIndices[2] = {2, 1};
+
+    YASAudioFormat *sourceFormat =
+        [[YASAudioFormat alloc] initStandardFormatWithSampleRate:sampleRate channels:sourceChannels];
+    YASAudioPCMBuffer *sourceBuffer =
+        [[YASAudioPCMBuffer alloc] initWithPCMFormat:sourceFormat frameCapacity:frameLength];
+    [self _fillDataToBuffer:sourceBuffer];
+    YASRelease(sourceFormat);
+
+    NSMutableArray *channelRoutes = [[NSMutableArray alloc] initWithCapacity:2];
+    for (UInt32 i = 0; i < destChannels; i++) {
+        YASAudioChannelRoute *channelRoute = [[YASAudioChannelRoute alloc] initWithSourceBus:bus
+                                                                               sourceChannel:sourceChannelIndices[i]
+                                                                              destinationBus:bus
+                                                                          destinationChannel:i];
+        [channelRoutes addObject:channelRoute];
+        YASRelease(channelRoute);
+    }
+
+    YASAudioFormat *destFormat =
+        [[YASAudioFormat alloc] initStandardFormatWithSampleRate:sampleRate channels:destChannels];
+    YASAudioPCMBuffer *destBuffer =
+        [[YASAudioPCMBuffer alloc] initWithPCMFormat:destFormat buffer:sourceBuffer inputChannelRoutes:channelRoutes];
+    YASRelease(destFormat);
+    YASRelease(channelRoutes);
+
+    for (UInt32 ch = 0; ch < destChannels; ch++) {
+        Float32 *destPtr = [destBuffer float32DataAtBufferIndex:ch];
+        Float32 *sourcePtr = [sourceBuffer float32DataAtBufferIndex:sourceChannelIndices[ch]];
+        XCTAssertEqual(destPtr, sourcePtr);
+        for (UInt32 frame = 0; frame < frameLength; frame++) {
+            Float32 value = destPtr[frame];
+            Float32 testValue = TestValue(frame, 0, sourceChannelIndices[ch]);
+            XCTAssertEqual(value, testValue);
+        }
+    }
+
+    YASRelease(destBuffer);
+    YASRelease(sourceBuffer);
+}
+
+#endif
+
 #pragma mark -
 
 - (void)_fillDataToBuffer:(YASAudioPCMBuffer *)buffer
@@ -584,7 +707,7 @@
         for (UInt32 frame = 0; frame < buffer.frameLength; frame++) {
             for (UInt32 ch = 0; ch < buffer.stride; ch++) {
                 UInt32 index = frame * buffer.stride + ch;
-                UInt32 value = frame + 1024 * (ch + 1);
+                UInt32 value = TestValue(frame, ch, buf);
                 switch (bitDepthFormat) {
                     case YASAudioBitDepthFormatFloat32: {
                         Float32 *ptr = [buffer float32DataAtBufferIndex:buf];

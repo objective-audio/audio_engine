@@ -5,11 +5,10 @@
 
 #import "YASAudioUnit.h"
 #import "YASAudioGraph.h"
-#import "YASAudioUnitParameterInfo.h"
+#import "YASAudioUnitParameter.h"
 #import "YASMacros.h"
 #import "YASAudioUtility.h"
 #import "NSException+YASAudio.h"
-#import <AVFoundation/AVFoundation.h>
 
 #if TARGET_OS_IPHONE
 OSType const YASAudioUnitSubType_DefaultIO = kAudioUnitSubType_RemoteIO;
@@ -96,9 +95,6 @@ static OSStatus InputRenderCallback(void *inRefCon, AudioUnitRenderActionFlags *
     return CommonRenderCallback(inRefCon, ioActionFlags, inTimeStamp, inBusNumber, inNumberFrames, ioData,
                                 YASAudioUnitRenderTypeInput);
 }
-
-#pragma mark -
-#pragma mark - YASAudioUnitParameterInfo
 
 #pragma mark -
 #pragma mark - YASAudioUnit
@@ -340,7 +336,7 @@ static OSStatus InputRenderCallback(void *inRefCon, AudioUnitRenderActionFlags *
     return result;
 }
 
-- (NSArray *)getParameterInfosWithScope:(const AudioUnitScope)scope
+- (NSDictionary *)getParameterInfosWithScope:(const AudioUnitScope)scope
 {
     NSData *propertyData = [self propertyDataWithPropertyID:kAudioUnitProperty_ParameterList scope:scope element:0];
 
@@ -348,21 +344,23 @@ static OSStatus InputRenderCallback(void *inRefCon, AudioUnitRenderActionFlags *
         NSInteger count = propertyData.length / sizeof(AudioUnitParameterID);
         if (count > 0) {
             const AudioUnitParameterID *ids = propertyData.bytes;
-            NSMutableArray *infos = [NSMutableArray arrayWithCapacity:count];
+            NSMutableDictionary *infos = [[NSMutableDictionary alloc] initWithCapacity:count];
             for (NSInteger i = 0; i < count; i++) {
-                YASAudioUnitParameterInfo *info = [self parameterInfo:ids[i] scope:scope];
+                YASAudioUnitParameter *info = [self parameterInfo:ids[i] scope:scope];
                 if (info) {
-                    [infos addObject:info];
+                    infos[@(info.parameterID)] = info;
                 }
             }
-            return infos;
+            NSDictionary *resultInfos = YASAutorelease([infos copy]);
+            YASRelease(infos);
+            return resultInfos;
         }
     }
 
     return nil;
 }
 
-- (YASAudioUnitParameterInfo *)parameterInfo:(const AudioUnitParameterID)parameterID scope:(const AudioUnitScope)scope
+- (YASAudioUnitParameter *)parameterInfo:(const AudioUnitParameterID)parameterID scope:(const AudioUnitScope)scope
 {
     AudioUnitParameterInfo info = {0};
     UInt32 size = sizeof(AudioUnitParameterInfo);
@@ -374,8 +372,8 @@ static OSStatus InputRenderCallback(void *inRefCon, AudioUnitRenderActionFlags *
         return nil;
     }
 
-    YASAudioUnitParameterInfo *parameterInfo =
-        [[YASAudioUnitParameterInfo alloc] initWithAudioUnitParameterInfo:&info parameterID:parameterID scope:scope];
+    YASAudioUnitParameter *parameterInfo =
+        [[YASAudioUnitParameter alloc] initWithAudioUnitParameterInfo:&info parameterID:parameterID scope:scope];
 
     if (info.flags & kAudioUnitParameterFlag_CFNameRelease) {
         if (info.flags & kAudioUnitParameterFlag_HasCFNameString && info.cfNameString != NULL) {

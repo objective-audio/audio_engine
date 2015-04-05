@@ -17,6 +17,14 @@ typedef NS_ENUM(NSInteger, YASAudioFileErrorCode) {
     YASAudioFileErrorCodeWriteFailed,
     YASAudioFileErrorCodeTellFailed,
     YASAudioFileErrorCodeArgumentIsNil,
+
+    YASAudioEngineErrorCodeAlreadyRunning = 2000,
+    YASAudioEngineErrorCodePrepareFailure,
+
+    YASAudioOfflineOutputErrorCodeAlreadyRunning = 3000,
+    YASAudioOfflineOutputErrorCodeConnectionIsNil,
+    YASAudioOfflineOutputErrorCodeCancelled,
+    YASAudioOfflineOutputErrorCodeInvalidConnectionFormat,
 };
 
 @interface NSError (YASAudio)

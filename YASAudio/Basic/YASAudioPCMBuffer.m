@@ -9,6 +9,10 @@
 #import "YASMacros.h"
 #import "NSException+YASAudio.h"
 
+#if (!TARGET_OS_IPHONE && TARGET_OS_MAC)
+#import "YASAudioChannelRoute.h"
+#endif
+
 typedef NS_ENUM(NSUInteger, YASAudioPCMBufferFreeType) {
     YASAudioPCMBufferFreeTypeNone,
     YASAudioPCMBufferFreeTypeFull,
@@ -59,6 +63,71 @@ typedef NS_ENUM(NSUInteger, YASAudioPCMBufferFreeType) {
     }
     return self;
 }
+
+#if (!TARGET_OS_IPHONE && TARGET_OS_MAC)
+
+- (instancetype)initWithPCMFormat:(YASAudioFormat *)format
+                           buffer:(YASAudioPCMBuffer *)buffer
+              outputChannelRoutes:(NSArray *)channelRoutes
+{
+    return [self _initWithPCMFormat:format buffer:buffer channelRoutes:channelRoutes isOutput:YES];
+}
+
+- (instancetype)initWithPCMFormat:(YASAudioFormat *)format
+                           buffer:(YASAudioPCMBuffer *)buffer
+               inputChannelRoutes:(NSArray *)channelRoutes
+{
+    return [self _initWithPCMFormat:format buffer:buffer channelRoutes:channelRoutes isOutput:NO];
+}
+
+- (instancetype)_initWithPCMFormat:(YASAudioFormat *)format
+                            buffer:(YASAudioPCMBuffer *)buffer
+                     channelRoutes:(NSArray *)channelRoutes
+                          isOutput:(BOOL)isOutput
+{
+    self = [super init];
+    if (self) {
+        if (!format || !buffer || !channelRoutes) {
+            YASRaiseWithReason(([NSString stringWithFormat:@"%s - Argument is nil.", __PRETTY_FUNCTION__]));
+            YASRelease(self);
+            return nil;
+        }
+
+        if (format.channelCount != channelRoutes.count || format.isInterleaved) {
+            YASRaiseWithReason(([NSString stringWithFormat:@"%s - Invalid format.", __PRETTY_FUNCTION__]));
+            YASRelease(self);
+            return nil;
+        }
+
+        _freeType = YASAudioPCMBufferFreeTypeWithoutData;
+        _audioBufferList = YASAudioAllocateAudioBufferListWithoutData(format.bufferCount, format.stride);
+        self.format = format;
+
+        const AudioBufferList *audioBufferList = buffer.audioBufferList;
+        UInt32 bytesPerFrame = format.streamDescription->mBytesPerFrame;
+        UInt32 frameCapacity = 0;
+
+        for (UInt32 i = 0; i < format.channelCount; i++) {
+            YASAudioChannelRoute *route = channelRoutes[i];
+            UInt32 fromChannel = isOutput ? route.destinationChannel : route.sourceChannel;
+            UInt32 toChannel = isOutput ? route.sourceChannel : route.destinationChannel;
+            _audioBufferList->mBuffers[toChannel].mData = audioBufferList->mBuffers[fromChannel].mData;
+            _audioBufferList->mBuffers[toChannel].mDataByteSize = audioBufferList->mBuffers[fromChannel].mDataByteSize;
+            UInt32 frameLength = audioBufferList->mBuffers[0].mDataByteSize / bytesPerFrame;
+            if (frameCapacity == 0) {
+                frameCapacity = frameLength;
+            } else if (frameCapacity != frameLength) {
+                YASRaiseWithReason(([NSString stringWithFormat:@"%s - Invalid frame length.", __PRETTY_FUNCTION__]));
+            }
+        }
+
+        _frameCapacity = frameCapacity;
+        _frameLength = frameCapacity;
+    }
+    return self;
+}
+
+#endif
 
 - (id)copyWithZone:(NSZone *)zone
 {
