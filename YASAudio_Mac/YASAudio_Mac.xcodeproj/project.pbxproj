@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		B60EFF6F1AC8395E00AA70DD /* YASAudioTime.m in Sources */ = {isa = PBXBuildFile; fileRef = B60EFF6E1AC8395E00AA70DD /* YASAudioTime.m */; };
 		B62ED55C1A62812F007DDE96 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = B62ED55B1A62812F007DDE96 /* AppDelegate.m */; };
 		B62ED55E1A62812F007DDE96 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = B62ED55D1A62812F007DDE96 /* main.m */; };
 		B62ED5631A62812F007DDE96 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B62ED5621A62812F007DDE96 /* Images.xcassets */; };
@@ -36,6 +37,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		B60EFF6D1AC8395E00AA70DD /* YASAudioTime.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YASAudioTime.h; sourceTree = "<group>"; };
+		B60EFF6E1AC8395E00AA70DD /* YASAudioTime.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YASAudioTime.m; sourceTree = "<group>"; };
 		B62ED5551A62812F007DDE96 /* YASAudio_Mac.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = YASAudio_Mac.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B62ED5591A62812F007DDE96 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B62ED55A1A62812F007DDE96 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -165,6 +168,8 @@
 		B65BAA4C1A636A5200E7C3D8 /* Basic */ = {
 			isa = PBXGroup;
 			children = (
+				B60EFF6D1AC8395E00AA70DD /* YASAudioTime.h */,
+				B60EFF6E1AC8395E00AA70DD /* YASAudioTime.m */,
 				B65BAA591A636A5200E7C3D8 /* YASAudioFile.h */,
 				B65BAA5A1A636A5200E7C3D8 /* YASAudioFile.m */,
 				B65BAA5B1A636A5200E7C3D8 /* YASAudioFormat.h */,
@@ -316,6 +321,7 @@
 			files = (
 				B6AB1C371A90785E0054349E /* YASAudioDeviceIO.m in Sources */,
 				B65BAA6D1A636A5200E7C3D8 /* YASAudioFile.m in Sources */,
+				B60EFF6F1AC8395E00AA70DD /* YASAudioTime.m in Sources */,
 				B6AB1C381A90785E0054349E /* YASAudioDeviceStream.m in Sources */,
 				B6841A901AAABD330035C704 /* YASDecibelValueTransformer.m in Sources */,
 				B65BAA681A636A5200E7C3D8 /* NSDictionary+YASAudio.m in Sources */,
