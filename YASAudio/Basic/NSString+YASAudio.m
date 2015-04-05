@@ -51,6 +51,86 @@
 #endif
 }
 
++ (NSString *)yas_stringWithAudioUnitScope:(AudioUnitScope)scope
+{
+    switch (scope) {
+        case kAudioUnitScope_Global:
+            return @"Global";
+        case kAudioUnitScope_Input:
+            return @"Input";
+        case kAudioUnitScope_Output:
+            return @"Output";
+        case kAudioUnitScope_Group:
+            return @"Group";
+        case kAudioUnitScope_Part:
+            return @"Part";
+        case kAudioUnitScope_Note:
+            return @"Note";
+        case kAudioUnitScope_Layer:
+            return @"Layer";
+        case kAudioUnitScope_LayerItem:
+            return @"LayerItem";
+    }
+    return nil;
+}
+
++ (NSString *)yas_stringWithAudioUnitParameterUnit:(AudioUnitParameterUnit)parameterUnit
+{
+    switch (parameterUnit) {
+        case kAudioUnitParameterUnit_Generic:
+            return @"Generic";
+        case kAudioUnitParameterUnit_Indexed:
+            return @"Indexed";
+        case kAudioUnitParameterUnit_Boolean:
+            return @"Boolean";
+        case kAudioUnitParameterUnit_Percent:
+            return @"Percent";
+        case kAudioUnitParameterUnit_Seconds:
+            return @"Seconds";
+        case kAudioUnitParameterUnit_SampleFrames:
+            return @"SampleFrames";
+        case kAudioUnitParameterUnit_Phase:
+            return @"Phase";
+        case kAudioUnitParameterUnit_Rate:
+            return @"Rate";
+        case kAudioUnitParameterUnit_Hertz:
+            return @"Hertz";
+        case kAudioUnitParameterUnit_Cents:
+            return @"Cents";
+        case kAudioUnitParameterUnit_RelativeSemiTones:
+            return @"RelativeSemiTones";
+        case kAudioUnitParameterUnit_MIDINoteNumber:
+            return @"MIDINoteNumber";
+        case kAudioUnitParameterUnit_MIDIController:
+            return @"MIDIController";
+        case kAudioUnitParameterUnit_Decibels:
+            return @"Decibels";
+        case kAudioUnitParameterUnit_LinearGain:
+            return @"LinearGain";
+        case kAudioUnitParameterUnit_Degrees:
+            return @"Degrees";
+        case kAudioUnitParameterUnit_EqualPowerCrossfade:
+            return @"EqualPowerCrossfade";
+        case kAudioUnitParameterUnit_MixerFaderCurve1:
+            return @"MixerFaderCurve1";
+        case kAudioUnitParameterUnit_Meters:
+            return @"Meters";
+        case kAudioUnitParameterUnit_AbsoluteCents:
+            return @"AbsoluteCents";
+        case kAudioUnitParameterUnit_Octaves:
+            return @"Octaves";
+        case kAudioUnitParameterUnit_BPM:
+            return @"BPM";
+        case kAudioUnitParameterUnit_Milliseconds:
+            return @"Milliseconds";
+        case kAudioUnitParameterUnit_Ratio:
+            return @"Ratio";
+        case kAudioUnitParameterUnit_CustomUnit:
+            return @"CustomUnit";
+    }
+    return nil;
+}
+
 - (NSString *)stringByAppendingLinePrefix:(NSString *)prefix
 {
     NSArray *lines = [self componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]];
