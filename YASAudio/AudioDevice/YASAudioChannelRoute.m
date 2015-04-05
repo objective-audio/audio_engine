@@ -44,6 +44,14 @@ NSString *const YASAudioDestinationChannelKey = @"destinationChannel";
     return self;
 }
 
+- (NSString *)description
+{
+    return
+        [NSString stringWithFormat:@"<%@: %p> sourceBus=%@, sourceChannel=%@, destinationBus=%@, destinationChannel=%@",
+                                   self.class, self, @(_sourceBus), @(_sourceChannel), @(_destinationBus),
+                                   @(_destinationChannel)];
+}
+
 + (NSArray *)defaultChannelRoutesWithBus:(UInt32)bus format:(YASAudioFormat *)format
 {
     if (!format) {
