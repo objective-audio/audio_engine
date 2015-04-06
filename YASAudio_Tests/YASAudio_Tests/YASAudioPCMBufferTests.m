@@ -1132,7 +1132,7 @@ static UInt32 TestValue(UInt32 frame, UInt32 ch, UInt32 buf)
     for (UInt32 frame = 0; frame < frameLength; frame++) {
         for (UInt32 bufferIndex = 0; bufferIndex < channels; bufferIndex++) {
             UInt32 testValue = TestValue(frame, 0, bufferIndex);
-            [buffer setValue:testValue / INT16_MAX atBufferIndex:bufferIndex channel:0 frame:frame];
+            [buffer setValue:(Float64)testValue / INT16_MAX atBufferIndex:bufferIndex channel:0 frame:frame];
             XCTAssertEqual((UInt32)([buffer valueAtBufferIndex:bufferIndex channel:0 frame:frame] * INT16_MAX),
                            testValue);
         }
@@ -1156,7 +1156,7 @@ static UInt32 TestValue(UInt32 frame, UInt32 ch, UInt32 buf)
     for (UInt32 frame = 0; frame < frameLength; frame++) {
         for (UInt32 bufferIndex = 0; bufferIndex < channels; bufferIndex++) {
             UInt32 testValue = TestValue(frame, 0, bufferIndex);
-            [buffer setValue:testValue / INT32_MAX atBufferIndex:bufferIndex channel:0 frame:frame];
+            [buffer setValue:(Float64)testValue / INT32_MAX atBufferIndex:bufferIndex channel:0 frame:frame];
             XCTAssertEqual((UInt32)([buffer valueAtBufferIndex:bufferIndex channel:0 frame:frame] * INT32_MAX),
                            testValue);
         }
