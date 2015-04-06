@@ -196,24 +196,9 @@ typedef NS_ENUM(NSUInteger, YASAudioPCMBufferFreeType) {
     return self.audioBufferList->mBuffers[0].mNumberChannels;
 }
 
-- (Float32 *)float32DataAtBufferIndex:(NSUInteger)index
+- (void *)dataAtBufferIndex:(NSUInteger)index
 {
-    return [self _dataWithBitDepthFormat:YASAudioBitDepthFormatFloat32 atBufferIndex:index];
-}
-
-- (Float64 *)float64DataAtBufferIndex:(NSUInteger)index
-{
-    return [self _dataWithBitDepthFormat:YASAudioBitDepthFormatFloat64 atBufferIndex:index];
-}
-
-- (SInt16 *)int16DataAtBufferIndex:(NSUInteger)index
-{
-    return [self _dataWithBitDepthFormat:YASAudioBitDepthFormatInt16 atBufferIndex:index];
-}
-
-- (SInt32 *)int32DataAtBufferIndex:(NSUInteger)index
-{
-    return [self _dataWithBitDepthFormat:YASAudioBitDepthFormatInt32 atBufferIndex:index];
+    return [self _dataWithBitDepthFormat:self.format.bitDepthFormat atBufferIndex:index];
 }
 
 - (Float64)valueAtBufferIndex:(UInt32)bufferIndex channel:(UInt32)channel frame:(UInt32)frame
@@ -292,7 +277,7 @@ typedef NS_ENUM(NSUInteger, YASAudioPCMBufferFreeType) {
     }
 }
 
-- (void)readData:(YASAudioPCMBufferReadBlock)readBlock
+- (void)readDataUsingBlock:(YASAudioPCMBufferReadBlock)readBlock
 {
     if (!readBlock) {
         YASRaiseWithReason(([NSString stringWithFormat:@"%s - Argument is nil.", __PRETTY_FUNCTION__]));
@@ -305,7 +290,7 @@ typedef NS_ENUM(NSUInteger, YASAudioPCMBufferFreeType) {
     }
 }
 
-- (void)writeData:(YASAudioPCMBufferWriteBlock)writeBlock
+- (void)writeDataUsingBlock:(YASAudioPCMBufferWriteBlock)writeBlock
 {
     if (!writeBlock) {
         YASRaiseWithReason(([NSString stringWithFormat:@"%s - Argument is nil.", __PRETTY_FUNCTION__]));
@@ -330,7 +315,7 @@ typedef NS_ENUM(NSUInteger, YASAudioPCMBufferFreeType) {
     return self.audioBufferList->mBuffers[index].mData;
 }
 
-- (void)enumerateReadValue:(YASAudioPCMBufferReadValueBlock)readValueBlock
+- (void)enumerateReadValuesUsingBlock:(YASAudioPCMBufferReadValueBlock)readValueBlock
 {
     if (!readValueBlock) {
         YASRaiseWithReason(([NSString stringWithFormat:@"%s - Argument is nil.", __PRETTY_FUNCTION__]));
@@ -378,7 +363,7 @@ typedef NS_ENUM(NSUInteger, YASAudioPCMBufferFreeType) {
     }
 }
 
-- (void)enumerateWriteValue:(YASAudioPCMBufferWriteValueBlock)writeValueBlock
+- (void)enumerateWriteValuesUsingBlock:(YASAudioPCMBufferWriteValueBlock)writeValueBlock
 {
     if (!writeValueBlock) {
         YASRaiseWithReason(([NSString stringWithFormat:@"%s - Argument is nil.", __PRETTY_FUNCTION__]));

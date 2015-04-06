@@ -34,12 +34,9 @@ static UInt32 TestValue(UInt32 frame, UInt32 ch, UInt32 buf)
 
     XCTAssertNotNil(buffer);
     XCTAssertEqualObjects(buffer.format, format);
-    XCTAssert([buffer float32DataAtBufferIndex:0]);
-    XCTAssert([buffer float32DataAtBufferIndex:1]);
-    XCTAssertThrows([buffer float32DataAtBufferIndex:2]);
-    XCTAssertThrows([buffer float64DataAtBufferIndex:0]);
-    XCTAssertThrows([buffer int16DataAtBufferIndex:0]);
-    XCTAssertThrows([buffer int32DataAtBufferIndex:0]);
+    XCTAssert([buffer dataAtBufferIndex:0]);
+    XCTAssert([buffer dataAtBufferIndex:1]);
+    XCTAssertThrows([buffer dataAtBufferIndex:2]);
 
     YASRelease(format);
     YASRelease(buffer);
@@ -53,11 +50,8 @@ static UInt32 TestValue(UInt32 frame, UInt32 ch, UInt32 buf)
                                                                 interleaved:YES];
     YASAudioPCMBuffer *buffer = [[YASAudioPCMBuffer alloc] initWithPCMFormat:format frameCapacity:4];
 
-    XCTAssert([buffer float32DataAtBufferIndex:0]);
-    XCTAssertThrows([buffer float32DataAtBufferIndex:1]);
-    XCTAssertThrows([buffer float64DataAtBufferIndex:0]);
-    XCTAssertThrows([buffer int16DataAtBufferIndex:0]);
-    XCTAssertThrows([buffer int32DataAtBufferIndex:0]);
+    XCTAssert([buffer dataAtBufferIndex:0]);
+    XCTAssertThrows([buffer dataAtBufferIndex:1]);
 
     YASRelease(format);
     YASRelease(buffer);
@@ -71,11 +65,8 @@ static UInt32 TestValue(UInt32 frame, UInt32 ch, UInt32 buf)
                                                                 interleaved:NO];
     YASAudioPCMBuffer *buffer = [[YASAudioPCMBuffer alloc] initWithPCMFormat:format frameCapacity:4];
 
-    XCTAssert([buffer float64DataAtBufferIndex:0]);
-    XCTAssertThrows([buffer float64DataAtBufferIndex:2]);
-    XCTAssertThrows([buffer float32DataAtBufferIndex:0]);
-    XCTAssertThrows([buffer int16DataAtBufferIndex:0]);
-    XCTAssertThrows([buffer int32DataAtBufferIndex:0]);
+    XCTAssert([buffer dataAtBufferIndex:0]);
+    XCTAssertThrows([buffer dataAtBufferIndex:2]);
 
     YASRelease(format);
     YASRelease(buffer);
@@ -89,11 +80,8 @@ static UInt32 TestValue(UInt32 frame, UInt32 ch, UInt32 buf)
                                                                 interleaved:YES];
     YASAudioPCMBuffer *buffer = [[YASAudioPCMBuffer alloc] initWithPCMFormat:format frameCapacity:4];
 
-    XCTAssert([buffer int32DataAtBufferIndex:0]);
-    XCTAssertThrows([buffer int32DataAtBufferIndex:3]);
-    XCTAssertThrows([buffer int16DataAtBufferIndex:0]);
-    XCTAssertThrows([buffer float64DataAtBufferIndex:0]);
-    XCTAssertThrows([buffer float32DataAtBufferIndex:0]);
+    XCTAssert([buffer dataAtBufferIndex:0]);
+    XCTAssertThrows([buffer dataAtBufferIndex:3]);
 
     YASRelease(format);
     YASRelease(buffer);
@@ -107,11 +95,8 @@ static UInt32 TestValue(UInt32 frame, UInt32 ch, UInt32 buf)
                                                                 interleaved:NO];
     YASAudioPCMBuffer *buffer = [[YASAudioPCMBuffer alloc] initWithPCMFormat:format frameCapacity:4];
 
-    XCTAssert([buffer int16DataAtBufferIndex:0]);
-    XCTAssertThrows([buffer int16DataAtBufferIndex:4]);
-    XCTAssertThrows([buffer int32DataAtBufferIndex:0]);
-    XCTAssertThrows([buffer float64DataAtBufferIndex:0]);
-    XCTAssertThrows([buffer float32DataAtBufferIndex:0]);
+    XCTAssert([buffer dataAtBufferIndex:0]);
+    XCTAssertThrows([buffer dataAtBufferIndex:4]);
 
     YASRelease(format);
     YASRelease(buffer);
@@ -189,7 +174,7 @@ static UInt32 TestValue(UInt32 frame, UInt32 ch, UInt32 buf)
     [buffer clearDataWithStartFrame:1 length:2];
 
     for (UInt32 buf = 0; buf < buffer.bufferCount; buf++) {
-        Float32 *ptr = [buffer float32DataAtBufferIndex:buf];
+        Float32 *ptr = [buffer dataAtBufferIndex:buf];
         for (UInt32 frame = 0; frame < buffer.frameLength; frame++) {
             for (UInt32 ch = 0; ch < buffer.stride; ch++) {
                 if (frame == 1 || frame == 2) {
@@ -633,8 +618,8 @@ static UInt32 TestValue(UInt32 frame, UInt32 ch, UInt32 buf)
     YASRelease(channelRoutes);
 
     for (UInt32 ch = 0; ch < sourceChannels; ch++) {
-        Float32 *destPtr = [destBuffer float32DataAtBufferIndex:destChannelIndices[ch]];
-        Float32 *sourcePtr = [sourceBuffer float32DataAtBufferIndex:ch];
+        Float32 *destPtr = [destBuffer dataAtBufferIndex:destChannelIndices[ch]];
+        Float32 *sourcePtr = [sourceBuffer dataAtBufferIndex:ch];
         XCTAssertEqual(destPtr, sourcePtr);
         for (UInt32 frame = 0; frame < frameLength; frame++) {
             Float32 value = sourcePtr[frame];
@@ -681,8 +666,8 @@ static UInt32 TestValue(UInt32 frame, UInt32 ch, UInt32 buf)
     YASRelease(channelRoutes);
 
     for (UInt32 ch = 0; ch < destChannels; ch++) {
-        Float32 *destPtr = [destBuffer float32DataAtBufferIndex:ch];
-        Float32 *sourcePtr = [sourceBuffer float32DataAtBufferIndex:sourceChannelIndices[ch]];
+        Float32 *destPtr = [destBuffer dataAtBufferIndex:ch];
+        Float32 *sourcePtr = [sourceBuffer dataAtBufferIndex:sourceChannelIndices[ch]];
         XCTAssertEqual(destPtr, sourcePtr);
         for (UInt32 frame = 0; frame < frameLength; frame++) {
             Float32 value = destPtr[frame];
@@ -707,7 +692,7 @@ static UInt32 TestValue(UInt32 frame, UInt32 ch, UInt32 buf)
 
     __block UInt32 bufferCount = 0;
 
-    [buffer readData:^(const void *data, const UInt32 bufferIndex) {
+    [buffer readDataUsingBlock:^(const void *data, const UInt32 bufferIndex) {
         const Float32 *floatData = data;
         for (UInt32 i = 0; i < buffer.frameLength; i++) {
             XCTAssertEqual(floatData[i], TestValue(i, 0, bufferIndex));
@@ -729,7 +714,7 @@ static UInt32 TestValue(UInt32 frame, UInt32 ch, UInt32 buf)
 
     [self _fillDataToBuffer:fillBuffer];
 
-    [writeBuffer writeData:^(void *data, const UInt32 bufferIndex) {
+    [writeBuffer writeDataUsingBlock:^(void *data, const UInt32 bufferIndex) {
         Float32 *floatData = data;
         for (UInt32 i = 0; i < writeBuffer.frameLength; i++) {
             floatData[i] = TestValue(i, 0, bufferIndex);
@@ -759,7 +744,7 @@ static UInt32 TestValue(UInt32 frame, UInt32 ch, UInt32 buf)
 
     __block UInt32 count = 0;
 
-    [buffer enumerateReadValue:^(Float64 value, const UInt32 bufferIndex, const UInt32 channel, const UInt32 frame) {
+    [buffer enumerateReadValuesUsingBlock:^(Float64 value, const UInt32 bufferIndex, const UInt32 channel, const UInt32 frame) {
         XCTAssertEqual((Float32)value, (Float32)TestValue(frame, channel, bufferIndex));
         count++;
     }];
@@ -785,7 +770,7 @@ static UInt32 TestValue(UInt32 frame, UInt32 ch, UInt32 buf)
 
     __block UInt32 count = 0;
 
-    [buffer enumerateReadValue:^(Float64 value, const UInt32 bufferIndex, const UInt32 channel, const UInt32 frame) {
+    [buffer enumerateReadValuesUsingBlock:^(Float64 value, const UInt32 bufferIndex, const UInt32 channel, const UInt32 frame) {
         XCTAssertEqual(value, (Float64)TestValue(frame, channel, bufferIndex));
         count++;
     }];
@@ -811,7 +796,7 @@ static UInt32 TestValue(UInt32 frame, UInt32 ch, UInt32 buf)
 
     __block UInt32 count = 0;
 
-    [buffer enumerateReadValue:^(Float64 value, const UInt32 bufferIndex, const UInt32 channel, const UInt32 frame) {
+    [buffer enumerateReadValuesUsingBlock:^(Float64 value, const UInt32 bufferIndex, const UInt32 channel, const UInt32 frame) {
         XCTAssertEqual(value * INT16_MAX, TestValue(frame, channel, bufferIndex));
         count++;
     }];
@@ -837,7 +822,7 @@ static UInt32 TestValue(UInt32 frame, UInt32 ch, UInt32 buf)
 
     __block UInt32 count = 0;
 
-    [buffer enumerateReadValue:^(Float64 value, const UInt32 bufferIndex, const UInt32 channel, const UInt32 frame) {
+    [buffer enumerateReadValuesUsingBlock:^(Float64 value, const UInt32 bufferIndex, const UInt32 channel, const UInt32 frame) {
         XCTAssertEqual(value * INT32_MAX, TestValue(frame, channel, bufferIndex));
         count++;
     }];
@@ -861,7 +846,7 @@ static UInt32 TestValue(UInt32 frame, UInt32 ch, UInt32 buf)
 
     __block UInt32 count = 0;
 
-    [buffer enumerateWriteValue:^Float64(const UInt32 bufferIndex, const UInt32 channel, const UInt32 frame) {
+    [buffer enumerateWriteValuesUsingBlock:^Float64(const UInt32 bufferIndex, const UInt32 channel, const UInt32 frame) {
         count++;
         return TestValue(frame, channel, bufferIndex);
     }];
@@ -869,7 +854,7 @@ static UInt32 TestValue(UInt32 frame, UInt32 ch, UInt32 buf)
     XCTAssertEqual(count, frameLength * channels);
     count = 0;
 
-    [buffer enumerateReadValue:^(Float64 value, const UInt32 bufferIndex, const UInt32 channel, const UInt32 frame) {
+    [buffer enumerateReadValuesUsingBlock:^(Float64 value, const UInt32 bufferIndex, const UInt32 channel, const UInt32 frame) {
         XCTAssertEqual((UInt32)value, TestValue(frame, channel, bufferIndex));
         count++;
     }];
@@ -893,7 +878,7 @@ static UInt32 TestValue(UInt32 frame, UInt32 ch, UInt32 buf)
 
     __block UInt32 count = 0;
 
-    [buffer enumerateWriteValue:^Float64(const UInt32 bufferIndex, const UInt32 channel, const UInt32 frame) {
+    [buffer enumerateWriteValuesUsingBlock:^Float64(const UInt32 bufferIndex, const UInt32 channel, const UInt32 frame) {
         count++;
         return TestValue(frame, channel, bufferIndex);
     }];
@@ -901,7 +886,7 @@ static UInt32 TestValue(UInt32 frame, UInt32 ch, UInt32 buf)
     XCTAssertEqual(count, frameLength * channels);
     count = 0;
 
-    [buffer enumerateReadValue:^(Float64 value, const UInt32 bufferIndex, const UInt32 channel, const UInt32 frame) {
+    [buffer enumerateReadValuesUsingBlock:^(Float64 value, const UInt32 bufferIndex, const UInt32 channel, const UInt32 frame) {
         XCTAssertEqual((UInt32)value, TestValue(frame, channel, bufferIndex));
         count++;
     }];
@@ -925,7 +910,7 @@ static UInt32 TestValue(UInt32 frame, UInt32 ch, UInt32 buf)
 
     __block UInt32 count = 0;
 
-    [buffer enumerateWriteValue:^Float64(const UInt32 bufferIndex, const UInt32 channel, const UInt32 frame) {
+    [buffer enumerateWriteValuesUsingBlock:^Float64(const UInt32 bufferIndex, const UInt32 channel, const UInt32 frame) {
         count++;
         return (Float64)TestValue(frame, channel, bufferIndex) / INT16_MAX;
     }];
@@ -933,7 +918,7 @@ static UInt32 TestValue(UInt32 frame, UInt32 ch, UInt32 buf)
     XCTAssertEqual(count, frameLength * channels);
     count = 0;
 
-    [buffer enumerateReadValue:^(Float64 value, const UInt32 bufferIndex, const UInt32 channel, const UInt32 frame) {
+    [buffer enumerateReadValuesUsingBlock:^(Float64 value, const UInt32 bufferIndex, const UInt32 channel, const UInt32 frame) {
         XCTAssertEqual((UInt32)(value * INT16_MAX), TestValue(frame, channel, bufferIndex));
         count++;
     }];
@@ -957,7 +942,7 @@ static UInt32 TestValue(UInt32 frame, UInt32 ch, UInt32 buf)
 
     __block UInt32 count = 0;
 
-    [buffer enumerateWriteValue:^Float64(const UInt32 bufferIndex, const UInt32 channel, const UInt32 frame) {
+    [buffer enumerateWriteValuesUsingBlock:^Float64(const UInt32 bufferIndex, const UInt32 channel, const UInt32 frame) {
         count++;
         return (Float64)TestValue(frame, channel, bufferIndex) / INT32_MAX;
     }];
@@ -965,7 +950,7 @@ static UInt32 TestValue(UInt32 frame, UInt32 ch, UInt32 buf)
     XCTAssertEqual(count, frameLength * channels);
     count = 0;
 
-    [buffer enumerateReadValue:^(Float64 value, const UInt32 bufferIndex, const UInt32 channel, const UInt32 frame) {
+    [buffer enumerateReadValuesUsingBlock:^(Float64 value, const UInt32 bufferIndex, const UInt32 channel, const UInt32 frame) {
         XCTAssertEqual((UInt32)(value * INT32_MAX), TestValue(frame, channel, bufferIndex));
         count++;
     }];
@@ -1178,19 +1163,19 @@ static UInt32 TestValue(UInt32 frame, UInt32 ch, UInt32 buf)
                 UInt32 value = TestValue(frame, ch, buf);
                 switch (bitDepthFormat) {
                     case YASAudioBitDepthFormatFloat32: {
-                        Float32 *ptr = [buffer float32DataAtBufferIndex:buf];
+                        Float32 *ptr = [buffer dataAtBufferIndex:buf];
                         ptr[index] = value;
                     } break;
                     case YASAudioBitDepthFormatFloat64: {
-                        Float64 *ptr = [buffer float64DataAtBufferIndex:buf];
+                        Float64 *ptr = [buffer dataAtBufferIndex:buf];
                         ptr[index] = value;
                     } break;
                     case YASAudioBitDepthFormatInt16: {
-                        SInt16 *ptr = [buffer int16DataAtBufferIndex:buf];
+                        SInt16 *ptr = [buffer dataAtBufferIndex:buf];
                         ptr[index] = value;
                     } break;
                     case YASAudioBitDepthFormatInt32: {
-                        SInt32 *ptr = [buffer int32DataAtBufferIndex:buf];
+                        SInt32 *ptr = [buffer dataAtBufferIndex:buf];
                         ptr[index] = value;
                     } break;
                     default:
@@ -1211,25 +1196,25 @@ static UInt32 TestValue(UInt32 frame, UInt32 ch, UInt32 buf)
                 UInt32 index = frame * buffer.stride + ch;
                 switch (bitDepthFormat) {
                     case YASAudioBitDepthFormatFloat32: {
-                        Float32 *ptr = [buffer float32DataAtBufferIndex:buf];
+                        Float32 *ptr = [buffer dataAtBufferIndex:buf];
                         if (ptr[index] == 0) {
                             return NO;
                         }
                     } break;
                     case YASAudioBitDepthFormatFloat64: {
-                        Float64 *ptr = [buffer float64DataAtBufferIndex:buf];
+                        Float64 *ptr = [buffer dataAtBufferIndex:buf];
                         if (ptr[index] == 0) {
                             return NO;
                         }
                     } break;
                     case YASAudioBitDepthFormatInt16: {
-                        SInt16 *ptr = [buffer int16DataAtBufferIndex:buf];
+                        SInt16 *ptr = [buffer dataAtBufferIndex:buf];
                         if (ptr[index] == 0) {
                             return NO;
                         }
                     } break;
                     case YASAudioBitDepthFormatInt32: {
-                        SInt32 *ptr = [buffer int32DataAtBufferIndex:buf];
+                        SInt32 *ptr = [buffer dataAtBufferIndex:buf];
                         if (ptr[index] == 0) {
                             return NO;
                         }

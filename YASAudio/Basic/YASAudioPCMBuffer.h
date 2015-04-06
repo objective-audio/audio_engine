@@ -28,17 +28,16 @@ typedef Float64 (^YASAudioPCMBufferWriteValueBlock)(const UInt32 bufferIndex, co
 - (instancetype)init NS_UNAVAILABLE;
 - (instancetype)initWithPCMFormat:(YASAudioFormat *)format frameCapacity:(UInt32)frameCapacity;
 
+- (void *)dataAtBufferIndex:(NSUInteger)index;
+
 - (Float64)valueAtBufferIndex:(UInt32)bufferIndex channel:(UInt32)channel frame:(UInt32)frame;
 - (void)setValue:(Float64)value atBufferIndex:(UInt32)bufferIndex channel:(UInt32)channel frame:(UInt32)frame;
-- (void)readData:(YASAudioPCMBufferReadBlock)readBlock;
-- (void)writeData:(YASAudioPCMBufferWriteBlock)writeBlock;
-- (void)enumerateReadValue:(YASAudioPCMBufferReadValueBlock)readValueBlock;
-- (void)enumerateWriteValue:(YASAudioPCMBufferWriteValueBlock)writeValueBlock;
 
-- (Float32 *)float32DataAtBufferIndex:(NSUInteger)index;
-- (Float64 *)float64DataAtBufferIndex:(NSUInteger)index;
-- (SInt16 *)int16DataAtBufferIndex:(NSUInteger)index;
-- (SInt32 *)int32DataAtBufferIndex:(NSUInteger)index;
+- (void)readDataUsingBlock:(YASAudioPCMBufferReadBlock)readBlock;
+- (void)writeDataUsingBlock:(YASAudioPCMBufferWriteBlock)writeBlock;
+
+- (void)enumerateReadValuesUsingBlock:(YASAudioPCMBufferReadValueBlock)readValueBlock;
+- (void)enumerateWriteValuesUsingBlock:(YASAudioPCMBufferWriteValueBlock)writeValueBlock;
 
 - (void)clearData;
 - (void)clearDataWithStartFrame:(UInt32)frame length:(UInt32)length;
