@@ -6,7 +6,7 @@
 #import "YASWeakSupport.h"
 #import <AudioUnit/AudioUnit.h>
 
-@class YASAudioFormat, YASAudioPCMBuffer, YASAudioTime, YASAudioEngine, YASAudioUnit, YASAudioConnection;
+@class YASAudioFormat, YASAudioWritablePCMBuffer, YASAudioTime, YASAudioEngine, YASAudioUnit, YASAudioConnection;
 
 @interface YASAudioNodeCore : NSObject
 
@@ -37,7 +37,7 @@
 
 #pragma mark Render thread
 
-- (void)renderWithBuffer:(YASAudioPCMBuffer *)buffer bus:(NSNumber *)bus when:(YASAudioTime *)when;
+- (void)renderWithBuffer:(YASAudioWritablePCMBuffer *)buffer bus:(NSNumber *)bus when:(YASAudioTime *)when;
 
 @end
 

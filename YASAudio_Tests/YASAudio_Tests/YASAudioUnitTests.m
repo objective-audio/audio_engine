@@ -276,7 +276,7 @@
         YASAudioTime *audioTime = [YASAudioTime timeWithSampleTime:0 atRate:format.sampleRate];
         AudioTimeStamp timeStamp = audioTime.audioTimeStamp;
 
-        YASAudioPCMBuffer *buffer = [[YASAudioPCMBuffer alloc] initWithPCMFormat:format frameCapacity:frameLength];
+        YASAudioWritablePCMBuffer *buffer = [[YASAudioWritablePCMBuffer alloc] initWithPCMFormat:format frameCapacity:frameLength];
 
         YASAudioUnitRenderParameters parameters = {
             .inRenderType = YASAudioUnitRenderTypeNormal,

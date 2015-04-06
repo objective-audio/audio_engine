@@ -70,8 +70,8 @@ static const UInt32 YASAudioOfflineOutputRenderFrameLength = 1024;
         NSBlockOperation *blockOperation = [[NSBlockOperation alloc] init];
         __unsafe_unretained NSBlockOperation *weakOperation = blockOperation;
 
-        YASAudioPCMBuffer *renderBuffer =
-            [[YASAudioPCMBuffer alloc] initWithPCMFormat:connection.format
+        YASAudioWritablePCMBuffer *renderBuffer =
+            [[YASAudioWritablePCMBuffer alloc] initWithPCMFormat:connection.format
                                            frameCapacity:YASAudioOfflineOutputRenderFrameLength];
 
         [blockOperation addExecutionBlock:^{

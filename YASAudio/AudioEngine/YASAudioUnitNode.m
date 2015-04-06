@@ -133,10 +133,10 @@
                             YASAudioNode *sourceNode = connection.sourceNode;
 
                             if (connection && sourceNode) {
-                                YASAudioPCMBuffer *buffer =
-                                    [[YASAudioPCMBuffer alloc] initWithPCMFormat:connection.format
-                                                                 audioBufferList:renderParameters->ioData
-                                                                       needsFree:NO];
+                                YASAudioWritablePCMBuffer *buffer =
+                                    [[YASAudioWritablePCMBuffer alloc] initWithPCMFormat:connection.format
+                                                                        audioBufferList:renderParameters->ioData
+                                                                              needsFree:NO];
                                 YASAudioTime *when =
                                     [[YASAudioTime alloc] initWithAudioTimeStamp:renderParameters->ioTimeStamp
                                                                       sampleRate:connection.format.sampleRate];
@@ -260,7 +260,7 @@
 
 #pragma mark Render thread
 
-- (void)renderWithBuffer:(YASAudioPCMBuffer *)buffer bus:(NSNumber *)bus when:(YASAudioTime *)when
+- (void)renderWithBuffer:(YASAudioWritablePCMBuffer *)buffer bus:(NSNumber *)bus when:(YASAudioTime *)when
 {
     [super renderWithBuffer:buffer bus:bus when:when];
 

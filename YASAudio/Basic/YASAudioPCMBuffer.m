@@ -21,6 +21,8 @@ typedef NS_ENUM(NSUInteger, YASAudioPCMBufferFreeType) {
 
 @interface YASAudioPCMBuffer ()
 @property (nonatomic, strong) YASAudioFormat *format;
+@property (nonatomic) UInt32 frameLength;
+@property (nonatomic) AudioBufferList *mutableAudioBufferList;
 @end
 
 @implementation YASAudioPCMBuffer {
@@ -28,20 +30,8 @@ typedef NS_ENUM(NSUInteger, YASAudioPCMBufferFreeType) {
     AudioBufferList *_audioBufferList;
 }
 
-- (instancetype)initWithPCMFormat:(YASAudioFormat *)format frameCapacity:(UInt32)frameCapacity
-{
-    BOOL interleaved = format.isInterleaved;
-    UInt32 bufferCount = interleaved ? 1 : format.channelCount;
-    UInt32 stride = interleaved ? format.channelCount : 1;
-    UInt32 bytesPerFrame = format.streamDescription->mBytesPerFrame;
-    AudioBufferList *audioBufferList =
-        YASAudioAllocateAudioBufferList(bufferCount, stride, frameCapacity * bytesPerFrame);
-
-    return [self initWithPCMFormat:format audioBufferList:audioBufferList needsFree:YES];
-}
-
 - (instancetype)initWithPCMFormat:(YASAudioFormat *)format
-                  audioBufferList:(AudioBufferList *)audioBufferList
+                  audioBufferList:(const AudioBufferList *)audioBufferList
                         needsFree:(BOOL)needsFree
 {
     self = [super init];
@@ -53,7 +43,7 @@ typedef NS_ENUM(NSUInteger, YASAudioPCMBufferFreeType) {
         }
 
         _freeType = needsFree ? YASAudioPCMBufferFreeTypeFull : YASAudioPCMBufferFreeTypeNone;
-        _audioBufferList = audioBufferList;
+        _audioBufferList = (AudioBufferList *)audioBufferList;
         self.format = format;
 
         UInt32 bytesPerFrame = format.streamDescription->mBytesPerFrame;
@@ -196,7 +186,7 @@ typedef NS_ENUM(NSUInteger, YASAudioPCMBufferFreeType) {
     return self.audioBufferList->mBuffers[0].mNumberChannels;
 }
 
-- (void *)dataAtBufferIndex:(NSUInteger)index
+- (const void *)dataAtBufferIndex:(NSUInteger)index
 {
     return [self _dataWithBitDepthFormat:self.format.bitDepthFormat atBufferIndex:index];
 }
@@ -238,67 +228,16 @@ typedef NS_ENUM(NSUInteger, YASAudioPCMBufferFreeType) {
     return 0;
 }
 
-- (void)setValue:(Float64)value atBufferIndex:(UInt32)bufferIndex channel:(UInt32)channel frame:(UInt32)frame
+- (void)readDataUsingBlock:(YASAudioPCMBufferReadBlock)readDataBlock
 {
-    const YASAudioBitDepthFormat bitDepthFormat = self.format.bitDepthFormat;
-    const UInt32 stride = self.stride;
-    const UInt32 frameLength = self.frameLength;
-    const UInt32 sampleByteCount = self.format.sampleByteCount;
-
-    if (channel >= stride) {
-        YASRaiseWithReason(
-            ([NSString stringWithFormat:@"%s - Overflow channel(%@).", __PRETTY_FUNCTION__, @(channel)]));
-        return;
-    }
-
-    if (frame >= frameLength) {
-        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Overflow frame(%@).", __PRETTY_FUNCTION__, @(frame)]));
-        return;
-    }
-
-    Byte *data = [self _dataWithBitDepthFormat:bitDepthFormat atBufferIndex:bufferIndex];
-    const void *ptr = &data[(stride * frame + channel) * sampleByteCount];
-
-    switch (bitDepthFormat) {
-        case YASAudioBitDepthFormatFloat32: {
-            *((Float32 *)ptr) = value;
-        } break;
-        case YASAudioBitDepthFormatFloat64: {
-            *((Float64 *)ptr) = value;
-        } break;
-        case YASAudioBitDepthFormatInt16: {
-            *((SInt16 *)ptr) = value * INT16_MAX;
-        } break;
-        case YASAudioBitDepthFormatInt32: {
-            *((SInt32 *)ptr) = value * INT32_MAX;
-        } break;
-        default:
-            break;
-    }
-}
-
-- (void)readDataUsingBlock:(YASAudioPCMBufferReadBlock)readBlock
-{
-    if (!readBlock) {
+    if (!readDataBlock) {
         YASRaiseWithReason(([NSString stringWithFormat:@"%s - Argument is nil.", __PRETTY_FUNCTION__]));
         return;
     }
 
     const YASAudioBitDepthFormat bitDepthFormat = self.format.bitDepthFormat;
     for (UInt32 i = 0; i < self.bufferCount; i++) {
-        readBlock([self _dataWithBitDepthFormat:bitDepthFormat atBufferIndex:i], i);
-    }
-}
-
-- (void)writeDataUsingBlock:(YASAudioPCMBufferWriteBlock)writeBlock
-{
-    if (!writeBlock) {
-        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Argument is nil.", __PRETTY_FUNCTION__]));
-    }
-
-    const YASAudioBitDepthFormat bitDepthFormat = self.format.bitDepthFormat;
-    for (UInt32 i = 0; i < self.bufferCount; i++) {
-        writeBlock([self _dataWithBitDepthFormat:bitDepthFormat atBufferIndex:i], i);
+        readDataBlock([self _dataWithBitDepthFormat:bitDepthFormat atBufferIndex:i], i);
     }
 }
 
@@ -363,57 +302,51 @@ typedef NS_ENUM(NSUInteger, YASAudioPCMBufferFreeType) {
     }
 }
 
-- (void)enumerateWriteValuesUsingBlock:(YASAudioPCMBufferWriteValueBlock)writeValueBlock
+- (BOOL)copyDataFlexiblyToAudioBufferList:(AudioBufferList *)toAudioBufferList
 {
-    if (!writeValueBlock) {
-        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Argument is nil.", __PRETTY_FUNCTION__]));
-        return;
+    if (!toAudioBufferList) {
+        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Argument is null.", __PRETTY_FUNCTION__]));
+        return NO;
     }
 
-    const YASAudioBitDepthFormat bitDepthFormat = self.format.bitDepthFormat;
+    const AudioBufferList *fromAudioBufferList = self.audioBufferList;
     const UInt32 sampleByteCount = self.format.sampleByteCount;
-    const UInt32 frameLength = self.frameLength;
-    const UInt32 stride = self.stride;
-    const UInt32 bufferCount = self.bufferCount;
-    Byte *datas[bufferCount];
 
-    for (UInt32 i = 0; i < bufferCount; i++) {
-        datas[i] = [self _dataWithBitDepthFormat:bitDepthFormat atBufferIndex:i];
-    }
+    return YASAudioCopyAudioBufferListFlexibly(fromAudioBufferList, toAudioBufferList, sampleByteCount, NULL);
+}
 
-    for (UInt32 frame = 0; frame < frameLength; frame++) {
-        for (UInt32 ch = 0; ch < stride; ch++) {
-            for (UInt32 bufferIndex = 0; bufferIndex < self.bufferCount; bufferIndex++) {
-                @autoreleasepool
-                {
-                    Float64 value = writeValueBlock(bufferIndex, ch, frame);
-                    void *ptr = &datas[bufferIndex][(stride * frame + ch) * sampleByteCount];
-                    switch (bitDepthFormat) {
-                        case YASAudioBitDepthFormatFloat32: {
-                            *((Float32 *)ptr) = value;
-                        } break;
-                        case YASAudioBitDepthFormatFloat64: {
-                            *((Float64 *)ptr) = value;
-                        } break;
-                        case YASAudioBitDepthFormatInt16: {
-                            *((SInt16 *)ptr) = value * INT16_MAX;
-                        } break;
-                        case YASAudioBitDepthFormatInt32: {
-                            *((SInt32 *)ptr) = value * INT32_MAX;
-                        } break;
-                        default:
-                            break;
-                    }
-                }
-            }
-        }
-    }
+@end
+
+@implementation YASAudioWritablePCMBuffer
+
+- (instancetype)initWithPCMFormat:(YASAudioFormat *)format frameCapacity:(UInt32)frameCapacity
+{
+    BOOL interleaved = format.isInterleaved;
+    UInt32 bufferCount = interleaved ? 1 : format.channelCount;
+    UInt32 stride = interleaved ? format.channelCount : 1;
+    UInt32 bytesPerFrame = format.streamDescription->mBytesPerFrame;
+    AudioBufferList *audioBufferList =
+        YASAudioAllocateAudioBufferList(bufferCount, stride, frameCapacity * bytesPerFrame);
+
+    return [self initWithPCMFormat:format audioBufferList:audioBufferList needsFree:YES];
+}
+
+- (instancetype)initWithPCMFormat:(YASAudioFormat *)format
+           mutableAudioBufferList:(AudioBufferList *)audioBufferList
+                        needsFree:(BOOL)needsFree
+{
+    return [super initWithPCMFormat:format audioBufferList:audioBufferList needsFree:needsFree];
+}
+
+- (void *)writableDataAtBufferIndex:(NSUInteger)index
+{
+    return [self _dataWithBitDepthFormat:self.format.bitDepthFormat atBufferIndex:index];
 }
 
 - (void)clearData
 {
     self.frameLength = self.frameCapacity;
-    YASAudioClearAudioBufferList(_audioBufferList);
+    YASAudioClearAudioBufferList(self.mutableAudioBufferList);
 }
 
 - (void)clearDataWithStartFrame:(UInt32)frame length:(UInt32)length
@@ -513,17 +446,102 @@ typedef NS_ENUM(NSUInteger, YASAudioPCMBufferFreeType) {
     return result;
 }
 
-- (BOOL)copyDataFlexiblyToAudioBufferList:(AudioBufferList *)toAudioBufferList
+- (void)setValue:(Float64)value atBufferIndex:(UInt32)bufferIndex channel:(UInt32)channel frame:(UInt32)frame
 {
-    if (!toAudioBufferList) {
-        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Argument is null.", __PRETTY_FUNCTION__]));
-        return NO;
-    }
-
-    const AudioBufferList *fromAudioBufferList = self.audioBufferList;
+    const YASAudioBitDepthFormat bitDepthFormat = self.format.bitDepthFormat;
+    const UInt32 stride = self.stride;
+    const UInt32 frameLength = self.frameLength;
     const UInt32 sampleByteCount = self.format.sampleByteCount;
 
-    return YASAudioCopyAudioBufferListFlexibly(fromAudioBufferList, toAudioBufferList, sampleByteCount, NULL);
+    if (channel >= stride) {
+        YASRaiseWithReason(
+            ([NSString stringWithFormat:@"%s - Overflow channel(%@).", __PRETTY_FUNCTION__, @(channel)]));
+        return;
+    }
+
+    if (frame >= frameLength) {
+        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Overflow frame(%@).", __PRETTY_FUNCTION__, @(frame)]));
+        return;
+    }
+
+    Byte *data = [self _dataWithBitDepthFormat:bitDepthFormat atBufferIndex:bufferIndex];
+    const void *ptr = &data[(stride * frame + channel) * sampleByteCount];
+
+    switch (bitDepthFormat) {
+        case YASAudioBitDepthFormatFloat32: {
+            *((Float32 *)ptr) = value;
+        } break;
+        case YASAudioBitDepthFormatFloat64: {
+            *((Float64 *)ptr) = value;
+        } break;
+        case YASAudioBitDepthFormatInt16: {
+            *((SInt16 *)ptr) = value * INT16_MAX;
+        } break;
+        case YASAudioBitDepthFormatInt32: {
+            *((SInt32 *)ptr) = value * INT32_MAX;
+        } break;
+        default:
+            break;
+    }
+}
+
+- (void)writeDataUsingBlock:(YASAudioPCMBufferWriteBlock)writeDataBlock
+{
+    if (!writeDataBlock) {
+        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Argument is nil.", __PRETTY_FUNCTION__]));
+    }
+
+    const YASAudioBitDepthFormat bitDepthFormat = self.format.bitDepthFormat;
+    for (UInt32 i = 0; i < self.bufferCount; i++) {
+        writeDataBlock([self _dataWithBitDepthFormat:bitDepthFormat atBufferIndex:i], i);
+    }
+}
+
+- (void)enumerateWriteValuesUsingBlock:(YASAudioPCMBufferWriteValueBlock)writeValueBlock
+{
+    if (!writeValueBlock) {
+        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Argument is nil.", __PRETTY_FUNCTION__]));
+        return;
+    }
+
+    const YASAudioBitDepthFormat bitDepthFormat = self.format.bitDepthFormat;
+    const UInt32 sampleByteCount = self.format.sampleByteCount;
+    const UInt32 frameLength = self.frameLength;
+    const UInt32 stride = self.stride;
+    const UInt32 bufferCount = self.bufferCount;
+    Byte *datas[bufferCount];
+
+    for (UInt32 i = 0; i < bufferCount; i++) {
+        datas[i] = [self _dataWithBitDepthFormat:bitDepthFormat atBufferIndex:i];
+    }
+
+    for (UInt32 frame = 0; frame < frameLength; frame++) {
+        for (UInt32 ch = 0; ch < stride; ch++) {
+            for (UInt32 bufferIndex = 0; bufferIndex < self.bufferCount; bufferIndex++) {
+                @autoreleasepool
+                {
+                    Float64 value = writeValueBlock(bufferIndex, ch, frame);
+                    void *ptr = &datas[bufferIndex][(stride * frame + ch) * sampleByteCount];
+                    switch (bitDepthFormat) {
+                        case YASAudioBitDepthFormatFloat32: {
+                            *((Float32 *)ptr) = value;
+                        } break;
+                        case YASAudioBitDepthFormatFloat64: {
+                            *((Float64 *)ptr) = value;
+                        } break;
+                        case YASAudioBitDepthFormatInt16: {
+                            *((SInt16 *)ptr) = value * INT16_MAX;
+                        } break;
+                        case YASAudioBitDepthFormatInt32: {
+                            *((SInt32 *)ptr) = value * INT32_MAX;
+                        } break;
+                        default:
+                            break;
+                    }
+                }
+            }
+        }
+    }
 }
 
 #pragma mark Private

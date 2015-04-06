@@ -117,7 +117,7 @@ static const AudioComponentDescription baseAcd = {.componentType = kAudioUnitTyp
     self.tapNode = tapNode;
     YASRelease(tapNode);
 
-    tapNode.renderBlock = ^(YASAudioPCMBuffer *buffer, NSNumber *bus, YASAudioTime *when, id nodeCore) {
+    tapNode.renderBlock = ^(YASAudioWritablePCMBuffer *buffer, NSNumber *bus, YASAudioTime *when, id nodeCore) {
         static Float64 phase = 0;
         const Float64 startPhase = phase;
         const Float64 phasePerFrame = 1000.0 / buffer.format.sampleRate * YAS_2_PI;

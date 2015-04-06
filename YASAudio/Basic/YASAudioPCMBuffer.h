@@ -18,25 +18,33 @@ typedef Float64 (^YASAudioPCMBufferWriteValueBlock)(const UInt32 bufferIndex, co
 
 @property (nonatomic, strong, readonly) YASAudioFormat *format;
 @property (nonatomic, readonly) const AudioBufferList *audioBufferList;
-@property (nonatomic, readonly) AudioBufferList *mutableAudioBufferList;
 
 @property (nonatomic, readonly) UInt32 frameCapacity;
-@property (nonatomic) UInt32 frameLength;
+@property (nonatomic, readonly) UInt32 frameLength;
 @property (nonatomic, readonly) UInt32 bufferCount;
 @property (nonatomic, readonly) UInt32 stride;
 
 - (instancetype)init NS_UNAVAILABLE;
+
+- (const void *)dataAtBufferIndex:(NSUInteger)index;
+- (Float64)valueAtBufferIndex:(UInt32)bufferIndex channel:(UInt32)channel frame:(UInt32)frame;
+- (void)readDataUsingBlock:(YASAudioPCMBufferReadBlock)readDataBlock;
+- (void)enumerateReadValuesUsingBlock:(YASAudioPCMBufferReadValueBlock)readValueBlock;
+
+- (BOOL)copyDataFlexiblyToAudioBufferList:(AudioBufferList *)toAudioBufferList;
+
+@end
+
+@interface YASAudioWritablePCMBuffer : YASAudioPCMBuffer
+
+@property (nonatomic, readonly) AudioBufferList *mutableAudioBufferList;
+@property (nonatomic) UInt32 frameLength;
+
 - (instancetype)initWithPCMFormat:(YASAudioFormat *)format frameCapacity:(UInt32)frameCapacity;
 
-- (void *)dataAtBufferIndex:(NSUInteger)index;
-
-- (Float64)valueAtBufferIndex:(UInt32)bufferIndex channel:(UInt32)channel frame:(UInt32)frame;
+- (void *)writableDataAtBufferIndex:(NSUInteger)index;
 - (void)setValue:(Float64)value atBufferIndex:(UInt32)bufferIndex channel:(UInt32)channel frame:(UInt32)frame;
-
-- (void)readDataUsingBlock:(YASAudioPCMBufferReadBlock)readBlock;
-- (void)writeDataUsingBlock:(YASAudioPCMBufferWriteBlock)writeBlock;
-
-- (void)enumerateReadValuesUsingBlock:(YASAudioPCMBufferReadValueBlock)readValueBlock;
+- (void)writeDataUsingBlock:(YASAudioPCMBufferWriteBlock)writeDataBlock;
 - (void)enumerateWriteValuesUsingBlock:(YASAudioPCMBufferWriteValueBlock)writeValueBlock;
 
 - (void)clearData;
@@ -50,14 +58,13 @@ typedef Float64 (^YASAudioPCMBufferWriteValueBlock)(const UInt32 bufferIndex, co
 
 - (BOOL)copyDataFlexiblyFromBuffer:(YASAudioPCMBuffer *)buffer;
 - (BOOL)copyDataFlexiblyFromAudioBufferList:(const AudioBufferList *)fromAudioBufferList;
-- (BOOL)copyDataFlexiblyToAudioBufferList:(AudioBufferList *)toAudioBufferList;
 
 @end
 
 @interface YASAudioPCMBuffer (YASInternal)
 
 - (instancetype)initWithPCMFormat:(YASAudioFormat *)format
-                  audioBufferList:(AudioBufferList *)audioBufferList
+                  audioBufferList:(const AudioBufferList *)audioBufferList
                         needsFree:(BOOL)needsFree;
 
 #if (!TARGET_OS_IPHONE && TARGET_OS_MAC)
@@ -68,5 +75,13 @@ typedef Float64 (^YASAudioPCMBufferWriteValueBlock)(const UInt32 bufferIndex, co
                            buffer:(YASAudioPCMBuffer *)buffer
                inputChannelRoutes:(NSArray *)channelRoutes;
 #endif
+
+@end
+
+@interface YASAudioWritablePCMBuffer (YASInternal)
+
+- (instancetype)initWithPCMFormat:(YASAudioFormat *)format
+           mutableAudioBufferList:(AudioBufferList *)audioBufferList
+                        needsFree:(BOOL)needsFree;
 
 @end

@@ -18,7 +18,7 @@ extern NSString *const YASAudioFileTypeMPEG4;
 extern NSString *const YASAudioFileTypeAppleM4A;
 extern NSString *const YASAudioFileTypeWAVE;
 
-@class YASAudioPCMBuffer, YASAudioFormat;
+@class YASAudioPCMBuffer, YASAudioWritablePCMBuffer, YASAudioFormat;
 
 @interface YASAudioFile : NSObject
 
@@ -41,8 +41,8 @@ extern NSString *const YASAudioFileTypeWAVE;
                 interleaved:(BOOL)interleaved
                       error:(NSError **)outError;
 
-- (BOOL)readIntoBuffer:(YASAudioPCMBuffer *)buffer error:(NSError **)outError;
-- (BOOL)readIntoBuffer:(YASAudioPCMBuffer *)buffer frameLength:(UInt32)frameLength error:(NSError **)outError;
+- (BOOL)readIntoBuffer:(YASAudioWritablePCMBuffer *)buffer error:(NSError **)outError;
+- (BOOL)readIntoBuffer:(YASAudioWritablePCMBuffer *)buffer frameLength:(UInt32)frameLength error:(NSError **)outError;
 
 @end
 

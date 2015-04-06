@@ -290,10 +290,10 @@
                             [core outputChannelRoutesWithSourceBus:connection.sourceBus format:connection.format];
                         if (channelRoutes) {
                             YASAudioFormat *format = connection.format;
-                            YASAudioPCMBuffer *renderBuffer =
-                                [[YASAudioPCMBuffer alloc] initWithPCMFormat:format
-                                                                      buffer:outBuffer
-                                                         outputChannelRoutes:channelRoutes];
+                            YASAudioWritablePCMBuffer *renderBuffer =
+                                [[YASAudioWritablePCMBuffer alloc] initWithPCMFormat:format
+                                                                             buffer:outBuffer
+                                                                outputChannelRoutes:channelRoutes];
 
                             YASAudioNode *sourceNode = connection.sourceNode;
                             [sourceNode renderWithBuffer:renderBuffer bus:connection.sourceBus when:when];
@@ -319,8 +319,8 @@
                                     YASAudioPCMBuffer *inputBuffer = [deviceIO inputBufferOnRender];
                                     YASAudioTime *inputTime = [deviceIO inputTimeOnRender];
                                     if (inputBuffer && inputTime) {
-                                        YASAudioPCMBuffer *renderBuffer =
-                                            [[YASAudioPCMBuffer alloc] initWithPCMFormat:format
+                                        YASAudioWritablePCMBuffer *renderBuffer =
+                                            [[YASAudioWritablePCMBuffer alloc] initWithPCMFormat:format
                                                                                   buffer:inputBuffer
                                                                       inputChannelRoutes:channelRoutes];
 
@@ -394,7 +394,7 @@
 
 #pragma mark Render thread
 
-- (void)renderWithBuffer:(YASAudioPCMBuffer *)buffer bus:(NSNumber *)bus when:(YASAudioTime *)when
+- (void)renderWithBuffer:(YASAudioWritablePCMBuffer *)buffer bus:(NSNumber *)bus when:(YASAudioTime *)when
 {
     [super renderWithBuffer:buffer bus:bus when:when];
 
