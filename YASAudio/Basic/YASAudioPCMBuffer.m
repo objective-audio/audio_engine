@@ -216,6 +216,82 @@ typedef NS_ENUM(NSUInteger, YASAudioPCMBufferFreeType) {
     return [self _dataWithBitDepthFormat:YASAudioBitDepthFormatInt32 atBufferIndex:index];
 }
 
+- (Float64)valueAtBufferIndex:(UInt32)bufferIndex channel:(UInt32)channel frame:(UInt32)frame
+{
+    const YASAudioBitDepthFormat bitDepthFormat = self.format.bitDepthFormat;
+    const UInt32 stride = self.stride;
+    const UInt32 frameLength = self.frameLength;
+    const UInt32 sampleByteCount = self.format.sampleByteCount;
+
+    if (channel >= stride) {
+        YASRaiseWithReason(
+            ([NSString stringWithFormat:@"%s - Overflow channel(%@).", __PRETTY_FUNCTION__, @(channel)]));
+        return 0;
+    }
+
+    if (frame >= frameLength) {
+        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Overflow frame(%@).", __PRETTY_FUNCTION__, @(frame)]));
+        return 0;
+    }
+
+    Byte *data = [self _dataWithBitDepthFormat:bitDepthFormat atBufferIndex:bufferIndex];
+    void *ptr = &data[(stride * frame + channel) * sampleByteCount];
+
+    switch (bitDepthFormat) {
+        case YASAudioBitDepthFormatFloat32:
+            return *((Float32 *)ptr);
+        case YASAudioBitDepthFormatFloat64:
+            return *((Float64 *)ptr);
+        case YASAudioBitDepthFormatInt16:
+            return (Float64)(*((SInt16 *)ptr)) / INT16_MAX;
+        case YASAudioBitDepthFormatInt32:
+            return (Float64)(*((SInt32 *)ptr)) / INT32_MAX;
+        default:
+            break;
+    }
+
+    return 0;
+}
+
+- (void)setValue:(Float64)value atBufferIndex:(UInt32)bufferIndex channel:(UInt32)channel frame:(UInt32)frame
+{
+    const YASAudioBitDepthFormat bitDepthFormat = self.format.bitDepthFormat;
+    const UInt32 stride = self.stride;
+    const UInt32 frameLength = self.frameLength;
+    const UInt32 sampleByteCount = self.format.sampleByteCount;
+
+    if (channel >= stride) {
+        YASRaiseWithReason(
+            ([NSString stringWithFormat:@"%s - Overflow channel(%@).", __PRETTY_FUNCTION__, @(channel)]));
+        return;
+    }
+
+    if (frame >= frameLength) {
+        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Overflow frame(%@).", __PRETTY_FUNCTION__, @(frame)]));
+        return;
+    }
+
+    Byte *data = [self _dataWithBitDepthFormat:bitDepthFormat atBufferIndex:bufferIndex];
+    const void *ptr = &data[(stride * frame + channel) * sampleByteCount];
+
+    switch (bitDepthFormat) {
+        case YASAudioBitDepthFormatFloat32: {
+            *((Float32 *)ptr) = value;
+        } break;
+        case YASAudioBitDepthFormatFloat64: {
+            *((Float64 *)ptr) = value;
+        } break;
+        case YASAudioBitDepthFormatInt16: {
+            *((SInt16 *)ptr) = value * INT16_MAX;
+        } break;
+        case YASAudioBitDepthFormatInt32: {
+            *((SInt32 *)ptr) = value * INT32_MAX;
+        } break;
+        default:
+            break;
+    }
+}
+
 - (void)readData:(YASAudioPCMBufferReadBlock)readBlock
 {
     if (!readBlock) {
