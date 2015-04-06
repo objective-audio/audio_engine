@@ -743,7 +743,7 @@ static UInt32 TestValue(UInt32 frame, UInt32 ch, UInt32 buf)
     YASRelease(writeBuffer);
 }
 
-- (void)testReadValueFloat32
+- (void)testEnumerateReadValueFloat32
 {
     const UInt32 frameLength = 4;
     const UInt32 channels = 2;
@@ -769,7 +769,7 @@ static UInt32 TestValue(UInt32 frame, UInt32 ch, UInt32 buf)
     YASRelease(buffer);
 }
 
-- (void)testReadValueFloat64
+- (void)testEnumerateReadValueFloat64
 {
     const UInt32 frameLength = 4;
     const UInt32 channels = 2;
@@ -795,7 +795,7 @@ static UInt32 TestValue(UInt32 frame, UInt32 ch, UInt32 buf)
     YASRelease(buffer);
 }
 
-- (void)testReadValueInt16
+- (void)testEnumerateReadValueInt16
 {
     const UInt32 frameLength = 4;
     const UInt32 channels = 2;
@@ -821,7 +821,7 @@ static UInt32 TestValue(UInt32 frame, UInt32 ch, UInt32 buf)
     YASRelease(buffer);
 }
 
-- (void)testReadValueInt32
+- (void)testEnumerateReadValueInt32
 {
     const UInt32 frameLength = 4;
     const UInt32 channels = 2;
@@ -847,7 +847,7 @@ static UInt32 TestValue(UInt32 frame, UInt32 ch, UInt32 buf)
     YASRelease(buffer);
 }
 
-- (void)testWriteValueFloat32
+- (void)testEnumerateWriteValueFloat32
 {
     const UInt32 frameLength = 4;
     const UInt32 channels = 2;
@@ -879,7 +879,7 @@ static UInt32 TestValue(UInt32 frame, UInt32 ch, UInt32 buf)
     YASRelease(buffer);
 }
 
-- (void)testWriteValueFloat64
+- (void)testEnumerateWriteValueFloat64
 {
     const UInt32 frameLength = 4;
     const UInt32 channels = 2;
@@ -911,7 +911,7 @@ static UInt32 TestValue(UInt32 frame, UInt32 ch, UInt32 buf)
     YASRelease(buffer);
 }
 
-- (void)testWriteValueInt16
+- (void)testEnumerateWriteValueInt16
 {
     const UInt32 frameLength = 4;
     const UInt32 channels = 2;
@@ -943,7 +943,7 @@ static UInt32 TestValue(UInt32 frame, UInt32 ch, UInt32 buf)
     YASRelease(buffer);
 }
 
-- (void)testWriteValueInt32
+- (void)testEnumerateWriteValueInt32
 {
     const UInt32 frameLength = 4;
     const UInt32 channels = 2;
