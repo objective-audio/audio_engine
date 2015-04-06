@@ -28,6 +28,8 @@ typedef Float64 (^YASAudioPCMBufferWriteValueBlock)(const UInt32 bufferIndex, co
 - (instancetype)init NS_UNAVAILABLE;
 - (instancetype)initWithPCMFormat:(YASAudioFormat *)format frameCapacity:(UInt32)frameCapacity;
 
+- (Float64)valueAtBufferIndex:(UInt32)bufferIndex channel:(UInt32)channel frame:(UInt32)frame;
+- (void)setValue:(Float64)value atBufferIndex:(UInt32)bufferIndex channel:(UInt32)channel frame:(UInt32)frame;
 - (void)readData:(YASAudioPCMBufferReadBlock)readBlock;
 - (void)writeData:(YASAudioPCMBufferWriteBlock)writeBlock;
 - (void)enumerateReadValue:(YASAudioPCMBufferReadValueBlock)readValueBlock;
