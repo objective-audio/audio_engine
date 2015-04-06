@@ -975,6 +975,196 @@ static UInt32 TestValue(UInt32 frame, UInt32 ch, UInt32 buf)
     YASRelease(buffer);
 }
 
+- (void)testReadValueFloat32
+{
+    const UInt32 frameLength = 4;
+    const UInt32 channels = 2;
+
+    YASAudioFormat *format = [[YASAudioFormat alloc] initWithBitDepthFormat:YASAudioBitDepthFormatFloat32
+                                                                 sampleRate:48000
+                                                                   channels:channels
+                                                                interleaved:NO];
+    YASAudioPCMBuffer *buffer = [[YASAudioPCMBuffer alloc] initWithPCMFormat:format frameCapacity:frameLength];
+    YASRelease(format);
+
+    [self _fillDataToBuffer:buffer];
+
+    for (UInt32 frame = 0; frame < frameLength; frame++) {
+        for (UInt32 bufferIndex = 0; bufferIndex < channels; bufferIndex++) {
+            XCTAssertEqual([buffer valueAtBufferIndex:bufferIndex channel:0 frame:frame],
+                           TestValue(frame, 0, bufferIndex));
+        }
+    }
+
+    YASRelease(buffer);
+}
+
+- (void)testReadValueFloat64
+{
+    const UInt32 frameLength = 4;
+    const UInt32 channels = 2;
+
+    YASAudioFormat *format = [[YASAudioFormat alloc] initWithBitDepthFormat:YASAudioBitDepthFormatFloat64
+                                                                 sampleRate:48000
+                                                                   channels:channels
+                                                                interleaved:NO];
+    YASAudioPCMBuffer *buffer = [[YASAudioPCMBuffer alloc] initWithPCMFormat:format frameCapacity:frameLength];
+    YASRelease(format);
+
+    [self _fillDataToBuffer:buffer];
+
+    for (UInt32 frame = 0; frame < frameLength; frame++) {
+        for (UInt32 bufferIndex = 0; bufferIndex < channels; bufferIndex++) {
+            XCTAssertEqual([buffer valueAtBufferIndex:bufferIndex channel:0 frame:frame],
+                           TestValue(frame, 0, bufferIndex));
+        }
+    }
+
+    YASRelease(buffer);
+}
+
+- (void)testReadValueInt16
+{
+    const UInt32 frameLength = 4;
+    const UInt32 channels = 2;
+
+    YASAudioFormat *format = [[YASAudioFormat alloc] initWithBitDepthFormat:YASAudioBitDepthFormatInt16
+                                                                 sampleRate:48000
+                                                                   channels:channels
+                                                                interleaved:NO];
+    YASAudioPCMBuffer *buffer = [[YASAudioPCMBuffer alloc] initWithPCMFormat:format frameCapacity:frameLength];
+    YASRelease(format);
+
+    [self _fillDataToBuffer:buffer];
+
+    for (UInt32 frame = 0; frame < frameLength; frame++) {
+        for (UInt32 bufferIndex = 0; bufferIndex < channels; bufferIndex++) {
+            XCTAssertEqual((UInt32)([buffer valueAtBufferIndex:bufferIndex channel:0 frame:frame] * INT16_MAX),
+                           TestValue(frame, 0, bufferIndex));
+        }
+    }
+
+    YASRelease(buffer);
+}
+
+- (void)testReadValueInt32
+{
+    const UInt32 frameLength = 4;
+    const UInt32 channels = 2;
+
+    YASAudioFormat *format = [[YASAudioFormat alloc] initWithBitDepthFormat:YASAudioBitDepthFormatInt32
+                                                                 sampleRate:48000
+                                                                   channels:channels
+                                                                interleaved:NO];
+    YASAudioPCMBuffer *buffer = [[YASAudioPCMBuffer alloc] initWithPCMFormat:format frameCapacity:frameLength];
+    YASRelease(format);
+
+    [self _fillDataToBuffer:buffer];
+
+    for (UInt32 frame = 0; frame < frameLength; frame++) {
+        for (UInt32 bufferIndex = 0; bufferIndex < channels; bufferIndex++) {
+            XCTAssertEqual((UInt32)([buffer valueAtBufferIndex:bufferIndex channel:0 frame:frame] * INT32_MAX),
+                           TestValue(frame, 0, bufferIndex));
+        }
+    }
+
+    YASRelease(buffer);
+}
+
+- (void)testWriteValueFloat32
+{
+    const UInt32 frameLength = 4;
+    const UInt32 channels = 2;
+
+    YASAudioFormat *format = [[YASAudioFormat alloc] initWithBitDepthFormat:YASAudioBitDepthFormatFloat32
+                                                                 sampleRate:48000
+                                                                   channels:channels
+                                                                interleaved:NO];
+    YASAudioPCMBuffer *buffer = [[YASAudioPCMBuffer alloc] initWithPCMFormat:format frameCapacity:frameLength];
+    YASRelease(format);
+
+    for (UInt32 frame = 0; frame < frameLength; frame++) {
+        for (UInt32 bufferIndex = 0; bufferIndex < channels; bufferIndex++) {
+            UInt32 testValue = TestValue(frame, 0, bufferIndex);
+            [buffer setValue:testValue atBufferIndex:bufferIndex channel:0 frame:frame];
+            XCTAssertEqual([buffer valueAtBufferIndex:bufferIndex channel:0 frame:frame], testValue);
+        }
+    }
+
+    YASRelease(buffer);
+}
+
+- (void)testWriteValueFloat64
+{
+    const UInt32 frameLength = 4;
+    const UInt32 channels = 2;
+
+    YASAudioFormat *format = [[YASAudioFormat alloc] initWithBitDepthFormat:YASAudioBitDepthFormatFloat64
+                                                                 sampleRate:48000
+                                                                   channels:channels
+                                                                interleaved:NO];
+    YASAudioPCMBuffer *buffer = [[YASAudioPCMBuffer alloc] initWithPCMFormat:format frameCapacity:frameLength];
+    YASRelease(format);
+
+    for (UInt32 frame = 0; frame < frameLength; frame++) {
+        for (UInt32 bufferIndex = 0; bufferIndex < channels; bufferIndex++) {
+            UInt32 testValue = TestValue(frame, 0, bufferIndex);
+            [buffer setValue:testValue atBufferIndex:bufferIndex channel:0 frame:frame];
+            XCTAssertEqual([buffer valueAtBufferIndex:bufferIndex channel:0 frame:frame], testValue);
+        }
+    }
+
+    YASRelease(buffer);
+}
+
+- (void)testWriteValueInt16
+{
+    const UInt32 frameLength = 4;
+    const UInt32 channels = 2;
+
+    YASAudioFormat *format = [[YASAudioFormat alloc] initWithBitDepthFormat:YASAudioBitDepthFormatInt16
+                                                                 sampleRate:48000
+                                                                   channels:channels
+                                                                interleaved:NO];
+    YASAudioPCMBuffer *buffer = [[YASAudioPCMBuffer alloc] initWithPCMFormat:format frameCapacity:frameLength];
+    YASRelease(format);
+
+    for (UInt32 frame = 0; frame < frameLength; frame++) {
+        for (UInt32 bufferIndex = 0; bufferIndex < channels; bufferIndex++) {
+            UInt32 testValue = TestValue(frame, 0, bufferIndex);
+            [buffer setValue:testValue / INT16_MAX atBufferIndex:bufferIndex channel:0 frame:frame];
+            XCTAssertEqual((UInt32)([buffer valueAtBufferIndex:bufferIndex channel:0 frame:frame] * INT16_MAX),
+                           testValue);
+        }
+    }
+
+    YASRelease(buffer);
+}
+
+- (void)testWriteValueInt32
+{
+    const UInt32 frameLength = 4;
+    const UInt32 channels = 2;
+
+    YASAudioFormat *format = [[YASAudioFormat alloc] initWithBitDepthFormat:YASAudioBitDepthFormatInt32
+                                                                 sampleRate:48000
+                                                                   channels:channels
+                                                                interleaved:NO];
+    YASAudioPCMBuffer *buffer = [[YASAudioPCMBuffer alloc] initWithPCMFormat:format frameCapacity:frameLength];
+    YASRelease(format);
+
+    for (UInt32 frame = 0; frame < frameLength; frame++) {
+        for (UInt32 bufferIndex = 0; bufferIndex < channels; bufferIndex++) {
+            UInt32 testValue = TestValue(frame, 0, bufferIndex);
+            [buffer setValue:testValue / INT32_MAX atBufferIndex:bufferIndex channel:0 frame:frame];
+            XCTAssertEqual((UInt32)([buffer valueAtBufferIndex:bufferIndex channel:0 frame:frame] * INT32_MAX),
+                           testValue);
+        }
+    }
+
+    YASRelease(buffer);
+}
+
 #pragma mark -
 
 - (void)_fillDataToBuffer:(YASAudioPCMBuffer *)buffer
