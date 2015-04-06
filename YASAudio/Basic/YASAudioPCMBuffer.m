@@ -220,7 +220,19 @@ typedef NS_ENUM(NSUInteger, YASAudioPCMBufferFreeType) {
 {
     const YASAudioBitDepthFormat bitDepthFormat = self.format.bitDepthFormat;
     const UInt32 stride = self.stride;
+    const UInt32 frameLength = self.frameLength;
     const UInt32 sampleByteCount = self.format.sampleByteCount;
+
+    if (channel >= stride) {
+        YASRaiseWithReason(
+            ([NSString stringWithFormat:@"%s - Overflow channel(%@).", __PRETTY_FUNCTION__, @(channel)]));
+        return 0;
+    }
+
+    if (frame >= frameLength) {
+        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Overflow frame(%@).", __PRETTY_FUNCTION__, @(frame)]));
+        return 0;
+    }
 
     Byte *data = [self _dataWithBitDepthFormat:bitDepthFormat atBufferIndex:bufferIndex];
     void *ptr = &data[(stride * frame + channel) * sampleByteCount];
@@ -245,7 +257,19 @@ typedef NS_ENUM(NSUInteger, YASAudioPCMBufferFreeType) {
 {
     const YASAudioBitDepthFormat bitDepthFormat = self.format.bitDepthFormat;
     const UInt32 stride = self.stride;
+    const UInt32 frameLength = self.frameLength;
     const UInt32 sampleByteCount = self.format.sampleByteCount;
+
+    if (channel >= stride) {
+        YASRaiseWithReason(
+            ([NSString stringWithFormat:@"%s - Overflow channel(%@).", __PRETTY_FUNCTION__, @(channel)]));
+        return;
+    }
+
+    if (frame >= frameLength) {
+        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Overflow frame(%@).", __PRETTY_FUNCTION__, @(frame)]));
+        return;
+    }
 
     Byte *data = [self _dataWithBitDepthFormat:bitDepthFormat atBufferIndex:bufferIndex];
     const void *ptr = &data[(stride * frame + channel) * sampleByteCount];
