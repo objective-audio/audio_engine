@@ -724,8 +724,10 @@ static UInt32 TestValue(UInt32 frame, UInt32 ch, UInt32 buf)
 - (void)testWriteData
 {
     YASAudioFormat *format = [[YASAudioFormat alloc] initStandardFormatWithSampleRate:48000 channels:2];
-    YASAudioWritablePCMBuffer *writeBuffer = [[YASAudioWritablePCMBuffer alloc] initWithPCMFormat:format frameCapacity:4];
-    YASAudioWritablePCMBuffer *fillBuffer = [[YASAudioWritablePCMBuffer alloc] initWithPCMFormat:format frameCapacity:4];
+    YASAudioWritablePCMBuffer *writeBuffer =
+        [[YASAudioWritablePCMBuffer alloc] initWithPCMFormat:format frameCapacity:4];
+    YASAudioWritablePCMBuffer *fillBuffer =
+        [[YASAudioWritablePCMBuffer alloc] initWithPCMFormat:format frameCapacity:4];
     YASRelease(format);
 
     [self _fillDataToBuffer:fillBuffer];
@@ -1192,6 +1194,32 @@ static UInt32 TestValue(UInt32 frame, UInt32 ch, UInt32 buf)
     }
 
     YASRelease(buffer);
+}
+
+- (void)testCopy
+{
+    YASAudioFormat *format = [[YASAudioFormat alloc] initStandardFormatWithSampleRate:48000 channels:2];
+    YASAudioWritablePCMBuffer *sourceBuffer =
+        [[YASAudioWritablePCMBuffer alloc] initWithPCMFormat:format frameCapacity:4];
+    YASAudioPCMBuffer *copiedBuffer = [sourceBuffer copy];
+
+    XCTAssertTrue([self _compareBufferFlexiblyWithBuffer:sourceBuffer otherBuffer:copiedBuffer]);
+    XCTAssertEqualObjects(sourceBuffer.format, copiedBuffer.format);
+    XCTAssertEqual(sourceBuffer.frameLength, copiedBuffer.frameLength);
+    XCTAssertTrue([copiedBuffer isMemberOfClass:[YASAudioPCMBuffer class]]);
+    XCTAssertNotEqualObjects(sourceBuffer, copiedBuffer);
+
+    YASAudioWritablePCMBuffer *mutableCopiedBuffer = [copiedBuffer mutableCopy];
+
+    XCTAssertTrue([self _compareBufferFlexiblyWithBuffer:copiedBuffer otherBuffer:mutableCopiedBuffer]);
+    XCTAssertEqualObjects(copiedBuffer.format, mutableCopiedBuffer.format);
+    XCTAssertEqual(copiedBuffer.frameLength, mutableCopiedBuffer.frameLength);
+    XCTAssertTrue([mutableCopiedBuffer isMemberOfClass:[YASAudioWritablePCMBuffer class]]);
+    XCTAssertNotEqualObjects(copiedBuffer, mutableCopiedBuffer);
+
+    YASRelease(mutableCopiedBuffer);
+    YASRelease(copiedBuffer);
+    YASRelease(sourceBuffer);
 }
 
 #pragma mark -

@@ -30,6 +30,18 @@ typedef NS_ENUM(NSUInteger, YASAudioPCMBufferFreeType) {
     AudioBufferList *_audioBufferList;
 }
 
+- (instancetype)initWithPCMFormat:(YASAudioFormat *)format frameCapacity:(UInt32)frameCapacity
+{
+    BOOL interleaved = format.isInterleaved;
+    UInt32 bufferCount = interleaved ? 1 : format.channelCount;
+    UInt32 stride = interleaved ? format.channelCount : 1;
+    UInt32 bytesPerFrame = format.streamDescription->mBytesPerFrame;
+    AudioBufferList *audioBufferList =
+        YASAudioAllocateAudioBufferList(bufferCount, stride, frameCapacity * bytesPerFrame);
+
+    return [self initWithPCMFormat:format audioBufferList:audioBufferList needsFree:YES];
+}
+
 - (instancetype)initWithPCMFormat:(YASAudioFormat *)format
                   audioBufferList:(const AudioBufferList *)audioBufferList
                         needsFree:(BOOL)needsFree
@@ -122,7 +134,16 @@ typedef NS_ENUM(NSUInteger, YASAudioPCMBufferFreeType) {
 - (id)copyWithZone:(NSZone *)zone
 {
     YASAudioPCMBuffer *buffer =
-        [[self.class allocWithZone:zone] initWithPCMFormat:self.format frameCapacity:_frameCapacity];
+        [[YASAudioPCMBuffer allocWithZone:zone] initWithPCMFormat:self.format frameCapacity:_frameCapacity];
+    YASAudioCopyAudioBufferListDirectly(self.audioBufferList, buffer.mutableAudioBufferList);
+    buffer.frameLength = _frameLength;
+    return buffer;
+}
+
+- (id)mutableCopyWithZone:(NSZone *)zone
+{
+    YASAudioWritablePCMBuffer *buffer =
+        [[YASAudioWritablePCMBuffer allocWithZone:zone] initWithPCMFormat:self.format frameCapacity:_frameCapacity];
     YASAudioCopyAudioBufferListDirectly(self.audioBufferList, buffer.mutableAudioBufferList);
     buffer.frameLength = _frameLength;
     return buffer;
@@ -317,18 +338,13 @@ typedef NS_ENUM(NSUInteger, YASAudioPCMBufferFreeType) {
 
 @end
 
+#pragma mark -
+
 @implementation YASAudioWritablePCMBuffer
 
 - (instancetype)initWithPCMFormat:(YASAudioFormat *)format frameCapacity:(UInt32)frameCapacity
 {
-    BOOL interleaved = format.isInterleaved;
-    UInt32 bufferCount = interleaved ? 1 : format.channelCount;
-    UInt32 stride = interleaved ? format.channelCount : 1;
-    UInt32 bytesPerFrame = format.streamDescription->mBytesPerFrame;
-    AudioBufferList *audioBufferList =
-        YASAudioAllocateAudioBufferList(bufferCount, stride, frameCapacity * bytesPerFrame);
-
-    return [self initWithPCMFormat:format audioBufferList:audioBufferList needsFree:YES];
+    return [super initWithPCMFormat:format frameCapacity:frameCapacity];
 }
 
 - (instancetype)initWithPCMFormat:(YASAudioFormat *)format

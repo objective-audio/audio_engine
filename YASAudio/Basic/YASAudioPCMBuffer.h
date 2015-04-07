@@ -14,7 +14,7 @@ typedef Float64 (^YASAudioPCMBufferWriteValueBlock)(const UInt32 bufferIndex, co
 
 @class YASAudioFormat;
 
-@interface YASAudioPCMBuffer : NSObject <NSCopying>
+@interface YASAudioPCMBuffer : NSObject <NSCopying, NSMutableCopying>
 
 @property (nonatomic, strong, readonly) YASAudioFormat *format;
 @property (nonatomic, readonly) const AudioBufferList *audioBufferList;
