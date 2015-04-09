@@ -12,7 +12,7 @@
 #import "YASAudioTypes.h"
 #import "YASWeakSupport.h"
 
-@class YASAudioDevice, YASAudioGraph, YASAudioTime;
+@class YASAudioDevice, YASAudioGraph, YASAudioTime, YASAudioPCMBuffer;
 
 @interface YASAudioDeviceIO : YASWeakProvider
 

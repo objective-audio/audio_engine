@@ -423,8 +423,8 @@
 
         audioFile.processingFormat = processingFormat;
 
-        YASAudioPCMBuffer *audioBuffer =
-            [[YASAudioPCMBuffer alloc] initWithPCMFormat:processingFormat frameCapacity:frameLength];
+        YASAudioWritablePCMBuffer *audioBuffer =
+            [[YASAudioWritablePCMBuffer alloc] initWithPCMFormat:processingFormat frameCapacity:frameLength];
 
         UInt32 startIndex = 0;
 
@@ -472,8 +472,8 @@
         XCTAssertEqualWithAccuracy(audioFile.processingLength,
                                    audioFile.fileLength * (processingSampleRate / fileSampleRate), 1);
 
-        YASAudioPCMBuffer *audioBuffer =
-            [[YASAudioPCMBuffer alloc] initWithPCMFormat:processingFormat frameCapacity:frameLength];
+        YASAudioWritablePCMBuffer *audioBuffer =
+            [[YASAudioWritablePCMBuffer alloc] initWithPCMFormat:processingFormat frameCapacity:frameLength];
 
         UInt32 startIndex = 0;
 
@@ -501,7 +501,7 @@
     YASRelease(processingFormat);
 }
 
-- (void)_writeToBuffer:(YASAudioPCMBuffer *)audioBuffer
+- (void)_writeToBuffer:(YASAudioWritablePCMBuffer *)audioBuffer
             fileFormat:(YASAudioFormat *)fileFormat
             startIndex:(NSInteger)startIndex
 {
@@ -511,20 +511,20 @@
             for (NSInteger strideIndex = 0; strideIndex < audioBuffer.stride; strideIndex++) {
                 switch (audioBuffer.format.bitDepthFormat) {
                     case YASAudioBitDepthFormatInt16: {
-                        SInt16 *ptr = [audioBuffer dataAtBufferIndex:bufIndex];
+                        SInt16 *ptr = [audioBuffer writableDataAtBufferIndex:bufIndex];
                         ptr[frameIndex * audioBuffer.stride + strideIndex] = value;
                     } break;
                     case YASAudioBitDepthFormatInt32: {
-                        SInt32 *ptr = [audioBuffer dataAtBufferIndex:bufIndex];
+                        SInt32 *ptr = [audioBuffer writableDataAtBufferIndex:bufIndex];
                         ptr[frameIndex * audioBuffer.stride + strideIndex] = value << 16;
                     } break;
                     case YASAudioBitDepthFormatFloat32: {
-                        Float32 *ptr = [audioBuffer dataAtBufferIndex:bufIndex];
+                        Float32 *ptr = [audioBuffer writableDataAtBufferIndex:bufIndex];
                         Float32 float32Value = (Float32)value / INT16_MAX;
                         ptr[frameIndex * audioBuffer.stride + strideIndex] = float32Value;
                     } break;
                     case YASAudioBitDepthFormatFloat64: {
-                        Float64 *ptr = [audioBuffer dataAtBufferIndex:bufIndex];
+                        Float64 *ptr = [audioBuffer writableDataAtBufferIndex:bufIndex];
                         Float64 float64Value = (Float64)value / INT16_MAX;
                         ptr[frameIndex * audioBuffer.stride + strideIndex] = (Float64)float64Value;
                     } break;
@@ -536,7 +536,7 @@
     }
 }
 
-- (BOOL)_compareBuffer:(YASAudioPCMBuffer *)audioBuffer
+- (BOOL)_compareBuffer:(YASAudioWritablePCMBuffer *)audioBuffer
             fileFormat:(YASAudioFormat *)fileFormat
             startIndex:(NSInteger)startIndex
 {
@@ -547,19 +547,19 @@
                 SInt16 ptrValue = 0;
                 switch (audioBuffer.format.bitDepthFormat) {
                     case YASAudioBitDepthFormatInt16: {
-                        SInt16 *ptr = [audioBuffer dataAtBufferIndex:bufIndex];
+                        SInt16 *ptr = [audioBuffer writableDataAtBufferIndex:bufIndex];
                         ptrValue = ptr[frameIndex * audioBuffer.stride + strideIndex];
                     } break;
                     case YASAudioBitDepthFormatInt32: {
-                        SInt32 *ptr = [audioBuffer dataAtBufferIndex:bufIndex];
+                        SInt32 *ptr = [audioBuffer writableDataAtBufferIndex:bufIndex];
                         ptrValue = ptr[frameIndex * audioBuffer.stride + strideIndex] >> 16;
                     } break;
                     case YASAudioBitDepthFormatFloat32: {
-                        Float32 *ptr = [audioBuffer dataAtBufferIndex:bufIndex];
+                        Float32 *ptr = [audioBuffer writableDataAtBufferIndex:bufIndex];
                         ptrValue = roundf(ptr[frameIndex * audioBuffer.stride + strideIndex] * INT16_MAX);
                     } break;
                     case YASAudioBitDepthFormatFloat64: {
-                        Float64 *ptr = [audioBuffer dataAtBufferIndex:bufIndex];
+                        Float64 *ptr = [audioBuffer writableDataAtBufferIndex:bufIndex];
                         ptrValue = round(ptr[frameIndex * audioBuffer.stride + strideIndex] * INT16_MAX);
                     } break;
                     default:

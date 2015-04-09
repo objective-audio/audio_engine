@@ -292,7 +292,7 @@
 
 #pragma mark Render thread
 
-- (void)renderWithBuffer:(YASAudioPCMBuffer *)buffer bus:(NSNumber *)bus when:(YASAudioTime *)when
+- (void)renderWithBuffer:(YASAudioWritablePCMBuffer *)buffer bus:(NSNumber *)bus when:(YASAudioTime *)when
 {
     [self setRenderTimeOnRender:when];
 }

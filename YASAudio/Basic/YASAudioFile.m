@@ -405,12 +405,12 @@ static NSString *YASFileTypeFromAudioFileTypeID(AudioFileTypeID fileTypeID)
     return self;
 }
 
-- (BOOL)readIntoBuffer:(YASAudioPCMBuffer *)buffer error:(NSError **)outError
+- (BOOL)readIntoBuffer:(YASAudioWritablePCMBuffer *)buffer error:(NSError **)outError
 {
     return [self readIntoBuffer:buffer frameLength:buffer.frameCapacity error:outError];
 }
 
-- (BOOL)readIntoBuffer:(YASAudioPCMBuffer *)buffer frameLength:(const UInt32)frameLength error:(NSError **)outError
+- (BOOL)readIntoBuffer:(YASAudioWritablePCMBuffer *)buffer frameLength:(const UInt32)frameLength error:(NSError **)outError
 {
     if (![buffer.format isEqualToAudioFormat:self.processingFormat]) {
         if (outError) {

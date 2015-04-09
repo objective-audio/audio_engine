@@ -4,6 +4,7 @@
 //
 
 #import "YASAudioTapNode.h"
+#import "YASAudioPCMBuffer.h"
 #import "YASAudioConnection.h"
 #import "YASMacros.h"
 
@@ -30,7 +31,7 @@
 
 #pragma mark Render thread
 
-- (void)renderWithBuffer:(YASAudioPCMBuffer *)buffer bus:(NSNumber *)bus when:(YASAudioTime *)when
+- (void)renderWithBuffer:(YASAudioWritablePCMBuffer *)buffer bus:(NSNumber *)bus when:(YASAudioTime *)when
 {
     [super renderWithBuffer:buffer bus:bus when:when];
 

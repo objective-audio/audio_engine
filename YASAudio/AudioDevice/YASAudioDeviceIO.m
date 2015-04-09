@@ -18,12 +18,10 @@
 
 static UInt32 YASAudioDeviceIOFrameCapacity = 4096;
 
-@class YASAudioPCMBuffer;
-
 @interface YASAudioDeviceIOCore : NSObject
 
-@property (nonatomic, strong) YASAudioPCMBuffer *inputBuffer;
-@property (nonatomic, strong) YASAudioPCMBuffer *outputBuffer;
+@property (nonatomic, strong) YASAudioWritablePCMBuffer *inputBuffer;
+@property (nonatomic, strong) YASAudioWritablePCMBuffer *outputBuffer;
 
 @end
 
@@ -124,7 +122,7 @@ static UInt32 YASAudioDeviceIOFrameCapacity = 4096;
             if (core) {
                 [core clearBuffers];
 
-                YASAudioPCMBuffer *inputBuffer = core.inputBuffer;
+                YASAudioWritablePCMBuffer *inputBuffer = core.inputBuffer;
                 [inputBuffer copyDataFlexiblyFromAudioBufferList:inInputData];
 
                 const UInt32 inputFrameLength = inputBuffer.frameLength;
@@ -139,7 +137,7 @@ static UInt32 YASAudioDeviceIOFrameCapacity = 4096;
 
                 YASAudioDeviceIOCallbackBlock renderCallbackBlock = deviceIO.renderCallbackBlock;
                 if (renderCallbackBlock) {
-                    YASAudioPCMBuffer *outputBuffer = core.outputBuffer;
+                    YASAudioWritablePCMBuffer *outputBuffer = core.outputBuffer;
                     if (outputBuffer) {
                         const UInt32 frameLength = YASAudioGetFrameLengthFromAudioBufferList(
                             outOutputData, outputBuffer.format.sampleByteCount);
@@ -267,15 +265,15 @@ static UInt32 YASAudioDeviceIOFrameCapacity = 4096;
     YASAudioFormat *outputFormat = self.audioDevice.outputFormat;
 
     if (inputFormat) {
-        YASAudioPCMBuffer *inputBuffer =
-            [[YASAudioPCMBuffer alloc] initWithPCMFormat:inputFormat frameCapacity:YASAudioDeviceIOFrameCapacity];
+        YASAudioWritablePCMBuffer *inputBuffer =
+            [[YASAudioWritablePCMBuffer alloc] initWithPCMFormat:inputFormat frameCapacity:YASAudioDeviceIOFrameCapacity];
         core.inputBuffer = inputBuffer;
         YASRelease(inputBuffer);
     }
 
     if (outputFormat) {
-        YASAudioPCMBuffer *outputBuffer =
-            [[YASAudioPCMBuffer alloc] initWithPCMFormat:outputFormat frameCapacity:YASAudioDeviceIOFrameCapacity];
+        YASAudioWritablePCMBuffer *outputBuffer =
+            [[YASAudioWritablePCMBuffer alloc] initWithPCMFormat:outputFormat frameCapacity:YASAudioDeviceIOFrameCapacity];
         core.outputBuffer = outputBuffer;
         YASRelease(outputBuffer);
     }

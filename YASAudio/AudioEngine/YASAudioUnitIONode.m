@@ -291,7 +291,8 @@
             [audioUnit setInputCallback];
 
             YASAudioFormat *format = outputConnection.format;
-            YASAudioPCMBuffer *inputBuffer = [[YASAudioPCMBuffer alloc] initWithPCMFormat:format frameCapacity:4096];
+            YASAudioWritablePCMBuffer *inputBuffer =
+                [[YASAudioWritablePCMBuffer alloc] initWithPCMFormat:format frameCapacity:4096];
             YASWeakContainer *inputNodeContainer = self.weakContainer;
 
             audioUnit.inputCallbackBlock = ^(YASAudioUnitRenderParameters *renderParameters) {
@@ -346,8 +347,8 @@
 
 - (void)render:(YASAudioUnitRenderParameters *)renderParameters format:(YASAudioFormat *)format
 {
-    YASAudioPCMBuffer *renderBuffer =
-        [[YASAudioPCMBuffer alloc] initWithPCMFormat:format audioBufferList:renderParameters->ioData needsFree:NO];
+    YASAudioWritablePCMBuffer *renderBuffer =
+        [[YASAudioWritablePCMBuffer alloc] initWithPCMFormat:format audioBufferList:renderParameters->ioData needsFree:NO];
     YASAudioPCMBuffer *inputBuffer = self.inputBuffer;
     UInt32 renderFrameLength = renderParameters->inNumberFrames;
 

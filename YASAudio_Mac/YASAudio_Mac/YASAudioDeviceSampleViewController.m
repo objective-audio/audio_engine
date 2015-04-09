@@ -42,7 +42,7 @@ static const UInt32 kSineDataMaxCount = 4096;
     YASSuperDealloc;
 }
 
-- (void)processWithOutputBuffer:(YASAudioPCMBuffer *)outputBuffer inputBuffer:(YASAudioPCMBuffer *)inputBuffer
+- (void)processWithOutputBuffer:(YASAudioWritablePCMBuffer *)outputBuffer inputBuffer:(YASAudioPCMBuffer *)inputBuffer
 {
     UInt32 frameLength = outputBuffer.frameLength;
     AudioBufferList *outputData = outputBuffer.mutableAudioBufferList;
@@ -139,7 +139,7 @@ static const UInt32 kSineDataMaxCount = 4096;
 
     YASWeakContainer *container = self.deviceIO.weakContainer;
 
-    self.deviceIO.renderCallbackBlock = ^(YASAudioPCMBuffer *outBuffer, YASAudioTime *when) {
+    self.deviceIO.renderCallbackBlock = ^(YASAudioWritablePCMBuffer *outBuffer, YASAudioTime *when) {
         YASAudioDeviceIO *deviceIO = [container retainedObject];
         [core processWithOutputBuffer:outBuffer inputBuffer:[deviceIO inputBufferOnRender]];
         YASRelease(deviceIO);
