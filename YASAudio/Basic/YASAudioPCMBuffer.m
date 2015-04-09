@@ -196,7 +196,7 @@ typedef NS_ENUM(NSUInteger, YASAudioPCMBufferFreeType) {
     return self.audioBufferList->mBuffers[0].mNumberChannels;
 }
 
-- (void *)dataAtBufferIndex:(NSUInteger)index
+- (YASAudioPointer)dataAtBufferIndex:(NSUInteger)index
 {
     return [self _dataWithBitDepthFormat:self.format.bitDepthFormat atBufferIndex:index];
 }
@@ -219,18 +219,18 @@ typedef NS_ENUM(NSUInteger, YASAudioPCMBufferFreeType) {
         return 0;
     }
 
-    Byte *data = [self _dataWithBitDepthFormat:bitDepthFormat atBufferIndex:bufferIndex];
-    void *ptr = &data[(stride * frame + channel) * sampleByteCount];
+    YASAudioPointer data = [self _dataWithBitDepthFormat:bitDepthFormat atBufferIndex:bufferIndex];
+    YASAudioConstPointer pointer = {&data.u8[(stride * frame + channel) * sampleByteCount]};
 
     switch (bitDepthFormat) {
         case YASAudioBitDepthFormatFloat32:
-            return *((Float32 *)ptr);
+            return *pointer.f32;
         case YASAudioBitDepthFormatFloat64:
-            return *((Float64 *)ptr);
+            return *pointer.f64;
         case YASAudioBitDepthFormatInt16:
-            return (Float64)(*((SInt16 *)ptr)) / INT16_MAX;
+            return (Float64)(*pointer.i16) / INT16_MAX;
         case YASAudioBitDepthFormatInt32:
-            return (Float64)(*((SInt32 *)ptr)) / INT32_MAX;
+            return (Float64)(*pointer.i32) / INT32_MAX;
         default:
             break;
     }
@@ -256,21 +256,21 @@ typedef NS_ENUM(NSUInteger, YASAudioPCMBufferFreeType) {
         return;
     }
 
-    Byte *data = [self _dataWithBitDepthFormat:bitDepthFormat atBufferIndex:bufferIndex];
-    const void *ptr = &data[(stride * frame + channel) * sampleByteCount];
+    YASAudioPointer data = [self _dataWithBitDepthFormat:bitDepthFormat atBufferIndex:bufferIndex];
+    YASAudioPointer pointer = {&data.u8[(stride * frame + channel) * sampleByteCount]};
 
     switch (bitDepthFormat) {
         case YASAudioBitDepthFormatFloat32: {
-            *((Float32 *)ptr) = value;
+            *pointer.f32 = value;
         } break;
         case YASAudioBitDepthFormatFloat64: {
-            *((Float64 *)ptr) = value;
+            *pointer.f64 = value;
         } break;
         case YASAudioBitDepthFormatInt16: {
-            *((SInt16 *)ptr) = value * INT16_MAX;
+            *pointer.i16 = value * INT16_MAX;
         } break;
         case YASAudioBitDepthFormatInt32: {
-            *((SInt32 *)ptr) = value * INT32_MAX;
+            *pointer.i32 = value * INT32_MAX;
         } break;
         default:
             break;
@@ -286,7 +286,8 @@ typedef NS_ENUM(NSUInteger, YASAudioPCMBufferFreeType) {
 
     const YASAudioBitDepthFormat bitDepthFormat = self.format.bitDepthFormat;
     for (UInt32 i = 0; i < self.bufferCount; i++) {
-        readBlock([self _dataWithBitDepthFormat:bitDepthFormat atBufferIndex:i], i);
+        YASAudioConstPointer pointer = {[self _dataWithBitDepthFormat:bitDepthFormat atBufferIndex:i].v};
+        readBlock(pointer, i);
     }
 }
 
@@ -302,17 +303,19 @@ typedef NS_ENUM(NSUInteger, YASAudioPCMBufferFreeType) {
     }
 }
 
-- (void *)_dataWithBitDepthFormat:(YASAudioBitDepthFormat)bitDepthFormat atBufferIndex:(NSUInteger)index
+- (YASAudioPointer)_dataWithBitDepthFormat:(YASAudioBitDepthFormat)bitDepthFormat atBufferIndex:(NSUInteger)index
 {
+    YASAudioPointer pointer = {NULL};
+
     if (_format.bitDepthFormat != bitDepthFormat) {
         YASRaiseWithReason(([NSString stringWithFormat:@"%s - Invalid bit depth format.", __PRETTY_FUNCTION__]));
-        return nil;
     } else if (index >= self.audioBufferList->mNumberBuffers) {
         YASRaiseWithReason(([NSString stringWithFormat:@"%s - Out of range.", __PRETTY_FUNCTION__]));
-        return nil;
+    } else {
+        pointer.v = self.audioBufferList->mBuffers[index].mData;
     }
 
-    return self.audioBufferList->mBuffers[index].mData;
+    return pointer;
 }
 
 - (void)enumerateReadValuesUsingBlock:(YASAudioPCMBufferReadValueBlock)readValueBlock
@@ -327,7 +330,7 @@ typedef NS_ENUM(NSUInteger, YASAudioPCMBufferFreeType) {
     const UInt32 frameLength = self.frameLength;
     const UInt32 stride = self.stride;
     const UInt32 bufferCount = self.bufferCount;
-    const Byte *datas[bufferCount];
+    YASAudioPointer datas[bufferCount];
 
     for (UInt32 i = 0; i < bufferCount; i++) {
         datas[i] = [self _dataWithBitDepthFormat:bitDepthFormat atBufferIndex:i];
@@ -336,20 +339,20 @@ typedef NS_ENUM(NSUInteger, YASAudioPCMBufferFreeType) {
     for (UInt32 frame = 0; frame < frameLength; frame++) {
         for (UInt32 ch = 0; ch < stride; ch++) {
             for (UInt32 bufferIndex = 0; bufferIndex < self.bufferCount; bufferIndex++) {
-                const void *ptr = &datas[bufferIndex][(stride * frame + ch) * sampleByteCount];
+                YASAudioConstPointer pointer = {&datas[bufferIndex].u8[(stride * frame + ch) * sampleByteCount]};
                 Float64 value = 0;
                 switch (bitDepthFormat) {
                     case YASAudioBitDepthFormatFloat32: {
-                        value = *((Float32 *)ptr);
+                        value = *pointer.f32;
                     } break;
                     case YASAudioBitDepthFormatFloat64: {
-                        value = *((Float64 *)ptr);
+                        value = *pointer.f64;
                     } break;
                     case YASAudioBitDepthFormatInt16: {
-                        value = (Float64)(*((SInt16 *)ptr)) / INT16_MAX;
+                        value = (Float64)(*pointer.i16) / INT16_MAX;
                     } break;
                     case YASAudioBitDepthFormatInt32: {
-                        value = (Float64)(*((SInt32 *)ptr)) / INT32_MAX;
+                        value = (Float64)(*pointer.i32) / INT32_MAX;
                     } break;
                     default:
                         break;
@@ -375,7 +378,7 @@ typedef NS_ENUM(NSUInteger, YASAudioPCMBufferFreeType) {
     const UInt32 frameLength = self.frameLength;
     const UInt32 stride = self.stride;
     const UInt32 bufferCount = self.bufferCount;
-    Byte *datas[bufferCount];
+    YASAudioPointer datas[bufferCount];
 
     for (UInt32 i = 0; i < bufferCount; i++) {
         datas[i] = [self _dataWithBitDepthFormat:bitDepthFormat atBufferIndex:i];
@@ -387,19 +390,19 @@ typedef NS_ENUM(NSUInteger, YASAudioPCMBufferFreeType) {
                 @autoreleasepool
                 {
                     Float64 value = writeValueBlock(bufferIndex, ch, frame);
-                    void *ptr = &datas[bufferIndex][(stride * frame + ch) * sampleByteCount];
+                    YASAudioPointer pointer = {&datas[bufferIndex].u8[(stride * frame + ch) * sampleByteCount]};
                     switch (bitDepthFormat) {
                         case YASAudioBitDepthFormatFloat32: {
-                            *((Float32 *)ptr) = value;
+                            *pointer.f32 = value;
                         } break;
                         case YASAudioBitDepthFormatFloat64: {
-                            *((Float64 *)ptr) = value;
+                            *pointer.f64 = value;
                         } break;
                         case YASAudioBitDepthFormatInt16: {
-                            *((SInt16 *)ptr) = value * INT16_MAX;
+                            *pointer.i16 = value * INT16_MAX;
                         } break;
                         case YASAudioBitDepthFormatInt32: {
-                            *((SInt32 *)ptr) = value * INT32_MAX;
+                            *pointer.i32 = value * INT32_MAX;
                         } break;
                         default:
                             break;

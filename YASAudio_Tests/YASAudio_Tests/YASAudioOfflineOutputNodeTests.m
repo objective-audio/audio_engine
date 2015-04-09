@@ -54,9 +54,9 @@ static UInt32 TestValue(UInt32 frame, UInt32 ch, UInt32 buf)
         XCTAssertEqualObjects(buffer.format, format);
 
         for (UInt32 buf = 0; buf < buffer.bufferCount; buf++) {
-            Float32 *data = [buffer dataAtBufferIndex:buf];
+            YASAudioPointer pointer = [buffer dataAtBufferIndex:buf];
             for (UInt32 frame = 0; frame < buffer.frameLength; frame++) {
-                data[frame] = TestValue(frame + tapRenderFrame, 0, buf);
+                pointer.f32[frame] = TestValue(frame + tapRenderFrame, 0, buf);
             }
         }
 
@@ -76,9 +76,9 @@ static UInt32 TestValue(UInt32 frame, UInt32 ch, UInt32 buf)
             XCTAssertEqualObjects(buffer.format, format);
 
             for (UInt32 buf = 0; buf < buffer.bufferCount; buf++) {
-                const Float32 *data = [buffer dataAtBufferIndex:buf];
+                YASAudioConstPointer pointer = {[buffer dataAtBufferIndex:buf].v};
                 for (UInt32 frame = 0; frame < buffer.frameLength; frame++) {
-                    XCTAssertEqual(data[frame], TestValue(frame + outputRenderFrame, 0, buf));
+                    XCTAssertEqual(pointer.f32[frame], TestValue(frame + outputRenderFrame, 0, buf));
                 }
             }
 
@@ -140,9 +140,9 @@ static UInt32 TestValue(UInt32 frame, UInt32 ch, UInt32 buf)
         XCTAssertEqualObjects(buffer.format, format);
 
         for (UInt32 buf = 0; buf < buffer.bufferCount; buf++) {
-            Float32 *data = [buffer dataAtBufferIndex:buf];
+            YASAudioPointer pointer = [buffer dataAtBufferIndex:buf];
             for (UInt32 frame = 0; frame < buffer.frameLength; frame++) {
-                data[frame] = TestValue(frame + tapRenderFrame, 0, buf);
+                pointer.f32[frame] = TestValue(frame + tapRenderFrame, 0, buf);
             }
         }
 
@@ -163,9 +163,9 @@ static UInt32 TestValue(UInt32 frame, UInt32 ch, UInt32 buf)
             XCTAssertEqualObjects(buffer.format, format);
 
             for (UInt32 buf = 0; buf < buffer.bufferCount; buf++) {
-                const Float32 *data = [buffer dataAtBufferIndex:buf];
+                YASAudioConstPointer pointer = {[buffer dataAtBufferIndex:buf].v};
                 for (UInt32 frame = 0; frame < buffer.frameLength; frame++) {
-                    XCTAssertEqual(data[frame], TestValue(frame + outputRenderFrame, 0, buf));
+                    XCTAssertEqual(pointer.f32[frame], TestValue(frame + outputRenderFrame, 0, buf));
                 }
             }
 
