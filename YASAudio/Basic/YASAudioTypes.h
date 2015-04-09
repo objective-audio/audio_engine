@@ -35,6 +35,26 @@ typedef struct YASAudioUnitRenderParameters {
     AudioBufferList *ioData;
 } YASAudioUnitRenderParameters;
 
+typedef union YASAudioPointer {
+    void *v;
+    Float32 *f32;
+    Float64 *f64;
+    SInt16 *i16;
+    SInt32 *i32;
+    SInt8 *i8;
+    UInt8 *u8;
+} YASAudioPointer;
+
+typedef union YASAudioConstPointer {
+    const void *v;
+    const Float32 *f32;
+    const Float64 *f64;
+    const SInt16 *i16;
+    const SInt32 *i32;
+    const SInt8 *i8;
+    const UInt8 *u8;
+} YASAudioConstPointer;
+
 typedef void (^YASAudioUnitCallbackBlock)(YASAudioUnitRenderParameters *renderParameters);
 typedef void (^YASAudioDeviceIOCallbackBlock)(YASAudioPCMBuffer *outBuffer, YASAudioTime *when);
 typedef void (^YASAudioNodeRenderBlock)(YASAudioPCMBuffer *buffer, NSNumber *bus, YASAudioTime *when, id nodeCore);
