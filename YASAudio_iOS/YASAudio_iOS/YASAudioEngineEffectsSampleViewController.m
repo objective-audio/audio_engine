@@ -122,8 +122,8 @@ static const AudioComponentDescription baseAcd = {.componentType = kAudioUnitTyp
         const Float64 startPhase = phase;
         const Float64 phasePerFrame = 1000.0 / buffer.format.sampleRate * YAS_2_PI;
         for (NSInteger idx = 0; idx < buffer.bufferCount; idx++) {
-            [buffer writeDataUsingBlock:^(void *data, const UInt32 bufferIndex) {
-                phase = YASAudioVectorSinef(data, buffer.frameLength, startPhase, phasePerFrame);
+            [buffer writeDataUsingBlock:^(YASAudioPointer pointer, const UInt32 bufferIndex) {
+                phase = YASAudioVectorSinef(pointer.f32, buffer.frameLength, startPhase, phasePerFrame);
             }];
         }
     };
