@@ -5,9 +5,10 @@
 
 #import <Foundation/Foundation.h>
 #import <AudioToolbox/AudioToolbox.h>
+#import "YASAudioTypes.h"
 
-typedef void (^YASAudioPCMBufferReadBlock)(const void *data, const UInt32 bufferIndex);
-typedef void (^YASAudioPCMBufferWriteBlock)(void *data, const UInt32 bufferIndex);
+typedef void (^YASAudioPCMBufferReadBlock)(YASAudioConstPointer pointer, const UInt32 bufferIndex);
+typedef void (^YASAudioPCMBufferWriteBlock)(YASAudioPointer pointer, const UInt32 bufferIndex);
 typedef void (^YASAudioPCMBufferReadValueBlock)(Float64 value, const UInt32 bufferIndex, const UInt32 channel,
                                                 const UInt32 frame);
 typedef Float64 (^YASAudioPCMBufferWriteValueBlock)(const UInt32 bufferIndex, const UInt32 channel, const UInt32 frame);
@@ -28,7 +29,7 @@ typedef Float64 (^YASAudioPCMBufferWriteValueBlock)(const UInt32 bufferIndex, co
 - (instancetype)init NS_UNAVAILABLE;
 - (instancetype)initWithPCMFormat:(YASAudioFormat *)format frameCapacity:(UInt32)frameCapacity;
 
-- (void *)dataAtBufferIndex:(NSUInteger)index;
+- (YASAudioPointer)dataAtBufferIndex:(NSUInteger)index;
 
 - (Float64)valueAtBufferIndex:(UInt32)bufferIndex channel:(UInt32)channel frame:(UInt32)frame;
 - (void)setValue:(Float64)value atBufferIndex:(UInt32)bufferIndex channel:(UInt32)channel frame:(UInt32)frame;
