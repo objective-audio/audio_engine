@@ -18,6 +18,7 @@
 #import "YASAudioFile.h"
 #import "YASAudioFormat.h"
 #import "YASAudioPCMBuffer.h"
+#import "YASAudioFrameScanner.h"
 
 #import "YASAudioGraph.h"
 #import "YASAudioUnit.h"
