@@ -296,8 +296,8 @@ Boolean YASAudioIsEqualAudioTimeStamp(const AudioTimeStamp *inTs1, const AudioTi
     } else {
         return ((inTs1->mFlags == inTs2->mFlags) && (inTs1->mHostTime == inTs2->mHostTime) &&
                 (inTs1->mWordClockTime == inTs2->mWordClockTime) &&
-                YASAudioIsEqualDoubleWithAccuracy(inTs1->mSampleTime, inTs2->mSampleTime, 0.00001) &&
-                YASAudioIsEqualDoubleWithAccuracy(inTs1->mRateScalar, inTs2->mRateScalar, 0.00001) &&
+                YASAudioIsEqualDoubleWithAccuracy(inTs1->mSampleTime, inTs2->mSampleTime, 0.0001) &&
+                YASAudioIsEqualDoubleWithAccuracy(inTs1->mRateScalar, inTs2->mRateScalar, 0.0001) &&
                 YASAudioIsEqualData(&inTs1->mSMPTETime, &inTs2->mSMPTETime, sizeof(SMPTETime)));
     }
 }
