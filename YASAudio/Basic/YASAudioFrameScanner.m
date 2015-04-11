@@ -10,7 +10,9 @@
 #import "YASMacros.h"
 
 @implementation YASAudioFrameScanner {
+   @protected
     YASAudioPointer _pointer;
+   @private
     YASAudioPointer *_pointers;
     YASAudioPointer *_topPointers;
     BOOL _atFrameEnd;
@@ -60,9 +62,9 @@
     YASSuperDealloc;
 }
 
-- (YASAudioPointer *)pointer
+- (YASAudioConstPointer *)pointer
 {
-    return &_pointer;
+    return (YASAudioConstPointer *)&_pointer;
 }
 
 - (const NSUInteger *)frame
@@ -163,6 +165,15 @@
 
     _channel = 0;
     _pointer.v = _pointers->v;
+}
+
+@end
+
+@implementation YASAudioMutableFrameScanner
+
+- (YASAudioPointer *)mutablePointer
+{
+    return &_pointer;
 }
 
 @end
