@@ -22,6 +22,9 @@
 - (void)moveFrame;
 - (void)moveChannel;
 
+- (void)setFramePosition:(NSUInteger)frame;
+- (void)setChannelPosition:(NSUInteger)channel;
+
 - (void)reset;
 
 @end

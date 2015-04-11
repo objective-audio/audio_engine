@@ -6,6 +6,7 @@
 #import "YASAudioFrameScanner.h"
 #import "YASAudioPCMBuffer.h"
 #import "YASAudioFormat.h"
+#import "NSException+YASAudio.h"
 #import "YASMacros.h"
 
 @implementation YASAudioFrameScanner {
@@ -114,6 +115,40 @@
     } else {
         _pointer.v = _pointers[_channel].v;
     }
+}
+
+- (void)setFramePosition:(NSUInteger)frame
+{
+    if (frame >= _frameLength) {
+        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Overflow frame.", __PRETTY_FUNCTION__]));
+        return;
+    }
+
+    _frame = frame;
+
+    NSUInteger pointerIndex = _channelCount;
+    while (pointerIndex--) {
+        _pointers[pointerIndex].u8 = _topPointers[pointerIndex].u8 + (_pointerStride * _frame);
+    }
+
+    if (_atChannelEnd) {
+        _channel = 0;
+        _pointer.v = _pointers->v;
+        _atChannelEnd = NO;
+    } else {
+        _pointer.v = _pointers[_channel].v;
+    }
+}
+
+- (void)setChannelPosition:(NSUInteger)channel
+{
+    if (channel >= _channelCount) {
+        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Overflow channel.", __PRETTY_FUNCTION__]));
+        return;
+    }
+
+    _channel = channel;
+    _pointer.v = _pointers[_channel].v;
 }
 
 - (void)reset

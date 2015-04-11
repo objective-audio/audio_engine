@@ -126,4 +126,69 @@ static UInt32 TestValue(UInt32 frame, UInt32 ch, UInt32 buf)
     YASRelease(pcmBuffer);
 }
 
+- (void)testSetFramePosition
+{
+    const UInt32 frameLength = 16;
+
+    YASAudioFormat *format = [[YASAudioFormat alloc] initStandardFormatWithSampleRate:48000 channels:1];
+    YASAudioPCMBuffer *pcmBuffer = [[YASAudioPCMBuffer alloc] initWithPCMFormat:format frameCapacity:frameLength];
+    YASRelease(format);
+
+    YASAudioPointer bufferPointer = [pcmBuffer dataAtBufferIndex:0];
+    for (UInt32 frame = 0; frame < frameLength; frame++) {
+        bufferPointer.f32[frame] = TestValue(frame, 0, 0);
+    }
+
+    YASAudioFrameScanner *frameScanner = [[YASAudioFrameScanner alloc] initWithPCMBuffer:pcmBuffer];
+    YASAudioPointer *pointer = frameScanner.pointer;
+    const NSUInteger *pointerFrame = frameScanner.frame;
+
+    XCTAssertEqual(*pointerFrame, 0);
+    XCTAssertEqual(*pointer->f32, TestValue(0, 0, 0));
+
+    [frameScanner setFramePosition:3];
+    XCTAssertEqual(*pointerFrame, 3);
+    XCTAssertEqual(*pointer->f32, TestValue(3, 0, 0));
+
+    XCTAssertThrows([frameScanner setFramePosition:16]);
+    XCTAssertThrows([frameScanner setFramePosition:100]);
+
+    YASRelease(frameScanner);
+    YASRelease(pcmBuffer);
+}
+
+- (void)testSetChannelPosition
+{
+    const UInt32 channels = 4;
+
+    YASAudioFormat *format = [[YASAudioFormat alloc] initWithBitDepthFormat:YASAudioBitDepthFormatFloat32
+                                                                 sampleRate:48000
+                                                                   channels:channels
+                                                                interleaved:YES];
+    YASAudioPCMBuffer *pcmBuffer = [[YASAudioPCMBuffer alloc] initWithPCMFormat:format frameCapacity:1];
+    YASRelease(format);
+
+    YASAudioPointer bufferPointer = [pcmBuffer dataAtBufferIndex:0];
+    for (UInt32 ch = 0; ch < channels; ch++) {
+        bufferPointer.f32[ch] = TestValue(0, ch, 0);
+    }
+
+    YASAudioFrameScanner *frameScanner = [[YASAudioFrameScanner alloc] initWithPCMBuffer:pcmBuffer];
+    YASAudioPointer *pointer = frameScanner.pointer;
+    const NSUInteger *pointerChannel = frameScanner.channel;
+
+    XCTAssertEqual(*pointerChannel, 0);
+    XCTAssertEqual(*pointer->f32, TestValue(0, 0, 0));
+
+    [frameScanner setChannelPosition:2];
+    XCTAssertEqual(*pointerChannel, 2);
+    XCTAssertEqual(*pointer->f32, TestValue(0, 2, 0));
+
+    XCTAssertThrows([frameScanner setFramePosition:4]);
+    XCTAssertThrows([frameScanner setFramePosition:100]);
+
+    YASRelease(frameScanner);
+    YASRelease(pcmBuffer);
+}
+
 @end
