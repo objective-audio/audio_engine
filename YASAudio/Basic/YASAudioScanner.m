@@ -14,13 +14,12 @@
     YASAudioPointer _pointer;
    @private
     YASAudioPointer _topPointer;
-    BOOL _atEnd;
     NSUInteger _stride;
     NSUInteger _length;
     NSUInteger _index;
 }
 
-- (instancetype)initWithAudioData:(YASAudioData *)data atBuffer:(NSUInteger)buffer
+- (instancetype)initWithAudioData:(YASAudioData *)data atBuffer:(const NSUInteger)buffer
 {
     YASAudioPointer pointer = [data pointerAtBuffer:buffer];
     YASAudioFormat *format = data.format;
@@ -28,7 +27,9 @@
     return [self initWithPointer:pointer stride:stride length:data.frameLength];
 }
 
-- (instancetype)initWithPointer:(YASAudioPointer)pointer stride:(const NSUInteger)stride length:(const NSUInteger)length
+- (instancetype)initWithPointer:(const YASAudioPointer)pointer
+                         stride:(const NSUInteger)stride
+                         length:(const NSUInteger)length
 {
     self = [super init];
     if (self) {
@@ -45,7 +46,7 @@
     return self;
 }
 
-- (YASAudioConstPointer *)pointer
+- (const YASAudioConstPointer *)pointer
 {
     return (YASAudioConstPointer *)&_pointer;
 }
@@ -55,22 +56,16 @@
     return &_index;
 }
 
-- (const BOOL *)isAtEnd
-{
-    return &_atEnd;
-}
-
 - (void)move
 {
     if (++_index >= _length) {
-        _atEnd = YES;
         _pointer.v = NULL;
     } else {
         _pointer.v += _stride;
     }
 }
 
-- (void)setPosition:(NSUInteger)index
+- (void)setPosition:(const NSUInteger)index
 {
     if (index >= _length) {
         YASRaiseWithReason(([NSString stringWithFormat:@"%s - Overflow index.", __PRETTY_FUNCTION__]));
@@ -83,7 +78,6 @@
 - (void)reset
 {
     _index = 0;
-    _atEnd = NO;
     _pointer.v = _topPointer.v;
 }
 
@@ -91,7 +85,7 @@
 
 @implementation YASAudioMutableScanner
 
-- (YASAudioPointer *)mutablePointer
+- (const YASAudioPointer *)mutablePointer
 {
     return &_pointer;
 }
@@ -104,12 +98,11 @@
    @private
     YASAudioPointer *_pointers;
     YASAudioPointer *_topPointers;
-    BOOL _atFrameEnd;
-    BOOL _atChannelEnd;
     NSUInteger _frameStride;
     NSUInteger _frameLength;
     NSUInteger _frame;
     NSUInteger _channel;
+    NSUInteger _channelCount;
 }
 
 - (instancetype)initWithAudioData:(YASAudioData *)data
@@ -121,7 +114,6 @@
         NSUInteger sampleByteCount = data.format.sampleByteCount;
 
         _frame = _channel = 0;
-        _atFrameEnd = _atChannelEnd = NO;
         _frameLength = data.frameLength;
         _channelCount = bufferCount * stride;
         _frameStride = stride * sampleByteCount;
@@ -151,7 +143,7 @@
     YASSuperDealloc;
 }
 
-- (YASAudioConstPointer *)pointer
+- (const YASAudioConstPointer *)pointer
 {
     return (YASAudioConstPointer *)&_pointer;
 }
@@ -166,34 +158,22 @@
     return &_channel;
 }
 
-- (const BOOL *)isAtFrameEnd
-{
-    return &_atFrameEnd;
-}
-
-- (const BOOL *)isAtChannelEnd
-{
-    return &_atChannelEnd;
-}
-
 - (void)moveFrame
 {
     if (++_frame >= _frameLength) {
         memset(_pointers, 0, _channelCount * sizeof(YASAudioPointer *));
         _pointer.v = NULL;
-        _atFrameEnd = YES;
     } else {
-        NSUInteger pointerIndex = _channelCount;
-        while (pointerIndex--) {
-            _pointers[pointerIndex].u8 += _frameStride;
+        NSUInteger index = _channelCount;
+        while (index--) {
+            _pointers[index].u8 += _frameStride;
         }
 
-        if (_atChannelEnd) {
+        if (_pointer.v) {
+            _pointer.v = _pointers[_channel].v;
+        } else {
             _channel = 0;
             _pointer.v = _pointers->v;
-            _atChannelEnd = NO;
-        } else {
-            _pointer.v = _pointers[_channel].v;
         }
     }
 }
@@ -201,14 +181,13 @@
 - (void)moveChannel
 {
     if (++_channel >= _channelCount) {
-        _atChannelEnd = YES;
         _pointer.v = NULL;
     } else {
         _pointer.v = _pointers[_channel].v;
     }
 }
 
-- (void)setFramePosition:(NSUInteger)frame
+- (void)setFramePosition:(const NSUInteger)frame
 {
     if (frame >= _frameLength) {
         YASRaiseWithReason(([NSString stringWithFormat:@"%s - Overflow frame.", __PRETTY_FUNCTION__]));
@@ -217,21 +196,21 @@
 
     _frame = frame;
 
-    NSUInteger pointerIndex = _channelCount;
-    while (pointerIndex--) {
-        _pointers[pointerIndex].u8 = _topPointers[pointerIndex].u8 + (_frameStride * _frame);
+    NSUInteger stride = _frameStride * frame;
+    NSUInteger index = _channelCount;
+    while (index--) {
+        _pointers[index].v = _topPointers[index].v + stride;
     }
 
-    if (_atChannelEnd) {
+    if (_pointer.v) {
+        _pointer.v = _pointers[_channel].v;
+    } else {
         _channel = 0;
         _pointer.v = _pointers->v;
-        _atChannelEnd = NO;
-    } else {
-        _pointer.v = _pointers[_channel].v;
     }
 }
 
-- (void)setChannelPosition:(NSUInteger)channel
+- (void)setChannelPosition:(const NSUInteger)channel
 {
     if (channel >= _channelCount) {
         YASRaiseWithReason(([NSString stringWithFormat:@"%s - Overflow channel.", __PRETTY_FUNCTION__]));
@@ -245,7 +224,6 @@
 - (void)reset
 {
     _frame = 0;
-    _atFrameEnd = _atChannelEnd = NO;
 
     NSUInteger channel = _channelCount;
     while (channel--) {
@@ -260,7 +238,7 @@
 
 @implementation YASAudioMutableFrameScanner
 
-- (YASAudioPointer *)mutablePointer
+- (const YASAudioPointer *)mutablePointer
 {
     return &_pointer;
 }
