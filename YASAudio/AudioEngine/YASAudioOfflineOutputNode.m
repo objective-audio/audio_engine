@@ -4,7 +4,7 @@
 //
 
 #import "YASAudioOfflineOutputNode.h"
-#import "YASAudioPCMBuffer.h"
+#import "YASAudioData.h"
 #import "YASAudioFormat.h"
 #import "YASAudioConnection.h"
 #import "YASAudioTime.h"
@@ -70,9 +70,8 @@ static const UInt32 YASAudioOfflineOutputRenderFrameLength = 1024;
         NSBlockOperation *blockOperation = [[NSBlockOperation alloc] init];
         __unsafe_unretained NSBlockOperation *weakOperation = blockOperation;
 
-        YASAudioPCMBuffer *renderBuffer =
-            [[YASAudioPCMBuffer alloc] initWithPCMFormat:connection.format
-                                           frameCapacity:YASAudioOfflineOutputRenderFrameLength];
+        YASAudioData *renderData = [[YASAudioData alloc] initWithFormat:connection.format
+                                                          frameCapacity:YASAudioOfflineOutputRenderFrameLength];
 
         [blockOperation addExecutionBlock:^{
             BOOL cancelled = NO;
@@ -83,7 +82,7 @@ static const UInt32 YASAudioOfflineOutputRenderFrameLength = 1024;
                 @autoreleasepool
                 {
                     YASAudioTime *when =
-                        [YASAudioTime timeWithSampleTime:currentSampleTime atRate:renderBuffer.format.sampleRate];
+                        [YASAudioTime timeWithSampleTime:currentSampleTime atRate:renderData.format.sampleRate];
 
                     YASAudioOfflineOutputNode *offlineNode = container.retainedObject;
                     YASAudioNodeCore *nodeCore = offlineNode.nodeCore;
@@ -92,18 +91,18 @@ static const UInt32 YASAudioOfflineOutputRenderFrameLength = 1024;
                     YASAudioConnection *connectionOnBlock = [nodeCore inputConnectionForBus:@0];
                     YASAudioFormat *format = connectionOnBlock.format;
 
-                    if (!format || ![format isEqualToAudioFormat:renderBuffer.format]) {
+                    if (!format || ![format isEqualToAudioFormat:renderData.format]) {
                         cancelled = YES;
                         break;
                     }
 
-                    [renderBuffer clearData];
+                    [renderData clear];
 
                     YASAudioNode *sourceNode = connectionOnBlock.sourceNode;
-                    [sourceNode renderWithBuffer:renderBuffer bus:connectionOnBlock.sourceBus when:when];
+                    [sourceNode renderWithData:renderData bus:connectionOnBlock.sourceBus when:when];
 
                     if (outputBlock) {
-                        outputBlock(renderBuffer, when, &stop);
+                        outputBlock(renderData, when, &stop);
                     }
 
                     if (weakOperation.isCancelled) {
@@ -136,7 +135,7 @@ static const UInt32 YASAudioOfflineOutputRenderFrameLength = 1024;
 
         YASRelease(blockOperation);
         YASRelease(queue);
-        YASRelease(renderBuffer);
+        YASRelease(renderData);
     }
 
     if (error) {

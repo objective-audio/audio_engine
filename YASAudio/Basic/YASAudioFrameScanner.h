@@ -6,7 +6,7 @@
 #import <Foundation/Foundation.h>
 #import "YASAudioTypes.h"
 
-@class YASAudioPCMBuffer;
+@class YASAudioData;
 
 @interface YASAudioFrameScanner : NSObject
 
@@ -17,7 +17,7 @@
 @property (nonatomic, assign, readonly) const BOOL *isAtChannelEnd;
 @property (nonatomic, assign, readonly) NSUInteger channelCount;
 
-- (instancetype)initWithPCMBuffer:(YASAudioPCMBuffer *)pcmBuffer;
+- (instancetype)initWithAudioData:(YASAudioData *)data;
 
 - (void)moveFrame;
 - (void)moveChannel;

@@ -11,7 +11,7 @@
 #import "YASAudioDeviceIO.h"
 #import "YASAudioTapNode.h"
 #import "YASAudioChannelRoute.h"
-#import "YASAudioPCMBuffer.h"
+#import "YASAudioData.h"
 #import "YASAudioFormat.h"
 #import "YASAudioTime.h"
 #import "YASWeakSupport.h"
@@ -268,7 +268,7 @@
         YASWeakContainer *nodeContainer = self.weakContainer;
         YASWeakContainer *deviceIOContainer = audioDeviceIO.weakContainer;
 
-        audioDeviceIO.renderCallbackBlock = ^(YASAudioPCMBuffer *outBuffer, YASAudioTime *when) {
+        audioDeviceIO.renderCallbackBlock = ^(YASAudioData *outData, YASAudioTime *when) {
             @autoreleasepool
             {
                 YASAudioDeviceIONode *node = [nodeContainer autoreleasingObject];
@@ -283,22 +283,21 @@
 
                 self.nodeCoreOnRender = core;
 
-                if (outBuffer) {
+                if (outData) {
                     NSDictionary *connections = core.inputConnections;
                     for (YASAudioConnection *connection in connections.objectEnumerator) {
                         NSArray *channelRoutes =
                             [core outputChannelRoutesWithSourceBus:connection.sourceBus format:connection.format];
                         if (channelRoutes) {
                             YASAudioFormat *format = connection.format;
-                            YASAudioPCMBuffer *renderBuffer =
-                                [[YASAudioPCMBuffer alloc] initWithPCMFormat:format
-                                                                      buffer:outBuffer
-                                                         outputChannelRoutes:channelRoutes];
+                            YASAudioData *renderData = [[YASAudioData alloc] initWithFormat:format
+                                                                                       data:outData
+                                                                        outputChannelRoutes:channelRoutes];
 
                             YASAudioNode *sourceNode = connection.sourceNode;
-                            [sourceNode renderWithBuffer:renderBuffer bus:connection.sourceBus when:when];
+                            [sourceNode renderWithData:renderData bus:connection.sourceBus when:when];
 
-                            YASRelease(renderBuffer);
+                            YASRelease(renderData);
                         }
                     }
                 }
@@ -316,17 +315,16 @@
                                 NSArray *channelRoutes =
                                     [core inputChannelRoutesWithDestinationBus:connection.destinationBus format:format];
                                 if (channelRoutes) {
-                                    YASAudioPCMBuffer *inputBuffer = [deviceIO inputBufferOnRender];
+                                    YASAudioData *inputData = [deviceIO inputDataOnRender];
                                     YASAudioTime *inputTime = [deviceIO inputTimeOnRender];
-                                    if (inputBuffer && inputTime) {
-                                        YASAudioPCMBuffer *renderBuffer =
-                                            [[YASAudioPCMBuffer alloc] initWithPCMFormat:format
-                                                                                  buffer:inputBuffer
-                                                                      inputChannelRoutes:channelRoutes];
+                                    if (inputData && inputTime) {
+                                        YASAudioData *renderData = [[YASAudioData alloc] initWithFormat:format
+                                                                                                   data:inputData
+                                                                                     inputChannelRoutes:channelRoutes];
 
-                                        [inputTapNode renderWithBuffer:renderBuffer bus:@0 when:inputTime];
+                                        [inputTapNode renderWithData:renderData bus:@0 when:inputTime];
 
-                                        YASRelease(renderBuffer);
+                                        YASRelease(renderData);
                                     }
                                 }
                             }
@@ -394,15 +392,15 @@
 
 #pragma mark Render thread
 
-- (void)renderWithBuffer:(YASAudioPCMBuffer *)buffer bus:(NSNumber *)bus when:(YASAudioTime *)when
+- (void)renderWithData:(YASAudioData *)data bus:(NSNumber *)bus when:(YASAudioTime *)when
 {
-    [super renderWithBuffer:buffer bus:bus when:when];
+    [super renderWithData:data bus:bus when:when];
 
     @autoreleasepool
     {
         YASAudioDeviceIO *audioDeviceIO = self.audioDeviceIO;
         if (audioDeviceIO) {
-            YASAudioFormat *format = buffer.format;
+            YASAudioFormat *format = data.format;
             YASAudioFormat *deviceFormat = audioDeviceIO.audioDevice.inputFormat;
             if (format.bitDepthFormat != deviceFormat.bitDepthFormat || format.isInterleaved) {
                 YASRaiseWithReason(([NSString stringWithFormat:@"%s - Format is not match.", __PRETTY_FUNCTION__]));
@@ -413,18 +411,18 @@
             if (nodeCore) {
                 NSArray *channelRoutes = [nodeCore inputChannelRoutesWithDestinationBus:bus format:format];
                 if (channelRoutes) {
-                    YASAudioPCMBuffer *inputBuffer = [audioDeviceIO inputBufferOnRender];
-                    const AudioBufferList *inputAudioBufferList = inputBuffer.audioBufferList;
-                    const AudioBufferList *outputAudioBufferList = buffer.audioBufferList;
-                    if (inputAudioBufferList &&
-                        !YASAudioIsEqualAudioBufferListStructure(inputAudioBufferList, outputAudioBufferList)) {
-                        YASAudioPCMBuffer *renderBuffer = [[YASAudioPCMBuffer alloc] initWithPCMFormat:format
-                                                                                                buffer:inputBuffer
-                                                                                    inputChannelRoutes:channelRoutes];
+                    YASAudioData *inputData = [audioDeviceIO inputDataOnRender];
+                    const AudioBufferList *inputAbl = inputData.audioBufferList;
+                    const AudioBufferList *outputAbl = data.audioBufferList;
+                    if (inputAbl &&
+                        !YASAudioIsEqualAudioBufferListStructure(inputAbl, outputAbl)) {
+                        YASAudioData *renderData = [[YASAudioData alloc] initWithFormat:format
+                                                                                   data:inputData
+                                                                     inputChannelRoutes:channelRoutes];
 
-                        [buffer copyDataFlexiblyFromBuffer:renderBuffer];
+                        [data copyFlexiblyFromData:renderData];
 
-                        YASRelease(renderBuffer);
+                        YASRelease(renderData);
                     }
                 }
             }

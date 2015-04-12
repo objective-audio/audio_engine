@@ -6,7 +6,7 @@
 #import "YASAudioUnitNode.h"
 #import "YASAudioUnitParameter.h"
 #import "YASAudioConnection.h"
-#import "YASAudioPCMBuffer.h"
+#import "YASAudioData.h"
 #import "YASAudioFormat.h"
 #import "YASAudioGraph.h"
 #import "YASAudioUnit.h"
@@ -133,18 +133,17 @@
                             YASAudioNode *sourceNode = connection.sourceNode;
 
                             if (connection && sourceNode) {
-                                YASAudioPCMBuffer *buffer =
-                                    [[YASAudioPCMBuffer alloc] initWithPCMFormat:connection.format
-                                                                 audioBufferList:renderParameters->ioData
-                                                                       needsFree:NO];
+                                YASAudioData *data = [[YASAudioData alloc] initWithFormat:connection.format
+                                                                          audioBufferList:renderParameters->ioData
+                                                                                needsFree:NO];
                                 YASAudioTime *when =
                                     [[YASAudioTime alloc] initWithAudioTimeStamp:renderParameters->ioTimeStamp
                                                                       sampleRate:connection.format.sampleRate];
 
-                                [sourceNode renderWithBuffer:buffer bus:connection.sourceBus when:when];
+                                [sourceNode renderWithData:data bus:connection.sourceBus when:when];
 
                                 YASRelease(when);
-                                YASRelease(buffer);
+                                YASRelease(data);
                             }
                             YASRelease(node);
                         }
@@ -260,9 +259,9 @@
 
 #pragma mark Render thread
 
-- (void)renderWithBuffer:(YASAudioPCMBuffer *)buffer bus:(NSNumber *)bus when:(YASAudioTime *)when
+- (void)renderWithData:(YASAudioData *)data bus:(NSNumber *)bus when:(YASAudioTime *)when
 {
-    [super renderWithBuffer:buffer bus:bus when:when];
+    [super renderWithData:data bus:bus when:when];
 
     @autoreleasepool
     {
@@ -275,8 +274,8 @@
             .ioActionFlags = &actionFlags,
             .ioTimeStamp = &timeStamp,
             .inBusNumber = bus.uint32Value,
-            .inNumberFrames = buffer.frameLength,
-            .ioData = buffer.mutableAudioBufferList,
+            .inNumberFrames = data.frameLength,
+            .ioData = data.mutableAudioBufferList,
         };
 
         [audioUnit audioUnitRender:&renderParameters];

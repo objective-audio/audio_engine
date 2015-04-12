@@ -33,19 +33,19 @@ static UInt32 TestValue(UInt32 frame, UInt32 ch, UInt32 buf)
     const UInt32 channels = 4;
 
     YASAudioFormat *format = [[YASAudioFormat alloc] initStandardFormatWithSampleRate:48000 channels:channels];
-    YASAudioPCMBuffer *pcmBuffer = [[YASAudioPCMBuffer alloc] initWithPCMFormat:format frameCapacity:frameLength];
+    YASAudioData *data = [[YASAudioData alloc] initWithFormat:format frameCapacity:frameLength];
     YASRelease(format);
 
     XCTAssertEqual(format.bufferCount, channels);
 
     for (UInt32 buf = 0; buf < format.bufferCount; buf++) {
-        YASAudioPointer pointer = [pcmBuffer dataAtBufferIndex:buf];
-        for (UInt32 frame = 0; frame < pcmBuffer.frameLength; frame++) {
+        YASAudioPointer pointer = [data pointerAtBuffer:buf];
+        for (UInt32 frame = 0; frame < data.frameLength; frame++) {
             pointer.f32[frame] = TestValue(frame, 0, buf);
         }
     }
 
-    YASAudioFrameScanner *frameScanner = [[YASAudioFrameScanner alloc] initWithPCMBuffer:pcmBuffer];
+    YASAudioFrameScanner *frameScanner = [[YASAudioFrameScanner alloc] initWithAudioData:data];
     YASAudioConstPointer *pointer = frameScanner.pointer;
     const NSUInteger *pointerFrame = frameScanner.frame;
     const NSUInteger *pointerChannel = frameScanner.channel;
@@ -72,7 +72,7 @@ static UInt32 TestValue(UInt32 frame, UInt32 ch, UInt32 buf)
     }
 
     YASRelease(frameScanner);
-    YASRelease(pcmBuffer);
+    YASRelease(data);
 }
 
 - (void)testReadFrameScannerInterleaved
@@ -84,19 +84,19 @@ static UInt32 TestValue(UInt32 frame, UInt32 ch, UInt32 buf)
                                                                  sampleRate:48000
                                                                    channels:channels
                                                                 interleaved:YES];
-    YASAudioPCMBuffer *pcmBuffer = [[YASAudioPCMBuffer alloc] initWithPCMFormat:format frameCapacity:frameLength];
+    YASAudioData *data = [[YASAudioData alloc] initWithFormat:format frameCapacity:frameLength];
     YASRelease(format);
 
     XCTAssertEqual(format.stride, channels);
 
-    YASAudioPointer bufferPointer = [pcmBuffer dataAtBufferIndex:0];
+    YASAudioPointer bufferPointer = [data pointerAtBuffer:0];
     for (UInt32 ch = 0; ch < format.stride; ch++) {
-        for (UInt32 frame = 0; frame < pcmBuffer.frameLength; frame++) {
+        for (UInt32 frame = 0; frame < data.frameLength; frame++) {
             bufferPointer.f32[frame * channels + ch] = TestValue(frame, ch, 0);
         }
     }
 
-    YASAudioFrameScanner *frameScanner = [[YASAudioFrameScanner alloc] initWithPCMBuffer:pcmBuffer];
+    YASAudioFrameScanner *frameScanner = [[YASAudioFrameScanner alloc] initWithAudioData:data];
     YASAudioConstPointer *pointer = frameScanner.pointer;
     const NSUInteger *pointerFrame = frameScanner.frame;
     const NSUInteger *pointerChannel = frameScanner.channel;
@@ -123,7 +123,7 @@ static UInt32 TestValue(UInt32 frame, UInt32 ch, UInt32 buf)
     }
 
     YASRelease(frameScanner);
-    YASRelease(pcmBuffer);
+    YASRelease(data);
 }
 
 - (void)testWriteFrameScanner
@@ -132,15 +132,14 @@ static UInt32 TestValue(UInt32 frame, UInt32 ch, UInt32 buf)
     const UInt32 channels = 4;
 
     YASAudioFormat *format = [[YASAudioFormat alloc] initStandardFormatWithSampleRate:48000 channels:channels];
-    YASAudioPCMBuffer *pcmBuffer = [[YASAudioPCMBuffer alloc] initWithPCMFormat:format frameCapacity:frameLength];
+    YASAudioData *data = [[YASAudioData alloc] initWithFormat:format frameCapacity:frameLength];
     YASRelease(format);
 
     XCTAssertEqual(format.bufferCount, channels);
 
     @autoreleasepool
     {
-        YASAudioMutableFrameScanner *mutableFrameScanner =
-            [[YASAudioMutableFrameScanner alloc] initWithPCMBuffer:pcmBuffer];
+        YASAudioMutableFrameScanner *mutableFrameScanner = [[YASAudioMutableFrameScanner alloc] initWithAudioData:data];
         YASAudioPointer *mutablePointer = mutableFrameScanner.mutablePointer;
         const NSUInteger *mutablePointerFrame = mutableFrameScanner.frame;
         const NSUInteger *mutablePointerChannel = mutableFrameScanner.channel;
@@ -167,7 +166,7 @@ static UInt32 TestValue(UInt32 frame, UInt32 ch, UInt32 buf)
 
     @autoreleasepool
     {
-        YASAudioFrameScanner *frameScanner = [[YASAudioFrameScanner alloc] initWithPCMBuffer:pcmBuffer];
+        YASAudioFrameScanner *frameScanner = [[YASAudioFrameScanner alloc] initWithAudioData:data];
         YASAudioConstPointer *pointer = frameScanner.pointer;
         const NSUInteger *pointerFrame = frameScanner.frame;
         const NSUInteger *pointerChannel = frameScanner.channel;
@@ -185,7 +184,7 @@ static UInt32 TestValue(UInt32 frame, UInt32 ch, UInt32 buf)
         YASRelease(frameScanner);
     }
 
-    YASRelease(pcmBuffer);
+    YASRelease(data);
 }
 
 - (void)testSetFramePosition
@@ -193,15 +192,15 @@ static UInt32 TestValue(UInt32 frame, UInt32 ch, UInt32 buf)
     const UInt32 frameLength = 16;
 
     YASAudioFormat *format = [[YASAudioFormat alloc] initStandardFormatWithSampleRate:48000 channels:1];
-    YASAudioPCMBuffer *pcmBuffer = [[YASAudioPCMBuffer alloc] initWithPCMFormat:format frameCapacity:frameLength];
+    YASAudioData *data = [[YASAudioData alloc] initWithFormat:format frameCapacity:frameLength];
     YASRelease(format);
 
-    YASAudioPointer bufferPointer = [pcmBuffer dataAtBufferIndex:0];
+    YASAudioPointer bufferPointer = [data pointerAtBuffer:0];
     for (UInt32 frame = 0; frame < frameLength; frame++) {
         bufferPointer.f32[frame] = TestValue(frame, 0, 0);
     }
 
-    YASAudioFrameScanner *frameScanner = [[YASAudioFrameScanner alloc] initWithPCMBuffer:pcmBuffer];
+    YASAudioFrameScanner *frameScanner = [[YASAudioFrameScanner alloc] initWithAudioData:data];
     YASAudioConstPointer *pointer = frameScanner.pointer;
     const NSUInteger *pointerFrame = frameScanner.frame;
 
@@ -216,7 +215,7 @@ static UInt32 TestValue(UInt32 frame, UInt32 ch, UInt32 buf)
     XCTAssertThrows([frameScanner setFramePosition:100]);
 
     YASRelease(frameScanner);
-    YASRelease(pcmBuffer);
+    YASRelease(data);
 }
 
 - (void)testSetChannelPosition
@@ -227,15 +226,15 @@ static UInt32 TestValue(UInt32 frame, UInt32 ch, UInt32 buf)
                                                                  sampleRate:48000
                                                                    channels:channels
                                                                 interleaved:YES];
-    YASAudioPCMBuffer *pcmBuffer = [[YASAudioPCMBuffer alloc] initWithPCMFormat:format frameCapacity:1];
+    YASAudioData *data = [[YASAudioData alloc] initWithFormat:format frameCapacity:1];
     YASRelease(format);
 
-    YASAudioPointer bufferPointer = [pcmBuffer dataAtBufferIndex:0];
+    YASAudioPointer bufferPointer = [data pointerAtBuffer:0];
     for (UInt32 ch = 0; ch < channels; ch++) {
         bufferPointer.f32[ch] = TestValue(0, ch, 0);
     }
 
-    YASAudioFrameScanner *frameScanner = [[YASAudioFrameScanner alloc] initWithPCMBuffer:pcmBuffer];
+    YASAudioFrameScanner *frameScanner = [[YASAudioFrameScanner alloc] initWithAudioData:data];
     YASAudioConstPointer *pointer = frameScanner.pointer;
     const NSUInteger *pointerChannel = frameScanner.channel;
 
@@ -250,7 +249,7 @@ static UInt32 TestValue(UInt32 frame, UInt32 ch, UInt32 buf)
     XCTAssertThrows([frameScanner setFramePosition:100]);
 
     YASRelease(frameScanner);
-    YASRelease(pcmBuffer);
+    YASRelease(data);
 }
 
 @end

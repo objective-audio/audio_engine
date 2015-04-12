@@ -5,7 +5,7 @@
 
 #import "YASAudioFile.h"
 #import "YASAudioFormat.h"
-#import "YASAudioPCMBuffer.h"
+#import "YASAudioData.h"
 #import "YASMacros.h"
 #import "YASAudioTypes.h"
 #import "YASAudioUtility.h"
@@ -405,14 +405,14 @@ static NSString *YASFileTypeFromAudioFileTypeID(AudioFileTypeID fileTypeID)
     return self;
 }
 
-- (BOOL)readIntoBuffer:(YASAudioPCMBuffer *)buffer error:(NSError **)outError
+- (BOOL)readIntoData:(YASAudioData *)data error:(NSError **)outError
 {
-    return [self readIntoBuffer:buffer frameLength:buffer.frameCapacity error:outError];
+    return [self readIntoData:data frameLength:data.frameCapacity error:outError];
 }
 
-- (BOOL)readIntoBuffer:(YASAudioPCMBuffer *)buffer frameLength:(const UInt32)frameLength error:(NSError **)outError
+- (BOOL)readIntoData:(YASAudioData *)data frameLength:(const UInt32)frameLength error:(NSError **)outError
 {
-    if (![buffer.format isEqualToAudioFormat:self.processingFormat]) {
+    if (![data.format isEqualToAudioFormat:self.processingFormat]) {
         if (outError) {
             *outError = [NSError yas_errorWithCode:YASAudioFileErrorCodeInvalidFormat];
         }
@@ -423,23 +423,23 @@ static NSString *YASFileTypeFromAudioFileTypeID(AudioFileTypeID fileTypeID)
     UInt32 outFrameLength = 0;
     UInt32 remainFrames = frameLength;
 
-    AudioBufferList *ioBufferList = YASAudioAllocateAudioBufferListWithoutData(buffer.bufferCount, 0);
+    AudioBufferList *ioAbl = YASAudioAllocateAudioBufferListWithoutData(data.bufferCount, 0);
 
     while (remainFrames) {
-        UInt32 bytesPerFrame = buffer.format.streamDescription->mBytesPerFrame;
+        UInt32 bytesPerFrame = data.format.streamDescription->mBytesPerFrame;
         UInt32 dataByteSize = remainFrames * bytesPerFrame;
         UInt32 dataIndex = outFrameLength * bytesPerFrame;
 
-        for (NSInteger i = 0; i < buffer.bufferCount; i++) {
-            AudioBuffer *audioBuffer = &ioBufferList->mBuffers[i];
-            audioBuffer->mNumberChannels = buffer.stride;
+        for (NSInteger i = 0; i < data.bufferCount; i++) {
+            AudioBuffer *audioBuffer = &ioAbl->mBuffers[i];
+            audioBuffer->mNumberChannels = data.stride;
             audioBuffer->mDataByteSize = dataByteSize;
-            audioBuffer->mData = &buffer.audioBufferList->mBuffers[i].mData[dataIndex];
+            audioBuffer->mData = &data.audioBufferList->mBuffers[i].mData[dataIndex];
         }
 
         UInt32 ioFrames = remainFrames;
 
-        err = ExtAudioFileRead(self.extAudioFile, &ioFrames, ioBufferList);
+        err = ExtAudioFileRead(self.extAudioFile, &ioFrames, ioAbl);
         if (err != noErr) {
             if (outError) {
                 *outError = [NSError yas_errorWithCode:YASAudioFileErrorCodeReadFailed audioErrorCode:err];
@@ -454,9 +454,9 @@ static NSString *YASFileTypeFromAudioFileTypeID(AudioFileTypeID fileTypeID)
         outFrameLength += ioFrames;
     }
 
-    free(ioBufferList);
+    free(ioAbl);
 
-    buffer.frameLength = outFrameLength;
+    data.frameLength = outFrameLength;
 
     if (err == noErr) {
         err = ExtAudioFileTell(self.extAudioFile, self.fileFramePositionPointer);
@@ -518,19 +518,19 @@ static NSString *YASFileTypeFromAudioFileTypeID(AudioFileTypeID fileTypeID)
     return self;
 }
 
-- (BOOL)writeSyncFromBuffer:(YASAudioPCMBuffer *)buffer error:(NSError **)outError
+- (BOOL)writeSyncFromData:(YASAudioData *)data error:(NSError **)outError
 {
-    return [self _writeFromBuffer:buffer isAsync:NO error:outError];
+    return [self _writeFromData:data isAsync:NO error:outError];
 }
 
-- (BOOL)writeAsyncFromBuffer:(YASAudioPCMBuffer *)buffer error:(NSError **)outError
+- (BOOL)writeAsyncFromData:(YASAudioData *)data error:(NSError **)outError
 {
-    return [self _writeFromBuffer:buffer isAsync:YES error:outError];
+    return [self _writeFromData:data isAsync:YES error:outError];
 }
 
-- (BOOL)_writeFromBuffer:(YASAudioPCMBuffer *)buffer isAsync:(BOOL)isAsync error:(NSError **)outError
+- (BOOL)_writeFromData:(YASAudioData *)data isAsync:(BOOL)isAsync error:(NSError **)outError
 {
-    if (![buffer.format isEqualToAudioFormat:self.processingFormat]) {
+    if (![data.format isEqualToAudioFormat:self.processingFormat]) {
         if (outError) {
             *outError = [NSError yas_errorWithCode:YASAudioFileErrorCodeInvalidFormat];
         }
@@ -540,9 +540,9 @@ static NSString *YASFileTypeFromAudioFileTypeID(AudioFileTypeID fileTypeID)
     OSStatus err = noErr;
 
     if (isAsync) {
-        err = ExtAudioFileWriteAsync(self.extAudioFile, buffer.frameLength, buffer.audioBufferList);
+        err = ExtAudioFileWriteAsync(self.extAudioFile, data.frameLength, data.audioBufferList);
     } else {
-        err = ExtAudioFileWrite(self.extAudioFile, buffer.frameLength, buffer.audioBufferList);
+        err = ExtAudioFileWrite(self.extAudioFile, data.frameLength, data.audioBufferList);
     }
 
     if (err != noErr) {
@@ -601,14 +601,14 @@ static NSString *YASFileTypeFromAudioFileTypeID(AudioFileTypeID fileTypeID)
                                      isNonInterleaved:(BOOL)isNonInterleaved
 {
     return @{
-        AVFormatIDKey : @(kAudioFormatLinearPCM),
-        AVSampleRateKey : @(sampleRate),
-        AVNumberOfChannelsKey : @(channels),
-        AVLinearPCMBitDepthKey : @(bitDepth),
-        AVLinearPCMIsBigEndianKey : @(isBigEndian),
-        AVLinearPCMIsFloatKey : @(isFloat),
-        AVLinearPCMIsNonInterleaved : @(isNonInterleaved),
-        AVChannelLayoutKey : [NSData data]
+        AVFormatIDKey: @(kAudioFormatLinearPCM),
+        AVSampleRateKey: @(sampleRate),
+        AVNumberOfChannelsKey: @(channels),
+        AVLinearPCMBitDepthKey: @(bitDepth),
+        AVLinearPCMIsBigEndianKey: @(isBigEndian),
+        AVLinearPCMIsFloatKey: @(isFloat),
+        AVLinearPCMIsNonInterleaved: @(isNonInterleaved),
+        AVChannelLayoutKey: [NSData data]
     };
 }
 
@@ -621,16 +621,16 @@ static NSString *YASFileTypeFromAudioFileTypeID(AudioFileTypeID fileTypeID)
                      sampleRateConverterQuality:(AVAudioQuality)converterQuality
 {
     return @{
-        AVFormatIDKey : @(kAudioFormatMPEG4AAC),
-        AVSampleRateKey : @(sampleRate),
-        AVNumberOfChannelsKey : @(channels),
-        AVLinearPCMBitDepthKey : @(bitDepth),
-        AVLinearPCMIsBigEndianKey : @(NO),
-        AVLinearPCMIsFloatKey : @(NO),
-        AVEncoderAudioQualityKey : @(encoderQuality),
-        AVEncoderBitRateKey : @(bitRate),
-        AVEncoderBitDepthHintKey : @(bitDepthHint),
-        AVSampleRateConverterAudioQualityKey : @(converterQuality)
+        AVFormatIDKey: @(kAudioFormatMPEG4AAC),
+        AVSampleRateKey: @(sampleRate),
+        AVNumberOfChannelsKey: @(channels),
+        AVLinearPCMBitDepthKey: @(bitDepth),
+        AVLinearPCMIsBigEndianKey: @(NO),
+        AVLinearPCMIsFloatKey: @(NO),
+        AVEncoderAudioQualityKey: @(encoderQuality),
+        AVEncoderBitRateKey: @(bitRate),
+        AVEncoderBitDepthHintKey: @(bitDepthHint),
+        AVSampleRateConverterAudioQualityKey: @(converterQuality)
     };
 }
 

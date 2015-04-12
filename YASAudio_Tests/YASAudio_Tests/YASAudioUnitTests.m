@@ -191,8 +191,7 @@
 {
     YASAudioUnit *delayUnit = [[YASAudioUnit alloc] initWithType:kAudioUnitType_Effect subType:kAudioUnitSubType_Delay];
 
-    YASAudioUnitParameter *delayTimeInfo =
-        [delayUnit parameterInfo:kDelayParam_DelayTime scope:kAudioUnitScope_Global];
+    YASAudioUnitParameter *delayTimeInfo = [delayUnit parameterInfo:kDelayParam_DelayTime scope:kAudioUnitScope_Global];
 
     const AudioUnitParameterValue min = delayTimeInfo.minValue;
 
@@ -276,7 +275,7 @@
         YASAudioTime *audioTime = [YASAudioTime timeWithSampleTime:0 atRate:format.sampleRate];
         AudioTimeStamp timeStamp = audioTime.audioTimeStamp;
 
-        YASAudioPCMBuffer *buffer = [[YASAudioPCMBuffer alloc] initWithPCMFormat:format frameCapacity:frameLength];
+        YASAudioData *data = [[YASAudioData alloc] initWithFormat:format frameCapacity:frameLength];
 
         YASAudioUnitRenderParameters parameters = {
             .inRenderType = YASAudioUnitRenderTypeNormal,
@@ -284,12 +283,12 @@
             .ioTimeStamp = &timeStamp,
             .inBusNumber = 0,
             .inNumberFrames = frameLength,
-            .ioData = buffer.mutableAudioBufferList,
+            .ioData = data.mutableAudioBufferList,
         };
 
         [audioUnit audioUnitRender:&parameters];
 
-        YASRelease(buffer);
+        YASRelease(data);
     });
 
     if (wait > 0) {

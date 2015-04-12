@@ -30,9 +30,9 @@
 
 #pragma mark Render thread
 
-- (void)renderWithBuffer:(YASAudioPCMBuffer *)buffer bus:(NSNumber *)bus when:(YASAudioTime *)when
+- (void)renderWithData:(YASAudioData *)data bus:(NSNumber *)bus when:(YASAudioTime *)when
 {
-    [super renderWithBuffer:buffer bus:bus when:when];
+    [super renderWithData:data bus:bus when:when];
 
     @autoreleasepool
     {
@@ -40,12 +40,12 @@
         YASAudioNodeRenderBlock renderBlock = self.renderBlock;
 
         if (renderBlock) {
-            renderBlock(buffer, bus, when, nodeCore);
+            renderBlock(data, bus, when, nodeCore);
         } else {
             YASAudioConnection *connection = [nodeCore inputConnectionForBus:@0];
             YASAudioNode *sourceNode = connection.sourceNode;
             if (sourceNode) {
-                [sourceNode renderWithBuffer:buffer bus:connection.sourceBus when:when];
+                [sourceNode renderWithData:data bus:connection.sourceBus when:when];
             }
         }
     }

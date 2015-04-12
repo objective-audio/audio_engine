@@ -26,7 +26,7 @@
 - (void)start;
 - (void)stop;
 
-- (YASAudioPCMBuffer *)inputBufferOnRender;
+- (YASAudioData *)inputDataOnRender;
 - (YASAudioTime *)inputTimeOnRender;
 
 @end

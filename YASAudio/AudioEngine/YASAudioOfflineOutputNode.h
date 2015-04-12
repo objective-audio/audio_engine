@@ -7,7 +7,7 @@
 #import "YASAudioTypes.h"
 #import "YASAudioNode.h"
 
-@class YASAudioFormat, YASAudioPCMBuffer;
+@class YASAudioFormat, YASAudioData;
 
 @interface YASAudioOfflineOutputNode : YASAudioNode
 

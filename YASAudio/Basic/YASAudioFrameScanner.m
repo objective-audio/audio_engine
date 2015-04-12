@@ -4,7 +4,7 @@
 //
 
 #import "YASAudioFrameScanner.h"
-#import "YASAudioPCMBuffer.h"
+#import "YASAudioData.h"
 #import "YASAudioFormat.h"
 #import "NSException+YASAudio.h"
 #import "YASMacros.h"
@@ -17,31 +17,31 @@
     YASAudioPointer *_topPointers;
     BOOL _atFrameEnd;
     BOOL _atChannelEnd;
-    NSUInteger _pointerStride;
+    NSUInteger _frameStride;
     NSUInteger _frameLength;
     NSUInteger _frame;
     NSUInteger _channel;
 }
 
-- (instancetype)initWithPCMBuffer:(YASAudioPCMBuffer *)pcmBuffer
+- (instancetype)initWithAudioData:(YASAudioData *)data
 {
     self = [super init];
     if (self) {
-        NSUInteger bufferCount = pcmBuffer.bufferCount;
-        NSUInteger stride = pcmBuffer.stride;
-        NSUInteger sampleByteCount = pcmBuffer.format.sampleByteCount;
+        NSUInteger bufferCount = data.bufferCount;
+        NSUInteger stride = data.stride;
+        NSUInteger sampleByteCount = data.format.sampleByteCount;
 
         _frame = _channel = 0;
         _atFrameEnd = _atChannelEnd = NO;
-        _frameLength = pcmBuffer.frameLength;
+        _frameLength = data.frameLength;
         _channelCount = bufferCount * stride;
-        _pointerStride = stride * sampleByteCount;
+        _frameStride = stride * sampleByteCount;
         _pointers = calloc(_channelCount, sizeof(YASAudioPointer *));
         _topPointers = calloc(_channelCount, sizeof(YASAudioPointer *));
 
         NSUInteger channel = 0;
-        for (NSInteger buf = 0; buf < bufferCount; buf++) {
-            YASAudioPointer pointer = [pcmBuffer dataAtBufferIndex:buf];
+        for (NSInteger buffer = 0; buffer < bufferCount; buffer++) {
+            YASAudioPointer pointer = [data pointerAtBuffer:buffer];
             for (NSInteger ch = 0; ch < stride; ch++) {
                 _pointers[channel].v = _topPointers[channel].v = pointer.v;
                 pointer.u8 += sampleByteCount;
@@ -96,7 +96,7 @@
     } else {
         NSUInteger pointerIndex = _channelCount;
         while (pointerIndex--) {
-            _pointers[pointerIndex].u8 += _pointerStride;
+            _pointers[pointerIndex].u8 += _frameStride;
         }
 
         if (_atChannelEnd) {
@@ -130,7 +130,7 @@
 
     NSUInteger pointerIndex = _channelCount;
     while (pointerIndex--) {
-        _pointers[pointerIndex].u8 = _topPointers[pointerIndex].u8 + (_pointerStride * _frame);
+        _pointers[pointerIndex].u8 = _topPointers[pointerIndex].u8 + (_frameStride * _frame);
     }
 
     if (_atChannelEnd) {
