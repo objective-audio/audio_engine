@@ -10,45 +10,42 @@
 
 @interface YASAudioScanner : NSObject
 
-@property (nonatomic, assign, readonly) YASAudioConstPointer *pointer;
+@property (nonatomic, assign, readonly) const YASAudioConstPointer *pointer;
 @property (nonatomic, assign, readonly) const NSUInteger *index;
-@property (nonatomic, assign, readonly) const BOOL *isAtEnd;
-@property (nonatomic, assign, readonly) NSUInteger length;
+@property (nonatomic, assign, readonly) const NSUInteger length;
 
-- (instancetype)initWithAudioData:(YASAudioData *)data atBuffer:(NSUInteger)buffer;
-- (instancetype)initWithPointer:(YASAudioPointer)pointer
+- (instancetype)initWithAudioData:(YASAudioData *)data atBuffer:(const NSUInteger)buffer;
+- (instancetype)initWithPointer:(const YASAudioPointer)pointer
                          stride:(const NSUInteger)stride
                          length:(const NSUInteger)length NS_DESIGNATED_INITIALIZER;
 
 - (void)move;
-- (void)setPosition:(NSUInteger)index;
+- (void)setPosition:(const NSUInteger)index;
 - (void)reset;
 
 @end
 
 @interface YASAudioMutableScanner : YASAudioScanner
 
-@property (nonatomic, assign, readonly) YASAudioPointer *mutablePointer;
+@property (nonatomic, assign, readonly) const YASAudioPointer *mutablePointer;
 
 @end
 
 @interface YASAudioFrameScanner : NSObject
 
-@property (nonatomic, assign, readonly) YASAudioConstPointer *pointer;
+@property (nonatomic, assign, readonly) const YASAudioConstPointer *pointer;
 @property (nonatomic, assign, readonly) const NSUInteger *frame;
 @property (nonatomic, assign, readonly) const NSUInteger *channel;
-@property (nonatomic, assign, readonly) const BOOL *isAtFrameEnd;
-@property (nonatomic, assign, readonly) const BOOL *isAtChannelEnd;
-@property (nonatomic, assign, readonly) NSUInteger frameLength;
-@property (nonatomic, assign, readonly) NSUInteger channelCount;
+@property (nonatomic, assign, readonly) const NSUInteger frameLength;
+@property (nonatomic, assign, readonly) const NSUInteger channelCount;
 
 - (instancetype)initWithAudioData:(YASAudioData *)data;
 
 - (void)moveFrame;
 - (void)moveChannel;
 
-- (void)setFramePosition:(NSUInteger)frame;
-- (void)setChannelPosition:(NSUInteger)channel;
+- (void)setFramePosition:(const NSUInteger)frame;
+- (void)setChannelPosition:(const NSUInteger)channel;
 
 - (void)reset;
 
@@ -56,6 +53,6 @@
 
 @interface YASAudioMutableFrameScanner : YASAudioFrameScanner
 
-@property (nonatomic, assign, readonly) YASAudioPointer *mutablePointer;
+@property (nonatomic, assign, readonly) const YASAudioPointer *mutablePointer;
 
 @end
