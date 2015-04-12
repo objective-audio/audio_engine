@@ -3,11 +3,100 @@
 //  Copyright (c) 2015 Yuki Yasoshima.
 //
 
-#import "YASAudioFrameScanner.h"
+#import "YASAudioScanner.h"
 #import "YASAudioData.h"
 #import "YASAudioFormat.h"
 #import "NSException+YASAudio.h"
 #import "YASMacros.h"
+
+@implementation YASAudioScanner {
+   @protected
+    YASAudioPointer _pointer;
+   @private
+    YASAudioPointer _topPointer;
+    BOOL _atEnd;
+    NSUInteger _stride;
+    NSUInteger _length;
+    NSUInteger _index;
+}
+
+- (instancetype)initWithAudioData:(YASAudioData *)data atBuffer:(NSUInteger)buffer
+{
+    YASAudioPointer pointer = [data pointerAtBuffer:buffer];
+    YASAudioFormat *format = data.format;
+    NSUInteger stride = format.stride * format.sampleByteCount;
+    return [self initWithPointer:pointer stride:stride length:data.frameLength];
+}
+
+- (instancetype)initWithPointer:(YASAudioPointer)pointer stride:(const NSUInteger)stride length:(const NSUInteger)length
+{
+    self = [super init];
+    if (self) {
+        if (!pointer.v || stride == 0 || length == 0) {
+            YASRaiseWithReason(([NSString stringWithFormat:@"%s - Invalid argument.", __PRETTY_FUNCTION__]));
+            YASRelease(self);
+            return nil;
+        }
+        _pointer = _topPointer = pointer;
+        _stride = stride;
+        _length = length;
+        _index = 0;
+    }
+    return self;
+}
+
+- (YASAudioConstPointer *)pointer
+{
+    return (YASAudioConstPointer *)&_pointer;
+}
+
+- (const NSUInteger *)index
+{
+    return &_index;
+}
+
+- (const BOOL *)isAtEnd
+{
+    return &_atEnd;
+}
+
+- (void)move
+{
+    if (++_index >= _length) {
+        _atEnd = YES;
+        _pointer.v = NULL;
+    } else {
+        _pointer.v += _stride;
+    }
+}
+
+- (void)setPosition:(NSUInteger)index
+{
+    if (index >= _length) {
+        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Overflow index.", __PRETTY_FUNCTION__]));
+        return;
+    }
+    _index = index;
+    _pointer.v = _topPointer.v + (_stride * index);
+}
+
+- (void)reset
+{
+    _index = 0;
+    _atEnd = NO;
+    _pointer.v = _topPointer.v;
+}
+
+@end
+
+@implementation YASAudioMutableScanner
+
+- (YASAudioPointer *)mutablePointer
+{
+    return &_pointer;
+}
+
+@end
 
 @implementation YASAudioFrameScanner {
    @protected
