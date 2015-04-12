@@ -149,7 +149,7 @@
     XCTestExpectation *renderExpectation = [self expectationWithDescription:@"Node Render"];
 
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        [node renderWithBuffer:nil bus:nil when:time];
+        [node renderWithData:nil bus:nil when:time];
         [renderExpectation fulfill];
     });
 

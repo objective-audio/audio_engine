@@ -243,9 +243,9 @@ UInt32 YASAudioGetFrameLengthFromAudioBufferList(const AudioBufferList *inAbl, c
     if (inAbl && inSampleByteCount > 0) {
         UInt32 outFrameLength = 0;
         for (UInt32 buf = 0; buf < inAbl->mNumberBuffers; buf++) {
-            const AudioBuffer *buffer = &inAbl->mBuffers[buf];
-            const UInt32 stride = buffer->mNumberChannels;
-            const UInt32 frameLength = buffer->mDataByteSize / stride / inSampleByteCount;
+            const AudioBuffer *ab = &inAbl->mBuffers[buf];
+            const UInt32 stride = ab->mNumberChannels;
+            const UInt32 frameLength = ab->mDataByteSize / stride / inSampleByteCount;
             if (buf == 0) {
                 outFrameLength = frameLength;
             } else if (outFrameLength != frameLength) {

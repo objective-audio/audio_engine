@@ -42,27 +42,27 @@ static const UInt32 kSineDataMaxCount = 4096;
     YASSuperDealloc;
 }
 
-- (void)processWithOutputBuffer:(YASAudioPCMBuffer *)outputBuffer inputBuffer:(YASAudioPCMBuffer *)inputBuffer
+- (void)processWithOutputData:(YASAudioData *)outputData inputData:(YASAudioData *)inputData
 {
-    UInt32 frameLength = outputBuffer.frameLength;
-    AudioBufferList *outputData = outputBuffer.mutableAudioBufferList;
-    const AudioBufferList *inputData = inputBuffer.audioBufferList;
+    UInt32 frameLength = outputData.frameLength;
+    AudioBufferList *outputAbl = outputData.mutableAudioBufferList;
+    const AudioBufferList *inputAbl = inputData.audioBufferList;
 
-    if (!outputData || frameLength == 0) {
+    if (!outputAbl || frameLength == 0) {
         return;
     }
 
     YASAudioFormat *format = self.format;
     if (format && format.bitDepthFormat == YASAudioBitDepthFormatFloat32) {
-        if (inputData && inputBuffer.frameLength >= frameLength) {
+        if (inputAbl && inputData.frameLength >= frameLength) {
             UInt32 outFrameLength = frameLength;
-            YASAudioCopyAudioBufferListFlexibly(inputData, outputData, sizeof(Float32), &outFrameLength);
+            YASAudioCopyAudioBufferListFlexibly(inputAbl, outputAbl, sizeof(Float32), &outFrameLength);
 
             const Float32 throughVol = self.throughVolume;
 
-            for (UInt32 buf = 0; buf < outputData->mNumberBuffers; buf++) {
-                Float32 *data = outputData->mBuffers[buf].mData;
-                UInt32 length = frameLength * outputData->mBuffers[buf].mNumberChannels;
+            for (UInt32 buf = 0; buf < outputAbl->mNumberBuffers; buf++) {
+                Float32 *data = outputAbl->mBuffers[buf].mData;
+                UInt32 length = frameLength * outputAbl->mBuffers[buf].mNumberChannels;
                 cblas_sscal(length, throughVol, data, 1);
             }
         }
@@ -78,9 +78,9 @@ static const UInt32 kSineDataMaxCount = 4096;
 
             _phase = endPhase;
 
-            for (UInt32 buf = 0; buf < outputData->mNumberBuffers; buf++) {
-                Float32 *data = outputData->mBuffers[buf].mData;
-                const int stride = outputData->mBuffers[buf].mNumberChannels;
+            for (UInt32 buf = 0; buf < outputAbl->mNumberBuffers; buf++) {
+                Float32 *data = outputAbl->mBuffers[buf].mData;
+                const int stride = outputAbl->mBuffers[buf].mNumberChannels;
                 const int length = frameLength;
                 for (UInt32 ch = 0; ch < stride; ch++) {
                     cblas_saxpy(length, sineVol, _sineData, 1, &data[ch], stride);
@@ -139,9 +139,9 @@ static const UInt32 kSineDataMaxCount = 4096;
 
     YASWeakContainer *container = self.deviceIO.weakContainer;
 
-    self.deviceIO.renderCallbackBlock = ^(YASAudioPCMBuffer *outBuffer, YASAudioTime *when) {
+    self.deviceIO.renderCallbackBlock = ^(YASAudioData *outData, YASAudioTime *when) {
         YASAudioDeviceIO *deviceIO = [container retainedObject];
-        [core processWithOutputBuffer:outBuffer inputBuffer:[deviceIO inputBufferOnRender]];
+        [core processWithOutputData:outData inputData:[deviceIO inputDataOnRender]];
         YASRelease(deviceIO);
     };
 

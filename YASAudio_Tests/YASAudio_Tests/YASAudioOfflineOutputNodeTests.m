@@ -47,20 +47,20 @@ static UInt32 TestValue(UInt32 frame, UInt32 ch, UInt32 buf)
     const UInt32 framesPerRender = 1024;
     const UInt32 length = 4196;
     __block UInt32 tapRenderFrame = 0;
-    tapNode.renderBlock = ^(YASAudioPCMBuffer *buffer, NSNumber *bus, YASAudioTime *when, id nodeCore) {
+    tapNode.renderBlock = ^(YASAudioData *data, NSNumber *bus, YASAudioTime *when, id nodeCore) {
         XCTAssertEqual(when.sampleTime, tapRenderFrame);
         XCTAssertEqual(when.sampleRate, sampleRate);
-        XCTAssertEqual(buffer.frameLength, framesPerRender);
-        XCTAssertEqualObjects(buffer.format, format);
+        XCTAssertEqual(data.frameLength, framesPerRender);
+        XCTAssertEqualObjects(data.format, format);
 
-        for (UInt32 buf = 0; buf < buffer.bufferCount; buf++) {
-            YASAudioPointer pointer = [buffer dataAtBufferIndex:buf];
-            for (UInt32 frame = 0; frame < buffer.frameLength; frame++) {
+        for (UInt32 buf = 0; buf < data.bufferCount; buf++) {
+            YASAudioPointer pointer = [data pointerAtBuffer:buf];
+            for (UInt32 frame = 0; frame < data.frameLength; frame++) {
                 pointer.f32[frame] = TestValue(frame + tapRenderFrame, 0, buf);
             }
         }
 
-        tapRenderFrame += buffer.frameLength;
+        tapRenderFrame += data.frameLength;
         if (tapRenderFrame >= length) {
             [tapNodeExpectation fulfill];
         }
@@ -69,20 +69,20 @@ static UInt32 TestValue(UInt32 frame, UInt32 ch, UInt32 buf)
     __block UInt32 outputRenderFrame = 0;
     NSError *error = nil;
     BOOL result =
-        [engine startOfflineRenderWithOutputCallbackBlock:^(YASAudioPCMBuffer *buffer, YASAudioTime *when, BOOL *stop) {
+        [engine startOfflineRenderWithOutputCallbackBlock:^(YASAudioData *data, YASAudioTime *when, BOOL *stop) {
             XCTAssertEqual(when.sampleTime, outputRenderFrame);
             XCTAssertEqual(when.sampleRate, sampleRate);
-            XCTAssertEqual(buffer.frameLength, framesPerRender);
-            XCTAssertEqualObjects(buffer.format, format);
+            XCTAssertEqual(data.frameLength, framesPerRender);
+            XCTAssertEqualObjects(data.format, format);
 
-            for (UInt32 buf = 0; buf < buffer.bufferCount; buf++) {
-                YASAudioConstPointer pointer = {[buffer dataAtBufferIndex:buf].v};
-                for (UInt32 frame = 0; frame < buffer.frameLength; frame++) {
+            for (UInt32 buf = 0; buf < data.bufferCount; buf++) {
+                YASAudioConstPointer pointer = {[data pointerAtBuffer:buf].v};
+                for (UInt32 frame = 0; frame < data.frameLength; frame++) {
                     XCTAssertEqual(pointer.f32[frame], TestValue(frame + outputRenderFrame, 0, buf));
                 }
             }
 
-            outputRenderFrame += buffer.frameLength;
+            outputRenderFrame += data.frameLength;
             if (outputRenderFrame >= length) {
                 *stop = YES;
                 [renderExpectation fulfill];
@@ -133,20 +133,20 @@ static UInt32 TestValue(UInt32 frame, UInt32 ch, UInt32 buf)
 
     __block UInt32 tapRenderFrame = 0;
 
-    tapNode.renderBlock = ^(YASAudioPCMBuffer *buffer, NSNumber *bus, YASAudioTime *when, id nodeCore) {
+    tapNode.renderBlock = ^(YASAudioData *data, NSNumber *bus, YASAudioTime *when, id nodeCore) {
         XCTAssertEqual(when.sampleTime, tapRenderFrame);
         XCTAssertEqual(when.sampleRate, sampleRate);
-        XCTAssertEqual(buffer.frameLength, framesPerRender);
-        XCTAssertEqualObjects(buffer.format, format);
+        XCTAssertEqual(data.frameLength, framesPerRender);
+        XCTAssertEqualObjects(data.format, format);
 
-        for (UInt32 buf = 0; buf < buffer.bufferCount; buf++) {
-            YASAudioPointer pointer = [buffer dataAtBufferIndex:buf];
-            for (UInt32 frame = 0; frame < buffer.frameLength; frame++) {
+        for (UInt32 buf = 0; buf < data.bufferCount; buf++) {
+            YASAudioPointer pointer = [data pointerAtBuffer:buf];
+            for (UInt32 frame = 0; frame < data.frameLength; frame++) {
                 pointer.f32[frame] = TestValue(frame + tapRenderFrame, 0, buf);
             }
         }
 
-        tapRenderFrame += buffer.frameLength;
+        tapRenderFrame += data.frameLength;
         if (tapRenderFrame >= length) {
             [tapNodeExpectation fulfill];
         }
@@ -156,20 +156,20 @@ static UInt32 TestValue(UInt32 frame, UInt32 ch, UInt32 buf)
     NSError *error = nil;
 
     BOOL result =
-        [outputNode startWithOutputCallbackBlock:^(YASAudioPCMBuffer *buffer, YASAudioTime *when, BOOL *stop) {
+        [outputNode startWithOutputCallbackBlock:^(YASAudioData *data, YASAudioTime *when, BOOL *stop) {
             XCTAssertEqual(when.sampleTime, outputRenderFrame);
             XCTAssertEqual(when.sampleRate, sampleRate);
-            XCTAssertEqual(buffer.frameLength, framesPerRender);
-            XCTAssertEqualObjects(buffer.format, format);
+            XCTAssertEqual(data.frameLength, framesPerRender);
+            XCTAssertEqualObjects(data.format, format);
 
-            for (UInt32 buf = 0; buf < buffer.bufferCount; buf++) {
-                YASAudioConstPointer pointer = {[buffer dataAtBufferIndex:buf].v};
-                for (UInt32 frame = 0; frame < buffer.frameLength; frame++) {
+            for (UInt32 buf = 0; buf < data.bufferCount; buf++) {
+                YASAudioConstPointer pointer = {[data pointerAtBuffer:buf].v};
+                for (UInt32 frame = 0; frame < data.frameLength; frame++) {
                     XCTAssertEqual(pointer.f32[frame], TestValue(frame + outputRenderFrame, 0, buf));
                 }
             }
 
-            outputRenderFrame += buffer.frameLength;
+            outputRenderFrame += data.frameLength;
             if (outputRenderFrame >= length) {
                 *stop = YES;
                 [renderExpectation fulfill];

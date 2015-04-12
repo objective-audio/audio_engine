@@ -6,7 +6,7 @@
 #import "YASAudioUnitIONode.h"
 #import "YASAudioTapNode.h"
 #import "YASAudioConnection.h"
-#import "YASAudioPCMBuffer.h"
+#import "YASAudioData.h"
 #import "YASAudioFormat.h"
 #import "YASAudioGraph.h"
 #import "YASAudioUnit.h"
@@ -243,7 +243,7 @@
 
 @interface YASAudioUnitInputNode ()
 
-@property (atomic, strong) YASAudioPCMBuffer *inputBuffer;
+@property (atomic, strong) YASAudioData *inputData;
 @property (atomic, strong) YASAudioTime *renderTime;
 
 @end
@@ -252,10 +252,10 @@
 
 - (void)dealloc
 {
-    YASRelease(_inputBuffer);
+    YASRelease(_inputData);
     YASRelease(_renderTime);
 
-    _inputBuffer = nil;
+    _inputData = nil;
     _renderTime = nil;
 
     YASSuperDealloc;
@@ -291,13 +291,13 @@
             [audioUnit setInputCallback];
 
             YASAudioFormat *format = outputConnection.format;
-            YASAudioPCMBuffer *inputBuffer = [[YASAudioPCMBuffer alloc] initWithPCMFormat:format frameCapacity:4096];
+            YASAudioData *inputData = [[YASAudioData alloc] initWithFormat:format frameCapacity:4096];
             YASWeakContainer *inputNodeContainer = self.weakContainer;
 
             audioUnit.inputCallbackBlock = ^(YASAudioUnitRenderParameters *renderParameters) {
-                if (renderParameters->inNumberFrames <= inputBuffer.frameCapacity) {
-                    inputBuffer.frameLength = renderParameters->inNumberFrames;
-                    renderParameters->ioData = inputBuffer.mutableAudioBufferList;
+                if (renderParameters->inNumberFrames <= inputData.frameCapacity) {
+                    inputData.frameLength = renderParameters->inNumberFrames;
+                    renderParameters->ioData = inputData.mutableAudioBufferList;
 
                     YASAudioUnitInputNode *inputNode = [inputNodeContainer retainedObject];
 
@@ -323,7 +323,7 @@
 
                             if ([destinationNode isKindOfClass:[YASAudioInputTapNode class]]) {
                                 YASAudioInputTapNode *inputTapNode = destinationNode;
-                                [inputTapNode renderWithBuffer:inputBuffer bus:@0 when:time];
+                                [inputTapNode renderWithData:inputData bus:@0 when:time];
                             }
                         }
                     }
@@ -332,12 +332,12 @@
                 }
             };
 
-            self.inputBuffer = inputBuffer;
-            YASRelease(inputBuffer);
+            self.inputData = inputData;
+            YASRelease(inputData);
         } else {
             [audioUnit removeInputCallback];
             audioUnit.inputCallbackBlock = NULL;
-            self.inputBuffer = nil;
+            self.inputData = nil;
         }
     }
 }
@@ -346,20 +346,20 @@
 
 - (void)render:(YASAudioUnitRenderParameters *)renderParameters format:(YASAudioFormat *)format
 {
-    YASAudioPCMBuffer *renderBuffer =
-        [[YASAudioPCMBuffer alloc] initWithPCMFormat:format audioBufferList:renderParameters->ioData needsFree:NO];
-    YASAudioPCMBuffer *inputBuffer = self.inputBuffer;
+    YASAudioData *renderData =
+        [[YASAudioData alloc] initWithFormat:format audioBufferList:renderParameters->ioData needsFree:NO];
+    YASAudioData *inputData = self.inputData;
     UInt32 renderFrameLength = renderParameters->inNumberFrames;
 
-    if (renderBuffer.audioBufferList != inputBuffer.audioBufferList) {
-        if (inputBuffer && renderFrameLength <= inputBuffer.frameLength) {
-            [renderBuffer copyDataFromBuffer:inputBuffer fromStartFrame:0 toStartFrame:0 length:renderFrameLength];
+    if (renderData.audioBufferList != inputData.audioBufferList) {
+        if (inputData && renderFrameLength <= inputData.frameLength) {
+            [renderData copyFromData:inputData fromStartFrame:0 toStartFrame:0 length:renderFrameLength];
         } else {
-            [renderBuffer clearData];
+            [renderData clear];
         }
     }
 
-    YASRelease(renderBuffer);
+    YASRelease(renderData);
 }
 
 @end

@@ -158,8 +158,7 @@
         YASAudioTime *audioTime = [YASAudioTime timeWithSampleTime:0 atRate:outputSampleRate];
         AudioTimeStamp timeStamp = audioTime.audioTimeStamp;
 
-        YASAudioPCMBuffer *buffer =
-            [[YASAudioPCMBuffer alloc] initWithPCMFormat:outputFormat frameCapacity:frameLength];
+        YASAudioData *data = [[YASAudioData alloc] initWithFormat:outputFormat frameCapacity:frameLength];
 
         YASAudioUnitRenderParameters parameters = {
             .inRenderType = YASAudioUnitRenderTypeNormal,
@@ -167,12 +166,12 @@
             .ioTimeStamp = &timeStamp,
             .inBusNumber = 0,
             .inNumberFrames = 1024,
-            .ioData = buffer.mutableAudioBufferList,
+            .ioData = data.mutableAudioBufferList,
         };
 
         [ioUnit audioUnitRender:&parameters];
 
-        YASRelease(buffer);
+        YASRelease(data);
     });
 
     [self waitForExpectationsWithTimeout:1.0
