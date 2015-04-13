@@ -7,10 +7,10 @@
 #import <AudioToolbox/AudioToolbox.h>
 #import "YASAudioTypes.h"
 
-typedef void (^YASAudioDataReadBlock)(YASAudioConstPointer pointer, const UInt32 buffer);
-typedef void (^YASAudioDataWriteBlock)(YASAudioPointer pointer, const UInt32 buffer);
+@class YASAudioFormat, YASAudioScanner, YASAudioMutableScanner;
 
-@class YASAudioFormat;
+typedef void (^YASAudioDataReadBlock)(YASAudioScanner *scanner, const UInt32 buffer);
+typedef void (^YASAudioDataWriteBlock)(YASAudioMutableScanner *scanner, const UInt32 buffer);
 
 @interface YASAudioData : NSObject <NSCopying>
 

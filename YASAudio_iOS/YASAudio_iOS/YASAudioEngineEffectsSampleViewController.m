@@ -116,14 +116,15 @@ static const AudioComponentDescription baseAcd = {.componentType = kAudioUnitTyp
     YASAudioTapNode *tapNode = [[YASAudioTapNode alloc] init];
     self.tapNode = tapNode;
     YASRelease(tapNode);
+    
+    __block Float64 phase = 0;
 
     tapNode.renderBlock = ^(YASAudioData *data, NSNumber *bus, YASAudioTime *when, id nodeCore) {
-        static Float64 phase = 0;
         const Float64 startPhase = phase;
         const Float64 phasePerFrame = 1000.0 / data.format.sampleRate * YAS_2_PI;
         for (NSInteger idx = 0; idx < data.bufferCount; idx++) {
-            [data writeBuffersUsingBlock:^(YASAudioPointer pointer, const UInt32 buffer) {
-                phase = YASAudioVectorSinef(pointer.f32, data.frameLength, startPhase, phasePerFrame);
+            [data writeBuffersUsingBlock:^(YASAudioMutableScanner *scanner, const UInt32 buffer) {
+                phase = YASAudioVectorSinef(scanner.mutablePointer->f32, (const UInt32)scanner.length, startPhase, phasePerFrame);
             }];
         }
     };
