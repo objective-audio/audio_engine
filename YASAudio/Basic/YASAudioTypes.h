@@ -26,6 +26,14 @@ typedef NS_ENUM(NSUInteger, YASAudioUnitRenderType) {
     YASAudioUnitRenderTypeUnknown,
 };
 
+typedef union YASAudioRenderID {
+    void *v;
+    struct {
+        UInt8 graph;
+        UInt16 unit;
+    };
+} YASAudioRenderID;
+
 typedef struct YASAudioUnitRenderParameters {
     YASAudioUnitRenderType inRenderType;
     AudioUnitRenderActionFlags *ioActionFlags;
@@ -33,6 +41,7 @@ typedef struct YASAudioUnitRenderParameters {
     UInt32 inBusNumber;
     UInt32 inNumberFrames;
     AudioBufferList *ioData;
+    YASAudioRenderID renderID;
 } YASAudioUnitRenderParameters;
 
 typedef union YASAudioPointer {
