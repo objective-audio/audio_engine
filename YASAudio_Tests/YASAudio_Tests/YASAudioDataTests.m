@@ -682,11 +682,19 @@ static UInt32 TestValue(UInt32 frame, UInt32 channel, UInt32 buffer)
     [self _fillTestValuesToData:data];
 
     __block UInt32 bufferCount = 0;
+    const UInt32 frameLength = data.frameLength;
 
-    [data readBuffersUsingBlock:^(YASAudioConstPointer pointer, const UInt32 buffer) {
-        for (UInt32 i = 0; i < data.frameLength; i++) {
-            XCTAssertEqual(pointer.f32[i], TestValue(i, 0, buffer));
+    [data readBuffersUsingBlock:^(YASAudioScanner *scanner, const UInt32 buffer) {
+        const YASAudioConstPointer *pointer = scanner.pointer;
+        const NSUInteger *index = scanner.index;
+        UInt32 frame = 0;
+        while (pointer->v) {
+            XCTAssertEqual(*index, frame);
+            XCTAssertEqual(*pointer->f32, (Float32)TestValue((UInt32)*index, 0, buffer));
+            [scanner move];
+            frame++;
         }
+        XCTAssertEqual(frameLength, frame);
         bufferCount++;
     }];
 
@@ -704,10 +712,19 @@ static UInt32 TestValue(UInt32 frame, UInt32 channel, UInt32 buffer)
 
     [self _fillTestValuesToData:dataForFill];
 
-    [dataForWrite writeBuffersUsingBlock:^(YASAudioPointer pointer, const UInt32 buffer) {
-        for (UInt32 i = 0; i < dataForWrite.frameLength; i++) {
-            pointer.f32[i] = TestValue(i, 0, buffer);
+    const UInt32 frameLength = dataForWrite.frameLength;
+    
+    [dataForWrite writeBuffersUsingBlock:^(YASAudioMutableScanner *scanner, const UInt32 buffer) {
+        const YASAudioPointer *pointer = scanner.mutablePointer;
+        const NSUInteger *index = scanner.index;
+        UInt32 frame = 0;
+        while (pointer->v) {
+            XCTAssertEqual(*index, frame);
+            *pointer->f32 = (Float32)TestValue((UInt32)*index, 0, buffer);
+            [scanner move];
+            frame++;
         }
+        XCTAssertEqual(frameLength, frame);
     }];
 
     XCTAssertTrue([self _isFilledData:dataForWrite]);

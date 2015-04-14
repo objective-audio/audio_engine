@@ -5,6 +5,7 @@
 
 #import "YASAudioData.h"
 #import "YASAudioFormat.h"
+#import "YASAudioScanner.h"
 #import "YASAudioUtility.h"
 #import "YASMacros.h"
 #import "NSException+YASAudio.h"
@@ -194,7 +195,15 @@ typedef NS_ENUM(NSUInteger, YASAudioDataFreeType) {
 
 - (YASAudioPointer)pointerAtBuffer:(NSUInteger)buffer
 {
-    return [self _pointerWithBitDepthFormat:self.format.bitDepthFormat atBuffer:buffer];
+    YASAudioPointer pointer = {NULL};
+    
+    if (buffer >= self.audioBufferList->mNumberBuffers) {
+        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Out of range.", __PRETTY_FUNCTION__]));
+    } else {
+        pointer.v = self.audioBufferList->mBuffers[buffer].mData;
+    }
+    
+    return pointer;
 }
 
 - (Float64)valueAtBuffer:(UInt32)buffer channel:(UInt32)channel frame:(UInt32)frame
@@ -215,7 +224,7 @@ typedef NS_ENUM(NSUInteger, YASAudioDataFreeType) {
         return 0;
     }
 
-    YASAudioPointer data = [self _pointerWithBitDepthFormat:bitDepthFormat atBuffer:buffer];
+    YASAudioPointer data = [self pointerAtBuffer:buffer];
     YASAudioConstPointer pointer = {&data.u8[(stride * frame + channel) * sampleByteCount]};
 
     switch (bitDepthFormat) {
@@ -252,7 +261,7 @@ typedef NS_ENUM(NSUInteger, YASAudioDataFreeType) {
         return;
     }
 
-    YASAudioPointer data = [self _pointerWithBitDepthFormat:bitDepthFormat atBuffer:buffer];
+    YASAudioPointer data = [self pointerAtBuffer:buffer];
     YASAudioPointer pointer = {&data.u8[(stride * frame + channel) * sampleByteCount]};
 
     switch (bitDepthFormat) {
@@ -280,9 +289,10 @@ typedef NS_ENUM(NSUInteger, YASAudioDataFreeType) {
         return;
     }
 
-    const YASAudioBitDepthFormat bitDepthFormat = self.format.bitDepthFormat;
     for (UInt32 i = 0; i < self.bufferCount; i++) {
-        readBlock((YASAudioConstPointer){[self _pointerWithBitDepthFormat:bitDepthFormat atBuffer:i].v}, i);
+        YASAudioScanner *scanner = [[YASAudioScanner alloc] initWithAudioData:self atBuffer:i];
+        readBlock(scanner, i);
+        YASRelease(scanner);
     }
 }
 
@@ -292,9 +302,10 @@ typedef NS_ENUM(NSUInteger, YASAudioDataFreeType) {
         YASRaiseWithReason(([NSString stringWithFormat:@"%s - Argument is nil.", __PRETTY_FUNCTION__]));
     }
 
-    const YASAudioBitDepthFormat bitDepthFormat = self.format.bitDepthFormat;
     for (UInt32 i = 0; i < self.bufferCount; i++) {
-        writeBlock([self _pointerWithBitDepthFormat:bitDepthFormat atBuffer:i], i);
+        YASAudioMutableScanner *scanner = [[YASAudioMutableScanner alloc] initWithAudioData:self atBuffer:i];
+        writeBlock(scanner, i);
+        YASRelease(scanner);
     }
 }
 
@@ -423,21 +434,6 @@ typedef NS_ENUM(NSUInteger, YASAudioDataFreeType) {
     for (NSInteger i = 0; i < abl->mNumberBuffers; i++) {
         abl->mBuffers[i].mDataByteSize = dataByteSize;
     }
-}
-
-- (YASAudioPointer)_pointerWithBitDepthFormat:(YASAudioBitDepthFormat)bitDepthFormat atBuffer:(NSUInteger)buffer
-{
-    YASAudioPointer pointer = {NULL};
-
-    if (_format.bitDepthFormat != bitDepthFormat) {
-        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Invalid bit depth format.", __PRETTY_FUNCTION__]));
-    } else if (buffer >= self.audioBufferList->mNumberBuffers) {
-        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Out of range.", __PRETTY_FUNCTION__]));
-    } else {
-        pointer.v = self.audioBufferList->mBuffers[buffer].mData;
-    }
-
-    return pointer;
 }
 
 @end

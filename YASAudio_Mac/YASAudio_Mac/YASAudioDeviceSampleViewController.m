@@ -44,48 +44,33 @@ static const UInt32 kSineDataMaxCount = 4096;
 
 - (void)processWithOutputData:(YASAudioData *)outputData inputData:(YASAudioData *)inputData
 {
-    UInt32 frameLength = outputData.frameLength;
-    AudioBufferList *outputAbl = outputData.mutableAudioBufferList;
-    const AudioBufferList *inputAbl = inputData.audioBufferList;
+    const UInt32 frameLength = outputData.frameLength;
 
-    if (!outputAbl || frameLength == 0) {
+    if (!outputData || frameLength == 0) {
         return;
     }
 
-    YASAudioFormat *format = self.format;
-    if (format && format.bitDepthFormat == YASAudioBitDepthFormatFloat32) {
-        if (inputAbl && inputData.frameLength >= frameLength) {
-            UInt32 outFrameLength = frameLength;
-            YASAudioCopyAudioBufferListFlexibly(inputAbl, outputAbl, sizeof(Float32), &outFrameLength);
+    YASAudioFormat *format = outputData.format;
+    if (format.bitDepthFormat == YASAudioBitDepthFormatFloat32 && format.stride == 1) {
+        if (inputData.frameLength >= frameLength) {
+            [outputData copyFlexiblyFromData:inputData];
 
             const Float32 throughVol = self.throughVolume;
-
-            for (UInt32 buf = 0; buf < outputAbl->mNumberBuffers; buf++) {
-                Float32 *data = outputAbl->mBuffers[buf].mData;
-                UInt32 length = frameLength * outputAbl->mBuffers[buf].mNumberChannels;
-                cblas_sscal(length, throughVol, data, 1);
-            }
+            [outputData writeBuffersUsingBlock:^(YASAudioMutableScanner *scanner, const UInt32 buffer) {
+                cblas_sscal(frameLength, throughVol, scanner.mutablePointer->f32, 1);
+            }];
         }
 
         const Float64 sampleRate = format.sampleRate;
         const Float64 startPhase = _phase;
         const Float64 sineVol = self.sineVolume;
         const Float64 freq = self.sineFrequency;
-        Float64 endPhase = 0;
 
         if (frameLength < kSineDataMaxCount) {
-            endPhase = YASAudioVectorSinef(_sineData, frameLength, startPhase, freq / sampleRate * YAS_2_PI);
-
-            _phase = endPhase;
-
-            for (UInt32 buf = 0; buf < outputAbl->mNumberBuffers; buf++) {
-                Float32 *data = outputAbl->mBuffers[buf].mData;
-                const int stride = outputAbl->mBuffers[buf].mNumberChannels;
-                const int length = frameLength;
-                for (UInt32 ch = 0; ch < stride; ch++) {
-                    cblas_saxpy(length, sineVol, _sineData, 1, &data[ch], stride);
-                }
-            }
+            _phase = YASAudioVectorSinef(_sineData, frameLength, startPhase, freq / sampleRate * YAS_2_PI);
+            [outputData writeBuffersUsingBlock:^(YASAudioMutableScanner *scanner, const UInt32 buffer) {
+                cblas_saxpy(frameLength, sineVol, _sineData, 1, scanner.mutablePointer->f32, 1);
+            }];
         }
     }
 }
