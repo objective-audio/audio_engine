@@ -33,8 +33,6 @@
 
 @property (nonatomic, copy, readonly) NSNumber *key;
 
-+ (void)audioUnitRender:(YASAudioUnitRenderParameters *)renderParameters
-               graphKey:(NSNumber *)graphKey
-                unitKey:(NSNumber *)unitKey;
++ (void)audioUnitRender:(YASAudioUnitRenderParameters *)renderParameters;
 
 @end

@@ -145,14 +145,12 @@ static BOOL _interrupting = NO;
 #pragma mark - Global / Render
 
 + (void)audioUnitRender:(YASAudioUnitRenderParameters *)renderParameters
-               graphKey:(NSNumber *)graphKey
-                unitKey:(NSNumber *)unitKey
 {
     YASRaiseIfMainThread;
-
-    YASAudioGraph *graph = [YASAudioGraph _graphForKey:graphKey];
+    
+    YASAudioGraph *graph = [YASAudioGraph _graphForKey:@(renderParameters->renderID.graph)];
     if (graph) {
-        YASAudioUnit *unit = [graph _unitForKey:unitKey];
+        YASAudioUnit *unit = [graph _unitForKey:@(renderParameters->renderID.unit)];
         if (unit) {
             [unit renderCallbackBlock:renderParameters];
         }

@@ -18,28 +18,12 @@ OSType const YASAudioUnitSubType_DefaultIO = kAudioUnitSubType_HALOutput;
 
 #pragma mark - C Functions
 
-static unsigned long PackRenderID(UInt8 graphID, UInt16 unitID)
-{
-    return (graphID & 0xF) + ((unitID & 0xFF) << 8);
-}
-
-static void UnpackRenderID(unsigned long number, UInt8 *graphID, UInt16 *unitID)
-{
-    *graphID = number & 0xF;
-    *unitID = (number >> 8) & 0xFF;
-}
-
 static OSStatus CommonRenderCallback(void *inRefCon, AudioUnitRenderActionFlags *ioActionFlags,
                                      const AudioTimeStamp *inTimeStamp, UInt32 inBusNumber, UInt32 inNumberFrames,
                                      AudioBufferList *ioData, YASAudioUnitRenderType renderType)
 {
     @autoreleasepool
     {
-        UInt8 graphID;
-        UInt16 unitID;
-        unsigned long renderID = (unsigned long)inRefCon;
-        UnpackRenderID(renderID, &graphID, &unitID);
-
         YASAudioUnitRenderParameters renderParameters = {
             .inRenderType = renderType,
             .ioActionFlags = ioActionFlags,
@@ -47,9 +31,10 @@ static OSStatus CommonRenderCallback(void *inRefCon, AudioUnitRenderActionFlags 
             .inBusNumber = inBusNumber,
             .inNumberFrames = inNumberFrames,
             .ioData = ioData,
+            .renderID = (YASAudioRenderID){inRefCon},
         };
 
-        [YASAudioGraph audioUnitRender:&renderParameters graphKey:@(graphID) unitKey:@(unitID)];
+        [YASAudioGraph audioUnitRender:&renderParameters];
     }
 
     return noErr;
@@ -191,11 +176,13 @@ static OSStatus InputRenderCallback(void *inRefCon, AudioUnitRenderActionFlags *
         return;
     }
 
-    unsigned long renderID = PackRenderID(graphKey.unsignedCharValue, unitKey.unsignedShortValue);
+    YASAudioRenderID renderID;
+    renderID.graph = graphKey.unsignedCharValue;
+    renderID.unit = unitKey.unsignedShortValue;
 
     AURenderCallbackStruct callbackStruct;
     callbackStruct.inputProc = RenderCallback;
-    callbackStruct.inputProcRefCon = (void *)renderID;
+    callbackStruct.inputProcRefCon = renderID.v;
     YASRaiseIfAUError(AudioUnitSetProperty(_audioUnitInstance, kAudioUnitProperty_SetRenderCallback,
                                            kAudioUnitScope_Input, inputNumber, &callbackStruct,
                                            sizeof(AURenderCallbackStruct)));
@@ -221,9 +208,11 @@ static OSStatus InputRenderCallback(void *inRefCon, AudioUnitRenderActionFlags *
         return;
     }
 
-    unsigned long renderID = PackRenderID(graphKey.unsignedCharValue, unitKey.unsignedShortValue);
+    YASAudioRenderID renderID;
+    renderID.graph = graphKey.unsignedCharValue;
+    renderID.unit = unitKey.unsignedShortValue;
 
-    YASRaiseIfAUError(AudioUnitAddRenderNotify(_audioUnitInstance, NotifyRenderCallback, (void *)renderID));
+    YASRaiseIfAUError(AudioUnitAddRenderNotify(_audioUnitInstance, NotifyRenderCallback, renderID.v));
 }
 
 - (void)removeRenderNotify
@@ -519,12 +508,14 @@ static OSStatus InputRenderCallback(void *inRefCon, AudioUnitRenderActionFlags *
         YASRaiseWithReason(([NSString stringWithFormat:@"%s - graph.key or unit.key is nil", __PRETTY_FUNCTION__]));
         return;
     }
-
-    unsigned long renderID = PackRenderID(graphKey.unsignedCharValue, unitKey.unsignedShortValue);
+    
+    YASAudioRenderID renderID;
+    renderID.graph = graphKey.unsignedCharValue;
+    renderID.unit = unitKey.unsignedShortValue;
 
     AURenderCallbackStruct callbackStruct;
     callbackStruct.inputProc = InputRenderCallback;
-    callbackStruct.inputProcRefCon = (void *)renderID;
+    callbackStruct.inputProcRefCon = renderID.v;
 
     YASRaiseIfAUError(AudioUnitSetProperty(self.audioUnitInstance, kAudioOutputUnitProperty_SetInputCallback,
                                            kAudioUnitScope_Global, 0, &callbackStruct, sizeof(AURenderCallbackStruct)));
