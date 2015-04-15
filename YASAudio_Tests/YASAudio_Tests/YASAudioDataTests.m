@@ -162,7 +162,7 @@
 
     [data clear];
 
-    XCTAssertTrue([self _isClearedDataWithBuffer:data]);
+    XCTAssertTrue([YASAudioTestUtils isClearedDataWithBuffer:data]);
 
     [YASAudioTestUtils fillTestValuesToData:data];
 
@@ -950,22 +950,6 @@
                     default:
                         return NO;
                 }
-            }
-        }
-    }
-
-    return YES;
-}
-
-- (BOOL)_isClearedDataWithBuffer:(YASAudioData *)data
-{
-    const AudioBufferList *abl = data.audioBufferList;
-
-    for (UInt32 buffer = 0; buffer < abl->mNumberBuffers; buffer++) {
-        Byte *ptr = abl->mBuffers[buffer].mData;
-        for (UInt32 frame = 0; frame < abl->mBuffers[buffer].mDataByteSize; frame++) {
-            if (ptr[frame] != 0) {
-                return NO;
             }
         }
     }
