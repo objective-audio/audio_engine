@@ -60,6 +60,13 @@
 		B62ED5311A6280C0007DDE96 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		B62ED5331A6280C0007DDE96 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		B62ED5361A6280C0007DDE96 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
+		B63743791ADE94B7007B27F0 /* YASAudioConnection+Internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "YASAudioConnection+Internal.h"; sourceTree = "<group>"; };
+		B637437B1ADE94B7007B27F0 /* YASAudioNode+Internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "YASAudioNode+Internal.h"; sourceTree = "<group>"; };
+		B637437C1ADE94B7007B27F0 /* YASAudioOfflineOutputNode+Internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "YASAudioOfflineOutputNode+Internal.h"; sourceTree = "<group>"; };
+		B637437D1ADE94B7007B27F0 /* YASAudioUnitNode+Internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "YASAudioUnitNode+Internal.h"; sourceTree = "<group>"; };
+		B637437F1ADE9504007B27F0 /* YASAudioData+Internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "YASAudioData+Internal.h"; sourceTree = "<group>"; };
+		B63743801ADE9527007B27F0 /* YASAudioGraph+Internal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "YASAudioGraph+Internal.h"; sourceTree = "<group>"; };
+		B63743811ADE9527007B27F0 /* YASAudioUnit+Internal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "YASAudioUnit+Internal.h"; sourceTree = "<group>"; };
 		B63789411AB4333E00B95F55 /* YASAudio.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YASAudio.h; sourceTree = "<group>"; };
 		B63B22191AAC4ED10015BD78 /* YASAudioConnection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YASAudioConnection.h; sourceTree = "<group>"; };
 		B63B221A1AAC4ED10015BD78 /* YASAudioConnection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YASAudioConnection.m; sourceTree = "<group>"; };
@@ -187,10 +194,12 @@
 			children = (
 				B63B22191AAC4ED10015BD78 /* YASAudioConnection.h */,
 				B63B221A1AAC4ED10015BD78 /* YASAudioConnection.m */,
+				B63743791ADE94B7007B27F0 /* YASAudioConnection+Internal.h */,
 				B63B221B1AAC4ED10015BD78 /* YASAudioEngine.h */,
 				B63B221C1AAC4ED10015BD78 /* YASAudioEngine.m */,
 				B63B221D1AAC4ED10015BD78 /* YASAudioNode.h */,
 				B63B221E1AAC4ED10015BD78 /* YASAudioNode.m */,
+				B637437B1ADE94B7007B27F0 /* YASAudioNode+Internal.h */,
 				B63B221F1AAC4ED10015BD78 /* YASAudioTapNode.h */,
 				B63B22201AAC4ED10015BD78 /* YASAudioTapNode.m */,
 				B63B22211AAC4ED10015BD78 /* YASAudioUnitDelayNode.h */,
@@ -201,8 +210,10 @@
 				B63B22261AAC4ED10015BD78 /* YASAudioUnitMixerNode.m */,
 				B63B22271AAC4ED10015BD78 /* YASAudioUnitNode.h */,
 				B63B22281AAC4ED10015BD78 /* YASAudioUnitNode.m */,
+				B637437D1ADE94B7007B27F0 /* YASAudioUnitNode+Internal.h */,
 				B60EFF571AC8285900AA70DD /* YASAudioOfflineOutputNode.h */,
 				B60EFF581AC8285900AA70DD /* YASAudioOfflineOutputNode.m */,
+				B637437C1ADE94B7007B27F0 /* YASAudioOfflineOutputNode+Internal.h */,
 			);
 			path = AudioEngine;
 			sourceTree = "<group>";
@@ -232,6 +243,7 @@
 				B65BA9E11A62C27D00E7C3D8 /* YASAudioFormat.m */,
 				B65BA9E21A62C27D00E7C3D8 /* YASAudioData.h */,
 				B65BA9E31A62C27D00E7C3D8 /* YASAudioData.m */,
+				B637437F1ADE9504007B27F0 /* YASAudioData+Internal.h */,
 				B6A463CC1AD76932006D15C8 /* YASAudioScanner.h */,
 				B6A463CD1AD76932006D15C8 /* YASAudioScanner.m */,
 				B65BAA1F1A62C6D600E7C3D8 /* YASAudioTypes.h */,
@@ -258,8 +270,10 @@
 			children = (
 				B65BA9E51A62C27D00E7C3D8 /* YASAudioGraph.h */,
 				B65BA9E61A62C27D00E7C3D8 /* YASAudioGraph.m */,
+				B63743801ADE9527007B27F0 /* YASAudioGraph+Internal.h */,
 				B65BA9E71A62C27D00E7C3D8 /* YASAudioUnit.h */,
 				B65BA9E81A62C27D00E7C3D8 /* YASAudioUnit.m */,
+				B63743811ADE9527007B27F0 /* YASAudioUnit+Internal.h */,
 				B6E827281A88504B00751441 /* YASAudioUnitParameter.h */,
 				B6E827291A88504B00751441 /* YASAudioUnitParameter.m */,
 			);

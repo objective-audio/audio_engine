@@ -4,10 +4,11 @@
 //
 
 #import "YASAudioEngine.h"
-#import "YASAudioConnection.h"
-#import "YASAudioUnitNode.h"
+#import "YASAudioConnection+Internal.h"
+#import "YASAudioNode+Internal.h"
+#import "YASAudioUnitNode+Internal.h"
 #import "YASAudioGraph.h"
-#import "YASAudioOfflineOutputNode.h"
+#import "YASAudioOfflineOutputNode+Internal.h"
 #import "YASMacros.h"
 #import "NSException+YASAudio.h"
 #import "NSError+YASAudio.h"
@@ -15,7 +16,7 @@
 
 #if (!TARGET_OS_IPHONE & TARGET_OS_MAC)
 #import "YASAudioDeviceIO.h"
-#import "YASAudioDeviceIONode.h"
+#import "YASAudioDeviceIONode+Internal.h"
 #endif
 
 NSString *const YASAudioEngineConfigurationChangeNotification = @"YASAudioEngineConfigurationChangeNotification";

@@ -21,11 +21,4 @@
 
 @end
 
-@interface YASAudioDeviceIONode (YASInternal)
-
-- (void)addAudioDeviceIOToGraph:(YASAudioGraph *)graph;
-- (void)removeAudioDeviceIOFromGraph;
-
-@end
-
 #endif

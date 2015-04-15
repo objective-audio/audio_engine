@@ -28,11 +28,3 @@
 + (BOOL)isInterrupting;
 
 @end
-
-@interface YASAudioGraph (YASInternal)
-
-@property (nonatomic, copy, readonly) NSNumber *key;
-
-+ (void)audioUnitRender:(YASAudioUnitRenderParameters *)renderParameters;
-
-@end

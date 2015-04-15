@@ -5,7 +5,7 @@
 
 #import "YASAudioNode.h"
 #import "YASAudioEngine.h"
-#import "YASAudioConnection.h"
+#import "YASAudioConnection+Internal.h"
 #import "YASMacros.h"
 #import "NSException+YASAudio.h"
 #import "NSNumber+YASAudio.h"

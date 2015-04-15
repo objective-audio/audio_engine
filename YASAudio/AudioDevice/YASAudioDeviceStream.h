@@ -35,10 +35,4 @@ typedef NS_ENUM(UInt32, YASAudioDeviceStreamDirection) {
 
 @end
 
-@interface YASAudioDeviceStream (YASInternal)
-
-- (instancetype)initWithAudioStreamID:(AudioStreamID)audioStreamID device:(YASAudioDevice *)device;
-
-@end
-
 #endif

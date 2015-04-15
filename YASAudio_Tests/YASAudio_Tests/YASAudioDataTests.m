@@ -5,6 +5,7 @@
 
 #import <XCTest/XCTest.h>
 #import "YASAudio.h"
+#import "YASAudioData+Internal.h"
 
 static UInt32 TestValue(UInt32 frame, UInt32 channel, UInt32 buffer)
 {

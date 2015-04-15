@@ -4,10 +4,10 @@
 //
 
 #import <XCTest/XCTest.h>
-#import "YASAudioNode.h"
+#import "YASAudioNode+Internal.h"
 #import "YASAudioEngine.h"
 #import "YASAudioFormat.h"
-#import "YASAudioConnection.h"
+#import "YASAudioConnection+Internal.h"
 #import "YASAudioTime.h"
 #import "YASMacros.h"
 

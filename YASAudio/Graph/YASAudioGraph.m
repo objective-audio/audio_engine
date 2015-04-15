@@ -4,7 +4,7 @@
 //
 
 #import "YASAudioGraph.h"
-#import "YASAudioUnit.h"
+#import "YASAudioUnit+Internal.h"
 #import "YASMacros.h"
 #import "NSArray+YASAudio.h"
 #import "NSDictionary+YASAudio.h"

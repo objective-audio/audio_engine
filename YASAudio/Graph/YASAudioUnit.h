@@ -84,13 +84,3 @@ extern OSType const YASAudioUnitSubType_DefaultIO;
 - (void)audioUnitRender:(YASAudioUnitRenderParameters *)renderParameters;
 
 @end
-
-@interface YASAudioUnit (YASInternal)
-
-@property (nonatomic, copy) NSNumber *graphKey;
-@property (nonatomic, copy) NSNumber *key;
-
-- (void)initialize;
-- (void)uninitialize;
-
-@end
