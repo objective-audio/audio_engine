@@ -156,7 +156,7 @@
 
 - (void)_testClearData:(YASAudioData *)data
 {
-    [self _fillTestValuesToData:data];
+    [YASAudioTestUtils fillTestValuesToData:data];
 
     XCTAssertTrue([self _isFilledData:data]);
 
@@ -164,7 +164,7 @@
 
     XCTAssertTrue([self _isClearedDataWithBuffer:data]);
 
-    [self _fillTestValuesToData:data];
+    [YASAudioTestUtils fillTestValuesToData:data];
 
     [data clearWithStartFrame:1 length:2];
 
@@ -202,7 +202,7 @@
         YASAudioData *fromData = [[YASAudioData alloc] initWithFormat:format frameCapacity:frameLength];
         YASAudioData *toData = [[YASAudioData alloc] initWithFormat:format frameCapacity:frameLength];
 
-        [self _fillTestValuesToData:fromData];
+        [YASAudioTestUtils fillTestValuesToData:fromData];
 
         XCTAssertTrue([toData copyFromData:fromData]);
 
@@ -234,7 +234,7 @@
         YASAudioData *fromData = [[YASAudioData alloc] initWithFormat:fromFormat frameCapacity:frameLength];
         YASAudioData *toData = [[YASAudioData alloc] initWithFormat:toFormat frameCapacity:frameLength];
 
-        [self _fillTestValuesToData:fromData];
+        [YASAudioTestUtils fillTestValuesToData:fromData];
 
         XCTAssertFalse([toData copyFromData:fromData]);
         XCTAssertThrows([toData copyFromData:nil]);
@@ -263,7 +263,7 @@
         YASAudioData *fromData = [[YASAudioData alloc] initWithFormat:format frameCapacity:fromFrameLength];
         YASAudioData *toData = [[YASAudioData alloc] initWithFormat:format frameCapacity:toFrameLength];
 
-        [self _fillTestValuesToData:fromData];
+        [YASAudioTestUtils fillTestValuesToData:fromData];
 
         XCTAssertFalse([toData copyFromData:fromData fromStartFrame:0 toStartFrame:0 length:fromFrameLength]);
         XCTAssertTrue([toData copyFromData:fromData fromStartFrame:0 toStartFrame:0 length:toFrameLength]);
@@ -300,7 +300,7 @@
         YASAudioData *fromData = [[YASAudioData alloc] initWithFormat:format frameCapacity:fromFrameLength];
         YASAudioData *toData = [[YASAudioData alloc] initWithFormat:format frameCapacity:toFrameLength];
 
-        [self _fillTestValuesToData:fromData];
+        [YASAudioTestUtils fillTestValuesToData:fromData];
 
         BOOL result = NO;
         const UInt32 length = 2;
@@ -357,7 +357,7 @@
         YASAudioData *fromData = [[YASAudioData alloc] initWithFormat:format frameCapacity:frameLength];
         YASAudioData *toData = [[YASAudioData alloc] initWithFormat:format frameCapacity:frameLength];
 
-        [self _fillTestValuesToData:fromData];
+        [YASAudioTestUtils fillTestValuesToData:fromData];
 
         XCTAssertNoThrow([toData copyFlexiblyFromData:fromData]);
         XCTAssertTrue([self _compareDataFlexiblyWithData:fromData otherData:toData]);
@@ -394,7 +394,7 @@
         YASAudioData *fromData = [[YASAudioData alloc] initWithFormat:fromFormat frameCapacity:frameLength];
         YASAudioData *toData = [[YASAudioData alloc] initWithFormat:toFormat frameCapacity:frameLength];
 
-        [self _fillTestValuesToData:fromData];
+        [YASAudioTestUtils fillTestValuesToData:fromData];
 
         XCTAssertNoThrow([toData copyFlexiblyFromData:fromData]);
         XCTAssertTrue([self _compareDataFlexiblyWithData:fromData otherData:toData]);
@@ -457,7 +457,7 @@
         YASAudioData *nonInterleavedData =
             [[YASAudioData alloc] initWithFormat:nonInterleavedFormat frameCapacity:frameLength];
 
-        [self _fillTestValuesToData:interleavedData];
+        [YASAudioTestUtils fillTestValuesToData:interleavedData];
 
         XCTAssertNoThrow([nonInterleavedData copyFlexiblyFromAudioBufferList:interleavedData.audioBufferList]);
         XCTAssertTrue([self _compareDataFlexiblyWithData:interleavedData otherData:nonInterleavedData]);
@@ -466,7 +466,7 @@
         [interleavedData clear];
         [nonInterleavedData clear];
 
-        [self _fillTestValuesToData:nonInterleavedData];
+        [YASAudioTestUtils fillTestValuesToData:nonInterleavedData];
 
         XCTAssertNoThrow([interleavedData copyFlexiblyFromAudioBufferList:nonInterleavedData.audioBufferList]);
         XCTAssertTrue([self _compareDataFlexiblyWithData:interleavedData otherData:nonInterleavedData]);
@@ -503,7 +503,7 @@
         YASAudioData *nonInterleavedData =
             [[YASAudioData alloc] initWithFormat:nonInterleavedFormat frameCapacity:frameLength];
 
-        [self _fillTestValuesToData:interleavedData];
+        [YASAudioTestUtils fillTestValuesToData:interleavedData];
 
         XCTAssertNoThrow([interleavedData copyFlexiblyToAudioBufferList:nonInterleavedData.mutableAudioBufferList]);
         XCTAssertTrue([self _compareDataFlexiblyWithData:interleavedData otherData:nonInterleavedData]);
@@ -511,7 +511,7 @@
         [interleavedData clear];
         [nonInterleavedData clear];
 
-        [self _fillTestValuesToData:nonInterleavedData];
+        [YASAudioTestUtils fillTestValuesToData:nonInterleavedData];
 
         XCTAssertNoThrow([nonInterleavedData copyFlexiblyToAudioBufferList:interleavedData.mutableAudioBufferList]);
         XCTAssertTrue([self _compareDataFlexiblyWithData:interleavedData otherData:nonInterleavedData]);
@@ -558,7 +558,7 @@
     YASAudioFormat *format = [[YASAudioFormat alloc] initStandardFormatWithSampleRate:48000 channels:2];
 
     YASAudioData *sourceData = [[YASAudioData alloc] initWithFormat:format frameCapacity:frameLength];
-    [self _fillTestValuesToData:sourceData];
+    [YASAudioTestUtils fillTestValuesToData:sourceData];
 
     YASAudioData *destData = [sourceData copy];
 
@@ -584,7 +584,7 @@
     YASAudioFormat *destFormat =
         [[YASAudioFormat alloc] initStandardFormatWithSampleRate:sampleRate channels:destChannels];
     YASAudioData *destData = [[YASAudioData alloc] initWithFormat:destFormat frameCapacity:frameLength];
-    [self _fillTestValuesToData:destData];
+    [YASAudioTestUtils fillTestValuesToData:destData];
     YASRelease(destFormat);
 
     NSMutableArray *channelRoutes = [[NSMutableArray alloc] initWithCapacity:2];
@@ -631,7 +631,7 @@
     YASAudioFormat *sourceFormat =
         [[YASAudioFormat alloc] initStandardFormatWithSampleRate:sampleRate channels:sourceChannels];
     YASAudioData *sourceData = [[YASAudioData alloc] initWithFormat:sourceFormat frameCapacity:frameLength];
-    [self _fillTestValuesToData:sourceData];
+    [YASAudioTestUtils fillTestValuesToData:sourceData];
     YASRelease(sourceFormat);
 
     NSMutableArray *channelRoutes = [[NSMutableArray alloc] initWithCapacity:2];
@@ -674,7 +674,7 @@
     YASAudioData *data = [[YASAudioData alloc] initWithFormat:format frameCapacity:4];
     YASRelease(format);
 
-    [self _fillTestValuesToData:data];
+    [YASAudioTestUtils fillTestValuesToData:data];
 
     __block UInt32 bufferCount = 0;
     const UInt32 frameLength = data.frameLength;
@@ -705,10 +705,10 @@
     YASAudioData *dataForFill = [[YASAudioData alloc] initWithFormat:format frameCapacity:4];
     YASRelease(format);
 
-    [self _fillTestValuesToData:dataForFill];
+    [YASAudioTestUtils fillTestValuesToData:dataForFill];
 
     const UInt32 frameLength = dataForWrite.frameLength;
-    
+
     [dataForWrite writeBuffersUsingBlock:^(YASAudioMutableScanner *scanner, const UInt32 buffer) {
         const YASAudioPointer *pointer = scanner.mutablePointer;
         const NSUInteger *index = scanner.index;
@@ -741,7 +741,7 @@
     YASAudioData *data = [[YASAudioData alloc] initWithFormat:format frameCapacity:frameLength];
     YASRelease(format);
 
-    [self _fillTestValuesToData:data];
+    [YASAudioTestUtils fillTestValuesToData:data];
 
     for (UInt32 frame = 0; frame < frameLength; frame++) {
         for (UInt32 buffer = 0; buffer < channels; buffer++) {
@@ -764,7 +764,7 @@
     YASAudioData *data = [[YASAudioData alloc] initWithFormat:format frameCapacity:frameLength];
     YASRelease(format);
 
-    [self _fillTestValuesToData:data];
+    [YASAudioTestUtils fillTestValuesToData:data];
 
     for (UInt32 frame = 0; frame < frameLength; frame++) {
         for (UInt32 buffer = 0; buffer < channels; buffer++) {
@@ -787,7 +787,7 @@
     YASAudioData *data = [[YASAudioData alloc] initWithFormat:format frameCapacity:frameLength];
     YASRelease(format);
 
-    [self _fillTestValuesToData:data];
+    [YASAudioTestUtils fillTestValuesToData:data];
 
     for (UInt32 frame = 0; frame < frameLength; frame++) {
         for (UInt32 buffer = 0; buffer < channels; buffer++) {
@@ -811,7 +811,7 @@
     YASAudioData *data = [[YASAudioData alloc] initWithFormat:format frameCapacity:frameLength];
     YASRelease(format);
 
-    [self _fillTestValuesToData:data];
+    [YASAudioTestUtils fillTestValuesToData:data];
 
     for (UInt32 frame = 0; frame < frameLength; frame++) {
         for (UInt32 buffer = 0; buffer < channels; buffer++) {
@@ -916,37 +916,6 @@
 }
 
 #pragma mark -
-
-- (void)_fillTestValuesToData:(YASAudioData *)data
-{
-    YASAudioBitDepthFormat bitDepthFormat = data.format.bitDepthFormat;
-
-    for (UInt32 buffer = 0; buffer < data.bufferCount; buffer++) {
-        YASAudioPointer pointer = [data pointerAtBuffer:buffer];
-        for (UInt32 frame = 0; frame < data.frameLength; frame++) {
-            for (UInt32 ch = 0; ch < data.stride; ch++) {
-                UInt32 index = frame * data.stride + ch;
-                UInt32 value = TestValue(frame, ch, buffer);
-                switch (bitDepthFormat) {
-                    case YASAudioBitDepthFormatFloat32: {
-                        pointer.f32[index] = value;
-                    } break;
-                    case YASAudioBitDepthFormatFloat64: {
-                        pointer.f64[index] = value;
-                    } break;
-                    case YASAudioBitDepthFormatInt16: {
-                        pointer.i16[index] = value;
-                    } break;
-                    case YASAudioBitDepthFormatInt32: {
-                        pointer.i32[index] = value;
-                    } break;
-                    default:
-                        break;
-                }
-            }
-        }
-    }
-}
 
 - (BOOL)_isFilledData:(YASAudioData *)data
 {

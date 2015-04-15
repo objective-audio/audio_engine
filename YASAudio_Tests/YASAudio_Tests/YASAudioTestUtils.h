@@ -14,4 +14,6 @@ extern UInt32 TestValue(UInt32 frame, UInt32 channel, UInt32 buffer);
 
 @interface YASAudioTestUtils : NSObject
 
++ (void)fillTestValuesToData:(YASAudioData *)data;
+
 @end
