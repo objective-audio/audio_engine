@@ -4,7 +4,8 @@
 //
 
 #import "YASAudioTapNode.h"
-#import "YASAudioConnection.h"
+#import "YASAudioNode+Internal.h"
+#import "YASAudioConnection+Internal.h"
 #import "YASMacros.h"
 
 @implementation YASAudioTapNode

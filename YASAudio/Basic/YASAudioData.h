@@ -48,20 +48,3 @@ typedef void (^YASAudioDataWriteBlock)(YASAudioMutableScanner *scanner, const UI
 - (BOOL)copyFlexiblyToAudioBufferList:(AudioBufferList *)toAbl;
 
 @end
-
-@interface YASAudioData (YASInternal)
-
-- (instancetype)initWithFormat:(YASAudioFormat *)format
-               audioBufferList:(AudioBufferList *)abl
-                     needsFree:(BOOL)needsFree;
-
-#if (!TARGET_OS_IPHONE && TARGET_OS_MAC)
-- (instancetype)initWithFormat:(YASAudioFormat *)format
-                          data:(YASAudioData *)data
-           outputChannelRoutes:(NSArray *)channelRoutes;
-- (instancetype)initWithFormat:(YASAudioFormat *)format
-                          data:(YASAudioData *)data
-            inputChannelRoutes:(NSArray *)channelRoutes;
-#endif
-
-@end

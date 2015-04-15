@@ -5,8 +5,9 @@
 
 #import "YASAudioUnitNode.h"
 #import "YASAudioUnitParameter.h"
-#import "YASAudioConnection.h"
-#import "YASAudioData.h"
+#import "YASAudioNode+Internal.h"
+#import "YASAudioConnection+Internal.h"
+#import "YASAudioData+Internal.h"
 #import "YASAudioFormat.h"
 #import "YASAudioGraph.h"
 #import "YASAudioUnit.h"

@@ -4,9 +4,10 @@
 //
 
 #import "YASAudioUnitIONode.h"
+#import "YASAudioNode+Internal.h"
 #import "YASAudioTapNode.h"
-#import "YASAudioConnection.h"
-#import "YASAudioData.h"
+#import "YASAudioConnection+Internal.h"
+#import "YASAudioData+Internal.h"
 #import "YASAudioFormat.h"
 #import "YASAudioGraph.h"
 #import "YASAudioUnit.h"

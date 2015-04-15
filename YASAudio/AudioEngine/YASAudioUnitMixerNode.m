@@ -5,6 +5,7 @@
 
 #import "YASAudioUnitMixerNode.h"
 #import "YASAudioUnit.h"
+#import "YASAudioNode+Internal.h"
 #import "NSNumber+YASAudio.h"
 #import "YASMacros.h"
 

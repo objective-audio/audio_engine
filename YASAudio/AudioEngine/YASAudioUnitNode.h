@@ -32,10 +32,3 @@
 - (void)prepareParameters NS_REQUIRES_SUPER;
 
 @end
-
-@interface YASAudioUnitNode (YASInternal)
-
-- (void)addAudioUnitToGraph:(YASAudioGraph *)graph;
-- (void)removeAudioUnitFromGraph;
-
-@end

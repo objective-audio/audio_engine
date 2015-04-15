@@ -8,7 +8,7 @@
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
 
 #import "YASAudioDevice.h"
-#import "YASAudioDeviceStream.h"
+#import "YASAudioDeviceStream+Internal.h"
 #import "YASAudioFormat.h"
 #import "YASWeakSupport.h"
 #import "YASMacros.h"
