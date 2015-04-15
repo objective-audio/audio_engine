@@ -4,12 +4,7 @@
 //
 
 #import <XCTest/XCTest.h>
-#import "YASAudio.h"
-
-static UInt32 TestValue(UInt32 frame, UInt32 ch, UInt32 buf)
-{
-    return frame + 1024 * (ch + 1) + 512 * (buf + 1);
-}
+#import "YASAudioTestUtils.h"
 
 @interface YASAudioScannerTests : XCTestCase
 

@@ -11,12 +11,6 @@
 #import "YASAudioTime.h"
 #import "YASMacros.h"
 
-@interface YASAudioNode (YASAudioNodeTest)
-
-@property (atomic, strong) id nodeCore;
-
-@end
-
 @interface YASAudioNodeTestNode : YASAudioNode
 
 @end
