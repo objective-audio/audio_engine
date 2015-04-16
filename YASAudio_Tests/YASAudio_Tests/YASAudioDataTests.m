@@ -158,7 +158,7 @@
 {
     [YASAudioTestUtils fillTestValuesToData:data];
 
-    XCTAssertTrue([self _isFilledData:data]);
+    XCTAssertTrue([YASAudioTestUtils isFilledData:data]);
 
     [data clear];
 
@@ -724,7 +724,7 @@
         XCTAssertEqual(frameLength, frame);
     }];
 
-    XCTAssertTrue([self _isFilledData:dataForWrite]);
+    XCTAssertTrue([YASAudioTestUtils isFilledData:dataForWrite]);
     XCTAssertTrue([YASAudioTestUtils compareDataFlexiblyWithData:dataForFill otherData:dataForWrite]);
 
     YASRelease(dataForFill);
@@ -915,48 +915,6 @@
     }
 
     YASRelease(data);
-}
-
-#pragma mark -
-
-- (BOOL)_isFilledData:(YASAudioData *)data
-{
-    YASAudioBitDepthFormat bitDepthFormat = data.format.bitDepthFormat;
-
-    for (UInt32 buffer = 0; buffer < data.bufferCount; buffer++) {
-        YASAudioConstPointer pointer = {[data pointerAtBuffer:buffer].v};
-        for (UInt32 frame = 0; frame < data.frameLength; frame++) {
-            for (UInt32 ch = 0; ch < data.stride; ch++) {
-                UInt32 index = frame * data.stride + ch;
-                switch (bitDepthFormat) {
-                    case YASAudioBitDepthFormatFloat32: {
-                        if (pointer.f32[index] == 0) {
-                            return NO;
-                        }
-                    } break;
-                    case YASAudioBitDepthFormatFloat64: {
-                        if (pointer.f64[index] == 0) {
-                            return NO;
-                        }
-                    } break;
-                    case YASAudioBitDepthFormatInt16: {
-                        if (pointer.i16[index] == 0) {
-                            return NO;
-                        }
-                    } break;
-                    case YASAudioBitDepthFormatInt32: {
-                        if (pointer.i32[index] == 0) {
-                            return NO;
-                        }
-                    } break;
-                    default:
-                        return NO;
-                }
-            }
-        }
-    }
-
-    return YES;
 }
 
 @end
