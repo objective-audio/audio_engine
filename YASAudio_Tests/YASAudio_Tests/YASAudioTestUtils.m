@@ -106,40 +106,16 @@ UInt32 TestValue(UInt32 frame, UInt32 channel, UInt32 buffer)
 + (BOOL)isFilledData:(YASAudioData *)data
 {
     __block BOOL isFilled = YES;
-    YASAudioBitDepthFormat bitDepthFormat = data.format.bitDepthFormat;
+    const NSUInteger sampleByteCount = data.format.sampleByteCount;
+    NSData *zeroData = [NSMutableData dataWithLength:sampleByteCount];
+    const void *zeroBytes = [zeroData bytes];
 
     [data readBuffersUsingBlock:^(YASAudioScanner *scanner, const UInt32 buffer) {
         const YASAudioConstPointer *pointer = scanner.pointer;
         while (pointer->v) {
-            switch (bitDepthFormat) {
-                case YASAudioBitDepthFormatFloat32: {
-                    if (*pointer->f32 == 0) {
-                        isFilled = NO;
-                        return;
-                    }
-                } break;
-                case YASAudioBitDepthFormatFloat64: {
-                    if (*pointer->f64 == 0) {
-                        isFilled = NO;
-                        return;
-                    }
-                } break;
-                case YASAudioBitDepthFormatInt16: {
-                    if (*pointer->i16 == 0) {
-                        isFilled = NO;
-                        return;
-                    }
-                } break;
-                case YASAudioBitDepthFormatInt32: {
-                    if (*pointer->i32 == 0) {
-                        isFilled = NO;
-                        return;
-                    }
-                } break;
-                default: {
-                    isFilled = NO;
-                    return;
-                } break;
+            if (YASAudioIsEqualData(pointer->v, zeroBytes, sampleByteCount)) {
+                isFilled = NO;
+                return;
             }
             [scanner move];
         }
