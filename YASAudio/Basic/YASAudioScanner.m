@@ -9,15 +9,7 @@
 #import "NSException+YASAudio.h"
 #import "YASMacros.h"
 
-@implementation YASAudioScanner {
-   @protected
-    YASAudioPointer _pointer;
-   @private
-    YASAudioPointer _topPointer;
-    NSUInteger _stride;
-    NSUInteger _length;
-    NSUInteger _index;
-}
+@implementation YASAudioScanner
 
 - (instancetype)initWithAudioData:(YASAudioData *)data atBuffer:(const NSUInteger)buffer
 {
@@ -92,18 +84,7 @@
 
 @end
 
-@implementation YASAudioFrameScanner {
-   @protected
-    YASAudioPointer _pointer;
-   @private
-    YASAudioPointer *_pointers;
-    YASAudioPointer *_topPointers;
-    NSUInteger _frameStride;
-    NSUInteger _frameLength;
-    NSUInteger _frame;
-    NSUInteger _channel;
-    NSUInteger _channelCount;
-}
+@implementation YASAudioFrameScanner
 
 - (instancetype)initWithAudioData:(YASAudioData *)data
 {
@@ -117,7 +98,8 @@
         _frameLength = data.frameLength;
         _channelCount = bufferCount * stride;
         _frameStride = stride * sampleByteCount;
-        _pointers = calloc(_channelCount, sizeof(YASAudioPointer *));
+        _pointersSize = _channelCount * sizeof(YASAudioPointer *);
+        _pointers = calloc(_pointersSize, 1);
         _topPointers = calloc(_channelCount, sizeof(YASAudioPointer *));
 
         NSUInteger channel = 0;
@@ -161,7 +143,7 @@
 - (void)moveFrame
 {
     if (++_frame >= _frameLength) {
-        memset(_pointers, 0, _channelCount * sizeof(YASAudioPointer *));
+        memset(_pointers, 0, _pointersSize);
         _pointer.v = NULL;
     } else {
         NSUInteger index = _channelCount;
@@ -224,13 +206,8 @@
 - (void)reset
 {
     _frame = 0;
-
-    NSUInteger channel = _channelCount;
-    while (channel--) {
-        _pointers[channel].v = _topPointers[channel].v;
-    }
-
     _channel = 0;
+    memcpy(_pointers, _topPointers, _channelCount * sizeof(YASAudioPointer *));
     _pointer.v = _pointers->v;
 }
 
