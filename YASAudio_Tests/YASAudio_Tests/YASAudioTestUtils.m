@@ -46,7 +46,7 @@ UInt32 TestValue(UInt32 frame, UInt32 channel, UInt32 buffer)
 + (BOOL)isClearedDataWithBuffer:(YASAudioData *)data
 {
     const AudioBufferList *abl = data.audioBufferList;
-    
+
     for (UInt32 buffer = 0; buffer < abl->mNumberBuffers; buffer++) {
         Byte *ptr = abl->mBuffers[buffer].mData;
         for (UInt32 frame = 0; frame < abl->mBuffers[buffer].mDataByteSize; frame++) {
@@ -55,8 +55,27 @@ UInt32 TestValue(UInt32 frame, UInt32 channel, UInt32 buffer)
             }
         }
     }
-    
+
     return YES;
+}
+
++ (YASAudioPointer)dataPointerWithData:(YASAudioData *)data channel:(UInt32)channel frame:(UInt32)frame
+{
+    const AudioBufferList *abl = data.audioBufferList;
+    const UInt32 sampleByteCount = data.format.sampleByteCount;
+    UInt32 index = 0;
+
+    for (UInt32 buffer = 0; buffer < data.bufferCount; buffer++) {
+        Byte *ptr = abl->mBuffers[buffer].mData;
+        for (UInt32 ch = 0; ch < data.stride; ch++) {
+            if (channel == index) {
+                return (YASAudioPointer){&ptr[(frame * data.stride + ch) * sampleByteCount]};
+            }
+            index++;
+        }
+    }
+
+    return (YASAudioPointer){NULL};
 }
 
 @end

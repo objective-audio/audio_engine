@@ -311,8 +311,10 @@
 
         for (UInt32 ch = 0; ch < channels; ch++) {
             for (UInt32 i = 0; i < length; i++) {
-                YASAudioPointer fromPtr = [self _dataPointerWithData:fromData channel:ch frame:fromStartFrame + i];
-                YASAudioPointer toPtr = [self _dataPointerWithData:toData channel:ch frame:toStartFrame + i];
+                YASAudioPointer fromPtr =
+                    [YASAudioTestUtils dataPointerWithData:fromData channel:ch frame:fromStartFrame + i];
+                YASAudioPointer toPtr =
+                    [YASAudioTestUtils dataPointerWithData:toData channel:ch frame:toStartFrame + i];
                 XCTAssertEqual(memcmp(fromPtr.v, toPtr.v, format.sampleByteCount), 0);
                 BOOL isFromNotZero = NO;
                 BOOL isToNotZero = NO;
@@ -977,8 +979,8 @@
 
     for (UInt32 ch = 0; ch < data1.format.channelCount; ch++) {
         for (UInt32 frame = 0; frame < data1.frameLength; frame++) {
-            YASAudioPointer ptr1 = [self _dataPointerWithData:data1 channel:ch frame:frame];
-            YASAudioPointer ptr2 = [self _dataPointerWithData:data2 channel:ch frame:frame];
+            YASAudioPointer ptr1 = [YASAudioTestUtils dataPointerWithData:data1 channel:ch frame:frame];
+            YASAudioPointer ptr2 = [YASAudioTestUtils dataPointerWithData:data2 channel:ch frame:frame];
             int result = memcmp(ptr1.v, ptr2.v, data1.format.sampleByteCount);
             if (result) {
                 return NO;
@@ -987,25 +989,6 @@
     }
 
     return YES;
-}
-
-- (YASAudioPointer)_dataPointerWithData:(YASAudioData *)data channel:(UInt32)channel frame:(UInt32)frame
-{
-    const AudioBufferList *abl = data.audioBufferList;
-    const UInt32 sampleByteCount = data.format.sampleByteCount;
-    UInt32 index = 0;
-
-    for (UInt32 buffer = 0; buffer < data.bufferCount; buffer++) {
-        Byte *ptr = abl->mBuffers[buffer].mData;
-        for (UInt32 ch = 0; ch < data.stride; ch++) {
-            if (channel == index) {
-                return (YASAudioPointer){&ptr[(frame * data.stride + ch) * sampleByteCount]};
-            }
-            index++;
-        }
-    }
-
-    return (YASAudioPointer){NULL};
 }
 
 @end

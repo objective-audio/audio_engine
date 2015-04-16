@@ -16,5 +16,6 @@ extern UInt32 TestValue(UInt32 frame, UInt32 channel, UInt32 buffer);
 
 + (void)fillTestValuesToData:(YASAudioData *)data;
 + (BOOL)isClearedDataWithBuffer:(YASAudioData *)data;
++ (YASAudioPointer)dataPointerWithData:(YASAudioData *)data channel:(UInt32)channel frame:(UInt32)frame;
 
 @end
