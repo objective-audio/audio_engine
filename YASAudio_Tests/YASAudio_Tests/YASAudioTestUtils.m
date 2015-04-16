@@ -61,11 +61,11 @@ UInt32 TestValue(UInt32 frame, UInt32 channel, UInt32 buffer)
 
 + (YASAudioPointer)dataPointerWithData:(YASAudioData *)data channel:(UInt32)channel frame:(UInt32)frame
 {
-    YASAudioFrameScanner *scanner = [[YASAudioFrameScanner alloc] initWithAudioData:data];
+    YASAudioMutableFrameScanner *scanner = [[YASAudioMutableFrameScanner alloc] initWithAudioData:data];
     [scanner setFramePosition:frame];
     [scanner setChannelPosition:channel];
 
-    YASAudioPointer pointer = {scanner.pointer->v};
+    YASAudioPointer pointer = *scanner.mutablePointer;
 
     YASRelease(scanner);
 
