@@ -206,7 +206,7 @@
 
         XCTAssertTrue([toData copyFromData:fromData]);
 
-        [self _compareDataFlexiblyWithData:fromData otherData:toData];
+        [YASAudioTestUtils compareDataFlexiblyWithData:fromData otherData:toData];
 
         YASRelease(format);
         YASRelease(fromData);
@@ -267,7 +267,7 @@
 
         XCTAssertFalse([toData copyFromData:fromData fromStartFrame:0 toStartFrame:0 length:fromFrameLength]);
         XCTAssertTrue([toData copyFromData:fromData fromStartFrame:0 toStartFrame:0 length:toFrameLength]);
-        XCTAssertFalse([self _compareDataFlexiblyWithData:fromData otherData:toData]);
+        XCTAssertFalse([YASAudioTestUtils compareDataFlexiblyWithData:fromData otherData:toData]);
 
         YASRelease(format);
         YASRelease(fromData);
@@ -362,7 +362,7 @@
         [YASAudioTestUtils fillTestValuesToData:fromData];
 
         XCTAssertNoThrow([toData copyFlexiblyFromData:fromData]);
-        XCTAssertTrue([self _compareDataFlexiblyWithData:fromData otherData:toData]);
+        XCTAssertTrue([YASAudioTestUtils compareDataFlexiblyWithData:fromData otherData:toData]);
 
         YASRelease(format);
         YASRelease(fromData);
@@ -399,7 +399,7 @@
         [YASAudioTestUtils fillTestValuesToData:fromData];
 
         XCTAssertNoThrow([toData copyFlexiblyFromData:fromData]);
-        XCTAssertTrue([self _compareDataFlexiblyWithData:fromData otherData:toData]);
+        XCTAssertTrue([YASAudioTestUtils compareDataFlexiblyWithData:fromData otherData:toData]);
         XCTAssertEqual(toData.frameLength, frameLength);
 
         YASRelease(fromFormat);
@@ -462,7 +462,7 @@
         [YASAudioTestUtils fillTestValuesToData:interleavedData];
 
         XCTAssertNoThrow([nonInterleavedData copyFlexiblyFromAudioBufferList:interleavedData.audioBufferList]);
-        XCTAssertTrue([self _compareDataFlexiblyWithData:interleavedData otherData:nonInterleavedData]);
+        XCTAssertTrue([YASAudioTestUtils compareDataFlexiblyWithData:interleavedData otherData:nonInterleavedData]);
         XCTAssertEqual(nonInterleavedData.frameLength, frameLength);
 
         [interleavedData clear];
@@ -471,7 +471,7 @@
         [YASAudioTestUtils fillTestValuesToData:nonInterleavedData];
 
         XCTAssertNoThrow([interleavedData copyFlexiblyFromAudioBufferList:nonInterleavedData.audioBufferList]);
-        XCTAssertTrue([self _compareDataFlexiblyWithData:interleavedData otherData:nonInterleavedData]);
+        XCTAssertTrue([YASAudioTestUtils compareDataFlexiblyWithData:interleavedData otherData:nonInterleavedData]);
         XCTAssertEqual(interleavedData.frameLength, frameLength);
 
         XCTAssertThrows([interleavedData copyFlexiblyFromAudioBufferList:nil]);
@@ -508,7 +508,7 @@
         [YASAudioTestUtils fillTestValuesToData:interleavedData];
 
         XCTAssertNoThrow([interleavedData copyFlexiblyToAudioBufferList:nonInterleavedData.mutableAudioBufferList]);
-        XCTAssertTrue([self _compareDataFlexiblyWithData:interleavedData otherData:nonInterleavedData]);
+        XCTAssertTrue([YASAudioTestUtils compareDataFlexiblyWithData:interleavedData otherData:nonInterleavedData]);
 
         [interleavedData clear];
         [nonInterleavedData clear];
@@ -516,7 +516,7 @@
         [YASAudioTestUtils fillTestValuesToData:nonInterleavedData];
 
         XCTAssertNoThrow([nonInterleavedData copyFlexiblyToAudioBufferList:interleavedData.mutableAudioBufferList]);
-        XCTAssertTrue([self _compareDataFlexiblyWithData:interleavedData otherData:nonInterleavedData]);
+        XCTAssertTrue([YASAudioTestUtils compareDataFlexiblyWithData:interleavedData otherData:nonInterleavedData]);
 
         XCTAssertThrows([interleavedData copyFlexiblyToAudioBufferList:nil]);
 
@@ -565,7 +565,7 @@
     YASAudioData *destData = [sourceData copy];
 
     XCTAssertNotEqualObjects(sourceData, destData);
-    XCTAssertTrue([self _compareDataFlexiblyWithData:sourceData otherData:destData]);
+    XCTAssertTrue([YASAudioTestUtils compareDataFlexiblyWithData:sourceData otherData:destData]);
 
     YASRelease(destData);
     YASRelease(sourceData);
@@ -725,7 +725,7 @@
     }];
 
     XCTAssertTrue([self _isFilledData:dataForWrite]);
-    XCTAssertTrue([self _compareDataFlexiblyWithData:dataForFill otherData:dataForWrite]);
+    XCTAssertTrue([YASAudioTestUtils compareDataFlexiblyWithData:dataForFill otherData:dataForWrite]);
 
     YASRelease(dataForFill);
     YASRelease(dataForWrite);
@@ -952,38 +952,6 @@
                     default:
                         return NO;
                 }
-            }
-        }
-    }
-
-    return YES;
-}
-
-- (BOOL)_compareDataFlexiblyWithData:(YASAudioData *)data1 otherData:(YASAudioData *)data2
-{
-    if (data1.format.channelCount != data2.format.channelCount) {
-        return NO;
-    }
-
-    if (data1.frameLength != data2.frameLength) {
-        return NO;
-    }
-
-    if (data1.format.sampleByteCount != data2.format.sampleByteCount) {
-        return NO;
-    }
-
-    if (data1.format.bitDepthFormat != data2.format.bitDepthFormat) {
-        return NO;
-    }
-
-    for (UInt32 ch = 0; ch < data1.format.channelCount; ch++) {
-        for (UInt32 frame = 0; frame < data1.frameLength; frame++) {
-            YASAudioPointer ptr1 = [YASAudioTestUtils dataPointerWithData:data1 channel:ch frame:frame];
-            YASAudioPointer ptr2 = [YASAudioTestUtils dataPointerWithData:data2 channel:ch frame:frame];
-            int result = memcmp(ptr1.v, ptr2.v, data1.format.sampleByteCount);
-            if (result) {
-                return NO;
             }
         }
     }
