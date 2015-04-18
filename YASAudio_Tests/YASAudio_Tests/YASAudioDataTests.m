@@ -688,7 +688,7 @@
         while (pointer->v) {
             XCTAssertEqual(*index, frame);
             XCTAssertEqual(*pointer->f32, (Float32)TestValue((UInt32)*index, 0, buffer));
-            [scanner move];
+            YASAudioScannerMove(scanner);
             frame++;
         }
         XCTAssertEqual(frameLength, frame);
@@ -718,7 +718,7 @@
         while (pointer->v) {
             XCTAssertEqual(*index, frame);
             *pointer->f32 = (Float32)TestValue((UInt32)*index, 0, buffer);
-            [scanner move];
+            YASAudioScannerMove(scanner);
             frame++;
         }
         XCTAssertEqual(frameLength, frame);
