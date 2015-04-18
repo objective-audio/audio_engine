@@ -123,4 +123,34 @@
     YASRelease(toNode);
 }
 
+- (void)testConfigurationChangeNotification
+{
+    YASAudioEngine *engine = [[YASAudioEngine alloc] init];
+
+    NSDictionary *userInfo = @{ @"test_key": @"test_value" };
+
+    [self expectationForNotification:YASAudioEngineConfigurationChangeNotification
+                              object:nil
+                             handler:^BOOL(NSNotification *notification) {
+                                 return [notification.userInfo isEqualToDictionary:userInfo];
+                             }];
+
+#if TARGET_OS_IPHONE
+    [[NSNotificationCenter defaultCenter] postNotificationName:AVAudioSessionRouteChangeNotification
+                                                        object:nil
+                                                      userInfo:userInfo];
+#elif TARGET_OS_MAC
+    [[NSNotificationCenter defaultCenter] postNotificationName:YASAudioDeviceConfigurationChangeNotification
+                                                        object:nil
+                                                      userInfo:userInfo];
+#endif
+
+    [self waitForExpectationsWithTimeout:0.5
+                                 handler:^(NSError *error){
+
+                                 }];
+
+    YASRelease(engine);
+}
+
 @end

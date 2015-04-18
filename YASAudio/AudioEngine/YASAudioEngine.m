@@ -15,6 +15,7 @@
 #import <AVFoundation/AVFoundation.h>
 
 #if (!TARGET_OS_IPHONE & TARGET_OS_MAC)
+#import "YASAudioDevice.h"
 #import "YASAudioDeviceIO.h"
 #import "YASAudioDeviceIONode+Internal.h"
 #endif
@@ -47,6 +48,11 @@ NSString *const YASAudioEngineConfigurationChangeNotification = @"YASAudioEngine
         [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(audioSessionRouteChangeNotification:)
                                                      name:AVAudioSessionRouteChangeNotification
+                                                   object:nil];
+#elif TARGET_OS_MAC
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(audioDeviceConfigurationChangeNotification:)
+                                                     name:YASAudioDeviceConfigurationChangeNotification
                                                    object:nil];
 #endif
     }
@@ -577,13 +583,19 @@ NSString *const YASAudioEngineConfigurationChangeNotification = @"YASAudioEngine
 
 - (void)audioSessionRouteChangeNotification:(NSNotification *)notification
 {
-    [self sendConfigurationChangeNotification];
+    [self sendConfigurationChangeNotificationWithUserInfo:notification.userInfo];
 }
 
-- (void)sendConfigurationChangeNotification
+- (void)audioDeviceConfigurationChangeNotification:(NSNotification *)notification
+{
+    [self sendConfigurationChangeNotificationWithUserInfo:notification.userInfo];
+}
+
+- (void)sendConfigurationChangeNotificationWithUserInfo:(NSDictionary *)userInfo
 {
     [[NSNotificationCenter defaultCenter] postNotificationName:YASAudioEngineConfigurationChangeNotification
-                                                        object:self];
+                                                        object:self
+                                                      userInfo:userInfo];
 }
 
 @end
