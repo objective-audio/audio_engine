@@ -18,6 +18,7 @@
 
 NSString *const YASAudioHardwareDidChangeNotification = @"YASAudioHardwareDidChangeNotification";
 NSString *const YASAudioDeviceDidChangeNotification = @"YASAudioDeviceDidChangeNotificaiton";
+NSString *const YASAudioDeviceConfigurationChangeNotification = @"YASAudioDeviceConfigurationChangeNotification";
 
 NSString *const YASAudioDevicePropertiesKey = @"properties";
 NSString *const YASAudioDeviceSelectorKey = @"selector";
@@ -241,9 +242,14 @@ static AudioObjectPropertyListenerBlock _globalListenerBlock;
                     YASAudioDeviceSelectorKey: [NSString yas_fileTypeStringWithHFSTypeCode:inAddresses[i].mSelector]
                 }];
             }
+
+            NSDictionary *userInfo = @{YASAudioDevicePropertiesKey: properties};
             [[NSNotificationCenter defaultCenter] postNotificationName:YASAudioHardwareDidChangeNotification
                                                                 object:nil
-                                                              userInfo:@{YASAudioDevicePropertiesKey: properties}];
+                                                              userInfo:userInfo];
+            [[NSNotificationCenter defaultCenter] postNotificationName:YASAudioDeviceConfigurationChangeNotification
+                                                                object:nil
+                                                              userInfo:userInfo];
             YASRelease(properties);
         };
     _globalListenerBlock = [listenerBlock copy];
@@ -627,10 +633,14 @@ static AudioObjectPropertyListenerBlock _globalListenerBlock;
 
             YASRelease(set);
 
-            [[NSNotificationCenter defaultCenter]
-                postNotificationName:YASAudioDeviceDidChangeNotification
-                              object:device
-                            userInfo:@{YASAudioDevicePropertiesKey: YASAutorelease([properties copy])}];
+            NSDictionary *userInfo = @{YASAudioDevicePropertiesKey: properties};
+
+            [[NSNotificationCenter defaultCenter] postNotificationName:YASAudioDeviceDidChangeNotification
+                                                                object:device
+                                                              userInfo:userInfo];
+            [[NSNotificationCenter defaultCenter] postNotificationName:YASAudioDeviceConfigurationChangeNotification
+                                                                object:device
+                                                              userInfo:userInfo];
 
             YASRelease(properties);
             YASRelease(device);

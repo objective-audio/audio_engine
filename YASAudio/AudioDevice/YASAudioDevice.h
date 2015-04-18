@@ -13,6 +13,7 @@
 
 extern NSString *const YASAudioHardwareDidChangeNotification;
 extern NSString *const YASAudioDeviceDidChangeNotification;
+extern NSString *const YASAudioDeviceConfigurationChangeNotification;
 
 extern NSString *const YASAudioDevicePropertiesKey;
 extern NSString *const YASAudioDeviceSelectorKey;
