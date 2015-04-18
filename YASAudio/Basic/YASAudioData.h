@@ -22,6 +22,7 @@
 - (instancetype)initWithFormat:(YASAudioFormat *)format frameCapacity:(UInt32)frameCapacity;
 
 - (YASAudioPointer)pointerAtBuffer:(NSUInteger)buffer;
+- (YASAudioPointer)pointerAtChannel:(NSUInteger)channel;
 
 - (void)clear;
 - (void)clearWithStartFrame:(UInt32)frame length:(UInt32)length;

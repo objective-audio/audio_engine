@@ -22,7 +22,7 @@
     [super tearDown];
 }
 
-- (void)testReadBufferScannerUseMacro
+- (void)testReadScannerNonInterleavedUseMacro
 {
     const UInt32 frameLength = 16;
     const UInt32 channels = 4;
@@ -36,29 +36,29 @@
     [YASAudioTestUtils fillTestValuesToData:data];
 
     for (UInt32 buffer = 0; buffer < channels; buffer++) {
-        YASAudioScanner *bufferScanner = [[YASAudioScanner alloc] initWithAudioData:data atBuffer:buffer];
-        const YASAudioConstPointer *pointer = bufferScanner.pointer;
-        const NSUInteger *index = bufferScanner.index;
+        YASAudioScanner *scanner = [[YASAudioScanner alloc] initWithAudioData:data atChannel:buffer];
+        const YASAudioConstPointer *pointer = scanner.pointer;
+        const NSUInteger *index = scanner.index;
 
         for (NSInteger i = 0; i < 2; i++) {
             UInt32 frame = 0;
             while (pointer->v) {
                 XCTAssertEqual(*index, frame);
                 XCTAssertEqual(*pointer->f32, (Float32)TestValue(frame, 0, buffer));
-                YASAudioScannerMove(bufferScanner);
+                YASAudioScannerMove(scanner);
                 frame++;
             }
             XCTAssertEqual(frame, frameLength);
-            YASAudioScannerReset(bufferScanner);
+            YASAudioScannerReset(scanner);
         }
 
-        YASRelease(bufferScanner);
+        YASRelease(scanner);
     }
 
     YASRelease(data);
 }
 
-- (void)testReadBufferScannerUseMethod
+- (void)testReadScannerNonInterleavedUseMethod
 {
     const UInt32 frameLength = 16;
     const UInt32 channels = 4;
@@ -72,29 +72,64 @@
     [YASAudioTestUtils fillTestValuesToData:data];
 
     for (UInt32 buffer = 0; buffer < channels; buffer++) {
-        YASAudioScanner *bufferScanner = [[YASAudioScanner alloc] initWithAudioData:data atBuffer:buffer];
-        const YASAudioConstPointer *pointer = bufferScanner.pointer;
-        const NSUInteger *index = bufferScanner.index;
+        YASAudioScanner *scanner = [[YASAudioScanner alloc] initWithAudioData:data atChannel:buffer];
+        const YASAudioConstPointer *pointer = scanner.pointer;
+        const NSUInteger *index = scanner.index;
 
         for (NSInteger i = 0; i < 2; i++) {
             UInt32 frame = 0;
             while (pointer->v) {
                 XCTAssertEqual(*index, frame);
                 XCTAssertEqual(*pointer->f32, (Float32)TestValue(frame, 0, buffer));
-                [bufferScanner move];
+                [scanner move];
                 frame++;
             }
             XCTAssertEqual(frame, frameLength);
-            [bufferScanner reset];
+            [scanner reset];
         }
 
-        YASRelease(bufferScanner);
+        YASRelease(scanner);
     }
 
     YASRelease(data);
 }
 
-- (void)testWriteBufferScanner
+- (void)testReadScannerInterleaved
+{
+    const UInt32 frameLength = 16;
+    const UInt32 channels = 4;
+
+    YASAudioFormat *format = [[YASAudioFormat alloc] initWithBitDepthFormat:YASAudioBitDepthFormatFloat32
+                                                                 sampleRate:48000
+                                                                   channels:channels
+                                                                interleaved:YES];
+    YASAudioData *data = [[YASAudioData alloc] initWithFormat:format frameCapacity:frameLength];
+    YASRelease(format);
+
+    XCTAssertEqual(format.stride, channels);
+
+    [YASAudioTestUtils fillTestValuesToData:data];
+
+    for (UInt32 ch = 0; ch < channels; ch++) {
+        YASAudioScanner *scanner = [[YASAudioScanner alloc] initWithAudioData:data atChannel:ch];
+        const YASAudioConstPointer *pointer = scanner.pointer;
+        const NSUInteger *index = scanner.index;
+
+        UInt32 frame = 0;
+        while (pointer->v) {
+            XCTAssertEqual(frame, *index);
+            XCTAssertEqual(*pointer->f32, (Float32)TestValue(frame, ch, 0));
+            YASAudioScannerMove(scanner);
+            frame++;
+        }
+
+        YASRelease(scanner);
+    }
+
+    YASRelease(data);
+}
+
+- (void)testWriteScanner
 {
     const UInt32 frameLength = 16;
     const UInt32 channels = 4;
@@ -107,7 +142,7 @@
 
     for (UInt32 buffer = 0; buffer < channels; buffer++) {
         YASAudioMutableScanner *mutableScanner =
-            [[YASAudioMutableScanner alloc] initWithAudioData:data atBuffer:buffer];
+            [[YASAudioMutableScanner alloc] initWithAudioData:data atChannel:buffer];
         const YASAudioPointer *mutablePointer = mutableScanner.mutablePointer;
         const NSUInteger *index = mutableScanner.index;
 
@@ -125,7 +160,7 @@
     }
 
     for (UInt32 buffer = 0; buffer < channels; buffer++) {
-        YASAudioScanner *scanner = [[YASAudioScanner alloc] initWithAudioData:data atBuffer:buffer];
+        YASAudioScanner *scanner = [[YASAudioScanner alloc] initWithAudioData:data atChannel:buffer];
         const YASAudioConstPointer *pointer = scanner.pointer;
         const NSUInteger *index = scanner.index;
 
@@ -151,7 +186,8 @@
 
     YASAudioFormat *format = [[YASAudioFormat alloc] initStandardFormatWithSampleRate:48000 channels:1];
     YASAudioData *data = [[YASAudioData alloc] initWithFormat:format frameCapacity:frameLength];
-    YASAudioMutableScanner *mutableScanner = [[YASAudioMutableScanner alloc] initWithAudioData:data atBuffer:0];
+    YASAudioMutableScanner *mutableScanner =
+        [[YASAudioMutableScanner alloc] initWithAudioData:data atChannel:0];
 
     const NSUInteger *index = mutableScanner.index;
     const YASAudioConstPointer *pointer = mutableScanner.pointer;
@@ -422,6 +458,61 @@
 
     YASRelease(frameScanner);
     YASRelease(data);
+}
+
+- (void)testReadFrameScannerEachBitDepthFormat
+{
+    const UInt32 frameLength = 16;
+    const UInt32 channels = 4;
+
+    for (NSUInteger bitDepthFormat = YASAudioBitDepthFormatFloat32; bitDepthFormat <= YASAudioBitDepthFormatInt32;
+         bitDepthFormat++) {
+        YASAudioFormat *format = [[YASAudioFormat alloc] initWithBitDepthFormat:bitDepthFormat
+                                                                     sampleRate:48000
+                                                                       channels:channels
+                                                                    interleaved:NO];
+        YASAudioData *data = [[YASAudioData alloc] initWithFormat:format frameCapacity:frameLength];
+        YASRelease(format);
+
+        [YASAudioTestUtils fillTestValuesToData:data];
+
+        YASAudioFrameScanner *scanner = [[YASAudioFrameScanner alloc] initWithAudioData:data];
+        const YASAudioConstPointer *pointer = scanner.pointer;
+        const NSUInteger *frame = scanner.frame;
+        const NSUInteger *channel = scanner.channel;
+
+        while (pointer->v) {
+            while (pointer->v) {
+                UInt32 testValue = (Float64)TestValue((UInt32)*frame, 0, (UInt32)*channel);
+                switch (bitDepthFormat) {
+                    case YASAudioBitDepthFormatFloat32:
+                        XCTAssertEqual(*pointer->f32, (Float32)testValue);
+                        break;
+                    case YASAudioBitDepthFormatFloat64:
+                        XCTAssertEqual(*pointer->f64, (Float64)testValue);
+                        break;
+                    case YASAudioBitDepthFormatInt16:
+                        XCTAssertEqual(*pointer->i16, (SInt16)testValue);
+                        break;
+                    case YASAudioBitDepthFormatInt32:
+                        XCTAssertEqual(*pointer->i32, (SInt32)testValue);
+                        break;
+                    default:
+                        XCTAssert(0);
+                        break;
+                }
+
+                YASAudioFrameScannerMoveChannel(scanner);
+            }
+            XCTAssertEqual(*channel, channels);
+            YASAudioFrameScannerMoveFrame(scanner);
+        }
+
+        XCTAssertEqual(*frame, frameLength);
+
+        YASRelease(scanner);
+        YASRelease(data);
+    }
 }
 
 @end

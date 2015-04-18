@@ -21,7 +21,7 @@
 @property (nonatomic, assign, readonly) const NSUInteger *index;
 @property (nonatomic, assign, readonly) const NSUInteger length;
 
-- (instancetype)initWithAudioData:(YASAudioData *)data atBuffer:(const NSUInteger)buffer;
+- (instancetype)initWithAudioData:(YASAudioData *)data atChannel:(const NSUInteger)channel;
 - (instancetype)initWithPointer:(const YASAudioPointer)pointer
                          stride:(const NSUInteger)stride
                          length:(const NSUInteger)length NS_DESIGNATED_INITIALIZER;

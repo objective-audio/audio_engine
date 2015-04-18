@@ -11,9 +11,9 @@
 
 @implementation YASAudioScanner
 
-- (instancetype)initWithAudioData:(YASAudioData *)data atBuffer:(const NSUInteger)buffer
+- (instancetype)initWithAudioData:(YASAudioData *)data atChannel:(const NSUInteger)channel
 {
-    YASAudioPointer pointer = [data pointerAtBuffer:buffer];
+    YASAudioPointer pointer = [data pointerAtChannel:channel];
     YASAudioFormat *format = data.format;
     NSUInteger stride = format.stride * format.sampleByteCount;
     return [self initWithPointer:pointer stride:stride length:data.frameLength];
