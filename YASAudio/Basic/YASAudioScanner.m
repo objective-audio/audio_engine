@@ -13,13 +13,13 @@
 
 - (instancetype)initWithAudioData:(YASAudioData *)data atChannel:(const NSUInteger)channel
 {
-    YASAudioPointer pointer = [data pointerAtChannel:channel];
+    YASAudioMutablePointer pointer = [data pointerAtChannel:channel];
     YASAudioFormat *format = data.format;
     NSUInteger stride = format.stride * format.sampleByteCount;
     return [self initWithPointer:pointer stride:stride length:data.frameLength];
 }
 
-- (instancetype)initWithPointer:(const YASAudioPointer)pointer
+- (instancetype)initWithPointer:(const YASAudioMutablePointer)pointer
                          stride:(const NSUInteger)stride
                          length:(const NSUInteger)length
 {
@@ -77,7 +77,7 @@
 
 @implementation YASAudioMutableScanner
 
-- (const YASAudioPointer *)mutablePointer
+- (const YASAudioMutablePointer *)mutablePointer
 {
     return &_pointer;
 }
@@ -99,13 +99,13 @@
         _frameLength = data.frameLength;
         _channelCount = bufferCount * stride;
         _frameStride = stride * sampleByteCount;
-        _pointersSize = _channelCount * sizeof(YASAudioPointer *);
+        _pointersSize = _channelCount * sizeof(YASAudioMutablePointer *);
         _pointers = calloc(_pointersSize, 1);
-        _topPointers = calloc(_channelCount, sizeof(YASAudioPointer *));
+        _topPointers = calloc(_channelCount, sizeof(YASAudioMutablePointer *));
 
         NSUInteger channel = 0;
         for (NSInteger buffer = 0; buffer < bufferCount; buffer++) {
-            YASAudioPointer pointer = [data pointerAtBuffer:buffer];
+            YASAudioMutablePointer pointer = [data pointerAtBuffer:buffer];
             for (NSInteger ch = 0; ch < stride; ch++) {
                 _pointers[channel].v = _topPointers[channel].v = pointer.v;
                 pointer.u8 += sampleByteCount;
@@ -208,7 +208,7 @@
 {
     _frame = 0;
     _channel = 0;
-    memcpy(_pointers, _topPointers, _channelCount * sizeof(YASAudioPointer *));
+    memcpy(_pointers, _topPointers, _channelCount * sizeof(YASAudioMutablePointer *));
     _pointer.v = _pointers->v;
 }
 
@@ -216,7 +216,7 @@
 
 @implementation YASAudioMutableFrameScanner
 
-- (const YASAudioPointer *)mutablePointer
+- (const YASAudioMutablePointer *)mutablePointer
 {
     return &_pointer;
 }

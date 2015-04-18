@@ -143,7 +143,7 @@
     for (UInt32 buffer = 0; buffer < channels; buffer++) {
         YASAudioMutableScanner *mutableScanner =
             [[YASAudioMutableScanner alloc] initWithAudioData:data atChannel:buffer];
-        const YASAudioPointer *mutablePointer = mutableScanner.mutablePointer;
+        const YASAudioMutablePointer *mutablePointer = mutableScanner.mutablePointer;
         const NSUInteger *index = mutableScanner.index;
 
         UInt32 frame = 0;
@@ -191,7 +191,7 @@
 
     const NSUInteger *index = mutableScanner.index;
     const YASAudioConstPointer *pointer = mutableScanner.pointer;
-    const YASAudioPointer *mutablePointer = mutableScanner.mutablePointer;
+    const YASAudioMutablePointer *mutablePointer = mutableScanner.mutablePointer;
 
     XCTAssertEqual(*index, 0);
 
@@ -357,7 +357,7 @@
     XCTAssertEqual(format.bufferCount, channels);
 
     YASAudioMutableFrameScanner *mutableFrameScanner = [[YASAudioMutableFrameScanner alloc] initWithAudioData:data];
-    const YASAudioPointer *mutablePointer = mutableFrameScanner.mutablePointer;
+    const YASAudioMutablePointer *mutablePointer = mutableFrameScanner.mutablePointer;
     const NSUInteger *mutablePointerFrame = mutableFrameScanner.frame;
     const NSUInteger *mutablePointerChannel = mutableFrameScanner.channel;
 
@@ -403,7 +403,7 @@
     YASAudioData *data = [[YASAudioData alloc] initWithFormat:format frameCapacity:frameLength];
     YASRelease(format);
 
-    YASAudioPointer bufferPointer = [data pointerAtBuffer:0];
+    YASAudioMutablePointer bufferPointer = [data pointerAtBuffer:0];
     for (UInt32 frame = 0; frame < frameLength; frame++) {
         bufferPointer.f32[frame] = TestValue(frame, 0, 0);
     }
@@ -437,7 +437,7 @@
     YASAudioData *data = [[YASAudioData alloc] initWithFormat:format frameCapacity:1];
     YASRelease(format);
 
-    YASAudioPointer bufferPointer = [data pointerAtBuffer:0];
+    YASAudioMutablePointer bufferPointer = [data pointerAtBuffer:0];
     for (UInt32 ch = 0; ch < channels; ch++) {
         bufferPointer.f32[ch] = TestValue(0, ch, 0);
     }

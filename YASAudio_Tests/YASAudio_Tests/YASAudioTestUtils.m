@@ -20,7 +20,7 @@ UInt32 TestValue(UInt32 frame, UInt32 channel, UInt32 buffer)
     const UInt32 stride = format.stride;
 
     for (UInt32 buffer = 0; buffer < bufferCount; buffer++) {
-        YASAudioPointer pointer = [data pointerAtBuffer:buffer];
+        YASAudioMutablePointer pointer = [data pointerAtBuffer:buffer];
         for (UInt32 frame = 0; frame < data.frameLength; frame++) {
             for (UInt32 ch = 0; ch < stride; ch++) {
                 UInt32 index = frame * stride + ch;
@@ -62,13 +62,13 @@ UInt32 TestValue(UInt32 frame, UInt32 channel, UInt32 buffer)
     return YES;
 }
 
-+ (YASAudioPointer)dataPointerWithData:(YASAudioData *)data channel:(UInt32)channel frame:(UInt32)frame
++ (YASAudioMutablePointer)mutablePointerWithData:(YASAudioData *)data channel:(UInt32)channel frame:(UInt32)frame
 {
     YASAudioMutableFrameScanner *scanner = [[YASAudioMutableFrameScanner alloc] initWithAudioData:data];
     [scanner setFramePosition:frame];
     [scanner setChannelPosition:channel];
 
-    YASAudioPointer pointer = *scanner.mutablePointer;
+    YASAudioMutablePointer pointer = *scanner.mutablePointer;
 
     YASRelease(scanner);
 
@@ -95,8 +95,8 @@ UInt32 TestValue(UInt32 frame, UInt32 channel, UInt32 buffer)
 
     for (UInt32 ch = 0; ch < data1.format.channelCount; ch++) {
         for (UInt32 frame = 0; frame < data1.frameLength; frame++) {
-            YASAudioPointer ptr1 = [YASAudioTestUtils dataPointerWithData:data1 channel:ch frame:frame];
-            YASAudioPointer ptr2 = [YASAudioTestUtils dataPointerWithData:data2 channel:ch frame:frame];
+            YASAudioMutablePointer ptr1 = [YASAudioTestUtils mutablePointerWithData:data1 channel:ch frame:frame];
+            YASAudioMutablePointer ptr2 = [YASAudioTestUtils mutablePointerWithData:data2 channel:ch frame:frame];
             if (!YASAudioIsEqualData(ptr1.v, ptr2.v, data1.format.sampleByteCount)) {
                 return NO;
             }

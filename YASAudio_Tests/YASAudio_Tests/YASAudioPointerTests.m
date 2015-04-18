@@ -31,12 +31,12 @@
     SInt8 int8Value = 5;
     UInt8 uint8Value = 6;
 
-    YASAudioPointer f32Pointer = {&float32Value};
-    YASAudioPointer f64Pointer = {&float64Value};
-    YASAudioPointer i16Pointer = {&int16Value};
-    YASAudioPointer i32Pointer = {&int32Value};
-    YASAudioPointer i8Pointer = {&int8Value};
-    YASAudioPointer u8Pointer = {&uint8Value};
+    YASAudioMutablePointer f32Pointer = {&float32Value};
+    YASAudioMutablePointer f64Pointer = {&float64Value};
+    YASAudioMutablePointer i16Pointer = {&int16Value};
+    YASAudioMutablePointer i32Pointer = {&int32Value};
+    YASAudioMutablePointer i8Pointer = {&int8Value};
+    YASAudioMutablePointer u8Pointer = {&uint8Value};
 
     XCTAssertEqual(float32Value, *f32Pointer.f32);
     XCTAssertEqual(float64Value, *f64Pointer.f64);

@@ -44,7 +44,7 @@ typedef struct YASAudioUnitRenderParameters {
     YASAudioRenderID renderID;
 } YASAudioUnitRenderParameters;
 
-typedef union YASAudioPointer {
+typedef union YASAudioMutablePointer {
     void *v;
     Float32 *f32;
     Float64 *f64;
@@ -52,7 +52,7 @@ typedef union YASAudioPointer {
     SInt32 *i32;
     SInt8 *i8;
     UInt8 *u8;
-} YASAudioPointer;
+} YASAudioMutablePointer;
 
 typedef union YASAudioConstPointer {
     const void *v;
