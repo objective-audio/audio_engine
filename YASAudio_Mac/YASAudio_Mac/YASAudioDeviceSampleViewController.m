@@ -52,13 +52,19 @@ static const UInt32 kSineDataMaxCount = 4096;
 
     YASAudioFormat *format = outputData.format;
     if (format.bitDepthFormat == YASAudioBitDepthFormatFloat32 && format.stride == 1) {
+        YASAudioMutableFrameScanner *scanner = [[YASAudioMutableFrameScanner alloc] initWithAudioData:outputData];
+        const YASAudioPointer *pointer = scanner.mutablePointer;
+
         if (inputData.frameLength >= frameLength) {
             [outputData copyFlexiblyFromData:inputData];
 
             const Float32 throughVol = self.throughVolume;
-            [outputData writeBuffersUsingBlock:^(YASAudioMutableScanner *scanner, const UInt32 buffer) {
-                cblas_sscal(frameLength, throughVol, scanner.mutablePointer->f32, 1);
-            }];
+
+            while (pointer->v) {
+                cblas_sscal(frameLength, throughVol, pointer->f32, 1);
+                YASAudioFrameScannerMoveChannel(scanner);
+            }
+            YASAudioFrameScannerReset(scanner);
         }
 
         const Float64 sampleRate = format.sampleRate;
@@ -68,10 +74,15 @@ static const UInt32 kSineDataMaxCount = 4096;
 
         if (frameLength < kSineDataMaxCount) {
             _phase = YASAudioVectorSinef(_sineData, frameLength, startPhase, freq / sampleRate * YAS_2_PI);
-            [outputData writeBuffersUsingBlock:^(YASAudioMutableScanner *scanner, const UInt32 buffer) {
-                cblas_saxpy(frameLength, sineVol, _sineData, 1, scanner.mutablePointer->f32, 1);
-            }];
+
+            while (pointer->v) {
+                cblas_saxpy(frameLength, sineVol, _sineData, 1, pointer->f32, 1);
+                YASAudioFrameScannerMoveChannel(scanner);
+            }
+            YASAudioFrameScannerReset(scanner);
         }
+
+        YASRelease(scanner);
     }
 }
 

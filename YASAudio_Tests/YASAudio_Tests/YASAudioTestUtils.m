@@ -14,13 +14,16 @@ UInt32 TestValue(UInt32 frame, UInt32 channel, UInt32 buffer)
 
 + (void)fillTestValuesToData:(YASAudioData *)data
 {
-    YASAudioBitDepthFormat bitDepthFormat = data.format.bitDepthFormat;
+    YASAudioFormat *format = data.format;
+    const YASAudioBitDepthFormat bitDepthFormat = format.bitDepthFormat;
+    const UInt32 bufferCount = format.bufferCount;
+    const UInt32 stride = format.stride;
 
-    for (UInt32 buffer = 0; buffer < data.bufferCount; buffer++) {
+    for (UInt32 buffer = 0; buffer < bufferCount; buffer++) {
         YASAudioPointer pointer = [data pointerAtBuffer:buffer];
         for (UInt32 frame = 0; frame < data.frameLength; frame++) {
-            for (UInt32 ch = 0; ch < data.stride; ch++) {
-                UInt32 index = frame * data.stride + ch;
+            for (UInt32 ch = 0; ch < stride; ch++) {
+                UInt32 index = frame * stride + ch;
                 UInt32 value = TestValue(frame, ch, buffer);
                 switch (bitDepthFormat) {
                     case YASAudioBitDepthFormatFloat32: {
@@ -110,16 +113,24 @@ UInt32 TestValue(UInt32 frame, UInt32 channel, UInt32 buffer)
     NSData *zeroData = [NSMutableData dataWithLength:sampleByteCount];
     const void *zeroBytes = [zeroData bytes];
 
-    [data readBuffersUsingBlock:^(YASAudioScanner *scanner, const UInt32 buffer) {
-        const YASAudioConstPointer *pointer = scanner.pointer;
+    YASAudioFrameScanner *scanner = [[YASAudioFrameScanner alloc] initWithAudioData:data];
+    const YASAudioConstPointer *pointer = scanner.pointer;
+
+    while (pointer->v) {
         while (pointer->v) {
             if (YASAudioIsEqualData(pointer->v, zeroBytes, sampleByteCount)) {
                 isFilled = NO;
-                return;
+                break;
             }
-            [scanner move];
+            YASAudioFrameScannerMoveChannel(scanner);
         }
-    }];
+        if (!isFilled) {
+            break;
+        }
+        YASAudioFrameScannerMoveFrame(scanner);
+    }
+
+    YASRelease(scanner);
 
     return isFilled;
 }

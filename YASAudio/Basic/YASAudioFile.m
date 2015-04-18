@@ -423,16 +423,16 @@ static NSString *YASFileTypeFromAudioFileTypeID(AudioFileTypeID fileTypeID)
     UInt32 outFrameLength = 0;
     UInt32 remainFrames = frameLength;
 
-    AudioBufferList *ioAbl = YASAudioAllocateAudioBufferListWithoutData(data.bufferCount, 0);
+    AudioBufferList *ioAbl = YASAudioAllocateAudioBufferListWithoutData(data.format.bufferCount, 0);
 
     while (remainFrames) {
         UInt32 bytesPerFrame = data.format.streamDescription->mBytesPerFrame;
         UInt32 dataByteSize = remainFrames * bytesPerFrame;
         UInt32 dataIndex = outFrameLength * bytesPerFrame;
 
-        for (NSInteger i = 0; i < data.bufferCount; i++) {
+        for (NSInteger i = 0; i < data.format.bufferCount; i++) {
             AudioBuffer *audioBuffer = &ioAbl->mBuffers[i];
-            audioBuffer->mNumberChannels = data.stride;
+            audioBuffer->mNumberChannels = data.format.stride;
             audioBuffer->mDataByteSize = dataByteSize;
             audioBuffer->mData = &data.audioBufferList->mBuffers[i].mData[dataIndex];
         }

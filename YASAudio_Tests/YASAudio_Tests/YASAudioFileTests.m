@@ -501,25 +501,28 @@
 
 - (void)_writeToData:(YASAudioData *)data fileFormat:(YASAudioFormat *)fileFormat startIndex:(NSInteger)startIndex
 {
-    for (NSInteger bufIndex = 0; bufIndex < data.bufferCount; bufIndex++) {
+    const UInt32 bufferCount = data.format.bufferCount;
+    const UInt32 stride = data.format.stride;
+
+    for (NSInteger bufIndex = 0; bufIndex < bufferCount; bufIndex++) {
         YASAudioPointer pointer = [data pointerAtBuffer:bufIndex];
         for (NSInteger frameIndex = 0; frameIndex < data.frameLength; frameIndex++) {
             SInt16 value = frameIndex + startIndex + 1;
-            for (NSInteger strideIndex = 0; strideIndex < data.stride; strideIndex++) {
+            for (NSInteger strideIndex = 0; strideIndex < stride; strideIndex++) {
                 switch (data.format.bitDepthFormat) {
                     case YASAudioBitDepthFormatInt16: {
-                        pointer.i16[frameIndex * data.stride + strideIndex] = value;
+                        pointer.i16[frameIndex * stride + strideIndex] = value;
                     } break;
                     case YASAudioBitDepthFormatInt32: {
-                        pointer.i32[frameIndex * data.stride + strideIndex] = value << 16;
+                        pointer.i32[frameIndex * stride + strideIndex] = value << 16;
                     } break;
                     case YASAudioBitDepthFormatFloat32: {
                         Float32 float32Value = (Float32)value / INT16_MAX;
-                        pointer.f32[frameIndex * data.stride + strideIndex] = float32Value;
+                        pointer.f32[frameIndex * stride + strideIndex] = float32Value;
                     } break;
                     case YASAudioBitDepthFormatFloat64: {
                         Float64 float64Value = (Float64)value / INT16_MAX;
-                        pointer.f64[frameIndex * data.stride + strideIndex] = (Float64)float64Value;
+                        pointer.f64[frameIndex * stride + strideIndex] = (Float64)float64Value;
                     } break;
                     default:
                         break;
@@ -531,24 +534,27 @@
 
 - (BOOL)_compareData:(YASAudioData *)data fileFormat:(YASAudioFormat *)fileFormat startIndex:(NSInteger)startIndex
 {
-    for (NSInteger bufIndex = 0; bufIndex < data.bufferCount; bufIndex++) {
+    const UInt32 bufferCount = data.format.bufferCount;
+    const UInt32 stride = data.format.stride;
+
+    for (NSInteger bufIndex = 0; bufIndex < bufferCount; bufIndex++) {
         const YASAudioPointer pointer = [data pointerAtBuffer:bufIndex];
         for (NSInteger frameIndex = 0; frameIndex < data.frameLength; frameIndex++) {
             SInt16 value = frameIndex + startIndex + 1;
-            for (NSInteger strideIndex = 0; strideIndex < data.stride; strideIndex++) {
+            for (NSInteger strideIndex = 0; strideIndex < stride; strideIndex++) {
                 SInt16 ptrValue = 0;
                 switch (data.format.bitDepthFormat) {
                     case YASAudioBitDepthFormatInt16: {
-                        ptrValue = pointer.i16[frameIndex * data.stride + strideIndex];
+                        ptrValue = pointer.i16[frameIndex * stride + strideIndex];
                     } break;
                     case YASAudioBitDepthFormatInt32: {
-                        ptrValue = pointer.i32[frameIndex * data.stride + strideIndex] >> 16;
+                        ptrValue = pointer.i32[frameIndex * stride + strideIndex] >> 16;
                     } break;
                     case YASAudioBitDepthFormatFloat32: {
-                        ptrValue = roundf(pointer.f32[frameIndex * data.stride + strideIndex] * INT16_MAX);
+                        ptrValue = roundf(pointer.f32[frameIndex * stride + strideIndex] * INT16_MAX);
                     } break;
                     case YASAudioBitDepthFormatFloat64: {
-                        ptrValue = round(pointer.f64[frameIndex * data.stride + strideIndex] * INT16_MAX);
+                        ptrValue = round(pointer.f64[frameIndex * stride + strideIndex] * INT16_MAX);
                     } break;
                     default:
                         break;
