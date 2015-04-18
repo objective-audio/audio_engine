@@ -38,9 +38,9 @@
     return self;
 }
 
-- (const YASAudioConstPointer *)pointer
+- (const YASAudioPointer *)pointer
 {
-    return (YASAudioConstPointer *)&_pointer;
+    return (YASAudioPointer *)&_pointer;
 }
 
 - (const NSUInteger *)index
@@ -126,9 +126,9 @@
     YASSuperDealloc;
 }
 
-- (const YASAudioConstPointer *)pointer
+- (const YASAudioPointer *)pointer
 {
-    return (YASAudioConstPointer *)&_pointer;
+    return (YASAudioPointer *)&_pointer;
 }
 
 - (const NSUInteger *)frame

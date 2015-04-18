@@ -17,7 +17,7 @@
     NSUInteger _index;
 }
 
-@property (nonatomic, assign, readonly) const YASAudioConstPointer *pointer;
+@property (nonatomic, assign, readonly) const YASAudioPointer *pointer;
 @property (nonatomic, assign, readonly) const NSUInteger *index;
 @property (nonatomic, assign, readonly) const NSUInteger length;
 
@@ -51,7 +51,7 @@
     NSUInteger _channelCount;
 }
 
-@property (nonatomic, assign, readonly) const YASAudioConstPointer *pointer;
+@property (nonatomic, assign, readonly) const YASAudioPointer *pointer;
 @property (nonatomic, assign, readonly) const NSUInteger *frame;
 @property (nonatomic, assign, readonly) const NSUInteger *channel;
 @property (nonatomic, assign, readonly) const NSUInteger frameLength;
@@ -110,8 +110,8 @@
         (__v)->_pointer.v = (__v)->_pointers[(__v)->_channel].v; \
     }
 
-#define YASAudioFrameScannerReset(__v)                                                               \
-    (__v)->_frame = 0;                                                                               \
-    (__v)->_channel = 0;                                                                             \
+#define YASAudioFrameScannerReset(__v)                                                                      \
+    (__v)->_frame = 0;                                                                                      \
+    (__v)->_channel = 0;                                                                                    \
     memcpy((__v)->_pointers, (__v)->_topPointers, (__v)->_channelCount * sizeof(YASAudioMutablePointer *)); \
     (__v)->_pointer.v = (__v)->_pointers->v;

@@ -71,7 +71,7 @@
             XCTAssertEqualObjects(data.format, format);
 
             for (UInt32 buf = 0; buf < data.format.bufferCount; buf++) {
-                YASAudioConstPointer pointer = {[data pointerAtBuffer:buf].v};
+                YASAudioPointer pointer = {[data pointerAtBuffer:buf].v};
                 for (UInt32 frame = 0; frame < data.frameLength; frame++) {
                     XCTAssertEqual(pointer.f32[frame], TestValue(frame + outputRenderFrame, 0, buf));
                 }
@@ -157,7 +157,7 @@
         XCTAssertEqualObjects(data.format, format);
 
         for (UInt32 buf = 0; buf < data.format.bufferCount; buf++) {
-            YASAudioConstPointer pointer = {[data pointerAtBuffer:buf].v};
+            YASAudioPointer pointer = {[data pointerAtBuffer:buf].v};
             for (UInt32 frame = 0; frame < data.frameLength; frame++) {
                 XCTAssertEqual(pointer.f32[frame], TestValue(frame + outputRenderFrame, 0, buf));
             }

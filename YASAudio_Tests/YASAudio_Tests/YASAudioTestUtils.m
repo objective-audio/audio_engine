@@ -114,7 +114,7 @@ UInt32 TestValue(UInt32 frame, UInt32 channel, UInt32 buffer)
     const void *zeroBytes = [zeroData bytes];
 
     YASAudioFrameScanner *scanner = [[YASAudioFrameScanner alloc] initWithAudioData:data];
-    const YASAudioConstPointer *pointer = scanner.pointer;
+    const YASAudioPointer *pointer = scanner.pointer;
 
     while (pointer->v) {
         while (pointer->v) {

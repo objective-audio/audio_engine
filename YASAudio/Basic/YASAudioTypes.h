@@ -54,7 +54,7 @@ typedef union YASAudioMutablePointer {
     UInt8 *u8;
 } YASAudioMutablePointer;
 
-typedef union YASAudioConstPointer {
+typedef union YASAudioPointer {
     const void *v;
     const Float32 *f32;
     const Float64 *f64;
@@ -62,7 +62,7 @@ typedef union YASAudioConstPointer {
     const SInt32 *i32;
     const SInt8 *i8;
     const UInt8 *u8;
-} YASAudioConstPointer;
+} YASAudioPointer;
 
 typedef void (^YASAudioUnitCallbackBlock)(YASAudioUnitRenderParameters *renderParameters);
 typedef void (^YASAudioDeviceIOCallbackBlock)(YASAudioData *outData, YASAudioTime *when);
