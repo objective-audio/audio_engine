@@ -53,7 +53,7 @@ static const UInt32 kSineDataMaxCount = 4096;
     YASAudioFormat *format = outputData.format;
     if (format.bitDepthFormat == YASAudioBitDepthFormatFloat32 && format.stride == 1) {
         YASAudioMutableFrameScanner *scanner = [[YASAudioMutableFrameScanner alloc] initWithAudioData:outputData];
-        const YASAudioPointer *pointer = scanner.mutablePointer;
+        const YASAudioMutablePointer *pointer = scanner.mutablePointer;
 
         if (inputData.frameLength >= frameLength) {
             [outputData copyFlexiblyFromData:inputData];

@@ -193,9 +193,9 @@ typedef NS_ENUM(NSUInteger, YASAudioDataFreeType) {
     return self.audioBufferList->mBuffers[0].mNumberChannels;
 }
 
-- (YASAudioPointer)pointerAtBuffer:(NSUInteger)buffer
+- (YASAudioMutablePointer)pointerAtBuffer:(NSUInteger)buffer
 {
-    YASAudioPointer pointer = {NULL};
+    YASAudioMutablePointer pointer = {NULL};
 
     if (buffer >= self.audioBufferList->mNumberBuffers) {
         YASRaiseWithReason(([NSString stringWithFormat:@"%s - Out of range.", __PRETTY_FUNCTION__]));
@@ -206,9 +206,9 @@ typedef NS_ENUM(NSUInteger, YASAudioDataFreeType) {
     return pointer;
 }
 
-- (YASAudioPointer)pointerAtChannel:(NSUInteger)channel
+- (YASAudioMutablePointer)pointerAtChannel:(NSUInteger)channel
 {
-    YASAudioPointer pointer = {NULL};
+    YASAudioMutablePointer pointer = {NULL};
 
     const UInt32 stride = self.format.stride;
 

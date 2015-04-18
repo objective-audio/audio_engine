@@ -37,7 +37,7 @@
 
     for (UInt32 buffer = 0; buffer < channels; buffer++) {
         YASAudioScanner *scanner = [[YASAudioScanner alloc] initWithAudioData:data atChannel:buffer];
-        const YASAudioConstPointer *pointer = scanner.pointer;
+        const YASAudioPointer *pointer = scanner.pointer;
         const NSUInteger *index = scanner.index;
 
         for (NSInteger i = 0; i < 2; i++) {
@@ -73,7 +73,7 @@
 
     for (UInt32 buffer = 0; buffer < channels; buffer++) {
         YASAudioScanner *scanner = [[YASAudioScanner alloc] initWithAudioData:data atChannel:buffer];
-        const YASAudioConstPointer *pointer = scanner.pointer;
+        const YASAudioPointer *pointer = scanner.pointer;
         const NSUInteger *index = scanner.index;
 
         for (NSInteger i = 0; i < 2; i++) {
@@ -112,7 +112,7 @@
 
     for (UInt32 ch = 0; ch < channels; ch++) {
         YASAudioScanner *scanner = [[YASAudioScanner alloc] initWithAudioData:data atChannel:ch];
-        const YASAudioConstPointer *pointer = scanner.pointer;
+        const YASAudioPointer *pointer = scanner.pointer;
         const NSUInteger *index = scanner.index;
 
         UInt32 frame = 0;
@@ -143,7 +143,7 @@
     for (UInt32 buffer = 0; buffer < channels; buffer++) {
         YASAudioMutableScanner *mutableScanner =
             [[YASAudioMutableScanner alloc] initWithAudioData:data atChannel:buffer];
-        const YASAudioPointer *mutablePointer = mutableScanner.mutablePointer;
+        const YASAudioMutablePointer *mutablePointer = mutableScanner.mutablePointer;
         const NSUInteger *index = mutableScanner.index;
 
         UInt32 frame = 0;
@@ -161,7 +161,7 @@
 
     for (UInt32 buffer = 0; buffer < channels; buffer++) {
         YASAudioScanner *scanner = [[YASAudioScanner alloc] initWithAudioData:data atChannel:buffer];
-        const YASAudioConstPointer *pointer = scanner.pointer;
+        const YASAudioPointer *pointer = scanner.pointer;
         const NSUInteger *index = scanner.index;
 
         UInt32 frame = 0;
@@ -190,8 +190,8 @@
         [[YASAudioMutableScanner alloc] initWithAudioData:data atChannel:0];
 
     const NSUInteger *index = mutableScanner.index;
-    const YASAudioConstPointer *pointer = mutableScanner.pointer;
-    const YASAudioPointer *mutablePointer = mutableScanner.mutablePointer;
+    const YASAudioPointer *pointer = mutableScanner.pointer;
+    const YASAudioMutablePointer *mutablePointer = mutableScanner.mutablePointer;
 
     XCTAssertEqual(*index, 0);
 
@@ -230,7 +230,7 @@
     [YASAudioTestUtils fillTestValuesToData:data];
 
     YASAudioFrameScanner *frameScanner = [[YASAudioFrameScanner alloc] initWithAudioData:data];
-    const YASAudioConstPointer *pointer = frameScanner.pointer;
+    const YASAudioPointer *pointer = frameScanner.pointer;
     const NSUInteger *pointerFrame = frameScanner.frame;
     const NSUInteger *pointerChannel = frameScanner.channel;
 
@@ -274,7 +274,7 @@
     [YASAudioTestUtils fillTestValuesToData:data];
 
     YASAudioFrameScanner *frameScanner = [[YASAudioFrameScanner alloc] initWithAudioData:data];
-    const YASAudioConstPointer *pointer = frameScanner.pointer;
+    const YASAudioPointer *pointer = frameScanner.pointer;
     const NSUInteger *pointerFrame = frameScanner.frame;
     const NSUInteger *pointerChannel = frameScanner.channel;
 
@@ -318,7 +318,7 @@
     [YASAudioTestUtils fillTestValuesToData:data];
 
     YASAudioFrameScanner *frameScanner = [[YASAudioFrameScanner alloc] initWithAudioData:data];
-    const YASAudioConstPointer *pointer = frameScanner.pointer;
+    const YASAudioPointer *pointer = frameScanner.pointer;
     const NSUInteger *pointerFrame = frameScanner.frame;
     const NSUInteger *pointerChannel = frameScanner.channel;
 
@@ -357,7 +357,7 @@
     XCTAssertEqual(format.bufferCount, channels);
 
     YASAudioMutableFrameScanner *mutableFrameScanner = [[YASAudioMutableFrameScanner alloc] initWithAudioData:data];
-    const YASAudioPointer *mutablePointer = mutableFrameScanner.mutablePointer;
+    const YASAudioMutablePointer *mutablePointer = mutableFrameScanner.mutablePointer;
     const NSUInteger *mutablePointerFrame = mutableFrameScanner.frame;
     const NSUInteger *mutablePointerChannel = mutableFrameScanner.channel;
 
@@ -378,7 +378,7 @@
     YASRelease(mutableFrameScanner);
 
     YASAudioFrameScanner *frameScanner = [[YASAudioFrameScanner alloc] initWithAudioData:data];
-    const YASAudioConstPointer *pointer = frameScanner.pointer;
+    const YASAudioPointer *pointer = frameScanner.pointer;
     const NSUInteger *pointerFrame = frameScanner.frame;
     const NSUInteger *pointerChannel = frameScanner.channel;
 
@@ -403,13 +403,13 @@
     YASAudioData *data = [[YASAudioData alloc] initWithFormat:format frameCapacity:frameLength];
     YASRelease(format);
 
-    YASAudioPointer bufferPointer = [data pointerAtBuffer:0];
+    YASAudioMutablePointer bufferPointer = [data pointerAtBuffer:0];
     for (UInt32 frame = 0; frame < frameLength; frame++) {
         bufferPointer.f32[frame] = TestValue(frame, 0, 0);
     }
 
     YASAudioFrameScanner *frameScanner = [[YASAudioFrameScanner alloc] initWithAudioData:data];
-    const YASAudioConstPointer *pointer = frameScanner.pointer;
+    const YASAudioPointer *pointer = frameScanner.pointer;
     const NSUInteger *pointerFrame = frameScanner.frame;
 
     XCTAssertEqual(*pointerFrame, 0);
@@ -437,13 +437,13 @@
     YASAudioData *data = [[YASAudioData alloc] initWithFormat:format frameCapacity:1];
     YASRelease(format);
 
-    YASAudioPointer bufferPointer = [data pointerAtBuffer:0];
+    YASAudioMutablePointer bufferPointer = [data pointerAtBuffer:0];
     for (UInt32 ch = 0; ch < channels; ch++) {
         bufferPointer.f32[ch] = TestValue(0, ch, 0);
     }
 
     YASAudioFrameScanner *frameScanner = [[YASAudioFrameScanner alloc] initWithAudioData:data];
-    const YASAudioConstPointer *pointer = frameScanner.pointer;
+    const YASAudioPointer *pointer = frameScanner.pointer;
     const NSUInteger *pointerChannel = frameScanner.channel;
 
     XCTAssertEqual(*pointerChannel, 0);
@@ -477,7 +477,7 @@
         [YASAudioTestUtils fillTestValuesToData:data];
 
         YASAudioFrameScanner *scanner = [[YASAudioFrameScanner alloc] initWithAudioData:data];
-        const YASAudioConstPointer *pointer = scanner.pointer;
+        const YASAudioPointer *pointer = scanner.pointer;
         const NSUInteger *frame = scanner.frame;
         const NSUInteger *channel = scanner.channel;
 
