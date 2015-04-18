@@ -50,11 +50,7 @@
 
 - (void)move
 {
-    if (++_index >= _length) {
-        _pointer.v = NULL;
-    } else {
-        _pointer.v += _stride;
-    }
+    YASAudioScannerMove(self);
 }
 
 - (void)setPosition:(const NSUInteger)index
@@ -69,8 +65,7 @@
 
 - (void)reset
 {
-    _index = 0;
-    _pointer.v = _topPointer.v;
+    YASAudioScannerReset(self);
 }
 
 @end
@@ -143,31 +138,12 @@
 
 - (void)moveFrame
 {
-    if (++_frame >= _frameLength) {
-        memset(_pointers, 0, _pointersSize);
-        _pointer.v = NULL;
-    } else {
-        NSUInteger index = _channelCount;
-        while (index--) {
-            _pointers[index].u8 += _frameStride;
-        }
-
-        if (_pointer.v) {
-            _pointer.v = _pointers[_channel].v;
-        } else {
-            _channel = 0;
-            _pointer.v = _pointers->v;
-        }
-    }
+    YASAudioFrameScannerMoveFrame(self);
 }
 
 - (void)moveChannel
 {
-    if (++_channel >= _channelCount) {
-        _pointer.v = NULL;
-    } else {
-        _pointer.v = _pointers[_channel].v;
-    }
+    YASAudioFrameScannerMoveChannel(self);
 }
 
 - (void)setFramePosition:(const NSUInteger)frame
@@ -187,9 +163,6 @@
 
     if (_pointer.v) {
         _pointer.v = _pointers[_channel].v;
-    } else {
-        _channel = 0;
-        _pointer.v = _pointers->v;
     }
 }
 
@@ -206,10 +179,7 @@
 
 - (void)reset
 {
-    _frame = 0;
-    _channel = 0;
-    memcpy(_pointers, _topPointers, _channelCount * sizeof(YASAudioMutablePointer *));
-    _pointer.v = _pointers->v;
+    YASAudioFrameScannerReset(self);
 }
 
 @end
