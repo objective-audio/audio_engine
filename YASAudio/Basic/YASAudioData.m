@@ -196,117 +196,14 @@ typedef NS_ENUM(NSUInteger, YASAudioDataFreeType) {
 - (YASAudioPointer)pointerAtBuffer:(NSUInteger)buffer
 {
     YASAudioPointer pointer = {NULL};
-    
+
     if (buffer >= self.audioBufferList->mNumberBuffers) {
         YASRaiseWithReason(([NSString stringWithFormat:@"%s - Out of range.", __PRETTY_FUNCTION__]));
     } else {
         pointer.v = self.audioBufferList->mBuffers[buffer].mData;
     }
-    
+
     return pointer;
-}
-
-- (Float64)valueAtBuffer:(UInt32)buffer channel:(UInt32)channel frame:(UInt32)frame
-{
-    const YASAudioBitDepthFormat bitDepthFormat = self.format.bitDepthFormat;
-    const UInt32 stride = self.stride;
-    const UInt32 frameLength = self.frameLength;
-    const UInt32 sampleByteCount = self.format.sampleByteCount;
-
-    if (channel >= stride) {
-        YASRaiseWithReason(
-            ([NSString stringWithFormat:@"%s - Overflow channel(%@).", __PRETTY_FUNCTION__, @(channel)]));
-        return 0;
-    }
-
-    if (frame >= frameLength) {
-        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Overflow frame(%@).", __PRETTY_FUNCTION__, @(frame)]));
-        return 0;
-    }
-
-    YASAudioPointer data = [self pointerAtBuffer:buffer];
-    YASAudioConstPointer pointer = {&data.u8[(stride * frame + channel) * sampleByteCount]};
-
-    switch (bitDepthFormat) {
-        case YASAudioBitDepthFormatFloat32:
-            return *pointer.f32;
-        case YASAudioBitDepthFormatFloat64:
-            return *pointer.f64;
-        case YASAudioBitDepthFormatInt16:
-            return (Float64)(*pointer.i16) / INT16_MAX;
-        case YASAudioBitDepthFormatInt32:
-            return (Float64)(*pointer.i32) / INT32_MAX;
-        default:
-            break;
-    }
-
-    return 0;
-}
-
-- (void)setValue:(Float64)value atBuffer:(UInt32)buffer channel:(UInt32)channel frame:(UInt32)frame
-{
-    const YASAudioBitDepthFormat bitDepthFormat = self.format.bitDepthFormat;
-    const UInt32 stride = self.stride;
-    const UInt32 frameLength = self.frameLength;
-    const UInt32 sampleByteCount = self.format.sampleByteCount;
-
-    if (channel >= stride) {
-        YASRaiseWithReason(
-            ([NSString stringWithFormat:@"%s - Overflow channel(%@).", __PRETTY_FUNCTION__, @(channel)]));
-        return;
-    }
-
-    if (frame >= frameLength) {
-        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Overflow frame(%@).", __PRETTY_FUNCTION__, @(frame)]));
-        return;
-    }
-
-    YASAudioPointer data = [self pointerAtBuffer:buffer];
-    YASAudioPointer pointer = {&data.u8[(stride * frame + channel) * sampleByteCount]};
-
-    switch (bitDepthFormat) {
-        case YASAudioBitDepthFormatFloat32: {
-            *pointer.f32 = value;
-        } break;
-        case YASAudioBitDepthFormatFloat64: {
-            *pointer.f64 = value;
-        } break;
-        case YASAudioBitDepthFormatInt16: {
-            *pointer.i16 = value * INT16_MAX;
-        } break;
-        case YASAudioBitDepthFormatInt32: {
-            *pointer.i32 = value * INT32_MAX;
-        } break;
-        default:
-            break;
-    }
-}
-
-- (void)readBuffersUsingBlock:(YASAudioDataReadBlock)readBlock
-{
-    if (!readBlock) {
-        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Argument is nil.", __PRETTY_FUNCTION__]));
-        return;
-    }
-
-    for (UInt32 i = 0; i < self.bufferCount; i++) {
-        YASAudioScanner *scanner = [[YASAudioScanner alloc] initWithAudioData:self atBuffer:i];
-        readBlock(scanner, i);
-        YASRelease(scanner);
-    }
-}
-
-- (void)writeBuffersUsingBlock:(YASAudioDataWriteBlock)writeBlock
-{
-    if (!writeBlock) {
-        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Argument is nil.", __PRETTY_FUNCTION__]));
-    }
-
-    for (UInt32 i = 0; i < self.bufferCount; i++) {
-        YASAudioMutableScanner *scanner = [[YASAudioMutableScanner alloc] initWithAudioData:self atBuffer:i];
-        writeBlock(scanner, i);
-        YASRelease(scanner);
-    }
 }
 
 - (void)clear

@@ -48,7 +48,7 @@
         XCTAssertEqual(data.frameLength, framesPerRender);
         XCTAssertEqualObjects(data.format, format);
 
-        for (UInt32 buf = 0; buf < data.bufferCount; buf++) {
+        for (UInt32 buf = 0; buf < data.format.bufferCount; buf++) {
             YASAudioPointer pointer = [data pointerAtBuffer:buf];
             for (UInt32 frame = 0; frame < data.frameLength; frame++) {
                 pointer.f32[frame] = TestValue(frame + tapRenderFrame, 0, buf);
@@ -70,7 +70,7 @@
             XCTAssertEqual(data.frameLength, framesPerRender);
             XCTAssertEqualObjects(data.format, format);
 
-            for (UInt32 buf = 0; buf < data.bufferCount; buf++) {
+            for (UInt32 buf = 0; buf < data.format.bufferCount; buf++) {
                 YASAudioConstPointer pointer = {[data pointerAtBuffer:buf].v};
                 for (UInt32 frame = 0; frame < data.frameLength; frame++) {
                     XCTAssertEqual(pointer.f32[frame], TestValue(frame + outputRenderFrame, 0, buf));
@@ -134,7 +134,7 @@
         XCTAssertEqual(data.frameLength, framesPerRender);
         XCTAssertEqualObjects(data.format, format);
 
-        for (UInt32 buf = 0; buf < data.bufferCount; buf++) {
+        for (UInt32 buf = 0; buf < data.format.bufferCount; buf++) {
             YASAudioPointer pointer = [data pointerAtBuffer:buf];
             for (UInt32 frame = 0; frame < data.frameLength; frame++) {
                 pointer.f32[frame] = TestValue(frame + tapRenderFrame, 0, buf);
@@ -150,29 +150,28 @@
     __block UInt32 outputRenderFrame = 0;
     NSError *error = nil;
 
-    BOOL result =
-        [outputNode startWithOutputCallbackBlock:^(YASAudioData *data, YASAudioTime *when, BOOL *stop) {
-            XCTAssertEqual(when.sampleTime, outputRenderFrame);
-            XCTAssertEqual(when.sampleRate, sampleRate);
-            XCTAssertEqual(data.frameLength, framesPerRender);
-            XCTAssertEqualObjects(data.format, format);
+    BOOL result = [outputNode startWithOutputCallbackBlock:^(YASAudioData *data, YASAudioTime *when, BOOL *stop) {
+        XCTAssertEqual(when.sampleTime, outputRenderFrame);
+        XCTAssertEqual(when.sampleRate, sampleRate);
+        XCTAssertEqual(data.frameLength, framesPerRender);
+        XCTAssertEqualObjects(data.format, format);
 
-            for (UInt32 buf = 0; buf < data.bufferCount; buf++) {
-                YASAudioConstPointer pointer = {[data pointerAtBuffer:buf].v};
-                for (UInt32 frame = 0; frame < data.frameLength; frame++) {
-                    XCTAssertEqual(pointer.f32[frame], TestValue(frame + outputRenderFrame, 0, buf));
-                }
+        for (UInt32 buf = 0; buf < data.format.bufferCount; buf++) {
+            YASAudioConstPointer pointer = {[data pointerAtBuffer:buf].v};
+            for (UInt32 frame = 0; frame < data.frameLength; frame++) {
+                XCTAssertEqual(pointer.f32[frame], TestValue(frame + outputRenderFrame, 0, buf));
             }
+        }
 
-            outputRenderFrame += data.frameLength;
-            if (outputRenderFrame >= length) {
-                *stop = YES;
-                [renderExpectation fulfill];
-            }
-        } completionBlock:^(BOOL cancelled) {
-            XCTAssertFalse(cancelled);
-            [completionExpectation fulfill];
-        } error:&error];
+        outputRenderFrame += data.frameLength;
+        if (outputRenderFrame >= length) {
+            *stop = YES;
+            [renderExpectation fulfill];
+        }
+    } completionBlock:^(BOOL cancelled) {
+        XCTAssertFalse(cancelled);
+        [completionExpectation fulfill];
+    } error:&error];
 
     XCTAssertTrue(result);
     XCTAssertNil(error);

@@ -90,8 +90,9 @@
 {
     self = [super init];
     if (self) {
-        NSUInteger bufferCount = data.bufferCount;
-        NSUInteger stride = data.stride;
+        YASAudioFormat *format = data.format;
+        NSUInteger bufferCount = format.bufferCount;
+        NSUInteger stride = format.stride;
         NSUInteger sampleByteCount = data.format.sampleByteCount;
 
         _frame = _channel = 0;
