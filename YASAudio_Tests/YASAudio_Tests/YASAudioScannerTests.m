@@ -215,6 +215,34 @@
     YASRelease(format);
 }
 
+- (void)testStop
+{
+    const NSUInteger frameLength = 16;
+    const NSUInteger stopIndex = 8;
+
+    YASAudioFormat *format = [[YASAudioFormat alloc] initStandardFormatWithSampleRate:48000 channels:1];
+    YASAudioData *data = [[YASAudioData alloc] initWithFormat:format frameCapacity:frameLength];
+    YASRelease(format);
+
+    YASAudioScanner *scanner = [[YASAudioScanner alloc] initWithAudioData:data atChannel:0];
+    const YASAudioPointer *pointer = scanner.pointer;
+    const NSUInteger *index = scanner.index;
+
+    NSUInteger frame = 0;
+    while (pointer->v) {
+        if (stopIndex == *index) {
+            [scanner stop];
+        }
+        YASAudioScannerMove(scanner);
+        frame++;
+    }
+
+    XCTAssertEqual(frame, stopIndex + 1);
+
+    YASRelease(scanner);
+    YASRelease(data);
+}
+
 - (void)testInitFailed
 {
     YASAudioMutablePointer pointer = {NULL};

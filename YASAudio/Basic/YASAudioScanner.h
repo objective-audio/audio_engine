@@ -27,6 +27,7 @@
                          length:(const NSUInteger)length NS_DESIGNATED_INITIALIZER;
 
 - (void)move;
+- (void)stop;
 - (void)setPosition:(const NSUInteger)index;
 - (void)reset;
 
@@ -61,6 +62,7 @@
 
 - (void)moveFrame;
 - (void)moveChannel;
+- (void)stop;
 
 - (void)setFramePosition:(const NSUInteger)frame;
 - (void)setChannelPosition:(const NSUInteger)channel;
@@ -82,6 +84,10 @@
         (__v)->_pointer.v += (__v)->_stride; \
     }
 
+#define YASAudioScannerStop(__v) \
+    (__v)->_pointer.v = NULL;    \
+    (__v)->_index = (__v)->_length;
+
 #define YASAudioScannerReset(__v) \
     (__v)->_index = 0;            \
     (__v)->_pointer.v = (__v)->_topPointer.v;
@@ -102,6 +108,11 @@
             (__v)->_pointer.v = (__v)->_pointers->v;                 \
         }                                                            \
     }
+
+#define YASAudioFrameScannerStop(__v)    \
+    (__v)->_pointer.v = NULL;            \
+    (__v)->_frame = (__v)->_frameLength; \
+    (__v)->_channel = (__v)->_channelCount;
 
 #define YASAudioFrameScannerMoveChannel(__v)                     \
     if (++(__v)->_channel >= (__v)->_channelCount) {             \
