@@ -69,7 +69,7 @@
 
 - (void)testCreateInt32Interleaved3chBuffer
 {
-    YASAudioFormat *format = [[YASAudioFormat alloc] initWithBitDepthFormat:YASAudioBitDepthFormatInt32
+    YASAudioFormat *format = [[YASAudioFormat alloc] initWithBitDepthFormat:YASAudioBitDepthFormatFixed824
                                                                  sampleRate:48000
                                                                    channels:3
                                                                 interleaved:YES];
@@ -196,7 +196,7 @@
     const UInt32 frameLength = 4;
 
     for (YASAudioBitDepthFormat bitDepthFormat = YASAudioBitDepthFormatFloat32;
-         bitDepthFormat <= YASAudioBitDepthFormatInt32; bitDepthFormat++) {
+         bitDepthFormat <= YASAudioBitDepthFormatFixed824; bitDepthFormat++) {
         YASAudioFormat *format = [[YASAudioFormat alloc] initWithBitDepthFormat:bitDepthFormat
                                                                      sampleRate:48000
                                                                        channels:2
@@ -224,7 +224,7 @@
     const UInt32 channels = 3;
 
     for (YASAudioBitDepthFormat bitDepthFormat = YASAudioBitDepthFormatFloat32;
-         bitDepthFormat <= YASAudioBitDepthFormatInt32; bitDepthFormat++) {
+         bitDepthFormat <= YASAudioBitDepthFormatFixed824; bitDepthFormat++) {
         YASAudioFormat *fromFormat = [[YASAudioFormat alloc] initWithBitDepthFormat:bitDepthFormat
                                                                          sampleRate:sampleRate
                                                                            channels:channels
@@ -257,7 +257,7 @@
     const UInt32 toFrameLength = 2;
 
     for (YASAudioBitDepthFormat bitDepthFormat = YASAudioBitDepthFormatFloat32;
-         bitDepthFormat <= YASAudioBitDepthFormatInt32; bitDepthFormat++) {
+         bitDepthFormat <= YASAudioBitDepthFormatFixed824; bitDepthFormat++) {
         YASAudioFormat *format = [[YASAudioFormat alloc] initWithBitDepthFormat:bitDepthFormat
                                                                      sampleRate:sampleRate
                                                                        channels:channels
@@ -294,7 +294,7 @@
     const UInt32 channels = 2;
 
     for (YASAudioBitDepthFormat bitDepthFormat = YASAudioBitDepthFormatFloat32;
-         bitDepthFormat <= YASAudioBitDepthFormatInt32; bitDepthFormat++) {
+         bitDepthFormat <= YASAudioBitDepthFormatFixed824; bitDepthFormat++) {
         YASAudioFormat *format = [[YASAudioFormat alloc] initWithBitDepthFormat:bitDepthFormat
                                                                      sampleRate:sampleRate
                                                                        channels:channels
@@ -353,7 +353,7 @@
     const UInt32 channels = 2;
 
     for (YASAudioBitDepthFormat bitDepthFormat = YASAudioBitDepthFormatFloat32;
-         bitDepthFormat <= YASAudioBitDepthFormatInt32; bitDepthFormat++) {
+         bitDepthFormat <= YASAudioBitDepthFormatFixed824; bitDepthFormat++) {
         YASAudioFormat *format = [[YASAudioFormat alloc] initWithBitDepthFormat:bitDepthFormat
                                                                      sampleRate:sampleRate
                                                                        channels:channels
@@ -386,7 +386,7 @@
     const UInt32 channels = 2;
 
     for (YASAudioBitDepthFormat bitDepthFormat = YASAudioBitDepthFormatFloat32;
-         bitDepthFormat <= YASAudioBitDepthFormatInt32; bitDepthFormat++) {
+         bitDepthFormat <= YASAudioBitDepthFormatFixed824; bitDepthFormat++) {
         YASAudioFormat *fromFormat = [[YASAudioFormat alloc] initWithBitDepthFormat:bitDepthFormat
                                                                          sampleRate:sampleRate
                                                                            channels:channels
@@ -418,7 +418,7 @@
     const UInt32 frameLength = 4;
     const UInt32 channels = 2;
     const YASAudioBitDepthFormat fromBitDepthFormat = YASAudioBitDepthFormatFloat32;
-    const YASAudioBitDepthFormat toBitDepthFormat = YASAudioBitDepthFormatInt32;
+    const YASAudioBitDepthFormat toBitDepthFormat = YASAudioBitDepthFormatFixed824;
 
     YASAudioFormat *fromFormat = [[YASAudioFormat alloc] initWithBitDepthFormat:fromBitDepthFormat
                                                                      sampleRate:sampleRate
@@ -447,7 +447,7 @@
     const UInt32 channels = 2;
 
     for (YASAudioBitDepthFormat bitDepthFormat = YASAudioBitDepthFormatFloat32;
-         bitDepthFormat <= YASAudioBitDepthFormatInt32; bitDepthFormat++) {
+         bitDepthFormat <= YASAudioBitDepthFormatFixed824; bitDepthFormat++) {
         YASAudioFormat *interleavedFormat = [[YASAudioFormat alloc] initWithBitDepthFormat:bitDepthFormat
                                                                                 sampleRate:sampleRate
                                                                                   channels:channels
@@ -493,7 +493,7 @@
     const UInt32 channels = 2;
 
     for (YASAudioBitDepthFormat bitDepthFormat = YASAudioBitDepthFormatFloat32;
-         bitDepthFormat <= YASAudioBitDepthFormatInt32; bitDepthFormat++) {
+         bitDepthFormat <= YASAudioBitDepthFormatFixed824; bitDepthFormat++) {
         YASAudioFormat *interleavedFormat = [[YASAudioFormat alloc] initWithBitDepthFormat:bitDepthFormat
                                                                                 sampleRate:sampleRate
                                                                                   channels:channels

@@ -123,7 +123,7 @@
         @(YASAudioBitDepthFormatFloat32),
         @(YASAudioBitDepthFormatFloat64),
         @(YASAudioBitDepthFormatInt16),
-        @(YASAudioBitDepthFormatInt32)
+        @(YASAudioBitDepthFormatFixed824)
     ];
     NSArray *interleaveds = @[@(YES), @(NO)];
 #endif
@@ -513,7 +513,7 @@
                     case YASAudioBitDepthFormatInt16: {
                         pointer.i16[frameIndex * stride + strideIndex] = value;
                     } break;
-                    case YASAudioBitDepthFormatInt32: {
+                    case YASAudioBitDepthFormatFixed824: {
                         pointer.i32[frameIndex * stride + strideIndex] = value << 16;
                     } break;
                     case YASAudioBitDepthFormatFloat32: {
@@ -547,7 +547,7 @@
                     case YASAudioBitDepthFormatInt16: {
                         ptrValue = pointer.i16[frameIndex * stride + strideIndex];
                     } break;
-                    case YASAudioBitDepthFormatInt32: {
+                    case YASAudioBitDepthFormatFixed824: {
                         ptrValue = pointer.i32[frameIndex * stride + strideIndex] >> 16;
                     } break;
                     case YASAudioBitDepthFormatFloat32: {

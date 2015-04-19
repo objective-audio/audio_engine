@@ -281,7 +281,7 @@
     const UInt32 frameLength = 16;
     const UInt32 channels = 4;
 
-    for (NSUInteger bitDepthFormat = YASAudioBitDepthFormatFloat32; bitDepthFormat <= YASAudioBitDepthFormatInt32;
+    for (NSUInteger bitDepthFormat = YASAudioBitDepthFormatFloat32; bitDepthFormat <= YASAudioBitDepthFormatFixed824;
          bitDepthFormat++) {
         YASAudioFormat *format = [[YASAudioFormat alloc] initWithBitDepthFormat:bitDepthFormat
                                                                      sampleRate:48000
@@ -310,7 +310,7 @@
                     case YASAudioBitDepthFormatInt16:
                         XCTAssertEqual(*pointer->i16, (SInt16)testValue);
                         break;
-                    case YASAudioBitDepthFormatInt32:
+                    case YASAudioBitDepthFormatFixed824:
                         XCTAssertEqual(*pointer->i32, (SInt32)testValue);
                         break;
                     default:

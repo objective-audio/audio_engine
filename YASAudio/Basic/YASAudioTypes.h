@@ -16,7 +16,7 @@ typedef NS_ENUM(NSUInteger, YASAudioBitDepthFormat) {
     YASAudioBitDepthFormatFloat32 = 1,
     YASAudioBitDepthFormatFloat64 = 2,
     YASAudioBitDepthFormatInt16 = 3,
-    YASAudioBitDepthFormatInt32 = 4
+    YASAudioBitDepthFormatFixed824 = 4
 };
 
 typedef NS_ENUM(NSUInteger, YASAudioUnitRenderType) {
