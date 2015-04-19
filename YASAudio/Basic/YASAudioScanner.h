@@ -62,6 +62,7 @@
 
 - (void)moveFrame;
 - (void)moveChannel;
+- (void)move;
 - (void)stop;
 
 - (void)setFramePosition:(const NSUInteger)frame;
@@ -109,17 +110,23 @@
         }                                                            \
     }
 
-#define YASAudioFrameScannerStop(__v)    \
-    (__v)->_pointer.v = NULL;            \
-    (__v)->_frame = (__v)->_frameLength; \
-    (__v)->_channel = (__v)->_channelCount;
-
 #define YASAudioFrameScannerMoveChannel(__v)                     \
     if (++(__v)->_channel >= (__v)->_channelCount) {             \
         (__v)->_pointer.v = NULL;                                \
     } else {                                                     \
         (__v)->_pointer.v = (__v)->_pointers[(__v)->_channel].v; \
     }
+
+#define YASAudioFrameScannerMove(__v)       \
+    YASAudioFrameScannerMoveChannel(__v);   \
+    if (!(__v)->_pointer.v) {               \
+        YASAudioFrameScannerMoveFrame(__v); \
+    }
+
+#define YASAudioFrameScannerStop(__v)    \
+    (__v)->_pointer.v = NULL;            \
+    (__v)->_frame = (__v)->_frameLength; \
+    (__v)->_channel = (__v)->_channelCount;
 
 #define YASAudioFrameScannerReset(__v)                                                                      \
     (__v)->_frame = 0;                                                                                      \
