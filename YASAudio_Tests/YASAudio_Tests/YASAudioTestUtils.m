@@ -117,14 +117,11 @@ UInt32 TestValue(UInt32 frame, UInt32 channel, UInt32 buffer)
     const YASAudioPointer *pointer = scanner.pointer;
 
     while (pointer->v) {
-        while (pointer->v) {
-            if (YASAudioIsEqualData(pointer->v, zeroBytes, sampleByteCount)) {
-                isFilled = NO;
-                YASAudioFrameScannerStop(scanner);
-            }
-            YASAudioFrameScannerMoveChannel(scanner);
+        if (YASAudioIsEqualData(pointer->v, zeroBytes, sampleByteCount)) {
+            isFilled = NO;
+            YASAudioFrameScannerStop(scanner);
         }
-        YASAudioFrameScannerMoveFrame(scanner);
+        YASAudioFrameScannerMove(scanner);
     }
 
     YASRelease(scanner);

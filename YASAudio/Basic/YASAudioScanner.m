@@ -141,6 +141,11 @@
     return &_channel;
 }
 
+- (void)move
+{
+    YASAudioFrameScannerMove(self);
+}
+
 - (void)moveFrame
 {
     YASAudioFrameScannerMoveFrame(self);
