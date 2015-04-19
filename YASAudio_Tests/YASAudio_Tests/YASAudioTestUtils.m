@@ -120,12 +120,9 @@ UInt32 TestValue(UInt32 frame, UInt32 channel, UInt32 buffer)
         while (pointer->v) {
             if (YASAudioIsEqualData(pointer->v, zeroBytes, sampleByteCount)) {
                 isFilled = NO;
-                break;
+                YASAudioFrameScannerStop(scanner);
             }
             YASAudioFrameScannerMoveChannel(scanner);
-        }
-        if (!isFilled) {
-            break;
         }
         YASAudioFrameScannerMoveFrame(scanner);
     }
