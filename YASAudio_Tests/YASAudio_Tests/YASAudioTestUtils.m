@@ -35,7 +35,7 @@ UInt32 TestValue(UInt32 frame, UInt32 channel, UInt32 buffer)
                     case YASAudioBitDepthFormatInt16: {
                         pointer.i16[index] = value;
                     } break;
-                    case YASAudioBitDepthFormatInt32: {
+                    case YASAudioBitDepthFormatFixed824: {
                         pointer.i32[index] = value;
                     } break;
                     default:
