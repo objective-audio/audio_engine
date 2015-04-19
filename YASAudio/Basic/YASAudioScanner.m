@@ -53,6 +53,11 @@
     YASAudioScannerMove(self);
 }
 
+- (void)stop
+{
+    YASAudioScannerStop(self);
+}
+
 - (void)setPosition:(const NSUInteger)index
 {
     if (index >= _length) {
@@ -144,6 +149,11 @@
 - (void)moveChannel
 {
     YASAudioFrameScannerMoveChannel(self);
+}
+
+- (void)stop
+{
+    YASAudioFrameScannerStop(self);
 }
 
 - (void)setFramePosition:(const NSUInteger)frame

@@ -331,4 +331,45 @@
     }
 }
 
+- (void)testStop
+{
+    const UInt32 frameLength = 16;
+    const UInt32 channels = 4;
+    const NSUInteger stopFrame = 8;
+    const NSUInteger stopChannel = 2;
+
+    YASAudioFormat *format = [[YASAudioFormat alloc] initWithBitDepthFormat:YASAudioBitDepthFormatFloat32
+                                                                 sampleRate:48000
+                                                                   channels:channels
+                                                                interleaved:YES];
+    YASAudioData *data = [[YASAudioData alloc] initWithFormat:format frameCapacity:frameLength];
+    YASRelease(format);
+
+    YASAudioFrameScanner *scanner = [[YASAudioFrameScanner alloc] initWithAudioData:data];
+    const YASAudioPointer *pointer = scanner.pointer;
+    const NSUInteger *frame = scanner.frame;
+    const NSUInteger *channel = scanner.channel;
+
+    NSUInteger fr = 0;
+    NSUInteger ch;
+    while (pointer->v) {
+        ch = 0;
+        while (pointer->v) {
+            if (*frame == stopFrame && *channel == stopChannel) {
+                [scanner stop];
+            }
+            YASAudioFrameScannerMoveChannel(scanner);
+            ch++;
+        }
+        YASAudioFrameScannerMoveFrame(scanner);
+        fr++;
+    }
+
+    XCTAssertEqual(fr, stopFrame + 1);
+    XCTAssertEqual(ch, stopChannel + 1);
+
+    YASRelease(scanner);
+    YASRelease(data);
+}
+
 @end
