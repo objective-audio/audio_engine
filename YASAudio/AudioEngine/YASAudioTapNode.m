@@ -8,13 +8,21 @@
 #import "YASAudioConnection+Internal.h"
 #import "YASMacros.h"
 
+@interface YASAudioTapNode ()
+
+@property (nonatomic, strong) YASAudioNodeCore *nodeCoreOnRender;
+
+@end
+
 @implementation YASAudioTapNode
 
 - (void)dealloc
 {
     YASRelease(_renderBlock);
+    YASRelease(_nodeCoreOnRender);
 
     _renderBlock = nil;
+    _nodeCoreOnRender = nil;
 
     YASSuperDealloc;
 }
@@ -38,10 +46,12 @@
     @autoreleasepool
     {
         YASAudioNodeCore *nodeCore = self.nodeCore;
+        self.nodeCoreOnRender = nodeCore;
+
         YASAudioNodeRenderBlock renderBlock = self.renderBlock;
 
         if (renderBlock) {
-            renderBlock(data, bus, when, nodeCore);
+            renderBlock(data, bus, when);
         } else {
             YASAudioConnection *connection = [nodeCore inputConnectionForBus:@0];
             YASAudioNode *sourceNode = connection.sourceNode;
@@ -49,7 +59,29 @@
                 [sourceNode renderWithData:data bus:connection.sourceBus when:when];
             }
         }
+
+        self.nodeCoreOnRender = nil;
     }
+}
+
+- (YASAudioConnection *)inputConnectionOnRenderForBus:(NSNumber *)bus
+{
+    return [self.nodeCoreOnRender inputConnectionForBus:bus];
+}
+
+- (YASAudioConnection *)outputConnectionOnRenderForBus:(NSNumber *)bus
+{
+    return [self.nodeCoreOnRender outputConnectionForBus:bus];
+}
+
+- (NSDictionary *)inputConnectionsOnRender
+{
+    return [self.nodeCoreOnRender inputConnections];
+}
+
+- (NSDictionary *)outputConnectionsOnRender
+{
+    return [self.nodeCoreOnRender outputConnections];
 }
 
 @end

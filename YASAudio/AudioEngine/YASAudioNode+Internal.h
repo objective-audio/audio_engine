@@ -5,6 +5,8 @@
 
 #import "YASAudioNode.h"
 
+@class YASAudioConnection;
+
 @interface YASAudioNode (Internal)
 
 - (void)setEngine:(YASAudioEngine *)engine;
@@ -28,5 +30,14 @@
 @property (atomic, strong, readonly) id nodeCore;
 
 - (void)setRenderTimeOnRender:(YASAudioTime *)time;
+
+@end
+
+@interface YASAudioNodeCore : NSObject
+
+- (YASAudioConnection *)inputConnectionForBus:(NSNumber *)bus;
+- (YASAudioConnection *)outputConnectionForBus:(NSNumber *)bus;
+- (NSDictionary *)inputConnections;
+- (NSDictionary *)outputConnections;
 
 @end

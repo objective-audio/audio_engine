@@ -6,16 +6,7 @@
 #import "YASWeakSupport.h"
 #import <AudioUnit/AudioUnit.h>
 
-@class YASAudioFormat, YASAudioData, YASAudioTime, YASAudioEngine, YASAudioUnit, YASAudioConnection;
-
-@interface YASAudioNodeCore : NSObject
-
-- (YASAudioConnection *)inputConnectionForBus:(NSNumber *)bus;
-- (YASAudioConnection *)outputConnectionForBus:(NSNumber *)bus;
-- (NSDictionary *)inputConnections;
-- (NSDictionary *)outputConnections;
-
-@end
+@class YASAudioFormat, YASAudioEngine, YASAudioTime, YASAudioData;
 
 @interface YASAudioNode : YASWeakProvider
 
