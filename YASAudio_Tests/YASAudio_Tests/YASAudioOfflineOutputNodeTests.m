@@ -134,12 +134,15 @@
         XCTAssertEqual(data.frameLength, framesPerRender);
         XCTAssertEqualObjects(data.format, format);
 
-        for (UInt32 buf = 0; buf < data.format.bufferCount; buf++) {
-            YASAudioMutablePointer pointer = [data pointerAtBuffer:buf];
-            for (UInt32 frame = 0; frame < data.frameLength; frame++) {
-                pointer.f32[frame] = TestValue(frame + tapRenderFrame, 0, buf);
-            }
+        YASAudioMutableFrameScanner *scanner = [[YASAudioMutableFrameScanner alloc] initWithAudioData:data];
+        const YASAudioMutablePointer *pointer = scanner.mutablePointer;
+        const NSUInteger *frame = scanner.frame;
+        const NSUInteger *channel = scanner.channel;
+        while (pointer->v) {
+            *pointer->f32 = TestValue((UInt32)*frame + tapRenderFrame, 0, (UInt32)*channel);
+            YASAudioFrameScannerMove(scanner);
         }
+        YASRelease(scanner);
 
         tapRenderFrame += data.frameLength;
         if (tapRenderFrame >= length) {
@@ -156,12 +159,15 @@
         XCTAssertEqual(data.frameLength, framesPerRender);
         XCTAssertEqualObjects(data.format, format);
 
-        for (UInt32 buf = 0; buf < data.format.bufferCount; buf++) {
-            YASAudioPointer pointer = {[data pointerAtBuffer:buf].v};
-            for (UInt32 frame = 0; frame < data.frameLength; frame++) {
-                XCTAssertEqual(pointer.f32[frame], TestValue(frame + outputRenderFrame, 0, buf));
-            }
+        YASAudioFrameScanner *scanner = [[YASAudioFrameScanner alloc] initWithAudioData:data];
+        const YASAudioPointer *pointer = scanner.pointer;
+        const NSUInteger *frame = scanner.frame;
+        const NSUInteger *channel = scanner.channel;
+        while (pointer->v) {
+            XCTAssertEqual(*pointer->f32, TestValue((UInt32)*frame + outputRenderFrame, 0, (UInt32)*channel));
+            YASAudioFrameScannerMove(scanner);
         }
+        YASRelease(scanner);
 
         outputRenderFrame += data.frameLength;
         if (outputRenderFrame >= length) {
