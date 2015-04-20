@@ -278,7 +278,7 @@
         return NO;
     }
 
-    return _inputConnectionContainers[bus] == nil;
+    return !_inputConnectionContainers[bus];
 }
 
 - (BOOL)isAvailableOutputBus:(NSNumber *)bus
@@ -287,7 +287,7 @@
         return NO;
     }
 
-    return _outputConnectionContainers[bus] == nil;
+    return !_outputConnectionContainers[bus];
 }
 
 #pragma mark Render thread
