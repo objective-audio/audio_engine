@@ -5,7 +5,7 @@
 
 #import "YASAudioNode.h"
 
-@class YASAudioGraph;
+@class YASAudioGraph, YASAudioUnit;
 
 @interface YASAudioUnitNode : YASAudioNode
 

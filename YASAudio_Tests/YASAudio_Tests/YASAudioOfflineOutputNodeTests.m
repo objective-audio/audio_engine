@@ -42,7 +42,7 @@
     const UInt32 framesPerRender = 1024;
     const UInt32 length = 4196;
     __block UInt32 tapRenderFrame = 0;
-    tapNode.renderBlock = ^(YASAudioData *data, NSNumber *bus, YASAudioTime *when, id nodeCore) {
+    tapNode.renderBlock = ^(YASAudioData *data, NSNumber *bus, YASAudioTime *when) {
         XCTAssertEqual(when.sampleTime, tapRenderFrame);
         XCTAssertEqual(when.sampleRate, sampleRate);
         XCTAssertEqual(data.frameLength, framesPerRender);
@@ -128,7 +128,7 @@
 
     __block UInt32 tapRenderFrame = 0;
 
-    tapNode.renderBlock = ^(YASAudioData *data, NSNumber *bus, YASAudioTime *when, id nodeCore) {
+    tapNode.renderBlock = ^(YASAudioData *data, NSNumber *bus, YASAudioTime *when) {
         XCTAssertEqual(when.sampleTime, tapRenderFrame);
         XCTAssertEqual(when.sampleRate, sampleRate);
         XCTAssertEqual(data.frameLength, framesPerRender);

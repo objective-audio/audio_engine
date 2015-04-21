@@ -3,7 +3,7 @@
 //  Copyright (c) 2015 Yuki Yasoshima.
 //
 
-#import "YASAudioNode.h"
+#import "YASAudioNode+Internal.h"
 #import "YASAudioEngine.h"
 #import "YASAudioConnection+Internal.h"
 #import "YASMacros.h"
