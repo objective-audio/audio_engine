@@ -18,6 +18,7 @@
 - (YASAudioConnection *)outputConnectionOnRenderForBus:(NSNumber *)bus;
 - (NSDictionary *)inputConnectionsOnRender;
 - (NSDictionary *)outputConnectionsOnRender;
+- (void)renderSourceNodeWithData:(YASAudioData *)data bus:(NSNumber *)bus when:(YASAudioTime *)when;
 
 @end
 

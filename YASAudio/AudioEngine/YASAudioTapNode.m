@@ -53,11 +53,7 @@
         if (renderBlock) {
             renderBlock(data, bus, when);
         } else {
-            YASAudioConnection *connection = [nodeCore inputConnectionForBus:@0];
-            YASAudioNode *sourceNode = connection.sourceNode;
-            if (sourceNode) {
-                [sourceNode renderWithData:data bus:connection.sourceBus when:when];
-            }
+            [self renderSourceNodeWithData:data bus:@0 when:when];
         }
 
         self.nodeCoreOnRender = nil;
@@ -82,6 +78,13 @@
 - (NSDictionary *)outputConnectionsOnRender
 {
     return [self.nodeCoreOnRender outputConnections];
+}
+
+- (void)renderSourceNodeWithData:(YASAudioData *)data bus:(NSNumber *)bus when:(YASAudioTime *)when
+{
+    YASAudioConnection *connection = [self inputConnectionOnRenderForBus:bus];
+    YASAudioNode *node = connection.sourceNode;
+    [node renderWithData:data bus:connection.sourceBus when:when];
 }
 
 @end
