@@ -36,12 +36,21 @@
 
     XCTestExpectation *toExpectation = [self expectationWithDescription:@"To Node"];
     XCTestExpectation *fromExpectation = [self expectationWithDescription:@"From Node"];
+    XCTestExpectation *completionExpectation = [self expectationWithDescription:@"Completion"];
 
     YASWeakContainer *toNodeContainer = toNode.weakContainer;
     toNode.renderBlock = ^(YASAudioData *data, NSNumber *bus, YASAudioTime *when) {
         YASAudioTapNode *node = toNodeContainer.retainedObject;
+
+        XCTAssertEqual([node outputConnectionsOnRender].count, 1);
+        XCTAssertNil([node outputConnectionOnRenderForBus:@1]);
+
+        XCTAssertEqual([node inputConnectionsOnRender].count, 1);
+        XCTAssertNil([node inputConnectionOnRenderForBus:@1]);
+
         [node renderSourceNodeWithData:data bus:@0 when:when];
         YASRelease(node);
+
         [toExpectation fulfill];
     };
 
@@ -51,12 +60,16 @@
 
     [engine startOfflineRenderWithOutputCallbackBlock:^(YASAudioData *data, YASAudioTime *when, BOOL *stop) {
         *stop = YES;
-    } completionBlock:NULL error:nil];
+    } completionBlock:^(BOOL cancelled) {
+        [completionExpectation fulfill];
+    } error:nil];
 
     [self waitForExpectationsWithTimeout:0.5
                                  handler:^(NSError *error){
 
                                  }];
+
+    [NSThread sleepForTimeInterval:1.0];
 
     YASRelease(format);
     YASRelease(fromNode);
