@@ -31,7 +31,8 @@
         _unit = info->unit;
         _minValue = info->minValue;
         _maxValue = info->maxValue;
-        _value = _defaultValue = info->defaultValue;
+        _defaultValue = info->defaultValue;
+        _values = [[NSMutableDictionary alloc] init];
     }
     return self;
 }
@@ -40,9 +41,11 @@
 {
     YASRelease(_unitName);
     YASRelease(_name);
+    YASRelease(_values);
 
     _unitName = nil;
     _name = nil;
+    _values = nil;
 
     YASSuperDealloc;
 }
@@ -64,6 +67,21 @@
     [result appendString:[[lines componentsJoinedByString:@"\n"] stringByAppendingLinePrefix:@"    "]];
     [result appendFormat:@"\n}"];
     return result;
+}
+
+- (Float32)valueForElement:(const AudioUnitElement)element
+{
+    NSNumber *valueNumber = _values[@(element)];
+    if (valueNumber) {
+        return valueNumber.floatValue;
+    } else {
+        return _defaultValue;
+    }
+}
+
+- (void)setValue:(Float32)value forElement:(const AudioUnitElement)element
+{
+    _values[@(element)] = @(value);
 }
 
 @end

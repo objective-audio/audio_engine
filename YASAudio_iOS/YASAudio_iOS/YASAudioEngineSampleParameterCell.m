@@ -15,7 +15,7 @@
 @end
 
 @implementation YASAudioEngineSampleParameterCell {
-    YASAudioUnitParameter *_parameterInfo;
+    YASAudioUnitParameter *_parameter;
     YASAudioUnitNode *_node;
 }
 
@@ -25,13 +25,13 @@
     YASRelease(_valueLabel);
     YASRelease(_valueSlider);
     YASRelease(_node);
-    YASRelease(_parameterInfo);
+    YASRelease(_parameter);
 
     _nameLabel = nil;
     _valueLabel = nil;
     _valueSlider = nil;
     _node = nil;
-    _parameterInfo = nil;
+    _parameter = nil;
 
     YASSuperDealloc;
 }
@@ -49,14 +49,14 @@
 
 - (void)reset
 {
-    [self setParameterInfo:nil node:nil];
+    [self setParameter:nil node:nil];
 }
 
-- (void)setParameterInfo:(YASAudioUnitParameter *)parameterInfo node:(YASAudioUnitNode *)node
+- (void)setParameter:(YASAudioUnitParameter *)parameter node:(YASAudioUnitNode *)node
 {
-    if (_parameterInfo) {
-        YASRelease(_parameterInfo);
-        _parameterInfo = nil;
+    if (_parameter) {
+        YASRelease(_parameter);
+        _parameter = nil;
     }
 
     if (_node) {
@@ -64,13 +64,13 @@
         _node = nil;
     }
 
-    _parameterInfo = YASRetain(parameterInfo);
+    _parameter = YASRetain(parameter);
     _node = YASRetain(node);
 
-    if (parameterInfo) {
-        self.nameLabel.text = parameterInfo.name;
-        self.valueSlider.minimumValue = parameterInfo.minValue;
-        self.valueSlider.maximumValue = parameterInfo.maxValue;
+    if (parameter) {
+        self.nameLabel.text = parameter.name;
+        self.valueSlider.minimumValue = parameter.minValue;
+        self.valueSlider.maximumValue = parameter.maxValue;
     } else {
         self.nameLabel.text = nil;
         self.valueSlider.minimumValue = 0.0;
@@ -78,7 +78,7 @@
     }
 
     if (node) {
-        self.valueSlider.value = [node globalParameterValue:parameterInfo.parameterID];
+        self.valueSlider.value = [node globalParameterValue:parameter.parameterID];
     } else {
         self.valueSlider.value = 0.0;
     }
@@ -88,12 +88,12 @@
 
 - (void)updateValueLabel
 {
-    self.valueLabel.text = @([_node globalParameterValue:_parameterInfo.parameterID]).stringValue;
+    self.valueLabel.text = @([_node globalParameterValue:_parameter.parameterID]).stringValue;
 }
 
 - (IBAction)sliderValueChanged:(UISlider *)sender
 {
-    [_node setGlobalParameter:_parameterInfo.parameterID value:sender.value];
+    [_node setGlobalParameter:_parameter.parameterID value:sender.value];
     [self updateValueLabel];
 }
 

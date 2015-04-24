@@ -63,8 +63,8 @@ extern OSType const YASAudioUnitSubType_DefaultIO;
 - (AudioUnitParameterValue)getParameter:(const AudioUnitParameterID)parameterID
                                   scope:(const AudioUnitScope)scope
                                 element:(const AudioUnitElement)element;
-- (NSDictionary *)getParameterInfosWithScope:(const AudioUnitScope)scope;
-- (YASAudioUnitParameter *)parameterInfo:(const AudioUnitParameterID)parameterID scope:(const AudioUnitScope)scope;
+- (NSDictionary *)getParametersWithScope:(const AudioUnitScope)scope;
+- (YASAudioUnitParameter *)parameter:(const AudioUnitParameterID)parameterID scope:(const AudioUnitScope)scope;
 
 - (void)setElementCount:(UInt32)count scope:(AudioUnitScope)scope;  // mixer only
 - (UInt32)elementCountForScope:(AudioUnitScope)scope;               // mixer only

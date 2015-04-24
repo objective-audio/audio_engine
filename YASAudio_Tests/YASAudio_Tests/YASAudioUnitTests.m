@@ -191,9 +191,10 @@
 {
     YASAudioUnit *delayUnit = [[YASAudioUnit alloc] initWithType:kAudioUnitType_Effect subType:kAudioUnitSubType_Delay];
 
-    YASAudioUnitParameter *delayTimeInfo = [delayUnit parameterInfo:kDelayParam_DelayTime scope:kAudioUnitScope_Global];
+    YASAudioUnitParameter *delayTimeParameter =
+        [delayUnit parameter:kDelayParam_DelayTime scope:kAudioUnitScope_Global];
 
-    const AudioUnitParameterValue min = delayTimeInfo.minValue;
+    const AudioUnitParameterValue min = delayTimeParameter.minValue;
 
     AudioUnitParameterValue value = min;
     AudioUnitScope scope = kAudioUnitScope_Global;
@@ -201,13 +202,13 @@
     [delayUnit setParameter:kDelayParam_DelayTime value:value scope:scope element:0];
     XCTAssertEqual([delayUnit getParameter:kDelayParam_DelayTime scope:scope element:0], value);
 
-    delayTimeInfo = nil;
-    XCTAssertThrows(delayTimeInfo = [delayUnit parameterInfo:kDelayParam_DelayTime scope:kAudioUnitScope_Input]);
-    XCTAssertNil(delayTimeInfo);
+    delayTimeParameter = nil;
+    XCTAssertThrows(delayTimeParameter = [delayUnit parameter:kDelayParam_DelayTime scope:kAudioUnitScope_Input]);
+    XCTAssertNil(delayTimeParameter);
 
-    delayTimeInfo = nil;
-    XCTAssertThrows(delayTimeInfo = [delayUnit parameterInfo:kDelayParam_DelayTime scope:kAudioUnitScope_Output]);
-    XCTAssertNil(delayTimeInfo);
+    delayTimeParameter = nil;
+    XCTAssertThrows(delayTimeParameter = [delayUnit parameter:kDelayParam_DelayTime scope:kAudioUnitScope_Output]);
+    XCTAssertNil(delayTimeParameter);
 
     YASRelease(delayUnit);
 }
@@ -216,16 +217,16 @@
 {
     YASAudioUnit *delayUnit = [[YASAudioUnit alloc] initWithType:kAudioUnitType_Effect subType:kAudioUnitSubType_Delay];
 
-    NSDictionary *parameterInfos = [delayUnit getParameterInfosWithScope:kAudioUnitScope_Global];
+    NSDictionary *parameters = [delayUnit getParametersWithScope:kAudioUnitScope_Global];
 
-    XCTAssertEqual(parameterInfos.count, 4);
+    XCTAssertEqual(parameters.count, 4);
 
-    NSArray *parameters =
+    NSArray *parameterIDs =
         @[@(kDelayParam_DelayTime), @(kDelayParam_Feedback), @(kDelayParam_LopassCutoff), @(kDelayParam_WetDryMix)];
 
-    for (YASAudioUnitParameter *info in parameterInfos.allValues) {
-        XCTAssertTrue([info isKindOfClass:[YASAudioUnitParameter class]]);
-        [parameters containsObject:@(info.parameterID)];
+    for (YASAudioUnitParameter *parameter in parameters.allValues) {
+        XCTAssertTrue([parameter isKindOfClass:[YASAudioUnitParameter class]]);
+        [parameterIDs containsObject:@(parameter.parameterID)];
     }
 
     YASRelease(delayUnit);

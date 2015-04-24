@@ -18,11 +18,15 @@
 @property (nonatomic, assign, readonly) AudioUnitParameterValue minValue;
 @property (nonatomic, assign, readonly) AudioUnitParameterValue maxValue;
 @property (nonatomic, assign, readonly) AudioUnitParameterValue defaultValue;
-@property (nonatomic, assign) AudioUnitParameterValue value;
+
+@property (nonatomic, strong, readonly) NSMutableDictionary *values;
 
 - (instancetype)init NS_UNAVAILABLE;
 - (instancetype)initWithAudioUnitParameterInfo:(const AudioUnitParameterInfo *)info
                                    parameterID:(const AudioUnitParameterID)parameterID
                                          scope:(const AudioUnitScope)scope NS_DESIGNATED_INITIALIZER;
+
+- (Float32)valueForElement:(const AudioUnitElement)element;
+- (void)setValue:(Float32)value forElement:(const AudioUnitElement)element;
 
 @end
