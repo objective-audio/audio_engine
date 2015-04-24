@@ -151,6 +151,7 @@
                                  }];
 
     YASRelease(engine);
+    engine = nil;
 }
 
 @end
