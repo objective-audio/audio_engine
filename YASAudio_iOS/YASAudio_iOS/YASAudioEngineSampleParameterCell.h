@@ -9,6 +9,6 @@
 
 @interface YASAudioEngineSampleParameterCell : UITableViewCell
 
-- (void)setParameterInfo:(YASAudioUnitParameter *)parameterInfo node:(YASAudioUnitNode *)node;
+- (void)setParameter:(YASAudioUnitParameter *)parameter node:(YASAudioUnitNode *)node;
 
 @end

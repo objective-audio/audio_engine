@@ -26,8 +26,8 @@
 {
     YASAudioUnitMixerNode *mixerNode = [[YASAudioUnitMixerNode alloc] init];
 
-    NSDictionary *inputParameterInfos = mixerNode.inputParameterInfos;
-    NSDictionary *outputParameterInfos = mixerNode.outputParameterInfos;
+    NSDictionary *inputParameters = mixerNode.parameters[@(kAudioUnitScope_Input)];
+    NSDictionary *outputParameters = mixerNode.parameters[@(kAudioUnitScope_Output)];
 
     NSArray *inputParameterIDs = @[
         @(kMultiChannelMixerParam_Volume),
@@ -40,13 +40,13 @@
     ];
 
     for (NSNumber *key in inputParameterIDs) {
-        XCTAssertNotNil(inputParameterInfos[key]);
+        XCTAssertNotNil(inputParameters[key]);
     }
 
     NSArray *outputParameterIDs = @[@(kMultiChannelMixerParam_Volume), @(kMultiChannelMixerParam_Pan)];
 
     for (NSNumber *key in outputParameterIDs) {
-        XCTAssertNotNil(outputParameterInfos[key]);
+        XCTAssertNotNil(outputParameters[key]);
     }
 
     YASRelease(mixerNode);

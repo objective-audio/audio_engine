@@ -20,9 +20,7 @@
 
 @property (nonatomic, assign, readonly) AudioComponentDescription acd;
 @property (nonatomic, strong) YASWeakContainer *graphContainer;
-@property (nonatomic, strong) NSDictionary *globalParameterInfos;
-@property (nonatomic, strong) NSDictionary *inputParameterInfos;
-@property (nonatomic, strong) NSDictionary *outputParameterInfos;
+@property (nonatomic, strong) NSDictionary *parameters;
 
 @end
 
@@ -34,9 +32,11 @@
     if (self) {
         _acd = *acd;
         _audioUnit = [[YASAudioUnit alloc] initWithAudioComponentDescription:&_acd];
-        self.globalParameterInfos = [_audioUnit getParameterInfosWithScope:kAudioUnitScope_Global];
-        self.inputParameterInfos = [_audioUnit getParameterInfosWithScope:kAudioUnitScope_Input];
-        self.outputParameterInfos = [_audioUnit getParameterInfosWithScope:kAudioUnitScope_Output];
+        self.parameters = @{
+            @(kAudioUnitScope_Global): [_audioUnit getParametersWithScope:kAudioUnitScope_Global],
+            @(kAudioUnitScope_Input): [_audioUnit getParametersWithScope:kAudioUnitScope_Input],
+            @(kAudioUnitScope_Output): [_audioUnit getParametersWithScope:kAudioUnitScope_Output]
+        };
     }
     return self;
 }
@@ -58,15 +58,11 @@
 {
     YASRelease(_audioUnit);
     YASRelease(_graphContainer);
-    YASRelease(_globalParameterInfos);
-    YASRelease(_inputParameterInfos);
-    YASRelease(_outputParameterInfos);
+    YASRelease(_parameters);
 
     _audioUnit = nil;
     _graphContainer = nil;
-    _globalParameterInfos = nil;
-    _inputParameterInfos = nil;
-    _outputParameterInfos = nil;
+    _parameters = nil;
 
     YASSuperDealloc;
 }
@@ -108,9 +104,22 @@
 
 - (void)prepareParameters
 {
-    for (YASAudioUnitParameter *info in _globalParameterInfos.allValues) {
-        [_audioUnit setParameter:info.parameterID value:info.value scope:kAudioUnitScope_Global element:0];
+    for (NSNumber *scopeKey in _parameters) {
+        AudioUnitScope scope = scopeKey.uint32Value;
+        NSDictionary *parametersInScope = _parameters[scopeKey];
+        for (YASAudioUnitParameter *parameter in parametersInScope.allValues) {
+            NSDictionary *elementValues = parameter.values;
+            for (NSNumber *elementKey in elementValues) {
+                AudioUnitElement element = elementKey.uint32Value;
+                [_audioUnit setParameter:parameter.parameterID
+                                   value:[parameter valueForElement:element]
+                                   scope:scope
+                                 element:element];
+            }
+        }
     }
+
+    // todo yaso inputとoutputも実装する
 }
 
 - (void)updateConnections
@@ -202,9 +211,9 @@
 
 - (void)setGlobalParameter:(AudioUnitParameterID)parameterID value:(Float32)value
 {
-    YASAudioUnitParameter *info = _globalParameterInfos[@(parameterID)];
-    info.value = value;
-
+    NSDictionary *globalParameters = _parameters[@(kAudioUnitScope_Global)];
+    YASAudioUnitParameter *parameter = globalParameters[@(parameterID)];
+    [parameter setValue:value forElement:0];
     [_audioUnit setParameter:parameterID value:value scope:kAudioUnitScope_Global element:0];
 }
 
@@ -215,9 +224,9 @@
 
 - (void)setInputParameter:(AudioUnitParameterID)parameterID value:(Float32)value element:(AudioUnitElement)element
 {
-    YASAudioUnitParameter *info = _inputParameterInfos[@(parameterID)];
-    info.value = value;
-
+    NSDictionary *inputParameters = _parameters[@(kAudioUnitScope_Input)];
+    YASAudioUnitParameter *parameter = inputParameters[@(parameterID)];
+    [parameter setValue:value forElement:element];
     [_audioUnit setParameter:parameterID value:value scope:kAudioUnitScope_Input element:element];
 }
 
@@ -228,9 +237,9 @@
 
 - (void)setOutputParameter:(AudioUnitParameterID)parameterID value:(Float32)value element:(AudioUnitElement)element
 {
-    YASAudioUnitParameter *info = _outputParameterInfos[@(parameterID)];
-    info.value = value;
-
+    NSDictionary *outputParameters = _parameters[@(kAudioUnitScope_Output)];
+    YASAudioUnitParameter *parameter = outputParameters[@(parameterID)];
+    [parameter setValue:value forElement:element];
     [_audioUnit setParameter:parameterID value:value scope:kAudioUnitScope_Output element:element];
 }
 

@@ -37,12 +37,12 @@
     YASAudioUnitNode *delayNode =
         [[YASAudioUnitNode alloc] initWithType:kAudioUnitType_Effect subType:kAudioUnitSubType_Delay];
 
-    NSDictionary *parameterInfos = delayNode.globalParameterInfos;
-    XCTAssertEqual(parameterInfos.count, 4);
+    NSDictionary *parameters = delayNode.parameters[@(kAudioUnitScope_Global)];
+    XCTAssertEqual(parameters.count, 4);
 
-    for (NSNumber *key in parameterInfos) {
-        YASAudioUnitParameter *info = parameterInfos[key];
-        XCTAssertEqual(info.defaultValue, [delayNode globalParameterValue:info.parameterID]);
+    for (NSNumber *key in parameters) {
+        YASAudioUnitParameter *parameter = parameters[key];
+        XCTAssertEqual(parameter.defaultValue, [delayNode globalParameterValue:parameter.parameterID]);
     }
 
     YASAudioConnection *connection = [engine connectFromNode:delayNode toNode:outputNode format:format];

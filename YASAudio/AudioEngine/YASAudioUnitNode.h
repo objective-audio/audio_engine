@@ -10,9 +10,7 @@
 @interface YASAudioUnitNode : YASAudioNode
 
 @property (atomic, strong) YASAudioUnit *audioUnit;
-@property (nonatomic, strong, readonly) NSDictionary *globalParameterInfos;
-@property (nonatomic, strong, readonly) NSDictionary *inputParameterInfos;
-@property (nonatomic, strong, readonly) NSDictionary *outputParameterInfos;
+@property (nonatomic, strong, readonly) NSDictionary *parameters;
 @property (nonatomic, assign, readonly) NSUInteger inputElementCount;
 @property (nonatomic, assign, readonly) NSUInteger outputElementCount;
 
