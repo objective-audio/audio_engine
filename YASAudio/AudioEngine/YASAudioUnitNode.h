@@ -11,8 +11,8 @@
 
 @property (atomic, strong) YASAudioUnit *audioUnit;
 @property (nonatomic, strong, readonly) NSDictionary *parameters;
-@property (nonatomic, assign, readonly) NSUInteger inputElementCount;
-@property (nonatomic, assign, readonly) NSUInteger outputElementCount;
+@property (nonatomic, assign, readonly) UInt32 inputElementCount;
+@property (nonatomic, assign, readonly) UInt32 outputElementCount;
 
 - (instancetype)initWithAudioComponentDescription:(const AudioComponentDescription *)acd NS_DESIGNATED_INITIALIZER;
 - (instancetype)initWithType:(const OSType)type subType:(const OSType)subType;

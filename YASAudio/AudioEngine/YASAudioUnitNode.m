@@ -118,8 +118,6 @@
             }
         }
     }
-
-    // todo yaso inputとoutputも実装する
 }
 
 - (void)updateConnections
@@ -199,12 +197,22 @@
     return 1;
 }
 
-- (NSUInteger)inputElementCount
+- (void)setInputElementCount:(const UInt32)inputElementCount
+{
+    [_audioUnit setElementCount:inputElementCount scope:kAudioUnitScope_Input];
+}
+
+- (UInt32)inputElementCount
 {
     return [_audioUnit elementCountForScope:kAudioUnitScope_Input];
 }
 
-- (NSUInteger)outputElementCount
+- (void)setOutputElementCount:(const UInt32)outputElementCount
+{
+    [_audioUnit setElementCount:outputElementCount scope:kAudioUnitScope_Output];
+}
+
+- (UInt32)outputElementCount
 {
     return [_audioUnit elementCountForScope:kAudioUnitScope_Output];
 }
@@ -224,6 +232,13 @@
 
 - (void)setInputParameter:(AudioUnitParameterID)parameterID value:(Float32)value element:(AudioUnitElement)element
 {
+    UInt32 elementCount = [_audioUnit elementCountForScope:kAudioUnitScope_Input];
+    if (element >= elementCount) {
+        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Overflow element. (element=%@, count=%@)",
+                                                       __PRETTY_FUNCTION__, @(element), @(elementCount)]));
+        return;
+    }
+
     NSDictionary *inputParameters = _parameters[@(kAudioUnitScope_Input)];
     YASAudioUnitParameter *parameter = inputParameters[@(parameterID)];
     [parameter setValue:value forElement:element];
@@ -232,11 +247,25 @@
 
 - (Float32)inputParameterValue:(AudioUnitParameterID)parameterID element:(AudioUnitElement)element
 {
+    UInt32 elementCount = [_audioUnit elementCountForScope:kAudioUnitScope_Input];
+    if (element >= elementCount) {
+        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Overflow element. (element=%@, count=%@)",
+                                                       __PRETTY_FUNCTION__, @(element), @(elementCount)]));
+        return 0;
+    }
+
     return [_audioUnit getParameter:parameterID scope:kAudioUnitScope_Input element:element];
 }
 
 - (void)setOutputParameter:(AudioUnitParameterID)parameterID value:(Float32)value element:(AudioUnitElement)element
 {
+    UInt32 elementCount = [_audioUnit elementCountForScope:kAudioUnitScope_Input];
+    if (element >= elementCount) {
+        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Overflow element. (element=%@, count=%@)",
+                                                       __PRETTY_FUNCTION__, @(element), @(elementCount)]));
+        return;
+    }
+
     NSDictionary *outputParameters = _parameters[@(kAudioUnitScope_Output)];
     YASAudioUnitParameter *parameter = outputParameters[@(parameterID)];
     [parameter setValue:value forElement:element];
@@ -245,6 +274,13 @@
 
 - (Float32)outputParameterValue:(AudioUnitParameterID)parameterID element:(AudioUnitElement)element
 {
+    UInt32 elementCount = [_audioUnit elementCountForScope:kAudioUnitScope_Input];
+    if (element >= elementCount) {
+        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Overflow element. (element=%@, count=%@)",
+                                                       __PRETTY_FUNCTION__, @(element), @(elementCount)]));
+        return 0;
+    }
+
     return [_audioUnit getParameter:parameterID scope:kAudioUnitScope_Output element:element];
 }
 
