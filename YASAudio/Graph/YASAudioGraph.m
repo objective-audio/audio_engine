@@ -147,7 +147,7 @@ static BOOL _interrupting = NO;
 + (void)audioUnitRender:(YASAudioUnitRenderParameters *)renderParameters
 {
     YASRaiseIfMainThread;
-    
+
     YASAudioGraph *graph = [YASAudioGraph _graphForKey:@(renderParameters->renderID.graph)];
     if (graph) {
         YASAudioUnit *unit = [graph _unitForKey:@(renderParameters->renderID.unit)];
@@ -189,9 +189,12 @@ static BOOL _interrupting = NO;
 
 - (void)dealloc
 {
-    [self _stopAllIOs];
-    [YASAudioGraph _removeGraph:self];
-    [self removeAllUnits];
+    @autoreleasepool
+    {
+        [self _stopAllIOs];
+        [YASAudioGraph _removeGraph:self];
+        [self removeAllUnits];
+    }
 
     YASRelease(_key);
     YASRelease(_units);

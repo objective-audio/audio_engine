@@ -47,12 +47,15 @@
 
 - (void)dealloc
 {
-    YASAudioNode *destinationNode = [self.destinationNodeContainer retainedObject];
-    YASAudioNode *sourceNode = [self.sourceNodeContainer retainedObject];
-    [destinationNode removeConnection:self];
-    [sourceNode removeConnection:self];
-    YASRelease(destinationNode);
-    YASRelease(sourceNode);
+    @autoreleasepool
+    {
+        YASAudioNode *destinationNode = [self.destinationNodeContainer retainedObject];
+        YASAudioNode *sourceNode = [self.sourceNodeContainer retainedObject];
+        [destinationNode removeConnection:self];
+        [sourceNode removeConnection:self];
+        YASRelease(destinationNode);
+        YASRelease(sourceNode);
+    }
 
     YASRelease(_sourceNodeContainer);
     YASRelease(_destinationNodeContainer);
