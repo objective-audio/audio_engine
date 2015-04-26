@@ -46,9 +46,12 @@
 - (void)dealloc
 {
     if (_weakContainer) {
-        _weakContainer.object = nil;
-        YASRelease(_weakContainer);
-        _weakContainer = nil;
+        @autoreleasepool
+        {
+            _weakContainer.object = nil;
+            YASRelease(_weakContainer);
+            _weakContainer = nil;
+        }
     }
 
     YASSuperDealloc;

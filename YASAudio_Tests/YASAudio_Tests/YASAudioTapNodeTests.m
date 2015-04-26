@@ -31,8 +31,8 @@
     YASAudioTapNode *fromNode = [[YASAudioTapNode alloc] init];
     YASAudioFormat *format = [[YASAudioFormat alloc] initStandardFormatWithSampleRate:48000 channels:2];
 
-    [engine connectFromNode:toNode toNode:outputNode format:format];
-    [engine connectFromNode:fromNode toNode:toNode format:format];
+    YASAudioConnection *toConnection = [engine connectFromNode:toNode toNode:outputNode format:format];
+    YASAudioConnection *fromConnection = [engine connectFromNode:fromNode toNode:toNode format:format];
 
     XCTestExpectation *toExpectation = [self expectationWithDescription:@"To Node"];
     XCTestExpectation *fromExpectation = [self expectationWithDescription:@"From Node"];
@@ -43,9 +43,11 @@
         YASAudioTapNode *node = toNodeContainer.retainedObject;
 
         XCTAssertEqual([node outputConnectionsOnRender].count, 1);
+        XCTAssertEqualObjects(toConnection, [node outputConnectionOnRenderForBus:@0]);
         XCTAssertNil([node outputConnectionOnRenderForBus:@1]);
 
         XCTAssertEqual([node inputConnectionsOnRender].count, 1);
+        XCTAssertEqualObjects(fromConnection, [node inputConnectionOnRenderForBus:@0]);
         XCTAssertNil([node inputConnectionOnRenderForBus:@1]);
 
         [node renderSourceNodeWithData:data bus:@0 when:when];

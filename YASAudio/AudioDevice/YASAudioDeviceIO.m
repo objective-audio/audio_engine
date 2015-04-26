@@ -80,7 +80,10 @@ static UInt32 YASAudioDeviceIOFrameCapacity = 4096;
 
 - (void)dealloc
 {
-    [self uninitialize];
+    @autoreleasepool
+    {
+        [self uninitialize];
+    }
 
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 
@@ -130,9 +133,8 @@ static UInt32 YASAudioDeviceIOFrameCapacity = 4096;
                 const UInt32 inputFrameLength = inputData.frameLength;
                 if (inputFrameLength > 0) {
                     deviceIO.inputData = inputData;
-                    YASAudioTime *inputTime =
-                        [[YASAudioTime alloc] initWithAudioTimeStamp:inInputTime
-                                                          sampleRate:inputData.format.sampleRate];
+                    YASAudioTime *inputTime = [[YASAudioTime alloc] initWithAudioTimeStamp:inInputTime
+                                                                                sampleRate:inputData.format.sampleRate];
                     deviceIO.inputTime = inputTime;
                     YASRelease(inputTime);
                 }
@@ -141,8 +143,8 @@ static UInt32 YASAudioDeviceIOFrameCapacity = 4096;
                 if (renderCallbackBlock) {
                     YASAudioData *outputData = core.outputData;
                     if (outputData) {
-                        const UInt32 frameLength = YASAudioGetFrameLengthFromAudioBufferList(
-                            outOutputData, outputData.format.sampleByteCount);
+                        const UInt32 frameLength =
+                            YASAudioGetFrameLengthFromAudioBufferList(outOutputData, outputData.format.sampleByteCount);
                         if (frameLength > 0) {
                             outputData.frameLength = frameLength;
                             YASAudioTime *time =
