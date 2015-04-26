@@ -234,8 +234,8 @@
 {
     UInt32 elementCount = [_audioUnit elementCountForScope:kAudioUnitScope_Input];
     if (element >= elementCount) {
-        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Overflow element. (element=%@, count=%@)",
-                                                       __PRETTY_FUNCTION__, @(element), @(elementCount)]));
+        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Out of range. element(%@) count(%@)", __PRETTY_FUNCTION__,
+                                                       @(element), @(elementCount)]));
         return;
     }
 
@@ -249,7 +249,7 @@
 {
     UInt32 elementCount = [_audioUnit elementCountForScope:kAudioUnitScope_Input];
     if (element >= elementCount) {
-        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Overflow element. (element=%@, count=%@)",
+        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Out of range. element(%@) count=(%@)",
                                                        __PRETTY_FUNCTION__, @(element), @(elementCount)]));
         return 0;
     }
@@ -261,8 +261,8 @@
 {
     UInt32 elementCount = [_audioUnit elementCountForScope:kAudioUnitScope_Input];
     if (element >= elementCount) {
-        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Overflow element. (element=%@, count=%@)",
-                                                       __PRETTY_FUNCTION__, @(element), @(elementCount)]));
+        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Out of range. element(%@) count(%@)", __PRETTY_FUNCTION__,
+                                                       @(element), @(elementCount)]));
         return;
     }
 
@@ -276,8 +276,8 @@
 {
     UInt32 elementCount = [_audioUnit elementCountForScope:kAudioUnitScope_Input];
     if (element >= elementCount) {
-        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Overflow element. (element=%@, count=%@)",
-                                                       __PRETTY_FUNCTION__, @(element), @(elementCount)]));
+        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Out of range. element(%@) count(%@)", __PRETTY_FUNCTION__,
+                                                       @(element), @(elementCount)]));
         return 0;
     }
 
