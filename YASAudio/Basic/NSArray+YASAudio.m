@@ -54,7 +54,7 @@
     NSNumber *result = nil;
 
     if (self.count >= length) {
-        YASLog(@"%s - Overflow. count(%@) length(%@)", __PRETTY_FUNCTION__, @(self.count), @(length));
+        YASLog(@"%s - Out of range. count(%@) length(%@)", __PRETTY_FUNCTION__, @(self.count), @(length));
         return nil;
     }
 

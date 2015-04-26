@@ -61,7 +61,8 @@
 - (void)setPosition:(const NSUInteger)index
 {
     if (index >= _length) {
-        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Overflow index.", __PRETTY_FUNCTION__]));
+        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Out of range. position(%@) length(%@)",
+                                                       __PRETTY_FUNCTION__, @(index), @(_length)]));
         return;
     }
     _index = index;
@@ -164,7 +165,8 @@
 - (void)setFramePosition:(const NSUInteger)frame
 {
     if (frame >= _frameLength) {
-        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Overflow frame.", __PRETTY_FUNCTION__]));
+        YASRaiseWithReason(
+            ([NSString stringWithFormat:@"%s - Out of range. frame(%@)", __PRETTY_FUNCTION__, @(frame)]));
         return;
     }
 
@@ -184,7 +186,8 @@
 - (void)setChannelPosition:(const NSUInteger)channel
 {
     if (channel >= _channelCount) {
-        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Overflow channel.", __PRETTY_FUNCTION__]));
+        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Out of range. channel(%@) count(%@)", __PRETTY_FUNCTION__,
+                                                       @(channel), @(_channelCount)]));
         return;
     }
 
