@@ -19,5 +19,9 @@ extern UInt32 TestValue(UInt32 frame, UInt32 channel, UInt32 buffer);
 + (YASAudioMutablePointer)mutablePointerWithData:(YASAudioData *)data channel:(UInt32)channel frame:(UInt32)frame;
 + (BOOL)compareDataFlexiblyWithData:(YASAudioData *)data1 otherData:(YASAudioData *)data2;
 + (BOOL)isFilledData:(YASAudioData *)data;
-
++ (void)audioUnitRenderOnSubThreadWithAudioUnit:(YASAudioUnit *)audioUnit
+                                         format:(YASAudioFormat *)format
+                                    frameLength:(const UInt32)frameLength
+                                          count:(const NSUInteger)count
+                                           wait:(const NSTimeInterval)wait;
 @end
