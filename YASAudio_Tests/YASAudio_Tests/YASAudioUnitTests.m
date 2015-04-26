@@ -4,7 +4,7 @@
 //
 
 #import <XCTest/XCTest.h>
-#import "YASAudio.h"
+#import "YASAudioTestUtils.h"
 
 @interface YASAudioUnit ()
 
@@ -98,7 +98,11 @@
         }
     };
 
-    [self audioUnitRenderOnSubThreadWithAudioUnit:converterUnit format:outputFormat frameLength:frameLength wait:0];
+    [YASAudioTestUtils audioUnitRenderOnSubThreadWithAudioUnit:converterUnit
+                                                        format:outputFormat
+                                                   frameLength:frameLength
+                                                         count:1
+                                                          wait:0];
 
     [self waitForExpectationsWithTimeout:0.5
                                  handler:^(NSError *error){
@@ -158,7 +162,11 @@
         }
     };
 
-    [self audioUnitRenderOnSubThreadWithAudioUnit:converterUnit format:format frameLength:frameLength wait:0];
+    [YASAudioTestUtils audioUnitRenderOnSubThreadWithAudioUnit:converterUnit
+                                                        format:format
+                                                   frameLength:frameLength
+                                                         count:1
+                                                          wait:0];
 
     [self waitForExpectationsWithTimeout:0.5
                                  handler:^(NSError *error){
@@ -179,7 +187,11 @@
         isRenderNotifyCallback = YES;
     };
 
-    [self audioUnitRenderOnSubThreadWithAudioUnit:converterUnit format:format frameLength:frameLength wait:0.2];
+    [YASAudioTestUtils audioUnitRenderOnSubThreadWithAudioUnit:converterUnit
+                                                        format:format
+                                                   frameLength:frameLength
+                                                         count:1
+                                                          wait:0.2];
 
     XCTAssertFalse(isRenderCallback);
     XCTAssertFalse(isRenderNotifyCallback);
@@ -258,43 +270,6 @@
     XCTAssertEqualObjects(setData, getData);
 
     YASRelease(converterUnit);
-}
-
-- (void)testException
-{
-}
-
-#pragma mark -
-
-- (void)audioUnitRenderOnSubThreadWithAudioUnit:(YASAudioUnit *)audioUnit
-                                         format:(YASAudioFormat *)format
-                                    frameLength:(UInt32)frameLength
-                                           wait:(NSTimeInterval)wait
-{
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        AudioUnitRenderActionFlags actionFlags = 0;
-        YASAudioTime *audioTime = [YASAudioTime timeWithSampleTime:0 atRate:format.sampleRate];
-        AudioTimeStamp timeStamp = audioTime.audioTimeStamp;
-
-        YASAudioData *data = [[YASAudioData alloc] initWithFormat:format frameCapacity:frameLength];
-
-        YASAudioUnitRenderParameters parameters = {
-            .inRenderType = YASAudioUnitRenderTypeNormal,
-            .ioActionFlags = &actionFlags,
-            .ioTimeStamp = &timeStamp,
-            .inBusNumber = 0,
-            .inNumberFrames = frameLength,
-            .ioData = data.mutableAudioBufferList,
-        };
-
-        [audioUnit audioUnitRender:&parameters];
-
-        YASRelease(data);
-    });
-
-    if (wait > 0) {
-        [NSThread sleepForTimeInterval:wait];
-    }
 }
 
 @end

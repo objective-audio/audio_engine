@@ -129,4 +129,38 @@ UInt32 TestValue(UInt32 frame, UInt32 channel, UInt32 buffer)
     return isFilled;
 }
 
++ (void)audioUnitRenderOnSubThreadWithAudioUnit:(YASAudioUnit *)audioUnit
+                                         format:(YASAudioFormat *)format
+                                    frameLength:(const UInt32)frameLength
+                                          count:(const NSUInteger)count
+                                           wait:(const NSTimeInterval)wait
+{
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        AudioUnitRenderActionFlags actionFlags = 0;
+        YASAudioData *data = [[YASAudioData alloc] initWithFormat:format frameCapacity:frameLength];
+
+        for (NSInteger i = 0; i < count; i++) {
+            YASAudioTime *audioTime = [YASAudioTime timeWithSampleTime:frameLength * i atRate:format.sampleRate];
+            AudioTimeStamp timeStamp = audioTime.audioTimeStamp;
+
+            YASAudioUnitRenderParameters parameters = {
+                .inRenderType = YASAudioUnitRenderTypeNormal,
+                .ioActionFlags = &actionFlags,
+                .ioTimeStamp = &timeStamp,
+                .inBusNumber = 0,
+                .inNumberFrames = frameLength,
+                .ioData = data.mutableAudioBufferList,
+            };
+
+            [audioUnit audioUnitRender:&parameters];
+        }
+
+        YASRelease(data);
+    });
+
+    if (wait > 0) {
+        [NSThread sleepForTimeInterval:wait];
+    }
+}
+
 @end
