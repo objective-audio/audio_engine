@@ -4,7 +4,6 @@
 //
 
 #include "YASAudioUtility.h"
-#include <string.h>
 #include <Accelerate/Accelerate.h>
 
 void YASAudioRemoveAudioBufferList(AudioBufferList *ioAbl)
