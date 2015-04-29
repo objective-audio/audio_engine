@@ -22,7 +22,7 @@
 - (instancetype)init NS_UNAVAILABLE;
 - (instancetype)initWithStreamDescription:(const AudioStreamBasicDescription *)asbd;
 - (instancetype)initStandardFormatWithSampleRate:(double)sampleRate channels:(UInt32)channels;
-- (instancetype)initWithBitDepthFormat:(YASAudioBitDepthFormat)format
+- (instancetype)initWithBitDepthFormat:(YASAudioBitDepthFormat)bitDepthFormat
                             sampleRate:(double)sampleRate
                               channels:(UInt32)channels
                            interleaved:(BOOL)interleaved;

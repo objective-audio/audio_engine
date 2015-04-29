@@ -70,7 +70,8 @@
 - (void)addAudioUnitToGraph:(YASAudioGraph *)graph
 {
     if (!graph) {
-        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Argument is nil", __PRETTY_FUNCTION__]));
+        YASRaiseWithReason(
+            ([NSString stringWithFormat:@"%s - Argument is nil. graph(%@)", __PRETTY_FUNCTION__, graph]));
         return;
     }
 
@@ -86,7 +87,6 @@
 - (void)removeAudioUnitFromGraph
 {
     if (!_graphContainer) {
-        YASLog(@"%s - AudioGraph is already released.", __PRETTY_FUNCTION__);
         return;
     }
 

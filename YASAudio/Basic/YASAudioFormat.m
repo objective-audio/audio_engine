@@ -58,13 +58,15 @@
                             interleaved:NO];
 }
 
-- (instancetype)initWithBitDepthFormat:(YASAudioBitDepthFormat)format
+- (instancetype)initWithBitDepthFormat:(YASAudioBitDepthFormat)bitDepthFormat
                             sampleRate:(double)sampleRate
                               channels:(UInt32)channels
                            interleaved:(BOOL)interleaved
 {
-    if (format == YASAudioBitDepthFormatOther || channels == 0) {
-        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Invalid argument.", __PRETTY_FUNCTION__]));
+    if (bitDepthFormat == YASAudioBitDepthFormatOther || channels == 0) {
+        YASRaiseWithReason(
+            ([NSString stringWithFormat:@"%s - Invalid argument. bitDepth(%@) channels(%@)", __PRETTY_FUNCTION__,
+                                        [NSString yas_stringWithBitDepth:bitDepthFormat], @(channels)]));
         YASRelease(self);
         return nil;
     }
@@ -75,11 +77,11 @@
 
     asbd.mFormatFlags = kAudioFormatFlagsNativeEndian | kAudioFormatFlagIsPacked;
 
-    if (format == YASAudioBitDepthFormatFloat32 || format == YASAudioBitDepthFormatFloat64) {
+    if (bitDepthFormat == YASAudioBitDepthFormatFloat32 || bitDepthFormat == YASAudioBitDepthFormatFloat64) {
         asbd.mFormatFlags |= kAudioFormatFlagIsFloat;
-    } else if (format == YASAudioBitDepthFormatInt16) {
+    } else if (bitDepthFormat == YASAudioBitDepthFormatInt16) {
         asbd.mFormatFlags |= kAudioFormatFlagIsSignedInteger;
-    } else if (format == YASAudioBitDepthFormatFixed824) {
+    } else if (bitDepthFormat == YASAudioBitDepthFormatFixed824) {
         asbd.mFormatFlags |= kAudioFormatFlagIsSignedInteger | (24 << kLinearPCMFormatFlagsSampleFractionShift);
     }
 
@@ -87,9 +89,9 @@
         asbd.mFormatFlags |= kAudioFormatFlagIsNonInterleaved;
     }
 
-    if (format == YASAudioBitDepthFormatFloat64) {
+    if (bitDepthFormat == YASAudioBitDepthFormatFloat64) {
         asbd.mBitsPerChannel = 64;
-    } else if (format == YASAudioBitDepthFormatInt16) {
+    } else if (bitDepthFormat == YASAudioBitDepthFormatInt16) {
         asbd.mBitsPerChannel = 16;
     } else {
         asbd.mBitsPerChannel = 32;

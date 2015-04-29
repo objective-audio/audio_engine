@@ -44,7 +44,8 @@ typedef NS_ENUM(NSUInteger, YASAudioDataFreeType) {
     self = [super init];
     if (self) {
         if (!format || !abl) {
-            YASRaiseWithReason(([NSString stringWithFormat:@"%s - Argument is nil", __PRETTY_FUNCTION__]));
+            YASRaiseWithReason(([NSString stringWithFormat:@"%s - Argument is nil. format(%@) audioBufferList(%p)",
+                                                           __PRETTY_FUNCTION__, format, abl]));
             YASRelease(self);
             return nil;
         }
@@ -85,13 +86,18 @@ typedef NS_ENUM(NSUInteger, YASAudioDataFreeType) {
     self = [super init];
     if (self) {
         if (!format || !data || !channelRoutes) {
-            YASRaiseWithReason(([NSString stringWithFormat:@"%s - Argument is nil.", __PRETTY_FUNCTION__]));
+            YASRaiseWithReason(
+                ([NSString stringWithFormat:@"%s - Argument is nil. format(%@) data(%@) channelRoutes(%@)",
+                                            __PRETTY_FUNCTION__, format, data, channelRoutes]));
             YASRelease(self);
             return nil;
         }
 
         if (format.channelCount != channelRoutes.count || format.isInterleaved) {
-            YASRaiseWithReason(([NSString stringWithFormat:@"%s - Invalid format.", __PRETTY_FUNCTION__]));
+            YASRaiseWithReason(([NSString
+                stringWithFormat:
+                    @"%s - Invalid format. format.channelCount(%@) channelRoute.count(%@) isInterleaved(%@)",
+                    __PRETTY_FUNCTION__, @(format.channelCount), @(channelRoutes.count), @(format.isInterleaved)]));
             YASRelease(self);
             return nil;
         }
@@ -114,7 +120,9 @@ typedef NS_ENUM(NSUInteger, YASAudioDataFreeType) {
             if (frameCapacity == 0) {
                 frameCapacity = frameLength;
             } else if (frameCapacity != frameLength) {
-                YASRaiseWithReason(([NSString stringWithFormat:@"%s - Invalid frame length.", __PRETTY_FUNCTION__]));
+                YASRaiseWithReason(
+                    ([NSString stringWithFormat:@"%s - Invalid frame length. frameCapacity(%@) frameLength(%@)",
+                                                __PRETTY_FUNCTION__, @(frameCapacity), @(frameLength)]));
             }
         }
 
@@ -170,7 +178,9 @@ typedef NS_ENUM(NSUInteger, YASAudioDataFreeType) {
 - (void)setFrameLength:(UInt32)frameLength
 {
     if (frameLength > _frameCapacity) {
-        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Frame length is over capacity.", __PRETTY_FUNCTION__]));
+        YASRaiseWithReason(
+            ([NSString stringWithFormat:@"%s - Frame length is over capacity. frameLength(%@) frameCapacity(%@)",
+                                        __PRETTY_FUNCTION__, @(frameLength), @(_frameCapacity)]));
         return;
     }
 
@@ -197,7 +207,9 @@ typedef NS_ENUM(NSUInteger, YASAudioDataFreeType) {
     YASAudioMutablePointer pointer = {NULL};
 
     if (buffer >= self.audioBufferList->mNumberBuffers) {
-        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Out of range.", __PRETTY_FUNCTION__]));
+        YASRaiseWithReason(
+            ([NSString stringWithFormat:@"%s - Out of range. buffer(%@) abl.mNumberBuffers(%@)", __PRETTY_FUNCTION__,
+                                        @(buffer), @(self.audioBufferList->mNumberBuffers)]));
     } else {
         pointer.v = self.audioBufferList->mBuffers[buffer].mData;
     }
@@ -218,13 +230,17 @@ typedef NS_ENUM(NSUInteger, YASAudioDataFreeType) {
                 pointer.u8 += channel * self.format.sampleByteCount;
             }
         } else {
-            YASRaiseWithReason(([NSString stringWithFormat:@"%s - Out of range.", __PRETTY_FUNCTION__]));
+            YASRaiseWithReason(
+                ([NSString stringWithFormat:@"%s - Out of range. channel(%@) mNumberChannels(%@)", __PRETTY_FUNCTION__,
+                                            @(channel), @(self.audioBufferList->mBuffers[0].mNumberChannels)]));
         }
     } else {
         if (channel < self.audioBufferList->mNumberBuffers) {
             pointer.v = self.audioBufferList->mBuffers[channel].mData;
         } else {
-            YASRaiseWithReason(([NSString stringWithFormat:@"%s - Out of range.", __PRETTY_FUNCTION__]));
+            YASRaiseWithReason(
+                ([NSString stringWithFormat:@"%s - Out of range. channel(%@) mNumberChannels(%@)", __PRETTY_FUNCTION__,
+                                            @(channel), @(self.audioBufferList->mBuffers[0].mNumberChannels)]));
         }
     }
 
@@ -240,9 +256,8 @@ typedef NS_ENUM(NSUInteger, YASAudioDataFreeType) {
 - (void)clearWithStartFrame:(UInt32)frame length:(UInt32)length
 {
     if ((frame + length) > self.frameLength) {
-        YASRaiseWithReason(
-            ([NSString stringWithFormat:@"%s - Out of range (frame = %@ / length = %@ / frameLength = %@).",
-                                        __PRETTY_FUNCTION__, @(frame), @(length), @(self.frameLength)]));
+        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Out of range. frame(%@) length(%@) frameLength(%@)",
+                                                       __PRETTY_FUNCTION__, @(frame), @(length), @(self.frameLength)]));
         return;
     }
 
@@ -265,7 +280,8 @@ typedef NS_ENUM(NSUInteger, YASAudioDataFreeType) {
               length:(UInt32)length
 {
     if (!fromData) {
-        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Argument is nil.", __PRETTY_FUNCTION__]));
+        YASRaiseWithReason(
+            ([NSString stringWithFormat:@"%s - Argument is nil. fromData(%@)", __PRETTY_FUNCTION__, fromData]));
         return NO;
     }
 
@@ -296,7 +312,7 @@ typedef NS_ENUM(NSUInteger, YASAudioDataFreeType) {
 - (BOOL)copyFlexiblyFromData:(YASAudioData *)data
 {
     if (!data) {
-        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Argument is null.", __PRETTY_FUNCTION__]));
+        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Argument is nil. data(%@)", __PRETTY_FUNCTION__, data]));
         return NO;
     }
 
@@ -313,7 +329,7 @@ typedef NS_ENUM(NSUInteger, YASAudioDataFreeType) {
 - (BOOL)copyFlexiblyFromAudioBufferList:(const AudioBufferList *)fromAbl
 {
     if (!fromAbl) {
-        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Argument is null.", __PRETTY_FUNCTION__]));
+        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Argument is nil. fromAbl(%p)", __PRETTY_FUNCTION__, fromAbl]));
         return NO;
     }
 
@@ -336,7 +352,7 @@ typedef NS_ENUM(NSUInteger, YASAudioDataFreeType) {
 - (BOOL)copyFlexiblyToAudioBufferList:(AudioBufferList *)toAbl
 {
     if (!toAbl) {
-        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Argument is null.", __PRETTY_FUNCTION__]));
+        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Argument is nil. toAbl(%p)", __PRETTY_FUNCTION__, toAbl]));
         return NO;
     }
 

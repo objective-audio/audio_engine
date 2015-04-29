@@ -15,6 +15,7 @@
 #import "YASMacros.h"
 #import "NSException+YASAudio.h"
 #import "NSNumber+YASAudio.h"
+#import "NSString+YASAudio.h"
 #import <AVFoundation/AVFoundation.h>
 
 #if !TARGET_OS_IPHONE & TARGET_OS_MAC
@@ -128,7 +129,8 @@
         channelCount = audioSession.outputNumberOfChannels;
         portDescriptions = routeDesc.outputs;
     } else {
-        YASRaiseWithReason(([NSString stringWithFormat:@"%s Out of scope.", __PRETTY_FUNCTION__]));
+        YASRaiseWithReason(([NSString stringWithFormat:@"%s Out of scope. scope(%@)", __PRETTY_FUNCTION__,
+                                                       [NSString yas_stringWithAudioUnitScope:scope]]));
         return nil;
     }
 
@@ -168,7 +170,8 @@
 - (void)setDevice:(YASAudioDevice *)device
 {
     if (!device) {
-        YASRaiseWithReason(([NSString stringWithFormat:@"%s Argument is nil.", __PRETTY_FUNCTION__]));
+        YASRaiseWithReason(
+            ([NSString stringWithFormat:@"%s Argument is nil. device(%@)", __PRETTY_FUNCTION__, device]));
     }
 
     self.audioUnit.currentDevice = device.audioDeviceID;
