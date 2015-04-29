@@ -66,7 +66,7 @@
     if (bitDepthFormat == YASAudioBitDepthFormatOther || channels == 0) {
         YASRaiseWithReason(
             ([NSString stringWithFormat:@"%s - Invalid argument. bitDepth(%@) channels(%@)", __PRETTY_FUNCTION__,
-                                        [NSString yas_stringWithBitDepth:bitDepthFormat], @(channels)]));
+                                        [NSString yas_stringWithBitDepthFormat:bitDepthFormat], @(channels)]));
         YASRelease(self);
         return nil;
     }
@@ -177,7 +177,7 @@
 {
     NSMutableString *result = [NSMutableString stringWithFormat:@"<%@: %p>\n", self.class, self];
     NSDictionary *asbdDict = @{
-        @"bitDepthFormat": [self _bitDepthFormatString],
+        @"bitDepthFormat": [NSString yas_stringWithBitDepthFormat:_bitDepthFormat],
         @"sampleRate": @(_asbd.mSampleRate),
         @"bitsPerChannel": @(_asbd.mBitsPerChannel),
         @"bytesPerFrame": @(_asbd.mBytesPerFrame),
@@ -188,21 +188,6 @@
         @"framesPerPacket": @(_asbd.mFramesPerPacket)
     };
     [result appendString:asbdDict.description];
-    return result;
-}
-
-- (NSString *)_bitDepthFormatString
-{
-    NSDictionary *bitDepthFormats = @{
-        @(YASAudioBitDepthFormatFloat32): @"YASAudioBitDepthFormatFloat32",
-        @(YASAudioBitDepthFormatFloat64): @"YASAudioBitDepthFormatFloat64",
-        @(YASAudioBitDepthFormatInt16): @"YASAudioBitDepthFormatInt16",
-        @(YASAudioBitDepthFormatFixed824): @"YASAudioBitDepthFormatFixed824"
-    };
-    NSString *result = bitDepthFormats[@(_bitDepthFormat)];
-    if (!result) {
-        result = @"Unknown";
-    }
     return result;
 }
 

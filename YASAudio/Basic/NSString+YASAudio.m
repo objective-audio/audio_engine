@@ -131,9 +131,9 @@
     return nil;
 }
 
-+ (NSString *)yas_stringWithBitDepth:(YASAudioBitDepthFormat)bitDepth
++ (NSString *)yas_stringWithBitDepthFormat:(YASAudioBitDepthFormat)bitDepthFormat
 {
-    switch (bitDepth) {
+    switch (bitDepthFormat) {
         case YASAudioBitDepthFormatFloat32:
             return @"Float32";
         case YASAudioBitDepthFormatFloat64:
