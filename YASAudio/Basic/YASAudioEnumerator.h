@@ -1,5 +1,5 @@
 //
-//  YASAudioScanner.h
+//  YASAudioEnumerator.h
 //  Copyright (c) 2015 Yuki Yasoshima.
 //
 
@@ -8,7 +8,7 @@
 
 @class YASAudioData;
 
-@interface YASAudioScanner : NSObject {
+@interface YASAudioEnumerator : NSObject {
    @public
     YASAudioMutablePointer _pointer;
     YASAudioMutablePointer _topPointer;
@@ -33,13 +33,13 @@
 
 @end
 
-@interface YASAudioMutableScanner : YASAudioScanner
+@interface YASAudioMutableEnumerator : YASAudioEnumerator
 
 @property (nonatomic, assign, readonly) const YASAudioMutablePointer *mutablePointer;
 
 @end
 
-@interface YASAudioFrameScanner : NSObject {
+@interface YASAudioFrameEnumerator : NSObject {
    @public
     YASAudioMutablePointer _pointer;
     YASAudioMutablePointer *_pointers;
@@ -72,28 +72,28 @@
 
 @end
 
-@interface YASAudioMutableFrameScanner : YASAudioFrameScanner
+@interface YASAudioMutableFrameEnumerator : YASAudioFrameEnumerator
 
 @property (nonatomic, assign, readonly) const YASAudioMutablePointer *mutablePointer;
 
 @end
 
-#define YASAudioScannerMove(__v)             \
+#define YASAudioEnumeratorMove(__v)          \
     if (++(__v)->_index >= (__v)->_length) { \
         (__v)->_pointer.v = NULL;            \
     } else {                                 \
         (__v)->_pointer.v += (__v)->_stride; \
     }
 
-#define YASAudioScannerStop(__v) \
-    (__v)->_pointer.v = NULL;    \
+#define YASAudioEnumeratorStop(__v) \
+    (__v)->_pointer.v = NULL;       \
     (__v)->_index = (__v)->_length;
 
-#define YASAudioScannerReset(__v) \
-    (__v)->_index = 0;            \
+#define YASAudioEnumeratorReset(__v) \
+    (__v)->_index = 0;               \
     (__v)->_pointer.v = (__v)->_topPointer.v;
 
-#define YASAudioFrameScannerMoveFrame(__v)                           \
+#define YASAudioFrameEnumeratorMoveFrame(__v)                        \
     if (++(__v)->_frame >= (__v)->_frameLength) {                    \
         memset((__v)->_pointers, 0, (__v)->_pointersSize);           \
         (__v)->_pointer.v = NULL;                                    \
@@ -110,25 +110,25 @@
         }                                                            \
     }
 
-#define YASAudioFrameScannerMoveChannel(__v)                     \
+#define YASAudioFrameEnumeratorMoveChannel(__v)                  \
     if (++(__v)->_channel >= (__v)->_channelCount) {             \
         (__v)->_pointer.v = NULL;                                \
     } else {                                                     \
         (__v)->_pointer.v = (__v)->_pointers[(__v)->_channel].v; \
     }
 
-#define YASAudioFrameScannerMove(__v)       \
-    YASAudioFrameScannerMoveChannel(__v);   \
-    if (!(__v)->_pointer.v) {               \
-        YASAudioFrameScannerMoveFrame(__v); \
+#define YASAudioFrameEnumeratorMove(__v)       \
+    YASAudioFrameEnumeratorMoveChannel(__v);   \
+    if (!(__v)->_pointer.v) {                  \
+        YASAudioFrameEnumeratorMoveFrame(__v); \
     }
 
-#define YASAudioFrameScannerStop(__v)    \
+#define YASAudioFrameEnumeratorStop(__v) \
     (__v)->_pointer.v = NULL;            \
     (__v)->_frame = (__v)->_frameLength; \
     (__v)->_channel = (__v)->_channelCount;
 
-#define YASAudioFrameScannerReset(__v)                                                                      \
+#define YASAudioFrameEnumeratorReset(__v)                                                                   \
     (__v)->_frame = 0;                                                                                      \
     (__v)->_channel = 0;                                                                                    \
     memcpy((__v)->_pointers, (__v)->_topPointers, (__v)->_channelCount * sizeof(YASAudioMutablePointer *)); \
