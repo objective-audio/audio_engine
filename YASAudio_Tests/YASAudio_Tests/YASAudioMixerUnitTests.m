@@ -5,7 +5,6 @@
 
 #import <XCTest/XCTest.h>
 #import "YASAudioTestUtils.h"
-#import "YASAudioUnit+Internal.h"
 
 @interface YASAudioMixerUnitTests : XCTestCase
 
@@ -71,9 +70,9 @@
                                                 interleaved:NO];
 
     XCTAssertNoThrow([mixerUnit setOutputFormat:format.streamDescription busNumber:0]);
-    
+
     XCTAssertNoThrow([mixerUnit initialize]);
-    
+
     XCTAssertNoThrow([mixerUnit setInputFormat:format.streamDescription busNumber:0]);
 
     memset(&asbd, 0, sizeof(AudioStreamBasicDescription));
@@ -83,7 +82,7 @@
     memset(&asbd, 0, sizeof(AudioStreamBasicDescription));
     XCTAssertNoThrow([mixerUnit getInputFormat:&asbd busNumber:0]);
     XCTAssertTrue(YASAudioIsEqualASBD(format.streamDescription, &asbd));
-    
+
     XCTAssertNoThrow([mixerUnit uninitialize]);
 
     YASRelease(format);
