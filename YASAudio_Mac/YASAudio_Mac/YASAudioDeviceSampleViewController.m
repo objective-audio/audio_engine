@@ -142,8 +142,6 @@ static const UInt32 kSineDataMaxCount = 4096;
         YASRelease(deviceIO);
     };
 
-    audioGraph.running = YES;
-
     [self updateDeviceNames];
 
     YASAudioDevice *defaultDevice = [YASAudioDevice defaultOutputDevice];
@@ -158,6 +156,20 @@ static const UInt32 kSineDataMaxCount = 4096;
                                              selector:@selector(audioDeviceDidChange:)
                                                  name:YASAudioDeviceDidChangeNotification
                                                object:nil];
+}
+
+- (void)viewDidAppear
+{
+    [super viewDidAppear];
+
+    self.audioGraph.running = YES;
+}
+
+- (void)viewWillDisappear
+{
+    [super viewWillDisappear];
+
+    self.audioGraph.running = NO;
 }
 
 - (void)dealloc

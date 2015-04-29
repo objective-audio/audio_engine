@@ -213,7 +213,7 @@ static NSString *YASFileTypeFromAudioFileTypeID(AudioFileTypeID fileTypeID)
 
 - (void)dealloc
 {
-    [self _close];
+    [self close];
 
     YASRelease(_url);
     YASRelease(_fileFormat);
@@ -286,7 +286,7 @@ static NSString *YASFileTypeFromAudioFileTypeID(AudioFileTypeID fileTypeID)
 
     AudioStreamBasicDescription asbd;
     if (!YASGetExtAudioFileFormat(&asbd, _extAudioFile)) {
-        [self _close];
+        [self close];
         return NO;
     }
 
@@ -294,7 +294,7 @@ static NSString *YASFileTypeFromAudioFileTypeID(AudioFileTypeID fileTypeID)
     AudioFileTypeID audioFileTypeID = YASGetAudioFileType(audioFileID);
     self.fileType = YASFileTypeFromAudioFileTypeID(audioFileTypeID);
     if (!_fileType) {
-        [self _close];
+        [self close];
         return NO;
     }
 
@@ -310,7 +310,7 @@ static NSString *YASFileTypeFromAudioFileTypeID(AudioFileTypeID fileTypeID)
     YASRelease(processingFormat);
 
     if (!YASSetClientFormat(_processingFormat.streamDescription, _extAudioFile)) {
-        [self _close];
+        [self close];
         return NO;
     }
 
@@ -343,17 +343,19 @@ static NSString *YASFileTypeFromAudioFileTypeID(AudioFileTypeID fileTypeID)
     YASRelease(processingFormat);
 
     if (!YASSetClientFormat(_processingFormat.streamDescription, _extAudioFile)) {
-        [self _close];
+        [self close];
         return NO;
     }
 
     return YES;
 }
 
-- (void)_close
+- (void)close
 {
-    YASDisposeExtAudioFile(_extAudioFile);
-    _extAudioFile = NULL;
+    if (_extAudioFile) {
+        YASDisposeExtAudioFile(_extAudioFile);
+        _extAudioFile = NULL;
+    }
 }
 
 #pragma mark - Tests
