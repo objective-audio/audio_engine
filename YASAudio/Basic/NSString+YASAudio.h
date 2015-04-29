@@ -5,6 +5,7 @@
 
 #import <Foundation/Foundation.h>
 #import <AudioToolbox/AudioToolbox.h>
+#import "YASAudioTypes.h"
 
 @interface NSString (YASAudio)
 
@@ -13,6 +14,7 @@
 
 + (NSString *)yas_stringWithAudioUnitScope:(AudioUnitScope)scope;
 + (NSString *)yas_stringWithAudioUnitParameterUnit:(AudioUnitParameterUnit)parameterUnit;
++ (NSString *)yas_stringWithBitDepth:(YASAudioBitDepthFormat)bitDepth;
 
 - (NSString *)stringByAppendingLinePrefix:(NSString *)prefix;
 

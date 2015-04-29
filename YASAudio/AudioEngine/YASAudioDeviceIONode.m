@@ -129,7 +129,8 @@
     self = [super init];
     if (self) {
         if (!audioDevice) {
-            YASRaiseWithReason(([NSString stringWithFormat:@"%s - Argument is nil.", __PRETTY_FUNCTION__]));
+            YASRaiseWithReason(([NSString
+                stringWithFormat:@"%s - Argument is nil. audioDevice(%@)", __PRETTY_FUNCTION__, audioDevice]));
             YASRelease(self);
             return nil;
         }
@@ -173,12 +174,13 @@
 - (void)addAudioDeviceIOToGraph:(YASAudioGraph *)graph
 {
     if (!graph) {
-        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Argument is nil", __PRETTY_FUNCTION__]));
+        YASRaiseWithReason(
+            ([NSString stringWithFormat:@"%s - Argument is nil. graph(%@)", __PRETTY_FUNCTION__, graph]));
         return;
     }
 
     if (_audioDeviceIO) {
-        YASRaiseWithReason(([NSString stringWithFormat:@"%s - AudioDeviceIO is already added", __PRETTY_FUNCTION__]));
+        YASRaiseWithReason(([NSString stringWithFormat:@"%s - AudioDeviceIO is already added.", __PRETTY_FUNCTION__]));
         return;
     }
 
@@ -193,12 +195,14 @@
 - (void)removeAudioDeviceIOFromGraph
 {
     if (!_graphContainer) {
-        YASRaiseWithReason(([NSString stringWithFormat:@"%s - AudioGraph is nil", __PRETTY_FUNCTION__]));
+        YASRaiseWithReason(([NSString
+            stringWithFormat:@"%s - AudioGraph is nil. graphContainer(%@)", __PRETTY_FUNCTION__, _graphContainer]));
         return;
     }
 
     if (!_audioDeviceIO) {
-        YASRaiseWithReason(([NSString stringWithFormat:@"%s - AudioDeviceIO is removed", __PRETTY_FUNCTION__]));
+        YASRaiseWithReason(([NSString stringWithFormat:@"%s - AudioDeviceIO is removed. audioDeviceIO(%@)",
+                                                       __PRETTY_FUNCTION__, _audioDeviceIO]));
         return;
     }
 
@@ -403,7 +407,9 @@
             YASAudioFormat *format = data.format;
             YASAudioFormat *deviceFormat = audioDeviceIO.audioDevice.inputFormat;
             if (format.bitDepthFormat != deviceFormat.bitDepthFormat || format.isInterleaved) {
-                YASRaiseWithReason(([NSString stringWithFormat:@"%s - Format is not match.", __PRETTY_FUNCTION__]));
+                YASRaiseWithReason(
+                    ([NSString stringWithFormat:@"%s - Format is not match. dataFormat(%@) deviceFormat(%@)",
+                                                __PRETTY_FUNCTION__, format, deviceFormat]));
                 return;
             }
 
@@ -414,8 +420,7 @@
                     YASAudioData *inputData = [audioDeviceIO inputDataOnRender];
                     const AudioBufferList *inputAbl = inputData.audioBufferList;
                     const AudioBufferList *outputAbl = data.audioBufferList;
-                    if (inputAbl &&
-                        !YASAudioIsEqualAudioBufferListStructure(inputAbl, outputAbl)) {
+                    if (inputAbl && !YASAudioIsEqualAudioBufferListStructure(inputAbl, outputAbl)) {
                         YASAudioData *renderData = [[YASAudioData alloc] initWithFormat:format
                                                                                    data:inputData
                                                                      inputChannelRoutes:channelRoutes];

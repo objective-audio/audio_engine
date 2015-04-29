@@ -131,6 +131,23 @@
     return nil;
 }
 
++ (NSString *)yas_stringWithBitDepth:(YASAudioBitDepthFormat)bitDepth
+{
+    switch (bitDepth) {
+        case YASAudioBitDepthFormatFloat32:
+            return @"Float32";
+        case YASAudioBitDepthFormatFloat64:
+            return @"Float64";
+        case YASAudioBitDepthFormatInt16:
+            return @"Int16";
+        case YASAudioBitDepthFormatFixed824:
+            return @"Fixed8.24";
+        case YASAudioBitDepthFormatOther:
+            return @"Other";
+    }
+    return nil;
+}
+
 - (NSString *)stringByAppendingLinePrefix:(NSString *)prefix
 {
     NSArray *lines = [self componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]];

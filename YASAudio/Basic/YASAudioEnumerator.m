@@ -26,7 +26,9 @@
     self = [super init];
     if (self) {
         if (!pointer.v || stride == 0 || length == 0) {
-            YASRaiseWithReason(([NSString stringWithFormat:@"%s - Invalid argument.", __PRETTY_FUNCTION__]));
+            YASRaiseWithReason(
+                ([NSString stringWithFormat:@"%s - Invalid argument. pointer.v(%p) stride(%@) length(%@)",
+                                            __PRETTY_FUNCTION__, pointer.v, @(stride), @(length)]));
             YASRelease(self);
             return nil;
         }

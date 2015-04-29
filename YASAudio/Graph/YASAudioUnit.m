@@ -172,7 +172,8 @@ static OSStatus InputRenderCallback(void *inRefCon, AudioUnitRenderActionFlags *
     NSNumber *unitKey = self.key;
 
     if (!graphKey || !unitKey) {
-        YASRaiseWithReason(([NSString stringWithFormat:@"%s - graph.key or unit.key is nil", __PRETTY_FUNCTION__]));
+        YASRaiseWithReason(([NSString
+            stringWithFormat:@"%s - Key is nil. graphKey(%@) unitKey(%@)", __PRETTY_FUNCTION__, graphKey, unitKey]));
         return;
     }
 
@@ -204,7 +205,8 @@ static OSStatus InputRenderCallback(void *inRefCon, AudioUnitRenderActionFlags *
     NSNumber *unitKey = self.key;
 
     if (!graphKey || !unitKey) {
-        YASRaiseWithReason(([NSString stringWithFormat:@"%s - graph or unit key is nil", __PRETTY_FUNCTION__]));
+        YASRaiseWithReason(([NSString
+            stringWithFormat:@"%s - Key is nil. graphKey(%@) unitKey(%@)", __PRETTY_FUNCTION__, graphKey, unitKey]));
         return;
     }
 
@@ -226,7 +228,8 @@ static OSStatus InputRenderCallback(void *inRefCon, AudioUnitRenderActionFlags *
                 element:(AudioUnitElement)element
 {
     if (data.length == 0) {
-        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Argument is nil.", __PRETTY_FUNCTION__]));
+        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Argument is nil. data(%@) data.length(%@)",
+                                                       __PRETTY_FUNCTION__, data, @(data.length)]));
     }
 
     const UInt32 size = (UInt32)data.length;
@@ -254,7 +257,7 @@ static OSStatus InputRenderCallback(void *inRefCon, AudioUnitRenderActionFlags *
 - (void)setInputFormat:(const AudioStreamBasicDescription *)asbd busNumber:(const UInt32)bus
 {
     if (!asbd) {
-        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Argument is nil.", __PRETTY_FUNCTION__]));
+        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Argument is nil. asbd(%p)", __PRETTY_FUNCTION__, asbd]));
     }
 
     YASRaiseIfAUError(AudioUnitSetProperty(_audioUnitInstance, kAudioUnitProperty_StreamFormat, kAudioUnitScope_Input,
@@ -264,7 +267,7 @@ static OSStatus InputRenderCallback(void *inRefCon, AudioUnitRenderActionFlags *
 - (void)setOutputFormat:(const AudioStreamBasicDescription *)asbd busNumber:(const UInt32)bus
 {
     if (!asbd) {
-        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Argument is nil.", __PRETTY_FUNCTION__]));
+        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Argument is nil. asbd(%p)", __PRETTY_FUNCTION__, asbd]));
     }
 
     YASRaiseIfAUError(AudioUnitSetProperty(_audioUnitInstance, kAudioUnitProperty_StreamFormat, kAudioUnitScope_Output,
@@ -274,7 +277,7 @@ static OSStatus InputRenderCallback(void *inRefCon, AudioUnitRenderActionFlags *
 - (void)getInputFormat:(AudioStreamBasicDescription *)asbd busNumber:(const UInt32)bus
 {
     if (!asbd) {
-        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Argument is nil.", __PRETTY_FUNCTION__]));
+        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Argument is nil. asbd(%p)", __PRETTY_FUNCTION__, asbd]));
     }
 
     UInt32 size = sizeof(AudioStreamBasicDescription);
@@ -285,7 +288,7 @@ static OSStatus InputRenderCallback(void *inRefCon, AudioUnitRenderActionFlags *
 - (void)getOutputFormat:(AudioStreamBasicDescription *)asbd busNumber:(const UInt32)bus
 {
     if (!asbd) {
-        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Argument is nil.", __PRETTY_FUNCTION__]));
+        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Argument is nil. asbd(%p)", __PRETTY_FUNCTION__, asbd]));
     }
 
     UInt32 size = sizeof(AudioStreamBasicDescription);
@@ -505,7 +508,8 @@ static OSStatus InputRenderCallback(void *inRefCon, AudioUnitRenderActionFlags *
     NSNumber *unitKey = self.key;
 
     if (!graphKey || !unitKey) {
-        YASRaiseWithReason(([NSString stringWithFormat:@"%s - graph.key or unit.key is nil", __PRETTY_FUNCTION__]));
+        YASRaiseWithReason(([NSString
+            stringWithFormat:@"%s - Key is nil. graphKey(%@) unitKey(%@)", __PRETTY_FUNCTION__, graphKey, unitKey]));
         return;
     }
 
@@ -663,7 +667,8 @@ static OSStatus InputRenderCallback(void *inRefCon, AudioUnitRenderActionFlags *
     }
 
     if (!_audioUnitInstance) {
-        YASRaiseWithReason(([NSString stringWithFormat:@"%s AudioUnit is null.", __PRETTY_FUNCTION__]));
+        YASRaiseWithReason(([NSString
+            stringWithFormat:@"%s AudioUnit is null. audioUnitInstance(%p)", __PRETTY_FUNCTION__, _audioUnitInstance]));
     }
 
     YASRaiseIfAUError(AudioUnitInitialize(_audioUnitInstance));
@@ -678,7 +683,8 @@ static OSStatus InputRenderCallback(void *inRefCon, AudioUnitRenderActionFlags *
     }
 
     if (!_audioUnitInstance) {
-        YASRaiseWithReason(([NSString stringWithFormat:@"%s AudioUnit is null.", __PRETTY_FUNCTION__]));
+        YASRaiseWithReason(([NSString
+            stringWithFormat:@"%s AudioUnit is null. audioUnitInstance(%p)", __PRETTY_FUNCTION__, _audioUnitInstance]));
     }
 
     YASRaiseIfAUError(AudioUnitUninitialize(_audioUnitInstance));

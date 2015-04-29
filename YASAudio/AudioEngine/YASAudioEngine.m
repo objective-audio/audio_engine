@@ -79,7 +79,7 @@ NSString *const YASAudioEngineConfigurationChangeNotification = @"YASAudioEngine
 - (void)_attachNode:(YASAudioNode *)node
 {
     if (!node) {
-        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Argument is nil.", __PRETTY_FUNCTION__]));
+        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Argument is nil. node(%@)", __PRETTY_FUNCTION__, node]));
     }
 
     if ([_nodes containsObject:node]) {
@@ -95,7 +95,7 @@ NSString *const YASAudioEngineConfigurationChangeNotification = @"YASAudioEngine
 - (void)_detachNode:(YASAudioNode *)node
 {
     if (!node) {
-        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Argument is nil.", __PRETTY_FUNCTION__]));
+        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Argument is nil. node(%@)", __PRETTY_FUNCTION__, node]));
     }
 
     if (![_nodes containsObject:node]) {
@@ -130,8 +130,11 @@ NSString *const YASAudioEngineConfigurationChangeNotification = @"YASAudioEngine
                                   toBus:(NSNumber *)destinationBus
                                  format:(YASAudioFormat *)format
 {
-    if (!sourceBus || !destinationBus) {
-        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Argument is nil.", __PRETTY_FUNCTION__]));
+    if (!sourceNode || !destinationNode || !sourceBus || !destinationBus || !format) {
+        YASRaiseWithReason(([NSString
+            stringWithFormat:
+                @"%s - Argument is nil. sourceNode(%@) destinationNode(%@) sourceBus(%@) destinationBus(%@) format(%@)",
+                __PRETTY_FUNCTION__, sourceNode, destinationNode, sourceBus, destinationBus, format]));
         return nil;
     }
 
@@ -144,11 +147,6 @@ NSString *const YASAudioEngineConfigurationChangeNotification = @"YASAudioEngine
     if (![destinationNode isAvailableInputBus:destinationBus]) {
         YASRaiseWithReason(
             ([NSString stringWithFormat:@"%s - Input bus(%@) is not available.", __PRETTY_FUNCTION__, destinationBus]));
-        return nil;
-    }
-
-    if (!format) {
-        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Format is nil.", __PRETTY_FUNCTION__]));
         return nil;
     }
 
@@ -199,14 +197,17 @@ NSString *const YASAudioEngineConfigurationChangeNotification = @"YASAudioEngine
                                  format:(YASAudioFormat *)format
 {
     if (!sourceNode || !destinationNode || !format) {
-        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Argument is nil.", __PRETTY_FUNCTION__]));
+        YASRaiseWithReason(
+            ([NSString stringWithFormat:@"%s - Argument is nil. sourceNode(%@) destinationNode(%@) format(%@)",
+                                        __PRETTY_FUNCTION__, sourceNode, destinationNode, format]));
         return nil;
     }
     NSNumber *sourceBus = sourceNode.nextAvailableOutputBus;
     NSNumber *destinationBus = destinationNode.nextAvailableInputBus;
 
     if (!sourceBus || !destinationBus) {
-        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Bus in not available.", __PRETTY_FUNCTION__]));
+        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Bus in not available. sourceBus(%@) destinationBus(%@)",
+                                                       __PRETTY_FUNCTION__, sourceBus, destinationBus]));
         return nil;
     }
 
@@ -237,7 +238,8 @@ NSString *const YASAudioEngineConfigurationChangeNotification = @"YASAudioEngine
 - (void)disconnectNodeInput:(YASAudioNode *)node bus:(NSNumber *)bus
 {
     if (!node || !bus) {
-        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Argument is nil.", __PRETTY_FUNCTION__]));
+        YASRaiseWithReason(
+            ([NSString stringWithFormat:@"%s - Argument is nil. node(%@) bus(%@)", __PRETTY_FUNCTION__, node, bus]));
         return;
     }
 
@@ -251,7 +253,7 @@ NSString *const YASAudioEngineConfigurationChangeNotification = @"YASAudioEngine
 - (void)disconnectNodeInput:(YASAudioNode *)node
 {
     if (!node) {
-        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Argument is nil.", __PRETTY_FUNCTION__]));
+        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Argument is nil. node(%@)", __PRETTY_FUNCTION__, node]));
         return;
     }
 
@@ -264,7 +266,8 @@ NSString *const YASAudioEngineConfigurationChangeNotification = @"YASAudioEngine
 - (void)disconnectNodeOutput:(YASAudioNode *)node bus:(NSNumber *)bus
 {
     if (!node || !bus) {
-        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Argument is nil.", __PRETTY_FUNCTION__]));
+        YASRaiseWithReason(
+            ([NSString stringWithFormat:@"%s - Argument is nil. node(%@) bus(%@)", __PRETTY_FUNCTION__, node, bus]));
         return;
     }
 
@@ -278,7 +281,7 @@ NSString *const YASAudioEngineConfigurationChangeNotification = @"YASAudioEngine
 - (void)disconnectNodeOutput:(YASAudioNode *)node
 {
     if (!node) {
-        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Argument is nil.", __PRETTY_FUNCTION__]));
+        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Argument is nil. node(%@)", __PRETTY_FUNCTION__, node]));
         return;
     }
 
@@ -442,7 +445,8 @@ NSString *const YASAudioEngineConfigurationChangeNotification = @"YASAudioEngine
 - (BOOL)_addConnection:(YASAudioConnection *)connection
 {
     if (!connection) {
-        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Argument is nil.", __PRETTY_FUNCTION__]));
+        YASRaiseWithReason(
+            ([NSString stringWithFormat:@"%s - Argument is nil. connection(%@)", __PRETTY_FUNCTION__, connection]));
         return NO;
     }
 
@@ -466,7 +470,8 @@ NSString *const YASAudioEngineConfigurationChangeNotification = @"YASAudioEngine
 - (void)_removeConnectionFromNodes:(YASAudioConnection *)connection
 {
     if (!connection) {
-        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Argument is nil.", __PRETTY_FUNCTION__]));
+        YASRaiseWithReason(
+            ([NSString stringWithFormat:@"%s - Argument is nil. connection(%@)", __PRETTY_FUNCTION__, connection]));
         return;
     }
 

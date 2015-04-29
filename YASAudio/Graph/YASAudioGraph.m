@@ -97,7 +97,8 @@ static BOOL _interrupting = NO;
 + (void)_addGraph:(YASAudioGraph *)graph
 {
     if (!graph || !graph.key) {
-        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Argument is nil", __PRETTY_FUNCTION__]));
+        YASRaiseWithReason(([NSString
+            stringWithFormat:@"%s - Argument is nil. graph(%@) graph.key(%@)", __PRETTY_FUNCTION__, graph, graph.key]));
         return;
     }
 
@@ -110,7 +111,8 @@ static BOOL _interrupting = NO;
 + (void)_removeGraph:(YASAudioGraph *)graph
 {
     if (!graph || !graph.key) {
-        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Argument is nil", __PRETTY_FUNCTION__]));
+        YASRaiseWithReason(([NSString
+            stringWithFormat:@"%s - Argument is nil. graph(%@) graph.key(%@)", __PRETTY_FUNCTION__, graph, graph.key]));
         return;
     }
 
@@ -123,7 +125,7 @@ static BOOL _interrupting = NO;
 + (YASAudioGraph *)_graphForKey:(NSNumber *)key
 {
     if (!key) {
-        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Argument is nil", __PRETTY_FUNCTION__]));
+        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Argument is nil. key(%@)", __PRETTY_FUNCTION__, key]));
         return nil;
     }
 
@@ -229,7 +231,7 @@ static BOOL _interrupting = NO;
 - (void)addAudioUnit:(YASAudioUnit *)unit
 {
     if (!unit) {
-        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Argument is nil.", __PRETTY_FUNCTION__]));
+        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Argument is nil. unit(%@)", __PRETTY_FUNCTION__, unit]));
         return;
     }
 
@@ -250,7 +252,8 @@ static BOOL _interrupting = NO;
 - (void)removeAudioUnit:(YASAudioUnit *)unit
 {
     if (!unit || !unit.key) {
-        YASRaiseWithReason(([NSString stringWithFormat:@"%s - unit or unit.key is nil.", __PRETTY_FUNCTION__]));
+        YASRaiseWithReason(([NSString
+            stringWithFormat:@"%s - Argument is nil. unit(%@) unit.key(%@)", __PRETTY_FUNCTION__, unit, unit.key]));
         return;
     }
 
@@ -284,7 +287,8 @@ static BOOL _interrupting = NO;
 - (void)removeAudioDeviceIO:(YASAudioDeviceIO *)audioDeviceIO
 {
     if (!audioDeviceIO) {
-        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Argument is nil.", __PRETTY_FUNCTION__]));
+        YASRaiseWithReason(([NSString
+            stringWithFormat:@"%s - Argument is nil. audioDeviceIO(%@)", __PRETTY_FUNCTION__, audioDeviceIO]));
         return;
     }
 
@@ -323,7 +327,7 @@ static BOOL _interrupting = NO;
 - (YASAudioUnit *)_unitForKey:(NSNumber *)key
 {
     if (!key) {
-        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Argument is nil.", __PRETTY_FUNCTION__]));
+        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Argument is nil. key(%@)", __PRETTY_FUNCTION__, key]));
         return nil;
     }
 
@@ -337,12 +341,13 @@ static BOOL _interrupting = NO;
 - (void)_addUnitToUnits:(YASAudioUnit *)unit
 {
     if (!unit) {
-        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Argument is nil.", __PRETTY_FUNCTION__]));
+        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Argument is nil. unit(%@)", __PRETTY_FUNCTION__, unit]));
         return;
     }
 
     if (unit.key) {
-        YASRaiseWithReason(([NSString stringWithFormat:@"%s - unit.key is not nil.", __PRETTY_FUNCTION__]));
+        YASRaiseWithReason(([NSString
+            stringWithFormat:@"%s - unit.key is not nil. unit(%@) unit.key(%@)", __PRETTY_FUNCTION__, unit, unit.key]));
     }
 
     @synchronized(self)

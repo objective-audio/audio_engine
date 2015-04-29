@@ -29,7 +29,10 @@
     self = [super init];
     if (self) {
         if (!sourceNode || !sourceBus || !destinationNode || !destinationBus || !format) {
-            YASRaiseWithReason(([NSString stringWithFormat:@"%s - Argument is nil.", __PRETTY_FUNCTION__]));
+            YASRaiseWithReason(([NSString stringWithFormat:@"%s - Argument is nil. sourceNode(%@) sourceBus(%@) "
+                                                           @"destinationNode(%@) destinationBus(%@) format(%@)",
+                                                           __PRETTY_FUNCTION__, sourceNode, sourceBus, destinationNode,
+                                                           destinationBus, format]));
             YASRelease(self);
             return nil;
         }

@@ -33,7 +33,7 @@
 - (NSArray *)yas_arrayOfPropertyForKey:(id)key
 {
     if (!key) {
-        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Argument is nil.", __PRETTY_FUNCTION__]));
+        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Argument is nil. key(%@)", __PRETTY_FUNCTION__, key]));
         return nil;
     }
 
