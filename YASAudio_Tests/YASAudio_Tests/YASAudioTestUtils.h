@@ -5,8 +5,10 @@
 
 #import <Foundation/Foundation.h>
 #import "YASAudio.h"
+#import "YASAudioUnit+Internal.h"
 #import "YASAudioData+Internal.h"
 #import "YASAudioNode+Internal.h"
+#import "YASAudioUnitNode+Internal.h"
 #import "YASAudioConnection+Internal.h"
 #import "YASAudioOfflineOutputNode+Internal.h"
 
