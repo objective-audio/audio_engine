@@ -273,7 +273,7 @@ static NSString *YASFileTypeFromAudioFileTypeID(AudioFileTypeID fileTypeID)
 
 #pragma mark Private
 
-- (BOOL)_openWithBitDepthFormat:(YASAudioBitDepthFormat)bitDepthFormat interleaved:(BOOL)interleaved
+- (BOOL)_openWithPCMFormat:(YASAudioPCMFormat)pcmFormat interleaved:(BOOL)interleaved
 {
     if (!YASCanOpenAudioFile(_url)) {
         return NO;
@@ -302,10 +302,10 @@ static NSString *YASFileTypeFromAudioFileTypeID(AudioFileTypeID fileTypeID)
     self.fileFormat = fileFormat;
     YASRelease(fileFormat);
 
-    YASAudioFormat *processingFormat = [[YASAudioFormat alloc] initWithBitDepthFormat:bitDepthFormat
-                                                                           sampleRate:fileFormat.sampleRate
-                                                                             channels:fileFormat.channelCount
-                                                                          interleaved:interleaved];
+    YASAudioFormat *processingFormat = [[YASAudioFormat alloc] initWithPCMFormat:pcmFormat
+                                                                      sampleRate:fileFormat.sampleRate
+                                                                        channels:fileFormat.channelCount
+                                                                     interleaved:interleaved];
     self.processingFormat = processingFormat;
     YASRelease(processingFormat);
 
@@ -318,7 +318,7 @@ static NSString *YASFileTypeFromAudioFileTypeID(AudioFileTypeID fileTypeID)
 }
 
 - (BOOL)_createWithSettings:(NSDictionary *)settings
-             bitDepthFormat:(YASAudioBitDepthFormat)bitDepthFormat
+                  pcmFormat:(YASAudioPCMFormat)pcmFormat
                 interleaved:(BOOL)interleaved
 {
     YASAudioFormat *fileFormat = [[YASAudioFormat alloc] initWithSettings:settings];
@@ -335,10 +335,10 @@ static NSString *YASFileTypeFromAudioFileTypeID(AudioFileTypeID fileTypeID)
         return NO;
     }
 
-    YASAudioFormat *processingFormat = [[YASAudioFormat alloc] initWithBitDepthFormat:bitDepthFormat
-                                                                           sampleRate:fileFormat.sampleRate
-                                                                             channels:fileFormat.channelCount
-                                                                          interleaved:interleaved];
+    YASAudioFormat *processingFormat = [[YASAudioFormat alloc] initWithPCMFormat:pcmFormat
+                                                                      sampleRate:fileFormat.sampleRate
+                                                                        channels:fileFormat.channelCount
+                                                                     interleaved:interleaved];
     self.processingFormat = processingFormat;
     YASRelease(processingFormat);
 
@@ -376,11 +376,11 @@ static NSString *YASFileTypeFromAudioFileTypeID(AudioFileTypeID fileTypeID)
 
 - (instancetype)initWithURL:(NSURL *)fileURL error:(NSError **)outError
 {
-    return [self initWithURL:fileURL bitDepthFormat:YASAudioBitDepthFormatFloat32 interleaved:NO error:outError];
+    return [self initWithURL:fileURL pcmFormat:YASAudioPCMFormatFloat32 interleaved:NO error:outError];
 }
 
 - (instancetype)initWithURL:(NSURL *)fileURL
-             bitDepthFormat:(YASAudioBitDepthFormat)format
+                  pcmFormat:(YASAudioPCMFormat)format
                 interleaved:(BOOL)interleaved
                       error:(NSError **)outError
 {
@@ -394,7 +394,7 @@ static NSString *YASFileTypeFromAudioFileTypeID(AudioFileTypeID fileTypeID)
             return nil;
         }
         self.url = fileURL;
-        if (![self _openWithBitDepthFormat:format interleaved:interleaved]) {
+        if (![self _openWithPCMFormat:format interleaved:interleaved]) {
             if (outError) {
                 *outError = [NSError yas_errorWithCode:YASAudioFileErrorCodeNotOpen];
             }
@@ -484,7 +484,7 @@ static NSString *YASFileTypeFromAudioFileTypeID(AudioFileTypeID fileTypeID)
     return [self initWithURL:fileURL
                     fileType:fileType
                     settings:settings
-              bitDepthFormat:YASAudioBitDepthFormatFloat32
+                   pcmFormat:YASAudioPCMFormatFloat32
                  interleaved:NO
                        error:outError];
 }
@@ -492,7 +492,7 @@ static NSString *YASFileTypeFromAudioFileTypeID(AudioFileTypeID fileTypeID)
 - (instancetype)initWithURL:(NSURL *)fileURL
                    fileType:(NSString *)fileType
                    settings:(NSDictionary *)settings
-             bitDepthFormat:(YASAudioBitDepthFormat)format
+                  pcmFormat:(YASAudioPCMFormat)format
                 interleaved:(BOOL)interleaved
                       error:(NSError **)outError
 {
@@ -507,7 +507,7 @@ static NSString *YASFileTypeFromAudioFileTypeID(AudioFileTypeID fileTypeID)
         }
         self.url = fileURL;
         self.fileType = fileType;
-        if (![self _createWithSettings:settings bitDepthFormat:format interleaved:interleaved]) {
+        if (![self _createWithSettings:settings pcmFormat:format interleaved:interleaved]) {
             if (outError) {
                 *outError = [NSError yas_errorWithCode:YASAudioFileErrorCodeNotCreate];
             }

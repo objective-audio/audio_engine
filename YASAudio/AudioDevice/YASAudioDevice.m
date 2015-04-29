@@ -535,7 +535,7 @@ static AudioObjectPropertyListenerBlock _globalListenerBlock;
                 channelCount += configuration->mBuffers[i].mNumberChannels;
             }
 
-            YASAudioFormat *format = [[YASAudioFormat alloc] initWithBitDepthFormat:streamFormat.bitDepthFormat
+            YASAudioFormat *format = [[YASAudioFormat alloc] initWithPCMFormat:streamFormat.pcmFormat
                                                                          sampleRate:streamFormat.sampleRate
                                                                            channels:channelCount
                                                                         interleaved:NO];

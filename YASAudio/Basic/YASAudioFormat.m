@@ -9,9 +9,24 @@
 #import "NSString+YASAudio.h"
 #import <AVFoundation/AVFoundation.h>
 
+static UInt32 YASAudioSampleByteCountWithPCMFormat(YASAudioPCMFormat pcmFormat)
+{
+    switch (pcmFormat) {
+        case YASAudioPCMFormatFloat32:
+        case YASAudioPCMFormatFixed824:
+            return 4;
+        case YASAudioPCMFormatInt16:
+            return 2;
+        case YASAudioPCMFormatFloat64:
+            return 8;
+        default:
+            return 0;
+    }
+}
+
 @implementation YASAudioFormat {
     AudioStreamBasicDescription _asbd;
-    YASAudioBitDepthFormat _bitDepthFormat;
+    YASAudioPCMFormat _pcmFormat;
 }
 
 - (instancetype)initWithStreamDescription:(const AudioStreamBasicDescription *)asbd
@@ -20,16 +35,16 @@
     if (self) {
         _asbd = *asbd;
         _asbd.mReserved = 0;
-        _bitDepthFormat = YASAudioBitDepthFormatOther;
+        _pcmFormat = YASAudioPCMFormatOther;
         _standard = NO;
         if (_asbd.mFormatID == kAudioFormatLinearPCM) {
             if ((_asbd.mFormatFlags & kAudioFormatFlagIsFloat) &&
                 ((_asbd.mFormatFlags & kAudioFormatFlagIsBigEndian) == kAudioFormatFlagsNativeEndian) &&
                 (_asbd.mFormatFlags & kAudioFormatFlagIsPacked)) {
                 if (_asbd.mBitsPerChannel == 64) {
-                    _bitDepthFormat = YASAudioBitDepthFormatFloat64;
+                    _pcmFormat = YASAudioPCMFormatFloat64;
                 } else if (_asbd.mBitsPerChannel == 32) {
-                    _bitDepthFormat = YASAudioBitDepthFormatFloat32;
+                    _pcmFormat = YASAudioPCMFormatFloat32;
                     if (_asbd.mFormatFlags & kAudioFormatFlagIsNonInterleaved) {
                         _standard = YES;
                     }
@@ -40,9 +55,9 @@
                 UInt32 fraction = (_asbd.mFormatFlags & kLinearPCMFormatFlagsSampleFractionMask) >>
                                   kLinearPCMFormatFlagsSampleFractionShift;
                 if (_asbd.mBitsPerChannel == 32 && fraction == 24) {
-                    _bitDepthFormat = YASAudioBitDepthFormatFixed824;
+                    _pcmFormat = YASAudioPCMFormatFixed824;
                 } else if (_asbd.mBitsPerChannel == 16) {
-                    _bitDepthFormat = YASAudioBitDepthFormatInt16;
+                    _pcmFormat = YASAudioPCMFormatInt16;
                 }
             }
         }
@@ -52,21 +67,18 @@
 
 - (instancetype)initStandardFormatWithSampleRate:(double)sampleRate channels:(UInt32)channels
 {
-    return [self initWithBitDepthFormat:YASAudioBitDepthFormatFloat32
-                             sampleRate:sampleRate
-                               channels:channels
-                            interleaved:NO];
+    return [self initWithPCMFormat:YASAudioPCMFormatFloat32 sampleRate:sampleRate channels:channels interleaved:NO];
 }
 
-- (instancetype)initWithBitDepthFormat:(YASAudioBitDepthFormat)bitDepthFormat
-                            sampleRate:(double)sampleRate
-                              channels:(UInt32)channels
-                           interleaved:(BOOL)interleaved
+- (instancetype)initWithPCMFormat:(YASAudioPCMFormat)pcmFormat
+                       sampleRate:(double)sampleRate
+                         channels:(UInt32)channels
+                      interleaved:(BOOL)interleaved
 {
-    if (bitDepthFormat == YASAudioBitDepthFormatOther || channels == 0) {
+    if (pcmFormat == YASAudioPCMFormatOther || channels == 0) {
         YASRaiseWithReason(
             ([NSString stringWithFormat:@"%s - Invalid argument. bitDepth(%@) channels(%@)", __PRETTY_FUNCTION__,
-                                        [NSString yas_stringWithBitDepthFormat:bitDepthFormat], @(channels)]));
+                                        [NSString yas_stringWithPCMFormat:pcmFormat], @(channels)]));
         YASRelease(self);
         return nil;
     }
@@ -77,11 +89,11 @@
 
     asbd.mFormatFlags = kAudioFormatFlagsNativeEndian | kAudioFormatFlagIsPacked;
 
-    if (bitDepthFormat == YASAudioBitDepthFormatFloat32 || bitDepthFormat == YASAudioBitDepthFormatFloat64) {
+    if (pcmFormat == YASAudioPCMFormatFloat32 || pcmFormat == YASAudioPCMFormatFloat64) {
         asbd.mFormatFlags |= kAudioFormatFlagIsFloat;
-    } else if (bitDepthFormat == YASAudioBitDepthFormatInt16) {
+    } else if (pcmFormat == YASAudioPCMFormatInt16) {
         asbd.mFormatFlags |= kAudioFormatFlagIsSignedInteger;
-    } else if (bitDepthFormat == YASAudioBitDepthFormatFixed824) {
+    } else if (pcmFormat == YASAudioPCMFormatFixed824) {
         asbd.mFormatFlags |= kAudioFormatFlagIsSignedInteger | (24 << kLinearPCMFormatFlagsSampleFractionShift);
     }
 
@@ -89,9 +101,9 @@
         asbd.mFormatFlags |= kAudioFormatFlagIsNonInterleaved;
     }
 
-    if (bitDepthFormat == YASAudioBitDepthFormatFloat64) {
+    if (pcmFormat == YASAudioPCMFormatFloat64) {
         asbd.mBitsPerChannel = 64;
-    } else if (bitDepthFormat == YASAudioBitDepthFormatInt16) {
+    } else if (pcmFormat == YASAudioPCMFormatInt16) {
         asbd.mBitsPerChannel = 16;
     } else {
         asbd.mBitsPerChannel = 32;
@@ -144,7 +156,7 @@
 
 - (UInt32)sampleByteCount
 {
-    return [self.class _sampleByteCountWithBitDepthFormat:_bitDepthFormat];
+    return YASAudioSampleByteCountWithPCMFormat(_pcmFormat);
 }
 
 - (BOOL)isEqual:(id)other
@@ -177,7 +189,7 @@
 {
     NSMutableString *result = [NSMutableString stringWithFormat:@"<%@: %p>\n", self.class, self];
     NSDictionary *asbdDict = @{
-        @"bitDepthFormat": [NSString yas_stringWithBitDepthFormat:_bitDepthFormat],
+        @"pcmFormat": [NSString yas_stringWithPCMFormat:_pcmFormat],
         @"sampleRate": @(_asbd.mSampleRate),
         @"bitsPerChannel": @(_asbd.mBitsPerChannel),
         @"bytesPerFrame": @(_asbd.mBytesPerFrame),
@@ -212,21 +224,6 @@
         }
     }
     return result;
-}
-
-+ (UInt32)_sampleByteCountWithBitDepthFormat:(YASAudioBitDepthFormat)bitDepthFormat
-{
-    switch (bitDepthFormat) {
-        case YASAudioBitDepthFormatFloat32:
-        case YASAudioBitDepthFormatFixed824:
-            return 4;
-        case YASAudioBitDepthFormatInt16:
-            return 2;
-        case YASAudioBitDepthFormatFloat64:
-            return 8;
-        default:
-            return 0;
-    }
 }
 
 @end

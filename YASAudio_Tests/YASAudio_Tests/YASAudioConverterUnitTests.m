@@ -27,19 +27,19 @@
     YASAudioUnit *converterUnit =
         [[YASAudioUnit alloc] initWithType:kAudioUnitType_FormatConverter subType:kAudioUnitSubType_AUConverter];
 
-    const YASAudioBitDepthFormat bitDepthFormats[] = {YASAudioBitDepthFormatFloat32, YASAudioBitDepthFormatFloat64,
-                                                      YASAudioBitDepthFormatInt16, YASAudioBitDepthFormatFixed824};
-    const NSUInteger bitDepthFormatsCount = sizeof(bitDepthFormats) / sizeof(YASAudioBitDepthFormat);
+    const YASAudioPCMFormat pcmFormats[] = {YASAudioPCMFormatFloat32, YASAudioPCMFormatFloat64,
+                                                 YASAudioPCMFormatInt16, YASAudioPCMFormatFixed824};
+    const NSUInteger pcmFormatsCount = sizeof(pcmFormats) / sizeof(YASAudioPCMFormat);
     const Float64 sampleRates[] = {4000, 8000, 16000, 22050, 44100, 48000, 88100, 96000, 192000, 382000};
     const NSUInteger sampleRatesCount = sizeof(sampleRates) / sizeof(Float64);
 
-    for (NSInteger bitDepthIdx = 0; bitDepthIdx < bitDepthFormatsCount; bitDepthIdx++) {
+    for (NSInteger pcmIdx = 0; pcmIdx < pcmFormatsCount; pcmIdx++) {
         for (NSInteger srIdx = 0; srIdx < sampleRatesCount; srIdx++) {
             for (NSInteger i = 0; i < 2; i++) {
-                YASAudioFormat *format = [[YASAudioFormat alloc] initWithBitDepthFormat:bitDepthFormats[bitDepthIdx]
-                                                                             sampleRate:sampleRates[srIdx]
-                                                                               channels:2
-                                                                            interleaved:i];
+                YASAudioFormat *format = [[YASAudioFormat alloc] initWithPCMFormat:pcmFormats[pcmIdx]
+                                                                        sampleRate:sampleRates[srIdx]
+                                                                          channels:2
+                                                                       interleaved:i];
 
                 XCTAssertNoThrow([converterUnit initialize]);
 

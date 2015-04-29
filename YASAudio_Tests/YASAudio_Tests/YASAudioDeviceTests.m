@@ -66,17 +66,17 @@
 
     XCTAssertThrows([YASAudioChannelRoute defaultChannelRoutesWithBus:bus format:nil]);
 
-    YASAudioFormat *interleavedFormat = [[YASAudioFormat alloc] initWithBitDepthFormat:YASAudioBitDepthFormatFloat32
-                                                                            sampleRate:44100
-                                                                              channels:channels
-                                                                           interleaved:YES];
+    YASAudioFormat *interleavedFormat = [[YASAudioFormat alloc] initWithPCMFormat:YASAudioPCMFormatFloat32
+                                                                       sampleRate:44100
+                                                                         channels:channels
+                                                                      interleaved:YES];
 
     XCTAssertThrows([YASAudioChannelRoute defaultChannelRoutesWithBus:bus format:interleavedFormat]);
 
-    YASAudioFormat *nonInterleavedFormat = [[YASAudioFormat alloc] initWithBitDepthFormat:YASAudioBitDepthFormatFloat32
-                                                                               sampleRate:44100
-                                                                                 channels:channels
-                                                                              interleaved:NO];
+    YASAudioFormat *nonInterleavedFormat = [[YASAudioFormat alloc] initWithPCMFormat:YASAudioPCMFormatFloat32
+                                                                          sampleRate:44100
+                                                                            channels:channels
+                                                                         interleaved:NO];
 
     NSArray *channelRoutes = [YASAudioChannelRoute defaultChannelRoutesWithBus:bus format:nonInterleavedFormat];
 

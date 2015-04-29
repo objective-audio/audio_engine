@@ -68,10 +68,10 @@
     const UInt32 frameLength = 16;
     const UInt32 channels = 3;
 
-    YASAudioFormat *format = [[YASAudioFormat alloc] initWithBitDepthFormat:YASAudioBitDepthFormatFloat32
-                                                                 sampleRate:48000
-                                                                   channels:channels
-                                                                interleaved:YES];
+    YASAudioFormat *format = [[YASAudioFormat alloc] initWithPCMFormat:YASAudioPCMFormatFloat32
+                                                            sampleRate:48000
+                                                              channels:channels
+                                                           interleaved:YES];
     YASAudioData *data = [[YASAudioData alloc] initWithFormat:format frameCapacity:frameLength];
     YASRelease(format);
 
@@ -112,10 +112,10 @@
     const UInt32 frameLength = 16;
     const UInt32 channels = 3;
 
-    YASAudioFormat *format = [[YASAudioFormat alloc] initWithBitDepthFormat:YASAudioBitDepthFormatFloat32
-                                                                 sampleRate:48000
-                                                                   channels:channels
-                                                                interleaved:YES];
+    YASAudioFormat *format = [[YASAudioFormat alloc] initWithPCMFormat:YASAudioPCMFormatFloat32
+                                                            sampleRate:48000
+                                                              channels:channels
+                                                           interleaved:YES];
     YASAudioData *data = [[YASAudioData alloc] initWithFormat:format frameCapacity:frameLength];
     YASRelease(format);
 
@@ -284,10 +284,10 @@
 {
     const UInt32 channels = 4;
 
-    YASAudioFormat *format = [[YASAudioFormat alloc] initWithBitDepthFormat:YASAudioBitDepthFormatFloat32
-                                                                 sampleRate:48000
-                                                                   channels:channels
-                                                                interleaved:YES];
+    YASAudioFormat *format = [[YASAudioFormat alloc] initWithPCMFormat:YASAudioPCMFormatFloat32
+                                                            sampleRate:48000
+                                                              channels:channels
+                                                           interleaved:YES];
     YASAudioData *data = [[YASAudioData alloc] initWithFormat:format frameCapacity:1];
     YASRelease(format);
 
@@ -314,17 +314,15 @@
     YASRelease(data);
 }
 
-- (void)testReadFrameEnumeratorEachBitDepthFormat
+- (void)testReadFrameEnumeratorEachPCMFormat
 {
     const UInt32 frameLength = 16;
     const UInt32 channels = 4;
 
-    for (NSUInteger bitDepthFormat = YASAudioBitDepthFormatFloat32; bitDepthFormat <= YASAudioBitDepthFormatFixed824;
-         bitDepthFormat++) {
-        YASAudioFormat *format = [[YASAudioFormat alloc] initWithBitDepthFormat:bitDepthFormat
-                                                                     sampleRate:48000
-                                                                       channels:channels
-                                                                    interleaved:NO];
+    for (NSUInteger pcmFormat = YASAudioPCMFormatFloat32; pcmFormat <= YASAudioPCMFormatFixed824;
+         pcmFormat++) {
+        YASAudioFormat *format =
+            [[YASAudioFormat alloc] initWithPCMFormat:pcmFormat sampleRate:48000 channels:channels interleaved:NO];
         YASAudioData *data = [[YASAudioData alloc] initWithFormat:format frameCapacity:frameLength];
         YASRelease(format);
 
@@ -338,17 +336,17 @@
         while (pointer->v) {
             while (pointer->v) {
                 UInt32 testValue = (Float64)TestValue((UInt32)*frame, 0, (UInt32)*channel);
-                switch (bitDepthFormat) {
-                    case YASAudioBitDepthFormatFloat32:
+                switch (pcmFormat) {
+                    case YASAudioPCMFormatFloat32:
                         XCTAssertEqual(*pointer->f32, (Float32)testValue);
                         break;
-                    case YASAudioBitDepthFormatFloat64:
+                    case YASAudioPCMFormatFloat64:
                         XCTAssertEqual(*pointer->f64, (Float64)testValue);
                         break;
-                    case YASAudioBitDepthFormatInt16:
+                    case YASAudioPCMFormatInt16:
                         XCTAssertEqual(*pointer->i16, (SInt16)testValue);
                         break;
-                    case YASAudioBitDepthFormatFixed824:
+                    case YASAudioPCMFormatFixed824:
                         XCTAssertEqual(*pointer->i32, (SInt32)testValue);
                         break;
                     default:
@@ -376,10 +374,10 @@
     const NSUInteger stopFrame = 8;
     const NSUInteger stopChannel = 2;
 
-    YASAudioFormat *format = [[YASAudioFormat alloc] initWithBitDepthFormat:YASAudioBitDepthFormatFloat32
-                                                                 sampleRate:48000
-                                                                   channels:channels
-                                                                interleaved:YES];
+    YASAudioFormat *format = [[YASAudioFormat alloc] initWithPCMFormat:YASAudioPCMFormatFloat32
+                                                            sampleRate:48000
+                                                              channels:channels
+                                                           interleaved:YES];
     YASAudioData *data = [[YASAudioData alloc] initWithFormat:format frameCapacity:frameLength];
     YASRelease(format);
 

@@ -37,7 +37,7 @@
      Float32
      NonInterleaved
      */
-    YASAudioFormat *format = [[YASAudioFormat alloc] initWithBitDepthFormat:YASAudioBitDepthFormatFloat32
+    YASAudioFormat *format = [[YASAudioFormat alloc] initWithPCMFormat:YASAudioPCMFormatFloat32
                                                                  sampleRate:48000
                                                                    channels:2
                                                                 interleaved:NO];
@@ -64,7 +64,7 @@
      Fixed8.24
      */
 
-    format = [[YASAudioFormat alloc] initWithBitDepthFormat:YASAudioBitDepthFormatFixed824
+    format = [[YASAudioFormat alloc] initWithPCMFormat:YASAudioPCMFormatFixed824
                                                  sampleRate:48000
                                                    channels:2
                                                 interleaved:NO];
@@ -102,7 +102,7 @@
      Initialized
      */
 
-    format = [[YASAudioFormat alloc] initWithBitDepthFormat:YASAudioBitDepthFormatFloat32
+    format = [[YASAudioFormat alloc] initWithPCMFormat:YASAudioPCMFormatFloat32
                                                  sampleRate:48000
                                                    channels:2
                                                 interleaved:NO];
@@ -116,7 +116,7 @@
      Float64
      */
 
-    format = [[YASAudioFormat alloc] initWithBitDepthFormat:YASAudioBitDepthFormatFloat64
+    format = [[YASAudioFormat alloc] initWithPCMFormat:YASAudioPCMFormatFloat64
                                                  sampleRate:48000
                                                    channels:2
                                                 interleaved:NO];
@@ -127,7 +127,7 @@
      Int16
      */
 
-    format = [[YASAudioFormat alloc] initWithBitDepthFormat:YASAudioBitDepthFormatInt16
+    format = [[YASAudioFormat alloc] initWithPCMFormat:YASAudioPCMFormatInt16
                                                  sampleRate:48000
                                                    channels:2
                                                 interleaved:NO];
@@ -139,7 +139,7 @@
      Fixed8.24
      */
 
-    format = [[YASAudioFormat alloc] initWithBitDepthFormat:YASAudioBitDepthFormatFixed824
+    format = [[YASAudioFormat alloc] initWithPCMFormat:YASAudioPCMFormatFixed824
                                                  sampleRate:48000
                                                    channels:2
                                                 interleaved:NO];
@@ -152,7 +152,7 @@
      Interleaved
      */
 
-    format = [[YASAudioFormat alloc] initWithBitDepthFormat:YASAudioBitDepthFormatFloat32
+    format = [[YASAudioFormat alloc] initWithPCMFormat:YASAudioPCMFormatFloat32
                                                  sampleRate:48000
                                                    channels:2
                                                 interleaved:YES];

@@ -29,7 +29,7 @@
     const UInt32 bufferCount = channelCount;
     const UInt32 stride = 1;
     const BOOL interleaved = NO;
-    const YASAudioBitDepthFormat bitDepthFormat = YASAudioBitDepthFormatFloat32;
+    const YASAudioPCMFormat pcmFormat = YASAudioPCMFormatFloat32;
     const UInt32 bitsPerChannel = 32;
     const UInt32 bytesPerFrame = bitsPerChannel / 8;
 
@@ -52,7 +52,7 @@
     XCTAssert(format.stride == stride);
     XCTAssert(format.sampleRate == sampleRate);
     XCTAssert(format.isInterleaved == interleaved);
-    XCTAssert(format.bitDepthFormat == bitDepthFormat);
+    XCTAssert(format.pcmFormat == pcmFormat);
     XCTAssert(YASAudioIsEqualASBD(format.streamDescription, &asbd));
 
     YASRelease(format);
@@ -65,7 +65,7 @@
     const UInt32 bufferCount = 1;
     const UInt32 stride = channelCount;
     const BOOL interleaved = YES;
-    const YASAudioBitDepthFormat bitDepthFormat = YASAudioBitDepthFormatFloat64;
+    const YASAudioPCMFormat pcmFormat = YASAudioPCMFormatFloat64;
     const UInt32 bitsPerChannel = 64;
     const UInt32 bytesPerFrame = bitsPerChannel / 8 * channelCount;
 
@@ -80,10 +80,10 @@
         .mBytesPerPacket = bytesPerFrame,
     };
 
-    YASAudioFormat *format = [[YASAudioFormat alloc] initWithBitDepthFormat:bitDepthFormat
-                                                                 sampleRate:sampleRate
-                                                                   channels:channelCount
-                                                                interleaved:interleaved];
+    YASAudioFormat *format = [[YASAudioFormat alloc] initWithPCMFormat:pcmFormat
+                                                            sampleRate:sampleRate
+                                                              channels:channelCount
+                                                           interleaved:interleaved];
 
     XCTAssert(!format.isStandard);
     XCTAssert(format.channelCount == channelCount);
@@ -91,7 +91,7 @@
     XCTAssert(format.stride == stride);
     XCTAssert(format.sampleRate == sampleRate);
     XCTAssert(format.isInterleaved == interleaved);
-    XCTAssert(format.bitDepthFormat == bitDepthFormat);
+    XCTAssert(format.pcmFormat == pcmFormat);
     XCTAssert(YASAudioIsEqualASBD(format.streamDescription, &asbd));
 
     YASRelease(format);
@@ -104,7 +104,7 @@
     const UInt32 bufferCount = 1;
     const UInt32 stride = channelCount;
     const BOOL interleaved = YES;
-    const YASAudioBitDepthFormat bitDepthFormat = YASAudioBitDepthFormatInt16;
+    const YASAudioPCMFormat pcmFormat = YASAudioPCMFormatInt16;
     const UInt32 bitsPerChannel = 16;
     const UInt32 bytesPerFrame = bitsPerChannel / 8 * channelCount;
 
@@ -119,10 +119,10 @@
         .mBytesPerPacket = bytesPerFrame,
     };
 
-    YASAudioFormat *format = [[YASAudioFormat alloc] initWithBitDepthFormat:bitDepthFormat
-                                                                 sampleRate:sampleRate
-                                                                   channels:channelCount
-                                                                interleaved:interleaved];
+    YASAudioFormat *format = [[YASAudioFormat alloc] initWithPCMFormat:pcmFormat
+                                                            sampleRate:sampleRate
+                                                              channels:channelCount
+                                                           interleaved:interleaved];
 
     XCTAssert(!format.isStandard);
     XCTAssert(format.channelCount == channelCount);
@@ -130,7 +130,7 @@
     XCTAssert(format.stride == stride);
     XCTAssert(format.sampleRate == sampleRate);
     XCTAssert(format.isInterleaved == interleaved);
-    XCTAssert(format.bitDepthFormat == bitDepthFormat);
+    XCTAssert(format.pcmFormat == pcmFormat);
     XCTAssert(YASAudioIsEqualASBD(format.streamDescription, &asbd));
 
     YASRelease(format);
@@ -208,7 +208,7 @@
     format = [[YASAudioFormat alloc] initWithSettings:settings];
 
     if (kAudioFormatFlagIsBigEndian != kAudioFormatFlagsNativeEndian) {
-        XCTAssertEqual(format.bitDepthFormat, YASAudioBitDepthFormatFloat32);
+        XCTAssertEqual(format.pcmFormat, YASAudioPCMFormatFloat32);
         XCTAssertEqual(format.channelCount, 2);
         XCTAssertEqual(format.bufferCount, 2);
         XCTAssertEqual(format.stride, 1);
@@ -216,7 +216,7 @@
         XCTAssertEqual(format.isInterleaved, NO);
         XCTAssertEqual(format.sampleByteCount, 4);
     } else {
-        XCTAssertEqual(format.bitDepthFormat, YASAudioBitDepthFormatOther);
+        XCTAssertEqual(format.pcmFormat, YASAudioPCMFormatOther);
     }
 
     YASRelease(format);
@@ -232,7 +232,7 @@
     format = [[YASAudioFormat alloc] initWithSettings:settings];
 
     if (kAudioFormatFlagIsBigEndian == kAudioFormatFlagsNativeEndian) {
-        XCTAssertEqual(format.bitDepthFormat, YASAudioBitDepthFormatInt16);
+        XCTAssertEqual(format.pcmFormat, YASAudioPCMFormatInt16);
         XCTAssertEqual(format.channelCount, 4);
         XCTAssertEqual(format.bufferCount, 1);
         XCTAssertEqual(format.stride, 4);
@@ -240,7 +240,7 @@
         XCTAssertEqual(format.isInterleaved, YES);
         XCTAssertEqual(format.sampleByteCount, 2);
     } else {
-        XCTAssertEqual(format.bitDepthFormat, YASAudioBitDepthFormatOther);
+        XCTAssertEqual(format.pcmFormat, YASAudioPCMFormatOther);
     }
 
     YASRelease(format);
@@ -249,18 +249,12 @@
 
 - (void)testIsEqualHash
 {
-    YASAudioFormat *format1 = [[YASAudioFormat alloc] initWithBitDepthFormat:YASAudioBitDepthFormatFloat32
-                                                                  sampleRate:48000
-                                                                    channels:2
-                                                                 interleaved:YES];
-    YASAudioFormat *format2 = [[YASAudioFormat alloc] initWithBitDepthFormat:YASAudioBitDepthFormatFloat32
-                                                                  sampleRate:48000
-                                                                    channels:2
-                                                                 interleaved:YES];
-    YASAudioFormat *format3 = [[YASAudioFormat alloc] initWithBitDepthFormat:YASAudioBitDepthFormatInt16
-                                                                  sampleRate:48000
-                                                                    channels:4
-                                                                 interleaved:NO];
+    YASAudioFormat *format1 =
+        [[YASAudioFormat alloc] initWithPCMFormat:YASAudioPCMFormatFloat32 sampleRate:48000 channels:2 interleaved:YES];
+    YASAudioFormat *format2 =
+        [[YASAudioFormat alloc] initWithPCMFormat:YASAudioPCMFormatFloat32 sampleRate:48000 channels:2 interleaved:YES];
+    YASAudioFormat *format3 =
+        [[YASAudioFormat alloc] initWithPCMFormat:YASAudioPCMFormatInt16 sampleRate:48000 channels:4 interleaved:NO];
 
     XCTAssertEqual(format1.hash, format2.hash);
     XCTAssertNotEqual(format1.hash, format3.hash);
@@ -275,7 +269,7 @@
     YASAudioFormat *format = [[YASAudioFormat alloc] initStandardFormatWithSampleRate:48000 channels:2];
     NSString *description = format.description;
 
-    XCTAssertNotEqual([description rangeOfString:@"bitDepthFormat"].location, NSNotFound);
+    XCTAssertNotEqual([description rangeOfString:@"pcmFormat"].location, NSNotFound);
     XCTAssertNotEqual([description rangeOfString:@"sampleRate"].location, NSNotFound);
     XCTAssertNotEqual([description rangeOfString:@"bitsPerChannel"].location, NSNotFound);
     XCTAssertNotEqual([description rangeOfString:@"bytesPerFrame"].location, NSNotFound);
