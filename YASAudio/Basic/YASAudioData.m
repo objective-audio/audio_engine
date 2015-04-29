@@ -5,7 +5,6 @@
 
 #import "YASAudioData.h"
 #import "YASAudioFormat.h"
-#import "YASAudioScanner.h"
 #import "YASAudioUtility.h"
 #import "YASMacros.h"
 #import "NSException+YASAudio.h"

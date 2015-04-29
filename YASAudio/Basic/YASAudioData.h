@@ -7,7 +7,7 @@
 #import <AudioToolbox/AudioToolbox.h>
 #import "YASAudioTypes.h"
 
-@class YASAudioFormat, YASAudioScanner, YASAudioMutableScanner;
+@class YASAudioFormat;
 
 @interface YASAudioData : NSObject <NSCopying>
 

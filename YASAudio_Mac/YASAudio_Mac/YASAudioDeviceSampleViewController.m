@@ -52,8 +52,9 @@ static const UInt32 kSineDataMaxCount = 4096;
 
     YASAudioFormat *format = outputData.format;
     if (format.bitDepthFormat == YASAudioBitDepthFormatFloat32 && format.stride == 1) {
-        YASAudioMutableFrameScanner *scanner = [[YASAudioMutableFrameScanner alloc] initWithAudioData:outputData];
-        const YASAudioMutablePointer *pointer = scanner.mutablePointer;
+        YASAudioMutableFrameEnumerator *enumerator =
+            [[YASAudioMutableFrameEnumerator alloc] initWithAudioData:outputData];
+        const YASAudioMutablePointer *pointer = enumerator.mutablePointer;
 
         if (inputData.frameLength >= frameLength) {
             [outputData copyFlexiblyFromData:inputData];
@@ -62,9 +63,9 @@ static const UInt32 kSineDataMaxCount = 4096;
 
             while (pointer->v) {
                 cblas_sscal(frameLength, throughVol, pointer->f32, 1);
-                YASAudioFrameScannerMoveChannel(scanner);
+                YASAudioFrameEnumeratorMoveChannel(enumerator);
             }
-            YASAudioFrameScannerReset(scanner);
+            YASAudioFrameEnumeratorReset(enumerator);
         }
 
         const Float64 sampleRate = format.sampleRate;
@@ -77,12 +78,12 @@ static const UInt32 kSineDataMaxCount = 4096;
 
             while (pointer->v) {
                 cblas_saxpy(frameLength, sineVol, _sineData, 1, pointer->f32, 1);
-                YASAudioFrameScannerMoveChannel(scanner);
+                YASAudioFrameEnumeratorMoveChannel(enumerator);
             }
-            YASAudioFrameScannerReset(scanner);
+            YASAudioFrameEnumeratorReset(enumerator);
         }
 
-        YASRelease(scanner);
+        YASRelease(enumerator);
     }
 }
 

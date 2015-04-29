@@ -134,15 +134,15 @@
         XCTAssertEqual(data.frameLength, framesPerRender);
         XCTAssertEqualObjects(data.format, format);
 
-        YASAudioMutableFrameScanner *scanner = [[YASAudioMutableFrameScanner alloc] initWithAudioData:data];
-        const YASAudioMutablePointer *pointer = scanner.mutablePointer;
-        const NSUInteger *frame = scanner.frame;
-        const NSUInteger *channel = scanner.channel;
+        YASAudioMutableFrameEnumerator *enumerator = [[YASAudioMutableFrameEnumerator alloc] initWithAudioData:data];
+        const YASAudioMutablePointer *pointer = enumerator.mutablePointer;
+        const NSUInteger *frame = enumerator.frame;
+        const NSUInteger *channel = enumerator.channel;
         while (pointer->v) {
             *pointer->f32 = TestValue((UInt32)*frame + tapRenderFrame, 0, (UInt32)*channel);
-            YASAudioFrameScannerMove(scanner);
+            YASAudioFrameEnumeratorMove(enumerator);
         }
-        YASRelease(scanner);
+        YASRelease(enumerator);
 
         tapRenderFrame += data.frameLength;
         if (tapRenderFrame >= length) {
@@ -159,15 +159,15 @@
         XCTAssertEqual(data.frameLength, framesPerRender);
         XCTAssertEqualObjects(data.format, format);
 
-        YASAudioFrameScanner *scanner = [[YASAudioFrameScanner alloc] initWithAudioData:data];
-        const YASAudioPointer *pointer = scanner.pointer;
-        const NSUInteger *frame = scanner.frame;
-        const NSUInteger *channel = scanner.channel;
+        YASAudioFrameEnumerator *enumerator = [[YASAudioFrameEnumerator alloc] initWithAudioData:data];
+        const YASAudioPointer *pointer = enumerator.pointer;
+        const NSUInteger *frame = enumerator.frame;
+        const NSUInteger *channel = enumerator.channel;
         while (pointer->v) {
             XCTAssertEqual(*pointer->f32, TestValue((UInt32)*frame + outputRenderFrame, 0, (UInt32)*channel));
-            YASAudioFrameScannerMove(scanner);
+            YASAudioFrameEnumeratorMove(enumerator);
         }
-        YASRelease(scanner);
+        YASRelease(enumerator);
 
         outputRenderFrame += data.frameLength;
         if (outputRenderFrame >= length) {

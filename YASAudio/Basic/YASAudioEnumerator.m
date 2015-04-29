@@ -1,15 +1,15 @@
 //
-//  YASAudioFrameScanner.m
+//  YASAudioEnumerator.m
 //  Copyright (c) 2015 Yuki Yasoshima.
 //
 
-#import "YASAudioScanner.h"
+#import "YASAudioEnumerator.h"
 #import "YASAudioData.h"
 #import "YASAudioFormat.h"
 #import "NSException+YASAudio.h"
 #import "YASMacros.h"
 
-@implementation YASAudioScanner
+@implementation YASAudioEnumerator
 
 - (instancetype)initWithAudioData:(YASAudioData *)data atChannel:(const NSUInteger)channel
 {
@@ -50,12 +50,12 @@
 
 - (void)move
 {
-    YASAudioScannerMove(self);
+    YASAudioEnumeratorMove(self);
 }
 
 - (void)stop
 {
-    YASAudioScannerStop(self);
+    YASAudioEnumeratorStop(self);
 }
 
 - (void)setPosition:(const NSUInteger)index
@@ -71,12 +71,12 @@
 
 - (void)reset
 {
-    YASAudioScannerReset(self);
+    YASAudioEnumeratorReset(self);
 }
 
 @end
 
-@implementation YASAudioMutableScanner
+@implementation YASAudioMutableEnumerator
 
 - (const YASAudioMutablePointer *)mutablePointer
 {
@@ -85,7 +85,7 @@
 
 @end
 
-@implementation YASAudioFrameScanner
+@implementation YASAudioFrameEnumerator
 
 - (instancetype)initWithAudioData:(YASAudioData *)data
 {
@@ -144,22 +144,22 @@
 
 - (void)move
 {
-    YASAudioFrameScannerMove(self);
+    YASAudioFrameEnumeratorMove(self);
 }
 
 - (void)moveFrame
 {
-    YASAudioFrameScannerMoveFrame(self);
+    YASAudioFrameEnumeratorMoveFrame(self);
 }
 
 - (void)moveChannel
 {
-    YASAudioFrameScannerMoveChannel(self);
+    YASAudioFrameEnumeratorMoveChannel(self);
 }
 
 - (void)stop
 {
-    YASAudioFrameScannerStop(self);
+    YASAudioFrameEnumeratorStop(self);
 }
 
 - (void)setFramePosition:(const NSUInteger)frame
@@ -197,12 +197,12 @@
 
 - (void)reset
 {
-    YASAudioFrameScannerReset(self);
+    YASAudioFrameEnumeratorReset(self);
 }
 
 @end
 
-@implementation YASAudioMutableFrameScanner
+@implementation YASAudioMutableFrameEnumerator
 
 - (const YASAudioMutablePointer *)mutablePointer
 {

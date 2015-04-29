@@ -1,16 +1,16 @@
 //
-//  YASAudioFrameScannerTests.m
+//  YASAudioFrameEnumeratorTests.m
 //  Copyright (c) 2015 Yuki Yasoshima.
 //
 
 #import <XCTest/XCTest.h>
 #import "YASAudioTestUtils.h"
 
-@interface YASAudioFrameScannerTests : XCTestCase
+@interface YASAudioFrameEnumeratorTests : XCTestCase
 
 @end
 
-@implementation YASAudioFrameScannerTests
+@implementation YASAudioFrameEnumeratorTests
 
 - (void)setUp
 {
@@ -22,7 +22,7 @@
     [super tearDown];
 }
 
-- (void)testReadFrameScannerNonInterleaved
+- (void)testReadFrameEnumeratorNonInterleaved
 {
     const UInt32 frameLength = 16;
     const UInt32 channels = 4;
@@ -35,10 +35,10 @@
 
     [YASAudioTestUtils fillTestValuesToData:data];
 
-    YASAudioFrameScanner *scanner = [[YASAudioFrameScanner alloc] initWithAudioData:data];
-    const YASAudioPointer *pointer = scanner.pointer;
-    const NSUInteger *pointerFrame = scanner.frame;
-    const NSUInteger *pointerChannel = scanner.channel;
+    YASAudioFrameEnumerator *enumerator = [[YASAudioFrameEnumerator alloc] initWithAudioData:data];
+    const YASAudioPointer *pointer = enumerator.pointer;
+    const NSUInteger *pointerFrame = enumerator.frame;
+    const NSUInteger *pointerChannel = enumerator.channel;
 
     for (NSInteger i = 0; i < 2; i++) {
         UInt32 frame = 0;
@@ -48,22 +48,22 @@
             while (pointer->v) {
                 XCTAssertEqual(*pointerChannel, channel);
                 XCTAssertEqual(*pointer->f32, (Float32)TestValue(frame, 0, channel));
-                YASAudioFrameScannerMoveChannel(scanner);
+                YASAudioFrameEnumeratorMoveChannel(enumerator);
                 channel++;
             }
             XCTAssertEqual(channel, channels);
-            YASAudioFrameScannerMoveFrame(scanner);
+            YASAudioFrameEnumeratorMoveFrame(enumerator);
             frame++;
         }
         XCTAssertEqual(frame, frameLength);
-        YASAudioFrameScannerReset(scanner);
+        YASAudioFrameEnumeratorReset(enumerator);
     }
 
-    YASRelease(scanner);
+    YASRelease(enumerator);
     YASRelease(data);
 }
 
-- (void)testReadFrameScannerInterleavedUseMacro
+- (void)testReadFrameEnumeratorInterleavedUseMacro
 {
     const UInt32 frameLength = 16;
     const UInt32 channels = 3;
@@ -79,10 +79,10 @@
 
     [YASAudioTestUtils fillTestValuesToData:data];
 
-    YASAudioFrameScanner *scanner = [[YASAudioFrameScanner alloc] initWithAudioData:data];
-    const YASAudioPointer *pointer = scanner.pointer;
-    const NSUInteger *pointerFrame = scanner.frame;
-    const NSUInteger *pointerChannel = scanner.channel;
+    YASAudioFrameEnumerator *enumerator = [[YASAudioFrameEnumerator alloc] initWithAudioData:data];
+    const YASAudioPointer *pointer = enumerator.pointer;
+    const NSUInteger *pointerFrame = enumerator.frame;
+    const NSUInteger *pointerChannel = enumerator.channel;
 
     for (NSInteger i = 0; i < 2; i++) {
         UInt32 frame = 0;
@@ -92,22 +92,22 @@
             while (pointer->v) {
                 XCTAssertEqual(*pointerChannel, channel);
                 XCTAssertEqual(*pointer->f32, (Float32)TestValue(frame, channel, 0));
-                YASAudioFrameScannerMoveChannel(scanner);
+                YASAudioFrameEnumeratorMoveChannel(enumerator);
                 channel++;
             }
             XCTAssertEqual(channel, channels);
-            YASAudioFrameScannerMoveFrame(scanner);
+            YASAudioFrameEnumeratorMoveFrame(enumerator);
             frame++;
         }
         XCTAssertEqual(frame, frameLength);
-        YASAudioFrameScannerReset(scanner);
+        YASAudioFrameEnumeratorReset(enumerator);
     }
 
-    YASRelease(scanner);
+    YASRelease(enumerator);
     YASRelease(data);
 }
 
-- (void)testReadFrameScannerUseMethod
+- (void)testReadFrameEnumeratorUseMethod
 {
     const UInt32 frameLength = 16;
     const UInt32 channels = 3;
@@ -123,10 +123,10 @@
 
     [YASAudioTestUtils fillTestValuesToData:data];
 
-    YASAudioFrameScanner *scanner = [[YASAudioFrameScanner alloc] initWithAudioData:data];
-    const YASAudioPointer *pointer = scanner.pointer;
-    const NSUInteger *pointerFrame = scanner.frame;
-    const NSUInteger *pointerChannel = scanner.channel;
+    YASAudioFrameEnumerator *enumerator = [[YASAudioFrameEnumerator alloc] initWithAudioData:data];
+    const YASAudioPointer *pointer = enumerator.pointer;
+    const NSUInteger *pointerFrame = enumerator.frame;
+    const NSUInteger *pointerChannel = enumerator.channel;
 
     for (NSInteger i = 0; i < 2; i++) {
         UInt32 frame = 0;
@@ -136,22 +136,22 @@
             while (pointer->v) {
                 XCTAssertEqual(*pointerChannel, channel);
                 XCTAssertEqual(*pointer->f32, (Float32)TestValue(frame, channel, 0));
-                [scanner moveChannel];
+                [enumerator moveChannel];
                 channel++;
             }
             XCTAssertEqual(channel, channels);
-            [scanner moveFrame];
+            [enumerator moveFrame];
             frame++;
         }
         XCTAssertEqual(frame, frameLength);
-        [scanner reset];
+        [enumerator reset];
     }
 
-    YASRelease(scanner);
+    YASRelease(enumerator);
     YASRelease(data);
 }
 
-- (void)testReadFrameScannerByMove
+- (void)testReadFrameEnumeratorByMove
 {
     const UInt32 frameLength = 16;
     const UInt32 channels = 4;
@@ -162,10 +162,10 @@
 
     [YASAudioTestUtils fillTestValuesToData:data];
 
-    YASAudioFrameScanner *scanner = [[YASAudioFrameScanner alloc] initWithAudioData:data];
-    const YASAudioPointer *pointer = scanner.pointer;
-    const NSUInteger *pointerFrame = scanner.frame;
-    const NSUInteger *pointerChannel = scanner.channel;
+    YASAudioFrameEnumerator *enumerator = [[YASAudioFrameEnumerator alloc] initWithAudioData:data];
+    const YASAudioPointer *pointer = enumerator.pointer;
+    const NSUInteger *pointerFrame = enumerator.frame;
+    const NSUInteger *pointerChannel = enumerator.channel;
 
     NSUInteger frame = 0;
     NSUInteger channel = 0;
@@ -174,7 +174,7 @@
         XCTAssertEqual(channel, *pointerChannel);
         XCTAssertEqual(*pointer->f32, TestValue((UInt32)*pointerFrame, 0, (UInt32)*pointerChannel));
 
-        [scanner move];
+        [enumerator move];
 
         channel++;
         if (channel == channels) {
@@ -185,11 +185,11 @@
 
     XCTAssertEqual(frame, frameLength);
 
-    YASRelease(scanner);
+    YASRelease(enumerator);
     YASRelease(data);
 }
 
-- (void)testWriteFrameScanner
+- (void)testWriteFrameEnumerator
 {
     const UInt32 frameLength = 16;
     const UInt32 channels = 4;
@@ -200,10 +200,10 @@
 
     XCTAssertEqual(format.bufferCount, channels);
 
-    YASAudioMutableFrameScanner *mutableScanner = [[YASAudioMutableFrameScanner alloc] initWithAudioData:data];
-    const YASAudioMutablePointer *mutablePointer = mutableScanner.mutablePointer;
-    const NSUInteger *mutablePointerFrame = mutableScanner.frame;
-    const NSUInteger *mutablePointerChannel = mutableScanner.channel;
+    YASAudioMutableFrameEnumerator *mutableEnumerator = [[YASAudioMutableFrameEnumerator alloc] initWithAudioData:data];
+    const YASAudioMutablePointer *mutablePointer = mutableEnumerator.mutablePointer;
+    const NSUInteger *mutablePointerFrame = mutableEnumerator.frame;
+    const NSUInteger *mutablePointerChannel = mutableEnumerator.channel;
 
     NSUInteger frame = 0;
     while (mutablePointer->v) {
@@ -212,29 +212,29 @@
         while (mutablePointer->v) {
             XCTAssertEqual(*mutablePointerChannel, channel);
             *mutablePointer->f32 = (Float32)TestValue((UInt32)*mutablePointerFrame, 0, (UInt32)*mutablePointerChannel);
-            YASAudioFrameScannerMoveChannel(mutableScanner);
+            YASAudioFrameEnumeratorMoveChannel(mutableEnumerator);
             channel++;
         }
-        YASAudioFrameScannerMoveFrame(mutableScanner);
+        YASAudioFrameEnumeratorMoveFrame(mutableEnumerator);
         frame++;
     }
     XCTAssertEqual(frame, frameLength);
-    YASRelease(mutableScanner);
+    YASRelease(mutableEnumerator);
 
-    YASAudioFrameScanner *scanner = [[YASAudioFrameScanner alloc] initWithAudioData:data];
-    const YASAudioPointer *pointer = scanner.pointer;
-    const NSUInteger *pointerFrame = scanner.frame;
-    const NSUInteger *pointerChannel = scanner.channel;
+    YASAudioFrameEnumerator *enumerator = [[YASAudioFrameEnumerator alloc] initWithAudioData:data];
+    const YASAudioPointer *pointer = enumerator.pointer;
+    const NSUInteger *pointerFrame = enumerator.frame;
+    const NSUInteger *pointerChannel = enumerator.channel;
 
     while (pointer->v) {
         XCTAssertEqual(*pointer->f32, (Float32)TestValue((UInt32)*pointerFrame, 0, (UInt32)*pointerChannel));
-        YASAudioFrameScannerMove(scanner);
+        YASAudioFrameEnumeratorMove(enumerator);
     }
 
     XCTAssertEqual(*pointerFrame, frameLength);
     XCTAssertEqual(*pointerChannel, channels);
 
-    YASRelease(scanner);
+    YASRelease(enumerator);
 
     YASRelease(data);
 }
@@ -252,31 +252,31 @@
         bufferPointer.f32[frame] = TestValue(frame, 0, 0);
     }
 
-    YASAudioFrameScanner *scanner = [[YASAudioFrameScanner alloc] initWithAudioData:data];
-    const YASAudioPointer *pointer = scanner.pointer;
-    const NSUInteger *pointerFrame = scanner.frame;
+    YASAudioFrameEnumerator *enumerator = [[YASAudioFrameEnumerator alloc] initWithAudioData:data];
+    const YASAudioPointer *pointer = enumerator.pointer;
+    const NSUInteger *pointerFrame = enumerator.frame;
 
     XCTAssertEqual(*pointerFrame, 0);
     XCTAssertEqual(*pointer->f32, TestValue(0, 0, 0));
 
-    [scanner setFramePosition:3];
+    [enumerator setFramePosition:3];
     XCTAssertEqual(*pointerFrame, 3);
     XCTAssertEqual(*pointer->f32, TestValue(3, 0, 0));
 
     while (pointer->v) {
-        YASAudioFrameScannerMoveChannel(scanner);
+        YASAudioFrameEnumeratorMoveChannel(enumerator);
     }
 
-    [scanner setFramePosition:5];
+    [enumerator setFramePosition:5];
     XCTAssertFalse(pointer->v);
 
-    [scanner setChannelPosition:0];
+    [enumerator setChannelPosition:0];
     XCTAssertEqual(*pointer->f32, TestValue(5, 0, 0));
 
-    XCTAssertThrows([scanner setFramePosition:16]);
-    XCTAssertThrows([scanner setFramePosition:100]);
+    XCTAssertThrows([enumerator setFramePosition:16]);
+    XCTAssertThrows([enumerator setFramePosition:100]);
 
-    YASRelease(scanner);
+    YASRelease(enumerator);
     YASRelease(data);
 }
 
@@ -296,25 +296,25 @@
         bufferPointer.f32[ch] = TestValue(0, ch, 0);
     }
 
-    YASAudioFrameScanner *scanner = [[YASAudioFrameScanner alloc] initWithAudioData:data];
-    const YASAudioPointer *pointer = scanner.pointer;
-    const NSUInteger *pointerChannel = scanner.channel;
+    YASAudioFrameEnumerator *enumerator = [[YASAudioFrameEnumerator alloc] initWithAudioData:data];
+    const YASAudioPointer *pointer = enumerator.pointer;
+    const NSUInteger *pointerChannel = enumerator.channel;
 
     XCTAssertEqual(*pointerChannel, 0);
     XCTAssertEqual(*pointer->f32, TestValue(0, 0, 0));
 
-    [scanner setChannelPosition:2];
+    [enumerator setChannelPosition:2];
     XCTAssertEqual(*pointerChannel, 2);
     XCTAssertEqual(*pointer->f32, TestValue(0, 2, 0));
 
-    XCTAssertThrows([scanner setChannelPosition:4]);
-    XCTAssertThrows([scanner setChannelPosition:100]);
+    XCTAssertThrows([enumerator setChannelPosition:4]);
+    XCTAssertThrows([enumerator setChannelPosition:100]);
 
-    YASRelease(scanner);
+    YASRelease(enumerator);
     YASRelease(data);
 }
 
-- (void)testReadFrameScannerEachBitDepthFormat
+- (void)testReadFrameEnumeratorEachBitDepthFormat
 {
     const UInt32 frameLength = 16;
     const UInt32 channels = 4;
@@ -330,10 +330,10 @@
 
         [YASAudioTestUtils fillTestValuesToData:data];
 
-        YASAudioFrameScanner *scanner = [[YASAudioFrameScanner alloc] initWithAudioData:data];
-        const YASAudioPointer *pointer = scanner.pointer;
-        const NSUInteger *frame = scanner.frame;
-        const NSUInteger *channel = scanner.channel;
+        YASAudioFrameEnumerator *enumerator = [[YASAudioFrameEnumerator alloc] initWithAudioData:data];
+        const YASAudioPointer *pointer = enumerator.pointer;
+        const NSUInteger *frame = enumerator.frame;
+        const NSUInteger *channel = enumerator.channel;
 
         while (pointer->v) {
             while (pointer->v) {
@@ -356,15 +356,15 @@
                         break;
                 }
 
-                YASAudioFrameScannerMoveChannel(scanner);
+                YASAudioFrameEnumeratorMoveChannel(enumerator);
             }
             XCTAssertEqual(*channel, channels);
-            YASAudioFrameScannerMoveFrame(scanner);
+            YASAudioFrameEnumeratorMoveFrame(enumerator);
         }
 
         XCTAssertEqual(*frame, frameLength);
 
-        YASRelease(scanner);
+        YASRelease(enumerator);
         YASRelease(data);
     }
 }
@@ -383,10 +383,10 @@
     YASAudioData *data = [[YASAudioData alloc] initWithFormat:format frameCapacity:frameLength];
     YASRelease(format);
 
-    YASAudioFrameScanner *scanner = [[YASAudioFrameScanner alloc] initWithAudioData:data];
-    const YASAudioPointer *pointer = scanner.pointer;
-    const NSUInteger *frame = scanner.frame;
-    const NSUInteger *channel = scanner.channel;
+    YASAudioFrameEnumerator *enumerator = [[YASAudioFrameEnumerator alloc] initWithAudioData:data];
+    const YASAudioPointer *pointer = enumerator.pointer;
+    const NSUInteger *frame = enumerator.frame;
+    const NSUInteger *channel = enumerator.channel;
 
     NSUInteger fr = 0;
     NSUInteger ch;
@@ -394,19 +394,19 @@
         ch = 0;
         while (pointer->v) {
             if (*frame == stopFrame && *channel == stopChannel) {
-                [scanner stop];
+                [enumerator stop];
             }
-            YASAudioFrameScannerMoveChannel(scanner);
+            YASAudioFrameEnumeratorMoveChannel(enumerator);
             ch++;
         }
-        YASAudioFrameScannerMoveFrame(scanner);
+        YASAudioFrameEnumeratorMoveFrame(enumerator);
         fr++;
     }
 
     XCTAssertEqual(fr, stopFrame + 1);
     XCTAssertEqual(ch, stopChannel + 1);
 
-    YASRelease(scanner);
+    YASRelease(enumerator);
     YASRelease(data);
 }
 

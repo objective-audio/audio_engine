@@ -64,13 +64,13 @@ UInt32 TestValue(UInt32 frame, UInt32 channel, UInt32 buffer)
 
 + (YASAudioMutablePointer)mutablePointerWithData:(YASAudioData *)data channel:(UInt32)channel frame:(UInt32)frame
 {
-    YASAudioMutableFrameScanner *scanner = [[YASAudioMutableFrameScanner alloc] initWithAudioData:data];
-    [scanner setFramePosition:frame];
-    [scanner setChannelPosition:channel];
+    YASAudioMutableFrameEnumerator *enumerator = [[YASAudioMutableFrameEnumerator alloc] initWithAudioData:data];
+    [enumerator setFramePosition:frame];
+    [enumerator setChannelPosition:channel];
 
-    YASAudioMutablePointer pointer = *scanner.mutablePointer;
+    YASAudioMutablePointer pointer = *enumerator.mutablePointer;
 
-    YASRelease(scanner);
+    YASRelease(enumerator);
 
     return pointer;
 }
@@ -113,18 +113,18 @@ UInt32 TestValue(UInt32 frame, UInt32 channel, UInt32 buffer)
     NSData *zeroData = [NSMutableData dataWithLength:sampleByteCount];
     const void *zeroBytes = [zeroData bytes];
 
-    YASAudioFrameScanner *scanner = [[YASAudioFrameScanner alloc] initWithAudioData:data];
-    const YASAudioPointer *pointer = scanner.pointer;
+    YASAudioFrameEnumerator *enumerator = [[YASAudioFrameEnumerator alloc] initWithAudioData:data];
+    const YASAudioPointer *pointer = enumerator.pointer;
 
     while (pointer->v) {
         if (YASAudioIsEqualData(pointer->v, zeroBytes, sampleByteCount)) {
             isFilled = NO;
-            YASAudioFrameScannerStop(scanner);
+            YASAudioFrameEnumeratorStop(enumerator);
         }
-        YASAudioFrameScannerMove(scanner);
+        YASAudioFrameEnumeratorMove(enumerator);
     }
 
-    YASRelease(scanner);
+    YASRelease(enumerator);
 
     return isFilled;
 }
