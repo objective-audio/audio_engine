@@ -131,18 +131,18 @@
     return nil;
 }
 
-+ (NSString *)yas_stringWithBitDepthFormat:(YASAudioBitDepthFormat)bitDepthFormat
++ (NSString *)yas_stringWithPCMFormat:(YASAudioPCMFormat)pcmFormat
 {
-    switch (bitDepthFormat) {
-        case YASAudioBitDepthFormatFloat32:
+    switch (pcmFormat) {
+        case YASAudioPCMFormatFloat32:
             return @"Float32";
-        case YASAudioBitDepthFormatFloat64:
+        case YASAudioPCMFormatFloat64:
             return @"Float64";
-        case YASAudioBitDepthFormatInt16:
+        case YASAudioPCMFormatInt16:
             return @"Int16";
-        case YASAudioBitDepthFormatFixed824:
+        case YASAudioPCMFormatFixed824:
             return @"Fixed8.24";
-        case YASAudioBitDepthFormatOther:
+        case YASAudioPCMFormatOther:
             return @"Other";
     }
     return nil;

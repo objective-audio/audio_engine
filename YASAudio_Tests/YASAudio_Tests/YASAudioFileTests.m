@@ -23,7 +23,7 @@
 @property (nonatomic, copy) NSString *fileName;
 @property (nonatomic) UInt32 frameLength;
 @property (nonatomic) UInt32 loopCount;
-@property (nonatomic) YASAudioBitDepthFormat bitDepthFormat;
+@property (nonatomic) YASAudioPCMFormat pcmFormat;
 @property (nonatomic) BOOL interleaved;
 @property (nonatomic, readonly) NSDictionary *settings;
 @property (nonatomic) BOOL standard;
@@ -113,17 +113,17 @@
     NSArray *sampleRates = @[@(44100.0), @(382000.0)];
     NSArray *channels = @[@(1), @(2)];
     NSArray *fileBitDepths = @[@(16), @(24)];
-    NSArray *bitDepthFormats = @[@(YASAudioBitDepthFormatFloat32), @(YASAudioBitDepthFormatInt16)];
+    NSArray *pcmFormats = @[@(YASAudioPCMFormatFloat32), @(YASAudioPCMFormatInt16)];
     NSArray *interleaveds = @[@(YES), @(NO)];
 #else
     NSArray *sampleRates = @[@(8000.0), @(44100.0), @(48000.0), @(382000.0)];
     NSArray *channels = @[@(1), @(2), @(3), @(6)];
     NSArray *fileBitDepths = @[@(16), @(24), @(32)];
-    NSArray *bitDepthFormats = @[
-        @(YASAudioBitDepthFormatFloat32),
-        @(YASAudioBitDepthFormatFloat64),
-        @(YASAudioBitDepthFormatInt16),
-        @(YASAudioBitDepthFormatFixed824)
+    NSArray *pcmFormats = @[
+        @(YASAudioPCMFormatFloat32),
+        @(YASAudioPCMFormatFloat64),
+        @(YASAudioPCMFormatInt16),
+        @(YASAudioPCMFormatFixed824)
     ];
     NSArray *interleaveds = @[@(YES), @(NO)];
 #endif
@@ -139,13 +139,13 @@
         for (NSNumber *processingSampleRate in sampleRates) {
             for (NSNumber *channel in channels) {
                 for (NSNumber *fileBitDepth in fileBitDepths) {
-                    for (NSNumber *bitDepthFormat in bitDepthFormats) {
+                    for (NSNumber *pcmFormat in pcmFormats) {
                         for (NSNumber *interleved in interleaveds) {
                             testData.fileSampleRate = fileSampleRate.doubleValue;
                             testData.channels = channel.unsignedIntValue;
                             testData.fileBitDepth = fileBitDepth.unsignedIntValue;
                             testData.processingSampleRate = processingSampleRate.doubleValue;
-                            testData.bitDepthFormat = bitDepthFormat.unsignedIntValue;
+                            testData.pcmFormat = pcmFormat.unsignedIntValue;
                             testData.interleaved = interleved.boolValue;
                             @autoreleasepool
                             {
@@ -163,7 +163,7 @@
     testData.channels = 2;
     testData.fileBitDepth = 32;
     testData.processingSampleRate = 44100;
-    testData.bitDepthFormat = YASAudioBitDepthFormatFloat32;
+    testData.pcmFormat = YASAudioPCMFormatFloat32;
     testData.interleaved = NO;
 
     [self _commonAudioFileTest:testData isWriteAsync:NO];
@@ -318,17 +318,15 @@
 {
     NSError *error = nil;
 
-    XCTAssertNil([[YASAudioFileReader alloc] initWithURL:nil
-                                          bitDepthFormat:YASAudioBitDepthFormatFloat32
-                                             interleaved:YES
-                                                   error:&error]);
+    XCTAssertNil(
+        [[YASAudioFileReader alloc] initWithURL:nil pcmFormat:YASAudioPCMFormatFloat32 interleaved:YES error:&error]);
     XCTAssertNotNil(error);
     XCTAssertEqual(error.code, YASAudioFileErrorCodeArgumentIsNil);
 
     const Float64 sampleRate = 48000;
     const UInt32 channels = 2;
     const UInt32 bitDepth = 32;
-    const YASAudioBitDepthFormat bitDepthFormat = YASAudioBitDepthFormatFloat32;
+    const YASAudioPCMFormat pcmFormat = YASAudioPCMFormatFloat32;
     const BOOL interleaved = YES;
     NSString *fileName = @"test.wav";
     NSString *filePath = [[self temporaryTestDirectory] stringByAppendingPathComponent:fileName];
@@ -340,7 +338,7 @@
     XCTAssertNil([[YASAudioFileWriter alloc] initWithURL:nil
                                                 fileType:fileType
                                                 settings:settings
-                                          bitDepthFormat:bitDepthFormat
+                                               pcmFormat:pcmFormat
                                              interleaved:interleaved
                                                    error:nil]);
     XCTAssertNotNil(error);
@@ -349,7 +347,7 @@
     XCTAssertNil([[YASAudioFileWriter alloc] initWithURL:fileURL
                                                 fileType:nil
                                                 settings:settings
-                                          bitDepthFormat:bitDepthFormat
+                                               pcmFormat:pcmFormat
                                              interleaved:interleaved
                                                    error:nil]);
     XCTAssertNotNil(error);
@@ -358,7 +356,7 @@
     XCTAssertNil([[YASAudioFileWriter alloc] initWithURL:fileURL
                                                 fileType:fileType
                                                 settings:nil
-                                          bitDepthFormat:bitDepthFormat
+                                               pcmFormat:pcmFormat
                                              interleaved:interleaved
                                                    error:nil]);
     XCTAssertNotNil(error);
@@ -381,19 +379,19 @@
     const UInt32 loopCount = testData.loopCount;
     const Float64 fileSampleRate = testData.fileSampleRate;
     const Float64 processingSampleRate = testData.processingSampleRate;
-    const YASAudioBitDepthFormat bitDepthFormat = testData.bitDepthFormat;
+    const YASAudioPCMFormat pcmFormat = testData.pcmFormat;
     const BOOL interleaved = testData.interleaved;
     NSDictionary *settings = testData.settings;
 
-    YASAudioFormat *defaultProcessingFormat = [[YASAudioFormat alloc] initWithBitDepthFormat:bitDepthFormat
-                                                                                  sampleRate:fileSampleRate
-                                                                                    channels:channels
-                                                                                 interleaved:interleaved];
+    YASAudioFormat *defaultProcessingFormat = [[YASAudioFormat alloc] initWithPCMFormat:pcmFormat
+                                                                             sampleRate:fileSampleRate
+                                                                               channels:channels
+                                                                            interleaved:interleaved];
 
-    YASAudioFormat *processingFormat = [[YASAudioFormat alloc] initWithBitDepthFormat:bitDepthFormat
-                                                                           sampleRate:processingSampleRate
-                                                                             channels:channels
-                                                                          interleaved:interleaved];
+    YASAudioFormat *processingFormat = [[YASAudioFormat alloc] initWithPCMFormat:pcmFormat
+                                                                      sampleRate:processingSampleRate
+                                                                        channels:channels
+                                                                     interleaved:interleaved];
 
     XCTAssertNotNil(defaultProcessingFormat);
     XCTAssertNotNil(processingFormat);
@@ -411,7 +409,7 @@
             audioFile = [[YASAudioFileWriter alloc] initWithURL:fileURL
                                                        fileType:fileType
                                                        settings:settings
-                                                 bitDepthFormat:bitDepthFormat
+                                                      pcmFormat:pcmFormat
                                                     interleaved:interleaved
                                                           error:&error];
         }
@@ -454,7 +452,7 @@
             audioFile = [[YASAudioFileReader alloc] initWithURL:fileURL error:&error];
         } else {
             audioFile = [[YASAudioFileReader alloc] initWithURL:fileURL
-                                                 bitDepthFormat:bitDepthFormat
+                                                      pcmFormat:pcmFormat
                                                     interleaved:interleaved
                                                           error:&error];
         }
@@ -481,7 +479,7 @@
             if (testData.fileSampleRate == testData.processingSampleRate) {
                 XCTAssert(data.frameLength == frameLength);
                 XCTAssert([self _compareData:data fileFormat:audioFile.fileFormat startIndex:startIndex],
-                          @"sampleRate: %@ - bitDepthFormat: %@", @(processingSampleRate), @(bitDepthFormat));
+                          @"sampleRate: %@ - pcmFormat: %@", @(processingSampleRate), @(pcmFormat));
             }
 
             startIndex += frameLength;
@@ -509,18 +507,18 @@
         for (NSInteger frameIndex = 0; frameIndex < data.frameLength; frameIndex++) {
             SInt16 value = frameIndex + startIndex + 1;
             for (NSInteger strideIndex = 0; strideIndex < stride; strideIndex++) {
-                switch (data.format.bitDepthFormat) {
-                    case YASAudioBitDepthFormatInt16: {
+                switch (data.format.pcmFormat) {
+                    case YASAudioPCMFormatInt16: {
                         pointer.i16[frameIndex * stride + strideIndex] = value;
                     } break;
-                    case YASAudioBitDepthFormatFixed824: {
+                    case YASAudioPCMFormatFixed824: {
                         pointer.i32[frameIndex * stride + strideIndex] = value << 16;
                     } break;
-                    case YASAudioBitDepthFormatFloat32: {
+                    case YASAudioPCMFormatFloat32: {
                         Float32 float32Value = (Float32)value / INT16_MAX;
                         pointer.f32[frameIndex * stride + strideIndex] = float32Value;
                     } break;
-                    case YASAudioBitDepthFormatFloat64: {
+                    case YASAudioPCMFormatFloat64: {
                         Float64 float64Value = (Float64)value / INT16_MAX;
                         pointer.f64[frameIndex * stride + strideIndex] = (Float64)float64Value;
                     } break;
@@ -543,17 +541,17 @@
             SInt16 value = frameIndex + startIndex + 1;
             for (NSInteger strideIndex = 0; strideIndex < stride; strideIndex++) {
                 SInt16 ptrValue = 0;
-                switch (data.format.bitDepthFormat) {
-                    case YASAudioBitDepthFormatInt16: {
+                switch (data.format.pcmFormat) {
+                    case YASAudioPCMFormatInt16: {
                         ptrValue = pointer.i16[frameIndex * stride + strideIndex];
                     } break;
-                    case YASAudioBitDepthFormatFixed824: {
+                    case YASAudioPCMFormatFixed824: {
                         ptrValue = pointer.i32[frameIndex * stride + strideIndex] >> 16;
                     } break;
-                    case YASAudioBitDepthFormatFloat32: {
+                    case YASAudioPCMFormatFloat32: {
                         ptrValue = roundf(pointer.f32[frameIndex * stride + strideIndex] * INT16_MAX);
                     } break;
-                    case YASAudioBitDepthFormatFloat64: {
+                    case YASAudioPCMFormatFloat64: {
                         ptrValue = round(pointer.f64[frameIndex * stride + strideIndex] * INT16_MAX);
                     } break;
                     default:

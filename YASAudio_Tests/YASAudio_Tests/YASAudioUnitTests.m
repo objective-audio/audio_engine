@@ -46,11 +46,11 @@
     const OSType type = kAudioUnitType_FormatConverter;
     const OSType subType = kAudioUnitSubType_AUConverter;
 
-    YASAudioFormat *outputFormat = [[YASAudioFormat alloc] initWithBitDepthFormat:YASAudioBitDepthFormatFloat32
+    YASAudioFormat *outputFormat = [[YASAudioFormat alloc] initWithPCMFormat:YASAudioPCMFormatFloat32
                                                                        sampleRate:outputSampleRate
                                                                          channels:channels
                                                                       interleaved:NO];
-    YASAudioFormat *inputFormat = [[YASAudioFormat alloc] initWithBitDepthFormat:YASAudioBitDepthFormatInt16
+    YASAudioFormat *inputFormat = [[YASAudioFormat alloc] initWithPCMFormat:YASAudioPCMFormatInt16
                                                                       sampleRate:inputSampleRate
                                                                         channels:channels
                                                                      interleaved:YES];
@@ -126,7 +126,7 @@
     const UInt32 frameLength = 1024;
     const UInt32 maximumFrameLength = 4096;
 
-    YASAudioFormat *format = [[YASAudioFormat alloc] initWithBitDepthFormat:YASAudioBitDepthFormatFloat32
+    YASAudioFormat *format = [[YASAudioFormat alloc] initWithPCMFormat:YASAudioPCMFormatFloat32
                                                                  sampleRate:sampleRate
                                                                    channels:channels
                                                                 interleaved:NO];
@@ -252,7 +252,7 @@
     const AudioUnitScope scope = kAudioUnitScope_Input;
     const AudioUnitElement element = 0;
 
-    YASAudioFormat *format = [[YASAudioFormat alloc] initWithBitDepthFormat:YASAudioBitDepthFormatFloat32
+    YASAudioFormat *format = [[YASAudioFormat alloc] initWithPCMFormat:YASAudioPCMFormatFloat32
                                                                  sampleRate:sampleRate
                                                                    channels:channels
                                                                 interleaved:NO];

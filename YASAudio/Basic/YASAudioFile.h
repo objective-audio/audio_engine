@@ -37,7 +37,7 @@ extern NSString *const YASAudioFileTypeWAVE;
 
 - (instancetype)initWithURL:(NSURL *)fileURL error:(NSError **)outError;
 - (instancetype)initWithURL:(NSURL *)fileURL
-             bitDepthFormat:(YASAudioBitDepthFormat)format
+                  pcmFormat:(YASAudioPCMFormat)format
                 interleaved:(BOOL)interleaved
                       error:(NSError **)outError;
 
@@ -57,7 +57,7 @@ extern NSString *const YASAudioFileTypeWAVE;
 - (instancetype)initWithURL:(NSURL *)fileURL
                    fileType:(NSString *)fileType
                    settings:(NSDictionary *)settings
-             bitDepthFormat:(YASAudioBitDepthFormat)format
+                  pcmFormat:(YASAudioPCMFormat)format
                 interleaved:(BOOL)interleaved
                       error:(NSError **)outError;
 

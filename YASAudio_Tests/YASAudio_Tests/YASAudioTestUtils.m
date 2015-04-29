@@ -15,7 +15,7 @@ UInt32 TestValue(UInt32 frame, UInt32 channel, UInt32 buffer)
 + (void)fillTestValuesToData:(YASAudioData *)data
 {
     YASAudioFormat *format = data.format;
-    const YASAudioBitDepthFormat bitDepthFormat = format.bitDepthFormat;
+    const YASAudioPCMFormat pcmFormat = format.pcmFormat;
     const UInt32 bufferCount = format.bufferCount;
     const UInt32 stride = format.stride;
 
@@ -25,17 +25,17 @@ UInt32 TestValue(UInt32 frame, UInt32 channel, UInt32 buffer)
             for (UInt32 ch = 0; ch < stride; ch++) {
                 UInt32 index = frame * stride + ch;
                 UInt32 value = TestValue(frame, ch, buffer);
-                switch (bitDepthFormat) {
-                    case YASAudioBitDepthFormatFloat32: {
+                switch (pcmFormat) {
+                    case YASAudioPCMFormatFloat32: {
                         pointer.f32[index] = value;
                     } break;
-                    case YASAudioBitDepthFormatFloat64: {
+                    case YASAudioPCMFormatFloat64: {
                         pointer.f64[index] = value;
                     } break;
-                    case YASAudioBitDepthFormatInt16: {
+                    case YASAudioPCMFormatInt16: {
                         pointer.i16[index] = value;
                     } break;
-                    case YASAudioBitDepthFormatFixed824: {
+                    case YASAudioPCMFormatFixed824: {
                         pointer.i32[index] = value;
                     } break;
                     default:
@@ -89,7 +89,7 @@ UInt32 TestValue(UInt32 frame, UInt32 channel, UInt32 buffer)
         return NO;
     }
 
-    if (data1.format.bitDepthFormat != data2.format.bitDepthFormat) {
+    if (data1.format.pcmFormat != data2.format.pcmFormat) {
         return NO;
     }
 

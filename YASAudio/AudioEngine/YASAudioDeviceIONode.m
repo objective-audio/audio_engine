@@ -230,7 +230,7 @@
                 for (YASAudioConnection *connection in inputConnections.objectEnumerator) {
                     YASAudioFormat *connectionFormat = connection.format;
                     YASAudioFormat *deviceFormat = audioDeviceIO.audioDevice.outputFormat;
-                    if (connectionFormat.bitDepthFormat != deviceFormat.bitDepthFormat ||
+                    if (connectionFormat.pcmFormat != deviceFormat.pcmFormat ||
                         connectionFormat.sampleRate != deviceFormat.sampleRate || connectionFormat.isInterleaved) {
                         YASLog(@"%s - Output device io format is not match.", __PRETTY_FUNCTION__);
                         return NO;
@@ -242,7 +242,7 @@
                 for (YASAudioConnection *connection in outputConnections.objectEnumerator) {
                     YASAudioFormat *connectionFormat = connection.format;
                     YASAudioFormat *deviceFormat = audioDeviceIO.audioDevice.inputFormat;
-                    if (connectionFormat.bitDepthFormat != deviceFormat.bitDepthFormat ||
+                    if (connectionFormat.pcmFormat != deviceFormat.pcmFormat ||
                         connectionFormat.sampleRate != deviceFormat.sampleRate || connectionFormat.isInterleaved) {
                         YASLog(@"%s - Input device io format is not match.", __PRETTY_FUNCTION__);
                         return NO;
@@ -406,7 +406,7 @@
         if (audioDeviceIO) {
             YASAudioFormat *format = data.format;
             YASAudioFormat *deviceFormat = audioDeviceIO.audioDevice.inputFormat;
-            if (format.bitDepthFormat != deviceFormat.bitDepthFormat || format.isInterleaved) {
+            if (format.pcmFormat != deviceFormat.pcmFormat || format.isInterleaved) {
                 YASRaiseWithReason(
                     ([NSString stringWithFormat:@"%s - Format is not match. dataFormat(%@) deviceFormat(%@)",
                                                 __PRETTY_FUNCTION__, format, deviceFormat]));

@@ -11,12 +11,12 @@
 
 @class YASAudioData, YASAudioTime;
 
-typedef NS_ENUM(NSUInteger, YASAudioBitDepthFormat) {
-    YASAudioBitDepthFormatOther = 0,
-    YASAudioBitDepthFormatFloat32 = 1,
-    YASAudioBitDepthFormatFloat64 = 2,
-    YASAudioBitDepthFormatInt16 = 3,
-    YASAudioBitDepthFormatFixed824 = 4
+typedef NS_ENUM(NSUInteger, YASAudioPCMFormat) {
+    YASAudioPCMFormatOther = 0,
+    YASAudioPCMFormatFloat32 = 1,
+    YASAudioPCMFormatFloat64 = 2,
+    YASAudioPCMFormatInt16 = 3,
+    YASAudioPCMFormatFixed824 = 4
 };
 
 typedef NS_ENUM(NSUInteger, YASAudioUnitRenderType) {

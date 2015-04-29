@@ -99,10 +99,10 @@
     const UInt32 frameLength = 16;
     const UInt32 channels = 4;
 
-    YASAudioFormat *format = [[YASAudioFormat alloc] initWithBitDepthFormat:YASAudioBitDepthFormatFloat32
-                                                                 sampleRate:48000
-                                                                   channels:channels
-                                                                interleaved:YES];
+    YASAudioFormat *format = [[YASAudioFormat alloc] initWithPCMFormat:YASAudioPCMFormatFloat32
+                                                            sampleRate:48000
+                                                              channels:channels
+                                                           interleaved:YES];
     YASAudioData *data = [[YASAudioData alloc] initWithFormat:format frameCapacity:frameLength];
     YASRelease(format);
 
@@ -186,7 +186,8 @@
 
     YASAudioFormat *format = [[YASAudioFormat alloc] initStandardFormatWithSampleRate:48000 channels:1];
     YASAudioData *data = [[YASAudioData alloc] initWithFormat:format frameCapacity:frameLength];
-    YASAudioMutableEnumerator *mutableEnumerator = [[YASAudioMutableEnumerator alloc] initWithAudioData:data atChannel:0];
+    YASAudioMutableEnumerator *mutableEnumerator =
+        [[YASAudioMutableEnumerator alloc] initWithAudioData:data atChannel:0];
 
     const NSUInteger *index = mutableEnumerator.index;
     const YASAudioPointer *pointer = mutableEnumerator.pointer;

@@ -316,7 +316,7 @@ typedef NS_ENUM(NSUInteger, YASAudioDataFreeType) {
         return NO;
     }
 
-    if (self.format.bitDepthFormat != data.format.bitDepthFormat) {
+    if (self.format.pcmFormat != data.format.pcmFormat) {
         YASLog(@"%s - Invalid bit depth format.", __PRETTY_FUNCTION__);
         return NO;
     }

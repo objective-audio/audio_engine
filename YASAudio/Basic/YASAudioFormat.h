@@ -10,7 +10,7 @@
 @interface YASAudioFormat : NSObject
 
 @property (nonatomic, readonly, getter=isStandard) BOOL standard;
-@property (nonatomic, readonly) YASAudioBitDepthFormat bitDepthFormat;
+@property (nonatomic, readonly) YASAudioPCMFormat pcmFormat;
 @property (nonatomic, readonly) UInt32 channelCount;
 @property (nonatomic, readonly) UInt32 bufferCount;
 @property (nonatomic, readonly) UInt32 stride;
@@ -22,10 +22,10 @@
 - (instancetype)init NS_UNAVAILABLE;
 - (instancetype)initWithStreamDescription:(const AudioStreamBasicDescription *)asbd;
 - (instancetype)initStandardFormatWithSampleRate:(double)sampleRate channels:(UInt32)channels;
-- (instancetype)initWithBitDepthFormat:(YASAudioBitDepthFormat)bitDepthFormat
-                            sampleRate:(double)sampleRate
-                              channels:(UInt32)channels
-                           interleaved:(BOOL)interleaved;
+- (instancetype)initWithPCMFormat:(YASAudioPCMFormat)pcmFormat
+                       sampleRate:(double)sampleRate
+                         channels:(UInt32)channels
+                      interleaved:(BOOL)interleaved;
 - (instancetype)initWithSettings:(NSDictionary *)settings;
 
 - (BOOL)isEqualToAudioFormat:(YASAudioFormat *)otherFormat;
