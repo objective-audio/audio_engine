@@ -14,7 +14,7 @@
 
 + (NSString *)yas_stringWithAudioUnitScope:(AudioUnitScope)scope;
 + (NSString *)yas_stringWithAudioUnitParameterUnit:(AudioUnitParameterUnit)parameterUnit;
-+ (NSString *)yas_stringWithBitDepth:(YASAudioBitDepthFormat)bitDepth;
++ (NSString *)yas_stringWithBitDepthFormat:(YASAudioBitDepthFormat)bitDepthFormat;
 
 - (NSString *)stringByAppendingLinePrefix:(NSString *)prefix;
 
