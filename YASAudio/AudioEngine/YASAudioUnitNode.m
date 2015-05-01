@@ -259,7 +259,7 @@
 
 - (void)setOutputParameter:(AudioUnitParameterID)parameterID value:(Float32)value element:(AudioUnitElement)element
 {
-    UInt32 elementCount = [_audioUnit elementCountForScope:kAudioUnitScope_Input];
+    UInt32 elementCount = [_audioUnit elementCountForScope:kAudioUnitScope_Output];
     if (element >= elementCount) {
         YASRaiseWithReason(([NSString stringWithFormat:@"%s - Out of range. element(%@) count(%@)", __PRETTY_FUNCTION__,
                                                        @(element), @(elementCount)]));
@@ -274,7 +274,7 @@
 
 - (Float32)outputParameterValue:(AudioUnitParameterID)parameterID element:(AudioUnitElement)element
 {
-    UInt32 elementCount = [_audioUnit elementCountForScope:kAudioUnitScope_Input];
+    UInt32 elementCount = [_audioUnit elementCountForScope:kAudioUnitScope_Output];
     if (element >= elementCount) {
         YASRaiseWithReason(([NSString stringWithFormat:@"%s - Out of range. element(%@) count(%@)", __PRETTY_FUNCTION__,
                                                        @(element), @(elementCount)]));
