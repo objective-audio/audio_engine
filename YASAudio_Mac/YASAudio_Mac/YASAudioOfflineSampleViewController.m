@@ -124,11 +124,20 @@ static Float64 YASAudioOfflineSampleSampleRate = 44100.0;
 
     YASAudioOfflineOutputNode *offlineOutputNode = [[YASAudioOfflineOutputNode alloc] init];
 
+    YASAudioUnitMixerNode *offlineMixerNode = [[YASAudioUnitMixerNode alloc] init];
+    [offlineMixerNode setInputPan:0.0 forBus:@0];
+    [offlineMixerNode setInputEnabled:YES forBus:@0];
+    [offlineMixerNode setOutputVolume:1.0 forBus:@0];
+    [offlineMixerNode setOutputPan:0.0 forBus:@0];
+    self.offlineMixerNode = offlineMixerNode;
+    YASRelease(offlineMixerNode);
+
     YASAudioOfflineSampleSineNode *offlineSineNode = [[YASAudioOfflineSampleSineNode alloc] init];
     self.offlineSineNode = offlineSineNode;
     YASRelease(playSineNode);
 
-    [offlineEngine connectFromNode:offlineSineNode toNode:offlineOutputNode format:format];
+    [offlineEngine connectFromNode:offlineMixerNode toNode:offlineOutputNode format:format];
+    [offlineEngine connectFromNode:offlineSineNode toNode:offlineMixerNode format:format];
 
     YASRelease(offlineOutputNode);
 
@@ -249,6 +258,7 @@ static Float64 YASAudioOfflineSampleSampleRate = 44100.0;
     YASAudioOfflineSampleSineNode *offlineSineNode = self.offlineSineNode;
     offlineSineNode.frequency = self.playSineNode.frequency;
     offlineSineNode.playing = YES;
+    [self.offlineMixerNode setInputVolume:self.volume forBus:@0];
 
     if (![self.offlineEngine startOfflineRenderWithOutputCallbackBlock:^(YASAudioData *data, YASAudioTime *when,
                                                                          BOOL *stop) {
