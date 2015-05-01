@@ -50,7 +50,7 @@
 - (IBAction)volumeSliderChanged:(UISlider *)sender
 {
     const Float32 value = sender.value;
-    [self.mixerNode setVolume:value forBus:@0];
+    [self.mixerNode setInputVolume:value forBus:@0];
 }
 
 - (BOOL)setupAudioEngine

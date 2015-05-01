@@ -68,15 +68,15 @@
     const UInt32 defaultElementCount = mixerNode.inputElementCount;
 
     XCTAssertGreaterThanOrEqual(defaultElementCount, 1);
-    XCTAssertNoThrow([mixerNode setVolume:0.5 forBus:@0]);
-    XCTAssertThrows([mixerNode setVolume:0.5 forBus:@(defaultElementCount)]);
+    XCTAssertNoThrow([mixerNode setInputVolume:0.5 forBus:@0]);
+    XCTAssertThrows([mixerNode setInputVolume:0.5 forBus:@(defaultElementCount)]);
 
     const UInt32 elementCount = defaultElementCount + 8;
     XCTAssertNoThrow([mixerNode.audioUnit setElementCount:elementCount scope:kAudioUnitScope_Input]);
 
     XCTAssertGreaterThanOrEqual(mixerNode.inputElementCount, elementCount);
-    XCTAssertNoThrow([mixerNode setVolume:0.5 forBus:@(elementCount - 1)]);
-    XCTAssertThrows([mixerNode setVolume:0.5 forBus:@(elementCount)]);
+    XCTAssertNoThrow([mixerNode setInputVolume:0.5 forBus:@(elementCount - 1)]);
+    XCTAssertThrows([mixerNode setInputVolume:0.5 forBus:@(elementCount)]);
 
     YASRelease(mixerNode);
 }
@@ -90,25 +90,33 @@
     const Float32 pan = 0.25;
     const BOOL enabled = NO;
 
-    [mixerNode setVolume:volume forBus:bus];
-    [mixerNode setPan:pan forBus:bus];
-    [mixerNode setEnabled:enabled forBus:bus];
+    [mixerNode setInputVolume:volume forBus:bus];
+    [mixerNode setInputPan:pan forBus:bus];
+    [mixerNode setInputEnabled:enabled forBus:bus];
+    [mixerNode setOutputVolume:volume forBus:bus];
+    [mixerNode setOutputPan:pan forBus:bus];
 
-    XCTAssertEqual([mixerNode volumeForBus:bus], volume);
-    XCTAssertEqual([mixerNode panForBus:bus], pan);
-    XCTAssertEqual([mixerNode isEnabledForBus:bus], enabled);
+    XCTAssertEqual([mixerNode inputVolumeForBus:bus], volume);
+    XCTAssertEqual([mixerNode inputPanForBus:bus], pan);
+    XCTAssertEqual([mixerNode isInputEnabledForBus:bus], enabled);
+    XCTAssertEqual([mixerNode outputVolumeForBus:bus], volume);
+    XCTAssertEqual([mixerNode outputPanForBus:bus], pan);
 
     [mixerNode _reloadAudioUnit];
-    
-    XCTAssertNotEqual([mixerNode volumeForBus:bus], volume);
-    XCTAssertNotEqual([mixerNode panForBus:bus], pan);
-    XCTAssertNotEqual([mixerNode isEnabledForBus:bus], enabled);
-    
+
+    XCTAssertNotEqual([mixerNode inputVolumeForBus:bus], volume);
+    XCTAssertNotEqual([mixerNode inputPanForBus:bus], pan);
+    XCTAssertNotEqual([mixerNode isInputEnabledForBus:bus], enabled);
+    XCTAssertNotEqual([mixerNode outputVolumeForBus:bus], volume);
+    XCTAssertNotEqual([mixerNode outputPanForBus:bus], pan);
+
     [mixerNode prepareParameters];
-    
-    XCTAssertEqual([mixerNode volumeForBus:bus], volume);
-    XCTAssertEqual([mixerNode panForBus:bus], pan);
-    XCTAssertEqual([mixerNode isEnabledForBus:bus], enabled);
+
+    XCTAssertEqual([mixerNode inputVolumeForBus:bus], volume);
+    XCTAssertEqual([mixerNode inputPanForBus:bus], pan);
+    XCTAssertEqual([mixerNode isInputEnabledForBus:bus], enabled);
+    XCTAssertEqual([mixerNode outputVolumeForBus:bus], volume);
+    XCTAssertEqual([mixerNode outputPanForBus:bus], pan);
 
     YASRelease(mixerNode);
 }

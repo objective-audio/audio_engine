@@ -9,11 +9,16 @@
 
 - (instancetype)init;
 
-- (void)setVolume:(Float32)volume forBus:(NSNumber *)bus;
-- (Float32)volumeForBus:(NSNumber *)bus;
-- (void)setPan:(Float32)pan forBus:(NSNumber *)bus;
-- (Float32)panForBus:(NSNumber *)bus;
-- (void)setEnabled:(BOOL)enabled forBus:(NSNumber *)bus;
-- (BOOL)isEnabledForBus:(NSNumber *)bus;
+- (void)setOutputVolume:(Float32)volume forBus:(NSNumber *)bus;
+- (Float32)outputVolumeForBus:(NSNumber *)bus;
+- (void)setOutputPan:(Float32)pan forBus:(NSNumber *)bus;
+- (Float32)outputPanForBus:(NSNumber *)bus;
+
+- (void)setInputVolume:(Float32)volume forBus:(NSNumber *)bus;
+- (Float32)inputVolumeForBus:(NSNumber *)bus;
+- (void)setInputPan:(Float32)pan forBus:(NSNumber *)bus;
+- (Float32)inputPanForBus:(NSNumber *)bus;
+- (void)setInputEnabled:(BOOL)enabled forBus:(NSNumber *)bus;
+- (BOOL)isInputEnabledForBus:(NSNumber *)bus;
 
 @end

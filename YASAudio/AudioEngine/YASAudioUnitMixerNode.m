@@ -52,32 +52,52 @@
     return 1;
 }
 
-- (void)setVolume:(Float32)volume forBus:(NSNumber *)bus
+- (void)setOutputVolume:(Float32)volume forBus:(NSNumber *)bus
+{
+    [self setOutputParameter:kMultiChannelMixerParam_Volume value:volume element:bus.uint32Value];
+}
+
+- (Float32)outputVolumeForBus:(NSNumber *)bus
+{
+    return [self outputParameterValue:kMultiChannelMixerParam_Volume element:bus.uint32Value];
+}
+
+- (void)setOutputPan:(Float32)pan forBus:(NSNumber *)bus
+{
+    [self setOutputParameter:kMultiChannelMixerParam_Pan value:pan element:bus.uint32Value];
+}
+
+- (Float32)outputPanForBus:(NSNumber *)bus
+{
+    return [self outputParameterValue:kMultiChannelMixerParam_Pan element:bus.uint32Value];
+}
+
+- (void)setInputVolume:(Float32)volume forBus:(NSNumber *)bus
 {
     [self setInputParameter:kMultiChannelMixerParam_Volume value:volume element:bus.uint32Value];
 }
 
-- (Float32)volumeForBus:(NSNumber *)bus
+- (Float32)inputVolumeForBus:(NSNumber *)bus
 {
     return [self inputParameterValue:kMultiChannelMixerParam_Volume element:bus.uint32Value];
 }
 
-- (void)setPan:(Float32)pan forBus:(NSNumber *)bus
+- (void)setInputPan:(Float32)pan forBus:(NSNumber *)bus
 {
     [self setInputParameter:kMultiChannelMixerParam_Pan value:pan element:bus.uint32Value];
 }
 
-- (Float32)panForBus:(NSNumber *)bus
+- (Float32)inputPanForBus:(NSNumber *)bus
 {
     return [self inputParameterValue:kMultiChannelMixerParam_Pan element:bus.uint32Value];
 }
 
-- (void)setEnabled:(BOOL)enabled forBus:(NSNumber *)bus
+- (void)setInputEnabled:(BOOL)enabled forBus:(NSNumber *)bus
 {
     [self setInputParameter:kMultiChannelMixerParam_Enable value:enabled ? 1.0f : 0.0f element:bus.uint32Value];
 }
 
-- (BOOL)isEnabledForBus:(NSNumber *)bus
+- (BOOL)isInputEnabledForBus:(NSNumber *)bus
 {
     return [self inputParameterValue:kMultiChannelMixerParam_Enable element:bus.uint32Value] != 0.0;
 }
