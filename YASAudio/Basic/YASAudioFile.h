@@ -29,6 +29,8 @@ extern NSString *const YASAudioFileTypeWAVE;
 @property (nonatomic, readonly) SInt64 processingLength;
 @property (nonatomic) UInt32 fileFramePosition;
 
+- (void)close;
+
 @end
 
 @interface YASAudioFileReader : YASAudioFile
