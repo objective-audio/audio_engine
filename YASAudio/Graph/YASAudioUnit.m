@@ -633,6 +633,11 @@ static OSStatus InputRenderCallback(void *inRefCon, AudioUnitRenderActionFlags *
     }
 }
 
+- (void)reset
+{
+    YASRaiseIfAUError(AudioUnitReset(_audioUnitInstance, kAudioUnitScope_Global, 0));
+}
+
 #pragma mark Setup Audio Unit
 
 - (void)_createAudioUnit:(const AudioComponentDescription *)acd

@@ -78,6 +78,8 @@ extern OSType const YASAudioUnitSubType_DefaultIO;
 - (void)start;  // io unit only.
 - (void)stop;   // io unit only.
 
+- (void)reset;
+
 #pragma mark Render thread
 
 - (void)renderCallbackBlock:(YASAudioUnitRenderParameters *)renderParameters;
