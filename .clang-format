@@ -12,3 +12,4 @@ AllowShortFunctionsOnASingleLine: false
 AllowShortLoopsOnASingleLine: false
 ObjCBlockIndentWidth: 4
 SpacesInContainerLiterals: false
+NamespaceIndentation: All
