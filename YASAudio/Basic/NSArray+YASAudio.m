@@ -59,18 +59,23 @@
     }
 
     NSNumber *max = [self valueForKeyPath:@"@max.self"];
-    NSInteger next = max ? max.integerValue : -1;
+    NSInteger next = max.integerValue + 1;
+    if (next == self.count) {
+        result = @(next);
+    } else {
+        next = 0;
+    }
 
     while (!result) {
-        next = (next + 1) % length;
         NSNumber *number = [[NSNumber alloc] initWithInteger:next];
         if (![self containsObject:number]) {
             result = YASAutorelease(number);
         } else {
             YASRelease(number);
+            next++;
         }
     }
-
+    
     return result;
 }
 
