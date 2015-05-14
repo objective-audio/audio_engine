@@ -32,6 +32,15 @@
 
     XCTAssertEqualObjects([array yas_emptyNumberInLength:2], @1);
     XCTAssertNil([array yas_emptyNumberInLength:1]);
+    
+    array = @[@0, @2];
+    
+    XCTAssertEqualObjects([array yas_emptyNumberInLength:4], @1);
+    
+    array = @[@0, @1, @2];
+    
+    XCTAssertEqualObjects([array yas_emptyNumberInLength:4], @3);
+    XCTAssertNil([array yas_emptyNumberInLength:3]);
 }
 
 - (void)testArrayOfProperty
