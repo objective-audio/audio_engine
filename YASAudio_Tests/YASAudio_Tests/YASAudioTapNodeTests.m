@@ -76,6 +76,7 @@
     YASRelease(format);
     YASRelease(fromNode);
     YASRelease(toNode);
+    YASRelease(outputNode);
     YASRelease(engine);
 }
 
@@ -109,6 +110,7 @@
     YASRelease(format);
     YASRelease(fromNode);
     YASRelease(toNode);
+    YASRelease(outputNode);
     YASRelease(engine);
 }
 

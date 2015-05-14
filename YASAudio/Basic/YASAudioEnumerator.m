@@ -104,7 +104,7 @@
         _frameStride = stride * sampleByteCount;
         _pointersSize = _channelCount * sizeof(YASAudioMutablePointer *);
         _pointers = calloc(_pointersSize, 1);
-        _topPointers = calloc(_channelCount, sizeof(YASAudioMutablePointer *));
+        _topPointers = calloc(_pointersSize, 1);
 
         NSUInteger channel = 0;
         for (NSInteger buffer = 0; buffer < bufferCount; buffer++) {
