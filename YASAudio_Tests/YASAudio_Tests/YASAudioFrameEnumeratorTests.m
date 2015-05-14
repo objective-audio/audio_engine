@@ -319,8 +319,7 @@
     const UInt32 frameLength = 16;
     const UInt32 channels = 4;
 
-    for (NSUInteger pcmFormat = YASAudioPCMFormatFloat32; pcmFormat <= YASAudioPCMFormatFixed824;
-         pcmFormat++) {
+    for (NSUInteger pcmFormat = YASAudioPCMFormatFloat32; pcmFormat <= YASAudioPCMFormatFixed824; pcmFormat++) {
         YASAudioFormat *format =
             [[YASAudioFormat alloc] initWithPCMFormat:pcmFormat sampleRate:48000 channels:channels interleaved:NO];
         YASAudioData *data = [[YASAudioData alloc] initWithFormat:format frameCapacity:frameLength];
