@@ -51,7 +51,7 @@ UInt32 TestValue(UInt32 frame, UInt32 channel, UInt32 buffer)
     const AudioBufferList *abl = data.audioBufferList;
 
     for (UInt32 buffer = 0; buffer < abl->mNumberBuffers; buffer++) {
-        Byte *ptr = abl->mBuffers[buffer].mData;
+        Byte *ptr = (Byte *)abl->mBuffers[buffer].mData;
         for (UInt32 frame = 0; frame < abl->mBuffers[buffer].mDataByteSize; frame++) {
             if (ptr[frame] != 0) {
                 return NO;
