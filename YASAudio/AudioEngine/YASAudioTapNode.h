@@ -4,7 +4,7 @@
 //
 
 #import "YASAudioNode.h"
-#import "YASAudioTypes.h"
+#import "YASAudioBlocks.h"
 
 @class YASAudioConnection;
 

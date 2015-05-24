@@ -9,8 +9,6 @@
 #ifndef __YASAudio_YASAudioTypes_h
 #define __YASAudio_YASAudioTypes_h
 
-@class YASAudioData, YASAudioTime;
-
 typedef NS_ENUM(NSUInteger, YASAudioPCMFormat) {
     YASAudioPCMFormatOther = 0,
     YASAudioPCMFormatFloat32 = 1,
@@ -63,11 +61,5 @@ typedef union YASAudioPointer {
     const SInt8 *i8;
     const UInt8 *u8;
 } YASAudioPointer;
-
-typedef void (^YASAudioUnitCallbackBlock)(YASAudioUnitRenderParameters *renderParameters);
-typedef void (^YASAudioDeviceIOCallbackBlock)(YASAudioData *outData, YASAudioTime *when);
-typedef void (^YASAudioNodeRenderBlock)(YASAudioData *data, NSNumber *bus, YASAudioTime *when);
-typedef void (^YASAudioOfflineRenderCallbackBlock)(YASAudioData *data, YASAudioTime *when, BOOL *stop);
-typedef void (^YASAudioOfflineRenderCompletionBlock)(BOOL cancelled);
 
 #endif

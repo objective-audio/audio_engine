@@ -9,7 +9,7 @@
 
 #import <Foundation/Foundation.h>
 #import <AudioToolbox/AudioToolbox.h>
-#import "YASAudioTypes.h"
+#import "YASAudioBlocks.h"
 #import "YASWeakSupport.h"
 
 @class YASAudioDevice, YASAudioGraph, YASAudioTime;
