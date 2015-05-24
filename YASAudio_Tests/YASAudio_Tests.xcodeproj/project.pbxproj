@@ -256,7 +256,7 @@
 		B62ED5AD1A62870F007DDE96 /* YASAudio_Mac_Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = YASAudio_Mac_Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B62ED5FD1A629B84007DDE96 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = Info.plist; path = YASAudio_Tests/Info.plist; sourceTree = SOURCE_ROOT; };
 		B630CA261A83B2D000EDE110 /* YASAudioUnitTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = YASAudioUnitTests.m; path = YASAudio_Tests/YASAudioUnitTests.m; sourceTree = SOURCE_ROOT; };
-		B634508C1AD10A7100CF7784 /* YASAudio_Mac_Tests copy.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "YASAudio_Mac_Tests copy.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		B634508C1AD10A7100CF7784 /* YASAudio_Mac_NonARC_Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = YASAudio_Mac_NonARC_Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B637433B1ADE023F007B27F0 /* YASAudioData+Internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "YASAudioData+Internal.h"; sourceTree = "<group>"; };
 		B637434F1ADE0346007B27F0 /* YASAudioDeviceStream+Internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "YASAudioDeviceStream+Internal.h"; path = "AudioDevice/YASAudioDeviceStream+Internal.h"; sourceTree = "<group>"; };
 		B63743551ADE0362007B27F0 /* YASAudioConnection+Internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "YASAudioConnection+Internal.h"; sourceTree = "<group>"; };
@@ -406,7 +406,7 @@
 				B62ED5861A628554007DDE96 /* YASAudio_Tests.xctest */,
 				B62ED5AD1A62870F007DDE96 /* YASAudio_Mac_Tests.xctest */,
 				B66E534D1A75CF0E008B9D4E /* YASAudio_iOS_Tests copy.xctest */,
-				B634508C1AD10A7100CF7784 /* YASAudio_Mac_Tests copy.xctest */,
+				B634508C1AD10A7100CF7784 /* YASAudio_Mac_NonARC_Tests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -648,7 +648,7 @@
 			);
 			name = YASAudio_Mac_NonARC_Tests;
 			productName = YASAudio_Mac_Tests;
-			productReference = B634508C1AD10A7100CF7784 /* YASAudio_Mac_Tests copy.xctest */;
+			productReference = B634508C1AD10A7100CF7784 /* YASAudio_Mac_NonARC_Tests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
 		B66E53311A75CF0E008B9D4E /* YASAudio_iOS_NonARC_Tests */ = {
@@ -1237,7 +1237,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
-				PRODUCT_NAME = "YASAudio_Mac_Tests copy";
+				PRODUCT_NAME = YASAudio_Mac_NonARC_Tests;
 				SDKROOT = macosx;
 			};
 			name = Debug;
@@ -1279,7 +1279,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				MTL_ENABLE_DEBUG_INFO = NO;
-				PRODUCT_NAME = "YASAudio_Mac_Tests copy";
+				PRODUCT_NAME = YASAudio_Mac_NonARC_Tests;
 				SDKROOT = macosx;
 			};
 			name = Release;
@@ -1327,7 +1327,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
-				PRODUCT_NAME = "YASAudio_iOS_Tests copy";
+				PRODUCT_NAME = YASAudio_iOS_NonARC_Tests;
 				SDKROOT = iphoneos;
 			};
 			name = Debug;
@@ -1368,7 +1368,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				MTL_ENABLE_DEBUG_INFO = NO;
-				PRODUCT_NAME = "YASAudio_iOS_Tests copy";
+				PRODUCT_NAME = YASAudio_iOS_NonARC_Tests;
 				SDKROOT = iphoneos;
 				VALIDATE_PRODUCT = YES;
 			};
