@@ -4,7 +4,7 @@
 //
 
 #import "YASWeakSupport.h"
-#import "YASAudioTypes.h"
+#import "YASAudioBlocks.h"
 #import <AudioToolbox/AudioToolbox.h>
 
 extern OSType const YASAudioUnitSubType_DefaultIO;

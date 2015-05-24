@@ -10,6 +10,7 @@
 #import "YASAudioConnection+Internal.h"
 #import "YASAudioTime.h"
 #import "YASMacros.h"
+#import "YASAudioBlocks.h"
 #import "NSException+YASAudio.h"
 #import "NSError+YASAudio.h"
 

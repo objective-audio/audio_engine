@@ -4,7 +4,7 @@
 //
 
 #import "YASWeakSupport.h"
-#import "YASAudioTypes.h"
+#import "YASAudioBlocks.h"
 
 extern NSString *const YASAudioEngineConfigurationChangeNotification;
 
