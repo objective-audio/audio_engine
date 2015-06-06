@@ -324,8 +324,8 @@
 
 - (void)testCopyDataFlexiblySameFormat
 {
-    [self _testCopyDataFormatSuccessWithInterleaved:NO];
-    [self _testCopyDataFormatSuccessWithInterleaved:YES];
+    [self _testCopyDataFlexiblySameFormatWithInterleaved:NO];
+    [self _testCopyDataFlexiblySameFormatWithInterleaved:YES];
 }
 
 - (void)_testCopyDataFlexiblySameFormatWithInterleaved:(BOOL)interleaved
@@ -400,14 +400,10 @@
     const YASAudioPCMFormat fromPcmFormat = YASAudioPCMFormatFloat32;
     const YASAudioPCMFormat toPcmFormat = YASAudioPCMFormatFixed824;
 
-    YASAudioFormat *fromFormat = [[YASAudioFormat alloc] initWithPCMFormat:fromPcmFormat
-                                                                sampleRate:sampleRate
-                                                                  channels:channels
-                                                               interleaved:NO];
-    YASAudioFormat *toFormat = [[YASAudioFormat alloc] initWithPCMFormat:toPcmFormat
-                                                              sampleRate:sampleRate
-                                                                channels:channels
-                                                             interleaved:!NO];
+    YASAudioFormat *fromFormat =
+        [[YASAudioFormat alloc] initWithPCMFormat:fromPcmFormat sampleRate:sampleRate channels:channels interleaved:NO];
+    YASAudioFormat *toFormat =
+        [[YASAudioFormat alloc] initWithPCMFormat:toPcmFormat sampleRate:sampleRate channels:channels interleaved:!NO];
     YASAudioData *fromData = [[YASAudioData alloc] initWithFormat:fromFormat frameCapacity:frameLength];
     YASAudioData *toData = [[YASAudioData alloc] initWithFormat:toFormat frameCapacity:frameLength];
 
@@ -426,16 +422,13 @@
     const UInt32 frameLength = 4;
     const UInt32 channels = 2;
 
-    for (YASAudioPCMFormat pcmFormat = YASAudioPCMFormatFloat32; pcmFormat <= YASAudioPCMFormatFixed824;
-         pcmFormat++) {
+    for (YASAudioPCMFormat pcmFormat = YASAudioPCMFormatFloat32; pcmFormat <= YASAudioPCMFormatFixed824; pcmFormat++) {
         YASAudioFormat *interleavedFormat = [[YASAudioFormat alloc] initWithPCMFormat:pcmFormat
                                                                            sampleRate:sampleRate
                                                                              channels:channels
                                                                           interleaved:YES];
-        YASAudioFormat *nonInterleavedFormat = [[YASAudioFormat alloc] initWithPCMFormat:pcmFormat
-                                                                              sampleRate:sampleRate
-                                                                                channels:channels
-                                                                             interleaved:NO];
+        YASAudioFormat *nonInterleavedFormat =
+            [[YASAudioFormat alloc] initWithPCMFormat:pcmFormat sampleRate:sampleRate channels:channels interleaved:NO];
 
         YASAudioData *interleavedData =
             [[YASAudioData alloc] initWithFormat:interleavedFormat frameCapacity:frameLength];
@@ -472,16 +465,13 @@
     const UInt32 frameLength = 4;
     const UInt32 channels = 2;
 
-    for (YASAudioPCMFormat pcmFormat = YASAudioPCMFormatFloat32; pcmFormat <= YASAudioPCMFormatFixed824;
-         pcmFormat++) {
+    for (YASAudioPCMFormat pcmFormat = YASAudioPCMFormatFloat32; pcmFormat <= YASAudioPCMFormatFixed824; pcmFormat++) {
         YASAudioFormat *interleavedFormat = [[YASAudioFormat alloc] initWithPCMFormat:pcmFormat
                                                                            sampleRate:sampleRate
                                                                              channels:channels
                                                                           interleaved:YES];
-        YASAudioFormat *nonInterleavedFormat = [[YASAudioFormat alloc] initWithPCMFormat:pcmFormat
-                                                                              sampleRate:sampleRate
-                                                                                channels:channels
-                                                                             interleaved:NO];
+        YASAudioFormat *nonInterleavedFormat =
+            [[YASAudioFormat alloc] initWithPCMFormat:pcmFormat sampleRate:sampleRate channels:channels interleaved:NO];
 
         YASAudioData *interleavedData =
             [[YASAudioData alloc] initWithFormat:interleavedFormat frameCapacity:frameLength];
