@@ -195,8 +195,7 @@
         [YASAudioTestUtils fillTestValuesToData:fromData];
 
         XCTAssertTrue([toData copyFromData:fromData]);
-
-        [YASAudioTestUtils compareDataFlexiblyWithData:fromData otherData:toData];
+        XCTAssertTrue([YASAudioTestUtils compareDataFlexiblyWithData:fromData otherData:toData]);
 
         YASRelease(format);
         YASRelease(fromData);
