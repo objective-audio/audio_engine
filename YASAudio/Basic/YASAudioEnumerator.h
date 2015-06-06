@@ -78,11 +78,11 @@
 
 @end
 
-#define YASAudioEnumeratorMove(__v)          \
-    if (++(__v)->_index >= (__v)->_length) { \
-        (__v)->_pointer.v = NULL;            \
-    } else {                                 \
-        (__v)->_pointer.v += (__v)->_stride; \
+#define YASAudioEnumeratorMove(__v)           \
+    if (++(__v)->_index >= (__v)->_length) {  \
+        (__v)->_pointer.v = NULL;             \
+    } else {                                  \
+        (__v)->_pointer.u8 += (__v)->_stride; \
     }
 
 #define YASAudioEnumeratorStop(__v) \
