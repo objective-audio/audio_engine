@@ -68,7 +68,7 @@
         return;
     }
     _index = index;
-    _pointer.v = _topPointer.v + (_stride * index);
+    _pointer.v = _topPointer.u8 + (_stride * index);
 }
 
 - (void)reset
@@ -177,7 +177,7 @@
     NSUInteger stride = _frameStride * frame;
     NSUInteger index = _channelCount;
     while (index--) {
-        _pointers[index].v = _topPointers[index].v + stride;
+        _pointers[index].v = _topPointers[index].u8 + stride;
     }
 
     if (_pointer.v) {
