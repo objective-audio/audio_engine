@@ -3,8 +3,7 @@
 //  Copyright (c) 2015 Yuki Yasoshima.
 //
 
-#ifndef YASAudio_Tests_YASAudioBlocks_h
-#define YASAudio_Tests_YASAudioBlocks_h
+#pragma once
 
 #include "YASAudioTypes.h"
 
@@ -15,5 +14,3 @@ typedef void (^YASAudioDeviceIOCallbackBlock)(YASAudioData *outData, YASAudioTim
 typedef void (^YASAudioNodeRenderBlock)(YASAudioData *data, NSNumber *bus, YASAudioTime *when);
 typedef void (^YASAudioOfflineRenderCallbackBlock)(YASAudioData *data, YASAudioTime *when, BOOL *stop);
 typedef void (^YASAudioOfflineRenderCompletionBlock)(BOOL cancelled);
-
-#endif

@@ -3,8 +3,7 @@
 //  Copyright (c) 2015 Yuki Yasoshima.
 //
 
-#ifndef __YASAudio_YASAudioMath_h
-#define __YASAudio_YASAudioMath_h
+#pragma once
 
 #include <MacTypes.h>
 
@@ -29,6 +28,4 @@ extern Float32 YASAudioVectorSinef(Float32 *outData, const UInt32 count, const F
 
 #if defined(__cplusplus)
 }
-#endif
-
 #endif

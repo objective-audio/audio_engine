@@ -3,8 +3,7 @@
 //  Copyright (c) 2015 Yuki Yasoshima.
 //
 
-#ifndef __YASAudio__YASAudioUtility__
-#define __YASAudio__YASAudioUtility__
+#pragma once
 
 #include <AudioToolbox/AudioToolbox.h>
 
@@ -34,6 +33,4 @@ extern Boolean YASAudioIsEqualASBD(const AudioStreamBasicDescription *inAsbd1,
 
 #if defined(__cplusplus)
 }
-#endif
-
 #endif
