@@ -37,9 +37,9 @@ static Float64 YASAudioOfflineSampleSampleRate = 44100.0;
                 const UInt32 frameLength = data.frameLength;
 
                 if (frameLength > 0) {
-                    const YASAudioMutableFrameEnumerator *enumerator =
-                        [[YASAudioMutableFrameEnumerator alloc] initWithAudioData:data];
-                    const YASAudioMutablePointer *pointer = enumerator.mutablePointer;
+                    const YASAudioFrameEnumerator *enumerator =
+                        [[YASAudioFrameEnumerator alloc] initWithAudioData:data];
+                    const YASAudioPointer *pointer = enumerator.pointer;
                     while (pointer->v) {
                         nextPhase = YASAudioVectorSinef(pointer->f32, frameLength, startPhase, phasePerFrame);
                         YASAudioFrameEnumeratorMoveChannel(enumerator);

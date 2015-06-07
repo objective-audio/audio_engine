@@ -20,7 +20,7 @@ UInt32 TestValue(UInt32 frame, UInt32 channel, UInt32 buffer)
     const UInt32 stride = format.stride;
 
     for (UInt32 buffer = 0; buffer < bufferCount; buffer++) {
-        YASAudioMutablePointer pointer = [data pointerAtBuffer:buffer];
+        YASAudioPointer pointer = [data pointerAtBuffer:buffer];
         for (UInt32 frame = 0; frame < data.frameLength; frame++) {
             for (UInt32 ch = 0; ch < stride; ch++) {
                 UInt32 index = frame * stride + ch;
@@ -62,13 +62,13 @@ UInt32 TestValue(UInt32 frame, UInt32 channel, UInt32 buffer)
     return YES;
 }
 
-+ (YASAudioMutablePointer)mutablePointerWithData:(YASAudioData *)data channel:(UInt32)channel frame:(UInt32)frame
++ (YASAudioPointer)pointerWithData:(YASAudioData *)data channel:(UInt32)channel frame:(UInt32)frame
 {
-    YASAudioMutableFrameEnumerator *enumerator = [[YASAudioMutableFrameEnumerator alloc] initWithAudioData:data];
+    YASAudioFrameEnumerator *enumerator = [[YASAudioFrameEnumerator alloc] initWithAudioData:data];
     [enumerator setFramePosition:frame];
     [enumerator setChannelPosition:channel];
 
-    YASAudioMutablePointer pointer = *enumerator.mutablePointer;
+    YASAudioPointer pointer = *enumerator.pointer;
 
     YASRelease(enumerator);
 
@@ -95,8 +95,8 @@ UInt32 TestValue(UInt32 frame, UInt32 channel, UInt32 buffer)
 
     for (UInt32 ch = 0; ch < data1.format.channelCount; ch++) {
         for (UInt32 frame = 0; frame < data1.frameLength; frame++) {
-            YASAudioMutablePointer ptr1 = [YASAudioTestUtils mutablePointerWithData:data1 channel:ch frame:frame];
-            YASAudioMutablePointer ptr2 = [YASAudioTestUtils mutablePointerWithData:data2 channel:ch frame:frame];
+            YASAudioPointer ptr1 = [YASAudioTestUtils pointerWithData:data1 channel:ch frame:frame];
+            YASAudioPointer ptr2 = [YASAudioTestUtils pointerWithData:data2 channel:ch frame:frame];
             if (!YASAudioIsEqualData(ptr1.v, ptr2.v, data1.format.sampleByteCount)) {
                 return NO;
             }

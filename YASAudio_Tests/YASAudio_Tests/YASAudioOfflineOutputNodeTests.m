@@ -49,7 +49,7 @@
         XCTAssertEqualObjects(data.format, format);
 
         for (UInt32 buf = 0; buf < data.format.bufferCount; buf++) {
-            YASAudioMutablePointer pointer = [data pointerAtBuffer:buf];
+            YASAudioPointer pointer = [data pointerAtBuffer:buf];
             for (UInt32 frame = 0; frame < data.frameLength; frame++) {
                 pointer.f32[frame] = TestValue(frame + tapRenderFrame, 0, buf);
             }
@@ -134,8 +134,8 @@
         XCTAssertEqual(data.frameLength, framesPerRender);
         XCTAssertEqualObjects(data.format, format);
 
-        YASAudioMutableFrameEnumerator *enumerator = [[YASAudioMutableFrameEnumerator alloc] initWithAudioData:data];
-        const YASAudioMutablePointer *pointer = enumerator.mutablePointer;
+        YASAudioFrameEnumerator *enumerator = [[YASAudioFrameEnumerator alloc] initWithAudioData:data];
+        const YASAudioPointer *pointer = enumerator.pointer;
         const NSUInteger *frame = enumerator.frame;
         const NSUInteger *channel = enumerator.channel;
         while (pointer->v) {

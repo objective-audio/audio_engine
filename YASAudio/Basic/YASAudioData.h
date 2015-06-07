@@ -21,8 +21,8 @@
 - (instancetype)init NS_UNAVAILABLE;
 - (instancetype)initWithFormat:(YASAudioFormat *)format frameCapacity:(UInt32)frameCapacity;
 
-- (YASAudioMutablePointer)pointerAtBuffer:(NSUInteger)buffer;
-- (YASAudioMutablePointer)pointerAtChannel:(NSUInteger)channel;
+- (YASAudioPointer)pointerAtBuffer:(NSUInteger)buffer;
+- (YASAudioPointer)pointerAtChannel:(NSUInteger)channel;
 
 - (void)clear;
 - (void)clearWithStartFrame:(UInt32)frame length:(UInt32)length;

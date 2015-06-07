@@ -50,16 +50,6 @@ typedef union YASAudioMutablePointer {
     SInt32 *i32;
     SInt8 *i8;
     UInt8 *u8;
-} YASAudioMutablePointer;
-
-typedef union YASAudioPointer {
-    const void *v;
-    const Float32 *f32;
-    const Float64 *f64;
-    const SInt16 *i16;
-    const SInt32 *i32;
-    const SInt8 *i8;
-    const UInt8 *u8;
 } YASAudioPointer;
 
 #endif

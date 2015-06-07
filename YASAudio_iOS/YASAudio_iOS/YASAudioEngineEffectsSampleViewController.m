@@ -122,8 +122,8 @@ static const AudioComponentDescription baseAcd = {.componentType = kAudioUnitTyp
     tapNode.renderBlock = ^(YASAudioData *data, NSNumber *bus, YASAudioTime *when) {
         const Float64 startPhase = phase;
         const Float64 phasePerFrame = 1000.0 / data.format.sampleRate * YAS_2_PI;
-        YASAudioMutableFrameEnumerator *enumerator = [[YASAudioMutableFrameEnumerator alloc] initWithAudioData:data];
-        const YASAudioMutablePointer *pointer = enumerator.mutablePointer;
+        YASAudioFrameEnumerator *enumerator = [[YASAudioFrameEnumerator alloc] initWithAudioData:data];
+        const YASAudioPointer *pointer = enumerator.pointer;
         const UInt32 length = (UInt32)enumerator.frameLength;
         while (pointer->v) {
             phase = YASAudioVectorSinef(pointer->f32, length, startPhase, phasePerFrame);
