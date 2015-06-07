@@ -5,8 +5,7 @@
 
 // clang-format off
 
-#ifndef __YASMacros_YASMacros_h
-#define __YASMacros_YASMacros_h
+#pragma once
 
 #if ! __has_feature(objc_arc)
     #define YASAutorelease(__v) [__v autorelease]
@@ -34,6 +33,4 @@
     #define YASLog(...) NSLog(__VA_ARGS__)
 #else
     #define YASLog(...)
-#endif
-
 #endif
