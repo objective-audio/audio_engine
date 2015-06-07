@@ -295,10 +295,10 @@
 
         for (UInt32 ch = 0; ch < channels; ch++) {
             for (UInt32 i = 0; i < length; i++) {
-                YASAudioMutablePointer fromPtr =
-                    [YASAudioTestUtils mutablePointerWithData:fromData channel:ch frame:fromStartFrame + i];
-                YASAudioMutablePointer toPtr =
-                    [YASAudioTestUtils mutablePointerWithData:toData channel:ch frame:toStartFrame + i];
+                YASAudioPointer fromPtr =
+                    [YASAudioTestUtils pointerWithData:fromData channel:ch frame:fromStartFrame + i];
+                YASAudioPointer toPtr =
+                    [YASAudioTestUtils pointerWithData:toData channel:ch frame:toStartFrame + i];
                 XCTAssertEqual(memcmp(fromPtr.v, toPtr.v, format.sampleByteCount), 0);
                 BOOL isFromNotZero = NO;
                 BOOL isToNotZero = NO;
@@ -579,8 +579,8 @@
     YASRelease(channelRoutes);
 
     for (UInt32 ch = 0; ch < sourceChannels; ch++) {
-        YASAudioMutablePointer destPtr = [destData pointerAtBuffer:destChannelIndices[ch]];
-        YASAudioMutablePointer sourcePtr = [sourceData pointerAtBuffer:ch];
+        YASAudioPointer destPtr = [destData pointerAtBuffer:destChannelIndices[ch]];
+        YASAudioPointer sourcePtr = [sourceData pointerAtBuffer:ch];
         XCTAssertEqual(destPtr.v, sourcePtr.v);
         for (UInt32 frame = 0; frame < frameLength; frame++) {
             Float32 value = sourcePtr.f32[frame];
@@ -626,8 +626,8 @@
     YASRelease(channelRoutes);
 
     for (UInt32 ch = 0; ch < destChannels; ch++) {
-        YASAudioMutablePointer destPtr = [destBuffer pointerAtBuffer:ch];
-        YASAudioMutablePointer sourcePtr = [sourceData pointerAtBuffer:sourceChannelIndices[ch]];
+        YASAudioPointer destPtr = [destBuffer pointerAtBuffer:ch];
+        YASAudioPointer sourcePtr = [sourceData pointerAtBuffer:sourceChannelIndices[ch]];
         XCTAssertEqual(destPtr.v, sourcePtr.v);
         for (UInt32 frame = 0; frame < frameLength; frame++) {
             Float32 value = destPtr.f32[frame];

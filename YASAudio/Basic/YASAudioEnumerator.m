@@ -13,13 +13,13 @@
 
 - (instancetype)initWithAudioData:(YASAudioData *)data atChannel:(const NSUInteger)channel
 {
-    YASAudioMutablePointer pointer = [data pointerAtChannel:channel];
+    YASAudioPointer pointer = [data pointerAtChannel:channel];
     YASAudioFormat *format = data.format;
     NSUInteger stride = format.stride * format.sampleByteCount;
     return [self initWithPointer:pointer stride:stride length:data.frameLength];
 }
 
-- (instancetype)initWithPointer:(const YASAudioMutablePointer)pointer
+- (instancetype)initWithPointer:(const YASAudioPointer)pointer
                          stride:(const NSUInteger)stride
                          length:(const NSUInteger)length
 {
@@ -78,15 +78,6 @@
 
 @end
 
-@implementation YASAudioMutableEnumerator
-
-- (const YASAudioMutablePointer *)mutablePointer
-{
-    return &_pointer;
-}
-
-@end
-
 @implementation YASAudioFrameEnumerator
 
 - (instancetype)initWithAudioData:(YASAudioData *)data
@@ -102,13 +93,13 @@
         _frameLength = data.frameLength;
         _channelCount = bufferCount * stride;
         _frameStride = stride * sampleByteCount;
-        _pointersSize = _channelCount * sizeof(YASAudioMutablePointer *);
+        _pointersSize = _channelCount * sizeof(YASAudioPointer *);
         _pointers = calloc(_pointersSize, 1);
         _topPointers = calloc(_pointersSize, 1);
 
         NSUInteger channel = 0;
         for (NSInteger buffer = 0; buffer < bufferCount; buffer++) {
-            YASAudioMutablePointer pointer = [data pointerAtBuffer:buffer];
+            YASAudioPointer pointer = [data pointerAtBuffer:buffer];
             for (NSInteger ch = 0; ch < stride; ch++) {
                 _pointers[channel].v = _topPointers[channel].v = pointer.v;
                 pointer.u8 += sampleByteCount;
@@ -200,15 +191,6 @@
 - (void)reset
 {
     YASAudioFrameEnumeratorReset(self);
-}
-
-@end
-
-@implementation YASAudioMutableFrameEnumerator
-
-- (const YASAudioMutablePointer *)mutablePointer
-{
-    return &_pointer;
 }
 
 @end

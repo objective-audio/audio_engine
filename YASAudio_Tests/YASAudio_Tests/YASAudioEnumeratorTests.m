@@ -141,9 +141,8 @@
     XCTAssertEqual(format.bufferCount, channels);
 
     for (UInt32 buffer = 0; buffer < channels; buffer++) {
-        YASAudioMutableEnumerator *mutableEnumerator =
-            [[YASAudioMutableEnumerator alloc] initWithAudioData:data atChannel:buffer];
-        const YASAudioMutablePointer *mutablePointer = mutableEnumerator.mutablePointer;
+        YASAudioEnumerator *mutableEnumerator = [[YASAudioEnumerator alloc] initWithAudioData:data atChannel:buffer];
+        const YASAudioPointer *mutablePointer = mutableEnumerator.pointer;
         const NSUInteger *index = mutableEnumerator.index;
 
         UInt32 frame = 0;
@@ -186,12 +185,11 @@
 
     YASAudioFormat *format = [[YASAudioFormat alloc] initStandardFormatWithSampleRate:48000 channels:1];
     YASAudioData *data = [[YASAudioData alloc] initWithFormat:format frameCapacity:frameLength];
-    YASAudioMutableEnumerator *mutableEnumerator =
-        [[YASAudioMutableEnumerator alloc] initWithAudioData:data atChannel:0];
+    YASAudioEnumerator *mutableEnumerator = [[YASAudioEnumerator alloc] initWithAudioData:data atChannel:0];
 
     const NSUInteger *index = mutableEnumerator.index;
     const YASAudioPointer *pointer = mutableEnumerator.pointer;
-    const YASAudioMutablePointer *mutablePointer = mutableEnumerator.mutablePointer;
+    const YASAudioPointer *mutablePointer = mutableEnumerator.pointer;
 
     XCTAssertEqual(*index, 0);
 
@@ -246,7 +244,7 @@
 
 - (void)testInitFailed
 {
-    YASAudioMutablePointer pointer = {NULL};
+    YASAudioPointer pointer = {NULL};
 
     XCTAssertThrows([[YASAudioEnumerator alloc] initWithPointer:pointer stride:1 length:1]);
 

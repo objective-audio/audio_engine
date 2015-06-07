@@ -503,7 +503,7 @@
     const UInt32 stride = data.format.stride;
 
     for (NSInteger bufIndex = 0; bufIndex < bufferCount; bufIndex++) {
-        YASAudioMutablePointer pointer = [data pointerAtBuffer:bufIndex];
+        YASAudioPointer pointer = [data pointerAtBuffer:bufIndex];
         for (NSInteger frameIndex = 0; frameIndex < data.frameLength; frameIndex++) {
             SInt16 value = frameIndex + startIndex + 1;
             for (NSInteger strideIndex = 0; strideIndex < stride; strideIndex++) {
@@ -536,7 +536,7 @@
     const UInt32 stride = data.format.stride;
 
     for (NSInteger bufIndex = 0; bufIndex < bufferCount; bufIndex++) {
-        const YASAudioMutablePointer pointer = [data pointerAtBuffer:bufIndex];
+        const YASAudioPointer pointer = [data pointerAtBuffer:bufIndex];
         for (NSInteger frameIndex = 0; frameIndex < data.frameLength; frameIndex++) {
             SInt16 value = frameIndex + startIndex + 1;
             for (NSInteger strideIndex = 0; strideIndex < stride; strideIndex++) {
