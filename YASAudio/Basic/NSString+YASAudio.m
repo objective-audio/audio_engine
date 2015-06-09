@@ -113,6 +113,8 @@
             return @"EqualPowerCrossfade";
         case kAudioUnitParameterUnit_MixerFaderCurve1:
             return @"MixerFaderCurve1";
+        case kAudioUnitParameterUnit_Pan:
+            return @"Pan";
         case kAudioUnitParameterUnit_Meters:
             return @"Meters";
         case kAudioUnitParameterUnit_AbsoluteCents:
@@ -121,6 +123,8 @@
             return @"Octaves";
         case kAudioUnitParameterUnit_BPM:
             return @"BPM";
+        case kAudioUnitParameterUnit_Beats:
+            return @"Beats";
         case kAudioUnitParameterUnit_Milliseconds:
             return @"Milliseconds";
         case kAudioUnitParameterUnit_Ratio:

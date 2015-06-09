@@ -56,7 +56,7 @@ void YASAudioClearAudioBufferList(AudioBufferList *ioAbl)
 {
     if (ioAbl) {
         for (UInt32 i = 0; i < ioAbl->mNumberBuffers; i++) {
-            if (ioAbl->mBuffers && ioAbl->mBuffers[i].mData) {
+            if (ioAbl->mBuffers[i].mData) {
                 memset(ioAbl->mBuffers[i].mData, 0, ioAbl->mBuffers[i].mDataByteSize);
             }
         }
