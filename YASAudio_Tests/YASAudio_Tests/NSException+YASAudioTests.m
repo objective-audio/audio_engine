@@ -51,7 +51,7 @@
     XCTAssertThrowsSpecificNamed([NSException yas_raiseIfMainThread], NSException, YASAudioGenericException);
     XCTAssertNoThrow([NSException yas_raiseIfSubThread]);
 
-    XCTestExpectation *expectation = [self expectationWithDescription:nil];
+    XCTestExpectation *expectation = [self expectationWithDescription:@""];
 
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         [NSException yas_raiseIfMainThread];
