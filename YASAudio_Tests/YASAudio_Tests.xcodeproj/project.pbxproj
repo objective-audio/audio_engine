@@ -24,6 +24,8 @@
 		B60EFF681AC837DB00AA70DD /* YASAudioTimeTests.m in Sources */ = {isa = PBXBuildFile; fileRef = B60EFF671AC837DB00AA70DD /* YASAudioTimeTests.m */; };
 		B60EFF691AC837DB00AA70DD /* YASAudioTimeTests.m in Sources */ = {isa = PBXBuildFile; fileRef = B60EFF671AC837DB00AA70DD /* YASAudioTimeTests.m */; };
 		B60EFF701AC83AB100AA70DD /* YASAudioOfflineOutputNodeTests.m in Sources */ = {isa = PBXBuildFile; fileRef = B68014F61AC7F8E200DF5A99 /* YASAudioOfflineOutputNodeTests.m */; };
+		B613A8191B2F0F9500D482FF /* YASAudioTimeTests.m in Sources */ = {isa = PBXBuildFile; fileRef = B60EFF671AC837DB00AA70DD /* YASAudioTimeTests.m */; };
+		B613A81A1B2F0F9500D482FF /* YASAudioTimeTests.m in Sources */ = {isa = PBXBuildFile; fileRef = B60EFF671AC837DB00AA70DD /* YASAudioTimeTests.m */; };
 		B61A24DB1AB1CEE000883B4A /* YASAudioConnectionTests.m in Sources */ = {isa = PBXBuildFile; fileRef = B61A24DA1AB1CEE000883B4A /* YASAudioConnectionTests.m */; };
 		B61A24DC1AB1CEE000883B4A /* YASAudioConnectionTests.m in Sources */ = {isa = PBXBuildFile; fileRef = B61A24DA1AB1CEE000883B4A /* YASAudioConnectionTests.m */; };
 		B61A24DD1AB1CEE000883B4A /* YASAudioConnectionTests.m in Sources */ = {isa = PBXBuildFile; fileRef = B61A24DA1AB1CEE000883B4A /* YASAudioConnectionTests.m */; };
@@ -839,6 +841,7 @@
 				B63B22011AAC4EBB0015BD78 /* YASAudioConnection.m in Sources */,
 				B6F726181ACFE268006980E5 /* YASAudioUnitMixerNodeTests.m in Sources */,
 				B6AE9F0E1A8F2EED00A4B935 /* YASAudioDevice.m in Sources */,
+				B613A8191B2F0F9500D482FF /* YASAudioTimeTests.m in Sources */,
 				B605B4061AE6918B00697EAF /* YASAudioTapNodeTests.m in Sources */,
 				B630CA281A83B2D000EDE110 /* YASAudioUnitTests.m in Sources */,
 				B6AE9F101A8F2EED00A4B935 /* YASAudioDeviceStream.m in Sources */,
@@ -906,6 +909,7 @@
 				B634506E1AD10A7100CF7784 /* YASAudioConnection.m in Sources */,
 				B634506F1AD10A7100CF7784 /* YASAudioUnitMixerNodeTests.m in Sources */,
 				B63450701AD10A7100CF7784 /* YASAudioDevice.m in Sources */,
+				B613A81A1B2F0F9500D482FF /* YASAudioTimeTests.m in Sources */,
 				B605B4071AE6918C00697EAF /* YASAudioTapNodeTests.m in Sources */,
 				B63450711AD10A7100CF7784 /* YASAudioUnitTests.m in Sources */,
 				B63450721AD10A7100CF7784 /* YASAudioDeviceStream.m in Sources */,
