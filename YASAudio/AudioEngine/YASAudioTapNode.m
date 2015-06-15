@@ -39,7 +39,7 @@
 
 #pragma mark Render thread
 
-- (void)renderWithData:(YASAudioData *)data bus:(NSNumber *)bus when:(YASAudioTime *)when
+- (void)renderWithData:(YASAudioData *)data bus:(NSNumber *)bus when:(AVAudioTime *)when
 {
     [super renderWithData:data bus:bus when:when];
 
@@ -80,7 +80,7 @@
     return [self.nodeCoreOnRender outputConnections];
 }
 
-- (void)renderSourceNodeWithData:(YASAudioData *)data bus:(NSNumber *)bus when:(YASAudioTime *)when
+- (void)renderSourceNodeWithData:(YASAudioData *)data bus:(NSNumber *)bus when:(AVAudioTime *)when
 {
     YASAudioConnection *connection = [self inputConnectionOnRenderForBus:bus];
     YASAudioNode *node = connection.sourceNode;

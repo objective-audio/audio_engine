@@ -11,10 +11,10 @@
 #import "YASAudioFormat.h"
 #import "YASAudioGraph.h"
 #import "YASAudioUnit.h"
-#import "YASAudioTime.h"
 #import "YASMacros.h"
 #import "NSException+YASAudio.h"
 #import "NSNumber+YASAudio.h"
+#import <AVFoundation/AVFoundation.h>
 
 @interface YASAudioUnitNode ()
 
@@ -144,9 +144,9 @@
                                 YASAudioData *data = [[YASAudioData alloc] initWithFormat:connection.format
                                                                           audioBufferList:renderParameters->ioData
                                                                                 needsFree:NO];
-                                YASAudioTime *when =
-                                    [[YASAudioTime alloc] initWithAudioTimeStamp:renderParameters->ioTimeStamp
-                                                                      sampleRate:connection.format.sampleRate];
+                                AVAudioTime *when =
+                                    [[AVAudioTime alloc] initWithAudioTimeStamp:renderParameters->ioTimeStamp
+                                                                     sampleRate:connection.format.sampleRate];
 
                                 [sourceNode renderWithData:data bus:connection.sourceBus when:when];
 
@@ -305,7 +305,7 @@
 
 #pragma mark Render thread
 
-- (void)renderWithData:(YASAudioData *)data bus:(NSNumber *)bus when:(YASAudioTime *)when
+- (void)renderWithData:(YASAudioData *)data bus:(NSNumber *)bus when:(AVAudioTime *)when
 {
     [super renderWithData:data bus:bus when:when];
 

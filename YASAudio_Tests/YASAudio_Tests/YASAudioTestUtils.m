@@ -140,7 +140,7 @@ UInt32 TestValue(UInt32 frame, UInt32 channel, UInt32 buffer)
         YASAudioData *data = [[YASAudioData alloc] initWithFormat:format frameCapacity:frameLength];
 
         for (NSInteger i = 0; i < count; i++) {
-            YASAudioTime *audioTime = [YASAudioTime timeWithSampleTime:frameLength * i atRate:format.sampleRate];
+            AVAudioTime *audioTime = [AVAudioTime timeWithSampleTime:frameLength * i atRate:format.sampleRate];
             AudioTimeStamp timeStamp = audioTime.audioTimeStamp;
 
             YASAudioUnitRenderParameters parameters = {

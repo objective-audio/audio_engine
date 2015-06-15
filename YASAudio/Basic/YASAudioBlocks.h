@@ -7,10 +7,10 @@
 
 #include "YASAudioTypes.h"
 
-@class YASAudioData, YASAudioTime;
+@class YASAudioData, AVAudioTime;
 
 typedef void (^YASAudioUnitCallbackBlock)(YASAudioUnitRenderParameters *renderParameters);
-typedef void (^YASAudioDeviceIOCallbackBlock)(YASAudioData *outData, YASAudioTime *when);
-typedef void (^YASAudioNodeRenderBlock)(YASAudioData *data, NSNumber *bus, YASAudioTime *when);
-typedef void (^YASAudioOfflineRenderCallbackBlock)(YASAudioData *data, YASAudioTime *when, BOOL *stop);
+typedef void (^YASAudioDeviceIOCallbackBlock)(YASAudioData *outData, AVAudioTime *when);
+typedef void (^YASAudioNodeRenderBlock)(YASAudioData *data, NSNumber *bus, AVAudioTime *when);
+typedef void (^YASAudioOfflineRenderCallbackBlock)(YASAudioData *data, AVAudioTime *when, BOOL *stop);
 typedef void (^YASAudioOfflineRenderCompletionBlock)(BOOL cancelled);

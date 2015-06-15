@@ -155,7 +155,7 @@
 
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         AudioUnitRenderActionFlags actionFlags = 0;
-        YASAudioTime *audioTime = [YASAudioTime timeWithSampleTime:0 atRate:outputSampleRate];
+        AVAudioTime *audioTime = [AVAudioTime timeWithSampleTime:0 atRate:outputSampleRate];
         AudioTimeStamp timeStamp = audioTime.audioTimeStamp;
 
         YASAudioData *data = [[YASAudioData alloc] initWithFormat:outputFormat frameCapacity:frameLength];

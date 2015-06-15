@@ -12,7 +12,7 @@
 #import "YASAudioBlocks.h"
 #import "YASWeakSupport.h"
 
-@class YASAudioDevice, YASAudioGraph, YASAudioTime;
+@class YASAudioDevice, YASAudioGraph, AVAudioTime;
 
 @interface YASAudioDeviceIO : YASWeakProvider
 
@@ -27,7 +27,7 @@
 - (void)stop;
 
 - (YASAudioData *)inputDataOnRender;
-- (YASAudioTime *)inputTimeOnRender;
+- (AVAudioTime *)inputTimeOnRender;
 
 @end
 

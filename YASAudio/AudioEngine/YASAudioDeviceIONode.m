@@ -13,7 +13,6 @@
 #import "YASAudioChannelRoute.h"
 #import "YASAudioData+Internal.h"
 #import "YASAudioFormat.h"
-#import "YASAudioTime.h"
 #import "YASWeakSupport.h"
 #import "YASMacros.h"
 #import "NSNumber+YASAudio.h"
@@ -272,7 +271,7 @@
         YASWeakContainer *nodeContainer = self.weakContainer;
         YASWeakContainer *deviceIOContainer = audioDeviceIO.weakContainer;
 
-        audioDeviceIO.renderCallbackBlock = ^(YASAudioData *outData, YASAudioTime *when) {
+        audioDeviceIO.renderCallbackBlock = ^(YASAudioData *outData, AVAudioTime *when) {
             @autoreleasepool
             {
                 YASAudioDeviceIONode *node = [nodeContainer autoreleasingObject];
@@ -320,7 +319,7 @@
                                     [core inputChannelRoutesWithDestinationBus:connection.destinationBus format:format];
                                 if (channelRoutes) {
                                     YASAudioData *inputData = [deviceIO inputDataOnRender];
-                                    YASAudioTime *inputTime = [deviceIO inputTimeOnRender];
+                                    AVAudioTime *inputTime = [deviceIO inputTimeOnRender];
                                     if (inputData && inputTime) {
                                         YASAudioData *renderData = [[YASAudioData alloc] initWithFormat:format
                                                                                                    data:inputData
@@ -396,7 +395,7 @@
 
 #pragma mark Render thread
 
-- (void)renderWithData:(YASAudioData *)data bus:(NSNumber *)bus when:(YASAudioTime *)when
+- (void)renderWithData:(YASAudioData *)data bus:(NSNumber *)bus when:(AVAudioTime *)when
 {
     [super renderWithData:data bus:bus when:when];
 

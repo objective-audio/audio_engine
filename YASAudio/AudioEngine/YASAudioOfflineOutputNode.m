@@ -8,11 +8,11 @@
 #import "YASAudioFormat.h"
 #import "YASAudioNode+Internal.h"
 #import "YASAudioConnection+Internal.h"
-#import "YASAudioTime.h"
 #import "YASMacros.h"
 #import "YASAudioBlocks.h"
 #import "NSException+YASAudio.h"
 #import "NSError+YASAudio.h"
+#import <AVFoundation/AVFoundation.h>
 
 static const UInt32 YASAudioOfflineOutputRenderFrameLength = 1024;
 
@@ -83,8 +83,8 @@ static const UInt32 YASAudioOfflineOutputRenderFrameLength = 1024;
             while (!stop) {
                 @autoreleasepool
                 {
-                    YASAudioTime *when =
-                        [YASAudioTime timeWithSampleTime:currentSampleTime atRate:renderData.format.sampleRate];
+                    AVAudioTime *when =
+                        [AVAudioTime timeWithSampleTime:currentSampleTime atRate:renderData.format.sampleRate];
 
                     YASAudioOfflineOutputNode *offlineNode = container.retainedObject;
                     YASAudioNodeCore *nodeCore = offlineNode.nodeCore;

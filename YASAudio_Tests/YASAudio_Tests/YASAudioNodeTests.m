@@ -8,8 +8,8 @@
 #import "YASAudioEngine.h"
 #import "YASAudioFormat.h"
 #import "YASAudioConnection+Internal.h"
-#import "YASAudioTime.h"
 #import "YASMacros.h"
+#import <AVFoundation/AVFoundation.h>
 
 @interface YASAudioNodeTestNode : YASAudioNode
 
@@ -138,7 +138,7 @@
 - (void)testRenderTime
 {
     YASAudioNode *node = [[YASAudioNode alloc] init];
-    YASAudioTime *time = [[YASAudioTime alloc] initWithSampleTime:100 atRate:48000];
+    AVAudioTime *time = [[AVAudioTime alloc] initWithSampleTime:100 atRate:48000];
 
     XCTestExpectation *renderExpectation = [self expectationWithDescription:@"Node Render"];
 
