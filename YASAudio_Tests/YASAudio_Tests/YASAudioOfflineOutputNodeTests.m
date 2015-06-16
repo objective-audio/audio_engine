@@ -5,6 +5,7 @@
 
 #import <XCTest/XCTest.h>
 #import "YASAudioTestUtils.h"
+#import <AVFoundation/AVFoundation.h>
 
 @interface YASAudioOfflineOutputNodeTests : XCTestCase
 
@@ -42,7 +43,7 @@
     const UInt32 framesPerRender = 1024;
     const UInt32 length = 4196;
     __block UInt32 tapRenderFrame = 0;
-    tapNode.renderBlock = ^(YASAudioData *data, NSNumber *bus, YASAudioTime *when) {
+    tapNode.renderBlock = ^(YASAudioData *data, NSNumber *bus, AVAudioTime *when) {
         XCTAssertEqual(when.sampleTime, tapRenderFrame);
         XCTAssertEqual(when.sampleRate, sampleRate);
         XCTAssertEqual(data.frameLength, framesPerRender);
@@ -64,7 +65,7 @@
     __block UInt32 outputRenderFrame = 0;
     NSError *error = nil;
     BOOL result =
-        [engine startOfflineRenderWithOutputCallbackBlock:^(YASAudioData *data, YASAudioTime *when, BOOL *stop) {
+        [engine startOfflineRenderWithOutputCallbackBlock:^(YASAudioData *data, AVAudioTime *when, BOOL *stop) {
             XCTAssertEqual(when.sampleTime, outputRenderFrame);
             XCTAssertEqual(when.sampleRate, sampleRate);
             XCTAssertEqual(data.frameLength, framesPerRender);
@@ -128,7 +129,7 @@
 
     __block UInt32 tapRenderFrame = 0;
 
-    tapNode.renderBlock = ^(YASAudioData *data, NSNumber *bus, YASAudioTime *when) {
+    tapNode.renderBlock = ^(YASAudioData *data, NSNumber *bus, AVAudioTime *when) {
         XCTAssertEqual(when.sampleTime, tapRenderFrame);
         XCTAssertEqual(when.sampleRate, sampleRate);
         XCTAssertEqual(data.frameLength, framesPerRender);
@@ -153,7 +154,7 @@
     __block UInt32 outputRenderFrame = 0;
     NSError *error = nil;
 
-    BOOL result = [outputNode startWithOutputCallbackBlock:^(YASAudioData *data, YASAudioTime *when, BOOL *stop) {
+    BOOL result = [outputNode startWithOutputCallbackBlock:^(YASAudioData *data, AVAudioTime *when, BOOL *stop) {
         XCTAssertEqual(when.sampleTime, outputRenderFrame);
         XCTAssertEqual(when.sampleRate, sampleRate);
         XCTAssertEqual(data.frameLength, framesPerRender);

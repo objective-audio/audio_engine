@@ -29,7 +29,7 @@
 
 @property (atomic, strong, readonly) id nodeCore;
 
-- (void)setRenderTimeOnRender:(YASAudioTime *)time;
+- (void)setRenderTimeOnRender:(AVAudioTime *)time;
 
 @end
 

@@ -11,7 +11,6 @@
 #import "YASAudioFormat.h"
 #import "YASAudioGraph.h"
 #import "YASAudioUnit.h"
-#import "YASAudioTime.h"
 #import "YASMacros.h"
 #import "NSException+YASAudio.h"
 #import "NSNumber+YASAudio.h"
@@ -248,7 +247,7 @@
 @interface YASAudioUnitInputNode ()
 
 @property (atomic, strong) YASAudioData *inputData;
-@property (atomic, strong) YASAudioTime *renderTime;
+@property (atomic, strong) AVAudioTime *renderTime;
 
 @end
 
@@ -309,8 +308,8 @@
                         YASAudioNodeCore *nodeCore = [inputNode nodeCore];
                         YASAudioConnection *connection = [nodeCore outputConnectionForBus:@1];
 
-                        YASAudioTime *time = [[YASAudioTime alloc] initWithAudioTimeStamp:renderParameters->ioTimeStamp
-                                                                               sampleRate:connection.format.sampleRate];
+                        AVAudioTime *time = [[AVAudioTime alloc] initWithAudioTimeStamp:renderParameters->ioTimeStamp
+                                                                             sampleRate:connection.format.sampleRate];
                         [inputNode setRenderTimeOnRender:time];
                         YASRelease(time);
 

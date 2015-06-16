@@ -67,7 +67,7 @@
 
 @property (nonatomic, strong) YASWeakContainer *engineContainer;
 @property (atomic, strong) id nodeCore;
-@property (atomic, strong) YASAudioTime *renderTime;
+@property (atomic, strong) AVAudioTime *renderTime;
 
 @end
 
@@ -161,7 +161,7 @@
     return [_engineContainer autoreleasingObject];
 }
 
-- (YASAudioTime *)lastRenderTime
+- (AVAudioTime *)lastRenderTime
 {
     return self.renderTime;
 }
@@ -292,12 +292,12 @@
 
 #pragma mark Render thread
 
-- (void)renderWithData:(YASAudioData *)data bus:(NSNumber *)bus when:(YASAudioTime *)when
+- (void)renderWithData:(YASAudioData *)data bus:(NSNumber *)bus when:(AVAudioTime *)when
 {
     [self setRenderTimeOnRender:when];
 }
 
-- (void)setRenderTimeOnRender:(YASAudioTime *)time
+- (void)setRenderTimeOnRender:(AVAudioTime *)time
 {
     self.renderTime = time;
 }

@@ -7,7 +7,7 @@
 #import "YASAudio.h"
 #import <AVFoundation/AVFoundation.h>
 
-static NSInteger testCount = 8;
+// static NSInteger testCount = 8;
 
 @interface YASAudioTimeTest : XCTestCase
 
@@ -24,7 +24,7 @@ static NSInteger testCount = 8;
 {
     [super tearDown];
 }
-
+/*
 - (void)testCreateAudioTimeWithHostTime
 {
     for (NSInteger i = 0; i < testCount; i++) {
@@ -109,5 +109,5 @@ static NSInteger testCount = 8;
     AudioTimeStamp yasTimeStamp = yasTime.audioTimeStamp;
     return YASAudioIsEqualAudioTimeStamp(&avTimeStamp, &yasTimeStamp);
 }
-
+*/
 @end

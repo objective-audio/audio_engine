@@ -6,7 +6,7 @@
 #import "YASWeakSupport.h"
 #import <AudioUnit/AudioUnit.h>
 
-@class YASAudioFormat, YASAudioEngine, YASAudioTime, YASAudioData;
+@class YASAudioFormat, YASAudioEngine, YASAudioData, AVAudioTime;
 
 @interface YASAudioNode : YASWeakProvider
 
@@ -19,7 +19,7 @@
 - (BOOL)isAvailableInputBus:(NSNumber *)bus;
 - (BOOL)isAvailableOutputBus:(NSNumber *)bus;
 - (YASAudioEngine *)engine;
-- (YASAudioTime *)lastRenderTime;
+- (AVAudioTime *)lastRenderTime;
 
 #pragma mark - Override by Subclass
 
@@ -28,6 +28,6 @@
 
 #pragma mark Render thread
 
-- (void)renderWithData:(YASAudioData *)data bus:(NSNumber *)bus when:(YASAudioTime *)when;
+- (void)renderWithData:(YASAudioData *)data bus:(NSNumber *)bus when:(AVAudioTime *)when;
 
 @end

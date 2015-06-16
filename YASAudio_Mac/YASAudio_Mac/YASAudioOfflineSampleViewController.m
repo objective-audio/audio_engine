@@ -26,7 +26,7 @@ static Float64 YASAudioOfflineSampleSampleRate = 44100.0;
         _frequency = 1000.0;
 
         YASWeakContainer *container = self.weakContainer;
-        self.renderBlock = ^(YASAudioData *data, NSNumber *bus, YASAudioTime *when) {
+        self.renderBlock = ^(YASAudioData *data, NSNumber *bus, AVAudioTime *when) {
             [data clear];
 
             YASAudioOfflineSampleSineNode *node = [container retainedObject];
@@ -260,7 +260,7 @@ static Float64 YASAudioOfflineSampleSampleRate = 44100.0;
     offlineSineNode.playing = YES;
     [self.offlineMixerNode setInputVolume:self.volume forBus:@0];
 
-    if (![self.offlineEngine startOfflineRenderWithOutputCallbackBlock:^(YASAudioData *data, YASAudioTime *when,
+    if (![self.offlineEngine startOfflineRenderWithOutputCallbackBlock:^(YASAudioData *data, AVAudioTime *when,
                                                                          BOOL *stop) {
             UInt32 frameLength = MIN(remain, data.frameLength);
             if (frameLength > 0) {

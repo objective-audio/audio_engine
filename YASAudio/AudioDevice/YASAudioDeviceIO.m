@@ -10,11 +10,11 @@
 #import "YASAudioDeviceIO.h"
 #import "YASAudioDevice.h"
 #import "YASAudioData.h"
-#import "YASAudioTime.h"
 #import "YASAudioFormat.h"
 #import "YASAudioUtility.h"
 #import "YASMacros.h"
 #import "NSException+YASAudio.h"
+#import <AVFoundation/AVFoundation.h>
 
 static UInt32 YASAudioDeviceIOFrameCapacity = 4096;
 
@@ -52,7 +52,7 @@ static UInt32 YASAudioDeviceIOFrameCapacity = 4096;
 
 @property (nonatomic, assign) AudioDeviceIOProcID ioProcID;
 @property (nonatomic, strong) YASAudioData *inputData;
-@property (nonatomic, strong) YASAudioTime *inputTime;
+@property (nonatomic, strong) AVAudioTime *inputTime;
 @property (atomic, strong) YASAudioDeviceIOCore *core;
 
 @end
@@ -133,8 +133,8 @@ static UInt32 YASAudioDeviceIOFrameCapacity = 4096;
                 const UInt32 inputFrameLength = inputData.frameLength;
                 if (inputFrameLength > 0) {
                     deviceIO.inputData = inputData;
-                    YASAudioTime *inputTime = [[YASAudioTime alloc] initWithAudioTimeStamp:inInputTime
-                                                                                sampleRate:inputData.format.sampleRate];
+                    AVAudioTime *inputTime =
+                        [[AVAudioTime alloc] initWithAudioTimeStamp:inInputTime sampleRate:inputData.format.sampleRate];
                     deviceIO.inputTime = inputTime;
                     YASRelease(inputTime);
                 }
@@ -147,9 +147,9 @@ static UInt32 YASAudioDeviceIOFrameCapacity = 4096;
                             YASAudioGetFrameLengthFromAudioBufferList(outOutputData, outputData.format.sampleByteCount);
                         if (frameLength > 0) {
                             outputData.frameLength = frameLength;
-                            YASAudioTime *time =
-                                [[YASAudioTime alloc] initWithAudioTimeStamp:inOutputTime
-                                                                  sampleRate:outputData.format.sampleRate];
+                            AVAudioTime *time =
+                                [[AVAudioTime alloc] initWithAudioTimeStamp:inOutputTime
+                                                                 sampleRate:outputData.format.sampleRate];
                             renderCallbackBlock(outputData, time);
                             YASRelease(time);
                             [outputData copyFlexiblyToAudioBufferList:outOutputData];
@@ -293,7 +293,7 @@ static UInt32 YASAudioDeviceIOFrameCapacity = 4096;
     return self.inputData;
 }
 
-- (YASAudioTime *)inputTimeOnRender
+- (AVAudioTime *)inputTimeOnRender
 {
     return self.inputTime;
 }

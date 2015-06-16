@@ -136,7 +136,7 @@ static const UInt32 kSineDataMaxCount = 4096;
 
     YASWeakContainer *container = self.deviceIO.weakContainer;
 
-    self.deviceIO.renderCallbackBlock = ^(YASAudioData *outData, YASAudioTime *when) {
+    self.deviceIO.renderCallbackBlock = ^(YASAudioData *outData, AVAudioTime *when) {
         YASAudioDeviceIO *deviceIO = [container retainedObject];
         [core processWithOutputData:outData inputData:[deviceIO inputDataOnRender]];
         YASRelease(deviceIO);
