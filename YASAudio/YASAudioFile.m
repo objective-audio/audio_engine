@@ -453,7 +453,7 @@ static BOOL CanOpenAudioFile(NSURL *url)
 {
 	UInt32 readBufferBytes = *ioFrames * _fileFormat.mBytesPerPacket;
 	UInt32 outFrames = *ioFrames;
-	OSStatus err = AudioFileReadPackets(_audioFileID, false, &readBufferBytes, NULL, startFrame, &outFrames, outBuffer);
+    OSStatus err = AudioFileReadPacketData(_audioFileID, false, &readBufferBytes, NULL, startFrame, &outFrames, outBuffer);
 	if (err != noErr) {
 		*ioFrames = 0;
 	} else {
