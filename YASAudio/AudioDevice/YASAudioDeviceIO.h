@@ -21,7 +21,7 @@
 @property (nonatomic, assign, readonly) BOOL isRunning;
 
 - (instancetype)init;
-- (instancetype)initWithAudioDevice:(YASAudioDevice *)device NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithAudioDevice:(YASAudioDevice *)device;
 
 - (void)start;
 - (void)stop;

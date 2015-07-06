@@ -9,12 +9,12 @@
 
 @interface YASAudioFormat : NSObject
 
-@property (nonatomic, readonly, getter=isStandard) BOOL standard;
+@property (nonatomic, readonly) BOOL isStandard;
 @property (nonatomic, readonly) YASAudioPCMFormat pcmFormat;
 @property (nonatomic, readonly) UInt32 channelCount;
 @property (nonatomic, readonly) UInt32 bufferCount;
 @property (nonatomic, readonly) UInt32 stride;
-@property (nonatomic, readonly) double sampleRate;
+@property (nonatomic, readonly) Float64 sampleRate;
 @property (nonatomic, readonly) BOOL isInterleaved;
 @property (nonatomic, readonly) const AudioStreamBasicDescription *streamDescription;
 @property (nonatomic, readonly) UInt32 sampleByteCount;
@@ -29,11 +29,5 @@
 - (instancetype)initWithSettings:(NSDictionary *)settings;
 
 - (BOOL)isEqualToAudioFormat:(YASAudioFormat *)otherFormat;
-
-@end
-
-@interface NSDictionary (YASAudioFormat)
-
-- (void)yas_getStreamDescription:(AudioStreamBasicDescription *)outFormat;
 
 @end

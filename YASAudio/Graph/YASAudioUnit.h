@@ -31,7 +31,7 @@ extern OSType const YASAudioUnitSubType_DefaultIO;
 #endif
 
 - (instancetype)init NS_UNAVAILABLE;
-- (instancetype)initWithAudioComponentDescription:(const AudioComponentDescription *)acd NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithAudioComponentDescription:(const AudioComponentDescription *)acd;
 - (instancetype)initWithType:(const OSType)type subType:(const OSType)subType;
 
 - (AudioUnit)audioUnitInstance;

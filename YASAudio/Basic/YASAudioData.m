@@ -39,6 +39,11 @@ typedef NS_ENUM(NSUInteger, YASAudioDataFreeType) {
     return [self initWithFormat:format audioBufferList:abl needsFree:YES];
 }
 
+- (instancetype)initWithFormat:(YASAudioFormat *)format audioBufferList:(AudioBufferList *)abl
+{
+    return [self initWithFormat:format audioBufferList:abl needsFree:NO];
+}
+
 - (instancetype)initWithFormat:(YASAudioFormat *)format audioBufferList:(AudioBufferList *)abl needsFree:(BOOL)needsFree
 {
     self = [super init];
@@ -329,7 +334,8 @@ typedef NS_ENUM(NSUInteger, YASAudioDataFreeType) {
 - (BOOL)copyFlexiblyFromAudioBufferList:(const AudioBufferList *)fromAbl
 {
     if (!fromAbl) {
-        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Argument is nil. fromAbl(%p)", __PRETTY_FUNCTION__, fromAbl]));
+        YASRaiseWithReason(
+            ([NSString stringWithFormat:@"%s - Argument is nil. fromAbl(%p)", __PRETTY_FUNCTION__, fromAbl]));
         return NO;
     }
 
@@ -352,7 +358,8 @@ typedef NS_ENUM(NSUInteger, YASAudioDataFreeType) {
 - (BOOL)copyFlexiblyToAudioBufferList:(AudioBufferList *)toAbl
 {
     if (!toAbl) {
-        YASRaiseWithReason(([NSString stringWithFormat:@"%s - Argument is nil. toAbl(%p)", __PRETTY_FUNCTION__, toAbl]));
+        YASRaiseWithReason(
+            ([NSString stringWithFormat:@"%s - Argument is nil. toAbl(%p)", __PRETTY_FUNCTION__, toAbl]));
         return NO;
     }
 

@@ -24,7 +24,7 @@
 - (instancetype)initWithAudioData:(YASAudioData *)data atChannel:(const NSUInteger)channel;
 - (instancetype)initWithPointer:(const YASAudioPointer)pointer
                          stride:(const NSUInteger)stride
-                         length:(const NSUInteger)length NS_DESIGNATED_INITIALIZER;
+                         length:(const NSUInteger)length;
 
 - (void)move;
 - (void)stop;

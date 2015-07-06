@@ -16,7 +16,11 @@
     YASAudioPointer pointer = [data pointerAtChannel:channel];
     YASAudioFormat *format = data.format;
     NSUInteger stride = format.stride * format.sampleByteCount;
-    return [self initWithPointer:pointer stride:stride length:data.frameLength];
+
+    self = [self initWithPointer:pointer stride:stride length:data.frameLength];
+    if (self) {
+    }
+    return self;
 }
 
 - (instancetype)initWithPointer:(const YASAudioPointer)pointer

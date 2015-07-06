@@ -3,28 +3,26 @@
 //  Copyright (c) 2015 Yuki Yasoshima.
 //
 
-#import <Foundation/Foundation.h>
-#import <AudioUnit/AUComponent.h>
+#pragma once
 
-#ifndef __YASAudio_YASAudioTypes_h
-#define __YASAudio_YASAudioTypes_h
+#include <AudioUnit/AUComponent.h>
 
-typedef NS_ENUM(NSUInteger, YASAudioPCMFormat) {
+typedef enum {
     YASAudioPCMFormatOther = 0,
     YASAudioPCMFormatFloat32 = 1,
     YASAudioPCMFormatFloat64 = 2,
     YASAudioPCMFormatInt16 = 3,
     YASAudioPCMFormatFixed824 = 4
-};
+} YASAudioPCMFormat;
 
-typedef NS_ENUM(NSUInteger, YASAudioUnitRenderType) {
+typedef enum {
     YASAudioUnitRenderTypeNormal,
     YASAudioUnitRenderTypeInput,
     YASAudioUnitRenderTypeNotify,
     YASAudioUnitRenderTypeUnknown,
-};
+} YASAudioUnitRenderType;
 
-typedef union YASAudioRenderID {
+typedef union {
     void *v;
     struct {
         UInt8 graph;
@@ -32,7 +30,7 @@ typedef union YASAudioRenderID {
     };
 } YASAudioRenderID;
 
-typedef struct YASAudioUnitRenderParameters {
+typedef struct {
     YASAudioUnitRenderType inRenderType;
     AudioUnitRenderActionFlags *ioActionFlags;
     const AudioTimeStamp *ioTimeStamp;
@@ -42,7 +40,7 @@ typedef struct YASAudioUnitRenderParameters {
     YASAudioRenderID renderID;
 } YASAudioUnitRenderParameters;
 
-typedef union YASAudioMutablePointer {
+typedef union {
     void *v;
     Float32 *f32;
     Float64 *f64;
@@ -51,5 +49,3 @@ typedef union YASAudioMutablePointer {
     SInt8 *i8;
     UInt8 *u8;
 } YASAudioPointer;
-
-#endif

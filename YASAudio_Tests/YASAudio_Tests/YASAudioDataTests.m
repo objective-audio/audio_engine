@@ -297,8 +297,7 @@
             for (UInt32 i = 0; i < length; i++) {
                 YASAudioPointer fromPtr =
                     [YASAudioTestUtils pointerWithData:fromData channel:ch frame:fromStartFrame + i];
-                YASAudioPointer toPtr =
-                    [YASAudioTestUtils pointerWithData:toData channel:ch frame:toStartFrame + i];
+                YASAudioPointer toPtr = [YASAudioTestUtils pointerWithData:toData channel:ch frame:toStartFrame + i];
                 XCTAssertEqual(memcmp(fromPtr.v, toPtr.v, format.sampleByteCount), 0);
                 BOOL isFromNotZero = NO;
                 BOOL isToNotZero = NO;
@@ -507,18 +506,17 @@
     YASAudioData *sourceBuffer = [[YASAudioData alloc] initWithFormat:format frameCapacity:frameLength];
 
     YASAudioData *data =
-        [[YASAudioData alloc] initWithFormat:format audioBufferList:sourceBuffer.mutableAudioBufferList needsFree:NO];
+        [[YASAudioData alloc] initWithFormat:format audioBufferList:sourceBuffer.mutableAudioBufferList];
     XCTAssertNotNil(data);
 
     YASRelease(data);
     data = nil;
 
-    XCTAssertThrows(data = [[YASAudioData alloc] initWithFormat:format audioBufferList:NULL needsFree:NO]);
+    XCTAssertThrows(data = [[YASAudioData alloc] initWithFormat:format audioBufferList:NULL]);
     XCTAssertNil(data);
 
-    XCTAssertThrows(
-        data =
-            [[YASAudioData alloc] initWithFormat:nil audioBufferList:sourceBuffer.mutableAudioBufferList needsFree:NO]);
+    XCTAssertThrows(data =
+                        [[YASAudioData alloc] initWithFormat:nil audioBufferList:sourceBuffer.mutableAudioBufferList]);
     XCTAssertNil(data);
 
     YASRelease(format);

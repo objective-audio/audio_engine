@@ -349,8 +349,7 @@
 
 - (void)render:(YASAudioUnitRenderParameters *)renderParameters format:(YASAudioFormat *)format
 {
-    YASAudioData *renderData =
-        [[YASAudioData alloc] initWithFormat:format audioBufferList:renderParameters->ioData needsFree:NO];
+    YASAudioData *renderData = [[YASAudioData alloc] initWithFormat:format audioBufferList:renderParameters->ioData];
     YASAudioData *inputData = self.inputData;
     UInt32 renderFrameLength = renderParameters->inNumberFrames;
 
