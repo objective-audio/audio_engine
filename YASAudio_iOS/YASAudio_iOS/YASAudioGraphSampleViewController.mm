@@ -81,26 +81,24 @@
 
     std::weak_ptr<yas::audio_unit> weak_mixer_unit = _mixer_unit;
 
-    _io_unit->set_render_callback(std::make_shared<yas::audio_unit::render_function>(
-        [weak_mixer_unit](yas::render_parameters &render_parameters) {
-            if (auto shared_mixer_unit = weak_mixer_unit.lock()) {
-                shared_mixer_unit->audio_unit_render(render_parameters);
-            }
-        }));
+    _io_unit->set_render_callback([weak_mixer_unit](yas::render_parameters &render_parameters) {
+        if (auto shared_mixer_unit = weak_mixer_unit.lock()) {
+            shared_mixer_unit->audio_unit_render(render_parameters);
+        }
+    });
 
     std::weak_ptr<yas::audio_unit> weak_io_unit = _io_unit;
 
-    _mixer_unit->set_render_callback(
-        std::make_shared<yas::audio_unit::render_function>([weak_io_unit](yas::render_parameters &render_parameters) {
-            if (auto shared_io_unit = weak_io_unit.lock()) {
-                render_parameters.in_bus_number = 1;
-                try {
-                    shared_io_unit->audio_unit_render(render_parameters);
-                } catch (std::runtime_error e) {
-                    std::cout << e.what() << std::endl;
-                }
+    _mixer_unit->set_render_callback([weak_io_unit](yas::render_parameters &render_parameters) {
+        if (auto shared_io_unit = weak_io_unit.lock()) {
+            render_parameters.in_bus_number = 1;
+            try {
+                shared_io_unit->audio_unit_render(render_parameters);
+            } catch (std::runtime_error e) {
+                std::cout << e.what() << std::endl;
             }
-        }));
+        }
+    });
 
     _audio_graph->start();
 }

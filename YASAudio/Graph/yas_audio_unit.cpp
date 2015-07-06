@@ -30,9 +30,9 @@ class audio_unit::impl
     std::experimental::optional<UInt16> key;
     mutable std::recursive_mutex mutex;
 
-    render_function_ptr render_callback;
-    render_function_ptr notify_callback;
-    render_function_ptr input_callback;
+    render_function render_callback;
+    render_function notify_callback;
+    render_function input_callback;
 
     impl() : acd(), au_instance(nullptr), name(nullptr), initialized(false), graph_key(), key(), mutex(){};
 
@@ -287,37 +287,37 @@ void audio_unit::detach_input_callback()
                                                sizeof(AURenderCallbackStruct)));
 }
 
-void audio_unit::set_render_callback(const render_function_ptr &callback)
+void audio_unit::set_render_callback(const render_function &callback)
 {
     std::lock_guard<std::recursive_mutex> lock(_impl->mutex);
     _impl->render_callback = callback;
 }
 
-audio_unit::render_function_ptr audio_unit::render_callback() const
+audio_unit::render_function audio_unit::render_callback() const
 {
     std::lock_guard<std::recursive_mutex> lock(_impl->mutex);
     return _impl->render_callback;
 }
 
-void audio_unit::set_notify_callback(const render_function_ptr &callback)
+void audio_unit::set_notify_callback(const render_function &callback)
 {
     std::lock_guard<std::recursive_mutex> lock(_impl->mutex);
     _impl->notify_callback = callback;
 }
 
-audio_unit::render_function_ptr audio_unit::notify_callback() const
+audio_unit::render_function audio_unit::notify_callback() const
 {
     std::lock_guard<std::recursive_mutex> lock(_impl->mutex);
     return _impl->notify_callback;
 }
 
-void audio_unit::set_input_callback(const render_function_ptr &callback)
+void audio_unit::set_input_callback(const render_function &callback)
 {
     std::lock_guard<std::recursive_mutex> lock(_impl->mutex);
     _impl->input_callback = callback;
 }
 
-audio_unit::render_function_ptr audio_unit::input_callback() const
+audio_unit::render_function audio_unit::input_callback() const
 {
     std::lock_guard<std::recursive_mutex> lock(_impl->mutex);
     return _impl->input_callback;
@@ -578,24 +578,24 @@ void audio_unit::callback_render(yas::render_parameters &render_parameters)
 {
     yas_raise_if_main_thread;
 
-    render_function_ptr func_ptr = nullptr;
+    render_function function = nullptr;
 
     switch (render_parameters.in_render_type) {
         case render_type::normal:
-            func_ptr = render_callback();
+            function = render_callback();
             break;
         case render_type::notify:
-            func_ptr = notify_callback();
+            function = notify_callback();
             break;
         case render_type::input:
-            func_ptr = input_callback();
+            function = input_callback();
             break;
         default:
             break;
     }
 
-    if (func_ptr) {
-        (*func_ptr)(render_parameters);
+    if (function) {
+        function(render_parameters);
     }
 }
 

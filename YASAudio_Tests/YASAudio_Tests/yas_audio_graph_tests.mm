@@ -91,7 +91,7 @@
     XCTestExpectation *ioExpectation = [self expectationWithDescription:@"io_unit render"];
     YASRetainOrErase(ioExpectation);
 
-    io_unit->set_render_callback(std::make_shared<yas::audio_unit::render_function>(
+    io_unit->set_render_callback(
         [ioExpectation, frame_length, output_format, &mixer_unit, &self](yas::render_parameters &render_parameters) {
             [ioExpectation fulfill];
 
@@ -112,7 +112,7 @@
             mixer_unit->audio_unit_render(render_parameters);
 
             YASRelease(ioExpectation);
-        }));
+        });
 
     NSMutableDictionary *mixerExpectations = [NSMutableDictionary dictionaryWithCapacity:mixerInputCount];
     for (UInt32 i = 0; i < mixerInputCount; i++) {
@@ -122,7 +122,7 @@
 
     YASRetainOrErase(mixerExpectations);
 
-    mixer_unit->set_render_callback(std::make_shared<yas::audio_unit::render_function>(
+    mixer_unit->set_render_callback(
         [mixerExpectations, output_format, frame_length, &self](yas::render_parameters &render_parameters) {
             const UInt32 bus = render_parameters.in_bus_number;
             NSNumber *busKey = @(bus);
@@ -148,7 +148,7 @@
             if (mixerExpectations.count == 0) {
                 YASRelease(mixerExpectations);
             }
-        }));
+        });
 
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0),
                    [io_unit, output_format, output_sample_rate]() {
