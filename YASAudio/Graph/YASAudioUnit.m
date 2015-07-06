@@ -11,6 +11,7 @@
 #import "NSException+YASAudio.h"
 
 #if TARGET_OS_IPHONE
+#import <AVFoundation/AVFoundation.h>
 OSType const YASAudioUnitSubType_DefaultIO = kAudioUnitSubType_RemoteIO;
 #elif TARGET_OS_MAC
 OSType const YASAudioUnitSubType_DefaultIO = kAudioUnitSubType_HALOutput;
@@ -119,7 +120,10 @@ static OSStatus InputRenderCallback(void *inRefCon, AudioUnitRenderActionFlags *
         .componentFlagsMask = 0,
     };
 
-    return [self initWithAudioComponentDescription:&acd];
+    self = [self initWithAudioComponentDescription:&acd];
+    if (self) {
+    }
+    return self;
 }
 
 - (void)dealloc

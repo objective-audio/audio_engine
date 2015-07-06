@@ -7,9 +7,7 @@
 
 @interface YASAudioData (Internal)
 
-- (instancetype)initWithFormat:(YASAudioFormat *)format
-               audioBufferList:(AudioBufferList *)abl
-                     needsFree:(BOOL)needsFree;
+- (instancetype)initWithFormat:(YASAudioFormat *)format audioBufferList:(AudioBufferList *)abl;
 
 #if (!TARGET_OS_IPHONE && TARGET_OS_MAC)
 - (instancetype)initWithFormat:(YASAudioFormat *)format

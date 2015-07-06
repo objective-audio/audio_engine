@@ -51,7 +51,10 @@
         .componentFlagsMask = 0,
     };
 
-    return [self initWithAudioComponentDescription:&acd];
+    self = [self initWithAudioComponentDescription:&acd];
+    if (self) {
+    }
+    return self;
 }
 
 - (void)dealloc
@@ -142,8 +145,7 @@
 
                             if (connection && sourceNode) {
                                 YASAudioData *data = [[YASAudioData alloc] initWithFormat:connection.format
-                                                                          audioBufferList:renderParameters->ioData
-                                                                                needsFree:NO];
+                                                                          audioBufferList:renderParameters->ioData];
                                 AVAudioTime *when =
                                     [[AVAudioTime alloc] initWithAudioTimeStamp:renderParameters->ioTimeStamp
                                                                      sampleRate:connection.format.sampleRate];

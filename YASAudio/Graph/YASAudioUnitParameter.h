@@ -24,7 +24,7 @@
 - (instancetype)init NS_UNAVAILABLE;
 - (instancetype)initWithAudioUnitParameterInfo:(const AudioUnitParameterInfo *)info
                                    parameterID:(const AudioUnitParameterID)parameterID
-                                         scope:(const AudioUnitScope)scope NS_DESIGNATED_INITIALIZER;
+                                         scope:(const AudioUnitScope)scope;
 
 - (Float32)valueForElement:(const AudioUnitElement)element;
 - (void)setValue:(Float32)value forElement:(const AudioUnitElement)element;
