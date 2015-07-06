@@ -69,20 +69,19 @@
 
     YASRetainOrErase(expectation);
 
-    converter_unit->set_render_callback(std::make_shared<yas::audio_unit::render_function>(
-        [expectation, input_format, &self](yas::render_parameters &render_parameters) {
-            const AudioBufferList *ioData = render_parameters.io_data;
-            XCTAssertNotEqual(ioData, nullptr);
-            XCTAssertEqual(ioData->mNumberBuffers, input_format->buffer_count());
-            for (UInt32 i = 0; i < input_format->buffer_count(); i++) {
-                XCTAssertEqual(ioData->mBuffers[i].mNumberChannels, input_format->stride());
-                XCTAssertEqual(ioData->mBuffers[i].mDataByteSize,
-                               input_format->buffer_frame_byte_count() * render_parameters.in_number_frames);
-            }
-            [expectation fulfill];
+    converter_unit->set_render_callback([expectation, input_format, &self](yas::render_parameters &render_parameters) {
+        const AudioBufferList *ioData = render_parameters.io_data;
+        XCTAssertNotEqual(ioData, nullptr);
+        XCTAssertEqual(ioData->mNumberBuffers, input_format->buffer_count());
+        for (UInt32 i = 0; i < input_format->buffer_count(); i++) {
+            XCTAssertEqual(ioData->mBuffers[i].mNumberChannels, input_format->stride());
+            XCTAssertEqual(ioData->mBuffers[i].mDataByteSize,
+                           input_format->buffer_frame_byte_count() * render_parameters.in_number_frames);
+        }
+        [expectation fulfill];
 
-            YASRelease(expectation);
-        }));
+        YASRelease(expectation);
+    });
 
     yas::test::audio_unit_render_on_sub_thread(converter_unit, output_format, frame_length, 1, 0);
 
@@ -124,13 +123,12 @@
     YASRetainOrErase(preRenderExpectation);
     YASRetainOrErase(postRenderExpectation);
 
-    converter_unit->set_render_callback(std::make_shared<yas::audio_unit::render_function>(
-        [renderExpectation](yas::render_parameters &render_parameters) {
-            [renderExpectation fulfill];
-            YASRelease(renderExpectation);
-        }));
+    converter_unit->set_render_callback([renderExpectation](yas::render_parameters &render_parameters) {
+        [renderExpectation fulfill];
+        YASRelease(renderExpectation);
+    });
 
-    converter_unit->set_notify_callback(std::make_shared<yas::audio_unit::render_function>(
+    converter_unit->set_notify_callback(
         [preRenderExpectation, postRenderExpectation](yas::render_parameters &render_parameters) {
             AudioUnitRenderActionFlags flags = *render_parameters.io_action_flags;
             if (flags & kAudioUnitRenderAction_PreRender) {
@@ -140,7 +138,7 @@
                 [postRenderExpectation fulfill];
                 YASRelease(postRenderExpectation);
             }
-        }));
+        });
 
     yas::test::audio_unit_render_on_sub_thread(converter_unit, format, frame_length, 1, 0);
 
@@ -155,11 +153,11 @@
     bool is_render_callback = false;
     bool is_render_notify_callback = false;
 
-    converter_unit->set_render_callback(std::make_shared<yas::audio_unit::render_function>(
-        [&is_render_callback](yas::render_parameters &render_parameters) { is_render_callback = true; }));
+    converter_unit->set_render_callback(
+        [&is_render_callback](yas::render_parameters &render_parameters) { is_render_callback = true; });
 
-    converter_unit->set_notify_callback(std::make_shared<yas::audio_unit::render_function>(
-        [&is_render_notify_callback](yas::render_parameters &render_parameters) { is_render_notify_callback = true; }));
+    converter_unit->set_notify_callback(
+        [&is_render_notify_callback](yas::render_parameters &render_parameters) { is_render_notify_callback = true; });
 
     yas::test::audio_unit_render_on_sub_thread(converter_unit, format, frame_length, 1, 0.2);
 

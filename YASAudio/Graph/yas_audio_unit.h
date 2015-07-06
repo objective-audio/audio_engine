@@ -25,7 +25,6 @@ namespace yas
     {
        public:
         using render_function = std::function<void(render_parameters &)>;
-        using render_function_ptr = std::shared_ptr<render_function>;
 
         static const OSType sub_type_default_io();
 
@@ -46,12 +45,12 @@ namespace yas
         void attach_input_callback();  // for io
         void detach_input_callback();  // for io
 
-        void set_render_callback(const render_function_ptr &callback);
-        render_function_ptr render_callback() const;
-        void set_notify_callback(const render_function_ptr &callback);
-        render_function_ptr notify_callback() const;
-        void set_input_callback(const render_function_ptr &callback);  // for io
-        render_function_ptr input_callback() const;                    // for io
+        void set_render_callback(const render_function &callback);
+        render_function render_callback() const;
+        void set_notify_callback(const render_function &callback);
+        render_function notify_callback() const;
+        void set_input_callback(const render_function &callback);  // for io
+        render_function input_callback() const;                    // for io
 
         template <typename T>
         void set_property_data(const std::unique_ptr<std::vector<T>> &data, const AudioUnitPropertyID property_id,
