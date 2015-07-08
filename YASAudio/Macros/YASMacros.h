@@ -15,7 +15,9 @@
     #define YASRetainAndAutorelease(__v) [[__v retain] autorelease]
     #define YASSuperDealloc [super dealloc]
     #define YASDispatchQueueRelease(__v) dispatch_release(__v)
-    #define YASBlockWeak __block
+    #define YASWeakForBlock __block
+    #define YASWeakForProperty assign
+    #define YASWeakForVariable __unsafe_unretained
 #else
     #define YASAutorelease(__v) __v
     #define YASRetain(__v) __v
@@ -28,7 +30,9 @@
     #else
         #define YASDispatchQueueRelease(__v) dispatch_release(__v)
     #endif
-    #define YASBlockWeak __weak
+    #define YASWeakForBlock __weak
+    #define YASWeakForProperty weak
+    #define YASWeakForVariable __weak
 #endif
 
 #if DEBUG
