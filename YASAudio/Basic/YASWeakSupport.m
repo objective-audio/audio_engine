@@ -8,7 +8,19 @@
 #import "YASMacros.h"
 
 @implementation YASWeakContainer {
-    __unsafe_unretained id _object;
+    YASWeakForVariable id _object;
+}
+
+- (instancetype)initWithObject:(id)object
+{
+    self = [super init];
+    if (self) {
+        @synchronized(self)
+        {
+            _object = object;
+        }
+    }
+    return self;
 }
 
 - (void)setObject:(id)object
@@ -35,6 +47,11 @@
     }
 }
 
+- (void)clearObject
+{
+    [self setObject:nil];
+}
+
 @end
 
 #pragma mark -
@@ -48,7 +65,7 @@
     if (_weakContainer) {
         @autoreleasepool
         {
-            _weakContainer.object = nil;
+            [_weakContainer clearObject];
             YASRelease(_weakContainer);
             _weakContainer = nil;
         }
@@ -62,8 +79,7 @@
     @synchronized(self)
     {
         if (!_weakContainer) {
-            _weakContainer = [[YASWeakContainer alloc] init];
-            _weakContainer.object = self;
+            _weakContainer = [[YASWeakContainer alloc] initWithObject:self];
         }
         return _weakContainer;
     }
