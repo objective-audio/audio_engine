@@ -250,7 +250,7 @@ class audio_device::impl
                     }
 
                     device->property_subject().notify(method::device_did_change, infos);
-                    device->property_subject().notify(method::configulation_change, infos);
+                    audio_device::system_subject().notify(method::configulation_change, infos);
                 }
             };
         }

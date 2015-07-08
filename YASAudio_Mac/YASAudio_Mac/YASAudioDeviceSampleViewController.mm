@@ -187,7 +187,7 @@ typedef std::shared_ptr<yas::audio_device_sample::kernel> sample_kernel_ptr;
 
     _audio_device_observer = yas::audio_device_observer::create();
     _audio_device_observer->add_handler(
-        yas::audio_device::system_subject(), yas::audio_device::method::configulation_change,
+        yas::audio_device::system_subject(), yas::audio_device::method::hardware_did_change,
         [&wself = self](const std::vector<yas::audio_device::property_info> infos) { [wself updateDeviceNames]; });
 
     std::weak_ptr<yas::audio_device_io> weak_device_io = _audio_device_io;
