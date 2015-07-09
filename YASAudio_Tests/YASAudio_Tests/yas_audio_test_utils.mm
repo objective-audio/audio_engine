@@ -138,7 +138,7 @@ void yas::test::audio_unit_render_on_sub_thread(std::shared_ptr<audio_unit> audi
                                                 const UInt32 frame_length, const NSUInteger count,
                                                 const NSTimeInterval wait)
 {
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0),
                    [audio_unit, format, frame_length, count, wait]() {
                        AudioUnitRenderActionFlags action_flags = 0;
 
