@@ -85,7 +85,7 @@ class audio_device_stream::impl
         };
     }
 
-    void add_listener(const AudioObjectPropertySelector &selector, listener_function &function)
+    void add_listener(const AudioObjectPropertySelector &selector, listener_function function)
     {
         const AudioObjectPropertyAddress address = {.mSelector = selector,
                                                     .mScope = kAudioObjectPropertyScopeGlobal,

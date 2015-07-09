@@ -59,7 +59,7 @@ static CFStringRef property_string(const AudioObjectID object_id, const AudioObj
 }
 
 static void add_listener(const AudioObjectID object_id, const AudioObjectPropertySelector selector,
-                         const AudioObjectPropertyScope scope, const listener_function &function)
+                         const AudioObjectPropertyScope scope, const listener_function function)
 {
     const AudioObjectPropertyAddress address = {
         .mSelector = selector, .mScope = scope, .mElement = kAudioObjectPropertyElementMaster};
@@ -375,7 +375,7 @@ const audio_device_ptr audio_device::device_for_id(const AudioDeviceID audio_dev
 {
     auto iterator = all_devices_map().find(audio_device_id);
     if (iterator != all_devices_map().end()) {
-        return all_devices().at(audio_device_id);
+        return all_devices_map().at(audio_device_id);
     }
     return nullptr;
 }
