@@ -89,7 +89,7 @@
     }
 
     XCTestExpectation *ioExpectation = [self expectationWithDescription:@"io_unit render"];
-    YASRetainOrErase(ioExpectation);
+    YASRetainOrIgnore(ioExpectation);
 
     io_unit->set_render_callback(
         [ioExpectation, frame_length, output_format, &mixer_unit, &self](yas::render_parameters &render_parameters) {
@@ -120,7 +120,7 @@
         mixerExpectations[@(i)] = [self expectationWithDescription:description];
     }
 
-    YASRetainOrErase(mixerExpectations);
+    YASRetainOrIgnore(mixerExpectations);
 
     mixer_unit->set_render_callback(
         [mixerExpectations, output_format, frame_length, &self](yas::render_parameters &render_parameters) {

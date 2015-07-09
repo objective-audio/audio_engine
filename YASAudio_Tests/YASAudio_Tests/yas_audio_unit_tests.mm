@@ -67,7 +67,7 @@
 
     XCTestExpectation *expectation = [self expectationWithDescription:@"ConverterUnit Render"];
 
-    YASRetainOrErase(expectation);
+    YASRetainOrIgnore(expectation);
 
     converter_unit->set_render_callback([expectation, input_format, &self](yas::render_parameters &render_parameters) {
         const AudioBufferList *ioData = render_parameters.io_data;
@@ -119,9 +119,9 @@
     XCTestExpectation *preRenderExpectation = [self expectationWithDescription:@"ConverterUnit PreRender"];
     XCTestExpectation *postRenderExpectation = [self expectationWithDescription:@"ConverterUnit PostRender"];
 
-    YASRetainOrErase(renderExpectation);
-    YASRetainOrErase(preRenderExpectation);
-    YASRetainOrErase(postRenderExpectation);
+    YASRetainOrIgnore(renderExpectation);
+    YASRetainOrIgnore(preRenderExpectation);
+    YASRetainOrIgnore(postRenderExpectation);
 
     converter_unit->set_render_callback([renderExpectation](yas::render_parameters &render_parameters) {
         [renderExpectation fulfill];
