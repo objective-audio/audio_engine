@@ -5,6 +5,7 @@
 
 #import "YASAudioDeviceSampleViewController.h"
 #import "YASMacros.h"
+#import "YASWeakSupport.h"
 #import "YASAudioMath.h"
 #import "YASDecibelValueTransformer.h"
 #import "YASFrequencyValueFormatter.h"
@@ -148,6 +149,8 @@ typedef std::shared_ptr<yas::audio_device_sample::kernel> sample_kernel_ptr;
 @property (nonatomic, assign) Float64 sineVolume;
 @property (nonatomic, assign) Float64 sineFrequency;
 
+@property (nonatomic, strong) YASWeakContainer *weakContainer;
+
 @end
 
 @implementation YASAudioDeviceSampleViewController {
@@ -246,6 +249,8 @@ typedef std::shared_ptr<yas::audio_device_sample::kernel> sample_kernel_ptr;
     YASRelease(_deviceInfo);
     YASRelease(_ioThroughTextColor);
     YASRelease(_sineTextColor);
+    [_weakContainer clearObject];
+    YASRelease(_weakContainer);
     YASSuperDealloc;
 }
 
@@ -321,13 +326,22 @@ typedef std::shared_ptr<yas::audio_device_sample::kernel> sample_kernel_ptr;
     if (selected_device && std::find(all_devices.begin(), all_devices.end(), selected_device) != all_devices.end()) {
         _audio_device_io->set_audio_device(selected_device);
 
+        YASWeakContainer *weakContainer = self.weakContainer;
+        if (!weakContainer) {
+            weakContainer = [[YASWeakContainer alloc] initWithObject:self];
+            self.weakContainer = weakContainer;
+            YASRelease(weakContainer);
+        }
+
         _audio_device_observer->add_handler(
             selected_device->property_subject(), yas::audio_device::method::device_did_change,
-            [selected_device, &self](const std::vector<yas::audio_device::property_info> infos) {
+            [selected_device, weakContainer](const std::vector<yas::audio_device::property_info> infos) {
                 if (infos.size() > 0) {
                     auto &device_id = infos[0].object_id;
                     if (selected_device->audio_device_id() == device_id) {
-                        [self updateDeviceInfo];
+                        YASAudioDeviceSampleViewController *strongSelf = [weakContainer retainedObject];
+                        [strongSelf updateDeviceInfo];
+                        YASRelease(strongSelf);
                     }
                 }
             });
@@ -344,7 +358,9 @@ typedef std::shared_ptr<yas::audio_device_sample::kernel> sample_kernel_ptr;
     NSColor *onColor = [NSColor blackColor];
     NSColor *offColor = [NSColor lightGrayColor];
     if (device) {
-        self.deviceInfo = (NSString *)device->name();
+        self.deviceInfo = [NSString stringWithFormat:@"name = %@\nnominal samplerate = %@", (NSString *)device->name(),
+                                                     @(device->nominal_sample_rate())];
+        ;
         self.nominalSampleRate = device->nominal_sample_rate();
         self.ioThroughTextColor = (device->input_format() && device->output_format()) ? onColor : offColor;
         self.sineTextColor = device->output_format() ? onColor : offColor;

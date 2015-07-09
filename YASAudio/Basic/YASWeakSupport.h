@@ -7,8 +7,12 @@
 
 @interface YASWeakContainer : NSObject
 
+- (instancetype)initWithObject:(id)object;
+
 - (id)retainedObject NS_RETURNS_RETAINED;
 - (id)autoreleasingObject;
+
+- (void)clearObject;
 
 @end
 
