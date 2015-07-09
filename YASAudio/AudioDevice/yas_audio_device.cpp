@@ -85,20 +85,16 @@ namespace yas
 
         static listener_function system_listener()
         {
-            auto &instance = audio_device_global::instance();
-            if (!instance._system_listener) {
-                instance._system_listener = [](UInt32 address_count, const AudioObjectPropertyAddress *addresses) {
-                    std::vector<audio_device::property_info> infos;
-                    for (UInt32 i = 0; i < address_count; i++) {
-                        infos.push_back(audio_device::property_info(audio_device::property::system,
-                                                                    kAudioObjectSystemObject, addresses[i]));
-                    }
-                    auto &subject = audio_device::system_subject();
-                    subject.notify(audio_device::method::hardware_did_change, infos);
-                    subject.notify(audio_device::method::configulation_change, infos);
-                };
-            }
-            return instance._system_listener;
+            return [](UInt32 address_count, const AudioObjectPropertyAddress *addresses) {
+                std::vector<audio_device::property_info> infos;
+                for (UInt32 i = 0; i < address_count; i++) {
+                    infos.push_back(audio_device::property_info(audio_device::property::system,
+                                                                kAudioObjectSystemObject, addresses[i]));
+                }
+                auto &subject = audio_device::system_subject();
+                subject.notify(audio_device::method::hardware_did_change, infos);
+                subject.notify(audio_device::method::configulation_change, infos);
+            };
         }
 
        private:
