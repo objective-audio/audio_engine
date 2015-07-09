@@ -85,20 +85,16 @@ namespace yas
 
         static listener_function system_listener()
         {
-            auto &instance = audio_device_global::instance();
-            if (!instance._system_listener) {
-                instance._system_listener = [](UInt32 address_count, const AudioObjectPropertyAddress *addresses) {
-                    std::vector<audio_device::property_info> infos;
-                    for (UInt32 i = 0; i < address_count; i++) {
-                        infos.push_back(audio_device::property_info(audio_device::property::system,
-                                                                    kAudioObjectSystemObject, addresses[i]));
-                    }
-                    auto &subject = audio_device::system_subject();
-                    subject.notify(audio_device::method::hardware_did_change, infos);
-                    subject.notify(audio_device::method::configulation_change, infos);
-                };
-            }
-            return instance._system_listener;
+            return [](UInt32 address_count, const AudioObjectPropertyAddress *addresses) {
+                std::vector<audio_device::property_info> infos;
+                for (UInt32 i = 0; i < address_count; i++) {
+                    infos.push_back(audio_device::property_info(audio_device::property::system,
+                                                                kAudioObjectSystemObject, addresses[i]));
+                }
+                auto &subject = audio_device::system_subject();
+                subject.notify(audio_device::method::hardware_did_change, infos);
+                subject.notify(audio_device::method::configulation_change, infos);
+            };
         }
 
        private:
@@ -175,7 +171,6 @@ class audio_device::impl
         : _input_format(nullptr),
           _output_format(nullptr),
           _mutex(),
-          _listener(nullptr),
           audio_device_id(device_id),
           input_streams_map(),
           output_streams_map(),
@@ -213,56 +208,52 @@ class audio_device::impl
 
     listener_function listener()
     {
-        if (!_listener) {
-            const AudioDeviceID device_id = audio_device_id;
-            _listener = [device_id](const UInt32 address_count, const AudioObjectPropertyAddress *addresses) {
-                auto device = audio_device::device_for_id(device_id);
-                if (device) {
-                    const AudioObjectID object_id = device->audio_device_id();
-                    std::vector<property_info> infos;
-                    for (UInt32 i = 0; i < address_count; ++i) {
-                        if (addresses[i].mSelector == kAudioDevicePropertyStreams) {
-                            infos.push_back(property_info(property::stream, object_id, addresses[i]));
-                        } else if (addresses[i].mSelector == kAudioDevicePropertyStreamConfiguration) {
-                            infos.push_back(property_info(property::format, object_id, addresses[i]));
-                        } else if (addresses[i].mSelector == kAudioDevicePropertyNominalSampleRate) {
-                            if (addresses[i].mScope == kAudioObjectPropertyScopeGlobal) {
-                                AudioObjectPropertyAddress address = addresses[i];
-                                address.mScope = kAudioObjectPropertyScopeOutput;
-                                infos.push_back(property_info(property::format, object_id, address));
-                                address.mScope = kAudioObjectPropertyScopeInput;
-                                infos.push_back(property_info(property::format, object_id, address));
-                            }
+        const AudioDeviceID device_id = audio_device_id;
+
+        return [device_id](const UInt32 address_count, const AudioObjectPropertyAddress *addresses) {
+            auto device = audio_device::device_for_id(device_id);
+            if (device) {
+                const AudioObjectID object_id = device->audio_device_id();
+                std::vector<property_info> infos;
+                for (UInt32 i = 0; i < address_count; ++i) {
+                    if (addresses[i].mSelector == kAudioDevicePropertyStreams) {
+                        infos.push_back(property_info(property::stream, object_id, addresses[i]));
+                    } else if (addresses[i].mSelector == kAudioDevicePropertyStreamConfiguration) {
+                        infos.push_back(property_info(property::format, object_id, addresses[i]));
+                    } else if (addresses[i].mSelector == kAudioDevicePropertyNominalSampleRate) {
+                        if (addresses[i].mScope == kAudioObjectPropertyScopeGlobal) {
+                            AudioObjectPropertyAddress address = addresses[i];
+                            address.mScope = kAudioObjectPropertyScopeOutput;
+                            infos.push_back(property_info(property::format, object_id, address));
+                            address.mScope = kAudioObjectPropertyScopeInput;
+                            infos.push_back(property_info(property::format, object_id, address));
                         }
                     }
-
-                    for (auto &info : infos) {
-                        switch (info.property) {
-                            case property::stream:
-                                device->update_streams(info.address.mScope);
-                                break;
-                            case property::format:
-                                device->update_format(info.address.mScope);
-                                break;
-                            default:
-                                break;
-                        }
-                    }
-
-                    device->property_subject().notify(method::device_did_change, infos);
-                    audio_device::system_subject().notify(method::configulation_change, infos);
                 }
-            };
-        }
 
-        return _listener;
+                for (auto &info : infos) {
+                    switch (info.property) {
+                        case property::stream:
+                            device->update_streams(info.address.mScope);
+                            break;
+                        case property::format:
+                            device->update_format(info.address.mScope);
+                            break;
+                        default:
+                            break;
+                    }
+                }
+
+                device->property_subject().notify(method::device_did_change, infos);
+                audio_device::system_subject().notify(method::configulation_change, infos);
+            }
+        };
     }
 
    private:
     audio_format_ptr _input_format;
     audio_format_ptr _output_format;
     mutable std::recursive_mutex _mutex;
-    std::function<void(const UInt32 in_number_addresses, const AudioObjectPropertyAddress *in_addresses)> _listener;
 };
 
 void audio_device::initialize()
