@@ -11,6 +11,7 @@
 #include <memory>
 #include <vector>
 #include <experimental/optional>
+#include <initializer_list>
 
 namespace yas
 {
@@ -56,6 +57,11 @@ namespace yas
 
     template <typename K, typename T>
     static auto make_observer(const subject<K, T> &) -> typename observer<K, T>::observer_ptr;
+
+    template <typename K, typename T>
+    static auto make_subject_dispatcher(const subject<K, T> &source_subject,
+                                        const std::initializer_list<subject<K, T> *> &destination_subjects) ->
+        typename observer<K, T>::observer_ptr;
 
     template <typename K, typename T>
     class subject

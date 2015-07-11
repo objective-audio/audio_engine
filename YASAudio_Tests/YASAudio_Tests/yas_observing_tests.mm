@@ -221,4 +221,52 @@
     XCTAssertEqual(receive_20, sender_20);
 }
 
+- (void)testSubjectDispatcher
+{
+    struct test_class {
+        enum class method : UInt32 {
+            property1,
+            property2,
+        };
+
+        yas::subject<method, std::string> property1;
+        yas::subject<method, std::string> property2;
+
+        yas::observer<method, std::string>::observer_ptr dispatcher;
+        yas::subject<method, std::string> properties_subject;
+
+        test_class() : dispatcher(yas::make_subject_dispatcher(properties_subject, {&property1, &property2}))
+        {
+        }
+
+        ~test_class()
+        {
+        }
+    };
+
+    test_class test_object;
+
+    std::string value1 = "";
+    std::string value2 = "";
+
+    auto observer = yas::make_observer(test_object.properties_subject);
+    observer->add_wild_card_handler(test_object.properties_subject,
+                                    [&value1, &value2](const auto &method, const auto &value) {
+                                        switch (method) {
+                                            case test_class::method::property1:
+                                                value1 = value;
+                                                break;
+                                            case test_class::method::property2:
+                                                value2 = value;
+                                                break;
+                                        }
+                                    });
+
+    test_object.property1.notify(test_class::method::property1, "property1");
+    test_object.property2.notify(test_class::method::property2, "property2");
+
+    XCTAssertEqual(value1, "property1");
+    XCTAssertEqual(value2, "property2");
+}
+
 @end
