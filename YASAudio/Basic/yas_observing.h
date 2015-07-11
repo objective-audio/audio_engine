@@ -10,6 +10,7 @@
 #include <map>
 #include <memory>
 #include <vector>
+#include <experimental/optional>
 
 namespace yas
 {
@@ -21,7 +22,7 @@ namespace yas
     {
        public:
         using observer_ptr = std::shared_ptr<observer<K, T>>;
-        using observer_handler = std::function<void(const T &)>;
+        using observer_handler = std::function<void(const K &, const T &)>;
 
         static observer_ptr create();
 
@@ -32,6 +33,9 @@ namespace yas
 
         void add_handler(subject<K, T> &subject, const K &key, const observer_handler &handler);
         void remove_handler(subject<K, T> &subject, const K &key);
+
+        void add_wild_card_handler(subject<K, T> &subject, const observer_handler &handler);
+        void remove_wild_card_handler(subject<K, T> &subject);
 
        private:
         class handler_holder;
@@ -45,9 +49,13 @@ namespace yas
         observer &operator=(const observer<K, T> &&) = delete;
 
         void call_handler(const subject<K, T> &subject, const K &key, const T &object);
+        void call_wild_card_handler(const subject<K, T> &subject, const K &key, const T &object);
 
         friend subject<K, T>;
     };
+
+    template <typename K, typename T>
+    static auto make_observer(const subject<K, T> &) -> typename observer<K, T>::observer_ptr;
 
     template <typename K, typename T>
     class subject
@@ -67,7 +75,7 @@ namespace yas
 
        private:
         using observers_vector = std::vector<std::weak_ptr<observer<K, T>>>;
-        using observers_map = std::map<const K, observers_vector>;
+        using observers_map = std::map<const std::experimental::optional<K>, observers_vector>;
         observers_map _observers;
 
         subject(const subject<K, T> &) = delete;
@@ -75,8 +83,8 @@ namespace yas
         subject &operator=(const subject<K, T> &) = delete;
         subject &operator=(const subject<K, T> &&) = delete;
 
-        void add_observer(observer<K, T> &observer, const K &key);
-        void remove_observer(const observer<K, T> &observer, const K &key);
+        void add_observer(observer<K, T> &observer, const std::experimental::optional<K> &key);
+        void remove_observer(const observer<K, T> &observer, const std::experimental::optional<K> &key);
         void remove_observer(const observer<K, T> &observer);
 
         friend observer<K, T>;
