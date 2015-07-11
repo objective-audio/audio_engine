@@ -189,9 +189,9 @@ typedef std::shared_ptr<yas::audio_device_sample::kernel> sample_kernel_ptr;
     self.sineFrequency = _kernel->sine_frequency();
 
     _audio_device_observer = yas::audio_device_observer::create();
-    _audio_device_observer->add_handler(
-        yas::audio_device::system_subject(), yas::audio_device::method::hardware_did_change,
-        [&wself = self](const std::vector<yas::audio_device::property_info> infos) { [wself updateDeviceNames]; });
+    _audio_device_observer->add_handler(yas::audio_device::system_subject(),
+                                        yas::audio_device::method::hardware_did_change,
+                                        [&wself = self](const auto &, const auto &) { [wself updateDeviceNames]; });
 
     std::weak_ptr<yas::audio_device_io> weak_device_io = _audio_device_io;
     _audio_device_io->set_render_callback(
@@ -335,7 +335,7 @@ typedef std::shared_ptr<yas::audio_device_sample::kernel> sample_kernel_ptr;
 
         _audio_device_observer->add_handler(
             selected_device->property_subject(), yas::audio_device::method::device_did_change,
-            [selected_device, weakContainer](const std::vector<yas::audio_device::property_info> infos) {
+            [selected_device, weakContainer](const auto &method, const auto &infos) {
                 if (infos.size() > 0) {
                     auto &device_id = infos[0].object_id;
                     if (selected_device->audio_device_id() == device_id) {
