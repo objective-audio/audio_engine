@@ -140,7 +140,7 @@ audio_device_io_ptr audio_device_io::create(const audio_device_ptr &audio_device
     std::weak_ptr<audio_device_io> weak_device_io = device_io->shared_from_this();
     device_io->_impl->observer->add_handler(
         audio_device::system_subject(), audio_device::method::hardware_did_change,
-        [weak_device_io](std::vector<audio_device::property_info> infos) {
+        [weak_device_io](const auto &method, const auto &infos) {
             if (auto device_io = weak_device_io.lock()) {
                 if (device_io->audio_device() &&
                     !audio_device::device_for_id(device_io->audio_device()->audio_device_id())) {
@@ -260,7 +260,7 @@ void audio_device_io::set_audio_device(const audio_device_ptr device)
             std::weak_ptr<audio_device_io> weak_device_io = this->shared_from_this();
             _impl->observer->add_handler(_impl->audio_device->property_subject(),
                                          audio_device::method::device_did_change,
-                                         [weak_device_io](std::vector<audio_device::property_info> infos) {
+                                         [weak_device_io](const auto &method, const auto &infos) {
                                              if (auto device_io = weak_device_io.lock()) {
                                                  device_io->_impl->update_kernel();
                                              }
