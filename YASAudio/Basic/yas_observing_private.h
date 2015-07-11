@@ -12,15 +12,15 @@ namespace yas
     template <typename K, typename T>
     class observer<K, T>::handler_holder
     {
-        std::map<const K, const std::function<void(const T &)>> functions;
+        std::map<const std::experimental::optional<K>, const observer_handler> functions;
 
        public:
-        void add_handler(const K &key, const std::function<void(const T &)> &handler)
+        void add_handler(const std::experimental::optional<K> &key, const observer_handler &handler)
         {
             functions.insert(std::make_pair(key, handler));
         }
 
-        void remove_handler(const K &key)
+        void remove_handler(const std::experimental::optional<K> &key)
         {
             if (functions.count(key) > 0) {
                 functions.erase(key);
@@ -30,7 +30,14 @@ namespace yas
         void call_handler(const K &key, const T &sender) const
         {
             if (functions.count(key) > 0) {
-                functions.at(key)(sender);
+                functions.at(key)(key, sender);
+            }
+        }
+
+        void call_wild_card_handler(const K &key, const T &sender) const
+        {
+            if (functions.count(std::experimental::nullopt)) {
+                functions.at(std::experimental::nullopt)(key, sender);
             }
         }
 
@@ -93,11 +100,49 @@ namespace yas
     }
 
     template <typename K, typename T>
+    void observer<K, T>::add_wild_card_handler(subject<K, T> &subject, const observer_handler &handler)
+    {
+        auto subject_ptr = &subject;
+        if (_handlers.count(subject_ptr) == 0) {
+            _handlers.insert(std::make_pair(&subject, typename yas::observer<K, T>::handler_holder()));
+        };
+        _handlers.at(&subject).add_handler(std::experimental::nullopt, handler);
+        subject.add_observer(*this, std::experimental::nullopt);
+    }
+
+    template <typename K, typename T>
+    void observer<K, T>::remove_wild_card_handler(subject<K, T> &subject)
+    {
+        if (_handlers.count(&subject) > 0) {
+            auto &handler_holder = _handlers.at(&subject);
+            handler_holder.remove_handler(std::experimental::nullopt);
+            if (handler_holder.size() == 0) {
+                _handlers.erase(&subject);
+            }
+        }
+        subject.remove_observer(*this, std::experimental::nullopt);
+    }
+
+    template <typename K, typename T>
     void observer<K, T>::call_handler(const subject<K, T> &subject, const K &key, const T &object)
     {
         if (_handlers.count(&subject) > 0) {
             _handlers.at(&subject).call_handler(key, object);
         }
+    }
+
+    template <typename K, typename T>
+    void observer<K, T>::call_wild_card_handler(const subject<K, T> &subject, const K &key, const T &object)
+    {
+        if (_handlers.count(&subject) > 0) {
+            _handlers.at(&subject).call_wild_card_handler(key, object);
+        }
+    }
+
+    template <typename K, typename T>
+    auto make_observer(const subject<K, T> &) -> typename observer<K, T>::observer_ptr
+    {
+        return observer<K, T>::create();
     }
 
 #pragma mark - subject
@@ -140,10 +185,17 @@ namespace yas
                 }
             }
         }
+        if (_observers.count(std::experimental::nullopt)) {
+            for (auto &observer : _observers.at(std::experimental::nullopt)) {
+                if (auto shared_observer = observer.lock()) {
+                    shared_observer->call_wild_card_handler(*this, key, object);
+                }
+            }
+        }
     }
 
     template <typename K, typename T>
-    void subject<K, T>::add_observer(observer<K, T> &observer, const K &key)
+    void subject<K, T>::add_observer(observer<K, T> &observer, const std::experimental::optional<K> &key)
     {
         if (_observers.count(key) == 0) {
             _observers.insert(std::make_pair(key, observers_vector()));
@@ -154,7 +206,7 @@ namespace yas
     }
 
     template <typename K, typename T>
-    void subject<K, T>::remove_observer(const observer<K, T> &observer, const K &key)
+    void subject<K, T>::remove_observer(const observer<K, T> &observer, const std::experimental::optional<K> &key)
     {
         if (_observers.count(key) > 0) {
             auto &vector = _observers.at(key);
