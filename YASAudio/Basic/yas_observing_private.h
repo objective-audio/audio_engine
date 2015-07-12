@@ -145,6 +145,21 @@ namespace yas
         return observer<K, T>::create();
     }
 
+    template <typename K, typename T>
+    auto make_subject_dispatcher(const subject<K, T> &source,
+                                 const std::initializer_list<subject<K, T> *> &destinations) ->
+        typename observer<K, T>::observer_ptr
+    {
+        auto observer = make_observer(source);
+        auto handler = [&source](const auto &method, const auto &value) { source.notify(method, value); };
+
+        for (const auto &destination : destinations) {
+            observer->add_wild_card_handler(*destination, handler);
+        }
+
+        return observer;
+    }
+
 #pragma mark - subject
 
     template <typename K, typename T>
