@@ -202,13 +202,12 @@ typedef std::shared_ptr<yas::audio_device_sample::kernel> sample_kernel_ptr;
         });
 
     std::weak_ptr<yas::audio_device_io> weak_device_io = _audio_device_io;
-    _audio_device_io->set_render_callback(
-        std::make_shared<yas::audio_device_io::render_function>([weak_device_io, kernel = _kernel](
-            yas::audio_data_ptr & out_data, yas::audio_time_ptr & when) {
-            if (auto device_io = weak_device_io.lock()) {
-                kernel->process(device_io->input_data_on_render(), out_data);
-            }
-        }));
+    _audio_device_io->set_render_callback([weak_device_io, kernel = _kernel](yas::audio_data_ptr & out_data,
+                                                                             yas::audio_time_ptr & when) {
+        if (auto device_io = weak_device_io.lock()) {
+            kernel->process(device_io->input_data_on_render(), out_data);
+        }
+    });
 
     [self updateDeviceNames];
 

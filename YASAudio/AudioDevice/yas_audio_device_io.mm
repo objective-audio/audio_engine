@@ -68,13 +68,13 @@ class audio_device_io::impl
     {
     }
 
-    void set_render_callback(const render_function_ptr render_callback)
+    void set_render_callback(const render_function &render_callback)
     {
         std::lock_guard<std::recursive_mutex> lock(_mutex);
         _render_callback = render_callback;
     }
 
-    render_function_ptr render_callback() const
+    render_function render_callback() const
     {
         std::lock_guard<std::recursive_mutex> lock(_mutex);
         return _render_callback;
@@ -123,7 +123,7 @@ class audio_device_io::impl
     }
 
    private:
-    render_function_ptr _render_callback;
+    render_function _render_callback;
     UInt32 _maximum_frames;
     kernel_ptr _kernel;
     mutable std::recursive_mutex _mutex;
@@ -208,14 +208,14 @@ void audio_device_io::initialize()
                                     output_data->set_frame_length(frame_length);
                                     auto time = std::make_shared<audio_time>(*inOutputTime,
                                                                              output_data->format()->sample_rate());
-                                    (*render_callback)(output_data, time);
+                                    render_callback(output_data, time);
                                     copy_data_flexibly(output_data, outOutputData);
                                 }
                             }
                         } else if (kernel->input_data) {
                             audio_data_ptr data = nullptr;
                             audio_time_ptr time = nullptr;
-                            (*render_callback)(data, time);
+                            render_callback(data, time);
                         }
                     }
                 }
@@ -285,7 +285,7 @@ bool audio_device_io::is_running() const
     return _impl->is_running;
 }
 
-void audio_device_io::set_render_callback(const render_function_ptr &callback)
+void audio_device_io::set_render_callback(const render_function &callback)
 {
     _impl->set_render_callback(callback);
 }
