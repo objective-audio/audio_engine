@@ -6,6 +6,7 @@
 #pragma once
 
 #include "yas_audio_types.h"
+#include "yas_audio_format.h"
 #include <MacTypes.h>
 #include <string>
 #include <memory>
@@ -13,6 +14,9 @@
 
 namespace yas
 {
+    class channel_route;
+    using channel_route_ptr = std::shared_ptr<channel_route>;
+
     class channel_route
     {
        public:

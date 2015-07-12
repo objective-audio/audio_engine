@@ -20,6 +20,8 @@
 namespace yas
 {
     class audio_unit_parameter;
+    class audio_unit;
+    using audio_unit_ptr = std::shared_ptr<audio_unit>;
 
     class audio_unit
     {

@@ -6,6 +6,7 @@
 #pragma once
 
 #include "yas_audio_types.h"
+#include "yas_audio_data.h"
 #include <vector>
 
 namespace yas

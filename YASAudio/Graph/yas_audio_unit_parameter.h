@@ -12,8 +12,6 @@
 
 namespace yas
 {
-    class subject;
-
     class audio_unit_parameter
     {
        public:
@@ -37,9 +35,6 @@ namespace yas
 
         Float32 value(const AudioUnitElement element) const;
         void set_value(const Float32 value, const AudioUnitElement element);
-
-        const subject &subject() const;
-        static const std::string &value_key();
 
        private:
         class impl;
