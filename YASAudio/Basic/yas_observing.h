@@ -22,10 +22,10 @@ namespace yas
     class observer : public std::enable_shared_from_this<observer<K, T>>
     {
        public:
-        using observer_ptr = std::shared_ptr<observer<K, T>>;
+        using shared_ptr = std::shared_ptr<observer<K, T>>;
         using observer_handler = std::function<void(const K &, const T &)>;
 
-        static observer_ptr create();
+        static shared_ptr create();
 
         ~observer();
 
@@ -56,12 +56,12 @@ namespace yas
     };
 
     template <typename K, typename T>
-    static auto make_observer(const subject<K, T> &) -> typename observer<K, T>::observer_ptr;
+    static auto make_observer(const subject<K, T> &) -> typename observer<K, T>::shared_ptr;
 
     template <typename K, typename T>
     static auto make_subject_dispatcher(const subject<K, T> &source_subject,
                                         const std::initializer_list<subject<K, T> *> &destination_subjects) ->
-        typename observer<K, T>::observer_ptr;
+        typename observer<K, T>::shared_ptr;
 
     template <typename K, typename T>
     class subject

@@ -48,9 +48,9 @@ namespace yas
     };
 
     template <typename K, typename T>
-    typename observer<K, T>::observer_ptr observer<K, T>::create()
+    typename observer<K, T>::shared_ptr observer<K, T>::create()
     {
-        return observer_ptr(new observer<K, T>());
+        return shared_ptr(new observer<K, T>());
     }
 
     template <typename K, typename T>
@@ -140,7 +140,7 @@ namespace yas
     }
 
     template <typename K, typename T>
-    auto make_observer(const subject<K, T> &) -> typename observer<K, T>::observer_ptr
+    auto make_observer(const subject<K, T> &) -> typename observer<K, T>::shared_ptr
     {
         return observer<K, T>::create();
     }
@@ -148,7 +148,7 @@ namespace yas
     template <typename K, typename T>
     auto make_subject_dispatcher(const subject<K, T> &source,
                                  const std::initializer_list<subject<K, T> *> &destinations) ->
-        typename observer<K, T>::observer_ptr
+        typename observer<K, T>::shared_ptr
     {
         auto observer = make_observer(source);
         auto handler = [&source](const auto &method, const auto &value) { source.notify(method, value); };

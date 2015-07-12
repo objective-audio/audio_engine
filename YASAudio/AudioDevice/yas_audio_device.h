@@ -87,7 +87,7 @@ namespace yas
             ~notification_provider();
 
            private:
-            observer<method, std::vector<property_info>>::observer_ptr observer;
+            observer<method, std::vector<property_info>>::shared_ptr observer;
 
             notification_provider(const notification_provider &) = delete;
             notification_provider(notification_provider &&) = delete;
@@ -114,7 +114,7 @@ namespace yas
     };
 
     using audio_device_observer = observer<audio_device::method, std::vector<audio_device::property_info>>;
-    using audio_device_observer_ptr = audio_device_observer::observer_ptr;
+    using audio_device_observer_ptr = audio_device_observer::shared_ptr;
 }
 
 #endif
