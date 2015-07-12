@@ -19,6 +19,7 @@
 #import "yas_audio_format.h"
 #import "yas_audio_time.h"
 #import "yas_observing.h"
+#import "yas_objc_container.h"
 #import <atomic>
 #import <vector>
 
@@ -149,8 +150,6 @@ typedef std::shared_ptr<yas::audio_device_sample::kernel> sample_kernel_ptr;
 @property (nonatomic, assign) Float64 sineVolume;
 @property (nonatomic, assign) Float64 sineFrequency;
 
-@property (nonatomic, strong) YASWeakContainer *weakContainer;
-
 @end
 
 @implementation YASAudioDeviceSampleViewController {
@@ -158,6 +157,7 @@ typedef std::shared_ptr<yas::audio_device_sample::kernel> sample_kernel_ptr;
     yas::audio_device_io_ptr _audio_device_io;
     yas::audio_device_observer_ptr _audio_device_observer;
     sample_kernel_ptr _kernel;
+    yas::objc_container_ptr _self_container;
 }
 
 - (void)viewDidLoad
@@ -178,6 +178,10 @@ typedef std::shared_ptr<yas::audio_device_sample::kernel> sample_kernel_ptr;
                                         forName:NSStringFromClass([YASFrequencyValueFormatter class])];
     });
 
+    if (!_self_container) {
+        _self_container = yas::objc_container::create(self);
+    }
+
     _audio_graph = yas::audio_graph::create();
     _audio_device_io = yas::audio_device_io::create();
     _audio_graph->add_audio_device_io(_audio_device_io);
@@ -189,9 +193,13 @@ typedef std::shared_ptr<yas::audio_device_sample::kernel> sample_kernel_ptr;
     self.sineFrequency = _kernel->sine_frequency();
 
     _audio_device_observer = yas::audio_device_observer::create();
-    _audio_device_observer->add_handler(yas::audio_device::system_subject(),
-                                        yas::audio_device::method::hardware_did_change,
-                                        [&wself = self](const auto &, const auto &) { [wself updateDeviceNames]; });
+    _audio_device_observer->add_handler(
+        yas::audio_device::system_subject(), yas::audio_device::method::hardware_did_change,
+        [&self_container = _self_container](const auto &, const auto &) {
+            YASAudioDeviceSampleViewController *strongSelf = self_container->retained_object();
+            [strongSelf updateDeviceNames];
+            YASRelease(strongSelf);
+        });
 
     std::weak_ptr<yas::audio_device_io> weak_device_io = _audio_device_io;
     _audio_device_io->set_render_callback(
@@ -249,8 +257,9 @@ typedef std::shared_ptr<yas::audio_device_sample::kernel> sample_kernel_ptr;
     YASRelease(_deviceInfo);
     YASRelease(_ioThroughTextColor);
     YASRelease(_sineTextColor);
-    [_weakContainer clearObject];
-    YASRelease(_weakContainer);
+    if (_self_container) {
+        _self_container->set_object(nil);
+    }
     YASSuperDealloc;
 }
 
@@ -326,20 +335,13 @@ typedef std::shared_ptr<yas::audio_device_sample::kernel> sample_kernel_ptr;
     if (selected_device && std::find(all_devices.begin(), all_devices.end(), selected_device) != all_devices.end()) {
         _audio_device_io->set_audio_device(selected_device);
 
-        YASWeakContainer *weakContainer = self.weakContainer;
-        if (!weakContainer) {
-            weakContainer = [[YASWeakContainer alloc] initWithObject:self];
-            self.weakContainer = weakContainer;
-            YASRelease(weakContainer);
-        }
-
         _audio_device_observer->add_handler(
             selected_device->property_subject(), yas::audio_device::method::device_did_change,
-            [selected_device, weakContainer](const auto &method, const auto &infos) {
+            [selected_device, self_container = _self_container](const auto &method, const auto &infos) {
                 if (infos.size() > 0) {
                     auto &device_id = infos[0].object_id;
                     if (selected_device->audio_device_id() == device_id) {
-                        YASAudioDeviceSampleViewController *strongSelf = [weakContainer retainedObject];
+                        YASAudioDeviceSampleViewController *strongSelf = self_container->retained_object();
                         [strongSelf updateDeviceInfo];
                         YASRelease(strongSelf);
                     }
