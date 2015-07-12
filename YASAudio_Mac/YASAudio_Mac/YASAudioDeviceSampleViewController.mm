@@ -149,8 +149,6 @@ typedef std::shared_ptr<yas::audio_device_sample::kernel> sample_kernel_ptr;
 @property (nonatomic, assign) Float64 sineVolume;
 @property (nonatomic, assign) Float64 sineFrequency;
 
-@property (nonatomic, strong) YASWeakContainer *weakContainer;
-
 @end
 
 @implementation YASAudioDeviceSampleViewController {
@@ -158,6 +156,7 @@ typedef std::shared_ptr<yas::audio_device_sample::kernel> sample_kernel_ptr;
     yas::audio_device_io_ptr _audio_device_io;
     yas::audio_device_observer_ptr _audio_device_observer;
     sample_kernel_ptr _kernel;
+    YASWeakContainer *_weakContainer;
 }
 
 - (void)viewDidLoad
@@ -188,10 +187,16 @@ typedef std::shared_ptr<yas::audio_device_sample::kernel> sample_kernel_ptr;
     self.sineVolume = _kernel->sine_volume();
     self.sineFrequency = _kernel->sine_frequency();
 
+    YASWeakContainer *weakContainer = [self weakContainer];
+
     _audio_device_observer = yas::audio_device_observer::create();
     _audio_device_observer->add_handler(yas::audio_device::system_subject(),
                                         yas::audio_device::method::hardware_did_change,
-                                        [&wself = self](const auto &, const auto &) { [wself updateDeviceNames]; });
+                                        [weakContainer](const auto &, const auto &) {
+                                            YASAudioDeviceSampleViewController *self = [weakContainer retainedObject];
+                                            [self updateDeviceNames];
+                                            YASRelease(self);
+                                        });
 
     std::weak_ptr<yas::audio_device_io> weak_device_io = _audio_device_io;
     _audio_device_io->set_render_callback(
@@ -255,6 +260,14 @@ typedef std::shared_ptr<yas::audio_device_sample::kernel> sample_kernel_ptr;
 }
 
 #pragma mark -
+
+- (YASWeakContainer *)weakContainer
+{
+    if (!_weakContainer) {
+        _weakContainer = [[YASWeakContainer alloc] initWithObject:self];
+    }
+    return _weakContainer;
+}
 
 - (void)setThroughVolume:(Float64)throughVolume
 {
@@ -326,12 +339,7 @@ typedef std::shared_ptr<yas::audio_device_sample::kernel> sample_kernel_ptr;
     if (selected_device && std::find(all_devices.begin(), all_devices.end(), selected_device) != all_devices.end()) {
         _audio_device_io->set_audio_device(selected_device);
 
-        YASWeakContainer *weakContainer = self.weakContainer;
-        if (!weakContainer) {
-            weakContainer = [[YASWeakContainer alloc] initWithObject:self];
-            self.weakContainer = weakContainer;
-            YASRelease(weakContainer);
-        }
+        YASWeakContainer *weakContainer = [self weakContainer];
 
         _audio_device_observer->add_handler(
             selected_device->property_subject(), yas::audio_device::method::device_did_change,
@@ -339,9 +347,9 @@ typedef std::shared_ptr<yas::audio_device_sample::kernel> sample_kernel_ptr;
                 if (infos.size() > 0) {
                     auto &device_id = infos[0].object_id;
                     if (selected_device->audio_device_id() == device_id) {
-                        YASAudioDeviceSampleViewController *strongSelf = [weakContainer retainedObject];
-                        [strongSelf updateDeviceInfo];
-                        YASRelease(strongSelf);
+                        YASAudioDeviceSampleViewController *self = [weakContainer retainedObject];
+                        [self updateDeviceInfo];
+                        YASRelease(self);
                     }
                 }
             });
