@@ -23,7 +23,7 @@ namespace yas
     {
        public:
         using shared_ptr = std::shared_ptr<observer<K, T>>;
-        using observer_handler = std::function<void(const K &, const T &)>;
+        using handler_function = std::function<void(const K &, const T &)>;
 
         static shared_ptr create();
 
@@ -32,10 +32,10 @@ namespace yas
         bool operator==(const observer<K, T> &) const;
         bool operator!=(const observer<K, T> &) const;
 
-        void add_handler(subject<K, T> &subject, const K &key, const observer_handler &handler);
+        void add_handler(subject<K, T> &subject, const K &key, const handler_function &handler);
         void remove_handler(subject<K, T> &subject, const K &key);
 
-        void add_wild_card_handler(subject<K, T> &subject, const observer_handler &handler);
+        void add_wild_card_handler(subject<K, T> &subject, const handler_function &handler);
         void remove_wild_card_handler(subject<K, T> &subject);
 
        private:
