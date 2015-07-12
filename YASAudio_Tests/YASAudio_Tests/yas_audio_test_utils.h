@@ -12,6 +12,7 @@
 #include <memory>
 #include "YASAudioTypes.h"
 #include "yas_audio_format.h"
+#include "yas_audio_data.h"
 
 @class YASAudioFormat;
 

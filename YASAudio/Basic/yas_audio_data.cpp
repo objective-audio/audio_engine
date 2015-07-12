@@ -34,7 +34,7 @@ class audio_data::impl
     {
     }
 
-    impl(const audio_format_ptr &format, abl_unique_ptr &&abl, data_unique_ptr &&data, const UInt32 frame_capacity)
+    impl(const audio_format_ptr &format, abl_unique_ptr &&abl, abl_data_unique_ptr &&data, const UInt32 frame_capacity)
         : format(format),
           frame_capacity(frame_capacity),
           frame_length(frame_capacity),
@@ -56,10 +56,10 @@ class audio_data::impl
 
    private:
     const abl_unique_ptr _abl;
-    const data_unique_ptr _data;
+    const abl_data_unique_ptr _data;
 };
 
-std::pair<abl_unique_ptr, data_unique_ptr> yas::allocate_audio_buffer_list(const UInt32 buffer_count,
+std::pair<abl_unique_ptr, abl_data_unique_ptr> yas::allocate_audio_buffer_list(const UInt32 buffer_count,
                                                                            const UInt32 channels, const UInt32 size)
 {
     abl_unique_ptr abl_ptr((AudioBufferList *)calloc(1, sizeof(AudioBufferList) + buffer_count * sizeof(AudioBuffer)),

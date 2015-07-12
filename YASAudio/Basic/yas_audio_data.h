@@ -7,12 +7,16 @@
 
 #include "yas_audio_types.h"
 #include "yas_result.h"
+#include "yas_audio_channel_route.h"
 #include <memory>
 #include <vector>
 
 namespace yas
 {
-    class channel_route;
+    class audio_data;
+    using audio_data_ptr = std::shared_ptr<audio_data>;
+    using abl_unique_ptr = std::unique_ptr<AudioBufferList, std::function<void(AudioBufferList *)>>;
+    using abl_data_unique_ptr = std::unique_ptr<std::vector<std::vector<UInt8>>>;
 
     class audio_data
     {
@@ -74,9 +78,6 @@ namespace yas
 
     UInt32 frame_length(const AudioBufferList *abl, const UInt32 sample_byte_count);
 
-    using abl_unique_ptr = std::unique_ptr<AudioBufferList, std::function<void(AudioBufferList *)>>;
-    using data_unique_ptr = std::unique_ptr<std::vector<std::vector<UInt8>>>;
-
-    std::pair<abl_unique_ptr, data_unique_ptr> allocate_audio_buffer_list(const UInt32 buffer_count,
-                                                                          const UInt32 channels, const UInt32 size);
+    std::pair<abl_unique_ptr, abl_data_unique_ptr> allocate_audio_buffer_list(const UInt32 buffer_count,
+                                                                              const UInt32 channels, const UInt32 size);
 }

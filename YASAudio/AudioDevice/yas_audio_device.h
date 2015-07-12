@@ -10,6 +10,8 @@
 
 #include "yas_audio_types.h"
 #include "yas_observing.h"
+#include "yas_audio_format.h"
+#include "yas_audio_device_stream.h"
 #include <AudioToolbox/AudioToolbox.h>
 #include <vector>
 #include <map>

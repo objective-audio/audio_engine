@@ -9,13 +9,15 @@
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
 
 #include "yas_audio_types.h"
+#include "yas_audio_data.h"
+#include "yas_audio_device.h"
 #include <functional>
 #include <memory>
 
 namespace yas
 {
-    class audio_data;
-    class audio_time;
+    class audio_device_io;
+    using audio_device_io_ptr = std::shared_ptr<audio_device_io>;
 
     class audio_device_io : public std::enable_shared_from_this<audio_device_io>
     {

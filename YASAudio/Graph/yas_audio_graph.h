@@ -6,10 +6,18 @@
 #pragma once
 
 #include "yas_audio_types.h"
+#include "yas_audio_unit.h"
 #include <memory>
+
+#if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
+#include "yas_audio_device_io.h"
+#endif
 
 namespace yas
 {
+    class audio_graph;
+    using audio_graph_ptr = std::shared_ptr<audio_graph>;
+
     class audio_graph
     {
        public:
