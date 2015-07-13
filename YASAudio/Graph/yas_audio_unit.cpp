@@ -28,24 +28,65 @@ class audio_unit::impl
     bool initialized;
     std::experimental::optional<UInt8> graph_key;
     std::experimental::optional<UInt16> key;
-    mutable std::recursive_mutex mutex;
 
-    render_function render_callback;
-    render_function notify_callback;
-    render_function input_callback;
-
-    impl() : acd(), au_instance(nullptr), name(nullptr), initialized(false), graph_key(), key(), mutex(){};
+    impl()
+        : acd(),
+          au_instance(nullptr),
+          name(nullptr),
+          initialized(false),
+          graph_key(),
+          key(),
+          _render_callback(nullptr),
+          _notify_callback(nullptr),
+          _input_callback(nullptr),
+          _mutex(){};
 
     void set_audio_unit(const AudioUnit au)
     {
-        std::lock_guard<std::recursive_mutex> lock(mutex);
+        std::lock_guard<std::recursive_mutex> lock(_mutex);
         au_instance = au;
     }
 
     const AudioUnit audio_unit()
     {
-        std::lock_guard<std::recursive_mutex> lock(mutex);
+        std::lock_guard<std::recursive_mutex> lock(_mutex);
         return au_instance;
+    }
+
+    void set_render_callback(const render_function &callback)
+    {
+        std::lock_guard<std::recursive_mutex> lock(_mutex);
+        _render_callback = callback;
+    }
+
+    void set_notify_callback(const render_function &callback)
+    {
+        std::lock_guard<std::recursive_mutex> lock(_mutex);
+        _notify_callback = callback;
+    }
+
+    void set_input_callback(const render_function &callback)
+    {
+        std::lock_guard<std::recursive_mutex> lock(_mutex);
+        _input_callback = callback;
+    }
+
+    audio_unit::render_function render_callback() const
+    {
+        std::lock_guard<std::recursive_mutex> lock(_mutex);
+        return _render_callback;
+    }
+
+    audio_unit::render_function notify_callback() const
+    {
+        std::lock_guard<std::recursive_mutex> lock(_mutex);
+        return _notify_callback;
+    }
+
+    audio_unit::render_function input_callback() const
+    {
+        std::lock_guard<std::recursive_mutex> lock(_mutex);
+        return _input_callback;
     }
 
 #pragma mark - setup audio unit
@@ -83,6 +124,13 @@ class audio_unit::impl
             name = nullptr;
         }
     }
+
+   private:
+    render_function _render_callback;
+    render_function _notify_callback;
+    render_function _input_callback;
+
+    mutable std::recursive_mutex _mutex;
 };
 
 static OSStatus CommonRenderCallback(void *inRefCon, AudioUnitRenderActionFlags *ioActionFlags,
@@ -289,38 +337,17 @@ void audio_unit::detach_input_callback()
 
 void audio_unit::set_render_callback(const render_function &callback)
 {
-    std::lock_guard<std::recursive_mutex> lock(_impl->mutex);
-    _impl->render_callback = callback;
-}
-
-audio_unit::render_function audio_unit::render_callback() const
-{
-    std::lock_guard<std::recursive_mutex> lock(_impl->mutex);
-    return _impl->render_callback;
+    _impl->set_render_callback(callback);
 }
 
 void audio_unit::set_notify_callback(const render_function &callback)
 {
-    std::lock_guard<std::recursive_mutex> lock(_impl->mutex);
-    _impl->notify_callback = callback;
-}
-
-audio_unit::render_function audio_unit::notify_callback() const
-{
-    std::lock_guard<std::recursive_mutex> lock(_impl->mutex);
-    return _impl->notify_callback;
+    _impl->set_notify_callback(callback);
 }
 
 void audio_unit::set_input_callback(const render_function &callback)
 {
-    std::lock_guard<std::recursive_mutex> lock(_impl->mutex);
-    _impl->input_callback = callback;
-}
-
-audio_unit::render_function audio_unit::input_callback() const
-{
-    std::lock_guard<std::recursive_mutex> lock(_impl->mutex);
-    return _impl->input_callback;
+    _impl->set_input_callback(callback);
 }
 
 #pragma mark - property
@@ -582,13 +609,13 @@ void audio_unit::callback_render(yas::render_parameters &render_parameters)
 
     switch (render_parameters.in_render_type) {
         case render_type::normal:
-            function = render_callback();
+            function = _impl->render_callback();
             break;
         case render_type::notify:
-            function = notify_callback();
+            function = _impl->notify_callback();
             break;
         case render_type::input:
-            function = input_callback();
+            function = _impl->input_callback();
             break;
         default:
             break;

@@ -23,7 +23,6 @@ namespace yas
     {
        public:
         using render_function = std::function<void(audio_data_ptr &out_data, audio_time_ptr &when)>;
-        using render_function_ptr = std::shared_ptr<render_function>;
 
         static audio_device_io_ptr create();
         static audio_device_io_ptr create(const audio_device_ptr &audio_device);
@@ -33,7 +32,7 @@ namespace yas
         void set_audio_device(const audio_device_ptr device);
         audio_device_ptr audio_device() const;
         bool is_running() const;
-        void set_render_callback(const render_function_ptr &callback);
+        void set_render_callback(const render_function &callback);
         void set_maximum_frames_per_slice(const UInt32 frames);
         UInt32 maximum_frames_per_slice() const;
 

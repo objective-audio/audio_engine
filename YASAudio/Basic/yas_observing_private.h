@@ -12,10 +12,10 @@ namespace yas
     template <typename K, typename T>
     class observer<K, T>::handler_holder
     {
-        std::map<const std::experimental::optional<K>, const observer_handler> functions;
+        std::map<const std::experimental::optional<K>, const handler_function> functions;
 
        public:
-        void add_handler(const std::experimental::optional<K> &key, const observer_handler &handler)
+        void add_handler(const std::experimental::optional<K> &key, const handler_function &handler)
         {
             functions.insert(std::make_pair(key, handler));
         }
@@ -48,9 +48,9 @@ namespace yas
     };
 
     template <typename K, typename T>
-    typename observer<K, T>::observer_ptr observer<K, T>::create()
+    typename observer<K, T>::shared_ptr observer<K, T>::create()
     {
-        return observer_ptr(new observer<K, T>());
+        return shared_ptr(new observer<K, T>());
     }
 
     template <typename K, typename T>
@@ -76,7 +76,7 @@ namespace yas
     }
 
     template <typename K, typename T>
-    void observer<K, T>::add_handler(subject<K, T> &subject, const K &key, const observer_handler &handler)
+    void observer<K, T>::add_handler(subject<K, T> &subject, const K &key, const handler_function &handler)
     {
         auto subject_ptr = &subject;
         if (_handlers.count(subject_ptr) == 0) {
@@ -100,7 +100,7 @@ namespace yas
     }
 
     template <typename K, typename T>
-    void observer<K, T>::add_wild_card_handler(subject<K, T> &subject, const observer_handler &handler)
+    void observer<K, T>::add_wild_card_handler(subject<K, T> &subject, const handler_function &handler)
     {
         auto subject_ptr = &subject;
         if (_handlers.count(subject_ptr) == 0) {
@@ -140,7 +140,7 @@ namespace yas
     }
 
     template <typename K, typename T>
-    auto make_observer(const subject<K, T> &) -> typename observer<K, T>::observer_ptr
+    auto make_observer(const subject<K, T> &) -> typename observer<K, T>::shared_ptr
     {
         return observer<K, T>::create();
     }
@@ -148,7 +148,7 @@ namespace yas
     template <typename K, typename T>
     auto make_subject_dispatcher(const subject<K, T> &source,
                                  const std::initializer_list<subject<K, T> *> &destinations) ->
-        typename observer<K, T>::observer_ptr
+        typename observer<K, T>::shared_ptr
     {
         auto observer = make_observer(source);
         auto handler = [&source](const auto &method, const auto &value) { source.notify(method, value); };

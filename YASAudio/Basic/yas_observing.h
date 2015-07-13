@@ -22,20 +22,20 @@ namespace yas
     class observer : public std::enable_shared_from_this<observer<K, T>>
     {
        public:
-        using observer_ptr = std::shared_ptr<observer<K, T>>;
-        using observer_handler = std::function<void(const K &, const T &)>;
+        using shared_ptr = std::shared_ptr<observer<K, T>>;
+        using handler_function = std::function<void(const K &, const T &)>;
 
-        static observer_ptr create();
+        static shared_ptr create();
 
         ~observer();
 
         bool operator==(const observer<K, T> &) const;
         bool operator!=(const observer<K, T> &) const;
 
-        void add_handler(subject<K, T> &subject, const K &key, const observer_handler &handler);
+        void add_handler(subject<K, T> &subject, const K &key, const handler_function &handler);
         void remove_handler(subject<K, T> &subject, const K &key);
 
-        void add_wild_card_handler(subject<K, T> &subject, const observer_handler &handler);
+        void add_wild_card_handler(subject<K, T> &subject, const handler_function &handler);
         void remove_wild_card_handler(subject<K, T> &subject);
 
        private:
@@ -56,12 +56,12 @@ namespace yas
     };
 
     template <typename K, typename T>
-    static auto make_observer(const subject<K, T> &) -> typename observer<K, T>::observer_ptr;
+    static auto make_observer(const subject<K, T> &) -> typename observer<K, T>::shared_ptr;
 
     template <typename K, typename T>
     static auto make_subject_dispatcher(const subject<K, T> &source_subject,
                                         const std::initializer_list<subject<K, T> *> &destination_subjects) ->
-        typename observer<K, T>::observer_ptr;
+        typename observer<K, T>::shared_ptr;
 
     template <typename K, typename T>
     class subject

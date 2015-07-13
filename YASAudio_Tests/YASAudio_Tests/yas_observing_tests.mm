@@ -232,7 +232,7 @@
         yas::subject<method, std::string> property1;
         yas::subject<method, std::string> property2;
 
-        yas::observer<method, std::string>::observer_ptr dispatcher;
+        yas::observer<method, std::string>::shared_ptr dispatcher;
         yas::subject<method, std::string> properties_subject;
 
         test_class() : dispatcher(yas::make_subject_dispatcher(properties_subject, {&property1, &property2}))
