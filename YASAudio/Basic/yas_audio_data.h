@@ -43,6 +43,11 @@ namespace yas
         audio_pointer audio_ptr_at_buffer(const UInt32 buffer) const;
         audio_pointer audio_ptr_at_channel(const UInt32 channel) const;
 
+        template <typename T>
+        T *audio_ptr_at_buffer(const UInt32 buffer) const;
+        template <typename T>
+        T *audio_ptr_at_channel(const UInt32 channel) const;
+
         const UInt32 frame_capacity() const;
         const UInt32 frame_length() const;
         void set_frame_length(const UInt32 length);

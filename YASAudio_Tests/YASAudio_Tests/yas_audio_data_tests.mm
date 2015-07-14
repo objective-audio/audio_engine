@@ -134,7 +134,7 @@
     const UInt32 stride = data->format()->stride();
 
     for (UInt32 buffer = 0; buffer < buffer_count; buffer++) {
-        Float32 *ptr = data->audio_ptr_at_buffer(buffer).f32;
+        Float32 *ptr = data->audio_ptr_at_buffer<Float32>(buffer);
         for (UInt32 frame = 0; frame < data->frame_length(); frame++) {
             for (UInt32 ch = 0; ch < stride; ch++) {
                 if (frame == 1 || frame == 2) {
