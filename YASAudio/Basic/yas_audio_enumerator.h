@@ -120,8 +120,8 @@ namespace yas
     (__v)._frame = (__v)._frame_length;      \
     (__v)._channel = (__v)._channel_count;
 
-#define yas_audio_frame_enumerator_reset(__v)                                                             \
-    (__v)._frame = 0;                                                                                     \
-    (__v)._channel = 0;                                                                                   \
-    memcpy(&(__v)._pointers[0], &(__v)._top_pointers[0], (__v)._channel_count * sizeof(audio_pointer *)); \
+#define yas_audio_frame_enumerator_reset(__v)                                                                  \
+    (__v)._frame = 0;                                                                                          \
+    (__v)._channel = 0;                                                                                        \
+    memcpy(&(__v)._pointers[0], &(__v)._top_pointers[0], (__v)._channel_count * sizeof(yas::audio_pointer *)); \
     (__v)._pointer.v = (__v)._pointers[0].v;
