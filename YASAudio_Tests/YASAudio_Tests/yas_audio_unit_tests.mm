@@ -69,19 +69,23 @@
 
     YASRetainOrIgnore(expectation);
 
-    converter_unit->set_render_callback([expectation, input_format, &self](yas::render_parameters &render_parameters) {
-        const AudioBufferList *ioData = render_parameters.io_data;
-        XCTAssertNotEqual(ioData, nullptr);
-        XCTAssertEqual(ioData->mNumberBuffers, input_format->buffer_count());
-        for (UInt32 i = 0; i < input_format->buffer_count(); i++) {
-            XCTAssertEqual(ioData->mBuffers[i].mNumberChannels, input_format->stride());
-            XCTAssertEqual(ioData->mBuffers[i].mDataByteSize,
-                           input_format->buffer_frame_byte_count() * render_parameters.in_number_frames);
-        }
-        [expectation fulfill];
+    converter_unit->set_render_callback(
+        [expectation, input_format, &self](yas::render_parameters &render_parameters) mutable {
+            if (expectation) {
+                const AudioBufferList *ioData = render_parameters.io_data;
+                XCTAssertNotEqual(ioData, nullptr);
+                XCTAssertEqual(ioData->mNumberBuffers, input_format->buffer_count());
+                for (UInt32 i = 0; i < input_format->buffer_count(); i++) {
+                    XCTAssertEqual(ioData->mBuffers[i].mNumberChannels, input_format->stride());
+                    XCTAssertEqual(ioData->mBuffers[i].mDataByteSize,
+                                   input_format->buffer_frame_byte_count() * render_parameters.in_number_frames);
+                }
+                [expectation fulfill];
 
-        YASRelease(expectation);
-    });
+                YASRelease(expectation);
+                expectation = nil;
+            }
+        });
 
     yas::test::audio_unit_render_on_sub_thread(converter_unit, output_format, frame_length, 1, 0);
 
@@ -123,20 +127,29 @@
     YASRetainOrIgnore(preRenderExpectation);
     YASRetainOrIgnore(postRenderExpectation);
 
-    converter_unit->set_render_callback([renderExpectation](yas::render_parameters &render_parameters) {
-        [renderExpectation fulfill];
-        YASRelease(renderExpectation);
+    converter_unit->set_render_callback([renderExpectation](yas::render_parameters &render_parameters) mutable {
+        if (renderExpectation) {
+            [renderExpectation fulfill];
+            YASRelease(renderExpectation);
+            renderExpectation = nil;
+        }
     });
 
     converter_unit->set_notify_callback(
-        [preRenderExpectation, postRenderExpectation](yas::render_parameters &render_parameters) {
+        [preRenderExpectation, postRenderExpectation](yas::render_parameters &render_parameters) mutable {
             AudioUnitRenderActionFlags flags = *render_parameters.io_action_flags;
             if (flags & kAudioUnitRenderAction_PreRender) {
-                [preRenderExpectation fulfill];
-                YASRelease(preRenderExpectation);
+                if (preRenderExpectation) {
+                    [preRenderExpectation fulfill];
+                    YASRelease(preRenderExpectation);
+                    preRenderExpectation = nil;
+                }
             } else if (flags & kAudioUnitRenderAction_PostRender) {
-                [postRenderExpectation fulfill];
-                YASRelease(postRenderExpectation);
+                if (postRenderExpectation) {
+                    [postRenderExpectation fulfill];
+                    YASRelease(postRenderExpectation);
+                    postRenderExpectation = nil;
+                }
             }
         });
 
