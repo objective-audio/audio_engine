@@ -1,5 +1,5 @@
 //
-//  yas_audio_audio_data.h
+//  yas_audio_pcm_buffer.h
 //  Copyright (c) 2015 Yuki Yasoshima.
 //
 
@@ -13,12 +13,12 @@
 
 namespace yas
 {
-    class audio_data;
-    using audio_data_ptr = std::shared_ptr<audio_data>;
+    class pcm_buffer;
+    using pcm_buffer_ptr = std::shared_ptr<pcm_buffer>;
     using abl_unique_ptr = std::unique_ptr<AudioBufferList, std::function<void(AudioBufferList *)>>;
     using abl_data_unique_ptr = std::unique_ptr<std::vector<std::vector<UInt8>>>;
 
-    class audio_data
+    class pcm_buffer
     {
        public:
         enum class copy_error_type {
@@ -31,9 +31,9 @@ namespace yas
 
         using copy_result = result<std::nullptr_t, copy_error_type>;
 
-        static audio_data_ptr create(const audio_format_ptr &format, AudioBufferList *abl);
-        static audio_data_ptr create(const audio_format_ptr &format, const UInt32 frame_capacity);
-        static audio_data_ptr create(const audio_format_ptr &format, const audio_data &data,
+        static pcm_buffer_ptr create(const audio_format_ptr &format, AudioBufferList *abl);
+        static pcm_buffer_ptr create(const audio_format_ptr &format, const UInt32 frame_capacity);
+        static pcm_buffer_ptr create(const audio_format_ptr &format, const pcm_buffer &data,
                                      const std::vector<channel_route_ptr> &channel_routes, const bool is_output);
 
         audio_format_ptr format() const;
@@ -59,27 +59,27 @@ namespace yas
         class impl;
         std::shared_ptr<impl> _impl;
 
-        audio_data(const audio_format_ptr &format, AudioBufferList *abl);
-        audio_data(const audio_format_ptr &format, const UInt32 frame_capacity);
-        audio_data(const audio_format_ptr &format, const audio_data &data,
+        pcm_buffer(const audio_format_ptr &format, AudioBufferList *abl);
+        pcm_buffer(const audio_format_ptr &format, const UInt32 frame_capacity);
+        pcm_buffer(const audio_format_ptr &format, const pcm_buffer &data,
                    const std::vector<channel_route_ptr> channel_routes, const bool is_output);
 
-        audio_data(const audio_data &) = delete;
-        audio_data(audio_data &&) = delete;
-        audio_data &operator=(const audio_data &) = delete;
-        audio_data &operator=(audio_data &&) = delete;
+        pcm_buffer(const pcm_buffer &) = delete;
+        pcm_buffer(pcm_buffer &&) = delete;
+        pcm_buffer &operator=(const pcm_buffer &) = delete;
+        pcm_buffer &operator=(pcm_buffer &&) = delete;
     };
 
     void clear(AudioBufferList *abl);
 
-    audio_data::copy_result copy_data(const audio_data_ptr &from_data, audio_data_ptr &to_data);
-    audio_data::copy_result copy_data(const audio_data_ptr &from_data, audio_data_ptr &to_data,
+    pcm_buffer::copy_result copy_data(const pcm_buffer_ptr &from_data, pcm_buffer_ptr &to_data);
+    pcm_buffer::copy_result copy_data(const pcm_buffer_ptr &from_data, pcm_buffer_ptr &to_data,
                                       const UInt32 from_start_frame, const UInt32 to_start_frame, const UInt32 length);
-    audio_data::copy_result copy_data_flexibly(const AudioBufferList *&from_abl, AudioBufferList *&to_abl,
+    pcm_buffer::copy_result copy_data_flexibly(const AudioBufferList *&from_abl, AudioBufferList *&to_abl,
                                                const UInt32 sample_byte_count, UInt32 *out_frame_length);
-    audio_data::copy_result copy_data_flexibly(const audio_data_ptr &from_data, audio_data_ptr &to_data);
-    audio_data::copy_result copy_data_flexibly(const audio_data_ptr &from_data, AudioBufferList *to_abl);
-    audio_data::copy_result copy_data_flexibly(const AudioBufferList *from_abl, audio_data_ptr &to_data);
+    pcm_buffer::copy_result copy_data_flexibly(const pcm_buffer_ptr &from_data, pcm_buffer_ptr &to_data);
+    pcm_buffer::copy_result copy_data_flexibly(const pcm_buffer_ptr &from_data, AudioBufferList *to_abl);
+    pcm_buffer::copy_result copy_data_flexibly(const AudioBufferList *from_abl, pcm_buffer_ptr &to_data);
 
     UInt32 frame_length(const AudioBufferList *abl, const UInt32 sample_byte_count);
 

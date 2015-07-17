@@ -8,7 +8,7 @@
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
 
 #include "yas_audio_device.h"
-#include "yas_audio_data.h"
+#include "yas_pcm_buffer.h"
 #include "yas_audio_format.h"
 #include "yas_audio_time.h"
 #include "yas_observing.h"
@@ -25,12 +25,12 @@ class audio_device_io::impl
     class kernel
     {
        public:
-        audio_data_ptr input_data;
-        audio_data_ptr output_data;
+        pcm_buffer_ptr input_data;
+        pcm_buffer_ptr output_data;
 
         kernel(const audio_format_ptr &input_format, const audio_format_ptr &output_format, const UInt32 frame_capacity)
-            : input_data(input_format ? audio_data::create(input_format, frame_capacity) : nullptr),
-              output_data(output_format ? audio_data::create(output_format, frame_capacity) : nullptr)
+            : input_data(input_format ? pcm_buffer::create(input_format, frame_capacity) : nullptr),
+              output_data(output_format ? pcm_buffer::create(output_format, frame_capacity) : nullptr)
         {
         }
 
@@ -50,7 +50,7 @@ class audio_device_io::impl
     audio_device_ptr audio_device;
     bool is_running;
     AudioDeviceIOProcID io_proc_id;
-    audio_data_ptr input_data_on_render;
+    pcm_buffer_ptr input_data_on_render;
     audio_time_ptr input_time_on_render;
     audio_device_observer_ptr observer;
 
@@ -213,7 +213,7 @@ void audio_device_io::initialize()
                                 }
                             }
                         } else if (kernel->input_data) {
-                            audio_data_ptr data = nullptr;
+                            pcm_buffer_ptr data = nullptr;
                             audio_time_ptr time = nullptr;
                             render_callback(data, time);
                         }
@@ -326,7 +326,7 @@ void audio_device_io::stop()
     yas_raise_if_au_error(AudioDeviceStop(_impl->audio_device->audio_device_id(), _impl->io_proc_id));
 }
 
-const audio_data_ptr audio_device_io::input_data_on_render() const
+const pcm_buffer_ptr audio_device_io::input_data_on_render() const
 {
     return _impl->input_data_on_render;
 }
