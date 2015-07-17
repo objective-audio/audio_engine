@@ -41,6 +41,7 @@ namespace yas
         objc_container(objc_container &&);
         objc_container &operator=(const objc_container &);
         objc_container &operator=(objc_container &&);
+        objc_container &operator=(const id object);
 
         void set_object(const id object);
         id retained_object() const;

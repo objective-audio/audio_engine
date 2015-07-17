@@ -117,6 +117,13 @@ objc_container &objc_container::operator=(objc_container &&container)
     return *this;
 }
 
+objc_container &objc_container::operator=(const id object)
+{
+    set_object(object);
+
+    return *this;
+}
+
 void objc_container::set_object(const id object)
 {
     std::lock_guard<std::recursive_mutex> lock(_mutex);
