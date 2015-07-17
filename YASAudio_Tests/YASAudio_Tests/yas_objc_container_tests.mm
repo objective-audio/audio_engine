@@ -422,4 +422,28 @@ static int _objc_object_count = 0;
     XCTAssertEqual(_objc_object_count, 0);
 }
 
+- (void)testDirectSet
+{
+    YASObjCContainerTest *objc_object = [[YASObjCContainerTest alloc] init];
+
+    {
+        yas::objc_container objc_container(nil, yas::strong);
+
+        XCTAssertEqual([objc_object retainCount], 1);
+
+        objc_container = objc_object;
+
+        XCTAssertEqual([objc_object retainCount], 2);
+
+        id retainedObject = objc_container.retained_object();
+        XCTAssertNotNil(retainedObject);
+        [retainedObject release];
+    }
+
+    [objc_object release];
+    objc_object = nil;
+
+    XCTAssertEqual(_objc_object_count, 0);
+}
+
 @end
