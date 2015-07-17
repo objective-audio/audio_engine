@@ -6,18 +6,18 @@
 #pragma once
 
 #include "yas_audio_types.h"
-#include "yas_audio_data.h"
+#include "yas_pcm_buffer.h"
 #include <vector>
 
 namespace yas
 {
-    class audio_data;
+    class pcm_buffer;
 
     class audio_enumerator
     {
        public:
         audio_enumerator(const audio_pointer &pointer, const UInt32 byte_stride, const UInt32 length);
-        audio_enumerator(const audio_data_ptr &data, const UInt32 channel);
+        audio_enumerator(const pcm_buffer_ptr &data, const UInt32 channel);
 
         const audio_pointer *pointer() const;
         const UInt32 *index() const;
@@ -40,7 +40,7 @@ namespace yas
     class audio_frame_enumerator
     {
        public:
-        explicit audio_frame_enumerator(const audio_data_ptr &data);
+        explicit audio_frame_enumerator(const pcm_buffer_ptr &data);
 
         const audio_pointer *pointer() const;
         const UInt32 *frame() const;

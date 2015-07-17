@@ -6,7 +6,7 @@
 #import <XCTest/XCTest.h>
 #import "yas_audio_format.h"
 #import "yas_audio_file.h"
-#import "yas_audio_data.h"
+#import "yas_pcm_buffer.h"
 #import "yas_cf_utils.h"
 #import "YASMacros.h"
 
@@ -199,7 +199,7 @@ namespace yas
 
         audio_file->set_processing_format(processing_format);
 
-        auto data = yas::audio_data::create(processing_format, frame_length);
+        auto data = yas::pcm_buffer::create(processing_format, frame_length);
 
         UInt32 startIndex = 0;
 
@@ -239,7 +239,7 @@ namespace yas
         XCTAssertEqualWithAccuracy(audio_file->processing_length(),
                                    audio_file->file_length() * (processing_sample_rate / file_sample_rate), 1);
 
-        auto data = yas::audio_data::create(processing_format, frame_length);
+        auto data = yas::pcm_buffer::create(processing_format, frame_length);
 
         UInt32 startIndex = 0;
 
@@ -260,7 +260,7 @@ namespace yas
 
 #pragma mark -
 
-- (void)_writeToData:(yas::audio_data_ptr &)data
+- (void)_writeToData:(yas::pcm_buffer_ptr &)data
           fileFormat:(yas::audio_format &)fileFormat
           startIndex:(NSInteger)startIndex
 {
@@ -296,7 +296,7 @@ namespace yas
     }
 }
 
-- (BOOL)_compareData:(yas::audio_data_ptr &)data
+- (BOOL)_compareData:(yas::pcm_buffer_ptr &)data
           fileFormat:(yas::audio_format &)fileFormat
           startIndex:(NSInteger)startIndex
 {

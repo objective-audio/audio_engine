@@ -14,7 +14,7 @@
 #import "yas_audio_unit.h"
 #import "yas_audio_device.h"
 #import "yas_audio_device_io.h"
-#import "yas_audio_data.h"
+#import "yas_pcm_buffer.h"
 #import "yas_audio_enumerator.h"
 #import "yas_audio_format.h"
 #import "yas_audio_time.h"
@@ -82,7 +82,7 @@ namespace yas
                 return _sine_volume.load();
             }
 
-            void process(const yas::audio_data_ptr &input_data, yas::audio_data_ptr &output_data)
+            void process(const yas::pcm_buffer_ptr &input_data, yas::pcm_buffer_ptr &output_data)
             {
                 if (!output_data) {
                     return;
@@ -202,7 +202,7 @@ typedef std::shared_ptr<yas::audio_device_sample::kernel> sample_kernel_ptr;
         });
 
     std::weak_ptr<yas::audio_device_io> weak_device_io = _audio_device_io;
-    _audio_device_io->set_render_callback([weak_device_io, kernel = _kernel](yas::audio_data_ptr & out_data,
+    _audio_device_io->set_render_callback([weak_device_io, kernel = _kernel](yas::pcm_buffer_ptr & out_data,
                                                                              yas::audio_time_ptr & when) {
         if (auto device_io = weak_device_io.lock()) {
             kernel->process(device_io->input_data_on_render(), out_data);

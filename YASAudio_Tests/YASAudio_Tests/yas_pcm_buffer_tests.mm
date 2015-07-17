@@ -1,20 +1,20 @@
 //
-//  yas_audio_data_tests.m
+//  yas_pcm_buffer_tests.m
 //  Copyright (c) 2015 Yuki Yasoshima.
 //
 
 #import <XCTest/XCTest.h>
-#include "yas_audio_data.h"
+#include "yas_pcm_buffer.h"
 #include "yas_audio_format.h"
 #include "yas_audio_channel_route.h"
 #include "yas_audio_test_utils.h"
 #include <memory>
 
-@interface yas_audio_data_tests : XCTestCase
+@interface yas_pcm_buffer_tests : XCTestCase
 
 @end
 
-@implementation yas_audio_data_tests
+@implementation yas_pcm_buffer_tests
 
 - (void)setUp
 {
@@ -29,71 +29,71 @@
 - (void)testCreateStandardBuffer
 {
     auto format = yas::audio_format::create(48000.0, 2);
-    auto audio_data = yas::audio_data::create(format, 4);
+    auto pcm_buffer = yas::pcm_buffer::create(format, 4);
 
-    XCTAssertTrue(*format == *audio_data->format());
-    XCTAssert(audio_data->audio_ptr_at_buffer(0).v);
-    XCTAssert(audio_data->audio_ptr_at_buffer(1).v);
-    XCTAssertThrows(audio_data->audio_ptr_at_buffer(2));
+    XCTAssertTrue(*format == *pcm_buffer->format());
+    XCTAssert(pcm_buffer->audio_ptr_at_buffer(0).v);
+    XCTAssert(pcm_buffer->audio_ptr_at_buffer(1).v);
+    XCTAssertThrows(pcm_buffer->audio_ptr_at_buffer(2));
 }
 
 - (void)testCreateFloat32Interleaved1chBuffer
 {
-    auto audio_data = yas::audio_data::create(yas::audio_format::create(48000.0, 1, yas::pcm_format::float32, true), 4);
+    auto pcm_buffer = yas::pcm_buffer::create(yas::audio_format::create(48000.0, 1, yas::pcm_format::float32, true), 4);
 
-    XCTAssert(audio_data->audio_ptr_at_buffer(0).v);
-    XCTAssertThrows(audio_data->audio_ptr_at_buffer(1));
+    XCTAssert(pcm_buffer->audio_ptr_at_buffer(0).v);
+    XCTAssertThrows(pcm_buffer->audio_ptr_at_buffer(1));
 }
 
 - (void)testCreateFloat64NonInterleaved2chBuffer
 {
-    auto audio_data =
-        yas::audio_data::create(yas::audio_format::create(48000.0, 2, yas::pcm_format::float64, false), 4);
+    auto pcm_buffer =
+        yas::pcm_buffer::create(yas::audio_format::create(48000.0, 2, yas::pcm_format::float64, false), 4);
 
-    XCTAssert(audio_data->audio_ptr_at_buffer(0).v);
-    XCTAssertThrows(audio_data->audio_ptr_at_buffer(2));
+    XCTAssert(pcm_buffer->audio_ptr_at_buffer(0).v);
+    XCTAssertThrows(pcm_buffer->audio_ptr_at_buffer(2));
 }
 
 - (void)testCreateInt32Interleaved3chBuffer
 {
-    auto audio_data =
-        yas::audio_data::create(yas::audio_format::create(48000.0, 3, yas::pcm_format::fixed824, true), 4);
+    auto pcm_buffer =
+        yas::pcm_buffer::create(yas::audio_format::create(48000.0, 3, yas::pcm_format::fixed824, true), 4);
 
-    XCTAssert(audio_data->audio_ptr_at_buffer(0).v);
-    XCTAssertThrows(audio_data->audio_ptr_at_buffer(3));
+    XCTAssert(pcm_buffer->audio_ptr_at_buffer(0).v);
+    XCTAssertThrows(pcm_buffer->audio_ptr_at_buffer(3));
 }
 
 - (void)testCreateInt16NonInterleaved4chBuffer
 {
-    auto audio_data = yas::audio_data::create(yas::audio_format::create(48000.0, 4, yas::pcm_format::int16, false), 4);
+    auto pcm_buffer = yas::pcm_buffer::create(yas::audio_format::create(48000.0, 4, yas::pcm_format::int16, false), 4);
 
-    XCTAssert(audio_data->audio_ptr_at_buffer(0).v);
-    XCTAssertThrows(audio_data->audio_ptr_at_buffer(4));
+    XCTAssert(pcm_buffer->audio_ptr_at_buffer(0).v);
+    XCTAssertThrows(pcm_buffer->audio_ptr_at_buffer(4));
 }
 
 - (void)testSetFrameLength
 {
     const UInt32 frame_capacity = 4;
 
-    auto audio_data = yas::audio_data::create(yas::audio_format::create(48000.0, 1), frame_capacity);
-    const auto &format = audio_data->format();
+    auto pcm_buffer = yas::pcm_buffer::create(yas::audio_format::create(48000.0, 1), frame_capacity);
+    const auto &format = pcm_buffer->format();
 
-    XCTAssertEqual(audio_data->frame_length(), frame_capacity);
-    XCTAssertEqual(audio_data->audio_buffer_list()->mBuffers[0].mDataByteSize,
+    XCTAssertEqual(pcm_buffer->frame_length(), frame_capacity);
+    XCTAssertEqual(pcm_buffer->audio_buffer_list()->mBuffers[0].mDataByteSize,
                    frame_capacity * format->buffer_frame_byte_count());
 
-    audio_data->set_frame_length(2);
+    pcm_buffer->set_frame_length(2);
 
-    XCTAssertEqual(audio_data->frame_length(), 2);
-    XCTAssertEqual(audio_data->audio_buffer_list()->mBuffers[0].mDataByteSize, 2 * format->buffer_frame_byte_count());
+    XCTAssertEqual(pcm_buffer->frame_length(), 2);
+    XCTAssertEqual(pcm_buffer->audio_buffer_list()->mBuffers[0].mDataByteSize, 2 * format->buffer_frame_byte_count());
 
-    audio_data->set_frame_length(0);
+    pcm_buffer->set_frame_length(0);
 
-    XCTAssertEqual(audio_data->frame_length(), 0);
-    XCTAssertEqual(audio_data->audio_buffer_list()->mBuffers[0].mDataByteSize, 0);
+    XCTAssertEqual(pcm_buffer->frame_length(), 0);
+    XCTAssertEqual(pcm_buffer->audio_buffer_list()->mBuffers[0].mDataByteSize, 0);
 
-    XCTAssertThrows(audio_data->set_frame_length(5));
-    XCTAssertEqual(audio_data->frame_length(), 0);
+    XCTAssertThrows(pcm_buffer->set_frame_length(5));
+    XCTAssertEqual(pcm_buffer->frame_length(), 0);
 }
 
 - (void)testClearDataNonInterleaved
@@ -101,7 +101,7 @@
     const UInt32 frame_length = 4;
 
     auto format = yas::audio_format::create(48000.0, 2, yas::pcm_format::float32, false);
-    auto data = yas::audio_data::create(format, frame_length);
+    auto data = yas::pcm_buffer::create(format, frame_length);
 
     [self _testClearData:data];
 }
@@ -111,12 +111,12 @@
     const UInt32 frame_length = 4;
 
     auto format = yas::audio_format::create(48000, 2, yas::pcm_format::float32, true);
-    auto data = yas::audio_data::create(format, frame_length);
+    auto data = yas::pcm_buffer::create(format, frame_length);
 
     [self _testClearData:data];
 }
 
-- (void)_testClearData:(yas::audio_data_ptr &)data
+- (void)_testClearData:(yas::pcm_buffer_ptr &)data
 {
     yas::test::fill_test_values_to_data(data);
 
@@ -161,8 +161,8 @@
         const auto pcm_format = static_cast<yas::pcm_format>(i);
         auto format = yas::audio_format::create(48000.0, 2, pcm_format, interleaved);
 
-        auto from_data = yas::audio_data::create(format, frame_length);
-        auto to_data = yas::audio_data::create(format, frame_length);
+        auto from_data = yas::pcm_buffer::create(format, frame_length);
+        auto to_data = yas::pcm_buffer::create(format, frame_length);
 
         yas::test::fill_test_values_to_data(from_data);
 
@@ -181,8 +181,8 @@
         const auto pcm_format = static_cast<yas::pcm_format>(i);
         auto from_format = yas::audio_format::create(sample_rate, channels, pcm_format, true);
         auto to_format = yas::audio_format::create(sample_rate, channels, pcm_format, false);
-        auto from_data = yas::audio_data::create(from_format, frame_length);
-        auto to_data = yas::audio_data::create(to_format, frame_length);
+        auto from_data = yas::pcm_buffer::create(from_format, frame_length);
+        auto to_data = yas::pcm_buffer::create(to_format, frame_length);
 
         yas::test::fill_test_values_to_data(from_data);
 
@@ -200,8 +200,8 @@
     for (auto i = static_cast<int>(yas::pcm_format::float32); i <= static_cast<int>(yas::pcm_format::fixed824); ++i) {
         const auto pcm_format = static_cast<yas::pcm_format>(i);
         auto format = yas::audio_format::create(sample_rate, channels, pcm_format, true);
-        auto from_data = yas::audio_data::create(format, from_frame_length);
-        auto to_data = yas::audio_data::create(format, to_frame_length);
+        auto from_data = yas::pcm_buffer::create(format, from_frame_length);
+        auto to_data = yas::pcm_buffer::create(format, to_frame_length);
 
         yas::test::fill_test_values_to_data(from_data);
 
@@ -230,8 +230,8 @@
         const auto pcm_format = static_cast<yas::pcm_format>(i);
         auto format = yas::audio_format::create(sample_rate, channels, pcm_format, interleaved);
 
-        auto from_data = yas::audio_data::create(format, from_frame_length);
-        auto to_data = yas::audio_data::create(format, to_frame_length);
+        auto from_data = yas::pcm_buffer::create(format, from_frame_length);
+        auto to_data = yas::pcm_buffer::create(format, to_frame_length);
 
         yas::test::fill_test_values_to_data(from_data);
 
@@ -277,8 +277,8 @@
         const auto pcm_format = static_cast<yas::pcm_format>(i);
         auto format = yas::audio_format::create(sample_rate, channels, pcm_format, interleaved);
 
-        auto from_data = yas::audio_data::create(format, frame_length);
-        auto to_data = yas::audio_data::create(format, frame_length);
+        auto from_data = yas::pcm_buffer::create(format, frame_length);
+        auto to_data = yas::pcm_buffer::create(format, frame_length);
 
         yas::test::fill_test_values_to_data(from_data);
 
@@ -304,8 +304,8 @@
         auto from_format = yas::audio_format::create(sample_rate, channels, pcm_format, interleaved);
         auto to_format = yas::audio_format::create(sample_rate, channels, pcm_format, !interleaved);
 
-        auto to_data = yas::audio_data::create(from_format, frame_length);
-        auto from_data = yas::audio_data::create(to_format, frame_length);
+        auto to_data = yas::pcm_buffer::create(from_format, frame_length);
+        auto from_data = yas::pcm_buffer::create(to_format, frame_length);
 
         yas::test::fill_test_values_to_data(from_data);
 
@@ -326,8 +326,8 @@
     auto from_format = yas::audio_format::create(sample_rate, channels, from_pcm_format, false);
     auto to_format = yas::audio_format::create(sample_rate, channels, to_pcm_format, true);
 
-    auto from_data = yas::audio_data::create(from_format, frame_length);
-    auto to_data = yas::audio_data::create(to_format, frame_length);
+    auto from_data = yas::pcm_buffer::create(from_format, frame_length);
+    auto to_data = yas::pcm_buffer::create(to_format, frame_length);
 
     XCTAssertFalse(yas::copy_data_flexibly(from_data, to_data));
 }
@@ -342,8 +342,8 @@
         auto pcm_format = static_cast<yas::pcm_format>(i);
         auto interleaved_format = yas::audio_format::create(sample_rate, channels, pcm_format, true);
         auto non_interleaved_format = yas::audio_format::create(sample_rate, channels, pcm_format, false);
-        auto interleaved_data = yas::audio_data::create(interleaved_format, frame_length);
-        auto deinterleaved_data = yas::audio_data::create(non_interleaved_format, frame_length);
+        auto interleaved_data = yas::pcm_buffer::create(interleaved_format, frame_length);
+        auto deinterleaved_data = yas::pcm_buffer::create(non_interleaved_format, frame_length);
 
         yas::test::fill_test_values_to_data(interleaved_data);
 
@@ -372,8 +372,8 @@
         auto pcm_format = static_cast<yas::pcm_format>(i);
         auto interleaved_format = yas::audio_format::create(sample_rate, channels, pcm_format, true);
         auto non_interleaved_format = yas::audio_format::create(sample_rate, channels, pcm_format, false);
-        auto interleaved_data = yas::audio_data::create(interleaved_format, frame_length);
-        auto deinterleaved_data = yas::audio_data::create(non_interleaved_format, frame_length);
+        auto interleaved_data = yas::pcm_buffer::create(interleaved_format, frame_length);
+        auto deinterleaved_data = yas::pcm_buffer::create(non_interleaved_format, frame_length);
 
         yas::test::fill_test_values_to_data(interleaved_data);
 
@@ -402,7 +402,7 @@
     const UInt32 dest_channel_indices[2] = {3, 0};
 
     auto dest_format = yas::audio_format::create(sample_rate, dest_channels);
-    auto dest_data = yas::audio_data::create(dest_format, frame_length);
+    auto dest_data = yas::pcm_buffer::create(dest_format, frame_length);
     yas::test::fill_test_values_to_data(dest_data);
 
     auto channel_routes = std::vector<yas::channel_route_ptr>();
@@ -411,7 +411,7 @@
     }
 
     auto source_format = yas::audio_format::create(sample_rate, source_channels);
-    auto source_data = yas::audio_data::create(source_format, *dest_data, channel_routes, true);
+    auto source_data = yas::pcm_buffer::create(source_format, *dest_data, channel_routes, true);
 
     for (UInt32 ch = 0; ch < source_channels; ++ch) {
         yas::audio_pointer dest_ptr = dest_data->audio_ptr_at_buffer(dest_channel_indices[ch]);
@@ -435,7 +435,7 @@
     const UInt32 source_channel_indices[2] = {2, 1};
 
     auto source_format = yas::audio_format::create(sample_rate, source_channels);
-    auto source_data = yas::audio_data::create(source_format, frame_length);
+    auto source_data = yas::pcm_buffer::create(source_format, frame_length);
     yas::test::fill_test_values_to_data(source_data);
 
     auto channel_routes = std::vector<yas::channel_route_ptr>();
@@ -444,7 +444,7 @@
     }
 
     auto dest_format = yas::audio_format::create(sample_rate, dest_channels);
-    auto dest_data = yas::audio_data::create(dest_format, *source_data, channel_routes, false);
+    auto dest_data = yas::pcm_buffer::create(dest_format, *source_data, channel_routes, false);
 
     for (UInt32 ch = 0; ch < dest_channels; ch++) {
         yas::audio_pointer dest_ptr = dest_data->audio_ptr_at_buffer(ch);

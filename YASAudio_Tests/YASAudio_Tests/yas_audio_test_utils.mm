@@ -9,7 +9,7 @@
 #include "yas_audio_test_utils.h"
 #include "yas_audio_unit.h"
 #include "yas_audio_format.h"
-#include "yas_audio_data.h"
+#include "yas_pcm_buffer.h"
 #include "yas_audio_enumerator.h"
 #include "yas_audio_time.h"
 #import "YASAudioData+Internal.h"
@@ -24,7 +24,7 @@ UInt32 yas::test::test_value(const UInt32 frame, const UInt32 channel, const UIn
     return frame + 1024 * (channel + 1) + 512 * (buffer + 1);
 }
 
-void yas::test::fill_test_values_to_data(audio_data_ptr &data)
+void yas::test::fill_test_values_to_data(pcm_buffer_ptr &data)
 {
     const auto &format = data->format();
     const yas::pcm_format pcmFormat = format->pcm_format();
@@ -58,7 +58,7 @@ void yas::test::fill_test_values_to_data(audio_data_ptr &data)
     }
 }
 
-bool yas::test::is_cleard_data(audio_data_ptr &data)
+bool yas::test::is_cleard_data(pcm_buffer_ptr &data)
 {
     const AudioBufferList *abl = data->audio_buffer_list();
 
@@ -74,7 +74,7 @@ bool yas::test::is_cleard_data(audio_data_ptr &data)
     return true;
 }
 
-bool yas::test::is_filled_data(audio_data_ptr &data)
+bool yas::test::is_filled_data(pcm_buffer_ptr &data)
 {
     __block BOOL isFilled = YES;
     const UInt32 sample_byte_count = data->format()->sample_byte_count();
@@ -95,7 +95,7 @@ bool yas::test::is_filled_data(audio_data_ptr &data)
     return isFilled;
 }
 
-bool yas::test::is_equal_data_flexibly(audio_data_ptr &data1, audio_data_ptr &data2)
+bool yas::test::is_equal_data_flexibly(pcm_buffer_ptr &data1, pcm_buffer_ptr &data2)
 {
     if (data1->format()->channel_count() != data2->format()->channel_count()) {
         return NO;
@@ -126,7 +126,7 @@ bool yas::test::is_equal_data_flexibly(audio_data_ptr &data1, audio_data_ptr &da
     return YES;
 }
 
-yas::audio_pointer yas::test::data_ptr_from_data(audio_data_ptr &data, const UInt32 channel, const UInt32 frame)
+yas::audio_pointer yas::test::data_ptr_from_data(pcm_buffer_ptr &data, const UInt32 channel, const UInt32 frame)
 {
     audio_frame_enumerator enumerator(data);
     enumerator.set_frame_position(frame);
@@ -142,7 +142,7 @@ void yas::test::audio_unit_render_on_sub_thread(std::shared_ptr<audio_unit> audi
                    [audio_unit, format, frame_length, count, wait]() {
                        AudioUnitRenderActionFlags action_flags = 0;
 
-                       yas::audio_data_ptr data = yas::audio_data::create(format, frame_length);
+                       yas::pcm_buffer_ptr data = yas::pcm_buffer::create(format, frame_length);
 
                        for (NSInteger i = 0; i < count; i++) {
                            yas::audio_time audio_time(frame_length * i, format->sample_rate());

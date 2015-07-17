@@ -4,7 +4,7 @@
 //
 
 #include "yas_audio_enumerator.h"
-#include "yas_audio_data.h"
+#include "yas_pcm_buffer.h"
 #include "yas_audio_format.h"
 #include <string>
 
@@ -24,7 +24,7 @@ audio_enumerator::audio_enumerator(const audio_pointer &pointer, const UInt32 by
     _index = 0;
 }
 
-audio_enumerator::audio_enumerator(const audio_data_ptr &data, const UInt32 channel)
+audio_enumerator::audio_enumerator(const pcm_buffer_ptr &data, const UInt32 channel)
     : audio_enumerator(data->audio_ptr_at_channel(channel), data->format()->buffer_frame_byte_count(),
                        data->frame_length())
 {
@@ -79,7 +79,7 @@ audio_enumerator &audio_enumerator::operator++()
 
 #pragma mark - frame enumerator
 
-audio_frame_enumerator::audio_frame_enumerator(const audio_data_ptr &data)
+audio_frame_enumerator::audio_frame_enumerator(const pcm_buffer_ptr &data)
     : _frame(0),
       _channel(0),
       _frame_length(data->frame_length()),
