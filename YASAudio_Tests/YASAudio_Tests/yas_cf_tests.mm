@@ -51,4 +51,26 @@
     CFRelease(array);
 }
 
+- (void)testStringToCFString
+{
+    std::string string("test_string");
+
+    CFStringRef cf_string = yas::to_cf_string(string);
+
+    CFComparisonResult result = CFStringCompare(cf_string, CFSTR("test_string"), kNilOptions);
+
+    XCTAssertEqual(result, kCFCompareEqualTo);
+}
+
+- (void)testCFStringToString
+{
+    CFStringRef cf_string = CFSTR("test_cf_string");
+
+    std::string string = yas::to_string(cf_string);
+
+    XCTAssertTrue(string == std::string("test_cf_string"));
+
+    CFRelease(cf_string);
+}
+
 @end
