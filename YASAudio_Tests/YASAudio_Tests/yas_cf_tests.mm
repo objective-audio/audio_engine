@@ -73,4 +73,40 @@
     CFRelease(cf_string);
 }
 
+- (void)testFloat32ToCFNumber
+{
+    Float32 value = 1.5;
+
+    CFNumberRef cf_number = yas::to_cf_object(value);
+
+    XCTAssertEqual(CFNumberCompare(cf_number, (CFNumberRef)(@1.5), nullptr), kCFCompareEqualTo);
+}
+
+- (void)testFloat64ToCFNumber
+{
+    Float64 value = 2.6;
+
+    CFNumberRef cf_number = yas::to_cf_object(value);
+
+    XCTAssertEqual(CFNumberCompare(cf_number, (CFNumberRef)(@2.6), nullptr), kCFCompareEqualTo);
+}
+
+- (void)testSInt32ToCFNumber
+{
+    SInt32 value = 3;
+
+    CFNumberRef cf_number = yas::to_cf_object(value);
+
+    XCTAssertEqual(CFNumberCompare(cf_number, (CFNumberRef)(@3), nullptr), kCFCompareEqualTo);
+}
+
+- (void)testSInt16ToCFNumber
+{
+    SInt16 value = 123;
+
+    CFNumberRef cf_number = yas::to_cf_object(value);
+
+    XCTAssertEqual(CFNumberCompare(cf_number, (CFNumberRef)(@123), nullptr), kCFCompareEqualTo);
+}
+
 @end

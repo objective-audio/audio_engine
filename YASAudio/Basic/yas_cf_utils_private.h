@@ -31,3 +31,11 @@ T yas::get_cf_property(T &_property)
     }
     return nullptr;
 }
+
+template <typename T>
+CFNumberRef yas::to_cf_object(const T &value)
+{
+    CFNumberRef number = CFNumberCreate(kCFAllocatorDefault, cf_number_type(value), &value);
+    CFAutorelease(number);
+    return number;
+}
