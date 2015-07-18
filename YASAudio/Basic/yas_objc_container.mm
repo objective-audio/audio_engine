@@ -34,7 +34,7 @@ objc_container::objc_container() : _strong_object(nil), _weak_object(nil), _is_s
 
 objc_container::objc_container(const id object, strong_t) : _strong_object(object), _weak_object(nil), _is_strong(true)
 {
-    YASRetain(object);
+    YASRetainOrIgnore(object);
 }
 
 objc_container::objc_container(const id object, weak_t) : _strong_object(nil), _weak_object(object), _is_strong(false)
@@ -128,7 +128,7 @@ void objc_container::set_object(const id object)
 {
     std::lock_guard<std::recursive_mutex> lock(_mutex);
     if (_is_strong) {
-        YASRetain(object);
+        YASRetainOrIgnore(object);
         YASRelease(_strong_object);
         _strong_object = object;
     } else {
