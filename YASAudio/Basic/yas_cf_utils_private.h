@@ -49,7 +49,8 @@ template <typename T>
 CFArrayRef yas::to_cf_object(const std::vector<T> &vector)
 {
     CFMutableArrayRef array = CFArrayCreateMutable(kCFAllocatorDefault, vector.size(), &kCFTypeArrayCallBacks);
-    for (T &value : vector) {
+
+    for (const T &value : vector) {
         CFTypeRef cf_object = yas::to_cf_object(value);
         CFArrayAppendValue(array, cf_object);
     }
