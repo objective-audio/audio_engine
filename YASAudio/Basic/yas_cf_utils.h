@@ -6,6 +6,8 @@
 #pragma once
 
 #include <string>
+#include <map>
+#include <vector>
 #include <CoreFoundation/CoreFoundation.h>
 
 namespace yas
@@ -28,6 +30,12 @@ namespace yas
 
     template <typename T>
     CFNumberRef to_cf_object(const T &);
+
+    template <typename T>
+    CFArrayRef to_cf_object(const std::vector<T> &vector);
+
+    template <typename K, typename T>
+    CFDictionaryRef to_cf_object(const std::map<K, T> &map);
 }
 
 #include "yas_cf_utils_private.h"
