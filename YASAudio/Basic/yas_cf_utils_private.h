@@ -39,3 +39,8 @@ CFNumberRef yas::to_cf_object(const T &value)
     CFAutorelease(number);
     return number;
 }
+
+template CFNumberRef yas::to_cf_object(const Float32 &);
+template CFNumberRef yas::to_cf_object(const Float64 &);
+template CFNumberRef yas::to_cf_object(const SInt32 &);
+template CFNumberRef yas::to_cf_object(const SInt16 &);
