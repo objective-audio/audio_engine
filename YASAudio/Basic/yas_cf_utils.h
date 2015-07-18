@@ -17,7 +17,7 @@ namespace yas
     T get_cf_property(T &_property);
 
     std::string to_string(const CFStringRef &cf_string);
-    CFStringRef to_cf_string(const std::string &string);
+    CFStringRef to_cf_object(const std::string &string);
 }
 
 #include "yas_cf_utils_private.h"

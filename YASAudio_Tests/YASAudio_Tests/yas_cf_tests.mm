@@ -55,7 +55,7 @@
 {
     std::string string("test_string");
 
-    CFStringRef cf_string = yas::to_cf_string(string);
+    CFStringRef cf_string = yas::to_cf_object(string);
 
     CFComparisonResult result = CFStringCompare(cf_string, CFSTR("test_string"), kNilOptions);
 
