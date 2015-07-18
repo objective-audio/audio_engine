@@ -109,4 +109,47 @@
     XCTAssertEqual(CFNumberCompare(cf_number, (CFNumberRef)(@123), nullptr), kCFCompareEqualTo);
 }
 
+- (void)testVectorToCFArray
+{
+    std::string value1 = "test_value_1";
+    std::string value2 = "test_value_2";
+    std::vector<std::string> vector{value1, value2};
+
+    CFArrayRef cf_array = yas::to_cf_object(vector);
+
+    XCTAssertEqual(CFArrayGetCount(cf_array), 2);
+
+    const CFStringRef cf_value1 = static_cast<CFStringRef>(CFArrayGetValueAtIndex(cf_array, 0));
+    const CFStringRef cf_value2 = static_cast<CFStringRef>(CFArrayGetValueAtIndex(cf_array, 1));
+
+    XCTAssertTrue(CFStringCompare(cf_value1, CFSTR("test_value_1"), kNilOptions) == kCFCompareEqualTo);
+    XCTAssertTrue(CFStringCompare(cf_value2, CFSTR("test_value_2"), kNilOptions) == kCFCompareEqualTo);
+}
+
+- (void)testMapToCFDictionary
+{
+    const std::string key1 = "key_1";
+    const int value1 = 10;
+
+    const std::string key2 = "key_2";
+    const int value2 = 20;
+
+    std::map<std::string, int> map{{key1, value1}, {key2, value2}};
+
+    const CFDictionaryRef cf_dictionary = yas::to_cf_object(map);
+
+    const CFStringRef cf_key1 = CFSTR("key_1");
+    const CFStringRef cf_key2 = CFSTR("key_2");
+
+    XCTAssertEqual(CFDictionaryGetCount(cf_dictionary), 2);
+    XCTAssertTrue(CFDictionaryContainsKey(cf_dictionary, CFSTR("key_1")));
+    XCTAssertTrue(CFDictionaryContainsKey(cf_dictionary, CFSTR("key_1")));
+
+    CFNumberRef cf_value1 = static_cast<CFNumberRef>(CFDictionaryGetValue(cf_dictionary, cf_key1));
+    CFNumberRef cf_value2 = static_cast<CFNumberRef>(CFDictionaryGetValue(cf_dictionary, cf_key2));
+
+    XCTAssertTrue(CFNumberCompare(cf_value1, (CFNumberRef)(@(10)), nullptr) == kCFCompareEqualTo);
+    XCTAssertTrue(CFNumberCompare(cf_value2, (CFNumberRef)(@(20)), nullptr) == kCFCompareEqualTo);
+}
+
 @end
