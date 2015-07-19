@@ -19,7 +19,7 @@ namespace yas
         };
     };
 
-    union audio_pointer {
+    union flex_pointer {
         void *v;
         Float32 *f32;
         Float64 *f64;

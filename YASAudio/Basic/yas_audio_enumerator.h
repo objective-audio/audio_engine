@@ -16,10 +16,10 @@ namespace yas
     class audio_enumerator
     {
        public:
-        audio_enumerator(const audio_pointer &pointer, const UInt32 byte_stride, const UInt32 length);
+        audio_enumerator(const flex_pointer &pointer, const UInt32 byte_stride, const UInt32 length);
         audio_enumerator(const pcm_buffer_ptr &data, const UInt32 channel);
 
-        const audio_pointer *pointer() const;
+        const flex_pointer *pointer() const;
         const UInt32 *index() const;
         const UInt32 length() const;
 
@@ -30,8 +30,8 @@ namespace yas
 
         audio_enumerator &operator++();
 
-        audio_pointer _pointer;
-        audio_pointer _top_pointer;
+        flex_pointer _pointer;
+        flex_pointer _top_pointer;
         UInt32 _byte_stride;
         UInt32 _length;
         UInt32 _index;
@@ -42,7 +42,7 @@ namespace yas
        public:
         explicit audio_frame_enumerator(const pcm_buffer_ptr &data);
 
-        const audio_pointer *pointer() const;
+        const flex_pointer *pointer() const;
         const UInt32 *frame() const;
         const UInt32 *channel() const;
         const UInt32 frame_length() const;
@@ -58,9 +58,9 @@ namespace yas
 
         audio_frame_enumerator &operator++();
 
-        audio_pointer _pointer;
-        std::vector<audio_pointer> _pointers;
-        std::vector<audio_pointer> _top_pointers;
+        flex_pointer _pointer;
+        std::vector<flex_pointer> _pointers;
+        std::vector<flex_pointer> _top_pointers;
         UInt32 _pointers_size;
         UInt32 _frame_byte_stride;
         UInt32 _frame_length;
@@ -123,5 +123,5 @@ namespace yas
 #define yas_audio_frame_enumerator_reset(__v)                                                                  \
     (__v)._frame = 0;                                                                                          \
     (__v)._channel = 0;                                                                                        \
-    memcpy(&(__v)._pointers[0], &(__v)._top_pointers[0], (__v)._channel_count * sizeof(yas::audio_pointer *)); \
+    memcpy(&(__v)._pointers[0], &(__v)._top_pointers[0], (__v)._channel_count * sizeof(yas::flex_pointer *)); \
     (__v)._pointer.v = (__v)._pointers[0].v;

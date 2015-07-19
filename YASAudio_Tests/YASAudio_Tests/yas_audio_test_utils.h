@@ -28,7 +28,7 @@ namespace yas
         bool is_cleard_data(pcm_buffer_ptr &data);
         bool is_filled_data(pcm_buffer_ptr &data);
         bool is_equal_data_flexibly(pcm_buffer_ptr &data1, pcm_buffer_ptr &data2);
-        audio_pointer data_ptr_from_data(pcm_buffer_ptr &data, const UInt32 channel, const UInt32 frame);
+        flex_pointer data_ptr_from_data(pcm_buffer_ptr &data, const UInt32 channel, const UInt32 frame);
 
         void audio_unit_render_on_sub_thread(std::shared_ptr<audio_unit> audio_unit, yas::audio_format_ptr format,
                                              const UInt32 frame_length, const NSUInteger count,

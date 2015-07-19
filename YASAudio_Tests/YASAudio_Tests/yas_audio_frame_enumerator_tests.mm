@@ -36,7 +36,7 @@
     yas::test::fill_test_values_to_data(data);
 
     yas::audio_frame_enumerator enumerator(data);
-    const yas::audio_pointer *pointer = enumerator.pointer();
+    const yas::flex_pointer *pointer = enumerator.pointer();
     const UInt32 *pointerFrame = enumerator.frame();
     const UInt32 *pointerChannel = enumerator.channel();
 
@@ -73,7 +73,7 @@
     yas::test::fill_test_values_to_data(data);
 
     yas::audio_frame_enumerator enumerator(data);
-    const yas::audio_pointer *pointer = enumerator.pointer();
+    const yas::flex_pointer *pointer = enumerator.pointer();
     const UInt32 *pointerFrame = enumerator.frame();
     const UInt32 *pointerChannel = enumerator.channel();
 
@@ -110,7 +110,7 @@
     yas::test::fill_test_values_to_data(data);
 
     yas::audio_frame_enumerator enumerator(data);
-    const yas::audio_pointer *pointer = enumerator.pointer();
+    const yas::flex_pointer *pointer = enumerator.pointer();
     const UInt32 *pointerFrame = enumerator.frame();
     const UInt32 *pointerChannel = enumerator.channel();
 
@@ -145,7 +145,7 @@
     yas::test::fill_test_values_to_data(data);
 
     yas::audio_frame_enumerator enumerator(data);
-    const yas::audio_pointer *pointer = enumerator.pointer();
+    const yas::flex_pointer *pointer = enumerator.pointer();
     const UInt32 *pointerFrame = enumerator.frame();
     const UInt32 *pointerChannel = enumerator.channel();
 
@@ -179,7 +179,7 @@
     XCTAssertEqual(format->buffer_count(), channels);
 
     yas::audio_frame_enumerator mutable_enumerator(data);
-    const yas::audio_pointer *mutablePointer = mutable_enumerator.pointer();
+    const yas::flex_pointer *mutablePointer = mutable_enumerator.pointer();
     const UInt32 *mutablePointerFrame = mutable_enumerator.frame();
     const UInt32 *mutablePointerChannel = mutable_enumerator.channel();
 
@@ -200,7 +200,7 @@
     XCTAssertEqual(frame, frame_length);
 
     yas::audio_frame_enumerator enumerator(data);
-    const yas::audio_pointer *pointer = enumerator.pointer();
+    const yas::flex_pointer *pointer = enumerator.pointer();
     const UInt32 *pointerFrame = enumerator.frame();
     const UInt32 *pointerChannel = enumerator.channel();
 
@@ -221,13 +221,13 @@
     auto format = yas::audio_format::create(48000, 1);
     auto data = yas::pcm_buffer::create(format, frame_length);
 
-    yas::audio_pointer bufferPointer = data->audio_ptr_at_buffer(0);
+    yas::flex_pointer bufferPointer = data->audio_ptr_at_buffer(0);
     for (UInt32 frame = 0; frame < frame_length; frame++) {
         bufferPointer.f32[frame] = yas::test::test_value(frame, 0, 0);
     }
 
     yas::audio_frame_enumerator enumerator(data);
-    const yas::audio_pointer *pointer = enumerator.pointer();
+    const yas::flex_pointer *pointer = enumerator.pointer();
     const UInt32 *pointerFrame = enumerator.frame();
 
     XCTAssertEqual(*pointerFrame, 0);
@@ -258,13 +258,13 @@
     auto format = yas::audio_format::create(48000, channels, yas::pcm_format::float32, true);
     auto data = yas::pcm_buffer::create(format, 1);
 
-    yas::audio_pointer bufferPointer = data->audio_ptr_at_buffer(0);
+    yas::flex_pointer bufferPointer = data->audio_ptr_at_buffer(0);
     for (UInt32 ch = 0; ch < channels; ch++) {
         bufferPointer.f32[ch] = yas::test::test_value(0, ch, 0);
     }
 
     yas::audio_frame_enumerator enumerator(data);
-    const yas::audio_pointer *pointer = enumerator.pointer();
+    const yas::flex_pointer *pointer = enumerator.pointer();
     const UInt32 *pointerChannel = enumerator.channel();
 
     XCTAssertEqual(*pointerChannel, 0);
@@ -292,7 +292,7 @@
         yas::test::fill_test_values_to_data(data);
 
         yas::audio_frame_enumerator enumerator(data);
-        const yas::audio_pointer *pointer = enumerator.pointer();
+        const yas::flex_pointer *pointer = enumerator.pointer();
         const UInt32 *frame = enumerator.frame();
         const UInt32 *channel = enumerator.channel();
 
@@ -339,7 +339,7 @@
     auto data = yas::pcm_buffer::create(format, frame_length);
 
     yas::audio_frame_enumerator enumerator(data);
-    const yas::audio_pointer *pointer = enumerator.pointer();
+    const yas::flex_pointer *pointer = enumerator.pointer();
     const UInt32 *frame = enumerator.frame();
     const UInt32 *channel = enumerator.channel();
 

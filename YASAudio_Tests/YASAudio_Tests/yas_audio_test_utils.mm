@@ -32,7 +32,7 @@ void yas::test::fill_test_values_to_data(pcm_buffer_ptr &data)
     const UInt32 stride = format->stride();
 
     for (UInt32 buffer = 0; buffer < bufferCount; buffer++) {
-        audio_pointer pointer = data->audio_ptr_at_buffer(buffer);
+        flex_pointer pointer = data->audio_ptr_at_buffer(buffer);
         for (UInt32 frame = 0; frame < data->frame_length(); frame++) {
             for (UInt32 ch = 0; ch < stride; ch++) {
                 UInt32 index = frame * stride + ch;
@@ -82,7 +82,7 @@ bool yas::test::is_filled_data(pcm_buffer_ptr &data)
     const void *zeroBytes = [zeroData bytes];
 
     audio_frame_enumerator enumerator(data);
-    const audio_pointer *pointer = enumerator.pointer();
+    const flex_pointer *pointer = enumerator.pointer();
 
     while (pointer->v) {
         if (YASAudioIsEqualData(pointer->v, zeroBytes, sample_byte_count)) {
@@ -115,8 +115,8 @@ bool yas::test::is_equal_data_flexibly(pcm_buffer_ptr &data1, pcm_buffer_ptr &da
 
     for (UInt32 ch = 0; ch < data1->format()->channel_count(); ch++) {
         for (UInt32 frame = 0; frame < data1->frame_length(); frame++) {
-            yas::audio_pointer ptr1 = data_ptr_from_data(data1, ch, frame);
-            yas::audio_pointer ptr2 = data_ptr_from_data(data2, ch, frame);
+            yas::flex_pointer ptr1 = data_ptr_from_data(data1, ch, frame);
+            yas::flex_pointer ptr2 = data_ptr_from_data(data2, ch, frame);
             if (!YASAudioIsEqualData(ptr1.v, ptr2.v, data1->format()->sample_byte_count())) {
                 return NO;
             }
@@ -126,7 +126,7 @@ bool yas::test::is_equal_data_flexibly(pcm_buffer_ptr &data1, pcm_buffer_ptr &da
     return YES;
 }
 
-yas::audio_pointer yas::test::data_ptr_from_data(pcm_buffer_ptr &data, const UInt32 channel, const UInt32 frame)
+yas::flex_pointer yas::test::data_ptr_from_data(pcm_buffer_ptr &data, const UInt32 channel, const UInt32 frame)
 {
     audio_frame_enumerator enumerator(data);
     enumerator.set_frame_position(frame);

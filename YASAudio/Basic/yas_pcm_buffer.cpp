@@ -211,7 +211,7 @@ const AudioBufferList *pcm_buffer::audio_buffer_list() const
     return _impl->abl_ptr;
 }
 
-audio_pointer pcm_buffer::audio_ptr_at_buffer(const UInt32 buffer) const
+flex_pointer pcm_buffer::audio_ptr_at_buffer(const UInt32 buffer) const
 {
     if (buffer >= _impl->abl_ptr->mNumberBuffers) {
         throw std::out_of_range(std::string(__PRETTY_FUNCTION__) + " : out of range. buffer(" + std::to_string(buffer) +
@@ -219,12 +219,12 @@ audio_pointer pcm_buffer::audio_ptr_at_buffer(const UInt32 buffer) const
                                 ")");
     }
 
-    return audio_pointer{.v = _impl->abl_ptr->mBuffers[buffer].mData};
+    return flex_pointer{.v = _impl->abl_ptr->mBuffers[buffer].mData};
 }
 
-audio_pointer pcm_buffer::audio_ptr_at_channel(const UInt32 channel) const
+flex_pointer pcm_buffer::audio_ptr_at_channel(const UInt32 channel) const
 {
-    audio_pointer pointer{.v = nullptr};
+    flex_pointer pointer{.v = nullptr};
 
     const UInt32 stride = format()->stride();
     const AudioBufferList *abl_ptr = _impl->abl_ptr;
