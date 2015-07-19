@@ -3,7 +3,7 @@
 //  Copyright (c) 2015 Yuki Yasoshima.
 //
 
-#pragma mark -
+#pragma once
 
 #include <memory>
 #include <string>
