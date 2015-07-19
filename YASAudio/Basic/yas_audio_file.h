@@ -75,7 +75,7 @@ namespace yas
         audio_file_reader();
         ~audio_file_reader();
 
-        read_result read_into_data(pcm_buffer_ptr &data, const UInt32 frame_length = 0);
+        read_result read_into_buffer(pcm_buffer_ptr &buffer, const UInt32 frame_length = 0);
 
        private:
         audio_file_reader(const audio_file_reader &) = delete;
@@ -113,7 +113,7 @@ namespace yas
         audio_file_writer();
         ~audio_file_writer();
 
-        write_result write_from_data(const pcm_buffer_ptr &data, const bool async = false);
+        write_result write_from_buffer(const pcm_buffer_ptr &data, const bool async = false);
 
        private:
         audio_file_writer(const audio_file_writer &) = delete;

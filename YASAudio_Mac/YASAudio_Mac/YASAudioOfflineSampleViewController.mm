@@ -266,7 +266,7 @@ static Float64 YASAudioOfflineSampleSampleRate = 44100.0;
             UInt32 frame_length = MIN(remain, pcm_buffer->frame_length());
             if (frame_length > 0) {
                 pcm_buffer->set_frame_length(frame_length);
-                auto write_result = file_writer->write_from_data(pcm_buffer);
+                auto write_result = file_writer->write_from_buffer(pcm_buffer);
                 if (!write_result) {
                     std::cout << __PRETTY_FUNCTION__ << " - error:" << yas::to_string(write_result.error())
                               << std::endl;

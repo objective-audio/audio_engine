@@ -72,14 +72,14 @@ namespace yas
 
     void clear(AudioBufferList *abl);
 
-    pcm_buffer::copy_result copy_data(const pcm_buffer_ptr &from_data, pcm_buffer_ptr &to_data);
-    pcm_buffer::copy_result copy_data(const pcm_buffer_ptr &from_data, pcm_buffer_ptr &to_data,
+    pcm_buffer::copy_result copy_data(const pcm_buffer_ptr &from_buffer, pcm_buffer_ptr &to_buffer);
+    pcm_buffer::copy_result copy_data(const pcm_buffer_ptr &from_buffer, pcm_buffer_ptr &to_buffer,
                                       const UInt32 from_start_frame, const UInt32 to_start_frame, const UInt32 length);
     pcm_buffer::copy_result copy_data_flexibly(const AudioBufferList *&from_abl, AudioBufferList *&to_abl,
                                                const UInt32 sample_byte_count, UInt32 *out_frame_length);
-    pcm_buffer::copy_result copy_data_flexibly(const pcm_buffer_ptr &from_data, pcm_buffer_ptr &to_data);
-    pcm_buffer::copy_result copy_data_flexibly(const pcm_buffer_ptr &from_data, AudioBufferList *to_abl);
-    pcm_buffer::copy_result copy_data_flexibly(const AudioBufferList *from_abl, pcm_buffer_ptr &to_data);
+    pcm_buffer::copy_result copy_data_flexibly(const pcm_buffer_ptr &from_buffer, pcm_buffer_ptr &to_buffer);
+    pcm_buffer::copy_result copy_data_flexibly(const pcm_buffer_ptr &from_buffer, AudioBufferList *to_abl);
+    pcm_buffer::copy_result copy_data_flexibly(const AudioBufferList *from_abl, pcm_buffer_ptr &to_buffer);
 
     UInt32 frame_length(const AudioBufferList *abl, const UInt32 sample_byte_count);
 

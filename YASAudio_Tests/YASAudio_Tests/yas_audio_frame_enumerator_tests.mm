@@ -33,7 +33,7 @@
 
     XCTAssertEqual(format->buffer_count(), channels);
 
-    yas::test::fill_test_values_to_data(data);
+    yas::test::fill_test_values_to_buffer(data);
 
     yas::audio_frame_enumerator enumerator(data);
     auto pointer = enumerator.pointer();
@@ -70,7 +70,7 @@
 
     XCTAssertEqual(format->stride(), channels);
 
-    yas::test::fill_test_values_to_data(data);
+    yas::test::fill_test_values_to_buffer(data);
 
     yas::audio_frame_enumerator enumerator(data);
     auto pointer = enumerator.pointer();
@@ -107,7 +107,7 @@
 
     XCTAssertEqual(format->stride(), channels);
 
-    yas::test::fill_test_values_to_data(data);
+    yas::test::fill_test_values_to_buffer(data);
 
     yas::audio_frame_enumerator enumerator(data);
     auto pointer = enumerator.pointer();
@@ -142,7 +142,7 @@
     auto format = yas::audio_format::create(48000, channels);
     auto data = yas::pcm_buffer::create(format, frame_length);
 
-    yas::test::fill_test_values_to_data(data);
+    yas::test::fill_test_values_to_buffer(data);
 
     yas::audio_frame_enumerator enumerator(data);
     auto pointer = enumerator.pointer();
@@ -289,7 +289,7 @@
         auto format = yas::audio_format::create(48000.0, channels, pcmFormat, false);
         auto data = yas::pcm_buffer::create(format, frame_length);
 
-        yas::test::fill_test_values_to_data(data);
+        yas::test::fill_test_values_to_buffer(data);
 
         yas::audio_frame_enumerator enumerator(data);
         auto pointer = enumerator.pointer();
