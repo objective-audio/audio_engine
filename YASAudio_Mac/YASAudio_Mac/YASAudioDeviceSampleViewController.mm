@@ -97,7 +97,7 @@ namespace yas
                 const yas::audio_format_ptr format = output_data->format();
                 if (format->pcm_format() == yas::pcm_format::float32 && format->stride() == 1) {
                     yas::audio_frame_enumerator enumerator(output_data);
-                    const yas::audio_pointer *pointer = enumerator.pointer();
+                    auto pointer = enumerator.pointer();
 
                     if (input_data) {
                         if (input_data->frame_length() >= frame_length) {

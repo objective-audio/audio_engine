@@ -115,8 +115,8 @@ bool yas::test::is_equal_data_flexibly(pcm_buffer_ptr &data1, pcm_buffer_ptr &da
 
     for (UInt32 ch = 0; ch < data1->format()->channel_count(); ch++) {
         for (UInt32 frame = 0; frame < data1->frame_length(); frame++) {
-            yas::flex_pointer ptr1 = data_ptr_from_data(data1, ch, frame);
-            yas::flex_pointer ptr2 = data_ptr_from_data(data2, ch, frame);
+            auto ptr1 = data_ptr_from_data(data1, ch, frame);
+            auto ptr2 = data_ptr_from_data(data2, ch, frame);
             if (!YASAudioIsEqualData(ptr1.v, ptr2.v, data1->format()->sample_byte_count())) {
                 return NO;
             }

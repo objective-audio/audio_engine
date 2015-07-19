@@ -241,21 +241,21 @@
 
         for (UInt32 ch = 0; ch < channels; ch++) {
             for (UInt32 i = 0; i < length; i++) {
-                yas::flex_pointer fromPtr = yas::test::data_ptr_from_data(from_data, ch, from_start_frame + i);
-                yas::flex_pointer toPtr = yas::test::data_ptr_from_data(to_data, ch, to_start_frame + i);
-                XCTAssertEqual(memcmp(fromPtr.v, toPtr.v, format->sample_byte_count()), 0);
-                BOOL isFromNotZero = NO;
-                BOOL isToNotZero = NO;
+                auto from_ptr = yas::test::data_ptr_from_data(from_data, ch, from_start_frame + i);
+                auto to_ptr = yas::test::data_ptr_from_data(to_data, ch, to_start_frame + i);
+                XCTAssertEqual(memcmp(from_ptr.v, to_ptr.v, format->sample_byte_count()), 0);
+                BOOL is_from_not_zero = NO;
+                BOOL is_to_not_zero = NO;
                 for (UInt32 j = 0; j < format->sample_byte_count(); j++) {
-                    if (fromPtr.u8[j] != 0) {
-                        isFromNotZero = YES;
+                    if (from_ptr.u8[j] != 0) {
+                        is_from_not_zero = YES;
                     }
-                    if (toPtr.u8[j] != 0) {
-                        isToNotZero = YES;
+                    if (to_ptr.u8[j] != 0) {
+                        is_to_not_zero = YES;
                     }
                 }
-                XCTAssertTrue(isFromNotZero);
-                XCTAssertTrue(isToNotZero);
+                XCTAssertTrue(is_from_not_zero);
+                XCTAssertTrue(is_to_not_zero);
             }
         }
     }
@@ -414,8 +414,8 @@
     auto source_data = yas::pcm_buffer::create(source_format, *dest_data, channel_routes, true);
 
     for (UInt32 ch = 0; ch < source_channels; ++ch) {
-        yas::flex_pointer dest_ptr = dest_data->audio_ptr_at_buffer(dest_channel_indices[ch]);
-        yas::flex_pointer source_ptr = source_data->audio_ptr_at_buffer(ch);
+        auto dest_ptr = dest_data->audio_ptr_at_buffer(dest_channel_indices[ch]);
+        auto source_ptr = source_data->audio_ptr_at_buffer(ch);
         XCTAssertEqual(dest_ptr.v, source_ptr.v);
         for (UInt32 frame = 0; frame < frame_length; frame++) {
             Float32 value = source_ptr.f32[frame];
@@ -447,8 +447,8 @@
     auto dest_data = yas::pcm_buffer::create(dest_format, *source_data, channel_routes, false);
 
     for (UInt32 ch = 0; ch < dest_channels; ch++) {
-        yas::flex_pointer dest_ptr = dest_data->audio_ptr_at_buffer(ch);
-        yas::flex_pointer source_ptr = source_data->audio_ptr_at_buffer(source_channel_indices[ch]);
+        auto dest_ptr = dest_data->audio_ptr_at_buffer(ch);
+        auto source_ptr = source_data->audio_ptr_at_buffer(source_channel_indices[ch]);
         XCTAssertEqual(dest_ptr.v, source_ptr.v);
         for (UInt32 frame = 0; frame < frame_length; frame++) {
             Float32 value = dest_ptr.f32[frame];
