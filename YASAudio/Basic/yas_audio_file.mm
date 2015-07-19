@@ -240,7 +240,7 @@ audio_file_reader::read_result audio_file_reader::read_into_data(pcm_buffer_ptr 
     if (!_impl->ext_audio_file) {
         return read_result(read_error_type::closed);
     }
-    
+
     if (!data) {
         return read_result(read_error_type::invalid_argument);
     }
@@ -302,6 +302,32 @@ audio_file_reader::read_result audio_file_reader::read_into_data(pcm_buffer_ptr 
     return read_result(nullptr);
 }
 
+std::string yas::to_string(const audio_file_reader::create_error_type &error_type)
+{
+    switch (error_type) {
+        case audio_file_reader::create_error_type::invalid_argument:
+            return "invalid_argument";
+        case audio_file_reader::create_error_type::open_failed:
+            return "open_failed";
+    }
+}
+
+std::string yas::to_string(const audio_file_reader::read_error_type &error_type)
+{
+    switch (error_type) {
+        case audio_file_reader::read_error_type::closed:
+            return "closed";
+        case audio_file_reader::read_error_type::invalid_argument:
+            return "invalid_argument";
+        case audio_file_reader::read_error_type::invalid_format:
+            return "invalid_format";
+        case audio_file_reader::read_error_type::read_failed:
+            return "read_failed";
+        case audio_file_reader::read_error_type::tell_failed:
+            return "tell_failed";
+    }
+}
+
 #pragma mark - audio file writer
 
 audio_file_writer::create_result audio_file_writer::create(const CFURLRef file_url, const CFStringRef file_type,
@@ -337,7 +363,7 @@ audio_file_writer::write_result audio_file_writer::write_from_data(const pcm_buf
     if (!_impl->ext_audio_file) {
         return write_result(write_error_type::closed);
     }
-    
+
     if (!data) {
         return write_result(write_error_type::invalid_argument);
     }
@@ -364,4 +390,30 @@ audio_file_writer::write_result audio_file_writer::write_from_data(const pcm_buf
     }
 
     return write_result(nullptr);
+}
+
+std::string yas::to_string(const audio_file_writer::create_error_type &error_type)
+{
+    switch (error_type) {
+        case audio_file_writer::create_error_type::invalid_argument:
+            return "invalid_argument";
+        case audio_file_writer::create_error_type::create_failed:
+            return "open_failed";
+    }
+}
+
+std::string yas::to_string(const audio_file_writer::write_error_type &error_type)
+{
+    switch (error_type) {
+        case audio_file_writer::write_error_type::closed:
+            return "closed";
+        case audio_file_writer::write_error_type::invalid_argument:
+            return "invalid_argument";
+        case audio_file_writer::write_error_type::invalid_format:
+            return "invalid_format";
+        case audio_file_writer::write_error_type::write_failed:
+            return "read_failed";
+        case audio_file_writer::write_error_type::tell_failed:
+            return "tell_failed";
+    }
 }
