@@ -237,22 +237,16 @@ static Float64 YASAudioOfflineSampleSampleRate = 44100.0;
 {
     self.processing = YES;
 
-    NSError *error = nil;
+    auto wave_settings = yas::wave_file_settings(YASAudioOfflineSampleSampleRate, 2, 16);
+    auto create_result =
+        yas::audio_file_writer::create((__bridge CFURLRef)url, yas::audio_file_type::wave, wave_settings);
 
-    NSDictionary *waveSettings = [NSDictionary yas_waveFileSettingsWithSampleRate:YASAudioOfflineSampleSampleRate
-                                                                 numberOfChannels:2
-                                                                         bitDepth:16];
-    YASAudioFileWriter *fileWriter = [[YASAudioFileWriter alloc] initWithURL:url
-                                                                    fileType:YASAudioFileTypeWAVE
-                                                                    settings:waveSettings
-                                                                   pcmFormat:YASAudioPCMFormatFloat32
-                                                                 interleaved:NO
-                                                                       error:&error];
-
-    if (error) {
-        NSLog(@"%s error = %@", __PRETTY_FUNCTION__, error);
+    if (!create_result) {
+        NSLog(@"%s create file writer error", __PRETTY_FUNCTION__);
         return;
     }
+
+    auto file_writer = create_result.value();
 
     __block UInt32 remain = self.length * YASAudioOfflineSampleSampleRate;
 
@@ -261,30 +255,33 @@ static Float64 YASAudioOfflineSampleSampleRate = 44100.0;
     offlineSineNode.playing = YES;
     [self.offlineMixerNode setInputVolume:self.volume forBus:@0];
 
+    NSError *error = nil;
+
     if (![self.offlineEngine startOfflineRenderWithOutputCallbackBlock:^(YASAudioData *data, AVAudioTime *when,
                                                                          BOOL *stop) {
-            UInt32 frameLength = MIN(remain, data.frameLength);
-            if (frameLength > 0) {
-                NSError *error = nil;
-                data.frameLength = frameLength;
-                if (![fileWriter writeSyncFromData:data error:&error]) {
-                    NSLog(@"%s error = %@", __PRETTY_FUNCTION__, error);
+            auto format = yas::audio_format::create(*data.format.streamDescription);
+            auto pcm_buffer = yas::pcm_buffer::create(format, data.mutableAudioBufferList);
+            pcm_buffer->set_frame_length(data.frameLength);
+
+            UInt32 frame_length = MIN(remain, pcm_buffer->frame_length());
+            if (frame_length > 0) {
+                pcm_buffer->set_frame_length(frame_length);
+                if (!file_writer->write_from_data(pcm_buffer)) {
+                    NSLog(@"%s write error.", __PRETTY_FUNCTION__);
                 }
             }
 
-            remain -= frameLength;
+            remain -= frame_length;
             if (remain == 0) {
-                [fileWriter close];
+                file_writer->close();
                 *stop = YES;
             }
         } completionBlock:^(BOOL cancelled) {
             self.processing = NO;
         } error:&error]) {
         self.processing = NO;
-        NSLog(@"%s error = %@", __PRETTY_FUNCTION__, error);
+        NSLog(@"%s start offline render error = %@", __PRETTY_FUNCTION__, error);
     };
-
-    YASRelease(fileWriter);
 }
 
 @end
