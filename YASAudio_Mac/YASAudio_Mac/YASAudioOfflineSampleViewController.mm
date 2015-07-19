@@ -5,6 +5,7 @@
 
 #import "YASAudioOfflineSampleViewController.h"
 #import "YASAudio.h"
+#import "yas_audio.h"
 #import <Accelerate/Accelerate.h>
 
 static Float64 YASAudioOfflineSampleSampleRate = 44100.0;

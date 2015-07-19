@@ -4,7 +4,6 @@
 //
 
 #include "yas_audio_unit.h"
-#include "yas_audio_unit_parameter.h"
 #include "yas_audio_graph.h"
 #include "YASAudioUtility.h"
 

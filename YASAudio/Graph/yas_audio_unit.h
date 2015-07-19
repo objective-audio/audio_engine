@@ -6,6 +6,7 @@
 #pragma once
 
 #include "yas_audio_types.h"
+#include "yas_audio_unit_parameter.h"
 #include "yas_exception.h"
 #include <AudioToolbox/AudioToolbox.h>
 #include <vector>
@@ -19,7 +20,6 @@
 
 namespace yas
 {
-    class audio_unit_parameter;
     class audio_unit;
     using audio_unit_ptr = std::shared_ptr<audio_unit>;
 
