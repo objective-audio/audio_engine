@@ -40,8 +40,8 @@ namespace yas
         AudioBufferList *audio_buffer_list();
         const AudioBufferList *audio_buffer_list() const;
 
-        audio_pointer audio_ptr_at_buffer(const UInt32 buffer) const;
-        audio_pointer audio_ptr_at_channel(const UInt32 channel) const;
+        flex_pointer audio_ptr_at_buffer(const UInt32 buffer) const;
+        flex_pointer audio_ptr_at_channel(const UInt32 channel) const;
 
         template <typename T>
         T *audio_ptr_at_buffer(const UInt32 buffer) const;
