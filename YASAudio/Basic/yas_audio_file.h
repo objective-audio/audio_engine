@@ -84,6 +84,9 @@ namespace yas
         audio_file_reader &operator=(audio_file_reader &&) = delete;
     };
 
+    std::string to_string(const audio_file_reader::create_error_type &);
+    std::string to_string(const audio_file_reader::read_error_type &);
+
     class audio_file_writer : public audio_file
     {
        public:
@@ -118,4 +121,7 @@ namespace yas
         audio_file_writer &operator=(const audio_file_writer &) = delete;
         audio_file_writer &operator=(audio_file_writer &&) = delete;
     };
+
+    std::string to_string(const audio_file_writer::create_error_type &);
+    std::string to_string(const audio_file_writer::write_error_type &);
 }
