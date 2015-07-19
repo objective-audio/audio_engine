@@ -6,7 +6,6 @@
 #pragma once
 
 #include <memory>
-#include <functional>
 #include <AudioUnit/AUComponent.h>
 
 namespace yas
