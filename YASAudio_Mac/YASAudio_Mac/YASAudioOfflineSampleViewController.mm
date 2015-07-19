@@ -242,7 +242,7 @@ static Float64 YASAudioOfflineSampleSampleRate = 44100.0;
         yas::audio_file_writer::create((__bridge CFURLRef)url, yas::audio_file_type::wave, wave_settings);
 
     if (!create_result) {
-        NSLog(@"%s create file writer error", __PRETTY_FUNCTION__);
+        NSLog(@"%s - error = %@", __PRETTY_FUNCTION__, yas::to_cf_object(yas::to_string(create_result.error())));
         return;
     }
 
@@ -266,8 +266,10 @@ static Float64 YASAudioOfflineSampleSampleRate = 44100.0;
             UInt32 frame_length = MIN(remain, pcm_buffer->frame_length());
             if (frame_length > 0) {
                 pcm_buffer->set_frame_length(frame_length);
-                if (!file_writer->write_from_data(pcm_buffer)) {
-                    NSLog(@"%s write error.", __PRETTY_FUNCTION__);
+                auto write_result = file_writer->write_from_data(pcm_buffer);
+                if (!write_result) {
+                    NSLog(@"%s - error = %@", __PRETTY_FUNCTION__,
+                          yas::to_cf_object(yas::to_string(write_result.error())));
                 }
             }
 
