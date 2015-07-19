@@ -10,16 +10,7 @@
 #import "YASDecibelValueTransformer.h"
 #import "YASFrequencyValueFormatter.h"
 #import <Accelerate/Accelerate.h>
-#import "yas_audio_graph.h"
-#import "yas_audio_unit.h"
-#import "yas_audio_device.h"
-#import "yas_audio_device_io.h"
-#import "yas_pcm_buffer.h"
-#import "yas_audio_enumerator.h"
-#import "yas_audio_format.h"
-#import "yas_audio_time.h"
-#import "yas_observing.h"
-#import "yas_objc_container.h"
+#import "yas_audio.h"
 #import <atomic>
 #import <vector>
 
