@@ -33,7 +33,7 @@
 
     XCTAssertEqual(format->buffer_count(), channels);
 
-    yas::test::fill_test_values_to_data(data);
+    yas::test::fill_test_values_to_buffer(data);
 
     for (UInt32 buffer = 0; buffer < channels; buffer++) {
         yas::audio_enumerator enumerator(data, buffer);
@@ -64,7 +64,7 @@
 
     XCTAssertEqual(format->buffer_count(), channels);
 
-    yas::test::fill_test_values_to_data(data);
+    yas::test::fill_test_values_to_buffer(data);
 
     for (UInt32 buffer = 0; buffer < channels; buffer++) {
         yas::audio_enumerator enumerator(data, buffer);
@@ -95,7 +95,7 @@
 
     XCTAssertEqual(format->stride(), channels);
 
-    yas::test::fill_test_values_to_data(data);
+    yas::test::fill_test_values_to_buffer(data);
 
     for (UInt32 ch = 0; ch < channels; ch++) {
         yas::audio_enumerator enumerator(data, ch);

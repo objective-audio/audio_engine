@@ -235,25 +235,25 @@ audio_file_reader::~audio_file_reader()
 {
 }
 
-audio_file_reader::read_result audio_file_reader::read_into_data(pcm_buffer_ptr &data, const UInt32 frame_length)
+audio_file_reader::read_result audio_file_reader::read_into_buffer(pcm_buffer_ptr &buffer, const UInt32 frame_length)
 {
     if (!_impl->ext_audio_file) {
         return read_result(read_error_type::closed);
     }
 
-    if (!data) {
+    if (!buffer) {
         return read_result(read_error_type::invalid_argument);
     }
 
-    if (*data->format() != *processing_format()) {
+    if (*buffer->format() != *processing_format()) {
         return read_result(read_error_type::invalid_format);
     }
 
     OSStatus err = noErr;
     UInt32 out_frame_length = 0;
-    UInt32 remain_frames = frame_length > 0 ?: data->frame_capacity();
+    UInt32 remain_frames = frame_length > 0 ?: buffer->frame_capacity();
 
-    const audio_format_ptr &format = data->format();
+    const audio_format_ptr &format = buffer->format();
     const UInt32 buffer_count = format->buffer_count();
     const UInt32 stride = format->stride();
 
@@ -269,7 +269,7 @@ audio_file_reader::read_result audio_file_reader::read_into_data(pcm_buffer_ptr 
                 AudioBuffer *audioBuffer = &io_abl->mBuffers[i];
                 audioBuffer->mNumberChannels = stride;
                 audioBuffer->mDataByteSize = dataByteSize;
-                UInt8 *byte_data = static_cast<UInt8 *>(data->audio_buffer_list()->mBuffers[i].mData);
+                UInt8 *byte_data = static_cast<UInt8 *>(buffer->audio_buffer_list()->mBuffers[i].mData);
                 audioBuffer->mData = &byte_data[dataIndex];
             }
 
@@ -288,7 +288,7 @@ audio_file_reader::read_result audio_file_reader::read_into_data(pcm_buffer_ptr 
         }
     }
 
-    data->set_frame_length(out_frame_length);
+    buffer->set_frame_length(out_frame_length);
 
     if (err != noErr) {
         return read_result(read_error_type::read_failed);
@@ -358,26 +358,26 @@ audio_file_writer::~audio_file_writer()
 {
 }
 
-audio_file_writer::write_result audio_file_writer::write_from_data(const pcm_buffer_ptr &data, const bool async)
+audio_file_writer::write_result audio_file_writer::write_from_buffer(const pcm_buffer_ptr &buffer, const bool async)
 {
     if (!_impl->ext_audio_file) {
         return write_result(write_error_type::closed);
     }
 
-    if (!data) {
+    if (!buffer) {
         return write_result(write_error_type::invalid_argument);
     }
 
-    if (*data->format() != *processing_format()) {
+    if (*buffer->format() != *processing_format()) {
         return write_result(write_error_type::invalid_format);
     }
 
     OSStatus err = noErr;
 
     if (async) {
-        err = ExtAudioFileWriteAsync(_impl->ext_audio_file, data->frame_length(), data->audio_buffer_list());
+        err = ExtAudioFileWriteAsync(_impl->ext_audio_file, buffer->frame_length(), buffer->audio_buffer_list());
     } else {
-        err = ExtAudioFileWrite(_impl->ext_audio_file, data->frame_length(), data->audio_buffer_list());
+        err = ExtAudioFileWrite(_impl->ext_audio_file, buffer->frame_length(), buffer->audio_buffer_list());
     }
 
     if (err != noErr) {

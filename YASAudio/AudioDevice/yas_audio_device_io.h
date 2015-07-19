@@ -22,7 +22,7 @@ namespace yas
     class audio_device_io : public std::enable_shared_from_this<audio_device_io>
     {
        public:
-        using render_function = std::function<void(pcm_buffer_ptr &out_data, audio_time_ptr &when)>;
+        using render_function = std::function<void(pcm_buffer_ptr &output_buffer, audio_time_ptr &when)>;
 
         static audio_device_io_ptr create();
         static audio_device_io_ptr create(const audio_device_ptr &audio_device);
@@ -39,7 +39,7 @@ namespace yas
         void start();
         void stop();
 
-        const pcm_buffer_ptr input_data_on_render() const;
+        const pcm_buffer_ptr input_buffer_on_render() const;
         const audio_time_ptr input_time_on_render() const;
 
        private:

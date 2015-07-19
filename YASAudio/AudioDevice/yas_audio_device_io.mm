@@ -25,22 +25,22 @@ class audio_device_io::impl
     class kernel
     {
        public:
-        pcm_buffer_ptr input_data;
-        pcm_buffer_ptr output_data;
+        pcm_buffer_ptr input_buffer;
+        pcm_buffer_ptr output_buffer;
 
         kernel(const audio_format_ptr &input_format, const audio_format_ptr &output_format, const UInt32 frame_capacity)
-            : input_data(input_format ? pcm_buffer::create(input_format, frame_capacity) : nullptr),
-              output_data(output_format ? pcm_buffer::create(output_format, frame_capacity) : nullptr)
+            : input_buffer(input_format ? pcm_buffer::create(input_format, frame_capacity) : nullptr),
+              output_buffer(output_format ? pcm_buffer::create(output_format, frame_capacity) : nullptr)
         {
         }
 
         void clear()
         {
-            if (input_data) {
-                input_data->clear();
+            if (input_buffer) {
+                input_buffer->clear();
             }
-            if (output_data) {
-                output_data->clear();
+            if (output_buffer) {
+                output_buffer->clear();
             }
         }
     };
@@ -50,7 +50,7 @@ class audio_device_io::impl
     audio_device_ptr audio_device;
     bool is_running;
     AudioDeviceIOProcID io_proc_id;
-    pcm_buffer_ptr input_data_on_render;
+    pcm_buffer_ptr input_buffer_on_render;
     audio_time_ptr input_time_on_render;
     audio_device_observer_ptr observer;
 
@@ -58,7 +58,7 @@ class audio_device_io::impl
         : audio_device(audio_device),
           is_running(false),
           io_proc_id(nullptr),
-          input_data_on_render(nullptr),
+          input_buffer_on_render(nullptr),
           input_time_on_render(nullptr),
           observer(audio_device_observer::create()),
           _render_callback(nullptr),
@@ -186,33 +186,33 @@ void audio_device_io::initialize()
                 if (auto kernel = device_io->_impl->kernel()) {
                     kernel->clear();
                     if (inInputData) {
-                        if (auto &input_data = kernel->input_data) {
-                            copy_data_flexibly(inInputData, input_data);
+                        if (auto &input_buffer = kernel->input_buffer) {
+                            copy_data_flexibly(inInputData, input_buffer);
 
-                            const UInt32 input_frame_length = input_data->frame_length();
+                            const UInt32 input_frame_length = input_buffer->frame_length();
                             if (input_frame_length > 0) {
-                                device_io->_impl->input_data_on_render = input_data;
+                                device_io->_impl->input_buffer_on_render = input_buffer;
                                 device_io->_impl->input_time_on_render =
-                                    std::make_shared<audio_time>(*inInputTime, input_data->format()->sample_rate());
+                                    std::make_shared<audio_time>(*inInputTime, input_buffer->format()->sample_rate());
                             }
                         }
                     }
 
                     auto render_callback = device_io->_impl->render_callback();
                     if (render_callback) {
-                        if (auto &output_data = kernel->output_data) {
+                        if (auto &output_buffer = kernel->output_buffer) {
                             if (outOutputData) {
                                 const UInt32 frame_length =
-                                    yas::frame_length(outOutputData, output_data->format()->sample_byte_count());
+                                    yas::frame_length(outOutputData, output_buffer->format()->sample_byte_count());
                                 if (frame_length > 0) {
-                                    output_data->set_frame_length(frame_length);
+                                    output_buffer->set_frame_length(frame_length);
                                     auto time = std::make_shared<audio_time>(*inOutputTime,
-                                                                             output_data->format()->sample_rate());
-                                    render_callback(output_data, time);
-                                    copy_data_flexibly(output_data, outOutputData);
+                                                                             output_buffer->format()->sample_rate());
+                                    render_callback(output_buffer, time);
+                                    copy_data_flexibly(output_buffer, outOutputData);
                                 }
                             }
-                        } else if (kernel->input_data) {
+                        } else if (kernel->input_buffer) {
                             pcm_buffer_ptr data = nullptr;
                             audio_time_ptr time = nullptr;
                             render_callback(data, time);
@@ -220,7 +220,7 @@ void audio_device_io::initialize()
                     }
                 }
 
-                device_io->_impl->input_data_on_render = nullptr;
+                device_io->_impl->input_buffer_on_render = nullptr;
                 device_io->_impl->input_time_on_render = nullptr;
             }
         }));
@@ -326,9 +326,9 @@ void audio_device_io::stop()
     yas_raise_if_au_error(AudioDeviceStop(_impl->audio_device->audio_device_id(), _impl->io_proc_id));
 }
 
-const pcm_buffer_ptr audio_device_io::input_data_on_render() const
+const pcm_buffer_ptr audio_device_io::input_buffer_on_render() const
 {
-    return _impl->input_data_on_render;
+    return _impl->input_buffer_on_render;
 }
 
 const audio_time_ptr audio_device_io::input_time_on_render() const

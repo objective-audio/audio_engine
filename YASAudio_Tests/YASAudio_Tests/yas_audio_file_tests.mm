@@ -206,7 +206,7 @@ namespace yas
         for (NSInteger i = 0; i < loopCount; i++) {
             [self _writeToData:data fileFormat:*audio_file->file_format() startIndex:startIndex];
 
-            XCTAssertTrue(audio_file->write_from_data(data, async));
+            XCTAssertTrue(audio_file->write_from_buffer(data, async));
 
             startIndex += frame_length;
         }
@@ -244,7 +244,7 @@ namespace yas
         UInt32 startIndex = 0;
 
         for (NSInteger i = 0; i < loopCount; i++) {
-            XCTAssertTrue(audio_file->read_into_data(data));
+            XCTAssertTrue(audio_file->read_into_buffer(data));
             if (test_data.file_sample_rate == test_data.processing_sample_rate) {
                 XCTAssert(data->frame_length() == frame_length);
                 XCTAssert([self _compareData:data fileFormat:*audio_file->file_format() startIndex:startIndex]);

@@ -73,26 +73,26 @@ namespace yas
                 return _sine_volume.load();
             }
 
-            void process(const yas::pcm_buffer_ptr &input_data, yas::pcm_buffer_ptr &output_data)
+            void process(const yas::pcm_buffer_ptr &input_buffer, yas::pcm_buffer_ptr &output_buffer)
             {
-                if (!output_data) {
+                if (!output_buffer) {
                     return;
                 }
 
-                const UInt32 frame_length = output_data->frame_length();
+                const UInt32 frame_length = output_buffer->frame_length();
 
                 if (frame_length == 0) {
                     return;
                 }
 
-                const yas::audio_format_ptr format = output_data->format();
+                const yas::audio_format_ptr format = output_buffer->format();
                 if (format->pcm_format() == yas::pcm_format::float32 && format->stride() == 1) {
-                    yas::audio_frame_enumerator enumerator(output_data);
+                    yas::audio_frame_enumerator enumerator(output_buffer);
                     auto pointer = enumerator.pointer();
 
-                    if (input_data) {
-                        if (input_data->frame_length() >= frame_length) {
-                            yas::copy_data_flexibly(input_data, output_data);
+                    if (input_buffer) {
+                        if (input_buffer->frame_length() >= frame_length) {
+                            yas::copy_data_flexibly(input_buffer, output_buffer);
 
                             const Float32 throughVol = through_volume();
 
@@ -193,10 +193,10 @@ typedef std::shared_ptr<yas::audio_device_sample::kernel> sample_kernel_ptr;
         });
 
     std::weak_ptr<yas::audio_device_io> weak_device_io = _audio_device_io;
-    _audio_device_io->set_render_callback([weak_device_io, kernel = _kernel](yas::pcm_buffer_ptr & out_data,
+    _audio_device_io->set_render_callback([weak_device_io, kernel = _kernel](yas::pcm_buffer_ptr & output_buffer,
                                                                              yas::audio_time_ptr & when) {
         if (auto device_io = weak_device_io.lock()) {
-            kernel->process(device_io->input_data_on_render(), out_data);
+            kernel->process(device_io->input_buffer_on_render(), output_buffer);
         }
     });
 
