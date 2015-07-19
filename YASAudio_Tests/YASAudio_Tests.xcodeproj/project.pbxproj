@@ -525,6 +525,7 @@
 		B6FB1D0E1B07084B00F10AE8 /* yas_audio_unit_parameter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yas_audio_unit_parameter.h; sourceTree = "<group>"; };
 		B6FB1D131B07089500F10AE8 /* yas_audio_graph.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = yas_audio_graph.mm; sourceTree = "<group>"; };
 		B6FB1D141B07089500F10AE8 /* yas_audio_graph.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yas_audio_graph.h; sourceTree = "<group>"; };
+		B6FC1D0D1B5B44A10051243A /* yas_audio.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yas_audio.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -680,6 +681,7 @@
 			children = (
 				B675BCC11B36747D00527F48 /* cpp */,
 				B63789401AB4316A00B95F55 /* YASAudio.h */,
+				B6FC1D0D1B5B44A10051243A /* yas_audio.h */,
 				B605B3D11AE268CB00697EAF /* Macros */,
 				B63B21EF1AAC4EBB0015BD78 /* AudioEngine */,
 				B6841A941AAC24770035C704 /* Math */,
