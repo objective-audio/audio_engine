@@ -113,7 +113,7 @@ namespace yas
         audio_file_writer();
         ~audio_file_writer();
 
-        write_result write_from_buffer(const pcm_buffer_ptr &data, const bool async = false);
+        write_result write_from_buffer(const pcm_buffer_ptr &buffer, const bool async = false);
 
        private:
         audio_file_writer(const audio_file_writer &) = delete;

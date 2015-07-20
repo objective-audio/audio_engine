@@ -19,9 +19,9 @@
 
 using namespace yas;
 
-UInt32 yas::test::test_value(const UInt32 frame, const UInt32 channel, const UInt32 buffer_index)
+UInt32 yas::test::test_value(const UInt32 frame, const UInt32 channel, const UInt32 buf_idx)
 {
-    return frame + 1024 * (channel + 1) + 512 * (buffer_index + 1);
+    return frame + 1024 * (channel + 1) + 512 * (buf_idx + 1);
 }
 
 void yas::test::fill_test_values_to_buffer(pcm_buffer_ptr &buffer)
@@ -31,12 +31,12 @@ void yas::test::fill_test_values_to_buffer(pcm_buffer_ptr &buffer)
     const UInt32 buffer_count = format->buffer_count();
     const UInt32 stride = format->stride();
 
-    for (UInt32 buffer_index = 0; buffer_index < buffer_count; buffer_index++) {
-        flex_pointer pointer = buffer->audio_ptr_at_buffer(buffer_index);
+    for (UInt32 buf_idx = 0; buf_idx < buffer_count; buf_idx++) {
+        flex_pointer pointer = buffer->audio_ptr_at_index(buf_idx);
         for (UInt32 frame = 0; frame < buffer->frame_length(); frame++) {
-            for (UInt32 ch = 0; ch < stride; ch++) {
-                UInt32 index = frame * stride + ch;
-                UInt32 value = test_value(frame, ch, buffer_index);
+            for (UInt32 ch_idx = 0; ch_idx < stride; ch_idx++) {
+                UInt32 index = frame * stride + ch_idx;
+                UInt32 value = test_value(frame, ch_idx, buf_idx);
                 switch (pcmFormat) {
                     case yas::pcm_format::float32: {
                         pointer.f32[index] = value;
@@ -62,9 +62,9 @@ bool yas::test::is_cleard_buffer(pcm_buffer_ptr &buffer)
 {
     const AudioBufferList *abl = buffer->audio_buffer_list();
 
-    for (UInt32 buffer_index = 0; buffer_index < abl->mNumberBuffers; buffer_index++) {
-        Byte *ptr = (Byte *)abl->mBuffers[buffer_index].mData;
-        for (UInt32 frame = 0; frame < abl->mBuffers[buffer_index].mDataByteSize; frame++) {
+    for (UInt32 buf_idx = 0; buf_idx < abl->mNumberBuffers; buf_idx++) {
+        Byte *ptr = (Byte *)abl->mBuffers[buf_idx].mData;
+        for (UInt32 frame = 0; frame < abl->mBuffers[buf_idx].mDataByteSize; frame++) {
             if (ptr[frame] != 0) {
                 return false;
             }
@@ -113,10 +113,10 @@ bool yas::test::is_equal_buffer_flexibly(pcm_buffer_ptr &data1, pcm_buffer_ptr &
         return NO;
     }
 
-    for (UInt32 ch = 0; ch < data1->format()->channel_count(); ch++) {
+    for (UInt32 ch_idx = 0; ch_idx < data1->format()->channel_count(); ch_idx++) {
         for (UInt32 frame = 0; frame < data1->frame_length(); frame++) {
-            auto ptr1 = data_ptr_from_buffer(data1, ch, frame);
-            auto ptr2 = data_ptr_from_buffer(data2, ch, frame);
+            auto ptr1 = data_ptr_from_buffer(data1, ch_idx, frame);
+            auto ptr2 = data_ptr_from_buffer(data2, ch_idx, frame);
             if (!YASAudioIsEqualData(ptr1.v, ptr2.v, data1->format()->sample_byte_count())) {
                 return NO;
             }

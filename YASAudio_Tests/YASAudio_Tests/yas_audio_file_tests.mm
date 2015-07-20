@@ -199,14 +199,14 @@ namespace yas
 
         audio_file->set_processing_format(processing_format);
 
-        auto data = yas::pcm_buffer::create(processing_format, frame_length);
+        auto buffer = yas::pcm_buffer::create(processing_format, frame_length);
 
         UInt32 startIndex = 0;
 
         for (NSInteger i = 0; i < loopCount; i++) {
-            [self _writeToData:data fileFormat:*audio_file->file_format() startIndex:startIndex];
+            [self _writeToBuffer:buffer fileFormat:*audio_file->file_format() startIndex:startIndex];
 
-            XCTAssertTrue(audio_file->write_from_buffer(data, async));
+            XCTAssertTrue(audio_file->write_from_buffer(buffer, async));
 
             startIndex += frame_length;
         }
@@ -239,15 +239,15 @@ namespace yas
         XCTAssertEqualWithAccuracy(audio_file->processing_length(),
                                    audio_file->file_length() * (processing_sample_rate / file_sample_rate), 1);
 
-        auto data = yas::pcm_buffer::create(processing_format, frame_length);
+        auto buffer = yas::pcm_buffer::create(processing_format, frame_length);
 
         UInt32 startIndex = 0;
 
         for (NSInteger i = 0; i < loopCount; i++) {
-            XCTAssertTrue(audio_file->read_into_buffer(data));
+            XCTAssertTrue(audio_file->read_into_buffer(buffer));
             if (test_data.file_sample_rate == test_data.processing_sample_rate) {
-                XCTAssert(data->frame_length() == frame_length);
-                XCTAssert([self _compareData:data fileFormat:*audio_file->file_format() startIndex:startIndex]);
+                XCTAssert(buffer->frame_length() == frame_length);
+                XCTAssert([self _compareData:buffer fileFormat:*audio_file->file_format() startIndex:startIndex]);
             }
 
             startIndex += frame_length;
@@ -260,33 +260,33 @@ namespace yas
 
 #pragma mark -
 
-- (void)_writeToData:(yas::pcm_buffer_ptr &)data
-          fileFormat:(yas::audio_format &)fileFormat
-          startIndex:(NSInteger)startIndex
+- (void)_writeToBuffer:(yas::pcm_buffer_ptr &)buffer
+            fileFormat:(yas::audio_format &)fileFormat
+            startIndex:(NSInteger)startIndex
 {
-    const auto &format = data->format();
-    const UInt32 bufferCount = format->buffer_count();
+    const auto &format = buffer->format();
+    const UInt32 buffer_count = format->buffer_count();
     const UInt32 stride = format->stride();
 
-    for (UInt32 bufIndex = 0; bufIndex < bufferCount; bufIndex++) {
-        auto pointer = data->audio_ptr_at_buffer(bufIndex);
-        for (NSInteger frameIndex = 0; frameIndex < data->frame_length(); frameIndex++) {
+    for (UInt32 buf_idx = 0; buf_idx < buffer_count; buf_idx++) {
+        auto pointer = buffer->audio_ptr_at_index(buf_idx);
+        for (NSInteger frameIndex = 0; frameIndex < buffer->frame_length(); frameIndex++) {
             SInt16 value = frameIndex + startIndex + 1;
-            for (NSInteger strideIndex = 0; strideIndex < stride; strideIndex++) {
+            for (NSInteger ch_idx = 0; ch_idx < stride; ch_idx++) {
                 switch (format->pcm_format()) {
                     case yas::pcm_format::int16: {
-                        pointer.i16[frameIndex * stride + strideIndex] = value;
+                        pointer.i16[frameIndex * stride + ch_idx] = value;
                     } break;
                     case yas::pcm_format::fixed824: {
-                        pointer.i32[frameIndex * stride + strideIndex] = value << 16;
+                        pointer.i32[frameIndex * stride + ch_idx] = value << 16;
                     } break;
                     case yas::pcm_format::float32: {
                         Float32 float32Value = (Float32)value / INT16_MAX;
-                        pointer.f32[frameIndex * stride + strideIndex] = float32Value;
+                        pointer.f32[frameIndex * stride + ch_idx] = float32Value;
                     } break;
                     case yas::pcm_format::float64: {
                         Float64 float64Value = (Float64)value / INT16_MAX;
-                        pointer.f64[frameIndex * stride + strideIndex] = (Float64)float64Value;
+                        pointer.f64[frameIndex * stride + ch_idx] = (Float64)float64Value;
                     } break;
                     default:
                         break;
@@ -296,32 +296,32 @@ namespace yas
     }
 }
 
-- (BOOL)_compareData:(yas::pcm_buffer_ptr &)data
+- (BOOL)_compareData:(yas::pcm_buffer_ptr &)buffer
           fileFormat:(yas::audio_format &)fileFormat
           startIndex:(NSInteger)startIndex
 {
-    const auto &format = data->format();
-    const UInt32 bufferCount = format->buffer_count();
+    const auto &format = buffer->format();
+    const UInt32 buffer_count = format->buffer_count();
     const UInt32 stride = format->stride();
 
-    for (UInt32 bufIndex = 0; bufIndex < bufferCount; bufIndex++) {
-        const auto pointer = data->audio_ptr_at_buffer(bufIndex);
-        for (NSInteger frameIndex = 0; frameIndex < data->frame_length(); frameIndex++) {
+    for (UInt32 buf_idx = 0; buf_idx < buffer_count; buf_idx++) {
+        const auto pointer = buffer->audio_ptr_at_index(buf_idx);
+        for (NSInteger frameIndex = 0; frameIndex < buffer->frame_length(); frameIndex++) {
             SInt16 value = frameIndex + startIndex + 1;
-            for (NSInteger strideIndex = 0; strideIndex < stride; strideIndex++) {
+            for (NSInteger ch_idx = 0; ch_idx < stride; ch_idx++) {
                 SInt16 ptrValue = 0;
                 switch (format->pcm_format()) {
                     case yas::pcm_format::int16: {
-                        ptrValue = pointer.i16[frameIndex * stride + strideIndex];
+                        ptrValue = pointer.i16[frameIndex * stride + ch_idx];
                     } break;
                     case yas::pcm_format::fixed824: {
-                        ptrValue = pointer.i32[frameIndex * stride + strideIndex] >> 16;
+                        ptrValue = pointer.i32[frameIndex * stride + ch_idx] >> 16;
                     } break;
                     case yas::pcm_format::float32: {
-                        ptrValue = roundf(pointer.f32[frameIndex * stride + strideIndex] * INT16_MAX);
+                        ptrValue = roundf(pointer.f32[frameIndex * stride + ch_idx] * INT16_MAX);
                     } break;
                     case yas::pcm_format::float64: {
-                        ptrValue = round(pointer.f64[frameIndex * stride + strideIndex] * INT16_MAX);
+                        ptrValue = round(pointer.f64[frameIndex * stride + ch_idx] * INT16_MAX);
                     } break;
                     default:
                         break;

@@ -24,9 +24,9 @@ audio_enumerator::audio_enumerator(const flex_pointer &pointer, const UInt32 byt
     _index = 0;
 }
 
-audio_enumerator::audio_enumerator(const pcm_buffer_ptr &data, const UInt32 channel)
-    : audio_enumerator(data->audio_ptr_at_channel(channel), data->format()->buffer_frame_byte_count(),
-                       data->frame_length())
+audio_enumerator::audio_enumerator(const pcm_buffer_ptr &buffer, const UInt32 channel)
+    : audio_enumerator(buffer->audio_ptr_at_channel(channel), buffer->format()->buffer_frame_byte_count(),
+                       buffer->frame_length())
 {
 }
 
@@ -79,24 +79,24 @@ audio_enumerator &audio_enumerator::operator++()
 
 #pragma mark - frame enumerator
 
-audio_frame_enumerator::audio_frame_enumerator(const pcm_buffer_ptr &data)
+audio_frame_enumerator::audio_frame_enumerator(const pcm_buffer_ptr &buffer)
     : _frame(0),
       _channel(0),
-      _frame_length(data->frame_length()),
-      _channel_count(data->format()->channel_count()),
-      _frame_byte_stride(data->format()->buffer_frame_byte_count()),
-      _pointers(std::vector<flex_pointer>(data->format()->channel_count())),
-      _top_pointers(std::vector<flex_pointer>(data->format()->channel_count())),
-      _pointers_size(data->format()->channel_count() * sizeof(flex_pointer *))
+      _frame_length(buffer->frame_length()),
+      _channel_count(buffer->format()->channel_count()),
+      _frame_byte_stride(buffer->format()->buffer_frame_byte_count()),
+      _pointers(std::vector<flex_pointer>(buffer->format()->channel_count())),
+      _top_pointers(std::vector<flex_pointer>(buffer->format()->channel_count())),
+      _pointers_size(buffer->format()->channel_count() * sizeof(flex_pointer *))
 {
-    const auto &format = data->format();
+    const auto &format = buffer->format();
     const UInt32 bufferCount = format->buffer_count();
     const UInt32 stride = format->stride();
     const UInt32 sampleByteCount = format->sample_byte_count();
 
     UInt32 channel = 0;
-    for (UInt32 buffer = 0; buffer < bufferCount; buffer++) {
-        flex_pointer pointer = data->audio_ptr_at_buffer(buffer);
+    for (UInt32 buf_idx = 0; buf_idx < bufferCount; buf_idx++) {
+        flex_pointer pointer = buffer->audio_ptr_at_index(buf_idx);
         for (UInt32 ch = 0; ch < stride; ch++) {
             _pointers[channel].v = _top_pointers[channel].v = pointer.v;
             pointer.u8 += sampleByteCount;

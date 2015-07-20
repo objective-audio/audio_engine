@@ -44,12 +44,12 @@ namespace yas
         CFStringRef get_audio_file_type(const ExtAudioFileRef ext_auidio_file);
     }
 
-    CFDictionaryRef wave_file_settings(const Float64 sample_rate, const UInt32 channels, const UInt32 bit_depth);
-    CFDictionaryRef aiff_file_settings(const Float64 sample_rate, const UInt32 channels, const UInt32 bit_depth);
-    CFDictionaryRef linear_pcm_file_settings(const Float64 sample_rate, const UInt32 channels, const UInt32 bit_depth,
-                                             const bool is_big_endian, const bool is_float,
+    CFDictionaryRef wave_file_settings(const Float64 sample_rate, const UInt32 channel_count, const UInt32 bit_depth);
+    CFDictionaryRef aiff_file_settings(const Float64 sample_rate, const UInt32 channel_count, const UInt32 bit_depth);
+    CFDictionaryRef linear_pcm_file_settings(const Float64 sample_rate, const UInt32 channel_count,
+                                             const UInt32 bit_depth, const bool is_big_endian, const bool is_float,
                                              const bool is_non_interleaved);
-    CFDictionaryRef aac_settings(const Float64 sample_rate, const UInt32 channels, const UInt32 bit_depth,
+    CFDictionaryRef aac_settings(const Float64 sample_rate, const UInt32 channel_count, const UInt32 bit_depth,
                                  const AVAudioQuality encoder_quality, const UInt32 bit_rate,
                                  const UInt32 bit_depth_hint, const AVAudioQuality converter_quality);
 }
