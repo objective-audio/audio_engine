@@ -186,16 +186,6 @@ bool audio_device::property_info::operator<(const audio_device::property_info &i
     return address.mElement < info.address.mElement;
 }
 
-#pragma mark - notification_provider
-
-audio_device::notification_provider::notification_provider() : observer(audio_device_observer::create())
-{
-}
-
-audio_device::notification_provider::~notification_provider()
-{
-}
-
 #pragma mark - private
 
 class audio_device::impl
@@ -386,12 +376,6 @@ const std::experimental::optional<size_t> audio_device::index_of_device(const au
         }
     }
     return std::experimental::nullopt;
-}
-
-class audio_device::notification_provider &audio_device::notification_provider()
-{
-    static class audio_device::notification_provider _provider;
-    return _provider;
 }
 
 subject<audio_device::method, std::vector<audio_device::property_info>> &audio_device::system_subject()

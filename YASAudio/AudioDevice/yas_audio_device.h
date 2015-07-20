@@ -78,24 +78,8 @@ namespace yas
         audio_format_ptr input_format() const;
         audio_format_ptr output_format() const;
 
-        static notification_provider &notification_provider();
         static subject<method, std::vector<property_info>> &system_subject();
         subject<method, std::vector<property_info>> &property_subject() const;
-
-        class notification_provider
-        {
-           public:
-            notification_provider();
-            ~notification_provider();
-
-           private:
-            observer<method, std::vector<property_info>>::shared_ptr observer;
-
-            notification_provider(const notification_provider &) = delete;
-            notification_provider(notification_provider &&) = delete;
-            notification_provider &operator=(const notification_provider &) = delete;
-            notification_provider &operator=(notification_provider &&) = delete;
-        };
 
        private:
         class impl;
