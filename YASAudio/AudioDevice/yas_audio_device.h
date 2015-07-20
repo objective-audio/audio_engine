@@ -22,6 +22,8 @@
 
 namespace yas
 {
+    class audio_device_global;
+
     class audio_device
     {
        public:
@@ -76,24 +78,8 @@ namespace yas
         audio_format_ptr input_format() const;
         audio_format_ptr output_format() const;
 
-        static notification_provider &notification_provider();
         static subject<method, std::vector<property_info>> &system_subject();
         subject<method, std::vector<property_info>> &property_subject() const;
-
-        class notification_provider
-        {
-           public:
-            notification_provider();
-            ~notification_provider();
-
-           private:
-            observer<method, std::vector<property_info>>::shared_ptr observer;
-
-            notification_provider(const notification_provider &) = delete;
-            notification_provider(notification_provider &&) = delete;
-            notification_provider &operator=(const notification_provider &) = delete;
-            notification_provider &operator=(notification_provider &&) = delete;
-        };
 
        private:
         class impl;
@@ -106,11 +92,7 @@ namespace yas
         audio_device &operator=(const audio_device &) = delete;
         audio_device &operator=(audio_device &&) = delete;
 
-        static void initialize();
-        static std::map<AudioDeviceID, audio_device_ptr> &all_devices_map();
-        static void update_all_devices();
-        void update_streams(const AudioObjectPropertyScope scope);
-        void update_format(const AudioObjectPropertyScope scope);
+        friend class audio_device_global;
     };
 
     using audio_device_observer = observer<audio_device::method, std::vector<audio_device::property_info>>;
