@@ -22,6 +22,8 @@
 
 namespace yas
 {
+    class audio_device_global;
+
     class audio_device
     {
        public:
@@ -106,11 +108,10 @@ namespace yas
         audio_device &operator=(const audio_device &) = delete;
         audio_device &operator=(audio_device &&) = delete;
 
-        static void initialize();
-        static std::map<AudioDeviceID, audio_device_ptr> &all_devices_map();
-        static void update_all_devices();
-        void update_streams(const AudioObjectPropertyScope scope);
-        void update_format(const AudioObjectPropertyScope scope);
+        void _udpate_streams(const AudioObjectPropertyScope scope);
+        void _update_format(const AudioObjectPropertyScope scope);
+
+        friend class audio_device_global;
     };
 
     using audio_device_observer = observer<audio_device::method, std::vector<audio_device::property_info>>;
