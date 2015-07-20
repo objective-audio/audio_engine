@@ -266,7 +266,7 @@ class audio_device::impl
                             device->_impl->udpate_streams(info.address.mScope);
                             break;
                         case property::format:
-                            device->_update_format(info.address.mScope);
+                            device->_impl->update_format(info.address.mScope);
                             break;
                         default:
                             break;
@@ -291,6 +291,53 @@ class audio_device::impl
                     new_streams[stream_id] = prev_streams.at(stream_id);
                 } else {
                     new_streams[stream_id] = audio_device_stream::create(stream_id, audio_device_id);
+                }
+            }
+        }
+    }
+
+    void update_format(const AudioObjectPropertyScope scope)
+    {
+        audio_device_stream_ptr stream = nullptr;
+
+        if (scope == kAudioObjectPropertyScopeInput) {
+            auto iterator = input_streams_map.begin();
+            if (iterator != input_streams_map.end()) {
+                stream = iterator->second;
+                set_input_format(nullptr);
+            }
+        } else if (scope == kAudioObjectPropertyScopeOutput) {
+            auto iterator = output_streams_map.begin();
+            if (iterator != output_streams_map.end()) {
+                stream = iterator->second;
+                set_output_format(nullptr);
+            }
+        }
+
+        audio_format_ptr stream_format = nullptr;
+        if (stream) {
+            stream_format = stream->virtual_format();
+        }
+
+        if (!stream_format) {
+            return;
+        }
+
+        auto data = property_data<AudioBufferList>(audio_device_id, kAudioDevicePropertyStreamConfiguration, scope);
+        if (data) {
+            UInt32 channel_count = 0;
+            for (auto &abl : *data) {
+                for (UInt32 i = 0; i < abl.mNumberBuffers; i++) {
+                    channel_count += abl.mBuffers[i].mNumberChannels;
+                }
+
+                auto format = yas::audio_format::create(stream_format->sample_rate(), channel_count,
+                                                        stream_format->pcm_format(), false);
+
+                if (scope == kAudioObjectPropertyScopeInput) {
+                    set_input_format(format);
+                } else if (scope == kAudioObjectPropertyScopeOutput) {
+                    set_output_format(format);
                 }
             }
         }
@@ -409,8 +456,8 @@ audio_device::audio_device(const AudioDeviceID device_id)
 
     _impl->udpate_streams(kAudioObjectPropertyScopeInput);
     _impl->udpate_streams(kAudioObjectPropertyScopeOutput);
-    _update_format(kAudioObjectPropertyScopeInput);
-    _update_format(kAudioObjectPropertyScopeOutput);
+    _impl->update_format(kAudioObjectPropertyScopeInput);
+    _impl->update_format(kAudioObjectPropertyScopeOutput);
 
     auto listener = _impl->listener();
     add_listener(device_id, kAudioDevicePropertyNominalSampleRate, kAudioObjectPropertyScopeGlobal, listener);
@@ -490,55 +537,6 @@ audio_format_ptr audio_device::output_format() const
 subject<audio_device::method, std::vector<audio_device::property_info>> &audio_device::property_subject() const
 {
     return _impl->property_subject;
-}
-
-#pragma mark - private
-
-void audio_device::_update_format(const AudioObjectPropertyScope scope)
-{
-    audio_device_stream_ptr stream = nullptr;
-
-    if (scope == kAudioObjectPropertyScopeInput) {
-        auto iterator = _impl->input_streams_map.begin();
-        if (iterator != _impl->input_streams_map.end()) {
-            stream = iterator->second;
-            _impl->set_input_format(nullptr);
-        }
-    } else if (scope == kAudioObjectPropertyScopeOutput) {
-        auto iterator = _impl->output_streams_map.begin();
-        if (iterator != _impl->output_streams_map.end()) {
-            stream = iterator->second;
-            _impl->set_output_format(nullptr);
-        }
-    }
-
-    audio_format_ptr stream_format = nullptr;
-    if (stream) {
-        stream_format = stream->virtual_format();
-    }
-
-    if (!stream_format) {
-        return;
-    }
-
-    auto data = property_data<AudioBufferList>(audio_device_id(), kAudioDevicePropertyStreamConfiguration, scope);
-    if (data) {
-        UInt32 channel_count = 0;
-        for (auto &abl : *data) {
-            for (UInt32 i = 0; i < abl.mNumberBuffers; i++) {
-                channel_count += abl.mBuffers[i].mNumberChannels;
-            }
-
-            auto format = yas::audio_format::create(stream_format->sample_rate(), channel_count,
-                                                    stream_format->pcm_format(), false);
-
-            if (scope == kAudioObjectPropertyScopeInput) {
-                _impl->set_input_format(format);
-            } else if (scope == kAudioObjectPropertyScopeOutput) {
-                _impl->set_output_format(format);
-            }
-        }
-    }
 }
 
 #endif

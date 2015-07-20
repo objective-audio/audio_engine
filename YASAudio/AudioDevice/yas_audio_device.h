@@ -92,8 +92,6 @@ namespace yas
         audio_device &operator=(const audio_device &) = delete;
         audio_device &operator=(audio_device &&) = delete;
 
-        void _update_format(const AudioObjectPropertyScope scope);
-
         friend class audio_device_global;
     };
 
