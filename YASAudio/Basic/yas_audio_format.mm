@@ -57,10 +57,10 @@ audio_format_ptr audio_format::create(const CFDictionaryRef &settings)
     return audio_format_ptr(new audio_format(settings));
 }
 
-audio_format_ptr audio_format::create(const Float64 sample_rate, const UInt32 channels,
+audio_format_ptr audio_format::create(const Float64 sample_rate, const UInt32 channel_count,
                                       const yas::pcm_format pcm_format, const bool interleaved)
 {
-    return audio_format_ptr(new audio_format(sample_rate, channels, pcm_format, interleaved));
+    return audio_format_ptr(new audio_format(sample_rate, channel_count, pcm_format, interleaved));
 }
 
 audio_format::audio_format(const AudioStreamBasicDescription &asbd) : _impl(std::make_shared<impl>())
@@ -99,9 +99,9 @@ audio_format::audio_format(const CFDictionaryRef &settings) : audio_format(to_st
 {
 }
 
-audio_format::audio_format(const Float64 sample_rate, const UInt32 channels, const yas::pcm_format pcm_format,
+audio_format::audio_format(const Float64 sample_rate, const UInt32 channel_count, const yas::pcm_format pcm_format,
                            const bool interleaved)
-    : audio_format(to_stream_description(sample_rate, channels, pcm_format, interleaved))
+    : audio_format(to_stream_description(sample_rate, channel_count, pcm_format, interleaved))
 {
 }
 
@@ -298,12 +298,12 @@ AudioStreamBasicDescription yas::to_stream_description(const CFDictionaryRef &se
     return asbd;
 }
 
-AudioStreamBasicDescription yas::to_stream_description(const Float64 sample_rate, const UInt32 channels,
+AudioStreamBasicDescription yas::to_stream_description(const Float64 sample_rate, const UInt32 channel_count,
                                                        const yas::pcm_format pcm_format, const bool interleaved)
 {
-    if (pcm_format == yas::pcm_format::other || channels == 0) {
+    if (pcm_format == yas::pcm_format::other || channel_count == 0) {
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : invalid argument. pcm_format(" +
-                                    to_string(pcm_format) + ") channels(" + std::to_string(channels) + ")");
+                                    to_string(pcm_format) + ") channel_count(" + std::to_string(channel_count) + ")");
     }
 
     AudioStreamBasicDescription asbd = {
@@ -332,7 +332,7 @@ AudioStreamBasicDescription yas::to_stream_description(const Float64 sample_rate
         asbd.mBitsPerChannel = 32;
     }
 
-    asbd.mChannelsPerFrame = channels;
+    asbd.mChannelsPerFrame = channel_count;
 
     UInt32 size = sizeof(AudioStreamBasicDescription);
     yas_raise_if_au_error(AudioFormatGetProperty(kAudioFormatProperty_FormatInfo, 0, NULL, &size, &asbd));

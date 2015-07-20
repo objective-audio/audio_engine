@@ -20,7 +20,7 @@ namespace yas
        public:
         static audio_format_ptr create(const AudioStreamBasicDescription &asbd);
         static audio_format_ptr create(const CFDictionaryRef &settings);
-        static audio_format_ptr create(const Float64 sample_rate, const UInt32 channels,
+        static audio_format_ptr create(const Float64 sample_rate, const UInt32 channel_count,
                                        const yas::pcm_format pcm_format = yas::pcm_format::float32,
                                        const bool interleaved = false);
         ~audio_format();
@@ -47,7 +47,7 @@ namespace yas
 
         explicit audio_format(const AudioStreamBasicDescription &asbd);
         explicit audio_format(const CFDictionaryRef &settings);
-        audio_format(const Float64 sample_rate, const UInt32 channels, const yas::pcm_format pcm_format,
+        audio_format(const Float64 sample_rate, const UInt32 channel_count, const yas::pcm_format pcm_format,
                      const bool interleaved);
 
         audio_format(const audio_format &) = delete;

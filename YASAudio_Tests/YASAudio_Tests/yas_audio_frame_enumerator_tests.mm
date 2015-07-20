@@ -221,7 +221,7 @@
     auto format = yas::audio_format::create(48000, 1);
     auto data = yas::pcm_buffer::create(format, frame_length);
 
-    auto bufferPointer = data->audio_ptr_at_buffer(0);
+    auto bufferPointer = data->audio_ptr_at_index(0);
     for (UInt32 frame = 0; frame < frame_length; frame++) {
         bufferPointer.f32[frame] = yas::test::test_value(frame, 0, 0);
     }
@@ -258,7 +258,7 @@
     auto format = yas::audio_format::create(48000, channels, yas::pcm_format::float32, true);
     auto data = yas::pcm_buffer::create(format, 1);
 
-    auto bufferPointer = data->audio_ptr_at_buffer(0);
+    auto bufferPointer = data->audio_ptr_at_index(0);
     for (UInt32 ch = 0; ch < channels; ch++) {
         bufferPointer.f32[ch] = yas::test::test_value(0, ch, 0);
     }

@@ -60,7 +60,8 @@ class pcm_buffer::impl
 };
 
 std::pair<abl_unique_ptr, abl_data_unique_ptr> yas::allocate_audio_buffer_list(const UInt32 buffer_count,
-                                                                               const UInt32 channels, const UInt32 size)
+                                                                               const UInt32 channel_count,
+                                                                               const UInt32 size)
 {
     abl_unique_ptr abl_ptr((AudioBufferList *)calloc(1, sizeof(AudioBufferList) + buffer_count * sizeof(AudioBuffer)),
                            [](AudioBufferList *abl) { free(abl); });
@@ -74,7 +75,7 @@ std::pair<abl_unique_ptr, abl_data_unique_ptr> yas::allocate_audio_buffer_list(c
     }
 
     for (UInt32 i = 0; i < buffer_count; ++i) {
-        abl_ptr->mBuffers[i].mNumberChannels = channels;
+        abl_ptr->mBuffers[i].mNumberChannels = channel_count;
         abl_ptr->mBuffers[i].mDataByteSize = size;
         if (size > 0) {
             data_ptr->push_back(std::vector<UInt8>(size));
@@ -211,18 +212,18 @@ const AudioBufferList *pcm_buffer::audio_buffer_list() const
     return _impl->abl_ptr;
 }
 
-flex_pointer pcm_buffer::audio_ptr_at_buffer(const UInt32 buffer) const
+flex_pointer pcm_buffer::audio_ptr_at_index(const UInt32 buf_idx) const
 {
-    if (buffer >= _impl->abl_ptr->mNumberBuffers) {
-        throw std::out_of_range(std::string(__PRETTY_FUNCTION__) + " : out of range. buffer(" + std::to_string(buffer) +
-                                ") _impl->abl_ptr.mNumberBuffers(" + std::to_string(_impl->abl_ptr->mNumberBuffers) +
-                                ")");
+    if (buf_idx >= _impl->abl_ptr->mNumberBuffers) {
+        throw std::out_of_range(std::string(__PRETTY_FUNCTION__) + " : out of range. buf_idx(" +
+                                std::to_string(buf_idx) + ") _impl->abl_ptr.mNumberBuffers(" +
+                                std::to_string(_impl->abl_ptr->mNumberBuffers) + ")");
     }
 
-    return flex_pointer{.v = _impl->abl_ptr->mBuffers[buffer].mData};
+    return flex_pointer{.v = _impl->abl_ptr->mBuffers[buf_idx].mData};
 }
 
-flex_pointer pcm_buffer::audio_ptr_at_channel(const UInt32 channel) const
+flex_pointer pcm_buffer::audio_ptr_at_channel(const UInt32 ch_idx) const
 {
     flex_pointer pointer{.v = nullptr};
 
@@ -230,22 +231,22 @@ flex_pointer pcm_buffer::audio_ptr_at_channel(const UInt32 channel) const
     const AudioBufferList *abl_ptr = _impl->abl_ptr;
 
     if (stride > 1) {
-        if (channel < abl_ptr->mBuffers[0].mNumberChannels) {
+        if (ch_idx < abl_ptr->mBuffers[0].mNumberChannels) {
             pointer.v = abl_ptr->mBuffers[0].mData;
-            if (channel > 0) {
-                pointer.u8 += channel * format()->sample_byte_count();
+            if (ch_idx > 0) {
+                pointer.u8 += ch_idx * format()->sample_byte_count();
             }
         } else {
-            throw std::out_of_range(std::string(__PRETTY_FUNCTION__) + " : out of range. channel(" +
-                                    std::to_string(channel) + ") mNumberChannels(" +
+            throw std::out_of_range(std::string(__PRETTY_FUNCTION__) + " : out of range. ch_idx(" +
+                                    std::to_string(ch_idx) + ") mNumberChannels(" +
                                     std::to_string(abl_ptr->mBuffers[0].mNumberChannels) + ")");
         }
     } else {
-        if (channel < abl_ptr->mNumberBuffers) {
-            pointer.v = abl_ptr->mBuffers[channel].mData;
+        if (ch_idx < abl_ptr->mNumberBuffers) {
+            pointer.v = abl_ptr->mBuffers[ch_idx].mData;
         } else {
-            throw std::out_of_range(std::string(__PRETTY_FUNCTION__) + " : out of range. channel(" +
-                                    std::to_string(channel) + ") mNumberChannels(" +
+            throw std::out_of_range(std::string(__PRETTY_FUNCTION__) + " : out of range. ch_idx(" +
+                                    std::to_string(ch_idx) + ") mNumberChannels(" +
                                     std::to_string(abl_ptr->mBuffers[0].mNumberChannels) + ")");
         }
     }
@@ -254,36 +255,36 @@ flex_pointer pcm_buffer::audio_ptr_at_channel(const UInt32 channel) const
 }
 
 template <typename T>
-T *yas::pcm_buffer::audio_ptr_at_buffer(const UInt32 buffer) const
+T *yas::pcm_buffer::audio_ptr_at_index(const UInt32 buf_idx) const
 {
     if (!validate_pcm_format<T>(format()->pcm_format())) {
         throw std::runtime_error(std::string(__PRETTY_FUNCTION__) + " : invalid pcm_format.");
         return nullptr;
     }
 
-    return static_cast<T *>(audio_ptr_at_buffer(buffer).v);
+    return static_cast<T *>(audio_ptr_at_index(buf_idx).v);
 }
 
-template Float32 *yas::pcm_buffer::audio_ptr_at_buffer(const UInt32 buffer) const;
-template Float64 *yas::pcm_buffer::audio_ptr_at_buffer(const UInt32 buffer) const;
-template SInt32 *yas::pcm_buffer::audio_ptr_at_buffer(const UInt32 buffer) const;
-template SInt16 *yas::pcm_buffer::audio_ptr_at_buffer(const UInt32 buffer) const;
+template Float32 *yas::pcm_buffer::audio_ptr_at_index(const UInt32 buf_idx) const;
+template Float64 *yas::pcm_buffer::audio_ptr_at_index(const UInt32 buf_idx) const;
+template SInt32 *yas::pcm_buffer::audio_ptr_at_index(const UInt32 buf_idx) const;
+template SInt16 *yas::pcm_buffer::audio_ptr_at_index(const UInt32 buf_idx) const;
 
 template <typename T>
-T *yas::pcm_buffer::audio_ptr_at_channel(const UInt32 channel) const
+T *yas::pcm_buffer::audio_ptr_at_channel(const UInt32 ch_idx) const
 {
     if (!validate_pcm_format<T>(format()->pcm_format())) {
         throw std::runtime_error(std::string(__PRETTY_FUNCTION__) + " : invalid pcm_format.");
         return nullptr;
     }
 
-    return static_cast<T *>(audio_ptr_at_channel(channel).v);
+    return static_cast<T *>(audio_ptr_at_channel(ch_idx).v);
 }
 
-template Float32 *yas::pcm_buffer::audio_ptr_at_channel(const UInt32 channel) const;
-template Float64 *yas::pcm_buffer::audio_ptr_at_channel(const UInt32 channel) const;
-template SInt32 *yas::pcm_buffer::audio_ptr_at_channel(const UInt32 channel) const;
-template SInt16 *yas::pcm_buffer::audio_ptr_at_channel(const UInt32 channel) const;
+template Float32 *yas::pcm_buffer::audio_ptr_at_channel(const UInt32 ch_idx) const;
+template Float64 *yas::pcm_buffer::audio_ptr_at_channel(const UInt32 ch_idx) const;
+template SInt32 *yas::pcm_buffer::audio_ptr_at_channel(const UInt32 ch_idx) const;
+template SInt16 *yas::pcm_buffer::audio_ptr_at_channel(const UInt32 ch_idx) const;
 
 const UInt32 pcm_buffer::frame_capacity() const
 {

@@ -198,24 +198,24 @@ CFStringRef get_audio_file_type(const ExtAudioFileRef ext_audio_file)
 
 #pragma mark -
 
-CFDictionaryRef yas::wave_file_settings(const Float64 sample_rate, const UInt32 channels, const UInt32 bit_depth)
+CFDictionaryRef yas::wave_file_settings(const Float64 sample_rate, const UInt32 channel_count, const UInt32 bit_depth)
 {
-    return linear_pcm_file_settings(sample_rate, channels, bit_depth, false, bit_depth >= 32, false);
+    return linear_pcm_file_settings(sample_rate, channel_count, bit_depth, false, bit_depth >= 32, false);
 }
 
-CFDictionaryRef yas::aiff_file_settings(const Float64 sample_rate, const UInt32 channels, const UInt32 bit_depth)
+CFDictionaryRef yas::aiff_file_settings(const Float64 sample_rate, const UInt32 channel_count, const UInt32 bit_depth)
 {
-    return linear_pcm_file_settings(sample_rate, channels, bit_depth, true, bit_depth >= 32, false);
+    return linear_pcm_file_settings(sample_rate, channel_count, bit_depth, true, bit_depth >= 32, false);
 }
 
-CFDictionaryRef yas::linear_pcm_file_settings(const Float64 sample_rate, const UInt32 channels, const UInt32 bit_depth,
-                                              const bool is_big_endian, const bool is_float,
+CFDictionaryRef yas::linear_pcm_file_settings(const Float64 sample_rate, const UInt32 channel_count,
+                                              const UInt32 bit_depth, const bool is_big_endian, const bool is_float,
                                               const bool is_non_interleaved)
 {
     return (__bridge CFDictionaryRef) @{
         AVFormatIDKey: @(kAudioFormatLinearPCM),
         AVSampleRateKey: @(sample_rate),
-        AVNumberOfChannelsKey: @(channels),
+        AVNumberOfChannelsKey: @(channel_count),
         AVLinearPCMBitDepthKey: @(bit_depth),
         AVLinearPCMIsBigEndianKey: @(is_big_endian),
         AVLinearPCMIsFloatKey: @(is_float),
@@ -224,14 +224,14 @@ CFDictionaryRef yas::linear_pcm_file_settings(const Float64 sample_rate, const U
     };
 }
 
-CFDictionaryRef yas::aac_settings(const Float64 sample_rate, const UInt32 channels, const UInt32 bit_depth,
+CFDictionaryRef yas::aac_settings(const Float64 sample_rate, const UInt32 channel_count, const UInt32 bit_depth,
                                   const AVAudioQuality encoder_quality, const UInt32 bit_rate,
                                   const UInt32 bit_depth_hint, const AVAudioQuality converter_quality)
 {
     return (__bridge CFDictionaryRef) @{
         AVFormatIDKey: @(kAudioFormatMPEG4AAC),
         AVSampleRateKey: @(sample_rate),
-        AVNumberOfChannelsKey: @(channels),
+        AVNumberOfChannelsKey: @(channel_count),
         AVLinearPCMBitDepthKey: @(bit_depth),
         AVLinearPCMIsBigEndianKey: @(NO),
         AVLinearPCMIsFloatKey: @(NO),

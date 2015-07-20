@@ -40,13 +40,13 @@ namespace yas
         AudioBufferList *audio_buffer_list();
         const AudioBufferList *audio_buffer_list() const;
 
-        flex_pointer audio_ptr_at_buffer(const UInt32 buffer) const;
-        flex_pointer audio_ptr_at_channel(const UInt32 channel) const;
+        flex_pointer audio_ptr_at_index(const UInt32 buf_idx) const;
+        flex_pointer audio_ptr_at_channel(const UInt32 ch_idx) const;
 
         template <typename T>
-        T *audio_ptr_at_buffer(const UInt32 buffer) const;
+        T *audio_ptr_at_index(const UInt32 buf_idx) const;
         template <typename T>
-        T *audio_ptr_at_channel(const UInt32 channel) const;
+        T *audio_ptr_at_channel(const UInt32 ch_idx) const;
 
         const UInt32 frame_capacity() const;
         const UInt32 frame_length() const;
@@ -84,5 +84,6 @@ namespace yas
     UInt32 frame_length(const AudioBufferList *abl, const UInt32 sample_byte_count);
 
     std::pair<abl_unique_ptr, abl_data_unique_ptr> allocate_audio_buffer_list(const UInt32 buffer_count,
-                                                                              const UInt32 channels, const UInt32 size);
+                                                                              const UInt32 channel_count,
+                                                                              const UInt32 size);
 }
