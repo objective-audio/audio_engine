@@ -263,7 +263,7 @@ class audio_device::impl
                 for (auto &info : infos) {
                     switch (info.property) {
                         case property::stream:
-                            device->_udpate_streams(info.address.mScope);
+                            device->_impl->udpate_streams(info.address.mScope);
                             break;
                         case property::format:
                             device->_update_format(info.address.mScope);
@@ -277,6 +277,23 @@ class audio_device::impl
                 audio_device::system_subject().notify(method::configulation_change, infos);
             }
         };
+    }
+
+    void udpate_streams(const AudioObjectPropertyScope scope)
+    {
+        auto prev_streams =
+            std::move((scope == kAudioObjectPropertyScopeInput) ? input_streams_map : output_streams_map);
+        auto data = property_data<AudioStreamID>(audio_device_id, kAudioDevicePropertyStreams, scope);
+        auto &new_streams = (scope == kAudioObjectPropertyScopeInput) ? input_streams_map : output_streams_map;
+        if (data) {
+            for (auto &stream_id : *data) {
+                if (prev_streams.count(stream_id) > 0) {
+                    new_streams[stream_id] = prev_streams.at(stream_id);
+                } else {
+                    new_streams[stream_id] = audio_device_stream::create(stream_id, audio_device_id);
+                }
+            }
+        }
     }
 
    private:
@@ -390,8 +407,8 @@ audio_device::audio_device(const AudioDeviceID device_id)
 {
     _impl = std::make_unique<impl>(device_id);
 
-    _udpate_streams(kAudioObjectPropertyScopeInput);
-    _udpate_streams(kAudioObjectPropertyScopeOutput);
+    _impl->udpate_streams(kAudioObjectPropertyScopeInput);
+    _impl->udpate_streams(kAudioObjectPropertyScopeOutput);
     _update_format(kAudioObjectPropertyScopeInput);
     _update_format(kAudioObjectPropertyScopeOutput);
 
@@ -476,24 +493,6 @@ subject<audio_device::method, std::vector<audio_device::property_info>> &audio_d
 }
 
 #pragma mark - private
-
-void audio_device::_udpate_streams(const AudioObjectPropertyScope scope)
-{
-    auto prev_streams =
-        std::move((scope == kAudioObjectPropertyScopeInput) ? _impl->input_streams_map : _impl->output_streams_map);
-    auto data = property_data<AudioStreamID>(audio_device_id(), kAudioDevicePropertyStreams, scope);
-    auto &new_streams =
-        (scope == kAudioObjectPropertyScopeInput) ? _impl->input_streams_map : _impl->output_streams_map;
-    if (data) {
-        for (auto &stream_id : *data) {
-            if (prev_streams.count(stream_id) > 0) {
-                new_streams[stream_id] = prev_streams.at(stream_id);
-            } else {
-                new_streams[stream_id] = audio_device_stream::create(stream_id, audio_device_id());
-            }
-        }
-    }
-}
 
 void audio_device::_update_format(const AudioObjectPropertyScope scope)
 {
