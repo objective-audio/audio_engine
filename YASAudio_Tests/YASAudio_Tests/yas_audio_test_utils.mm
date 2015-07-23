@@ -19,9 +19,9 @@
 
 using namespace yas;
 
-UInt32 yas::test::test_value(const UInt32 frame, const UInt32 channel, const UInt32 buf_idx)
+UInt32 yas::test::test_value(const UInt32 frame, const UInt32 ch_idx, const UInt32 buf_idx)
 {
-    return frame + 1024 * (channel + 1) + 512 * (buf_idx + 1);
+    return frame + 1024 * (ch_idx + 1) + 512 * (buf_idx + 1);
 }
 
 void yas::test::fill_test_values_to_buffer(pcm_buffer_ptr &buffer)
