@@ -15,13 +15,18 @@ namespace yas
     class result
     {
        public:
+        explicit result(const T &value);
+        explicit result(const U &error);
         explicit result(T &&value);
         explicit result(U &&error);
 
         ~result();
 
-        result(const result<T, U> &other);
-        result(result<T, U> &&other);
+        result(const result<T, U> &);
+        result(result<T, U> &&);
+
+        result<T, U> &operator=(const result<T, U> &);
+        result<T, U> &operator=(result<T, U> &&);
 
         explicit operator bool() const;
 
