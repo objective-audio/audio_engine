@@ -6,11 +6,11 @@
 #include "yas_pcm_buffer.h"
 #include "yas_audio_format.h"
 #include "yas_audio_channel_route.h"
-#include "YASAudioUtility.h"
 #include <string>
 #include <exception>
 #include <functional>
 #include <iostream>
+#include <Accelerate/Accelerate.h>
 
 using namespace yas;
 
@@ -116,6 +116,57 @@ static bool validate_pcm_format(const yas::pcm_format &pcm_format)
         default:
             return false;
     }
+}
+
+namespace yas
+{
+    struct abl_info {
+        UInt32 channel_count;
+        UInt32 frame_length;
+        std::vector<UInt8 *> datas;
+        std::vector<UInt32> strides;
+
+        abl_info() : channel_count(0), frame_length(0), datas(0), strides(0)
+        {
+        }
+    };
+
+    using get_abl_info_result = result<yas::abl_info, pcm_buffer::copy_error_type>;
+}
+
+static get_abl_info_result get_abl_info(const AudioBufferList *abl, const UInt32 sample_byte_count)
+{
+    if (!abl || sample_byte_count == 0 || sample_byte_count > 8) {
+        return get_abl_info_result(pcm_buffer::copy_error_type::invalid_argument);
+    }
+
+    const UInt32 buffer_count = abl->mNumberBuffers;
+
+    abl_info data_info;
+
+    for (UInt32 buf_idx = 0; buf_idx < buffer_count; ++buf_idx) {
+        const UInt32 stride = abl->mBuffers[buf_idx].mNumberChannels;
+        const UInt32 frame_length = abl->mBuffers[buf_idx].mDataByteSize / stride / sample_byte_count;
+        if (data_info.frame_length == 0) {
+            data_info.frame_length = frame_length;
+        } else if (data_info.frame_length != frame_length) {
+            return get_abl_info_result(pcm_buffer::copy_error_type::invalid_abl);
+        }
+        data_info.channel_count += stride;
+    }
+
+    if (data_info.channel_count > 0) {
+        for (UInt32 buf_idx = 0; buf_idx < buffer_count; buf_idx++) {
+            const UInt32 stride = abl->mBuffers[buf_idx].mNumberChannels;
+            UInt8 *data = static_cast<UInt8 *>(abl->mBuffers[buf_idx].mData);
+            for (UInt32 ch_idx = 0; ch_idx < stride; ++ch_idx) {
+                data_info.datas.push_back(&data[ch_idx * sample_byte_count]);
+                data_info.strides.push_back(stride);
+            }
+        }
+    }
+
+    return get_abl_info_result(std::move(data_info));
 }
 
 #pragma mark - public
@@ -331,6 +382,53 @@ void pcm_buffer::clear(const UInt32 start_frame, const UInt32 length)
     }
 }
 
+pcm_buffer::copy_result pcm_buffer::copy_from(const pcm_buffer_ptr &from_buffer, const UInt32 from_start_frame,
+                                              const UInt32 to_start_frame, const UInt32 length)
+{
+    auto from_format = from_buffer->format();
+
+    if ((from_format->pcm_format() != format()->pcm_format()) ||
+        (from_format->channel_count() != format()->channel_count())) {
+        return pcm_buffer::copy_result(pcm_buffer::copy_error_type::invalid_format);
+    }
+
+    const AudioBufferList *from_abl = from_buffer->audio_buffer_list();
+    AudioBufferList *to_abl = audio_buffer_list();
+
+    auto result = copy(from_abl, to_abl, from_format->sample_byte_count(), from_start_frame, to_start_frame, length);
+
+    if (result && from_start_frame == 0 && to_start_frame == 0 && length == 0) {
+        set_frame_length(result.value());
+    }
+
+    return result;
+}
+
+pcm_buffer::copy_result pcm_buffer::copy_from(const AudioBufferList *from_abl, const UInt32 from_start_frame,
+                                              const UInt32 to_start_frame, const UInt32 length)
+{
+    set_frame_length(0);
+    reset_data_byte_size(*this);
+
+    AudioBufferList *to_abl = audio_buffer_list();
+
+    auto result = copy(from_abl, to_abl, format()->sample_byte_count(), from_start_frame, to_start_frame, length);
+
+    if (result) {
+        set_frame_length(result.value());
+    }
+
+    return result;
+}
+
+pcm_buffer::copy_result pcm_buffer::copy_to(AudioBufferList *to_abl, const UInt32 from_start_frame,
+                                            const UInt32 to_start_frame, const UInt32 length)
+{
+    const AudioBufferList *from_abl = audio_buffer_list();
+
+    return copy(from_abl, to_abl, format()->sample_byte_count(), from_start_frame, to_start_frame, length);
+}
+
 #pragma mark - global
 
 void yas::clear(AudioBufferList *abl)
@@ -342,93 +440,60 @@ void yas::clear(AudioBufferList *abl)
     }
 }
 
-pcm_buffer::copy_result yas::copy_data(const pcm_buffer_ptr &from_buffer, pcm_buffer_ptr &to_buffer)
+pcm_buffer::copy_result yas::copy(const AudioBufferList *from_abl, AudioBufferList *to_abl,
+                                  const UInt32 sample_byte_count, const UInt32 from_start_frame,
+                                  const UInt32 to_start_frame, const UInt32 length)
 {
-    return copy_data(from_buffer, to_buffer, 0, 0, from_buffer->frame_length());
-}
-
-pcm_buffer::copy_result yas::copy_data(const pcm_buffer_ptr &from_buffer, pcm_buffer_ptr &to_buffer,
-                                       const UInt32 from_start_frame, const UInt32 to_start_frame, const UInt32 length)
-{
-    if (!from_buffer || !to_buffer) {
-        return pcm_buffer::copy_result(pcm_buffer::copy_error_type::invalid_argument);
+    auto from_result = get_abl_info(from_abl, sample_byte_count);
+    if (!from_result) {
+        return pcm_buffer::copy_result(from_result.error());
     }
 
-    if (*from_buffer->format() != *to_buffer->format()) {
-        return pcm_buffer::copy_result(pcm_buffer::copy_error_type::invalid_format);
+    auto to_result = get_abl_info(to_abl, sample_byte_count);
+    if (!to_result) {
+        return pcm_buffer::copy_result(to_result.error());
     }
 
-    if (((to_start_frame + length) > to_buffer->frame_length()) ||
-        ((from_start_frame + length) > from_buffer->frame_length())) {
-        return pcm_buffer::copy_result(pcm_buffer::copy_error_type::out_of_range_frame_length);
+    auto from_info = from_result.value();
+    auto to_info = to_result.value();
+
+    const UInt32 copy_length = length ?: (from_info.frame_length - from_start_frame);
+
+    if ((from_start_frame + copy_length) > from_info.frame_length ||
+        (to_start_frame + copy_length) > to_info.frame_length || from_info.channel_count > to_info.channel_count) {
+        return pcm_buffer::copy_result(pcm_buffer::copy_error_type::out_of_range);
     }
 
-    const UInt32 bytes_per_frame = to_buffer->format()->stream_description().mBytesPerFrame;
-    const UInt32 buffer_count = to_buffer->format()->buffer_count();
+    for (UInt32 ch_idx = 0; ch_idx < from_info.channel_count; ch_idx++) {
+        const UInt32 &from_stride = from_info.strides[ch_idx];
+        const UInt32 &to_stride = to_info.strides[ch_idx];
+        const void *from_data = &(from_info.datas[ch_idx][from_start_frame * sample_byte_count * from_stride]);
+        void *to_data = &(to_info.datas[ch_idx][to_start_frame * sample_byte_count * to_stride]);
 
-    for (UInt32 i = 0; i < buffer_count; i++) {
-        UInt8 *to_data_ptr = static_cast<UInt8 *>(to_buffer->audio_buffer_list()->mBuffers[i].mData);
-        const UInt8 *from_data_ptr = static_cast<const UInt8 *>(from_buffer->audio_buffer_list()->mBuffers[i].mData);
-        memcpy(&to_data_ptr[to_start_frame * bytes_per_frame], &from_data_ptr[from_start_frame * bytes_per_frame],
-               length * bytes_per_frame);
+        if (from_stride == 1 && to_stride == 1) {
+            memcpy(to_data, from_data, copy_length * sample_byte_count);
+        } else {
+            if (sample_byte_count == sizeof(Float32)) {
+                auto from_float_data = static_cast<const Float32 *>(from_data);
+                auto to_float_data = static_cast<Float32 *>(to_data);
+                cblas_scopy(copy_length, from_float_data, from_stride, to_float_data, to_stride);
+            } else if (sample_byte_count == sizeof(Float64)) {
+                auto from_double_data = static_cast<const Float64 *>(from_data);
+                auto to_double_data = static_cast<Float64 *>(to_data);
+                cblas_dcopy(copy_length, from_double_data, from_stride, to_double_data, to_stride);
+            } else {
+                for (UInt32 frame = 0; frame < copy_length; ++frame) {
+                    const UInt32 sample_frame = frame * sample_byte_count;
+                    auto from_byte_data = static_cast<const UInt8 *>(from_data);
+                    auto to_byte_data = static_cast<UInt8 *>(to_data);
+                    memcpy(&to_byte_data[sample_frame * to_stride], &from_byte_data[sample_frame * from_stride],
+                           sample_byte_count);
+                }
+            }
+        }
     }
 
-    return pcm_buffer::copy_result(nullptr);
-}
-
-pcm_buffer::copy_result yas::copy_data_flexibly(const AudioBufferList *&from_abl, AudioBufferList *&to_abl,
-                                                const UInt32 sample_byte_count, UInt32 *out_frame_length)
-{
-    if (YASAudioCopyAudioBufferListFlexibly(from_abl, to_abl, sample_byte_count, out_frame_length)) {
-        return pcm_buffer::copy_result(nullptr);
-    } else {
-        return pcm_buffer::copy_result(pcm_buffer::copy_error_type::flexible_copy_failed);
-    }
-}
-
-pcm_buffer::copy_result yas::copy_data_flexibly(const pcm_buffer_ptr &from_buffer, pcm_buffer_ptr &to_buffer)
-{
-    if (!from_buffer || !to_buffer) {
-        return pcm_buffer::copy_result(pcm_buffer::copy_error_type::invalid_argument);
-    }
-
-    if (from_buffer->format()->pcm_format() != to_buffer->format()->pcm_format()) {
-        return pcm_buffer::copy_result(pcm_buffer::copy_error_type::invalid_pcm_format);
-    }
-
-    const auto abl = from_buffer->audio_buffer_list();
-    return copy_data_flexibly(abl, to_buffer);
-}
-
-pcm_buffer::copy_result yas::copy_data_flexibly(const pcm_buffer_ptr &from_buffer, AudioBufferList *to_abl)
-{
-    if (!from_buffer || !to_abl) {
-        return pcm_buffer::copy_result(pcm_buffer::copy_error_type::invalid_argument);
-    }
-
-    const AudioBufferList *from_abl = from_buffer->audio_buffer_list();
-    const UInt32 sample_byte_count = from_buffer->format()->sample_byte_count();
-    return copy_data_flexibly(from_abl, to_abl, sample_byte_count, nullptr);
-}
-
-pcm_buffer::copy_result yas::copy_data_flexibly(const AudioBufferList *from_abl, pcm_buffer_ptr &to_buffer)
-{
-    if (!from_abl || !to_buffer) {
-        return pcm_buffer::copy_result(pcm_buffer::copy_error_type::invalid_argument);
-    }
-
-    to_buffer->set_frame_length(0);
-    reset_data_byte_size(*to_buffer);
-
-    AudioBufferList *to_abl = to_buffer->audio_buffer_list();
-    const UInt32 sample_byte_count = to_buffer->format()->sample_byte_count();
-    UInt32 frameLength = 0;
-
-    auto result = copy_data_flexibly(from_abl, to_abl, sample_byte_count, &frameLength);
-    if (result) {
-        to_buffer->set_frame_length(frameLength);
-    }
-    return result;
+    return pcm_buffer::copy_result(copy_length);
 }
 
 UInt32 yas::frame_length(const AudioBufferList *abl, const UInt32 sample_byte_count)
