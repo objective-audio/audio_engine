@@ -92,7 +92,7 @@ namespace yas
 
                     if (input_buffer) {
                         if (input_buffer->frame_length() >= frame_length) {
-                            yas::copy_data_flexibly(input_buffer, output_buffer);
+                            output_buffer->copy_from(input_buffer);
 
                             const Float32 throughVol = through_volume();
 
