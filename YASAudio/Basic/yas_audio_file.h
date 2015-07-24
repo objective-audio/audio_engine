@@ -40,7 +40,6 @@ namespace yas
 
         audio_file();
 
-        bool _open(const pcm_format pcm_format, const bool interleaved);
         bool _create(const CFDictionaryRef &settings, const pcm_format pcm_format, const bool interleaved);
 
        private:
