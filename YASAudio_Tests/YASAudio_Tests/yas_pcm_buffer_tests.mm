@@ -166,12 +166,12 @@
 
         yas::test::fill_test_values_to_buffer(from_buffer);
 
-        XCTAssertTrue(yas::copy_data(from_buffer, to_buffer));
+        XCTAssertTrue(to_buffer->copy_from(from_buffer));
         XCTAssertTrue(yas::test::is_equal_buffer_flexibly(from_buffer, to_buffer));
     }
 }
 
-- (void)testCopyDataDifferentInterleavedFormatFailed
+- (void)testCopyDataDifferentInterleavedFormatSuccess
 {
     const Float64 sample_rate = 48000;
     const UInt32 frame_length = 4;
@@ -186,7 +186,8 @@
 
         yas::test::fill_test_values_to_buffer(from_buffer);
 
-        XCTAssertFalse(yas::copy_data(from_buffer, to_buffer));
+        XCTAssertTrue(to_buffer->copy_from(from_buffer));
+        XCTAssertTrue(yas::test::is_equal_buffer_flexibly(from_buffer, to_buffer));
     }
 }
 
@@ -205,8 +206,8 @@
 
         yas::test::fill_test_values_to_buffer(from_buffer);
 
-        XCTAssertFalse(yas::copy_data(from_buffer, to_buffer, 0, 0, from_frame_length));
-        XCTAssertTrue(yas::copy_data(from_buffer, to_buffer, 0, 0, to_frame_length));
+        XCTAssertFalse(to_buffer->copy_from(from_buffer, 0, 0, from_frame_length));
+        XCTAssertTrue(to_buffer->copy_from(from_buffer, 0, 0, to_frame_length));
         XCTAssertFalse(yas::test::is_equal_buffer_flexibly(from_buffer, to_buffer));
     }
 }
@@ -236,8 +237,7 @@
         yas::test::fill_test_values_to_buffer(from_buffer);
 
         const UInt32 length = 2;
-        auto result = yas::copy_data(from_buffer, to_buffer, from_start_frame, to_start_frame, length);
-        XCTAssertTrue(result);
+        XCTAssertTrue(to_buffer->copy_from(from_buffer, from_start_frame, to_start_frame, length));
 
         for (UInt32 ch = 0; ch < channels; ch++) {
             for (UInt32 i = 0; i < length; i++) {
@@ -282,7 +282,7 @@
 
         yas::test::fill_test_values_to_buffer(from_buffer);
 
-        XCTAssertNoThrow(yas::copy_data_flexibly(from_buffer, to_buffer));
+        XCTAssertNoThrow(to_buffer->copy_from(from_buffer));
         XCTAssertTrue(yas::test::is_equal_buffer_flexibly(from_buffer, to_buffer));
     }
 }
@@ -309,7 +309,7 @@
 
         yas::test::fill_test_values_to_buffer(from_buffer);
 
-        XCTAssertNoThrow(yas::copy_data_flexibly(from_buffer, to_buffer));
+        XCTAssertNoThrow(to_buffer->copy_from(from_buffer));
         XCTAssertTrue(yas::test::is_equal_buffer_flexibly(from_buffer, to_buffer));
         XCTAssertEqual(to_buffer->frame_length(), frame_length);
     }
@@ -329,7 +329,7 @@
     auto from_buffer = yas::pcm_buffer::create(from_format, frame_length);
     auto to_buffer = yas::pcm_buffer::create(to_format, frame_length);
 
-    XCTAssertFalse(yas::copy_data_flexibly(from_buffer, to_buffer));
+    XCTAssertFalse(to_buffer->copy_from(from_buffer));
 }
 
 - (void)testCopyDataFlexiblyFromAudioBufferListSameFormat
@@ -347,7 +347,7 @@
 
         yas::test::fill_test_values_to_buffer(interleaved_buffer);
 
-        XCTAssertNoThrow(yas::copy_data_flexibly(interleaved_buffer->audio_buffer_list(), deinterleaved_buffer));
+        XCTAssertNoThrow(deinterleaved_buffer->copy_from(interleaved_buffer->audio_buffer_list()));
         XCTAssertTrue(yas::test::is_equal_buffer_flexibly(interleaved_buffer, deinterleaved_buffer));
         XCTAssertEqual(deinterleaved_buffer->frame_length(), frame_length);
 
@@ -356,7 +356,7 @@
 
         yas::test::fill_test_values_to_buffer(deinterleaved_buffer);
 
-        XCTAssertNoThrow(yas::copy_data_flexibly(deinterleaved_buffer->audio_buffer_list(), interleaved_buffer));
+        XCTAssertNoThrow(interleaved_buffer->copy_from(deinterleaved_buffer->audio_buffer_list()));
         XCTAssertTrue(yas::test::is_equal_buffer_flexibly(interleaved_buffer, deinterleaved_buffer));
         XCTAssertEqual(interleaved_buffer->frame_length(), frame_length);
     }
@@ -377,7 +377,7 @@
 
         yas::test::fill_test_values_to_buffer(interleaved_buffer);
 
-        XCTAssertNoThrow(yas::copy_data_flexibly(interleaved_buffer, deinterleaved_buffer->audio_buffer_list()));
+        XCTAssertNoThrow(interleaved_buffer->copy_to(deinterleaved_buffer->audio_buffer_list()));
         XCTAssertTrue(yas::test::is_equal_buffer_flexibly(interleaved_buffer, deinterleaved_buffer));
 
         interleaved_buffer->clear();
@@ -385,7 +385,7 @@
 
         yas::test::fill_test_values_to_buffer(deinterleaved_buffer);
 
-        XCTAssertNoThrow(yas::copy_data_flexibly(deinterleaved_buffer, interleaved_buffer->audio_buffer_list()));
+        XCTAssertNoThrow(deinterleaved_buffer->copy_to(interleaved_buffer->audio_buffer_list()));
         XCTAssertTrue(yas::test::is_equal_buffer_flexibly(interleaved_buffer, deinterleaved_buffer));
     }
 }

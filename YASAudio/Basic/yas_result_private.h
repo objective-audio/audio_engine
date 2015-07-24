@@ -11,6 +11,18 @@
 namespace yas
 {
     template <typename T, typename U>
+    result<T, U>::result(const T &value)
+        : _value(std::experimental::make_optional<T>(T(value))), _error(std::experimental::nullopt)
+    {
+    }
+
+    template <typename T, typename U>
+    result<T, U>::result(const U &error)
+        : _value(std::experimental::nullopt), _error(std::experimental::make_optional<U>(U(error)))
+    {
+    }
+
+    template <typename T, typename U>
     result<T, U>::result(T &&value)
         : _value(std::experimental::make_optional<T>(std::move(value))), _error(std::experimental::nullopt)
     {
@@ -49,6 +61,34 @@ namespace yas
         } else {
             throw std::logic_error(std::string(__PRETTY_FUNCTION__) + " : value or error are not found.");
         }
+    }
+
+    template <typename T, typename U>
+    result<T, U> &result<T, U>::operator=(const result<T, U> &other)
+    {
+        if (other._value) {
+            this->_value = other._value;
+        } else if (other._error) {
+            this->_error = other._error;
+        } else {
+            throw std::logic_error(std::string(__PRETTY_FUNCTION__) + " : value or error are not found.");
+        }
+
+        return *this;
+    }
+
+    template <typename T, typename U>
+    result<T, U> &result<T, U>::operator=(result<T, U> &&other)
+    {
+        if (other._value) {
+            this->_value = std::move(other._value);
+        } else if (other._error) {
+            this->_error = std::move(other._error);
+        } else {
+            throw std::logic_error(std::string(__PRETTY_FUNCTION__) + " : value or error are not found.");
+        }
+
+        return *this;
     }
 
     template <typename T, typename U>

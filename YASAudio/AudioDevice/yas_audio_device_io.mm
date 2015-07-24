@@ -187,7 +187,7 @@ void audio_device_io::initialize()
                     kernel->clear();
                     if (inInputData) {
                         if (auto &input_buffer = kernel->input_buffer) {
-                            copy_data_flexibly(inInputData, input_buffer);
+                            input_buffer->copy_from(inInputData);
 
                             const UInt32 input_frame_length = input_buffer->frame_length();
                             if (input_frame_length > 0) {
@@ -209,7 +209,7 @@ void audio_device_io::initialize()
                                     auto time = std::make_shared<audio_time>(*inOutputTime,
                                                                              output_buffer->format()->sample_rate());
                                     render_callback(output_buffer, time);
-                                    copy_data_flexibly(output_buffer, outOutputData);
+                                    output_buffer->copy_to(outOutputData);
                                 }
                             }
                         } else if (kernel->input_buffer) {
