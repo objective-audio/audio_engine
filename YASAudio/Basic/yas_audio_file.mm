@@ -38,6 +38,7 @@ class audio_file::impl
     {
         set_url(nullptr);
         set_file_type(nullptr);
+        close();
     }
 
     void set_url(const CFURLRef url)
@@ -60,6 +61,76 @@ class audio_file::impl
         return _file_type;
     }
 
+    bool open(const pcm_format pcm_format, const bool interleaved)
+    {
+        if (!ext_audio_file_utils::can_open(url())) {
+            return false;
+        }
+
+        if (!ext_audio_file_utils::open(&ext_audio_file, url())) {
+            ext_audio_file = nullptr;
+            return false;
+        };
+
+        AudioStreamBasicDescription asbd;
+        if (!ext_audio_file_utils::get_audio_file_format(&asbd, ext_audio_file)) {
+            close();
+            return false;
+        }
+
+        AudioFileTypeID file_type_id = ext_audio_file_utils::get_audio_file_type_id(ext_audio_file);
+        set_file_type(to_audio_file_type(file_type_id));
+        if (!file_type()) {
+            close();
+            return false;
+        }
+
+        file_format = audio_format::create(asbd);
+
+        processing_format =
+            audio_format::create(file_format->sample_rate(), file_format->channel_count(), pcm_format, interleaved);
+
+        if (!ext_audio_file_utils::set_client_format(processing_format->stream_description(), ext_audio_file)) {
+            close();
+            return false;
+        }
+
+        return true;
+    }
+
+    bool create(const CFDictionaryRef &settings, const pcm_format pcm_format, const bool interleaved)
+    {
+        file_format = audio_format::create(settings);
+
+        AudioFileTypeID file_type_id = to_audio_file_type_id(file_type());
+        if (!file_type_id) {
+            return false;
+        }
+
+        if (!ext_audio_file_utils::create(&ext_audio_file, url(), file_type_id, file_format->stream_description())) {
+            ext_audio_file = nullptr;
+            return false;
+        }
+
+        processing_format =
+            audio_format::create(file_format->sample_rate(), file_format->channel_count(), pcm_format, interleaved);
+
+        if (!ext_audio_file_utils::set_client_format(processing_format->stream_description(), ext_audio_file)) {
+            close();
+            return false;
+        }
+
+        return true;
+    }
+
+    void close()
+    {
+        if (ext_audio_file) {
+            ext_audio_file_utils::dispose(ext_audio_file);
+            ext_audio_file = nullptr;
+        }
+    }
+
    private:
     CFURLRef _url;
     CFStringRef _file_type;
@@ -71,7 +142,6 @@ audio_file::audio_file() : _impl(std::make_unique<impl>())
 
 audio_file::~audio_file()
 {
-    close();
 }
 
 CFURLRef audio_file::url() const
@@ -130,81 +200,7 @@ SInt64 audio_file::file_frame_position() const
 
 void audio_file::close()
 {
-    if (_impl->ext_audio_file) {
-        ext_audio_file_utils::dispose(_impl->ext_audio_file);
-        _impl->ext_audio_file = nullptr;
-    }
-}
-
-bool audio_file::_open(const pcm_format pcm_format, const bool interleaved)
-{
-    const CFURLRef url = _impl->url();
-    ExtAudioFileRef &ext_audio_file = _impl->ext_audio_file;
-
-    if (!ext_audio_file_utils::can_open(url)) {
-        return false;
-    }
-
-    if (!ext_audio_file_utils::open(&ext_audio_file, url)) {
-        ext_audio_file = nullptr;
-        return false;
-    };
-
-    AudioStreamBasicDescription asbd;
-    if (!ext_audio_file_utils::get_audio_file_format(&asbd, ext_audio_file)) {
-        close();
-        return false;
-    }
-
-    AudioFileTypeID file_type_id = ext_audio_file_utils::get_audio_file_type_id(ext_audio_file);
-    _impl->set_file_type(to_audio_file_type(file_type_id));
-    if (!_impl->file_type()) {
-        close();
-        return false;
-    }
-
-    auto file_format = audio_format::create(asbd);
-    _impl->file_format = file_format;
-
-    auto processing_format =
-        audio_format::create(file_format->sample_rate(), file_format->channel_count(), pcm_format, interleaved);
-    _impl->processing_format = processing_format;
-
-    if (!ext_audio_file_utils::set_client_format(processing_format->stream_description(), ext_audio_file)) {
-        close();
-        return false;
-    }
-
-    return true;
-}
-
-bool audio_file::_create(const CFDictionaryRef &settings, const pcm_format pcm_format, const bool interleaved)
-{
-    auto file_format = audio_format::create(settings);
-    _impl->file_format = file_format;
-
-    AudioFileTypeID file_type_id = to_audio_file_type_id(_impl->file_type());
-    if (!file_type_id) {
-        return false;
-    }
-
-    ExtAudioFileRef &ext_audio_file = _impl->ext_audio_file;
-
-    if (!ext_audio_file_utils::create(&ext_audio_file, _impl->url(), file_type_id, file_format->stream_description())) {
-        ext_audio_file = nullptr;
-        return false;
-    }
-
-    auto processing_format =
-        audio_format::create(file_format->sample_rate(), file_format->channel_count(), pcm_format, interleaved);
-    _impl->processing_format = processing_format;
-
-    if (!ext_audio_file_utils::set_client_format(processing_format->stream_description(), ext_audio_file)) {
-        close();
-        return false;
-    }
-
-    return true;
+    _impl->close();
 }
 
 #pragma mark - audio file reader
@@ -216,11 +212,11 @@ audio_file_reader::create_result audio_file_reader::create(const CFURLRef file_u
         return create_result(create_error_type::invalid_argument);
     }
 
-    auto reader = std::make_shared<audio_file_reader>();
+    auto reader = audio_file_reader_ptr(new audio_file_reader());
 
     reader->_impl->set_url(file_url);
 
-    if (!reader->_open(pcm_format, interleaved)) {
+    if (!reader->_impl->open(pcm_format, interleaved)) {
         return create_result(create_error_type::open_failed);
     }
 
@@ -338,12 +334,12 @@ audio_file_writer::create_result audio_file_writer::create(const CFURLRef file_u
         return create_result(create_error_type::invalid_argument);
     }
 
-    auto writer = std::make_shared<audio_file_writer>();
+    auto writer = audio_file_writer_ptr(new audio_file_writer());
 
     writer->_impl->set_url(file_url);
     writer->_impl->set_file_type(file_type);
 
-    if (!writer->_create(settings, pcm_format, interleaved)) {
+    if (!writer->_impl->create(settings, pcm_format, interleaved)) {
         return create_result(create_error_type::create_failed);
     }
 
