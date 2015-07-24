@@ -69,12 +69,12 @@ namespace yas
         static create_result create(const CFURLRef file_url, const pcm_format pcm_format = pcm_format::float32,
                                     const bool interleaved = false);
 
-        audio_file_reader();
         ~audio_file_reader();
 
         read_result read_into_buffer(pcm_buffer_ptr &buffer, const UInt32 frame_length = 0);
 
        private:
+        audio_file_reader();
         audio_file_reader(const audio_file_reader &) = delete;
         audio_file_reader(audio_file_reader &&) = delete;
         audio_file_reader &operator=(const audio_file_reader &) = delete;
@@ -107,12 +107,12 @@ namespace yas
                                     const CFDictionaryRef settings, const pcm_format pcm_format = pcm_format::float32,
                                     const bool interleaved = false);
 
-        audio_file_writer();
         ~audio_file_writer();
 
         write_result write_from_buffer(const pcm_buffer_ptr &buffer, const bool async = false);
 
        private:
+        audio_file_writer();
         audio_file_writer(const audio_file_writer &) = delete;
         audio_file_writer(audio_file_writer &&) = delete;
         audio_file_writer &operator=(const audio_file_writer &) = delete;

@@ -212,7 +212,7 @@ audio_file_reader::create_result audio_file_reader::create(const CFURLRef file_u
         return create_result(create_error_type::invalid_argument);
     }
 
-    auto reader = std::make_shared<audio_file_reader>();
+    auto reader = audio_file_reader_ptr(new audio_file_reader());
 
     reader->_impl->set_url(file_url);
 
@@ -334,7 +334,7 @@ audio_file_writer::create_result audio_file_writer::create(const CFURLRef file_u
         return create_result(create_error_type::invalid_argument);
     }
 
-    auto writer = std::make_shared<audio_file_writer>();
+    auto writer = audio_file_writer_ptr(new audio_file_writer());
 
     writer->_impl->set_url(file_url);
     writer->_impl->set_file_type(file_type);
