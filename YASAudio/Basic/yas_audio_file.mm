@@ -63,11 +63,11 @@ class audio_file::impl
 
     bool open(const pcm_format pcm_format, const bool interleaved)
     {
-        if (!ext_audio_file_utils::can_open(_url)) {
+        if (!ext_audio_file_utils::can_open(url())) {
             return false;
         }
 
-        if (!ext_audio_file_utils::open(&ext_audio_file, _url)) {
+        if (!ext_audio_file_utils::open(&ext_audio_file, url())) {
             ext_audio_file = nullptr;
             return false;
         };
@@ -80,12 +80,37 @@ class audio_file::impl
 
         AudioFileTypeID file_type_id = ext_audio_file_utils::get_audio_file_type_id(ext_audio_file);
         set_file_type(to_audio_file_type(file_type_id));
-        if (!_file_type) {
+        if (!file_type()) {
             close();
             return false;
         }
 
         file_format = audio_format::create(asbd);
+
+        processing_format =
+            audio_format::create(file_format->sample_rate(), file_format->channel_count(), pcm_format, interleaved);
+
+        if (!ext_audio_file_utils::set_client_format(processing_format->stream_description(), ext_audio_file)) {
+            close();
+            return false;
+        }
+
+        return true;
+    }
+
+    bool create(const CFDictionaryRef &settings, const pcm_format pcm_format, const bool interleaved)
+    {
+        file_format = audio_format::create(settings);
+
+        AudioFileTypeID file_type_id = to_audio_file_type_id(file_type());
+        if (!file_type_id) {
+            return false;
+        }
+
+        if (!ext_audio_file_utils::create(&ext_audio_file, url(), file_type_id, file_format->stream_description())) {
+            ext_audio_file = nullptr;
+            return false;
+        }
 
         processing_format =
             audio_format::create(file_format->sample_rate(), file_format->channel_count(), pcm_format, interleaved);
@@ -176,35 +201,6 @@ SInt64 audio_file::file_frame_position() const
 void audio_file::close()
 {
     _impl->close();
-}
-
-bool audio_file::_create(const CFDictionaryRef &settings, const pcm_format pcm_format, const bool interleaved)
-{
-    auto file_format = audio_format::create(settings);
-    _impl->file_format = file_format;
-
-    AudioFileTypeID file_type_id = to_audio_file_type_id(_impl->file_type());
-    if (!file_type_id) {
-        return false;
-    }
-
-    ExtAudioFileRef &ext_audio_file = _impl->ext_audio_file;
-
-    if (!ext_audio_file_utils::create(&ext_audio_file, _impl->url(), file_type_id, file_format->stream_description())) {
-        ext_audio_file = nullptr;
-        return false;
-    }
-
-    auto processing_format =
-        audio_format::create(file_format->sample_rate(), file_format->channel_count(), pcm_format, interleaved);
-    _impl->processing_format = processing_format;
-
-    if (!ext_audio_file_utils::set_client_format(processing_format->stream_description(), ext_audio_file)) {
-        close();
-        return false;
-    }
-
-    return true;
 }
 
 #pragma mark - audio file reader
@@ -343,7 +339,7 @@ audio_file_writer::create_result audio_file_writer::create(const CFURLRef file_u
     writer->_impl->set_url(file_url);
     writer->_impl->set_file_type(file_type);
 
-    if (!writer->_create(settings, pcm_format, interleaved)) {
+    if (!writer->_impl->create(settings, pcm_format, interleaved)) {
         return create_result(create_error_type::create_failed);
     }
 
