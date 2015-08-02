@@ -7,8 +7,6 @@
 #import "YASAudioTypes.h"
 #import "YASAudioNode.h"
 
-@class YASAudioFormat, YASAudioData;
-
 @interface YASAudioOfflineOutputNode : YASAudioNode
 
 @property (nonatomic, assign, readonly) BOOL isRunning;
