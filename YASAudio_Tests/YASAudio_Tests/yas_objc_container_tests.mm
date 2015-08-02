@@ -56,7 +56,7 @@ static int _objc_object_count = 0;
     XCTAssertEqual(_objc_object_count, 1);
     XCTAssertEqual([objc_object retainCount], 1);
 
-    if (auto objc_container = yas::objc_container::create(objc_object, yas::weak)) {
+    if (auto objc_weak_container = yas::objc_weak_container::create(objc_object)) {
         XCTAssertEqual(_objc_object_count, 1);
         XCTAssertEqual([objc_object retainCount], 1);
     }
@@ -74,7 +74,7 @@ static int _objc_object_count = 0;
     XCTAssertEqual(_objc_object_count, 1);
     XCTAssertEqual([objc_object retainCount], 1);
 
-    if (auto objc_container = yas::objc_container::create(objc_object, yas::strong)) {
+    if (auto objc_strong_container = yas::objc_strong_container::create(objc_object)) {
         XCTAssertEqual(_objc_object_count, 1);
         XCTAssertEqual([objc_object retainCount], 2);
     }
@@ -89,15 +89,15 @@ static int _objc_object_count = 0;
 {
     YASObjCContainerTest *objc_object = [[YASObjCContainerTest alloc] init];
 
-    if (auto objc_container = yas::objc_container::create()) {
-        XCTAssertNil(objc_container->retained_object());
-        XCTAssertNil(objc_container->autoreleased_object());
+    if (auto objc_weak_container = yas::objc_weak_container::create()) {
+        XCTAssertNil(objc_weak_container->retained_object());
+        XCTAssertNil(objc_weak_container->autoreleased_object());
         XCTAssertEqual(_objc_object_count, 1);
         XCTAssertEqual([objc_object retainCount], 1);
 
-        objc_container->set_object(objc_object);
+        objc_weak_container->set_object(objc_object);
 
-        id retained_object = objc_container->retained_object();
+        id retained_object = objc_weak_container->retained_object();
 
         XCTAssertNotNil(retained_object);
         XCTAssertEqual([objc_object retainCount], 2);
@@ -109,7 +109,7 @@ static int _objc_object_count = 0;
 
         @autoreleasepool
         {
-            id autoreleased_object = objc_container->autoreleased_object();
+            id autoreleased_object = objc_weak_container->autoreleased_object();
 
             XCTAssertNotNil(autoreleased_object);
             XCTAssertEqual([objc_object retainCount], 2);
@@ -117,10 +117,10 @@ static int _objc_object_count = 0;
 
         XCTAssertEqual([objc_object retainCount], 1);
 
-        objc_container->set_object(nil);
+        objc_weak_container->set_object(nil);
 
-        XCTAssertNil(objc_container->retained_object());
-        XCTAssertNil(objc_container->autoreleased_object());
+        XCTAssertNil(objc_weak_container->retained_object());
+        XCTAssertNil(objc_weak_container->autoreleased_object());
         XCTAssertEqual(_objc_object_count, 1);
         XCTAssertEqual([objc_object retainCount], 1);
     }
@@ -135,17 +135,17 @@ static int _objc_object_count = 0;
 {
     YASObjCContainerTest *objc_object = [[YASObjCContainerTest alloc] init];
 
-    if (auto objc_container = yas::objc_container::create(nil, yas::strong)) {
-        XCTAssertNil(objc_container->retained_object());
-        XCTAssertNil(objc_container->autoreleased_object());
+    if (auto objc_strong_container = yas::objc_strong_container::create(nil)) {
+        XCTAssertNil(objc_strong_container->retained_object());
+        XCTAssertNil(objc_strong_container->autoreleased_object());
         XCTAssertEqual(_objc_object_count, 1);
         XCTAssertEqual([objc_object retainCount], 1);
 
-        objc_container->set_object(objc_object);
+        objc_strong_container->set_object(objc_object);
 
         XCTAssertEqual([objc_object retainCount], 2);
 
-        id retained_object = objc_container->retained_object();
+        id retained_object = objc_strong_container->retained_object();
 
         XCTAssertNotNil(retained_object);
         XCTAssertEqual([objc_object retainCount], 3);
@@ -157,7 +157,7 @@ static int _objc_object_count = 0;
 
         @autoreleasepool
         {
-            id autoreleased_object = objc_container->autoreleased_object();
+            id autoreleased_object = objc_strong_container->autoreleased_object();
 
             XCTAssertNotNil(autoreleased_object);
             XCTAssertEqual([objc_object retainCount], 3);
@@ -165,10 +165,10 @@ static int _objc_object_count = 0;
 
         XCTAssertEqual([objc_object retainCount], 2);
 
-        objc_container->set_object(nil);
+        objc_strong_container->set_object(nil);
 
-        XCTAssertNil(objc_container->retained_object());
-        XCTAssertNil(objc_container->autoreleased_object());
+        XCTAssertNil(objc_strong_container->retained_object());
+        XCTAssertNil(objc_strong_container->autoreleased_object());
         XCTAssertEqual(_objc_object_count, 1);
         XCTAssertEqual([objc_object retainCount], 1);
     }
@@ -188,15 +188,15 @@ static int _objc_object_count = 0;
     XCTAssertEqual([objc_object retainCount], 1);
 
     {
-        yas::objc_container objc_container1(objc_object, yas::strong);
+        yas::objc_strong_container objc_strong_container1(objc_object);
 
         XCTAssertEqual([objc_object retainCount], 2);
 
-        yas::objc_container objc_container2(objc_object, yas::strong);
+        yas::objc_strong_container objc_strong_container2(objc_object);
 
         XCTAssertEqual([objc_object retainCount], 3);
 
-        objc_container1 = objc_container2;
+        objc_strong_container1 = objc_strong_container2;
 
         XCTAssertEqual([objc_object retainCount], 3);
     }
@@ -216,17 +216,17 @@ static int _objc_object_count = 0;
     XCTAssertEqual([objc_object retainCount], 1);
 
     {
-        yas::objc_container objc_container1(objc_object, yas::strong);
+        yas::objc_strong_container objc_strong_container(objc_object);
 
         XCTAssertEqual([objc_object retainCount], 2);
 
-        yas::objc_container objc_container2(objc_object, yas::weak);
+        yas::objc_weak_container objc_weak_container(objc_object);
 
         XCTAssertEqual([objc_object retainCount], 2);
 
-        objc_container1 = objc_container2;
+        objc_strong_container = objc_weak_container;
 
-        XCTAssertEqual([objc_object retainCount], 1);
+        XCTAssertEqual([objc_object retainCount], 2);
     }
 
     XCTAssertEqual([objc_object retainCount], 1);
@@ -244,17 +244,17 @@ static int _objc_object_count = 0;
     XCTAssertEqual([objc_object retainCount], 1);
 
     {
-        yas::objc_container objc_container1(objc_object, yas::weak);
+        yas::objc_weak_container objc_weak_container(objc_object);
 
         XCTAssertEqual([objc_object retainCount], 1);
 
-        yas::objc_container objc_container2(objc_object, yas::strong);
+        yas::objc_strong_container objc_strong_container(objc_object);
 
         XCTAssertEqual([objc_object retainCount], 2);
 
-        objc_container1 = objc_container2;
+        objc_weak_container = objc_strong_container;
 
-        XCTAssertEqual([objc_object retainCount], 3);
+        XCTAssertEqual([objc_object retainCount], 2);
     }
 
     XCTAssertEqual([objc_object retainCount], 1);
@@ -272,15 +272,15 @@ static int _objc_object_count = 0;
     XCTAssertEqual([objc_object retainCount], 1);
 
     {
-        yas::objc_container objc_container1(objc_object, yas::weak);
+        yas::objc_weak_container objc_weak_container1(objc_object);
 
         XCTAssertEqual([objc_object retainCount], 1);
 
-        yas::objc_container objc_container2(objc_object, yas::weak);
+        yas::objc_weak_container objc_weak_container2(objc_object);
 
         XCTAssertEqual([objc_object retainCount], 1);
 
-        objc_container1 = objc_container2;
+        objc_weak_container1 = objc_weak_container2;
 
         XCTAssertEqual([objc_object retainCount], 1);
     }
@@ -300,11 +300,11 @@ static int _objc_object_count = 0;
     XCTAssertEqual([objc_object retainCount], 1);
 
     {
-        yas::objc_container objc_container1(objc_object, yas::strong);
+        yas::objc_strong_container objc_strong_container1(objc_object);
 
         XCTAssertEqual([objc_object retainCount], 2);
 
-        yas::objc_container objc_container2(objc_container1);
+        yas::objc_strong_container objc_strong_container2(objc_strong_container1);
 
         XCTAssertEqual([objc_object retainCount], 3);
     }
@@ -324,11 +324,11 @@ static int _objc_object_count = 0;
     XCTAssertEqual([objc_object retainCount], 1);
 
     {
-        yas::objc_container objc_container1(objc_object, yas::weak);
+        yas::objc_weak_container objc_weak_container1(objc_object);
 
         XCTAssertEqual([objc_object retainCount], 1);
 
-        yas::objc_container objc_container2(objc_container1);
+        yas::objc_weak_container objc_weak_container2(objc_weak_container1);
 
         XCTAssertEqual([objc_object retainCount], 1);
     }
@@ -347,13 +347,13 @@ static int _objc_object_count = 0;
     YASObjCContainerTest *objc_object2 = [[YASObjCContainerTest alloc] init];
 
     {
-        yas::objc_container objc_container1(objc_object1, yas::strong);
-        yas::objc_container objc_container2(objc_object2, yas::strong);
+        yas::objc_strong_container objc_strong_container1(objc_object1);
+        yas::objc_strong_container objc_strong_container2(objc_object2);
 
         XCTAssertEqual([objc_object1 retainCount], 2);
         XCTAssertEqual([objc_object2 retainCount], 2);
 
-        objc_container1 = objc_container2;
+        objc_strong_container1 = objc_strong_container2;
 
         XCTAssertEqual([objc_object1 retainCount], 1);
         XCTAssertEqual([objc_object2 retainCount], 3);
@@ -374,18 +374,18 @@ static int _objc_object_count = 0;
     YASObjCContainerTest *objc_object = [[YASObjCContainerTest alloc] init];
 
     {
-        yas::objc_container objc_container1(objc_object, yas::strong);
-        yas::objc_container objc_container2;
+        yas::objc_strong_container objc_strong_container1(objc_object);
+        yas::objc_strong_container objc_strong_container2;
 
         XCTAssertEqual([objc_object retainCount], 2);
 
-        objc_container2 = std::move(objc_container1);
+        objc_strong_container2 = std::move(objc_strong_container1);
 
         XCTAssertEqual([objc_object retainCount], 2);
 
-        XCTAssertNil(objc_container1.retained_object());
+        XCTAssertNil(objc_strong_container1.retained_object());
 
-        id retainedObject = objc_container2.retained_object();
+        id retainedObject = objc_strong_container2.retained_object();
         XCTAssertNotNil(retainedObject);
         [retainedObject release];
     }
@@ -401,17 +401,17 @@ static int _objc_object_count = 0;
     YASObjCContainerTest *objc_object = [[YASObjCContainerTest alloc] init];
 
     {
-        yas::objc_container objc_container1(objc_object, yas::strong);
+        yas::objc_strong_container objc_strong_container1(objc_object);
 
         XCTAssertEqual([objc_object retainCount], 2);
 
-        yas::objc_container objc_container2(std::move(objc_container1));
+        yas::objc_strong_container objc_strong_container2(std::move(objc_strong_container1));
 
         XCTAssertEqual([objc_object retainCount], 2);
 
-        XCTAssertNil(objc_container1.retained_object());
+        XCTAssertNil(objc_strong_container1.retained_object());
 
-        id retainedObject = objc_container2.retained_object();
+        id retainedObject = objc_strong_container2.retained_object();
         XCTAssertNotNil(retainedObject);
         [retainedObject release];
     }
@@ -427,15 +427,15 @@ static int _objc_object_count = 0;
     YASObjCContainerTest *objc_object = [[YASObjCContainerTest alloc] init];
 
     {
-        yas::objc_container objc_container(nil, yas::strong);
+        yas::objc_strong_container objc_strong_container(nil);
 
         XCTAssertEqual([objc_object retainCount], 1);
 
-        objc_container = objc_object;
+        objc_strong_container = objc_object;
 
         XCTAssertEqual([objc_object retainCount], 2);
 
-        id retainedObject = objc_container.retained_object();
+        id retainedObject = objc_strong_container.retained_object();
         XCTAssertNotNil(retainedObject);
         [retainedObject release];
     }
