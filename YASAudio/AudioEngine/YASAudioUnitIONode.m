@@ -345,25 +345,6 @@
     }
 }
 
-#pragma mark Render thread
-
-- (void)render:(YASAudioUnitRenderParameters *)renderParameters format:(YASAudioFormat *)format
-{
-    YASAudioData *renderData = [[YASAudioData alloc] initWithFormat:format audioBufferList:renderParameters->ioData];
-    YASAudioData *inputData = self.inputData;
-    UInt32 renderFrameLength = renderParameters->inNumberFrames;
-
-    if (renderData.audioBufferList != inputData.audioBufferList) {
-        if (inputData && renderFrameLength <= inputData.frameLength) {
-            [renderData copyFromData:inputData fromStartFrame:0 toStartFrame:0 length:renderFrameLength];
-        } else {
-            [renderData clear];
-        }
-    }
-
-    YASRelease(renderData);
-}
-
 @end
 
 #pragma mark -
