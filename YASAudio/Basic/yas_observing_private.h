@@ -191,6 +191,12 @@ namespace yas
     }
 
     template <typename K, typename T>
+    void subject<K, T>::notify(const K &key) const
+    {
+        notify(key, nullptr);
+    }
+
+    template <typename K, typename T>
     void subject<K, T>::notify(const K &key, const T &object) const
     {
         if (_observers.count(key)) {

@@ -18,7 +18,7 @@ namespace yas
     template <typename K, typename T>
     class subject;
 
-    template <typename K, typename T>
+    template <typename K, typename T = std::nullptr_t>
     class observer : public std::enable_shared_from_this<observer<K, T>>
     {
        public:
@@ -63,7 +63,7 @@ namespace yas
                                         const std::initializer_list<subject<K, T> *> &destination_subjects) ->
         typename observer<K, T>::shared_ptr;
 
-    template <typename K, typename T>
+    template <typename K, typename T = std::nullptr_t>
     class subject
     {
        public:
@@ -77,6 +77,7 @@ namespace yas
         bool operator==(const subject<K, T> &) const;
         bool operator!=(const subject<K, T> &) const;
 
+        void notify(const K &key) const;
         void notify(const K &key, const T &object) const;
 
        private:
