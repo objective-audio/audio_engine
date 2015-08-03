@@ -148,7 +148,7 @@ typedef std::shared_ptr<yas::audio_device_sample::kernel> sample_kernel_ptr;
     yas::audio_device_io_ptr _audio_device_io;
     yas::audio_device_observer_ptr _audio_device_observer;
     sample_kernel_ptr _kernel;
-    yas::objc_container_ptr _self_container;
+    yas::objc_weak_container_ptr _self_container;
 }
 
 - (void)viewDidLoad
@@ -170,7 +170,7 @@ typedef std::shared_ptr<yas::audio_device_sample::kernel> sample_kernel_ptr;
     });
 
     if (!_self_container) {
-        _self_container = yas::objc_container::create(self);
+        _self_container = yas::objc_weak_container::create(self);
     }
 
     _audio_graph = yas::audio_graph::create();
@@ -186,10 +186,11 @@ typedef std::shared_ptr<yas::audio_device_sample::kernel> sample_kernel_ptr;
     _audio_device_observer = yas::audio_device_observer::create();
     _audio_device_observer->add_handler(
         yas::audio_device::system_subject(), yas::audio_device::method::hardware_did_change,
-        [&self_container = _self_container](const auto &, const auto &) {
-            YASAudioDeviceSampleViewController *strongSelf = self_container->retained_object();
-            [strongSelf updateDeviceNames];
-            YASRelease(strongSelf);
+        [weak_container = _self_container](const auto &, const auto &) {
+            if (auto strong_container = weak_container->lock()) {
+                YASAudioDeviceSampleViewController *strongSelf = strong_container.object();
+                [strongSelf updateDeviceNames];
+            }
         });
 
     std::weak_ptr<yas::audio_device_io> weak_device_io = _audio_device_io;
@@ -327,13 +328,14 @@ typedef std::shared_ptr<yas::audio_device_sample::kernel> sample_kernel_ptr;
 
         _audio_device_observer->add_handler(
             selected_device->property_subject(), yas::audio_device::method::device_did_change,
-            [selected_device, self_container = _self_container](const auto &method, const auto &infos) {
+            [selected_device, weak_container = _self_container](const auto &method, const auto &infos) {
                 if (infos.size() > 0) {
                     auto &device_id = infos[0].object_id;
                     if (selected_device->audio_device_id() == device_id) {
-                        YASAudioDeviceSampleViewController *strongSelf = self_container->retained_object();
-                        [strongSelf updateDeviceInfo];
-                        YASRelease(strongSelf);
+                        if (auto strong_container = weak_container->lock()) {
+                            YASAudioDeviceSampleViewController *strongSelf = strong_container.object();
+                            [strongSelf updateDeviceInfo];
+                        }
                     }
                 }
             });
