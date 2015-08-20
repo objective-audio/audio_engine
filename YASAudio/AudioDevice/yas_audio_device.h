@@ -54,6 +54,9 @@ namespace yas
             bool operator<(const property_info &info) const;
         };
 
+        using system_subject_type = subject<method, std::vector<property_info>>;
+        using property_subject_type = subject<method, std::vector<property_info>>;
+
         static std::vector<audio_device_ptr> all_devices();
         static std::vector<audio_device_ptr> output_devices();
         static std::vector<audio_device_ptr> input_devices();
@@ -78,8 +81,8 @@ namespace yas
         audio_format_ptr input_format() const;
         audio_format_ptr output_format() const;
 
-        static subject<method, std::vector<property_info>> &system_subject();
-        subject<method, std::vector<property_info>> &property_subject() const;
+        static system_subject_type &system_subject();
+        property_subject_type &property_subject() const;
 
        private:
         class impl;
