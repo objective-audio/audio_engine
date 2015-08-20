@@ -55,6 +55,4 @@ namespace yas
         render_id render_id;
     };
 
-    class audio_time;
-    using audio_time_ptr = std::shared_ptr<audio_time>;
 }
