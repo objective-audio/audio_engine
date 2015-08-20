@@ -47,6 +47,7 @@ class audio_device_io::impl
 
     using kernel_ptr = std::shared_ptr<kernel>;
 
+    std::weak_ptr<audio_device_io> weak_device_io;
     audio_device_ptr audio_device;
     bool is_running;
     AudioDeviceIOProcID io_proc_id;
@@ -54,8 +55,9 @@ class audio_device_io::impl
     audio_time_ptr input_time_on_render;
     audio_device_observer_ptr observer;
 
-    impl(const audio_device_ptr audio_device)
-        : audio_device(audio_device),
+    impl()
+        : weak_device_io(),
+          audio_device(nullptr),
           is_running(false),
           io_proc_id(nullptr),
           input_buffer_on_render(nullptr),
@@ -134,10 +136,14 @@ audio_device_io_ptr audio_device_io::create()
     return audio_device_io::create(nullptr);
 }
 
-audio_device_io_ptr audio_device_io::create(const audio_device_ptr &audio_device)
+audio_device_io_ptr audio_device_io::create(const audio_device_ptr &device)
 {
-    auto device_io = std::shared_ptr<audio_device_io>(new audio_device_io(audio_device));
-    std::weak_ptr<audio_device_io> weak_device_io = device_io->shared_from_this();
+    auto device_io = std::shared_ptr<audio_device_io>(new audio_device_io());
+    device_io->_impl->weak_device_io = device_io;
+    auto &weak_device_io = device_io->_impl->weak_device_io;
+
+    device_io->set_audio_device(device);
+
     device_io->_impl->observer->add_handler(
         audio_device::system_subject(), audio_device::method::hardware_did_change,
         [weak_device_io](const auto &method, const auto &infos) {
@@ -148,10 +154,11 @@ audio_device_io_ptr audio_device_io::create(const audio_device_ptr &audio_device
                 }
             }
         });
+
     return device_io;
 }
 
-audio_device_io::audio_device_io(const audio_device_ptr &audio_device) : _impl(std::make_unique<impl>(audio_device))
+audio_device_io::audio_device_io() : _impl(std::make_unique<impl>())
 {
 }
 
@@ -172,58 +179,58 @@ void audio_device_io::initialize()
         return;
     }
 
-    std::weak_ptr<audio_device_io> weak_device_io = this->shared_from_this();
+    auto function = [weak_device_io = _impl->weak_device_io](
+        const AudioTimeStamp *inNow, const AudioBufferList *inInputData, const AudioTimeStamp *inInputTime,
+        AudioBufferList *outOutputData, const AudioTimeStamp *inOutputTime)
+    {
+        if (outOutputData) {
+            clear(outOutputData);
+        }
 
-    yas_raise_if_au_error(AudioDeviceCreateIOProcIDWithBlock(
-        &_impl->io_proc_id, _impl->audio_device->audio_device_id(), nullptr,
-        ^(const AudioTimeStamp *inNow, const AudioBufferList *inInputData, const AudioTimeStamp *inInputTime,
-          AudioBufferList *outOutputData, const AudioTimeStamp *inOutputTime) {
-            if (outOutputData) {
-                clear(outOutputData);
-            }
+        if (auto device_io = weak_device_io.lock()) {
+            if (auto kernel = device_io->_impl->kernel()) {
+                kernel->clear();
+                if (inInputData) {
+                    if (auto &input_buffer = kernel->input_buffer) {
+                        input_buffer->copy_from(inInputData);
 
-            if (auto device_io = weak_device_io.lock()) {
-                if (auto kernel = device_io->_impl->kernel()) {
-                    kernel->clear();
-                    if (inInputData) {
-                        if (auto &input_buffer = kernel->input_buffer) {
-                            input_buffer->copy_from(inInputData);
-
-                            const UInt32 input_frame_length = input_buffer->frame_length();
-                            if (input_frame_length > 0) {
-                                device_io->_impl->input_buffer_on_render = input_buffer;
-                                device_io->_impl->input_time_on_render =
-                                    std::make_shared<audio_time>(*inInputTime, input_buffer->format()->sample_rate());
-                            }
-                        }
-                    }
-
-                    auto render_callback = device_io->_impl->render_callback();
-                    if (render_callback) {
-                        if (auto &output_buffer = kernel->output_buffer) {
-                            if (outOutputData) {
-                                const UInt32 frame_length =
-                                    yas::frame_length(outOutputData, output_buffer->format()->sample_byte_count());
-                                if (frame_length > 0) {
-                                    output_buffer->set_frame_length(frame_length);
-                                    auto time = std::make_shared<audio_time>(*inOutputTime,
-                                                                             output_buffer->format()->sample_rate());
-                                    render_callback(output_buffer, time);
-                                    output_buffer->copy_to(outOutputData);
-                                }
-                            }
-                        } else if (kernel->input_buffer) {
-                            pcm_buffer_ptr data = nullptr;
-                            audio_time_ptr time = nullptr;
-                            render_callback(data, time);
+                        const UInt32 input_frame_length = input_buffer->frame_length();
+                        if (input_frame_length > 0) {
+                            device_io->_impl->input_buffer_on_render = input_buffer;
+                            device_io->_impl->input_time_on_render =
+                                std::make_shared<audio_time>(*inInputTime, input_buffer->format()->sample_rate());
                         }
                     }
                 }
 
-                device_io->_impl->input_buffer_on_render = nullptr;
-                device_io->_impl->input_time_on_render = nullptr;
+                if (auto render_callback = device_io->_impl->render_callback()) {
+                    if (auto &output_buffer = kernel->output_buffer) {
+                        if (outOutputData) {
+                            const UInt32 frame_length =
+                                yas::frame_length(outOutputData, output_buffer->format()->sample_byte_count());
+                            if (frame_length > 0) {
+                                output_buffer->set_frame_length(frame_length);
+                                auto time =
+                                    std::make_shared<audio_time>(*inOutputTime, output_buffer->format()->sample_rate());
+                                render_callback(output_buffer, time);
+                                output_buffer->copy_to(outOutputData);
+                            }
+                        }
+                    } else if (kernel->input_buffer) {
+                        pcm_buffer_ptr data = nullptr;
+                        audio_time_ptr time = nullptr;
+                        render_callback(data, time);
+                    }
+                }
             }
-        }));
+
+            device_io->_impl->input_buffer_on_render = nullptr;
+            device_io->_impl->input_time_on_render = nullptr;
+        }
+    };
+
+    yas_raise_if_au_error(AudioDeviceCreateIOProcIDWithBlock(&_impl->io_proc_id, _impl->audio_device->audio_device_id(),
+                                                             nullptr, function));
 
     _impl->update_kernel();
 }
@@ -257,14 +264,13 @@ void audio_device_io::set_audio_device(const audio_device_ptr device)
         _impl->audio_device = device;
 
         if (device) {
-            std::weak_ptr<audio_device_io> weak_device_io = this->shared_from_this();
-            _impl->observer->add_handler(_impl->audio_device->property_subject(),
-                                         audio_device::method::device_did_change,
-                                         [weak_device_io](const auto &method, const auto &infos) {
-                                             if (auto device_io = weak_device_io.lock()) {
-                                                 device_io->_impl->update_kernel();
-                                             }
-                                         });
+            _impl->observer->add_handler(
+                _impl->audio_device->property_subject(), audio_device::method::device_did_change,
+                [weak_device_io = _impl->weak_device_io](const auto &method, const auto &infos) {
+                    if (auto device_io = weak_device_io.lock()) {
+                        device_io->_impl->update_kernel();
+                    }
+                });
         }
 
         initialize();

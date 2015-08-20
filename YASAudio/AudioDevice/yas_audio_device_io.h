@@ -21,10 +21,10 @@ namespace yas
     class audio_device_io;
     using audio_device_io_ptr = std::shared_ptr<audio_device_io>;
 
-    class audio_device_io : public std::enable_shared_from_this<audio_device_io>
+    class audio_device_io
     {
        public:
-        using render_function = std::function<void(pcm_buffer_ptr &output_buffer, audio_time_ptr &when)>;
+        using render_function = std::function<void(const pcm_buffer_ptr &output_buffer, const audio_time_ptr &when)>;
 
         static audio_device_io_ptr create();
         static audio_device_io_ptr create(const audio_device_ptr &audio_device);
@@ -48,7 +48,7 @@ namespace yas
         class impl;
         std::unique_ptr<impl> _impl;
 
-        explicit audio_device_io(const audio_device_ptr &audio_device);
+        audio_device_io();
 
         audio_device_io(const audio_device_io &) = delete;
         audio_device_io(audio_device_io &&) = delete;
