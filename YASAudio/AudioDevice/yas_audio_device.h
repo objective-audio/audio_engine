@@ -72,8 +72,10 @@ namespace yas
         bool operator!=(const audio_device &) const;
 
         AudioDeviceID audio_device_id() const;
-        CFStringRef name() const;
-        CFStringRef manufacture() const;
+        std::string name() const;
+        std::string manufacture() const;
+        CFStringRef cf_name() const;
+        CFStringRef cf_manufacture() const;
         std::vector<audio_device_stream_ptr> input_streams() const;
         std::vector<audio_device_stream_ptr> output_streams() const;
         Float64 nominal_sample_rate() const;
