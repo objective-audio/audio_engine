@@ -25,6 +25,7 @@ extern Float32 YASAudioLinearFromDecibelf(Float32 decibel);
 
 extern Float32 YASAudioVectorSinef(Float32 *outData, const UInt32 count, const Float64 startPhase,
                                    const Float64 phasePerFrame);
+extern Float32 YASAudioVectorMaxf(const Float32 *inData, const uint32_t count);
 
 #if defined(__cplusplus)
 }

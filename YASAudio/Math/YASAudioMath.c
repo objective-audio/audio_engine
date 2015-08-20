@@ -65,3 +65,8 @@ Float32 YASAudioVectorSinef(Float32 *outData, const UInt32 count, const Float64 
 
     return phase;
 }
+
+Float32 YASAudioVectorMaxf(const Float32 *inData, const uint32_t count)
+{
+    return inData[cblas_isamax((int)count, inData, 1)];
+}
