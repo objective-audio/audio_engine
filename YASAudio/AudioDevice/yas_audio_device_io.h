@@ -16,6 +16,8 @@
 
 namespace yas
 {
+    class audio_time;
+    using audio_time_ptr = std::shared_ptr<audio_time>;
     class audio_device_io;
     using audio_device_io_ptr = std::shared_ptr<audio_device_io>;
 

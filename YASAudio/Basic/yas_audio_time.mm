@@ -34,6 +34,26 @@ class audio_time::impl
     impl &operator=(impl &&) = delete;
 };
 
+audio_time_ptr audio_time::create(const AudioTimeStamp &ts, const Float64 sample_rate)
+{
+    return std::make_shared<audio_time>(ts, sample_rate);
+}
+
+audio_time_ptr audio_time::create(const UInt64 host_time)
+{
+    return std::make_shared<audio_time>(host_time);
+}
+
+audio_time_ptr audio_time::create(const SInt64 sample_time, const Float64 sample_rate)
+{
+    return std::make_shared<audio_time>(sample_time, sample_rate);
+}
+
+audio_time_ptr audio_time::create(const UInt64 host_time, const SInt64 sample_time, const Float64 sample_rate)
+{
+    return std::make_shared<audio_time>(host_time, sample_time, sample_rate);
+}
+
 audio_time::audio_time(const AudioTimeStamp &ts, const Float64 sample_rate)
     : _impl(std::make_unique<impl>([[AVAudioTime alloc] initWithAudioTimeStamp:&ts sampleRate:sample_rate]))
 {
