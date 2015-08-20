@@ -9,6 +9,7 @@
 
 #include "yas_audio_format.h"
 #include "yas_audio_device_stream.h"
+#include "yas_cf_utils.h"
 #include <mutex>
 #include <memory>
 
@@ -486,12 +487,22 @@ AudioDeviceID audio_device::audio_device_id() const
     return _impl->audio_device_id;
 }
 
-CFStringRef audio_device::name() const
+std::string audio_device::name() const
+{
+    return yas::to_string(cf_name());
+}
+
+std::string audio_device::manufacture() const
+{
+    return yas::to_string(cf_manufacture());
+}
+
+CFStringRef audio_device::cf_name() const
 {
     return property_string(audio_device_id(), kAudioObjectPropertyName);
 }
 
-CFStringRef audio_device::manufacture() const
+CFStringRef audio_device::cf_manufacture() const
 {
     return property_string(audio_device_id(), kAudioObjectPropertyManufacturer);
 }
