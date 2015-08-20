@@ -297,7 +297,7 @@ typedef std::shared_ptr<yas::audio_device_sample::kernel> sample_kernel_ptr;
     NSMutableArray *titles = [NSMutableArray arrayWithCapacity:all_devices.size()];
 
     for (auto &device : all_devices) {
-        CFStringRef name = device->name();
+        CFStringRef name = device->cf_name();
         [titles addObject:(NSString *)name];
     }
 
@@ -352,8 +352,8 @@ typedef std::shared_ptr<yas::audio_device_sample::kernel> sample_kernel_ptr;
     NSColor *onColor = [NSColor blackColor];
     NSColor *offColor = [NSColor lightGrayColor];
     if (device) {
-        self.deviceInfo = [NSString stringWithFormat:@"name = %@\nnominal samplerate = %@", (NSString *)device->name(),
-                                                     @(device->nominal_sample_rate())];
+        self.deviceInfo = [NSString stringWithFormat:@"name = %@\nnominal samplerate = %@",
+                                                     (NSString *)device->cf_name(), @(device->nominal_sample_rate())];
         ;
         self.nominalSampleRate = device->nominal_sample_rate();
         self.ioThroughTextColor = (device->input_format() && device->output_format()) ? onColor : offColor;
