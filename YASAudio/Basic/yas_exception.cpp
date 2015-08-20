@@ -1,9 +1,6 @@
 //
 //  yas_exception.cpp
-//  YASAudio_Tests
-//
-//  Created by Yuki Yasoshima on 2015/05/24.
-//
+//  Copyright (c) 2015 Yuki Yasoshima.
 //
 
 #include "yas_exception.h"
