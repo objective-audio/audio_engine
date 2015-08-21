@@ -73,7 +73,7 @@ namespace yas
                 return _sine_volume.load();
             }
 
-            void process(const yas::pcm_buffer_ptr &input_buffer, yas::pcm_buffer_ptr &output_buffer)
+            void process(const yas::pcm_buffer_ptr &input_buffer, const yas::pcm_buffer_ptr &output_buffer)
             {
                 if (!output_buffer) {
                     return;
@@ -125,8 +125,8 @@ namespace yas
     }
 }
 
-typedef yas::audio_device_sample::kernel sample_kernel;
-typedef std::shared_ptr<yas::audio_device_sample::kernel> sample_kernel_ptr;
+using sample_kernel = yas::audio_device_sample::kernel;
+using sample_kernel_ptr = std::shared_ptr<yas::audio_device_sample::kernel>;
 
 @interface YASAudioDeviceSampleViewController ()
 
@@ -189,23 +189,22 @@ typedef std::shared_ptr<yas::audio_device_sample::kernel> sample_kernel_ptr;
         [weak_container = _self_container](const auto &, const auto &) {
             if (auto strong_container = weak_container->lock()) {
                 YASAudioDeviceSampleViewController *strongSelf = strong_container.object();
-                [strongSelf updateDeviceNames];
+                [strongSelf _updateDeviceNames];
             }
         });
 
     std::weak_ptr<yas::audio_device_io> weak_device_io = _audio_device_io;
-    _audio_device_io->set_render_callback([weak_device_io, kernel = _kernel](yas::pcm_buffer_ptr & output_buffer,
-                                                                             yas::audio_time_ptr & when) {
+    _audio_device_io->set_render_callback([weak_device_io, kernel = _kernel](const yas::pcm_buffer_ptr &output_buffer,
+                                                                             const yas::audio_time_ptr &when) {
         if (auto device_io = weak_device_io.lock()) {
             kernel->process(device_io->input_buffer_on_render(), output_buffer);
         }
     });
 
-    [self updateDeviceNames];
+    [self _updateDeviceNames];
 
     auto default_device = yas::audio_device::default_output_device();
-    auto index = yas::audio_device::index_of_device(default_device);
-    if (index) {
+    if (auto index = yas::audio_device::index_of_device(default_device)) {
         self.selectedDeviceIndex = *index;
     }
 }
@@ -290,7 +289,7 @@ typedef std::shared_ptr<yas::audio_device_sample::kernel> sample_kernel_ptr;
     }
 }
 
-- (void)updateDeviceNames
+- (void)_updateDeviceNames
 {
     auto all_devices = yas::audio_device::all_devices();
 
@@ -314,7 +313,7 @@ typedef std::shared_ptr<yas::audio_device_sample::kernel> sample_kernel_ptr;
     }
 }
 
-- (void)setDevice:(yas::audio_device_ptr)selected_device
+- (void)setDevice:(const yas::audio_device_ptr &)selected_device
 {
     if (auto prev_audio_device = _audio_device_io->audio_device()) {
         _audio_device_observer->remove_handler(prev_audio_device->property_subject(),
@@ -334,7 +333,7 @@ typedef std::shared_ptr<yas::audio_device_sample::kernel> sample_kernel_ptr;
                     if (selected_device->audio_device_id() == device_id) {
                         if (auto strong_container = weak_container->lock()) {
                             YASAudioDeviceSampleViewController *strongSelf = strong_container.object();
-                            [strongSelf updateDeviceInfo];
+                            [strongSelf _updateDeviceInfo];
                         }
                     }
                 }
@@ -343,10 +342,10 @@ typedef std::shared_ptr<yas::audio_device_sample::kernel> sample_kernel_ptr;
         _audio_device_io->set_audio_device(nullptr);
     }
 
-    [self updateDeviceInfo];
+    [self _updateDeviceInfo];
 }
 
-- (void)updateDeviceInfo
+- (void)_updateDeviceInfo
 {
     auto const device = _audio_device_io->audio_device();
     NSColor *onColor = [NSColor blackColor];
