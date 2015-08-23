@@ -523,7 +523,7 @@ audio_engine::start_result audio_engine::start_offline_render(const offline_rend
         return start_result(start_error_type::offline_output_not_found);
     }
 
-    auto result = offline_output_node->_start(render_function, completion_function);
+    auto result = audio_offline_output_node::private_access::start(offline_output_node, render_function, completion_function);
 
     if (result) {
         return start_result(nullptr);
@@ -539,7 +539,7 @@ void audio_engine::stop()
     }
 
     if (auto offline_output_node = _impl->offline_output_node()) {
-        offline_output_node->_stop();
+        audio_offline_output_node::private_access::stop(offline_output_node);
     }
 }
 
