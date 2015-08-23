@@ -17,7 +17,7 @@ namespace yas
     };
 
     template <typename K, typename T>
-    class property : public std::enable_shared_from_this<property<K, T>>
+    class property
     {
        public:
         using shared_ptr = std::shared_ptr<property<K, T>>;
@@ -34,6 +34,7 @@ namespace yas
         subject<property_method, shared_ptr> &subject();
 
        private:
+        std::weak_ptr<property<K, T>> _weak_this;
         T _value;
         K _key;
         yas::subject<property_method, shared_ptr> _subject;

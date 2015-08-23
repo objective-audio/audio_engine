@@ -10,13 +10,17 @@ namespace yas
     template <typename K, typename T>
     typename property<K, T>::shared_ptr property<K, T>::create(const K &key)
     {
-        return shared_ptr(new property(key));
+        auto prop = shared_ptr(new property(key));
+        prop->_weak_this = prop;
+        return prop;
     }
 
     template <typename K, typename T>
     typename property<K, T>::shared_ptr property<K, T>::create(const K &key, const T &value)
     {
-        return shared_ptr(new property(key, value));
+        auto prop = shared_ptr(new property(key, value));
+        prop->_weak_this = prop;
+        return prop;
     }
 
     template <typename K, typename T>
@@ -42,7 +46,7 @@ namespace yas
     {
         if (auto lock = std::unique_lock<std::mutex>(_notify_mutex, std::try_to_lock)) {
             if (lock.owns_lock()) {
-                auto shared_this = this->shared_from_this();
+                auto shared_this = _weak_this.lock();
                 _subject.notify(property_method::will_change, shared_this);
                 _value = value;
                 _subject.notify(property_method::did_change, shared_this);
@@ -61,7 +65,7 @@ namespace yas
     {
         return _subject;
     }
-    
+
     template <typename K, typename T>
     auto make_property(const K &key, const T &value) -> typename property<K, T>::shared_ptr
     {

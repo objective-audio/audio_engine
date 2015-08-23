@@ -67,7 +67,7 @@ namespace yas
         using super_class = audio_unit_io_node;
     };
 
-    class audio_unit_input_node : public audio_unit_io_node, public std::enable_shared_from_this<audio_unit_input_node>
+    class audio_unit_input_node : public audio_unit_io_node
     {
        public:
         static audio_unit_input_node_ptr create();
@@ -87,5 +87,7 @@ namespace yas
         std::unique_ptr<impl> _impl;
 
         using super_class = audio_unit_io_node;
+
+        std::weak_ptr<audio_unit_input_node> _weak_this;
     };
 }

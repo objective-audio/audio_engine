@@ -241,6 +241,7 @@ audio_unit_input_node_ptr audio_unit_input_node::create()
 {
     auto node = audio_unit_input_node_ptr(new audio_unit_input_node());
     prepare_for_create(node);
+    node->_weak_this = node;
     return node;
 }
 
@@ -278,9 +279,7 @@ void audio_unit_input_node::update_connections()
         auto input_buffer = pcm_buffer::create(out_connection->format(), 4096);
         _impl->input_buffer = input_buffer;
 
-        std::weak_ptr<audio_unit_input_node> weak_node = shared_from_this();
-
-        unit->set_input_callback([weak_node, input_buffer](render_parameters &render_parameters) {
+        unit->set_input_callback([weak_node = _weak_this, input_buffer](render_parameters &render_parameters) {
             auto input_node = weak_node.lock();
             if (input_node && render_parameters.in_number_frames <= input_buffer->frame_capacity()) {
                 input_buffer->set_frame_length(render_parameters.in_number_frames);

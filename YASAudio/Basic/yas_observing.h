@@ -19,7 +19,7 @@ namespace yas
     class subject;
 
     template <typename K, typename T = std::nullptr_t>
-    class observer : public std::enable_shared_from_this<observer<K, T>>
+    class observer
     {
        public:
         using shared_ptr = std::shared_ptr<observer<K, T>>;
@@ -41,6 +41,8 @@ namespace yas
        private:
         class handler_holder;
         std::map<const subject<K, T> *, handler_holder> _handlers;
+
+        std::weak_ptr<observer<K, T>> _weak_this;
 
         observer();
 
@@ -90,9 +92,10 @@ namespace yas
         subject &operator=(const subject<K, T> &) = delete;
         subject &operator=(const subject<K, T> &&) = delete;
 
-        void add_observer(observer<K, T> &observer, const std::experimental::optional<K> &key);
-        void remove_observer(const observer<K, T> &observer, const std::experimental::optional<K> &key);
-        void remove_observer(const observer<K, T> &observer);
+        void add_observer(typename observer<K, T>::shared_ptr &observer, const std::experimental::optional<K> &key);
+        void remove_observer(const typename observer<K, T>::shared_ptr &observer,
+                             const std::experimental::optional<K> &key);
+        void remove_observer(const typename observer<K, T>::shared_ptr &observer);
 
         friend observer<K, T>;
     };
