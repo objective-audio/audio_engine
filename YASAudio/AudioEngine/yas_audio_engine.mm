@@ -56,7 +56,7 @@ class audio_engine::impl
         }
 
         _nodes.insert(node);
-        node->set_engine(engine.lock());
+        audio_node::private_access::set_engine(node, engine.lock());
 
         add_node_to_graph(node);
     }
@@ -76,7 +76,7 @@ class audio_engine::impl
         });
 
         remove_node_from_graph(node);
-        node->set_engine(nullptr);
+        audio_node::private_access::set_engine(node, nullptr);
         _nodes.erase(node);
     }
 
@@ -128,7 +128,7 @@ class audio_engine::impl
         }
 
         for (auto &node : update_nodes) {
-            node->update_connections();
+            audio_node::private_access::update_connections(node);
             detach_node_if_unused(node);
         }
 
@@ -201,8 +201,8 @@ class audio_engine::impl
             return false;
         }
 
-        destination_node->add_connection(connection);
-        source_node->add_connection(connection);
+        audio_node::private_access::add_connection(destination_node, connection);
+        audio_node::private_access::add_connection(source_node, connection);
 
         return true;
     }
@@ -215,11 +215,11 @@ class audio_engine::impl
         }
 
         if (auto source_node = connection->source_node()) {
-            source_node->remove_connection(*connection);
+            audio_node::private_access::remove_connection(source_node, *connection);
         }
 
         if (auto destination_node = connection->destination_node()) {
-            destination_node->remove_connection(*connection);
+            audio_node::private_access::remove_connection(destination_node, *connection);
         }
     }
 
@@ -229,7 +229,7 @@ class audio_engine::impl
             return;
         }
 
-        node->update_connections();
+        audio_node::private_access::update_connections(node);
     }
 
     void update_all_node_connections()
@@ -239,7 +239,7 @@ class audio_engine::impl
         }
 
         for (auto &node : _nodes) {
-            node->update_connections();
+            audio_node::private_access::update_connections(node);
         }
     }
 
@@ -419,7 +419,7 @@ void audio_engine::disconnect(const audio_connection_ptr &connection)
     audio_connection::private_access::remove_nodes(connection);
 
     for (auto &node : update_nodes) {
-        node->update_connections();
+        audio_node::private_access::update_connections(node);
         _impl->detach_node_if_unused(node);
     }
 

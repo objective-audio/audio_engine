@@ -97,9 +97,6 @@ namespace yas
         void add_connection(const audio_connection_ptr &connection);
         void remove_connection(const audio_connection &connection);
 
-        friend audio_connection;
-        friend audio_engine;
-
        public:
         class private_access;
         friend private_access;

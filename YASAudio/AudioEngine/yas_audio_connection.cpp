@@ -37,8 +37,8 @@ audio_connection_ptr audio_connection::create(const audio_node_ptr &source_node,
 {
     auto connection =
         audio_connection_ptr(new audio_connection(source_node, source_bus, destination_node, destination_bus, format));
-    source_node->add_connection(connection);
-    destination_node->add_connection(connection);
+    audio_node::private_access::add_connection(source_node, connection);
+    audio_node::private_access::add_connection(destination_node, connection);
     return connection;
 }
 
@@ -55,10 +55,10 @@ audio_connection::audio_connection(const audio_node_ptr &source_node, const UInt
 audio_connection::~audio_connection()
 {
     if (auto destination_node = _impl->destination_node.lock()) {
-        destination_node->remove_connection(*this);
+        audio_node::private_access::remove_connection(destination_node, *this);
     }
     if (auto source_node = _impl->source_node.lock()) {
-        source_node->remove_connection(*this);
+        audio_node::private_access::remove_connection(source_node, *this);
     }
 }
 
