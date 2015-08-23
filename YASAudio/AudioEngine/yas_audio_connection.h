@@ -51,10 +51,6 @@ namespace yas
         void remove_source_node();
         void remove_destination_node();
 
-        friend audio_node;
-        friend audio_engine;
-        friend audio_unit_node;
-
        public:
         class private_access;
         friend private_access;
