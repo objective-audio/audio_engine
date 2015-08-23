@@ -166,10 +166,10 @@ audio_device_io::~audio_device_io()
 {
     _impl->observer->remove_handler(audio_device::system_subject(), audio_device::method::hardware_did_change);
 
-    uninitialize();
+    _uninitialize();
 }
 
-void audio_device_io::initialize()
+void audio_device_io::_initialize()
 {
     if (!_impl->audio_device || _impl->io_proc_id) {
         return;
@@ -235,7 +235,7 @@ void audio_device_io::initialize()
     _impl->update_kernel();
 }
 
-void audio_device_io::uninitialize()
+void audio_device_io::_uninitialize()
 {
     stop();
 
@@ -254,7 +254,7 @@ void audio_device_io::set_audio_device(const audio_device_ptr device)
     if (_impl->audio_device != device) {
         bool running = is_running();
 
-        uninitialize();
+        _uninitialize();
 
         if (_impl->audio_device) {
             _impl->observer->remove_handler(_impl->audio_device->property_subject(),
@@ -273,7 +273,7 @@ void audio_device_io::set_audio_device(const audio_device_ptr device)
                 });
         }
 
-        initialize();
+        _initialize();
 
         if (running) {
             start();

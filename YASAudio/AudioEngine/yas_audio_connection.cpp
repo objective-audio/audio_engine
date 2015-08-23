@@ -31,9 +31,9 @@ class audio_connection::impl
     }
 };
 
-audio_connection_ptr audio_connection::create(const audio_node_ptr &source_node, const UInt32 source_bus,
-                                              const audio_node_ptr &destination_node, const UInt32 destination_bus,
-                                              const audio_format_ptr &format)
+audio_connection_ptr audio_connection::_create(const audio_node_ptr &source_node, const UInt32 source_bus,
+                                               const audio_node_ptr &destination_node, const UInt32 destination_bus,
+                                               const audio_format_ptr &format)
 {
     auto connection =
         audio_connection_ptr(new audio_connection(source_node, source_bus, destination_node, destination_bus, format));
@@ -89,20 +89,20 @@ audio_format_ptr &audio_connection::format() const
     return _impl->format;
 }
 
-void audio_connection::remove_nodes()
+void audio_connection::_remove_nodes()
 {
     std::lock_guard<std::recursive_mutex> lock(_impl->mutex);
     _impl->source_node.reset();
     _impl->destination_node.reset();
 }
 
-void audio_connection::remove_source_node()
+void audio_connection::_remove_source_node()
 {
     std::lock_guard<std::recursive_mutex> lock(_impl->mutex);
     _impl->source_node.reset();
 }
 
-void audio_connection::remove_destination_node()
+void audio_connection::_remove_destination_node()
 {
     std::lock_guard<std::recursive_mutex> lock(_impl->mutex);
     _impl->destination_node.reset();

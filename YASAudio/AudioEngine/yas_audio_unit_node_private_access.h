@@ -13,7 +13,7 @@ namespace yas
         template <typename T>
         static void reload_audio_unit(T &node)
         {
-            node->reload_audio_unit();
+            node->_reload_audio_unit();
         }
 
         template <typename T>
@@ -25,13 +25,13 @@ namespace yas
         template <typename T>
         static void add_audio_unit_to_graph(T &node, const audio_graph_ptr &graph)
         {
-            node->add_audio_unit_to_graph(graph);
+            node->_add_audio_unit_to_graph(graph);
         }
 
         template <typename T>
         static void remove_audio_unit_from_graph(T &node)
         {
-            node->remove_audio_unit_from_graph();
+            node->_remove_audio_unit_from_graph();
         }
     };
 }

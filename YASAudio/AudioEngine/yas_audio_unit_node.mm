@@ -287,22 +287,22 @@ void audio_unit_node::render(const pcm_buffer_ptr &buffer, const uint32_t bus_id
 
 #pragma mark - private
 
-void audio_unit_node::reload_audio_unit()
+void audio_unit_node::_reload_audio_unit()
 {
     auto graph = _impl->audio_graph.lock();
 
     if (graph) {
-        remove_audio_unit_from_graph();
+        _remove_audio_unit_from_graph();
     }
 
     _impl->set_audio_unit(audio_unit::create(_impl->acd));
 
     if (graph) {
-        add_audio_unit_to_graph(graph);
+        _add_audio_unit_to_graph(graph);
     }
 }
 
-void audio_unit_node::add_audio_unit_to_graph(const audio_graph_ptr &graph)
+void audio_unit_node::_add_audio_unit_to_graph(const audio_graph_ptr &graph)
 {
     if (!graph) {
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
@@ -315,7 +315,7 @@ void audio_unit_node::add_audio_unit_to_graph(const audio_graph_ptr &graph)
     prepare_parameters();
 }
 
-void audio_unit_node::remove_audio_unit_from_graph()
+void audio_unit_node::_remove_audio_unit_from_graph()
 {
     if (auto graph = _impl->audio_graph.lock()) {
         graph->remove_audio_unit(_impl->_audio_unit);

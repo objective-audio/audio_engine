@@ -83,11 +83,11 @@ namespace yas
         audio_engine &operator=(const audio_engine &) = delete;
         audio_engine &operator=(audio_engine &&) = delete;
 
-        void reload_graph();
-        void post_configuration_change() const;
+        void _reload_graph();
+        void _post_configuration_change() const;
 
-        std::set<audio_node_ptr> &nodes() const;
-        std::set<audio_connection_ptr> &connections() const;
+        std::set<audio_node_ptr> &_nodes() const;
+        std::set<audio_connection_ptr> &_connections() const;
 
        public:
         class private_access;

@@ -32,7 +32,6 @@ namespace yas
 
         bool is_running() const;
 
-       protected:
        private:
         class impl;
         std::unique_ptr<impl> _impl;

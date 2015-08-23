@@ -219,12 +219,12 @@ void audio_node::update_node_core()
 
 #pragma mark - private
 
-void audio_node::set_engine(const audio_engine_ptr &engine)
+void audio_node::_set_engine(const audio_engine_ptr &engine)
 {
     _impl->engine = engine;
 }
 
-void audio_node::add_connection(const audio_connection_ptr &connection)
+void audio_node::_add_connection(const audio_connection_ptr &connection)
 {
     if (*connection->destination_node() == *this) {
         auto bus_idx = connection->destination_bus();
@@ -239,7 +239,7 @@ void audio_node::add_connection(const audio_connection_ptr &connection)
     update_node_core();
 }
 
-void audio_node::remove_connection(const audio_connection &connection)
+void audio_node::_remove_connection(const audio_connection &connection)
 {
     if (*connection.destination_node() == *this) {
         _impl->input_connections().erase(connection.destination_bus());

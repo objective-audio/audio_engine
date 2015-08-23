@@ -16,8 +16,8 @@
 namespace yas
 {
     template <typename T>
-    std::unique_ptr<std::vector<T>> audio_device_stream::property_data(const AudioStreamID stream_id,
-                                                                       const AudioObjectPropertySelector selector) const
+    std::unique_ptr<std::vector<T>> audio_device_stream::_property_data(
+        const AudioStreamID stream_id, const AudioObjectPropertySelector selector) const
     {
         const AudioObjectPropertyAddress address = {.mSelector = selector,
                                                     .mScope = kAudioObjectPropertyScopeGlobal,
