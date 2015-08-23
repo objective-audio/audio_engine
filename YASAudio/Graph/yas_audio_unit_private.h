@@ -39,7 +39,7 @@ namespace yas
     {
         UInt32 byte_size = 0;
         yas_raise_if_au_error(
-            AudioUnitGetPropertyInfo(audio_unit_instance(), property_id, scope, element, &byte_size, NULL));
+            AudioUnitGetPropertyInfo(audio_unit_instance(), property_id, scope, element, &byte_size, nullptr));
         UInt32 vector_size = byte_size / sizeof(T);
 
         if (vector_size > 0) {
@@ -47,6 +47,7 @@ namespace yas
             byte_size = vector_size * sizeof(T);
             yas_raise_if_au_error(
                 AudioUnitGetProperty(audio_unit_instance(), property_id, scope, element, data->data(), &byte_size));
+
             return data;
         }
 

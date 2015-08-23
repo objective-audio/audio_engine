@@ -5,6 +5,6 @@
 
 #import <Cocoa/Cocoa.h>
 
-@interface YASAudioEngineSampleViewController : NSViewController
+@interface YASAudioEngineDeviceIOSampleViewController : NSViewController
 
 @end

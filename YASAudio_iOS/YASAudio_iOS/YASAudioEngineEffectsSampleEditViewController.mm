@@ -5,25 +5,14 @@
 
 #import "YASAudioEngineEffectsSampleEditViewController.h"
 #import "YASAudioEngineSampleParameterCell.h"
-#import "YASAudio.h"
+#import "yas_audio.h"
 
 @interface YASAudioEngineEffectsSampleEditViewController ()
 
-@property (nonatomic, strong) NSArray *globalParameters;
-
 @end
 
-@implementation YASAudioEngineEffectsSampleEditViewController
-
-- (void)dealloc
-{
-    YASRelease(_audioUnitNode);
-    YASRelease(_globalParameters);
-
-    _audioUnitNode = nil;
-    _globalParameters = nil;
-
-    YASSuperDealloc;
+@implementation YASAudioEngineEffectsSampleEditViewController {
+    yas::audio_unit_node_ptr _node;
 }
 
 - (void)viewDidLoad
@@ -31,14 +20,9 @@
     [super viewDidLoad];
 }
 
-- (void)setAudioUnitNode:(YASAudioUnitNode *)audioUnitNode
+- (void)set_audio_unit_node:(const std::shared_ptr<yas::audio_unit_node> &)node
 {
-    if (_audioUnitNode != audioUnitNode) {
-        YASRelease(_audioUnitNode);
-        _audioUnitNode = YASRetain(audioUnitNode);
-    }
-
-    self.globalParameters = [_audioUnitNode.audioUnit getParametersWithScope:kAudioUnitScope_Global].allValues;
+    _node = node;
 
     [self.tableView reloadData];
 }
@@ -52,14 +36,15 @@
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    return self.globalParameters.count;
+    return _node->global_parameters().size();
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     YASAudioEngineSampleParameterCell *cell =
         [tableView dequeueReusableCellWithIdentifier:@"ParameterCell" forIndexPath:indexPath];
-    [cell setParameter:self.globalParameters[indexPath.row] node:self.audioUnitNode];
+
+    [cell set_node:_node index:static_cast<uint32_t>(indexPath.row)];
 
     return cell;
 }

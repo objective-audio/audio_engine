@@ -38,6 +38,8 @@ namespace yas
         UInt32 destination_bus() const;
         UInt32 destination_channel() const;
 
+        std::string description() const;
+
        private:
         class impl;
         std::unique_ptr<impl> _impl;
@@ -45,4 +47,6 @@ namespace yas
         channel_route(const UInt32 source_bus, const UInt32 source_channel, const UInt32 destination_bus,
                       const UInt32 destination_channel);
     };
+
+    std::string to_string(const channel_route &);
 }

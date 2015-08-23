@@ -4,11 +4,15 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <memory>
 
-@class YASAudioUnitNode;
+namespace yas
+{
+    class audio_unit_node;
+}
 
 @interface YASAudioEngineEffectsSampleEditViewController : UITableViewController
 
-@property (nonatomic, strong) YASAudioUnitNode *audioUnitNode;
+- (void)set_audio_unit_node:(const std::shared_ptr<yas::audio_unit_node> &)node;
 
 @end

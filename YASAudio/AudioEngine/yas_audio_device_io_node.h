@@ -1,0 +1,63 @@
+//
+//  yas_audio_device_io_node.h
+//  Copyright (c) 2015 Yuki Yasoshima.
+//
+
+#pragma once
+
+#include <TargetConditionals.h>
+
+#if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
+
+#include "yas_audio_node.h"
+#include <set>
+
+namespace yas
+{
+    class audio_device_io_node;
+    class audio_device;
+    class audio_graph;
+
+    using audio_device_io_node_ptr = std::shared_ptr<audio_device_io_node>;
+    using audio_device_ptr = std::shared_ptr<audio_device>;
+    using audio_graph_ptr = std::shared_ptr<audio_graph>;
+
+    class audio_device_io_node : public audio_node
+    {
+       public:
+        static audio_device_io_node_ptr create(const audio_device_ptr &device = nullptr);
+
+        virtual ~audio_device_io_node();
+
+        virtual uint32_t input_bus_count() const override;
+        virtual uint32_t output_bus_count() const override;
+
+        void set_device(const audio_device_ptr &device);
+        audio_device_ptr device() const;
+
+        virtual void render(const pcm_buffer_ptr &buffer, const uint32_t bus_idx, const audio_time_ptr &when) override;
+
+       protected:
+        audio_device_io_node(const audio_device_ptr &device);
+
+        virtual void update_connections() override;
+
+       private:
+        class impl;
+        std::unique_ptr<impl> _impl;
+
+        using super_class = audio_node;
+
+        void _add_audio_device_io_to_graph(const audio_graph_ptr &graph);
+        void _remove_audio_device_io_from_graph();
+        bool _validate_connections() const;
+
+       public:
+        class private_access;
+        friend private_access;
+    };
+}
+
+#include "yas_audio_device_io_node_private_access.h"
+
+#endif

@@ -34,13 +34,13 @@ class audio_device_io::impl
         {
         }
 
-        void clear()
+        void reset_buffers()
         {
             if (input_buffer) {
-                input_buffer->clear();
+                input_buffer->reset();
             }
             if (output_buffer) {
-                output_buffer->clear();
+                output_buffer->reset();
             }
         }
     };
@@ -189,7 +189,7 @@ void audio_device_io::initialize()
 
         if (auto device_io = weak_device_io.lock()) {
             if (auto kernel = device_io->_impl->kernel()) {
-                kernel->clear();
+                kernel->reset_buffers();
                 if (inInputData) {
                     if (auto &input_buffer = kernel->input_buffer) {
                         input_buffer->copy_from(inInputData);

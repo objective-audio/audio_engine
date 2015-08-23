@@ -22,6 +22,8 @@ namespace yas
 {
     class audio_unit;
     using audio_unit_ptr = std::shared_ptr<audio_unit>;
+    using channel_map = std::vector<uint32_t>;
+    using channel_map_uptr = std::unique_ptr<channel_map>;
 
     class audio_unit
     {
@@ -35,6 +37,7 @@ namespace yas
 
         ~audio_unit();
 
+        const std::string &name();
         OSType type() const;
         OSType sub_type() const;
         bool is_output_unit() const;
@@ -71,19 +74,26 @@ namespace yas
         AudioUnitParameterValue parameter_value(const AudioUnitParameterID parameter_id, const AudioUnitScope scope,
                                                 const AudioUnitElement element);
 
-        std::map<AudioUnitParameterID, audio_unit_parameter> create_parameters(const AudioUnitScope &scope);
-        audio_unit_parameter create_parameter(const AudioUnitParameterID &parameter_id, const AudioUnitScope &scope);
+        audio_unit_parameter_map create_parameters(const AudioUnitScope scope);
+        audio_unit_parameter create_parameter(const AudioUnitParameterID &parameter_id, const AudioUnitScope scope);
 
         void set_element_count(const UInt32 &count, const AudioUnitScope &scope);  // for mixer
         UInt32 element_count(const AudioUnitScope &scope) const;                   // for mixer
 
-        void set_enable_output(const bool enable_output);  // for io
-        bool is_enable_output() const;                     // for io
-        void set_enable_input(const bool enable_input);    // for io
-        bool is_enable_input() const;                      // for io
-        bool has_output() const;                           // for io
-        bool has_input() const;                            // for io
-        bool is_running() const;                           // for io
+        void set_enable_output(const bool enable_output);                            // for io
+        bool is_enable_output() const;                                               // for io
+        void set_enable_input(const bool enable_input);                              // for io
+        bool is_enable_input() const;                                                // for io
+        bool has_output() const;                                                     // for io
+        bool has_input() const;                                                      // for io
+        bool is_running() const;                                                     // for io
+        void set_channel_map(const channel_map_uptr &, const AudioUnitScope scope);  // for io
+        channel_map_uptr channel_map(const AudioUnitScope scope);                    // for io
+        uint32_t channel_map_count(const AudioUnitScope scope);                      // for io
+#if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
+        void set_current_device(const AudioDeviceID &device);  // for io
+        const AudioDeviceID current_device() const;            // for io
+#endif
 
         void start();  // for io
         void stop();   // for io

@@ -82,6 +82,8 @@ namespace yas
 
         audio_format_ptr input_format() const;
         audio_format_ptr output_format() const;
+        uint32_t input_channel_count() const;
+        uint32_t output_channel_count() const;
 
         static system_subject_type &system_subject();
         property_subject_type &property_subject() const;

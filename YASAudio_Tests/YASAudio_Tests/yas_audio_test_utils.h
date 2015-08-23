@@ -8,11 +8,8 @@
 
 #pragma once
 
+#include "yas_audio.h"
 #include <Foundation/Foundation.h>
-#include <memory>
-#include "YASAudioTypes.h"
-#include "yas_audio_format.h"
-#include "yas_pcm_buffer.h"
 
 @class YASAudioFormat;
 
@@ -33,5 +30,20 @@ namespace yas
         void audio_unit_render_on_sub_thread(std::shared_ptr<audio_unit> audio_unit, yas::audio_format_ptr format,
                                              const UInt32 frame_length, const NSUInteger count,
                                              const NSTimeInterval wait);
+
+        class audio_test_node;
+        using audio_test_node_ptr = std::shared_ptr<audio_test_node>;
+
+        class audio_test_node : public yas::audio_node
+        {
+           public:
+            static audio_test_node_ptr create(const uint32_t input_bus_count = 2, const uint32_t output_bus_count = 1);
+            uint32_t input_bus_count() const override;
+            uint32_t output_bus_count() const override;
+
+           private:
+            uint32_t _input_bus_count;
+            uint32_t _output_bus_count;
+        };
     }
 }

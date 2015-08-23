@@ -17,6 +17,7 @@ namespace yas
 {
     class audio_graph;
     using audio_graph_ptr = std::shared_ptr<audio_graph>;
+    using audio_graph_weak_ptr = std::weak_ptr<audio_graph>;
 
     class audio_graph
     {
@@ -24,8 +25,8 @@ namespace yas
         static audio_graph_ptr create();
         ~audio_graph();
 
-        void add_audio_unit(audio_unit_ptr &audio_unit);
-        void remove_audio_unit(audio_unit_ptr &audio_unit);
+        void add_audio_unit(const audio_unit_ptr &audio_unit);
+        void remove_audio_unit(const audio_unit_ptr &audio_unit);
         void remove_all_units();
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
