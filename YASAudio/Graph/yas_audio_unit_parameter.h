@@ -12,6 +12,9 @@
 
 namespace yas
 {
+    class audio_unit_parameter;
+    using audio_unit_parameter_map = std::map<AudioUnitParameterID, audio_unit_parameter>;
+
     class audio_unit_parameter
     {
        public:
@@ -24,10 +27,10 @@ namespace yas
 
         AudioUnitParameterID parameter_id() const;
         AudioUnitScope scope() const;
-        CFStringRef unit_name() const;
+        const std::string &unit_name() const;
         bool has_clump() const;
         uint32_t clump_id() const;
-        CFStringRef name() const;
+        const std::string &name() const;
         AudioUnitParameterUnit unit() const;
         AudioUnitParameterValue min_value() const;
         AudioUnitParameterValue max_value() const;
@@ -35,6 +38,7 @@ namespace yas
 
         Float32 value(const AudioUnitElement element) const;
         void set_value(const Float32 value, const AudioUnitElement element);
+        const std::map<AudioUnitElement, AudioUnitParameterValue> &values() const;
 
        private:
         class impl;

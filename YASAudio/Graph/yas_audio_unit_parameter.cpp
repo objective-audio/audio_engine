@@ -21,6 +21,8 @@ class audio_unit_parameter::impl
     AudioUnitParameterValue max_value;
     AudioUnitParameterValue default_value;
     std::map<AudioUnitElement, AudioUnitParameterValue> values;
+    std::string unit_name;
+    std::string name;
 
     impl(const AudioUnitParameterInfo &info, const AudioUnitParameterID parameter_id, const AudioUnitScope scope)
         : parameter_id(parameter_id),
@@ -32,17 +34,13 @@ class audio_unit_parameter::impl
           max_value(info.maxValue),
           default_value(info.defaultValue),
           values(),
-          _unit_name(nullptr),
-          _name(nullptr)
+          unit_name(yas::to_string(info.unitName)),
+          name(yas::to_string(info.cfNameString))
     {
-        set_unit_name(info.unitName);
-        set_name(info.cfNameString);
     }
 
     ~impl()
     {
-        set_unit_name(nullptr);
-        set_name(nullptr);
     }
 
     impl(impl &&impl)
@@ -56,41 +54,14 @@ class audio_unit_parameter::impl
         max_value = std::move(impl.max_value);
         default_value = std::move(impl.default_value);
         values = std::move(impl.values);
-
-        _unit_name = std::move(impl.unit_name());
-        _name = std::move(impl.name());
-        impl._unit_name = nullptr;
-        impl._name = nullptr;
+        unit_name = std::move(impl.unit_name);
+        name = std::move(impl.name);
     }
 
     impl &operator=(impl &&impl)
     {
         return *this;
     }
-
-    void set_unit_name(const CFStringRef &unit_name)
-    {
-        yas::set_cf_property(_unit_name, unit_name);
-    }
-
-    CFStringRef unit_name() const
-    {
-        return _unit_name;
-    }
-
-    void set_name(const CFStringRef &name)
-    {
-        yas::set_cf_property(_name, name);
-    }
-
-    CFStringRef name() const
-    {
-        return _name;
-    }
-
-   private:
-    CFStringRef _unit_name;
-    CFStringRef _name;
 };
 
 audio_unit_parameter::audio_unit_parameter(const AudioUnitParameterInfo &info, const AudioUnitParameterID parameter_id,
@@ -129,9 +100,9 @@ AudioUnitScope audio_unit_parameter::scope() const
     return _impl->scope;
 }
 
-CFStringRef audio_unit_parameter::unit_name() const
+const std::string &audio_unit_parameter::unit_name() const
 {
-    return _impl->unit_name();
+    return _impl->unit_name;
 }
 
 bool audio_unit_parameter::has_clump() const
@@ -144,9 +115,9 @@ uint32_t audio_unit_parameter::clump_id() const
     return _impl->clump_id;
 }
 
-CFStringRef audio_unit_parameter::name() const
+const std::string &audio_unit_parameter::name() const
 {
-    return _impl->name();
+    return _impl->name;
 }
 
 AudioUnitParameterUnit audio_unit_parameter::unit() const
@@ -177,4 +148,9 @@ Float32 audio_unit_parameter::value(const AudioUnitElement element) const
 void audio_unit_parameter::set_value(const AudioUnitParameterValue value, const AudioUnitElement element)
 {
     _impl->values.insert(std::make_pair(element, value));
+}
+
+const std::map<AudioUnitElement, AudioUnitParameterValue> &audio_unit_parameter::values() const
+{
+    return _impl->values;
 }

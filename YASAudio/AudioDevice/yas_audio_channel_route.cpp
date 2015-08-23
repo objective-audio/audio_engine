@@ -120,3 +120,10 @@ UInt32 channel_route::destination_channel() const
 {
     return _impl->destination_channel;
 }
+
+std::string yas::to_string(const channel_route &route)
+{
+    return "src-bus:" + std::to_string(route.source_bus()) + " src-ch:" + std::to_string(route.source_channel()) +
+           " dst-bus:" + std::to_string(route.destination_bus()) + " dst-ch:" +
+           std::to_string(route.destination_channel());
+}

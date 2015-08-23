@@ -6,13 +6,12 @@
 #include "yas_audio_graph.h"
 #include "yas_audio_unit.h"
 #include "yas_exception.h"
+#include "yas_stl_utils.h"
 #include <mutex>
-#include <map>
 #include <set>
 #include <string>
 #include <exception>
 #include <limits>
-#include <experimental/optional>
 
 #if TARGET_OS_IPHONE
 #import "NSException+YASAudio.h"
@@ -24,33 +23,6 @@
 #include <iostream>
 
 using namespace yas;
-
-#pragma mark - utility
-
-template <typename T, typename U>
-static std::experimental::optional<T> _min_empty_key_in_map(std::map<T, U> &map)
-{
-    auto map_size = map.size();
-
-    if (map_size == 0) {
-        return std::experimental::make_optional<T>(0);
-    }
-
-    if (map_size >= std::numeric_limits<T>::max()) {
-        return std::experimental::nullopt;
-    }
-
-    int next = map.rbegin()->first + 1;
-    if (next == map.size()) {
-        return std::experimental::make_optional<T>(next);
-    }
-
-    next = 0;
-    while (map.count(next) > 0) {
-        ++next;
-    }
-    return std::experimental::make_optional<T>(next);
-}
 
 static std::recursive_mutex _global_mutex;
 static bool _interrupting;
@@ -135,7 +107,7 @@ class audio_graph::impl
     std::experimental::optional<UInt16> next_unit_key()
     {
         std::lock_guard<std::recursive_mutex> lock(_global_mutex);
-        return _min_empty_key_in_map(units);
+        return min_empty_key(units);
     }
 
     std::shared_ptr<audio_unit> unit_for_key(const UInt16 key) const
@@ -225,7 +197,7 @@ audio_graph::~audio_graph()
     remove_all_units();
 }
 
-void audio_graph::add_audio_unit(audio_unit_ptr &audio_unit)
+void audio_graph::add_audio_unit(const audio_unit_ptr &audio_unit)
 {
     if (audio_unit->key()) {
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : audio_unit.key is assigned.");
@@ -240,7 +212,7 @@ void audio_graph::add_audio_unit(audio_unit_ptr &audio_unit)
     }
 }
 
-void audio_graph::remove_audio_unit(audio_unit_ptr &audio_unit)
+void audio_graph::remove_audio_unit(const audio_unit_ptr &audio_unit)
 {
     if (!audio_unit->key()) {
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : audio_unit.key is not assigned.");
@@ -324,7 +296,7 @@ void audio_graph::audio_unit_render(render_parameters &render_parameters)
 audio_graph_ptr audio_graph::create()
 {
     std::lock_guard<std::recursive_mutex> lock(_global_mutex);
-    auto key = _min_empty_key_in_map(_graphs);
+    auto key = min_empty_key(_graphs);
     if (key && _graphs.count(*key) == 0) {
         auto graph = audio_graph_ptr(new audio_graph(*key));
         audio_graph::impl::add_graph(graph);

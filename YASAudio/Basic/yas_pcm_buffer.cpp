@@ -181,10 +181,14 @@ pcm_buffer_ptr pcm_buffer::create(const audio_format_ptr &format, const UInt32 f
     return pcm_buffer_ptr(new pcm_buffer(format, frame_capacity));
 }
 
-pcm_buffer_ptr pcm_buffer::create(const audio_format_ptr &format, const pcm_buffer &data,
-                                  const std::vector<channel_route_ptr> &channel_routes, const bool is_output)
+pcm_buffer_ptr pcm_buffer::create(const audio_format_ptr &format, const pcm_buffer_ptr &buffer,
+                                  const std::vector<channel_route_ptr> &channel_routes, const direction direction)
 {
-    return pcm_buffer_ptr(new pcm_buffer(format, data, channel_routes, is_output));
+    if (!buffer) {
+        throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
+    }
+
+    return pcm_buffer_ptr(new pcm_buffer(format, *buffer, channel_routes, direction));
 }
 
 pcm_buffer::pcm_buffer(const audio_format_ptr &format, AudioBufferList *abl)
@@ -208,8 +212,8 @@ pcm_buffer::pcm_buffer(const audio_format_ptr &format, const UInt32 frame_capaci
     _impl = std::make_unique<impl>(format, std::move(pair.first), std::move(pair.second), frame_capacity);
 }
 
-pcm_buffer::pcm_buffer(const audio_format_ptr &format, const pcm_buffer &data,
-                       const std::vector<channel_route_ptr> channel_routes, const bool is_output)
+pcm_buffer::pcm_buffer(const audio_format_ptr &format, const pcm_buffer &buffer,
+                       const std::vector<channel_route_ptr> channel_routes, const direction direction)
 {
     if (!format || channel_routes.size() == 0) {
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
@@ -225,12 +229,13 @@ pcm_buffer::pcm_buffer(const audio_format_ptr &format, const pcm_buffer &data,
     auto pair = allocate_audio_buffer_list(format->buffer_count(), format->stride(), 0);
     abl_unique_ptr &to_abl = pair.first;
 
-    const AudioBufferList *from_abl = data.audio_buffer_list();
+    const AudioBufferList *from_abl = buffer.audio_buffer_list();
     UInt32 bytesPerFrame = format->stream_description().mBytesPerFrame;
     UInt32 frame_capacity = 0;
 
     for (UInt32 i = 0; i < format->channel_count(); i++) {
         const channel_route_ptr &route = channel_routes.at(i);
+        const bool is_output = direction == direction::output;
         UInt32 from_channel = is_output ? route->destination_channel() : route->source_channel();
         UInt32 to_channel = is_output ? route->source_channel() : route->destination_channel();
         to_abl->mBuffers[to_channel].mData = from_abl->mBuffers[from_channel].mData;
@@ -361,10 +366,15 @@ void pcm_buffer::set_frame_length(const UInt32 length)
     set_data_byte_size(*this, data_byte_size);
 }
 
-void pcm_buffer::clear()
+void pcm_buffer::reset()
 {
     set_frame_length(frame_capacity());
     yas::clear(audio_buffer_list());
+}
+
+void pcm_buffer::clear()
+{
+    clear(0, frame_length());
 }
 
 void pcm_buffer::clear(const UInt32 start_frame, const UInt32 length)
@@ -514,4 +524,25 @@ UInt32 yas::frame_length(const AudioBufferList *abl, const UInt32 sample_byte_co
     } else {
         return 0;
     }
+}
+
+bool yas::is_equal_structure(const AudioBufferList *abl1, const AudioBufferList *abl2)
+{
+    if (!abl1 || !abl2) {
+        return false;
+    }
+
+    if (abl1->mNumberBuffers != abl2->mNumberBuffers) {
+        return false;
+    }
+
+    for (UInt32 i = 0; i < abl1->mNumberBuffers; i++) {
+        if (abl1->mBuffers[i].mData != abl2->mBuffers[i].mData) {
+            return false;
+        } else if (abl1->mBuffers[i].mNumberChannels != abl2->mBuffers[i].mNumberChannels) {
+            return false;
+        }
+    }
+
+    return true;
 }

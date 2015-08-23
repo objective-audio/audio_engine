@@ -4,10 +4,15 @@
 //
 
 #include "yas_cf_utils.h"
+#include <Foundation/Foundation.h>
 
 std::string yas::to_string(const CFStringRef &cf_string)
 {
-    return std::string(CFStringGetCStringPtr(cf_string, kCFStringEncodingUTF8));
+    if (cf_string && CFStringGetLength(cf_string) > 0) {
+        NSString *objc_str = (__bridge NSString *)cf_string;
+        return std::string([objc_str UTF8String]);
+    }
+    return std::string();
 }
 
 CFStringRef yas::to_cf_object(const std::string &string)

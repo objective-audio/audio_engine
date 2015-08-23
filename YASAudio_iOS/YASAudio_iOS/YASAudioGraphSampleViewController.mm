@@ -4,14 +4,7 @@
 //
 
 #import "YASAudioGraphSampleViewController.h"
-#import <AVFoundation/AVFoundation.h>
-#import "yas_audio_graph.h"
-#import "yas_audio_unit.h"
-#import "yas_audio_format.h"
-#import "YASMacros.h"
-#import <memory>
-#import <exception>
-#import <iostream>
+#import "yas_audio.h"
 
 @interface YASAudioGraphSampleViewController ()
 

@@ -545,6 +545,22 @@ audio_format_ptr audio_device::output_format() const
     return _impl->output_format();
 }
 
+uint32_t audio_device::input_channel_count() const
+{
+    if (_impl->input_format()) {
+        return _impl->input_format()->channel_count();
+    }
+    return 0;
+}
+
+uint32_t audio_device::output_channel_count() const
+{
+    if (_impl->output_format()) {
+        return _impl->output_format()->channel_count();
+    }
+    return 0;
+}
+
 audio_device::property_subject_type &audio_device::property_subject() const
 {
     return _impl->property_subject;

@@ -6,6 +6,8 @@
 #pragma once
 
 #include <memory>
+#include <string>
+#include <experimental/optional>
 #include <AudioUnit/AUComponent.h>
 
 namespace yas
@@ -45,6 +47,13 @@ namespace yas
         unknown,
     };
 
+    enum class direction {
+        output = 0,
+        input = 1,
+    };
+
+    std::string to_string(const yas::direction &);
+
     struct render_parameters {
         render_type in_render_type;
         AudioUnitRenderActionFlags *io_action_flags;
@@ -55,4 +64,5 @@ namespace yas
         render_id render_id;
     };
 
+    using bus_result = std::experimental::optional<uint32_t>;
 }

@@ -122,7 +122,7 @@
 
     XCTAssertTrue(yas::test::is_filled_buffer(buffer));
 
-    buffer->clear();
+    buffer->reset();
 
     XCTAssertTrue(yas::test::is_cleard_buffer(buffer));
 
@@ -351,8 +351,8 @@
         XCTAssertTrue(yas::test::is_equal_buffer_flexibly(interleaved_buffer, deinterleaved_buffer));
         XCTAssertEqual(deinterleaved_buffer->frame_length(), frame_length);
 
-        interleaved_buffer->clear();
-        deinterleaved_buffer->clear();
+        interleaved_buffer->reset();
+        deinterleaved_buffer->reset();
 
         yas::test::fill_test_values_to_buffer(deinterleaved_buffer);
 
@@ -380,8 +380,8 @@
         XCTAssertNoThrow(interleaved_buffer->copy_to(deinterleaved_buffer->audio_buffer_list()));
         XCTAssertTrue(yas::test::is_equal_buffer_flexibly(interleaved_buffer, deinterleaved_buffer));
 
-        interleaved_buffer->clear();
-        deinterleaved_buffer->clear();
+        interleaved_buffer->reset();
+        deinterleaved_buffer->reset();
 
         yas::test::fill_test_values_to_buffer(deinterleaved_buffer);
 
@@ -411,7 +411,7 @@
     }
 
     auto source_format = yas::audio_format::create(sample_rate, source_channels);
-    auto source_buffer = yas::pcm_buffer::create(source_format, *dest_buffer, channel_routes, true);
+    auto source_buffer = yas::pcm_buffer::create(source_format, dest_buffer, channel_routes, yas::direction::output);
 
     for (UInt32 ch = 0; ch < source_channels; ++ch) {
         auto dest_ptr = dest_buffer->audio_ptr_at_index(dest_channel_indices[ch]);
@@ -444,7 +444,7 @@
     }
 
     auto dest_format = yas::audio_format::create(sample_rate, dest_channels);
-    auto dest_buffer = yas::pcm_buffer::create(dest_format, *source_buffer, channel_routes, false);
+    auto dest_buffer = yas::pcm_buffer::create(dest_format, source_buffer, channel_routes, yas::direction::input);
 
     for (UInt32 ch = 0; ch < dest_channels; ch++) {
         auto dest_ptr = dest_buffer->audio_ptr_at_index(ch);

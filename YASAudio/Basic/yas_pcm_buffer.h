@@ -32,8 +32,8 @@ namespace yas
 
         static pcm_buffer_ptr create(const audio_format_ptr &format, AudioBufferList *abl);
         static pcm_buffer_ptr create(const audio_format_ptr &format, const UInt32 frame_capacity);
-        static pcm_buffer_ptr create(const audio_format_ptr &format, const pcm_buffer &data,
-                                     const std::vector<channel_route_ptr> &channel_routes, const bool is_output);
+        static pcm_buffer_ptr create(const audio_format_ptr &format, const pcm_buffer_ptr &buffer,
+                                     const std::vector<channel_route_ptr> &channel_routes, const direction direction);
 
         audio_format_ptr format() const;
         AudioBufferList *audio_buffer_list();
@@ -51,6 +51,7 @@ namespace yas
         const UInt32 frame_length() const;
         void set_frame_length(const UInt32 length);
 
+        void reset();
         void clear();
         void clear(const UInt32 start_frame, const UInt32 length);
 
@@ -68,7 +69,7 @@ namespace yas
         pcm_buffer(const audio_format_ptr &format, AudioBufferList *abl);
         pcm_buffer(const audio_format_ptr &format, const UInt32 frame_capacity);
         pcm_buffer(const audio_format_ptr &format, const pcm_buffer &data,
-                   const std::vector<channel_route_ptr> channel_routes, const bool is_output);
+                   const std::vector<channel_route_ptr> channel_routes, const direction direction);
 
         pcm_buffer(const pcm_buffer &) = delete;
         pcm_buffer(pcm_buffer &&) = delete;
@@ -87,4 +88,5 @@ namespace yas
     std::pair<abl_unique_ptr, abl_data_unique_ptr> allocate_audio_buffer_list(const UInt32 buffer_count,
                                                                               const UInt32 channel_count,
                                                                               const UInt32 size);
+    bool is_equal_structure(const AudioBufferList *abl1, const AudioBufferList *abl2);
 }
