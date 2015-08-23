@@ -116,13 +116,13 @@ class audio_graph::impl
         return units.at(key);
     }
 
-    void add_unit_to_units(const std::shared_ptr<audio_unit> &audio_unit)
+    void add_unit_to_units(const std::shared_ptr<audio_unit> &unit)
     {
-        if (!audio_unit) {
+        if (!unit) {
             throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
         }
 
-        if (audio_unit->key()) {
+        if (audio_unit::private_access::key(unit)) {
             throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : audio_unit.key is not null.");
         }
 
@@ -130,24 +130,24 @@ class audio_graph::impl
 
         auto unit_key = next_unit_key();
         if (unit_key) {
-            audio_unit->set_graph_key(key());
-            audio_unit->set_key(*unit_key);
-            units.insert(std::make_pair(*unit_key, audio_unit));
-            if (audio_unit->is_output_unit()) {
-                io_units.insert(audio_unit);
+            audio_unit::private_access::set_graph_key(unit, key());
+            audio_unit::private_access::set_key(unit, *unit_key);
+            units.insert(std::make_pair(*unit_key, unit));
+            if (unit->is_output_unit()) {
+                io_units.insert(unit);
             }
         }
     }
 
-    void remove_unit_from_units(const std::shared_ptr<audio_unit> &audio_unit)
+    void remove_unit_from_units(const std::shared_ptr<audio_unit> &unit)
     {
         std::lock_guard<std::recursive_mutex> lock(mutex);
 
-        if (audio_unit->key()) {
-            units.erase(*audio_unit->key());
-            io_units.erase(audio_unit);
-            audio_unit->set_key(std::experimental::nullopt);
-            audio_unit->set_graph_key(std::experimental::nullopt);
+        if (auto key = audio_unit::private_access::key(unit)) {
+            units.erase(*key);
+            io_units.erase(unit);
+            audio_unit::private_access::set_key(unit, std::experimental::nullopt);
+            audio_unit::private_access::set_graph_key(unit, std::experimental::nullopt);
         }
     }
 
@@ -197,30 +197,30 @@ audio_graph::~audio_graph()
     remove_all_units();
 }
 
-void audio_graph::add_audio_unit(const audio_unit_ptr &audio_unit)
+void audio_graph::add_audio_unit(const audio_unit_ptr &unit)
 {
-    if (audio_unit->key()) {
+    if (audio_unit::private_access::key(unit)) {
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : audio_unit.key is assigned.");
     }
 
-    _impl->add_unit_to_units(audio_unit);
+    _impl->add_unit_to_units(unit);
 
-    audio_unit->initialize();
+    audio_unit::private_access::initialize(unit);
 
-    if (audio_unit->is_output_unit() && is_running() && !_impl->is_interrupting()) {
-        audio_unit->start();
+    if (unit->is_output_unit() && is_running() && !_impl->is_interrupting()) {
+        unit->start();
     }
 }
 
-void audio_graph::remove_audio_unit(const audio_unit_ptr &audio_unit)
+void audio_graph::remove_audio_unit(const audio_unit_ptr &unit)
 {
-    if (!audio_unit->key()) {
+    if (!audio_unit::private_access::key(unit)) {
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : audio_unit.key is not assigned.");
     }
 
-    audio_unit->uninitialize();
+    audio_unit::private_access::uninitialize(unit);
 
-    _impl->remove_unit_from_units(audio_unit);
+    _impl->remove_unit_from_units(unit);
 }
 
 void audio_graph::remove_all_units()
