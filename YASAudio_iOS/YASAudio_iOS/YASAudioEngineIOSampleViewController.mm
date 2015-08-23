@@ -13,6 +13,7 @@ namespace yas
     namespace sample
     {
         class meter_input_tap_node;
+
         using meter_input_tap_node_ptr = std::shared_ptr<meter_input_tap_node>;
 
         class meter_input_tap_node : public audio_input_tap_node

@@ -12,12 +12,13 @@
 namespace yas
 {
     class audio_connection;
-    using audio_connection_ptr = std::shared_ptr<audio_connection>;
-    using audio_connection_weak_ptr = std::weak_ptr<audio_connection>;
     class audio_node;
-    using audio_node_ptr = std::shared_ptr<audio_node>;
     class audio_unit_node;
     class audio_engine;
+
+    using audio_connection_ptr = std::shared_ptr<audio_connection>;
+    using audio_connection_weak_ptr = std::weak_ptr<audio_connection>;
+    using audio_node_ptr = std::shared_ptr<audio_node>;
 
     class audio_connection
     {

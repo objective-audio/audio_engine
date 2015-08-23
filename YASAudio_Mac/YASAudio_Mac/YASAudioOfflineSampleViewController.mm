@@ -15,6 +15,7 @@ namespace yas
         static Float64 sample_rate = 44100.0;
 
         class sine_node;
+
         using sine_node_ptr = std::shared_ptr<sine_node>;
         using sine_node_weak_ptr = std::weak_ptr<sine_node>;
 

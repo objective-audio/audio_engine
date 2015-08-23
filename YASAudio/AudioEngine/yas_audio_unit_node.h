@@ -11,9 +11,10 @@
 namespace yas
 {
     class audio_unit_node;
+    class audio_graph;
+
     using audio_unit_node_ptr = std::shared_ptr<audio_unit_node>;
     using audio_unit_node_weak_ptr = std::weak_ptr<audio_unit_node>;
-    class audio_graph;
     using audio_graph_ptr = std::shared_ptr<audio_graph>;
 
     class audio_unit_node : public audio_node

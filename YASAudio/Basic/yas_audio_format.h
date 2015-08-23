@@ -13,6 +13,7 @@
 namespace yas
 {
     class audio_format;
+
     using audio_format_ptr = std::shared_ptr<audio_format>;
 
     class audio_format

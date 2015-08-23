@@ -15,6 +15,7 @@ namespace yas
 {
     class audio_file_reader;
     class audio_file_writer;
+
     using audio_file_reader_ptr = std::shared_ptr<audio_file_reader>;
     using audio_file_writer_ptr = std::shared_ptr<audio_file_writer>;
 

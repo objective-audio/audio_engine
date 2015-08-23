@@ -15,6 +15,7 @@
 namespace yas
 {
     class channel_route;
+
     using channel_route_ptr = std::shared_ptr<channel_route>;
 
     class channel_route
