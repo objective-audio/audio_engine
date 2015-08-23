@@ -64,5 +64,10 @@ namespace yas
         {
             return node->node_core();
         }
+
+        static void update_connections(const audio_node_ptr &node)
+        {
+            node->update_connections();
+        }
     };
 }

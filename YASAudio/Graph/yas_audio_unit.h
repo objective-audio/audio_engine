@@ -116,15 +116,18 @@ namespace yas
         audio_unit &operator=(const audio_unit &) = delete;
         audio_unit &operator=(const audio_unit &&) = delete;
 
-        void initialize();
-        void uninitialize();
-        void set_graph_key(const std::experimental::optional<UInt8> &key);
-        const std::experimental::optional<UInt8> &graph_key() const;
-        void set_key(const std::experimental::optional<UInt16> &key);
-        const std::experimental::optional<UInt16> &key() const;
+        void _initialize();
+        void _uninitialize();
+        void _set_graph_key(const std::experimental::optional<UInt8> &key);
+        const std::experimental::optional<UInt8> &_graph_key() const;
+        void _set_key(const std::experimental::optional<UInt16> &_key);
+        const std::experimental::optional<UInt16> &_key() const;
 
-        friend class audio_graph;
+       public:
+        class private_access;
+        friend private_access;
     };
 }
 
 #include "yas_audio_unit_private.h"
+#include "yas_audio_unit_private_access.h"

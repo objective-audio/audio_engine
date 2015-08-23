@@ -194,8 +194,8 @@
         }
     };
 
-    auto result =
-        yas::audio_offline_output_node::private_access::start(output_node, start_render_function, completion_function);
+    auto result = yas::audio_offline_output_node::private_access::start(output_node.get(), start_render_function,
+                                                                        completion_function);
 
     [self waitForExpectationsWithTimeout:10.0
                                  handler:^(NSError *error){

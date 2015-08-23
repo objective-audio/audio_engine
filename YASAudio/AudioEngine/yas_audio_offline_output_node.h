@@ -47,8 +47,6 @@ namespace yas
         start_result _start(const render_function &callback_func, const completion_function &completion_func);
         void _stop();
 
-        friend audio_engine;
-
        public:
         class private_access;
         friend private_access;

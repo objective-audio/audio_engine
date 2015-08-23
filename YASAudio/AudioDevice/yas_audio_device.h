@@ -99,7 +99,7 @@ namespace yas
         audio_device &operator=(const audio_device &) = delete;
         audio_device &operator=(audio_device &&) = delete;
 
-        friend class audio_device_global;
+        friend audio_device_global;
     };
 
     using audio_device_observer = observer<audio_device::method, std::vector<audio_device::property_info>>;

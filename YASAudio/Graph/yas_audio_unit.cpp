@@ -228,7 +228,7 @@ audio_unit::audio_unit(const OSType &type, const OSType &sub_type)
 
 audio_unit::~audio_unit()
 {
-    uninitialize();
+    _uninitialize();
     _impl->dispose_audio_unit();
 }
 
@@ -706,7 +706,7 @@ void audio_unit::audio_unit_render(yas::render_parameters &render_parameters)
 
 #pragma mark - internal function
 
-void audio_unit::initialize()
+void audio_unit::_initialize()
 {
     if (_impl->initialized) {
         return;
@@ -722,7 +722,7 @@ void audio_unit::initialize()
     _impl->initialized = true;
 }
 
-void audio_unit::uninitialize()
+void audio_unit::_uninitialize()
 {
     if (!_impl->initialized) {
         return;
@@ -738,22 +738,22 @@ void audio_unit::uninitialize()
     _impl->initialized = false;
 }
 
-void audio_unit::set_graph_key(const std::experimental::optional<UInt8> &key)
+void audio_unit::_set_graph_key(const std::experimental::optional<UInt8> &key)
 {
     _impl->graph_key = key;
 }
 
-const std::experimental::optional<UInt8> &audio_unit::graph_key() const
+const std::experimental::optional<UInt8> &audio_unit::_graph_key() const
 {
     return _impl->graph_key;
 }
 
-void audio_unit::set_key(const std::experimental::optional<UInt16> &key)
+void audio_unit::_set_key(const std::experimental::optional<UInt16> &key)
 {
     _impl->key = key;
 }
 
-const std::experimental::optional<UInt16> &audio_unit::key() const
+const std::experimental::optional<UInt16> &audio_unit::_key() const
 {
     return _impl->key;
 }
