@@ -50,7 +50,9 @@ namespace yas
     template <typename K, typename T>
     typename observer<K, T>::shared_ptr observer<K, T>::create()
     {
-        return shared_ptr(new observer<K, T>());
+        auto ptr = shared_ptr(new observer<K, T>());
+        ptr->_weak_this = ptr;
+        return ptr;
     }
 
     template <typename K, typename T>
@@ -83,7 +85,11 @@ namespace yas
             _handlers.insert(std::make_pair(&subject, typename yas::observer<K, T>::handler_holder()));
         };
         _handlers.at(&subject).add_handler(key, handler);
-        subject.add_observer(*this, key);
+        if (auto shared_observer = _weak_this.lock()) {
+            subject.add_observer(shared_observer, key);
+        } else {
+            throw std::runtime_error(std::string(__PRETTY_FUNCTION__) + " : _weak_this.lock() failed.");
+        }
     }
 
     template <typename K, typename T>
@@ -96,7 +102,12 @@ namespace yas
                 _handlers.erase(&subject);
             }
         }
-        subject.remove_observer(*this, key);
+
+        if (auto shared_observer = _weak_this.lock()) {
+            subject.remove_observer(shared_observer, key);
+        } else {
+            throw std::runtime_error(std::string(__PRETTY_FUNCTION__) + " : _weak_this.lock() failed.");
+        }
     }
 
     template <typename K, typename T>
@@ -107,7 +118,12 @@ namespace yas
             _handlers.insert(std::make_pair(&subject, typename yas::observer<K, T>::handler_holder()));
         };
         _handlers.at(&subject).add_handler(std::experimental::nullopt, handler);
-        subject.add_observer(*this, std::experimental::nullopt);
+
+        if (auto shared_observer = _weak_this.lock()) {
+            subject.add_observer(shared_observer, std::experimental::nullopt);
+        } else {
+            throw std::runtime_error(std::string(__PRETTY_FUNCTION__) + " : _weak_this.lock() failed.");
+        }
     }
 
     template <typename K, typename T>
@@ -120,7 +136,12 @@ namespace yas
                 _handlers.erase(&subject);
             }
         }
-        subject.remove_observer(*this, std::experimental::nullopt);
+
+        if (auto shared_observer = _weak_this.lock()) {
+            subject.remove_observer(shared_observer, std::experimental::nullopt);
+        } else {
+            throw std::runtime_error(std::string(__PRETTY_FUNCTION__) + " : _weak_this.lock() failed.");
+        }
     }
 
     template <typename K, typename T>
@@ -216,18 +237,20 @@ namespace yas
     }
 
     template <typename K, typename T>
-    void subject<K, T>::add_observer(observer<K, T> &observer, const std::experimental::optional<K> &key)
+    void subject<K, T>::add_observer(typename observer<K, T>::shared_ptr &observer,
+                                     const std::experimental::optional<K> &key)
     {
         if (_observers.count(key) == 0) {
             _observers.insert(std::make_pair(key, observers_vector()));
         }
 
         auto &vector = _observers.at(key);
-        vector.push_back(observer.shared_from_this());
+        vector.push_back(observer);
     }
 
     template <typename K, typename T>
-    void subject<K, T>::remove_observer(const observer<K, T> &observer, const std::experimental::optional<K> &key)
+    void subject<K, T>::remove_observer(const typename observer<K, T>::shared_ptr &observer,
+                                        const std::experimental::optional<K> &key)
     {
         if (_observers.count(key) > 0) {
             auto &vector = _observers.at(key);
@@ -235,7 +258,7 @@ namespace yas
             auto it = vector.begin();
             while (it != vector.end()) {
                 if (auto shared_observer = it->lock()) {
-                    if (*shared_observer == observer) {
+                    if (shared_observer == observer) {
                         it = vector.erase(it);
                     } else {
                         ++it;
@@ -248,7 +271,7 @@ namespace yas
     }
 
     template <typename K, typename T>
-    void subject<K, T>::remove_observer(const observer<K, T> &observer)
+    void subject<K, T>::remove_observer(const typename observer<K, T>::shared_ptr &observer)
     {
         for (auto &pair : _observers) {
             remove_observer(observer, pair.first);
