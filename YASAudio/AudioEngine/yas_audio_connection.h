@@ -34,9 +34,9 @@ namespace yas
         class impl;
         std::unique_ptr<impl> _impl;
 
-        static audio_connection_ptr create(const audio_node_ptr &source_node, const UInt32 source_bus,
-                                           const audio_node_ptr &destination_node, const UInt32 destination_bus,
-                                           const audio_format_ptr &format);
+        static audio_connection_ptr _create(const audio_node_ptr &source_node, const UInt32 source_bus,
+                                            const audio_node_ptr &destination_node, const UInt32 destination_bus,
+                                            const audio_format_ptr &format);
 
         audio_connection(const audio_node_ptr &source_node, const UInt32 source_bus,
                          const audio_node_ptr &destination_node, const UInt32 destination_bus,
@@ -47,9 +47,9 @@ namespace yas
         audio_connection &operator=(const audio_connection &) = delete;
         audio_connection &operator=(audio_connection &&) = delete;
 
-        void remove_nodes();
-        void remove_source_node();
-        void remove_destination_node();
+        void _remove_nodes();
+        void _remove_source_node();
+        void _remove_destination_node();
 
        public:
         class private_access;

@@ -93,9 +93,9 @@ namespace yas
         audio_node &operator=(const audio_node &) = delete;
         audio_node &operator=(audio_node &&) = delete;
 
-        void set_engine(const audio_engine_ptr &engine);
-        void add_connection(const audio_connection_ptr &connection);
-        void remove_connection(const audio_connection &connection);
+        void _set_engine(const audio_engine_ptr &engine);
+        void _add_connection(const audio_connection_ptr &connection);
+        void _remove_connection(const audio_connection &connection);
 
        public:
         class private_access;

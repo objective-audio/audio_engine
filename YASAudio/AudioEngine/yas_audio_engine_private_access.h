@@ -10,12 +10,12 @@ namespace yas
        public:
         static std::set<audio_node_ptr> &nodes(const audio_engine_ptr &engine)
         {
-            return engine->nodes();
+            return engine->_nodes();
         }
 
         static std::set<audio_connection_ptr> &connections(const audio_engine_ptr &engine)
         {
-            return engine->connections();
+            return engine->_connections();
         }
     };
 }

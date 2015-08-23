@@ -83,8 +83,8 @@ namespace yas
         audio_device_stream &operator=(audio_device_stream &&) = delete;
 
         template <typename T>
-        std::unique_ptr<std::vector<T>> property_data(const AudioStreamID stream_id,
-                                                      const AudioObjectPropertySelector selector) const;
+        std::unique_ptr<std::vector<T>> _property_data(const AudioStreamID stream_id,
+                                                       const AudioObjectPropertySelector selector) const;
     };
 }
 

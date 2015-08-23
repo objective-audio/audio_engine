@@ -55,8 +55,8 @@ namespace yas
         audio_device_io &operator=(const audio_device_io &) = delete;
         audio_device_io &operator=(audio_device_io &&) = delete;
 
-        void initialize();
-        void uninitialize();
+        void _initialize();
+        void _uninitialize();
     };
 }
 

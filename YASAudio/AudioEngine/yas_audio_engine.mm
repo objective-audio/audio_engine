@@ -297,30 +297,30 @@ audio_engine_ptr audio_engine::create()
     std::weak_ptr<audio_engine> weak_engine = engine;
 
 #if TARGET_OS_IPHONE
+    auto reset_lambda = [weak_engine](NSNotification *note) {
+        if (auto engine = weak_engine.lock()) {
+            engine->_reload_graph();
+        }
+    };
+
     id reset_observer =
         [[NSNotificationCenter defaultCenter] addObserverForName:AVAudioSessionMediaServicesWereResetNotification
                                                           object:nil
                                                            queue:[NSOperationQueue mainQueue]
-                                                      usingBlock:[weak_engine](NSNotification *note) {
-                                                          if (auto engine = weak_engine.lock()) {
-                                                              engine->reload_graph();
-                                                          }
-                                                      }];
+                                                      usingBlock:reset_lambda];
     engine->_impl->reset_observer.set_object(reset_observer);
+
+    auto route_change_lambda = [weak_engine](NSNotification *note) {
+        if (auto engine = weak_engine.lock()) {
+            engine->_post_configuration_change();
+        }
+    };
 
     id route_change_observer =
         [[NSNotificationCenter defaultCenter] addObserverForName:AVAudioSessionRouteChangeNotification
                                                           object:nil
                                                            queue:[NSOperationQueue mainQueue]
-                                                      usingBlock:[weak_engine](NSNotification *note) {
-                                                          std::cout
-                                                              << "yaso pre engine.expired=" << weak_engine.expired()
-                                                              << std::endl;
-                                                          if (auto engine = weak_engine.lock()) {
-                                                              std::cout << "yaso call" << std::endl;
-                                                              engine->post_configuration_change();
-                                                          }
-                                                      }];
+                                                      usingBlock:route_change_lambda];
     engine->_impl->route_change_observer.set_object(route_change_observer);
 
 #elif TARGET_OS_MAC
@@ -328,7 +328,7 @@ audio_engine_ptr audio_engine::create()
                                                 audio_device::method::configulation_change,
                                                 [weak_engine](const auto &method, const auto &infos) {
                                                     if (auto engine = weak_engine.lock()) {
-                                                        engine->post_configuration_change();
+                                                        engine->_post_configuration_change();
                                                     }
                                                 });
 #endif
@@ -523,7 +523,8 @@ audio_engine::start_result audio_engine::start_offline_render(const offline_rend
         return start_result(start_error_type::offline_output_not_found);
     }
 
-    auto result = audio_offline_output_node::private_access::start(offline_output_node, render_function, completion_function);
+    auto result =
+        audio_offline_output_node::private_access::start(offline_output_node, render_function, completion_function);
 
     if (result) {
         return start_result(nullptr);
@@ -548,7 +549,7 @@ audio_engine::notification_subject_type &audio_engine::subject() const
     return _impl->subject;
 }
 
-void audio_engine::reload_graph()
+void audio_engine::_reload_graph()
 {
     if (auto prev_graph = _impl->graph()) {
         const bool prev_runnging = prev_graph->is_running();
@@ -572,17 +573,17 @@ void audio_engine::reload_graph()
     }
 }
 
-void audio_engine::post_configuration_change() const
+void audio_engine::_post_configuration_change() const
 {
     _impl->subject.notify(audio_engine::notification_method::configulation_change);
 }
 
-std::set<audio_node_ptr> &audio_engine::nodes() const
+std::set<audio_node_ptr> &audio_engine::_nodes() const
 {
     return _impl->nodes();
 }
 
-std::set<audio_connection_ptr> &audio_engine::connections() const
+std::set<audio_connection_ptr> &audio_engine::_connections() const
 {
     return _impl->connections();
 }

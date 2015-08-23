@@ -51,8 +51,8 @@ namespace yas
         observer &operator=(const observer<K, T> &) = delete;
         observer &operator=(const observer<K, T> &&) = delete;
 
-        void call_handler(const subject<K, T> &subject, const K &key, const T &object);
-        void call_wild_card_handler(const subject<K, T> &subject, const K &key, const T &object);
+        void _call_handler(const subject<K, T> &subject, const K &key, const T &object);
+        void _call_wild_card_handler(const subject<K, T> &subject, const K &key, const T &object);
 
         friend subject<K, T>;
     };
@@ -92,10 +92,10 @@ namespace yas
         subject &operator=(const subject<K, T> &) = delete;
         subject &operator=(const subject<K, T> &&) = delete;
 
-        void add_observer(typename observer<K, T>::shared_ptr &observer, const std::experimental::optional<K> &key);
-        void remove_observer(const typename observer<K, T>::shared_ptr &observer,
+        void _add_observer(typename observer<K, T>::shared_ptr &observer, const std::experimental::optional<K> &key);
+        void _remove_observer(const typename observer<K, T>::shared_ptr &observer,
                              const std::experimental::optional<K> &key);
-        void remove_observer(const typename observer<K, T>::shared_ptr &observer);
+        void _remove_observer(const typename observer<K, T>::shared_ptr &observer);
 
         friend observer<K, T>;
     };

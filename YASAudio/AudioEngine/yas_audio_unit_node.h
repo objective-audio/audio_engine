@@ -62,9 +62,9 @@ namespace yas
 
         using super_class = audio_node;
 
-        void reload_audio_unit();
-        void add_audio_unit_to_graph(const audio_graph_ptr &graph);
-        void remove_audio_unit_from_graph();
+        void _reload_audio_unit();
+        void _add_audio_unit_to_graph(const audio_graph_ptr &graph);
+        void _remove_audio_unit_from_graph();
 
        public:
         class private_access;

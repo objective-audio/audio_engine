@@ -14,22 +14,22 @@ namespace yas
                                            const audio_node_ptr &destination_node, const UInt32 destination_bus,
                                            const audio_format_ptr &format)
         {
-            return audio_connection::create(source_node, source_bus, destination_node, destination_bus, format);
+            return audio_connection::_create(source_node, source_bus, destination_node, destination_bus, format);
         }
 
         static void remove_nodes(const audio_connection_ptr &connection)
         {
-            connection->remove_nodes();
+            connection->_remove_nodes();
         }
 
         static void remove_source_node(const audio_connection_ptr &connection)
         {
-            connection->remove_source_node();
+            connection->_remove_source_node();
         }
 
         static void remove_destination_node(const audio_connection_ptr &connection)
         {
-            connection->remove_destination_node();
+            connection->_remove_destination_node();
         }
     };
 }

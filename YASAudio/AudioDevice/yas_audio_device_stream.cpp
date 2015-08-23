@@ -144,7 +144,7 @@ audio_device_ptr audio_device_stream::device() const
 
 bool audio_device_stream::is_active() const
 {
-    auto data = property_data<UInt32>(stream_id(), kAudioStreamPropertyIsActive);
+    auto data = _property_data<UInt32>(stream_id(), kAudioStreamPropertyIsActive);
     if (data) {
         return *data->data() > 0;
     }
@@ -153,7 +153,7 @@ bool audio_device_stream::is_active() const
 
 enum audio_device_stream::direction audio_device_stream::direction() const
 {
-    auto data = property_data<UInt32>(stream_id(), kAudioStreamPropertyDirection);
+    auto data = _property_data<UInt32>(stream_id(), kAudioStreamPropertyDirection);
     if (data) {
         if (*data->data() == 1) {
             return direction::input;
@@ -164,7 +164,7 @@ enum audio_device_stream::direction audio_device_stream::direction() const
 
 audio_format_ptr audio_device_stream::virtual_format() const
 {
-    auto data = property_data<AudioStreamBasicDescription>(stream_id(), kAudioStreamPropertyVirtualFormat);
+    auto data = _property_data<AudioStreamBasicDescription>(stream_id(), kAudioStreamPropertyVirtualFormat);
     if (!data) {
         throw std::runtime_error(std::string(__PRETTY_FUNCTION__) + " : can't get virtual format.");
     }
@@ -173,7 +173,7 @@ audio_format_ptr audio_device_stream::virtual_format() const
 
 UInt32 audio_device_stream::starting_channel() const
 {
-    auto data = property_data<UInt32>(stream_id(), kAudioStreamPropertyStartingChannel);
+    auto data = _property_data<UInt32>(stream_id(), kAudioStreamPropertyStartingChannel);
     if (data) {
         return *data->data();
     }

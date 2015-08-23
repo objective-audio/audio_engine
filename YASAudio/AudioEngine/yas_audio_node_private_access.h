@@ -37,17 +37,17 @@ namespace yas
 
         static void add_connection(const audio_node_ptr &node, const audio_connection_ptr &connection)
         {
-            node->add_connection(connection);
+            node->_add_connection(connection);
         }
 
         static void remove_connection(const audio_node_ptr &node, const audio_connection &connection)
         {
-            node->remove_connection(connection);
+            node->_remove_connection(connection);
         }
 
         static void set_engine(const audio_node_ptr &node, const audio_engine_ptr &engine)
         {
-            node->set_engine(engine);
+            node->_set_engine(engine);
         }
 
         static audio_engine_ptr engine(const audio_node_ptr &node)
