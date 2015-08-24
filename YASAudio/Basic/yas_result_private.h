@@ -35,9 +35,7 @@ namespace yas
     }
 
     template <typename T, typename U>
-    result<T, U>::~result()
-    {
-    }
+    result<T, U>::~result() = default;
 
     template <typename T, typename U>
     result<T, U>::result(const result<T, U> &other)

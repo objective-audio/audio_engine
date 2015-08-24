@@ -468,9 +468,7 @@ audio_device::audio_device(const AudioDeviceID device_id)
     add_listener(device_id, kAudioDevicePropertyStreamConfiguration, kAudioObjectPropertyScopeOutput, listener);
 }
 
-audio_device::~audio_device()
-{
-}
+audio_device::~audio_device() = default;
 
 bool audio_device::operator==(const audio_device &other_device) const
 {

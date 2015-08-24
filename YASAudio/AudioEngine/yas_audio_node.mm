@@ -13,13 +13,8 @@
 
 using namespace yas;
 
-audio_node_core::audio_node_core()
-{
-}
-
-audio_node_core::~audio_node_core()
-{
-}
+audio_node_core::audio_node_core() = default;
+audio_node_core::~audio_node_core() = default;
 
 audio_connection_ptr audio_node_core::input_connection(const uint32_t bus_idx)
 {
@@ -96,9 +91,7 @@ audio_node::audio_node() : _impl(std::make_unique<impl>())
 {
 }
 
-audio_node::~audio_node()
-{
-}
+audio_node::~audio_node() = default;
 
 bool audio_node::operator==(const audio_node &node)
 {

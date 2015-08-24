@@ -42,9 +42,7 @@ audio_unit_io_node::audio_unit_io_node()
 {
 }
 
-audio_unit_io_node::~audio_unit_io_node()
-{
-}
+audio_unit_io_node::~audio_unit_io_node() = default;
 
 void audio_unit_io_node::set_output_channel_map(const channel_map &channel_map)
 {
@@ -279,7 +277,7 @@ void audio_unit_input_node::update_connections()
         auto input_buffer = pcm_buffer::create(out_connection->format(), 4096);
         _impl->input_buffer = input_buffer;
 
-        unit->set_input_callback([weak_node = _weak_this, input_buffer](render_parameters &render_parameters) {
+        unit->set_input_callback([weak_node = _weak_this, input_buffer](render_parameters & render_parameters) {
             auto input_node = weak_node.lock();
             if (input_node && render_parameters.in_number_frames <= input_buffer->frame_capacity()) {
                 input_buffer->set_frame_length(render_parameters.in_number_frames);

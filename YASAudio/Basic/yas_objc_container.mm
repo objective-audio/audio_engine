@@ -135,9 +135,7 @@ objc_weak_container::objc_weak_container(const id object) : _weak_object(object)
 {
 }
 
-objc_weak_container::~objc_weak_container()
-{
-}
+objc_weak_container::~objc_weak_container() = default;
 
 objc_weak_container::objc_weak_container(const objc_weak_container &container) : _weak_object(nil)
 {

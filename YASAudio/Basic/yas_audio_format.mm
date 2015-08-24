@@ -105,9 +105,7 @@ audio_format::audio_format(const Float64 sample_rate, const UInt32 channel_count
 {
 }
 
-audio_format::~audio_format()
-{
-}
+audio_format::~audio_format() = default;
 
 bool audio_format::operator==(const audio_format &format) const
 {

@@ -77,9 +77,7 @@ audio_unit_node::audio_unit_node(const AudioComponentDescription &acd) : audio_n
         std::make_pair(kAudioUnitScope_Output, audio_unit->create_parameters(kAudioUnitScope_Output)));
 }
 
-audio_unit_node::~audio_unit_node()
-{
-}
+audio_unit_node::~audio_unit_node() = default;
 
 audio_unit_ptr audio_unit_node::audio_unit() const
 {
