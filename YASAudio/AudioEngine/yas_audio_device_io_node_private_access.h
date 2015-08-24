@@ -10,6 +10,7 @@
 namespace yas
 {
     class audio_graph;
+
     using audio_graph_ptr = std::shared_ptr<audio_graph>;
 
     class audio_device_io_node::private_access

@@ -21,6 +21,7 @@
 namespace yas
 {
     class audio_unit;
+
     using audio_unit_ptr = std::shared_ptr<audio_unit>;
     using channel_map = std::vector<uint32_t>;
     using channel_map_uptr = std::unique_ptr<channel_map>;

@@ -10,6 +10,7 @@
 namespace yas
 {
     class audio_unit_mixer_node;
+
     using audio_unit_mixer_node_ptr = std::shared_ptr<audio_unit_mixer_node>;
 
     class audio_unit_mixer_node : public audio_unit_node

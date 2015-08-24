@@ -16,6 +16,7 @@
 namespace yas
 {
     class audio_graph;
+
     using audio_graph_ptr = std::shared_ptr<audio_graph>;
     using audio_graph_weak_ptr = std::weak_ptr<audio_graph>;
 

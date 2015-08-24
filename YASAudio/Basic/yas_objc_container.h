@@ -13,8 +13,9 @@
 namespace yas
 {
     class objc_strong_container;
-    using objc_strong_container_ptr = std::shared_ptr<objc_strong_container>;
     class objc_weak_container;
+
+    using objc_strong_container_ptr = std::shared_ptr<objc_strong_container>;
     using objc_weak_container_ptr = std::shared_ptr<objc_weak_container>;
 
     class objc_strong_container

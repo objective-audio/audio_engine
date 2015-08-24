@@ -14,6 +14,7 @@
 namespace yas
 {
     class pcm_buffer;
+
     using pcm_buffer_ptr = std::shared_ptr<pcm_buffer>;
     using abl_unique_ptr = std::unique_ptr<AudioBufferList, std::function<void(AudioBufferList *)>>;
     using abl_data_unique_ptr = std::unique_ptr<std::vector<std::vector<UInt8>>>;

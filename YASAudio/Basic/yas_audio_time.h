@@ -13,6 +13,7 @@
 namespace yas
 {
     class audio_time;
+
     using audio_time_ptr = std::shared_ptr<audio_time>;
 
     class audio_time

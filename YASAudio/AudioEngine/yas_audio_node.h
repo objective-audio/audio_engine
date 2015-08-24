@@ -17,10 +17,11 @@
 namespace yas
 {
     class audio_time;
+    class audio_engine;
+
     using audio_time_ptr = std::shared_ptr<audio_time>;
     using audio_connection_weak_map = std::map<uint32_t, audio_connection_weak_ptr>;
     using audio_connection_weak_map_ptr = std::shared_ptr<audio_connection_weak_map>;
-    class audio_engine;
     using audio_engine_ptr = std::shared_ptr<audio_engine>;
 
     class audio_node_core
