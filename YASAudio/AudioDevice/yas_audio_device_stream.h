@@ -18,12 +18,6 @@
 
 namespace yas
 {
-    class audio_device_stream;
-    class audio_device;
-
-    using audio_device_stream_ptr = std::shared_ptr<audio_device_stream>;
-    using audio_device_ptr = std::shared_ptr<audio_device>;
-
     class audio_device_stream
     {
        public:

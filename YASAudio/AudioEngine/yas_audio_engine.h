@@ -5,26 +5,13 @@
 
 #pragma once
 
+#include "yas_audio_types.h"
 #include "yas_result.h"
 #include "yas_observing.h"
 #include <set>
 
 namespace yas
 {
-    class audio_engine;
-    class audio_node;
-    class audio_time;
-    class audio_connection;
-    class pcm_buffer;
-    class audio_format;
-
-    using audio_engine_ptr = std::shared_ptr<audio_engine>;
-    using audio_node_ptr = std::shared_ptr<audio_node>;
-    using audio_time_ptr = std::shared_ptr<audio_time>;
-    using audio_connection_ptr = std::shared_ptr<audio_connection>;
-    using pcm_buffer_ptr = std::shared_ptr<pcm_buffer>;
-    using audio_format_ptr = std::shared_ptr<audio_format>;
-
     class audio_engine
     {
        public:

@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "yas_audio_types.h"
 #include <AudioToolbox/AudioToolbox.h>
 #include <memory>
 
@@ -12,10 +13,6 @@
 
 namespace yas
 {
-    class audio_time;
-
-    using audio_time_ptr = std::shared_ptr<audio_time>;
-
     class audio_time
     {
        public:
