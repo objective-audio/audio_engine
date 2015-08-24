@@ -56,14 +56,10 @@ namespace yas
     }
 
     template <typename K, typename T>
-    observer<K, T>::observer()
-    {
-    }
+    observer<K, T>::observer() = default;
 
     template <typename K, typename T>
-    observer<K, T>::~observer()
-    {
-    }
+    observer<K, T>::~observer() = default;
 
     template <typename K, typename T>
     bool observer<K, T>::operator==(const observer<K, T> &other) const

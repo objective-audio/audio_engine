@@ -70,9 +70,7 @@ audio_unit_parameter::audio_unit_parameter(const AudioUnitParameterInfo &info, c
 {
 }
 
-audio_unit_parameter::~audio_unit_parameter()
-{
-}
+audio_unit_parameter::~audio_unit_parameter() = default;
 
 audio_unit_parameter::audio_unit_parameter(audio_unit_parameter &&parameter)
 {

@@ -39,9 +39,7 @@ channel_route::channel_route(const UInt32 source_bus, const UInt32 source_channe
     _impl->destination_channel = destination_channel;
 }
 
-channel_route::~channel_route()
-{
-}
+channel_route::~channel_route() = default;
 
 std::vector<channel_route_ptr> channel_route::default_channel_routes(const UInt32 bus, const audio_format_ptr &format)
 {

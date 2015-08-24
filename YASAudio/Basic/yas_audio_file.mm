@@ -140,9 +140,7 @@ audio_file::audio_file() : _impl(std::make_unique<impl>())
 {
 }
 
-audio_file::~audio_file()
-{
-}
+audio_file::~audio_file() = default;
 
 CFURLRef audio_file::url() const
 {
@@ -223,13 +221,8 @@ audio_file_reader::create_result audio_file_reader::create(const CFURLRef file_u
     return create_result(std::move(reader));
 }
 
-audio_file_reader::audio_file_reader()
-{
-}
-
-audio_file_reader::~audio_file_reader()
-{
-}
+audio_file_reader::audio_file_reader() = default;
+audio_file_reader::~audio_file_reader() = default;
 
 audio_file_reader::read_result audio_file_reader::read_into_buffer(pcm_buffer_ptr &buffer, const UInt32 frame_length)
 {
@@ -346,13 +339,8 @@ audio_file_writer::create_result audio_file_writer::create(const CFURLRef file_u
     return create_result(std::move(writer));
 }
 
-audio_file_writer::audio_file_writer()
-{
-}
-
-audio_file_writer::~audio_file_writer()
-{
-}
+audio_file_writer::audio_file_writer() = default;
+audio_file_writer::~audio_file_writer() = default;
 
 audio_file_writer::write_result audio_file_writer::write_from_buffer(const pcm_buffer_ptr &buffer, const bool async)
 {

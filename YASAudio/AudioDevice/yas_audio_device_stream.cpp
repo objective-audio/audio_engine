@@ -118,9 +118,7 @@ audio_device_stream::audio_device_stream(const AudioStreamID stream_id, const Au
     _impl->device_id = device_id;
 }
 
-audio_device_stream::~audio_device_stream()
-{
-}
+audio_device_stream::~audio_device_stream() = default;
 
 bool audio_device_stream::operator==(const audio_device_stream &stream)
 {

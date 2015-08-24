@@ -51,9 +51,7 @@ audio_tap_node::audio_tap_node() : audio_node(), _impl(std::make_unique<impl>())
 {
 }
 
-audio_tap_node::~audio_tap_node()
-{
-}
+audio_tap_node::~audio_tap_node() = default;
 
 void audio_tap_node::set_render_function(const render_function &render_function)
 {

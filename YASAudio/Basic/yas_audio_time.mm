@@ -110,9 +110,7 @@ audio_time &audio_time::operator=(audio_time &&time) noexcept
     return *this;
 }
 
-audio_time::~audio_time()
-{
-}
+audio_time::~audio_time() = default;
 
 bool audio_time::is_host_time_valid() const
 {
