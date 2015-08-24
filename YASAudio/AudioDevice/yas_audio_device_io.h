@@ -32,8 +32,8 @@ namespace yas
 
         ~audio_device_io();
 
-        void set_audio_device(const audio_device_ptr device);
-        audio_device_ptr audio_device() const;
+        void set_device(const audio_device_ptr device);
+        audio_device_ptr device() const;
         bool is_running() const;
         void set_render_callback(const render_function &callback);
         void set_maximum_frames_per_slice(const UInt32 frames);

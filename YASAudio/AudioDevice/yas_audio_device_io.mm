@@ -48,7 +48,7 @@ class audio_device_io::impl
     using kernel_ptr = std::shared_ptr<kernel>;
 
     std::weak_ptr<audio_device_io> weak_device_io;
-    audio_device_ptr audio_device;
+    audio_device_ptr device;
     bool is_running;
     AudioDeviceIOProcID io_proc_id;
     pcm_buffer_ptr input_buffer_on_render;
@@ -57,7 +57,7 @@ class audio_device_io::impl
 
     impl()
         : weak_device_io(),
-          audio_device(nullptr),
+          device(nullptr),
           is_running(false),
           io_proc_id(nullptr),
           input_buffer_on_render(nullptr),
@@ -116,12 +116,11 @@ class audio_device_io::impl
 
         set_kernel(nullptr);
 
-        if (!audio_device || !io_proc_id) {
+        if (!device || !io_proc_id) {
             return;
         }
 
-        set_kernel(std::make_shared<class kernel>(audio_device->input_format(), audio_device->output_format(),
-                                                  _maximum_frames));
+        set_kernel(std::make_shared<class kernel>(device->input_format(), device->output_format(), _maximum_frames));
     }
 
    private:
@@ -142,15 +141,14 @@ audio_device_io_ptr audio_device_io::create(const audio_device_ptr &device)
     device_io->_impl->weak_device_io = device_io;
     auto &weak_device_io = device_io->_impl->weak_device_io;
 
-    device_io->set_audio_device(device);
+    device_io->set_device(device);
 
     device_io->_impl->observer->add_handler(
         audio_device::system_subject(), audio_device::method::hardware_did_change,
         [weak_device_io](const auto &method, const auto &infos) {
             if (auto device_io = weak_device_io.lock()) {
-                if (device_io->audio_device() &&
-                    !audio_device::device_for_id(device_io->audio_device()->audio_device_id())) {
-                    device_io->set_audio_device(nullptr);
+                if (device_io->device() && !audio_device::device_for_id(device_io->device()->audio_device_id())) {
+                    device_io->set_device(nullptr);
                 }
             }
         });
@@ -171,11 +169,11 @@ audio_device_io::~audio_device_io()
 
 void audio_device_io::_initialize()
 {
-    if (!_impl->audio_device || _impl->io_proc_id) {
+    if (!_impl->device || _impl->io_proc_id) {
         return;
     }
 
-    if (!_impl->audio_device->input_format() && !_impl->audio_device->output_format()) {
+    if (!_impl->device->input_format() && !_impl->device->output_format()) {
         return;
     }
 
@@ -229,8 +227,8 @@ void audio_device_io::_initialize()
         }
     };
 
-    yas_raise_if_au_error(AudioDeviceCreateIOProcIDWithBlock(&_impl->io_proc_id, _impl->audio_device->audio_device_id(),
-                                                             nullptr, function));
+    yas_raise_if_au_error(
+        AudioDeviceCreateIOProcIDWithBlock(&_impl->io_proc_id, _impl->device->audio_device_id(), nullptr, function));
 
     _impl->update_kernel();
 }
@@ -239,33 +237,33 @@ void audio_device_io::_uninitialize()
 {
     stop();
 
-    if (!_impl->audio_device || !_impl->io_proc_id) {
+    if (!_impl->device || !_impl->io_proc_id) {
         return;
     }
 
-    yas_raise_if_au_error(AudioDeviceDestroyIOProcID(_impl->audio_device->audio_device_id(), _impl->io_proc_id));
+    yas_raise_if_au_error(AudioDeviceDestroyIOProcID(_impl->device->audio_device_id(), _impl->io_proc_id));
 
     _impl->io_proc_id = nullptr;
     _impl->update_kernel();
 }
 
-void audio_device_io::set_audio_device(const audio_device_ptr device)
+void audio_device_io::set_device(const audio_device_ptr device)
 {
-    if (_impl->audio_device != device) {
+    if (_impl->device != device) {
         bool running = is_running();
 
         _uninitialize();
 
-        if (_impl->audio_device) {
-            _impl->observer->remove_handler(_impl->audio_device->property_subject(),
+        if (_impl->device) {
+            _impl->observer->remove_handler(_impl->device->property_subject(),
                                             audio_device::method::device_did_change);
         }
 
-        _impl->audio_device = device;
+        _impl->device = device;
 
         if (device) {
             _impl->observer->add_handler(
-                _impl->audio_device->property_subject(), audio_device::method::device_did_change,
+                _impl->device->property_subject(), audio_device::method::device_did_change,
                 [weak_device_io = _impl->weak_device_io](const auto &method, const auto &infos) {
                     if (auto device_io = weak_device_io.lock()) {
                         device_io->_impl->update_kernel();
@@ -281,9 +279,9 @@ void audio_device_io::set_audio_device(const audio_device_ptr device)
     }
 }
 
-audio_device_ptr audio_device_io::audio_device() const
+audio_device_ptr audio_device_io::device() const
 {
-    return _impl->audio_device;
+    return _impl->device;
 }
 
 bool audio_device_io::is_running() const
@@ -310,11 +308,11 @@ void audio_device_io::start()
 {
     _impl->is_running = YES;
 
-    if (!_impl->audio_device || !_impl->io_proc_id) {
+    if (!_impl->device || !_impl->io_proc_id) {
         return;
     }
 
-    yas_raise_if_au_error(AudioDeviceStart(_impl->audio_device->audio_device_id(), _impl->io_proc_id));
+    yas_raise_if_au_error(AudioDeviceStart(_impl->device->audio_device_id(), _impl->io_proc_id));
 }
 
 void audio_device_io::stop()
@@ -325,11 +323,11 @@ void audio_device_io::stop()
 
     _impl->is_running = NO;
 
-    if (!_impl->audio_device || !_impl->io_proc_id) {
+    if (!_impl->device || !_impl->io_proc_id) {
         return;
     }
 
-    yas_raise_if_au_error(AudioDeviceStop(_impl->audio_device->audio_device_id(), _impl->io_proc_id));
+    yas_raise_if_au_error(AudioDeviceStop(_impl->device->audio_device_id(), _impl->io_proc_id));
 }
 
 const pcm_buffer_ptr audio_device_io::input_buffer_on_render() const
