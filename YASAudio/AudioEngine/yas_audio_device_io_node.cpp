@@ -36,7 +36,7 @@ class audio_device_io_node::impl
     {
         _device = device;
         if (device_io) {
-            device_io->set_audio_device(device);
+            device_io->set_device(device);
         }
     }
 
@@ -154,7 +154,7 @@ void audio_device_io_node::update_connections()
 
 #pragma mark - private
 
-void audio_device_io_node::_add_audio_device_io_to_graph(const audio_graph_ptr &graph)
+void audio_device_io_node::_add_device_io_to_graph(const audio_graph_ptr &graph)
 {
     if (!graph) {
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
@@ -169,7 +169,7 @@ void audio_device_io_node::_add_audio_device_io_to_graph(const audio_graph_ptr &
     graph->add_audio_device_io(_impl->device_io);
 }
 
-void audio_device_io_node::_remove_audio_device_io_from_graph()
+void audio_device_io_node::_remove_device_io_from_graph()
 {
     if (auto graph = _impl->graph.lock()) {
         if (_impl->device_io) {
@@ -189,7 +189,7 @@ bool audio_device_io_node::_validate_connections() const
             if (connections.count(0) > 0) {
                 const auto &connection = connections.at(0);
                 const auto &connection_format = connection->format();
-                const auto &device_format = device_io->audio_device()->output_format();
+                const auto &device_format = device_io->device()->output_format();
                 if (*connection_format != *device_format) {
                     std::cout << __PRETTY_FUNCTION__ << " : output device io format is not match." << std::endl;
                     return false;
@@ -202,7 +202,7 @@ bool audio_device_io_node::_validate_connections() const
             if (connections.count(0) > 0) {
                 const auto &connection = connections.at(0);
                 const auto &connection_format = connection->format();
-                const auto &device_format = device_io->audio_device()->input_format();
+                const auto &device_format = device_io->device()->input_format();
                 if (*connection_format != *device_format) {
                     std::cout << __PRETTY_FUNCTION__ << " : input device io format is not match." << std::endl;
                     return false;

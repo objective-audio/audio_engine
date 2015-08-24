@@ -18,12 +18,12 @@ namespace yas
        public:
         static void add_audio_device_io_to_graph(audio_device_io_node *node, const audio_graph_ptr &graph)
         {
-            node->_add_audio_device_io_to_graph(graph);
+            node->_add_device_io_to_graph(graph);
         }
 
         static void remove_audio_device_io_from_graph(audio_device_io_node *node)
         {
-            node->_remove_audio_device_io_from_graph();
+            node->_remove_device_io_from_graph();
         }
     };
 }
