@@ -16,7 +16,7 @@
 
 #include "yas_audio_time.h"
 #include "yas_audio_format.h"
-#include "yas_pcm_buffer.h"
+#include "yas_audio_pcm_buffer.h"
 #include "yas_audio_enumerator.h"
 #include "yas_audio_file.h"
 #include "yas_audio_file_utils.h"

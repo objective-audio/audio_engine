@@ -8,7 +8,7 @@
 #import "yas_audio_unit.h"
 #import "yas_audio_format.h"
 #import "yas_audio_time.h"
-#import "yas_pcm_buffer.h"
+#import "yas_audio_pcm_buffer.h"
 #import "YASMacros.h"
 
 @interface yas_audio_graph_tests : XCTestCase
@@ -162,7 +162,7 @@
                        yas::audio_time audio_time(0, output_sample_rate);
                        AudioTimeStamp timeStamp = audio_time.audio_time_stamp();
 
-                       auto data = yas::pcm_buffer::create(output_format, frame_length);
+                       auto data = yas::audio_pcm_buffer::create(output_format, frame_length);
 
                        yas::render_parameters parameters = {
                            .in_render_type = yas::render_type::normal,

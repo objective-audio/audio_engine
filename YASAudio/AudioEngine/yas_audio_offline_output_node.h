@@ -35,7 +35,7 @@ namespace yas
 
         using super_class = audio_unit_node;
         using render_function =
-            std::function<void(const pcm_buffer_sptr &buffer, const audio_time_sptr &when, bool &stop)>;
+            std::function<void(const audio_pcm_buffer_sptr &buffer, const audio_time_sptr &when, bool &stop)>;
         using completion_function = std::function<void(const bool cancelled)>;
 
         audio_offline_output_node();

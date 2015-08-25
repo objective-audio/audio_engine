@@ -73,7 +73,7 @@ namespace yas
                 return _sine_volume.load();
             }
 
-            void process(const yas::pcm_buffer_sptr &input_buffer, const yas::pcm_buffer_sptr &output_buffer)
+            void process(const yas::audio_pcm_buffer_sptr &input_buffer, const yas::audio_pcm_buffer_sptr &output_buffer)
             {
                 if (!output_buffer) {
                     return;
@@ -194,7 +194,7 @@ using sample_kernel_ptr = std::shared_ptr<yas::audio_device_sample::kernel>;
         });
 
     std::weak_ptr<yas::audio_device_io> weak_device_io = _audio_device_io;
-    _audio_device_io->set_render_callback([weak_device_io, kernel = _kernel](const yas::pcm_buffer_sptr &output_buffer,
+    _audio_device_io->set_render_callback([weak_device_io, kernel = _kernel](const yas::audio_pcm_buffer_sptr &output_buffer,
                                                                              const yas::audio_time_sptr &when) {
         if (auto device_io = weak_device_io.lock()) {
             kernel->process(device_io->input_buffer_on_render(), output_buffer);

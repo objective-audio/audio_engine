@@ -7,7 +7,7 @@
 
 #include "yas_audio_types.h"
 #include "yas_audio_file_utils.h"
-#include "yas_pcm_buffer.h"
+#include "yas_audio_pcm_buffer.h"
 #include <memory>
 #include <Foundation/Foundation.h>
 
@@ -66,7 +66,7 @@ namespace yas
 
         ~audio_file_reader();
 
-        read_result read_into_buffer(pcm_buffer_sptr &buffer, const UInt32 frame_length = 0);
+        read_result read_into_buffer(audio_pcm_buffer_sptr &buffer, const UInt32 frame_length = 0);
 
        private:
         audio_file_reader();
@@ -104,7 +104,7 @@ namespace yas
 
         ~audio_file_writer();
 
-        write_result write_from_buffer(const pcm_buffer_sptr &buffer, const bool async = false);
+        write_result write_from_buffer(const audio_pcm_buffer_sptr &buffer, const bool async = false);
 
        private:
         audio_file_writer();

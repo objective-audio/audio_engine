@@ -371,10 +371,10 @@
 		B6BFE06E1B771DAB00E7B00B /* yas_audio_unit_mixer_node_tests.mm in Sources */ = {isa = PBXBuildFile; fileRef = B6BFE06C1B771DAB00E7B00B /* yas_audio_unit_mixer_node_tests.mm */; };
 		B6BFE06F1B771DAB00E7B00B /* yas_audio_unit_mixer_node_tests.mm in Sources */ = {isa = PBXBuildFile; fileRef = B6BFE06C1B771DAB00E7B00B /* yas_audio_unit_mixer_node_tests.mm */; };
 		B6BFE0701B771DAB00E7B00B /* yas_audio_unit_mixer_node_tests.mm in Sources */ = {isa = PBXBuildFile; fileRef = B6BFE06C1B771DAB00E7B00B /* yas_audio_unit_mixer_node_tests.mm */; };
-		B6C1A3611B1B39E500EB876D /* yas_pcm_buffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6C1A35F1B1B39E500EB876D /* yas_pcm_buffer.cpp */; };
-		B6C1A3621B1B39E500EB876D /* yas_pcm_buffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6C1A35F1B1B39E500EB876D /* yas_pcm_buffer.cpp */; };
-		B6C1A3631B1B39E500EB876D /* yas_pcm_buffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6C1A35F1B1B39E500EB876D /* yas_pcm_buffer.cpp */; };
-		B6C1A3641B1B39E500EB876D /* yas_pcm_buffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6C1A35F1B1B39E500EB876D /* yas_pcm_buffer.cpp */; };
+		B6C1A3611B1B39E500EB876D /* yas_audio_pcm_buffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6C1A35F1B1B39E500EB876D /* yas_audio_pcm_buffer.cpp */; };
+		B6C1A3621B1B39E500EB876D /* yas_audio_pcm_buffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6C1A35F1B1B39E500EB876D /* yas_audio_pcm_buffer.cpp */; };
+		B6C1A3631B1B39E500EB876D /* yas_audio_pcm_buffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6C1A35F1B1B39E500EB876D /* yas_audio_pcm_buffer.cpp */; };
+		B6C1A3641B1B39E500EB876D /* yas_audio_pcm_buffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6C1A35F1B1B39E500EB876D /* yas_audio_pcm_buffer.cpp */; };
 		B6C4CA181B330C6400CEB378 /* yas_audio_device.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B65214291B27CA6D004ED1C7 /* yas_audio_device.cpp */; };
 		B6CD08121B1360E700E7D4ED /* yas_audio_graph_tests.mm in Sources */ = {isa = PBXBuildFile; fileRef = B6CD08111B1360E700E7D4ED /* yas_audio_graph_tests.mm */; };
 		B6CD08131B1360E700E7D4ED /* yas_audio_graph_tests.mm in Sources */ = {isa = PBXBuildFile; fileRef = B6CD08111B1360E700E7D4ED /* yas_audio_graph_tests.mm */; };
@@ -607,8 +607,8 @@
 		B6BFE0661B77180E00E7B00B /* yas_audio_unit_mixer_node.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = yas_audio_unit_mixer_node.cpp; path = AudioEngine/yas_audio_unit_mixer_node.cpp; sourceTree = "<group>"; };
 		B6BFE0671B77180E00E7B00B /* yas_audio_unit_mixer_node.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = yas_audio_unit_mixer_node.h; path = AudioEngine/yas_audio_unit_mixer_node.h; sourceTree = "<group>"; };
 		B6BFE06C1B771DAB00E7B00B /* yas_audio_unit_mixer_node_tests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = yas_audio_unit_mixer_node_tests.mm; path = YASAudio_Tests/yas_audio_unit_mixer_node_tests.mm; sourceTree = SOURCE_ROOT; };
-		B6C1A35F1B1B39E500EB876D /* yas_pcm_buffer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = yas_pcm_buffer.cpp; sourceTree = "<group>"; };
-		B6C1A3601B1B39E500EB876D /* yas_pcm_buffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yas_pcm_buffer.h; sourceTree = "<group>"; };
+		B6C1A35F1B1B39E500EB876D /* yas_audio_pcm_buffer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = yas_audio_pcm_buffer.cpp; sourceTree = "<group>"; };
+		B6C1A3601B1B39E500EB876D /* yas_audio_pcm_buffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yas_audio_pcm_buffer.h; sourceTree = "<group>"; };
 		B6CD08111B1360E700E7D4ED /* yas_audio_graph_tests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = yas_audio_graph_tests.mm; path = YASAudio_Tests/yas_audio_graph_tests.mm; sourceTree = SOURCE_ROOT; };
 		B6CD08161B14B1BC00E7D4ED /* yas_audio_format.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = yas_audio_format.mm; sourceTree = "<group>"; };
 		B6CD08171B14B1BC00E7D4ED /* yas_audio_format.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yas_audio_format.h; sourceTree = "<group>"; };
@@ -994,8 +994,8 @@
 				B68A92AD1B19D2D60017C413 /* yas_audio_time.mm */,
 				B6CD08171B14B1BC00E7D4ED /* yas_audio_format.h */,
 				B6CD08161B14B1BC00E7D4ED /* yas_audio_format.mm */,
-				B6C1A3601B1B39E500EB876D /* yas_pcm_buffer.h */,
-				B6C1A35F1B1B39E500EB876D /* yas_pcm_buffer.cpp */,
+				B6C1A3601B1B39E500EB876D /* yas_audio_pcm_buffer.h */,
+				B6C1A35F1B1B39E500EB876D /* yas_audio_pcm_buffer.cpp */,
 				B6B7289A1B22A59A00D9D922 /* yas_audio_enumerator.h */,
 				B6B728991B22A59A00D9D922 /* yas_audio_enumerator.cpp */,
 				B6EE85EA1B437A0500096F8A /* yas_audio_file.h */,
@@ -1218,7 +1218,7 @@
 				B66845A51A6558E600D5A372 /* NSArray+YASAudio.m in Sources */,
 				B68A92B41B19F8700017C413 /* yas_audio_time_tests.mm in Sources */,
 				B63B21ED1AAC342A0015BD78 /* NSString+YASAudioTests.m in Sources */,
-				B6C1A3611B1B39E500EB876D /* yas_pcm_buffer.cpp in Sources */,
+				B6C1A3611B1B39E500EB876D /* yas_audio_pcm_buffer.cpp in Sources */,
 				B64F93C91A791E750023F49B /* YASAudioGraph.m in Sources */,
 				B69170EB1B80AC3600B02E29 /* yas_any_tests.mm in Sources */,
 				B60C4A381B823E45006F1B5E /* yas_any.cpp in Sources */,
@@ -1344,7 +1344,7 @@
 				B66845AD1A655D9700D5A372 /* NSArray+YASAudio.m in Sources */,
 				B651FD511B46E536007ADDE2 /* yas_audio_file_utils_tests.mm in Sources */,
 				B60CD4A61B7F4BAF002AFDCE /* yas_audio_device_io_node.cpp in Sources */,
-				B6C1A3631B1B39E500EB876D /* yas_pcm_buffer.cpp in Sources */,
+				B6C1A3631B1B39E500EB876D /* yas_audio_pcm_buffer.cpp in Sources */,
 				B63B22011AAC4EBB0015BD78 /* YASAudioConnection.m in Sources */,
 				B6EE85ED1B437A0500096F8A /* yas_audio_file.mm in Sources */,
 				B6F726181ACFE268006980E5 /* YASAudioUnitMixerNodeTests.m in Sources */,
@@ -1464,7 +1464,7 @@
 				B634506C1AD10A7100CF7784 /* NSString+YASAudioTests.m in Sources */,
 				B634506D1AD10A7100CF7784 /* NSArray+YASAudio.m in Sources */,
 				B651FD521B46E536007ADDE2 /* yas_audio_file_utils_tests.mm in Sources */,
-				B6C1A3641B1B39E500EB876D /* yas_pcm_buffer.cpp in Sources */,
+				B6C1A3641B1B39E500EB876D /* yas_audio_pcm_buffer.cpp in Sources */,
 				B6ACC1A21B6C8AB5007322C8 /* yas_audio_unit_node_tests.mm in Sources */,
 				B6962F981B671BE700BAB69E /* yas_audio_unit_io_node.mm in Sources */,
 				B634506E1AD10A7100CF7784 /* YASAudioConnection.m in Sources */,
@@ -1531,7 +1531,7 @@
 				B66E53341A75CF0E008B9D4E /* YASWeakSupport.m in Sources */,
 				B66E53351A75CF0E008B9D4E /* NSNumber+YASAudio.m in Sources */,
 				B65214321B287D56004ED1C7 /* yas_audio_device_stream.cpp in Sources */,
-				B6C1A3621B1B39E500EB876D /* yas_pcm_buffer.cpp in Sources */,
+				B6C1A3621B1B39E500EB876D /* yas_audio_pcm_buffer.cpp in Sources */,
 				B6CD08191B14B1BC00E7D4ED /* yas_audio_format.mm in Sources */,
 				B6FB1D041B07068F00F10AE8 /* yas_audio_unit_tests.mm in Sources */,
 				B6EE85EC1B437A0500096F8A /* yas_audio_file.mm in Sources */,

@@ -9,7 +9,7 @@
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
 
 #include "yas_audio_types.h"
-#include "yas_pcm_buffer.h"
+#include "yas_audio_pcm_buffer.h"
 #include "yas_audio_device.h"
 #include <functional>
 #include <memory>
@@ -19,7 +19,7 @@ namespace yas
     class audio_device_io
     {
        public:
-        using render_function = std::function<void(const pcm_buffer_sptr &output_buffer, const audio_time_sptr &when)>;
+        using render_function = std::function<void(const audio_pcm_buffer_sptr &output_buffer, const audio_time_sptr &when)>;
 
         static audio_device_io_sptr create();
         static audio_device_io_sptr create(const audio_device_sptr &audio_device);
@@ -36,7 +36,7 @@ namespace yas
         void start();
         void stop();
 
-        const pcm_buffer_sptr input_buffer_on_render() const;
+        const audio_pcm_buffer_sptr input_buffer_on_render() const;
         const audio_time_sptr input_time_on_render() const;
 
        private:

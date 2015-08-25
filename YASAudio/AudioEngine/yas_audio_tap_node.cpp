@@ -70,7 +70,7 @@ uint32_t audio_tap_node::output_bus_count() const
     return 1;
 }
 
-void audio_tap_node::render(const pcm_buffer_sptr &buffer, const uint32_t bus_idx, const audio_time_sptr &when)
+void audio_tap_node::render(const audio_pcm_buffer_sptr &buffer, const uint32_t bus_idx, const audio_time_sptr &when)
 {
     super_class::render(buffer, bus_idx, when);
 
@@ -110,7 +110,7 @@ audio_connection_wmap &audio_tap_node::output_connections_on_render() const
     return _impl->node_core_on_render()->output_connections;
 }
 
-void audio_tap_node::render_source(const pcm_buffer_sptr &buffer, const uint32_t bus_idx, const audio_time_sptr &when)
+void audio_tap_node::render_source(const audio_pcm_buffer_sptr &buffer, const uint32_t bus_idx, const audio_time_sptr &when)
 {
     if (auto connection = input_connection_on_render(bus_idx)) {
         if (auto node = connection->source_node()) {

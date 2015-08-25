@@ -8,7 +8,7 @@
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
 
 #include "yas_audio_device.h"
-#include "yas_pcm_buffer.h"
+#include "yas_audio_pcm_buffer.h"
 #include "yas_audio_format.h"
 #include "yas_audio_time.h"
 #include "yas_observing.h"
@@ -25,12 +25,13 @@ class audio_device_io::impl
     class kernel
     {
        public:
-        pcm_buffer_sptr input_buffer;
-        pcm_buffer_sptr output_buffer;
+        audio_pcm_buffer_sptr input_buffer;
+        audio_pcm_buffer_sptr output_buffer;
 
-        kernel(const audio_format_sptr &input_format, const audio_format_sptr &output_format, const UInt32 frame_capacity)
-            : input_buffer(input_format ? pcm_buffer::create(input_format, frame_capacity) : nullptr),
-              output_buffer(output_format ? pcm_buffer::create(output_format, frame_capacity) : nullptr)
+        kernel(const audio_format_sptr &input_format, const audio_format_sptr &output_format,
+               const UInt32 frame_capacity)
+            : input_buffer(input_format ? audio_pcm_buffer::create(input_format, frame_capacity) : nullptr),
+              output_buffer(output_format ? audio_pcm_buffer::create(output_format, frame_capacity) : nullptr)
         {
         }
 
@@ -51,7 +52,7 @@ class audio_device_io::impl
     audio_device_sptr device;
     bool is_running;
     AudioDeviceIOProcID io_proc_id;
-    pcm_buffer_sptr input_buffer_on_render;
+    audio_pcm_buffer_sptr input_buffer_on_render;
     audio_time_sptr input_time_on_render;
     audio_device_observer_ptr observer;
 
@@ -215,7 +216,7 @@ void audio_device_io::_initialize()
                             }
                         }
                     } else if (kernel->input_buffer) {
-                        pcm_buffer_sptr data = nullptr;
+                        audio_pcm_buffer_sptr data = nullptr;
                         audio_time_sptr time = nullptr;
                         render_callback(data, time);
                     }
@@ -255,8 +256,7 @@ void audio_device_io::set_device(const audio_device_sptr device)
         _uninitialize();
 
         if (_impl->device) {
-            _impl->observer->remove_handler(_impl->device->property_subject(),
-                                            audio_device::method::device_did_change);
+            _impl->observer->remove_handler(_impl->device->property_subject(), audio_device::method::device_did_change);
         }
 
         _impl->device = device;
@@ -330,7 +330,7 @@ void audio_device_io::stop()
     yas_raise_if_au_error(AudioDeviceStop(_impl->device->audio_device_id(), _impl->io_proc_id));
 }
 
-const pcm_buffer_sptr audio_device_io::input_buffer_on_render() const
+const audio_pcm_buffer_sptr audio_device_io::input_buffer_on_render() const
 {
     return _impl->input_buffer_on_render;
 }

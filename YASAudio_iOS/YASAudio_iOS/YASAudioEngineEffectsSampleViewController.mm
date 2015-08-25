@@ -87,7 +87,7 @@ static const AudioComponentDescription baseAcd = {.componentType = kAudioUnitTyp
     Float64 phase = 0;
 
     auto tap_render_function =
-        [phase](const yas::pcm_buffer_sptr &buffer, const uint32_t bus_idx, const yas::audio_time_sptr &when) mutable {
+        [phase](const yas::audio_pcm_buffer_sptr &buffer, const uint32_t bus_idx, const yas::audio_time_sptr &when) mutable {
             buffer->clear();
 
             const Float64 start_phase = phase;
