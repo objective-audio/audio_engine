@@ -27,8 +27,8 @@ namespace yas
 
         static const OSType sub_type_default_io();
 
-        static audio_unit_ptr create(const AudioComponentDescription &acd);
-        static audio_unit_ptr create(const OSType &type, const OSType &subType);
+        static audio_unit_sptr create(const AudioComponentDescription &acd);
+        static audio_unit_sptr create(const OSType &type, const OSType &subType);
 
         ~audio_unit();
 

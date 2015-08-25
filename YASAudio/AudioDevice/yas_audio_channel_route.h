@@ -17,9 +17,9 @@ namespace yas
     class channel_route
     {
        public:
-        static channel_route_ptr create(const UInt32 source_bus, const UInt32 source_channel,
+        static channel_route_sptr create(const UInt32 source_bus, const UInt32 source_channel,
                                         const UInt32 destination_bus, const UInt32 destination_channel);
-        static channel_route_ptr create(const UInt32 bus, const UInt32 channel);
+        static channel_route_sptr create(const UInt32 bus, const UInt32 channel);
 
         ~channel_route();
 
@@ -28,7 +28,7 @@ namespace yas
         channel_route &operator=(const channel_route &);
         channel_route &operator=(channel_route &&) noexcept;
 
-        static std::vector<channel_route_ptr> default_channel_routes(const UInt32 bus, const audio_format_ptr &format);
+        static std::vector<channel_route_sptr> default_channel_routes(const UInt32 bus, const audio_format_sptr &format);
 
         UInt32 source_bus() const;
         UInt32 source_channel() const;

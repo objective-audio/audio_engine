@@ -11,11 +11,11 @@ namespace yas
     class audio_unit_parameter;
     class audio_unit_node;
 
-    using audio_unit_node_ptr = std::shared_ptr<audio_unit_node>;
+    using audio_unit_node_sptr = std::shared_ptr<audio_unit_node>;
 }
 
 @interface YASAudioEngineSampleParameterCell : UITableViewCell
 
-- (void)set_node:(const yas::audio_unit_node_ptr &)node index:(const uint32_t)index;
+- (void)set_node:(const yas::audio_unit_node_sptr &)node index:(const uint32_t)index;
 
 @end

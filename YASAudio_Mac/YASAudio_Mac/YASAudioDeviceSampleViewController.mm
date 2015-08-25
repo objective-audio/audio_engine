@@ -73,7 +73,7 @@ namespace yas
                 return _sine_volume.load();
             }
 
-            void process(const yas::pcm_buffer_ptr &input_buffer, const yas::pcm_buffer_ptr &output_buffer)
+            void process(const yas::pcm_buffer_sptr &input_buffer, const yas::pcm_buffer_sptr &output_buffer)
             {
                 if (!output_buffer) {
                     return;
@@ -85,7 +85,7 @@ namespace yas
                     return;
                 }
 
-                const yas::audio_format_ptr format = output_buffer->format();
+                const yas::audio_format_sptr format = output_buffer->format();
                 if (format->pcm_format() == yas::pcm_format::float32 && format->stride() == 1) {
                     yas::audio_frame_enumerator enumerator(output_buffer);
                     auto pointer = enumerator.pointer();
@@ -144,11 +144,11 @@ using sample_kernel_ptr = std::shared_ptr<yas::audio_device_sample::kernel>;
 @end
 
 @implementation YASAudioDeviceSampleViewController {
-    yas::audio_graph_ptr _audio_graph;
-    yas::audio_device_io_ptr _audio_device_io;
+    yas::audio_graph_sptr _audio_graph;
+    yas::audio_device_io_sptr _audio_device_io;
     yas::audio_device_observer_ptr _audio_device_observer;
     sample_kernel_ptr _kernel;
-    yas::objc_weak_container_ptr _self_container;
+    yas::objc_weak_container_sptr _self_container;
 }
 
 - (void)viewDidLoad
@@ -194,8 +194,8 @@ using sample_kernel_ptr = std::shared_ptr<yas::audio_device_sample::kernel>;
         });
 
     std::weak_ptr<yas::audio_device_io> weak_device_io = _audio_device_io;
-    _audio_device_io->set_render_callback([weak_device_io, kernel = _kernel](const yas::pcm_buffer_ptr &output_buffer,
-                                                                             const yas::audio_time_ptr &when) {
+    _audio_device_io->set_render_callback([weak_device_io, kernel = _kernel](const yas::pcm_buffer_sptr &output_buffer,
+                                                                             const yas::audio_time_sptr &when) {
         if (auto device_io = weak_device_io.lock()) {
             kernel->process(device_io->input_buffer_on_render(), output_buffer);
         }
@@ -313,7 +313,7 @@ using sample_kernel_ptr = std::shared_ptr<yas::audio_device_sample::kernel>;
     }
 }
 
-- (void)setDevice:(const yas::audio_device_ptr &)selected_device
+- (void)setDevice:(const yas::audio_device_sptr &)selected_device
 {
     if (auto prev_audio_device = _audio_device_io->device()) {
         _audio_device_observer->remove_handler(prev_audio_device->property_subject(),

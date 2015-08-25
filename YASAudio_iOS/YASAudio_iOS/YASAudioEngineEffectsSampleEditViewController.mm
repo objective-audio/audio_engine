@@ -12,7 +12,7 @@
 @end
 
 @implementation YASAudioEngineEffectsSampleEditViewController {
-    yas::audio_unit_node_ptr _node;
+    yas::audio_unit_node_sptr _node;
 }
 
 - (void)viewDidLoad

@@ -16,7 +16,7 @@ using namespace yas;
 audio_node_core::audio_node_core() = default;
 audio_node_core::~audio_node_core() = default;
 
-audio_connection_ptr audio_node_core::input_connection(const uint32_t bus_idx)
+audio_connection_sptr audio_node_core::input_connection(const uint32_t bus_idx)
 {
     if (input_connections.count(bus_idx) > 0) {
         return input_connections.at(bus_idx).lock();
@@ -24,7 +24,7 @@ audio_connection_ptr audio_node_core::input_connection(const uint32_t bus_idx)
     return nullptr;
 }
 
-audio_connection_ptr audio_node_core::output_connection(const uint32_t bus_idx)
+audio_connection_sptr audio_node_core::output_connection(const uint32_t bus_idx)
 {
     if (output_connections.count(bus_idx) > 0) {
         return output_connections.at(bus_idx).lock();
@@ -43,12 +43,12 @@ class audio_node::impl
     {
     }
 
-    audio_connection_weak_map &input_connections()
+    audio_connection_wmap &input_connections()
     {
         return _input_connections;
     }
 
-    audio_connection_weak_map &output_connections()
+    audio_connection_wmap &output_connections()
     {
         return _output_connections;
     }
@@ -65,23 +65,23 @@ class audio_node::impl
         return _node_core;
     }
 
-    void set_render_time(const audio_time_ptr &render_time)
+    void set_render_time(const audio_time_sptr &render_time)
     {
         std::lock_guard<std::recursive_mutex> lock(_mutex);
         _render_time = render_time;
     }
 
-    audio_time_ptr render_time() const
+    audio_time_sptr render_time() const
     {
         std::lock_guard<std::recursive_mutex> lock(_mutex);
         return _render_time;
     }
 
    private:
-    audio_connection_weak_map _input_connections;
-    audio_connection_weak_map _output_connections;
+    audio_connection_wmap _input_connections;
+    audio_connection_wmap _output_connections;
     audio_node_core_ptr _node_core;
-    audio_time_ptr _render_time;
+    audio_time_sptr _render_time;
     mutable std::recursive_mutex _mutex;
 };
 
@@ -106,7 +106,7 @@ void audio_node::reset()
     update_node_core();
 }
 
-audio_format_ptr audio_node::input_format(const uint32_t bus_idx)
+audio_format_sptr audio_node::input_format(const uint32_t bus_idx)
 {
     if (auto connection = input_connection(bus_idx)) {
         return connection->format();
@@ -114,7 +114,7 @@ audio_format_ptr audio_node::input_format(const uint32_t bus_idx)
     return nullptr;
 }
 
-audio_format_ptr audio_node::output_format(const uint32_t bus_idx)
+audio_format_sptr audio_node::output_format(const uint32_t bus_idx)
 {
     if (auto connection = output_connection(bus_idx)) {
         return connection->format();
@@ -156,12 +156,12 @@ bool audio_node::is_available_output_bus(const uint32_t bus_idx) const
     return _impl->output_connections().count(bus_idx) == 0;
 }
 
-audio_engine_ptr audio_node::engine() const
+audio_engine_sptr audio_node::engine() const
 {
     return _impl->engine.lock();
 }
 
-audio_time_ptr audio_node::last_render_time() const
+audio_time_sptr audio_node::last_render_time() const
 {
     return _impl->render_time();
 }
@@ -178,7 +178,7 @@ uint32_t audio_node::output_bus_count() const
 
 #pragma mark render thread
 
-void audio_node::render(const pcm_buffer_ptr &buffer, const uint32_t bus_idx, const audio_time_ptr &when)
+void audio_node::render(const pcm_buffer_sptr &buffer, const uint32_t bus_idx, const audio_time_sptr &when)
 {
     set_render_time_on_render(when);
 }
@@ -212,12 +212,12 @@ void audio_node::update_node_core()
 
 #pragma mark - private
 
-void audio_node::_set_engine(const audio_engine_ptr &engine)
+void audio_node::_set_engine(const audio_engine_sptr &engine)
 {
     _impl->engine = engine;
 }
 
-void audio_node::_add_connection(const audio_connection_ptr &connection)
+void audio_node::_add_connection(const audio_connection_sptr &connection)
 {
     if (*connection->destination_node() == *this) {
         auto bus_idx = connection->destination_bus();
@@ -245,7 +245,7 @@ void audio_node::_remove_connection(const audio_connection &connection)
     update_node_core();
 }
 
-audio_connection_ptr audio_node::input_connection(const uint32_t bus_idx) const
+audio_connection_sptr audio_node::input_connection(const uint32_t bus_idx) const
 {
     if (_impl->input_connections().count(bus_idx) > 0) {
         return _impl->input_connections().at(bus_idx).lock();
@@ -253,7 +253,7 @@ audio_connection_ptr audio_node::input_connection(const uint32_t bus_idx) const
     return nullptr;
 }
 
-audio_connection_ptr audio_node::output_connection(const uint32_t bus_idx) const
+audio_connection_sptr audio_node::output_connection(const uint32_t bus_idx) const
 {
     if (_impl->output_connections().count(bus_idx) > 0) {
         return _impl->output_connections().at(bus_idx).lock();
@@ -261,12 +261,12 @@ audio_connection_ptr audio_node::output_connection(const uint32_t bus_idx) const
     return nullptr;
 }
 
-const audio_connection_weak_map &audio_node::input_connections() const
+const audio_connection_wmap &audio_node::input_connections() const
 {
     return _impl->input_connections();
 }
 
-const audio_connection_weak_map &audio_node::output_connections() const
+const audio_connection_wmap &audio_node::output_connections() const
 {
     return _impl->output_connections();
 }
@@ -278,7 +278,7 @@ audio_node_core_ptr audio_node::node_core() const
     return _impl->node_core();
 }
 
-void audio_node::set_render_time_on_render(const audio_time_ptr &time)
+void audio_node::set_render_time_on_render(const audio_time_sptr &time)
 {
     _impl->set_render_time(time);
 }

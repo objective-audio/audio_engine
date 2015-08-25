@@ -57,14 +57,14 @@ namespace yas
         using system_subject_type = subject<method, std::vector<property_info>>;
         using property_subject_type = subject<method, std::vector<property_info>>;
 
-        static std::vector<audio_device_ptr> all_devices();
-        static std::vector<audio_device_ptr> output_devices();
-        static std::vector<audio_device_ptr> input_devices();
-        static const audio_device_ptr default_system_output_device();
-        static const audio_device_ptr default_output_device();
-        static const audio_device_ptr default_input_device();
-        static const audio_device_ptr device_for_id(const AudioDeviceID);
-        static const std::experimental::optional<size_t> index_of_device(const audio_device_ptr &);
+        static std::vector<audio_device_sptr> all_devices();
+        static std::vector<audio_device_sptr> output_devices();
+        static std::vector<audio_device_sptr> input_devices();
+        static const audio_device_sptr default_system_output_device();
+        static const audio_device_sptr default_output_device();
+        static const audio_device_sptr default_input_device();
+        static const audio_device_sptr device_for_id(const AudioDeviceID);
+        static const std::experimental::optional<size_t> index_of_device(const audio_device_sptr &);
 
         ~audio_device();
 
@@ -76,12 +76,12 @@ namespace yas
         std::string manufacture() const;
         CFStringRef cf_name() const;
         CFStringRef cf_manufacture() const;
-        std::vector<audio_device_stream_ptr> input_streams() const;
-        std::vector<audio_device_stream_ptr> output_streams() const;
+        std::vector<audio_device_stream_sptr> input_streams() const;
+        std::vector<audio_device_stream_sptr> output_streams() const;
         Float64 nominal_sample_rate() const;
 
-        audio_format_ptr input_format() const;
-        audio_format_ptr output_format() const;
+        audio_format_sptr input_format() const;
+        audio_format_sptr output_format() const;
         uint32_t input_channel_count() const;
         uint32_t output_channel_count() const;
 

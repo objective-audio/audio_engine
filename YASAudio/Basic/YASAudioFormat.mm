@@ -9,7 +9,7 @@
 #import "yas_audio_format.h"
 
 @implementation YASAudioFormat {
-    yas::audio_format_ptr _format;
+    yas::audio_format_sptr _format;
 }
 
 - (instancetype)initWithStreamDescription:(const AudioStreamBasicDescription *)asbd

@@ -183,7 +183,7 @@ bool audio_unit_io_node::is_available_output_bus(const uint32_t bus_idx) const
 */
 #elif TARGET_OS_MAC
 
-void audio_unit_io_node::set_device(const audio_device_ptr &device)
+void audio_unit_io_node::set_device(const audio_device_sptr &device)
 {
     if (!device) {
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
@@ -192,7 +192,7 @@ void audio_unit_io_node::set_device(const audio_device_ptr &device)
     audio_unit()->set_current_device(device->audio_device_id());
 }
 
-audio_device_ptr audio_unit_io_node::device() const
+audio_device_sptr audio_unit_io_node::device() const
 {
     return audio_device::device_for_id(audio_unit()->current_device());
 }
@@ -201,9 +201,9 @@ audio_device_ptr audio_unit_io_node::device() const
 
 #pragma mark - audio_unit_output_node
 
-audio_unit_output_node_ptr audio_unit_output_node::create()
+audio_unit_output_node_sptr audio_unit_output_node::create()
 {
-    auto node = audio_unit_output_node_ptr(new audio_unit_output_node());
+    auto node = audio_unit_output_node_sptr(new audio_unit_output_node());
     prepare_for_create(node);
     return node;
 }
@@ -231,13 +231,13 @@ uint32_t audio_unit_output_node::output_bus_count() const
 class audio_unit_input_node::impl
 {
    public:
-    pcm_buffer_ptr input_buffer;
-    audio_time_ptr render_time;
+    pcm_buffer_sptr input_buffer;
+    audio_time_sptr render_time;
 };
 
-audio_unit_input_node_ptr audio_unit_input_node::create()
+audio_unit_input_node_sptr audio_unit_input_node::create()
 {
-    auto node = audio_unit_input_node_ptr(new audio_unit_input_node());
+    auto node = audio_unit_input_node_sptr(new audio_unit_input_node());
     prepare_for_create(node);
     node->_weak_this = node;
     return node;

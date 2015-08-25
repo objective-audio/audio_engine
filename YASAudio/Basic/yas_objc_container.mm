@@ -10,7 +10,7 @@ using namespace yas;
 
 #pragma mark - strong
 
-objc_strong_container_ptr objc_strong_container::create(const id object)
+objc_strong_container_sptr objc_strong_container::create(const id object)
 {
     return std::make_shared<objc_strong_container>(object);
 }
@@ -126,7 +126,7 @@ id objc_strong_container::autoreleased_object() const
 
 #pragma mark - weak
 
-objc_weak_container_ptr objc_weak_container::create(const id object)
+objc_weak_container_sptr objc_weak_container::create(const id object)
 {
     return std::make_shared<objc_weak_container>(object);
 }

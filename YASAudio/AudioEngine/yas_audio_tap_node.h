@@ -12,25 +12,25 @@ namespace yas
     class audio_tap_node : public audio_node
     {
        public:
-        static audio_tap_node_ptr create();
+        static audio_tap_node_sptr create();
 
         virtual ~audio_tap_node();
 
         using render_function =
-            std::function<void(const pcm_buffer_ptr &buffer, const uint32_t bus_idx, const audio_time_ptr &when)>;
+            std::function<void(const pcm_buffer_sptr &buffer, const uint32_t bus_idx, const audio_time_sptr &when)>;
 
         void set_render_function(const render_function &);
 
         virtual uint32_t input_bus_count() const override;
         virtual uint32_t output_bus_count() const override;
 
-        virtual void render(const pcm_buffer_ptr &buffer, const uint32_t bus_idx, const audio_time_ptr &when) override;
+        virtual void render(const pcm_buffer_sptr &buffer, const uint32_t bus_idx, const audio_time_sptr &when) override;
 
-        audio_connection_ptr input_connection_on_render(const uint32_t bus_idx) const;
-        audio_connection_ptr output_connection_on_render(const uint32_t bus_idx) const;
-        audio_connection_weak_map &input_connections_on_render() const;
-        audio_connection_weak_map &output_connections_on_render() const;
-        void render_source(const pcm_buffer_ptr &buffer, const uint32_t bus_idx, const audio_time_ptr &when);
+        audio_connection_sptr input_connection_on_render(const uint32_t bus_idx) const;
+        audio_connection_sptr output_connection_on_render(const uint32_t bus_idx) const;
+        audio_connection_wmap &input_connections_on_render() const;
+        audio_connection_wmap &output_connections_on_render() const;
+        void render_source(const pcm_buffer_sptr &buffer, const uint32_t bus_idx, const audio_time_sptr &when);
 
        protected:
         audio_tap_node();
@@ -48,7 +48,7 @@ namespace yas
     class audio_input_tap_node : public audio_tap_node
     {
        public:
-        static audio_input_tap_node_ptr create();
+        static audio_input_tap_node_sptr create();
 
         virtual uint32_t input_bus_count() const override;
         virtual uint32_t output_bus_count() const override;

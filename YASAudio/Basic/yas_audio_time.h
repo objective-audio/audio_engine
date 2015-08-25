@@ -16,10 +16,10 @@ namespace yas
     class audio_time
     {
        public:
-        static audio_time_ptr create(const AudioTimeStamp &ts, const Float64 sample_rate);
-        static audio_time_ptr create(const UInt64 host_time);
-        static audio_time_ptr create(const SInt64 sample_time, const Float64 sample_rate);
-        static audio_time_ptr create(const UInt64 host_time, const SInt64 sample_time, const Float64 sample_rate);
+        static audio_time_sptr create(const AudioTimeStamp &ts, const Float64 sample_rate);
+        static audio_time_sptr create(const UInt64 host_time);
+        static audio_time_sptr create(const SInt64 sample_time, const Float64 sample_rate);
+        static audio_time_sptr create(const UInt64 host_time, const SInt64 sample_time, const Float64 sample_rate);
 
         audio_time(const AudioTimeStamp &ts, const Float64 sample_rate);
         explicit audio_time(const UInt64 host_time);

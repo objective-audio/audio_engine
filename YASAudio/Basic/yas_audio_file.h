@@ -19,9 +19,9 @@ namespace yas
         virtual ~audio_file();
 
         CFURLRef url() const;
-        audio_format_ptr file_format() const;
-        void set_processing_format(const audio_format_ptr &format);
-        audio_format_ptr processing_format() const;
+        audio_format_sptr file_format() const;
+        void set_processing_format(const audio_format_sptr &format);
+        audio_format_sptr processing_format() const;
         SInt64 file_length() const;
         SInt64 processing_length() const;
         void set_file_frame_position(const UInt32 position);
@@ -58,7 +58,7 @@ namespace yas
             tell_failed,
         };
 
-        using create_result = result<audio_file_reader_ptr, create_error_type>;
+        using create_result = result<audio_file_reader_sptr, create_error_type>;
         using read_result = result<std::nullptr_t, read_error_type>;
 
         static create_result create(const CFURLRef file_url, const pcm_format pcm_format = pcm_format::float32,
@@ -66,7 +66,7 @@ namespace yas
 
         ~audio_file_reader();
 
-        read_result read_into_buffer(pcm_buffer_ptr &buffer, const UInt32 frame_length = 0);
+        read_result read_into_buffer(pcm_buffer_sptr &buffer, const UInt32 frame_length = 0);
 
        private:
         audio_file_reader();
@@ -95,7 +95,7 @@ namespace yas
             tell_failed,
         };
 
-        using create_result = result<audio_file_writer_ptr, create_error_type>;
+        using create_result = result<audio_file_writer_sptr, create_error_type>;
         using write_result = result<std::nullptr_t, write_error_type>;
 
         static create_result create(const CFURLRef file_url, const CFStringRef file_type,
@@ -104,7 +104,7 @@ namespace yas
 
         ~audio_file_writer();
 
-        write_result write_from_buffer(const pcm_buffer_ptr &buffer, const bool async = false);
+        write_result write_from_buffer(const pcm_buffer_sptr &buffer, const bool async = false);
 
        private:
         audio_file_writer();

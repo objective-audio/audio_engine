@@ -16,7 +16,7 @@ namespace yas
     class objc_strong_container
     {
        public:
-        static objc_strong_container_ptr create(const id object = nil);
+        static objc_strong_container_sptr create(const id object = nil);
 
         objc_strong_container(const id object = nil);
         ~objc_strong_container();
@@ -45,7 +45,7 @@ namespace yas
     class objc_weak_container
     {
        public:
-        static objc_weak_container_ptr create(const id object = nil);
+        static objc_weak_container_sptr create(const id object = nil);
 
         objc_weak_container(const id object = nil);
         ~objc_weak_container();

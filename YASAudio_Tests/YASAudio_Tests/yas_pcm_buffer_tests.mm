@@ -116,7 +116,7 @@
     [self _testClearBuffer:buffer];
 }
 
-- (void)_testClearBuffer:(yas::pcm_buffer_ptr &)buffer
+- (void)_testClearBuffer:(yas::pcm_buffer_sptr &)buffer
 {
     yas::test::fill_test_values_to_buffer(buffer);
 
@@ -405,7 +405,7 @@
     auto dest_buffer = yas::pcm_buffer::create(dest_format, frame_length);
     yas::test::fill_test_values_to_buffer(dest_buffer);
 
-    auto channel_routes = std::vector<yas::channel_route_ptr>();
+    auto channel_routes = std::vector<yas::channel_route_sptr>();
     for (UInt32 i = 0; i < source_channels; i++) {
         channel_routes.push_back(yas::channel_route::create(bus, i, bus, dest_channel_indices[i]));
     }
@@ -438,7 +438,7 @@
     auto source_buffer = yas::pcm_buffer::create(source_format, frame_length);
     yas::test::fill_test_values_to_buffer(source_buffer);
 
-    auto channel_routes = std::vector<yas::channel_route_ptr>();
+    auto channel_routes = std::vector<yas::channel_route_sptr>();
     for (UInt32 i = 0; i < dest_channels; i++) {
         channel_routes.push_back(yas::channel_route::create(bus, source_channel_indices[i], bus, i));
     }

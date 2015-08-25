@@ -49,7 +49,7 @@ namespace yas
             bool operator<(const property_info &info) const;
         };
 
-        static audio_device_stream_ptr create(const AudioStreamID, const AudioDeviceID);
+        static audio_device_stream_sptr create(const AudioStreamID, const AudioDeviceID);
 
         ~audio_device_stream();
 
@@ -57,10 +57,10 @@ namespace yas
         bool operator!=(const audio_device_stream &);
 
         AudioStreamID stream_id() const;
-        audio_device_ptr device() const;
+        audio_device_sptr device() const;
         bool is_active() const;
         direction direction() const;
-        audio_format_ptr virtual_format() const;
+        audio_format_sptr virtual_format() const;
         UInt32 starting_channel() const;
 
         using property_subject = subject<method, std::set<property_info>>;

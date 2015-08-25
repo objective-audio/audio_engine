@@ -24,7 +24,7 @@ UInt32 yas::test::test_value(const UInt32 frame, const UInt32 ch_idx, const UInt
     return frame + 1024 * (ch_idx + 1) + 512 * (buf_idx + 1);
 }
 
-void yas::test::fill_test_values_to_buffer(pcm_buffer_ptr &buffer)
+void yas::test::fill_test_values_to_buffer(pcm_buffer_sptr &buffer)
 {
     const auto &format = buffer->format();
     const yas::pcm_format pcmFormat = format->pcm_format();
@@ -58,7 +58,7 @@ void yas::test::fill_test_values_to_buffer(pcm_buffer_ptr &buffer)
     }
 }
 
-bool yas::test::is_cleard_buffer(pcm_buffer_ptr &buffer)
+bool yas::test::is_cleard_buffer(pcm_buffer_sptr &buffer)
 {
     const AudioBufferList *abl = buffer->audio_buffer_list();
 
@@ -74,7 +74,7 @@ bool yas::test::is_cleard_buffer(pcm_buffer_ptr &buffer)
     return true;
 }
 
-bool yas::test::is_filled_buffer(pcm_buffer_ptr &buffer)
+bool yas::test::is_filled_buffer(pcm_buffer_sptr &buffer)
 {
     __block BOOL isFilled = YES;
     const UInt32 sample_byte_count = buffer->format()->sample_byte_count();
@@ -95,7 +95,7 @@ bool yas::test::is_filled_buffer(pcm_buffer_ptr &buffer)
     return isFilled;
 }
 
-bool yas::test::is_equal_buffer_flexibly(pcm_buffer_ptr &data1, pcm_buffer_ptr &data2)
+bool yas::test::is_equal_buffer_flexibly(pcm_buffer_sptr &data1, pcm_buffer_sptr &data2)
 {
     if (data1->format()->channel_count() != data2->format()->channel_count()) {
         return NO;
@@ -126,7 +126,7 @@ bool yas::test::is_equal_buffer_flexibly(pcm_buffer_ptr &data1, pcm_buffer_ptr &
     return YES;
 }
 
-yas::flex_pointer yas::test::data_ptr_from_buffer(pcm_buffer_ptr &buffer, const UInt32 channel, const UInt32 frame)
+yas::flex_pointer yas::test::data_ptr_from_buffer(pcm_buffer_sptr &buffer, const UInt32 channel, const UInt32 frame)
 {
     audio_frame_enumerator enumerator(buffer);
     enumerator.set_frame_position(frame);
@@ -134,7 +134,7 @@ yas::flex_pointer yas::test::data_ptr_from_buffer(pcm_buffer_ptr &buffer, const 
     return *enumerator.pointer();
 }
 
-void yas::test::audio_unit_render_on_sub_thread(std::shared_ptr<audio_unit> audio_unit, yas::audio_format_ptr format,
+void yas::test::audio_unit_render_on_sub_thread(std::shared_ptr<audio_unit> audio_unit, yas::audio_format_sptr format,
                                                 const UInt32 frame_length, const NSUInteger count,
                                                 const NSTimeInterval wait)
 {
@@ -142,7 +142,7 @@ void yas::test::audio_unit_render_on_sub_thread(std::shared_ptr<audio_unit> audi
                    [audio_unit, format, frame_length, count, wait]() {
                        AudioUnitRenderActionFlags action_flags = 0;
 
-                       yas::pcm_buffer_ptr buffer = yas::pcm_buffer::create(format, frame_length);
+                       yas::pcm_buffer_sptr buffer = yas::pcm_buffer::create(format, frame_length);
 
                        for (NSInteger i = 0; i < count; i++) {
                            yas::audio_time audio_time(frame_length * i, format->sample_rate());

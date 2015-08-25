@@ -19,15 +19,15 @@ namespace yas
     class audio_device_io
     {
        public:
-        using render_function = std::function<void(const pcm_buffer_ptr &output_buffer, const audio_time_ptr &when)>;
+        using render_function = std::function<void(const pcm_buffer_sptr &output_buffer, const audio_time_sptr &when)>;
 
-        static audio_device_io_ptr create();
-        static audio_device_io_ptr create(const audio_device_ptr &audio_device);
+        static audio_device_io_sptr create();
+        static audio_device_io_sptr create(const audio_device_sptr &audio_device);
 
         ~audio_device_io();
 
-        void set_device(const audio_device_ptr device);
-        audio_device_ptr device() const;
+        void set_device(const audio_device_sptr device);
+        audio_device_sptr device() const;
         bool is_running() const;
         void set_render_callback(const render_function &callback);
         void set_maximum_frames_per_slice(const UInt32 frames);
@@ -36,8 +36,8 @@ namespace yas
         void start();
         void stop();
 
-        const pcm_buffer_ptr input_buffer_on_render() const;
-        const audio_time_ptr input_time_on_render() const;
+        const pcm_buffer_sptr input_buffer_on_render() const;
+        const audio_time_sptr input_time_on_render() const;
 
        private:
         class impl;

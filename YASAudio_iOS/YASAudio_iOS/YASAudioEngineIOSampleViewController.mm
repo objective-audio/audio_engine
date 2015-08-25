@@ -33,8 +33,8 @@ namespace yas
 
                 std::weak_ptr<meter_input_tap_node> weak_node = node;
 
-                node->set_render_function([weak_node](const yas::pcm_buffer_ptr &buffer, const uint32_t bus_idx,
-                                                      const yas::audio_time_ptr &when) {
+                node->set_render_function([weak_node](const yas::pcm_buffer_sptr &buffer, const uint32_t bus_idx,
+                                                      const yas::audio_time_sptr &when) {
                     if (auto node = weak_node.lock()) {
                         node->render_source(buffer, bus_idx, when);
 
@@ -101,12 +101,12 @@ namespace yas
 @end
 
 @implementation YASAudioEngineIOSampleViewController {
-    yas::audio_engine_ptr _audio_engine;
-    yas::audio_unit_output_node_ptr _output_node;
-    yas::audio_unit_mixer_node_ptr _mixer_node;
-    yas::audio_unit_input_node_ptr _input_node;
+    yas::audio_engine_sptr _audio_engine;
+    yas::audio_unit_output_node_sptr _output_node;
+    yas::audio_unit_mixer_node_sptr _mixer_node;
+    yas::audio_unit_input_node_sptr _input_node;
 
-    yas::audio_unit_input_node_ptr _meter_input_node;
+    yas::audio_unit_input_node_sptr _meter_input_node;
     yas::sample::meter_input_tap_node_ptr _meter_tap_node;
     yas::sample::meter_input_tap_node::property_observer_ptr _meter_tap_observer;
     std::vector<yas::any> _observers;

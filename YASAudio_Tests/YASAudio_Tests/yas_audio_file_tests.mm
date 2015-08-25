@@ -181,7 +181,7 @@ namespace yas
 
     @autoreleasepool
     {
-        yas::audio_file_writer_ptr audio_file = nullptr;
+        yas::audio_file_writer_sptr audio_file = nullptr;
 
         if (test_data.standard) {
             if (auto result = yas::audio_file_writer::create(fileURL, test_data.file_type(), settings)) {
@@ -216,7 +216,7 @@ namespace yas
 
     @autoreleasepool
     {
-        yas::audio_file_reader_ptr audio_file = nullptr;
+        yas::audio_file_reader_sptr audio_file = nullptr;
 
         if (test_data.standard) {
             if (auto result = yas::audio_file_reader::create(fileURL)) {
@@ -260,7 +260,7 @@ namespace yas
 
 #pragma mark -
 
-- (void)_writeToBuffer:(yas::pcm_buffer_ptr &)buffer
+- (void)_writeToBuffer:(yas::pcm_buffer_sptr &)buffer
             fileFormat:(yas::audio_format &)fileFormat
             startIndex:(NSInteger)startIndex
 {
@@ -296,7 +296,7 @@ namespace yas
     }
 }
 
-- (BOOL)_compareData:(yas::pcm_buffer_ptr &)buffer
+- (BOOL)_compareData:(yas::pcm_buffer_sptr &)buffer
           fileFormat:(yas::audio_format &)fileFormat
           startIndex:(NSInteger)startIndex
 {

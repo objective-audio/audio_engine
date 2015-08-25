@@ -7,9 +7,9 @@
 
 using namespace yas;
 
-audio_unit_mixer_node_ptr audio_unit_mixer_node::create()
+audio_unit_mixer_node_sptr audio_unit_mixer_node::create()
 {
-    auto node = audio_unit_mixer_node_ptr(new audio_unit_mixer_node());
+    auto node = audio_unit_mixer_node_sptr(new audio_unit_mixer_node());
     prepare_for_create(node);
     return node;
 }
