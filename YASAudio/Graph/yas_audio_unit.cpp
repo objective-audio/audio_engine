@@ -200,14 +200,14 @@ static OSStatus InputRenderCallback(void *inRefCon, AudioUnitRenderActionFlags *
 
 #pragma mark -
 
-audio_unit_ptr audio_unit::create(const AudioComponentDescription &acd)
+audio_unit_sptr audio_unit::create(const AudioComponentDescription &acd)
 {
-    return audio_unit_ptr(new audio_unit(acd));
+    return audio_unit_sptr(new audio_unit(acd));
 }
 
-audio_unit_ptr audio_unit::create(const OSType &type, const OSType &subType)
+audio_unit_sptr audio_unit::create(const OSType &type, const OSType &subType)
 {
-    return audio_unit_ptr(new audio_unit(type, subType));
+    return audio_unit_sptr(new audio_unit(type, subType));
 }
 
 audio_unit::audio_unit(const AudioComponentDescription &acd) : _impl(std::make_unique<impl>())

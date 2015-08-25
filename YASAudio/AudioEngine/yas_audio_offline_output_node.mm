@@ -55,9 +55,9 @@ class audio_offline_output_node::impl
     completion_function_map _completion_functions;
 };
 
-audio_offline_output_node_ptr audio_offline_output_node::create()
+audio_offline_output_node_sptr audio_offline_output_node::create()
 {
-    auto node = audio_offline_output_node_ptr(new audio_offline_output_node());
+    auto node = audio_offline_output_node_sptr(new audio_offline_output_node());
     node->_impl->weak_node = node;
     return node;
 }

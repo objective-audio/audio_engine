@@ -43,14 +43,14 @@
 @end
 
 @implementation YASAudioEngineDeviceIOSampleViewController {
-    yas::audio_engine_ptr _engine;
-    yas::audio_device_io_node_ptr _device_io_node;
-    yas::audio_tap_node_ptr _tap_node;
+    yas::audio_engine_sptr _engine;
+    yas::audio_device_io_node_sptr _device_io_node;
+    yas::audio_tap_node_sptr _tap_node;
 
     yas::any _system_observer;
     yas::any _device_observer;
 
-    yas::objc_weak_container_ptr _self_container;
+    yas::objc_weak_container_sptr _self_container;
 }
 
 - (void)dealloc
@@ -108,7 +108,7 @@
     Float64 next_phase = 0.0;
 
     auto render_function = [next_phase, weak_node, weak_container = _self_container](
-        const yas::pcm_buffer_ptr &buffer, const uint32_t bus_idx, const yas::audio_time_ptr &when) mutable
+        const yas::pcm_buffer_sptr &buffer, const uint32_t bus_idx, const yas::audio_time_sptr &when) mutable
     {
         buffer->clear();
 
@@ -271,7 +271,7 @@
     }
 }
 
-- (void)setDevice:(const yas::audio_device_ptr &)selected_device
+- (void)setDevice:(const yas::audio_device_sptr &)selected_device
 {
     _device_observer = nullptr;
 

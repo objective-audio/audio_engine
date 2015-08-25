@@ -15,12 +15,12 @@ namespace yas
     class audio_unit_node : public audio_node
     {
        public:
-        static audio_unit_node_ptr create(const AudioComponentDescription &acd);
-        static audio_unit_node_ptr create(const OSType type, const OSType sub_type);
+        static audio_unit_node_sptr create(const AudioComponentDescription &acd);
+        static audio_unit_node_sptr create(const OSType type, const OSType sub_type);
 
         virtual ~audio_unit_node();
 
-        audio_unit_ptr audio_unit() const;
+        audio_unit_sptr audio_unit() const;
         const std::map<AudioUnitScope, audio_unit_parameter_map> &parameters() const;
         const audio_unit_parameter_map &global_parameters() const;
         const audio_unit_parameter_map &input_parameters() const;
@@ -42,10 +42,10 @@ namespace yas
 
         virtual void update_connections() override;
 
-        void render(const pcm_buffer_ptr &buffer, const uint32_t bus_idx, const audio_time_ptr &when) override;
+        void render(const pcm_buffer_sptr &buffer, const uint32_t bus_idx, const audio_time_sptr &when) override;
 
        protected:
-        static void prepare_for_create(const audio_unit_node_ptr &node);
+        static void prepare_for_create(const audio_unit_node_sptr &node);
 
         audio_unit_node(const AudioComponentDescription &acd);
 
@@ -59,7 +59,7 @@ namespace yas
         using super_class = audio_node;
 
         void _reload_audio_unit();
-        void _add_audio_unit_to_graph(const audio_graph_ptr &graph);
+        void _add_audio_unit_to_graph(const audio_graph_sptr &graph);
         void _remove_audio_unit_from_graph();
 
        public:

@@ -101,9 +101,9 @@ class audio_device_stream::impl
 
 #pragma mark - main
 
-audio_device_stream_ptr audio_device_stream::create(const AudioStreamID stream_id, const AudioDeviceID device_id)
+audio_device_stream_sptr audio_device_stream::create(const AudioStreamID stream_id, const AudioDeviceID device_id)
 {
-    auto stream = audio_device_stream_ptr(new audio_device_stream(stream_id, device_id));
+    auto stream = audio_device_stream_sptr(new audio_device_stream(stream_id, device_id));
     auto function = stream->_impl->listener(stream);
     stream->_impl->add_listener(kAudioStreamPropertyVirtualFormat, function);
     stream->_impl->add_listener(kAudioStreamPropertyIsActive, function);
@@ -135,7 +135,7 @@ AudioStreamID audio_device_stream::stream_id() const
     return _impl->stream_id;
 }
 
-audio_device_ptr audio_device_stream::device() const
+audio_device_sptr audio_device_stream::device() const
 {
     return audio_device::device_for_id(_impl->device_id);
 }
@@ -160,7 +160,7 @@ enum audio_device_stream::direction audio_device_stream::direction() const
     return direction::output;
 }
 
-audio_format_ptr audio_device_stream::virtual_format() const
+audio_format_sptr audio_device_stream::virtual_format() const
 {
     auto data = _property_data<AudioStreamBasicDescription>(stream_id(), kAudioStreamPropertyVirtualFormat);
     if (!data) {

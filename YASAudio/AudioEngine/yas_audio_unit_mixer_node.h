@@ -12,7 +12,7 @@ namespace yas
     class audio_unit_mixer_node : public audio_unit_node
     {
        public:
-        static audio_unit_mixer_node_ptr create();
+        static audio_unit_mixer_node_sptr create();
 
         virtual void update_connections() override;
 

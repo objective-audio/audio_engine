@@ -19,12 +19,12 @@ using namespace yas;
 class pcm_buffer::impl
 {
    public:
-    const audio_format_ptr format;
+    const audio_format_sptr format;
     const AudioBufferList *abl_ptr;
     const UInt32 frame_capacity;
     UInt32 frame_length;
 
-    impl(const audio_format_ptr &format, AudioBufferList *ptr, const UInt32 frame_capacity)
+    impl(const audio_format_sptr &format, AudioBufferList *ptr, const UInt32 frame_capacity)
         : format(format),
           abl_ptr(ptr),
           frame_capacity(frame_capacity),
@@ -34,7 +34,7 @@ class pcm_buffer::impl
     {
     }
 
-    impl(const audio_format_ptr &format, abl_unique_ptr &&abl, abl_data_unique_ptr &&data, const UInt32 frame_capacity)
+    impl(const audio_format_sptr &format, abl_uptr &&abl, abl_data_uptr &&data, const UInt32 frame_capacity)
         : format(format),
           frame_capacity(frame_capacity),
           frame_length(frame_capacity),
@@ -44,7 +44,7 @@ class pcm_buffer::impl
     {
     }
 
-    impl(const audio_format_ptr &format, abl_unique_ptr &&abl, const UInt32 frame_capacity)
+    impl(const audio_format_sptr &format, abl_uptr &&abl, const UInt32 frame_capacity)
         : format(format),
           frame_capacity(frame_capacity),
           frame_length(frame_capacity),
@@ -55,15 +55,15 @@ class pcm_buffer::impl
     }
 
    private:
-    const abl_unique_ptr _abl;
-    const abl_data_unique_ptr _data;
+    const abl_uptr _abl;
+    const abl_data_uptr _data;
 };
 
-std::pair<abl_unique_ptr, abl_data_unique_ptr> yas::allocate_audio_buffer_list(const UInt32 buffer_count,
+std::pair<abl_uptr, abl_data_uptr> yas::allocate_audio_buffer_list(const UInt32 buffer_count,
                                                                                const UInt32 channel_count,
                                                                                const UInt32 size)
 {
-    abl_unique_ptr abl_ptr((AudioBufferList *)calloc(1, sizeof(AudioBufferList) + buffer_count * sizeof(AudioBuffer)),
+    abl_uptr abl_ptr((AudioBufferList *)calloc(1, sizeof(AudioBufferList) + buffer_count * sizeof(AudioBuffer)),
                            [](AudioBufferList *abl) { free(abl); });
 
     abl_ptr->mNumberBuffers = buffer_count;
@@ -171,27 +171,27 @@ static get_abl_info_result get_abl_info(const AudioBufferList *abl, const UInt32
 
 #pragma mark - public
 
-pcm_buffer_ptr pcm_buffer::create(const audio_format_ptr &format, AudioBufferList *abl)
+pcm_buffer_sptr pcm_buffer::create(const audio_format_sptr &format, AudioBufferList *abl)
 {
-    return pcm_buffer_ptr(new pcm_buffer(format, abl));
+    return pcm_buffer_sptr(new pcm_buffer(format, abl));
 }
 
-pcm_buffer_ptr pcm_buffer::create(const audio_format_ptr &format, const UInt32 frame_capacity)
+pcm_buffer_sptr pcm_buffer::create(const audio_format_sptr &format, const UInt32 frame_capacity)
 {
-    return pcm_buffer_ptr(new pcm_buffer(format, frame_capacity));
+    return pcm_buffer_sptr(new pcm_buffer(format, frame_capacity));
 }
 
-pcm_buffer_ptr pcm_buffer::create(const audio_format_ptr &format, const pcm_buffer_ptr &buffer,
-                                  const std::vector<channel_route_ptr> &channel_routes, const direction direction)
+pcm_buffer_sptr pcm_buffer::create(const audio_format_sptr &format, const pcm_buffer_sptr &buffer,
+                                  const std::vector<channel_route_sptr> &channel_routes, const direction direction)
 {
     if (!buffer) {
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
     }
 
-    return pcm_buffer_ptr(new pcm_buffer(format, *buffer, channel_routes, direction));
+    return pcm_buffer_sptr(new pcm_buffer(format, *buffer, channel_routes, direction));
 }
 
-pcm_buffer::pcm_buffer(const audio_format_ptr &format, AudioBufferList *abl)
+pcm_buffer::pcm_buffer(const audio_format_sptr &format, AudioBufferList *abl)
 {
     if (!format || !abl) {
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
@@ -201,7 +201,7 @@ pcm_buffer::pcm_buffer(const audio_format_ptr &format, AudioBufferList *abl)
                                    abl->mBuffers[0].mDataByteSize / format->stream_description().mBytesPerFrame);
 }
 
-pcm_buffer::pcm_buffer(const audio_format_ptr &format, const UInt32 frame_capacity)
+pcm_buffer::pcm_buffer(const audio_format_sptr &format, const UInt32 frame_capacity)
 {
     if (!format || frame_capacity == 0) {
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
@@ -212,8 +212,8 @@ pcm_buffer::pcm_buffer(const audio_format_ptr &format, const UInt32 frame_capaci
     _impl = std::make_unique<impl>(format, std::move(pair.first), std::move(pair.second), frame_capacity);
 }
 
-pcm_buffer::pcm_buffer(const audio_format_ptr &format, const pcm_buffer &buffer,
-                       const std::vector<channel_route_ptr> channel_routes, const direction direction)
+pcm_buffer::pcm_buffer(const audio_format_sptr &format, const pcm_buffer &buffer,
+                       const std::vector<channel_route_sptr> channel_routes, const direction direction)
 {
     if (!format || channel_routes.size() == 0) {
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
@@ -227,14 +227,14 @@ pcm_buffer::pcm_buffer(const audio_format_ptr &format, const pcm_buffer &buffer,
     }
 
     auto pair = allocate_audio_buffer_list(format->buffer_count(), format->stride(), 0);
-    abl_unique_ptr &to_abl = pair.first;
+    abl_uptr &to_abl = pair.first;
 
     const AudioBufferList *from_abl = buffer.audio_buffer_list();
     UInt32 bytesPerFrame = format->stream_description().mBytesPerFrame;
     UInt32 frame_capacity = 0;
 
     for (UInt32 i = 0; i < format->channel_count(); i++) {
-        const channel_route_ptr &route = channel_routes.at(i);
+        const channel_route_sptr &route = channel_routes.at(i);
         const bool is_output = direction == direction::output;
         UInt32 from_channel = is_output ? route->destination_channel() : route->source_channel();
         UInt32 to_channel = is_output ? route->source_channel() : route->destination_channel();
@@ -253,7 +253,7 @@ pcm_buffer::pcm_buffer(const audio_format_ptr &format, const pcm_buffer &buffer,
     _impl = std::make_unique<impl>(format, std::move(to_abl), frame_capacity);
 }
 
-audio_format_ptr pcm_buffer::format() const
+audio_format_sptr pcm_buffer::format() const
 {
     return _impl->format;
 }
@@ -392,7 +392,7 @@ void pcm_buffer::clear(const UInt32 start_frame, const UInt32 length)
     }
 }
 
-pcm_buffer::copy_result pcm_buffer::copy_from(const pcm_buffer_ptr &from_buffer, const UInt32 from_start_frame,
+pcm_buffer::copy_result pcm_buffer::copy_from(const pcm_buffer_sptr &from_buffer, const UInt32 from_start_frame,
                                               const UInt32 to_start_frame, const UInt32 length)
 {
     auto from_format = from_buffer->format();

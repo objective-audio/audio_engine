@@ -30,7 +30,7 @@ namespace yas
                 sine_node_weak_ptr weak_node = node;
 
                 auto render_function =
-                    [weak_node](const pcm_buffer_ptr &buffer, const uint32_t bus_idx, const audio_time_ptr &when) {
+                    [weak_node](const pcm_buffer_sptr &buffer, const uint32_t bus_idx, const audio_time_sptr &when) {
                         buffer->clear();
 
                         if (auto node = weak_node.lock()) {
@@ -105,12 +105,12 @@ namespace yas
 @end
 
 @implementation YASAudioOfflineSampleViewController {
-    yas::audio_engine_ptr _play_engine;
-    yas::audio_unit_mixer_node_ptr _play_mixer_node;
+    yas::audio_engine_sptr _play_engine;
+    yas::audio_unit_mixer_node_sptr _play_mixer_node;
     yas::offline_sample::sine_node_ptr _play_sine_node;
 
-    yas::audio_engine_ptr _offline_engine;
-    yas::audio_unit_mixer_node_ptr _offline_mixer_node;
+    yas::audio_engine_sptr _offline_engine;
+    yas::audio_unit_mixer_node_sptr _offline_mixer_node;
     yas::offline_sample::sine_node_ptr _offline_sine_node;
 
     std::vector<yas::any> _observers;
@@ -290,7 +290,7 @@ namespace yas
     uint32_t remain = self.length * yas::offline_sample::sample_rate;
 
     auto start_result = _offline_engine->start_offline_render(
-        [remain, file_writer](const yas::pcm_buffer_ptr &buffer, const auto &when, bool &stop) mutable {
+        [remain, file_writer](const yas::pcm_buffer_sptr &buffer, const auto &when, bool &stop) mutable {
             auto format = yas::audio_format::create(buffer->format()->stream_description());
             auto pcm_buffer = yas::pcm_buffer::create(format, buffer->audio_buffer_list());
             pcm_buffer->set_frame_length(buffer->frame_length());

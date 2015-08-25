@@ -26,13 +26,13 @@ static const AudioComponentDescription baseAcd = {.componentType = kAudioUnitTyp
 @end
 
 @implementation YASAudioEngineEffectsSampleViewController {
-    std::vector<yas::audio_unit_ptr> _audio_units;
+    std::vector<yas::audio_unit_sptr> _audio_units;
     std::experimental::optional<uint32_t> _index;
     yas::audio_engine_ptr _engine;
-    yas::audio_unit_output_node_ptr _output_node;
-    yas::audio_unit_node_ptr _effect_node;
-    yas::audio_connection_ptr _through_connection;
-    yas::audio_tap_node_ptr _tap_node;
+    yas::audio_unit_output_node_sptr _output_node;
+    yas::audio_unit_node_sptr _effect_node;
+    yas::audio_connection_sptr _through_connection;
+    yas::audio_tap_node_sptr _tap_node;
     std::vector<yas::channel_map> _channel_maps;
 }
 
@@ -87,7 +87,7 @@ static const AudioComponentDescription baseAcd = {.componentType = kAudioUnitTyp
     Float64 phase = 0;
 
     auto tap_render_function =
-        [phase](const yas::pcm_buffer_ptr &buffer, const uint32_t bus_idx, const yas::audio_time_ptr &when) mutable {
+        [phase](const yas::pcm_buffer_sptr &buffer, const uint32_t bus_idx, const yas::audio_time_sptr &when) mutable {
             buffer->clear();
 
             const Float64 start_phase = phase;

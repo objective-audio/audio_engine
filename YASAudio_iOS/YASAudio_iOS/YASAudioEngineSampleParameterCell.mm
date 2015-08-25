@@ -15,7 +15,7 @@
 @end
 
 @implementation YASAudioEngineSampleParameterCell {
-    yas::audio_unit_node_ptr _node;
+    yas::audio_unit_node_sptr _node;
     uint32_t _index;
 }
 
@@ -48,7 +48,7 @@
     [self set_node:nullptr index:0];
 }
 
-- (void)set_node:(const yas::audio_unit_node_ptr &)node index:(const uint32_t)index
+- (void)set_node:(const yas::audio_unit_node_sptr &)node index:(const uint32_t)index
 {
     _node = node;
     _index = index;

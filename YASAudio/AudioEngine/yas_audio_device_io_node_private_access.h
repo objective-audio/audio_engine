@@ -11,12 +11,12 @@ namespace yas
 {
     class audio_graph;
 
-    using audio_graph_ptr = std::shared_ptr<audio_graph>;
+    using audio_graph_sptr = std::shared_ptr<audio_graph>;
 
     class audio_device_io_node::private_access
     {
        public:
-        static void add_audio_device_io_to_graph(audio_device_io_node *node, const audio_graph_ptr &graph)
+        static void add_audio_device_io_to_graph(audio_device_io_node *node, const audio_graph_sptr &graph)
         {
             node->_add_device_io_to_graph(graph);
         }

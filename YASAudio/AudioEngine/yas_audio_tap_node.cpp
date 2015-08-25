@@ -42,9 +42,9 @@ class audio_tap_node::impl
     mutable std::recursive_mutex _mutex;
 };
 
-audio_tap_node_ptr audio_tap_node::create()
+audio_tap_node_sptr audio_tap_node::create()
 {
-    return audio_tap_node_ptr(new audio_tap_node());
+    return audio_tap_node_sptr(new audio_tap_node());
 }
 
 audio_tap_node::audio_tap_node() : audio_node(), _impl(std::make_unique<impl>())
@@ -70,7 +70,7 @@ uint32_t audio_tap_node::output_bus_count() const
     return 1;
 }
 
-void audio_tap_node::render(const pcm_buffer_ptr &buffer, const uint32_t bus_idx, const audio_time_ptr &when)
+void audio_tap_node::render(const pcm_buffer_sptr &buffer, const uint32_t bus_idx, const audio_time_sptr &when)
 {
     super_class::render(buffer, bus_idx, when);
 
@@ -90,27 +90,27 @@ void audio_tap_node::render(const pcm_buffer_ptr &buffer, const uint32_t bus_idx
     }
 }
 
-audio_connection_ptr audio_tap_node::input_connection_on_render(const uint32_t bus_idx) const
+audio_connection_sptr audio_tap_node::input_connection_on_render(const uint32_t bus_idx) const
 {
     return _impl->node_core_on_render()->input_connection(bus_idx);
 }
 
-audio_connection_ptr audio_tap_node::output_connection_on_render(const uint32_t bus_idx) const
+audio_connection_sptr audio_tap_node::output_connection_on_render(const uint32_t bus_idx) const
 {
     return _impl->node_core_on_render()->output_connection(bus_idx);
 }
 
-audio_connection_weak_map &audio_tap_node::input_connections_on_render() const
+audio_connection_wmap &audio_tap_node::input_connections_on_render() const
 {
     return _impl->node_core_on_render()->input_connections;
 }
 
-audio_connection_weak_map &audio_tap_node::output_connections_on_render() const
+audio_connection_wmap &audio_tap_node::output_connections_on_render() const
 {
     return _impl->node_core_on_render()->output_connections;
 }
 
-void audio_tap_node::render_source(const pcm_buffer_ptr &buffer, const uint32_t bus_idx, const audio_time_ptr &when)
+void audio_tap_node::render_source(const pcm_buffer_sptr &buffer, const uint32_t bus_idx, const audio_time_sptr &when)
 {
     if (auto connection = input_connection_on_render(bus_idx)) {
         if (auto node = connection->source_node()) {
@@ -137,9 +137,9 @@ void audio_tap_node::prepare_node_core(const audio_node_core_ptr &node_core)
 
 #pragma mark - input_tap_node
 
-audio_input_tap_node_ptr audio_input_tap_node::create()
+audio_input_tap_node_sptr audio_input_tap_node::create()
 {
-    return audio_input_tap_node_ptr(new audio_input_tap_node());
+    return audio_input_tap_node_sptr(new audio_input_tap_node());
 }
 
 uint32_t audio_input_tap_node::input_bus_count() const

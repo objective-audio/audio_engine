@@ -12,23 +12,23 @@ using namespace yas;
 class audio_unit_node::impl
 {
    public:
-    audio_unit_node_weak_ptr weak_node;
+    audio_unit_node_wptr weak_node;
     AudioComponentDescription acd;
     std::map<AudioUnitScope, audio_unit_parameter_map> parameters;
-    audio_graph_weak_ptr audio_graph;
-    audio_unit_ptr _audio_unit;
+    audio_graph_wptr audio_graph;
+    audio_unit_sptr _audio_unit;
 
     impl() : weak_node(), acd(), parameters(), audio_graph(), _audio_unit(nullptr), _mutex()
     {
     }
 
-    void set_audio_unit(const audio_unit_ptr &audio_unit)
+    void set_audio_unit(const audio_unit_sptr &audio_unit)
     {
         std::lock_guard<std::recursive_mutex> lock(_mutex);
         _audio_unit = audio_unit;
     }
 
-    audio_unit_ptr audio_unit() const
+    audio_unit_sptr audio_unit() const
     {
         std::lock_guard<std::recursive_mutex> lock(_mutex);
         return _audio_unit;
@@ -38,14 +38,14 @@ class audio_unit_node::impl
     mutable std::recursive_mutex _mutex;
 };
 
-audio_unit_node_ptr audio_unit_node::create(const AudioComponentDescription &acd)
+audio_unit_node_sptr audio_unit_node::create(const AudioComponentDescription &acd)
 {
-    auto node = audio_unit_node_ptr(new audio_unit_node(acd));
+    auto node = audio_unit_node_sptr(new audio_unit_node(acd));
     prepare_for_create(node);
     return node;
 }
 
-audio_unit_node_ptr audio_unit_node::create(const OSType type, const OSType sub_type)
+audio_unit_node_sptr audio_unit_node::create(const OSType type, const OSType sub_type)
 {
     const AudioComponentDescription acd = {
         .componentType = type,
@@ -58,7 +58,7 @@ audio_unit_node_ptr audio_unit_node::create(const OSType type, const OSType sub_
     return create(acd);
 }
 
-void audio_unit_node::prepare_for_create(const audio_unit_node_ptr &node)
+void audio_unit_node::prepare_for_create(const audio_unit_node_sptr &node)
 {
     node->_impl->weak_node = node;
 }
@@ -79,7 +79,7 @@ audio_unit_node::audio_unit_node(const AudioComponentDescription &acd) : audio_n
 
 audio_unit_node::~audio_unit_node() = default;
 
-audio_unit_ptr audio_unit_node::audio_unit() const
+audio_unit_sptr audio_unit_node::audio_unit() const
 {
     return _impl->audio_unit();
 }
@@ -260,7 +260,7 @@ void audio_unit_node::update_connections()
     }
 }
 
-void audio_unit_node::render(const pcm_buffer_ptr &buffer, const uint32_t bus_idx, const audio_time_ptr &when)
+void audio_unit_node::render(const pcm_buffer_sptr &buffer, const uint32_t bus_idx, const audio_time_sptr &when)
 {
     super_class::render(buffer, bus_idx, when);
 
@@ -300,7 +300,7 @@ void audio_unit_node::_reload_audio_unit()
     }
 }
 
-void audio_unit_node::_add_audio_unit_to_graph(const audio_graph_ptr &graph)
+void audio_unit_node::_add_audio_unit_to_graph(const audio_graph_sptr &graph)
 {
     if (!graph) {
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");

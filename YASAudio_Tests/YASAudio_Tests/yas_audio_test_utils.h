@@ -21,13 +21,13 @@ namespace yas
     namespace test
     {
         UInt32 test_value(const UInt32 frame, const UInt32 ch_idx, const UInt32 buf_idx);
-        void fill_test_values_to_buffer(pcm_buffer_ptr &buffer);
-        bool is_cleard_buffer(pcm_buffer_ptr &data);
-        bool is_filled_buffer(pcm_buffer_ptr &data);
-        bool is_equal_buffer_flexibly(pcm_buffer_ptr &data1, pcm_buffer_ptr &data2);
-        flex_pointer data_ptr_from_buffer(pcm_buffer_ptr &data, const UInt32 ch_idx, const UInt32 frame);
+        void fill_test_values_to_buffer(pcm_buffer_sptr &buffer);
+        bool is_cleard_buffer(pcm_buffer_sptr &data);
+        bool is_filled_buffer(pcm_buffer_sptr &data);
+        bool is_equal_buffer_flexibly(pcm_buffer_sptr &data1, pcm_buffer_sptr &data2);
+        flex_pointer data_ptr_from_buffer(pcm_buffer_sptr &data, const UInt32 ch_idx, const UInt32 frame);
 
-        void audio_unit_render_on_sub_thread(std::shared_ptr<audio_unit> audio_unit, yas::audio_format_ptr format,
+        void audio_unit_render_on_sub_thread(std::shared_ptr<audio_unit> audio_unit, yas::audio_format_sptr format,
                                              const UInt32 frame_length, const NSUInteger count,
                                              const NSTimeInterval wait);
 

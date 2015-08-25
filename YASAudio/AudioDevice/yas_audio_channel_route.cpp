@@ -18,15 +18,15 @@ class channel_route::impl
     UInt32 destination_channel;
 };
 
-channel_route_ptr channel_route::create(const UInt32 source_bus, const UInt32 source_channel,
+channel_route_sptr channel_route::create(const UInt32 source_bus, const UInt32 source_channel,
                                         const UInt32 destination_bus, const UInt32 destination_channel)
 {
-    return channel_route_ptr(new channel_route(source_bus, source_channel, destination_bus, destination_channel));
+    return channel_route_sptr(new channel_route(source_bus, source_channel, destination_bus, destination_channel));
 }
 
-channel_route_ptr channel_route::create(const UInt32 bus, const UInt32 channel)
+channel_route_sptr channel_route::create(const UInt32 bus, const UInt32 channel)
 {
-    return channel_route_ptr(new channel_route(bus, channel, bus, channel));
+    return channel_route_sptr(new channel_route(bus, channel, bus, channel));
 }
 
 channel_route::channel_route(const UInt32 source_bus, const UInt32 source_channel, const UInt32 destination_bus,
@@ -41,7 +41,7 @@ channel_route::channel_route(const UInt32 source_bus, const UInt32 source_channe
 
 channel_route::~channel_route() = default;
 
-std::vector<channel_route_ptr> channel_route::default_channel_routes(const UInt32 bus, const audio_format_ptr &format)
+std::vector<channel_route_sptr> channel_route::default_channel_routes(const UInt32 bus, const audio_format_sptr &format)
 {
     if (!format) {
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : invalid format. format is null.");
@@ -54,7 +54,7 @@ std::vector<channel_route_ptr> channel_route::default_channel_routes(const UInt3
 
     const UInt32 channel_count = format->channel_count();
 
-    std::vector<channel_route_ptr> channel_routes;
+    std::vector<channel_route_sptr> channel_routes;
     channel_routes.reserve(channel_count);
 
     for (UInt32 ch = 0; ch < channel_count; ++ch) {

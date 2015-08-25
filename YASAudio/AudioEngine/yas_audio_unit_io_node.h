@@ -26,8 +26,8 @@ namespace yas
 @property (nonatomic, strong) NSArray *inputChannelAssignments;
  */
 #elif TARGET_OS_MAC
-        void set_device(const audio_device_ptr &device);
-        audio_device_ptr device() const;
+        void set_device(const audio_device_sptr &device);
+        audio_device_sptr device() const;
 #endif
 
         virtual bus_result next_available_output_bus() const override;
@@ -49,7 +49,7 @@ namespace yas
     class audio_unit_output_node : public audio_unit_io_node
     {
        public:
-        static audio_unit_output_node_ptr create();
+        static audio_unit_output_node_sptr create();
 
         virtual uint32_t input_bus_count() const override;
         virtual uint32_t output_bus_count() const override;
@@ -64,7 +64,7 @@ namespace yas
     class audio_unit_input_node : public audio_unit_io_node
     {
        public:
-        static audio_unit_input_node_ptr create();
+        static audio_unit_input_node_sptr create();
 
         virtual uint32_t input_bus_count() const override;
         virtual uint32_t output_bus_count() const override;

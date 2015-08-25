@@ -18,16 +18,16 @@ namespace yas
     class audio_graph
     {
        public:
-        static audio_graph_ptr create();
+        static audio_graph_sptr create();
         ~audio_graph();
 
-        void add_audio_unit(const audio_unit_ptr &audio_unit);
-        void remove_audio_unit(const audio_unit_ptr &audio_unit);
+        void add_audio_unit(const audio_unit_sptr &audio_unit);
+        void remove_audio_unit(const audio_unit_sptr &audio_unit);
         void remove_all_units();
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
-        void add_audio_device_io(audio_device_io_ptr &audio_device_io);
-        void remove_audio_device_io(audio_device_io_ptr &audio_device_io);
+        void add_audio_device_io(audio_device_io_sptr &audio_device_io);
+        void remove_audio_device_io(audio_device_io_sptr &audio_device_io);
 #endif
 
         void start();

@@ -19,8 +19,8 @@ using namespace yas;
 class audio_file::impl
 {
    public:
-    audio_format_ptr file_format;
-    audio_format_ptr processing_format;
+    audio_format_sptr file_format;
+    audio_format_sptr processing_format;
     SInt64 file_frame_position;
     ExtAudioFileRef ext_audio_file;
 
@@ -147,12 +147,12 @@ CFURLRef audio_file::url() const
     return _impl->url();
 }
 
-audio_format_ptr audio_file::file_format() const
+audio_format_sptr audio_file::file_format() const
 {
     return _impl->file_format;
 }
 
-void audio_file::set_processing_format(const audio_format_ptr &format)
+void audio_file::set_processing_format(const audio_format_sptr &format)
 {
     _impl->processing_format = format;
     if (_impl->ext_audio_file) {
@@ -160,7 +160,7 @@ void audio_file::set_processing_format(const audio_format_ptr &format)
     }
 }
 
-audio_format_ptr audio_file::processing_format() const
+audio_format_sptr audio_file::processing_format() const
 {
     return _impl->processing_format;
 }
@@ -210,7 +210,7 @@ audio_file_reader::create_result audio_file_reader::create(const CFURLRef file_u
         return create_result(create_error_type::invalid_argument);
     }
 
-    auto reader = audio_file_reader_ptr(new audio_file_reader());
+    auto reader = audio_file_reader_sptr(new audio_file_reader());
 
     reader->_impl->set_url(file_url);
 
@@ -224,7 +224,7 @@ audio_file_reader::create_result audio_file_reader::create(const CFURLRef file_u
 audio_file_reader::audio_file_reader() = default;
 audio_file_reader::~audio_file_reader() = default;
 
-audio_file_reader::read_result audio_file_reader::read_into_buffer(pcm_buffer_ptr &buffer, const UInt32 frame_length)
+audio_file_reader::read_result audio_file_reader::read_into_buffer(pcm_buffer_sptr &buffer, const UInt32 frame_length)
 {
     if (!_impl->ext_audio_file) {
         return read_result(read_error_type::closed);
@@ -242,7 +242,7 @@ audio_file_reader::read_result audio_file_reader::read_into_buffer(pcm_buffer_pt
     UInt32 out_frame_length = 0;
     UInt32 remain_frames = frame_length > 0 ?: buffer->frame_capacity();
 
-    const audio_format_ptr &format = buffer->format();
+    const audio_format_sptr &format = buffer->format();
     const UInt32 buffer_count = format->buffer_count();
     const UInt32 stride = format->stride();
 
@@ -327,7 +327,7 @@ audio_file_writer::create_result audio_file_writer::create(const CFURLRef file_u
         return create_result(create_error_type::invalid_argument);
     }
 
-    auto writer = audio_file_writer_ptr(new audio_file_writer());
+    auto writer = audio_file_writer_sptr(new audio_file_writer());
 
     writer->_impl->set_url(file_url);
     writer->_impl->set_file_type(file_type);
@@ -342,7 +342,7 @@ audio_file_writer::create_result audio_file_writer::create(const CFURLRef file_u
 audio_file_writer::audio_file_writer() = default;
 audio_file_writer::~audio_file_writer() = default;
 
-audio_file_writer::write_result audio_file_writer::write_from_buffer(const pcm_buffer_ptr &buffer, const bool async)
+audio_file_writer::write_result audio_file_writer::write_from_buffer(const pcm_buffer_sptr &buffer, const bool async)
 {
     if (!_impl->ext_audio_file) {
         return write_result(write_error_type::closed);

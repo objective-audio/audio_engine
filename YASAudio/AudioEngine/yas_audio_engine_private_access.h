@@ -8,12 +8,12 @@ namespace yas
     class audio_engine::private_access
     {
        public:
-        static std::set<audio_node_ptr> &nodes(const audio_engine_ptr &engine)
+        static std::set<audio_node_sptr> &nodes(const audio_engine_sptr &engine)
         {
             return engine->_nodes();
         }
 
-        static std::set<audio_connection_ptr> &connections(const audio_engine_ptr &engine)
+        static std::set<audio_connection_sptr> &connections(const audio_engine_sptr &engine)
         {
             return engine->_connections();
         }

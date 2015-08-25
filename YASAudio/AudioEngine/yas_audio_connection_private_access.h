@@ -10,24 +10,24 @@ namespace yas
     class audio_connection::private_access
     {
        public:
-        static audio_connection_ptr create(const audio_node_ptr &source_node, const UInt32 source_bus,
-                                           const audio_node_ptr &destination_node, const UInt32 destination_bus,
-                                           const audio_format_ptr &format)
+        static audio_connection_sptr create(const audio_node_sptr &source_node, const UInt32 source_bus,
+                                           const audio_node_sptr &destination_node, const UInt32 destination_bus,
+                                           const audio_format_sptr &format)
         {
             return audio_connection::_create(source_node, source_bus, destination_node, destination_bus, format);
         }
 
-        static void remove_nodes(const audio_connection_ptr &connection)
+        static void remove_nodes(const audio_connection_sptr &connection)
         {
             connection->_remove_nodes();
         }
 
-        static void remove_source_node(const audio_connection_ptr &connection)
+        static void remove_source_node(const audio_connection_sptr &connection)
         {
             connection->_remove_source_node();
         }
 
-        static void remove_destination_node(const audio_connection_ptr &connection)
+        static void remove_destination_node(const audio_connection_sptr &connection)
         {
             connection->_remove_destination_node();
         }

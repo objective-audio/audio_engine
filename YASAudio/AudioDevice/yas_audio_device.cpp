@@ -98,7 +98,7 @@ namespace yas
             }
         }
 
-        static std::map<AudioDeviceID, audio_device_ptr> &all_devices_map()
+        static std::map<AudioDeviceID, audio_device_sptr> &all_devices_map()
         {
             initialize();
             return audio_device_global::instance()._all_devices;
@@ -131,14 +131,14 @@ namespace yas
                     if (prev_devices.count(device_id) > 0) {
                         map[device_id] = prev_devices.at(device_id);
                     } else {
-                        map[device_id] = audio_device_ptr(new audio_device(device_id));
+                        map[device_id] = audio_device_sptr(new audio_device(device_id));
                     }
                 }
             }
         }
 
        private:
-        std::map<AudioDeviceID, audio_device_ptr> _all_devices;
+        std::map<AudioDeviceID, audio_device_sptr> _all_devices;
         listener_function _system_listener = nullptr;
 
         static audio_device_global &instance()
@@ -193,8 +193,8 @@ class audio_device::impl
 {
    public:
     const AudioDeviceID audio_device_id;
-    std::map<AudioStreamID, audio_device_stream_ptr> input_streams_map;
-    std::map<AudioStreamID, audio_device_stream_ptr> output_streams_map;
+    std::map<AudioStreamID, audio_device_stream_sptr> input_streams_map;
+    std::map<AudioStreamID, audio_device_stream_sptr> output_streams_map;
     subject<audio_device::method, std::vector<audio_device::property_info>> property_subject;
 
     impl(AudioDeviceID device_id)
@@ -212,25 +212,25 @@ class audio_device::impl
     {
     }
 
-    void set_input_format(const audio_format_ptr &format)
+    void set_input_format(const audio_format_sptr &format)
     {
         std::lock_guard<std::recursive_mutex> lock(_mutex);
         _input_format = format;
     }
 
-    audio_format_ptr input_format() const
+    audio_format_sptr input_format() const
     {
         std::lock_guard<std::recursive_mutex> lock(_mutex);
         return _input_format;
     }
 
-    void set_output_format(const audio_format_ptr &format)
+    void set_output_format(const audio_format_sptr &format)
     {
         std::lock_guard<std::recursive_mutex> lock(_mutex);
         _output_format = format;
     }
 
-    audio_format_ptr output_format() const
+    audio_format_sptr output_format() const
     {
         std::lock_guard<std::recursive_mutex> lock(_mutex);
         return _output_format;
@@ -299,7 +299,7 @@ class audio_device::impl
 
     void update_format(const AudioObjectPropertyScope scope)
     {
-        audio_device_stream_ptr stream = nullptr;
+        audio_device_stream_sptr stream = nullptr;
 
         if (scope == kAudioObjectPropertyScopeInput) {
             auto iterator = input_streams_map.begin();
@@ -315,7 +315,7 @@ class audio_device::impl
             }
         }
 
-        audio_format_ptr stream_format = nullptr;
+        audio_format_sptr stream_format = nullptr;
         if (stream) {
             stream_format = stream->virtual_format();
         }
@@ -345,25 +345,25 @@ class audio_device::impl
     }
 
    private:
-    audio_format_ptr _input_format;
-    audio_format_ptr _output_format;
+    audio_format_sptr _input_format;
+    audio_format_sptr _output_format;
     mutable std::recursive_mutex _mutex;
 };
 
 #pragma mark - global
 
-std::vector<audio_device_ptr> audio_device::all_devices()
+std::vector<audio_device_sptr> audio_device::all_devices()
 {
-    std::vector<audio_device_ptr> devices;
+    std::vector<audio_device_sptr> devices;
     for (auto &pair : audio_device_global::all_devices_map()) {
         devices.push_back(pair.second);
     }
     return devices;
 }
 
-std::vector<audio_device_ptr> audio_device::output_devices()
+std::vector<audio_device_sptr> audio_device::output_devices()
 {
-    std::vector<audio_device_ptr> devices;
+    std::vector<audio_device_sptr> devices;
     for (auto &pair : audio_device_global::all_devices_map()) {
         if (pair.second->output_streams().size() > 0) {
             devices.push_back(pair.second);
@@ -372,9 +372,9 @@ std::vector<audio_device_ptr> audio_device::output_devices()
     return devices;
 }
 
-std::vector<audio_device_ptr> audio_device::input_devices()
+std::vector<audio_device_sptr> audio_device::input_devices()
 {
-    std::vector<audio_device_ptr> devices;
+    std::vector<audio_device_sptr> devices;
     for (auto &pair : audio_device_global::all_devices_map()) {
         if (pair.second->input_streams().size() > 0) {
             devices.push_back(pair.second);
@@ -383,7 +383,7 @@ std::vector<audio_device_ptr> audio_device::input_devices()
     return devices;
 }
 
-const audio_device_ptr audio_device::default_system_output_device()
+const audio_device_sptr audio_device::default_system_output_device()
 {
     auto data = property_data<AudioDeviceID>(kAudioObjectSystemObject, kAudioHardwarePropertyDefaultSystemOutputDevice,
                                              kAudioObjectPropertyScopeGlobal);
@@ -396,7 +396,7 @@ const audio_device_ptr audio_device::default_system_output_device()
     return nullptr;
 }
 
-const audio_device_ptr audio_device::default_output_device()
+const audio_device_sptr audio_device::default_output_device()
 {
     auto data = property_data<AudioDeviceID>(kAudioObjectSystemObject, kAudioHardwarePropertyDefaultOutputDevice,
                                              kAudioObjectPropertyScopeGlobal);
@@ -409,7 +409,7 @@ const audio_device_ptr audio_device::default_output_device()
     return nullptr;
 }
 
-const audio_device_ptr audio_device::default_input_device()
+const audio_device_sptr audio_device::default_input_device()
 {
     auto data = property_data<AudioDeviceID>(kAudioObjectSystemObject, kAudioHardwarePropertyDefaultInputDevice,
                                              kAudioObjectPropertyScopeGlobal);
@@ -422,7 +422,7 @@ const audio_device_ptr audio_device::default_input_device()
     return nullptr;
 }
 
-const audio_device_ptr audio_device::device_for_id(const AudioDeviceID audio_device_id)
+const audio_device_sptr audio_device::device_for_id(const AudioDeviceID audio_device_id)
 {
     auto iterator = audio_device_global::all_devices_map().find(audio_device_id);
     if (iterator != audio_device_global::all_devices_map().end()) {
@@ -431,7 +431,7 @@ const audio_device_ptr audio_device::device_for_id(const AudioDeviceID audio_dev
     return nullptr;
 }
 
-const std::experimental::optional<size_t> audio_device::index_of_device(const audio_device_ptr &device)
+const std::experimental::optional<size_t> audio_device::index_of_device(const audio_device_sptr &device)
 {
     if (device) {
         auto all_devices = audio_device::all_devices();
@@ -505,18 +505,18 @@ CFStringRef audio_device::cf_manufacture() const
     return property_string(audio_device_id(), kAudioObjectPropertyManufacturer);
 }
 
-std::vector<audio_device_stream_ptr> audio_device::input_streams() const
+std::vector<audio_device_stream_sptr> audio_device::input_streams() const
 {
-    std::vector<audio_device_stream_ptr> streams;
+    std::vector<audio_device_stream_sptr> streams;
     for (auto &pair : _impl->input_streams_map) {
         streams.push_back(pair.second);
     }
     return streams;
 }
 
-std::vector<audio_device_stream_ptr> audio_device::output_streams() const
+std::vector<audio_device_stream_sptr> audio_device::output_streams() const
 {
-    std::vector<audio_device_stream_ptr> streams;
+    std::vector<audio_device_stream_sptr> streams;
     for (auto &pair : _impl->output_streams_map) {
         streams.push_back(pair.second);
     }
@@ -533,12 +533,12 @@ Float64 audio_device::nominal_sample_rate() const
     return 0;
 }
 
-audio_format_ptr audio_device::input_format() const
+audio_format_sptr audio_device::input_format() const
 {
     return _impl->input_format();
 }
 
-audio_format_ptr audio_device::output_format() const
+audio_format_sptr audio_device::output_format() const
 {
     return _impl->output_format();
 }

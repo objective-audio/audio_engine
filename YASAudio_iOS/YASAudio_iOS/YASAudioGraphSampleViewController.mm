@@ -13,9 +13,9 @@
 @end
 
 @implementation YASAudioGraphSampleViewController {
-    yas::audio_graph_ptr _audio_graph;
-    yas::audio_unit_ptr _io_unit;
-    yas::audio_unit_ptr _mixer_unit;
+    yas::audio_graph_sptr _audio_graph;
+    yas::audio_unit_sptr _io_unit;
+    yas::audio_unit_sptr _mixer_unit;
 }
 
 - (void)dealloc
