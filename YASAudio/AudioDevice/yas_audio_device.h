@@ -52,8 +52,8 @@ namespace yas
             bool operator<(const property_info &info) const;
         };
 
-        using system_subject_type = subject<method, std::vector<property_info>>;
-        using property_subject_type = subject<method, std::vector<property_info>>;
+        using system_subject_t = subject<method, std::vector<property_info>>;
+        using property_subject_t = subject<method, std::vector<property_info>>;
 
         static std::vector<audio_device_sptr> all_devices();
         static std::vector<audio_device_sptr> output_devices();
@@ -83,8 +83,8 @@ namespace yas
         uint32_t input_channel_count() const;
         uint32_t output_channel_count() const;
 
-        static system_subject_type &system_subject();
-        property_subject_type &property_subject() const;
+        static system_subject_t &system_subject();
+        property_subject_t &property_subject() const;
 
        private:
         class impl;
@@ -101,7 +101,7 @@ namespace yas
     };
 
     using audio_device_observer = observer<audio_device::method, std::vector<audio_device::property_info>>;
-    using audio_device_observer_ptr = audio_device_observer::shared_ptr;
+    using audio_device_observer_sptr = audio_device_observer::sptr;
 }
 
 #endif

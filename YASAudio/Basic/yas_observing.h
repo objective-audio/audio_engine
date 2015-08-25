@@ -22,10 +22,10 @@ namespace yas
     class observer
     {
        public:
-        using shared_ptr = std::shared_ptr<observer<K, T>>;
+        using sptr = std::shared_ptr<observer<K, T>>;
         using handler_f = std::function<void(const K &, const T &)>;
 
-        static shared_ptr create();
+        static sptr create();
 
         ~observer();
 
@@ -58,20 +58,20 @@ namespace yas
     };
 
     template <typename K, typename T>
-    static auto make_observer(const subject<K, T> &) -> typename observer<K, T>::shared_ptr;
+    static auto make_observer(const subject<K, T> &) -> typename observer<K, T>::sptr;
 
     template <typename K, typename T>
     static auto make_subject_dispatcher(const subject<K, T> &source_subject,
                                         const std::initializer_list<subject<K, T> *> &destination_subjects) ->
-        typename observer<K, T>::shared_ptr;
+        typename observer<K, T>::sptr;
 
     template <typename K, typename T = std::nullptr_t>
     class subject
     {
        public:
-        using subject_ptr = std::shared_ptr<subject<K, T>>;
+        using sptr = std::shared_ptr<subject<K, T>>;
 
-        static subject_ptr create();
+        static sptr create();
 
         subject();
         ~subject();
@@ -83,8 +83,8 @@ namespace yas
         void notify(const K &key, const T &object) const;
 
        private:
-        using observers_vector = std::vector<std::weak_ptr<observer<K, T>>>;
-        using observers_map = std::map<const std::experimental::optional<K>, observers_vector>;
+        using observers_vec = std::vector<std::weak_ptr<observer<K, T>>>;
+        using observers_map = std::map<const std::experimental::optional<K>, observers_vec>;
         observers_map _observers;
 
         subject(const subject<K, T> &) = delete;
@@ -92,10 +92,9 @@ namespace yas
         subject &operator=(const subject<K, T> &) = delete;
         subject &operator=(const subject<K, T> &&) = delete;
 
-        void _add_observer(typename observer<K, T>::shared_ptr &observer, const std::experimental::optional<K> &key);
-        void _remove_observer(const typename observer<K, T>::shared_ptr &observer,
-                              const std::experimental::optional<K> &key);
-        void _remove_observer(const typename observer<K, T>::shared_ptr &observer);
+        void _add_observer(typename observer<K, T>::sptr &observer, const std::experimental::optional<K> &key);
+        void _remove_observer(const typename observer<K, T>::sptr &observer, const std::experimental::optional<K> &key);
+        void _remove_observer(const typename observer<K, T>::sptr &observer);
 
         friend observer<K, T>;
     };

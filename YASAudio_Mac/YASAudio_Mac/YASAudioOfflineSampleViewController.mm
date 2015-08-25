@@ -16,44 +16,44 @@ namespace yas
 
         class sine_node;
 
-        using sine_node_ptr = std::shared_ptr<sine_node>;
-        using sine_node_weak_ptr = std::weak_ptr<sine_node>;
+        using sine_node_sptr = std::shared_ptr<sine_node>;
+        using sine_node_wptr = std::weak_ptr<sine_node>;
 
         class sine_node : public audio_tap_node
         {
            public:
-            static sine_node_ptr create()
+            static sine_node_sptr create()
             {
-                auto node = sine_node_ptr(new sine_node());
+                auto node = sine_node_sptr(new sine_node());
                 node->_frequency = 1000.0;
 
-                sine_node_weak_ptr weak_node = node;
+                sine_node_wptr weak_node = node;
 
-                auto render_function =
-                    [weak_node](const audio_pcm_buffer_sptr &buffer, const uint32_t bus_idx, const audio_time_sptr &when) {
-                        buffer->clear();
+                auto render_function = [weak_node](const audio_pcm_buffer_sptr &buffer, const uint32_t bus_idx,
+                                                   const audio_time_sptr &when) {
+                    buffer->clear();
 
-                        if (auto node = weak_node.lock()) {
-                            if (node->is_playing()) {
-                                const Float64 start_phase = node->_phase_on_render;
-                                const Float64 phase_per_frame = node->frequency() / sample_rate * YAS_2_PI;
-                                Float64 next_phase = start_phase;
-                                const UInt32 frame_length = buffer->frame_length();
+                    if (auto node = weak_node.lock()) {
+                        if (node->is_playing()) {
+                            const Float64 start_phase = node->_phase_on_render;
+                            const Float64 phase_per_frame = node->frequency() / sample_rate * YAS_2_PI;
+                            Float64 next_phase = start_phase;
+                            const UInt32 frame_length = buffer->frame_length();
 
-                                if (frame_length > 0) {
-                                    yas::audio_frame_enumerator enumerator(buffer);
-                                    const auto *flex_ptr = enumerator.pointer();
-                                    while (flex_ptr->v) {
-                                        next_phase = YASAudioVectorSinef(flex_ptr->f32, frame_length, start_phase,
-                                                                         phase_per_frame);
-                                        yas_audio_frame_enumerator_move_channel(enumerator);
-                                    }
-
-                                    node->_phase_on_render = next_phase;
+                            if (frame_length > 0) {
+                                yas::audio_frame_enumerator enumerator(buffer);
+                                const auto *flex_ptr = enumerator.pointer();
+                                while (flex_ptr->v) {
+                                    next_phase =
+                                        YASAudioVectorSinef(flex_ptr->f32, frame_length, start_phase, phase_per_frame);
+                                    yas_audio_frame_enumerator_move_channel(enumerator);
                                 }
+
+                                node->_phase_on_render = next_phase;
                             }
                         }
-                    };
+                    }
+                };
 
                 node->set_render_function(render_function);
 
@@ -107,11 +107,11 @@ namespace yas
 @implementation YASAudioOfflineSampleViewController {
     yas::audio_engine_sptr _play_engine;
     yas::audio_unit_mixer_node_sptr _play_mixer_node;
-    yas::offline_sample::sine_node_ptr _play_sine_node;
+    yas::offline_sample::sine_node_sptr _play_sine_node;
 
     yas::audio_engine_sptr _offline_engine;
     yas::audio_unit_mixer_node_sptr _offline_mixer_node;
-    yas::offline_sample::sine_node_ptr _offline_sine_node;
+    yas::offline_sample::sine_node_sptr _offline_sine_node;
 
     std::vector<yas::any> _observers;
 }

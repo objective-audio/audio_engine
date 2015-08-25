@@ -5,14 +5,7 @@
 
 #import <UIKit/UIKit.h>
 #import <memory>
-
-namespace yas
-{
-    class audio_unit_parameter;
-    class audio_unit_node;
-
-    using audio_unit_node_sptr = std::shared_ptr<audio_unit_node>;
-}
+#import "yas_audio.h"
 
 @interface YASAudioEngineSampleParameterCell : UITableViewCell
 

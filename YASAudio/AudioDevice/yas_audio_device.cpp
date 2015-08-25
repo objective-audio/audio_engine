@@ -442,7 +442,7 @@ const std::experimental::optional<size_t> audio_device::index_of_device(const au
     return std::experimental::nullopt;
 }
 
-audio_device::system_subject_type &audio_device::system_subject()
+audio_device::system_subject_t &audio_device::system_subject()
 {
     static subject<audio_device::method, std::vector<audio_device::property_info>> system_subject;
     return system_subject;
@@ -558,7 +558,7 @@ uint32_t audio_device::output_channel_count() const
     return 0;
 }
 
-audio_device::property_subject_type &audio_device::property_subject() const
+audio_device::property_subject_t &audio_device::property_subject() const
 {
     return _impl->property_subject;
 }

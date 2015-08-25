@@ -48,9 +48,9 @@ namespace yas
     };
 
     template <typename K, typename T>
-    typename observer<K, T>::shared_ptr observer<K, T>::create()
+    typename observer<K, T>::sptr observer<K, T>::create()
     {
-        auto ptr = shared_ptr(new observer<K, T>());
+        auto ptr = sptr(new observer<K, T>());
         ptr->_weak_this = ptr;
         return ptr;
     }
@@ -157,7 +157,7 @@ namespace yas
     }
 
     template <typename K, typename T>
-    auto make_observer(const subject<K, T> &) -> typename observer<K, T>::shared_ptr
+    auto make_observer(const subject<K, T> &) -> typename observer<K, T>::sptr
     {
         return observer<K, T>::create();
     }
@@ -165,7 +165,7 @@ namespace yas
     template <typename K, typename T>
     auto make_subject_dispatcher(const subject<K, T> &source,
                                  const std::initializer_list<subject<K, T> *> &destinations) ->
-        typename observer<K, T>::shared_ptr
+        typename observer<K, T>::sptr
     {
         auto observer = make_observer(source);
         auto handler = [&source](const auto &method, const auto &value) { source.notify(method, value); };
@@ -180,9 +180,9 @@ namespace yas
 #pragma mark - subject
 
     template <typename K, typename T>
-    typename subject<K, T>::subject_ptr subject<K, T>::create()
+    typename subject<K, T>::sptr subject<K, T>::create()
     {
-        return subject_ptr(new subject<K, T>());
+        return sptr(new subject<K, T>());
     }
 
     template <typename K, typename T>
@@ -233,11 +233,11 @@ namespace yas
     }
 
     template <typename K, typename T>
-    void subject<K, T>::_add_observer(typename observer<K, T>::shared_ptr &observer,
+    void subject<K, T>::_add_observer(typename observer<K, T>::sptr &observer,
                                       const std::experimental::optional<K> &key)
     {
         if (_observers.count(key) == 0) {
-            _observers.insert(std::make_pair(key, observers_vector()));
+            _observers.insert(std::make_pair(key, observers_vec()));
         }
 
         auto &vector = _observers.at(key);
@@ -245,7 +245,7 @@ namespace yas
     }
 
     template <typename K, typename T>
-    void subject<K, T>::_remove_observer(const typename observer<K, T>::shared_ptr &observer,
+    void subject<K, T>::_remove_observer(const typename observer<K, T>::sptr &observer,
                                          const std::experimental::optional<K> &key)
     {
         if (_observers.count(key) > 0) {
@@ -267,7 +267,7 @@ namespace yas
     }
 
     template <typename K, typename T>
-    void subject<K, T>::_remove_observer(const typename observer<K, T>::shared_ptr &observer)
+    void subject<K, T>::_remove_observer(const typename observer<K, T>::sptr &observer)
     {
         for (auto &pair : _observers) {
             remove_observer(observer, pair.first);

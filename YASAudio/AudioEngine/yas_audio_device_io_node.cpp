@@ -24,7 +24,7 @@ class audio_device_io_node::impl
     std::weak_ptr<audio_device_io_node> weak_node;
     audio_graph_wptr graph;
     audio_device_io_sptr device_io;
-    audio_node_core_ptr node_core_on_render;
+    audio_node_core_sptr node_core_on_render;
 
     impl() : weak_node(), _device(nullptr), graph(), device_io(nullptr), node_core_on_render(nullptr)
     {

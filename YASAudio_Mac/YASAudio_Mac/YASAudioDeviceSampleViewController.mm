@@ -73,7 +73,8 @@ namespace yas
                 return _sine_volume.load();
             }
 
-            void process(const yas::audio_pcm_buffer_sptr &input_buffer, const yas::audio_pcm_buffer_sptr &output_buffer)
+            void process(const yas::audio_pcm_buffer_sptr &input_buffer,
+                         const yas::audio_pcm_buffer_sptr &output_buffer)
             {
                 if (!output_buffer) {
                     return;
@@ -126,7 +127,7 @@ namespace yas
 }
 
 using sample_kernel = yas::audio_device_sample::kernel;
-using sample_kernel_ptr = std::shared_ptr<yas::audio_device_sample::kernel>;
+using sample_kernel_sptr = std::shared_ptr<yas::audio_device_sample::kernel>;
 
 @interface YASAudioDeviceSampleViewController ()
 
@@ -146,8 +147,8 @@ using sample_kernel_ptr = std::shared_ptr<yas::audio_device_sample::kernel>;
 @implementation YASAudioDeviceSampleViewController {
     yas::audio_graph_sptr _audio_graph;
     yas::audio_device_io_sptr _audio_device_io;
-    yas::audio_device_observer_ptr _audio_device_observer;
-    sample_kernel_ptr _kernel;
+    yas::audio_device_observer_sptr _audio_device_observer;
+    sample_kernel_sptr _kernel;
     yas::objc_weak_container_sptr _self_container;
 }
 
@@ -194,8 +195,8 @@ using sample_kernel_ptr = std::shared_ptr<yas::audio_device_sample::kernel>;
         });
 
     std::weak_ptr<yas::audio_device_io> weak_device_io = _audio_device_io;
-    _audio_device_io->set_render_callback([weak_device_io, kernel = _kernel](const yas::audio_pcm_buffer_sptr &output_buffer,
-                                                                             const yas::audio_time_sptr &when) {
+    _audio_device_io->set_render_callback([weak_device_io, kernel = _kernel](
+        const yas::audio_pcm_buffer_sptr &output_buffer, const yas::audio_time_sptr &when) {
         if (auto device_io = weak_device_io.lock()) {
             kernel->process(device_io->input_buffer_on_render(), output_buffer);
         }

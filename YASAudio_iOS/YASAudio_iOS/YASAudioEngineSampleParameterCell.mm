@@ -4,7 +4,6 @@
 //
 
 #import "YASAudioEngineSampleParameterCell.h"
-#import "yas_audio.h"
 
 @interface YASAudioEngineSampleParameterCell ()
 
