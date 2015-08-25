@@ -15,8 +15,7 @@
 
 using namespace yas;
 
-using audio_device_weak_ptr = std::weak_ptr<audio_device>;
-using listener_function =
+using listener_f =
     std::function<void(const UInt32 in_number_addresses, const AudioObjectPropertyAddress *in_addresses)>;
 
 #pragma mark - utility
@@ -60,7 +59,7 @@ static CFStringRef property_string(const AudioObjectID object_id, const AudioObj
 }
 
 static void add_listener(const AudioObjectID object_id, const AudioObjectPropertySelector selector,
-                         const AudioObjectPropertyScope scope, const listener_function function)
+                         const AudioObjectPropertyScope scope, const listener_f function)
 {
     const AudioObjectPropertyAddress address = {
         .mSelector = selector, .mScope = scope, .mElement = kAudioObjectPropertyElementMaster};
@@ -104,7 +103,7 @@ namespace yas
             return audio_device_global::instance()._all_devices;
         }
 
-        static listener_function system_listener()
+        static listener_f system_listener()
         {
             return [](UInt32 address_count, const AudioObjectPropertyAddress *addresses) {
                 update_all_devices();
@@ -139,7 +138,7 @@ namespace yas
 
        private:
         std::map<AudioDeviceID, audio_device_sptr> _all_devices;
-        listener_function _system_listener = nullptr;
+        listener_f _system_listener = nullptr;
 
         static audio_device_global &instance()
         {
@@ -236,7 +235,7 @@ class audio_device::impl
         return _output_format;
     }
 
-    listener_function listener()
+    listener_f listener()
     {
         const AudioDeviceID device_id = audio_device_id;
 

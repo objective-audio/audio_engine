@@ -6,7 +6,6 @@
 #include "yas_audio_engine.h"
 #include "yas_audio_node.h"
 #include "yas_audio_unit_node.h"
-#include "yas_audio_offline_output_node.h"
 #include "yas_audio_device_io_node.h"
 #include "yas_audio_graph.h"
 #include "yas_stl_utils.h"
@@ -354,7 +353,7 @@ audio_engine::~audio_engine()
 }
 
 audio_connection_sptr audio_engine::connect(const audio_node_sptr &source_node, const audio_node_sptr &destination_node,
-                                           const audio_format_sptr &format)
+                                            const audio_format_sptr &format)
 {
     if (!source_node || !destination_node || !format) {
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
@@ -371,8 +370,8 @@ audio_connection_sptr audio_engine::connect(const audio_node_sptr &source_node, 
 }
 
 audio_connection_sptr audio_engine::connect(const audio_node_sptr &source_node, const audio_node_sptr &destination_node,
-                                           const uint32_t source_bus_idx, const uint32_t destination_bus_idx,
-                                           const audio_format_sptr &format)
+                                            const uint32_t source_bus_idx, const uint32_t destination_bus_idx,
+                                            const audio_format_sptr &format)
 {
     if (!source_node || !destination_node || !format) {
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
@@ -498,8 +497,8 @@ audio_engine::start_result audio_engine::start_render()
     return start_result(nullptr);
 }
 
-audio_engine::start_result audio_engine::start_offline_render(const offline_render_function &render_function,
-                                                              const offline_completion_function &completion_function)
+audio_engine::start_result audio_engine::start_offline_render(const offline_render_f &render_function,
+                                                              const offline_completion_f &completion_function)
 {
     if (const auto graph = _impl->graph()) {
         if (graph->is_running()) {

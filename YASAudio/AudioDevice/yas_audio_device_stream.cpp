@@ -13,7 +13,7 @@
 
 using namespace yas;
 
-using listener_function =
+using listener_f =
     std::function<void(const UInt32 in_number_addresses, const AudioObjectPropertyAddress *in_addresses)>;
 
 #pragma mark - property_info
@@ -63,7 +63,7 @@ class audio_device_stream::impl
     {
     }
 
-    listener_function listener(std::weak_ptr<audio_device_stream> weak_stream)
+    listener_f listener(std::weak_ptr<audio_device_stream> weak_stream)
     {
         return [weak_stream](UInt32 address_count, const AudioObjectPropertyAddress *addresses) {
             if (auto stream = weak_stream.lock()) {
@@ -85,7 +85,7 @@ class audio_device_stream::impl
         };
     }
 
-    void add_listener(const AudioObjectPropertySelector &selector, listener_function function)
+    void add_listener(const AudioObjectPropertySelector &selector, listener_f function)
     {
         const AudioObjectPropertyAddress address = {.mSelector = selector,
                                                     .mScope = kAudioObjectPropertyScopeGlobal,

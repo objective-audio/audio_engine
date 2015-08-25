@@ -12,10 +12,10 @@ namespace yas
     template <typename K, typename T>
     class observer<K, T>::handler_holder
     {
-        std::map<const std::experimental::optional<K>, const handler_function> functions;
+        std::map<const std::experimental::optional<K>, const handler_f> functions;
 
        public:
-        void add_handler(const std::experimental::optional<K> &key, const handler_function &handler)
+        void add_handler(const std::experimental::optional<K> &key, const handler_f &handler)
         {
             functions.insert(std::make_pair(key, handler));
         }
@@ -74,7 +74,7 @@ namespace yas
     }
 
     template <typename K, typename T>
-    void observer<K, T>::add_handler(subject<K, T> &subject, const K &key, const handler_function &handler)
+    void observer<K, T>::add_handler(subject<K, T> &subject, const K &key, const handler_f &handler)
     {
         auto subject_ptr = &subject;
         if (_handlers.count(subject_ptr) == 0) {
@@ -107,7 +107,7 @@ namespace yas
     }
 
     template <typename K, typename T>
-    void observer<K, T>::add_wild_card_handler(subject<K, T> &subject, const handler_function &handler)
+    void observer<K, T>::add_wild_card_handler(subject<K, T> &subject, const handler_f &handler)
     {
         auto subject_ptr = &subject;
         if (_handlers.count(subject_ptr) == 0) {

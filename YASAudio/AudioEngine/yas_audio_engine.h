@@ -8,6 +8,7 @@
 #include "yas_audio_types.h"
 #include "yas_result.h"
 #include "yas_observing.h"
+#include "yas_audio_offline_output_node.h"
 #include <set>
 
 namespace yas
@@ -32,9 +33,8 @@ namespace yas
 
         using start_result = yas::result<std::nullptr_t, start_error_type>;
 
-        using offline_render_function =
-            std::function<void(const audio_pcm_buffer_sptr &buffer, const audio_time_sptr &when, bool &stop)>;
-        using offline_completion_function = std::function<void(const bool cancelled)>;
+        using offline_render_f = audio_offline_output_node::render_f;
+        using offline_completion_f = audio_offline_output_node::completion_f;
 
         static audio_engine_sptr create();
 
@@ -54,8 +54,8 @@ namespace yas
         void disconnect_output(const audio_node_sptr &node, const uint32_t bus_idx);
 
         start_result start_render();
-        start_result start_offline_render(const offline_render_function &render_function,
-                                          const offline_completion_function &completion_function);
+        start_result start_offline_render(const offline_render_f &render_function,
+                                          const offline_completion_f &completion_function);
         void stop();
 
         notification_subject_type &subject() const;

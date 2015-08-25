@@ -20,6 +20,10 @@ namespace yas
         using start_result = yas::result<std::nullptr_t, start_error_type>;
 
        public:
+        using render_f =
+            std::function<void(const audio_pcm_buffer_sptr &buffer, const audio_time_sptr &when, bool &stop)>;
+        using completion_f = std::function<void(const bool cancelled)>;
+
         static audio_offline_output_node_sptr create();
 
         ~audio_offline_output_node();
@@ -34,13 +38,10 @@ namespace yas
         std::unique_ptr<impl> _impl;
 
         using super_class = audio_unit_node;
-        using render_function =
-            std::function<void(const audio_pcm_buffer_sptr &buffer, const audio_time_sptr &when, bool &stop)>;
-        using completion_function = std::function<void(const bool cancelled)>;
 
         audio_offline_output_node();
 
-        start_result _start(const render_function &callback_func, const completion_function &completion_func);
+        start_result _start(const render_f &callback_func, const completion_f &completion_func);
         void _stop();
 
        public:

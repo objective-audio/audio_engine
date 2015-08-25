@@ -23,7 +23,7 @@ namespace yas
     class audio_unit
     {
        public:
-        using render_function = std::function<void(render_parameters &)>;
+        using render_f = std::function<void(render_parameters &)>;
 
         static const OSType sub_type_default_io();
 
@@ -45,9 +45,9 @@ namespace yas
         void attach_input_callback();  // for io
         void detach_input_callback();  // for io
 
-        void set_render_callback(const render_function &callback);
-        void set_notify_callback(const render_function &callback);
-        void set_input_callback(const render_function &callback);  // for io
+        void set_render_callback(const render_f &callback);
+        void set_notify_callback(const render_f &callback);
+        void set_input_callback(const render_f &callback);  // for io
 
         template <typename T>
         void set_property_data(const std::unique_ptr<std::vector<T>> &data, const AudioUnitPropertyID property_id,
