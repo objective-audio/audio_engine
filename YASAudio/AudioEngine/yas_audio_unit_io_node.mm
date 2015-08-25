@@ -231,7 +231,7 @@ uint32_t audio_unit_output_node::output_bus_count() const
 class audio_unit_input_node::impl
 {
    public:
-    pcm_buffer_sptr input_buffer;
+    audio_pcm_buffer_sptr input_buffer;
     audio_time_sptr render_time;
 };
 
@@ -274,7 +274,7 @@ void audio_unit_input_node::update_connections()
     if (auto out_connection = output_connection(1)) {
         unit->attach_input_callback();
 
-        auto input_buffer = pcm_buffer::create(out_connection->format(), 4096);
+        auto input_buffer = audio_pcm_buffer::create(out_connection->format(), 4096);
         _impl->input_buffer = input_buffer;
 
         unit->set_input_callback([weak_node = _weak_this, input_buffer](render_parameters & render_parameters) {

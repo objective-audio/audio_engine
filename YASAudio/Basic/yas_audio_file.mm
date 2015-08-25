@@ -4,7 +4,7 @@
 //
 
 #include "yas_audio_file.h"
-#include "yas_pcm_buffer.h"
+#include "yas_audio_pcm_buffer.h"
 #include "yas_audio_format.h"
 #include "yas_cf_utils.h"
 #include "yas_exception.h"
@@ -224,7 +224,7 @@ audio_file_reader::create_result audio_file_reader::create(const CFURLRef file_u
 audio_file_reader::audio_file_reader() = default;
 audio_file_reader::~audio_file_reader() = default;
 
-audio_file_reader::read_result audio_file_reader::read_into_buffer(pcm_buffer_sptr &buffer, const UInt32 frame_length)
+audio_file_reader::read_result audio_file_reader::read_into_buffer(audio_pcm_buffer_sptr &buffer, const UInt32 frame_length)
 {
     if (!_impl->ext_audio_file) {
         return read_result(read_error_type::closed);
@@ -342,7 +342,7 @@ audio_file_writer::create_result audio_file_writer::create(const CFURLRef file_u
 audio_file_writer::audio_file_writer() = default;
 audio_file_writer::~audio_file_writer() = default;
 
-audio_file_writer::write_result audio_file_writer::write_from_buffer(const pcm_buffer_sptr &buffer, const bool async)
+audio_file_writer::write_result audio_file_writer::write_from_buffer(const audio_pcm_buffer_sptr &buffer, const bool async)
 {
     if (!_impl->ext_audio_file) {
         return write_result(write_error_type::closed);

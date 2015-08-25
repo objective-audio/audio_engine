@@ -33,7 +33,7 @@ namespace yas
         using start_result = yas::result<std::nullptr_t, start_error_type>;
 
         using offline_render_function =
-            std::function<void(const pcm_buffer_sptr &buffer, const audio_time_sptr &when, bool &stop)>;
+            std::function<void(const audio_pcm_buffer_sptr &buffer, const audio_time_sptr &when, bool &stop)>;
         using offline_completion_function = std::function<void(const bool cancelled)>;
 
         static audio_engine_sptr create();

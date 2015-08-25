@@ -5,7 +5,7 @@
 
 #include "yas_audio_unit.h"
 #include "yas_audio_graph.h"
-#include "yas_pcm_buffer.h"
+#include "yas_audio_pcm_buffer.h"
 #include "yas_cf_utils.h"
 
 using namespace yas;

@@ -8,7 +8,7 @@
 #include "yas_audio_types.h"
 #include "yas_result.h"
 #include "yas_audio_format.h"
-#include "yas_pcm_buffer.h"
+#include "yas_audio_pcm_buffer.h"
 #include "yas_audio_connection.h"
 #include <memory>
 #include <map>
@@ -58,7 +58,7 @@ namespace yas
         virtual uint32_t input_bus_count() const;
         virtual uint32_t output_bus_count() const;
 
-        virtual void render(const pcm_buffer_sptr &buffer, const uint32_t bus_idx, const audio_time_sptr &when);
+        virtual void render(const audio_pcm_buffer_sptr &buffer, const uint32_t bus_idx, const audio_time_sptr &when);
 
        protected:
         audio_node();

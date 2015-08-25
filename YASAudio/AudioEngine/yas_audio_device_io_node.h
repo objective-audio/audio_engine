@@ -27,7 +27,7 @@ namespace yas
         void set_device(const audio_device_sptr &device);
         audio_device_sptr device() const;
 
-        virtual void render(const pcm_buffer_sptr &buffer, const uint32_t bus_idx, const audio_time_sptr &when) override;
+        virtual void render(const audio_pcm_buffer_sptr &buffer, const uint32_t bus_idx, const audio_time_sptr &when) override;
 
        protected:
         audio_device_io_node(const audio_device_sptr &device);

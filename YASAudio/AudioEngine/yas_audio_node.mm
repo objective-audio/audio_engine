@@ -178,7 +178,7 @@ uint32_t audio_node::output_bus_count() const
 
 #pragma mark render thread
 
-void audio_node::render(const pcm_buffer_sptr &buffer, const uint32_t bus_idx, const audio_time_sptr &when)
+void audio_node::render(const audio_pcm_buffer_sptr &buffer, const uint32_t bus_idx, const audio_time_sptr &when)
 {
     set_render_time_on_render(when);
 }

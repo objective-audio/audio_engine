@@ -30,7 +30,7 @@ namespace yas
                 sine_node_weak_ptr weak_node = node;
 
                 auto render_function =
-                    [weak_node](const pcm_buffer_sptr &buffer, const uint32_t bus_idx, const audio_time_sptr &when) {
+                    [weak_node](const audio_pcm_buffer_sptr &buffer, const uint32_t bus_idx, const audio_time_sptr &when) {
                         buffer->clear();
 
                         if (auto node = weak_node.lock()) {
@@ -290,9 +290,9 @@ namespace yas
     uint32_t remain = self.length * yas::offline_sample::sample_rate;
 
     auto start_result = _offline_engine->start_offline_render(
-        [remain, file_writer](const yas::pcm_buffer_sptr &buffer, const auto &when, bool &stop) mutable {
+        [remain, file_writer](const yas::audio_pcm_buffer_sptr &buffer, const auto &when, bool &stop) mutable {
             auto format = yas::audio_format::create(buffer->format()->stream_description());
-            auto pcm_buffer = yas::pcm_buffer::create(format, buffer->audio_buffer_list());
+            auto pcm_buffer = yas::audio_pcm_buffer::create(format, buffer->audio_buffer_list());
             pcm_buffer->set_frame_length(buffer->frame_length());
 
             UInt32 frame_length = MIN(remain, pcm_buffer->frame_length());

@@ -107,7 +107,7 @@ void audio_device_io_node::update_connections()
     auto weak_node = _impl->weak_node;
     std::weak_ptr<audio_device_io> weak_device_io = device_io;
 
-    auto render_function = [weak_node, weak_device_io](const pcm_buffer_sptr &output_buffer,
+    auto render_function = [weak_node, weak_device_io](const audio_pcm_buffer_sptr &output_buffer,
                                                        const audio_time_sptr &when) {
         if (auto node = weak_node.lock()) {
             if (auto core = node->node_core()) {
@@ -216,7 +216,7 @@ bool audio_device_io_node::_validate_connections() const
 
 #pragma mark - render
 
-void audio_device_io_node::render(const pcm_buffer_sptr &buffer, const uint32_t bus_idx, const audio_time_sptr &when)
+void audio_device_io_node::render(const audio_pcm_buffer_sptr &buffer, const uint32_t bus_idx, const audio_time_sptr &when)
 {
     super_class::render(buffer, bus_idx, when);
 

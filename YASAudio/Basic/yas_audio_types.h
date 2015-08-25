@@ -76,7 +76,7 @@ namespace yas
     class objc_weak_container;
     class audio_time;
     class audio_format;
-    class pcm_buffer;
+    class audio_pcm_buffer;
     class audio_file_reader;
     class audio_file_writer;
     class channel_route;
@@ -97,7 +97,7 @@ namespace yas
     using objc_weak_container_sptr = std::shared_ptr<objc_weak_container>;
     using audio_time_sptr = std::shared_ptr<audio_time>;
     using audio_format_sptr = std::shared_ptr<audio_format>;
-    using pcm_buffer_sptr = std::shared_ptr<pcm_buffer>;
+    using audio_pcm_buffer_sptr = std::shared_ptr<audio_pcm_buffer>;
     using audio_file_reader_sptr = std::shared_ptr<audio_file_reader>;
     using audio_file_writer_sptr = std::shared_ptr<audio_file_writer>;
     using channel_route_sptr = std::shared_ptr<channel_route>;

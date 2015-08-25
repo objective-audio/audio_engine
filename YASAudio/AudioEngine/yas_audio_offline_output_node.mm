@@ -96,7 +96,7 @@ audio_offline_output_node::start_result audio_offline_output_node::_start(const 
         }
 
         auto weak_node = _impl->weak_node;
-        auto render_buffer = yas::pcm_buffer::create(connection->format(), 1024);
+        auto render_buffer = yas::audio_pcm_buffer::create(connection->format(), 1024);
 
         NSBlockOperation *blockOperation = [[NSBlockOperation alloc] init];
         auto operation_container = objc_weak_container::create(blockOperation);
