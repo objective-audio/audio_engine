@@ -71,13 +71,13 @@ class audio_device_io::impl
     {
     }
 
-    void set_render_callback(const render_function &render_callback)
+    void set_render_callback(const render_f &render_callback)
     {
         std::lock_guard<std::recursive_mutex> lock(_mutex);
         _render_callback = render_callback;
     }
 
-    render_function render_callback() const
+    render_f render_callback() const
     {
         std::lock_guard<std::recursive_mutex> lock(_mutex);
         return _render_callback;
@@ -125,7 +125,7 @@ class audio_device_io::impl
     }
 
    private:
-    render_function _render_callback;
+    render_f _render_callback;
     UInt32 _maximum_frames;
     kernel_ptr _kernel;
     mutable std::recursive_mutex _mutex;
@@ -289,7 +289,7 @@ bool audio_device_io::is_running() const
     return _impl->is_running;
 }
 
-void audio_device_io::set_render_callback(const render_function &callback)
+void audio_device_io::set_render_callback(const render_f &callback)
 {
     _impl->set_render_callback(callback);
 }

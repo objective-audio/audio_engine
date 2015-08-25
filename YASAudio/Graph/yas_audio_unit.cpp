@@ -52,37 +52,37 @@ class audio_unit::impl
         return au_instance;
     }
 
-    void set_render_callback(const render_function &callback)
+    void set_render_callback(const render_f &callback)
     {
         std::lock_guard<std::recursive_mutex> lock(_mutex);
         _render_callback = callback;
     }
 
-    void set_notify_callback(const render_function &callback)
+    void set_notify_callback(const render_f &callback)
     {
         std::lock_guard<std::recursive_mutex> lock(_mutex);
         _notify_callback = callback;
     }
 
-    void set_input_callback(const render_function &callback)
+    void set_input_callback(const render_f &callback)
     {
         std::lock_guard<std::recursive_mutex> lock(_mutex);
         _input_callback = callback;
     }
 
-    audio_unit::render_function render_callback() const
+    audio_unit::render_f render_callback() const
     {
         std::lock_guard<std::recursive_mutex> lock(_mutex);
         return _render_callback;
     }
 
-    audio_unit::render_function notify_callback() const
+    audio_unit::render_f notify_callback() const
     {
         std::lock_guard<std::recursive_mutex> lock(_mutex);
         return _notify_callback;
     }
 
-    audio_unit::render_function input_callback() const
+    audio_unit::render_f input_callback() const
     {
         std::lock_guard<std::recursive_mutex> lock(_mutex);
         return _input_callback;
@@ -130,9 +130,9 @@ class audio_unit::impl
     }
 
    private:
-    render_function _render_callback;
-    render_function _notify_callback;
-    render_function _input_callback;
+    render_f _render_callback;
+    render_f _notify_callback;
+    render_f _input_callback;
     std::string _name;
 
     mutable std::recursive_mutex _mutex;
@@ -345,17 +345,17 @@ void audio_unit::detach_input_callback()
                                                sizeof(AURenderCallbackStruct)));
 }
 
-void audio_unit::set_render_callback(const render_function &callback)
+void audio_unit::set_render_callback(const render_f &callback)
 {
     _impl->set_render_callback(callback);
 }
 
-void audio_unit::set_notify_callback(const render_function &callback)
+void audio_unit::set_notify_callback(const render_f &callback)
 {
     _impl->set_notify_callback(callback);
 }
 
-void audio_unit::set_input_callback(const render_function &callback)
+void audio_unit::set_input_callback(const render_f &callback)
 {
     _impl->set_input_callback(callback);
 }
@@ -671,7 +671,7 @@ void audio_unit::callback_render(yas::render_parameters &render_parameters)
 {
     yas_raise_if_main_thread;
 
-    render_function function = nullptr;
+    render_f function = nullptr;
 
     switch (render_parameters.in_render_type) {
         case render_type::normal:

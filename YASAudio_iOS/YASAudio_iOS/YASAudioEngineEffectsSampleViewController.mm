@@ -86,25 +86,25 @@ static const AudioComponentDescription baseAcd = {.componentType = kAudioUnitTyp
 
     Float64 phase = 0;
 
-    auto tap_render_function =
-        [phase](const yas::audio_pcm_buffer_sptr &buffer, const uint32_t bus_idx, const yas::audio_time_sptr &when) mutable {
-            buffer->clear();
+    auto tap_render_function = [phase](const yas::audio_pcm_buffer_sptr &buffer, const uint32_t bus_idx,
+                                       const yas::audio_time_sptr &when) mutable {
+        buffer->clear();
 
-            const Float64 start_phase = phase;
-            const Float64 phase_per_frame = 1000.0 / buffer->format()->sample_rate() * YAS_2_PI;
-            yas::audio_frame_enumerator enumerator(buffer);
-            const auto *flex_ptr = enumerator.pointer();
-            const uint32_t length = enumerator.frame_length();
+        const Float64 start_phase = phase;
+        const Float64 phase_per_frame = 1000.0 / buffer->format()->sample_rate() * YAS_2_PI;
+        yas::audio_frame_enumerator enumerator(buffer);
+        const auto *flex_ptr = enumerator.pointer();
+        const uint32_t length = enumerator.frame_length();
 
-            uint32_t idx = 0;
-            while (flex_ptr->v) {
-                if (idx == 0) {
-                    phase = YASAudioVectorSinef(flex_ptr->f32, length, start_phase, phase_per_frame);
-                }
-                idx++;
-                yas_audio_frame_enumerator_move_channel(enumerator);
+        uint32_t idx = 0;
+        while (flex_ptr->v) {
+            if (idx == 0) {
+                phase = YASAudioVectorSinef(flex_ptr->f32, length, start_phase, phase_per_frame);
             }
-        };
+            idx++;
+            yas_audio_frame_enumerator_move_channel(enumerator);
+        }
+    };
 
     _tap_node->set_render_function(tap_render_function);
 

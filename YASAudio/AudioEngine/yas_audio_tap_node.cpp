@@ -14,7 +14,7 @@ namespace yas
     class audio_tap_node_core : public audio_node_core
     {
        public:
-        audio_tap_node::render_function render_function;
+        audio_tap_node::render_f render_function;
     };
 }
 
@@ -23,7 +23,7 @@ namespace yas
 class audio_tap_node::impl
 {
    public:
-    render_function render_function;
+    render_f render_function;
 
     void set_node_core_on_render(const audio_node_core_ptr &node_core)
     {
@@ -53,7 +53,7 @@ audio_tap_node::audio_tap_node() : audio_node(), _impl(std::make_unique<impl>())
 
 audio_tap_node::~audio_tap_node() = default;
 
-void audio_tap_node::set_render_function(const render_function &render_function)
+void audio_tap_node::set_render_function(const render_f &render_function)
 {
     _impl->render_function = render_function;
 
@@ -110,7 +110,8 @@ audio_connection_wmap &audio_tap_node::output_connections_on_render() const
     return _impl->node_core_on_render()->output_connections;
 }
 
-void audio_tap_node::render_source(const audio_pcm_buffer_sptr &buffer, const uint32_t bus_idx, const audio_time_sptr &when)
+void audio_tap_node::render_source(const audio_pcm_buffer_sptr &buffer, const uint32_t bus_idx,
+                                   const audio_time_sptr &when)
 {
     if (auto connection = input_connection_on_render(bus_idx)) {
         if (auto node = connection->source_node()) {
