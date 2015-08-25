@@ -304,7 +304,7 @@ using sample_kernel_ptr = std::shared_ptr<yas::audio_device_sample::kernel>;
 
     self.deviceNames = titles;
 
-    auto device = _audio_device_io->audio_device();
+    auto device = _audio_device_io->device();
     auto index = yas::audio_device::index_of_device(device);
     if (index) {
         self.selectedDeviceIndex = *index;
@@ -315,7 +315,7 @@ using sample_kernel_ptr = std::shared_ptr<yas::audio_device_sample::kernel>;
 
 - (void)setDevice:(const yas::audio_device_ptr &)selected_device
 {
-    if (auto prev_audio_device = _audio_device_io->audio_device()) {
+    if (auto prev_audio_device = _audio_device_io->device()) {
         _audio_device_observer->remove_handler(prev_audio_device->property_subject(),
                                                yas::audio_device::method::device_did_change);
     }
@@ -323,7 +323,7 @@ using sample_kernel_ptr = std::shared_ptr<yas::audio_device_sample::kernel>;
     auto all_devices = yas::audio_device::all_devices();
 
     if (selected_device && std::find(all_devices.begin(), all_devices.end(), selected_device) != all_devices.end()) {
-        _audio_device_io->set_audio_device(selected_device);
+        _audio_device_io->set_device(selected_device);
 
         _audio_device_observer->add_handler(
             selected_device->property_subject(), yas::audio_device::method::device_did_change,
@@ -339,7 +339,7 @@ using sample_kernel_ptr = std::shared_ptr<yas::audio_device_sample::kernel>;
                 }
             });
     } else {
-        _audio_device_io->set_audio_device(nullptr);
+        _audio_device_io->set_device(nullptr);
     }
 
     [self _updateDeviceInfo];
@@ -347,7 +347,7 @@ using sample_kernel_ptr = std::shared_ptr<yas::audio_device_sample::kernel>;
 
 - (void)_updateDeviceInfo
 {
-    auto const device = _audio_device_io->audio_device();
+    auto const device = _audio_device_io->device();
     NSColor *onColor = [NSColor blackColor];
     NSColor *offColor = [NSColor lightGrayColor];
     if (device) {
