@@ -27,8 +27,6 @@ namespace yas
     class audio_device
     {
        public:
-        class notification_provider;
-
         enum class method : UInt32 {
             hardware_did_change,
             device_did_change,
