@@ -9,12 +9,6 @@
 
 namespace yas
 {
-    class audio_tap_node;
-    class audio_input_tap_node;
-
-    using audio_tap_node_ptr = std::shared_ptr<audio_tap_node>;
-    using audio_input_tap_node_ptr = std::shared_ptr<audio_input_tap_node>;
-
     class audio_tap_node : public audio_node
     {
        public:

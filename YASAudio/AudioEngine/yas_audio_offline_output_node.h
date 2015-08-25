@@ -9,10 +9,6 @@
 
 namespace yas
 {
-    class audio_offline_output_node;
-
-    using audio_offline_output_node_ptr = std::shared_ptr<audio_offline_output_node>;
-
     class audio_offline_output_node : public audio_node
     {
         enum class start_error_type {

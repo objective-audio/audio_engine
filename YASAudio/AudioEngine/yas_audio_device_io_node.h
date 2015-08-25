@@ -14,14 +14,6 @@
 
 namespace yas
 {
-    class audio_device_io_node;
-    class audio_device;
-    class audio_graph;
-
-    using audio_device_io_node_ptr = std::shared_ptr<audio_device_io_node>;
-    using audio_device_ptr = std::shared_ptr<audio_device>;
-    using audio_graph_ptr = std::shared_ptr<audio_graph>;
-
     class audio_device_io_node : public audio_node
     {
        public:

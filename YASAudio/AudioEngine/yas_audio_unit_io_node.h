@@ -5,18 +5,11 @@
 
 #pragma once
 
+#include "yas_audio_types.h"
 #include "yas_audio_unit_node.h"
 
 namespace yas
 {
-    class audio_unit_output_node;
-    class audio_unit_input_node;
-    class audio_device;
-
-    using audio_unit_output_node_ptr = std::shared_ptr<audio_unit_output_node>;
-    using audio_unit_input_node_ptr = std::shared_ptr<audio_unit_input_node>;
-    using audio_device_ptr = std::shared_ptr<audio_device>;
-
     class audio_unit_io_node : public audio_unit_node
     {
        public:
