@@ -28,7 +28,7 @@ static const AudioComponentDescription baseAcd = {.componentType = kAudioUnitTyp
 @implementation YASAudioEngineEffectsSampleViewController {
     std::vector<yas::audio_unit_sptr> _audio_units;
     std::experimental::optional<uint32_t> _index;
-    yas::audio_engine_ptr _engine;
+    yas::audio_engine_sptr _engine;
     yas::audio_unit_output_node_sptr _output_node;
     yas::audio_unit_node_sptr _effect_node;
     yas::audio_connection_sptr _through_connection;
