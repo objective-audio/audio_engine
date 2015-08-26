@@ -53,13 +53,13 @@ class audio_node::impl
         return _output_connections;
     }
 
-    void set_node_core(const audio_node_core_ptr &node_core)
+    void set_node_core(const audio_node_core_sptr &node_core)
     {
         std::lock_guard<std::recursive_mutex> lock(_mutex);
         _node_core = node_core;
     }
 
-    audio_node_core_ptr node_core() const
+    audio_node_core_sptr node_core() const
     {
         std::lock_guard<std::recursive_mutex> lock(_mutex);
         return _node_core;
@@ -80,7 +80,7 @@ class audio_node::impl
    private:
     audio_connection_wmap _input_connections;
     audio_connection_wmap _output_connections;
-    audio_node_core_ptr _node_core;
+    audio_node_core_sptr _node_core;
     audio_time_sptr _render_time;
     mutable std::recursive_mutex _mutex;
 };
@@ -189,12 +189,12 @@ void audio_node::update_connections()
 {
 }
 
-audio_node_core_ptr audio_node::make_node_core()
+audio_node_core_sptr audio_node::make_node_core()
 {
-    return audio_node_core_ptr(new audio_node_core());
+    return audio_node_core_sptr(new audio_node_core());
 }
 
-void audio_node::prepare_node_core(const audio_node_core_ptr &node_core)
+void audio_node::prepare_node_core(const audio_node_core_sptr &node_core)
 {
     if (!node_core) {
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
@@ -273,7 +273,7 @@ const audio_connection_wmap &audio_node::output_connections() const
 
 #pragma mark render thread
 
-audio_node_core_ptr audio_node::node_core() const
+audio_node_core_sptr audio_node::node_core() const
 {
     return _impl->node_core();
 }

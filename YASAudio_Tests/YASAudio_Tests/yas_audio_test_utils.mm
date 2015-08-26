@@ -126,7 +126,8 @@ bool yas::test::is_equal_buffer_flexibly(audio_pcm_buffer_sptr &data1, audio_pcm
     return YES;
 }
 
-yas::flex_pointer yas::test::data_ptr_from_buffer(audio_pcm_buffer_sptr &buffer, const UInt32 channel, const UInt32 frame)
+yas::flex_pointer yas::test::data_ptr_from_buffer(audio_pcm_buffer_sptr &buffer, const UInt32 channel,
+                                                  const UInt32 frame)
 {
     audio_frame_enumerator enumerator(buffer);
     enumerator.set_frame_position(frame);
@@ -166,9 +167,10 @@ void yas::test::audio_unit_render_on_sub_thread(std::shared_ptr<audio_unit> audi
     }
 }
 
-test::audio_test_node_ptr test::audio_test_node::create(const uint32_t input_bus_count, const uint32_t output_bus_count)
+test::audio_test_node_sptr test::audio_test_node::create(const uint32_t input_bus_count,
+                                                         const uint32_t output_bus_count)
 {
-    auto node = audio_test_node_ptr(new audio_test_node());
+    auto node = audio_test_node_sptr(new audio_test_node());
     node->_input_bus_count = input_bus_count;
     node->_output_bus_count = output_bus_count;
     return node;

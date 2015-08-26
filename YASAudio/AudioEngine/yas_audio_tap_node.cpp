@@ -25,20 +25,20 @@ class audio_tap_node::impl
    public:
     render_f render_function;
 
-    void set_node_core_on_render(const audio_node_core_ptr &node_core)
+    void set_node_core_on_render(const audio_node_core_sptr &node_core)
     {
         std::lock_guard<std::recursive_mutex> lock(_mutex);
         _node_core_on_render = node_core;
     }
 
-    audio_node_core_ptr node_core_on_render() const
+    audio_node_core_sptr node_core_on_render() const
     {
         std::lock_guard<std::recursive_mutex> lock(_mutex);
         return _node_core_on_render;
     }
 
    private:
-    audio_node_core_ptr _node_core_on_render;
+    audio_node_core_sptr _node_core_on_render;
     mutable std::recursive_mutex _mutex;
 };
 
@@ -120,12 +120,12 @@ void audio_tap_node::render_source(const audio_pcm_buffer_sptr &buffer, const ui
     }
 }
 
-audio_node_core_ptr audio_tap_node::make_node_core()
+audio_node_core_sptr audio_tap_node::make_node_core()
 {
-    return audio_node_core_ptr(new audio_tap_node_core());
+    return audio_node_core_sptr(new audio_tap_node_core());
 }
 
-void audio_tap_node::prepare_node_core(const audio_node_core_ptr &node_core)
+void audio_tap_node::prepare_node_core(const audio_node_core_sptr &node_core)
 {
     super_class::prepare_node_core(node_core);
 

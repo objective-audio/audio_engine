@@ -17,7 +17,7 @@ struct test_class {
     yas::property<test_key, int>::shared_ptr property2;
 
     yas::property<test_key, int>::dispatched_subject properties_subject;
-    yas::property<test_key, int>::dispatcher_ptr dispatcher;
+    yas::property<test_key, int>::dispatcher_sptr dispatcher;
 
     test_class()
         : property1(yas::make_property(test_key::property1, 1)),
@@ -87,7 +87,7 @@ struct test_class {
 - (void)testObserveValue
 {
     auto property = yas::property<int, bool>::create(1, false);
-    yas::observer<yas::property_method, yas::property<int, bool>::shared_ptr>::shared_ptr observer =
+    yas::observer<yas::property_method, yas::property<int, bool>::shared_ptr>::sptr observer =
         yas::make_observer(property->subject());
 
     bool will_change_called = false;

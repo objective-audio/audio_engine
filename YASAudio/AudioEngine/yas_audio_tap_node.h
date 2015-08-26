@@ -36,8 +36,8 @@ namespace yas
        protected:
         audio_tap_node();
 
-        virtual audio_node_core_ptr make_node_core() override;
-        virtual void prepare_node_core(const audio_node_core_ptr &node_core) override;
+        virtual audio_node_core_sptr make_node_core() override;
+        virtual void prepare_node_core(const audio_node_core_sptr &node_core) override;
 
        private:
         class impl;

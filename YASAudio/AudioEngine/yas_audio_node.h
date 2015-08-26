@@ -35,7 +35,7 @@ namespace yas
         audio_node_core &operator=(audio_node_core &&) = delete;
     };
 
-    using audio_node_core_ptr = std::shared_ptr<audio_node_core>;
+    using audio_node_core_sptr = std::shared_ptr<audio_node_core>;
 
     class audio_node
     {
@@ -68,11 +68,11 @@ namespace yas
         const audio_connection_wmap &input_connections() const;
         const audio_connection_wmap &output_connections() const;
 
-        audio_node_core_ptr node_core() const;
+        audio_node_core_sptr node_core() const;
 
         virtual void update_connections();
-        virtual audio_node_core_ptr make_node_core();
-        virtual void prepare_node_core(const audio_node_core_ptr &node_core);  // NS_REQUIRES_SUPER
+        virtual audio_node_core_sptr make_node_core();
+        virtual void prepare_node_core(const audio_node_core_sptr &node_core);  // NS_REQUIRES_SUPER
         void update_node_core();
 
         void set_render_time_on_render(const audio_time_sptr &time);

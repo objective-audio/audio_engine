@@ -27,9 +27,9 @@ class audio_engine::impl
     std::weak_ptr<audio_engine> engine;
     objc_strong_container reset_observer;
     objc_strong_container route_change_observer;
-    notification_subject_type subject;
+    notification_subject_t subject;
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
-    audio_device_observer_ptr device_observer;
+    audio_device_observer_sptr device_observer;
 #endif
 
     impl() : reset_observer(), route_change_observer(), subject()
@@ -543,7 +543,7 @@ void audio_engine::stop()
     }
 }
 
-audio_engine::notification_subject_type &audio_engine::subject() const
+audio_engine::notification_subject_t &audio_engine::subject() const
 {
     return _impl->subject;
 }

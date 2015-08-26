@@ -25,7 +25,7 @@ namespace yas
 
             yas::property<property_key, Float32>::shared_ptr meter_level;
 
-            using property_observer_ptr = yas::observer<yas::property_method, decltype(meter_level)>::shared_ptr;
+            using property_observer_ptr = yas::observer<yas::property_method, decltype(meter_level)>::sptr;
 
             static meter_input_tap_node_ptr create()
             {

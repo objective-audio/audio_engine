@@ -46,7 +46,7 @@ class audio_device_io::impl
         }
     };
 
-    using kernel_ptr = std::shared_ptr<kernel>;
+    using kernel_sptr = std::shared_ptr<kernel>;
 
     std::weak_ptr<audio_device_io> weak_device_io;
     audio_device_sptr device;
@@ -54,7 +54,7 @@ class audio_device_io::impl
     AudioDeviceIOProcID io_proc_id;
     audio_pcm_buffer_sptr input_buffer_on_render;
     audio_time_sptr input_time_on_render;
-    audio_device_observer_ptr observer;
+    audio_device_observer_sptr observer;
 
     impl()
         : weak_device_io(),
@@ -96,7 +96,7 @@ class audio_device_io::impl
         return _maximum_frames;
     }
 
-    void set_kernel(const kernel_ptr &kernel)
+    void set_kernel(const kernel_sptr &kernel)
     {
         std::lock_guard<std::recursive_mutex> lock(_mutex);
         _kernel = nullptr;
@@ -105,7 +105,7 @@ class audio_device_io::impl
         }
     }
 
-    kernel_ptr kernel() const
+    kernel_sptr kernel() const
     {
         std::lock_guard<std::recursive_mutex> lock(_mutex);
         return _kernel;
@@ -127,7 +127,7 @@ class audio_device_io::impl
    private:
     render_f _render_callback;
     UInt32 _maximum_frames;
-    kernel_ptr _kernel;
+    kernel_sptr _kernel;
     mutable std::recursive_mutex _mutex;
 };
 

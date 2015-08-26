@@ -60,7 +60,7 @@ namespace yas
             node->update_node_core();
         }
 
-        static audio_node_core_ptr node_core(const audio_node_sptr &node)
+        static audio_node_core_sptr node_core(const audio_node_sptr &node)
         {
             return node->node_core();
         }
