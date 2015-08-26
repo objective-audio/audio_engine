@@ -30,7 +30,7 @@ namespace yas
         audio_device_sptr device() const;
 #endif
 
-        virtual bus_result next_available_output_bus() const override;
+        virtual bus_result_t next_available_output_bus() const override;
         virtual bool is_available_output_bus(const uint32_t bus_idx) const override;
 
        protected:

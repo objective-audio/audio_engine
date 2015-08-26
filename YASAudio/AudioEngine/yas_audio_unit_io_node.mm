@@ -89,7 +89,7 @@ void audio_unit_io_node::prepare_parameters()
     unit->set_channel_map(std::make_unique<channel_map>(_impl->input_channel_map), kAudioUnitScope_Input);
 }
 
-bus_result audio_unit_io_node::next_available_output_bus() const
+bus_result_t audio_unit_io_node::next_available_output_bus() const
 {
     auto result = super_class::next_available_output_bus();
     if (result && *result == 0) {
