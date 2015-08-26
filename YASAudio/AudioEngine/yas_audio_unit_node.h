@@ -10,8 +10,6 @@
 
 namespace yas
 {
-    
-
     class audio_unit_node : public audio_node
     {
        public:

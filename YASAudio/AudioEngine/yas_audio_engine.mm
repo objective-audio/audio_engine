@@ -478,18 +478,18 @@ audio_engine::start_result audio_engine::start_render()
 {
     if (const auto graph = _impl->graph()) {
         if (graph->is_running()) {
-            return start_result(start_error_type::already_running);
+            return start_result(start_error_t::already_running);
         }
     }
 
     if (const auto offline_output_node = _impl->offline_output_node()) {
         if (offline_output_node->is_running()) {
-            return start_result(start_error_type::already_running);
+            return start_result(start_error_t::already_running);
         }
     }
 
     if (!_impl->prepare()) {
-        return start_result(start_error_type::prepare_failure);
+        return start_result(start_error_t::prepare_failure);
     }
 
     _impl->graph()->start();
@@ -502,24 +502,24 @@ audio_engine::start_result audio_engine::start_offline_render(const offline_rend
 {
     if (const auto graph = _impl->graph()) {
         if (graph->is_running()) {
-            return start_result(start_error_type::already_running);
+            return start_result(start_error_t::already_running);
         }
     }
 
     if (const auto offline_output_node = _impl->offline_output_node()) {
         if (offline_output_node->is_running()) {
-            return start_result(start_error_type::already_running);
+            return start_result(start_error_t::already_running);
         }
     }
 
     if (!_impl->prepare()) {
-        return start_result(start_error_type::prepare_failure);
+        return start_result(start_error_t::prepare_failure);
     }
 
     const auto offline_output_node = _impl->offline_output_node();
 
     if (!offline_output_node) {
-        return start_result(start_error_type::offline_output_not_found);
+        return start_result(start_error_t::offline_output_not_found);
     }
 
     auto result =
@@ -528,7 +528,7 @@ audio_engine::start_result audio_engine::start_offline_render(const offline_rend
     if (result) {
         return start_result(nullptr);
     } else {
-        return start_result(start_error_type::offline_output_starting_failure);
+        return start_result(start_error_t::offline_output_starting_failure);
     }
 }
 

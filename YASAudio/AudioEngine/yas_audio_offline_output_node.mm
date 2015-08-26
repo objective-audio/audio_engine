@@ -88,11 +88,11 @@ audio_offline_output_node::start_result audio_offline_output_node::_start(const 
                                                                           const completion_f &completion_func)
 {
     if (_impl->queue_container) {
-        return start_result(start_error_type::already_running);
+        return start_result(start_error_t::already_running);
     } else if (auto connection = input_connection(0)) {
         auto key = _impl->push_completion_function(completion_func);
         if (!key) {
-            return start_result(start_error_type::prepare_failure);
+            return start_result(start_error_t::prepare_failure);
         }
 
         auto weak_node = _impl->weak_node;
@@ -179,7 +179,7 @@ audio_offline_output_node::start_result audio_offline_output_node::_start(const 
         YASRelease(blockOperation);
         YASRelease(queue);
     } else {
-        return start_result(start_error_type::connection_not_found);
+        return start_result(start_error_t::connection_not_found);
     }
     return start_result(nullptr);
 }

@@ -11,13 +11,13 @@ namespace yas
 {
     class audio_offline_output_node : public audio_node
     {
-        enum class start_error_type {
+        enum class start_error_t {
             already_running,
             prepare_failure,
             connection_not_found,
         };
 
-        using start_result = yas::result<std::nullptr_t, start_error_type>;
+        using start_result = yas::result<std::nullptr_t, start_error_t>;
 
        public:
         using render_f =

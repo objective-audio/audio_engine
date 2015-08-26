@@ -16,14 +16,14 @@ namespace yas
     class audio_pcm_buffer
     {
        public:
-        enum class copy_error_type {
+        enum class copy_error_t {
             invalid_argument,
             invalid_abl,
             invalid_format,
             out_of_range,
         };
 
-        using copy_result = result<UInt32, copy_error_type>;
+        using copy_result = result<UInt32, copy_error_t>;
 
         static audio_pcm_buffer_sptr create(const audio_format_sptr &format, AudioBufferList *abl);
         static audio_pcm_buffer_sptr create(const audio_format_sptr &format, const UInt32 frame_capacity);

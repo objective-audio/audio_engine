@@ -45,12 +45,12 @@ namespace yas
     class audio_file_reader : public audio_file
     {
        public:
-        enum class create_error_type : UInt32 {
+        enum class create_error_t : UInt32 {
             invalid_argument,
             open_failed,
         };
 
-        enum class read_error_type : UInt32 {
+        enum class read_error_t : UInt32 {
             closed,
             invalid_argument,
             invalid_format,
@@ -58,8 +58,8 @@ namespace yas
             tell_failed,
         };
 
-        using create_result = result<audio_file_reader_sptr, create_error_type>;
-        using read_result = result<std::nullptr_t, read_error_type>;
+        using create_result = result<audio_file_reader_sptr, create_error_t>;
+        using read_result = result<std::nullptr_t, read_error_t>;
 
         static create_result create(const CFURLRef file_url, const pcm_format pcm_format = pcm_format::float32,
                                     const bool interleaved = false);
@@ -76,18 +76,18 @@ namespace yas
         audio_file_reader &operator=(audio_file_reader &&) = delete;
     };
 
-    std::string to_string(const audio_file_reader::create_error_type &);
-    std::string to_string(const audio_file_reader::read_error_type &);
+    std::string to_string(const audio_file_reader::create_error_t &);
+    std::string to_string(const audio_file_reader::read_error_t &);
 
     class audio_file_writer : public audio_file
     {
        public:
-        enum class create_error_type : UInt32 {
+        enum class create_error_t : UInt32 {
             invalid_argument,
             create_failed,
         };
 
-        enum class write_error_type : UInt32 {
+        enum class write_error_t : UInt32 {
             closed,
             invalid_argument,
             invalid_format,
@@ -95,8 +95,8 @@ namespace yas
             tell_failed,
         };
 
-        using create_result = result<audio_file_writer_sptr, create_error_type>;
-        using write_result = result<std::nullptr_t, write_error_type>;
+        using create_result = result<audio_file_writer_sptr, create_error_t>;
+        using write_result = result<std::nullptr_t, write_error_t>;
 
         static create_result create(const CFURLRef file_url, const CFStringRef file_type,
                                     const CFDictionaryRef settings, const pcm_format pcm_format = pcm_format::float32,
@@ -114,6 +114,6 @@ namespace yas
         audio_file_writer &operator=(audio_file_writer &&) = delete;
     };
 
-    std::string to_string(const audio_file_writer::create_error_type &);
-    std::string to_string(const audio_file_writer::write_error_type &);
+    std::string to_string(const audio_file_writer::create_error_t &);
+    std::string to_string(const audio_file_writer::write_error_t &);
 }

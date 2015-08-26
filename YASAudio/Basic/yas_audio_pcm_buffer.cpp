@@ -130,13 +130,13 @@ namespace yas
         }
     };
 
-    using get_abl_info_result = result<yas::abl_info, audio_pcm_buffer::copy_error_type>;
+    using get_abl_info_result = result<yas::abl_info, audio_pcm_buffer::copy_error_t>;
 }
 
 static get_abl_info_result get_abl_info(const AudioBufferList *abl, const UInt32 sample_byte_count)
 {
     if (!abl || sample_byte_count == 0 || sample_byte_count > 8) {
-        return get_abl_info_result(audio_pcm_buffer::copy_error_type::invalid_argument);
+        return get_abl_info_result(audio_pcm_buffer::copy_error_t::invalid_argument);
     }
 
     const UInt32 buffer_count = abl->mNumberBuffers;
@@ -149,7 +149,7 @@ static get_abl_info_result get_abl_info(const AudioBufferList *abl, const UInt32
         if (data_info.frame_length == 0) {
             data_info.frame_length = frame_length;
         } else if (data_info.frame_length != frame_length) {
-            return get_abl_info_result(audio_pcm_buffer::copy_error_type::invalid_abl);
+            return get_abl_info_result(audio_pcm_buffer::copy_error_t::invalid_abl);
         }
         data_info.channel_count += stride;
     }
@@ -400,7 +400,7 @@ audio_pcm_buffer::copy_result audio_pcm_buffer::copy_from(const audio_pcm_buffer
 
     if ((from_format->pcm_format() != format()->pcm_format()) ||
         (from_format->channel_count() != format()->channel_count())) {
-        return audio_pcm_buffer::copy_result(audio_pcm_buffer::copy_error_type::invalid_format);
+        return audio_pcm_buffer::copy_result(audio_pcm_buffer::copy_error_t::invalid_format);
     }
 
     const AudioBufferList *from_abl = from_buffer->audio_buffer_list();
@@ -473,7 +473,7 @@ audio_pcm_buffer::copy_result yas::copy(const AudioBufferList *from_abl, AudioBu
 
     if ((from_start_frame + copy_length) > from_info.frame_length ||
         (to_start_frame + copy_length) > to_info.frame_length || from_info.channel_count > to_info.channel_count) {
-        return audio_pcm_buffer::copy_result(audio_pcm_buffer::copy_error_type::out_of_range);
+        return audio_pcm_buffer::copy_result(audio_pcm_buffer::copy_error_t::out_of_range);
     }
 
     for (UInt32 ch_idx = 0; ch_idx < from_info.channel_count; ch_idx++) {
