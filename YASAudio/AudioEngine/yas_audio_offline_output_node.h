@@ -11,15 +11,14 @@ namespace yas
 {
     class audio_offline_output_node : public audio_node
     {
-        enum class start_error_type {
+       public:
+        enum class start_error_t {
             already_running,
             prepare_failure,
             connection_not_found,
         };
 
-        using start_result = yas::result<std::nullptr_t, start_error_type>;
-
-       public:
+        using start_result = yas::result<std::nullptr_t, start_error_t>;
         using render_f =
             std::function<void(const audio_pcm_buffer_sptr &buffer, const audio_time_sptr &when, bool &stop)>;
         using completion_f = std::function<void(const bool cancelled)>;
@@ -48,6 +47,8 @@ namespace yas
         class private_access;
         friend private_access;
     };
+
+    std::string to_string(const audio_offline_output_node::start_error_t &error);
 }
 
 #include "yas_audio_offline_output_node_private_access.h"

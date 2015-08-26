@@ -23,7 +23,7 @@ namespace yas
         using notification_subject_type = subject<notification_method>;
         using notification_observer_ptr = observer<notification_method>::shared_ptr;
 
-        enum class start_error_type {
+        enum class start_error_t {
             already_running,
             prepare_failure,
             connection_not_found,
@@ -31,7 +31,7 @@ namespace yas
             offline_output_starting_failure,
         };
 
-        using start_result = yas::result<std::nullptr_t, start_error_type>;
+        using start_result = yas::result<std::nullptr_t, start_error_t>;
 
         using offline_render_f = audio_offline_output_node::render_f;
         using offline_completion_f = audio_offline_output_node::completion_f;
@@ -80,6 +80,8 @@ namespace yas
         class private_access;
         friend private_access;
     };
+
+    std::string to_string(const audio_engine::start_error_t &error);
 }
 
 #include "yas_audio_engine_private_access.h"

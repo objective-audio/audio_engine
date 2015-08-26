@@ -227,7 +227,8 @@ void audio_unit_node::update_connections()
                     if (auto core = node->node_core()) {
                         if (auto connection = core->input_connection(render_parameters.in_bus_number)) {
                             if (auto source_node = connection->source_node()) {
-                                auto buffer = yas::audio_pcm_buffer::create(connection->format(), render_parameters.io_data);
+                                auto buffer =
+                                    yas::audio_pcm_buffer::create(connection->format(), render_parameters.io_data);
                                 auto when = yas::audio_time::create(*render_parameters.io_time_stamp,
                                                                     connection->format()->sample_rate());
                                 source_node->render(buffer, connection->source_bus(), when);
