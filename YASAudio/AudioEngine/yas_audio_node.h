@@ -48,8 +48,8 @@ namespace yas
 
         audio_format_sptr input_format(const uint32_t bus_idx);
         audio_format_sptr output_format(const uint32_t bus_idx);
-        virtual bus_result next_available_input_bus() const;
-        virtual bus_result next_available_output_bus() const;
+        virtual bus_result_t next_available_input_bus() const;
+        virtual bus_result_t next_available_output_bus() const;
         virtual bool is_available_input_bus(const uint32_t bus_idx) const;
         virtual bool is_available_output_bus(const uint32_t bus_idx) const;
         audio_engine_sptr engine() const;

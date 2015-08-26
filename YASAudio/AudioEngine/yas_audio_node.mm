@@ -122,7 +122,7 @@ audio_format_sptr audio_node::output_format(const uint32_t bus_idx)
     return nullptr;
 }
 
-bus_result audio_node::next_available_input_bus() const
+bus_result_t audio_node::next_available_input_bus() const
 {
     auto key = min_empty_key(_impl->input_connections());
     if (key && *key < input_bus_count()) {
@@ -131,7 +131,7 @@ bus_result audio_node::next_available_input_bus() const
     return std::experimental::nullopt;
 }
 
-bus_result audio_node::next_available_output_bus() const
+bus_result_t audio_node::next_available_output_bus() const
 {
     auto key = min_empty_key(_impl->output_connections());
     if (key && *key < output_bus_count()) {

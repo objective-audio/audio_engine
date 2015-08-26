@@ -66,7 +66,7 @@ namespace yas
         render_id render_id;
     };
 
-    using bus_result = std::experimental::optional<uint32_t>;
+    using bus_result_t = std::experimental::optional<uint32_t>;
     using abl_uptr = std::unique_ptr<AudioBufferList, std::function<void(AudioBufferList *)>>;
     using abl_data_uptr = std::unique_ptr<std::vector<std::vector<UInt8>>>;
     using channel_map = std::vector<uint32_t>;
