@@ -586,3 +586,19 @@ std::set<audio_connection_sptr> &audio_engine::_connections() const
 {
     return _impl->connections();
 }
+
+std::string to_string(const audio_engine::start_error_t &error)
+{
+    switch (error) {
+        case audio_engine::start_error_t::already_running:
+            return "already_running";
+        case audio_engine::start_error_t::prepare_failure:
+            return "prepare_failure";
+        case audio_engine::start_error_t::connection_not_found:
+            return "connection_not_found";
+        case audio_engine::start_error_t::offline_output_not_found:
+            return "offline_output_not_found";
+        case audio_engine::start_error_t::offline_output_starting_failure:
+            return "offline_output_starting_failure";
+    }
+}

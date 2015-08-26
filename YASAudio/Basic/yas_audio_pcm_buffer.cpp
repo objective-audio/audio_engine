@@ -548,3 +548,17 @@ bool yas::is_equal_structure(const AudioBufferList *abl1, const AudioBufferList 
 
     return true;
 }
+
+std::string to_string(const audio_pcm_buffer::copy_error_t &error)
+{
+    switch (error) {
+        case audio_pcm_buffer::copy_error_t::invalid_argument:
+            return "invalid_argument";
+        case audio_pcm_buffer::copy_error_t::invalid_abl:
+            return "invalid_abl";
+        case audio_pcm_buffer::copy_error_t::invalid_format:
+            return "invalid_format";
+        case audio_pcm_buffer::copy_error_t::out_of_range:
+            return "out_of_range";
+    }
+}

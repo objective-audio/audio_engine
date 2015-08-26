@@ -80,6 +80,8 @@ namespace yas
         class private_access;
         friend private_access;
     };
+
+    std::string to_string(const audio_engine::start_error_t &error);
 }
 
 #include "yas_audio_engine_private_access.h"

@@ -207,3 +207,15 @@ bool audio_offline_output_node::is_running() const
 {
     return !!_impl->queue_container;
 }
+
+std::string to_string(const audio_offline_output_node::start_error_t &error)
+{
+    switch (error) {
+        case audio_offline_output_node::start_error_t::already_running:
+            return "already_running";
+        case audio_offline_output_node::start_error_t::prepare_failure:
+            return "prepare_failure";
+        case audio_offline_output_node::start_error_t::connection_not_found:
+            return "connection_not_found";
+    }
+}

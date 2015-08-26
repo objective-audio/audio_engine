@@ -85,4 +85,6 @@ namespace yas
     std::pair<abl_uptr, abl_data_uptr> allocate_audio_buffer_list(const UInt32 buffer_count, const UInt32 channel_count,
                                                                   const UInt32 size);
     bool is_equal_structure(const AudioBufferList *abl1, const AudioBufferList *abl2);
+
+    std::string to_string(const audio_pcm_buffer::copy_error_t &error);
 }
