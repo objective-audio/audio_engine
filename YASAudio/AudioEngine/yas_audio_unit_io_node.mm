@@ -49,7 +49,7 @@ void audio_unit_io_node::set_output_channel_map(const channel_map &channel_map)
     _impl->output_channel_map = channel_map;
 
     if (const auto unit = audio_unit()) {
-        unit->set_channel_map(std::make_unique<std::vector<uint32_t>>(channel_map), kAudioUnitScope_Output);
+        unit->set_channel_map(channel_map, kAudioUnitScope_Output);
     }
 }
 
@@ -63,7 +63,7 @@ void audio_unit_io_node::set_input_channel_map(const channel_map &channel_map)
     _impl->input_channel_map = channel_map;
 
     if (const auto unit = audio_unit()) {
-        unit->set_channel_map(std::make_unique<std::vector<uint32_t>>(channel_map), kAudioUnitScope_Input);
+        unit->set_channel_map(channel_map, kAudioUnitScope_Input);
     }
 }
 
@@ -85,8 +85,8 @@ void audio_unit_io_node::prepare_parameters()
     super_class::prepare_parameters();
 
     auto unit = audio_unit();
-    unit->set_channel_map(std::make_unique<channel_map>(_impl->output_channel_map), kAudioUnitScope_Output);
-    unit->set_channel_map(std::make_unique<channel_map>(_impl->input_channel_map), kAudioUnitScope_Input);
+    unit->set_channel_map(_impl->output_channel_map, kAudioUnitScope_Output);
+    unit->set_channel_map(_impl->input_channel_map, kAudioUnitScope_Input);
 }
 
 bus_result_t audio_unit_io_node::next_available_output_bus() const
