@@ -50,11 +50,11 @@ namespace yas
         void set_input_callback(const render_f &callback);  // for io
 
         template <typename T>
-        void set_property_data(const std::unique_ptr<std::vector<T>> &data, const AudioUnitPropertyID property_id,
+        void set_property_data(const std::vector<T> &data, const AudioUnitPropertyID property_id,
                                const AudioUnitScope scope, const AudioUnitElement element);
         template <typename T>
-        std::unique_ptr<std::vector<T>> property_data(const AudioUnitPropertyID property_id, const AudioUnitScope scope,
-                                                      const AudioUnitElement element) const;
+        std::vector<T> property_data(const AudioUnitPropertyID property_id, const AudioUnitScope scope,
+                                     const AudioUnitElement element) const;
 
         void set_input_format(const AudioStreamBasicDescription &asbd, const UInt32 bus);
         void set_output_format(const AudioStreamBasicDescription &asbd, const UInt32 bus);
