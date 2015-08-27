@@ -448,9 +448,9 @@ audio_unit_parameter_map audio_unit::create_parameters(const AudioUnitScope scop
 {
     auto parameter_list = audio_unit::property_data<AudioUnitParameterID>(kAudioUnitProperty_ParameterList, scope, 0);
 
-    if (parameter_list && parameter_list->size() > 0) {
+    if (parameter_list.size() > 0) {
         auto parameters = audio_unit_parameter_map();
-        for (const AudioUnitParameterID &parameter_id : *parameter_list) {
+        for (const AudioUnitParameterID &parameter_id : parameter_list) {
             auto parameter = audio_unit::create_parameter(parameter_id, scope);
             parameters.insert(std::make_pair(parameter_id, std::move(parameter)));
         }
@@ -587,10 +587,7 @@ void audio_unit::set_channel_map(const channel_map_uptr &channel_map, const Audi
                                  " : invalid component type. (not kAudioUnitType_Output)");
     }
 
-    const uint32_t *map_data = channel_map->data();
-    uint32_t size = static_cast<uint32_t>(channel_map->size()) * sizeof(uint32_t);
-    yas_raise_if_au_error(
-        AudioUnitSetProperty(_impl->au_instance, kAudioOutputUnitProperty_ChannelMap, scope, 0, map_data, size));
+    set_property_data(*channel_map, kAudioOutputUnitProperty_ChannelMap, scope, 0);
 }
 
 channel_map_uptr audio_unit::channel_map(const AudioUnitScope scope)
@@ -601,7 +598,8 @@ channel_map_uptr audio_unit::channel_map(const AudioUnitScope scope)
     }
 
     if (channel_map_count(scope) > 0) {
-        return property_data<uint32_t>(kAudioOutputUnitProperty_ChannelMap, scope, 0);
+        return std::make_unique<yas::channel_map>(
+            property_data<uint32_t>(kAudioOutputUnitProperty_ChannelMap, scope, 0));
     }
 
     return nullptr;

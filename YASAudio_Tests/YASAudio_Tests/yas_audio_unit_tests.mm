@@ -221,24 +221,21 @@
 
     auto format = yas::audio_format::create(sampleRate, channels, yas::pcm_format::float32, false);
 
-    auto set_data = std::make_unique<std::vector<AudioStreamBasicDescription>>();
-    set_data->push_back(format->stream_description());
+    std::vector<AudioStreamBasicDescription> set_data;
+    set_data.push_back(format->stream_description());
 
     auto converter_unit = yas::audio_unit::create(kAudioUnitType_FormatConverter, kAudioUnitSubType_AUConverter);
 
-    XCTAssertNoThrow(converter_unit->set_property_data(set_data, property_id, scope, element));
+    converter_unit->set_property_data(set_data, property_id, scope, element);
 
-    std::shared_ptr<std::vector<AudioStreamBasicDescription>> get_data;
+    std::vector<AudioStreamBasicDescription> get_data;
 
     XCTAssertNoThrow(get_data =
                          converter_unit->property_data<AudioStreamBasicDescription>(property_id, scope, element));
 
-    XCTAssertTrue(YASAudioIsEqualASBD(&set_data->at(0), &get_data->at(0)));
+    XCTAssertTrue(YASAudioIsEqualASBD(&set_data.at(0), &get_data.at(0)));
 
-    std::unique_ptr<std::vector<AudioStreamBasicDescription>> null_data = nullptr;
-    XCTAssertThrows(converter_unit->set_property_data(null_data, property_id, scope, element));
-
-    auto zero_data = std::make_unique<std::vector<AudioStreamBasicDescription>>();
+    std::vector<AudioStreamBasicDescription> zero_data;
     XCTAssertThrows(converter_unit->set_property_data(zero_data, property_id, scope, element));
 }
 
