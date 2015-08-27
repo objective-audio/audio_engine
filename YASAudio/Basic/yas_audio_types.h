@@ -70,7 +70,6 @@ namespace yas
     using abl_uptr = std::unique_ptr<AudioBufferList, std::function<void(AudioBufferList *)>>;
     using abl_data_uptr = std::unique_ptr<std::vector<std::vector<UInt8>>>;
     using channel_map = std::vector<uint32_t>;
-    using channel_map_uptr = std::unique_ptr<channel_map>;
 
     class objc_strong_container;
     class objc_weak_container;

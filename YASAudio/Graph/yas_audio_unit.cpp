@@ -580,29 +580,24 @@ bool audio_unit::is_running() const
     return is_running != 0;
 }
 
-void audio_unit::set_channel_map(const channel_map_uptr &channel_map, const AudioUnitScope scope)
+void audio_unit::set_channel_map(const yas::channel_map &map, const AudioUnitScope scope)
 {
     if (_impl->acd.componentType != kAudioUnitType_Output) {
         throw std::runtime_error(std::string(__PRETTY_FUNCTION__) +
                                  " : invalid component type. (not kAudioUnitType_Output)");
     }
 
-    set_property_data(*channel_map, kAudioOutputUnitProperty_ChannelMap, scope, 0);
+    set_property_data(map, kAudioOutputUnitProperty_ChannelMap, scope, 0);
 }
 
-channel_map_uptr audio_unit::channel_map(const AudioUnitScope scope)
+channel_map audio_unit::channel_map(const AudioUnitScope scope)
 {
     if (_impl->acd.componentType != kAudioUnitType_Output) {
         throw std::runtime_error(std::string(__PRETTY_FUNCTION__) +
                                  " : invalid component type. (not kAudioUnitType_Output)");
     }
 
-    if (channel_map_count(scope) > 0) {
-        return std::make_unique<yas::channel_map>(
-            property_data<uint32_t>(kAudioOutputUnitProperty_ChannelMap, scope, 0));
-    }
-
-    return nullptr;
+    return property_data<uint32_t>(kAudioOutputUnitProperty_ChannelMap, scope, 0);
 }
 
 uint32_t audio_unit::channel_map_count(const AudioUnitScope scope)

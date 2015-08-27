@@ -75,16 +75,16 @@ namespace yas
         void set_element_count(const UInt32 &count, const AudioUnitScope &scope);  // for mixer
         UInt32 element_count(const AudioUnitScope &scope) const;                   // for mixer
 
-        void set_enable_output(const bool enable_output);                            // for io
-        bool is_enable_output() const;                                               // for io
-        void set_enable_input(const bool enable_input);                              // for io
-        bool is_enable_input() const;                                                // for io
-        bool has_output() const;                                                     // for io
-        bool has_input() const;                                                      // for io
-        bool is_running() const;                                                     // for io
-        void set_channel_map(const channel_map_uptr &, const AudioUnitScope scope);  // for io
-        channel_map_uptr channel_map(const AudioUnitScope scope);                    // for io
-        uint32_t channel_map_count(const AudioUnitScope scope);                      // for io
+        void set_enable_output(const bool enable_output);                          // for io
+        bool is_enable_output() const;                                             // for io
+        void set_enable_input(const bool enable_input);                            // for io
+        bool is_enable_input() const;                                              // for io
+        bool has_output() const;                                                   // for io
+        bool has_input() const;                                                    // for io
+        bool is_running() const;                                                   // for io
+        void set_channel_map(const channel_map &map, const AudioUnitScope scope);  // for io
+        channel_map channel_map(const AudioUnitScope scope);                       // for io
+        uint32_t channel_map_count(const AudioUnitScope scope);                    // for io
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
         void set_current_device(const AudioDeviceID &device);  // for io
         const AudioDeviceID current_device() const;            // for io
