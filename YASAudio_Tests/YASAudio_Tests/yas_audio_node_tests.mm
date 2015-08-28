@@ -161,8 +161,8 @@
 
     auto lambda = [self, expectation, relay_node, input_connections, output_connection]() {
         auto node_core = yas::audio_node::private_access::node_core(relay_node);
-        XCTAssertEqual(node_core->output_connections.size(), 1);
-        XCTAssertEqual(node_core->input_connections.size(), 2);
+        XCTAssertEqual(node_core->output_connections().size(), 1);
+        XCTAssertEqual(node_core->input_connections().size(), 2);
         XCTAssertEqual(node_core->output_connection(0), output_connection);
         XCTAssertEqual(node_core->input_connection(0), input_connections.at(0));
         XCTAssertEqual(node_core->input_connection(1), input_connections.at(1));

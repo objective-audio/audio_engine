@@ -7,6 +7,20 @@
 
 namespace yas
 {
+    class audio_node_core::private_access
+    {
+       public:
+        static void set_input_connections(const audio_node_core_sptr &node, const audio_connection_wmap &connections)
+        {
+            node->set_input_connections(connections);
+        }
+
+        static void set_output_connections(const audio_node_core_sptr &node, const audio_connection_wmap &connections)
+        {
+            node->set_output_connections(connections);
+        }
+    };
+
     class audio_node::private_access
     {
        public:

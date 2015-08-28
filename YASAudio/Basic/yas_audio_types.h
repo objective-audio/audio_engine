@@ -107,6 +107,7 @@ namespace yas
     using audio_node_sptr = std::shared_ptr<audio_node>;
     using audio_connection_sptr = std::shared_ptr<audio_connection>;
     using audio_connection_wptr = std::weak_ptr<audio_connection>;
+    using audio_connection_smap = std::map<uint32_t, audio_connection_sptr>;
     using audio_connection_wmap = std::map<uint32_t, audio_connection_wptr>;
     using audio_connection_wmap_sptr = std::shared_ptr<audio_connection_wmap>;
     using audio_unit_node_sptr = std::shared_ptr<audio_unit_node>;

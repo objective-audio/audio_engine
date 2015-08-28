@@ -13,23 +13,53 @@
 
 using namespace yas;
 
-audio_node_core::audio_node_core() = default;
+class audio_node_core::impl
+{
+   public:
+    audio_connection_wmap input_connections;
+    audio_connection_wmap output_connections;
+};
+
+audio_node_core::audio_node_core() : _impl(std::make_unique<impl>())
+{
+}
+
 audio_node_core::~audio_node_core() = default;
+
+audio_connection_smap audio_node_core::input_connections() const
+{
+    return yas::lock_values(_impl->input_connections);
+}
+
+audio_connection_smap audio_node_core::output_connections() const
+{
+    return yas::lock_values(_impl->output_connections);
+}
 
 audio_connection_sptr audio_node_core::input_connection(const uint32_t bus_idx)
 {
-    if (input_connections.count(bus_idx) > 0) {
-        return input_connections.at(bus_idx).lock();
+    if (_impl->input_connections.count(bus_idx) > 0) {
+        return _impl->input_connections.at(bus_idx).lock();
     }
     return nullptr;
 }
 
 audio_connection_sptr audio_node_core::output_connection(const uint32_t bus_idx)
 {
-    if (output_connections.count(bus_idx) > 0) {
-        return output_connections.at(bus_idx).lock();
+    if (_impl->output_connections.count(bus_idx) > 0) {
+        return _impl->output_connections.at(bus_idx).lock();
     }
     return nullptr;
+}
+
+void audio_node_core::set_input_connections(const audio_connection_wmap &connections)
+{
+    _impl->input_connections = connections;
+}
+
+void audio_node_core::set_output_connections(const audio_connection_wmap &connections)
+{
+    _impl->output_connections = connections;
 }
 
 #pragma mark - impl
@@ -199,8 +229,9 @@ void audio_node::prepare_node_core(const audio_node_core_sptr &node_core)
     if (!node_core) {
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
     }
-    node_core->input_connections = _impl->input_connections();
-    node_core->output_connections = _impl->output_connections();
+
+    audio_node_core::private_access::set_input_connections(node_core, _impl->input_connections());
+    audio_node_core::private_access::set_output_connections(node_core, _impl->output_connections());
 }
 
 void audio_node::update_node_core()

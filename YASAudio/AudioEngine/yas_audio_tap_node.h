@@ -29,8 +29,8 @@ namespace yas
 
         audio_connection_sptr input_connection_on_render(const uint32_t bus_idx) const;
         audio_connection_sptr output_connection_on_render(const uint32_t bus_idx) const;
-        audio_connection_wmap &input_connections_on_render() const;
-        audio_connection_wmap &output_connections_on_render() const;
+        audio_connection_smap input_connections_on_render() const;
+        audio_connection_smap output_connections_on_render() const;
         void render_source(const audio_pcm_buffer_sptr &buffer, const uint32_t bus_idx, const audio_time_sptr &when);
 
        protected:

@@ -100,14 +100,14 @@ audio_connection_sptr audio_tap_node::output_connection_on_render(const uint32_t
     return _impl->node_core_on_render()->output_connection(bus_idx);
 }
 
-audio_connection_wmap &audio_tap_node::input_connections_on_render() const
+audio_connection_smap audio_tap_node::input_connections_on_render() const
 {
-    return _impl->node_core_on_render()->input_connections;
+    return _impl->node_core_on_render()->input_connections();
 }
 
-audio_connection_wmap &audio_tap_node::output_connections_on_render() const
+audio_connection_smap audio_tap_node::output_connections_on_render() const
 {
-    return _impl->node_core_on_render()->output_connections;
+    return _impl->node_core_on_render()->output_connections();
 }
 
 void audio_tap_node::render_source(const audio_pcm_buffer_sptr &buffer, const uint32_t bus_idx,
