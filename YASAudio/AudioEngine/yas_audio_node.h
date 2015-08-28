@@ -22,17 +22,26 @@ namespace yas
         audio_node_core();
         virtual ~audio_node_core();
 
-        audio_connection_wmap input_connections;
-        audio_connection_wmap output_connections;
-
+        audio_connection_smap input_connections() const;
+        audio_connection_smap output_connections() const;
         audio_connection_sptr input_connection(const uint32_t bus_idx);
         audio_connection_sptr output_connection(const uint32_t bus_idx);
 
        private:
+        class impl;
+        std::unique_ptr<impl> _impl;
+
         audio_node_core(const audio_node_core &) = delete;
         audio_node_core(audio_node_core &&) = delete;
         audio_node_core &operator=(const audio_node_core &) = delete;
         audio_node_core &operator=(audio_node_core &&) = delete;
+
+        void set_input_connections(const audio_connection_wmap &);
+        void set_output_connections(const audio_connection_wmap &);
+
+       public:
+        class private_access;
+        friend private_access;
     };
 
     using audio_node_core_sptr = std::shared_ptr<audio_node_core>;

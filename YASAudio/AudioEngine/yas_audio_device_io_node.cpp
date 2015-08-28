@@ -114,7 +114,7 @@ void audio_device_io_node::update_connections()
                 node->_impl->node_core_on_render = core;
 
                 if (output_buffer) {
-                    const auto connections = yas::lock_values(core->input_connections);
+                    const auto connections = core->input_connections();
                     if (connections.count(0) > 0) {
                         const auto &connection = connections.at(0);
                         if (const auto source_node = connection->source_node()) {
@@ -126,7 +126,7 @@ void audio_device_io_node::update_connections()
                 }
 
                 if (const auto device_io = weak_device_io.lock()) {
-                    const auto connections = yas::lock_values(core->output_connections);
+                    const auto connections = core->output_connections();
                     if (connections.count(0) > 0) {
                         const auto &connection = connections.at(0);
                         if (const auto destination_node = connection->destination_node()) {
@@ -216,7 +216,8 @@ bool audio_device_io_node::_validate_connections() const
 
 #pragma mark - render
 
-void audio_device_io_node::render(const audio_pcm_buffer_sptr &buffer, const uint32_t bus_idx, const audio_time_sptr &when)
+void audio_device_io_node::render(const audio_pcm_buffer_sptr &buffer, const uint32_t bus_idx,
+                                  const audio_time_sptr &when)
 {
     super_class::render(buffer, bus_idx, when);
 
