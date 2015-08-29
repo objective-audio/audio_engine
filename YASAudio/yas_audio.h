@@ -6,6 +6,7 @@
 #pragma once
 
 #include "yas_audio_types.h"
+#include "yas_stl_utils.h"
 #include "yas_cf_utils.h"
 #include "yas_observing.h"
 #include "yas_objc_container.h"

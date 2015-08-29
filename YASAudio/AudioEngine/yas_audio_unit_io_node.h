@@ -15,12 +15,7 @@ namespace yas
        public:
         virtual ~audio_unit_io_node();
 
-#if TARGET_OS_IPHONE
-/*
-@property (nonatomic, strong) NSArray *outputChannelAssignments;
-@property (nonatomic, strong) NSArray *inputChannelAssignments;
- */
-#elif TARGET_OS_MAC
+#if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
         void set_device(const audio_device_sptr &device);
         audio_device_sptr device() const;
 #endif

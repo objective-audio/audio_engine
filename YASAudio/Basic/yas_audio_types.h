@@ -55,6 +55,7 @@ namespace yas
     };
 
     std::string to_string(const yas::direction &);
+    std::string to_string(const AudioUnitScope scope);
 
     struct render_parameters {
         render_type in_render_type;

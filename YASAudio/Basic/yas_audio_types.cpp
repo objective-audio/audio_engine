@@ -4,6 +4,7 @@
 //
 
 #include "yas_audio_types.h"
+#import <AudioToolbox/AudioToolbox.h>
 
 using namespace yas;
 
@@ -15,4 +16,28 @@ std::string yas::to_string(const direction &dir)
         case direction::input:
             return "input";
     }
+}
+
+std::string yas::to_string(const AudioUnitScope scope)
+{
+    switch (scope) {
+        case kAudioUnitScope_Global:
+            return "global";
+        case kAudioUnitScope_Input:
+            return "input";
+        case kAudioUnitScope_Output:
+            return "output";
+        case kAudioUnitScope_Group:
+            return "group";
+        case kAudioUnitScope_Part:
+            return "part";
+        case kAudioUnitScope_Note:
+            return "note";
+        case kAudioUnitScope_Layer:
+            return "layer";
+        case kAudioUnitScope_LayerItem:
+            return "layer_item";
+    }
+
+    return "unknown";
 }
