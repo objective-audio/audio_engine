@@ -109,6 +109,18 @@ bool audio_unit_io_node::is_available_output_bus(const uint32_t bus_idx) const
     return false;
 }
 
+Float64 audio_unit_io_node::device_sample_rate() const
+{
+#if TARGET_OS_IPHONE
+    return [AVAudioSession sharedInstance].sampleRate;
+#elif TARGET_OS_MAC
+    if (const auto &dev = device()) {
+        return dev->nominal_sample_rate();
+    }
+    return 0;
+#endif
+}
+
 uint32_t audio_unit_io_node::output_device_channel_count() const
 {
 #if TARGET_OS_IPHONE
