@@ -16,9 +16,10 @@ namespace yas
                                        const AudioUnitScope scope, const AudioUnitElement element)
     {
         const UInt32 size = static_cast<UInt32>(data.size());
+        const void *raw_data = size > 0 ? data.data() : nullptr;
 
         yas_raise_if_au_error(
-            AudioUnitSetProperty(audio_unit_instance(), property_id, scope, element, data.data(), size * sizeof(T)));
+            AudioUnitSetProperty(audio_unit_instance(), property_id, scope, element, raw_data, size * sizeof(T)));
     }
 
     template <typename T>
