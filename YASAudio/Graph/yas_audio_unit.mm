@@ -8,6 +8,10 @@
 #include "yas_audio_pcm_buffer.h"
 #include "yas_cf_utils.h"
 
+#if TARGET_OS_IPHONE
+#import <AVFoundation/AVFoundation.h>
+#endif
+
 using namespace yas;
 
 const OSType audio_unit::sub_type_default_io()
