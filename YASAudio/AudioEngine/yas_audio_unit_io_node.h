@@ -28,6 +28,9 @@ namespace yas
         void set_input_channel_map(const channel_map &map, const AudioUnitElement element);
         const channel_map &input_channel_map(const AudioUnitElement element) const;
 
+        uint32_t output_device_channel_count() const;
+        uint32_t input_device_channel_count() const;
+
        protected:
         audio_unit_io_node();
 

@@ -109,6 +109,30 @@ bool audio_unit_io_node::is_available_output_bus(const uint32_t bus_idx) const
     return false;
 }
 
+uint32_t audio_unit_io_node::output_device_channel_count() const
+{
+#if TARGET_OS_IPHONE
+    return static_cast<uint32_t>([AVAudioSession sharedInstance].outputNumberOfChannels);
+#elif TARGET_OS_MAC
+    if (const auto &dev = device()) {
+        return dev->output_channel_count();
+    }
+    return 0;
+#endif
+}
+
+uint32_t audio_unit_io_node::input_device_channel_count() const
+{
+#if TARGET_OS_IPHONE
+    return static_cast<uint32_t>([AVAudioSession sharedInstance].inputNumberOfChannels);
+#elif TARGET_OS_MAC
+    if (const auto &dev = device()) {
+        return dev->input_channel_count();
+    }
+    return 0;
+#endif
+}
+
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
 
 void audio_unit_io_node::set_device(const audio_device_sptr &device)
