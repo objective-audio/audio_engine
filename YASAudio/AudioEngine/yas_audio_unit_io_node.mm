@@ -26,8 +26,9 @@ using namespace yas;
 class audio_unit_io_node::impl
 {
    public:
-    channel_map output_channel_map;
-    channel_map input_channel_map;
+    static const uint32_t channel_map_count = 2;
+    channel_map output_channel_map[channel_map_count];
+    channel_map input_channel_map[channel_map_count];
 };
 
 audio_unit_io_node::audio_unit_io_node()
@@ -44,32 +45,32 @@ audio_unit_io_node::audio_unit_io_node()
 
 audio_unit_io_node::~audio_unit_io_node() = default;
 
-void audio_unit_io_node::set_output_channel_map(const channel_map &channel_map)
+void audio_unit_io_node::set_output_channel_map(const channel_map &channel_map, const AudioUnitElement element)
 {
-    _impl->output_channel_map = channel_map;
+    _impl->output_channel_map[element] = channel_map;
 
     if (const auto unit = audio_unit()) {
-        unit->set_channel_map(channel_map, kAudioUnitScope_Output);
+        unit->set_channel_map(channel_map, kAudioUnitScope_Output, element);
     }
 }
 
-const channel_map &audio_unit_io_node::output_channel_map() const
+const channel_map &audio_unit_io_node::output_channel_map(const AudioUnitElement element) const
 {
-    return _impl->output_channel_map;
+    return _impl->output_channel_map[element];
 }
 
-void audio_unit_io_node::set_input_channel_map(const channel_map &channel_map)
+void audio_unit_io_node::set_input_channel_map(const channel_map &channel_map, const AudioUnitElement element)
 {
-    _impl->input_channel_map = channel_map;
+    _impl->input_channel_map[element] = channel_map;
 
     if (const auto unit = audio_unit()) {
-        unit->set_channel_map(channel_map, kAudioUnitScope_Input);
+        unit->set_channel_map(channel_map, kAudioUnitScope_Input, element);
     }
 }
 
-const channel_map &audio_unit_io_node::input_channel_map() const
+const channel_map &audio_unit_io_node::input_channel_map(const AudioUnitElement element) const
 {
-    return _impl->input_channel_map;
+    return _impl->input_channel_map[element];
 }
 
 void audio_unit_io_node::prepare_audio_unit()
@@ -85,8 +86,10 @@ void audio_unit_io_node::prepare_parameters()
     super_class::prepare_parameters();
 
     auto unit = audio_unit();
-    unit->set_channel_map(_impl->output_channel_map, kAudioUnitScope_Output);
-    unit->set_channel_map(_impl->input_channel_map, kAudioUnitScope_Input);
+    unit->set_channel_map(_impl->output_channel_map[0], kAudioUnitScope_Output, 0);
+    unit->set_channel_map(_impl->output_channel_map[1], kAudioUnitScope_Output, 1);
+    unit->set_channel_map(_impl->input_channel_map[0], kAudioUnitScope_Input, 0);
+    unit->set_channel_map(_impl->input_channel_map[1], kAudioUnitScope_Input, 1);
 }
 
 bus_result_t audio_unit_io_node::next_available_output_bus() const
@@ -226,6 +229,26 @@ uint32_t audio_unit_output_node::output_bus_count() const
     return 0;
 }
 
+void audio_unit_output_node::set_output_channel_map(const channel_map &map)
+{
+    return audio_unit_io_node::set_output_channel_map(map, 0);
+}
+
+const channel_map &audio_unit_output_node::output_channel_map() const
+{
+    return audio_unit_io_node::output_channel_map(0);
+}
+
+void audio_unit_output_node::set_input_channel_map(const channel_map &map)
+{
+    return audio_unit_io_node::set_input_channel_map(map, 0);
+}
+
+const channel_map &audio_unit_output_node::input_channel_map() const
+{
+    return audio_unit_io_node::input_channel_map(0);
+}
+
 #pragma mark - audio_unit_input_node
 
 class audio_unit_input_node::impl
@@ -306,6 +329,26 @@ void audio_unit_input_node::update_connections()
         unit->set_input_callback(nullptr);
         _impl->input_buffer = nullptr;
     }
+}
+
+void audio_unit_input_node::set_output_channel_map(const channel_map &map)
+{
+    return audio_unit_io_node::set_output_channel_map(map, 1);
+}
+
+const channel_map &audio_unit_input_node::output_channel_map() const
+{
+    return audio_unit_io_node::output_channel_map(1);
+}
+
+void audio_unit_input_node::set_input_channel_map(const channel_map &map)
+{
+    return audio_unit_io_node::set_input_channel_map(map, 1);
+}
+
+const channel_map &audio_unit_input_node::input_channel_map() const
+{
+    return audio_unit_io_node::input_channel_map(1);
 }
 
 /*

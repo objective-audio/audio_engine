@@ -15,11 +15,6 @@ namespace yas
        public:
         virtual ~audio_unit_io_node();
 
-        void set_output_channel_map(const channel_map &);
-        const channel_map &output_channel_map() const;
-        void set_input_channel_map(const channel_map &);
-        const channel_map &input_channel_map() const;
-
 #if TARGET_OS_IPHONE
 /*
 @property (nonatomic, strong) NSArray *outputChannelAssignments;
@@ -32,6 +27,11 @@ namespace yas
 
         virtual bus_result_t next_available_output_bus() const override;
         virtual bool is_available_output_bus(const uint32_t bus_idx) const override;
+
+        void set_output_channel_map(const channel_map &map, const AudioUnitElement element);
+        const channel_map &output_channel_map(const AudioUnitElement element) const;
+        void set_input_channel_map(const channel_map &map, const AudioUnitElement element);
+        const channel_map &input_channel_map(const AudioUnitElement element) const;
 
        protected:
         audio_unit_io_node();
@@ -54,6 +54,11 @@ namespace yas
         virtual uint32_t input_bus_count() const override;
         virtual uint32_t output_bus_count() const override;
 
+        void set_output_channel_map(const channel_map &map);
+        const channel_map &output_channel_map() const;
+        void set_input_channel_map(const channel_map &map);
+        const channel_map &input_channel_map() const;
+
        protected:
         void prepare_audio_unit() override;
 
@@ -70,6 +75,11 @@ namespace yas
         virtual uint32_t output_bus_count() const override;
 
         void update_connections() override;
+
+        void set_output_channel_map(const channel_map &map);
+        const channel_map &output_channel_map() const;
+        void set_input_channel_map(const channel_map &map);
+        const channel_map &input_channel_map() const;
 
        protected:
         audio_unit_input_node();

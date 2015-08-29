@@ -82,9 +82,9 @@ namespace yas
         bool has_output() const;                                                   // for io
         bool has_input() const;                                                    // for io
         bool is_running() const;                                                   // for io
-        void set_channel_map(const channel_map &map, const AudioUnitScope scope);  // for io
-        channel_map channel_map(const AudioUnitScope scope);                       // for io
-        uint32_t channel_map_count(const AudioUnitScope scope);                    // for io
+        void set_channel_map(const channel_map &map, const AudioUnitScope scope, const AudioUnitElement element);  // for io
+        channel_map channel_map(const AudioUnitScope scope, const AudioUnitElement element);                       // for io
+        uint32_t channel_map_count(const AudioUnitScope scope, const AudioUnitElement element);                    // for io
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
         void set_current_device(const AudioDeviceID &device);  // for io
         const AudioDeviceID current_device() const;            // for io

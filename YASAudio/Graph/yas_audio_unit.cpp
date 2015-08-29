@@ -580,31 +580,32 @@ bool audio_unit::is_running() const
     return is_running != 0;
 }
 
-void audio_unit::set_channel_map(const yas::channel_map &map, const AudioUnitScope scope)
+void audio_unit::set_channel_map(const yas::channel_map &map, const AudioUnitScope scope,
+                                 const AudioUnitElement element)
 {
     if (_impl->acd.componentType != kAudioUnitType_Output) {
         throw std::runtime_error(std::string(__PRETTY_FUNCTION__) +
                                  " : invalid component type. (not kAudioUnitType_Output)");
     }
 
-    set_property_data(map, kAudioOutputUnitProperty_ChannelMap, scope, 0);
+    set_property_data(map, kAudioOutputUnitProperty_ChannelMap, scope, element);
 }
 
-channel_map audio_unit::channel_map(const AudioUnitScope scope)
+channel_map audio_unit::channel_map(const AudioUnitScope scope, const AudioUnitElement element)
 {
     if (_impl->acd.componentType != kAudioUnitType_Output) {
         throw std::runtime_error(std::string(__PRETTY_FUNCTION__) +
                                  " : invalid component type. (not kAudioUnitType_Output)");
     }
 
-    return property_data<uint32_t>(kAudioOutputUnitProperty_ChannelMap, scope, 0);
+    return property_data<uint32_t>(kAudioOutputUnitProperty_ChannelMap, scope, element);
 }
 
-uint32_t audio_unit::channel_map_count(const AudioUnitScope scope)
+uint32_t audio_unit::channel_map_count(const AudioUnitScope scope, const AudioUnitElement element)
 {
     UInt32 byte_size = 0;
-    yas_raise_if_au_error(AudioUnitGetPropertyInfo(_impl->au_instance, kAudioOutputUnitProperty_ChannelMap, scope, 0,
-                                                   &byte_size, nullptr));
+    yas_raise_if_au_error(AudioUnitGetPropertyInfo(_impl->au_instance, kAudioOutputUnitProperty_ChannelMap, scope,
+                                                   element, &byte_size, nullptr));
 
     if (byte_size) {
         return byte_size / sizeof(uint32_t);
