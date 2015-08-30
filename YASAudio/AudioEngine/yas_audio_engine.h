@@ -20,8 +20,8 @@ namespace yas
             configulation_change,
         };
 
-        using notification_subject_t = subject<notification_method>;
-        using notification_observer_ptr = observer<notification_method>::sptr;
+        using subject_t = subject<notification_method>;
+        using observer_ptr = observer<notification_method>::sptr;
 
         enum class start_error_t {
             already_running,
@@ -58,7 +58,7 @@ namespace yas
                                           const offline_completion_f &completion_function);
         void stop();
 
-        notification_subject_t &subject() const;
+        subject_t &subject() const;
 
        private:
         class impl;
