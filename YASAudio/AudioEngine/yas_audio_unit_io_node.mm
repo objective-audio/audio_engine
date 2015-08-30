@@ -267,21 +267,23 @@ void audio_unit_input_node::update_connections()
                 input_buffer->set_frame_length(render_parameters.in_number_frames);
                 render_parameters.io_data = input_buffer->audio_buffer_list();
 
-                auto core = input_node->node_core();
-                auto connection = core->output_connection(1);
-                auto format = connection->format();
-                auto time = audio_time::create(*render_parameters.io_time_stamp, format->sample_rate());
-                input_node->set_render_time_on_render(time);
+                if (const auto core = input_node->node_core()) {
+                    if (auto connection = core->output_connection(1)) {
+                        auto format = connection->format();
+                        auto time = audio_time::create(*render_parameters.io_time_stamp, format->sample_rate());
+                        input_node->set_render_time_on_render(time);
 
-                if (auto io_unit = input_node->audio_unit()) {
-                    render_parameters.in_bus_number = 1;
-                    io_unit->audio_unit_render(render_parameters);
-                }
+                        if (auto io_unit = input_node->audio_unit()) {
+                            render_parameters.in_bus_number = 1;
+                            io_unit->audio_unit_render(render_parameters);
+                        }
 
-                auto destination_node = connection->destination_node();
+                        auto destination_node = connection->destination_node();
 
-                if (auto *input_tap_node = dynamic_cast<audio_input_tap_node *>(destination_node.get())) {
-                    input_tap_node->render(input_buffer, 0, time);
+                        if (auto *input_tap_node = dynamic_cast<audio_input_tap_node *>(destination_node.get())) {
+                            input_tap_node->render(input_buffer, 0, time);
+                        }
+                    }
                 }
             }
         });
