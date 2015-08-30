@@ -150,7 +150,7 @@ void audio_unit_node::set_input_parameter_value(const AudioUnitParameterID param
     auto &input_parameters = _impl->parameters.at(kAudioUnitScope_Input);
     if (input_parameters.count(parameter_id) > 0) {
         auto &parameter = input_parameters.at(parameter_id);
-        parameter.set_value(value, 0);
+        parameter.set_value(value, element);
         if (auto &audio_unit = _impl->_audio_unit) {
             audio_unit->set_parameter_value(value, parameter_id, kAudioUnitScope_Input, element);
         }
@@ -172,7 +172,7 @@ void audio_unit_node::set_output_parameter_value(const AudioUnitParameterID para
     auto &output_parameters = _impl->parameters.at(kAudioUnitScope_Output);
     if (output_parameters.count(parameter_id) > 0) {
         auto &parameter = output_parameters.at(parameter_id);
-        parameter.set_value(value, 0);
+        parameter.set_value(value, element);
         if (auto &audio_unit = _impl->_audio_unit) {
             audio_unit->set_parameter_value(value, parameter_id, kAudioUnitScope_Output, element);
         }

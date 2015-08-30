@@ -145,7 +145,7 @@ Float32 audio_unit_parameter::value(const AudioUnitElement element) const
 
 void audio_unit_parameter::set_value(const AudioUnitParameterValue value, const AudioUnitElement element)
 {
-    _impl->values.insert(std::make_pair(element, value));
+    _impl->values[element] = value;
 }
 
 const std::map<AudioUnitElement, AudioUnitParameterValue> &audio_unit_parameter::values() const
