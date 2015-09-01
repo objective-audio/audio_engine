@@ -38,6 +38,7 @@
 		B65BAA1A1A62C6A600E7C3D8 /* NSString+YASAudio.m in Sources */ = {isa = PBXBuildFile; fileRef = B65BAA141A62C6A600E7C3D8 /* NSString+YASAudio.m */; };
 		B65BAA1E1A62C6B000E7C3D8 /* YASWeakSupport.m in Sources */ = {isa = PBXBuildFile; fileRef = B65BAA1D1A62C6B000E7C3D8 /* YASWeakSupport.m */; };
 		B65BE8D21AB66D9C0073A07E /* YASAudioEngineEffectsSampleViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = B65BE8D11AB66D9C0073A07E /* YASAudioEngineEffectsSampleViewController.mm */; };
+		B6669FF71B91633700AC5234 /* YASAudioEngineIOSampleSelectionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B6669FF61B91633700AC5234 /* YASAudioEngineIOSampleSelectionViewController.m */; };
 		B681DA3A1B7712D90010FCAE /* yas_objc_container.mm in Sources */ = {isa = PBXBuildFile; fileRef = B681DA391B7712D90010FCAE /* yas_objc_container.mm */; };
 		B681DA431B7713100010FCAE /* yas_audio_file_utils.mm in Sources */ = {isa = PBXBuildFile; fileRef = B681DA401B7713100010FCAE /* yas_audio_file_utils.mm */; };
 		B681DA441B7713100010FCAE /* yas_audio_file.mm in Sources */ = {isa = PBXBuildFile; fileRef = B681DA421B7713100010FCAE /* yas_audio_file.mm */; };
@@ -62,6 +63,7 @@
 		B6C8FD7B1B3B06E100DB72E7 /* yas_audio_unit.mm in Sources */ = {isa = PBXBuildFile; fileRef = B6C8FD6B1B3B06E100DB72E7 /* yas_audio_unit.mm */; };
 		B6C8FD7C1B3B06E100DB72E7 /* yas_audio_unit_parameter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6C8FD6E1B3B06E100DB72E7 /* yas_audio_unit_parameter.cpp */; };
 		B6C8FD881B3B071700DB72E7 /* yas_audio_channel_route.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6C8FD7E1B3B071700DB72E7 /* yas_audio_channel_route.cpp */; };
+		B6D35D521B90B2B700AB5B9B /* YASAudioSliderCell.m in Sources */ = {isa = PBXBuildFile; fileRef = B6D35D511B90B2B700AB5B9B /* YASAudioSliderCell.m */; };
 		B6E52AE61ABD362300D2C45A /* YASAudioEngineEffectsSampleEditViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = B6E52AE51ABD362300D2C45A /* YASAudioEngineEffectsSampleEditViewController.mm */; };
 		B6E52AE91ABD3B5500D2C45A /* YASAudioEngineSampleParameterCell.mm in Sources */ = {isa = PBXBuildFile; fileRef = B6E52AE81ABD3B5500D2C45A /* YASAudioEngineSampleParameterCell.mm */; };
 		B6E8272A1A88504B00751441 /* YASAudioUnitParameter.m in Sources */ = {isa = PBXBuildFile; fileRef = B6E827291A88504B00751441 /* YASAudioUnitParameter.m */; };
@@ -140,6 +142,8 @@
 		B65BAA1F1A62C6D600E7C3D8 /* YASAudioTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YASAudioTypes.h; sourceTree = "<group>"; };
 		B65BE8D01AB66D9C0073A07E /* YASAudioEngineEffectsSampleViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YASAudioEngineEffectsSampleViewController.h; sourceTree = "<group>"; };
 		B65BE8D11AB66D9C0073A07E /* YASAudioEngineEffectsSampleViewController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = YASAudioEngineEffectsSampleViewController.mm; sourceTree = "<group>"; };
+		B6669FF51B91633700AC5234 /* YASAudioEngineIOSampleSelectionViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YASAudioEngineIOSampleSelectionViewController.h; sourceTree = "<group>"; };
+		B6669FF61B91633700AC5234 /* YASAudioEngineIOSampleSelectionViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YASAudioEngineIOSampleSelectionViewController.m; sourceTree = "<group>"; };
 		B681DA361B7712720010FCAE /* yas_audio.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yas_audio.h; sourceTree = "<group>"; };
 		B681DA381B7712D90010FCAE /* yas_objc_container.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = yas_objc_container.h; path = Basic/yas_objc_container.h; sourceTree = "<group>"; };
 		B681DA391B7712D90010FCAE /* yas_objc_container.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = yas_objc_container.mm; path = Basic/yas_objc_container.mm; sourceTree = "<group>"; };
@@ -204,6 +208,8 @@
 		B6C8FD6E1B3B06E100DB72E7 /* yas_audio_unit_parameter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = yas_audio_unit_parameter.cpp; sourceTree = "<group>"; };
 		B6C8FD7D1B3B071700DB72E7 /* yas_audio_channel_route.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = yas_audio_channel_route.h; path = AudioDevice/yas_audio_channel_route.h; sourceTree = "<group>"; };
 		B6C8FD7E1B3B071700DB72E7 /* yas_audio_channel_route.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = yas_audio_channel_route.cpp; path = AudioDevice/yas_audio_channel_route.cpp; sourceTree = "<group>"; };
+		B6D35D501B90B2B700AB5B9B /* YASAudioSliderCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YASAudioSliderCell.h; sourceTree = "<group>"; };
+		B6D35D511B90B2B700AB5B9B /* YASAudioSliderCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YASAudioSliderCell.m; sourceTree = "<group>"; };
 		B6E52AE41ABD362300D2C45A /* YASAudioEngineEffectsSampleEditViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YASAudioEngineEffectsSampleEditViewController.h; sourceTree = "<group>"; };
 		B6E52AE51ABD362300D2C45A /* YASAudioEngineEffectsSampleEditViewController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = YASAudioEngineEffectsSampleEditViewController.mm; sourceTree = "<group>"; };
 		B6E52AE71ABD3B5500D2C45A /* YASAudioEngineSampleParameterCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YASAudioEngineSampleParameterCell.h; sourceTree = "<group>"; };
@@ -258,6 +264,10 @@
 				B6AE9EFA1A8CF28000A4B935 /* YASAudioGraphSampleViewController.mm */,
 				B61A24D71AB06F1400883B4A /* YASAudioEngineIOSampleViewController.h */,
 				B61E57CF1B77A07B008620ED /* YASAudioEngineIOSampleViewController.mm */,
+				B6669FF51B91633700AC5234 /* YASAudioEngineIOSampleSelectionViewController.h */,
+				B6669FF61B91633700AC5234 /* YASAudioEngineIOSampleSelectionViewController.m */,
+				B6D35D501B90B2B700AB5B9B /* YASAudioSliderCell.h */,
+				B6D35D511B90B2B700AB5B9B /* YASAudioSliderCell.m */,
 				B65BE8D01AB66D9C0073A07E /* YASAudioEngineEffectsSampleViewController.h */,
 				B65BE8D11AB66D9C0073A07E /* YASAudioEngineEffectsSampleViewController.mm */,
 				B6E52AE41ABD362300D2C45A /* YASAudioEngineEffectsSampleEditViewController.h */,
@@ -588,6 +598,7 @@
 				B6E52AE91ABD3B5500D2C45A /* YASAudioEngineSampleParameterCell.mm in Sources */,
 				B681DA431B7713100010FCAE /* yas_audio_file_utils.mm in Sources */,
 				B6C8FD731B3B06E100DB72E7 /* yas_audio_pcm_buffer.cpp in Sources */,
+				B6D35D521B90B2B700AB5B9B /* YASAudioSliderCell.m in Sources */,
 				B6A1DA2B1B934B2700B0F36F /* yas_audio_types.cpp in Sources */,
 				B6C8FD751B3B06E100DB72E7 /* yas_exception.cpp in Sources */,
 				B65BE8D21AB66D9C0073A07E /* YASAudioEngineEffectsSampleViewController.mm in Sources */,
@@ -604,6 +615,7 @@
 				B6C8FD7B1B3B06E100DB72E7 /* yas_audio_unit.mm in Sources */,
 				B681DA5B1B77132F0010FCAE /* yas_audio_offline_output_node.mm in Sources */,
 				B62ED52C1A6280C0007DDE96 /* AppDelegate.m in Sources */,
+				B6669FF71B91633700AC5234 /* YASAudioEngineIOSampleSelectionViewController.m in Sources */,
 				B62ED5291A6280C0007DDE96 /* main.m in Sources */,
 				B60C4A361B823C8E006F1B5E /* yas_any.cpp in Sources */,
 				B6841AAF1AAC249C0035C704 /* YASAudioUtility.c in Sources */,

@@ -5,6 +5,6 @@
 
 #import <UIKit/UIKit.h>
 
-@interface YASAudioEngineIOSampleViewController : UIViewController
+@interface YASAudioEngineIOSampleViewController : UITableViewController
 
 @end
