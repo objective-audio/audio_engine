@@ -8,6 +8,11 @@
 
 using namespace yas;
 
+uint32_t yas::to_uint32(const yas::direction &dir)
+{
+    return static_cast<uint32_t>(dir);
+}
+
 std::string yas::to_string(const direction &dir)
 {
     switch (dir) {

@@ -584,8 +584,7 @@ bool audio_unit::is_running() const
     return is_running != 0;
 }
 
-void audio_unit::set_channel_map(const yas::channel_map &map, const AudioUnitScope scope,
-                                 const AudioUnitElement element)
+void audio_unit::set_channel_map(const channel_map_t &map, const AudioUnitScope scope, const AudioUnitElement element)
 {
     if (_impl->acd.componentType != kAudioUnitType_Output) {
         throw std::runtime_error(std::string(__PRETTY_FUNCTION__) +
@@ -595,7 +594,7 @@ void audio_unit::set_channel_map(const yas::channel_map &map, const AudioUnitSco
     set_property_data(map, kAudioOutputUnitProperty_ChannelMap, scope, element);
 }
 
-channel_map audio_unit::channel_map(const AudioUnitScope scope, const AudioUnitElement element)
+channel_map_t audio_unit::channel_map(const AudioUnitScope scope, const AudioUnitElement element)
 {
     if (_impl->acd.componentType != kAudioUnitType_Output) {
         throw std::runtime_error(std::string(__PRETTY_FUNCTION__) +

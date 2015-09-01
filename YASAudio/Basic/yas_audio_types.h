@@ -54,6 +54,7 @@ namespace yas
         input = 1,
     };
 
+    uint32_t to_uint32(const yas::direction &);
     std::string to_string(const yas::direction &);
     std::string to_string(const AudioUnitScope scope);
 
@@ -70,7 +71,7 @@ namespace yas
     using bus_result_t = std::experimental::optional<uint32_t>;
     using abl_uptr = std::unique_ptr<AudioBufferList, std::function<void(AudioBufferList *)>>;
     using abl_data_uptr = std::unique_ptr<std::vector<std::vector<UInt8>>>;
-    using channel_map = std::vector<uint32_t>;
+    using channel_map_t = std::vector<uint32_t>;
 
     class objc_strong_container;
     class objc_weak_container;
