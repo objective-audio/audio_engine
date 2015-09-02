@@ -13,7 +13,7 @@ using namespace yas;
 
 #if TARGET_OS_IPHONE
 
-channel_map yas::to_channel_map(const NSArray *channelAssignments, const AudioUnitScope scope)
+channel_map_t yas::to_channel_map(const NSArray *channelAssignments, const AudioUnitScope scope)
 {
     AVAudioSession *audioSession = [AVAudioSession sharedInstance];
     AVAudioSessionRouteDescription *routeDesc = audioSession.currentRoute;
@@ -33,10 +33,10 @@ channel_map yas::to_channel_map(const NSArray *channelAssignments, const AudioUn
     }
 
     if (channel_count == 0) {
-        return channel_map();
+        return channel_map_t();
     }
 
-    channel_map map;
+    channel_map_t map;
     map.reserve(channel_count);
 
     for (AVAudioSessionPortDescription *portDescription in portDescriptions) {

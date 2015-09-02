@@ -23,20 +23,19 @@ namespace yas
         virtual bus_result_t next_available_output_bus() const override;
         virtual bool is_available_output_bus(const uint32_t bus_idx) const override;
 
-        void set_output_channel_map(const channel_map &map, const AudioUnitElement element);
-        const channel_map &output_channel_map(const AudioUnitElement element) const;
-        void set_input_channel_map(const channel_map &map, const AudioUnitElement element);
-        const channel_map &input_channel_map(const AudioUnitElement element) const;
+        void set_channel_map(const channel_map_t &map, const yas::direction dir);
+        const channel_map_t &channel_map(const yas::direction dir) const;
 
         Float64 device_sample_rate() const;
         uint32_t output_device_channel_count() const;
         uint32_t input_device_channel_count() const;
 
+        virtual void update_connections() override;
+
        protected:
         audio_unit_io_node();
 
-        void prepare_audio_unit() override;
-        void prepare_parameters() override;
+        virtual void prepare_audio_unit() override;
 
        private:
         class impl;
@@ -53,13 +52,11 @@ namespace yas
         virtual uint32_t input_bus_count() const override;
         virtual uint32_t output_bus_count() const override;
 
-        void set_output_channel_map(const channel_map &map);
-        const channel_map &output_channel_map() const;
-        void set_input_channel_map(const channel_map &map);
-        const channel_map &input_channel_map() const;
+        void set_channel_map(const channel_map_t &map);
+        const channel_map_t &channel_map() const;
 
        protected:
-        void prepare_audio_unit() override;
+        virtual void prepare_audio_unit() override;
 
        private:
         using super_class = audio_unit_io_node;
@@ -73,17 +70,15 @@ namespace yas
         virtual uint32_t input_bus_count() const override;
         virtual uint32_t output_bus_count() const override;
 
-        void update_connections() override;
+        void set_channel_map(const channel_map_t &map);
+        const channel_map_t &channel_map() const;
 
-        void set_output_channel_map(const channel_map &map);
-        const channel_map &output_channel_map() const;
-        void set_input_channel_map(const channel_map &map);
-        const channel_map &input_channel_map() const;
+        virtual void update_connections() override;
 
        protected:
         audio_unit_input_node();
 
-        void prepare_audio_unit() override;
+        virtual void prepare_audio_unit() override;
 
        private:
         class impl;

@@ -33,7 +33,7 @@ static const AudioComponentDescription baseAcd = {.componentType = kAudioUnitTyp
     yas::audio_unit_node_sptr _effect_node;
     yas::audio_connection_sptr _through_connection;
     yas::audio_tap_node_sptr _tap_node;
-    std::vector<yas::channel_map> _channel_maps;
+    std::vector<yas::channel_map_t> _channel_maps;
 }
 
 - (void)viewDidLoad
@@ -56,7 +56,7 @@ static const AudioComponentDescription baseAcd = {.componentType = kAudioUnitTyp
 
 - (void)setupAudioEngine
 {
-    _channel_maps = std::vector<yas::channel_map>({{}, {0, 0}, {0, 1}, {1, 0}, {1, 1}});
+    _channel_maps = std::vector<yas::channel_map_t>({{}, {0, 0}, {0, 1}, {1, 0}, {1, 1}});
 
     if (_audio_units.size() == 0) {
         AudioComponent component = NULL;
@@ -220,7 +220,7 @@ static const AudioComponentDescription baseAcd = {.componentType = kAudioUnitTyp
             [self replaceEffectNodeWithAudioComponentDescription:&acd];
         } break;
         case YASAudioEngineEffectsSampleSectionChannelMap: {
-            _output_node->set_input_channel_map(_channel_maps.at(indexPath.row));
+            _output_node->set_channel_map(_channel_maps.at(indexPath.row));
         } break;
     }
 

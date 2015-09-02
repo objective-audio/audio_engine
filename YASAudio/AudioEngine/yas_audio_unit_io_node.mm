@@ -27,8 +27,7 @@ class audio_unit_io_node::impl
 {
    public:
     static const uint32_t channel_map_count = 2;
-    channel_map output_channel_map[channel_map_count];
-    channel_map input_channel_map[channel_map_count];
+    channel_map_t channel_map[2];
 };
 
 audio_unit_io_node::audio_unit_io_node()
@@ -45,32 +44,18 @@ audio_unit_io_node::audio_unit_io_node()
 
 audio_unit_io_node::~audio_unit_io_node() = default;
 
-void audio_unit_io_node::set_output_channel_map(const channel_map &channel_map, const AudioUnitElement element)
+void audio_unit_io_node::set_channel_map(const channel_map_t &map, const yas::direction dir)
 {
-    _impl->output_channel_map[element] = channel_map;
+    _impl->channel_map[yas::to_uint32(dir)] = map;
 
     if (const auto unit = audio_unit()) {
-        unit->set_channel_map(channel_map, kAudioUnitScope_Output, element);
+        unit->set_channel_map(map, kAudioUnitScope_Output, yas::to_uint32(dir));
     }
 }
 
-const channel_map &audio_unit_io_node::output_channel_map(const AudioUnitElement element) const
+const channel_map_t &audio_unit_io_node::channel_map(const yas::direction dir) const
 {
-    return _impl->output_channel_map[element];
-}
-
-void audio_unit_io_node::set_input_channel_map(const channel_map &channel_map, const AudioUnitElement element)
-{
-    _impl->input_channel_map[element] = channel_map;
-
-    if (const auto unit = audio_unit()) {
-        unit->set_channel_map(channel_map, kAudioUnitScope_Input, element);
-    }
-}
-
-const channel_map &audio_unit_io_node::input_channel_map(const AudioUnitElement element) const
-{
-    return _impl->input_channel_map[element];
+    return _impl->channel_map[yas::to_uint32(dir)];
 }
 
 void audio_unit_io_node::prepare_audio_unit()
@@ -79,17 +64,6 @@ void audio_unit_io_node::prepare_audio_unit()
     unit->set_enable_output(true);
     unit->set_enable_input(true);
     unit->set_maximum_frames_per_slice(4096);
-}
-
-void audio_unit_io_node::prepare_parameters()
-{
-    super_class::prepare_parameters();
-
-    auto unit = audio_unit();
-    unit->set_channel_map(_impl->output_channel_map[0], kAudioUnitScope_Output, 0);
-    unit->set_channel_map(_impl->output_channel_map[1], kAudioUnitScope_Output, 1);
-    unit->set_channel_map(_impl->input_channel_map[0], kAudioUnitScope_Input, 0);
-    unit->set_channel_map(_impl->input_channel_map[1], kAudioUnitScope_Input, 1);
 }
 
 bus_result_t audio_unit_io_node::next_available_output_bus() const
@@ -163,6 +137,40 @@ audio_device_sptr audio_unit_io_node::device() const
 
 #endif
 
+void audio_unit_io_node::update_connections()
+{
+    super_class::update_connections();
+
+    auto unit = audio_unit();
+
+    auto update_channel_map = [](channel_map_t &map, const yas::audio_format_sptr format, const uint32_t dev_ch_count) {
+        if (map.size() > 0) {
+            if (format) {
+                const uint32_t ch_count = format->channel_count();
+                if (map.size() != ch_count) {
+                    map.resize(ch_count, -1);
+                }
+                for (auto &value : map) {
+                    if (value >= dev_ch_count) {
+                        value = -1;
+                    }
+                }
+            }
+        }
+    };
+
+    const auto output_idx = yas::to_uint32(yas::direction::output);
+    auto &output_map = _impl->channel_map[output_idx];
+    update_channel_map(output_map, input_format(output_idx), output_device_channel_count());
+
+    const auto input_idx = yas::to_uint32(yas::direction::input);
+    auto &input_map = _impl->channel_map[input_idx];
+    update_channel_map(input_map, output_format(input_idx), input_device_channel_count());
+
+    unit->set_channel_map(output_map, kAudioUnitScope_Output, output_idx);
+    unit->set_channel_map(input_map, kAudioUnitScope_Output, input_idx);
+}
+
 #pragma mark - audio_unit_output_node
 
 audio_unit_output_node_sptr audio_unit_output_node::create()
@@ -190,24 +198,14 @@ uint32_t audio_unit_output_node::output_bus_count() const
     return 0;
 }
 
-void audio_unit_output_node::set_output_channel_map(const channel_map &map)
+void audio_unit_output_node::set_channel_map(const channel_map_t &map)
 {
-    return audio_unit_io_node::set_output_channel_map(map, 0);
+    super_class::set_channel_map(map, yas::direction::output);
 }
 
-const channel_map &audio_unit_output_node::output_channel_map() const
+const channel_map_t &audio_unit_output_node::channel_map() const
 {
-    return audio_unit_io_node::output_channel_map(0);
-}
-
-void audio_unit_output_node::set_input_channel_map(const channel_map &map)
-{
-    return audio_unit_io_node::set_input_channel_map(map, 0);
-}
-
-const channel_map &audio_unit_output_node::input_channel_map() const
-{
-    return audio_unit_io_node::input_channel_map(0);
+    return super_class::channel_map(yas::direction::output);
 }
 
 #pragma mark - audio_unit_input_node
@@ -249,6 +247,16 @@ uint32_t audio_unit_input_node::output_bus_count() const
     return 1;
 }
 
+void audio_unit_input_node::set_channel_map(const channel_map_t &map)
+{
+    super_class::set_channel_map(map, yas::direction::input);
+}
+
+const channel_map_t &audio_unit_input_node::channel_map() const
+{
+    return super_class::channel_map(yas::direction::input);
+}
+
 void audio_unit_input_node::update_connections()
 {
     super_class::update_connections();
@@ -268,7 +276,7 @@ void audio_unit_input_node::update_connections()
                 render_parameters.io_data = input_buffer->audio_buffer_list();
 
                 if (const auto core = input_node->node_core()) {
-                    if (auto connection = core->output_connection(1)) {
+                    if (const auto connection = core->output_connection(1)) {
                         auto format = connection->format();
                         auto time = audio_time::create(*render_parameters.io_time_stamp, format->sample_rate());
                         input_node->set_render_time_on_render(time);
@@ -293,64 +301,3 @@ void audio_unit_input_node::update_connections()
         _impl->input_buffer = nullptr;
     }
 }
-
-void audio_unit_input_node::set_output_channel_map(const channel_map &map)
-{
-    return audio_unit_io_node::set_output_channel_map(map, 1);
-}
-
-const channel_map &audio_unit_input_node::output_channel_map() const
-{
-    return audio_unit_io_node::output_channel_map(1);
-}
-
-void audio_unit_input_node::set_input_channel_map(const channel_map &map)
-{
-    return audio_unit_io_node::set_input_channel_map(map, 1);
-}
-
-const channel_map &audio_unit_input_node::input_channel_map() const
-{
-    return audio_unit_io_node::input_channel_map(1);
-}
-
-/*
-
- #pragma mark -
-
-#pragma mark -
-
-@implementation NSArray (YASAudioUnitIONode)
-
-- (NSData *)yas_channelMapData
-{
-    NSUInteger count = self.count;
-    if (count > 0) {
-        NSMutableData *data = [NSMutableData dataWithLength:self.count * sizeof(UInt32)];
-        UInt32 *ptr = data.mutableBytes;
-        for (UInt32 i = 0; i < count; i++) {
-            NSNumber *numberValue = self[i];
-            ptr[i] = numberValue.uint32Value;
-        }
-        return data;
-    } else {
-        return nil;
-    }
-}
-
-+ (NSArray *)yas_channelMapArrayWithData:(NSData *)data
-{
-    if (data.length > 0) {
-        NSUInteger count = data.length / sizeof(UInt32);
-        NSMutableArray *array = [NSMutableArray array];
-        const UInt32 *ptr = data.bytes;
-        for (UInt32 i = 0; i < count; i++) {
-            [array addObject:@(ptr[i])];
-        }
-        return YASAutorelease([array copy]);
-    } else {
-        return nil;
-    }
-}
-
-@end*/

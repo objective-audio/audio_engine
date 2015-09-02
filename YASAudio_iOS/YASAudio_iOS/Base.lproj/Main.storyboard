@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="7706" systemVersion="15A216g" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="INd-f6-EIx">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="7706" systemVersion="15A263e" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="INd-f6-EIx">
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="7703"/>
     </dependencies>
@@ -54,7 +54,7 @@
                                         </tableViewCellContentView>
                                         <animations/>
                                         <connections>
-                                            <segue destination="45e-hU-bpM" kind="show" id="cZA-Ns-nn2"/>
+                                            <segue destination="hE7-8D-Vxl" kind="show" id="KPM-EO-0Ep"/>
                                         </connections>
                                     </tableViewCell>
                                     <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" textLabel="KCa-Vc-d48" style="IBUITableViewCellStyleDefault" id="ZoT-qb-YBh">
@@ -140,59 +140,6 @@
             </objects>
             <point key="canvasLocation" x="1485" y="325"/>
         </scene>
-        <!--Audio EngineIO Sample View Controller-->
-        <scene sceneID="wpI-sV-Gcs">
-            <objects>
-                <viewController id="45e-hU-bpM" customClass="YASAudioEngineIOSampleViewController" sceneMemberID="viewController">
-                    <layoutGuides>
-                        <viewControllerLayoutGuide type="top" id="e0T-FT-Jqo"/>
-                        <viewControllerLayoutGuide type="bottom" id="Fge-Jg-F2Z"/>
-                    </layoutGuides>
-                    <view key="view" contentMode="scaleToFill" id="hq2-dl-73f">
-                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <subviews>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Volume" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Qpu-gf-AWh">
-                                <rect key="frame" x="16" y="72" width="57" height="21"/>
-                                <animations/>
-                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
-                                <nil key="highlightedColor"/>
-                            </label>
-                            <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" minValue="0.0" maxValue="1" translatesAutoresizingMaskIntoConstraints="NO" id="ubp-Ic-yYc">
-                                <rect key="frame" x="14" y="101" width="572" height="31"/>
-                                <animations/>
-                                <connections>
-                                    <action selector="volumeSliderChanged:" destination="45e-hU-bpM" eventType="valueChanged" id="w8f-yj-Iso"/>
-                                </connections>
-                            </slider>
-                            <progressView opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="750" progressViewStyle="bar" progress="0.5" translatesAutoresizingMaskIntoConstraints="NO" id="NYo-8T-wlv">
-                                <rect key="frame" x="16" y="158" width="568" height="3"/>
-                                <animations/>
-                            </progressView>
-                        </subviews>
-                        <animations/>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                        <constraints>
-                            <constraint firstItem="ubp-Ic-yYc" firstAttribute="top" secondItem="Qpu-gf-AWh" secondAttribute="bottom" constant="8" id="5LH-JS-cAZ"/>
-                            <constraint firstAttribute="trailing" secondItem="NYo-8T-wlv" secondAttribute="trailing" constant="16" id="975-hh-xjM"/>
-                            <constraint firstItem="NYo-8T-wlv" firstAttribute="top" secondItem="ubp-Ic-yYc" secondAttribute="bottom" constant="27" id="Dkd-EY-Y5c"/>
-                            <constraint firstItem="Qpu-gf-AWh" firstAttribute="leading" secondItem="hq2-dl-73f" secondAttribute="leading" constant="16" id="H97-N3-kgs"/>
-                            <constraint firstAttribute="trailing" secondItem="ubp-Ic-yYc" secondAttribute="trailing" constant="16" id="Ih4-Br-J1n"/>
-                            <constraint firstItem="NYo-8T-wlv" firstAttribute="leading" secondItem="hq2-dl-73f" secondAttribute="leading" constant="16" id="OgF-Bf-U0q"/>
-                            <constraint firstItem="Qpu-gf-AWh" firstAttribute="top" secondItem="e0T-FT-Jqo" secondAttribute="bottom" constant="8" id="ZSE-x6-cE6"/>
-                            <constraint firstItem="ubp-Ic-yYc" firstAttribute="leading" secondItem="hq2-dl-73f" secondAttribute="leading" constant="16" id="mos-jA-3Tw"/>
-                        </constraints>
-                    </view>
-                    <connections>
-                        <outlet property="progressView" destination="NYo-8T-wlv" id="iXN-CG-oJU"/>
-                        <outlet property="slider" destination="ubp-Ic-yYc" id="Of0-s2-foF"/>
-                    </connections>
-                </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="mkz-pd-Odw" userLabel="First Responder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="1485" y="1000"/>
-        </scene>
         <!--Effects-->
         <scene sceneID="eFo-YZ-7kR">
             <objects>
@@ -212,7 +159,7 @@
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                             <animations/>
                                             <fontDescription key="fontDescription" type="system" pointSize="16"/>
-                                            <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                            <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                             <nil key="highlightedColor"/>
                                         </label>
                                     </subviews>
@@ -238,6 +185,132 @@
             </objects>
             <point key="canvasLocation" x="1485" y="1678"/>
         </scene>
+        <!--Audio EngineIO Sample View Controller-->
+        <scene sceneID="2n3-ep-D83">
+            <objects>
+                <tableViewController id="hE7-8D-Vxl" customClass="YASAudioEngineIOSampleViewController" sceneMemberID="viewController">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" id="QbR-bq-YRF">
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <animations/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <prototypes>
+                            <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="Cell" textLabel="fCa-Fk-Iwy" style="IBUITableViewCellStyleDefault" id="dp0-KW-ERC">
+                                <autoresizingMask key="autoresizingMask"/>
+                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="dp0-KW-ERC" id="Ofn-pb-ZjM">
+                                    <autoresizingMask key="autoresizingMask"/>
+                                    <subviews>
+                                        <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="Title" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="fCa-Fk-Iwy">
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                            <animations/>
+                                            <fontDescription key="fontDescription" type="system" pointSize="16"/>
+                                            <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
+                                    </subviews>
+                                    <animations/>
+                                </tableViewCellContentView>
+                                <animations/>
+                            </tableViewCell>
+                            <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="PushCell" textLabel="ZLS-BC-afV" style="IBUITableViewCellStyleDefault" id="dhW-tj-B8e">
+                                <autoresizingMask key="autoresizingMask"/>
+                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="dhW-tj-B8e" id="CNO-X0-s7s">
+                                    <autoresizingMask key="autoresizingMask"/>
+                                    <subviews>
+                                        <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="Title" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="ZLS-BC-afV">
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                            <animations/>
+                                            <fontDescription key="fontDescription" type="system" pointSize="16"/>
+                                            <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
+                                    </subviews>
+                                    <animations/>
+                                </tableViewCellContentView>
+                                <animations/>
+                                <connections>
+                                    <segue destination="JKG-uB-NIq" kind="show" id="JYE-1i-efx"/>
+                                </connections>
+                            </tableViewCell>
+                            <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="SliderCell" id="krI-OY-wwj" customClass="YASAudioSliderCell">
+                                <rect key="frame" x="0.0" y="0.0" width="600" height="44"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="krI-OY-wwj" id="qpd-uc-chh">
+                                    <autoresizingMask key="autoresizingMask"/>
+                                    <subviews>
+                                        <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" minValue="0.0" maxValue="1" translatesAutoresizingMaskIntoConstraints="NO" id="jky-eV-W8s">
+                                            <rect key="frame" x="28" y="7" width="544" height="31"/>
+                                            <animations/>
+                                            <connections>
+                                                <action selector="volumeSliderChanged:" destination="hE7-8D-Vxl" eventType="valueChanged" id="8tY-13-JxA"/>
+                                            </connections>
+                                        </slider>
+                                    </subviews>
+                                    <animations/>
+                                    <constraints>
+                                        <constraint firstAttribute="centerY" secondItem="jky-eV-W8s" secondAttribute="centerY" id="4Fp-bR-9qz"/>
+                                        <constraint firstAttribute="trailing" secondItem="jky-eV-W8s" secondAttribute="trailing" constant="30" id="5hQ-H6-ja6"/>
+                                        <constraint firstItem="jky-eV-W8s" firstAttribute="leading" secondItem="qpd-uc-chh" secondAttribute="leading" constant="30" id="O8x-1Z-VEa"/>
+                                    </constraints>
+                                </tableViewCellContentView>
+                                <animations/>
+                                <connections>
+                                    <outlet property="slider" destination="jky-eV-W8s" id="vJL-zU-NZT"/>
+                                </connections>
+                            </tableViewCell>
+                        </prototypes>
+                        <connections>
+                            <outlet property="dataSource" destination="hE7-8D-Vxl" id="yC1-nu-LBE"/>
+                            <outlet property="delegate" destination="hE7-8D-Vxl" id="nnl-mT-YfY"/>
+                        </connections>
+                    </tableView>
+                </tableViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="vez-wz-ANW" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1485" y="1001"/>
+        </scene>
+        <!--Audio EngineIO Sample Selection View Controller-->
+        <scene sceneID="xyQ-DZ-3sX">
+            <objects>
+                <tableViewController id="JKG-uB-NIq" customClass="YASAudioEngineIOSampleSelectionViewController" sceneMemberID="viewController">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" id="z4X-JX-vg4">
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <animations/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <prototypes>
+                            <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="Cell" textLabel="s7i-dO-Ngq" style="IBUITableViewCellStyleDefault" id="ja3-50-Gfd">
+                                <autoresizingMask key="autoresizingMask"/>
+                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="ja3-50-Gfd" id="pks-V4-gvv">
+                                    <autoresizingMask key="autoresizingMask"/>
+                                    <subviews>
+                                        <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="Title" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="s7i-dO-Ngq">
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                            <animations/>
+                                            <fontDescription key="fontDescription" type="system" pointSize="16"/>
+                                            <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
+                                    </subviews>
+                                    <animations/>
+                                </tableViewCellContentView>
+                                <animations/>
+                                <connections>
+                                    <segue destination="0f7-Ee-bHD" kind="unwind" unwindAction="unwindForSegue:" id="dHV-MC-Mar"/>
+                                </connections>
+                            </tableViewCell>
+                        </prototypes>
+                        <connections>
+                            <outlet property="dataSource" destination="JKG-uB-NIq" id="MfB-fM-1YT"/>
+                            <outlet property="delegate" destination="JKG-uB-NIq" id="qVr-ND-oH9"/>
+                        </connections>
+                    </tableView>
+                </tableViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="IyM-NC-Ao7" userLabel="First Responder" sceneMemberID="firstResponder"/>
+                <exit id="0f7-Ee-bHD" userLabel="Exit" sceneMemberID="exit"/>
+            </objects>
+            <point key="canvasLocation" x="2157" y="1001"/>
+        </scene>
         <!--Audio Engine Effects Sample Edit View Controller-->
         <scene sceneID="e7x-Qg-dFf">
             <objects>
@@ -257,14 +330,14 @@
                                             <rect key="frame" x="8" y="9" width="46" height="21"/>
                                             <animations/>
                                             <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                            <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                            <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                             <nil key="highlightedColor"/>
                                         </label>
                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Value" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="QjA-rc-TXA">
                                             <rect key="frame" x="550" y="9" width="42" height="21"/>
                                             <animations/>
                                             <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                            <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                            <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                             <nil key="highlightedColor"/>
                                         </label>
                                         <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="0.5" minValue="0.0" maxValue="1" translatesAutoresizingMaskIntoConstraints="NO" id="2ux-Py-KIb">
