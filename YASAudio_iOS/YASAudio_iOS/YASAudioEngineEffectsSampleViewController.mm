@@ -34,11 +34,58 @@ static const AudioComponentDescription baseAcd = {.componentType = kAudioUnitTyp
     yas::audio_tap_node_sptr _tap_node;
 }
 
-- (void)viewDidLoad
+- (void)viewDidAppear:(BOOL)animated
 {
-    [super viewDidLoad];
+    [super viewDidAppear:animated];
 
-    [self setupAudioEngine];
+    if (self.isMovingToParentViewController) {
+        BOOL success = NO;
+        NSString *errorMessage = nil;
+        NSError *error = nil;
+
+        AVAudioSession *audioSession = [AVAudioSession sharedInstance];
+        if ([audioSession setCategory:AVAudioSessionCategoryPlayback error:&error]) {
+            [self setupAudioEngine];
+            auto start_result = _engine->start_render();
+            if (start_result) {
+                success = YES;
+                [self.tableView reloadData];
+            } else {
+                const auto error_string = yas::to_string(start_result.error());
+                errorMessage = (__bridge NSString *)yas::to_cf_object(error_string);
+            }
+        } else {
+            errorMessage = error.description;
+        }
+
+        if (!success) {
+            [self _showErrorAlertWithMessage:errorMessage];
+        }
+    }
+}
+
+- (void)viewWillDisappear:(BOOL)animated
+{
+    [super viewWillDisappear:animated];
+
+    if (self.isMovingFromParentViewController) {
+        if (_engine) {
+            _engine->stop();
+        }
+
+        NSError *error = nil;
+        if (![[AVAudioSession sharedInstance] setActive:NO error:&error]) {
+            NSLog(@"error : %@", error);
+        }
+    }
+}
+
+- (BOOL)shouldPerformSegueWithIdentifier:(NSString *)identifier sender:(id)sender
+{
+    if (!_index) {
+        return NO;
+    }
+    return YES;
 }
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
@@ -67,13 +114,6 @@ static const AudioComponentDescription baseAcd = {.componentType = kAudioUnitTyp
                 break;
             }
         }
-    }
-
-    NSError *error = nil;
-    AVAudioSession *audioSession = [AVAudioSession sharedInstance];
-    if (![audioSession setCategory:AVAudioSessionCategoryPlayback error:&error]) {
-        [self _showErrorAlertWithMessage:error.description];
-        return;
     }
 
     _engine = yas::audio_engine::create();
@@ -105,10 +145,6 @@ static const AudioComponentDescription baseAcd = {.componentType = kAudioUnitTyp
     _tap_node->set_render_function(tap_render_function);
 
     [self replaceEffectNodeWithAudioComponentDescription:NULL];
-
-    if (!_engine->start_render()) {
-        [self _showErrorAlertWithMessage:error.description];
-    }
 }
 
 - (void)replaceEffectNodeWithAudioComponentDescription:(const AudioComponentDescription *)acd
@@ -143,7 +179,10 @@ static const AudioComponentDescription baseAcd = {.componentType = kAudioUnitTyp
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
-    return YASAudioEngineEffectsSampleSectionCount;
+    if (_engine) {
+        return YASAudioEngineEffectsSampleSectionCount;
+    }
+    return 0;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
@@ -217,7 +256,7 @@ static const AudioComponentDescription baseAcd = {.componentType = kAudioUnitTyp
 - (void)_showErrorAlertWithMessage:(NSString *)message
 {
     UIAlertController *controller = [UIAlertController alertControllerWithTitle:@"Error"
-                                                                        message:@"Can't start audio engine."
+                                                                        message:message
                                                                  preferredStyle:UIAlertControllerStyleAlert];
     [controller addAction:[UIAlertAction actionWithTitle:@"OK"
                                                    style:UIAlertActionStyleDefault

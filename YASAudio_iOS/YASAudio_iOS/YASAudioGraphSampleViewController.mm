@@ -13,7 +13,7 @@
 @end
 
 @implementation YASAudioGraphSampleViewController {
-    yas::audio_graph_sptr _audio_graph;
+    yas::audio_graph_sptr _graph;
     yas::audio_unit_sptr _io_unit;
     yas::audio_unit_sptr _mixer_unit;
 }
@@ -27,13 +27,30 @@
     YASSuperDealloc;
 }
 
-- (void)viewDidLoad
+- (void)viewDidAppear:(BOOL)animated
 {
-    [super viewDidLoad];
+    [super viewDidAppear:animated];
 
-    [self setupAudioGraph];
+    if (self.isMovingToParentViewController) {
+        NSError *error = nil;
+        if ([[AVAudioSession sharedInstance] setActive:YES error:&error]) {
+            [self setupAudioGraph];
+            [self volumeSliderChanged:self.slider];
+        } else {
+            [self _showErrorAlertWithMessage:error.description];
+        }
+    }
+}
 
-    [self volumeSliderChanged:self.slider];
+- (void)viewWillDisappear:(BOOL)animated
+{
+    [super viewWillDisappear:animated];
+
+    if (self.isMovingFromParentViewController) {
+        _graph->stop();
+
+        [[AVAudioSession sharedInstance] setActive:NO error:nil];
+    }
 }
 
 - (IBAction)volumeSliderChanged:(UISlider *)sender
@@ -49,14 +66,14 @@
     const Float64 sample_rate = [audioSession sampleRate];
 
     auto format = yas::audio_format::create(sample_rate, 2);
-    _audio_graph = yas::audio_graph::create();
+    _graph = yas::audio_graph::create();
 
     _io_unit = yas::audio_unit::create(kAudioUnitType_Output, yas::audio_unit::sub_type_default_io());
     _io_unit->set_enable_input(true);
     _io_unit->set_enable_output(true);
     _io_unit->set_maximum_frames_per_slice(4096);
 
-    _audio_graph->add_audio_unit(_io_unit);
+    _graph->add_audio_unit(_io_unit);
 
     _io_unit->attach_render_callback(0);
     _io_unit->set_input_format(format->stream_description(), 0);
@@ -65,7 +82,7 @@
     _mixer_unit = yas::audio_unit::create(kAudioUnitType_Mixer, kAudioUnitSubType_MultiChannelMixer);
     _mixer_unit->set_maximum_frames_per_slice(4096);
 
-    _audio_graph->add_audio_unit(_mixer_unit);
+    _graph->add_audio_unit(_mixer_unit);
 
     _mixer_unit->attach_render_callback(0);
     _mixer_unit->set_element_count(1, kAudioUnitScope_Input);
@@ -93,7 +110,22 @@
         }
     });
 
-    _audio_graph->start();
+    _graph->start();
+}
+
+#pragma mark -
+
+- (void)_showErrorAlertWithMessage:(NSString *)message
+{
+    UIAlertController *controller = [UIAlertController alertControllerWithTitle:@"Error"
+                                                                        message:message
+                                                                 preferredStyle:UIAlertControllerStyleAlert];
+    [controller addAction:[UIAlertAction actionWithTitle:@"OK"
+                                                   style:UIAlertActionStyleDefault
+                                                 handler:^(UIAlertAction *action) {
+                                                     [self.navigationController popViewControllerAnimated:YES];
+                                                 }]];
+    [self presentViewController:controller animated:YES completion:NULL];
 }
 
 @end
