@@ -24,22 +24,7 @@ class audio_tap_node::impl
 {
    public:
     render_f render_function;
-
-    void set_node_core_on_render(const audio_node_core_sptr &node_core)
-    {
-        std::lock_guard<std::recursive_mutex> lock(_mutex);
-        _node_core_on_render = node_core;
-    }
-
-    audio_node_core_sptr node_core_on_render() const
-    {
-        std::lock_guard<std::recursive_mutex> lock(_mutex);
-        return _node_core_on_render;
-    }
-
-   private:
-    audio_node_core_sptr _node_core_on_render;
-    mutable std::recursive_mutex _mutex;
+    audio_node_core_sptr node_core_on_render;
 };
 
 audio_tap_node_sptr audio_tap_node::create()
@@ -75,7 +60,7 @@ void audio_tap_node::render(const audio_pcm_buffer_sptr &buffer, const uint32_t 
     super_class::render(buffer, bus_idx, when);
 
     if (auto core = node_core()) {
-        _impl->set_node_core_on_render(core);
+        _impl->node_core_on_render = core;
 
         audio_tap_node_core *tap_node_core = dynamic_cast<audio_tap_node_core *>(core.get());
         auto &render_function = tap_node_core->render_function;
@@ -86,28 +71,28 @@ void audio_tap_node::render(const audio_pcm_buffer_sptr &buffer, const uint32_t 
             render_source(buffer, bus_idx, when);
         }
 
-        _impl->set_node_core_on_render(nullptr);
+        _impl->node_core_on_render = nullptr;
     }
 }
 
 audio_connection_sptr audio_tap_node::input_connection_on_render(const uint32_t bus_idx) const
 {
-    return _impl->node_core_on_render()->input_connection(bus_idx);
+    return _impl->node_core_on_render->input_connection(bus_idx);
 }
 
 audio_connection_sptr audio_tap_node::output_connection_on_render(const uint32_t bus_idx) const
 {
-    return _impl->node_core_on_render()->output_connection(bus_idx);
+    return _impl->node_core_on_render->output_connection(bus_idx);
 }
 
 audio_connection_smap audio_tap_node::input_connections_on_render() const
 {
-    return _impl->node_core_on_render()->input_connections();
+    return _impl->node_core_on_render->input_connections();
 }
 
 audio_connection_smap audio_tap_node::output_connections_on_render() const
 {
-    return _impl->node_core_on_render()->output_connections();
+    return _impl->node_core_on_render->output_connections();
 }
 
 void audio_tap_node::render_source(const audio_pcm_buffer_sptr &buffer, const uint32_t bus_idx,
