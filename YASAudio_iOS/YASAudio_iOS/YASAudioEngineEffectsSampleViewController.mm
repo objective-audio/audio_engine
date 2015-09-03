@@ -11,7 +11,6 @@
 typedef NS_ENUM(NSUInteger, YASAudioEngineEffectsSampleSection) {
     YASAudioEngineEffectsSampleSectionNone,
     YASAudioEngineEffectsSampleSectionEffects,
-    YASAudioEngineEffectsSampleSectionChannelMap,
     YASAudioEngineEffectsSampleSectionCount,
 };
 
@@ -33,7 +32,6 @@ static const AudioComponentDescription baseAcd = {.componentType = kAudioUnitTyp
     yas::audio_unit_node_sptr _effect_node;
     yas::audio_connection_sptr _through_connection;
     yas::audio_tap_node_sptr _tap_node;
-    std::vector<yas::channel_map_t> _channel_maps;
 }
 
 - (void)viewDidLoad
@@ -56,8 +54,6 @@ static const AudioComponentDescription baseAcd = {.componentType = kAudioUnitTyp
 
 - (void)setupAudioEngine
 {
-    _channel_maps = std::vector<yas::channel_map_t>({{}, {0, 0}, {0, 1}, {1, 0}, {1, 1}});
-
     if (_audio_units.size() == 0) {
         AudioComponent component = NULL;
 
@@ -157,8 +153,6 @@ static const AudioComponentDescription baseAcd = {.componentType = kAudioUnitTyp
             return 1;
         case YASAudioEngineEffectsSampleSectionEffects:
             return _audio_units.size();
-        case YASAudioEngineEffectsSampleSectionChannelMap:
-            return _channel_maps.size();
         default:
             return 0;
     }
@@ -169,8 +163,6 @@ static const AudioComponentDescription baseAcd = {.componentType = kAudioUnitTyp
     switch (section) {
         case YASAudioEngineEffectsSampleSectionEffects:
             return @"Effects";
-        case YASAudioEngineEffectsSampleSectionChannelMap:
-            return @"Input Channel Map";
         default:
             break;
     }
@@ -194,12 +186,6 @@ static const AudioComponentDescription baseAcd = {.componentType = kAudioUnitTyp
         if (_index && indexPath.row == *_index) {
             cell.accessoryType = UITableViewCellAccessoryCheckmark;
         }
-    } else if (indexPath.section == YASAudioEngineEffectsSampleSectionChannelMap) {
-        NSMutableArray *mapArray = [NSMutableArray array];
-        for (auto &value : _channel_maps.at(indexPath.row)) {
-            [mapArray addObject:[NSString stringWithFormat:@"%@", @(value)]];
-        }
-        cell.textLabel.text = mapArray.count > 0 ? [mapArray componentsJoinedByString:@":"] : @"None";
     }
 
     return cell;
@@ -218,9 +204,6 @@ static const AudioComponentDescription baseAcd = {.componentType = kAudioUnitTyp
             const auto &audio_unit = _audio_units.at(indexPath.row);
             acd.componentSubType = audio_unit->sub_type();
             [self replaceEffectNodeWithAudioComponentDescription:&acd];
-        } break;
-        case YASAudioEngineEffectsSampleSectionChannelMap: {
-            _output_node->set_channel_map(_channel_maps.at(indexPath.row));
         } break;
     }
 
