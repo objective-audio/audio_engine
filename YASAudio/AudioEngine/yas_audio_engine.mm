@@ -587,7 +587,7 @@ std::set<audio_connection_sptr> &audio_engine::_connections() const
     return _impl->connections();
 }
 
-std::string to_string(const audio_engine::start_error_t &error)
+std::string yas::to_string(const audio_engine::start_error_t &error)
 {
     switch (error) {
         case audio_engine::start_error_t::already_running:
