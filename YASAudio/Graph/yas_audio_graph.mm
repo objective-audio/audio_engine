@@ -14,7 +14,9 @@
 #include <limits>
 
 #if TARGET_OS_IPHONE
+#include "yas_objc_container.h"
 #import <AVFoundation/AVFoundation.h>
+#import <UIKit/UIKit.h>
 #elif TARGET_OS_MAC
 #include "yas_audio_device_io.h"
 #endif
@@ -26,6 +28,10 @@ using namespace yas;
 static std::recursive_mutex _global_mutex;
 static bool _interrupting;
 static std::map<UInt8, std::weak_ptr<audio_graph>> _graphs;
+#if TARGET_OS_IPHONE
+static yas::objc_strong_container _did_become_active_observer;
+static yas::objc_strong_container _interruption_observer;
+#endif
 
 #pragma mark - impl
 
@@ -41,6 +47,46 @@ class audio_graph::impl
 #endif
 
     impl(const UInt8 key) : running(false), mutex(), units(), io_units(), _key(key){};
+
+#if TARGET_OS_IPHONE
+    static void setup_notifications()
+    {
+        if (!_did_become_active_observer) {
+            const auto lambda = [](NSNotification *note) { start_all_graphs(); };
+            id observer =
+                [[NSNotificationCenter defaultCenter] addObserverForName:UIApplicationDidBecomeActiveNotification
+                                                                  object:nil
+                                                                   queue:[NSOperationQueue mainQueue]
+                                                              usingBlock:lambda];
+            _did_become_active_observer = yas::objc_strong_container(observer);
+        }
+
+        if (!_interruption_observer) {
+            const auto lambda = [](NSNotification *note) {
+                NSDictionary *info = note.userInfo;
+                NSNumber *typeNum = [info valueForKey:AVAudioSessionInterruptionTypeKey];
+                AVAudioSessionInterruptionType interruptionType =
+                    static_cast<AVAudioSessionInterruptionType>([typeNum unsignedIntegerValue]);
+
+                if (interruptionType == AVAudioSessionInterruptionTypeBegan) {
+                    _interrupting = true;
+                    stop_all_graphs();
+                } else if (interruptionType == AVAudioSessionInterruptionTypeEnded) {
+                    if ([UIApplication sharedApplication].applicationState == UIApplicationStateActive) {
+                        start_all_graphs();
+                        _interrupting = false;
+                    }
+                }
+            };
+            id observer =
+                [[NSNotificationCenter defaultCenter] addObserverForName:AVAudioSessionInterruptionNotification
+                                                                  object:nil
+                                                                   queue:[NSOperationQueue mainQueue]
+                                                              usingBlock:lambda];
+            _interruption_observer = yas::objc_strong_container(observer);
+        }
+    }
+#endif
 
     static const bool is_interrupting()
     {
@@ -152,6 +198,10 @@ class audio_graph::impl
 
     void start_all_ios()
     {
+#if TARGET_OS_IPHONE
+        setup_notifications();
+#endif
+
         for (const auto &audio_unit : io_units) {
             audio_unit->start();
         }
