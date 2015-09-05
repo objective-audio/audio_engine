@@ -96,7 +96,7 @@
     const UInt32 count = 8;
     const Float64 startPhase = 0.1;
     const Float64 phasePerFrame = 1.0 / (Float64)count * 2.0 * M_PI;
-    Float32 *data = calloc(count, sizeof(Float32));
+    Float32 *data = static_cast<Float32 *>(calloc(count, sizeof(Float32)));
 
     YASAudioVectorSinef(data, count, startPhase, phasePerFrame);
 

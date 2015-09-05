@@ -1,9 +1,6 @@
 //
 //  yas_audio_test_utils.cpp
-//  YASAudio_Tests
-//
-//  Created by Yuki Yasoshima on 2015/05/19.
-//
+//  Copyright (c) 2015 Yuki Yasoshima.
 //
 
 #include "yas_audio_test_utils.h"
@@ -12,9 +9,6 @@
 #include "yas_audio_pcm_buffer.h"
 #include "yas_audio_enumerator.h"
 #include "yas_audio_time.h"
-#import "YASAudioData+Internal.h"
-#import "YASAudioFormat.h"
-#import "YASAudioUtility.h"
 #import "YASMacros.h"
 
 using namespace yas;
@@ -85,7 +79,7 @@ bool yas::test::is_filled_buffer(audio_pcm_buffer_sptr &buffer)
     const flex_pointer *pointer = enumerator.pointer();
 
     while (pointer->v) {
-        if (YASAudioIsEqualData(pointer->v, zeroBytes, sample_byte_count)) {
+        if (is_equal_data(pointer->v, zeroBytes, sample_byte_count)) {
             isFilled = NO;
             yas_audio_frame_enumerator_stop(enumerator);
         }
@@ -117,13 +111,35 @@ bool yas::test::is_equal_buffer_flexibly(audio_pcm_buffer_sptr &data1, audio_pcm
         for (UInt32 frame = 0; frame < data1->frame_length(); frame++) {
             auto ptr1 = data_ptr_from_buffer(data1, ch_idx, frame);
             auto ptr2 = data_ptr_from_buffer(data2, ch_idx, frame);
-            if (!YASAudioIsEqualData(ptr1.v, ptr2.v, data1->format()->sample_byte_count())) {
+            if (!is_equal_data(ptr1.v, ptr2.v, data1->format()->sample_byte_count())) {
                 return NO;
             }
         }
     }
 
     return YES;
+}
+
+bool test::is_equal(const double val1, const double val2, const double accuracy)
+{
+    return ((val1 - accuracy) <= val2 && val2 <= (val1 + accuracy));
+}
+
+bool test::is_equal_data(const void *inData1, const void *inData2, const size_t inSize)
+{
+    return memcmp(inData1, inData2, inSize) == 0;
+}
+
+bool test::is_equal(const AudioTimeStamp *ts1, const AudioTimeStamp *ts2)
+{
+    if (is_equal_data(ts1, ts2, sizeof(AudioTimeStamp))) {
+        return true;
+    } else {
+        return ((ts1->mFlags == ts2->mFlags) && (ts1->mHostTime == ts2->mHostTime) &&
+                (ts1->mWordClockTime == ts2->mWordClockTime) && is_equal(ts1->mSampleTime, ts2->mSampleTime, 0.0001) &&
+                is_equal(ts1->mRateScalar, ts2->mRateScalar, 0.0001) &&
+                is_equal_data(&ts1->mSMPTETime, &ts2->mSMPTETime, sizeof(SMPTETime)));
+    }
 }
 
 yas::flex_pointer yas::test::data_ptr_from_buffer(audio_pcm_buffer_sptr &buffer, const UInt32 channel,

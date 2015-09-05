@@ -14,7 +14,6 @@
 #include <limits>
 
 #if TARGET_OS_IPHONE
-#import "NSException+YASAudio.h"
 #import <AVFoundation/AVFoundation.h>
 #elif TARGET_OS_MAC
 #include "yas_audio_device_io.h"
@@ -53,7 +52,7 @@ class audio_graph::impl
 #if TARGET_OS_IPHONE
         NSError *error = nil;
         if (![[AVAudioSession sharedInstance] setActive:YES error:&error]) {
-            YASRaiseIfError(error);
+            NSLog(@"%@", error);
             return;
         }
 #endif

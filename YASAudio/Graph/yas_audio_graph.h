@@ -7,6 +7,7 @@
 
 #include "yas_audio_types.h"
 #include "yas_audio_unit.h"
+#include "yas_result.h"
 #include <memory>
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)

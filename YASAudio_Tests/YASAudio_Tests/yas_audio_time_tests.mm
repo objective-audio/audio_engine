@@ -6,7 +6,7 @@
 #import <XCTest/XCTest.h>
 #import <AVFoundation/AVFoundation.h>
 #import "yas_audio_time.h"
-#import "YASAudioUtility.h"
+#import "yas_audio_test_utils.h"
 
 static NSInteger testCount = 8;
 
@@ -30,7 +30,7 @@ static NSInteger testCount = 8;
 {
     AudioTimeStamp avTimeStamp = avTime.audioTimeStamp;
     const AudioTimeStamp &yasTimeStamp = yasTime.audio_time_stamp();
-    return YASAudioIsEqualAudioTimeStamp(&avTimeStamp, &yasTimeStamp);
+    return yas::test::is_equal(&avTimeStamp, &yasTimeStamp);
 }
 
 - (void)testCreateAudioTimeWithHostTime
@@ -54,7 +54,7 @@ static NSInteger testCount = 8;
         AVAudioTime *avTime = [AVAudioTime timeWithSampleTime:sampleTime atRate:rate];
         auto yas_time = yas::audio_time(sampleTime, rate);
         XCTAssertTrue([self compareAudioTimeStamp:avTime to:yas_time]);
-        XCTAssertTrue(YASAudioIsEqualDoubleWithAccuracy(avTime.sampleRate, yas_time.sample_rate(), 0.00001), @"");
+        XCTAssertTrue(yas::test::is_equal(avTime.sampleRate, yas_time.sample_rate(), 0.00001), @"");
     }
 }
 
@@ -68,7 +68,7 @@ static NSInteger testCount = 8;
         AVAudioTime *avTime = [AVAudioTime timeWithHostTime:hostTime sampleTime:sampleTime atRate:rate];
         auto yas_time = yas::audio_time(hostTime, sampleTime, rate);
         XCTAssertTrue([self compareAudioTimeStamp:avTime to:yas_time]);
-        XCTAssertTrue(YASAudioIsEqualDoubleWithAccuracy(avTime.sampleRate, yas_time.sample_rate(), 0.00001), @"");
+        XCTAssertTrue(yas::test::is_equal(avTime.sampleRate, yas_time.sample_rate(), 0.00001), @"");
     }
 }
 

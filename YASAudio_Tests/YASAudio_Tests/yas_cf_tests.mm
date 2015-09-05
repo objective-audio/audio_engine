@@ -152,4 +152,67 @@
     XCTAssertTrue(CFNumberCompare(cf_value2, (CFNumberRef)(@(20)), nullptr) == kCFCompareEqualTo);
 }
 
+#pragma mark -
+
+- (void)testFileTypeStringWithHFSTypeCodeSuccess
+{
+    CFStringRef fileType = yas::file_type_for_hfs_type_code('abcd');
+    XCTAssertEqualObjects((__bridge NSString *)fileType, @"'abcd'");
+}
+
+- (void)testFileTypeStringWithHFSTypeCodeZeroSuccess
+{
+    OSType fcc = 0;
+    CFStringRef fileType = yas::file_type_for_hfs_type_code(fcc);
+    XCTAssertEqualObjects((__bridge NSString *)fileType, @"''");
+}
+
+- (void)testHFSTypeCodeSuccess
+{
+    OSType fcc = yas::hfs_type_code_from_file_type(CFSTR("'abcd'"));
+    XCTAssertEqual(fcc, 'abcd');
+}
+
+- (void)testHFSTypeCodeIncludeQuoteSuccess
+{
+    OSType fcc = yas::hfs_type_code_from_file_type(CFSTR("'ab'c'"));
+    XCTAssertEqual(fcc, 'ab\'c');
+}
+
+- (void)testHFSTypeCodeNoQuotesFail
+{
+    OSType fcc = yas::hfs_type_code_from_file_type(CFSTR("abcd"));
+    XCTAssertEqual(fcc, 0);
+}
+
+- (void)testHFSTypeCodeGapQuotesFail
+{
+    OSType fcc = yas::hfs_type_code_from_file_type(CFSTR("'abc'd"));
+    XCTAssertEqual(fcc, 0);
+}
+
+- (void)testHFSTypeCodeShortCharacterFail
+{
+    OSType fcc = yas::hfs_type_code_from_file_type(CFSTR("'abc'"));
+    XCTAssertEqual(fcc, 0);
+}
+
+- (void)testHFSTypeCodeLongCharacterFail
+{
+    OSType fcc = yas::hfs_type_code_from_file_type(CFSTR("'abcde'"));
+    XCTAssertEqual(fcc, 0);
+}
+
+- (void)testHFSTypeCodeJapaneseFail
+{
+    OSType fcc = yas::hfs_type_code_from_file_type(CFSTR("'あいうえ'"));
+    XCTAssertEqual(fcc, 0);
+}
+
+- (void)testHFSTypeCodeEmojiFail
+{
+    OSType fcc = yas::hfs_type_code_from_file_type(CFSTR("'😊😓💦😱'"));
+    XCTAssertEqual(fcc, 0);
+}
+
 @end

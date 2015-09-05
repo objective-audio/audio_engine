@@ -1,9 +1,6 @@
 //
 //  yas_audio_test_utils.h
-//  YASAudio_Tests
-//
-//  Created by Yuki Yasoshima on 2015/05/19.
-//
+//  Copyright (c) 2015 Yuki Yasoshima.
 //
 
 #pragma once
@@ -26,6 +23,9 @@ namespace yas
         bool is_filled_buffer(audio_pcm_buffer_sptr &data);
         bool is_equal_buffer_flexibly(audio_pcm_buffer_sptr &data1, audio_pcm_buffer_sptr &data2);
         flex_pointer data_ptr_from_buffer(audio_pcm_buffer_sptr &data, const UInt32 ch_idx, const UInt32 frame);
+        bool is_equal(const double val1, const double val2, const double accuracy = 0);
+        bool is_equal_data(const void *inData1, const void *inData2, const size_t inSize);
+        bool is_equal(const AudioTimeStamp *ts1, const AudioTimeStamp *ts2);
 
         void audio_unit_render_on_sub_thread(std::shared_ptr<audio_unit> audio_unit, yas::audio_format_sptr format,
                                              const UInt32 frame_length, const NSUInteger count,
