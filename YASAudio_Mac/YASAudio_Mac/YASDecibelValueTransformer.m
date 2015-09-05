@@ -4,7 +4,8 @@
 //
 
 #import "YASDecibelValueTransformer.h"
-#import "YASAudio.h"
+#import "YASMacros.h"
+#import "YASAudioMath.h"
 
 @interface YASDecibelValueTransformer ()
 

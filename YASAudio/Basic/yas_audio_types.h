@@ -54,10 +54,6 @@ namespace yas
         input = 1,
     };
 
-    uint32_t to_uint32(const yas::direction &);
-    std::string to_string(const yas::direction &);
-    std::string to_string(const AudioUnitScope scope);
-
     struct render_parameters {
         render_type in_render_type;
         AudioUnitRenderActionFlags *io_action_flags;
@@ -67,6 +63,10 @@ namespace yas
         AudioBufferList *io_data;
         render_id render_id;
     };
+
+    uint32_t to_uint32(const yas::direction &);
+    std::string to_string(const yas::direction &);
+    std::string to_string(const AudioUnitScope scope);
 
     using bus_result_t = std::experimental::optional<uint32_t>;
     using abl_uptr = std::unique_ptr<AudioBufferList, std::function<void(AudioBufferList *)>>;

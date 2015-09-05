@@ -5,8 +5,7 @@
 
 #import <XCTest/XCTest.h>
 #import "yas_audio_format.h"
-#import "YASAudioUtility.h"
-#import "YASAudioFile.h"
+#import "yas_audio_file_utils.h"
 
 @interface YASCppAudioFormatTests : XCTestCase
 
@@ -55,7 +54,7 @@
     XCTAssert(format->sample_rate() == sampleRate);
     XCTAssert(format->is_interleaved() == interleaved);
     XCTAssert(format->pcm_format() == pcmFormat);
-    XCTAssert(YASAudioIsEqualASBD(&format->stream_description(), &asbd));
+    XCTAssertTrue(yas::is_equal(format->stream_description(), asbd));
 }
 
 - (void)testCreateFormat48000kHz1ch64bitsInterleaved
@@ -89,7 +88,7 @@
     XCTAssert(format->sample_rate() == sampleRate);
     XCTAssert(format->is_interleaved() == interleaved);
     XCTAssert(format->pcm_format() == pcmFormat);
-    XCTAssert(YASAudioIsEqualASBD(&format->stream_description(), &asbd));
+    XCTAssertTrue(yas::is_equal(format->stream_description(), asbd));
 }
 
 - (void)testCreateFormat32000kHz4ch16bitsInterleaved
@@ -123,7 +122,7 @@
     XCTAssert(format->sample_rate() == sampleRate);
     XCTAssert(format->is_interleaved() == interleaved);
     XCTAssert(format->pcm_format() == pcmFormat);
-    XCTAssert(YASAudioIsEqualASBD(&format->stream_description(), &asbd));
+    XCTAssertTrue(yas::is_equal(format->stream_description(), asbd));
 }
 
 - (void)testCreateAudioFormatWithStreamDescription
@@ -155,7 +154,7 @@
     XCTAssert(format->buffer_count() == bufferCount);
     XCTAssert(format->stride() == stride);
     XCTAssert(format->is_interleaved() == interleaved);
-    XCTAssert(YASAudioIsEqualASBD(&format->stream_description(), &asbd));
+    XCTAssertTrue(yas::is_equal(format->stream_description(), asbd));
 }
 
 - (void)testEqualAudioFormats
@@ -175,12 +174,7 @@
 {
     const double sampleRate = 44100.0;
 
-    CFDictionaryRef settings = (__bridge CFDictionaryRef)[NSDictionary yas_linearPCMSettingsWithSampleRate:sampleRate
-                                                                                          numberOfChannels:2
-                                                                                                  bitDepth:32
-                                                                                               isBigEndian:NO
-                                                                                                   isFloat:YES
-                                                                                          isNonInterleaved:YES];
+    CFDictionaryRef settings = yas::linear_pcm_file_settings(sampleRate, 2, 32, false, true, true);
 
     auto format = yas::audio_format::create(settings);
 
@@ -196,12 +190,7 @@
         XCTAssertEqual(format->pcm_format(), yas::pcm_format::other);
     }
 
-    settings = (__bridge CFDictionaryRef)[NSDictionary yas_linearPCMSettingsWithSampleRate:sampleRate
-                                                                          numberOfChannels:4
-                                                                                  bitDepth:16
-                                                                               isBigEndian:YES
-                                                                                   isFloat:NO
-                                                                          isNonInterleaved:NO];
+    settings = yas::linear_pcm_file_settings(sampleRate, 4, 16, true, false, false);
 
     format = yas::audio_format::create(settings);
 
@@ -216,6 +205,64 @@
     } else {
         XCTAssertEqual(format->pcm_format(), yas::pcm_format::other);
     }
+}
+
+- (void)testIsEqualASBD
+{
+    AudioStreamBasicDescription asbd1 = {
+        .mSampleRate = 1,
+        .mFormatID = 1,
+        .mFormatFlags = 1,
+        .mBytesPerPacket = 1,
+        .mFramesPerPacket = 1,
+        .mBytesPerFrame = 1,
+        .mChannelsPerFrame = 1,
+        .mBitsPerChannel = 1,
+    };
+
+    AudioStreamBasicDescription asbd2 = asbd1;
+
+    XCTAssertTrue(yas::is_equal(asbd1, asbd2));
+
+    asbd2 = asbd1;
+    asbd2.mSampleRate = 2;
+
+    XCTAssertFalse(yas::is_equal(asbd1, asbd2));
+
+    asbd2 = asbd1;
+    asbd2.mFormatID = 2;
+
+    XCTAssertFalse(yas::is_equal(asbd1, asbd2));
+
+    asbd2 = asbd1;
+    asbd2.mFormatFlags = 2;
+
+    XCTAssertFalse(yas::is_equal(asbd1, asbd2));
+
+    asbd2 = asbd1;
+    asbd2.mBytesPerPacket = 2;
+
+    XCTAssertFalse(yas::is_equal(asbd1, asbd2));
+
+    asbd2 = asbd1;
+    asbd2.mFramesPerPacket = 2;
+
+    XCTAssertFalse(yas::is_equal(asbd1, asbd2));
+
+    asbd2 = asbd1;
+    asbd2.mBytesPerFrame = 2;
+
+    XCTAssertFalse(yas::is_equal(asbd1, asbd2));
+
+    asbd2 = asbd1;
+    asbd2.mChannelsPerFrame = 2;
+
+    XCTAssertFalse(yas::is_equal(asbd1, asbd2));
+
+    asbd2 = asbd1;
+    asbd2.mBitsPerChannel = 2;
+
+    XCTAssertFalse(yas::is_equal(asbd1, asbd2));
 }
 
 @end

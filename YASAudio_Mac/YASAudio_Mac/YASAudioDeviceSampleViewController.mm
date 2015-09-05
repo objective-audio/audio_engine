@@ -5,7 +5,7 @@
 
 #import "YASAudioDeviceSampleViewController.h"
 #import "YASMacros.h"
-#import "YASWeakSupport.h"
+//#import "YASWeakSupport.h"
 #import "YASAudioMath.h"
 #import "YASDecibelValueTransformer.h"
 #import "YASFrequencyValueFormatter.h"

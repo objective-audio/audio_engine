@@ -39,7 +39,8 @@
 
 - (void)testCreateFloat32Interleaved1chBuffer
 {
-    auto pcm_buffer = yas::audio_pcm_buffer::create(yas::audio_format::create(48000.0, 1, yas::pcm_format::float32, true), 4);
+    auto pcm_buffer =
+        yas::audio_pcm_buffer::create(yas::audio_format::create(48000.0, 1, yas::pcm_format::float32, true), 4);
 
     XCTAssert(pcm_buffer->audio_ptr_at_index(0).v);
     XCTAssertThrows(pcm_buffer->audio_ptr_at_index(1));
@@ -65,7 +66,8 @@
 
 - (void)testCreateInt16NonInterleaved4chBuffer
 {
-    auto pcm_buffer = yas::audio_pcm_buffer::create(yas::audio_format::create(48000.0, 4, yas::pcm_format::int16, false), 4);
+    auto pcm_buffer =
+        yas::audio_pcm_buffer::create(yas::audio_format::create(48000.0, 4, yas::pcm_format::int16, false), 4);
 
     XCTAssert(pcm_buffer->audio_ptr_at_index(0).v);
     XCTAssertThrows(pcm_buffer->audio_ptr_at_index(4));
@@ -411,7 +413,8 @@
     }
 
     auto source_format = yas::audio_format::create(sample_rate, source_channels);
-    auto source_buffer = yas::audio_pcm_buffer::create(source_format, dest_buffer, channel_routes, yas::direction::output);
+    auto source_buffer =
+        yas::audio_pcm_buffer::create(source_format, dest_buffer, channel_routes, yas::direction::output);
 
     for (UInt32 ch = 0; ch < source_channels; ++ch) {
         auto dest_ptr = dest_buffer->audio_ptr_at_index(dest_channel_indices[ch]);
@@ -459,5 +462,123 @@
 }
 
 #endif
+
+- (void)testAllocateAudioBufferListInterleaved
+{
+    const UInt32 ch = 2;
+    const UInt32 size = 4;
+
+    const auto pair = yas::allocate_audio_buffer_list(1, ch, size);
+    const yas::abl_uptr &abl = pair.first;
+
+    XCTAssertEqual(abl->mNumberBuffers, 1);
+    XCTAssertEqual(abl->mBuffers[0].mNumberChannels, ch);
+    XCTAssertEqual(abl->mBuffers[0].mDataByteSize, size);
+    XCTAssertTrue(abl->mBuffers[0].mData != nullptr);
+}
+
+- (void)testAllocateAudioBufferListNonInterleaved
+{
+    const UInt32 buf = 2;
+    const UInt32 size = 4;
+
+    const auto pair = yas::allocate_audio_buffer_list(buf, 1, size);
+    const yas::abl_uptr &abl = pair.first;
+
+    XCTAssertTrue(abl != nullptr);
+    XCTAssertEqual(abl->mNumberBuffers, buf);
+    for (UInt32 i = 0; i < buf; i++) {
+        XCTAssertEqual(abl->mBuffers[i].mNumberChannels, 1);
+        XCTAssertEqual(abl->mBuffers[i].mDataByteSize, size);
+        XCTAssertTrue(abl->mBuffers[i].mData != nullptr);
+    }
+}
+
+- (void)testAllocateAudioBufferListWithoutData
+{
+    UInt32 buf = 1;
+    UInt32 ch = 1;
+
+    const auto pair1 = yas::allocate_audio_buffer_list(buf, ch, 0);
+    const yas::abl_uptr &abl1 = pair1.first;
+
+    XCTAssertTrue(abl1 != nullptr);
+    for (UInt32 i = 0; i < buf; i++) {
+        XCTAssertEqual(abl1->mBuffers[i].mNumberChannels, ch);
+        XCTAssertEqual(abl1->mBuffers[i].mDataByteSize, 0);
+        XCTAssertTrue(abl1->mBuffers[i].mData == nullptr);
+    }
+
+    const auto pair2 = yas::allocate_audio_buffer_list(buf, ch);
+    const yas::abl_uptr &abl2 = pair2.first;
+
+    XCTAssertTrue(abl2 != nullptr);
+    XCTAssertEqual(abl2->mNumberBuffers, buf);
+    for (UInt32 i = 0; i < buf; i++) {
+        XCTAssertEqual(abl2->mBuffers[i].mNumberChannels, ch);
+        XCTAssertEqual(abl2->mBuffers[i].mDataByteSize, 0);
+        XCTAssertTrue(abl2->mBuffers[i].mData == nullptr);
+    }
+}
+
+- (void)testIsEqualAudioBufferListStructureTrue
+{
+    auto pair1 = yas::allocate_audio_buffer_list(2, 2);
+    auto pair2 = yas::allocate_audio_buffer_list(2, 2);
+    yas::abl_uptr &abl1 = pair1.first;
+    yas::abl_uptr &abl2 = pair2.first;
+
+    std::vector<uint8_t> buffer1{0};
+    std::vector<uint8_t> buffer2{0};
+
+    abl1->mBuffers[0].mData = abl2->mBuffers[0].mData = buffer1.data();
+    abl1->mBuffers[1].mData = abl2->mBuffers[1].mData = buffer2.data();
+
+    XCTAssertTrue(yas::is_equal_structure(*abl1, *abl2));
+}
+
+- (void)testIsEqualAudioBufferListStructureDifferentBufferFalse
+{
+    auto pair1 = yas::allocate_audio_buffer_list(1, 1);
+    auto pair2 = yas::allocate_audio_buffer_list(1, 1);
+    yas::abl_uptr &abl1 = pair1.first;
+    yas::abl_uptr &abl2 = pair2.first;
+
+    std::vector<uint8_t> buffer1{0};
+    std::vector<uint8_t> buffer2{0};
+
+    abl1->mBuffers[0].mData = buffer1.data();
+    abl2->mBuffers[0].mData = buffer2.data();
+
+    XCTAssertFalse(yas::is_equal_structure(*abl1, *abl2));
+}
+
+- (void)testIsEqualAudioBufferListStructureDifferentBuffersFalse
+{
+    auto pair1 = yas::allocate_audio_buffer_list(1, 1);
+    auto pair2 = yas::allocate_audio_buffer_list(2, 1);
+    yas::abl_uptr &abl1 = pair1.first;
+    yas::abl_uptr &abl2 = pair2.first;
+
+    std::vector<uint8_t> buffer{0};
+
+    abl1->mBuffers[0].mData = abl2->mBuffers[0].mData = buffer.data();
+
+    XCTAssertFalse(yas::is_equal_structure(*abl1, *abl2));
+}
+
+- (void)testIsEqualAudioBufferListStructureDifferentChannelsFalse
+{
+    auto pair1 = yas::allocate_audio_buffer_list(1, 1);
+    auto pair2 = yas::allocate_audio_buffer_list(1, 2);
+    yas::abl_uptr &abl1 = pair1.first;
+    yas::abl_uptr &abl2 = pair2.first;
+
+    std::vector<uint8_t> buffer{0};
+
+    abl1->mBuffers[0].mData = abl2->mBuffers[0].mData = buffer.data();
+
+    XCTAssertFalse(yas::is_equal_structure(*abl1, *abl2));
+}
 
 @end

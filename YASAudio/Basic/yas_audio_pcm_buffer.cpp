@@ -528,20 +528,21 @@ UInt32 yas::frame_length(const AudioBufferList *abl, const UInt32 sample_byte_co
     }
 }
 
-bool yas::is_equal_structure(const AudioBufferList *abl1, const AudioBufferList *abl2)
+bool yas::is_equal(const AudioBufferList &abl1, const AudioBufferList &abl2)
 {
-    if (!abl1 || !abl2) {
+    return memcmp(&abl1, &abl2, sizeof(AudioStreamBasicDescription)) == 0;
+}
+
+bool yas::is_equal_structure(const AudioBufferList &abl1, const AudioBufferList &abl2)
+{
+    if (abl1.mNumberBuffers != abl2.mNumberBuffers) {
         return false;
     }
 
-    if (abl1->mNumberBuffers != abl2->mNumberBuffers) {
-        return false;
-    }
-
-    for (UInt32 i = 0; i < abl1->mNumberBuffers; i++) {
-        if (abl1->mBuffers[i].mData != abl2->mBuffers[i].mData) {
+    for (UInt32 i = 0; i < abl1.mNumberBuffers; i++) {
+        if (abl1.mBuffers[i].mData != abl2.mBuffers[i].mData) {
             return false;
-        } else if (abl1->mBuffers[i].mNumberChannels != abl2->mBuffers[i].mNumberChannels) {
+        } else if (abl1.mBuffers[i].mNumberChannels != abl2.mBuffers[i].mNumberChannels) {
             return false;
         }
     }
