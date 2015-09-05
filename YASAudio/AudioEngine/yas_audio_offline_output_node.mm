@@ -26,6 +26,10 @@ class audio_offline_output_node::impl
 
     const std::experimental::optional<uint8_t> push_completion_function(const completion_f &function)
     {
+        if (!function) {
+            return std::experimental::nullopt;
+        }
+
         auto key = min_empty_key(_completion_functions);
         if (key) {
             _completion_functions.insert(std::make_pair(*key, function));
@@ -90,9 +94,12 @@ audio_offline_output_node::start_result audio_offline_output_node::_start(const 
     if (_impl->queue_container) {
         return start_result(start_error_t::already_running);
     } else if (auto connection = input_connection(0)) {
-        auto key = _impl->push_completion_function(completion_func);
-        if (!key) {
-            return start_result(start_error_t::prepare_failure);
+        std::experimental::optional<uint8_t> key;
+        if (completion_func) {
+            key = _impl->push_completion_function(completion_func);
+            if (!key) {
+                return start_result(start_error_t::prepare_failure);
+            }
         }
 
         auto weak_node = _impl->weak_node;
@@ -101,8 +108,7 @@ audio_offline_output_node::start_result audio_offline_output_node::_start(const 
         NSBlockOperation *blockOperation = [[NSBlockOperation alloc] init];
         auto operation_container = objc_weak_container::create(blockOperation);
 
-        auto operation_lambda = [weak_node, operation_container, render_buffer, render_func, key = *key]()
-        {
+        auto operation_lambda = [weak_node, operation_container, render_buffer, render_func, key]() {
             bool cancelled = false;
             uint32_t current_sample_time = 0;
             bool stop = false;
@@ -156,7 +162,11 @@ audio_offline_output_node::start_result audio_offline_output_node::_start(const 
 
             auto completion_lambda = [weak_node, cancelled, key]() {
                 if (auto offline_node = weak_node.lock()) {
-                    auto node_completion_func = offline_node->_impl->pull_completion_function(key);
+                    std::experimental::optional<completion_f> node_completion_func;
+                    if (key) {
+                        node_completion_func = offline_node->_impl->pull_completion_function(*key);
+                    }
+
                     offline_node->_impl->queue_container.set_object(nil);
 
                     if (node_completion_func) {
