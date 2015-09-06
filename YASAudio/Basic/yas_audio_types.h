@@ -87,6 +87,7 @@ namespace yas
     class audio_node;
     class audio_connection;
     class audio_unit_node;
+    class audio_unit_io_node;
     class audio_unit_output_node;
     class audio_unit_input_node;
     class audio_offline_output_node;
@@ -114,6 +115,7 @@ namespace yas
     using audio_connection_wmap_sptr = std::shared_ptr<audio_connection_wmap>;
     using audio_unit_node_sptr = std::shared_ptr<audio_unit_node>;
     using audio_unit_node_wptr = std::weak_ptr<audio_unit_node>;
+    using audio_unit_io_node_sptr = std::shared_ptr<audio_unit_io_node>;
     using audio_unit_output_node_sptr = std::shared_ptr<audio_unit_output_node>;
     using audio_unit_input_node_sptr = std::shared_ptr<audio_unit_input_node>;
     using audio_offline_output_node_sptr = std::shared_ptr<audio_offline_output_node>;

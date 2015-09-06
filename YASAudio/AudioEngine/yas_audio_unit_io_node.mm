@@ -42,6 +42,13 @@ audio_unit_io_node::audio_unit_io_node()
 {
 }
 
+audio_unit_io_node_sptr audio_unit_io_node::create()
+{
+    auto node = audio_unit_io_node_sptr(new audio_unit_io_node());
+    prepare_for_create(node);
+    return node;
+}
+
 audio_unit_io_node::~audio_unit_io_node() = default;
 
 void audio_unit_io_node::set_channel_map(const channel_map_t &map, const yas::direction dir)

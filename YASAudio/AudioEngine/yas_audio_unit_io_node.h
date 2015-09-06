@@ -13,6 +13,8 @@ namespace yas
     class audio_unit_io_node : public audio_unit_node
     {
        public:
+        static audio_unit_io_node_sptr create();
+
         virtual ~audio_unit_io_node();
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
