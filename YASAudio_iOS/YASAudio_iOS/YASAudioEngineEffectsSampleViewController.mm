@@ -6,7 +6,6 @@
 #import "YASAudioEngineEffectsSampleViewController.h"
 #import "YASAudioEngineEffectsSampleEditViewController.h"
 #import "yas_audio.h"
-#import "YASAudioMath.h"
 
 typedef NS_ENUM(NSUInteger, YASAudioEngineEffectsSampleSection) {
     YASAudioEngineEffectsSampleSectionNone,
@@ -127,7 +126,7 @@ static const AudioComponentDescription baseAcd = {.componentType = kAudioUnitTyp
         buffer->clear();
 
         const Float64 start_phase = phase;
-        const Float64 phase_per_frame = 1000.0 / buffer->format()->sample_rate() * YAS_2_PI;
+        const Float64 phase_per_frame = 1000.0 / buffer->format()->sample_rate() * yas::audio_math::two_pi;
         yas::audio_frame_enumerator enumerator(buffer);
         const auto *flex_ptr = enumerator.pointer();
         const uint32_t length = enumerator.frame_length();
@@ -135,7 +134,7 @@ static const AudioComponentDescription baseAcd = {.componentType = kAudioUnitTyp
         uint32_t idx = 0;
         while (flex_ptr->v) {
             if (idx == 0) {
-                phase = YASAudioVectorSinef(flex_ptr->f32, length, start_phase, phase_per_frame);
+                phase = yas::audio_math::fill_sine(flex_ptr->f32, length, start_phase, phase_per_frame);
             }
             idx++;
             yas_audio_frame_enumerator_move_channel(enumerator);

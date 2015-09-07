@@ -14,6 +14,7 @@
 #include "yas_exception.h"
 #include "yas_result.h"
 #include "yas_any.h"
+#include "yas_audio_math.h"
 
 #include "yas_audio_time.h"
 #include "yas_audio_format.h"

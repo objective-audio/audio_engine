@@ -5,8 +5,6 @@
 
 #import "YASAudioDeviceSampleViewController.h"
 #import "YASMacros.h"
-//#import "YASWeakSupport.h"
-#import "YASAudioMath.h"
 #import "YASDecibelValueTransformer.h"
 #import "YASFrequencyValueFormatter.h"
 #import <Accelerate/Accelerate.h>
@@ -111,8 +109,8 @@ namespace yas
                     const Float64 freq = sine_frequency();
 
                     if (frame_length < kSineDataMaxCount) {
-                        _phase = YASAudioVectorSinef(&_sine_data[0], frame_length, start_phase,
-                                                     freq / sample_rate * YAS_2_PI);
+                        _phase = yas::audio_math::fill_sine(&_sine_data[0], frame_length, start_phase,
+                                                            freq / sample_rate * yas::audio_math::two_pi);
 
                         while (pointer->v) {
                             cblas_saxpy(frame_length, sine_vol, &_sine_data[0], 1, pointer->f32, 1);
