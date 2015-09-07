@@ -4,8 +4,8 @@
 //
 
 #import "YASDecibelValueTransformer.h"
+#import "yas_audio_math.h"
 #import "YASMacros.h"
-#import "YASAudioMath.h"
 
 @interface YASDecibelValueTransformer ()
 
@@ -41,6 +41,9 @@
 - (void)dealloc
 {
     YASRelease(_numberFormatter);
+    
+    _numberFormatter = nil;
+    
     YASSuperDealloc;
 }
 
@@ -48,7 +51,7 @@
 {
     if ([value isKindOfClass:[NSNumber class]]) {
         NSNumber *numberValue = value;
-        numberValue = @(YASAudioDecibelFromLinear(numberValue.doubleValue));
+        numberValue = @(yas::audio_math::decibel_from_linear(numberValue.doubleValue));
         return [self.numberFormatter stringFromNumber:numberValue];
     }
 

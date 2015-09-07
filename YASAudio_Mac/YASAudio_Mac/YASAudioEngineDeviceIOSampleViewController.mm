@@ -5,7 +5,6 @@
 
 #import "YASAudioEngineDeviceIOSampleViewController.h"
 #import "yas_audio.h"
-#import "YASAudioMath.h"
 #import <Accelerate/Accelerate.h>
 
 @interface YASAudioDeviceRouteSampleData : NSObject
@@ -131,13 +130,13 @@
             yas::audio_frame_enumerator enumerator(buffer);
             const auto *flex_ptr = enumerator.pointer();
             const Float64 start_phase = next_phase;
-            const Float64 phase_per_frame = 1000.0 / buffer->format()->sample_rate() * YAS_2_PI;
+            const Float64 phase_per_frame = 1000.0 / buffer->format()->sample_rate() * yas::audio_math::two_pi;
             uint32_t idx = 0;
             while (flex_ptr->v) {
                 YASAudioDeviceRouteSampleData *data = outputRoutes[idx];
                 if (data.enabled && !input_available) {
                     next_phase =
-                        YASAudioVectorSinef(flex_ptr->f32, buffer->frame_length(), start_phase, phase_per_frame);
+                        yas::audio_math::fill_sine(flex_ptr->f32, buffer->frame_length(), start_phase, phase_per_frame);
                     cblas_sscal(buffer->frame_length(), 0.2, flex_ptr->f32, 1);
                 } else if (!data.enabled && input_available) {
                     memset(flex_ptr->f32, 0, buffer->frame_length() * buffer->format()->sample_byte_count());

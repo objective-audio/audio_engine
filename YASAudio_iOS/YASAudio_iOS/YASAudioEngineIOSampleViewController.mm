@@ -7,7 +7,6 @@
 #import "YASAudioEngineIOSampleSelectionViewController.h"
 #import "YASAudioSliderCell.h"
 #import "yas_audio.h"
-#import "YASAudioMath.h"
 #import <Accelerate/Accelerate.h>
 
 static uint32_t const YASAudioEngineIOSampleConnectionMaxChannels = 2;

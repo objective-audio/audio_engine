@@ -5,7 +5,6 @@
 
 #import "YASFrequencyValueFormatter.h"
 #import "YASMacros.h"
-#import "YASAudioMath.h"
 
 @interface YASFrequencyValueFormatter ()
 
@@ -41,6 +40,9 @@
 - (void)dealloc
 {
     YASRelease(_numberFormatter);
+
+    _numberFormatter = nil;
+
     YASSuperDealloc;
 }
 

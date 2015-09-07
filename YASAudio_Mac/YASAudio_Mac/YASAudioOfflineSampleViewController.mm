@@ -5,7 +5,6 @@
 
 #import "YASAudioOfflineSampleViewController.h"
 #import "yas_audio.h"
-#import "YASAudioMath.h"
 #import <Accelerate/Accelerate.h>
 
 namespace yas
@@ -36,7 +35,7 @@ namespace yas
                     if (auto node = weak_node.lock()) {
                         if (node->is_playing()) {
                             const Float64 start_phase = node->_phase_on_render;
-                            const Float64 phase_per_frame = node->frequency() / sample_rate * YAS_2_PI;
+                            const Float64 phase_per_frame = node->frequency() / sample_rate * yas::audio_math::two_pi;
                             Float64 next_phase = start_phase;
                             const UInt32 frame_length = buffer->frame_length();
 
@@ -44,8 +43,8 @@ namespace yas
                                 yas::audio_frame_enumerator enumerator(buffer);
                                 const auto *flex_ptr = enumerator.pointer();
                                 while (flex_ptr->v) {
-                                    next_phase =
-                                        YASAudioVectorSinef(flex_ptr->f32, frame_length, start_phase, phase_per_frame);
+                                    next_phase = yas::audio_math::fill_sine(flex_ptr->f32, frame_length, start_phase,
+                                                                            phase_per_frame);
                                     yas_audio_frame_enumerator_move_channel(enumerator);
                                 }
 
