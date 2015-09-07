@@ -601,17 +601,17 @@ channel_map_t audio_unit::channel_map(const AudioUnitScope scope, const AudioUni
                                  " : invalid component type. (not kAudioUnitType_Output)");
     }
 
-    return property_data<uint32_t>(kAudioOutputUnitProperty_ChannelMap, scope, element);
+    return property_data<UInt32>(kAudioOutputUnitProperty_ChannelMap, scope, element);
 }
 
-uint32_t audio_unit::channel_map_count(const AudioUnitScope scope, const AudioUnitElement element)
+UInt32 audio_unit::channel_map_count(const AudioUnitScope scope, const AudioUnitElement element)
 {
     UInt32 byte_size = 0;
     yas_raise_if_au_error(AudioUnitGetPropertyInfo(_impl->au_instance, kAudioOutputUnitProperty_ChannelMap, scope,
                                                    element, &byte_size, nullptr));
 
     if (byte_size) {
-        return byte_size / sizeof(uint32_t);
+        return byte_size / sizeof(UInt32);
     }
     return 0;
 }

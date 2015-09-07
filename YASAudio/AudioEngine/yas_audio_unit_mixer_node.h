@@ -16,21 +16,21 @@ namespace yas
 
         virtual void update_connections() override;
 
-        virtual uint32_t input_bus_count() const override;
-        virtual uint32_t output_bus_count() const override;
+        virtual UInt32 input_bus_count() const override;
+        virtual UInt32 output_bus_count() const override;
 
-        void set_output_volume(const Float32 volume, const uint32_t bus_idx);
-        Float32 output_volume(const uint32_t bus_idx);
-        void set_output_pan(const Float32 pan, const uint32_t bus_idx);
-        Float32 output_pan(const uint32_t bus_idx);
+        void set_output_volume(const Float32 volume, const UInt32 bus_idx);
+        Float32 output_volume(const UInt32 bus_idx);
+        void set_output_pan(const Float32 pan, const UInt32 bus_idx);
+        Float32 output_pan(const UInt32 bus_idx);
 
-        void set_input_volume(const Float32 volume, const uint32_t bus_idx);
-        Float32 input_volume(const uint32_t bus_idx);
-        void set_input_pan(const Float32 pan, const uint32_t bus_idx);
-        Float32 input_pan(const uint32_t bus_idx);
+        void set_input_volume(const Float32 volume, const UInt32 bus_idx);
+        Float32 input_volume(const UInt32 bus_idx);
+        void set_input_pan(const Float32 pan, const UInt32 bus_idx);
+        Float32 input_pan(const UInt32 bus_idx);
 
-        void set_input_enabled(const bool enabled, uint32_t bus_idx);
-        bool input_enabled(uint32_t bus_idx);
+        void set_input_enabled(const bool enabled, UInt32 bus_idx);
+        bool input_enabled(UInt32 bus_idx);
 
        protected:
         audio_unit_mixer_node();

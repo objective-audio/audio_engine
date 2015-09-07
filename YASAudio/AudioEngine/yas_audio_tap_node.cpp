@@ -45,17 +45,17 @@ void audio_tap_node::set_render_function(const render_f &render_function)
     update_node_core();
 }
 
-uint32_t audio_tap_node::input_bus_count() const
+UInt32 audio_tap_node::input_bus_count() const
 {
     return 1;
 }
 
-uint32_t audio_tap_node::output_bus_count() const
+UInt32 audio_tap_node::output_bus_count() const
 {
     return 1;
 }
 
-void audio_tap_node::render(const audio_pcm_buffer_sptr &buffer, const uint32_t bus_idx, const audio_time_sptr &when)
+void audio_tap_node::render(const audio_pcm_buffer_sptr &buffer, const UInt32 bus_idx, const audio_time_sptr &when)
 {
     super_class::render(buffer, bus_idx, when);
 
@@ -75,12 +75,12 @@ void audio_tap_node::render(const audio_pcm_buffer_sptr &buffer, const uint32_t 
     }
 }
 
-audio_connection_sptr audio_tap_node::input_connection_on_render(const uint32_t bus_idx) const
+audio_connection_sptr audio_tap_node::input_connection_on_render(const UInt32 bus_idx) const
 {
     return _impl->node_core_on_render->input_connection(bus_idx);
 }
 
-audio_connection_sptr audio_tap_node::output_connection_on_render(const uint32_t bus_idx) const
+audio_connection_sptr audio_tap_node::output_connection_on_render(const UInt32 bus_idx) const
 {
     return _impl->node_core_on_render->output_connection(bus_idx);
 }
@@ -95,7 +95,7 @@ audio_connection_smap audio_tap_node::output_connections_on_render() const
     return _impl->node_core_on_render->output_connections();
 }
 
-void audio_tap_node::render_source(const audio_pcm_buffer_sptr &buffer, const uint32_t bus_idx,
+void audio_tap_node::render_source(const audio_pcm_buffer_sptr &buffer, const UInt32 bus_idx,
                                    const audio_time_sptr &when)
 {
     if (auto connection = input_connection_on_render(bus_idx)) {
@@ -128,12 +128,12 @@ audio_input_tap_node_sptr audio_input_tap_node::create()
     return audio_input_tap_node_sptr(new audio_input_tap_node());
 }
 
-uint32_t audio_input_tap_node::input_bus_count() const
+UInt32 audio_input_tap_node::input_bus_count() const
 {
     return 1;
 }
 
-uint32_t audio_input_tap_node::output_bus_count() const
+UInt32 audio_input_tap_node::output_bus_count() const
 {
     return 0;
 }

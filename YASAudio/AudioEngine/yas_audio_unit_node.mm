@@ -104,22 +104,22 @@ const audio_unit_parameter_map &audio_unit_node::output_parameters() const
     return _impl->parameters.at(kAudioUnitScope_Output);
 }
 
-uint32_t audio_unit_node::input_bus_count() const
+UInt32 audio_unit_node::input_bus_count() const
 {
     return 1;
 }
 
-uint32_t audio_unit_node::output_bus_count() const
+UInt32 audio_unit_node::output_bus_count() const
 {
     return 1;
 }
 
-uint32_t audio_unit_node::input_element_count() const
+UInt32 audio_unit_node::input_element_count() const
 {
     return _impl->audio_unit()->element_count(kAudioUnitScope_Input);
 }
 
-uint32_t audio_unit_node::output_element_count() const
+UInt32 audio_unit_node::output_element_count() const
 {
     return _impl->audio_unit()->element_count(kAudioUnitScope_Output);
 }
@@ -238,7 +238,7 @@ void audio_unit_node::update_connections()
                 }
             });
 
-            for (uint32_t bus_idx = 0; bus_idx < input_bus_count; ++bus_idx) {
+            for (UInt32 bus_idx = 0; bus_idx < input_bus_count; ++bus_idx) {
                 if (auto connection = input_connection(bus_idx)) {
                     audio_unit->set_input_format(connection->format()->stream_description(), bus_idx);
                     audio_unit->attach_render_callback(bus_idx);
@@ -252,7 +252,7 @@ void audio_unit_node::update_connections()
 
         auto output_bus_count = output_element_count();
         if (output_bus_count > 0) {
-            for (uint32_t bus_idx = 0; bus_idx < output_bus_count; ++bus_idx) {
+            for (UInt32 bus_idx = 0; bus_idx < output_bus_count; ++bus_idx) {
                 if (auto connection = output_connection(bus_idx)) {
                     audio_unit->set_output_format(connection->format()->stream_description(), bus_idx);
                 }
@@ -261,7 +261,7 @@ void audio_unit_node::update_connections()
     }
 }
 
-void audio_unit_node::render(const audio_pcm_buffer_sptr &buffer, const uint32_t bus_idx, const audio_time_sptr &when)
+void audio_unit_node::render(const audio_pcm_buffer_sptr &buffer, const UInt32 bus_idx, const audio_time_sptr &when)
 {
     super_class::render(buffer, bus_idx, when);
 

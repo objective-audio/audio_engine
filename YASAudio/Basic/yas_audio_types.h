@@ -64,14 +64,14 @@ namespace yas
         render_id render_id;
     };
 
-    uint32_t to_uint32(const yas::direction &);
+    UInt32 to_uint32(const yas::direction &);
     std::string to_string(const yas::direction &);
     std::string to_string(const AudioUnitScope scope);
 
-    using bus_result_t = std::experimental::optional<uint32_t>;
+    using bus_result_t = std::experimental::optional<UInt32>;
     using abl_uptr = std::unique_ptr<AudioBufferList, std::function<void(AudioBufferList *)>>;
     using abl_data_uptr = std::unique_ptr<std::vector<std::vector<UInt8>>>;
-    using channel_map_t = std::vector<uint32_t>;
+    using channel_map_t = std::vector<UInt32>;
 
     class objc_strong_container;
     class objc_weak_container;
@@ -110,8 +110,8 @@ namespace yas
     using audio_node_sptr = std::shared_ptr<audio_node>;
     using audio_connection_sptr = std::shared_ptr<audio_connection>;
     using audio_connection_wptr = std::weak_ptr<audio_connection>;
-    using audio_connection_smap = std::map<uint32_t, audio_connection_sptr>;
-    using audio_connection_wmap = std::map<uint32_t, audio_connection_wptr>;
+    using audio_connection_smap = std::map<UInt32, audio_connection_sptr>;
+    using audio_connection_wmap = std::map<UInt32, audio_connection_wptr>;
     using audio_connection_wmap_sptr = std::shared_ptr<audio_connection_wmap>;
     using audio_unit_node_sptr = std::shared_ptr<audio_unit_node>;
     using audio_unit_node_wptr = std::weak_ptr<audio_unit_node>;

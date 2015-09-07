@@ -27,8 +27,8 @@ namespace yas
 
         ~audio_offline_output_node();
 
-        uint32_t output_bus_count() const override;
-        uint32_t input_bus_count() const override;
+        UInt32 output_bus_count() const override;
+        UInt32 input_bus_count() const override;
 
         bool is_running() const;
 

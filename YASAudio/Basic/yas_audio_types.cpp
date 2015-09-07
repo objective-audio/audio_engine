@@ -8,9 +8,9 @@
 
 using namespace yas;
 
-uint32_t yas::to_uint32(const yas::direction &dir)
+UInt32 yas::to_uint32(const yas::direction &dir)
 {
-    return static_cast<uint32_t>(dir);
+    return static_cast<UInt32>(dir);
 }
 
 std::string yas::to_string(const direction &dir)

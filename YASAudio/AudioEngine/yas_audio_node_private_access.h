@@ -29,12 +29,12 @@ namespace yas
             return audio_node_sptr(new audio_node());
         }
 
-        static audio_connection_sptr input_connection(const audio_node_sptr &node, const uint32_t bus_idx)
+        static audio_connection_sptr input_connection(const audio_node_sptr &node, const UInt32 bus_idx)
         {
             return node->input_connection(bus_idx);
         }
 
-        static audio_connection_sptr output_connection(const audio_node_sptr &node, const uint32_t bus_idx)
+        static audio_connection_sptr output_connection(const audio_node_sptr &node, const UInt32 bus_idx)
         {
             return node->output_connection(bus_idx);
         }

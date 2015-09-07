@@ -78,12 +78,12 @@ audio_offline_output_node::~audio_offline_output_node()
     }
 }
 
-uint32_t audio_offline_output_node::output_bus_count() const
+UInt32 audio_offline_output_node::output_bus_count() const
 {
     return 0;
 }
 
-uint32_t audio_offline_output_node::input_bus_count() const
+UInt32 audio_offline_output_node::input_bus_count() const
 {
     return 1;
 }
@@ -110,7 +110,7 @@ audio_offline_output_node::start_result audio_offline_output_node::_start(const 
 
         auto operation_lambda = [weak_node, operation_container, render_buffer, render_func, key]() {
             bool cancelled = false;
-            uint32_t current_sample_time = 0;
+            UInt32 current_sample_time = 0;
             bool stop = false;
 
             while (!stop) {

@@ -9,7 +9,7 @@
 
 @interface YASAudioDeviceRouteSampleData : NSObject
 
-@property (nonatomic, assign) uint32_t index;
+@property (nonatomic, assign) UInt32 index;
 @property (atomic, assign) BOOL enabled;
 
 + (instancetype)data;
@@ -107,7 +107,7 @@
     Float64 next_phase = 0.0;
 
     auto render_function = [next_phase, weak_node, weak_container = _self_container](
-        const yas::audio_pcm_buffer_sptr &buffer, const uint32_t bus_idx, const yas::audio_time_sptr &when) mutable
+        const yas::audio_pcm_buffer_sptr &buffer, const UInt32 bus_idx, const yas::audio_time_sptr &when) mutable
     {
         buffer->clear();
 
@@ -131,7 +131,7 @@
             const auto *flex_ptr = enumerator.pointer();
             const Float64 start_phase = next_phase;
             const Float64 phase_per_frame = 1000.0 / buffer->format()->sample_rate() * yas::audio_math::two_pi;
-            uint32_t idx = 0;
+            UInt32 idx = 0;
             while (flex_ptr->v) {
                 YASAudioDeviceRouteSampleData *data = outputRoutes[idx];
                 if (data.enabled && !input_available) {
@@ -223,19 +223,19 @@
     if (auto const device = _device_io_node->device()) {
         NSLog(@"device name = %@ - samplerate = %@", device->cf_name(), @(device->nominal_sample_rate()));
 
-        const uint32_t output_channel_count = device->output_channel_count();
-        const uint32_t input_channel_count = device->input_channel_count();
+        const UInt32 output_channel_count = device->output_channel_count();
+        const UInt32 input_channel_count = device->input_channel_count();
         NSMutableArray *outputRoutes = [NSMutableArray arrayWithCapacity:output_channel_count];
         NSMutableArray *inputRoutes = [NSMutableArray arrayWithCapacity:input_channel_count];
 
-        for (uint32_t i = 0; i < output_channel_count; ++i) {
+        for (UInt32 i = 0; i < output_channel_count; ++i) {
             YASAudioDeviceRouteSampleData *data = [YASAudioDeviceRouteSampleData data];
             data.index = i;
             data.enabled = NO;
             [outputRoutes addObject:data];
         }
 
-        for (uint32_t i = 0; i < input_channel_count; ++i) {
+        for (UInt32 i = 0; i < input_channel_count; ++i) {
             YASAudioDeviceRouteSampleData *data = [YASAudioDeviceRouteSampleData data];
             data.index = i;
             data.enabled = NO;

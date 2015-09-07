@@ -44,7 +44,7 @@
     YASAudioEngineSampleParameterCell *cell =
         [tableView dequeueReusableCellWithIdentifier:@"ParameterCell" forIndexPath:indexPath];
 
-    [cell set_node:_node index:static_cast<uint32_t>(indexPath.row)];
+    [cell set_node:_node index:static_cast<UInt32>(indexPath.row)];
 
     return cell;
 }

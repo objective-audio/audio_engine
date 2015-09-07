@@ -9,6 +9,6 @@
 
 @interface YASAudioEngineSampleParameterCell : UITableViewCell
 
-- (void)set_node:(const yas::audio_unit_node_sptr &)node index:(const uint32_t)index;
+- (void)set_node:(const yas::audio_unit_node_sptr &)node index:(const UInt32)index;
 
 @end

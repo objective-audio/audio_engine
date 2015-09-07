@@ -147,7 +147,7 @@
     std::vector<yas::audio_connection_sptr> input_connections;
     input_connections.reserve(relay_node->input_bus_count());
 
-    for (uint32_t i = 0; i < relay_node->input_bus_count(); ++i) {
+    for (UInt32 i = 0; i < relay_node->input_bus_count(); ++i) {
         auto input_node = yas::test::audio_test_node::create();
         auto input_connection =
             yas::audio_connection::private_access::create(input_node, 0, relay_node, i, input_format);

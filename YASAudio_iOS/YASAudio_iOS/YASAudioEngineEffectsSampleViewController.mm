@@ -25,7 +25,7 @@ static const AudioComponentDescription baseAcd = {.componentType = kAudioUnitTyp
 
 @implementation YASAudioEngineEffectsSampleViewController {
     std::vector<yas::audio_unit_sptr> _audio_units;
-    std::experimental::optional<uint32_t> _index;
+    std::experimental::optional<UInt32> _index;
     yas::audio_engine_sptr _engine;
     yas::audio_unit_output_node_sptr _output_node;
     yas::audio_unit_node_sptr _effect_node;
@@ -121,7 +121,7 @@ static const AudioComponentDescription baseAcd = {.componentType = kAudioUnitTyp
 
     Float64 phase = 0;
 
-    auto tap_render_function = [phase](const yas::audio_pcm_buffer_sptr &buffer, const uint32_t bus_idx,
+    auto tap_render_function = [phase](const yas::audio_pcm_buffer_sptr &buffer, const UInt32 bus_idx,
                                        const yas::audio_time_sptr &when) mutable {
         buffer->clear();
 
@@ -129,9 +129,9 @@ static const AudioComponentDescription baseAcd = {.componentType = kAudioUnitTyp
         const Float64 phase_per_frame = 1000.0 / buffer->format()->sample_rate() * yas::audio_math::two_pi;
         yas::audio_frame_enumerator enumerator(buffer);
         const auto *flex_ptr = enumerator.pointer();
-        const uint32_t length = enumerator.frame_length();
+        const UInt32 length = enumerator.frame_length();
 
-        uint32_t idx = 0;
+        UInt32 idx = 0;
         while (flex_ptr->v) {
             if (idx == 0) {
                 phase = yas::audio_math::fill_sine(flex_ptr->f32, length, start_phase, phase_per_frame);
@@ -237,7 +237,7 @@ static const AudioComponentDescription baseAcd = {.componentType = kAudioUnitTyp
             [self replaceEffectNodeWithAudioComponentDescription:nullptr];
         } break;
         case YASAudioEngineEffectsSampleSectionEffects: {
-            _index = static_cast<uint32_t>(indexPath.row);
+            _index = static_cast<UInt32>(indexPath.row);
             AudioComponentDescription acd = baseAcd;
             const auto &audio_unit = _audio_units.at(indexPath.row);
             acd.componentSubType = audio_unit->sub_type();

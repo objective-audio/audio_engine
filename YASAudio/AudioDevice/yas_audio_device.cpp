@@ -542,7 +542,7 @@ audio_format_sptr audio_device::output_format() const
     return _impl->output_format();
 }
 
-uint32_t audio_device::input_channel_count() const
+UInt32 audio_device::input_channel_count() const
 {
     if (_impl->input_format()) {
         return _impl->input_format()->channel_count();
@@ -550,7 +550,7 @@ uint32_t audio_device::input_channel_count() const
     return 0;
 }
 
-uint32_t audio_device::output_channel_count() const
+UInt32 audio_device::output_channel_count() const
 {
     if (_impl->output_format()) {
         return _impl->output_format()->channel_count();
