@@ -16,7 +16,7 @@ namespace yas
     class audio_engine
     {
        public:
-        enum class notification_method : uint32_t {
+        enum class notification_method : UInt32 {
             configulation_change,
         };
 
@@ -43,15 +43,15 @@ namespace yas
         audio_connection_sptr connect(const audio_node_sptr &source_node, const audio_node_sptr &destination_node,
                                       const audio_format_sptr &format);
         audio_connection_sptr connect(const audio_node_sptr &source_node, const audio_node_sptr &destination_node,
-                                      const uint32_t source_bus_idx, const uint32_t destination_bus_idx,
+                                      const UInt32 source_bus_idx, const UInt32 destination_bus_idx,
                                       const audio_format_sptr &format);
 
         void disconnect(const audio_connection_sptr &connectiion);
         void disconnect(const audio_node_sptr &node);
         void disconnect_input(const audio_node_sptr &node);
-        void disconnect_input(const audio_node_sptr &node, const uint32_t bus_idx);
+        void disconnect_input(const audio_node_sptr &node, const UInt32 bus_idx);
         void disconnect_output(const audio_node_sptr &node);
-        void disconnect_output(const audio_node_sptr &node, const uint32_t bus_idx);
+        void disconnect_output(const audio_node_sptr &node, const UInt32 bus_idx);
 
         start_result start_render();
         start_result start_offline_render(const offline_render_f &render_function,

@@ -29,7 +29,7 @@ namespace yas
         AudioUnitScope scope() const;
         const std::string &unit_name() const;
         bool has_clump() const;
-        uint32_t clump_id() const;
+        UInt32 clump_id() const;
         const std::string &name() const;
         AudioUnitParameterUnit unit() const;
         AudioUnitParameterValue min_value() const;

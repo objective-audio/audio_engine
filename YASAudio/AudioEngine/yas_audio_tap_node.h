@@ -16,22 +16,22 @@ namespace yas
 
         virtual ~audio_tap_node();
 
-        using render_f = std::function<void(const audio_pcm_buffer_sptr &buffer, const uint32_t bus_idx,
+        using render_f = std::function<void(const audio_pcm_buffer_sptr &buffer, const UInt32 bus_idx,
                                             const audio_time_sptr &when)>;
 
         void set_render_function(const render_f &);
 
-        virtual uint32_t input_bus_count() const override;
-        virtual uint32_t output_bus_count() const override;
+        virtual UInt32 input_bus_count() const override;
+        virtual UInt32 output_bus_count() const override;
 
-        virtual void render(const audio_pcm_buffer_sptr &buffer, const uint32_t bus_idx,
+        virtual void render(const audio_pcm_buffer_sptr &buffer, const UInt32 bus_idx,
                             const audio_time_sptr &when) override;
 
-        audio_connection_sptr input_connection_on_render(const uint32_t bus_idx) const;
-        audio_connection_sptr output_connection_on_render(const uint32_t bus_idx) const;
+        audio_connection_sptr input_connection_on_render(const UInt32 bus_idx) const;
+        audio_connection_sptr output_connection_on_render(const UInt32 bus_idx) const;
         audio_connection_smap input_connections_on_render() const;
         audio_connection_smap output_connections_on_render() const;
-        void render_source(const audio_pcm_buffer_sptr &buffer, const uint32_t bus_idx, const audio_time_sptr &when);
+        void render_source(const audio_pcm_buffer_sptr &buffer, const UInt32 bus_idx, const audio_time_sptr &when);
 
        protected:
         audio_tap_node();
@@ -51,7 +51,7 @@ namespace yas
        public:
         static audio_input_tap_node_sptr create();
 
-        virtual uint32_t input_bus_count() const override;
-        virtual uint32_t output_bus_count() const override;
+        virtual UInt32 input_bus_count() const override;
+        virtual UInt32 output_bus_count() const override;
     };
 }

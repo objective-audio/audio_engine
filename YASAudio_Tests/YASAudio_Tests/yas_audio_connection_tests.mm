@@ -28,8 +28,8 @@
     auto format = yas::audio_format::create(48000.0, 2);
     auto source_node = yas::test::audio_test_node::create();
     auto destination_node = yas::test::audio_test_node::create();
-    const uint32_t source_bus = 0;
-    const uint32_t destination_bus = 1;
+    const UInt32 source_bus = 0;
+    const UInt32 destination_bus = 1;
 
     auto connection = yas::audio_connection::private_access::create(source_node, source_bus, destination_node,
                                                                     destination_bus, format);
@@ -49,8 +49,8 @@
     auto format = yas::audio_format::create(44100.0, 2);
     auto source_node = yas::test::audio_test_node::create();
     auto destination_node = yas::test::audio_test_node::create();
-    const uint32_t source_bus = 0;
-    const uint32_t destination_bus = 1;
+    const UInt32 source_bus = 0;
+    const UInt32 destination_bus = 1;
 
     auto connection = yas::audio_connection::private_access::create(source_node, source_bus, destination_node,
                                                                     destination_bus, format);
@@ -66,8 +66,8 @@
     auto format = yas::audio_format::create(8000.0, 2);
     auto source_node = yas::test::audio_test_node::create();
     auto destination_node = yas::test::audio_test_node::create();
-    const uint32_t source_bus = 0;
-    const uint32_t destination_bus = 1;
+    const UInt32 source_bus = 0;
+    const UInt32 destination_bus = 1;
 
     auto connection = yas::audio_connection::private_access::create(source_node, source_bus, destination_node,
                                                                     destination_bus, format);
@@ -87,8 +87,8 @@
     auto format = yas::audio_format::create(48000.0, 2);
     auto source_node = yas::test::audio_test_node::create();
     auto destination_node = yas::test::audio_test_node::create();
-    const uint32_t source_bus = 0;
-    const uint32_t destination_bus = 1;
+    const UInt32 source_bus = 0;
+    const UInt32 destination_bus = 1;
 
     XCTAssertThrows(
         yas::audio_connection::private_access::create(nullptr, source_bus, destination_node, destination_bus, format));

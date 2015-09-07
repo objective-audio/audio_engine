@@ -28,7 +28,7 @@ namespace yas
 
                 sine_node_wptr weak_node = node;
 
-                auto render_function = [weak_node](const audio_pcm_buffer_sptr &buffer, const uint32_t bus_idx,
+                auto render_function = [weak_node](const audio_pcm_buffer_sptr &buffer, const UInt32 bus_idx,
                                                    const audio_time_sptr &when) {
                     buffer->clear();
 
@@ -286,7 +286,7 @@ namespace yas
 
     auto weak_self_container = yas::objc_weak_container::create(self);
     auto file_writer = create_result.value();
-    uint32_t remain = self.length * yas::offline_sample::sample_rate;
+    UInt32 remain = self.length * yas::offline_sample::sample_rate;
 
     auto start_result = _offline_engine->start_offline_render(
         [remain, file_writer](const yas::audio_pcm_buffer_sptr &buffer, const auto &when, bool &stop) mutable {

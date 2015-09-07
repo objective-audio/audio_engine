@@ -80,8 +80,8 @@ namespace yas
 
         audio_format_sptr input_format() const;
         audio_format_sptr output_format() const;
-        uint32_t input_channel_count() const;
-        uint32_t output_channel_count() const;
+        UInt32 input_channel_count() const;
+        UInt32 output_channel_count() const;
 
         static system_subject_t &system_subject();
         property_subject_t &property_subject() const;

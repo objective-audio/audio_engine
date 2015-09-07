@@ -24,10 +24,10 @@ namespace yas
         const audio_unit_parameter_map &input_parameters() const;
         const audio_unit_parameter_map &output_parameters() const;
 
-        virtual uint32_t input_bus_count() const override;
-        virtual uint32_t output_bus_count() const override;
-        uint32_t input_element_count() const;
-        uint32_t output_element_count() const;
+        virtual UInt32 input_bus_count() const override;
+        virtual UInt32 output_bus_count() const override;
+        UInt32 input_element_count() const;
+        UInt32 output_element_count() const;
 
         void set_global_parameter_value(const AudioUnitParameterID parameter_id, const Float32 value);
         Float32 global_parameter_value(const AudioUnitParameterID parameter_id) const;
@@ -40,7 +40,7 @@ namespace yas
 
         virtual void update_connections() override;
 
-        void render(const audio_pcm_buffer_sptr &buffer, const uint32_t bus_idx, const audio_time_sptr &when) override;
+        void render(const audio_pcm_buffer_sptr &buffer, const UInt32 bus_idx, const audio_time_sptr &when) override;
 
        protected:
         static void prepare_for_create(const audio_unit_node_sptr &node);

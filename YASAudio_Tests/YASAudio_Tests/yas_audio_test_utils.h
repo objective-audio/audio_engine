@@ -37,13 +37,13 @@ namespace yas
         class audio_test_node : public yas::audio_node
         {
            public:
-            static audio_test_node_sptr create(const uint32_t input_bus_count = 2, const uint32_t output_bus_count = 1);
-            uint32_t input_bus_count() const override;
-            uint32_t output_bus_count() const override;
+            static audio_test_node_sptr create(const UInt32 input_bus_count = 2, const UInt32 output_bus_count = 1);
+            UInt32 input_bus_count() const override;
+            UInt32 output_bus_count() const override;
 
            private:
-            uint32_t _input_bus_count;
-            uint32_t _output_bus_count;
+            UInt32 _input_bus_count;
+            UInt32 _output_bus_count;
         };
     }
 }

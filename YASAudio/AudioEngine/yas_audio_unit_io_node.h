@@ -23,14 +23,14 @@ namespace yas
 #endif
 
         virtual bus_result_t next_available_output_bus() const override;
-        virtual bool is_available_output_bus(const uint32_t bus_idx) const override;
+        virtual bool is_available_output_bus(const UInt32 bus_idx) const override;
 
         void set_channel_map(const channel_map_t &map, const yas::direction dir);
         const channel_map_t &channel_map(const yas::direction dir) const;
 
         Float64 device_sample_rate() const;
-        uint32_t output_device_channel_count() const;
-        uint32_t input_device_channel_count() const;
+        UInt32 output_device_channel_count() const;
+        UInt32 input_device_channel_count() const;
 
         virtual void update_connections() override;
 
@@ -51,8 +51,8 @@ namespace yas
        public:
         static audio_unit_output_node_sptr create();
 
-        virtual uint32_t input_bus_count() const override;
-        virtual uint32_t output_bus_count() const override;
+        virtual UInt32 input_bus_count() const override;
+        virtual UInt32 output_bus_count() const override;
 
         void set_channel_map(const channel_map_t &map);
         const channel_map_t &channel_map() const;
@@ -69,8 +69,8 @@ namespace yas
        public:
         static audio_unit_input_node_sptr create();
 
-        virtual uint32_t input_bus_count() const override;
-        virtual uint32_t output_bus_count() const override;
+        virtual UInt32 input_bus_count() const override;
+        virtual UInt32 output_bus_count() const override;
 
         void set_channel_map(const channel_map_t &map);
         const channel_map_t &channel_map() const;

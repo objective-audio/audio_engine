@@ -24,8 +24,8 @@ namespace yas
 
         audio_connection_smap input_connections() const;
         audio_connection_smap output_connections() const;
-        audio_connection_sptr input_connection(const uint32_t bus_idx);
-        audio_connection_sptr output_connection(const uint32_t bus_idx);
+        audio_connection_sptr input_connection(const UInt32 bus_idx);
+        audio_connection_sptr output_connection(const UInt32 bus_idx);
 
        private:
         class impl;
@@ -55,25 +55,25 @@ namespace yas
 
         void reset();
 
-        audio_format_sptr input_format(const uint32_t bus_idx);
-        audio_format_sptr output_format(const uint32_t bus_idx);
+        audio_format_sptr input_format(const UInt32 bus_idx);
+        audio_format_sptr output_format(const UInt32 bus_idx);
         virtual bus_result_t next_available_input_bus() const;
         virtual bus_result_t next_available_output_bus() const;
-        virtual bool is_available_input_bus(const uint32_t bus_idx) const;
-        virtual bool is_available_output_bus(const uint32_t bus_idx) const;
+        virtual bool is_available_input_bus(const UInt32 bus_idx) const;
+        virtual bool is_available_output_bus(const UInt32 bus_idx) const;
         audio_engine_sptr engine() const;
         audio_time_sptr last_render_time() const;
 
-        virtual uint32_t input_bus_count() const;
-        virtual uint32_t output_bus_count() const;
+        virtual UInt32 input_bus_count() const;
+        virtual UInt32 output_bus_count() const;
 
-        virtual void render(const audio_pcm_buffer_sptr &buffer, const uint32_t bus_idx, const audio_time_sptr &when);
+        virtual void render(const audio_pcm_buffer_sptr &buffer, const UInt32 bus_idx, const audio_time_sptr &when);
 
        protected:
         audio_node();
 
-        audio_connection_sptr input_connection(const uint32_t bus_idx) const;
-        audio_connection_sptr output_connection(const uint32_t bus_idx) const;
+        audio_connection_sptr input_connection(const UInt32 bus_idx) const;
+        audio_connection_sptr output_connection(const UInt32 bus_idx) const;
         const audio_connection_wmap &input_connections() const;
         const audio_connection_wmap &output_connections() const;
 

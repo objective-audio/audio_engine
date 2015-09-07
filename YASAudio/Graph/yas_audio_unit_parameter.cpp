@@ -15,7 +15,7 @@ class audio_unit_parameter::impl
     AudioUnitParameterID parameter_id;
     AudioUnitScope scope;
     bool has_clump;
-    uint32_t clump_id;
+    UInt32 clump_id;
     AudioUnitParameterUnit unit;
     AudioUnitParameterValue min_value;
     AudioUnitParameterValue max_value;
@@ -108,7 +108,7 @@ bool audio_unit_parameter::has_clump() const
     return _impl->has_clump;
 }
 
-uint32_t audio_unit_parameter::clump_id() const
+UInt32 audio_unit_parameter::clump_id() const
 {
     return _impl->clump_id;
 }

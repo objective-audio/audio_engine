@@ -183,8 +183,8 @@ void yas::test::audio_unit_render_on_sub_thread(std::shared_ptr<audio_unit> audi
     }
 }
 
-test::audio_test_node_sptr test::audio_test_node::create(const uint32_t input_bus_count,
-                                                         const uint32_t output_bus_count)
+test::audio_test_node_sptr test::audio_test_node::create(const UInt32 input_bus_count,
+                                                         const UInt32 output_bus_count)
 {
     auto node = audio_test_node_sptr(new audio_test_node());
     node->_input_bus_count = input_bus_count;
@@ -192,12 +192,12 @@ test::audio_test_node_sptr test::audio_test_node::create(const uint32_t input_bu
     return node;
 }
 
-uint32_t yas::test::audio_test_node::input_bus_count() const
+UInt32 yas::test::audio_test_node::input_bus_count() const
 {
     return _input_bus_count;
 }
 
-uint32_t yas::test::audio_test_node::output_bus_count() const
+UInt32 yas::test::audio_test_node::output_bus_count() const
 {
     return _output_bus_count;
 }

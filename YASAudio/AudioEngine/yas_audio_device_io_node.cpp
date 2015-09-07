@@ -70,12 +70,12 @@ audio_device_io_node::audio_device_io_node(const audio_device_sptr &device)
 
 audio_device_io_node::~audio_device_io_node() = default;
 
-uint32_t audio_device_io_node::input_bus_count() const
+UInt32 audio_device_io_node::input_bus_count() const
 {
     return 1;
 }
 
-uint32_t audio_device_io_node::output_bus_count() const
+UInt32 audio_device_io_node::output_bus_count() const
 {
     return 1;
 }
@@ -216,7 +216,7 @@ bool audio_device_io_node::_validate_connections() const
 
 #pragma mark - render
 
-void audio_device_io_node::render(const audio_pcm_buffer_sptr &buffer, const uint32_t bus_idx,
+void audio_device_io_node::render(const audio_pcm_buffer_sptr &buffer, const UInt32 bus_idx,
                                   const audio_time_sptr &when)
 {
     super_class::render(buffer, bus_idx, when);

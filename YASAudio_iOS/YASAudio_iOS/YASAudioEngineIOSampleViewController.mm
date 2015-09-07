@@ -9,7 +9,7 @@
 #import "yas_audio.h"
 #import <Accelerate/Accelerate.h>
 
-static uint32_t const YASAudioEngineIOSampleConnectionMaxChannels = 2;
+static UInt32 const YASAudioEngineIOSampleConnectionMaxChannels = 2;
 
 typedef NS_ENUM(NSUInteger, YASAudioEngineIOSampleSection) {
     YASAudioEngineIOSampleSectionInfo,
@@ -45,7 +45,7 @@ namespace yas
 
                 std::weak_ptr<meter_input_tap_node> weak_node = node;
 
-                node->set_render_function([weak_node](const yas::audio_pcm_buffer_sptr &buffer, const uint32_t bus_idx,
+                node->set_render_function([weak_node](const yas::audio_pcm_buffer_sptr &buffer, const UInt32 bus_idx,
                                                       const yas::audio_time_sptr &when) {
                     if (auto node = weak_node.lock()) {
                         node->render_source(buffer, bus_idx, when);
@@ -266,13 +266,13 @@ namespace yas
 {
     const Float64 sample_rate = _io_node->device_sample_rate();
 
-    const uint32_t output_channel_count = [self _connectionChannelCountForDirection:yas::direction::output];
+    const UInt32 output_channel_count = [self _connectionChannelCountForDirection:yas::direction::output];
     if (output_channel_count > 0) {
         auto output_format = yas::audio_format::create(sample_rate, output_channel_count);
         _engine->connect(_mixer_node, _io_node, output_format);
     }
 
-    const uint32_t input_channel_count = [self _connectionChannelCountForDirection:yas::direction::input];
+    const UInt32 input_channel_count = [self _connectionChannelCountForDirection:yas::direction::input];
     if (input_channel_count > 0) {
         auto input_format = yas::audio_format::create(sample_rate, input_channel_count);
         _engine->connect(_io_node, _mixer_node, input_format);
@@ -343,7 +343,7 @@ namespace yas
         UITableViewCell *cell = [self _dequeueChannelMapCellWithIndexPath:indexPath];
 
         yas::direction dir = [self _directionForSection:indexPath.section];
-        uint32_t map_size = [self _deviceChannelCountForDirection:dir];
+        UInt32 map_size = [self _deviceChannelCountForDirection:dir];
 
         if (indexPath.row < map_size) {
             const auto &map = [self _channelMapForDirection:dir];
@@ -462,7 +462,7 @@ namespace yas
     }
 }
 
-- (uint32_t)_connectionChannelCountForDirection:(yas::direction)dir
+- (UInt32)_connectionChannelCountForDirection:(yas::direction)dir
 {
     switch (dir) {
         case yas::direction::output:
@@ -474,7 +474,7 @@ namespace yas
     }
 }
 
-- (uint32_t)_deviceChannelCountForDirection:(yas::direction)dir
+- (UInt32)_deviceChannelCountForDirection:(yas::direction)dir
 {
     switch (dir) {
         case yas::direction::output:
@@ -486,7 +486,7 @@ namespace yas
     }
 }
 
-- (uint32_t)_deviceChannelCountForSection:(NSInteger)section
+- (UInt32)_deviceChannelCountForSection:(NSInteger)section
 {
     switch (section) {
         case YASAudioEngineIOSampleSectionChannelMapOutput:
