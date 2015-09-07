@@ -7,6 +7,7 @@
 #import "YASAudioEngineIOSampleSelectionViewController.h"
 #import "YASAudioSliderCell.h"
 #import "yas_audio.h"
+#import "yas_objc_utils.h"
 #import <Accelerate/Accelerate.h>
 
 static UInt32 const YASAudioEngineIOSampleConnectionMaxChannels = 2;
@@ -17,6 +18,8 @@ typedef NS_ENUM(NSUInteger, YASAudioEngineIOSampleSection) {
     YASAudioEngineIOSampleSectionNotify,
     YASAudioEngineIOSampleSectionChannelMapOutput,
     YASAudioEngineIOSampleSectionChannelMapInput,
+    YASAudioEngineIOSampleSectionChannelRouteOutput,
+    YASAudioEngineIOSampleSectionChannelRouteInput,
     YASAudioEngineIOSampleSectionCount,
 };
 
@@ -137,7 +140,7 @@ namespace yas
         NSString *errorMessage = nil;
         NSError *error = nil;
 
-        if ([[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayAndRecord error:&error]) {
+        if ([[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryMultiRoute error:&error]) {
             [self setupEngine];
 
             const auto start_result = _engine->start_render();
@@ -201,7 +204,7 @@ namespace yas
 
         yas::direction dir = [self _directionForSection:indexPath.section];
 
-        auto map = [self _channelMapForDirection:dir];
+        auto map = _io_node->channel_map(dir);
         if (map.empty()) {
             map.resize([self _deviceChannelCountForDirection:dir], -1);
         }
@@ -209,7 +212,7 @@ namespace yas
         auto &value = map.at(indexPath.row);
         value = controller.selectedValue;
 
-        [self _setChannelMap:map forDirection:dir];
+        _io_node->set_channel_map(map, dir);
 
         [self.tableView reloadSections:[NSIndexSet indexSetWithIndex:indexPath.section]
                       withRowAnimation:UITableViewRowAnimationAutomatic];
@@ -304,6 +307,10 @@ namespace yas
         case YASAudioEngineIOSampleSectionChannelMapOutput:
         case YASAudioEngineIOSampleSectionChannelMapInput:
             return [self _deviceChannelCountForSection:section] + 1;
+        case YASAudioEngineIOSampleSectionChannelRouteOutput:
+            return [AVAudioSession sharedInstance].currentRoute.outputs.count;
+        case YASAudioEngineIOSampleSectionChannelRouteInput:
+            return [AVAudioSession sharedInstance].currentRoute.inputs.count;
     }
     return 0;
 }
@@ -319,64 +326,121 @@ namespace yas
             return @"Output Channel Map";
         case YASAudioEngineIOSampleSectionChannelMapInput:
             return @"Input Channel Map";
+        case YASAudioEngineIOSampleSectionChannelRouteOutput:
+            return @"Output Channel Routes";
+        case YASAudioEngineIOSampleSectionChannelRouteInput:
+            return @"Input Channel Routes";
     }
     return nil;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    if (indexPath.section == YASAudioEngineIOSampleSectionInfo) {
-        UITableViewCell *cell = [self _dequeueNormalCellWithIndexPath:indexPath];
-        cell.textLabel.text = [NSString stringWithFormat:@"sr:%@ out:%@ in:%@", @(_io_node->device_sample_rate()),
-                                                         @(_io_node->output_device_channel_count()),
-                                                         @(_io_node->input_device_channel_count())];
-        return cell;
-    } else if (indexPath.section == YASAudioEngineIOSampleSectionSlider) {
-        YASAudioSliderCell *cell = [self _dequeueSliderWithIndexPath:indexPath];
-        cell.slider.value = _mixer_node->input_volume(0);
-        return cell;
-    } else if (indexPath.section == YASAudioEngineIOSampleSectionNotify) {
-        UITableViewCell *cell = [self _dequeueNormalCellWithIndexPath:indexPath];
-        cell.textLabel.text = @"Send Notify";
-        return cell;
-    } else {
-        UITableViewCell *cell = [self _dequeueChannelMapCellWithIndexPath:indexPath];
+    switch (indexPath.section) {
+        case YASAudioEngineIOSampleSectionInfo: {
+            UITableViewCell *cell = [self _dequeueNormalCellWithIndexPath:indexPath];
+            cell.textLabel.text = [NSString stringWithFormat:@"sr:%@ out:%@ in:%@", @(_io_node->device_sample_rate()),
+                                                             @(_io_node->output_device_channel_count()),
+                                                             @(_io_node->input_device_channel_count())];
+            return cell;
+        } break;
 
-        yas::direction dir = [self _directionForSection:indexPath.section];
-        UInt32 map_size = [self _deviceChannelCountForDirection:dir];
+        case YASAudioEngineIOSampleSectionSlider: {
+            YASAudioSliderCell *cell = [self _dequeueSliderWithIndexPath:indexPath];
+            cell.slider.value = _mixer_node->input_volume(0);
+            return cell;
+        } break;
 
-        if (indexPath.row < map_size) {
-            const auto &map = [self _channelMapForDirection:dir];
-            NSString *selected = nil;
-            if (map.empty()) {
-                selected = @"empty";
+        case YASAudioEngineIOSampleSectionNotify: {
+            UITableViewCell *cell = [self _dequeueNormalCellWithIndexPath:indexPath];
+            cell.textLabel.text = @"Send Notify";
+            return cell;
+        } break;
+
+        case YASAudioEngineIOSampleSectionChannelMapOutput:
+        case YASAudioEngineIOSampleSectionChannelMapInput: {
+            UITableViewCell *cell = [self _dequeueChannelMapCellWithIndexPath:indexPath];
+
+            yas::direction dir = [self _directionForSection:indexPath.section];
+            UInt32 map_size = [self _deviceChannelCountForDirection:dir];
+
+            if (indexPath.row < map_size) {
+                const auto &map = _io_node->channel_map(dir);
+                NSString *selected = nil;
+                if (map.empty()) {
+                    selected = @"empty";
+                } else {
+                    selected = [NSString stringWithFormat:@"%@", @(map.at(indexPath.row))];
+                }
+                cell.textLabel.text = [NSString stringWithFormat:@"%@ - %@", @(indexPath.row), selected];
             } else {
-                selected = [NSString stringWithFormat:@"%@", @(map.at(indexPath.row))];
+                cell.textLabel.text = @"Clear";
             }
-            cell.textLabel.text = [NSString stringWithFormat:@"%@ - %@", @(indexPath.row), selected];
-        } else {
-            cell.textLabel.text = @"Clear";
-        }
 
-        return cell;
+            return cell;
+        } break;
+
+        case YASAudioEngineIOSampleSectionChannelRouteOutput: {
+            AVAudioSessionPortDescription *port = [AVAudioSession sharedInstance].currentRoute.outputs[indexPath.row];
+            UITableViewCell *cell = [self _dequeueNormalCellWithIndexPath:indexPath];
+            cell.textLabel.text =
+                [NSString stringWithFormat:@"name:%@ channels:%@", port.portName, @(port.channels.count)];
+            cell.selectionStyle = UITableViewCellSelectionStyleDefault;
+            return cell;
+        } break;
+
+        case YASAudioEngineIOSampleSectionChannelRouteInput: {
+            AVAudioSessionPortDescription *port = [AVAudioSession sharedInstance].currentRoute.inputs[indexPath.row];
+            UITableViewCell *cell = [self _dequeueNormalCellWithIndexPath:indexPath];
+            cell.textLabel.text =
+                [NSString stringWithFormat:@"name:%@ channels:%@", port.portName, @(port.channels.count)];
+            cell.selectionStyle = UITableViewCellSelectionStyleDefault;
+            return cell;
+        } break;
     }
+
+    return nil;
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    if (indexPath.section == YASAudioEngineIOSampleSectionNotify) {
-        if (_engine) {
-            _engine->subject().notify(yas::audio_engine::notification_method::configulation_change);
-        }
-    } else if (indexPath.section >= YASAudioEngineIOSampleSectionChannelMapOutput) {
-        yas::direction dir = [self _directionForSection:indexPath.section];
-        auto map = [self _channelMapForDirection:dir];
-        if (indexPath.row == [self _deviceChannelCountForSection:indexPath.section]) {
-            map.clear();
-            [self _setChannelMap:map forDirection:dir];
-            [self.tableView reloadSections:[NSIndexSet indexSetWithIndex:indexPath.section]
+    switch (indexPath.section) {
+        case YASAudioEngineIOSampleSectionNotify: {
+            if (_engine) {
+                _engine->subject().notify(yas::audio_engine::notification_method::configulation_change);
+            }
+        } break;
+
+        case YASAudioEngineIOSampleSectionChannelMapOutput:
+        case YASAudioEngineIOSampleSectionChannelMapInput: {
+            yas::direction dir = [self _directionForSection:indexPath.section];
+            auto map = _io_node->channel_map(dir);
+            if (indexPath.row == [self _deviceChannelCountForSection:indexPath.section]) {
+                map.clear();
+                _io_node->set_channel_map(map, dir);
+
+                [self.tableView reloadSections:[NSIndexSet indexSetWithIndex:indexPath.section]
+                              withRowAnimation:UITableViewRowAnimationAutomatic];
+            }
+        } break;
+
+        case YASAudioEngineIOSampleSectionChannelRouteOutput: {
+            AVAudioSessionPortDescription *port = [AVAudioSession sharedInstance].currentRoute.outputs[indexPath.row];
+            auto map = yas::to_channel_map(port.channels, yas::direction::output);
+            _io_node->set_channel_map(map, yas::direction::output);
+
+            [self.tableView reloadSections:[NSIndexSet indexSetWithIndex:YASAudioEngineIOSampleSectionChannelMapOutput]
                           withRowAnimation:UITableViewRowAnimationAutomatic];
-        }
+        } break;
+
+        case YASAudioEngineIOSampleSectionChannelRouteInput: {
+            AVAudioSessionPortDescription *port = [AVAudioSession sharedInstance].currentRoute.inputs[indexPath.row];
+            auto map = yas::to_channel_map(port.channels, yas::direction::input);
+            _io_node->set_channel_map(map, yas::direction::input);
+
+            [self.tableView reloadSections:[NSIndexSet indexSetWithIndex:YASAudioEngineIOSampleSectionChannelMapInput]
+                          withRowAnimation:UITableViewRowAnimationAutomatic];
+        } break;
     }
 
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
@@ -439,18 +503,6 @@ namespace yas
             }
         }
     }
-}
-
-- (const yas::channel_map_t &)_channelMapForDirection:(yas::direction)dir
-{
-#warning TODO: メソッドを使う必要なし
-    return _io_node->channel_map(dir);
-}
-
-- (void)_setChannelMap:(const yas::channel_map_t &)map forDirection:(yas::direction)dir
-{
-#warning TODO: メソッドを使う必要なし
-    _io_node->set_channel_map(map, dir);
 }
 
 - (yas::direction)_directionForSection:(NSInteger)section

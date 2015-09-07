@@ -11,6 +11,6 @@
 namespace yas
 {
 #if TARGET_OS_IPHONE
-    channel_map_t to_channel_map(const NSArray *channelAssignments, const AudioUnitScope scope);
+    channel_map_t to_channel_map(const NSArray *channelDescriptions, const yas::direction dir);
 #endif
 }
