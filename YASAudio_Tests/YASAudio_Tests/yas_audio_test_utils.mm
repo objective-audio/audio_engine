@@ -120,7 +120,7 @@ bool yas::test::is_equal_buffer_flexibly(audio_pcm_buffer_sptr &data1, audio_pcm
     return YES;
 }
 
-bool test::is_equal(const double val1, const double val2, const double accuracy)
+bool test::is_equal(const Float64 val1, const Float64 val2, const Float64 accuracy)
 {
     return ((val1 - accuracy) <= val2 && val2 <= (val1 + accuracy));
 }
@@ -183,8 +183,7 @@ void yas::test::audio_unit_render_on_sub_thread(std::shared_ptr<audio_unit> audi
     }
 }
 
-test::audio_test_node_sptr test::audio_test_node::create(const UInt32 input_bus_count,
-                                                         const UInt32 output_bus_count)
+test::audio_test_node_sptr test::audio_test_node::create(const UInt32 input_bus_count, const UInt32 output_bus_count)
 {
     auto node = audio_test_node_sptr(new audio_test_node());
     node->_input_bus_count = input_bus_count;

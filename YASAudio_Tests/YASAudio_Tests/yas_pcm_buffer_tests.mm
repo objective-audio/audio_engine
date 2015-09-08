@@ -528,8 +528,8 @@
     yas::abl_uptr &abl1 = pair1.first;
     yas::abl_uptr &abl2 = pair2.first;
 
-    std::vector<uint8_t> buffer1{0};
-    std::vector<uint8_t> buffer2{0};
+    std::vector<UInt8> buffer1{0};
+    std::vector<UInt8> buffer2{0};
 
     abl1->mBuffers[0].mData = abl2->mBuffers[0].mData = buffer1.data();
     abl1->mBuffers[1].mData = abl2->mBuffers[1].mData = buffer2.data();
@@ -544,8 +544,8 @@
     yas::abl_uptr &abl1 = pair1.first;
     yas::abl_uptr &abl2 = pair2.first;
 
-    std::vector<uint8_t> buffer1{0};
-    std::vector<uint8_t> buffer2{0};
+    std::vector<UInt8> buffer1{0};
+    std::vector<UInt8> buffer2{0};
 
     abl1->mBuffers[0].mData = buffer1.data();
     abl2->mBuffers[0].mData = buffer2.data();
@@ -560,7 +560,7 @@
     yas::abl_uptr &abl1 = pair1.first;
     yas::abl_uptr &abl2 = pair2.first;
 
-    std::vector<uint8_t> buffer{0};
+    std::vector<UInt8> buffer{0};
 
     abl1->mBuffers[0].mData = abl2->mBuffers[0].mData = buffer.data();
 
@@ -574,7 +574,7 @@
     yas::abl_uptr &abl1 = pair1.first;
     yas::abl_uptr &abl2 = pair2.first;
 
-    std::vector<uint8_t> buffer{0};
+    std::vector<UInt8> buffer{0};
 
     abl1->mBuffers[0].mData = abl2->mBuffers[0].mData = buffer.data();
 

@@ -25,7 +25,7 @@
 
 - (void)testCreateStandardAudioFormat
 {
-    const double sampleRate = 44100.0;
+    const Float64 sampleRate = 44100.0;
     const UInt32 channelCount = 2;
     const UInt32 bufferCount = channelCount;
     const UInt32 stride = 1;
@@ -59,7 +59,7 @@
 
 - (void)testCreateFormat48000kHz1ch64bitsInterleaved
 {
-    const double sampleRate = 48000.0;
+    const Float64 sampleRate = 48000.0;
     const UInt32 channelCount = 1;
     const UInt32 bufferCount = 1;
     const UInt32 stride = channelCount;
@@ -93,7 +93,7 @@
 
 - (void)testCreateFormat32000kHz4ch16bitsInterleaved
 {
-    const double sampleRate = 32000.0;
+    const Float64 sampleRate = 32000.0;
     const UInt32 channelCount = 4;
     const UInt32 bufferCount = 1;
     const UInt32 stride = channelCount;
@@ -127,7 +127,7 @@
 
 - (void)testCreateAudioFormatWithStreamDescription
 {
-    const double sampleRate = 2348739.1;
+    const Float64 sampleRate = 2348739.1;
     const UInt32 channelCount = 6;
     const UInt32 bufferCount = 1;
     const UInt32 stride = channelCount;
@@ -159,7 +159,7 @@
 
 - (void)testEqualAudioFormats
 {
-    const double sampleRate = 44100;
+    const Float64 sampleRate = 44100;
     const UInt32 channelCount = 2;
 
     auto audio_format1 = yas::audio_format::create(sampleRate, channelCount);
@@ -172,7 +172,7 @@
 
 - (void)testCreateAudioFormatWithSettings
 {
-    const double sampleRate = 44100.0;
+    const Float64 sampleRate = 44100.0;
 
     CFDictionaryRef settings = yas::linear_pcm_file_settings(sampleRate, 2, 32, false, true, true);
 

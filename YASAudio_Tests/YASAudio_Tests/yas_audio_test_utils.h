@@ -23,7 +23,7 @@ namespace yas
         bool is_filled_buffer(audio_pcm_buffer_sptr &data);
         bool is_equal_buffer_flexibly(audio_pcm_buffer_sptr &data1, audio_pcm_buffer_sptr &data2);
         flex_pointer data_ptr_from_buffer(audio_pcm_buffer_sptr &data, const UInt32 ch_idx, const UInt32 frame);
-        bool is_equal(const double val1, const double val2, const double accuracy = 0);
+        bool is_equal(const Float64 val1, const Float64 val2, const Float64 accuracy = 0);
         bool is_equal_data(const void *inData1, const void *inData2, const size_t inSize);
         bool is_equal(const AudioTimeStamp *ts1, const AudioTimeStamp *ts2);
 

@@ -490,9 +490,9 @@ audio_pcm_buffer::copy_result yas::copy(const AudioBufferList *from_abl, AudioBu
                 auto to_float_data = static_cast<Float32 *>(to_data);
                 cblas_scopy(copy_length, from_float_data, from_stride, to_float_data, to_stride);
             } else if (sample_byte_count == sizeof(Float64)) {
-                auto from_double_data = static_cast<const Float64 *>(from_data);
-                auto to_double_data = static_cast<Float64 *>(to_data);
-                cblas_dcopy(copy_length, from_double_data, from_stride, to_double_data, to_stride);
+                auto from_float64_data = static_cast<const Float64 *>(from_data);
+                auto to_float64_data = static_cast<Float64 *>(to_data);
+                cblas_dcopy(copy_length, from_float64_data, from_stride, to_float64_data, to_stride);
             } else {
                 for (UInt32 frame = 0; frame < copy_length; ++frame) {
                     const UInt32 sample_frame = frame * sample_byte_count;
