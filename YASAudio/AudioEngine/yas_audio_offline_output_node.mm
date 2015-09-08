@@ -14,7 +14,7 @@ using namespace yas;
 
 class audio_offline_output_node::impl
 {
-    using completion_function_map = std::map<uint8_t, completion_f>;
+    using completion_function_map = std::map<UInt8, completion_f>;
 
    public:
     std::weak_ptr<audio_offline_output_node> weak_node;
@@ -24,7 +24,7 @@ class audio_offline_output_node::impl
     {
     }
 
-    const std::experimental::optional<uint8_t> push_completion_function(const completion_f &function)
+    const std::experimental::optional<UInt8> push_completion_function(const completion_f &function)
     {
         if (!function) {
             return std::experimental::nullopt;
@@ -37,7 +37,7 @@ class audio_offline_output_node::impl
         return key;
     }
 
-    const std::experimental::optional<completion_f> pull_completion_function(uint8_t key)
+    const std::experimental::optional<completion_f> pull_completion_function(UInt8 key)
     {
         if (_completion_functions.count(key) > 0) {
             auto func = _completion_functions.at(key);
@@ -94,7 +94,7 @@ audio_offline_output_node::start_result audio_offline_output_node::_start(const 
     if (_impl->queue_container) {
         return start_result(start_error_t::already_running);
     } else if (auto connection = input_connection(0)) {
-        std::experimental::optional<uint8_t> key;
+        std::experimental::optional<UInt8> key;
         if (completion_func) {
             key = _impl->push_completion_function(completion_func);
             if (!key) {

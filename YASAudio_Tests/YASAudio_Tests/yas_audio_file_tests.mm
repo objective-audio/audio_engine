@@ -94,18 +94,18 @@ namespace yas
 - (void)testWAVEFile
 {
 #if WAVEFILE_LIGHT_TEST
-    double sample_rates[] = {44100.0, 382000.0};
+    Float64 sample_rates[] = {44100.0, 382000.0};
     UInt32 channels[] = {1, 2};
     UInt32 file_bit_depths[] = {16, 24};
     yas::pcm_format pcm_formats[] = {yas::pcm_format::float32, yas::pcm_format::float64};
-    BOOL interleaveds[] = {YES, NO};
+    bool interleaveds[] = {YES, NO};
 #else
-    double sample_rates[] = {8000.0, 44100.0, 48000.0, 382000.0};
+    Float64 sample_rates[] = {8000.0, 44100.0, 48000.0, 382000.0};
     UInt32 channels[] = {1, 2, 3, 6};
     UInt32 file_bit_depths[] = {16, 24, 32};
     yas::pcm_format pcm_formats[] = {yas::pcm_format::float32, yas::pcm_format::float64, yas::pcm_format::int16,
                                      yas::pcm_format::fixed824};
-    BOOL interleaveds[] = {YES, NO};
+    bool interleaveds[] = {YES, NO};
 #endif
 
     yas::audio_file_test_data test_data;
@@ -116,8 +116,8 @@ namespace yas
     test_data.standard = NO;
     test_data.async = NO;
 
-    for (double file_sample_rate : sample_rates) {
-        for (double processing_sample_rate : sample_rates) {
+    for (Float64 file_sample_rate : sample_rates) {
+        for (Float64 processing_sample_rate : sample_rates) {
             for (UInt32 channel : channels) {
                 for (UInt32 file_bit_depth : file_bit_depths) {
                     for (yas::pcm_format pcm_format : pcm_formats) {
@@ -297,7 +297,7 @@ namespace yas
     }
 }
 
-- (BOOL)_compareData:(yas::audio_pcm_buffer_sptr &)buffer
+- (bool)_compareData:(yas::audio_pcm_buffer_sptr &)buffer
           fileFormat:(yas::audio_format &)fileFormat
           startIndex:(NSInteger)startIndex
 {

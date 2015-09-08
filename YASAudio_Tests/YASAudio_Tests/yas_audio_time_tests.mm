@@ -36,7 +36,7 @@ static NSInteger testCount = 8;
 - (void)testCreateAudioTimeWithHostTime
 {
     for (NSInteger i = 0; i < testCount; i++) {
-        uint64_t hostTime = arc4random();
+        UInt64 hostTime = arc4random();
 
         AVAudioTime *avTime = [AVAudioTime timeWithHostTime:hostTime];
         auto yas_time = yas::audio_time(hostTime);
@@ -48,8 +48,8 @@ static NSInteger testCount = 8;
 - (void)testCreateAudioTimeSampleTime
 {
     for (NSInteger i = 0; i < testCount; i++) {
-        int64_t sampleTime = arc4random();
-        double rate = arc4random_uniform(378000 - 4000) + 4000;
+        SInt64 sampleTime = arc4random();
+        Float64 rate = arc4random_uniform(378000 - 4000) + 4000;
 
         AVAudioTime *avTime = [AVAudioTime timeWithSampleTime:sampleTime atRate:rate];
         auto yas_time = yas::audio_time(sampleTime, rate);
@@ -61,9 +61,9 @@ static NSInteger testCount = 8;
 - (void)testCreateAudioTimeWithHostTimeAndSampleTime
 {
     for (NSInteger i = 0; i < testCount; i++) {
-        uint64_t hostTime = arc4random();
-        int64_t sampleTime = arc4random();
-        double rate = arc4random_uniform(378000 - 4000) + 4000;
+        UInt64 hostTime = arc4random();
+        SInt64 sampleTime = arc4random();
+        Float64 rate = arc4random_uniform(378000 - 4000) + 4000;
 
         AVAudioTime *avTime = [AVAudioTime timeWithHostTime:hostTime sampleTime:sampleTime atRate:rate];
         auto yas_time = yas::audio_time(hostTime, sampleTime, rate);
@@ -75,13 +75,13 @@ static NSInteger testCount = 8;
 - (void)testConvert
 {
     for (NSInteger i = 0; i < testCount; i++) {
-        uint64_t hostTime = arc4random();
+        UInt64 hostTime = arc4random();
 
         NSTimeInterval avSec = [AVAudioTime secondsForHostTime:hostTime];
         NSTimeInterval yasSec = yas::seconds_for_host_time(hostTime);
         XCTAssertTrue(avSec == yasSec, @"");
-        uint64_t avHostTime = [AVAudioTime hostTimeForSeconds:avSec];
-        uint64_t yasHostTime = yas::host_time_for_seconds(yasSec);
+        UInt64 avHostTime = [AVAudioTime hostTimeForSeconds:avSec];
+        UInt64 yasHostTime = yas::host_time_for_seconds(yasSec);
         XCTAssertTrue(avHostTime == yasHostTime, @"");
     }
 }
@@ -89,13 +89,13 @@ static NSInteger testCount = 8;
 - (void)testExtrapolateTime
 {
     for (NSInteger i = 0; i < testCount; i++) {
-        uint64_t hostTime = arc4random();
-        int64_t sampleTime = arc4random();
-        double rate = arc4random_uniform(378000 - 4000) + 4000;
+        UInt64 hostTime = arc4random();
+        SInt64 sampleTime = arc4random();
+        Float64 rate = arc4random_uniform(378000 - 4000) + 4000;
 
         AVAudioTime *avTime = [AVAudioTime timeWithHostTime:hostTime sampleTime:sampleTime atRate:rate];
         auto yas_time = yas::audio_time(hostTime, sampleTime, rate);
-        int64_t sampleTime2 = sampleTime + arc4random();
+        SInt64 sampleTime2 = sampleTime + arc4random();
         AVAudioTime *avTime2 = [AVAudioTime timeWithSampleTime:sampleTime2 atRate:rate];
         auto yas_time2 = yas::audio_time(sampleTime2, rate);
         AVAudioTime *avExtraplateTime = [avTime2 extrapolateTimeFromAnchor:avTime];
