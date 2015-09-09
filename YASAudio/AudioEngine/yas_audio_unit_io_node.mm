@@ -1,5 +1,5 @@
 //
-//  yas_audio_unit_io_node.cpp
+//  yas_audio_unit_io_node.mm
 //  Copyright (c) 2015 Yuki Yasoshima.
 //
 

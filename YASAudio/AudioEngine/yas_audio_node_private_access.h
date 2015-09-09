@@ -1,5 +1,5 @@
 //
-//  yas_audio_node_test_utils.h
+//  yas_audio_node_private_access.h
 //  Copyright (c) 2015 Yuki Yasoshima.
 //
 

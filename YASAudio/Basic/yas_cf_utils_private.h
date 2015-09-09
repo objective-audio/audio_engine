@@ -1,5 +1,5 @@
 //
-//  yas_cf_utils.cpp
+//  yas_cf_utils_private.h
 //  Copyright (c) 2015 Yuki Yasoshima.
 //
 

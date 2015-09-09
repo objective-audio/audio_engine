@@ -1,5 +1,5 @@
 //
-//  yas_audio_offline_output_node.cpp
+//  yas_audio_offline_output_node.mm
 //  Copyright (c) 2015 Yuki Yasoshima.
 //
 
