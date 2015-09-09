@@ -6,6 +6,7 @@
 #import <XCTest/XCTest.h>
 #import <AVFoundation/AVFoundation.h>
 #import "yas_audio_time.h"
+#import "yas_objc_utils.h"
 #import "yas_audio_test_utils.h"
 
 static NSInteger testCount = 8;
@@ -24,13 +25,6 @@ static NSInteger testCount = 8;
 - (void)tearDown
 {
     [super tearDown];
-}
-
-- (BOOL)compareAudioTimeStamp:(AVAudioTime *)avTime to:(yas::audio_time &)yasTime
-{
-    AudioTimeStamp avTimeStamp = avTime.audioTimeStamp;
-    const AudioTimeStamp &yasTimeStamp = yasTime.audio_time_stamp();
-    return yas::test::is_equal(&avTimeStamp, &yasTimeStamp);
 }
 
 - (void)testCreateAudioTimeWithHostTime
@@ -104,6 +98,41 @@ static NSInteger testCount = 8;
         XCTAssertTrue([self compareAudioTimeStamp:avExtraplateTime to:yas_extraplate_time]);
         XCTAssertTrue(avTime2.sampleRate == yas_time2.sample_rate());
     }
+}
+
+- (void)test_compare_objc_to_cpp
+{
+    for (NSInteger i = 0; i < testCount; i++) {
+        SInt64 sampleTime = arc4random();
+        Float64 rate = arc4random_uniform(378000 - 4000) + 4000;
+
+        AVAudioTime *avTime = [AVAudioTime timeWithSampleTime:sampleTime atRate:rate];
+        auto yas_time = yas::to_audio_time(avTime);
+        XCTAssertTrue([self compareAudioTimeStamp:avTime to:yas_time]);
+        XCTAssertTrue(yas::test::is_equal(avTime.sampleRate, yas_time.sample_rate(), 0.00001), @"");
+    }
+}
+
+- (void)test_compare_cpp_to_objc
+{
+    for (NSInteger i = 0; i < testCount; i++) {
+        SInt64 sampleTime = arc4random();
+        Float64 rate = arc4random_uniform(378000 - 4000) + 4000;
+
+        auto yas_time = yas::audio_time(sampleTime, rate);
+        AVAudioTime *avTime = yas::to_objc_object(yas_time);
+        XCTAssertTrue([self compareAudioTimeStamp:avTime to:yas_time]);
+        XCTAssertTrue(yas::test::is_equal(avTime.sampleRate, yas_time.sample_rate(), 0.00001), @"");
+    }
+}
+
+#pragma mark -
+
+- (BOOL)compareAudioTimeStamp:(AVAudioTime *)avTime to:(yas::audio_time &)yasTime
+{
+    AudioTimeStamp avTimeStamp = avTime.audioTimeStamp;
+    const AudioTimeStamp &yasTimeStamp = yasTime.audio_time_stamp();
+    return yas::test::is_equal(&avTimeStamp, &yasTimeStamp);
 }
 
 @end

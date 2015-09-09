@@ -4,6 +4,7 @@
 //
 
 #include "yas_audio_time.h"
+#include "yas_objc_utils.h"
 #include <AVFoundation/AVFoundation.h>
 #include "YASMacros.h"
 #include <exception>
@@ -79,10 +80,6 @@ audio_time::audio_time(const UInt64 host_time, const SInt64 sample_time, const F
     YASRelease(_impl->av_audio_time);
 }
 
-audio_time::audio_time(AVAudioTime *av_audio_time) : _impl(std::make_unique<impl>(av_audio_time))
-{
-}
-
 audio_time::audio_time(const audio_time &time) : _impl(std::make_unique<impl>(time._impl->av_audio_time))
 {
 }
@@ -142,14 +139,10 @@ AudioTimeStamp audio_time::audio_time_stamp() const
     return _impl->av_audio_time.audioTimeStamp;
 }
 
-AVAudioTime *audio_time::av_audio_time() const
-{
-    return YASRetainAndAutorelease(_impl->av_audio_time);
-}
-
 audio_time audio_time::extrapolate_time_from_anchor(const audio_time &anchor_time)
 {
-    return audio_time([_impl->av_audio_time extrapolateTimeFromAnchor:anchor_time._impl->av_audio_time]);
+    AVAudioTime *time = [_impl->av_audio_time extrapolateTimeFromAnchor:anchor_time._impl->av_audio_time];
+    return to_audio_time(time);
 }
 
 #pragma mark - global

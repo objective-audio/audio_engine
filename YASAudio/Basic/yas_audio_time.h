@@ -9,8 +9,6 @@
 #include <AudioToolbox/AudioToolbox.h>
 #include <memory>
 
-@class AVAudioTime;
-
 namespace yas
 {
     class audio_time
@@ -25,7 +23,6 @@ namespace yas
         explicit audio_time(const UInt64 host_time);
         audio_time(const SInt64 sample_time, const Float64 sample_rate);
         audio_time(const UInt64 host_time, const SInt64 sample_time, const Float64 sample_rate);
-        explicit audio_time(AVAudioTime *av_audio_time);
         ~audio_time();
 
         audio_time(const audio_time &);
@@ -39,7 +36,6 @@ namespace yas
         SInt64 sample_time() const;
         Float64 sample_rate() const;
         AudioTimeStamp audio_time_stamp() const;
-        AVAudioTime *av_audio_time() const;
 
         audio_time extrapolate_time_from_anchor(const audio_time &anchor_time);
 
