@@ -8,7 +8,6 @@
 #include "yas_objc_container.h"
 #include "yas_stl_utils.h"
 #include <map>
-#include <Foundation/Foundation.h>
 
 using namespace yas;
 

@@ -15,7 +15,6 @@
 #include "yas_exception.h"
 #include <memory>
 #include <mutex>
-#include <Foundation/Foundation.h>
 
 using namespace yas;
 
@@ -306,7 +305,7 @@ UInt32 audio_device_io::maximum_frames_per_slice() const
 
 void audio_device_io::start()
 {
-    _impl->is_running = YES;
+    _impl->is_running = true;
 
     if (!_impl->device || !_impl->io_proc_id) {
         return;
@@ -321,7 +320,7 @@ void audio_device_io::stop()
         return;
     }
 
-    _impl->is_running = NO;
+    _impl->is_running = false;
 
     if (!_impl->device || !_impl->io_proc_id) {
         return;

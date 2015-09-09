@@ -58,7 +58,7 @@ audio_format_sptr audio_format::create(const CFDictionaryRef &settings)
 }
 
 audio_format_sptr audio_format::create(const Float64 sample_rate, const UInt32 channel_count,
-                                      const yas::pcm_format pcm_format, const bool interleaved)
+                                       const yas::pcm_format pcm_format, const bool interleaved)
 {
     return audio_format_sptr(new audio_format(sample_rate, channel_count, pcm_format, interleaved));
 }
