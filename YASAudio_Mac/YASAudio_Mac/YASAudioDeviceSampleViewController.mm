@@ -5,6 +5,7 @@
 
 #import "YASAudioDeviceSampleViewController.h"
 #import "YASMacros.h"
+#import "yas_objc_container.h"
 #import "YASDecibelValueTransformer.h"
 #import "YASFrequencyValueFormatter.h"
 #import <Accelerate/Accelerate.h>

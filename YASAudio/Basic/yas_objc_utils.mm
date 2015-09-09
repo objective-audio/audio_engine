@@ -58,3 +58,15 @@ channel_map_t yas::to_channel_map(const NSArray *channelDescriptions, const yas:
 }
 
 #endif
+
+AVAudioTime *yas::to_objc_object(const audio_time &time)
+{
+    const AudioTimeStamp time_stamp = time.audio_time_stamp();
+    return [AVAudioTime timeWithAudioTimeStamp:&time_stamp sampleRate:time.sample_rate()];
+}
+
+audio_time yas::to_audio_time(const AVAudioTime *av_time)
+{
+    const AudioTimeStamp time_stamp = av_time.audioTimeStamp;
+    return audio_time(time_stamp, av_time.sampleRate);
+}

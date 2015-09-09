@@ -4,7 +4,6 @@
 //
 
 #include "yas_audio_node.h"
-#include "yas_audio_engine.h"
 #include "yas_audio_connection.h"
 #include "yas_audio_time.h"
 #include "yas_stl_utils.h"
@@ -67,7 +66,7 @@ void audio_node_core::set_output_connections(const audio_connection_wmap &connec
 class audio_node::impl
 {
    public:
-    std::weak_ptr<audio_engine> engine;
+    audio_engine_wptr engine;
 
     impl() : engine(), _input_connections(), _output_connections(), _node_core(nullptr), _render_time(nullptr), _mutex()
     {

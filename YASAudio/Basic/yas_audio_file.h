@@ -8,7 +8,7 @@
 #include "yas_audio_types.h"
 #include "yas_audio_pcm_buffer.h"
 #include <memory>
-#include <Foundation/Foundation.h>
+#include <CoreFoundation/CoreFoundation.h>
 
 namespace yas
 {
