@@ -1,5 +1,5 @@
 //
-//  yas_objc_utils.cpp
+//  yas_objc_utils.mm
 //  Copyright (c) 2015 Yuki Yasoshima.
 //
 

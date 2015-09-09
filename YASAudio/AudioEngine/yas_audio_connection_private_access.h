@@ -1,5 +1,5 @@
 //
-//  yas_audio_connection_test_utils.h
+//  yas_audio_connection_private_access.h
 //  Copyright (c) 2015 Yuki Yasoshima.
 //
 
@@ -11,8 +11,8 @@ namespace yas
     {
        public:
         static audio_connection_sptr create(const audio_node_sptr &source_node, const UInt32 source_bus,
-                                           const audio_node_sptr &destination_node, const UInt32 destination_bus,
-                                           const audio_format_sptr &format)
+                                            const audio_node_sptr &destination_node, const UInt32 destination_bus,
+                                            const audio_format_sptr &format)
         {
             return audio_connection::_create(source_node, source_bus, destination_node, destination_bus, format);
         }
