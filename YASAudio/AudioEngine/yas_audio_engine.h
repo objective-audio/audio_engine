@@ -31,7 +31,7 @@ namespace yas
             offline_output_starting_failure,
         };
 
-        using start_result = yas::result<std::nullptr_t, start_error_t>;
+        using start_result_t = yas::result<std::nullptr_t, start_error_t>;
 
         using offline_render_f = audio_offline_output_node::render_f;
         using offline_completion_f = audio_offline_output_node::completion_f;
@@ -53,8 +53,8 @@ namespace yas
         void disconnect_output(const audio_node_sptr &node);
         void disconnect_output(const audio_node_sptr &node, const UInt32 bus_idx);
 
-        start_result start_render();
-        start_result start_offline_render(const offline_render_f &render_function,
+        start_result_t start_render();
+        start_result_t start_offline_render(const offline_render_f &render_function,
                                           const offline_completion_f &completion_function);
         void stop();
 

@@ -130,13 +130,13 @@ namespace yas
         }
     };
 
-    using get_abl_info_result = result<yas::abl_info, audio_pcm_buffer::copy_error_t>;
+    using get_abl_info_result_t = result<yas::abl_info, audio_pcm_buffer::copy_error_t>;
 }
 
-static get_abl_info_result get_abl_info(const AudioBufferList *abl, const UInt32 sample_byte_count)
+static get_abl_info_result_t get_abl_info(const AudioBufferList *abl, const UInt32 sample_byte_count)
 {
     if (!abl || sample_byte_count == 0 || sample_byte_count > 8) {
-        return get_abl_info_result(audio_pcm_buffer::copy_error_t::invalid_argument);
+        return get_abl_info_result_t(audio_pcm_buffer::copy_error_t::invalid_argument);
     }
 
     const UInt32 buffer_count = abl->mNumberBuffers;
@@ -149,7 +149,7 @@ static get_abl_info_result get_abl_info(const AudioBufferList *abl, const UInt32
         if (data_info.frame_length == 0) {
             data_info.frame_length = frame_length;
         } else if (data_info.frame_length != frame_length) {
-            return get_abl_info_result(audio_pcm_buffer::copy_error_t::invalid_abl);
+            return get_abl_info_result_t(audio_pcm_buffer::copy_error_t::invalid_abl);
         }
         data_info.channel_count += stride;
     }
@@ -165,7 +165,7 @@ static get_abl_info_result get_abl_info(const AudioBufferList *abl, const UInt32
         }
     }
 
-    return get_abl_info_result(std::move(data_info));
+    return get_abl_info_result_t(std::move(data_info));
 }
 
 #pragma mark - public

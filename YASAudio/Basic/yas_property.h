@@ -21,7 +21,7 @@ namespace yas
     {
        public:
         using shared_ptr = std::shared_ptr<property<K, T>>;
-        using dispatched_subject = subject<property_method, yas::property<K, T>::shared_ptr>;
+        using dispatched_subject_t = subject<property_method, yas::property<K, T>::shared_ptr>;
         using dispatcher_sptr = typename observer<property_method, property<K, T>::shared_ptr>::sptr;
 
         static shared_ptr create(const K &key);

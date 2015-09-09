@@ -14,7 +14,7 @@ class audio_unit_node::impl
    public:
     audio_unit_node_wptr weak_node;
     AudioComponentDescription acd;
-    std::map<AudioUnitScope, audio_unit_parameter_map> parameters;
+    std::map<AudioUnitScope, audio_unit_parameter_map_t> parameters;
     audio_graph_wptr audio_graph;
     audio_unit_sptr _audio_unit;
 
@@ -84,22 +84,22 @@ audio_unit_sptr audio_unit_node::audio_unit() const
     return _impl->audio_unit();
 }
 
-const std::map<AudioUnitParameterID, audio_unit_parameter_map> &audio_unit_node::parameters() const
+const std::map<AudioUnitParameterID, audio_unit_parameter_map_t> &audio_unit_node::parameters() const
 {
     return _impl->parameters;
 }
 
-const audio_unit_parameter_map &audio_unit_node::global_parameters() const
+const audio_unit_parameter_map_t &audio_unit_node::global_parameters() const
 {
     return _impl->parameters.at(kAudioUnitScope_Global);
 }
 
-const audio_unit_parameter_map &audio_unit_node::input_parameters() const
+const audio_unit_parameter_map_t &audio_unit_node::input_parameters() const
 {
     return _impl->parameters.at(kAudioUnitScope_Input);
 }
 
-const audio_unit_parameter_map &audio_unit_node::output_parameters() const
+const audio_unit_parameter_map_t &audio_unit_node::output_parameters() const
 {
     return _impl->parameters.at(kAudioUnitScope_Output);
 }

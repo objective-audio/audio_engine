@@ -83,9 +83,9 @@ namespace yas
         void notify(const K &key, const T &object) const;
 
        private:
-        using observers_vec = std::vector<std::weak_ptr<observer<K, T>>>;
-        using observers_map = std::map<const std::experimental::optional<K>, observers_vec>;
-        observers_map _observers;
+        using observers_vector_t = std::vector<std::weak_ptr<observer<K, T>>>;
+        using observers_map_t = std::map<const std::experimental::optional<K>, observers_vector_t>;
+        observers_map_t _observers;
 
         subject(const subject<K, T> &) = delete;
         subject(const subject<K, T> &&) = delete;

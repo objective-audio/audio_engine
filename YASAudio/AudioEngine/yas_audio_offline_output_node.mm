@@ -13,7 +13,7 @@ using namespace yas;
 
 class audio_offline_output_node::impl
 {
-    using completion_function_map = std::map<UInt8, completion_f>;
+    using completion_function_map_t = std::map<UInt8, completion_f>;
 
    public:
     std::weak_ptr<audio_offline_output_node> weak_node;
@@ -47,7 +47,7 @@ class audio_offline_output_node::impl
         }
     }
 
-    completion_function_map pull_completion_functions()
+    completion_function_map_t pull_completion_functions()
     {
         auto map = _completion_functions;
         _completion_functions.clear();
@@ -55,7 +55,7 @@ class audio_offline_output_node::impl
     }
 
    private:
-    completion_function_map _completion_functions;
+    completion_function_map_t _completion_functions;
 };
 
 audio_offline_output_node_sptr audio_offline_output_node::create()
@@ -87,17 +87,17 @@ UInt32 audio_offline_output_node::input_bus_count() const
     return 1;
 }
 
-audio_offline_output_node::start_result audio_offline_output_node::_start(const render_f &render_func,
-                                                                          const completion_f &completion_func)
+audio_offline_output_node::start_result_t audio_offline_output_node::_start(const render_f &render_func,
+                                                                            const completion_f &completion_func)
 {
     if (_impl->queue_container) {
-        return start_result(start_error_t::already_running);
+        return start_result_t(start_error_t::already_running);
     } else if (auto connection = input_connection(0)) {
         std::experimental::optional<UInt8> key;
         if (completion_func) {
             key = _impl->push_completion_function(completion_func);
             if (!key) {
-                return start_result(start_error_t::prepare_failure);
+                return start_result_t(start_error_t::prepare_failure);
             }
         }
 
@@ -188,9 +188,9 @@ audio_offline_output_node::start_result audio_offline_output_node::_start(const 
         YASRelease(blockOperation);
         YASRelease(queue);
     } else {
-        return start_result(start_error_t::connection_not_found);
+        return start_result_t(start_error_t::connection_not_found);
     }
-    return start_result(nullptr);
+    return start_result_t(nullptr);
 }
 
 void audio_offline_output_node::_stop()

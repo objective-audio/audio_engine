@@ -474,61 +474,61 @@ void audio_engine::disconnect_output(const audio_node_sptr &node, const UInt32 b
     });
 }
 
-audio_engine::start_result audio_engine::start_render()
+audio_engine::start_result_t audio_engine::start_render()
 {
     if (const auto graph = _impl->graph()) {
         if (graph->is_running()) {
-            return start_result(start_error_t::already_running);
+            return start_result_t(start_error_t::already_running);
         }
     }
 
     if (const auto offline_output_node = _impl->offline_output_node()) {
         if (offline_output_node->is_running()) {
-            return start_result(start_error_t::already_running);
+            return start_result_t(start_error_t::already_running);
         }
     }
 
     if (!_impl->prepare()) {
-        return start_result(start_error_t::prepare_failure);
+        return start_result_t(start_error_t::prepare_failure);
     }
 
     _impl->graph()->start();
 
-    return start_result(nullptr);
+    return start_result_t(nullptr);
 }
 
-audio_engine::start_result audio_engine::start_offline_render(const offline_render_f &render_function,
-                                                              const offline_completion_f &completion_function)
+audio_engine::start_result_t audio_engine::start_offline_render(const offline_render_f &render_function,
+                                                                const offline_completion_f &completion_function)
 {
     if (const auto graph = _impl->graph()) {
         if (graph->is_running()) {
-            return start_result(start_error_t::already_running);
+            return start_result_t(start_error_t::already_running);
         }
     }
 
     if (const auto offline_output_node = _impl->offline_output_node()) {
         if (offline_output_node->is_running()) {
-            return start_result(start_error_t::already_running);
+            return start_result_t(start_error_t::already_running);
         }
     }
 
     if (!_impl->prepare()) {
-        return start_result(start_error_t::prepare_failure);
+        return start_result_t(start_error_t::prepare_failure);
     }
 
     const auto offline_output_node = _impl->offline_output_node();
 
     if (!offline_output_node) {
-        return start_result(start_error_t::offline_output_not_found);
+        return start_result_t(start_error_t::offline_output_not_found);
     }
 
     auto result =
         audio_offline_output_node::private_access::start(offline_output_node, render_function, completion_function);
 
     if (result) {
-        return start_result(nullptr);
+        return start_result_t(nullptr);
     } else {
-        return start_result(start_error_t::offline_output_starting_failure);
+        return start_result_t(start_error_t::offline_output_starting_failure);
     }
 }
 

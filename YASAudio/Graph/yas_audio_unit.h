@@ -69,7 +69,7 @@ namespace yas
         AudioUnitParameterValue parameter_value(const AudioUnitParameterID parameter_id, const AudioUnitScope scope,
                                                 const AudioUnitElement element);
 
-        audio_unit_parameter_map create_parameters(const AudioUnitScope scope);
+        audio_unit_parameter_map_t create_parameters(const AudioUnitScope scope);
         audio_unit_parameter create_parameter(const AudioUnitParameterID &parameter_id, const AudioUnitScope scope);
 
         void set_element_count(const UInt32 &count, const AudioUnitScope &scope);  // for mixer

@@ -125,8 +125,8 @@ namespace yas
     }
 }
 
-using sample_kernel = yas::audio_device_sample::kernel;
-using sample_kernel_sptr = std::shared_ptr<yas::audio_device_sample::kernel>;
+using sample_kernel_t = yas::audio_device_sample::kernel;
+using sample_kernel_sptr = std::shared_ptr<sample_kernel_t>;
 
 @interface YASAudioDeviceSampleViewController ()
 
@@ -177,13 +177,13 @@ using sample_kernel_sptr = std::shared_ptr<yas::audio_device_sample::kernel>;
     _audio_device_io = yas::audio_device_io::create();
     _audio_graph->add_audio_device_io(_audio_device_io);
 
-    _kernel = std::make_shared<sample_kernel>();
+    _kernel = std::make_shared<sample_kernel_t>();
 
     self.throughVolume = _kernel->through_volume();
     self.sineVolume = _kernel->sine_volume();
     self.sineFrequency = _kernel->sine_frequency();
 
-    _audio_device_observer = yas::audio_device_observer::create();
+    _audio_device_observer = yas::audio_device_observer_t::create();
     _audio_device_observer->add_handler(
         yas::audio_device::system_subject(), yas::audio_device::method::hardware_did_change,
         [weak_container = _self_container](const auto &, const auto &) {

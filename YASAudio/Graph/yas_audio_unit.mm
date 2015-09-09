@@ -448,20 +448,19 @@ AudioUnitParameterValue audio_unit::parameter_value(const AudioUnitParameterID p
     return value;
 }
 
-audio_unit_parameter_map audio_unit::create_parameters(const AudioUnitScope scope)
+audio_unit_parameter_map_t audio_unit::create_parameters(const AudioUnitScope scope)
 {
     auto parameter_list = audio_unit::property_data<AudioUnitParameterID>(kAudioUnitProperty_ParameterList, scope, 0);
+    auto parameters = audio_unit_parameter_map_t();
 
     if (parameter_list.size() > 0) {
-        auto parameters = audio_unit_parameter_map();
         for (const AudioUnitParameterID &parameter_id : parameter_list) {
             auto parameter = audio_unit::create_parameter(parameter_id, scope);
             parameters.insert(std::make_pair(parameter_id, std::move(parameter)));
         }
-        return parameters;
     }
 
-    return audio_unit_parameter_map();
+    return parameters;
 }
 
 audio_unit_parameter audio_unit::create_parameter(const AudioUnitParameterID &parameter_id, const AudioUnitScope scope)
