@@ -5,7 +5,6 @@
 
 #import "YASAudioGraphSampleViewController.h"
 #import "yas_audio.h"
-#import "YASMacros.h"
 
 @interface YASAudioGraphSampleViewController ()
 

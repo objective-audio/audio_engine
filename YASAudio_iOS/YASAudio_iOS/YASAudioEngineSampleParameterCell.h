@@ -5,10 +5,13 @@
 
 #import <UIKit/UIKit.h>
 #import <memory>
-#import "yas_audio.h"
+
+namespace yas {
+    class audio_unit_node;
+}
 
 @interface YASAudioEngineSampleParameterCell : UITableViewCell
 
-- (void)set_node:(const yas::audio_unit_node_sptr &)node index:(const UInt32)index;
+- (void)set_node:(const std::shared_ptr<yas::audio_unit_node> &)node index:(const UInt32)index;
 
 @end

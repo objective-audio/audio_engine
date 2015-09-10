@@ -3,8 +3,7 @@
 //  Copyright (c) 2015 Yuki Yasoshima.
 //
 
-#import <XCTest/XCTest.h>
-#import "yas_objc_container.h"
+#import "yas_audio_test_utils.h"
 
 static int _objc_object_count = 0;
 

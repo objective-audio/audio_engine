@@ -3,9 +3,7 @@
 //  Copyright (c) 2015 Yuki Yasoshima.
 //
 
-#import <XCTest/XCTest.h>
-#import "yas_property.h"
-#import "YASMacros.h"
+#import "yas_audio_test_utils.h"
 
 enum class test_key {
     property1,

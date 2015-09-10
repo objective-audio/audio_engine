@@ -3,10 +3,12 @@
 //  Copyright (c) 2015 Yuki Yasoshima.
 //
 
+#import <XCTest/XCTest.h>
+#import <Foundation/Foundation.h>
+
 #pragma once
 
 #include "yas_audio.h"
-#include <Foundation/Foundation.h>
 
 @class YASAudioFormat;
 

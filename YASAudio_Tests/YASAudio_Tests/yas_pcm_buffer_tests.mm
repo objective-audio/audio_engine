@@ -3,12 +3,7 @@
 //  Copyright (c) 2015 Yuki Yasoshima.
 //
 
-#import <XCTest/XCTest.h>
-#include "yas_audio_pcm_buffer.h"
-#include "yas_audio_format.h"
-#include "yas_audio_channel_route.h"
-#include "yas_audio_test_utils.h"
-#include <memory>
+#import "yas_audio_test_utils.h"
 
 @interface yas_pcm_buffer_tests : XCTestCase
 

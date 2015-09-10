@@ -3,13 +3,7 @@
 //  Copyright (c) 2015 Yuki Yasoshima.
 //
 
-#import <XCTest/XCTest.h>
-#import "yas_audio_graph.h"
-#import "yas_audio_unit.h"
-#import "yas_audio_format.h"
-#import "yas_audio_time.h"
-#import "yas_audio_pcm_buffer.h"
-#import "YASMacros.h"
+#import "yas_audio_test_utils.h"
 
 @interface yas_audio_graph_tests : XCTestCase
 

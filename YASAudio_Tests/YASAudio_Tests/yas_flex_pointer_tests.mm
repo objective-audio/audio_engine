@@ -3,8 +3,7 @@
 //  Copyright (c) 2015 Yuki Yasoshima.
 //
 
-#import <XCTest/XCTest.h>
-#import "yas_audio_types.h"
+#import "yas_audio_test_utils.h"
 
 @interface yas_flex_pointer_tests : XCTestCase
 
