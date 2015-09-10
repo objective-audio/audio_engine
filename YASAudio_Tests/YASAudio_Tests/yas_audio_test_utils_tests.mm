@@ -49,7 +49,7 @@
         .mSubframes = 1,
         .mSubframeDivisor = 1,
         .mCounter = 1,
-        .mType = 1,
+        .mType = kSMPTETimeType25,
         .mFlags = 1,
         .mHours = 1,
         .mMinutes = 1,
@@ -86,7 +86,7 @@
     XCTAssertFalse(yas::test::is_equal(&timeStamp1, &timeStamp2));
 
     timeStamp2 = timeStamp1;
-    timeStamp2.mSMPTETime.mType = 2;
+    timeStamp2.mSMPTETime.mType = kSMPTETimeType30Drop;
 
     XCTAssertFalse(yas::test::is_equal(&timeStamp1, &timeStamp2));
 
