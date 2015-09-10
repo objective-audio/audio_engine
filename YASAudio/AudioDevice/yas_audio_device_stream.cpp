@@ -53,7 +53,7 @@ class audio_device_stream::impl
    public:
     AudioStreamID stream_id;
     AudioDeviceID device_id;
-    property_subject subject;
+    property_subject_t subject;
 
     impl() : stream_id(0), device_id(0), subject()
     {
@@ -178,7 +178,7 @@ UInt32 audio_device_stream::starting_channel() const
     return 0;
 }
 
-audio_device_stream::property_subject &audio_device_stream::subject() const
+audio_device_stream::property_subject_t &audio_device_stream::subject() const
 {
     return _impl->subject;
 }

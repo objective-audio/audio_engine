@@ -10,8 +10,8 @@ namespace yas
     class audio_offline_output_node::private_access
     {
        public:
-        static start_result start(audio_offline_output_node *node, const render_f &callback_func,
-                                  const completion_f &completion_func)
+        static start_result_t start(audio_offline_output_node *node, const render_f &callback_func,
+                                    const completion_f &completion_func)
         {
             return node->_start(callback_func, completion_func);
         }

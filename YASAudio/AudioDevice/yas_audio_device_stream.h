@@ -63,8 +63,8 @@ namespace yas
         audio_format_sptr virtual_format() const;
         UInt32 starting_channel() const;
 
-        using property_subject = subject<method, std::set<property_info>>;
-        property_subject &subject() const;
+        using property_subject_t = subject<method, std::set<property_info>>;
+        property_subject_t &subject() const;
 
        private:
         class impl;

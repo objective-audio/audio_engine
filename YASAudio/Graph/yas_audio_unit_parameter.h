@@ -13,7 +13,7 @@
 namespace yas
 {
     class audio_unit_parameter;
-    using audio_unit_parameter_map = std::map<AudioUnitParameterID, audio_unit_parameter>;
+    using audio_unit_parameter_map_t = std::map<AudioUnitParameterID, audio_unit_parameter>;
 
     class audio_unit_parameter
     {

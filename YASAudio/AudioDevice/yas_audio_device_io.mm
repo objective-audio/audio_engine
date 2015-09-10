@@ -62,7 +62,7 @@ class audio_device_io::impl
           io_proc_id(nullptr),
           input_buffer_on_render(nullptr),
           input_time_on_render(nullptr),
-          observer(audio_device_observer::create()),
+          observer(audio_device_observer_t::create()),
           _render_callback(nullptr),
           _maximum_frames(4096),
           _kernel(nullptr),

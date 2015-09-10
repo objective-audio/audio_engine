@@ -100,8 +100,8 @@ namespace yas
         friend audio_device_global;
     };
 
-    using audio_device_observer = observer<audio_device::method, std::vector<audio_device::property_info>>;
-    using audio_device_observer_sptr = audio_device_observer::sptr;
+    using audio_device_observer_t = observer<audio_device::method, std::vector<audio_device::property_info>>;
+    using audio_device_observer_sptr = audio_device_observer_t::sptr;
 }
 
 #endif

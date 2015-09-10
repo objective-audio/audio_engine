@@ -19,10 +19,10 @@ namespace yas
         virtual ~audio_unit_node();
 
         audio_unit_sptr audio_unit() const;
-        const std::map<AudioUnitScope, audio_unit_parameter_map> &parameters() const;
-        const audio_unit_parameter_map &global_parameters() const;
-        const audio_unit_parameter_map &input_parameters() const;
-        const audio_unit_parameter_map &output_parameters() const;
+        const std::map<AudioUnitScope, audio_unit_parameter_map_t> &parameters() const;
+        const audio_unit_parameter_map_t &global_parameters() const;
+        const audio_unit_parameter_map_t &input_parameters() const;
+        const audio_unit_parameter_map_t &output_parameters() const;
 
         virtual UInt32 input_bus_count() const override;
         virtual UInt32 output_bus_count() const override;

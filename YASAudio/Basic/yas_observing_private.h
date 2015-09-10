@@ -237,7 +237,7 @@ namespace yas
                                       const std::experimental::optional<K> &key)
     {
         if (_observers.count(key) == 0) {
-            _observers.insert(std::make_pair(key, observers_vec()));
+            _observers.insert(std::make_pair(key, observers_vector_t()));
         }
 
         auto &vector = _observers.at(key);
