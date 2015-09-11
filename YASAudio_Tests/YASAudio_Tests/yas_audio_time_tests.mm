@@ -3,10 +3,6 @@
 //  Copyright (c) 2015 Yuki Yasoshima.
 //
 
-#import <XCTest/XCTest.h>
-#import <AVFoundation/AVFoundation.h>
-#import "yas_audio_time.h"
-#import "yas_objc_utils.h"
 #import "yas_audio_test_utils.h"
 
 static NSInteger testCount = 8;

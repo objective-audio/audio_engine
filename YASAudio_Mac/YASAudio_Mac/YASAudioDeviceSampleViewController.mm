@@ -4,14 +4,11 @@
 //
 
 #import "YASAudioDeviceSampleViewController.h"
-#import "YASMacros.h"
-#import "yas_objc_container.h"
 #import "YASDecibelValueTransformer.h"
 #import "YASFrequencyValueFormatter.h"
-#import <Accelerate/Accelerate.h>
 #import "yas_audio.h"
 #import <atomic>
-#import <vector>
+#import <Accelerate/Accelerate.h>
 
 static const UInt32 kSineDataMaxCount = 4096;
 

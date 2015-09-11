@@ -5,8 +5,6 @@
 
 #import "YASAudioEngineDeviceIOSampleViewController.h"
 #import "yas_audio.h"
-#import "yas_objc_container.h"
-#import "YASMacros.h"
 #import <Accelerate/Accelerate.h>
 
 @interface YASAudioDeviceRouteSampleData : NSObject

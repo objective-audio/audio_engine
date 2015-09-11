@@ -3,11 +3,7 @@
 //  Copyright (c) 2015 Yuki Yasoshima.
 //
 
-#import <XCTest/XCTest.h>
-#import "yas_any.h"
-#import "yas_observing.h"
-#import <string>
-#import <vector>
+#import "yas_audio_test_utils.h"
 
 @interface yas_any_tests : XCTestCase
 

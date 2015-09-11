@@ -3,8 +3,7 @@
 //  Copyright (c) 2015 Yuki Yasoshima.
 //
 
-#import <XCTest/XCTest.h>
-#import "yas_stl_utils.h"
+#import "yas_audio_test_utils.h"
 
 @interface yas_stl_utils_tests : XCTestCase
 
