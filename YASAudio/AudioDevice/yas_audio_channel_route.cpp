@@ -5,6 +5,7 @@
 
 #include "yas_audio_channel_route.h"
 #include "yas_audio_format.h"
+#include "yas_cf_utils.h"
 #include <exception>
 
 using namespace yas;
@@ -117,6 +118,11 @@ UInt32 channel_route::destination_bus() const
 UInt32 channel_route::destination_channel() const
 {
     return _impl->destination_channel;
+}
+
+CFStringRef channel_route::description() const
+{
+    return to_cf_object(to_string(*this));
 }
 
 std::string yas::to_string(const channel_route &route)

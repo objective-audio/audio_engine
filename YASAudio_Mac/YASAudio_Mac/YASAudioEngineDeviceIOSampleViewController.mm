@@ -185,7 +185,7 @@
     NSMutableArray *titles = [NSMutableArray arrayWithCapacity:all_devices.size()];
 
     for (auto &device : all_devices) {
-        [titles addObject:(__bridge NSString *)device->cf_name()];
+        [titles addObject:(__bridge NSString *)device->name()];
     }
 
     [titles addObject:@"None"];
@@ -221,7 +221,7 @@
     }
 
     if (auto const device = _device_io_node->device()) {
-        NSLog(@"device name = %@ - samplerate = %@", device->cf_name(), @(device->nominal_sample_rate()));
+        NSLog(@"device name = %@ - samplerate = %@", device->name(), @(device->nominal_sample_rate()));
 
         const UInt32 output_channel_count = device->output_channel_count();
         const UInt32 input_channel_count = device->input_channel_count();

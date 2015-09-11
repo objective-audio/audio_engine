@@ -5,6 +5,7 @@
 
 #include "yas_audio_format.h"
 #include "yas_exception.h"
+#include "yas_cf_utils.h"
 #include <map>
 #import <AVFoundation/AVFoundation.h>
 
@@ -183,7 +184,7 @@ UInt32 audio_format::buffer_frame_byte_count() const
     return sample_byte_count() * stride();
 }
 
-std::string audio_format::description() const
+CFStringRef audio_format::description() const
 {
     std::string string;
     const AudioStreamBasicDescription &asbd = stream_description();
@@ -195,10 +196,10 @@ std::string audio_format::description() const
     string += "    bytesPerPacket = " + std::to_string(asbd.mBytesPerPacket) + ";\n";
     string += "    channelsPerFrame = " + std::to_string(asbd.mChannelsPerFrame) + ";\n";
     string += "    formatFlags = " + format_flags_string(stream_description()) + ";\n";
-    string += "    formatID = " + file_type_string(asbd.mFormatID) + ";\n";
+    string += "    formatID = " + to_string(yas::file_type_for_hfs_type_code(asbd.mFormatID)) + ";\n";
     string += "    framesPerPacket = " + std::to_string(asbd.mFramesPerPacket) + ";\n";
     string += "}\n";
-    return string;
+    return yas::to_cf_object(string);
 }
 
 #pragma mark - utility
@@ -341,11 +342,4 @@ AudioStreamBasicDescription yas::to_stream_description(const Float64 sample_rate
 bool yas::is_equal(const AudioStreamBasicDescription &asbd1, const AudioStreamBasicDescription &asbd2)
 {
     return memcmp(&asbd1, &asbd2, sizeof(AudioStreamBasicDescription)) == 0;
-}
-
-std::string yas::file_type_string(OSType fcc)
-{
-    const char four_char[5] = {static_cast<char>((fcc >> 24) & 0xFF), static_cast<char>((fcc >> 16) & 0xFF),
-                               static_cast<char>((fcc >> 8) & 0xFF), static_cast<char>(fcc & 0xFF), 0};
-    return std::string("'") + four_char + "'";
 }

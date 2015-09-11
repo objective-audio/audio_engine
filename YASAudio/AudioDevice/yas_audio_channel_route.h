@@ -35,7 +35,7 @@ namespace yas
         UInt32 destination_bus() const;
         UInt32 destination_channel() const;
 
-        std::string description() const;
+        CFStringRef description() const;
 
        private:
         class impl;
