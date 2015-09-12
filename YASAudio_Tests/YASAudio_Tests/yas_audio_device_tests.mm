@@ -38,38 +38,38 @@
 
 - (void)testAudioChannelRouteSimple
 {
-    const UInt32 bus = 4;
-    const UInt32 channel = 5;
+    const UInt32 bus_idx = 4;
+    const UInt32 ch_idx = 5;
 
-    auto channel_route = yas::channel_route::create(bus, channel);
+    auto channel_route = yas::channel_route::create(bus_idx, ch_idx);
 
-    XCTAssertEqual(channel_route->source_bus(), bus);
-    XCTAssertEqual(channel_route->source_channel(), channel);
-    XCTAssertEqual(channel_route->destination_bus(), bus);
-    XCTAssertEqual(channel_route->destination_channel(), channel);
+    XCTAssertEqual(channel_route->source_bus(), bus_idx);
+    XCTAssertEqual(channel_route->source_channel(), ch_idx);
+    XCTAssertEqual(channel_route->destination_bus(), bus_idx);
+    XCTAssertEqual(channel_route->destination_channel(), ch_idx);
 }
 
 - (void)testDefaultAudioChannelRoute
 {
-    const UInt32 bus = 6;
-    const UInt32 channels = 4;
+    const UInt32 bus_idx = 6;
+    const UInt32 ch_count = 4;
 
-    auto interleaved_format = yas::audio_format::create(44100.0, channels, yas::pcm_format::float32, true);
+    auto interleaved_format = yas::audio_format::create(44100.0, ch_count, yas::pcm_format::float32, true);
 
-    XCTAssertThrows(yas::channel_route::default_channel_routes(bus, interleaved_format));
+    XCTAssertThrows(yas::channel_route::default_channel_routes(bus_idx, interleaved_format));
 
-    auto non_interleaved_format = yas::audio_format::create(44100.0, channels, yas::pcm_format::float32, false);
+    auto non_interleaved_format = yas::audio_format::create(44100.0, ch_count, yas::pcm_format::float32, false);
 
-    auto channel_routes = yas::channel_route::default_channel_routes(bus, non_interleaved_format);
+    auto channel_routes = yas::channel_route::default_channel_routes(bus_idx, non_interleaved_format);
 
-    XCTAssertEqual(channel_routes.size(), channels);
+    XCTAssertEqual(channel_routes.size(), ch_count);
 
-    for (UInt32 ch = 0; ch < channels; ch++) {
-        auto &channel_route = channel_routes.at(ch);
-        XCTAssertEqual(channel_route->source_bus(), bus);
-        XCTAssertEqual(channel_route->source_channel(), ch);
-        XCTAssertEqual(channel_route->destination_bus(), bus);
-        XCTAssertEqual(channel_route->destination_channel(), ch);
+    for (UInt32 ch_idx = 0; ch_idx < ch_count; ch_idx++) {
+        auto &channel_route = channel_routes.at(ch_idx);
+        XCTAssertEqual(channel_route->source_bus(), bus_idx);
+        XCTAssertEqual(channel_route->source_channel(), ch_idx);
+        XCTAssertEqual(channel_route->destination_bus(), bus_idx);
+        XCTAssertEqual(channel_route->destination_channel(), ch_idx);
     }
 }
 

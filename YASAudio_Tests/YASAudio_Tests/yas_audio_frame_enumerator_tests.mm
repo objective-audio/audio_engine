@@ -257,8 +257,8 @@
     auto data = yas::audio_pcm_buffer::create(format, 1);
 
     auto bufferPointer = data->audio_ptr_at_index(0);
-    for (UInt32 ch = 0; ch < channels; ch++) {
-        bufferPointer.f32[ch] = yas::test::test_value(0, ch, 0);
+    for (UInt32 ch_idx = 0; ch_idx < channels; ch_idx++) {
+        bufferPointer.f32[ch_idx] = yas::test::test_value(0, ch_idx, 0);
     }
 
     yas::audio_frame_enumerator enumerator(data);
@@ -342,22 +342,22 @@
     const UInt32 *channel = enumerator.channel();
 
     NSUInteger fr = 0;
-    NSUInteger ch;
+    NSUInteger ch_idx;
     while (pointer->v) {
-        ch = 0;
+        ch_idx = 0;
         while (pointer->v) {
             if (*frame == stopFrame && *channel == stopChannel) {
                 enumerator.stop();
             }
             yas_audio_frame_enumerator_move_channel(enumerator);
-            ch++;
+            ch_idx++;
         }
         yas_audio_frame_enumerator_move_frame(enumerator);
         fr++;
     }
 
     XCTAssertEqual(fr, stopFrame + 1);
-    XCTAssertEqual(ch, stopChannel + 1);
+    XCTAssertEqual(ch_idx, stopChannel + 1);
 }
 
 @end

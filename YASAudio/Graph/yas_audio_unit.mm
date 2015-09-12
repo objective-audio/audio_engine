@@ -265,7 +265,7 @@ AudioUnit audio_unit::audio_unit_instance() const
 
 #pragma mark - render callback
 
-void audio_unit::attach_render_callback(const UInt32 &bus)
+void audio_unit::attach_render_callback(const UInt32 &bus_idx)
 {
     if (!_impl->graph_key || !_impl->key) {
         yas_raise_with_reason(std::string(__PRETTY_FUNCTION__) + " - Key is not assigned. graphKey(" +
@@ -278,16 +278,16 @@ void audio_unit::attach_render_callback(const UInt32 &bus)
     AURenderCallbackStruct callbackStruct{.inputProc = RenderCallback, .inputProcRefCon = render_id.v};
 
     yas_raise_if_au_error(AudioUnitSetProperty(_impl->au_instance, kAudioUnitProperty_SetRenderCallback,
-                                               kAudioUnitScope_Input, bus, &callbackStruct,
+                                               kAudioUnitScope_Input, bus_idx, &callbackStruct,
                                                sizeof(AURenderCallbackStruct)));
 }
 
-void audio_unit::detach_render_callback(const UInt32 &bus)
+void audio_unit::detach_render_callback(const UInt32 &bus_idx)
 {
     AURenderCallbackStruct callbackStruct{.inputProc = ClearCallback, .inputProcRefCon = nullptr};
 
     yas_raise_if_au_error(AudioUnitSetProperty(_impl->au_instance, kAudioUnitProperty_SetRenderCallback,
-                                               kAudioUnitScope_Input, bus, &callbackStruct,
+                                               kAudioUnitScope_Input, bus_idx, &callbackStruct,
                                                sizeof(AURenderCallbackStruct)));
 }
 
@@ -366,34 +366,35 @@ void audio_unit::set_input_callback(const render_f &callback)
 
 #pragma mark - property
 
-void audio_unit::set_input_format(const AudioStreamBasicDescription &asbd, const UInt32 bus)
+void audio_unit::set_input_format(const AudioStreamBasicDescription &asbd, const UInt32 bus_idx)
 {
     yas_raise_if_au_error(AudioUnitSetProperty(_impl->au_instance, kAudioUnitProperty_StreamFormat,
-                                               kAudioUnitScope_Input, bus, &asbd, sizeof(AudioStreamBasicDescription)));
-}
-
-void audio_unit::set_output_format(const AudioStreamBasicDescription &asbd, const UInt32 bus)
-{
-    yas_raise_if_au_error(AudioUnitSetProperty(_impl->au_instance, kAudioUnitProperty_StreamFormat,
-                                               kAudioUnitScope_Output, bus, &asbd,
+                                               kAudioUnitScope_Input, bus_idx, &asbd,
                                                sizeof(AudioStreamBasicDescription)));
 }
 
-AudioStreamBasicDescription audio_unit::input_format(const UInt32 bus) const
+void audio_unit::set_output_format(const AudioStreamBasicDescription &asbd, const UInt32 bus_idx)
+{
+    yas_raise_if_au_error(AudioUnitSetProperty(_impl->au_instance, kAudioUnitProperty_StreamFormat,
+                                               kAudioUnitScope_Output, bus_idx, &asbd,
+                                               sizeof(AudioStreamBasicDescription)));
+}
+
+AudioStreamBasicDescription audio_unit::input_format(const UInt32 bus_idx) const
 {
     AudioStreamBasicDescription asbd = {0};
     UInt32 size = sizeof(AudioStreamBasicDescription);
     yas_raise_if_au_error(AudioUnitGetProperty(_impl->au_instance, kAudioUnitProperty_StreamFormat,
-                                               kAudioUnitScope_Input, bus, &asbd, &size));
+                                               kAudioUnitScope_Input, bus_idx, &asbd, &size));
     return asbd;
 }
 
-AudioStreamBasicDescription audio_unit::output_format(const UInt32 bus) const
+AudioStreamBasicDescription audio_unit::output_format(const UInt32 bus_idx) const
 {
     AudioStreamBasicDescription asbd = {0};
     UInt32 size = sizeof(AudioStreamBasicDescription);
     yas_raise_if_au_error(AudioUnitGetProperty(_impl->au_instance, kAudioUnitProperty_StreamFormat,
-                                               kAudioUnitScope_Output, bus, &asbd, &size));
+                                               kAudioUnitScope_Output, bus_idx, &asbd, &size));
     return asbd;
 }
 
