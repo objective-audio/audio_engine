@@ -15,8 +15,8 @@ namespace yas
     template <typename T, typename U>
     std::experimental::optional<T> min_empty_key(std::map<T, U> &map);
 
-    template <typename T>
-    auto filter(const std::set<T> source, std::function<bool(const T &)> predicate) -> decltype(source);
+    template <typename T, typename P>
+    std::set<T> filter(const std::set<T> &source, P predicate);
 
     template <typename K, typename T>
     std::map<K, std::shared_ptr<T>> lock_values(const std::map<K, std::weak_ptr<T>> &map);

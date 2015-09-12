@@ -32,8 +32,8 @@ namespace yas
         return next;
     }
 
-    template <typename T>
-    auto filter(const std::set<T> source, std::function<bool(const T &)> predicate) -> decltype(source)
+    template <typename T, typename P>
+    std::set<T> filter(const std::set<T> &source, P predicate)
     {
         std::set<T> filtered_set;
 

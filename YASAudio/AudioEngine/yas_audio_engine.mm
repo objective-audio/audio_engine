@@ -81,11 +81,10 @@ class audio_engine::impl
 
     void detach_node_if_unused(const audio_node_sptr &node)
     {
-        std::function<bool(const audio_connection_sptr &)> predicate = [node](const audio_connection_sptr &connection) {
+        auto filtered_set = filter(_connections, [node](const audio_connection_sptr &connection) {
             return (connection->destination_node() == node || connection->source_node() == node);
-        };
+        });
 
-        auto filtered_set = filter(_connections, predicate);
         if (filtered_set.size() == 0) {
             detach_node(node);
         }
@@ -244,16 +243,15 @@ class audio_engine::impl
 
     std::set<audio_connection_sptr> input_connections_for_destination_node(const audio_node_sptr &node)
     {
-        std::function<bool(const audio_connection_sptr &)> predicate =
-            [node](const audio_connection_sptr &connection) { return connection->destination_node() == node; };
-        return filter(_connections, predicate);
+        return filter(_connections, [node](const audio_connection_sptr &connection) {
+            return connection->destination_node() == node;
+        });
     }
 
     std::set<audio_connection_sptr> output_connections_for_source_node(const audio_node_sptr &node)
     {
-        std::function<bool(const audio_connection_sptr &)> predicate =
-            [node](const audio_connection_sptr &connection) { return connection->source_node() == node; };
-        return filter(_connections, predicate);
+        return filter(_connections,
+                      [node](const audio_connection_sptr &connection) { return connection->source_node() == node; });
     }
 
     void set_graph(const audio_graph_sptr &graph)
