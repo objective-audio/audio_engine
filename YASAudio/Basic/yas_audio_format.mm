@@ -64,7 +64,7 @@ audio_format_sptr audio_format::create(const Float64 sample_rate, const UInt32 c
     return audio_format_sptr(new audio_format(sample_rate, channel_count, pcm_format, interleaved));
 }
 
-audio_format::audio_format(const AudioStreamBasicDescription &asbd) : _impl(std::make_shared<impl>())
+audio_format::audio_format(const AudioStreamBasicDescription &asbd) : _impl(std::make_unique<impl>())
 {
     _impl->asbd = asbd;
     _impl->asbd.mReserved = 0;

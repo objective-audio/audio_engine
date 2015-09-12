@@ -61,7 +61,7 @@ namespace yas
 
        private:
         class impl;
-        std::shared_ptr<impl> _impl;
+        std::unique_ptr<impl> _impl;
 
         audio_pcm_buffer(const audio_format_sptr &format, AudioBufferList *abl);
         audio_pcm_buffer(const audio_format_sptr &format, const UInt32 frame_capacity);
