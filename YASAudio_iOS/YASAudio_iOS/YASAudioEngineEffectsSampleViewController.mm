@@ -218,9 +218,7 @@ static const AudioComponentDescription baseAcd = {.componentType = kAudioUnitTyp
         }
     } else if (indexPath.section == YASAudioEngineEffectsSampleSectionEffects) {
         const auto &audio_unit = _audio_units.at(indexPath.row);
-        const auto &name = audio_unit->name();
-        CFStringRef cf_name = yas::to_cf_object(name);
-        cell.textLabel.text = (__bridge NSString *)cf_name;
+        cell.textLabel.text = (__bridge NSString *)audio_unit->name();
         if (_index && indexPath.row == *_index) {
             cell.accessoryType = UITableViewCellAccessoryCheckmark;
         }

@@ -293,8 +293,7 @@ using sample_kernel_sptr = std::shared_ptr<sample_kernel_t>;
     NSMutableArray *titles = [NSMutableArray arrayWithCapacity:all_devices.size()];
 
     for (auto &device : all_devices) {
-        CFStringRef name = device->cf_name();
-        [titles addObject:(NSString *)name];
+        [titles addObject:(NSString *)device->name()];
     }
 
     [titles addObject:@"None"];
@@ -348,8 +347,8 @@ using sample_kernel_sptr = std::shared_ptr<sample_kernel_t>;
     NSColor *onColor = [NSColor blackColor];
     NSColor *offColor = [NSColor lightGrayColor];
     if (device) {
-        self.deviceInfo = [NSString stringWithFormat:@"name = %@\nnominal samplerate = %@",
-                                                     (NSString *)device->cf_name(), @(device->nominal_sample_rate())];
+        self.deviceInfo = [NSString
+            stringWithFormat:@"name = %@\nnominal samplerate = %@", device->name(), @(device->nominal_sample_rate())];
         ;
         self.nominalSampleRate = device->nominal_sample_rate();
         self.ioThroughTextColor = (device->input_format() && device->output_format()) ? onColor : offColor;

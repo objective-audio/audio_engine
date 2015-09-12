@@ -36,7 +36,7 @@ namespace yas
         const AudioStreamBasicDescription &stream_description() const;
         UInt32 sample_byte_count() const;
         UInt32 buffer_frame_byte_count() const;
-        std::string description() const;
+        CFStringRef description() const;
 
        private:
         class impl;
@@ -58,5 +58,4 @@ namespace yas
     AudioStreamBasicDescription to_stream_description(const Float64 sample_rate, const UInt32 channels,
                                                       const yas::pcm_format pcm_format, const bool interleaved);
     bool is_equal(const AudioStreamBasicDescription &asbd1, const AudioStreamBasicDescription &asbd2);
-    std::string file_type_string(OSType fcc);
 }

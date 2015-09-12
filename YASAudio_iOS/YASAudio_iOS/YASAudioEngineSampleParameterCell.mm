@@ -55,7 +55,7 @@
 
     if (_node && _node->global_parameters().count(_index)) {
         auto &parameter = _node->global_parameters().at(_index);
-        self.nameLabel.text = (__bridge NSString *)(yas::to_cf_object(parameter.name()));
+        self.nameLabel.text = (__bridge NSString *)parameter.name();
         self.valueSlider.minimumValue = parameter.min_value();
         self.valueSlider.maximumValue = parameter.max_value();
         self.valueSlider.value = node->global_parameter_value(parameter.parameter_id());

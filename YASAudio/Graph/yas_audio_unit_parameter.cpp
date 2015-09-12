@@ -60,6 +60,18 @@ class audio_unit_parameter::impl
 
     impl &operator=(impl &&impl)
     {
+        parameter_id = std::move(impl.parameter_id);
+        scope = std::move(impl.scope);
+        has_clump = std::move(impl.has_clump);
+        clump_id = std::move(impl.clump_id);
+        unit = std::move(impl.unit);
+        min_value = std::move(impl.min_value);
+        max_value = std::move(impl.max_value);
+        default_value = std::move(impl.default_value);
+        values = std::move(impl.values);
+        unit_name = std::move(impl.unit_name);
+        name = std::move(impl.name);
+
         return *this;
     }
 };
@@ -98,9 +110,9 @@ AudioUnitScope audio_unit_parameter::scope() const
     return _impl->scope;
 }
 
-const std::string &audio_unit_parameter::unit_name() const
+CFStringRef audio_unit_parameter::unit_name() const
 {
-    return _impl->unit_name;
+    return to_cf_object(_impl->unit_name);
 }
 
 bool audio_unit_parameter::has_clump() const
@@ -113,9 +125,9 @@ UInt32 audio_unit_parameter::clump_id() const
     return _impl->clump_id;
 }
 
-const std::string &audio_unit_parameter::name() const
+CFStringRef audio_unit_parameter::name() const
 {
-    return _impl->name;
+    return to_cf_object(_impl->name);
 }
 
 AudioUnitParameterUnit audio_unit_parameter::unit() const

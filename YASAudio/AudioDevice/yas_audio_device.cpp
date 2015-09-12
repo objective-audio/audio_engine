@@ -484,22 +484,12 @@ AudioDeviceID audio_device::audio_device_id() const
     return _impl->audio_device_id;
 }
 
-std::string audio_device::name() const
-{
-    return yas::to_string(cf_name());
-}
-
-std::string audio_device::manufacture() const
-{
-    return yas::to_string(cf_manufacture());
-}
-
-CFStringRef audio_device::cf_name() const
+CFStringRef audio_device::name() const
 {
     return property_string(audio_device_id(), kAudioObjectPropertyName);
 }
 
-CFStringRef audio_device::cf_manufacture() const
+CFStringRef audio_device::manufacture() const
 {
     return property_string(audio_device_id(), kAudioObjectPropertyManufacturer);
 }

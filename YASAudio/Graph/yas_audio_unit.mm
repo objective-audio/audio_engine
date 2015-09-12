@@ -238,9 +238,9 @@ audio_unit::~audio_unit()
 
 #pragma mark - accessor
 
-const std::string &audio_unit::name()
+CFStringRef audio_unit::name() const
 {
-    return _impl->name();
+    return to_cf_object(_impl->name());
 }
 
 OSType audio_unit::type() const
