@@ -38,8 +38,8 @@ namespace yas
         bool is_output_unit() const;
         AudioUnit audio_unit_instance() const;
 
-        void attach_render_callback(const UInt32 &bus);
-        void detach_render_callback(const UInt32 &bus);
+        void attach_render_callback(const UInt32 &bus_idx);
+        void detach_render_callback(const UInt32 &bus_idx);
         void attach_render_notify();
         void detach_render_notify();
         void attach_input_callback();  // for io
@@ -56,10 +56,10 @@ namespace yas
         std::vector<T> property_data(const AudioUnitPropertyID property_id, const AudioUnitScope scope,
                                      const AudioUnitElement element) const;
 
-        void set_input_format(const AudioStreamBasicDescription &asbd, const UInt32 bus);
-        void set_output_format(const AudioStreamBasicDescription &asbd, const UInt32 bus);
-        AudioStreamBasicDescription input_format(const UInt32 bus) const;
-        AudioStreamBasicDescription output_format(const UInt32 bus) const;
+        void set_input_format(const AudioStreamBasicDescription &asbd, const UInt32 bus_idx);
+        void set_output_format(const AudioStreamBasicDescription &asbd, const UInt32 bus_idx);
+        AudioStreamBasicDescription input_format(const UInt32 bus_idx) const;
+        AudioStreamBasicDescription output_format(const UInt32 bus_idx) const;
         void set_maximum_frames_per_slice(const UInt32 frames);
         UInt32 maximum_frames_per_slice() const;
         bool is_initialized();

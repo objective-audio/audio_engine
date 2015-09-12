@@ -122,8 +122,8 @@
     mixer_unit->set_render_callback(
         [mixerExpectations, output_format, frame_length, &self](yas::render_parameters &render_parameters) mutable {
             if (mixerExpectations) {
-                const UInt32 bus = render_parameters.in_bus_number;
-                NSNumber *busKey = @(bus);
+                const UInt32 bus_idx = render_parameters.in_bus_number;
+                NSNumber *busKey = @(bus_idx);
                 XCTestExpectation *mixerExpectation = mixerExpectations[busKey];
                 if (mixerExpectations) {
                     [mixerExpectation fulfill];

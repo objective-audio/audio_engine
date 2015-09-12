@@ -95,15 +95,15 @@
 
     yas::test::fill_test_values_to_buffer(data);
 
-    for (UInt32 ch = 0; ch < channels; ch++) {
-        yas::audio_enumerator enumerator(data, ch);
+    for (UInt32 ch_idx = 0; ch_idx < channels; ch_idx++) {
+        yas::audio_enumerator enumerator(data, ch_idx);
         auto pointer = enumerator.pointer();
         const UInt32 *index = enumerator.index();
 
         UInt32 frame = 0;
         while (pointer->v) {
             XCTAssertEqual(frame, *index);
-            XCTAssertEqual(*pointer->f32, (Float32)yas::test::test_value(frame, ch, 0));
+            XCTAssertEqual(*pointer->f32, (Float32)yas::test::test_value(frame, ch_idx, 0));
             yas_audio_enumerator_move(enumerator);
             ++frame;
         }

@@ -97,7 +97,7 @@ audio_frame_enumerator::audio_frame_enumerator(const audio_pcm_buffer_sptr &buff
     UInt32 channel = 0;
     for (UInt32 buf_idx = 0; buf_idx < bufferCount; buf_idx++) {
         flex_pointer pointer = buffer->audio_ptr_at_index(buf_idx);
-        for (UInt32 ch = 0; ch < stride; ch++) {
+        for (UInt32 ch_idx = 0; ch_idx < stride; ch_idx++) {
             _pointers[channel].v = _top_pointers[channel].v = pointer.v;
             pointer.u8 += sampleByteCount;
             channel++;
