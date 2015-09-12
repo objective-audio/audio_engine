@@ -31,11 +31,6 @@ namespace yas
             starting_channel,
         };
 
-        enum class direction {
-            output = 0,
-            input = 1,
-        };
-
         class property_info
         {
            public:
