@@ -174,16 +174,32 @@
 {
     auto delay_unit = yas::audio_unit::create(kAudioUnitType_Effect, kAudioUnitSubType_Delay);
 
-    auto delay_time_parameter = delay_unit->create_parameter(kDelayParam_DelayTime, kAudioUnitScope_Global);
-    const AudioUnitParameterValue min = delay_time_parameter.min_value();
-    const AudioUnitParameterValue value = min;
     const AudioUnitScope scope = kAudioUnitScope_Global;
+    auto parameter = delay_unit->create_parameter(kDelayParam_DelayTime, scope);
 
-    delay_unit->set_parameter_value(value, kDelayParam_DelayTime, scope, 0);
-    XCTAssertEqual(delay_unit->parameter_value(kDelayParam_DelayTime, scope, 0), value);
+    delay_unit->set_parameter_value(parameter.min_value(), kDelayParam_DelayTime, scope, 0);
+    XCTAssertEqual(delay_unit->parameter_value(kDelayParam_DelayTime, scope, 0), parameter.min_value());
+    delay_unit->set_parameter_value(parameter.max_value(), kDelayParam_DelayTime, scope, 0);
+    XCTAssertEqual(delay_unit->parameter_value(kDelayParam_DelayTime, scope, 0), parameter.max_value());
+    delay_unit->set_parameter_value(parameter.default_value(), kDelayParam_DelayTime, scope, 0);
+    XCTAssertEqual(delay_unit->parameter_value(kDelayParam_DelayTime, scope, 0), parameter.default_value());
 
-    XCTAssertThrows(delay_time_parameter = delay_unit->create_parameter(kDelayParam_DelayTime, kAudioUnitScope_Input));
-    XCTAssertThrows(delay_time_parameter = delay_unit->create_parameter(kDelayParam_DelayTime, kAudioUnitScope_Output));
+    XCTAssertTrue(parameter.parameter_id() != 0);
+    XCTAssertTrue(parameter.scope() == scope);
+    XCTAssertTrue(parameter.unit_name() != nullptr);
+    if (parameter.has_clump()) {
+        XCTAssertTrue(parameter.clump_id() != 0);
+    }
+    XCTAssertTrue(parameter.name() != nullptr);
+    XCTAssertTrue(parameter.unit() == kAudioUnitParameterUnit_Seconds);
+}
+
+- (void)testParameterCreateFailed
+{
+    auto delay_unit = yas::audio_unit::create(kAudioUnitType_Effect, kAudioUnitSubType_Delay);
+
+    XCTAssertThrows(delay_unit->create_parameter(kDelayParam_DelayTime, kAudioUnitScope_Input));
+    XCTAssertThrows(delay_unit->create_parameter(kDelayParam_DelayTime, kAudioUnitScope_Output));
 }
 
 - (void)testParameters
