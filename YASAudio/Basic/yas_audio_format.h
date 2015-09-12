@@ -18,8 +18,8 @@ namespace yas
         static audio_format_sptr create(const AudioStreamBasicDescription &asbd);
         static audio_format_sptr create(const CFDictionaryRef &settings);
         static audio_format_sptr create(const Float64 sample_rate, const UInt32 channel_count,
-                                       const yas::pcm_format pcm_format = yas::pcm_format::float32,
-                                       const bool interleaved = false);
+                                        const yas::pcm_format pcm_format = yas::pcm_format::float32,
+                                        const bool interleaved = false);
         ~audio_format();
 
         bool operator==(const audio_format &) const;
@@ -40,7 +40,7 @@ namespace yas
 
        private:
         class impl;
-        std::shared_ptr<impl> _impl;
+        std::unique_ptr<impl> _impl;
 
         explicit audio_format(const AudioStreamBasicDescription &asbd);
         explicit audio_format(const CFDictionaryRef &settings);
