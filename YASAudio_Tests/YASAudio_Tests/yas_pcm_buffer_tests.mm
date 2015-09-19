@@ -121,7 +121,7 @@
 
     buffer->reset();
 
-    XCTAssertTrue(yas::test::is_cleard_buffer(buffer));
+    XCTAssertTrue(yas::test::is_cleared_buffer(buffer));
 
     yas::test::fill_test_values_to_buffer(buffer);
 
@@ -387,76 +387,47 @@
     }
 }
 
-#if (!TARGET_OS_IPHONE && TARGET_OS_MAC)
-
-- (void)testInitWithOutputChannelRoutes
+- (void)test_create_buffer_with_channel_map_many_destination
 {
     const UInt32 frame_length = 4;
     const UInt32 src_ch_count = 2;
     const UInt32 dst_ch_count = 4;
-    const UInt32 bus_idx = 0;
     const UInt32 sample_rate = 48000;
-    const UInt32 dest_channel_indices[2] = {3, 0};
+    const yas::channel_map_t channel_map{3, 0};
 
-    auto dest_format = yas::audio_format::create(sample_rate, dst_ch_count);
-    auto dest_buffer = yas::audio_pcm_buffer::create(dest_format, frame_length);
-    yas::test::fill_test_values_to_buffer(dest_buffer);
+    const auto dst_format = yas::audio_format::create(sample_rate, dst_ch_count);
+    auto dst_buffer = yas::audio_pcm_buffer::create(dst_format, frame_length);
+    yas::test::fill_test_values_to_buffer(dst_buffer);
 
-    auto channel_routes = std::vector<yas::channel_route_sptr>();
-    for (UInt32 i = 0; i < src_ch_count; i++) {
-        channel_routes.push_back(yas::channel_route::create(bus_idx, i, bus_idx, dest_channel_indices[i]));
-    }
+    const auto src_format = yas::audio_format::create(sample_rate, src_ch_count);
+    const auto src_buffer = yas::audio_pcm_buffer::create(src_format, dst_buffer, channel_map);
 
-    auto source_format = yas::audio_format::create(sample_rate, src_ch_count);
-    auto source_buffer =
-        yas::audio_pcm_buffer::create(source_format, dest_buffer, channel_routes, yas::direction::output);
-
-    for (UInt32 ch_idx = 0; ch_idx < src_ch_count; ++ch_idx) {
-        auto dest_ptr = dest_buffer->audio_ptr_at_index(dest_channel_indices[ch_idx]);
-        auto source_ptr = source_buffer->audio_ptr_at_index(ch_idx);
-        XCTAssertEqual(dest_ptr.v, source_ptr.v);
-        for (UInt32 frame = 0; frame < frame_length; frame++) {
-            Float32 value = source_ptr.f32[frame];
-            Float32 test_value = yas::test::test_value(frame, 0, dest_channel_indices[ch_idx]);
-            XCTAssertEqual(value, test_value);
-        }
-    }
+    [self assert_buffer_with_channel_map:channel_map
+                           source_buffer:src_buffer
+                      destination_buffer:dst_buffer
+                            frame_length:frame_length];
 }
 
-- (void)testInitWithInputChannelRoutes
+- (void)test_create_buffer_with_channel_map_many_source
 {
     const UInt32 frame_length = 4;
     const UInt32 src_ch_count = 4;
     const UInt32 dst_ch_count = 2;
-    const UInt32 bus_idx = 0;
     const UInt32 sample_rate = 48000;
-    const UInt32 source_channel_indices[2] = {2, 1};
+    const yas::channel_map_t channel_map{1, static_cast<UInt32>(-1), static_cast<UInt32>(-1), 0};
 
-    auto source_format = yas::audio_format::create(sample_rate, src_ch_count);
-    auto source_buffer = yas::audio_pcm_buffer::create(source_format, frame_length);
-    yas::test::fill_test_values_to_buffer(source_buffer);
+    const auto dst_format = yas::audio_format::create(sample_rate, dst_ch_count);
+    auto dst_buffer = yas::audio_pcm_buffer::create(dst_format, frame_length);
+    yas::test::fill_test_values_to_buffer(dst_buffer);
 
-    auto channel_routes = std::vector<yas::channel_route_sptr>();
-    for (UInt32 i = 0; i < dst_ch_count; i++) {
-        channel_routes.push_back(yas::channel_route::create(bus_idx, source_channel_indices[i], bus_idx, i));
-    }
+    const auto src_format = yas::audio_format::create(sample_rate, src_ch_count);
+    const auto src_buffer = yas::audio_pcm_buffer::create(src_format, dst_buffer, channel_map);
 
-    auto dest_format = yas::audio_format::create(sample_rate, dst_ch_count);
-    auto dest_buffer = yas::audio_pcm_buffer::create(dest_format, source_buffer, channel_routes, yas::direction::input);
-
-    for (UInt32 ch_idx = 0; ch_idx < dst_ch_count; ch_idx++) {
-        auto dest_ptr = dest_buffer->audio_ptr_at_index(ch_idx);
-        auto source_ptr = source_buffer->audio_ptr_at_index(source_channel_indices[ch_idx]);
-        XCTAssertEqual(dest_ptr.v, source_ptr.v);
-        for (UInt32 frame = 0; frame < frame_length; frame++) {
-            Float32 value = dest_ptr.f32[frame];
-            Float32 testValue = yas::test::test_value(frame, 0, source_channel_indices[ch_idx]);
-            XCTAssertEqual(value, testValue);
-        }
-    }
+    [self assert_buffer_with_channel_map:channel_map
+                           source_buffer:src_buffer
+                      destination_buffer:dst_buffer
+                            frame_length:frame_length];
 }
-
-#endif
 
 - (void)testAllocateAudioBufferListInterleaved
 {
@@ -574,6 +545,37 @@
     abl1->mBuffers[0].mData = abl2->mBuffers[0].mData = buffer.data();
 
     XCTAssertFalse(yas::is_equal_structure(*abl1, *abl2));
+}
+
+#pragma mark -
+
+- (void)assert_buffer_with_channel_map:(const yas::channel_map_t &)channel_map
+                         source_buffer:(const yas::audio_pcm_buffer_sptr &)src_buffer
+                    destination_buffer:(const yas::audio_pcm_buffer_sptr &)dst_buffer
+                          frame_length:(const UInt32)frame_length
+{
+    if (src_buffer->format()->channel_count() != channel_map.size()) {
+        XCTAssert(0);
+        return;
+    }
+
+    UInt32 src_ch_idx = 0;
+    for (const auto &dst_ch_idx : channel_map) {
+        if (dst_ch_idx != -1) {
+            auto dst_ptr = dst_buffer->audio_ptr_at_index(dst_ch_idx);
+            auto src_ptr = src_buffer->audio_ptr_at_index(src_ch_idx);
+            XCTAssertEqual(dst_ptr.v, src_ptr.v);
+            for (UInt32 frame = 0; frame < frame_length; frame++) {
+                Float32 test_value = yas::test::test_value(frame, 0, dst_ch_idx);
+                XCTAssertEqual(test_value, src_ptr.f32[frame]);
+            }
+        } else {
+            auto src_ptr = src_buffer->audio_ptr_at_index(src_ch_idx);
+            XCTAssertTrue(src_ptr.v != nullptr);
+        }
+
+        ++src_ch_idx;
+    }
 }
 
 @end

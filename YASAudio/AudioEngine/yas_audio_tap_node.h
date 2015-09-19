@@ -16,8 +16,8 @@ namespace yas
 
         virtual ~audio_tap_node();
 
-        using render_f = std::function<void(const audio_pcm_buffer_sptr &buffer, const UInt32 bus_idx,
-                                            const audio_time_sptr &when)>;
+        using render_f =
+            std::function<void(const audio_pcm_buffer_sptr &buffer, const UInt32 bus_idx, const audio_time_sptr &when)>;
 
         void set_render_function(const render_f &);
 

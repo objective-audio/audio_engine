@@ -7,7 +7,7 @@
 
 #include "yas_audio_types.h"
 #include "yas_result.h"
-#include "yas_audio_channel_route.h"
+#include "yas_audio_route.h"
 #include <memory>
 #include <vector>
 
@@ -27,9 +27,8 @@ namespace yas
 
         static audio_pcm_buffer_sptr create(const audio_format_sptr &format, AudioBufferList *abl);
         static audio_pcm_buffer_sptr create(const audio_format_sptr &format, const UInt32 frame_capacity);
-        static audio_pcm_buffer_sptr create(const audio_format_sptr &format, const audio_pcm_buffer_sptr &buffer,
-                                            const std::vector<channel_route_sptr> &channel_routes,
-                                            const direction direction);
+        static audio_pcm_buffer_sptr create(const audio_format_sptr &format, const audio_pcm_buffer_sptr &from_buffer,
+                                            const channel_map_t &channel_map);
 
         audio_format_sptr format() const;
         AudioBufferList *audio_buffer_list();
@@ -65,8 +64,8 @@ namespace yas
 
         audio_pcm_buffer(const audio_format_sptr &format, AudioBufferList *abl);
         audio_pcm_buffer(const audio_format_sptr &format, const UInt32 frame_capacity);
-        audio_pcm_buffer(const audio_format_sptr &format, const audio_pcm_buffer &data,
-                         const std::vector<channel_route_sptr> channel_routes, const direction direction);
+        audio_pcm_buffer(const audio_format_sptr &format, const audio_pcm_buffer_sptr &from_buffer,
+                         const channel_map_t &channel_map);
 
         audio_pcm_buffer(const audio_pcm_buffer &) = delete;
         audio_pcm_buffer(audio_pcm_buffer &&) = delete;

@@ -24,7 +24,7 @@
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
 
-#include "yas_audio_channel_route.h"
+#include "yas_audio_route.h"
 #include "yas_audio_device.h"
 #include "yas_audio_device_stream.h"
 #include "yas_audio_device_io.h"
@@ -44,3 +44,4 @@
 #include "yas_audio_offline_output_node.h"
 #include "yas_audio_tap_node.h"
 #include "yas_audio_connection.h"
+#include "yas_audio_route_node.h"
