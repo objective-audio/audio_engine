@@ -12,7 +12,7 @@ UInt32 yas::test::test_value(const UInt32 frame, const UInt32 ch_idx, const UInt
     return frame + 1024 * (ch_idx + 1) + 512 * (buf_idx + 1);
 }
 
-void yas::test::fill_test_values_to_buffer(audio_pcm_buffer_sptr &buffer)
+void yas::test::fill_test_values_to_buffer(const audio_pcm_buffer_sptr &buffer)
 {
     const auto &format = buffer->format();
     const yas::pcm_format pcmFormat = format->pcm_format();
@@ -46,7 +46,7 @@ void yas::test::fill_test_values_to_buffer(audio_pcm_buffer_sptr &buffer)
     }
 }
 
-bool yas::test::is_cleard_buffer(audio_pcm_buffer_sptr &buffer)
+bool yas::test::is_cleared_buffer(const audio_pcm_buffer_sptr &buffer)
 {
     const AudioBufferList *abl = buffer->audio_buffer_list();
 
@@ -62,7 +62,7 @@ bool yas::test::is_cleard_buffer(audio_pcm_buffer_sptr &buffer)
     return true;
 }
 
-bool yas::test::is_filled_buffer(audio_pcm_buffer_sptr &buffer)
+bool yas::test::is_filled_buffer(const audio_pcm_buffer_sptr &buffer)
 {
     __block BOOL isFilled = YES;
     const UInt32 sample_byte_count = buffer->format()->sample_byte_count();
@@ -83,7 +83,7 @@ bool yas::test::is_filled_buffer(audio_pcm_buffer_sptr &buffer)
     return isFilled;
 }
 
-bool yas::test::is_equal_buffer_flexibly(audio_pcm_buffer_sptr &data1, audio_pcm_buffer_sptr &data2)
+bool yas::test::is_equal_buffer_flexibly(const audio_pcm_buffer_sptr &data1, const audio_pcm_buffer_sptr &data2)
 {
     if (data1->format()->channel_count() != data2->format()->channel_count()) {
         return NO;
@@ -136,7 +136,7 @@ bool test::is_equal(const AudioTimeStamp *ts1, const AudioTimeStamp *ts2)
     }
 }
 
-yas::flex_pointer yas::test::data_ptr_from_buffer(audio_pcm_buffer_sptr &buffer, const UInt32 channel,
+yas::flex_pointer yas::test::data_ptr_from_buffer(const audio_pcm_buffer_sptr &buffer, const UInt32 channel,
                                                   const UInt32 frame)
 {
     audio_frame_enumerator enumerator(buffer);

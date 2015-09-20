@@ -9,6 +9,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <set>
 #include <experimental/optional>
 #include <AudioUnit/AUComponent.h>
 
@@ -80,7 +81,7 @@ namespace yas
     class audio_pcm_buffer;
     class audio_file_reader;
     class audio_file_writer;
-    class channel_route;
+    class audio_route;
     class audio_graph;
     class audio_unit;
     class audio_engine;
@@ -94,6 +95,7 @@ namespace yas
     class audio_tap_node;
     class audio_input_tap_node;
     class audio_unit_mixer_node;
+    class audio_route_node;
 
     using objc_strong_container_sptr = std::shared_ptr<objc_strong_container>;
     using objc_weak_container_sptr = std::shared_ptr<objc_weak_container>;
@@ -102,7 +104,7 @@ namespace yas
     using audio_pcm_buffer_sptr = std::shared_ptr<audio_pcm_buffer>;
     using audio_file_reader_sptr = std::shared_ptr<audio_file_reader>;
     using audio_file_writer_sptr = std::shared_ptr<audio_file_writer>;
-    using channel_route_sptr = std::shared_ptr<channel_route>;
+    using audio_route_set = std::set<audio_route>;
     using audio_graph_sptr = std::shared_ptr<audio_graph>;
     using audio_graph_wptr = std::weak_ptr<audio_graph>;
     using audio_unit_sptr = std::shared_ptr<audio_unit>;
@@ -123,6 +125,7 @@ namespace yas
     using audio_tap_node_sptr = std::shared_ptr<audio_tap_node>;
     using audio_input_tap_node_sptr = std::shared_ptr<audio_input_tap_node>;
     using audio_unit_mixer_node_sptr = std::shared_ptr<audio_unit_mixer_node>;
+    using audio_route_node_sptr = std::shared_ptr<audio_route_node>;
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
     class audio_device_stream;
