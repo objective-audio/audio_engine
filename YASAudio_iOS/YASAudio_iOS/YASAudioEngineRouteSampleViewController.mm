@@ -129,8 +129,6 @@ typedef NS_ENUM(NSUInteger, YASAudioEngineRouteSampleSourceIndex) {
                 _route_node->add_route({src_bus_idx, src_ch_idx, dst_bus_idx, dst_ch_idx});
             }
 
-            std::cout << "routes.size : " << _route_node->routes().size() << std::endl;
-
             [self.tableView reloadSections:[NSIndexSet indexSetWithIndex:fromIndexPath.section]
                           withRowAnimation:UITableViewRowAnimationAutomatic];
         }

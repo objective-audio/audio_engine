@@ -7,16 +7,28 @@
 #import "yas_audio.h"
 #import <Accelerate/Accelerate.h>
 
-@interface YASAudioDeviceRouteSampleData : NSObject
+typedef NS_ENUM(NSUInteger, YASAudioDeviceRouteSampleSourceBus) {
+    YASAudioDeviceRouteSampleSourceBusSine = 0,
+    YASAudioDeviceRouteSampleSourceBusInput = 1,
+    YASAudioDeviceRouteSampleSourceBusCount,
+};
 
-@property (nonatomic, assign) UInt32 index;
-@property (atomic, assign) BOOL enabled;
+typedef NS_ENUM(NSUInteger, YASAudioDeviceRouteSampleInputType) {
+    YASAudioDeviceRouteSampleInputTypeNone,
+    YASAudioDeviceRouteSampleInputTypeSine,
+    YASAudioDeviceRouteSampleInputTypeInput,
+};
+
+@interface YASAudioDeviceRouteSampleOutputData : NSObject
+
+@property (nonatomic, assign) UInt32 outputIndex;
+@property (nonatomic, assign) UInt32 inputSelectIndex;
 
 + (instancetype)data;
 
 @end
 
-@implementation YASAudioDeviceRouteSampleData
+@implementation YASAudioDeviceRouteSampleOutputData
 
 + (instancetype)data
 {
@@ -25,7 +37,55 @@
 
 - (NSString *)indexTitle
 {
-    return [NSString stringWithFormat:@"bus %@", @(self.index)];
+    return [NSString stringWithFormat:@"bus %@", @(self.outputIndex)];
+}
+
+- (BOOL)isNoneSelected
+{
+    return self.inputSelectIndex == YASAudioDeviceRouteSampleInputTypeNone;
+}
+
+- (BOOL)isSineSelected
+{
+    return self.inputSelectIndex == YASAudioDeviceRouteSampleInputTypeSine;
+}
+
+- (BOOL)isInputSelected
+{
+    return self.inputSelectIndex >= YASAudioDeviceRouteSampleInputTypeInput;
+}
+
+- (UInt32)inputIndex
+{
+    return self.inputSelectIndex - YASAudioDeviceRouteSampleInputTypeInput;
+}
+
+@end
+
+@interface YASAudioDeviceRouteSampleInputData : NSObject
+
+@property (nonatomic, assign) UInt32 index;
+
++ (instancetype)data;
+
+@end
+
+@implementation YASAudioDeviceRouteSampleInputData
+
++ (instancetype)data
+{
+    return YASAutorelease([[self alloc] init]);
+}
+
+- (NSString *)indexTitle
+{
+    if (self.index == YASAudioDeviceRouteSampleInputTypeNone) {
+        return @"None";
+    } else if (self.index == YASAudioDeviceRouteSampleInputTypeSine) {
+        return @"Sine";
+    } else {
+        return [NSString stringWithFormat:@"Input Ch : %@", @(self.index - YASAudioDeviceRouteSampleInputTypeInput)];
+    }
 }
 
 @end
@@ -44,6 +104,7 @@
 @implementation YASAudioEngineDeviceIOSampleViewController {
     yas::audio_engine_sptr _engine;
     yas::audio_device_io_node_sptr _device_io_node;
+    yas::audio_route_node_sptr _route_node;
     yas::audio_tap_node_sptr _tap_node;
 
     yas::any _system_observer;
@@ -92,10 +153,32 @@
     [super viewWillDisappear];
 }
 
+- (void)observeValueForKeyPath:(NSString *)keyPath
+                      ofObject:(id)object
+                        change:(NSDictionary<NSString *, id> *)change
+                       context:(void *)context
+{
+    if ([object isKindOfClass:[YASAudioDeviceRouteSampleOutputData class]]) {
+        YASAudioDeviceRouteSampleOutputData *data = object;
+        if ([data isNoneSelected]) {
+            _route_node->remove_route_for_destination({0, data.outputIndex});
+        } else if ([data isSineSelected]) {
+            _route_node->add_route({YASAudioDeviceRouteSampleSourceBusSine, data.outputIndex, 0, data.outputIndex});
+        } else if ([data isInputSelected]) {
+            _route_node->add_route({YASAudioDeviceRouteSampleSourceBusInput, [data inputIndex], 0, data.outputIndex});
+        }
+
+        [self _updateInputSelection];
+    } else {
+        [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
+    }
+}
+
 - (void)setupEngine
 {
     _engine = yas::audio_engine::create();
     _device_io_node = yas::audio_device_io_node::create();
+    _route_node = yas::audio_route_node::create();
     _tap_node = yas::audio_tap_node::create();
 
     if (!_self_container) {
@@ -111,39 +194,15 @@
     {
         buffer->clear();
 
-        auto strong_container = weak_container->lock();
-        YASAudioEngineDeviceIOSampleViewController *controller = strong_container ? strong_container.object() : nil;
-        NSArray *outputRoutes = controller.outputRoutes;
-        const auto node = weak_node.lock();
-
-        if (outputRoutes.count > 0 && node) {
-            bool input_available = false;
-            if (const auto connection = node->input_connection_on_render(0)) {
-                if (const auto source_node = connection->source_node()) {
-                    if (*buffer->format() == *connection->format()) {
-                        source_node->render(buffer, 0, when);
-                        input_available = true;
-                    }
-                }
-            }
-
-            yas::audio_frame_enumerator enumerator(buffer);
-            const auto *flex_ptr = enumerator.pointer();
-            const Float64 start_phase = next_phase;
-            const Float64 phase_per_frame = 1000.0 / buffer->format()->sample_rate() * yas::audio_math::two_pi;
-            UInt32 idx = 0;
-            while (flex_ptr->v) {
-                YASAudioDeviceRouteSampleData *data = outputRoutes[idx];
-                if (data.enabled && !input_available) {
-                    next_phase =
-                        yas::audio_math::fill_sine(flex_ptr->f32, buffer->frame_length(), start_phase, phase_per_frame);
-                    cblas_sscal(buffer->frame_length(), 0.2, flex_ptr->f32, 1);
-                } else if (!data.enabled && input_available) {
-                    memset(flex_ptr->f32, 0, buffer->frame_length() * buffer->format()->sample_byte_count());
-                }
-                yas_audio_frame_enumerator_move_channel(enumerator);
-                ++idx;
-            }
+        yas::audio_frame_enumerator enumerator(buffer);
+        const auto *flex_ptr = enumerator.pointer();
+        const Float64 start_phase = next_phase;
+        const Float64 phase_per_frame = 1000.0 / buffer->format()->sample_rate() * yas::audio_math::two_pi;
+        while (flex_ptr->v) {
+            next_phase =
+                yas::audio_math::fill_sine(flex_ptr->f32, buffer->frame_length(), start_phase, phase_per_frame);
+            cblas_sscal(buffer->frame_length(), 0.2, flex_ptr->f32, 1);
+            yas_audio_frame_enumerator_move_channel(enumerator);
         }
     };
 
@@ -173,7 +232,19 @@
     _engine->stop();
 
     _device_io_node = nullptr;
+    _route_node = nullptr;
+    _tap_node = nullptr;
     _engine = nullptr;
+
+    _system_observer = nullptr;
+    _device_observer = nullptr;
+
+    self.selectedDeviceIndex = yas::audio_device::all_devices().size();
+
+    [self _removeObservers];
+
+    self.outputRoutes = nil;
+    self.inputRoutes = nil;
 }
 
 #pragma mark - update
@@ -203,52 +274,106 @@
 
 - (void)_updateConnection
 {
+    [self _removeObservers];
+
     self.outputRoutes = nil;
     self.inputRoutes = nil;
 
     if (_engine) {
         _engine->disconnect(_tap_node);
+        _engine->disconnect(_route_node);
+        _route_node->clear_routes();
 
         if (const auto &device = _device_io_node->device()) {
             if (device->output_channel_count() > 0) {
-                _engine->connect(_tap_node, _device_io_node, device->output_format());
+                _engine->connect(_route_node, _device_io_node, device->output_format());
+                _engine->connect(_tap_node, _route_node, 0, YASAudioDeviceRouteSampleSourceBusSine,
+                                 device->output_format());
             }
 
             if (device->input_channel_count() > 0) {
-                _engine->connect(_device_io_node, _tap_node, device->input_format());
+                _engine->connect(_device_io_node, _route_node, 0, YASAudioDeviceRouteSampleSourceBusInput,
+                                 device->input_format());
             }
         }
     }
 
     if (auto const device = _device_io_node->device()) {
-        NSLog(@"device name = %@ - samplerate = %@", device->name(), @(device->nominal_sample_rate()));
-
         const UInt32 output_channel_count = device->output_channel_count();
         const UInt32 input_channel_count = device->input_channel_count();
         NSMutableArray *outputRoutes = [NSMutableArray arrayWithCapacity:output_channel_count];
         NSMutableArray *inputRoutes = [NSMutableArray arrayWithCapacity:input_channel_count];
 
         for (UInt32 i = 0; i < output_channel_count; ++i) {
-            YASAudioDeviceRouteSampleData *data = [YASAudioDeviceRouteSampleData data];
-            data.index = i;
-            data.enabled = NO;
+            YASAudioDeviceRouteSampleOutputData *data = [YASAudioDeviceRouteSampleOutputData data];
+            data.outputIndex = i;
             [outputRoutes addObject:data];
         }
 
-        for (UInt32 i = 0; i < input_channel_count; ++i) {
-            YASAudioDeviceRouteSampleData *data = [YASAudioDeviceRouteSampleData data];
+        for (UInt32 i = 0; i < input_channel_count + 2; ++i) {
+            YASAudioDeviceRouteSampleInputData *data = [YASAudioDeviceRouteSampleInputData data];
             data.index = i;
-            data.enabled = NO;
             [inputRoutes addObject:data];
         }
 
         self.outputRoutes = outputRoutes;
         self.inputRoutes = inputRoutes;
         self.nominalSampleRate = device->nominal_sample_rate();
+
+        [self _updateInputSelection];
+        [self _addObservers];
     } else {
         self.outputRoutes = nil;
         self.inputRoutes = nil;
         self.nominalSampleRate = 0.0;
+    }
+}
+
+- (void)_addObservers
+{
+    for (YASAudioDeviceRouteSampleOutputData *data in self.outputRoutes) {
+        [data addObserver:self forKeyPath:@"inputSelectIndex" options:NSKeyValueObservingOptionNew context:nil];
+    }
+}
+
+- (void)_removeObservers
+{
+    for (YASAudioDeviceRouteSampleOutputData *data in self.outputRoutes) {
+        [data removeObserver:self forKeyPath:@"inputSelectIndex"];
+    }
+}
+
+- (void)_updateInputSelection
+{
+    if (!_route_node) {
+        return;
+    }
+
+    auto &routes = _route_node->routes();
+    for (YASAudioDeviceRouteSampleOutputData *data in self.outputRoutes) {
+        const UInt32 dst_ch_idx = data.outputIndex;
+        auto it = std::find_if(routes.begin(), routes.end(), [dst_ch_idx](const yas::audio_route &route) {
+            return route.destination.channel == dst_ch_idx;
+        });
+
+        UInt32 inputSelectIndex = 0;
+
+        if (it != routes.end()) {
+            const auto &route = *it;
+            if (route.source.bus == YASAudioDeviceRouteSampleSourceBusSine) {
+                inputSelectIndex = YASAudioDeviceRouteSampleInputTypeSine;
+            } else if (route.source.bus == YASAudioDeviceRouteSampleSourceBusInput) {
+                inputSelectIndex = route.source.channel + YASAudioDeviceRouteSampleInputTypeInput;
+            } else {
+                inputSelectIndex = YASAudioDeviceRouteSampleInputTypeNone;
+            }
+        } else {
+            inputSelectIndex = YASAudioDeviceRouteSampleInputTypeNone;
+        }
+
+        if (data.inputSelectIndex != inputSelectIndex) {
+            data.inputSelectIndex = inputSelectIndex;
+        }
     }
 }
 
@@ -273,6 +398,10 @@
 - (void)setDevice:(const yas::audio_device_sptr &)selected_device
 {
     _device_observer = nullptr;
+
+    if (!_device_io_node) {
+        return;
+    }
 
     const auto all_devices = yas::audio_device::all_devices();
 
