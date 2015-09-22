@@ -235,7 +235,7 @@ audio_pcm_buffer::audio_pcm_buffer(const audio_format_sptr &format, const audio_
 
     const AudioBufferList *from_abl = from_buffer->audio_buffer_list();
     UInt32 bytesPerFrame = format->stream_description().mBytesPerFrame;
-    const UInt32 frame_capacity = from_buffer->frame_capacity();
+    const UInt32 frame_length = from_buffer->frame_length();
     UInt32 to_ch_idx = 0;
     abl_data_uptr data = nullptr;
 
@@ -243,15 +243,15 @@ audio_pcm_buffer::audio_pcm_buffer(const audio_format_sptr &format, const audio_
         if (from_ch_idx != -1) {
             to_abl->mBuffers[to_ch_idx].mData = from_abl->mBuffers[from_ch_idx].mData;
             to_abl->mBuffers[to_ch_idx].mDataByteSize = from_abl->mBuffers[from_ch_idx].mDataByteSize;
-            UInt32 frame_length = from_abl->mBuffers[0].mDataByteSize / bytesPerFrame;
-            if (frame_capacity != frame_length) {
-                throw std::invalid_argument(
-                    std::string(__PRETTY_FUNCTION__) + " : invalid frame length. frame_capacity(" +
-                    std::to_string(frame_capacity) + ") frame_length(" + std::to_string(frame_length) + ")");
+            UInt32 actual_frame_length = from_abl->mBuffers[0].mDataByteSize / bytesPerFrame;
+            if (frame_length != actual_frame_length) {
+                throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) +
+                                            " : invalid frame length. frame_length(" + std::to_string(frame_length) +
+                                            ") actual_frame_length(" + std::to_string(actual_frame_length) + ")");
             }
         } else {
             if (to_abl->mBuffers[to_ch_idx].mData == nullptr) {
-                const UInt32 size = bytesPerFrame * frame_capacity;
+                const UInt32 size = bytesPerFrame * frame_length;
                 auto dummy_data = audio_pcm_buffer::impl::dummy_data();
                 if (size <= dummy_data.size()) {
                     to_abl->mBuffers[to_ch_idx].mData = dummy_data.data();
@@ -265,7 +265,7 @@ audio_pcm_buffer::audio_pcm_buffer(const audio_format_sptr &format, const audio_
         ++to_ch_idx;
     }
 
-    _impl = std::make_unique<impl>(format, std::move(to_abl), std::move(data), frame_capacity);
+    _impl = std::make_unique<impl>(format, std::move(to_abl), std::move(data), frame_length);
 }
 
 audio_format_sptr audio_pcm_buffer::format() const
