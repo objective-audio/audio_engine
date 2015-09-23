@@ -15,11 +15,16 @@ namespace yas
     class audio_format
     {
        public:
-        static audio_format_sptr create(const AudioStreamBasicDescription &asbd);
-        static audio_format_sptr create(const CFDictionaryRef &settings);
-        static audio_format_sptr create(const Float64 sample_rate, const UInt32 channel_count,
-                                        const yas::pcm_format pcm_format = yas::pcm_format::float32,
-                                        const bool interleaved = false);
+        explicit audio_format(const AudioStreamBasicDescription &asbd);
+        explicit audio_format(const CFDictionaryRef &settings);
+        audio_format(const Float64 sample_rate = 44100.0, const UInt32 channel_count = 2,
+                     const yas::pcm_format pcm_format = yas::pcm_format::float32, const bool interleaved = false);
+
+        audio_format(const audio_format &);
+        audio_format(audio_format &&) noexcept;
+        audio_format &operator=(const audio_format &);
+        audio_format &operator=(audio_format &&) noexcept;
+
         ~audio_format();
 
         bool operator==(const audio_format &) const;
@@ -41,16 +46,6 @@ namespace yas
        private:
         class impl;
         std::unique_ptr<impl> _impl;
-
-        explicit audio_format(const AudioStreamBasicDescription &asbd);
-        explicit audio_format(const CFDictionaryRef &settings);
-        audio_format(const Float64 sample_rate, const UInt32 channel_count, const yas::pcm_format pcm_format,
-                     const bool interleaved);
-
-        audio_format(const audio_format &) = delete;
-        audio_format(const audio_format &&) = delete;
-        audio_format &operator=(const audio_format &) = delete;
-        audio_format &operator=(const audio_format &&) = delete;
     };
 
     std::string to_string(const yas::pcm_format &pcm_format);
