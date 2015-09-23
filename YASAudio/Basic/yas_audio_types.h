@@ -69,11 +69,6 @@ namespace yas
     std::string to_string(const yas::direction &);
     std::string to_string(const AudioUnitScope scope);
 
-    using bus_result_t = std::experimental::optional<UInt32>;
-    using abl_uptr = std::unique_ptr<AudioBufferList, std::function<void(AudioBufferList *)>>;
-    using abl_data_uptr = std::unique_ptr<std::vector<std::vector<UInt8>>>;
-    using channel_map_t = std::vector<UInt32>;
-
     class objc_strong_container;
     class objc_weak_container;
     class audio_time;
@@ -96,6 +91,14 @@ namespace yas
     class audio_input_tap_node;
     class audio_unit_mixer_node;
     class audio_route_node;
+
+    constexpr std::experimental::nullopt_t nullopt = std::experimental::nullopt;
+
+    using bus_result_t = std::experimental::optional<UInt32>;
+    using audio_format_opt_t = std::experimental::optional<audio_format>;
+    using abl_uptr = std::unique_ptr<AudioBufferList, std::function<void(AudioBufferList *)>>;
+    using abl_data_uptr = std::unique_ptr<std::vector<std::vector<UInt8>>>;
+    using channel_map_t = std::vector<UInt32>;
 
     using objc_strong_container_sptr = std::shared_ptr<objc_strong_container>;
     using objc_weak_container_sptr = std::shared_ptr<objc_weak_container>;
