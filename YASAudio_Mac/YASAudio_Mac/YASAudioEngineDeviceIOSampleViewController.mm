@@ -197,7 +197,7 @@ typedef NS_ENUM(NSUInteger, YASAudioDeviceRouteSampleInputType) {
         yas::audio_frame_enumerator enumerator(buffer);
         const auto *flex_ptr = enumerator.pointer();
         const Float64 start_phase = next_phase;
-        const Float64 phase_per_frame = 1000.0 / buffer->format()->sample_rate() * yas::audio_math::two_pi;
+        const Float64 phase_per_frame = 1000.0 / buffer->format().sample_rate() * yas::audio_math::two_pi;
         while (flex_ptr->v) {
             next_phase =
                 yas::audio_math::fill_sine(flex_ptr->f32, buffer->frame_length(), start_phase, phase_per_frame);
@@ -286,14 +286,14 @@ typedef NS_ENUM(NSUInteger, YASAudioDeviceRouteSampleInputType) {
 
         if (const auto &device = _device_io_node->device()) {
             if (device->output_channel_count() > 0) {
-                _engine->connect(_route_node, _device_io_node, device->output_format());
-                _engine->connect(_tap_node, _route_node, 0, YASAudioDeviceRouteSampleSourceBusSine,
-                                 device->output_format());
+                const auto output_format = *device->output_format();
+                _engine->connect(_route_node, _device_io_node, output_format);
+                _engine->connect(_tap_node, _route_node, 0, YASAudioDeviceRouteSampleSourceBusSine, output_format);
             }
 
             if (device->input_channel_count() > 0) {
                 _engine->connect(_device_io_node, _route_node, 0, YASAudioDeviceRouteSampleSourceBusInput,
-                                 device->input_format());
+                                 *device->input_format());
             }
         }
     }

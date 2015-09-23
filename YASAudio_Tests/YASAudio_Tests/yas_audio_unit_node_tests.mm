@@ -24,7 +24,7 @@
 - (void)test_restore_parameters
 {
     auto engine = yas::audio_engine::create();
-    auto format = yas::audio_format::create(44100.0, 2);
+    auto format = yas::audio_format(44100.0, 2);
     auto output_node = yas::audio_offline_output_node::create();
     auto delay_node = yas::audio_unit_node::create(kAudioUnitType_Effect, kAudioUnitSubType_Delay);
 

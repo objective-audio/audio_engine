@@ -48,22 +48,6 @@ class audio_format::impl
 
 #pragma mark - main
 
-audio_format_sptr audio_format::create(const AudioStreamBasicDescription &asbd)
-{
-    return audio_format_sptr(new audio_format(asbd));
-}
-
-audio_format_sptr audio_format::create(const CFDictionaryRef &settings)
-{
-    return audio_format_sptr(new audio_format(settings));
-}
-
-audio_format_sptr audio_format::create(const Float64 sample_rate, const UInt32 channel_count,
-                                       const yas::pcm_format pcm_format, const bool interleaved)
-{
-    return audio_format_sptr(new audio_format(sample_rate, channel_count, pcm_format, interleaved));
-}
-
 audio_format::audio_format(const AudioStreamBasicDescription &asbd) : _impl(std::make_unique<impl>())
 {
     _impl->asbd = asbd;
@@ -104,6 +88,26 @@ audio_format::audio_format(const Float64 sample_rate, const UInt32 channel_count
                            const bool interleaved)
     : audio_format(to_stream_description(sample_rate, channel_count, pcm_format, interleaved))
 {
+}
+
+audio_format::audio_format(const audio_format &other) : _impl(std::make_unique<impl>(*other._impl))
+{
+}
+
+audio_format::audio_format(audio_format &&other) noexcept : _impl(std::move(other._impl))
+{
+}
+
+audio_format &audio_format::operator=(const audio_format &other)
+{
+    _impl = std::make_unique<impl>(*other._impl);
+    return *this;
+}
+
+audio_format &audio_format::operator=(audio_format &&other) noexcept
+{
+    _impl = std::move(other._impl);
+    return *this;
 }
 
 audio_format::~audio_format() = default;

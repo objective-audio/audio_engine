@@ -27,10 +27,9 @@ class audio_device_io::impl
         audio_pcm_buffer_sptr input_buffer;
         audio_pcm_buffer_sptr output_buffer;
 
-        kernel(const audio_format_sptr &input_format, const audio_format_sptr &output_format,
-               const UInt32 frame_capacity)
-            : input_buffer(input_format ? audio_pcm_buffer::create(input_format, frame_capacity) : nullptr),
-              output_buffer(output_format ? audio_pcm_buffer::create(output_format, frame_capacity) : nullptr)
+        kernel(const audio_format_sptr &input_format, const audio_format_sptr &output_format, const UInt32 frame_capacity)
+            : input_buffer(input_format ? audio_pcm_buffer::create(*input_format, frame_capacity) : nullptr),
+              output_buffer(output_format ? audio_pcm_buffer::create(*output_format, frame_capacity) : nullptr)
         {
         }
 
@@ -196,7 +195,7 @@ void audio_device_io::_initialize()
                         if (input_frame_length > 0) {
                             device_io->_impl->input_buffer_on_render = input_buffer;
                             device_io->_impl->input_time_on_render =
-                                std::make_shared<audio_time>(*inInputTime, input_buffer->format()->sample_rate());
+                                std::make_shared<audio_time>(*inInputTime, input_buffer->format().sample_rate());
                         }
                     }
                 }
@@ -205,11 +204,11 @@ void audio_device_io::_initialize()
                     if (auto &output_buffer = kernel->output_buffer) {
                         if (outOutputData) {
                             const UInt32 frame_length =
-                                yas::frame_length(outOutputData, output_buffer->format()->sample_byte_count());
+                                yas::frame_length(outOutputData, output_buffer->format().sample_byte_count());
                             if (frame_length > 0) {
                                 output_buffer->set_frame_length(frame_length);
                                 auto time =
-                                    std::make_shared<audio_time>(*inOutputTime, output_buffer->format()->sample_rate());
+                                    std::make_shared<audio_time>(*inOutputTime, output_buffer->format().sample_rate());
                                 render_callback(output_buffer, time);
                                 output_buffer->copy_to(outOutputData);
                             }

@@ -31,8 +31,8 @@
     const OSType type = kAudioUnitType_FormatConverter;
     const OSType sub_type = kAudioUnitSubType_AUConverter;
 
-    auto output_format = yas::audio_format::create(output_sample_rate, channels, yas::pcm_format::float32, false);
-    auto input_format = yas::audio_format::create(input_sample_rate, channels, yas::pcm_format::int16, true);
+    auto output_format = yas::audio_format(output_sample_rate, channels, yas::pcm_format::float32, false);
+    auto input_format = yas::audio_format(input_sample_rate, channels, yas::pcm_format::int16, true);
 
     const auto audio_graph = yas::audio_graph::create();
     auto converter_unit = yas::audio_unit::create(kAudioUnitType_FormatConverter, kAudioUnitSubType_AUConverter);
@@ -48,14 +48,14 @@
     XCTAssertEqual(converter_unit->maximum_frames_per_slice(), maximum_frame_length);
 
     converter_unit->attach_render_callback(0);
-    converter_unit->set_output_format(output_format->stream_description(), 0);
-    converter_unit->set_input_format(input_format->stream_description(), 0);
+    converter_unit->set_output_format(output_format.stream_description(), 0);
+    converter_unit->set_input_format(input_format.stream_description(), 0);
 
     AudioStreamBasicDescription outputASBD = converter_unit->output_format(0);
-    XCTAssertTrue(yas::is_equal(output_format->stream_description(), outputASBD));
+    XCTAssertTrue(yas::is_equal(output_format.stream_description(), outputASBD));
 
     AudioStreamBasicDescription inputASBD = converter_unit->input_format(0);
-    XCTAssertTrue(yas::is_equal(input_format->stream_description(), inputASBD));
+    XCTAssertTrue(yas::is_equal(input_format.stream_description(), inputASBD));
 
     XCTestExpectation *expectation = [self expectationWithDescription:@"ConverterUnit Render"];
 
@@ -66,11 +66,11 @@
             if (expectation) {
                 const AudioBufferList *ioData = render_parameters.io_data;
                 XCTAssertNotEqual(ioData, nullptr);
-                XCTAssertEqual(ioData->mNumberBuffers, input_format->buffer_count());
-                for (UInt32 i = 0; i < input_format->buffer_count(); i++) {
-                    XCTAssertEqual(ioData->mBuffers[i].mNumberChannels, input_format->stride());
+                XCTAssertEqual(ioData->mNumberBuffers, input_format.buffer_count());
+                for (UInt32 i = 0; i < input_format.buffer_count(); i++) {
+                    XCTAssertEqual(ioData->mBuffers[i].mNumberChannels, input_format.stride());
                     XCTAssertEqual(ioData->mBuffers[i].mDataByteSize,
-                                   input_format->buffer_frame_byte_count() * render_parameters.in_number_frames);
+                                   input_format.buffer_frame_byte_count() * render_parameters.in_number_frames);
                 }
                 [expectation fulfill];
 
@@ -98,7 +98,7 @@
     const UInt32 frame_length = 1024;
     const UInt32 maximum_frame_length = 4096;
 
-    auto format = yas::audio_format::create(sampleRate, channels, yas::pcm_format::float32, false);
+    auto format = yas::audio_format(sampleRate, channels, yas::pcm_format::float32, false);
 
     const auto audio_graph = yas::audio_graph::create();
     auto converter_unit = yas::audio_unit::create(kAudioUnitType_FormatConverter, kAudioUnitSubType_AUConverter);
@@ -108,8 +108,8 @@
 
     converter_unit->attach_render_callback(0);
     converter_unit->attach_render_notify();
-    converter_unit->set_output_format(format->stream_description(), 0);
-    converter_unit->set_input_format(format->stream_description(), 0);
+    converter_unit->set_output_format(format.stream_description(), 0);
+    converter_unit->set_input_format(format.stream_description(), 0);
 
     XCTestExpectation *renderExpectation = [self expectationWithDescription:@"ConverterUnit Render"];
     XCTestExpectation *preRenderExpectation = [self expectationWithDescription:@"ConverterUnit PreRender"];
@@ -227,10 +227,10 @@
     const AudioUnitScope scope = kAudioUnitScope_Input;
     const AudioUnitElement element = 0;
 
-    auto format = yas::audio_format::create(sampleRate, channels, yas::pcm_format::float32, false);
+    auto format = yas::audio_format(sampleRate, channels, yas::pcm_format::float32, false);
 
     std::vector<AudioStreamBasicDescription> set_data;
-    set_data.push_back(format->stream_description());
+    set_data.push_back(format.stream_description());
 
     auto converter_unit = yas::audio_unit::create(kAudioUnitType_FormatConverter, kAudioUnitSubType_AUConverter);
 

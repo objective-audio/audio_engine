@@ -28,7 +28,7 @@
     const auto output_node = yas::audio_offline_output_node::create();
     const auto to_node = yas::audio_tap_node::create();
     const auto from_node = yas::audio_tap_node::create();
-    const auto format = yas::audio_format::create(48000.0, 2);
+    const auto format = yas::audio_format(48000.0, 2);
 
     const auto to_connection = engine->connect(to_node, output_node, format);
     const auto from_connection = engine->connect(from_node, to_node, format);
@@ -81,7 +81,7 @@
     const auto output_node = yas::audio_offline_output_node::create();
     const auto to_node = yas::audio_tap_node::create();
     const auto from_node = yas::audio_tap_node::create();
-    const auto format = yas::audio_format::create(48000.0, 2);
+    const auto format = yas::audio_format(48000.0, 2);
 
     const auto to_connection = engine->connect(to_node, output_node, format);
     const auto from_connection = engine->connect(from_node, to_node, format);

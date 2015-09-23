@@ -77,7 +77,7 @@
 - (void)test_render
 {
     auto engine = yas::audio_engine::create();
-    auto format = yas::audio_format::create(44100.0, 2);
+    auto format = yas::audio_format(44100.0, 2);
     auto output_node = yas::audio_offline_output_node::create();
     auto route_node = yas::audio_route_node::create();
     auto tap_node = yas::audio_tap_node::create();
@@ -150,8 +150,8 @@
     const auto src_count = 2;
 
     auto engine = yas::audio_engine::create();
-    auto dst_format = yas::audio_format::create(44100.0, 2);
-    auto src_format = yas::audio_format::create(44100.0, 1);
+    auto dst_format = yas::audio_format(44100.0, 2);
+    auto src_format = yas::audio_format(44100.0, 1);
     auto output_node = yas::audio_offline_output_node::create();
     auto route_node = yas::audio_route_node::create();
 
@@ -216,8 +216,8 @@
     const auto src_count = 2;
 
     auto engine = yas::audio_engine::create();
-    auto dst_format = yas::audio_format::create(44100.0, 4);
-    auto src_format = yas::audio_format::create(44100.0, 2);
+    auto dst_format = yas::audio_format(44100.0, 4);
+    auto src_format = yas::audio_format(44100.0, 2);
     auto output_node = yas::audio_offline_output_node::create();
     auto route_node = yas::audio_route_node::create();
 

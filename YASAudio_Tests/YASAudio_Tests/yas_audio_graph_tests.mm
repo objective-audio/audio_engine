@@ -42,8 +42,8 @@
     const UInt32 frame_length = 1024;
     const UInt32 maximum_frame_length = 4096;
 
-    auto output_format = yas::audio_format::create(output_sample_rate, channels);
-    auto mixer_format = yas::audio_format::create(mixer_sample_rate, channels);
+    auto output_format = yas::audio_format(output_sample_rate, channels);
+    auto mixer_format = yas::audio_format(mixer_sample_rate, channels);
 
     const auto audio_graph = yas::audio_graph::create();
     auto io_unit = yas::audio_unit::create(kAudioUnitType_Output, kAudioUnitSubType_GenericOutput);
@@ -58,7 +58,7 @@
     mixer_unit->set_maximum_frames_per_slice(maximum_frame_length);
     audio_graph->add_audio_unit(mixer_unit);
 
-    mixer_unit->set_output_format(mixer_format->stream_description(), 0);
+    mixer_unit->set_output_format(mixer_format.stream_description(), 0);
 
     AudioStreamBasicDescription outputASBD = mixer_unit->output_format(0);
     XCTAssertEqual(outputASBD.mSampleRate, mixer_sample_rate);
@@ -73,11 +73,11 @@
     for (UInt32 i = 0; i < mixerInputCount; i++) {
         mixer_unit->attach_render_callback(i);
 
-        mixer_unit->set_input_format(output_format->stream_description(), i);
+        mixer_unit->set_input_format(output_format.stream_description(), i);
         AudioStreamBasicDescription input_asbd = mixer_unit->input_format(i);
         XCTAssertEqual(input_asbd.mSampleRate, output_sample_rate);
 
-        mixer_unit->set_input_format(mixer_format->stream_description(), i);
+        mixer_unit->set_input_format(mixer_format.stream_description(), i);
         input_asbd = mixer_unit->input_format(i);
         XCTAssertEqual(input_asbd.mSampleRate, mixer_sample_rate);
     }
@@ -96,12 +96,12 @@
             XCTAssertEqual(*render_parameters.io_action_flags, 0);
             const AudioBufferList *ioData = render_parameters.io_data;
             XCTAssertNotEqual(ioData, nullptr);
-            XCTAssertEqual(ioData->mNumberBuffers, output_format->buffer_count());
-            for (UInt32 i = 0; i < output_format->buffer_count(); i++) {
-                XCTAssertEqual(ioData->mBuffers[i].mNumberChannels, output_format->stride());
+            XCTAssertEqual(ioData->mNumberBuffers, output_format.buffer_count());
+            for (UInt32 i = 0; i < output_format.buffer_count(); i++) {
+                XCTAssertEqual(ioData->mBuffers[i].mNumberChannels, output_format.stride());
                 XCTAssertEqual(
                     ioData->mBuffers[i].mDataByteSize,
-                    output_format->sample_byte_count() * output_format->stride() * render_parameters.in_number_frames);
+                    output_format.sample_byte_count() * output_format.stride() * render_parameters.in_number_frames);
             }
 
             mixer_unit->audio_unit_render(render_parameters);
@@ -134,11 +134,11 @@
                     XCTAssertEqual(*render_parameters.io_action_flags, 0);
                     const AudioBufferList *ioData = render_parameters.io_data;
                     XCTAssertNotEqual(ioData, nullptr);
-                    XCTAssertEqual(ioData->mNumberBuffers, output_format->buffer_count());
-                    for (UInt32 i = 0; i < output_format->buffer_count(); i++) {
-                        XCTAssertEqual(ioData->mBuffers[i].mNumberChannels, output_format->stride());
-                        XCTAssertEqual(ioData->mBuffers[i].mDataByteSize, output_format->sample_byte_count() *
-                                                                              output_format->stride() *
+                    XCTAssertEqual(ioData->mNumberBuffers, output_format.buffer_count());
+                    for (UInt32 i = 0; i < output_format.buffer_count(); i++) {
+                        XCTAssertEqual(ioData->mBuffers[i].mNumberChannels, output_format.stride());
+                        XCTAssertEqual(ioData->mBuffers[i].mDataByteSize, output_format.sample_byte_count() *
+                                                                              output_format.stride() *
                                                                               render_parameters.in_number_frames);
                     }
                 }

@@ -119,7 +119,7 @@ namespace yas
 {
     [super viewDidLoad];
 
-    auto format = yas::audio_format::create(yas::offline_sample::sample_rate, 2, yas::pcm_format::float32, false);
+    auto format = yas::audio_format(yas::offline_sample::sample_rate, 2, yas::pcm_format::float32, false);
 
     /*
      play engine
@@ -290,7 +290,7 @@ namespace yas
 
     auto start_result = _offline_engine->start_offline_render(
         [remain, file_writer](const yas::audio_pcm_buffer_sptr &buffer, const auto &when, bool &stop) mutable {
-            auto format = yas::audio_format::create(buffer->format()->stream_description());
+            auto format = yas::audio_format(buffer->format().stream_description());
             auto pcm_buffer = yas::audio_pcm_buffer::create(format, buffer->audio_buffer_list());
             pcm_buffer->set_frame_length(buffer->frame_length());
 

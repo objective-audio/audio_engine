@@ -118,7 +118,7 @@ void audio_device_io_node::update_connections()
                     if (connections.count(0) > 0) {
                         const auto &connection = connections.at(0);
                         if (const auto source_node = connection->source_node()) {
-                            if (*connection->format() == *source_node->output_format(connection->source_bus())) {
+                            if (connection->format() == *source_node->output_format(connection->source_bus())) {
                                 source_node->render(output_buffer, connection->source_bus(), when);
                             }
                         }
@@ -134,7 +134,7 @@ void audio_device_io_node::update_connections()
                                 const auto input_buffer = device_io->input_buffer_on_render();
                                 const auto input_time = device_io->input_time_on_render();
                                 if (input_buffer && input_time) {
-                                    if (*connection->format() ==
+                                    if (connection->format() ==
                                         *destination_node->input_format(connection->destination_bus())) {
                                         input_tap_node->render(input_buffer, 0, input_time);
                                     }
@@ -190,7 +190,7 @@ bool audio_device_io_node::_validate_connections() const
                 const auto &connection = connections.at(0);
                 const auto &connection_format = connection->format();
                 const auto &device_format = device_io->device()->output_format();
-                if (*connection_format != *device_format) {
+                if (connection_format != *device_format) {
                     std::cout << __PRETTY_FUNCTION__ << " : output device io format is not match." << std::endl;
                     return false;
                 }
@@ -203,7 +203,7 @@ bool audio_device_io_node::_validate_connections() const
                 const auto &connection = connections.at(0);
                 const auto &connection_format = connection->format();
                 const auto &device_format = device_io->device()->input_format();
-                if (*connection_format != *device_format) {
+                if (connection_format != *device_format) {
                     std::cout << __PRETTY_FUNCTION__ << " : input device io format is not match." << std::endl;
                     return false;
                 }
@@ -224,7 +224,7 @@ void audio_device_io_node::render(const audio_pcm_buffer_sptr &buffer, const UIn
     if (const auto &device_io = _impl->device_io) {
         if (auto core = _impl->node_core_on_render) {
             auto &input_buffer = device_io->input_buffer_on_render();
-            if (input_buffer && *input_buffer->format() == *buffer->format()) {
+            if (input_buffer && input_buffer->format() == buffer->format()) {
                 buffer->copy_from(input_buffer);
             }
         }

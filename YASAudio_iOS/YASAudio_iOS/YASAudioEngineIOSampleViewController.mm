@@ -270,13 +270,13 @@ namespace yas
 
     const UInt32 output_channel_count = [self _connectionChannelCountForDirection:yas::direction::output];
     if (output_channel_count > 0) {
-        auto output_format = yas::audio_format::create(sample_rate, output_channel_count);
+        auto output_format = yas::audio_format(sample_rate, output_channel_count);
         _engine->connect(_mixer_node, _io_node, output_format);
     }
 
     const UInt32 input_channel_count = [self _connectionChannelCountForDirection:yas::direction::input];
     if (input_channel_count > 0) {
-        auto input_format = yas::audio_format::create(sample_rate, input_channel_count);
+        auto input_format = yas::audio_format(sample_rate, input_channel_count);
         _engine->connect(_io_node, _mixer_node, input_format);
     }
 }

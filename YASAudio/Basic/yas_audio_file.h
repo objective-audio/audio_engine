@@ -18,9 +18,9 @@ namespace yas
         virtual ~audio_file();
 
         CFURLRef url() const;
-        audio_format_sptr file_format() const;
-        void set_processing_format(const audio_format_sptr &format);
-        audio_format_sptr processing_format() const;
+        audio_format &file_format() const;
+        void set_processing_format(const audio_format &format);
+        audio_format &processing_format() const;
         SInt64 file_length() const;
         SInt64 processing_length() const;
         void set_file_frame_position(const UInt32 position);

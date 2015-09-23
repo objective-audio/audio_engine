@@ -15,9 +15,9 @@ UInt32 yas::test::test_value(const UInt32 frame, const UInt32 ch_idx, const UInt
 void yas::test::fill_test_values_to_buffer(const audio_pcm_buffer_sptr &buffer)
 {
     const auto &format = buffer->format();
-    const yas::pcm_format pcmFormat = format->pcm_format();
-    const UInt32 buffer_count = format->buffer_count();
-    const UInt32 stride = format->stride();
+    const yas::pcm_format pcmFormat = format.pcm_format();
+    const UInt32 buffer_count = format.buffer_count();
+    const UInt32 stride = format.stride();
 
     for (UInt32 buf_idx = 0; buf_idx < buffer_count; buf_idx++) {
         flex_pointer pointer = buffer->audio_ptr_at_index(buf_idx);
@@ -65,7 +65,7 @@ bool yas::test::is_cleared_buffer(const audio_pcm_buffer_sptr &buffer)
 bool yas::test::is_filled_buffer(const audio_pcm_buffer_sptr &buffer)
 {
     __block BOOL isFilled = YES;
-    const UInt32 sample_byte_count = buffer->format()->sample_byte_count();
+    const UInt32 sample_byte_count = buffer->format().sample_byte_count();
     NSData *zeroData = [NSMutableData dataWithLength:sample_byte_count];
     const void *zeroBytes = [zeroData bytes];
 
@@ -85,7 +85,7 @@ bool yas::test::is_filled_buffer(const audio_pcm_buffer_sptr &buffer)
 
 bool yas::test::is_equal_buffer_flexibly(const audio_pcm_buffer_sptr &data1, const audio_pcm_buffer_sptr &data2)
 {
-    if (data1->format()->channel_count() != data2->format()->channel_count()) {
+    if (data1->format().channel_count() != data2->format().channel_count()) {
         return NO;
     }
 
@@ -93,19 +93,19 @@ bool yas::test::is_equal_buffer_flexibly(const audio_pcm_buffer_sptr &data1, con
         return NO;
     }
 
-    if (data1->format()->sample_byte_count() != data2->format()->sample_byte_count()) {
+    if (data1->format().sample_byte_count() != data2->format().sample_byte_count()) {
         return NO;
     }
 
-    if (data1->format()->pcm_format() != data2->format()->pcm_format()) {
+    if (data1->format().pcm_format() != data2->format().pcm_format()) {
         return NO;
     }
 
-    for (UInt32 ch_idx = 0; ch_idx < data1->format()->channel_count(); ch_idx++) {
+    for (UInt32 ch_idx = 0; ch_idx < data1->format().channel_count(); ch_idx++) {
         for (UInt32 frame = 0; frame < data1->frame_length(); frame++) {
             auto ptr1 = data_ptr_from_buffer(data1, ch_idx, frame);
             auto ptr2 = data_ptr_from_buffer(data2, ch_idx, frame);
-            if (!is_equal_data(ptr1.v, ptr2.v, data1->format()->sample_byte_count())) {
+            if (!is_equal_data(ptr1.v, ptr2.v, data1->format().sample_byte_count())) {
                 return NO;
             }
         }
@@ -145,32 +145,33 @@ yas::flex_pointer yas::test::data_ptr_from_buffer(const audio_pcm_buffer_sptr &b
     return *enumerator.pointer();
 }
 
-void yas::test::audio_unit_render_on_sub_thread(std::shared_ptr<audio_unit> audio_unit, yas::audio_format_sptr format,
+void yas::test::audio_unit_render_on_sub_thread(std::shared_ptr<audio_unit> audio_unit, yas::audio_format &format,
                                                 const UInt32 frame_length, const NSUInteger count,
                                                 const NSTimeInterval wait)
 {
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0),
-                   [audio_unit, format, frame_length, count, wait]() {
-                       AudioUnitRenderActionFlags action_flags = 0;
+    auto lambda = [audio_unit, format, frame_length, count, wait]() {
+        AudioUnitRenderActionFlags action_flags = 0;
 
-                       yas::audio_pcm_buffer_sptr buffer = yas::audio_pcm_buffer::create(format, frame_length);
+        yas::audio_pcm_buffer_sptr buffer = yas::audio_pcm_buffer::create(format, frame_length);
 
-                       for (NSInteger i = 0; i < count; i++) {
-                           yas::audio_time audio_time(frame_length * i, format->sample_rate());
-                           AudioTimeStamp timeStamp = audio_time.audio_time_stamp();
+        for (NSInteger i = 0; i < count; i++) {
+            yas::audio_time audio_time(frame_length * i, format.sample_rate());
+            AudioTimeStamp timeStamp = audio_time.audio_time_stamp();
 
-                           yas::render_parameters parameters = {
-                               .in_render_type = yas::render_type::normal,
-                               .io_action_flags = &action_flags,
-                               .io_time_stamp = &timeStamp,
-                               .in_bus_number = 0,
-                               .in_number_frames = frame_length,
-                               .io_data = buffer->audio_buffer_list(),
-                           };
+            yas::render_parameters parameters = {
+                .in_render_type = yas::render_type::normal,
+                .io_action_flags = &action_flags,
+                .io_time_stamp = &timeStamp,
+                .in_bus_number = 0,
+                .in_number_frames = frame_length,
+                .io_data = buffer->audio_buffer_list(),
+            };
 
-                           audio_unit->audio_unit_render(parameters);
-                       }
-                   });
+            audio_unit->audio_unit_render(parameters);
+        }
+    };
+
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), lambda);
 
     if (wait > 0) {
         [NSThread sleepForTimeInterval:wait];

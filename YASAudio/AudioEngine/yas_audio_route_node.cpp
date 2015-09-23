@@ -152,14 +152,14 @@ void audio_route_node::render(const audio_pcm_buffer_sptr &dst_buffer, const UIn
         auto &routes = route_node_core->routes;
         auto output_connection = core->output_connection(dst_bus_idx);
         auto input_connections = core->input_connections();
-        const UInt32 dst_ch_count = dst_buffer->format()->channel_count();
+        const UInt32 dst_ch_count = dst_buffer->format().channel_count();
 
         for (const auto &pair : input_connections) {
             if (const auto &input_connection = pair.second) {
                 if (auto node = input_connection->source_node()) {
                     const auto &src_format = input_connection->format();
                     const auto &src_bus_idx = pair.first;
-                    const UInt32 src_ch_count = src_format->channel_count();
+                    const UInt32 src_ch_count = src_format.channel_count();
                     if (const auto result =
                             channel_map_from_routes(routes, src_bus_idx, src_ch_count, dst_bus_idx, dst_ch_count)) {
                         auto src_buffer = yas::audio_pcm_buffer::create(src_format, dst_buffer, result.value());

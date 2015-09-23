@@ -25,7 +25,7 @@ audio_enumerator::audio_enumerator(const flex_pointer &pointer, const UInt32 byt
 }
 
 audio_enumerator::audio_enumerator(const audio_pcm_buffer_sptr &buffer, const UInt32 channel)
-    : audio_enumerator(buffer->audio_ptr_at_channel(channel), buffer->format()->buffer_frame_byte_count(),
+    : audio_enumerator(buffer->audio_ptr_at_channel(channel), buffer->format().buffer_frame_byte_count(),
                        buffer->frame_length())
 {
 }
@@ -83,16 +83,16 @@ audio_frame_enumerator::audio_frame_enumerator(const audio_pcm_buffer_sptr &buff
     : _frame(0),
       _channel(0),
       _frame_length(buffer->frame_length()),
-      _channel_count(buffer->format()->channel_count()),
-      _frame_byte_stride(buffer->format()->buffer_frame_byte_count()),
-      _pointers(std::vector<flex_pointer>(buffer->format()->channel_count())),
-      _top_pointers(std::vector<flex_pointer>(buffer->format()->channel_count())),
-      _pointers_size(buffer->format()->channel_count() * sizeof(flex_pointer *))
+      _channel_count(buffer->format().channel_count()),
+      _frame_byte_stride(buffer->format().buffer_frame_byte_count()),
+      _pointers(std::vector<flex_pointer>(buffer->format().channel_count())),
+      _top_pointers(std::vector<flex_pointer>(buffer->format().channel_count())),
+      _pointers_size(buffer->format().channel_count() * sizeof(flex_pointer *))
 {
     const auto &format = buffer->format();
-    const UInt32 bufferCount = format->buffer_count();
-    const UInt32 stride = format->stride();
-    const UInt32 sampleByteCount = format->sample_byte_count();
+    const UInt32 bufferCount = format.buffer_count();
+    const UInt32 stride = format.stride();
+    const UInt32 sampleByteCount = format.sample_byte_count();
 
     UInt32 channel = 0;
     for (UInt32 buf_idx = 0; buf_idx < bufferCount; buf_idx++) {
