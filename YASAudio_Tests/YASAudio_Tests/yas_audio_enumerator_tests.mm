@@ -26,10 +26,10 @@
     const UInt32 frame_length = 16;
     const UInt32 channels = 4;
 
-    auto format = yas::audio_format::create(48000.0, channels);
+    auto format = yas::audio_format(48000.0, channels);
     auto data = yas::audio_pcm_buffer::create(format, frame_length);
 
-    XCTAssertEqual(format->buffer_count(), channels);
+    XCTAssertEqual(format.buffer_count(), channels);
 
     yas::test::fill_test_values_to_buffer(data);
 
@@ -57,10 +57,10 @@
     const UInt32 frame_length = 16;
     const UInt32 channels = 4;
 
-    auto format = yas::audio_format::create(48000.0, channels);
+    auto format = yas::audio_format(48000.0, channels);
     auto data = yas::audio_pcm_buffer::create(format, frame_length);
 
-    XCTAssertEqual(format->buffer_count(), channels);
+    XCTAssertEqual(format.buffer_count(), channels);
 
     yas::test::fill_test_values_to_buffer(data);
 
@@ -88,10 +88,10 @@
     const UInt32 frame_length = 16;
     const UInt32 channels = 4;
 
-    auto format = yas::audio_format::create(48000.0, channels, yas::pcm_format::float32, true);
+    auto format = yas::audio_format(48000.0, channels, yas::pcm_format::float32, true);
     auto data = yas::audio_pcm_buffer::create(format, frame_length);
 
-    XCTAssertEqual(format->stride(), channels);
+    XCTAssertEqual(format.stride(), channels);
 
     yas::test::fill_test_values_to_buffer(data);
 
@@ -115,10 +115,10 @@
     const UInt32 frame_length = 16;
     const UInt32 channels = 4;
 
-    auto format = yas::audio_format::create(48000, channels);
+    auto format = yas::audio_format(48000, channels);
     auto data = yas::audio_pcm_buffer::create(format, frame_length);
 
-    XCTAssertEqual(format->buffer_count(), channels);
+    XCTAssertEqual(format.buffer_count(), channels);
 
     for (UInt32 buffer = 0; buffer < channels; buffer++) {
         yas::audio_enumerator enumerator(data, buffer);
@@ -157,7 +157,7 @@
 {
     const NSUInteger frame_length = 16;
 
-    auto format = yas::audio_format::create(48000.0, 1);
+    auto format = yas::audio_format(48000.0, 1);
     auto data = yas::audio_pcm_buffer::create(format, frame_length);
     yas::audio_enumerator enumerator(data, 0);
 
@@ -188,7 +188,7 @@
     const NSUInteger frame_length = 16;
     const NSUInteger stopIndex = 8;
 
-    auto format = yas::audio_format::create(48000.0, 1);
+    auto format = yas::audio_format(48000.0, 1);
     auto data = yas::audio_pcm_buffer::create(format, frame_length);
 
     yas::audio_enumerator enumerator(data, 0);

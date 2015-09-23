@@ -55,7 +55,7 @@ namespace yas
         audio_device_sptr device() const;
         bool is_active() const;
         direction direction() const;
-        audio_format_sptr virtual_format() const;
+        audio_format virtual_format() const;
         UInt32 starting_channel() const;
 
         using property_subject_t = subject<method, std::set<property_info>>;

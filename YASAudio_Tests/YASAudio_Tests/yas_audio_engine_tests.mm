@@ -24,7 +24,7 @@
 - (void)test_connect_success
 {
     auto engine = yas::audio_engine::create();
-    auto format = yas::audio_format::create(48000.0, 2);
+    auto format = yas::audio_format(48000.0, 2);
     auto source_node = yas::test::audio_test_node::create(1, 1);
     auto destination_node = yas::test::audio_test_node::create(1, 1);
 
@@ -46,7 +46,7 @@
 - (void)test_connect_failed_no_bus
 {
     auto engine = yas::audio_engine::create();
-    auto format = yas::audio_format::create(48000.0, 2);
+    auto format = yas::audio_format(48000.0, 2);
     auto source_node = yas::test::audio_test_node::create(0, 0);
     auto destination_node = yas::test::audio_test_node::create(0, 0);
 
@@ -59,7 +59,7 @@
 - (void)testConnectAndDisconnect
 {
     auto engine = yas::audio_engine::create();
-    auto format = yas::audio_format::create(48000.0, 2);
+    auto format = yas::audio_format(48000.0, 2);
     auto source_node = yas::test::audio_test_node::create(1, 1);
     auto relay_node = yas::test::audio_test_node::create(1, 1);
     auto destination_node = yas::test::audio_test_node::create(1, 1);

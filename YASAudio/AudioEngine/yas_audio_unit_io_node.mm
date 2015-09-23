@@ -150,7 +150,7 @@ void audio_unit_io_node::update_connections()
 
     auto unit = audio_unit();
 
-    auto update_channel_map = [](channel_map_t &map, const yas::audio_format_sptr format, const UInt32 dev_ch_count) {
+    auto update_channel_map = [](channel_map_t &map, const yas::audio_format_opt_t &format, const UInt32 dev_ch_count) {
         if (map.size() > 0) {
             if (format) {
                 const UInt32 ch_count = format->channel_count();
@@ -285,7 +285,7 @@ void audio_unit_input_node::update_connections()
                 if (const auto core = input_node->node_core()) {
                     if (const auto connection = core->output_connection(1)) {
                         auto format = connection->format();
-                        auto time = audio_time::create(*render_parameters.io_time_stamp, format->sample_rate());
+                        auto time = audio_time::create(*render_parameters.io_time_stamp, format.sample_rate());
                         input_node->set_render_time_on_render(time);
 
                         if (auto io_unit = input_node->audio_unit()) {

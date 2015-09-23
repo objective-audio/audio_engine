@@ -29,7 +29,7 @@ namespace yas
         bool is_equal_data(const void *inData1, const void *inData2, const size_t inSize);
         bool is_equal(const AudioTimeStamp *ts1, const AudioTimeStamp *ts2);
 
-        void audio_unit_render_on_sub_thread(std::shared_ptr<audio_unit> audio_unit, yas::audio_format_sptr format,
+        void audio_unit_render_on_sub_thread(std::shared_ptr<audio_unit> audio_unit, yas::audio_format &format,
                                              const UInt32 frame_length, const NSUInteger count,
                                              const NSTimeInterval wait);
 

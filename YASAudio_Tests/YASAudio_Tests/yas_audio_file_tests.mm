@@ -164,13 +164,8 @@ namespace yas
     const bool async = test_data.async;
     CFDictionaryRef settings = test_data.settings();
 
-    auto default_processing_format =
-        yas::audio_format::create(file_sample_rate, test_data.channels, pcm_format, interleaved);
-    auto processing_format =
-        yas::audio_format::create(processing_sample_rate, test_data.channels, pcm_format, interleaved);
-
-    XCTAssertTrue(default_processing_format != nullptr);
-    XCTAssertTrue(processing_format != nullptr);
+    auto default_processing_format = yas::audio_format(file_sample_rate, test_data.channels, pcm_format, interleaved);
+    auto processing_format = yas::audio_format(processing_sample_rate, test_data.channels, pcm_format, interleaved);
 
     // write
 
@@ -190,7 +185,7 @@ namespace yas
         }
 
         XCTAssert(audio_file);
-        XCTAssertTrue(*audio_file->processing_format() == *default_processing_format);
+        XCTAssertTrue(audio_file->processing_format() == default_processing_format);
 
         audio_file->set_processing_format(processing_format);
 
@@ -199,7 +194,7 @@ namespace yas
         UInt32 startIndex = 0;
 
         for (NSInteger i = 0; i < loopCount; i++) {
-            [self _writeToBuffer:buffer fileFormat:*audio_file->file_format() startIndex:startIndex];
+            [self _writeToBuffer:buffer fileFormat:audio_file->file_format() startIndex:startIndex];
 
             XCTAssertTrue(audio_file->write_from_buffer(buffer, async));
 
@@ -242,7 +237,7 @@ namespace yas
             XCTAssertTrue(audio_file->read_into_buffer(buffer));
             if (test_data.file_sample_rate == test_data.processing_sample_rate) {
                 XCTAssert(buffer->frame_length() == frame_length);
-                XCTAssert([self _compareData:buffer fileFormat:*audio_file->file_format() startIndex:startIndex]);
+                XCTAssert([self _compareData:buffer fileFormat:audio_file->file_format() startIndex:startIndex]);
             }
 
             startIndex += frame_length;
@@ -260,15 +255,15 @@ namespace yas
             startIndex:(NSInteger)startIndex
 {
     const auto &format = buffer->format();
-    const UInt32 buffer_count = format->buffer_count();
-    const UInt32 stride = format->stride();
+    const UInt32 buffer_count = format.buffer_count();
+    const UInt32 stride = format.stride();
 
     for (UInt32 buf_idx = 0; buf_idx < buffer_count; buf_idx++) {
         auto pointer = buffer->audio_ptr_at_index(buf_idx);
         for (NSInteger frameIndex = 0; frameIndex < buffer->frame_length(); frameIndex++) {
             SInt16 value = frameIndex + startIndex + 1;
             for (NSInteger ch_idx = 0; ch_idx < stride; ch_idx++) {
-                switch (format->pcm_format()) {
+                switch (format.pcm_format()) {
                     case yas::pcm_format::int16: {
                         pointer.i16[frameIndex * stride + ch_idx] = value;
                     } break;
@@ -296,8 +291,8 @@ namespace yas
           startIndex:(NSInteger)startIndex
 {
     const auto &format = buffer->format();
-    const UInt32 buffer_count = format->buffer_count();
-    const UInt32 stride = format->stride();
+    const UInt32 buffer_count = format.buffer_count();
+    const UInt32 stride = format.stride();
 
     for (UInt32 buf_idx = 0; buf_idx < buffer_count; buf_idx++) {
         const auto pointer = buffer->audio_ptr_at_index(buf_idx);
@@ -305,7 +300,7 @@ namespace yas
             SInt16 value = frameIndex + startIndex + 1;
             for (NSInteger ch_idx = 0; ch_idx < stride; ch_idx++) {
                 SInt16 ptrValue = 0;
-                switch (format->pcm_format()) {
+                switch (format.pcm_format()) {
                     case yas::pcm_format::int16: {
                         ptrValue = pointer.i16[frameIndex * stride + ch_idx];
                     } break;

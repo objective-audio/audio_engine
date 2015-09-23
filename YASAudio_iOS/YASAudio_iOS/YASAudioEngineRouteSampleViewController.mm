@@ -227,7 +227,7 @@ typedef NS_ENUM(NSUInteger, YASAudioEngineRouteSampleSourceIndex) {
         buffer->clear();
 
         const Float64 start_phase = phase;
-        const Float64 phase_per_frame = 1000.0 / buffer->format()->sample_rate() * yas::audio_math::two_pi;
+        const Float64 phase_per_frame = 1000.0 / buffer->format().sample_rate() * yas::audio_math::two_pi;
         yas::audio_frame_enumerator enumerator(buffer);
         const auto *flex_ptr = enumerator.pointer();
         const UInt32 length = enumerator.frame_length();
@@ -277,7 +277,7 @@ typedef NS_ENUM(NSUInteger, YASAudioEngineRouteSampleSourceIndex) {
 {
     const Float64 sample_rate = _io_node->device_sample_rate();
 
-    const auto format = yas::audio_format::create(sample_rate, 2);
+    const auto format = yas::audio_format(sample_rate, 2);
 
     _engine->connect(_mixer_node, _io_node, format);
     _engine->connect(_route_node, _mixer_node, format);

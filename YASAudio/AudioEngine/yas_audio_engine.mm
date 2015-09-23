@@ -351,9 +351,9 @@ audio_engine::~audio_engine()
 }
 
 audio_connection_sptr audio_engine::connect(const audio_node_sptr &source_node, const audio_node_sptr &destination_node,
-                                            const audio_format_sptr &format)
+                                            const audio_format &format)
 {
-    if (!source_node || !destination_node || !format) {
+    if (!source_node || !destination_node) {
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
     }
 
@@ -369,9 +369,9 @@ audio_connection_sptr audio_engine::connect(const audio_node_sptr &source_node, 
 
 audio_connection_sptr audio_engine::connect(const audio_node_sptr &source_node, const audio_node_sptr &destination_node,
                                             const UInt32 source_bus_idx, const UInt32 destination_bus_idx,
-                                            const audio_format_sptr &format)
+                                            const audio_format &format)
 {
-    if (!source_node || !destination_node || !format) {
+    if (!source_node || !destination_node) {
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
     }
 

@@ -25,7 +25,7 @@
 {
     const Float64 sample_rate = 44100.0;
 
-    auto format = yas::audio_format::create(sample_rate, 2);
+    auto format = yas::audio_format(sample_rate, 2);
     auto engine = yas::audio_engine::create();
     auto output_node = yas::audio_offline_output_node::create();
     auto sample_delay_node = yas::audio_unit_node::create(kAudioUnitType_Effect, kAudioUnitSubType_SampleDelay);
@@ -45,9 +45,9 @@
             XCTAssertEqual(when->sample_time(), tap_render_frame);
             XCTAssertEqual(when->sample_rate(), sample_rate);
             XCTAssertEqual(buffer->frame_length(), frames_per_render);
-            XCTAssertTrue(*buffer->format() == *format);
+            XCTAssertTrue(buffer->format() == format);
 
-            for (UInt32 buf_idx = 0; buf_idx < buffer->format()->buffer_count(); ++buf_idx) {
+            for (UInt32 buf_idx = 0; buf_idx < buffer->format().buffer_count(); ++buf_idx) {
                 Float32 *ptr = buffer->audio_ptr_at_index<Float32>(buf_idx);
                 for (UInt32 frm_idx = 0; frm_idx < buffer->frame_length(); ++frm_idx) {
                     ptr[frm_idx] = yas::test::test_value(frm_idx + tap_render_frame, 0, buf_idx);
@@ -73,9 +73,9 @@
             XCTAssertEqual(when->sample_time(), output_render_frame);
             XCTAssertEqual(when->sample_rate(), sample_rate);
             XCTAssertEqual(buffer->frame_length(), frames_per_render);
-            XCTAssertTrue(*buffer->format() == *format);
+            XCTAssertTrue(buffer->format() == format);
 
-            for (UInt32 buf_idx = 0; buf_idx < buffer->format()->buffer_count(); ++buf_idx) {
+            for (UInt32 buf_idx = 0; buf_idx < buffer->format().buffer_count(); ++buf_idx) {
                 Float32 *ptr = buffer->audio_ptr_at_index<Float32>(buf_idx);
                 for (UInt32 frm_idx = 0; frm_idx < buffer->frame_length(); ++frm_idx) {
                     XCTAssertEqual(ptr[frm_idx], yas::test::test_value(frm_idx + output_render_frame, 0, buf_idx));
@@ -110,7 +110,7 @@
 - (void)test_offline_render_without_audio_engine
 {
     const Float64 sample_rate = 48000.0;
-    auto format = yas::audio_format::create(sample_rate, 2);
+    auto format = yas::audio_format(sample_rate, 2);
     auto output_node = yas::audio_offline_output_node::create();
     auto tap_node = yas::audio_tap_node::create();
 
@@ -132,7 +132,7 @@
             XCTAssertEqual(when->sample_time(), tap_render_frame);
             XCTAssertEqual(when->sample_rate(), sample_rate);
             XCTAssertEqual(buffer->frame_length(), frames_per_render);
-            XCTAssertTrue(*buffer->format() == *format);
+            XCTAssertTrue(buffer->format() == format);
 
             auto enumerator = yas::audio_frame_enumerator(buffer);
             auto *flex_ptr = enumerator.pointer();
@@ -163,7 +163,7 @@
             XCTAssertEqual(when->sample_time(), output_render_frame);
             XCTAssertEqual(when->sample_rate(), sample_rate);
             XCTAssertEqual(buffer->frame_length(), frames_per_render);
-            XCTAssertTrue(*buffer->format() == *format);
+            XCTAssertTrue(buffer->format() == format);
 
             auto enumerator = yas::audio_frame_enumerator(buffer);
 

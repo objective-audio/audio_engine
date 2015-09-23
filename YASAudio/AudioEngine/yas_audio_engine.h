@@ -41,10 +41,10 @@ namespace yas
         ~audio_engine();
 
         audio_connection_sptr connect(const audio_node_sptr &source_node, const audio_node_sptr &destination_node,
-                                      const audio_format_sptr &format);
+                                      const audio_format &format);
         audio_connection_sptr connect(const audio_node_sptr &source_node, const audio_node_sptr &destination_node,
                                       const UInt32 source_bus_idx, const UInt32 destination_bus_idx,
-                                      const audio_format_sptr &format);
+                                      const audio_format &format);
 
         void disconnect(const audio_connection_sptr &connectiion);
         void disconnect(const audio_node_sptr &node);
@@ -55,7 +55,7 @@ namespace yas
 
         start_result_t start_render();
         start_result_t start_offline_render(const offline_render_f &render_function,
-                                          const offline_completion_f &completion_function);
+                                            const offline_completion_f &completion_function);
         void stop();
 
         subject_t &subject() const;

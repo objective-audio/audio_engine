@@ -230,7 +230,7 @@ void audio_unit_node::update_connections()
                                 auto buffer =
                                     yas::audio_pcm_buffer::create(connection->format(), render_parameters.io_data);
                                 auto when = yas::audio_time::create(*render_parameters.io_time_stamp,
-                                                                    connection->format()->sample_rate());
+                                                                    connection->format().sample_rate());
                                 source_node->render(buffer, connection->source_bus(), when);
                             }
                         }
@@ -240,7 +240,7 @@ void audio_unit_node::update_connections()
 
             for (UInt32 bus_idx = 0; bus_idx < input_bus_count; ++bus_idx) {
                 if (auto connection = input_connection(bus_idx)) {
-                    audio_unit->set_input_format(connection->format()->stream_description(), bus_idx);
+                    audio_unit->set_input_format(connection->format().stream_description(), bus_idx);
                     audio_unit->attach_render_callback(bus_idx);
                 } else {
                     audio_unit->detach_render_callback(bus_idx);
@@ -254,7 +254,7 @@ void audio_unit_node::update_connections()
         if (output_bus_count > 0) {
             for (UInt32 bus_idx = 0; bus_idx < output_bus_count; ++bus_idx) {
                 if (auto connection = output_connection(bus_idx)) {
-                    audio_unit->set_output_format(connection->format()->stream_description(), bus_idx);
+                    audio_unit->set_output_format(connection->format().stream_description(), bus_idx);
                 }
             }
         }

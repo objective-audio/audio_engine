@@ -25,12 +25,12 @@ namespace yas
 
         using copy_result = result<UInt32, copy_error_t>;
 
-        static audio_pcm_buffer_sptr create(const audio_format_sptr &format, AudioBufferList *abl);
-        static audio_pcm_buffer_sptr create(const audio_format_sptr &format, const UInt32 frame_capacity);
-        static audio_pcm_buffer_sptr create(const audio_format_sptr &format, const audio_pcm_buffer_sptr &from_buffer,
+        static audio_pcm_buffer_sptr create(const audio_format &format, AudioBufferList *abl);
+        static audio_pcm_buffer_sptr create(const audio_format &format, const UInt32 frame_capacity);
+        static audio_pcm_buffer_sptr create(const audio_format &format, const audio_pcm_buffer_sptr &from_buffer,
                                             const channel_map_t &channel_map);
 
-        audio_format_sptr format() const;
+        const audio_format &format() const;
         AudioBufferList *audio_buffer_list();
         const AudioBufferList *audio_buffer_list() const;
 
@@ -62,9 +62,9 @@ namespace yas
         class impl;
         std::unique_ptr<impl> _impl;
 
-        audio_pcm_buffer(const audio_format_sptr &format, AudioBufferList *abl);
-        audio_pcm_buffer(const audio_format_sptr &format, const UInt32 frame_capacity);
-        audio_pcm_buffer(const audio_format_sptr &format, const audio_pcm_buffer_sptr &from_buffer,
+        audio_pcm_buffer(const audio_format &format, AudioBufferList *abl);
+        audio_pcm_buffer(const audio_format &format, const UInt32 frame_capacity);
+        audio_pcm_buffer(const audio_format &format, const audio_pcm_buffer_sptr &from_buffer,
                          const channel_map_t &channel_map);
 
         audio_pcm_buffer(const audio_pcm_buffer &) = delete;

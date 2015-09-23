@@ -17,11 +17,11 @@ class audio_connection::impl
     UInt32 source_bus;
     std::weak_ptr<audio_node> destination_node;
     UInt32 destination_bus;
-    audio_format_sptr format;
+    audio_format format;
     mutable std::recursive_mutex mutex;
 
     impl(const audio_node_sptr &source_node, const UInt32 source_bus, const audio_node_sptr &destination_node,
-         const UInt32 destination_bus, const audio_format_sptr &format)
+         const UInt32 destination_bus, const audio_format &format)
         : source_bus(source_bus),
           destination_bus(destination_bus),
           format(format),
@@ -32,8 +32,8 @@ class audio_connection::impl
 };
 
 audio_connection_sptr audio_connection::_create(const audio_node_sptr &source_node, const UInt32 source_bus,
-                                               const audio_node_sptr &destination_node, const UInt32 destination_bus,
-                                               const audio_format_sptr &format)
+                                                const audio_node_sptr &destination_node, const UInt32 destination_bus,
+                                                const audio_format &format)
 {
     auto connection =
         audio_connection_sptr(new audio_connection(source_node, source_bus, destination_node, destination_bus, format));
@@ -44,10 +44,10 @@ audio_connection_sptr audio_connection::_create(const audio_node_sptr &source_no
 
 audio_connection::audio_connection(const audio_node_sptr &source_node, const UInt32 source_bus,
                                    const audio_node_sptr &destination_node, const UInt32 destination_bus,
-                                   const audio_format_sptr &format)
+                                   const audio_format &format)
     : _impl(std::make_unique<impl>(source_node, source_bus, destination_node, destination_bus, format))
 {
-    if (!source_node || !destination_node || !format) {
+    if (!source_node || !destination_node) {
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : invalid argument.");
     }
 }
@@ -84,7 +84,7 @@ audio_node_sptr audio_connection::destination_node() const
     return _impl->destination_node.lock();
 }
 
-audio_format_sptr &audio_connection::format() const
+audio_format &audio_connection::format() const
 {
     return _impl->format;
 }

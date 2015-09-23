@@ -126,7 +126,7 @@ static const AudioComponentDescription baseAcd = {.componentType = kAudioUnitTyp
         buffer->clear();
 
         const Float64 start_phase = phase;
-        const Float64 phase_per_frame = 1000.0 / buffer->format()->sample_rate() * yas::audio_math::two_pi;
+        const Float64 phase_per_frame = 1000.0 / buffer->format().sample_rate() * yas::audio_math::two_pi;
         yas::audio_frame_enumerator enumerator(buffer);
         const auto *flex_ptr = enumerator.pointer();
         const UInt32 length = enumerator.frame_length();
@@ -163,7 +163,7 @@ static const AudioComponentDescription baseAcd = {.componentType = kAudioUnitTyp
         _through_connection = nullptr;
     }
 
-    auto format = yas::audio_format::create([AVAudioSession sharedInstance].sampleRate, 2);
+    auto format = yas::audio_format([AVAudioSession sharedInstance].sampleRate, 2);
 
     if (acd) {
         _effect_node = yas::audio_unit_node::create(*acd);

@@ -314,14 +314,11 @@ class audio_device::impl
             }
         }
 
-        audio_format_sptr stream_format = nullptr;
-        if (stream) {
-            stream_format = stream->virtual_format();
-        }
-
-        if (!stream_format) {
+        if (!stream) {
             return;
         }
+
+        auto stream_format = stream->virtual_format();
 
         auto data = property_data<AudioBufferList>(audio_device_id, kAudioDevicePropertyStreamConfiguration, scope);
         if (data) {
@@ -331,8 +328,8 @@ class audio_device::impl
                     channel_count += abl.mBuffers[i].mNumberChannels;
                 }
 
-                auto format = yas::audio_format::create(stream_format->sample_rate(), channel_count,
-                                                        stream_format->pcm_format(), false);
+                auto format = std::make_shared<audio_format>(stream_format.sample_rate(), channel_count,
+                                                             stream_format.pcm_format(), false);
 
                 if (scope == kAudioObjectPropertyScopeInput) {
                     set_input_format(format);
@@ -534,16 +531,16 @@ audio_format_sptr audio_device::output_format() const
 
 UInt32 audio_device::input_channel_count() const
 {
-    if (_impl->input_format()) {
-        return _impl->input_format()->channel_count();
+    if (const auto format = _impl->input_format()) {
+        return format->channel_count();
     }
     return 0;
 }
 
 UInt32 audio_device::output_channel_count() const
 {
-    if (_impl->output_format()) {
-        return _impl->output_format()->channel_count();
+    if (const auto format = _impl->output_format()) {
+        return format->channel_count();
     }
     return 0;
 }

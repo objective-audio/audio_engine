@@ -20,19 +20,19 @@ namespace yas
         UInt32 destination_bus() const;
         audio_node_sptr source_node() const;
         audio_node_sptr destination_node() const;
-        audio_format_sptr &format() const;
+        audio_format &format() const;
 
        private:
         class impl;
         std::unique_ptr<impl> _impl;
 
         static audio_connection_sptr _create(const audio_node_sptr &source_node, const UInt32 source_bus,
-                                            const audio_node_sptr &destination_node, const UInt32 destination_bus,
-                                            const audio_format_sptr &format);
+                                             const audio_node_sptr &destination_node, const UInt32 destination_bus,
+                                             const audio_format &format);
 
         audio_connection(const audio_node_sptr &source_node, const UInt32 source_bus,
                          const audio_node_sptr &destination_node, const UInt32 destination_bus,
-                         const audio_format_sptr &format);
+                         const audio_format &format);
 
         audio_connection(const audio_connection &) = delete;
         audio_connection(audio_connection &&) = delete;
