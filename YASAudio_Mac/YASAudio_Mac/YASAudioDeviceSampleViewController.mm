@@ -82,7 +82,7 @@ namespace yas
                     return;
                 }
 
-                const yas::audio_format_sptr format = output_buffer->format();
+                const auto &format = output_buffer->format();
                 if (format.pcm_format() == yas::pcm_format::float32 && format.stride() == 1) {
                     yas::audio_frame_enumerator enumerator(output_buffer);
                     auto pointer = enumerator.pointer();
