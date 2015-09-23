@@ -12,25 +12,25 @@ namespace yas
 {
     template <typename T, typename U>
     result<T, U>::result(const T &value)
-        : _value(std::experimental::make_optional<T>(T(value))), _error(std::experimental::nullopt)
+        : _value(std::experimental::make_optional<T>(T(value))), _error(nullopt)
     {
     }
 
     template <typename T, typename U>
     result<T, U>::result(const U &error)
-        : _value(std::experimental::nullopt), _error(std::experimental::make_optional<U>(U(error)))
+        : _value(nullopt), _error(std::experimental::make_optional<U>(U(error)))
     {
     }
 
     template <typename T, typename U>
     result<T, U>::result(T &&value)
-        : _value(std::experimental::make_optional<T>(std::move(value))), _error(std::experimental::nullopt)
+        : _value(std::experimental::make_optional<T>(std::move(value))), _error(nullopt)
     {
     }
 
     template <typename T, typename U>
     result<T, U>::result(U &&error)
-        : _value(std::experimental::nullopt), _error(std::experimental::make_optional<U>(std::move(error)))
+        : _value(nullopt), _error(std::experimental::make_optional<U>(std::move(error)))
     {
     }
 

@@ -191,8 +191,8 @@ class audio_graph::impl
         if (auto key = audio_unit::private_access::key(unit)) {
             units.erase(*key);
             io_units.erase(unit);
-            audio_unit::private_access::set_key(unit, std::experimental::nullopt);
-            audio_unit::private_access::set_graph_key(unit, std::experimental::nullopt);
+            audio_unit::private_access::set_key(unit, nullopt);
+            audio_unit::private_access::set_graph_key(unit, nullopt);
         }
     }
 

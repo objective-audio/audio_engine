@@ -17,7 +17,7 @@ namespace yas
         }
 
         if (map_size >= std::numeric_limits<T>::max()) {
-            return std::experimental::nullopt;
+            return nullopt;
         }
 
         int next = map.rbegin()->first + 1;

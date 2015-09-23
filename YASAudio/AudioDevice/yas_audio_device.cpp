@@ -436,7 +436,7 @@ const std::experimental::optional<size_t> audio_device::index_of_device(const au
             return std::experimental::make_optional<size_t>(it - all_devices.begin());
         }
     }
-    return std::experimental::nullopt;
+    return nullopt;
 }
 
 audio_device::system_subject_t &audio_device::system_subject()

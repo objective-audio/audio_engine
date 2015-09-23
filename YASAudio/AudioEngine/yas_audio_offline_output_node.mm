@@ -26,7 +26,7 @@ class audio_offline_output_node::impl
     const std::experimental::optional<UInt8> push_completion_function(const completion_f &function)
     {
         if (!function) {
-            return std::experimental::nullopt;
+            return nullopt;
         }
 
         auto key = min_empty_key(_completion_functions);
@@ -43,7 +43,7 @@ class audio_offline_output_node::impl
             _completion_functions.erase(key);
             return func;
         } else {
-            return std::experimental::nullopt;
+            return nullopt;
         }
     }
 
