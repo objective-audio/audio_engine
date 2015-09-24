@@ -140,7 +140,7 @@ audio_format_opt_t audio_node::input_format(const UInt32 bus_idx)
     if (auto connection = input_connection(bus_idx)) {
         return connection->format();
     }
-    return yas::nullopt;
+    return nullopt;
 }
 
 audio_format_opt_t audio_node::output_format(const UInt32 bus_idx)
@@ -148,7 +148,7 @@ audio_format_opt_t audio_node::output_format(const UInt32 bus_idx)
     if (auto connection = output_connection(bus_idx)) {
         return connection->format();
     }
-    return yas::nullopt;
+    return nullopt;
 }
 
 bus_result_t audio_node::next_available_input_bus() const
@@ -157,7 +157,7 @@ bus_result_t audio_node::next_available_input_bus() const
     if (key && *key < input_bus_count()) {
         return key;
     }
-    return std::experimental::nullopt;
+    return nullopt;
 }
 
 bus_result_t audio_node::next_available_output_bus() const
@@ -166,7 +166,7 @@ bus_result_t audio_node::next_available_output_bus() const
     if (key && *key < output_bus_count()) {
         return key;
     }
-    return std::experimental::nullopt;
+    return nullopt;
 }
 
 bool audio_node::is_available_input_bus(const UInt32 bus_idx) const

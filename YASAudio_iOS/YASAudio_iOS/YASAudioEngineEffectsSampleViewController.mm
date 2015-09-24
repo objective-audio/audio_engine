@@ -231,7 +231,7 @@ static const AudioComponentDescription baseAcd = {.componentType = kAudioUnitTyp
 {
     switch (indexPath.section) {
         case YASAudioEngineEffectsSampleSectionNone: {
-            _index = std::experimental::nullopt;
+            _index = yas::nullopt;
             [self replaceEffectNodeWithAudioComponentDescription:nullptr];
         } break;
         case YASAudioEngineEffectsSampleSectionEffects: {

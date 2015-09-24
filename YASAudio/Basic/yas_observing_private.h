@@ -36,8 +36,8 @@ namespace yas
 
         void call_wild_card_handler(const K &key, const T &sender) const
         {
-            if (functions.count(std::experimental::nullopt)) {
-                functions.at(std::experimental::nullopt)(key, sender);
+            if (functions.count(nullopt)) {
+                functions.at(nullopt)(key, sender);
             }
         }
 
@@ -113,10 +113,10 @@ namespace yas
         if (_handlers.count(subject_ptr) == 0) {
             _handlers.insert(std::make_pair(&subject, typename yas::observer<K, T>::handler_holder()));
         };
-        _handlers.at(&subject).add_handler(std::experimental::nullopt, handler);
+        _handlers.at(&subject).add_handler(nullopt, handler);
 
         if (auto shared_observer = _weak_this.lock()) {
-            subject._add_observer(shared_observer, std::experimental::nullopt);
+            subject._add_observer(shared_observer, nullopt);
         } else {
             throw std::runtime_error(std::string(__PRETTY_FUNCTION__) + " : _weak_this.lock() failed.");
         }
@@ -127,14 +127,14 @@ namespace yas
     {
         if (_handlers.count(&subject) > 0) {
             auto &handler_holder = _handlers.at(&subject);
-            handler_holder.remove_handler(std::experimental::nullopt);
+            handler_holder.remove_handler(nullopt);
             if (handler_holder.size() == 0) {
                 _handlers.erase(&subject);
             }
         }
 
         if (auto shared_observer = _weak_this.lock()) {
-            subject.remove_observer(shared_observer, std::experimental::nullopt);
+            subject.remove_observer(shared_observer, nullopt);
         } else {
             throw std::runtime_error(std::string(__PRETTY_FUNCTION__) + " : _weak_this.lock() failed.");
         }
@@ -223,8 +223,8 @@ namespace yas
                 }
             }
         }
-        if (_observers.count(std::experimental::nullopt)) {
-            for (auto &observer : _observers.at(std::experimental::nullopt)) {
+        if (_observers.count(nullopt)) {
+            for (auto &observer : _observers.at(nullopt)) {
                 if (auto shared_observer = observer.lock()) {
                     shared_observer->_call_wild_card_handler(*this, key, object);
                 }
