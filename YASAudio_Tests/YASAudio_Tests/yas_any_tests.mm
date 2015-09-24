@@ -57,4 +57,19 @@
     XCTAssertEqual(any.get<int>(), 1);
 }
 
+- (void)test_assign
+{
+    int int_value1 = 1;
+    yas::any any1(int_value1);
+
+    XCTAssertEqual(any1.get<int>(), 1);
+
+    int int_value2 = 2;
+    yas::any any2(int_value2);
+
+    any1 = any2;
+
+    XCTAssertEqual(any1.get<int>(), 2);
+}
+
 @end
