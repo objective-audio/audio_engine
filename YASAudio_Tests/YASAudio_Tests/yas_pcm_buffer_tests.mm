@@ -27,41 +27,41 @@
     auto pcm_buffer = yas::audio_pcm_buffer::create(format, 4);
 
     XCTAssertTrue(format == pcm_buffer->format());
-    XCTAssert(pcm_buffer->audio_ptr_at_index(0).v);
-    XCTAssert(pcm_buffer->audio_ptr_at_index(1).v);
-    XCTAssertThrows(pcm_buffer->audio_ptr_at_index(2));
+    XCTAssert(pcm_buffer->flex_ptr_at_index(0).v);
+    XCTAssert(pcm_buffer->flex_ptr_at_index(1).v);
+    XCTAssertThrows(pcm_buffer->flex_ptr_at_index(2));
 }
 
 - (void)testCreateFloat32Interleaved1chBuffer
 {
     auto pcm_buffer = yas::audio_pcm_buffer::create(yas::audio_format(48000.0, 1, yas::pcm_format::float32, true), 4);
 
-    XCTAssert(pcm_buffer->audio_ptr_at_index(0).v);
-    XCTAssertThrows(pcm_buffer->audio_ptr_at_index(1));
+    XCTAssert(pcm_buffer->flex_ptr_at_index(0).v);
+    XCTAssertThrows(pcm_buffer->flex_ptr_at_index(1));
 }
 
 - (void)testCreateFloat64NonInterleaved2chBuffer
 {
     auto pcm_buffer = yas::audio_pcm_buffer::create(yas::audio_format(48000.0, 2, yas::pcm_format::float64, false), 4);
 
-    XCTAssert(pcm_buffer->audio_ptr_at_index(0).v);
-    XCTAssertThrows(pcm_buffer->audio_ptr_at_index(2));
+    XCTAssert(pcm_buffer->flex_ptr_at_index(0).v);
+    XCTAssertThrows(pcm_buffer->flex_ptr_at_index(2));
 }
 
 - (void)testCreateInt32Interleaved3chBuffer
 {
     auto pcm_buffer = yas::audio_pcm_buffer::create(yas::audio_format(48000.0, 3, yas::pcm_format::fixed824, true), 4);
 
-    XCTAssert(pcm_buffer->audio_ptr_at_index(0).v);
-    XCTAssertThrows(pcm_buffer->audio_ptr_at_index(3));
+    XCTAssert(pcm_buffer->flex_ptr_at_index(0).v);
+    XCTAssertThrows(pcm_buffer->flex_ptr_at_index(3));
 }
 
 - (void)testCreateInt16NonInterleaved4chBuffer
 {
     auto pcm_buffer = yas::audio_pcm_buffer::create(yas::audio_format(48000.0, 4, yas::pcm_format::int16, false), 4);
 
-    XCTAssert(pcm_buffer->audio_ptr_at_index(0).v);
-    XCTAssertThrows(pcm_buffer->audio_ptr_at_index(4));
+    XCTAssert(pcm_buffer->flex_ptr_at_index(0).v);
+    XCTAssertThrows(pcm_buffer->flex_ptr_at_index(4));
 }
 
 - (void)testSetFrameLength
@@ -127,7 +127,7 @@
     const UInt32 stride = buffer->format().stride();
 
     for (UInt32 buffer_index = 0; buffer_index < buffer_count; buffer_index++) {
-        Float32 *ptr = buffer->audio_ptr_at_index<Float32>(buffer_index);
+        Float32 *ptr = buffer->data_ptr_at_index<Float32>(buffer_index);
         for (UInt32 frame = 0; frame < buffer->frame_length(); frame++) {
             for (UInt32 ch_idx = 0; ch_idx < stride; ch_idx++) {
                 if (frame == 1 || frame == 2) {
@@ -558,15 +558,15 @@
     UInt32 src_ch_idx = 0;
     for (const auto &dst_ch_idx : channel_map) {
         if (dst_ch_idx != -1) {
-            auto dst_ptr = dst_buffer->audio_ptr_at_index(dst_ch_idx);
-            auto src_ptr = src_buffer->audio_ptr_at_index(src_ch_idx);
+            auto dst_ptr = dst_buffer->flex_ptr_at_index(dst_ch_idx);
+            auto src_ptr = src_buffer->flex_ptr_at_index(src_ch_idx);
             XCTAssertEqual(dst_ptr.v, src_ptr.v);
             for (UInt32 frame = 0; frame < frame_length; frame++) {
                 Float32 test_value = yas::test::test_value(frame, 0, dst_ch_idx);
                 XCTAssertEqual(test_value, src_ptr.f32[frame]);
             }
         } else {
-            auto src_ptr = src_buffer->audio_ptr_at_index(src_ch_idx);
+            auto src_ptr = src_buffer->flex_ptr_at_index(src_ch_idx);
             XCTAssertTrue(src_ptr.v != nullptr);
         }
 
