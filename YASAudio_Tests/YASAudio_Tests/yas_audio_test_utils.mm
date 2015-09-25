@@ -20,7 +20,7 @@ void yas::test::fill_test_values_to_buffer(const audio_pcm_buffer_sptr &buffer)
     const UInt32 stride = format.stride();
 
     for (UInt32 buf_idx = 0; buf_idx < buffer_count; buf_idx++) {
-        flex_pointer pointer = buffer->audio_ptr_at_index(buf_idx);
+        flex_pointer pointer = buffer->flex_ptr_at_index(buf_idx);
         for (UInt32 frame = 0; frame < buffer->frame_length(); frame++) {
             for (UInt32 ch_idx = 0; ch_idx < stride; ch_idx++) {
                 UInt32 index = frame * stride + ch_idx;

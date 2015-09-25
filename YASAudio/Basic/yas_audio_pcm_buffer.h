@@ -34,13 +34,13 @@ namespace yas
         AudioBufferList *audio_buffer_list();
         const AudioBufferList *audio_buffer_list() const;
 
-        flex_pointer audio_ptr_at_index(const UInt32 buf_idx) const;
-        flex_pointer audio_ptr_at_channel(const UInt32 ch_idx) const;
+        flex_pointer flex_ptr_at_index(const UInt32 buf_idx) const;
+        flex_pointer flex_ptr_at_channel(const UInt32 ch_idx) const;
 
         template <typename T>
-        T *audio_ptr_at_index(const UInt32 buf_idx) const;
+        T *data_ptr_at_index(const UInt32 buf_idx) const;
         template <typename T>
-        T *audio_ptr_at_channel(const UInt32 ch_idx) const;
+        T *data_ptr_at_channel(const UInt32 ch_idx) const;
 
         const UInt32 frame_capacity() const;
         const UInt32 frame_length() const;

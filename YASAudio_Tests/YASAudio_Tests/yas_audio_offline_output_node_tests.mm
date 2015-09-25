@@ -48,7 +48,7 @@
             XCTAssertTrue(buffer->format() == format);
 
             for (UInt32 buf_idx = 0; buf_idx < buffer->format().buffer_count(); ++buf_idx) {
-                Float32 *ptr = buffer->audio_ptr_at_index<Float32>(buf_idx);
+                Float32 *ptr = buffer->data_ptr_at_index<Float32>(buf_idx);
                 for (UInt32 frm_idx = 0; frm_idx < buffer->frame_length(); ++frm_idx) {
                     ptr[frm_idx] = yas::test::test_value(frm_idx + tap_render_frame, 0, buf_idx);
                 }
@@ -76,7 +76,7 @@
             XCTAssertTrue(buffer->format() == format);
 
             for (UInt32 buf_idx = 0; buf_idx < buffer->format().buffer_count(); ++buf_idx) {
-                Float32 *ptr = buffer->audio_ptr_at_index<Float32>(buf_idx);
+                Float32 *ptr = buffer->data_ptr_at_index<Float32>(buf_idx);
                 for (UInt32 frm_idx = 0; frm_idx < buffer->frame_length(); ++frm_idx) {
                     XCTAssertEqual(ptr[frm_idx], yas::test::test_value(frm_idx + output_render_frame, 0, buf_idx));
                 }

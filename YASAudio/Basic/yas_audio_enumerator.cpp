@@ -25,7 +25,7 @@ audio_enumerator::audio_enumerator(const flex_pointer &pointer, const UInt32 byt
 }
 
 audio_enumerator::audio_enumerator(const audio_pcm_buffer_sptr &buffer, const UInt32 channel)
-    : audio_enumerator(buffer->audio_ptr_at_channel(channel), buffer->format().buffer_frame_byte_count(),
+    : audio_enumerator(buffer->flex_ptr_at_channel(channel), buffer->format().buffer_frame_byte_count(),
                        buffer->frame_length())
 {
 }
@@ -96,7 +96,7 @@ audio_frame_enumerator::audio_frame_enumerator(const audio_pcm_buffer_sptr &buff
 
     UInt32 channel = 0;
     for (UInt32 buf_idx = 0; buf_idx < bufferCount; buf_idx++) {
-        flex_pointer pointer = buffer->audio_ptr_at_index(buf_idx);
+        flex_pointer pointer = buffer->flex_ptr_at_index(buf_idx);
         for (UInt32 ch_idx = 0; ch_idx < stride; ch_idx++) {
             _pointers[channel].v = _top_pointers[channel].v = pointer.v;
             pointer.u8 += sampleByteCount;

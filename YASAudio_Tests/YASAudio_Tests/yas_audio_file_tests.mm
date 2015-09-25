@@ -259,7 +259,7 @@ namespace yas
     const UInt32 stride = format.stride();
 
     for (UInt32 buf_idx = 0; buf_idx < buffer_count; buf_idx++) {
-        auto pointer = buffer->audio_ptr_at_index(buf_idx);
+        auto pointer = buffer->flex_ptr_at_index(buf_idx);
         for (NSInteger frameIndex = 0; frameIndex < buffer->frame_length(); frameIndex++) {
             SInt16 value = frameIndex + startIndex + 1;
             for (NSInteger ch_idx = 0; ch_idx < stride; ch_idx++) {
@@ -295,7 +295,7 @@ namespace yas
     const UInt32 stride = format.stride();
 
     for (UInt32 buf_idx = 0; buf_idx < buffer_count; buf_idx++) {
-        const auto pointer = buffer->audio_ptr_at_index(buf_idx);
+        const auto pointer = buffer->flex_ptr_at_index(buf_idx);
         for (NSInteger frameIndex = 0; frameIndex < buffer->frame_length(); frameIndex++) {
             SInt16 value = frameIndex + startIndex + 1;
             for (NSInteger ch_idx = 0; ch_idx < stride; ch_idx++) {
