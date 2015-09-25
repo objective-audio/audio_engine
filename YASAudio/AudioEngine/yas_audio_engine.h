@@ -13,15 +13,16 @@
 
 namespace yas
 {
+    namespace audio_engine_method
+    {
+        static const auto configuration_change = "yas.audio_engine.configuration_change";
+    }
+
     class audio_engine
     {
        public:
-        enum class notification_method : UInt32 {
-            configulation_change,
-        };
-
-        using subject_t = subject<notification_method>;
-        using observer_ptr = observer<notification_method>::sptr;
+        using subject_t = subject;
+        using observer_ptr = observer::sptr;
 
         enum class start_error_t {
             already_running,

@@ -35,7 +35,7 @@ class audio_engine::impl
     impl() : reset_observer(), route_change_observer(), subject()
     {
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
-        device_observer = make_observer(audio_device::system_subject());
+        device_observer = observer::create();
 #endif
     }
 
@@ -322,7 +322,7 @@ audio_engine_sptr audio_engine::create()
 
 #elif TARGET_OS_MAC
     engine->_impl->device_observer->add_handler(audio_device::system_subject(),
-                                                audio_device::method::configulation_change,
+                                                audio_device_method::configuration_change,
                                                 [weak_engine](const auto &method, const auto &infos) {
                                                     if (auto engine = weak_engine.lock()) {
                                                         engine->_post_configuration_change();
@@ -572,7 +572,7 @@ void audio_engine::_reload_graph()
 
 void audio_engine::_post_configuration_change() const
 {
-    _impl->subject.notify(audio_engine::notification_method::configulation_change);
+    _impl->subject.notify(audio_engine_method::configuration_change);
 }
 
 std::set<audio_node_sptr> &audio_engine::_nodes() const

@@ -161,8 +161,8 @@ namespace yas
 
     std::weak_ptr<yas::audio_unit_output_node> weak_play_output_node = play_output_node;
 
-    auto observer = yas::make_observer(_play_engine->subject());
-    observer->add_handler(_play_engine->subject(), yas::audio_engine::notification_method::configulation_change,
+    auto observer = yas::observer::create();
+    observer->add_handler(_play_engine->subject(), yas::audio_engine_method::configuration_change,
                           [weak_play_output_node](const auto &, const auto &) {
                               if (auto play_output_node = weak_play_output_node.lock()) {
                                   play_output_node->set_device(yas::audio_device::default_output_device());

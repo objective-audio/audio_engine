@@ -241,8 +241,8 @@ typedef NS_ENUM(NSUInteger, YASAudioEngineRouteSampleSourceIndex) {
     _sine_node->set_render_function(tap_render_function);
 
     auto weak_self = yas::objc_weak_container::create(self);
-    auto observer = yas::make_observer(_engine->subject());
-    observer->add_handler(_engine->subject(), yas::audio_engine::notification_method::configulation_change,
+    auto observer = yas::observer::create();
+    observer->add_handler(_engine->subject(), yas::audio_engine_method::configuration_change,
                           [weak_self](const auto &method, const auto &sender) {
                               if (auto strong_self = weak_self->lock()) {
                                   if ([UIApplication sharedApplication].applicationState == UIApplicationStateActive) {

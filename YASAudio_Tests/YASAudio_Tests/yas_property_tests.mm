@@ -11,8 +11,8 @@ enum class test_key {
 };
 
 struct test_class {
-    yas::property<test_key, int>::shared_ptr property1;
-    yas::property<test_key, int>::shared_ptr property2;
+    yas::property<test_key, int>::sptr property1;
+    yas::property<test_key, int>::sptr property2;
 
     yas::property<test_key, int>::dispatched_subject_t properties_subject;
     yas::property<test_key, int>::dispatcher_sptr dispatcher;
@@ -85,42 +85,41 @@ struct test_class {
 - (void)testObserveValue
 {
     auto property = yas::property<int, bool>::create(1, false);
-    yas::observer<yas::property_method, yas::property<int, bool>::shared_ptr>::sptr observer =
-        yas::make_observer(property->subject());
+    yas::observer::sptr observer = yas::observer::create();
 
     bool will_change_called = false;
 
     observer->add_handler(property->subject(), yas::property_method::will_change,
-                          [self, &will_change_called](const auto &method, const auto &sender) {
+                          [self, &will_change_called](const std::string &method, const yas::any &sender) {
                               XCTAssertEqual(method, yas::property_method::will_change);
-                              XCTAssertEqual(sender->key(), 1);
-                              XCTAssertEqual(sender->value(), false);
+                              auto &property = sender.get<yas::property<int, bool>::sptr>();
+                              XCTAssertEqual(property->key(), 1);
+                              XCTAssertEqual(property->value(), false);
                               will_change_called = true;
                           });
 
     bool did_change_called = false;
 
     observer->add_handler(property->subject(), yas::property_method::did_change,
-                          [self, &did_change_called](const auto &method, const auto &sender) {
+                          [self, &did_change_called](const std::string &method, const yas::any &sender) {
                               XCTAssertEqual(method, yas::property_method::did_change);
-                              XCTAssertEqual(sender->key(), 1);
-                              XCTAssertEqual(sender->value(), true);
+                              auto &property = sender.get<yas::property<int, bool>::sptr>();
+                              XCTAssertEqual(property->key(), 1);
+                              XCTAssertEqual(property->value(), true);
                               did_change_called = true;
                           });
 
     int wildcard_called_count = 0;
 
     observer->add_wild_card_handler(property->subject(),
-                                    [self, &wildcard_called_count](const auto &method, const auto &sender) {
-                                        switch (method) {
-                                            case yas::property_method::will_change:
-                                                XCTAssertEqual(sender->key(), 1);
-                                                XCTAssertEqual(sender->value(), false);
-                                                break;
-                                            case yas::property_method::did_change:
-                                                XCTAssertEqual(sender->key(), 1);
-                                                XCTAssertEqual(sender->value(), true);
-                                                break;
+                                    [self, &wildcard_called_count](const std::string &method, const yas::any &sender) {
+                                        auto &property = sender.get<yas::property<int, bool>::sptr>();
+                                        if (method == yas::property_method::will_change) {
+                                            XCTAssertEqual(property->key(), 1);
+                                            XCTAssertEqual(property->value(), false);
+                                        } else if (method == yas::property_method::did_change) {
+                                            XCTAssertEqual(property->key(), 1);
+                                            XCTAssertEqual(property->value(), true);
                                         }
                                         ++wildcard_called_count;
                                     });
@@ -135,24 +134,26 @@ struct test_class {
 - (void)testDispatcher
 {
     test_class test_object;
-    auto observer = yas::make_observer(test_object.properties_subject);
+    auto observer = yas::observer::create();
 
     int receive_value1 = 0;
     int receive_value2 = 0;
 
-    observer->add_wild_card_handler(test_object.properties_subject,
-                                    [&receive_value1, &receive_value2](const auto &method, const auto &sender) {
-                                        if (method == yas::property_method::did_change) {
-                                            switch (sender->key()) {
-                                                case test_key::property1:
-                                                    receive_value1 = sender->value();
-                                                    break;
-                                                case test_key::property2:
-                                                    receive_value2 = sender->value();
-                                                    break;
-                                            }
-                                        }
-                                    });
+    observer->add_wild_card_handler(
+        test_object.properties_subject,
+        [&receive_value1, &receive_value2](const std::string &method, const yas::any &sender) {
+            if (method == yas::property_method::did_change) {
+                auto &property = sender.get<yas::property<test_key, int>::sptr>();
+                switch (property->key()) {
+                    case test_key::property1:
+                        receive_value1 = property->value();
+                        break;
+                    case test_key::property2:
+                        receive_value2 = property->value();
+                        break;
+                }
+            }
+        });
 
     test_object.property1->set_value(1);
 
@@ -168,16 +169,17 @@ struct test_class {
 - (void)testRecursiveGuard
 {
     test_class test_object;
-    auto observer = yas::make_observer(test_object.properties_subject);
+    auto observer = yas::observer::create();
 
     observer->add_handler(test_object.properties_subject, yas::property_method::did_change,
-                          [&test_object](const auto &key, const auto &sender) {
-                              switch (sender->key()) {
+                          [&test_object](const std::string &method, const yas::any &sender) {
+                              auto &property = sender.get<yas::property<test_key, int>::sptr>();
+                              switch (property->key()) {
                                   case test_key::property1:
-                                      test_object.property2->set_value(sender->value());
+                                      test_object.property2->set_value(property->value());
                                       break;
                                   case test_key::property2:
-                                      test_object.property1->set_value(sender->value());
+                                      test_object.property1->set_value(property->value());
                                       break;
                                   default:
                                       break;

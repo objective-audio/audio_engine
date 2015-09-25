@@ -182,7 +182,7 @@ using sample_kernel_sptr = std::shared_ptr<sample_kernel_t>;
 
     _audio_device_observer = yas::audio_device_observer_t::create();
     _audio_device_observer->add_handler(
-        yas::audio_device::system_subject(), yas::audio_device::method::hardware_did_change,
+        yas::audio_device::system_subject(), yas::audio_device_method::hardware_did_change,
         [weak_container = _self_container](const auto &, const auto &) {
             if (auto strong_container = weak_container->lock()) {
                 YASAudioDeviceSampleViewController *strongSelf = strong_container.object();
@@ -313,7 +313,7 @@ using sample_kernel_sptr = std::shared_ptr<sample_kernel_t>;
 {
     if (auto prev_audio_device = _audio_device_io->device()) {
         _audio_device_observer->remove_handler(prev_audio_device->property_subject(),
-                                               yas::audio_device::method::device_did_change);
+                                               yas::audio_device_method::device_did_change);
     }
 
     auto all_devices = yas::audio_device::all_devices();
@@ -322,10 +322,11 @@ using sample_kernel_sptr = std::shared_ptr<sample_kernel_t>;
         _audio_device_io->set_device(selected_device);
 
         _audio_device_observer->add_handler(
-            selected_device->property_subject(), yas::audio_device::method::device_did_change,
-            [selected_device, weak_container = _self_container](const auto &method, const auto &infos) {
-                if (infos.size() > 0) {
-                    auto &device_id = infos[0].object_id;
+            selected_device->property_subject(), yas::audio_device_method::device_did_change,
+            [selected_device, weak_container = _self_container](const std::string &method, const yas::any &sender) {
+                const auto &infos = sender.get<yas::audio_device::property_infos_sptr>();
+                if (infos->size() > 0) {
+                    auto &device_id = infos->at(0).object_id;
                     if (selected_device->audio_device_id() == device_id) {
                         if (auto strong_container = weak_container->lock()) {
                             YASAudioDeviceSampleViewController *strongSelf = strong_container.object();
