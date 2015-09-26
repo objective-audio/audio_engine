@@ -231,7 +231,7 @@
         yas::subject property1;
         yas::subject property2;
 
-        yas::observer::sptr dispatcher;
+        yas::observer_sptr dispatcher;
         yas::subject properties_subject;
 
         test_class() : dispatcher(yas::make_subject_dispatcher(properties_subject, {&property1, &property2}))

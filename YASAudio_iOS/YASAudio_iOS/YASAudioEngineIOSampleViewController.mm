@@ -39,7 +39,7 @@ namespace yas
 
             yas::property<property_key, Float32>::sptr meter_level;
 
-            using property_observer_ptr = yas::observer::sptr;
+            using property_observer_ptr = yas::observer_sptr;
 
             static meter_input_tap_node_ptr create()
             {
@@ -118,7 +118,7 @@ namespace yas
     yas::audio_unit_mixer_node_sptr _mixer_node;
     yas::audio_unit_io_node_sptr _io_node;
 
-    yas::observer::sptr _engine_observer;
+    yas::observer_sptr _engine_observer;
 }
 
 - (void)dealloc

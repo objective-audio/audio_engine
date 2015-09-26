@@ -14,8 +14,8 @@ struct test_class {
     yas::property<test_key, int>::sptr property1;
     yas::property<test_key, int>::sptr property2;
 
-    yas::property<test_key, int>::dispatched_subject_t properties_subject;
-    yas::property<test_key, int>::dispatcher_sptr dispatcher;
+    yas::subject properties_subject;
+    yas::observer_sptr dispatcher;
 
     test_class()
         : property1(yas::make_property(test_key::property1, 1)),

@@ -143,7 +143,7 @@ using sample_kernel_sptr = std::shared_ptr<sample_kernel_t>;
 @implementation YASAudioDeviceSampleViewController {
     yas::audio_graph_sptr _audio_graph;
     yas::audio_device_io_sptr _audio_device_io;
-    yas::observer::sptr _audio_device_observer;
+    yas::observer_sptr _audio_device_observer;
     sample_kernel_sptr _kernel;
     yas::objc_weak_container_sptr _self_container;
 }

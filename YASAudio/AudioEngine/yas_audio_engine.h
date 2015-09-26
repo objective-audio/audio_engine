@@ -21,9 +21,6 @@ namespace yas
     class audio_engine
     {
        public:
-        using subject_t = subject;
-        using observer_ptr = observer::sptr;
-
         enum class start_error_t {
             already_running,
             prepare_failure,
@@ -59,7 +56,7 @@ namespace yas
                                             const offline_completion_f &completion_function);
         void stop();
 
-        subject_t &subject() const;
+        subject &subject() const;
 
        private:
         class impl;

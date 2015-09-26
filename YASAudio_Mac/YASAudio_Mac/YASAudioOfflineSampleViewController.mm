@@ -112,7 +112,7 @@ namespace yas
     yas::audio_unit_mixer_node_sptr _offline_mixer_node;
     yas::offline_sample::sine_node_sptr _offline_sine_node;
 
-    yas::observer::sptr _engine_observer;
+    yas::observer_sptr _engine_observer;
 }
 
 - (void)viewDidLoad

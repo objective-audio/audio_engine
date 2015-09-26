@@ -16,15 +16,17 @@
 
 namespace yas
 {
+    class observer;
     class subject;
+
+    using observer_sptr = std::shared_ptr<observer>;
 
     class observer
     {
        public:
-        using sptr = std::shared_ptr<observer>;
         using handler_f = std::function<void(const std::string &, const yas::any &)>;
 
-        static sptr create();
+        static observer_sptr create();
 
         ~observer() = default;
 
@@ -56,8 +58,8 @@ namespace yas
         friend subject;
     };
 
-    observer::sptr make_subject_dispatcher(const subject &source_subject,
-                                           const std::initializer_list<subject *> &destination_subjects);
+    observer_sptr make_subject_dispatcher(const subject &source_subject,
+                                          const std::initializer_list<subject *> &destination_subjects);
 
     class subject
     {
@@ -81,10 +83,9 @@ namespace yas
         subject &operator=(const subject &) = delete;
         subject &operator=(subject &&) = delete;
 
-        void _add_observer(typename observer::sptr &observer, const std::experimental::optional<std::string> &key);
-        void _remove_observer(const typename observer::sptr &observer,
-                              const std::experimental::optional<std::string> &key);
-        void _remove_observer(const typename observer::sptr &observer);
+        void _add_observer(observer_sptr &observer, const std::experimental::optional<std::string> &key);
+        void _remove_observer(const observer_sptr &observer, const std::experimental::optional<std::string> &key);
+        void _remove_observer(const observer_sptr &observer);
 
         friend observer;
     };

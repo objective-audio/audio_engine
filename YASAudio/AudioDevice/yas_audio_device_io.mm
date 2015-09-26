@@ -53,7 +53,7 @@ class audio_device_io::impl
     AudioDeviceIOProcID io_proc_id;
     audio_pcm_buffer_sptr input_buffer_on_render;
     audio_time_sptr input_time_on_render;
-    observer::sptr observer;
+    observer_sptr observer;
 
     impl()
         : weak_device_io(),

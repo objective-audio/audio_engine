@@ -47,9 +47,9 @@ class observer::handler_holder
     }
 };
 
-observer::sptr observer::create()
+observer_sptr observer::create()
 {
-    auto ptr = sptr(new observer());
+    auto ptr = observer_sptr(new observer());
     ptr->_weak_this = ptr;
     return ptr;
 }
@@ -141,7 +141,7 @@ void observer::_call_wild_card_handler(const subject &subject, const std::string
     }
 }
 
-observer::sptr yas::make_subject_dispatcher(const subject &source, const std::initializer_list<subject *> &destinations)
+observer_sptr yas::make_subject_dispatcher(const subject &source, const std::initializer_list<subject *> &destinations)
 {
     auto observer = observer::create();
     auto handler = [&source](const auto &method, const auto &value) { source.notify(method, value); };
@@ -188,7 +188,7 @@ void subject::notify(const std::string &key, const yas::any &object) const
     }
 }
 
-void subject::_add_observer(observer::sptr &observer, const std::experimental::optional<std::string> &key)
+void subject::_add_observer(observer_sptr &observer, const std::experimental::optional<std::string> &key)
 {
     if (_observers.count(key) == 0) {
         _observers.insert(std::make_pair(key, observers_vector_t()));
@@ -198,7 +198,7 @@ void subject::_add_observer(observer::sptr &observer, const std::experimental::o
     vector.push_back(observer);
 }
 
-void subject::_remove_observer(const observer::sptr &observer, const std::experimental::optional<std::string> &key)
+void subject::_remove_observer(const observer_sptr &observer, const std::experimental::optional<std::string> &key)
 {
     if (_observers.count(key) > 0) {
         auto &vector = _observers.at(key);
@@ -218,7 +218,7 @@ void subject::_remove_observer(const observer::sptr &observer, const std::experi
     }
 }
 
-void subject::_remove_observer(const observer::sptr &observer)
+void subject::_remove_observer(const observer_sptr &observer)
 {
     for (auto &pair : _observers) {
         _remove_observer(observer, pair.first);

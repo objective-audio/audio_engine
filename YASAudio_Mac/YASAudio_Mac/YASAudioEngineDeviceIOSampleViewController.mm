@@ -107,8 +107,8 @@ typedef NS_ENUM(NSUInteger, YASAudioDeviceRouteSampleInputType) {
     yas::audio_route_node_sptr _route_node;
     yas::audio_tap_node_sptr _tap_node;
 
-    yas::observer::sptr _system_observer;
-    yas::observer::sptr _device_observer;
+    yas::observer_sptr _system_observer;
+    yas::observer_sptr _device_observer;
 
     yas::objc_weak_container_sptr _self_container;
 }

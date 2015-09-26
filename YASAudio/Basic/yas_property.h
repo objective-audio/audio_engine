@@ -22,8 +22,6 @@ namespace yas
     {
        public:
         using sptr = std::shared_ptr<property<K, T>>;
-        using dispatched_subject_t = subject;
-        using dispatcher_sptr = observer::sptr;
 
         static sptr create(const K &key);
         static sptr create(const K &key, const T &value);

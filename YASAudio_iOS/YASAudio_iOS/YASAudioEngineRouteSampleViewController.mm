@@ -35,7 +35,7 @@ typedef NS_ENUM(NSUInteger, YASAudioEngineRouteSampleSourceIndex) {
     yas::audio_route_node_sptr _route_node;
     yas::audio_tap_node_sptr _sine_node;
 
-    yas::observer::sptr _engine_observer;
+    yas::observer_sptr _engine_observer;
 }
 
 - (void)dealloc
