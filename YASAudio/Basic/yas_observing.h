@@ -62,10 +62,6 @@ namespace yas
     class subject
     {
        public:
-        using sptr = std::shared_ptr<subject>;
-
-        static sptr create();
-
         subject() = default;
         ~subject() = default;
 

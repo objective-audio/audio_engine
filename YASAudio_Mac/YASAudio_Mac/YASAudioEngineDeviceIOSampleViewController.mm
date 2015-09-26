@@ -107,8 +107,8 @@ typedef NS_ENUM(NSUInteger, YASAudioDeviceRouteSampleInputType) {
     yas::audio_route_node_sptr _route_node;
     yas::audio_tap_node_sptr _tap_node;
 
-    yas::any _system_observer;
-    yas::any _device_observer;
+    yas::observer::sptr _system_observer;
+    yas::observer::sptr _device_observer;
 
     yas::objc_weak_container_sptr _self_container;
 }
@@ -208,16 +208,15 @@ typedef NS_ENUM(NSUInteger, YASAudioDeviceRouteSampleInputType) {
 
     _tap_node->set_render_function(render_function);
 
-    auto system_observer = yas::observer::create();
-    system_observer->add_handler(yas::audio_device::system_subject(), yas::audio_device_method::hardware_did_change,
-                                 [weak_container = _self_container](const auto &method, const auto &infos) {
-                                     if (auto strong_container = weak_container->lock()) {
-                                         YASAudioEngineDeviceIOSampleViewController *strongSelf =
-                                             strong_container.object();
-                                         [strongSelf _updateDeviceNames];
-                                     }
-                                 });
-    _system_observer = yas::any(system_observer);
+    _system_observer = yas::observer::create();
+    _system_observer->add_handler(yas::audio_device::system_subject(), yas::audio_device_method::hardware_did_change,
+                                  [weak_container = _self_container](const auto &method, const auto &infos) {
+                                      if (auto strong_container = weak_container->lock()) {
+                                          YASAudioEngineDeviceIOSampleViewController *strongSelf =
+                                              strong_container.object();
+                                          [strongSelf _updateDeviceNames];
+                                      }
+                                  });
 
     [self _updateDeviceNames];
 
@@ -408,8 +407,8 @@ typedef NS_ENUM(NSUInteger, YASAudioDeviceRouteSampleInputType) {
     if (selected_device && std::find(all_devices.begin(), all_devices.end(), selected_device) != all_devices.end()) {
         _device_io_node->set_device(selected_device);
 
-        const auto device_observer = yas::observer::create();
-        device_observer->add_handler(
+        _device_observer = yas::observer::create();
+        _device_observer->add_handler(
             selected_device->property_subject(), yas::audio_device_method::device_did_change,
             [selected_device, weak_container = _self_container](const std::string &method, const yas::any &sender) {
                 const auto &infos = sender.get<yas::audio_device::property_infos_sptr>();
@@ -423,7 +422,6 @@ typedef NS_ENUM(NSUInteger, YASAudioDeviceRouteSampleInputType) {
                     }
                 }
             });
-        _device_observer = device_observer;
     } else {
         _device_io_node->set_device(nullptr);
     }

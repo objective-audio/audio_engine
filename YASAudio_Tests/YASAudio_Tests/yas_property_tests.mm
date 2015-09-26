@@ -85,7 +85,7 @@ struct test_class {
 - (void)testObserveValue
 {
     auto property = yas::property<int, bool>::create(1, false);
-    yas::observer::sptr observer = yas::observer::create();
+    auto observer = yas::observer::create();
 
     bool will_change_called = false;
 

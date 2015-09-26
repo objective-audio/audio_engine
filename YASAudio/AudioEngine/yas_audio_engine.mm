@@ -29,7 +29,7 @@ class audio_engine::impl
     objc_strong_container route_change_observer;
     subject_t subject;
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
-    audio_device_observer_sptr device_observer;
+    observer::sptr device_observer;
 #endif
 
     impl() : reset_observer(), route_change_observer(), subject()

@@ -97,9 +97,6 @@ namespace yas
 
         friend audio_device_global;
     };
-
-    using audio_device_observer_t = observer;
-    using audio_device_observer_sptr = audio_device_observer_t::sptr;
 }
 
 #endif

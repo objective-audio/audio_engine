@@ -155,11 +155,6 @@ observer::sptr yas::make_subject_dispatcher(const subject &source, const std::in
 
 #pragma mark - subject
 
-subject::sptr subject::create()
-{
-    return std::make_shared<subject>();
-}
-
 bool subject::operator==(const subject &other) const
 {
     return this == &other;

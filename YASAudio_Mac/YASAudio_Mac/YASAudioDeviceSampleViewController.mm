@@ -143,7 +143,7 @@ using sample_kernel_sptr = std::shared_ptr<sample_kernel_t>;
 @implementation YASAudioDeviceSampleViewController {
     yas::audio_graph_sptr _audio_graph;
     yas::audio_device_io_sptr _audio_device_io;
-    yas::audio_device_observer_sptr _audio_device_observer;
+    yas::observer::sptr _audio_device_observer;
     sample_kernel_sptr _kernel;
     yas::objc_weak_container_sptr _self_container;
 }
@@ -180,7 +180,7 @@ using sample_kernel_sptr = std::shared_ptr<sample_kernel_t>;
     self.sineVolume = _kernel->sine_volume();
     self.sineFrequency = _kernel->sine_frequency();
 
-    _audio_device_observer = yas::audio_device_observer_t::create();
+    _audio_device_observer = yas::observer::create();
     _audio_device_observer->add_handler(
         yas::audio_device::system_subject(), yas::audio_device_method::hardware_did_change,
         [weak_container = _self_container](const auto &, const auto &) {
