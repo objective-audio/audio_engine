@@ -108,9 +108,9 @@ namespace yas
         audio_unit(const OSType &type, const OSType &subType);
 
         audio_unit(const audio_unit &) = delete;
-        audio_unit(const audio_unit &&) = delete;
+        audio_unit(audio_unit &&) = delete;
         audio_unit &operator=(const audio_unit &) = delete;
-        audio_unit &operator=(const audio_unit &&) = delete;
+        audio_unit &operator=(audio_unit &&) = delete;
 
         void _initialize();
         void _uninitialize();
