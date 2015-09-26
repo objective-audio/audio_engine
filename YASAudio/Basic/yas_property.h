@@ -11,33 +11,32 @@
 
 namespace yas
 {
-    enum class property_method : UInt32 {
-        will_change,
-        did_change,
+    namespace property_method
+    {
+        static const auto will_change = "yas.property.will_change";
+        static const auto did_change = "yas.property.did_change";
     };
 
     template <typename K, typename T>
     class property
     {
        public:
-        using shared_ptr = std::shared_ptr<property<K, T>>;
-        using dispatched_subject_t = subject<property_method, yas::property<K, T>::shared_ptr>;
-        using dispatcher_sptr = typename observer<property_method, property<K, T>::shared_ptr>::sptr;
+        using sptr = std::shared_ptr<property<K, T>>;
 
-        static shared_ptr create(const K &key);
-        static shared_ptr create(const K &key, const T &value);
+        static sptr create(const K &key);
+        static sptr create(const K &key, const T &value);
 
         const K &key() const;
         void set_value(const T &value);
         T value() const;
 
-        subject<property_method, shared_ptr> &subject();
+        subject &subject();
 
        private:
         std::weak_ptr<property<K, T>> _weak_this;
         T _value;
         K _key;
-        yas::subject<property_method, shared_ptr> _subject;
+        yas::subject _subject;
         std::mutex _notify_mutex;
 
         explicit property(const K &key);
@@ -50,7 +49,7 @@ namespace yas
     };
 
     template <typename K, typename T>
-    auto make_property(const K &key, const T &value) -> typename property<K, T>::shared_ptr;
+    auto make_property(const K &key, const T &value) -> typename property<K, T>::sptr;
 }
 
 #include "yas_property_private.h"

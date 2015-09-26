@@ -24,15 +24,16 @@ namespace yas
 {
     class audio_device_global;
 
+    namespace audio_device_method
+    {
+        static const auto hardware_did_change = "yas.audio_device.hardware_did_change";
+        static const auto device_did_change = "yas.audio_device.device_did_change";
+        static const auto configuration_change = "yas.audio_device.configuration_change";
+    }
+
     class audio_device
     {
        public:
-        enum class method : UInt32 {
-            hardware_did_change,
-            device_did_change,
-            configulation_change,
-        };
-
         enum class property : UInt32 {
             system,
             stream,
@@ -52,8 +53,7 @@ namespace yas
             bool operator<(const property_info &info) const;
         };
 
-        using system_subject_t = subject<method, std::vector<property_info>>;
-        using property_subject_t = subject<method, std::vector<property_info>>;
+        using property_infos_sptr = std::shared_ptr<std::vector<property_info>>;
 
         static std::vector<audio_device_sptr> all_devices();
         static std::vector<audio_device_sptr> output_devices();
@@ -81,8 +81,8 @@ namespace yas
         UInt32 input_channel_count() const;
         UInt32 output_channel_count() const;
 
-        static system_subject_t &system_subject();
-        property_subject_t &property_subject() const;
+        static subject &system_subject();
+        subject &property_subject() const;
 
        private:
         class impl;
@@ -97,9 +97,6 @@ namespace yas
 
         friend audio_device_global;
     };
-
-    using audio_device_observer_t = observer<audio_device::method, std::vector<audio_device::property_info>>;
-    using audio_device_observer_sptr = audio_device_observer_t::sptr;
 }
 
 #endif

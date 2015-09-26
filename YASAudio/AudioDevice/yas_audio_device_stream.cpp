@@ -53,34 +53,32 @@ class audio_device_stream::impl
    public:
     AudioStreamID stream_id;
     AudioDeviceID device_id;
-    property_subject_t subject;
+    yas::subject subject;
 
     impl() : stream_id(0), device_id(0), subject()
     {
     }
 
-    ~impl()
-    {
-    }
+    ~impl() = default;
 
     listener_f listener(std::weak_ptr<audio_device_stream> weak_stream)
     {
         return [weak_stream](UInt32 address_count, const AudioObjectPropertyAddress *addresses) {
             if (auto stream = weak_stream.lock()) {
                 const AudioStreamID object_id = stream->stream_id();
-                std::set<property_info> set;
+                auto infos = std::make_shared<std::set<property_info> >();
                 for (UInt32 i = 0; i < address_count; i++) {
                     if (addresses[i].mSelector == kAudioStreamPropertyVirtualFormat) {
-                        set.insert(
+                        infos->insert(
                             property_info(audio_device_stream::property::virtual_format, object_id, addresses[i]));
                     } else if (addresses[i].mSelector == kAudioStreamPropertyIsActive) {
-                        set.insert(property_info(audio_device_stream::property::is_active, object_id, addresses[i]));
+                        infos->insert(property_info(audio_device_stream::property::is_active, object_id, addresses[i]));
                     } else if (addresses[i].mSelector == kAudioStreamPropertyStartingChannel) {
-                        set.insert(
+                        infos->insert(
                             property_info(audio_device_stream::property::starting_channel, object_id, addresses[i]));
                     }
                 }
-                stream->subject().notify(audio_device_stream::method::stream_did_change, set);
+                stream->subject().notify(audio_device_stream_method::stream_did_change, infos);
             }
         };
     }
@@ -178,7 +176,7 @@ UInt32 audio_device_stream::starting_channel() const
     return 0;
 }
 
-audio_device_stream::property_subject_t &audio_device_stream::subject() const
+yas::subject &audio_device_stream::subject() const
 {
     return _impl->subject;
 }

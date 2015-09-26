@@ -37,9 +37,9 @@ namespace yas
                 meter_level,
             };
 
-            yas::property<property_key, Float32>::shared_ptr meter_level;
+            yas::property<property_key, Float32>::sptr meter_level;
 
-            using property_observer_ptr = yas::observer<yas::property_method, decltype(meter_level)>::sptr;
+            using property_observer_ptr = yas::observer_sptr;
 
             static meter_input_tap_node_ptr create()
             {
@@ -118,7 +118,7 @@ namespace yas
     yas::audio_unit_mixer_node_sptr _mixer_node;
     yas::audio_unit_io_node_sptr _io_node;
 
-    std::vector<yas::any> _observers;
+    yas::observer_sptr _engine_observer;
 }
 
 - (void)dealloc
@@ -235,17 +235,17 @@ namespace yas
     _mixer_node->set_input_volume(1.0, 0);
 
     auto weak_self = yas::objc_weak_container::create(self);
-    auto observer = yas::make_observer(_engine->subject());
-    observer->add_handler(_engine->subject(), yas::audio_engine::notification_method::configulation_change,
-                          [weak_self](const auto &method, const auto &sender) {
-                              if (auto strong_self = weak_self->lock()) {
-                                  if ([UIApplication sharedApplication].applicationState == UIApplicationStateActive) {
-                                      YASAudioEngineIOSampleViewController *controller = strong_self.object();
-                                      [controller _updateEngine];
-                                  }
-                              }
-                          });
-    _observers.push_back(observer);
+    _engine_observer = yas::observer::create();
+    _engine_observer->add_handler(
+        _engine->subject(), yas::audio_engine_method::configuration_change,
+        [weak_self](const auto &method, const auto &sender) {
+            if (auto strong_self = weak_self->lock()) {
+                if ([UIApplication sharedApplication].applicationState == UIApplicationStateActive) {
+                    YASAudioEngineIOSampleViewController *controller = strong_self.object();
+                    [controller _updateEngine];
+                }
+            }
+        });
 
     [self _connectNodes];
 }
@@ -406,7 +406,7 @@ namespace yas
     switch (indexPath.section) {
         case YASAudioEngineIOSampleSectionNotify: {
             if (_engine) {
-                _engine->subject().notify(yas::audio_engine::notification_method::configulation_change);
+                _engine->subject().notify(yas::audio_engine_method::configuration_change);
             }
         } break;
 

@@ -112,7 +112,7 @@ namespace yas
     yas::audio_unit_mixer_node_sptr _offline_mixer_node;
     yas::offline_sample::sine_node_sptr _offline_sine_node;
 
-    std::vector<yas::any> _observers;
+    yas::observer_sptr _engine_observer;
 }
 
 - (void)viewDidLoad
@@ -161,14 +161,13 @@ namespace yas
 
     std::weak_ptr<yas::audio_unit_output_node> weak_play_output_node = play_output_node;
 
-    auto observer = yas::make_observer(_play_engine->subject());
-    observer->add_handler(_play_engine->subject(), yas::audio_engine::notification_method::configulation_change,
-                          [weak_play_output_node](const auto &, const auto &) {
-                              if (auto play_output_node = weak_play_output_node.lock()) {
-                                  play_output_node->set_device(yas::audio_device::default_output_device());
-                              }
-                          });
-    _observers.push_back(observer);
+    _engine_observer = yas::observer::create();
+    _engine_observer->add_handler(_play_engine->subject(), yas::audio_engine_method::configuration_change,
+                                  [weak_play_output_node](const auto &, const auto &) {
+                                      if (auto play_output_node = weak_play_output_node.lock()) {
+                                          play_output_node->set_device(yas::audio_device::default_output_device());
+                                      }
+                                  });
 
     self.volume = 0.5;
     self.frequency = 1000.0;

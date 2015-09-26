@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "yas_any.h"
 #include <functional>
 #include <string>
 #include <map>
@@ -15,89 +16,77 @@
 
 namespace yas
 {
-    template <typename K, typename T>
+    class observer;
     class subject;
 
-    template <typename K, typename T = std::nullptr_t>
+    using observer_sptr = std::shared_ptr<observer>;
+
     class observer
     {
        public:
-        using sptr = std::shared_ptr<observer<K, T>>;
-        using handler_f = std::function<void(const K &, const T &)>;
+        using handler_f = std::function<void(const std::string &, const yas::any &)>;
 
-        static sptr create();
+        static observer_sptr create();
 
-        ~observer();
+        ~observer() = default;
 
-        bool operator==(const observer<K, T> &) const;
-        bool operator!=(const observer<K, T> &) const;
+        bool operator==(const observer &) const;
+        bool operator!=(const observer &) const;
 
-        void add_handler(subject<K, T> &subject, const K &key, const handler_f &handler);
-        void remove_handler(subject<K, T> &subject, const K &key);
+        void add_handler(subject &subject, const std::string &key, const handler_f &handler);
+        void remove_handler(subject &subject, const std::string &key);
 
-        void add_wild_card_handler(subject<K, T> &subject, const handler_f &handler);
-        void remove_wild_card_handler(subject<K, T> &subject);
+        void add_wild_card_handler(subject &subject, const handler_f &handler);
+        void remove_wild_card_handler(subject &subject);
 
        private:
         class handler_holder;
-        std::map<const subject<K, T> *, handler_holder> _handlers;
+        std::map<const subject *, handler_holder> _handlers;
 
-        std::weak_ptr<observer<K, T>> _weak_this;
+        std::weak_ptr<observer> _weak_this;
 
-        observer();
+        observer() = default;
 
-        observer(const observer<K, T> &) = delete;
-        observer(const observer<K, T> &&) = delete;
-        observer &operator=(const observer<K, T> &) = delete;
-        observer &operator=(const observer<K, T> &&) = delete;
+        observer(const observer &) = delete;
+        observer(observer &&) = delete;
+        observer &operator=(const observer &) = delete;
+        observer &operator=(observer &&) = delete;
 
-        void _call_handler(const subject<K, T> &subject, const K &key, const T &object);
-        void _call_wild_card_handler(const subject<K, T> &subject, const K &key, const T &object);
+        void _call_handler(const subject &subject, const std::string &key, const yas::any &object);
+        void _call_wild_card_handler(const subject &subject, const std::string &key, const yas::any &object);
 
-        friend subject<K, T>;
+        friend subject;
     };
 
-    template <typename K, typename T>
-    static auto make_observer(const subject<K, T> &) -> typename observer<K, T>::sptr;
+    observer_sptr make_subject_dispatcher(const subject &source_subject,
+                                          const std::initializer_list<subject *> &destination_subjects);
 
-    template <typename K, typename T>
-    static auto make_subject_dispatcher(const subject<K, T> &source_subject,
-                                        const std::initializer_list<subject<K, T> *> &destination_subjects) ->
-        typename observer<K, T>::sptr;
-
-    template <typename K, typename T = std::nullptr_t>
     class subject
     {
        public:
-        using sptr = std::shared_ptr<subject<K, T>>;
+        subject() = default;
+        ~subject() = default;
 
-        static sptr create();
+        bool operator==(const subject &) const;
+        bool operator!=(const subject &) const;
 
-        subject();
-        ~subject();
-
-        bool operator==(const subject<K, T> &) const;
-        bool operator!=(const subject<K, T> &) const;
-
-        void notify(const K &key) const;
-        void notify(const K &key, const T &object) const;
+        void notify(const std::string &key) const;
+        void notify(const std::string &key, const yas::any &object) const;
 
        private:
-        using observers_vector_t = std::vector<std::weak_ptr<observer<K, T>>>;
-        using observers_map_t = std::map<const std::experimental::optional<K>, observers_vector_t>;
+        using observers_vector_t = std::vector<std::weak_ptr<observer>>;
+        using observers_map_t = std::map<const std::experimental::optional<std::string>, observers_vector_t>;
         observers_map_t _observers;
 
-        subject(const subject<K, T> &) = delete;
-        subject(const subject<K, T> &&) = delete;
-        subject &operator=(const subject<K, T> &) = delete;
-        subject &operator=(const subject<K, T> &&) = delete;
+        subject(const subject &) = delete;
+        subject(subject &&) = delete;
+        subject &operator=(const subject &) = delete;
+        subject &operator=(subject &&) = delete;
 
-        void _add_observer(typename observer<K, T>::sptr &observer, const std::experimental::optional<K> &key);
-        void _remove_observer(const typename observer<K, T>::sptr &observer, const std::experimental::optional<K> &key);
-        void _remove_observer(const typename observer<K, T>::sptr &observer);
+        void _add_observer(observer_sptr &observer, const std::experimental::optional<std::string> &key);
+        void _remove_observer(const observer_sptr &observer, const std::experimental::optional<std::string> &key);
+        void _remove_observer(const observer_sptr &observer);
 
-        friend observer<K, T>;
+        friend observer;
     };
 }
-
-#include "yas_observing_private.h"

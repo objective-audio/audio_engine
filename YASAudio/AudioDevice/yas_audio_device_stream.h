@@ -18,13 +18,14 @@
 
 namespace yas
 {
+    namespace audio_device_stream_method
+    {
+        static const auto stream_did_change = "yas.audio_device_stream.stream_did_change";
+    }
+
     class audio_device_stream
     {
        public:
-        enum class method : UInt32 {
-            stream_did_change,
-        };
-
         enum class property : UInt32 {
             virtual_format = 0,
             is_active,
@@ -44,6 +45,8 @@ namespace yas
             bool operator<(const property_info &info) const;
         };
 
+        using property_infos_sptr = std::shared_ptr<std::set<property_info>>;
+
         static audio_device_stream_sptr create(const AudioStreamID, const AudioDeviceID);
 
         ~audio_device_stream();
@@ -58,8 +61,7 @@ namespace yas
         audio_format virtual_format() const;
         UInt32 starting_channel() const;
 
-        using property_subject_t = subject<method, std::set<property_info>>;
-        property_subject_t &subject() const;
+        subject &subject() const;
 
        private:
         class impl;

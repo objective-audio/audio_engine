@@ -27,7 +27,8 @@ class audio_device_io::impl
         audio_pcm_buffer_sptr input_buffer;
         audio_pcm_buffer_sptr output_buffer;
 
-        kernel(const audio_format_sptr &input_format, const audio_format_sptr &output_format, const UInt32 frame_capacity)
+        kernel(const audio_format_sptr &input_format, const audio_format_sptr &output_format,
+               const UInt32 frame_capacity)
             : input_buffer(input_format ? audio_pcm_buffer::create(*input_format, frame_capacity) : nullptr),
               output_buffer(output_format ? audio_pcm_buffer::create(*output_format, frame_capacity) : nullptr)
         {
@@ -52,7 +53,7 @@ class audio_device_io::impl
     AudioDeviceIOProcID io_proc_id;
     audio_pcm_buffer_sptr input_buffer_on_render;
     audio_time_sptr input_time_on_render;
-    audio_device_observer_sptr observer;
+    observer_sptr observer;
 
     impl()
         : weak_device_io(),
@@ -61,7 +62,7 @@ class audio_device_io::impl
           io_proc_id(nullptr),
           input_buffer_on_render(nullptr),
           input_time_on_render(nullptr),
-          observer(audio_device_observer_t::create()),
+          observer(observer::create()),
           _render_callback(nullptr),
           _maximum_frames(4096),
           _kernel(nullptr),
@@ -143,7 +144,7 @@ audio_device_io_sptr audio_device_io::create(const audio_device_sptr &device)
     device_io->set_device(device);
 
     device_io->_impl->observer->add_handler(
-        audio_device::system_subject(), audio_device::method::hardware_did_change,
+        audio_device::system_subject(), audio_device_method::hardware_did_change,
         [weak_device_io](const auto &method, const auto &infos) {
             if (auto device_io = weak_device_io.lock()) {
                 if (device_io->device() && !audio_device::device_for_id(device_io->device()->audio_device_id())) {
@@ -161,7 +162,7 @@ audio_device_io::audio_device_io() : _impl(std::make_unique<impl>())
 
 audio_device_io::~audio_device_io()
 {
-    _impl->observer->remove_handler(audio_device::system_subject(), audio_device::method::hardware_did_change);
+    _impl->observer->remove_handler(audio_device::system_subject(), audio_device_method::hardware_did_change);
 
     _uninitialize();
 }
@@ -254,14 +255,14 @@ void audio_device_io::set_device(const audio_device_sptr device)
         _uninitialize();
 
         if (_impl->device) {
-            _impl->observer->remove_handler(_impl->device->property_subject(), audio_device::method::device_did_change);
+            _impl->observer->remove_handler(_impl->device->property_subject(), audio_device_method::device_did_change);
         }
 
         _impl->device = device;
 
         if (device) {
             _impl->observer->add_handler(
-                _impl->device->property_subject(), audio_device::method::device_did_change,
+                _impl->device->property_subject(), audio_device_method::device_did_change,
                 [weak_device_io = _impl->weak_device_io](const auto &method, const auto &infos) {
                     if (auto device_io = weak_device_io.lock()) {
                         device_io->_impl->update_kernel();

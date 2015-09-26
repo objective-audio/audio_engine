@@ -35,7 +35,7 @@ typedef NS_ENUM(NSUInteger, YASAudioEngineRouteSampleSourceIndex) {
     yas::audio_route_node_sptr _route_node;
     yas::audio_tap_node_sptr _sine_node;
 
-    std::vector<yas::any> _observers;
+    yas::observer_sptr _engine_observer;
 }
 
 - (void)dealloc
@@ -241,17 +241,17 @@ typedef NS_ENUM(NSUInteger, YASAudioEngineRouteSampleSourceIndex) {
     _sine_node->set_render_function(tap_render_function);
 
     auto weak_self = yas::objc_weak_container::create(self);
-    auto observer = yas::make_observer(_engine->subject());
-    observer->add_handler(_engine->subject(), yas::audio_engine::notification_method::configulation_change,
-                          [weak_self](const auto &method, const auto &sender) {
-                              if (auto strong_self = weak_self->lock()) {
-                                  if ([UIApplication sharedApplication].applicationState == UIApplicationStateActive) {
-                                      YASAudioEngineRouteSampleViewController *controller = strong_self.object();
-                                      [controller _updateEngine];
-                                  }
-                              }
-                          });
-    _observers.push_back(observer);
+    _engine_observer = yas::observer::create();
+    _engine_observer->add_handler(
+        _engine->subject(), yas::audio_engine_method::configuration_change,
+        [weak_self](const auto &method, const auto &sender) {
+            if (auto strong_self = weak_self->lock()) {
+                if ([UIApplication sharedApplication].applicationState == UIApplicationStateActive) {
+                    YASAudioEngineRouteSampleViewController *controller = strong_self.object();
+                    [controller _updateEngine];
+                }
+            }
+        });
 
     [self _connectNodes];
 }

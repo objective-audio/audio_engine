@@ -8,7 +8,7 @@
 namespace yas
 {
     template <typename K, typename T>
-    typename property<K, T>::shared_ptr property<K, T>::create(const K &key)
+    typename property<K, T>::sptr property<K, T>::create(const K &key)
     {
         auto prop = shared_ptr(new property(key));
         prop->_weak_this = prop;
@@ -16,9 +16,9 @@ namespace yas
     }
 
     template <typename K, typename T>
-    typename property<K, T>::shared_ptr property<K, T>::create(const K &key, const T &value)
+    typename property<K, T>::sptr property<K, T>::create(const K &key, const T &value)
     {
-        auto prop = shared_ptr(new property(key, value));
+        auto prop = sptr(new property(key, value));
         prop->_weak_this = prop;
         return prop;
     }
@@ -61,13 +61,13 @@ namespace yas
     }
 
     template <typename K, typename T>
-    subject<property_method, typename property<K, T>::shared_ptr> &property<K, T>::subject()
+    subject &property<K, T>::subject()
     {
         return _subject;
     }
 
     template <typename K, typename T>
-    auto make_property(const K &key, const T &value) -> typename property<K, T>::shared_ptr
+    auto make_property(const K &key, const T &value) -> typename property<K, T>::sptr
     {
         return property<K, T>::create(key, value);
     }
