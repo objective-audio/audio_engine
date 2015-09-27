@@ -8,48 +8,49 @@
 namespace yas
 {
     template <typename K, typename T>
-    typename property<K, T>::sptr property<K, T>::create(const K &key)
+    class property<K, T>::impl
     {
-        auto prop = shared_ptr(new property(key));
-        prop->_weak_this = prop;
-        return prop;
-    }
+       public:
+        K key;
+        T value;
+        yas::subject subject;
+        std::mutex notify_mutex;
 
-    template <typename K, typename T>
-    typename property<K, T>::sptr property<K, T>::create(const K &key, const T &value)
-    {
-        auto prop = sptr(new property(key, value));
-        prop->_weak_this = prop;
-        return prop;
-    }
+        impl(const K &key) : key(key)
+        {
+        }
+
+        impl(const K &key, const T &value) : key(key), value(value)
+        {
+        }
+    };
 
     template <typename K, typename T>
     property<K, T>::property(const K &key)
-        : _key(key)
+        : _impl(std::make_shared<impl>(key))
     {
     }
 
     template <typename K, typename T>
     property<K, T>::property(const K &key, const T &value)
-        : _key(key), _value(value)
+        : _impl(std::make_shared<impl>(key, value))
     {
     }
 
     template <typename K, typename T>
     const K &property<K, T>::key() const
     {
-        return _key;
+        return _impl->key;
     }
 
     template <typename K, typename T>
     void property<K, T>::set_value(const T &value)
     {
-        if (auto lock = std::unique_lock<std::mutex>(_notify_mutex, std::try_to_lock)) {
+        if (auto lock = std::unique_lock<std::mutex>(_impl->notify_mutex, std::try_to_lock)) {
             if (lock.owns_lock()) {
-                auto shared_this = _weak_this.lock();
-                _subject.notify(property_method::will_change, shared_this);
-                _value = value;
-                _subject.notify(property_method::did_change, shared_this);
+                _impl->subject.notify(property_method::will_change, *this);
+                _impl->value = value;
+                _impl->subject.notify(property_method::did_change, *this);
             }
         }
     }
@@ -57,18 +58,12 @@ namespace yas
     template <typename K, typename T>
     T property<K, T>::value() const
     {
-        return _value;
+        return _impl->value;
     }
 
     template <typename K, typename T>
     subject &property<K, T>::subject()
     {
-        return _subject;
-    }
-
-    template <typename K, typename T>
-    auto make_property(const K &key, const T &value) -> typename property<K, T>::sptr
-    {
-        return property<K, T>::create(key, value);
+        return _impl->subject;
     }
 }
