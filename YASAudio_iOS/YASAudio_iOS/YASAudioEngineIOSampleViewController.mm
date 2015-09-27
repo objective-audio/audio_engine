@@ -37,7 +37,7 @@ namespace yas
                 meter_level,
             };
 
-            yas::property<property_key, Float32>::sptr meter_level;
+            yas::property<property_key, Float32> meter_level;
 
             using property_observer_ptr = yas::observer_sptr;
 
@@ -75,7 +75,7 @@ namespace yas
                         if (meter_duration > 1.0 / 15.0f) {
                             auto update_function = [weak_node, level]() {
                                 if (auto strong_node = weak_node.lock()) {
-                                    strong_node->meter_level->set_value(level);
+                                    strong_node->meter_level.set_value(level);
                                 }
                             };
                             dispatch_async(dispatch_get_main_queue(), update_function);
@@ -88,7 +88,7 @@ namespace yas
             }
 
             meter_input_tap_node()
-                : meter_level(yas::make_property(property_key::meter_level, 0.0f)),
+                : meter_level(property_key::meter_level, 0.0f),
                   _last_max_on_render(0.0f),
                   _last_update_max_time_on_render(0.0),
                   _last_update_meter_time_on_render(0.0)

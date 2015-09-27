@@ -21,10 +21,13 @@ namespace yas
     class property
     {
        public:
-        using sptr = std::shared_ptr<property<K, T>>;
+        explicit property(const K &key);
+        property(const K &key, const T &value);
 
-        static sptr create(const K &key);
-        static sptr create(const K &key, const T &value);
+        property(const property &) = default;
+        property(property &&) = default;
+        property &operator=(const property &) = default;
+        property &operator=(property &&) = default;
 
         const K &key() const;
         void set_value(const T &value);
@@ -33,23 +36,9 @@ namespace yas
         subject &subject();
 
        private:
-        std::weak_ptr<property<K, T>> _weak_this;
-        T _value;
-        K _key;
-        yas::subject _subject;
-        std::mutex _notify_mutex;
-
-        explicit property(const K &key);
-        property(const K &key, const T &value);
-
-        property(const property &) = delete;
-        property(property &&) = delete;
-        property &operator=(const property &) = delete;
-        property &operator=(property &&) = delete;
+        class impl;
+        std::shared_ptr<impl> _impl;
     };
-
-    template <typename K, typename T>
-    auto make_property(const K &key, const T &value) -> typename property<K, T>::sptr;
 }
 
 #include "yas_property_private.h"
