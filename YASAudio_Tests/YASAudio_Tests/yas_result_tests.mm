@@ -21,16 +21,31 @@
     [super tearDown];
 }
 
-- (void)testCreateSuccessResult
+- (void)test_create_success_result_move_constructor
 {
-    yas::result<bool, int> result(true);
+    std::string value("test_value");
+    yas::result<std::string, int> result(std::move(value));
 
+    XCTAssertTrue(result);
     XCTAssertTrue(result.is_success());
-    XCTAssertTrue(result.value());
-    XCTAssertEqual(result.value(), true);
+    XCTAssertEqual(result.value(), std::string("test_value"));
+
+    XCTAssertNotEqual(value, result.value());
 }
 
-- (void)testCreateVoidPointerSuccessResult
+- (void)test_create_success_result_copy_constructor
+{
+    std::string value("test_value");
+    yas::result<std::string, int> result(value);
+
+    XCTAssertTrue(result);
+    XCTAssertTrue(result.is_success());
+    XCTAssertEqual(result.value(), std::string("test_value"));
+
+    XCTAssertEqual(value, result.value());
+}
+
+- (void)test_create_void_ptr_sucess_result
 {
     yas::result<std::nullptr_t, int> result(nullptr);
 
@@ -39,16 +54,31 @@
     XCTAssertEqual(result.value(), nullptr);
 }
 
-- (void)testCreateErrorResult
+- (void)test_create_error_result_move_constructor
 {
-    yas::result<bool, int> result(10);
+    std::string error("test_error");
+    yas::result<bool, std::string> result(std::move(error));
 
     XCTAssertFalse(result);
     XCTAssertFalse(result.is_success());
-    XCTAssertEqual(result.error(), 10);
+    XCTAssertEqual(result.error(), std::string("test_error"));
+
+    XCTAssertNotEqual(error, result.error());
 }
 
-- (void)testReceiveSuccessResult
+- (void)test_create_error_result_copy_constructor
+{
+    std::string error("test_error");
+    yas::result<bool, std::string> result(error);
+
+    XCTAssertFalse(result);
+    XCTAssertFalse(result.is_success());
+    XCTAssertEqual(result.error(), std::string("test_error"));
+
+    XCTAssertEqual(error, result.error());
+}
+
+- (void)test_receive_success_result
 {
     bool value = true;
     bool result_flag;
@@ -62,7 +92,7 @@
     XCTAssertTrue(result_flag);
 }
 
-- (void)testReceiveErrorResult
+- (void)test_receive_error_result
 {
     int value = 10;
     bool result_flag;
