@@ -52,7 +52,7 @@ class audio_device_io::impl
     bool is_running;
     AudioDeviceIOProcID io_proc_id;
     audio_pcm_buffer_sptr input_buffer_on_render;
-    audio_time_sptr input_time_on_render;
+    audio_time input_time_on_render;
     observer_sptr observer;
 
     impl()
@@ -61,7 +61,7 @@ class audio_device_io::impl
           is_running(false),
           io_proc_id(nullptr),
           input_buffer_on_render(nullptr),
-          input_time_on_render(nullptr),
+          input_time_on_render(),
           observer(observer::create()),
           _render_callback(nullptr),
           _maximum_frames(4096),
@@ -196,7 +196,7 @@ void audio_device_io::_initialize()
                         if (input_frame_length > 0) {
                             device_io->_impl->input_buffer_on_render = input_buffer;
                             device_io->_impl->input_time_on_render =
-                                std::make_shared<audio_time>(*inInputTime, input_buffer->format().sample_rate());
+                                audio_time(*inInputTime, input_buffer->format().sample_rate());
                         }
                     }
                 }
@@ -208,16 +208,13 @@ void audio_device_io::_initialize()
                                 yas::frame_length(outOutputData, output_buffer->format().sample_byte_count());
                             if (frame_length > 0) {
                                 output_buffer->set_frame_length(frame_length);
-                                auto time =
-                                    std::make_shared<audio_time>(*inOutputTime, output_buffer->format().sample_rate());
+                                audio_time time(*inOutputTime, output_buffer->format().sample_rate());
                                 render_callback(output_buffer, time);
                                 output_buffer->copy_to(outOutputData);
                             }
                         }
                     } else if (kernel->input_buffer) {
-                        audio_pcm_buffer_sptr data = nullptr;
-                        audio_time_sptr time = nullptr;
-                        render_callback(data, time);
+                        render_callback(nullptr, nullptr);
                     }
                 }
             }
@@ -334,7 +331,7 @@ const audio_pcm_buffer_sptr audio_device_io::input_buffer_on_render() const
     return _impl->input_buffer_on_render;
 }
 
-const audio_time_sptr audio_device_io::input_time_on_render() const
+const audio_time &audio_device_io::input_time_on_render() const
 {
     return _impl->input_time_on_render;
 }

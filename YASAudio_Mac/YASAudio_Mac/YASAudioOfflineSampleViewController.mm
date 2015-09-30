@@ -29,7 +29,7 @@ namespace yas
                 sine_node_wptr weak_node = node;
 
                 auto render_function = [weak_node](const audio_pcm_buffer_sptr &buffer, const UInt32 bus_idx,
-                                                   const audio_time_sptr &when) {
+                                                   const audio_time &when) {
                     buffer->clear();
 
                     if (auto node = weak_node.lock()) {

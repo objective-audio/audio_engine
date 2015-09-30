@@ -28,8 +28,7 @@ namespace yas
         void set_routes(std::set<audio_route> &&routes);
         void clear_routes();
 
-        virtual void render(const audio_pcm_buffer_sptr &buffer, const UInt32 bus_idx,
-                            const audio_time_sptr &when) override;
+        virtual void render(const audio_pcm_buffer_sptr &buffer, const UInt32 bus_idx, const audio_time &when) override;
 
        protected:
         virtual audio_node_core_sptr make_node_core() override;
@@ -43,6 +42,6 @@ namespace yas
 
         audio_route_node();
 
-        void render_source(const audio_pcm_buffer_sptr &buffer, const UInt32 bus_idx, const audio_time_sptr &when);
+        void render_source(const audio_pcm_buffer_sptr &buffer, const UInt32 bus_idx, const audio_time &when);
     };
 }

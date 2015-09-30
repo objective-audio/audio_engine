@@ -113,7 +113,7 @@ audio_offline_output_node::start_result_t audio_offline_output_node::_start(cons
             bool stop = false;
 
             while (!stop) {
-                auto when = audio_time::create(current_sample_time, render_buffer->format().sample_rate());
+                audio_time when(current_sample_time, render_buffer->format().sample_rate());
                 auto offline_node = weak_node.lock();
                 if (!offline_node) {
                     cancelled = true;

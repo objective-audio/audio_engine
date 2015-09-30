@@ -11,6 +11,7 @@
 #include "yas_audio_device_io.h"
 #include "yas_audio_tap_node.h"
 #include "yas_audio_graph.h"
+#include "yas_audio_time.h"
 #include "yas_stl_utils.h"
 #include <set>
 
@@ -108,7 +109,7 @@ void audio_device_io_node::update_connections()
     std::weak_ptr<audio_device_io> weak_device_io = device_io;
 
     auto render_function = [weak_node, weak_device_io](const audio_pcm_buffer_sptr &output_buffer,
-                                                       const audio_time_sptr &when) {
+                                                       const audio_time &when) {
         if (auto node = weak_node.lock()) {
             if (auto core = node->node_core()) {
                 node->_impl->node_core_on_render = core;
@@ -132,7 +133,7 @@ void audio_device_io_node::update_connections()
                         if (const auto destination_node = connection->destination_node()) {
                             if (auto *input_tap_node = dynamic_cast<audio_input_tap_node *>(destination_node.get())) {
                                 const auto input_buffer = device_io->input_buffer_on_render();
-                                const auto input_time = device_io->input_time_on_render();
+                                const audio_time &input_time = device_io->input_time_on_render();
                                 if (input_buffer && input_time) {
                                     if (connection->format() ==
                                         *destination_node->input_format(connection->destination_bus())) {
@@ -216,8 +217,7 @@ bool audio_device_io_node::_validate_connections() const
 
 #pragma mark - render
 
-void audio_device_io_node::render(const audio_pcm_buffer_sptr &buffer, const UInt32 bus_idx,
-                                  const audio_time_sptr &when)
+void audio_device_io_node::render(const audio_pcm_buffer_sptr &buffer, const UInt32 bus_idx, const audio_time &when)
 {
     super_class::render(buffer, bus_idx, when);
 

@@ -221,7 +221,7 @@ class audio_unit_input_node::impl
 {
    public:
     audio_pcm_buffer_sptr input_buffer;
-    audio_time_sptr render_time;
+    audio_time render_time;
 };
 
 audio_unit_input_node_sptr audio_unit_input_node::create()
@@ -285,7 +285,7 @@ void audio_unit_input_node::update_connections()
                 if (const auto core = input_node->node_core()) {
                     if (const auto connection = core->output_connection(1)) {
                         auto format = connection->format();
-                        auto time = audio_time::create(*render_parameters.io_time_stamp, format.sample_rate());
+                        audio_time time(*render_parameters.io_time_stamp, format.sample_rate());
                         input_node->set_render_time_on_render(time);
 
                         if (auto io_unit = input_node->audio_unit()) {

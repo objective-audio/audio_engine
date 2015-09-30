@@ -35,114 +35,124 @@ class audio_time::impl
     impl &operator=(impl &&) = delete;
 };
 
-audio_time_sptr audio_time::create(const AudioTimeStamp &ts, const Float64 sample_rate)
+audio_time::audio_time() : _impl(nullptr)
 {
-    return std::make_shared<audio_time>(ts, sample_rate);
 }
 
-audio_time_sptr audio_time::create(const UInt64 host_time)
+audio_time::audio_time(const std::nullptr_t &) : _impl(nullptr)
 {
-    return std::make_shared<audio_time>(host_time);
-}
-
-audio_time_sptr audio_time::create(const SInt64 sample_time, const Float64 sample_rate)
-{
-    return std::make_shared<audio_time>(sample_time, sample_rate);
-}
-
-audio_time_sptr audio_time::create(const UInt64 host_time, const SInt64 sample_time, const Float64 sample_rate)
-{
-    return std::make_shared<audio_time>(host_time, sample_time, sample_rate);
 }
 
 audio_time::audio_time(const AudioTimeStamp &ts, const Float64 sample_rate)
-    : _impl(std::make_unique<impl>([[AVAudioTime alloc] initWithAudioTimeStamp:&ts sampleRate:sample_rate]))
+    : _impl(std::make_shared<impl>([[AVAudioTime alloc] initWithAudioTimeStamp:&ts sampleRate:sample_rate]))
 {
     YASRelease(_impl->av_audio_time);
 }
 
 audio_time::audio_time(const UInt64 host_time)
-    : _impl(std::make_unique<impl>([[AVAudioTime alloc] initWithHostTime:host_time]))
+    : _impl(std::make_shared<impl>([[AVAudioTime alloc] initWithHostTime:host_time]))
 {
     YASRelease(_impl->av_audio_time);
 }
 
 audio_time::audio_time(const SInt64 sample_time, const Float64 sample_rate)
-    : _impl(std::make_unique<impl>([[AVAudioTime alloc] initWithSampleTime:sample_time atRate:sample_rate]))
+    : _impl(std::make_shared<impl>([[AVAudioTime alloc] initWithSampleTime:sample_time atRate:sample_rate]))
 {
     YASRelease(_impl->av_audio_time);
 }
 
 audio_time::audio_time(const UInt64 host_time, const SInt64 sample_time, const Float64 sample_rate)
-    : _impl(std::make_unique<impl>(
+    : _impl(std::make_shared<impl>(
           [[AVAudioTime alloc] initWithHostTime:host_time sampleTime:sample_time atRate:sample_rate]))
 {
     YASRelease(_impl->av_audio_time);
 }
 
-audio_time::audio_time(const audio_time &time) : _impl(std::make_unique<impl>(time._impl->av_audio_time))
+bool audio_time::operator==(const audio_time &other) const
 {
-}
-
-audio_time::audio_time(audio_time &&time) noexcept
-{
-    _impl = std::move(time._impl);
-}
-
-audio_time &audio_time::operator=(const audio_time &time)
-{
-    if (this == &time) {
-        return *this;
+    if (_impl && other._impl) {
+        if (_impl == other._impl) {
+            return true;
+        } else {
+            return [_impl->av_audio_time isEqual:other._impl->av_audio_time];
+        }
+    } else {
+        return false;
     }
-    _impl = std::make_unique<impl>(time._impl->av_audio_time);
-    return *this;
 }
 
-audio_time &audio_time::operator=(audio_time &&time) noexcept
+bool audio_time::operator!=(const audio_time &other) const
 {
-    if (this == &time) {
-        return *this;
-    }
-    _impl = std::move(time._impl);
-    return *this;
+    return !(*this == other);
 }
 
-audio_time::~audio_time() = default;
+audio_time::operator bool() const
+{
+    return _impl != nullptr;
+}
 
 bool audio_time::is_host_time_valid() const
 {
-    return _impl->av_audio_time.isHostTimeValid;
+    if (_impl) {
+        return _impl->av_audio_time.isHostTimeValid;
+    } else {
+        return false;
+    }
 }
 
 UInt64 audio_time::host_time() const
 {
-    return _impl->av_audio_time.hostTime;
+    if (_impl) {
+        return _impl->av_audio_time.hostTime;
+    } else {
+        return 0;
+    }
 }
 
 bool audio_time::is_sample_time_valid() const
 {
-    return _impl->av_audio_time.isSampleTimeValid;
+    if (_impl) {
+        return _impl->av_audio_time.isSampleTimeValid;
+    } else {
+        return false;
+    }
 }
 
 SInt64 audio_time::sample_time() const
 {
-    return _impl->av_audio_time.sampleTime;
+    if (_impl) {
+        return _impl->av_audio_time.sampleTime;
+    } else {
+        return 0;
+    }
 }
 
 Float64 audio_time::sample_rate() const
 {
-    return _impl->av_audio_time.sampleRate;
+    if (_impl) {
+        return _impl->av_audio_time.sampleRate;
+    } else {
+        return 0.0;
+    }
 }
 
 AudioTimeStamp audio_time::audio_time_stamp() const
 {
-    return _impl->av_audio_time.audioTimeStamp;
+    if (_impl) {
+        return _impl->av_audio_time.audioTimeStamp;
+    } else {
+        return {0};
+    }
 }
 
 audio_time audio_time::extrapolate_time_from_anchor(const audio_time &anchor_time)
 {
-    AVAudioTime *time = [_impl->av_audio_time extrapolateTimeFromAnchor:anchor_time._impl->av_audio_time];
-    return to_audio_time(time);
+    if (_impl) {
+        AVAudioTime *time = [_impl->av_audio_time extrapolateTimeFromAnchor:anchor_time._impl->av_audio_time];
+        return to_audio_time(time);
+    } else {
+        return audio_time();
+    }
 }
 
 #pragma mark - global

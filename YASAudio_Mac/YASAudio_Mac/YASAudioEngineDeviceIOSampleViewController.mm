@@ -190,7 +190,7 @@ typedef NS_ENUM(NSUInteger, YASAudioDeviceRouteSampleInputType) {
     Float64 next_phase = 0.0;
 
     auto render_function = [next_phase, weak_node, weak_container = _self_container](
-        const yas::audio_pcm_buffer_sptr &buffer, const UInt32 bus_idx, const yas::audio_time_sptr &when) mutable
+        const yas::audio_pcm_buffer_sptr &buffer, const UInt32 bus_idx, const yas::audio_time &when) mutable
     {
         buffer->clear();
 

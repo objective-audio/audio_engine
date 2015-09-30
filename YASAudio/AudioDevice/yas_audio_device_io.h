@@ -19,7 +19,7 @@ namespace yas
     class audio_device_io
     {
        public:
-        using render_f = std::function<void(const audio_pcm_buffer_sptr &output_buffer, const audio_time_sptr &when)>;
+        using render_f = std::function<void(const audio_pcm_buffer_sptr &output_buffer, const audio_time &when)>;
 
         static audio_device_io_sptr create();
         static audio_device_io_sptr create(const audio_device_sptr &audio_device);
@@ -37,7 +37,7 @@ namespace yas
         void stop();
 
         const audio_pcm_buffer_sptr input_buffer_on_render() const;
-        const audio_time_sptr input_time_on_render() const;
+        const audio_time &input_time_on_render() const;
 
        private:
         class impl;
