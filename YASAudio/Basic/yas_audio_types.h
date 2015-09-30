@@ -102,7 +102,6 @@ namespace yas
 
     using objc_strong_container_sptr = std::shared_ptr<objc_strong_container>;
     using objc_weak_container_sptr = std::shared_ptr<objc_weak_container>;
-    using audio_time_sptr = std::shared_ptr<audio_time>;
     using audio_format_sptr = std::shared_ptr<audio_format>;
     using audio_pcm_buffer_sptr = std::shared_ptr<audio_pcm_buffer>;
     using audio_file_reader_sptr = std::shared_ptr<audio_file_reader>;

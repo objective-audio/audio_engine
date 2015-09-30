@@ -68,7 +68,7 @@ class audio_node::impl
    public:
     audio_engine_wptr engine;
 
-    impl() : engine(), _input_connections(), _output_connections(), _node_core(nullptr), _render_time(nullptr), _mutex()
+    impl() : engine(), _input_connections(), _output_connections(), _node_core(nullptr), _render_time(), _mutex()
     {
     }
 
@@ -94,13 +94,13 @@ class audio_node::impl
         return _node_core;
     }
 
-    void set_render_time(const audio_time_sptr &render_time)
+    void set_render_time(const audio_time &render_time)
     {
         std::lock_guard<std::recursive_mutex> lock(_mutex);
         _render_time = render_time;
     }
 
-    audio_time_sptr render_time() const
+    audio_time render_time() const
     {
         std::lock_guard<std::recursive_mutex> lock(_mutex);
         return _render_time;
@@ -110,7 +110,7 @@ class audio_node::impl
     audio_connection_wmap _input_connections;
     audio_connection_wmap _output_connections;
     audio_node_core_sptr _node_core;
-    audio_time_sptr _render_time;
+    audio_time _render_time;
     mutable std::recursive_mutex _mutex;
 };
 
@@ -190,7 +190,7 @@ audio_engine_sptr audio_node::engine() const
     return _impl->engine.lock();
 }
 
-audio_time_sptr audio_node::last_render_time() const
+audio_time audio_node::last_render_time() const
 {
     return _impl->render_time();
 }
@@ -207,7 +207,7 @@ UInt32 audio_node::output_bus_count() const
 
 #pragma mark render thread
 
-void audio_node::render(const audio_pcm_buffer_sptr &buffer, const UInt32 bus_idx, const audio_time_sptr &when)
+void audio_node::render(const audio_pcm_buffer_sptr &buffer, const UInt32 bus_idx, const audio_time &when)
 {
     set_render_time_on_render(when);
 }
@@ -308,7 +308,7 @@ audio_node_core_sptr audio_node::node_core() const
     return _impl->node_core();
 }
 
-void audio_node::set_render_time_on_render(const audio_time_sptr &time)
+void audio_node::set_render_time_on_render(const audio_time &time)
 {
     _impl->set_render_time(time);
 }

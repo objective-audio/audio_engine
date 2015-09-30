@@ -41,9 +41,9 @@
     UInt32 tap_render_frame = 0;
 
     auto tap_render_function =
-        [=](const yas::audio_pcm_buffer_sptr &buffer, const UInt32 bus_idx, const yas::audio_time_sptr &when) mutable {
-            XCTAssertEqual(when->sample_time(), tap_render_frame);
-            XCTAssertEqual(when->sample_rate(), sample_rate);
+        [=](const yas::audio_pcm_buffer_sptr &buffer, const UInt32 bus_idx, const yas::audio_time &when) mutable {
+            XCTAssertEqual(when.sample_time(), tap_render_frame);
+            XCTAssertEqual(when.sample_rate(), sample_rate);
             XCTAssertEqual(buffer->frame_length(), frames_per_render);
             XCTAssertTrue(buffer->format() == format);
 
@@ -69,9 +69,9 @@
     UInt32 output_render_frame = 0;
 
     auto start_render_function =
-        [=](const yas::audio_pcm_buffer_sptr &buffer, const yas::audio_time_sptr &when, bool &stop) mutable {
-            XCTAssertEqual(when->sample_time(), output_render_frame);
-            XCTAssertEqual(when->sample_rate(), sample_rate);
+        [=](const yas::audio_pcm_buffer_sptr &buffer, const yas::audio_time &when, bool &stop) mutable {
+            XCTAssertEqual(when.sample_time(), output_render_frame);
+            XCTAssertEqual(when.sample_rate(), sample_rate);
             XCTAssertEqual(buffer->frame_length(), frames_per_render);
             XCTAssertTrue(buffer->format() == format);
 
@@ -128,9 +128,9 @@
     UInt32 tap_render_frame = 0;
 
     auto tap_render_function =
-        [=](const yas::audio_pcm_buffer_sptr &buffer, const UInt32 bus_idx, const yas::audio_time_sptr &when) mutable {
-            XCTAssertEqual(when->sample_time(), tap_render_frame);
-            XCTAssertEqual(when->sample_rate(), sample_rate);
+        [=](const yas::audio_pcm_buffer_sptr &buffer, const UInt32 bus_idx, const yas::audio_time &when) mutable {
+            XCTAssertEqual(when.sample_time(), tap_render_frame);
+            XCTAssertEqual(when.sample_rate(), sample_rate);
             XCTAssertEqual(buffer->frame_length(), frames_per_render);
             XCTAssertTrue(buffer->format() == format);
 
@@ -158,10 +158,10 @@
     UInt32 output_render_frame = 0;
 
     auto start_render_function =
-        [=](const yas::audio_pcm_buffer_sptr &buffer, const yas::audio_time_sptr &when, bool &stop) mutable {
+        [=](const yas::audio_pcm_buffer_sptr &buffer, const yas::audio_time &when, bool &stop) mutable {
 
-            XCTAssertEqual(when->sample_time(), output_render_frame);
-            XCTAssertEqual(when->sample_rate(), sample_rate);
+            XCTAssertEqual(when.sample_time(), output_render_frame);
+            XCTAssertEqual(when.sample_rate(), sample_rate);
             XCTAssertEqual(buffer->frame_length(), frames_per_render);
             XCTAssertTrue(buffer->format() == format);
 

@@ -48,7 +48,7 @@ namespace yas
                 std::weak_ptr<meter_input_tap_node> weak_node = node;
 
                 node->set_render_function([weak_node](const yas::audio_pcm_buffer_sptr &buffer, const UInt32 bus_idx,
-                                                      const yas::audio_time_sptr &when) {
+                                                      const yas::audio_time &when) {
                     if (auto node = weak_node.lock()) {
                         node->render_source(buffer, bus_idx, when);
 

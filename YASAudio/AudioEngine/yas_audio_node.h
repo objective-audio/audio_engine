@@ -62,12 +62,12 @@ namespace yas
         virtual bool is_available_input_bus(const UInt32 bus_idx) const;
         virtual bool is_available_output_bus(const UInt32 bus_idx) const;
         audio_engine_sptr engine() const;
-        audio_time_sptr last_render_time() const;
+        audio_time last_render_time() const;
 
         virtual UInt32 input_bus_count() const;
         virtual UInt32 output_bus_count() const;
 
-        virtual void render(const audio_pcm_buffer_sptr &buffer, const UInt32 bus_idx, const audio_time_sptr &when);
+        virtual void render(const audio_pcm_buffer_sptr &buffer, const UInt32 bus_idx, const audio_time &when);
 
        protected:
         audio_node();
@@ -84,7 +84,7 @@ namespace yas
         virtual void prepare_node_core(const audio_node_core_sptr &node_core);  // NS_REQUIRES_SUPER
         void update_node_core();
 
-        void set_render_time_on_render(const audio_time_sptr &time);
+        void set_render_time_on_render(const audio_time &time);
 
        private:
         class impl;

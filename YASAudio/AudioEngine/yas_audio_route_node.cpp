@@ -143,7 +143,7 @@ void audio_route_node::prepare_node_core(const audio_node_core_sptr &node_core)
 }
 
 void audio_route_node::render(const audio_pcm_buffer_sptr &dst_buffer, const UInt32 dst_bus_idx,
-                              const audio_time_sptr &when)
+                              const audio_time &when)
 {
     super_class::render(dst_buffer, dst_bus_idx, when);
 

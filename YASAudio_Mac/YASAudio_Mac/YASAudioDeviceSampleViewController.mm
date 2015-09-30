@@ -192,7 +192,7 @@ using sample_kernel_sptr = std::shared_ptr<sample_kernel_t>;
 
     std::weak_ptr<yas::audio_device_io> weak_device_io = _audio_device_io;
     _audio_device_io->set_render_callback([weak_device_io, kernel = _kernel](
-        const yas::audio_pcm_buffer_sptr &output_buffer, const yas::audio_time_sptr &when) {
+        const yas::audio_pcm_buffer_sptr &output_buffer, const yas::audio_time &when) {
         if (auto device_io = weak_device_io.lock()) {
             kernel->process(device_io->input_buffer_on_render(), output_buffer);
         }
