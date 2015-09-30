@@ -48,7 +48,7 @@ class audio_format::impl
 
 #pragma mark - main
 
-audio_format::audio_format(const AudioStreamBasicDescription &asbd) : _impl(std::make_unique<impl>())
+audio_format::audio_format(const AudioStreamBasicDescription &asbd) : _impl(std::make_shared<impl>())
 {
     _impl->asbd = asbd;
     _impl->asbd.mReserved = 0;
@@ -89,28 +89,6 @@ audio_format::audio_format(const Float64 sample_rate, const UInt32 channel_count
     : audio_format(to_stream_description(sample_rate, channel_count, pcm_format, interleaved))
 {
 }
-
-audio_format::audio_format(const audio_format &other) : _impl(std::make_unique<impl>(*other._impl))
-{
-}
-
-audio_format::audio_format(audio_format &&other) noexcept : _impl(std::move(other._impl))
-{
-}
-
-audio_format &audio_format::operator=(const audio_format &other)
-{
-    _impl = std::make_unique<impl>(*other._impl);
-    return *this;
-}
-
-audio_format &audio_format::operator=(audio_format &&other) noexcept
-{
-    _impl = std::move(other._impl);
-    return *this;
-}
-
-audio_format::~audio_format() = default;
 
 bool audio_format::operator==(const audio_format &format) const
 {
