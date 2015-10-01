@@ -15,9 +15,11 @@ namespace yas
     class audio_format
     {
        public:
+        audio_format();
+        audio_format(const std::nullptr_t &);
         explicit audio_format(const AudioStreamBasicDescription &asbd);
         explicit audio_format(const CFDictionaryRef &settings);
-        audio_format(const Float64 sample_rate = 44100.0, const UInt32 channel_count = 2,
+        audio_format(const Float64 sample_rate, const UInt32 channel_count,
                      const yas::pcm_format pcm_format = yas::pcm_format::float32, const bool interleaved = false);
 
         audio_format(const audio_format &) = default;
@@ -29,6 +31,8 @@ namespace yas
 
         bool operator==(const audio_format &) const;
         bool operator!=(const audio_format &) const;
+
+        explicit operator bool() const;
 
         bool is_empty() const;
         bool is_standard() const;

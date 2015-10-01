@@ -135,20 +135,20 @@ void audio_node::reset()
     update_node_core();
 }
 
-audio_format_opt_t audio_node::input_format(const UInt32 bus_idx)
+audio_format audio_node::input_format(const UInt32 bus_idx)
 {
     if (auto connection = input_connection(bus_idx)) {
         return connection->format();
     }
-    return nullopt;
+    return nullptr;
 }
 
-audio_format_opt_t audio_node::output_format(const UInt32 bus_idx)
+audio_format audio_node::output_format(const UInt32 bus_idx)
 {
     if (auto connection = output_connection(bus_idx)) {
         return connection->format();
     }
-    return nullopt;
+    return nullptr;
 }
 
 bus_result_t audio_node::next_available_input_bus() const

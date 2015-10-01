@@ -76,8 +76,8 @@ namespace yas
         std::vector<audio_device_stream_sptr> output_streams() const;
         Float64 nominal_sample_rate() const;
 
-        audio_format_sptr input_format() const;
-        audio_format_sptr output_format() const;
+        audio_format input_format() const;
+        audio_format output_format() const;
         UInt32 input_channel_count() const;
         UInt32 output_channel_count() const;
 
