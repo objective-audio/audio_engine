@@ -38,6 +38,8 @@ static std::string format_flags_string(const AudioStreamBasicDescription &asbd)
 
 #pragma mark - impl
 
+static const AudioStreamBasicDescription empty_asbd = {0};
+
 class audio_format::impl
 {
    public:
@@ -47,6 +49,14 @@ class audio_format::impl
 };
 
 #pragma mark - main
+
+audio_format::audio_format() : _impl(nullptr)
+{
+}
+
+audio_format::audio_format(const std::nullptr_t &) : _impl(nullptr)
+{
+}
 
 audio_format::audio_format(const AudioStreamBasicDescription &asbd) : _impl(std::make_shared<impl>())
 {
@@ -100,64 +110,108 @@ bool audio_format::operator!=(const audio_format &format) const
     return !is_equal(stream_description(), format.stream_description());
 }
 
+audio_format::operator bool() const
+{
+    return _impl != nullptr;
+}
+
 bool audio_format::is_empty() const
 {
-    static const AudioStreamBasicDescription empty_asbd = {0};
-    return memcmp(&_impl->asbd, &empty_asbd, sizeof(AudioStreamBasicDescription)) == 0;
+    if (_impl) {
+        return memcmp(&_impl->asbd, &empty_asbd, sizeof(AudioStreamBasicDescription)) == 0;
+    } else {
+        return true;
+    }
 }
 
 bool audio_format::is_standard() const
 {
-    return _impl->standard;
+    if (_impl) {
+        return _impl->standard;
+    } else {
+        return false;
+    }
 }
 
 yas::pcm_format audio_format::pcm_format() const
 {
-    return _impl->pcm_format;
+    if (_impl) {
+        return _impl->pcm_format;
+    } else {
+        return pcm_format::other;
+    }
 }
 
 UInt32 audio_format::channel_count() const
 {
-    return _impl->asbd.mChannelsPerFrame;
+    if (_impl) {
+        return _impl->asbd.mChannelsPerFrame;
+    } else {
+        return 0;
+    }
 }
 
 UInt32 audio_format::buffer_count() const
 {
-    return is_interleaved() ? 1 : _impl->asbd.mChannelsPerFrame;
+    if (_impl) {
+        return is_interleaved() ? 1 : _impl->asbd.mChannelsPerFrame;
+    } else {
+        return 0;
+    }
 }
 
 UInt32 audio_format::stride() const
 {
-    return is_interleaved() ? _impl->asbd.mChannelsPerFrame : 1;
+    if (_impl) {
+        return is_interleaved() ? _impl->asbd.mChannelsPerFrame : 1;
+    } else {
+        return 0;
+    }
 }
 
 Float64 audio_format::sample_rate() const
 {
-    return _impl->asbd.mSampleRate;
+    if (_impl) {
+        return _impl->asbd.mSampleRate;
+    } else {
+        return 0.0;
+    }
 }
 
 bool audio_format::is_interleaved() const
 {
-    return !(_impl->asbd.mFormatFlags & kAudioFormatFlagIsNonInterleaved);
+    if (_impl) {
+        return !(_impl->asbd.mFormatFlags & kAudioFormatFlagIsNonInterleaved);
+    } else {
+        return false;
+    }
 }
 
 const AudioStreamBasicDescription &audio_format::stream_description() const
 {
-    return _impl->asbd;
+    if (_impl) {
+        return _impl->asbd;
+    } else {
+        return empty_asbd;
+    }
 }
 
 UInt32 audio_format::sample_byte_count() const
 {
-    switch (_impl->pcm_format) {
-        case yas::pcm_format::float32:
-        case yas::pcm_format::fixed824:
-            return 4;
-        case yas::pcm_format::int16:
-            return 2;
-        case yas::pcm_format::float64:
-            return 8;
-        default:
-            return 0;
+    if (_impl) {
+        switch (_impl->pcm_format) {
+            case yas::pcm_format::float32:
+            case yas::pcm_format::fixed824:
+                return 4;
+            case yas::pcm_format::int16:
+                return 2;
+            case yas::pcm_format::float64:
+                return 8;
+            default:
+                return 0;
+        }
+    } else {
+        return 0;
     }
 }
 

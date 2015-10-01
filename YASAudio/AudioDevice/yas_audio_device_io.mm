@@ -27,10 +27,9 @@ class audio_device_io::impl
         audio_pcm_buffer_sptr input_buffer;
         audio_pcm_buffer_sptr output_buffer;
 
-        kernel(const audio_format_sptr &input_format, const audio_format_sptr &output_format,
-               const UInt32 frame_capacity)
-            : input_buffer(input_format ? audio_pcm_buffer::create(*input_format, frame_capacity) : nullptr),
-              output_buffer(output_format ? audio_pcm_buffer::create(*output_format, frame_capacity) : nullptr)
+        kernel(const audio_format &input_format, const audio_format &output_format, const UInt32 frame_capacity)
+            : input_buffer(input_format ? audio_pcm_buffer::create(input_format, frame_capacity) : nullptr),
+              output_buffer(output_format ? audio_pcm_buffer::create(output_format, frame_capacity) : nullptr)
         {
         }
 

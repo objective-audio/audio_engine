@@ -211,25 +211,25 @@ class audio_device::impl
     {
     }
 
-    void set_input_format(const audio_format_sptr &format)
+    void set_input_format(const audio_format &format)
     {
         std::lock_guard<std::recursive_mutex> lock(_mutex);
         _input_format = format;
     }
 
-    audio_format_sptr input_format() const
+    audio_format input_format() const
     {
         std::lock_guard<std::recursive_mutex> lock(_mutex);
         return _input_format;
     }
 
-    void set_output_format(const audio_format_sptr &format)
+    void set_output_format(const audio_format &format)
     {
         std::lock_guard<std::recursive_mutex> lock(_mutex);
         _output_format = format;
     }
 
-    audio_format_sptr output_format() const
+    audio_format output_format() const
     {
         std::lock_guard<std::recursive_mutex> lock(_mutex);
         return _output_format;
@@ -328,8 +328,7 @@ class audio_device::impl
                     channel_count += abl.mBuffers[i].mNumberChannels;
                 }
 
-                auto format = std::make_shared<audio_format>(stream_format.sample_rate(), channel_count,
-                                                             stream_format.pcm_format(), false);
+                audio_format format(stream_format.sample_rate(), channel_count, stream_format.pcm_format(), false);
 
                 if (scope == kAudioObjectPropertyScopeInput) {
                     set_input_format(format);
@@ -341,8 +340,8 @@ class audio_device::impl
     }
 
    private:
-    audio_format_sptr _input_format;
-    audio_format_sptr _output_format;
+    audio_format _input_format;
+    audio_format _output_format;
     mutable std::recursive_mutex _mutex;
 };
 
@@ -519,12 +518,12 @@ Float64 audio_device::nominal_sample_rate() const
     return 0;
 }
 
-audio_format_sptr audio_device::input_format() const
+audio_format audio_device::input_format() const
 {
     return _impl->input_format();
 }
 
-audio_format_sptr audio_device::output_format() const
+audio_format audio_device::output_format() const
 {
     return _impl->output_format();
 }
@@ -532,7 +531,7 @@ audio_format_sptr audio_device::output_format() const
 UInt32 audio_device::input_channel_count() const
 {
     if (const auto format = _impl->input_format()) {
-        return format->channel_count();
+        return format.channel_count();
     }
     return 0;
 }
@@ -540,7 +539,7 @@ UInt32 audio_device::input_channel_count() const
 UInt32 audio_device::output_channel_count() const
 {
     if (const auto format = _impl->output_format()) {
-        return format->channel_count();
+        return format.channel_count();
     }
     return 0;
 }

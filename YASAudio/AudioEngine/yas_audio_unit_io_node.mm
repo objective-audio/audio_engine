@@ -150,10 +150,10 @@ void audio_unit_io_node::update_connections()
 
     auto unit = audio_unit();
 
-    auto update_channel_map = [](channel_map_t &map, const yas::audio_format_opt_t &format, const UInt32 dev_ch_count) {
+    auto update_channel_map = [](channel_map_t &map, const yas::audio_format &format, const UInt32 dev_ch_count) {
         if (map.size() > 0) {
             if (format) {
-                const UInt32 ch_count = format->channel_count();
+                const UInt32 ch_count = format.channel_count();
                 if (map.size() != ch_count) {
                     map.resize(ch_count, -1);
                 }

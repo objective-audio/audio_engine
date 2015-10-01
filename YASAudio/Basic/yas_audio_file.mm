@@ -24,8 +24,8 @@ class audio_file::impl
     ExtAudioFileRef ext_audio_file;
 
     impl()
-        : file_format(),
-          processing_format(),
+        : file_format(nullptr),
+          processing_format(nullptr),
           file_frame_position(0),
           ext_audio_file(nullptr),
           _url(nullptr),

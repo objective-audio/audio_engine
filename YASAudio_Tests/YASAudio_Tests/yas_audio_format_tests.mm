@@ -21,7 +21,49 @@
     [super tearDown];
 }
 
-- (void)testCreateStandardAudioFormat
+- (void)test_create_empty
+{
+    yas::audio_format format;
+
+    XCTAssertEqual(format.is_empty(), true);
+    XCTAssertEqual(format.is_standard(), false);
+    XCTAssertEqual(format.pcm_format(), yas::pcm_format::other);
+    XCTAssertEqual(format.channel_count(), 0);
+    XCTAssertEqual(format.buffer_count(), 0);
+    XCTAssertEqual(format.stride(), 0);
+    XCTAssertEqual(format.sample_rate(), 0.0);
+    XCTAssertEqual(format.is_interleaved(), false);
+    XCTAssertEqual(format.sample_byte_count(), 0);
+    XCTAssertEqual(format.buffer_frame_byte_count(), 0);
+}
+
+- (void)test_create_with_nullptr
+{
+    yas::audio_format format(nullptr);
+
+    XCTAssertEqual(format.is_empty(), true);
+    XCTAssertEqual(format.is_standard(), false);
+    XCTAssertEqual(format.pcm_format(), yas::pcm_format::other);
+    XCTAssertEqual(format.channel_count(), 0);
+    XCTAssertEqual(format.buffer_count(), 0);
+    XCTAssertEqual(format.stride(), 0);
+    XCTAssertEqual(format.sample_rate(), 0.0);
+    XCTAssertEqual(format.is_interleaved(), false);
+    XCTAssertEqual(format.sample_byte_count(), 0);
+    XCTAssertEqual(format.buffer_frame_byte_count(), 0);
+}
+
+- (void)test_nullptr_parameter
+{
+    auto lambda = [self](const yas::audio_format &format) {
+        yas::audio_format empty_format;
+        XCTAssertEqual(empty_format, format);
+    };
+
+    lambda(nullptr);
+}
+
+- (void)test_create_standard_format
 {
     const Float64 sampleRate = 44100.0;
     const UInt32 channelCount = 2;
@@ -55,7 +97,7 @@
     XCTAssertTrue(yas::is_equal(format.stream_description(), asbd));
 }
 
-- (void)testCreateFormat48000kHz1ch64bitsInterleaved
+- (void)test_create_format_48000kHz_1ch_64bits_interleaved
 {
     const Float64 sampleRate = 48000.0;
     const UInt32 channelCount = 1;
@@ -89,7 +131,7 @@
     XCTAssertTrue(yas::is_equal(format.stream_description(), asbd));
 }
 
-- (void)testCreateFormat32000kHz4ch16bitsInterleaved
+- (void)test_create_format_32000kHz_4ch_16bits_interleaved
 {
     const Float64 sampleRate = 32000.0;
     const UInt32 channelCount = 4;
@@ -123,7 +165,7 @@
     XCTAssertTrue(yas::is_equal(format.stream_description(), asbd));
 }
 
-- (void)testCreateAudioFormatWithStreamDescription
+- (void)test_create_format_with_streadm_description
 {
     const Float64 sampleRate = 2348739.1;
     const UInt32 channelCount = 6;
@@ -155,7 +197,7 @@
     XCTAssertTrue(yas::is_equal(format.stream_description(), asbd));
 }
 
-- (void)testEqualAudioFormats
+- (void)test_equal_formats
 {
     const Float64 sampleRate = 44100;
     const UInt32 channelCount = 2;
@@ -168,7 +210,7 @@
     XCTAssert(audio_format1 == audio_format2);
 }
 
-- (void)testCreateAudioFormatWithSettings
+- (void)test_create_format_with_settings
 {
     const Float64 sampleRate = 44100.0;
 
@@ -205,7 +247,7 @@
     }
 }
 
-- (void)testIsEqualASBD
+- (void)test_is_equal_asbd
 {
     AudioStreamBasicDescription asbd1 = {
         .mSampleRate = 1,
