@@ -145,7 +145,7 @@ using sample_kernel_sptr = std::shared_ptr<sample_kernel_t>;
     yas::audio_device_io_sptr _audio_device_io;
     yas::observer_sptr _audio_device_observer;
     sample_kernel_sptr _kernel;
-    yas::objc_weak_container_sptr _self_container;
+    std::shared_ptr<yas::objc_weak_container> _self_container;
 }
 
 - (void)viewDidLoad
@@ -167,7 +167,7 @@ using sample_kernel_sptr = std::shared_ptr<sample_kernel_t>;
     });
 
     if (!_self_container) {
-        _self_container = yas::objc_weak_container::create(self);
+        _self_container = std::make_shared<yas::objc_weak_container>(self);
     }
 
     _audio_graph = yas::audio_graph::create();

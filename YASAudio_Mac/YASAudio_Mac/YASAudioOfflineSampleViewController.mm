@@ -113,6 +113,17 @@ namespace yas
     yas::offline_sample::sine_node_sptr _offline_sine_node;
 
     yas::observer_sptr _engine_observer;
+
+    std::shared_ptr<yas::objc_weak_container> _self_container;
+}
+
+- (void)dealloc
+{
+    if (_self_container) {
+        _self_container->set_object(nil);
+    }
+
+    YASSuperDealloc;
 }
 
 - (void)viewDidLoad
@@ -283,7 +294,10 @@ namespace yas
 
     self.processing = YES;
 
-    auto weak_self_container = yas::objc_weak_container::create(self);
+    if (!_self_container) {
+        _self_container = std::make_shared<yas::objc_weak_container>(self);
+    }
+
     auto file_writer = create_result.value();
     UInt32 remain = self.length * yas::offline_sample::sample_rate;
 
@@ -309,9 +323,9 @@ namespace yas
                 stop = YES;
             }
         },
-        [weak_self_container](const bool cancelled) {
-            if (auto strong_self_container = weak_self_container->lock()) {
-                YASAudioOfflineSampleViewController *controller = strong_self_container.object();
+        [weak_container = _self_container](const bool cancelled) {
+            if (auto strong_container = weak_container->lock()) {
+                YASAudioOfflineSampleViewController *controller = strong_container.object();
                 controller.processing = NO;
             }
         });

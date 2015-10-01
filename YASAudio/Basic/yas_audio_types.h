@@ -99,8 +99,6 @@ namespace yas
     using abl_data_uptr = std::unique_ptr<std::vector<std::vector<UInt8>>>;
     using channel_map_t = std::vector<UInt32>;
 
-    using objc_strong_container_sptr = std::shared_ptr<objc_strong_container>;
-    using objc_weak_container_sptr = std::shared_ptr<objc_weak_container>;
     using audio_pcm_buffer_sptr = std::shared_ptr<audio_pcm_buffer>;
     using audio_file_reader_sptr = std::shared_ptr<audio_file_reader>;
     using audio_file_writer_sptr = std::shared_ptr<audio_file_writer>;

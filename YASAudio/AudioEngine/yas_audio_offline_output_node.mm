@@ -105,7 +105,7 @@ audio_offline_output_node::start_result_t audio_offline_output_node::_start(cons
         auto render_buffer = yas::audio_pcm_buffer::create(connection->format(), 1024);
 
         NSBlockOperation *blockOperation = [[NSBlockOperation alloc] init];
-        auto operation_container = objc_weak_container::create(blockOperation);
+        objc_weak_container operation_container(blockOperation);
 
         auto operation_lambda = [weak_node, operation_container, render_buffer, render_func, key]() {
             bool cancelled = false;
@@ -148,7 +148,7 @@ audio_offline_output_node::start_result_t audio_offline_output_node::_start(cons
                     render_func(render_buffer, when, stop);
                 }
 
-                if (auto strong_operation_container = operation_container->lock()) {
+                if (auto strong_operation_container = operation_container.lock()) {
                     NSOperation *operation = strong_operation_container.object();
                     if (!operation || operation.isCancelled) {
                         cancelled = true;

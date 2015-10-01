@@ -119,6 +119,8 @@ namespace yas
     yas::audio_unit_io_node_sptr _io_node;
 
     yas::observer_sptr _engine_observer;
+
+    std::shared_ptr<yas::objc_weak_container> _self_container;
 }
 
 - (void)dealloc
@@ -234,12 +236,15 @@ namespace yas
 
     _mixer_node->set_input_volume(1.0, 0);
 
-    auto weak_self = yas::objc_weak_container::create(self);
+    if (!_self_container) {
+        _self_container = std::make_shared<yas::objc_weak_container>(self);
+    }
+
     _engine_observer = yas::observer::create();
     _engine_observer->add_handler(
         _engine->subject(), yas::audio_engine_method::configuration_change,
-        [weak_self](const auto &method, const auto &sender) {
-            if (auto strong_self = weak_self->lock()) {
+        [weak_container = _self_container](const auto &method, const auto &sender) {
+            if (auto strong_self = weak_container->lock()) {
                 if ([UIApplication sharedApplication].applicationState == UIApplicationStateActive) {
                     YASAudioEngineIOSampleViewController *controller = strong_self.object();
                     [controller _updateEngine];

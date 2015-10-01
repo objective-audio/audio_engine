@@ -110,7 +110,7 @@ typedef NS_ENUM(NSUInteger, YASAudioDeviceRouteSampleInputType) {
     yas::observer_sptr _system_observer;
     yas::observer_sptr _device_observer;
 
-    yas::objc_weak_container_sptr _self_container;
+    std::shared_ptr<yas::objc_weak_container> _self_container;
 }
 
 - (void)dealloc
@@ -182,7 +182,7 @@ typedef NS_ENUM(NSUInteger, YASAudioDeviceRouteSampleInputType) {
     _tap_node = yas::audio_tap_node::create();
 
     if (!_self_container) {
-        _self_container = yas::objc_weak_container::create(self);
+        _self_container = std::make_shared<yas::objc_weak_container>(self);
     }
 
     std::weak_ptr<yas::audio_tap_node> weak_node = _tap_node;

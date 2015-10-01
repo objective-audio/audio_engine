@@ -10,11 +10,6 @@ using namespace yas;
 
 #pragma mark - strong
 
-objc_strong_container_sptr objc_strong_container::create(const id object)
-{
-    return std::make_shared<objc_strong_container>(object);
-}
-
 objc_strong_container::objc_strong_container(const id object) : _strong_object(object)
 {
     YASRetainOrIgnore(object);
@@ -25,19 +20,14 @@ objc_strong_container::~objc_strong_container()
     YASRelease(_strong_object);
 }
 
-objc_strong_container::objc_strong_container(const objc_strong_container &container) : _strong_object(nil)
+objc_strong_container::objc_strong_container(const objc_strong_container &container)
+    : _strong_object(container.retained_object())
 {
-    id object = container.retained_object();
-    set_object(object);
-    YASRelease(object);
 }
 
-objc_strong_container::objc_strong_container(objc_strong_container &&container) : _strong_object(nil)
+objc_strong_container::objc_strong_container(objc_strong_container &&container) noexcept
+    : _strong_object(container.retained_object())
 {
-    id object = container.retained_object();
-    set_object(object);
-    YASRelease(object);
-
     container.set_object(nil);
 }
 
@@ -54,7 +44,7 @@ objc_strong_container &objc_strong_container::operator=(const objc_strong_contai
     return *this;
 }
 
-objc_strong_container &objc_strong_container::operator=(objc_strong_container &&container)
+objc_strong_container &objc_strong_container::operator=(objc_strong_container &&container) noexcept
 {
     if (this == &container) {
         return *this;
@@ -76,11 +66,9 @@ objc_strong_container &objc_strong_container::operator=(const id object)
     return *this;
 }
 
-objc_strong_container::objc_strong_container(const objc_weak_container &container) : _strong_object(nil)
+objc_strong_container::objc_strong_container(const objc_weak_container &container)
+    : _strong_object(container.retained_object())
 {
-    id object = container.retained_object();
-    set_object(object);
-    YASRelease(object);
 }
 
 objc_strong_container &objc_strong_container::operator=(const objc_weak_container &container)
@@ -126,30 +114,18 @@ id objc_strong_container::autoreleased_object() const
 
 #pragma mark - weak
 
-objc_weak_container_sptr objc_weak_container::create(const id object)
-{
-    return std::make_shared<objc_weak_container>(object);
-}
-
 objc_weak_container::objc_weak_container(const id object) : _weak_object(object)
 {
 }
 
 objc_weak_container::~objc_weak_container() = default;
 
-objc_weak_container::objc_weak_container(const objc_weak_container &container) : _weak_object(nil)
+objc_weak_container::objc_weak_container(const objc_weak_container &container) : _weak_object(container.object())
 {
-    id object = container.retained_object();
-    set_object(object);
-    YASRelease(object);
 }
 
-objc_weak_container::objc_weak_container(objc_weak_container &&container) : _weak_object(nil)
+objc_weak_container::objc_weak_container(objc_weak_container &&container) noexcept : _weak_object(container.object())
 {
-    id object = container.retained_object();
-    set_object(object);
-    YASRelease(object);
-
     container.set_object(nil);
 }
 
@@ -166,7 +142,7 @@ objc_weak_container &objc_weak_container::operator=(const objc_weak_container &c
     return *this;
 }
 
-objc_weak_container &objc_weak_container::operator=(objc_weak_container &&container)
+objc_weak_container &objc_weak_container::operator=(objc_weak_container &&container) noexcept
 {
     if (this == &container) {
         return *this;
@@ -188,11 +164,10 @@ objc_weak_container &objc_weak_container::operator=(const id object)
     return *this;
 }
 
-objc_weak_container::objc_weak_container(const objc_strong_container &container) : _weak_object(nil)
+objc_weak_container::objc_weak_container(const objc_strong_container &container)
+    : _weak_object(container.retained_object())
 {
-    id object = container.retained_object();
-    set_object(object);
-    YASRelease(object);
+    YASRelease(_weak_object);
 }
 
 objc_weak_container &objc_weak_container::operator=(const objc_strong_container &container)
