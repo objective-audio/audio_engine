@@ -36,6 +36,8 @@ typedef NS_ENUM(NSUInteger, YASAudioEngineRouteSampleSourceIndex) {
     yas::audio_tap_node_sptr _sine_node;
 
     yas::observer_sptr _engine_observer;
+
+    std::shared_ptr<yas::objc_weak_container> _self_container;
 }
 
 - (void)dealloc
@@ -43,6 +45,10 @@ typedef NS_ENUM(NSUInteger, YASAudioEngineRouteSampleSourceIndex) {
     YASRelease(_slider);
 
     _slider = nil;
+
+    if (_self_container) {
+        _self_container->set_object(nil);
+    }
 
     YASSuperDealloc;
 }
@@ -222,30 +228,33 @@ typedef NS_ENUM(NSUInteger, YASAudioEngineRouteSampleSourceIndex) {
 
     Float64 phase = 0;
 
-    auto tap_render_function = [phase](const yas::audio_pcm_buffer_sptr &buffer, const UInt32 bus_idx,
-                                       const yas::audio_time &when) mutable {
-        buffer->clear();
+    auto tap_render_function =
+        [phase](const yas::audio_pcm_buffer_sptr &buffer, const UInt32 bus_idx, const yas::audio_time &when) mutable {
+            buffer->clear();
 
-        const Float64 start_phase = phase;
-        const Float64 phase_per_frame = 1000.0 / buffer->format().sample_rate() * yas::audio_math::two_pi;
-        yas::audio_frame_enumerator enumerator(buffer);
-        const auto *flex_ptr = enumerator.pointer();
-        const UInt32 length = enumerator.frame_length();
+            const Float64 start_phase = phase;
+            const Float64 phase_per_frame = 1000.0 / buffer->format().sample_rate() * yas::audio_math::two_pi;
+            yas::audio_frame_enumerator enumerator(buffer);
+            const auto *flex_ptr = enumerator.pointer();
+            const UInt32 length = enumerator.frame_length();
 
-        while (flex_ptr->v) {
-            phase = yas::audio_math::fill_sine(flex_ptr->f32, length, start_phase, phase_per_frame);
-            yas_audio_frame_enumerator_move_channel(enumerator);
-        }
-    };
+            while (flex_ptr->v) {
+                phase = yas::audio_math::fill_sine(flex_ptr->f32, length, start_phase, phase_per_frame);
+                yas_audio_frame_enumerator_move_channel(enumerator);
+            }
+        };
 
     _sine_node->set_render_function(tap_render_function);
 
-    auto weak_self = yas::objc_weak_container::create(self);
+    if (!_self_container) {
+        _self_container = std::make_shared<yas::objc_weak_container>(self);
+    }
+
     _engine_observer = yas::observer::create();
     _engine_observer->add_handler(
         _engine->subject(), yas::audio_engine_method::configuration_change,
-        [weak_self](const auto &method, const auto &sender) {
-            if (auto strong_self = weak_self->lock()) {
+        [weak_container = _self_container](const auto &method, const auto &sender) {
+            if (auto strong_self = weak_container->lock()) {
                 if ([UIApplication sharedApplication].applicationState == UIApplicationStateActive) {
                     YASAudioEngineRouteSampleViewController *controller = strong_self.object();
                     [controller _updateEngine];
