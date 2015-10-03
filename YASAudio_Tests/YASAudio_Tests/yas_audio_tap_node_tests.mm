@@ -39,7 +39,7 @@
 
     std::weak_ptr<yas::audio_tap_node> weak_to_node = to_node;
     auto to_render_func = [weak_to_node, self, to_connection, from_connection, to_expectation](
-        const auto &buffer, const auto &bus_idx, const auto &when) {
+        auto &buffer, const auto &bus_idx, const auto &when) {
         const auto &node = weak_to_node.lock();
         XCTAssertTrue(node);
         if (node) {

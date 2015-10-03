@@ -189,7 +189,7 @@ namespace yas
 
         audio_file->set_processing_format(processing_format);
 
-        auto buffer = yas::audio_pcm_buffer::create(processing_format, frame_length);
+        yas::audio_pcm_buffer buffer(processing_format, frame_length);
 
         UInt32 startIndex = 0;
 
@@ -229,14 +229,14 @@ namespace yas
         XCTAssertEqualWithAccuracy(audio_file->processing_length(),
                                    audio_file->file_length() * (processing_sample_rate / file_sample_rate), 1);
 
-        auto buffer = yas::audio_pcm_buffer::create(processing_format, frame_length);
+        yas::audio_pcm_buffer buffer(processing_format, frame_length);
 
         UInt32 startIndex = 0;
 
         for (NSInteger i = 0; i < loopCount; i++) {
             XCTAssertTrue(audio_file->read_into_buffer(buffer));
             if (test_data.file_sample_rate == test_data.processing_sample_rate) {
-                XCTAssert(buffer->frame_length() == frame_length);
+                XCTAssert(buffer.frame_length() == frame_length);
                 XCTAssert([self _compareData:buffer fileFormat:audio_file->file_format() startIndex:startIndex]);
             }
 
@@ -250,17 +250,17 @@ namespace yas
 
 #pragma mark -
 
-- (void)_writeToBuffer:(yas::audio_pcm_buffer_sptr &)buffer
+- (void)_writeToBuffer:(yas::audio_pcm_buffer &)buffer
             fileFormat:(yas::audio_format &)fileFormat
             startIndex:(NSInteger)startIndex
 {
-    const auto &format = buffer->format();
+    const auto &format = buffer.format();
     const UInt32 buffer_count = format.buffer_count();
     const UInt32 stride = format.stride();
 
     for (UInt32 buf_idx = 0; buf_idx < buffer_count; buf_idx++) {
-        auto pointer = buffer->flex_ptr_at_index(buf_idx);
-        for (NSInteger frameIndex = 0; frameIndex < buffer->frame_length(); frameIndex++) {
+        auto pointer = buffer.flex_ptr_at_index(buf_idx);
+        for (NSInteger frameIndex = 0; frameIndex < buffer.frame_length(); frameIndex++) {
             SInt16 value = frameIndex + startIndex + 1;
             for (NSInteger ch_idx = 0; ch_idx < stride; ch_idx++) {
                 switch (format.pcm_format()) {
@@ -286,17 +286,17 @@ namespace yas
     }
 }
 
-- (bool)_compareData:(yas::audio_pcm_buffer_sptr &)buffer
+- (bool)_compareData:(yas::audio_pcm_buffer &)buffer
           fileFormat:(yas::audio_format &)fileFormat
           startIndex:(NSInteger)startIndex
 {
-    const auto &format = buffer->format();
+    const auto &format = buffer.format();
     const UInt32 buffer_count = format.buffer_count();
     const UInt32 stride = format.stride();
 
     for (UInt32 buf_idx = 0; buf_idx < buffer_count; buf_idx++) {
-        const auto pointer = buffer->flex_ptr_at_index(buf_idx);
-        for (NSInteger frameIndex = 0; frameIndex < buffer->frame_length(); frameIndex++) {
+        const auto pointer = buffer.flex_ptr_at_index(buf_idx);
+        for (NSInteger frameIndex = 0; frameIndex < buffer.frame_length(); frameIndex++) {
             SInt16 value = frameIndex + startIndex + 1;
             for (NSInteger ch_idx = 0; ch_idx < stride; ch_idx++) {
                 SInt16 ptrValue = 0;

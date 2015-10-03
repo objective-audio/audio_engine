@@ -24,23 +24,19 @@ class audio_device_io::impl
     class kernel
     {
        public:
-        audio_pcm_buffer_sptr input_buffer;
-        audio_pcm_buffer_sptr output_buffer;
+        audio_pcm_buffer input_buffer;
+        audio_pcm_buffer output_buffer;
 
         kernel(const audio_format &input_format, const audio_format &output_format, const UInt32 frame_capacity)
-            : input_buffer(input_format ? audio_pcm_buffer::create(input_format, frame_capacity) : nullptr),
-              output_buffer(output_format ? audio_pcm_buffer::create(output_format, frame_capacity) : nullptr)
+            : input_buffer(input_format ? audio_pcm_buffer(input_format, frame_capacity) : nullptr),
+              output_buffer(output_format ? audio_pcm_buffer(output_format, frame_capacity) : nullptr)
         {
         }
 
         void reset_buffers()
         {
-            if (input_buffer) {
-                input_buffer->reset();
-            }
-            if (output_buffer) {
-                output_buffer->reset();
-            }
+            input_buffer.reset();
+            output_buffer.reset();
         }
     };
 
@@ -50,7 +46,7 @@ class audio_device_io::impl
     audio_device_sptr device;
     bool is_running;
     AudioDeviceIOProcID io_proc_id;
-    audio_pcm_buffer_sptr input_buffer_on_render;
+    audio_pcm_buffer input_buffer_on_render;
     audio_time input_time_on_render;
     observer_sptr observer;
 
@@ -189,13 +185,13 @@ void audio_device_io::_initialize()
                 kernel->reset_buffers();
                 if (inInputData) {
                     if (auto &input_buffer = kernel->input_buffer) {
-                        input_buffer->copy_from(inInputData);
+                        input_buffer.copy_from(inInputData);
 
-                        const UInt32 input_frame_length = input_buffer->frame_length();
+                        const UInt32 input_frame_length = input_buffer.frame_length();
                         if (input_frame_length > 0) {
                             device_io->_impl->input_buffer_on_render = input_buffer;
                             device_io->_impl->input_time_on_render =
-                                audio_time(*inInputTime, input_buffer->format().sample_rate());
+                                audio_time(*inInputTime, input_buffer.format().sample_rate());
                         }
                     }
                 }
@@ -204,16 +200,17 @@ void audio_device_io::_initialize()
                     if (auto &output_buffer = kernel->output_buffer) {
                         if (outOutputData) {
                             const UInt32 frame_length =
-                                yas::frame_length(outOutputData, output_buffer->format().sample_byte_count());
+                                yas::frame_length(outOutputData, output_buffer.format().sample_byte_count());
                             if (frame_length > 0) {
-                                output_buffer->set_frame_length(frame_length);
-                                audio_time time(*inOutputTime, output_buffer->format().sample_rate());
+                                output_buffer.set_frame_length(frame_length);
+                                audio_time time(*inOutputTime, output_buffer.format().sample_rate());
                                 render_callback(output_buffer, time);
-                                output_buffer->copy_to(outOutputData);
+                                output_buffer.copy_to(outOutputData);
                             }
                         }
                     } else if (kernel->input_buffer) {
-                        render_callback(nullptr, nullptr);
+                        yas::audio_pcm_buffer null_buffer;
+                        render_callback(null_buffer, nullptr);
                     }
                 }
             }
@@ -325,7 +322,7 @@ void audio_device_io::stop()
     yas_raise_if_au_error(AudioDeviceStop(_impl->device->audio_device_id(), _impl->io_proc_id));
 }
 
-const audio_pcm_buffer_sptr audio_device_io::input_buffer_on_render() const
+const audio_pcm_buffer &audio_device_io::input_buffer_on_render() const
 {
     return _impl->input_buffer_on_render;
 }

@@ -108,8 +108,7 @@ void audio_device_io_node::update_connections()
     auto weak_node = _impl->weak_node;
     std::weak_ptr<audio_device_io> weak_device_io = device_io;
 
-    auto render_function = [weak_node, weak_device_io](const audio_pcm_buffer_sptr &output_buffer,
-                                                       const audio_time &when) {
+    auto render_function = [weak_node, weak_device_io](audio_pcm_buffer &output_buffer, const audio_time &when) {
         if (auto node = weak_node.lock()) {
             if (auto core = node->node_core()) {
                 node->_impl->node_core_on_render = core;
@@ -132,7 +131,7 @@ void audio_device_io_node::update_connections()
                         const auto &connection = connections.at(0);
                         if (const auto destination_node = connection->destination_node()) {
                             if (auto *input_tap_node = dynamic_cast<audio_input_tap_node *>(destination_node.get())) {
-                                const auto input_buffer = device_io->input_buffer_on_render();
+                                auto input_buffer = device_io->input_buffer_on_render();
                                 const audio_time &input_time = device_io->input_time_on_render();
                                 if (input_buffer && input_time) {
                                     if (connection->format() ==
@@ -217,15 +216,15 @@ bool audio_device_io_node::_validate_connections() const
 
 #pragma mark - render
 
-void audio_device_io_node::render(const audio_pcm_buffer_sptr &buffer, const UInt32 bus_idx, const audio_time &when)
+void audio_device_io_node::render(audio_pcm_buffer &buffer, const UInt32 bus_idx, const audio_time &when)
 {
     super_class::render(buffer, bus_idx, when);
 
     if (const auto &device_io = _impl->device_io) {
         if (auto core = _impl->node_core_on_render) {
             auto &input_buffer = device_io->input_buffer_on_render();
-            if (input_buffer && input_buffer->format() == buffer->format()) {
-                buffer->copy_from(input_buffer);
+            if (input_buffer && input_buffer.format() == buffer.format()) {
+                buffer.copy_from(input_buffer);
             }
         }
     }

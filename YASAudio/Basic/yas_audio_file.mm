@@ -223,7 +223,7 @@ audio_file_reader::create_result_t audio_file_reader::create(const CFURLRef file
 audio_file_reader::audio_file_reader() = default;
 audio_file_reader::~audio_file_reader() = default;
 
-audio_file_reader::read_result_t audio_file_reader::read_into_buffer(audio_pcm_buffer_sptr &buffer,
+audio_file_reader::read_result_t audio_file_reader::read_into_buffer(audio_pcm_buffer &buffer,
                                                                      const UInt32 frame_length)
 {
     if (!_impl->ext_audio_file) {
@@ -234,15 +234,15 @@ audio_file_reader::read_result_t audio_file_reader::read_into_buffer(audio_pcm_b
         return read_result_t(read_error_t::invalid_argument);
     }
 
-    if (buffer->format() != processing_format()) {
+    if (buffer.format() != processing_format()) {
         return read_result_t(read_error_t::invalid_format);
     }
 
     OSStatus err = noErr;
     UInt32 out_frame_length = 0;
-    UInt32 remain_frames = frame_length > 0 ?: buffer->frame_capacity();
+    UInt32 remain_frames = frame_length > 0 ?: buffer.frame_capacity();
 
-    const audio_format &format = buffer->format();
+    const audio_format &format = buffer.format();
     const UInt32 buffer_count = format.buffer_count();
     const UInt32 stride = format.stride();
 
@@ -255,11 +255,11 @@ audio_file_reader::read_result_t audio_file_reader::read_into_buffer(audio_pcm_b
             UInt32 dataIndex = out_frame_length * bytesPerFrame;
 
             for (NSInteger i = 0; i < buffer_count; i++) {
-                AudioBuffer *audioBuffer = &io_abl->mBuffers[i];
-                audioBuffer->mNumberChannels = stride;
-                audioBuffer->mDataByteSize = dataByteSize;
-                UInt8 *byte_data = static_cast<UInt8 *>(buffer->audio_buffer_list()->mBuffers[i].mData);
-                audioBuffer->mData = &byte_data[dataIndex];
+                AudioBuffer *ab = &io_abl->mBuffers[i];
+                ab->mNumberChannels = stride;
+                ab->mDataByteSize = dataByteSize;
+                UInt8 *byte_data = static_cast<UInt8 *>(buffer.audio_buffer_list()->mBuffers[i].mData);
+                ab->mData = &byte_data[dataIndex];
             }
 
             UInt32 io_frames = remain_frames;
@@ -277,7 +277,7 @@ audio_file_reader::read_result_t audio_file_reader::read_into_buffer(audio_pcm_b
         }
     }
 
-    buffer->set_frame_length(out_frame_length);
+    buffer.set_frame_length(out_frame_length);
 
     if (err != noErr) {
         return read_result_t(read_error_t::read_failed);
@@ -342,8 +342,7 @@ audio_file_writer::create_result_t audio_file_writer::create(const CFURLRef file
 audio_file_writer::audio_file_writer() = default;
 audio_file_writer::~audio_file_writer() = default;
 
-audio_file_writer::write_result_t audio_file_writer::write_from_buffer(const audio_pcm_buffer_sptr &buffer,
-                                                                       const bool async)
+audio_file_writer::write_result_t audio_file_writer::write_from_buffer(const audio_pcm_buffer &buffer, const bool async)
 {
     if (!_impl->ext_audio_file) {
         return write_result_t(write_error_t::closed);
@@ -353,16 +352,16 @@ audio_file_writer::write_result_t audio_file_writer::write_from_buffer(const aud
         return write_result_t(write_error_t::invalid_argument);
     }
 
-    if (buffer->format() != processing_format()) {
+    if (buffer.format() != processing_format()) {
         return write_result_t(write_error_t::invalid_format);
     }
 
     OSStatus err = noErr;
 
     if (async) {
-        err = ExtAudioFileWriteAsync(_impl->ext_audio_file, buffer->frame_length(), buffer->audio_buffer_list());
+        err = ExtAudioFileWriteAsync(_impl->ext_audio_file, buffer.frame_length(), buffer.audio_buffer_list());
     } else {
-        err = ExtAudioFileWrite(_impl->ext_audio_file, buffer->frame_length(), buffer->audio_buffer_list());
+        err = ExtAudioFileWrite(_impl->ext_audio_file, buffer.frame_length(), buffer.audio_buffer_list());
     }
 
     if (err != noErr) {

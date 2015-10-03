@@ -47,6 +47,8 @@ namespace yas
         UInt32 buffer_frame_byte_count() const;
         CFStringRef description() const;
 
+        static const audio_format &null_format();
+
        private:
         class impl;
         std::shared_ptr<impl> _impl;

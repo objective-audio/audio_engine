@@ -142,8 +142,7 @@ void audio_route_node::prepare_node_core(const audio_node_core_sptr &node_core)
     }
 }
 
-void audio_route_node::render(const audio_pcm_buffer_sptr &dst_buffer, const UInt32 dst_bus_idx,
-                              const audio_time &when)
+void audio_route_node::render(audio_pcm_buffer &dst_buffer, const UInt32 dst_bus_idx, const audio_time &when)
 {
     super_class::render(dst_buffer, dst_bus_idx, when);
 
@@ -152,7 +151,7 @@ void audio_route_node::render(const audio_pcm_buffer_sptr &dst_buffer, const UIn
         auto &routes = route_node_core->routes;
         auto output_connection = core->output_connection(dst_bus_idx);
         auto input_connections = core->input_connections();
-        const UInt32 dst_ch_count = dst_buffer->format().channel_count();
+        const UInt32 dst_ch_count = dst_buffer.format().channel_count();
 
         for (const auto &pair : input_connections) {
             if (const auto &input_connection = pair.second) {
@@ -162,7 +161,7 @@ void audio_route_node::render(const audio_pcm_buffer_sptr &dst_buffer, const UIn
                     const UInt32 src_ch_count = src_format.channel_count();
                     if (const auto result =
                             channel_map_from_routes(routes, src_bus_idx, src_ch_count, dst_bus_idx, dst_ch_count)) {
-                        auto src_buffer = yas::audio_pcm_buffer::create(src_format, dst_buffer, result.value());
+                        yas::audio_pcm_buffer src_buffer(src_format, dst_buffer, result.value());
                         node->render(src_buffer, src_bus_idx, when);
                     }
                 }

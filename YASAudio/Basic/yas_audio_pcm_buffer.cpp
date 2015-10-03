@@ -178,29 +178,21 @@ static get_abl_info_result_t get_abl_info(const AudioBufferList *abl, const UInt
 
 #pragma mark - public
 
-audio_pcm_buffer_sptr audio_pcm_buffer::create(const audio_format &format, AudioBufferList *abl)
+audio_pcm_buffer::audio_pcm_buffer() : _impl(nullptr)
 {
-    return audio_pcm_buffer_sptr(new audio_pcm_buffer(format, abl));
 }
 
-audio_pcm_buffer_sptr audio_pcm_buffer::create(const audio_format &format, const UInt32 frame_capacity)
+audio_pcm_buffer::audio_pcm_buffer(const std::nullptr_t &) : _impl(nullptr)
 {
-    return audio_pcm_buffer_sptr(new audio_pcm_buffer(format, frame_capacity));
-}
-
-audio_pcm_buffer_sptr audio_pcm_buffer::create(const audio_format &format, const audio_pcm_buffer_sptr &from_buffer,
-                                               const channel_map_t &channel_map)
-{
-    return audio_pcm_buffer_sptr(new audio_pcm_buffer(format, from_buffer, channel_map));
 }
 
 audio_pcm_buffer::audio_pcm_buffer(const audio_format &format, AudioBufferList *abl)
 {
-    if (!abl) {
+    if (!format || !abl) {
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
     }
 
-    _impl = std::make_unique<impl>(format, abl,
+    _impl = std::make_shared<impl>(format, abl,
                                    abl->mBuffers[0].mDataByteSize / format.stream_description().mBytesPerFrame);
 }
 
@@ -212,17 +204,13 @@ audio_pcm_buffer::audio_pcm_buffer(const audio_format &format, const UInt32 fram
 
     auto pair = allocate_audio_buffer_list(format.buffer_count(), format.stride(),
                                            frame_capacity * format.stream_description().mBytesPerFrame);
-    _impl = std::make_unique<impl>(format, std::move(pair.first), std::move(pair.second), frame_capacity);
+    _impl = std::make_shared<impl>(format, std::move(pair.first), std::move(pair.second), frame_capacity);
 }
 
-audio_pcm_buffer::audio_pcm_buffer(const audio_format &format, const audio_pcm_buffer_sptr &from_buffer,
+audio_pcm_buffer::audio_pcm_buffer(const audio_format &format, const audio_pcm_buffer &from_buffer,
                                    const channel_map_t &channel_map)
 {
-    if (!from_buffer) {
-        throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
-    }
-
-    const auto &from_format = from_buffer->format();
+    const auto &from_format = from_buffer.format();
 
     if (channel_map.size() != format.channel_count() || format.is_interleaved() || from_format.is_interleaved() ||
         format.pcm_format() != from_format.pcm_format()) {
@@ -232,9 +220,9 @@ audio_pcm_buffer::audio_pcm_buffer(const audio_format &format, const audio_pcm_b
     auto pair = allocate_audio_buffer_list(format.buffer_count(), format.stride(), 0);
     abl_uptr &to_abl = pair.first;
 
-    const AudioBufferList *from_abl = from_buffer->audio_buffer_list();
+    const AudioBufferList *from_abl = from_buffer.audio_buffer_list();
     UInt32 bytesPerFrame = format.stream_description().mBytesPerFrame;
-    const UInt32 frame_length = from_buffer->frame_length();
+    const UInt32 frame_length = from_buffer.frame_length();
     UInt32 to_ch_idx = 0;
     abl_data_uptr data = nullptr;
 
@@ -264,60 +252,79 @@ audio_pcm_buffer::audio_pcm_buffer(const audio_format &format, const audio_pcm_b
         ++to_ch_idx;
     }
 
-    _impl = std::make_unique<impl>(format, std::move(to_abl), std::move(data), frame_length);
+    _impl = std::make_shared<impl>(format, std::move(to_abl), std::move(data), frame_length);
+}
+
+audio_pcm_buffer::operator bool() const
+{
+    return _impl != nullptr;
 }
 
 const audio_format &audio_pcm_buffer::format() const
 {
-    return _impl->format;
+    if (_impl) {
+        return _impl->format;
+    }
+    return audio_format::null_format();
 }
 
 AudioBufferList *audio_pcm_buffer::audio_buffer_list()
 {
-    return const_cast<AudioBufferList *>(_impl->abl_ptr);
+    if (_impl) {
+        return const_cast<AudioBufferList *>(_impl->abl_ptr);
+    }
+    return nullptr;
 }
 
 const AudioBufferList *audio_pcm_buffer::audio_buffer_list() const
 {
-    return _impl->abl_ptr;
+    if (_impl) {
+        return _impl->abl_ptr;
+    }
+    return nullptr;
 }
 
 flex_pointer audio_pcm_buffer::flex_ptr_at_index(const UInt32 buf_idx) const
 {
-    if (buf_idx >= _impl->abl_ptr->mNumberBuffers) {
-        throw std::out_of_range(std::string(__PRETTY_FUNCTION__) + " : out of range. buf_idx(" +
-                                std::to_string(buf_idx) + ") _impl->abl_ptr.mNumberBuffers(" +
-                                std::to_string(_impl->abl_ptr->mNumberBuffers) + ")");
-    }
+    if (_impl) {
+        if (buf_idx >= _impl->abl_ptr->mNumberBuffers) {
+            throw std::out_of_range(std::string(__PRETTY_FUNCTION__) + " : out of range. buf_idx(" +
+                                    std::to_string(buf_idx) + ") _impl->abl_ptr.mNumberBuffers(" +
+                                    std::to_string(_impl->abl_ptr->mNumberBuffers) + ")");
+        }
 
-    return flex_pointer{.v = _impl->abl_ptr->mBuffers[buf_idx].mData};
+        return flex_pointer{.v = _impl->abl_ptr->mBuffers[buf_idx].mData};
+    }
+    return flex_pointer{.v = nullptr};
 }
 
 flex_pointer audio_pcm_buffer::flex_ptr_at_channel(const UInt32 ch_idx) const
 {
     flex_pointer pointer{.v = nullptr};
 
-    const UInt32 stride = format().stride();
-    const AudioBufferList *abl_ptr = _impl->abl_ptr;
+    if (_impl) {
+        const UInt32 stride = format().stride();
+        const AudioBufferList *abl_ptr = _impl->abl_ptr;
 
-    if (stride > 1) {
-        if (ch_idx < abl_ptr->mBuffers[0].mNumberChannels) {
-            pointer.v = abl_ptr->mBuffers[0].mData;
-            if (ch_idx > 0) {
-                pointer.u8 += ch_idx * format().sample_byte_count();
+        if (stride > 1) {
+            if (ch_idx < abl_ptr->mBuffers[0].mNumberChannels) {
+                pointer.v = abl_ptr->mBuffers[0].mData;
+                if (ch_idx > 0) {
+                    pointer.u8 += ch_idx * format().sample_byte_count();
+                }
+            } else {
+                throw std::out_of_range(std::string(__PRETTY_FUNCTION__) + " : out of range. ch_idx(" +
+                                        std::to_string(ch_idx) + ") mNumberChannels(" +
+                                        std::to_string(abl_ptr->mBuffers[0].mNumberChannels) + ")");
             }
         } else {
-            throw std::out_of_range(std::string(__PRETTY_FUNCTION__) + " : out of range. ch_idx(" +
-                                    std::to_string(ch_idx) + ") mNumberChannels(" +
-                                    std::to_string(abl_ptr->mBuffers[0].mNumberChannels) + ")");
-        }
-    } else {
-        if (ch_idx < abl_ptr->mNumberBuffers) {
-            pointer.v = abl_ptr->mBuffers[ch_idx].mData;
-        } else {
-            throw std::out_of_range(std::string(__PRETTY_FUNCTION__) + " : out of range. ch_idx(" +
-                                    std::to_string(ch_idx) + ") mNumberChannels(" +
-                                    std::to_string(abl_ptr->mBuffers[0].mNumberChannels) + ")");
+            if (ch_idx < abl_ptr->mNumberBuffers) {
+                pointer.v = abl_ptr->mBuffers[ch_idx].mData;
+            } else {
+                throw std::out_of_range(std::string(__PRETTY_FUNCTION__) + " : out of range. ch_idx(" +
+                                        std::to_string(ch_idx) + ") mNumberChannels(" +
+                                        std::to_string(abl_ptr->mBuffers[0].mNumberChannels) + ")");
+            }
         }
     }
 
@@ -327,12 +334,15 @@ flex_pointer audio_pcm_buffer::flex_ptr_at_channel(const UInt32 ch_idx) const
 template <typename T>
 T *yas::audio_pcm_buffer::data_ptr_at_index(const UInt32 buf_idx) const
 {
-    if (!validate_pcm_format<T>(format().pcm_format())) {
-        throw std::runtime_error(std::string(__PRETTY_FUNCTION__) + " : invalid pcm_format.");
-        return nullptr;
-    }
+    if (_impl) {
+        if (!validate_pcm_format<T>(format().pcm_format())) {
+            throw std::runtime_error(std::string(__PRETTY_FUNCTION__) + " : invalid pcm_format.");
+            return nullptr;
+        }
 
-    return static_cast<T *>(flex_ptr_at_index(buf_idx).v);
+        return static_cast<T *>(flex_ptr_at_index(buf_idx).v);
+    }
+    return nullptr;
 }
 
 template Float32 *yas::audio_pcm_buffer::data_ptr_at_index(const UInt32 buf_idx) const;
@@ -343,12 +353,15 @@ template SInt16 *yas::audio_pcm_buffer::data_ptr_at_index(const UInt32 buf_idx) 
 template <typename T>
 T *yas::audio_pcm_buffer::data_ptr_at_channel(const UInt32 ch_idx) const
 {
-    if (!validate_pcm_format<T>(format().pcm_format())) {
-        throw std::runtime_error(std::string(__PRETTY_FUNCTION__) + " : invalid pcm_format.");
-        return nullptr;
-    }
+    if (_impl) {
+        if (!validate_pcm_format<T>(format().pcm_format())) {
+            throw std::runtime_error(std::string(__PRETTY_FUNCTION__) + " : invalid pcm_format.");
+            return nullptr;
+        }
 
-    return static_cast<T *>(flex_ptr_at_channel(ch_idx).v);
+        return static_cast<T *>(flex_ptr_at_channel(ch_idx).v);
+    }
+    return nullptr;
 }
 
 template Float32 *yas::audio_pcm_buffer::data_ptr_at_channel(const UInt32 ch_idx) const;
@@ -358,32 +371,43 @@ template SInt16 *yas::audio_pcm_buffer::data_ptr_at_channel(const UInt32 ch_idx)
 
 const UInt32 audio_pcm_buffer::frame_capacity() const
 {
-    return _impl->frame_capacity;
+    if (_impl) {
+        return _impl->frame_capacity;
+    }
+    return 0;
 }
 
 const UInt32 audio_pcm_buffer::frame_length() const
 {
-    return _impl->frame_length;
+    if (_impl) {
+        return _impl->frame_length;
+    }
+    return 0;
 }
 
 void audio_pcm_buffer::set_frame_length(const UInt32 length)
 {
-    if (length > frame_capacity()) {
-        throw std::out_of_range(std::string(__PRETTY_FUNCTION__) + " : out of range. frame_length(" +
-                                std::to_string(length) + ") frame_capacity(" + std::to_string(frame_capacity()) + ")");
-        return;
+    if (_impl) {
+        if (length > frame_capacity()) {
+            throw std::out_of_range(std::string(__PRETTY_FUNCTION__) + " : out of range. frame_length(" +
+                                    std::to_string(length) + ") frame_capacity(" + std::to_string(frame_capacity()) +
+                                    ")");
+            return;
+        }
+
+        _impl->frame_length = length;
+
+        const UInt32 data_byte_size = format().stream_description().mBytesPerFrame * length;
+        set_data_byte_size(*this, data_byte_size);
     }
-
-    _impl->frame_length = length;
-
-    const UInt32 data_byte_size = format().stream_description().mBytesPerFrame * length;
-    set_data_byte_size(*this, data_byte_size);
 }
 
 void audio_pcm_buffer::reset()
 {
-    set_frame_length(frame_capacity());
-    yas::clear(audio_buffer_list());
+    if (_impl) {
+        set_frame_length(frame_capacity());
+        yas::clear(audio_buffer_list());
+    }
 }
 
 void audio_pcm_buffer::clear()
@@ -393,31 +417,37 @@ void audio_pcm_buffer::clear()
 
 void audio_pcm_buffer::clear(const UInt32 start_frame, const UInt32 length)
 {
-    if ((start_frame + length) > frame_length()) {
-        throw std::out_of_range(std::string(__PRETTY_FUNCTION__) + " : out of range. frame(" +
-                                std::to_string(start_frame) + " length(" + std::to_string(length) + " frame_length(" +
-                                std::to_string(frame_length()) + ")");
-    }
+    if (_impl) {
+        if ((start_frame + length) > frame_length()) {
+            throw std::out_of_range(std::string(__PRETTY_FUNCTION__) + " : out of range. frame(" +
+                                    std::to_string(start_frame) + " length(" + std::to_string(length) +
+                                    " frame_length(" + std::to_string(frame_length()) + ")");
+        }
 
-    const UInt32 bytes_per_frame = format().stream_description().mBytesPerFrame;
-    for (UInt32 i = 0; i < format().buffer_count(); i++) {
-        UInt8 *byte_data = static_cast<UInt8 *>(audio_buffer_list()->mBuffers[i].mData);
-        memset(&byte_data[start_frame * bytes_per_frame], 0, length * bytes_per_frame);
+        const UInt32 bytes_per_frame = format().stream_description().mBytesPerFrame;
+        for (UInt32 i = 0; i < format().buffer_count(); i++) {
+            UInt8 *byte_data = static_cast<UInt8 *>(audio_buffer_list()->mBuffers[i].mData);
+            memset(&byte_data[start_frame * bytes_per_frame], 0, length * bytes_per_frame);
+        }
     }
 }
 
-audio_pcm_buffer::copy_result audio_pcm_buffer::copy_from(const audio_pcm_buffer_sptr &from_buffer,
+audio_pcm_buffer::copy_result audio_pcm_buffer::copy_from(const audio_pcm_buffer &from_buffer,
                                                           const UInt32 from_start_frame, const UInt32 to_start_frame,
                                                           const UInt32 length)
 {
-    auto from_format = from_buffer->format();
+    if (!_impl || !from_buffer) {
+        return audio_pcm_buffer::copy_result(audio_pcm_buffer::copy_error_t::buffer_is_null);
+    }
+
+    auto from_format = from_buffer.format();
 
     if ((from_format.pcm_format() != format().pcm_format()) ||
         (from_format.channel_count() != format().channel_count())) {
         return audio_pcm_buffer::copy_result(audio_pcm_buffer::copy_error_t::invalid_format);
     }
 
-    const AudioBufferList *from_abl = from_buffer->audio_buffer_list();
+    const AudioBufferList *from_abl = from_buffer.audio_buffer_list();
     AudioBufferList *to_abl = audio_buffer_list();
 
     auto result = copy(from_abl, to_abl, from_format.sample_byte_count(), from_start_frame, to_start_frame, length);
@@ -433,6 +463,10 @@ audio_pcm_buffer::copy_result audio_pcm_buffer::copy_from(const AudioBufferList 
                                                           const UInt32 from_start_frame, const UInt32 to_start_frame,
                                                           const UInt32 length)
 {
+    if (!_impl) {
+        return audio_pcm_buffer::copy_result(audio_pcm_buffer::copy_error_t::buffer_is_null);
+    }
+
     set_frame_length(0);
     reset_data_byte_size(*this);
 
@@ -450,6 +484,10 @@ audio_pcm_buffer::copy_result audio_pcm_buffer::copy_from(const AudioBufferList 
 audio_pcm_buffer::copy_result audio_pcm_buffer::copy_to(AudioBufferList *to_abl, const UInt32 from_start_frame,
                                                         const UInt32 to_start_frame, const UInt32 length)
 {
+    if (!_impl) {
+        return audio_pcm_buffer::copy_result(audio_pcm_buffer::copy_error_t::buffer_is_null);
+    }
+
     const AudioBufferList *from_abl = audio_buffer_list();
 
     return copy(from_abl, to_abl, format().sample_byte_count(), from_start_frame, to_start_frame, length);
@@ -575,5 +613,7 @@ std::string to_string(const audio_pcm_buffer::copy_error_t &error)
             return "invalid_format";
         case audio_pcm_buffer::copy_error_t::out_of_range:
             return "out_of_range";
+        case audio_pcm_buffer::copy_error_t::buffer_is_null:
+            return "buffer_is_null";
     }
 }

@@ -21,14 +21,24 @@ namespace yas
             invalid_abl,
             invalid_format,
             out_of_range,
+            buffer_is_null,
         };
 
         using copy_result = result<UInt32, copy_error_t>;
 
-        static audio_pcm_buffer_sptr create(const audio_format &format, AudioBufferList *abl);
-        static audio_pcm_buffer_sptr create(const audio_format &format, const UInt32 frame_capacity);
-        static audio_pcm_buffer_sptr create(const audio_format &format, const audio_pcm_buffer_sptr &from_buffer,
-                                            const channel_map_t &channel_map);
+        audio_pcm_buffer();
+        audio_pcm_buffer(const std::nullptr_t &);
+        audio_pcm_buffer(const audio_format &format, AudioBufferList *abl);
+        audio_pcm_buffer(const audio_format &format, const UInt32 frame_capacity);
+        audio_pcm_buffer(const audio_format &format, const audio_pcm_buffer &from_buffer,
+                         const channel_map_t &channel_map);
+
+        audio_pcm_buffer(const audio_pcm_buffer &) = default;
+        audio_pcm_buffer(audio_pcm_buffer &&) = default;
+        audio_pcm_buffer &operator=(const audio_pcm_buffer &) = default;
+        audio_pcm_buffer &operator=(audio_pcm_buffer &&) = default;
+
+        explicit operator bool() const;
 
         const audio_format &format() const;
         AudioBufferList *audio_buffer_list();
@@ -50,9 +60,8 @@ namespace yas
         void clear();
         void clear(const UInt32 start_frame, const UInt32 length);
 
-        audio_pcm_buffer::copy_result copy_from(const audio_pcm_buffer_sptr &from_buffer,
-                                                const UInt32 from_start_frame = 0, const UInt32 to_start_frame = 0,
-                                                const UInt32 length = 0);
+        audio_pcm_buffer::copy_result copy_from(const audio_pcm_buffer &from_buffer, const UInt32 from_start_frame = 0,
+                                                const UInt32 to_start_frame = 0, const UInt32 length = 0);
         audio_pcm_buffer::copy_result copy_from(const AudioBufferList *from_abl, const UInt32 from_start_frame = 0,
                                                 const UInt32 to_start_frame = 0, const UInt32 length = 0);
         audio_pcm_buffer::copy_result copy_to(AudioBufferList *to_abl, const UInt32 from_start_frame = 0,
@@ -60,17 +69,7 @@ namespace yas
 
        private:
         class impl;
-        std::unique_ptr<impl> _impl;
-
-        audio_pcm_buffer(const audio_format &format, AudioBufferList *abl);
-        audio_pcm_buffer(const audio_format &format, const UInt32 frame_capacity);
-        audio_pcm_buffer(const audio_format &format, const audio_pcm_buffer_sptr &from_buffer,
-                         const channel_map_t &channel_map);
-
-        audio_pcm_buffer(const audio_pcm_buffer &) = delete;
-        audio_pcm_buffer(audio_pcm_buffer &&) = delete;
-        audio_pcm_buffer &operator=(const audio_pcm_buffer &) = delete;
-        audio_pcm_buffer &operator=(audio_pcm_buffer &&) = delete;
+        std::shared_ptr<impl> _impl;
     };
 
     void clear(AudioBufferList *abl);

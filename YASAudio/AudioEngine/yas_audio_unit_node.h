@@ -40,7 +40,7 @@ namespace yas
 
         virtual void update_connections() override;
 
-        void render(const audio_pcm_buffer_sptr &buffer, const UInt32 bus_idx, const audio_time &when) override;
+        void render(audio_pcm_buffer &buffer, const UInt32 bus_idx, const audio_time &when) override;
 
        protected:
         static void prepare_for_create(const audio_unit_node_sptr &node);

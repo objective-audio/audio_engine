@@ -101,7 +101,8 @@
     XCTestExpectation *render_expectation = [self expectationWithDescription:@"node render"];
 
     auto lambda = [self, node, time, render_expectation]() {
-        node->render(nil, 0, time);
+        yas::audio_pcm_buffer null_buffer;
+        node->render(null_buffer, 0, time);
         [render_expectation fulfill];
     };
 

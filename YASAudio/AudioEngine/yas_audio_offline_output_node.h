@@ -19,7 +19,7 @@ namespace yas
         };
 
         using start_result_t = yas::result<std::nullptr_t, start_error_t>;
-        using render_f = std::function<void(const audio_pcm_buffer_sptr &buffer, const audio_time &when, bool &stop)>;
+        using render_f = std::function<void(audio_pcm_buffer &buffer, const audio_time &when, bool &stop)>;
         using completion_f = std::function<void(const bool cancelled)>;
 
         static audio_offline_output_node_sptr create();

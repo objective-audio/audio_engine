@@ -47,7 +47,7 @@ namespace yas
 
                 std::weak_ptr<meter_input_tap_node> weak_node = node;
 
-                node->set_render_function([weak_node](const yas::audio_pcm_buffer_sptr &buffer, const UInt32 bus_idx,
+                node->set_render_function([weak_node](yas::audio_pcm_buffer &buffer, const UInt32 bus_idx,
                                                       const yas::audio_time &when) {
                     if (auto node = weak_node.lock()) {
                         node->render_source(buffer, bus_idx, when);
@@ -58,7 +58,7 @@ namespace yas
                         while (flex_ptr->v) {
                             current_max =
                                 MAX(current_max,
-                                    fabsf(flex_ptr->f32[cblas_isamax((int)buffer->frame_length(), flex_ptr->f32, 1)]));
+                                    fabsf(flex_ptr->f32[cblas_isamax((int)buffer.frame_length(), flex_ptr->f32, 1)]));
                             yas_audio_frame_enumerator_move_channel(enumerator);
                         }
 

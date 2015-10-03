@@ -69,27 +69,26 @@ namespace yas
                 return _sine_volume.load();
             }
 
-            void process(const yas::audio_pcm_buffer_sptr &input_buffer,
-                         const yas::audio_pcm_buffer_sptr &output_buffer)
+            void process(const yas::audio_pcm_buffer &input_buffer, yas::audio_pcm_buffer &output_buffer)
             {
                 if (!output_buffer) {
                     return;
                 }
 
-                const UInt32 frame_length = output_buffer->frame_length();
+                const UInt32 frame_length = output_buffer.frame_length();
 
                 if (frame_length == 0) {
                     return;
                 }
 
-                const auto &format = output_buffer->format();
+                const auto &format = output_buffer.format();
                 if (format.pcm_format() == yas::pcm_format::float32 && format.stride() == 1) {
                     yas::audio_frame_enumerator enumerator(output_buffer);
                     auto pointer = enumerator.pointer();
 
                     if (input_buffer) {
-                        if (input_buffer->frame_length() >= frame_length) {
-                            output_buffer->copy_from(input_buffer);
+                        if (input_buffer.frame_length() >= frame_length) {
+                            output_buffer.copy_from(input_buffer);
 
                             const Float32 throughVol = through_volume();
 
@@ -191,8 +190,8 @@ using sample_kernel_sptr = std::shared_ptr<sample_kernel_t>;
         });
 
     std::weak_ptr<yas::audio_device_io> weak_device_io = _audio_device_io;
-    _audio_device_io->set_render_callback([weak_device_io, kernel = _kernel](
-        const yas::audio_pcm_buffer_sptr &output_buffer, const yas::audio_time &when) {
+    _audio_device_io->set_render_callback([weak_device_io, kernel = _kernel](yas::audio_pcm_buffer & output_buffer,
+                                                                             const yas::audio_time &when) {
         if (auto device_io = weak_device_io.lock()) {
             kernel->process(device_io->input_buffer_on_render(), output_buffer);
         }
