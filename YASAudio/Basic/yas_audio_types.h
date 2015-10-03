@@ -23,18 +23,6 @@ namespace yas
         };
     };
 
-    union flex_pointer {
-        void *v;
-        Float32 *f32;
-        Float64 *f64;
-        SInt32 *i32;
-        UInt32 *u32;
-        SInt16 *i16;
-        UInt16 *u16;
-        SInt8 *i8;
-        UInt8 *u8;
-    };
-
     enum class pcm_format : UInt32 {
         other = 0,
         float32,
