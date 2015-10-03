@@ -15,7 +15,7 @@ namespace yas
     {
        public:
         audio_time();
-        audio_time(const std::nullptr_t &);
+        audio_time(std::nullptr_t);
         audio_time(const AudioTimeStamp &ts, const Float64 sample_rate);
         explicit audio_time(const UInt64 host_time);
         audio_time(const SInt64 sample_time, const Float64 sample_rate);

@@ -182,7 +182,7 @@ audio_pcm_buffer::audio_pcm_buffer() : _impl(nullptr)
 {
 }
 
-audio_pcm_buffer::audio_pcm_buffer(const std::nullptr_t &) : _impl(nullptr)
+audio_pcm_buffer::audio_pcm_buffer(std::nullptr_t) : _impl(nullptr)
 {
 }
 

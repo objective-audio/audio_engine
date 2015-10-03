@@ -16,7 +16,7 @@ namespace yas
     {
        public:
         audio_format();
-        audio_format(const std::nullptr_t &);
+        audio_format(std::nullptr_t);
         explicit audio_format(const AudioStreamBasicDescription &asbd);
         explicit audio_format(const CFDictionaryRef &settings);
         audio_format(const Float64 sample_rate, const UInt32 channel_count,
