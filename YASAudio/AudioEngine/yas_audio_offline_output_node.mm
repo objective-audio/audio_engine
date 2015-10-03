@@ -102,18 +102,18 @@ audio_offline_output_node::start_result_t audio_offline_output_node::_start(cons
         }
 
         auto weak_node = _impl->weak_node;
-        auto render_buffer = yas::audio_pcm_buffer::create(connection->format(), 1024);
+        yas::audio_pcm_buffer render_buffer(connection->format(), 1024);
 
         NSBlockOperation *blockOperation = [[NSBlockOperation alloc] init];
         objc_weak_container operation_container(blockOperation);
 
-        auto operation_lambda = [weak_node, operation_container, render_buffer, render_func, key]() {
+        auto operation_lambda = [weak_node, operation_container, render_buffer, render_func, key]() mutable {
             bool cancelled = false;
             UInt32 current_sample_time = 0;
             bool stop = false;
 
             while (!stop) {
-                audio_time when(current_sample_time, render_buffer->format().sample_rate());
+                audio_time when(current_sample_time, render_buffer.format().sample_rate());
                 auto offline_node = weak_node.lock();
                 if (!offline_node) {
                     cancelled = true;
@@ -133,12 +133,12 @@ audio_offline_output_node::start_result_t audio_offline_output_node::_start(cons
                 }
 
                 auto format = connection_on_block->format();
-                if (format != render_buffer->format()) {
+                if (format != render_buffer.format()) {
                     cancelled = true;
                     break;
                 }
 
-                render_buffer->reset();
+                render_buffer.reset();
 
                 if (auto source_node = connection_on_block->source_node()) {
                     source_node->render(render_buffer, connection_on_block->source_bus(), when);

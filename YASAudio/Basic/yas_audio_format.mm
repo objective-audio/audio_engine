@@ -238,6 +238,12 @@ CFStringRef audio_format::description() const
     return yas::to_cf_object(string);
 }
 
+const audio_format &audio_format::null_format()
+{
+    static const audio_format _format;
+    return _format;
+}
+
 #pragma mark - utility
 
 std::string yas::to_string(const yas::pcm_format &pcm_format)

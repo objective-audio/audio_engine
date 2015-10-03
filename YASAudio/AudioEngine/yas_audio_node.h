@@ -67,7 +67,7 @@ namespace yas
         virtual UInt32 input_bus_count() const;
         virtual UInt32 output_bus_count() const;
 
-        virtual void render(const audio_pcm_buffer_sptr &buffer, const UInt32 bus_idx, const audio_time &when);
+        virtual void render(audio_pcm_buffer &buffer, const UInt32 bus_idx, const audio_time &when);
 
        protected:
         audio_node();

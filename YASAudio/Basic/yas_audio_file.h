@@ -65,7 +65,7 @@ namespace yas
 
         ~audio_file_reader();
 
-        read_result_t read_into_buffer(audio_pcm_buffer_sptr &buffer, const UInt32 frame_length = 0);
+        read_result_t read_into_buffer(audio_pcm_buffer &buffer, const UInt32 frame_length = 0);
 
        private:
         audio_file_reader();
@@ -103,7 +103,7 @@ namespace yas
 
         ~audio_file_writer();
 
-        write_result_t write_from_buffer(const audio_pcm_buffer_sptr &buffer, const bool async = false);
+        write_result_t write_from_buffer(const audio_pcm_buffer &buffer, const bool async = false);
 
        private:
         audio_file_writer();

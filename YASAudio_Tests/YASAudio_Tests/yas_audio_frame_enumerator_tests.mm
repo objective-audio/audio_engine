@@ -27,13 +27,13 @@
     const UInt32 channels = 4;
 
     auto format = yas::audio_format(48000.0, channels);
-    auto data = yas::audio_pcm_buffer::create(format, frame_length);
+    yas::audio_pcm_buffer buffer(format, frame_length);
 
     XCTAssertEqual(format.buffer_count(), channels);
 
-    yas::test::fill_test_values_to_buffer(data);
+    yas::test::fill_test_values_to_buffer(buffer);
 
-    yas::audio_frame_enumerator enumerator(data);
+    yas::audio_frame_enumerator enumerator(buffer);
     auto pointer = enumerator.pointer();
     const UInt32 *pointer_frame = enumerator.frame();
     const UInt32 *pointer_channel = enumerator.channel();
@@ -64,13 +64,13 @@
     const UInt32 channels = 3;
 
     auto format = yas::audio_format(48000, channels, yas::pcm_format::float32, true);
-    auto data = yas::audio_pcm_buffer::create(format, frame_length);
+    yas::audio_pcm_buffer buffer(format, frame_length);
 
     XCTAssertEqual(format.stride(), channels);
 
-    yas::test::fill_test_values_to_buffer(data);
+    yas::test::fill_test_values_to_buffer(buffer);
 
-    yas::audio_frame_enumerator enumerator(data);
+    yas::audio_frame_enumerator enumerator(buffer);
     auto pointer = enumerator.pointer();
     const UInt32 *pointer_frame = enumerator.frame();
     const UInt32 *pointer_channel = enumerator.channel();
@@ -101,7 +101,7 @@
     const UInt32 channels = 3;
 
     auto format = yas::audio_format(48000, channels, yas::pcm_format::float32, true);
-    auto data = yas::audio_pcm_buffer::create(format, frame_length);
+    yas::audio_pcm_buffer data(format, frame_length);
 
     XCTAssertEqual(format.stride(), channels);
 
@@ -138,11 +138,11 @@
     const UInt32 channels = 4;
 
     auto format = yas::audio_format(48000, channels);
-    auto data = yas::audio_pcm_buffer::create(format, frame_length);
+    yas::audio_pcm_buffer buffer(format, frame_length);
 
-    yas::test::fill_test_values_to_buffer(data);
+    yas::test::fill_test_values_to_buffer(buffer);
 
-    yas::audio_frame_enumerator enumerator(data);
+    yas::audio_frame_enumerator enumerator(buffer);
     auto pointer = enumerator.pointer();
     const UInt32 *pointer_frame = enumerator.frame();
     const UInt32 *pointer_channel = enumerator.channel();
@@ -172,11 +172,11 @@
     const UInt32 channels = 4;
 
     auto format = yas::audio_format(48000, channels);
-    auto data = yas::audio_pcm_buffer::create(format, frame_length);
+    yas::audio_pcm_buffer buffer(format, frame_length);
 
     XCTAssertEqual(format.buffer_count(), channels);
 
-    yas::audio_frame_enumerator mutable_enumerator(data);
+    yas::audio_frame_enumerator mutable_enumerator(buffer);
     const auto *mutable_pointer = mutable_enumerator.pointer();
     const UInt32 *mutable_pointer_frame = mutable_enumerator.frame();
     const UInt32 *mutable_pointer_channel = mutable_enumerator.channel();
@@ -197,7 +197,7 @@
     }
     XCTAssertEqual(frame, frame_length);
 
-    yas::audio_frame_enumerator enumerator(data);
+    yas::audio_frame_enumerator enumerator(buffer);
     auto pointer = enumerator.pointer();
     const UInt32 *pointer_frame = enumerator.frame();
     const UInt32 *pointer_channel = enumerator.channel();
@@ -217,14 +217,14 @@
     const UInt32 frame_length = 16;
 
     auto format = yas::audio_format(48000, 1);
-    auto data = yas::audio_pcm_buffer::create(format, frame_length);
+    yas::audio_pcm_buffer buffer(format, frame_length);
 
-    auto bufferPointer = data->flex_ptr_at_index(0);
+    auto bufferPointer = buffer.flex_ptr_at_index(0);
     for (UInt32 frame = 0; frame < frame_length; frame++) {
         bufferPointer.f32[frame] = yas::test::test_value(frame, 0, 0);
     }
 
-    yas::audio_frame_enumerator enumerator(data);
+    yas::audio_frame_enumerator enumerator(buffer);
     auto pointer = enumerator.pointer();
     const UInt32 *pointer_frame = enumerator.frame();
 
@@ -254,14 +254,14 @@
     const UInt32 channels = 4;
 
     auto format = yas::audio_format(48000, channels, yas::pcm_format::float32, true);
-    auto data = yas::audio_pcm_buffer::create(format, 1);
+    yas::audio_pcm_buffer buffer(format, 1);
 
-    auto bufferPointer = data->flex_ptr_at_index(0);
+    auto bufferPointer = buffer.flex_ptr_at_index(0);
     for (UInt32 ch_idx = 0; ch_idx < channels; ch_idx++) {
         bufferPointer.f32[ch_idx] = yas::test::test_value(0, ch_idx, 0);
     }
 
-    yas::audio_frame_enumerator enumerator(data);
+    yas::audio_frame_enumerator enumerator(buffer);
     auto pointer = enumerator.pointer();
     const UInt32 *pointer_channel = enumerator.channel();
 
@@ -285,11 +285,11 @@
          ++i) {
         auto pcmFormat = static_cast<yas::pcm_format>(i);
         auto format = yas::audio_format(48000.0, channels, pcmFormat, false);
-        auto data = yas::audio_pcm_buffer::create(format, frame_length);
+        yas::audio_pcm_buffer buffer(format, frame_length);
 
-        yas::test::fill_test_values_to_buffer(data);
+        yas::test::fill_test_values_to_buffer(buffer);
 
-        yas::audio_frame_enumerator enumerator(data);
+        yas::audio_frame_enumerator enumerator(buffer);
         auto pointer = enumerator.pointer();
         const UInt32 *frame = enumerator.frame();
         const UInt32 *channel = enumerator.channel();
@@ -334,9 +334,9 @@
     const NSUInteger stopChannel = 2;
 
     auto format = yas::audio_format(48000.0, channels, yas::pcm_format::float32, true);
-    auto data = yas::audio_pcm_buffer::create(format, frame_length);
+    yas::audio_pcm_buffer buffer(format, frame_length);
 
-    yas::audio_frame_enumerator enumerator(data);
+    yas::audio_frame_enumerator enumerator(buffer);
     auto pointer = enumerator.pointer();
     const UInt32 *frame = enumerator.frame();
     const UInt32 *channel = enumerator.channel();

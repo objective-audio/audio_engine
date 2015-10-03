@@ -190,18 +190,17 @@ typedef NS_ENUM(NSUInteger, YASAudioDeviceRouteSampleInputType) {
     Float64 next_phase = 0.0;
 
     auto render_function = [next_phase, weak_node, weak_container = _self_container](
-        const yas::audio_pcm_buffer_sptr &buffer, const UInt32 bus_idx, const yas::audio_time &when) mutable
+        yas::audio_pcm_buffer & buffer, const UInt32 bus_idx, const yas::audio_time &when) mutable
     {
-        buffer->clear();
+        buffer.clear();
 
         yas::audio_frame_enumerator enumerator(buffer);
         const auto *flex_ptr = enumerator.pointer();
         const Float64 start_phase = next_phase;
-        const Float64 phase_per_frame = 1000.0 / buffer->format().sample_rate() * yas::audio_math::two_pi;
+        const Float64 phase_per_frame = 1000.0 / buffer.format().sample_rate() * yas::audio_math::two_pi;
         while (flex_ptr->v) {
-            next_phase =
-                yas::audio_math::fill_sine(flex_ptr->f32, buffer->frame_length(), start_phase, phase_per_frame);
-            cblas_sscal(buffer->frame_length(), 0.2, flex_ptr->f32, 1);
+            next_phase = yas::audio_math::fill_sine(flex_ptr->f32, buffer.frame_length(), start_phase, phase_per_frame);
+            cblas_sscal(buffer.frame_length(), 0.2, flex_ptr->f32, 1);
             yas_audio_frame_enumerator_move_channel(enumerator);
         }
     };

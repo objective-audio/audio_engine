@@ -150,25 +150,26 @@
             }
         });
 
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0),
-                   [io_unit, output_format, output_sample_rate]() {
-                       AudioUnitRenderActionFlags actionFlags = 0;
-                       yas::audio_time audio_time(0, output_sample_rate);
-                       AudioTimeStamp timeStamp = audio_time.audio_time_stamp();
+    auto dispatch_labmda = [io_unit, output_format, output_sample_rate]() {
+        AudioUnitRenderActionFlags actionFlags = 0;
+        yas::audio_time audio_time(0, output_sample_rate);
+        AudioTimeStamp timeStamp = audio_time.audio_time_stamp();
 
-                       auto data = yas::audio_pcm_buffer::create(output_format, frame_length);
+        yas::audio_pcm_buffer buffer(output_format, frame_length);
 
-                       yas::render_parameters parameters = {
-                           .in_render_type = yas::render_type::normal,
-                           .io_action_flags = &actionFlags,
-                           .io_time_stamp = &timeStamp,
-                           .in_bus_number = 0,
-                           .in_number_frames = 1024,
-                           .io_data = data->audio_buffer_list(),
-                       };
+        yas::render_parameters parameters = {
+            .in_render_type = yas::render_type::normal,
+            .io_action_flags = &actionFlags,
+            .io_time_stamp = &timeStamp,
+            .in_bus_number = 0,
+            .in_number_frames = 1024,
+            .io_data = buffer.audio_buffer_list(),
+        };
 
-                       io_unit->audio_unit_render(parameters);
-                   });
+        io_unit->audio_unit_render(parameters);
+    };
+
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), dispatch_labmda);
 
     [self waitForExpectationsWithTimeout:1.0
                                  handler:^(NSError *error){

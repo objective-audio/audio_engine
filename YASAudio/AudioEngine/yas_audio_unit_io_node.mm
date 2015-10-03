@@ -220,7 +220,7 @@ const channel_map_t &audio_unit_output_node::channel_map() const
 class audio_unit_input_node::impl
 {
    public:
-    audio_pcm_buffer_sptr input_buffer;
+    audio_pcm_buffer input_buffer;
     audio_time render_time;
 };
 
@@ -273,14 +273,14 @@ void audio_unit_input_node::update_connections()
     if (auto out_connection = output_connection(1)) {
         unit->attach_input_callback();
 
-        auto input_buffer = audio_pcm_buffer::create(out_connection->format(), 4096);
+        audio_pcm_buffer input_buffer(out_connection->format(), 4096);
         _impl->input_buffer = input_buffer;
 
-        unit->set_input_callback([weak_node = _weak_this, input_buffer](render_parameters & render_parameters) {
+        unit->set_input_callback([weak_node = _weak_this, input_buffer](render_parameters & render_parameters) mutable {
             auto input_node = weak_node.lock();
-            if (input_node && render_parameters.in_number_frames <= input_buffer->frame_capacity()) {
-                input_buffer->set_frame_length(render_parameters.in_number_frames);
-                render_parameters.io_data = input_buffer->audio_buffer_list();
+            if (input_node && render_parameters.in_number_frames <= input_buffer.frame_capacity()) {
+                input_buffer.set_frame_length(render_parameters.in_number_frames);
+                render_parameters.io_data = input_buffer.audio_buffer_list();
 
                 if (const auto core = input_node->node_core()) {
                     if (const auto connection = core->output_connection(1)) {

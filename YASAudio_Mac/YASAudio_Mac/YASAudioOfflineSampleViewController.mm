@@ -28,16 +28,16 @@ namespace yas
 
                 sine_node_wptr weak_node = node;
 
-                auto render_function = [weak_node](const audio_pcm_buffer_sptr &buffer, const UInt32 bus_idx,
+                auto render_function = [weak_node](audio_pcm_buffer &buffer, const UInt32 bus_idx,
                                                    const audio_time &when) {
-                    buffer->clear();
+                    buffer.clear();
 
                     if (auto node = weak_node.lock()) {
                         if (node->is_playing()) {
                             const Float64 start_phase = node->_phase_on_render;
                             const Float64 phase_per_frame = node->frequency() / sample_rate * yas::audio_math::two_pi;
                             Float64 next_phase = start_phase;
-                            const UInt32 frame_length = buffer->frame_length();
+                            const UInt32 frame_length = buffer.frame_length();
 
                             if (frame_length > 0) {
                                 yas::audio_frame_enumerator enumerator(buffer);
@@ -302,14 +302,14 @@ namespace yas
     UInt32 remain = self.length * yas::offline_sample::sample_rate;
 
     auto start_result = _offline_engine->start_offline_render(
-        [remain, file_writer](const yas::audio_pcm_buffer_sptr &buffer, const auto &when, bool &stop) mutable {
-            auto format = yas::audio_format(buffer->format().stream_description());
-            auto pcm_buffer = yas::audio_pcm_buffer::create(format, buffer->audio_buffer_list());
-            pcm_buffer->set_frame_length(buffer->frame_length());
+        [remain, file_writer](yas::audio_pcm_buffer &buffer, const auto &when, bool &stop) mutable {
+            auto format = yas::audio_format(buffer.format().stream_description());
+            yas::audio_pcm_buffer pcm_buffer(format, buffer.audio_buffer_list());
+            pcm_buffer.set_frame_length(buffer.frame_length());
 
-            UInt32 frame_length = MIN(remain, pcm_buffer->frame_length());
+            UInt32 frame_length = MIN(remain, pcm_buffer.frame_length());
             if (frame_length > 0) {
-                pcm_buffer->set_frame_length(frame_length);
+                pcm_buffer.set_frame_length(frame_length);
                 auto write_result = file_writer->write_from_buffer(pcm_buffer);
                 if (!write_result) {
                     std::cout << __PRETTY_FUNCTION__ << " - error:" << yas::to_string(write_result.error())

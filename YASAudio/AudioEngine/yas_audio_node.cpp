@@ -207,7 +207,7 @@ UInt32 audio_node::output_bus_count() const
 
 #pragma mark render thread
 
-void audio_node::render(const audio_pcm_buffer_sptr &buffer, const UInt32 bus_idx, const audio_time &when)
+void audio_node::render(audio_pcm_buffer &buffer, const UInt32 bus_idx, const audio_time &when)
 {
     set_render_time_on_render(when);
 }
