@@ -20,7 +20,7 @@ void yas::test::fill_test_values_to_buffer(const audio_pcm_buffer &buffer)
     const UInt32 stride = format.stride();
 
     for (UInt32 buf_idx = 0; buf_idx < buffer_count; buf_idx++) {
-        flex_pointer pointer = buffer.flex_ptr_at_index(buf_idx);
+        flex_ptr pointer = buffer.flex_ptr_at_index(buf_idx);
         for (UInt32 frame = 0; frame < buffer.frame_length(); frame++) {
             for (UInt32 ch_idx = 0; ch_idx < stride; ch_idx++) {
                 UInt32 index = frame * stride + ch_idx;
@@ -70,7 +70,7 @@ bool yas::test::is_filled_buffer(const audio_pcm_buffer &buffer)
     const void *zeroBytes = [zeroData bytes];
 
     audio_frame_enumerator enumerator(buffer);
-    const flex_pointer *pointer = enumerator.pointer();
+    const flex_ptr *pointer = enumerator.pointer();
 
     while (pointer->v) {
         if (is_equal_data(pointer->v, zeroBytes, sample_byte_count)) {
@@ -136,8 +136,7 @@ bool test::is_equal(const AudioTimeStamp *ts1, const AudioTimeStamp *ts2)
     }
 }
 
-yas::flex_pointer yas::test::data_ptr_from_buffer(const audio_pcm_buffer &buffer, const UInt32 channel,
-                                                  const UInt32 frame)
+yas::flex_ptr yas::test::data_ptr_from_buffer(const audio_pcm_buffer &buffer, const UInt32 channel, const UInt32 frame)
 {
     audio_frame_enumerator enumerator(buffer);
     enumerator.set_frame_position(frame);

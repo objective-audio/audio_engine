@@ -209,7 +209,7 @@
 
 - (void)testInitFailed
 {
-    yas::flex_pointer pointer = {nullptr};
+    yas::flex_ptr pointer(nullptr);
 
     XCTAssertThrows(yas::audio_enumerator(pointer, 1, 1));
 

@@ -21,30 +21,6 @@
     [super tearDown];
 }
 
-- (void)test_flex_pointer
-{
-    Float32 float32Value = 1.0f;
-    Float64 float64Value = 2.0;
-    SInt16 int16Value = 3;
-    SInt32 int32Value = 4;
-    SInt8 int8Value = 5;
-    UInt8 uint8Value = 6;
-
-    yas::flex_pointer f32_pointer{&float32Value};
-    yas::flex_pointer f64_pointer{&float64Value};
-    yas::flex_pointer i16_pointer{&int16Value};
-    yas::flex_pointer i32_pointer{&int32Value};
-    yas::flex_pointer i8_pointer{&int8Value};
-    yas::flex_pointer u8_pointer{&uint8Value};
-
-    XCTAssertEqual(*f32_pointer.f32, 1.0f);
-    XCTAssertEqual(*f64_pointer.f64, 2.0);
-    XCTAssertEqual(*i16_pointer.i16, 3);
-    XCTAssertEqual(*i32_pointer.i32, 4);
-    XCTAssertEqual(*i8_pointer.i8, 5);
-    XCTAssertEqual(*u8_pointer.u8, 6);
-}
-
 - (void)test_flex_ptr
 {
     Float32 float32_value = 1.0f;

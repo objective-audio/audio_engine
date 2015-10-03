@@ -54,6 +54,45 @@ class audio_pcm_buffer::impl
     {
     }
 
+    flex_ptr flex_ptr_at_index(const UInt32 buf_idx)
+    {
+        if (buf_idx >= abl_ptr->mNumberBuffers) {
+            throw std::out_of_range(std::string(__PRETTY_FUNCTION__) + " : out of range. buf_idx(" +
+                                    std::to_string(buf_idx) + ") _impl->abl_ptr.mNumberBuffers(" +
+                                    std::to_string(abl_ptr->mNumberBuffers) + ")");
+        }
+
+        return flex_ptr(abl_ptr->mBuffers[buf_idx].mData);
+    }
+
+    flex_ptr flex_ptr_at_channel(const UInt32 ch_idx)
+    {
+        flex_ptr pointer;
+
+        if (format.stride() > 1) {
+            if (ch_idx < abl_ptr->mBuffers[0].mNumberChannels) {
+                pointer.v = abl_ptr->mBuffers[0].mData;
+                if (ch_idx > 0) {
+                    pointer.u8 += ch_idx * format.sample_byte_count();
+                }
+            } else {
+                throw std::out_of_range(std::string(__PRETTY_FUNCTION__) + " : out of range. ch_idx(" +
+                                        std::to_string(ch_idx) + ") mNumberChannels(" +
+                                        std::to_string(abl_ptr->mBuffers[0].mNumberChannels) + ")");
+            }
+        } else {
+            if (ch_idx < abl_ptr->mNumberBuffers) {
+                pointer.v = abl_ptr->mBuffers[ch_idx].mData;
+            } else {
+                throw std::out_of_range(std::string(__PRETTY_FUNCTION__) + " : out of range. ch_idx(" +
+                                        std::to_string(ch_idx) + ") mNumberChannels(" +
+                                        std::to_string(abl_ptr->mBuffers[0].mNumberChannels) + ")");
+            }
+        }
+
+        return pointer;
+    }
+
     static std::vector<UInt8> &dummy_data()
     {
         static std::vector<UInt8> _dummy_data(4096 * 4);
@@ -284,51 +323,36 @@ const AudioBufferList *audio_pcm_buffer::audio_buffer_list() const
     return nullptr;
 }
 
-flex_pointer audio_pcm_buffer::flex_ptr_at_index(const UInt32 buf_idx) const
+flex_ptr audio_pcm_buffer::flex_ptr_at_index(const UInt32 buf_idx)
 {
     if (_impl) {
-        if (buf_idx >= _impl->abl_ptr->mNumberBuffers) {
-            throw std::out_of_range(std::string(__PRETTY_FUNCTION__) + " : out of range. buf_idx(" +
-                                    std::to_string(buf_idx) + ") _impl->abl_ptr.mNumberBuffers(" +
-                                    std::to_string(_impl->abl_ptr->mNumberBuffers) + ")");
-        }
-
-        return flex_pointer{.v = _impl->abl_ptr->mBuffers[buf_idx].mData};
+        return _impl->flex_ptr_at_index(buf_idx);
     }
-    return flex_pointer{.v = nullptr};
+    return nullptr;
 }
 
-flex_pointer audio_pcm_buffer::flex_ptr_at_channel(const UInt32 ch_idx) const
+flex_ptr audio_pcm_buffer::flex_ptr_at_channel(const UInt32 ch_idx)
 {
-    flex_pointer pointer{.v = nullptr};
-
     if (_impl) {
-        const UInt32 stride = format().stride();
-        const AudioBufferList *abl_ptr = _impl->abl_ptr;
-
-        if (stride > 1) {
-            if (ch_idx < abl_ptr->mBuffers[0].mNumberChannels) {
-                pointer.v = abl_ptr->mBuffers[0].mData;
-                if (ch_idx > 0) {
-                    pointer.u8 += ch_idx * format().sample_byte_count();
-                }
-            } else {
-                throw std::out_of_range(std::string(__PRETTY_FUNCTION__) + " : out of range. ch_idx(" +
-                                        std::to_string(ch_idx) + ") mNumberChannels(" +
-                                        std::to_string(abl_ptr->mBuffers[0].mNumberChannels) + ")");
-            }
-        } else {
-            if (ch_idx < abl_ptr->mNumberBuffers) {
-                pointer.v = abl_ptr->mBuffers[ch_idx].mData;
-            } else {
-                throw std::out_of_range(std::string(__PRETTY_FUNCTION__) + " : out of range. ch_idx(" +
-                                        std::to_string(ch_idx) + ") mNumberChannels(" +
-                                        std::to_string(abl_ptr->mBuffers[0].mNumberChannels) + ")");
-            }
-        }
+        return _impl->flex_ptr_at_channel(ch_idx);
     }
+    return nullptr;
+}
 
-    return pointer;
+const flex_ptr audio_pcm_buffer::flex_ptr_at_index(const UInt32 buf_idx) const
+{
+    if (_impl) {
+        return _impl->flex_ptr_at_index(buf_idx);
+    }
+    return nullptr;
+}
+
+const flex_ptr audio_pcm_buffer::flex_ptr_at_channel(const UInt32 ch_idx) const
+{
+    if (_impl) {
+        return _impl->flex_ptr_at_channel(ch_idx);
+    }
+    return nullptr;
 }
 
 template <typename T>

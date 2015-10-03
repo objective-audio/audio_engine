@@ -8,6 +8,7 @@
 #include "yas_audio_types.h"
 #include "yas_result.h"
 #include "yas_audio_route.h"
+#include "yas_flex_ptr.h"
 #include <memory>
 #include <vector>
 
@@ -44,8 +45,10 @@ namespace yas
         AudioBufferList *audio_buffer_list();
         const AudioBufferList *audio_buffer_list() const;
 
-        flex_pointer flex_ptr_at_index(const UInt32 buf_idx) const;
-        flex_pointer flex_ptr_at_channel(const UInt32 ch_idx) const;
+        flex_ptr flex_ptr_at_index(const UInt32 buf_idx);
+        flex_ptr flex_ptr_at_channel(const UInt32 ch_idx);
+        const flex_ptr flex_ptr_at_index(const UInt32 buf_idx) const;
+        const flex_ptr flex_ptr_at_channel(const UInt32 ch_idx) const;
 
         template <typename T>
         T *data_ptr_at_index(const UInt32 buf_idx) const;
