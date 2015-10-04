@@ -54,7 +54,7 @@ audio_format::audio_format() : _impl(nullptr)
 {
 }
 
-audio_format::audio_format(const std::nullptr_t &) : _impl(nullptr)
+audio_format::audio_format(std::nullptr_t) : _impl(nullptr)
 {
 }
 

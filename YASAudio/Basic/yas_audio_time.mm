@@ -39,7 +39,7 @@ audio_time::audio_time() : _impl(nullptr)
 {
 }
 
-audio_time::audio_time(const std::nullptr_t &) : _impl(nullptr)
+audio_time::audio_time(std::nullptr_t) : _impl(nullptr)
 {
 }
 
