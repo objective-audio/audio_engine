@@ -49,9 +49,13 @@ namespace yas
         flex_ptr flex_ptr_at_channel(const UInt32 ch_idx) const;
 
         template <typename T>
-        T *data_ptr_at_index(const UInt32 buf_idx) const;
+        T *data_ptr_at_index(const UInt32 buf_idx);
         template <typename T>
-        T *data_ptr_at_channel(const UInt32 ch_idx) const;
+        T *data_ptr_at_channel(const UInt32 ch_idx);
+        template <typename T>
+        const T *data_ptr_at_index(const UInt32 buf_idx) const;
+        template <typename T>
+        const T *data_ptr_at_channel(const UInt32 ch_idx) const;
 
         const UInt32 frame_capacity() const;
         const UInt32 frame_length() const;
