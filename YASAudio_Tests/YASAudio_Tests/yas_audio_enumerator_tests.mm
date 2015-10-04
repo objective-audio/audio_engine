@@ -35,8 +35,8 @@
 
     for (UInt32 buf_idx = 0; buf_idx < channels; buf_idx++) {
         yas::audio_enumerator enumerator(buffer, buf_idx);
-        auto pointer = enumerator.pointer();
-        const UInt32 *index = enumerator.index();
+        const auto pointer = enumerator.pointer();
+        const auto index = enumerator.index();
 
         for (NSInteger i = 0; i < 2; i++) {
             UInt32 frame = 0;
@@ -66,8 +66,8 @@
 
     for (UInt32 buf_idx = 0; buf_idx < channels; buf_idx++) {
         yas::audio_enumerator enumerator(buffer, buf_idx);
-        auto pointer = enumerator.pointer();
-        const UInt32 *index = enumerator.index();
+        const auto pointer = enumerator.pointer();
+        const auto index = enumerator.index();
 
         for (NSInteger i = 0; i < 2; i++) {
             UInt32 frame = 0;
@@ -97,8 +97,8 @@
 
     for (UInt32 ch_idx = 0; ch_idx < channels; ch_idx++) {
         yas::audio_enumerator enumerator(buffer, ch_idx);
-        auto pointer = enumerator.pointer();
-        const UInt32 *index = enumerator.index();
+        const auto pointer = enumerator.pointer();
+        const auto index = enumerator.index();
 
         UInt32 frame = 0;
         while (pointer->v) {
@@ -122,8 +122,8 @@
 
     for (UInt32 buf_idx = 0; buf_idx < channels; buf_idx++) {
         yas::audio_enumerator enumerator(buffer, buf_idx);
-        auto pointer = enumerator.pointer();
-        const UInt32 *index = enumerator.index();
+        const auto pointer = enumerator.pointer();
+        const auto index = enumerator.index();
 
         UInt32 frame = 0;
         while (pointer->v) {
@@ -138,8 +138,8 @@
 
     for (UInt32 buf_idx = 0; buf_idx < channels; buf_idx++) {
         yas::audio_enumerator enumerator(buffer, buf_idx);
-        auto pointer = enumerator.pointer();
-        const UInt32 *index = enumerator.index();
+        const auto pointer = enumerator.pointer();
+        const auto index = enumerator.index();
 
         UInt32 frame = 0;
         while (pointer->v) {
@@ -161,8 +161,8 @@
     yas::audio_pcm_buffer buffer(format, frame_length);
     yas::audio_enumerator enumerator(buffer, 0);
 
-    const UInt32 *index = enumerator.index();
-    auto pointer = enumerator.pointer();
+    const auto pointer = enumerator.pointer();
+    const auto index = enumerator.index();
 
     XCTAssertEqual(*index, 0);
 
@@ -192,8 +192,8 @@
     yas::audio_pcm_buffer buffer(format, frame_length);
 
     yas::audio_enumerator enumerator(buffer, 0);
-    auto pointer = enumerator.pointer();
-    const UInt32 *index = enumerator.index();
+    const auto pointer = enumerator.pointer();
+    const auto index = enumerator.index();
 
     NSUInteger frame = 0;
     while (pointer->v) {

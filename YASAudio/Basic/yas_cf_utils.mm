@@ -22,7 +22,7 @@ CFStringRef yas::to_cf_object(const std::string &string)
     return cf_string;
 }
 
-CFStringRef yas::file_type_for_hfs_type_code(OSType fcc)
+CFStringRef yas::file_type_for_hfs_type_code(const OSType fcc)
 {
 #if TARGET_OS_IPHONE
     const char fourChar[5] = {static_cast<char>((fcc >> 24) & 0xFF), static_cast<char>((fcc >> 16) & 0xFF),

@@ -37,7 +37,7 @@ namespace yas
     template <typename K, typename T>
     CFDictionaryRef to_cf_object(const std::map<K, T> &map);
 
-    CFStringRef file_type_for_hfs_type_code(OSType fcc);
+    CFStringRef file_type_for_hfs_type_code(const OSType fcc);
     OSType hfs_type_code_from_file_type(const CFStringRef cfStr);
 }
 

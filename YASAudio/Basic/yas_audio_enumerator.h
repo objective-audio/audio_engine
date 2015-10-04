@@ -20,7 +20,7 @@ namespace yas
 
         const flex_ptr *pointer() const;
         const UInt32 *index() const;
-        const UInt32 length() const;
+        UInt32 length() const;
 
         void move();
         void stop();
@@ -44,8 +44,8 @@ namespace yas
         const flex_ptr *pointer() const;
         const UInt32 *frame() const;
         const UInt32 *channel() const;
-        const UInt32 frame_length() const;
-        const UInt32 channel_count() const;
+        UInt32 frame_length() const;
+        UInt32 channel_count() const;
 
         void move_frame();
         void move_channel();

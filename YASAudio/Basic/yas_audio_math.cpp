@@ -62,7 +62,7 @@ UInt32 audio_math::frames_from_seconds(const Float64 seconds, const Float64 samp
 }
 
 template <>
-Float32 audio_math::fill_sine(Float32 *out_data, const UInt32 length, const Float64 start_phase,
+Float32 audio_math::fill_sine(Float32 *const out_data, const UInt32 length, const Float64 start_phase,
                               const Float64 phase_per_frame)
 {
     if (!out_data || length == 0) {

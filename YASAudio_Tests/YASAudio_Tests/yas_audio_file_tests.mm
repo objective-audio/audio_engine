@@ -251,7 +251,7 @@ namespace yas
 #pragma mark -
 
 - (void)_writeToBuffer:(yas::audio_pcm_buffer &)buffer
-            fileFormat:(yas::audio_format &)fileFormat
+            fileFormat:(const yas::audio_format &)fileFormat
             startIndex:(NSInteger)startIndex
 {
     const auto &format = buffer.format();
@@ -287,7 +287,7 @@ namespace yas
 }
 
 - (bool)_compareData:(yas::audio_pcm_buffer &)buffer
-          fileFormat:(yas::audio_format &)fileFormat
+          fileFormat:(const yas::audio_format &)fileFormat
           startIndex:(NSInteger)startIndex
 {
     const auto &format = buffer.format();

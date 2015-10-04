@@ -26,8 +26,8 @@ namespace yas
         bool is_equal_buffer_flexibly(const audio_pcm_buffer &data1, const audio_pcm_buffer &data2);
         flex_ptr data_ptr_from_buffer(const audio_pcm_buffer &data, const UInt32 ch_idx, const UInt32 frame);
         bool is_equal(const Float64 val1, const Float64 val2, const Float64 accuracy = 0);
-        bool is_equal_data(const void *inData1, const void *inData2, const size_t inSize);
-        bool is_equal(const AudioTimeStamp *ts1, const AudioTimeStamp *ts2);
+        bool is_equal_data(const void *const inData1, const void *const inData2, const size_t inSize);
+        bool is_equal(const AudioTimeStamp *const ts1, const AudioTimeStamp *const ts2);
 
         void audio_unit_render_on_sub_thread(std::shared_ptr<audio_unit> audio_unit, yas::audio_format &format,
                                              const UInt32 frame_length, const NSUInteger count,

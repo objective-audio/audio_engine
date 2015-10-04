@@ -28,6 +28,6 @@ namespace yas
         flex_ptr();
         flex_ptr(std::nullptr_t);
         template <typename T>
-        flex_ptr(const T *p);
+        flex_ptr(const T *const p);
     };
 }
