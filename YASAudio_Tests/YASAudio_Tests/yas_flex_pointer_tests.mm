@@ -73,38 +73,6 @@
     XCTAssertEqual(*u8_ptr.u8, 17);
 }
 
-- (void)test_const_flex_ptr
-{
-    Float32 float32_value = 1.0f;
-    Float64 float64_value = 2.0;
-    SInt32 int32_value = 3;
-    UInt32 uint32_value = 4;
-    SInt16 int16_value = 5;
-    UInt16 uint16_value = 6;
-    SInt8 int8_value = 7;
-    UInt8 uint8_value = 8;
-
-    // create
-
-    const yas::flex_ptr f32_ptr(&float32_value);
-    const yas::flex_ptr f64_ptr(&float64_value);
-    const yas::flex_ptr i32_ptr(&int32_value);
-    const yas::flex_ptr u32_ptr(&uint32_value);
-    const yas::flex_ptr i16_ptr(&int16_value);
-    const yas::flex_ptr u16_ptr(&uint16_value);
-    const yas::flex_ptr i8_ptr(&int8_value);
-    const yas::flex_ptr u8_ptr(&uint8_value);
-
-    XCTAssertEqual(*f32_ptr.f32, 1.0f);
-    XCTAssertEqual(*f64_ptr.f64, 2.0);
-    XCTAssertEqual(*i32_ptr.i32, 3);
-    XCTAssertEqual(*u32_ptr.u32, 4);
-    XCTAssertEqual(*i16_ptr.i16, 5);
-    XCTAssertEqual(*u16_ptr.u16, 6);
-    XCTAssertEqual(*i8_ptr.i8, 7);
-    XCTAssertEqual(*u8_ptr.u8, 8);
-}
-
 - (void)test_copy
 {
     Float32 value = 20.0f;
