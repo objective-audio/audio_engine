@@ -323,7 +323,7 @@ const AudioBufferList *audio_pcm_buffer::audio_buffer_list() const
     return nullptr;
 }
 
-flex_ptr audio_pcm_buffer::flex_ptr_at_index(const UInt32 buf_idx)
+flex_ptr audio_pcm_buffer::flex_ptr_at_index(const UInt32 buf_idx) const
 {
     if (_impl) {
         return _impl->flex_ptr_at_index(buf_idx);
@@ -331,23 +331,7 @@ flex_ptr audio_pcm_buffer::flex_ptr_at_index(const UInt32 buf_idx)
     return nullptr;
 }
 
-flex_ptr audio_pcm_buffer::flex_ptr_at_channel(const UInt32 ch_idx)
-{
-    if (_impl) {
-        return _impl->flex_ptr_at_channel(ch_idx);
-    }
-    return nullptr;
-}
-
-const flex_ptr audio_pcm_buffer::flex_ptr_at_index(const UInt32 buf_idx) const
-{
-    if (_impl) {
-        return _impl->flex_ptr_at_index(buf_idx);
-    }
-    return nullptr;
-}
-
-const flex_ptr audio_pcm_buffer::flex_ptr_at_channel(const UInt32 ch_idx) const
+flex_ptr audio_pcm_buffer::flex_ptr_at_channel(const UInt32 ch_idx) const
 {
     if (_impl) {
         return _impl->flex_ptr_at_channel(ch_idx);
