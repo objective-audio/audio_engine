@@ -62,8 +62,6 @@ namespace yas
     class audio_time;
     class audio_format;
     class audio_pcm_buffer;
-    class audio_file_reader;
-    class audio_file_writer;
     class audio_route;
     class audio_graph;
     class audio_unit;
@@ -87,8 +85,6 @@ namespace yas
     using abl_data_uptr = std::unique_ptr<std::vector<std::vector<UInt8>>>;
     using channel_map_t = std::vector<UInt32>;
 
-    using audio_file_reader_sptr = std::shared_ptr<audio_file_reader>;
-    using audio_file_writer_sptr = std::shared_ptr<audio_file_writer>;
     using audio_route_set = std::set<audio_route>;
     using audio_graph_sptr = std::shared_ptr<audio_graph>;
     using audio_graph_wptr = std::weak_ptr<audio_graph>;

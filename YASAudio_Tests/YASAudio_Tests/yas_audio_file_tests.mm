@@ -171,32 +171,26 @@ namespace yas
 
     @autoreleasepool
     {
-        yas::audio_file_writer_sptr audio_file = nullptr;
+        yas::audio_file audio_file;
 
         if (test_data.standard) {
-            if (auto result = yas::audio_file_writer::create(fileURL, test_data.file_type(), settings)) {
-                audio_file = result.value();
-            }
+            XCTAssertTrue(audio_file.create(fileURL, test_data.file_type(), settings));
         } else {
-            if (auto result =
-                    yas::audio_file_writer::create(fileURL, test_data.file_type(), settings, pcm_format, interleaved)) {
-                audio_file = result.value();
-            }
+            XCTAssertTrue(audio_file.create(fileURL, test_data.file_type(), settings, pcm_format, interleaved));
         }
 
-        XCTAssert(audio_file);
-        XCTAssertTrue(audio_file->processing_format() == default_processing_format);
+        XCTAssertTrue(audio_file.processing_format() == default_processing_format);
 
-        audio_file->set_processing_format(processing_format);
+        audio_file.set_processing_format(processing_format);
 
         yas::audio_pcm_buffer buffer(processing_format, frame_length);
 
         UInt32 startIndex = 0;
 
         for (NSInteger i = 0; i < loopCount; i++) {
-            [self _writeToBuffer:buffer fileFormat:audio_file->file_format() startIndex:startIndex];
+            [self _writeToBuffer:buffer fileFormat:audio_file.file_format() startIndex:startIndex];
 
-            XCTAssertTrue(audio_file->write_from_buffer(buffer, async));
+            XCTAssertTrue(audio_file.write_from_buffer(buffer, async));
 
             startIndex += frame_length;
         }
@@ -206,45 +200,39 @@ namespace yas
 
     @autoreleasepool
     {
-        yas::audio_file_reader_sptr audio_file = nullptr;
+        yas::audio_file audio_file;
 
         if (test_data.standard) {
-            if (auto result = yas::audio_file_reader::create(fileURL)) {
-                audio_file = result.value();
-            }
+            XCTAssertTrue(audio_file.open(fileURL));
         } else {
-            if (auto result = yas::audio_file_reader::create(fileURL, pcm_format, interleaved)) {
-                audio_file = result.value();
-            }
+            XCTAssertTrue(audio_file.open(fileURL, pcm_format, interleaved));
         }
 
-        XCTAssert(audio_file);
-
         SInt64 looped_frame_length = frame_length * loopCount;
-        XCTAssertEqualWithAccuracy(audio_file->file_length(),
+        XCTAssertEqualWithAccuracy(audio_file.file_length(),
                                    (SInt64)(looped_frame_length * (file_sample_rate / processing_sample_rate)), 1);
 
-        audio_file->set_processing_format(processing_format);
+        audio_file.set_processing_format(processing_format);
 
-        XCTAssertEqualWithAccuracy(audio_file->processing_length(),
-                                   audio_file->file_length() * (processing_sample_rate / file_sample_rate), 1);
+        XCTAssertEqualWithAccuracy(audio_file.processing_length(),
+                                   audio_file.file_length() * (processing_sample_rate / file_sample_rate), 1);
 
         yas::audio_pcm_buffer buffer(processing_format, frame_length);
 
         UInt32 startIndex = 0;
 
         for (NSInteger i = 0; i < loopCount; i++) {
-            XCTAssertTrue(audio_file->read_into_buffer(buffer));
+            XCTAssertTrue(audio_file.read_into_buffer(buffer));
             if (test_data.file_sample_rate == test_data.processing_sample_rate) {
                 XCTAssert(buffer.frame_length() == frame_length);
-                XCTAssert([self _compareData:buffer fileFormat:audio_file->file_format() startIndex:startIndex]);
+                XCTAssert([self _compareData:buffer fileFormat:audio_file.file_format() startIndex:startIndex]);
             }
 
             startIndex += frame_length;
         }
 
-        audio_file->set_file_frame_position(0);
-        XCTAssertEqual(audio_file->file_frame_position(), 0);
+        audio_file.set_file_frame_position(0);
+        XCTAssertEqual(audio_file.file_frame_position(), 0);
     }
 }
 

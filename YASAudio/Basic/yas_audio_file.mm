@@ -130,16 +130,27 @@ class audio_file::impl
         }
     }
 
+    bool is_open() const
+    {
+        return ext_audio_file != nullptr;
+    }
+
    private:
     CFURLRef _url;
     CFStringRef _file_type;
 };
 
-audio_file::audio_file() : _impl(std::make_unique<impl>())
+audio_file::audio_file() : _impl(std::make_shared<impl>())
 {
 }
 
-audio_file::~audio_file() = default;
+audio_file::operator bool() const
+{
+    if (_impl) {
+        return _impl->is_open();
+    }
+    return false;
+}
 
 CFURLRef audio_file::url() const
 {
@@ -195,36 +206,53 @@ SInt64 audio_file::file_frame_position() const
     return _impl->file_frame_position;
 }
 
+audio_file::open_result_t audio_file::open(const CFURLRef file_url, const pcm_format pcm_format, const bool interleaved)
+{
+    if (_impl->ext_audio_file) {
+        return open_result_t(open_error_t::opened);
+    }
+
+    if (!file_url || pcm_format == yas::pcm_format::other) {
+        return open_result_t(open_error_t::invalid_argument);
+    }
+
+    _impl->set_url(file_url);
+
+    if (!_impl->open(pcm_format, interleaved)) {
+        return open_result_t(open_error_t::open_failed);
+    }
+
+    return open_result_t(nullptr);
+}
+
+audio_file::create_result_t audio_file::create(const CFURLRef file_url, const CFStringRef file_type,
+                                               const CFDictionaryRef settings, const pcm_format pcm_format,
+                                               const bool interleaved)
+{
+    if (_impl->ext_audio_file) {
+        return create_result_t(create_error_t::created);
+    }
+
+    if (!file_url || !file_type || !settings) {
+        return create_result_t(create_error_t::invalid_argument);
+    }
+
+    _impl->set_url(file_url);
+    _impl->set_file_type(file_type);
+
+    if (!_impl->create(settings, pcm_format, interleaved)) {
+        return create_result_t(create_error_t::create_failed);
+    }
+
+    return create_result_t(nullptr);
+}
+
 void audio_file::close()
 {
     _impl->close();
 }
 
-#pragma mark - audio file reader
-
-audio_file_reader::create_result_t audio_file_reader::create(const CFURLRef file_url, const pcm_format pcm_format,
-                                                             const bool interleaved)
-{
-    if (!file_url) {
-        return create_result_t(create_error_t::invalid_argument);
-    }
-
-    auto reader = audio_file_reader_sptr(new audio_file_reader());
-
-    reader->_impl->set_url(file_url);
-
-    if (!reader->_impl->open(pcm_format, interleaved)) {
-        return create_result_t(create_error_t::open_failed);
-    }
-
-    return create_result_t(std::move(reader));
-}
-
-audio_file_reader::audio_file_reader() = default;
-audio_file_reader::~audio_file_reader() = default;
-
-audio_file_reader::read_result_t audio_file_reader::read_into_buffer(audio_pcm_buffer &buffer,
-                                                                     const UInt32 frame_length)
+audio_file::read_result_t audio_file::read_into_buffer(audio_pcm_buffer &buffer, const UInt32 frame_length)
 {
     if (!_impl->ext_audio_file) {
         return read_result_t(read_error_t::closed);
@@ -291,58 +319,7 @@ audio_file_reader::read_result_t audio_file_reader::read_into_buffer(audio_pcm_b
     return read_result_t(nullptr);
 }
 
-std::string yas::to_string(const audio_file_reader::create_error_t &error_t)
-{
-    switch (error_t) {
-        case audio_file_reader::create_error_t::invalid_argument:
-            return "invalid_argument";
-        case audio_file_reader::create_error_t::open_failed:
-            return "open_failed";
-    }
-}
-
-std::string yas::to_string(const audio_file_reader::read_error_t &error_t)
-{
-    switch (error_t) {
-        case audio_file_reader::read_error_t::closed:
-            return "closed";
-        case audio_file_reader::read_error_t::invalid_argument:
-            return "invalid_argument";
-        case audio_file_reader::read_error_t::invalid_format:
-            return "invalid_format";
-        case audio_file_reader::read_error_t::read_failed:
-            return "read_failed";
-        case audio_file_reader::read_error_t::tell_failed:
-            return "tell_failed";
-    }
-}
-
-#pragma mark - audio file writer
-
-audio_file_writer::create_result_t audio_file_writer::create(const CFURLRef file_url, const CFStringRef file_type,
-                                                             const CFDictionaryRef settings,
-                                                             const pcm_format pcm_format, const bool interleaved)
-{
-    if (!file_url || !file_type || !settings) {
-        return create_result_t(create_error_t::invalid_argument);
-    }
-
-    auto writer = audio_file_writer_sptr(new audio_file_writer());
-
-    writer->_impl->set_url(file_url);
-    writer->_impl->set_file_type(file_type);
-
-    if (!writer->_impl->create(settings, pcm_format, interleaved)) {
-        return create_result_t(create_error_t::create_failed);
-    }
-
-    return create_result_t(std::move(writer));
-}
-
-audio_file_writer::audio_file_writer() = default;
-audio_file_writer::~audio_file_writer() = default;
-
-audio_file_writer::write_result_t audio_file_writer::write_from_buffer(const audio_pcm_buffer &buffer, const bool async)
+audio_file::write_result_t audio_file::write_from_buffer(const audio_pcm_buffer &buffer, const bool async)
 {
     if (!_impl->ext_audio_file) {
         return write_result_t(write_error_t::closed);
@@ -376,28 +353,58 @@ audio_file_writer::write_result_t audio_file_writer::write_from_buffer(const aud
     return write_result_t(nullptr);
 }
 
-std::string yas::to_string(const audio_file_writer::create_error_t &error_t)
+std::string yas::to_string(const audio_file::open_error_t &error_t)
 {
     switch (error_t) {
-        case audio_file_writer::create_error_t::invalid_argument:
+        case audio_file::open_error_t::opened:
+            return "opened";
+        case audio_file::open_error_t::invalid_argument:
             return "invalid_argument";
-        case audio_file_writer::create_error_t::create_failed:
+        case audio_file::open_error_t::open_failed:
             return "open_failed";
     }
 }
 
-std::string yas::to_string(const audio_file_writer::write_error_t &error_t)
+std::string yas::to_string(const audio_file::read_error_t &error_t)
 {
     switch (error_t) {
-        case audio_file_writer::write_error_t::closed:
+        case audio_file::read_error_t::closed:
             return "closed";
-        case audio_file_writer::write_error_t::invalid_argument:
+        case audio_file::read_error_t::invalid_argument:
             return "invalid_argument";
-        case audio_file_writer::write_error_t::invalid_format:
+        case audio_file::read_error_t::invalid_format:
             return "invalid_format";
-        case audio_file_writer::write_error_t::write_failed:
+        case audio_file::read_error_t::read_failed:
             return "read_failed";
-        case audio_file_writer::write_error_t::tell_failed:
+        case audio_file::read_error_t::tell_failed:
+            return "tell_failed";
+    }
+}
+
+std::string yas::to_string(const audio_file::create_error_t &error_t)
+{
+    switch (error_t) {
+        case audio_file::create_error_t::created:
+            return "created";
+        case audio_file::create_error_t::invalid_argument:
+            return "invalid_argument";
+        case audio_file::create_error_t::create_failed:
+            return "open_failed";
+    }
+}
+
+std::string yas::to_string(const audio_file::write_error_t &error_t)
+{
+    switch (error_t) {
+        case audio_file::write_error_t::closed:
+            return "closed";
+        case audio_file::write_error_t::invalid_argument:
+            return "invalid_argument";
+        case audio_file::write_error_t::invalid_format:
+            return "invalid_format";
+        case audio_file::write_error_t::write_failed:
+            return "read_failed";
+        case audio_file::write_error_t::tell_failed:
             return "tell_failed";
     }
 }
