@@ -171,20 +171,14 @@ namespace yas
 
     @autoreleasepool
     {
-        yas::audio_file_writer audio_file;
+        yas::audio_file audio_file;
 
         if (test_data.standard) {
-            if (auto result = yas::audio_file_writer::create(fileURL, test_data.file_type(), settings)) {
-                audio_file = result.value();
-            }
+            XCTAssertTrue(audio_file.create(fileURL, test_data.file_type(), settings));
         } else {
-            if (auto result =
-                    yas::audio_file_writer::create(fileURL, test_data.file_type(), settings, pcm_format, interleaved)) {
-                audio_file = result.value();
-            }
+            XCTAssertTrue(audio_file.create(fileURL, test_data.file_type(), settings, pcm_format, interleaved));
         }
 
-        XCTAssert(audio_file);
         XCTAssertTrue(audio_file.processing_format() == default_processing_format);
 
         audio_file.set_processing_format(processing_format);
@@ -206,19 +200,13 @@ namespace yas
 
     @autoreleasepool
     {
-        yas::audio_file_reader audio_file;
+        yas::audio_file audio_file;
 
         if (test_data.standard) {
-            if (auto result = yas::audio_file_reader::create(fileURL)) {
-                audio_file = result.value();
-            }
+            XCTAssertTrue(audio_file.open(fileURL));
         } else {
-            if (auto result = yas::audio_file_reader::create(fileURL, pcm_format, interleaved)) {
-                audio_file = result.value();
-            }
+            XCTAssertTrue(audio_file.open(fileURL, pcm_format, interleaved));
         }
-
-        XCTAssert(audio_file);
 
         SInt64 looped_frame_length = frame_length * loopCount;
         XCTAssertEqualWithAccuracy(audio_file.file_length(),
