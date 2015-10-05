@@ -280,8 +280,8 @@ namespace yas
     }
 
     auto wave_settings = yas::wave_file_settings(yas::offline_sample::sample_rate, 2, 16);
-    auto create_result =
-        yas::audio_file_writer::create((__bridge CFURLRef)url, yas::audio_file_type::wave, wave_settings);
+    yas::audio_file file_writer;
+    auto create_result = file_writer.create((__bridge CFURLRef)url, yas::audio_file_type::wave, wave_settings);
 
     if (!create_result) {
         std::cout << __PRETTY_FUNCTION__ << " - error:" << yas::to_string(create_result.error()) << std::endl;
@@ -298,11 +298,11 @@ namespace yas
         _self_container = std::make_shared<yas::objc_weak_container>(self);
     }
 
-    auto file_writer = create_result.value();
     UInt32 remain = self.length * yas::offline_sample::sample_rate;
 
     auto start_result = _offline_engine->start_offline_render(
-        [remain, file_writer](yas::audio_pcm_buffer &buffer, const auto &when, bool &stop) mutable {
+        [remain, file_writer = std::move(file_writer)](yas::audio_pcm_buffer & buffer, const auto &when,
+                                                       bool &stop) mutable {
             auto format = yas::audio_format(buffer.format().stream_description());
             yas::audio_pcm_buffer pcm_buffer(format, buffer.audio_buffer_list());
             pcm_buffer.set_frame_length(buffer.frame_length());
@@ -310,7 +310,7 @@ namespace yas
             UInt32 frame_length = MIN(remain, pcm_buffer.frame_length());
             if (frame_length > 0) {
                 pcm_buffer.set_frame_length(frame_length);
-                auto write_result = file_writer->write_from_buffer(pcm_buffer);
+                auto write_result = file_writer.write_from_buffer(pcm_buffer);
                 if (!write_result) {
                     std::cout << __PRETTY_FUNCTION__ << " - error:" << yas::to_string(write_result.error())
                               << std::endl;
@@ -319,7 +319,7 @@ namespace yas
 
             remain -= frame_length;
             if (remain == 0) {
-                file_writer->close();
+                file_writer.close();
                 stop = YES;
             }
         },
