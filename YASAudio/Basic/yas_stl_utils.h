@@ -13,7 +13,7 @@
 namespace yas
 {
     template <typename T, typename U>
-    std::experimental::optional<T> min_empty_key(std::map<T, U> &map);
+    std::experimental::optional<T> min_empty_key(const std::map<T, U> &map);
 
     template <typename T, typename P>
     std::set<T> filter(const std::set<T> &source, P predicate);

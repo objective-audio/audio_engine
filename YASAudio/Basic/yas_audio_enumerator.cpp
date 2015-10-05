@@ -13,15 +13,11 @@ using namespace yas;
 #pragma mark - enumerator
 
 audio_enumerator::audio_enumerator(const flex_ptr &pointer, const UInt32 byte_stride, const UInt32 length)
-    : _pointer(pointer), _top_pointer(pointer)
+    : _pointer(pointer), _top_pointer(pointer), _byte_stride(byte_stride), _length(length), _index(0)
 {
     if (!pointer.v || byte_stride == 0 || length == 0) {
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : invalid argument.");
     }
-
-    _byte_stride = byte_stride;
-    _length = length;
-    _index = 0;
 }
 
 audio_enumerator::audio_enumerator(const audio_pcm_buffer &buffer, const UInt32 channel)
@@ -40,7 +36,7 @@ const UInt32 *audio_enumerator::index() const
     return &_index;
 }
 
-const UInt32 audio_enumerator::length() const
+UInt32 audio_enumerator::length() const
 {
     return _length;
 }
@@ -123,12 +119,12 @@ const UInt32 *audio_frame_enumerator::channel() const
     return &_channel;
 }
 
-const UInt32 audio_frame_enumerator::frame_length() const
+UInt32 audio_frame_enumerator::frame_length() const
 {
     return _frame_length;
 }
 
-const UInt32 audio_frame_enumerator::channel_count() const
+UInt32 audio_frame_enumerator::channel_count() const
 {
     return _channel_count;
 }

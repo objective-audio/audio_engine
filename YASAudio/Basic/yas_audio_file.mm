@@ -146,7 +146,7 @@ CFURLRef audio_file::url() const
     return _impl->url();
 }
 
-audio_format &audio_file::file_format() const
+const audio_format &audio_file::file_format() const
 {
     return _impl->file_format;
 }
@@ -159,7 +159,7 @@ void audio_file::set_processing_format(const audio_format &format)
     }
 }
 
-audio_format &audio_file::processing_format() const
+const audio_format &audio_file::processing_format() const
 {
     return _impl->processing_format;
 }

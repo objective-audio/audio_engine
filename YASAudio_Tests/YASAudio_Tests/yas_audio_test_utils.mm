@@ -119,12 +119,12 @@ bool test::is_equal(const Float64 val1, const Float64 val2, const Float64 accura
     return ((val1 - accuracy) <= val2 && val2 <= (val1 + accuracy));
 }
 
-bool test::is_equal_data(const void *inbuffer1, const void *inbuffer2, const size_t inSize)
+bool test::is_equal_data(const void *const inbuffer1, const void *const inbuffer2, const size_t inSize)
 {
     return memcmp(inbuffer1, inbuffer2, inSize) == 0;
 }
 
-bool test::is_equal(const AudioTimeStamp *ts1, const AudioTimeStamp *ts2)
+bool test::is_equal(const AudioTimeStamp *const ts1, const AudioTimeStamp *const ts2)
 {
     if (is_equal_data(ts1, ts2, sizeof(AudioTimeStamp))) {
         return true;

@@ -649,8 +649,8 @@
 				B69170E41B80A2DE00B02E29 /* yas_any.h */,
 				B60C4A371B823E45006F1B5E /* yas_any.cpp */,
 				B69170E91B80A94F00B02E29 /* yas_any_private.h */,
-				B61D52E21B9D234100A449C5 /* yas_audio_math.cpp */,
 				B61D52E31B9D234100A449C5 /* yas_audio_math.h */,
+				B61D52E21B9D234100A449C5 /* yas_audio_math.cpp */,
 				B69082271BBFD3F3008FD218 /* yas_flex_ptr.h */,
 				B69082261BBFD3F3008FD218 /* yas_flex_ptr.cpp */,
 			);
