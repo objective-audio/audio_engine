@@ -48,6 +48,21 @@ bool audio_device_stream::property_info::operator<(const audio_device_stream::pr
 
 #pragma mark - private
 
+class audio_device_stream::weak_stream
+{
+   public:
+    std::weak_ptr<audio_device_stream::impl> impl;
+
+    explicit weak_stream(const audio_device_stream &stream) : impl(stream._impl)
+    {
+    }
+
+    audio_device_stream lock() const
+    {
+        return audio_device_stream(impl.lock());
+    }
+};
+
 class audio_device_stream::impl
 {
    public:
@@ -55,17 +70,18 @@ class audio_device_stream::impl
     AudioDeviceID device_id;
     yas::subject subject;
 
-    impl() : stream_id(0), device_id(0), subject()
+    impl(const AudioStreamID stream_id, const AudioDeviceID device_id)
+        : stream_id(stream_id), device_id(device_id), subject()
     {
     }
 
-    ~impl() = default;
-
-    listener_f listener(std::weak_ptr<audio_device_stream> weak_stream)
+    listener_f listener(const audio_device_stream &stream)
     {
+        audio_device_stream::weak_stream weak_stream(stream);
+
         return [weak_stream](UInt32 address_count, const AudioObjectPropertyAddress *addresses) {
             if (auto stream = weak_stream.lock()) {
-                const AudioStreamID object_id = stream->stream_id();
+                const AudioStreamID object_id = stream.stream_id();
                 auto infos = std::make_shared<std::set<property_info> >();
                 for (UInt32 i = 0; i < address_count; i++) {
                     if (addresses[i].mSelector == kAudioStreamPropertyVirtualFormat) {
@@ -78,7 +94,7 @@ class audio_device_stream::impl
                             property_info(audio_device_stream::property::starting_channel, object_id, addresses[i]));
                     }
                 }
-                stream->subject().notify(audio_device_stream_method::stream_did_change, infos);
+                stream.subject().notify(audio_device_stream_method::stream_did_change, infos);
             }
         };
     }
@@ -99,24 +115,31 @@ class audio_device_stream::impl
 
 #pragma mark - main
 
-audio_device_stream_sptr audio_device_stream::create(const AudioStreamID stream_id, const AudioDeviceID device_id)
+audio_device_stream::audio_device_stream() : _impl(nullptr)
 {
-    auto stream = audio_device_stream_sptr(new audio_device_stream(stream_id, device_id));
-    auto function = stream->_impl->listener(stream);
-    stream->_impl->add_listener(kAudioStreamPropertyVirtualFormat, function);
-    stream->_impl->add_listener(kAudioStreamPropertyIsActive, function);
-    stream->_impl->add_listener(kAudioStreamPropertyStartingChannel, function);
-    return stream;
+}
+
+audio_device_stream::audio_device_stream(std::nullptr_t) : _impl(nullptr)
+{
 }
 
 audio_device_stream::audio_device_stream(const AudioStreamID stream_id, const AudioDeviceID device_id)
-    : _impl(std::make_unique<impl>())
+    : _impl(std::make_shared<impl>(stream_id, device_id))
 {
-    _impl->stream_id = stream_id;
-    _impl->device_id = device_id;
+    auto function = _impl->listener(*this);
+    _impl->add_listener(kAudioStreamPropertyVirtualFormat, function);
+    _impl->add_listener(kAudioStreamPropertyIsActive, function);
+    _impl->add_listener(kAudioStreamPropertyStartingChannel, function);
 }
 
-audio_device_stream::~audio_device_stream() = default;
+audio_device_stream::audio_device_stream(const std::shared_ptr<impl> &impl) : _impl(impl)
+{
+}
+
+audio_device_stream::operator bool() const
+{
+    return _impl != nullptr;
+}
 
 bool audio_device_stream::operator==(const audio_device_stream &stream)
 {

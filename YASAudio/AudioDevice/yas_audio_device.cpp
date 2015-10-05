@@ -192,8 +192,8 @@ class audio_device::impl
 {
    public:
     const AudioDeviceID audio_device_id;
-    std::map<AudioStreamID, audio_device_stream_sptr> input_streams_map;
-    std::map<AudioStreamID, audio_device_stream_sptr> output_streams_map;
+    std::map<AudioStreamID, audio_device_stream> input_streams_map;
+    std::map<AudioStreamID, audio_device_stream> output_streams_map;
     subject property_subject;
 
     impl(AudioDeviceID device_id)
@@ -290,7 +290,7 @@ class audio_device::impl
                 if (prev_streams.count(stream_id) > 0) {
                     new_streams[stream_id] = prev_streams.at(stream_id);
                 } else {
-                    new_streams[stream_id] = audio_device_stream::create(stream_id, audio_device_id);
+                    new_streams[stream_id] = audio_device_stream(stream_id, audio_device_id);
                 }
             }
         }
@@ -298,7 +298,7 @@ class audio_device::impl
 
     void update_format(const AudioObjectPropertyScope scope)
     {
-        audio_device_stream_sptr stream = nullptr;
+        audio_device_stream stream;
 
         if (scope == kAudioObjectPropertyScopeInput) {
             auto iterator = input_streams_map.begin();
@@ -318,7 +318,7 @@ class audio_device::impl
             return;
         }
 
-        auto stream_format = stream->virtual_format();
+        auto stream_format = stream.virtual_format();
 
         auto data = property_data<AudioBufferList>(audio_device_id, kAudioDevicePropertyStreamConfiguration, scope);
         if (data) {
@@ -490,18 +490,18 @@ CFStringRef audio_device::manufacture() const
     return property_string(audio_device_id(), kAudioObjectPropertyManufacturer);
 }
 
-std::vector<audio_device_stream_sptr> audio_device::input_streams() const
+std::vector<audio_device_stream> audio_device::input_streams() const
 {
-    std::vector<audio_device_stream_sptr> streams;
+    std::vector<audio_device_stream> streams;
     for (auto &pair : _impl->input_streams_map) {
         streams.push_back(pair.second);
     }
     return streams;
 }
 
-std::vector<audio_device_stream_sptr> audio_device::output_streams() const
+std::vector<audio_device_stream> audio_device::output_streams() const
 {
-    std::vector<audio_device_stream_sptr> streams;
+    std::vector<audio_device_stream> streams;
     for (auto &pair : _impl->output_streams_map) {
         streams.push_back(pair.second);
     }
