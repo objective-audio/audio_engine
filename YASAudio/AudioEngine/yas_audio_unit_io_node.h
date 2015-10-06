@@ -10,6 +10,10 @@
 
 namespace yas
 {
+#if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
+    class audio_device;
+#endif
+
     class audio_unit_io_node : public audio_unit_node
     {
        public:
@@ -18,8 +22,8 @@ namespace yas
         virtual ~audio_unit_io_node();
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
-        void set_device(const audio_device_sptr &device);
-        audio_device_sptr device() const;
+        void set_device(const audio_device &device);
+        audio_device device() const;
 #endif
 
         virtual bus_result_t next_available_output_bus() const override;

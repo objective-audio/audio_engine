@@ -33,7 +33,7 @@ class audio_device_io_node::impl
 
     ~impl() = default;
 
-    void set_device(const audio_device_sptr &device)
+    void set_device(const audio_device &device)
     {
         _device = device;
         if (device_io) {
@@ -41,26 +41,32 @@ class audio_device_io_node::impl
         }
     }
 
-    audio_device_sptr device() const
+    audio_device device() const
     {
         return _device;
     }
 
    private:
-    audio_device_sptr _device;
+    audio_device _device;
 };
 
 #pragma mark - main
 
-audio_device_io_node_sptr audio_device_io_node::create(const audio_device_sptr &device)
+audio_device_io_node_sptr audio_device_io_node::create()
+{
+    auto node = audio_device_io_node_sptr(new audio_device_io_node(nullptr));
+    node->_impl->weak_node = node;
+    return node;
+}
+
+audio_device_io_node_sptr audio_device_io_node::create(const audio_device &device)
 {
     auto node = audio_device_io_node_sptr(new audio_device_io_node(device));
     node->_impl->weak_node = node;
     return node;
 }
 
-audio_device_io_node::audio_device_io_node(const audio_device_sptr &device)
-    : audio_node(), _impl(std::make_unique<impl>())
+audio_device_io_node::audio_device_io_node(const audio_device &device) : audio_node(), _impl(std::make_unique<impl>())
 {
     if (device) {
         set_device(device);
@@ -81,12 +87,12 @@ UInt32 audio_device_io_node::output_bus_count() const
     return 1;
 }
 
-void audio_device_io_node::set_device(const audio_device_sptr &device)
+void audio_device_io_node::set_device(const audio_device &device)
 {
     _impl->set_device(device);
 }
 
-audio_device_sptr audio_device_io_node::device() const
+audio_device audio_device_io_node::device() const
 {
     return _impl->device();
 }
@@ -189,7 +195,7 @@ bool audio_device_io_node::_validate_connections() const
             if (connections.count(0) > 0) {
                 const auto &connection = connections.at(0);
                 const auto &connection_format = connection->format();
-                const auto &device_format = device_io->device()->output_format();
+                const auto &device_format = device_io->device().output_format();
                 if (connection_format != device_format) {
                     std::cout << __PRETTY_FUNCTION__ << " : output device io format is not match." << std::endl;
                     return false;
@@ -202,7 +208,7 @@ bool audio_device_io_node::_validate_connections() const
             if (connections.count(0) > 0) {
                 const auto &connection = connections.at(0);
                 const auto &connection_format = connection->format();
-                const auto &device_format = device_io->device()->input_format();
+                const auto &device_format = device_io->device().input_format();
                 if (connection_format != device_format) {
                     std::cout << __PRETTY_FUNCTION__ << " : input device io format is not match." << std::endl;
                     return false;

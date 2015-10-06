@@ -292,7 +292,7 @@ using sample_kernel_sptr = std::shared_ptr<sample_kernel_t>;
     NSMutableArray *titles = [NSMutableArray arrayWithCapacity:all_devices.size()];
 
     for (auto &device : all_devices) {
-        [titles addObject:(NSString *)device->name()];
+        [titles addObject:(NSString *)device.name()];
     }
 
     [titles addObject:@"None"];
@@ -308,10 +308,10 @@ using sample_kernel_sptr = std::shared_ptr<sample_kernel_t>;
     }
 }
 
-- (void)setDevice:(const yas::audio_device_sptr &)selected_device
+- (void)setDevice:(const yas::audio_device &)selected_device
 {
     if (auto prev_audio_device = _audio_device_io->device()) {
-        _audio_device_observer->remove_handler(prev_audio_device->property_subject(),
+        _audio_device_observer->remove_handler(prev_audio_device.property_subject(),
                                                yas::audio_device_method::device_did_change);
     }
 
@@ -321,12 +321,12 @@ using sample_kernel_sptr = std::shared_ptr<sample_kernel_t>;
         _audio_device_io->set_device(selected_device);
 
         _audio_device_observer->add_handler(
-            selected_device->property_subject(), yas::audio_device_method::device_did_change,
+            selected_device.property_subject(), yas::audio_device_method::device_did_change,
             [selected_device, weak_container = _self_container](const std::string &method, const yas::any &sender) {
                 const auto &infos = sender.get<yas::audio_device::property_infos_sptr>();
                 if (infos->size() > 0) {
                     auto &device_id = infos->at(0).object_id;
-                    if (selected_device->audio_device_id() == device_id) {
+                    if (selected_device.audio_device_id() == device_id) {
                         if (auto strong_container = weak_container->lock()) {
                             YASAudioDeviceSampleViewController *strongSelf = strong_container.object();
                             [strongSelf _updateDeviceInfo];
@@ -348,11 +348,11 @@ using sample_kernel_sptr = std::shared_ptr<sample_kernel_t>;
     NSColor *offColor = [NSColor lightGrayColor];
     if (device) {
         self.deviceInfo = [NSString
-            stringWithFormat:@"name = %@\nnominal samplerate = %@", device->name(), @(device->nominal_sample_rate())];
+            stringWithFormat:@"name = %@\nnominal samplerate = %@", device.name(), @(device.nominal_sample_rate())];
         ;
-        self.nominalSampleRate = device->nominal_sample_rate();
-        self.ioThroughTextColor = (device->input_format() && device->output_format()) ? onColor : offColor;
-        self.sineTextColor = device->output_format() ? onColor : offColor;
+        self.nominalSampleRate = device.nominal_sample_rate();
+        self.ioThroughTextColor = (device.input_format() && device.output_format()) ? onColor : offColor;
+        self.sineTextColor = device.output_format() ? onColor : offColor;
     } else {
         self.deviceInfo = nil;
         self.nominalSampleRate = 0;

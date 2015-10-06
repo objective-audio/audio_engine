@@ -23,6 +23,8 @@ namespace yas
         static const auto stream_did_change = "yas.audio_device_stream.stream_did_change";
     }
 
+    class audio_device;
+
     class audio_device_stream
     {
        public:
@@ -63,7 +65,7 @@ namespace yas
         bool operator!=(const audio_device_stream &);
 
         AudioStreamID stream_id() const;
-        audio_device_sptr device() const;
+        audio_device device() const;
         bool is_active() const;
         direction direction() const;
         audio_format virtual_format() const;

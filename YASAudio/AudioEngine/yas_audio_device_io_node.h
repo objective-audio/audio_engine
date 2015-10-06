@@ -14,23 +14,26 @@
 
 namespace yas
 {
+    class audio_device;
+
     class audio_device_io_node : public audio_node
     {
        public:
-        static audio_device_io_node_sptr create(const audio_device_sptr &device = nullptr);
+        static audio_device_io_node_sptr create();
+        static audio_device_io_node_sptr create(const audio_device &device);
 
         virtual ~audio_device_io_node();
 
         virtual UInt32 input_bus_count() const override;
         virtual UInt32 output_bus_count() const override;
 
-        void set_device(const audio_device_sptr &device);
-        audio_device_sptr device() const;
+        void set_device(const audio_device &device);
+        audio_device device() const;
 
         virtual void render(audio_pcm_buffer &buffer, const UInt32 bus_idx, const audio_time &when) override;
 
        protected:
-        audio_device_io_node(const audio_device_sptr &device);
+        audio_device_io_node(const audio_device &device);
 
         virtual void update_connections() override;
 

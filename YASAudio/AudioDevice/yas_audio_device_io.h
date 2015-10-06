@@ -22,12 +22,12 @@ namespace yas
         using render_f = std::function<void(audio_pcm_buffer &output_buffer, const audio_time &when)>;
 
         static audio_device_io_sptr create();
-        static audio_device_io_sptr create(const audio_device_sptr &audio_device);
+        static audio_device_io_sptr create(const audio_device &audio_device);
 
         ~audio_device_io();
 
-        void set_device(const audio_device_sptr device);
-        audio_device_sptr device() const;
+        void set_device(const audio_device device);
+        audio_device device() const;
         bool is_running() const;
         void set_render_callback(const render_f &callback);
         void set_maximum_frames_per_slice(const UInt32 frames);

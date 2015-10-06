@@ -96,7 +96,7 @@ Float64 audio_unit_io_node::device_sample_rate() const
     return [AVAudioSession sharedInstance].sampleRate;
 #elif TARGET_OS_MAC
     if (const auto &dev = device()) {
-        return dev->nominal_sample_rate();
+        return dev.nominal_sample_rate();
     }
     return 0;
 #endif
@@ -108,7 +108,7 @@ UInt32 audio_unit_io_node::output_device_channel_count() const
     return static_cast<UInt32>([AVAudioSession sharedInstance].outputNumberOfChannels);
 #elif TARGET_OS_MAC
     if (const auto &dev = device()) {
-        return dev->output_channel_count();
+        return dev.output_channel_count();
     }
     return 0;
 #endif
@@ -120,7 +120,7 @@ UInt32 audio_unit_io_node::input_device_channel_count() const
     return static_cast<UInt32>([AVAudioSession sharedInstance].inputNumberOfChannels);
 #elif TARGET_OS_MAC
     if (const auto &dev = device()) {
-        return dev->input_channel_count();
+        return dev.input_channel_count();
     }
     return 0;
 #endif
@@ -128,16 +128,16 @@ UInt32 audio_unit_io_node::input_device_channel_count() const
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
 
-void audio_unit_io_node::set_device(const audio_device_sptr &device)
+void audio_unit_io_node::set_device(const audio_device &device)
 {
     if (!device) {
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
     }
 
-    audio_unit()->set_current_device(device->audio_device_id());
+    audio_unit()->set_current_device(device.audio_device_id());
 }
 
-audio_device_sptr audio_unit_io_node::device() const
+audio_device audio_unit_io_node::device() const
 {
     return audio_device::device_for_id(audio_unit()->current_device());
 }

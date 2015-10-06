@@ -162,7 +162,7 @@ AudioStreamID audio_device_stream::stream_id() const
     return _impl->stream_id;
 }
 
-audio_device_sptr audio_device_stream::device() const
+audio_device audio_device_stream::device() const
 {
     return audio_device::device_for_id(_impl->device_id);
 }
