@@ -115,10 +115,6 @@ class audio_device_stream::impl
 
 #pragma mark - main
 
-audio_device_stream::audio_device_stream() : _impl(nullptr)
-{
-}
-
 audio_device_stream::audio_device_stream(std::nullptr_t) : _impl(nullptr)
 {
 }
@@ -141,14 +137,24 @@ audio_device_stream::operator bool() const
     return _impl != nullptr;
 }
 
-bool audio_device_stream::operator==(const audio_device_stream &stream)
+bool audio_device_stream::operator==(const audio_device_stream &other)
 {
-    return stream_id() == stream.stream_id();
+    if (_impl && other._impl) {
+        return stream_id() == other.stream_id();
+    } else if (!_impl && !other._impl) {
+        return true;
+    }
+    return false;
 }
 
-bool audio_device_stream::operator!=(const audio_device_stream &stream)
+bool audio_device_stream::operator!=(const audio_device_stream &other)
 {
-    return stream_id() != stream.stream_id();
+    if (_impl && other._impl) {
+        return stream_id() != other.stream_id();
+    } else if (!_impl && !other._impl) {
+        return false;
+    }
+    return true;
 }
 
 AudioStreamID audio_device_stream::stream_id() const
