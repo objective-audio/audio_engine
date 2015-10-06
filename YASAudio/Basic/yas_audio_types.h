@@ -109,12 +109,10 @@ namespace yas
     using audio_route_node_sptr = std::shared_ptr<audio_route_node>;
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
-    class audio_device_stream;
     class audio_device;
     class audio_device_io;
     class audio_device_io_node;
 
-    using audio_device_stream_sptr = std::shared_ptr<audio_device_stream>;
     using audio_device_sptr = std::shared_ptr<audio_device>;
     using audio_device_io_sptr = std::shared_ptr<audio_device_io>;
     using audio_device_io_node_sptr = std::shared_ptr<audio_device_io_node>;

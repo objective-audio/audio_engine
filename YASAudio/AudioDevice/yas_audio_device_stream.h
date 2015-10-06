@@ -47,9 +47,18 @@ namespace yas
 
         using property_infos_sptr = std::shared_ptr<std::set<property_info>>;
 
-        static audio_device_stream_sptr create(const AudioStreamID, const AudioDeviceID);
+        audio_device_stream();
+        explicit audio_device_stream(std::nullptr_t);
+        audio_device_stream(const AudioStreamID, const AudioDeviceID);
 
-        ~audio_device_stream();
+        ~audio_device_stream() = default;
+
+        audio_device_stream(const audio_device_stream &) = default;
+        audio_device_stream(audio_device_stream &&) = default;
+        audio_device_stream &operator=(const audio_device_stream &) = default;
+        audio_device_stream &operator=(audio_device_stream &&) = default;
+
+        explicit operator bool() const;
 
         bool operator==(const audio_device_stream &);
         bool operator!=(const audio_device_stream &);
@@ -65,14 +74,10 @@ namespace yas
 
        private:
         class impl;
-        std::unique_ptr<impl> _impl;
+        std::shared_ptr<impl> _impl;
+        class weak_stream;
 
-        audio_device_stream(const AudioStreamID, const AudioDeviceID);
-
-        audio_device_stream(const audio_device_stream &) = delete;
-        audio_device_stream(audio_device_stream &&) = delete;
-        audio_device_stream &operator=(const audio_device_stream &) = delete;
-        audio_device_stream &operator=(audio_device_stream &&) = delete;
+        explicit audio_device_stream(const std::shared_ptr<impl> &);
 
         template <typename T>
         std::unique_ptr<std::vector<T>> _property_data(const AudioStreamID stream_id,
