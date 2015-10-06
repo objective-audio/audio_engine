@@ -254,7 +254,7 @@ typedef NS_ENUM(NSUInteger, YASAudioDeviceRouteSampleInputType) {
     NSMutableArray *titles = [NSMutableArray arrayWithCapacity:all_devices.size()];
 
     for (auto &device : all_devices) {
-        [titles addObject:(__bridge NSString *)device->name()];
+        [titles addObject:(__bridge NSString *)device.name()];
     }
 
     [titles addObject:@"None"];
@@ -283,22 +283,22 @@ typedef NS_ENUM(NSUInteger, YASAudioDeviceRouteSampleInputType) {
         _route_node->clear_routes();
 
         if (const auto &device = _device_io_node->device()) {
-            if (device->output_channel_count() > 0) {
-                const auto output_format = device->output_format();
+            if (device.output_channel_count() > 0) {
+                const auto output_format = device.output_format();
                 _engine->connect(_route_node, _device_io_node, output_format);
                 _engine->connect(_tap_node, _route_node, 0, YASAudioDeviceRouteSampleSourceBusSine, output_format);
             }
 
-            if (device->input_channel_count() > 0) {
+            if (device.input_channel_count() > 0) {
                 _engine->connect(_device_io_node, _route_node, 0, YASAudioDeviceRouteSampleSourceBusInput,
-                                 device->input_format());
+                                 device.input_format());
             }
         }
     }
 
     if (auto const device = _device_io_node->device()) {
-        const UInt32 output_channel_count = device->output_channel_count();
-        const UInt32 input_channel_count = device->input_channel_count();
+        const UInt32 output_channel_count = device.output_channel_count();
+        const UInt32 input_channel_count = device.input_channel_count();
         NSMutableArray *outputRoutes = [NSMutableArray arrayWithCapacity:output_channel_count];
         NSMutableArray *inputRoutes = [NSMutableArray arrayWithCapacity:input_channel_count];
 
@@ -316,7 +316,7 @@ typedef NS_ENUM(NSUInteger, YASAudioDeviceRouteSampleInputType) {
 
         self.outputRoutes = outputRoutes;
         self.inputRoutes = inputRoutes;
-        self.nominalSampleRate = device->nominal_sample_rate();
+        self.nominalSampleRate = device.nominal_sample_rate();
 
         [self _updateInputSelection];
         [self _addObservers];
@@ -393,7 +393,7 @@ typedef NS_ENUM(NSUInteger, YASAudioDeviceRouteSampleInputType) {
     }
 }
 
-- (void)setDevice:(const yas::audio_device_sptr &)selected_device
+- (void)setDevice:(const yas::audio_device &)selected_device
 {
     _device_observer = nullptr;
 
@@ -408,12 +408,12 @@ typedef NS_ENUM(NSUInteger, YASAudioDeviceRouteSampleInputType) {
 
         _device_observer = yas::observer::create();
         _device_observer->add_handler(
-            selected_device->property_subject(), yas::audio_device_method::device_did_change,
+            selected_device.property_subject(), yas::audio_device_method::device_did_change,
             [selected_device, weak_container = _self_container](const std::string &method, const yas::any &sender) {
                 const auto &infos = sender.get<yas::audio_device::property_infos_sptr>();
                 if (infos->size() > 0) {
                     const auto &device_id = infos->at(0).object_id;
-                    if (selected_device->audio_device_id() == device_id) {
+                    if (selected_device.audio_device_id() == device_id) {
                         if (const auto strong_container = weak_container->lock()) {
                             YASAudioEngineDeviceIOSampleViewController *controller = strong_container.object();
                             [controller _updateConnection];

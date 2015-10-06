@@ -55,19 +55,28 @@ namespace yas
 
         using property_infos_sptr = std::shared_ptr<std::vector<property_info>>;
 
-        static std::vector<audio_device_sptr> all_devices();
-        static std::vector<audio_device_sptr> output_devices();
-        static std::vector<audio_device_sptr> input_devices();
-        static const audio_device_sptr default_system_output_device();
-        static const audio_device_sptr default_output_device();
-        static const audio_device_sptr default_input_device();
-        static const audio_device_sptr device_for_id(const AudioDeviceID);
-        static const std::experimental::optional<size_t> index_of_device(const audio_device_sptr &);
+        static std::vector<audio_device> all_devices();
+        static std::vector<audio_device> output_devices();
+        static std::vector<audio_device> input_devices();
+        static audio_device default_system_output_device();
+        static audio_device default_output_device();
+        static audio_device default_input_device();
+        static audio_device device_for_id(const AudioDeviceID);
+        static std::experimental::optional<size_t> index_of_device(const audio_device &);
 
-        ~audio_device();
+        audio_device(std::nullptr_t n = nullptr);
+
+        ~audio_device() = default;
+
+        audio_device(const audio_device &) = default;
+        audio_device(audio_device &&) = default;
+        audio_device &operator=(const audio_device &) = default;
+        audio_device &operator=(audio_device &&) = default;
 
         bool operator==(const audio_device &) const;
         bool operator!=(const audio_device &) const;
+
+        explicit operator bool() const;
 
         AudioDeviceID audio_device_id() const;
         CFStringRef name() const;
@@ -86,14 +95,9 @@ namespace yas
 
        private:
         class impl;
-        std::unique_ptr<impl> _impl;
+        std::shared_ptr<impl> _impl;
 
         explicit audio_device(const AudioDeviceID device_id);
-
-        audio_device(const audio_device &) = delete;
-        audio_device(audio_device &&) = delete;
-        audio_device &operator=(const audio_device &) = delete;
-        audio_device &operator=(audio_device &&) = delete;
 
         friend audio_device_global;
     };
