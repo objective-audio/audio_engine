@@ -48,7 +48,7 @@ class audio_device_io::impl
     AudioDeviceIOProcID io_proc_id;
     audio_pcm_buffer input_buffer_on_render;
     audio_time input_time_on_render;
-    observer_sptr observer;
+    observer observer;
 
     impl()
         : weak_device_io(),
@@ -57,7 +57,7 @@ class audio_device_io::impl
           io_proc_id(nullptr),
           input_buffer_on_render(nullptr),
           input_time_on_render(),
-          observer(observer::create()),
+          observer(),
           _render_callback(nullptr),
           _maximum_frames(4096),
           _kernel(nullptr),
@@ -138,7 +138,7 @@ audio_device_io_sptr audio_device_io::create(const audio_device &device)
 
     device_io->set_device(device);
 
-    device_io->_impl->observer->add_handler(
+    device_io->_impl->observer.add_handler(
         audio_device::system_subject(), audio_device_method::hardware_did_change,
         [weak_device_io](const auto &method, const auto &infos) {
             if (auto device_io = weak_device_io.lock()) {
@@ -157,7 +157,7 @@ audio_device_io::audio_device_io() : _impl(std::make_unique<impl>())
 
 audio_device_io::~audio_device_io()
 {
-    _impl->observer->remove_handler(audio_device::system_subject(), audio_device_method::hardware_did_change);
+    _impl->observer.remove_handler(audio_device::system_subject(), audio_device_method::hardware_did_change);
 
     _uninitialize();
 }
@@ -248,13 +248,13 @@ void audio_device_io::set_device(const audio_device device)
         _uninitialize();
 
         if (_impl->device) {
-            _impl->observer->remove_handler(_impl->device.property_subject(), audio_device_method::device_did_change);
+            _impl->observer.remove_handler(_impl->device.property_subject(), audio_device_method::device_did_change);
         }
 
         _impl->device = device;
 
         if (device) {
-            _impl->observer->add_handler(
+            _impl->observer.add_handler(
                 _impl->device.property_subject(), audio_device_method::device_did_change,
                 [weak_device_io = _impl->weak_device_io](const auto &method, const auto &infos) {
                     if (auto device_io = weak_device_io.lock()) {

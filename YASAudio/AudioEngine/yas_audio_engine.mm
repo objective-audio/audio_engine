@@ -29,14 +29,11 @@ class audio_engine::impl
     objc_strong_container route_change_observer;
     yas::subject subject;
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
-    observer_sptr device_observer;
+    observer device_observer;
 #endif
 
     impl() : reset_observer(), route_change_observer(), subject()
     {
-#if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
-        device_observer = observer::create();
-#endif
     }
 
     bool node_exists(const audio_node_sptr &node)
@@ -321,13 +318,13 @@ audio_engine_sptr audio_engine::create()
     engine->_impl->route_change_observer.set_object(route_change_observer);
 
 #elif TARGET_OS_MAC
-    engine->_impl->device_observer->add_handler(audio_device::system_subject(),
-                                                audio_device_method::configuration_change,
-                                                [weak_engine](const auto &method, const auto &infos) {
-                                                    if (auto engine = weak_engine.lock()) {
-                                                        engine->_post_configuration_change();
-                                                    }
-                                                });
+    engine->_impl->device_observer.add_handler(audio_device::system_subject(),
+                                               audio_device_method::configuration_change,
+                                               [weak_engine](const auto &method, const auto &infos) {
+                                                   if (auto engine = weak_engine.lock()) {
+                                                       engine->_post_configuration_change();
+                                                   }
+                                               });
 #endif
 
     return engine;

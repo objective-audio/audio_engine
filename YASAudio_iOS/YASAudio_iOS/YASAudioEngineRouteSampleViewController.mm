@@ -35,7 +35,7 @@ typedef NS_ENUM(NSUInteger, YASAudioEngineRouteSampleSourceIndex) {
     yas::audio_route_node_sptr _route_node;
     yas::audio_tap_node_sptr _sine_node;
 
-    yas::observer_sptr _engine_observer;
+    yas::observer _engine_observer;
 
     std::shared_ptr<yas::objc_weak_container> _self_container;
 }
@@ -250,8 +250,8 @@ typedef NS_ENUM(NSUInteger, YASAudioEngineRouteSampleSourceIndex) {
         _self_container = std::make_shared<yas::objc_weak_container>(self);
     }
 
-    _engine_observer = yas::observer::create();
-    _engine_observer->add_handler(
+    _engine_observer = yas::observer();
+    _engine_observer.add_handler(
         _engine->subject(), yas::audio_engine_method::configuration_change,
         [weak_container = _self_container](const auto &method, const auto &sender) {
             if (auto strong_self = weak_container->lock()) {

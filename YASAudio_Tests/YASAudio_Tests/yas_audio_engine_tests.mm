@@ -90,9 +90,9 @@
 
     XCTestExpectation *expectation = [self expectationWithDescription:@"configuration change"];
 
-    auto observer = yas::observer::create();
-    observer->add_wild_card_handler(engine->subject(),
-                                    [expectation](const auto &method, const auto &info) { [expectation fulfill]; });
+    yas::observer observer;
+    observer.add_wild_card_handler(engine->subject(),
+                                   [expectation](const auto &method, const auto &info) { [expectation fulfill]; });
 
 #if TARGET_OS_IPHONE
     [[NSNotificationCenter defaultCenter] postNotificationName:AVAudioSessionRouteChangeNotification object:nil];
