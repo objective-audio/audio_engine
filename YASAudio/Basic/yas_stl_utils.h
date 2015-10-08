@@ -23,6 +23,9 @@ namespace yas
 
     template <typename T, typename P>
     void erase(T &collection, P predicate);
+
+    template <typename T, typename F>
+    void enumerate(T &collection, F function);
 }
 
 #include "yas_stl_utils_private.h"

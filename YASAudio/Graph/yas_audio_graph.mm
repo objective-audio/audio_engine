@@ -276,12 +276,12 @@ void audio_graph::remove_all_units()
 {
     std::lock_guard<std::recursive_mutex> lock(_impl->mutex);
 
-    auto it = _impl->units.begin();
-    while (it != _impl->units.end()) {
+    enumerate(_impl->units, [this](const auto &it) {
         auto unit = it->second;
-        ++it;
+        auto next = std::next(it);
         remove_audio_unit(unit);
-    }
+        return next;
+    });
 }
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)

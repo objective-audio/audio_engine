@@ -73,4 +73,14 @@ namespace yas
             }
         }
     }
+
+    template <typename T, typename F>
+    void enumerate(T &collection, F function)
+    {
+        auto it = collection.begin();
+
+        while (it != collection.end()) {
+            it = function(it);
+        }
+    }
 }
