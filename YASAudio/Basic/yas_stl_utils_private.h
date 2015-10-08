@@ -59,4 +59,18 @@ namespace yas
 
         return unwrapped_map;
     }
+
+    template <typename T, typename P>
+    void erase(T &collection, P predicate)
+    {
+        auto it = collection.begin();
+
+        while (it != collection.end()) {
+            if (predicate(*it)) {
+                it = collection.erase(it);
+            } else {
+                ++it;
+            }
+        }
+    }
 }
