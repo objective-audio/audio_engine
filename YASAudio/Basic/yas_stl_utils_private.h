@@ -61,7 +61,7 @@ namespace yas
     }
 
     template <typename T, typename P>
-    void erase(T &collection, P predicate)
+    void erase_if(T &collection, P predicate)
     {
         auto it = collection.begin();
 

@@ -22,7 +22,7 @@ namespace yas
     std::map<K, std::shared_ptr<T>> lock_values(const std::map<K, std::weak_ptr<T>> &map);
 
     template <typename T, typename P>
-    void erase(T &collection, P predicate);
+    void erase_if(T &collection, P predicate);
 
     template <typename T, typename F>
     void enumerate(T &collection, F function);

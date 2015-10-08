@@ -35,16 +35,7 @@ class audio_route_node::impl
 
     void erase_route_if(std::function<bool(const audio_route &)> pred)
     {
-        auto it = routes.begin();
-        while (it != routes.end()) {
-            auto &route_of_set = *it;
-
-            if (pred(route_of_set)) {
-                it = routes.erase(it);
-            } else {
-                ++it;
-            }
-        }
+        erase_if(routes, pred);
     }
 };
 
