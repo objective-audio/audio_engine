@@ -20,6 +20,9 @@ namespace yas
 
     template <typename K, typename T>
     std::map<K, std::shared_ptr<T>> lock_values(const std::map<K, std::weak_ptr<T>> &map);
+
+    template <typename T, typename P>
+    void erase(T &collection, P predicate);
 }
 
 #include "yas_stl_utils_private.h"
