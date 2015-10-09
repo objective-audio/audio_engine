@@ -4,6 +4,7 @@
 //
 
 #include "yas_audio_unit_mixer_node.h"
+#include "yas_audio_unit.h"
 
 using namespace yas;
 
@@ -33,7 +34,7 @@ void audio_unit_mixer_node::update_connections()
         --last;
         if (auto unit = audio_unit()) {
             auto &pair = *last;
-            unit->set_element_count(pair.first + 1, kAudioUnitScope_Input);
+            unit.set_element_count(pair.first + 1, kAudioUnitScope_Input);
         }
     }
 

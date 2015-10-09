@@ -14,8 +14,8 @@
 
 @implementation YASAudioGraphSampleViewController {
     yas::audio_graph_sptr _graph;
-    yas::audio_unit_sptr _io_unit;
-    yas::audio_unit_sptr _mixer_unit;
+    yas::audio_unit _io_unit;
+    yas::audio_unit _mixer_unit;
 }
 
 - (void)dealloc
@@ -56,7 +56,7 @@
 - (IBAction)volumeSliderChanged:(UISlider *)sender
 {
     const AudioUnitParameterValue value = sender.value;
-    _mixer_unit->set_parameter_value(value, kMultiChannelMixerParam_Volume, kAudioUnitScope_Input, 0);
+    _mixer_unit.set_parameter_value(value, kMultiChannelMixerParam_Volume, kAudioUnitScope_Input, 0);
 }
 
 - (void)setupAudioGraph
@@ -68,42 +68,42 @@
     auto format = yas::audio_format(sample_rate, 2);
     _graph = yas::audio_graph::create();
 
-    _io_unit = yas::audio_unit::create(kAudioUnitType_Output, yas::audio_unit::sub_type_default_io());
-    _io_unit->set_enable_input(true);
-    _io_unit->set_enable_output(true);
-    _io_unit->set_maximum_frames_per_slice(4096);
+    _io_unit = yas::audio_unit(kAudioUnitType_Output, yas::audio_unit::sub_type_default_io());
+    _io_unit.set_enable_input(true);
+    _io_unit.set_enable_output(true);
+    _io_unit.set_maximum_frames_per_slice(4096);
 
     _graph->add_audio_unit(_io_unit);
 
-    _io_unit->attach_render_callback(0);
-    _io_unit->set_input_format(format.stream_description(), 0);
-    _io_unit->set_output_format(format.stream_description(), 1);
+    _io_unit.attach_render_callback(0);
+    _io_unit.set_input_format(format.stream_description(), 0);
+    _io_unit.set_output_format(format.stream_description(), 1);
 
-    _mixer_unit = yas::audio_unit::create(kAudioUnitType_Mixer, kAudioUnitSubType_MultiChannelMixer);
-    _mixer_unit->set_maximum_frames_per_slice(4096);
+    _mixer_unit = yas::audio_unit(kAudioUnitType_Mixer, kAudioUnitSubType_MultiChannelMixer);
+    _mixer_unit.set_maximum_frames_per_slice(4096);
 
     _graph->add_audio_unit(_mixer_unit);
 
-    _mixer_unit->attach_render_callback(0);
-    _mixer_unit->set_element_count(1, kAudioUnitScope_Input);
-    _mixer_unit->set_output_format(format.stream_description(), 0);
-    _mixer_unit->set_input_format(format.stream_description(), 0);
+    _mixer_unit.attach_render_callback(0);
+    _mixer_unit.set_element_count(1, kAudioUnitScope_Input);
+    _mixer_unit.set_output_format(format.stream_description(), 0);
+    _mixer_unit.set_input_format(format.stream_description(), 0);
 
-    std::weak_ptr<yas::audio_unit> weak_mixer_unit = _mixer_unit;
+    auto weak_mixer_unit = yas::audio_unit::weak(_mixer_unit);
 
-    _io_unit->set_render_callback([weak_mixer_unit](yas::render_parameters &render_parameters) {
+    _io_unit.set_render_callback([weak_mixer_unit](yas::render_parameters &render_parameters) {
         if (auto shared_mixer_unit = weak_mixer_unit.lock()) {
-            shared_mixer_unit->audio_unit_render(render_parameters);
+            shared_mixer_unit.audio_unit_render(render_parameters);
         }
     });
 
-    std::weak_ptr<yas::audio_unit> weak_io_unit = _io_unit;
+    auto weak_io_unit = yas::audio_unit::weak(_io_unit);
 
-    _mixer_unit->set_render_callback([weak_io_unit](yas::render_parameters &render_parameters) {
+    _mixer_unit.set_render_callback([weak_io_unit](yas::render_parameters &render_parameters) {
         if (auto shared_io_unit = weak_io_unit.lock()) {
             render_parameters.in_bus_number = 1;
             try {
-                shared_io_unit->audio_unit_render(render_parameters);
+                shared_io_unit.audio_unit_render(render_parameters);
             } catch (std::runtime_error e) {
                 std::cout << e.what() << std::endl;
             }

@@ -58,7 +58,7 @@
     XCTAssertThrows(mixer_node->set_input_volume(0.5f, default_element_count));
 
     const UInt32 element_count = default_element_count + 8;
-    XCTAssertNoThrow(mixer_node->audio_unit()->set_element_count(element_count, kAudioUnitScope_Input));
+    XCTAssertNoThrow(mixer_node->audio_unit().set_element_count(element_count, kAudioUnitScope_Input));
 
     XCTAssertGreaterThanOrEqual(mixer_node->input_element_count(), element_count);
     XCTAssertNoThrow(mixer_node->set_input_volume(0.5f, element_count - 1));
