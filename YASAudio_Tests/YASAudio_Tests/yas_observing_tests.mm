@@ -28,38 +28,40 @@
     const std::string key("key");
     const std::string key2("key2");
 
-    yas::subject subject;
-    auto observer = yas::observer::create();
-
     bool called = false;
+    yas::subject subject;
 
-    observer->add_handler(subject, key, [&called](const std::string &key, const yas::any &sender) {
-        if (key == "key" && sender.get<int>() == 100) {
-            called = true;
-        }
-    });
+    {
+        yas::observer observer;
 
-    subject.notify(key, sender);
+        observer.add_handler(subject, key, [&called](const std::string &key, const yas::any &sender) {
+            if (key == "key" && sender.get<int>() == 100) {
+                called = true;
+            }
+        });
 
-    XCTAssertTrue(called);
+        subject.notify(key, sender);
 
-    called = false;
+        XCTAssertTrue(called);
 
-    subject.notify(key2, sender);
+        called = false;
 
-    XCTAssertFalse(called);
+        subject.notify(key2, sender);
 
-    observer->remove_handler(subject, key);
-    subject.notify(key, sender);
+        XCTAssertFalse(called);
 
-    XCTAssertFalse(called);
+        observer.remove_handler(subject, key);
+        subject.notify(key, sender);
 
-    observer->add_handler(subject, key, [&called](const std::string &key, const yas::any &sender) {
-        if (key == "key" && sender.get<int>() == 100) {
-            called = true;
-        }
-    });
-    observer = nullptr;
+        XCTAssertFalse(called);
+
+        observer.add_handler(subject, key, [&called](const std::string &key, const yas::any &sender) {
+            if (key == "key" && sender.get<int>() == 100) {
+                called = true;
+            }
+        });
+    }
+
     subject.notify(key, sender);
 
     XCTAssertFalse(called);
@@ -74,17 +76,17 @@
     const std::string key3("key3");
 
     yas::subject subject;
-    auto observer = yas::observer::create();
+    yas::observer observer;
 
     bool called1 = false;
     bool called2 = false;
 
-    observer->add_handler(subject, key1, [&called1](const std::string &key, const yas::any &sender) {
+    observer.add_handler(subject, key1, [&called1](const std::string &key, const yas::any &sender) {
         if (key == "key1" && sender.get<int>() == 100) {
             called1 = true;
         }
     });
-    observer->add_handler(subject, key2, [&called2](const std::string &key, const yas::any &sender) {
+    observer.add_handler(subject, key2, [&called2](const std::string &key, const yas::any &sender) {
         if (key == "key2" && sender.get<int>() == 100) {
             called2 = true;
         }
@@ -119,18 +121,18 @@
     const std::string key("key");
 
     yas::subject subject;
-    auto observer1 = yas::observer::create();
-    auto observer2 = yas::observer::create();
+    yas::observer observer1;
+    yas::observer observer2;
 
     bool called1 = false;
     bool called2 = false;
 
-    observer1->add_handler(subject, key, [&called1](const std::string &key, const yas::any &sender) {
+    observer1.add_handler(subject, key, [&called1](const std::string &key, const yas::any &sender) {
         if (key == "key" && sender.get<int>() == 100) {
             called1 = true;
         }
     });
-    observer2->add_handler(subject, key, [&called2](const std::string &key, const yas::any &sender) {
+    observer2.add_handler(subject, key, [&called2](const std::string &key, const yas::any &sender) {
         if (key == "key" && sender.get<int>() == 100) {
             called2 = true;
         }
@@ -150,18 +152,18 @@
 
     yas::subject subject1;
     yas::subject subject2;
-    auto observer = yas::observer::create();
+    yas::observer observer;
 
     bool called1 = false;
     bool called2 = false;
 
-    observer->add_handler(subject1, key, [&called1](const std::string &key, const yas::any &sender) {
+    observer.add_handler(subject1, key, [&called1](const std::string &key, const yas::any &sender) {
         if (key == "key" && sender.get<int>() == 100) {
             called1 = true;
         }
     });
 
-    observer->add_handler(subject2, key, [&called2](const std::string &key, const yas::any &sender) {
+    observer.add_handler(subject2, key, [&called2](const std::string &key, const yas::any &sender) {
         if (key == "key" && sender.get<int>() == 100) {
             called2 = true;
         }
@@ -184,7 +186,7 @@
 - (void)testWildCard
 {
     yas::subject subject;
-    auto observer = yas::observer::create();
+    yas::observer observer;
 
     std::string key00 = "30";
     std::string key10 = "10";
@@ -197,14 +199,13 @@
     std::string receive_10 = "";
     std::string receive_20 = "";
 
-    observer->add_wild_card_handler(subject,
-                                    [&receive_10, &receive_20](const std::string &key, const yas::any &sender) {
-                                        if (key == "10") {
-                                            receive_10 = sender.get<std::string>();
-                                        } else if (key == "20") {
-                                            receive_20 = sender.get<std::string>();
-                                        }
-                                    });
+    observer.add_wild_card_handler(subject, [&receive_10, &receive_20](const std::string &key, const yas::any &sender) {
+        if (key == "10") {
+            receive_10 = sender.get<std::string>();
+        } else if (key == "20") {
+            receive_20 = sender.get<std::string>();
+        }
+    });
 
     subject.notify(key00, sender_00);
 
@@ -231,7 +232,7 @@
         yas::subject property1;
         yas::subject property2;
 
-        yas::observer_sptr dispatcher;
+        yas::observer dispatcher;
         yas::subject properties_subject;
 
         test_class() : dispatcher(yas::make_subject_dispatcher(properties_subject, {&property1, &property2}))
@@ -248,21 +249,78 @@
     std::string value1 = "";
     std::string value2 = "";
 
-    auto observer = yas::observer::create();
-    observer->add_wild_card_handler(test_object.properties_subject,
-                                    [&value1, &value2](const std::string &method, const yas::any &sender) {
-                                        if (method == property_method1) {
-                                            value1 = sender.get<std::string>();
-                                        } else if (method == property_method2) {
-                                            value2 = sender.get<std::string>();
-                                        }
-                                    });
+    yas::observer observer;
+    observer.add_wild_card_handler(test_object.properties_subject,
+                                   [&value1, &value2](const std::string &method, const yas::any &sender) {
+                                       if (method == property_method1) {
+                                           value1 = sender.get<std::string>();
+                                       } else if (method == property_method2) {
+                                           value2 = sender.get<std::string>();
+                                       }
+                                   });
 
     test_object.property1.notify(property_method1, std::string("property1"));
     test_object.property2.notify(property_method2, std::string("property2"));
 
     XCTAssertEqual(value1, "property1");
     XCTAssertEqual(value2, "property2");
+}
+
+- (void)test_clear_observer
+{
+    int sender = 100;
+
+    const std::string key("key");
+
+    bool called = false;
+
+    yas::subject subject;
+    yas::observer observer;
+
+    observer.add_handler(subject, key, [&called](const std::string &key, const yas::any &sender) {
+        if (key == "key" && sender.get<int>() == 100) {
+            called = true;
+        }
+    });
+
+    subject.notify(key, sender);
+
+    XCTAssertTrue(called);
+
+    called = false;
+
+    observer.clear();
+
+    subject.notify(key, sender);
+
+    XCTAssertFalse(called);
+}
+
+- (void)test_remove_subject
+{
+    int sender = 100;
+
+    const std::string key("key");
+
+    bool called = false;
+
+    yas::observer observer;
+
+    {
+        yas::subject subject;
+
+        observer.add_handler(subject, key, [&called](const std::string &key, const yas::any &sender) {
+            if (key == "key" && sender.get<int>() == 100) {
+                called = true;
+            }
+        });
+
+        subject.notify(key, sender);
+
+        XCTAssertTrue(called);
+    }
+
+    observer.clear();
 }
 
 @end

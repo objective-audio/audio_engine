@@ -142,7 +142,7 @@ using sample_kernel_sptr = std::shared_ptr<sample_kernel_t>;
 @implementation YASAudioDeviceSampleViewController {
     yas::audio_graph_sptr _audio_graph;
     yas::audio_device_io_sptr _audio_device_io;
-    yas::observer_sptr _audio_device_observer;
+    yas::observer _audio_device_observer;
     sample_kernel_sptr _kernel;
     std::shared_ptr<yas::objc_weak_container> _self_container;
 }
@@ -179,8 +179,8 @@ using sample_kernel_sptr = std::shared_ptr<sample_kernel_t>;
     self.sineVolume = _kernel->sine_volume();
     self.sineFrequency = _kernel->sine_frequency();
 
-    _audio_device_observer = yas::observer::create();
-    _audio_device_observer->add_handler(
+    _audio_device_observer.clear();
+    _audio_device_observer.add_handler(
         yas::audio_device::system_subject(), yas::audio_device_method::hardware_did_change,
         [weak_container = _self_container](const auto &, const auto &) {
             if (auto strong_container = weak_container->lock()) {
@@ -209,7 +209,7 @@ using sample_kernel_sptr = std::shared_ptr<sample_kernel_t>;
 {
     _audio_graph = nullptr;
     _audio_device_io = nullptr;
-    _audio_device_observer = nullptr;
+    _audio_device_observer.clear();
     _kernel = nullptr;
 }
 
@@ -311,8 +311,8 @@ using sample_kernel_sptr = std::shared_ptr<sample_kernel_t>;
 - (void)setDevice:(const yas::audio_device &)selected_device
 {
     if (auto prev_audio_device = _audio_device_io->device()) {
-        _audio_device_observer->remove_handler(prev_audio_device.property_subject(),
-                                               yas::audio_device_method::device_did_change);
+        _audio_device_observer.remove_handler(prev_audio_device.property_subject(),
+                                              yas::audio_device_method::device_did_change);
     }
 
     auto all_devices = yas::audio_device::all_devices();
@@ -320,7 +320,7 @@ using sample_kernel_sptr = std::shared_ptr<sample_kernel_t>;
     if (selected_device && std::find(all_devices.begin(), all_devices.end(), selected_device) != all_devices.end()) {
         _audio_device_io->set_device(selected_device);
 
-        _audio_device_observer->add_handler(
+        _audio_device_observer.add_handler(
             selected_device.property_subject(), yas::audio_device_method::device_did_change,
             [selected_device, weak_container = _self_container](const std::string &method, const yas::any &sender) {
                 const auto &infos = sender.get<yas::audio_device::property_infos_sptr>();
