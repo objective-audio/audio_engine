@@ -23,15 +23,16 @@
 
 - (void)testRunning
 {
-    auto audio_graph = yas::audio_graph::create();
+    yas::audio_graph graph;
 
-    audio_graph->start();
+    graph.prepare();
+    graph.start();
 
-    XCTAssertTrue(audio_graph->is_running());
+    XCTAssertTrue(graph.is_running());
 
-    audio_graph->stop();
+    graph.stop();
 
-    XCTAssertFalse(audio_graph->is_running());
+    XCTAssertFalse(graph.is_running());
 }
 
 - (void)testIORendering
@@ -45,10 +46,12 @@
     auto output_format = yas::audio_format(output_sample_rate, channels);
     auto mixer_format = yas::audio_format(mixer_sample_rate, channels);
 
-    const auto audio_graph = yas::audio_graph::create();
+    yas::audio_graph graph;
+    graph.prepare();
+
     yas::audio_unit io_unit(kAudioUnitType_Output, kAudioUnitSubType_GenericOutput);
     io_unit.set_maximum_frames_per_slice(maximum_frame_length);
-    audio_graph->add_audio_unit(io_unit);
+    graph.add_audio_unit(io_unit);
 
     io_unit.attach_render_callback(0);
 
@@ -56,7 +59,7 @@
 
     yas::audio_unit mixer_unit(kAudioUnitType_Mixer, kAudioUnitSubType_MultiChannelMixer);
     mixer_unit.set_maximum_frames_per_slice(maximum_frame_length);
-    audio_graph->add_audio_unit(mixer_unit);
+    graph.add_audio_unit(mixer_unit);
 
     mixer_unit.set_output_format(mixer_format.stream_description(), 0);
 

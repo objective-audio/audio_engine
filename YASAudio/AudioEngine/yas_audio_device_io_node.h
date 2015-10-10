@@ -43,7 +43,7 @@ namespace yas
 
         using super_class = audio_node;
 
-        void _add_device_io_to_graph(const audio_graph_sptr &graph);
+        void _add_device_io_to_graph(audio_graph &graph);
         void _remove_device_io_from_graph();
         bool _validate_connections() const;
 

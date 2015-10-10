@@ -19,8 +19,21 @@ namespace yas
     class audio_graph
     {
        public:
-        static audio_graph_sptr create();
-        ~audio_graph();
+        audio_graph(std::nullptr_t n = nullptr);
+
+        ~audio_graph() = default;
+
+        audio_graph(const audio_graph &) = default;
+        audio_graph(audio_graph &&) = default;
+        audio_graph &operator=(const audio_graph &) = default;
+        audio_graph &operator=(audio_graph &&) = default;
+
+        bool operator==(const audio_graph &) const;
+        bool operator!=(const audio_graph &) const;
+
+        explicit operator bool() const;
+
+        void prepare();
 
         void add_audio_unit(audio_unit &audio_unit);
         void remove_audio_unit(audio_unit &audio_unit);
@@ -40,13 +53,22 @@ namespace yas
 
        private:
         class impl;
-        std::unique_ptr<impl> _impl;
+        std::shared_ptr<impl> _impl;
 
         explicit audio_graph(const UInt8 key);
+        explicit audio_graph(const std::shared_ptr<audio_graph::impl> &);
 
-        audio_graph(const audio_graph &) = delete;
-        audio_graph(const audio_graph &&) = delete;
-        audio_graph &operator=(const audio_graph &) = delete;
-        audio_graph &operator=(const audio_graph &&) = delete;
+       public:
+        class weak
+        {
+           public:
+            weak();
+            explicit weak(const audio_graph &unit);
+            audio_graph lock() const;
+            void reset();
+
+           private:
+            std::weak_ptr<audio_graph::impl> _impl;
+        };
     };
 }

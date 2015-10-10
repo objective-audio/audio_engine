@@ -23,7 +23,7 @@ class audio_device_io_node::impl
 {
    public:
     std::weak_ptr<audio_device_io_node> weak_node;
-    audio_graph_wptr graph;
+    audio_graph::weak graph;
     audio_device_io_sptr device_io;
     audio_node_core_sptr node_core_on_render;
 
@@ -160,7 +160,7 @@ void audio_device_io_node::update_connections()
 
 #pragma mark - private
 
-void audio_device_io_node::_add_device_io_to_graph(const audio_graph_sptr &graph)
+void audio_device_io_node::_add_device_io_to_graph(audio_graph &graph)
 {
     if (!graph) {
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
@@ -170,16 +170,16 @@ void audio_device_io_node::_add_device_io_to_graph(const audio_graph_sptr &graph
         return;
     }
 
-    _impl->graph = graph;
+    _impl->graph = audio_graph::weak(graph);
     _impl->device_io = yas::audio_device_io::create(_impl->device());
-    graph->add_audio_device_io(_impl->device_io);
+    graph.add_audio_device_io(_impl->device_io);
 }
 
 void audio_device_io_node::_remove_device_io_from_graph()
 {
     if (auto graph = _impl->graph.lock()) {
         if (_impl->device_io) {
-            graph->remove_audio_device_io(_impl->device_io);
+            graph.remove_audio_device_io(_impl->device_io);
         }
     }
 

@@ -93,7 +93,7 @@ class audio_engine::impl
             return true;
         }
 
-        _graph = yas::audio_graph::create();
+        _graph.prepare();
 
         for (auto &node : _nodes) {
             add_node_to_graph(node);
@@ -251,12 +251,12 @@ class audio_engine::impl
                       [node](const audio_connection_sptr &connection) { return connection->source_node() == node; });
     }
 
-    void set_graph(const audio_graph_sptr &graph)
+    void set_graph(const audio_graph &graph)
     {
         _graph = graph;
     }
 
-    audio_graph_sptr graph()
+    audio_graph graph()
     {
         return _graph;
     }
@@ -277,7 +277,7 @@ class audio_engine::impl
     }
 
    private:
-    audio_graph_sptr _graph;
+    audio_graph _graph;
     std::set<audio_node_sptr> _nodes;
     std::set<audio_connection_sptr> _connections;
     audio_node_sptr _offline_output_node;
@@ -472,7 +472,7 @@ void audio_engine::disconnect_output(const audio_node_sptr &node, const UInt32 b
 audio_engine::start_result_t audio_engine::start_render()
 {
     if (const auto graph = _impl->graph()) {
-        if (graph->is_running()) {
+        if (graph.is_running()) {
             return start_result_t(start_error_t::already_running);
         }
     }
@@ -487,7 +487,7 @@ audio_engine::start_result_t audio_engine::start_render()
         return start_result_t(start_error_t::prepare_failure);
     }
 
-    _impl->graph()->start();
+    _impl->graph().start();
 
     return start_result_t(nullptr);
 }
@@ -496,7 +496,7 @@ audio_engine::start_result_t audio_engine::start_offline_render(const offline_re
                                                                 const offline_completion_f &completion_function)
 {
     if (const auto graph = _impl->graph()) {
-        if (graph->is_running()) {
+        if (graph.is_running()) {
             return start_result_t(start_error_t::already_running);
         }
     }
@@ -530,7 +530,7 @@ audio_engine::start_result_t audio_engine::start_offline_render(const offline_re
 void audio_engine::stop()
 {
     if (auto graph = _impl->graph()) {
-        graph->stop();
+        graph.stop();
     }
 
     if (auto offline_output_node = _impl->offline_output_node()) {
@@ -546,9 +546,9 @@ subject &audio_engine::subject() const
 void audio_engine::_reload_graph()
 {
     if (auto prev_graph = _impl->graph()) {
-        const bool prev_runnging = prev_graph->is_running();
+        const bool prev_runnging = prev_graph.is_running();
 
-        prev_graph->stop();
+        prev_graph.stop();
 
         auto &nodes = _impl->nodes();
         for (auto &node : nodes) {
@@ -562,7 +562,7 @@ void audio_engine::_reload_graph()
         }
 
         if (prev_runnging) {
-            _impl->graph()->start();
+            _impl->graph().start();
         }
     }
 }
