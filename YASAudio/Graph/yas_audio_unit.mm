@@ -28,14 +28,13 @@ class audio_unit::impl
    public:
     AudioComponentDescription acd;
     AudioUnit au_instance;
-    bool initialized;
     std::experimental::optional<UInt8> graph_key;
     std::experimental::optional<UInt16> key;
 
     impl()
         : acd(),
           au_instance(nullptr),
-          initialized(false),
+          _initialized(false),
           graph_key(),
           key(),
           _render_callback(nullptr),
@@ -44,13 +43,19 @@ class audio_unit::impl
           _name(),
           _mutex(){};
 
-    void set_audio_unit(const AudioUnit au)
+    ~impl()
+    {
+        uninitialize();
+        dispose_audio_unit();
+    }
+
+    void set_audio_unit_instance(const AudioUnit au)
     {
         std::lock_guard<std::recursive_mutex> lock(_mutex);
         au_instance = au;
     }
 
-    const AudioUnit audio_unit()
+    const AudioUnit audio_unit_instance()
     {
         std::lock_guard<std::recursive_mutex> lock(_mutex);
         return au_instance;
@@ -116,7 +121,7 @@ class audio_unit::impl
 
         AudioUnit au = nullptr;
         yas_raise_if_au_error(AudioComponentInstanceNew(component, &au));
-        set_audio_unit(au);
+        set_audio_unit_instance(au);
     }
 
     void dispose_audio_unit()
@@ -126,14 +131,52 @@ class audio_unit::impl
         }
 
         AudioUnit au = au_instance;
-        set_audio_unit(nullptr);
+        set_audio_unit_instance(nullptr);
 
         yas_raise_if_au_error(AudioComponentInstanceDispose(au));
 
         _name.clear();
     }
 
+    void initialize()
+    {
+        if (_initialized) {
+            return;
+        }
+
+        if (!au_instance) {
+            yas_raise_with_reason(std::string(__PRETTY_FUNCTION__) + " - AudioUnit is null.");
+            return;
+        }
+
+        yas_raise_if_au_error(AudioUnitInitialize(au_instance));
+
+        _initialized = true;
+    }
+
+    void uninitialize()
+    {
+        if (!_initialized) {
+            return;
+        }
+
+        if (!au_instance) {
+            yas_raise_with_reason(std::string(__PRETTY_FUNCTION__) + " - AudioUnit is null.");
+            return;
+        }
+
+        yas_raise_if_au_error(AudioUnitUninitialize(au_instance));
+
+        _initialized = false;
+    }
+
+    bool is_initialized() const
+    {
+        return _initialized;
+    }
+
    private:
+    bool _initialized;
     render_f _render_callback;
     render_f _notify_callback;
     render_f _input_callback;
@@ -141,6 +184,15 @@ class audio_unit::impl
 
     mutable std::recursive_mutex _mutex;
 };
+
+audio_unit::weak::weak(const audio_unit &unit) : _impl(unit._impl)
+{
+}
+
+audio_unit audio_unit::weak::lock() const
+{
+    return audio_unit(_impl.lock());
+}
 
 static OSStatus CommonRenderCallback(void *inRefCon, AudioUnitRenderActionFlags *ioActionFlags,
                                      const AudioTimeStamp *inTimeStamp, UInt32 inBusNumber, UInt32 inNumberFrames,
@@ -204,17 +256,11 @@ static OSStatus InputRenderCallback(void *inRefCon, AudioUnitRenderActionFlags *
 
 #pragma mark -
 
-audio_unit_sptr audio_unit::create(const AudioComponentDescription &acd)
+audio_unit::audio_unit(std::nullptr_t) : _impl(nullptr)
 {
-    return audio_unit_sptr(new audio_unit(acd));
 }
 
-audio_unit_sptr audio_unit::create(const OSType &type, const OSType &subType)
-{
-    return audio_unit_sptr(new audio_unit(type, subType));
-}
-
-audio_unit::audio_unit(const AudioComponentDescription &acd) : _impl(std::make_unique<impl>())
+audio_unit::audio_unit(const AudioComponentDescription &acd) : _impl(std::make_shared<impl>())
 {
     _impl->create_audio_unit(acd);
 }
@@ -230,10 +276,31 @@ audio_unit::audio_unit(const OSType &type, const OSType &sub_type)
 {
 }
 
-audio_unit::~audio_unit()
+audio_unit::audio_unit(const std::shared_ptr<impl> &impl) : _impl(impl)
 {
-    _uninitialize();
-    _impl->dispose_audio_unit();
+}
+
+bool audio_unit::operator==(const yas::audio_unit &other) const
+{
+    return _impl && other._impl && _impl == other._impl;
+}
+
+bool audio_unit::operator!=(const yas::audio_unit &other) const
+{
+    return !_impl || !other._impl || _impl != other._impl;
+}
+
+bool audio_unit::operator<(const yas::audio_unit &other) const
+{
+    if (_impl && other._impl) {
+        return _impl < other._impl;
+    }
+    return false;
+}
+
+audio_unit::operator bool() const
+{
+    return _impl != nullptr;
 }
 
 #pragma mark - accessor
@@ -415,7 +482,7 @@ UInt32 audio_unit::maximum_frames_per_slice() const
 
 bool audio_unit::is_initialized()
 {
-    return _impl->initialized;
+    return _impl->is_initialized();
 }
 
 void audio_unit::set_element_count(const UInt32 &count, const AudioUnitScope &scope)
@@ -499,7 +566,7 @@ void audio_unit::set_enable_output(const bool enable_output)
         return;
     }
 
-    if (_impl->initialized) {
+    if (_impl->is_initialized()) {
         yas_raise_with_reason(std::string(__PRETTY_FUNCTION__) + " - AudioUnit is initialized.");
         return;
     }
@@ -528,7 +595,7 @@ void audio_unit::set_enable_input(const bool enable_input)
         return;
     }
 
-    if (_impl->initialized) {
+    if (_impl->is_initialized()) {
         yas_raise_with_reason(std::string(__PRETTY_FUNCTION__) + " - AudioUnit is initialized.");
         return;
     }
@@ -693,7 +760,7 @@ void audio_unit::audio_unit_render(yas::render_parameters &render_parameters)
 {
     yas_raise_if_main_thread;
 
-    AudioUnit au = _impl->audio_unit();
+    AudioUnit au = _impl->audio_unit_instance();
     if (au) {
         yas_raise_if_au_error(AudioUnitRender(au, render_parameters.io_action_flags, render_parameters.io_time_stamp,
                                               render_parameters.in_bus_number, render_parameters.in_number_frames,
@@ -705,34 +772,12 @@ void audio_unit::audio_unit_render(yas::render_parameters &render_parameters)
 
 void audio_unit::_initialize()
 {
-    if (_impl->initialized) {
-        return;
-    }
-
-    if (!_impl->au_instance) {
-        yas_raise_with_reason(std::string(__PRETTY_FUNCTION__) + " - AudioUnit is null.");
-        return;
-    }
-
-    yas_raise_if_au_error(AudioUnitInitialize(_impl->au_instance));
-
-    _impl->initialized = true;
+    _impl->initialize();
 }
 
 void audio_unit::_uninitialize()
 {
-    if (!_impl->initialized) {
-        return;
-    }
-
-    if (!_impl->au_instance) {
-        yas_raise_with_reason(std::string(__PRETTY_FUNCTION__) + " - AudioUnit is null.");
-        return;
-    }
-
-    yas_raise_if_au_error(AudioUnitUninitialize(_impl->au_instance));
-
-    _impl->initialized = false;
+    _impl->uninitialize();
 }
 
 void audio_unit::_set_graph_key(const std::experimental::optional<UInt8> &key)

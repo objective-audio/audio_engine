@@ -40,8 +40,8 @@ class audio_graph::impl
    public:
     bool running;
     mutable std::recursive_mutex mutex;
-    std::map<UInt16, audio_unit_sptr> units;
-    std::set<audio_unit_sptr> io_units;
+    std::map<UInt16, audio_unit> units;
+    std::map<UInt16, audio_unit> io_units;
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
     std::set<audio_device_io_sptr> device_ios;
 #endif
@@ -155,13 +155,13 @@ class audio_graph::impl
         return min_empty_key(units);
     }
 
-    std::shared_ptr<audio_unit> unit_for_key(const UInt16 key) const
+    audio_unit unit_for_key(const UInt16 key) const
     {
         std::lock_guard<std::recursive_mutex> lock(mutex);
         return units.at(key);
     }
 
-    void add_unit_to_units(const std::shared_ptr<audio_unit> &unit)
+    void add_unit_to_units(audio_unit &unit)
     {
         if (!unit) {
             throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
@@ -177,20 +177,21 @@ class audio_graph::impl
         if (unit_key) {
             audio_unit::private_access::set_graph_key(unit, key());
             audio_unit::private_access::set_key(unit, *unit_key);
-            units.insert(std::make_pair(*unit_key, unit));
-            if (unit->is_output_unit()) {
-                io_units.insert(unit);
+            auto pair = std::make_pair(*unit_key, unit);
+            units.insert(pair);
+            if (unit.is_output_unit()) {
+                io_units.insert(pair);
             }
         }
     }
 
-    void remove_unit_from_units(const std::shared_ptr<audio_unit> &unit)
+    void remove_unit_from_units(audio_unit &unit)
     {
         std::lock_guard<std::recursive_mutex> lock(mutex);
 
         if (auto key = audio_unit::private_access::key(unit)) {
             units.erase(*key);
-            io_units.erase(unit);
+            io_units.erase(*key);
             audio_unit::private_access::set_key(unit, nullopt);
             audio_unit::private_access::set_graph_key(unit, nullopt);
         }
@@ -202,8 +203,9 @@ class audio_graph::impl
         setup_notifications();
 #endif
 
-        for (const auto &audio_unit : io_units) {
-            audio_unit->start();
+        for (auto &pair : io_units) {
+            auto &audio_unit = pair.second;
+            audio_unit.start();
         }
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
         for (const auto &device_io : device_ios) {
@@ -214,8 +216,9 @@ class audio_graph::impl
 
     void stop_all_ios()
     {
-        for (const auto &audio_unit : io_units) {
-            audio_unit->stop();
+        for (auto &pair : io_units) {
+            auto &audio_unit = pair.second;
+            audio_unit.stop();
         }
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
         for (const auto &device_io : device_ios) {
@@ -246,7 +249,7 @@ audio_graph::~audio_graph()
     remove_all_units();
 }
 
-void audio_graph::add_audio_unit(const audio_unit_sptr &unit)
+void audio_graph::add_audio_unit(audio_unit &unit)
 {
     if (audio_unit::private_access::key(unit)) {
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : audio_unit.key is assigned.");
@@ -256,12 +259,12 @@ void audio_graph::add_audio_unit(const audio_unit_sptr &unit)
 
     audio_unit::private_access::initialize(unit);
 
-    if (unit->is_output_unit() && is_running() && !_impl->is_interrupting()) {
-        unit->start();
+    if (unit.is_output_unit() && is_running() && !_impl->is_interrupting()) {
+        unit.start();
     }
 }
 
-void audio_graph::remove_audio_unit(const audio_unit_sptr &unit)
+void audio_graph::remove_audio_unit(audio_unit &unit)
 {
     if (!audio_unit::private_access::key(unit)) {
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : audio_unit.key is not assigned.");
@@ -337,7 +340,7 @@ void audio_graph::audio_unit_render(render_parameters &render_parameters)
     if (graph) {
         auto unit = graph->_impl->unit_for_key(render_parameters.render_id.unit);
         if (unit) {
-            unit->callback_render(render_parameters);
+            unit.callback_render(render_parameters);
         }
     }
 }

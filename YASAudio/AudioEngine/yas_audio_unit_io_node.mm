@@ -5,6 +5,7 @@
 
 #include "yas_audio_unit_io_node.h"
 #include "yas_audio_tap_node.h"
+#include "yas_audio_unit.h"
 #include "yas_audio_time.h"
 
 #if TARGET_OS_IPHONE
@@ -55,8 +56,8 @@ void audio_unit_io_node::set_channel_map(const channel_map_t &map, const yas::di
 {
     _impl->channel_map[yas::to_uint32(dir)] = map;
 
-    if (const auto unit = audio_unit()) {
-        unit->set_channel_map(map, kAudioUnitScope_Output, yas::to_uint32(dir));
+    if (auto unit = audio_unit()) {
+        unit.set_channel_map(map, kAudioUnitScope_Output, yas::to_uint32(dir));
     }
 }
 
@@ -68,9 +69,9 @@ const channel_map_t &audio_unit_io_node::channel_map(const yas::direction dir) c
 void audio_unit_io_node::prepare_audio_unit()
 {
     auto unit = audio_unit();
-    unit->set_enable_output(true);
-    unit->set_enable_input(true);
-    unit->set_maximum_frames_per_slice(4096);
+    unit.set_enable_output(true);
+    unit.set_enable_input(true);
+    unit.set_maximum_frames_per_slice(4096);
 }
 
 bus_result_t audio_unit_io_node::next_available_output_bus() const
@@ -134,12 +135,12 @@ void audio_unit_io_node::set_device(const audio_device &device)
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
     }
 
-    audio_unit()->set_current_device(device.audio_device_id());
+    audio_unit().set_current_device(device.audio_device_id());
 }
 
 audio_device audio_unit_io_node::device() const
 {
-    return audio_device::device_for_id(audio_unit()->current_device());
+    return audio_device::device_for_id(audio_unit().current_device());
 }
 
 #endif
@@ -174,8 +175,8 @@ void audio_unit_io_node::update_connections()
     auto &input_map = _impl->channel_map[input_idx];
     update_channel_map(input_map, output_format(input_idx), input_device_channel_count());
 
-    unit->set_channel_map(output_map, kAudioUnitScope_Output, output_idx);
-    unit->set_channel_map(input_map, kAudioUnitScope_Output, input_idx);
+    unit.set_channel_map(output_map, kAudioUnitScope_Output, output_idx);
+    unit.set_channel_map(input_map, kAudioUnitScope_Output, input_idx);
 }
 
 #pragma mark - audio_unit_output_node
@@ -190,9 +191,9 @@ audio_unit_output_node_sptr audio_unit_output_node::create()
 void audio_unit_output_node::prepare_audio_unit()
 {
     auto unit = audio_unit();
-    unit->set_enable_output(true);
-    unit->set_enable_input(false);
-    unit->set_maximum_frames_per_slice(4096);
+    unit.set_enable_output(true);
+    unit.set_enable_input(false);
+    unit.set_maximum_frames_per_slice(4096);
 }
 
 UInt32 audio_unit_output_node::input_bus_count() const
@@ -239,9 +240,9 @@ audio_unit_input_node::audio_unit_input_node() : audio_unit_io_node(), _impl(std
 void audio_unit_input_node::prepare_audio_unit()
 {
     auto unit = audio_unit();
-    unit->set_enable_output(false);
-    unit->set_enable_input(true);
-    unit->set_maximum_frames_per_slice(4096);
+    unit.set_enable_output(false);
+    unit.set_enable_input(true);
+    unit.set_maximum_frames_per_slice(4096);
 }
 
 UInt32 audio_unit_input_node::input_bus_count() const
@@ -271,12 +272,12 @@ void audio_unit_input_node::update_connections()
     auto unit = audio_unit();
 
     if (auto out_connection = output_connection(1)) {
-        unit->attach_input_callback();
+        unit.attach_input_callback();
 
         audio_pcm_buffer input_buffer(out_connection->format(), 4096);
         _impl->input_buffer = input_buffer;
 
-        unit->set_input_callback([weak_node = _weak_this, input_buffer](render_parameters & render_parameters) mutable {
+        unit.set_input_callback([weak_node = _weak_this, input_buffer](render_parameters & render_parameters) mutable {
             auto input_node = weak_node.lock();
             if (input_node && render_parameters.in_number_frames <= input_buffer.frame_capacity()) {
                 input_buffer.set_frame_length(render_parameters.in_number_frames);
@@ -290,7 +291,7 @@ void audio_unit_input_node::update_connections()
 
                         if (auto io_unit = input_node->audio_unit()) {
                             render_parameters.in_bus_number = 1;
-                            io_unit->audio_unit_render(render_parameters);
+                            io_unit.audio_unit_render(render_parameters);
                         }
 
                         auto destination_node = connection->destination_node();
@@ -303,8 +304,8 @@ void audio_unit_input_node::update_connections()
             }
         });
     } else {
-        unit->detach_input_callback();
-        unit->set_input_callback(nullptr);
+        unit.detach_input_callback();
+        unit.set_input_callback(nullptr);
         _impl->input_buffer = nullptr;
     }
 }

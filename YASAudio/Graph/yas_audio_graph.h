@@ -22,8 +22,8 @@ namespace yas
         static audio_graph_sptr create();
         ~audio_graph();
 
-        void add_audio_unit(const audio_unit_sptr &audio_unit);
-        void remove_audio_unit(const audio_unit_sptr &audio_unit);
+        void add_audio_unit(audio_unit &audio_unit);
+        void remove_audio_unit(audio_unit &audio_unit);
         void remove_all_units();
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)

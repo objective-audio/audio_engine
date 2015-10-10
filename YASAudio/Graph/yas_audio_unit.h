@@ -27,10 +27,22 @@ namespace yas
 
         static const OSType sub_type_default_io();
 
-        static audio_unit_sptr create(const AudioComponentDescription &acd);
-        static audio_unit_sptr create(const OSType &type, const OSType &subType);
+        explicit audio_unit(std::nullptr_t n = nullptr);
+        explicit audio_unit(const AudioComponentDescription &acd);
+        audio_unit(const OSType &type, const OSType &subType);
 
-        ~audio_unit();
+        ~audio_unit() = default;
+
+        audio_unit(const audio_unit &) = default;
+        audio_unit(audio_unit &&) = default;
+        audio_unit &operator=(const audio_unit &) = default;
+        audio_unit &operator=(audio_unit &&) = default;
+
+        bool operator==(const yas::audio_unit &) const;
+        bool operator!=(const yas::audio_unit &) const;
+        bool operator<(const yas::audio_unit &) const;
+
+        explicit operator bool() const;
 
         CFStringRef name() const;
         OSType type() const;
@@ -102,15 +114,9 @@ namespace yas
 
        private:
         class impl;
-        std::unique_ptr<impl> _impl;
+        std::shared_ptr<impl> _impl;
 
-        explicit audio_unit(const AudioComponentDescription &acd);
-        audio_unit(const OSType &type, const OSType &subType);
-
-        audio_unit(const audio_unit &) = delete;
-        audio_unit(audio_unit &&) = delete;
-        audio_unit &operator=(const audio_unit &) = delete;
-        audio_unit &operator=(audio_unit &&) = delete;
+        explicit audio_unit(const std::shared_ptr<impl> &);
 
         void _initialize();
         void _uninitialize();
@@ -122,6 +128,15 @@ namespace yas
        public:
         class private_access;
         friend private_access;
+
+        class weak
+        {
+           public:
+            explicit weak(const audio_unit &unit);  // : impl(audio_unit._impl)
+            audio_unit lock() const;                // return audio_unit(impl.lock());
+           private:
+            std::weak_ptr<audio_unit::impl> _impl;
+        };
     };
 }
 

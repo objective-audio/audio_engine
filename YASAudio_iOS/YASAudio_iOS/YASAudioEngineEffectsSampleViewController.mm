@@ -24,7 +24,7 @@ static const AudioComponentDescription baseAcd = {.componentType = kAudioUnitTyp
 @end
 
 @implementation YASAudioEngineEffectsSampleViewController {
-    std::vector<yas::audio_unit_sptr> _audio_units;
+    std::vector<yas::audio_unit> _audio_units;
     std::experimental::optional<UInt32> _index;
     yas::audio_engine_sptr _engine;
     yas::audio_unit_output_node_sptr _output_node;
@@ -108,7 +108,7 @@ static const AudioComponentDescription baseAcd = {.componentType = kAudioUnitTyp
             if (component != NULL) {
                 AudioComponentDescription acd;
                 yas_raise_if_au_error(AudioComponentGetDescription(component, &acd));
-                _audio_units.push_back(yas::audio_unit::create(acd));
+                _audio_units.push_back(yas::audio_unit(acd));
             } else {
                 break;
             }
@@ -218,7 +218,7 @@ static const AudioComponentDescription baseAcd = {.componentType = kAudioUnitTyp
         }
     } else if (indexPath.section == YASAudioEngineEffectsSampleSectionEffects) {
         const auto &audio_unit = _audio_units.at(indexPath.row);
-        cell.textLabel.text = (__bridge NSString *)audio_unit->name();
+        cell.textLabel.text = (__bridge NSString *)audio_unit.name();
         if (_index && indexPath.row == *_index) {
             cell.accessoryType = UITableViewCellAccessoryCheckmark;
         }
@@ -238,7 +238,7 @@ static const AudioComponentDescription baseAcd = {.componentType = kAudioUnitTyp
             _index = static_cast<UInt32>(indexPath.row);
             AudioComponentDescription acd = baseAcd;
             const auto &audio_unit = _audio_units.at(indexPath.row);
-            acd.componentSubType = audio_unit->sub_type();
+            acd.componentSubType = audio_unit.sub_type();
             [self replaceEffectNodeWithAudioComponentDescription:&acd];
         } break;
     }

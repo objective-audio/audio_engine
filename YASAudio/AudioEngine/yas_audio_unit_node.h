@@ -6,10 +6,12 @@
 #pragma once
 
 #include "yas_audio_node.h"
-#include "yas_audio_unit.h"
 
 namespace yas
 {
+    class audio_unit;
+    class audio_unit_parameter;
+
     class audio_unit_node : public audio_node
     {
        public:
@@ -18,11 +20,11 @@ namespace yas
 
         virtual ~audio_unit_node();
 
-        audio_unit_sptr audio_unit() const;
-        const std::map<AudioUnitScope, audio_unit_parameter_map_t> &parameters() const;
-        const audio_unit_parameter_map_t &global_parameters() const;
-        const audio_unit_parameter_map_t &input_parameters() const;
-        const audio_unit_parameter_map_t &output_parameters() const;
+        audio_unit audio_unit() const;
+        const std::map<AudioUnitScope, std::map<AudioUnitParameterID, audio_unit_parameter>> &parameters() const;
+        const std::map<AudioUnitParameterID, audio_unit_parameter> &global_parameters() const;
+        const std::map<AudioUnitParameterID, audio_unit_parameter> &input_parameters() const;
+        const std::map<AudioUnitParameterID, audio_unit_parameter> &output_parameters() const;
 
         virtual UInt32 input_bus_count() const override;
         virtual UInt32 output_bus_count() const override;
