@@ -469,8 +469,6 @@ bool audio_device::operator==(const audio_device &other_device) const
 {
     if (_impl && other_device._impl) {
         return audio_device_id() == other_device.audio_device_id();
-    } else if (!_impl && !other_device._impl) {
-        return true;
     }
     return false;
 }
@@ -479,8 +477,6 @@ bool audio_device::operator!=(const audio_device &other_device) const
 {
     if (_impl && other_device._impl) {
         return audio_device_id() != other_device.audio_device_id();
-    } else if (!_impl && !other_device._impl) {
-        return false;
     }
     return true;
 }

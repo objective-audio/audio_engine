@@ -141,8 +141,6 @@ bool audio_device_stream::operator==(const audio_device_stream &other)
 {
     if (_impl && other._impl) {
         return stream_id() == other.stream_id();
-    } else if (!_impl && !other._impl) {
-        return true;
     }
     return false;
 }
@@ -151,8 +149,6 @@ bool audio_device_stream::operator!=(const audio_device_stream &other)
 {
     if (_impl && other._impl) {
         return stream_id() != other.stream_id();
-    } else if (!_impl && !other._impl) {
-        return false;
     }
     return true;
 }
