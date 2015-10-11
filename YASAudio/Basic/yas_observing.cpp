@@ -153,8 +153,6 @@ bool observer::operator==(const observer &other) const
 {
     if (_impl && other._impl) {
         return _impl == other._impl;
-    } else if (!_impl && !other._impl) {
-        return true;
     }
     return false;
 }
@@ -163,8 +161,6 @@ bool observer::operator!=(const observer &other) const
 {
     if (_impl && other._impl) {
         return _impl != other._impl;
-    } else if (!_impl && !other._impl) {
-        return false;
     }
     return true;
 }
