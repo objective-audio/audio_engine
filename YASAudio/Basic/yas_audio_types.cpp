@@ -46,3 +46,17 @@ std::string yas::to_string(const AudioUnitScope scope)
 
     return "unknown";
 }
+
+std::string yas::to_string(const render_type &type)
+{
+    switch (type) {
+        case render_type::normal:
+            return "normal";
+        case render_type::notify:
+            return "notify";
+        case render_type::input:
+            return "notify";
+        case render_type::unknown:
+            return "unknown";
+    }
+}

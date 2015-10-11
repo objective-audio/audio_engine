@@ -56,6 +56,7 @@ namespace yas
     UInt32 to_uint32(const yas::direction &);
     std::string to_string(const yas::direction &);
     std::string to_string(const AudioUnitScope scope);
+    std::string to_string(const render_type &);
 
     class objc_strong_container;
     class objc_weak_container;
