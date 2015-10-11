@@ -49,7 +49,7 @@ namespace yas
 
         using property_infos_sptr = std::shared_ptr<std::set<property_info>>;
 
-        explicit audio_device_stream(std::nullptr_t n = nullptr);
+        audio_device_stream(std::nullptr_t n = nullptr);
         audio_device_stream(const AudioStreamID, const AudioDeviceID);
 
         ~audio_device_stream() = default;

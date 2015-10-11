@@ -217,10 +217,6 @@ static get_abl_info_result_t get_abl_info(const AudioBufferList *abl, const UInt
 
 #pragma mark - public
 
-audio_pcm_buffer::audio_pcm_buffer() : _impl(nullptr)
-{
-}
-
 audio_pcm_buffer::audio_pcm_buffer(std::nullptr_t) : _impl(nullptr)
 {
 }
