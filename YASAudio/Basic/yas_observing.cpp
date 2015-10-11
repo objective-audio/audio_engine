@@ -14,21 +14,6 @@ using namespace yas;
 class observer::impl
 {
    public:
-    class weak
-    {
-       public:
-        std::weak_ptr<observer::impl> impl;
-
-        explicit weak(const observer &observer) : impl(observer._impl)
-        {
-        }
-
-        observer lock() const
-        {
-            return observer(impl.lock());
-        }
-    };
-
     class handler_holder
     {
         std::map<const std::experimental::optional<std::string>, const handler_f> functions;
@@ -86,7 +71,7 @@ class observer::impl
 class subject::impl
 {
    public:
-    using weak_observers_vector_t = std::vector<observer::impl::weak>;
+    using weak_observers_vector_t = std::vector<observer::weak>;
     using weak_observers_map_t = std::map<const std::experimental::optional<std::string>, weak_observers_vector_t>;
     weak_observers_map_t observers;
 
@@ -97,7 +82,7 @@ class subject::impl
         }
 
         auto &vector = observers.at(key);
-        vector.push_back(observer::impl::weak(observer));
+        vector.push_back(observer::weak(observer));
     }
 
     void remove_observer(const observer &observer, const std::experimental::optional<std::string> &key)
@@ -105,7 +90,7 @@ class subject::impl
         if (observers.count(key) > 0) {
             auto &vector = observers.at(key);
 
-            erase_if(vector, [&observer](const observer::impl::weak &weak_observer) {
+            erase_if(vector, [&observer](const observer::weak &weak_observer) {
                 if (auto shared_observer = weak_observer.lock()) {
                     if (shared_observer == observer) {
                         return true;

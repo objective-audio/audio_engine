@@ -8,6 +8,7 @@
 #include "yas_audio_types.h"
 #include "yas_audio_unit_parameter.h"
 #include "yas_exception.h"
+#include "yas_weak.h"
 #include <AudioToolbox/AudioToolbox.h>
 #include <vector>
 #include <memory>
@@ -129,15 +130,8 @@ namespace yas
         class private_access;
         friend private_access;
 
-        class weak
-        {
-           public:
-            explicit weak(const audio_unit &unit);
-            audio_unit lock() const;
-
-           private:
-            std::weak_ptr<audio_unit::impl> _impl;
-        };
+        using weak = weak<audio_unit, audio_unit::impl>;
+        friend weak;
     };
 }
 

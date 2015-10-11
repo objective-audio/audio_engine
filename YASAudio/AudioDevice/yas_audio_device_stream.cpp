@@ -48,21 +48,6 @@ bool audio_device_stream::property_info::operator<(const audio_device_stream::pr
 
 #pragma mark - private
 
-class audio_device_stream::weak_stream
-{
-   public:
-    std::weak_ptr<audio_device_stream::impl> impl;
-
-    explicit weak_stream(const audio_device_stream &stream) : impl(stream._impl)
-    {
-    }
-
-    audio_device_stream lock() const
-    {
-        return audio_device_stream(impl.lock());
-    }
-};
-
 class audio_device_stream::impl
 {
    public:
@@ -77,7 +62,7 @@ class audio_device_stream::impl
 
     listener_f listener(const audio_device_stream &stream)
     {
-        audio_device_stream::weak_stream weak_stream(stream);
+        audio_device_stream::weak weak_stream(stream);
 
         return [weak_stream](UInt32 address_count, const AudioObjectPropertyAddress *addresses) {
             if (auto stream = weak_stream.lock()) {

@@ -236,24 +236,6 @@ class audio_device_io::impl
     mutable std::recursive_mutex _mutex;
 };
 
-audio_device_io::weak::weak() : _impl()
-{
-}
-
-audio_device_io::weak::weak(const audio_device_io &unit) : _impl(unit._impl)
-{
-}
-
-audio_device_io audio_device_io::weak::lock() const
-{
-    return audio_device_io(_impl.lock());
-}
-
-void audio_device_io::weak::reset()
-{
-    _impl.reset();
-}
-
 #pragma mark -
 
 audio_device_io::audio_device_io(std::nullptr_t) : _impl(nullptr)

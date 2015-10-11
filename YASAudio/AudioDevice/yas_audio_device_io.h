@@ -61,17 +61,8 @@ namespace yas
         void _uninitialize();
 
        public:
-        class weak
-        {
-           public:
-            weak();
-            explicit weak(const audio_device_io &device_io);
-            audio_device_io lock() const;
-            void reset();
-
-           private:
-            std::weak_ptr<audio_device_io::impl> _impl;
-        };
+        using weak = weak<audio_device_io, audio_device_io::impl>;
+        friend weak;
     };
 }
 
