@@ -8,7 +8,7 @@
 #include "yas_exception.h"
 #include "yas_stl_utils.h"
 #include <mutex>
-#include <set>
+#include <list>
 #include <string>
 #include <exception>
 #include <limits>
@@ -43,7 +43,7 @@ class audio_graph::impl
     std::map<UInt16, audio_unit> units;
     std::map<UInt16, audio_unit> io_units;
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
-    std::set<audio_device_io_sptr> device_ios;
+    std::list<audio_device_io> device_ios;
 #endif
 
     impl(const UInt8 key) : running(false), mutex(), units(), io_units(), _key(key){};
@@ -238,8 +238,8 @@ class audio_graph::impl
             audio_unit.start();
         }
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
-        for (const auto &device_io : device_ios) {
-            device_io->start();
+        for (auto &device_io : device_ios) {
+            device_io.start();
         }
 #endif
     }
@@ -251,8 +251,8 @@ class audio_graph::impl
             audio_unit.stop();
         }
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
-        for (const auto &device_io : device_ios) {
-            device_io->stop();
+        for (auto &device_io : device_ios) {
+            device_io.stop();
         }
 #endif
     }
@@ -348,23 +348,24 @@ void audio_graph::remove_all_units()
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
 
-void audio_graph::add_audio_device_io(audio_device_io_sptr &audio_device_io)
+void audio_graph::add_audio_device_io(audio_device_io &device_io)
 {
     {
         std::lock_guard<std::recursive_mutex> lock(_impl->mutex);
-        _impl->device_ios.insert(audio_device_io);
+        _impl->device_ios.push_back(device_io);
     }
     if (is_running() && !_impl->is_interrupting()) {
-        audio_device_io->start();
+        device_io.start();
     }
 }
 
-void audio_graph::remove_audio_device_io(audio_device_io_sptr &audio_device_io)
+void audio_graph::remove_audio_device_io(audio_device_io &device_io)
 {
-    audio_device_io->stop();
+    device_io.stop();
     {
         std::lock_guard<std::recursive_mutex> lock(_impl->mutex);
-        _impl->device_ios.erase(audio_device_io);
+        erase_if(_impl->device_ios,
+                 [&device_io](const auto &device_io_in_vec) { return device_io == device_io_in_vec; });
     }
 }
 

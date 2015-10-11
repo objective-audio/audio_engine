@@ -21,10 +21,22 @@ namespace yas
        public:
         using render_f = std::function<void(audio_pcm_buffer &output_buffer, const audio_time &when)>;
 
-        static audio_device_io_sptr create();
-        static audio_device_io_sptr create(const audio_device &audio_device);
+        audio_device_io(std::nullptr_t n = nullptr);
+        explicit audio_device_io(const audio_device &device);
 
-        ~audio_device_io();
+        ~audio_device_io() = default;
+
+        audio_device_io(const audio_device_io &) = default;
+        audio_device_io(audio_device_io &&) = default;
+        audio_device_io &operator=(const audio_device_io &) = default;
+        audio_device_io &operator=(audio_device_io &&) = default;
+
+        bool operator==(const audio_device_io &) const;
+        bool operator!=(const audio_device_io &) const;
+
+        explicit operator bool() const;
+
+        void prepare();
 
         void set_device(const audio_device device);
         audio_device device() const;
@@ -41,17 +53,25 @@ namespace yas
 
        private:
         class impl;
-        std::unique_ptr<impl> _impl;
+        std::shared_ptr<impl> _impl;
 
-        audio_device_io();
-
-        audio_device_io(const audio_device_io &) = delete;
-        audio_device_io(audio_device_io &&) = delete;
-        audio_device_io &operator=(const audio_device_io &) = delete;
-        audio_device_io &operator=(audio_device_io &&) = delete;
+        audio_device_io(const std::shared_ptr<audio_device_io::impl> &);
 
         void _initialize();
         void _uninitialize();
+
+       public:
+        class weak
+        {
+           public:
+            weak();
+            explicit weak(const audio_device_io &device_io);
+            audio_device_io lock() const;
+            void reset();
+
+           private:
+            std::weak_ptr<audio_device_io::impl> _impl;
+        };
     };
 }
 

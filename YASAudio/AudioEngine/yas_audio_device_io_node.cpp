@@ -24,7 +24,7 @@ class audio_device_io_node::impl
    public:
     std::weak_ptr<audio_device_io_node> weak_node;
     audio_graph::weak graph;
-    audio_device_io_sptr device_io;
+    audio_device_io device_io;
     audio_node_core_sptr node_core_on_render;
 
     impl() : weak_node(), _device(nullptr), graph(), device_io(nullptr), node_core_on_render(nullptr)
@@ -37,7 +37,7 @@ class audio_device_io_node::impl
     {
         _device = device;
         if (device_io) {
-            device_io->set_device(device);
+            device_io.set_device(device);
         }
     }
 
@@ -107,12 +107,12 @@ void audio_device_io_node::update_connections()
     }
 
     if (!_validate_connections()) {
-        device_io->set_render_callback(nullptr);
+        device_io.set_render_callback(nullptr);
         return;
     }
 
     auto weak_node = _impl->weak_node;
-    std::weak_ptr<audio_device_io> weak_device_io = device_io;
+    audio_device_io::weak weak_device_io(device_io);
 
     auto render_function = [weak_node, weak_device_io](audio_pcm_buffer &output_buffer, const audio_time &when) {
         if (auto node = weak_node.lock()) {
@@ -137,8 +137,8 @@ void audio_device_io_node::update_connections()
                         const auto &connection = connections.at(0);
                         if (const auto destination_node = connection->destination_node()) {
                             if (auto *input_tap_node = dynamic_cast<audio_input_tap_node *>(destination_node.get())) {
-                                auto input_buffer = device_io->input_buffer_on_render();
-                                const audio_time &input_time = device_io->input_time_on_render();
+                                auto input_buffer = device_io.input_buffer_on_render();
+                                const audio_time &input_time = device_io.input_time_on_render();
                                 if (input_buffer && input_time) {
                                     if (connection->format() ==
                                         destination_node->input_format(connection->destination_bus())) {
@@ -155,7 +155,7 @@ void audio_device_io_node::update_connections()
         }
     };
 
-    device_io->set_render_callback(render_function);
+    device_io.set_render_callback(render_function);
 }
 
 #pragma mark - private
@@ -171,7 +171,7 @@ void audio_device_io_node::_add_device_io_to_graph(audio_graph &graph)
     }
 
     _impl->graph = audio_graph::weak(graph);
-    _impl->device_io = yas::audio_device_io::create(_impl->device());
+    _impl->device_io = audio_device_io(_impl->device());
     graph.add_audio_device_io(_impl->device_io);
 }
 
@@ -195,7 +195,7 @@ bool audio_device_io_node::_validate_connections() const
             if (connections.count(0) > 0) {
                 const auto &connection = connections.at(0);
                 const auto &connection_format = connection->format();
-                const auto &device_format = device_io->device().output_format();
+                const auto &device_format = device_io.device().output_format();
                 if (connection_format != device_format) {
                     std::cout << __PRETTY_FUNCTION__ << " : output device io format is not match." << std::endl;
                     return false;
@@ -208,7 +208,7 @@ bool audio_device_io_node::_validate_connections() const
             if (connections.count(0) > 0) {
                 const auto &connection = connections.at(0);
                 const auto &connection_format = connection->format();
-                const auto &device_format = device_io->device().input_format();
+                const auto &device_format = device_io.device().input_format();
                 if (connection_format != device_format) {
                     std::cout << __PRETTY_FUNCTION__ << " : input device io format is not match." << std::endl;
                     return false;
@@ -228,7 +228,7 @@ void audio_device_io_node::render(audio_pcm_buffer &buffer, const UInt32 bus_idx
 
     if (const auto &device_io = _impl->device_io) {
         if (auto core = _impl->node_core_on_render) {
-            auto &input_buffer = device_io->input_buffer_on_render();
+            auto &input_buffer = device_io.input_buffer_on_render();
             if (input_buffer && input_buffer.format() == buffer.format()) {
                 buffer.copy_from(input_buffer);
             }
