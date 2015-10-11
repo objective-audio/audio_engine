@@ -25,13 +25,16 @@
 
 using namespace yas;
 
-static std::recursive_mutex _global_mutex;
-static bool _interrupting;
-static std::map<UInt8, audio_graph::weak> _graphs;
+namespace yas
+{
+    static std::recursive_mutex _global_mutex;
+    static bool _interrupting;
+    static std::map<UInt8, audio_graph::weak> _graphs;
 #if TARGET_OS_IPHONE
-static yas::objc_strong_container _did_become_active_observer;
-static yas::objc_strong_container _interruption_observer;
+    static yas::objc_strong_container _did_become_active_observer;
+    static yas::objc_strong_container _interruption_observer;
 #endif
+}
 
 #pragma mark - impl
 
