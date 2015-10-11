@@ -34,11 +34,13 @@
     auto output_format = yas::audio_format(output_sample_rate, channels, yas::pcm_format::float32, false);
     auto input_format = yas::audio_format(input_sample_rate, channels, yas::pcm_format::int16, true);
 
-    const auto audio_graph = yas::audio_graph::create();
-    yas::audio_unit converter_unit(kAudioUnitType_FormatConverter, kAudioUnitSubType_AUConverter);
+    yas::audio_graph graph;
+    graph.prepare();
 
+    yas::audio_unit converter_unit(kAudioUnitType_FormatConverter, kAudioUnitSubType_AUConverter);
     converter_unit.set_maximum_frames_per_slice(maximum_frame_length);
-    audio_graph->add_audio_unit(converter_unit);
+
+    graph.add_audio_unit(converter_unit);
 
     XCTAssertTrue(converter_unit.is_initialized());
     XCTAssertEqual(converter_unit.type(), type);
@@ -86,7 +88,7 @@
 
                                  }];
 
-    audio_graph->remove_audio_unit(converter_unit);
+    graph.remove_audio_unit(converter_unit);
 
     XCTAssertFalse(converter_unit.is_initialized());
 }
@@ -100,11 +102,13 @@
 
     auto format = yas::audio_format(sampleRate, channels, yas::pcm_format::float32, false);
 
-    const auto audio_graph = yas::audio_graph::create();
-    yas::audio_unit converter_unit(kAudioUnitType_FormatConverter, kAudioUnitSubType_AUConverter);
+    yas::audio_graph graph;
+    graph.prepare();
 
+    yas::audio_unit converter_unit(kAudioUnitType_FormatConverter, kAudioUnitSubType_AUConverter);
     converter_unit.set_maximum_frames_per_slice(maximum_frame_length);
-    audio_graph->add_audio_unit(converter_unit);
+
+    graph.add_audio_unit(converter_unit);
 
     converter_unit.attach_render_callback(0);
     converter_unit.attach_render_notify();

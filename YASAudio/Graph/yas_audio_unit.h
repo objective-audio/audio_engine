@@ -132,8 +132,9 @@ namespace yas
         class weak
         {
            public:
-            explicit weak(const audio_unit &unit);  // : impl(audio_unit._impl)
-            audio_unit lock() const;                // return audio_unit(impl.lock());
+            explicit weak(const audio_unit &unit);
+            audio_unit lock() const;
+
            private:
             std::weak_ptr<audio_unit::impl> _impl;
         };

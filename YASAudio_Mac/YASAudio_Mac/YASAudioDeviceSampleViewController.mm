@@ -140,7 +140,7 @@ using sample_kernel_sptr = std::shared_ptr<sample_kernel_t>;
 @end
 
 @implementation YASAudioDeviceSampleViewController {
-    yas::audio_graph_sptr _audio_graph;
+    yas::audio_graph _audio_graph;
     yas::audio_device_io_sptr _audio_device_io;
     yas::observer _audio_device_observer;
     sample_kernel_sptr _kernel;
@@ -169,9 +169,9 @@ using sample_kernel_sptr = std::shared_ptr<sample_kernel_t>;
         _self_container = std::make_shared<yas::objc_weak_container>(self);
     }
 
-    _audio_graph = yas::audio_graph::create();
+    _audio_graph.prepare();
     _audio_device_io = yas::audio_device_io::create();
-    _audio_graph->add_audio_device_io(_audio_device_io);
+    _audio_graph.add_audio_device_io(_audio_device_io);
 
     _kernel = std::make_shared<sample_kernel_t>();
 
@@ -220,7 +220,7 @@ using sample_kernel_sptr = std::shared_ptr<sample_kernel_t>;
     [self setup];
 
     if (_audio_graph) {
-        _audio_graph->start();
+        _audio_graph.start();
     }
 }
 
@@ -229,7 +229,7 @@ using sample_kernel_sptr = std::shared_ptr<sample_kernel_t>;
     [super viewWillDisappear];
 
     if (_audio_graph) {
-        _audio_graph->stop();
+        _audio_graph.stop();
     }
 
     [self dispose];

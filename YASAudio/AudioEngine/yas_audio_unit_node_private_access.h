@@ -23,7 +23,7 @@ namespace yas
         }
 
         template <typename T>
-        static void add_audio_unit_to_graph(T &node, const audio_graph_sptr &graph)
+        static void add_audio_unit_to_graph(T &node, audio_graph &graph)
         {
             node->_add_audio_unit_to_graph(graph);
         }

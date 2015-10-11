@@ -27,7 +27,7 @@ using namespace yas;
 
 static std::recursive_mutex _global_mutex;
 static bool _interrupting;
-static std::map<UInt8, std::weak_ptr<audio_graph>> _graphs;
+static std::map<UInt8, audio_graph::weak> _graphs;
 #if TARGET_OS_IPHONE
 static yas::objc_strong_container _did_become_active_observer;
 static yas::objc_strong_container _interruption_observer;
@@ -47,6 +47,13 @@ class audio_graph::impl
 #endif
 
     impl(const UInt8 key) : running(false), mutex(), units(), io_units(), _key(key){};
+
+    ~impl()
+    {
+        stop_all_ios();
+        remove_graph_for_key(key());
+        remove_all_units();
+    }
 
 #if TARGET_OS_IPHONE
     static void setup_notifications()
@@ -107,8 +114,8 @@ class audio_graph::impl
             std::lock_guard<std::recursive_mutex> lock(_global_mutex);
             for (auto &pair : _graphs) {
                 if (auto graph = pair.second.lock()) {
-                    if (graph->is_running()) {
-                        graph->_impl->start_all_ios();
+                    if (graph.is_running()) {
+                        graph._impl->start_all_ios();
                     }
                 }
             }
@@ -122,15 +129,15 @@ class audio_graph::impl
         std::lock_guard<std::recursive_mutex> lock(_global_mutex);
         for (const auto &pair : _graphs) {
             if (const auto graph = pair.second.lock()) {
-                graph->_impl->stop_all_ios();
+                graph._impl->stop_all_ios();
             }
         }
     }
 
-    static void add_graph(const audio_graph_sptr &graph)
+    static void add_graph(const audio_graph &graph)
     {
         std::lock_guard<std::recursive_mutex> lock(_global_mutex);
-        _graphs.insert(std::make_pair(graph->_impl->key(), std::weak_ptr<audio_graph>(graph)));
+        _graphs.insert(std::make_pair(graph._impl->key(), audio_graph::weak(graph)));
     }
 
     static void remove_graph_for_key(const UInt8 key)
@@ -139,7 +146,7 @@ class audio_graph::impl
         _graphs.erase(key);
     }
 
-    static audio_graph_sptr graph_for_key(const UInt8 key)
+    static audio_graph graph_for_key(const UInt8 key)
     {
         std::lock_guard<std::recursive_mutex> lock(_global_mutex);
         if (_graphs.count(key) > 0) {
@@ -197,6 +204,29 @@ class audio_graph::impl
         }
     }
 
+    void remove_audio_unit(audio_unit &unit)
+    {
+        if (!audio_unit::private_access::key(unit)) {
+            throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : audio_unit.key is not assigned.");
+        }
+
+        audio_unit::private_access::uninitialize(unit);
+
+        remove_unit_from_units(unit);
+    }
+
+    void remove_all_units()
+    {
+        std::lock_guard<std::recursive_mutex> lock(mutex);
+
+        enumerate(units, [this](const auto &it) {
+            auto unit = it->second;
+            auto next = std::next(it);
+            remove_audio_unit(unit);
+            return next;
+        });
+    }
+
     void start_all_ios()
     {
 #if TARGET_OS_IPHONE
@@ -236,17 +266,59 @@ class audio_graph::impl
     UInt8 _key;
 };
 
-#pragma mark - constructor
-
-audio_graph::audio_graph(const UInt8 key) : _impl(std::make_unique<impl>(key))
+audio_graph::weak::weak() : _impl()
 {
 }
 
-audio_graph::~audio_graph()
+audio_graph::weak::weak(const audio_graph &graph) : _impl(graph._impl)
 {
-    _impl->stop_all_ios();
-    impl::remove_graph_for_key(_impl->key());
-    remove_all_units();
+}
+
+audio_graph audio_graph::weak::lock() const
+{
+    return audio_graph(_impl.lock());
+}
+
+void audio_graph::weak::reset()
+{
+    _impl.reset();
+}
+
+#pragma mark - constructor
+
+audio_graph::audio_graph(std::nullptr_t) : _impl(nullptr)
+{
+}
+
+audio_graph::audio_graph(const std::shared_ptr<audio_graph::impl> &impl) : _impl(impl)
+{
+}
+
+bool audio_graph::operator==(const audio_graph &other) const
+{
+    return _impl && other._impl && _impl == other._impl;
+}
+
+bool audio_graph::operator!=(const audio_graph &other) const
+{
+    return !_impl || !other._impl || _impl != other._impl;
+}
+
+audio_graph::operator bool() const
+{
+    return _impl != nullptr;
+}
+
+void audio_graph::prepare()
+{
+    std::lock_guard<std::recursive_mutex> lock(_global_mutex);
+    if (!_impl) {
+        auto key = min_empty_key(_graphs);
+        if (key && _graphs.count(*key) == 0) {
+            _impl = std::make_shared<impl>(*key);
+            audio_graph::impl::add_graph(*this);
+        }
+    }
 }
 
 void audio_graph::add_audio_unit(audio_unit &unit)
@@ -266,25 +338,12 @@ void audio_graph::add_audio_unit(audio_unit &unit)
 
 void audio_graph::remove_audio_unit(audio_unit &unit)
 {
-    if (!audio_unit::private_access::key(unit)) {
-        throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : audio_unit.key is not assigned.");
-    }
-
-    audio_unit::private_access::uninitialize(unit);
-
-    _impl->remove_unit_from_units(unit);
+    _impl->remove_audio_unit(unit);
 }
 
 void audio_graph::remove_all_units()
 {
-    std::lock_guard<std::recursive_mutex> lock(_impl->mutex);
-
-    enumerate(_impl->units, [this](const auto &it) {
-        auto unit = it->second;
-        auto next = std::next(it);
-        remove_audio_unit(unit);
-        return next;
-    });
+    _impl->remove_all_units();
 }
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
@@ -338,21 +397,9 @@ void audio_graph::audio_unit_render(render_parameters &render_parameters)
 
     auto graph = impl::graph_for_key(render_parameters.render_id.graph);
     if (graph) {
-        auto unit = graph->_impl->unit_for_key(render_parameters.render_id.unit);
+        auto unit = graph._impl->unit_for_key(render_parameters.render_id.unit);
         if (unit) {
             unit.callback_render(render_parameters);
         }
     }
-}
-
-audio_graph_sptr audio_graph::create()
-{
-    std::lock_guard<std::recursive_mutex> lock(_global_mutex);
-    auto key = min_empty_key(_graphs);
-    if (key && _graphs.count(*key) == 0) {
-        auto graph = audio_graph_sptr(new audio_graph(*key));
-        audio_graph::impl::add_graph(graph);
-        return graph;
-    }
-    return nullptr;
 }
