@@ -7,10 +7,6 @@
 
 using namespace yas;
 
-flex_ptr::flex_ptr() : v(nullptr)
-{
-}
-
 flex_ptr::flex_ptr(std::nullptr_t) : v(nullptr)
 {
 }

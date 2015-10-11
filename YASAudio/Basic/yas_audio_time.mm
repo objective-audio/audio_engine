@@ -35,10 +35,6 @@ class audio_time::impl
     impl &operator=(impl &&) = delete;
 };
 
-audio_time::audio_time() : _impl(nullptr)
-{
-}
-
 audio_time::audio_time(std::nullptr_t) : _impl(nullptr)
 {
 }

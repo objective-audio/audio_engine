@@ -27,7 +27,7 @@ namespace yas
 
         static const OSType sub_type_default_io();
 
-        explicit audio_unit(std::nullptr_t n = nullptr);
+        audio_unit(std::nullptr_t n = nullptr);
         explicit audio_unit(const AudioComponentDescription &acd);
         audio_unit(const OSType &type, const OSType &subType);
 

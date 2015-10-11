@@ -25,8 +25,7 @@ namespace yas
             UInt8 *u8;
         };
 
-        flex_ptr();
-        flex_ptr(std::nullptr_t);
+        flex_ptr(std::nullptr_t n = nullptr);
         template <typename T>
         flex_ptr(const T *const p);
     };
