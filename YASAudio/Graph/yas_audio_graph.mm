@@ -269,24 +269,6 @@ class audio_graph::impl
     UInt8 _key;
 };
 
-audio_graph::weak::weak() : _impl()
-{
-}
-
-audio_graph::weak::weak(const audio_graph &graph) : _impl(graph._impl)
-{
-}
-
-audio_graph audio_graph::weak::lock() const
-{
-    return audio_graph(_impl.lock());
-}
-
-void audio_graph::weak::reset()
-{
-    _impl.reset();
-}
-
 #pragma mark - constructor
 
 audio_graph::audio_graph(std::nullptr_t) : _impl(nullptr)

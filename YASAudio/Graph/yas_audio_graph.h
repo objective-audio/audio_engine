@@ -8,6 +8,7 @@
 #include "yas_audio_types.h"
 #include "yas_audio_unit.h"
 #include "yas_result.h"
+#include "yas_weak.h"
 #include <memory>
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
@@ -59,16 +60,7 @@ namespace yas
         explicit audio_graph(const std::shared_ptr<audio_graph::impl> &);
 
        public:
-        class weak
-        {
-           public:
-            weak();
-            explicit weak(const audio_graph &unit);
-            audio_graph lock() const;
-            void reset();
-
-           private:
-            std::weak_ptr<audio_graph::impl> _impl;
-        };
+        using weak = weak<audio_graph, audio_graph::impl>;
+        friend weak;
     };
 }

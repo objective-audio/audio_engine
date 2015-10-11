@@ -185,15 +185,6 @@ class audio_unit::impl
     mutable std::recursive_mutex _mutex;
 };
 
-audio_unit::weak::weak(const audio_unit &unit) : _impl(unit._impl)
-{
-}
-
-audio_unit audio_unit::weak::lock() const
-{
-    return audio_unit(_impl.lock());
-}
-
 static OSStatus CommonRenderCallback(void *inRefCon, AudioUnitRenderActionFlags *ioActionFlags,
                                      const AudioTimeStamp *inTimeStamp, UInt32 inBusNumber, UInt32 inNumberFrames,
                                      AudioBufferList *ioData, yas::render_type renderType)

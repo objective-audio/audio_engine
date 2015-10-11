@@ -11,6 +11,7 @@
 #include "yas_audio_types.h"
 #include "yas_observing.h"
 #include "yas_audio_format.h"
+#include "yas_weak.h"
 #include <AudioToolbox/AudioToolbox.h>
 #include <memory>
 #include <vector>
@@ -76,13 +77,15 @@ namespace yas
        private:
         class impl;
         std::shared_ptr<impl> _impl;
-        class weak_stream;
 
         explicit audio_device_stream(const std::shared_ptr<impl> &);
 
         template <typename T>
         std::unique_ptr<std::vector<T>> _property_data(const AudioStreamID stream_id,
                                                        const AudioObjectPropertySelector selector) const;
+
+        using weak = weak<audio_device_stream, audio_device_stream::impl>;
+        friend weak;
     };
 }
 
