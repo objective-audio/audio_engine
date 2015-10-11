@@ -50,4 +50,42 @@
     }
 }
 
+- (void)test_min_empty_key_insert
+{
+    std::map<UInt8, UInt8> map;
+
+    auto key = yas::min_empty_key(map);
+    XCTAssertTrue(key);
+    XCTAssertEqual(*key, 0);
+
+    map.insert(std::make_pair(0, 0));
+
+    key = yas::min_empty_key(map);
+    XCTAssertTrue(key);
+    XCTAssertEqual(*key, 1);
+}
+
+- (void)test_min_empty_key_insert_gappy
+{
+    std::map<UInt8, UInt8> map;
+
+    map.insert(std::make_pair(1, 1));
+
+    auto key = yas::min_empty_key(map);
+    XCTAssertTrue(key);
+    XCTAssertEqual(*key, 0);
+}
+
+- (void)test_min_empty_key_filled
+{
+    std::map<UInt8, UInt8> map;
+
+    for (UInt16 i = 0; i < std::numeric_limits<UInt8>::max(); ++i) {
+        map.insert(std::make_pair(i, i));
+    }
+
+    auto key = yas::min_empty_key(map);
+    XCTAssertFalse(key);
+}
+
 @end

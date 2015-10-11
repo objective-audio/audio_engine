@@ -20,7 +20,7 @@ namespace yas
             return nullopt;
         }
 
-        int next = map.rbegin()->first + 1;
+        T next = map.rbegin()->first + 1;
         if (next == map.size()) {
             return next;
         }
