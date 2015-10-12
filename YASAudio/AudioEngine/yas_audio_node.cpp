@@ -51,12 +51,12 @@ audio_connection_sptr audio_node_core::output_connection(const UInt32 bus_idx)
     return nullptr;
 }
 
-void audio_node_core::set_input_connections(const audio_connection_wmap &connections)
+void audio_node_core::_set_input_connections(const audio_connection_wmap &connections)
 {
     _impl->input_connections = connections;
 }
 
-void audio_node_core::set_output_connections(const audio_connection_wmap &connections)
+void audio_node_core::_set_output_connections(const audio_connection_wmap &connections)
 {
     _impl->output_connections = connections;
 }

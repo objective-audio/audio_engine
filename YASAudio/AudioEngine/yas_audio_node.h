@@ -36,8 +36,8 @@ namespace yas
         audio_node_core &operator=(const audio_node_core &) = delete;
         audio_node_core &operator=(audio_node_core &&) = delete;
 
-        void set_input_connections(const audio_connection_wmap &);
-        void set_output_connections(const audio_connection_wmap &);
+        void _set_input_connections(const audio_connection_wmap &);
+        void _set_output_connections(const audio_connection_wmap &);
 
        public:
         class private_access;
