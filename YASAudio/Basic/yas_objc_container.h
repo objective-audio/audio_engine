@@ -12,61 +12,56 @@
 
 namespace yas
 {
-    class objc_strong_container
+    namespace objc
     {
-       public:
-        objc_strong_container(const id object = nil);
+        struct strong_holder {
+            strong_holder();
+            strong_holder(const id object);
+            ~strong_holder();
+            void set_object(const id object);
 
-        ~objc_strong_container();
+            id _object;
+        };
 
-        objc_strong_container(const objc_strong_container &);
-        objc_strong_container(objc_strong_container &&) noexcept;
-        objc_strong_container &operator=(const objc_strong_container &);
-        objc_strong_container &operator=(objc_strong_container &&) noexcept;
-        objc_strong_container &operator=(const id object);
+        struct weak_holder {
+            weak_holder();
+            weak_holder(const id object);
+            ~weak_holder();
+            void set_object(const id object);
 
-        objc_strong_container(const objc_weak_container &);
-        objc_strong_container &operator=(const objc_weak_container &);
+            YASWeakForVariable id _object;
+        };
 
-        explicit operator bool() const;
+        using strong = strong_holder;
+        using weak = weak_holder;
 
-        void set_object(const id object);
-        id object() const;
-        id retained_object() const;
-        id autoreleased_object() const;
+        template <typename T = strong>
+        class container
+        {
+           public:
+            container(const id object = nil);
 
-       private:
-        id _strong_object;
-        mutable std::recursive_mutex _mutex;
-    };
+            ~container() = default;
 
-    class objc_weak_container
-    {
-       public:
-        objc_weak_container(const id object = nil);
+            container(const container &);
+            container(container &&);
+            container &operator=(const container &);
+            container &operator=(container &&);
 
-        ~objc_weak_container();
+            container &operator=(const id object);
 
-        objc_weak_container(const objc_weak_container &);
-        objc_weak_container(objc_weak_container &&) noexcept;
-        objc_weak_container &operator=(const objc_weak_container &);
-        objc_weak_container &operator=(objc_weak_container &&) noexcept;
-        objc_weak_container &operator=(const id object);
+            explicit operator bool() const;
 
-        objc_weak_container(const objc_strong_container &);
-        objc_weak_container &operator=(const objc_strong_container &);
+            void set_object(const id object);
+            id object() const;
+            id retained_object() const;
+            id autoreleased_object() const;
 
-        explicit operator bool() const;
+            container<strong_holder> lock() const;
 
-        void set_object(const id object);
-        id object() const;
-        id retained_object() const;
-        id autoreleased_object() const;
-
-        objc_strong_container lock() const;
-
-       private:
-        YASWeakForVariable id _weak_object;
-        mutable std::recursive_mutex _mutex;
-    };
+           private:
+            T _holder;
+            mutable std::recursive_mutex _mutex;
+        };
+    }
 }

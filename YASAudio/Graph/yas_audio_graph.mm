@@ -31,8 +31,8 @@ namespace yas
     static bool _interrupting;
     static std::map<UInt8, audio_graph::weak> _graphs;
 #if TARGET_OS_IPHONE
-    static yas::objc_strong_container _did_become_active_observer;
-    static yas::objc_strong_container _interruption_observer;
+    static yas::objc::container<> _did_become_active_observer;
+    static yas::objc::container<> _interruption_observer;
 #endif
 }
 
@@ -68,7 +68,7 @@ class audio_graph::impl
                                                                   object:nil
                                                                    queue:[NSOperationQueue mainQueue]
                                                               usingBlock:lambda];
-            _did_become_active_observer = yas::objc_strong_container(observer);
+            _did_become_active_observer = yas::objc::container<>(observer);
         }
 
         if (!_interruption_observer) {
@@ -93,7 +93,7 @@ class audio_graph::impl
                                                                   object:nil
                                                                    queue:[NSOperationQueue mainQueue]
                                                               usingBlock:lambda];
-            _interruption_observer = yas::objc_strong_container(observer);
+            _interruption_observer = yas::objc::container<>(observer);
         }
     }
 #endif

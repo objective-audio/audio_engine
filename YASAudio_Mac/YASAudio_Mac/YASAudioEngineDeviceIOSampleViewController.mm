@@ -110,7 +110,7 @@ typedef NS_ENUM(NSUInteger, YASAudioDeviceRouteSampleInputType) {
     yas::observer _system_observer;
     yas::observer _device_observer;
 
-    std::shared_ptr<yas::objc_weak_container> _self_container;
+    yas::objc::container<yas::objc::weak> _self_container;
 }
 
 - (void)dealloc
@@ -124,7 +124,7 @@ typedef NS_ENUM(NSUInteger, YASAudioDeviceRouteSampleInputType) {
     _inputRoutes = nil;
 
     if (_self_container) {
-        _self_container->set_object(nil);
+        _self_container.set_object(nil);
     }
 
     YASSuperDealloc;
@@ -182,7 +182,7 @@ typedef NS_ENUM(NSUInteger, YASAudioDeviceRouteSampleInputType) {
     _tap_node = yas::audio_tap_node::create();
 
     if (!_self_container) {
-        _self_container = std::make_shared<yas::objc_weak_container>(self);
+        _self_container.set_object(self);
     }
 
     std::weak_ptr<yas::audio_tap_node> weak_node = _tap_node;
@@ -210,7 +210,7 @@ typedef NS_ENUM(NSUInteger, YASAudioDeviceRouteSampleInputType) {
     _system_observer = yas::observer();
     _system_observer.add_handler(yas::audio_device::system_subject(), yas::audio_device_method::hardware_did_change,
                                  [weak_container = _self_container](const auto &method, const auto &infos) {
-                                     if (auto strong_container = weak_container->lock()) {
+                                     if (auto strong_container = weak_container.lock()) {
                                          YASAudioEngineDeviceIOSampleViewController *strongSelf =
                                              strong_container.object();
                                          [strongSelf _updateDeviceNames];
@@ -413,7 +413,7 @@ typedef NS_ENUM(NSUInteger, YASAudioDeviceRouteSampleInputType) {
                 if (infos->size() > 0) {
                     const auto &device_id = infos->at(0).object_id;
                     if (selected_device.audio_device_id() == device_id) {
-                        if (const auto strong_container = weak_container->lock()) {
+                        if (const auto strong_container = weak_container.lock()) {
                             YASAudioEngineDeviceIOSampleViewController *controller = strong_container.object();
                             [controller _updateConnection];
                         }

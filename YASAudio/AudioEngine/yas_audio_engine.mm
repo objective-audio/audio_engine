@@ -25,8 +25,8 @@ class audio_engine::impl
 {
    public:
     std::weak_ptr<audio_engine> engine;
-    objc_strong_container reset_observer;
-    objc_strong_container route_change_observer;
+    objc::container<> reset_observer;
+    objc::container<> route_change_observer;
     yas::subject subject;
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
     observer device_observer;
