@@ -146,8 +146,8 @@ void audio_route_node::render(audio_pcm_buffer &dst_buffer, const UInt32 dst_bus
 
         for (const auto &pair : input_connections) {
             if (const auto &input_connection = pair.second) {
-                if (auto node = input_connection->source_node()) {
-                    const auto &src_format = input_connection->format();
+                if (auto node = input_connection.source_node()) {
+                    const auto &src_format = input_connection.format();
                     const auto &src_bus_idx = pair.first;
                     const UInt32 src_ch_count = src_format.channel_count();
                     if (const auto result =

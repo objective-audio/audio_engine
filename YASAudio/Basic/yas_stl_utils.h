@@ -16,7 +16,7 @@ namespace yas
     std::experimental::optional<T> min_empty_key(const std::map<T, U> &map);
 
     template <typename T, typename P>
-    std::set<T> filter(const std::set<T> &source, P predicate);
+    T filter(const T &collection, P predicate);
 
     template <typename K, typename T>
     std::map<K, std::shared_ptr<T>> lock_values(const std::map<K, std::weak_ptr<T>> &map);

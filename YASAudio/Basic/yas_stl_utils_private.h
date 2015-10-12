@@ -33,17 +33,17 @@ namespace yas
     }
 
     template <typename T, typename P>
-    std::set<T> filter(const std::set<T> &source, P predicate)
+    T filter(const T &collection, P predicate)
     {
-        std::set<T> filtered_set;
+        T filtered;
 
-        for (auto &obj : source) {
+        for (auto &obj : collection) {
             if (predicate(obj)) {
-                filtered_set.insert(obj);
+                filtered.insert(obj);
             }
         }
 
-        return filtered_set;
+        return filtered;
     }
 
     template <typename K, typename T>

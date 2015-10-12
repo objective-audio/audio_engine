@@ -24,8 +24,8 @@ namespace yas
 
         audio_connection_smap input_connections() const;
         audio_connection_smap output_connections() const;
-        audio_connection_sptr input_connection(const UInt32 bus_idx);
-        audio_connection_sptr output_connection(const UInt32 bus_idx);
+        audio_connection input_connection(const UInt32 bus_idx);
+        audio_connection output_connection(const UInt32 bus_idx);
 
        private:
         class impl;
@@ -72,8 +72,8 @@ namespace yas
        protected:
         audio_node();
 
-        audio_connection_sptr input_connection(const UInt32 bus_idx) const;
-        audio_connection_sptr output_connection(const UInt32 bus_idx) const;
+        audio_connection input_connection(const UInt32 bus_idx) const;
+        audio_connection output_connection(const UInt32 bus_idx) const;
         const audio_connection_wmap &input_connections() const;
         const audio_connection_wmap &output_connections() const;
 
@@ -96,7 +96,7 @@ namespace yas
         audio_node &operator=(audio_node &&) = delete;
 
         void _set_engine(const audio_engine_sptr &engine);
-        void _add_connection(const audio_connection_sptr &connection);
+        void _add_connection(const audio_connection &connection);
         void _remove_connection(const audio_connection &connection);
 
        public:

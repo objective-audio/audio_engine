@@ -29,37 +29,68 @@ class audio_connection::impl
           destination_node(destination_node)
     {
     }
+
+    void remove_connection_from_nodes(const audio_connection &connection)
+    {
+        if (auto node = destination_node.lock()) {
+            audio_node::private_access::remove_connection(node, connection);
+        }
+        if (auto node = source_node.lock()) {
+            audio_node::private_access::remove_connection(node, connection);
+        }
+    }
 };
 
-audio_connection_sptr audio_connection::_create(const audio_node_sptr &source_node, const UInt32 source_bus,
-                                                const audio_node_sptr &destination_node, const UInt32 destination_bus,
-                                                const audio_format &format)
+audio_connection::audio_connection(std::nullptr_t) : _impl(nullptr)
 {
-    auto connection =
-        audio_connection_sptr(new audio_connection(source_node, source_bus, destination_node, destination_bus, format));
-    audio_node::private_access::add_connection(source_node, connection);
-    audio_node::private_access::add_connection(destination_node, connection);
-    return connection;
+}
+
+audio_connection::~audio_connection()
+{
+    if (_impl && _impl.unique()) {
+        _impl->remove_connection_from_nodes(*this);
+        _impl.reset();
+    }
 }
 
 audio_connection::audio_connection(const audio_node_sptr &source_node, const UInt32 source_bus,
                                    const audio_node_sptr &destination_node, const UInt32 destination_bus,
                                    const audio_format &format)
-    : _impl(std::make_unique<impl>(source_node, source_bus, destination_node, destination_bus, format))
+    : _impl(std::make_shared<impl>(source_node, source_bus, destination_node, destination_bus, format))
 {
     if (!source_node || !destination_node) {
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : invalid argument.");
     }
+
+    audio_node::private_access::add_connection(source_node, *this);
+    audio_node::private_access::add_connection(destination_node, *this);
 }
 
-audio_connection::~audio_connection()
+audio_connection::audio_connection(const std::shared_ptr<impl> &impl) : _impl(impl)
 {
-    if (auto destination_node = _impl->destination_node.lock()) {
-        audio_node::private_access::remove_connection(destination_node, *this);
+}
+
+bool audio_connection::operator==(const audio_connection &other) const
+{
+    return _impl && other._impl && _impl == other._impl;
+}
+
+bool audio_connection::operator!=(const audio_connection &other) const
+{
+    return !_impl || !other._impl || _impl != other._impl;
+}
+
+bool audio_connection::operator<(const audio_connection &other) const
+{
+    if (_impl && other._impl) {
+        return _impl < other._impl;
     }
-    if (auto source_node = _impl->source_node.lock()) {
-        audio_node::private_access::remove_connection(source_node, *this);
-    }
+    return false;
+}
+
+audio_connection::operator bool() const
+{
+    return _impl != nullptr;
 }
 
 UInt32 audio_connection::source_bus() const
@@ -74,19 +105,30 @@ UInt32 audio_connection::destination_bus() const
 
 audio_node_sptr audio_connection::source_node() const
 {
-    std::lock_guard<std::recursive_mutex> lock(_impl->mutex);
-    return _impl->source_node.lock();
+    if (_impl) {
+        std::lock_guard<std::recursive_mutex> lock(_impl->mutex);
+        return _impl->source_node.lock();
+    }
+    return nullptr;
 }
 
 audio_node_sptr audio_connection::destination_node() const
 {
-    std::lock_guard<std::recursive_mutex> lock(_impl->mutex);
-    return _impl->destination_node.lock();
+    if (_impl) {
+        std::lock_guard<std::recursive_mutex> lock(_impl->mutex);
+        return _impl->destination_node.lock();
+    }
+    return nullptr;
 }
 
 audio_format &audio_connection::format() const
 {
     return _impl->format;
+}
+
+uintptr_t audio_connection::key() const
+{
+    return reinterpret_cast<uintptr_t>(&*_impl);
 }
 
 void audio_connection::_remove_nodes()

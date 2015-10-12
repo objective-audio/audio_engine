@@ -29,7 +29,7 @@ static const AudioComponentDescription baseAcd = {.componentType = kAudioUnitTyp
     yas::audio_engine_sptr _engine;
     yas::audio_unit_output_node_sptr _output_node;
     yas::audio_unit_node_sptr _effect_node;
-    yas::audio_connection_sptr _through_connection;
+    yas::audio_connection _through_connection;
     yas::audio_tap_node_sptr _tap_node;
 }
 

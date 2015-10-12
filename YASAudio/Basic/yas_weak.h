@@ -6,6 +6,7 @@
 #pragma once
 
 #include <memory>
+#include <map>
 
 namespace yas
 {
@@ -34,4 +35,18 @@ namespace yas
        private:
         std::weak_ptr<I> _impl;
     };
+
+    template <typename K, typename T, typename I>
+    std::map<K, T> lock_values(const std::map<K, weak<T, I>> &map)
+    {
+        std::map<K, T> unwrapped_map;
+
+        for (auto &pair : map) {
+            if (auto shared = pair.second.lock()) {
+                unwrapped_map.insert(std::make_pair(pair.first, shared));
+            }
+        }
+
+        return unwrapped_map;
+    }
 }

@@ -75,12 +75,12 @@ void audio_tap_node::render(audio_pcm_buffer &buffer, const UInt32 bus_idx, cons
     }
 }
 
-audio_connection_sptr audio_tap_node::input_connection_on_render(const UInt32 bus_idx) const
+audio_connection audio_tap_node::input_connection_on_render(const UInt32 bus_idx) const
 {
     return _impl->node_core_on_render->input_connection(bus_idx);
 }
 
-audio_connection_sptr audio_tap_node::output_connection_on_render(const UInt32 bus_idx) const
+audio_connection audio_tap_node::output_connection_on_render(const UInt32 bus_idx) const
 {
     return _impl->node_core_on_render->output_connection(bus_idx);
 }
@@ -98,8 +98,8 @@ audio_connection_smap audio_tap_node::output_connections_on_render() const
 void audio_tap_node::render_source(audio_pcm_buffer &buffer, const UInt32 bus_idx, const audio_time &when)
 {
     if (auto connection = input_connection_on_render(bus_idx)) {
-        if (auto node = connection->source_node()) {
-            node->render(buffer, connection->source_bus(), when);
+        if (auto node = connection.source_node()) {
+            node->render(buffer, connection.source_bus(), when);
         }
     }
 }

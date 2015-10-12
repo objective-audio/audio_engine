@@ -35,7 +35,7 @@ audio_connection_smap audio_node_core::output_connections() const
     return yas::lock_values(_impl->output_connections);
 }
 
-audio_connection_sptr audio_node_core::input_connection(const UInt32 bus_idx)
+audio_connection audio_node_core::input_connection(const UInt32 bus_idx)
 {
     if (_impl->input_connections.count(bus_idx) > 0) {
         return _impl->input_connections.at(bus_idx).lock();
@@ -43,7 +43,7 @@ audio_connection_sptr audio_node_core::input_connection(const UInt32 bus_idx)
     return nullptr;
 }
 
-audio_connection_sptr audio_node_core::output_connection(const UInt32 bus_idx)
+audio_connection audio_node_core::output_connection(const UInt32 bus_idx)
 {
     if (_impl->output_connections.count(bus_idx) > 0) {
         return _impl->output_connections.at(bus_idx).lock();
@@ -138,7 +138,7 @@ void audio_node::reset()
 audio_format audio_node::input_format(const UInt32 bus_idx)
 {
     if (auto connection = input_connection(bus_idx)) {
-        return connection->format();
+        return connection.format();
     }
     return nullptr;
 }
@@ -146,7 +146,7 @@ audio_format audio_node::input_format(const UInt32 bus_idx)
 audio_format audio_node::output_format(const UInt32 bus_idx)
 {
     if (auto connection = output_connection(bus_idx)) {
-        return connection->format();
+        return connection.format();
     }
     return nullptr;
 }
@@ -247,14 +247,14 @@ void audio_node::_set_engine(const audio_engine_sptr &engine)
     _impl->engine = engine;
 }
 
-void audio_node::_add_connection(const audio_connection_sptr &connection)
+void audio_node::_add_connection(const audio_connection &connection)
 {
-    if (*connection->destination_node() == *this) {
-        auto bus_idx = connection->destination_bus();
-        _impl->input_connections().insert(std::make_pair(bus_idx, connection));
-    } else if (*connection->source_node() == *this) {
-        auto bus_idx = connection->source_bus();
-        _impl->output_connections().insert(std::make_pair(bus_idx, connection));
+    if (*connection.destination_node() == *this) {
+        auto bus_idx = connection.destination_bus();
+        _impl->input_connections().insert(std::make_pair(bus_idx, audio_connection::weak(connection)));
+    } else if (*connection.source_node() == *this) {
+        auto bus_idx = connection.source_bus();
+        _impl->output_connections().insert(std::make_pair(bus_idx, audio_connection::weak(connection)));
     } else {
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : connection does not exist in a node.");
     }
@@ -275,7 +275,7 @@ void audio_node::_remove_connection(const audio_connection &connection)
     update_node_core();
 }
 
-audio_connection_sptr audio_node::input_connection(const UInt32 bus_idx) const
+audio_connection audio_node::input_connection(const UInt32 bus_idx) const
 {
     if (_impl->input_connections().count(bus_idx) > 0) {
         return _impl->input_connections().at(bus_idx).lock();
@@ -283,7 +283,7 @@ audio_connection_sptr audio_node::input_connection(const UInt32 bus_idx) const
     return nullptr;
 }
 
-audio_connection_sptr audio_node::output_connection(const UInt32 bus_idx) const
+audio_connection audio_node::output_connection(const UInt32 bus_idx) const
 {
     if (_impl->output_connections().count(bus_idx) > 0) {
         return _impl->output_connections().at(bus_idx).lock();
