@@ -58,8 +58,6 @@ namespace yas
     std::string to_string(const AudioUnitScope scope);
     std::string to_string(const render_type &);
 
-    class objc_strong_container;
-    class objc_weak_container;
     class audio_time;
     class audio_format;
     class audio_pcm_buffer;
