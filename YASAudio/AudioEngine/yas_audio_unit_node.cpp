@@ -17,10 +17,10 @@ class audio_unit_node::impl
     audio_unit_node_wptr weak_node;
     AudioComponentDescription acd;
     std::map<AudioUnitScope, audio_unit_parameter_map_t> parameters;
-    audio_graph::weak audio_graph;
+    audio_graph::weak weak_graph;
     yas::audio_unit _au;
 
-    impl() : weak_node(), acd(), parameters(), audio_graph(), _au(nullptr), _mutex()
+    impl() : weak_node(), acd(), parameters(), weak_graph(), _au(nullptr), _mutex()
     {
     }
 
@@ -285,7 +285,7 @@ void audio_unit_node::render(audio_pcm_buffer &buffer, const UInt32 bus_idx, con
 
 void audio_unit_node::_reload_audio_unit()
 {
-    auto graph = _impl->audio_graph.lock();
+    auto graph = _impl->weak_graph.lock();
 
     if (graph) {
         _remove_audio_unit_from_graph();
@@ -304,7 +304,7 @@ void audio_unit_node::_add_audio_unit_to_graph(audio_graph &graph)
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
     }
 
-    _impl->audio_graph = audio_graph::weak(graph);
+    _impl->weak_graph = audio_graph::weak(graph);
 
     prepare_audio_unit();
     graph.add_audio_unit(_impl->_au);
@@ -313,9 +313,9 @@ void audio_unit_node::_add_audio_unit_to_graph(audio_graph &graph)
 
 void audio_unit_node::_remove_audio_unit_from_graph()
 {
-    if (auto graph = _impl->audio_graph.lock()) {
+    if (auto graph = _impl->weak_graph.lock()) {
         graph.remove_audio_unit(_impl->_au);
     }
 
-    _impl->audio_graph.reset();
+    _impl->weak_graph.reset();
 }

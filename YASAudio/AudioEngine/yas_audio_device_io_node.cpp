@@ -23,11 +23,11 @@ class audio_device_io_node::impl
 {
    public:
     std::weak_ptr<audio_device_io_node> weak_node;
-    audio_graph::weak graph;
+    audio_graph::weak weak_graph;
     audio_device_io device_io;
     audio_node_core_sptr node_core_on_render;
 
-    impl() : weak_node(), _device(nullptr), graph(), device_io(nullptr), node_core_on_render(nullptr)
+    impl() : weak_node(), _device(nullptr), weak_graph(), device_io(nullptr), node_core_on_render(nullptr)
     {
     }
 
@@ -170,20 +170,20 @@ void audio_device_io_node::_add_device_io_to_graph(audio_graph &graph)
         return;
     }
 
-    _impl->graph = audio_graph::weak(graph);
+    _impl->weak_graph = audio_graph::weak(graph);
     _impl->device_io = audio_device_io(_impl->device());
     graph.add_audio_device_io(_impl->device_io);
 }
 
 void audio_device_io_node::_remove_device_io_from_graph()
 {
-    if (auto graph = _impl->graph.lock()) {
+    if (auto graph = _impl->weak_graph.lock()) {
         if (_impl->device_io) {
             graph.remove_audio_device_io(_impl->device_io);
         }
     }
 
-    _impl->graph.reset();
+    _impl->weak_graph.reset();
     _impl->device_io = nullptr;
 }
 
