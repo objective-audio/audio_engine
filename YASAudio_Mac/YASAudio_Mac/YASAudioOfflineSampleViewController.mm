@@ -114,13 +114,13 @@ namespace yas
 
     yas::observer _engine_observer;
 
-    std::shared_ptr<yas::objc_weak_container> _self_container;
+    yas::objc::container<yas::objc::weak> _self_container;
 }
 
 - (void)dealloc
 {
     if (_self_container) {
-        _self_container->set_object(nil);
+        _self_container.set_object(nil);
     }
 
     YASSuperDealloc;
@@ -295,7 +295,7 @@ namespace yas
     self.processing = YES;
 
     if (!_self_container) {
-        _self_container = std::make_shared<yas::objc_weak_container>(self);
+        _self_container.set_object(self);
     }
 
     UInt32 remain = self.length * yas::offline_sample::sample_rate;
@@ -324,7 +324,7 @@ namespace yas
             }
         },
         [weak_container = _self_container](const bool cancelled) {
-            if (auto strong_container = weak_container->lock()) {
+            if (auto strong_container = weak_container.lock()) {
                 YASAudioOfflineSampleViewController *controller = strong_container.object();
                 controller.processing = NO;
             }

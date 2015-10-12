@@ -6,213 +6,178 @@
 #include "yas_objc_container.h"
 #include "YASMacros.h"
 
-using namespace yas;
+using namespace yas::objc;
 
-#pragma mark - strong
+strong_holder::strong_holder() : _object(nil)
+{
+}
 
-objc_strong_container::objc_strong_container(const id object) : _strong_object(object)
+strong_holder::strong_holder(const id object) : _object(object)
 {
     YASRetainOrIgnore(object);
 }
 
-objc_strong_container::~objc_strong_container()
+strong_holder::~strong_holder()
 {
-    YASRelease(_strong_object);
+    YASRelease(_object);
+    _object = nil;
 }
 
-objc_strong_container::objc_strong_container(const objc_strong_container &container)
-    : _strong_object(container.retained_object())
+void strong_holder::set_object(const id object)
 {
-}
-
-objc_strong_container::objc_strong_container(objc_strong_container &&container) noexcept
-    : _strong_object(container.retained_object())
-{
-    container.set_object(nil);
-}
-
-objc_strong_container &objc_strong_container::operator=(const objc_strong_container &container)
-{
-    if (this == &container) {
-        return *this;
-    }
-
-    id object = container.retained_object();
-    set_object(object);
-    YASRelease(object);
-
-    return *this;
-}
-
-objc_strong_container &objc_strong_container::operator=(objc_strong_container &&container) noexcept
-{
-    if (this == &container) {
-        return *this;
-    }
-
-    id object = container.retained_object();
-    set_object(object);
-    YASRelease(object);
-
-    container.set_object(nil);
-
-    return *this;
-}
-
-objc_strong_container &objc_strong_container::operator=(const id object)
-{
-    set_object(object);
-
-    return *this;
-}
-
-objc_strong_container::objc_strong_container(const objc_weak_container &container)
-    : _strong_object(container.retained_object())
-{
-}
-
-objc_strong_container &objc_strong_container::operator=(const objc_weak_container &container)
-{
-    id object = container.retained_object();
-    set_object(object);
-    YASRelease(object);
-
-    return *this;
-}
-
-objc_strong_container::operator bool() const
-{
-    std::lock_guard<std::recursive_mutex> lock(_mutex);
-    return !!_strong_object;
-}
-
-void objc_strong_container::set_object(const id object)
-{
-    std::lock_guard<std::recursive_mutex> lock(_mutex);
     YASRetainOrIgnore(object);
-    YASRelease(_strong_object);
-    _strong_object = object;
+    YASRelease(_object);
+    _object = object;
 }
 
-id objc_strong_container::object() const
-{
-    std::lock_guard<std::recursive_mutex> lock(_mutex);
-    return _strong_object;
-}
-
-id objc_strong_container::retained_object() const
-{
-    std::lock_guard<std::recursive_mutex> lock(_mutex);
-    return YASRetain(_strong_object);
-}
-
-id objc_strong_container::autoreleased_object() const
-{
-    std::lock_guard<std::recursive_mutex> lock(_mutex);
-    return YASRetainAndAutorelease(_strong_object);
-}
-
-#pragma mark - weak
-
-objc_weak_container::objc_weak_container(const id object) : _weak_object(object)
+weak_holder::weak_holder() : _object(nil)
 {
 }
 
-objc_weak_container::~objc_weak_container() = default;
-
-objc_weak_container::objc_weak_container(const objc_weak_container &container) : _weak_object(container.object())
+weak_holder::weak_holder(const id object) : _object(object)
 {
 }
 
-objc_weak_container::objc_weak_container(objc_weak_container &&container) noexcept : _weak_object(container.object())
+weak_holder::~weak_holder()
 {
-    container.set_object(nil);
+    _object = nil;
 }
 
-objc_weak_container &objc_weak_container::operator=(const objc_weak_container &container)
+void weak_holder::set_object(const id object)
 {
-    if (this == &container) {
-        return *this;
-    }
+    _object = object;
+}
 
-    id object = container.retained_object();
-    set_object(object);
-    YASRelease(object);
+#pragma mark -
+
+template <typename T>
+container<T>::container(const id object)
+    : _holder(object)
+{
+}
+
+template container<strong_holder>::container(const id object);
+template container<weak_holder>::container(const id object);
+
+template <typename T>
+container<T>::container(const container &other)
+{
+    id obj = other.retained_object();
+    set_object(obj);
+    YASRelease(obj);
+}
+
+template container<strong_holder>::container(const container<strong_holder> &);
+template container<weak_holder>::container(const container<weak_holder> &);
+
+template <typename T>
+container<T>::container(container &&other)
+{
+    id obj = other.retained_object();
+    set_object(obj);
+    YASRelease(obj);
+    other.set_object(nil);
+}
+
+template container<strong_holder>::container(container<strong_holder> &&);
+template container<weak_holder>::container(container<weak_holder> &&);
+
+template <typename T>
+container<T> &container<T>::operator=(const container<T> &other)
+{
+    id obj = other.retained_object();
+    set_object(obj);
+    YASRelease(obj);
 
     return *this;
 }
 
-objc_weak_container &objc_weak_container::operator=(objc_weak_container &&container) noexcept
+template container<strong_holder> &container<strong_holder>::operator=(const container<strong_holder> &);
+template container<weak_holder> &container<weak_holder>::operator=(const container<weak_holder> &);
+
+template <typename T>
+container<T> &container<T>::operator=(container<T> &&other)
 {
-    if (this == &container) {
-        return *this;
-    }
-
-    id object = container.retained_object();
-    set_object(object);
-    YASRelease(object);
-
-    container.set_object(nil);
+    id obj = other.retained_object();
+    set_object(obj);
+    YASRelease(obj);
+    other.set_object(nil);
 
     return *this;
 }
 
-objc_weak_container &objc_weak_container::operator=(const id object)
+template container<strong_holder> &container<strong_holder>::operator=(container<strong_holder> &&);
+template container<weak_holder> &container<weak_holder>::operator=(container<weak_holder> &&);
+
+template <typename T>
+container<T> &container<T>::operator=(const id object)
 {
     set_object(object);
 
     return *this;
 }
 
-objc_weak_container::objc_weak_container(const objc_strong_container &container)
-    : _weak_object(container.retained_object())
-{
-    YASRelease(_weak_object);
-}
+template container<strong_holder> &container<strong_holder>::operator=(const id object);
+template container<weak_holder> &container<weak_holder>::operator=(const id object);
 
-objc_weak_container &objc_weak_container::operator=(const objc_strong_container &container)
-{
-    id object = container.retained_object();
-    set_object(object);
-    YASRelease(object);
-
-    return *this;
-}
-
-objc_weak_container::operator bool() const
+template <typename T>
+container<T>::operator bool() const
 {
     std::lock_guard<std::recursive_mutex> lock(_mutex);
-    return !!_weak_object;
+    return !!_holder._object;
 }
 
-void objc_weak_container::set_object(const id object)
+template container<strong_holder>::operator bool() const;
+template container<weak_holder>::operator bool() const;
+
+template <typename T>
+void container<T>::set_object(const id object)
 {
     std::lock_guard<std::recursive_mutex> lock(_mutex);
-    _weak_object = object;
+    _holder.set_object(object);
 }
 
-id objc_weak_container::object() const
+template void container<strong_holder>::set_object(const id object);
+template void container<weak_holder>::set_object(const id object);
+
+template <typename T>
+id container<T>::object() const
 {
     std::lock_guard<std::recursive_mutex> lock(_mutex);
-    return _weak_object;
+    return _holder._object;
 }
 
-id objc_weak_container::retained_object() const
+template id container<strong_holder>::object() const;
+template id container<weak_holder>::object() const;
+
+template <typename T>
+id container<T>::retained_object() const
 {
     std::lock_guard<std::recursive_mutex> lock(_mutex);
-    return YASRetain(_weak_object);
+    return YASRetain(_holder._object);
 }
 
-id objc_weak_container::autoreleased_object() const
+template id container<strong_holder>::retained_object() const;
+template id container<weak_holder>::retained_object() const;
+
+template <typename T>
+id container<T>::autoreleased_object() const
 {
     std::lock_guard<std::recursive_mutex> lock(_mutex);
-    return YASRetainAndAutorelease(_weak_object);
+    return YASRetainAndAutorelease(_holder._object);
 }
 
-objc_strong_container objc_weak_container::lock() const
+template id container<strong_holder>::autoreleased_object() const;
+template id container<weak_holder>::autoreleased_object() const;
+
+template <typename T>
+container<strong_holder> container<T>::lock() const
 {
-    id object = retained_object();
-    objc_strong_container container(object);
-    YASRelease(object);
-    return container;
+    id obj = retained_object();
+    container<strong> strong_container(obj);
+    YASRelease(obj);
+    return strong_container;
 }
+
+template container<strong_holder> container<strong_holder>::lock() const;
+template container<strong_holder> container<weak_holder>::lock() const;

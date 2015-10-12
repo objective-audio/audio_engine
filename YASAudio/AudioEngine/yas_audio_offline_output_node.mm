@@ -17,7 +17,7 @@ class audio_offline_output_node::impl
 
    public:
     std::weak_ptr<audio_offline_output_node> weak_node;
-    objc_strong_container queue_container;
+    objc::container<> queue_container;
 
     impl() : queue_container(nil), _completion_functions()
     {
@@ -105,7 +105,7 @@ audio_offline_output_node::start_result_t audio_offline_output_node::_start(cons
         yas::audio_pcm_buffer render_buffer(connection->format(), 1024);
 
         NSBlockOperation *blockOperation = [[NSBlockOperation alloc] init];
-        objc_weak_container operation_container(blockOperation);
+        objc::container<objc::weak> operation_container(blockOperation);
 
         auto operation_lambda = [weak_node, operation_container, render_buffer, render_func, key]() mutable {
             bool cancelled = false;

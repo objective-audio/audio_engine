@@ -144,7 +144,7 @@ using sample_kernel_sptr = std::shared_ptr<sample_kernel_t>;
     yas::audio_device_io _audio_device_io;
     yas::observer _audio_device_observer;
     sample_kernel_sptr _kernel;
-    std::shared_ptr<yas::objc_weak_container> _self_container;
+    yas::objc::container<yas::objc::weak> _self_container;
 }
 
 - (void)viewDidLoad
@@ -166,7 +166,7 @@ using sample_kernel_sptr = std::shared_ptr<sample_kernel_t>;
     });
 
     if (!_self_container) {
-        _self_container = std::make_shared<yas::objc_weak_container>(self);
+        _self_container.set_object(self);
     }
 
     _audio_graph.prepare();
@@ -183,7 +183,7 @@ using sample_kernel_sptr = std::shared_ptr<sample_kernel_t>;
     _audio_device_observer.add_handler(
         yas::audio_device::system_subject(), yas::audio_device_method::hardware_did_change,
         [weak_container = _self_container](const auto &, const auto &) {
-            if (auto strong_container = weak_container->lock()) {
+            if (auto strong_container = weak_container.lock()) {
                 YASAudioDeviceSampleViewController *strongSelf = strong_container.object();
                 [strongSelf _updateDeviceNames];
             }
@@ -244,7 +244,7 @@ using sample_kernel_sptr = std::shared_ptr<sample_kernel_t>;
     YASRelease(_ioThroughTextColor);
     YASRelease(_sineTextColor);
     if (_self_container) {
-        _self_container->set_object(nil);
+        _self_container.set_object(nil);
     }
     YASSuperDealloc;
 }
@@ -327,7 +327,7 @@ using sample_kernel_sptr = std::shared_ptr<sample_kernel_t>;
                 if (infos->size() > 0) {
                     auto &device_id = infos->at(0).object_id;
                     if (selected_device.audio_device_id() == device_id) {
-                        if (auto strong_container = weak_container->lock()) {
+                        if (auto strong_container = weak_container.lock()) {
                             YASAudioDeviceSampleViewController *strongSelf = strong_container.object();
                             [strongSelf _updateDeviceInfo];
                         }
