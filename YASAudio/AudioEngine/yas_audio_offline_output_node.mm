@@ -102,7 +102,7 @@ audio_offline_output_node::start_result_t audio_offline_output_node::_start(cons
         }
 
         auto weak_node = _impl->weak_node;
-        yas::audio_pcm_buffer render_buffer(connection->format(), 1024);
+        yas::audio_pcm_buffer render_buffer(connection.format(), 1024);
 
         NSBlockOperation *blockOperation = [[NSBlockOperation alloc] init];
         objc::container<objc::weak> operation_container(blockOperation);
@@ -132,7 +132,7 @@ audio_offline_output_node::start_result_t audio_offline_output_node::_start(cons
                     break;
                 }
 
-                auto format = connection_on_block->format();
+                auto format = connection_on_block.format();
                 if (format != render_buffer.format()) {
                     cancelled = true;
                     break;
@@ -140,8 +140,8 @@ audio_offline_output_node::start_result_t audio_offline_output_node::_start(cons
 
                 render_buffer.reset();
 
-                if (auto source_node = connection_on_block->source_node()) {
-                    source_node->render(render_buffer, connection_on_block->source_bus(), when);
+                if (auto source_node = connection_on_block.source_node()) {
+                    source_node->render(render_buffer, connection_on_block.source_bus(), when);
                 }
 
                 if (render_func) {

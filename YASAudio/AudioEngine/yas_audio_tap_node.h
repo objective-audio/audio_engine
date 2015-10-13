@@ -25,8 +25,8 @@ namespace yas
 
         virtual void render(audio_pcm_buffer &buffer, const UInt32 bus_idx, const audio_time &when) override;
 
-        audio_connection_sptr input_connection_on_render(const UInt32 bus_idx) const;
-        audio_connection_sptr output_connection_on_render(const UInt32 bus_idx) const;
+        audio_connection input_connection_on_render(const UInt32 bus_idx) const;
+        audio_connection output_connection_on_render(const UInt32 bus_idx) const;
         audio_connection_smap input_connections_on_render() const;
         audio_connection_smap output_connections_on_render() const;
         void render_source(audio_pcm_buffer &buffer, const UInt32 bus_idx, const audio_time &when);

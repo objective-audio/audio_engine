@@ -225,10 +225,10 @@ void audio_unit_node::update_connections()
                 if (auto node = weak_node.lock()) {
                     if (auto core = node->node_core()) {
                         if (auto connection = core->input_connection(render_parameters.in_bus_number)) {
-                            if (auto source_node = connection->source_node()) {
-                                auto buffer = yas::audio_pcm_buffer(connection->format(), render_parameters.io_data);
-                                audio_time when(*render_parameters.io_time_stamp, connection->format().sample_rate());
-                                source_node->render(buffer, connection->source_bus(), when);
+                            if (auto source_node = connection.source_node()) {
+                                auto buffer = yas::audio_pcm_buffer(connection.format(), render_parameters.io_data);
+                                audio_time when(*render_parameters.io_time_stamp, connection.format().sample_rate());
+                                source_node->render(buffer, connection.source_bus(), when);
                             }
                         }
                     }
@@ -237,7 +237,7 @@ void audio_unit_node::update_connections()
 
             for (UInt32 bus_idx = 0; bus_idx < input_bus_count; ++bus_idx) {
                 if (auto connection = input_connection(bus_idx)) {
-                    audio_unit.set_input_format(connection->format().stream_description(), bus_idx);
+                    audio_unit.set_input_format(connection.format().stream_description(), bus_idx);
                     audio_unit.attach_render_callback(bus_idx);
                 } else {
                     audio_unit.detach_render_callback(bus_idx);
@@ -251,7 +251,7 @@ void audio_unit_node::update_connections()
         if (output_bus_count > 0) {
             for (UInt32 bus_idx = 0; bus_idx < output_bus_count; ++bus_idx) {
                 if (auto connection = output_connection(bus_idx)) {
-                    audio_unit.set_output_format(connection->format().stream_description(), bus_idx);
+                    audio_unit.set_output_format(connection.format().stream_description(), bus_idx);
                 }
             }
         }

@@ -38,13 +38,13 @@ namespace yas
 
         ~audio_engine();
 
-        audio_connection_sptr connect(const audio_node_sptr &source_node, const audio_node_sptr &destination_node,
-                                      const audio_format &format);
-        audio_connection_sptr connect(const audio_node_sptr &source_node, const audio_node_sptr &destination_node,
-                                      const UInt32 source_bus_idx, const UInt32 destination_bus_idx,
-                                      const audio_format &format);
+        audio_connection connect(const audio_node_sptr &source_node, const audio_node_sptr &destination_node,
+                                 const audio_format &format);
+        audio_connection connect(const audio_node_sptr &source_node, const audio_node_sptr &destination_node,
+                                 const UInt32 source_bus_idx, const UInt32 destination_bus_idx,
+                                 const audio_format &format);
 
-        void disconnect(const audio_connection_sptr &connectiion);
+        void disconnect(audio_connection &connectiion);
         void disconnect(const audio_node_sptr &node);
         void disconnect_input(const audio_node_sptr &node);
         void disconnect_input(const audio_node_sptr &node, const UInt32 bus_idx);
@@ -72,7 +72,7 @@ namespace yas
         void _post_configuration_change() const;
 
         std::set<audio_node_sptr> &_nodes() const;
-        std::set<audio_connection_sptr> &_connections() const;
+        audio_connection_map &_connections() const;
 
        public:
         class private_access;

@@ -13,7 +13,7 @@ namespace yas
             return engine->_nodes();
         }
 
-        static std::set<audio_connection_sptr> &connections(const audio_engine_sptr &engine)
+        static audio_connection_map &connections(const audio_engine_sptr &engine)
         {
             return engine->_connections();
         }

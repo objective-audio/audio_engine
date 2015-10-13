@@ -67,8 +67,8 @@ class audio_engine::impl
             throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : node is not attached.");
         }
 
-        disconnect_node_with_predicate([node](const audio_connection_sptr &connection) {
-            return (connection->destination_node() == node || connection->source_node() == node);
+        disconnect_node_with_predicate([&node](const audio_connection &connection) {
+            return (connection.destination_node() == node || connection.source_node() == node);
         });
 
         remove_node_from_graph(node);
@@ -78,11 +78,12 @@ class audio_engine::impl
 
     void detach_node_if_unused(const audio_node_sptr &node)
     {
-        auto filtered_set = filter(_connections, [node](const audio_connection_sptr &connection) {
-            return (connection->destination_node() == node || connection->source_node() == node);
+        auto filtered_connection = filter(_connections, [node](const auto &pair) {
+            const auto &connection = pair.second;
+            return (connection.destination_node() == node || connection.source_node() == node);
         });
 
-        if (filtered_set.size() == 0) {
+        if (filtered_connection.size() == 0) {
             detach_node(node);
         }
     }
@@ -99,7 +100,8 @@ class audio_engine::impl
             add_node_to_graph(node);
         }
 
-        for (auto &connection : _connections) {
+        for (auto &pair : _connections) {
+            auto &connection = pair.second;
             if (!add_connection(connection)) {
                 return false;
             }
@@ -110,14 +112,16 @@ class audio_engine::impl
         return true;
     }
 
-    void disconnect_node_with_predicate(std::function<bool(const audio_connection_sptr &)> predicate)
+    void disconnect_node_with_predicate(std::function<bool(const audio_connection &)> predicate)
     {
-        auto remove_connections = filter(_connections, predicate);
+        auto remove_connections =
+            filter(_connections, [&predicate](const auto &pair) { return predicate(pair.second); });
         std::set<audio_node_sptr> update_nodes;
 
-        for (auto &connection : remove_connections) {
-            update_nodes.insert(connection->source_node());
-            update_nodes.insert(connection->destination_node());
+        for (auto &pair : remove_connections) {
+            auto &connection = pair.second;
+            update_nodes.insert(connection.source_node());
+            update_nodes.insert(connection.destination_node());
             remove_connection_from_nodes(connection);
             audio_connection::private_access::remove_nodes(connection);
         }
@@ -127,8 +131,9 @@ class audio_engine::impl
             detach_node_if_unused(node);
         }
 
-        for (auto &connection : remove_connections) {
-            _connections.erase(connection);
+        for (auto &pair : remove_connections) {
+            auto &connection = pair.second;
+            _connections.erase(connection.key());
         }
     }
 
@@ -181,15 +186,15 @@ class audio_engine::impl
         }
     }
 
-    bool add_connection(const audio_connection_sptr &connection)
+    bool add_connection(const audio_connection &connection)
     {
         if (!connection) {
             throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
             return false;
         }
 
-        auto destination_node = connection->destination_node();
-        auto source_node = connection->source_node();
+        auto destination_node = connection.destination_node();
+        auto source_node = connection.source_node();
 
         if (_nodes.count(destination_node) == 0 || _nodes.count(source_node) == 0) {
             throw std::runtime_error(std::string(__PRETTY_FUNCTION__) + " : node is not attached.");
@@ -202,19 +207,19 @@ class audio_engine::impl
         return true;
     }
 
-    void remove_connection_from_nodes(const audio_connection_sptr &connection)
+    void remove_connection_from_nodes(const audio_connection &connection)
     {
         if (!connection) {
             throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
             return;
         }
 
-        if (auto source_node = connection->source_node()) {
-            audio_node::private_access::remove_connection(source_node, *connection);
+        if (auto source_node = connection.source_node()) {
+            audio_node::private_access::remove_connection(source_node, connection);
         }
 
-        if (auto destination_node = connection->destination_node()) {
-            audio_node::private_access::remove_connection(destination_node, *connection);
+        if (auto destination_node = connection.destination_node()) {
+            audio_node::private_access::remove_connection(destination_node, connection);
         }
     }
 
@@ -238,17 +243,14 @@ class audio_engine::impl
         }
     }
 
-    std::set<audio_connection_sptr> input_connections_for_destination_node(const audio_node_sptr &node)
+    audio_connection_map input_connections_for_destination_node(const audio_node_sptr &node)
     {
-        return filter(_connections, [node](const audio_connection_sptr &connection) {
-            return connection->destination_node() == node;
-        });
+        return filter(_connections, [node](const auto &pair) { return pair.second.destination_node() == node; });
     }
 
-    std::set<audio_connection_sptr> output_connections_for_source_node(const audio_node_sptr &node)
+    audio_connection_map output_connections_for_source_node(const audio_node_sptr &node)
     {
-        return filter(_connections,
-                      [node](const audio_connection_sptr &connection) { return connection->source_node() == node; });
+        return filter(_connections, [node](const auto &pair) { return pair.second.source_node() == node; });
     }
 
     void set_graph(const audio_graph &graph)
@@ -266,7 +268,7 @@ class audio_engine::impl
         return _nodes;
     }
 
-    std::set<audio_connection_sptr> &connections()
+    audio_connection_map &connections()
     {
         return _connections;
     }
@@ -279,7 +281,7 @@ class audio_engine::impl
    private:
     audio_graph _graph;
     std::set<audio_node_sptr> _nodes;
-    std::set<audio_connection_sptr> _connections;
+    audio_connection_map _connections;
     audio_node_sptr _offline_output_node;
 };
 
@@ -347,8 +349,8 @@ audio_engine::~audio_engine()
 #endif
 }
 
-audio_connection_sptr audio_engine::connect(const audio_node_sptr &source_node, const audio_node_sptr &destination_node,
-                                            const audio_format &format)
+audio_connection audio_engine::connect(const audio_node_sptr &source_node, const audio_node_sptr &destination_node,
+                                       const audio_format &format)
 {
     if (!source_node || !destination_node) {
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
@@ -364,9 +366,9 @@ audio_connection_sptr audio_engine::connect(const audio_node_sptr &source_node, 
     return connect(source_node, destination_node, *source_bus_result, *destination_bus_result, format);
 }
 
-audio_connection_sptr audio_engine::connect(const audio_node_sptr &source_node, const audio_node_sptr &destination_node,
-                                            const UInt32 source_bus_idx, const UInt32 destination_bus_idx,
-                                            const audio_format &format)
+audio_connection audio_engine::connect(const audio_node_sptr &source_node, const audio_node_sptr &destination_node,
+                                       const UInt32 source_bus_idx, const UInt32 destination_bus_idx,
+                                       const audio_format &format)
 {
     if (!source_node || !destination_node) {
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
@@ -394,7 +396,7 @@ audio_connection_sptr audio_engine::connect(const audio_node_sptr &source_node, 
                                                                destination_bus_idx, format);
 
     auto &connections = _impl->connections();
-    connections.insert(connection);
+    connections.insert(std::make_pair(connection.key(), connection));
 
     if (_impl->graph()) {
         _impl->add_connection(connection);
@@ -405,9 +407,9 @@ audio_connection_sptr audio_engine::connect(const audio_node_sptr &source_node, 
     return connection;
 }
 
-void audio_engine::disconnect(const audio_connection_sptr &connection)
+void audio_engine::disconnect(audio_connection &connection)
 {
-    auto update_nodes = {connection->source_node(), connection->destination_node()};
+    auto update_nodes = {connection.source_node(), connection.destination_node()};
 
     _impl->remove_connection_from_nodes(connection);
     audio_connection::private_access::remove_nodes(connection);
@@ -417,7 +419,7 @@ void audio_engine::disconnect(const audio_connection_sptr &connection)
         _impl->detach_node_if_unused(node);
     }
 
-    _impl->connections().erase(connection);
+    _impl->connections().erase(connection.key());
 }
 
 void audio_engine::disconnect(const audio_node_sptr &node)
@@ -434,7 +436,7 @@ void audio_engine::disconnect_input(const audio_node_sptr &node)
     }
 
     _impl->disconnect_node_with_predicate(
-        [node](const audio_connection_sptr &connection) { return (connection->destination_node() == node); });
+        [node](const audio_connection &connection) { return (connection.destination_node() == node); });
 }
 
 void audio_engine::disconnect_input(const audio_node_sptr &node, const UInt32 bus_idx)
@@ -443,8 +445,8 @@ void audio_engine::disconnect_input(const audio_node_sptr &node, const UInt32 bu
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
     }
 
-    _impl->disconnect_node_with_predicate([node, bus_idx](const audio_connection_sptr &connection) {
-        return (connection->destination_node() == node && connection->destination_bus() == bus_idx);
+    _impl->disconnect_node_with_predicate([node, bus_idx](const audio_connection &connection) {
+        return (connection.destination_node() == node && connection.destination_bus() == bus_idx);
     });
 }
 
@@ -455,7 +457,7 @@ void audio_engine::disconnect_output(const audio_node_sptr &node)
     }
 
     _impl->disconnect_node_with_predicate(
-        [node](const audio_connection_sptr &connection) { return (connection->source_node() == node); });
+        [node](const audio_connection &connection) { return (connection.source_node() == node); });
 }
 
 void audio_engine::disconnect_output(const audio_node_sptr &node, const UInt32 bus_idx)
@@ -464,8 +466,8 @@ void audio_engine::disconnect_output(const audio_node_sptr &node, const UInt32 b
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
     }
 
-    _impl->disconnect_node_with_predicate([node, bus_idx](const audio_connection_sptr &connection) {
-        return (connection->source_node() == node && connection->source_bus() == bus_idx);
+    _impl->disconnect_node_with_predicate([node, bus_idx](const audio_connection &connection) {
+        return (connection.source_node() == node && connection.source_bus() == bus_idx);
     });
 }
 
@@ -577,7 +579,7 @@ std::set<audio_node_sptr> &audio_engine::_nodes() const
     return _impl->nodes();
 }
 
-std::set<audio_connection_sptr> &audio_engine::_connections() const
+audio_connection_map &audio_engine::_connections() const
 {
     return _impl->connections();
 }

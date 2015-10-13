@@ -274,7 +274,7 @@ void audio_unit_input_node::update_connections()
     if (auto out_connection = output_connection(1)) {
         unit.attach_input_callback();
 
-        audio_pcm_buffer input_buffer(out_connection->format(), 4096);
+        audio_pcm_buffer input_buffer(out_connection.format(), 4096);
         _impl->input_buffer = input_buffer;
 
         unit.set_input_callback([weak_node = _weak_this, input_buffer](render_parameters & render_parameters) mutable {
@@ -285,7 +285,7 @@ void audio_unit_input_node::update_connections()
 
                 if (const auto core = input_node->node_core()) {
                     if (const auto connection = core->output_connection(1)) {
-                        auto format = connection->format();
+                        auto format = connection.format();
                         audio_time time(*render_parameters.io_time_stamp, format.sample_rate());
                         input_node->set_render_time_on_render(time);
 
@@ -294,7 +294,7 @@ void audio_unit_input_node::update_connections()
                             io_unit.audio_unit_render(render_parameters);
                         }
 
-                        auto destination_node = connection->destination_node();
+                        auto destination_node = connection.destination_node();
 
                         if (auto *input_tap_node = dynamic_cast<audio_input_tap_node *>(destination_node.get())) {
                             input_tap_node->render(input_buffer, 0, time);
