@@ -304,7 +304,7 @@ void audio_unit_node::_add_audio_unit_to_graph(audio_graph &graph)
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
     }
 
-    _impl->weak_graph = audio_graph::weak(graph);
+    _impl->weak_graph = graph;
 
     prepare_audio_unit();
     graph.add_audio_unit(_impl->_au);

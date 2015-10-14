@@ -18,8 +18,15 @@ namespace yas
         {
         }
 
-        explicit weak(const T &obj) : _impl(obj._impl)
+        weak(const T &obj) : _impl(obj._impl)
         {
+        }
+
+        weak<T, I> &operator=(const T &obj)
+        {
+            _impl = obj._impl;
+
+            return *this;
         }
 
         T lock() const

@@ -170,7 +170,7 @@ void audio_device_io_node::_add_device_io_to_graph(audio_graph &graph)
         return;
     }
 
-    _impl->weak_graph = audio_graph::weak(graph);
+    _impl->weak_graph = graph;
     _impl->device_io = audio_device_io(_impl->device());
     graph.add_audio_device_io(_impl->device_io);
 }

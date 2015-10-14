@@ -90,7 +90,7 @@
     _mixer_unit.set_output_format(format.stream_description(), 0);
     _mixer_unit.set_input_format(format.stream_description(), 0);
 
-    auto weak_mixer_unit = yas::audio_unit::weak(_mixer_unit);
+    yas::audio_unit::weak weak_mixer_unit = _mixer_unit;
 
     _io_unit.set_render_callback([weak_mixer_unit](yas::render_parameters &render_parameters) {
         if (auto shared_mixer_unit = weak_mixer_unit.lock()) {
@@ -98,7 +98,7 @@
         }
     });
 
-    auto weak_io_unit = yas::audio_unit::weak(_io_unit);
+    yas::audio_unit::weak weak_io_unit = _io_unit;
 
     _mixer_unit.set_render_callback([weak_io_unit](yas::render_parameters &render_parameters) {
         if (auto shared_io_unit = weak_io_unit.lock()) {
