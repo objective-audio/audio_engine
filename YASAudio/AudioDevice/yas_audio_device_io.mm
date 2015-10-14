@@ -281,7 +281,7 @@ void audio_device_io::prepare()
 {
     if (!_impl) {
         _impl = std::make_shared<audio_device_io::impl>();
-        _impl->weak_device_io = audio_device_io::weak(*this);
+        _impl->weak_device_io = *this;
         _impl->observer.add_handler(
             audio_device::system_subject(), audio_device_method::hardware_did_change,
             [weak_device_io = _impl->weak_device_io](const auto &method, const auto &infos) {
