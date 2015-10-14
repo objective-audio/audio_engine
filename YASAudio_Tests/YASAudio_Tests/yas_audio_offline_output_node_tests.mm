@@ -26,13 +26,14 @@
     const Float64 sample_rate = 44100.0;
 
     auto format = yas::audio_format(sample_rate, 2);
-    auto engine = yas::audio_engine::create();
+    yas::audio_engine engine;
+    engine.prepare();
     auto output_node = yas::audio_offline_output_node::create();
     auto sample_delay_node = yas::audio_unit_node::create(kAudioUnitType_Effect, kAudioUnitSubType_SampleDelay);
     auto tap_node = yas::audio_tap_node::create();
 
-    engine->connect(sample_delay_node, output_node, format);
-    engine->connect(tap_node, sample_delay_node, format);
+    engine.connect(sample_delay_node, output_node, format);
+    engine.connect(tap_node, sample_delay_node, format);
 
     XCTestExpectation *tapNodeExpectation = [self expectationWithDescription:@"tap node render"];
 
@@ -99,7 +100,7 @@
         }
     };
 
-    auto result = engine->start_offline_render(start_render_function, completion_function);
+    auto result = engine.start_offline_render(start_render_function, completion_function);
 
     XCTAssertTrue(result);
 

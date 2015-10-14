@@ -66,9 +66,9 @@ void audio_node_core::_set_output_connections(const audio_connection_wmap &conne
 class audio_node::impl
 {
    public:
-    audio_engine_wptr engine;
+    audio_engine::weak weak_engine;
 
-    impl() : engine(), _input_connections(), _output_connections(), _node_core(nullptr), _render_time(), _mutex()
+    impl() : weak_engine(), _input_connections(), _output_connections(), _node_core(nullptr), _render_time(), _mutex()
     {
     }
 
@@ -185,9 +185,9 @@ bool audio_node::is_available_output_bus(const UInt32 bus_idx) const
     return _impl->output_connections().count(bus_idx) == 0;
 }
 
-audio_engine_sptr audio_node::engine() const
+audio_engine audio_node::engine() const
 {
-    return _impl->engine.lock();
+    return _impl->weak_engine.lock();
 }
 
 audio_time audio_node::last_render_time() const
@@ -242,9 +242,9 @@ void audio_node::update_node_core()
 
 #pragma mark - private
 
-void audio_node::_set_engine(const audio_engine_sptr &engine)
+void audio_node::_set_engine(const audio_engine &engine)
 {
-    _impl->engine = engine;
+    _impl->weak_engine = engine;
 }
 
 void audio_node::_add_connection(const audio_connection &connection)

@@ -26,7 +26,7 @@ static const AudioComponentDescription baseAcd = {.componentType = kAudioUnitTyp
 @implementation YASAudioEngineEffectsSampleViewController {
     std::vector<yas::audio_unit> _audio_units;
     std::experimental::optional<UInt32> _index;
-    yas::audio_engine_sptr _engine;
+    yas::audio_engine _engine;
     yas::audio_unit_output_node_sptr _output_node;
     yas::audio_unit_node_sptr _effect_node;
     yas::audio_connection _through_connection;
@@ -45,7 +45,7 @@ static const AudioComponentDescription baseAcd = {.componentType = kAudioUnitTyp
         AVAudioSession *audioSession = [AVAudioSession sharedInstance];
         if ([audioSession setCategory:AVAudioSessionCategoryPlayback error:&error]) {
             [self setupAudioEngine];
-            auto start_result = _engine->start_render();
+            auto start_result = _engine.start_render();
             if (start_result) {
                 success = YES;
                 [self.tableView reloadData];
@@ -69,7 +69,7 @@ static const AudioComponentDescription baseAcd = {.componentType = kAudioUnitTyp
 
     if (self.isMovingFromParentViewController) {
         if (_engine) {
-            _engine->stop();
+            _engine.stop();
         }
 
         NSError *error = nil;
@@ -115,7 +115,7 @@ static const AudioComponentDescription baseAcd = {.componentType = kAudioUnitTyp
         }
     }
 
-    _engine = yas::audio_engine::create();
+    _engine.prepare();
     _output_node = yas::audio_unit_output_node::create();
     _tap_node = yas::audio_tap_node::create();
 
@@ -154,12 +154,12 @@ static const AudioComponentDescription baseAcd = {.componentType = kAudioUnitTyp
     }
 
     if (_effect_node) {
-        _engine->disconnect(_effect_node);
+        _engine.disconnect(_effect_node);
         _effect_node = nullptr;
     }
 
     if (_through_connection) {
-        _engine->disconnect(_through_connection);
+        _engine.disconnect(_through_connection);
         _through_connection = nullptr;
     }
 
@@ -167,10 +167,10 @@ static const AudioComponentDescription baseAcd = {.componentType = kAudioUnitTyp
 
     if (acd) {
         _effect_node = yas::audio_unit_node::create(*acd);
-        _engine->connect(_effect_node, _output_node, format);
-        _engine->connect(_tap_node, _effect_node, format);
+        _engine.connect(_effect_node, _output_node, format);
+        _engine.connect(_tap_node, _effect_node, format);
     } else {
-        _through_connection = _engine->connect(_tap_node, _output_node, format);
+        _through_connection = _engine.connect(_tap_node, _output_node, format);
     }
 }
 

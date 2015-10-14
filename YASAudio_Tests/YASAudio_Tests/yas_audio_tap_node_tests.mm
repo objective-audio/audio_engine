@@ -23,15 +23,16 @@
 
 - (void)test_render_with_lambda
 {
-    const auto engine = yas::audio_engine::create();
+    yas::audio_engine engine;
+    engine.prepare();
 
     const auto output_node = yas::audio_offline_output_node::create();
     const auto to_node = yas::audio_tap_node::create();
     const auto from_node = yas::audio_tap_node::create();
     const auto format = yas::audio_format(48000.0, 2);
 
-    const auto to_connection = engine->connect(to_node, output_node, format);
-    const auto from_connection = engine->connect(from_node, to_node, format);
+    const auto to_connection = engine.connect(to_node, output_node, format);
+    const auto from_connection = engine.connect(from_node, to_node, format);
 
     XCTestExpectation *to_expectation = [self expectationWithDescription:@"to node"];
     XCTestExpectation *from_expectation = [self expectationWithDescription:@"from node"];
@@ -62,7 +63,7 @@
     from_node->set_render_function(
         [from_expectation](const auto &, const auto &, const auto &) { [from_expectation fulfill]; });
 
-    XCTAssertTrue(engine->start_offline_render(
+    XCTAssertTrue(engine.start_offline_render(
         [](const auto &, const auto &, auto &stop) { stop = true; },
         [completion_expectation](const auto cancelled) { [completion_expectation fulfill]; }));
 
@@ -76,22 +77,23 @@
 
 - (void)test_render_without_lambda
 {
-    const auto engine = yas::audio_engine::create();
+    yas::audio_engine engine;
+    engine.prepare();
 
     const auto output_node = yas::audio_offline_output_node::create();
     const auto to_node = yas::audio_tap_node::create();
     const auto from_node = yas::audio_tap_node::create();
     const auto format = yas::audio_format(48000.0, 2);
 
-    const auto to_connection = engine->connect(to_node, output_node, format);
-    const auto from_connection = engine->connect(from_node, to_node, format);
+    const auto to_connection = engine.connect(to_node, output_node, format);
+    const auto from_connection = engine.connect(from_node, to_node, format);
 
     XCTestExpectation *from_expectation = [self expectationWithDescription:@"from node"];
 
     from_node->set_render_function(
         [from_expectation](const auto &, const auto &, const auto &) { [from_expectation fulfill]; });
 
-    XCTAssertTrue(engine->start_offline_render([](const auto &, const auto &, auto &stop) { stop = true; }, nullptr));
+    XCTAssertTrue(engine.start_offline_render([](const auto &, const auto &, auto &stop) { stop = true; }, nullptr));
 
     [self waitForExpectationsWithTimeout:0.5
                                  handler:^(NSError *error){

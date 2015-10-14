@@ -23,7 +23,9 @@
 
 - (void)test_connect_success
 {
-    auto engine = yas::audio_engine::create();
+    yas::audio_engine engine;
+    engine.prepare();
+
     auto format = yas::audio_format(48000.0, 2);
     auto source_node = yas::test::audio_test_node::create(1, 1);
     auto destination_node = yas::test::audio_test_node::create(1, 1);
@@ -32,7 +34,7 @@
     XCTAssertEqual(yas::audio_engine::private_access::connections(engine).size(), 0);
 
     yas::audio_connection connection = nullptr;
-    XCTAssertNoThrow(connection = engine->connect(source_node, destination_node, format));
+    XCTAssertNoThrow(connection = engine.connect(source_node, destination_node, format));
     XCTAssertNotEqual(connection, nullptr);
 
     auto &nodes = yas::audio_engine::private_access::nodes(engine);
@@ -45,39 +47,43 @@
 
 - (void)test_connect_failed_no_bus
 {
-    auto engine = yas::audio_engine::create();
+    yas::audio_engine engine;
+    engine.prepare();
+
     auto format = yas::audio_format(48000.0, 2);
     auto source_node = yas::test::audio_test_node::create(0, 0);
     auto destination_node = yas::test::audio_test_node::create(0, 0);
 
     yas::audio_connection connection = nullptr;
-    XCTAssertThrows(connection = engine->connect(source_node, destination_node, format));
+    XCTAssertThrows(connection = engine.connect(source_node, destination_node, format));
     XCTAssertFalse(connection);
     XCTAssertEqual(yas::audio_engine::private_access::connections(engine).size(), 0);
 }
 
 - (void)testConnectAndDisconnect
 {
-    auto engine = yas::audio_engine::create();
+    yas::audio_engine engine;
+    engine.prepare();
+
     auto format = yas::audio_format(48000.0, 2);
     auto source_node = yas::test::audio_test_node::create(1, 1);
     auto relay_node = yas::test::audio_test_node::create(1, 1);
     auto destination_node = yas::test::audio_test_node::create(1, 1);
 
-    engine->connect(source_node, relay_node, format);
+    engine.connect(source_node, relay_node, format);
 
     auto &nodes = yas::audio_engine::private_access::nodes(engine);
     XCTAssertGreaterThanOrEqual(nodes.count(source_node), 1);
     XCTAssertGreaterThanOrEqual(nodes.count(relay_node), 1);
     XCTAssertEqual(nodes.count(destination_node), 0);
 
-    engine->connect(relay_node, destination_node, format);
+    engine.connect(relay_node, destination_node, format);
 
     XCTAssertGreaterThanOrEqual(nodes.count(source_node), 1);
     XCTAssertGreaterThanOrEqual(nodes.count(relay_node), 1);
     XCTAssertGreaterThanOrEqual(nodes.count(destination_node), 1);
 
-    engine->disconnect(relay_node);
+    engine.disconnect(relay_node);
 
     XCTAssertEqual(nodes.count(source_node), 0);
     XCTAssertEqual(nodes.count(relay_node), 0);
@@ -86,12 +92,13 @@
 
 - (void)testConfigurationChangeNotification
 {
-    auto engine = yas::audio_engine::create();
+    yas::audio_engine engine;
+    engine.prepare();
 
     XCTestExpectation *expectation = [self expectationWithDescription:@"configuration change"];
 
     yas::observer observer;
-    observer.add_wild_card_handler(engine->subject(),
+    observer.add_wild_card_handler(engine.subject(),
                                    [expectation](const auto &method, const auto &info) { [expectation fulfill]; });
 
 #if TARGET_OS_IPHONE

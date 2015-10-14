@@ -13,7 +13,7 @@ using namespace yas;
 
 class audio_offline_output_node::impl
 {
-    using completion_function_map_t = std::map<UInt8, completion_f>;
+    using completion_function_map_t = std::map<UInt8, offline_completion_f>;
 
    public:
     std::weak_ptr<audio_offline_output_node> weak_node;
@@ -23,7 +23,7 @@ class audio_offline_output_node::impl
     {
     }
 
-    const std::experimental::optional<UInt8> push_completion_function(const completion_f &function)
+    const std::experimental::optional<UInt8> push_completion_function(const offline_completion_f &function)
     {
         if (!function) {
             return nullopt;
@@ -36,7 +36,7 @@ class audio_offline_output_node::impl
         return key;
     }
 
-    const std::experimental::optional<completion_f> pull_completion_function(UInt8 key)
+    const std::experimental::optional<offline_completion_f> pull_completion_function(UInt8 key)
     {
         if (_completion_functions.count(key) > 0) {
             auto func = _completion_functions.at(key);
@@ -87,8 +87,8 @@ UInt32 audio_offline_output_node::input_bus_count() const
     return 1;
 }
 
-audio_offline_output_node::start_result_t audio_offline_output_node::_start(const render_f &render_func,
-                                                                            const completion_f &completion_func)
+audio_offline_output_node::start_result_t audio_offline_output_node::_start(const offline_render_f &render_func,
+                                                                            const offline_completion_f &completion_func)
 {
     if (_impl->queue_container) {
         return start_result_t(start_error_t::already_running);
@@ -161,7 +161,7 @@ audio_offline_output_node::start_result_t audio_offline_output_node::_start(cons
 
             auto completion_lambda = [weak_node, cancelled, key]() {
                 if (auto offline_node = weak_node.lock()) {
-                    std::experimental::optional<completion_f> node_completion_func;
+                    std::experimental::optional<offline_completion_f> node_completion_func;
                     if (key) {
                         node_completion_func = offline_node->_impl->pull_completion_function(*key);
                     }

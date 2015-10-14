@@ -16,6 +16,8 @@
 
 namespace yas
 {
+    class audio_engine;
+
     class audio_node_core
     {
        public:
@@ -61,7 +63,7 @@ namespace yas
         virtual bus_result_t next_available_output_bus() const;
         virtual bool is_available_input_bus(const UInt32 bus_idx) const;
         virtual bool is_available_output_bus(const UInt32 bus_idx) const;
-        audio_engine_sptr engine() const;
+        audio_engine engine() const;
         audio_time last_render_time() const;
 
         virtual UInt32 input_bus_count() const;
@@ -95,7 +97,7 @@ namespace yas
         audio_node &operator=(const audio_node &) = delete;
         audio_node &operator=(audio_node &&) = delete;
 
-        void _set_engine(const audio_engine_sptr &engine);
+        void _set_engine(const audio_engine &engine);
         void _add_connection(const audio_connection &connection);
         void _remove_connection(const audio_connection &connection);
 

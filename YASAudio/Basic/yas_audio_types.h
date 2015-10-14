@@ -64,7 +64,6 @@ namespace yas
     class audio_route;
     class audio_graph;
     class audio_unit;
-    class audio_engine;
     class audio_node;
     class audio_unit_node;
     class audio_unit_io_node;
@@ -84,8 +83,6 @@ namespace yas
     using channel_map_t = std::vector<UInt32>;
 
     using audio_route_set = std::set<audio_route>;
-    using audio_engine_sptr = std::shared_ptr<audio_engine>;
-    using audio_engine_wptr = std::weak_ptr<audio_engine>;
     using audio_node_sptr = std::shared_ptr<audio_node>;
     using audio_unit_node_sptr = std::shared_ptr<audio_unit_node>;
     using audio_unit_node_wptr = std::weak_ptr<audio_unit_node>;
@@ -103,4 +100,7 @@ namespace yas
 
     using audio_device_io_node_sptr = std::shared_ptr<audio_device_io_node>;
 #endif
+
+    using offline_render_f = std::function<void(audio_pcm_buffer &buffer, const audio_time &when, bool &stop)>;
+    using offline_completion_f = std::function<void(const bool cancelled)>;
 }
