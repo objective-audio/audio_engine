@@ -113,7 +113,7 @@ namespace yas
 @end
 
 @implementation YASAudioEngineIOSampleViewController {
-    yas::audio_engine_sptr _engine;
+    yas::audio_engine _engine;
     yas::audio_unit_mixer_node_sptr _mixer_node;
     yas::audio_unit_io_node_sptr _io_node;
 
@@ -143,7 +143,7 @@ namespace yas
         if ([[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryMultiRoute error:&error]) {
             [self setupEngine];
 
-            const auto start_result = _engine->start_render();
+            const auto start_result = _engine.start_render();
             if (start_result) {
                 [self.tableView reloadData];
                 [self _updateSlider];
@@ -168,7 +168,7 @@ namespace yas
 
     if (self.isMovingFromParentViewController) {
         if (_engine) {
-            _engine->stop();
+            _engine.stop();
         }
 
         [[AVAudioSession sharedInstance] setActive:NO error:nil];
@@ -229,7 +229,7 @@ namespace yas
 
 - (void)setupEngine
 {
-    _engine = yas::audio_engine::create();
+    _engine.prepare();
     _io_node = yas::audio_unit_io_node::create();
     _mixer_node = yas::audio_unit_mixer_node::create();
 
@@ -241,7 +241,7 @@ namespace yas
 
     _engine_observer = yas::observer();
     _engine_observer.add_handler(
-        _engine->subject(), yas::audio_engine_method::configuration_change,
+        _engine.subject(), yas::audio_engine_method::configuration_change,
         [weak_container = _self_container](const auto &method, const auto &sender) {
             if (auto strong_self = weak_container.lock()) {
                 if ([UIApplication sharedApplication].applicationState == UIApplicationStateActive) {
@@ -265,7 +265,7 @@ namespace yas
 
 - (void)_disconnectNodes
 {
-    _engine->disconnect(_mixer_node);
+    _engine.disconnect(_mixer_node);
 }
 
 - (void)_connectNodes
@@ -275,13 +275,13 @@ namespace yas
     const UInt32 output_channel_count = [self _connectionChannelCountForDirection:yas::direction::output];
     if (output_channel_count > 0) {
         auto output_format = yas::audio_format(sample_rate, output_channel_count);
-        _engine->connect(_mixer_node, _io_node, output_format);
+        _engine.connect(_mixer_node, _io_node, output_format);
     }
 
     const UInt32 input_channel_count = [self _connectionChannelCountForDirection:yas::direction::input];
     if (input_channel_count > 0) {
         auto input_format = yas::audio_format(sample_rate, input_channel_count);
-        _engine->connect(_io_node, _mixer_node, input_format);
+        _engine.connect(_io_node, _mixer_node, input_format);
     }
 }
 
@@ -410,7 +410,7 @@ namespace yas
     switch (indexPath.section) {
         case YASAudioEngineIOSampleSectionNotify: {
             if (_engine) {
-                _engine->subject().notify(yas::audio_engine_method::configuration_change);
+                _engine.subject().notify(yas::audio_engine_method::configuration_change);
             }
         } break;
 

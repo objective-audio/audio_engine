@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "yas_audio_engine.h"
+
 namespace yas
 {
     class audio_node_core::private_access
@@ -59,12 +61,12 @@ namespace yas
             node->_remove_connection(connection);
         }
 
-        static void set_engine(const audio_node_sptr &node, const audio_engine_sptr &engine)
+        static void set_engine(const audio_node_sptr &node, const audio_engine &engine)
         {
             node->_set_engine(engine);
         }
 
-        static audio_engine_sptr engine(const audio_node_sptr &node)
+        static audio_engine engine(const audio_node_sptr &node)
         {
             return node->engine();
         }

@@ -76,14 +76,16 @@
 
 - (void)test_render
 {
-    auto engine = yas::audio_engine::create();
+    yas::audio_engine engine;
+    engine.prepare();
+
     auto format = yas::audio_format(44100.0, 2);
     auto output_node = yas::audio_offline_output_node::create();
     auto route_node = yas::audio_route_node::create();
     auto tap_node = yas::audio_tap_node::create();
 
-    engine->connect(route_node, output_node, format);
-    engine->connect(tap_node, route_node, format);
+    engine.connect(route_node, output_node, format);
+    engine.connect(tap_node, route_node, format);
 
     bool tap_node_called = false;
     tap_node->set_render_function(
@@ -92,8 +94,8 @@
     {
         XCTestExpectation *expectation = [self expectationWithDescription:@"first render"];
 
-        XCTAssertTrue(engine->start_offline_render([](const auto &, const auto &, auto &stop) { stop = true; },
-                                                   [expectation](const bool cancelled) { [expectation fulfill]; }));
+        XCTAssertTrue(engine.start_offline_render([](const auto &, const auto &, auto &stop) { stop = true; },
+                                                  [expectation](const bool cancelled) { [expectation fulfill]; }));
 
         [self waitForExpectationsWithTimeout:0.5
                                      handler:^(NSError *error){
@@ -116,7 +118,7 @@
     {
         XCTestExpectation *expectation = [self expectationWithDescription:@"second render"];
 
-        XCTAssertTrue(engine->start_offline_render(
+        XCTAssertTrue(engine.start_offline_render(
             [self](yas::audio_pcm_buffer &buffer, const yas::audio_time &when, bool &stop) {
                 stop = true;
                 yas::audio_frame_enumerator enumerator(buffer);
@@ -149,13 +151,15 @@
 {
     const auto src_count = 2;
 
-    auto engine = yas::audio_engine::create();
+    yas::audio_engine engine;
+    engine.prepare();
+
     auto dst_format = yas::audio_format(44100.0, 2);
     auto src_format = yas::audio_format(44100.0, 1);
     auto output_node = yas::audio_offline_output_node::create();
     auto route_node = yas::audio_route_node::create();
 
-    engine->connect(route_node, output_node, dst_format);
+    engine.connect(route_node, output_node, dst_format);
 
     bool tap_node_calleds[src_count];
     for (auto &tap_node_called : tap_node_calleds) {
@@ -167,7 +171,7 @@
         tap_nodes.push_back(yas::audio_tap_node::create());
         const auto &tap_node = tap_nodes.at(i);
 
-        engine->connect(tap_node, route_node, 0, i, src_format);
+        engine.connect(tap_node, route_node, 0, i, src_format);
 
         auto &tap_node_called = tap_node_calleds[i];
         tap_node->set_render_function([&tap_node_called](const auto &buffer, const bool bus_idx, const auto &when) {
@@ -181,7 +185,7 @@
 
     XCTestExpectation *expectation = [self expectationWithDescription:@"render"];
 
-    XCTAssertTrue(engine->start_offline_render(
+    XCTAssertTrue(engine.start_offline_render(
         [self](yas::audio_pcm_buffer &buffer, const yas::audio_time &when, bool &stop) {
             stop = true;
             yas::audio_frame_enumerator enumerator(buffer);
@@ -215,13 +219,15 @@
 {
     const auto src_count = 2;
 
-    auto engine = yas::audio_engine::create();
+    yas::audio_engine engine;
+    engine.prepare();
+
     auto dst_format = yas::audio_format(44100.0, 4);
     auto src_format = yas::audio_format(44100.0, 2);
     auto output_node = yas::audio_offline_output_node::create();
     auto route_node = yas::audio_route_node::create();
 
-    engine->connect(route_node, output_node, dst_format);
+    engine.connect(route_node, output_node, dst_format);
 
     bool tap_node_calleds[src_count];
     for (auto &tap_node_called : tap_node_calleds) {
@@ -233,7 +239,7 @@
         tap_nodes.push_back(yas::audio_tap_node::create());
         const auto &tap_node = tap_nodes.at(i);
 
-        engine->connect(tap_node, route_node, 0, i, src_format);
+        engine.connect(tap_node, route_node, 0, i, src_format);
 
         auto &tap_node_called = tap_node_calleds[i];
         tap_node->set_render_function([&tap_node_called](const auto &buffer, const bool bus_idx, const auto &when) {
@@ -247,7 +253,7 @@
 
     XCTestExpectation *expectation = [self expectationWithDescription:@"render"];
 
-    XCTAssertTrue(engine->start_offline_render(
+    XCTAssertTrue(engine.start_offline_render(
         [self](yas::audio_pcm_buffer &buffer, const yas::audio_time &when, bool &stop) {
             stop = true;
             yas::audio_frame_enumerator enumerator(buffer);

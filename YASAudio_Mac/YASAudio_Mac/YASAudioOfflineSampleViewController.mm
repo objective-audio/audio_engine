@@ -104,11 +104,11 @@ namespace yas
 @end
 
 @implementation YASAudioOfflineSampleViewController {
-    yas::audio_engine_sptr _play_engine;
+    yas::audio_engine _play_engine;
     yas::audio_unit_mixer_node_sptr _play_mixer_node;
     yas::offline_sample::sine_node_sptr _play_sine_node;
 
-    yas::audio_engine_sptr _offline_engine;
+    yas::audio_engine _offline_engine;
     yas::audio_unit_mixer_node_sptr _offline_mixer_node;
     yas::offline_sample::sine_node_sptr _offline_sine_node;
 
@@ -136,7 +136,7 @@ namespace yas
      play engine
      */
 
-    _play_engine = yas::audio_engine::create();
+    _play_engine.prepare();
 
     auto play_output_node = yas::audio_unit_output_node::create();
 
@@ -148,14 +148,14 @@ namespace yas
 
     _play_sine_node = yas::offline_sample::sine_node::create();
 
-    _play_engine->connect(_play_mixer_node, play_output_node, format);
-    _play_engine->connect(_play_sine_node, _play_mixer_node, format);
+    _play_engine.connect(_play_mixer_node, play_output_node, format);
+    _play_engine.connect(_play_sine_node, _play_mixer_node, format);
 
     /*
      offline engine
      */
 
-    _offline_engine = yas::audio_engine::create();
+    _offline_engine.prepare();
 
     auto offline_output_node = yas::audio_offline_output_node::create();
 
@@ -167,13 +167,13 @@ namespace yas
 
     _offline_sine_node = yas::offline_sample::sine_node::create();
 
-    _offline_engine->connect(_offline_mixer_node, offline_output_node, format);
-    _offline_engine->connect(_offline_sine_node, _offline_mixer_node, format);
+    _offline_engine.connect(_offline_mixer_node, offline_output_node, format);
+    _offline_engine.connect(_offline_sine_node, _offline_mixer_node, format);
 
     std::weak_ptr<yas::audio_unit_output_node> weak_play_output_node = play_output_node;
 
     _engine_observer.clear();
-    _engine_observer.add_handler(_play_engine->subject(), yas::audio_engine_method::configuration_change,
+    _engine_observer.add_handler(_play_engine.subject(), yas::audio_engine_method::configuration_change,
                                  [weak_play_output_node](const auto &, const auto &) {
                                      if (auto play_output_node = weak_play_output_node.lock()) {
                                          play_output_node->set_device(yas::audio_device::default_output_device());
@@ -190,7 +190,7 @@ namespace yas
 {
     [super viewDidAppear];
 
-    if (_play_engine && !_play_engine->start_render()) {
+    if (_play_engine && !_play_engine.start_render()) {
         NSLog(@"%s error", __PRETTY_FUNCTION__);
     }
 }
@@ -200,7 +200,7 @@ namespace yas
     [super viewWillDisappear];
 
     if (_play_engine) {
-        _play_engine->stop();
+        _play_engine.stop();
     }
 }
 
@@ -300,7 +300,7 @@ namespace yas
 
     UInt32 remain = self.length * yas::offline_sample::sample_rate;
 
-    auto start_result = _offline_engine->start_offline_render(
+    auto start_result = _offline_engine.start_offline_render(
         [remain, file_writer = std::move(file_writer)](yas::audio_pcm_buffer & buffer, const auto &when,
                                                        bool &stop) mutable {
             auto format = yas::audio_format(buffer.format().stream_description());

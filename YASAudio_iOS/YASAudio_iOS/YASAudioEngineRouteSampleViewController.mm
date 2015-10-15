@@ -29,7 +29,7 @@ typedef NS_ENUM(NSUInteger, YASAudioEngineRouteSampleSourceIndex) {
 @end
 
 @implementation YASAudioEngineRouteSampleViewController {
-    yas::audio_engine_sptr _engine;
+    yas::audio_engine _engine;
     yas::audio_unit_io_node_sptr _io_node;
     yas::audio_unit_mixer_node_sptr _mixer_node;
     yas::audio_route_node_sptr _route_node;
@@ -65,7 +65,7 @@ typedef NS_ENUM(NSUInteger, YASAudioEngineRouteSampleSourceIndex) {
         if ([[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayAndRecord error:&error]) {
             [self setupEngine];
 
-            const auto start_result = _engine->start_render();
+            const auto start_result = _engine.start_render();
             if (start_result) {
                 [self.tableView reloadData];
                 [self _updateSlider];
@@ -90,7 +90,7 @@ typedef NS_ENUM(NSUInteger, YASAudioEngineRouteSampleSourceIndex) {
 
     if (self.isMovingFromParentViewController) {
         if (_engine) {
-            _engine->stop();
+            _engine.stop();
         }
 
         [[AVAudioSession sharedInstance] setActive:NO error:nil];
@@ -217,7 +217,7 @@ typedef NS_ENUM(NSUInteger, YASAudioEngineRouteSampleSourceIndex) {
 
 - (void)setupEngine
 {
-    _engine = yas::audio_engine::create();
+    _engine.prepare();
     _io_node = yas::audio_unit_io_node::create();
     _mixer_node = yas::audio_unit_mixer_node::create();
     _route_node = yas::audio_route_node::create();
@@ -252,7 +252,7 @@ typedef NS_ENUM(NSUInteger, YASAudioEngineRouteSampleSourceIndex) {
 
     _engine_observer = yas::observer();
     _engine_observer.add_handler(
-        _engine->subject(), yas::audio_engine_method::configuration_change,
+        _engine.subject(), yas::audio_engine_method::configuration_change,
         [weak_container = _self_container](const auto &method, const auto &sender) {
             if (auto strong_self = weak_container.lock()) {
                 if ([UIApplication sharedApplication].applicationState == UIApplicationStateActive) {
@@ -276,10 +276,10 @@ typedef NS_ENUM(NSUInteger, YASAudioEngineRouteSampleSourceIndex) {
 
 - (void)_disconnectNodes
 {
-    _engine->disconnect(_mixer_node);
-    _engine->disconnect(_route_node);
-    _engine->disconnect(_sine_node);
-    _engine->disconnect(_io_node);
+    _engine.disconnect(_mixer_node);
+    _engine.disconnect(_route_node);
+    _engine.disconnect(_sine_node);
+    _engine.disconnect(_io_node);
 }
 
 - (void)_connectNodes
@@ -288,10 +288,10 @@ typedef NS_ENUM(NSUInteger, YASAudioEngineRouteSampleSourceIndex) {
 
     const auto format = yas::audio_format(sample_rate, 2);
 
-    _engine->connect(_mixer_node, _io_node, format);
-    _engine->connect(_route_node, _mixer_node, format);
-    _engine->connect(_sine_node, _route_node, 0, YASAudioEngineRouteSampleSourceIndexSine, format);
-    _engine->connect(_io_node, _route_node, 1, YASAudioEngineRouteSampleSourceIndexInput, format);
+    _engine.connect(_mixer_node, _io_node, format);
+    _engine.connect(_route_node, _mixer_node, format);
+    _engine.connect(_sine_node, _route_node, 0, YASAudioEngineRouteSampleSourceIndexSine, format);
+    _engine.connect(_io_node, _route_node, 1, YASAudioEngineRouteSampleSourceIndexInput, format);
 }
 
 #pragma mark -

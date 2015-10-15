@@ -7,6 +7,7 @@
 #include "yas_audio_node.h"
 #include "yas_audio_unit_node.h"
 #include "yas_audio_device_io_node.h"
+#include "yas_audio_offline_output_node.h"
 #include "yas_audio_graph.h"
 #include "yas_stl_utils.h"
 #include "yas_objc_container.h"
@@ -24,7 +25,7 @@ using namespace yas;
 class audio_engine::impl
 {
    public:
-    std::weak_ptr<audio_engine> engine;
+    audio_engine::weak weak_engine;
     objc::container<> reset_observer;
     objc::container<> route_change_observer;
     yas::subject subject;
@@ -34,6 +35,18 @@ class audio_engine::impl
 
     impl() : reset_observer(), route_change_observer(), subject()
     {
+    }
+
+    ~impl()
+    {
+#if TARGET_OS_IPHONE
+        if (reset_observer) {
+            [[NSNotificationCenter defaultCenter] removeObserver:reset_observer.object()];
+        }
+        if (route_change_observer) {
+            [[NSNotificationCenter defaultCenter] removeObserver:route_change_observer.object()];
+        }
+#endif
     }
 
     bool node_exists(const audio_node_sptr &node)
@@ -52,7 +65,7 @@ class audio_engine::impl
         }
 
         _nodes.insert(node);
-        audio_node::private_access::set_engine(node, engine.lock());
+        audio_node::private_access::set_engine(node, weak_engine.lock());
 
         add_node_to_graph(node);
     }
@@ -285,17 +298,39 @@ class audio_engine::impl
     audio_node_sptr _offline_output_node;
 };
 
-audio_engine_sptr audio_engine::create()
+audio_engine::audio_engine(std::nullptr_t) : _impl(nullptr)
 {
-    auto engine = audio_engine_sptr(new audio_engine());
-    engine->_impl->engine = engine;
+}
 
-    std::weak_ptr<audio_engine> weak_engine = engine;
+audio_engine::audio_engine(const std::shared_ptr<impl> &impl) : _impl(impl)
+{
+}
+
+bool audio_engine::operator==(const audio_engine &other) const
+{
+    return _impl && other._impl && _impl == other._impl;
+}
+
+bool audio_engine::operator!=(const audio_engine &other) const
+{
+    return !_impl || !other._impl || _impl != other._impl;
+}
+
+audio_engine::operator bool() const
+{
+    return _impl != nullptr;
+}
+
+void audio_engine::prepare()
+{
+    _impl = std::make_unique<impl>();
+    _impl->weak_engine = *this;
 
 #if TARGET_OS_IPHONE
-    auto reset_lambda = [weak_engine](NSNotification *note) {
+    auto reset_lambda = [weak_engine = _impl->weak_engine](NSNotification * note)
+    {
         if (auto engine = weak_engine.lock()) {
-            engine->_reload_graph();
+            engine._reload_graph();
         }
     };
 
@@ -304,11 +339,12 @@ audio_engine_sptr audio_engine::create()
                                                           object:nil
                                                            queue:[NSOperationQueue mainQueue]
                                                       usingBlock:reset_lambda];
-    engine->_impl->reset_observer.set_object(reset_observer);
+    _impl->reset_observer.set_object(reset_observer);
 
-    auto route_change_lambda = [weak_engine](NSNotification *note) {
+    auto route_change_lambda = [weak_engine = _impl->weak_engine](NSNotification * note)
+    {
         if (auto engine = weak_engine.lock()) {
-            engine->_post_configuration_change();
+            engine._post_configuration_change();
         }
     };
 
@@ -317,35 +353,15 @@ audio_engine_sptr audio_engine::create()
                                                           object:nil
                                                            queue:[NSOperationQueue mainQueue]
                                                       usingBlock:route_change_lambda];
-    engine->_impl->route_change_observer.set_object(route_change_observer);
+    _impl->route_change_observer.set_object(route_change_observer);
 
 #elif TARGET_OS_MAC
-    engine->_impl->device_observer.add_handler(audio_device::system_subject(),
-                                               audio_device_method::configuration_change,
-                                               [weak_engine](const auto &method, const auto &infos) {
-                                                   if (auto engine = weak_engine.lock()) {
-                                                       engine->_post_configuration_change();
-                                                   }
-                                               });
-#endif
-
-    return engine;
-}
-
-audio_engine::audio_engine() : _impl(std::make_unique<impl>())
-{
-}
-
-audio_engine::~audio_engine()
-{
-#if TARGET_OS_IPHONE
-    if (auto reset_observer = _impl->reset_observer) {
-        [[NSNotificationCenter defaultCenter] removeObserver:reset_observer.object()];
-    }
-
-    if (auto route_change_observer = _impl->route_change_observer) {
-        [[NSNotificationCenter defaultCenter] removeObserver:route_change_observer.object()];
-    }
+    _impl->device_observer.add_handler(audio_device::system_subject(), audio_device_method::configuration_change,
+                                       [weak_engine = _impl->weak_engine](const auto &method, const auto &infos) {
+                                           if (auto engine = weak_engine.lock()) {
+                                               engine._post_configuration_change();
+                                           }
+                                       });
 #endif
 }
 

@@ -8,7 +8,7 @@
 #include "yas_audio_types.h"
 #include "yas_result.h"
 #include "yas_observing.h"
-#include "yas_audio_offline_output_node.h"
+#include "yas_audio_connection.h"
 #include <set>
 
 namespace yas
@@ -31,12 +31,21 @@ namespace yas
 
         using start_result_t = yas::result<std::nullptr_t, start_error_t>;
 
-        using offline_render_f = audio_offline_output_node::render_f;
-        using offline_completion_f = audio_offline_output_node::completion_f;
+        audio_engine(std::nullptr_t n = nullptr);
 
-        static audio_engine_sptr create();
+        ~audio_engine() = default;
 
-        ~audio_engine();
+        audio_engine(const audio_engine &) = default;
+        audio_engine(audio_engine &&) = default;
+        audio_engine &operator=(const audio_engine &) = default;
+        audio_engine &operator=(audio_engine &&) = default;
+
+        bool operator==(const audio_engine &) const;
+        bool operator!=(const audio_engine &) const;
+
+        explicit operator bool() const;
+
+        void prepare();
 
         audio_connection connect(const audio_node_sptr &source_node, const audio_node_sptr &destination_node,
                                  const audio_format &format);
@@ -60,13 +69,9 @@ namespace yas
 
        private:
         class impl;
-        std::unique_ptr<impl> _impl;
-
-        audio_engine();
-        audio_engine(const audio_engine &) = delete;
-        audio_engine(audio_engine &&) = delete;
-        audio_engine &operator=(const audio_engine &) = delete;
-        audio_engine &operator=(audio_engine &&) = delete;
+        std::shared_ptr<impl> _impl;
+        
+        audio_engine(const std::shared_ptr<impl> &);
 
         void _reload_graph();
         void _post_configuration_change() const;
@@ -77,6 +82,9 @@ namespace yas
        public:
         class private_access;
         friend private_access;
+
+        using weak = weak<audio_engine, audio_engine::impl>;
+        friend weak;
     };
 
     std::string to_string(const audio_engine::start_error_t &error);
