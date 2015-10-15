@@ -59,11 +59,8 @@ namespace yas
     std::string to_string(const render_type &);
 
     class audio_time;
-    class audio_format;
     class audio_pcm_buffer;
     class audio_route;
-    class audio_graph;
-    class audio_unit;
     class audio_node;
     class audio_unit_node;
     class audio_unit_io_node;
