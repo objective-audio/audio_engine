@@ -15,6 +15,7 @@
 namespace yas
 {
     class audio_device;
+    class audio_graph;
 
     class audio_device_io_node : public audio_node
     {
