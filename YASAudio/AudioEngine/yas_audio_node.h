@@ -72,7 +72,19 @@ namespace yas
         virtual void render(audio_pcm_buffer &buffer, const UInt32 bus_idx, const audio_time &when);
 
        protected:
-        audio_node();
+        class impl
+        {
+           public:
+            impl();
+            virtual ~impl();
+
+            class core;
+            std::unique_ptr<core> _core;
+        };
+
+        std::unique_ptr<impl> _impl;
+
+        audio_node(std::unique_ptr<impl> &&);
 
         audio_connection input_connection(const UInt32 bus_idx) const;
         audio_connection output_connection(const UInt32 bus_idx) const;
@@ -89,9 +101,6 @@ namespace yas
         void set_render_time_on_render(const audio_time &time);
 
        private:
-        class impl;
-        std::unique_ptr<impl> _impl;
-
         audio_node(const audio_node &) = delete;
         audio_node(audio_node &&) = delete;
         audio_node &operator=(const audio_node &) = delete;

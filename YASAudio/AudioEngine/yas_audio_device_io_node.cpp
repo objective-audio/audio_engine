@@ -19,7 +19,7 @@ using namespace yas;
 
 #pragma mark - impl
 
-class audio_device_io_node::impl
+class audio_device_io_node::impl::core
 {
    public:
     std::weak_ptr<audio_device_io_node> weak_node;
@@ -27,11 +27,11 @@ class audio_device_io_node::impl
     audio_device_io device_io;
     audio_node_core_sptr node_core_on_render;
 
-    impl() : weak_node(), _device(nullptr), weak_graph(), device_io(nullptr), node_core_on_render(nullptr)
+    core() : weak_node(), _device(nullptr), weak_graph(), device_io(nullptr), node_core_on_render(nullptr)
     {
     }
 
-    ~impl() = default;
+    ~core() = default;
 
     void set_device(const audio_device &device)
     {
@@ -50,23 +50,35 @@ class audio_device_io_node::impl
     audio_device _device;
 };
 
+audio_device_io_node::impl::impl() : audio_node::impl(), _core(std::make_unique<core>())
+{
+}
+
+audio_device_io_node::impl::~impl() = default;
+
+audio_device_io_node::impl *audio_device_io_node::_impl_ptr() const
+{
+    return dynamic_cast<audio_device_io_node::impl *>(_impl.get());
+}
+
 #pragma mark - main
 
 audio_device_io_node_sptr audio_device_io_node::create()
 {
     auto node = audio_device_io_node_sptr(new audio_device_io_node(nullptr));
-    node->_impl->weak_node = node;
+    node->_impl_ptr()->_core->weak_node = node;
     return node;
 }
 
 audio_device_io_node_sptr audio_device_io_node::create(const audio_device &device)
 {
     auto node = audio_device_io_node_sptr(new audio_device_io_node(device));
-    node->_impl->weak_node = node;
+    node->_impl_ptr()->_core->weak_node = node;
     return node;
 }
 
-audio_device_io_node::audio_device_io_node(const audio_device &device) : audio_node(), _impl(std::make_unique<impl>())
+audio_device_io_node::audio_device_io_node(const audio_device &device)
+    : audio_node(std::make_unique<audio_device_io_node::impl>())
 {
     if (device) {
         set_device(device);
@@ -89,19 +101,19 @@ UInt32 audio_device_io_node::output_bus_count() const
 
 void audio_device_io_node::set_device(const audio_device &device)
 {
-    _impl->set_device(device);
+    _impl_ptr()->_core->set_device(device);
 }
 
 audio_device audio_device_io_node::device() const
 {
-    return _impl->device();
+    return _impl_ptr()->_core->device();
 }
 
 #pragma mark - override
 
 void audio_device_io_node::update_connections()
 {
-    auto &device_io = _impl->device_io;
+    auto &device_io = _impl_ptr()->_core->device_io;
     if (!device_io) {
         return;
     }
@@ -111,13 +123,13 @@ void audio_device_io_node::update_connections()
         return;
     }
 
-    auto weak_node = _impl->weak_node;
+    auto weak_node = _impl_ptr()->_core->weak_node;
     audio_device_io::weak weak_device_io(device_io);
 
     auto render_function = [weak_node, weak_device_io](audio_pcm_buffer &output_buffer, const audio_time &when) {
         if (auto node = weak_node.lock()) {
             if (auto core = node->node_core()) {
-                node->_impl->node_core_on_render = core;
+                node->_impl_ptr()->_core->node_core_on_render = core;
 
                 if (output_buffer) {
                     const auto connections = core->input_connections();
@@ -150,7 +162,7 @@ void audio_device_io_node::update_connections()
                     }
                 }
 
-                node->_impl->node_core_on_render = nullptr;
+                node->_impl_ptr()->_core->node_core_on_render = nullptr;
             }
         }
     };
@@ -166,30 +178,30 @@ void audio_device_io_node::_add_device_io_to_graph(audio_graph &graph)
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
     }
 
-    if (_impl->device_io) {
+    if (_impl_ptr()->_core->device_io) {
         return;
     }
 
-    _impl->weak_graph = graph;
-    _impl->device_io = audio_device_io(_impl->device());
-    graph.add_audio_device_io(_impl->device_io);
+    _impl_ptr()->_core->weak_graph = graph;
+    _impl_ptr()->_core->device_io = audio_device_io(_impl_ptr()->_core->device());
+    graph.add_audio_device_io(_impl_ptr()->_core->device_io);
 }
 
 void audio_device_io_node::_remove_device_io_from_graph()
 {
-    if (auto graph = _impl->weak_graph.lock()) {
-        if (_impl->device_io) {
-            graph.remove_audio_device_io(_impl->device_io);
+    if (auto graph = _impl_ptr()->_core->weak_graph.lock()) {
+        if (_impl_ptr()->_core->device_io) {
+            graph.remove_audio_device_io(_impl_ptr()->_core->device_io);
         }
     }
 
-    _impl->weak_graph.reset();
-    _impl->device_io = nullptr;
+    _impl_ptr()->_core->weak_graph.reset();
+    _impl_ptr()->_core->device_io = nullptr;
 }
 
 bool audio_device_io_node::_validate_connections() const
 {
-    if (const auto &device_io = _impl->device_io) {
+    if (const auto &device_io = _impl_ptr()->_core->device_io) {
         if (input_connections().size() > 0) {
             const auto connections = yas::lock_values(input_connections());
             if (connections.count(0) > 0) {
@@ -226,8 +238,8 @@ void audio_device_io_node::render(audio_pcm_buffer &buffer, const UInt32 bus_idx
 {
     super_class::render(buffer, bus_idx, when);
 
-    if (const auto &device_io = _impl->device_io) {
-        if (auto core = _impl->node_core_on_render) {
+    if (const auto &device_io = _impl_ptr()->_core->device_io) {
+        if (auto core = _impl_ptr()->_core->node_core_on_render) {
             auto &input_buffer = device_io.input_buffer_on_render();
             if (input_buffer && input_buffer.format() == buffer.format()) {
                 buffer.copy_from(input_buffer);

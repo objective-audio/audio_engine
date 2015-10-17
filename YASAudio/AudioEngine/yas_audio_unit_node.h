@@ -16,7 +16,7 @@ namespace yas
     class audio_unit_node : public audio_node
     {
        public:
-        static audio_unit_node_sptr create(const AudioComponentDescription &acd);
+        static audio_unit_node_sptr create(const AudioComponentDescription &);
         static audio_unit_node_sptr create(const OSType type, const OSType sub_type);
 
         virtual ~audio_unit_node();
@@ -46,16 +46,25 @@ namespace yas
         void render(audio_pcm_buffer &buffer, const UInt32 bus_idx, const audio_time &when) override;
 
        protected:
-        static void prepare_for_create(const audio_unit_node_sptr &node);
+        class impl : public audio_node::impl
+        {
+           public:
+            impl();
+            virtual ~impl();
 
-        audio_unit_node(const AudioComponentDescription &acd);
+            class core;
+            std::unique_ptr<core> _core;
+        };
+
+        static void prepare_for_create(const audio_unit_node_sptr &);
+
+        audio_unit_node(std::unique_ptr<impl> &&, const AudioComponentDescription &);
 
         virtual void prepare_audio_unit();
         virtual void prepare_parameters();  // NS_REQUIRES_SUPER
 
        private:
-        class impl;
-        std::unique_ptr<impl> _impl;
+        impl *_impl_ptr() const;
 
         using super_class = audio_node;
 

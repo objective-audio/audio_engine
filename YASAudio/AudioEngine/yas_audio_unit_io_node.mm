@@ -24,28 +24,44 @@ namespace yas
 
 using namespace yas;
 
-class audio_unit_io_node::impl
+#pragma mark - impl::core
+
+class audio_unit_io_node::impl::core
 {
    public:
     static const UInt32 channel_map_count = 2;
     channel_map_t channel_map[2];
 };
 
-audio_unit_io_node::audio_unit_io_node()
-    : audio_unit_node({
-          .componentType = kAudioUnitType_Output,
-          .componentSubType = audio_unit_sub_type_default_io,
-          .componentManufacturer = kAudioUnitManufacturer_Apple,
-          .componentFlags = 0,
-          .componentFlagsMask = 0,
-      }),
-      _impl(std::make_unique<impl>())
+#pragma mark - impl
+
+audio_unit_io_node::impl::impl() : super_class::impl(), _core(std::make_unique<audio_unit_io_node::impl::core>())
+{
+}
+
+audio_unit_io_node::impl::~impl() = default;
+
+audio_unit_io_node::impl *audio_unit_io_node::_impl_ptr() const
+{
+    return dynamic_cast<audio_unit_io_node::impl *>(_impl.get());
+}
+
+#pragma mark - main
+
+audio_unit_io_node::audio_unit_io_node(std::unique_ptr<impl> &&impl)
+    : super_class(std::move(impl), AudioComponentDescription{
+                                       .componentType = kAudioUnitType_Output,
+                                       .componentSubType = audio_unit_sub_type_default_io,
+                                       .componentManufacturer = kAudioUnitManufacturer_Apple,
+                                       .componentFlags = 0,
+                                       .componentFlagsMask = 0,
+                                   })
 {
 }
 
 audio_unit_io_node_sptr audio_unit_io_node::create()
 {
-    auto node = audio_unit_io_node_sptr(new audio_unit_io_node());
+    auto node = audio_unit_io_node_sptr(new audio_unit_io_node(std::make_unique<impl>()));
     prepare_for_create(node);
     return node;
 }
@@ -54,7 +70,7 @@ audio_unit_io_node::~audio_unit_io_node() = default;
 
 void audio_unit_io_node::set_channel_map(const channel_map_t &map, const yas::direction dir)
 {
-    _impl->channel_map[yas::to_uint32(dir)] = map;
+    _impl_ptr()->_core->channel_map[yas::to_uint32(dir)] = map;
 
     if (auto unit = audio_unit()) {
         unit.set_channel_map(map, kAudioUnitScope_Output, yas::to_uint32(dir));
@@ -63,7 +79,7 @@ void audio_unit_io_node::set_channel_map(const channel_map_t &map, const yas::di
 
 const channel_map_t &audio_unit_io_node::channel_map(const yas::direction dir) const
 {
-    return _impl->channel_map[yas::to_uint32(dir)];
+    return _impl_ptr()->_core->channel_map[yas::to_uint32(dir)];
 }
 
 void audio_unit_io_node::prepare_audio_unit()
@@ -168,11 +184,11 @@ void audio_unit_io_node::update_connections()
     };
 
     const auto output_idx = yas::to_uint32(yas::direction::output);
-    auto &output_map = _impl->channel_map[output_idx];
+    auto &output_map = _impl_ptr()->_core->channel_map[output_idx];
     update_channel_map(output_map, input_format(output_idx), output_device_channel_count());
 
     const auto input_idx = yas::to_uint32(yas::direction::input);
-    auto &input_map = _impl->channel_map[input_idx];
+    auto &input_map = _impl_ptr()->_core->channel_map[input_idx];
     update_channel_map(input_map, output_format(input_idx), input_device_channel_count());
 
     unit.set_channel_map(output_map, kAudioUnitScope_Output, output_idx);
@@ -186,6 +202,10 @@ audio_unit_output_node_sptr audio_unit_output_node::create()
     auto node = audio_unit_output_node_sptr(new audio_unit_output_node());
     prepare_for_create(node);
     return node;
+}
+
+audio_unit_output_node::audio_unit_output_node() : super_class(std::make_unique<audio_unit_io_node::impl>())
+{
 }
 
 void audio_unit_output_node::prepare_audio_unit()
@@ -218,12 +238,24 @@ const channel_map_t &audio_unit_output_node::channel_map() const
 
 #pragma mark - audio_unit_input_node
 
-class audio_unit_input_node::impl
+class audio_unit_input_node::impl::core
 {
    public:
     audio_pcm_buffer input_buffer;
     audio_time render_time;
 };
+
+audio_unit_input_node::impl::impl()
+    : audio_unit_io_node::impl(), _core(std::make_unique<audio_unit_input_node::impl::core>())
+{
+}
+
+audio_unit_input_node::impl::~impl() = default;
+
+audio_unit_input_node::impl *audio_unit_input_node::_impl_ptr() const
+{
+    return dynamic_cast<audio_unit_input_node::impl *>(_impl.get());
+}
 
 audio_unit_input_node_sptr audio_unit_input_node::create()
 {
@@ -233,7 +265,7 @@ audio_unit_input_node_sptr audio_unit_input_node::create()
     return node;
 }
 
-audio_unit_input_node::audio_unit_input_node() : audio_unit_io_node(), _impl(std::make_unique<impl>())
+audio_unit_input_node::audio_unit_input_node() : super_class(std::make_unique<impl>())
 {
 }
 
@@ -275,7 +307,7 @@ void audio_unit_input_node::update_connections()
         unit.attach_input_callback();
 
         audio_pcm_buffer input_buffer(out_connection.format(), 4096);
-        _impl->input_buffer = input_buffer;
+        _impl_ptr()->_core->input_buffer = input_buffer;
 
         unit.set_input_callback([weak_node = _weak_this, input_buffer](render_parameters & render_parameters) mutable {
             auto input_node = weak_node.lock();
@@ -306,6 +338,6 @@ void audio_unit_input_node::update_connections()
     } else {
         unit.detach_input_callback();
         unit.set_input_callback(nullptr);
-        _impl->input_buffer = nullptr;
+        _impl_ptr()->_core->input_buffer = nullptr;
     }
 }

@@ -28,7 +28,7 @@ namespace yas
        public:
         static audio_node_sptr create()
         {
-            return audio_node_sptr(new audio_node());
+            return audio_node_sptr(new audio_node(std::make_unique<audio_node::impl>()));
         }
 
         static audio_connection input_connection(const audio_node_sptr &node, const UInt32 bus_idx)

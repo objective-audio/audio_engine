@@ -39,10 +39,19 @@ namespace yas
         virtual void update_connections() override;
 
        private:
-        class impl;
-        std::unique_ptr<impl> _impl;
-
         using super_class = audio_node;
+
+        class impl : public super_class::impl
+        {
+           public:
+            impl();
+            ~impl();
+
+            class core;
+            std::unique_ptr<core> _core;
+        };
+
+        impl *_impl_ptr() const;
 
         void _add_device_io_to_graph(audio_graph &graph);
         void _remove_device_io_from_graph();

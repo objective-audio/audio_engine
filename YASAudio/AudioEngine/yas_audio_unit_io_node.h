@@ -38,16 +38,25 @@ namespace yas
 
         virtual void update_connections() override;
 
+       private:
+        using super_class = audio_unit_node;
+
        protected:
-        audio_unit_io_node();
+        class impl : public super_class::impl
+        {
+           public:
+            impl();
+            virtual ~impl();
+
+            class core;
+            std::unique_ptr<core> _core;
+        };
+
+        impl *_impl_ptr() const;
+
+        audio_unit_io_node(std::unique_ptr<impl> &&);
 
         virtual void prepare_audio_unit() override;
-
-       private:
-        class impl;
-        std::unique_ptr<impl> _impl;
-
-        using super_class = audio_unit_node;
     };
 
     class audio_unit_output_node : public audio_unit_io_node
@@ -66,6 +75,8 @@ namespace yas
 
        private:
         using super_class = audio_unit_io_node;
+
+        audio_unit_output_node();
     };
 
     class audio_unit_input_node : public audio_unit_io_node
@@ -87,10 +98,19 @@ namespace yas
         virtual void prepare_audio_unit() override;
 
        private:
-        class impl;
-        std::unique_ptr<impl> _impl;
-
         using super_class = audio_unit_io_node;
+
+        class impl : public super_class::impl
+        {
+           public:
+            impl();
+            ~impl();
+
+            class core;
+            std::unique_ptr<core> _core;
+        };
+
+        impl *_impl_ptr() const;
 
         std::weak_ptr<audio_unit_input_node> _weak_this;
     };

@@ -11,7 +11,7 @@
 
 using namespace yas;
 
-class audio_offline_output_node::impl
+class audio_offline_output_node::impl::core
 {
     using completion_function_map_t = std::map<UInt8, offline_completion_f>;
 
@@ -19,7 +19,7 @@ class audio_offline_output_node::impl
     std::weak_ptr<audio_offline_output_node> weak_node;
     objc::container<> queue_container;
 
-    impl() : queue_container(nil), _completion_functions()
+    core() : queue_container(nil), _completion_functions()
     {
     }
 
@@ -58,20 +58,34 @@ class audio_offline_output_node::impl
     completion_function_map_t _completion_functions;
 };
 
+#pragma mark - impl
+
+audio_offline_output_node::impl::impl()
+    : audio_node::impl(), _core(std::make_unique<audio_offline_output_node::impl::core>())
+{
+}
+
+audio_offline_output_node::impl *audio_offline_output_node::_impl_ptr() const
+{
+    return dynamic_cast<audio_offline_output_node::impl *>(_impl.get());
+}
+
+#pragma mark - main
+
 audio_offline_output_node_sptr audio_offline_output_node::create()
 {
     auto node = audio_offline_output_node_sptr(new audio_offline_output_node());
-    node->_impl->weak_node = node;
+    node->_impl_ptr()->_core->weak_node = node;
     return node;
 }
 
-audio_offline_output_node::audio_offline_output_node() : audio_node(), _impl(std::make_unique<impl>())
+audio_offline_output_node::audio_offline_output_node() : audio_node(std::make_unique<audio_offline_output_node::impl>())
 {
 }
 
 audio_offline_output_node::~audio_offline_output_node()
 {
-    if (auto queue_container = _impl->queue_container) {
+    if (auto queue_container = _impl_ptr()->_core->queue_container) {
         NSOperationQueue *operationQueue = queue_container.object();
         [operationQueue cancelAllOperations];
     }
@@ -90,18 +104,18 @@ UInt32 audio_offline_output_node::input_bus_count() const
 audio_offline_output_node::start_result_t audio_offline_output_node::_start(const offline_render_f &render_func,
                                                                             const offline_completion_f &completion_func)
 {
-    if (_impl->queue_container) {
+    if (_impl_ptr()->_core->queue_container) {
         return start_result_t(start_error_t::already_running);
     } else if (auto connection = input_connection(0)) {
         std::experimental::optional<UInt8> key;
         if (completion_func) {
-            key = _impl->push_completion_function(completion_func);
+            key = _impl_ptr()->_core->push_completion_function(completion_func);
             if (!key) {
                 return start_result_t(start_error_t::prepare_failure);
             }
         }
 
-        auto weak_node = _impl->weak_node;
+        auto weak_node = _impl_ptr()->_core->weak_node;
         yas::audio_pcm_buffer render_buffer(connection.format(), 1024);
 
         NSBlockOperation *blockOperation = [[NSBlockOperation alloc] init];
@@ -163,10 +177,10 @@ audio_offline_output_node::start_result_t audio_offline_output_node::_start(cons
                 if (auto offline_node = weak_node.lock()) {
                     std::experimental::optional<offline_completion_f> node_completion_func;
                     if (key) {
-                        node_completion_func = offline_node->_impl->pull_completion_function(*key);
+                        node_completion_func = offline_node->_impl_ptr()->_core->pull_completion_function(*key);
                     }
 
-                    offline_node->_impl->queue_container.set_object(nil);
+                    offline_node->_impl_ptr()->_core->queue_container.set_object(nil);
 
                     if (node_completion_func) {
                         (*node_completion_func)(cancelled);
@@ -181,7 +195,7 @@ audio_offline_output_node::start_result_t audio_offline_output_node::_start(cons
 
         NSOperationQueue *queue = [[NSOperationQueue alloc] init];
         queue.maxConcurrentOperationCount = 1;
-        _impl->queue_container.set_object(queue);
+        _impl_ptr()->_core->queue_container.set_object(queue);
 
         [queue addOperation:blockOperation];
 
@@ -195,13 +209,13 @@ audio_offline_output_node::start_result_t audio_offline_output_node::_start(cons
 
 void audio_offline_output_node::_stop()
 {
-    auto completion_functions = _impl->pull_completion_functions();
+    auto completion_functions = _impl_ptr()->_core->pull_completion_functions();
 
-    if (auto queue_container = _impl->queue_container) {
+    if (auto queue_container = _impl_ptr()->_core->queue_container) {
         NSOperationQueue *queue = queue_container.object();
         [queue cancelAllOperations];
         [queue waitUntilAllOperationsAreFinished];
-        _impl->queue_container.set_object(nil);
+        _impl_ptr()->_core->queue_container.set_object(nil);
     }
 
     for (auto &pair : completion_functions) {
@@ -214,7 +228,7 @@ void audio_offline_output_node::_stop()
 
 bool audio_offline_output_node::is_running() const
 {
-    return !!_impl->queue_container;
+    return !!_impl_ptr()->_core->queue_container;
 }
 
 std::string to_string(const audio_offline_output_node::start_error_t &error)

@@ -38,10 +38,19 @@ namespace yas
         virtual void prepare_node_core(const audio_node_core_sptr &node_core) override;
 
        private:
-        class impl;
-        std::unique_ptr<impl> _impl;
-
         using super_class = audio_node;
+
+        class impl : public super_class::impl
+        {
+           public:
+            impl();
+            ~impl();
+
+            class core;
+            std::unique_ptr<core> _core;
+        };
+
+        impl *_impl_ptr() const;
     };
 
     class audio_input_tap_node : public audio_tap_node

@@ -40,6 +40,9 @@ namespace yas
         {
            public:
             static audio_test_node_sptr create(const UInt32 input_bus_count = 2, const UInt32 output_bus_count = 1);
+
+            audio_test_node();
+
             UInt32 input_bus_count() const override;
             UInt32 output_bus_count() const override;
 
