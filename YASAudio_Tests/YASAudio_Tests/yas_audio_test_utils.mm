@@ -184,6 +184,10 @@ test::audio_test_node_sptr test::audio_test_node::create(const UInt32 input_bus_
     return node;
 }
 
+yas::test::audio_test_node::audio_test_node() : audio_node(std::make_unique<audio_node::impl>())
+{
+}
+
 UInt32 yas::test::audio_test_node::input_bus_count() const
 {
     return _input_bus_count;

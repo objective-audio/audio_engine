@@ -16,13 +16,14 @@ audio_unit_mixer_node_sptr audio_unit_mixer_node::create()
 }
 
 audio_unit_mixer_node::audio_unit_mixer_node()
-    : audio_unit_node({
-          .componentType = kAudioUnitType_Mixer,
-          .componentSubType = kAudioUnitSubType_MultiChannelMixer,
-          .componentManufacturer = kAudioUnitManufacturer_Apple,
-          .componentFlags = 0,
-          .componentFlagsMask = 0,
-      })
+    : audio_unit_node(std::make_unique<audio_unit_node::impl>(),
+                      AudioComponentDescription{
+                          .componentType = kAudioUnitType_Mixer,
+                          .componentSubType = kAudioUnitSubType_MultiChannelMixer,
+                          .componentManufacturer = kAudioUnitManufacturer_Apple,
+                          .componentFlags = 0,
+                          .componentFlagsMask = 0,
+                      })
 {
 }
 

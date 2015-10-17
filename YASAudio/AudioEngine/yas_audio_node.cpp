@@ -61,14 +61,14 @@ void audio_node_core::_set_output_connections(const audio_connection_wmap &conne
     _impl->output_connections = connections;
 }
 
-#pragma mark - impl
+#pragma mark - impl::core
 
-class audio_node::impl
+class audio_node::impl::core
 {
    public:
     audio_engine::weak weak_engine;
 
-    impl() : weak_engine(), _input_connections(), _output_connections(), _node_core(nullptr), _render_time(), _mutex()
+    core() : weak_engine(), _input_connections(), _output_connections(), _node_core(nullptr), _render_time(), _mutex()
     {
     }
 
@@ -114,9 +114,17 @@ class audio_node::impl
     mutable std::recursive_mutex _mutex;
 };
 
+#pragma mark - impl
+
+audio_node::impl::impl() : _core(std::make_unique<core>())
+{
+}
+
+audio_node::impl::~impl() = default;
+
 #pragma mark - main
 
-audio_node::audio_node() : _impl(std::make_unique<impl>())
+audio_node::audio_node(std::unique_ptr<impl> &&impl) : _impl(std::move(impl))
 {
 }
 
@@ -129,8 +137,8 @@ bool audio_node::operator==(const audio_node &node)
 
 void audio_node::reset()
 {
-    _impl->input_connections().clear();
-    _impl->output_connections().clear();
+    _impl->_core->input_connections().clear();
+    _impl->_core->output_connections().clear();
 
     update_node_core();
 }
@@ -153,7 +161,7 @@ audio_format audio_node::output_format(const UInt32 bus_idx)
 
 bus_result_t audio_node::next_available_input_bus() const
 {
-    auto key = min_empty_key(_impl->input_connections());
+    auto key = min_empty_key(_impl->_core->input_connections());
     if (key && *key < input_bus_count()) {
         return key;
     }
@@ -162,7 +170,7 @@ bus_result_t audio_node::next_available_input_bus() const
 
 bus_result_t audio_node::next_available_output_bus() const
 {
-    auto key = min_empty_key(_impl->output_connections());
+    auto key = min_empty_key(_impl->_core->output_connections());
     if (key && *key < output_bus_count()) {
         return key;
     }
@@ -174,7 +182,7 @@ bool audio_node::is_available_input_bus(const UInt32 bus_idx) const
     if (bus_idx >= input_bus_count()) {
         return false;
     }
-    return _impl->input_connections().count(bus_idx) == 0;
+    return _impl->_core->input_connections().count(bus_idx) == 0;
 }
 
 bool audio_node::is_available_output_bus(const UInt32 bus_idx) const
@@ -182,17 +190,17 @@ bool audio_node::is_available_output_bus(const UInt32 bus_idx) const
     if (bus_idx >= output_bus_count()) {
         return false;
     }
-    return _impl->output_connections().count(bus_idx) == 0;
+    return _impl->_core->output_connections().count(bus_idx) == 0;
 }
 
 audio_engine audio_node::engine() const
 {
-    return _impl->weak_engine.lock();
+    return _impl->_core->weak_engine.lock();
 }
 
 audio_time audio_node::last_render_time() const
 {
-    return _impl->render_time();
+    return _impl->_core->render_time();
 }
 
 UInt32 audio_node::input_bus_count() const
@@ -229,32 +237,32 @@ void audio_node::prepare_node_core(const audio_node_core_sptr &node_core)
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
     }
 
-    audio_node_core::private_access::set_input_connections(node_core, _impl->input_connections());
-    audio_node_core::private_access::set_output_connections(node_core, _impl->output_connections());
+    audio_node_core::private_access::set_input_connections(node_core, _impl->_core->input_connections());
+    audio_node_core::private_access::set_output_connections(node_core, _impl->_core->output_connections());
 }
 
 void audio_node::update_node_core()
 {
     auto node_core = make_node_core();
     prepare_node_core(node_core);
-    _impl->set_node_core(node_core);
+    _impl->_core->set_node_core(node_core);
 }
 
 #pragma mark - private
 
 void audio_node::_set_engine(const audio_engine &engine)
 {
-    _impl->weak_engine = engine;
+    _impl->_core->weak_engine = engine;
 }
 
 void audio_node::_add_connection(const audio_connection &connection)
 {
     if (*connection.destination_node() == *this) {
         auto bus_idx = connection.destination_bus();
-        _impl->input_connections().insert(std::make_pair(bus_idx, audio_connection::weak(connection)));
+        _impl->_core->input_connections().insert(std::make_pair(bus_idx, audio_connection::weak(connection)));
     } else if (*connection.source_node() == *this) {
         auto bus_idx = connection.source_bus();
-        _impl->output_connections().insert(std::make_pair(bus_idx, audio_connection::weak(connection)));
+        _impl->_core->output_connections().insert(std::make_pair(bus_idx, audio_connection::weak(connection)));
     } else {
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : connection does not exist in a node.");
     }
@@ -265,11 +273,11 @@ void audio_node::_add_connection(const audio_connection &connection)
 void audio_node::_remove_connection(const audio_connection &connection)
 {
     if (*connection.destination_node() == *this) {
-        _impl->input_connections().erase(connection.destination_bus());
+        _impl->_core->input_connections().erase(connection.destination_bus());
     }
 
     if (*connection.source_node() == *this) {
-        _impl->output_connections().erase(connection.source_bus());
+        _impl->_core->output_connections().erase(connection.source_bus());
     }
 
     update_node_core();
@@ -277,38 +285,38 @@ void audio_node::_remove_connection(const audio_connection &connection)
 
 audio_connection audio_node::input_connection(const UInt32 bus_idx) const
 {
-    if (_impl->input_connections().count(bus_idx) > 0) {
-        return _impl->input_connections().at(bus_idx).lock();
+    if (_impl->_core->input_connections().count(bus_idx) > 0) {
+        return _impl->_core->input_connections().at(bus_idx).lock();
     }
     return nullptr;
 }
 
 audio_connection audio_node::output_connection(const UInt32 bus_idx) const
 {
-    if (_impl->output_connections().count(bus_idx) > 0) {
-        return _impl->output_connections().at(bus_idx).lock();
+    if (_impl->_core->output_connections().count(bus_idx) > 0) {
+        return _impl->_core->output_connections().at(bus_idx).lock();
     }
     return nullptr;
 }
 
 const audio_connection_wmap &audio_node::input_connections() const
 {
-    return _impl->input_connections();
+    return _impl->_core->input_connections();
 }
 
 const audio_connection_wmap &audio_node::output_connections() const
 {
-    return _impl->output_connections();
+    return _impl->_core->output_connections();
 }
 
 #pragma mark render thread
 
 audio_node_core_sptr audio_node::node_core() const
 {
-    return _impl->node_core();
+    return _impl->_core->node_core();
 }
 
 void audio_node::set_render_time_on_render(const audio_time &time)
 {
-    _impl->set_render_time(time);
+    _impl->_core->set_render_time(time);
 }

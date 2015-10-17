@@ -30,8 +30,17 @@ namespace yas
         bool is_running() const;
 
        private:
-        class impl;
-        std::unique_ptr<impl> _impl;
+        class impl : public audio_node::impl
+        {
+           public:
+            impl();
+            ~impl() = default;
+
+            class core;
+            std::unique_ptr<core> _core;
+        };
+
+        impl *_impl_ptr() const;
 
         using super_class = audio_unit_node;
 

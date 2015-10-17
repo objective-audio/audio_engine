@@ -21,7 +21,7 @@ namespace yas
 
 #pragma mark - impl
 
-class audio_route_node::impl
+class audio_route_node::impl::core
 {
    public:
     audio_route_set routes;
@@ -39,6 +39,17 @@ class audio_route_node::impl
     }
 };
 
+audio_route_node::impl::impl() : audio_node::impl(), _core(std::make_unique<core>())
+{
+}
+
+audio_route_node::impl::~impl() = default;
+
+audio_route_node::impl *audio_route_node::_impl_ptr() const
+{
+    return dynamic_cast<audio_route_node::impl *>(_impl.get());
+}
+
 #pragma mark - main
 
 audio_route_node_sptr audio_route_node::create()
@@ -46,7 +57,7 @@ audio_route_node_sptr audio_route_node::create()
     return std::shared_ptr<audio_route_node>(new audio_route_node());
 }
 
-audio_route_node::audio_route_node() : audio_node(), _impl(std::make_unique<impl>())
+audio_route_node::audio_route_node() : audio_node(std::make_unique<impl>())
 {
 }
 
@@ -62,58 +73,60 @@ UInt32 audio_route_node::output_bus_count() const
 
 const std::set<audio_route> &audio_route_node::routes() const
 {
-    return _impl->routes;
+    return _impl_ptr()->_core->routes;
 }
 
 void audio_route_node::add_route(const audio_route &route)
 {
-    _impl->erase_route_if_either_matched(route);
-    _impl->routes.insert(route);
+    _impl_ptr()->_core->erase_route_if_either_matched(route);
+    _impl_ptr()->_core->routes.insert(route);
     update_node_core();
 }
 
 void audio_route_node::add_route(audio_route &&route)
 {
-    _impl->erase_route_if_either_matched(route);
-    _impl->routes.insert(std::move(route));
+    _impl_ptr()->_core->erase_route_if_either_matched(route);
+    _impl_ptr()->_core->routes.insert(std::move(route));
     update_node_core();
 }
 
 void audio_route_node::remove_route(const audio_route &route)
 {
-    _impl->routes.erase(route);
+    _impl_ptr()->_core->routes.erase(route);
     update_node_core();
 }
 
 void audio_route_node::remove_route_for_source(const audio_route::point &src_pt)
 {
-    _impl->erase_route_if([&src_pt](const audio_route &route_of_set) { return route_of_set.source == src_pt; });
+    _impl_ptr()->_core->erase_route_if(
+        [&src_pt](const audio_route &route_of_set) { return route_of_set.source == src_pt; });
     update_node_core();
 }
 
 void audio_route_node::remove_route_for_destination(const audio_route::point &dst_pt)
 {
-    _impl->erase_route_if([&dst_pt](const audio_route &route_of_set) { return route_of_set.destination == dst_pt; });
+    _impl_ptr()->_core->erase_route_if(
+        [&dst_pt](const audio_route &route_of_set) { return route_of_set.destination == dst_pt; });
     update_node_core();
 }
 
 void audio_route_node::set_routes(const std::set<audio_route> &routes)
 {
-    _impl->routes.clear();
-    _impl->routes = routes;
+    _impl_ptr()->_core->routes.clear();
+    _impl_ptr()->_core->routes = routes;
     update_node_core();
 }
 
 void audio_route_node::set_routes(std::set<audio_route> &&routes)
 {
-    _impl->routes.clear();
-    _impl->routes = std::move(routes);
+    _impl_ptr()->_core->routes.clear();
+    _impl_ptr()->_core->routes = std::move(routes);
     update_node_core();
 }
 
 void audio_route_node::clear_routes()
 {
-    _impl->routes.clear();
+    _impl_ptr()->_core->routes.clear();
     update_node_core();
 }
 
@@ -127,7 +140,7 @@ void audio_route_node::prepare_node_core(const audio_node_core_sptr &node_core)
     super_class::prepare_node_core(node_core);
 
     if (audio_route_node_core *route_node_core = dynamic_cast<audio_route_node_core *>(node_core.get())) {
-        route_node_core->routes = _impl->routes;
+        route_node_core->routes = _impl_ptr()->_core->routes;
     } else {
         throw std::runtime_error(std::string(__PRETTY_FUNCTION__) + " : failed dynamic cast to audio_route_node_core.");
     }
