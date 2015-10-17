@@ -40,16 +40,7 @@ namespace yas
 
        private:
         using super_class = audio_node;
-
-        class impl : public super_class::impl
-        {
-           public:
-            impl();
-            ~impl();
-
-            class core;
-            std::unique_ptr<core> _core;
-        };
+        class impl;
 
         impl *_impl_ptr() const;
 

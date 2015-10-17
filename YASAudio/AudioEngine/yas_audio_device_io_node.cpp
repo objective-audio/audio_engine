@@ -19,15 +19,27 @@ using namespace yas;
 
 #pragma mark - impl
 
+class audio_device_io_node::impl : public audio_node::impl
+{
+   public:
+    impl() : audio_node::impl(), _core(std::make_unique<core>())
+    {
+    }
+
+    ~impl() = default;
+
+    class core;
+    std::unique_ptr<core> _core;
+};
+
 class audio_device_io_node::impl::core
 {
    public:
     std::weak_ptr<audio_device_io_node> weak_node;
     audio_graph::weak weak_graph;
     audio_device_io device_io;
-    audio_node_core_sptr node_core_on_render;
 
-    core() : weak_node(), _device(nullptr), weak_graph(), device_io(nullptr), node_core_on_render(nullptr)
+    core() : weak_node(), _device(nullptr), weak_graph(), device_io(nullptr)
     {
     }
 
@@ -49,17 +61,6 @@ class audio_device_io_node::impl::core
    private:
     audio_device _device;
 };
-
-audio_device_io_node::impl::impl() : audio_node::impl(), _core(std::make_unique<core>())
-{
-}
-
-audio_device_io_node::impl::~impl() = default;
-
-audio_device_io_node::impl *audio_device_io_node::_impl_ptr() const
-{
-    return dynamic_cast<audio_device_io_node::impl *>(_impl.get());
-}
 
 #pragma mark - main
 
@@ -128,11 +129,9 @@ void audio_device_io_node::update_connections()
 
     auto render_function = [weak_node, weak_device_io](audio_pcm_buffer &output_buffer, const audio_time &when) {
         if (auto node = weak_node.lock()) {
-            if (auto core = node->node_core()) {
-                node->_impl_ptr()->_core->node_core_on_render = core;
-
+            if (auto kernel = node->_kernel()) {
                 if (output_buffer) {
-                    const auto connections = core->input_connections();
+                    const auto connections = kernel->input_connections();
                     if (connections.count(0) > 0) {
                         const auto &connection = connections.at(0);
                         if (const auto source_node = connection.source_node()) {
@@ -144,7 +143,7 @@ void audio_device_io_node::update_connections()
                 }
 
                 if (const auto device_io = weak_device_io.lock()) {
-                    const auto connections = core->output_connections();
+                    const auto connections = kernel->output_connections();
                     if (connections.count(0) > 0) {
                         const auto &connection = connections.at(0);
                         if (const auto destination_node = connection.destination_node()) {
@@ -161,8 +160,6 @@ void audio_device_io_node::update_connections()
                         }
                     }
                 }
-
-                node->_impl_ptr()->_core->node_core_on_render = nullptr;
             }
         }
     };
@@ -232,6 +229,11 @@ bool audio_device_io_node::_validate_connections() const
     return true;
 }
 
+audio_device_io_node::impl *audio_device_io_node::_impl_ptr() const
+{
+    return dynamic_cast<audio_device_io_node::impl *>(_impl.get());
+}
+
 #pragma mark - render
 
 void audio_device_io_node::render(audio_pcm_buffer &buffer, const UInt32 bus_idx, const audio_time &when)
@@ -239,11 +241,9 @@ void audio_device_io_node::render(audio_pcm_buffer &buffer, const UInt32 bus_idx
     super_class::render(buffer, bus_idx, when);
 
     if (const auto &device_io = _impl_ptr()->_core->device_io) {
-        if (auto core = _impl_ptr()->_core->node_core_on_render) {
-            auto &input_buffer = device_io.input_buffer_on_render();
-            if (input_buffer && input_buffer.format() == buffer.format()) {
-                buffer.copy_from(input_buffer);
-            }
+        auto &input_buffer = device_io.input_buffer_on_render();
+        if (input_buffer && input_buffer.format() == buffer.format()) {
+            buffer.copy_from(input_buffer);
         }
     }
 }

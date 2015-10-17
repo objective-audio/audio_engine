@@ -12,30 +12,30 @@
 
 using namespace yas;
 
-class audio_node_core::impl
+class audio_node::kernel::impl
 {
    public:
     audio_connection_wmap input_connections;
     audio_connection_wmap output_connections;
 };
 
-audio_node_core::audio_node_core() : _impl(std::make_unique<impl>())
+audio_node::kernel::kernel() : _impl(std::make_unique<impl>())
 {
 }
 
-audio_node_core::~audio_node_core() = default;
+audio_node::kernel::~kernel() = default;
 
-audio_connection_smap audio_node_core::input_connections() const
+audio_connection_smap audio_node::kernel::input_connections() const
 {
     return yas::lock_values(_impl->input_connections);
 }
 
-audio_connection_smap audio_node_core::output_connections() const
+audio_connection_smap audio_node::kernel::output_connections() const
 {
     return yas::lock_values(_impl->output_connections);
 }
 
-audio_connection audio_node_core::input_connection(const UInt32 bus_idx)
+audio_connection audio_node::kernel::input_connection(const UInt32 bus_idx)
 {
     if (_impl->input_connections.count(bus_idx) > 0) {
         return _impl->input_connections.at(bus_idx).lock();
@@ -43,7 +43,7 @@ audio_connection audio_node_core::input_connection(const UInt32 bus_idx)
     return nullptr;
 }
 
-audio_connection audio_node_core::output_connection(const UInt32 bus_idx)
+audio_connection audio_node::kernel::output_connection(const UInt32 bus_idx)
 {
     if (_impl->output_connections.count(bus_idx) > 0) {
         return _impl->output_connections.at(bus_idx).lock();
@@ -51,24 +51,30 @@ audio_connection audio_node_core::output_connection(const UInt32 bus_idx)
     return nullptr;
 }
 
-void audio_node_core::_set_input_connections(const audio_connection_wmap &connections)
+void audio_node::kernel::_set_input_connections(const audio_connection_wmap &connections)
 {
     _impl->input_connections = connections;
 }
 
-void audio_node_core::_set_output_connections(const audio_connection_wmap &connections)
+void audio_node::kernel::_set_output_connections(const audio_connection_wmap &connections)
 {
     _impl->output_connections = connections;
 }
 
-#pragma mark - impl::core
+#pragma mark - impl
+
+audio_node::impl::impl() : _core(std::make_unique<core>())
+{
+}
+
+audio_node::impl::~impl() = default;
 
 class audio_node::impl::core
 {
    public:
     audio_engine::weak weak_engine;
 
-    core() : weak_engine(), _input_connections(), _output_connections(), _node_core(nullptr), _render_time(), _mutex()
+    core() : weak_engine(), _input_connections(), _output_connections(), _kernel(nullptr), _render_time(), _mutex()
     {
     }
 
@@ -82,16 +88,16 @@ class audio_node::impl::core
         return _output_connections;
     }
 
-    void set_node_core(const audio_node_core_sptr &node_core)
+    void set_kernel(const kernel_sptr &kernel)
     {
         std::lock_guard<std::recursive_mutex> lock(_mutex);
-        _node_core = node_core;
+        _kernel = kernel;
     }
 
-    audio_node_core_sptr node_core() const
+    kernel_sptr kernel() const
     {
         std::lock_guard<std::recursive_mutex> lock(_mutex);
-        return _node_core;
+        return _kernel;
     }
 
     void set_render_time(const audio_time &render_time)
@@ -109,18 +115,10 @@ class audio_node::impl::core
    private:
     audio_connection_wmap _input_connections;
     audio_connection_wmap _output_connections;
-    audio_node_core_sptr _node_core;
+    kernel_sptr _kernel;
     audio_time _render_time;
     mutable std::recursive_mutex _mutex;
 };
-
-#pragma mark - impl
-
-audio_node::impl::impl() : _core(std::make_unique<core>())
-{
-}
-
-audio_node::impl::~impl() = default;
 
 #pragma mark - main
 
@@ -140,7 +138,7 @@ void audio_node::reset()
     _impl->_core->input_connections().clear();
     _impl->_core->output_connections().clear();
 
-    update_node_core();
+    update_kernel();
 }
 
 audio_format audio_node::input_format(const UInt32 bus_idx)
@@ -226,26 +224,26 @@ void audio_node::update_connections()
 {
 }
 
-audio_node_core_sptr audio_node::make_node_core()
+audio_node::kernel_sptr audio_node::make_kernel()
 {
-    return audio_node_core_sptr(new audio_node_core());
+    return kernel_sptr(new kernel());
 }
 
-void audio_node::prepare_node_core(const audio_node_core_sptr &node_core)
+void audio_node::prepare_kernel(const kernel_sptr &kernel)
 {
-    if (!node_core) {
+    if (!kernel) {
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
     }
 
-    audio_node_core::private_access::set_input_connections(node_core, _impl->_core->input_connections());
-    audio_node_core::private_access::set_output_connections(node_core, _impl->_core->output_connections());
+    kernel::private_access::set_input_connections(kernel, _impl->_core->input_connections());
+    kernel::private_access::set_output_connections(kernel, _impl->_core->output_connections());
 }
 
-void audio_node::update_node_core()
+void audio_node::update_kernel()
 {
-    auto node_core = make_node_core();
-    prepare_node_core(node_core);
-    _impl->_core->set_node_core(node_core);
+    auto kernel = make_kernel();
+    prepare_kernel(kernel);
+    _impl->_core->set_kernel(kernel);
 }
 
 #pragma mark - private
@@ -267,7 +265,7 @@ void audio_node::_add_connection(const audio_connection &connection)
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : connection does not exist in a node.");
     }
 
-    update_node_core();
+    update_kernel();
 }
 
 void audio_node::_remove_connection(const audio_connection &connection)
@@ -280,7 +278,7 @@ void audio_node::_remove_connection(const audio_connection &connection)
         _impl->_core->output_connections().erase(connection.source_bus());
     }
 
-    update_node_core();
+    update_kernel();
 }
 
 audio_connection audio_node::input_connection(const UInt32 bus_idx) const
@@ -311,9 +309,9 @@ const audio_connection_wmap &audio_node::output_connections() const
 
 #pragma mark render thread
 
-audio_node_core_sptr audio_node::node_core() const
+audio_node::kernel_sptr audio_node::_kernel() const
 {
-    return _impl->_core->node_core();
+    return _impl->_core->kernel();
 }
 
 void audio_node::set_render_time_on_render(const audio_time &time)
