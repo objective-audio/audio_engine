@@ -29,6 +29,16 @@ class audio_route_node::impl : public audio_node::impl
 
     ~impl() = default;
 
+    virtual UInt32 input_bus_count() const override
+    {
+        return std::numeric_limits<UInt32>::max();
+    }
+
+    virtual UInt32 output_bus_count() const override
+    {
+        return std::numeric_limits<UInt32>::max();
+    }
+
     class core;
     std::unique_ptr<core> _core;
 };
@@ -60,16 +70,6 @@ audio_route_node_sptr audio_route_node::create()
 
 audio_route_node::audio_route_node() : audio_node(std::make_unique<impl>())
 {
-}
-
-UInt32 audio_route_node::input_bus_count() const
-{
-    return std::numeric_limits<UInt32>::max();
-}
-
-UInt32 audio_route_node::output_bus_count() const
-{
-    return std::numeric_limits<UInt32>::max();
 }
 
 const std::set<audio_route> &audio_route_node::routes() const

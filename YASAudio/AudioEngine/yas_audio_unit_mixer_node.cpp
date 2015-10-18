@@ -8,6 +8,23 @@
 
 using namespace yas;
 
+#pragma mark - impl
+
+class audio_unit_mixer_node::impl : public super_class::impl
+{
+    virtual UInt32 input_bus_count() const override
+    {
+        return std::numeric_limits<UInt32>::max();
+    }
+
+    virtual UInt32 output_bus_count() const override
+    {
+        return 1;
+    }
+};
+
+#pragma mark - main
+
 audio_unit_mixer_node_sptr audio_unit_mixer_node::create()
 {
     auto node = audio_unit_mixer_node_sptr(new audio_unit_mixer_node());
@@ -16,14 +33,13 @@ audio_unit_mixer_node_sptr audio_unit_mixer_node::create()
 }
 
 audio_unit_mixer_node::audio_unit_mixer_node()
-    : audio_unit_node(std::make_unique<audio_unit_node::impl>(),
-                      AudioComponentDescription{
-                          .componentType = kAudioUnitType_Mixer,
-                          .componentSubType = kAudioUnitSubType_MultiChannelMixer,
-                          .componentManufacturer = kAudioUnitManufacturer_Apple,
-                          .componentFlags = 0,
-                          .componentFlagsMask = 0,
-                      })
+    : audio_unit_node(std::make_unique<impl>(), AudioComponentDescription{
+                                                    .componentType = kAudioUnitType_Mixer,
+                                                    .componentSubType = kAudioUnitSubType_MultiChannelMixer,
+                                                    .componentManufacturer = kAudioUnitManufacturer_Apple,
+                                                    .componentFlags = 0,
+                                                    .componentFlagsMask = 0,
+                                                })
 {
 }
 
@@ -40,16 +56,6 @@ void audio_unit_mixer_node::update_connections()
     }
 
     super_class::update_connections();
-}
-
-UInt32 audio_unit_mixer_node::input_bus_count() const
-{
-    return std::numeric_limits<UInt32>::max();
-}
-
-UInt32 audio_unit_mixer_node::output_bus_count() const
-{
-    return 1;
 }
 
 void audio_unit_mixer_node::set_output_volume(const Float32 volume, const UInt32 bus_idx)

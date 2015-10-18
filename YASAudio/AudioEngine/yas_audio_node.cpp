@@ -69,6 +69,16 @@ audio_node::impl::impl() : _core(std::make_unique<core>())
 
 audio_node::impl::~impl() = default;
 
+UInt32 audio_node::impl::input_bus_count() const
+{
+    return 0;
+}
+
+UInt32 audio_node::impl::output_bus_count() const
+{
+    return 0;
+}
+
 class audio_node::impl::core
 {
    public:
@@ -203,12 +213,12 @@ audio_time audio_node::last_render_time() const
 
 UInt32 audio_node::input_bus_count() const
 {
-    return 0;
+    return _impl->input_bus_count();
 }
 
 UInt32 audio_node::output_bus_count() const
 {
-    return 0;
+    return _impl->output_bus_count();
 }
 
 #pragma mark render thread

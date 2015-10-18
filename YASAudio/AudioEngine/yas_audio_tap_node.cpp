@@ -19,7 +19,7 @@ class audio_tap_node::kernel : public audio_node::kernel
 
 #pragma mark - impl
 
-class audio_tap_node::impl : public audio_node::impl
+class audio_tap_node::impl : public super_class::impl
 {
    public:
     impl() : audio_node::impl(), _core(std::make_unique<core>())
@@ -27,6 +27,16 @@ class audio_tap_node::impl : public audio_node::impl
     }
 
     ~impl() = default;
+
+    virtual UInt32 input_bus_count() const override
+    {
+        return 1;
+    }
+
+    virtual UInt32 output_bus_count() const override
+    {
+        return 1;
+    }
 
     class core;
     std::unique_ptr<core> _core;
@@ -43,10 +53,14 @@ class audio_tap_node::impl::core
 
 audio_tap_node_sptr audio_tap_node::create()
 {
-    return audio_tap_node_sptr(new audio_tap_node());
+    return audio_tap_node_sptr(new audio_tap_node(std::make_unique<impl>()));
 }
 
 audio_tap_node::audio_tap_node() : super_class(std::make_unique<impl>())
+{
+}
+
+audio_tap_node::audio_tap_node(std::unique_ptr<impl> &&impl) : super_class(std::move(impl))
 {
 }
 
@@ -57,16 +71,6 @@ void audio_tap_node::set_render_function(const render_f &render_function)
     _impl_ptr()->_core->render_function = render_function;
 
     update_kernel();
-}
-
-UInt32 audio_tap_node::input_bus_count() const
-{
-    return 1;
-}
-
-UInt32 audio_tap_node::output_bus_count() const
-{
-    return 1;
 }
 
 void audio_tap_node::render(audio_pcm_buffer &buffer, const UInt32 bus_idx, const audio_time &when)
@@ -148,17 +152,24 @@ audio_tap_node::impl *audio_tap_node::_impl_ptr() const
 
 #pragma mark - input_tap_node
 
+class audio_input_tap_node::impl : public super_class::impl
+{
+    virtual UInt32 input_bus_count() const override
+    {
+        return 1;
+    }
+
+    virtual UInt32 output_bus_count() const override
+    {
+        return 0;
+    }
+};
+
 audio_input_tap_node_sptr audio_input_tap_node::create()
 {
     return audio_input_tap_node_sptr(new audio_input_tap_node());
 }
 
-UInt32 audio_input_tap_node::input_bus_count() const
+audio_input_tap_node::audio_input_tap_node() : audio_tap_node(std::make_unique<impl>())
 {
-    return 1;
-}
-
-UInt32 audio_input_tap_node::output_bus_count() const
-{
-    return 0;
 }

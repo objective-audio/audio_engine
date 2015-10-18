@@ -27,8 +27,6 @@ namespace yas
         const std::map<AudioUnitParameterID, audio_unit_parameter> &input_parameters() const;
         const std::map<AudioUnitParameterID, audio_unit_parameter> &output_parameters() const;
 
-        virtual UInt32 input_bus_count() const override;
-        virtual UInt32 output_bus_count() const override;
         UInt32 input_element_count() const;
         UInt32 output_element_count() const;
 
@@ -51,6 +49,9 @@ namespace yas
            public:
             impl();
             virtual ~impl();
+
+            virtual UInt32 input_bus_count() const override;
+            virtual UInt32 output_bus_count() const override;
 
             class core;
             std::unique_ptr<core> _core;

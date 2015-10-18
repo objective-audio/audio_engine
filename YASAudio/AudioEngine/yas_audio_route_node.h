@@ -15,9 +15,6 @@ namespace yas
        public:
         static audio_route_node_sptr create();
 
-        virtual UInt32 input_bus_count() const override;
-        virtual UInt32 output_bus_count() const override;
-
         const std::set<audio_route> &routes() const;
         void add_route(const audio_route &);
         void add_route(audio_route &&);

@@ -176,24 +176,46 @@ void yas::test::audio_unit_render_on_sub_thread(audio_unit unit, yas::audio_form
     }
 }
 
+class test::audio_test_node::impl : public yas::audio_node::impl
+{
+   public:
+    virtual UInt32 input_bus_count() const override
+    {
+        return _input_bus_count;
+    }
+
+    virtual UInt32 output_bus_count() const override
+    {
+        return _output_bus_count;
+    }
+
+    UInt32 _input_bus_count;
+    UInt32 _output_bus_count;
+};
+
 test::audio_test_node_sptr test::audio_test_node::create(const UInt32 input_bus_count, const UInt32 output_bus_count)
 {
     auto node = audio_test_node_sptr(new audio_test_node());
-    node->_input_bus_count = input_bus_count;
-    node->_output_bus_count = output_bus_count;
+    node->set_input_bus_count(input_bus_count);
+    node->set_output_bus_count(output_bus_count);
     return node;
 }
 
-yas::test::audio_test_node::audio_test_node() : audio_node(std::make_unique<audio_node::impl>())
+yas::test::audio_test_node::audio_test_node() : audio_node(std::make_unique<impl>())
 {
 }
 
-UInt32 yas::test::audio_test_node::input_bus_count() const
+void yas::test::audio_test_node::set_input_bus_count(const UInt32 &count)
 {
-    return _input_bus_count;
+    impl_ptr()->_input_bus_count = count;
 }
 
-UInt32 yas::test::audio_test_node::output_bus_count() const
+void yas::test::audio_test_node::set_output_bus_count(const UInt32 &count)
 {
-    return _output_bus_count;
+    impl_ptr()->_output_bus_count = count;
+}
+
+yas::test::audio_test_node::impl *yas::test::audio_test_node::impl_ptr() const
+{
+    return dynamic_cast<yas::test::audio_test_node::impl *>(_impl.get());
 }

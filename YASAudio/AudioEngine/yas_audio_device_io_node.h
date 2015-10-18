@@ -25,9 +25,6 @@ namespace yas
 
         virtual ~audio_device_io_node();
 
-        virtual UInt32 input_bus_count() const override;
-        virtual UInt32 output_bus_count() const override;
-
         void set_device(const audio_device &device);
         audio_device device() const;
 

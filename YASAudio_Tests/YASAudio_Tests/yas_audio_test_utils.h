@@ -43,12 +43,13 @@ namespace yas
 
             audio_test_node();
 
-            UInt32 input_bus_count() const override;
-            UInt32 output_bus_count() const override;
+            void set_input_bus_count(const UInt32 &);
+            void set_output_bus_count(const UInt32 &);
 
            private:
-            UInt32 _input_bus_count;
-            UInt32 _output_bus_count;
+            class impl;
+
+            impl *impl_ptr() const;
         };
     }
 }

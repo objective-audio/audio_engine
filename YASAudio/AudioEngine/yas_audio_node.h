@@ -36,8 +36,8 @@ namespace yas
         audio_engine engine() const;
         audio_time last_render_time() const;
 
-        virtual UInt32 input_bus_count() const;
-        virtual UInt32 output_bus_count() const;
+        UInt32 input_bus_count() const;
+        UInt32 output_bus_count() const;
 
         virtual void render(audio_pcm_buffer &buffer, const UInt32 bus_idx, const audio_time &when);
 
@@ -80,6 +80,9 @@ namespace yas
             impl(impl &&) = delete;
             impl &operator=(const impl &) = delete;
             impl &operator=(impl &&) = delete;
+
+            virtual UInt32 input_bus_count() const;
+            virtual UInt32 output_bus_count() const;
 
             class core;
             std::unique_ptr<core> _core;

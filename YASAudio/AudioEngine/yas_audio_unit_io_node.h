@@ -64,9 +64,6 @@ namespace yas
        public:
         static audio_unit_output_node_sptr create();
 
-        virtual UInt32 input_bus_count() const override;
-        virtual UInt32 output_bus_count() const override;
-
         void set_channel_map(const channel_map_t &map);
         const channel_map_t &channel_map() const;
 
@@ -75,6 +72,7 @@ namespace yas
 
        private:
         using super_class = audio_unit_io_node;
+        class impl;
 
         audio_unit_output_node();
     };
@@ -83,9 +81,6 @@ namespace yas
     {
        public:
         static audio_unit_input_node_sptr create();
-
-        virtual UInt32 input_bus_count() const override;
-        virtual UInt32 output_bus_count() const override;
 
         void set_channel_map(const channel_map_t &map);
         const channel_map_t &channel_map() const;
@@ -99,16 +94,7 @@ namespace yas
 
        private:
         using super_class = audio_unit_io_node;
-
-        class impl : public super_class::impl
-        {
-           public:
-            impl();
-            ~impl();
-
-            class core;
-            std::unique_ptr<core> _core;
-        };
+        class impl;
 
         impl *_impl_ptr() const;
 

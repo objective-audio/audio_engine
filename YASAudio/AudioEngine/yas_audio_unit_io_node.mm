@@ -197,6 +197,19 @@ void audio_unit_io_node::update_connections()
 
 #pragma mark - audio_unit_output_node
 
+class audio_unit_output_node::impl : public super_class::impl
+{
+    virtual UInt32 input_bus_count() const override
+    {
+        return 1;
+    }
+
+    virtual UInt32 output_bus_count() const override
+    {
+        return 0;
+    }
+};
+
 audio_unit_output_node_sptr audio_unit_output_node::create()
 {
     auto node = audio_unit_output_node_sptr(new audio_unit_output_node());
@@ -204,7 +217,7 @@ audio_unit_output_node_sptr audio_unit_output_node::create()
     return node;
 }
 
-audio_unit_output_node::audio_unit_output_node() : super_class(std::make_unique<audio_unit_io_node::impl>())
+audio_unit_output_node::audio_unit_output_node() : super_class(std::make_unique<impl>())
 {
 }
 
@@ -214,16 +227,6 @@ void audio_unit_output_node::prepare_audio_unit()
     unit.set_enable_output(true);
     unit.set_enable_input(false);
     unit.set_maximum_frames_per_slice(4096);
-}
-
-UInt32 audio_unit_output_node::input_bus_count() const
-{
-    return 1;
-}
-
-UInt32 audio_unit_output_node::output_bus_count() const
-{
-    return 0;
 }
 
 void audio_unit_output_node::set_channel_map(const channel_map_t &map)
@@ -238,19 +241,35 @@ const channel_map_t &audio_unit_output_node::channel_map() const
 
 #pragma mark - audio_unit_input_node
 
+class audio_unit_input_node::impl : public super_class::impl
+{
+   public:
+    impl() : audio_unit_io_node::impl(), _core(std::make_unique<audio_unit_input_node::impl::core>())
+    {
+    }
+
+    ~impl() = default;
+
+    virtual UInt32 input_bus_count() const override
+    {
+        return 0;
+    }
+
+    virtual UInt32 output_bus_count() const override
+    {
+        return 1;
+    }
+
+    class core;
+    std::unique_ptr<core> _core;
+};
+
 class audio_unit_input_node::impl::core
 {
    public:
     audio_pcm_buffer input_buffer;
     audio_time render_time;
 };
-
-audio_unit_input_node::impl::impl()
-    : audio_unit_io_node::impl(), _core(std::make_unique<audio_unit_input_node::impl::core>())
-{
-}
-
-audio_unit_input_node::impl::~impl() = default;
 
 audio_unit_input_node::impl *audio_unit_input_node::_impl_ptr() const
 {
@@ -275,16 +294,6 @@ void audio_unit_input_node::prepare_audio_unit()
     unit.set_enable_output(false);
     unit.set_enable_input(true);
     unit.set_maximum_frames_per_slice(4096);
-}
-
-UInt32 audio_unit_input_node::input_bus_count() const
-{
-    return 0;
-}
-
-UInt32 audio_unit_input_node::output_bus_count() const
-{
-    return 1;
 }
 
 void audio_unit_input_node::set_channel_map(const channel_map_t &map)

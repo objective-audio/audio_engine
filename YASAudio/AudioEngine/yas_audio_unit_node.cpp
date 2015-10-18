@@ -48,6 +48,16 @@ audio_unit_node::impl::impl() : audio_node::impl(), _core(std::make_unique<audio
 
 audio_unit_node::impl::~impl() = default;
 
+UInt32 audio_unit_node::impl::input_bus_count() const
+{
+    return 1;
+}
+
+UInt32 audio_unit_node::impl::output_bus_count() const
+{
+    return 1;
+}
+
 audio_unit_node::impl *audio_unit_node::_impl_ptr() const
 {
     return dynamic_cast<audio_unit_node::impl *>(_impl.get());
@@ -120,16 +130,6 @@ const audio_unit_parameter_map_t &audio_unit_node::input_parameters() const
 const audio_unit_parameter_map_t &audio_unit_node::output_parameters() const
 {
     return _impl_ptr()->_core->parameters.at(kAudioUnitScope_Output);
-}
-
-UInt32 audio_unit_node::input_bus_count() const
-{
-    return 1;
-}
-
-UInt32 audio_unit_node::output_bus_count() const
-{
-    return 1;
 }
 
 UInt32 audio_unit_node::input_element_count() const

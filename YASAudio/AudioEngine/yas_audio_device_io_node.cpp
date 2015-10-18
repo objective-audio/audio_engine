@@ -28,6 +28,16 @@ class audio_device_io_node::impl : public audio_node::impl
 
     ~impl() = default;
 
+    virtual UInt32 input_bus_count() const override
+    {
+        return 1;
+    }
+
+    virtual UInt32 output_bus_count() const override
+    {
+        return 1;
+    }
+
     class core;
     std::unique_ptr<core> _core;
 };
@@ -89,16 +99,6 @@ audio_device_io_node::audio_device_io_node(const audio_device &device)
 }
 
 audio_device_io_node::~audio_device_io_node() = default;
-
-UInt32 audio_device_io_node::input_bus_count() const
-{
-    return 1;
-}
-
-UInt32 audio_device_io_node::output_bus_count() const
-{
-    return 1;
-}
 
 void audio_device_io_node::set_device(const audio_device &device)
 {
