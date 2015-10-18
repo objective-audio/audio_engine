@@ -76,6 +76,11 @@ namespace yas
             impl();
             virtual ~impl();
 
+            impl(const impl &) = delete;
+            impl(impl &&) = delete;
+            impl &operator=(const impl &) = delete;
+            impl &operator=(impl &&) = delete;
+
             class core;
             std::unique_ptr<core> _core;
         };
