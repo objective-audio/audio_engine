@@ -52,6 +52,7 @@ namespace yas
         const audio_time &input_time_on_render() const;
 
        private:
+        class kernel;
         class impl;
         std::shared_ptr<impl> _impl;
 

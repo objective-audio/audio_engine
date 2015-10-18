@@ -14,11 +14,6 @@ namespace yas
        public:
         static audio_unit_mixer_node_sptr create();
 
-        virtual void update_connections() override;
-
-        virtual UInt32 input_bus_count() const override;
-        virtual UInt32 output_bus_count() const override;
-
         void set_output_volume(const Float32 volume, const UInt32 bus_idx);
         Float32 output_volume(const UInt32 bus_idx);
         void set_output_pan(const Float32 pan, const UInt32 bus_idx);
@@ -37,5 +32,6 @@ namespace yas
 
        private:
         using super_class = audio_unit_node;
+        class impl;
     };
 }

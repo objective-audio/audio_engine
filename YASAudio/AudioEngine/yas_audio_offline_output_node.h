@@ -24,23 +24,11 @@ namespace yas
 
         ~audio_offline_output_node();
 
-        UInt32 output_bus_count() const override;
-        UInt32 input_bus_count() const override;
-
         bool is_running() const;
 
        private:
-        class impl : public audio_node::impl
-        {
-           public:
-            impl();
-            ~impl() = default;
-
-            class core;
-            std::unique_ptr<core> _core;
-        };
-
-        using super_class = audio_unit_node;
+        using super_class = audio_node;
+        class impl;
 
         audio_offline_output_node();
 

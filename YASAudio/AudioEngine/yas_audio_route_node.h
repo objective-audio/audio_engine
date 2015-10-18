@@ -15,9 +15,6 @@ namespace yas
        public:
         static audio_route_node_sptr create();
 
-        virtual UInt32 input_bus_count() const override;
-        virtual UInt32 output_bus_count() const override;
-
         const std::set<audio_route> &routes() const;
         void add_route(const audio_route &);
         void add_route(audio_route &&);
@@ -28,11 +25,8 @@ namespace yas
         void set_routes(std::set<audio_route> &&routes);
         void clear_routes();
 
+        // render thread
         virtual void render(audio_pcm_buffer &buffer, const UInt32 bus_idx, const audio_time &when) override;
-
-       protected:
-        virtual kernel_sptr make_kernel() override;
-        virtual void prepare_kernel(const kernel_sptr &) override;
 
        private:
         using super_class = audio_node;

@@ -20,9 +20,6 @@ namespace yas
 
         void set_render_function(const render_f &);
 
-        virtual UInt32 input_bus_count() const override;
-        virtual UInt32 output_bus_count() const override;
-
         // render thread
         virtual void render(audio_pcm_buffer &buffer, const UInt32 bus_idx, const audio_time &when) override;
 
@@ -33,15 +30,14 @@ namespace yas
         void render_source(audio_pcm_buffer &buffer, const UInt32 bus_idx, const audio_time &when);
 
        protected:
-        audio_tap_node();
+        class impl;
 
-        virtual kernel_sptr make_kernel() override;
-        virtual void prepare_kernel(const kernel_sptr &) override;
+        audio_tap_node();
+        audio_tap_node(std::unique_ptr<impl> &&impl);
 
        private:
         using super_class = audio_node;
         class kernel;
-        class impl;
 
         std::shared_ptr<kernel> _kernel() const;
         impl *_impl_ptr() const;
@@ -52,7 +48,10 @@ namespace yas
        public:
         static audio_input_tap_node_sptr create();
 
-        virtual UInt32 input_bus_count() const override;
-        virtual UInt32 output_bus_count() const override;
+        audio_input_tap_node();
+
+       private:
+        using super_class = audio_tap_node;
+        class impl;
     };
 }

@@ -26,17 +26,12 @@ namespace yas
         audio_device device() const;
 #endif
 
-        virtual bus_result_t next_available_output_bus() const override;
-        virtual bool is_available_output_bus(const UInt32 bus_idx) const override;
-
         void set_channel_map(const channel_map_t &map, const yas::direction dir);
         const channel_map_t &channel_map(const yas::direction dir) const;
 
         Float64 device_sample_rate() const;
         UInt32 output_device_channel_count() const;
         UInt32 input_device_channel_count() const;
-
-        virtual void update_connections() override;
 
        private:
         using super_class = audio_unit_node;
@@ -48,8 +43,24 @@ namespace yas
             impl();
             virtual ~impl();
 
+#if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
+            void set_device(const audio_device &device);
+            audio_device device() const;
+#endif
+            Float64 device_sample_rate() const;
+            UInt32 output_device_channel_count() const;
+            UInt32 input_device_channel_count() const;
+
+            virtual bus_result_t next_available_output_bus() const override;
+            virtual bool is_available_output_bus(const UInt32 bus_idx) const override;
+
+            virtual void update_connections() override;
+
             class core;
             std::unique_ptr<core> _core;
+
+           private:
+            using super_class = super_class::impl;
         };
 
         audio_unit_io_node(std::unique_ptr<impl> &&);
@@ -64,9 +75,6 @@ namespace yas
        public:
         static audio_unit_output_node_sptr create();
 
-        virtual UInt32 input_bus_count() const override;
-        virtual UInt32 output_bus_count() const override;
-
         void set_channel_map(const channel_map_t &map);
         const channel_map_t &channel_map() const;
 
@@ -75,6 +83,7 @@ namespace yas
 
        private:
         using super_class = audio_unit_io_node;
+        class impl;
 
         audio_unit_output_node();
     };
@@ -84,13 +93,8 @@ namespace yas
        public:
         static audio_unit_input_node_sptr create();
 
-        virtual UInt32 input_bus_count() const override;
-        virtual UInt32 output_bus_count() const override;
-
         void set_channel_map(const channel_map_t &map);
         const channel_map_t &channel_map() const;
-
-        virtual void update_connections() override;
 
        protected:
         audio_unit_input_node();
@@ -99,19 +103,8 @@ namespace yas
 
        private:
         using super_class = audio_unit_io_node;
-
-        class impl : public super_class::impl
-        {
-           public:
-            impl();
-            ~impl();
-
-            class core;
-            std::unique_ptr<core> _core;
-        };
+        class impl;
 
         impl *_impl_ptr() const;
-
-        std::weak_ptr<audio_unit_input_node> _weak_this;
     };
 }

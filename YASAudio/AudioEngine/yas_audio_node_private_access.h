@@ -12,12 +12,12 @@ namespace yas
     class audio_node::kernel::private_access
     {
        public:
-        static void set_input_connections(const kernel_sptr &kernel, const audio_connection_wmap &connections)
+        static void set_input_connections(const std::shared_ptr<kernel> &kernel, const audio_connection_wmap &connections)
         {
             kernel->_set_input_connections(connections);
         }
 
-        static void set_output_connections(const kernel_sptr &kernel, const audio_connection_wmap &connections)
+        static void set_output_connections(const std::shared_ptr<kernel> &kernel, const audio_connection_wmap &connections)
         {
             kernel->_set_output_connections(connections);
         }
@@ -76,7 +76,7 @@ namespace yas
             node->update_kernel();
         }
 
-        static kernel_sptr kernel(const audio_node_sptr &node)
+        static std::shared_ptr<kernel> kernel(const audio_node_sptr &node)
         {
             return node->_kernel();
         }

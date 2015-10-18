@@ -63,12 +63,6 @@ void audio_node::kernel::_set_output_connections(const audio_connection_wmap &co
 
 #pragma mark - impl
 
-audio_node::impl::impl() : _core(std::make_unique<core>())
-{
-}
-
-audio_node::impl::~impl() = default;
-
 class audio_node::impl::core
 {
    public:
@@ -88,13 +82,13 @@ class audio_node::impl::core
         return _output_connections;
     }
 
-    void set_kernel(const kernel_sptr &kernel)
+    void set_kernel(const std::shared_ptr<kernel> &kernel)
     {
         std::lock_guard<std::recursive_mutex> lock(_mutex);
         _kernel = kernel;
     }
 
-    kernel_sptr kernel() const
+    std::shared_ptr<kernel> kernel() const
     {
         std::lock_guard<std::recursive_mutex> lock(_mutex);
         return _kernel;
@@ -115,10 +109,128 @@ class audio_node::impl::core
    private:
     audio_connection_wmap _input_connections;
     audio_connection_wmap _output_connections;
-    kernel_sptr _kernel;
+    std::shared_ptr<audio_node::kernel> _kernel;
     audio_time _render_time;
     mutable std::recursive_mutex _mutex;
 };
+
+audio_node::impl::impl() : _core(std::make_unique<core>())
+{
+}
+
+audio_node::impl::~impl() = default;
+
+audio_format audio_node::impl::input_format(const UInt32 bus_idx)
+{
+    if (auto connection = input_connection(bus_idx)) {
+        return connection.format();
+    }
+    return nullptr;
+}
+
+audio_format audio_node::impl::output_format(const UInt32 bus_idx)
+{
+    if (auto connection = output_connection(bus_idx)) {
+        return connection.format();
+    }
+    return nullptr;
+}
+
+bus_result_t audio_node::impl::next_available_input_bus() const
+{
+    auto key = min_empty_key(_core->input_connections());
+    if (key && *key < input_bus_count()) {
+        return key;
+    }
+    return nullopt;
+}
+
+bus_result_t audio_node::impl::next_available_output_bus() const
+{
+    auto key = min_empty_key(_core->output_connections());
+    if (key && *key < output_bus_count()) {
+        return key;
+    }
+    return nullopt;
+}
+
+bool audio_node::impl::is_available_input_bus(const UInt32 bus_idx) const
+{
+    if (bus_idx >= input_bus_count()) {
+        return false;
+    }
+    return _core->input_connections().count(bus_idx) == 0;
+}
+
+bool audio_node::impl::is_available_output_bus(const UInt32 bus_idx) const
+{
+    if (bus_idx >= output_bus_count()) {
+        return false;
+    }
+    return _core->output_connections().count(bus_idx) == 0;
+}
+
+UInt32 audio_node::impl::input_bus_count() const
+{
+    return 0;
+}
+
+UInt32 audio_node::impl::output_bus_count() const
+{
+    return 0;
+}
+
+audio_connection audio_node::impl::input_connection(const UInt32 bus_idx) const
+{
+    if (_core->input_connections().count(bus_idx) > 0) {
+        return _core->input_connections().at(bus_idx).lock();
+    }
+    return nullptr;
+}
+
+audio_connection audio_node::impl::output_connection(const UInt32 bus_idx) const
+{
+    if (_core->output_connections().count(bus_idx) > 0) {
+        return _core->output_connections().at(bus_idx).lock();
+    }
+    return nullptr;
+}
+
+const audio_connection_wmap &audio_node::impl::input_connections() const
+{
+    return _core->input_connections();
+}
+
+const audio_connection_wmap &audio_node::impl::output_connections() const
+{
+    return _core->output_connections();
+}
+
+void audio_node::impl::update_connections()
+{
+}
+
+std::shared_ptr<audio_node::kernel> audio_node::impl::make_kernel()
+{
+    return std::shared_ptr<kernel>(new kernel());
+}
+
+void audio_node::impl::prepare_kernel(const std::shared_ptr<kernel> &kernel)
+{
+    if (!kernel) {
+        throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
+    }
+
+    kernel::private_access::set_input_connections(kernel, _core->input_connections());
+    kernel::private_access::set_output_connections(kernel, _core->output_connections());
+}
+
+void audio_node::impl::update_kernel()
+{
+    auto kernel = make_kernel();
+    prepare_kernel(kernel);
+    _core->set_kernel(kernel);
+}
 
 #pragma mark - main
 
@@ -143,52 +255,32 @@ void audio_node::reset()
 
 audio_format audio_node::input_format(const UInt32 bus_idx)
 {
-    if (auto connection = input_connection(bus_idx)) {
-        return connection.format();
-    }
-    return nullptr;
+    return _impl->input_format(bus_idx);
 }
 
 audio_format audio_node::output_format(const UInt32 bus_idx)
 {
-    if (auto connection = output_connection(bus_idx)) {
-        return connection.format();
-    }
-    return nullptr;
+    return _impl->output_format(bus_idx);
 }
 
 bus_result_t audio_node::next_available_input_bus() const
 {
-    auto key = min_empty_key(_impl->_core->input_connections());
-    if (key && *key < input_bus_count()) {
-        return key;
-    }
-    return nullopt;
+    return _impl->next_available_input_bus();
 }
 
 bus_result_t audio_node::next_available_output_bus() const
 {
-    auto key = min_empty_key(_impl->_core->output_connections());
-    if (key && *key < output_bus_count()) {
-        return key;
-    }
-    return nullopt;
+    return _impl->next_available_output_bus();
 }
 
 bool audio_node::is_available_input_bus(const UInt32 bus_idx) const
 {
-    if (bus_idx >= input_bus_count()) {
-        return false;
-    }
-    return _impl->_core->input_connections().count(bus_idx) == 0;
+    return _impl->is_available_input_bus(bus_idx);
 }
 
 bool audio_node::is_available_output_bus(const UInt32 bus_idx) const
 {
-    if (bus_idx >= output_bus_count()) {
-        return false;
-    }
-    return _impl->_core->output_connections().count(bus_idx) == 0;
+    return _impl->is_available_output_bus(bus_idx);
 }
 
 audio_engine audio_node::engine() const
@@ -203,12 +295,12 @@ audio_time audio_node::last_render_time() const
 
 UInt32 audio_node::input_bus_count() const
 {
-    return 0;
+    return _impl->input_bus_count();
 }
 
 UInt32 audio_node::output_bus_count() const
 {
-    return 0;
+    return _impl->output_bus_count();
 }
 
 #pragma mark render thread
@@ -222,28 +314,22 @@ void audio_node::render(audio_pcm_buffer &buffer, const UInt32 bus_idx, const au
 
 void audio_node::update_connections()
 {
+    _impl->update_connections();
 }
 
-audio_node::kernel_sptr audio_node::make_kernel()
+std::shared_ptr<audio_node::kernel> audio_node::make_kernel()
 {
-    return kernel_sptr(new kernel());
+    return _impl->make_kernel();
 }
 
-void audio_node::prepare_kernel(const kernel_sptr &kernel)
+void audio_node::prepare_kernel(const std::shared_ptr<kernel> &kernel)
 {
-    if (!kernel) {
-        throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
-    }
-
-    kernel::private_access::set_input_connections(kernel, _impl->_core->input_connections());
-    kernel::private_access::set_output_connections(kernel, _impl->_core->output_connections());
+    _impl->prepare_kernel(kernel);
 }
 
 void audio_node::update_kernel()
 {
-    auto kernel = make_kernel();
-    prepare_kernel(kernel);
-    _impl->_core->set_kernel(kernel);
+    _impl->update_kernel();
 }
 
 #pragma mark - private
@@ -283,33 +369,27 @@ void audio_node::_remove_connection(const audio_connection &connection)
 
 audio_connection audio_node::input_connection(const UInt32 bus_idx) const
 {
-    if (_impl->_core->input_connections().count(bus_idx) > 0) {
-        return _impl->_core->input_connections().at(bus_idx).lock();
-    }
-    return nullptr;
+    return _impl->input_connection(bus_idx);
 }
 
 audio_connection audio_node::output_connection(const UInt32 bus_idx) const
 {
-    if (_impl->_core->output_connections().count(bus_idx) > 0) {
-        return _impl->_core->output_connections().at(bus_idx).lock();
-    }
-    return nullptr;
+    return _impl->output_connection(bus_idx);
 }
 
 const audio_connection_wmap &audio_node::input_connections() const
 {
-    return _impl->_core->input_connections();
+    return _impl->input_connections();
 }
 
 const audio_connection_wmap &audio_node::output_connections() const
 {
-    return _impl->_core->output_connections();
+    return _impl->output_connections();
 }
 
 #pragma mark render thread
 
-audio_node::kernel_sptr audio_node::_kernel() const
+std::shared_ptr<audio_node::kernel> audio_node::_kernel() const
 {
     return _impl->_core->kernel();
 }

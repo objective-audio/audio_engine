@@ -27,8 +27,6 @@ namespace yas
         const std::map<AudioUnitParameterID, audio_unit_parameter> &input_parameters() const;
         const std::map<AudioUnitParameterID, audio_unit_parameter> &output_parameters() const;
 
-        virtual UInt32 input_bus_count() const override;
-        virtual UInt32 output_bus_count() const override;
         UInt32 input_element_count() const;
         UInt32 output_element_count() const;
 
@@ -41,8 +39,6 @@ namespace yas
                                         const AudioUnitElement element);
         Float32 output_parameter_value(const AudioUnitParameterID parameter_id, const AudioUnitElement element) const;
 
-        virtual void update_connections() override;
-
         void render(audio_pcm_buffer &buffer, const UInt32 bus_idx, const audio_time &when) override;
 
        protected:
@@ -51,6 +47,16 @@ namespace yas
            public:
             impl();
             virtual ~impl();
+
+            yas::audio_unit au() const;
+
+            UInt32 input_element_count() const;
+            UInt32 output_element_count() const;
+
+            virtual UInt32 input_bus_count() const override;
+            virtual UInt32 output_bus_count() const override;
+
+            virtual void update_connections() override;
 
             class core;
             std::unique_ptr<core> _core;

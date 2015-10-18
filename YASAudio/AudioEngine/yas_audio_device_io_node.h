@@ -25,9 +25,6 @@ namespace yas
 
         virtual ~audio_device_io_node();
 
-        virtual UInt32 input_bus_count() const override;
-        virtual UInt32 output_bus_count() const override;
-
         void set_device(const audio_device &device);
         audio_device device() const;
 
@@ -35,8 +32,6 @@ namespace yas
 
        protected:
         audio_device_io_node(const audio_device &device);
-
-        virtual void update_connections() override;
 
        private:
         using super_class = audio_node;
@@ -46,7 +41,6 @@ namespace yas
 
         void _add_device_io_to_graph(audio_graph &graph);
         void _remove_device_io_from_graph();
-        bool _validate_connections() const;
 
        public:
         class private_access;

@@ -11,6 +11,31 @@
 
 using namespace yas;
 
+#pragma mark - impl
+
+class audio_offline_output_node::impl : public super_class::impl
+{
+   public:
+    impl() : audio_node::impl(), _core(std::make_unique<audio_offline_output_node::impl::core>())
+    {
+    }
+
+    ~impl() = default;
+
+    virtual UInt32 output_bus_count() const override
+    {
+        return 0;
+    }
+
+    virtual UInt32 input_bus_count() const override
+    {
+        return 1;
+    }
+
+    class core;
+    std::unique_ptr<core> _core;
+};
+
 class audio_offline_output_node::impl::core
 {
     using completion_function_map_t = std::map<UInt8, offline_completion_f>;
@@ -58,18 +83,6 @@ class audio_offline_output_node::impl::core
     completion_function_map_t _completion_functions;
 };
 
-#pragma mark - impl
-
-audio_offline_output_node::impl::impl()
-    : audio_node::impl(), _core(std::make_unique<audio_offline_output_node::impl::core>())
-{
-}
-
-audio_offline_output_node::impl *audio_offline_output_node::_impl_ptr() const
-{
-    return dynamic_cast<audio_offline_output_node::impl *>(_impl.get());
-}
-
 #pragma mark - main
 
 audio_offline_output_node_sptr audio_offline_output_node::create()
@@ -91,14 +104,9 @@ audio_offline_output_node::~audio_offline_output_node()
     }
 }
 
-UInt32 audio_offline_output_node::output_bus_count() const
+bool audio_offline_output_node::is_running() const
 {
-    return 0;
-}
-
-UInt32 audio_offline_output_node::input_bus_count() const
-{
-    return 1;
+    return !!_impl_ptr()->_core->queue_container;
 }
 
 audio_offline_output_node::start_result_t audio_offline_output_node::_start(const offline_render_f &render_func,
@@ -226,9 +234,9 @@ void audio_offline_output_node::_stop()
     }
 }
 
-bool audio_offline_output_node::is_running() const
+audio_offline_output_node::impl *audio_offline_output_node::_impl_ptr() const
 {
-    return !!_impl_ptr()->_core->queue_container;
+    return dynamic_cast<audio_offline_output_node::impl *>(_impl.get());
 }
 
 std::string to_string(const audio_offline_output_node::start_error_t &error)
