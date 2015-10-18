@@ -41,6 +41,23 @@ audio_unit_io_node::impl::impl() : super_class::impl(), _core(std::make_unique<a
 
 audio_unit_io_node::impl::~impl() = default;
 
+bus_result_t audio_unit_io_node::impl::next_available_output_bus() const
+{
+    auto result = super_class::next_available_output_bus();
+    if (result && *result == 0) {
+        return 1;
+    }
+    return result;
+}
+
+bool audio_unit_io_node::impl::is_available_output_bus(const UInt32 bus_idx) const
+{
+    if (bus_idx == 1) {
+        return super_class::is_available_output_bus(0);
+    }
+    return false;
+}
+
 audio_unit_io_node::impl *audio_unit_io_node::_impl_ptr() const
 {
     return dynamic_cast<audio_unit_io_node::impl *>(_impl.get());
@@ -88,23 +105,6 @@ void audio_unit_io_node::prepare_audio_unit()
     unit.set_enable_output(true);
     unit.set_enable_input(true);
     unit.set_maximum_frames_per_slice(4096);
-}
-
-bus_result_t audio_unit_io_node::next_available_output_bus() const
-{
-    auto result = super_class::next_available_output_bus();
-    if (result && *result == 0) {
-        return 1;
-    }
-    return result;
-}
-
-bool audio_unit_io_node::is_available_output_bus(const UInt32 bus_idx) const
-{
-    if (bus_idx == 1) {
-        return super_class::is_available_output_bus(0);
-    }
-    return false;
 }
 
 Float64 audio_unit_io_node::device_sample_rate() const

@@ -63,22 +63,6 @@ void audio_node::kernel::_set_output_connections(const audio_connection_wmap &co
 
 #pragma mark - impl
 
-audio_node::impl::impl() : _core(std::make_unique<core>())
-{
-}
-
-audio_node::impl::~impl() = default;
-
-UInt32 audio_node::impl::input_bus_count() const
-{
-    return 0;
-}
-
-UInt32 audio_node::impl::output_bus_count() const
-{
-    return 0;
-}
-
 class audio_node::impl::core
 {
    public:
@@ -130,6 +114,56 @@ class audio_node::impl::core
     mutable std::recursive_mutex _mutex;
 };
 
+audio_node::impl::impl() : _core(std::make_unique<core>())
+{
+}
+
+audio_node::impl::~impl() = default;
+
+bus_result_t audio_node::impl::next_available_input_bus() const
+{
+    auto key = min_empty_key(_core->input_connections());
+    if (key && *key < input_bus_count()) {
+        return key;
+    }
+    return nullopt;
+}
+
+bus_result_t audio_node::impl::next_available_output_bus() const
+{
+    auto key = min_empty_key(_core->output_connections());
+    if (key && *key < output_bus_count()) {
+        return key;
+    }
+    return nullopt;
+}
+
+bool audio_node::impl::is_available_input_bus(const UInt32 bus_idx) const
+{
+    if (bus_idx >= input_bus_count()) {
+        return false;
+    }
+    return _core->input_connections().count(bus_idx) == 0;
+}
+
+bool audio_node::impl::is_available_output_bus(const UInt32 bus_idx) const
+{
+    if (bus_idx >= output_bus_count()) {
+        return false;
+    }
+    return _core->output_connections().count(bus_idx) == 0;
+}
+
+UInt32 audio_node::impl::input_bus_count() const
+{
+    return 0;
+}
+
+UInt32 audio_node::impl::output_bus_count() const
+{
+    return 0;
+}
+
 #pragma mark - main
 
 audio_node::audio_node(std::unique_ptr<impl> &&impl) : _impl(std::move(impl))
@@ -169,36 +203,22 @@ audio_format audio_node::output_format(const UInt32 bus_idx)
 
 bus_result_t audio_node::next_available_input_bus() const
 {
-    auto key = min_empty_key(_impl->_core->input_connections());
-    if (key && *key < input_bus_count()) {
-        return key;
-    }
-    return nullopt;
+    return _impl->next_available_input_bus();
 }
 
 bus_result_t audio_node::next_available_output_bus() const
 {
-    auto key = min_empty_key(_impl->_core->output_connections());
-    if (key && *key < output_bus_count()) {
-        return key;
-    }
-    return nullopt;
+    return _impl->next_available_output_bus();
 }
 
 bool audio_node::is_available_input_bus(const UInt32 bus_idx) const
 {
-    if (bus_idx >= input_bus_count()) {
-        return false;
-    }
-    return _impl->_core->input_connections().count(bus_idx) == 0;
+    return _impl->is_available_input_bus(bus_idx);
 }
 
 bool audio_node::is_available_output_bus(const UInt32 bus_idx) const
 {
-    if (bus_idx >= output_bus_count()) {
-        return false;
-    }
-    return _impl->_core->output_connections().count(bus_idx) == 0;
+    return _impl->is_available_output_bus(bus_idx);
 }
 
 audio_engine audio_node::engine() const

@@ -26,9 +26,6 @@ namespace yas
         audio_device device() const;
 #endif
 
-        virtual bus_result_t next_available_output_bus() const override;
-        virtual bool is_available_output_bus(const UInt32 bus_idx) const override;
-
         void set_channel_map(const channel_map_t &map, const yas::direction dir);
         const channel_map_t &channel_map(const yas::direction dir) const;
 
@@ -48,8 +45,14 @@ namespace yas
             impl();
             virtual ~impl();
 
+            virtual bus_result_t next_available_output_bus() const override;
+            virtual bool is_available_output_bus(const UInt32 bus_idx) const override;
+
             class core;
             std::unique_ptr<core> _core;
+
+           private:
+            using super_class = super_class::impl;
         };
 
         audio_unit_io_node(std::unique_ptr<impl> &&);
