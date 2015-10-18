@@ -234,15 +234,29 @@ void audio_node::impl::update_kernel()
 
 #pragma mark - main
 
-audio_node::audio_node(std::unique_ptr<impl> &&impl) : _impl(std::move(impl))
+audio_node::audio_node(std::shared_ptr<impl> &&impl) : _impl(std::move(impl))
+{
+}
+
+audio_node::audio_node(const std::shared_ptr<audio_node::impl> &impl) : _impl(impl)
 {
 }
 
 audio_node::~audio_node() = default;
 
-bool audio_node::operator==(const audio_node &node)
+bool audio_node::operator==(const audio_node &other)
 {
-    return this == &node;
+    return _impl && other._impl && _impl == other._impl;
+}
+
+bool audio_node::operator!=(const audio_node &other)
+{
+    return !_impl || !other._impl || _impl != other._impl;
+}
+
+audio_node::operator bool() const
+{
+    return _impl != nullptr;
 }
 
 void audio_node::reset()
@@ -356,12 +370,16 @@ void audio_node::_add_connection(const audio_connection &connection)
 
 void audio_node::_remove_connection(const audio_connection &connection)
 {
-    if (*connection.destination_node() == *this) {
-        _impl->_core->input_connections().erase(connection.destination_bus());
+    if (auto destination_node = connection.destination_node()) {
+        if (*connection.destination_node() == *this) {
+            _impl->_core->input_connections().erase(connection.destination_bus());
+        }
     }
 
-    if (*connection.source_node() == *this) {
-        _impl->_core->output_connections().erase(connection.source_bus());
+    if (auto source_node = connection.source_node()) {
+        if (*connection.source_node() == *this) {
+            _impl->_core->output_connections().erase(connection.source_bus());
+        }
     }
 
     update_kernel();

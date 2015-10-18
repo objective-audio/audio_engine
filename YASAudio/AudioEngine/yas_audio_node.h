@@ -10,6 +10,7 @@
 #include "yas_audio_format.h"
 #include "yas_audio_pcm_buffer.h"
 #include "yas_audio_connection.h"
+#include "yas_weak.h"
 #include <memory>
 #include <map>
 #include <experimental/optional>
@@ -23,7 +24,15 @@ namespace yas
        public:
         virtual ~audio_node();
 
+        audio_node(const audio_node &) = default;
+        audio_node(audio_node &&) = default;
+        audio_node &operator=(const audio_node &) = default;
+        audio_node &operator=(audio_node &&) = default;
+
         bool operator==(const audio_node &);
+        bool operator!=(const audio_node &);
+
+        explicit operator bool() const;
 
         void reset();
 
@@ -105,9 +114,9 @@ namespace yas
             std::unique_ptr<core> _core;
         };
 
-        std::unique_ptr<impl> _impl;
+        std::shared_ptr<impl> _impl;
 
-        audio_node(std::unique_ptr<impl> &&);
+        audio_node(std::shared_ptr<impl> &&);
 
         audio_connection input_connection(const UInt32 bus_idx) const;
         audio_connection output_connection(const UInt32 bus_idx) const;
@@ -125,10 +134,7 @@ namespace yas
         void set_render_time_on_render(const audio_time &time);
 
        private:
-        audio_node(const audio_node &) = delete;
-        audio_node(audio_node &&) = delete;
-        audio_node &operator=(const audio_node &) = delete;
-        audio_node &operator=(audio_node &&) = delete;
+        audio_node(const std::shared_ptr<audio_node::impl> &);
 
         void _set_engine(const audio_engine &engine);
         void _add_connection(const audio_connection &connection);
@@ -137,6 +143,9 @@ namespace yas
        public:
         class private_access;
         friend private_access;
+
+        using weak = weak<audio_node, audio_node::impl>;
+        friend weak;
     };
 }
 

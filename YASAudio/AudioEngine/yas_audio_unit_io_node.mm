@@ -153,7 +153,7 @@ audio_unit_io_node::impl *audio_unit_io_node::_impl_ptr() const
 
 #pragma mark - main
 
-audio_unit_io_node::audio_unit_io_node(std::unique_ptr<impl> &&impl)
+audio_unit_io_node::audio_unit_io_node(std::shared_ptr<impl> &&impl)
     : super_class(std::move(impl), AudioComponentDescription{
                                        .componentType = kAudioUnitType_Output,
                                        .componentSubType = audio_unit_sub_type_default_io,
@@ -278,7 +278,7 @@ class audio_unit_input_node::impl : public super_class::impl
        public:
         audio_pcm_buffer input_buffer;
         audio_time render_time;
-        std::weak_ptr<audio_unit_input_node> _weak_this;
+        audio_unit_input_node::weak _weak_node;
     };
 
     impl() : audio_unit_io_node::impl(), _core(std::make_unique<audio_unit_input_node::impl::core>())
@@ -309,20 +309,20 @@ class audio_unit_input_node::impl : public super_class::impl
             audio_pcm_buffer input_buffer(out_connection.format(), 4096);
             _core->input_buffer = input_buffer;
 
-            unit.set_input_callback([weak_node = _core->_weak_this, input_buffer](render_parameters &
+            unit.set_input_callback([weak_node = _core->_weak_node, input_buffer](render_parameters &
                                                                                   render_parameters) mutable {
                 auto input_node = weak_node.lock();
                 if (input_node && render_parameters.in_number_frames <= input_buffer.frame_capacity()) {
                     input_buffer.set_frame_length(render_parameters.in_number_frames);
                     render_parameters.io_data = input_buffer.audio_buffer_list();
 
-                    if (const auto kernel = input_node->_kernel()) {
+                    if (const auto kernel = input_node._kernel()) {
                         if (const auto connection = kernel->output_connection(1)) {
                             auto format = connection.format();
                             audio_time time(*render_parameters.io_time_stamp, format.sample_rate());
-                            input_node->set_render_time_on_render(time);
+                            input_node.set_render_time_on_render(time);
 
-                            if (auto io_unit = input_node->audio_unit()) {
+                            if (auto io_unit = input_node.audio_unit()) {
                                 render_parameters.in_bus_number = 1;
                                 io_unit.audio_unit_render(render_parameters);
                             }
@@ -358,11 +358,16 @@ audio_unit_input_node_sptr audio_unit_input_node::create()
 {
     auto node = audio_unit_input_node_sptr(new audio_unit_input_node());
     prepare_for_create(node);
-    node->_impl_ptr()->_core->_weak_this = node;
+    node->_impl_ptr()->_core->_weak_node = audio_unit_input_node::weak(*node);
     return node;
 }
 
 audio_unit_input_node::audio_unit_input_node() : super_class(std::make_unique<impl>())
+{
+}
+
+audio_unit_input_node::audio_unit_input_node(const std::shared_ptr<audio_unit_input_node::impl> &impl)
+    : super_class(impl)
 {
 }
 

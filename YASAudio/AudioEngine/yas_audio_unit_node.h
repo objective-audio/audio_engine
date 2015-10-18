@@ -64,7 +64,7 @@ namespace yas
 
         static void prepare_for_create(const audio_unit_node_sptr &);
 
-        audio_unit_node(std::unique_ptr<impl> &&, const AudioComponentDescription &);
+        audio_unit_node(std::shared_ptr<impl> &&, const AudioComponentDescription &);
 
         virtual void prepare_audio_unit();
         virtual void prepare_parameters();  // NS_REQUIRES_SUPER

@@ -18,7 +18,7 @@ namespace yas
         {
         }
 
-        weak(const T &obj) : _impl(obj._impl)
+        weak(const T &obj) : _impl(std::static_pointer_cast<I>(obj._impl))
         {
         }
 
