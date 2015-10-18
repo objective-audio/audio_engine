@@ -88,13 +88,13 @@ class audio_node::impl::core
         return _output_connections;
     }
 
-    void set_kernel(const kernel_sptr &kernel)
+    void set_kernel(const std::shared_ptr<kernel> &kernel)
     {
         std::lock_guard<std::recursive_mutex> lock(_mutex);
         _kernel = kernel;
     }
 
-    kernel_sptr kernel() const
+    std::shared_ptr<kernel> kernel() const
     {
         std::lock_guard<std::recursive_mutex> lock(_mutex);
         return _kernel;
@@ -115,7 +115,7 @@ class audio_node::impl::core
    private:
     audio_connection_wmap _input_connections;
     audio_connection_wmap _output_connections;
-    kernel_sptr _kernel;
+    std::shared_ptr<audio_node::kernel> _kernel;
     audio_time _render_time;
     mutable std::recursive_mutex _mutex;
 };
@@ -224,12 +224,12 @@ void audio_node::update_connections()
 {
 }
 
-audio_node::kernel_sptr audio_node::make_kernel()
+std::shared_ptr<audio_node::kernel> audio_node::make_kernel()
 {
-    return kernel_sptr(new kernel());
+    return std::shared_ptr<kernel>(new kernel());
 }
 
-void audio_node::prepare_kernel(const kernel_sptr &kernel)
+void audio_node::prepare_kernel(const std::shared_ptr<kernel> &kernel)
 {
     if (!kernel) {
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
@@ -309,7 +309,7 @@ const audio_connection_wmap &audio_node::output_connections() const
 
 #pragma mark render thread
 
-audio_node::kernel_sptr audio_node::_kernel() const
+std::shared_ptr<audio_node::kernel> audio_node::_kernel() const
 {
     return _impl->_core->kernel();
 }

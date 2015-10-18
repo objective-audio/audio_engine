@@ -31,8 +31,8 @@ namespace yas
         virtual void render(audio_pcm_buffer &buffer, const UInt32 bus_idx, const audio_time &when) override;
 
        protected:
-        virtual kernel_sptr make_kernel() override;
-        virtual void prepare_kernel(const kernel_sptr &) override;
+        virtual std::shared_ptr<kernel> make_kernel() override;
+        virtual void prepare_kernel(const std::shared_ptr<kernel> &) override;
 
        private:
         using super_class = audio_node;

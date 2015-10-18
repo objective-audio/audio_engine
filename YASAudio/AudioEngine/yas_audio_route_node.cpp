@@ -133,12 +133,12 @@ void audio_route_node::clear_routes()
 
 #pragma mark - protected
 
-audio_node::kernel_sptr audio_route_node::make_kernel()
+std::shared_ptr<audio_node::kernel> audio_route_node::make_kernel()
 {
-    return audio_node::kernel_sptr(new audio_route_node::kernel());
+    return std::shared_ptr<audio_node::kernel>(new audio_route_node::kernel());
 }
 
-void audio_route_node::prepare_kernel(const kernel_sptr &kernel)
+void audio_route_node::prepare_kernel(const std::shared_ptr<audio_node::kernel> &kernel)
 {
     super_class::prepare_kernel(kernel);
 

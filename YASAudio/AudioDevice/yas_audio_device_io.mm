@@ -18,30 +18,28 @@
 
 using namespace yas;
 
+class audio_device_io::kernel
+{
+   public:
+    audio_pcm_buffer input_buffer;
+    audio_pcm_buffer output_buffer;
+
+    kernel(const audio_format &input_format, const audio_format &output_format, const UInt32 frame_capacity)
+        : input_buffer(input_format ? audio_pcm_buffer(input_format, frame_capacity) : nullptr),
+          output_buffer(output_format ? audio_pcm_buffer(output_format, frame_capacity) : nullptr)
+    {
+    }
+
+    void reset_buffers()
+    {
+        input_buffer.reset();
+        output_buffer.reset();
+    }
+};
+
 class audio_device_io::impl
 {
    public:
-    class kernel
-    {
-       public:
-        audio_pcm_buffer input_buffer;
-        audio_pcm_buffer output_buffer;
-
-        kernel(const audio_format &input_format, const audio_format &output_format, const UInt32 frame_capacity)
-            : input_buffer(input_format ? audio_pcm_buffer(input_format, frame_capacity) : nullptr),
-              output_buffer(output_format ? audio_pcm_buffer(output_format, frame_capacity) : nullptr)
-        {
-        }
-
-        void reset_buffers()
-        {
-            input_buffer.reset();
-            output_buffer.reset();
-        }
-    };
-
-    using kernel_sptr = std::shared_ptr<kernel>;
-
     audio_device_io::weak weak_device_io;
     audio_device device;
     bool is_running;
@@ -201,7 +199,7 @@ class audio_device_io::impl
         return _maximum_frames;
     }
 
-    void set_kernel(const kernel_sptr &kernel)
+    void set_kernel(const std::shared_ptr<kernel> &kernel)
     {
         std::lock_guard<std::recursive_mutex> lock(_mutex);
         _kernel = nullptr;
@@ -210,7 +208,7 @@ class audio_device_io::impl
         }
     }
 
-    kernel_sptr kernel() const
+    std::shared_ptr<kernel> kernel() const
     {
         std::lock_guard<std::recursive_mutex> lock(_mutex);
         return _kernel;
@@ -226,13 +224,14 @@ class audio_device_io::impl
             return;
         }
 
-        set_kernel(std::make_shared<class kernel>(device.input_format(), device.output_format(), _maximum_frames));
+        set_kernel(
+            std::make_shared<audio_device_io::kernel>(device.input_format(), device.output_format(), _maximum_frames));
     }
 
    private:
     render_f _render_callback;
     UInt32 _maximum_frames;
-    kernel_sptr _kernel;
+    std::shared_ptr<audio_device_io::kernel> _kernel;
     mutable std::recursive_mutex _mutex;
 };
 

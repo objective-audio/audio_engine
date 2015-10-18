@@ -36,7 +36,7 @@ class audio_tap_node::impl::core
 {
    public:
     render_f render_function;
-    kernel_sptr kernel_on_render;
+    std::shared_ptr<kernel> kernel_on_render;
 };
 
 #pragma mark - main
@@ -117,12 +117,12 @@ void audio_tap_node::render_source(audio_pcm_buffer &buffer, const UInt32 bus_id
     }
 }
 
-audio_node::kernel_sptr audio_tap_node::make_kernel()
+std::shared_ptr<audio_node::kernel> audio_tap_node::make_kernel()
 {
-    return audio_node::kernel_sptr(new audio_tap_node::kernel());
+    return std::shared_ptr<kernel>(new audio_tap_node::kernel());
 }
 
-void audio_tap_node::prepare_kernel(const audio_node::kernel_sptr &kernel)
+void audio_tap_node::prepare_kernel(const std::shared_ptr<audio_node::kernel> &kernel)
 {
     super_class::prepare_kernel(kernel);
 

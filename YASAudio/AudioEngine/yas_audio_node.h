@@ -70,8 +70,6 @@ namespace yas
             friend private_access;
         };
 
-        using kernel_sptr = std::shared_ptr<kernel>;
-
         class impl
         {
            public:
@@ -92,12 +90,12 @@ namespace yas
         const audio_connection_wmap &output_connections() const;
 
         virtual void update_connections();
-        virtual kernel_sptr make_kernel();
-        virtual void prepare_kernel(const kernel_sptr &kernel);  // NS_REQUIRES_SUPER
+        virtual std::shared_ptr<kernel> make_kernel();
+        virtual void prepare_kernel(const std::shared_ptr<kernel> &kernel);  // NS_REQUIRES_SUPER
         void update_kernel();
 
         // render thread
-        kernel_sptr _kernel() const;
+        std::shared_ptr<kernel> _kernel() const;
         void set_render_time_on_render(const audio_time &time);
 
        private:
