@@ -64,12 +64,14 @@ namespace yas
 
         static void prepare_for_create(const audio_unit_node_sptr &);
 
-        audio_unit_node(std::unique_ptr<impl> &&, const AudioComponentDescription &);
+        audio_unit_node(std::shared_ptr<impl> &&, const AudioComponentDescription &);
 
         virtual void prepare_audio_unit();
         virtual void prepare_parameters();  // NS_REQUIRES_SUPER
 
        private:
+        audio_unit_node(const std::shared_ptr<impl> &);
+
         impl *_impl_ptr() const;
 
         using super_class = audio_node;
@@ -81,6 +83,9 @@ namespace yas
        public:
         class private_access;
         friend private_access;
+
+        using weak = yas::weak<audio_unit_node, audio_unit_node::impl>;
+        friend weak;
     };
 }
 

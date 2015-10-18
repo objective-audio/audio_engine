@@ -148,7 +148,7 @@ void audio_unit_node::prepare_for_create(const audio_unit_node_sptr &node)
     node->_impl_ptr()->_core->weak_node = node;
 }
 
-audio_unit_node::audio_unit_node(std::unique_ptr<impl> &&impl, const AudioComponentDescription &acd)
+audio_unit_node::audio_unit_node(std::shared_ptr<impl> &&impl, const AudioComponentDescription &acd)
     : audio_node(std::move(impl))
 {
     _impl_ptr()->_core->acd = acd;
@@ -161,6 +161,10 @@ audio_unit_node::audio_unit_node(std::unique_ptr<impl> &&impl, const AudioCompon
         std::make_pair(kAudioUnitScope_Input, unit.create_parameters(kAudioUnitScope_Input)));
     _impl_ptr()->_core->parameters.insert(
         std::make_pair(kAudioUnitScope_Output, unit.create_parameters(kAudioUnitScope_Output)));
+}
+
+audio_unit_node::audio_unit_node(const std::shared_ptr<impl> &impl) : super_class(impl)
+{
 }
 
 audio_unit_node::~audio_unit_node() = default;

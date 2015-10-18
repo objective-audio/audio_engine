@@ -63,7 +63,7 @@ namespace yas
             using super_class = super_class::impl;
         };
 
-        audio_unit_io_node(std::unique_ptr<impl> &&);
+        audio_unit_io_node(std::shared_ptr<impl> &&);
 
         impl *_impl_ptr() const;
 
@@ -105,6 +105,12 @@ namespace yas
         using super_class = audio_unit_io_node;
         class impl;
 
+        audio_unit_input_node(const std::shared_ptr<audio_unit_input_node::impl> &);
+
         impl *_impl_ptr() const;
+
+       public:
+        using weak = yas::weak<audio_unit_input_node, audio_unit_input_node::impl>;
+        friend weak;
     };
 }
