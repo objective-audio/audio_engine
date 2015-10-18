@@ -163,6 +163,10 @@ audio_unit_node::audio_unit_node(std::shared_ptr<impl> &&impl, const AudioCompon
         std::make_pair(kAudioUnitScope_Output, unit.create_parameters(kAudioUnitScope_Output)));
 }
 
+audio_unit_node::audio_unit_node(const std::shared_ptr<impl> &impl) : super_class(impl)
+{
+}
+
 audio_unit_node::~audio_unit_node() = default;
 
 audio_unit audio_unit_node::audio_unit() const
