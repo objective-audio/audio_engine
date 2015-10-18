@@ -81,6 +81,8 @@ namespace yas
             impl &operator=(const impl &) = delete;
             impl &operator=(impl &&) = delete;
 
+            audio_format input_format(const UInt32 bus_idx);
+            audio_format output_format(const UInt32 bus_idx);
             virtual bus_result_t next_available_input_bus() const;
             virtual bus_result_t next_available_output_bus() const;
             virtual bool is_available_input_bus(const UInt32 bus_idx) const;
@@ -88,6 +90,13 @@ namespace yas
 
             virtual UInt32 input_bus_count() const;
             virtual UInt32 output_bus_count() const;
+
+            audio_connection input_connection(const UInt32 bus_idx) const;
+            audio_connection output_connection(const UInt32 bus_idx) const;
+            const audio_connection_wmap &input_connections() const;
+            const audio_connection_wmap &output_connections() const;
+
+            virtual void update_connections();
 
             class core;
             std::unique_ptr<core> _core;
@@ -102,7 +111,7 @@ namespace yas
         const audio_connection_wmap &input_connections() const;
         const audio_connection_wmap &output_connections() const;
 
-        virtual void update_connections();
+        void update_connections();
         virtual std::shared_ptr<kernel> make_kernel();
         virtual void prepare_kernel(const std::shared_ptr<kernel> &kernel);  // NS_REQUIRES_SUPER
         void update_kernel();

@@ -33,8 +33,6 @@ namespace yas
        protected:
         audio_device_io_node(const audio_device &device);
 
-        virtual void update_connections() override;
-
        private:
         using super_class = audio_node;
         class impl;
@@ -43,7 +41,6 @@ namespace yas
 
         void _add_device_io_to_graph(audio_graph &graph);
         void _remove_device_io_from_graph();
-        bool _validate_connections() const;
 
        public:
         class private_access;

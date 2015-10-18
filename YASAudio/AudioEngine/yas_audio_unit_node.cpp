@@ -48,6 +48,21 @@ audio_unit_node::impl::impl() : audio_node::impl(), _core(std::make_unique<audio
 
 audio_unit_node::impl::~impl() = default;
 
+audio_unit audio_unit_node::impl::au() const
+{
+    return _core->au();
+}
+
+UInt32 audio_unit_node::impl::input_element_count() const
+{
+    return _core->au().element_count(kAudioUnitScope_Input);
+}
+
+UInt32 audio_unit_node::impl::output_element_count() const
+{
+    return _core->au().element_count(kAudioUnitScope_Output);
+}
+
 UInt32 audio_unit_node::impl::input_bus_count() const
 {
     return 1;
@@ -56,6 +71,49 @@ UInt32 audio_unit_node::impl::input_bus_count() const
 UInt32 audio_unit_node::impl::output_bus_count() const
 {
     return 1;
+}
+
+void audio_unit_node::impl::update_connections()
+{
+    if (auto audio_unit = _core->au()) {
+        auto input_bus_count = input_element_count();
+        if (input_bus_count > 0) {
+            auto weak_node = _core->weak_node;
+            audio_unit.set_render_callback([weak_node](yas::render_parameters &render_parameters) {
+                if (auto node = weak_node.lock()) {
+                    if (auto kernel = node->_kernel()) {
+                        if (auto connection = kernel->input_connection(render_parameters.in_bus_number)) {
+                            if (auto source_node = connection.source_node()) {
+                                auto buffer = yas::audio_pcm_buffer(connection.format(), render_parameters.io_data);
+                                audio_time when(*render_parameters.io_time_stamp, connection.format().sample_rate());
+                                source_node->render(buffer, connection.source_bus(), when);
+                            }
+                        }
+                    }
+                }
+            });
+
+            for (UInt32 bus_idx = 0; bus_idx < input_bus_count; ++bus_idx) {
+                if (auto connection = input_connection(bus_idx)) {
+                    audio_unit.set_input_format(connection.format().stream_description(), bus_idx);
+                    audio_unit.attach_render_callback(bus_idx);
+                } else {
+                    audio_unit.detach_render_callback(bus_idx);
+                }
+            }
+        } else {
+            audio_unit.set_render_callback(nullptr);
+        }
+
+        auto output_bus_count = output_element_count();
+        if (output_bus_count > 0) {
+            for (UInt32 bus_idx = 0; bus_idx < output_bus_count; ++bus_idx) {
+                if (auto connection = output_connection(bus_idx)) {
+                    audio_unit.set_output_format(connection.format().stream_description(), bus_idx);
+                }
+            }
+        }
+    }
 }
 
 audio_unit_node::impl *audio_unit_node::_impl_ptr() const
@@ -109,7 +167,7 @@ audio_unit_node::~audio_unit_node() = default;
 
 audio_unit audio_unit_node::audio_unit() const
 {
-    return _impl_ptr()->_core->au();
+    return _impl_ptr()->au();
 }
 
 const std::map<AudioUnitParameterID, audio_unit_parameter_map_t> &audio_unit_node::parameters() const
@@ -134,12 +192,12 @@ const audio_unit_parameter_map_t &audio_unit_node::output_parameters() const
 
 UInt32 audio_unit_node::input_element_count() const
 {
-    return _impl_ptr()->_core->au().element_count(kAudioUnitScope_Input);
+    return _impl_ptr()->input_element_count();
 }
 
 UInt32 audio_unit_node::output_element_count() const
 {
-    return _impl_ptr()->_core->au().element_count(kAudioUnitScope_Output);
+    return _impl_ptr()->output_element_count();
 }
 
 void audio_unit_node::set_global_parameter_value(const AudioUnitParameterID parameter_id, const Float32 value)
@@ -226,51 +284,6 @@ void audio_unit_node::prepare_parameters()
                     auto &element = value_pair.first;
                     auto &value = value_pair.second;
                     audio_unit.set_parameter_value(value, parameter.parameter_id(), scope, element);
-                }
-            }
-        }
-    }
-}
-
-#pragma mark - override
-
-void audio_unit_node::update_connections()
-{
-    if (auto audio_unit = _impl_ptr()->_core->au()) {
-        auto input_bus_count = input_element_count();
-        if (input_bus_count > 0) {
-            auto weak_node = _impl_ptr()->_core->weak_node;
-            audio_unit.set_render_callback([weak_node](yas::render_parameters &render_parameters) {
-                if (auto node = weak_node.lock()) {
-                    if (auto kernel = node->_kernel()) {
-                        if (auto connection = kernel->input_connection(render_parameters.in_bus_number)) {
-                            if (auto source_node = connection.source_node()) {
-                                auto buffer = yas::audio_pcm_buffer(connection.format(), render_parameters.io_data);
-                                audio_time when(*render_parameters.io_time_stamp, connection.format().sample_rate());
-                                source_node->render(buffer, connection.source_bus(), when);
-                            }
-                        }
-                    }
-                }
-            });
-
-            for (UInt32 bus_idx = 0; bus_idx < input_bus_count; ++bus_idx) {
-                if (auto connection = input_connection(bus_idx)) {
-                    audio_unit.set_input_format(connection.format().stream_description(), bus_idx);
-                    audio_unit.attach_render_callback(bus_idx);
-                } else {
-                    audio_unit.detach_render_callback(bus_idx);
-                }
-            }
-        } else {
-            audio_unit.set_render_callback(nullptr);
-        }
-
-        auto output_bus_count = output_element_count();
-        if (output_bus_count > 0) {
-            for (UInt32 bus_idx = 0; bus_idx < output_bus_count; ++bus_idx) {
-                if (auto connection = output_connection(bus_idx)) {
-                    audio_unit.set_output_format(connection.format().stream_description(), bus_idx);
                 }
             }
         }

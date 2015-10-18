@@ -12,6 +12,7 @@ using namespace yas;
 
 class audio_unit_mixer_node::impl : public super_class::impl
 {
+   private:
     virtual UInt32 input_bus_count() const override
     {
         return std::numeric_limits<UInt32>::max();
@@ -21,6 +22,23 @@ class audio_unit_mixer_node::impl : public super_class::impl
     {
         return 1;
     }
+
+    virtual void update_connections() override
+    {
+        auto &connections = input_connections();
+        if (connections.size() > 0) {
+            auto last = connections.end();
+            --last;
+            if (auto unit = au()) {
+                auto &pair = *last;
+                unit.set_element_count(pair.first + 1, kAudioUnitScope_Input);
+            }
+        }
+
+        super_class::update_connections();
+    }
+
+    using super_class = super_class::impl;
 };
 
 #pragma mark - main
@@ -41,21 +59,6 @@ audio_unit_mixer_node::audio_unit_mixer_node()
                                                     .componentFlagsMask = 0,
                                                 })
 {
-}
-
-void audio_unit_mixer_node::update_connections()
-{
-    auto &connections = input_connections();
-    if (connections.size() > 0) {
-        auto last = connections.end();
-        --last;
-        if (auto unit = audio_unit()) {
-            auto &pair = *last;
-            unit.set_element_count(pair.first + 1, kAudioUnitScope_Input);
-        }
-    }
-
-    super_class::update_connections();
 }
 
 void audio_unit_mixer_node::set_output_volume(const Float32 volume, const UInt32 bus_idx)
