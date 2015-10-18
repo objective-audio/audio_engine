@@ -107,8 +107,9 @@ namespace yas
         virtual void prepare_kernel(const std::shared_ptr<kernel> &kernel);  // NS_REQUIRES_SUPER
         void update_kernel();
 
-        // render thread
         std::shared_ptr<kernel> _kernel() const;
+
+        // render thread
         void set_render_time_on_render(const audio_time &time);
 
        private:
