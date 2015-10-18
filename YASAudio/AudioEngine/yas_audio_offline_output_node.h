@@ -40,14 +40,14 @@ namespace yas
             std::unique_ptr<core> _core;
         };
 
-        impl *_impl_ptr() const;
-
         using super_class = audio_unit_node;
 
         audio_offline_output_node();
 
         start_result_t _start(const offline_render_f &callback_func, const offline_completion_f &completion_func);
         void _stop();
+
+        impl *_impl_ptr() const;
 
        public:
         class private_access;

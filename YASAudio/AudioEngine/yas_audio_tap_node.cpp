@@ -7,36 +7,39 @@
 
 using namespace yas;
 
-#pragma mark - node_core
+#pragma mark - kernel
 
-namespace yas
+class audio_tap_node::kernel : public audio_node::kernel
 {
-    class audio_tap_node_core : public audio_node_core
-    {
-       public:
-        audio_tap_node::render_f render_function;
-    };
-}
+   public:
+    ~kernel() = default;
 
-#pragma mark - tap_node
+    audio_tap_node::render_f render_function;
+};
+
+#pragma mark - impl
+
+class audio_tap_node::impl : public audio_node::impl
+{
+   public:
+    impl() : audio_node::impl(), _core(std::make_unique<core>())
+    {
+    }
+
+    ~impl() = default;
+
+    class core;
+    std::unique_ptr<core> _core;
+};
 
 class audio_tap_node::impl::core
 {
    public:
     render_f render_function;
-    audio_node_core_sptr node_core_on_render;
+    kernel_sptr kernel_on_render;
 };
 
-audio_tap_node::impl::impl() : audio_node::impl(), _core(std::make_unique<core>())
-{
-}
-
-audio_tap_node::impl::~impl() = default;
-
-audio_tap_node::impl *audio_tap_node::_impl_ptr() const
-{
-    return dynamic_cast<audio_tap_node::impl *>(_impl.get());
-}
+#pragma mark - main
 
 audio_tap_node_sptr audio_tap_node::create()
 {
@@ -53,7 +56,7 @@ void audio_tap_node::set_render_function(const render_f &render_function)
 {
     _impl_ptr()->_core->render_function = render_function;
 
-    update_node_core();
+    update_kernel();
 }
 
 UInt32 audio_tap_node::input_bus_count() const
@@ -70,11 +73,10 @@ void audio_tap_node::render(audio_pcm_buffer &buffer, const UInt32 bus_idx, cons
 {
     super_class::render(buffer, bus_idx, when);
 
-    if (auto core = node_core()) {
-        _impl_ptr()->_core->node_core_on_render = core;
+    if (auto kernel = _kernel()) {
+        _impl_ptr()->_core->kernel_on_render = kernel;
 
-        audio_tap_node_core *tap_node_core = dynamic_cast<audio_tap_node_core *>(core.get());
-        auto &render_function = tap_node_core->render_function;
+        auto &render_function = kernel->render_function;
 
         if (render_function) {
             render_function(buffer, bus_idx, when);
@@ -82,28 +84,28 @@ void audio_tap_node::render(audio_pcm_buffer &buffer, const UInt32 bus_idx, cons
             render_source(buffer, bus_idx, when);
         }
 
-        _impl_ptr()->_core->node_core_on_render = nullptr;
+        _impl_ptr()->_core->kernel_on_render = nullptr;
     }
 }
 
 audio_connection audio_tap_node::input_connection_on_render(const UInt32 bus_idx) const
 {
-    return _impl_ptr()->_core->node_core_on_render->input_connection(bus_idx);
+    return _impl_ptr()->_core->kernel_on_render->input_connection(bus_idx);
 }
 
 audio_connection audio_tap_node::output_connection_on_render(const UInt32 bus_idx) const
 {
-    return _impl_ptr()->_core->node_core_on_render->output_connection(bus_idx);
+    return _impl_ptr()->_core->kernel_on_render->output_connection(bus_idx);
 }
 
 audio_connection_smap audio_tap_node::input_connections_on_render() const
 {
-    return _impl_ptr()->_core->node_core_on_render->input_connections();
+    return _impl_ptr()->_core->kernel_on_render->input_connections();
 }
 
 audio_connection_smap audio_tap_node::output_connections_on_render() const
 {
-    return _impl_ptr()->_core->node_core_on_render->output_connections();
+    return _impl_ptr()->_core->kernel_on_render->output_connections();
 }
 
 void audio_tap_node::render_source(audio_pcm_buffer &buffer, const UInt32 bus_idx, const audio_time &when)
@@ -115,20 +117,33 @@ void audio_tap_node::render_source(audio_pcm_buffer &buffer, const UInt32 bus_id
     }
 }
 
-audio_node_core_sptr audio_tap_node::make_node_core()
+audio_node::kernel_sptr audio_tap_node::make_kernel()
 {
-    return audio_node_core_sptr(new audio_tap_node_core());
+    return audio_node::kernel_sptr(new audio_tap_node::kernel());
 }
 
-void audio_tap_node::prepare_node_core(const audio_node_core_sptr &node_core)
+void audio_tap_node::prepare_kernel(const audio_node::kernel_sptr &kernel)
 {
-    super_class::prepare_node_core(node_core);
+    super_class::prepare_kernel(kernel);
 
-    if (audio_tap_node_core *tap_node_core = dynamic_cast<audio_tap_node_core *>(node_core.get())) {
-        tap_node_core->render_function = _impl_ptr()->_core->render_function;
+    if (auto tap_kernel = std::dynamic_pointer_cast<audio_tap_node::kernel>(kernel)) {
+        tap_kernel->render_function = _impl_ptr()->_core->render_function;
     } else {
-        throw std::runtime_error(std::string(__PRETTY_FUNCTION__) + " : failed dynamic cast to audio_tap_node_core.");
+        throw std::runtime_error(std::string(__PRETTY_FUNCTION__) +
+                                 " : failed dynamic cast to audio_tap_node::kernel.");
     }
+}
+
+#pragma mark - private
+
+std::shared_ptr<audio_tap_node::kernel> audio_tap_node::_kernel() const
+{
+    return std::static_pointer_cast<audio_tap_node::kernel>(super_class::_kernel());
+}
+
+audio_tap_node::impl *audio_tap_node::_impl_ptr() const
+{
+    return dynamic_cast<audio_tap_node::impl *>(_impl.get());
 }
 
 #pragma mark - input_tap_node

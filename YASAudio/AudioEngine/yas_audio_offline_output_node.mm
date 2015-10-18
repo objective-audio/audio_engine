@@ -134,13 +134,13 @@ audio_offline_output_node::start_result_t audio_offline_output_node::_start(cons
                     break;
                 }
 
-                auto node_core = offline_node->node_core();
-                if (!node_core) {
+                auto kernel = offline_node->_kernel();
+                if (!kernel) {
                     cancelled = true;
                     break;
                 }
 
-                auto connection_on_block = node_core->input_connection(0);
+                auto connection_on_block = kernel->input_connection(0);
                 if (!connection_on_block) {
                     cancelled = true;
                     break;

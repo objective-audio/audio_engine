@@ -18,36 +18,6 @@ namespace yas
 {
     class audio_engine;
 
-    class audio_node_core
-    {
-       public:
-        audio_node_core();
-        virtual ~audio_node_core();
-
-        audio_connection_smap input_connections() const;
-        audio_connection_smap output_connections() const;
-        audio_connection input_connection(const UInt32 bus_idx);
-        audio_connection output_connection(const UInt32 bus_idx);
-
-       private:
-        class impl;
-        std::unique_ptr<impl> _impl;
-
-        audio_node_core(const audio_node_core &) = delete;
-        audio_node_core(audio_node_core &&) = delete;
-        audio_node_core &operator=(const audio_node_core &) = delete;
-        audio_node_core &operator=(audio_node_core &&) = delete;
-
-        void _set_input_connections(const audio_connection_wmap &);
-        void _set_output_connections(const audio_connection_wmap &);
-
-       public:
-        class private_access;
-        friend private_access;
-    };
-
-    using audio_node_core_sptr = std::shared_ptr<audio_node_core>;
-
     class audio_node
     {
        public:
@@ -72,6 +42,36 @@ namespace yas
         virtual void render(audio_pcm_buffer &buffer, const UInt32 bus_idx, const audio_time &when);
 
        protected:
+        class kernel
+        {
+           public:
+            kernel();
+            virtual ~kernel();
+
+            audio_connection_smap input_connections() const;
+            audio_connection_smap output_connections() const;
+            audio_connection input_connection(const UInt32 bus_idx);
+            audio_connection output_connection(const UInt32 bus_idx);
+
+           private:
+            class impl;
+            std::unique_ptr<impl> _impl;
+
+            kernel(const kernel &) = delete;
+            kernel(kernel &&) = delete;
+            kernel &operator=(const kernel &) = delete;
+            kernel &operator=(kernel &&) = delete;
+
+            void _set_input_connections(const audio_connection_wmap &);
+            void _set_output_connections(const audio_connection_wmap &);
+
+           public:
+            class private_access;
+            friend private_access;
+        };
+
+        using kernel_sptr = std::shared_ptr<kernel>;
+
         class impl
         {
            public:
@@ -91,13 +91,13 @@ namespace yas
         const audio_connection_wmap &input_connections() const;
         const audio_connection_wmap &output_connections() const;
 
-        audio_node_core_sptr node_core() const;
-
         virtual void update_connections();
-        virtual audio_node_core_sptr make_node_core();
-        virtual void prepare_node_core(const audio_node_core_sptr &node_core);  // NS_REQUIRES_SUPER
-        void update_node_core();
+        virtual kernel_sptr make_kernel();
+        virtual void prepare_kernel(const kernel_sptr &kernel);  // NS_REQUIRES_SUPER
+        void update_kernel();
 
+        // render thread
+        kernel_sptr _kernel() const;
         void set_render_time_on_render(const audio_time &time);
 
        private:

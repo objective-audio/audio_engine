@@ -52,9 +52,9 @@ namespace yas
             std::unique_ptr<core> _core;
         };
 
-        impl *_impl_ptr() const;
-
         audio_unit_io_node(std::unique_ptr<impl> &&);
+
+        impl *_impl_ptr() const;
 
         virtual void prepare_audio_unit() override;
     };

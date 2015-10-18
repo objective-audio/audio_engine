@@ -242,8 +242,8 @@ void audio_unit_node::update_connections()
             auto weak_node = _impl_ptr()->_core->weak_node;
             audio_unit.set_render_callback([weak_node](yas::render_parameters &render_parameters) {
                 if (auto node = weak_node.lock()) {
-                    if (auto core = node->node_core()) {
-                        if (auto connection = core->input_connection(render_parameters.in_bus_number)) {
+                    if (auto kernel = node->_kernel()) {
+                        if (auto connection = kernel->input_connection(render_parameters.in_bus_number)) {
                             if (auto source_node = connection.source_node()) {
                                 auto buffer = yas::audio_pcm_buffer(connection.format(), render_parameters.io_data);
                                 audio_time when(*render_parameters.io_time_stamp, connection.format().sample_rate());

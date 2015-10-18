@@ -9,17 +9,17 @@
 
 namespace yas
 {
-    class audio_node_core::private_access
+    class audio_node::kernel::private_access
     {
        public:
-        static void set_input_connections(const audio_node_core_sptr &node, const audio_connection_wmap &connections)
+        static void set_input_connections(const kernel_sptr &kernel, const audio_connection_wmap &connections)
         {
-            node->_set_input_connections(connections);
+            kernel->_set_input_connections(connections);
         }
 
-        static void set_output_connections(const audio_node_core_sptr &node, const audio_connection_wmap &connections)
+        static void set_output_connections(const kernel_sptr &kernel, const audio_connection_wmap &connections)
         {
-            node->_set_output_connections(connections);
+            kernel->_set_output_connections(connections);
         }
     };
 
@@ -71,14 +71,14 @@ namespace yas
             return node->engine();
         }
 
-        static void update_node_core(const audio_node_sptr &node)
+        static void update_kernel(const audio_node_sptr &node)
         {
-            node->update_node_core();
+            node->update_kernel();
         }
 
-        static audio_node_core_sptr node_core(const audio_node_sptr &node)
+        static kernel_sptr kernel(const audio_node_sptr &node)
         {
-            return node->node_core();
+            return node->_kernel();
         }
 
         static void update_connections(const audio_node_sptr &node)

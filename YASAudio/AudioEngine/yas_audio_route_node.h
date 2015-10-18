@@ -31,25 +31,18 @@ namespace yas
         virtual void render(audio_pcm_buffer &buffer, const UInt32 bus_idx, const audio_time &when) override;
 
        protected:
-        virtual audio_node_core_sptr make_node_core() override;
-        virtual void prepare_node_core(const audio_node_core_sptr &node_core) override;
+        virtual kernel_sptr make_kernel() override;
+        virtual void prepare_kernel(const kernel_sptr &) override;
 
        private:
         using super_class = audio_node;
-
-        class impl : public super_class::impl
-        {
-           public:
-            impl();
-            ~impl();
-
-            class core;
-            std::unique_ptr<core> _core;
-        };
-
-        impl *_impl_ptr() const;
+        class kernel;
+        class impl;
 
         audio_route_node();
+
+        impl *_impl_ptr() const;
+        std::shared_ptr<kernel> _kernel() const;
 
         void render_source(const audio_pcm_buffer &buffer, const UInt32 bus_idx, const audio_time &when);
     };

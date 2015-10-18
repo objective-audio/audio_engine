@@ -117,9 +117,9 @@
     auto connection = yas::audio_connection::private_access::create(tap_node, 0, output_node, 0, format);
 
     yas::audio_node::private_access::add_connection(output_node, connection);
-    yas::audio_node::private_access::update_node_core(output_node);
+    yas::audio_node::private_access::update_kernel(output_node);
     yas::audio_node::private_access::add_connection(tap_node, connection);
-    yas::audio_node::private_access::update_node_core(tap_node);
+    yas::audio_node::private_access::update_kernel(tap_node);
 
     XCTestExpectation *tapNodeExpectation = [self expectationWithDescription:@"tap node render"];
 
