@@ -97,6 +97,9 @@ namespace yas
             const audio_connection_wmap &output_connections() const;
 
             virtual void update_connections();
+            virtual std::shared_ptr<kernel> make_kernel();
+            virtual void prepare_kernel(const std::shared_ptr<kernel> &kernel);  // NS_REQUIRES_SUPER
+            void update_kernel();
 
             class core;
             std::unique_ptr<core> _core;
@@ -112,8 +115,8 @@ namespace yas
         const audio_connection_wmap &output_connections() const;
 
         void update_connections();
-        virtual std::shared_ptr<kernel> make_kernel();
-        virtual void prepare_kernel(const std::shared_ptr<kernel> &kernel);  // NS_REQUIRES_SUPER
+        std::shared_ptr<kernel> make_kernel();
+        void prepare_kernel(const std::shared_ptr<kernel> &kernel);
         void update_kernel();
 
         std::shared_ptr<kernel> _kernel() const;

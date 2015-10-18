@@ -22,6 +22,13 @@ class audio_tap_node::kernel : public audio_node::kernel
 class audio_tap_node::impl : public super_class::impl
 {
    public:
+    class core
+    {
+       public:
+        render_f render_function;
+        std::shared_ptr<kernel> kernel_on_render;
+    };
+
     impl() : audio_node::impl(), _core(std::make_unique<core>())
     {
     }
@@ -38,15 +45,27 @@ class audio_tap_node::impl : public super_class::impl
         return 1;
     }
 
-    class core;
-    std::unique_ptr<core> _core;
-};
+    virtual std::shared_ptr<audio_node::kernel> make_kernel() override
+    {
+        return std::shared_ptr<kernel>(new audio_tap_node::kernel());
+    }
 
-class audio_tap_node::impl::core
-{
-   public:
-    render_f render_function;
-    std::shared_ptr<kernel> kernel_on_render;
+    virtual void prepare_kernel(const std::shared_ptr<audio_node::kernel> &kernel) override
+    {
+        super_class::prepare_kernel(kernel);
+
+        if (auto tap_kernel = std::dynamic_pointer_cast<audio_tap_node::kernel>(kernel)) {
+            tap_kernel->render_function = _core->render_function;
+        } else {
+            throw std::runtime_error(std::string(__PRETTY_FUNCTION__) +
+                                     " : failed dynamic cast to audio_tap_node::kernel.");
+        }
+    }
+
+    std::unique_ptr<core> _core;
+
+   private:
+    using super_class = super_class::impl;
 };
 
 #pragma mark - main
@@ -118,23 +137,6 @@ void audio_tap_node::render_source(audio_pcm_buffer &buffer, const UInt32 bus_id
         if (auto node = connection.source_node()) {
             node->render(buffer, connection.source_bus(), when);
         }
-    }
-}
-
-std::shared_ptr<audio_node::kernel> audio_tap_node::make_kernel()
-{
-    return std::shared_ptr<kernel>(new audio_tap_node::kernel());
-}
-
-void audio_tap_node::prepare_kernel(const std::shared_ptr<audio_node::kernel> &kernel)
-{
-    super_class::prepare_kernel(kernel);
-
-    if (auto tap_kernel = std::dynamic_pointer_cast<audio_tap_node::kernel>(kernel)) {
-        tap_kernel->render_function = _impl_ptr()->_core->render_function;
-    } else {
-        throw std::runtime_error(std::string(__PRETTY_FUNCTION__) +
-                                 " : failed dynamic cast to audio_tap_node::kernel.");
     }
 }
 

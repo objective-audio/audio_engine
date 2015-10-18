@@ -35,9 +35,6 @@ namespace yas
         audio_tap_node();
         audio_tap_node(std::unique_ptr<impl> &&impl);
 
-        virtual std::shared_ptr<kernel> make_kernel() override;
-        virtual void prepare_kernel(const std::shared_ptr<kernel> &) override;
-
        private:
         using super_class = audio_node;
         class kernel;

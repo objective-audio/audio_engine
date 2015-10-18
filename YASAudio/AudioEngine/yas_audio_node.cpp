@@ -210,6 +210,28 @@ void audio_node::impl::update_connections()
 {
 }
 
+std::shared_ptr<audio_node::kernel> audio_node::impl::make_kernel()
+{
+    return std::shared_ptr<kernel>(new kernel());
+}
+
+void audio_node::impl::prepare_kernel(const std::shared_ptr<kernel> &kernel)
+{
+    if (!kernel) {
+        throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
+    }
+
+    kernel::private_access::set_input_connections(kernel, _core->input_connections());
+    kernel::private_access::set_output_connections(kernel, _core->output_connections());
+}
+
+void audio_node::impl::update_kernel()
+{
+    auto kernel = make_kernel();
+    prepare_kernel(kernel);
+    _core->set_kernel(kernel);
+}
+
 #pragma mark - main
 
 audio_node::audio_node(std::unique_ptr<impl> &&impl) : _impl(std::move(impl))
@@ -297,24 +319,17 @@ void audio_node::update_connections()
 
 std::shared_ptr<audio_node::kernel> audio_node::make_kernel()
 {
-    return std::shared_ptr<kernel>(new kernel());
+    return _impl->make_kernel();
 }
 
 void audio_node::prepare_kernel(const std::shared_ptr<kernel> &kernel)
 {
-    if (!kernel) {
-        throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
-    }
-
-    kernel::private_access::set_input_connections(kernel, _impl->_core->input_connections());
-    kernel::private_access::set_output_connections(kernel, _impl->_core->output_connections());
+    _impl->prepare_kernel(kernel);
 }
 
 void audio_node::update_kernel()
 {
-    auto kernel = make_kernel();
-    prepare_kernel(kernel);
-    _impl->_core->set_kernel(kernel);
+    _impl->update_kernel();
 }
 
 #pragma mark - private

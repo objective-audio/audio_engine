@@ -23,6 +23,24 @@ class audio_route_node::kernel : public audio_node::kernel
 class audio_route_node::impl : public audio_node::impl
 {
    public:
+    class core
+    {
+       public:
+        audio_route_set routes;
+
+        void erase_route_if_either_matched(const audio_route &route)
+        {
+            erase_route_if([&route](const audio_route &route_of_set) {
+                return route_of_set.source == route.source || route_of_set.destination == route.destination;
+            });
+        }
+
+        void erase_route_if(std::function<bool(const audio_route &)> pred)
+        {
+            erase_if(routes, pred);
+        }
+    };
+
     impl() : audio_node::impl(), _core(std::make_unique<core>())
     {
     }
@@ -39,26 +57,27 @@ class audio_route_node::impl : public audio_node::impl
         return std::numeric_limits<UInt32>::max();
     }
 
-    class core;
+    virtual std::shared_ptr<audio_node::kernel> make_kernel() override
+    {
+        return std::shared_ptr<audio_node::kernel>(new audio_route_node::kernel());
+    }
+
+    virtual void prepare_kernel(const std::shared_ptr<audio_node::kernel> &kernel) override
+    {
+        super_class::prepare_kernel(kernel);
+
+        if (audio_route_node::kernel *route_kernel = dynamic_cast<audio_route_node::kernel *>(kernel.get())) {
+            route_kernel->routes = _core->routes;
+        } else {
+            throw std::runtime_error(std::string(__PRETTY_FUNCTION__) +
+                                     " : failed dynamic cast to audio_route_node::kernel.");
+        }
+    }
+
     std::unique_ptr<core> _core;
-};
 
-class audio_route_node::impl::core
-{
-   public:
-    audio_route_set routes;
-
-    void erase_route_if_either_matched(const audio_route &route)
-    {
-        erase_route_if([&route](const audio_route &route_of_set) {
-            return route_of_set.source == route.source || route_of_set.destination == route.destination;
-        });
-    }
-
-    void erase_route_if(std::function<bool(const audio_route &)> pred)
-    {
-        erase_if(routes, pred);
-    }
+   private:
+    using super_class = super_class::impl;
 };
 
 #pragma mark - main
@@ -129,25 +148,6 @@ void audio_route_node::clear_routes()
 {
     _impl_ptr()->_core->routes.clear();
     update_kernel();
-}
-
-#pragma mark - protected
-
-std::shared_ptr<audio_node::kernel> audio_route_node::make_kernel()
-{
-    return std::shared_ptr<audio_node::kernel>(new audio_route_node::kernel());
-}
-
-void audio_route_node::prepare_kernel(const std::shared_ptr<audio_node::kernel> &kernel)
-{
-    super_class::prepare_kernel(kernel);
-
-    if (audio_route_node::kernel *route_kernel = dynamic_cast<audio_route_node::kernel *>(kernel.get())) {
-        route_kernel->routes = _impl_ptr()->_core->routes;
-    } else {
-        throw std::runtime_error(std::string(__PRETTY_FUNCTION__) +
-                                 " : failed dynamic cast to audio_route_node::kernel.");
-    }
 }
 
 #pragma mark - private

@@ -25,11 +25,8 @@ namespace yas
         void set_routes(std::set<audio_route> &&routes);
         void clear_routes();
 
+        // render thread
         virtual void render(audio_pcm_buffer &buffer, const UInt32 bus_idx, const audio_time &when) override;
-
-       protected:
-        virtual std::shared_ptr<kernel> make_kernel() override;
-        virtual void prepare_kernel(const std::shared_ptr<kernel> &) override;
 
        private:
         using super_class = audio_node;
