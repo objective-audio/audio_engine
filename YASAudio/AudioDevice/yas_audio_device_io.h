@@ -62,7 +62,7 @@ namespace yas
         void _uninitialize();
 
        public:
-        using weak = weak<audio_device_io, audio_device_io::impl>;
+        using weak = weak<audio_device_io>;
         friend weak;
     };
 }

@@ -83,7 +83,7 @@ namespace yas
         class private_access;
         friend private_access;
 
-        using weak = weak<audio_engine, audio_engine::impl>;
+        using weak = weak<audio_engine>;
         friend weak;
     };
 

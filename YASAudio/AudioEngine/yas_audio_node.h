@@ -144,7 +144,7 @@ namespace yas
         class private_access;
         friend private_access;
 
-        using weak = weak<audio_node, audio_node::impl>;
+        using weak = weak<audio_node>;
         friend weak;
     };
 }

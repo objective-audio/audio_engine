@@ -10,7 +10,7 @@
 
 namespace yas
 {
-    template <typename T, typename I>
+    template <typename T>
     class weak
     {
        public:
@@ -18,11 +18,11 @@ namespace yas
         {
         }
 
-        weak(const T &obj) : _impl(std::static_pointer_cast<I>(obj._impl))
+        weak(const T &obj) : _impl(std::static_pointer_cast<typename T::impl>(obj._impl))
         {
         }
 
-        weak<T, I> &operator=(const T &obj)
+        weak<T> &operator=(const T &obj)
         {
             _impl = obj._impl;
 
@@ -40,11 +40,11 @@ namespace yas
         }
 
        private:
-        std::weak_ptr<I> _impl;
+        std::weak_ptr<typename T::impl> _impl;
     };
 
-    template <typename K, typename T, typename I>
-    std::map<K, T> lock_values(const std::map<K, weak<T, I>> &map)
+    template <typename K, typename T>
+    std::map<K, T> lock_values(const std::map<K, weak<T>> &map)
     {
         std::map<K, T> unwrapped_map;
 

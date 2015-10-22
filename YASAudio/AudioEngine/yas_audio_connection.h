@@ -55,7 +55,7 @@ namespace yas
         class private_access;
         friend private_access;
 
-        using weak = weak<audio_connection, audio_connection::impl>;
+        using weak = weak<audio_connection>;
         friend weak;
     };
 

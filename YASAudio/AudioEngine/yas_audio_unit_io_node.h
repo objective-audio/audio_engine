@@ -110,7 +110,7 @@ namespace yas
         impl *_impl_ptr() const;
 
        public:
-        using weak = yas::weak<audio_unit_input_node, audio_unit_input_node::impl>;
+        using weak = yas::weak<audio_unit_input_node>;
         friend weak;
     };
 }
