@@ -12,7 +12,7 @@
 @end
 
 @implementation YASAudioEngineEffectsSampleEditViewController {
-    yas::audio_unit_node_sptr _node;
+    std::experimental::optional<yas::audio_unit_node> _node_opt;
 }
 
 - (void)viewDidLoad
@@ -20,9 +20,9 @@
     [super viewDidLoad];
 }
 
-- (void)set_audio_unit_node:(const std::shared_ptr<yas::audio_unit_node> &)node
+- (void)set_audio_unit_node:(const yas::audio_unit_node &)node
 {
-    _node = node;
+    _node_opt = node;
 
     [self.tableView reloadData];
 }
@@ -36,7 +36,11 @@
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    return _node->global_parameters().size();
+    if (_node_opt) {
+        return _node_opt->global_parameters().size();
+    } else {
+        return 0;
+    }
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -44,7 +48,7 @@
     YASAudioEngineSampleParameterCell *cell =
         [tableView dequeueReusableCellWithIdentifier:@"ParameterCell" forIndexPath:indexPath];
 
-    [cell set_node:_node index:static_cast<UInt32>(indexPath.row)];
+    [cell set_node:*_node_opt index:static_cast<UInt32>(indexPath.row)];
 
     return cell;
 }

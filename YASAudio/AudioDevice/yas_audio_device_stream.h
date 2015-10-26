@@ -84,8 +84,7 @@ namespace yas
         std::unique_ptr<std::vector<T>> _property_data(const AudioStreamID stream_id,
                                                        const AudioObjectPropertySelector selector) const;
 
-        using weak = weak<audio_device_stream>;
-        friend weak;
+        friend weak<audio_device_stream>;
     };
 }
 

@@ -22,16 +22,30 @@ namespace yas
         {
         }
 
+        weak<T>(const weak<T> &) = default;
+        weak<T>(weak<T> &&) = default;
+        weak<T> &operator=(const weak<T> &) = default;
+        weak<T> &operator=(weak<T> &&) = default;
+
         weak<T> &operator=(const T &obj)
         {
-            _impl = obj._impl;
+            _impl = std::static_pointer_cast<typename T::impl>(obj._impl);
 
             return *this;
         }
 
+        explicit operator bool() const
+        {
+            return !_impl.expired();
+        }
+
         T lock() const
         {
-            return T(_impl.lock());
+            if (_impl.expired()) {
+                return T(nullptr);
+            } else {
+                return T(_impl.lock());
+            }
         }
 
         void reset()
@@ -55,5 +69,11 @@ namespace yas
         }
 
         return unwrapped_map;
+    }
+
+    template <typename T>
+    weak<T> to_weak(const T &obj)
+    {
+        return weak<T>(obj);
     }
 }

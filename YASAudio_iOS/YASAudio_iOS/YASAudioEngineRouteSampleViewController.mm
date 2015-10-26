@@ -30,10 +30,10 @@ typedef NS_ENUM(NSUInteger, YASAudioEngineRouteSampleSourceIndex) {
 
 @implementation YASAudioEngineRouteSampleViewController {
     yas::audio_engine _engine;
-    yas::audio_unit_io_node_sptr _io_node;
-    yas::audio_unit_mixer_node_sptr _mixer_node;
-    yas::audio_route_node_sptr _route_node;
-    yas::audio_tap_node_sptr _sine_node;
+    yas::audio_unit_io_node _io_node;
+    yas::audio_unit_mixer_node _mixer_node;
+    yas::audio_route_node _route_node;
+    yas::audio_tap_node _sine_node;
 
     yas::observer _engine_observer;
 
@@ -130,9 +130,9 @@ typedef NS_ENUM(NSUInteger, YASAudioEngineRouteSampleSourceIndex) {
             }
 
             if (src_bus_idx == -1 || src_ch_idx == -1) {
-                _route_node->remove_route_for_destination({dst_bus_idx, dst_ch_idx});
+                _route_node.remove_route_for_destination({dst_bus_idx, dst_ch_idx});
             } else {
-                _route_node->add_route({src_bus_idx, src_ch_idx, dst_bus_idx, dst_ch_idx});
+                _route_node.add_route({src_bus_idx, src_ch_idx, dst_bus_idx, dst_ch_idx});
             }
 
             [self.tableView reloadSections:[NSIndexSet indexSetWithIndex:fromIndexPath.section]
@@ -180,7 +180,7 @@ typedef NS_ENUM(NSUInteger, YASAudioEngineRouteSampleSourceIndex) {
 
         case YASAudioEngineRouteSampleSectionDestinations: {
             UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"Cell" forIndexPath:indexPath];
-            const auto &routes = _route_node->routes();
+            const auto &routes = _route_node.routes();
             yas::audio_route::point dst_point{0, static_cast<UInt32>(indexPath.row)};
             auto it = std::find_if(routes.begin(), routes.end(),
                                    [dst_point = std::move(dst_point)](const yas::audio_route &route) {
@@ -209,7 +209,7 @@ typedef NS_ENUM(NSUInteger, YASAudioEngineRouteSampleSourceIndex) {
 {
     const Float32 value = sender.value;
     if (_mixer_node) {
-        _mixer_node->set_input_volume(value, 0);
+        _mixer_node.set_input_volume(value, 0);
     }
 }
 
@@ -218,13 +218,9 @@ typedef NS_ENUM(NSUInteger, YASAudioEngineRouteSampleSourceIndex) {
 - (void)setupEngine
 {
     _engine.prepare();
-    _io_node = yas::audio_unit_io_node::create();
-    _mixer_node = yas::audio_unit_mixer_node::create();
-    _route_node = yas::audio_route_node::create();
-    _sine_node = yas::audio_tap_node::create();
 
-    _mixer_node->set_input_volume(1.0, 0);
-    _route_node->set_routes({{0, 0, 0, 0}, {0, 1, 0, 1}});
+    _mixer_node.set_input_volume(1.0, 0);
+    _route_node.set_routes({{0, 0, 0, 0}, {0, 1, 0, 1}});
 
     Float64 phase = 0;
 
@@ -244,7 +240,7 @@ typedef NS_ENUM(NSUInteger, YASAudioEngineRouteSampleSourceIndex) {
             }
         };
 
-    _sine_node->set_render_function(tap_render_function);
+    _sine_node.set_render_function(tap_render_function);
 
     if (!_self_container) {
         _self_container.set_object(self);
@@ -284,7 +280,7 @@ typedef NS_ENUM(NSUInteger, YASAudioEngineRouteSampleSourceIndex) {
 
 - (void)_connectNodes
 {
-    const Float64 sample_rate = _io_node->device_sample_rate();
+    const Float64 sample_rate = _io_node.device_sample_rate();
 
     const auto format = yas::audio_format(sample_rate, 2);
 
@@ -318,7 +314,7 @@ typedef NS_ENUM(NSUInteger, YASAudioEngineRouteSampleSourceIndex) {
             for (UIView *view in cell.contentView.subviews) {
                 if ([view isKindOfClass:[UISlider class]]) {
                     UISlider *slider = (UISlider *)view;
-                    slider.value = _mixer_node->input_volume(0);
+                    slider.value = _mixer_node.input_volume(0);
                 }
             }
         }

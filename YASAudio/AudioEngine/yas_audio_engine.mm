@@ -12,7 +12,6 @@
 #include "yas_stl_utils.h"
 #include "yas_objc_container.h"
 #include "yas_any.h"
-#include <set>
 #include <CoreFoundation/CoreFoundation.h>
 #include <AVFoundation/AVFoundation.h>
 
@@ -25,7 +24,7 @@ using namespace yas;
 class audio_engine::impl
 {
    public:
-    audio_engine::weak weak_engine;
+    weak<audio_engine> weak_engine;
     objc::container<> reset_observer;
     objc::container<> route_change_observer;
     yas::subject subject;
@@ -49,34 +48,34 @@ class audio_engine::impl
 #endif
     }
 
-    bool node_exists(const audio_node_sptr &node)
+    bool node_exists(const audio_node &node)
     {
-        return _nodes.count(node) > 0;
+        return _nodes.count(node.key()) > 0;
     }
 
-    void attach_node(const audio_node_sptr &node)
+    void attach_node(audio_node &node)
     {
         if (!node) {
             throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
         }
 
-        if (_nodes.count(node) > 0) {
+        if (_nodes.count(node.key()) > 0) {
             throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : node is already attached.");
         }
 
-        _nodes.insert(node);
+        _nodes.insert(std::make_pair(node.key(), node));
         audio_node::private_access::set_engine(node, weak_engine.lock());
 
         add_node_to_graph(node);
     }
 
-    void detach_node(const audio_node_sptr &node)
+    void detach_node(audio_node &node)
     {
         if (!node) {
             throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
         }
 
-        if (_nodes.count(node) == 0) {
+        if (_nodes.count(node.key()) == 0) {
             throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : node is not attached.");
         }
 
@@ -86,10 +85,10 @@ class audio_engine::impl
 
         remove_node_from_graph(node);
         audio_node::private_access::set_engine(node, nullptr);
-        _nodes.erase(node);
+        _nodes.erase(node.key());
     }
 
-    void detach_node_if_unused(const audio_node_sptr &node)
+    void detach_node_if_unused(audio_node &node)
     {
         auto filtered_connection = filter(_connections, [node](const auto &pair) {
             const auto &connection = pair.second;
@@ -109,8 +108,8 @@ class audio_engine::impl
 
         _graph.prepare();
 
-        for (auto &node : _nodes) {
-            add_node_to_graph(node);
+        for (auto &pair : _nodes) {
+            add_node_to_graph(pair.second);
         }
 
         for (auto &pair : _connections) {
@@ -129,17 +128,18 @@ class audio_engine::impl
     {
         auto remove_connections =
             filter(_connections, [&predicate](const auto &pair) { return predicate(pair.second); });
-        std::set<audio_node_sptr> update_nodes;
+        std::map<uintptr_t, audio_node> update_nodes;
 
         for (auto &pair : remove_connections) {
             auto &connection = pair.second;
-            update_nodes.insert(connection.source_node());
-            update_nodes.insert(connection.destination_node());
+            update_nodes.insert(std::make_pair(connection.source_node().key(), connection.source_node()));
+            update_nodes.insert(std::make_pair(connection.destination_node().key(), connection.destination_node()));
             remove_connection_from_nodes(connection);
             audio_connection::private_access::remove_nodes(connection);
         }
 
-        for (auto &node : update_nodes) {
+        for (auto &pair : update_nodes) {
+            auto &node = pair.second;
             audio_node::private_access::update_connections(node);
             detach_node_if_unused(node);
         }
@@ -150,50 +150,50 @@ class audio_engine::impl
         }
     }
 
-    void add_node_to_graph(const audio_node_sptr &node)
+    void add_node_to_graph(audio_node &node)
     {
         if (!_graph) {
             return;
         }
 
-        if (auto unit_node = dynamic_cast<audio_unit_node *>(node.get())) {
+        if (auto unit_node = node.cast<audio_unit_node>()) {
             yas::audio_unit_node::private_access::add_audio_unit_to_graph(unit_node, _graph);
         }
 
 #if (!TARGET_OS_IPHONE & TARGET_OS_MAC)
-        if (auto device_io_node = dynamic_cast<audio_device_io_node *>(node.get())) {
+        if (auto device_io_node = node.cast<audio_device_io_node>()) {
             audio_device_io_node::private_access::add_audio_device_io_to_graph(device_io_node, _graph);
         }
 #endif
 
-        if (dynamic_cast<class audio_offline_output_node *>(node.get())) {
+        if (auto offline_output_node = node.cast<audio_offline_output_node>()) {
             if (_offline_output_node) {
                 throw std::runtime_error(std::string(__PRETTY_FUNCTION__) +
                                          " : offline_output_node is already attached.");
             } else {
-                _offline_output_node = node;
+                _offline_output_node = offline_output_node;
             }
         }
     }
 
-    void remove_node_from_graph(const audio_node_sptr &node)
+    void remove_node_from_graph(const audio_node &node)
     {
         if (!_graph) {
             return;
         }
 
-        if (audio_unit_node *unit_node = dynamic_cast<class audio_unit_node *>(node.get())) {
+        if (auto unit_node = node.cast<audio_unit_node>()) {
             yas::audio_unit_node::private_access::remove_audio_unit_from_graph(unit_node);
         }
 
 #if (!TARGET_OS_IPHONE & TARGET_OS_MAC)
-        if (auto device_io_node = dynamic_cast<audio_device_io_node *>(node.get())) {
+        if (auto device_io_node = node.cast<audio_device_io_node>()) {
             audio_device_io_node::private_access::remove_audio_device_io_from_graph(device_io_node);
         }
 #endif
 
-        if (auto *offline_output_node = dynamic_cast<class audio_offline_output_node *>(node.get())) {
-            if (offline_output_node == _offline_output_node.get()) {
+        if (auto offline_output_node = node.cast<audio_offline_output_node>()) {
+            if (offline_output_node == _offline_output_node) {
                 _offline_output_node = nullptr;
             }
         }
@@ -209,7 +209,7 @@ class audio_engine::impl
         auto destination_node = connection.destination_node();
         auto source_node = connection.source_node();
 
-        if (_nodes.count(destination_node) == 0 || _nodes.count(source_node) == 0) {
+        if (_nodes.count(destination_node.key()) == 0 || _nodes.count(source_node.key()) == 0) {
             throw std::runtime_error(std::string(__PRETTY_FUNCTION__) + " : node is not attached.");
             return false;
         }
@@ -236,7 +236,7 @@ class audio_engine::impl
         }
     }
 
-    void update_node_connections(const audio_node_sptr &node)
+    void update_node_connections(audio_node &node)
     {
         if (!_graph) {
             return;
@@ -251,17 +251,17 @@ class audio_engine::impl
             return;
         }
 
-        for (auto &node : _nodes) {
-            audio_node::private_access::update_connections(node);
+        for (auto &pair : _nodes) {
+            audio_node::private_access::update_connections(pair.second);
         }
     }
 
-    audio_connection_map input_connections_for_destination_node(const audio_node_sptr &node)
+    audio_connection_map input_connections_for_destination_node(const audio_node &node)
     {
         return filter(_connections, [node](const auto &pair) { return pair.second.destination_node() == node; });
     }
 
-    audio_connection_map output_connections_for_source_node(const audio_node_sptr &node)
+    audio_connection_map output_connections_for_source_node(const audio_node &node)
     {
         return filter(_connections, [node](const auto &pair) { return pair.second.source_node() == node; });
     }
@@ -276,7 +276,7 @@ class audio_engine::impl
         return _graph;
     }
 
-    std::set<audio_node_sptr> &nodes()
+    std::unordered_map<uintptr_t, audio_node> &nodes()
     {
         return _nodes;
     }
@@ -286,16 +286,16 @@ class audio_engine::impl
         return _connections;
     }
 
-    audio_offline_output_node *offline_output_node()
+    audio_offline_output_node &offline_output_node()
     {
-        return dynamic_cast<audio_offline_output_node *>(_offline_output_node.get());
+        return _offline_output_node;
     }
 
    private:
     audio_graph _graph;
-    std::set<audio_node_sptr> _nodes;
+    std::unordered_map<uintptr_t, audio_node> _nodes;
     audio_connection_map _connections;
-    audio_node_sptr _offline_output_node;
+    audio_offline_output_node _offline_output_node = nullptr;
 };
 
 audio_engine::audio_engine(std::nullptr_t) : _impl(nullptr)
@@ -365,15 +365,15 @@ void audio_engine::prepare()
 #endif
 }
 
-audio_connection audio_engine::connect(const audio_node_sptr &source_node, const audio_node_sptr &destination_node,
+audio_connection audio_engine::connect(audio_node &source_node, audio_node &destination_node,
                                        const audio_format &format)
 {
     if (!source_node || !destination_node) {
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
     }
 
-    auto source_bus_result = source_node->next_available_output_bus();
-    auto destination_bus_result = destination_node->next_available_input_bus();
+    auto source_bus_result = source_node.next_available_output_bus();
+    auto destination_bus_result = destination_node.next_available_input_bus();
 
     if (!source_bus_result || !destination_bus_result) {
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : bus is not available.");
@@ -382,7 +382,7 @@ audio_connection audio_engine::connect(const audio_node_sptr &source_node, const
     return connect(source_node, destination_node, *source_bus_result, *destination_bus_result, format);
 }
 
-audio_connection audio_engine::connect(const audio_node_sptr &source_node, const audio_node_sptr &destination_node,
+audio_connection audio_engine::connect(audio_node &source_node, audio_node &destination_node,
                                        const UInt32 source_bus_idx, const UInt32 destination_bus_idx,
                                        const audio_format &format)
 {
@@ -390,12 +390,12 @@ audio_connection audio_engine::connect(const audio_node_sptr &source_node, const
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
     }
 
-    if (!source_node->is_available_output_bus(source_bus_idx)) {
+    if (!source_node.is_available_output_bus(source_bus_idx)) {
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : output bus(" +
                                     std::to_string(source_bus_idx) + ") is not available.");
     }
 
-    if (!destination_node->is_available_input_bus(destination_bus_idx)) {
+    if (!destination_node.is_available_input_bus(destination_bus_idx)) {
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : input bus(" +
                                     std::to_string(destination_bus_idx) + ") is not available.");
     }
@@ -425,7 +425,7 @@ audio_connection audio_engine::connect(const audio_node_sptr &source_node, const
 
 void audio_engine::disconnect(audio_connection &connection)
 {
-    auto update_nodes = {connection.source_node(), connection.destination_node()};
+    std::vector<audio_node> update_nodes{connection.source_node(), connection.destination_node()};
 
     _impl->remove_connection_from_nodes(connection);
     audio_connection::private_access::remove_nodes(connection);
@@ -438,14 +438,14 @@ void audio_engine::disconnect(audio_connection &connection)
     _impl->connections().erase(connection.key());
 }
 
-void audio_engine::disconnect(const audio_node_sptr &node)
+void audio_engine::disconnect(audio_node &node)
 {
     if (_impl->node_exists(node)) {
         _impl->detach_node(node);
     }
 }
 
-void audio_engine::disconnect_input(const audio_node_sptr &node)
+void audio_engine::disconnect_input(const audio_node &node)
 {
     if (!node) {
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
@@ -455,7 +455,7 @@ void audio_engine::disconnect_input(const audio_node_sptr &node)
         [node](const audio_connection &connection) { return (connection.destination_node() == node); });
 }
 
-void audio_engine::disconnect_input(const audio_node_sptr &node, const UInt32 bus_idx)
+void audio_engine::disconnect_input(const audio_node &node, const UInt32 bus_idx)
 {
     if (!node) {
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
@@ -466,7 +466,7 @@ void audio_engine::disconnect_input(const audio_node_sptr &node, const UInt32 bu
     });
 }
 
-void audio_engine::disconnect_output(const audio_node_sptr &node)
+void audio_engine::disconnect_output(const audio_node &node)
 {
     if (!node) {
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
@@ -476,7 +476,7 @@ void audio_engine::disconnect_output(const audio_node_sptr &node)
         [node](const audio_connection &connection) { return (connection.source_node() == node); });
 }
 
-void audio_engine::disconnect_output(const audio_node_sptr &node, const UInt32 bus_idx)
+void audio_engine::disconnect_output(const audio_node &node, const UInt32 bus_idx)
 {
     if (!node) {
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
@@ -496,7 +496,7 @@ audio_engine::start_result_t audio_engine::start_render()
     }
 
     if (const auto offline_output_node = _impl->offline_output_node()) {
-        if (offline_output_node->is_running()) {
+        if (offline_output_node.is_running()) {
             return start_result_t(start_error_t::already_running);
         }
     }
@@ -520,7 +520,7 @@ audio_engine::start_result_t audio_engine::start_offline_render(const offline_re
     }
 
     if (const auto offline_output_node = _impl->offline_output_node()) {
-        if (offline_output_node->is_running()) {
+        if (offline_output_node.is_running()) {
             return start_result_t(start_error_t::already_running);
         }
     }
@@ -529,7 +529,7 @@ audio_engine::start_result_t audio_engine::start_offline_render(const offline_re
         return start_result_t(start_error_t::prepare_failure);
     }
 
-    const auto offline_output_node = _impl->offline_output_node();
+    auto offline_output_node = _impl->offline_output_node();
 
     if (!offline_output_node) {
         return start_result_t(start_error_t::offline_output_not_found);
@@ -568,9 +568,8 @@ void audio_engine::_reload_graph()
 
         prev_graph.stop();
 
-        auto &nodes = _impl->nodes();
-        for (auto &node : nodes) {
-            _impl->remove_node_from_graph(node);
+        for (auto &pair : _impl->nodes()) {
+            _impl->remove_node_from_graph(pair.second);
         }
 
         _impl->set_graph(nullptr);
@@ -590,7 +589,7 @@ void audio_engine::_post_configuration_change() const
     _impl->subject.notify(audio_engine_method::configuration_change);
 }
 
-std::set<audio_node_sptr> &audio_engine::_nodes() const
+std::unordered_map<uintptr_t, audio_node> &audio_engine::_nodes() const
 {
     return _impl->nodes();
 }

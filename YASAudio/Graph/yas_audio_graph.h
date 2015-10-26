@@ -60,7 +60,6 @@ namespace yas
         explicit audio_graph(const std::shared_ptr<audio_graph::impl> &);
 
        public:
-        using weak = weak<audio_graph>;
-        friend weak;
+        friend weak<audio_graph>;
     };
 }

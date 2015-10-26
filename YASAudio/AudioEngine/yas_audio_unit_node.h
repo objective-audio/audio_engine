@@ -16,8 +16,11 @@ namespace yas
     class audio_unit_node : public audio_node
     {
        public:
-        static audio_unit_node_sptr create(const AudioComponentDescription &);
-        static audio_unit_node_sptr create(const OSType type, const OSType sub_type);
+        audio_unit_node(std::nullptr_t);
+        audio_unit_node(const AudioComponentDescription &);
+        audio_unit_node(const OSType type, const OSType sub_type);
+
+        audio_unit_node(const audio_node &, audio_node::cast_tag_t);
 
         virtual ~audio_unit_node();
 
@@ -39,54 +42,24 @@ namespace yas
                                         const AudioUnitElement element);
         Float32 output_parameter_value(const AudioUnitParameterID parameter_id, const AudioUnitElement element) const;
 
-        void render(audio_pcm_buffer &buffer, const UInt32 bus_idx, const audio_time &when) override;
-
        protected:
-        class impl : public audio_node::impl
-        {
-           public:
-            impl();
-            virtual ~impl();
+        class impl;
 
-            yas::audio_unit au() const;
-
-            UInt32 input_element_count() const;
-            UInt32 output_element_count() const;
-
-            virtual UInt32 input_bus_count() const override;
-            virtual UInt32 output_bus_count() const override;
-
-            virtual void update_connections() override;
-
-            class core;
-            std::unique_ptr<core> _core;
-        };
-
-        static void prepare_for_create(const audio_unit_node_sptr &);
-
-        audio_unit_node(std::shared_ptr<impl> &&, const AudioComponentDescription &);
-
-        virtual void prepare_audio_unit();
-        virtual void prepare_parameters();  // NS_REQUIRES_SUPER
+        audio_unit_node(std::shared_ptr<impl> &&, const AudioComponentDescription &, create_tag_t);
+        explicit audio_unit_node(const std::shared_ptr<impl> &);
 
        private:
-        audio_unit_node(const std::shared_ptr<impl> &);
-
-        impl *_impl_ptr() const;
-
         using super_class = audio_node;
 
-        void _reload_audio_unit();
-        void _add_audio_unit_to_graph(audio_graph &graph);
-        void _remove_audio_unit_from_graph();
+        std::shared_ptr<impl> _impl_ptr() const;
 
        public:
         class private_access;
         friend private_access;
 
-        using weak = yas::weak<audio_unit_node>;
-        friend weak;
+        friend weak<audio_unit_node>;
     };
 }
 
+#include "yas_audio_unit_node_impl.h"
 #include "yas_audio_unit_node_private_access.h"

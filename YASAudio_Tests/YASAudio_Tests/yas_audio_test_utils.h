@@ -29,19 +29,14 @@ namespace yas
         bool is_equal_data(const void *const inData1, const void *const inData2, const size_t inSize);
         bool is_equal(const AudioTimeStamp *const ts1, const AudioTimeStamp *const ts2);
 
-        void audio_unit_render_on_sub_thread(audio_unit audio_unit, yas::audio_format &format,
+        void audio_unit_render_on_sub_thread(audio_unit &audio_unit, yas::audio_format &format,
                                              const UInt32 frame_length, const NSUInteger count,
                                              const NSTimeInterval wait);
-
-        class audio_test_node;
-        using audio_test_node_sptr = std::shared_ptr<audio_test_node>;
 
         class audio_test_node : public yas::audio_node
         {
            public:
-            static audio_test_node_sptr create(const UInt32 input_bus_count = 2, const UInt32 output_bus_count = 1);
-
-            audio_test_node();
+            audio_test_node(const UInt32 input_bus_count = 2, const UInt32 output_bus_count = 1);
 
             void set_input_bus_count(const UInt32 &);
             void set_output_bus_count(const UInt32 &);

@@ -17,7 +17,8 @@ namespace yas
     class audio_unit_io_node : public audio_unit_node
     {
        public:
-        static audio_unit_io_node_sptr create();
+        audio_unit_io_node();
+        audio_unit_io_node(std::nullptr_t);
 
         virtual ~audio_unit_io_node();
 
@@ -37,69 +38,42 @@ namespace yas
         using super_class = audio_unit_node;
 
        protected:
-        class impl : public super_class::impl
-        {
-           public:
-            impl();
-            virtual ~impl();
+        class impl;
 
-#if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
-            void set_device(const audio_device &device);
-            audio_device device() const;
-#endif
-            Float64 device_sample_rate() const;
-            UInt32 output_device_channel_count() const;
-            UInt32 input_device_channel_count() const;
+        audio_unit_io_node(std::shared_ptr<impl> &&, create_tag_t);
+        explicit audio_unit_io_node(const std::shared_ptr<impl> &);
 
-            virtual bus_result_t next_available_output_bus() const override;
-            virtual bool is_available_output_bus(const UInt32 bus_idx) const override;
-
-            virtual void update_connections() override;
-
-            class core;
-            std::unique_ptr<core> _core;
-
-           private:
-            using super_class = super_class::impl;
-        };
-
-        audio_unit_io_node(std::shared_ptr<impl> &&);
-
-        impl *_impl_ptr() const;
-
-        virtual void prepare_audio_unit() override;
+        std::shared_ptr<impl> _impl_ptr() const;
     };
 
     class audio_unit_output_node : public audio_unit_io_node
     {
        public:
-        static audio_unit_output_node_sptr create();
+        audio_unit_output_node();
+        audio_unit_output_node(std::nullptr_t);
+        audio_unit_output_node(const audio_node &, audio_node::cast_tag_t);
 
         void set_channel_map(const channel_map_t &map);
         const channel_map_t &channel_map() const;
-
-       protected:
-        virtual void prepare_audio_unit() override;
 
        private:
         using super_class = audio_unit_io_node;
         class impl;
 
-        audio_unit_output_node();
+        audio_unit_output_node(const std::shared_ptr<audio_unit_output_node::impl> &impl);
+
+        friend weak<audio_unit_output_node>;
     };
 
     class audio_unit_input_node : public audio_unit_io_node
     {
        public:
-        static audio_unit_input_node_sptr create();
+        audio_unit_input_node();
+        audio_unit_input_node(std::nullptr_t);
+        audio_unit_input_node(const audio_node &, audio_node::cast_tag_t);
 
         void set_channel_map(const channel_map_t &map);
         const channel_map_t &channel_map() const;
-
-       protected:
-        audio_unit_input_node();
-
-        virtual void prepare_audio_unit() override;
 
        private:
         using super_class = audio_unit_io_node;
@@ -107,10 +81,10 @@ namespace yas
 
         audio_unit_input_node(const std::shared_ptr<audio_unit_input_node::impl> &);
 
-        impl *_impl_ptr() const;
+        std::shared_ptr<impl> _impl_ptr() const;
 
-       public:
-        using weak = yas::weak<audio_unit_input_node>;
-        friend weak;
+        friend weak<audio_unit_input_node>;
     };
 }
+
+#include "yas_audio_unit_io_node_impl.h"

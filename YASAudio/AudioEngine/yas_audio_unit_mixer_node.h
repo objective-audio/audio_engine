@@ -12,7 +12,8 @@ namespace yas
     class audio_unit_mixer_node : public audio_unit_node
     {
        public:
-        static audio_unit_mixer_node_sptr create();
+        audio_unit_mixer_node();
+        audio_unit_mixer_node(std::nullptr_t);
 
         void set_output_volume(const Float32 volume, const UInt32 bus_idx);
         Float32 output_volume(const UInt32 bus_idx);
@@ -26,9 +27,6 @@ namespace yas
 
         void set_input_enabled(const bool enabled, UInt32 bus_idx);
         bool input_enabled(UInt32 bus_idx);
-
-       protected:
-        audio_unit_mixer_node();
 
        private:
         using super_class = audio_unit_node;

@@ -62,7 +62,7 @@ class audio_device_stream::impl
 
     listener_f listener(const audio_device_stream &stream)
     {
-        audio_device_stream::weak weak_stream(stream);
+        weak<audio_device_stream> weak_stream(stream);
 
         return [weak_stream](UInt32 address_count, const AudioObjectPropertyAddress *addresses) {
             if (auto stream = weak_stream.lock()) {

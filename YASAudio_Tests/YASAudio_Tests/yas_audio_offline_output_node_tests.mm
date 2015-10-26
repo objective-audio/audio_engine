@@ -28,9 +28,9 @@
     auto format = yas::audio_format(sample_rate, 2);
     yas::audio_engine engine;
     engine.prepare();
-    auto output_node = yas::audio_offline_output_node::create();
-    auto sample_delay_node = yas::audio_unit_node::create(kAudioUnitType_Effect, kAudioUnitSubType_SampleDelay);
-    auto tap_node = yas::audio_tap_node::create();
+    yas::audio_offline_output_node output_node;
+    yas::audio_unit_node sample_delay_node(kAudioUnitType_Effect, kAudioUnitSubType_SampleDelay);
+    yas::audio_tap_node tap_node;
 
     engine.connect(sample_delay_node, output_node, format);
     engine.connect(tap_node, sample_delay_node, format);
@@ -62,7 +62,7 @@
             }
         };
 
-    tap_node->set_render_function(tap_render_function);
+    tap_node.set_render_function(tap_render_function);
 
     XCTestExpectation *renderExpectation = [self expectationWithDescription:@"offline output node render"];
     XCTestExpectation *completionExpectation = [self expectationWithDescription:@"offline output node completion"];
@@ -78,7 +78,12 @@
         for (UInt32 buf_idx = 0; buf_idx < buffer.format().buffer_count(); ++buf_idx) {
             Float32 *ptr = buffer.data_ptr_at_index<Float32>(buf_idx);
             for (UInt32 frm_idx = 0; frm_idx < buffer.frame_length(); ++frm_idx) {
-                XCTAssertEqual(ptr[frm_idx], yas::test::test_value(frm_idx + output_render_frame, 0, buf_idx));
+                bool is_equal_value = ptr[frm_idx] == yas::test::test_value(frm_idx + output_render_frame, 0, buf_idx);
+                XCTAssertTrue(is_equal_value);
+                if (!is_equal_value) {
+                    stop = true;
+                    return;
+                }
             }
         }
 
@@ -111,8 +116,8 @@
 {
     const Float64 sample_rate = 48000.0;
     auto format = yas::audio_format(sample_rate, 2);
-    auto output_node = yas::audio_offline_output_node::create();
-    auto tap_node = yas::audio_tap_node::create();
+    yas::audio_offline_output_node output_node;
+    yas::audio_tap_node tap_node;
 
     auto connection = yas::audio_connection::private_access::create(tap_node, 0, output_node, 0, format);
 
@@ -150,7 +155,7 @@
             }
         };
 
-    tap_node->set_render_function(tap_render_function);
+    tap_node.set_render_function(tap_render_function);
 
     XCTestExpectation *renderExpectation = [self expectationWithDescription:@"offline output node render"];
     XCTestExpectation *completionExpectation = [self expectationWithDescription:@"offline output node completion"];
@@ -158,7 +163,6 @@
     UInt32 output_render_frame = 0;
 
     auto start_render_function = [=](yas::audio_pcm_buffer &buffer, const yas::audio_time &when, bool &stop) mutable {
-
         XCTAssertEqual(when.sample_time(), output_render_frame);
         XCTAssertEqual(when.sample_rate(), sample_rate);
         XCTAssertEqual(buffer.frame_length(), frames_per_render);
@@ -170,7 +174,12 @@
         auto *frm_idx = enumerator.frame();
         auto *ch_idx = enumerator.channel();
         while (flex_ptr->v) {
-            XCTAssertEqual(*flex_ptr->f32, yas::test::test_value(*frm_idx + output_render_frame, 0, *ch_idx));
+            bool is_equal_value = *flex_ptr->f32 == yas::test::test_value(*frm_idx + output_render_frame, 0, *ch_idx);
+            XCTAssertTrue(is_equal_value);
+            if (!is_equal_value) {
+                stop = YES;
+                return;
+            }
             yas_audio_frame_enumerator_move(enumerator);
         }
 
@@ -192,8 +201,8 @@
         }
     };
 
-    auto result = yas::audio_offline_output_node::private_access::start(output_node.get(), start_render_function,
-                                                                        completion_function);
+    auto result =
+        yas::audio_offline_output_node::private_access::start(output_node, start_render_function, completion_function);
 
     [self waitForExpectationsWithTimeout:10.0
                                  handler:^(NSError *error){
