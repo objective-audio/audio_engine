@@ -53,9 +53,7 @@ namespace yas
         explicit observer(const std::shared_ptr<impl> &);
 
         friend subject;
-
-        using weak = weak<observer, observer::impl>;
-        friend weak;
+        friend weak<observer>;
     };
 
     observer make_subject_dispatcher(const subject &source_subject,

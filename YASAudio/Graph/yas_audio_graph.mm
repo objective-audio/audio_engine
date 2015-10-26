@@ -29,7 +29,7 @@ namespace yas
 {
     static std::recursive_mutex _global_mutex;
     static bool _interrupting;
-    static std::map<UInt8, audio_graph::weak> _graphs;
+    static std::map<UInt8, weak<audio_graph>> _graphs;
 #if TARGET_OS_IPHONE
     static yas::objc::container<> _did_become_active_observer;
     static yas::objc::container<> _interruption_observer;
@@ -140,7 +140,7 @@ class audio_graph::impl
     static void add_graph(const audio_graph &graph)
     {
         std::lock_guard<std::recursive_mutex> lock(_global_mutex);
-        _graphs.insert(std::make_pair(graph._impl->key(), audio_graph::weak(graph)));
+        _graphs.insert(std::make_pair(graph._impl->key(), weak<audio_graph>(graph)));
     }
 
     static void remove_graph_for_key(const UInt8 key)

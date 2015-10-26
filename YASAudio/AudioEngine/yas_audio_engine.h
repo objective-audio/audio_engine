@@ -9,7 +9,7 @@
 #include "yas_result.h"
 #include "yas_observing.h"
 #include "yas_audio_connection.h"
-#include <set>
+#include <unordered_map>
 
 namespace yas
 {
@@ -47,18 +47,16 @@ namespace yas
 
         void prepare();
 
-        audio_connection connect(const audio_node_sptr &source_node, const audio_node_sptr &destination_node,
-                                 const audio_format &format);
-        audio_connection connect(const audio_node_sptr &source_node, const audio_node_sptr &destination_node,
-                                 const UInt32 source_bus_idx, const UInt32 destination_bus_idx,
-                                 const audio_format &format);
+        audio_connection connect(audio_node &source_node, audio_node &destination_node, const audio_format &format);
+        audio_connection connect(audio_node &source_node, audio_node &destination_node, const UInt32 source_bus_idx,
+                                 const UInt32 destination_bus_idx, const audio_format &format);
 
         void disconnect(audio_connection &connectiion);
-        void disconnect(const audio_node_sptr &node);
-        void disconnect_input(const audio_node_sptr &node);
-        void disconnect_input(const audio_node_sptr &node, const UInt32 bus_idx);
-        void disconnect_output(const audio_node_sptr &node);
-        void disconnect_output(const audio_node_sptr &node, const UInt32 bus_idx);
+        void disconnect(audio_node &node);
+        void disconnect_input(const audio_node &node);
+        void disconnect_input(const audio_node &node, const UInt32 bus_idx);
+        void disconnect_output(const audio_node &node);
+        void disconnect_output(const audio_node &node, const UInt32 bus_idx);
 
         start_result_t start_render();
         start_result_t start_offline_render(const offline_render_f &render_function,
@@ -70,21 +68,20 @@ namespace yas
        private:
         class impl;
         std::shared_ptr<impl> _impl;
-        
+
         audio_engine(const std::shared_ptr<impl> &);
 
         void _reload_graph();
         void _post_configuration_change() const;
 
-        std::set<audio_node_sptr> &_nodes() const;
+        std::unordered_map<uintptr_t, audio_node> &_nodes() const;
         audio_connection_map &_connections() const;
 
        public:
         class private_access;
         friend private_access;
 
-        using weak = weak<audio_engine, audio_engine::impl>;
-        friend weak;
+        friend weak<audio_engine>;
     };
 
     std::string to_string(const audio_engine::start_error_t &error);

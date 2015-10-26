@@ -6,13 +6,15 @@
 #pragma once
 
 #include "yas_audio_node.h"
+#include "yas_weak.h"
 
 namespace yas
 {
     class audio_tap_node : public audio_node
     {
        public:
-        static audio_tap_node_sptr create();
+        audio_tap_node();
+        audio_tap_node(std::nullptr_t);
 
         virtual ~audio_tap_node();
 
@@ -20,38 +22,40 @@ namespace yas
 
         void set_render_function(const render_f &);
 
-        // render thread
-        virtual void render(audio_pcm_buffer &buffer, const UInt32 bus_idx, const audio_time &when) override;
-
         audio_connection input_connection_on_render(const UInt32 bus_idx) const;
         audio_connection output_connection_on_render(const UInt32 bus_idx) const;
         audio_connection_smap input_connections_on_render() const;
         audio_connection_smap output_connections_on_render() const;
         void render_source(audio_pcm_buffer &buffer, const UInt32 bus_idx, const audio_time &when);
 
+       private:
+        using super_class = audio_node;
+
        protected:
         class impl;
 
-        audio_tap_node();
-        audio_tap_node(std::unique_ptr<impl> &&impl);
+        explicit audio_tap_node(const std::shared_ptr<impl> &);
 
        private:
-        using super_class = audio_node;
         class kernel;
 
-        std::shared_ptr<kernel> _kernel() const;
-        impl *_impl_ptr() const;
+        std::shared_ptr<impl> _impl_ptr() const;
+
+        friend weak<audio_tap_node>;
     };
 
     class audio_input_tap_node : public audio_tap_node
     {
        public:
-        static audio_input_tap_node_sptr create();
-
         audio_input_tap_node();
+        audio_input_tap_node(std::nullptr_t);
+
+        audio_input_tap_node(const audio_node &, audio_node::cast_tag_t);
 
        private:
         using super_class = audio_tap_node;
         class impl;
     };
 }
+
+#include "yas_audio_tap_node_impl.h"

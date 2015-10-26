@@ -189,7 +189,7 @@ using sample_kernel_sptr = std::shared_ptr<sample_kernel_t>;
             }
         });
 
-    yas::audio_device_io::weak weak_device_io(_audio_device_io);
+    yas::weak<yas::audio_device_io> weak_device_io(_audio_device_io);
     _audio_device_io.set_render_callback([weak_device_io, kernel = _kernel](yas::audio_pcm_buffer & output_buffer,
                                                                             const yas::audio_time &when) {
         if (auto device_io = weak_device_io.lock()) {

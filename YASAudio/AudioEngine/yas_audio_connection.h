@@ -13,6 +13,8 @@
 
 namespace yas
 {
+    class audio_node;
+
     class audio_connection
     {
        public:
@@ -26,14 +28,13 @@ namespace yas
 
         bool operator==(const audio_connection &) const;
         bool operator!=(const audio_connection &) const;
-        bool operator<(const audio_connection &) const;
 
         explicit operator bool() const;
 
         UInt32 source_bus() const;
         UInt32 destination_bus() const;
-        audio_node_sptr source_node() const;
-        audio_node_sptr destination_node() const;
+        audio_node source_node() const;
+        audio_node destination_node() const;
         audio_format &format() const;
 
         uintptr_t key() const;
@@ -42,9 +43,8 @@ namespace yas
         class impl;
         std::shared_ptr<impl> _impl;
 
-        audio_connection(const audio_node_sptr &source_node, const UInt32 source_bus,
-                         const audio_node_sptr &destination_node, const UInt32 destination_bus,
-                         const audio_format &format);
+        audio_connection(audio_node &source_node, const UInt32 source_bus, audio_node &destination_node,
+                         const UInt32 destination_bus, const audio_format &format);
         audio_connection(const std::shared_ptr<impl> &);
 
         void _remove_nodes();
@@ -55,13 +55,12 @@ namespace yas
         class private_access;
         friend private_access;
 
-        using weak = weak<audio_connection, audio_connection::impl>;
-        friend weak;
+        friend weak<audio_connection>;
     };
 
     using audio_connection_map = std::unordered_map<uintptr_t, audio_connection>;
     using audio_connection_smap = std::map<UInt32, audio_connection>;
-    using audio_connection_wmap = std::map<UInt32, audio_connection::weak>;
+    using audio_connection_wmap = std::map<UInt32, weak<audio_connection>>;
     using audio_connection_wmap_sptr = std::shared_ptr<audio_connection_wmap>;
 }
 

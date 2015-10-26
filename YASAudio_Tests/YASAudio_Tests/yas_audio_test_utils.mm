@@ -144,7 +144,7 @@ yas::flex_ptr yas::test::data_ptr_from_buffer(const audio_pcm_buffer &buffer, co
     return *enumerator.pointer();
 }
 
-void yas::test::audio_unit_render_on_sub_thread(audio_unit unit, yas::audio_format &format, const UInt32 frame_length,
+void yas::test::audio_unit_render_on_sub_thread(audio_unit &unit, yas::audio_format &format, const UInt32 frame_length,
                                                 const NSUInteger count, const NSTimeInterval wait)
 {
     auto lambda = [unit, format, frame_length, count, wait]() mutable {
@@ -193,16 +193,11 @@ class test::audio_test_node::impl : public yas::audio_node::impl
     UInt32 _output_bus_count;
 };
 
-test::audio_test_node_sptr test::audio_test_node::create(const UInt32 input_bus_count, const UInt32 output_bus_count)
+yas::test::audio_test_node::audio_test_node(const UInt32 input_bus_count, const UInt32 output_bus_count)
+    : audio_node(std::make_unique<impl>())
 {
-    auto node = audio_test_node_sptr(new audio_test_node());
-    node->set_input_bus_count(input_bus_count);
-    node->set_output_bus_count(output_bus_count);
-    return node;
-}
-
-yas::test::audio_test_node::audio_test_node() : audio_node(std::make_unique<impl>())
-{
+    set_input_bus_count(input_bus_count);
+    set_output_bus_count(output_bus_count);
 }
 
 void yas::test::audio_test_node::set_input_bus_count(const UInt32 &count)

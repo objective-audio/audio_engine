@@ -27,8 +27,8 @@
     engine.prepare();
 
     auto format = yas::audio_format(48000.0, 2);
-    auto source_node = yas::test::audio_test_node::create(1, 1);
-    auto destination_node = yas::test::audio_test_node::create(1, 1);
+    yas::test::audio_test_node source_node(1, 1);
+    yas::test::audio_test_node destination_node(1, 1);
 
     XCTAssertEqual(yas::audio_engine::private_access::nodes(engine).size(), 0);
     XCTAssertEqual(yas::audio_engine::private_access::connections(engine).size(), 0);
@@ -39,8 +39,8 @@
 
     auto &nodes = yas::audio_engine::private_access::nodes(engine);
     auto &connections = yas::audio_engine::private_access::connections(engine);
-    XCTAssertGreaterThanOrEqual(nodes.count(source_node), 1);
-    XCTAssertGreaterThanOrEqual(nodes.count(destination_node), 1);
+    XCTAssertGreaterThanOrEqual(nodes.count(source_node.key()), 1);
+    XCTAssertGreaterThanOrEqual(nodes.count(destination_node.key()), 1);
     XCTAssertEqual(connections.size(), 1);
     XCTAssertEqual(connections.begin()->second, connection);
 }
@@ -51,8 +51,8 @@
     engine.prepare();
 
     auto format = yas::audio_format(48000.0, 2);
-    auto source_node = yas::test::audio_test_node::create(0, 0);
-    auto destination_node = yas::test::audio_test_node::create(0, 0);
+    yas::test::audio_test_node source_node(0, 0);
+    yas::test::audio_test_node destination_node(0, 0);
 
     yas::audio_connection connection = nullptr;
     XCTAssertThrows(connection = engine.connect(source_node, destination_node, format));
@@ -66,28 +66,28 @@
     engine.prepare();
 
     auto format = yas::audio_format(48000.0, 2);
-    auto source_node = yas::test::audio_test_node::create(1, 1);
-    auto relay_node = yas::test::audio_test_node::create(1, 1);
-    auto destination_node = yas::test::audio_test_node::create(1, 1);
+    yas::test::audio_test_node source_node(1, 1);
+    yas::test::audio_test_node relay_node(1, 1);
+    yas::test::audio_test_node destination_node(1, 1);
 
     engine.connect(source_node, relay_node, format);
 
     auto &nodes = yas::audio_engine::private_access::nodes(engine);
-    XCTAssertGreaterThanOrEqual(nodes.count(source_node), 1);
-    XCTAssertGreaterThanOrEqual(nodes.count(relay_node), 1);
-    XCTAssertEqual(nodes.count(destination_node), 0);
+    XCTAssertGreaterThanOrEqual(nodes.count(source_node.key()), 1);
+    XCTAssertGreaterThanOrEqual(nodes.count(relay_node.key()), 1);
+    XCTAssertEqual(nodes.count(destination_node.key()), 0);
 
     engine.connect(relay_node, destination_node, format);
 
-    XCTAssertGreaterThanOrEqual(nodes.count(source_node), 1);
-    XCTAssertGreaterThanOrEqual(nodes.count(relay_node), 1);
-    XCTAssertGreaterThanOrEqual(nodes.count(destination_node), 1);
+    XCTAssertGreaterThanOrEqual(nodes.count(source_node.key()), 1);
+    XCTAssertGreaterThanOrEqual(nodes.count(relay_node.key()), 1);
+    XCTAssertGreaterThanOrEqual(nodes.count(destination_node.key()), 1);
 
     engine.disconnect(relay_node);
 
-    XCTAssertEqual(nodes.count(source_node), 0);
-    XCTAssertEqual(nodes.count(relay_node), 0);
-    XCTAssertEqual(nodes.count(destination_node), 0);
+    XCTAssertEqual(nodes.count(source_node.key()), 0);
+    XCTAssertEqual(nodes.count(relay_node.key()), 0);
+    XCTAssertEqual(nodes.count(destination_node.key()), 0);
 }
 
 - (void)testConfigurationChangeNotification

@@ -13,6 +13,6 @@ namespace yas
 
 @interface YASAudioEngineEffectsSampleEditViewController : UITableViewController
 
-- (void)set_audio_unit_node:(const std::shared_ptr<yas::audio_unit_node> &)node;
+- (void)set_audio_unit_node:(const yas::audio_unit_node &)node;
 
 @end

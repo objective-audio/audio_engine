@@ -27,16 +27,16 @@
     engine.prepare();
 
     auto format = yas::audio_format(44100.0, 2);
-    auto output_node = yas::audio_offline_output_node::create();
-    auto delay_node = yas::audio_unit_node::create(kAudioUnitType_Effect, kAudioUnitSubType_Delay);
+    yas::audio_offline_output_node output_node;
+    yas::audio_unit_node delay_node(kAudioUnitType_Effect, kAudioUnitSubType_Delay);
 
-    const auto &parameters = delay_node->parameters();
+    const auto &parameters = delay_node.parameters();
     XCTAssertGreaterThanOrEqual(parameters.count(kAudioUnitScope_Global), 1);
     const auto &global_parameters = parameters.at(kAudioUnitScope_Global);
     XCTAssertEqual(global_parameters.size(), 4);
     for (auto &pair : global_parameters) {
         auto &parameter = pair.second;
-        XCTAssertEqual(parameter.default_value(), delay_node->global_parameter_value(parameter.parameter_id()));
+        XCTAssertEqual(parameter.default_value(), delay_node.global_parameter_value(parameter.parameter_id()));
     }
 
     auto connection = engine.connect(delay_node, output_node, format);
@@ -53,15 +53,15 @@
     float lopass_cutoff_value = 100.0f;
     float wet_dry_mix = 10.0f;
 
-    delay_node->set_global_parameter_value(kDelayParam_DelayTime, delay_time_value);
-    delay_node->set_global_parameter_value(kDelayParam_Feedback, feedback_value);
-    delay_node->set_global_parameter_value(kDelayParam_LopassCutoff, lopass_cutoff_value);
-    delay_node->set_global_parameter_value(kDelayParam_WetDryMix, wet_dry_mix);
+    delay_node.set_global_parameter_value(kDelayParam_DelayTime, delay_time_value);
+    delay_node.set_global_parameter_value(kDelayParam_Feedback, feedback_value);
+    delay_node.set_global_parameter_value(kDelayParam_LopassCutoff, lopass_cutoff_value);
+    delay_node.set_global_parameter_value(kDelayParam_WetDryMix, wet_dry_mix);
 
-    XCTAssertEqual(delay_node->global_parameter_value(kDelayParam_DelayTime), delay_time_value);
-    XCTAssertEqual(delay_node->global_parameter_value(kDelayParam_Feedback), feedback_value);
-    XCTAssertEqual(delay_node->global_parameter_value(kDelayParam_LopassCutoff), lopass_cutoff_value);
-    XCTAssertEqual(delay_node->global_parameter_value(kDelayParam_WetDryMix), wet_dry_mix);
+    XCTAssertEqual(delay_node.global_parameter_value(kDelayParam_DelayTime), delay_time_value);
+    XCTAssertEqual(delay_node.global_parameter_value(kDelayParam_Feedback), feedback_value);
+    XCTAssertEqual(delay_node.global_parameter_value(kDelayParam_LopassCutoff), lopass_cutoff_value);
+    XCTAssertEqual(delay_node.global_parameter_value(kDelayParam_WetDryMix), wet_dry_mix);
 
     engine.stop();
 
@@ -80,10 +80,10 @@
 
     engine.start_offline_render(nullptr, [expectation](const bool cancelled) { [expectation fulfill]; });
 
-    XCTAssertEqual(delay_node->global_parameter_value(kDelayParam_DelayTime), delay_time_value);
-    XCTAssertEqual(delay_node->global_parameter_value(kDelayParam_Feedback), feedback_value);
-    XCTAssertEqual(delay_node->global_parameter_value(kDelayParam_LopassCutoff), lopass_cutoff_value);
-    XCTAssertEqual(delay_node->global_parameter_value(kDelayParam_WetDryMix), wet_dry_mix);
+    XCTAssertEqual(delay_node.global_parameter_value(kDelayParam_DelayTime), delay_time_value);
+    XCTAssertEqual(delay_node.global_parameter_value(kDelayParam_Feedback), feedback_value);
+    XCTAssertEqual(delay_node.global_parameter_value(kDelayParam_LopassCutoff), lopass_cutoff_value);
+    XCTAssertEqual(delay_node.global_parameter_value(kDelayParam_WetDryMix), wet_dry_mix);
 
     engine.stop();
 

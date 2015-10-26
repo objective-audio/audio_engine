@@ -38,26 +38,25 @@ class audio_unit_mixer_node::impl : public super_class::impl
         super_class::update_connections();
     }
 
-    using super_class = super_class::impl;
+    using super_class = audio_unit_node::impl;
 };
 
 #pragma mark - main
 
-audio_unit_mixer_node_sptr audio_unit_mixer_node::create()
+audio_unit_mixer_node::audio_unit_mixer_node()
+    : super_class(std::make_unique<impl>(),
+                  AudioComponentDescription{
+                      .componentType = kAudioUnitType_Mixer,
+                      .componentSubType = kAudioUnitSubType_MultiChannelMixer,
+                      .componentManufacturer = kAudioUnitManufacturer_Apple,
+                      .componentFlags = 0,
+                      .componentFlagsMask = 0,
+                  },
+                  create_tag)
 {
-    auto node = audio_unit_mixer_node_sptr(new audio_unit_mixer_node());
-    prepare_for_create(node);
-    return node;
 }
 
-audio_unit_mixer_node::audio_unit_mixer_node()
-    : audio_unit_node(std::make_unique<impl>(), AudioComponentDescription{
-                                                    .componentType = kAudioUnitType_Mixer,
-                                                    .componentSubType = kAudioUnitSubType_MultiChannelMixer,
-                                                    .componentManufacturer = kAudioUnitManufacturer_Apple,
-                                                    .componentFlags = 0,
-                                                    .componentFlagsMask = 0,
-                                                })
+audio_unit_mixer_node::audio_unit_mixer_node(std::nullptr_t) : super_class(nullptr)
 {
 }
 

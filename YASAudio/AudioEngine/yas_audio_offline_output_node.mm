@@ -7,7 +7,6 @@
 #include "yas_audio_time.h"
 #include "yas_objc_container.h"
 #include "yas_stl_utils.h"
-#include <map>
 
 using namespace yas;
 
@@ -15,12 +14,91 @@ using namespace yas;
 
 class audio_offline_output_node::impl : public super_class::impl
 {
+    class core
+    {
+        using completion_function_map_t = std::map<UInt8, offline_completion_f>;
+
+       public:
+        objc::container<> queue_container;
+
+        core() : queue_container(nil), _completion_functions()
+        {
+        }
+
+        ~core()
+        {
+            if (queue_container) {
+                NSOperationQueue *operationQueue = queue_container.object();
+                [operationQueue cancelAllOperations];
+            }
+        }
+
+        const std::experimental::optional<UInt8> push_completion_function(const offline_completion_f &function)
+        {
+            if (!function) {
+                return nullopt;
+            }
+
+            auto key = min_empty_key(_completion_functions);
+            if (key) {
+                _completion_functions.insert(std::make_pair(*key, function));
+            }
+            return key;
+        }
+
+        const std::experimental::optional<offline_completion_f> pull_completion_function(UInt8 key)
+        {
+            if (_completion_functions.count(key) > 0) {
+                auto func = _completion_functions.at(key);
+                _completion_functions.erase(key);
+                return func;
+            } else {
+                return nullopt;
+            }
+        }
+
+        completion_function_map_t pull_completion_functions()
+        {
+            auto map = _completion_functions;
+            _completion_functions.clear();
+            return map;
+        }
+
+       private:
+        completion_function_map_t _completion_functions;
+    };
+
    public:
     impl() : audio_node::impl(), _core(std::make_unique<audio_offline_output_node::impl::core>())
     {
     }
 
     ~impl() = default;
+
+    void stop()
+    {
+        auto completion_functions = _core->pull_completion_functions();
+
+        if (auto queue_container = _core->queue_container) {
+            NSOperationQueue *queue = queue_container.object();
+            [queue cancelAllOperations];
+            [queue waitUntilAllOperationsAreFinished];
+            _core->queue_container.set_object(nil);
+        }
+
+        for (auto &pair : completion_functions) {
+            auto &func = pair.second;
+            if (func) {
+                func(true);
+            }
+        }
+    }
+
+    virtual void reset() override
+    {
+        stop();
+        super_class::reset();
+    }
 
     virtual UInt32 output_bus_count() const override
     {
@@ -32,77 +110,39 @@ class audio_offline_output_node::impl : public super_class::impl
         return 1;
     }
 
-    class core;
+    weak<audio_offline_output_node> weak_node() const
+    {
+        return node().cast<audio_offline_output_node>();
+    }
+
     std::unique_ptr<core> _core;
-};
-
-class audio_offline_output_node::impl::core
-{
-    using completion_function_map_t = std::map<UInt8, offline_completion_f>;
-
-   public:
-    std::weak_ptr<audio_offline_output_node> weak_node;
-    objc::container<> queue_container;
-
-    core() : queue_container(nil), _completion_functions()
-    {
-    }
-
-    const std::experimental::optional<UInt8> push_completion_function(const offline_completion_f &function)
-    {
-        if (!function) {
-            return nullopt;
-        }
-
-        auto key = min_empty_key(_completion_functions);
-        if (key) {
-            _completion_functions.insert(std::make_pair(*key, function));
-        }
-        return key;
-    }
-
-    const std::experimental::optional<offline_completion_f> pull_completion_function(UInt8 key)
-    {
-        if (_completion_functions.count(key) > 0) {
-            auto func = _completion_functions.at(key);
-            _completion_functions.erase(key);
-            return func;
-        } else {
-            return nullopt;
-        }
-    }
-
-    completion_function_map_t pull_completion_functions()
-    {
-        auto map = _completion_functions;
-        _completion_functions.clear();
-        return map;
-    }
 
    private:
-    completion_function_map_t _completion_functions;
+    using super_class = super_class::impl;
 };
 
 #pragma mark - main
 
-audio_offline_output_node_sptr audio_offline_output_node::create()
-{
-    auto node = audio_offline_output_node_sptr(new audio_offline_output_node());
-    node->_impl_ptr()->_core->weak_node = node;
-    return node;
-}
-
-audio_offline_output_node::audio_offline_output_node() : audio_node(std::make_unique<audio_offline_output_node::impl>())
+audio_offline_output_node::audio_offline_output_node()
+    : super_class(std::make_unique<audio_offline_output_node::impl>(), create_tag)
 {
 }
 
-audio_offline_output_node::~audio_offline_output_node()
+audio_offline_output_node::audio_offline_output_node(std::nullptr_t) : super_class(nullptr)
 {
-    if (auto queue_container = _impl_ptr()->_core->queue_container) {
-        NSOperationQueue *operationQueue = queue_container.object();
-        [operationQueue cancelAllOperations];
-    }
 }
+
+audio_offline_output_node::audio_offline_output_node(const std::shared_ptr<audio_offline_output_node::impl> &impl)
+    : super_class(impl)
+{
+}
+
+audio_offline_output_node::audio_offline_output_node(const audio_node &node, audio_node::cast_tag_t)
+    : super_class(std::dynamic_pointer_cast<audio_offline_output_node::impl>(audio_node::private_access::impl(node)))
+{
+}
+
+audio_offline_output_node::~audio_offline_output_node() = default;
 
 bool audio_offline_output_node::is_running() const
 {
@@ -123,7 +163,7 @@ audio_offline_output_node::start_result_t audio_offline_output_node::_start(cons
             }
         }
 
-        auto weak_node = _impl_ptr()->_core->weak_node;
+        auto weak_node = _impl_ptr()->weak_node();
         yas::audio_pcm_buffer render_buffer(connection.format(), 1024);
 
         NSBlockOperation *blockOperation = [[NSBlockOperation alloc] init];
@@ -142,7 +182,7 @@ audio_offline_output_node::start_result_t audio_offline_output_node::_start(cons
                     break;
                 }
 
-                auto kernel = offline_node->_kernel();
+                auto kernel = offline_node._impl_ptr()->kernel_cast();
                 if (!kernel) {
                     cancelled = true;
                     break;
@@ -163,7 +203,7 @@ audio_offline_output_node::start_result_t audio_offline_output_node::_start(cons
                 render_buffer.reset();
 
                 if (auto source_node = connection_on_block.source_node()) {
-                    source_node->render(render_buffer, connection_on_block.source_bus(), when);
+                    source_node.render(render_buffer, connection_on_block.source_bus(), when);
                 }
 
                 if (render_func) {
@@ -185,10 +225,10 @@ audio_offline_output_node::start_result_t audio_offline_output_node::_start(cons
                 if (auto offline_node = weak_node.lock()) {
                     std::experimental::optional<offline_completion_f> node_completion_func;
                     if (key) {
-                        node_completion_func = offline_node->_impl_ptr()->_core->pull_completion_function(*key);
+                        node_completion_func = offline_node._impl_ptr()->_core->pull_completion_function(*key);
                     }
 
-                    offline_node->_impl_ptr()->_core->queue_container.set_object(nil);
+                    offline_node._impl_ptr()->_core->queue_container.set_object(nil);
 
                     if (node_completion_func) {
                         (*node_completion_func)(cancelled);
@@ -217,26 +257,12 @@ audio_offline_output_node::start_result_t audio_offline_output_node::_start(cons
 
 void audio_offline_output_node::_stop()
 {
-    auto completion_functions = _impl_ptr()->_core->pull_completion_functions();
-
-    if (auto queue_container = _impl_ptr()->_core->queue_container) {
-        NSOperationQueue *queue = queue_container.object();
-        [queue cancelAllOperations];
-        [queue waitUntilAllOperationsAreFinished];
-        _impl_ptr()->_core->queue_container.set_object(nil);
-    }
-
-    for (auto &pair : completion_functions) {
-        auto &func = pair.second;
-        if (func) {
-            func(true);
-        }
-    }
+    _impl_ptr()->stop();
 }
 
-audio_offline_output_node::impl *audio_offline_output_node::_impl_ptr() const
+std::shared_ptr<audio_offline_output_node::impl> audio_offline_output_node::_impl_ptr() const
 {
-    return dynamic_cast<audio_offline_output_node::impl *>(_impl.get());
+    return std::dynamic_pointer_cast<audio_offline_output_node::impl>(_impl);
 }
 
 std::string to_string(const audio_offline_output_node::start_error_t &error)

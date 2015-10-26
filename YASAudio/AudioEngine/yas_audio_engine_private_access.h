@@ -8,7 +8,7 @@ namespace yas
     class audio_engine::private_access
     {
        public:
-        static std::set<audio_node_sptr> &nodes(const audio_engine &engine)
+        static std::unordered_map<uintptr_t, audio_node> &nodes(const audio_engine &engine)
         {
             return engine._nodes();
         }

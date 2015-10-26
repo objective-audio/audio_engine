@@ -15,7 +15,7 @@
 @end
 
 @implementation YASAudioEngineSampleParameterCell {
-    yas::audio_unit_node_sptr _node;
+    std::experimental::optional<yas::audio_unit_node> _node_opt;
     UInt32 _index;
 }
 
@@ -45,20 +45,21 @@
 
 - (void)reset
 {
-    [self set_node:nullptr index:0];
+    [self set_node:yas::nullopt index:0];
 }
 
-- (void)set_node:(const yas::audio_unit_node_sptr &)node index:(const UInt32)index
+- (void)set_node:(const std::experimental::optional<yas::audio_unit_node> &)node_opt index:(const UInt32)index
 {
-    _node = node;
+    _node_opt = node_opt;
     _index = index;
 
-    if (_node && _node->global_parameters().count(_index)) {
-        auto &parameter = _node->global_parameters().at(_index);
+    auto node = node_opt ? *node_opt : nullptr;
+    if (node && node.global_parameters().count(_index)) {
+        auto &parameter = node.global_parameters().at(_index);
         self.nameLabel.text = (__bridge NSString *)parameter.name();
         self.valueSlider.minimumValue = parameter.min_value();
         self.valueSlider.maximumValue = parameter.max_value();
-        self.valueSlider.value = node->global_parameter_value(parameter.parameter_id());
+        self.valueSlider.value = node.global_parameter_value(parameter.parameter_id());
     } else {
         self.nameLabel.text = nil;
         self.valueSlider.minimumValue = 0.0;
@@ -73,9 +74,12 @@
 {
     Float32 value = 0;
 
-    if (_node && _node->global_parameters().count(_index)) {
-        auto parameter_id = _node->global_parameters().at(_index).parameter_id();
-        value = _node->global_parameter_value(parameter_id);
+    if (_node_opt) {
+        auto &node = *_node_opt;
+        if (node.global_parameters().count(_index)) {
+            auto parameter_id = node.global_parameters().at(_index).parameter_id();
+            value = node.global_parameter_value(parameter_id);
+        }
     }
 
     self.valueLabel.text = @(value).stringValue;
@@ -83,9 +87,12 @@
 
 - (IBAction)sliderValueChanged:(UISlider *)sender
 {
-    if (_node && _node->global_parameters().count(_index)) {
-        auto parameter_id = _node->global_parameters().at(_index).parameter_id();
-        _node->set_global_parameter_value(parameter_id, sender.value);
+    if (_node_opt) {
+        auto &node = *_node_opt;
+        if (node && node.global_parameters().count(_index)) {
+            auto parameter_id = node.global_parameters().at(_index).parameter_id();
+            node.set_global_parameter_value(parameter_id, sender.value);
+        }
     }
 
     [self updateValueLabel];
