@@ -24,7 +24,6 @@
 - (void)test_connect_success
 {
     yas::audio_engine engine;
-    engine.prepare();
 
     auto format = yas::audio_format(48000.0, 2);
     yas::test::audio_test_node source_node(1, 1);
@@ -48,7 +47,6 @@
 - (void)test_connect_failed_no_bus
 {
     yas::audio_engine engine;
-    engine.prepare();
 
     auto format = yas::audio_format(48000.0, 2);
     yas::test::audio_test_node source_node(0, 0);
@@ -63,7 +61,6 @@
 - (void)testConnectAndDisconnect
 {
     yas::audio_engine engine;
-    engine.prepare();
 
     auto format = yas::audio_format(48000.0, 2);
     yas::test::audio_test_node source_node(1, 1);
@@ -93,7 +90,6 @@
 - (void)testConfigurationChangeNotification
 {
     yas::audio_engine engine;
-    engine.prepare();
 
     XCTestExpectation *expectation = [self expectationWithDescription:@"configuration change"];
 

@@ -159,8 +159,6 @@ namespace yas
             {
                 auto format = yas::audio_format(yas::offline_sample::sample_rate, 2, yas::pcm_format::float32, false);
 
-                play_engine.prepare();
-
                 yas::audio_unit_output_node play_output_node;
 
                 play_mixer_node.reset();
@@ -171,8 +169,6 @@ namespace yas
 
                 play_engine.connect(play_mixer_node, play_output_node, format);
                 play_engine.connect(play_sine_node, play_mixer_node, format);
-
-                offline_engine.prepare();
 
                 yas::audio_offline_output_node offline_output_node;
 
@@ -238,7 +234,7 @@ namespace yas
 {
     [super viewWillDisappear];
 
-    if (_internal->play_engine) {
+    if (_internal) {
         _internal->play_engine.stop();
     }
 }

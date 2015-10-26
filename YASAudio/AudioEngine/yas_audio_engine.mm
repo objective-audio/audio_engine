@@ -84,7 +84,7 @@ class audio_engine::impl
         });
 
         remove_node_from_graph(node);
-        audio_node::private_access::set_engine(node, nullptr);
+        audio_node::private_access::set_engine(node, audio_engine(nullptr));
         _nodes.erase(node.key());
     }
 
@@ -298,32 +298,8 @@ class audio_engine::impl
     audio_offline_output_node _offline_output_node = nullptr;
 };
 
-audio_engine::audio_engine(std::nullptr_t) : _impl(nullptr)
+audio_engine::audio_engine() : _impl(std::make_shared<impl>())
 {
-}
-
-audio_engine::audio_engine(const std::shared_ptr<impl> &impl) : _impl(impl)
-{
-}
-
-bool audio_engine::operator==(const audio_engine &other) const
-{
-    return _impl && other._impl && _impl == other._impl;
-}
-
-bool audio_engine::operator!=(const audio_engine &other) const
-{
-    return !_impl || !other._impl || _impl != other._impl;
-}
-
-audio_engine::operator bool() const
-{
-    return _impl != nullptr;
-}
-
-void audio_engine::prepare()
-{
-    _impl = std::make_unique<impl>();
     _impl->weak_engine = *this;
 
 #if TARGET_OS_IPHONE
@@ -363,6 +339,35 @@ void audio_engine::prepare()
                                            }
                                        });
 #endif
+}
+
+audio_engine::audio_engine(std::nullptr_t) : _impl(nullptr)
+{
+}
+
+audio_engine::audio_engine(const std::shared_ptr<impl> &impl) : _impl(impl)
+{
+}
+
+audio_engine &audio_engine::operator=(std::nullptr_t)
+{
+    _impl = nullptr;
+    return *this;
+}
+
+bool audio_engine::operator==(const audio_engine &other) const
+{
+    return _impl && other._impl && _impl == other._impl;
+}
+
+bool audio_engine::operator!=(const audio_engine &other) const
+{
+    return !_impl || !other._impl || _impl != other._impl;
+}
+
+audio_engine::operator bool() const
+{
+    return _impl != nullptr;
 }
 
 audio_connection audio_engine::connect(audio_node &source_node, audio_node &destination_node,

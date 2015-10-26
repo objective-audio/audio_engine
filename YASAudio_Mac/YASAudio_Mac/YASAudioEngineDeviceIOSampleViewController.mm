@@ -106,6 +106,7 @@ namespace yas
     namespace sample
     {
         struct device_io_vc_internal {
+            yas::audio_engine engine;
             yas::audio_device_io_node device_io_node;
             yas::audio_route_node route_node;
             yas::audio_tap_node tap_node;
@@ -114,7 +115,6 @@ namespace yas
 }
 
 @implementation YASAudioEngineDeviceIOSampleViewController {
-    yas::audio_engine _engine;
     std::experimental::optional<yas::sample::device_io_vc_internal> _internal;
     yas::observer _system_observer;
     yas::observer _device_observer;
@@ -150,7 +150,7 @@ namespace yas
 
     [self setupEngine];
 
-    if (!_engine.start_render()) {
+    if (!_internal->engine.start_render()) {
         NSLog(@"audio engine start failed.");
     }
 }
@@ -187,8 +187,6 @@ namespace yas
 
 - (void)setupEngine
 {
-    _engine.prepare();
-
     _internal = yas::sample::device_io_vc_internal();
 
     if (!_self_container) {
@@ -237,10 +235,8 @@ namespace yas
 
 - (void)dispose
 {
-    _engine.stop();
-
+    _internal->engine.stop();
     _internal = yas::nullopt;
-    _engine = nullptr;
 
     _system_observer.clear();
     _device_observer.clear();
@@ -285,22 +281,22 @@ namespace yas
     self.outputRoutes = nil;
     self.inputRoutes = nil;
 
-    if (_engine) {
-        _engine.disconnect(_internal->tap_node);
-        _engine.disconnect(_internal->route_node);
+    if (_internal) {
+        _internal->engine.disconnect(_internal->tap_node);
+        _internal->engine.disconnect(_internal->route_node);
         _internal->route_node.clear_routes();
 
         if (const auto &device = _internal->device_io_node.device()) {
             if (device.output_channel_count() > 0) {
                 const auto output_format = device.output_format();
-                _engine.connect(_internal->route_node, _internal->device_io_node, output_format);
-                _engine.connect(_internal->tap_node, _internal->route_node, 0, YASAudioDeviceRouteSampleSourceBusSine,
-                                output_format);
+                _internal->engine.connect(_internal->route_node, _internal->device_io_node, output_format);
+                _internal->engine.connect(_internal->tap_node, _internal->route_node, 0,
+                                          YASAudioDeviceRouteSampleSourceBusSine, output_format);
             }
 
             if (device.input_channel_count() > 0) {
-                _engine.connect(_internal->device_io_node, _internal->route_node, 0,
-                                YASAudioDeviceRouteSampleSourceBusInput, device.input_format());
+                _internal->engine.connect(_internal->device_io_node, _internal->route_node, 0,
+                                          YASAudioDeviceRouteSampleSourceBusInput, device.input_format());
             }
         }
     }
