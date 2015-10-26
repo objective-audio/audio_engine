@@ -73,7 +73,7 @@ namespace yas
         class kernel;
         class impl;
 
-        explicit audio_node(std::shared_ptr<impl> &&, create_tag_t);
+        audio_node(std::shared_ptr<impl> &&, create_tag_t);
         audio_node(const std::shared_ptr<audio_node::impl> &);
 
         audio_connection input_connection(const UInt32 bus_idx) const;
