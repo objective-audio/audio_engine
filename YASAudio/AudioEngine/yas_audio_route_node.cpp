@@ -72,7 +72,7 @@ class audio_route_node::impl : public audio_node::impl
     {
         super_class::prepare_kernel(kernel);
 
-        if (audio_route_node::kernel *route_kernel = dynamic_cast<audio_route_node::kernel *>(kernel.get())) {
+        if (auto route_kernel = std::dynamic_pointer_cast<audio_route_node::kernel>(kernel)) {
             route_kernel->routes = _core->routes;
         } else {
             throw std::runtime_error(std::string(__PRETTY_FUNCTION__) +
