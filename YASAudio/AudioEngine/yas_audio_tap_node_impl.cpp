@@ -63,10 +63,9 @@ void audio_tap_node::impl::prepare_kernel(const std::shared_ptr<audio_node::kern
 
 void audio_tap_node::impl::set_render_function(const render_f &func)
 {
-    if (!_core) {
-        std::cout << "core is null" << std::endl;
-    }
     _core->render_function = func;
+
+    update_kernel();
 }
 
 audio_connection audio_tap_node::impl::input_connection_on_render(const UInt32 bus_idx) const

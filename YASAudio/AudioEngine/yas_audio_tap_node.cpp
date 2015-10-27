@@ -23,12 +23,7 @@ audio_tap_node::~audio_tap_node() = default;
 
 void audio_tap_node::set_render_function(const render_f &func)
 {
-    if (!_impl_ptr()) {
-        std::cout << "impl is null" << std::endl;
-    }
     _impl_ptr()->set_render_function(func);
-
-    _impl->update_kernel();
 }
 
 audio_connection audio_tap_node::input_connection_on_render(const UInt32 bus_idx) const
