@@ -23,14 +23,47 @@ static const AudioComponentDescription baseAcd = {.componentType = kAudioUnitTyp
 
 @end
 
+namespace yas
+{
+    namespace sample
+    {
+        struct effects_vc_internal {
+            yas::audio_engine engine;
+            yas::audio_unit_output_node output_node;
+            yas::audio_connection through_connection;
+            yas::audio_tap_node tap_node;
+            yas::audio_unit_node effect_node = nullptr;
+
+            void replace_effect_node(const AudioComponentDescription *acd)
+            {
+                if (effect_node) {
+                    engine.disconnect(effect_node);
+                    effect_node = nullptr;
+                }
+
+                if (through_connection) {
+                    engine.disconnect(through_connection);
+                    through_connection = nullptr;
+                }
+
+                auto format = yas::audio_format([AVAudioSession sharedInstance].sampleRate, 2);
+
+                if (acd) {
+                    effect_node = yas::audio_unit_node(*acd);
+                    engine.connect(effect_node, output_node, format);
+                    engine.connect(tap_node, effect_node, format);
+                } else {
+                    through_connection = engine.connect(tap_node, output_node, format);
+                }
+            }
+        };
+    }
+}
+
 @implementation YASAudioEngineEffectsSampleViewController {
     std::vector<yas::audio_unit> _audio_units;
     std::experimental::optional<UInt32> _index;
-    yas::audio_engine _engine;
-    yas::audio_unit_output_node _output_node;
-    std::experimental::optional<yas::audio_unit_node> _effect_node;
-    yas::audio_connection _through_connection;
-    yas::audio_tap_node _tap_node;
+    std::experimental::optional<yas::sample::effects_vc_internal> _internal;
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -45,7 +78,7 @@ static const AudioComponentDescription baseAcd = {.componentType = kAudioUnitTyp
         AVAudioSession *audioSession = [AVAudioSession sharedInstance];
         if ([audioSession setCategory:AVAudioSessionCategoryPlayback error:&error]) {
             [self setupAudioEngine];
-            auto start_result = _engine.start_render();
+            auto start_result = _internal->engine.start_render();
             if (start_result) {
                 success = YES;
                 [self.tableView reloadData];
@@ -68,8 +101,8 @@ static const AudioComponentDescription baseAcd = {.componentType = kAudioUnitTyp
     [super viewWillDisappear:animated];
 
     if (self.isMovingFromParentViewController) {
-        if (_engine) {
-            _engine.stop();
+        if (_internal) {
+            _internal->engine.stop();
         }
 
         NSError *error = nil;
@@ -92,7 +125,7 @@ static const AudioComponentDescription baseAcd = {.componentType = kAudioUnitTyp
     id destinationViewController = segue.destinationViewController;
     if ([destinationViewController isKindOfClass:[YASAudioEngineEffectsSampleEditViewController class]]) {
         YASAudioEngineEffectsSampleEditViewController *controller = destinationViewController;
-        [controller set_audio_unit_node:*_effect_node];
+        [controller set_audio_unit_node:_internal->effect_node];
     }
 }
 
@@ -115,9 +148,7 @@ static const AudioComponentDescription baseAcd = {.componentType = kAudioUnitTyp
         }
     }
 
-    _engine.prepare();
-    _output_node.reset();
-    _tap_node.reset();
+    _internal = yas::sample::effects_vc_internal();
 
     Float64 phase = 0;
 
@@ -141,44 +172,16 @@ static const AudioComponentDescription baseAcd = {.componentType = kAudioUnitTyp
             }
         };
 
-    _tap_node.set_render_function(tap_render_function);
+    _internal->tap_node.set_render_function(tap_render_function);
 
-    [self replaceEffectNodeWithAudioComponentDescription:NULL];
-}
-
-- (void)replaceEffectNodeWithAudioComponentDescription:(const AudioComponentDescription *)acd
-{
-    if (!_engine) {
-        [NSException raise:NSInternalInconsistencyException format:@"audio_engine is null."];
-        return;
-    }
-
-    if (_effect_node) {
-        _engine.disconnect(*_effect_node);
-        _effect_node = yas::nullopt;
-    }
-
-    if (_through_connection) {
-        _engine.disconnect(_through_connection);
-        _through_connection = nullptr;
-    }
-
-    auto format = yas::audio_format([AVAudioSession sharedInstance].sampleRate, 2);
-
-    if (acd) {
-        _effect_node = yas::audio_unit_node(*acd);
-        _engine.connect(*_effect_node, _output_node, format);
-        _engine.connect(_tap_node, *_effect_node, format);
-    } else {
-        _through_connection = _engine.connect(_tap_node, _output_node, format);
-    }
+    _internal->replace_effect_node(nullptr);
 }
 
 #pragma mark -
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
-    if (_engine) {
+    if (_internal) {
         return YASAudioEngineEffectsSampleSectionCount;
     }
     return 0;
@@ -232,14 +235,14 @@ static const AudioComponentDescription baseAcd = {.componentType = kAudioUnitTyp
     switch (indexPath.section) {
         case YASAudioEngineEffectsSampleSectionNone: {
             _index = yas::nullopt;
-            [self replaceEffectNodeWithAudioComponentDescription:nullptr];
+            _internal->replace_effect_node(nullptr);
         } break;
         case YASAudioEngineEffectsSampleSectionEffects: {
             _index = static_cast<UInt32>(indexPath.row);
             AudioComponentDescription acd = baseAcd;
             const auto &audio_unit = _audio_units.at(indexPath.row);
             acd.componentSubType = audio_unit.sub_type();
-            [self replaceEffectNodeWithAudioComponentDescription:&acd];
+            _internal->replace_effect_node(&acd);
         } break;
     }
 
