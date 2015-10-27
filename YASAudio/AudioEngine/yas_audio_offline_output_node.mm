@@ -75,6 +75,113 @@ class audio_offline_output_node::impl : public super_class::impl
 
     ~impl() = default;
 
+    audio_offline_output_node::start_result_t start(const offline_render_f &render_func,
+                                                    const offline_completion_f &completion_func)
+    {
+        if (_core->queue_container) {
+            return start_result_t(start_error_t::already_running);
+        } else if (auto connection = input_connection(0)) {
+            std::experimental::optional<UInt8> key;
+            if (completion_func) {
+                key = _core->push_completion_function(completion_func);
+                if (!key) {
+                    return start_result_t(start_error_t::prepare_failure);
+                }
+            }
+
+            yas::audio_pcm_buffer render_buffer(connection.format(), 1024);
+
+            NSBlockOperation *blockOperation = [[NSBlockOperation alloc] init];
+            objc::container<objc::weak> operation_container(blockOperation);
+
+            auto operation_lambda =
+                [weak_node = weak_node(), operation_container, render_buffer, render_func, key]() mutable
+            {
+                bool cancelled = false;
+                UInt32 current_sample_time = 0;
+                bool stop = false;
+
+                while (!stop) {
+                    audio_time when(current_sample_time, render_buffer.format().sample_rate());
+                    auto offline_node = weak_node.lock();
+                    if (!offline_node) {
+                        cancelled = true;
+                        break;
+                    }
+
+                    auto kernel = offline_node._impl_ptr()->kernel_cast();
+                    if (!kernel) {
+                        cancelled = true;
+                        break;
+                    }
+
+                    auto connection_on_block = kernel->input_connection(0);
+                    if (!connection_on_block) {
+                        cancelled = true;
+                        break;
+                    }
+
+                    auto format = connection_on_block.format();
+                    if (format != render_buffer.format()) {
+                        cancelled = true;
+                        break;
+                    }
+
+                    render_buffer.reset();
+
+                    if (auto source_node = connection_on_block.source_node()) {
+                        source_node.render(render_buffer, connection_on_block.source_bus(), when);
+                    }
+
+                    if (render_func) {
+                        render_func(render_buffer, when, stop);
+                    }
+
+                    if (auto strong_operation_container = operation_container.lock()) {
+                        NSOperation *operation = strong_operation_container.object();
+                        if (!operation || operation.isCancelled) {
+                            cancelled = true;
+                            break;
+                        }
+                    }
+
+                    current_sample_time += 1024;
+                }
+
+                auto completion_lambda = [weak_node, cancelled, key]() {
+                    if (auto offline_node = weak_node.lock()) {
+                        std::experimental::optional<offline_completion_f> node_completion_func;
+                        if (key) {
+                            node_completion_func = offline_node._impl_ptr()->_core->pull_completion_function(*key);
+                        }
+
+                        offline_node._impl_ptr()->_core->queue_container.set_object(nil);
+
+                        if (node_completion_func) {
+                            (*node_completion_func)(cancelled);
+                        }
+                    }
+                };
+
+                dispatch_async(dispatch_get_main_queue(), completion_lambda);
+            };
+
+            [blockOperation addExecutionBlock:operation_lambda];
+
+            NSOperationQueue *queue = [[NSOperationQueue alloc] init];
+            queue.maxConcurrentOperationCount = 1;
+            _core->queue_container.set_object(queue);
+
+            [queue addOperation:blockOperation];
+
+            YASRelease(blockOperation);
+            YASRelease(queue);
+        } else {
+            return start_result_t(start_error_t::connection_not_found);
+        }
+        return start_result_t(nullptr);
+    }
+
     void stop()
     {
         auto completion_functions = _core->pull_completion_functions();
@@ -149,110 +256,10 @@ bool audio_offline_output_node::is_running() const
     return !!_impl_ptr()->_core->queue_container;
 }
 
-audio_offline_output_node::start_result_t audio_offline_output_node::_start(const offline_render_f &render_func,
+audio_offline_output_node::start_result_t audio_offline_output_node::_start(const offline_render_f &callback_func,
                                                                             const offline_completion_f &completion_func)
 {
-    if (_impl_ptr()->_core->queue_container) {
-        return start_result_t(start_error_t::already_running);
-    } else if (auto connection = input_connection(0)) {
-        std::experimental::optional<UInt8> key;
-        if (completion_func) {
-            key = _impl_ptr()->_core->push_completion_function(completion_func);
-            if (!key) {
-                return start_result_t(start_error_t::prepare_failure);
-            }
-        }
-
-        auto weak_node = _impl_ptr()->weak_node();
-        yas::audio_pcm_buffer render_buffer(connection.format(), 1024);
-
-        NSBlockOperation *blockOperation = [[NSBlockOperation alloc] init];
-        objc::container<objc::weak> operation_container(blockOperation);
-
-        auto operation_lambda = [weak_node, operation_container, render_buffer, render_func, key]() mutable {
-            bool cancelled = false;
-            UInt32 current_sample_time = 0;
-            bool stop = false;
-
-            while (!stop) {
-                audio_time when(current_sample_time, render_buffer.format().sample_rate());
-                auto offline_node = weak_node.lock();
-                if (!offline_node) {
-                    cancelled = true;
-                    break;
-                }
-
-                auto kernel = offline_node._impl_ptr()->kernel_cast();
-                if (!kernel) {
-                    cancelled = true;
-                    break;
-                }
-
-                auto connection_on_block = kernel->input_connection(0);
-                if (!connection_on_block) {
-                    cancelled = true;
-                    break;
-                }
-
-                auto format = connection_on_block.format();
-                if (format != render_buffer.format()) {
-                    cancelled = true;
-                    break;
-                }
-
-                render_buffer.reset();
-
-                if (auto source_node = connection_on_block.source_node()) {
-                    source_node.render(render_buffer, connection_on_block.source_bus(), when);
-                }
-
-                if (render_func) {
-                    render_func(render_buffer, when, stop);
-                }
-
-                if (auto strong_operation_container = operation_container.lock()) {
-                    NSOperation *operation = strong_operation_container.object();
-                    if (!operation || operation.isCancelled) {
-                        cancelled = true;
-                        break;
-                    }
-                }
-
-                current_sample_time += 1024;
-            }
-
-            auto completion_lambda = [weak_node, cancelled, key]() {
-                if (auto offline_node = weak_node.lock()) {
-                    std::experimental::optional<offline_completion_f> node_completion_func;
-                    if (key) {
-                        node_completion_func = offline_node._impl_ptr()->_core->pull_completion_function(*key);
-                    }
-
-                    offline_node._impl_ptr()->_core->queue_container.set_object(nil);
-
-                    if (node_completion_func) {
-                        (*node_completion_func)(cancelled);
-                    }
-                }
-            };
-
-            dispatch_async(dispatch_get_main_queue(), completion_lambda);
-        };
-
-        [blockOperation addExecutionBlock:operation_lambda];
-
-        NSOperationQueue *queue = [[NSOperationQueue alloc] init];
-        queue.maxConcurrentOperationCount = 1;
-        _impl_ptr()->_core->queue_container.set_object(queue);
-
-        [queue addOperation:blockOperation];
-
-        YASRelease(blockOperation);
-        YASRelease(queue);
-    } else {
-        return start_result_t(start_error_t::connection_not_found);
-    }
-    return start_result_t(nullptr);
+    return _impl_ptr()->start(callback_func, completion_func);
 }
 
 void audio_offline_output_node::_stop()
