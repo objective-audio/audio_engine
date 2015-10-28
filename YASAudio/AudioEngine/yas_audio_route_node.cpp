@@ -72,12 +72,8 @@ class audio_route_node::impl : public audio_node::impl
     {
         super_class::prepare_kernel(kernel);
 
-        if (auto route_kernel = std::dynamic_pointer_cast<audio_route_node::kernel>(kernel)) {
-            route_kernel->routes = _core->routes;
-        } else {
-            throw std::runtime_error(std::string(__PRETTY_FUNCTION__) +
-                                     " : failed dynamic cast to audio_route_node::kernel.");
-        }
+        auto route_kernel = std::static_pointer_cast<audio_route_node::kernel>(kernel);
+        route_kernel->routes = _core->routes;
     }
 
     virtual void render(audio_pcm_buffer &dst_buffer, const UInt32 dst_bus_idx, const audio_time &when) override

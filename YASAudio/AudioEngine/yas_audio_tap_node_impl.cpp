@@ -53,12 +53,8 @@ void audio_tap_node::impl::prepare_kernel(const std::shared_ptr<audio_node::kern
 {
     super_class::prepare_kernel(kernel);
 
-    if (auto tap_kernel = std::dynamic_pointer_cast<audio_tap_node::kernel>(kernel)) {
-        tap_kernel->render_function = _core->render_function;
-    } else {
-        throw std::runtime_error(std::string(__PRETTY_FUNCTION__) +
-                                 " : failed dynamic cast to audio_tap_node::kernel.");
-    }
+    auto tap_kernel = std::static_pointer_cast<audio_tap_node::kernel>(kernel);
+    tap_kernel->render_function = _core->render_function;
 }
 
 void audio_tap_node::impl::set_render_function(const render_f &func)
