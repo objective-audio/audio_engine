@@ -24,7 +24,6 @@
 - (void)test_render_with_lambda
 {
     yas::audio_engine engine;
-    engine.prepare();
 
     yas::audio_offline_output_node output_node;
     yas::audio_tap_node to_node;
@@ -78,7 +77,6 @@
 - (void)test_render_without_lambda
 {
     yas::audio_engine engine;
-    engine.prepare();
 
     yas::audio_offline_output_node output_node;
     yas::audio_tap_node to_node;

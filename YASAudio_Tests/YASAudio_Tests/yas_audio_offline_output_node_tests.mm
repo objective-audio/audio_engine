@@ -27,7 +27,6 @@
 
     auto format = yas::audio_format(sample_rate, 2);
     yas::audio_engine engine;
-    engine.prepare();
     yas::audio_offline_output_node output_node;
     yas::audio_unit_node sample_delay_node(kAudioUnitType_Effect, kAudioUnitSubType_SampleDelay);
     yas::audio_tap_node tap_node;

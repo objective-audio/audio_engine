@@ -31,7 +31,8 @@ namespace yas
 
         using start_result_t = yas::result<std::nullptr_t, start_error_t>;
 
-        audio_engine(std::nullptr_t n = nullptr);
+        audio_engine();
+        explicit audio_engine(std::nullptr_t);
 
         ~audio_engine() = default;
 
@@ -39,13 +40,13 @@ namespace yas
         audio_engine(audio_engine &&) = default;
         audio_engine &operator=(const audio_engine &) = default;
         audio_engine &operator=(audio_engine &&) = default;
+        
+        audio_engine &operator=(std::nullptr_t);
 
         bool operator==(const audio_engine &) const;
         bool operator!=(const audio_engine &) const;
 
         explicit operator bool() const;
-
-        void prepare();
 
         audio_connection connect(audio_node &source_node, audio_node &destination_node, const audio_format &format);
         audio_connection connect(audio_node &source_node, audio_node &destination_node, const UInt32 source_bus_idx,
@@ -69,7 +70,7 @@ namespace yas
         class impl;
         std::shared_ptr<impl> _impl;
 
-        audio_engine(const std::shared_ptr<impl> &);
+        explicit audio_engine(const std::shared_ptr<impl> &);
 
         void _reload_graph();
         void _post_configuration_change() const;
