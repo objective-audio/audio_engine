@@ -12,7 +12,7 @@ using namespace yas;
 class audio_node::impl::core
 {
    public:
-    weak<audio_engine> weak_engine;
+    base_weak<audio_engine> weak_engine;
     weak<audio_node> weak_node;
     audio_connection_wmap input_connections;
     audio_connection_wmap output_connections;
