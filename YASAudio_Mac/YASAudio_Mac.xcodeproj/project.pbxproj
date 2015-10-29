@@ -131,6 +131,7 @@
 		B68D57CB1BDD0BA200414726 /* yas_audio_unit_node.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = yas_audio_unit_node.h; path = AudioEngine/yas_audio_unit_node.h; sourceTree = "<group>"; };
 		B690822C1BC01024008FD218 /* yas_flex_ptr.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = yas_flex_ptr.cpp; path = Basic/yas_flex_ptr.cpp; sourceTree = "<group>"; };
 		B690822D1BC01024008FD218 /* yas_flex_ptr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = yas_flex_ptr.h; path = Basic/yas_flex_ptr.h; sourceTree = "<group>"; };
+		B69A11011BE238D7001A624C /* yas_base.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = yas_base.h; path = Basic/yas_base.h; sourceTree = "<group>"; };
 		B69C84861AF1144F00B9EB3D /* YASAudioOfflineSampleViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YASAudioOfflineSampleViewController.h; sourceTree = "<group>"; };
 		B69C84871AF1144F00B9EB3D /* YASAudioOfflineSampleViewController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = YASAudioOfflineSampleViewController.mm; sourceTree = "<group>"; };
 		B6AB1B3D1B47897600F15163 /* yas_cf_utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = yas_cf_utils.h; path = Basic/yas_cf_utils.h; sourceTree = "<group>"; };
@@ -297,6 +298,7 @@
 				B690822D1BC01024008FD218 /* yas_flex_ptr.h */,
 				B690822C1BC01024008FD218 /* yas_flex_ptr.cpp */,
 				B686C8021BCA4BEC0048F0AD /* yas_weak.h */,
+				B69A11011BE238D7001A624C /* yas_base.h */,
 			);
 			name = utils;
 			sourceTree = "<group>";
