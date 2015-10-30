@@ -8,7 +8,7 @@
 #include "yas_audio_types.h"
 #include "yas_audio_unit_parameter.h"
 #include "yas_exception.h"
-#include "yas_weak.h"
+#include "yas_base.h"
 #include <AudioToolbox/AudioToolbox.h>
 #include <vector>
 #include <memory>
@@ -21,14 +21,14 @@
 
 namespace yas
 {
-    class audio_unit
+    class audio_unit : public base
     {
        public:
         using render_f = std::function<void(render_parameters &)>;
 
         static const OSType sub_type_default_io();
 
-        audio_unit(std::nullptr_t n = nullptr);
+        audio_unit(std::nullptr_t);
         explicit audio_unit(const AudioComponentDescription &acd);
         audio_unit(const OSType &type, const OSType &subType);
 
@@ -38,12 +38,6 @@ namespace yas
         audio_unit(audio_unit &&) = default;
         audio_unit &operator=(const audio_unit &) = default;
         audio_unit &operator=(audio_unit &&) = default;
-
-        bool operator==(const yas::audio_unit &) const;
-        bool operator!=(const yas::audio_unit &) const;
-        bool operator<(const yas::audio_unit &) const;
-
-        explicit operator bool() const;
 
         CFStringRef name() const;
         OSType type() const;
@@ -62,13 +56,6 @@ namespace yas
         void set_notify_callback(const render_f &callback);
         void set_input_callback(const render_f &callback);  // for io
 
-        template <typename T>
-        void set_property_data(const std::vector<T> &data, const AudioUnitPropertyID property_id,
-                               const AudioUnitScope scope, const AudioUnitElement element);
-        template <typename T>
-        std::vector<T> property_data(const AudioUnitPropertyID property_id, const AudioUnitScope scope,
-                                     const AudioUnitElement element) const;
-
         void set_input_format(const AudioStreamBasicDescription &asbd, const UInt32 bus_idx);
         void set_output_format(const AudioStreamBasicDescription &asbd, const UInt32 bus_idx);
         AudioStreamBasicDescription input_format(const UInt32 bus_idx) const;
@@ -82,8 +69,9 @@ namespace yas
         AudioUnitParameterValue parameter_value(const AudioUnitParameterID parameter_id, const AudioUnitScope scope,
                                                 const AudioUnitElement element);
 
-        audio_unit_parameter_map_t create_parameters(const AudioUnitScope scope);
-        audio_unit_parameter create_parameter(const AudioUnitParameterID &parameter_id, const AudioUnitScope scope);
+        audio_unit_parameter_map_t create_parameters(const AudioUnitScope scope) const;
+        audio_unit_parameter create_parameter(const AudioUnitParameterID &parameter_id,
+                                              const AudioUnitScope scope) const;
 
         void set_element_count(const UInt32 &count, const AudioUnitScope &scope);  // for mixer
         UInt32 element_count(const AudioUnitScope &scope) const;                   // for mixer
@@ -96,9 +84,9 @@ namespace yas
         bool has_input() const;                            // for io
         bool is_running() const;                           // for io
         void set_channel_map(const channel_map_t &map, const AudioUnitScope scope,
-                             const AudioUnitElement element);                                   // for io
-        channel_map_t channel_map(const AudioUnitScope scope, const AudioUnitElement element);  // for io
-        UInt32 channel_map_count(const AudioUnitScope scope, const AudioUnitElement element);   // for io
+                             const AudioUnitElement element);                                         // for io
+        channel_map_t channel_map(const AudioUnitScope scope, const AudioUnitElement element) const;  // for io
+        UInt32 channel_map_count(const AudioUnitScope scope, const AudioUnitElement element) const;   // for io
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
         void set_current_device(const AudioDeviceID &device);  // for io
         const AudioDeviceID current_device() const;            // for io
@@ -114,25 +102,16 @@ namespace yas
         void audio_unit_render(render_parameters &render_parameters);
 
        private:
+        using super_class = base;
         class impl;
-        std::shared_ptr<impl> _impl;
 
-        explicit audio_unit(const std::shared_ptr<impl> &);
-
-        void _initialize();
-        void _uninitialize();
-        void _set_graph_key(const std::experimental::optional<UInt8> &key);
-        const std::experimental::optional<UInt8> &_graph_key() const;
-        void _set_key(const std::experimental::optional<UInt16> &_key);
-        const std::experimental::optional<UInt16> &_key() const;
+        std::shared_ptr<impl> _impl_ptr() const;
 
        public:
         class private_access;
         friend private_access;
-
-        friend weak<audio_unit>;
     };
 }
 
-#include "yas_audio_unit_private.h"
+#include "yas_audio_unit_impl.h"
 #include "yas_audio_unit_private_access.h"

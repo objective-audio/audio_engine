@@ -238,16 +238,18 @@
 
     yas::audio_unit converter_unit(kAudioUnitType_FormatConverter, kAudioUnitSubType_AUConverter);
 
-    converter_unit.set_property_data(set_data, property_id, scope, element);
+    yas::audio_unit::private_access::set_property_data(converter_unit, set_data, property_id, scope, element);
 
     std::vector<AudioStreamBasicDescription> get_data;
 
-    XCTAssertNoThrow(get_data = converter_unit.property_data<AudioStreamBasicDescription>(property_id, scope, element));
+    XCTAssertNoThrow(get_data = yas::audio_unit::private_access::property_data<AudioStreamBasicDescription>(
+                         converter_unit, property_id, scope, element));
 
     XCTAssertTrue(yas::is_equal(set_data.at(0), get_data.at(0)));
 
     std::vector<AudioStreamBasicDescription> zero_data;
-    XCTAssertThrows(converter_unit.set_property_data(zero_data, property_id, scope, element));
+    XCTAssertThrows(
+        yas::audio_unit::private_access::set_property_data(converter_unit, zero_data, property_id, scope, element));
 }
 
 @end
