@@ -23,7 +23,7 @@
 
 - (void)testRunning
 {
-    yas::audio_graph graph;
+    yas::audio_graph graph{nullptr};
 
     graph.prepare();
     graph.start();
@@ -46,7 +46,7 @@
     auto output_format = yas::audio_format(output_sample_rate, channels);
     auto mixer_format = yas::audio_format(mixer_sample_rate, channels);
 
-    yas::audio_graph graph;
+    yas::audio_graph graph{nullptr};
     graph.prepare();
 
     yas::audio_unit io_unit(kAudioUnitType_Output, kAudioUnitSubType_GenericOutput);

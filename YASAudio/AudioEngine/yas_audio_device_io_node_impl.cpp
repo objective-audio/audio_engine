@@ -18,7 +18,7 @@ class audio_device_io_node::impl::core
 {
    public:
     weak<audio_device_io_node> weak_node;
-    weak<audio_graph> weak_graph;
+    base_weak<audio_graph> weak_graph;
     audio_device_io device_io;
 
     core() : weak_node(), _device(nullptr), weak_graph(), device_io(nullptr)

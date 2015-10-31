@@ -139,8 +139,18 @@ using sample_kernel_sptr = std::shared_ptr<sample_kernel_t>;
 
 @end
 
+namespace yas
+{
+    namespace sample
+    {
+        struct device_vc_internal {
+            yas::audio_graph audio_graph = nullptr;
+        };
+    }
+}
+
 @implementation YASAudioDeviceSampleViewController {
-    yas::audio_graph _audio_graph;
+    yas::sample::device_vc_internal _internal;
     yas::audio_device_io _audio_device_io;
     yas::observer _audio_device_observer;
     sample_kernel_sptr _kernel;
@@ -169,9 +179,9 @@ using sample_kernel_sptr = std::shared_ptr<sample_kernel_t>;
         _self_container.set_object(self);
     }
 
-    _audio_graph.prepare();
+    _internal.audio_graph.prepare();
     _audio_device_io.prepare();
-    _audio_graph.add_audio_device_io(_audio_device_io);
+    _internal.audio_graph.add_audio_device_io(_audio_device_io);
 
     _kernel = std::make_shared<sample_kernel_t>();
 
@@ -207,7 +217,7 @@ using sample_kernel_sptr = std::shared_ptr<sample_kernel_t>;
 
 - (void)dispose
 {
-    _audio_graph = nullptr;
+    _internal.audio_graph = nullptr;
     _audio_device_io = nullptr;
     _audio_device_observer.clear();
     _kernel = nullptr;
@@ -219,8 +229,8 @@ using sample_kernel_sptr = std::shared_ptr<sample_kernel_t>;
 
     [self setup];
 
-    if (_audio_graph) {
-        _audio_graph.start();
+    if (_internal.audio_graph) {
+        _internal.audio_graph.start();
     }
 }
 
@@ -228,8 +238,8 @@ using sample_kernel_sptr = std::shared_ptr<sample_kernel_t>;
 {
     [super viewWillDisappear];
 
-    if (_audio_graph) {
-        _audio_graph.stop();
+    if (_internal.audio_graph) {
+        _internal.audio_graph.stop();
     }
 
     [self dispose];

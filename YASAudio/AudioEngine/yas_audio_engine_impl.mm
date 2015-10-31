@@ -45,7 +45,7 @@ class audio_engine::impl::core
     observer device_observer;
 #endif
 
-    audio_graph graph;
+    audio_graph graph = nullptr;
     std::unordered_map<uintptr_t, audio_node> nodes;
     audio_connection_map connections;
     audio_offline_output_node offline_output_node = nullptr;

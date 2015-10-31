@@ -16,7 +16,7 @@ class audio_unit_node::impl::core
    public:
     AudioComponentDescription acd;
     std::map<AudioUnitScope, audio_unit_parameter_map_t> parameters;
-    weak<audio_graph> weak_graph;
+    base_weak<audio_graph> weak_graph;
     yas::audio_unit _au;
 
     core() : acd(), parameters(), weak_graph(), _au(nullptr), _mutex()

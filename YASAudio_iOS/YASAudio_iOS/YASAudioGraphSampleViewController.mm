@@ -17,7 +17,7 @@ namespace yas
     namespace sample
     {
         struct graph_vc_internal {
-            yas::audio_graph graph;
+            yas::audio_graph graph = nullptr;
             yas::audio_unit io_unit = nullptr;
             yas::audio_unit mixer_unit = nullptr;
 
