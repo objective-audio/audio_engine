@@ -6,6 +6,7 @@
 #pragma once
 
 #include "yas_audio_node.h"
+#include "yas_weak.h"
 
 namespace yas
 {
