@@ -22,6 +22,8 @@ class audio_route_node::kernel : public audio_node::kernel
 
 class audio_route_node::impl : public audio_node::impl
 {
+    using super_class = super_class::impl;
+
    public:
     class core
     {
@@ -163,15 +165,13 @@ class audio_route_node::impl : public audio_node::impl
         update_kernel();
     }
 
-    std::unique_ptr<core> _core;
-
    private:
-    using super_class = super_class::impl;
+    std::unique_ptr<core> _core;
 };
 
 #pragma mark - main
 
-audio_route_node::audio_route_node() : super_class(std::make_unique<impl>(), create_tag)
+audio_route_node::audio_route_node() : super_class(std::make_unique<impl>())
 {
 }
 
@@ -228,5 +228,5 @@ void audio_route_node::clear_routes()
 
 std::shared_ptr<audio_route_node::impl> audio_route_node::_impl_ptr() const
 {
-    return std::dynamic_pointer_cast<audio_route_node::impl>(_impl);
+    return impl_ptr<impl>();
 }

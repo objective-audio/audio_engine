@@ -12,6 +12,8 @@ using namespace yas;
 
 class audio_unit_mixer_node::impl : public super_class::impl
 {
+    using super_class = audio_unit_node::impl;
+
    private:
     virtual UInt32 input_bus_count() const override
     {
@@ -37,22 +39,18 @@ class audio_unit_mixer_node::impl : public super_class::impl
 
         super_class::update_connections();
     }
-
-    using super_class = audio_unit_node::impl;
 };
 
 #pragma mark - main
 
 audio_unit_mixer_node::audio_unit_mixer_node()
-    : super_class(std::make_unique<impl>(),
-                  AudioComponentDescription{
-                      .componentType = kAudioUnitType_Mixer,
-                      .componentSubType = kAudioUnitSubType_MultiChannelMixer,
-                      .componentManufacturer = kAudioUnitManufacturer_Apple,
-                      .componentFlags = 0,
-                      .componentFlagsMask = 0,
-                  },
-                  create_tag)
+    : super_class(std::make_unique<impl>(), AudioComponentDescription{
+                                                .componentType = kAudioUnitType_Mixer,
+                                                .componentSubType = kAudioUnitSubType_MultiChannelMixer,
+                                                .componentManufacturer = kAudioUnitManufacturer_Apple,
+                                                .componentFlags = 0,
+                                                .componentFlagsMask = 0,
+                                            })
 {
 }
 
