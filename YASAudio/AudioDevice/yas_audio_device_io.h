@@ -11,6 +11,7 @@
 #include "yas_audio_types.h"
 #include "yas_audio_pcm_buffer.h"
 #include "yas_audio_device.h"
+#include "yas_weak.h"
 #include <functional>
 #include <memory>
 

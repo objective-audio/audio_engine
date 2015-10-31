@@ -11,7 +11,7 @@
 #include "yas_audio_types.h"
 #include "yas_observing.h"
 #include "yas_audio_format.h"
-#include "yas_weak.h"
+#include "yas_base.h"
 #include <AudioToolbox/AudioToolbox.h>
 #include <memory>
 #include <vector>
@@ -26,8 +26,10 @@ namespace yas
 
     class audio_device;
 
-    class audio_device_stream
+    class audio_device_stream : public base
     {
+        using super_class = base;
+
        public:
         enum class property : UInt32 {
             virtual_format = 0,
@@ -50,17 +52,15 @@ namespace yas
 
         using property_infos_sptr = std::shared_ptr<std::set<property_info>>;
 
-        audio_device_stream(std::nullptr_t n = nullptr);
+        audio_device_stream(std::nullptr_t);
         audio_device_stream(const AudioStreamID, const AudioDeviceID);
 
-        ~audio_device_stream() = default;
+        ~audio_device_stream();
 
         audio_device_stream(const audio_device_stream &) = default;
         audio_device_stream(audio_device_stream &&) = default;
         audio_device_stream &operator=(const audio_device_stream &) = default;
         audio_device_stream &operator=(audio_device_stream &&) = default;
-
-        explicit operator bool() const;
 
         bool operator==(const audio_device_stream &);
         bool operator!=(const audio_device_stream &);
@@ -76,15 +76,12 @@ namespace yas
 
        private:
         class impl;
-        std::shared_ptr<impl> _impl;
 
-        explicit audio_device_stream(const std::shared_ptr<impl> &);
+        std::shared_ptr<impl> _impl_ptr() const;
 
         template <typename T>
         std::unique_ptr<std::vector<T>> _property_data(const AudioStreamID stream_id,
                                                        const AudioObjectPropertySelector selector) const;
-
-        friend weak<audio_device_stream>;
     };
 }
 
