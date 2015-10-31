@@ -6,7 +6,7 @@
 #pragma once
 
 #include "yas_any.h"
-#include "yas_weak.h"
+#include "yas_base.h"
 #include <functional>
 #include <string>
 #include <map>
@@ -20,23 +20,19 @@ namespace yas
     class observer;
     class subject;
 
-    class observer
+    class observer : public base
     {
        public:
         using handler_f = std::function<void(const std::string &, const yas::any &)>;
 
         observer();
+        explicit observer(std::nullptr_t);
         ~observer() = default;
 
         observer(const observer &) = default;
         observer(observer &&) = default;
         observer &operator=(const observer &) = default;
         observer &operator=(observer &&) = default;
-
-        bool operator==(const observer &) const;
-        bool operator!=(const observer &) const;
-
-        explicit operator bool() const;
 
         void add_handler(subject &subject, const std::string &key, const handler_f &handler);
         void remove_handler(subject &subject, const std::string &key);
@@ -47,13 +43,12 @@ namespace yas
         void clear();
 
        private:
+        using super_class = base;
         class impl;
-        std::shared_ptr<impl> _impl;
 
-        explicit observer(const std::shared_ptr<impl> &);
+        std::shared_ptr<impl> _impl_ptr() const;
 
         friend subject;
-        friend weak<observer>;
     };
 
     observer make_subject_dispatcher(const subject &source_subject,

@@ -5,6 +5,7 @@
 
 #include "yas_objc_container.h"
 #include "YASMacros.h"
+#include <Foundation/Foundation.h>
 
 using namespace yas::objc;
 

@@ -34,7 +34,7 @@
 
     yas::audio_connection connection = nullptr;
     XCTAssertNoThrow(connection = engine.connect(source_node, destination_node, format));
-    XCTAssertNotEqual(connection, nullptr);
+    XCTAssertTrue(connection);
 
     auto &nodes = yas::audio_engine::private_access::nodes(engine);
     auto &connections = yas::audio_engine::private_access::connections(engine);

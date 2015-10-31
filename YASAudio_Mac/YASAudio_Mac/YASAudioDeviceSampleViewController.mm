@@ -139,9 +139,19 @@ using sample_kernel_sptr = std::shared_ptr<sample_kernel_t>;
 
 @end
 
+namespace yas
+{
+    namespace sample
+    {
+        struct device_vc_internal {
+            yas::audio_graph audio_graph = nullptr;
+            yas::audio_device_io audio_device_io = nullptr;
+        };
+    }
+}
+
 @implementation YASAudioDeviceSampleViewController {
-    yas::audio_graph _audio_graph;
-    yas::audio_device_io _audio_device_io;
+    yas::sample::device_vc_internal _internal;
     yas::observer _audio_device_observer;
     sample_kernel_sptr _kernel;
     yas::objc::container<yas::objc::weak> _self_container;
@@ -169,9 +179,9 @@ using sample_kernel_sptr = std::shared_ptr<sample_kernel_t>;
         _self_container.set_object(self);
     }
 
-    _audio_graph.prepare();
-    _audio_device_io.prepare();
-    _audio_graph.add_audio_device_io(_audio_device_io);
+    _internal.audio_graph.prepare();
+    _internal.audio_device_io = yas::audio_device_io(yas::audio_device(nullptr));
+    _internal.audio_graph.add_audio_device_io(_internal.audio_device_io);
 
     _kernel = std::make_shared<sample_kernel_t>();
 
@@ -189,9 +199,9 @@ using sample_kernel_sptr = std::shared_ptr<sample_kernel_t>;
             }
         });
 
-    yas::weak<yas::audio_device_io> weak_device_io(_audio_device_io);
-    _audio_device_io.set_render_callback([weak_device_io, kernel = _kernel](yas::audio_pcm_buffer & output_buffer,
-                                                                            const yas::audio_time &when) {
+    auto weak_device_io = yas::to_base_weak(_internal.audio_device_io);
+    _internal.audio_device_io.set_render_callback([weak_device_io, kernel = _kernel](
+        yas::audio_pcm_buffer & output_buffer, const yas::audio_time &when) {
         if (auto device_io = weak_device_io.lock()) {
             kernel->process(device_io.input_buffer_on_render(), output_buffer);
         }
@@ -207,8 +217,8 @@ using sample_kernel_sptr = std::shared_ptr<sample_kernel_t>;
 
 - (void)dispose
 {
-    _audio_graph = nullptr;
-    _audio_device_io = nullptr;
+    _internal.audio_graph = nullptr;
+    _internal.audio_device_io = nullptr;
     _audio_device_observer.clear();
     _kernel = nullptr;
 }
@@ -219,8 +229,8 @@ using sample_kernel_sptr = std::shared_ptr<sample_kernel_t>;
 
     [self setup];
 
-    if (_audio_graph) {
-        _audio_graph.start();
+    if (_internal.audio_graph) {
+        _internal.audio_graph.start();
     }
 }
 
@@ -228,8 +238,8 @@ using sample_kernel_sptr = std::shared_ptr<sample_kernel_t>;
 {
     [super viewWillDisappear];
 
-    if (_audio_graph) {
-        _audio_graph.stop();
+    if (_internal.audio_graph) {
+        _internal.audio_graph.stop();
     }
 
     [self dispose];
@@ -299,7 +309,7 @@ using sample_kernel_sptr = std::shared_ptr<sample_kernel_t>;
 
     self.deviceNames = titles;
 
-    auto device = _audio_device_io.device();
+    auto device = _internal.audio_device_io.device();
     auto index = yas::audio_device::index_of_device(device);
     if (index) {
         self.selectedDeviceIndex = *index;
@@ -310,7 +320,7 @@ using sample_kernel_sptr = std::shared_ptr<sample_kernel_t>;
 
 - (void)setDevice:(const yas::audio_device &)selected_device
 {
-    if (auto prev_audio_device = _audio_device_io.device()) {
+    if (auto prev_audio_device = _internal.audio_device_io.device()) {
         _audio_device_observer.remove_handler(prev_audio_device.property_subject(),
                                               yas::audio_device_method::device_did_change);
     }
@@ -318,7 +328,7 @@ using sample_kernel_sptr = std::shared_ptr<sample_kernel_t>;
     auto all_devices = yas::audio_device::all_devices();
 
     if (selected_device && std::find(all_devices.begin(), all_devices.end(), selected_device) != all_devices.end()) {
-        _audio_device_io.set_device(selected_device);
+        _internal.audio_device_io.set_device(selected_device);
 
         _audio_device_observer.add_handler(
             selected_device.property_subject(), yas::audio_device_method::device_did_change,
@@ -335,7 +345,7 @@ using sample_kernel_sptr = std::shared_ptr<sample_kernel_t>;
                 }
             });
     } else {
-        _audio_device_io.set_device(nullptr);
+        _internal.audio_device_io.set_device(nullptr);
     }
 
     [self _updateDeviceInfo];
@@ -343,7 +353,7 @@ using sample_kernel_sptr = std::shared_ptr<sample_kernel_t>;
 
 - (void)_updateDeviceInfo
 {
-    auto const device = _audio_device_io.device();
+    auto const device = _internal.audio_device_io.device();
     NSColor *onColor = [NSColor blackColor];
     NSColor *offColor = [NSColor lightGrayColor];
     if (device) {

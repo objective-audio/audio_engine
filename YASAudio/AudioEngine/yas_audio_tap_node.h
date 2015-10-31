@@ -6,13 +6,16 @@
 #pragma once
 
 #include "yas_audio_node.h"
-#include "yas_weak.h"
 
 namespace yas
 {
     class audio_tap_node : public audio_node
     {
+        using super_class = audio_node;
+
        public:
+        class impl;
+
         audio_tap_node();
         audio_tap_node(std::nullptr_t);
 
@@ -28,33 +31,25 @@ namespace yas
         audio_connection_smap output_connections_on_render() const;
         void render_source(audio_pcm_buffer &buffer, const UInt32 bus_idx, const audio_time &when);
 
-       private:
-        using super_class = audio_node;
-
        protected:
-        class impl;
-
         explicit audio_tap_node(const std::shared_ptr<impl> &);
 
        private:
         class kernel;
 
         std::shared_ptr<impl> _impl_ptr() const;
-
-        friend weak<audio_tap_node>;
     };
 
     class audio_input_tap_node : public audio_tap_node
     {
        public:
+        class impl;
+
         audio_input_tap_node();
         audio_input_tap_node(std::nullptr_t);
 
-        audio_input_tap_node(const audio_node &, audio_node::cast_tag_t);
-
        private:
         using super_class = audio_tap_node;
-        class impl;
     };
 }
 

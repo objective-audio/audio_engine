@@ -8,7 +8,7 @@
 #include "yas_audio_types.h"
 #include "yas_audio_unit.h"
 #include "yas_result.h"
-#include "yas_weak.h"
+#include "yas_base.h"
 #include <memory>
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
@@ -17,22 +17,20 @@
 
 namespace yas
 {
-    class audio_graph
+    class audio_graph : public base
     {
-       public:
-        audio_graph(std::nullptr_t n = nullptr);
+        using super_class = base;
 
-        ~audio_graph() = default;
+       public:
+        class impl;
+
+        audio_graph(std::nullptr_t);
+        ~audio_graph();
 
         audio_graph(const audio_graph &) = default;
         audio_graph(audio_graph &&) = default;
         audio_graph &operator=(const audio_graph &) = default;
         audio_graph &operator=(audio_graph &&) = default;
-
-        bool operator==(const audio_graph &) const;
-        bool operator!=(const audio_graph &) const;
-
-        explicit operator bool() const;
 
         void prepare();
 
@@ -53,13 +51,6 @@ namespace yas
         static void audio_unit_render(render_parameters &render_parameters);
 
        private:
-        class impl;
-        std::shared_ptr<impl> _impl;
-
-        explicit audio_graph(const UInt8 key);
-        explicit audio_graph(const std::shared_ptr<audio_graph::impl> &);
-
-       public:
-        friend weak<audio_graph>;
+        std::shared_ptr<impl> _impl_ptr() const;
     };
 }

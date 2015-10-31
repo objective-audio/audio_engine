@@ -288,9 +288,9 @@ class audio_device::impl
         if (data) {
             for (auto &stream_id : *data) {
                 if (prev_streams.count(stream_id) > 0) {
-                    new_streams[stream_id] = prev_streams.at(stream_id);
+                    new_streams.insert(std::make_pair(stream_id, prev_streams.at(stream_id)));
                 } else {
-                    new_streams[stream_id] = audio_device_stream(stream_id, audio_device_id);
+                    new_streams.insert(std::make_pair(stream_id, audio_device_stream(stream_id, audio_device_id)));
                 }
             }
         }
@@ -298,7 +298,7 @@ class audio_device::impl
 
     void update_format(const AudioObjectPropertyScope scope)
     {
-        audio_device_stream stream;
+        audio_device_stream stream = nullptr;
 
         if (scope == kAudioObjectPropertyScopeInput) {
             auto iterator = input_streams_map.begin();

@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <Foundation/Foundation.h>
+#include <objc/objc.h>
 #include <mutex>
 #include "yas_audio_types.h"
 #include "YASMacros.h"

@@ -29,7 +29,7 @@ namespace yas
 {
     static std::recursive_mutex _global_mutex;
     static bool _interrupting;
-    static std::map<UInt8, weak<audio_graph>> _graphs;
+    static std::map<UInt8, base_weak<audio_graph>> _graphs;
 #if TARGET_OS_IPHONE
     static yas::objc::container<> _did_become_active_observer;
     static yas::objc::container<> _interruption_observer;
@@ -38,7 +38,7 @@ namespace yas
 
 #pragma mark - impl
 
-class audio_graph::impl
+class audio_graph::impl : public base::impl
 {
    public:
     bool running;
@@ -118,7 +118,7 @@ class audio_graph::impl
             for (auto &pair : _graphs) {
                 if (auto graph = pair.second.lock()) {
                     if (graph.is_running()) {
-                        graph._impl->start_all_ios();
+                        graph._impl_ptr()->start_all_ios();
                     }
                 }
             }
@@ -132,7 +132,7 @@ class audio_graph::impl
         std::lock_guard<std::recursive_mutex> lock(_global_mutex);
         for (const auto &pair : _graphs) {
             if (const auto graph = pair.second.lock()) {
-                graph._impl->stop_all_ios();
+                graph._impl_ptr()->stop_all_ios();
             }
         }
     }
@@ -140,7 +140,7 @@ class audio_graph::impl
     static void add_graph(const audio_graph &graph)
     {
         std::lock_guard<std::recursive_mutex> lock(_global_mutex);
-        _graphs.insert(std::make_pair(graph._impl->key(), weak<audio_graph>(graph)));
+        _graphs.insert(std::make_pair(graph._impl_ptr()->key(), to_base_weak(graph)));
     }
 
     static void remove_graph_for_key(const UInt8 key)
@@ -271,36 +271,19 @@ class audio_graph::impl
 
 #pragma mark - constructor
 
-audio_graph::audio_graph(std::nullptr_t) : _impl(nullptr)
+audio_graph::audio_graph(std::nullptr_t) : super_class(nullptr)
 {
 }
 
-audio_graph::audio_graph(const std::shared_ptr<audio_graph::impl> &impl) : _impl(impl)
-{
-}
-
-bool audio_graph::operator==(const audio_graph &other) const
-{
-    return _impl && other._impl && _impl == other._impl;
-}
-
-bool audio_graph::operator!=(const audio_graph &other) const
-{
-    return !_impl || !other._impl || _impl != other._impl;
-}
-
-audio_graph::operator bool() const
-{
-    return _impl != nullptr;
-}
+audio_graph::~audio_graph() = default;
 
 void audio_graph::prepare()
 {
     std::lock_guard<std::recursive_mutex> lock(_global_mutex);
-    if (!_impl) {
+    if (!impl_ptr()) {
         auto key = min_empty_key(_graphs);
         if (key && _graphs.count(*key) == 0) {
-            _impl = std::make_shared<impl>(*key);
+            set_impl_ptr(std::make_shared<impl>(*key));
             audio_graph::impl::add_graph(*this);
         }
     }
@@ -312,23 +295,23 @@ void audio_graph::add_audio_unit(audio_unit &unit)
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : audio_unit.key is assigned.");
     }
 
-    _impl->add_unit_to_units(unit);
+    _impl_ptr()->add_unit_to_units(unit);
 
     audio_unit::private_access::initialize(unit);
 
-    if (unit.is_output_unit() && is_running() && !_impl->is_interrupting()) {
+    if (unit.is_output_unit() && is_running() && !_impl_ptr()->is_interrupting()) {
         unit.start();
     }
 }
 
 void audio_graph::remove_audio_unit(audio_unit &unit)
 {
-    _impl->remove_audio_unit(unit);
+    _impl_ptr()->remove_audio_unit(unit);
 }
 
 void audio_graph::remove_all_units()
 {
-    _impl->remove_all_units();
+    _impl_ptr()->remove_all_units();
 }
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
@@ -336,10 +319,10 @@ void audio_graph::remove_all_units()
 void audio_graph::add_audio_device_io(audio_device_io &device_io)
 {
     {
-        std::lock_guard<std::recursive_mutex> lock(_impl->mutex);
-        _impl->device_ios.push_back(device_io);
+        std::lock_guard<std::recursive_mutex> lock(_impl_ptr()->mutex);
+        _impl_ptr()->device_ios.push_back(device_io);
     }
-    if (is_running() && !_impl->is_interrupting()) {
+    if (is_running() && !_impl_ptr()->is_interrupting()) {
         device_io.start();
     }
 }
@@ -348,8 +331,8 @@ void audio_graph::remove_audio_device_io(audio_device_io &device_io)
 {
     device_io.stop();
     {
-        std::lock_guard<std::recursive_mutex> lock(_impl->mutex);
-        erase_if(_impl->device_ios,
+        std::lock_guard<std::recursive_mutex> lock(_impl_ptr()->mutex);
+        erase_if(_impl_ptr()->device_ios,
                  [&device_io](const auto &device_io_in_vec) { return device_io == device_io_in_vec; });
     }
 }
@@ -358,23 +341,23 @@ void audio_graph::remove_audio_device_io(audio_device_io &device_io)
 
 void audio_graph::start()
 {
-    if (!_impl->running) {
-        _impl->running = true;
-        _impl->start_all_ios();
+    if (!_impl_ptr()->running) {
+        _impl_ptr()->running = true;
+        _impl_ptr()->start_all_ios();
     }
 }
 
 void audio_graph::stop()
 {
-    if (_impl->running) {
-        _impl->running = false;
-        _impl->stop_all_ios();
+    if (_impl_ptr()->running) {
+        _impl_ptr()->running = false;
+        _impl_ptr()->stop_all_ios();
     }
 }
 
 bool audio_graph::is_running() const
 {
-    return _impl->running;
+    return _impl_ptr()->running;
 }
 
 void audio_graph::audio_unit_render(render_parameters &render_parameters)
@@ -383,9 +366,14 @@ void audio_graph::audio_unit_render(render_parameters &render_parameters)
 
     auto graph = impl::graph_for_key(render_parameters.render_id.graph);
     if (graph) {
-        auto unit = graph._impl->unit_for_key(render_parameters.render_id.unit);
+        auto unit = graph._impl_ptr()->unit_for_key(render_parameters.render_id.unit);
         if (unit) {
             unit.callback_render(render_parameters);
         }
     }
+}
+
+std::shared_ptr<audio_graph::impl> audio_graph::_impl_ptr() const
+{
+    return impl_ptr<impl>();
 }

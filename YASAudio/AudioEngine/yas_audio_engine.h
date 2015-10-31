@@ -6,6 +6,7 @@
 #pragma once
 
 #include "yas_audio_types.h"
+#include "yas_base.h"
 #include "yas_result.h"
 #include "yas_observing.h"
 #include "yas_audio_connection.h"
@@ -18,7 +19,7 @@ namespace yas
         static const auto configuration_change = "yas.audio_engine.configuration_change";
     }
 
-    class audio_engine
+    class audio_engine : public base
     {
        public:
         enum class start_error_t {
@@ -33,20 +34,14 @@ namespace yas
 
         audio_engine();
         explicit audio_engine(std::nullptr_t);
-
-        ~audio_engine() = default;
+        ~audio_engine();
 
         audio_engine(const audio_engine &) = default;
         audio_engine(audio_engine &&) = default;
         audio_engine &operator=(const audio_engine &) = default;
         audio_engine &operator=(audio_engine &&) = default;
-        
+
         audio_engine &operator=(std::nullptr_t);
-
-        bool operator==(const audio_engine &) const;
-        bool operator!=(const audio_engine &) const;
-
-        explicit operator bool() const;
 
         audio_connection connect(audio_node &source_node, audio_node &destination_node, const audio_format &format);
         audio_connection connect(audio_node &source_node, audio_node &destination_node, const UInt32 source_bus_idx,
@@ -67,13 +62,10 @@ namespace yas
         subject &subject() const;
 
        private:
+        using super_class = base;
         class impl;
-        std::shared_ptr<impl> _impl;
 
-        explicit audio_engine(const std::shared_ptr<impl> &);
-
-        void _reload_graph();
-        void _post_configuration_change() const;
+        std::shared_ptr<impl> _impl_ptr() const;
 
         std::unordered_map<uintptr_t, audio_node> &_nodes() const;
         audio_connection_map &_connections() const;
@@ -81,8 +73,6 @@ namespace yas
        public:
         class private_access;
         friend private_access;
-
-        friend weak<audio_engine>;
     };
 
     std::string to_string(const audio_engine::start_error_t &error);

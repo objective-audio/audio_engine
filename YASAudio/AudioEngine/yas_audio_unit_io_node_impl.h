@@ -7,6 +7,8 @@
 
 class yas::audio_unit_io_node::impl : public super_class::impl
 {
+    using super_class = audio_unit_node::impl;
+
    public:
     impl();
     virtual ~impl();
@@ -31,8 +33,6 @@ class yas::audio_unit_io_node::impl : public super_class::impl
     virtual void prepare_audio_unit() override;
 
    private:
-    using super_class = audio_unit_node::impl;
-
     class core;
     std::unique_ptr<core> _core;
 };
@@ -46,6 +46,8 @@ class yas::audio_unit_output_node::impl : public super_class::impl
 
 class yas::audio_unit_input_node::impl : public super_class::impl
 {
+    using super_class = audio_unit_io_node::impl;
+
    public:
     impl();
     virtual ~impl();
@@ -55,12 +57,10 @@ class yas::audio_unit_input_node::impl : public super_class::impl
 
     virtual void update_connections() override;
     virtual void prepare_audio_unit() override;
-    
-    weak<audio_unit_input_node> weak_node() const;
+
+    base_weak<audio_unit_input_node> weak_node() const;
 
    private:
-    using super_class = audio_unit_io_node::impl;
-
     class core;
     std::unique_ptr<core> _core;
 };

@@ -10,6 +10,8 @@
 
 class yas::audio_unit_node::impl : public audio_node::impl
 {
+    using super_class = audio_node::impl;
+
    public:
     impl();
     virtual ~impl();
@@ -46,14 +48,12 @@ class yas::audio_unit_node::impl : public audio_node::impl
     void reload_audio_unit();
     void add_audio_unit_to_graph(audio_graph &graph);
     void remove_audio_unit_from_graph();
-    
-    weak<audio_unit_node> weak_node() const;
+
+    base_weak<audio_unit_node> weak_node() const;
 
     virtual void render(audio_pcm_buffer &buffer, const UInt32 bus_idx, const audio_time &when) override;
 
    private:
-    using super_class = audio_node::impl;
-
     class core;
     std::unique_ptr<core> _core;
 };

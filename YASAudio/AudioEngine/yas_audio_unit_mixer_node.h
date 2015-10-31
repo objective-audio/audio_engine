@@ -11,6 +11,8 @@ namespace yas
 {
     class audio_unit_mixer_node : public audio_unit_node
     {
+        using super_class = audio_unit_node;
+
        public:
         audio_unit_mixer_node();
         audio_unit_mixer_node(std::nullptr_t);
@@ -29,7 +31,6 @@ namespace yas
         bool input_enabled(UInt32 bus_idx);
 
        private:
-        using super_class = audio_unit_node;
         class impl;
     };
 }

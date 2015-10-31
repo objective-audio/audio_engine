@@ -34,7 +34,7 @@
     auto output_format = yas::audio_format(output_sample_rate, channels, yas::pcm_format::float32, false);
     auto input_format = yas::audio_format(input_sample_rate, channels, yas::pcm_format::int16, true);
 
-    yas::audio_graph graph;
+    yas::audio_graph graph{nullptr};
     graph.prepare();
 
     yas::audio_unit converter_unit(kAudioUnitType_FormatConverter, kAudioUnitSubType_AUConverter);
@@ -102,7 +102,7 @@
 
     auto format = yas::audio_format(sampleRate, channels, yas::pcm_format::float32, false);
 
-    yas::audio_graph graph;
+    yas::audio_graph graph{nullptr};
     graph.prepare();
 
     yas::audio_unit converter_unit(kAudioUnitType_FormatConverter, kAudioUnitSubType_AUConverter);
@@ -238,16 +238,18 @@
 
     yas::audio_unit converter_unit(kAudioUnitType_FormatConverter, kAudioUnitSubType_AUConverter);
 
-    converter_unit.set_property_data(set_data, property_id, scope, element);
+    yas::audio_unit::private_access::set_property_data(converter_unit, set_data, property_id, scope, element);
 
     std::vector<AudioStreamBasicDescription> get_data;
 
-    XCTAssertNoThrow(get_data = converter_unit.property_data<AudioStreamBasicDescription>(property_id, scope, element));
+    XCTAssertNoThrow(get_data = yas::audio_unit::private_access::property_data<AudioStreamBasicDescription>(
+                         converter_unit, property_id, scope, element));
 
     XCTAssertTrue(yas::is_equal(set_data.at(0), get_data.at(0)));
 
     std::vector<AudioStreamBasicDescription> zero_data;
-    XCTAssertThrows(converter_unit.set_property_data(zero_data, property_id, scope, element));
+    XCTAssertThrows(
+        yas::audio_unit::private_access::set_property_data(converter_unit, zero_data, property_id, scope, element));
 }
 
 @end

@@ -25,11 +25,6 @@ audio_device_io_node::audio_device_io_node(const audio_device &device)
     _impl_ptr()->prepare(*this, device);
 }
 
-audio_device_io_node::audio_device_io_node(const audio_node &node, audio_node::cast_tag_t)
-    : super_class(std::dynamic_pointer_cast<audio_device_io_node::impl>(audio_node::private_access::impl(node)))
-{
-}
-
 audio_device_io_node::audio_device_io_node(const std::shared_ptr<audio_device_io_node::impl> &impl) : super_class(impl)
 {
 }
@@ -50,7 +45,7 @@ audio_device audio_device_io_node::device() const
 
 std::shared_ptr<audio_device_io_node::impl> audio_device_io_node::_impl_ptr() const
 {
-    return std::dynamic_pointer_cast<audio_device_io_node::impl>(_impl);
+    return impl_ptr<impl>();
 }
 
 #endif
