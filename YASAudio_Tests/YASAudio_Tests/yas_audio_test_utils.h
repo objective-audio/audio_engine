@@ -44,7 +44,7 @@ namespace yas
            private:
             class impl;
 
-            std::shared_ptr<impl> _impl_ptr() const;
+            impl *impl_ptr() const;
         };
     }
 }

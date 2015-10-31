@@ -7,7 +7,7 @@
 
 using namespace yas;
 
-audio_tap_node::audio_tap_node() : super_class(std::make_unique<impl>())
+audio_tap_node::audio_tap_node() : super_class(std::make_unique<impl>(), create_tag)
 {
 }
 
@@ -55,7 +55,7 @@ void audio_tap_node::render_source(audio_pcm_buffer &buffer, const UInt32 bus_id
 
 std::shared_ptr<audio_tap_node::impl> audio_tap_node::_impl_ptr() const
 {
-    return impl_ptr<impl>();
+    return std::dynamic_pointer_cast<audio_tap_node::impl>(_impl);
 }
 
 #pragma mark - input_tap_node
@@ -65,5 +65,10 @@ audio_input_tap_node::audio_input_tap_node() : super_class(std::make_unique<impl
 }
 
 audio_input_tap_node::audio_input_tap_node(std::nullptr_t) : super_class(nullptr)
+{
+}
+
+audio_input_tap_node::audio_input_tap_node(const audio_node &node, audio_node::cast_tag_t)
+    : super_class(std::dynamic_pointer_cast<audio_input_tap_node::impl>(audio_node::private_access::impl(node)))
 {
 }

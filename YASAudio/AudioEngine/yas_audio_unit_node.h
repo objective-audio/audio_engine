@@ -15,14 +15,12 @@ namespace yas
 
     class audio_unit_node : public audio_node
     {
-        using super_class = audio_node;
-
        public:
-        class impl;
-
         audio_unit_node(std::nullptr_t);
         audio_unit_node(const AudioComponentDescription &);
         audio_unit_node(const OSType type, const OSType sub_type);
+
+        audio_unit_node(const audio_node &, audio_node::cast_tag_t);
 
         virtual ~audio_unit_node();
 
@@ -45,15 +43,21 @@ namespace yas
         Float32 output_parameter_value(const AudioUnitParameterID parameter_id, const AudioUnitElement element) const;
 
        protected:
-        audio_unit_node(std::shared_ptr<impl> &&, const AudioComponentDescription &);
+        class impl;
+
+        audio_unit_node(std::shared_ptr<impl> &&, const AudioComponentDescription &, create_tag_t);
         explicit audio_unit_node(const std::shared_ptr<impl> &);
 
        private:
+        using super_class = audio_node;
+
         std::shared_ptr<impl> _impl_ptr() const;
 
        public:
         class private_access;
         friend private_access;
+
+        friend weak<audio_unit_node>;
     };
 }
 
