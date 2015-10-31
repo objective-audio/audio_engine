@@ -5,7 +5,6 @@
 
 #include "yas_audio_engine_impl.h"
 
-#include "yas_weak.h"
 #include "yas_audio_node.h"
 #include "yas_audio_unit_node.h"
 #include "yas_audio_device_io_node.h"
