@@ -211,10 +211,10 @@ void audio_node::impl::add_connection(const audio_connection &connection)
 {
     if (connection.destination_node()._impl->_core == _core) {
         auto bus_idx = connection.destination_bus();
-        _core->input_connections.insert(std::make_pair(bus_idx, weak<audio_connection>(connection)));
+        _core->input_connections.insert(std::make_pair(bus_idx, base_weak<audio_connection>(connection)));
     } else if (connection.source_node()._impl->_core == _core) {
         auto bus_idx = connection.source_bus();
-        _core->output_connections.insert(std::make_pair(bus_idx, weak<audio_connection>(connection)));
+        _core->output_connections.insert(std::make_pair(bus_idx, base_weak<audio_connection>(connection)));
     } else {
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : connection does not exist in a node.");
     }
