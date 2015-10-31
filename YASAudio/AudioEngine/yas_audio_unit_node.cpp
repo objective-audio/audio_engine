@@ -15,7 +15,8 @@ audio_unit_node::audio_unit_node(std::nullptr_t) : super_class(nullptr)
 {
 }
 
-audio_unit_node::audio_unit_node(const AudioComponentDescription &acd) : audio_unit_node(std::make_shared<impl>(), acd)
+audio_unit_node::audio_unit_node(const AudioComponentDescription &acd)
+    : audio_unit_node(std::make_unique<impl>(), acd, create_tag)
 {
 }
 
@@ -30,8 +31,13 @@ audio_unit_node::audio_unit_node(const OSType type, const OSType sub_type)
 {
 }
 
-audio_unit_node::audio_unit_node(std::shared_ptr<impl> &&impl, const AudioComponentDescription &acd)
-    : audio_node(std::move(impl))
+audio_unit_node::audio_unit_node(const audio_node &node, audio_node::cast_tag_t)
+    : super_class(std::dynamic_pointer_cast<audio_unit_node::impl>(audio_node::private_access::impl(node)))
+{
+}
+
+audio_unit_node::audio_unit_node(std::shared_ptr<impl> &&impl, const AudioComponentDescription &acd, create_tag_t)
+    : audio_node(std::move(impl), create_tag)
 {
     _impl_ptr()->prepare(*this, acd);
 }
@@ -113,5 +119,5 @@ Float32 audio_unit_node::output_parameter_value(const AudioUnitParameterID param
 
 std::shared_ptr<audio_unit_node::impl> audio_unit_node::_impl_ptr() const
 {
-    return impl_ptr<impl>();
+    return std::dynamic_pointer_cast<audio_unit_node::impl>(_impl);
 }

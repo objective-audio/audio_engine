@@ -5,7 +5,7 @@
 
 #pragma once
 
-class yas::audio_node::impl : public base::impl
+class yas::audio_node::impl
 {
    public:
     impl();
@@ -53,7 +53,7 @@ class yas::audio_node::impl : public base::impl
     template <typename T>
     T node_cast() const
     {
-        return node().cast<T>();
+        return T(node(), cast_tag);
     }
 
     audio_engine engine() const;

@@ -70,8 +70,8 @@ class audio_connection::impl : public base::impl
     }
 
    private:
-    base_weak<audio_node> _source_node;
-    base_weak<audio_node> _destination_node;
+    weak<audio_node> _source_node;
+    weak<audio_node> _destination_node;
 };
 
 audio_connection::audio_connection(std::nullptr_t) : super_class(nullptr)

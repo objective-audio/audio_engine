@@ -179,12 +179,12 @@ void yas::test::audio_unit_render_on_sub_thread(audio_unit &unit, yas::audio_for
 class test::audio_test_node::impl : public yas::audio_node::impl
 {
    public:
-    UInt32 input_bus_count() const override
+    virtual UInt32 input_bus_count() const override
     {
         return _input_bus_count;
     }
 
-    UInt32 output_bus_count() const override
+    virtual UInt32 output_bus_count() const override
     {
         return _output_bus_count;
     }
@@ -202,15 +202,15 @@ yas::test::audio_test_node::audio_test_node(const UInt32 input_bus_count, const 
 
 void yas::test::audio_test_node::set_input_bus_count(const UInt32 &count)
 {
-    _impl_ptr()->_input_bus_count = count;
+    impl_ptr()->_input_bus_count = count;
 }
 
 void yas::test::audio_test_node::set_output_bus_count(const UInt32 &count)
 {
-    _impl_ptr()->_output_bus_count = count;
+    impl_ptr()->_output_bus_count = count;
 }
 
-std::shared_ptr<yas::test::audio_test_node::impl> yas::test::audio_test_node::_impl_ptr() const
+yas::test::audio_test_node::impl *yas::test::audio_test_node::impl_ptr() const
 {
-    return impl_ptr<impl>();
+    return dynamic_cast<yas::test::audio_test_node::impl *>(_impl.get());
 }

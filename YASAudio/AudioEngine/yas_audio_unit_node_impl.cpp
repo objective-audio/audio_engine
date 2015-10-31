@@ -281,7 +281,7 @@ void audio_unit_node::impl::remove_audio_unit_from_graph()
     _core->weak_graph.reset();
 }
 
-base_weak<audio_unit_node> audio_unit_node::impl::weak_node() const
+weak<audio_unit_node> audio_unit_node::impl::weak_node() const
 {
     return node().cast<audio_unit_node>();
 }

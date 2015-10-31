@@ -16,8 +16,6 @@ namespace yas
 
     class audio_unit_io_node : public audio_unit_node
     {
-        using super_class = audio_unit_node;
-
        public:
         audio_unit_io_node();
         audio_unit_io_node(std::nullptr_t);
@@ -36,6 +34,9 @@ namespace yas
         UInt32 output_device_channel_count() const;
         UInt32 input_device_channel_count() const;
 
+       private:
+        using super_class = audio_unit_node;
+
        protected:
         class impl;
 
@@ -47,33 +48,42 @@ namespace yas
 
     class audio_unit_output_node : public audio_unit_io_node
     {
-        using super_class = audio_unit_io_node;
-
        public:
-        class impl;
-
         audio_unit_output_node();
         audio_unit_output_node(std::nullptr_t);
-
-        void set_channel_map(const channel_map_t &map);
-        const channel_map_t &channel_map() const;
-    };
-
-    class audio_unit_input_node : public audio_unit_io_node
-    {
-        using super_class = audio_unit_io_node;
-
-       public:
-        class impl;
-
-        audio_unit_input_node();
-        audio_unit_input_node(std::nullptr_t);
+        audio_unit_output_node(const audio_node &, audio_node::cast_tag_t);
 
         void set_channel_map(const channel_map_t &map);
         const channel_map_t &channel_map() const;
 
        private:
+        using super_class = audio_unit_io_node;
+        class impl;
+
+        audio_unit_output_node(const std::shared_ptr<audio_unit_output_node::impl> &impl);
+
+        friend weak<audio_unit_output_node>;
+    };
+
+    class audio_unit_input_node : public audio_unit_io_node
+    {
+       public:
+        audio_unit_input_node();
+        audio_unit_input_node(std::nullptr_t);
+        audio_unit_input_node(const audio_node &, audio_node::cast_tag_t);
+
+        void set_channel_map(const channel_map_t &map);
+        const channel_map_t &channel_map() const;
+
+       private:
+        using super_class = audio_unit_io_node;
+        class impl;
+
+        audio_unit_input_node(const std::shared_ptr<audio_unit_input_node::impl> &);
+
         std::shared_ptr<impl> _impl_ptr() const;
+
+        friend weak<audio_unit_input_node>;
     };
 }
 

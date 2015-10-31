@@ -19,11 +19,11 @@ namespace yas
     class audio_device_io_node : public audio_node
     {
        public:
-        class impl;
-
         audio_device_io_node();
         audio_device_io_node(std::nullptr_t);
         audio_device_io_node(const audio_device &device);
+
+        audio_device_io_node(const audio_node &, audio_node::cast_tag_t);
 
         virtual ~audio_device_io_node();
 
@@ -32,6 +32,7 @@ namespace yas
 
        private:
         using super_class = audio_node;
+        class impl;
 
         std::shared_ptr<impl> _impl_ptr() const;
 
@@ -41,6 +42,8 @@ namespace yas
        public:
         class private_access;
         friend private_access;
+
+        friend weak<audio_device_io_node>;
     };
 }
 

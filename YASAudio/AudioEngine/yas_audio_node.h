@@ -10,7 +10,7 @@
 #include "yas_audio_format.h"
 #include "yas_audio_pcm_buffer.h"
 #include "yas_audio_connection.h"
-#include "yas_base.h"
+#include "yas_weak.h"
 #include <memory>
 #include <map>
 #include <experimental/optional>
@@ -19,13 +19,14 @@ namespace yas
 {
     class audio_engine;
 
-    class audio_node : public base
+    class audio_node
     {
-        using super_class = base;
-
        public:
+        struct cast_tag_t {
+        };
         struct create_tag_t {
         };
+        constexpr static cast_tag_t cast_tag{};
         constexpr static create_tag_t create_tag{};
 
         explicit audio_node(std::nullptr_t);
@@ -36,6 +37,14 @@ namespace yas
         audio_node &operator=(const audio_node &) = default;
         audio_node &operator=(audio_node &&) = default;
         audio_node &operator=(std::nullptr_t);
+
+        bool operator==(const audio_node &);
+        bool operator!=(const audio_node &);
+
+        bool expired() const;
+        explicit operator bool() const;
+
+        uintptr_t key() const;
 
         void reset();
 
@@ -51,6 +60,12 @@ namespace yas
         UInt32 input_bus_count() const;
         UInt32 output_bus_count() const;
 
+        template <typename T>
+        T cast() const
+        {
+            return T(*this, cast_tag);
+        }
+
         void render(audio_pcm_buffer &buffer, const UInt32 bus_idx, const audio_time &when);
         void set_render_time_on_render(const audio_time &time);
 
@@ -58,13 +73,21 @@ namespace yas
         class kernel;
         class impl;
 
-        explicit audio_node(const std::shared_ptr<impl> &);
+        audio_node(std::shared_ptr<impl> &&, create_tag_t);
+        audio_node(const std::shared_ptr<audio_node::impl> &);
 
-        std::shared_ptr<impl> _impl_ptr() const;
+        audio_connection input_connection(const UInt32 bus_idx) const;
+        audio_connection output_connection(const UInt32 bus_idx) const;
+        const audio_connection_wmap &input_connections() const;
+        const audio_connection_wmap &output_connections() const;
+
+        std::shared_ptr<impl> _impl;
 
        public:
         class private_access;
         friend private_access;
+
+        friend weak<audio_node>;
     };
 }
 
