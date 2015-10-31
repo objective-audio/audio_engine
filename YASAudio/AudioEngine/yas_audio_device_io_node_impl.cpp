@@ -79,7 +79,7 @@ void audio_device_io_node::impl::update_connections()
     }
 
     auto weak_node = _core->weak_node;
-    weak<audio_device_io> weak_device_io(device_io);
+    auto weak_device_io = to_base_weak(device_io);
 
     auto render_function = [weak_node, weak_device_io](audio_pcm_buffer &output_buffer, const audio_time &when) {
         if (auto node = weak_node.lock()) {

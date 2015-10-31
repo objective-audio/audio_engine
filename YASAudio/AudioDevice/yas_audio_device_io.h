@@ -11,33 +11,28 @@
 #include "yas_audio_types.h"
 #include "yas_audio_pcm_buffer.h"
 #include "yas_audio_device.h"
-#include "yas_weak.h"
+#include "yas_base.h"
 #include <functional>
 #include <memory>
 
 namespace yas
 {
-    class audio_device_io
+    class audio_device_io : public base
     {
+        using super_class = base;
+
        public:
         using render_f = std::function<void(audio_pcm_buffer &output_buffer, const audio_time &when)>;
 
-        audio_device_io(std::nullptr_t n = nullptr);
+        audio_device_io(std::nullptr_t);
         explicit audio_device_io(const audio_device &device);
 
-        ~audio_device_io() = default;
+        ~audio_device_io();
 
         audio_device_io(const audio_device_io &) = default;
         audio_device_io(audio_device_io &&) = default;
         audio_device_io &operator=(const audio_device_io &) = default;
         audio_device_io &operator=(audio_device_io &&) = default;
-
-        bool operator==(const audio_device_io &) const;
-        bool operator!=(const audio_device_io &) const;
-
-        explicit operator bool() const;
-
-        void prepare();
 
         void set_device(const audio_device device);
         audio_device device() const;
@@ -55,15 +50,11 @@ namespace yas
        private:
         class kernel;
         class impl;
-        std::shared_ptr<impl> _impl;
 
-        audio_device_io(const std::shared_ptr<audio_device_io::impl> &);
+        std::shared_ptr<impl> _impl_ptr() const;
 
         void _initialize();
         void _uninitialize();
-
-       public:
-        friend weak<audio_device_io>;
     };
 }
 
