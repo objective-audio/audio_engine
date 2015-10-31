@@ -6,17 +6,24 @@
 #include "yas_audio_unit_io_node.h"
 
 #if TARGET_OS_IPHONE
-namespace yas
-{
-    OSType const audio_unit_sub_type_default_io = kAudioUnitSubType_RemoteIO;
-}
 #elif TARGET_OS_MAC
 #include "yas_audio_device.h"
+#endif
+
 namespace yas
 {
-    OSType const audio_unit_sub_type_default_io = kAudioUnitSubType_HALOutput;
-}
+    constexpr AudioComponentDescription audio_unit_io_node_acd = {
+        .componentType = kAudioUnitType_Output,
+#if TARGET_OS_IPHONE
+        .componentSubType = kAudioUnitSubType_RemoteIO,
+#elif TARGET_OS_MAC
+        .componentSubType = kAudioUnitSubType_HALOutput,
 #endif
+        .componentManufacturer = kAudioUnitManufacturer_Apple,
+        .componentFlags = 0,
+        .componentFlagsMask = 0,
+    };
+}
 
 using namespace yas;
 
@@ -31,15 +38,7 @@ audio_unit_io_node::audio_unit_io_node() : audio_unit_io_node(std::make_unique<i
 }
 
 audio_unit_io_node::audio_unit_io_node(std::shared_ptr<impl> &&impl, create_tag_t)
-    : super_class(std::move(impl),
-                  AudioComponentDescription{
-                      .componentType = kAudioUnitType_Output,
-                      .componentSubType = audio_unit_sub_type_default_io,
-                      .componentManufacturer = kAudioUnitManufacturer_Apple,
-                      .componentFlags = 0,
-                      .componentFlagsMask = 0,
-                  },
-                  create_tag)
+    : super_class(std::move(impl), audio_unit_io_node_acd)
 {
 }
 
@@ -90,7 +89,7 @@ audio_device audio_unit_io_node::device() const
 
 std::shared_ptr<audio_unit_io_node::impl> audio_unit_io_node::_impl_ptr() const
 {
-    return std::dynamic_pointer_cast<audio_unit_io_node::impl>(_impl);
+    return impl_ptr<impl>();
 }
 
 #pragma mark - audio_unit_output_node
@@ -99,17 +98,7 @@ audio_unit_output_node::audio_unit_output_node(std::nullptr_t) : super_class()
 {
 }
 
-audio_unit_output_node::audio_unit_output_node() : super_class(std::make_unique<impl>(), create_tag)
-{
-}
-
-audio_unit_output_node::audio_unit_output_node(const std::shared_ptr<audio_unit_output_node::impl> &impl)
-    : super_class(impl)
-{
-}
-
-audio_unit_output_node::audio_unit_output_node(const audio_node &node, audio_node::cast_tag_t)
-    : super_class(std::dynamic_pointer_cast<audio_unit_output_node::impl>(audio_node::private_access::impl(node)))
+audio_unit_output_node::audio_unit_output_node() : super_class(std::make_unique<impl>())
 {
 }
 
@@ -129,17 +118,7 @@ audio_unit_input_node::audio_unit_input_node(std::nullptr_t) : super_class(nullp
 {
 }
 
-audio_unit_input_node::audio_unit_input_node() : super_class(std::make_unique<impl>(), create_tag)
-{
-}
-
-audio_unit_input_node::audio_unit_input_node(const std::shared_ptr<audio_unit_input_node::impl> &impl)
-    : super_class(impl)
-{
-}
-
-audio_unit_input_node::audio_unit_input_node(const audio_node &node, audio_node::cast_tag_t)
-    : super_class(std::dynamic_pointer_cast<audio_unit_input_node::impl>(audio_node::private_access::impl(node)))
+audio_unit_input_node::audio_unit_input_node() : super_class(std::make_unique<impl>())
 {
 }
 
@@ -155,5 +134,5 @@ const channel_map_t &audio_unit_input_node::channel_map() const
 
 std::shared_ptr<audio_unit_input_node::impl> audio_unit_input_node::_impl_ptr() const
 {
-    return std::dynamic_pointer_cast<audio_unit_input_node::impl>(_impl);
+    return impl_ptr<impl>();
 }

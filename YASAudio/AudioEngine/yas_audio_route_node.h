@@ -11,6 +11,8 @@ namespace yas
 {
     class audio_route_node : public audio_node
     {
+        using super_class = audio_node;
+
        public:
         audio_route_node();
         audio_route_node(std::nullptr_t);
@@ -26,7 +28,6 @@ namespace yas
         void clear_routes();
 
        private:
-        using super_class = audio_node;
         class kernel;
         class impl;
 

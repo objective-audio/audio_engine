@@ -7,6 +7,8 @@
 
 class yas::audio_tap_node::impl : public super_class::impl
 {
+    using super_class = super_class::impl;
+
    public:
     impl();
     virtual ~impl();
@@ -30,8 +32,6 @@ class yas::audio_tap_node::impl : public super_class::impl
     void render_source(audio_pcm_buffer &buffer, const UInt32 bus_idx, const audio_time &when);
 
    private:
-    using super_class = super_class::impl;
-
     class core;
     std::unique_ptr<core> _core;
 };
