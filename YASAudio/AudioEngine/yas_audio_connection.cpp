@@ -31,10 +31,10 @@ class audio_connection::impl : public base::impl
     void remove_connection_from_nodes(const audio_connection &connection)
     {
         if (auto node = _destination_node.lock()) {
-            static_cast<audio_node_from_connection *>(&node)->_remove_connection(connection);
+            static_cast<audio_node_from_connection &>(node)._remove_connection(connection);
         }
         if (auto node = _source_node.lock()) {
-            static_cast<audio_node_from_connection *>(&node)->_remove_connection(connection);
+            static_cast<audio_node_from_connection &>(node)._remove_connection(connection);
         }
     }
 
@@ -96,8 +96,8 @@ audio_connection::audio_connection(audio_node &source_node, const UInt32 source_
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : invalid argument.");
     }
 
-    static_cast<audio_node_from_connection *>(&source_node)->_add_connection(*this);
-    static_cast<audio_node_from_connection *>(&destination_node)->_add_connection(*this);
+    static_cast<audio_node_from_connection &>(source_node)._add_connection(*this);
+    static_cast<audio_node_from_connection &>(destination_node)._add_connection(*this);
 }
 
 UInt32 audio_connection::source_bus() const
