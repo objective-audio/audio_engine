@@ -14,7 +14,7 @@
 #include "yas_audio_device_stream.h"
 #include <AudioToolbox/AudioToolbox.h>
 #include <vector>
-#include <map>
+#include <unordered_map>
 #include <set>
 #include <memory>
 #include <string>
@@ -63,6 +63,7 @@ namespace yas
         static audio_device default_input_device();
         static audio_device device_for_id(const AudioDeviceID);
         static std::experimental::optional<size_t> index_of_device(const audio_device &);
+        static bool is_available_device(const audio_device &);
 
         audio_device(std::nullptr_t n = nullptr);
 
