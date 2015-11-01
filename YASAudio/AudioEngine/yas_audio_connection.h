@@ -52,4 +52,6 @@ namespace yas
     };
 }
 
+#if YAS_TEST
 #include "yas_audio_connection_private_access.h"
+#endif

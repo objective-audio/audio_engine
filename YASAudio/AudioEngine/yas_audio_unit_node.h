@@ -66,4 +66,7 @@ namespace yas
 }
 
 #include "yas_audio_unit_node_impl.h"
+
+#if YAS_TEST
 #include "yas_audio_unit_node_private_access.h"
+#endif

@@ -97,4 +97,7 @@ namespace yas
 
 #include "yas_audio_node_kernel.h"
 #include "yas_audio_node_impl.h"
+
+#if YAS_TEST
 #include "yas_audio_node_private_access.h"
+#endif

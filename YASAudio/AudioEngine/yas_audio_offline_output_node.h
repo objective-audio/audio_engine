@@ -46,4 +46,7 @@ namespace yas
 }
 
 #include "yas_audio_offline_output_node_impl.h"
+
+#if YAS_TEST
 #include "yas_audio_offline_output_node_private_access.h"
+#endif

@@ -82,4 +82,7 @@ namespace yas
 }
 
 #include "yas_audio_engine_impl.h"
+
+#if YAS_TEST
 #include "yas_audio_engine_private_access.h"
+#endif
