@@ -66,6 +66,8 @@
 
     for (UInt32 buf_idx = 0; buf_idx < channels; buf_idx++) {
         yas::audio_enumerator enumerator(buffer, buf_idx);
+        XCTAssertEqual(enumerator.length(), frame_length);
+
         const auto pointer = enumerator.pointer();
         const auto index = enumerator.index();
 
@@ -74,7 +76,7 @@
             while (pointer->v) {
                 XCTAssertEqual(*index, frame);
                 XCTAssertEqual(*pointer->f32, (Float32)yas::test::test_value(frame, 0, buf_idx));
-                enumerator.move();
+                ++enumerator;
                 ++frame;
             }
             XCTAssertEqual(frame, frame_length);
