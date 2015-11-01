@@ -3,9 +3,7 @@
 //  Copyright (c) 2015 Yuki Yasoshima.
 //
 
-#include "yas_audio_engine_impl.h"
-
-#include "yas_weak.h"
+#include "yas_audio_engine.h"
 #include "yas_audio_node.h"
 #include "yas_audio_unit_node.h"
 #include "yas_audio_device_io_node.h"
@@ -21,6 +19,21 @@
 #endif
 
 using namespace yas;
+
+namespace yas
+{
+    class audio_connection_for_engine : public audio_connection
+    {
+        using super_class = audio_connection;
+
+       public:
+        audio_connection_for_engine(audio_node &source_node, const UInt32 source_bus, audio_node &destination_node,
+                                    const UInt32 destination_bus, const audio_format &format)
+            : super_class(source_node, source_bus, destination_node, destination_bus, format)
+        {
+        }
+    };
+}
 
 class audio_engine::impl::core
 {
@@ -143,7 +156,8 @@ void audio_engine::impl::attach_node(audio_node &node)
     }
 
     _core->nodes.insert(std::make_pair(node.key(), node));
-    audio_node::private_access::set_engine(node, _core->weak_engine.lock());
+
+    static_cast<audio_node_from_engine *>(&node)->_set_engine(_core->weak_engine.lock());
 
     add_node_to_graph(node);
 }
@@ -163,7 +177,9 @@ void audio_engine::impl::detach_node(audio_node &node)
     });
 
     remove_node_from_graph(node);
-    audio_node::private_access::set_engine(node, audio_engine(nullptr));
+
+    static_cast<audio_node_from_engine *>(&node)->_set_engine(audio_engine(nullptr));
+
     _core->nodes.erase(node.key());
 }
 
@@ -229,8 +245,7 @@ audio_connection audio_engine::impl::connect(audio_node &source_node, audio_node
         attach_node(destination_node);
     }
 
-    auto connection = audio_connection::private_access::create(source_node, source_bus_idx, destination_node,
-                                                               destination_bus_idx, format);
+    audio_connection_for_engine connection(source_node, source_bus_idx, destination_node, destination_bus_idx, format);
 
     connections().insert(std::make_pair(connection.key(), connection));
 
@@ -251,7 +266,7 @@ void audio_engine::impl::disconnect(audio_connection &connection)
     audio_connection::private_access::remove_nodes(connection);
 
     for (auto &node : update_nodes) {
-        audio_node::private_access::update_connections(node);
+        static_cast<audio_node_from_engine *>(&node)->_update_connections();
         detach_node_if_unused(node);
     }
 
@@ -276,12 +291,12 @@ void audio_engine::impl::disconnect_node_with_predicate(std::function<bool(const
         update_nodes.insert(std::make_pair(connection.source_node().key(), connection.source_node()));
         update_nodes.insert(std::make_pair(connection.destination_node().key(), connection.destination_node()));
         remove_connection_from_nodes(connection);
-        audio_connection::private_access::remove_nodes(connection);
+        static_cast<audio_connection_from_engine *>(&connection)->_remove_nodes();
     }
 
     for (auto &pair : update_nodes) {
         auto &node = pair.second;
-        audio_node::private_access::update_connections(node);
+        static_cast<audio_node_from_engine *>(&node)->_update_connections();
         detach_node_if_unused(node);
     }
 
@@ -298,7 +313,7 @@ void audio_engine::impl::add_node_to_graph(audio_node &node)
     }
 
     if (auto unit_node = node.cast<audio_unit_node>()) {
-        yas::audio_unit_node::private_access::add_audio_unit_to_graph(unit_node, _core->graph);
+        static_cast<audio_unit_node_from_engine *>(&unit_node)->_add_audio_unit_to_graph(_core->graph);
     }
 
 #if (!TARGET_OS_IPHONE & TARGET_OS_MAC)
@@ -323,7 +338,7 @@ void audio_engine::impl::remove_node_from_graph(const audio_node &node)
     }
 
     if (auto unit_node = node.cast<audio_unit_node>()) {
-        yas::audio_unit_node::private_access::remove_audio_unit_from_graph(unit_node);
+        static_cast<audio_unit_node_from_engine *>(&unit_node)->_remove_audio_unit_from_graph();
     }
 
 #if (!TARGET_OS_IPHONE & TARGET_OS_MAC)
@@ -354,8 +369,8 @@ bool audio_engine::impl::add_connection(const audio_connection &connection)
         return false;
     }
 
-    audio_node::private_access::add_connection(destination_node, connection);
-    audio_node::private_access::add_connection(source_node, connection);
+    static_cast<audio_node_from_engine *>(&destination_node)->_add_connection(connection);
+    static_cast<audio_node_from_engine *>(&source_node)->_add_connection(connection);
 
     return true;
 }
@@ -368,11 +383,11 @@ void audio_engine::impl::remove_connection_from_nodes(const audio_connection &co
     }
 
     if (auto source_node = connection.source_node()) {
-        audio_node::private_access::remove_connection(source_node, connection);
+        static_cast<audio_node_from_engine *>(&source_node)->_remove_connection(connection);
     }
 
     if (auto destination_node = connection.destination_node()) {
-        audio_node::private_access::remove_connection(destination_node, connection);
+        static_cast<audio_node_from_engine *>(&destination_node)->_remove_connection(connection);
     }
 }
 
@@ -382,7 +397,7 @@ void audio_engine::impl::update_node_connections(audio_node &node)
         return;
     }
 
-    audio_node::private_access::update_connections(node);
+    static_cast<audio_node_from_engine *>(&node)->_update_connections();
 }
 
 void audio_engine::impl::update_all_node_connections()
@@ -392,7 +407,7 @@ void audio_engine::impl::update_all_node_connections()
     }
 
     for (auto &pair : _core->nodes) {
-        audio_node::private_access::update_connections(pair.second);
+        static_cast<audio_node_from_engine *>(&pair.second)->_update_connections();
     }
 }
 
@@ -502,8 +517,8 @@ audio_engine::start_result_t audio_engine::impl::start_offline_render(const offl
         return start_result_t(start_error_t::offline_output_not_found);
     }
 
-    auto result =
-        audio_offline_output_node::private_access::start(offline_output_node, render_function, completion_function);
+    auto node_from_engine = static_cast<audio_offline_output_unit_from_engine *>(&offline_output_node);
+    auto result = node_from_engine->_start(render_function, completion_function);
 
     if (result) {
         return start_result_t(nullptr);
@@ -519,7 +534,7 @@ void audio_engine::impl::stop()
     }
 
     if (auto offline_output_node = _core->offline_output_node) {
-        audio_offline_output_node::private_access::stop(offline_output_node);
+        static_cast<audio_offline_output_unit_from_engine *>(&offline_output_node)->_stop();
     }
 }
 

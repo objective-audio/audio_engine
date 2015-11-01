@@ -125,7 +125,7 @@
 
     yas::audio_node::private_access::set_engine(node, engine);
 
-    XCTAssertEqual(engine, yas::audio_node::private_access::engine(node));
+    XCTAssertEqual(engine, node.engine());
 
     yas::audio_node::private_access::set_engine(node, yas::audio_engine(nullptr));
 

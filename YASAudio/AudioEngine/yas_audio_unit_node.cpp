@@ -115,3 +115,13 @@ std::shared_ptr<audio_unit_node::impl> audio_unit_node::_impl_ptr() const
 {
     return impl_ptr<impl>();
 }
+
+void audio_unit_node::_add_audio_unit_to_graph(audio_graph &graph)
+{
+    _impl_ptr()->add_audio_unit_to_graph(graph);
+}
+
+void audio_unit_node::_remove_audio_unit_from_graph()
+{
+    _impl_ptr()->remove_audio_unit_from_graph();
+}

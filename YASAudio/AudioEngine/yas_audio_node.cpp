@@ -98,3 +98,53 @@ std::shared_ptr<audio_node::impl> audio_node::_impl_ptr() const
 {
     return impl_ptr<impl>();
 }
+
+audio_connection audio_node::_input_connection(const UInt32 bus_idx) const
+{
+    return _impl_ptr()->input_connection(bus_idx);
+}
+
+audio_connection audio_node::_output_connection(const UInt32 bus_idx) const
+{
+    return _impl_ptr()->output_connection(bus_idx);
+}
+
+const audio_connection_wmap &audio_node::_input_connections() const
+{
+    return _impl_ptr()->input_connections();
+}
+
+const audio_connection_wmap &audio_node::_output_connections() const
+{
+    return _impl_ptr()->output_connections();
+}
+
+void audio_node::_add_connection(const audio_connection &connection)
+{
+    _impl_ptr()->add_connection(connection);
+}
+
+void audio_node::_remove_connection(const audio_connection &connection)
+{
+    _impl_ptr()->remove_connection(connection);
+}
+
+void audio_node::_set_engine(const audio_engine &engine)
+{
+    _impl_ptr()->set_engine(engine);
+}
+
+audio_engine audio_node::_engine()
+{
+    return _impl_ptr()->engine();
+}
+
+void audio_node::_update_kernel()
+{
+    _impl_ptr()->update_kernel();
+}
+
+void audio_node::_update_connections()
+{
+    _impl_ptr()->update_connections();
+}

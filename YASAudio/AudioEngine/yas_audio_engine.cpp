@@ -5,6 +5,7 @@
 
 #include "yas_audio_engine.h"
 #include "yas_audio_engine_impl.h"
+#include "yas_audio_node.h"
 
 using namespace yas;
 
@@ -125,16 +126,6 @@ void audio_engine::stop()
 subject &audio_engine::subject() const
 {
     return _impl_ptr()->subject();
-}
-
-std::unordered_map<uintptr_t, audio_node> &audio_engine::_nodes() const
-{
-    return _impl_ptr()->nodes();
-}
-
-audio_connection_map &audio_engine::_connections() const
-{
-    return _impl_ptr()->connections();
 }
 
 std::string yas::to_string(const audio_engine::start_error_t &error)

@@ -5,7 +5,7 @@
 
 #pragma once
 
-class yas::audio_node::kernel
+class yas::audio_node::kernel : public kernel_from_node
 {
    public:
     kernel();
@@ -25,8 +25,10 @@ class yas::audio_node::kernel
     kernel &operator=(const kernel &) = delete;
     kernel &operator=(kernel &&) = delete;
 
-    void _set_input_connections(const audio_connection_wmap &);
-    void _set_output_connections(const audio_connection_wmap &);
+    // from node
+
+    void _set_input_connections(const audio_connection_wmap &) override;
+    void _set_output_connections(const audio_connection_wmap &) override;
 
    public:
     class private_access;

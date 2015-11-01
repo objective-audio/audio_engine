@@ -58,8 +58,6 @@ namespace yas
     std::string to_string(const AudioUnitScope scope);
     std::string to_string(const render_type &);
 
-    class audio_time;
-    class audio_pcm_buffer;
     class audio_route;
 
     constexpr std::experimental::nullopt_t nullopt = std::experimental::nullopt;
@@ -70,7 +68,4 @@ namespace yas
     using channel_map_t = std::vector<UInt32>;
 
     using audio_route_set = std::set<audio_route>;
-
-    using offline_render_f = std::function<void(audio_pcm_buffer &buffer, const audio_time &when, bool &stop)>;
-    using offline_completion_f = std::function<void(const bool cancelled)>;
 }

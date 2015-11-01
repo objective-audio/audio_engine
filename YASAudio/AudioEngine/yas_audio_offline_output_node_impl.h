@@ -13,8 +13,7 @@ class yas::audio_offline_output_node::impl : public super_class::impl
     impl();
     ~impl();
 
-    audio_offline_output_node::start_result_t start(const offline_render_f &render_func,
-                                                    const offline_completion_f &completion_func);
+    offline_start_result_t start(const offline_render_f &render_func, const offline_completion_f &completion_func);
     void stop();
 
     virtual void reset() override;

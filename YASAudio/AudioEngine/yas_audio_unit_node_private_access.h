@@ -21,17 +21,5 @@ namespace yas
         {
             node._impl_ptr()->prepare_parameters();
         }
-
-        template <typename T>
-        static void add_audio_unit_to_graph(T &node, audio_graph &graph)
-        {
-            node._impl_ptr()->add_audio_unit_to_graph(graph);
-        }
-
-        template <typename T>
-        static void remove_audio_unit_from_graph(T &node)
-        {
-            node._impl_ptr()->remove_audio_unit_from_graph();
-        }
     };
 }

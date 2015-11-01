@@ -9,7 +9,6 @@
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
 
 #include "yas_audio_types.h"
-#include "yas_audio_pcm_buffer.h"
 #include "yas_audio_device.h"
 #include "yas_base.h"
 #include <functional>
@@ -17,6 +16,9 @@
 
 namespace yas
 {
+    class audio_pcm_buffer;
+    class audio_time;
+
     class audio_device_io : public base
     {
         using super_class = base;
