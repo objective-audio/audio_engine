@@ -107,7 +107,7 @@ namespace yas
             }
         }
 
-        static std::map<AudioDeviceID, audio_device> &all_devices_map()
+        static std::unordered_map<AudioDeviceID, audio_device> &all_devices_map()
         {
             initialize();
             return audio_device_global::instance()._all_devices;
@@ -147,7 +147,7 @@ namespace yas
         }
 
        private:
-        std::map<AudioDeviceID, audio_device> _all_devices;
+        std::unordered_map<AudioDeviceID, audio_device> _all_devices;
         listener_f _system_listener = nullptr;
 
         static audio_device_global &instance()
@@ -202,8 +202,8 @@ class audio_device::impl
 {
    public:
     const AudioDeviceID audio_device_id;
-    std::map<AudioStreamID, audio_device_stream> input_streams_map;
-    std::map<AudioStreamID, audio_device_stream> output_streams_map;
+    std::unordered_map<AudioStreamID, audio_device_stream> input_streams_map;
+    std::unordered_map<AudioStreamID, audio_device_stream> output_streams_map;
     subject property_subject;
 
     impl(AudioDeviceID device_id)

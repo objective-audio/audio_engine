@@ -14,7 +14,7 @@
 #include "yas_audio_device_stream.h"
 #include <AudioToolbox/AudioToolbox.h>
 #include <vector>
-#include <map>
+#include <unordered_map>
 #include <set>
 #include <memory>
 #include <string>
