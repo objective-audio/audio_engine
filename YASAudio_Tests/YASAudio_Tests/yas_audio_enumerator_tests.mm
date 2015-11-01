@@ -76,7 +76,7 @@
             while (pointer->v) {
                 XCTAssertEqual(*index, frame);
                 XCTAssertEqual(*pointer->f32, (Float32)yas::test::test_value(frame, 0, buf_idx));
-                ++enumerator;
+                ++enumerator;  // enumerator.move()
                 ++frame;
             }
             XCTAssertEqual(frame, frame_length);
