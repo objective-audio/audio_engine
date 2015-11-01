@@ -177,7 +177,9 @@ class audio_graph::impl : public base::impl
             throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
         }
 
-        if (audio_unit::private_access::key(unit)) {
+        auto unit_from_graph = static_cast<audio_unit_from_graph *>(&unit);
+
+        if (unit_from_graph->_key()) {
             throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : audio_unit.key is not null.");
         }
 
@@ -185,8 +187,8 @@ class audio_graph::impl : public base::impl
 
         auto unit_key = next_unit_key();
         if (unit_key) {
-            audio_unit::private_access::set_graph_key(unit, key());
-            audio_unit::private_access::set_key(unit, *unit_key);
+            unit_from_graph->_set_graph_key(key());
+            unit_from_graph->_set_key(*unit_key);
             auto pair = std::make_pair(*unit_key, unit);
             units.insert(pair);
             if (unit.is_output_unit()) {
@@ -199,21 +201,25 @@ class audio_graph::impl : public base::impl
     {
         std::lock_guard<std::recursive_mutex> lock(mutex);
 
-        if (auto key = audio_unit::private_access::key(unit)) {
+        auto unit_from_graph = static_cast<audio_unit_from_graph *>(&unit);
+
+        if (auto key = unit_from_graph->_key()) {
             units.erase(*key);
             io_units.erase(*key);
-            audio_unit::private_access::set_key(unit, nullopt);
-            audio_unit::private_access::set_graph_key(unit, nullopt);
+            unit_from_graph->_set_key(nullopt);
+            unit_from_graph->_set_graph_key(nullopt);
         }
     }
 
     void remove_audio_unit(audio_unit &unit)
     {
-        if (!audio_unit::private_access::key(unit)) {
+        auto unit_from_graph = static_cast<audio_unit_from_graph *>(&unit);
+
+        if (!unit_from_graph->_key()) {
             throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : audio_unit.key is not assigned.");
         }
 
-        audio_unit::private_access::uninitialize(unit);
+        unit_from_graph->_uninitialize();
 
         remove_unit_from_units(unit);
     }
@@ -291,13 +297,15 @@ void audio_graph::prepare()
 
 void audio_graph::add_audio_unit(audio_unit &unit)
 {
-    if (audio_unit::private_access::key(unit)) {
+    auto unit_from_graph = static_cast<audio_unit_from_graph *>(&unit);
+
+    if (unit_from_graph->_key()) {
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : audio_unit.key is assigned.");
     }
 
     _impl_ptr()->add_unit_to_units(unit);
 
-    audio_unit::private_access::initialize(unit);
+    unit_from_graph->_initialize();
 
     if (unit.is_output_unit() && is_running() && !_impl_ptr()->is_interrupting()) {
         unit.start();

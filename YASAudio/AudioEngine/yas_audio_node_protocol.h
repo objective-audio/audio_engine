@@ -28,4 +28,13 @@ namespace yas
         virtual void _update_kernel() = 0;
         virtual void _update_connections() = 0;
     };
+
+    class audio_node_from_connection
+    {
+       public:
+        virtual ~audio_node_from_connection() = default;
+
+        virtual void _add_connection(const audio_connection &connection) = 0;
+        virtual void _remove_connection(const audio_connection &connection) = 0;
+    };
 }

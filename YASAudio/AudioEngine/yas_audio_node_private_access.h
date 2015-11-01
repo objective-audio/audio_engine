@@ -5,6 +5,8 @@
 
 #pragma once
 
+#if YAS_TEST
+
 #include "yas_audio_engine.h"
 
 namespace yas
@@ -63,3 +65,5 @@ namespace yas
         }
     };
 }
+
+#endif

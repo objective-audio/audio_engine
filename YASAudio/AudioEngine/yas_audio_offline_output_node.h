@@ -35,13 +35,18 @@ namespace yas
                                       const offline_completion_f &completion_func) override;
         void _stop() override;
 
+#if YAS_TEST
        public:
         class private_access;
         friend private_access;
+#endif
     };
 
     std::string to_string(const offline_start_error_t &error);
 }
 
 #include "yas_audio_offline_output_node_impl.h"
+
+#if YAS_TEST
 #include "yas_audio_offline_output_node_private_access.h"
+#endif

@@ -21,7 +21,7 @@ namespace yas
     class audio_engine;
     class audio_time;
 
-    class audio_node : public base, public audio_node_from_engine
+    class audio_node : public base, public audio_node_from_engine, public audio_node_from_connection
     {
         using super_class = base;
 
@@ -79,9 +79,11 @@ namespace yas
         void _update_kernel() override;
         void _update_connections() override;
 
+#if YAS_TEST
        public:
         class private_access;
         friend private_access;
+#endif
     };
 
     class audio_node::kernel_from_node
@@ -95,4 +97,7 @@ namespace yas
 
 #include "yas_audio_node_kernel.h"
 #include "yas_audio_node_impl.h"
+
+#if YAS_TEST
 #include "yas_audio_node_private_access.h"
+#endif

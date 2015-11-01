@@ -48,4 +48,14 @@ std::shared_ptr<audio_device_io_node::impl> audio_device_io_node::_impl_ptr() co
     return impl_ptr<impl>();
 }
 
+void audio_device_io_node::_add_audio_device_io_to_graph(audio_graph &graph)
+{
+    _impl_ptr()->add_device_io_to_graph(graph);
+}
+
+void audio_device_io_node::_remove_audio_device_io_from_graph()
+{
+    _impl_ptr()->remove_device_io_from_graph();
+}
+
 #endif

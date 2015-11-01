@@ -30,7 +30,9 @@ class yas::audio_node::kernel : public kernel_from_node
     void _set_input_connections(const audio_connection_wmap &) override;
     void _set_output_connections(const audio_connection_wmap &) override;
 
+#if YAS_TEST
    public:
     class private_access;
     friend private_access;
+#endif
 };

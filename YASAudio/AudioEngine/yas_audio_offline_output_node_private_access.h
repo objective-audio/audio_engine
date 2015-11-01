@@ -5,6 +5,8 @@
 
 #pragma once
 
+#if YAS_TEST
+
 namespace yas
 {
     class audio_offline_output_node::private_access
@@ -22,3 +24,5 @@ namespace yas
         }
     };
 }
+
+#endif

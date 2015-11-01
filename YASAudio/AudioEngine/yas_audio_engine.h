@@ -71,13 +71,18 @@ namespace yas
 
         std::shared_ptr<impl> _impl_ptr() const;
 
+#if YAS_TEST
        public:
         class private_access;
         friend private_access;
+#endif
     };
 
     std::string to_string(const audio_engine::start_error_t &error);
 }
 
 #include "yas_audio_engine_impl.h"
+
+#if YAS_TEST
 #include "yas_audio_engine_private_access.h"
+#endif

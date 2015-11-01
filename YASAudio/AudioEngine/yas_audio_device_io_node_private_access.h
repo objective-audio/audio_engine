@@ -6,6 +6,7 @@
 #pragma once
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
+#if YAS_TEST
 
 namespace yas
 {
@@ -26,4 +27,5 @@ namespace yas
     };
 }
 
+#endif
 #endif

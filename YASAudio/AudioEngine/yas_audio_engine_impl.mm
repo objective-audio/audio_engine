@@ -263,7 +263,7 @@ void audio_engine::impl::disconnect(audio_connection &connection)
     std::vector<audio_node> update_nodes{connection.source_node(), connection.destination_node()};
 
     remove_connection_from_nodes(connection);
-    audio_connection::private_access::remove_nodes(connection);
+    static_cast<audio_connection_from_engine *>(&connection)->_remove_nodes();
 
     for (auto &node : update_nodes) {
         static_cast<audio_node_from_engine *>(&node)->_update_connections();
@@ -318,7 +318,7 @@ void audio_engine::impl::add_node_to_graph(audio_node &node)
 
 #if (!TARGET_OS_IPHONE & TARGET_OS_MAC)
     if (auto device_io_node = node.cast<audio_device_io_node>()) {
-        audio_device_io_node::private_access::add_audio_device_io_to_graph(device_io_node, _core->graph);
+        static_cast<audio_device_io_node_from_engine *>(&device_io_node)->_add_audio_device_io_to_graph(_core->graph);
     }
 #endif
 
@@ -343,7 +343,7 @@ void audio_engine::impl::remove_node_from_graph(const audio_node &node)
 
 #if (!TARGET_OS_IPHONE & TARGET_OS_MAC)
     if (auto device_io_node = node.cast<audio_device_io_node>()) {
-        audio_device_io_node::private_access::remove_audio_device_io_from_graph(device_io_node);
+        static_cast<audio_device_io_node_from_engine *>(&device_io_node)->_remove_audio_device_io_from_graph();
     }
 #endif
 

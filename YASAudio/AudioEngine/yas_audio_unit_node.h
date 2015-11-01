@@ -57,11 +57,16 @@ namespace yas
         void _add_audio_unit_to_graph(audio_graph &graph) override;
         void _remove_audio_unit_from_graph() override;
 
+#if YAS_TEST
        public:
         class private_access;
         friend private_access;
+#endif
     };
 }
 
 #include "yas_audio_unit_node_impl.h"
+
+#if YAS_TEST
 #include "yas_audio_unit_node_private_access.h"
+#endif
