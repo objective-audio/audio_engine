@@ -263,7 +263,7 @@ void audio_engine::impl::disconnect(audio_connection &connection)
     std::vector<audio_node> update_nodes{connection.source_node(), connection.destination_node()};
 
     remove_connection_from_nodes(connection);
-    audio_connection::private_access::remove_nodes(connection);
+    static_cast<audio_connection_from_engine *>(&connection)->_remove_nodes();
 
     for (auto &node : update_nodes) {
         static_cast<audio_node_from_engine *>(&node)->_update_connections();
