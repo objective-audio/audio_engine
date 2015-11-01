@@ -71,7 +71,7 @@ class observer::impl : public base::impl
 class subject::impl
 {
    public:
-    using weak_observers_vector_t = std::vector<base_weak<observer>>;
+    using weak_observers_vector_t = std::vector<weak<observer>>;
     using weak_observers_map_t = std::map<const std::experimental::optional<std::string>, weak_observers_vector_t>;
     weak_observers_map_t observers;
 
@@ -82,7 +82,7 @@ class subject::impl
         }
 
         auto &vector = observers.at(key);
-        vector.push_back(base_weak<observer>(obs));
+        vector.push_back(weak<observer>(obs));
     }
 
     void remove_observer(const observer &obs, const std::experimental::optional<std::string> &key)
@@ -90,7 +90,7 @@ class subject::impl
         if (observers.count(key) > 0) {
             auto &vector = observers.at(key);
 
-            erase_if(vector, [&obs](const base_weak<observer> &weak_observer) {
+            erase_if(vector, [&obs](const weak<observer> &weak_observer) {
                 if (auto shared_observer = weak_observer.lock()) {
                     if (shared_observer == obs) {
                         return true;

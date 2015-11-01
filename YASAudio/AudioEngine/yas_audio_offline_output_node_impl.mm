@@ -213,7 +213,7 @@ UInt32 audio_offline_output_node::impl::input_bus_count() const
     return 1;
 }
 
-base_weak<audio_offline_output_node> audio_offline_output_node::impl::weak_node() const
+weak<audio_offline_output_node> audio_offline_output_node::impl::weak_node() const
 {
     return node().cast<audio_offline_output_node>();
 }

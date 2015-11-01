@@ -17,7 +17,7 @@ namespace yas
 
     using audio_connection_map = std::unordered_map<uintptr_t, audio_connection>;
     using audio_connection_smap = std::map<UInt32, audio_connection>;
-    using audio_connection_wmap = std::map<UInt32, base_weak<audio_connection>>;
+    using audio_connection_wmap = std::map<UInt32, weak<audio_connection>>;
     using audio_connection_wmap_sptr = std::shared_ptr<audio_connection_wmap>;
 
     class audio_connection_from_engine

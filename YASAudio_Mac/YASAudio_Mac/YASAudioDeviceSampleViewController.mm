@@ -199,7 +199,7 @@ namespace yas
             }
         });
 
-    auto weak_device_io = yas::to_base_weak(_internal.audio_device_io);
+    auto weak_device_io = yas::to_weak(_internal.audio_device_io);
     _internal.audio_device_io.set_render_callback([weak_device_io, kernel = _kernel](
         yas::audio_pcm_buffer & output_buffer, const yas::audio_time &when) {
         if (auto device_io = weak_device_io.lock()) {

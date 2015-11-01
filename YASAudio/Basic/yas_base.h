@@ -99,23 +99,23 @@ namespace yas
     };
 
     template <typename T>
-    class base_weak
+    class weak
     {
        public:
-        base_weak() : _impl()
+        weak() : _impl()
         {
         }
 
-        base_weak(const T &obj) : _impl(obj.impl_ptr())
+        weak(const T &obj) : _impl(obj.impl_ptr())
         {
         }
 
-        base_weak<T>(const base_weak<T> &) = default;
-        base_weak<T>(base_weak<T> &&) = default;
-        base_weak<T> &operator=(const base_weak<T> &) = default;
-        base_weak<T> &operator=(base_weak<T> &&) = default;
+        weak<T>(const weak<T> &) = default;
+        weak<T>(weak<T> &&) = default;
+        weak<T> &operator=(const weak<T> &) = default;
+        weak<T> &operator=(weak<T> &&) = default;
 
-        base_weak<T> &operator=(const T &obj)
+        weak<T> &operator=(const T &obj)
         {
             _impl = obj.impl_ptr();
 
@@ -148,7 +148,7 @@ namespace yas
     };
 
     template <typename K, typename T>
-    std::map<K, T> lock_values(const std::map<K, base_weak<T>> &map)
+    std::map<K, T> lock_values(const std::map<K, weak<T>> &map)
     {
         std::map<K, T> unwrapped_map;
 
@@ -162,8 +162,8 @@ namespace yas
     }
 
     template <typename T>
-    base_weak<T> to_base_weak(const T &obj)
+    weak<T> to_weak(const T &obj)
     {
-        return base_weak<T>(obj);
+        return weak<T>(obj);
     }
 }

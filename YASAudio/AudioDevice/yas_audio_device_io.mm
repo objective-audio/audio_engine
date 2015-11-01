@@ -40,7 +40,7 @@ class audio_device_io::kernel
 class audio_device_io::impl : public base::impl
 {
    public:
-    base_weak<audio_device_io> weak_device_io;
+    weak<audio_device_io> weak_device_io;
     audio_device device;
     bool is_running;
     AudioDeviceIOProcID io_proc_id;
@@ -72,7 +72,7 @@ class audio_device_io::impl : public base::impl
 
     void prepare(const audio_device_io &device_io, const audio_device dev)
     {
-        weak_device_io = to_base_weak(device_io);
+        weak_device_io = to_weak(device_io);
 
         observer.add_handler(
             audio_device::system_subject(), audio_device_method::hardware_did_change,
