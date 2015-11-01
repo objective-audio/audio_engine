@@ -21,7 +21,7 @@ namespace yas
     class audio_engine;
     class audio_time;
 
-    class audio_node : public base, public audio_node_from_engine
+    class audio_node : public base, public audio_node_from_engine, public audio_node_from_connection
     {
         using super_class = base;
 
