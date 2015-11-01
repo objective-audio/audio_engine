@@ -448,6 +448,12 @@ std::experimental::optional<size_t> audio_device::index_of_device(const audio_de
     return nullopt;
 }
 
+bool audio_device::is_available_device(const audio_device &device)
+{
+    auto iterator = audio_device_global::all_devices_map().find(device.audio_device_id());
+    return iterator != audio_device_global::all_devices_map().end();
+}
+
 subject &audio_device::system_subject()
 {
     static subject system_subject;

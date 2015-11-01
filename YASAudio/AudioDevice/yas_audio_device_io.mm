@@ -190,7 +190,9 @@ class audio_device_io::impl : public base::impl
             return;
         }
 
-        yas_raise_if_au_error(AudioDeviceDestroyIOProcID(device.audio_device_id(), io_proc_id));
+        if (audio_device::is_available_device(device)) {
+            yas_raise_if_au_error(AudioDeviceDestroyIOProcID(device.audio_device_id(), io_proc_id));
+        }
 
         io_proc_id = nullptr;
         update_kernel();
@@ -219,7 +221,9 @@ class audio_device_io::impl : public base::impl
             return;
         }
 
-        yas_raise_if_au_error(AudioDeviceStop(device.audio_device_id(), io_proc_id));
+        if (audio_device::is_available_device(device)) {
+            yas_raise_if_au_error(AudioDeviceStop(device.audio_device_id(), io_proc_id));
+        }
     }
 
     void set_render_callback(const render_f &render_callback)
