@@ -10,13 +10,14 @@
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
 
 #include "yas_audio_node.h"
+#include "yas_audio_device_io_node_protocol.h"
 
 namespace yas
 {
     class audio_device;
     class audio_graph;
 
-    class audio_device_io_node : public audio_node
+    class audio_device_io_node : public audio_node, public audio_device_io_node_from_engine
     {
        public:
         class impl;
@@ -34,6 +35,9 @@ namespace yas
         using super_class = audio_node;
 
         std::shared_ptr<impl> _impl_ptr() const;
+
+        void _add_audio_device_io_to_graph(audio_graph &graph) override;
+        void _remove_audio_device_io_from_graph() override;
 
        protected:
         audio_device_io_node(const std::shared_ptr<audio_device_io_node::impl> &impl);

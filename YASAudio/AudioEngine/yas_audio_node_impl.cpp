@@ -4,6 +4,7 @@
 //
 
 #include "yas_audio_node.h"
+#include "yas_audio_engine.h"
 #include "yas_audio_time.h"
 #include "yas_stl_utils.h"
 

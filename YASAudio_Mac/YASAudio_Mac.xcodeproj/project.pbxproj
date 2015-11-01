@@ -182,6 +182,7 @@
 		B6F81E061BE508710022D6BD /* yas_audio_node_protocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = yas_audio_node_protocol.h; path = AudioEngine/yas_audio_node_protocol.h; sourceTree = "<group>"; };
 		B6F81E071BE508710022D6BD /* yas_audio_offline_output_node_protocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = yas_audio_offline_output_node_protocol.h; path = AudioEngine/yas_audio_offline_output_node_protocol.h; sourceTree = "<group>"; };
 		B6F81E081BE508710022D6BD /* yas_audio_unit_node_protocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = yas_audio_unit_node_protocol.h; path = AudioEngine/yas_audio_unit_node_protocol.h; sourceTree = "<group>"; };
+		B6F81E111BE5A8970022D6BD /* yas_audio_device_io_node_protocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = yas_audio_device_io_node_protocol.h; path = AudioEngine/yas_audio_device_io_node_protocol.h; sourceTree = "<group>"; };
 		B6FC1D0E1B5B45EE0051243A /* yas_audio_cpp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yas_audio_cpp.h; sourceTree = "<group>"; };
 		B6FC1D0F1B5B46A50051243A /* yas_result_private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = yas_result_private.h; path = Basic/yas_result_private.h; sourceTree = "<group>"; };
 		B6FC1D101B5B46A50051243A /* yas_result.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = yas_result.h; path = Basic/yas_result.h; sourceTree = "<group>"; };
@@ -393,6 +394,7 @@
 				B68D57A91BDD0BA200414726 /* yas_audio_device_io_node_impl.cpp */,
 				B68D57AA1BDD0BA200414726 /* yas_audio_device_io_node_impl.h */,
 				B68D57AB1BDD0BA200414726 /* yas_audio_device_io_node_private_access.h */,
+				B6F81E111BE5A8970022D6BD /* yas_audio_device_io_node_protocol.h */,
 				B68D57AC1BDD0BA200414726 /* yas_audio_device_io_node.cpp */,
 				B68D57AD1BDD0BA200414726 /* yas_audio_device_io_node.h */,
 				B68D57AE1BDD0BA200414726 /* yas_audio_engine_private_access.h */,

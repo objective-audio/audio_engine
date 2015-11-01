@@ -469,6 +469,7 @@
 		B6F81E0A1BE508FE0022D6BD /* yas_audio_node_protocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = yas_audio_node_protocol.h; path = AudioEngine/yas_audio_node_protocol.h; sourceTree = "<group>"; };
 		B6F81E0B1BE509070022D6BD /* yas_audio_offline_output_node_protocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = yas_audio_offline_output_node_protocol.h; path = AudioEngine/yas_audio_offline_output_node_protocol.h; sourceTree = "<group>"; };
 		B6F81E0C1BE509100022D6BD /* yas_audio_connection_protocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = yas_audio_connection_protocol.h; path = AudioEngine/yas_audio_connection_protocol.h; sourceTree = "<group>"; };
+		B6F81E121BE5AABC0022D6BD /* yas_audio_device_io_node_protocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = yas_audio_device_io_node_protocol.h; path = AudioEngine/yas_audio_device_io_node_protocol.h; sourceTree = "<group>"; };
 		B6FB1CFC1B04F07F00F10AE8 /* yas_audio_unit.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = yas_audio_unit.cpp; sourceTree = "<group>"; };
 		B6FB1CFD1B04F07F00F10AE8 /* yas_audio_unit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yas_audio_unit.h; sourceTree = "<group>"; };
 		B6FB1D021B07068F00F10AE8 /* yas_audio_unit_tests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = yas_audio_unit_tests.mm; path = YASAudio_Tests/yas_audio_unit_tests.mm; sourceTree = SOURCE_ROOT; };
@@ -692,6 +693,7 @@
 				B60CD4A21B7F4BAF002AFDCE /* yas_audio_device_io_node.cpp */,
 				B6DCAB931BDB74780065EBBC /* yas_audio_device_io_node_impl.h */,
 				B6DCAB921BDB74780065EBBC /* yas_audio_device_io_node_impl.cpp */,
+				B6F81E121BE5AABC0022D6BD /* yas_audio_device_io_node_protocol.h */,
 				B69170E21B809EDA00B02E29 /* yas_audio_device_io_node_private_access.h */,
 				B63B21001BA412A700CA629F /* yas_audio_route_node.h */,
 				B63B20FF1BA412A700CA629F /* yas_audio_route_node.cpp */,
