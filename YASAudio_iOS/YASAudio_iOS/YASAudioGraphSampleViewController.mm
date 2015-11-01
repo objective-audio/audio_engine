@@ -78,7 +78,7 @@ namespace yas
 }
 
 @implementation YASAudioGraphSampleViewController {
-    std::experimental::optional<yas::sample::graph_vc_internal> _internal;
+    yas::sample::graph_vc_internal _internal;
 }
 
 - (void)dealloc
@@ -97,7 +97,7 @@ namespace yas
     if (self.isMovingToParentViewController) {
         NSError *error = nil;
         if ([[AVAudioSession sharedInstance] setActive:YES error:&error]) {
-            [self setupAudioGraph];
+            _internal.graph.start();
             [self volumeSliderChanged:self.slider];
         } else {
             [self _showErrorAlertWithMessage:error.description];
@@ -110,7 +110,7 @@ namespace yas
     [super viewWillDisappear:animated];
 
     if (self.isMovingFromParentViewController) {
-        _internal->graph.stop();
+        _internal.graph.stop();
 
         [[AVAudioSession sharedInstance] setActive:NO error:nil];
     }
@@ -119,13 +119,7 @@ namespace yas
 - (IBAction)volumeSliderChanged:(UISlider *)sender
 {
     const AudioUnitParameterValue value = sender.value;
-    _internal->mixer_unit.set_parameter_value(value, kMultiChannelMixerParam_Volume, kAudioUnitScope_Input, 0);
-}
-
-- (void)setupAudioGraph
-{
-    _internal = yas::sample::graph_vc_internal();
-    _internal->graph.start();
+    _internal.mixer_unit.set_parameter_value(value, kMultiChannelMixerParam_Volume, kAudioUnitScope_Input, 0);
 }
 
 #pragma mark -

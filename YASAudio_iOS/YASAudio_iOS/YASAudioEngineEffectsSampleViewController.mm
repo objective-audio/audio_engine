@@ -63,7 +63,7 @@ namespace yas
 @implementation YASAudioEngineEffectsSampleViewController {
     std::vector<yas::audio_unit> _audio_units;
     std::experimental::optional<UInt32> _index;
-    std::experimental::optional<yas::sample::effects_vc_internal> _internal;
+    yas::sample::effects_vc_internal _internal;
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -78,7 +78,7 @@ namespace yas
         AVAudioSession *audioSession = [AVAudioSession sharedInstance];
         if ([audioSession setCategory:AVAudioSessionCategoryPlayback error:&error]) {
             [self setupAudioEngine];
-            auto start_result = _internal->engine.start_render();
+            auto start_result = _internal.engine.start_render();
             if (start_result) {
                 success = YES;
                 [self.tableView reloadData];
@@ -101,8 +101,8 @@ namespace yas
     [super viewWillDisappear:animated];
 
     if (self.isMovingFromParentViewController) {
-        if (_internal) {
-            _internal->engine.stop();
+        if (_internal.engine) {
+            _internal.engine.stop();
         }
 
         NSError *error = nil;
@@ -125,7 +125,7 @@ namespace yas
     id destinationViewController = segue.destinationViewController;
     if ([destinationViewController isKindOfClass:[YASAudioEngineEffectsSampleEditViewController class]]) {
         YASAudioEngineEffectsSampleEditViewController *controller = destinationViewController;
-        [controller set_audio_unit_node:_internal->effect_node];
+        [controller set_audio_unit_node:_internal.effect_node];
     }
 }
 
@@ -172,16 +172,16 @@ namespace yas
             }
         };
 
-    _internal->tap_node.set_render_function(tap_render_function);
+    _internal.tap_node.set_render_function(tap_render_function);
 
-    _internal->replace_effect_node(nullptr);
+    _internal.replace_effect_node(nullptr);
 }
 
 #pragma mark -
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
-    if (_internal) {
+    if (_internal.engine) {
         return YASAudioEngineEffectsSampleSectionCount;
     }
     return 0;
@@ -235,14 +235,14 @@ namespace yas
     switch (indexPath.section) {
         case YASAudioEngineEffectsSampleSectionNone: {
             _index = yas::nullopt;
-            _internal->replace_effect_node(nullptr);
+            _internal.replace_effect_node(nullptr);
         } break;
         case YASAudioEngineEffectsSampleSectionEffects: {
             _index = static_cast<UInt32>(indexPath.row);
             AudioComponentDescription acd = baseAcd;
             const auto &audio_unit = _audio_units.at(indexPath.row);
             acd.componentSubType = audio_unit.sub_type();
-            _internal->replace_effect_node(&acd);
+            _internal.replace_effect_node(&acd);
         } break;
     }
 

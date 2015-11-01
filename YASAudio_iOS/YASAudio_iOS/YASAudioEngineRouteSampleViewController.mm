@@ -39,6 +39,14 @@ namespace yas
             yas::audio_route_node route_node;
             yas::audio_tap_node sine_node;
 
+            yas::observer engine_observer;
+            yas::objc::container<yas::objc::weak> self_container;
+
+            ~route_vc_internal()
+            {
+                self_container.set_object(nil);
+            }
+
             void disconnectNodes()
             {
                 engine.disconnect(mixer_node);
@@ -63,10 +71,7 @@ namespace yas
 }
 
 @implementation YASAudioEngineRouteSampleViewController {
-    std::experimental::optional<yas::sample::route_vc_internal> _internal;
-
-    yas::observer _engine_observer;
-    yas::objc::container<yas::objc::weak> _self_container;
+    yas::sample::route_vc_internal _internal;
 }
 
 - (void)dealloc
@@ -74,10 +79,6 @@ namespace yas
     YASRelease(_slider);
 
     _slider = nil;
-
-    if (_self_container) {
-        _self_container.set_object(nil);
-    }
 
     YASSuperDealloc;
 }
@@ -94,7 +95,7 @@ namespace yas
         if ([[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayAndRecord error:&error]) {
             [self setupEngine];
 
-            const auto start_result = _internal->engine.start_render();
+            const auto start_result = _internal.engine.start_render();
             if (start_result) {
                 [self.tableView reloadData];
                 [self _updateSlider];
@@ -118,8 +119,8 @@ namespace yas
     [super viewWillDisappear:animated];
 
     if (self.isMovingFromParentViewController) {
-        if (_internal) {
-            _internal->engine.stop();
+        if (_internal.engine) {
+            _internal.engine.stop();
         }
 
         [[AVAudioSession sharedInstance] setActive:NO error:nil];
@@ -159,9 +160,9 @@ namespace yas
             }
 
             if (src_bus_idx == -1 || src_ch_idx == -1) {
-                _internal->route_node.remove_route_for_destination({dst_bus_idx, dst_ch_idx});
+                _internal.route_node.remove_route_for_destination({dst_bus_idx, dst_ch_idx});
             } else {
-                _internal->route_node.add_route({src_bus_idx, src_ch_idx, dst_bus_idx, dst_ch_idx});
+                _internal.route_node.add_route({src_bus_idx, src_ch_idx, dst_bus_idx, dst_ch_idx});
             }
 
             [self.tableView reloadSections:[NSIndexSet indexSetWithIndex:fromIndexPath.section]
@@ -174,7 +175,7 @@ namespace yas
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
-    if (!_internal) {
+    if (!_internal.engine) {
         return 0;
     }
 
@@ -183,7 +184,7 @@ namespace yas
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    if (!_internal) {
+    if (!_internal.engine) {
         return 0;
     }
 
@@ -209,7 +210,7 @@ namespace yas
 
         case YASAudioEngineRouteSampleSectionDestinations: {
             UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"Cell" forIndexPath:indexPath];
-            const auto &routes = _internal->route_node.routes();
+            const auto &routes = _internal.route_node.routes();
             yas::audio_route::point dst_point{0, static_cast<UInt32>(indexPath.row)};
             auto it = std::find_if(routes.begin(), routes.end(),
                                    [dst_point = std::move(dst_point)](const yas::audio_route &route) {
@@ -237,8 +238,8 @@ namespace yas
 - (IBAction)volumeSliderChanged:(UISlider *)sender
 {
     const Float32 value = sender.value;
-    if (_internal) {
-        _internal->mixer_node.set_input_volume(value, 0);
+    if (_internal.mixer_node) {
+        _internal.mixer_node.set_input_volume(value, 0);
     }
 }
 
@@ -248,8 +249,8 @@ namespace yas
 {
     _internal = yas::sample::route_vc_internal();
 
-    _internal->mixer_node.set_input_volume(1.0, 0);
-    _internal->route_node.set_routes({{0, 0, 0, 0}, {0, 1, 0, 1}});
+    _internal.mixer_node.set_input_volume(1.0, 0);
+    _internal.route_node.set_routes({{0, 0, 0, 0}, {0, 1, 0, 1}});
 
     Float64 phase = 0;
 
@@ -269,16 +270,16 @@ namespace yas
             }
         };
 
-    _internal->sine_node.set_render_function(tap_render_function);
+    _internal.sine_node.set_render_function(tap_render_function);
 
-    if (!_self_container) {
-        _self_container.set_object(self);
+    if (!_internal.self_container) {
+        _internal.self_container.set_object(self);
     }
 
-    _engine_observer = yas::observer();
-    _engine_observer.add_handler(
-        _internal->engine.subject(), yas::audio_engine_method::configuration_change,
-        [weak_container = _self_container](const auto &method, const auto &sender) {
+    _internal.engine_observer = yas::observer();
+    _internal.engine_observer.add_handler(
+        _internal.engine.subject(), yas::audio_engine_method::configuration_change,
+        [weak_container = _internal.self_container](const auto &method, const auto &sender) {
             if (auto strong_self = weak_container.lock()) {
                 if ([UIApplication sharedApplication].applicationState == UIApplicationStateActive) {
                     YASAudioEngineRouteSampleViewController *controller = strong_self.object();
@@ -287,13 +288,13 @@ namespace yas
             }
         });
 
-    _internal->connect_nodes();
+    _internal.connect_nodes();
 }
 
 - (void)_updateEngine
 {
-    _internal->disconnectNodes();
-    _internal->connect_nodes();
+    _internal.disconnectNodes();
+    _internal.connect_nodes();
 
     [self.tableView reloadData];
     [self _updateSlider];
@@ -316,14 +317,14 @@ namespace yas
 
 - (void)_updateSlider
 {
-    if (_internal) {
+    if (_internal.mixer_node) {
         NSIndexPath *indexPath = [NSIndexPath indexPathForRow:0 inSection:YASAudioEngineRouteSampleSectionSlider];
         UITableViewCell *cell = [self.tableView cellForRowAtIndexPath:indexPath];
         if (cell) {
             for (UIView *view in cell.contentView.subviews) {
                 if ([view isKindOfClass:[UISlider class]]) {
                     UISlider *slider = (UISlider *)view;
-                    slider.value = _internal->mixer_node.input_volume(0);
+                    slider.value = _internal.mixer_node.input_volume(0);
                 }
             }
         }

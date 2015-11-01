@@ -150,6 +150,8 @@ namespace yas
 
             yas::observer engine_observer;
 
+            yas::objc::container<yas::objc::weak> self_container;
+
             offline_vc_internal()
             {
                 auto format = yas::audio_format(yas::offline_sample::sample_rate, 2, yas::pcm_format::float32, false);
@@ -190,15 +192,13 @@ namespace yas
 }
 
 @implementation YASAudioOfflineSampleViewController {
-    std::experimental::optional<yas::sample::offline_vc_internal> _internal;
-
-    yas::objc::container<yas::objc::weak> _self_container;
+    yas::sample::offline_vc_internal _internal;
 }
 
 - (void)dealloc
 {
-    if (_self_container) {
-        _self_container.set_object(nil);
+    if (_internal.self_container) {
+        _internal.self_container.set_object(nil);
     }
 
     YASSuperDealloc;
@@ -207,8 +207,6 @@ namespace yas
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-
-    _internal = yas::sample::offline_vc_internal();
 
     self.volume = 0.5;
     self.frequency = 1000.0;
@@ -220,7 +218,7 @@ namespace yas
 {
     [super viewDidAppear];
 
-    if (_internal->play_engine && !_internal->play_engine.start_render()) {
+    if (_internal.play_engine && !_internal.play_engine.start_render()) {
         NSLog(@"%s error", __PRETTY_FUNCTION__);
     }
 }
@@ -229,54 +227,37 @@ namespace yas
 {
     [super viewWillDisappear];
 
-    if (_internal) {
-        _internal->play_engine.stop();
-    }
+    _internal.play_engine.stop();
 }
 
 - (void)setVolume:(Float32)volume
 {
-    if (_internal) {
-        _internal->play_mixer_node.set_input_volume(volume, 0);
-    }
+    _internal.play_mixer_node.set_input_volume(volume, 0);
 }
 
 - (Float32)volume
 {
-    if (_internal) {
-        return _internal->play_mixer_node.input_volume(0);
-    }
-    return 0.0f;
+    return _internal.play_mixer_node.input_volume(0);
 }
 
 - (void)setFrequency:(Float32)frequency
 {
-    if (_internal) {
-        _internal->play_sine_node.set_frequency(frequency);
-    }
+    _internal.play_sine_node.set_frequency(frequency);
 }
 
 - (Float32)frequency
 {
-    if (_internal) {
-        return _internal->play_sine_node.frequency();
-    }
-    return 0.0f;
+    return _internal.play_sine_node.frequency();
 }
 
 - (void)setPlaying:(BOOL)playing
 {
-    if (_internal) {
-        _internal->play_sine_node.set_playing(playing);
-    }
+    _internal.play_sine_node.set_playing(playing);
 }
 
 - (BOOL)playing
 {
-    if (_internal) {
-        return _internal->play_sine_node.is_playing();
-    }
-    return NO;
+    return _internal.play_sine_node.is_playing();
 }
 
 - (IBAction)playButtonTapped:(id)sender
@@ -305,10 +286,6 @@ namespace yas
 
 - (void)startOfflineFileWritingWithURL:(NSURL *)url
 {
-    if (!_internal) {
-        return;
-    }
-
     auto wave_settings = yas::wave_file_settings(yas::offline_sample::sample_rate, 2, 16);
     yas::audio_file file_writer;
     auto create_result = file_writer.create((__bridge CFURLRef)url, yas::audio_file_type::wave, wave_settings);
@@ -318,19 +295,19 @@ namespace yas
         return;
     }
 
-    _internal->offline_sine_node.set_frequency(_internal->play_sine_node.frequency());
-    _internal->offline_sine_node.set_playing(true);
-    _internal->offline_mixer_node.set_input_volume(self.volume, 0);
+    _internal.offline_sine_node.set_frequency(_internal.play_sine_node.frequency());
+    _internal.offline_sine_node.set_playing(true);
+    _internal.offline_mixer_node.set_input_volume(self.volume, 0);
 
     self.processing = YES;
 
-    if (!_self_container) {
-        _self_container.set_object(self);
+    if (!_internal.self_container) {
+        _internal.self_container.set_object(self);
     }
 
     UInt32 remain = self.length * yas::offline_sample::sample_rate;
 
-    auto start_result = _internal->offline_engine.start_offline_render(
+    auto start_result = _internal.offline_engine.start_offline_render(
         [remain, file_writer = std::move(file_writer)](yas::audio_pcm_buffer & buffer, const auto &when,
                                                        bool &stop) mutable {
             auto format = yas::audio_format(buffer.format().stream_description());
@@ -353,7 +330,7 @@ namespace yas
                 stop = YES;
             }
         },
-        [weak_container = _self_container](const bool cancelled) {
+        [weak_container = _internal.self_container](const bool cancelled) {
             if (auto strong_container = weak_container.lock()) {
                 YASAudioOfflineSampleViewController *controller = strong_container.object();
                 controller.processing = NO;

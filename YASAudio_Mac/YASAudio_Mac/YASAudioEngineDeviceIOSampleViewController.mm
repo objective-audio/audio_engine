@@ -106,20 +106,26 @@ namespace yas
     namespace sample
     {
         struct device_io_vc_internal {
-            yas::audio_engine engine;
-            yas::audio_device_io_node device_io_node;
-            yas::audio_route_node route_node;
-            yas::audio_tap_node tap_node;
+            yas::audio_engine engine = nullptr;
+            yas::audio_device_io_node device_io_node = nullptr;
+            yas::audio_route_node route_node = nullptr;
+            yas::audio_tap_node tap_node = nullptr;
+
+            yas::observer system_observer;
+            yas::observer device_observer;
+
+            yas::objc::container<yas::objc::weak> self_container;
+
+            ~device_io_vc_internal()
+            {
+                self_container.set_object(nil);
+            }
         };
     }
 }
 
 @implementation YASAudioEngineDeviceIOSampleViewController {
-    std::experimental::optional<yas::sample::device_io_vc_internal> _internal;
-    yas::observer _system_observer;
-    yas::observer _device_observer;
-
-    yas::objc::container<yas::objc::weak> _self_container;
+    yas::sample::device_io_vc_internal _internal;
 }
 
 - (void)dealloc
@@ -131,10 +137,6 @@ namespace yas
     _deviceNames = nil;
     _outputRoutes = nil;
     _inputRoutes = nil;
-
-    if (_self_container) {
-        _self_container.set_object(nil);
-    }
 
     YASSuperDealloc;
 }
@@ -150,7 +152,7 @@ namespace yas
 
     [self setupEngine];
 
-    if (!_internal->engine.start_render()) {
+    if (!_internal.engine.start_render()) {
         NSLog(@"audio engine start failed.");
     }
 }
@@ -170,12 +172,12 @@ namespace yas
     if ([object isKindOfClass:[YASAudioDeviceRouteSampleOutputData class]]) {
         YASAudioDeviceRouteSampleOutputData *data = object;
         if ([data isNoneSelected]) {
-            _internal->route_node.remove_route_for_destination({0, data.outputIndex});
+            _internal.route_node.remove_route_for_destination({0, data.outputIndex});
         } else if ([data isSineSelected]) {
-            _internal->route_node.add_route(
+            _internal.route_node.add_route(
                 {YASAudioDeviceRouteSampleSourceBusSine, data.outputIndex, 0, data.outputIndex});
         } else if ([data isInputSelected]) {
-            _internal->route_node.add_route(
+            _internal.route_node.add_route(
                 {YASAudioDeviceRouteSampleSourceBusInput, [data inputIndex], 0, data.outputIndex});
         }
 
@@ -187,17 +189,20 @@ namespace yas
 
 - (void)setupEngine
 {
-    _internal = yas::sample::device_io_vc_internal();
+    _internal.engine = yas::audio_engine();
+    _internal.device_io_node = yas::audio_device_io_node();
+    _internal.route_node = yas::audio_route_node();
+    _internal.tap_node = yas::audio_tap_node();
 
-    if (!_self_container) {
-        _self_container.set_object(self);
+    if (!_internal.self_container) {
+        _internal.self_container.set_object(self);
     }
 
-    auto weak_node = yas::to_weak(_internal->tap_node);
+    auto weak_node = yas::to_weak(_internal.tap_node);
 
     Float64 next_phase = 0.0;
 
-    auto render_function = [next_phase, weak_node, weak_container = _self_container](
+    auto render_function = [next_phase, weak_node, weak_container = _internal.self_container](
         yas::audio_pcm_buffer & buffer, const UInt32 bus_idx, const yas::audio_time &when) mutable
     {
         buffer.clear();
@@ -213,17 +218,17 @@ namespace yas
         }
     };
 
-    _internal->tap_node.set_render_function(render_function);
+    _internal.tap_node.set_render_function(render_function);
 
-    _system_observer = yas::observer();
-    _system_observer.add_handler(yas::audio_device::system_subject(), yas::audio_device_method::hardware_did_change,
-                                 [weak_container = _self_container](const auto &method, const auto &infos) {
-                                     if (auto strong_container = weak_container.lock()) {
-                                         YASAudioEngineDeviceIOSampleViewController *strongSelf =
-                                             strong_container.object();
-                                         [strongSelf _updateDeviceNames];
-                                     }
-                                 });
+    _internal.system_observer = yas::observer();
+    _internal.system_observer.add_handler(
+        yas::audio_device::system_subject(), yas::audio_device_method::hardware_did_change,
+        [weak_container = _internal.self_container](const auto &method, const auto &infos) {
+            if (auto strong_container = weak_container.lock()) {
+                YASAudioEngineDeviceIOSampleViewController *strongSelf = strong_container.object();
+                [strongSelf _updateDeviceNames];
+            }
+        });
 
     [self _updateDeviceNames];
 
@@ -235,11 +240,15 @@ namespace yas
 
 - (void)dispose
 {
-    _internal->engine.stop();
-    _internal = yas::nullopt;
+    _internal.engine.stop();
 
-    _system_observer.clear();
-    _device_observer.clear();
+    _internal.device_io_node = nullptr;
+    _internal.route_node = nullptr;
+    _internal.tap_node = nullptr;
+    _internal.engine = nullptr;
+
+    _internal.system_observer.clear();
+    _internal.device_observer.clear();
 
     self.selectedDeviceIndex = yas::audio_device::all_devices().size();
 
@@ -265,7 +274,7 @@ namespace yas
 
     self.deviceNames = titles;
 
-    auto device = _internal->device_io_node.device();
+    auto device = _internal.device_io_node.device();
     auto index = yas::audio_device::index_of_device(device);
     if (index) {
         self.selectedDeviceIndex = *index;
@@ -281,27 +290,27 @@ namespace yas
     self.outputRoutes = nil;
     self.inputRoutes = nil;
 
-    if (_internal) {
-        _internal->engine.disconnect(_internal->tap_node);
-        _internal->engine.disconnect(_internal->route_node);
-        _internal->route_node.clear_routes();
+    if (_internal.engine) {
+        _internal.engine.disconnect(_internal.tap_node);
+        _internal.engine.disconnect(_internal.route_node);
+        _internal.route_node.clear_routes();
 
-        if (const auto &device = _internal->device_io_node.device()) {
+        if (const auto &device = _internal.device_io_node.device()) {
             if (device.output_channel_count() > 0) {
                 const auto output_format = device.output_format();
-                _internal->engine.connect(_internal->route_node, _internal->device_io_node, output_format);
-                _internal->engine.connect(_internal->tap_node, _internal->route_node, 0,
-                                          YASAudioDeviceRouteSampleSourceBusSine, output_format);
+                _internal.engine.connect(_internal.route_node, _internal.device_io_node, output_format);
+                _internal.engine.connect(_internal.tap_node, _internal.route_node, 0,
+                                         YASAudioDeviceRouteSampleSourceBusSine, output_format);
             }
 
             if (device.input_channel_count() > 0) {
-                _internal->engine.connect(_internal->device_io_node, _internal->route_node, 0,
-                                          YASAudioDeviceRouteSampleSourceBusInput, device.input_format());
+                _internal.engine.connect(_internal.device_io_node, _internal.route_node, 0,
+                                         YASAudioDeviceRouteSampleSourceBusInput, device.input_format());
             }
         }
     }
 
-    if (auto const device = _internal->device_io_node.device()) {
+    if (auto const device = _internal.device_io_node.device()) {
         const UInt32 output_channel_count = device.output_channel_count();
         const UInt32 input_channel_count = device.input_channel_count();
         NSMutableArray *outputRoutes = [NSMutableArray arrayWithCapacity:output_channel_count];
@@ -348,11 +357,11 @@ namespace yas
 
 - (void)_updateInputSelection
 {
-    if (!_internal->route_node) {
+    if (!_internal.route_node) {
         return;
     }
 
-    auto &routes = _internal->route_node.routes();
+    auto &routes = _internal.route_node.routes();
     for (YASAudioDeviceRouteSampleOutputData *data in self.outputRoutes) {
         const UInt32 dst_ch_idx = data.outputIndex;
         auto it = std::find_if(routes.begin(), routes.end(), [dst_ch_idx](const yas::audio_route &route) {
@@ -400,20 +409,21 @@ namespace yas
 
 - (void)setDevice:(const yas::audio_device &)selected_device
 {
-    _device_observer.clear();
+    _internal.device_observer.clear();
 
-    if (!_internal) {
+    if (!_internal.device_io_node) {
         return;
     }
 
     const auto all_devices = yas::audio_device::all_devices();
 
     if (selected_device && std::find(all_devices.begin(), all_devices.end(), selected_device) != all_devices.end()) {
-        _internal->device_io_node.set_device(selected_device);
+        _internal.device_io_node.set_device(selected_device);
 
-        _device_observer.add_handler(
+        _internal.device_observer.add_handler(
             selected_device.property_subject(), yas::audio_device_method::device_did_change,
-            [selected_device, weak_container = _self_container](const std::string &method, const yas::any &sender) {
+            [selected_device, weak_container = _internal.self_container](const std::string &method,
+                                                                         const yas::any &sender) {
                 const auto &infos = sender.get<yas::audio_device::property_infos_sptr>();
                 if (infos->size() > 0) {
                     const auto &device_id = infos->at(0).object_id;
@@ -426,7 +436,7 @@ namespace yas
                 }
             });
     } else {
-        _internal->device_io_node.set_device(nullptr);
+        _internal.device_io_node.set_device(nullptr);
     }
 
     [self _updateConnection];

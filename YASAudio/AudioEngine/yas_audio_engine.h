@@ -38,7 +38,7 @@ namespace yas
         using start_result_t = yas::result<std::nullptr_t, start_error_t>;
 
         audio_engine();
-        explicit audio_engine(std::nullptr_t);
+        audio_engine(std::nullptr_t);
         ~audio_engine();
 
         audio_engine(const audio_engine &) = default;
