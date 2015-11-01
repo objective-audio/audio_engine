@@ -193,7 +193,7 @@ namespace yas
         _self_container.set_object(self);
     }
 
-    auto weak_node = yas::to_base_weak(_internal->tap_node);
+    auto weak_node = yas::to_weak(_internal->tap_node);
 
     Float64 next_phase = 0.0;
 

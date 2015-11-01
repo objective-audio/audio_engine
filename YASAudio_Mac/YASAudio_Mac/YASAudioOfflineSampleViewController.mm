@@ -58,7 +58,7 @@ namespace yas
             {
                 set_frequency(1000.0);
 
-                auto weak_node = yas::to_base_weak(*this);
+                auto weak_node = yas::to_weak(*this);
 
                 auto render_function = [weak_node](audio_pcm_buffer &buffer, const UInt32 bus_idx,
                                                    const audio_time &when) {
@@ -179,7 +179,7 @@ namespace yas
                 engine_observer.clear();
                 engine_observer.add_handler(
                     play_engine.subject(), yas::audio_engine_method::configuration_change,
-                    [weak_play_output_node = to_base_weak(play_output_node)](const auto &, const auto &) {
+                    [weak_play_output_node = to_weak(play_output_node)](const auto &, const auto &) {
                         if (auto play_output_node = weak_play_output_node.lock()) {
                             play_output_node.set_device(yas::audio_device::default_output_device());
                         }

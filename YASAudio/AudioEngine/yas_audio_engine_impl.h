@@ -15,7 +15,7 @@ class yas::audio_engine::impl : public yas::base::impl
 
     void prepare(const audio_engine &);
 
-    base_weak<audio_engine> &weak_engine() const;
+    weak<audio_engine> &weak_engine() const;
     objc::container<> &reset_observer() const;
     objc::container<> &route_change_observer() const;
     yas::subject &subject() const;

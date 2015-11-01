@@ -58,7 +58,7 @@ class yas::audio_unit_input_node::impl : public super_class::impl
     virtual void update_connections() override;
     virtual void prepare_audio_unit() override;
 
-    base_weak<audio_unit_input_node> weak_node() const;
+    weak<audio_unit_input_node> weak_node() const;
 
    private:
     class core;

@@ -262,7 +262,7 @@ void audio_unit_input_node::impl::prepare_audio_unit()
     unit.set_maximum_frames_per_slice(4096);
 }
 
-base_weak<audio_unit_input_node> audio_unit_input_node::impl::weak_node() const
+weak<audio_unit_input_node> audio_unit_input_node::impl::weak_node() const
 {
     return node().cast<audio_unit_input_node>();
 }

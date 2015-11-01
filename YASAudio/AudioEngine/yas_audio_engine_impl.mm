@@ -50,7 +50,7 @@ class audio_engine::impl::core
 #endif
     }
 
-    base_weak<audio_engine> weak_engine;
+    weak<audio_engine> weak_engine;
     objc::container<> reset_observer;
     objc::container<> route_change_observer;
     yas::subject subject;
@@ -113,7 +113,7 @@ void audio_engine::impl::prepare(const audio_engine &engine)
 #endif
 }
 
-base_weak<audio_engine> &audio_engine::impl::weak_engine() const
+weak<audio_engine> &audio_engine::impl::weak_engine() const
 {
     return _core->weak_engine;
 }

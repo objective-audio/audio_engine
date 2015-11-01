@@ -52,7 +52,7 @@ namespace yas
                 mixer_unit.set_output_format(format.stream_description(), 0);
                 mixer_unit.set_input_format(format.stream_description(), 0);
 
-                auto weak_mixer_unit = yas::base_weak<yas::audio_unit>(mixer_unit);
+                auto weak_mixer_unit = yas::weak<yas::audio_unit>(mixer_unit);
 
                 io_unit.set_render_callback([weak_mixer_unit](yas::render_parameters &render_parameters) {
                     if (auto shared_mixer_unit = weak_mixer_unit.lock()) {
@@ -60,7 +60,7 @@ namespace yas
                     }
                 });
 
-                auto weak_io_unit = yas::base_weak<yas::audio_unit>(io_unit);
+                auto weak_io_unit = yas::weak<yas::audio_unit>(io_unit);
 
                 mixer_unit.set_render_callback([weak_io_unit](yas::render_parameters &render_parameters) {
                     if (auto shared_io_unit = weak_io_unit.lock()) {
