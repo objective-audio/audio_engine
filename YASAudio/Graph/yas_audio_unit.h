@@ -107,9 +107,11 @@ namespace yas
 
         std::shared_ptr<impl> _impl_ptr() const;
 
+#if YAS_TEST
        public:
         class private_access;
         friend private_access;
+#endif
     };
 }
 

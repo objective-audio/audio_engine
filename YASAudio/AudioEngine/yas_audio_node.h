@@ -79,9 +79,11 @@ namespace yas
         void _update_kernel() override;
         void _update_connections() override;
 
+#if YAS_TEST
        public:
         class private_access;
         friend private_access;
+#endif
     };
 
     class audio_node::kernel_from_node

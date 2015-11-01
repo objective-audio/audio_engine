@@ -5,6 +5,8 @@
 
 #pragma once
 
+#if YAS_TEST
+
 namespace yas
 {
     class audio_connection::private_access
@@ -32,3 +34,5 @@ namespace yas
         }
     };
 }
+
+#endif

@@ -44,10 +44,11 @@ namespace yas
         void _remove_nodes() override;
         void _remove_source_node() override;
         void _remove_destination_node() override;
-
+#if YAS_TEST
        public:
         class private_access;
         friend private_access;
+#endif
     };
 }
 

@@ -35,9 +35,11 @@ namespace yas
                                       const offline_completion_f &completion_func) override;
         void _stop() override;
 
+#if YAS_TEST
        public:
         class private_access;
         friend private_access;
+#endif
     };
 
     std::string to_string(const offline_start_error_t &error);

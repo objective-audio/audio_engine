@@ -38,9 +38,11 @@ namespace yas
        protected:
         audio_device_io_node(const std::shared_ptr<audio_device_io_node::impl> &impl);
 
+#if YAS_TEST
        public:
         class private_access;
         friend private_access;
+#endif
     };
 }
 
