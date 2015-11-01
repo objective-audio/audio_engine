@@ -60,6 +60,9 @@
         XCTAssertEqual(source_node.output_format(source_bus), format);
         XCTAssertEqual(destination_node.input_format(destination_bus), format);
 
+        XCTAssertFalse(source_node.output_format(source_bus + 1));
+        XCTAssertFalse(destination_node.input_format(destination_bus + 1));
+
         XCTAssertFalse(source_node.next_available_output_bus());
         XCTAssertTrue(destination_node.next_available_input_bus());
         destination_bus_result = destination_node.next_available_input_bus();

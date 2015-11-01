@@ -88,41 +88,40 @@ static int _objc_object_count = 0;
 {
     YASObjCContainerTest *objc_object = [[YASObjCContainerTest alloc] init];
 
-    if (auto objc_weak_container = yas::objc::container<yas::objc::weak>(nil)) {
-        XCTAssertNil(objc_weak_container.retained_object());
-        XCTAssertNil(objc_weak_container.autoreleased_object());
-        XCTAssertEqual(_objc_object_count, 1);
-        XCTAssertEqual([objc_object retainCount], 1);
+    auto objc_weak_container = yas::objc::container<yas::objc::weak>(nil);
+    XCTAssertNil(objc_weak_container.retained_object());
+    XCTAssertNil(objc_weak_container.autoreleased_object());
+    XCTAssertEqual(_objc_object_count, 1);
+    XCTAssertEqual([objc_object retainCount], 1);
 
-        objc_weak_container.set_object(objc_object);
+    objc_weak_container.set_object(objc_object);
 
-        id retained_object = objc_weak_container.retained_object();
+    id retained_object = objc_weak_container.retained_object();
 
-        XCTAssertNotNil(retained_object);
+    XCTAssertNotNil(retained_object);
+    XCTAssertEqual([objc_object retainCount], 2);
+
+    [objc_object release];
+    retained_object = nil;
+
+    XCTAssertEqual([objc_object retainCount], 1);
+
+    @autoreleasepool
+    {
+        id autoreleased_object = objc_weak_container.autoreleased_object();
+
+        XCTAssertNotNil(autoreleased_object);
         XCTAssertEqual([objc_object retainCount], 2);
-
-        [objc_object release];
-        retained_object = nil;
-
-        XCTAssertEqual([objc_object retainCount], 1);
-
-        @autoreleasepool
-        {
-            id autoreleased_object = objc_weak_container.autoreleased_object();
-
-            XCTAssertNotNil(autoreleased_object);
-            XCTAssertEqual([objc_object retainCount], 2);
-        }
-
-        XCTAssertEqual([objc_object retainCount], 1);
-
-        objc_weak_container.set_object(nil);
-
-        XCTAssertNil(objc_weak_container.retained_object());
-        XCTAssertNil(objc_weak_container.autoreleased_object());
-        XCTAssertEqual(_objc_object_count, 1);
-        XCTAssertEqual([objc_object retainCount], 1);
     }
+
+    XCTAssertEqual([objc_object retainCount], 1);
+
+    objc_weak_container.set_object(nil);
+
+    XCTAssertNil(objc_weak_container.retained_object());
+    XCTAssertNil(objc_weak_container.autoreleased_object());
+    XCTAssertEqual(_objc_object_count, 1);
+    XCTAssertEqual([objc_object retainCount], 1);
 
     [objc_object release];
     objc_object = nil;
@@ -134,43 +133,42 @@ static int _objc_object_count = 0;
 {
     YASObjCContainerTest *objc_object = [[YASObjCContainerTest alloc] init];
 
-    if (auto objc_strong_container = yas::objc::container<>(nil)) {
-        XCTAssertNil(objc_strong_container.retained_object());
-        XCTAssertNil(objc_strong_container.autoreleased_object());
-        XCTAssertEqual(_objc_object_count, 1);
-        XCTAssertEqual([objc_object retainCount], 1);
+    auto objc_strong_container = yas::objc::container<>(nil);
+    XCTAssertNil(objc_strong_container.retained_object());
+    XCTAssertNil(objc_strong_container.autoreleased_object());
+    XCTAssertEqual(_objc_object_count, 1);
+    XCTAssertEqual([objc_object retainCount], 1);
 
-        objc_strong_container.set_object(objc_object);
+    objc_strong_container.set_object(objc_object);
 
-        XCTAssertEqual([objc_object retainCount], 2);
+    XCTAssertEqual([objc_object retainCount], 2);
 
-        id retained_object = objc_strong_container.retained_object();
+    id retained_object = objc_strong_container.retained_object();
 
-        XCTAssertNotNil(retained_object);
+    XCTAssertNotNil(retained_object);
+    XCTAssertEqual([objc_object retainCount], 3);
+
+    [objc_object release];
+    retained_object = nil;
+
+    XCTAssertEqual([objc_object retainCount], 2);
+
+    @autoreleasepool
+    {
+        id autoreleased_object = objc_strong_container.autoreleased_object();
+
+        XCTAssertNotNil(autoreleased_object);
         XCTAssertEqual([objc_object retainCount], 3);
-
-        [objc_object release];
-        retained_object = nil;
-
-        XCTAssertEqual([objc_object retainCount], 2);
-
-        @autoreleasepool
-        {
-            id autoreleased_object = objc_strong_container.autoreleased_object();
-
-            XCTAssertNotNil(autoreleased_object);
-            XCTAssertEqual([objc_object retainCount], 3);
-        }
-
-        XCTAssertEqual([objc_object retainCount], 2);
-
-        objc_strong_container.set_object(nil);
-
-        XCTAssertNil(objc_strong_container.retained_object());
-        XCTAssertNil(objc_strong_container.autoreleased_object());
-        XCTAssertEqual(_objc_object_count, 1);
-        XCTAssertEqual([objc_object retainCount], 1);
     }
+
+    XCTAssertEqual([objc_object retainCount], 2);
+
+    objc_strong_container.set_object(nil);
+
+    XCTAssertNil(objc_strong_container.retained_object());
+    XCTAssertNil(objc_strong_container.autoreleased_object());
+    XCTAssertEqual(_objc_object_count, 1);
+    XCTAssertEqual([objc_object retainCount], 1);
 
     [objc_object release];
     objc_object = nil;

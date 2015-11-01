@@ -47,11 +47,11 @@
                 XCTAssertEqual(*pointer_channel, channel);
                 XCTAssertEqual(*pointer->f32, (Float32)yas::test::test_value(frame, 0, channel));
                 yas_audio_frame_enumerator_move_channel(enumerator);
-                channel++;
+                ++channel;
             }
             XCTAssertEqual(channel, channels);
             yas_audio_frame_enumerator_move_frame(enumerator);
-            frame++;
+            ++frame;
         }
         XCTAssertEqual(frame, frame_length);
         yas_audio_frame_enumerator_reset(enumerator);
@@ -84,18 +84,18 @@
                 XCTAssertEqual(*pointer_channel, channel);
                 XCTAssertEqual(*pointer->f32, (Float32)yas::test::test_value(frame, channel, 0));
                 yas_audio_frame_enumerator_move_channel(enumerator);
-                channel++;
+                ++channel;
             }
             XCTAssertEqual(channel, channels);
             yas_audio_frame_enumerator_move_frame(enumerator);
-            frame++;
+            ++frame;
         }
         XCTAssertEqual(frame, frame_length);
         yas_audio_frame_enumerator_reset(enumerator);
     }
 }
 
-- (void)testReadFrameEnumeratorUseMethod
+- (void)testReadFrameEnumeratorUseFunction
 {
     const UInt32 frame_length = 16;
     const UInt32 channels = 3;
@@ -108,6 +108,9 @@
     yas::test::fill_test_values_to_buffer(data);
 
     yas::audio_frame_enumerator enumerator(data);
+    XCTAssertEqual(enumerator.frame_length(), frame_length);
+    XCTAssertEqual(enumerator.channel_count(), channels);
+
     auto pointer = enumerator.pointer();
     const UInt32 *pointer_frame = enumerator.frame();
     const UInt32 *pointer_channel = enumerator.channel();
@@ -121,11 +124,11 @@
                 XCTAssertEqual(*pointer_channel, channel);
                 XCTAssertEqual(*pointer->f32, (Float32)yas::test::test_value(frame, channel, 0));
                 enumerator.move_channel();
-                channel++;
+                ++channel;
             }
             XCTAssertEqual(channel, channels);
             enumerator.move_frame();
-            frame++;
+            ++frame;
         }
         XCTAssertEqual(frame, frame_length);
         enumerator.reset();
@@ -154,12 +157,12 @@
         XCTAssertEqual(channel, *pointer_channel);
         XCTAssertEqual(*pointer->f32, yas::test::test_value((UInt32)*pointer_frame, 0, (UInt32)*pointer_channel));
 
-        enumerator.move();
+        ++enumerator;  // enumerator.move();
 
-        channel++;
+        ++channel;
         if (channel == channels) {
             channel = 0;
-            frame++;
+            ++frame;
         }
     }
 
@@ -190,10 +193,10 @@
             *mutable_pointer->f32 =
                 (Float32)yas::test::test_value((UInt32)*mutable_pointer_frame, 0, (UInt32)*mutable_pointer_channel);
             yas_audio_frame_enumerator_move_channel(mutable_enumerator);
-            channel++;
+            ++channel;
         }
         yas_audio_frame_enumerator_move_frame(mutable_enumerator);
-        frame++;
+        ++frame;
     }
     XCTAssertEqual(frame, frame_length);
 
@@ -220,7 +223,7 @@
     yas::audio_pcm_buffer buffer(format, frame_length);
 
     auto bufferPointer = buffer.flex_ptr_at_index(0);
-    for (UInt32 frame = 0; frame < frame_length; frame++) {
+    for (UInt32 frame = 0; frame < frame_length; ++frame) {
         bufferPointer.f32[frame] = yas::test::test_value(frame, 0, 0);
     }
 

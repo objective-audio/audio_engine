@@ -95,4 +95,12 @@
         yas::audio_connection::private_access::create(source_node, source_bus, null_node, destination_bus, format));
 }
 
+- (void)test_empty_connection
+{
+    yas::audio_connection connection(nullptr);
+
+    XCTAssertFalse(connection.source_node());
+    XCTAssertFalse(connection.destination_node());
+}
+
 @end

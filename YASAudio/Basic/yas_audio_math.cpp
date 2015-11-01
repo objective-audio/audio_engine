@@ -40,12 +40,6 @@ Float64 audio_math::tempo_from_seconds(const Float64 seconds)
 }
 
 template <>
-Float32 audio_math::tempo_from_seconds(const Float32 seconds)
-{
-    return powf(2, -log2f(seconds)) * 60.0f;
-}
-
-template <>
 Float64 audio_math::seconds_from_tempo(const Float64 tempo)
 {
     return powf(2, -log2f(tempo / 60.0f));
