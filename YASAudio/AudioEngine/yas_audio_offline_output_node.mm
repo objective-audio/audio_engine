@@ -18,8 +18,7 @@ audio_offline_output_node::audio_offline_output_node(std::nullptr_t) : super_cla
 {
 }
 
-audio_offline_output_node::audio_offline_output_node(const std::shared_ptr<audio_offline_output_node::impl> &impl)
-    : super_class(impl)
+audio_offline_output_node::audio_offline_output_node(const std::shared_ptr<impl> &impl) : super_class(impl)
 {
 }
 

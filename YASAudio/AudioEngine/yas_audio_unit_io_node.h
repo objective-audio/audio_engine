@@ -39,8 +39,7 @@ namespace yas
        protected:
         class impl;
 
-        audio_unit_io_node(std::shared_ptr<impl> &&, create_tag_t);
-        explicit audio_unit_io_node(const std::shared_ptr<impl> &);
+        audio_unit_io_node(const std::shared_ptr<impl> &, const AudioComponentDescription &);
 
         std::shared_ptr<impl> _impl_ptr() const;
     };

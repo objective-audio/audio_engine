@@ -33,16 +33,12 @@ audio_unit_io_node::audio_unit_io_node(std::nullptr_t) : super_class(nullptr)
 {
 }
 
-audio_unit_io_node::audio_unit_io_node() : audio_unit_io_node(std::make_unique<impl>(), create_tag)
+audio_unit_io_node::audio_unit_io_node() : audio_unit_io_node(std::make_shared<impl>(), audio_unit_io_node_acd)
 {
 }
 
-audio_unit_io_node::audio_unit_io_node(std::shared_ptr<impl> &&impl, create_tag_t)
-    : super_class(std::move(impl), audio_unit_io_node_acd)
-{
-}
-
-audio_unit_io_node::audio_unit_io_node(const std::shared_ptr<impl> &impl) : super_class(impl)
+audio_unit_io_node::audio_unit_io_node(const std::shared_ptr<impl> &impl, const AudioComponentDescription &acd)
+    : super_class(impl, acd)
 {
 }
 
@@ -98,7 +94,7 @@ audio_unit_output_node::audio_unit_output_node(std::nullptr_t) : super_class()
 {
 }
 
-audio_unit_output_node::audio_unit_output_node() : super_class(std::make_unique<impl>())
+audio_unit_output_node::audio_unit_output_node() : super_class(std::make_unique<impl>(), audio_unit_io_node_acd)
 {
 }
 
@@ -118,7 +114,7 @@ audio_unit_input_node::audio_unit_input_node(std::nullptr_t) : super_class(nullp
 {
 }
 
-audio_unit_input_node::audio_unit_input_node() : super_class(std::make_unique<impl>())
+audio_unit_input_node::audio_unit_input_node() : super_class(std::make_unique<impl>(), audio_unit_io_node_acd)
 {
 }
 

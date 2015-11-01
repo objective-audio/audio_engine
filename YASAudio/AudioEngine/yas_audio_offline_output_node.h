@@ -32,7 +32,7 @@ namespace yas
         bool is_running() const;
 
        private:
-        audio_offline_output_node(const std::shared_ptr<audio_offline_output_node::impl> &);
+        audio_offline_output_node(const std::shared_ptr<impl> &);
 
         start_result_t _start(const offline_render_f &callback_func, const offline_completion_f &completion_func);
         void _stop();
