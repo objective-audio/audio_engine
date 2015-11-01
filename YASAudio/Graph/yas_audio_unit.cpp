@@ -311,3 +311,33 @@ std::shared_ptr<audio_unit::impl> audio_unit::_impl_ptr() const
 {
     return impl_ptr<impl>();
 }
+
+void audio_unit::_initialize()
+{
+    _impl_ptr()->initialize();
+}
+
+void audio_unit::_uninitialize()
+{
+    _impl_ptr()->uninitialize();
+}
+
+void audio_unit::_set_graph_key(const std::experimental::optional<UInt8> &key)
+{
+    _impl_ptr()->graph_key = key;
+}
+
+const std::experimental::optional<UInt8> &audio_unit::_graph_key() const
+{
+    return _impl_ptr()->graph_key;
+}
+
+void audio_unit::_set_key(const std::experimental::optional<UInt16> &key)
+{
+    _impl_ptr()->key = key;
+}
+
+const std::experimental::optional<UInt16> &audio_unit::_key() const
+{
+    return _impl_ptr()->key;
+}

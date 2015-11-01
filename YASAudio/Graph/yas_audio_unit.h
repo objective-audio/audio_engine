@@ -6,6 +6,7 @@
 #pragma once
 
 #include "yas_audio_types.h"
+#include "yas_audio_unit_protocol.h"
 #include "yas_audio_unit_parameter.h"
 #include "yas_exception.h"
 #include "yas_base.h"
@@ -21,7 +22,7 @@
 
 namespace yas
 {
-    class audio_unit : public base
+    class audio_unit : public base, public audio_unit_from_graph
     {
        public:
         using render_f = std::function<void(render_parameters &)>;
@@ -106,6 +107,15 @@ namespace yas
         class impl;
 
         std::shared_ptr<impl> _impl_ptr() const;
+
+        // from graph
+
+        void _initialize() override;
+        void _uninitialize() override;
+        void _set_graph_key(const std::experimental::optional<UInt8> &key) override;
+        const std::experimental::optional<UInt8> &_graph_key() const override;
+        void _set_key(const std::experimental::optional<UInt16> &key) override;
+        const std::experimental::optional<UInt16> &_key() const override;
 
 #if YAS_TEST
        public:

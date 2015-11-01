@@ -470,6 +470,7 @@
 		B6F81E0B1BE509070022D6BD /* yas_audio_offline_output_node_protocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = yas_audio_offline_output_node_protocol.h; path = AudioEngine/yas_audio_offline_output_node_protocol.h; sourceTree = "<group>"; };
 		B6F81E0C1BE509100022D6BD /* yas_audio_connection_protocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = yas_audio_connection_protocol.h; path = AudioEngine/yas_audio_connection_protocol.h; sourceTree = "<group>"; };
 		B6F81E121BE5AABC0022D6BD /* yas_audio_device_io_node_protocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = yas_audio_device_io_node_protocol.h; path = AudioEngine/yas_audio_device_io_node_protocol.h; sourceTree = "<group>"; };
+		B6F81E161BE5AF6B0022D6BD /* yas_audio_unit_protocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yas_audio_unit_protocol.h; sourceTree = "<group>"; };
 		B6FB1CFC1B04F07F00F10AE8 /* yas_audio_unit.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = yas_audio_unit.cpp; sourceTree = "<group>"; };
 		B6FB1CFD1B04F07F00F10AE8 /* yas_audio_unit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yas_audio_unit.h; sourceTree = "<group>"; };
 		B6FB1D021B07068F00F10AE8 /* yas_audio_unit_tests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = yas_audio_unit_tests.mm; path = YASAudio_Tests/yas_audio_unit_tests.mm; sourceTree = SOURCE_ROOT; };
@@ -749,6 +750,7 @@
 				B6F81DEA1BE3A20A0022D6BD /* yas_audio_unit_impl.h */,
 				B6F81DE91BE3A20A0022D6BD /* yas_audio_unit_impl.mm */,
 				B68A92AC1B19C63E0017C413 /* yas_audio_unit_impl_private.h */,
+				B6F81E161BE5AF6B0022D6BD /* yas_audio_unit_protocol.h */,
 				B6477F881B89E8D800E27974 /* yas_audio_unit_private_access.h */,
 				B6FB1D0E1B07084B00F10AE8 /* yas_audio_unit_parameter.h */,
 				B6FB1D0D1B07084B00F10AE8 /* yas_audio_unit_parameter.cpp */,
