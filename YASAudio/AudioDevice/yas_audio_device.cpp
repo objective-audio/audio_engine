@@ -77,6 +77,16 @@ namespace yas
 {
     class audio_device_global
     {
+        class audio_device_for_global : public audio_device
+        {
+            using super_class = audio_device;
+
+           public:
+            audio_device_for_global(const AudioDeviceID device_id) : super_class(device_id)
+            {
+            }
+        };
+
        public:
         static void initialize()
         {
@@ -130,7 +140,7 @@ namespace yas
                     if (prev_devices.count(device_id) > 0) {
                         map[device_id] = prev_devices.at(device_id);
                     } else {
-                        map[device_id] = audio_device(device_id);
+                        map[device_id] = audio_device_for_global(device_id);
                     }
                 }
             }

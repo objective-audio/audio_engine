@@ -93,13 +93,12 @@ namespace yas
         static subject &system_subject();
         subject &property_subject() const;
 
+       protected:
+        explicit audio_device(const AudioDeviceID device_id);
+
        private:
         class impl;
         std::shared_ptr<impl> _impl;
-
-        explicit audio_device(const AudioDeviceID device_id);
-
-        friend audio_device_global;
     };
 }
 
