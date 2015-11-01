@@ -6,6 +6,7 @@
 #pragma once
 
 #include "yas_audio_node.h"
+#include "yas_audio_unit_node_protocol.h"
 
 namespace yas
 {
@@ -13,7 +14,7 @@ namespace yas
     class audio_unit;
     class audio_unit_parameter;
 
-    class audio_unit_node : public audio_node
+    class audio_unit_node : public audio_node, public audio_unit_node_from_engine
     {
         using super_class = audio_node;
 
@@ -50,6 +51,11 @@ namespace yas
 
        private:
         std::shared_ptr<impl> _impl_ptr() const;
+
+        // from engine
+
+        void _add_audio_unit_to_graph(audio_graph &graph) override;
+        void _remove_audio_unit_from_graph() override;
 
        public:
         class private_access;

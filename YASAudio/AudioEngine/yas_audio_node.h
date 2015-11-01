@@ -6,6 +6,7 @@
 #pragma once
 
 #include "yas_audio_types.h"
+#include "yas_audio_node_protocol.h"
 #include "yas_result.h"
 #include "yas_audio_format.h"
 #include "yas_audio_pcm_buffer.h"
@@ -18,12 +19,15 @@
 namespace yas
 {
     class audio_engine;
+    class audio_time;
 
-    class audio_node : public base
+    class audio_node : public base, public audio_node_from_engine
     {
         using super_class = base;
 
        public:
+        class kernel;
+
         struct create_tag_t {
         };
         constexpr static create_tag_t create_tag{};
@@ -55,16 +59,37 @@ namespace yas
         void set_render_time_on_render(const audio_time &time);
 
        protected:
-        class kernel;
+        class kernel_from_node;
         class impl;
 
         explicit audio_node(const std::shared_ptr<impl> &);
 
         std::shared_ptr<impl> _impl_ptr() const;
 
+        // from engine
+
+        audio_connection _input_connection(const UInt32 bus_idx) const override;
+        audio_connection _output_connection(const UInt32 bus_idx) const override;
+        const audio_connection_wmap &_input_connections() const override;
+        const audio_connection_wmap &_output_connections() const override;
+        void _add_connection(const audio_connection &connection) override;
+        void _remove_connection(const audio_connection &connection) override;
+        void _set_engine(const audio_engine &engine) override;
+        audio_engine _engine() override;
+        void _update_kernel() override;
+        void _update_connections() override;
+
        public:
         class private_access;
         friend private_access;
+    };
+
+    class audio_node::kernel_from_node
+    {
+       public:
+        virtual ~kernel_from_node() = default;
+        virtual void _set_input_connections(const audio_connection_wmap &) = 0;
+        virtual void _set_output_connections(const audio_connection_wmap &) = 0;
     };
 }
 

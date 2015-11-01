@@ -71,17 +71,17 @@ audio_offline_output_node::impl::impl()
 
 audio_offline_output_node::impl::~impl() = default;
 
-audio_offline_output_node::start_result_t audio_offline_output_node::impl::start(
-    const offline_render_f &render_func, const offline_completion_f &completion_func)
+offline_start_result_t audio_offline_output_node::impl::start(const offline_render_f &render_func,
+                                                              const offline_completion_f &completion_func)
 {
     if (_core->queue_container) {
-        return start_result_t(start_error_t::already_running);
+        return offline_start_result_t(offline_start_error_t::already_running);
     } else if (auto connection = input_connection(0)) {
         std::experimental::optional<UInt8> key;
         if (completion_func) {
             key = _core->push_completion_function(completion_func);
             if (!key) {
-                return start_result_t(start_error_t::prepare_failure);
+                return offline_start_result_t(offline_start_error_t::prepare_failure);
             }
         }
 
@@ -173,9 +173,9 @@ audio_offline_output_node::start_result_t audio_offline_output_node::impl::start
         YASRelease(blockOperation);
         YASRelease(queue);
     } else {
-        return start_result_t(start_error_t::connection_not_found);
+        return offline_start_result_t(offline_start_error_t::connection_not_found);
     }
-    return start_result_t(nullptr);
+    return offline_start_result_t(nullptr);
 }
 
 void audio_offline_output_node::impl::stop()

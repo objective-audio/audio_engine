@@ -171,8 +171,9 @@ void audio_node::impl::prepare_kernel(const std::shared_ptr<kernel> &kernel)
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
     }
 
-    kernel::private_access::set_input_connections(kernel, _core->input_connections);
-    kernel::private_access::set_output_connections(kernel, _core->output_connections);
+    auto knl = std::static_pointer_cast<kernel_from_node>(kernel);
+    knl->_set_input_connections(_core->input_connections);
+    knl->_set_output_connections(_core->output_connections);
 }
 
 void audio_node::impl::update_kernel()

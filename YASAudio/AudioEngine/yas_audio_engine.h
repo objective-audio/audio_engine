@@ -10,7 +10,7 @@
 #include "yas_result.h"
 #include "yas_observing.h"
 #include "yas_audio_connection.h"
-#include <unordered_map>
+#include "yas_audio_offline_output_node_protocol.h"
 
 namespace yas
 {
@@ -19,8 +19,13 @@ namespace yas
         static const auto configuration_change = "yas.audio_engine.configuration_change";
     }
 
+    class audio_offline_output_node;
+    class audio_graph;
+
     class audio_engine : public base
     {
+        using super_class = base;
+
        public:
         enum class start_error_t {
             already_running,
@@ -62,13 +67,9 @@ namespace yas
         subject &subject() const;
 
        private:
-        using super_class = base;
         class impl;
 
         std::shared_ptr<impl> _impl_ptr() const;
-
-        std::unordered_map<uintptr_t, audio_node> &_nodes() const;
-        audio_connection_map &_connections() const;
 
        public:
         class private_access;
@@ -78,4 +79,5 @@ namespace yas
     std::string to_string(const audio_engine::start_error_t &error);
 }
 
+#include "yas_audio_engine_impl.h"
 #include "yas_audio_engine_private_access.h"

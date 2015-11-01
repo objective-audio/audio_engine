@@ -1,5 +1,5 @@
 //
-//  yas_audio_offline_output_node.mm
+//  yas_audio_offline_output_node.cpp
 //  Copyright (c) 2015 Yuki Yasoshima.
 //
 
@@ -29,8 +29,8 @@ bool audio_offline_output_node::is_running() const
     return _impl_ptr()->is_running();
 }
 
-audio_offline_output_node::start_result_t audio_offline_output_node::_start(const offline_render_f &callback_func,
-                                                                            const offline_completion_f &completion_func)
+offline_start_result_t audio_offline_output_node::_start(const offline_render_f &callback_func,
+                                                         const offline_completion_f &completion_func)
 {
     return _impl_ptr()->start(callback_func, completion_func);
 }
@@ -45,14 +45,14 @@ std::shared_ptr<audio_offline_output_node::impl> audio_offline_output_node::_imp
     return impl_ptr<impl>();
 }
 
-std::string to_string(const audio_offline_output_node::start_error_t &error)
+std::string to_string(const offline_start_error_t &error)
 {
     switch (error) {
-        case audio_offline_output_node::start_error_t::already_running:
+        case offline_start_error_t::already_running:
             return "already_running";
-        case audio_offline_output_node::start_error_t::prepare_failure:
+        case offline_start_error_t::prepare_failure:
             return "prepare_failure";
-        case audio_offline_output_node::start_error_t::connection_not_found:
+        case offline_start_error_t::connection_not_found:
             return "connection_not_found";
     }
 }

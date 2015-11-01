@@ -3,6 +3,8 @@
 //  Copyright (c) 2015 Yuki Yasoshima.
 //
 
+#pragma once
+
 namespace yas
 {
     class audio_engine::private_access
@@ -10,12 +12,12 @@ namespace yas
        public:
         static std::unordered_map<uintptr_t, audio_node> &nodes(const audio_engine &engine)
         {
-            return engine._nodes();
+            return engine._impl_ptr()->nodes();
         }
 
         static audio_connection_map &connections(const audio_engine &engine)
         {
-            return engine._connections();
+            return engine._impl_ptr()->connections();
         }
     };
 }
