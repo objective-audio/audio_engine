@@ -37,7 +37,7 @@
     XCTestExpectation *from_expectation = [self expectationWithDescription:@"from node"];
     XCTestExpectation *completion_expectation = [self expectationWithDescription:@"completion"];
 
-    auto weak_to_node = yas::weak<yas::audio_tap_node>(to_node);
+    auto weak_to_node = yas::to_base_weak(to_node);
     auto to_render_func = [weak_to_node, self, to_connection, from_connection, to_expectation](
         auto &buffer, const auto &bus_idx, const auto &when) {
         auto node = weak_to_node.lock();
