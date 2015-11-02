@@ -57,7 +57,7 @@ namespace yas
 
             void connect_nodes()
             {
-                const Float64 sample_rate = io_node.device_sample_rate();
+                const auto sample_rate = io_node.device_sample_rate();
 
                 const auto format = yas::audio_format(sample_rate, 2);
 
