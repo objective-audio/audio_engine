@@ -18,9 +18,6 @@ namespace yas
     template <typename T, typename P>
     T filter(const T &collection, P predicate);
 
-    template <typename K, typename T>
-    std::map<K, std::shared_ptr<T>> lock_values(const std::map<K, std::weak_ptr<T>> &map);
-
     template <typename T, typename P>
     void erase_if(T &collection, P predicate);
 
