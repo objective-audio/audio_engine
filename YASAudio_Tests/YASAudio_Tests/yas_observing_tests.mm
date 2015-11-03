@@ -21,7 +21,7 @@
     [super tearDown];
 }
 
-- (void)testSingle
+- (void)test_single
 {
     int sender = 100;
 
@@ -67,7 +67,7 @@
     XCTAssertFalse(called);
 }
 
-- (void)testMultiKeys
+- (void)test_multi_keys
 {
     int sender = 100;
 
@@ -114,7 +114,7 @@
     XCTAssertFalse(called2);
 }
 
-- (void)testMultiObservers
+- (void)test_multi_observers
 {
     int sender = 100;
 
@@ -144,7 +144,7 @@
     XCTAssertTrue(called2);
 }
 
-- (void)testMultiSubjects
+- (void)test_multi_subjects
 {
     int sender = 100;
 
@@ -183,7 +183,7 @@
     XCTAssertTrue(called2);
 }
 
-- (void)testWildCard
+- (void)test_wild_card
 {
     yas::subject subject;
     yas::observer observer;
@@ -223,7 +223,42 @@
     XCTAssertEqual(receive_20, sender_20);
 }
 
-- (void)testSubjectDispatcher
+- (void)test_remove_wild_card
+{
+    yas::subject subject;
+    yas::observer observer;
+
+    std::string key10 = "10";
+    std::string key20 = "20";
+
+    std::string sender_10 = "sender_10";
+    std::string sender_20 = "sender_20";
+
+    std::string receive_10 = "";
+    std::string receive_20 = "";
+
+    observer.add_wild_card_handler(subject, [&receive_10, &receive_20](const std::string &key, const yas::any &sender) {
+        if (key == "10") {
+            receive_10 = sender.get<std::string>();
+        } else if (key == "20") {
+            receive_20 = sender.get<std::string>();
+        }
+    });
+
+    observer.remove_wild_card_handler(subject);
+
+    subject.notify(key10, sender_10);
+
+    XCTAssertNotEqual(receive_10, sender_10);
+    XCTAssertNotEqual(receive_20, sender_20);
+
+    subject.notify(key20, sender_20);
+
+    XCTAssertNotEqual(receive_10, sender_10);
+    XCTAssertNotEqual(receive_20, sender_20);
+}
+
+- (void)test_subject_dispatcher
 {
     static const std::string property_method1 = "p1";
     static const std::string property_method2 = "p2";
