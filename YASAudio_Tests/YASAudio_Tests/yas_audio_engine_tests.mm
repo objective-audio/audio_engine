@@ -38,8 +38,8 @@
 
     auto &nodes = yas::audio_engine::private_access::nodes(engine);
     auto &connections = yas::audio_engine::private_access::connections(engine);
-    XCTAssertGreaterThanOrEqual(nodes.count(source_node.key()), 1);
-    XCTAssertGreaterThanOrEqual(nodes.count(destination_node.key()), 1);
+    XCTAssertGreaterThanOrEqual(nodes.count(source_node.identifier()), 1);
+    XCTAssertGreaterThanOrEqual(nodes.count(destination_node.identifier()), 1);
     XCTAssertEqual(connections.size(), 1);
     XCTAssertEqual(connections.begin()->second, connection);
 }
@@ -70,21 +70,21 @@
     engine.connect(source_node, relay_node, format);
 
     auto &nodes = yas::audio_engine::private_access::nodes(engine);
-    XCTAssertGreaterThanOrEqual(nodes.count(source_node.key()), 1);
-    XCTAssertGreaterThanOrEqual(nodes.count(relay_node.key()), 1);
-    XCTAssertEqual(nodes.count(destination_node.key()), 0);
+    XCTAssertGreaterThanOrEqual(nodes.count(source_node.identifier()), 1);
+    XCTAssertGreaterThanOrEqual(nodes.count(relay_node.identifier()), 1);
+    XCTAssertEqual(nodes.count(destination_node.identifier()), 0);
 
     engine.connect(relay_node, destination_node, format);
 
-    XCTAssertGreaterThanOrEqual(nodes.count(source_node.key()), 1);
-    XCTAssertGreaterThanOrEqual(nodes.count(relay_node.key()), 1);
-    XCTAssertGreaterThanOrEqual(nodes.count(destination_node.key()), 1);
+    XCTAssertGreaterThanOrEqual(nodes.count(source_node.identifier()), 1);
+    XCTAssertGreaterThanOrEqual(nodes.count(relay_node.identifier()), 1);
+    XCTAssertGreaterThanOrEqual(nodes.count(destination_node.identifier()), 1);
 
     engine.disconnect(relay_node);
 
-    XCTAssertEqual(nodes.count(source_node.key()), 0);
-    XCTAssertEqual(nodes.count(relay_node.key()), 0);
-    XCTAssertEqual(nodes.count(destination_node.key()), 0);
+    XCTAssertEqual(nodes.count(source_node.identifier()), 0);
+    XCTAssertEqual(nodes.count(relay_node.identifier()), 0);
+    XCTAssertEqual(nodes.count(destination_node.identifier()), 0);
 }
 
 - (void)testConfigurationChangeNotification

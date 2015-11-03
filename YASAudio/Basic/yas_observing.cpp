@@ -6,6 +6,8 @@
 #include "yas_observing.h"
 #include "yas_audio_types.h"
 #include "yas_stl_utils.h"
+#include <list>
+#include <experimental/optional>
 
 using namespace yas;
 
@@ -71,55 +73,51 @@ class observer::impl : public base::impl
 class subject::impl
 {
    public:
-    using weak_observers_vector_t = std::vector<weak<observer>>;
-    using weak_observers_map_t = std::map<const std::experimental::optional<std::string>, weak_observers_vector_t>;
-    weak_observers_map_t observers;
+    using observer_map_t = std::map<uintptr_t, weak<observer>>;
+    using observers_t = std::map<const std::experimental::optional<std::string>, observer_map_t>;
+    observers_t observers;
 
     void add_observer(observer &obs, const std::experimental::optional<std::string> &key)
     {
         if (observers.count(key) == 0) {
-            observers.insert(std::make_pair(key, weak_observers_vector_t()));
+            observers.insert(std::make_pair(key, observer_map_t()));
         }
 
-        auto &vector = observers.at(key);
-        vector.push_back(weak<observer>(obs));
+        auto &map = observers.at(key);
+        map.insert(std::make_pair(obs.identifier(), weak<observer>(obs)));
     }
 
-    void remove_observer(const observer &obs, const std::experimental::optional<std::string> &key)
+    void remove_observer(const uintptr_t observer_key, const std::experimental::optional<std::string> &key)
     {
         if (observers.count(key) > 0) {
-            auto &vector = observers.at(key);
+            auto &map = observers.at(key);
 
-            erase_if(vector, [&obs](const weak<observer> &weak_observer) {
-                if (auto shared_observer = weak_observer.lock()) {
-                    if (shared_observer == obs) {
-                        return true;
-                    }
+            erase_if(map, [&observer_key](const auto &observer_pair) {
+                if (observer_key == observer_pair.first) {
+                    return true;
                 }
                 return false;
             });
 
-            if (vector.size() == 0) {
+            if (map.size() == 0) {
                 observers.erase(key);
             }
         }
     }
 
-    void remove_observer(const observer &observer)
+    void remove_observer(const uintptr_t observer_key)
     {
-        erase_if(observers, [&observer](auto &pair) {
-            auto &vector = pair.second;
+        erase_if(observers, [&observer_key](auto &pair) {
+            auto &map = pair.second;
 
-            erase_if(vector, [&observer](const auto &weak_observer) {
-                if (auto shared_observer = weak_observer.lock()) {
-                    if (shared_observer == observer) {
-                        return true;
-                    }
+            erase_if(map, [&observer_key](const auto &observer_pair) {
+                if (observer_key == observer_pair.first) {
+                    return true;
                 }
                 return false;
             });
 
-            return vector.size() == 0;
+            return map.size() == 0;
         });
     }
 };
@@ -132,6 +130,14 @@ observer::observer() : super_class(std::make_shared<impl>())
 
 observer::observer(std::nullptr_t) : super_class(nullptr)
 {
+}
+
+observer::~observer()
+{
+    if (impl_ptr() && impl_ptr().unique()) {
+        clear();
+        impl_ptr().reset();
+    }
 }
 
 void observer::add_handler(subject &subject, const std::string &key, const handler_f &handler)
@@ -155,7 +161,7 @@ void observer::remove_handler(subject &subject, const std::string &key)
             impl->handlers.erase(&subject);
         }
     }
-    subject._impl->remove_observer(*this, key);
+    subject._impl->remove_observer(identifier(), key);
 }
 
 void observer::add_wild_card_handler(subject &subject, const handler_f &handler)
@@ -179,15 +185,16 @@ void observer::remove_wild_card_handler(subject &subject)
             impl->handlers.erase(&subject);
         }
     }
-    subject._impl->remove_observer(*this, nullopt);
+    subject._impl->remove_observer(identifier(), nullopt);
 }
 
 void observer::clear()
 {
+    auto id = identifier();
     auto impl = _impl_ptr();
     for (auto &pair : impl->handlers) {
         auto &subject_ptr = pair.first;
-        subject_ptr->_impl->remove_observer(*this);
+        subject_ptr->_impl->remove_observer(id);
     }
     impl->handlers.clear();
 }
@@ -218,8 +225,8 @@ subject::subject() : _impl(std::make_unique<impl>())
 subject::~subject()
 {
     for (auto &pair : _impl->observers) {
-        for (auto &weak_observer : pair.second) {
-            if (auto observer = weak_observer.lock()) {
+        for (auto &observer_pair : pair.second) {
+            if (auto observer = observer_pair.second.lock()) {
                 observer._impl_ptr()->handlers.erase(this);
             }
         }
@@ -244,15 +251,15 @@ void subject::notify(const std::string &key) const
 void subject::notify(const std::string &key, const yas::any &object) const
 {
     if (_impl->observers.count(key)) {
-        for (auto &weak_observer : _impl->observers.at(key)) {
-            if (auto observer = weak_observer.lock()) {
+        for (auto &observer_pair : _impl->observers.at(key)) {
+            if (auto observer = observer_pair.second.lock()) {
                 observer._impl_ptr()->call_handler(*this, key, object);
             }
         }
     }
     if (_impl->observers.count(nullopt)) {
-        for (auto &weak_observer : _impl->observers.at(nullopt)) {
-            if (auto observer = weak_observer.lock()) {
+        for (auto &observer_pair : _impl->observers.at(nullopt)) {
+            if (auto observer = observer_pair.second.lock()) {
                 observer._impl_ptr()->call_wild_card_handler(*this, key, object);
             }
         }
