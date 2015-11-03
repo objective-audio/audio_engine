@@ -9,10 +9,6 @@
 #include "yas_base.h"
 #include <functional>
 #include <string>
-#include <map>
-#include <memory>
-#include <vector>
-#include <experimental/optional>
 #include <initializer_list>
 
 namespace yas
@@ -27,7 +23,7 @@ namespace yas
 
         observer();
         explicit observer(std::nullptr_t);
-        ~observer() = default;
+        ~observer();
 
         observer(const observer &) = default;
         observer(observer &&) = default;
