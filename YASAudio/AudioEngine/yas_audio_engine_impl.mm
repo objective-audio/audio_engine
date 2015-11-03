@@ -142,7 +142,7 @@ observer &audio_engine::impl::device_observer()
 
 bool audio_engine::impl::node_exists(const audio_node &node)
 {
-    return _core->nodes.count(node.key()) > 0;
+    return _core->nodes.count(node.identifier()) > 0;
 }
 
 void audio_engine::impl::attach_node(audio_node &node)
@@ -151,11 +151,11 @@ void audio_engine::impl::attach_node(audio_node &node)
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
     }
 
-    if (_core->nodes.count(node.key()) > 0) {
+    if (_core->nodes.count(node.identifier()) > 0) {
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : node is already attached.");
     }
 
-    _core->nodes.insert(std::make_pair(node.key(), node));
+    _core->nodes.insert(std::make_pair(node.identifier(), node));
 
     static_cast<audio_node_from_engine &>(node)._set_engine(_core->weak_engine.lock());
 
@@ -168,7 +168,7 @@ void audio_engine::impl::detach_node(audio_node &node)
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
     }
 
-    if (_core->nodes.count(node.key()) == 0) {
+    if (_core->nodes.count(node.identifier()) == 0) {
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : node is not attached.");
     }
 
@@ -180,7 +180,7 @@ void audio_engine::impl::detach_node(audio_node &node)
 
     static_cast<audio_node_from_engine &>(node)._set_engine(audio_engine(nullptr));
 
-    _core->nodes.erase(node.key());
+    _core->nodes.erase(node.identifier());
 }
 
 void audio_engine::impl::detach_node_if_unused(audio_node &node)
@@ -247,7 +247,7 @@ audio_connection audio_engine::impl::connect(audio_node &source_node, audio_node
 
     audio_connection_for_engine connection(source_node, source_bus_idx, destination_node, destination_bus_idx, format);
 
-    connections().insert(std::make_pair(connection.key(), connection));
+    connections().insert(std::make_pair(connection.identifier(), connection));
 
     if (graph()) {
         add_connection(connection);
@@ -270,7 +270,7 @@ void audio_engine::impl::disconnect(audio_connection &connection)
         detach_node_if_unused(node);
     }
 
-    connections().erase(connection.key());
+    connections().erase(connection.identifier());
 }
 
 void audio_engine::impl::disconnect(audio_node &node)
@@ -288,8 +288,8 @@ void audio_engine::impl::disconnect_node_with_predicate(std::function<bool(const
 
     for (auto &pair : remove_connections) {
         auto &connection = pair.second;
-        update_nodes.insert(std::make_pair(connection.source_node().key(), connection.source_node()));
-        update_nodes.insert(std::make_pair(connection.destination_node().key(), connection.destination_node()));
+        update_nodes.insert(std::make_pair(connection.source_node().identifier(), connection.source_node()));
+        update_nodes.insert(std::make_pair(connection.destination_node().identifier(), connection.destination_node()));
         remove_connection_from_nodes(connection);
         static_cast<audio_connection_from_engine &>(connection)._remove_nodes();
     }
@@ -302,7 +302,7 @@ void audio_engine::impl::disconnect_node_with_predicate(std::function<bool(const
 
     for (auto &pair : remove_connections) {
         auto &connection = pair.second;
-        _core->connections.erase(connection.key());
+        _core->connections.erase(connection.identifier());
     }
 }
 
@@ -364,7 +364,7 @@ bool audio_engine::impl::add_connection(const audio_connection &connection)
     auto destination_node = connection.destination_node();
     auto source_node = connection.source_node();
 
-    if (_core->nodes.count(destination_node.key()) == 0 || _core->nodes.count(source_node.key()) == 0) {
+    if (_core->nodes.count(destination_node.identifier()) == 0 || _core->nodes.count(source_node.identifier()) == 0) {
         throw std::runtime_error(std::string(__PRETTY_FUNCTION__) + " : node is not attached.");
         return false;
     }

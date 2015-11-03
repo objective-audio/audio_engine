@@ -58,7 +58,7 @@ namespace yas
             return !_impl;
         }
 
-        uintptr_t key() const
+        uintptr_t identifier() const
         {
             return reinterpret_cast<uintptr_t>(&*_impl);
         }
