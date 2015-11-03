@@ -46,20 +46,6 @@ namespace yas
         return filtered;
     }
 
-    template <typename K, typename T>
-    std::map<K, std::shared_ptr<T>> lock_values(const std::map<K, std::weak_ptr<T>> &map)
-    {
-        std::map<K, std::shared_ptr<T>> unwrapped_map;
-
-        for (auto &pair : map) {
-            if (auto shared = pair.second.lock()) {
-                unwrapped_map.insert(std::make_pair(pair.first, shared));
-            }
-        }
-
-        return unwrapped_map;
-    }
-
     template <typename T, typename P>
     void erase_if(T &collection, P predicate)
     {
