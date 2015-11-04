@@ -49,8 +49,5 @@ namespace yas
 
         // render thread
         static void audio_unit_render(render_parameters &render_parameters);
-
-       private:
-        std::shared_ptr<impl> _impl_ptr() const;
     };
 }

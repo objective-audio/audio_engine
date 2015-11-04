@@ -202,15 +202,10 @@ yas::test::audio_test_node::audio_test_node(const UInt32 input_bus_count, const 
 
 void yas::test::audio_test_node::set_input_bus_count(const UInt32 &count)
 {
-    _impl_ptr()->_input_bus_count = count;
+    impl_ptr<impl>()->_input_bus_count = count;
 }
 
 void yas::test::audio_test_node::set_output_bus_count(const UInt32 &count)
 {
-    _impl_ptr()->_output_bus_count = count;
-}
-
-std::shared_ptr<yas::test::audio_test_node::impl> yas::test::audio_test_node::_impl_ptr() const
-{
-    return impl_ptr<impl>();
+    impl_ptr<impl>()->_output_bus_count = count;
 }

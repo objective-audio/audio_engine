@@ -64,8 +64,6 @@ namespace yas
 
         explicit audio_node(const std::shared_ptr<impl> &);
 
-        std::shared_ptr<impl> _impl_ptr() const;
-
         // from engine
 
         audio_connection _input_connection(const UInt32 bus_idx) const override;

@@ -30,10 +30,10 @@ audio_unit_node::audio_unit_node(const OSType type, const OSType sub_type)
 {
 }
 
-audio_unit_node::audio_unit_node(std::shared_ptr<impl> &&impl, const AudioComponentDescription &acd)
-    : audio_node(std::move(impl))
+audio_unit_node::audio_unit_node(std::shared_ptr<impl> &&imp, const AudioComponentDescription &acd)
+    : audio_node(std::move(imp))
 {
-    _impl_ptr()->prepare(*this, acd);
+    impl_ptr<impl>()->prepare(*this, acd);
 }
 
 audio_unit_node::audio_unit_node(const std::shared_ptr<impl> &impl) : super_class(impl)
@@ -44,84 +44,79 @@ audio_unit_node::~audio_unit_node() = default;
 
 audio_unit audio_unit_node::audio_unit() const
 {
-    return _impl_ptr()->au();
+    return impl_ptr<impl>()->au();
 }
 
 const std::map<AudioUnitParameterID, audio_unit_parameter_map_t> &audio_unit_node::parameters() const
 {
-    return _impl_ptr()->parameters();
+    return impl_ptr<impl>()->parameters();
 }
 
 const audio_unit_parameter_map_t &audio_unit_node::global_parameters() const
 {
-    return _impl_ptr()->global_parameters();
+    return impl_ptr<impl>()->global_parameters();
 }
 
 const audio_unit_parameter_map_t &audio_unit_node::input_parameters() const
 {
-    return _impl_ptr()->input_parameters();
+    return impl_ptr<impl>()->input_parameters();
 }
 
 const audio_unit_parameter_map_t &audio_unit_node::output_parameters() const
 {
-    return _impl_ptr()->output_parameters();
+    return impl_ptr<impl>()->output_parameters();
 }
 
 UInt32 audio_unit_node::input_element_count() const
 {
-    return _impl_ptr()->input_element_count();
+    return impl_ptr<impl>()->input_element_count();
 }
 
 UInt32 audio_unit_node::output_element_count() const
 {
-    return _impl_ptr()->output_element_count();
+    return impl_ptr<impl>()->output_element_count();
 }
 
 void audio_unit_node::set_global_parameter_value(const AudioUnitParameterID parameter_id, const Float32 value)
 {
-    _impl_ptr()->set_global_parameter_value(parameter_id, value);
+    impl_ptr<impl>()->set_global_parameter_value(parameter_id, value);
 }
 
 Float32 audio_unit_node::global_parameter_value(const AudioUnitParameterID parameter_id) const
 {
-    return _impl_ptr()->global_parameter_value(parameter_id);
+    return impl_ptr<impl>()->global_parameter_value(parameter_id);
 }
 
 void audio_unit_node::set_input_parameter_value(const AudioUnitParameterID parameter_id, const Float32 value,
                                                 const AudioUnitElement element)
 {
-    _impl_ptr()->set_input_parameter_value(parameter_id, value, element);
+    impl_ptr<impl>()->set_input_parameter_value(parameter_id, value, element);
 }
 
 Float32 audio_unit_node::input_parameter_value(const AudioUnitParameterID parameter_id,
                                                const AudioUnitElement element) const
 {
-    return _impl_ptr()->input_parameter_value(parameter_id, element);
+    return impl_ptr<impl>()->input_parameter_value(parameter_id, element);
 }
 
 void audio_unit_node::set_output_parameter_value(const AudioUnitParameterID parameter_id, const Float32 value,
                                                  const AudioUnitElement element)
 {
-    _impl_ptr()->set_output_parameter_value(parameter_id, value, element);
+    impl_ptr<impl>()->set_output_parameter_value(parameter_id, value, element);
 }
 
 Float32 audio_unit_node::output_parameter_value(const AudioUnitParameterID parameter_id,
                                                 const AudioUnitElement element) const
 {
-    return _impl_ptr()->output_parameter_value(parameter_id, element);
-}
-
-std::shared_ptr<audio_unit_node::impl> audio_unit_node::_impl_ptr() const
-{
-    return impl_ptr<impl>();
+    return impl_ptr<impl>()->output_parameter_value(parameter_id, element);
 }
 
 void audio_unit_node::_add_audio_unit_to_graph(audio_graph &graph)
 {
-    _impl_ptr()->add_audio_unit_to_graph(graph);
+    impl_ptr<impl>()->add_audio_unit_to_graph(graph);
 }
 
 void audio_unit_node::_remove_audio_unit_from_graph()
 {
-    _impl_ptr()->remove_audio_unit_from_graph();
+    impl_ptr<impl>()->remove_audio_unit_from_graph();
 }

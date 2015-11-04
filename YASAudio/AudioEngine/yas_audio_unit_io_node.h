@@ -40,8 +40,6 @@ namespace yas
         class impl;
 
         audio_unit_io_node(const std::shared_ptr<impl> &, const AudioComponentDescription &);
-
-        std::shared_ptr<impl> _impl_ptr() const;
     };
 
     class audio_unit_output_node : public audio_unit_io_node
@@ -70,9 +68,6 @@ namespace yas
 
         void set_channel_map(const channel_map_t &map);
         const channel_map_t &channel_map() const;
-
-       private:
-        std::shared_ptr<impl> _impl_ptr() const;
     };
 }
 

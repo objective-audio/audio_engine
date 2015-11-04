@@ -107,11 +107,11 @@ audio_device_stream::audio_device_stream(std::nullptr_t) : super_class(nullptr)
 audio_device_stream::audio_device_stream(const AudioStreamID stream_id, const AudioDeviceID device_id)
     : super_class(std::make_shared<impl>(stream_id, device_id))
 {
-    auto impl = _impl_ptr();
-    auto function = impl->listener(*this);
-    impl->add_listener(kAudioStreamPropertyVirtualFormat, function);
-    impl->add_listener(kAudioStreamPropertyIsActive, function);
-    impl->add_listener(kAudioStreamPropertyStartingChannel, function);
+    auto imp = impl_ptr<impl>();
+    auto function = imp->listener(*this);
+    imp->add_listener(kAudioStreamPropertyVirtualFormat, function);
+    imp->add_listener(kAudioStreamPropertyIsActive, function);
+    imp->add_listener(kAudioStreamPropertyStartingChannel, function);
 }
 
 audio_device_stream::~audio_device_stream() = default;
@@ -134,12 +134,12 @@ bool audio_device_stream::operator!=(const audio_device_stream &other)
 
 AudioStreamID audio_device_stream::stream_id() const
 {
-    return _impl_ptr()->stream_id;
+    return impl_ptr<impl>()->stream_id;
 }
 
 audio_device audio_device_stream::device() const
 {
-    return audio_device::device_for_id(_impl_ptr()->device_id);
+    return audio_device::device_for_id(impl_ptr<impl>()->device_id);
 }
 
 bool audio_device_stream::is_active() const
@@ -182,12 +182,7 @@ UInt32 audio_device_stream::starting_channel() const
 
 yas::subject &audio_device_stream::subject() const
 {
-    return _impl_ptr()->subject;
-}
-
-std::shared_ptr<audio_device_stream::impl> audio_device_stream::_impl_ptr() const
-{
-    return impl_ptr<impl>();
+    return impl_ptr<impl>()->subject;
 }
 
 #endif

@@ -26,23 +26,18 @@ audio_offline_output_node::~audio_offline_output_node() = default;
 
 bool audio_offline_output_node::is_running() const
 {
-    return _impl_ptr()->is_running();
+    return impl_ptr<impl>()->is_running();
 }
 
 offline_start_result_t audio_offline_output_node::_start(const offline_render_f &callback_func,
                                                          const offline_completion_f &completion_func)
 {
-    return _impl_ptr()->start(callback_func, completion_func);
+    return impl_ptr<impl>()->start(callback_func, completion_func);
 }
 
 void audio_offline_output_node::_stop()
 {
-    _impl_ptr()->stop();
-}
-
-std::shared_ptr<audio_offline_output_node::impl> audio_offline_output_node::_impl_ptr() const
-{
-    return impl_ptr<impl>();
+    impl_ptr<impl>()->stop();
 }
 
 std::string to_string(const offline_start_error_t &error)

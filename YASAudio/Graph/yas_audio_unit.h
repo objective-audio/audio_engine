@@ -24,6 +24,9 @@ namespace yas
 {
     class audio_unit : public base, public audio_unit_from_graph
     {
+        using super_class = base;
+        class impl;
+
        public:
         using render_f = std::function<void(render_parameters &)>;
 
@@ -103,11 +106,6 @@ namespace yas
         void audio_unit_render(render_parameters &render_parameters);
 
        private:
-        using super_class = base;
-        class impl;
-
-        std::shared_ptr<impl> _impl_ptr() const;
-
         // from graph
 
         void _initialize() override;

@@ -211,10 +211,10 @@ void audio_node::impl::set_engine(const audio_engine &engine)
 
 void audio_node::impl::add_connection(const audio_connection &connection)
 {
-    if (connection.destination_node()._impl_ptr()->_core == _core) {
+    if (connection.destination_node().impl_ptr<impl>()->_core == _core) {
         auto bus_idx = connection.destination_bus();
         _core->input_connections.insert(std::make_pair(bus_idx, weak<audio_connection>(connection)));
-    } else if (connection.source_node()._impl_ptr()->_core == _core) {
+    } else if (connection.source_node().impl_ptr<impl>()->_core == _core) {
         auto bus_idx = connection.source_bus();
         _core->output_connections.insert(std::make_pair(bus_idx, weak<audio_connection>(connection)));
     } else {
@@ -227,13 +227,13 @@ void audio_node::impl::add_connection(const audio_connection &connection)
 void audio_node::impl::remove_connection(const audio_connection &connection)
 {
     if (auto destination_node = connection.destination_node()) {
-        if (connection.destination_node()._impl_ptr()->_core == _core) {
+        if (connection.destination_node().impl_ptr<impl>()->_core == _core) {
             _core->input_connections.erase(connection.destination_bus());
         }
     }
 
     if (auto source_node = connection.source_node()) {
-        if (connection.source_node()._impl_ptr()->_core == _core) {
+        if (connection.source_node().impl_ptr<impl>()->_core == _core) {
             _core->output_connections.erase(connection.source_bus());
         }
     }

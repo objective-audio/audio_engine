@@ -53,8 +53,6 @@ namespace yas
         class kernel;
         class impl;
 
-        std::shared_ptr<impl> _impl_ptr() const;
-
         void _initialize();
         void _uninitialize();
     };

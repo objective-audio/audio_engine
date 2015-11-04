@@ -142,23 +142,23 @@ observer::~observer()
 
 void observer::add_handler(subject &subject, const std::string &key, const handler_f &handler)
 {
-    auto impl = _impl_ptr();
+    auto imp = impl_ptr<impl>();
     auto subject_ptr = &subject;
-    if (impl->handlers.count(subject_ptr) == 0) {
-        impl->handlers.insert(std::make_pair(&subject, yas::observer::impl::handler_holder()));
+    if (imp->handlers.count(subject_ptr) == 0) {
+        imp->handlers.insert(std::make_pair(&subject, yas::observer::impl::handler_holder()));
     };
-    impl->handlers.at(&subject).add_handler(key, handler);
+    imp->handlers.at(&subject).add_handler(key, handler);
     subject._impl->add_observer(*this, key);
 }
 
 void observer::remove_handler(subject &subject, const std::string &key)
 {
-    auto impl = _impl_ptr();
-    if (impl->handlers.count(&subject) > 0) {
-        auto &handler_holder = impl->handlers.at(&subject);
+    auto imp = impl_ptr<impl>();
+    if (imp->handlers.count(&subject) > 0) {
+        auto &handler_holder = imp->handlers.at(&subject);
         handler_holder.remove_handler(key);
         if (handler_holder.size() == 0) {
-            impl->handlers.erase(&subject);
+            imp->handlers.erase(&subject);
         }
     }
     subject._impl->remove_observer(identifier(), key);
@@ -166,23 +166,23 @@ void observer::remove_handler(subject &subject, const std::string &key)
 
 void observer::add_wild_card_handler(subject &subject, const handler_f &handler)
 {
-    auto impl = _impl_ptr();
+    auto imp = impl_ptr<impl>();
     auto subject_ptr = &subject;
-    if (impl->handlers.count(subject_ptr) == 0) {
-        impl->handlers.insert(std::make_pair(&subject, yas::observer::impl::handler_holder()));
+    if (imp->handlers.count(subject_ptr) == 0) {
+        imp->handlers.insert(std::make_pair(&subject, yas::observer::impl::handler_holder()));
     };
-    impl->handlers.at(&subject).add_handler(nullopt, handler);
+    imp->handlers.at(&subject).add_handler(nullopt, handler);
     subject._impl->add_observer(*this, nullopt);
 }
 
 void observer::remove_wild_card_handler(subject &subject)
 {
-    auto impl = _impl_ptr();
-    if (impl->handlers.count(&subject) > 0) {
-        auto &handler_holder = impl->handlers.at(&subject);
+    auto imp = impl_ptr<impl>();
+    if (imp->handlers.count(&subject) > 0) {
+        auto &handler_holder = imp->handlers.at(&subject);
         handler_holder.remove_handler(nullopt);
         if (handler_holder.size() == 0) {
-            impl->handlers.erase(&subject);
+            imp->handlers.erase(&subject);
         }
     }
     subject._impl->remove_observer(identifier(), nullopt);
@@ -191,17 +191,12 @@ void observer::remove_wild_card_handler(subject &subject)
 void observer::clear()
 {
     auto id = identifier();
-    auto impl = _impl_ptr();
-    for (auto &pair : impl->handlers) {
+    auto imp = impl_ptr<impl>();
+    for (auto &pair : imp->handlers) {
         auto &subject_ptr = pair.first;
         subject_ptr->_impl->remove_observer(id);
     }
-    impl->handlers.clear();
-}
-
-std::shared_ptr<observer::impl> observer::_impl_ptr() const
-{
-    return impl_ptr<observer::impl>();
+    imp->handlers.clear();
 }
 
 observer yas::make_subject_dispatcher(const subject &source, const std::initializer_list<subject *> &destinations)
@@ -227,7 +222,7 @@ subject::~subject()
     for (auto &pair : _impl->observers) {
         for (auto &observer_pair : pair.second) {
             if (auto observer = observer_pair.second.lock()) {
-                observer._impl_ptr()->handlers.erase(this);
+                observer.impl_ptr<observer::impl>()->handlers.erase(this);
             }
         }
     }
@@ -253,14 +248,14 @@ void subject::notify(const std::string &key, const yas::any &object) const
     if (_impl->observers.count(key)) {
         for (auto &observer_pair : _impl->observers.at(key)) {
             if (auto observer = observer_pair.second.lock()) {
-                observer._impl_ptr()->call_handler(*this, key, object);
+                observer.impl_ptr<observer::impl>()->call_handler(*this, key, object);
             }
         }
     }
     if (_impl->observers.count(nullopt)) {
         for (auto &observer_pair : _impl->observers.at(nullopt)) {
             if (auto observer = observer_pair.second.lock()) {
-                observer._impl_ptr()->call_wild_card_handler(*this, key, object);
+                observer.impl_ptr<observer::impl>()->call_wild_card_handler(*this, key, object);
             }
         }
     }

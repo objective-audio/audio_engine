@@ -12,6 +12,8 @@ namespace yas
     class audio_route_node : public audio_node
     {
         using super_class = audio_node;
+        class kernel;
+        class impl;
 
        public:
         audio_route_node();
@@ -26,11 +28,5 @@ namespace yas
         void set_routes(const std::set<audio_route> &routes);
         void set_routes(std::set<audio_route> &&routes);
         void clear_routes();
-
-       private:
-        class kernel;
-        class impl;
-
-        std::shared_ptr<impl> _impl_ptr() const;
     };
 }

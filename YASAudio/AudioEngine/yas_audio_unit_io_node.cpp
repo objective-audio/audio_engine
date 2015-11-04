@@ -46,47 +46,42 @@ audio_unit_io_node::~audio_unit_io_node() = default;
 
 void audio_unit_io_node::set_channel_map(const channel_map_t &map, const yas::direction dir)
 {
-    _impl_ptr()->set_channel_map(map, dir);
+    impl_ptr<impl>()->set_channel_map(map, dir);
 }
 
 const channel_map_t &audio_unit_io_node::channel_map(const yas::direction dir) const
 {
-    return _impl_ptr()->channel_map(dir);
+    return impl_ptr<impl>()->channel_map(dir);
 }
 
 Float64 audio_unit_io_node::device_sample_rate() const
 {
-    return _impl_ptr()->device_sample_rate();
+    return impl_ptr<impl>()->device_sample_rate();
 }
 
 UInt32 audio_unit_io_node::output_device_channel_count() const
 {
-    return _impl_ptr()->output_device_channel_count();
+    return impl_ptr<impl>()->output_device_channel_count();
 }
 
 UInt32 audio_unit_io_node::input_device_channel_count() const
 {
-    return _impl_ptr()->input_device_channel_count();
+    return impl_ptr<impl>()->input_device_channel_count();
 }
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
 
 void audio_unit_io_node::set_device(const audio_device &device)
 {
-    _impl_ptr()->set_device(device);
+    impl_ptr<impl>()->set_device(device);
 }
 
 audio_device audio_unit_io_node::device() const
 {
-    return _impl_ptr()->device();
+    return impl_ptr<impl>()->device();
 }
 
 #endif
-
-std::shared_ptr<audio_unit_io_node::impl> audio_unit_io_node::_impl_ptr() const
-{
-    return impl_ptr<impl>();
-}
 
 #pragma mark - audio_unit_output_node
 
@@ -126,9 +121,4 @@ void audio_unit_input_node::set_channel_map(const channel_map_t &map)
 const channel_map_t &audio_unit_input_node::channel_map() const
 {
     return super_class::channel_map(yas::direction::input);
-}
-
-std::shared_ptr<audio_unit_input_node::impl> audio_unit_input_node::_impl_ptr() const
-{
-    return impl_ptr<impl>();
 }

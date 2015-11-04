@@ -18,6 +18,9 @@ namespace yas
 
     class observer : public base
     {
+        using super_class = base;
+        class impl;
+
        public:
         using handler_f = std::function<void(const std::string &, const yas::any &)>;
 
@@ -37,12 +40,6 @@ namespace yas
         void remove_wild_card_handler(subject &subject);
 
         void clear();
-
-       private:
-        using super_class = base;
-        class impl;
-
-        std::shared_ptr<impl> _impl_ptr() const;
 
         friend subject;
     };

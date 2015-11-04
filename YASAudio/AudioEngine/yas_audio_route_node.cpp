@@ -181,52 +181,45 @@ audio_route_node::audio_route_node(std::nullptr_t) : super_class(nullptr)
 
 const audio_route_set &audio_route_node::routes() const
 {
-    return _impl_ptr()->routes();
+    return impl_ptr<impl>()->routes();
 }
 
 void audio_route_node::add_route(const audio_route &route)
 {
-    _impl_ptr()->add_route(route);
+    impl_ptr<impl>()->add_route(route);
 }
 
 void audio_route_node::add_route(audio_route &&route)
 {
-    _impl_ptr()->add_route(std::move(route));
+    impl_ptr<impl>()->add_route(std::move(route));
 }
 
 void audio_route_node::remove_route(const audio_route &route)
 {
-    _impl_ptr()->remove_route(route);
+    impl_ptr<impl>()->remove_route(route);
 }
 
 void audio_route_node::remove_route_for_source(const audio_route::point &src_pt)
 {
-    _impl_ptr()->remove_route_for_source(src_pt);
+    impl_ptr<impl>()->remove_route_for_source(src_pt);
 }
 
 void audio_route_node::remove_route_for_destination(const audio_route::point &dst_pt)
 {
-    _impl_ptr()->remove_route_for_destination(dst_pt);
+    impl_ptr<impl>()->remove_route_for_destination(dst_pt);
 }
 
 void audio_route_node::set_routes(const audio_route_set &routes)
 {
-    _impl_ptr()->set_routes(routes);
+    impl_ptr<impl>()->set_routes(routes);
 }
 
 void audio_route_node::set_routes(audio_route_set &&routes)
 {
-    _impl_ptr()->set_routes(std::move(routes));
+    impl_ptr<impl>()->set_routes(std::move(routes));
 }
 
 void audio_route_node::clear_routes()
 {
-    _impl_ptr()->clear_routes();
-}
-
-#pragma mark - private
-
-std::shared_ptr<audio_route_node::impl> audio_route_node::_impl_ptr() const
-{
-    return impl_ptr<impl>();
+    impl_ptr<impl>()->clear_routes();
 }

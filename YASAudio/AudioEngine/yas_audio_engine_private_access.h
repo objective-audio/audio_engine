@@ -14,12 +14,12 @@ namespace yas
        public:
         static std::unordered_map<uintptr_t, audio_node> &nodes(const audio_engine &engine)
         {
-            return engine._impl_ptr()->nodes();
+            return engine.impl_ptr<impl>()->nodes();
         }
 
         static audio_connection_map &connections(const audio_engine &engine)
         {
-            return engine._impl_ptr()->connections();
+            return engine.impl_ptr<impl>()->connections();
         }
     };
 }

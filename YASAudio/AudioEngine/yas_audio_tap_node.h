@@ -14,6 +14,7 @@ namespace yas
         using super_class = audio_node;
 
        public:
+        class kernel;
         class impl;
 
         audio_tap_node();
@@ -33,11 +34,6 @@ namespace yas
 
        protected:
         explicit audio_tap_node(const std::shared_ptr<impl> &);
-
-       private:
-        class kernel;
-
-        std::shared_ptr<impl> _impl_ptr() const;
     };
 
     class audio_input_tap_node : public audio_tap_node
