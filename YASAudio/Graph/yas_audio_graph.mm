@@ -118,7 +118,7 @@ class audio_graph::impl : public base::impl
             for (auto &pair : _graphs) {
                 if (auto graph = pair.second.lock()) {
                     if (graph.is_running()) {
-                        graph._impl_ptr()->start_all_ios();
+                        graph.impl_ptr<impl>()->start_all_ios();
                     }
                 }
             }
@@ -132,7 +132,7 @@ class audio_graph::impl : public base::impl
         std::lock_guard<std::recursive_mutex> lock(_global_mutex);
         for (const auto &pair : _graphs) {
             if (const auto graph = pair.second.lock()) {
-                graph._impl_ptr()->stop_all_ios();
+                graph.impl_ptr<impl>()->stop_all_ios();
             }
         }
     }
@@ -140,7 +140,7 @@ class audio_graph::impl : public base::impl
     static void add_graph(const audio_graph &graph)
     {
         std::lock_guard<std::recursive_mutex> lock(_global_mutex);
-        _graphs.insert(std::make_pair(graph._impl_ptr()->key(), to_weak(graph)));
+        _graphs.insert(std::make_pair(graph.impl_ptr<impl>()->key(), to_weak(graph)));
     }
 
     static void remove_graph_for_key(const UInt8 key)
@@ -303,23 +303,25 @@ void audio_graph::add_audio_unit(audio_unit &unit)
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : audio_unit.key is assigned.");
     }
 
-    _impl_ptr()->add_unit_to_units(unit);
+    auto imp = impl_ptr<impl>();
+
+    imp->add_unit_to_units(unit);
 
     unit_from_graph._initialize();
 
-    if (unit.is_output_unit() && is_running() && !_impl_ptr()->is_interrupting()) {
+    if (unit.is_output_unit() && is_running() && !imp->is_interrupting()) {
         unit.start();
     }
 }
 
 void audio_graph::remove_audio_unit(audio_unit &unit)
 {
-    _impl_ptr()->remove_audio_unit(unit);
+    impl_ptr<impl>()->remove_audio_unit(unit);
 }
 
 void audio_graph::remove_all_units()
 {
-    _impl_ptr()->remove_all_units();
+    impl_ptr<impl>()->remove_all_units();
 }
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
@@ -327,10 +329,10 @@ void audio_graph::remove_all_units()
 void audio_graph::add_audio_device_io(audio_device_io &device_io)
 {
     {
-        std::lock_guard<std::recursive_mutex> lock(_impl_ptr()->mutex);
-        _impl_ptr()->device_ios.push_back(device_io);
+        std::lock_guard<std::recursive_mutex> lock(impl_ptr<impl>()->mutex);
+        impl_ptr<impl>()->device_ios.push_back(device_io);
     }
-    if (is_running() && !_impl_ptr()->is_interrupting()) {
+    if (is_running() && !impl_ptr<impl>()->is_interrupting()) {
         device_io.start();
     }
 }
@@ -339,8 +341,8 @@ void audio_graph::remove_audio_device_io(audio_device_io &device_io)
 {
     device_io.stop();
     {
-        std::lock_guard<std::recursive_mutex> lock(_impl_ptr()->mutex);
-        erase_if(_impl_ptr()->device_ios,
+        std::lock_guard<std::recursive_mutex> lock(impl_ptr<impl>()->mutex);
+        erase_if(impl_ptr<impl>()->device_ios,
                  [&device_io](const auto &device_io_in_vec) { return device_io == device_io_in_vec; });
     }
 }
@@ -349,23 +351,25 @@ void audio_graph::remove_audio_device_io(audio_device_io &device_io)
 
 void audio_graph::start()
 {
-    if (!_impl_ptr()->running) {
-        _impl_ptr()->running = true;
-        _impl_ptr()->start_all_ios();
+    auto imp = impl_ptr<impl>();
+    if (!imp->running) {
+        imp->running = true;
+        imp->start_all_ios();
     }
 }
 
 void audio_graph::stop()
 {
-    if (_impl_ptr()->running) {
-        _impl_ptr()->running = false;
-        _impl_ptr()->stop_all_ios();
+    auto imp = impl_ptr<impl>();
+    if (imp->running) {
+        imp->running = false;
+        imp->stop_all_ios();
     }
 }
 
 bool audio_graph::is_running() const
 {
-    return _impl_ptr()->running;
+    return impl_ptr<impl>()->running;
 }
 
 void audio_graph::audio_unit_render(render_parameters &render_parameters)
@@ -374,14 +378,9 @@ void audio_graph::audio_unit_render(render_parameters &render_parameters)
 
     auto graph = impl::graph_for_key(render_parameters.render_id.graph);
     if (graph) {
-        auto unit = graph._impl_ptr()->unit_for_key(render_parameters.render_id.unit);
+        auto unit = graph.impl_ptr<impl>()->unit_for_key(render_parameters.render_id.unit);
         if (unit) {
             unit.callback_render(render_parameters);
         }
     }
-}
-
-std::shared_ptr<audio_graph::impl> audio_graph::_impl_ptr() const
-{
-    return impl_ptr<impl>();
 }

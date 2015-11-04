@@ -46,7 +46,7 @@ namespace yas
 
         static void remove_connection(audio_node &node, const audio_connection &connection)
         {
-            node._impl_ptr()->remove_connection(connection);
+            node.impl_ptr<impl>()->remove_connection(connection);
         }
 
         static void set_engine(audio_node &node, const audio_engine &engine)
@@ -56,12 +56,12 @@ namespace yas
 
         static void update_kernel(audio_node &node)
         {
-            node._impl_ptr()->update_kernel();
+            node.impl_ptr<impl>()->update_kernel();
         }
 
         static std::shared_ptr<kernel> kernel(const audio_node &node)
         {
-            return node._impl_ptr()->kernel_cast();
+            return node.impl_ptr<impl>()->kernel_cast();
         }
     };
 }

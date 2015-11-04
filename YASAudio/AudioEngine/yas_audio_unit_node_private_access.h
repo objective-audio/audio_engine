@@ -12,16 +12,14 @@ namespace yas
     class audio_unit_node::private_access
     {
        public:
-        template <typename T>
-        static void reload_audio_unit(T &node)
+        static void reload_audio_unit(audio_unit_node &node)
         {
-            node._impl_ptr()->reload_audio_unit();
+            node.impl_ptr<impl>()->reload_audio_unit();
         }
 
-        template <typename T>
-        static void prepare_parameters(T &node)
+        static void prepare_parameters(audio_unit_node &node)
         {
-            node._impl_ptr()->prepare_parameters();
+            node.impl_ptr<impl>()->prepare_parameters();
         }
     };
 }

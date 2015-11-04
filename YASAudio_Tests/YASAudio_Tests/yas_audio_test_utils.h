@@ -35,16 +35,13 @@ namespace yas
 
         class audio_test_node : public yas::audio_node
         {
+            class impl;
+
            public:
             audio_test_node(const UInt32 input_bus_count = 2, const UInt32 output_bus_count = 1);
 
             void set_input_bus_count(const UInt32 &);
             void set_output_bus_count(const UInt32 &);
-
-           private:
-            class impl;
-
-            std::shared_ptr<impl> _impl_ptr() const;
         };
     }
 }

@@ -25,6 +25,7 @@ namespace yas
     class audio_engine : public base
     {
         using super_class = base;
+        class impl;
 
        public:
         enum class start_error_t {
@@ -65,11 +66,6 @@ namespace yas
         void stop();
 
         subject &subject() const;
-
-       private:
-        class impl;
-
-        std::shared_ptr<impl> _impl_ptr() const;
 
 #if YAS_TEST
        public:

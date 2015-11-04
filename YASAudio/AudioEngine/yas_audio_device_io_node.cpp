@@ -22,7 +22,7 @@ audio_device_io_node::audio_device_io_node(std::nullptr_t) : super_class(nullptr
 audio_device_io_node::audio_device_io_node(const audio_device &device)
     : audio_node(std::make_unique<audio_device_io_node::impl>())
 {
-    _impl_ptr()->prepare(*this, device);
+    impl_ptr<impl>()->prepare(*this, device);
 }
 
 audio_device_io_node::audio_device_io_node(const std::shared_ptr<audio_device_io_node::impl> &impl) : super_class(impl)
@@ -33,29 +33,24 @@ audio_device_io_node::~audio_device_io_node() = default;
 
 void audio_device_io_node::set_device(const audio_device &device)
 {
-    _impl_ptr()->set_device(device);
+    impl_ptr<impl>()->set_device(device);
 }
 
 audio_device audio_device_io_node::device() const
 {
-    return _impl_ptr()->device();
+    return impl_ptr<impl>()->device();
 }
 
 #pragma mark - private
 
-std::shared_ptr<audio_device_io_node::impl> audio_device_io_node::_impl_ptr() const
-{
-    return impl_ptr<impl>();
-}
-
 void audio_device_io_node::_add_audio_device_io_to_graph(audio_graph &graph)
 {
-    _impl_ptr()->add_device_io_to_graph(graph);
+    impl_ptr<impl>()->add_device_io_to_graph(graph);
 }
 
 void audio_device_io_node::_remove_audio_device_io_from_graph()
 {
-    _impl_ptr()->remove_device_io_from_graph();
+    impl_ptr<impl>()->remove_device_io_from_graph();
 }
 
 #endif

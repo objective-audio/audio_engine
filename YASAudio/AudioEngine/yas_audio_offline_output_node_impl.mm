@@ -105,7 +105,7 @@ offline_start_result_t audio_offline_output_node::impl::start(const offline_rend
                     break;
                 }
 
-                auto kernel = offline_node._impl_ptr()->kernel_cast();
+                auto kernel = offline_node.impl_ptr<impl>()->kernel_cast();
                 if (!kernel) {
                     cancelled = true;
                     break;
@@ -148,10 +148,10 @@ offline_start_result_t audio_offline_output_node::impl::start(const offline_rend
                 if (auto offline_node = weak_node.lock()) {
                     std::experimental::optional<offline_completion_f> node_completion_func;
                     if (key) {
-                        node_completion_func = offline_node._impl_ptr()->_core->pull_completion_function(*key);
+                        node_completion_func = offline_node.impl_ptr<impl>()->_core->pull_completion_function(*key);
                     }
 
-                    offline_node._impl_ptr()->_core->queue_container.set_object(nil);
+                    offline_node.impl_ptr<impl>()->_core->queue_container.set_object(nil);
 
                     if (node_completion_func) {
                         (*node_completion_func)(cancelled);

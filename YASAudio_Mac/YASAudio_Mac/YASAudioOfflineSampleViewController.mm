@@ -66,7 +66,7 @@ namespace yas
 
                     if (auto node = weak_node.lock()) {
                         if (node.is_playing()) {
-                            const Float64 start_phase = node._impl_ptr()->phase_on_render;
+                            const Float64 start_phase = node.impl_ptr<impl>()->phase_on_render;
                             const Float64 phase_per_frame = node.frequency() / sample_rate * yas::audio_math::two_pi;
                             Float64 next_phase = start_phase;
                             const UInt32 frame_length = buffer.frame_length();
@@ -80,7 +80,7 @@ namespace yas
                                     yas_audio_frame_enumerator_move_channel(enumerator);
                                 }
 
-                                node._impl_ptr()->phase_on_render = next_phase;
+                                node.impl_ptr<impl>()->phase_on_render = next_phase;
                             }
                         }
                     }
@@ -97,28 +97,22 @@ namespace yas
 
             void set_frequency(const Float32 frequency)
             {
-                _impl_ptr()->set_frequency(frequency);
+                impl_ptr<impl>()->set_frequency(frequency);
             }
 
             Float32 frequency() const
             {
-                return _impl_ptr()->frequency();
+                return impl_ptr<impl>()->frequency();
             }
 
             void set_playing(const bool playing)
             {
-                _impl_ptr()->set_playing(playing);
+                impl_ptr<impl>()->set_playing(playing);
             }
 
             bool is_playing() const
             {
-                return _impl_ptr()->is_playing();
-            }
-
-           private:
-            std::shared_ptr<impl> _impl_ptr() const
-            {
-                return impl_ptr<impl>();
+                return impl_ptr<impl>()->is_playing();
             }
         };
     }

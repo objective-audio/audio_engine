@@ -17,12 +17,12 @@ namespace yas
        public:
         static void add_audio_device_io_to_graph(audio_device_io_node node, audio_graph &graph)
         {
-            node._impl_ptr()->add_device_io_to_graph(graph);
+            node.impl_ptr<impl>()->add_device_io_to_graph(graph);
         }
 
         static void remove_audio_device_io_from_graph(audio_device_io_node node)
         {
-            node._impl_ptr()->remove_device_io_from_graph();
+            node.impl_ptr<impl>()->remove_device_io_from_graph();
         }
     };
 }

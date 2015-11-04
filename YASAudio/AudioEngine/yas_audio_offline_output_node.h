@@ -27,8 +27,6 @@ namespace yas
        private:
         audio_offline_output_node(const std::shared_ptr<impl> &);
 
-        std::shared_ptr<impl> _impl_ptr() const;
-
         // from engine
 
         offline_start_result_t _start(const offline_render_f &callback_func,

@@ -78,7 +78,7 @@ void audio_engine::impl::prepare(const audio_engine &engine)
     auto reset_lambda = [weak_engine = _core->weak_engine](NSNotification * note)
     {
         if (auto engine = weak_engine.lock()) {
-            engine._impl_ptr()->reload_graph();
+            engine.impl_ptr<impl>()->reload_graph();
         }
     };
 
@@ -92,7 +92,7 @@ void audio_engine::impl::prepare(const audio_engine &engine)
     auto route_change_lambda = [weak_engine = _core->weak_engine](NSNotification * note)
     {
         if (auto engine = weak_engine.lock()) {
-            engine._impl_ptr()->post_configuration_change();
+            engine.impl_ptr<impl>()->post_configuration_change();
         }
     };
 
@@ -107,7 +107,7 @@ void audio_engine::impl::prepare(const audio_engine &engine)
     _core->device_observer.add_handler(audio_device::system_subject(), audio_device_method::configuration_change,
                                        [weak_engine = _core->weak_engine](const auto &method, const auto &infos) {
                                            if (auto engine = weak_engine.lock()) {
-                                               engine._impl_ptr()->post_configuration_change();
+                                               engine.impl_ptr<impl>()->post_configuration_change();
                                            }
                                        });
 #endif

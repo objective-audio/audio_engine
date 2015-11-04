@@ -17,6 +17,7 @@ namespace yas
     class audio_connection : public base, public audio_connection_from_engine
     {
         using super_class = base;
+        class impl;
 
        public:
         audio_connection(std::nullptr_t);
@@ -36,10 +37,6 @@ namespace yas
        protected:
         audio_connection(audio_node &source_node, const UInt32 source_bus, audio_node &destination_node,
                          const UInt32 destination_bus, const audio_format &format);
-
-       private:
-        class impl;
-        std::shared_ptr<impl> _impl_ptr() const;
 
         void _remove_nodes() override;
         void _remove_source_node() override;

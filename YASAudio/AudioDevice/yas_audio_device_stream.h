@@ -29,6 +29,7 @@ namespace yas
     class audio_device_stream : public base
     {
         using super_class = base;
+        class impl;
 
        public:
         enum class property : UInt32 {
@@ -75,10 +76,6 @@ namespace yas
         subject &subject() const;
 
        private:
-        class impl;
-
-        std::shared_ptr<impl> _impl_ptr() const;
-
         template <typename T>
         std::unique_ptr<std::vector<T>> _property_data(const AudioStreamID stream_id,
                                                        const AudioObjectPropertySelector selector) const;

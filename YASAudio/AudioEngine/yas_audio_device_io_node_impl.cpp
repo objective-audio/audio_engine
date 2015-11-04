@@ -83,7 +83,7 @@ void audio_device_io_node::impl::update_connections()
 
     auto render_function = [weak_node, weak_device_io](audio_pcm_buffer &output_buffer, const audio_time &when) {
         if (auto node = weak_node.lock()) {
-            if (auto kernel = node._impl_ptr()->kernel_cast()) {
+            if (auto kernel = node.impl_ptr<impl>()->kernel_cast()) {
                 if (output_buffer) {
                     const auto connections = kernel->input_connections();
                     if (connections.count(0) > 0) {

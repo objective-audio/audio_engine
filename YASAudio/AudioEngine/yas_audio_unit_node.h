@@ -50,8 +50,6 @@ namespace yas
         explicit audio_unit_node(const std::shared_ptr<impl> &);
 
        private:
-        std::shared_ptr<impl> _impl_ptr() const;
-
         // from engine
 
         void _add_audio_unit_to_graph(audio_graph &graph) override;

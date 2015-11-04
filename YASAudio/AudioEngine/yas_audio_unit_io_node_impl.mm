@@ -227,7 +227,7 @@ void audio_unit_input_node::impl::update_connections()
                 input_buffer.set_frame_length(render_parameters.in_number_frames);
                 render_parameters.io_data = input_buffer.audio_buffer_list();
 
-                if (const auto kernel = input_node._impl_ptr()->kernel_cast()) {
+                if (const auto kernel = input_node.impl_ptr<impl>()->kernel_cast()) {
                     if (const auto connection = kernel->output_connection(1)) {
                         auto format = connection.format();
                         audio_time time(*render_parameters.io_time_stamp, format.sample_rate());

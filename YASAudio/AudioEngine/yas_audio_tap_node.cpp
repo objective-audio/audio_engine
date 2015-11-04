@@ -23,39 +23,32 @@ audio_tap_node::~audio_tap_node() = default;
 
 void audio_tap_node::set_render_function(const render_f &func)
 {
-    _impl_ptr()->set_render_function(func);
+    impl_ptr<impl>()->set_render_function(func);
 }
 
 audio_connection audio_tap_node::input_connection_on_render(const UInt32 bus_idx) const
 {
-    return _impl_ptr()->input_connection_on_render(bus_idx);
+    return impl_ptr<impl>()->input_connection_on_render(bus_idx);
 }
 
 audio_connection audio_tap_node::output_connection_on_render(const UInt32 bus_idx) const
 {
-    return _impl_ptr()->output_connection_on_render(bus_idx);
+    return impl_ptr<impl>()->output_connection_on_render(bus_idx);
 }
 
 audio_connection_smap audio_tap_node::input_connections_on_render() const
 {
-    return _impl_ptr()->input_connections_on_render();
+    return impl_ptr<impl>()->input_connections_on_render();
 }
 
 audio_connection_smap audio_tap_node::output_connections_on_render() const
 {
-    return _impl_ptr()->output_connections_on_render();
+    return impl_ptr<impl>()->output_connections_on_render();
 }
 
 void audio_tap_node::render_source(audio_pcm_buffer &buffer, const UInt32 bus_idx, const audio_time &when)
 {
-    _impl_ptr()->render_source(buffer, bus_idx, when);
-}
-
-#pragma mark - private
-
-std::shared_ptr<audio_tap_node::impl> audio_tap_node::_impl_ptr() const
-{
-    return impl_ptr<impl>();
+    impl_ptr<impl>()->render_source(buffer, bus_idx, when);
 }
 
 #pragma mark - input_tap_node

@@ -19,6 +19,8 @@ namespace yas
 
     class audio_device_io_node : public audio_node, public audio_device_io_node_from_engine
     {
+        using super_class = audio_node;
+
        public:
         class impl;
 
@@ -32,9 +34,7 @@ namespace yas
         audio_device device() const;
 
        private:
-        using super_class = audio_node;
-
-        std::shared_ptr<impl> _impl_ptr() const;
+        // from engine
 
         void _add_audio_device_io_to_graph(audio_graph &graph) override;
         void _remove_audio_device_io_from_graph() override;
