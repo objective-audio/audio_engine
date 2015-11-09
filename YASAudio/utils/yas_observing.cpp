@@ -6,7 +6,7 @@
 #include "yas_observing.h"
 #include "yas_audio_types.h"
 #include "yas_stl_utils.h"
-#include <list>
+#include <unordered_set>
 #include <experimental/optional>
 
 using namespace yas;
@@ -73,33 +73,35 @@ class observer::impl : public base::impl
 class subject::impl
 {
    public:
-    using observer_map_t = std::map<uintptr_t, weak<observer>>;
-    using observers_t = std::map<const std::experimental::optional<std::string>, observer_map_t>;
+    using observer_set_t = std::unordered_set<weak<observer>>;
+    using observers_t = std::map<const std::experimental::optional<std::string>, observer_set_t>;
     observers_t observers;
 
     void add_observer(observer &obs, const std::experimental::optional<std::string> &key)
     {
         if (observers.count(key) == 0) {
-            observers.insert(std::make_pair(key, observer_map_t()));
+            observers.insert(std::make_pair(key, observer_set_t()));
         }
 
-        auto &map = observers.at(key);
-        map.insert(std::make_pair(obs.identifier(), weak<observer>(obs)));
+        auto &set = observers.at(key);
+        set.insert(weak<observer>(obs));
     }
 
-    void remove_observer(const uintptr_t observer_key, const std::experimental::optional<std::string> &key)
+    void remove_observer(const observer observer, const std::experimental::optional<std::string> &key)
     {
         if (observers.count(key) > 0) {
-            auto &map = observers.at(key);
+            auto &set = observers.at(key);
 
-            erase_if(map, [&observer_key](const auto &observer_pair) {
-                if (observer_key == observer_pair.first) {
-                    return true;
+            erase_if(set, [&observer](const auto &weak_observer) {
+                if (auto locked_observer = weak_observer.lock()) {
+                    if (observer == locked_observer) {
+                        return true;
+                    }
                 }
                 return false;
             });
 
-            if (map.size() == 0) {
+            if (set.size() == 0) {
                 observers.erase(key);
             }
         }
@@ -108,16 +110,20 @@ class subject::impl
     void remove_observer(const uintptr_t observer_key)
     {
         erase_if(observers, [&observer_key](auto &pair) {
-            auto &map = pair.second;
+            auto &set = pair.second;
 
-            erase_if(map, [&observer_key](const auto &observer_pair) {
-                if (observer_key == observer_pair.first) {
+            erase_if(set, [&observer_key](const auto &weak_observer) {
+                if (auto strong_observer = weak_observer.lock()) {
+                    if (strong_observer.identifier() == observer_key) {
+                        return true;
+                    }
+                } else {
                     return true;
                 }
                 return false;
             });
 
-            return map.size() == 0;
+            return set.size() == 0;
         });
     }
 };
@@ -161,7 +167,7 @@ void observer::remove_handler(subject &subject, const std::string &key)
             imp->handlers.erase(&subject);
         }
     }
-    subject._impl->remove_observer(identifier(), key);
+    subject._impl->remove_observer(*this, key);
 }
 
 void observer::add_wild_card_handler(subject &subject, const handler_f &handler)
@@ -185,7 +191,7 @@ void observer::remove_wild_card_handler(subject &subject)
             imp->handlers.erase(&subject);
         }
     }
-    subject._impl->remove_observer(identifier(), nullopt);
+    subject._impl->remove_observer(*this, nullopt);
 }
 
 void observer::clear()
@@ -220,8 +226,8 @@ subject::subject() : _impl(std::make_unique<impl>())
 subject::~subject()
 {
     for (auto &pair : _impl->observers) {
-        for (auto &observer_pair : pair.second) {
-            if (auto observer = observer_pair.second.lock()) {
+        for (auto &weak_observer : pair.second) {
+            if (auto observer = weak_observer.lock()) {
                 observer.impl_ptr<observer::impl>()->handlers.erase(this);
             }
         }
@@ -246,15 +252,15 @@ void subject::notify(const std::string &key) const
 void subject::notify(const std::string &key, const yas::any &object) const
 {
     if (_impl->observers.count(key)) {
-        for (auto &observer_pair : _impl->observers.at(key)) {
-            if (auto observer = observer_pair.second.lock()) {
+        for (auto &weak_observer : _impl->observers.at(key)) {
+            if (auto observer = weak_observer.lock()) {
                 observer.impl_ptr<observer::impl>()->call_handler(*this, key, object);
             }
         }
     }
     if (_impl->observers.count(nullopt)) {
-        for (auto &observer_pair : _impl->observers.at(nullopt)) {
-            if (auto observer = observer_pair.second.lock()) {
+        for (auto &weak_observer : _impl->observers.at(nullopt)) {
+            if (auto observer = weak_observer.lock()) {
                 observer.impl_ptr<observer::impl>()->call_wild_card_handler(*this, key, object);
             }
         }
