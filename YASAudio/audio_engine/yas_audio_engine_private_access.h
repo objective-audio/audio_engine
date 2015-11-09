@@ -17,7 +17,7 @@ namespace yas
             return engine.impl_ptr<impl>()->nodes();
         }
 
-        static audio_connection_map &connections(const audio_engine &engine)
+        static audio_connection_set &connections(const audio_engine &engine)
         {
             return engine.impl_ptr<impl>()->connections();
         }

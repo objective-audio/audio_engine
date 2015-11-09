@@ -46,15 +46,15 @@ class yas::audio_engine::impl : public yas::base::impl
     void update_node_connections(audio_node &node);
     void update_all_node_connections();
 
-    audio_connection_map input_connections_for_destination_node(const audio_node &node) const;
-    audio_connection_map output_connections_for_source_node(const audio_node &node) const;
+    audio_connection_set input_connections_for_destination_node(const audio_node &node) const;
+    audio_connection_set output_connections_for_source_node(const audio_node &node) const;
 
     void set_graph(const audio_graph &graph);
     audio_graph graph() const;
     void reload_graph();
 
     std::unordered_set<audio_node> &nodes() const;
-    audio_connection_map &connections() const;
+    audio_connection_set &connections() const;
     audio_offline_output_node &offline_output_node() const;
 
     audio_engine::start_result_t start_render();
