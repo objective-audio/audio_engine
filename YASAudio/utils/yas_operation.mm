@@ -1,5 +1,5 @@
 //
-//  yas_operation.cpp
+//  yas_operation.mm
 //  Copyright (c) 2015 Yuki Yasoshima.
 //
 
@@ -10,6 +10,7 @@
 #include <mutex>
 #include <vector>
 #include <deque>
+#include <dispatch/dispatch.h>
 
 using namespace yas;
 
@@ -170,7 +171,8 @@ class operation_queue::impl : public base::impl
             if (op) {
                 _current_operation = op;
 
-                std::thread th([weak_ope = to_weak(op), weak_queue = weak_queue]() {
+                auto lambda = [weak_ope = to_weak(op), weak_queue = weak_queue]()
+                {
                     if (auto ope = weak_ope.lock()) {
                         auto &ope_for_queue = static_cast<operation_from_queue &>(ope);
                         ope_for_queue._execute();
@@ -179,9 +181,9 @@ class operation_queue::impl : public base::impl
                             queue.impl_ptr<impl>()->_operation_did_finish(ope);
                         }
                     }
-                });
+                };
 
-                th.detach();
+                dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), lambda);
             }
         }
     }
