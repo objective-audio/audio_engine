@@ -127,6 +127,28 @@ namespace yas
             return !_impl.expired();
         }
 
+        bool operator==(const weak &other) const
+        {
+            if (_impl.expired() || other._impl.expired()) {
+                return false;
+            } else {
+                auto impl = _impl.lock();
+                auto other_impl = other._impl.lock();
+                return impl == other_impl;
+            }
+        }
+
+        bool operator!=(const weak &other) const
+        {
+            if (_impl.expired() || other._impl.expired()) {
+                return true;
+            } else {
+                auto impl = _impl.lock();
+                auto other_impl = other._impl.lock();
+                return impl != other_impl;
+            }
+        }
+
         T lock() const
         {
             if (_impl.expired()) {

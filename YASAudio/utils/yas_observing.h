@@ -71,3 +71,20 @@ namespace yas
         friend observer;
     };
 }
+
+template <>
+struct std::hash<yas::observer> {
+    std::size_t operator()(yas::observer const &key) const
+    {
+        return std::hash<uintptr_t>()(key.identifier());
+    }
+};
+
+template <>
+struct std::hash<yas::weak<yas::observer>> {
+    std::size_t operator()(yas::weak<yas::observer> const &weak_key) const
+    {
+        auto key = weak_key.lock();
+        return std::hash<uintptr_t>()(key.identifier());
+    }
+};
