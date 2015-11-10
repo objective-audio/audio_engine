@@ -59,7 +59,7 @@ class audio_engine::impl::core
 #endif
 
     audio_graph graph = nullptr;
-    std::unordered_map<uintptr_t, audio_node> nodes;
+    std::unordered_set<audio_node> nodes;
     audio_connection_map connections;
     audio_offline_output_node offline_output_node = nullptr;
 };
@@ -142,7 +142,7 @@ observer &audio_engine::impl::device_observer()
 
 bool audio_engine::impl::node_exists(const audio_node &node)
 {
-    return _core->nodes.count(node.identifier()) > 0;
+    return _core->nodes.count(node) > 0;
 }
 
 void audio_engine::impl::attach_node(audio_node &node)
@@ -151,11 +151,11 @@ void audio_engine::impl::attach_node(audio_node &node)
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
     }
 
-    if (_core->nodes.count(node.identifier()) > 0) {
+    if (_core->nodes.count(node) > 0) {
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : node is already attached.");
     }
 
-    _core->nodes.insert(std::make_pair(node.identifier(), node));
+    _core->nodes.insert(node);
 
     static_cast<audio_node_from_engine &>(node)._set_engine(_core->weak_engine.lock());
 
@@ -168,7 +168,7 @@ void audio_engine::impl::detach_node(audio_node &node)
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
     }
 
-    if (_core->nodes.count(node.identifier()) == 0) {
+    if (_core->nodes.count(node) == 0) {
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : node is not attached.");
     }
 
@@ -180,7 +180,7 @@ void audio_engine::impl::detach_node(audio_node &node)
 
     static_cast<audio_node_from_engine &>(node)._set_engine(audio_engine(nullptr));
 
-    _core->nodes.erase(node.identifier());
+    _core->nodes.erase(node);
 }
 
 void audio_engine::impl::detach_node_if_unused(audio_node &node)
@@ -203,8 +203,9 @@ bool audio_engine::impl::prepare()
 
     _core->graph.prepare();
 
-    for (auto &pair : _core->nodes) {
-        add_node_to_graph(pair.second);
+    auto &nodes = _core->nodes;
+    for (auto &node : std::vector<audio_node>{nodes.begin(), nodes.end()}) {
+        add_node_to_graph(node);
     }
 
     for (auto &pair : _core->connections) {
@@ -364,7 +365,7 @@ bool audio_engine::impl::add_connection(const audio_connection &connection)
     auto destination_node = connection.destination_node();
     auto source_node = connection.source_node();
 
-    if (_core->nodes.count(destination_node.identifier()) == 0 || _core->nodes.count(source_node.identifier()) == 0) {
+    if (_core->nodes.count(destination_node) == 0 || _core->nodes.count(source_node) == 0) {
         throw std::runtime_error(std::string(__PRETTY_FUNCTION__) + " : node is not attached.");
         return false;
     }
@@ -406,8 +407,9 @@ void audio_engine::impl::update_all_node_connections()
         return;
     }
 
-    for (auto &pair : _core->nodes) {
-        static_cast<audio_node_from_engine &>(pair.second)._update_connections();
+    auto &nodes = _core->nodes;
+    for (auto &node : std::vector<audio_node>{nodes.begin(), nodes.end()}) {
+        static_cast<audio_node_from_engine &>(node)._update_connections();
     }
 }
 
@@ -438,8 +440,8 @@ void audio_engine::impl::reload_graph()
 
         prev_graph.stop();
 
-        for (auto &pair : nodes()) {
-            remove_node_from_graph(pair.second);
+        for (auto &node : nodes()) {
+            remove_node_from_graph(node);
         }
 
         set_graph(nullptr);
@@ -454,7 +456,7 @@ void audio_engine::impl::reload_graph()
     }
 }
 
-std::unordered_map<uintptr_t, audio_node> &audio_engine::impl::nodes() const
+std::unordered_set<audio_node> &audio_engine::impl::nodes() const
 {
     return _core->nodes;
 }
