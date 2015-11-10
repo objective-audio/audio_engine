@@ -93,6 +93,14 @@ namespace yas
     };
 }
 
+template <>
+struct std::hash<yas::audio_node> {
+    std::size_t operator()(yas::audio_node const &key) const
+    {
+        return std::hash<uintptr_t>()(key.identifier());
+    }
+};
+
 #include "yas_audio_node_kernel.h"
 #include "yas_audio_node_impl.h"
 
