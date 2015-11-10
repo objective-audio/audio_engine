@@ -6,6 +6,7 @@
 #pragma once
 
 #include "yas_objc_container.h"
+#include <unordered_set>
 
 class yas::audio_engine::impl : public yas::base::impl
 {
