@@ -49,6 +49,14 @@ namespace yas
     };
 }
 
+template <>
+struct std::hash<yas::audio_connection> {
+    std::size_t operator()(yas::audio_connection const &key) const
+    {
+        return std::hash<uintptr_t>()(key.identifier());
+    }
+};
+
 #if YAS_TEST
 #include "yas_audio_connection_private_access.h"
 #endif

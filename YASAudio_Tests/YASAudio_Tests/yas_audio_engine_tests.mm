@@ -41,7 +41,7 @@
     XCTAssertGreaterThanOrEqual(nodes.count(source_node), 1);
     XCTAssertGreaterThanOrEqual(nodes.count(destination_node), 1);
     XCTAssertEqual(connections.size(), 1);
-    XCTAssertEqual(connections.begin()->second, connection);
+    XCTAssertEqual(*connections.begin(), connection);
 }
 
 - (void)test_connect_failed_no_bus
