@@ -52,7 +52,7 @@ class yas::audio_engine::impl : public yas::base::impl
     audio_graph graph() const;
     void reload_graph();
 
-    std::unordered_map<uintptr_t, audio_node> &nodes() const;
+    std::unordered_set<audio_node> &nodes() const;
     audio_connection_map &connections() const;
     audio_offline_output_node &offline_output_node() const;
 
