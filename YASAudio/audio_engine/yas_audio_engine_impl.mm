@@ -281,30 +281,27 @@ void audio_engine::impl::disconnect(audio_node &node)
 
 void audio_engine::impl::disconnect_node_with_predicate(std::function<bool(const audio_connection &)> predicate)
 {
-    auto remove_connections =
+    auto connections =
         filter(_core->connections, [&predicate](const auto &connection) { return predicate(connection); });
-    std::map<uintptr_t, audio_node> update_nodes;
-    std::map<uintptr_t, audio_connection> remove_connections_map;
 
-    for (auto &connection : remove_connections) {
-        update_nodes.insert(std::make_pair(connection.source_node().identifier(), connection.source_node()));
-        update_nodes.insert(std::make_pair(connection.destination_node().identifier(), connection.destination_node()));
-        remove_connections_map.insert(std::make_pair(connection.identifier(), connection));
+    std::unordered_set<audio_node> update_nodes;
+
+    for (auto &connection : connections) {
+        update_nodes.insert(connection.source_node());
+        update_nodes.insert(connection.destination_node());
     }
 
-    for (auto &pair : remove_connections_map) {
-        auto &connection = pair.second;
+    for (auto &connection : std::vector<audio_connection>{connections.begin(), connections.end()}) {
         remove_connection_from_nodes(connection);
         static_cast<audio_connection_from_engine &>(connection)._remove_nodes();
     }
 
-    for (auto &pair : update_nodes) {
-        auto &node = pair.second;
+    for (auto &node : std::vector<audio_node>{update_nodes.begin(), update_nodes.end()}) {
         static_cast<audio_node_from_engine &>(node)._update_connections();
         detach_node_if_unused(node);
     }
 
-    for (auto &connection : remove_connections) {
+    for (auto &connection : connections) {
         _core->connections.erase(connection);
     }
 }
