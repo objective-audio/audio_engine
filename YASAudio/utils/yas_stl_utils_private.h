@@ -69,4 +69,10 @@ namespace yas
             it = function(it);
         }
     }
+
+    template <typename T>
+    std::vector<T> to_vector(std::unordered_set<T> &set)
+    {
+        return std::vector<T>{set.begin(), set.end()};
+    }
 }
