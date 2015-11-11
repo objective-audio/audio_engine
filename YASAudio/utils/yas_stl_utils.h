@@ -6,7 +6,7 @@
 #pragma once
 
 #include <map>
-#include <set>
+#include <unordered_set>
 #include <memory>
 #include <experimental/optional>
 
@@ -23,6 +23,9 @@ namespace yas
 
     template <typename T, typename F>
     void enumerate(T &collection, F function);
+
+    template <typename T>
+    std::vector<T> to_vector(std::unordered_set<T> &set);
 }
 
 #include "yas_stl_utils_private.h"

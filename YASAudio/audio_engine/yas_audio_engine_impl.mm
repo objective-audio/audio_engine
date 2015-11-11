@@ -202,8 +202,7 @@ bool audio_engine::impl::prepare()
 
     _core->graph.prepare();
 
-    auto &nodes = _core->nodes;
-    for (auto &node : std::vector<audio_node>{nodes.begin(), nodes.end()}) {
+    for (auto &node : to_vector(_core->nodes)) {
         add_node_to_graph(node);
     }
 
@@ -291,12 +290,12 @@ void audio_engine::impl::disconnect_node_with_predicate(std::function<bool(const
         update_nodes.insert(connection.destination_node());
     }
 
-    for (auto &connection : std::vector<audio_connection>{connections.begin(), connections.end()}) {
+    for (auto &connection : yas::to_vector(connections)) {
         remove_connection_from_nodes(connection);
         static_cast<audio_connection_from_engine &>(connection)._remove_nodes();
     }
 
-    for (auto &node : std::vector<audio_node>{update_nodes.begin(), update_nodes.end()}) {
+    for (auto &node : yas::to_vector(update_nodes)) {
         static_cast<audio_node_from_engine &>(node)._update_connections();
         detach_node_if_unused(node);
     }
@@ -406,8 +405,7 @@ void audio_engine::impl::update_all_node_connections()
         return;
     }
 
-    auto &nodes = _core->nodes;
-    for (auto &node : std::vector<audio_node>{nodes.begin(), nodes.end()}) {
+    for (auto &node : to_vector(_core->nodes)) {
         static_cast<audio_node_from_engine &>(node)._update_connections();
     }
 }
