@@ -10,7 +10,6 @@
 #include "yas_audio_offline_output_node.h"
 #include "yas_audio_graph.h"
 #include "yas_stl_utils.h"
-#include "yas_any.h"
 #include <CoreFoundation/CoreFoundation.h>
 #include <AVFoundation/AVFoundation.h>
 
