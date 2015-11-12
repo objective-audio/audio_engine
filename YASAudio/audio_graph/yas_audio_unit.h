@@ -10,6 +10,7 @@
 #include "yas_audio_unit_parameter.h"
 #include "yas_exception.h"
 #include "yas_base.h"
+#include "yas_result.h"
 #include <AudioToolbox/AudioToolbox.h>
 #include <vector>
 #include <memory>
@@ -29,6 +30,7 @@ namespace yas
 
        public:
         using render_f = std::function<void(render_parameters &)>;
+        using au_result_t = yas::result<std::nullptr_t, OSStatus>;
 
         static const OSType sub_type_default_io();
 
@@ -103,7 +105,7 @@ namespace yas
         // render thread
 
         void callback_render(render_parameters &render_parameters);
-        void audio_unit_render(render_parameters &render_parameters);
+        au_result_t audio_unit_render(render_parameters &render_parameters);
 
        private:
         // from graph
@@ -121,6 +123,8 @@ namespace yas
         friend private_access;
 #endif
     };
+
+    audio_unit::au_result_t to_result(const OSStatus err);
 }
 
 #include "yas_audio_unit_impl.h"

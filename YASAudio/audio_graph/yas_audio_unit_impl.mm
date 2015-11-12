@@ -598,14 +598,16 @@ void audio_unit::impl::callback_render(yas::render_parameters &render_parameters
     }
 }
 
-void audio_unit::impl::audio_unit_render(yas::render_parameters &render_parameters)
+audio_unit::au_result_t audio_unit::impl::audio_unit_render(yas::render_parameters &render_parameters)
 {
     yas_raise_if_main_thread;
 
     AudioUnit au = audio_unit_instance();
     if (au) {
-        yas_raise_if_au_error(AudioUnitRender(au, render_parameters.io_action_flags, render_parameters.io_time_stamp,
-                                              render_parameters.in_bus_number, render_parameters.in_number_frames,
-                                              render_parameters.io_data));
+        return to_result(AudioUnitRender(au, render_parameters.io_action_flags, render_parameters.io_time_stamp,
+                                         render_parameters.in_bus_number, render_parameters.in_number_frames,
+                                         render_parameters.io_data));
     }
+
+    return audio_unit::au_result_t(nullptr);
 }
