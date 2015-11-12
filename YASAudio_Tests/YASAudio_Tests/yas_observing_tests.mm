@@ -331,6 +331,37 @@
     XCTAssertFalse(called);
 }
 
+- (void)test_remove_observer
+{
+    int sender = 100;
+
+    const std::string key("key");
+
+    bool called = false;
+
+    yas::subject subject;
+
+    {
+        yas::observer observer;
+
+        observer.add_handler(subject, key, [&called](const std::string &key, const yas::any &sender) {
+            if (key == "key" && sender.get<int>() == 100) {
+                called = true;
+            }
+        });
+
+        subject.notify(key, sender);
+
+        XCTAssertTrue(called);
+
+        called = false;
+    }
+
+    subject.notify(key, sender);
+
+    XCTAssertFalse(called);
+}
+
 - (void)test_remove_subject
 {
     int sender = 100;
