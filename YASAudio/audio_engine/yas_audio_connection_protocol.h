@@ -18,7 +18,6 @@ namespace yas
     using audio_connection_set = std::unordered_set<audio_connection>;
     using audio_connection_smap = std::map<UInt32, audio_connection>;
     using audio_connection_wmap = std::map<UInt32, weak<audio_connection>>;
-    using audio_connection_wmap_sptr = std::shared_ptr<audio_connection_wmap>;
 
     class audio_connection_from_engine
     {
