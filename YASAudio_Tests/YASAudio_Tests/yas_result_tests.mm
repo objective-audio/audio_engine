@@ -94,16 +94,45 @@
 
 - (void)test_receive_error_result
 {
-    int value = 10;
+    int error = 10;
     bool result_flag;
 
-    if (auto result = yas::result<bool, int>(std::move(value))) {
+    if (auto result = yas::result<bool, int>(std::move(error))) {
         result_flag = true;
     } else {
         result_flag = false;
     }
 
     XCTAssertFalse(result_flag);
+}
+
+- (void)test_value_opt
+{
+    bool value = true;
+
+    auto result = yas::result<bool, int>(std::move(value));
+    auto value_opt = result.value_opt();
+
+    XCTAssertTrue(value_opt);
+    XCTAssertEqual(*value_opt, true);
+
+    auto error_opt = result.error_opt();
+    XCTAssertFalse(error_opt);
+}
+
+- (void)test_error_opt
+{
+    int error = 20;
+
+    auto result = yas::result<bool, int>(std::move(error));
+    auto error_opt = result.error_opt();
+
+    XCTAssertTrue(error_opt);
+    XCTAssertEqual(*error_opt, 20);
+
+    auto value_opt = result.value_opt();
+
+    XCTAssertFalse(value_opt);
 }
 
 @end
