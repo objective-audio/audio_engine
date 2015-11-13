@@ -35,6 +35,9 @@ namespace yas
         const T &value() const;
         const U &error() const;
 
+        std::experimental::optional<T> value_opt() const;
+        std::experimental::optional<U> error_opt() const;
+
        private:
         std::experimental::optional<T> _value;
         std::experimental::optional<U> _error;

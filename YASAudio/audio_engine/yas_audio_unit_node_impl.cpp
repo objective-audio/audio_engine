@@ -301,10 +301,9 @@ void audio_unit_node::impl::render(audio_pcm_buffer &buffer, const UInt32 bus_id
                                             .in_number_frames = buffer.frame_length(),
                                             .io_data = buffer.audio_buffer_list()};
 
-        try {
-            audio_unit.audio_unit_render(render_parameters);
-        } catch (std::runtime_error &e) {
-            std::cout << e.what() << std::endl;
+        if (auto err = audio_unit.audio_unit_render(render_parameters).error_opt()) {
+            std::cout << "audio unit render error : " << std::to_string(*err) << " - " << yas::to_string(*err)
+                      << std::endl;
         }
     }
 }

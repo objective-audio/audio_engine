@@ -57,6 +57,7 @@ namespace yas
     std::string to_string(const yas::direction &);
     std::string to_string(const AudioUnitScope scope);
     std::string to_string(const render_type &);
+    std::string to_string(const OSStatus err);
 
     class audio_route;
 

@@ -176,7 +176,8 @@ AudioUnitParameterValue audio_unit::parameter_value(const AudioUnitParameterID p
 
 audio_unit_parameter_map_t audio_unit::create_parameters(const AudioUnitScope scope) const
 {
-    auto parameter_list = impl_ptr<impl>()->property_data<AudioUnitParameterID>(kAudioUnitProperty_ParameterList, scope, 0);
+    auto parameter_list =
+        impl_ptr<impl>()->property_data<AudioUnitParameterID>(kAudioUnitProperty_ParameterList, scope, 0);
     auto parameters = audio_unit_parameter_map_t();
 
     if (parameter_list.size() > 0) {
@@ -196,9 +197,9 @@ audio_unit_parameter audio_unit::create_parameter(const AudioUnitParameterID &pa
     UInt32 size = sizeof(AudioUnitParameterInfo);
     OSStatus err = noErr;
 
-    yas_raise_if_au_error(err =
-                              AudioUnitGetProperty(impl_ptr<impl>()->audio_unit_instance(), kAudioUnitProperty_ParameterInfo,
-                                                   scope, parameter_id, &info, &size));
+    yas_raise_if_au_error(err = AudioUnitGetProperty(impl_ptr<impl>()->audio_unit_instance(),
+                                                     kAudioUnitProperty_ParameterInfo, scope, parameter_id, &info,
+                                                     &size));
 
     audio_unit_parameter parameter(info, parameter_id, scope);
 
@@ -300,9 +301,9 @@ void audio_unit::callback_render(yas::render_parameters &render_parameters)
     impl_ptr<impl>()->callback_render(render_parameters);
 }
 
-void audio_unit::audio_unit_render(yas::render_parameters &render_parameters)
+audio_unit::au_result_t audio_unit::audio_unit_render(yas::render_parameters &render_parameters)
 {
-    impl_ptr<impl>()->audio_unit_render(render_parameters);
+    return impl_ptr<impl>()->audio_unit_render(render_parameters);
 }
 
 #pragma mark - private function
@@ -335,4 +336,15 @@ void audio_unit::_set_key(const std::experimental::optional<UInt16> &key)
 const std::experimental::optional<UInt16> &audio_unit::_key() const
 {
     return impl_ptr<impl>()->key;
+}
+
+#pragma mark - global
+
+audio_unit::au_result_t yas::to_result(const OSStatus err)
+{
+    if (err == noErr) {
+        return audio_unit::au_result_t(nullptr);
+    } else {
+        return audio_unit::au_result_t(err);
+    }
 }
