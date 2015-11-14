@@ -152,8 +152,9 @@ namespace yas
 
     [self setupEngine];
 
-    if (!_internal.engine.start_render()) {
-        NSLog(@"audio engine start failed.");
+    if (auto error = _internal.engine.start_render().error_opt()) {
+        const auto error_str = yas::to_string(*error);
+        NSLog(@"audio engine start failed. error : %@", (__bridge NSString *)yas::to_cf_object(error_str));
     }
 }
 
