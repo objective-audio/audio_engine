@@ -394,17 +394,15 @@ namespace yas
 
 - (void)setSelectedDeviceIndex:(NSUInteger)selectedDeviceIndex
 {
-    if (_selectedDeviceIndex != selectedDeviceIndex) {
-        _selectedDeviceIndex = selectedDeviceIndex;
+    _selectedDeviceIndex = selectedDeviceIndex;
 
-        auto all_devices = yas::audio_device::all_devices();
+    auto all_devices = yas::audio_device::all_devices();
 
-        if (selectedDeviceIndex < all_devices.size()) {
-            auto device = all_devices[selectedDeviceIndex];
-            [self setDevice:device];
-        } else {
-            [self setDevice:nullptr];
-        }
+    if (selectedDeviceIndex < all_devices.size()) {
+        auto device = all_devices[selectedDeviceIndex];
+        [self setDevice:device];
+    } else {
+        [self setDevice:nullptr];
     }
 }
 
