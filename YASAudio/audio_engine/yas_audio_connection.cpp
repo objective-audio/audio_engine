@@ -131,17 +131,17 @@ audio_format &audio_connection::format() const
     return impl_ptr<impl>()->format;
 }
 
-void audio_connection::_remove_nodes()
+void audio_connection::_remove_nodes() const
 {
     impl_ptr<impl>()->remove_nodes();
 }
 
-void audio_connection::_remove_source_node()
+void audio_connection::_remove_source_node() const
 {
     impl_ptr<impl>()->remove_source_node();
 }
 
-void audio_connection::_remove_destination_node()
+void audio_connection::_remove_destination_node() const
 {
     impl_ptr<impl>()->remove_destination_node();
 }

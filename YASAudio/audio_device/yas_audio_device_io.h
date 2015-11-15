@@ -36,15 +36,15 @@ namespace yas
         audio_device_io &operator=(const audio_device_io &) = default;
         audio_device_io &operator=(audio_device_io &&) = default;
 
-        void set_device(const audio_device device);
+        void set_device(const audio_device device) const;
         audio_device device() const;
         bool is_running() const;
-        void set_render_callback(const render_f &callback);
-        void set_maximum_frames_per_slice(const UInt32 frames);
+        void set_render_callback(const render_f &callback) const;
+        void set_maximum_frames_per_slice(const UInt32 frames) const;
         UInt32 maximum_frames_per_slice() const;
 
-        void start();
-        void stop();
+        void start() const;
+        void stop() const;
 
         const audio_pcm_buffer &input_buffer_on_render() const;
         const audio_time &input_time_on_render() const;
@@ -53,8 +53,8 @@ namespace yas
         class kernel;
         class impl;
 
-        void _initialize();
-        void _uninitialize();
+        void _initialize() const;
+        void _uninitialize() const;
     };
 }
 

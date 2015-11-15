@@ -24,8 +24,8 @@ namespace yas
        public:
         virtual ~audio_connection_from_engine() = default;
 
-        virtual void _remove_nodes() = 0;
-        virtual void _remove_source_node() = 0;
-        virtual void _remove_destination_node() = 0;
+        virtual void _remove_nodes() const = 0;
+        virtual void _remove_source_node() const = 0;
+        virtual void _remove_destination_node() const = 0;
     };
 }

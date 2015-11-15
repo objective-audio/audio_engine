@@ -51,56 +51,56 @@ namespace yas
         bool is_output_unit() const;
         AudioUnit audio_unit_instance() const;
 
-        void attach_render_callback(const UInt32 &bus_idx);
-        void detach_render_callback(const UInt32 &bus_idx);
-        void attach_render_notify();
-        void detach_render_notify();
-        void attach_input_callback();  // for io
-        void detach_input_callback();  // for io
+        void attach_render_callback(const UInt32 &bus_idx) const;
+        void detach_render_callback(const UInt32 &bus_idx) const;
+        void attach_render_notify() const;
+        void detach_render_notify() const;
+        void attach_input_callback() const;  // for io
+        void detach_input_callback() const;  // for io
 
-        void set_render_callback(const render_f &callback);
-        void set_notify_callback(const render_f &callback);
-        void set_input_callback(const render_f &callback);  // for io
+        void set_render_callback(const render_f &callback) const;
+        void set_notify_callback(const render_f &callback) const;
+        void set_input_callback(const render_f &callback) const;  // for io
 
-        void set_input_format(const AudioStreamBasicDescription &asbd, const UInt32 bus_idx);
-        void set_output_format(const AudioStreamBasicDescription &asbd, const UInt32 bus_idx);
+        void set_input_format(const AudioStreamBasicDescription &asbd, const UInt32 bus_idx) const;
+        void set_output_format(const AudioStreamBasicDescription &asbd, const UInt32 bus_idx) const;
         AudioStreamBasicDescription input_format(const UInt32 bus_idx) const;
         AudioStreamBasicDescription output_format(const UInt32 bus_idx) const;
-        void set_maximum_frames_per_slice(const UInt32 frames);
+        void set_maximum_frames_per_slice(const UInt32 frames) const;
         UInt32 maximum_frames_per_slice() const;
-        bool is_initialized();
+        bool is_initialized() const;
 
         void set_parameter_value(const AudioUnitParameterValue value, const AudioUnitParameterID parameter_id,
-                                 const AudioUnitScope scope, const AudioUnitElement element);
+                                 const AudioUnitScope scope, const AudioUnitElement element) const;
         AudioUnitParameterValue parameter_value(const AudioUnitParameterID parameter_id, const AudioUnitScope scope,
-                                                const AudioUnitElement element);
+                                                const AudioUnitElement element) const;
 
         audio_unit_parameter_map_t create_parameters(const AudioUnitScope scope) const;
         audio_unit_parameter create_parameter(const AudioUnitParameterID &parameter_id,
                                               const AudioUnitScope scope) const;
 
-        void set_element_count(const UInt32 &count, const AudioUnitScope &scope);  // for mixer
-        UInt32 element_count(const AudioUnitScope &scope) const;                   // for mixer
+        void set_element_count(const UInt32 &count, const AudioUnitScope &scope) const;  // for mixer
+        UInt32 element_count(const AudioUnitScope &scope) const;                         // for mixer
 
-        void set_enable_output(const bool enable_output);  // for io
-        bool is_enable_output() const;                     // for io
-        void set_enable_input(const bool enable_input);    // for io
-        bool is_enable_input() const;                      // for io
-        bool has_output() const;                           // for io
-        bool has_input() const;                            // for io
-        bool is_running() const;                           // for io
+        void set_enable_output(const bool enable_output) const;  // for io
+        bool is_enable_output() const;                           // for io
+        void set_enable_input(const bool enable_input) const;    // for io
+        bool is_enable_input() const;                            // for io
+        bool has_output() const;                                 // for io
+        bool has_input() const;                                  // for io
+        bool is_running() const;                                 // for io
         void set_channel_map(const channel_map_t &map, const AudioUnitScope scope,
-                             const AudioUnitElement element);                                         // for io
+                             const AudioUnitElement element) const;                                   // for io
         channel_map_t channel_map(const AudioUnitScope scope, const AudioUnitElement element) const;  // for io
         UInt32 channel_map_count(const AudioUnitScope scope, const AudioUnitElement element) const;   // for io
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
-        void set_current_device(const AudioDeviceID &device);  // for io
-        const AudioDeviceID current_device() const;            // for io
+        void set_current_device(const AudioDeviceID &device) const;  // for io
+        const AudioDeviceID current_device() const;                  // for io
 #endif
 
-        void start();  // for io
-        void stop();   // for io
-        void reset();
+        void start() const;  // for io
+        void stop() const;   // for io
+        void reset() const;
 
         // render thread
 
@@ -110,11 +110,11 @@ namespace yas
        private:
         // from graph
 
-        void _initialize() override;
-        void _uninitialize() override;
-        void _set_graph_key(const std::experimental::optional<UInt8> &key) override;
+        void _initialize() const override;
+        void _uninitialize() const override;
+        void _set_graph_key(const std::experimental::optional<UInt8> &key) const override;
         const std::experimental::optional<UInt8> &_graph_key() const override;
-        void _set_key(const std::experimental::optional<UInt16> &key) override;
+        void _set_key(const std::experimental::optional<UInt16> &key) const override;
         const std::experimental::optional<UInt16> &_key() const override;
 
 #if YAS_TEST

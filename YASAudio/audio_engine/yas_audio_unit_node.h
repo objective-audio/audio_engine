@@ -36,13 +36,13 @@ namespace yas
         UInt32 input_element_count() const;
         UInt32 output_element_count() const;
 
-        void set_global_parameter_value(const AudioUnitParameterID parameter_id, const Float32 value);
+        void set_global_parameter_value(const AudioUnitParameterID parameter_id, const Float32 value) const;
         Float32 global_parameter_value(const AudioUnitParameterID parameter_id) const;
         void set_input_parameter_value(const AudioUnitParameterID parameter_id, const Float32 value,
-                                       const AudioUnitElement element);
+                                       const AudioUnitElement element) const;
         Float32 input_parameter_value(const AudioUnitParameterID parameter_id, const AudioUnitElement element) const;
         void set_output_parameter_value(const AudioUnitParameterID parameter_id, const Float32 value,
-                                        const AudioUnitElement element);
+                                        const AudioUnitElement element) const;
         Float32 output_parameter_value(const AudioUnitParameterID parameter_id, const AudioUnitElement element) const;
 
        protected:
@@ -52,8 +52,8 @@ namespace yas
        private:
         // from engine
 
-        void _add_audio_unit_to_graph(audio_graph &graph) override;
-        void _remove_audio_unit_from_graph() override;
+        void _add_audio_unit_to_graph(audio_graph &graph) const override;
+        void _remove_audio_unit_from_graph() const override;
 
 #if YAS_TEST
        public:

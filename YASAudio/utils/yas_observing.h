@@ -33,13 +33,13 @@ namespace yas
         observer &operator=(const observer &) = default;
         observer &operator=(observer &&) = default;
 
-        void add_handler(subject &subject, const std::string &key, const handler_f &handler);
-        void remove_handler(subject &subject, const std::string &key);
+        void add_handler(subject &subject, const std::string &key, const handler_f &handler) const;
+        void remove_handler(subject &subject, const std::string &key) const;
 
-        void add_wild_card_handler(subject &subject, const handler_f &handler);
-        void remove_wild_card_handler(subject &subject);
+        void add_wild_card_handler(subject &subject, const handler_f &handler) const;
+        void remove_wild_card_handler(subject &subject) const;
 
-        void clear();
+        void clear() const;
 
         friend subject;
     };

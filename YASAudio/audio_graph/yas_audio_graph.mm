@@ -295,7 +295,7 @@ void audio_graph::prepare()
     }
 }
 
-void audio_graph::add_audio_unit(audio_unit &unit)
+void audio_graph::add_audio_unit(audio_unit &unit) const
 {
     auto &unit_from_graph = static_cast<audio_unit_from_graph &>(unit);
 
@@ -314,12 +314,12 @@ void audio_graph::add_audio_unit(audio_unit &unit)
     }
 }
 
-void audio_graph::remove_audio_unit(audio_unit &unit)
+void audio_graph::remove_audio_unit(audio_unit &unit) const
 {
     impl_ptr<impl>()->remove_audio_unit(unit);
 }
 
-void audio_graph::remove_all_units()
+void audio_graph::remove_all_units() const
 {
     impl_ptr<impl>()->remove_all_units();
 }
@@ -349,7 +349,7 @@ void audio_graph::remove_audio_device_io(audio_device_io &device_io)
 
 #endif
 
-void audio_graph::start()
+void audio_graph::start() const
 {
     auto imp = impl_ptr<impl>();
     if (!imp->running) {
@@ -358,7 +358,7 @@ void audio_graph::start()
     }
 }
 
-void audio_graph::stop()
+void audio_graph::stop() const
 {
     auto imp = impl_ptr<impl>();
     if (imp->running) {

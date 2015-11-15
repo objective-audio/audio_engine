@@ -34,17 +34,17 @@ namespace yas
 
         void prepare();
 
-        void add_audio_unit(audio_unit &audio_unit);
-        void remove_audio_unit(audio_unit &audio_unit);
-        void remove_all_units();
+        void add_audio_unit(audio_unit &audio_unit) const;
+        void remove_audio_unit(audio_unit &audio_unit) const;
+        void remove_all_units() const;
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
         void add_audio_device_io(audio_device_io &audio_device_io);
         void remove_audio_device_io(audio_device_io &audio_device_io);
 #endif
 
-        void start();
-        void stop();
+        void start() const;
+        void stop() const;
         bool is_running() const;
 
         // render thread

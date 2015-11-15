@@ -12,7 +12,7 @@ namespace yas
        public:
         virtual ~audio_device_io_node_from_engine() = default;
 
-        virtual void _add_audio_device_io_to_graph(audio_graph &graph) = 0;
-        virtual void _remove_audio_device_io_from_graph() = 0;
+        virtual void _add_audio_device_io_to_graph(audio_graph &graph) const = 0;
+        virtual void _remove_audio_device_io_from_graph() const = 0;
     };
 }

@@ -300,17 +300,17 @@ audio_device_io::audio_device_io(const audio_device &device) : super_class(std::
 
 audio_device_io::~audio_device_io() = default;
 
-void audio_device_io::_initialize()
+void audio_device_io::_initialize() const
 {
     impl_ptr<impl>()->initialize();
 }
 
-void audio_device_io::_uninitialize()
+void audio_device_io::_uninitialize() const
 {
     impl_ptr<impl>()->uninitialize();
 }
 
-void audio_device_io::set_device(const audio_device device)
+void audio_device_io::set_device(const audio_device device) const
 {
     impl_ptr<impl>()->set_device(device);
 }
@@ -325,12 +325,12 @@ bool audio_device_io::is_running() const
     return impl_ptr<impl>()->is_running;
 }
 
-void audio_device_io::set_render_callback(const render_f &callback)
+void audio_device_io::set_render_callback(const render_f &callback) const
 {
     impl_ptr<impl>()->set_render_callback(callback);
 }
 
-void audio_device_io::set_maximum_frames_per_slice(const UInt32 frames)
+void audio_device_io::set_maximum_frames_per_slice(const UInt32 frames) const
 {
     impl_ptr<impl>()->set_maximum_frames(frames);
 }
@@ -340,12 +340,12 @@ UInt32 audio_device_io::maximum_frames_per_slice() const
     return impl_ptr<impl>()->maximum_frames();
 }
 
-void audio_device_io::start()
+void audio_device_io::start() const
 {
     impl_ptr<impl>()->start();
 }
 
-void audio_device_io::stop()
+void audio_device_io::stop() const
 {
     impl_ptr<impl>()->stop();
 }

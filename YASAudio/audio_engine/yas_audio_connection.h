@@ -38,9 +38,9 @@ namespace yas
         audio_connection(audio_node &source_node, const UInt32 source_bus, audio_node &destination_node,
                          const UInt32 destination_bus, const audio_format &format);
 
-        void _remove_nodes() override;
-        void _remove_source_node() override;
-        void _remove_destination_node() override;
+        void _remove_nodes() const override;
+        void _remove_source_node() const override;
+        void _remove_destination_node() const override;
 #if YAS_TEST
        public:
         class private_access;

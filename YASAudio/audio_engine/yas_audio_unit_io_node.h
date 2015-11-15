@@ -25,11 +25,11 @@ namespace yas
         virtual ~audio_unit_io_node();
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
-        void set_device(const audio_device &device);
+        void set_device(const audio_device &device) const;
         audio_device device() const;
 #endif
 
-        void set_channel_map(const channel_map_t &map, const yas::direction dir);
+        void set_channel_map(const channel_map_t &map, const yas::direction dir) const;
         const channel_map_t &channel_map(const yas::direction dir) const;
 
         Float64 device_sample_rate() const;
@@ -52,7 +52,7 @@ namespace yas
         audio_unit_output_node();
         audio_unit_output_node(std::nullptr_t);
 
-        void set_channel_map(const channel_map_t &map);
+        void set_channel_map(const channel_map_t &map) const;
         const channel_map_t &channel_map() const;
     };
 
@@ -66,7 +66,7 @@ namespace yas
         audio_unit_input_node();
         audio_unit_input_node(std::nullptr_t);
 
-        void set_channel_map(const channel_map_t &map);
+        void set_channel_map(const channel_map_t &map) const;
         const channel_map_t &channel_map() const;
     };
 }

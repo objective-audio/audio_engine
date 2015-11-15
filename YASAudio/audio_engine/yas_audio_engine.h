@@ -49,21 +49,22 @@ namespace yas
 
         audio_engine &operator=(std::nullptr_t);
 
-        audio_connection connect(audio_node &source_node, audio_node &destination_node, const audio_format &format);
+        audio_connection connect(audio_node &source_node, audio_node &destination_node,
+                                 const audio_format &format) const;
         audio_connection connect(audio_node &source_node, audio_node &destination_node, const UInt32 source_bus_idx,
-                                 const UInt32 destination_bus_idx, const audio_format &format);
+                                 const UInt32 destination_bus_idx, const audio_format &format) const;
 
-        void disconnect(audio_connection &connectiion);
-        void disconnect(audio_node &node);
-        void disconnect_input(const audio_node &node);
-        void disconnect_input(const audio_node &node, const UInt32 bus_idx);
-        void disconnect_output(const audio_node &node);
-        void disconnect_output(const audio_node &node, const UInt32 bus_idx);
+        void disconnect(audio_connection &connectiion) const;
+        void disconnect(audio_node &node) const;
+        void disconnect_input(const audio_node &node) const;
+        void disconnect_input(const audio_node &node, const UInt32 bus_idx) const;
+        void disconnect_output(const audio_node &node) const;
+        void disconnect_output(const audio_node &node, const UInt32 bus_idx) const;
 
-        start_result_t start_render();
+        start_result_t start_render() const;
         start_result_t start_offline_render(const offline_render_f &render_function,
-                                            const offline_completion_f &completion_function);
-        void stop();
+                                            const offline_completion_f &completion_function) const;
+        void stop() const;
 
         subject &subject() const;
 
