@@ -34,8 +34,8 @@ namespace yas
 
         void prepare();
 
-        void add_audio_unit(audio_unit &audio_unit) const;
-        void remove_audio_unit(audio_unit &audio_unit) const;
+        void add_audio_unit(const audio_unit &audio_unit) const;
+        void remove_audio_unit(const audio_unit &audio_unit) const;
         void remove_all_units() const;
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)

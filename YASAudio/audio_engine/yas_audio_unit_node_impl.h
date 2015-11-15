@@ -46,8 +46,7 @@ class yas::audio_unit_node::impl : public audio_node::impl
     virtual void prepare_parameters();  // NS_REQUIRES_SUPER
 
     void reload_audio_unit();
-    void add_audio_unit_to_graph(audio_graph &graph);
-    void remove_audio_unit_from_graph();
+    void set_graph(const audio_graph &);
 
     weak<audio_unit_node> weak_node() const;
 

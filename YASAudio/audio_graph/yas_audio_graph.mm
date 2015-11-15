@@ -171,13 +171,13 @@ class audio_graph::impl : public base::impl
         return units.at(key);
     }
 
-    void add_unit_to_units(audio_unit &unit)
+    void add_unit_to_units(const audio_unit &unit)
     {
         if (!unit) {
             throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
         }
 
-        auto &unit_from_graph = static_cast<audio_unit_from_graph &>(unit);
+        auto &unit_from_graph = static_cast<const audio_unit_from_graph &>(unit);
 
         if (unit_from_graph._key()) {
             throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : audio_unit.key is not null.");
@@ -197,11 +197,11 @@ class audio_graph::impl : public base::impl
         }
     }
 
-    void remove_unit_from_units(audio_unit &unit)
+    void remove_unit_from_units(const audio_unit &unit)
     {
         std::lock_guard<std::recursive_mutex> lock(mutex);
 
-        auto &unit_from_graph = static_cast<audio_unit_from_graph &>(unit);
+        auto &unit_from_graph = static_cast<const audio_unit_from_graph &>(unit);
 
         if (auto key = unit_from_graph._key()) {
             units.erase(*key);
@@ -211,9 +211,9 @@ class audio_graph::impl : public base::impl
         }
     }
 
-    void remove_audio_unit(audio_unit &unit)
+    void remove_audio_unit(const audio_unit &unit)
     {
-        auto &unit_from_graph = static_cast<audio_unit_from_graph &>(unit);
+        auto &unit_from_graph = static_cast<const audio_unit_from_graph &>(unit);
 
         if (!unit_from_graph._key()) {
             throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : audio_unit.key is not assigned.");
@@ -295,9 +295,9 @@ void audio_graph::prepare()
     }
 }
 
-void audio_graph::add_audio_unit(audio_unit &unit) const
+void audio_graph::add_audio_unit(const audio_unit &unit) const
 {
-    auto &unit_from_graph = static_cast<audio_unit_from_graph &>(unit);
+    auto &unit_from_graph = static_cast<const audio_unit_from_graph &>(unit);
 
     if (unit_from_graph._key()) {
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : audio_unit.key is assigned.");
@@ -314,7 +314,7 @@ void audio_graph::add_audio_unit(audio_unit &unit) const
     }
 }
 
-void audio_graph::remove_audio_unit(audio_unit &unit) const
+void audio_graph::remove_audio_unit(const audio_unit &unit) const
 {
     impl_ptr<impl>()->remove_audio_unit(unit);
 }
