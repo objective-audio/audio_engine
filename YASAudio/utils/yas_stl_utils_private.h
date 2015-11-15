@@ -39,7 +39,7 @@ namespace yas
 
         for (auto &obj : collection) {
             if (predicate(obj)) {
-                filtered.insert(obj);
+                filtered.insert(filtered.end(), obj);
             }
         }
 
