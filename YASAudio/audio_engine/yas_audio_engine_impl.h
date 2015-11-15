@@ -26,9 +26,9 @@ class yas::audio_engine::impl : public yas::base::impl
 
     bool node_exists(const audio_node &node);
 
-    void attach_node(audio_node &node);
-    void detach_node(audio_node &node);
-    void detach_node_if_unused(audio_node &node);
+    void attach_node(const audio_node &node);
+    void detach_node(const audio_node &node);
+    void detach_node_if_unused(const audio_node &node);
 
     bool prepare();
 
@@ -38,7 +38,7 @@ class yas::audio_engine::impl : public yas::base::impl
     void disconnect(audio_node &node);
     void disconnect_node_with_predicate(std::function<bool(const audio_connection &)> predicate);
 
-    void add_node_to_graph(audio_node &node);
+    void add_node_to_graph(const audio_node &node);
     void remove_node_from_graph(const audio_node &node);
 
     bool add_connection(const audio_connection &connection);
