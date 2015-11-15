@@ -16,10 +16,9 @@ class audio_unit_node::impl::core
    public:
     AudioComponentDescription acd;
     std::map<AudioUnitScope, audio_unit_parameter_map_t> parameters;
-    weak<audio_graph> weak_graph;
     yas::audio_unit _au;
 
-    core() : acd(), parameters(), weak_graph(), _au(nullptr), _mutex()
+    core() : acd(), parameters(), _au(nullptr), _mutex()
     {
     }
 
@@ -246,39 +245,7 @@ void audio_unit_node::impl::prepare_parameters()
 
 void audio_unit_node::impl::reload_audio_unit()
 {
-    auto graph = _core->weak_graph.lock();
-
-    if (graph) {
-        remove_audio_unit_from_graph();
-    }
-
     _core->set_au(yas::audio_unit(_core->acd));
-
-    if (graph) {
-        add_audio_unit_to_graph(graph);
-    }
-}
-
-void audio_unit_node::impl::add_audio_unit_to_graph(audio_graph &graph)
-{
-    if (!graph) {
-        throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
-    }
-
-    _core->weak_graph = graph;
-
-    prepare_audio_unit();
-    graph.add_audio_unit(_core->_au);
-    prepare_parameters();
-}
-
-void audio_unit_node::impl::remove_audio_unit_from_graph()
-{
-    if (auto graph = _core->weak_graph.lock()) {
-        graph.remove_audio_unit(_core->_au);
-    }
-
-    _core->weak_graph.reset();
 }
 
 weak<audio_unit_node> audio_unit_node::impl::weak_node() const

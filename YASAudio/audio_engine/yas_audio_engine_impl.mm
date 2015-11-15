@@ -308,7 +308,10 @@ void audio_engine::impl::add_node_to_graph(const audio_node &node)
     }
 
     if (auto unit_node = node.cast<audio_unit_node>()) {
-        static_cast<audio_unit_node_from_engine &>(unit_node)._add_audio_unit_to_graph(_core->graph);
+        auto &node = static_cast<audio_unit_node_from_engine &>(unit_node);
+        node._prepare_audio_unit();
+        _core->graph.add_audio_unit(unit_node.audio_unit());
+        node._prepare_parameters();
     }
 
 #if (!TARGET_OS_IPHONE & TARGET_OS_MAC)
@@ -333,7 +336,7 @@ void audio_engine::impl::remove_node_from_graph(const audio_node &node)
     }
 
     if (auto unit_node = node.cast<audio_unit_node>()) {
-        static_cast<audio_unit_node_from_engine &>(unit_node)._remove_audio_unit_from_graph();
+        _core->graph.remove_audio_unit(unit_node.audio_unit());
     }
 
 #if (!TARGET_OS_IPHONE & TARGET_OS_MAC)

@@ -52,8 +52,9 @@ namespace yas
        private:
         // from engine
 
-        void _add_audio_unit_to_graph(audio_graph &graph) const override;
-        void _remove_audio_unit_from_graph() const override;
+        void _prepare_audio_unit() const override;
+        void _prepare_parameters() const override;
+        void _reload_audio_unit() const override;
 
 #if YAS_TEST
        public:
