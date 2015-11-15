@@ -55,8 +55,8 @@ namespace yas
         UInt32 input_bus_count() const;
         UInt32 output_bus_count() const;
 
-        void render(audio_pcm_buffer &buffer, const UInt32 bus_idx, const audio_time &when);
-        void set_render_time_on_render(const audio_time &time);
+        void render(audio_pcm_buffer &buffer, const UInt32 bus_idx, const audio_time &when) const;
+        void set_render_time_on_render(const audio_time &time) const;
 
        protected:
         class kernel_from_node;
@@ -70,12 +70,12 @@ namespace yas
         audio_connection _output_connection(const UInt32 bus_idx) const override;
         const audio_connection_wmap &_input_connections() const override;
         const audio_connection_wmap &_output_connections() const override;
-        void _add_connection(const audio_connection &connection) override;
-        void _remove_connection(const audio_connection &connection) override;
-        void _set_engine(const audio_engine &engine) override;
-        audio_engine _engine() override;
-        void _update_kernel() override;
-        void _update_connections() override;
+        void _add_connection(const audio_connection &connection) const override;
+        void _remove_connection(const audio_connection &connection) const override;
+        void _set_engine(const audio_engine &engine) const override;
+        audio_engine _engine() const override;
+        void _update_kernel() const override;
+        void _update_connections() const override;
 
 #if YAS_TEST
        public:

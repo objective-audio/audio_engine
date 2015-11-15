@@ -58,52 +58,52 @@ audio_unit_mixer_node::audio_unit_mixer_node(std::nullptr_t) : super_class(nullp
 {
 }
 
-void audio_unit_mixer_node::set_output_volume(const Float32 volume, const UInt32 bus_idx)
+void audio_unit_mixer_node::set_output_volume(const Float32 volume, const UInt32 bus_idx) const
 {
     set_output_parameter_value(kMultiChannelMixerParam_Volume, volume, bus_idx);
 }
 
-Float32 audio_unit_mixer_node::output_volume(const UInt32 bus_idx)
+Float32 audio_unit_mixer_node::output_volume(const UInt32 bus_idx) const
 {
     return output_parameter_value(kMultiChannelMixerParam_Volume, bus_idx);
 }
 
-void audio_unit_mixer_node::set_output_pan(const Float32 pan, const UInt32 bus_idx)
+void audio_unit_mixer_node::set_output_pan(const Float32 pan, const UInt32 bus_idx) const
 {
     set_output_parameter_value(kMultiChannelMixerParam_Pan, pan, bus_idx);
 }
 
-Float32 audio_unit_mixer_node::output_pan(const UInt32 bus_idx)
+Float32 audio_unit_mixer_node::output_pan(const UInt32 bus_idx) const
 {
     return output_parameter_value(kMultiChannelMixerParam_Pan, bus_idx);
 }
 
-void audio_unit_mixer_node::set_input_volume(const Float32 volume, const UInt32 bus_idx)
+void audio_unit_mixer_node::set_input_volume(const Float32 volume, const UInt32 bus_idx) const
 {
     set_input_parameter_value(kMultiChannelMixerParam_Volume, volume, bus_idx);
 }
 
-Float32 audio_unit_mixer_node::input_volume(const UInt32 bus_idx)
+Float32 audio_unit_mixer_node::input_volume(const UInt32 bus_idx) const
 {
     return input_parameter_value(kMultiChannelMixerParam_Volume, bus_idx);
 }
 
-void audio_unit_mixer_node::set_input_pan(const Float32 pan, const UInt32 bus_idx)
+void audio_unit_mixer_node::set_input_pan(const Float32 pan, const UInt32 bus_idx) const
 {
     set_input_parameter_value(kMultiChannelMixerParam_Pan, pan, bus_idx);
 }
 
-Float32 audio_unit_mixer_node::input_pan(const UInt32 bus_idx)
+Float32 audio_unit_mixer_node::input_pan(const UInt32 bus_idx) const
 {
     return input_parameter_value(kMultiChannelMixerParam_Pan, bus_idx);
 }
 
-void audio_unit_mixer_node::set_input_enabled(const bool enabled, UInt32 bus_idx)
+void audio_unit_mixer_node::set_input_enabled(const bool enabled, UInt32 bus_idx) const
 {
     set_input_parameter_value(kMultiChannelMixerParam_Enable, enabled ? 1.0f : 0.0f, bus_idx);
 }
 
-bool audio_unit_mixer_node::input_enabled(UInt32 bus_idx)
+bool audio_unit_mixer_node::input_enabled(UInt32 bus_idx) const
 {
     return input_parameter_value(kMultiChannelMixerParam_Enable, bus_idx) != 0.0f;
 }

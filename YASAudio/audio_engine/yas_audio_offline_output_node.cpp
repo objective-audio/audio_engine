@@ -30,12 +30,12 @@ bool audio_offline_output_node::is_running() const
 }
 
 offline_start_result_t audio_offline_output_node::_start(const offline_render_f &callback_func,
-                                                         const offline_completion_f &completion_func)
+                                                         const offline_completion_f &completion_func) const
 {
     return impl_ptr<impl>()->start(callback_func, completion_func);
 }
 
-void audio_offline_output_node::_stop()
+void audio_offline_output_node::_stop() const
 {
     impl_ptr<impl>()->stop();
 }

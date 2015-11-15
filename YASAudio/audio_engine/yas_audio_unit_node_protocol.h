@@ -14,7 +14,7 @@ namespace yas
        public:
         virtual ~audio_unit_node_from_engine() = default;
 
-        virtual void _add_audio_unit_to_graph(audio_graph &graph) = 0;
-        virtual void _remove_audio_unit_from_graph() = 0;
+        virtual void _add_audio_unit_to_graph(audio_graph &graph) const = 0;
+        virtual void _remove_audio_unit_from_graph() const = 0;
     };
 }

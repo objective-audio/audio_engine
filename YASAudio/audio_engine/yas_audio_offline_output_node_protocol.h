@@ -28,7 +28,7 @@ namespace yas
        public:
         virtual ~audio_offline_output_unit_from_engine() = default;
 
-        virtual offline_start_result_t _start(const offline_render_f &, const offline_completion_f &) = 0;
-        virtual void _stop() = 0;
+        virtual offline_start_result_t _start(const offline_render_f &, const offline_completion_f &) const = 0;
+        virtual void _stop() const = 0;
     };
 }

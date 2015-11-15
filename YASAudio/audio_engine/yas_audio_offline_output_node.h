@@ -30,8 +30,8 @@ namespace yas
         // from engine
 
         offline_start_result_t _start(const offline_render_f &callback_func,
-                                      const offline_completion_f &completion_func) override;
-        void _stop() override;
+                                      const offline_completion_f &completion_func) const override;
+        void _stop() const override;
 
 #if YAS_TEST
        public:
