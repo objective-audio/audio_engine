@@ -316,7 +316,9 @@ void audio_engine::impl::add_node_to_graph(const audio_node &node)
 
 #if (!TARGET_OS_IPHONE & TARGET_OS_MAC)
     if (auto device_io_node = node.cast<audio_device_io_node>()) {
-        static_cast<audio_device_io_node_from_engine &>(device_io_node)._add_audio_device_io_to_graph(_core->graph);
+        auto &node = static_cast<audio_device_io_node_from_engine &>(device_io_node);
+        node._add_device_io();
+        _core->graph.add_audio_device_io(node._device_io());
     }
 #endif
 
@@ -341,7 +343,11 @@ void audio_engine::impl::remove_node_from_graph(const audio_node &node)
 
 #if (!TARGET_OS_IPHONE & TARGET_OS_MAC)
     if (auto device_io_node = node.cast<audio_device_io_node>()) {
-        static_cast<audio_device_io_node_from_engine &>(device_io_node)._remove_audio_device_io_from_graph();
+        auto &node = static_cast<audio_device_io_node_from_engine &>(device_io_node);
+        if (auto &device_io = node._device_io()) {
+            _core->graph.remove_audio_device_io(device_io);
+            node._remove_device_io();
+        }
     }
 #endif
 

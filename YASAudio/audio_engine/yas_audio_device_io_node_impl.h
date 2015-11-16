@@ -20,8 +20,10 @@ class yas::audio_device_io_node::impl : public audio_node::impl
 
     virtual void update_connections() override;
 
-    void add_device_io_to_graph(audio_graph &graph);
-    void remove_device_io_from_graph();
+    void add_device_io();
+    void remove_device_io();
+    audio_device_io &device_io() const;
+
     void set_device(const audio_device &device);
     audio_device device() const;
 

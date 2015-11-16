@@ -18,10 +18,9 @@ class audio_device_io_node::impl::core
 {
    public:
     weak<audio_device_io_node> weak_node;
-    weak<audio_graph> weak_graph;
     audio_device_io device_io;
 
-    core() : weak_node(), _device(nullptr), weak_graph(), device_io(nullptr)
+    core() : weak_node(), _device(nullptr), device_io(nullptr)
     {
     }
 
@@ -154,31 +153,19 @@ bool audio_device_io_node::impl::_validate_connections() const
     return true;
 }
 
-void audio_device_io_node::impl::add_device_io_to_graph(audio_graph &graph)
+void audio_device_io_node::impl::add_device_io()
 {
-    if (!graph) {
-        throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
-    }
-
-    if (_core->device_io) {
-        return;
-    }
-
-    _core->weak_graph = graph;
     _core->device_io = audio_device_io(_core->device());
-    graph.add_audio_device_io(_core->device_io);
 }
 
-void audio_device_io_node::impl::remove_device_io_from_graph()
+void audio_device_io_node::impl::remove_device_io()
 {
-    if (auto graph = _core->weak_graph.lock()) {
-        if (_core->device_io) {
-            graph.remove_audio_device_io(_core->device_io);
-        }
-    }
-
-    _core->weak_graph.reset();
     _core->device_io = nullptr;
+}
+
+audio_device_io &audio_device_io_node::impl::device_io() const
+{
+    return _core->device_io;
 }
 
 void audio_device_io_node::impl::set_device(const audio_device &device)
