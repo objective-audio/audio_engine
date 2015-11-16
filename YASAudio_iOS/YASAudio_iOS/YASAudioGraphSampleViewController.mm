@@ -29,7 +29,7 @@ namespace yas
 
                 auto format = yas::audio_format(sample_rate, 2);
 
-                graph.prepare();
+                graph = yas::audio_graph();
 
                 io_unit = yas::audio_unit(kAudioUnitType_Output, yas::audio_unit::sub_type_default_io());
                 io_unit.set_enable_input(true);

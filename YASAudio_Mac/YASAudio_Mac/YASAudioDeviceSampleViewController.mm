@@ -184,7 +184,7 @@ namespace yas
         _internal.self_container.set_object(self);
     }
 
-    _internal.audio_graph.prepare();
+    _internal.audio_graph = yas::audio_graph();
     _internal.audio_device_io = yas::audio_device_io(yas::audio_device(nullptr));
     _internal.audio_graph.add_audio_device_io(_internal.audio_device_io);
 

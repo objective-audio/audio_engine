@@ -34,8 +34,7 @@
     auto output_format = yas::audio_format(output_sample_rate, channels, yas::pcm_format::float32, false);
     auto input_format = yas::audio_format(input_sample_rate, channels, yas::pcm_format::int16, true);
 
-    yas::audio_graph graph{nullptr};
-    graph.prepare();
+    yas::audio_graph graph;
 
     yas::audio_unit converter_unit(kAudioUnitType_FormatConverter, kAudioUnitSubType_AUConverter);
     converter_unit.set_maximum_frames_per_slice(maximum_frame_length);
@@ -102,8 +101,7 @@
 
     auto format = yas::audio_format(sampleRate, channels, yas::pcm_format::float32, false);
 
-    yas::audio_graph graph{nullptr};
-    graph.prepare();
+    yas::audio_graph graph;
 
     yas::audio_unit converter_unit(kAudioUnitType_FormatConverter, kAudioUnitSubType_AUConverter);
     converter_unit.set_maximum_frames_per_slice(maximum_frame_length);
