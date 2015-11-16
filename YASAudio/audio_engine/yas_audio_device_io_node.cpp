@@ -43,14 +43,19 @@ audio_device audio_device_io_node::device() const
 
 #pragma mark - private
 
-void audio_device_io_node::_add_audio_device_io_to_graph(audio_graph &graph) const
+void audio_device_io_node::_add_device_io() const
 {
-    impl_ptr<impl>()->add_device_io_to_graph(graph);
+    impl_ptr<impl>()->add_device_io();
 }
 
-void audio_device_io_node::_remove_audio_device_io_from_graph() const
+void audio_device_io_node::_remove_device_io() const
 {
-    impl_ptr<impl>()->remove_device_io_from_graph();
+    impl_ptr<impl>()->remove_device_io();
+}
+
+audio_device_io &audio_device_io_node::_device_io() const
+{
+    return impl_ptr<impl>()->device_io();
 }
 
 #endif
