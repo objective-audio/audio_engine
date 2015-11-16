@@ -24,6 +24,7 @@ namespace yas
        public:
         class impl;
 
+        audio_graph();
         audio_graph(std::nullptr_t);
         ~audio_graph();
 
@@ -31,8 +32,6 @@ namespace yas
         audio_graph(audio_graph &&) = default;
         audio_graph &operator=(const audio_graph &) = default;
         audio_graph &operator=(audio_graph &&) = default;
-
-        void prepare();
 
         void add_audio_unit(const audio_unit &audio_unit) const;
         void remove_audio_unit(const audio_unit &audio_unit) const;

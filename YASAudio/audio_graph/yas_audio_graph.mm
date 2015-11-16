@@ -277,23 +277,21 @@ class audio_graph::impl : public base::impl
 
 #pragma mark - constructor
 
+audio_graph::audio_graph() : super_class(nullptr)
+{
+    std::lock_guard<std::recursive_mutex> lock(_global_mutex);
+    auto key = min_empty_key(_graphs);
+    if (key && _graphs.count(*key) == 0) {
+        set_impl_ptr(std::make_shared<impl>(*key));
+        audio_graph::impl::add_graph(*this);
+    }
+}
+
 audio_graph::audio_graph(std::nullptr_t) : super_class(nullptr)
 {
 }
 
 audio_graph::~audio_graph() = default;
-
-void audio_graph::prepare()
-{
-    std::lock_guard<std::recursive_mutex> lock(_global_mutex);
-    if (!impl_ptr()) {
-        auto key = min_empty_key(_graphs);
-        if (key && _graphs.count(*key) == 0) {
-            set_impl_ptr(std::make_shared<impl>(*key));
-            audio_graph::impl::add_graph(*this);
-        }
-    }
-}
 
 void audio_graph::add_audio_unit(const audio_unit &unit) const
 {

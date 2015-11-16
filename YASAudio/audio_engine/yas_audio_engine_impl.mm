@@ -199,7 +199,7 @@ bool audio_engine::impl::prepare()
         return true;
     }
 
-    _core->graph.prepare();
+    _core->graph = yas::audio_graph();
 
     for (auto &node : _core->nodes) {
         add_node_to_graph(node);
