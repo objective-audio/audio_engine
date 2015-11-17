@@ -6,6 +6,7 @@
 #include "yas_observing.h"
 #include "yas_audio_types.h"
 #include "yas_stl_utils.h"
+#include <unordered_map>
 #include <unordered_set>
 #include <experimental/optional>
 
@@ -23,7 +24,7 @@ class observer::impl : public base::impl
    public:
     class handler_holder
     {
-        std::map<const string_opt, const handler_f> functions;
+        std::unordered_map<string_opt, const handler_f> functions;
 
        public:
         void add_handler(const string_opt &key, const handler_f &handler)
@@ -58,7 +59,7 @@ class observer::impl : public base::impl
         }
     };
 
-    std::map<const subject *, handler_holder> handlers;
+    std::unordered_map<const subject *, handler_holder> handlers;
 
     void call_handler(const subject &subject, const std::string &key, const yas::any &object)
     {
@@ -79,7 +80,7 @@ class subject::impl
 {
    public:
     using observer_set_t = std::unordered_set<weak<observer>>;
-    using observers_t = std::map<const string_opt, observer_set_t>;
+    using observers_t = std::unordered_map<string_opt, observer_set_t>;
     observers_t observers;
 
     void add_observer(const observer &obs, const string_opt &key)
