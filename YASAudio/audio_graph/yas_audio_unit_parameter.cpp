@@ -20,7 +20,7 @@ class audio_unit_parameter::impl
     AudioUnitParameterValue min_value;
     AudioUnitParameterValue max_value;
     AudioUnitParameterValue default_value;
-    std::map<AudioUnitElement, AudioUnitParameterValue> values;
+    std::unordered_map<AudioUnitElement, AudioUnitParameterValue> values;
     std::string unit_name;
     std::string name;
 
@@ -160,7 +160,7 @@ void audio_unit_parameter::set_value(const AudioUnitParameterValue value, const 
     _impl->values[element] = value;
 }
 
-const std::map<AudioUnitElement, AudioUnitParameterValue> &audio_unit_parameter::values() const
+const std::unordered_map<AudioUnitElement, AudioUnitParameterValue> &audio_unit_parameter::values() const
 {
     return _impl->values;
 }
