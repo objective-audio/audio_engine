@@ -6,7 +6,7 @@
 #pragma once
 
 #include <string>
-#include <map>
+#include <unordered_map>
 #include <vector>
 #include <CoreFoundation/CoreFoundation.h>
 
@@ -35,7 +35,7 @@ namespace yas
     CFArrayRef to_cf_object(const std::vector<T> &vector);
 
     template <typename K, typename T>
-    CFDictionaryRef to_cf_object(const std::map<K, T> &map);
+    CFDictionaryRef to_cf_object(const std::unordered_map<K, T> &map);
 
     CFStringRef file_type_for_hfs_type_code(const OSType fcc);
     OSType hfs_type_code_from_file_type(const CFStringRef cfStr);

@@ -133,7 +133,7 @@
     const std::string key2 = "key_2";
     const SInt16 value2 = 20;
 
-    std::map<std::string, SInt16> map{{key1, value1}, {key2, value2}};
+    std::unordered_map<std::string, SInt16> map{{key1, value1}, {key2, value2}};
 
     const CFDictionaryRef cf_dictionary = yas::to_cf_object(map);
 
