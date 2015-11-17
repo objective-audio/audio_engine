@@ -58,4 +58,12 @@ namespace yas
     };
 }
 
+template <>
+struct std::hash<yas::audio_device_io> {
+    std::size_t operator()(yas::audio_device_io const &key) const
+    {
+        return std::hash<uintptr_t>()(key.identifier());
+    }
+};
+
 #endif
