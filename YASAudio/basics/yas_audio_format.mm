@@ -6,7 +6,7 @@
 #include "yas_audio_format.h"
 #include "yas_exception.h"
 #include "yas_cf_utils.h"
-#include <map>
+#include <unordered_map>
 #import <AVFoundation/AVFoundation.h>
 
 using namespace yas;
@@ -15,7 +15,7 @@ using namespace yas;
 
 static std::string format_flags_string(const AudioStreamBasicDescription &asbd)
 {
-    const std::map<AudioFormatFlags, std::string> flags = {
+    const std::unordered_map<AudioFormatFlags, std::string> flags = {
         {kAudioFormatFlagIsFloat, "kAudioFormatFlagIsFloat"},
         {kAudioFormatFlagIsBigEndian, "kAudioFormatFlagIsBigEndian"},
         {kAudioFormatFlagIsSignedInteger, "kAudioFormatFlagIsSignedInteger"},
