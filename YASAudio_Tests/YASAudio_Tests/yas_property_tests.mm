@@ -45,8 +45,6 @@ struct test_class {
 {
     yas::property<float> float_property;
 
-    XCTAssertEqual(float_property.value(), 0.0f);
-
     float_property.set_value(1.0f);
 
     XCTAssertEqual(float_property.value(), 1.0f);
