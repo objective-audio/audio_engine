@@ -186,4 +186,54 @@ struct test_class {
     XCTAssertEqual(test_object.property2.value(), 20);
 }
 
+- (void)test_equal_true
+{
+    float value = 3.0f;
+
+    yas::property<int, float> property1{1, value};
+    yas::property<int, float> property2{2, value};
+
+    XCTAssertTrue(property1 == property2);
+    XCTAssertTrue(property1 == value);
+    XCTAssertTrue(value == property1);
+}
+
+- (void)test_equal_false
+{
+    float value1 = 3.0f;
+    float value2 = 5.0f;
+
+    yas::property<int, float> property1{1, value1};
+    yas::property<int, float> property2{2, value2};
+
+    XCTAssertFalse(property1 == property2);
+    XCTAssertFalse(property1 == value2);
+    XCTAssertFalse(value1 == property2);
+}
+
+- (void)test_not_equal_true
+{
+    float value1 = 3.0f;
+    float value2 = 5.0f;
+
+    yas::property<int, float> property1{1, value1};
+    yas::property<int, float> property2{2, value2};
+
+    XCTAssertTrue(property1 != property2);
+    XCTAssertTrue(property1 != value2);
+    XCTAssertTrue(value1 != property2);
+}
+
+- (void)test_not_equal_false
+{
+    float value = 3.0f;
+
+    yas::property<int, float> property1{1, value};
+    yas::property<int, float> property2{2, value};
+
+    XCTAssertFalse(property1 != property2);
+    XCTAssertFalse(property1 != value);
+    XCTAssertFalse(value != property1);
+}
+
 @end
