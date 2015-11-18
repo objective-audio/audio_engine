@@ -6,10 +6,16 @@
 #include "yas_observing.h"
 #include "yas_audio_types.h"
 #include "yas_stl_utils.h"
+#include <unordered_map>
 #include <unordered_set>
 #include <experimental/optional>
 
 using namespace yas;
+
+namespace yas
+{
+    using string_opt = std::experimental::optional<std::string>;
+}
 
 #pragma mark - impl
 
@@ -18,15 +24,15 @@ class observer::impl : public base::impl
    public:
     class handler_holder
     {
-        std::map<const std::experimental::optional<std::string>, const handler_f> functions;
+        std::unordered_map<string_opt, const handler_f> functions;
 
        public:
-        void add_handler(const std::experimental::optional<std::string> &key, const handler_f &handler)
+        void add_handler(const string_opt &key, const handler_f &handler)
         {
             functions.insert(std::make_pair(key, handler));
         }
 
-        void remove_handler(const std::experimental::optional<std::string> &key)
+        void remove_handler(const string_opt &key)
         {
             if (functions.count(key) > 0) {
                 functions.erase(key);
@@ -53,7 +59,7 @@ class observer::impl : public base::impl
         }
     };
 
-    std::map<const subject *, handler_holder> handlers;
+    std::unordered_map<const subject *, handler_holder> handlers;
 
     void call_handler(const subject &subject, const std::string &key, const yas::any &object)
     {
@@ -74,10 +80,10 @@ class subject::impl
 {
    public:
     using observer_set_t = std::unordered_set<weak<observer>>;
-    using observers_t = std::map<const std::experimental::optional<std::string>, observer_set_t>;
+    using observers_t = std::unordered_map<string_opt, observer_set_t>;
     observers_t observers;
 
-    void add_observer(const observer &obs, const std::experimental::optional<std::string> &key)
+    void add_observer(const observer &obs, const string_opt &key)
     {
         if (observers.count(key) == 0) {
             observers.insert(std::make_pair(key, observer_set_t()));
@@ -87,7 +93,7 @@ class subject::impl
         set.insert(weak<observer>(obs));
     }
 
-    void remove_observer(const observer &observer, const std::experimental::optional<std::string> &key)
+    void remove_observer(const observer &observer, const string_opt &key)
     {
         if (observers.count(key) > 0) {
             auto &set = observers.at(key);

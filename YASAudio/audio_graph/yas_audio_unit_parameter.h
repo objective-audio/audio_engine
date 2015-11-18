@@ -7,13 +7,13 @@
 
 #include <AudioToolbox/AudioToolbox.h>
 #include <string>
-#include <map>
+#include <unordered_map>
 #include <memory>
 
 namespace yas
 {
     class audio_unit_parameter;
-    using audio_unit_parameter_map_t = std::map<AudioUnitParameterID, audio_unit_parameter>;
+    using audio_unit_parameter_map_t = std::unordered_map<AudioUnitParameterID, audio_unit_parameter>;
 
     class audio_unit_parameter
     {
@@ -38,7 +38,7 @@ namespace yas
 
         Float32 value(const AudioUnitElement element) const;
         void set_value(const Float32 value, const AudioUnitElement element);
-        const std::map<AudioUnitElement, AudioUnitParameterValue> &values() const;
+        const std::unordered_map<AudioUnitElement, AudioUnitParameterValue> &values() const;
 
        private:
         class impl;

@@ -15,7 +15,7 @@ class audio_unit_node::impl::core
 {
    public:
     AudioComponentDescription acd;
-    std::map<AudioUnitScope, audio_unit_parameter_map_t> parameters;
+    std::unordered_map<AudioUnitScope, audio_unit_parameter_map_t> parameters;
     yas::audio_unit _au;
 
     core() : acd(), parameters(), _au(nullptr), _mutex()
@@ -73,7 +73,7 @@ audio_unit audio_unit_node::impl::au() const
     return _core->au();
 }
 
-const std::map<AudioUnitParameterID, audio_unit_parameter_map_t> &audio_unit_node::impl::parameters() const
+const std::unordered_map<AudioUnitParameterID, audio_unit_parameter_map_t> &audio_unit_node::impl::parameters() const
 {
     return _core->parameters;
 }

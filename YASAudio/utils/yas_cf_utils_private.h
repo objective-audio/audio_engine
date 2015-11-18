@@ -58,7 +58,7 @@ CFArrayRef yas::to_cf_object(const std::vector<T> &vector)
 }
 
 template <typename K, typename T>
-CFDictionaryRef yas::to_cf_object(const std::map<K, T> &map)
+CFDictionaryRef yas::to_cf_object(const std::unordered_map<K, T> &map)
 {
     CFMutableDictionaryRef dictionary = CFDictionaryCreateMutable(
         kCFAllocatorDefault, map.size(), &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);

@@ -47,7 +47,7 @@ audio_unit audio_unit_node::audio_unit() const
     return impl_ptr<impl>()->au();
 }
 
-const std::map<AudioUnitParameterID, audio_unit_parameter_map_t> &audio_unit_node::parameters() const
+const std::unordered_map<AudioUnitParameterID, audio_unit_parameter_map_t> &audio_unit_node::parameters() const
 {
     return impl_ptr<impl>()->parameters();
 }
