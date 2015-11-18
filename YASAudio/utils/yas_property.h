@@ -30,10 +30,10 @@ namespace yas
         property &operator=(const property &) = default;
         property &operator=(property &&) = default;
 
-        bool operator==(const property &);
-        bool operator!=(const property &);
-        bool operator==(const T &);
-        bool operator!=(const T &);
+        bool operator==(const property &) const;
+        bool operator!=(const property &) const;
+        bool operator==(const T &) const;
+        bool operator!=(const T &) const;
 
         const K &key() const;
         void set_value(const T &value);

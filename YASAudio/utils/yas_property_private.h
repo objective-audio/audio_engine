@@ -48,25 +48,25 @@ namespace yas
     }
 
     template <typename T, typename K>
-    bool property<T, K>::operator==(const property &rhs)
+    bool property<T, K>::operator==(const property &rhs) const
     {
         return _impl == rhs._impl;
     }
 
     template <typename T, typename K>
-    bool property<T, K>::operator!=(const property &rhs)
+    bool property<T, K>::operator!=(const property &rhs) const
     {
         return _impl != rhs._impl;
     }
 
     template <typename T, typename K>
-    bool property<T, K>::operator==(const T &rhs)
+    bool property<T, K>::operator==(const T &rhs) const
     {
         return _impl->value == rhs;
     }
 
     template <typename T, typename K>
-    bool property<T, K>::operator!=(const T &rhs)
+    bool property<T, K>::operator!=(const T &rhs) const
     {
         return _impl->value != rhs;
     }
