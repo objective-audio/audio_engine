@@ -29,9 +29,14 @@ namespace yas
         property &operator=(const property &) = default;
         property &operator=(property &&) = default;
 
+        bool operator==(const property &);
+        bool operator!=(const property &);
+        bool operator==(const T &);
+        bool operator!=(const T &);
+
         const K &key() const;
         void set_value(const T &value);
-        T value() const;
+        const T &value() const;
 
         subject &subject();
 

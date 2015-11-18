@@ -38,6 +38,30 @@ namespace yas
     }
 
     template <typename K, typename T>
+    bool property<K, T>::operator==(const property &rhs)
+    {
+        return _impl->value == rhs._impl->value;
+    }
+
+    template <typename K, typename T>
+    bool property<K, T>::operator!=(const property &rhs)
+    {
+        return _impl->value != rhs._impl->value;
+    }
+
+    template <typename K, typename T>
+    bool property<K, T>::operator==(const T &rhs)
+    {
+        return _impl->value == rhs;
+    }
+
+    template <typename K, typename T>
+    bool property<K, T>::operator!=(const T &rhs)
+    {
+        return _impl->value != rhs;
+    }
+
+    template <typename K, typename T>
     const K &property<K, T>::key() const
     {
         return _impl->key;
@@ -56,7 +80,7 @@ namespace yas
     }
 
     template <typename K, typename T>
-    T property<K, T>::value() const
+    const T &property<K, T>::value() const
     {
         return _impl->value;
     }
@@ -65,5 +89,17 @@ namespace yas
     subject &property<K, T>::subject()
     {
         return _impl->subject;
+    }
+
+    template <typename T, typename K>
+    bool operator==(const K &lhs, const property<T, K> &rhs)
+    {
+        return lhs == rhs.value();
+    }
+
+    template <typename T, typename K>
+    bool operator!=(const K &lhs, const property<T, K> &rhs)
+    {
+        return lhs != rhs.value();
     }
 }
