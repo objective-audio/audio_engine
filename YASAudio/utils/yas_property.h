@@ -17,10 +17,11 @@ namespace yas
         static const auto did_change = "yas.property.did_change";
     };
 
-    template <typename K, typename T>
+    template <typename T, typename K = std::nullptr_t>
     class property
     {
        public:
+        property();
         explicit property(const K &key);
         property(const K &key, const T &value);
 
@@ -29,9 +30,14 @@ namespace yas
         property &operator=(const property &) = default;
         property &operator=(property &&) = default;
 
+        bool operator==(const property &) const;
+        bool operator!=(const property &) const;
+        bool operator==(const T &) const;
+        bool operator!=(const T &) const;
+
         const K &key() const;
         void set_value(const T &value);
-        T value() const;
+        const T &value() const;
 
         subject &subject();
 

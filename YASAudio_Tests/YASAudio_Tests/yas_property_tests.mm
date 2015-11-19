@@ -11,8 +11,8 @@ enum class test_key {
 };
 
 struct test_class {
-    yas::property<test_key, int> property1;
-    yas::property<test_key, int> property2;
+    yas::property<int, test_key> property1;
+    yas::property<int, test_key> property2;
 
     yas::subject properties_subject;
     yas::observer dispatcher;
@@ -43,10 +43,19 @@ struct test_class {
 
 - (void)test_create_property
 {
+    yas::property<float> float_property;
+
+    float_property.set_value(1.0f);
+
+    XCTAssertEqual(float_property.value(), 1.0f);
+}
+
+- (void)test_create_property_with_key
+{
     int key = 1;
     float value1 = 1.5;
 
-    yas::property<int, float> float_property(key, value1);
+    yas::property<float, int> float_property(key, value1);
 
     XCTAssertEqual(key, float_property.key());
     XCTAssertEqual(float_property.value(), value1);
@@ -73,7 +82,7 @@ struct test_class {
 
 - (void)test_observe_value
 {
-    yas::property<int, bool> property(1, false);
+    yas::property<bool, int> property(1, false);
     yas::observer observer;
 
     bool will_change_called = false;
@@ -81,7 +90,7 @@ struct test_class {
     observer.add_handler(property.subject(), yas::property_method::will_change,
                          [self, &will_change_called](const std::string &method, const yas::any &sender) {
                              XCTAssertEqual(method, yas::property_method::will_change);
-                             auto &property = sender.get<yas::property<int, bool> >();
+                             auto &property = sender.get<yas::property<bool, int> >();
                              XCTAssertEqual(property.key(), 1);
                              XCTAssertEqual(property.value(), false);
                              will_change_called = true;
@@ -92,7 +101,7 @@ struct test_class {
     observer.add_handler(property.subject(), yas::property_method::did_change,
                          [self, &did_change_called](const std::string &method, const yas::any &sender) {
                              XCTAssertEqual(method, yas::property_method::did_change);
-                             auto &property = sender.get<yas::property<int, bool> >();
+                             auto &property = sender.get<yas::property<bool, int> >();
                              XCTAssertEqual(property.key(), 1);
                              XCTAssertEqual(property.value(), true);
                              did_change_called = true;
@@ -102,7 +111,7 @@ struct test_class {
 
     observer.add_wild_card_handler(property.subject(),
                                    [self, &wildcard_called_count](const std::string &method, const yas::any &sender) {
-                                       auto &property = sender.get<yas::property<int, bool> >();
+                                       auto &property = sender.get<yas::property<bool, int> >();
                                        if (method == yas::property_method::will_change) {
                                            XCTAssertEqual(property.key(), 1);
                                            XCTAssertEqual(property.value(), false);
@@ -132,7 +141,7 @@ struct test_class {
         test_object.properties_subject,
         [&receive_value1, &receive_value2](const std::string &method, const yas::any &sender) {
             if (method == yas::property_method::did_change) {
-                auto &property = sender.get<yas::property<test_key, int> >();
+                auto &property = sender.get<yas::property<int, test_key> >();
                 switch (property.key()) {
                     case test_key::property1:
                         receive_value1 = property.value();
@@ -162,7 +171,7 @@ struct test_class {
 
     observer.add_handler(test_object.properties_subject, yas::property_method::did_change,
                          [&test_object](const std::string &method, const yas::any &sender) {
-                             auto &property = sender.get<yas::property<test_key, int> >();
+                             auto &property = sender.get<yas::property<int, test_key> >();
                              switch (property.key()) {
                                  case test_key::property1:
                                      test_object.property2.set_value(property.value());
@@ -184,6 +193,70 @@ struct test_class {
 
     XCTAssertEqual(test_object.property1.value(), 20);
     XCTAssertEqual(test_object.property2.value(), 20);
+}
+
+- (void)test_equal
+{
+    yas::property<float> property1;
+    yas::property<float> property2;
+
+    XCTAssertTrue(property1 == property1);
+    XCTAssertFalse(property1 == property2);
+}
+
+- (void)test_not_equal
+{
+    yas::property<float> property1;
+    yas::property<float> property2;
+
+    XCTAssertFalse(property1 != property1);
+    XCTAssertTrue(property1 != property2);
+}
+
+- (void)test_equal_to_value_true
+{
+    float value = 3.0f;
+
+    yas::property<float, int> property1{1, value};
+    yas::property<float, int> property2{2, value};
+
+    XCTAssertTrue(property1 == value);
+    XCTAssertTrue(value == property1);
+}
+
+- (void)test_equal_to_value_false
+{
+    float value1 = 3.0f;
+    float value2 = 5.0f;
+
+    yas::property<float, int> property1{1, value1};
+    yas::property<float, int> property2{2, value2};
+
+    XCTAssertFalse(property1 == value2);
+    XCTAssertFalse(value1 == property2);
+}
+
+- (void)test_not_equal_to_value_true
+{
+    float value1 = 3.0f;
+    float value2 = 5.0f;
+
+    yas::property<float, int> property1{1, value1};
+    yas::property<float, int> property2{2, value2};
+
+    XCTAssertTrue(property1 != value2);
+    XCTAssertTrue(value1 != property2);
+}
+
+- (void)test_not_equal_to_value_false
+{
+    float value = 3.0f;
+
+    yas::property<float, int> property1{1, value};
+    yas::property<float, int> property2{2, value};
+
+    XCTAssertFalse(property1 != value);
+    XCTAssertFalse(value != property1);
 }
 
 @end
