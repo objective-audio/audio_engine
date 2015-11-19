@@ -589,6 +589,28 @@
     XCTAssertEqual(buffer.data_ptr_at_channel<Float32>(1), &data[1]);
 }
 
+- (void)test_copy_error_to_string
+{
+    XCTAssertTrue(yas::to_string(yas::audio_pcm_buffer::copy_error_t::invalid_argument) == "invalid_argument");
+    XCTAssertTrue(yas::to_string(yas::audio_pcm_buffer::copy_error_t::invalid_abl) == "invalid_abl");
+    XCTAssertTrue(yas::to_string(yas::audio_pcm_buffer::copy_error_t::invalid_format) == "invalid_format");
+    XCTAssertTrue(yas::to_string(yas::audio_pcm_buffer::copy_error_t::out_of_range) == "out_of_range");
+    XCTAssertTrue(yas::to_string(yas::audio_pcm_buffer::copy_error_t::buffer_is_null) == "buffer_is_null");
+}
+
+- (void)test_clear
+{
+    yas::audio_pcm_buffer buffer(yas::audio_format(44100.0, 1), 1);
+    auto *data = buffer.data_ptr_at_channel<Float32>(0);
+    *data = 1.0f;
+
+    XCTAssertFalse(*data == 0.0f);
+
+    buffer.clear();
+
+    XCTAssertTrue(*data == 0.0f);
+}
+
 #pragma mark -
 
 - (void)assert_buffer_with_channel_map:(const yas::channel_map_t &)channel_map

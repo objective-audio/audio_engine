@@ -622,11 +622,6 @@ UInt32 yas::frame_length(const AudioBufferList *abl, const UInt32 sample_byte_co
     }
 }
 
-bool yas::is_equal(const AudioBufferList &abl1, const AudioBufferList &abl2)
-{
-    return memcmp(&abl1, &abl2, sizeof(AudioStreamBasicDescription)) == 0;
-}
-
 bool yas::is_equal_structure(const AudioBufferList &abl1, const AudioBufferList &abl2)
 {
     if (abl1.mNumberBuffers != abl2.mNumberBuffers) {
@@ -644,7 +639,7 @@ bool yas::is_equal_structure(const AudioBufferList &abl1, const AudioBufferList 
     return true;
 }
 
-std::string to_string(const audio_pcm_buffer::copy_error_t &error)
+std::string yas::to_string(const audio_pcm_buffer::copy_error_t &error)
 {
     switch (error) {
         case audio_pcm_buffer::copy_error_t::invalid_argument:
