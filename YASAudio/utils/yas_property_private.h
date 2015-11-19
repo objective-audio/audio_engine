@@ -8,97 +8,125 @@
 namespace yas
 {
     template <typename T, typename K>
-    class property<T, K>::impl
+    class property<T, K>::impl : public base::impl
     {
        public:
-        K key;
-        T value;
-        yas::subject subject;
-        std::mutex notify_mutex;
-
-        impl()
+        impl(const K &key, const T &value) : _key(key), _value(value)
         {
         }
 
-        impl(const K &key) : key(key)
+        void set_property(const property &prop)
         {
+            _weak_property = prop;
         }
 
-        impl(const K &key, const T &value) : key(key), value(value)
+        K &key()
         {
+            return _key;
         }
+
+        void set_value(const T &val)
+        {
+            if (auto lock = std::unique_lock<std::mutex>(_notify_mutex, std::try_to_lock)) {
+                if (lock.owns_lock()) {
+                    if (auto property = _weak_property.lock()) {
+                        _subject.notify(property_method::will_change, property);
+                        _value = val;
+                        _subject.notify(property_method::did_change, property);
+                    }
+                }
+            }
+        }
+
+        T &value()
+        {
+            return _value;
+        }
+
+        yas::subject &subject()
+        {
+            return _subject;
+        }
+
+       private:
+        std::mutex _notify_mutex;
+        K _key;
+        T _value;
+        yas::subject _subject;
+        weak<property<T, K>> _weak_property;
     };
 
     template <typename T, typename K>
     property<T, K>::property()
-        : _impl(std::make_shared<impl>())
+        : property(K{}, T{})
     {
     }
 
     template <typename T, typename K>
     property<T, K>::property(const K &key)
-        : _impl(std::make_shared<impl>(key))
+        : property(key, T{})
     {
     }
 
     template <typename T, typename K>
     property<T, K>::property(const K &key, const T &value)
-        : _impl(std::make_shared<impl>(key, value))
+        : super_class(std::make_shared<impl>(key, value))
+    {
+        impl_ptr<impl>()->set_property(*this);
+    }
+
+    template <typename T, typename K>
+    property<T, K>::property(std::nullptr_t)
+        : super_class(nullptr)
     {
     }
 
     template <typename T, typename K>
     bool property<T, K>::operator==(const property &rhs) const
     {
-        return _impl == rhs._impl;
+        return impl_ptr() && rhs.impl_ptr() && (impl_ptr() == rhs.impl_ptr());
     }
 
     template <typename T, typename K>
     bool property<T, K>::operator!=(const property &rhs) const
     {
-        return _impl != rhs._impl;
+        return !impl_ptr() || !rhs.impl_ptr() || (impl_ptr() != rhs.impl_ptr());
     }
 
     template <typename T, typename K>
     bool property<T, K>::operator==(const T &rhs) const
     {
-        return _impl->value == rhs;
+        return impl_ptr<impl>()->value() == rhs;
     }
 
     template <typename T, typename K>
     bool property<T, K>::operator!=(const T &rhs) const
     {
-        return _impl->value != rhs;
+        return impl_ptr<impl>()->value() != rhs;
     }
 
     template <typename T, typename K>
     const K &property<T, K>::key() const
     {
-        return _impl->key;
+        return impl_ptr<impl>()->key();
     }
 
     template <typename T, typename K>
     void property<T, K>::set_value(const T &value)
     {
-        if (auto lock = std::unique_lock<std::mutex>(_impl->notify_mutex, std::try_to_lock)) {
-            if (lock.owns_lock()) {
-                _impl->subject.notify(property_method::will_change, *this);
-                _impl->value = value;
-                _impl->subject.notify(property_method::did_change, *this);
-            }
-        }
+        impl_ptr<impl>()->set_value(value);
     }
 
     template <typename T, typename K>
     const T &property<T, K>::value() const
     {
-        return _impl->value;
+        return impl_ptr<impl>()->value();
     }
 
     template <typename T, typename K>
     subject &property<T, K>::subject()
     {
-        return _impl->subject;
+        return impl_ptr<impl>()->subject();
     }
 
     template <typename T, typename K>
