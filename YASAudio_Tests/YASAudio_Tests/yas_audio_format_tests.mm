@@ -305,4 +305,33 @@
     XCTAssertFalse(yas::is_equal(asbd1, asbd2));
 }
 
+- (void)test_pcm_format_to_string
+{
+    XCTAssertTrue(yas::to_string(yas::pcm_format::float32) == "Float32");
+    XCTAssertTrue(yas::to_string(yas::pcm_format::float64) == "Float64");
+    XCTAssertTrue(yas::to_string(yas::pcm_format::int16) == "Int16");
+    XCTAssertTrue(yas::to_string(yas::pcm_format::fixed824) == "Fixed8.24");
+    XCTAssertTrue(yas::to_string(yas::pcm_format::other) == "Other");
+}
+
+- (void)test_null_format
+{
+    const auto null_format = yas::audio_format::null_format();
+    XCTAssertFalse(null_format);
+}
+
+- (void)test_is_empty
+{
+    yas::audio_format format{AudioStreamBasicDescription{}};
+    XCTAssertTrue(format.is_empty());
+
+    XCTAssertTrue(yas::audio_format::null_format().is_empty());
+}
+
+- (void)test_smoke
+{
+    yas::audio_format format{48000.0, 2};
+    format.description();
+}
+
 @end
