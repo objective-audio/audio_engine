@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "yas_observing.h"
 #include <AudioToolbox/AudioToolbox.h>
 #include <string>
 #include <unordered_map>
@@ -18,6 +19,16 @@ namespace yas
     class audio_unit_parameter
     {
        public:
+        struct change_info {
+            const audio_unit_parameter &parameter;
+            const AudioUnitElement element;
+            const AudioUnitParameterValue old_value;
+            const AudioUnitParameterValue new_value;
+        };
+
+        constexpr static auto will_change_key = "yas.audio_unit_parameter.will_change";
+        constexpr static auto did_change_key = "yas.audio_unit_parameter.did_change";
+
         audio_unit_parameter(const AudioUnitParameterInfo &info, const AudioUnitParameterID paramter_id,
                              const AudioUnitScope scope);
         ~audio_unit_parameter();
@@ -39,6 +50,8 @@ namespace yas
         Float32 value(const AudioUnitElement element) const;
         void set_value(const Float32 value, const AudioUnitElement element);
         const std::unordered_map<AudioUnitElement, AudioUnitParameterValue> &values() const;
+
+        subject<change_info> &subject();
 
        private:
         class impl;

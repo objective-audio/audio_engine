@@ -23,6 +23,7 @@ class audio_unit_parameter::impl
     std::unordered_map<AudioUnitElement, AudioUnitParameterValue> values;
     std::string unit_name;
     std::string name;
+    yas::subject<audio_unit_parameter::change_info> subject;
 
     impl(const AudioUnitParameterInfo &info, const AudioUnitParameterID parameter_id, const AudioUnitScope scope)
         : parameter_id(parameter_id),
@@ -157,10 +158,21 @@ Float32 audio_unit_parameter::value(const AudioUnitElement element) const
 
 void audio_unit_parameter::set_value(const AudioUnitParameterValue value, const AudioUnitElement element)
 {
+    change_info info{
+        .element = element, .old_value = _impl->values[element], .new_value = value, .parameter = *this,
+    };
+
+    _impl->subject.notify(will_change_key, info);
     _impl->values[element] = value;
+    _impl->subject.notify(did_change_key, info);
 }
 
 const std::unordered_map<AudioUnitElement, AudioUnitParameterValue> &audio_unit_parameter::values() const
 {
     return _impl->values;
+}
+
+subject<audio_unit_parameter::change_info> &audio_unit_parameter::subject()
+{
+    return _impl->subject;
 }
