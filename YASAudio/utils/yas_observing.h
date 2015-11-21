@@ -5,7 +5,6 @@
 
 #pragma once
 
-#include "yas_any.h"
 #include "yas_base.h"
 #include <functional>
 #include <string>
@@ -13,19 +12,20 @@
 
 namespace yas
 {
-    class observer;
+    template <typename T>
     class subject;
 
+    template <typename T = std::nullptr_t>
     class observer : public base
     {
         using super_class = base;
         class impl;
 
        public:
-        using handler_f = std::function<void(const std::string &, const yas::any &)>;
+        using handler_f = std::function<void(const std::string &, const T &)>;
 
         observer();
-        explicit observer(std::nullptr_t);
+        observer(std::nullptr_t);
         ~observer();
 
         observer(const observer &) = default;
@@ -33,20 +33,18 @@ namespace yas
         observer &operator=(const observer &) = default;
         observer &operator=(observer &&) = default;
 
-        void add_handler(subject &subject, const std::string &key, const handler_f &handler) const;
-        void remove_handler(subject &subject, const std::string &key) const;
+        void add_handler(subject<T> &subject, const std::string &key, const handler_f &handler) const;
+        void remove_handler(subject<T> &subject, const std::string &key) const;
 
-        void add_wild_card_handler(subject &subject, const handler_f &handler) const;
-        void remove_wild_card_handler(subject &subject) const;
+        void add_wild_card_handler(subject<T> &subject, const handler_f &handler) const;
+        void remove_wild_card_handler(subject<T> &subject) const;
 
         void clear() const;
 
-        friend subject;
+        friend subject<T>;
     };
 
-    observer make_subject_dispatcher(const subject &source_subject,
-                                     const std::initializer_list<subject *> &destination_subjects);
-
+    template <typename T = std::nullptr_t>
     class subject
     {
        public:
@@ -57,7 +55,10 @@ namespace yas
         bool operator!=(const subject &) const;
 
         void notify(const std::string &key) const;
-        void notify(const std::string &key, const yas::any &object) const;
+        void notify(const std::string &key, const T &object) const;
+
+        observer<T> make_observer(const std::string &key, const typename observer<T>::handler_f &handler);
+        observer<T> make_wild_card_observer(const typename observer<T>::handler_f &handler);
 
        private:
         class impl;
@@ -68,23 +69,29 @@ namespace yas
         subject &operator=(const subject &) = delete;
         subject &operator=(subject &&) = delete;
 
-        friend observer;
+        friend observer<T>;
     };
+
+    template <typename T>
+    observer<T> make_subject_dispatcher(const subject<T> &source_subject,
+                                        const std::initializer_list<subject<T> *> &destination_subjects);
 }
 
-template <>
-struct std::hash<yas::observer> {
-    std::size_t operator()(yas::observer const &key) const
+template <typename T>
+struct std::hash<yas::observer<T>> {
+    std::size_t operator()(yas::observer<T> const &key) const
     {
         return std::hash<uintptr_t>()(key.identifier());
     }
 };
 
-template <>
-struct std::hash<yas::weak<yas::observer>> {
-    std::size_t operator()(yas::weak<yas::observer> const &weak_key) const
+template <typename T>
+struct std::hash<yas::weak<yas::observer<T>>> {
+    std::size_t operator()(yas::weak<yas::observer<T>> const &weak_key) const
     {
         auto key = weak_key.lock();
         return std::hash<uintptr_t>()(key.identifier());
     }
 };
+
+#include "yas_observing_private.h"

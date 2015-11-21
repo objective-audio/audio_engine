@@ -66,7 +66,7 @@ namespace yas
                                             const offline_completion_f &completion_function) const;
         void stop() const;
 
-        subject &subject() const;
+        subject<audio_engine> &subject() const;
 
 #if YAS_TEST
        public:

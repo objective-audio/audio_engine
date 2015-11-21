@@ -28,7 +28,7 @@ namespace yas
             yas::audio_unit_input_node input_node;
             yas::audio_input_tap_node input_tap_node;
 
-            yas::property<property_key, Float32> input_level;
+            yas::property<Float32, property_key> input_level;
 
             input_tap_node_vc_internal()
                 : input_level(property_key::input_level, yas::audio_math::decibel_from_linear(0.0))

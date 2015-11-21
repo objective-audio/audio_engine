@@ -117,7 +117,7 @@ void audio_engine::stop() const
     impl_ptr<impl>()->stop();
 }
 
-subject &audio_engine::subject() const
+subject<audio_engine> &audio_engine::subject() const
 {
     return impl_ptr<impl>()->subject();
 }

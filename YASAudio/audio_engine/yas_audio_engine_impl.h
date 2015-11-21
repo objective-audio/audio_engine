@@ -7,6 +7,9 @@
 
 #include "yas_objc_container.h"
 #include <unordered_set>
+#if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
+#include "yas_audio_device.h"
+#endif
 
 class yas::audio_engine::impl : public yas::base::impl
 {
@@ -19,9 +22,9 @@ class yas::audio_engine::impl : public yas::base::impl
     weak<audio_engine> &weak_engine() const;
     objc::container<> &reset_observer() const;
     objc::container<> &route_change_observer() const;
-    yas::subject &subject() const;
+    yas::subject<audio_engine> &subject() const;
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
-    observer &device_observer();
+    observer<audio_device::property_infos_sptr> &device_observer();
 #endif
 
     bool node_exists(const audio_node &node);

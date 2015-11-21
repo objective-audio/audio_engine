@@ -142,7 +142,7 @@ namespace yas
             yas::audio_unit_mixer_node offline_mixer_node;
             yas::offline_sample::sine_node offline_sine_node;
 
-            yas::observer engine_observer;
+            yas::base engine_observer = nullptr;
 
             yas::objc::container<yas::objc::weak> self_container;
 
@@ -172,9 +172,8 @@ namespace yas
                 offline_engine.connect(offline_mixer_node, offline_output_node, format);
                 offline_engine.connect(offline_sine_node, offline_mixer_node, format);
 
-                engine_observer.clear();
-                engine_observer.add_handler(
-                    play_engine.subject(), yas::audio_engine_method::configuration_change,
+                engine_observer = play_engine.subject().make_observer(
+                    yas::audio_engine_method::configuration_change,
                     [weak_play_output_node = to_weak(play_output_node)](const auto &, const auto &) {
                         if (auto play_output_node = weak_play_output_node.lock()) {
                             play_output_node.set_device(yas::audio_device::default_output_device());

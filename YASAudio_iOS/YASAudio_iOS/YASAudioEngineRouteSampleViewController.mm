@@ -39,7 +39,7 @@ namespace yas
             yas::audio_route_node route_node;
             yas::audio_tap_node sine_node;
 
-            yas::observer engine_observer;
+            yas::base engine_observer = nullptr;
             yas::objc::container<yas::objc::weak> self_container;
 
             ~route_vc_internal()
@@ -276,9 +276,8 @@ namespace yas
         _internal.self_container.set_object(self);
     }
 
-    _internal.engine_observer = yas::observer();
-    _internal.engine_observer.add_handler(
-        _internal.engine.subject(), yas::audio_engine_method::configuration_change,
+    _internal.engine_observer = _internal.engine.subject().make_observer(
+        yas::audio_engine_method::configuration_change,
         [weak_container = _internal.self_container](const auto &method, const auto &sender) {
             if (auto strong_self = weak_container.lock()) {
                 if ([UIApplication sharedApplication].applicationState == UIApplicationStateActive) {

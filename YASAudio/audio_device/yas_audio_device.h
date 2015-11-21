@@ -91,8 +91,8 @@ namespace yas
         UInt32 input_channel_count() const;
         UInt32 output_channel_count() const;
 
-        static subject &system_subject();
-        subject &property_subject() const;
+        static subject<property_infos_sptr> &system_subject();
+        subject<property_infos_sptr> &property_subject() const;
 
        protected:
         explicit audio_device(const AudioDeviceID device_id);
