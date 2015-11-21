@@ -19,7 +19,7 @@ namespace yas
             virtual ~impl() = default;
         };
 
-        explicit base(std::nullptr_t) : _impl(nullptr)
+        base(std::nullptr_t) : _impl(nullptr)
         {
         }
 
