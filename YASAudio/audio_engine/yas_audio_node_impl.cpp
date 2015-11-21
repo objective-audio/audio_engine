@@ -14,7 +14,6 @@ class audio_node::impl::core
 {
    public:
     weak<audio_engine> weak_engine;
-    weak<audio_node> weak_node;
     audio_connection_wmap input_connections;
     audio_connection_wmap output_connections;
 
@@ -187,16 +186,6 @@ void audio_node::impl::update_kernel()
 std::shared_ptr<audio_node::kernel> audio_node::impl::_kernel() const
 {
     return _core->kernel();
-}
-
-void audio_node::impl::set_node(const audio_node &node)
-{
-    _core->weak_node = node;
-}
-
-audio_node audio_node::impl::node() const
-{
-    return _core->weak_node.lock();
 }
 
 audio_engine audio_node::impl::engine() const

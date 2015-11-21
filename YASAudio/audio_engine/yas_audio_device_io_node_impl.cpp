@@ -17,10 +17,9 @@ using namespace yas;
 class audio_device_io_node::impl::core
 {
    public:
-    weak<audio_device_io_node> weak_node;
     audio_device_io device_io;
 
-    core() : weak_node(), _device(nullptr), device_io(nullptr)
+    core() : _device(nullptr), device_io(nullptr)
     {
     }
 
@@ -51,7 +50,6 @@ audio_device_io_node::impl::~impl() = default;
 
 void audio_device_io_node::impl::prepare(const audio_device_io_node &node, const audio_device &device)
 {
-    _core->weak_node = to_weak(node);
     set_device(device ?: audio_device::default_output_device());
 }
 
@@ -77,7 +75,7 @@ void audio_device_io_node::impl::update_connections()
         return;
     }
 
-    auto weak_node = _core->weak_node;
+    auto weak_node = to_weak(cast<audio_device_io_node>());
     auto weak_device_io = to_weak(device_io);
 
     auto render_function = [weak_node, weak_device_io](audio_pcm_buffer &output_buffer, const audio_time &when) {

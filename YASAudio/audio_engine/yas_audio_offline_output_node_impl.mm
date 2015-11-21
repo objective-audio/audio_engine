@@ -90,9 +90,8 @@ offline_start_result_t audio_offline_output_node::impl::start(const offline_rend
         NSBlockOperation *blockOperation = [[NSBlockOperation alloc] init];
         objc::container<objc::weak> operation_container(blockOperation);
 
-        auto operation_lambda =
-            [weak_node = weak_node(), operation_container, render_buffer, render_func, key]() mutable
-        {
+        auto weak_node = to_weak(cast<audio_offline_output_node>());
+        auto operation_lambda = [weak_node, operation_container, render_buffer, render_func, key]() mutable {
             bool cancelled = false;
             UInt32 current_sample_time = 0;
             bool stop = false;
@@ -211,11 +210,6 @@ UInt32 audio_offline_output_node::impl::output_bus_count() const
 UInt32 audio_offline_output_node::impl::input_bus_count() const
 {
     return 1;
-}
-
-weak<audio_offline_output_node> audio_offline_output_node::impl::weak_node() const
-{
-    return node().cast<audio_offline_output_node>();
 }
 
 bool audio_offline_output_node::impl::is_running() const

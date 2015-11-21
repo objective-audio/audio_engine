@@ -182,7 +182,8 @@ void audio_unit_node::impl::update_connections()
     if (auto audio_unit = _core->au()) {
         auto input_bus_count = input_element_count();
         if (input_bus_count > 0) {
-            audio_unit.set_render_callback([weak_node = weak_node()](yas::render_parameters & render_parameters) {
+            auto weak_node = to_weak(cast<audio_unit_node>());
+            audio_unit.set_render_callback([weak_node](yas::render_parameters &render_parameters) {
                 if (auto node = weak_node.lock()) {
                     if (auto kernel = node.impl_ptr<impl>()->kernel_cast()) {
                         if (auto connection = kernel->input_connection(render_parameters.in_bus_number)) {
@@ -246,11 +247,6 @@ void audio_unit_node::impl::prepare_parameters()
 void audio_unit_node::impl::reload_audio_unit()
 {
     _core->set_au(yas::audio_unit(_core->acd));
-}
-
-weak<audio_unit_node> audio_unit_node::impl::weak_node() const
-{
-    return node().cast<audio_unit_node>();
 }
 
 void audio_unit_node::impl::render(audio_pcm_buffer &buffer, const UInt32 bus_idx, const audio_time &when)
