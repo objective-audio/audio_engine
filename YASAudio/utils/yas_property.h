@@ -6,6 +6,7 @@
 #pragma once
 
 #include "yas_observing.h"
+#include "yas_base.h"
 #include <memory>
 #include <mutex>
 
@@ -17,18 +18,19 @@ namespace yas
         static const auto did_change = "yas.property.did_change";
     };
 
-    template <typename T, typename K = std::nullptr_t>
-    class property
+    struct null_key {
+    };
+
+    template <typename T, typename K = null_key>
+    class property : public base
     {
+        using super_class = base;
+
        public:
         property();
         explicit property(const K &key);
         property(const K &key, const T &value);
-
-        property(const property &) = default;
-        property(property &&) = default;
-        property &operator=(const property &) = default;
-        property &operator=(property &&) = default;
+        property(std::nullptr_t);
 
         bool operator==(const property &) const;
         bool operator!=(const property &) const;
@@ -43,7 +45,6 @@ namespace yas
 
        private:
         class impl;
-        std::shared_ptr<impl> _impl;
     };
 }
 
