@@ -13,10 +13,21 @@ namespace yas
     class base
     {
        public:
-        class impl
+        class impl : public std::enable_shared_from_this<base::impl>
         {
            public:
             virtual ~impl() = default;
+
+            template <typename T, typename I = typename T::impl>
+            T cast()
+            {
+                static_assert(std::is_base_of<base, T>(), "base class is not base.");
+                static_assert(std::is_base_of<base::impl, I>(), "impl class is not base::impl.");
+
+                T obj{nullptr};
+                obj.set_impl_ptr(std::dynamic_pointer_cast<I>(shared_from_this()));
+                return obj;
+            }
         };
 
         base(std::nullptr_t) : _impl(nullptr)
@@ -30,20 +41,20 @@ namespace yas
         base &operator=(const base &) = default;
         base &operator=(base &&) = default;
 
-        bool operator==(const base &other) const
+        bool operator==(const base &rhs) const
         {
-            return _impl && other._impl && _impl == other._impl;
+            return _impl && rhs._impl && _impl == rhs._impl;
         }
 
-        bool operator!=(const base &other) const
+        bool operator!=(const base &rhs) const
         {
-            return !_impl || !other._impl || _impl != other._impl;
+            return !_impl || !rhs._impl || _impl != rhs._impl;
         }
 
-        bool operator<(const base &other) const
+        bool operator<(const base &rhs) const
         {
-            if (_impl && other._impl) {
-                return _impl < other._impl;
+            if (_impl && rhs._impl) {
+                return _impl < rhs._impl;
             }
             return false;
         }
@@ -67,6 +78,7 @@ namespace yas
         T cast() const
         {
             static_assert(std::is_base_of<base, T>(), "base class is not base.");
+            static_assert(std::is_base_of<base::impl, I>(), "impl class is not base::impl.");
 
             auto obj = T(nullptr);
             obj.set_impl_ptr(std::dynamic_pointer_cast<I>(_impl));
@@ -127,25 +139,25 @@ namespace yas
             return !_impl.expired();
         }
 
-        bool operator==(const weak &other) const
+        bool operator==(const weak &rhs) const
         {
-            if (_impl.expired() || other._impl.expired()) {
+            if (_impl.expired() || rhs._impl.expired()) {
                 return false;
             } else {
                 auto impl = _impl.lock();
-                auto other_impl = other._impl.lock();
-                return impl == other_impl;
+                auto rhs_impl = rhs._impl.lock();
+                return impl == rhs_impl;
             }
         }
 
-        bool operator!=(const weak &other) const
+        bool operator!=(const weak &rhs) const
         {
-            if (_impl.expired() || other._impl.expired()) {
+            if (_impl.expired() || rhs._impl.expired()) {
                 return true;
             } else {
                 auto impl = _impl.lock();
-                auto other_impl = other._impl.lock();
-                return impl != other_impl;
+                auto rhs_impl = rhs._impl.lock();
+                return impl != rhs_impl;
             }
         }
 

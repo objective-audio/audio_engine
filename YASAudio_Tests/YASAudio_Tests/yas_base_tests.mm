@@ -13,13 +13,13 @@ namespace yas
         {
             using super_class = base;
 
+           public:
             class impl : public base::impl
             {
                public:
                 float value;
             };
 
-           public:
             test_derived() : super_class(std::make_shared<impl>())
             {
             }
@@ -36,6 +36,28 @@ namespace yas
             float value() const
             {
                 return impl_ptr<impl>()->value;
+            }
+
+            template <typename T>
+            T object_from_impl()
+            {
+                return impl_ptr()->cast<T>();
+            }
+        };
+
+        class test_derived2 : public base
+        {
+            using super_class = base;
+
+           public:
+            class impl : public base::impl
+            {
+               public:
+                float value;
+            };
+
+            test_derived2(std::nullptr_t) : super_class(nullptr)
+            {
             }
         };
     }
@@ -86,6 +108,44 @@ namespace yas
                 break;
         }
     }
+}
+
+- (void)test_cast_success
+{
+    yas::test::test_derived derived;
+    yas::base base = derived;
+
+    auto casted = base.cast<yas::test::test_derived>();
+
+    XCTAssertTrue(!!casted);
+}
+
+- (void)test_cast_failed
+{
+    yas::base base{nullptr};
+    base.set_impl_ptr(std::make_shared<yas::base::impl>());
+
+    auto casted = base.cast<yas::test::test_derived>();
+
+    XCTAssertFalse(!!casted);
+}
+
+- (void)test_make_object_from_impl_success
+{
+    yas::test::test_derived derived;
+
+    auto derived_from_impl = derived.object_from_impl<yas::test::test_derived>();
+
+    XCTAssertTrue(!!derived_from_impl);
+}
+
+- (void)test_make_object_from_impl_failed
+{
+    yas::test::test_derived derived;
+
+    auto derived2_from_impl = derived.object_from_impl<yas::test::test_derived2>();
+
+    XCTAssertFalse(!!derived2_from_impl);
 }
 
 @end
