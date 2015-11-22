@@ -148,4 +148,37 @@ namespace yas
     XCTAssertFalse(!!derived2_from_impl);
 }
 
+- (void)test_equal_to_nullptr
+{
+    yas::base base{nullptr};
+
+    XCTAssertTrue(base == nullptr);
+
+    base.set_impl_ptr(std::make_shared<yas::base::impl>());
+
+    XCTAssertFalse(base == nullptr);
+}
+
+- (void)test_not_equal_to_nullptr
+{
+    yas::base base{nullptr};
+
+    XCTAssertFalse(base != nullptr);
+
+    base.set_impl_ptr(std::make_shared<yas::base::impl>());
+
+    XCTAssertTrue(base != nullptr);
+}
+
+- (void)test_derived_equal_to_nullptr
+{
+    yas::test::test_derived derived{nullptr};
+
+    XCTAssertTrue(derived == nullptr);
+
+    derived.set_impl_ptr(std::make_shared<yas::test::test_derived::impl>());
+
+    XCTAssertFalse(derived == nullptr);
+}
+
 @end

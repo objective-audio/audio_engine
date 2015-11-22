@@ -51,6 +51,16 @@ namespace yas
             return !_impl || !rhs._impl || _impl != rhs._impl;
         }
 
+        bool operator==(std::nullptr_t) const
+        {
+            return _impl == nullptr;
+        }
+
+        bool operator!=(std::nullptr_t) const
+        {
+            return _impl != nullptr;
+        }
+
         bool operator<(const base &rhs) const
         {
             if (_impl && rhs._impl) {
