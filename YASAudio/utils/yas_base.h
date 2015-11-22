@@ -16,105 +16,42 @@ namespace yas
         class impl : public std::enable_shared_from_this<base::impl>
         {
            public:
-            virtual ~impl() = default;
+            virtual ~impl();
 
             template <typename T, typename I = typename T::impl>
-            T cast()
-            {
-                static_assert(std::is_base_of<base, T>(), "base class is not base.");
-                static_assert(std::is_base_of<base::impl, I>(), "impl class is not base::impl.");
-
-                T obj{nullptr};
-                obj.set_impl_ptr(std::dynamic_pointer_cast<I>(shared_from_this()));
-                return obj;
-            }
+            T cast();
         };
 
-        base(std::nullptr_t) : _impl(nullptr)
-        {
-        }
+        base(std::nullptr_t);
+        virtual ~base();
 
-        virtual ~base() = default;
+        base(const base &);
+        base(base &&);
+        base &operator=(const base &);
+        base &operator=(base &&);
 
-        base(const base &) = default;
-        base(base &&) = default;
-        base &operator=(const base &) = default;
-        base &operator=(base &&) = default;
+        bool operator==(const base &rhs) const;
+        bool operator!=(const base &rhs) const;
+        bool operator==(std::nullptr_t) const;
+        bool operator!=(std::nullptr_t) const;
+        bool operator<(const base &rhs) const;
 
-        bool operator==(const base &rhs) const
-        {
-            return _impl && rhs._impl && _impl == rhs._impl;
-        }
+        operator bool() const;
+        bool expired() const;
 
-        bool operator!=(const base &rhs) const
-        {
-            return !_impl || !rhs._impl || _impl != rhs._impl;
-        }
-
-        bool operator==(std::nullptr_t) const
-        {
-            return _impl == nullptr;
-        }
-
-        bool operator!=(std::nullptr_t) const
-        {
-            return _impl != nullptr;
-        }
-
-        bool operator<(const base &rhs) const
-        {
-            if (_impl && rhs._impl) {
-                return _impl < rhs._impl;
-            }
-            return false;
-        }
-
-        operator bool() const
-        {
-            return _impl != nullptr;
-        }
-
-        bool expired() const
-        {
-            return !_impl;
-        }
-
-        uintptr_t identifier() const
-        {
-            return reinterpret_cast<uintptr_t>(&*_impl);
-        }
+        uintptr_t identifier() const;
 
         template <typename T, typename I = typename T::impl>
-        T cast() const
-        {
-            static_assert(std::is_base_of<base, T>(), "base class is not base.");
-            static_assert(std::is_base_of<base::impl, I>(), "impl class is not base::impl.");
+        T cast() const;
 
-            auto obj = T(nullptr);
-            obj.set_impl_ptr(std::dynamic_pointer_cast<I>(_impl));
-            return obj;
-        }
-
-        std::shared_ptr<impl> &impl_ptr()
-        {
-            return _impl;
-        }
+        std::shared_ptr<impl> &impl_ptr();
+        void set_impl_ptr(const std::shared_ptr<impl> &impl);
 
         template <typename T = class impl>
-        const std::shared_ptr<T> impl_ptr() const
-        {
-            return std::static_pointer_cast<T>(_impl);
-        }
-
-        void set_impl_ptr(const std::shared_ptr<impl> &impl)
-        {
-            _impl = impl;
-        }
+        const std::shared_ptr<T> impl_ptr() const;
 
        protected:
-        base(const std::shared_ptr<class impl> &impl) : _impl(impl)
-        {
-        }
+        base(const std::shared_ptr<class impl> &impl);
 
        private:
         std::shared_ptr<class impl> _impl;
@@ -124,90 +61,33 @@ namespace yas
     class weak
     {
        public:
-        weak() : _impl()
-        {
-        }
+        weak();
+        weak(const T &);
 
-        weak(const T &obj) : _impl(obj.impl_ptr())
-        {
-        }
+        weak(const weak<T> &);
+        weak(weak<T> &&);
+        weak<T> &operator=(const weak<T> &);
+        weak<T> &operator=(weak<T> &&);
+        weak<T> &operator=(const T &);
 
-        weak<T>(const weak<T> &) = default;
-        weak<T>(weak<T> &&) = default;
-        weak<T> &operator=(const weak<T> &) = default;
-        weak<T> &operator=(weak<T> &&) = default;
+        explicit operator bool() const;
 
-        weak<T> &operator=(const T &obj)
-        {
-            _impl = obj.impl_ptr();
+        bool operator==(const weak &rhs) const;
+        bool operator!=(const weak &rhs) const;
 
-            return *this;
-        }
+        T lock() const;
 
-        explicit operator bool() const
-        {
-            return !_impl.expired();
-        }
-
-        bool operator==(const weak &rhs) const
-        {
-            if (_impl.expired() || rhs._impl.expired()) {
-                return false;
-            } else {
-                auto impl = _impl.lock();
-                auto rhs_impl = rhs._impl.lock();
-                return impl == rhs_impl;
-            }
-        }
-
-        bool operator!=(const weak &rhs) const
-        {
-            if (_impl.expired() || rhs._impl.expired()) {
-                return true;
-            } else {
-                auto impl = _impl.lock();
-                auto rhs_impl = rhs._impl.lock();
-                return impl != rhs_impl;
-            }
-        }
-
-        T lock() const
-        {
-            if (_impl.expired()) {
-                return T{nullptr};
-            } else {
-                T obj{nullptr};
-                obj.set_impl_ptr(_impl.lock());
-                return obj;
-            }
-        }
-
-        void reset()
-        {
-            _impl.reset();
-        }
+        void reset();
 
        private:
         std::weak_ptr<base::impl> _impl;
     };
 
     template <typename K, typename T>
-    std::map<K, T> lock_values(const std::map<K, weak<T>> &map)
-    {
-        std::map<K, T> unwrapped_map;
-
-        for (auto &pair : map) {
-            if (auto shared = pair.second.lock()) {
-                unwrapped_map.insert(std::make_pair(pair.first, shared));
-            }
-        }
-
-        return unwrapped_map;
-    }
+    std::map<K, T> lock_values(const std::map<K, weak<T>> &);
 
     template <typename T>
-    weak<T> to_weak(const T &obj)
-    {
-        return weak<T>(obj);
-    }
+    weak<T> to_weak(const T &);
 }
+
+#include "yas_base_private.h"
