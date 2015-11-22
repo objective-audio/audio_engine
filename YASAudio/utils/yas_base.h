@@ -45,13 +45,14 @@ namespace yas
         T cast() const;
 
         std::shared_ptr<impl> &impl_ptr();
-        void set_impl_ptr(const std::shared_ptr<impl> &impl);
+        void set_impl_ptr(const std::shared_ptr<impl> &);
+        void set_impl_ptr(std::shared_ptr<impl> &&);
 
         template <typename T = class impl>
         const std::shared_ptr<T> impl_ptr() const;
 
        protected:
-        base(const std::shared_ptr<class impl> &impl);
+        base(const std::shared_ptr<class impl> &);
 
        private:
         std::shared_ptr<class impl> _impl;
