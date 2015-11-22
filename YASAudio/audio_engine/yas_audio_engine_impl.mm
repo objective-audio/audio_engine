@@ -52,9 +52,9 @@ class audio_engine::impl::core
     weak<audio_engine> weak_engine;
     objc::container<> reset_observer;
     objc::container<> route_change_observer;
-    yas::subject subject;
+    yas::subject<audio_engine> subject;
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
-    observer device_observer;
+    observer<audio_device::property_infos_sptr> device_observer;
 #endif
 
     audio_graph graph = nullptr;
@@ -127,13 +127,13 @@ objc::container<> &audio_engine::impl::route_change_observer() const
     return _core->route_change_observer;
 }
 
-yas::subject &audio_engine::impl::subject() const
+yas::subject<audio_engine> &audio_engine::impl::subject() const
 {
     return _core->subject;
 }
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
-observer &audio_engine::impl::device_observer()
+observer<audio_device::property_infos_sptr> &audio_engine::impl::device_observer()
 {
     return _core->device_observer;
 }
@@ -544,5 +544,5 @@ void audio_engine::impl::stop()
 
 void audio_engine::impl::post_configuration_change() const
 {
-    subject().notify(audio_engine_method::configuration_change);
+    subject().notify(audio_engine_method::configuration_change, _core->weak_engine.lock());
 }

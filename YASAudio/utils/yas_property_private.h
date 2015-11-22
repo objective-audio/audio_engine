@@ -43,7 +43,7 @@ namespace yas
             return _value;
         }
 
-        yas::subject &subject()
+        yas::subject<property<T, K>> &subject()
         {
             return _subject;
         }
@@ -52,7 +52,7 @@ namespace yas
         std::mutex _notify_mutex;
         K _key;
         T _value;
-        yas::subject _subject;
+        yas::subject<property<T, K>> _subject;
         weak<property<T, K>> _weak_property;
     };
 
@@ -124,7 +124,7 @@ namespace yas
     }
 
     template <typename T, typename K>
-    subject &property<T, K>::subject()
+    subject<property<T, K>> &property<T, K>::subject()
     {
         return impl_ptr<impl>()->subject();
     }

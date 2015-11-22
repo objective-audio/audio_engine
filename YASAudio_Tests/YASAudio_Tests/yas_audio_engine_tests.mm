@@ -93,7 +93,7 @@
 
     XCTestExpectation *expectation = [self expectationWithDescription:@"configuration change"];
 
-    yas::observer observer;
+    yas::observer<yas::audio_engine> observer;
     observer.add_wild_card_handler(engine.subject(),
                                    [expectation](const auto &method, const auto &info) { [expectation fulfill]; });
 

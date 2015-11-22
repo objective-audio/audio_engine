@@ -111,8 +111,8 @@ namespace yas
             yas::audio_route_node route_node = nullptr;
             yas::audio_tap_node tap_node = nullptr;
 
-            yas::observer system_observer;
-            yas::observer device_observer;
+            yas::base system_observer = nullptr;
+            yas::base device_observer = nullptr;
 
             yas::objc::container<yas::objc::weak> self_container;
 
@@ -221,9 +221,8 @@ namespace yas
 
     _internal.tap_node.set_render_function(render_function);
 
-    _internal.system_observer = yas::observer();
-    _internal.system_observer.add_handler(
-        yas::audio_device::system_subject(), yas::audio_device_method::hardware_did_change,
+    _internal.system_observer = yas::audio_device::system_subject().make_observer(
+        yas::audio_device_method::hardware_did_change,
         [weak_container = _internal.self_container](const auto &method, const auto &infos) {
             if (auto strong_container = weak_container.lock()) {
                 YASAudioEngineDeviceIOSampleViewController *strongSelf = strong_container.object();
@@ -248,8 +247,8 @@ namespace yas
     _internal.tap_node = nullptr;
     _internal.engine = nullptr;
 
-    _internal.system_observer.clear();
-    _internal.device_observer.clear();
+    _internal.system_observer = nullptr;
+    _internal.device_observer = nullptr;
 
     self.selectedDeviceIndex = yas::audio_device::all_devices().size();
 
@@ -408,7 +407,7 @@ namespace yas
 
 - (void)setDevice:(const yas::audio_device &)selected_device
 {
-    _internal.device_observer.clear();
+    _internal.device_observer = nullptr;
 
     if (!_internal.device_io_node) {
         return;
@@ -419,10 +418,9 @@ namespace yas
     if (selected_device && std::find(all_devices.begin(), all_devices.end(), selected_device) != all_devices.end()) {
         _internal.device_io_node.set_device(selected_device);
 
-        _internal.device_observer.add_handler(
-            selected_device.property_subject(), yas::audio_device_method::device_did_change,
-            [selected_device, weak_container = _internal.self_container](const std::string &method,
-                                                                         const yas::any &sender) {
+        _internal.device_observer = selected_device.property_subject().make_observer(
+            yas::audio_device_method::device_did_change, [selected_device, weak_container = _internal.self_container](
+                                                             const std::string &method, const yas::any &sender) {
                 const auto &infos = sender.get<yas::audio_device::property_infos_sptr>();
                 if (infos->size() > 0) {
                     const auto &device_id = infos->at(0).object_id;

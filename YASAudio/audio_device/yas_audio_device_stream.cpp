@@ -53,7 +53,7 @@ class audio_device_stream::impl : public base::impl
    public:
     AudioStreamID stream_id;
     AudioDeviceID device_id;
-    yas::subject subject;
+    yas::subject<property_infos_sptr> subject;
 
     impl(const AudioStreamID stream_id, const AudioDeviceID device_id)
         : stream_id(stream_id), device_id(device_id), subject()
@@ -180,7 +180,7 @@ UInt32 audio_device_stream::starting_channel() const
     return 0;
 }
 
-yas::subject &audio_device_stream::subject() const
+yas::subject<yas::audio_device_stream::property_infos_sptr> &audio_device_stream::subject() const
 {
     return impl_ptr<impl>()->subject;
 }

@@ -73,7 +73,7 @@ namespace yas
         audio_format virtual_format() const;
         UInt32 starting_channel() const;
 
-        subject &subject() const;
+        subject<property_infos_sptr> &subject() const;
 
        private:
         template <typename T>

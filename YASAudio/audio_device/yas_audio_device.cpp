@@ -204,7 +204,7 @@ class audio_device::impl
     const AudioDeviceID audio_device_id;
     std::unordered_map<AudioStreamID, audio_device_stream> input_streams_map;
     std::unordered_map<AudioStreamID, audio_device_stream> output_streams_map;
-    subject property_subject;
+    subject<property_infos_sptr> property_subject;
 
     impl(AudioDeviceID device_id)
         : _input_format(nullptr),
@@ -454,9 +454,9 @@ bool audio_device::is_available_device(const audio_device &device)
     return iterator != audio_device_global::all_devices_map().end();
 }
 
-subject &audio_device::system_subject()
+subject<audio_device::property_infos_sptr> &audio_device::system_subject()
 {
-    static subject system_subject;
+    static subject<audio_device::property_infos_sptr> system_subject;
     return system_subject;
 }
 
@@ -571,7 +571,7 @@ UInt32 audio_device::output_channel_count() const
     return 0;
 }
 
-subject &audio_device::property_subject() const
+subject<audio_device::property_infos_sptr> &audio_device::property_subject() const
 {
     return _impl->property_subject;
 }

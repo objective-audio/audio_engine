@@ -41,7 +41,7 @@ namespace yas
         void set_value(const T &value);
         const T &value() const;
 
-        subject &subject();
+        subject<property> &subject();
 
        private:
         class impl;
