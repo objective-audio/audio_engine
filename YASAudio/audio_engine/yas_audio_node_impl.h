@@ -47,15 +47,6 @@ class yas::audio_node::impl : public base::impl
         return std::static_pointer_cast<T>(_kernel());
     }
 
-    void set_node(const audio_node &);
-    audio_node node() const;
-
-    template <typename T>
-    T node_cast() const
-    {
-        return node().cast<T>();
-    }
-
     audio_engine engine() const;
     void set_engine(const audio_engine &);
 

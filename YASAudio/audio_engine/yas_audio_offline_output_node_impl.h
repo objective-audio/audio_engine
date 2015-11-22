@@ -21,8 +21,6 @@ class yas::audio_offline_output_node::impl : public super_class::impl
     virtual UInt32 output_bus_count() const override;
     virtual UInt32 input_bus_count() const override;
 
-    weak<audio_offline_output_node> weak_node() const;
-
     bool is_running() const;
 
    private:

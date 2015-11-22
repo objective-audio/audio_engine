@@ -221,7 +221,8 @@ void audio_unit_input_node::impl::update_connections()
         audio_pcm_buffer input_buffer(out_connection.format(), 4096);
         _core->input_buffer = input_buffer;
 
-        unit.set_input_callback([weak_node = weak_node(), input_buffer](render_parameters & render_parameters) mutable {
+        auto weak_node = to_weak(cast<audio_unit_input_node>());
+        unit.set_input_callback([weak_node, input_buffer](render_parameters &render_parameters) mutable {
             auto input_node = weak_node.lock();
             if (input_node && render_parameters.in_number_frames <= input_buffer.frame_capacity()) {
                 input_buffer.set_frame_length(render_parameters.in_number_frames);
@@ -260,9 +261,4 @@ void audio_unit_input_node::impl::prepare_audio_unit()
     unit.set_enable_output(false);
     unit.set_enable_input(true);
     unit.set_maximum_frames_per_slice(4096);
-}
-
-weak<audio_unit_input_node> audio_unit_input_node::impl::weak_node() const
-{
-    return node().cast<audio_unit_input_node>();
 }

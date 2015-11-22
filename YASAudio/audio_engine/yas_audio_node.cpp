@@ -16,9 +16,6 @@ audio_node::audio_node(std::nullptr_t) : super_class(nullptr)
 
 audio_node::audio_node(const std::shared_ptr<audio_node::impl> &impl) : super_class(impl)
 {
-    if (impl) {
-        impl->set_node(*this);
-    }
 }
 
 audio_node::~audio_node() = default;

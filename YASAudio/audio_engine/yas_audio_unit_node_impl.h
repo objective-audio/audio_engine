@@ -49,8 +49,6 @@ class yas::audio_unit_node::impl : public audio_node::impl
     void reload_audio_unit();
     void set_graph(const audio_graph &);
 
-    weak<audio_unit_node> weak_node() const;
-
     virtual void render(audio_pcm_buffer &buffer, const UInt32 bus_idx, const audio_time &when) override;
 
    private:
