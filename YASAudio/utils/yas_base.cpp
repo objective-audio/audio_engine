@@ -80,3 +80,8 @@ void base::set_impl_ptr(const std::shared_ptr<impl> &impl)
 {
     _impl = impl;
 }
+
+void base::set_impl_ptr(std::shared_ptr<impl> &&impl)
+{
+    _impl = std::move(impl);
+}
