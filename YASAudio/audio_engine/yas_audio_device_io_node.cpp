@@ -31,7 +31,7 @@ audio_device_io_node::audio_device_io_node(const std::shared_ptr<audio_device_io
 
 audio_device_io_node::~audio_device_io_node() = default;
 
-void audio_device_io_node::set_device(const audio_device &device) const
+void audio_device_io_node::set_device(const audio_device &device)
 {
     impl_ptr<impl>()->set_device(device);
 }
@@ -43,12 +43,12 @@ audio_device audio_device_io_node::device() const
 
 #pragma mark - private
 
-void audio_device_io_node::_add_device_io() const
+void audio_device_io_node::_add_device_io()
 {
     impl_ptr<impl>()->add_device_io();
 }
 
-void audio_device_io_node::_remove_device_io() const
+void audio_device_io_node::_remove_device_io()
 {
     impl_ptr<impl>()->remove_device_io();
 }

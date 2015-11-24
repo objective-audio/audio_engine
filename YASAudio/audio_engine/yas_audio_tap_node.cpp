@@ -21,7 +21,7 @@ audio_tap_node::audio_tap_node(const std::shared_ptr<impl> &impl) : super_class(
 
 audio_tap_node::~audio_tap_node() = default;
 
-void audio_tap_node::set_render_function(const render_f &func) const
+void audio_tap_node::set_render_function(const render_f &func)
 {
     impl_ptr<impl>()->set_render_function(func);
 }
@@ -46,7 +46,7 @@ audio_connection_smap audio_tap_node::output_connections_on_render() const
     return impl_ptr<impl>()->output_connections_on_render();
 }
 
-void audio_tap_node::render_source(audio_pcm_buffer &buffer, const UInt32 bus_idx, const audio_time &when) const
+void audio_tap_node::render_source(audio_pcm_buffer &buffer, const UInt32 bus_idx, const audio_time &when)
 {
     impl_ptr<impl>()->render_source(buffer, bus_idx, when);
 }

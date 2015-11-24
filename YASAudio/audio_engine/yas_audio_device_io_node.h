@@ -30,13 +30,13 @@ namespace yas
 
         virtual ~audio_device_io_node();
 
-        void set_device(const audio_device &device) const;
+        void set_device(const audio_device &device);
         audio_device device() const;
 
        private:
         // from engine
-        void _add_device_io() const override;
-        void _remove_device_io() const override;
+        void _add_device_io() override;
+        void _remove_device_io() override;
         audio_device_io &_device_io() const override;
 
        protected:

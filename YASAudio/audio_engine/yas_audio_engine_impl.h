@@ -29,9 +29,9 @@ class yas::audio_engine::impl : public yas::base::impl
 
     bool node_exists(const audio_node &node);
 
-    void attach_node(const audio_node &node);
-    void detach_node(const audio_node &node);
-    void detach_node_if_unused(const audio_node &node);
+    void attach_node(audio_node &node);
+    void detach_node(audio_node &node);
+    void detach_node_if_unused(audio_node &node);
 
     bool prepare();
 

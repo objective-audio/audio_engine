@@ -68,59 +68,59 @@ AudioUnit audio_unit::audio_unit_instance() const
 
 #pragma mark - render callback
 
-void audio_unit::attach_render_callback(const UInt32 &bus_idx) const
+void audio_unit::attach_render_callback(const UInt32 &bus_idx)
 {
     impl_ptr<impl>()->attach_render_callback(bus_idx);
 }
 
-void audio_unit::detach_render_callback(const UInt32 &bus_idx) const
+void audio_unit::detach_render_callback(const UInt32 &bus_idx)
 {
     impl_ptr<impl>()->detach_render_callback(bus_idx);
 }
 
-void audio_unit::attach_render_notify() const
+void audio_unit::attach_render_notify()
 {
     impl_ptr<impl>()->attach_render_notify();
 }
 
-void audio_unit::detach_render_notify() const
+void audio_unit::detach_render_notify()
 {
     impl_ptr<impl>()->detach_render_notify();
 }
 
-void audio_unit::attach_input_callback() const
+void audio_unit::attach_input_callback()
 {
     impl_ptr<impl>()->attach_input_callback();
 }
 
-void audio_unit::detach_input_callback() const
+void audio_unit::detach_input_callback()
 {
     impl_ptr<impl>()->detach_input_callback();
 }
 
-void audio_unit::set_render_callback(const render_f &callback) const
+void audio_unit::set_render_callback(const render_f &callback)
 {
     impl_ptr<impl>()->set_render_callback(callback);
 }
 
-void audio_unit::set_notify_callback(const render_f &callback) const
+void audio_unit::set_notify_callback(const render_f &callback)
 {
     impl_ptr<impl>()->set_notify_callback(callback);
 }
 
-void audio_unit::set_input_callback(const render_f &callback) const
+void audio_unit::set_input_callback(const render_f &callback)
 {
     impl_ptr<impl>()->set_input_callback(callback);
 }
 
 #pragma mark - property
 
-void audio_unit::set_input_format(const AudioStreamBasicDescription &asbd, const UInt32 bus_idx) const
+void audio_unit::set_input_format(const AudioStreamBasicDescription &asbd, const UInt32 bus_idx)
 {
     impl_ptr<impl>()->set_input_format(asbd, bus_idx);
 }
 
-void audio_unit::set_output_format(const AudioStreamBasicDescription &asbd, const UInt32 bus_idx) const
+void audio_unit::set_output_format(const AudioStreamBasicDescription &asbd, const UInt32 bus_idx)
 {
     impl_ptr<impl>()->set_output_format(asbd, bus_idx);
 }
@@ -135,7 +135,7 @@ AudioStreamBasicDescription audio_unit::output_format(const UInt32 bus_idx) cons
     return impl_ptr<impl>()->output_format(bus_idx);
 }
 
-void audio_unit::set_maximum_frames_per_slice(const UInt32 frames) const
+void audio_unit::set_maximum_frames_per_slice(const UInt32 frames)
 {
     impl_ptr<impl>()->set_maximum_frames_per_slice(frames);
 }
@@ -150,7 +150,7 @@ bool audio_unit::is_initialized() const
     return impl_ptr<impl>()->is_initialized();
 }
 
-void audio_unit::set_element_count(const UInt32 &count, const AudioUnitScope &scope) const
+void audio_unit::set_element_count(const UInt32 &count, const AudioUnitScope &scope)
 {
     impl_ptr<impl>()->set_element_count(count, scope);
 }
@@ -163,7 +163,7 @@ UInt32 audio_unit::element_count(const AudioUnitScope &scope) const
 #pragma mark - parameter
 
 void audio_unit::set_parameter_value(const AudioUnitParameterValue value, const AudioUnitParameterID parameter_id,
-                                     const AudioUnitScope scope, const AudioUnitElement element) const
+                                     const AudioUnitScope scope, const AudioUnitElement element)
 {
     impl_ptr<impl>()->set_parameter_value(value, parameter_id, scope, element);
 }
@@ -217,7 +217,7 @@ audio_unit_parameter audio_unit::create_parameter(const AudioUnitParameterID &pa
 
 #pragma mark - io
 
-void audio_unit::set_enable_output(const bool enable_output) const
+void audio_unit::set_enable_output(const bool enable_output)
 {
     impl_ptr<impl>()->set_enable_output(enable_output);
 }
@@ -227,7 +227,7 @@ bool audio_unit::is_enable_output() const
     return impl_ptr<impl>()->is_enable_input();
 }
 
-void audio_unit::set_enable_input(const bool enable_input) const
+void audio_unit::set_enable_input(const bool enable_input)
 {
     impl_ptr<impl>()->set_enable_input(enable_input);
 }
@@ -252,8 +252,7 @@ bool audio_unit::is_running() const
     return impl_ptr<impl>()->is_running();
 }
 
-void audio_unit::set_channel_map(const channel_map_t &map, const AudioUnitScope scope,
-                                 const AudioUnitElement element) const
+void audio_unit::set_channel_map(const channel_map_t &map, const AudioUnitScope scope, const AudioUnitElement element)
 {
     impl_ptr<impl>()->set_channel_map(map, scope, element);
 }
@@ -269,7 +268,7 @@ UInt32 audio_unit::channel_map_count(const AudioUnitScope scope, const AudioUnit
 }
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
-void audio_unit::set_current_device(const AudioDeviceID &device) const
+void audio_unit::set_current_device(const AudioDeviceID &device)
 {
     impl_ptr<impl>()->set_current_device(device);
 }
@@ -280,17 +279,17 @@ const AudioDeviceID audio_unit::current_device() const
 }
 #endif
 
-void audio_unit::start() const
+void audio_unit::start()
 {
     impl_ptr<impl>()->start();
 }
 
-void audio_unit::stop() const
+void audio_unit::stop()
 {
     impl_ptr<impl>()->stop();
 }
 
-void audio_unit::reset() const
+void audio_unit::reset()
 {
     impl_ptr<impl>()->reset();
 }
@@ -309,17 +308,17 @@ audio_unit::au_result_t audio_unit::audio_unit_render(yas::render_parameters &re
 
 #pragma mark - private function
 
-void audio_unit::_initialize() const
+void audio_unit::_initialize()
 {
     impl_ptr<impl>()->initialize();
 }
 
-void audio_unit::_uninitialize() const
+void audio_unit::_uninitialize()
 {
     impl_ptr<impl>()->uninitialize();
 }
 
-void audio_unit::_set_graph_key(const std::experimental::optional<UInt8> &key) const
+void audio_unit::_set_graph_key(const std::experimental::optional<UInt8> &key)
 {
     impl_ptr<impl>()->graph_key = key;
 }
@@ -329,7 +328,7 @@ const std::experimental::optional<UInt8> &audio_unit::_graph_key() const
     return impl_ptr<impl>()->graph_key;
 }
 
-void audio_unit::_set_key(const std::experimental::optional<UInt16> &key) const
+void audio_unit::_set_key(const std::experimental::optional<UInt16> &key)
 {
     impl_ptr<impl>()->key = key;
 }

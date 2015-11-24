@@ -77,7 +77,7 @@ UInt32 audio_unit_node::output_element_count() const
     return impl_ptr<impl>()->output_element_count();
 }
 
-void audio_unit_node::set_global_parameter_value(const AudioUnitParameterID parameter_id, const Float32 value) const
+void audio_unit_node::set_global_parameter_value(const AudioUnitParameterID parameter_id, const Float32 value)
 {
     impl_ptr<impl>()->set_global_parameter_value(parameter_id, value);
 }
@@ -88,7 +88,7 @@ Float32 audio_unit_node::global_parameter_value(const AudioUnitParameterID param
 }
 
 void audio_unit_node::set_input_parameter_value(const AudioUnitParameterID parameter_id, const Float32 value,
-                                                const AudioUnitElement element) const
+                                                const AudioUnitElement element)
 {
     impl_ptr<impl>()->set_input_parameter_value(parameter_id, value, element);
 }
@@ -100,7 +100,7 @@ Float32 audio_unit_node::input_parameter_value(const AudioUnitParameterID parame
 }
 
 void audio_unit_node::set_output_parameter_value(const AudioUnitParameterID parameter_id, const Float32 value,
-                                                 const AudioUnitElement element) const
+                                                 const AudioUnitElement element)
 {
     impl_ptr<impl>()->set_output_parameter_value(parameter_id, value, element);
 }
@@ -111,17 +111,17 @@ Float32 audio_unit_node::output_parameter_value(const AudioUnitParameterID param
     return impl_ptr<impl>()->output_parameter_value(parameter_id, element);
 }
 
-void audio_unit_node::_prepare_audio_unit() const
+void audio_unit_node::_prepare_audio_unit()
 {
     impl_ptr<impl>()->prepare_audio_unit();
 }
 
-void audio_unit_node::_prepare_parameters() const
+void audio_unit_node::_prepare_parameters()
 {
     impl_ptr<impl>()->prepare_parameters();
 }
 
-void audio_unit_node::_reload_audio_unit() const
+void audio_unit_node::_reload_audio_unit()
 {
     impl_ptr<impl>()->reload_audio_unit();
 }

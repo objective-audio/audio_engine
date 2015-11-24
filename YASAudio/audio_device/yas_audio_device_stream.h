@@ -63,8 +63,8 @@ namespace yas
         audio_device_stream &operator=(const audio_device_stream &) = default;
         audio_device_stream &operator=(audio_device_stream &&) = default;
 
-        bool operator==(const audio_device_stream &);
-        bool operator!=(const audio_device_stream &);
+        bool operator==(const audio_device_stream &) const;
+        bool operator!=(const audio_device_stream &) const;
 
         AudioStreamID stream_id() const;
         audio_device device() const;

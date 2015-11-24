@@ -36,11 +36,11 @@ namespace yas
         audio_device_io &operator=(const audio_device_io &) = default;
         audio_device_io &operator=(audio_device_io &&) = default;
 
-        void set_device(const audio_device device) const;
+        void set_device(const audio_device device);
         audio_device device() const;
         bool is_running() const;
-        void set_render_callback(const render_f &callback) const;
-        void set_maximum_frames_per_slice(const UInt32 frames) const;
+        void set_render_callback(const render_f &callback);
+        void set_maximum_frames_per_slice(const UInt32 frames);
         UInt32 maximum_frames_per_slice() const;
 
         void start() const;

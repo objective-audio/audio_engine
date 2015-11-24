@@ -116,7 +116,7 @@ audio_device_stream::audio_device_stream(const AudioStreamID stream_id, const Au
 
 audio_device_stream::~audio_device_stream() = default;
 
-bool audio_device_stream::operator==(const audio_device_stream &other)
+bool audio_device_stream::operator==(const audio_device_stream &other) const
 {
     if (impl_ptr() && other.impl_ptr()) {
         return stream_id() == other.stream_id();
@@ -124,7 +124,7 @@ bool audio_device_stream::operator==(const audio_device_stream &other)
     return false;
 }
 
-bool audio_device_stream::operator!=(const audio_device_stream &other)
+bool audio_device_stream::operator!=(const audio_device_stream &other) const
 {
     if (impl_ptr() && other.impl_ptr()) {
         return stream_id() != other.stream_id();

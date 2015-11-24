@@ -310,7 +310,7 @@ void audio_device_io::_uninitialize() const
     impl_ptr<impl>()->uninitialize();
 }
 
-void audio_device_io::set_device(const audio_device device) const
+void audio_device_io::set_device(const audio_device device)
 {
     impl_ptr<impl>()->set_device(device);
 }
@@ -325,12 +325,12 @@ bool audio_device_io::is_running() const
     return impl_ptr<impl>()->is_running;
 }
 
-void audio_device_io::set_render_callback(const render_f &callback) const
+void audio_device_io::set_render_callback(const render_f &callback)
 {
     impl_ptr<impl>()->set_render_callback(callback);
 }
 
-void audio_device_io::set_maximum_frames_per_slice(const UInt32 frames) const
+void audio_device_io::set_maximum_frames_per_slice(const UInt32 frames)
 {
     impl_ptr<impl>()->set_maximum_frames(frames);
 }

@@ -14,8 +14,8 @@ namespace yas
        public:
         virtual ~audio_device_io_node_from_engine() = default;
 
-        virtual void _add_device_io() const = 0;
-        virtual void _remove_device_io() const = 0;
+        virtual void _add_device_io() = 0;
+        virtual void _remove_device_io() = 0;
         virtual audio_device_io &_device_io() const = 0;
     };
 }
