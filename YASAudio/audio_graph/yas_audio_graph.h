@@ -33,17 +33,17 @@ namespace yas
         audio_graph &operator=(const audio_graph &) = default;
         audio_graph &operator=(audio_graph &&) = default;
 
-        void add_audio_unit(const audio_unit &audio_unit) const;
-        void remove_audio_unit(const audio_unit &audio_unit) const;
-        void remove_all_units() const;
+        void add_audio_unit(audio_unit &audio_unit);
+        void remove_audio_unit(audio_unit &audio_unit);
+        void remove_all_units();
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
         void add_audio_device_io(audio_device_io &audio_device_io);
         void remove_audio_device_io(audio_device_io &audio_device_io);
 #endif
 
-        void start() const;
-        void stop() const;
+        void start();
+        void stop();
         bool is_running() const;
 
         // render thread

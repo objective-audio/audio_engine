@@ -126,22 +126,22 @@ audio_node audio_connection::destination_node() const
     return audio_node(nullptr);
 }
 
-audio_format &audio_connection::format() const
+const audio_format &audio_connection::format() const
 {
     return impl_ptr<impl>()->format;
 }
 
-void audio_connection::_remove_nodes() const
+void audio_connection::_remove_nodes()
 {
     impl_ptr<impl>()->remove_nodes();
 }
 
-void audio_connection::_remove_source_node() const
+void audio_connection::_remove_source_node()
 {
     impl_ptr<impl>()->remove_source_node();
 }
 
-void audio_connection::_remove_destination_node() const
+void audio_connection::_remove_destination_node()
 {
     impl_ptr<impl>()->remove_destination_node();
 }

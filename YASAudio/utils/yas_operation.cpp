@@ -34,17 +34,17 @@ operation::operation(std::nullptr_t) : super_class(nullptr)
 {
 }
 
-void operation::cancel() const
+void operation::cancel()
 {
     _cancel();
 }
 
-bool operation::is_canceled() const
+bool operation::is_canceled()
 {
     return impl_ptr<impl>()->canceled;
 }
 
-void operation::_execute() const
+void operation::_execute()
 {
     if (auto &exe = impl_ptr<impl>()->execution) {
         if (!is_canceled()) {
@@ -53,7 +53,7 @@ void operation::_execute() const
     }
 }
 
-void operation::_cancel() const
+void operation::_cancel()
 {
     impl_ptr<impl>()->canceled = true;
 }
@@ -207,32 +207,32 @@ operation_queue::operation_queue(std::nullptr_t) : super_class(nullptr)
 {
 }
 
-void operation_queue::add_operation(const operation &op, const priority_t pr) const
+void operation_queue::add_operation(const operation &op, const priority_t pr)
 {
     impl_ptr<impl>()->add_operation(op, pr);
 }
 
-void operation_queue::insert_operation_to_top(const operation &op, const priority_t pr) const
+void operation_queue::insert_operation_to_top(const operation &op, const priority_t pr)
 {
     impl_ptr<impl>()->insert_operation_to_top(op, pr);
 }
 
-void operation_queue::cancel_operation(const operation &op) const
+void operation_queue::cancel_operation(const operation &op)
 {
     impl_ptr<impl>()->cancel_operation(op);
 }
 
-void operation_queue::cancel_all_operations() const
+void operation_queue::cancel_all_operations()
 {
     impl_ptr<impl>()->cancel_all_operations();
 }
 
-void operation_queue::suspend() const
+void operation_queue::suspend()
 {
     impl_ptr<impl>()->suspend();
 }
 
-void operation_queue::resume() const
+void operation_queue::resume()
 {
     impl_ptr<impl>()->resume();
 }

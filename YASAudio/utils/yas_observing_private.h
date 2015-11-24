@@ -158,7 +158,7 @@ namespace yas
     }
 
     template <typename T>
-    void observer<T>::add_handler(subject<T> &subject, const std::string &key, const handler_f &handler) const
+    void observer<T>::add_handler(subject<T> &subject, const std::string &key, const handler_f &handler)
     {
         auto imp = impl_ptr<impl>();
         auto subject_ptr = &subject;
@@ -171,7 +171,7 @@ namespace yas
     }
 
     template <typename T>
-    void observer<T>::remove_handler(subject<T> &subject, const std::string &key) const
+    void observer<T>::remove_handler(subject<T> &subject, const std::string &key)
     {
         auto imp = impl_ptr<impl>();
         if (imp->handlers.count(&subject) > 0) {
@@ -185,7 +185,7 @@ namespace yas
     }
 
     template <typename T>
-    void observer<T>::add_wild_card_handler(subject<T> &subject, const handler_f &handler) const
+    void observer<T>::add_wild_card_handler(subject<T> &subject, const handler_f &handler)
     {
         auto imp = impl_ptr<impl>();
         auto subject_ptr = &subject;
@@ -197,7 +197,7 @@ namespace yas
     }
 
     template <typename T>
-    void observer<T>::remove_wild_card_handler(subject<T> &subject) const
+    void observer<T>::remove_wild_card_handler(subject<T> &subject)
     {
         auto imp = impl_ptr<impl>();
         if (imp->handlers.count(&subject) > 0) {
@@ -211,7 +211,7 @@ namespace yas
     }
 
     template <typename T>
-    void observer<T>::clear() const
+    void observer<T>::clear()
     {
         auto id = identifier();
         auto imp = impl_ptr<impl>();

@@ -80,12 +80,12 @@ UInt32 audio_node::output_bus_count() const
 
 #pragma mark render thread
 
-void audio_node::render(audio_pcm_buffer &buffer, const UInt32 bus_idx, const audio_time &when) const
+void audio_node::render(audio_pcm_buffer &buffer, const UInt32 bus_idx, const audio_time &when)
 {
     impl_ptr<impl>()->render(buffer, bus_idx, when);
 }
 
-void audio_node::set_render_time_on_render(const audio_time &time) const
+void audio_node::set_render_time_on_render(const audio_time &time)
 {
     impl_ptr<impl>()->set_render_time_on_render(time);
 }
@@ -112,17 +112,17 @@ const audio_connection_wmap &audio_node::_output_connections() const
     return impl_ptr<impl>()->output_connections();
 }
 
-void audio_node::_add_connection(const audio_connection &connection) const
+void audio_node::_add_connection(const audio_connection &connection)
 {
     impl_ptr<impl>()->add_connection(connection);
 }
 
-void audio_node::_remove_connection(const audio_connection &connection) const
+void audio_node::_remove_connection(const audio_connection &connection)
 {
     impl_ptr<impl>()->remove_connection(connection);
 }
 
-void audio_node::_set_engine(const audio_engine &engine) const
+void audio_node::_set_engine(const audio_engine &engine)
 {
     impl_ptr<impl>()->set_engine(engine);
 }
@@ -132,12 +132,12 @@ audio_engine audio_node::_engine() const
     return impl_ptr<impl>()->engine();
 }
 
-void audio_node::_update_kernel() const
+void audio_node::_update_kernel()
 {
     impl_ptr<impl>()->update_kernel();
 }
 
-void audio_node::_update_connections() const
+void audio_node::_update_connections()
 {
     impl_ptr<impl>()->update_connections();
 }

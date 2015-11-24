@@ -44,7 +44,7 @@ audio_unit_io_node::audio_unit_io_node(const std::shared_ptr<impl> &impl, const 
 
 audio_unit_io_node::~audio_unit_io_node() = default;
 
-void audio_unit_io_node::set_channel_map(const channel_map_t &map, const yas::direction dir) const
+void audio_unit_io_node::set_channel_map(const channel_map_t &map, const yas::direction dir)
 {
     impl_ptr<impl>()->set_channel_map(map, dir);
 }
@@ -71,7 +71,7 @@ UInt32 audio_unit_io_node::input_device_channel_count() const
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
 
-void audio_unit_io_node::set_device(const audio_device &device) const
+void audio_unit_io_node::set_device(const audio_device &device)
 {
     impl_ptr<impl>()->set_device(device);
 }
@@ -93,7 +93,7 @@ audio_unit_output_node::audio_unit_output_node() : super_class(std::make_unique<
 {
 }
 
-void audio_unit_output_node::set_channel_map(const channel_map_t &map) const
+void audio_unit_output_node::set_channel_map(const channel_map_t &map)
 {
     super_class::set_channel_map(map, yas::direction::output);
 }
@@ -113,7 +113,7 @@ audio_unit_input_node::audio_unit_input_node() : super_class(std::make_unique<im
 {
 }
 
-void audio_unit_input_node::set_channel_map(const channel_map_t &map) const
+void audio_unit_input_node::set_channel_map(const channel_map_t &map)
 {
     super_class::set_channel_map(map, yas::direction::input);
 }
