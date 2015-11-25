@@ -243,15 +243,15 @@ namespace yas
     }
 
     template <typename T>
-    bool subject<T>::operator==(const subject &other) const
+    bool subject<T>::operator==(const subject &rhs) const
     {
-        return this == &other;
+        return this == &rhs;
     }
 
     template <typename T>
-    bool subject<T>::operator!=(const subject &other) const
+    bool subject<T>::operator!=(const subject &rhs) const
     {
-        return this != &other;
+        return this != &rhs;
     }
 
     template <typename T>
