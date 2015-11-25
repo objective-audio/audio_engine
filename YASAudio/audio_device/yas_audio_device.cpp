@@ -481,18 +481,18 @@ audio_device::audio_device(const AudioDeviceID device_id) : _impl(std::make_shar
     add_listener(device_id, kAudioDevicePropertyStreamConfiguration, kAudioObjectPropertyScopeOutput, listener);
 }
 
-bool audio_device::operator==(const audio_device &other_device) const
+bool audio_device::operator==(const audio_device &rhs) const
 {
-    if (_impl && other_device._impl) {
-        return audio_device_id() == other_device.audio_device_id();
+    if (_impl && rhs._impl) {
+        return audio_device_id() == rhs.audio_device_id();
     }
     return false;
 }
 
-bool audio_device::operator!=(const audio_device &other_device) const
+bool audio_device::operator!=(const audio_device &rhs) const
 {
-    if (_impl && other_device._impl) {
-        return audio_device_id() != other_device.audio_device_id();
+    if (_impl && rhs._impl) {
+        return audio_device_id() != rhs.audio_device_id();
     }
     return true;
 }
