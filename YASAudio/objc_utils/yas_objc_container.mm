@@ -84,9 +84,9 @@ template container<strong_holder>::container(container<strong_holder> &&);
 template container<weak_holder>::container(container<weak_holder> &&);
 
 template <typename T>
-container<T> &container<T>::operator=(const container<T> &other)
+container<T> &container<T>::operator=(const container<T> &rhs)
 {
-    id obj = other.retained_object();
+    id obj = rhs.retained_object();
     set_object(obj);
     YASRelease(obj);
 
@@ -97,12 +97,12 @@ template container<strong_holder> &container<strong_holder>::operator=(const con
 template container<weak_holder> &container<weak_holder>::operator=(const container<weak_holder> &);
 
 template <typename T>
-container<T> &container<T>::operator=(container<T> &&other)
+container<T> &container<T>::operator=(container<T> &&rhs)
 {
-    id obj = other.retained_object();
+    id obj = rhs.retained_object();
     set_object(obj);
     YASRelease(obj);
-    other.set_object(nil);
+    rhs.set_object(nil);
 
     return *this;
 }
@@ -111,15 +111,15 @@ template container<strong_holder> &container<strong_holder>::operator=(container
 template container<weak_holder> &container<weak_holder>::operator=(container<weak_holder> &&);
 
 template <typename T>
-container<T> &container<T>::operator=(const id object)
+container<T> &container<T>::operator=(const id rhs)
 {
-    set_object(object);
+    set_object(rhs);
 
     return *this;
 }
 
-template container<strong_holder> &container<strong_holder>::operator=(const id object);
-template container<weak_holder> &container<weak_holder>::operator=(const id object);
+template container<strong_holder> &container<strong_holder>::operator=(const id);
+template container<weak_holder> &container<weak_holder>::operator=(const id);
 
 template <typename T>
 container<T>::operator bool() const
@@ -138,8 +138,8 @@ void container<T>::set_object(const id object)
     _holder.set_object(object);
 }
 
-template void container<strong_holder>::set_object(const id object);
-template void container<weak_holder>::set_object(const id object);
+template void container<strong_holder>::set_object(const id);
+template void container<weak_holder>::set_object(const id);
 
 template <typename T>
 id container<T>::object() const
