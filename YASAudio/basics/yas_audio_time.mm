@@ -64,22 +64,22 @@ audio_time::audio_time(const UInt64 host_time, const SInt64 sample_time, const F
     YASRelease(_impl->av_audio_time);
 }
 
-bool audio_time::operator==(const audio_time &other) const
+bool audio_time::operator==(const audio_time &rhs) const
 {
-    if (_impl && other._impl) {
-        if (_impl == other._impl) {
+    if (_impl && rhs._impl) {
+        if (_impl == rhs._impl) {
             return true;
         } else {
-            return [_impl->av_audio_time isEqual:other._impl->av_audio_time];
+            return [_impl->av_audio_time isEqual:rhs._impl->av_audio_time];
         }
     } else {
         return false;
     }
 }
 
-bool audio_time::operator!=(const audio_time &other) const
+bool audio_time::operator!=(const audio_time &rhs) const
 {
-    return !(*this == other);
+    return !(*this == rhs);
 }
 
 audio_time::operator bool() const
