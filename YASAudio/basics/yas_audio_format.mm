@@ -96,14 +96,14 @@ audio_format::audio_format(const Float64 sample_rate, const UInt32 channel_count
 {
 }
 
-bool audio_format::operator==(const audio_format &format) const
+bool audio_format::operator==(const audio_format &rhs) const
 {
-    return is_equal(stream_description(), format.stream_description());
+    return is_equal(stream_description(), rhs.stream_description());
 }
 
-bool audio_format::operator!=(const audio_format &format) const
+bool audio_format::operator!=(const audio_format &rhs) const
 {
-    return !is_equal(stream_description(), format.stream_description());
+    return !is_equal(stream_description(), rhs.stream_description());
 }
 
 audio_format::operator bool() const
