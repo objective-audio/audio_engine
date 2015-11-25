@@ -14,14 +14,14 @@ audio_route::point::point(const UInt32 bus_idx, const UInt32 ch_idx) : bus(bus_i
 {
 }
 
-bool audio_route::point::operator==(const point &other) const
+bool audio_route::point::operator==(const point &rhs) const
 {
-    return bus == other.bus && channel == other.channel;
+    return bus == rhs.bus && channel == rhs.channel;
 }
 
-bool audio_route::point::operator!=(const point &other) const
+bool audio_route::point::operator!=(const point &rhs) const
 {
-    return bus != other.bus || channel != other.channel;
+    return bus != rhs.bus || channel != rhs.channel;
 }
 
 audio_route::audio_route(const UInt32 src_bus_idx, const UInt32 src_ch_idx, const UInt32 dst_bus_idx,
@@ -39,31 +39,31 @@ audio_route::audio_route(const point &src_point, const point &dst_point) : sourc
 {
 }
 
-bool audio_route::operator==(const audio_route &other) const
+bool audio_route::operator==(const audio_route &rhs) const
 {
-    return source == other.source && destination == other.destination;
+    return source == rhs.source && destination == rhs.destination;
 }
 
-bool audio_route::operator!=(const audio_route &other) const
+bool audio_route::operator!=(const audio_route &rhs) const
 {
-    return source != other.source || destination != other.destination;
+    return source != rhs.source || destination != rhs.destination;
 }
 
-bool audio_route::operator<(const audio_route &other) const
+bool audio_route::operator<(const audio_route &rhs) const
 {
-    if (source.bus != other.source.bus) {
-        return source.bus < other.source.bus;
+    if (source.bus != rhs.source.bus) {
+        return source.bus < rhs.source.bus;
     }
 
-    if (destination.bus != other.destination.bus) {
-        return destination.bus < other.destination.bus;
+    if (destination.bus != rhs.destination.bus) {
+        return destination.bus < rhs.destination.bus;
     }
 
-    if (source.channel != other.source.channel) {
-        return source.channel < other.source.channel;
+    if (source.channel != rhs.source.channel) {
+        return source.channel < rhs.source.channel;
     }
 
-    return destination.channel < other.destination.channel;
+    return destination.channel < rhs.destination.channel;
 }
 
 #pragma mark -
