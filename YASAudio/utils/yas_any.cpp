@@ -15,9 +15,9 @@ any::any(const any &other) : _container(other._container ? other._container->cop
 {
 }
 
-any &any::operator=(const any &other)
+any &any::operator=(const any &rhs)
 {
-    _container = other._container ? other._container->copy() : nullptr;
+    _container = rhs._container ? rhs._container->copy() : nullptr;
     return *this;
 }
 
