@@ -27,7 +27,7 @@ namespace yas
         using render_f = std::function<void(audio_pcm_buffer &output_buffer, const audio_time &when)>;
 
         audio_device_io(std::nullptr_t);
-        explicit audio_device_io(const audio_device &device);
+        explicit audio_device_io(const audio_device &);
 
         ~audio_device_io();
 
