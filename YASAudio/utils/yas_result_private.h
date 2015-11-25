@@ -62,12 +62,12 @@ namespace yas
     }
 
     template <typename T, typename U>
-    result<T, U> &result<T, U>::operator=(const result<T, U> &other)
+    result<T, U> &result<T, U>::operator=(const result<T, U> &rhs)
     {
-        if (other._value) {
-            this->_value = other._value;
-        } else if (other._error) {
-            this->_error = other._error;
+        if (rhs._value) {
+            this->_value = rhs._value;
+        } else if (rhs._error) {
+            this->_error = rhs._error;
         } else {
             throw std::logic_error(std::string(__PRETTY_FUNCTION__) + " : value or error are not found.");
         }
@@ -76,12 +76,12 @@ namespace yas
     }
 
     template <typename T, typename U>
-    result<T, U> &result<T, U>::operator=(result<T, U> &&other)
+    result<T, U> &result<T, U>::operator=(result<T, U> &&rhs)
     {
-        if (other._value) {
-            this->_value = std::move(other._value);
-        } else if (other._error) {
-            this->_error = std::move(other._error);
+        if (rhs._value) {
+            this->_value = std::move(rhs._value);
+        } else if (rhs._error) {
+            this->_error = std::move(rhs._error);
         } else {
             throw std::logic_error(std::string(__PRETTY_FUNCTION__) + " : value or error are not found.");
         }
