@@ -420,8 +420,8 @@ namespace yas
 
         _internal.device_observer = selected_device.property_subject().make_observer(
             yas::audio_device::device_did_change_key, [selected_device, weak_container = _internal.self_container](
-                                                             const std::string &method, const yas::any &sender) {
-                const auto &infos = sender.get<yas::audio_device::property_infos_sptr>();
+                                                          const std::string &method, const yas::any &sender) {
+                const auto &infos = sender.get<yas::audio_device::change_info>();
                 if (infos->size() > 0) {
                     const auto &device_id = infos->at(0).object_id;
                     if (selected_device.audio_device_id() == device_id) {

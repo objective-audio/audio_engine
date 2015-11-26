@@ -100,8 +100,9 @@
 #if TARGET_OS_IPHONE
     [[NSNotificationCenter defaultCenter] postNotificationName:AVAudioSessionRouteChangeNotification object:nil];
 #elif TARGET_OS_MAC
-    yas::audio_device::system_subject().notify(yas::audio_device::configuration_change_key,
-                                               std::make_shared<std::vector<yas::audio_device::property_info> >());
+    yas::audio_device::system_subject().notify(
+        yas::audio_device::configuration_change_key,
+        yas::audio_device::change_info{std::vector<yas::audio_device::property_info>{}});
 #endif
 
     [self waitForExpectationsWithTimeout:1.0 handler:nil];

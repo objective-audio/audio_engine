@@ -54,7 +54,7 @@ class audio_engine::impl::core
     objc::container<> route_change_observer;
     yas::subject<audio_engine> subject;
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
-    observer<audio_device::property_infos_sptr> device_observer;
+    observer<audio_device::change_info> device_observer;
 #endif
 
     audio_graph graph = nullptr;
@@ -133,7 +133,7 @@ yas::subject<audio_engine> &audio_engine::impl::subject() const
 }
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
-observer<audio_device::property_infos_sptr> &audio_engine::impl::device_observer()
+observer<audio_device::change_info> &audio_engine::impl::device_observer()
 {
     return _core->device_observer;
 }

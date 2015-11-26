@@ -37,9 +37,7 @@ namespace yas
         constexpr static auto device_did_change_key = "yas.audio_device.device_did_change";
         constexpr static auto configuration_change_key = "yas.audio_device.configuration_change";
 
-        class property_info
-        {
-           public:
+        struct property_info {
             const AudioObjectID object_id;
             const audio_device::property property;
             const AudioObjectPropertyAddress address;
@@ -50,7 +48,11 @@ namespace yas
             bool operator<(const property_info &info) const;
         };
 
-        using property_infos_sptr = std::shared_ptr<std::vector<property_info>>;
+        struct change_info {
+            const std::vector<property_info> property_infos;
+
+            change_info(std::vector<property_info> &&infos);
+        };
 
         static std::vector<audio_device> all_devices();
         static std::vector<audio_device> output_devices();
@@ -88,8 +90,8 @@ namespace yas
         UInt32 input_channel_count() const;
         UInt32 output_channel_count() const;
 
-        static subject<property_infos_sptr> &system_subject();
-        subject<property_infos_sptr> &property_subject() const;
+        static subject<change_info> &system_subject();
+        subject<change_info> &property_subject() const;
 
        protected:
         explicit audio_device(const AudioDeviceID device_id);
