@@ -103,7 +103,7 @@ void audio_engine::impl::prepare(const audio_engine &engine)
     _core->route_change_observer.set_object(route_change_observer);
 
 #elif TARGET_OS_MAC
-    _core->device_observer.add_handler(audio_device::system_subject(), audio_device_method::configuration_change,
+    _core->device_observer.add_handler(audio_device::system_subject(), audio_device::configuration_change_key,
                                        [weak_engine = _core->weak_engine](const auto &method, const auto &infos) {
                                            if (auto engine = weak_engine.lock()) {
                                                engine.impl_ptr<impl>()->post_configuration_change();

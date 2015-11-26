@@ -196,7 +196,7 @@ namespace yas
     self.sineFrequency = _internal.kernel->sine_frequency();
 
     _internal.system_observer = yas::audio_device::system_subject().make_observer(
-        yas::audio_device_method::hardware_did_change,
+        yas::audio_device::hardware_did_change_key,
         [weak_container = _internal.self_container](const auto &, const auto &) {
             if (auto strong_container = weak_container.lock()) {
                 YASAudioDeviceSampleViewController *strongSelf = strong_container.object();
@@ -336,7 +336,7 @@ namespace yas
         _internal.audio_device_io.set_device(selected_device);
 
         _internal.device_observer = selected_device.property_subject().make_observer(
-            yas::audio_device_method::device_did_change, [selected_device, weak_container = _internal.self_container](
+            yas::audio_device::device_did_change_key, [selected_device, weak_container = _internal.self_container](
                                                              const std::string &method, const yas::any &sender) {
                 const auto &infos = sender.get<yas::audio_device::property_infos_sptr>();
                 if (infos->size() > 0) {

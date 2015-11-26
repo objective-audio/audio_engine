@@ -124,8 +124,8 @@ namespace yas
                                                                  kAudioObjectSystemObject, addresses[i]));
                 }
                 auto &subject = audio_device::system_subject();
-                subject.notify(audio_device_method::hardware_did_change, infos);
-                subject.notify(audio_device_method::configuration_change, infos);
+                subject.notify(audio_device::hardware_did_change_key, infos);
+                subject.notify(audio_device::configuration_change_key, infos);
             };
         }
 
@@ -283,8 +283,8 @@ class audio_device::impl
                     }
                 }
 
-                device.property_subject().notify(audio_device_method::device_did_change, infos);
-                audio_device::system_subject().notify(audio_device_method::configuration_change, infos);
+                device.property_subject().notify(audio_device::device_did_change_key, infos);
+                audio_device::system_subject().notify(audio_device::configuration_change_key, infos);
             }
         };
     }

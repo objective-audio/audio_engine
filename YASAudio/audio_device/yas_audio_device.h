@@ -24,13 +24,6 @@ namespace yas
 {
     class audio_device_global;
 
-    namespace audio_device_method
-    {
-        static const auto hardware_did_change = "yas.audio_device.hardware_did_change";
-        static const auto device_did_change = "yas.audio_device.device_did_change";
-        static const auto configuration_change = "yas.audio_device.configuration_change";
-    }
-
     class audio_device
     {
        public:
@@ -39,6 +32,10 @@ namespace yas
             stream,
             format,
         };
+
+        constexpr static auto hardware_did_change_key = "yas.audio_device.hardware_did_change";
+        constexpr static auto device_did_change_key = "yas.audio_device.device_did_change";
+        constexpr static auto configuration_change_key = "yas.audio_device.configuration_change";
 
         class property_info
         {
