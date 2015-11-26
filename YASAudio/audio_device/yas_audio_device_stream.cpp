@@ -46,6 +46,12 @@ bool audio_device_stream::property_info::operator<(const audio_device_stream::pr
     return address.mElement < info.address.mElement;
 }
 
+#pragma mark - change_info
+
+audio_device_stream::change_info::change_info(std::vector<property_info> &&infos) : property_infos(infos)
+{
+}
+
 #pragma mark - private
 
 class audio_device_stream::impl : public base::impl
@@ -53,7 +59,7 @@ class audio_device_stream::impl : public base::impl
    public:
     AudioStreamID stream_id;
     AudioDeviceID device_id;
-    yas::subject<property_infos_sptr> subject;
+    yas::subject<change_info> subject;
 
     impl(const AudioStreamID stream_id, const AudioDeviceID device_id)
         : stream_id(stream_id), device_id(device_id), subject()
@@ -67,19 +73,21 @@ class audio_device_stream::impl : public base::impl
         return [weak_stream](UInt32 address_count, const AudioObjectPropertyAddress *addresses) {
             if (auto stream = weak_stream.lock()) {
                 const AudioStreamID object_id = stream.stream_id();
-                auto infos = std::make_shared<std::set<property_info> >();
+                std::vector<property_info> infos;
                 for (UInt32 i = 0; i < address_count; i++) {
                     if (addresses[i].mSelector == kAudioStreamPropertyVirtualFormat) {
-                        infos->insert(
+                        infos.push_back(
                             property_info(audio_device_stream::property::virtual_format, object_id, addresses[i]));
                     } else if (addresses[i].mSelector == kAudioStreamPropertyIsActive) {
-                        infos->insert(property_info(audio_device_stream::property::is_active, object_id, addresses[i]));
+                        infos.push_back(
+                            property_info(audio_device_stream::property::is_active, object_id, addresses[i]));
                     } else if (addresses[i].mSelector == kAudioStreamPropertyStartingChannel) {
-                        infos->insert(
+                        infos.push_back(
                             property_info(audio_device_stream::property::starting_channel, object_id, addresses[i]));
                     }
                 }
-                stream.subject().notify(audio_device_stream::stream_did_change_key, infos);
+                change_info change_info{std::move(infos)};
+                stream.subject().notify(audio_device_stream::stream_did_change_key, change_info);
             }
         };
     }
@@ -180,7 +188,7 @@ UInt32 audio_device_stream::starting_channel() const
     return 0;
 }
 
-yas::subject<yas::audio_device_stream::property_infos_sptr> &audio_device_stream::subject() const
+yas::subject<yas::audio_device_stream::change_info> &audio_device_stream::subject() const
 {
     return impl_ptr<impl>()->subject;
 }

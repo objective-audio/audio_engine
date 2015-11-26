@@ -35,9 +35,7 @@ namespace yas
 
         constexpr static auto stream_did_change_key = "yas.audio_device_stream.stream_did_change";
 
-        class property_info
-        {
-           public:
+        struct property_info {
             const AudioObjectID object_id;
             const audio_device_stream::property property;
             const AudioObjectPropertyAddress address;
@@ -48,7 +46,11 @@ namespace yas
             bool operator<(const property_info &info) const;
         };
 
-        using property_infos_sptr = std::shared_ptr<std::set<property_info>>;
+        struct change_info {
+            const std::vector<property_info> property_infos;
+
+            change_info(std::vector<property_info> &&);
+        };
 
         audio_device_stream(std::nullptr_t);
         audio_device_stream(const AudioStreamID, const AudioDeviceID);
@@ -70,7 +72,7 @@ namespace yas
         audio_format virtual_format() const;
         UInt32 starting_channel() const;
 
-        subject<property_infos_sptr> &subject() const;
+        subject<change_info> &subject() const;
 
        private:
         template <typename T>
