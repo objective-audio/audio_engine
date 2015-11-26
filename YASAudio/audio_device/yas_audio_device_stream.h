@@ -19,11 +19,6 @@
 
 namespace yas
 {
-    namespace audio_device_stream_method
-    {
-        static const auto stream_did_change = "yas.audio_device_stream.stream_did_change";
-    }
-
     class audio_device;
 
     class audio_device_stream : public base
@@ -37,6 +32,8 @@ namespace yas
             is_active,
             starting_channel,
         };
+
+        constexpr static auto stream_did_change_key = "yas.audio_device_stream.stream_did_change";
 
         class property_info
         {

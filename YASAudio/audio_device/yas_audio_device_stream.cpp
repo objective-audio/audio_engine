@@ -79,7 +79,7 @@ class audio_device_stream::impl : public base::impl
                             property_info(audio_device_stream::property::starting_channel, object_id, addresses[i]));
                     }
                 }
-                stream.subject().notify(audio_device_stream_method::stream_did_change, infos);
+                stream.subject().notify(audio_device_stream::stream_did_change_key, infos);
             }
         };
     }
