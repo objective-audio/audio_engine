@@ -24,8 +24,10 @@ namespace yas
 {
     class audio_device_global;
 
-    class audio_device
+    class audio_device : public base
     {
+        using super_class = base;
+
        public:
         enum class property : UInt32 {
             system,
@@ -64,9 +66,9 @@ namespace yas
         static std::experimental::optional<size_t> index_of_device(const audio_device &);
         static bool is_available_device(const audio_device &);
 
-        audio_device(std::nullptr_t n = nullptr);
+        audio_device(std::nullptr_t);
 
-        ~audio_device() = default;
+        ~audio_device();
 
         audio_device(const audio_device &) = default;
         audio_device(audio_device &&) = default;
@@ -98,7 +100,6 @@ namespace yas
 
        private:
         class impl;
-        std::shared_ptr<impl> _impl;
     };
 }
 
