@@ -95,13 +95,13 @@ class audio_device_io::impl : public base::impl
             uninitialize();
 
             if (device) {
-                observer.remove_handler(device.property_subject(), audio_device::device_did_change_key);
+                observer.remove_handler(device.subject(), audio_device::device_did_change_key);
             }
 
             device = dev;
 
             if (device) {
-                observer.add_handler(device.property_subject(), audio_device::device_did_change_key,
+                observer.add_handler(device.subject(), audio_device::device_did_change_key,
                                      [weak_device_io = weak_device_io](const auto &method, const auto &infos) {
                                          if (auto device_io = weak_device_io.lock()) {
                                              device_io.impl_ptr<impl>()->update_kernel();
