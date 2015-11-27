@@ -418,12 +418,12 @@ namespace yas
     if (selected_device && std::find(all_devices.begin(), all_devices.end(), selected_device) != all_devices.end()) {
         _internal.device_io_node.set_device(selected_device);
 
-        _internal.device_observer = selected_device.property_subject().make_observer(
+        _internal.device_observer = selected_device.subject().make_observer(
             yas::audio_device::device_did_change_key, [selected_device, weak_container = _internal.self_container](
-                                                          const std::string &method, const yas::any &sender) {
-                const auto &infos = sender.get<yas::audio_device::change_info>();
-                if (infos->size() > 0) {
-                    const auto &device_id = infos->at(0).object_id;
+                                                          const std::string &method, const auto &change_info) {
+                const auto &infos = change_info.property_infos;
+                if (change_info.property_infos.size() > 0) {
+                    const auto &device_id = infos.at(0).object_id;
                     if (selected_device.audio_device_id() == device_id) {
                         if (const auto strong_container = weak_container.lock()) {
                             YASAudioEngineDeviceIOSampleViewController *controller = strong_container.object();
