@@ -181,4 +181,39 @@ namespace yas
     XCTAssertFalse(derived == nullptr);
 }
 
+- (void)test_expired
+{
+    yas::base base{nullptr};
+
+    XCTAssertTrue(base.expired());
+
+    base.set_impl_ptr(std::make_shared<yas::base::impl>());
+
+    XCTAssertFalse(base.expired());
+
+    base.set_impl_ptr(nullptr);
+
+    XCTAssertTrue(base.expired());
+}
+
+- (void)test_compare
+{
+    yas::base base1{nullptr};
+    yas::base base2{nullptr};
+
+    XCTAssertFalse(base1 < base2);
+    XCTAssertFalse(base2 < base1);
+
+    auto impl1 = std::make_shared<yas::base::impl>();
+    auto impl2 = std::make_shared<yas::base::impl>();
+
+    base1.set_impl_ptr(impl1);
+    base2.set_impl_ptr(impl2);
+
+    bool compare_impl = impl1 < impl2;
+    bool compare_base = base1 < base2;
+
+    XCTAssertEqual(compare_impl, compare_base);
+}
+
 @end
