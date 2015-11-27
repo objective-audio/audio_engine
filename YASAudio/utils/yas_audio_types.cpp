@@ -55,7 +55,7 @@ std::string yas::to_string(const render_type &type)
         case render_type::notify:
             return "notify";
         case render_type::input:
-            return "notify";
+            return "input";
         case render_type::unknown:
             return "unknown";
     }
@@ -64,6 +64,8 @@ std::string yas::to_string(const render_type &type)
 std::string yas::to_string(const OSStatus err)
 {
     switch (err) {
+        case noErr:
+            return "noErr";
         case kAudioUnitErr_InvalidProperty:
             return "InvalidProperty";
         case kAudioUnitErr_InvalidParameter:
