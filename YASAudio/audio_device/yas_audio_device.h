@@ -24,15 +24,10 @@ namespace yas
 {
     class audio_device_global;
 
-    namespace audio_device_method
+    class audio_device : public base
     {
-        static const auto hardware_did_change = "yas.audio_device.hardware_did_change";
-        static const auto device_did_change = "yas.audio_device.device_did_change";
-        static const auto configuration_change = "yas.audio_device.configuration_change";
-    }
+        using super_class = base;
 
-    class audio_device
-    {
        public:
         enum class property : UInt32 {
             system,
@@ -40,9 +35,11 @@ namespace yas
             format,
         };
 
-        class property_info
-        {
-           public:
+        constexpr static auto hardware_did_change_key = "yas.audio_device.hardware_did_change";
+        constexpr static auto device_did_change_key = "yas.audio_device.device_did_change";
+        constexpr static auto configuration_change_key = "yas.audio_device.configuration_change";
+
+        struct property_info {
             const AudioObjectID object_id;
             const audio_device::property property;
             const AudioObjectPropertyAddress address;
@@ -53,7 +50,11 @@ namespace yas
             bool operator<(const property_info &info) const;
         };
 
-        using property_infos_sptr = std::shared_ptr<std::vector<property_info>>;
+        struct change_info {
+            const std::vector<property_info> property_infos;
+
+            change_info(std::vector<property_info> &&infos);
+        };
 
         static std::vector<audio_device> all_devices();
         static std::vector<audio_device> output_devices();
@@ -65,9 +66,9 @@ namespace yas
         static std::experimental::optional<size_t> index_of_device(const audio_device &);
         static bool is_available_device(const audio_device &);
 
-        audio_device(std::nullptr_t n = nullptr);
+        audio_device(std::nullptr_t);
 
-        ~audio_device() = default;
+        ~audio_device();
 
         audio_device(const audio_device &) = default;
         audio_device(audio_device &&) = default;
@@ -91,15 +92,14 @@ namespace yas
         UInt32 input_channel_count() const;
         UInt32 output_channel_count() const;
 
-        static subject<property_infos_sptr> &system_subject();
-        subject<property_infos_sptr> &property_subject() const;
+        static subject<change_info> &system_subject();
+        subject<change_info> &subject() const;
 
        protected:
         explicit audio_device(const AudioDeviceID device_id);
 
        private:
         class impl;
-        std::shared_ptr<impl> _impl;
     };
 }
 

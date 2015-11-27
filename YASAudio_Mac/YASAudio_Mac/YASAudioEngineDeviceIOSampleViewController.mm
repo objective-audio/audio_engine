@@ -222,7 +222,7 @@ namespace yas
     _internal.tap_node.set_render_function(render_function);
 
     _internal.system_observer = yas::audio_device::system_subject().make_observer(
-        yas::audio_device_method::hardware_did_change,
+        yas::audio_device::hardware_did_change_key,
         [weak_container = _internal.self_container](const auto &method, const auto &infos) {
             if (auto strong_container = weak_container.lock()) {
                 YASAudioEngineDeviceIOSampleViewController *strongSelf = strong_container.object();
@@ -418,12 +418,12 @@ namespace yas
     if (selected_device && std::find(all_devices.begin(), all_devices.end(), selected_device) != all_devices.end()) {
         _internal.device_io_node.set_device(selected_device);
 
-        _internal.device_observer = selected_device.property_subject().make_observer(
-            yas::audio_device_method::device_did_change, [selected_device, weak_container = _internal.self_container](
-                                                             const std::string &method, const yas::any &sender) {
-                const auto &infos = sender.get<yas::audio_device::property_infos_sptr>();
-                if (infos->size() > 0) {
-                    const auto &device_id = infos->at(0).object_id;
+        _internal.device_observer = selected_device.subject().make_observer(
+            yas::audio_device::device_did_change_key, [selected_device, weak_container = _internal.self_container](
+                                                          const std::string &method, const auto &change_info) {
+                const auto &infos = change_info.property_infos;
+                if (change_info.property_infos.size() > 0) {
+                    const auto &device_id = infos.at(0).object_id;
                     if (selected_device.audio_device_id() == device_id) {
                         if (const auto strong_container = weak_container.lock()) {
                             YASAudioEngineDeviceIOSampleViewController *controller = strong_container.object();

@@ -46,7 +46,7 @@ class audio_device_io::impl : public base::impl
     AudioDeviceIOProcID io_proc_id;
     audio_pcm_buffer input_buffer_on_render;
     audio_time input_time_on_render;
-    observer<audio_device::property_infos_sptr> observer;
+    observer<audio_device::change_info> observer;
 
     impl()
         : weak_device_io(),
@@ -65,7 +65,7 @@ class audio_device_io::impl : public base::impl
 
     ~impl()
     {
-        observer.remove_handler(audio_device::system_subject(), audio_device_method::hardware_did_change);
+        observer.remove_handler(audio_device::system_subject(), audio_device::hardware_did_change_key);
 
         uninitialize();
     }
@@ -75,7 +75,7 @@ class audio_device_io::impl : public base::impl
         weak_device_io = to_weak(device_io);
 
         observer.add_handler(
-            audio_device::system_subject(), audio_device_method::hardware_did_change,
+            audio_device::system_subject(), audio_device::hardware_did_change_key,
             [weak_device_io = weak_device_io](const auto &method, const auto &infos) {
                 if (auto device_io = weak_device_io.lock()) {
                     if (device_io.device() && !audio_device::device_for_id(device_io.device().audio_device_id())) {
@@ -95,13 +95,13 @@ class audio_device_io::impl : public base::impl
             uninitialize();
 
             if (device) {
-                observer.remove_handler(device.property_subject(), audio_device_method::device_did_change);
+                observer.remove_handler(device.subject(), audio_device::device_did_change_key);
             }
 
             device = dev;
 
             if (device) {
-                observer.add_handler(device.property_subject(), audio_device_method::device_did_change,
+                observer.add_handler(device.subject(), audio_device::device_did_change_key,
                                      [weak_device_io = weak_device_io](const auto &method, const auto &infos) {
                                          if (auto device_io = weak_device_io.lock()) {
                                              device_io.impl_ptr<impl>()->update_kernel();
