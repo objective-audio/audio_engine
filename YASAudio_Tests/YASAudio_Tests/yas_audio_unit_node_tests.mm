@@ -47,10 +47,10 @@
 
     XCTAssertTrue(start_result);
 
-    float delay_time_value = 0.5f;
-    float feedback_value = -50.0f;
-    float lopass_cutoff_value = 100.0f;
-    float wet_dry_mix = 10.0f;
+    const float delay_time_value = 0.5f;
+    const float feedback_value = -50.0f;
+    const float lopass_cutoff_value = 100.0f;
+    const float wet_dry_mix = 10.0f;
 
     delay_node.set_global_parameter_value(kDelayParam_DelayTime, delay_time_value);
     delay_node.set_global_parameter_value(kDelayParam_Feedback, feedback_value);
@@ -121,10 +121,15 @@
 {
     yas::audio_unit_node delay_node(kAudioUnitType_Effect, kAudioUnitSubType_Delay);
 
-    float delay_time_value = 0.5f;
-    float feedback_value = -50.0f;
-    float lopass_cutoff_value = 100.0f;
-    float wet_dry_mix = 10.0f;
+    const float delay_time_value = 0.5f;
+    const float feedback_value = -50.0f;
+    const float lopass_cutoff_value = 100.0f;
+    const float wet_dry_mix = 10.0f;
+
+    XCTAssertNotEqual(delay_node.global_parameter_value(kDelayParam_DelayTime), delay_time_value);
+    XCTAssertNotEqual(delay_node.global_parameter_value(kDelayParam_Feedback), feedback_value);
+    XCTAssertNotEqual(delay_node.global_parameter_value(kDelayParam_LopassCutoff), lopass_cutoff_value);
+    XCTAssertNotEqual(delay_node.global_parameter_value(kDelayParam_WetDryMix), wet_dry_mix);
 
     delay_node.set_global_parameter_value(kDelayParam_DelayTime, delay_time_value);
     delay_node.set_global_parameter_value(kDelayParam_Feedback, feedback_value);
