@@ -233,14 +233,14 @@
     yas::audio_node::private_access::add_connection(tap_node, connection);
     yas::audio_node::private_access::update_kernel(tap_node);
 
-    auto promise = std::make_shared<std::promise<bool>>();
+    auto promise = std::make_shared<std::promise<void>>();
     auto future = promise->get_future();
 
     XCTestExpectation *completionExpectation = [self expectationWithDescription:@"offline output node completion"];
 
     auto render_func = [promise](yas::audio_pcm_buffer &buffer, const yas::audio_time &when, bool &stop) mutable {
         if (when.sample_time() == 0) {
-            promise->set_value(true);
+            promise->set_value();
         }
     };
 
@@ -256,7 +256,8 @@
         yas::audio_offline_output_node::private_access::start(output_node, std::move(render_func), completion_function);
 
     XCTAssertTrue(result);
-    XCTAssertTrue(future.get());
+
+    future.get();
 
     output_node.reset();
 
