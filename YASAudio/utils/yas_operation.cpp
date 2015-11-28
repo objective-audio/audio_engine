@@ -39,7 +39,7 @@ void operation::cancel()
     _cancel();
 }
 
-bool operation::is_canceled()
+bool operation::is_canceled() const
 {
     return impl_ptr<impl>()->canceled;
 }
