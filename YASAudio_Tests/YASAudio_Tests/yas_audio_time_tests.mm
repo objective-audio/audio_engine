@@ -122,6 +122,47 @@ static NSInteger testCount = 8;
     }
 }
 
+- (void)test_bool
+{
+    yas::audio_time time{100};
+
+    XCTAssertTrue(time);
+
+    yas::audio_time null_time{nullptr};
+
+    XCTAssertFalse(null_time);
+}
+
+- (void)test_host_time
+{
+    const UInt64 host_time = 1000;
+    yas::audio_time time{host_time};
+
+    XCTAssertTrue(time.is_host_time_valid());
+    XCTAssertTrue(time.host_time() == 1000);
+}
+
+- (void)test_sample_time
+{
+    const SInt64 sample_time = 2000;
+    const Float64 sample_rate = 48000.0;
+    yas::audio_time time{sample_time, sample_rate};
+
+    XCTAssertTrue(time.is_sample_time_valid());
+    XCTAssertTrue(time.sample_time() == 2000);
+}
+
+- (void)test_equal_null_false
+{
+    const yas::audio_time time1{4000, 48000.0};
+    const yas::audio_time time2{nullptr};
+    const yas::audio_time time3{nullptr};
+
+    XCTAssertFalse(time1 == time2);
+    XCTAssertFalse(time2 == time1);
+    XCTAssertFalse(time2 == time2);
+}
+
 #pragma mark -
 
 - (BOOL)compareAudioTimeStamp:(AVAudioTime *)avTime to:(yas::audio_time &)yasTime
