@@ -32,7 +32,7 @@ namespace yas
         operation(std::nullptr_t);
 
         void cancel();
-        bool is_canceled();
+        bool is_canceled() const;
 
        private:
         class impl;

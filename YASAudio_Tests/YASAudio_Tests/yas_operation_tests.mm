@@ -4,6 +4,7 @@
 //
 
 #import "yas_audio_test_utils.h"
+#import <future>
 
 @interface yas_operation_tests : XCTestCase
 
@@ -128,7 +129,7 @@
     XCTAssertEqual(count.load(), 3);
 }
 
-- (void)test_cancel
+- (void)test_operation_cancel
 {
     yas::operation_queue queue;
 
@@ -147,6 +148,59 @@
     [NSThread sleepForTimeInterval:0.1];
 
     XCTAssertFalse(called);
+}
+
+- (void)test_cancel_operation_from_queue
+{
+    yas::operation_queue queue;
+
+    queue.suspend();
+
+    bool called = false;
+
+    yas::operation operation([self, &called](const yas::operation &op) { called = true; });
+
+    queue.add_operation(operation);
+
+    queue.cancel_operation(operation);
+
+    queue.resume();
+
+    [NSThread sleepForTimeInterval:0.1];
+
+    XCTAssertFalse(called);
+}
+
+- (void)test_cancel_current_operation
+{
+    yas::operation_queue queue;
+
+    queue.suspend();
+
+    std::promise<void> start_promise;
+    std::promise<void> wait_promise;
+    std::promise<bool> end_promise;
+
+    auto start_future = start_promise.get_future();
+    auto wait_future = wait_promise.get_future();
+    auto end_future = end_promise.get_future();
+
+    yas::operation operation([self, &start_promise, &wait_future, &end_promise](const yas::operation &op) {
+        start_promise.set_value();
+        wait_future.get();
+        end_promise.set_value(op.is_canceled());
+    });
+
+    queue.add_operation(operation);
+    queue.resume();
+
+    start_future.get();
+
+    queue.cancel_operation(operation);
+
+    wait_promise.set_value();
+
+    XCTAssertTrue(end_future.get());
 }
 
 - (void)test_null_created
