@@ -52,6 +52,8 @@ void audio_unit_node::impl::prepare(const audio_unit_node &node, const AudioComp
 
     yas::audio_unit unit(acd);
     _core->set_au(unit);
+
+    _core->parameters.clear();
     _core->parameters.insert(std::make_pair(kAudioUnitScope_Global, unit.create_parameters(kAudioUnitScope_Global)));
     _core->parameters.insert(std::make_pair(kAudioUnitScope_Input, unit.create_parameters(kAudioUnitScope_Input)));
     _core->parameters.insert(std::make_pair(kAudioUnitScope_Output, unit.create_parameters(kAudioUnitScope_Output)));
@@ -61,6 +63,8 @@ void audio_unit_node::impl::reset()
 {
     auto unit = au();
     unit.reset();
+
+    _core->parameters.clear();
     _core->parameters.insert(std::make_pair(kAudioUnitScope_Global, unit.create_parameters(kAudioUnitScope_Global)));
     _core->parameters.insert(std::make_pair(kAudioUnitScope_Input, unit.create_parameters(kAudioUnitScope_Input)));
     _core->parameters.insert(std::make_pair(kAudioUnitScope_Output, unit.create_parameters(kAudioUnitScope_Output)));
