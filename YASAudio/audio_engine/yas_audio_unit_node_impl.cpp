@@ -52,6 +52,8 @@ void audio_unit_node::impl::prepare(const audio_unit_node &node, const AudioComp
 
     yas::audio_unit unit(acd);
     _core->set_au(unit);
+
+    _core->parameters.clear();
     _core->parameters.insert(std::make_pair(kAudioUnitScope_Global, unit.create_parameters(kAudioUnitScope_Global)));
     _core->parameters.insert(std::make_pair(kAudioUnitScope_Input, unit.create_parameters(kAudioUnitScope_Input)));
     _core->parameters.insert(std::make_pair(kAudioUnitScope_Output, unit.create_parameters(kAudioUnitScope_Output)));
@@ -61,9 +63,24 @@ void audio_unit_node::impl::reset()
 {
     auto unit = au();
     unit.reset();
+
+    auto prev_parameters = std::move(_core->parameters);
+
     _core->parameters.insert(std::make_pair(kAudioUnitScope_Global, unit.create_parameters(kAudioUnitScope_Global)));
     _core->parameters.insert(std::make_pair(kAudioUnitScope_Input, unit.create_parameters(kAudioUnitScope_Input)));
     _core->parameters.insert(std::make_pair(kAudioUnitScope_Output, unit.create_parameters(kAudioUnitScope_Output)));
+
+    for (const AudioUnitScope scope : {kAudioUnitScope_Global, kAudioUnitScope_Input, kAudioUnitScope_Output}) {
+        for (const auto &param_pair : prev_parameters.at(scope)) {
+            const auto &parameter_id = param_pair.first;
+            const auto &parameter = param_pair.second;
+            const auto default_value = parameter.default_value();
+            for (auto &value_pair : parameter.values()) {
+                const auto &element = value_pair.first;
+                unit.set_parameter_value(default_value, parameter_id, scope, element);
+            }
+        }
+    }
 
     super_class::reset();
 }
