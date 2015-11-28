@@ -533,13 +533,37 @@
     XCTAssertFalse(yas::is_equal_structure(*abl1, *abl2));
 }
 
-- (void)test_data_ptr_at_index
+- (void)test_data_ptr_at_index_f32
 {
     yas::audio_pcm_buffer buffer(yas::audio_format(44100.0, 2), 1);
     auto abl = buffer.audio_buffer_list();
 
     XCTAssertEqual(buffer.data_ptr_at_index<Float32>(0), abl->mBuffers[0].mData);
     XCTAssertEqual(buffer.data_ptr_at_index<Float32>(1), abl->mBuffers[1].mData);
+}
+
+- (void)test_data_ptr_at_index_f64
+{
+    yas::audio_pcm_buffer buffer(yas::audio_format(44100.0, 1, yas::pcm_format::float64), 1);
+    auto abl = buffer.audio_buffer_list();
+
+    XCTAssertEqual(buffer.data_ptr_at_index<Float64>(0), abl->mBuffers[0].mData);
+}
+
+- (void)test_data_ptr_at_index_i16
+{
+    yas::audio_pcm_buffer buffer(yas::audio_format(44100.0, 1, yas::pcm_format::int16), 1);
+    auto abl = buffer.audio_buffer_list();
+
+    XCTAssertEqual(buffer.data_ptr_at_index<SInt16>(0), abl->mBuffers[0].mData);
+}
+
+- (void)test_data_ptr_at_index_fixed824
+{
+    yas::audio_pcm_buffer buffer(yas::audio_format(44100.0, 1, yas::pcm_format::fixed824), 1);
+    auto abl = buffer.audio_buffer_list();
+
+    XCTAssertEqual(buffer.data_ptr_at_index<SInt32>(0), abl->mBuffers[0].mData);
 }
 
 - (void)test_const_data_ptr_at_index
@@ -609,6 +633,14 @@
     buffer.clear();
 
     XCTAssertTrue(*data == 0.0f);
+}
+
+- (void)test_abl_frame_length
+{
+    yas::audio_format format{44100.0, 1};
+    yas::audio_pcm_buffer buffer{format, 4};
+
+    XCTAssertEqual(yas::frame_length(buffer.audio_buffer_list(), format.sample_byte_count()), 4);
 }
 
 #pragma mark -
