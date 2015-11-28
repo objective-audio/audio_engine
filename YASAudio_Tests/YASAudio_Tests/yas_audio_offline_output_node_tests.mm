@@ -266,4 +266,11 @@
                                  }];
 }
 
+- (void)test_to_string_error
+{
+    XCTAssertTrue(yas::to_string(yas::offline_start_error_t::already_running) == "already_running");
+    XCTAssertTrue(yas::to_string(yas::offline_start_error_t::prepare_failure) == "prepare_failure");
+    XCTAssertTrue(yas::to_string(yas::offline_start_error_t::connection_not_found) == "connection_not_found");
+}
+
 @end
