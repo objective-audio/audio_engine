@@ -92,4 +92,56 @@
                                  }];
 }
 
+- (void)test_get_parameters
+{
+    yas::audio_unit_node delay_node(kAudioUnitType_Effect, kAudioUnitSubType_Delay);
+
+    const auto &global_parameters = delay_node.global_parameters();
+    const auto &output_parameters = delay_node.output_parameters();
+    const auto &input_parameters = delay_node.input_parameters();
+
+    XCTAssertGreaterThan(global_parameters.size(), 0);
+    XCTAssertEqual(output_parameters.size(), 0);
+    XCTAssertEqual(input_parameters.size(), 0);
+
+    auto &wet_dry_mix = global_parameters.at(kDelayParam_WetDryMix);
+    XCTAssertEqual(wet_dry_mix.parameter_id(), kDelayParam_WetDryMix);
+
+    auto &delay_time = global_parameters.at(kDelayParam_DelayTime);
+    XCTAssertEqual(delay_time.parameter_id(), kDelayParam_DelayTime);
+
+    auto &feedback = global_parameters.at(kDelayParam_Feedback);
+    XCTAssertEqual(feedback.parameter_id(), kDelayParam_Feedback);
+
+    auto &lopass = global_parameters.at(kDelayParam_LopassCutoff);
+    XCTAssertEqual(lopass.parameter_id(), kDelayParam_LopassCutoff);
+}
+
+- (void)test_reset_parameters
+{
+    yas::audio_unit_node delay_node(kAudioUnitType_Effect, kAudioUnitSubType_Delay);
+
+    float delay_time_value = 0.5f;
+    float feedback_value = -50.0f;
+    float lopass_cutoff_value = 100.0f;
+    float wet_dry_mix = 10.0f;
+
+    delay_node.set_global_parameter_value(kDelayParam_DelayTime, delay_time_value);
+    delay_node.set_global_parameter_value(kDelayParam_Feedback, feedback_value);
+    delay_node.set_global_parameter_value(kDelayParam_LopassCutoff, lopass_cutoff_value);
+    delay_node.set_global_parameter_value(kDelayParam_WetDryMix, wet_dry_mix);
+
+    XCTAssertEqual(delay_node.global_parameter_value(kDelayParam_DelayTime), delay_time_value);
+    XCTAssertEqual(delay_node.global_parameter_value(kDelayParam_Feedback), feedback_value);
+    XCTAssertEqual(delay_node.global_parameter_value(kDelayParam_LopassCutoff), lopass_cutoff_value);
+    XCTAssertEqual(delay_node.global_parameter_value(kDelayParam_WetDryMix), wet_dry_mix);
+
+    delay_node.reset();
+
+    XCTAssertNotEqual(delay_node.global_parameter_value(kDelayParam_DelayTime), delay_time_value);
+    XCTAssertNotEqual(delay_node.global_parameter_value(kDelayParam_Feedback), feedback_value);
+    XCTAssertNotEqual(delay_node.global_parameter_value(kDelayParam_LopassCutoff), lopass_cutoff_value);
+    XCTAssertNotEqual(delay_node.global_parameter_value(kDelayParam_WetDryMix), wet_dry_mix);
+}
+
 @end
