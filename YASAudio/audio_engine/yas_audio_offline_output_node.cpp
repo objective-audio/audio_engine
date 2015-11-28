@@ -40,7 +40,7 @@ void audio_offline_output_node::_stop() const
     impl_ptr<impl>()->stop();
 }
 
-std::string to_string(const offline_start_error_t &error)
+std::string yas::to_string(const offline_start_error_t &error)
 {
     switch (error) {
         case offline_start_error_t::already_running:
