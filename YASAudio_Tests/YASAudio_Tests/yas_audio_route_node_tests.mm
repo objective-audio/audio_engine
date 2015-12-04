@@ -120,7 +120,7 @@
         XCTAssertTrue(engine.start_offline_render(
             [self](yas::audio_pcm_buffer &buffer, const yas::audio_time &when, bool &stop) {
                 stop = true;
-                yas::audio_frame_enumerator enumerator(buffer);
+                yas::audio::frame_enumerator enumerator(buffer);
                 auto pointer = enumerator.pointer();
                 const UInt32 *frm_idx = enumerator.frame();
                 const UInt32 *ch_idx = enumerator.channel();
@@ -186,7 +186,7 @@
     XCTAssertTrue(engine.start_offline_render(
         [self](yas::audio_pcm_buffer &buffer, const yas::audio_time &when, bool &stop) {
             stop = true;
-            yas::audio_frame_enumerator enumerator(buffer);
+            yas::audio::frame_enumerator enumerator(buffer);
             auto pointer = enumerator.pointer();
             const UInt32 *frm_idx = enumerator.frame();
             const UInt32 *ch_idx = enumerator.channel();
@@ -253,7 +253,7 @@
     XCTAssertTrue(engine.start_offline_render(
         [self](yas::audio_pcm_buffer &buffer, const yas::audio_time &when, bool &stop) {
             stop = true;
-            yas::audio_frame_enumerator enumerator(buffer);
+            yas::audio::frame_enumerator enumerator(buffer);
             auto pointer = enumerator.pointer();
             const UInt32 *frm_idx = enumerator.frame();
             const UInt32 *ch_idx = enumerator.channel();

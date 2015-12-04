@@ -34,7 +34,7 @@
     yas::test::fill_test_values_to_buffer(buffer);
 
     for (UInt32 buf_idx = 0; buf_idx < channels; buf_idx++) {
-        yas::audio_enumerator enumerator(buffer, buf_idx);
+        yas::audio::enumerator enumerator(buffer, buf_idx);
         const auto pointer = enumerator.pointer();
         const auto index = enumerator.index();
 
@@ -65,7 +65,7 @@
     yas::test::fill_test_values_to_buffer(buffer);
 
     for (UInt32 buf_idx = 0; buf_idx < channels; buf_idx++) {
-        yas::audio_enumerator enumerator(buffer, buf_idx);
+        yas::audio::enumerator enumerator(buffer, buf_idx);
         XCTAssertEqual(enumerator.length(), frame_length);
 
         const auto pointer = enumerator.pointer();
@@ -98,7 +98,7 @@
     yas::test::fill_test_values_to_buffer(buffer);
 
     for (UInt32 ch_idx = 0; ch_idx < channels; ch_idx++) {
-        yas::audio_enumerator enumerator(buffer, ch_idx);
+        yas::audio::enumerator enumerator(buffer, ch_idx);
         const auto pointer = enumerator.pointer();
         const auto index = enumerator.index();
 
@@ -123,7 +123,7 @@
     XCTAssertEqual(format.buffer_count(), channels);
 
     for (UInt32 buf_idx = 0; buf_idx < channels; buf_idx++) {
-        yas::audio_enumerator enumerator(buffer, buf_idx);
+        yas::audio::enumerator enumerator(buffer, buf_idx);
         const auto pointer = enumerator.pointer();
         const auto index = enumerator.index();
 
@@ -139,7 +139,7 @@
     }
 
     for (UInt32 buf_idx = 0; buf_idx < channels; buf_idx++) {
-        yas::audio_enumerator enumerator(buffer, buf_idx);
+        yas::audio::enumerator enumerator(buffer, buf_idx);
         const auto pointer = enumerator.pointer();
         const auto index = enumerator.index();
 
@@ -161,7 +161,7 @@
 
     auto format = yas::audio_format(48000.0, 1);
     yas::audio_pcm_buffer buffer(format, frame_length);
-    yas::audio_enumerator enumerator(buffer, 0);
+    yas::audio::enumerator enumerator(buffer, 0);
 
     const auto pointer = enumerator.pointer();
     const auto index = enumerator.index();
@@ -193,7 +193,7 @@
     auto format = yas::audio_format(48000.0, 1);
     yas::audio_pcm_buffer buffer(format, frame_length);
 
-    yas::audio_enumerator enumerator(buffer, 0);
+    yas::audio::enumerator enumerator(buffer, 0);
     const auto pointer = enumerator.pointer();
     const auto index = enumerator.index();
 
@@ -213,13 +213,13 @@
 {
     yas::flex_ptr pointer(nullptr);
 
-    XCTAssertThrows(yas::audio_enumerator(pointer, 1, 1));
+    XCTAssertThrows(yas::audio::enumerator(pointer, 1, 1));
 
     SInt16 val = 0;
     pointer.v = &val;
 
-    XCTAssertThrows(yas::audio_enumerator(pointer, 0, 1));
-    XCTAssertThrows(yas::audio_enumerator(pointer, 1, 0));
+    XCTAssertThrows(yas::audio::enumerator(pointer, 0, 1));
+    XCTAssertThrows(yas::audio::enumerator(pointer, 1, 0));
 }
 
 @end

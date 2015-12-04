@@ -72,7 +72,7 @@ namespace yas
                             const UInt32 frame_length = buffer.frame_length();
 
                             if (frame_length > 0) {
-                                yas::audio_frame_enumerator enumerator(buffer);
+                                yas::audio::frame_enumerator enumerator(buffer);
                                 const auto *flex_ptr = enumerator.pointer();
                                 while (flex_ptr->v) {
                                     next_phase = yas::audio_math::fill_sine(flex_ptr->f32, frame_length, start_phase,

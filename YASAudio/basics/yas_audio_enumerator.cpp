@@ -9,10 +9,11 @@
 #include <string>
 
 using namespace yas;
+using namespace yas::audio;
 
 #pragma mark - enumerator
 
-audio_enumerator::audio_enumerator(const flex_ptr &pointer, const UInt32 byte_stride, const UInt32 length)
+enumerator::enumerator(const flex_ptr &pointer, const UInt32 byte_stride, const UInt32 length)
     : _pointer(pointer), _top_pointer(pointer), _byte_stride(byte_stride), _length(length), _index(0)
 {
     if (!pointer.v || byte_stride == 0 || length == 0) {
@@ -20,38 +21,37 @@ audio_enumerator::audio_enumerator(const flex_ptr &pointer, const UInt32 byte_st
     }
 }
 
-audio_enumerator::audio_enumerator(const audio_pcm_buffer &buffer, const UInt32 channel)
-    : audio_enumerator(buffer.flex_ptr_at_channel(channel), buffer.format().buffer_frame_byte_count(),
-                       buffer.frame_length())
+enumerator::enumerator(const audio_pcm_buffer &buffer, const UInt32 channel)
+    : enumerator(buffer.flex_ptr_at_channel(channel), buffer.format().buffer_frame_byte_count(), buffer.frame_length())
 {
 }
 
-const flex_ptr *audio_enumerator::pointer() const
+const flex_ptr *enumerator::pointer() const
 {
     return &_pointer;
 }
 
-const UInt32 *audio_enumerator::index() const
+const UInt32 *enumerator::index() const
 {
     return &_index;
 }
 
-UInt32 audio_enumerator::length() const
+UInt32 enumerator::length() const
 {
     return _length;
 }
 
-void audio_enumerator::move()
+void enumerator::move()
 {
     yas_audio_enumerator_move(*this);
 }
 
-void audio_enumerator::stop()
+void enumerator::stop()
 {
     yas_audio_enumerator_stop(*this);
 }
 
-void audio_enumerator::set_position(const UInt32 index)
+void enumerator::set_position(const UInt32 index)
 {
     if (index >= _length) {
         throw std::out_of_range(std::string(__PRETTY_FUNCTION__) + " : out of range. position(" +
@@ -62,12 +62,12 @@ void audio_enumerator::set_position(const UInt32 index)
     _pointer.v = _top_pointer.u8 + (_byte_stride * index);
 }
 
-void audio_enumerator::reset()
+void enumerator::reset()
 {
     yas_audio_enumerator_reset(*this);
 }
 
-audio_enumerator &audio_enumerator::operator++()
+enumerator &enumerator::operator++()
 {
     yas_audio_enumerator_move(*this);
     return *this;
@@ -75,7 +75,7 @@ audio_enumerator &audio_enumerator::operator++()
 
 #pragma mark - frame enumerator
 
-audio_frame_enumerator::audio_frame_enumerator(const audio_pcm_buffer &buffer)
+frame_enumerator::frame_enumerator(const audio_pcm_buffer &buffer)
     : _frame(0),
       _channel(0),
       _frame_length(buffer.frame_length()),
@@ -104,52 +104,52 @@ audio_frame_enumerator::audio_frame_enumerator(const audio_pcm_buffer &buffer)
     _pointer.v = _pointers[0].v;
 }
 
-const flex_ptr *audio_frame_enumerator::pointer() const
+const flex_ptr *frame_enumerator::pointer() const
 {
     return &_pointer;
 }
 
-const UInt32 *audio_frame_enumerator::frame() const
+const UInt32 *frame_enumerator::frame() const
 {
     return &_frame;
 }
 
-const UInt32 *audio_frame_enumerator::channel() const
+const UInt32 *frame_enumerator::channel() const
 {
     return &_channel;
 }
 
-UInt32 audio_frame_enumerator::frame_length() const
+UInt32 frame_enumerator::frame_length() const
 {
     return _frame_length;
 }
 
-UInt32 audio_frame_enumerator::channel_count() const
+UInt32 frame_enumerator::channel_count() const
 {
     return _channel_count;
 }
 
-void audio_frame_enumerator::move_frame()
+void frame_enumerator::move_frame()
 {
     yas_audio_frame_enumerator_move_frame(*this);
 }
 
-void audio_frame_enumerator::move_channel()
+void frame_enumerator::move_channel()
 {
     yas_audio_frame_enumerator_move_channel(*this);
 }
 
-void audio_frame_enumerator::move()
+void frame_enumerator::move()
 {
     yas_audio_frame_enumerator_move(*this);
 }
 
-void audio_frame_enumerator::stop()
+void frame_enumerator::stop()
 {
     yas_audio_frame_enumerator_stop(*this);
 }
 
-void audio_frame_enumerator::set_frame_position(const UInt32 frame)
+void frame_enumerator::set_frame_position(const UInt32 frame)
 {
     if (frame >= _frame_length) {
         throw std::out_of_range(std::string(__PRETTY_FUNCTION__) + " : out of range. frame(" + std::to_string(frame) +
@@ -169,7 +169,7 @@ void audio_frame_enumerator::set_frame_position(const UInt32 frame)
     }
 }
 
-void audio_frame_enumerator::set_channel_position(const UInt32 channel)
+void frame_enumerator::set_channel_position(const UInt32 channel)
 {
     if (channel >= _channel_count) {
         throw std::out_of_range(std::string(__PRETTY_FUNCTION__) + " : out of range. channel(" +
@@ -180,12 +180,12 @@ void audio_frame_enumerator::set_channel_position(const UInt32 channel)
     _pointer.v = _pointers[_channel].v;
 }
 
-void audio_frame_enumerator::reset()
+void frame_enumerator::reset()
 {
     yas_audio_frame_enumerator_reset(*this);
 }
 
-audio_frame_enumerator &audio_frame_enumerator::operator++()
+frame_enumerator &frame_enumerator::operator++()
 {
     yas_audio_frame_enumerator_move(*this);
     return *this;

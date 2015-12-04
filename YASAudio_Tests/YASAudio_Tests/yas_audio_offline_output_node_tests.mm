@@ -139,7 +139,7 @@
             XCTAssertEqual(buffer.frame_length(), frames_per_render);
             XCTAssertTrue(buffer.format() == format);
 
-            auto enumerator = yas::audio_frame_enumerator(buffer);
+            auto enumerator = yas::audio::frame_enumerator(buffer);
             auto *flex_ptr = enumerator.pointer();
             auto *frm_idx = enumerator.frame();
             auto *ch_idx = enumerator.channel();
@@ -168,7 +168,7 @@
         XCTAssertEqual(buffer.frame_length(), frames_per_render);
         XCTAssertTrue(buffer.format() == format);
 
-        auto enumerator = yas::audio_frame_enumerator(buffer);
+        auto enumerator = yas::audio::frame_enumerator(buffer);
 
         auto *flex_ptr = enumerator.pointer();
         auto *frm_idx = enumerator.frame();

@@ -69,7 +69,7 @@ bool yas::test::is_filled_buffer(const audio_pcm_buffer &buffer)
     NSData *zeroData = [NSMutableData dataWithLength:sample_byte_count];
     const void *zeroBytes = [zeroData bytes];
 
-    audio_frame_enumerator enumerator(buffer);
+    audio::frame_enumerator enumerator(buffer);
     const flex_ptr *pointer = enumerator.pointer();
 
     while (pointer->v) {
@@ -138,7 +138,7 @@ bool test::is_equal(const AudioTimeStamp *const ts1, const AudioTimeStamp *const
 
 yas::flex_ptr yas::test::data_ptr_from_buffer(const audio_pcm_buffer &buffer, const UInt32 channel, const UInt32 frame)
 {
-    audio_frame_enumerator enumerator(buffer);
+    audio::frame_enumerator enumerator(buffer);
     enumerator.set_frame_position(frame);
     enumerator.set_channel_position(channel);
     return *enumerator.pointer();

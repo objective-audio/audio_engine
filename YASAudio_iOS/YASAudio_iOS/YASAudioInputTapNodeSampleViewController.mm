@@ -43,7 +43,7 @@ namespace yas
 
                 input_tap_node.set_render_function([input_level = input_level, sample_rate](
                     audio_pcm_buffer & buffer, const UInt32 bus_idx, const audio_time &when) mutable {
-                    yas::audio_frame_enumerator enumerator(buffer);
+                    yas::audio::frame_enumerator enumerator(buffer);
                     const auto *flex_ptr = enumerator.pointer();
                     const int frame_length = enumerator.frame_length();
                     Float32 level = 0;

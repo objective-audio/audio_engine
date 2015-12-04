@@ -208,7 +208,7 @@ namespace yas
     {
         buffer.clear();
 
-        yas::audio_frame_enumerator enumerator(buffer);
+        yas::audio::frame_enumerator enumerator(buffer);
         const auto *flex_ptr = enumerator.pointer();
         const Float64 start_phase = next_phase;
         const Float64 phase_per_frame = 1000.0 / buffer.format().sample_rate() * yas::audio_math::two_pi;
