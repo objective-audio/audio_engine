@@ -51,10 +51,10 @@ namespace yas
 
         CFDictionaryRef settings() const
         {
-            if (CFStringCompare(file_type(), yas::audio_file_type::wave, kNilOptions) == kCFCompareEqualTo) {
-                return yas::wave_file_settings(file_sample_rate, channels, file_bit_depth);
-            } else if (CFStringCompare(file_type(), yas::audio_file_type::aiff, kNilOptions) == kCFCompareEqualTo) {
-                return yas::aiff_file_settings(file_sample_rate, channels, file_bit_depth);
+            if (CFStringCompare(file_type(), yas::audio::file_type::wave, kNilOptions) == kCFCompareEqualTo) {
+                return yas::audio::wave_file_settings(file_sample_rate, channels, file_bit_depth);
+            } else if (CFStringCompare(file_type(), yas::audio::file_type::aiff, kNilOptions) == kCFCompareEqualTo) {
+                return yas::audio::aiff_file_settings(file_sample_rate, channels, file_bit_depth);
             }
             return nullptr;
         }
@@ -106,7 +106,7 @@ namespace yas
     test_data.frame_length = 8;
     test_data.loop_count = 4;
     test_data.set_file_name(CFSTR("test.wav"));
-    test_data.set_file_type(yas::audio_file_type::wave);
+    test_data.set_file_type(yas::audio::file_type::wave);
     test_data.standard = NO;
     test_data.async = NO;
 

@@ -12,6 +12,7 @@
 #include <AudioToolbox/AudioToolbox.h>
 
 using namespace yas;
+using namespace yas::audio;
 
 #pragma mark -
 
@@ -78,7 +79,7 @@ class audio_file::impl
         }
 
         AudioFileTypeID file_type_id = ext_audio_file_utils::get_audio_file_type_id(ext_audio_file);
-        set_file_type(to_audio_file_type(file_type_id));
+        set_file_type(to_file_type(file_type_id));
         if (!file_type()) {
             close();
             return false;

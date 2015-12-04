@@ -214,7 +214,7 @@
 {
     const Float64 sampleRate = 44100.0;
 
-    CFDictionaryRef settings = yas::linear_pcm_file_settings(sampleRate, 2, 32, false, true, true);
+    CFDictionaryRef settings = yas::audio::linear_pcm_file_settings(sampleRate, 2, 32, false, true, true);
 
     auto format = yas::audio_format(settings);
 
@@ -230,7 +230,7 @@
         XCTAssertEqual(format.pcm_format(), yas::pcm_format::other);
     }
 
-    settings = yas::linear_pcm_file_settings(sampleRate, 4, 16, true, false, false);
+    settings = yas::audio::linear_pcm_file_settings(sampleRate, 4, 16, true, false, false);
 
     format = yas::audio_format(settings);
 

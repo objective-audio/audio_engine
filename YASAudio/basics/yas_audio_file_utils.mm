@@ -7,72 +7,73 @@
 #include "yas_exception.h"
 
 using namespace yas;
+using namespace yas::audio;
 
-const CFStringRef audio_file_type::three_gpp = CFSTR("public.3gpp");
-const CFStringRef audio_file_type::three_gpp2 = CFSTR("public.3gpp2");
-const CFStringRef audio_file_type::aifc = CFSTR("public.aifc-audio");
-const CFStringRef audio_file_type::aiff = CFSTR("public.aiff-audio");
-const CFStringRef audio_file_type::amr = CFSTR("org.3gpp.adaptive-multi-rate-audio");
-const CFStringRef audio_file_type::ac3 = CFSTR("public.ac3-audio");
-const CFStringRef audio_file_type::mpeg_layer3 = CFSTR("public.mp3");
-const CFStringRef audio_file_type::core_audio_format = CFSTR("com.apple.coreaudio-format");
-const CFStringRef audio_file_type::mpeg4 = CFSTR("public.mpeg-4");
-const CFStringRef audio_file_type::apple_m4a = CFSTR("com.apple.m4a-audio");
-const CFStringRef audio_file_type::wave = CFSTR("com.microsoft.waveform-audio");
+const CFStringRef file_type::three_gpp = CFSTR("public.3gpp");
+const CFStringRef file_type::three_gpp2 = CFSTR("public.3gpp2");
+const CFStringRef file_type::aifc = CFSTR("public.aifc-audio");
+const CFStringRef file_type::aiff = CFSTR("public.aiff-audio");
+const CFStringRef file_type::amr = CFSTR("org.3gpp.adaptive-multi-rate-audio");
+const CFStringRef file_type::ac3 = CFSTR("public.ac3-audio");
+const CFStringRef file_type::mpeg_layer3 = CFSTR("public.mp3");
+const CFStringRef file_type::core_audio_format = CFSTR("com.apple.coreaudio-format");
+const CFStringRef file_type::mpeg4 = CFSTR("public.mpeg-4");
+const CFStringRef file_type::apple_m4a = CFSTR("com.apple.m4a-audio");
+const CFStringRef file_type::wave = CFSTR("com.microsoft.waveform-audio");
 
-AudioFileTypeID yas::to_audio_file_type_id(const CFStringRef fileType)
+AudioFileTypeID yas::audio::to_audio_file_type_id(const CFStringRef fileType)
 {
-    if (CFEqual(fileType, audio_file_type::three_gpp)) {
+    if (CFEqual(fileType, file_type::three_gpp)) {
         return kAudioFile3GPType;
-    } else if (CFEqual(fileType, audio_file_type::three_gpp2)) {
+    } else if (CFEqual(fileType, file_type::three_gpp2)) {
         return kAudioFile3GP2Type;
-    } else if (CFEqual(fileType, audio_file_type::aifc)) {
+    } else if (CFEqual(fileType, file_type::aifc)) {
         return kAudioFileAIFCType;
-    } else if (CFEqual(fileType, audio_file_type::aiff)) {
+    } else if (CFEqual(fileType, file_type::aiff)) {
         return kAudioFileAIFFType;
-    } else if (CFEqual(fileType, audio_file_type::amr)) {
+    } else if (CFEqual(fileType, file_type::amr)) {
         return kAudioFileAMRType;
-    } else if (CFEqual(fileType, audio_file_type::ac3)) {
+    } else if (CFEqual(fileType, file_type::ac3)) {
         return kAudioFileAC3Type;
-    } else if (CFEqual(fileType, audio_file_type::mpeg_layer3)) {
+    } else if (CFEqual(fileType, file_type::mpeg_layer3)) {
         return kAudioFileMP3Type;
-    } else if (CFEqual(fileType, audio_file_type::core_audio_format)) {
+    } else if (CFEqual(fileType, file_type::core_audio_format)) {
         return kAudioFileCAFType;
-    } else if (CFEqual(fileType, audio_file_type::mpeg4)) {
+    } else if (CFEqual(fileType, file_type::mpeg4)) {
         return kAudioFileMPEG4Type;
-    } else if (CFEqual(fileType, audio_file_type::apple_m4a)) {
+    } else if (CFEqual(fileType, file_type::apple_m4a)) {
         return kAudioFileM4AType;
-    } else if (CFEqual(fileType, audio_file_type::wave)) {
+    } else if (CFEqual(fileType, file_type::wave)) {
         return kAudioFileWAVEType;
     }
     return 0;
 }
 
-CFStringRef yas::to_audio_file_type(const AudioFileTypeID fileTypeID)
+CFStringRef yas::audio::to_file_type(const AudioFileTypeID fileTypeID)
 {
     switch (fileTypeID) {
         case kAudioFile3GPType:
-            return audio_file_type::three_gpp;
+            return file_type::three_gpp;
         case kAudioFile3GP2Type:
-            return audio_file_type::three_gpp2;
+            return file_type::three_gpp2;
         case kAudioFileAIFCType:
-            return audio_file_type::aifc;
+            return file_type::aifc;
         case kAudioFileAIFFType:
-            return audio_file_type::aiff;
+            return file_type::aiff;
         case kAudioFileAMRType:
-            return audio_file_type::amr;
+            return file_type::amr;
         case kAudioFileAC3Type:
-            return audio_file_type::ac3;
+            return file_type::ac3;
         case kAudioFileMP3Type:
-            return audio_file_type::mpeg_layer3;
+            return file_type::mpeg_layer3;
         case kAudioFileCAFType:
-            return audio_file_type::core_audio_format;
+            return file_type::core_audio_format;
         case kAudioFileMPEG4Type:
-            return audio_file_type::mpeg4;
+            return file_type::mpeg4;
         case kAudioFileM4AType:
-            return audio_file_type::apple_m4a;
+            return file_type::apple_m4a;
         case kAudioFileWAVEType:
-            return audio_file_type::wave;
+            return file_type::wave;
         default:
             break;
     }
@@ -193,24 +194,26 @@ AudioFileTypeID ext_audio_file_utils::get_audio_file_type_id(const ExtAudioFileR
 
 CFStringRef get_audio_file_type(const ExtAudioFileRef ext_audio_file)
 {
-    return yas::to_audio_file_type(ext_audio_file_utils::get_audio_file_type_id(ext_audio_file));
+    return to_file_type(ext_audio_file_utils::get_audio_file_type_id(ext_audio_file));
 }
 
 #pragma mark -
 
-CFDictionaryRef yas::wave_file_settings(const Float64 sample_rate, const UInt32 channel_count, const UInt32 bit_depth)
+CFDictionaryRef yas::audio::wave_file_settings(const Float64 sample_rate, const UInt32 channel_count,
+                                               const UInt32 bit_depth)
 {
     return linear_pcm_file_settings(sample_rate, channel_count, bit_depth, false, bit_depth >= 32, false);
 }
 
-CFDictionaryRef yas::aiff_file_settings(const Float64 sample_rate, const UInt32 channel_count, const UInt32 bit_depth)
+CFDictionaryRef yas::audio::aiff_file_settings(const Float64 sample_rate, const UInt32 channel_count,
+                                               const UInt32 bit_depth)
 {
     return linear_pcm_file_settings(sample_rate, channel_count, bit_depth, true, bit_depth >= 32, false);
 }
 
-CFDictionaryRef yas::linear_pcm_file_settings(const Float64 sample_rate, const UInt32 channel_count,
-                                              const UInt32 bit_depth, const bool is_big_endian, const bool is_float,
-                                              const bool is_non_interleaved)
+CFDictionaryRef yas::audio::linear_pcm_file_settings(const Float64 sample_rate, const UInt32 channel_count,
+                                                     const UInt32 bit_depth, const bool is_big_endian,
+                                                     const bool is_float, const bool is_non_interleaved)
 {
     return (__bridge CFDictionaryRef) @{
         AVFormatIDKey: @(kAudioFormatLinearPCM),
@@ -224,9 +227,9 @@ CFDictionaryRef yas::linear_pcm_file_settings(const Float64 sample_rate, const U
     };
 }
 
-CFDictionaryRef yas::aac_settings(const Float64 sample_rate, const UInt32 channel_count, const UInt32 bit_depth,
-                                  const AVAudioQuality encoder_quality, const UInt32 bit_rate,
-                                  const UInt32 bit_depth_hint, const AVAudioQuality converter_quality)
+CFDictionaryRef yas::audio::aac_settings(const Float64 sample_rate, const UInt32 channel_count, const UInt32 bit_depth,
+                                         const AVAudioQuality encoder_quality, const UInt32 bit_rate,
+                                         const UInt32 bit_depth_hint, const AVAudioQuality converter_quality)
 {
     return (__bridge CFDictionaryRef) @{
         AVFormatIDKey: @(kAudioFormatMPEG4AAC),
