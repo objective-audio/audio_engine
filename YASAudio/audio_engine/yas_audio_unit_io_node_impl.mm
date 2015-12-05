@@ -241,8 +241,8 @@ void audio::unit_input_node::impl::update_connections()
 
                         auto destination_node = connection.destination_node();
 
-                        if (auto input_tap_node = destination_node.cast<audio_input_tap_node>()) {
-                            input_tap_node.render(input_buffer, 0, time);
+                        if (auto tap_node = destination_node.cast<input_tap_node>()) {
+                            tap_node.render(input_buffer, 0, time);
                         }
                     }
                 }

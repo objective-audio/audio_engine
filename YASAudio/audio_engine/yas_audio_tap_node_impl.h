@@ -5,7 +5,7 @@
 
 #pragma once
 
-class yas::audio_tap_node::impl : public super_class::impl
+class yas::audio::tap_node::impl : public super_class::impl
 {
     using super_class = super_class::impl;
 
@@ -36,7 +36,7 @@ class yas::audio_tap_node::impl : public super_class::impl
     std::unique_ptr<core> _core;
 };
 
-class yas::audio_input_tap_node::impl : public super_class::impl
+class yas::audio::input_tap_node::impl : public super_class::impl
 {
     virtual UInt32 input_bus_count() const override;
     virtual UInt32 output_bus_count() const override;

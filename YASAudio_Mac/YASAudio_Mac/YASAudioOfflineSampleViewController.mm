@@ -13,10 +13,10 @@ namespace yas
     {
         static Float64 sample_rate = 44100.0;
 
-        class sine_node : public audio_tap_node
+        class sine_node : public audio::tap_node
         {
            public:
-            using super_class = audio_tap_node;
+            using super_class = audio::tap_node;
 
             class impl : public super_class::impl
             {
@@ -135,11 +135,11 @@ namespace yas
     {
         struct offline_vc_internal {
             yas::audio::engine play_engine;
-            yas::audio_unit_mixer_node play_mixer_node;
+            yas::audio::unit_mixer_node play_mixer_node;
             yas::offline_sample::sine_node play_sine_node;
 
             yas::audio::engine offline_engine;
-            yas::audio_unit_mixer_node offline_mixer_node;
+            yas::audio::unit_mixer_node offline_mixer_node;
             yas::offline_sample::sine_node offline_sine_node;
 
             yas::base engine_observer = nullptr;
@@ -150,7 +150,7 @@ namespace yas
             {
                 auto format = yas::audio::format(yas::offline_sample::sample_rate, 2, yas::pcm_format::float32, false);
 
-                yas::audio_unit_output_node play_output_node;
+                yas::audio::unit_output_node play_output_node;
 
                 play_mixer_node.reset();
                 play_mixer_node.set_input_pan(0.0f, 0);
@@ -173,7 +173,7 @@ namespace yas
                 offline_engine.connect(offline_sine_node, offline_mixer_node, format);
 
                 engine_observer = play_engine.subject().make_observer(
-                    yas::audio::engine_method::configuration_change,
+                    yas::audio_engine_method::configuration_change,
                     [weak_play_output_node = to_weak(play_output_node)](const auto &, const auto &) {
                         if (auto play_output_node = weak_play_output_node.lock()) {
                             play_output_node.set_device(yas::audio::device::default_output_device());

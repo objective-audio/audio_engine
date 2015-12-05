@@ -34,10 +34,10 @@ namespace yas
     {
         struct route_vc_internal {
             yas::audio::engine engine;
-            yas::audio_unit_io_node io_node;
-            yas::audio_unit_mixer_node mixer_node;
+            yas::audio::unit_io_node io_node;
+            yas::audio::unit_mixer_node mixer_node;
             yas::audio_route_node route_node;
-            yas::audio_tap_node sine_node;
+            yas::audio::tap_node sine_node;
 
             yas::base engine_observer = nullptr;
             yas::objc::container<yas::objc::weak> self_container;
@@ -277,7 +277,7 @@ namespace yas
     }
 
     _internal.engine_observer = _internal.engine.subject().make_observer(
-        yas::audio::engine_method::configuration_change,
+        yas::audio_engine_method::configuration_change,
         [weak_container = _internal.self_container](const auto &method, const auto &sender) {
             if (auto strong_self = weak_container.lock()) {
                 if ([UIApplication sharedApplication].applicationState == UIApplicationStateActive) {

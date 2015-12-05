@@ -29,10 +29,10 @@ namespace yas
     {
         struct effects_vc_internal {
             yas::audio::engine engine;
-            yas::audio_unit_output_node output_node;
+            yas::audio::unit_output_node output_node;
             yas::audio::connection through_connection = nullptr;
-            yas::audio_tap_node tap_node;
-            yas::audio_unit_node effect_node = nullptr;
+            yas::audio::tap_node tap_node;
+            yas::audio::unit_node effect_node = nullptr;
 
             void replace_effect_node(const AudioComponentDescription *acd)
             {
@@ -49,7 +49,7 @@ namespace yas
                 auto format = yas::audio::format([AVAudioSession sharedInstance].sampleRate, 2);
 
                 if (acd) {
-                    effect_node = yas::audio_unit_node(*acd);
+                    effect_node = yas::audio::unit_node(*acd);
                     engine.connect(effect_node, output_node, format);
                     engine.connect(tap_node, effect_node, format);
                 } else {

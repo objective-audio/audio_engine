@@ -9,11 +9,14 @@
 
 namespace yas
 {
-    class audio_unit_node;
+    namespace audio
+    {
+        class unit_node;
+    }
 }
 
 @interface YASAudioEngineSampleParameterCell : UITableViewCell
 
-- (void)set_node:(const std::experimental::optional<yas::audio_unit_node> &)node_opt index:(const UInt32)index;
+- (void)set_node:(const std::experimental::optional<yas::audio::unit_node> &)node_opt index:(const UInt32)index;
 
 @end

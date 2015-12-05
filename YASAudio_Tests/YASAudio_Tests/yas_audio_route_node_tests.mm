@@ -81,7 +81,7 @@
     auto format = yas::audio::format(44100.0, 2);
     yas::audio_offline_output_node output_node;
     yas::audio_route_node route_node;
-    yas::audio_tap_node tap_node;
+    yas::audio::tap_node tap_node;
 
     engine.connect(route_node, output_node, format);
     engine.connect(tap_node, route_node, format);
@@ -164,9 +164,9 @@
         tap_node_called = false;
     }
 
-    std::vector<yas::audio_tap_node> tap_nodes;
+    std::vector<yas::audio::tap_node> tap_nodes;
     for (UInt32 i = 0; i < src_count; ++i) {
-        tap_nodes.push_back(yas::audio_tap_node());
+        tap_nodes.push_back(yas::audio::tap_node{});
         auto &tap_node = tap_nodes.at(i);
 
         engine.connect(tap_node, route_node, 0, i, src_format);
@@ -231,9 +231,9 @@
         tap_node_called = false;
     }
 
-    std::vector<yas::audio_tap_node> tap_nodes;
+    std::vector<yas::audio::tap_node> tap_nodes;
     for (UInt32 i = 0; i < src_count; ++i) {
-        tap_nodes.push_back(yas::audio_tap_node());
+        tap_nodes.push_back(yas::audio::tap_node{});
         auto &tap_node = tap_nodes.at(i);
 
         engine.connect(tap_node, route_node, 0, i, src_format);

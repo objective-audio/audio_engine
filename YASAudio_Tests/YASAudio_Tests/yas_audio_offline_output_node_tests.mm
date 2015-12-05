@@ -30,7 +30,7 @@
     yas::audio::engine engine;
     yas::audio_offline_output_node output_node;
     yas::audio::unit_node sample_delay_node(kAudioUnitType_Effect, kAudioUnitSubType_SampleDelay);
-    yas::audio_tap_node tap_node;
+    yas::audio::tap_node tap_node;
 
     engine.connect(sample_delay_node, output_node, format);
     engine.connect(tap_node, sample_delay_node, format);
@@ -117,7 +117,7 @@
     const Float64 sample_rate = 48000.0;
     auto format = yas::audio::format(sample_rate, 2);
     yas::audio_offline_output_node output_node;
-    yas::audio_tap_node tap_node;
+    yas::audio::tap_node tap_node;
 
     auto connection = yas::audio::connection::private_access::create(tap_node, 0, output_node, 0, format);
 
@@ -224,7 +224,7 @@
 {
     auto format = yas::audio::format(48000.0, 2);
     yas::audio_offline_output_node output_node;
-    yas::audio_tap_node tap_node;
+    yas::audio::tap_node tap_node;
 
     auto connection = yas::audio::connection::private_access::create(tap_node, 0, output_node, 0, format);
 

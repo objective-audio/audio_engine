@@ -98,13 +98,13 @@ void audio::device_io_node::impl::update_connections()
                     if (connections.count(0) > 0) {
                         const auto &connection = connections.at(0);
                         if (auto destination_node = connection.destination_node()) {
-                            if (auto input_tap_node = destination_node.cast<audio_input_tap_node>()) {
+                            if (auto tap_node = destination_node.cast<input_tap_node>()) {
                                 auto input_buffer = device_io.input_buffer_on_render();
                                 const audio::time &input_time = device_io.input_time_on_render();
                                 if (input_buffer && input_time) {
                                     if (connection.format() ==
                                         destination_node.input_format(connection.destination_bus())) {
-                                        input_tap_node.render(input_buffer, 0, input_time);
+                                        tap_node.render(input_buffer, 0, input_time);
                                     }
                                 }
                             }

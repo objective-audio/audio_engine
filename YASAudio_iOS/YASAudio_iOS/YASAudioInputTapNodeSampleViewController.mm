@@ -25,8 +25,8 @@ namespace yas
             };
 
             yas::audio::engine engine;
-            yas::audio_unit_input_node input_node;
-            yas::audio_input_tap_node input_tap_node;
+            yas::audio::unit_input_node input_node;
+            yas::audio::input_tap_node input_tap_node;
 
             yas::property<Float32, property_key> input_level;
 
