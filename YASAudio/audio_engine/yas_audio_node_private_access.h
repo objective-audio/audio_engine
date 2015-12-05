@@ -19,32 +19,32 @@ namespace yas
             return audio_node(std::make_shared<audio_node::impl>());
         }
 
-        static audio_connection input_connection(const audio_node &node, const UInt32 bus_idx)
+        static audio::connection input_connection(const audio_node &node, const UInt32 bus_idx)
         {
             return node._input_connection(bus_idx);
         }
 
-        static audio_connection output_connection(const audio_node &node, const UInt32 bus_idx)
+        static audio::connection output_connection(const audio_node &node, const UInt32 bus_idx)
         {
             return node._output_connection(bus_idx);
         }
 
-        static const audio_connection_wmap &input_connections(const audio_node &node)
+        static const audio::connection_wmap &input_connections(const audio_node &node)
         {
             return node._input_connections();
         }
 
-        static const audio_connection_wmap &output_connections(const audio_node &node)
+        static const audio::connection_wmap &output_connections(const audio_node &node)
         {
             return node._output_connections();
         }
 
-        static void add_connection(audio_node &node, const audio_connection &connection)
+        static void add_connection(audio_node &node, const audio::connection &connection)
         {
             node._add_connection(connection);
         }
 
-        static void remove_connection(audio_node &node, const audio_connection &connection)
+        static void remove_connection(audio_node &node, const audio::connection &connection)
         {
             node.impl_ptr<impl>()->remove_connection(connection);
         }

@@ -11,19 +11,22 @@
 
 namespace yas
 {
-    class audio_connection;
-
-    using audio_connection_set = std::unordered_set<audio_connection>;
-    using audio_connection_smap = std::map<UInt32, audio_connection>;
-    using audio_connection_wmap = std::map<UInt32, weak<audio_connection>>;
-
-    class audio_connection_from_engine
+    namespace audio
     {
-       public:
-        virtual ~audio_connection_from_engine() = default;
+        class connection;
 
-        virtual void _remove_nodes() = 0;
-        virtual void _remove_source_node() = 0;
-        virtual void _remove_destination_node() = 0;
-    };
+        using connection_set = std::unordered_set<connection>;
+        using connection_smap = std::map<UInt32, connection>;
+        using connection_wmap = std::map<UInt32, weak<connection>>;
+
+        class connection_from_engine
+        {
+           public:
+            virtual ~connection_from_engine() = default;
+
+            virtual void _remove_nodes() = 0;
+            virtual void _remove_source_node() = 0;
+            virtual void _remove_destination_node() = 0;
+        };
+    }
 }

@@ -70,12 +70,12 @@ namespace yas
 
         // from engine
 
-        audio_connection _input_connection(const UInt32 bus_idx) const override;
-        audio_connection _output_connection(const UInt32 bus_idx) const override;
-        const audio_connection_wmap &_input_connections() const override;
-        const audio_connection_wmap &_output_connections() const override;
-        void _add_connection(const audio_connection &connection) override;
-        void _remove_connection(const audio_connection &connection) override;
+        audio::connection _input_connection(const UInt32 bus_idx) const override;
+        audio::connection _output_connection(const UInt32 bus_idx) const override;
+        const audio::connection_wmap &_input_connections() const override;
+        const audio::connection_wmap &_output_connections() const override;
+        void _add_connection(const audio::connection &connection) override;
+        void _remove_connection(const audio::connection &connection) override;
         void _set_engine(const audio_engine &engine) override;
         audio_engine _engine() const override;
         void _update_kernel() override;
@@ -92,8 +92,8 @@ namespace yas
     {
        public:
         virtual ~kernel_from_node() = default;
-        virtual void _set_input_connections(const audio_connection_wmap &) = 0;
-        virtual void _set_output_connections(const audio_connection_wmap &) = 0;
+        virtual void _set_input_connections(const audio::connection_wmap &) = 0;
+        virtual void _set_output_connections(const audio::connection_wmap &) = 0;
     };
 }
 

@@ -92,32 +92,32 @@ void audio_node::set_render_time_on_render(const audio::time &time)
 
 #pragma mark - private
 
-audio_connection audio_node::_input_connection(const UInt32 bus_idx) const
+audio::connection audio_node::_input_connection(const UInt32 bus_idx) const
 {
     return impl_ptr<impl>()->input_connection(bus_idx);
 }
 
-audio_connection audio_node::_output_connection(const UInt32 bus_idx) const
+audio::connection audio_node::_output_connection(const UInt32 bus_idx) const
 {
     return impl_ptr<impl>()->output_connection(bus_idx);
 }
 
-const audio_connection_wmap &audio_node::_input_connections() const
+const audio::connection_wmap &audio_node::_input_connections() const
 {
     return impl_ptr<impl>()->input_connections();
 }
 
-const audio_connection_wmap &audio_node::_output_connections() const
+const audio::connection_wmap &audio_node::_output_connections() const
 {
     return impl_ptr<impl>()->output_connections();
 }
 
-void audio_node::_add_connection(const audio_connection &connection)
+void audio_node::_add_connection(const audio::connection &connection)
 {
     impl_ptr<impl>()->add_connection(connection);
 }
 
-void audio_node::_remove_connection(const audio_connection &connection)
+void audio_node::_remove_connection(const audio::connection &connection)
 {
     impl_ptr<impl>()->remove_connection(connection);
 }

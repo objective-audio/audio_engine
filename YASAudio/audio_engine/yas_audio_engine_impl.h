@@ -35,29 +35,29 @@ class yas::audio_engine::impl : public yas::base::impl
 
     bool prepare();
 
-    audio_connection connect(audio_node &source_node, audio_node &destination_node, const UInt32 source_bus_idx,
+    audio::connection connect(audio_node &source_node, audio_node &destination_node, const UInt32 source_bus_idx,
                              const UInt32 destination_bus_idx, const audio::format &format);
-    void disconnect(audio_connection &connection);
+    void disconnect(audio::connection &connection);
     void disconnect(audio_node &node);
-    void disconnect_node_with_predicate(std::function<bool(const audio_connection &)> predicate);
+    void disconnect_node_with_predicate(std::function<bool(const audio::connection &)> predicate);
 
     void add_node_to_graph(const audio_node &node);
     void remove_node_from_graph(const audio_node &node);
 
-    bool add_connection(const audio_connection &connection);
-    void remove_connection_from_nodes(const audio_connection &connection);
+    bool add_connection(const audio::connection &connection);
+    void remove_connection_from_nodes(const audio::connection &connection);
     void update_node_connections(audio_node &node);
     void update_all_node_connections();
 
-    audio_connection_set input_connections_for_destination_node(const audio_node &node) const;
-    audio_connection_set output_connections_for_source_node(const audio_node &node) const;
+    audio::connection_set input_connections_for_destination_node(const audio_node &node) const;
+    audio::connection_set output_connections_for_source_node(const audio_node &node) const;
 
     void set_graph(const yas::audio::graph &graph);
     yas::audio::graph graph() const;
     void reload_graph();
 
     std::unordered_set<audio_node> &nodes() const;
-    audio_connection_set &connections() const;
+    audio::connection_set &connections() const;
     audio_offline_output_node &offline_output_node() const;
 
     audio_engine::start_result_t start_render();

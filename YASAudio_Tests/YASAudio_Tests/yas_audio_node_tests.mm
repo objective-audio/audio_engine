@@ -50,8 +50,8 @@
     auto destination_bus = *destination_bus_result;
     XCTAssertEqual(destination_bus, 0);
 
-    if (auto connection = yas::audio_connection::private_access::create(source_node, source_bus, destination_node,
-                                                                        destination_bus, format)) {
+    if (auto connection = yas::audio::connection::private_access::create(source_node, source_bus, destination_node,
+                                                                         destination_bus, format)) {
         XCTAssertEqual(yas::audio_node::private_access::output_connections(source_node).size(), 1);
         XCTAssertEqual(yas::audio_node::private_access::input_connections(destination_node).size(), 1);
         XCTAssertEqual(yas::audio_node::private_access::output_connection(source_node, source_bus), connection);
@@ -83,8 +83,8 @@
     auto source_bus = *source_node.next_available_output_bus();
     auto destination_bus = *destination_node.next_available_input_bus();
 
-    auto connection = yas::audio_connection::private_access::create(source_node, source_bus, destination_node,
-                                                                    destination_bus, format);
+    auto connection = yas::audio::connection::private_access::create(source_node, source_bus, destination_node,
+                                                                     destination_bus, format);
 
     XCTAssertEqual(yas::audio_node::private_access::output_connections(source_node).size(), 1);
     XCTAssertEqual(yas::audio_node::private_access::input_connections(destination_node).size(), 1);
@@ -144,15 +144,15 @@
     yas::test::audio_test_node relay_node;
 
     auto output_connection =
-        yas::audio_connection::private_access::create(relay_node, 0, output_node, 0, output_format);
+        yas::audio::connection::private_access::create(relay_node, 0, output_node, 0, output_format);
 
-    std::vector<yas::audio_connection> input_connections;
+    std::vector<yas::audio::connection> input_connections;
     input_connections.reserve(relay_node.input_bus_count());
 
     for (UInt32 i = 0; i < relay_node.input_bus_count(); ++i) {
         yas::test::audio_test_node input_node;
         auto input_connection =
-            yas::audio_connection::private_access::create(input_node, 0, relay_node, i, input_format);
+            yas::audio::connection::private_access::create(input_node, 0, relay_node, i, input_format);
         yas::audio_node::private_access::add_connection(input_node, input_connection);
         input_connections.push_back(input_connection);
     }
@@ -193,13 +193,13 @@
     XCTAssertTrue(destination_node.is_available_input_bus(1));
     XCTAssertFalse(destination_node.is_available_input_bus(2));
 
-    auto connection_1 = yas::audio_connection::private_access::create(source_node_1, 0, destination_node, 1, format);
+    auto connection_1 = yas::audio::connection::private_access::create(source_node_1, 0, destination_node, 1, format);
 
     XCTAssertFalse(source_node_1.is_available_output_bus(0));
     XCTAssertTrue(destination_node.is_available_input_bus(0));
     XCTAssertFalse(destination_node.is_available_input_bus(1));
 
-    auto connection_0 = yas::audio_connection::private_access::create(source_node_0, 0, destination_node, 0, format);
+    auto connection_0 = yas::audio::connection::private_access::create(source_node_0, 0, destination_node, 0, format);
 
     XCTAssertFalse(source_node_0.is_available_output_bus(0));
     XCTAssertFalse(destination_node.is_available_input_bus(0));

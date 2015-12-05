@@ -119,7 +119,7 @@
     yas::audio_offline_output_node output_node;
     yas::audio_tap_node tap_node;
 
-    auto connection = yas::audio_connection::private_access::create(tap_node, 0, output_node, 0, format);
+    auto connection = yas::audio::connection::private_access::create(tap_node, 0, output_node, 0, format);
 
     yas::audio_node::private_access::add_connection(output_node, connection);
     yas::audio_node::private_access::update_kernel(output_node);
@@ -226,7 +226,7 @@
     yas::audio_offline_output_node output_node;
     yas::audio_tap_node tap_node;
 
-    auto connection = yas::audio_connection::private_access::create(tap_node, 0, output_node, 0, format);
+    auto connection = yas::audio::connection::private_access::create(tap_node, 0, output_node, 0, format);
 
     yas::audio_node::private_access::add_connection(output_node, connection);
     yas::audio_node::private_access::update_kernel(output_node);

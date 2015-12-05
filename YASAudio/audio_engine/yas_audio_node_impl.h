@@ -28,13 +28,13 @@ class yas::audio_node::impl : public base::impl
     virtual UInt32 input_bus_count() const;
     virtual UInt32 output_bus_count() const;
 
-    audio_connection input_connection(const UInt32 bus_idx) const;
-    audio_connection output_connection(const UInt32 bus_idx) const;
-    audio_connection_wmap &input_connections() const;
-    audio_connection_wmap &output_connections() const;
+    audio::connection input_connection(const UInt32 bus_idx) const;
+    audio::connection output_connection(const UInt32 bus_idx) const;
+    audio::connection_wmap &input_connections() const;
+    audio::connection_wmap &output_connections() const;
 
-    void add_connection(const audio_connection &connection);
-    void remove_connection(const audio_connection &connection);
+    void add_connection(const audio::connection &connection);
+    void remove_connection(const audio::connection &connection);
 
     virtual void update_connections();
     virtual std::shared_ptr<kernel> make_kernel();

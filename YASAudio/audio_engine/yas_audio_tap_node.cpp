@@ -26,22 +26,22 @@ void audio_tap_node::set_render_function(const render_f &func)
     impl_ptr<impl>()->set_render_function(func);
 }
 
-audio_connection audio_tap_node::input_connection_on_render(const UInt32 bus_idx) const
+audio::connection audio_tap_node::input_connection_on_render(const UInt32 bus_idx) const
 {
     return impl_ptr<impl>()->input_connection_on_render(bus_idx);
 }
 
-audio_connection audio_tap_node::output_connection_on_render(const UInt32 bus_idx) const
+audio::connection audio_tap_node::output_connection_on_render(const UInt32 bus_idx) const
 {
     return impl_ptr<impl>()->output_connection_on_render(bus_idx);
 }
 
-audio_connection_smap audio_tap_node::input_connections_on_render() const
+audio::connection_smap audio_tap_node::input_connections_on_render() const
 {
     return impl_ptr<impl>()->input_connections_on_render();
 }
 
-audio_connection_smap audio_tap_node::output_connections_on_render() const
+audio::connection_smap audio_tap_node::output_connections_on_render() const
 {
     return impl_ptr<impl>()->output_connections_on_render();
 }

@@ -32,7 +32,7 @@
     XCTAssertEqual(yas::audio_engine::private_access::nodes(engine).size(), 0);
     XCTAssertEqual(yas::audio_engine::private_access::connections(engine).size(), 0);
 
-    yas::audio_connection connection = nullptr;
+    yas::audio::connection connection = nullptr;
     XCTAssertNoThrow(connection = engine.connect(source_node, destination_node, format));
     XCTAssertTrue(connection);
 
@@ -52,7 +52,7 @@
     yas::test::audio_test_node source_node(0, 0);
     yas::test::audio_test_node destination_node(0, 0);
 
-    yas::audio_connection connection = nullptr;
+    yas::audio::connection connection = nullptr;
     XCTAssertThrows(connection = engine.connect(source_node, destination_node, format));
     XCTAssertFalse(connection);
     XCTAssertEqual(yas::audio_engine::private_access::connections(engine).size(), 0);

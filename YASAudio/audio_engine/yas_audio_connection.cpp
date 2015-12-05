@@ -9,7 +9,7 @@
 
 using namespace yas;
 
-class audio_connection::impl : public base::impl
+class audio::connection::impl : public base::impl
 {
    public:
     UInt32 source_bus;
@@ -28,7 +28,7 @@ class audio_connection::impl : public base::impl
     {
     }
 
-    void remove_connection_from_nodes(const audio_connection &connection)
+    void remove_connection_from_nodes(const audio::connection &connection)
     {
         if (auto node = _destination_node.lock()) {
             static_cast<audio_node_from_connection &>(node)._remove_connection(connection);
@@ -74,11 +74,11 @@ class audio_connection::impl : public base::impl
     weak<audio_node> _destination_node;
 };
 
-audio_connection::audio_connection(std::nullptr_t) : super_class(nullptr)
+audio::connection::connection(std::nullptr_t) : super_class(nullptr)
 {
 }
 
-audio_connection::~audio_connection()
+audio::connection::~connection()
 {
     if (impl_ptr() && impl_ptr().unique()) {
         if (auto imp = impl_ptr<impl>()) {
@@ -88,8 +88,8 @@ audio_connection::~audio_connection()
     }
 }
 
-audio_connection::audio_connection(audio_node &source_node, const UInt32 source_bus, audio_node &destination_node,
-                                   const UInt32 destination_bus, const audio::format &format)
+audio::connection::connection(audio_node &source_node, const UInt32 source_bus, audio_node &destination_node,
+                              const UInt32 destination_bus, const audio::format &format)
     : super_class(std::make_shared<impl>(source_node, source_bus, destination_node, destination_bus, format))
 {
     if (!source_node || !destination_node) {
@@ -100,17 +100,17 @@ audio_connection::audio_connection(audio_node &source_node, const UInt32 source_
     static_cast<audio_node_from_connection &>(destination_node)._add_connection(*this);
 }
 
-UInt32 audio_connection::source_bus() const
+UInt32 audio::connection::source_bus() const
 {
     return impl_ptr<impl>()->source_bus;
 }
 
-UInt32 audio_connection::destination_bus() const
+UInt32 audio::connection::destination_bus() const
 {
     return impl_ptr<impl>()->destination_bus;
 }
 
-audio_node audio_connection::source_node() const
+audio_node audio::connection::source_node() const
 {
     if (impl_ptr()) {
         return impl_ptr<impl>()->source_node();
@@ -118,7 +118,7 @@ audio_node audio_connection::source_node() const
     return audio_node(nullptr);
 }
 
-audio_node audio_connection::destination_node() const
+audio_node audio::connection::destination_node() const
 {
     if (impl_ptr()) {
         return impl_ptr<impl>()->destination_node();
@@ -126,22 +126,22 @@ audio_node audio_connection::destination_node() const
     return audio_node(nullptr);
 }
 
-const audio::format &audio_connection::format() const
+const audio::format &audio::connection::format() const
 {
     return impl_ptr<impl>()->format;
 }
 
-void audio_connection::_remove_nodes()
+void audio::connection::_remove_nodes()
 {
     impl_ptr<impl>()->remove_nodes();
 }
 
-void audio_connection::_remove_source_node()
+void audio::connection::_remove_source_node()
 {
     impl_ptr<impl>()->remove_source_node();
 }
 
-void audio_connection::_remove_destination_node()
+void audio::connection::_remove_destination_node()
 {
     impl_ptr<impl>()->remove_destination_node();
 }

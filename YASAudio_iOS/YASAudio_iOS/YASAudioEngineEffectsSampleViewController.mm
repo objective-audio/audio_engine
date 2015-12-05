@@ -30,7 +30,7 @@ namespace yas
         struct effects_vc_internal {
             yas::audio_engine engine;
             yas::audio_unit_output_node output_node;
-            yas::audio_connection through_connection = nullptr;
+            yas::audio::connection through_connection = nullptr;
             yas::audio_tap_node tap_node;
             yas::audio_unit_node effect_node = nullptr;
 

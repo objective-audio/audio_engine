@@ -26,10 +26,10 @@ namespace yas
 
         void set_render_function(const render_f &);
 
-        audio_connection input_connection_on_render(const UInt32 bus_idx) const;
-        audio_connection output_connection_on_render(const UInt32 bus_idx) const;
-        audio_connection_smap input_connections_on_render() const;
-        audio_connection_smap output_connections_on_render() const;
+        audio::connection input_connection_on_render(const UInt32 bus_idx) const;
+        audio::connection output_connection_on_render(const UInt32 bus_idx) const;
+        audio::connection_smap input_connections_on_render() const;
+        audio::connection_smap output_connections_on_render() const;
         void render_source(audio::pcm_buffer &buffer, const UInt32 bus_idx, const audio::time &when);
 
        protected:
