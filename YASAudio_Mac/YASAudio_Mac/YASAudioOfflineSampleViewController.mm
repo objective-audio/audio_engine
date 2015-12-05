@@ -279,7 +279,7 @@ namespace yas
 
 - (void)startOfflineFileWritingWithURL:(NSURL *)url
 {
-    auto wave_settings = yas::wave_file_settings(yas::offline_sample::sample_rate, 2, 16);
+    auto wave_settings = yas::audio::wave_file_settings(yas::offline_sample::sample_rate, 2, 16);
     yas::audio::file file_writer;
     auto create_result = file_writer.create((__bridge CFURLRef)url, yas::audio::file_type::wave, wave_settings);
 
