@@ -9,19 +9,22 @@
 
 namespace yas
 {
-    class audio_unit_node::private_access
+    namespace audio
     {
-       public:
-        static void reload_audio_unit(audio_unit_node &node)
+        class unit_node::private_access
         {
-            node.impl_ptr<impl>()->reload_audio_unit();
-        }
+           public:
+            static void reload_audio_unit(unit_node &node)
+            {
+                node.impl_ptr<impl>()->reload_audio_unit();
+            }
 
-        static void prepare_parameters(audio_unit_node &node)
-        {
-            node.impl_ptr<impl>()->prepare_parameters();
-        }
-    };
+            static void prepare_parameters(unit_node &node)
+            {
+                node.impl_ptr<impl>()->prepare_parameters();
+            }
+        };
+    }
 }
 
 #endif

@@ -310,7 +310,7 @@ void audio::engine::impl::add_node_to_graph(const audio_node &node)
         return;
     }
 
-    if (auto unit_node = node.cast<audio_unit_node>()) {
+    if (auto unit_node = node.cast<audio::unit_node>()) {
         auto &node = static_cast<audio_unit_node_from_engine &>(unit_node);
         node._prepare_audio_unit();
         if (auto unit = unit_node.audio_unit()) {
@@ -342,7 +342,7 @@ void audio::engine::impl::remove_node_from_graph(const audio_node &node)
         return;
     }
 
-    if (auto unit_node = node.cast<audio_unit_node>()) {
+    if (auto unit_node = node.cast<audio::unit_node>()) {
         if (auto unit = unit_node.audio_unit()) {
             _core->graph.remove_audio_unit(unit);
         }

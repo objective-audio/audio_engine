@@ -5,9 +5,9 @@
 
 #pragma once
 
-class yas::audio_unit_io_node::impl : public super_class::impl
+class yas::audio::unit_io_node::impl : public super_class::impl
 {
-    using super_class = audio_unit_node::impl;
+    using super_class = unit_node::impl;
 
    public:
     impl();
@@ -37,16 +37,16 @@ class yas::audio_unit_io_node::impl : public super_class::impl
     std::unique_ptr<core> _core;
 };
 
-class yas::audio_unit_output_node::impl : public super_class::impl
+class yas::audio::unit_output_node::impl : public super_class::impl
 {
     virtual UInt32 input_bus_count() const override;
     virtual UInt32 output_bus_count() const override;
     virtual void prepare_audio_unit() override;
 };
 
-class yas::audio_unit_input_node::impl : public super_class::impl
+class yas::audio::unit_input_node::impl : public super_class::impl
 {
-    using super_class = audio_unit_io_node::impl;
+    using super_class = unit_io_node::impl;
 
    public:
     impl();

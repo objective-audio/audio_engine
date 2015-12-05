@@ -8,7 +8,7 @@
 
 #pragma once
 
-class yas::audio_unit_node::impl : public audio_node::impl
+class yas::audio::unit_node::impl : public audio_node::impl
 {
     using super_class = audio_node::impl;
 
@@ -16,7 +16,7 @@ class yas::audio_unit_node::impl : public audio_node::impl
     impl();
     virtual ~impl();
 
-    void prepare(const audio_unit_node &node, const AudioComponentDescription &acd);
+    void prepare(const unit_node &node, const AudioComponentDescription &acd);
     virtual void reset() override;
 
     yas::audio::unit au() const;

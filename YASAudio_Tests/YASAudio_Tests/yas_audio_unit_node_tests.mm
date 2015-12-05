@@ -27,7 +27,7 @@
 
     auto format = yas::audio::format(44100.0, 2);
     yas::audio_offline_output_node output_node;
-    yas::audio_unit_node delay_node(kAudioUnitType_Effect, kAudioUnitSubType_Delay);
+    yas::audio::unit_node delay_node(kAudioUnitType_Effect, kAudioUnitSubType_Delay);
 
     const auto &parameters = delay_node.parameters();
     XCTAssertGreaterThanOrEqual(parameters.count(kAudioUnitScope_Global), 1);
@@ -71,7 +71,7 @@
 
     engine.disconnect(connection);
 
-    yas::audio_unit_node::private_access::reload_audio_unit(delay_node);
+    yas::audio::unit_node::private_access::reload_audio_unit(delay_node);
 
     engine.connect(delay_node, output_node, format);
 
@@ -94,7 +94,7 @@
 
 - (void)test_get_parameters
 {
-    yas::audio_unit_node delay_node(kAudioUnitType_Effect, kAudioUnitSubType_Delay);
+    yas::audio::unit_node delay_node(kAudioUnitType_Effect, kAudioUnitSubType_Delay);
 
     const auto &global_parameters = delay_node.global_parameters();
     const auto &output_parameters = delay_node.output_parameters();
@@ -119,7 +119,7 @@
 
 - (void)test_reset_parameters
 {
-    yas::audio_unit_node delay_node(kAudioUnitType_Effect, kAudioUnitSubType_Delay);
+    yas::audio::unit_node delay_node(kAudioUnitType_Effect, kAudioUnitSubType_Delay);
 
     const float delay_time_value = 0.5f;
     const float feedback_value = -50.0f;

@@ -29,54 +29,54 @@ using namespace yas;
 
 #pragma mark - main
 
-audio_unit_io_node::audio_unit_io_node(std::nullptr_t) : super_class(nullptr)
+audio::unit_io_node::unit_io_node(std::nullptr_t) : super_class(nullptr)
 {
 }
 
-audio_unit_io_node::audio_unit_io_node() : audio_unit_io_node(std::make_shared<impl>(), audio_unit_io_node_acd)
+audio::unit_io_node::unit_io_node() : unit_io_node(std::make_shared<impl>(), audio_unit_io_node_acd)
 {
 }
 
-audio_unit_io_node::audio_unit_io_node(const std::shared_ptr<impl> &impl, const AudioComponentDescription &acd)
+audio::unit_io_node::unit_io_node(const std::shared_ptr<impl> &impl, const AudioComponentDescription &acd)
     : super_class(impl, acd)
 {
 }
 
-audio_unit_io_node::~audio_unit_io_node() = default;
+audio::unit_io_node::~unit_io_node() = default;
 
-void audio_unit_io_node::set_channel_map(const channel_map_t &map, const yas::direction dir)
+void audio::unit_io_node::set_channel_map(const channel_map_t &map, const yas::direction dir)
 {
     impl_ptr<impl>()->set_channel_map(map, dir);
 }
 
-const channel_map_t &audio_unit_io_node::channel_map(const yas::direction dir) const
+const channel_map_t &audio::unit_io_node::channel_map(const yas::direction dir) const
 {
     return impl_ptr<impl>()->channel_map(dir);
 }
 
-Float64 audio_unit_io_node::device_sample_rate() const
+Float64 audio::unit_io_node::device_sample_rate() const
 {
     return impl_ptr<impl>()->device_sample_rate();
 }
 
-UInt32 audio_unit_io_node::output_device_channel_count() const
+UInt32 audio::unit_io_node::output_device_channel_count() const
 {
     return impl_ptr<impl>()->output_device_channel_count();
 }
 
-UInt32 audio_unit_io_node::input_device_channel_count() const
+UInt32 audio::unit_io_node::input_device_channel_count() const
 {
     return impl_ptr<impl>()->input_device_channel_count();
 }
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
 
-void audio_unit_io_node::set_device(const audio::device &device)
+void audio::unit_io_node::set_device(const audio::device &device)
 {
     impl_ptr<impl>()->set_device(device);
 }
 
-audio::device audio_unit_io_node::device() const
+audio::device audio::unit_io_node::device() const
 {
     return impl_ptr<impl>()->device();
 }
@@ -85,40 +85,40 @@ audio::device audio_unit_io_node::device() const
 
 #pragma mark - audio_unit_output_node
 
-audio_unit_output_node::audio_unit_output_node(std::nullptr_t) : super_class()
+audio::unit_output_node::unit_output_node(std::nullptr_t) : super_class()
 {
 }
 
-audio_unit_output_node::audio_unit_output_node() : super_class(std::make_unique<impl>(), audio_unit_io_node_acd)
+audio::unit_output_node::unit_output_node() : super_class(std::make_unique<impl>(), audio_unit_io_node_acd)
 {
 }
 
-void audio_unit_output_node::set_channel_map(const channel_map_t &map)
+void audio::unit_output_node::set_channel_map(const channel_map_t &map)
 {
     super_class::set_channel_map(map, yas::direction::output);
 }
 
-const channel_map_t &audio_unit_output_node::channel_map() const
+const channel_map_t &audio::unit_output_node::channel_map() const
 {
     return super_class::channel_map(yas::direction::output);
 }
 
 #pragma mark - audio_unit_input_node
 
-audio_unit_input_node::audio_unit_input_node(std::nullptr_t) : super_class(nullptr)
+audio::unit_input_node::unit_input_node(std::nullptr_t) : super_class(nullptr)
 {
 }
 
-audio_unit_input_node::audio_unit_input_node() : super_class(std::make_unique<impl>(), audio_unit_io_node_acd)
+audio::unit_input_node::unit_input_node() : super_class(std::make_unique<impl>(), audio_unit_io_node_acd)
 {
 }
 
-void audio_unit_input_node::set_channel_map(const channel_map_t &map)
+void audio::unit_input_node::set_channel_map(const channel_map_t &map)
 {
     super_class::set_channel_map(map, yas::direction::input);
 }
 
-const channel_map_t &audio_unit_input_node::channel_map() const
+const channel_map_t &audio::unit_input_node::channel_map() const
 {
     return super_class::channel_map(yas::direction::input);
 }
