@@ -211,9 +211,9 @@ namespace yas
         case YASAudioEngineRouteSampleSectionDestinations: {
             UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"Cell" forIndexPath:indexPath];
             const auto &routes = _internal.route_node.routes();
-            yas::audio_route::point dst_point{0, static_cast<UInt32>(indexPath.row)};
+            yas::audio::route::point dst_point{0, static_cast<UInt32>(indexPath.row)};
             auto it = std::find_if(routes.begin(), routes.end(),
-                                   [dst_point = std::move(dst_point)](const yas::audio_route &route) {
+                                   [dst_point = std::move(dst_point)](const yas::audio::route &route) {
                                        return route.destination == dst_point;
                                    });
             NSString *sourceIndexText = nil;
