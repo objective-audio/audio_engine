@@ -3,13 +3,9 @@
 //  Copyright (c) 2015 Yuki Yasoshima.
 //
 
-#include "yas_audio_device_stream.h"
+#include "yas_audio_device.h"
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
-
-#include "yas_audio_device.h"
-#include "yas_audio_format.h"
-#include <dispatch/dispatch.h>
 
 using namespace yas;
 
@@ -18,14 +14,14 @@ using listener_f =
 
 #pragma mark - property_info
 
-audio::device_stream::property_info::property_info(const audio::device_stream::property property,
-                                                   const AudioObjectID object_id,
-                                                   const AudioObjectPropertyAddress &address)
+audio::device::stream::property_info::property_info(const audio::device::stream::property property,
+                                                    const AudioObjectID object_id,
+                                                    const AudioObjectPropertyAddress &address)
     : property(property), object_id(object_id), address(address)
 {
 }
 
-bool audio::device_stream::property_info::operator<(const audio::device_stream::property_info &info) const
+bool audio::device::stream::property_info::operator<(const audio::device::stream::property_info &info) const
 {
     if (property != info.property) {
         return property < info.property;
@@ -48,13 +44,13 @@ bool audio::device_stream::property_info::operator<(const audio::device_stream::
 
 #pragma mark - change_info
 
-audio::device_stream::change_info::change_info(std::vector<property_info> &&infos) : property_infos(infos)
+audio::device::stream::change_info::change_info(std::vector<property_info> &&infos) : property_infos(infos)
 {
 }
 
 #pragma mark - private
 
-class audio::device_stream::impl : public base::impl
+class audio::device::stream::impl : public base::impl
 {
    public:
     AudioStreamID stream_id;
@@ -66,7 +62,7 @@ class audio::device_stream::impl : public base::impl
     {
     }
 
-    listener_f listener(const audio::device_stream &stream)
+    listener_f listener(const audio::device::stream &stream)
     {
         auto weak_stream = to_weak(stream);
 
@@ -77,17 +73,17 @@ class audio::device_stream::impl : public base::impl
                 for (UInt32 i = 0; i < address_count; i++) {
                     if (addresses[i].mSelector == kAudioStreamPropertyVirtualFormat) {
                         infos.push_back(
-                            property_info(audio::device_stream::property::virtual_format, object_id, addresses[i]));
+                            property_info(audio::device::stream::property::virtual_format, object_id, addresses[i]));
                     } else if (addresses[i].mSelector == kAudioStreamPropertyIsActive) {
                         infos.push_back(
-                            property_info(audio::device_stream::property::is_active, object_id, addresses[i]));
+                            property_info(audio::device::stream::property::is_active, object_id, addresses[i]));
                     } else if (addresses[i].mSelector == kAudioStreamPropertyStartingChannel) {
                         infos.push_back(
-                            property_info(audio::device_stream::property::starting_channel, object_id, addresses[i]));
+                            property_info(audio::device::stream::property::starting_channel, object_id, addresses[i]));
                     }
                 }
                 change_info change_info{std::move(infos)};
-                stream.subject().notify(audio::device_stream::stream_did_change_key, change_info);
+                stream.subject().notify(audio::device::stream::stream_did_change_key, change_info);
             }
         };
     }
@@ -108,11 +104,11 @@ class audio::device_stream::impl : public base::impl
 
 #pragma mark - main
 
-audio::device_stream::device_stream(std::nullptr_t) : super_class(nullptr)
+audio::device::stream::stream(std::nullptr_t) : super_class(nullptr)
 {
 }
 
-audio::device_stream::device_stream(const AudioStreamID stream_id, const AudioDeviceID device_id)
+audio::device::stream::stream(const AudioStreamID stream_id, const AudioDeviceID device_id)
     : super_class(std::make_shared<impl>(stream_id, device_id))
 {
     auto imp = impl_ptr<impl>();
@@ -122,9 +118,9 @@ audio::device_stream::device_stream(const AudioStreamID stream_id, const AudioDe
     imp->add_listener(kAudioStreamPropertyStartingChannel, function);
 }
 
-audio::device_stream::~device_stream() = default;
+audio::device::stream::~stream() = default;
 
-bool audio::device_stream::operator==(const audio::device_stream &rhs) const
+bool audio::device::stream::operator==(const audio::device::stream &rhs) const
 {
     if (impl_ptr() && rhs.impl_ptr()) {
         return stream_id() == rhs.stream_id();
@@ -132,7 +128,7 @@ bool audio::device_stream::operator==(const audio::device_stream &rhs) const
     return false;
 }
 
-bool audio::device_stream::operator!=(const audio::device_stream &rhs) const
+bool audio::device::stream::operator!=(const audio::device::stream &rhs) const
 {
     if (impl_ptr() && rhs.impl_ptr()) {
         return stream_id() != rhs.stream_id();
@@ -140,17 +136,17 @@ bool audio::device_stream::operator!=(const audio::device_stream &rhs) const
     return true;
 }
 
-AudioStreamID audio::device_stream::stream_id() const
+AudioStreamID audio::device::stream::stream_id() const
 {
     return impl_ptr<impl>()->stream_id;
 }
 
-audio::device audio::device_stream::device() const
+audio::device audio::device::stream::device() const
 {
     return audio::device::device_for_id(impl_ptr<impl>()->device_id);
 }
 
-bool audio::device_stream::is_active() const
+bool audio::device::stream::is_active() const
 {
     auto data = _property_data<UInt32>(stream_id(), kAudioStreamPropertyIsActive);
     if (data) {
@@ -159,7 +155,7 @@ bool audio::device_stream::is_active() const
     return false;
 }
 
-direction audio::device_stream::direction() const
+direction audio::device::stream::direction() const
 {
     auto data = _property_data<UInt32>(stream_id(), kAudioStreamPropertyDirection);
     if (data) {
@@ -170,7 +166,7 @@ direction audio::device_stream::direction() const
     return direction::output;
 }
 
-audio::format audio::device_stream::virtual_format() const
+audio::format audio::device::stream::virtual_format() const
 {
     auto data = _property_data<AudioStreamBasicDescription>(stream_id(), kAudioStreamPropertyVirtualFormat);
     if (!data) {
@@ -179,7 +175,7 @@ audio::format audio::device_stream::virtual_format() const
     return audio::format(*data->data());
 }
 
-UInt32 audio::device_stream::starting_channel() const
+UInt32 audio::device::stream::starting_channel() const
 {
     auto data = _property_data<UInt32>(stream_id(), kAudioStreamPropertyStartingChannel);
     if (data) {
@@ -188,7 +184,7 @@ UInt32 audio::device_stream::starting_channel() const
     return 0;
 }
 
-yas::subject<yas::audio::device_stream::change_info> &audio::device_stream::subject() const
+yas::subject<yas::audio::device::stream::change_info> &audio::device::stream::subject() const
 {
     return impl_ptr<impl>()->subject;
 }

@@ -11,7 +11,6 @@
 #include "yas_audio_types.h"
 #include "yas_observing.h"
 #include "yas_audio_format.h"
-#include "yas_audio_device_stream.h"
 #include <AudioToolbox/AudioToolbox.h>
 #include <vector>
 #include <unordered_map>
@@ -31,6 +30,8 @@ namespace yas
             using super_class = base;
 
            public:
+            class stream;
+
             enum class property : UInt32 {
                 system,
                 stream,
@@ -85,8 +86,8 @@ namespace yas
             AudioDeviceID audio_device_id() const;
             CFStringRef name() const;
             CFStringRef manufacture() const;
-            std::vector<device_stream> input_streams() const;
-            std::vector<device_stream> output_streams() const;
+            std::vector<stream> input_streams() const;
+            std::vector<stream> output_streams() const;
             Float64 nominal_sample_rate() const;
 
             audio::format input_format() const;
@@ -105,5 +106,7 @@ namespace yas
         };
     }
 }
+
+#include "yas_audio_device_stream.h"
 
 #endif
