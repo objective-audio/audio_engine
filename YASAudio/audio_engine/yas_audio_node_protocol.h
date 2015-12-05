@@ -10,7 +10,6 @@
 namespace yas
 {
     class audio_engine;
-    class audio_graph;
 
     class audio_node_from_engine
     {

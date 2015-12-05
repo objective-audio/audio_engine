@@ -14,13 +14,17 @@
 
 namespace yas
 {
+    namespace audio
+    {
+        class graph;
+    }
+
     namespace audio_engine_method
     {
         static const auto configuration_change = "yas.audio_engine.configuration_change";
     }
 
     class audio_offline_output_node;
-    class audio_graph;
 
     class audio_engine : public base
     {

@@ -52,8 +52,8 @@ class yas::audio_engine::impl : public yas::base::impl
     audio_connection_set input_connections_for_destination_node(const audio_node &node) const;
     audio_connection_set output_connections_for_source_node(const audio_node &node) const;
 
-    void set_graph(const audio_graph &graph);
-    audio_graph graph() const;
+    void set_graph(const yas::audio::graph &graph);
+    yas::audio::graph graph() const;
     void reload_graph();
 
     std::unordered_set<audio_node> &nodes() const;

@@ -17,7 +17,7 @@ namespace yas
     namespace sample
     {
         struct graph_vc_internal {
-            yas::audio_graph graph = nullptr;
+            yas::audio::graph graph = nullptr;
             yas::audio_unit io_unit = nullptr;
             yas::audio_unit mixer_unit = nullptr;
 
@@ -29,7 +29,7 @@ namespace yas
 
                 auto format = yas::audio::format(sample_rate, 2);
 
-                graph = yas::audio_graph();
+                graph = yas::audio::graph{};
 
                 io_unit = yas::audio_unit(kAudioUnitType_Output, yas::audio_unit::sub_type_default_io());
                 io_unit.set_enable_input(true);

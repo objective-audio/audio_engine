@@ -30,7 +30,7 @@ static OSStatus CommonRenderCallback(void *inRefCon, AudioUnitRenderActionFlags 
         .render_id = (render_id){inRefCon},
     };
 
-    audio_graph::audio_unit_render(renderParameters);
+    audio::graph::audio_unit_render(renderParameters);
 
     return noErr;
 }

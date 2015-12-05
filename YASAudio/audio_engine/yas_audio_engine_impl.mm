@@ -57,7 +57,7 @@ class audio_engine::impl::core
     observer<audio::device::change_info> device_observer;
 #endif
 
-    audio_graph graph = nullptr;
+    yas::audio::graph graph = nullptr;
     std::unordered_set<audio_node> nodes;
     audio_connection_set connections;
     audio_offline_output_node offline_output_node = nullptr;
@@ -199,7 +199,7 @@ bool audio_engine::impl::prepare()
         return true;
     }
 
-    _core->graph = yas::audio_graph();
+    _core->graph = yas::audio::graph{};
 
     for (auto &node : _core->nodes) {
         add_node_to_graph(node);
@@ -429,12 +429,12 @@ audio_connection_set audio_engine::impl::output_connections_for_source_node(cons
     return filter(_core->connections, [node](const auto &connection) { return connection.source_node() == node; });
 }
 
-void audio_engine::impl::set_graph(const audio_graph &graph)
+void audio_engine::impl::set_graph(const yas::audio::graph &graph)
 {
     _core->graph = graph;
 }
 
-audio_graph audio_engine::impl::graph() const
+yas::audio::graph audio_engine::impl::graph() const
 {
     return _core->graph;
 }

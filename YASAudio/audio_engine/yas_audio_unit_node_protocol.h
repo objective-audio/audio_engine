@@ -7,8 +7,6 @@
 
 namespace yas
 {
-    class audio_graph;
-
     class audio_unit_node_from_engine
     {
        public:

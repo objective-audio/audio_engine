@@ -19,8 +19,6 @@ namespace yas
         class device;
     }
 
-    class audio_graph;
-
     class audio_device_io_node : public audio_node, public audio_device_io_node_from_engine
     {
         using super_class = audio_node;

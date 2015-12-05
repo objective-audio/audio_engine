@@ -16,18 +16,21 @@ using namespace yas;
 
 namespace yas
 {
-    static std::recursive_mutex _global_mutex;
-    static bool _interrupting;
-    static std::map<UInt8, weak<audio_graph>> _graphs;
+    namespace audio
+    {
+        static std::recursive_mutex _global_mutex;
+        static bool _interrupting;
+        static std::map<UInt8, weak<audio::graph>> _graphs;
 #if TARGET_OS_IPHONE
-    static yas::objc::container<> _did_become_active_observer;
-    static yas::objc::container<> _interruption_observer;
+        static yas::objc::container<> _did_become_active_observer;
+        static yas::objc::container<> _interruption_observer;
 #endif
+    }
 }
 
 #pragma mark - impl
 
-class audio_graph::impl : public base::impl
+class audio::graph::impl : public base::impl
 {
    public:
     impl(const UInt8 key) : _running(false), _mutex(), _units(), _io_units(), _key(key){};
@@ -128,7 +131,7 @@ class audio_graph::impl : public base::impl
         }
     }
 
-    static void add_graph(const audio_graph &graph)
+    static void add_graph(const graph &graph)
     {
         std::lock_guard<std::recursive_mutex> lock(_global_mutex);
         _graphs.insert(std::make_pair(graph.impl_ptr<impl>()->key(), to_weak(graph)));
@@ -140,7 +143,7 @@ class audio_graph::impl : public base::impl
         _graphs.erase(key);
     }
 
-    static audio_graph graph_for_key(const UInt8 key)
+    static graph graph_for_key(const UInt8 key)
     {
         std::lock_guard<std::recursive_mutex> lock(_global_mutex);
         if (_graphs.count(key) > 0) {
@@ -335,64 +338,64 @@ class audio_graph::impl : public base::impl
 
 #pragma mark - main
 
-audio_graph::audio_graph() : super_class(impl::make_shared())
+audio::graph::graph() : super_class(impl::make_shared())
 {
     if (impl_ptr()) {
-        audio_graph::impl::add_graph(*this);
+        audio::graph::impl::add_graph(*this);
     }
 }
 
-audio_graph::audio_graph(std::nullptr_t) : super_class(nullptr)
+audio::graph::graph(std::nullptr_t) : super_class(nullptr)
 {
 }
 
-audio_graph::~audio_graph() = default;
+audio::graph::~graph() = default;
 
-void audio_graph::add_audio_unit(audio_unit &unit)
+void audio::graph::add_audio_unit(audio_unit &unit)
 {
     impl_ptr<impl>()->add_audio_unit(unit);
 }
 
-void audio_graph::remove_audio_unit(audio_unit &unit)
+void audio::graph::remove_audio_unit(audio_unit &unit)
 {
     impl_ptr<impl>()->remove_audio_unit(unit);
 }
 
-void audio_graph::remove_all_units()
+void audio::graph::remove_all_units()
 {
     impl_ptr<impl>()->remove_all_units();
 }
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
 
-void audio_graph::add_audio_device_io(audio::device_io &device_io)
+void audio::graph::add_audio_device_io(audio::device_io &device_io)
 {
     impl_ptr<impl>()->add_audio_device_io(device_io);
 }
 
-void audio_graph::remove_audio_device_io(audio::device_io &device_io)
+void audio::graph::remove_audio_device_io(audio::device_io &device_io)
 {
     impl_ptr<impl>()->remove_audio_device_io(device_io);
 }
 
 #endif
 
-void audio_graph::start()
+void audio::graph::start()
 {
     impl_ptr<impl>()->start();
 }
 
-void audio_graph::stop()
+void audio::graph::stop()
 {
     impl_ptr<impl>()->stop();
 }
 
-bool audio_graph::is_running() const
+bool audio::graph::is_running() const
 {
     return impl_ptr<impl>()->is_running();
 }
 
-void audio_graph::audio_unit_render(render_parameters &render_parameters)
+void audio::graph::audio_unit_render(render_parameters &render_parameters)
 {
     yas_raise_if_main_thread;
 

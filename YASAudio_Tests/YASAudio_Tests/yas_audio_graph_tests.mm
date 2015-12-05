@@ -23,7 +23,7 @@
 
 - (void)testRunning
 {
-    yas::audio_graph graph;
+    yas::audio::graph graph;
 
     graph.start();
 
@@ -45,7 +45,7 @@
     auto output_format = yas::audio::format(output_sample_rate, channels);
     auto mixer_format = yas::audio::format(mixer_sample_rate, channels);
 
-    yas::audio_graph graph;
+    yas::audio::graph graph;
 
     yas::audio_unit io_unit(kAudioUnitType_Output, kAudioUnitSubType_GenericOutput);
     io_unit.set_maximum_frames_per_slice(maximum_frame_length);

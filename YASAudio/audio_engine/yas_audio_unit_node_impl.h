@@ -47,7 +47,7 @@ class yas::audio_unit_node::impl : public audio_node::impl
     virtual void prepare_parameters();  // NS_REQUIRES_SUPER
 
     void reload_audio_unit();
-    void set_graph(const audio_graph &);
+    void set_graph(const audio::graph &);
 
     virtual void render(audio::pcm_buffer &buffer, const UInt32 bus_idx, const audio::time &when) override;
 
