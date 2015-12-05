@@ -18,7 +18,7 @@ namespace yas
         {
            public:
             enumerator(const flex_ptr &pointer, const UInt32 byte_stride, const UInt32 length);
-            enumerator(const audio::pcm_buffer &buffer, const UInt32 channel);
+            enumerator(const pcm_buffer &buffer, const UInt32 channel);
 
             const flex_ptr *pointer() const;
             const UInt32 *index() const;
@@ -41,7 +41,7 @@ namespace yas
         class frame_enumerator
         {
            public:
-            explicit frame_enumerator(const audio::pcm_buffer &buffer);
+            explicit frame_enumerator(const pcm_buffer &buffer);
 
             const flex_ptr *pointer() const;
             const UInt32 *frame() const;

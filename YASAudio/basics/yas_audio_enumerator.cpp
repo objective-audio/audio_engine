@@ -20,7 +20,7 @@ audio::enumerator::enumerator(const flex_ptr &pointer, const UInt32 byte_stride,
     }
 }
 
-audio::enumerator::enumerator(const audio::pcm_buffer &buffer, const UInt32 channel)
+audio::enumerator::enumerator(const pcm_buffer &buffer, const UInt32 channel)
     : enumerator(buffer.flex_ptr_at_channel(channel), buffer.format().buffer_frame_byte_count(), buffer.frame_length())
 {
 }
@@ -74,7 +74,7 @@ audio::enumerator &audio::enumerator::operator++()
 
 #pragma mark - frame enumerator
 
-audio::frame_enumerator::frame_enumerator(const audio::pcm_buffer &buffer)
+audio::frame_enumerator::frame_enumerator(const pcm_buffer &buffer)
     : _frame(0),
       _channel(0),
       _frame_length(buffer.frame_length()),
