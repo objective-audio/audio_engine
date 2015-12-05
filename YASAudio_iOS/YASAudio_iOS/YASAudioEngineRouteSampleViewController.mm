@@ -36,7 +36,7 @@ namespace yas
             yas::audio::engine engine;
             yas::audio::unit_io_node io_node;
             yas::audio::unit_mixer_node mixer_node;
-            yas::audio_route_node route_node;
+            yas::audio::route_node route_node;
             yas::audio::tap_node sine_node;
 
             yas::base engine_observer = nullptr;

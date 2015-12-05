@@ -10,7 +10,7 @@ using namespace yas;
 
 #pragma mark - kernel
 
-class audio_route_node::kernel : public audio_node::kernel
+class audio::route_node::kernel : public audio_node::kernel
 {
    public:
     ~kernel() = default;
@@ -20,7 +20,7 @@ class audio_route_node::kernel : public audio_node::kernel
 
 #pragma mark - impl
 
-class audio_route_node::impl : public audio_node::impl
+class audio::route_node::impl : public audio_node::impl
 {
     using super_class = super_class::impl;
 
@@ -67,14 +67,14 @@ class audio_route_node::impl : public audio_node::impl
 
     virtual std::shared_ptr<audio_node::kernel> make_kernel() override
     {
-        return std::shared_ptr<audio_node::kernel>(new audio_route_node::kernel());
+        return std::shared_ptr<audio_node::kernel>(new audio::route_node::kernel());
     }
 
     virtual void prepare_kernel(const std::shared_ptr<audio_node::kernel> &kernel) override
     {
         super_class::prepare_kernel(kernel);
 
-        auto route_kernel = std::static_pointer_cast<audio_route_node::kernel>(kernel);
+        auto route_kernel = std::static_pointer_cast<audio::route_node::kernel>(kernel);
         route_kernel->routes = _core->routes;
     }
 
@@ -82,7 +82,7 @@ class audio_route_node::impl : public audio_node::impl
     {
         super_class::render(dst_buffer, dst_bus_idx, when);
 
-        if (auto kernel = kernel_cast<audio_route_node::kernel>()) {
+        if (auto kernel = kernel_cast<audio::route_node::kernel>()) {
             auto &routes = kernel->routes;
             auto output_connection = kernel->output_connection(dst_bus_idx);
             auto input_connections = kernel->input_connections();
@@ -171,55 +171,55 @@ class audio_route_node::impl : public audio_node::impl
 
 #pragma mark - main
 
-audio_route_node::audio_route_node() : super_class(std::make_unique<impl>())
+audio::route_node::route_node() : super_class(std::make_unique<impl>())
 {
 }
 
-audio_route_node::audio_route_node(std::nullptr_t) : super_class(nullptr)
+audio::route_node::route_node(std::nullptr_t) : super_class(nullptr)
 {
 }
 
-const audio::route_set_t &audio_route_node::routes() const
+const audio::route_set_t &audio::route_node::routes() const
 {
     return impl_ptr<impl>()->routes();
 }
 
-void audio_route_node::add_route(const audio::route &route)
+void audio::route_node::add_route(const audio::route &route)
 {
     impl_ptr<impl>()->add_route(route);
 }
 
-void audio_route_node::add_route(audio::route &&route)
+void audio::route_node::add_route(audio::route &&route)
 {
     impl_ptr<impl>()->add_route(std::move(route));
 }
 
-void audio_route_node::remove_route(const audio::route &route)
+void audio::route_node::remove_route(const audio::route &route)
 {
     impl_ptr<impl>()->remove_route(route);
 }
 
-void audio_route_node::remove_route_for_source(const audio::route::point &src_pt)
+void audio::route_node::remove_route_for_source(const audio::route::point &src_pt)
 {
     impl_ptr<impl>()->remove_route_for_source(src_pt);
 }
 
-void audio_route_node::remove_route_for_destination(const audio::route::point &dst_pt)
+void audio::route_node::remove_route_for_destination(const audio::route::point &dst_pt)
 {
     impl_ptr<impl>()->remove_route_for_destination(dst_pt);
 }
 
-void audio_route_node::set_routes(const audio::route_set_t &routes)
+void audio::route_node::set_routes(const audio::route_set_t &routes)
 {
     impl_ptr<impl>()->set_routes(routes);
 }
 
-void audio_route_node::set_routes(audio::route_set_t &&routes)
+void audio::route_node::set_routes(audio::route_set_t &&routes)
 {
     impl_ptr<impl>()->set_routes(std::move(routes));
 }
 
-void audio_route_node::clear_routes()
+void audio::route_node::clear_routes()
 {
     impl_ptr<impl>()->clear_routes();
 }
