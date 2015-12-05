@@ -4,7 +4,6 @@
 //
 
 #include "yas_audio_unit_node.h"
-#include "yas_audio_unit_parameter.h"
 
 using namespace yas;
 

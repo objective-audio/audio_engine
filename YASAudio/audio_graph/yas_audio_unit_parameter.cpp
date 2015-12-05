@@ -5,7 +5,6 @@
 
 #include "yas_audio_unit.h"
 #include "yas_cf_utils.h"
-#include "YASMacros.h"
 
 using namespace yas;
 
