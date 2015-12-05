@@ -27,7 +27,7 @@
 
     XCTAssertEqual(route_node.routes().size(), 0);
 
-    yas::audio_route route{0, 1, 2, 3};
+    yas::audio::route route{0, 1, 2, 3};
     route_node.add_route(route);
 
     XCTAssertEqual(route_node.routes().size(), 1);
@@ -58,7 +58,7 @@
 
     XCTAssertEqual(route_node.routes().size(), 1);
 
-    std::set<yas::audio_route> routes{{4, 5, 6, 7}, {8, 9, 10, 11}};
+    std::set<yas::audio::route> routes{{4, 5, 6, 7}, {8, 9, 10, 11}};
     route_node.set_routes(routes);
 
     XCTAssertEqual(route_node.routes().size(), 2);

@@ -19,14 +19,14 @@ namespace yas
         audio_route_node();
         audio_route_node(std::nullptr_t);
 
-        const audio_route_set &routes() const;
-        void add_route(const audio_route &);
-        void add_route(audio_route &&);
-        void remove_route(const audio_route &);
-        void remove_route_for_source(const audio_route::point &);
-        void remove_route_for_destination(const audio_route::point &);
-        void set_routes(const std::set<audio_route> &routes);
-        void set_routes(std::set<audio_route> &&routes);
+        const audio::route_set_t &routes() const;
+        void add_route(const audio::route &);
+        void add_route(audio::route &&);
+        void remove_route(const audio::route &);
+        void remove_route_for_source(const audio::route::point &);
+        void remove_route_for_destination(const audio::route::point &);
+        void set_routes(const audio::route_set_t &routes);
+        void set_routes(audio::route_set_t &&routes);
         void clear_routes();
     };
 }

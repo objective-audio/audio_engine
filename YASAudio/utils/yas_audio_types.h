@@ -59,14 +59,10 @@ namespace yas
     std::string to_string(const render_type &);
     std::string to_string(const OSStatus err);
 
-    class audio_route;
-
     constexpr std::experimental::nullopt_t nullopt = std::experimental::nullopt;
 
     using bus_result_t = std::experimental::optional<UInt32>;
     using abl_uptr = std::unique_ptr<AudioBufferList, std::function<void(AudioBufferList *)>>;
     using abl_data_uptr = std::unique_ptr<std::vector<std::vector<UInt8>>>;
     using channel_map_t = std::vector<UInt32>;
-
-    using audio_route_set = std::set<audio_route>;
 }

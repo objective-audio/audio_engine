@@ -15,7 +15,7 @@ class audio_route_node::kernel : public audio_node::kernel
    public:
     ~kernel() = default;
 
-    audio_route_set routes;
+    audio::route_set_t routes;
 };
 
 #pragma mark - impl
@@ -28,16 +28,16 @@ class audio_route_node::impl : public audio_node::impl
     class core
     {
        public:
-        audio_route_set routes;
+        audio::route_set_t routes;
 
-        void erase_route_if_either_matched(const audio_route &route)
+        void erase_route_if_either_matched(const audio::route &route)
         {
-            erase_route_if([&route](const audio_route &route_of_set) {
+            erase_route_if([&route](const audio::route &route_of_set) {
                 return route_of_set.source == route.source || route_of_set.destination == route.destination;
             });
         }
 
-        void erase_route_if(std::function<bool(const audio_route &)> pred)
+        void erase_route_if(std::function<bool(const audio::route &)> pred)
         {
             erase_if(routes, pred);
         }
@@ -107,52 +107,52 @@ class audio_route_node::impl : public audio_node::impl
 
 #pragma mark -
 
-    const audio_route_set &routes() const
+    const audio::route_set_t &routes() const
     {
         return _core->routes;
     }
 
-    void add_route(const audio_route &route)
+    void add_route(const audio::route &route)
     {
         _core->erase_route_if_either_matched(route);
         _core->routes.insert(route);
         update_kernel();
     }
 
-    void add_route(audio_route &&route)
+    void add_route(audio::route &&route)
     {
         _core->erase_route_if_either_matched(route);
         _core->routes.insert(std::move(route));
         update_kernel();
     }
 
-    void remove_route(const audio_route &route)
+    void remove_route(const audio::route &route)
     {
         _core->routes.erase(route);
         update_kernel();
     }
 
-    void remove_route_for_source(const audio_route::point &src_pt)
+    void remove_route_for_source(const audio::route::point &src_pt)
     {
-        _core->erase_route_if([&src_pt](const audio_route &route_of_set) { return route_of_set.source == src_pt; });
+        _core->erase_route_if([&src_pt](const audio::route &route_of_set) { return route_of_set.source == src_pt; });
         update_kernel();
     }
 
-    void remove_route_for_destination(const audio_route::point &dst_pt)
+    void remove_route_for_destination(const audio::route::point &dst_pt)
     {
         _core->erase_route_if(
-            [&dst_pt](const audio_route &route_of_set) { return route_of_set.destination == dst_pt; });
+            [&dst_pt](const audio::route &route_of_set) { return route_of_set.destination == dst_pt; });
         update_kernel();
     }
 
-    void set_routes(const audio_route_set &routes)
+    void set_routes(const audio::route_set_t &routes)
     {
         _core->routes.clear();
         _core->routes = routes;
         update_kernel();
     }
 
-    void set_routes(audio_route_set &&routes)
+    void set_routes(audio::route_set_t &&routes)
     {
         _core->routes.clear();
         _core->routes = std::move(routes);
@@ -179,42 +179,42 @@ audio_route_node::audio_route_node(std::nullptr_t) : super_class(nullptr)
 {
 }
 
-const audio_route_set &audio_route_node::routes() const
+const audio::route_set_t &audio_route_node::routes() const
 {
     return impl_ptr<impl>()->routes();
 }
 
-void audio_route_node::add_route(const audio_route &route)
+void audio_route_node::add_route(const audio::route &route)
 {
     impl_ptr<impl>()->add_route(route);
 }
 
-void audio_route_node::add_route(audio_route &&route)
+void audio_route_node::add_route(audio::route &&route)
 {
     impl_ptr<impl>()->add_route(std::move(route));
 }
 
-void audio_route_node::remove_route(const audio_route &route)
+void audio_route_node::remove_route(const audio::route &route)
 {
     impl_ptr<impl>()->remove_route(route);
 }
 
-void audio_route_node::remove_route_for_source(const audio_route::point &src_pt)
+void audio_route_node::remove_route_for_source(const audio::route::point &src_pt)
 {
     impl_ptr<impl>()->remove_route_for_source(src_pt);
 }
 
-void audio_route_node::remove_route_for_destination(const audio_route::point &dst_pt)
+void audio_route_node::remove_route_for_destination(const audio::route::point &dst_pt)
 {
     impl_ptr<impl>()->remove_route_for_destination(dst_pt);
 }
 
-void audio_route_node::set_routes(const audio_route_set &routes)
+void audio_route_node::set_routes(const audio::route_set_t &routes)
 {
     impl_ptr<impl>()->set_routes(routes);
 }
 
-void audio_route_node::set_routes(audio_route_set &&routes)
+void audio_route_node::set_routes(audio::route_set_t &&routes)
 {
     impl_ptr<impl>()->set_routes(std::move(routes));
 }
