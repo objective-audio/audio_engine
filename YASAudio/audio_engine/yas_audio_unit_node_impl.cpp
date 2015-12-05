@@ -205,7 +205,7 @@ void audio_unit_node::impl::update_connections()
                     if (auto kernel = node.impl_ptr<impl>()->kernel_cast()) {
                         if (auto connection = kernel->input_connection(render_parameters.in_bus_number)) {
                             if (auto source_node = connection.source_node()) {
-                                auto buffer = yas::audio_pcm_buffer(connection.format(), render_parameters.io_data);
+                                auto buffer = yas::audio::pcm_buffer(connection.format(), render_parameters.io_data);
                                 audio_time when(*render_parameters.io_time_stamp, connection.format().sample_rate());
                                 source_node.render(buffer, connection.source_bus(), when);
                             }
@@ -266,7 +266,7 @@ void audio_unit_node::impl::reload_audio_unit()
     _core->set_au(yas::audio_unit(_core->acd));
 }
 
-void audio_unit_node::impl::render(audio_pcm_buffer &buffer, const UInt32 bus_idx, const audio_time &when)
+void audio_unit_node::impl::render(audio::pcm_buffer &buffer, const UInt32 bus_idx, const audio_time &when)
 {
     super_class::render(buffer, bus_idx, when);
 

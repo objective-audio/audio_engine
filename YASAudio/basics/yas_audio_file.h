@@ -75,8 +75,8 @@ namespace yas
                                    const pcm_format pcm_format = pcm_format::float32, const bool interleaved = false);
             void close();
 
-            read_result_t read_into_buffer(audio_pcm_buffer &buffer, const UInt32 frame_length = 0);
-            write_result_t write_from_buffer(const audio_pcm_buffer &buffer, const bool async = false);
+            read_result_t read_into_buffer(audio::pcm_buffer &buffer, const UInt32 frame_length = 0);
+            write_result_t write_from_buffer(const audio::pcm_buffer &buffer, const bool async = false);
 
            protected:
             class impl;

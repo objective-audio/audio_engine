@@ -21,12 +21,12 @@ using namespace yas;
 class audio_device_io::kernel
 {
    public:
-    audio_pcm_buffer input_buffer;
-    audio_pcm_buffer output_buffer;
+    audio::pcm_buffer input_buffer;
+    audio::pcm_buffer output_buffer;
 
     kernel(const audio::format &input_format, const audio::format &output_format, const UInt32 frame_capacity)
-        : input_buffer(input_format ? audio_pcm_buffer(input_format, frame_capacity) : nullptr),
-          output_buffer(output_format ? audio_pcm_buffer(output_format, frame_capacity) : nullptr)
+        : input_buffer(input_format ? audio::pcm_buffer(input_format, frame_capacity) : nullptr),
+          output_buffer(output_format ? audio::pcm_buffer(output_format, frame_capacity) : nullptr)
     {
     }
 
@@ -44,7 +44,7 @@ class audio_device_io::impl : public base::impl
     audio_device device;
     bool is_running;
     AudioDeviceIOProcID io_proc_id;
-    audio_pcm_buffer input_buffer_on_render;
+    audio::pcm_buffer input_buffer_on_render;
     audio_time input_time_on_render;
     observer<audio_device::change_info> observer;
 
@@ -132,7 +132,7 @@ class audio_device_io::impl : public base::impl
             AudioBufferList *outOutputData, const AudioTimeStamp *inOutputTime)
         {
             if (outOutputData) {
-                clear(outOutputData);
+                audio::clear(outOutputData);
             }
 
             if (auto device_io = weak_device_io.lock()) {
@@ -156,7 +156,7 @@ class audio_device_io::impl : public base::impl
                         if (auto &output_buffer = kernel->output_buffer) {
                             if (outOutputData) {
                                 const UInt32 frame_length =
-                                    yas::frame_length(outOutputData, output_buffer.format().sample_byte_count());
+                                    audio::frame_length(outOutputData, output_buffer.format().sample_byte_count());
                                 if (frame_length > 0) {
                                     output_buffer.set_frame_length(frame_length);
                                     audio_time time(*inOutputTime, output_buffer.format().sample_rate());
@@ -165,7 +165,7 @@ class audio_device_io::impl : public base::impl
                                 }
                             }
                         } else if (kernel->input_buffer) {
-                            yas::audio_pcm_buffer null_buffer;
+                            yas::audio::pcm_buffer null_buffer;
                             render_callback(null_buffer, nullptr);
                         }
                     }
@@ -350,7 +350,7 @@ void audio_device_io::stop() const
     impl_ptr<impl>()->stop();
 }
 
-const audio_pcm_buffer &audio_device_io::input_buffer_on_render() const
+const audio::pcm_buffer &audio_device_io::input_buffer_on_render() const
 {
     return impl_ptr<impl>()->input_buffer_on_render;
 }

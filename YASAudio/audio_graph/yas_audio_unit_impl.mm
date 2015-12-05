@@ -48,7 +48,7 @@ static OSStatus ClearCallback(void *inRefCon, AudioUnitRenderActionFlags *ioActi
                               AudioBufferList *ioData)
 {
     if (ioData) {
-        clear(ioData);
+        audio::clear(ioData);
     }
     return noErr;
 }

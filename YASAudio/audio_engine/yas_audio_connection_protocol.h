@@ -12,8 +12,6 @@
 namespace yas
 {
     class audio_connection;
-    class audio_node;
-    class audio_format;
 
     using audio_connection_set = std::unordered_set<audio_connection>;
     using audio_connection_smap = std::map<UInt32, audio_connection>;

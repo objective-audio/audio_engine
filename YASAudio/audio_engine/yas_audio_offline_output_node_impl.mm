@@ -85,7 +85,7 @@ offline_start_result_t audio_offline_output_node::impl::start(const offline_rend
             }
         }
 
-        yas::audio_pcm_buffer render_buffer(connection.format(), 1024);
+        yas::audio::pcm_buffer render_buffer(connection.format(), 1024);
 
         NSBlockOperation *blockOperation = [[NSBlockOperation alloc] init];
         objc::container<objc::weak> operation_container(blockOperation);

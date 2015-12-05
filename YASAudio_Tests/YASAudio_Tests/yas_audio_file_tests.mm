@@ -187,7 +187,7 @@ namespace yas
 
         audio_file.set_processing_format(processing_format);
 
-        yas::audio_pcm_buffer buffer(processing_format, frame_length);
+        yas::audio::pcm_buffer buffer(processing_format, frame_length);
 
         UInt32 startIndex = 0;
 
@@ -221,7 +221,7 @@ namespace yas
         XCTAssertEqualWithAccuracy(audio_file.processing_length(),
                                    audio_file.file_length() * (processing_sample_rate / file_sample_rate), 1);
 
-        yas::audio_pcm_buffer buffer(processing_format, frame_length);
+        yas::audio::pcm_buffer buffer(processing_format, frame_length);
 
         UInt32 startIndex = 0;
 
@@ -242,7 +242,7 @@ namespace yas
 
 #pragma mark -
 
-- (void)_writeToBuffer:(yas::audio_pcm_buffer &)buffer
+- (void)_writeToBuffer:(yas::audio::pcm_buffer &)buffer
             fileFormat:(const yas::audio::format &)fileFormat
             startIndex:(NSInteger)startIndex
 {
@@ -278,7 +278,7 @@ namespace yas
     }
 }
 
-- (bool)_compareData:(yas::audio_pcm_buffer &)buffer
+- (bool)_compareData:(yas::audio::pcm_buffer &)buffer
           fileFormat:(const yas::audio::format &)fileFormat
           startIndex:(NSInteger)startIndex
 {

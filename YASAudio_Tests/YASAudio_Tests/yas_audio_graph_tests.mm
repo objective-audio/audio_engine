@@ -156,7 +156,7 @@
         yas::audio_time audio_time(0, output_sample_rate);
         AudioTimeStamp timeStamp = audio_time.audio_time_stamp();
 
-        yas::audio_pcm_buffer buffer(output_format, frame_length);
+        yas::audio::pcm_buffer buffer(output_format, frame_length);
 
         yas::render_parameters parameters = {
             .in_render_type = yas::render_type::normal,

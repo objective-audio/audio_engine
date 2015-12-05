@@ -188,7 +188,7 @@ void audio_unit_output_node::impl::prepare_audio_unit()
 class audio_unit_input_node::impl::core
 {
    public:
-    audio_pcm_buffer input_buffer;
+    audio::pcm_buffer input_buffer;
     audio_time render_time;
 };
 
@@ -218,7 +218,7 @@ void audio_unit_input_node::impl::update_connections()
     if (auto out_connection = output_connection(1)) {
         unit.attach_input_callback();
 
-        audio_pcm_buffer input_buffer(out_connection.format(), 4096);
+        audio::pcm_buffer input_buffer(out_connection.format(), 4096);
         _core->input_buffer = input_buffer;
 
         auto weak_node = to_weak(cast<audio_unit_input_node>());

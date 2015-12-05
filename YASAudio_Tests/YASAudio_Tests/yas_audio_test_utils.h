@@ -20,11 +20,11 @@ namespace yas
     namespace test
     {
         UInt32 test_value(const UInt32 frame, const UInt32 ch_idx, const UInt32 buf_idx);
-        void fill_test_values_to_buffer(const audio_pcm_buffer &buffer);
-        bool is_cleared_buffer(const audio_pcm_buffer &data);
-        bool is_filled_buffer(const audio_pcm_buffer &data);
-        bool is_equal_buffer_flexibly(const audio_pcm_buffer &data1, const audio_pcm_buffer &data2);
-        flex_ptr data_ptr_from_buffer(const audio_pcm_buffer &data, const UInt32 ch_idx, const UInt32 frame);
+        void fill_test_values_to_buffer(const audio::pcm_buffer &buffer);
+        bool is_cleared_buffer(const audio::pcm_buffer &data);
+        bool is_filled_buffer(const audio::pcm_buffer &data);
+        bool is_equal_buffer_flexibly(const audio::pcm_buffer &data1, const audio::pcm_buffer &data2);
+        flex_ptr data_ptr_from_buffer(const audio::pcm_buffer &data, const UInt32 ch_idx, const UInt32 frame);
         bool is_equal(const Float64 val1, const Float64 val2, const Float64 accuracy = 0);
         bool is_equal_data(const void *const inData1, const void *const inData2, const size_t inSize);
         bool is_equal(const AudioTimeStamp *const ts1, const AudioTimeStamp *const ts2);

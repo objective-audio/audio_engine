@@ -28,8 +28,8 @@ class yas::audio_tap_node::impl : public super_class::impl
     audio_connection_smap input_connections_on_render() const;
     audio_connection_smap output_connections_on_render() const;
 
-    virtual void render(audio_pcm_buffer &buffer, const UInt32 bus_idx, const audio_time &when) override;
-    void render_source(audio_pcm_buffer &buffer, const UInt32 bus_idx, const audio_time &when);
+    virtual void render(audio::pcm_buffer &buffer, const UInt32 bus_idx, const audio_time &when) override;
+    void render_source(audio::pcm_buffer &buffer, const UInt32 bus_idx, const audio_time &when);
 
    private:
     class core;

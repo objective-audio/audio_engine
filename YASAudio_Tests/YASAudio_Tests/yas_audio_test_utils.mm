@@ -12,7 +12,7 @@ UInt32 yas::test::test_value(const UInt32 frame, const UInt32 ch_idx, const UInt
     return frame + 1024 * (ch_idx + 1) + 512 * (buf_idx + 1);
 }
 
-void yas::test::fill_test_values_to_buffer(const audio_pcm_buffer &buffer)
+void yas::test::fill_test_values_to_buffer(const audio::pcm_buffer &buffer)
 {
     const auto &format = buffer.format();
     const yas::pcm_format pcmFormat = format.pcm_format();
@@ -46,7 +46,7 @@ void yas::test::fill_test_values_to_buffer(const audio_pcm_buffer &buffer)
     }
 }
 
-bool yas::test::is_cleared_buffer(const audio_pcm_buffer &buffer)
+bool yas::test::is_cleared_buffer(const audio::pcm_buffer &buffer)
 {
     const AudioBufferList *abl = buffer.audio_buffer_list();
 
@@ -62,7 +62,7 @@ bool yas::test::is_cleared_buffer(const audio_pcm_buffer &buffer)
     return true;
 }
 
-bool yas::test::is_filled_buffer(const audio_pcm_buffer &buffer)
+bool yas::test::is_filled_buffer(const audio::pcm_buffer &buffer)
 {
     __block BOOL isFilled = YES;
     const UInt32 sample_byte_count = buffer.format().sample_byte_count();
@@ -83,7 +83,7 @@ bool yas::test::is_filled_buffer(const audio_pcm_buffer &buffer)
     return isFilled;
 }
 
-bool yas::test::is_equal_buffer_flexibly(const audio_pcm_buffer &buffer1, const audio_pcm_buffer &buffer2)
+bool yas::test::is_equal_buffer_flexibly(const audio::pcm_buffer &buffer1, const audio::pcm_buffer &buffer2)
 {
     if (buffer1.format().channel_count() != buffer2.format().channel_count()) {
         return NO;
@@ -136,7 +136,7 @@ bool test::is_equal(const AudioTimeStamp *const ts1, const AudioTimeStamp *const
     }
 }
 
-yas::flex_ptr yas::test::data_ptr_from_buffer(const audio_pcm_buffer &buffer, const UInt32 channel, const UInt32 frame)
+yas::flex_ptr yas::test::data_ptr_from_buffer(const audio::pcm_buffer &buffer, const UInt32 channel, const UInt32 frame)
 {
     audio::frame_enumerator enumerator(buffer);
     enumerator.set_frame_position(frame);
@@ -150,7 +150,7 @@ void yas::test::audio_unit_render_on_sub_thread(audio_unit &unit, yas::audio::fo
     auto lambda = [unit, format, frame_length, count, wait]() mutable {
         AudioUnitRenderActionFlags action_flags = 0;
 
-        yas::audio_pcm_buffer buffer(format, frame_length);
+        yas::audio::pcm_buffer buffer(format, frame_length);
 
         for (NSInteger i = 0; i < count; i++) {
             yas::audio_time audio_time(frame_length * i, format.sample_rate());

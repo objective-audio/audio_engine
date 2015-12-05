@@ -69,7 +69,7 @@ namespace yas
                 return _sine_volume.load();
             }
 
-            void process(const yas::audio_pcm_buffer &input_buffer, yas::audio_pcm_buffer &output_buffer)
+            void process(const yas::audio::pcm_buffer &input_buffer, yas::audio::pcm_buffer &output_buffer)
             {
                 if (!output_buffer) {
                     return;
@@ -206,7 +206,7 @@ namespace yas
 
     auto weak_device_io = yas::to_weak(_internal.audio_device_io);
     _internal.audio_device_io.set_render_callback([weak_device_io, kernel = _internal.kernel](
-        yas::audio_pcm_buffer & output_buffer, const yas::audio_time &when) {
+        yas::audio::pcm_buffer & output_buffer, const yas::audio_time &when) {
         if (auto device_io = weak_device_io.lock()) {
             kernel->process(device_io.input_buffer_on_render(), output_buffer);
         }

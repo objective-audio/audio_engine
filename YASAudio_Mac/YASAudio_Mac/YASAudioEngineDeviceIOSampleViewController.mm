@@ -204,7 +204,7 @@ namespace yas
     Float64 next_phase = 0.0;
 
     auto render_function = [next_phase, weak_node, weak_container = _internal.self_container](
-        yas::audio_pcm_buffer & buffer, const UInt32 bus_idx, const yas::audio_time &when) mutable
+        yas::audio::pcm_buffer & buffer, const UInt32 bus_idx, const yas::audio_time &when) mutable
     {
         buffer.clear();
 

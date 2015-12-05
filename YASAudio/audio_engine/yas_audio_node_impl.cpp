@@ -230,7 +230,7 @@ void audio_node::impl::remove_connection(const audio_connection &connection)
     update_kernel();
 }
 
-void audio_node::impl::render(audio_pcm_buffer &buffer, const UInt32 bus_idx, const audio_time &when)
+void audio_node::impl::render(audio::pcm_buffer &buffer, const UInt32 bus_idx, const audio_time &when)
 {
     set_render_time_on_render(when);
 }

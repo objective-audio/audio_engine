@@ -27,7 +27,7 @@ class yas::audio_device_io_node::impl : public audio_node::impl
     void set_device(const audio_device &device);
     audio_device device() const;
 
-    virtual void render(audio_pcm_buffer &buffer, const UInt32 bus_idx, const audio_time &when) override;
+    virtual void render(audio::pcm_buffer &buffer, const UInt32 bus_idx, const audio_time &when) override;
 
    private:
     using super_class = super_class::impl;

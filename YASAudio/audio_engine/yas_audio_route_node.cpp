@@ -78,7 +78,7 @@ class audio_route_node::impl : public audio_node::impl
         route_kernel->routes = _core->routes;
     }
 
-    virtual void render(audio_pcm_buffer &dst_buffer, const UInt32 dst_bus_idx, const audio_time &when) override
+    virtual void render(audio::pcm_buffer &dst_buffer, const UInt32 dst_bus_idx, const audio_time &when) override
     {
         super_class::render(dst_buffer, dst_bus_idx, when);
 
@@ -96,7 +96,7 @@ class audio_route_node::impl : public audio_node::impl
                         const UInt32 src_ch_count = src_format.channel_count();
                         if (const auto result =
                                 channel_map_from_routes(routes, src_bus_idx, src_ch_count, dst_bus_idx, dst_ch_count)) {
-                            yas::audio_pcm_buffer src_buffer(src_format, dst_buffer, result.value());
+                            yas::audio::pcm_buffer src_buffer(src_format, dst_buffer, result.value());
                             node.render(src_buffer, src_bus_idx, when);
                         }
                     }

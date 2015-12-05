@@ -206,7 +206,8 @@ SInt64 audio::file::file_frame_position() const
     return _impl->file_frame_position;
 }
 
-audio::file::open_result_t audio::file::open(const CFURLRef file_url, const pcm_format pcm_format, const bool interleaved)
+audio::file::open_result_t audio::file::open(const CFURLRef file_url, const pcm_format pcm_format,
+                                             const bool interleaved)
 {
     if (_impl->ext_audio_file) {
         return open_result_t(open_error_t::opened);
@@ -225,8 +226,9 @@ audio::file::open_result_t audio::file::open(const CFURLRef file_url, const pcm_
     return open_result_t(nullptr);
 }
 
-audio::file::create_result_t audio::file::create(const CFURLRef file_url, const CFStringRef file_type, const CFDictionaryRef settings,
-                                   const pcm_format pcm_format, const bool interleaved)
+audio::file::create_result_t audio::file::create(const CFURLRef file_url, const CFStringRef file_type,
+                                                 const CFDictionaryRef settings, const pcm_format pcm_format,
+                                                 const bool interleaved)
 {
     if (_impl->ext_audio_file) {
         return create_result_t(create_error_t::created);
@@ -251,7 +253,7 @@ void audio::file::close()
     _impl->close();
 }
 
-audio::file::read_result_t audio::file::read_into_buffer(audio_pcm_buffer &buffer, const UInt32 frame_length)
+audio::file::read_result_t audio::file::read_into_buffer(audio::pcm_buffer &buffer, const UInt32 frame_length)
 {
     if (!_impl->ext_audio_file) {
         return read_result_t(read_error_t::closed);
@@ -273,7 +275,7 @@ audio::file::read_result_t audio::file::read_into_buffer(audio_pcm_buffer &buffe
     const UInt32 buffer_count = format.buffer_count();
     const UInt32 stride = format.stride();
 
-    if (auto abl_ptr = yas::allocate_audio_buffer_list(buffer_count, 0, 0).first) {
+    if (auto abl_ptr = allocate_audio_buffer_list(buffer_count, 0, 0).first) {
         AudioBufferList *io_abl = abl_ptr.get();
 
         while (remain_frames) {
@@ -318,7 +320,7 @@ audio::file::read_result_t audio::file::read_into_buffer(audio_pcm_buffer &buffe
     return read_result_t(nullptr);
 }
 
-audio::file::write_result_t audio::file::write_from_buffer(const audio_pcm_buffer &buffer, const bool async)
+audio::file::write_result_t audio::file::write_from_buffer(const audio::pcm_buffer &buffer, const bool async)
 {
     if (!_impl->ext_audio_file) {
         return write_result_t(write_error_t::closed);

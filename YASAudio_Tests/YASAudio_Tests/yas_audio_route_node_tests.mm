@@ -118,7 +118,7 @@
         XCTestExpectation *expectation = [self expectationWithDescription:@"second render"];
 
         XCTAssertTrue(engine.start_offline_render(
-            [self](yas::audio_pcm_buffer &buffer, const yas::audio_time &when, bool &stop) {
+            [self](yas::audio::pcm_buffer &buffer, const yas::audio_time &when, bool &stop) {
                 stop = true;
                 yas::audio::frame_enumerator enumerator(buffer);
                 auto pointer = enumerator.pointer();
@@ -184,7 +184,7 @@
     XCTestExpectation *expectation = [self expectationWithDescription:@"render"];
 
     XCTAssertTrue(engine.start_offline_render(
-        [self](yas::audio_pcm_buffer &buffer, const yas::audio_time &when, bool &stop) {
+        [self](yas::audio::pcm_buffer &buffer, const yas::audio_time &when, bool &stop) {
             stop = true;
             yas::audio::frame_enumerator enumerator(buffer);
             auto pointer = enumerator.pointer();
@@ -251,7 +251,7 @@
     XCTestExpectation *expectation = [self expectationWithDescription:@"render"];
 
     XCTAssertTrue(engine.start_offline_render(
-        [self](yas::audio_pcm_buffer &buffer, const yas::audio_time &when, bool &stop) {
+        [self](yas::audio::pcm_buffer &buffer, const yas::audio_time &when, bool &stop) {
             stop = true;
             yas::audio::frame_enumerator enumerator(buffer);
             auto pointer = enumerator.pointer();

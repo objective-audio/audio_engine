@@ -55,7 +55,7 @@ namespace yas
         UInt32 input_bus_count() const;
         UInt32 output_bus_count() const;
 
-        void render(audio_pcm_buffer &buffer, const UInt32 bus_idx, const audio_time &when);
+        void render(audio::pcm_buffer &buffer, const UInt32 bus_idx, const audio_time &when);
         void set_render_time_on_render(const audio_time &time);
 
        protected:

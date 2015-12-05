@@ -80,7 +80,7 @@ UInt32 audio_node::output_bus_count() const
 
 #pragma mark render thread
 
-void audio_node::render(audio_pcm_buffer &buffer, const UInt32 bus_idx, const audio_time &when)
+void audio_node::render(audio::pcm_buffer &buffer, const UInt32 bus_idx, const audio_time &when)
 {
     impl_ptr<impl>()->render(buffer, bus_idx, when);
 }
