@@ -134,11 +134,11 @@ namespace yas
     namespace sample
     {
         struct offline_vc_internal {
-            yas::audio_engine play_engine;
+            yas::audio::engine play_engine;
             yas::audio_unit_mixer_node play_mixer_node;
             yas::offline_sample::sine_node play_sine_node;
 
-            yas::audio_engine offline_engine;
+            yas::audio::engine offline_engine;
             yas::audio_unit_mixer_node offline_mixer_node;
             yas::offline_sample::sine_node offline_sine_node;
 
@@ -173,7 +173,7 @@ namespace yas
                 offline_engine.connect(offline_sine_node, offline_mixer_node, format);
 
                 engine_observer = play_engine.subject().make_observer(
-                    yas::audio_engine_method::configuration_change,
+                    yas::audio::engine_method::configuration_change,
                     [weak_play_output_node = to_weak(play_output_node)](const auto &, const auto &) {
                         if (auto play_output_node = weak_play_output_node.lock()) {
                             play_output_node.set_device(yas::audio::device::default_output_device());

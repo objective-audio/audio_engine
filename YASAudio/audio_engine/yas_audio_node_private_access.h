@@ -49,7 +49,7 @@ namespace yas
             node.impl_ptr<impl>()->remove_connection(connection);
         }
 
-        static void set_engine(audio_node &node, const audio_engine &engine)
+        static void set_engine(audio_node &node, const audio::engine &engine)
         {
             node._set_engine(engine);
         }

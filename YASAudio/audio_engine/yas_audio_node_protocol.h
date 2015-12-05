@@ -9,7 +9,10 @@
 
 namespace yas
 {
-    class audio_engine;
+    namespace audio
+    {
+        class engine;
+    }
 
     class audio_node_from_engine
     {
@@ -22,8 +25,8 @@ namespace yas
         virtual const audio::connection_wmap &_output_connections() const = 0;
         virtual void _add_connection(const audio::connection &connection) = 0;
         virtual void _remove_connection(const audio::connection &connection) = 0;
-        virtual void _set_engine(const audio_engine &engine) = 0;
-        virtual audio_engine _engine() const = 0;
+        virtual void _set_engine(const audio::engine &engine) = 0;
+        virtual audio::engine _engine() const = 0;
         virtual void _update_kernel() = 0;
         virtual void _update_connections() = 0;
     };

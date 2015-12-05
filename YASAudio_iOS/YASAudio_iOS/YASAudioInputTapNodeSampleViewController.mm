@@ -24,7 +24,7 @@ namespace yas
                 input_level,
             };
 
-            yas::audio_engine engine;
+            yas::audio::engine engine;
             yas::audio_unit_input_node input_node;
             yas::audio_input_tap_node input_tap_node;
 

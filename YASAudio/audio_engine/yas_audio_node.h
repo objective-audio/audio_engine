@@ -21,9 +21,8 @@ namespace yas
     namespace audio
     {
         class time;
+        class engine;
     }
-
-    class audio_engine;
 
     class audio_node : public base, public audio_node_from_engine, public audio_node_from_connection
     {
@@ -53,7 +52,7 @@ namespace yas
         bus_result_t next_available_output_bus() const;
         bool is_available_input_bus(const UInt32 bus_idx) const;
         bool is_available_output_bus(const UInt32 bus_idx) const;
-        audio_engine engine() const;
+        audio::engine engine() const;
         audio::time last_render_time() const;
 
         UInt32 input_bus_count() const;
@@ -76,8 +75,8 @@ namespace yas
         const audio::connection_wmap &_output_connections() const override;
         void _add_connection(const audio::connection &connection) override;
         void _remove_connection(const audio::connection &connection) override;
-        void _set_engine(const audio_engine &engine) override;
-        audio_engine _engine() const override;
+        void _set_engine(const audio::engine &engine) override;
+        audio::engine _engine() const override;
         void _update_kernel() override;
         void _update_connections() override;
 

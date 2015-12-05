@@ -27,7 +27,7 @@
     const Float64 sample_rate = 44100.0;
 
     auto format = yas::audio::format(sample_rate, 2);
-    yas::audio_engine engine;
+    yas::audio::engine engine;
     yas::audio_offline_output_node output_node;
     yas::audio_unit_node sample_delay_node(kAudioUnitType_Effect, kAudioUnitSubType_SampleDelay);
     yas::audio_tap_node tap_node;

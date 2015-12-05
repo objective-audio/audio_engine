@@ -28,7 +28,7 @@ namespace yas
     namespace sample
     {
         struct effects_vc_internal {
-            yas::audio_engine engine;
+            yas::audio::engine engine;
             yas::audio_unit_output_node output_node;
             yas::audio::connection through_connection = nullptr;
             yas::audio_tap_node tap_node;

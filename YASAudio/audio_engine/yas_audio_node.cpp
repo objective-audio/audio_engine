@@ -58,7 +58,7 @@ bool audio_node::is_available_output_bus(const UInt32 bus_idx) const
     return impl_ptr<impl>()->is_available_output_bus(bus_idx);
 }
 
-audio_engine audio_node::engine() const
+audio::engine audio_node::engine() const
 {
     return impl_ptr<impl>()->engine();
 }
@@ -122,12 +122,12 @@ void audio_node::_remove_connection(const audio::connection &connection)
     impl_ptr<impl>()->remove_connection(connection);
 }
 
-void audio_node::_set_engine(const audio_engine &engine)
+void audio_node::_set_engine(const audio::engine &engine)
 {
     impl_ptr<impl>()->set_engine(engine);
 }
 
-audio_engine audio_node::_engine() const
+audio::engine audio_node::_engine() const
 {
     return impl_ptr<impl>()->engine();
 }

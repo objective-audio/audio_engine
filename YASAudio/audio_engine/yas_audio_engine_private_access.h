@@ -9,19 +9,22 @@
 
 namespace yas
 {
-    class audio_engine::private_access
+    namespace audio
     {
-       public:
-        static std::unordered_set<audio_node> &nodes(const audio_engine &engine)
+        class engine::private_access
         {
-            return engine.impl_ptr<impl>()->nodes();
-        }
+           public:
+            static std::unordered_set<audio_node> &nodes(const engine &engine)
+            {
+                return engine.impl_ptr<impl>()->nodes();
+            }
 
-        static audio::connection_set &connections(const audio_engine &engine)
-        {
-            return engine.impl_ptr<impl>()->connections();
-        }
-    };
+            static audio::connection_set &connections(const engine &engine)
+            {
+                return engine.impl_ptr<impl>()->connections();
+            }
+        };
+    }
 }
 
 #endif

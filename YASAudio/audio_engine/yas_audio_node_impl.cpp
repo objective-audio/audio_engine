@@ -13,7 +13,7 @@ using namespace yas;
 class audio_node::impl::core
 {
    public:
-    weak<audio_engine> weak_engine;
+    weak<audio::engine> weak_engine;
     audio::connection_wmap input_connections;
     audio::connection_wmap output_connections;
 
@@ -188,12 +188,12 @@ std::shared_ptr<audio_node::kernel> audio_node::impl::_kernel() const
     return _core->kernel();
 }
 
-audio_engine audio_node::impl::engine() const
+audio::engine audio_node::impl::engine() const
 {
     return _core->weak_engine.lock();
 }
 
-void audio_node::impl::set_engine(const audio_engine &engine)
+void audio_node::impl::set_engine(const audio::engine &engine)
 {
     _core->weak_engine = engine;
 }

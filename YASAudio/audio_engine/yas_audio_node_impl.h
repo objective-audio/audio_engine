@@ -47,8 +47,8 @@ class yas::audio_node::impl : public base::impl
         return std::static_pointer_cast<T>(_kernel());
     }
 
-    audio_engine engine() const;
-    void set_engine(const audio_engine &);
+    audio::engine engine() const;
+    void set_engine(const audio::engine &);
 
     virtual void render(audio::pcm_buffer &buffer, const UInt32 bus_idx, const audio::time &when);
     audio::time render_time() const;

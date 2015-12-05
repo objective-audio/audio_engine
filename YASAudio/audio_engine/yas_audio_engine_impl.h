@@ -11,18 +11,18 @@
 #include "yas_audio_device.h"
 #endif
 
-class yas::audio_engine::impl : public yas::base::impl
+class yas::audio::engine::impl : public yas::base::impl
 {
    public:
     impl();
     virtual ~impl();
 
-    void prepare(const audio_engine &);
+    void prepare(const engine &);
 
-    weak<audio_engine> &weak_engine() const;
+    weak<engine> &weak_engine() const;
     objc::container<> &reset_observer() const;
     objc::container<> &route_change_observer() const;
-    yas::subject<audio_engine> &subject() const;
+    yas::subject<engine> &subject() const;
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
     observer<audio::device::change_info> &device_observer();
 #endif
@@ -36,7 +36,7 @@ class yas::audio_engine::impl : public yas::base::impl
     bool prepare();
 
     audio::connection connect(audio_node &source_node, audio_node &destination_node, const UInt32 source_bus_idx,
-                             const UInt32 destination_bus_idx, const audio::format &format);
+                              const UInt32 destination_bus_idx, const audio::format &format);
     void disconnect(audio::connection &connection);
     void disconnect(audio_node &node);
     void disconnect_node_with_predicate(std::function<bool(const audio::connection &)> predicate);
@@ -60,8 +60,8 @@ class yas::audio_engine::impl : public yas::base::impl
     audio::connection_set &connections() const;
     audio_offline_output_node &offline_output_node() const;
 
-    audio_engine::start_result_t start_render();
-    audio_engine::start_result_t start_offline_render(const offline_render_f &, const offline_completion_f &);
+    engine::start_result_t start_render();
+    engine::start_result_t start_offline_render(const offline_render_f &, const offline_completion_f &);
     void stop();
 
     void post_configuration_change() const;

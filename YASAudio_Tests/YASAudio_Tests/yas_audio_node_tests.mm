@@ -122,7 +122,7 @@
 - (void)test_set_engine
 {
     auto node = yas::audio_node::private_access::create();
-    yas::audio_engine engine;
+    yas::audio::engine engine;
 
     XCTAssertFalse(node.engine());
 
@@ -130,7 +130,7 @@
 
     XCTAssertEqual(engine, node.engine());
 
-    yas::audio_node::private_access::set_engine(node, yas::audio_engine(nullptr));
+    yas::audio_node::private_access::set_engine(node, yas::audio::engine(nullptr));
 
     XCTAssertFalse(node.engine());
 }

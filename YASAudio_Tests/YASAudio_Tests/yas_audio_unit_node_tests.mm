@@ -23,7 +23,7 @@
 
 - (void)test_restore_parameters
 {
-    yas::audio_engine engine;
+    yas::audio::engine engine;
 
     auto format = yas::audio::format(44100.0, 2);
     yas::audio_offline_output_node output_node;
