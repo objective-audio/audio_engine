@@ -38,8 +38,8 @@ namespace yas
         void remove_all_units();
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
-        void add_audio_device_io(audio_device_io &audio_device_io);
-        void remove_audio_device_io(audio_device_io &audio_device_io);
+        void add_audio_device_io(audio::device_io &);
+        void remove_audio_device_io(audio::device_io &);
 #endif
 
         void start();

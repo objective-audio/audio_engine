@@ -145,7 +145,7 @@ namespace yas
     {
         struct device_vc_internal {
             yas::audio_graph audio_graph = nullptr;
-            yas::audio_device_io audio_device_io = nullptr;
+            yas::audio::device_io audio_device_io = nullptr;
             yas::base system_observer = nullptr;
             yas::base device_observer = nullptr;
             sample_kernel_sptr kernel;
@@ -186,7 +186,7 @@ namespace yas
     }
 
     _internal.audio_graph = yas::audio_graph();
-    _internal.audio_device_io = yas::audio_device_io(yas::audio::device(nullptr));
+    _internal.audio_device_io = yas::audio::device_io{yas::audio::device(nullptr)};
     _internal.audio_graph.add_audio_device_io(_internal.audio_device_io);
 
     _internal.kernel = std::make_shared<sample_kernel_t>();

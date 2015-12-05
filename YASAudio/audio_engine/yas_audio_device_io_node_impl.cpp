@@ -17,7 +17,7 @@ using namespace yas;
 class audio_device_io_node::impl::core
 {
    public:
-    audio_device_io device_io;
+    audio::device_io device_io;
 
     core() : _device(nullptr), device_io(nullptr)
     {
@@ -153,7 +153,7 @@ bool audio_device_io_node::impl::_validate_connections() const
 
 void audio_device_io_node::impl::add_device_io()
 {
-    _core->device_io = audio_device_io(_core->device());
+    _core->device_io = audio::device_io{_core->device()};
 }
 
 void audio_device_io_node::impl::remove_device_io()
@@ -161,7 +161,7 @@ void audio_device_io_node::impl::remove_device_io()
     _core->device_io = nullptr;
 }
 
-audio_device_io &audio_device_io_node::impl::device_io() const
+audio::device_io &audio_device_io_node::impl::device_io() const
 {
     return _core->device_io;
 }

@@ -41,7 +41,7 @@ namespace yas
         // from engine
         void _add_device_io() override;
         void _remove_device_io() override;
-        audio_device_io &_device_io() const override;
+        audio::device_io &_device_io() const override;
 
        protected:
         audio_device_io_node(const std::shared_ptr<audio_device_io_node::impl> &impl);

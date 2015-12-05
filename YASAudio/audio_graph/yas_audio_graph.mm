@@ -275,7 +275,7 @@ class audio_graph::impl : public base::impl
     }
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
-    void add_audio_device_io(audio_device_io &device_io)
+    void add_audio_device_io(audio::device_io &device_io)
     {
         {
             std::lock_guard<std::recursive_mutex> lock(_mutex);
@@ -286,7 +286,7 @@ class audio_graph::impl : public base::impl
         }
     }
 
-    void remove_audio_device_io(audio_device_io &device_io)
+    void remove_audio_device_io(audio::device_io &device_io)
     {
         device_io.stop();
         {
@@ -329,7 +329,7 @@ class audio_graph::impl : public base::impl
     std::map<UInt16, audio_unit> _units;
     std::map<UInt16, audio_unit> _io_units;
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
-    std::unordered_set<audio_device_io> _device_ios;
+    std::unordered_set<audio::device_io> _device_ios;
 #endif
 };
 
@@ -365,12 +365,12 @@ void audio_graph::remove_all_units()
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
 
-void audio_graph::add_audio_device_io(audio_device_io &device_io)
+void audio_graph::add_audio_device_io(audio::device_io &device_io)
 {
     impl_ptr<impl>()->add_audio_device_io(device_io);
 }
 
-void audio_graph::remove_audio_device_io(audio_device_io &device_io)
+void audio_graph::remove_audio_device_io(audio::device_io &device_io)
 {
     impl_ptr<impl>()->remove_audio_device_io(device_io);
 }

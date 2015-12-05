@@ -20,50 +20,50 @@ namespace yas
     {
         class pcm_buffer;
         class time;
+
+        class device_io : public base
+        {
+            using super_class = base;
+
+           public:
+            using render_f = std::function<void(audio::pcm_buffer &output_buffer, const audio::time &when)>;
+
+            device_io(std::nullptr_t);
+            explicit device_io(const audio::device &);
+
+            ~device_io();
+
+            device_io(const device_io &) = default;
+            device_io(device_io &&) = default;
+            device_io &operator=(const device_io &) = default;
+            device_io &operator=(device_io &&) = default;
+
+            void set_device(const audio::device device);
+            audio::device device() const;
+            bool is_running() const;
+            void set_render_callback(const render_f &callback);
+            void set_maximum_frames_per_slice(const UInt32 frames);
+            UInt32 maximum_frames_per_slice() const;
+
+            void start() const;
+            void stop() const;
+
+            const audio::pcm_buffer &input_buffer_on_render() const;
+            const audio::time &input_time_on_render() const;
+
+           private:
+            class kernel;
+            class impl;
+
+            void _initialize() const;
+            void _uninitialize() const;
+        };
     }
-
-    class audio_device_io : public base
-    {
-        using super_class = base;
-
-       public:
-        using render_f = std::function<void(audio::pcm_buffer &output_buffer, const audio::time &when)>;
-
-        audio_device_io(std::nullptr_t);
-        explicit audio_device_io(const audio::device &);
-
-        ~audio_device_io();
-
-        audio_device_io(const audio_device_io &) = default;
-        audio_device_io(audio_device_io &&) = default;
-        audio_device_io &operator=(const audio_device_io &) = default;
-        audio_device_io &operator=(audio_device_io &&) = default;
-
-        void set_device(const audio::device device);
-        audio::device device() const;
-        bool is_running() const;
-        void set_render_callback(const render_f &callback);
-        void set_maximum_frames_per_slice(const UInt32 frames);
-        UInt32 maximum_frames_per_slice() const;
-
-        void start() const;
-        void stop() const;
-
-        const audio::pcm_buffer &input_buffer_on_render() const;
-        const audio::time &input_time_on_render() const;
-
-       private:
-        class kernel;
-        class impl;
-
-        void _initialize() const;
-        void _uninitialize() const;
-    };
 }
 
 template <>
-struct std::hash<yas::audio_device_io> {
-    std::size_t operator()(yas::audio_device_io const &key) const
+struct std::hash<yas::audio::device_io> {
+    std::size_t operator()(yas::audio::device_io const &key) const
     {
         return std::hash<uintptr_t>()(key.identifier());
     }

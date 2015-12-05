@@ -53,7 +53,7 @@ void audio_device_io_node::_remove_device_io()
     impl_ptr<impl>()->remove_device_io();
 }
 
-audio_device_io &audio_device_io_node::_device_io() const
+audio::device_io &audio_device_io_node::_device_io() const
 {
     return impl_ptr<impl>()->device_io();
 }

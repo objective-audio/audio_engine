@@ -22,7 +22,7 @@ class yas::audio_device_io_node::impl : public audio_node::impl
 
     void add_device_io();
     void remove_device_io();
-    audio_device_io &device_io() const;
+    audio::device_io &device_io() const;
 
     void set_device(const audio::device &device);
     audio::device device() const;

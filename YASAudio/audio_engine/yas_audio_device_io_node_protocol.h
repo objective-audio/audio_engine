@@ -7,7 +7,10 @@
 
 namespace yas
 {
-    class audio_device_io;
+    namespace audio
+    {
+        class device_io;
+    }
 
     class audio_device_io_node_from_engine
     {
@@ -16,6 +19,6 @@ namespace yas
 
         virtual void _add_device_io() = 0;
         virtual void _remove_device_io() = 0;
-        virtual audio_device_io &_device_io() const = 0;
+        virtual audio::device_io &_device_io() const = 0;
     };
 }
