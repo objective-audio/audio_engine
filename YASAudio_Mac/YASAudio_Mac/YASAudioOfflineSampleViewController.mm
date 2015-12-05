@@ -176,7 +176,7 @@ namespace yas
                     yas::audio_engine_method::configuration_change,
                     [weak_play_output_node = to_weak(play_output_node)](const auto &, const auto &) {
                         if (auto play_output_node = weak_play_output_node.lock()) {
-                            play_output_node.set_device(yas::audio_device::default_output_device());
+                            play_output_node.set_device(yas::audio::device::default_output_device());
                         }
                     });
             }

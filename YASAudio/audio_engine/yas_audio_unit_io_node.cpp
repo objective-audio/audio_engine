@@ -71,12 +71,12 @@ UInt32 audio_unit_io_node::input_device_channel_count() const
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
 
-void audio_unit_io_node::set_device(const audio_device &device)
+void audio_unit_io_node::set_device(const audio::device &device)
 {
     impl_ptr<impl>()->set_device(device);
 }
 
-audio_device audio_unit_io_node::device() const
+audio::device audio_unit_io_node::device() const
 {
     return impl_ptr<impl>()->device();
 }

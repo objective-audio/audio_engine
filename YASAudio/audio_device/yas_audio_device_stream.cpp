@@ -145,9 +145,9 @@ AudioStreamID audio_device_stream::stream_id() const
     return impl_ptr<impl>()->stream_id;
 }
 
-audio_device audio_device_stream::device() const
+audio::device audio_device_stream::device() const
 {
-    return audio_device::device_for_id(impl_ptr<impl>()->device_id);
+    return audio::device::device_for_id(impl_ptr<impl>()->device_id);
 }
 
 bool audio_device_stream::is_active() const

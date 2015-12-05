@@ -41,12 +41,12 @@ class audio_device_io::impl : public base::impl
 {
    public:
     weak<audio_device_io> weak_device_io;
-    audio_device device;
+    audio::device device;
     bool is_running;
     AudioDeviceIOProcID io_proc_id;
     audio::pcm_buffer input_buffer_on_render;
     audio::time input_time_on_render;
-    observer<audio_device::change_info> observer;
+    observer<audio::device::change_info> observer;
 
     impl()
         : weak_device_io(),
@@ -65,20 +65,20 @@ class audio_device_io::impl : public base::impl
 
     ~impl()
     {
-        observer.remove_handler(audio_device::system_subject(), audio_device::hardware_did_change_key);
+        observer.remove_handler(audio::device::system_subject(), audio::device::hardware_did_change_key);
 
         uninitialize();
     }
 
-    void prepare(const audio_device_io &device_io, const audio_device dev)
+    void prepare(const audio_device_io &device_io, const audio::device dev)
     {
         weak_device_io = to_weak(device_io);
 
         observer.add_handler(
-            audio_device::system_subject(), audio_device::hardware_did_change_key,
+            audio::device::system_subject(), audio::device::hardware_did_change_key,
             [weak_device_io = weak_device_io](const auto &method, const auto &infos) {
                 if (auto device_io = weak_device_io.lock()) {
-                    if (device_io.device() && !audio_device::device_for_id(device_io.device().audio_device_id())) {
+                    if (device_io.device() && !audio::device::device_for_id(device_io.device().audio_device_id())) {
                         device_io.set_device(nullptr);
                     }
                 }
@@ -87,7 +87,7 @@ class audio_device_io::impl : public base::impl
         set_device(dev);
     }
 
-    void set_device(const audio_device &dev)
+    void set_device(const audio::device &dev)
     {
         if (device != dev) {
             bool running = is_running;
@@ -95,13 +95,13 @@ class audio_device_io::impl : public base::impl
             uninitialize();
 
             if (device) {
-                observer.remove_handler(device.subject(), audio_device::device_did_change_key);
+                observer.remove_handler(device.subject(), audio::device::device_did_change_key);
             }
 
             device = dev;
 
             if (device) {
-                observer.add_handler(device.subject(), audio_device::device_did_change_key,
+                observer.add_handler(device.subject(), audio::device::device_did_change_key,
                                      [weak_device_io = weak_device_io](const auto &method, const auto &infos) {
                                          if (auto device_io = weak_device_io.lock()) {
                                              device_io.impl_ptr<impl>()->update_kernel();
@@ -190,7 +190,7 @@ class audio_device_io::impl : public base::impl
             return;
         }
 
-        if (audio_device::is_available_device(device)) {
+        if (audio::device::is_available_device(device)) {
             yas_raise_if_au_error(AudioDeviceDestroyIOProcID(device.audio_device_id(), io_proc_id));
         }
 
@@ -221,7 +221,7 @@ class audio_device_io::impl : public base::impl
             return;
         }
 
-        if (audio_device::is_available_device(device)) {
+        if (audio::device::is_available_device(device)) {
             yas_raise_if_au_error(AudioDeviceStop(device.audio_device_id(), io_proc_id));
         }
     }
@@ -293,7 +293,7 @@ audio_device_io::audio_device_io(std::nullptr_t) : super_class(nullptr)
 {
 }
 
-audio_device_io::audio_device_io(const audio_device &device) : super_class(std::make_shared<impl>())
+audio_device_io::audio_device_io(const audio::device &device) : super_class(std::make_shared<impl>())
 {
     impl_ptr<impl>()->prepare(*this, device);
 }
@@ -310,12 +310,12 @@ void audio_device_io::_uninitialize() const
     impl_ptr<impl>()->uninitialize();
 }
 
-void audio_device_io::set_device(const audio_device device)
+void audio_device_io::set_device(const audio::device device)
 {
     impl_ptr<impl>()->set_device(device);
 }
 
-audio_device audio_device_io::device() const
+audio::device audio_device_io::device() const
 {
     return impl_ptr<impl>()->device;
 }

@@ -25,7 +25,7 @@ class audio_device_io_node::impl::core
 
     ~core() = default;
 
-    void set_device(const audio_device &device)
+    void set_device(const audio::device &device)
     {
         _device = device;
         if (device_io) {
@@ -33,13 +33,13 @@ class audio_device_io_node::impl::core
         }
     }
 
-    audio_device device() const
+    audio::device device() const
     {
         return _device;
     }
 
    private:
-    audio_device _device;
+    audio::device _device;
 };
 
 audio_device_io_node::impl::impl() : audio_node::impl(), _core(std::make_unique<core>())
@@ -48,9 +48,9 @@ audio_device_io_node::impl::impl() : audio_node::impl(), _core(std::make_unique<
 
 audio_device_io_node::impl::~impl() = default;
 
-void audio_device_io_node::impl::prepare(const audio_device_io_node &node, const audio_device &device)
+void audio_device_io_node::impl::prepare(const audio_device_io_node &node, const audio::device &device)
 {
-    set_device(device ?: audio_device::default_output_device());
+    set_device(device ?: audio::device::default_output_device());
 }
 
 UInt32 audio_device_io_node::impl::input_bus_count() const
@@ -166,12 +166,12 @@ audio_device_io &audio_device_io_node::impl::device_io() const
     return _core->device_io;
 }
 
-void audio_device_io_node::impl::set_device(const audio_device &device)
+void audio_device_io_node::impl::set_device(const audio::device &device)
 {
     _core->set_device(device);
 }
 
-audio_device audio_device_io_node::impl::device() const
+audio::device audio_device_io_node::impl::device() const
 {
     return _core->device();
 }

@@ -19,7 +19,10 @@
 
 namespace yas
 {
-    class audio_device;
+    namespace audio
+    {
+        class device;
+    }
 
     class audio_device_stream : public base
     {
@@ -66,7 +69,7 @@ namespace yas
         bool operator!=(const audio_device_stream &) const;
 
         AudioStreamID stream_id() const;
-        audio_device device() const;
+        audio::device device() const;
         bool is_active() const;
         direction direction() const;
         audio::format virtual_format() const;

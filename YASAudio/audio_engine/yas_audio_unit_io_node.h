@@ -11,7 +11,10 @@
 namespace yas
 {
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
-    class audio_device;
+    namespace audio
+    {
+        class device;
+    }
 #endif
 
     class audio_unit_io_node : public audio_unit_node
@@ -25,8 +28,8 @@ namespace yas
         virtual ~audio_unit_io_node();
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
-        void set_device(const audio_device &device);
-        audio_device device() const;
+        void set_device(const audio::device &device);
+        audio::device device() const;
 #endif
 
         void set_channel_map(const channel_map_t &map, const yas::direction dir);

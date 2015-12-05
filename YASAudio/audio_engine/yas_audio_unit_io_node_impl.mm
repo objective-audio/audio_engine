@@ -38,7 +38,7 @@ void audio_unit_io_node::impl::reset()
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
 
-void audio_unit_io_node::impl::set_device(const audio_device &device)
+void audio_unit_io_node::impl::set_device(const audio::device &device)
 {
     if (!device) {
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
@@ -47,9 +47,9 @@ void audio_unit_io_node::impl::set_device(const audio_device &device)
     au().set_current_device(device.audio_device_id());
 }
 
-audio_device audio_unit_io_node::impl::device() const
+audio::device audio_unit_io_node::impl::device() const
 {
-    return audio_device::device_for_id(au().current_device());
+    return audio::device::device_for_id(au().current_device());
 }
 
 #endif

@@ -14,7 +14,11 @@
 
 namespace yas
 {
-    class audio_device;
+    namespace audio
+    {
+        class device;
+    }
+
     class audio_graph;
 
     class audio_device_io_node : public audio_node, public audio_device_io_node_from_engine
@@ -26,12 +30,12 @@ namespace yas
 
         audio_device_io_node();
         audio_device_io_node(std::nullptr_t);
-        audio_device_io_node(const audio_device &device);
+        audio_device_io_node(const audio::device &device);
 
         virtual ~audio_device_io_node();
 
-        void set_device(const audio_device &device);
-        audio_device device() const;
+        void set_device(const audio::device &device);
+        audio::device device() const;
 
        private:
         // from engine

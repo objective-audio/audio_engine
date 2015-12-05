@@ -30,7 +30,7 @@ namespace yas
         using render_f = std::function<void(audio::pcm_buffer &output_buffer, const audio::time &when)>;
 
         audio_device_io(std::nullptr_t);
-        explicit audio_device_io(const audio_device &);
+        explicit audio_device_io(const audio::device &);
 
         ~audio_device_io();
 
@@ -39,8 +39,8 @@ namespace yas
         audio_device_io &operator=(const audio_device_io &) = default;
         audio_device_io &operator=(audio_device_io &&) = default;
 
-        void set_device(const audio_device device);
-        audio_device device() const;
+        void set_device(const audio::device device);
+        audio::device device() const;
         bool is_running() const;
         void set_render_callback(const render_f &callback);
         void set_maximum_frames_per_slice(const UInt32 frames);

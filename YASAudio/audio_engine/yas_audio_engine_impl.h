@@ -24,7 +24,7 @@ class yas::audio_engine::impl : public yas::base::impl
     objc::container<> &route_change_observer() const;
     yas::subject<audio_engine> &subject() const;
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
-    observer<audio_device::change_info> &device_observer();
+    observer<audio::device::change_info> &device_observer();
 #endif
 
     bool node_exists(const audio_node &node);

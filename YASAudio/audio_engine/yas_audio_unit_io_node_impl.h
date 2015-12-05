@@ -16,8 +16,8 @@ class yas::audio_unit_io_node::impl : public super_class::impl
     virtual void reset() override;
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
-    void set_device(const audio_device &device);
-    audio_device device() const;
+    void set_device(const audio::device &device);
+    audio::device device() const;
 #endif
     Float64 device_sample_rate() const;
     UInt32 output_device_channel_count() const;
