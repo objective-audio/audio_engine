@@ -15,20 +15,20 @@ class audio_unit_node::impl::core
 {
    public:
     AudioComponentDescription acd;
-    std::unordered_map<AudioUnitScope, audio::audio_unit::parameter_map_t> parameters;
-    yas::audio::audio_unit _au;
+    std::unordered_map<AudioUnitScope, audio::unit::parameter_map_t> parameters;
+    yas::audio::unit _au;
 
     core() : acd(), parameters(), _au(nullptr), _mutex()
     {
     }
 
-    void set_au(const yas::audio::audio_unit &au)
+    void set_au(const yas::audio::unit &au)
     {
         std::lock_guard<std::recursive_mutex> lock(_mutex);
         _au = au;
     }
 
-    yas::audio::audio_unit au() const
+    yas::audio::unit au() const
     {
         std::lock_guard<std::recursive_mutex> lock(_mutex);
         return _au;
@@ -50,7 +50,7 @@ void audio_unit_node::impl::prepare(const audio_unit_node &node, const AudioComp
 {
     _core->acd = acd;
 
-    yas::audio::audio_unit unit(acd);
+    yas::audio::unit unit(acd);
     _core->set_au(unit);
 
     _core->parameters.clear();
@@ -85,28 +85,28 @@ void audio_unit_node::impl::reset()
     super_class::reset();
 }
 
-audio::audio_unit audio_unit_node::impl::au() const
+audio::unit audio_unit_node::impl::au() const
 {
     return _core->au();
 }
 
-const std::unordered_map<AudioUnitParameterID, audio::audio_unit::parameter_map_t> &audio_unit_node::impl::parameters()
+const std::unordered_map<AudioUnitParameterID, audio::unit::parameter_map_t> &audio_unit_node::impl::parameters()
     const
 {
     return _core->parameters;
 }
 
-const audio::audio_unit::parameter_map_t &audio_unit_node::impl::global_parameters() const
+const audio::unit::parameter_map_t &audio_unit_node::impl::global_parameters() const
 {
     return _core->parameters.at(kAudioUnitScope_Global);
 }
 
-const audio::audio_unit::parameter_map_t &audio_unit_node::impl::input_parameters() const
+const audio::unit::parameter_map_t &audio_unit_node::impl::input_parameters() const
 {
     return _core->parameters.at(kAudioUnitScope_Input);
 }
 
-const audio::audio_unit::parameter_map_t &audio_unit_node::impl::output_parameters() const
+const audio::unit::parameter_map_t &audio_unit_node::impl::output_parameters() const
 {
     return _core->parameters.at(kAudioUnitScope_Output);
 }
@@ -264,7 +264,7 @@ void audio_unit_node::impl::prepare_parameters()
 
 void audio_unit_node::impl::reload_audio_unit()
 {
-    _core->set_au(yas::audio::audio_unit(_core->acd));
+    _core->set_au(yas::audio::unit(_core->acd));
 }
 
 void audio_unit_node::impl::render(audio::pcm_buffer &buffer, const UInt32 bus_idx, const audio::time &when)

@@ -5,7 +5,7 @@
 
 #pragma once
 
-class yas::audio::audio_unit::impl : public base::impl
+class yas::audio::unit::impl : public base::impl
 {
    public:
     std::experimental::optional<UInt8> graph_key;
@@ -75,9 +75,9 @@ class yas::audio::audio_unit::impl : public base::impl
     void start();  // for io
     void stop();   // for io
 
-    audio_unit::render_f render_callback() const;  // atomic
-    audio_unit::render_f notify_callback() const;  // atomic
-    audio_unit::render_f input_callback() const;   // atomic
+    unit::render_f render_callback() const;  // atomic
+    unit::render_f notify_callback() const;  // atomic
+    unit::render_f input_callback() const;   // atomic
 
     void set_audio_unit_instance(const AudioUnit);  // atomic
     const AudioUnit audio_unit_instance() const;    // atomic

@@ -35,8 +35,8 @@ namespace yas
             graph &operator=(const graph &) = default;
             graph &operator=(graph &&) = default;
 
-            void add_audio_unit(audio_unit &audio_unit);
-            void remove_audio_unit(audio_unit &audio_unit);
+            void add_audio_unit(unit &audio_unit);
+            void remove_audio_unit(unit &audio_unit);
             void remove_all_units();
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)

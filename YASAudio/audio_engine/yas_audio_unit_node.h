@@ -30,12 +30,12 @@ namespace yas
 
         virtual ~audio_unit_node();
 
-        audio::audio_unit audio_unit() const;
-        const std::unordered_map<AudioUnitScope, std::unordered_map<AudioUnitParameterID, audio::audio_unit::parameter>>
+        audio::unit audio_unit() const;
+        const std::unordered_map<AudioUnitScope, std::unordered_map<AudioUnitParameterID, audio::unit::parameter>>
             &parameters() const;
-        const std::unordered_map<AudioUnitParameterID, audio::audio_unit::parameter> &global_parameters() const;
-        const std::unordered_map<AudioUnitParameterID, audio::audio_unit::parameter> &input_parameters() const;
-        const std::unordered_map<AudioUnitParameterID, audio::audio_unit::parameter> &output_parameters() const;
+        const std::unordered_map<AudioUnitParameterID, audio::unit::parameter> &global_parameters() const;
+        const std::unordered_map<AudioUnitParameterID, audio::unit::parameter> &input_parameters() const;
+        const std::unordered_map<AudioUnitParameterID, audio::unit::parameter> &output_parameters() const;
 
         UInt32 input_element_count() const;
         UInt32 output_element_count() const;

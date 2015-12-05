@@ -8,7 +8,7 @@
 
 using namespace yas;
 
-class yas::audio::audio_unit::parameter::impl
+class yas::audio::unit::parameter::impl
 {
    public:
     AudioUnitParameterID parameter_id;
@@ -22,7 +22,7 @@ class yas::audio::audio_unit::parameter::impl
     std::unordered_map<AudioUnitElement, AudioUnitParameterValue> values;
     std::string unit_name;
     std::string name;
-    yas::subject<audio::audio_unit::parameter::change_info> subject;
+    yas::subject<audio::unit::parameter::change_info> subject;
 
     impl(const AudioUnitParameterInfo &info, const AudioUnitParameterID parameter_id, const AudioUnitScope scope)
         : parameter_id(parameter_id),
@@ -76,20 +76,20 @@ class yas::audio::audio_unit::parameter::impl
     }
 };
 
-audio::audio_unit::parameter::parameter(const AudioUnitParameterInfo &info, const AudioUnitParameterID parameter_id,
+audio::unit::parameter::parameter(const AudioUnitParameterInfo &info, const AudioUnitParameterID parameter_id,
                                         const AudioUnitScope scope)
     : _impl(std::make_unique<impl>(info, parameter_id, scope))
 {
 }
 
-audio::audio_unit::parameter::~parameter() = default;
+audio::unit::parameter::~parameter() = default;
 
-audio::audio_unit::parameter::parameter(parameter &&parameter)
+audio::unit::parameter::parameter(parameter &&parameter)
 {
     _impl = std::move(parameter._impl);
 }
 
-audio::audio_unit::parameter &audio::audio_unit::parameter::operator=(parameter &&rhs)
+audio::unit::parameter &audio::unit::parameter::operator=(parameter &&rhs)
 {
     if (this == &rhs) {
         return *this;
@@ -100,62 +100,62 @@ audio::audio_unit::parameter &audio::audio_unit::parameter::operator=(parameter 
 
 #pragma mark - accessor
 
-AudioUnitParameterID audio::audio_unit::parameter::parameter_id() const
+AudioUnitParameterID audio::unit::parameter::parameter_id() const
 {
     return _impl->parameter_id;
 }
 
-AudioUnitScope audio::audio_unit::parameter::scope() const
+AudioUnitScope audio::unit::parameter::scope() const
 {
     return _impl->scope;
 }
 
-CFStringRef audio::audio_unit::parameter::unit_name() const
+CFStringRef audio::unit::parameter::unit_name() const
 {
     return to_cf_object(_impl->unit_name);
 }
 
-bool audio::audio_unit::parameter::has_clump() const
+bool audio::unit::parameter::has_clump() const
 {
     return _impl->has_clump;
 }
 
-UInt32 audio::audio_unit::parameter::clump_id() const
+UInt32 audio::unit::parameter::clump_id() const
 {
     return _impl->clump_id;
 }
 
-CFStringRef audio::audio_unit::parameter::name() const
+CFStringRef audio::unit::parameter::name() const
 {
     return to_cf_object(_impl->name);
 }
 
-AudioUnitParameterUnit audio::audio_unit::parameter::unit() const
+AudioUnitParameterUnit audio::unit::parameter::unit() const
 {
     return _impl->unit;
 }
 
-AudioUnitParameterValue audio::audio_unit::parameter::min_value() const
+AudioUnitParameterValue audio::unit::parameter::min_value() const
 {
     return _impl->min_value;
 }
 
-AudioUnitParameterValue audio::audio_unit::parameter::max_value() const
+AudioUnitParameterValue audio::unit::parameter::max_value() const
 {
     return _impl->max_value;
 }
 
-AudioUnitParameterValue audio::audio_unit::parameter::default_value() const
+AudioUnitParameterValue audio::unit::parameter::default_value() const
 {
     return _impl->default_value;
 }
 
-Float32 audio::audio_unit::parameter::value(const AudioUnitElement element) const
+Float32 audio::unit::parameter::value(const AudioUnitElement element) const
 {
     return _impl->values.at(element);
 }
 
-void audio::audio_unit::parameter::set_value(const AudioUnitParameterValue value, const AudioUnitElement element)
+void audio::unit::parameter::set_value(const AudioUnitParameterValue value, const AudioUnitElement element)
 {
     change_info info{
         .element = element, .old_value = _impl->values[element], .new_value = value, .parameter = *this,
@@ -166,12 +166,12 @@ void audio::audio_unit::parameter::set_value(const AudioUnitParameterValue value
     _impl->subject.notify(did_change_key, info);
 }
 
-const std::unordered_map<AudioUnitElement, AudioUnitParameterValue> &audio::audio_unit::parameter::values() const
+const std::unordered_map<AudioUnitElement, AudioUnitParameterValue> &audio::unit::parameter::values() const
 {
     return _impl->values;
 }
 
-subject<audio::audio_unit::parameter::change_info> &audio::audio_unit::parameter::subject()
+subject<audio::unit::parameter::change_info> &audio::unit::parameter::subject()
 {
     return _impl->subject;
 }

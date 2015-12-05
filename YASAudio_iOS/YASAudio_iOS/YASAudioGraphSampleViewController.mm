@@ -18,8 +18,8 @@ namespace yas
     {
         struct graph_vc_internal {
             yas::audio::graph graph = nullptr;
-            yas::audio::audio_unit io_unit = nullptr;
-            yas::audio::audio_unit mixer_unit = nullptr;
+            yas::audio::unit io_unit = nullptr;
+            yas::audio::unit mixer_unit = nullptr;
 
             graph_vc_internal()
             {
@@ -31,7 +31,7 @@ namespace yas
 
                 graph = yas::audio::graph{};
 
-                io_unit = yas::audio::audio_unit(kAudioUnitType_Output, yas::audio::audio_unit::sub_type_default_io());
+                io_unit = yas::audio::unit(kAudioUnitType_Output, yas::audio::unit::sub_type_default_io());
                 io_unit.set_enable_input(true);
                 io_unit.set_enable_output(true);
                 io_unit.set_maximum_frames_per_slice(4096);
@@ -42,7 +42,7 @@ namespace yas
                 io_unit.set_input_format(format.stream_description(), 0);
                 io_unit.set_output_format(format.stream_description(), 1);
 
-                mixer_unit = yas::audio::audio_unit(kAudioUnitType_Mixer, kAudioUnitSubType_MultiChannelMixer);
+                mixer_unit = yas::audio::unit(kAudioUnitType_Mixer, kAudioUnitSubType_MultiChannelMixer);
                 mixer_unit.set_maximum_frames_per_slice(4096);
 
                 graph.add_audio_unit(mixer_unit);
@@ -52,7 +52,7 @@ namespace yas
                 mixer_unit.set_output_format(format.stream_description(), 0);
                 mixer_unit.set_input_format(format.stream_description(), 0);
 
-                auto weak_mixer_unit = yas::weak<yas::audio::audio_unit>(mixer_unit);
+                auto weak_mixer_unit = yas::weak<yas::audio::unit>(mixer_unit);
 
                 io_unit.set_render_callback([weak_mixer_unit](yas::render_parameters &render_parameters) {
                     if (auto shared_mixer_unit = weak_mixer_unit.lock()) {
@@ -60,7 +60,7 @@ namespace yas
                     }
                 });
 
-                auto weak_io_unit = yas::weak<yas::audio::audio_unit>(io_unit);
+                auto weak_io_unit = yas::weak<yas::audio::unit>(io_unit);
 
                 mixer_unit.set_render_callback([weak_io_unit](yas::render_parameters &render_parameters) {
                     if (auto shared_io_unit = weak_io_unit.lock()) {

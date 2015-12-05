@@ -36,7 +36,7 @@
 
     yas::audio::graph graph;
 
-    yas::audio::audio_unit converter_unit(kAudioUnitType_FormatConverter, kAudioUnitSubType_AUConverter);
+    yas::audio::unit converter_unit(kAudioUnitType_FormatConverter, kAudioUnitSubType_AUConverter);
     converter_unit.set_maximum_frames_per_slice(maximum_frame_length);
 
     graph.add_audio_unit(converter_unit);
@@ -103,7 +103,7 @@
 
     yas::audio::graph graph;
 
-    yas::audio::audio_unit converter_unit(kAudioUnitType_FormatConverter, kAudioUnitSubType_AUConverter);
+    yas::audio::unit converter_unit(kAudioUnitType_FormatConverter, kAudioUnitSubType_AUConverter);
     converter_unit.set_maximum_frames_per_slice(maximum_frame_length);
 
     graph.add_audio_unit(converter_unit);
@@ -174,7 +174,7 @@
 
 - (void)testParameter
 {
-    yas::audio::audio_unit delay_unit(kAudioUnitType_Effect, kAudioUnitSubType_Delay);
+    yas::audio::unit delay_unit(kAudioUnitType_Effect, kAudioUnitSubType_Delay);
 
     const AudioUnitScope scope = kAudioUnitScope_Global;
     auto parameter = delay_unit.create_parameter(kDelayParam_DelayTime, scope);
@@ -198,7 +198,7 @@
 
 - (void)testParameterCreateFailed
 {
-    yas::audio::audio_unit delay_unit(kAudioUnitType_Effect, kAudioUnitSubType_Delay);
+    yas::audio::unit delay_unit(kAudioUnitType_Effect, kAudioUnitSubType_Delay);
 
     XCTAssertThrows(delay_unit.create_parameter(kDelayParam_DelayTime, kAudioUnitScope_Input));
     XCTAssertThrows(delay_unit.create_parameter(kDelayParam_DelayTime, kAudioUnitScope_Output));
@@ -206,7 +206,7 @@
 
 - (void)testParameters
 {
-    yas::audio::audio_unit delay_unit(kAudioUnitType_Effect, kAudioUnitSubType_Delay);
+    yas::audio::unit delay_unit(kAudioUnitType_Effect, kAudioUnitSubType_Delay);
 
     auto parameters = delay_unit.create_parameters(kAudioUnitScope_Global);
 
@@ -234,20 +234,20 @@
     std::vector<AudioStreamBasicDescription> set_data;
     set_data.push_back(format.stream_description());
 
-    yas::audio::audio_unit converter_unit(kAudioUnitType_FormatConverter, kAudioUnitSubType_AUConverter);
+    yas::audio::unit converter_unit(kAudioUnitType_FormatConverter, kAudioUnitSubType_AUConverter);
 
-    yas::audio::audio_unit::private_access::set_property_data(converter_unit, set_data, property_id, scope, element);
+    yas::audio::unit::private_access::set_property_data(converter_unit, set_data, property_id, scope, element);
 
     std::vector<AudioStreamBasicDescription> get_data;
 
-    XCTAssertNoThrow(get_data = yas::audio::audio_unit::private_access::property_data<AudioStreamBasicDescription>(
+    XCTAssertNoThrow(get_data = yas::audio::unit::private_access::property_data<AudioStreamBasicDescription>(
                          converter_unit, property_id, scope, element));
 
     XCTAssertTrue(yas::is_equal(set_data.at(0), get_data.at(0)));
 
     std::vector<AudioStreamBasicDescription> zero_data;
     XCTAssertThrows(
-        yas::audio::audio_unit::private_access::set_property_data(converter_unit, zero_data, property_id, scope, element));
+        yas::audio::unit::private_access::set_property_data(converter_unit, zero_data, property_id, scope, element));
 }
 
 @end

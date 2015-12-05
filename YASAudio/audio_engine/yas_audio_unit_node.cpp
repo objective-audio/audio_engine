@@ -40,27 +40,27 @@ audio_unit_node::audio_unit_node(const std::shared_ptr<impl> &impl) : super_clas
 
 audio_unit_node::~audio_unit_node() = default;
 
-audio::audio_unit audio_unit_node::audio_unit() const
+audio::unit audio_unit_node::audio_unit() const
 {
     return impl_ptr<impl>()->au();
 }
 
-const std::unordered_map<AudioUnitParameterID, audio::audio_unit::parameter_map_t> &audio_unit_node::parameters() const
+const std::unordered_map<AudioUnitParameterID, audio::unit::parameter_map_t> &audio_unit_node::parameters() const
 {
     return impl_ptr<impl>()->parameters();
 }
 
-const audio::audio_unit::parameter_map_t &audio_unit_node::global_parameters() const
+const audio::unit::parameter_map_t &audio_unit_node::global_parameters() const
 {
     return impl_ptr<impl>()->global_parameters();
 }
 
-const audio::audio_unit::parameter_map_t &audio_unit_node::input_parameters() const
+const audio::unit::parameter_map_t &audio_unit_node::input_parameters() const
 {
     return impl_ptr<impl>()->input_parameters();
 }
 
-const audio::audio_unit::parameter_map_t &audio_unit_node::output_parameters() const
+const audio::unit::parameter_map_t &audio_unit_node::output_parameters() const
 {
     return impl_ptr<impl>()->output_parameters();
 }

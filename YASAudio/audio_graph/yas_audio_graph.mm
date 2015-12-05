@@ -159,13 +159,13 @@ class audio::graph::impl : public base::impl
         return min_empty_key(_units);
     }
 
-    audio_unit unit_for_key(const UInt16 key) const
+    unit unit_for_key(const UInt16 key) const
     {
         std::lock_guard<std::recursive_mutex> lock(_mutex);
         return _units.at(key);
     }
 
-    void add_unit_to_units(audio_unit &unit)
+    void add_unit_to_units(unit &unit)
     {
         if (!unit) {
             throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
@@ -174,7 +174,7 @@ class audio::graph::impl : public base::impl
         auto &unit_for_graph = static_cast<unit_from_graph &>(unit);
 
         if (unit_for_graph._key()) {
-            throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : audio_unit.key is not null.");
+            throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : unit.key is not null.");
         }
 
         std::lock_guard<std::recursive_mutex> lock(_mutex);
@@ -191,7 +191,7 @@ class audio::graph::impl : public base::impl
         }
     }
 
-    void remove_unit_from_units(audio_unit &unit)
+    void remove_unit_from_units(unit &unit)
     {
         std::lock_guard<std::recursive_mutex> lock(_mutex);
 
@@ -205,12 +205,12 @@ class audio::graph::impl : public base::impl
         }
     }
 
-    void add_audio_unit(audio_unit &unit)
+    void add_audio_unit(unit &unit)
     {
         auto &unit_for_graph = static_cast<unit_from_graph &>(unit);
 
         if (unit_for_graph._key()) {
-            throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : audio_unit.key is already assigned.");
+            throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : unit.key is already assigned.");
         }
 
         add_unit_to_units(unit);
@@ -222,12 +222,12 @@ class audio::graph::impl : public base::impl
         }
     }
 
-    void remove_audio_unit(audio_unit &unit)
+    void remove_audio_unit(unit &unit)
     {
         auto &unit_for_graph = static_cast<unit_from_graph &>(unit);
 
         if (!unit_for_graph._key()) {
-            throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : audio_unit.key is not assigned.");
+            throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : unit.key is not assigned.");
         }
 
         unit_for_graph._uninitialize();
@@ -254,8 +254,8 @@ class audio::graph::impl : public base::impl
 #endif
 
         for (auto &pair : _io_units) {
-            auto &audio_unit = pair.second;
-            audio_unit.start();
+            auto &unit = pair.second;
+            unit.start();
         }
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
         for (auto &device_io : _device_ios) {
@@ -267,8 +267,8 @@ class audio::graph::impl : public base::impl
     void stop_all_ios()
     {
         for (auto &pair : _io_units) {
-            auto &audio_unit = pair.second;
-            audio_unit.stop();
+            auto &unit = pair.second;
+            unit.stop();
         }
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
         for (auto &device_io : _device_ios) {
@@ -329,8 +329,8 @@ class audio::graph::impl : public base::impl
     UInt8 _key;
     bool _running;
     mutable std::recursive_mutex _mutex;
-    std::map<UInt16, audio_unit> _units;
-    std::map<UInt16, audio_unit> _io_units;
+    std::map<UInt16, unit> _units;
+    std::map<UInt16, unit> _io_units;
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
     std::unordered_set<audio::device_io> _device_ios;
 #endif
@@ -351,12 +351,12 @@ audio::graph::graph(std::nullptr_t) : super_class(nullptr)
 
 audio::graph::~graph() = default;
 
-void audio::graph::add_audio_unit(audio_unit &unit)
+void audio::graph::add_audio_unit(unit &unit)
 {
     impl_ptr<impl>()->add_audio_unit(unit);
 }
 
-void audio::graph::remove_audio_unit(audio_unit &unit)
+void audio::graph::remove_audio_unit(unit &unit)
 {
     impl_ptr<impl>()->remove_audio_unit(unit);
 }

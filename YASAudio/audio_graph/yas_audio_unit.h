@@ -25,7 +25,7 @@ namespace yas
 {
     namespace audio
     {
-        class audio_unit : public base, public unit_from_graph
+        class unit : public base, public unit_from_graph
         {
             using super_class = base;
             class impl;
@@ -39,16 +39,16 @@ namespace yas
 
             static const OSType sub_type_default_io();
 
-            audio_unit(std::nullptr_t);
-            explicit audio_unit(const AudioComponentDescription &acd);
-            audio_unit(const OSType &type, const OSType &subType);
+            unit(std::nullptr_t);
+            explicit unit(const AudioComponentDescription &acd);
+            unit(const OSType &type, const OSType &subType);
 
-            ~audio_unit() = default;
+            ~unit() = default;
 
-            audio_unit(const audio_unit &) = default;
-            audio_unit(audio_unit &&) = default;
-            audio_unit &operator=(const audio_unit &) = default;
-            audio_unit &operator=(audio_unit &&) = default;
+            unit(const unit &) = default;
+            unit(unit &&) = default;
+            unit &operator=(const unit &) = default;
+            unit &operator=(unit &&) = default;
 
             CFStringRef name() const;
             OSType type() const;
@@ -129,7 +129,7 @@ namespace yas
         };
     }
 
-    audio::audio_unit::au_result_t to_result(const OSStatus err);
+    audio::unit::au_result_t to_result(const OSStatus err);
 }
 
 #include "yas_audio_unit_impl.h"

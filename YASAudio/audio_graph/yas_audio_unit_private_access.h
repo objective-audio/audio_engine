@@ -7,41 +7,41 @@
 
 #if YAS_TEST
 
-class yas::audio::audio_unit::private_access
+class yas::audio::unit::private_access
 {
    public:
-    static void initialize(audio_unit &unit)
+    static void initialize(unit &unit)
     {
         unit.impl_ptr<impl>()->initialize();
     }
 
-    static void uninitialize(audio_unit &unit)
+    static void uninitialize(unit &unit)
     {
         unit.impl_ptr<impl>()->uninitialize();
     }
 
-    static void set_graph_key(audio_unit &unit, const std::experimental::optional<UInt8> &key)
+    static void set_graph_key(unit &unit, const std::experimental::optional<UInt8> &key)
     {
         unit.impl_ptr<impl>()->graph_key = key;
     }
 
-    static const std::experimental::optional<UInt8> &graph_key(const audio_unit &unit)
+    static const std::experimental::optional<UInt8> &graph_key(const unit &unit)
     {
         return unit.impl_ptr<impl>()->graph_key;
     }
 
-    static void set_key(audio_unit &unit, const std::experimental::optional<UInt16> &key)
+    static void set_key(unit &unit, const std::experimental::optional<UInt16> &key)
     {
         unit.impl_ptr<impl>()->key = key;
     }
 
-    static const std::experimental::optional<UInt16> &key(const audio_unit &unit)
+    static const std::experimental::optional<UInt16> &key(const unit &unit)
     {
         return unit.impl_ptr<impl>()->key;
     }
 
     template <typename T>
-    static void set_property_data(const audio_unit &unit, const std::vector<T> &data,
+    static void set_property_data(const unit &unit, const std::vector<T> &data,
                                   const AudioUnitPropertyID property_id, const AudioUnitScope scope,
                                   const AudioUnitElement element)
     {
@@ -49,7 +49,7 @@ class yas::audio::audio_unit::private_access
     }
 
     template <typename T>
-    static std::vector<T> property_data(const audio_unit &unit, const AudioUnitPropertyID property_id,
+    static std::vector<T> property_data(const unit &unit, const AudioUnitPropertyID property_id,
                                         const AudioUnitScope scope, const AudioUnitElement element)
     {
         return unit.impl_ptr<impl>()->property_data<T>(property_id, scope, element);
