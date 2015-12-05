@@ -14,11 +14,6 @@
 
 namespace yas
 {
-    namespace audio_engine_method
-    {
-        static const auto configuration_change = "yas.audio.engine.configuration_change";
-    }
-
     class audio_offline_output_node;
 
     namespace audio
@@ -31,6 +26,8 @@ namespace yas
             class impl;
 
            public:
+            constexpr static auto configuration_change_key = "yas.audio.engine.configuration_change";
+
             enum class start_error_t {
                 already_running,
                 prepare_failure,

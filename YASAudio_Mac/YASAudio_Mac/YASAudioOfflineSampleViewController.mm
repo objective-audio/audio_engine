@@ -173,7 +173,7 @@ namespace yas
                 offline_engine.connect(offline_sine_node, offline_mixer_node, format);
 
                 engine_observer = play_engine.subject().make_observer(
-                    yas::audio_engine_method::configuration_change,
+                    yas::audio::engine::configuration_change_key,
                     [weak_play_output_node = to_weak(play_output_node)](const auto &, const auto &) {
                         if (auto play_output_node = weak_play_output_node.lock()) {
                             play_output_node.set_device(yas::audio::device::default_output_device());

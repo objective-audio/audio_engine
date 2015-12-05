@@ -211,7 +211,7 @@ namespace yas
     }
 
     _internal.engine_observer = _internal.engine.subject().make_observer(
-        yas::audio_engine_method::configuration_change,
+        yas::audio::engine::configuration_change_key,
         [weak_container = _internal.self_container](const auto &method, const auto &sender) {
             if (auto strong_self = weak_container.lock()) {
                 if ([UIApplication sharedApplication].applicationState == UIApplicationStateActive) {
@@ -382,7 +382,7 @@ namespace yas
         case YASAudioEngineIOSampleSectionNotify: {
             if (_internal.engine) {
                 auto &engine = _internal.engine;
-                engine.subject().notify(yas::audio_engine_method::configuration_change, engine);
+                engine.subject().notify(yas::audio::engine::configuration_change_key, engine);
             }
         } break;
 

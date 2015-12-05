@@ -551,5 +551,5 @@ void audio::engine::impl::stop()
 
 void audio::engine::impl::post_configuration_change() const
 {
-    subject().notify(audio_engine_method::configuration_change, _core->weak_engine.lock());
+    subject().notify(configuration_change_key, _core->weak_engine.lock());
 }
