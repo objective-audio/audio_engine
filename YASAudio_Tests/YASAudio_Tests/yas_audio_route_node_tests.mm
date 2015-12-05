@@ -23,7 +23,7 @@
 
 - (void)test_add_and_remove_route
 {
-    yas::audio_route_node route_node;
+    yas::audio::route_node route_node;
 
     XCTAssertEqual(route_node.routes().size(), 0);
 
@@ -50,7 +50,7 @@
 
 - (void)test_replace_route
 {
-    yas::audio_route_node route_node;
+    yas::audio::route_node route_node;
 
     XCTAssertEqual(route_node.routes().size(), 0);
 
@@ -80,7 +80,7 @@
 
     auto format = yas::audio::format(44100.0, 2);
     yas::audio_offline_output_node output_node;
-    yas::audio_route_node route_node;
+    yas::audio::route_node route_node;
     yas::audio::tap_node tap_node;
 
     engine.connect(route_node, output_node, format);
@@ -155,7 +155,7 @@
     auto dst_format = yas::audio::format(44100.0, 2);
     auto src_format = yas::audio::format(44100.0, 1);
     yas::audio_offline_output_node output_node;
-    yas::audio_route_node route_node;
+    yas::audio::route_node route_node;
 
     engine.connect(route_node, output_node, dst_format);
 
@@ -222,7 +222,7 @@
     auto dst_format = yas::audio::format(44100.0, 4);
     auto src_format = yas::audio::format(44100.0, 2);
     yas::audio_offline_output_node output_node;
-    yas::audio_route_node route_node;
+    yas::audio::route_node route_node;
 
     engine.connect(route_node, output_node, dst_format);
 
