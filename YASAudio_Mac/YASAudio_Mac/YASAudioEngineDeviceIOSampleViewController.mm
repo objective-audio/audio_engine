@@ -364,7 +364,7 @@ namespace yas
     auto &routes = _internal.route_node.routes();
     for (YASAudioDeviceRouteSampleOutputData *data in self.outputRoutes) {
         const UInt32 dst_ch_idx = data.outputIndex;
-        auto it = std::find_if(routes.begin(), routes.end(), [dst_ch_idx](const yas::audio_route &route) {
+        auto it = std::find_if(routes.begin(), routes.end(), [dst_ch_idx](const yas::audio::route &route) {
             return route.destination.channel == dst_ch_idx;
         });
 
