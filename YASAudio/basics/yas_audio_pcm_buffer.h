@@ -89,7 +89,7 @@ namespace yas
                                                                       const UInt32 channel_count,
                                                                       const UInt32 size = 0);
         bool is_equal_structure(const AudioBufferList &abl1, const AudioBufferList &abl2);
-
-        std::string to_string(const pcm_buffer::copy_error_t &error);
     }
+
+    std::string to_string(const audio::pcm_buffer::copy_error_t &error);
 }

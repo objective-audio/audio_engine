@@ -53,10 +53,10 @@
     converter_unit.set_input_format(input_format.stream_description(), 0);
 
     AudioStreamBasicDescription outputASBD = converter_unit.output_format(0);
-    XCTAssertTrue(yas::audio::is_equal(output_format.stream_description(), outputASBD));
+    XCTAssertTrue(yas::is_equal(output_format.stream_description(), outputASBD));
 
     AudioStreamBasicDescription inputASBD = converter_unit.input_format(0);
-    XCTAssertTrue(yas::audio::is_equal(input_format.stream_description(), inputASBD));
+    XCTAssertTrue(yas::is_equal(input_format.stream_description(), inputASBD));
 
     XCTestExpectation *expectation = [self expectationWithDescription:@"ConverterUnit Render"];
 
@@ -243,7 +243,7 @@
     XCTAssertNoThrow(get_data = yas::audio_unit::private_access::property_data<AudioStreamBasicDescription>(
                          converter_unit, property_id, scope, element));
 
-    XCTAssertTrue(yas::audio::is_equal(set_data.at(0), get_data.at(0)));
+    XCTAssertTrue(yas::is_equal(set_data.at(0), get_data.at(0)));
 
     std::vector<AudioStreamBasicDescription> zero_data;
     XCTAssertThrows(

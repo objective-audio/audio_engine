@@ -54,11 +54,11 @@ namespace yas
             class impl;
             std::shared_ptr<impl> _impl;
         };
-
-        std::string to_string(const yas::pcm_format &pcm_format);
-        AudioStreamBasicDescription to_stream_description(const CFDictionaryRef &settings);
-        AudioStreamBasicDescription to_stream_description(const Float64 sample_rate, const UInt32 channels,
-                                                          const yas::pcm_format pcm_format, const bool interleaved);
-        bool is_equal(const AudioStreamBasicDescription &asbd1, const AudioStreamBasicDescription &asbd2);
     }
+
+    std::string to_string(const yas::pcm_format &pcm_format);
+    AudioStreamBasicDescription to_stream_description(const CFDictionaryRef &settings);
+    AudioStreamBasicDescription to_stream_description(const Float64 sample_rate, const UInt32 channels,
+                                                      const yas::pcm_format pcm_format, const bool interleaved);
+    bool is_equal(const AudioStreamBasicDescription &asbd1, const AudioStreamBasicDescription &asbd2);
 }

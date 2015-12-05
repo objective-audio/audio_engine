@@ -354,58 +354,58 @@ audio::file::write_result_t audio::file::write_from_buffer(const audio::pcm_buff
     return write_result_t(nullptr);
 }
 
-std::string yas::audio::to_string(const file::open_error_t &error_t)
+std::string yas::to_string(const audio::file::open_error_t &error_t)
 {
     switch (error_t) {
-        case file::open_error_t::opened:
+        case audio::file::open_error_t::opened:
             return "opened";
-        case file::open_error_t::invalid_argument:
+        case audio::file::open_error_t::invalid_argument:
             return "invalid_argument";
-        case file::open_error_t::open_failed:
+        case audio::file::open_error_t::open_failed:
             return "open_failed";
     }
 }
 
-std::string yas::audio::to_string(const file::read_error_t &error_t)
+std::string yas::to_string(const audio::file::read_error_t &error_t)
 {
     switch (error_t) {
-        case file::read_error_t::closed:
+        case audio::file::read_error_t::closed:
             return "closed";
-        case file::read_error_t::invalid_argument:
+        case audio::file::read_error_t::invalid_argument:
             return "invalid_argument";
-        case file::read_error_t::invalid_format:
+        case audio::file::read_error_t::invalid_format:
             return "invalid_format";
-        case file::read_error_t::read_failed:
+        case audio::file::read_error_t::read_failed:
             return "read_failed";
-        case file::read_error_t::tell_failed:
+        case audio::file::read_error_t::tell_failed:
             return "tell_failed";
     }
 }
 
-std::string yas::audio::to_string(const file::create_error_t &error_t)
+std::string yas::to_string(const audio::file::create_error_t &error_t)
 {
     switch (error_t) {
-        case file::create_error_t::created:
+        case audio::file::create_error_t::created:
             return "created";
-        case file::create_error_t::invalid_argument:
+        case audio::file::create_error_t::invalid_argument:
             return "invalid_argument";
-        case file::create_error_t::create_failed:
+        case audio::file::create_error_t::create_failed:
             return "open_failed";
     }
 }
 
-std::string yas::audio::to_string(const file::write_error_t &error_t)
+std::string yas::to_string(const audio::file::write_error_t &error_t)
 {
     switch (error_t) {
-        case file::write_error_t::closed:
+        case audio::file::write_error_t::closed:
             return "closed";
-        case file::write_error_t::invalid_argument:
+        case audio::file::write_error_t::invalid_argument:
             return "invalid_argument";
-        case file::write_error_t::invalid_format:
+        case audio::file::write_error_t::invalid_format:
             return "invalid_format";
-        case file::write_error_t::write_failed:
+        case audio::file::write_error_t::write_failed:
             return "read_failed";
-        case file::write_error_t::tell_failed:
+        case audio::file::write_error_t::tell_failed:
             return "tell_failed";
     }
 }

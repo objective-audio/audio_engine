@@ -615,11 +615,11 @@
 
 - (void)test_copy_error_to_string
 {
-    XCTAssertTrue(yas::audio::to_string(yas::audio::pcm_buffer::copy_error_t::invalid_argument) == "invalid_argument");
-    XCTAssertTrue(yas::audio::to_string(yas::audio::pcm_buffer::copy_error_t::invalid_abl) == "invalid_abl");
-    XCTAssertTrue(yas::audio::to_string(yas::audio::pcm_buffer::copy_error_t::invalid_format) == "invalid_format");
-    XCTAssertTrue(yas::audio::to_string(yas::audio::pcm_buffer::copy_error_t::out_of_range) == "out_of_range");
-    XCTAssertTrue(yas::audio::to_string(yas::audio::pcm_buffer::copy_error_t::buffer_is_null) == "buffer_is_null");
+    XCTAssertTrue(yas::to_string(yas::audio::pcm_buffer::copy_error_t::invalid_argument) == "invalid_argument");
+    XCTAssertTrue(yas::to_string(yas::audio::pcm_buffer::copy_error_t::invalid_abl) == "invalid_abl");
+    XCTAssertTrue(yas::to_string(yas::audio::pcm_buffer::copy_error_t::invalid_format) == "invalid_format");
+    XCTAssertTrue(yas::to_string(yas::audio::pcm_buffer::copy_error_t::out_of_range) == "out_of_range");
+    XCTAssertTrue(yas::to_string(yas::audio::pcm_buffer::copy_error_t::buffer_is_null) == "buffer_is_null");
 }
 
 - (void)test_clear

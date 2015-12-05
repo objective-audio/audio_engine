@@ -46,11 +46,11 @@
 
     AudioStreamBasicDescription asbd = {0};
     XCTAssertNoThrow(asbd = mixer_unit.output_format(0));
-    XCTAssertTrue(yas::audio::is_equal(format.stream_description(), asbd));
+    XCTAssertTrue(yas::is_equal(format.stream_description(), asbd));
 
     memset(&asbd, 0, sizeof(AudioStreamBasicDescription));
     XCTAssertNoThrow(asbd = mixer_unit.input_format(0));
-    XCTAssertTrue(yas::audio::is_equal(format.stream_description(), asbd));
+    XCTAssertTrue(yas::is_equal(format.stream_description(), asbd));
 
     XCTAssertNoThrow(yas::audio_unit::private_access::uninitialize(mixer_unit));
 

@@ -82,10 +82,10 @@ namespace yas
             class impl;
             std::shared_ptr<impl> _impl;
         };
-
-        std::string to_string(const file::open_error_t &);
-        std::string to_string(const file::read_error_t &);
-        std::string to_string(const file::create_error_t &);
-        std::string to_string(const file::write_error_t &);
     }
+
+    std::string to_string(const audio::file::open_error_t &);
+    std::string to_string(const audio::file::read_error_t &);
+    std::string to_string(const audio::file::create_error_t &);
+    std::string to_string(const audio::file::write_error_t &);
 }

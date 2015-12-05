@@ -639,7 +639,7 @@ bool yas::audio::is_equal_structure(const AudioBufferList &abl1, const AudioBuff
     return true;
 }
 
-std::string yas::audio::to_string(const audio::pcm_buffer::copy_error_t &error)
+std::string yas::to_string(const audio::pcm_buffer::copy_error_t &error)
 {
     switch (error) {
         case audio::pcm_buffer::copy_error_t::invalid_argument:

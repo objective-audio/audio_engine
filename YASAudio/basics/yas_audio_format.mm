@@ -242,7 +242,7 @@ const audio::format &audio::format::null_format()
 
 #pragma mark - utility
 
-std::string yas::audio::to_string(const yas::pcm_format &pcm_format)
+std::string yas::to_string(const yas::pcm_format &pcm_format)
 {
     switch (pcm_format) {
         case yas::pcm_format::float32:
@@ -259,7 +259,7 @@ std::string yas::audio::to_string(const yas::pcm_format &pcm_format)
     return "";
 }
 
-AudioStreamBasicDescription yas::audio::to_stream_description(const CFDictionaryRef &settings)
+AudioStreamBasicDescription yas::to_stream_description(const CFDictionaryRef &settings)
 {
     AudioStreamBasicDescription asbd = {0};
 
@@ -335,13 +335,12 @@ AudioStreamBasicDescription yas::audio::to_stream_description(const CFDictionary
     return asbd;
 }
 
-AudioStreamBasicDescription yas::audio::to_stream_description(const Float64 sample_rate, const UInt32 channel_count,
-                                                              const yas::pcm_format pcm_format, const bool interleaved)
+AudioStreamBasicDescription yas::to_stream_description(const Float64 sample_rate, const UInt32 channel_count,
+                                                       const yas::pcm_format pcm_format, const bool interleaved)
 {
     if (pcm_format == yas::pcm_format::other || channel_count == 0) {
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : invalid argument. pcm_format(" +
-                                    audio::to_string(pcm_format) + ") channel_count(" + std::to_string(channel_count) +
-                                    ")");
+                                    to_string(pcm_format) + ") channel_count(" + std::to_string(channel_count) + ")");
     }
 
     AudioStreamBasicDescription asbd = {
@@ -378,7 +377,7 @@ AudioStreamBasicDescription yas::audio::to_stream_description(const Float64 samp
     return asbd;
 }
 
-bool yas::audio::is_equal(const AudioStreamBasicDescription &asbd1, const AudioStreamBasicDescription &asbd2)
+bool yas::is_equal(const AudioStreamBasicDescription &asbd1, const AudioStreamBasicDescription &asbd2)
 {
     return memcmp(&asbd1, &asbd2, sizeof(AudioStreamBasicDescription)) == 0;
 }
