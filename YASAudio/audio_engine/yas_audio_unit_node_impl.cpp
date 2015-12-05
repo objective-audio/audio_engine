@@ -15,7 +15,7 @@ class audio_unit_node::impl::core
 {
    public:
     AudioComponentDescription acd;
-    std::unordered_map<AudioUnitScope, audio_unit_parameter_map_t> parameters;
+    std::unordered_map<AudioUnitScope, audio::audio_unit::parameter_map_t> parameters;
     yas::audio::audio_unit _au;
 
     core() : acd(), parameters(), _au(nullptr), _mutex()
@@ -90,22 +90,23 @@ audio::audio_unit audio_unit_node::impl::au() const
     return _core->au();
 }
 
-const std::unordered_map<AudioUnitParameterID, audio_unit_parameter_map_t> &audio_unit_node::impl::parameters() const
+const std::unordered_map<AudioUnitParameterID, audio::audio_unit::parameter_map_t> &audio_unit_node::impl::parameters()
+    const
 {
     return _core->parameters;
 }
 
-const audio_unit_parameter_map_t &audio_unit_node::impl::global_parameters() const
+const audio::audio_unit::parameter_map_t &audio_unit_node::impl::global_parameters() const
 {
     return _core->parameters.at(kAudioUnitScope_Global);
 }
 
-const audio_unit_parameter_map_t &audio_unit_node::impl::input_parameters() const
+const audio::audio_unit::parameter_map_t &audio_unit_node::impl::input_parameters() const
 {
     return _core->parameters.at(kAudioUnitScope_Input);
 }
 
-const audio_unit_parameter_map_t &audio_unit_node::impl::output_parameters() const
+const audio::audio_unit::parameter_map_t &audio_unit_node::impl::output_parameters() const
 {
     return _core->parameters.at(kAudioUnitScope_Output);
 }

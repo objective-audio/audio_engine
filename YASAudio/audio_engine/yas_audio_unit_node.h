@@ -6,6 +6,7 @@
 #pragma once
 
 #include "yas_audio_node.h"
+#include "yas_audio_unit.h"
 #include "yas_audio_unit_node_protocol.h"
 #include <unordered_map>
 
@@ -14,10 +15,7 @@ namespace yas
     namespace audio
     {
         class graph;
-        class audio_unit;
     }
-
-    class audio_unit_parameter;
 
     class audio_unit_node : public audio_node, public audio_unit_node_from_engine
     {
@@ -33,11 +31,11 @@ namespace yas
         virtual ~audio_unit_node();
 
         audio::audio_unit audio_unit() const;
-        const std::unordered_map<AudioUnitScope, std::unordered_map<AudioUnitParameterID, audio_unit_parameter>>
+        const std::unordered_map<AudioUnitScope, std::unordered_map<AudioUnitParameterID, audio::audio_unit::parameter>>
             &parameters() const;
-        const std::unordered_map<AudioUnitParameterID, audio_unit_parameter> &global_parameters() const;
-        const std::unordered_map<AudioUnitParameterID, audio_unit_parameter> &input_parameters() const;
-        const std::unordered_map<AudioUnitParameterID, audio_unit_parameter> &output_parameters() const;
+        const std::unordered_map<AudioUnitParameterID, audio::audio_unit::parameter> &global_parameters() const;
+        const std::unordered_map<AudioUnitParameterID, audio::audio_unit::parameter> &input_parameters() const;
+        const std::unordered_map<AudioUnitParameterID, audio::audio_unit::parameter> &output_parameters() const;
 
         UInt32 input_element_count() const;
         UInt32 output_element_count() const;

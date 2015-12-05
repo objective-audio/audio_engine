@@ -21,11 +21,11 @@ class yas::audio_unit_node::impl : public audio_node::impl
 
     yas::audio::audio_unit au() const;
 
-    const std::unordered_map<AudioUnitScope, std::unordered_map<AudioUnitParameterID, audio_unit_parameter>>
+    const std::unordered_map<AudioUnitScope, std::unordered_map<AudioUnitParameterID, audio::audio_unit::parameter>>
         &parameters() const;
-    const std::unordered_map<AudioUnitParameterID, audio_unit_parameter> &global_parameters() const;
-    const std::unordered_map<AudioUnitParameterID, audio_unit_parameter> &input_parameters() const;
-    const std::unordered_map<AudioUnitParameterID, audio_unit_parameter> &output_parameters() const;
+    const std::unordered_map<AudioUnitParameterID, audio::audio_unit::parameter> &global_parameters() const;
+    const std::unordered_map<AudioUnitParameterID, audio::audio_unit::parameter> &input_parameters() const;
+    const std::unordered_map<AudioUnitParameterID, audio::audio_unit::parameter> &output_parameters() const;
 
     UInt32 input_element_count() const;
     UInt32 output_element_count() const;

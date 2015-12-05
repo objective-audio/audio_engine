@@ -176,11 +176,11 @@ AudioUnitParameterValue audio::audio_unit::parameter_value(const AudioUnitParame
     return impl_ptr<impl>()->parameter_value(parameter_id, scope, element);
 }
 
-audio_unit_parameter_map_t audio::audio_unit::create_parameters(const AudioUnitScope scope) const
+audio::audio_unit::parameter_map_t audio::audio_unit::create_parameters(const AudioUnitScope scope) const
 {
     auto parameter_list =
         impl_ptr<impl>()->property_data<AudioUnitParameterID>(kAudioUnitProperty_ParameterList, scope, 0);
-    auto parameters = audio_unit_parameter_map_t();
+    auto parameters = audio::audio_unit::parameter_map_t{};
 
     if (parameter_list.size() > 0) {
         for (const AudioUnitParameterID &parameter_id : parameter_list) {
@@ -192,8 +192,8 @@ audio_unit_parameter_map_t audio::audio_unit::create_parameters(const AudioUnitS
     return parameters;
 }
 
-audio_unit_parameter audio::audio_unit::create_parameter(const AudioUnitParameterID &parameter_id,
-                                                         const AudioUnitScope scope) const
+audio::audio_unit::parameter audio::audio_unit::create_parameter(const AudioUnitParameterID &parameter_id,
+                                                                 const AudioUnitScope scope) const
 {
     AudioUnitParameterInfo info = {0};
     UInt32 size = sizeof(AudioUnitParameterInfo);
@@ -203,7 +203,7 @@ audio_unit_parameter audio::audio_unit::create_parameter(const AudioUnitParamete
                                                      kAudioUnitProperty_ParameterInfo, scope, parameter_id, &info,
                                                      &size));
 
-    audio_unit_parameter parameter(info, parameter_id, scope);
+    parameter parameter(info, parameter_id, scope);
 
     if (info.flags & kAudioUnitParameterFlag_CFNameRelease) {
         if (info.flags & kAudioUnitParameterFlag_HasCFNameString && info.cfNameString) {

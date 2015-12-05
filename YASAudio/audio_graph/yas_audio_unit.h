@@ -7,7 +7,6 @@
 
 #include "yas_audio_types.h"
 #include "yas_audio_unit_protocol.h"
-#include "yas_audio_unit_parameter.h"
 #include "yas_exception.h"
 #include "yas_base.h"
 #include "yas_result.h"
@@ -18,6 +17,7 @@
 #include <exception>
 #include <string>
 #include <map>
+#include <unordered_map>
 #include <mutex>
 #include <experimental/optional>
 
@@ -31,6 +31,9 @@ namespace yas
             class impl;
 
            public:
+            class parameter;
+            using parameter_map_t = std::unordered_map<AudioUnitParameterID, parameter>;
+
             using render_f = std::function<void(render_parameters &)>;
             using au_result_t = yas::result<std::nullptr_t, OSStatus>;
 
@@ -77,9 +80,8 @@ namespace yas
             AudioUnitParameterValue parameter_value(const AudioUnitParameterID parameter_id, const AudioUnitScope scope,
                                                     const AudioUnitElement element) const;
 
-            audio_unit_parameter_map_t create_parameters(const AudioUnitScope scope) const;
-            audio_unit_parameter create_parameter(const AudioUnitParameterID &parameter_id,
-                                                  const AudioUnitScope scope) const;
+            parameter_map_t create_parameters(const AudioUnitScope scope) const;
+            parameter create_parameter(const AudioUnitParameterID &parameter_id, const AudioUnitScope scope) const;
 
             void set_element_count(const UInt32 &count, const AudioUnitScope &scope);  // for mixer
             UInt32 element_count(const AudioUnitScope &scope) const;                   // for mixer
@@ -131,6 +133,7 @@ namespace yas
 }
 
 #include "yas_audio_unit_impl.h"
+#include "yas_audio_unit_parameter.h"
 
 #if YAS_TEST
 #include "yas_audio_unit_private_access.h"

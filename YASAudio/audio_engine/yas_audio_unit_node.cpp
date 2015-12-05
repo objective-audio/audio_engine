@@ -4,7 +4,6 @@
 //
 
 #include "yas_audio_unit_node.h"
-#include "yas_audio_unit.h"
 #include "yas_audio_unit_parameter.h"
 
 using namespace yas;
@@ -47,22 +46,22 @@ audio::audio_unit audio_unit_node::audio_unit() const
     return impl_ptr<impl>()->au();
 }
 
-const std::unordered_map<AudioUnitParameterID, audio_unit_parameter_map_t> &audio_unit_node::parameters() const
+const std::unordered_map<AudioUnitParameterID, audio::audio_unit::parameter_map_t> &audio_unit_node::parameters() const
 {
     return impl_ptr<impl>()->parameters();
 }
 
-const audio_unit_parameter_map_t &audio_unit_node::global_parameters() const
+const audio::audio_unit::parameter_map_t &audio_unit_node::global_parameters() const
 {
     return impl_ptr<impl>()->global_parameters();
 }
 
-const audio_unit_parameter_map_t &audio_unit_node::input_parameters() const
+const audio::audio_unit::parameter_map_t &audio_unit_node::input_parameters() const
 {
     return impl_ptr<impl>()->input_parameters();
 }
 
-const audio_unit_parameter_map_t &audio_unit_node::output_parameters() const
+const audio::audio_unit::parameter_map_t &audio_unit_node::output_parameters() const
 {
     return impl_ptr<impl>()->output_parameters();
 }
