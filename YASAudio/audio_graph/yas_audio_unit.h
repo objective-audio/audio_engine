@@ -25,7 +25,7 @@ namespace yas
 {
     namespace audio
     {
-        class audio_unit : public base, public audio_unit_from_graph
+        class audio_unit : public base, public unit_from_graph
         {
             using super_class = base;
             class impl;

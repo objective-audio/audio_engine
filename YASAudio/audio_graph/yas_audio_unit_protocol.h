@@ -9,10 +9,10 @@ namespace yas
 {
     namespace audio
     {
-        class audio_unit_from_graph
+        class unit_from_graph
         {
            public:
-            virtual ~audio_unit_from_graph() = default;
+            virtual ~unit_from_graph() = default;
 
             virtual void _initialize() = 0;
             virtual void _uninitialize() = 0;
