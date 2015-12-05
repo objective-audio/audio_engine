@@ -23,7 +23,7 @@
 
 - (void)test_create_empty
 {
-    yas::audio_format format;
+    yas::audio::format format;
 
     XCTAssertEqual(format.is_empty(), true);
     XCTAssertEqual(format.is_standard(), false);
@@ -39,7 +39,7 @@
 
 - (void)test_create_with_nullptr
 {
-    yas::audio_format format(nullptr);
+    yas::audio::format format(nullptr);
 
     XCTAssertEqual(format.is_empty(), true);
     XCTAssertEqual(format.is_standard(), false);
@@ -55,8 +55,8 @@
 
 - (void)test_nullptr_parameter
 {
-    auto lambda = [self](const yas::audio_format &format) {
-        yas::audio_format empty_format;
+    auto lambda = [self](const yas::audio::format &format) {
+        yas::audio::format empty_format;
         XCTAssertEqual(empty_format, format);
     };
 
@@ -85,7 +85,7 @@
         .mBytesPerPacket = bytesPerFrame,
     };
 
-    auto format = yas::audio_format(sampleRate, channelCount);
+    auto format = yas::audio::format(sampleRate, channelCount);
 
     XCTAssert(format.is_standard());
     XCTAssert(format.channel_count() == channelCount);
@@ -94,7 +94,7 @@
     XCTAssert(format.sample_rate() == sampleRate);
     XCTAssert(format.is_interleaved() == interleaved);
     XCTAssert(format.pcm_format() == pcmFormat);
-    XCTAssertTrue(yas::is_equal(format.stream_description(), asbd));
+    XCTAssertTrue(yas::audio::is_equal(format.stream_description(), asbd));
 }
 
 - (void)test_create_format_48000kHz_1ch_64bits_interleaved
@@ -119,7 +119,7 @@
         .mBytesPerPacket = bytesPerFrame,
     };
 
-    auto format = yas::audio_format(sampleRate, channelCount, pcmFormat, interleaved);
+    auto format = yas::audio::format(sampleRate, channelCount, pcmFormat, interleaved);
 
     XCTAssert(!format.is_standard());
     XCTAssert(format.channel_count() == channelCount);
@@ -128,7 +128,7 @@
     XCTAssert(format.sample_rate() == sampleRate);
     XCTAssert(format.is_interleaved() == interleaved);
     XCTAssert(format.pcm_format() == pcmFormat);
-    XCTAssertTrue(yas::is_equal(format.stream_description(), asbd));
+    XCTAssertTrue(yas::audio::is_equal(format.stream_description(), asbd));
 }
 
 - (void)test_create_format_32000kHz_4ch_16bits_interleaved
@@ -153,7 +153,7 @@
         .mBytesPerPacket = bytesPerFrame,
     };
 
-    auto format = yas::audio_format(sampleRate, channelCount, pcmFormat, interleaved);
+    auto format = yas::audio::format(sampleRate, channelCount, pcmFormat, interleaved);
 
     XCTAssert(!format.is_standard());
     XCTAssert(format.channel_count() == channelCount);
@@ -162,7 +162,7 @@
     XCTAssert(format.sample_rate() == sampleRate);
     XCTAssert(format.is_interleaved() == interleaved);
     XCTAssert(format.pcm_format() == pcmFormat);
-    XCTAssertTrue(yas::is_equal(format.stream_description(), asbd));
+    XCTAssertTrue(yas::audio::is_equal(format.stream_description(), asbd));
 }
 
 - (void)test_create_format_with_streadm_description
@@ -187,14 +187,14 @@
         .mBytesPerPacket = bytesPerFrame * framesPerPacket,
     };
 
-    auto format = yas::audio_format(asbd);
+    auto format = yas::audio::format(asbd);
 
     XCTAssert(!format.is_standard());
     XCTAssert(format.channel_count() == channelCount);
     XCTAssert(format.buffer_count() == bufferCount);
     XCTAssert(format.stride() == stride);
     XCTAssert(format.is_interleaved() == interleaved);
-    XCTAssertTrue(yas::is_equal(format.stream_description(), asbd));
+    XCTAssertTrue(yas::audio::is_equal(format.stream_description(), asbd));
 }
 
 - (void)test_equal_formats
@@ -202,9 +202,9 @@
     const Float64 sampleRate = 44100;
     const UInt32 channelCount = 2;
 
-    auto audio_format1 = yas::audio_format(sampleRate, channelCount);
+    auto audio_format1 = yas::audio::format(sampleRate, channelCount);
     auto audio_format1b = audio_format1;
-    auto audio_format2 = yas::audio_format(sampleRate, channelCount);
+    auto audio_format2 = yas::audio::format(sampleRate, channelCount);
 
     XCTAssert(audio_format1 == audio_format1b);
     XCTAssert(audio_format1 == audio_format2);
@@ -216,7 +216,7 @@
 
     CFDictionaryRef settings = yas::audio::linear_pcm_file_settings(sampleRate, 2, 32, false, true, true);
 
-    auto format = yas::audio_format(settings);
+    auto format = yas::audio::format(settings);
 
     if (kAudioFormatFlagIsBigEndian != kAudioFormatFlagsNativeEndian) {
         XCTAssertEqual(format.pcm_format(), yas::pcm_format::float32);
@@ -232,7 +232,7 @@
 
     settings = yas::audio::linear_pcm_file_settings(sampleRate, 4, 16, true, false, false);
 
-    format = yas::audio_format(settings);
+    format = yas::audio::format(settings);
 
     if (kAudioFormatFlagIsBigEndian == kAudioFormatFlagsNativeEndian) {
         XCTAssertEqual(format.pcm_format(), yas::pcm_format::int16);
@@ -262,75 +262,75 @@
 
     AudioStreamBasicDescription asbd2 = asbd1;
 
-    XCTAssertTrue(yas::is_equal(asbd1, asbd2));
+    XCTAssertTrue(yas::audio::is_equal(asbd1, asbd2));
 
     asbd2 = asbd1;
     asbd2.mSampleRate = 2;
 
-    XCTAssertFalse(yas::is_equal(asbd1, asbd2));
+    XCTAssertFalse(yas::audio::is_equal(asbd1, asbd2));
 
     asbd2 = asbd1;
     asbd2.mFormatID = 2;
 
-    XCTAssertFalse(yas::is_equal(asbd1, asbd2));
+    XCTAssertFalse(yas::audio::is_equal(asbd1, asbd2));
 
     asbd2 = asbd1;
     asbd2.mFormatFlags = 2;
 
-    XCTAssertFalse(yas::is_equal(asbd1, asbd2));
+    XCTAssertFalse(yas::audio::is_equal(asbd1, asbd2));
 
     asbd2 = asbd1;
     asbd2.mBytesPerPacket = 2;
 
-    XCTAssertFalse(yas::is_equal(asbd1, asbd2));
+    XCTAssertFalse(yas::audio::is_equal(asbd1, asbd2));
 
     asbd2 = asbd1;
     asbd2.mFramesPerPacket = 2;
 
-    XCTAssertFalse(yas::is_equal(asbd1, asbd2));
+    XCTAssertFalse(yas::audio::is_equal(asbd1, asbd2));
 
     asbd2 = asbd1;
     asbd2.mBytesPerFrame = 2;
 
-    XCTAssertFalse(yas::is_equal(asbd1, asbd2));
+    XCTAssertFalse(yas::audio::is_equal(asbd1, asbd2));
 
     asbd2 = asbd1;
     asbd2.mChannelsPerFrame = 2;
 
-    XCTAssertFalse(yas::is_equal(asbd1, asbd2));
+    XCTAssertFalse(yas::audio::is_equal(asbd1, asbd2));
 
     asbd2 = asbd1;
     asbd2.mBitsPerChannel = 2;
 
-    XCTAssertFalse(yas::is_equal(asbd1, asbd2));
+    XCTAssertFalse(yas::audio::is_equal(asbd1, asbd2));
 }
 
 - (void)test_pcm_format_to_string
 {
-    XCTAssertTrue(yas::to_string(yas::pcm_format::float32) == "Float32");
-    XCTAssertTrue(yas::to_string(yas::pcm_format::float64) == "Float64");
-    XCTAssertTrue(yas::to_string(yas::pcm_format::int16) == "Int16");
-    XCTAssertTrue(yas::to_string(yas::pcm_format::fixed824) == "Fixed8.24");
-    XCTAssertTrue(yas::to_string(yas::pcm_format::other) == "Other");
+    XCTAssertTrue(yas::audio::to_string(yas::pcm_format::float32) == "Float32");
+    XCTAssertTrue(yas::audio::to_string(yas::pcm_format::float64) == "Float64");
+    XCTAssertTrue(yas::audio::to_string(yas::pcm_format::int16) == "Int16");
+    XCTAssertTrue(yas::audio::to_string(yas::pcm_format::fixed824) == "Fixed8.24");
+    XCTAssertTrue(yas::audio::to_string(yas::pcm_format::other) == "Other");
 }
 
 - (void)test_null_format
 {
-    const auto null_format = yas::audio_format::null_format();
+    const auto null_format = yas::audio::format::null_format();
     XCTAssertFalse(null_format);
 }
 
 - (void)test_is_empty
 {
-    yas::audio_format format{AudioStreamBasicDescription{}};
+    yas::audio::format format{AudioStreamBasicDescription{}};
     XCTAssertTrue(format.is_empty());
 
-    XCTAssertTrue(yas::audio_format::null_format().is_empty());
+    XCTAssertTrue(yas::audio::format::null_format().is_empty());
 }
 
 - (void)test_smoke
 {
-    yas::audio_format format{48000.0, 2};
+    yas::audio::format format{48000.0, 2};
     format.description();
 }
 

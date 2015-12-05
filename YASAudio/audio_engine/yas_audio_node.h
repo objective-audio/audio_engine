@@ -43,8 +43,8 @@ namespace yas
 
         void reset();
 
-        audio_format input_format(const UInt32 bus_idx) const;
-        audio_format output_format(const UInt32 bus_idx) const;
+        audio::format input_format(const UInt32 bus_idx) const;
+        audio::format output_format(const UInt32 bus_idx) const;
         bus_result_t next_available_input_bus() const;
         bus_result_t next_available_output_bus() const;
         bool is_available_input_bus(const UInt32 bus_idx) const;

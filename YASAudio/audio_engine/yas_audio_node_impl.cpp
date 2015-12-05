@@ -70,7 +70,7 @@ void audio_node::impl::reset()
     update_kernel();
 }
 
-audio_format audio_node::impl::input_format(const UInt32 bus_idx)
+audio::format audio_node::impl::input_format(const UInt32 bus_idx)
 {
     if (auto connection = input_connection(bus_idx)) {
         return connection.format();
@@ -78,7 +78,7 @@ audio_format audio_node::impl::input_format(const UInt32 bus_idx)
     return nullptr;
 }
 
-audio_format audio_node::impl::output_format(const UInt32 bus_idx)
+audio::format audio_node::impl::output_format(const UInt32 bus_idx)
 {
     if (auto connection = output_connection(bus_idx)) {
         return connection.format();

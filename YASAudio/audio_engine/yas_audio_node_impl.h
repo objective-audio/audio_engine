@@ -18,8 +18,8 @@ class yas::audio_node::impl : public base::impl
 
     virtual void reset();  // requires super
 
-    audio_format input_format(const UInt32 bus_idx);
-    audio_format output_format(const UInt32 bus_idx);
+    audio::format input_format(const UInt32 bus_idx);
+    audio::format output_format(const UInt32 bus_idx);
     virtual bus_result_t next_available_input_bus() const;
     virtual bus_result_t next_available_output_bus() const;
     virtual bool is_available_input_bus(const UInt32 bus_idx) const;

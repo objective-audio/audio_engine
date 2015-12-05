@@ -244,13 +244,13 @@ namespace yas
 
     const auto output_channel_count = _internal.connection_channel_count_for_direction(yas::direction::output);
     if (output_channel_count > 0) {
-        auto output_format = yas::audio_format(sample_rate, output_channel_count);
+        auto output_format = yas::audio::format(sample_rate, output_channel_count);
         _internal.engine.connect(_internal.mixer_node, _internal.io_node, output_format);
     }
 
     const auto input_channel_count = _internal.connection_channel_count_for_direction(yas::direction::input);
     if (input_channel_count > 0) {
-        auto input_format = yas::audio_format(sample_rate, input_channel_count);
+        auto input_format = yas::audio::format(sample_rate, input_channel_count);
         _internal.engine.connect(_internal.io_node, _internal.mixer_node, input_format);
     }
 }

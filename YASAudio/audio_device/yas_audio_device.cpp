@@ -239,25 +239,25 @@ class audio_device::impl : public base::impl
     {
     }
 
-    void set_input_format(const audio_format &format)
+    void set_input_format(const audio::format &format)
     {
         std::lock_guard<std::recursive_mutex> lock(_mutex);
         _input_format = format;
     }
 
-    audio_format input_format() const
+    audio::format input_format() const
     {
         std::lock_guard<std::recursive_mutex> lock(_mutex);
         return _input_format;
     }
 
-    void set_output_format(const audio_format &format)
+    void set_output_format(const audio::format &format)
     {
         std::lock_guard<std::recursive_mutex> lock(_mutex);
         _output_format = format;
     }
 
-    audio_format output_format() const
+    audio::format output_format() const
     {
         std::lock_guard<std::recursive_mutex> lock(_mutex);
         return _output_format;
@@ -358,7 +358,7 @@ class audio_device::impl : public base::impl
                     channel_count += abl.mBuffers[i].mNumberChannels;
                 }
 
-                audio_format format(stream_format.sample_rate(), channel_count, stream_format.pcm_format(), false);
+                audio::format format(stream_format.sample_rate(), channel_count, stream_format.pcm_format(), false);
 
                 if (scope == kAudioObjectPropertyScopeInput) {
                     set_input_format(format);
@@ -370,8 +370,8 @@ class audio_device::impl : public base::impl
     }
 
    private:
-    audio_format _input_format;
-    audio_format _output_format;
+    audio::format _input_format;
+    audio::format _output_format;
     mutable std::recursive_mutex _mutex;
 };
 
@@ -553,12 +553,12 @@ Float64 audio_device::nominal_sample_rate() const
     return 0;
 }
 
-audio_format audio_device::input_format() const
+audio::format audio_device::input_format() const
 {
     return impl_ptr<impl>()->input_format();
 }
 
-audio_format audio_device::output_format() const
+audio::format audio_device::output_format() const
 {
     return impl_ptr<impl>()->output_format();
 }

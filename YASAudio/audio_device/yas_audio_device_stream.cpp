@@ -170,13 +170,13 @@ direction audio_device_stream::direction() const
     return direction::output;
 }
 
-audio_format audio_device_stream::virtual_format() const
+audio::format audio_device_stream::virtual_format() const
 {
     auto data = _property_data<AudioStreamBasicDescription>(stream_id(), kAudioStreamPropertyVirtualFormat);
     if (!data) {
         throw std::runtime_error(std::string(__PRETTY_FUNCTION__) + " : can't get virtual format.");
     }
-    return audio_format(*data->data());
+    return audio::format(*data->data());
 }
 
 UInt32 audio_device_stream::starting_channel() const

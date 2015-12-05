@@ -36,7 +36,7 @@ class yas::audio_engine::impl : public yas::base::impl
     bool prepare();
 
     audio_connection connect(audio_node &source_node, audio_node &destination_node, const UInt32 source_bus_idx,
-                             const UInt32 destination_bus_idx, const audio_format &format);
+                             const UInt32 destination_bus_idx, const audio::format &format);
     void disconnect(audio_connection &connection);
     void disconnect(audio_node &node);
     void disconnect_node_with_predicate(std::function<bool(const audio_connection &)> predicate);

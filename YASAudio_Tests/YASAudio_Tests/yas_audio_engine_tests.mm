@@ -25,7 +25,7 @@
 {
     yas::audio_engine engine;
 
-    auto format = yas::audio_format(48000.0, 2);
+    auto format = yas::audio::format(48000.0, 2);
     yas::test::audio_test_node source_node(1, 1);
     yas::test::audio_test_node destination_node(1, 1);
 
@@ -48,7 +48,7 @@
 {
     yas::audio_engine engine;
 
-    auto format = yas::audio_format(48000.0, 2);
+    auto format = yas::audio::format(48000.0, 2);
     yas::test::audio_test_node source_node(0, 0);
     yas::test::audio_test_node destination_node(0, 0);
 
@@ -62,7 +62,7 @@
 {
     yas::audio_engine engine;
 
-    auto format = yas::audio_format(48000.0, 2);
+    auto format = yas::audio::format(48000.0, 2);
     yas::test::audio_test_node source_node(1, 1);
     yas::test::audio_test_node relay_node(1, 1);
     yas::test::audio_test_node destination_node(1, 1);

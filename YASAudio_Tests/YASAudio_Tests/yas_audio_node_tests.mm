@@ -38,7 +38,7 @@
 {
     yas::test::audio_test_node source_node;
     yas::test::audio_test_node destination_node;
-    auto format = yas::audio_format(44100.0, 2);
+    auto format = yas::audio::format(44100.0, 2);
     auto source_bus_result = source_node.next_available_input_bus();
     auto destination_bus_result = destination_node.next_available_output_bus();
 
@@ -79,7 +79,7 @@
 {
     yas::test::audio_test_node source_node;
     yas::test::audio_test_node destination_node;
-    auto format = yas::audio_format(48000.0, 2);
+    auto format = yas::audio::format(48000.0, 2);
     auto source_bus = *source_node.next_available_output_bus();
     auto destination_bus = *destination_node.next_available_input_bus();
 
@@ -137,8 +137,8 @@
 
 - (void)test_kernel
 {
-    auto output_format = yas::audio_format(48000.0, 2);
-    auto input_format = yas::audio_format(44100.0, 1);
+    auto output_format = yas::audio::format(48000.0, 2);
+    auto input_format = yas::audio::format(44100.0, 1);
 
     yas::test::audio_test_node output_node;
     yas::test::audio_test_node relay_node;
@@ -181,7 +181,7 @@
 
 - (void)test_available_bus
 {
-    auto format = yas::audio_format(48000.0, 2);
+    auto format = yas::audio::format(48000.0, 2);
     yas::test::audio_test_node source_node_0;
     yas::test::audio_test_node source_node_1;
     yas::test::audio_test_node destination_node;

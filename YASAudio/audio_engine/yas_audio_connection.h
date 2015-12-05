@@ -32,11 +32,11 @@ namespace yas
         UInt32 destination_bus() const;
         audio_node source_node() const;
         audio_node destination_node() const;
-        const audio_format &format() const;
+        const audio::format &format() const;
 
        protected:
         audio_connection(audio_node &source_node, const UInt32 source_bus, audio_node &destination_node,
-                         const UInt32 destination_bus, const audio_format &format);
+                         const UInt32 destination_bus, const audio::format &format);
 
         void _remove_nodes() override;
         void _remove_source_node() override;

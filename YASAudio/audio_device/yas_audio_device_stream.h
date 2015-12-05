@@ -69,7 +69,7 @@ namespace yas
         audio_device device() const;
         bool is_active() const;
         direction direction() const;
-        audio_format virtual_format() const;
+        audio::format virtual_format() const;
         UInt32 starting_channel() const;
 
         subject<change_info> &subject() const;

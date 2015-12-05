@@ -26,7 +26,7 @@
     const UInt32 frame_length = 16;
     const UInt32 channels = 4;
 
-    auto format = yas::audio_format(48000.0, channels);
+    auto format = yas::audio::format(48000.0, channels);
     yas::audio_pcm_buffer buffer(format, frame_length);
 
     XCTAssertEqual(format.buffer_count(), channels);
@@ -57,7 +57,7 @@
     const UInt32 frame_length = 16;
     const UInt32 channels = 4;
 
-    auto format = yas::audio_format(48000.0, channels);
+    auto format = yas::audio::format(48000.0, channels);
     yas::audio_pcm_buffer buffer(format, frame_length);
 
     XCTAssertEqual(format.buffer_count(), channels);
@@ -90,7 +90,7 @@
     const UInt32 frame_length = 16;
     const UInt32 channels = 4;
 
-    auto format = yas::audio_format(48000.0, channels, yas::pcm_format::float32, true);
+    auto format = yas::audio::format(48000.0, channels, yas::pcm_format::float32, true);
     yas::audio_pcm_buffer buffer(format, frame_length);
 
     XCTAssertEqual(format.stride(), channels);
@@ -117,7 +117,7 @@
     const UInt32 frame_length = 16;
     const UInt32 channels = 4;
 
-    auto format = yas::audio_format(48000, channels);
+    auto format = yas::audio::format(48000, channels);
     yas::audio_pcm_buffer buffer(format, frame_length);
 
     XCTAssertEqual(format.buffer_count(), channels);
@@ -159,7 +159,7 @@
 {
     const NSUInteger frame_length = 16;
 
-    auto format = yas::audio_format(48000.0, 1);
+    auto format = yas::audio::format(48000.0, 1);
     yas::audio_pcm_buffer buffer(format, frame_length);
     yas::audio::enumerator enumerator(buffer, 0);
 
@@ -190,7 +190,7 @@
     const NSUInteger frame_length = 16;
     const NSUInteger stopIndex = 8;
 
-    auto format = yas::audio_format(48000.0, 1);
+    auto format = yas::audio::format(48000.0, 1);
     yas::audio_pcm_buffer buffer(format, frame_length);
 
     yas::audio::enumerator enumerator(buffer, 0);

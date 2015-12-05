@@ -28,10 +28,9 @@ namespace yas
         using copy_result = result<UInt32, copy_error_t>;
 
         audio_pcm_buffer(std::nullptr_t n = nullptr);
-        audio_pcm_buffer(const audio_format &format, AudioBufferList *abl);
-        audio_pcm_buffer(const audio_format &format, const UInt32 frame_capacity);
-        audio_pcm_buffer(const audio_format &format, const audio_pcm_buffer &from_buffer,
-                         const channel_map_t &channel_map);
+        audio_pcm_buffer(const audio::format &format, AudioBufferList *abl);
+        audio_pcm_buffer(const audio::format &format, const UInt32 frame_capacity);
+        audio_pcm_buffer(const audio::format &format, const audio_pcm_buffer &from_buffer, const channel_map_t &channel_map);
 
         audio_pcm_buffer(const audio_pcm_buffer &) = default;
         audio_pcm_buffer(audio_pcm_buffer &&) = default;
@@ -40,7 +39,7 @@ namespace yas
 
         explicit operator bool() const;
 
-        const audio_format &format() const;
+        const audio::format &format() const;
         AudioBufferList *audio_buffer_list();
         const AudioBufferList *audio_buffer_list() const;
 

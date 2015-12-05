@@ -46,7 +46,7 @@ namespace yas
                     through_connection = nullptr;
                 }
 
-                auto format = yas::audio_format([AVAudioSession sharedInstance].sampleRate, 2);
+                auto format = yas::audio::format([AVAudioSession sharedInstance].sampleRate, 2);
 
                 if (acd) {
                     effect_node = yas::audio_unit_node(*acd);

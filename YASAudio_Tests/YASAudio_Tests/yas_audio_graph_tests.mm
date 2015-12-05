@@ -42,8 +42,8 @@
     const UInt32 frame_length = 1024;
     const UInt32 maximum_frame_length = 4096;
 
-    auto output_format = yas::audio_format(output_sample_rate, channels);
-    auto mixer_format = yas::audio_format(mixer_sample_rate, channels);
+    auto output_format = yas::audio::format(output_sample_rate, channels);
+    auto mixer_format = yas::audio::format(mixer_sample_rate, channels);
 
     yas::audio_graph graph;
 

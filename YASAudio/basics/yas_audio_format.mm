@@ -40,7 +40,7 @@ static std::string format_flags_string(const AudioStreamBasicDescription &asbd)
 
 static const AudioStreamBasicDescription empty_asbd = {0};
 
-class audio_format::impl
+class audio::format::impl
 {
    public:
     AudioStreamBasicDescription asbd;
@@ -50,11 +50,11 @@ class audio_format::impl
 
 #pragma mark - main
 
-audio_format::audio_format(std::nullptr_t) : _impl(nullptr)
+audio::format::format(std::nullptr_t) : _impl(nullptr)
 {
 }
 
-audio_format::audio_format(const AudioStreamBasicDescription &asbd) : _impl(std::make_shared<impl>())
+audio::format::format(const AudioStreamBasicDescription &asbd) : _impl(std::make_shared<impl>())
 {
     _impl->asbd = asbd;
     _impl->asbd.mReserved = 0;
@@ -86,32 +86,32 @@ audio_format::audio_format(const AudioStreamBasicDescription &asbd) : _impl(std:
     }
 }
 
-audio_format::audio_format(const CFDictionaryRef &settings) : audio_format(to_stream_description(settings))
+audio::format::format(const CFDictionaryRef &settings) : format(to_stream_description(settings))
 {
 }
 
-audio_format::audio_format(const Float64 sample_rate, const UInt32 channel_count, const yas::pcm_format pcm_format,
-                           const bool interleaved)
-    : audio_format(to_stream_description(sample_rate, channel_count, pcm_format, interleaved))
+audio::format::format(const Float64 sample_rate, const UInt32 channel_count, const yas::pcm_format pcm_format,
+                      const bool interleaved)
+    : format(to_stream_description(sample_rate, channel_count, pcm_format, interleaved))
 {
 }
 
-bool audio_format::operator==(const audio_format &rhs) const
+bool audio::format::operator==(const format &rhs) const
 {
     return is_equal(stream_description(), rhs.stream_description());
 }
 
-bool audio_format::operator!=(const audio_format &rhs) const
+bool audio::format::operator!=(const format &rhs) const
 {
     return !is_equal(stream_description(), rhs.stream_description());
 }
 
-audio_format::operator bool() const
+audio::format::operator bool() const
 {
     return _impl != nullptr;
 }
 
-bool audio_format::is_empty() const
+bool audio::format::is_empty() const
 {
     if (_impl) {
         return memcmp(&_impl->asbd, &empty_asbd, sizeof(AudioStreamBasicDescription)) == 0;
@@ -120,7 +120,7 @@ bool audio_format::is_empty() const
     }
 }
 
-bool audio_format::is_standard() const
+bool audio::format::is_standard() const
 {
     if (_impl) {
         return _impl->standard;
@@ -129,7 +129,7 @@ bool audio_format::is_standard() const
     }
 }
 
-yas::pcm_format audio_format::pcm_format() const
+yas::pcm_format audio::format::pcm_format() const
 {
     if (_impl) {
         return _impl->pcm_format;
@@ -138,7 +138,7 @@ yas::pcm_format audio_format::pcm_format() const
     }
 }
 
-UInt32 audio_format::channel_count() const
+UInt32 audio::format::channel_count() const
 {
     if (_impl) {
         return _impl->asbd.mChannelsPerFrame;
@@ -147,7 +147,7 @@ UInt32 audio_format::channel_count() const
     }
 }
 
-UInt32 audio_format::buffer_count() const
+UInt32 audio::format::buffer_count() const
 {
     if (_impl) {
         return is_interleaved() ? 1 : _impl->asbd.mChannelsPerFrame;
@@ -156,7 +156,7 @@ UInt32 audio_format::buffer_count() const
     }
 }
 
-UInt32 audio_format::stride() const
+UInt32 audio::format::stride() const
 {
     if (_impl) {
         return is_interleaved() ? _impl->asbd.mChannelsPerFrame : 1;
@@ -165,7 +165,7 @@ UInt32 audio_format::stride() const
     }
 }
 
-Float64 audio_format::sample_rate() const
+Float64 audio::format::sample_rate() const
 {
     if (_impl) {
         return _impl->asbd.mSampleRate;
@@ -174,7 +174,7 @@ Float64 audio_format::sample_rate() const
     }
 }
 
-bool audio_format::is_interleaved() const
+bool audio::format::is_interleaved() const
 {
     if (_impl) {
         return !(_impl->asbd.mFormatFlags & kAudioFormatFlagIsNonInterleaved);
@@ -183,7 +183,7 @@ bool audio_format::is_interleaved() const
     }
 }
 
-const AudioStreamBasicDescription &audio_format::stream_description() const
+const AudioStreamBasicDescription &audio::format::stream_description() const
 {
     if (_impl) {
         return _impl->asbd;
@@ -192,7 +192,7 @@ const AudioStreamBasicDescription &audio_format::stream_description() const
     }
 }
 
-UInt32 audio_format::sample_byte_count() const
+UInt32 audio::format::sample_byte_count() const
 {
     if (_impl) {
         switch (_impl->pcm_format) {
@@ -211,12 +211,12 @@ UInt32 audio_format::sample_byte_count() const
     }
 }
 
-UInt32 audio_format::buffer_frame_byte_count() const
+UInt32 audio::format::buffer_frame_byte_count() const
 {
     return sample_byte_count() * stride();
 }
 
-CFStringRef audio_format::description() const
+CFStringRef audio::format::description() const
 {
     std::string string;
     const AudioStreamBasicDescription &asbd = stream_description();
@@ -228,21 +228,21 @@ CFStringRef audio_format::description() const
     string += "    bytesPerPacket = " + std::to_string(asbd.mBytesPerPacket) + ";\n";
     string += "    channelsPerFrame = " + std::to_string(asbd.mChannelsPerFrame) + ";\n";
     string += "    formatFlags = " + format_flags_string(stream_description()) + ";\n";
-    string += "    formatID = " + to_string(yas::file_type_for_hfs_type_code(asbd.mFormatID)) + ";\n";
+    string += "    formatID = " + yas::to_string(yas::file_type_for_hfs_type_code(asbd.mFormatID)) + ";\n";
     string += "    framesPerPacket = " + std::to_string(asbd.mFramesPerPacket) + ";\n";
     string += "}\n";
     return yas::to_cf_object(string);
 }
 
-const audio_format &audio_format::null_format()
+const audio::format &audio::format::null_format()
 {
-    static const audio_format _format;
+    static const format _format;
     return _format;
 }
 
 #pragma mark - utility
 
-std::string yas::to_string(const yas::pcm_format &pcm_format)
+std::string yas::audio::to_string(const yas::pcm_format &pcm_format)
 {
     switch (pcm_format) {
         case yas::pcm_format::float32:
@@ -259,7 +259,7 @@ std::string yas::to_string(const yas::pcm_format &pcm_format)
     return "";
 }
 
-AudioStreamBasicDescription yas::to_stream_description(const CFDictionaryRef &settings)
+AudioStreamBasicDescription yas::audio::to_stream_description(const CFDictionaryRef &settings)
 {
     AudioStreamBasicDescription asbd = {0};
 
@@ -335,12 +335,13 @@ AudioStreamBasicDescription yas::to_stream_description(const CFDictionaryRef &se
     return asbd;
 }
 
-AudioStreamBasicDescription yas::to_stream_description(const Float64 sample_rate, const UInt32 channel_count,
-                                                       const yas::pcm_format pcm_format, const bool interleaved)
+AudioStreamBasicDescription yas::audio::to_stream_description(const Float64 sample_rate, const UInt32 channel_count,
+                                                              const yas::pcm_format pcm_format, const bool interleaved)
 {
     if (pcm_format == yas::pcm_format::other || channel_count == 0) {
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : invalid argument. pcm_format(" +
-                                    to_string(pcm_format) + ") channel_count(" + std::to_string(channel_count) + ")");
+                                    audio::to_string(pcm_format) + ") channel_count(" + std::to_string(channel_count) +
+                                    ")");
     }
 
     AudioStreamBasicDescription asbd = {
@@ -377,7 +378,7 @@ AudioStreamBasicDescription yas::to_stream_description(const Float64 sample_rate
     return asbd;
 }
 
-bool yas::is_equal(const AudioStreamBasicDescription &asbd1, const AudioStreamBasicDescription &asbd2)
+bool yas::audio::is_equal(const AudioStreamBasicDescription &asbd1, const AudioStreamBasicDescription &asbd2)
 {
     return memcmp(&asbd1, &asbd2, sizeof(AudioStreamBasicDescription)) == 0;
 }

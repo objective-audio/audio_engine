@@ -59,7 +59,7 @@ namespace yas
             {
                 const auto sample_rate = io_node.device_sample_rate();
 
-                const auto format = yas::audio_format(sample_rate, 2);
+                const auto format = yas::audio::format(sample_rate, 2);
 
                 engine.connect(mixer_node, io_node, format);
                 engine.connect(route_node, mixer_node, format);

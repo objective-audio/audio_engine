@@ -27,7 +27,7 @@ namespace yas
 
        public:
         audio_connection_for_engine(audio_node &source_node, const UInt32 source_bus, audio_node &destination_node,
-                                    const UInt32 destination_bus, const audio_format &format)
+                                    const UInt32 destination_bus, const audio::format &format)
             : super_class(source_node, source_bus, destination_node, destination_bus, format)
         {
         }
@@ -218,7 +218,7 @@ bool audio_engine::impl::prepare()
 
 audio_connection audio_engine::impl::connect(audio_node &source_node, audio_node &destination_node,
                                              const UInt32 source_bus_idx, const UInt32 destination_bus_idx,
-                                             const audio_format &format)
+                                             const audio::format &format)
 {
     if (!source_node || !destination_node) {
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");

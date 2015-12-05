@@ -23,7 +23,7 @@
 
 - (void)test_create_connention_success
 {
-    auto format = yas::audio_format(48000.0, 2);
+    auto format = yas::audio::format(48000.0, 2);
     yas::test::audio_test_node source_node;
     yas::test::audio_test_node destination_node;
     const UInt32 source_bus = 0;
@@ -44,7 +44,7 @@
 
 - (void)test_remove_nodes
 {
-    auto format = yas::audio_format(44100.0, 2);
+    auto format = yas::audio::format(44100.0, 2);
     yas::test::audio_test_node source_node;
     yas::test::audio_test_node destination_node;
     const UInt32 source_bus = 0;
@@ -61,7 +61,7 @@
 
 - (void)test_remove_nodes_separately
 {
-    auto format = yas::audio_format(8000.0, 2);
+    auto format = yas::audio::format(8000.0, 2);
     yas::test::audio_test_node source_node;
     yas::test::audio_test_node destination_node;
     const UInt32 source_bus = 0;
@@ -82,7 +82,7 @@
 
 - (void)test_create_connection_failed
 {
-    auto format = yas::audio_format(48000.0, 2);
+    auto format = yas::audio::format(48000.0, 2);
     yas::test::audio_test_node source_node;
     yas::test::audio_test_node destination_node;
     const UInt32 source_bus = 0;

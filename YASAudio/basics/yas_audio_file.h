@@ -61,9 +61,9 @@ namespace yas
             explicit operator bool() const;
 
             CFURLRef url() const;
-            const audio_format &file_format() const;
-            void set_processing_format(const audio_format &format);
-            const audio_format &processing_format() const;
+            const audio::format &file_format() const;
+            void set_processing_format(const audio::format &format);
+            const audio::format &processing_format() const;
             SInt64 file_length() const;
             SInt64 processing_length() const;
             void set_file_frame_position(const UInt32 position);

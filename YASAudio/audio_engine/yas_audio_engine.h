@@ -49,9 +49,9 @@ namespace yas
 
         audio_engine &operator=(std::nullptr_t);
 
-        audio_connection connect(audio_node &source_node, audio_node &destination_node, const audio_format &format);
+        audio_connection connect(audio_node &source_node, audio_node &destination_node, const audio::format &format);
         audio_connection connect(audio_node &source_node, audio_node &destination_node, const UInt32 source_bus_idx,
-                                 const UInt32 destination_bus_idx, const audio_format &format);
+                                 const UInt32 destination_bus_idx, const audio::format &format);
 
         void disconnect(audio_connection &);
         void disconnect(audio_node &);

@@ -28,12 +28,12 @@ void audio_node::reset()
     impl_ptr<impl>()->reset();
 }
 
-audio_format audio_node::input_format(const UInt32 bus_idx) const
+audio::format audio_node::input_format(const UInt32 bus_idx) const
 {
     return impl_ptr<impl>()->input_format(bus_idx);
 }
 
-audio_format audio_node::output_format(const UInt32 bus_idx) const
+audio::format audio_node::output_format(const UInt32 bus_idx) const
 {
     return impl_ptr<impl>()->output_format(bus_idx);
 }

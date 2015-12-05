@@ -78,7 +78,7 @@
 {
     yas::audio_engine engine;
 
-    auto format = yas::audio_format(44100.0, 2);
+    auto format = yas::audio::format(44100.0, 2);
     yas::audio_offline_output_node output_node;
     yas::audio_route_node route_node;
     yas::audio_tap_node tap_node;
@@ -152,8 +152,8 @@
 
     yas::audio_engine engine;
 
-    auto dst_format = yas::audio_format(44100.0, 2);
-    auto src_format = yas::audio_format(44100.0, 1);
+    auto dst_format = yas::audio::format(44100.0, 2);
+    auto src_format = yas::audio::format(44100.0, 1);
     yas::audio_offline_output_node output_node;
     yas::audio_route_node route_node;
 
@@ -219,8 +219,8 @@
 
     yas::audio_engine engine;
 
-    auto dst_format = yas::audio_format(44100.0, 4);
-    auto src_format = yas::audio_format(44100.0, 2);
+    auto dst_format = yas::audio::format(44100.0, 4);
+    auto src_format = yas::audio::format(44100.0, 2);
     yas::audio_offline_output_node output_node;
     yas::audio_route_node route_node;
 

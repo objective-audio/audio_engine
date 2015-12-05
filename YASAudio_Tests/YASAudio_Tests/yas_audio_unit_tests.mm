@@ -31,8 +31,8 @@
     const OSType type = kAudioUnitType_FormatConverter;
     const OSType sub_type = kAudioUnitSubType_AUConverter;
 
-    auto output_format = yas::audio_format(output_sample_rate, channels, yas::pcm_format::float32, false);
-    auto input_format = yas::audio_format(input_sample_rate, channels, yas::pcm_format::int16, true);
+    auto output_format = yas::audio::format(output_sample_rate, channels, yas::pcm_format::float32, false);
+    auto input_format = yas::audio::format(input_sample_rate, channels, yas::pcm_format::int16, true);
 
     yas::audio_graph graph;
 
@@ -53,10 +53,10 @@
     converter_unit.set_input_format(input_format.stream_description(), 0);
 
     AudioStreamBasicDescription outputASBD = converter_unit.output_format(0);
-    XCTAssertTrue(yas::is_equal(output_format.stream_description(), outputASBD));
+    XCTAssertTrue(yas::audio::is_equal(output_format.stream_description(), outputASBD));
 
     AudioStreamBasicDescription inputASBD = converter_unit.input_format(0);
-    XCTAssertTrue(yas::is_equal(input_format.stream_description(), inputASBD));
+    XCTAssertTrue(yas::audio::is_equal(input_format.stream_description(), inputASBD));
 
     XCTestExpectation *expectation = [self expectationWithDescription:@"ConverterUnit Render"];
 
@@ -99,7 +99,7 @@
     const UInt32 frame_length = 1024;
     const UInt32 maximum_frame_length = 4096;
 
-    auto format = yas::audio_format(sampleRate, channels, yas::pcm_format::float32, false);
+    auto format = yas::audio::format(sampleRate, channels, yas::pcm_format::float32, false);
 
     yas::audio_graph graph;
 
@@ -229,7 +229,7 @@
     const AudioUnitScope scope = kAudioUnitScope_Input;
     const AudioUnitElement element = 0;
 
-    auto format = yas::audio_format(sampleRate, channels, yas::pcm_format::float32, false);
+    auto format = yas::audio::format(sampleRate, channels, yas::pcm_format::float32, false);
 
     std::vector<AudioStreamBasicDescription> set_data;
     set_data.push_back(format.stream_description());
@@ -243,7 +243,7 @@
     XCTAssertNoThrow(get_data = yas::audio_unit::private_access::property_data<AudioStreamBasicDescription>(
                          converter_unit, property_id, scope, element));
 
-    XCTAssertTrue(yas::is_equal(set_data.at(0), get_data.at(0)));
+    XCTAssertTrue(yas::audio::is_equal(set_data.at(0), get_data.at(0)));
 
     std::vector<AudioStreamBasicDescription> zero_data;
     XCTAssertThrows(

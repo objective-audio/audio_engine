@@ -13,7 +13,7 @@ namespace yas
     {
        public:
         static audio_connection create(audio_node &source_node, const UInt32 source_bus, audio_node &destination_node,
-                                       const UInt32 destination_bus, const audio_format &format)
+                                       const UInt32 destination_bus, const audio::format &format)
         {
             return audio_connection(source_node, source_bus, destination_node, destination_bus, format);
         }

@@ -15,11 +15,11 @@ class audio_connection::impl : public base::impl
     UInt32 source_bus;
 
     UInt32 destination_bus;
-    audio_format format;
+    audio::format format;
     mutable std::recursive_mutex mutex;
 
     impl(const audio_node &source_node, const UInt32 source_bus, const audio_node &destination_node,
-         const UInt32 destination_bus, const audio_format &format)
+         const UInt32 destination_bus, const audio::format &format)
         : source_bus(source_bus),
           destination_bus(destination_bus),
           format(format),
@@ -89,7 +89,7 @@ audio_connection::~audio_connection()
 }
 
 audio_connection::audio_connection(audio_node &source_node, const UInt32 source_bus, audio_node &destination_node,
-                                   const UInt32 destination_bus, const audio_format &format)
+                                   const UInt32 destination_bus, const audio::format &format)
     : super_class(std::make_shared<impl>(source_node, source_bus, destination_node, destination_bus, format))
 {
     if (!source_node || !destination_node) {
@@ -126,7 +126,7 @@ audio_node audio_connection::destination_node() const
     return audio_node(nullptr);
 }
 
-const audio_format &audio_connection::format() const
+const audio::format &audio_connection::format() const
 {
     return impl_ptr<impl>()->format;
 }

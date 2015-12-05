@@ -168,8 +168,8 @@ namespace yas
     const bool async = test_data.async;
     CFDictionaryRef settings = test_data.settings();
 
-    auto default_processing_format = yas::audio_format(file_sample_rate, test_data.channels, pcm_format, interleaved);
-    auto processing_format = yas::audio_format(processing_sample_rate, test_data.channels, pcm_format, interleaved);
+    auto default_processing_format = yas::audio::format(file_sample_rate, test_data.channels, pcm_format, interleaved);
+    auto processing_format = yas::audio::format(processing_sample_rate, test_data.channels, pcm_format, interleaved);
 
     // write
 
@@ -243,7 +243,7 @@ namespace yas
 #pragma mark -
 
 - (void)_writeToBuffer:(yas::audio_pcm_buffer &)buffer
-            fileFormat:(const yas::audio_format &)fileFormat
+            fileFormat:(const yas::audio::format &)fileFormat
             startIndex:(NSInteger)startIndex
 {
     const auto &format = buffer.format();
@@ -279,7 +279,7 @@ namespace yas
 }
 
 - (bool)_compareData:(yas::audio_pcm_buffer &)buffer
-          fileFormat:(const yas::audio_format &)fileFormat
+          fileFormat:(const yas::audio::format &)fileFormat
           startIndex:(NSInteger)startIndex
 {
     const auto &format = buffer.format();

@@ -38,7 +38,7 @@ namespace yas
             void prepare()
             {
                 const Float64 sample_rate = input_node.device_sample_rate();
-                yas::audio_format format{sample_rate, 2};
+                yas::audio::format format{sample_rate, 2};
                 engine.connect(input_node, input_tap_node, format);
 
                 input_tap_node.set_render_function([input_level = input_level, sample_rate](

@@ -27,7 +27,7 @@ namespace yas
                 [audioSession setCategory:AVAudioSessionCategoryPlayAndRecord error:nil];
                 const Float64 sample_rate = [audioSession sampleRate];
 
-                auto format = yas::audio_format(sample_rate, 2);
+                auto format = yas::audio::format(sample_rate, 2);
 
                 graph = yas::audio_graph();
 

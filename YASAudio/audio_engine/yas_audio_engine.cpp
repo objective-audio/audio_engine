@@ -27,7 +27,7 @@ audio_engine &audio_engine::operator=(std::nullptr_t)
 }
 
 audio_connection audio_engine::connect(audio_node &source_node, audio_node &destination_node,
-                                       const audio_format &format)
+                                       const audio::format &format)
 {
     if (!source_node || !destination_node) {
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
@@ -44,7 +44,7 @@ audio_connection audio_engine::connect(audio_node &source_node, audio_node &dest
 }
 
 audio_connection audio_engine::connect(audio_node &source_node, audio_node &destination_node, const UInt32 src_bus_idx,
-                                       const UInt32 dst_bus_idx, const audio_format &format)
+                                       const UInt32 dst_bus_idx, const audio::format &format)
 {
     return impl_ptr<impl>()->connect(source_node, destination_node, src_bus_idx, dst_bus_idx, format);
 }

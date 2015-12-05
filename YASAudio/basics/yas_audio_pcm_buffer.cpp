@@ -19,12 +19,12 @@ using namespace yas;
 class audio_pcm_buffer::impl
 {
    public:
-    const audio_format format;
+    const audio::format format;
     const AudioBufferList *abl_ptr;
     const UInt32 frame_capacity;
     UInt32 frame_length;
 
-    impl(const audio_format &format, AudioBufferList *ptr, const UInt32 frame_capacity)
+    impl(const audio::format &format, AudioBufferList *ptr, const UInt32 frame_capacity)
         : format(format),
           abl_ptr(ptr),
           frame_capacity(frame_capacity),
@@ -34,7 +34,7 @@ class audio_pcm_buffer::impl
     {
     }
 
-    impl(const audio_format &format, abl_uptr &&abl, abl_data_uptr &&data, const UInt32 frame_capacity)
+    impl(const audio::format &format, abl_uptr &&abl, abl_data_uptr &&data, const UInt32 frame_capacity)
         : format(format),
           frame_capacity(frame_capacity),
           frame_length(frame_capacity),
@@ -44,7 +44,7 @@ class audio_pcm_buffer::impl
     {
     }
 
-    impl(const audio_format &format, abl_uptr &&abl, const UInt32 frame_capacity)
+    impl(const audio::format &format, abl_uptr &&abl, const UInt32 frame_capacity)
         : format(format),
           frame_capacity(frame_capacity),
           frame_length(frame_capacity),
@@ -221,7 +221,7 @@ audio_pcm_buffer::audio_pcm_buffer(std::nullptr_t) : _impl(nullptr)
 {
 }
 
-audio_pcm_buffer::audio_pcm_buffer(const audio_format &format, AudioBufferList *abl)
+audio_pcm_buffer::audio_pcm_buffer(const audio::format &format, AudioBufferList *abl)
 {
     if (!format || !abl) {
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
@@ -231,7 +231,7 @@ audio_pcm_buffer::audio_pcm_buffer(const audio_format &format, AudioBufferList *
                                    abl->mBuffers[0].mDataByteSize / format.stream_description().mBytesPerFrame);
 }
 
-audio_pcm_buffer::audio_pcm_buffer(const audio_format &format, const UInt32 frame_capacity)
+audio_pcm_buffer::audio_pcm_buffer(const audio::format &format, const UInt32 frame_capacity)
 {
     if (frame_capacity == 0) {
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
@@ -242,7 +242,7 @@ audio_pcm_buffer::audio_pcm_buffer(const audio_format &format, const UInt32 fram
     _impl = std::make_shared<impl>(format, std::move(pair.first), std::move(pair.second), frame_capacity);
 }
 
-audio_pcm_buffer::audio_pcm_buffer(const audio_format &format, const audio_pcm_buffer &from_buffer,
+audio_pcm_buffer::audio_pcm_buffer(const audio::format &format, const audio_pcm_buffer &from_buffer,
                                    const channel_map_t &channel_map)
 {
     const auto &from_format = from_buffer.format();
@@ -295,12 +295,12 @@ audio_pcm_buffer::operator bool() const
     return _impl != nullptr;
 }
 
-const audio_format &audio_pcm_buffer::format() const
+const audio::format &audio_pcm_buffer::format() const
 {
     if (_impl) {
         return _impl->format;
     }
-    return audio_format::null_format();
+    return audio::format::null_format();
 }
 
 AudioBufferList *audio_pcm_buffer::audio_buffer_list()

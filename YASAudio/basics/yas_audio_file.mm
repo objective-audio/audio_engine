@@ -19,8 +19,8 @@ using namespace yas::audio;
 class file::impl
 {
    public:
-    audio_format file_format;
-    audio_format processing_format;
+    audio::format file_format;
+    audio::format processing_format;
     SInt64 file_frame_position;
     ExtAudioFileRef ext_audio_file;
 
@@ -85,10 +85,10 @@ class file::impl
             return false;
         }
 
-        file_format = audio_format(asbd);
+        file_format = audio::format(asbd);
 
         processing_format =
-            audio_format(file_format.sample_rate(), file_format.channel_count(), pcm_format, interleaved);
+            audio::format(file_format.sample_rate(), file_format.channel_count(), pcm_format, interleaved);
 
         if (!ext_audio_file_utils::set_client_format(processing_format.stream_description(), ext_audio_file)) {
             close();
@@ -100,7 +100,7 @@ class file::impl
 
     bool create(const CFDictionaryRef &settings, const pcm_format pcm_format, const bool interleaved)
     {
-        file_format = audio_format(settings);
+        file_format = audio::format(settings);
 
         AudioFileTypeID file_type_id = to_audio_file_type_id(file_type());
         if (!file_type_id) {
@@ -113,7 +113,7 @@ class file::impl
         }
 
         processing_format =
-            audio_format(file_format.sample_rate(), file_format.channel_count(), pcm_format, interleaved);
+            audio::format(file_format.sample_rate(), file_format.channel_count(), pcm_format, interleaved);
 
         if (!ext_audio_file_utils::set_client_format(processing_format.stream_description(), ext_audio_file)) {
             close();
@@ -158,12 +158,12 @@ CFURLRef file::url() const
     return _impl->url();
 }
 
-const audio_format &file::file_format() const
+const audio::format &file::file_format() const
 {
     return _impl->file_format;
 }
 
-void file::set_processing_format(const audio_format &format)
+void file::set_processing_format(const audio::format &format)
 {
     _impl->processing_format = format;
     if (_impl->ext_audio_file) {
@@ -171,7 +171,7 @@ void file::set_processing_format(const audio_format &format)
     }
 }
 
-const audio_format &file::processing_format() const
+const audio::format &file::processing_format() const
 {
     return _impl->processing_format;
 }
@@ -270,7 +270,7 @@ file::read_result_t file::read_into_buffer(audio_pcm_buffer &buffer, const UInt3
     UInt32 out_frame_length = 0;
     UInt32 remain_frames = frame_length > 0 ?: buffer.frame_capacity();
 
-    const audio_format &format = buffer.format();
+    const audio::format &format = buffer.format();
     const UInt32 buffer_count = format.buffer_count();
     const UInt32 stride = format.stride();
 
