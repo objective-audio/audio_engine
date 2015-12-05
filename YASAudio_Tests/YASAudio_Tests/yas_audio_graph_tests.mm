@@ -47,7 +47,7 @@
 
     yas::audio::graph graph;
 
-    yas::audio_unit io_unit(kAudioUnitType_Output, kAudioUnitSubType_GenericOutput);
+    yas::audio::audio_unit io_unit(kAudioUnitType_Output, kAudioUnitSubType_GenericOutput);
     io_unit.set_maximum_frames_per_slice(maximum_frame_length);
     graph.add_audio_unit(io_unit);
 
@@ -55,7 +55,7 @@
 
     const UInt32 mixerInputCount = 16;
 
-    yas::audio_unit mixer_unit(kAudioUnitType_Mixer, kAudioUnitSubType_MultiChannelMixer);
+    yas::audio::audio_unit mixer_unit(kAudioUnitType_Mixer, kAudioUnitSubType_MultiChannelMixer);
     mixer_unit.set_maximum_frames_per_slice(maximum_frame_length);
     graph.add_audio_unit(mixer_unit);
 

@@ -42,7 +42,7 @@ audio_unit_node::audio_unit_node(const std::shared_ptr<impl> &impl) : super_clas
 
 audio_unit_node::~audio_unit_node() = default;
 
-audio_unit audio_unit_node::audio_unit() const
+audio::audio_unit audio_unit_node::audio_unit() const
 {
     return impl_ptr<impl>()->au();
 }

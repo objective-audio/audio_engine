@@ -14,9 +14,9 @@ namespace yas
     namespace audio
     {
         class graph;
+        class audio_unit;
     }
 
-    class audio_unit;
     class audio_unit_parameter;
 
     class audio_unit_node : public audio_node, public audio_unit_node_from_engine
@@ -32,7 +32,7 @@ namespace yas
 
         virtual ~audio_unit_node();
 
-        audio_unit audio_unit() const;
+        audio::audio_unit audio_unit() const;
         const std::unordered_map<AudioUnitScope, std::unordered_map<AudioUnitParameterID, audio_unit_parameter>>
             &parameters() const;
         const std::unordered_map<AudioUnitParameterID, audio_unit_parameter> &global_parameters() const;

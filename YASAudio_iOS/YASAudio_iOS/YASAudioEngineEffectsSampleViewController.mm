@@ -61,7 +61,7 @@ namespace yas
 }
 
 @implementation YASAudioEngineEffectsSampleViewController {
-    std::vector<yas::audio_unit> _audio_units;
+    std::vector<yas::audio::audio_unit> _audio_units;
     std::experimental::optional<UInt32> _index;
     yas::sample::effects_vc_internal _internal;
 }
@@ -141,7 +141,7 @@ namespace yas
             if (component != NULL) {
                 AudioComponentDescription acd;
                 yas_raise_if_au_error(AudioComponentGetDescription(component, &acd));
-                _audio_units.push_back(yas::audio_unit(acd));
+                _audio_units.push_back(yas::audio::audio_unit(acd));
             } else {
                 break;
             }

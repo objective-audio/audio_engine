@@ -19,7 +19,7 @@ class yas::audio_unit_node::impl : public audio_node::impl
     void prepare(const audio_unit_node &node, const AudioComponentDescription &acd);
     virtual void reset() override;
 
-    yas::audio_unit au() const;
+    yas::audio::audio_unit au() const;
 
     const std::unordered_map<AudioUnitScope, std::unordered_map<AudioUnitParameterID, audio_unit_parameter>>
         &parameters() const;

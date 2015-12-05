@@ -144,8 +144,9 @@ yas::flex_ptr yas::test::data_ptr_from_buffer(const audio::pcm_buffer &buffer, c
     return *enumerator.pointer();
 }
 
-void yas::test::audio_unit_render_on_sub_thread(audio_unit &unit, yas::audio::format &format, const UInt32 frame_length,
-                                                const NSUInteger count, const NSTimeInterval wait)
+void yas::test::audio_unit_render_on_sub_thread(audio::audio_unit &unit, audio::format &format,
+                                                const UInt32 frame_length, const NSUInteger count,
+                                                const NSTimeInterval wait)
 {
     auto lambda = [unit, format, frame_length, count, wait]() mutable {
         AudioUnitRenderActionFlags action_flags = 0;

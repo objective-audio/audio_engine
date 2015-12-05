@@ -9,7 +9,7 @@
 
 namespace yas
 {
-    class audio_unit::private_access
+    class audio::audio_unit::private_access
     {
        public:
         static void initialize(audio_unit &unit)
