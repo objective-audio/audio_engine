@@ -107,7 +107,7 @@ namespace yas
     {
         struct device_io_vc_internal {
             yas::audio::engine engine = nullptr;
-            yas::audio_device_io_node device_io_node = nullptr;
+            yas::audio::device_io_node device_io_node = nullptr;
             yas::audio_route_node route_node = nullptr;
             yas::audio_tap_node tap_node = nullptr;
 
@@ -191,7 +191,7 @@ namespace yas
 - (void)setupEngine
 {
     _internal.engine = yas::audio::engine{};
-    _internal.device_io_node = yas::audio_device_io_node{};
+    _internal.device_io_node = yas::audio::device_io_node{};
     _internal.route_node = yas::audio_route_node{};
     _internal.tap_node = yas::audio_tap_node{};
 

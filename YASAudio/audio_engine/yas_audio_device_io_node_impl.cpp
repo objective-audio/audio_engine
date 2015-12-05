@@ -14,7 +14,7 @@
 
 using namespace yas;
 
-class audio_device_io_node::impl::core
+class audio::device_io_node::impl::core
 {
    public:
     audio::device_io device_io;
@@ -42,28 +42,28 @@ class audio_device_io_node::impl::core
     audio::device _device;
 };
 
-audio_device_io_node::impl::impl() : audio_node::impl(), _core(std::make_unique<core>())
+audio::device_io_node::impl::impl() : audio_node::impl(), _core(std::make_unique<core>())
 {
 }
 
-audio_device_io_node::impl::~impl() = default;
+audio::device_io_node::impl::~impl() = default;
 
-void audio_device_io_node::impl::prepare(const audio_device_io_node &node, const audio::device &device)
+void audio::device_io_node::impl::prepare(const device_io_node &node, const audio::device &device)
 {
     set_device(device ?: audio::device::default_output_device());
 }
 
-UInt32 audio_device_io_node::impl::input_bus_count() const
+UInt32 audio::device_io_node::impl::input_bus_count() const
 {
     return 1;
 }
 
-UInt32 audio_device_io_node::impl::output_bus_count() const
+UInt32 audio::device_io_node::impl::output_bus_count() const
 {
     return 1;
 }
 
-void audio_device_io_node::impl::update_connections()
+void audio::device_io_node::impl::update_connections()
 {
     auto &device_io = _core->device_io;
     if (!device_io) {
@@ -75,7 +75,7 @@ void audio_device_io_node::impl::update_connections()
         return;
     }
 
-    auto weak_node = to_weak(cast<audio_device_io_node>());
+    auto weak_node = to_weak(cast<device_io_node>());
     auto weak_device_io = to_weak(device_io);
 
     auto render_function = [weak_node, weak_device_io](audio::pcm_buffer &output_buffer, const audio::time &when) {
@@ -118,7 +118,7 @@ void audio_device_io_node::impl::update_connections()
     device_io.set_render_callback(render_function);
 }
 
-bool audio_device_io_node::impl::_validate_connections() const
+bool audio::device_io_node::impl::_validate_connections() const
 {
     if (const auto &device_io = _core->device_io) {
         if (input_connections().size() > 0) {
@@ -151,32 +151,32 @@ bool audio_device_io_node::impl::_validate_connections() const
     return true;
 }
 
-void audio_device_io_node::impl::add_device_io()
+void audio::device_io_node::impl::add_device_io()
 {
     _core->device_io = audio::device_io{_core->device()};
 }
 
-void audio_device_io_node::impl::remove_device_io()
+void audio::device_io_node::impl::remove_device_io()
 {
     _core->device_io = nullptr;
 }
 
-audio::device_io &audio_device_io_node::impl::device_io() const
+audio::device_io &audio::device_io_node::impl::device_io() const
 {
     return _core->device_io;
 }
 
-void audio_device_io_node::impl::set_device(const audio::device &device)
+void audio::device_io_node::impl::set_device(const audio::device &device)
 {
     _core->set_device(device);
 }
 
-audio::device audio_device_io_node::impl::device() const
+audio::device audio::device_io_node::impl::device() const
 {
     return _core->device();
 }
 
-void audio_device_io_node::impl::render(audio::pcm_buffer &buffer, const UInt32 bus_idx, const audio::time &when)
+void audio::device_io_node::impl::render(audio::pcm_buffer &buffer, const UInt32 bus_idx, const audio::time &when)
 {
     super_class::render(buffer, bus_idx, when);
 

@@ -7,13 +7,13 @@
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
 
-class yas::audio_device_io_node::impl : public audio_node::impl
+class yas::audio::device_io_node::impl : public audio_node::impl
 {
    public:
     impl();
     virtual ~impl();
 
-    void prepare(const audio_device_io_node &, const audio::device &);
+    void prepare(const device_io_node &, const audio::device &);
 
     virtual UInt32 input_bus_count() const override;
     virtual UInt32 output_bus_count() const override;
