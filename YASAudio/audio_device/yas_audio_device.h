@@ -85,8 +85,8 @@ namespace yas
             AudioDeviceID audio_device_id() const;
             CFStringRef name() const;
             CFStringRef manufacture() const;
-            std::vector<audio_device_stream> input_streams() const;
-            std::vector<audio_device_stream> output_streams() const;
+            std::vector<device_stream> input_streams() const;
+            std::vector<device_stream> output_streams() const;
             Float64 nominal_sample_rate() const;
 
             audio::format input_format() const;
