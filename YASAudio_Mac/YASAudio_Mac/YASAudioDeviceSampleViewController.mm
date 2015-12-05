@@ -144,8 +144,8 @@ namespace yas
     namespace sample
     {
         struct device_vc_internal {
-            yas::audio::graph audio_graph = nullptr;
-            yas::audio::device_io audio_device_io = nullptr;
+            yas::audio::graph graph = nullptr;
+            yas::audio::device_io device_io = nullptr;
             yas::base system_observer = nullptr;
             yas::base device_observer = nullptr;
             sample_kernel_sptr kernel;
@@ -185,9 +185,9 @@ namespace yas
         _internal.self_container.set_object(self);
     }
 
-    _internal.audio_graph = yas::audio::graph{};
-    _internal.audio_device_io = yas::audio::device_io{yas::audio::device(nullptr)};
-    _internal.audio_graph.add_audio_device_io(_internal.audio_device_io);
+    _internal.graph = yas::audio::graph{};
+    _internal.device_io = yas::audio::device_io{yas::audio::device(nullptr)};
+    _internal.graph.add_audio_device_io(_internal.device_io);
 
     _internal.kernel = std::make_shared<sample_kernel_t>();
 
@@ -204,8 +204,8 @@ namespace yas
             }
         });
 
-    auto weak_device_io = yas::to_weak(_internal.audio_device_io);
-    _internal.audio_device_io.set_render_callback([weak_device_io, kernel = _internal.kernel](
+    auto weak_device_io = yas::to_weak(_internal.device_io);
+    _internal.device_io.set_render_callback([weak_device_io, kernel = _internal.kernel](
         yas::audio::pcm_buffer & output_buffer, const yas::audio::time &when) {
         if (auto device_io = weak_device_io.lock()) {
             kernel->process(device_io.input_buffer_on_render(), output_buffer);
@@ -222,8 +222,8 @@ namespace yas
 
 - (void)dispose
 {
-    _internal.audio_graph = nullptr;
-    _internal.audio_device_io = nullptr;
+    _internal.graph = nullptr;
+    _internal.device_io = nullptr;
     _internal.system_observer = nullptr;
     _internal.device_observer = nullptr;
     _internal.kernel = nullptr;
@@ -235,8 +235,8 @@ namespace yas
 
     [self setup];
 
-    if (_internal.audio_graph) {
-        _internal.audio_graph.start();
+    if (_internal.graph) {
+        _internal.graph.start();
     }
 }
 
@@ -244,8 +244,8 @@ namespace yas
 {
     [super viewWillDisappear];
 
-    if (_internal.audio_graph) {
-        _internal.audio_graph.stop();
+    if (_internal.graph) {
+        _internal.graph.stop();
     }
 
     [self dispose];
@@ -315,7 +315,7 @@ namespace yas
 
     self.deviceNames = titles;
 
-    auto device = _internal.audio_device_io.device();
+    auto device = _internal.device_io.device();
     auto index = yas::audio::device::index_of_device(device);
     if (index) {
         self.selectedDeviceIndex = *index;
@@ -326,14 +326,14 @@ namespace yas
 
 - (void)setDevice:(const yas::audio::device &)selected_device
 {
-    if (auto prev_audio_device = _internal.audio_device_io.device()) {
+    if (auto prev_audio_device = _internal.device_io.device()) {
         _internal.device_observer = nullptr;
     }
 
     auto all_devices = yas::audio::device::all_devices();
 
     if (selected_device && std::find(all_devices.begin(), all_devices.end(), selected_device) != all_devices.end()) {
-        _internal.audio_device_io.set_device(selected_device);
+        _internal.device_io.set_device(selected_device);
 
         _internal.device_observer = selected_device.subject().make_observer(
             yas::audio::device::device_did_change_key, [selected_device, weak_container = _internal.self_container](
@@ -350,7 +350,7 @@ namespace yas
                 }
             });
     } else {
-        _internal.audio_device_io.set_device(nullptr);
+        _internal.device_io.set_device(nullptr);
     }
 
     [self _updateDeviceInfo];
@@ -358,7 +358,7 @@ namespace yas
 
 - (void)_updateDeviceInfo
 {
-    auto const device = _internal.audio_device_io.device();
+    auto const device = _internal.device_io.device();
     NSColor *onColor = [NSColor blackColor];
     NSColor *offColor = [NSColor lightGrayColor];
     if (device) {
