@@ -99,7 +99,7 @@
 - (void)test_render_time
 {
     auto node = yas::audio_node::private_access::create();
-    yas::audio_time time(100, 48000.0);
+    yas::audio::time time(100, 48000.0);
 
     XCTestExpectation *render_expectation = [self expectationWithDescription:@"node render"];
 

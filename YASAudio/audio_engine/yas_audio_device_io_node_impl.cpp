@@ -78,7 +78,7 @@ void audio_device_io_node::impl::update_connections()
     auto weak_node = to_weak(cast<audio_device_io_node>());
     auto weak_device_io = to_weak(device_io);
 
-    auto render_function = [weak_node, weak_device_io](audio::pcm_buffer &output_buffer, const audio_time &when) {
+    auto render_function = [weak_node, weak_device_io](audio::pcm_buffer &output_buffer, const audio::time &when) {
         if (auto node = weak_node.lock()) {
             if (auto kernel = node.impl_ptr<impl>()->kernel_cast()) {
                 if (output_buffer) {
@@ -100,7 +100,7 @@ void audio_device_io_node::impl::update_connections()
                         if (auto destination_node = connection.destination_node()) {
                             if (auto input_tap_node = destination_node.cast<audio_input_tap_node>()) {
                                 auto input_buffer = device_io.input_buffer_on_render();
-                                const audio_time &input_time = device_io.input_time_on_render();
+                                const audio::time &input_time = device_io.input_time_on_render();
                                 if (input_buffer && input_time) {
                                     if (connection.format() ==
                                         destination_node.input_format(connection.destination_bus())) {
@@ -176,7 +176,7 @@ audio_device audio_device_io_node::impl::device() const
     return _core->device();
 }
 
-void audio_device_io_node::impl::render(audio::pcm_buffer &buffer, const UInt32 bus_idx, const audio_time &when)
+void audio_device_io_node::impl::render(audio::pcm_buffer &buffer, const UInt32 bus_idx, const audio::time &when)
 {
     super_class::render(buffer, bus_idx, when);
 

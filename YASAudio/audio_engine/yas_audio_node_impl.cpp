@@ -40,13 +40,13 @@ class audio_node::impl::core
         return _kernel;
     }
 
-    void set_render_time(const audio_time &render_time)
+    void set_render_time(const audio::time &render_time)
     {
         std::lock_guard<std::recursive_mutex> lock(_mutex);
         _render_time = render_time;
     }
 
-    audio_time render_time() const
+    audio::time render_time() const
     {
         std::lock_guard<std::recursive_mutex> lock(_mutex);
         return _render_time;
@@ -54,7 +54,7 @@ class audio_node::impl::core
 
    private:
     std::shared_ptr<audio_node::kernel> _kernel;
-    audio_time _render_time;
+    audio::time _render_time;
     mutable std::recursive_mutex _mutex;
 };
 
@@ -230,17 +230,17 @@ void audio_node::impl::remove_connection(const audio_connection &connection)
     update_kernel();
 }
 
-void audio_node::impl::render(audio::pcm_buffer &buffer, const UInt32 bus_idx, const audio_time &when)
+void audio_node::impl::render(audio::pcm_buffer &buffer, const UInt32 bus_idx, const audio::time &when)
 {
     set_render_time_on_render(when);
 }
 
-audio_time audio_node::impl::render_time() const
+audio::time audio_node::impl::render_time() const
 {
     return _core->render_time();
 }
 
-void audio_node::impl::set_render_time_on_render(const audio_time &time)
+void audio_node::impl::set_render_time_on_render(const audio::time &time)
 {
     _core->set_render_time(time);
 }

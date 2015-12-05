@@ -49,7 +49,7 @@ class yas::audio_unit_node::impl : public audio_node::impl
     void reload_audio_unit();
     void set_graph(const audio_graph &);
 
-    virtual void render(audio::pcm_buffer &buffer, const UInt32 bus_idx, const audio_time &when) override;
+    virtual void render(audio::pcm_buffer &buffer, const UInt32 bus_idx, const audio::time &when) override;
 
    private:
     class core;

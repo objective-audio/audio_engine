@@ -22,7 +22,7 @@ namespace yas
 
         virtual ~audio_tap_node();
 
-        using render_f = std::function<void(audio::pcm_buffer &buffer, const UInt32 bus_idx, const audio_time &when)>;
+        using render_f = std::function<void(audio::pcm_buffer &buffer, const UInt32 bus_idx, const audio::time &when)>;
 
         void set_render_function(const render_f &);
 
@@ -30,7 +30,7 @@ namespace yas
         audio_connection output_connection_on_render(const UInt32 bus_idx) const;
         audio_connection_smap input_connections_on_render() const;
         audio_connection_smap output_connections_on_render() const;
-        void render_source(audio::pcm_buffer &buffer, const UInt32 bus_idx, const audio_time &when);
+        void render_source(audio::pcm_buffer &buffer, const UInt32 bus_idx, const audio::time &when);
 
        protected:
         explicit audio_tap_node(const std::shared_ptr<impl> &);

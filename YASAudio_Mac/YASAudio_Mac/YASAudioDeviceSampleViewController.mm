@@ -206,7 +206,7 @@ namespace yas
 
     auto weak_device_io = yas::to_weak(_internal.audio_device_io);
     _internal.audio_device_io.set_render_callback([weak_device_io, kernel = _internal.kernel](
-        yas::audio::pcm_buffer & output_buffer, const yas::audio_time &when) {
+        yas::audio::pcm_buffer & output_buffer, const yas::audio::time &when) {
         if (auto device_io = weak_device_io.lock()) {
             kernel->process(device_io.input_buffer_on_render(), output_buffer);
         }

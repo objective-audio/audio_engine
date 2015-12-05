@@ -45,7 +45,7 @@ class audio_device_io::impl : public base::impl
     bool is_running;
     AudioDeviceIOProcID io_proc_id;
     audio::pcm_buffer input_buffer_on_render;
-    audio_time input_time_on_render;
+    audio::time input_time_on_render;
     observer<audio_device::change_info> observer;
 
     impl()
@@ -147,7 +147,7 @@ class audio_device_io::impl : public base::impl
                             if (input_frame_length > 0) {
                                 imp->input_buffer_on_render = input_buffer;
                                 imp->input_time_on_render =
-                                    audio_time(*inInputTime, input_buffer.format().sample_rate());
+                                    audio::time(*inInputTime, input_buffer.format().sample_rate());
                             }
                         }
                     }
@@ -159,7 +159,7 @@ class audio_device_io::impl : public base::impl
                                     audio::frame_length(outOutputData, output_buffer.format().sample_byte_count());
                                 if (frame_length > 0) {
                                     output_buffer.set_frame_length(frame_length);
-                                    audio_time time(*inOutputTime, output_buffer.format().sample_rate());
+                                    audio::time time(*inOutputTime, output_buffer.format().sample_rate());
                                     render_callback(output_buffer, time);
                                     output_buffer.copy_to(outOutputData);
                                 }
@@ -355,7 +355,7 @@ const audio::pcm_buffer &audio_device_io::input_buffer_on_render() const
     return impl_ptr<impl>()->input_buffer_on_render;
 }
 
-const audio_time &audio_device_io::input_time_on_render() const
+const audio::time &audio_device_io::input_time_on_render() const
 {
     return impl_ptr<impl>()->input_time_on_render;
 }

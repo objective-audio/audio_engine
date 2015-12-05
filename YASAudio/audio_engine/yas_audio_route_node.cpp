@@ -78,7 +78,7 @@ class audio_route_node::impl : public audio_node::impl
         route_kernel->routes = _core->routes;
     }
 
-    virtual void render(audio::pcm_buffer &dst_buffer, const UInt32 dst_bus_idx, const audio_time &when) override
+    virtual void render(audio::pcm_buffer &dst_buffer, const UInt32 dst_bus_idx, const audio::time &when) override
     {
         super_class::render(dst_buffer, dst_bus_idx, when);
 

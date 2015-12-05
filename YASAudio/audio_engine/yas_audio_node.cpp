@@ -63,7 +63,7 @@ audio_engine audio_node::engine() const
     return impl_ptr<impl>()->engine();
 }
 
-audio_time audio_node::last_render_time() const
+audio::time audio_node::last_render_time() const
 {
     return impl_ptr<impl>()->render_time();
 }
@@ -80,12 +80,12 @@ UInt32 audio_node::output_bus_count() const
 
 #pragma mark render thread
 
-void audio_node::render(audio::pcm_buffer &buffer, const UInt32 bus_idx, const audio_time &when)
+void audio_node::render(audio::pcm_buffer &buffer, const UInt32 bus_idx, const audio::time &when)
 {
     impl_ptr<impl>()->render(buffer, bus_idx, when);
 }
 
-void audio_node::set_render_time_on_render(const audio_time &time)
+void audio_node::set_render_time_on_render(const audio::time &time)
 {
     impl_ptr<impl>()->set_render_time_on_render(time);
 }

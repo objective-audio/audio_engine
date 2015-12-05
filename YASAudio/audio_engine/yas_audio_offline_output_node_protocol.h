@@ -13,6 +13,7 @@ namespace yas
     namespace audio
     {
         class pcm_buffer;
+        class time;
     }
 
     enum class offline_start_error_t {
@@ -21,9 +22,7 @@ namespace yas
         connection_not_found,
     };
 
-    class audio_time;
-
-    using offline_render_f = std::function<void(audio::pcm_buffer &buffer, const audio_time &when, bool &stop)>;
+    using offline_render_f = std::function<void(audio::pcm_buffer &buffer, const audio::time &when, bool &stop)>;
     using offline_completion_f = std::function<void(const bool cancelled)>;
     using offline_start_result_t = yas::result<std::nullptr_t, offline_start_error_t>;
 

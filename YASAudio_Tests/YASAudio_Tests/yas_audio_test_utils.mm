@@ -153,8 +153,8 @@ void yas::test::audio_unit_render_on_sub_thread(audio_unit &unit, yas::audio::fo
         yas::audio::pcm_buffer buffer(format, frame_length);
 
         for (NSInteger i = 0; i < count; i++) {
-            yas::audio_time audio_time(frame_length * i, format.sample_rate());
-            AudioTimeStamp timeStamp = audio_time.audio_time_stamp();
+            yas::audio::time time(frame_length * i, format.sample_rate());
+            AudioTimeStamp timeStamp = time.audio_time_stamp();
 
             yas::render_parameters parameters = {
                 .in_render_type = yas::render_type::normal,

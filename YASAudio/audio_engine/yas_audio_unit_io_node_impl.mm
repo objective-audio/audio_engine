@@ -189,7 +189,7 @@ class audio_unit_input_node::impl::core
 {
    public:
     audio::pcm_buffer input_buffer;
-    audio_time render_time;
+    audio::time render_time;
 };
 
 audio_unit_input_node::impl::impl()
@@ -231,7 +231,7 @@ void audio_unit_input_node::impl::update_connections()
                 if (const auto kernel = input_node.impl_ptr<impl>()->kernel_cast()) {
                     if (const auto connection = kernel->output_connection(1)) {
                         auto format = connection.format();
-                        audio_time time(*render_parameters.io_time_stamp, format.sample_rate());
+                        audio::time time(*render_parameters.io_time_stamp, format.sample_rate());
                         input_node.set_render_time_on_render(time);
 
                         if (auto io_unit = input_node.audio_unit()) {

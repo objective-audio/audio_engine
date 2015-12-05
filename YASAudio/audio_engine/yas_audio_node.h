@@ -18,8 +18,12 @@
 
 namespace yas
 {
+    namespace audio
+    {
+        class time;
+    }
+
     class audio_engine;
-    class audio_time;
 
     class audio_node : public base, public audio_node_from_engine, public audio_node_from_connection
     {
@@ -50,13 +54,13 @@ namespace yas
         bool is_available_input_bus(const UInt32 bus_idx) const;
         bool is_available_output_bus(const UInt32 bus_idx) const;
         audio_engine engine() const;
-        audio_time last_render_time() const;
+        audio::time last_render_time() const;
 
         UInt32 input_bus_count() const;
         UInt32 output_bus_count() const;
 
-        void render(audio::pcm_buffer &buffer, const UInt32 bus_idx, const audio_time &when);
-        void set_render_time_on_render(const audio_time &time);
+        void render(audio::pcm_buffer &buffer, const UInt32 bus_idx, const audio::time &when);
+        void set_render_time_on_render(const audio::time &time);
 
        protected:
         class kernel_from_node;

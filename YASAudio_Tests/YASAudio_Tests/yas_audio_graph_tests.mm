@@ -153,8 +153,8 @@
 
     auto dispatch_labmda = [io_unit, output_format, output_sample_rate]() mutable {
         AudioUnitRenderActionFlags actionFlags = 0;
-        yas::audio_time audio_time(0, output_sample_rate);
-        AudioTimeStamp timeStamp = audio_time.audio_time_stamp();
+        yas::audio::time time(0, output_sample_rate);
+        AudioTimeStamp timeStamp = time.audio_time_stamp();
 
         yas::audio::pcm_buffer buffer(output_format, frame_length);
 

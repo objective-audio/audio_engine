@@ -61,7 +61,7 @@ namespace yas
                 auto weak_node = yas::to_weak(*this);
 
                 auto render_function = [weak_node](audio::pcm_buffer &buffer, const UInt32 bus_idx,
-                                                   const audio_time &when) {
+                                                   const audio::time &when) {
                     buffer.clear();
 
                     if (auto node = weak_node.lock()) {

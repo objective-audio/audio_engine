@@ -19,16 +19,15 @@ namespace yas
     namespace audio
     {
         class pcm_buffer;
+        class time;
     }
-
-    class audio_time;
 
     class audio_device_io : public base
     {
         using super_class = base;
 
        public:
-        using render_f = std::function<void(audio::pcm_buffer &output_buffer, const audio_time &when)>;
+        using render_f = std::function<void(audio::pcm_buffer &output_buffer, const audio::time &when)>;
 
         audio_device_io(std::nullptr_t);
         explicit audio_device_io(const audio_device &);
@@ -51,7 +50,7 @@ namespace yas
         void stop() const;
 
         const audio::pcm_buffer &input_buffer_on_render() const;
-        const audio_time &input_time_on_render() const;
+        const audio::time &input_time_on_render() const;
 
        private:
         class kernel;

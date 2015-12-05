@@ -50,9 +50,9 @@ class yas::audio_node::impl : public base::impl
     audio_engine engine() const;
     void set_engine(const audio_engine &);
 
-    virtual void render(audio::pcm_buffer &buffer, const UInt32 bus_idx, const audio_time &when);
-    audio_time render_time() const;
-    void set_render_time_on_render(const audio_time &time);
+    virtual void render(audio::pcm_buffer &buffer, const UInt32 bus_idx, const audio::time &when);
+    audio::time render_time() const;
+    void set_render_time_on_render(const audio::time &time);
 
    private:
     class core;
