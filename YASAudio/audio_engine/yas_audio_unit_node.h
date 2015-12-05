@@ -11,6 +11,11 @@
 
 namespace yas
 {
+    namespace audio
+    {
+        class graph;
+    }
+
     class audio_unit;
     class audio_unit_parameter;
 
