@@ -7,19 +7,18 @@
 #include "yas_exception.h"
 
 using namespace yas;
-using namespace yas::audio;
 
-const CFStringRef file_type::three_gpp = CFSTR("public.3gpp");
-const CFStringRef file_type::three_gpp2 = CFSTR("public.3gpp2");
-const CFStringRef file_type::aifc = CFSTR("public.aifc-audio");
-const CFStringRef file_type::aiff = CFSTR("public.aiff-audio");
-const CFStringRef file_type::amr = CFSTR("org.3gpp.adaptive-multi-rate-audio");
-const CFStringRef file_type::ac3 = CFSTR("public.ac3-audio");
-const CFStringRef file_type::mpeg_layer3 = CFSTR("public.mp3");
-const CFStringRef file_type::core_audio_format = CFSTR("com.apple.coreaudio-format");
-const CFStringRef file_type::mpeg4 = CFSTR("public.mpeg-4");
-const CFStringRef file_type::apple_m4a = CFSTR("com.apple.m4a-audio");
-const CFStringRef file_type::wave = CFSTR("com.microsoft.waveform-audio");
+const CFStringRef audio::file_type::three_gpp = CFSTR("public.3gpp");
+const CFStringRef audio::file_type::three_gpp2 = CFSTR("public.3gpp2");
+const CFStringRef audio::file_type::aifc = CFSTR("public.aifc-audio");
+const CFStringRef audio::file_type::aiff = CFSTR("public.aiff-audio");
+const CFStringRef audio::file_type::amr = CFSTR("org.3gpp.adaptive-multi-rate-audio");
+const CFStringRef audio::file_type::ac3 = CFSTR("public.ac3-audio");
+const CFStringRef audio::file_type::mpeg_layer3 = CFSTR("public.mp3");
+const CFStringRef audio::file_type::core_audio_format = CFSTR("com.apple.coreaudio-format");
+const CFStringRef audio::file_type::mpeg4 = CFSTR("public.mpeg-4");
+const CFStringRef audio::file_type::apple_m4a = CFSTR("com.apple.m4a-audio");
+const CFStringRef audio::file_type::wave = CFSTR("com.microsoft.waveform-audio");
 
 AudioFileTypeID yas::audio::to_audio_file_type_id(const CFStringRef fileType)
 {
@@ -114,7 +113,7 @@ namespace audio_file_utils
 
 #pragma mark - ext audio file
 
-Boolean ext_audio_file_utils::can_open(const CFURLRef url)
+Boolean audio::ext_audio_file_utils::can_open(const CFURLRef url)
 {
     Boolean result = true;
     AudioFileID file_id;
@@ -130,27 +129,27 @@ Boolean ext_audio_file_utils::can_open(const CFURLRef url)
     return result;
 }
 
-Boolean ext_audio_file_utils::open(ExtAudioFileRef *ext_audio_file, const CFURLRef url)
+Boolean audio::ext_audio_file_utils::open(ExtAudioFileRef *ext_audio_file, const CFURLRef url)
 {
     OSStatus err = ExtAudioFileOpenURL(url, ext_audio_file);
     return err == noErr;
 }
 
-Boolean ext_audio_file_utils::create(ExtAudioFileRef *extAudioFile, const CFURLRef url,
-                                     const AudioFileTypeID file_type_id, const AudioStreamBasicDescription &asbd)
+Boolean audio::ext_audio_file_utils::create(ExtAudioFileRef *extAudioFile, const CFURLRef url,
+                                            const AudioFileTypeID file_type_id, const AudioStreamBasicDescription &asbd)
 {
     OSStatus err = ExtAudioFileCreateWithURL(url, file_type_id, &asbd, NULL, kAudioFileFlags_EraseFile, extAudioFile);
     return err == noErr;
 }
 
-Boolean ext_audio_file_utils::dispose(const ExtAudioFileRef ext_audio_file)
+Boolean audio::ext_audio_file_utils::dispose(const ExtAudioFileRef ext_audio_file)
 {
     OSStatus err = ExtAudioFileDispose(ext_audio_file);
     return err == noErr;
 }
 
-Boolean ext_audio_file_utils::set_client_format(const AudioStreamBasicDescription &asbd,
-                                                const ExtAudioFileRef ext_audio_file)
+Boolean audio::ext_audio_file_utils::set_client_format(const AudioStreamBasicDescription &asbd,
+                                                       const ExtAudioFileRef ext_audio_file)
 {
     UInt32 size = sizeof(AudioStreamBasicDescription);
     OSStatus err = noErr;
@@ -159,8 +158,8 @@ Boolean ext_audio_file_utils::set_client_format(const AudioStreamBasicDescriptio
     return err == noErr;
 }
 
-Boolean ext_audio_file_utils::get_audio_file_format(AudioStreamBasicDescription *asbd,
-                                                    const ExtAudioFileRef ext_audio_file)
+Boolean audio::ext_audio_file_utils::get_audio_file_format(AudioStreamBasicDescription *asbd,
+                                                           const ExtAudioFileRef ext_audio_file)
 {
     UInt32 size = sizeof(AudioStreamBasicDescription);
     OSStatus err = noErr;
@@ -169,7 +168,7 @@ Boolean ext_audio_file_utils::get_audio_file_format(AudioStreamBasicDescription 
     return err == noErr;
 }
 
-AudioFileID ext_audio_file_utils::get_audio_file_id(const ExtAudioFileRef ext_audio_file)
+AudioFileID audio::ext_audio_file_utils::get_audio_file_id(const ExtAudioFileRef ext_audio_file)
 {
     UInt32 size = sizeof(AudioFileID);
     AudioFileID file_id = 0;
@@ -177,7 +176,7 @@ AudioFileID ext_audio_file_utils::get_audio_file_id(const ExtAudioFileRef ext_au
     return file_id;
 }
 
-SInt64 ext_audio_file_utils::get_file_length_frames(const ExtAudioFileRef ext_audio_file)
+SInt64 audio::ext_audio_file_utils::get_file_length_frames(const ExtAudioFileRef ext_audio_file)
 {
     SInt64 result = 0;
     UInt32 size = sizeof(SInt64);
@@ -186,7 +185,7 @@ SInt64 ext_audio_file_utils::get_file_length_frames(const ExtAudioFileRef ext_au
     return result;
 }
 
-AudioFileTypeID ext_audio_file_utils::get_audio_file_type_id(const ExtAudioFileRef ext_audio_file)
+AudioFileTypeID audio::ext_audio_file_utils::get_audio_file_type_id(const ExtAudioFileRef ext_audio_file)
 {
     AudioFileID file_id = get_audio_file_id(ext_audio_file);
     return audio_file_utils::get_audio_file_type_id(file_id);
@@ -194,7 +193,7 @@ AudioFileTypeID ext_audio_file_utils::get_audio_file_type_id(const ExtAudioFileR
 
 CFStringRef get_audio_file_type(const ExtAudioFileRef ext_audio_file)
 {
-    return to_file_type(ext_audio_file_utils::get_audio_file_type_id(ext_audio_file));
+    return audio::to_file_type(audio::ext_audio_file_utils::get_audio_file_type_id(ext_audio_file));
 }
 
 #pragma mark -

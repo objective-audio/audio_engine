@@ -12,11 +12,10 @@
 #include <AudioToolbox/AudioToolbox.h>
 
 using namespace yas;
-using namespace yas::audio;
 
 #pragma mark -
 
-class file::impl
+class audio::file::impl
 {
    public:
     audio::format file_format;
@@ -141,11 +140,11 @@ class file::impl
     CFStringRef _file_type;
 };
 
-file::file() : _impl(std::make_shared<impl>())
+audio::file::file() : _impl(std::make_shared<impl>())
 {
 }
 
-file::operator bool() const
+audio::file::operator bool() const
 {
     if (_impl) {
         return _impl->is_open();
@@ -153,17 +152,17 @@ file::operator bool() const
     return false;
 }
 
-CFURLRef file::url() const
+CFURLRef audio::file::url() const
 {
     return _impl->url();
 }
 
-const audio::format &file::file_format() const
+const audio::format &audio::file::file_format() const
 {
     return _impl->file_format;
 }
 
-void file::set_processing_format(const audio::format &format)
+void audio::file::set_processing_format(const audio::format &format)
 {
     _impl->processing_format = format;
     if (_impl->ext_audio_file) {
@@ -171,12 +170,12 @@ void file::set_processing_format(const audio::format &format)
     }
 }
 
-const audio::format &file::processing_format() const
+const audio::format &audio::file::processing_format() const
 {
     return _impl->processing_format;
 }
 
-SInt64 file::file_length() const
+SInt64 audio::file::file_length() const
 {
     if (_impl->ext_audio_file) {
         return ext_audio_file_utils::get_file_length_frames(_impl->ext_audio_file);
@@ -184,7 +183,7 @@ SInt64 file::file_length() const
     return 0;
 }
 
-SInt64 file::processing_length() const
+SInt64 audio::file::processing_length() const
 {
     const SInt64 fileLength = file_length();
     const Float64 rate =
@@ -192,7 +191,7 @@ SInt64 file::processing_length() const
     return fileLength * rate;
 }
 
-void file::set_file_frame_position(const UInt32 position)
+void audio::file::set_file_frame_position(const UInt32 position)
 {
     if (_impl->file_frame_position != position) {
         OSStatus err = ExtAudioFileSeek(_impl->ext_audio_file, position);
@@ -202,12 +201,12 @@ void file::set_file_frame_position(const UInt32 position)
     }
 }
 
-SInt64 file::file_frame_position() const
+SInt64 audio::file::file_frame_position() const
 {
     return _impl->file_frame_position;
 }
 
-file::open_result_t file::open(const CFURLRef file_url, const pcm_format pcm_format, const bool interleaved)
+audio::file::open_result_t audio::file::open(const CFURLRef file_url, const pcm_format pcm_format, const bool interleaved)
 {
     if (_impl->ext_audio_file) {
         return open_result_t(open_error_t::opened);
@@ -226,7 +225,7 @@ file::open_result_t file::open(const CFURLRef file_url, const pcm_format pcm_for
     return open_result_t(nullptr);
 }
 
-file::create_result_t file::create(const CFURLRef file_url, const CFStringRef file_type, const CFDictionaryRef settings,
+audio::file::create_result_t audio::file::create(const CFURLRef file_url, const CFStringRef file_type, const CFDictionaryRef settings,
                                    const pcm_format pcm_format, const bool interleaved)
 {
     if (_impl->ext_audio_file) {
@@ -247,12 +246,12 @@ file::create_result_t file::create(const CFURLRef file_url, const CFStringRef fi
     return create_result_t(nullptr);
 }
 
-void file::close()
+void audio::file::close()
 {
     _impl->close();
 }
 
-file::read_result_t file::read_into_buffer(audio_pcm_buffer &buffer, const UInt32 frame_length)
+audio::file::read_result_t audio::file::read_into_buffer(audio_pcm_buffer &buffer, const UInt32 frame_length)
 {
     if (!_impl->ext_audio_file) {
         return read_result_t(read_error_t::closed);
@@ -319,7 +318,7 @@ file::read_result_t file::read_into_buffer(audio_pcm_buffer &buffer, const UInt3
     return read_result_t(nullptr);
 }
 
-file::write_result_t file::write_from_buffer(const audio_pcm_buffer &buffer, const bool async)
+audio::file::write_result_t audio::file::write_from_buffer(const audio_pcm_buffer &buffer, const bool async)
 {
     if (!_impl->ext_audio_file) {
         return write_result_t(write_error_t::closed);
