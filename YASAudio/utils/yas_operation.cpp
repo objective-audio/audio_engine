@@ -4,7 +4,6 @@
 //
 
 #include "yas_operation.h"
-#include "yas_objc_macros.h"
 #include <thread>
 #include <atomic>
 #include <mutex>
