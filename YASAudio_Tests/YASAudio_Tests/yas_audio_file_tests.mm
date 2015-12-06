@@ -101,8 +101,8 @@ namespace yas
     Float64 sample_rates[] = {8000.0, 44100.0, 48000.0, 382000.0};
     UInt32 channels[] = {1, 2, 3, 6};
     UInt32 file_bit_depths[] = {16, 24, 32};
-    yas::audio::pcm_format::pcm_formats[] = {yas::audio::pcm_format::float32, yas::audio::pcm_format::float64,
-                                             yas::audio::pcm_format::int16, yas::audio::pcm_format::fixed824};
+    yas::audio::pcm_format pcm_formats[] = {yas::audio::pcm_format::float32, yas::audio::pcm_format::float64,
+                                            yas::audio::pcm_format::int16, yas::audio::pcm_format::fixed824};
     bool interleaveds[] = {YES, NO};
 #endif
 
