@@ -11,13 +11,11 @@
 
 @implementation YASAudioMixerUnitTests
 
-- (void)setUp
-{
+- (void)setUp {
     [super setUp];
 }
 
-- (void)tearDown
-{
+- (void)tearDown {
     [super tearDown];
 }
 
@@ -27,8 +25,7 @@
  initialize後は出力側のフォーマットの指定ができない
  */
 
-- (void)test_set_format_success
-{
+- (void)test_set_format_success {
     yas::audio::unit mixer_unit(kAudioUnitType_Mixer, kAudioUnitSubType_MultiChannelMixer);
 
     /*
@@ -79,8 +76,7 @@
 #endif
 }
 
-- (void)test_set_format_failed
-{
+- (void)test_set_format_failed {
     yas::audio::unit mixer_unit(kAudioUnitType_Mixer, kAudioUnitSubType_MultiChannelMixer);
 
     /*

@@ -15,8 +15,7 @@
 
 @implementation YASAudioEngineRouteSampleSelectionViewController
 
-- (void)dealloc
-{
+- (void)dealloc {
     YASRelease(_fromCellIndexPath);
     YASRelease(_selectedIndexPath);
 
@@ -26,13 +25,11 @@
     YASSuperDealloc;
 }
 
-- (void)viewDidLoad
-{
+- (void)viewDidLoad {
     [super viewDidLoad];
 }
 
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(UITableViewCell *)cell
-{
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(UITableViewCell *)cell {
     id destinationViewController = segue.destinationViewController;
     if ([destinationViewController isKindOfClass:[YASAudioEngineRouteSampleViewController class]]) {
         self.selectedIndexPath = [self.tableView indexPathForCell:cell];
@@ -41,13 +38,11 @@
 
 #pragma mark - Table view data source
 
-- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
-{
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
     return YASAudioEngineRouteSampleSelectionSectionCount;
 }
 
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
-{
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     switch (section) {
         case YASAudioEngineRouteSampleSelectionSectionNone:
             return 1;
@@ -60,8 +55,7 @@
     return 0;
 }
 
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
-{
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"Cell" forIndexPath:indexPath];
 
     switch (indexPath.section) {

@@ -12,18 +12,15 @@
 
 @implementation yas_audio_offline_output_node_tests
 
-- (void)setUp
-{
+- (void)setUp {
     [super setUp];
 }
 
-- (void)tearDown
-{
+- (void)tearDown {
     [super tearDown];
 }
 
-- (void)test_offline_render_with_audio_engine
-{
+- (void)test_offline_render_with_audio_engine {
     const Float64 sample_rate = 44100.0;
 
     auto format = yas::audio::format(sample_rate, 2);
@@ -112,8 +109,7 @@
     [self waitForExpectationsWithTimeout:10.0 handler:nil];
 }
 
-- (void)test_offline_render_without_audio_engine
-{
+- (void)test_offline_render_without_audio_engine {
     const Float64 sample_rate = 48000.0;
     auto format = yas::audio::format(sample_rate, 2);
     yas::audio::offline_output_node output_node;
@@ -212,16 +208,14 @@
                                  }];
 }
 
-- (void)test_bus_count
-{
+- (void)test_bus_count {
     yas::audio::offline_output_node node;
 
     XCTAssertEqual(node.output_bus_count(), 0);
     XCTAssertEqual(node.input_bus_count(), 1);
 }
 
-- (void)test_reset_to_stop
-{
+- (void)test_reset_to_stop {
     auto format = yas::audio::format(48000.0, 2);
     yas::audio::offline_output_node output_node;
     yas::audio::tap_node tap_node;
@@ -267,8 +261,7 @@
                                  }];
 }
 
-- (void)test_to_string_error
-{
+- (void)test_to_string_error {
     XCTAssertTrue(yas::to_string(yas::audio::offline_start_error_t::already_running) == "already_running");
     XCTAssertTrue(yas::to_string(yas::audio::offline_start_error_t::prepare_failure) == "prepare_failure");
     XCTAssertTrue(yas::to_string(yas::audio::offline_start_error_t::connection_not_found) == "connection_not_found");

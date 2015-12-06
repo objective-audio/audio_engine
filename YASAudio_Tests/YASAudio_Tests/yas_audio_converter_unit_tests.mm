@@ -11,18 +11,15 @@
 
 @implementation yas_audio_converter_unit_tests
 
-- (void)setUp
-{
+- (void)setUp {
     [super setUp];
 }
 
-- (void)tearDown
-{
+- (void)tearDown {
     [super tearDown];
 }
 
-- (void)testSetFormatSuccess
-{
+- (void)testSetFormatSuccess {
     yas::audio::unit converter_unit(kAudioUnitType_FormatConverter, kAudioUnitSubType_AUConverter);
     const yas::audio::pcm_format pcm_formats[] = {yas::audio::pcm_format::float32, yas::audio::pcm_format::float64,
                                                   yas::audio::pcm_format::int16, yas::audio::pcm_format::fixed824};

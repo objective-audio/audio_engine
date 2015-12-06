@@ -7,8 +7,7 @@
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
 
-class yas::audio::device_io_node::impl : public node::impl
-{
+class yas::audio::device_io_node::impl : public node::impl {
    public:
     impl();
     virtual ~impl();

@@ -11,18 +11,15 @@
 
 @implementation yas_audio_frame_enumerator_tests
 
-- (void)setUp
-{
+- (void)setUp {
     [super setUp];
 }
 
-- (void)tearDown
-{
+- (void)tearDown {
     [super tearDown];
 }
 
-- (void)testReadFrameEnumeratorNonInterleaved
-{
+- (void)testReadFrameEnumeratorNonInterleaved {
     const UInt32 frame_length = 16;
     const UInt32 channels = 4;
 
@@ -58,8 +55,7 @@
     }
 }
 
-- (void)testReadFrameEnumeratorInterleavedUseMacro
-{
+- (void)testReadFrameEnumeratorInterleavedUseMacro {
     const UInt32 frame_length = 16;
     const UInt32 channels = 3;
 
@@ -95,8 +91,7 @@
     }
 }
 
-- (void)testReadFrameEnumeratorUseFunction
-{
+- (void)testReadFrameEnumeratorUseFunction {
     const UInt32 frame_length = 16;
     const UInt32 channels = 3;
 
@@ -135,8 +130,7 @@
     }
 }
 
-- (void)testReadFrameEnumeratorByMove
-{
+- (void)testReadFrameEnumeratorByMove {
     const UInt32 frame_length = 16;
     const UInt32 channels = 4;
 
@@ -169,8 +163,7 @@
     XCTAssertEqual(frame, frame_length);
 }
 
-- (void)testWriteFrameEnumerator
-{
+- (void)testWriteFrameEnumerator {
     const UInt32 frame_length = 16;
     const UInt32 channels = 4;
 
@@ -215,8 +208,7 @@
     XCTAssertEqual(*pointer_channel, channels);
 }
 
-- (void)testSetFramePosition
-{
+- (void)testSetFramePosition {
     const UInt32 frame_length = 16;
 
     auto format = yas::audio::format(48000, 1);
@@ -252,8 +244,7 @@
     XCTAssertThrows(enumerator.set_frame_position(100));
 }
 
-- (void)testSetChannelPosition
-{
+- (void)testSetChannelPosition {
     const UInt32 channels = 4;
 
     auto format = yas::audio::format(48000, channels, yas::audio::pcm_format::float32, true);
@@ -279,8 +270,7 @@
     XCTAssertThrows(enumerator.set_channel_position(100));
 }
 
-- (void)testReadFrameEnumeratorEachPCMFormat
-{
+- (void)testReadFrameEnumeratorEachPCMFormat {
     const UInt32 frame_length = 16;
     const UInt32 channels = 4;
 
@@ -329,8 +319,7 @@
     }
 }
 
-- (void)testStop
-{
+- (void)testStop {
     const UInt32 frame_length = 16;
     const UInt32 channels = 4;
     const NSUInteger stopFrame = 8;

@@ -7,61 +7,52 @@
 #import "yas_audio.h"
 #import <Accelerate/Accelerate.h>
 
-namespace yas
-{
-    namespace offline_sample
-    {
-        static Float64 sample_rate = 44100.0;
+namespace yas {
+namespace offline_sample {
+    static Float64 sample_rate = 44100.0;
 
-        class sine_node : public audio::tap_node
-        {
+    class sine_node : public audio::tap_node {
+       public:
+        using super_class = audio::tap_node;
+
+        class impl : public super_class::impl {
            public:
-            using super_class = audio::tap_node;
+            Float64 phase_on_render;
 
-            class impl : public super_class::impl
-            {
-               public:
-                Float64 phase_on_render;
+            void set_frequency(const Float32 frequency) {
+                std::lock_guard<std::recursive_mutex> lock(_mutex);
+                _frequency = frequency;
+            }
 
-                void set_frequency(const Float32 frequency)
-                {
-                    std::lock_guard<std::recursive_mutex> lock(_mutex);
-                    _frequency = frequency;
-                }
+            Float32 frequency() const {
+                std::lock_guard<std::recursive_mutex> lock(_mutex);
+                return _frequency;
+            }
 
-                Float32 frequency() const
-                {
-                    std::lock_guard<std::recursive_mutex> lock(_mutex);
-                    return _frequency;
-                }
+            void set_playing(const bool playing) {
+                std::lock_guard<std::recursive_mutex> lock(_mutex);
+                _playing = playing;
+            }
 
-                void set_playing(const bool playing)
-                {
-                    std::lock_guard<std::recursive_mutex> lock(_mutex);
-                    _playing = playing;
-                }
+            bool is_playing() const {
+                std::lock_guard<std::recursive_mutex> lock(_mutex);
+                return _playing;
+            }
 
-                bool is_playing() const
-                {
-                    std::lock_guard<std::recursive_mutex> lock(_mutex);
-                    return _playing;
-                }
+           private:
+            Float32 _frequency;
+            bool _playing;
+            mutable std::recursive_mutex _mutex;
+        };
 
-               private:
-                Float32 _frequency;
-                bool _playing;
-                mutable std::recursive_mutex _mutex;
-            };
+       public:
+        sine_node() : super_class(std::make_unique<impl>()) {
+            set_frequency(1000.0);
 
-           public:
-            sine_node() : super_class(std::make_unique<impl>())
-            {
-                set_frequency(1000.0);
+            auto weak_node = yas::to_weak(*this);
 
-                auto weak_node = yas::to_weak(*this);
-
-                auto render_function = [weak_node](audio::pcm_buffer &buffer, const UInt32 bus_idx,
-                                                   const audio::time &when) {
+            auto render_function =
+                [weak_node](audio::pcm_buffer &buffer, const UInt32 bus_idx, const audio::time &when) {
                     buffer.clear();
 
                     if (auto node = weak_node.lock()) {
@@ -86,36 +77,31 @@ namespace yas
                     }
                 };
 
-                set_render_function(render_function);
-            }
+            set_render_function(render_function);
+        }
 
-            sine_node(std::nullptr_t) : super_class(nullptr)
-            {
-            }
+        sine_node(std::nullptr_t) : super_class(nullptr) {
+        }
 
-            virtual ~sine_node() = default;
+        virtual ~sine_node() = default;
 
-            void set_frequency(const Float32 frequency)
-            {
-                impl_ptr<impl>()->set_frequency(frequency);
-            }
+        void set_frequency(const Float32 frequency) {
+            impl_ptr<impl>()->set_frequency(frequency);
+        }
 
-            Float32 frequency() const
-            {
-                return impl_ptr<impl>()->frequency();
-            }
+        Float32 frequency() const {
+            return impl_ptr<impl>()->frequency();
+        }
 
-            void set_playing(const bool playing)
-            {
-                impl_ptr<impl>()->set_playing(playing);
-            }
+        void set_playing(const bool playing) {
+            impl_ptr<impl>()->set_playing(playing);
+        }
 
-            bool is_playing() const
-            {
-                return impl_ptr<impl>()->is_playing();
-            }
-        };
-    }
+        bool is_playing() const {
+            return impl_ptr<impl>()->is_playing();
+        }
+    };
+}
 }
 
 @interface YASAudioOfflineSampleViewController ()
@@ -129,68 +115,64 @@ namespace yas
 
 @end
 
-namespace yas
-{
-    namespace sample
-    {
-        struct offline_vc_internal {
-            yas::audio::engine play_engine;
-            yas::audio::unit_mixer_node play_mixer_node;
-            yas::offline_sample::sine_node play_sine_node;
+namespace yas {
+namespace sample {
+    struct offline_vc_internal {
+        yas::audio::engine play_engine;
+        yas::audio::unit_mixer_node play_mixer_node;
+        yas::offline_sample::sine_node play_sine_node;
 
-            yas::audio::engine offline_engine;
-            yas::audio::unit_mixer_node offline_mixer_node;
-            yas::offline_sample::sine_node offline_sine_node;
+        yas::audio::engine offline_engine;
+        yas::audio::unit_mixer_node offline_mixer_node;
+        yas::offline_sample::sine_node offline_sine_node;
 
-            yas::base engine_observer = nullptr;
+        yas::base engine_observer = nullptr;
 
-            yas::objc::container<yas::objc::weak> self_container;
+        yas::objc::container<yas::objc::weak> self_container;
 
-            offline_vc_internal()
-            {
-                auto format =
-                    yas::audio::format(yas::offline_sample::sample_rate, 2, yas::audio::pcm_format::float32, false);
+        offline_vc_internal() {
+            auto format =
+                yas::audio::format(yas::offline_sample::sample_rate, 2, yas::audio::pcm_format::float32, false);
 
-                yas::audio::unit_output_node play_output_node;
+            yas::audio::unit_output_node play_output_node;
 
-                play_mixer_node.reset();
-                play_mixer_node.set_input_pan(0.0f, 0);
-                play_mixer_node.set_input_enabled(true, 0);
-                play_mixer_node.set_output_volume(1.0f, 0);
-                play_mixer_node.set_output_pan(0.0f, 0);
+            play_mixer_node.reset();
+            play_mixer_node.set_input_pan(0.0f, 0);
+            play_mixer_node.set_input_enabled(true, 0);
+            play_mixer_node.set_output_volume(1.0f, 0);
+            play_mixer_node.set_output_pan(0.0f, 0);
 
-                play_engine.connect(play_mixer_node, play_output_node, format);
-                play_engine.connect(play_sine_node, play_mixer_node, format);
+            play_engine.connect(play_mixer_node, play_output_node, format);
+            play_engine.connect(play_sine_node, play_mixer_node, format);
 
-                yas::audio::offline_output_node offline_output_node;
+            yas::audio::offline_output_node offline_output_node;
 
-                offline_mixer_node.reset();
-                offline_mixer_node.set_input_pan(0.0f, 0);
-                offline_mixer_node.set_input_enabled(true, 0);
-                offline_mixer_node.set_output_volume(1.0f, 0);
-                offline_mixer_node.set_output_pan(0.0f, 0);
+            offline_mixer_node.reset();
+            offline_mixer_node.set_input_pan(0.0f, 0);
+            offline_mixer_node.set_input_enabled(true, 0);
+            offline_mixer_node.set_output_volume(1.0f, 0);
+            offline_mixer_node.set_output_pan(0.0f, 0);
 
-                offline_engine.connect(offline_mixer_node, offline_output_node, format);
-                offline_engine.connect(offline_sine_node, offline_mixer_node, format);
+            offline_engine.connect(offline_mixer_node, offline_output_node, format);
+            offline_engine.connect(offline_sine_node, offline_mixer_node, format);
 
-                engine_observer = play_engine.subject().make_observer(
-                    yas::audio::engine::configuration_change_key,
-                    [weak_play_output_node = to_weak(play_output_node)](const auto &, const auto &) {
-                        if (auto play_output_node = weak_play_output_node.lock()) {
-                            play_output_node.set_device(yas::audio::device::default_output_device());
-                        }
-                    });
-            }
-        };
-    }
+            engine_observer = play_engine.subject().make_observer(
+                yas::audio::engine::configuration_change_key,
+                [weak_play_output_node = to_weak(play_output_node)](const auto &, const auto &) {
+                    if (auto play_output_node = weak_play_output_node.lock()) {
+                        play_output_node.set_device(yas::audio::device::default_output_device());
+                    }
+                });
+        }
+    };
+}
 }
 
 @implementation YASAudioOfflineSampleViewController {
     yas::sample::offline_vc_internal _internal;
 }
 
-- (void)dealloc
-{
+- (void)dealloc {
     if (_internal.self_container) {
         _internal.self_container.set_object(nil);
     }
@@ -198,8 +180,7 @@ namespace yas
     YASSuperDealloc;
 }
 
-- (void)viewDidLoad
-{
+- (void)viewDidLoad {
     [super viewDidLoad];
 
     self.volume = 0.5;
@@ -208,8 +189,7 @@ namespace yas
     self.playing = NO;
 }
 
-- (void)viewDidAppear
-{
+- (void)viewDidAppear {
     [super viewDidAppear];
 
     if (_internal.play_engine && !_internal.play_engine.start_render()) {
@@ -217,55 +197,45 @@ namespace yas
     }
 }
 
-- (void)viewWillDisappear
-{
+- (void)viewWillDisappear {
     [super viewWillDisappear];
 
     _internal.play_engine.stop();
 }
 
-- (void)setVolume:(Float32)volume
-{
+- (void)setVolume:(Float32)volume {
     _internal.play_mixer_node.set_input_volume(volume, 0);
 }
 
-- (Float32)volume
-{
+- (Float32)volume {
     return _internal.play_mixer_node.input_volume(0);
 }
 
-- (void)setFrequency:(Float32)frequency
-{
+- (void)setFrequency:(Float32)frequency {
     _internal.play_sine_node.set_frequency(frequency);
 }
 
-- (Float32)frequency
-{
+- (Float32)frequency {
     return _internal.play_sine_node.frequency();
 }
 
-- (void)setPlaying:(BOOL)playing
-{
+- (void)setPlaying:(BOOL)playing {
     _internal.play_sine_node.set_playing(playing);
 }
 
-- (BOOL)playing
-{
+- (BOOL)playing {
     return _internal.play_sine_node.is_playing();
 }
 
-- (IBAction)playButtonTapped:(id)sender
-{
+- (IBAction)playButtonTapped:(id)sender {
     self.playing = YES;
 }
 
-- (IBAction)stopButtonTapped:(id)sender
-{
+- (IBAction)stopButtonTapped:(id)sender {
     self.playing = NO;
 }
 
-- (IBAction)exportButtonTapped:(id)sender
-{
+- (IBAction)exportButtonTapped:(id)sender {
     if (self.processing) {
         return;
     }
@@ -278,8 +248,7 @@ namespace yas
     }
 }
 
-- (void)startOfflineFileWritingWithURL:(NSURL *)url
-{
+- (void)startOfflineFileWritingWithURL:(NSURL *)url {
     auto wave_settings = yas::audio::wave_file_settings(yas::offline_sample::sample_rate, 2, 16);
     yas::audio::file file_writer;
     auto create_result = file_writer.create((__bridge CFURLRef)url, yas::audio::file_type::wave, wave_settings);

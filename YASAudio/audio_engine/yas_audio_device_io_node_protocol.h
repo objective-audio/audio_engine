@@ -5,20 +5,17 @@
 
 #pragma once
 
-namespace yas
-{
-    namespace audio
-    {
-        class device_io;
+namespace yas {
+namespace audio {
+    class device_io;
 
-        class device_io_node_from_engine
-        {
-           public:
-            virtual ~device_io_node_from_engine() = default;
+    class device_io_node_from_engine {
+       public:
+        virtual ~device_io_node_from_engine() = default;
 
-            virtual void _add_device_io() = 0;
-            virtual void _remove_device_io() = 0;
-            virtual audio::device_io &_device_io() const = 0;
-        };
-    }
+        virtual void _add_device_io() = 0;
+        virtual void _remove_device_io() = 0;
+        virtual audio::device_io &_device_io() const = 0;
+    };
+}
 }

@@ -11,18 +11,15 @@
 
 @implementation yas_audio_enumerator_tests
 
-- (void)setUp
-{
+- (void)setUp {
     [super setUp];
 }
 
-- (void)tearDown
-{
+- (void)tearDown {
     [super tearDown];
 }
 
-- (void)testReadEnumeratorNonInterleavedUseMacro
-{
+- (void)testReadEnumeratorNonInterleavedUseMacro {
     const UInt32 frame_length = 16;
     const UInt32 channels = 4;
 
@@ -52,8 +49,7 @@
     }
 }
 
-- (void)testReadEnumeratorNonInterleavedUseFunction
-{
+- (void)testReadEnumeratorNonInterleavedUseFunction {
     const UInt32 frame_length = 16;
     const UInt32 channels = 4;
 
@@ -85,8 +81,7 @@
     }
 }
 
-- (void)testReadEnumeratorInterleaved
-{
+- (void)testReadEnumeratorInterleaved {
     const UInt32 frame_length = 16;
     const UInt32 channels = 4;
 
@@ -112,8 +107,7 @@
     }
 }
 
-- (void)testWriteEnumerator
-{
+- (void)testWriteEnumerator {
     const UInt32 frame_length = 16;
     const UInt32 channels = 4;
 
@@ -155,8 +149,7 @@
     }
 }
 
-- (void)testSetPosition
-{
+- (void)testSetPosition {
     const NSUInteger frame_length = 16;
 
     auto format = yas::audio::format(48000.0, 1);
@@ -185,8 +178,7 @@
     XCTAssertThrows(enumerator.set_position(100));
 }
 
-- (void)testStop
-{
+- (void)testStop {
     const NSUInteger frame_length = 16;
     const NSUInteger stopIndex = 8;
 
@@ -209,8 +201,7 @@
     XCTAssertEqual(frame, stopIndex + 1);
 }
 
-- (void)testInitFailed
-{
+- (void)testInitFailed {
     yas::flex_ptr pointer(nullptr);
 
     XCTAssertThrows(yas::audio::enumerator(pointer, 1, 1));

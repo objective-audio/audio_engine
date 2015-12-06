@@ -11,18 +11,15 @@
 
 @implementation yas_audio_unit_node_tests
 
-- (void)setUp
-{
+- (void)setUp {
     [super setUp];
 }
 
-- (void)tearDown
-{
+- (void)tearDown {
     [super tearDown];
 }
 
-- (void)test_restore_parameters
-{
+- (void)test_restore_parameters {
     yas::audio::engine engine;
 
     auto format = yas::audio::format(44100.0, 2);
@@ -92,8 +89,7 @@
                                  }];
 }
 
-- (void)test_get_parameters
-{
+- (void)test_get_parameters {
     yas::audio::unit_node delay_node(kAudioUnitType_Effect, kAudioUnitSubType_Delay);
 
     const auto &global_parameters = delay_node.global_parameters();
@@ -117,8 +113,7 @@
     XCTAssertEqual(lopass.parameter_id(), kDelayParam_LopassCutoff);
 }
 
-- (void)test_reset_parameters
-{
+- (void)test_reset_parameters {
     yas::audio::unit_node delay_node(kAudioUnitType_Effect, kAudioUnitSubType_Delay);
 
     const float delay_time_value = 0.5f;

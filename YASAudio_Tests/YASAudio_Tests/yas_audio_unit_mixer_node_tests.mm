@@ -11,18 +11,15 @@
 
 @implementation yas_audio_unit_mixer_node_tests
 
-- (void)setUp
-{
+- (void)setUp {
     [super setUp];
 }
 
-- (void)tearDown
-{
+- (void)tearDown {
     [super tearDown];
 }
 
-- (void)test_parameter_exists
-{
+- (void)test_parameter_exists {
     yas::audio::unit_mixer_node mixer_node;
 
     const auto &paramters = mixer_node.parameters();
@@ -48,8 +45,7 @@
     }
 }
 
-- (void)testElement
-{
+- (void)testElement {
     yas::audio::unit_mixer_node mixer_node;
     const UInt32 default_element_count = mixer_node.input_element_count();
 
@@ -65,8 +61,7 @@
     XCTAssertThrows(mixer_node.set_input_volume(0.5f, element_count));
 }
 
-- (void)testRestoreParamters
-{
+- (void)testRestoreParamters {
     yas::audio::unit_mixer_node mixer_node;
 
     const UInt32 bus_idx = 0;

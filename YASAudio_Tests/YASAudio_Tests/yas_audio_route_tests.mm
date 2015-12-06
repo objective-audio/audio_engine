@@ -11,18 +11,15 @@
 
 @implementation yas_audio_route_tests
 
-- (void)setUp
-{
+- (void)setUp {
     [super setUp];
 }
 
-- (void)tearDown
-{
+- (void)tearDown {
     [super tearDown];
 }
 
-- (void)test_create_route_full
-{
+- (void)test_create_route_full {
     const UInt32 src_bus_idx = 0;
     const UInt32 src_ch_idx = 1;
     const UInt32 dst_bus_idx = 2;
@@ -36,8 +33,7 @@
     XCTAssertEqual(route.destination.channel, dst_ch_idx);
 }
 
-- (void)test_create_route_common
-{
+- (void)test_create_route_common {
     const UInt32 bus_idx = 4;
     const UInt32 ch_idx = 5;
 
@@ -49,8 +45,7 @@
     XCTAssertEqual(route.destination.channel, ch_idx);
 }
 
-- (void)test_create_route_points
-{
+- (void)test_create_route_points {
     const yas::audio::route::point src_point(0, 1);
     const yas::audio::route::point dst_point(2, 3);
 
@@ -62,8 +57,7 @@
     XCTAssertEqual(route.destination.channel, 3);
 }
 
-- (void)test_channel_map_from_routes_normal
-{
+- (void)test_channel_map_from_routes_normal {
     yas::audio::route_set_t routes{{0, 0, 0, 0}, {0, 1, 0, 1}};
 
     auto result = yas::audio::channel_map_from_routes(routes, 0, 2, 0, 2);
@@ -74,8 +68,7 @@
     XCTAssertEqual(map.at(1), 1);
 }
 
-- (void)test_channel_map_from_routes_src_less_than_dst
-{
+- (void)test_channel_map_from_routes_src_less_than_dst {
     yas::audio::route_set_t routes{{0, 0, 0, 0}, {0, 1, 0, 1}};
 
     auto result = yas::audio::channel_map_from_routes(routes, 0, 1, 0, 2);
@@ -86,8 +79,7 @@
     XCTAssertEqual(map.at(0), 0);
 }
 
-- (void)test_channel_map_from_routes_dst_less_than_src
-{
+- (void)test_channel_map_from_routes_dst_less_than_src {
     yas::audio::route_set_t routes{{0, 0, 0, 0}, {0, 1, 0, 1}};
 
     auto result = yas::audio::channel_map_from_routes(routes, 0, 2, 0, 1);
@@ -98,8 +90,7 @@
     XCTAssertEqual(map.at(1), -1);
 }
 
-- (void)test_channel_map_from_routes_filtered
-{
+- (void)test_channel_map_from_routes_filtered {
     yas::audio::route_set_t routes{{0, 0, 0, 0}, {0, 1, 1, 1}, {1, 0, 0, 1}, {1, 1, 1, 0}};
 
     auto result_0_0 = yas::audio::channel_map_from_routes(routes, 0, 2, 0, 2);

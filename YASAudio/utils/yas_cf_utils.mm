@@ -6,8 +6,7 @@
 #include "yas_cf_utils.h"
 #include <Foundation/Foundation.h>
 
-std::string yas::to_string(const CFStringRef &cf_string)
-{
+std::string yas::to_string(const CFStringRef &cf_string) {
     if (cf_string && CFStringGetLength(cf_string) > 0) {
         NSString *objc_str = (__bridge NSString *)cf_string;
         return std::string([objc_str UTF8String]);
@@ -15,15 +14,13 @@ std::string yas::to_string(const CFStringRef &cf_string)
     return std::string();
 }
 
-CFStringRef yas::to_cf_object(const std::string &string)
-{
+CFStringRef yas::to_cf_object(const std::string &string) {
     CFStringRef cf_string = CFStringCreateWithCString(kCFAllocatorDefault, string.c_str(), kCFStringEncodingUTF8);
     CFAutorelease(cf_string);
     return cf_string;
 }
 
-CFStringRef yas::file_type_for_hfs_type_code(const OSType fcc)
-{
+CFStringRef yas::file_type_for_hfs_type_code(const OSType fcc) {
 #if TARGET_OS_IPHONE
     const char fourChar[5] = {static_cast<char>((fcc >> 24) & 0xFF), static_cast<char>((fcc >> 16) & 0xFF),
                               static_cast<char>((fcc >> 8) & 0xFF), static_cast<char>(fcc & 0xFF), 0};
@@ -35,8 +32,7 @@ CFStringRef yas::file_type_for_hfs_type_code(const OSType fcc)
 #endif
 }
 
-OSType yas::hfs_type_code_from_file_type(const CFStringRef cfStr)
-{
+OSType yas::hfs_type_code_from_file_type(const CFStringRef cfStr) {
 #if TARGET_OS_IPHONE
     if (CFStringGetLength(cfStr) != 6) {
         return 0;

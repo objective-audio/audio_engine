@@ -11,18 +11,15 @@
 
 @implementation yas_audio_engine_tests
 
-- (void)setUp
-{
+- (void)setUp {
     [super setUp];
 }
 
-- (void)tearDown
-{
+- (void)tearDown {
     [super tearDown];
 }
 
-- (void)test_connect_success
-{
+- (void)test_connect_success {
     yas::audio::engine engine;
 
     auto format = yas::audio::format(48000.0, 2);
@@ -44,8 +41,7 @@
     XCTAssertEqual(*connections.begin(), connection);
 }
 
-- (void)test_connect_failed_no_bus
-{
+- (void)test_connect_failed_no_bus {
     yas::audio::engine engine;
 
     auto format = yas::audio::format(48000.0, 2);
@@ -58,8 +54,7 @@
     XCTAssertEqual(yas::audio::engine::private_access::connections(engine).size(), 0);
 }
 
-- (void)testConnectAndDisconnect
-{
+- (void)testConnectAndDisconnect {
     yas::audio::engine engine;
 
     auto format = yas::audio::format(48000.0, 2);
@@ -87,8 +82,7 @@
     XCTAssertEqual(nodes.count(destination_node), 0);
 }
 
-- (void)testConfigurationChangeNotification
-{
+- (void)testConfigurationChangeNotification {
     yas::audio::engine engine;
 
     XCTestExpectation *expectation = [self expectationWithDescription:@"configuration change"];

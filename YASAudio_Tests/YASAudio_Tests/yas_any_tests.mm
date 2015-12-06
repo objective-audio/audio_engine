@@ -11,18 +11,15 @@
 
 @implementation yas_any_tests
 
-- (void)setUp
-{
+- (void)setUp {
     [super setUp];
 }
 
-- (void)tearDown
-{
+- (void)tearDown {
     [super tearDown];
 }
 
-- (void)test_types
-{
+- (void)test_types {
     int int_value = 1;
     float float_value = 2.0;
     std::string string_value = "3";
@@ -42,8 +39,7 @@
     XCTAssertEqual(vector.at(2).get<std::string>(), "3");
 }
 
-- (void)test_empty_to_set
-{
+- (void)test_empty_to_set {
     yas::any any;
 
     XCTAssertFalse(any);
@@ -57,8 +53,7 @@
     XCTAssertEqual(any.get<int>(), 1);
 }
 
-- (void)test_assign
-{
+- (void)test_assign {
     int int_value1 = 1;
     yas::any any1(int_value1);
 

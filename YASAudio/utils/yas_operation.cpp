@@ -15,37 +15,30 @@ using namespace yas;
 
 #pragma mark - operation
 
-class operation::impl : public base::impl
-{
+class operation::impl : public base::impl {
    public:
     std::atomic<bool> canceled;
     execution_f execution;
 
-    impl(const execution_f &exe) : canceled(false), execution(exe)
-    {
+    impl(const execution_f &exe) : canceled(false), execution(exe) {
     }
 };
 
-operation::operation(const execution_f &exe) : super_class(std::make_unique<impl>(exe))
-{
+operation::operation(const execution_f &exe) : super_class(std::make_unique<impl>(exe)) {
 }
 
-operation::operation(std::nullptr_t) : super_class(nullptr)
-{
+operation::operation(std::nullptr_t) : super_class(nullptr) {
 }
 
-void operation::cancel()
-{
+void operation::cancel() {
     _cancel();
 }
 
-bool operation::is_canceled() const
-{
+bool operation::is_canceled() const {
     return impl_ptr<impl>()->canceled;
 }
 
-void operation::_execute()
-{
+void operation::_execute() {
     if (auto &exe = impl_ptr<impl>()->execution) {
         if (!is_canceled()) {
             exe(*this);
@@ -53,29 +46,24 @@ void operation::_execute()
     }
 }
 
-void operation::_cancel()
-{
+void operation::_cancel() {
     impl_ptr<impl>()->canceled = true;
 }
 
 #pragma mark - queue
 
-class operation_queue::impl : public base::impl
-{
+class operation_queue::impl : public base::impl {
    public:
     weak<operation_queue> weak_queue;
 
-    impl(const size_t count) : _operations(count)
-    {
+    impl(const size_t count) : _operations(count) {
     }
 
-    ~impl()
-    {
+    ~impl() {
         cancel_all_operations();
     }
 
-    void add_operation(const operation &op, const priority_t priority)
-    {
+    void add_operation(const operation &op, const priority_t priority) {
         std::lock_guard<std::recursive_mutex> lock(_mutex);
 
         auto &dq = _operations.at(priority);
@@ -84,8 +72,7 @@ class operation_queue::impl : public base::impl
         _start_next_operation_if_needed();
     }
 
-    void insert_operation_to_top(const operation &op, const priority_t priority)
-    {
+    void insert_operation_to_top(const operation &op, const priority_t priority) {
         std::lock_guard<std::recursive_mutex> lock(_mutex);
 
         auto &dq = _operations.at(priority);
@@ -94,8 +81,7 @@ class operation_queue::impl : public base::impl
         _start_next_operation_if_needed();
     }
 
-    void cancel_operation(const operation &operation)
-    {
+    void cancel_operation(const operation &operation) {
         std::lock_guard<std::recursive_mutex> lock(_mutex);
 
         for (auto &dq : _operations) {
@@ -113,8 +99,7 @@ class operation_queue::impl : public base::impl
         }
     }
 
-    void cancel_all_operations()
-    {
+    void cancel_all_operations() {
         std::lock_guard<std::recursive_mutex> lock(_mutex);
 
         for (auto &dq : _operations) {
@@ -129,15 +114,13 @@ class operation_queue::impl : public base::impl
         }
     }
 
-    void suspend()
-    {
+    void suspend() {
         std::lock_guard<std::recursive_mutex> lock(_mutex);
 
         _suspended = true;
     }
 
-    void resume()
-    {
+    void resume() {
         std::lock_guard<std::recursive_mutex> lock(_mutex);
 
         if (_suspended) {
@@ -152,8 +135,7 @@ class operation_queue::impl : public base::impl
     bool _suspended = false;
     mutable std::recursive_mutex _mutex;
 
-    void _start_next_operation_if_needed()
-    {
+    void _start_next_operation_if_needed() {
         std::lock_guard<std::recursive_mutex> lock(_mutex);
 
         if (!_current_operation && !_suspended) {
@@ -186,8 +168,7 @@ class operation_queue::impl : public base::impl
         }
     }
 
-    void _operation_did_finish(const operation &prev_op)
-    {
+    void _operation_did_finish(const operation &prev_op) {
         std::lock_guard<std::recursive_mutex> lock(_mutex);
 
         if (_current_operation == prev_op) {
@@ -198,41 +179,33 @@ class operation_queue::impl : public base::impl
     }
 };
 
-operation_queue::operation_queue(const size_t count) : super_class(std::make_unique<impl>(count))
-{
+operation_queue::operation_queue(const size_t count) : super_class(std::make_unique<impl>(count)) {
     impl_ptr<impl>()->weak_queue = *this;
 }
 
-operation_queue::operation_queue(std::nullptr_t) : super_class(nullptr)
-{
+operation_queue::operation_queue(std::nullptr_t) : super_class(nullptr) {
 }
 
-void operation_queue::add_operation(const operation &op, const priority_t pr)
-{
+void operation_queue::add_operation(const operation &op, const priority_t pr) {
     impl_ptr<impl>()->add_operation(op, pr);
 }
 
-void operation_queue::insert_operation_to_top(const operation &op, const priority_t pr)
-{
+void operation_queue::insert_operation_to_top(const operation &op, const priority_t pr) {
     impl_ptr<impl>()->insert_operation_to_top(op, pr);
 }
 
-void operation_queue::cancel_operation(const operation &op)
-{
+void operation_queue::cancel_operation(const operation &op) {
     impl_ptr<impl>()->cancel_operation(op);
 }
 
-void operation_queue::cancel_all_operations()
-{
+void operation_queue::cancel_all_operations() {
     impl_ptr<impl>()->cancel_all_operations();
 }
 
-void operation_queue::suspend()
-{
+void operation_queue::suspend() {
     impl_ptr<impl>()->suspend();
 }
 
-void operation_queue::resume()
-{
+void operation_queue::resume() {
     impl_ptr<impl>()->resume();
 }

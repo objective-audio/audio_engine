@@ -8,8 +8,7 @@
 #include <CoreFoundation/CoreFoundation.h>
 
 template <typename T>
-void yas::set_cf_property(T &_property, const T &value)
-{
+void yas::set_cf_property(T &_property, const T &value) {
     if (_property != value) {
         if (_property) {
             CFRelease(_property);
@@ -24,8 +23,7 @@ void yas::set_cf_property(T &_property, const T &value)
 }
 
 template <typename T>
-T yas::get_cf_property(T &_property)
-{
+T yas::get_cf_property(T &_property) {
     if (_property) {
         return (T)CFAutorelease(CFRetain(_property));
     }
@@ -33,8 +31,7 @@ T yas::get_cf_property(T &_property)
 }
 
 template <typename T>
-CFNumberRef yas::to_cf_object(const T &value)
-{
+CFNumberRef yas::to_cf_object(const T &value) {
     CFNumberRef number = CFNumberCreate(kCFAllocatorDefault, cf_number_type(value), &value);
     CFAutorelease(number);
     return number;
@@ -46,8 +43,7 @@ template CFNumberRef yas::to_cf_object(const SInt32 &);
 template CFNumberRef yas::to_cf_object(const SInt16 &);
 
 template <typename T>
-CFArrayRef yas::to_cf_object(const std::vector<T> &vector)
-{
+CFArrayRef yas::to_cf_object(const std::vector<T> &vector) {
     CFMutableArrayRef array = CFArrayCreateMutable(kCFAllocatorDefault, vector.size(), &kCFTypeArrayCallBacks);
 
     for (const T &value : vector) {
@@ -58,8 +54,7 @@ CFArrayRef yas::to_cf_object(const std::vector<T> &vector)
 }
 
 template <typename K, typename T>
-CFDictionaryRef yas::to_cf_object(const std::unordered_map<K, T> &map)
-{
+CFDictionaryRef yas::to_cf_object(const std::unordered_map<K, T> &map) {
     CFMutableDictionaryRef dictionary = CFDictionaryCreateMutable(
         kCFAllocatorDefault, map.size(), &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
     for (const auto &pair : map) {

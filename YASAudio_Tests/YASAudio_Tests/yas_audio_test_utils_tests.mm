@@ -11,18 +11,15 @@
 
 @implementation yas_audio_test_utils_tests
 
-- (void)setUp
-{
+- (void)setUp {
     [super setUp];
 }
 
-- (void)tearDown
-{
+- (void)tearDown {
     [super tearDown];
 }
 
-- (void)testIsEqualFloat64WithAccuracy
-{
+- (void)testIsEqualFloat64WithAccuracy {
     const Float64 val1 = 1.0;
     const Float64 accuracy = 0.1;
 
@@ -42,8 +39,7 @@
     XCTAssertFalse(yas::test::is_equal(val1, val2, accuracy));
 }
 
-- (void)testIsEqualAudioTimeStamp
-{
+- (void)testIsEqualAudioTimeStamp {
     SMPTETime smpteTime = {
         .mSubframes = 1,
         .mSubframeDivisor = 1,
@@ -95,8 +91,7 @@
     XCTAssertFalse(yas::test::is_equal(&timeStamp1, &timeStamp2));
 }
 
-- (void)testIsEqualData
-{
+- (void)testIsEqualData {
     const UInt32 size = 4;
 
     std::vector<UInt8> vec1(size);

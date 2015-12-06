@@ -11,13 +11,11 @@
 
 @implementation yas_audio_device_stream_tests
 
-- (void)setUp
-{
+- (void)setUp {
     [super setUp];
 }
 
-- (void)tearDown
-{
+- (void)tearDown {
     [super tearDown];
 }
 

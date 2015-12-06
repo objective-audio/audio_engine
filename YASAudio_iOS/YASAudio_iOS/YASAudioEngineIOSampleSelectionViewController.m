@@ -13,8 +13,7 @@
 
 @implementation YASAudioEngineIOSampleSelectionViewController
 
-- (void)dealloc
-{
+- (void)dealloc {
     YASRelease(_fromCellIndexPath);
 
     _fromCellIndexPath = nil;
@@ -22,8 +21,7 @@
     YASSuperDealloc;
 }
 
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(UITableViewCell *)cell
-{
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(UITableViewCell *)cell {
     id destinationViewController = segue.destinationViewController;
     if ([destinationViewController isKindOfClass:[YASAudioEngineIOSampleViewController class]]) {
         NSIndexPath *indexPath = [self.tableView indexPathForCell:cell];
@@ -33,25 +31,21 @@
 
 #pragma mark - Table view data source
 
-- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
-{
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
     return 1;
 }
 
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
-{
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     return self.channelCount + 1;
 }
 
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
-{
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"Cell" forIndexPath:indexPath];
     cell.textLabel.text = [NSString stringWithFormat:@"%@", @([self valueAtIndex:indexPath.row])];
     return cell;
 }
 
-- (NSInteger)valueAtIndex:(NSInteger)idx
-{
+- (NSInteger)valueAtIndex:(NSInteger)idx {
     return idx < self.channelCount ? idx : -1;
 }
 

@@ -11,8 +11,7 @@
 
 template <typename T>
 void yas::audio::unit::impl::set_property_data(const std::vector<T> &data, const AudioUnitPropertyID property_id,
-                                                     const AudioUnitScope scope, const AudioUnitElement element)
-{
+                                               const AudioUnitScope scope, const AudioUnitElement element) {
     const UInt32 size = static_cast<UInt32>(data.size());
     const void *raw_data = size > 0 ? data.data() : nullptr;
 
@@ -21,10 +20,8 @@ void yas::audio::unit::impl::set_property_data(const std::vector<T> &data, const
 }
 
 template <typename T>
-std::vector<T> yas::audio::unit::impl::property_data(const AudioUnitPropertyID property_id,
-                                                           const AudioUnitScope scope,
-                                                           const AudioUnitElement element) const
-{
+std::vector<T> yas::audio::unit::impl::property_data(const AudioUnitPropertyID property_id, const AudioUnitScope scope,
+                                                     const AudioUnitElement element) const {
     AudioUnit au = audio_unit_instance();
 
     UInt32 byte_size = 0;

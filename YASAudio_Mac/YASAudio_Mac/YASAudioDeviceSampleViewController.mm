@@ -12,113 +12,102 @@
 
 static const UInt32 kSineDataMaxCount = 4096;
 
-namespace yas
-{
-    namespace audio_device_sample
-    {
-        class kernel
-        {
-           private:
-            std::atomic<Float64> _through_volume;
-            std::atomic<Float64> _sine_frequency;
-            std::atomic<Float64> _sine_volume;
+namespace yas {
+namespace audio_device_sample {
+    class kernel {
+       private:
+        std::atomic<Float64> _through_volume;
+        std::atomic<Float64> _sine_frequency;
+        std::atomic<Float64> _sine_volume;
 
-            Float64 _phase;
-            std::vector<Float32> _sine_data;
+        Float64 _phase;
+        std::vector<Float32> _sine_data;
 
-           public:
-            kernel() : _phase(0), _sine_data(kSineDataMaxCount)
-            {
-                _through_volume.store(0);
-                _sine_frequency.store(1000.0);
-                _sine_volume.store(0.0);
+       public:
+        kernel() : _phase(0), _sine_data(kSineDataMaxCount) {
+            _through_volume.store(0);
+            _sine_frequency.store(1000.0);
+            _sine_volume.store(0.0);
+        }
+
+        kernel(const kernel &) = delete;
+        kernel(kernel &&) = delete;
+        kernel &operator=(const kernel &) = delete;
+        kernel &operator=(kernel &&) = delete;
+
+        void set_througn_volume(Float64 value) {
+            _through_volume.store(value);
+        }
+
+        Float64 through_volume() const {
+            return _through_volume.load();
+        }
+
+        void set_sine_frequency(Float64 value) {
+            _sine_frequency.store(value);
+        }
+
+        Float64 sine_frequency() const {
+            return _sine_frequency.load();
+        }
+
+        void set_sine_volume(Float64 value) {
+            _sine_volume.store(value);
+        }
+
+        Float64 sine_volume() const {
+            return _sine_volume.load();
+        }
+
+        void process(const yas::audio::pcm_buffer &input_buffer, yas::audio::pcm_buffer &output_buffer) {
+            if (!output_buffer) {
+                return;
             }
 
-            kernel(const kernel &) = delete;
-            kernel(kernel &&) = delete;
-            kernel &operator=(const kernel &) = delete;
-            kernel &operator=(kernel &&) = delete;
+            const UInt32 frame_length = output_buffer.frame_length();
 
-            void set_througn_volume(Float64 value)
-            {
-                _through_volume.store(value);
+            if (frame_length == 0) {
+                return;
             }
 
-            Float64 through_volume() const
-            {
-                return _through_volume.load();
-            }
+            const auto &format = output_buffer.format();
+            if (format.pcm_format() == yas::audio::pcm_format::float32 && format.stride() == 1) {
+                yas::audio::frame_enumerator enumerator(output_buffer);
+                auto pointer = enumerator.pointer();
 
-            void set_sine_frequency(Float64 value)
-            {
-                _sine_frequency.store(value);
-            }
+                if (input_buffer) {
+                    if (input_buffer.frame_length() >= frame_length) {
+                        output_buffer.copy_from(input_buffer);
 
-            Float64 sine_frequency() const
-            {
-                return _sine_frequency.load();
-            }
-
-            void set_sine_volume(Float64 value)
-            {
-                _sine_volume.store(value);
-            }
-
-            Float64 sine_volume() const
-            {
-                return _sine_volume.load();
-            }
-
-            void process(const yas::audio::pcm_buffer &input_buffer, yas::audio::pcm_buffer &output_buffer)
-            {
-                if (!output_buffer) {
-                    return;
-                }
-
-                const UInt32 frame_length = output_buffer.frame_length();
-
-                if (frame_length == 0) {
-                    return;
-                }
-
-                const auto &format = output_buffer.format();
-                if (format.pcm_format() == yas::audio::pcm_format::float32 && format.stride() == 1) {
-                    yas::audio::frame_enumerator enumerator(output_buffer);
-                    auto pointer = enumerator.pointer();
-
-                    if (input_buffer) {
-                        if (input_buffer.frame_length() >= frame_length) {
-                            output_buffer.copy_from(input_buffer);
-
-                            const Float32 throughVol = through_volume();
-
-                            while (pointer->v) {
-                                cblas_sscal(frame_length, throughVol, pointer->f32, 1);
-                                yas_audio_frame_enumerator_move_channel(enumerator);
-                            }
-                            yas_audio_frame_enumerator_reset(enumerator);
-                        }
-                    }
-
-                    const Float64 sample_rate = format.sample_rate();
-                    const Float64 start_phase = _phase;
-                    const Float64 sine_vol = sine_volume();
-                    const Float64 freq = sine_frequency();
-
-                    if (frame_length < kSineDataMaxCount) {
-                        _phase = yas::audio_math::fill_sine(&_sine_data[0], frame_length, start_phase,
-                                                            freq / sample_rate * yas::audio_math::two_pi);
+                        const Float32 throughVol = through_volume();
 
                         while (pointer->v) {
-                            cblas_saxpy(frame_length, sine_vol, &_sine_data[0], 1, pointer->f32, 1);
+                            cblas_sscal(frame_length, throughVol, pointer->f32, 1);
                             yas_audio_frame_enumerator_move_channel(enumerator);
                         }
                         yas_audio_frame_enumerator_reset(enumerator);
                     }
                 }
+
+                const Float64 sample_rate = format.sample_rate();
+                const Float64 start_phase = _phase;
+                const Float64 sine_vol = sine_volume();
+                const Float64 freq = sine_frequency();
+
+                if (frame_length < kSineDataMaxCount) {
+                    _phase = yas::audio_math::fill_sine(&_sine_data[0], frame_length, start_phase,
+                                                        freq / sample_rate * yas::audio_math::two_pi);
+
+                    while (pointer->v) {
+                        cblas_saxpy(frame_length, sine_vol, &_sine_data[0], 1, pointer->f32, 1);
+                        yas_audio_frame_enumerator_move_channel(enumerator);
+                    }
+                    yas_audio_frame_enumerator_reset(enumerator);
+                }
             }
-        };
-    }
+        }
+    };
+}
 }
 
 using sample_kernel_t = yas::audio_device_sample::kernel;
@@ -139,37 +128,32 @@ using sample_kernel_sptr = std::shared_ptr<sample_kernel_t>;
 
 @end
 
-namespace yas
-{
-    namespace sample
-    {
-        struct device_vc_internal {
-            yas::audio::graph graph = nullptr;
-            yas::audio::device_io device_io = nullptr;
-            yas::base system_observer = nullptr;
-            yas::base device_observer = nullptr;
-            sample_kernel_sptr kernel;
-            yas::objc::container<yas::objc::weak> self_container;
+namespace yas {
+namespace sample {
+    struct device_vc_internal {
+        yas::audio::graph graph = nullptr;
+        yas::audio::device_io device_io = nullptr;
+        yas::base system_observer = nullptr;
+        yas::base device_observer = nullptr;
+        sample_kernel_sptr kernel;
+        yas::objc::container<yas::objc::weak> self_container;
 
-            ~device_vc_internal()
-            {
-                self_container.set_object(nil);
-            }
-        };
-    }
+        ~device_vc_internal() {
+            self_container.set_object(nil);
+        }
+    };
+}
 }
 
 @implementation YASAudioDeviceSampleViewController {
     yas::sample::device_vc_internal _internal;
 }
 
-- (void)viewDidLoad
-{
+- (void)viewDidLoad {
     [super viewDidLoad];
 }
 
-- (void)setup
-{
+- (void)setup {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         YASDecibelValueTransformer *decibelValueFormatter = YASAutorelease([[YASDecibelValueTransformer alloc] init]);
@@ -220,8 +204,7 @@ namespace yas
     }
 }
 
-- (void)dispose
-{
+- (void)dispose {
     _internal.graph = nullptr;
     _internal.device_io = nullptr;
     _internal.system_observer = nullptr;
@@ -229,8 +212,7 @@ namespace yas
     _internal.kernel = nullptr;
 }
 
-- (void)viewDidAppear
-{
+- (void)viewDidAppear {
     [super viewDidAppear];
 
     [self setup];
@@ -240,8 +222,7 @@ namespace yas
     }
 }
 
-- (void)viewWillDisappear
-{
+- (void)viewWillDisappear {
     [super viewWillDisappear];
 
     if (_internal.graph) {
@@ -251,8 +232,7 @@ namespace yas
     [self dispose];
 }
 
-- (void)dealloc
-{
+- (void)dealloc {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 
     YASRelease(_deviceNames);
@@ -267,26 +247,22 @@ namespace yas
 
 #pragma mark -
 
-- (void)setThroughVolume:(Float64)throughVolume
-{
+- (void)setThroughVolume:(Float64)throughVolume {
     _throughVolume = throughVolume;
     _internal.kernel->set_througn_volume(throughVolume);
 }
 
-- (void)setSineFrequency:(Float64)sineFrequency
-{
+- (void)setSineFrequency:(Float64)sineFrequency {
     _sineFrequency = sineFrequency;
     _internal.kernel->set_sine_frequency(sineFrequency);
 }
 
-- (void)setSineVolume:(Float64)sineVolume
-{
+- (void)setSineVolume:(Float64)sineVolume {
     _sineVolume = sineVolume;
     _internal.kernel->set_sine_volume(sineVolume);
 }
 
-- (void)setSelectedDeviceIndex:(NSUInteger)selectedDeviceIndex
-{
+- (void)setSelectedDeviceIndex:(NSUInteger)selectedDeviceIndex {
     if (_selectedDeviceIndex != selectedDeviceIndex) {
         _selectedDeviceIndex = selectedDeviceIndex;
 
@@ -301,8 +277,7 @@ namespace yas
     }
 }
 
-- (void)_updateDeviceNames
-{
+- (void)_updateDeviceNames {
     auto all_devices = yas::audio::device::all_devices();
 
     NSMutableArray *titles = [NSMutableArray arrayWithCapacity:all_devices.size()];
@@ -324,8 +299,7 @@ namespace yas
     }
 }
 
-- (void)setDevice:(const yas::audio::device &)selected_device
-{
+- (void)setDevice:(const yas::audio::device &)selected_device {
     if (auto prev_audio_device = _internal.device_io.device()) {
         _internal.device_observer = nullptr;
     }
@@ -356,8 +330,7 @@ namespace yas
     [self _updateDeviceInfo];
 }
 
-- (void)_updateDeviceInfo
-{
+- (void)_updateDeviceInfo {
     auto const device = _internal.device_io.device();
     NSColor *onColor = [NSColor blackColor];
     NSColor *offColor = [NSColor lightGrayColor];

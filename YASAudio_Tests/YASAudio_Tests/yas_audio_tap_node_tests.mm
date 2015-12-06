@@ -11,18 +11,15 @@
 
 @implementation yas_audio_tap_node_tests
 
-- (void)setUp
-{
+- (void)setUp {
     [super setUp];
 }
 
-- (void)tearDown
-{
+- (void)tearDown {
     [super tearDown];
 }
 
-- (void)test_render_with_lambda
-{
+- (void)test_render_with_lambda {
     yas::audio::engine engine;
 
     yas::audio::offline_output_node output_node;
@@ -74,8 +71,7 @@
     [NSThread sleepForTimeInterval:1.0];
 }
 
-- (void)test_render_without_lambda
-{
+- (void)test_render_without_lambda {
     yas::audio::engine engine;
 
     yas::audio::offline_output_node output_node;
@@ -99,8 +95,7 @@
                                  }];
 }
 
-- (void)test_bus_count
-{
+- (void)test_bus_count {
     yas::audio::tap_node node;
 
     XCTAssertEqual(node.input_bus_count(), 1);

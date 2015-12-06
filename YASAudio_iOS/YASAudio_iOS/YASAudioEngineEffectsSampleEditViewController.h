@@ -6,12 +6,10 @@
 #import <UIKit/UIKit.h>
 #import <memory>
 
-namespace yas
-{
-    namespace audio
-    {
-        class unit_node;
-    }
+namespace yas {
+namespace audio {
+    class unit_node;
+}
 }
 
 @interface YASAudioEngineEffectsSampleEditViewController : UITableViewController
