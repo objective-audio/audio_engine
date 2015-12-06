@@ -82,8 +82,8 @@ class yas::audio::unit::impl : public base::impl
     void set_audio_unit_instance(const AudioUnit);  // atomic
     const AudioUnit audio_unit_instance() const;    // atomic
 
-    void callback_render(yas::render_parameters &render_parameters);           // render thread
-    au_result_t audio_unit_render(yas::render_parameters &render_parameters);  // render thread
+    void callback_render(render_parameters &render_parameters);                // render thread
+    au_result_t audio_unit_render(render_parameters &render_parameters);  // render thread
 
     template <typename T>
     void set_property_data(const std::vector<T> &data, const AudioUnitPropertyID property_id,

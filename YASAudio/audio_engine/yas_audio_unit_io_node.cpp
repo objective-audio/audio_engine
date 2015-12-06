@@ -47,12 +47,12 @@ audio::unit_io_node::unit_io_node(const std::shared_ptr<impl> &impl, const Audio
 
 audio::unit_io_node::~unit_io_node() = default;
 
-void audio::unit_io_node::set_channel_map(const channel_map_t &map, const yas::direction dir)
+void audio::unit_io_node::set_channel_map(const channel_map_t &map, const direction dir)
 {
     impl_ptr<impl>()->set_channel_map(map, dir);
 }
 
-const channel_map_t &audio::unit_io_node::channel_map(const yas::direction dir) const
+const audio::channel_map_t &audio::unit_io_node::channel_map(const direction dir) const
 {
     return impl_ptr<impl>()->channel_map(dir);
 }
@@ -98,12 +98,12 @@ audio::unit_output_node::unit_output_node() : super_class(std::make_unique<impl>
 
 void audio::unit_output_node::set_channel_map(const channel_map_t &map)
 {
-    super_class::set_channel_map(map, yas::direction::output);
+    super_class::set_channel_map(map, direction::output);
 }
 
-const channel_map_t &audio::unit_output_node::channel_map() const
+const audio::channel_map_t &audio::unit_output_node::channel_map() const
 {
-    return super_class::channel_map(yas::direction::output);
+    return super_class::channel_map(direction::output);
 }
 
 #pragma mark - audio_unit_input_node
@@ -118,10 +118,10 @@ audio::unit_input_node::unit_input_node() : super_class(std::make_unique<impl>()
 
 void audio::unit_input_node::set_channel_map(const channel_map_t &map)
 {
-    super_class::set_channel_map(map, yas::direction::input);
+    super_class::set_channel_map(map, direction::input);
 }
 
-const channel_map_t &audio::unit_input_node::channel_map() const
+const audio::channel_map_t &audio::unit_input_node::channel_map() const
 {
-    return super_class::channel_map(yas::direction::input);
+    return super_class::channel_map(direction::input);
 }

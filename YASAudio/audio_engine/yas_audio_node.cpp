@@ -38,12 +38,12 @@ audio::format audio::node::output_format(const UInt32 bus_idx) const
     return impl_ptr<impl>()->output_format(bus_idx);
 }
 
-bus_result_t audio::node::next_available_input_bus() const
+audio::bus_result_t audio::node::next_available_input_bus() const
 {
     return impl_ptr<impl>()->next_available_input_bus();
 }
 
-bus_result_t audio::node::next_available_output_bus() const
+audio::bus_result_t audio::node::next_available_output_bus() const
 {
     return impl_ptr<impl>()->next_available_output_bus();
 }

@@ -87,13 +87,13 @@
     YASRetainOrIgnore(ioExpectation);
 
     io_unit.set_render_callback([ioExpectation, frame_length, output_format, &mixer_unit, &self](
-        yas::render_parameters &render_parameters) mutable {
+        yas::audio::render_parameters &render_parameters) mutable {
         if (ioExpectation) {
             [ioExpectation fulfill];
 
             XCTAssertEqual(render_parameters.in_number_frames, frame_length);
             XCTAssertEqual(render_parameters.in_bus_number, 0);
-            XCTAssertEqual(render_parameters.in_render_type, yas::render_type::normal);
+            XCTAssertEqual(render_parameters.in_render_type, yas::audio::render_type::normal);
             XCTAssertEqual(*render_parameters.io_action_flags, 0);
             const AudioBufferList *ioData = render_parameters.io_data;
             XCTAssertNotEqual(ioData, nullptr);
@@ -120,36 +120,36 @@
 
     YASRetainOrIgnore(mixerExpectations);
 
-    mixer_unit.set_render_callback(
-        [mixerExpectations, output_format, frame_length, &self](yas::render_parameters &render_parameters) mutable {
+    mixer_unit.set_render_callback([mixerExpectations, output_format, frame_length, &self](
+        yas::audio::render_parameters &render_parameters) mutable {
+        if (mixerExpectations) {
+            const UInt32 bus_idx = render_parameters.in_bus_number;
+            NSNumber *busKey = @(bus_idx);
+            XCTestExpectation *mixerExpectation = mixerExpectations[busKey];
             if (mixerExpectations) {
-                const UInt32 bus_idx = render_parameters.in_bus_number;
-                NSNumber *busKey = @(bus_idx);
-                XCTestExpectation *mixerExpectation = mixerExpectations[busKey];
-                if (mixerExpectations) {
-                    [mixerExpectation fulfill];
-                    [mixerExpectations removeObjectForKey:busKey];
+                [mixerExpectation fulfill];
+                [mixerExpectations removeObjectForKey:busKey];
 
-                    XCTAssertEqual(render_parameters.in_number_frames, frame_length);
-                    XCTAssertEqual(render_parameters.in_render_type, yas::render_type::normal);
-                    XCTAssertEqual(*render_parameters.io_action_flags, 0);
-                    const AudioBufferList *ioData = render_parameters.io_data;
-                    XCTAssertNotEqual(ioData, nullptr);
-                    XCTAssertEqual(ioData->mNumberBuffers, output_format.buffer_count());
-                    for (UInt32 i = 0; i < output_format.buffer_count(); i++) {
-                        XCTAssertEqual(ioData->mBuffers[i].mNumberChannels, output_format.stride());
-                        XCTAssertEqual(ioData->mBuffers[i].mDataByteSize, output_format.sample_byte_count() *
-                                                                              output_format.stride() *
-                                                                              render_parameters.in_number_frames);
-                    }
-                }
-
-                if (mixerExpectations.count == 0) {
-                    YASRelease(mixerExpectations);
-                    mixerExpectations = nil;
+                XCTAssertEqual(render_parameters.in_number_frames, frame_length);
+                XCTAssertEqual(render_parameters.in_render_type, yas::audio::render_type::normal);
+                XCTAssertEqual(*render_parameters.io_action_flags, 0);
+                const AudioBufferList *ioData = render_parameters.io_data;
+                XCTAssertNotEqual(ioData, nullptr);
+                XCTAssertEqual(ioData->mNumberBuffers, output_format.buffer_count());
+                for (UInt32 i = 0; i < output_format.buffer_count(); i++) {
+                    XCTAssertEqual(ioData->mBuffers[i].mNumberChannels, output_format.stride());
+                    XCTAssertEqual(ioData->mBuffers[i].mDataByteSize, output_format.sample_byte_count() *
+                                                                          output_format.stride() *
+                                                                          render_parameters.in_number_frames);
                 }
             }
-        });
+
+            if (mixerExpectations.count == 0) {
+                YASRelease(mixerExpectations);
+                mixerExpectations = nil;
+            }
+        }
+    });
 
     auto dispatch_labmda = [io_unit, output_format, output_sample_rate]() mutable {
         AudioUnitRenderActionFlags actionFlags = 0;
@@ -158,8 +158,8 @@
 
         yas::audio::pcm_buffer buffer(output_format, frame_length);
 
-        yas::render_parameters parameters = {
-            .in_render_type = yas::render_type::normal,
+        yas::audio::render_parameters parameters = {
+            .in_render_type = yas::audio::render_type::normal,
             .io_action_flags = &actionFlags,
             .io_time_stamp = &timeStamp,
             .in_bus_number = 0,

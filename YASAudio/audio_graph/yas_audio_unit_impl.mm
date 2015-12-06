@@ -18,16 +18,16 @@ using namespace yas;
 
 static OSStatus CommonRenderCallback(void *inRefCon, AudioUnitRenderActionFlags *ioActionFlags,
                                      const AudioTimeStamp *inTimeStamp, UInt32 inBusNumber, UInt32 inNumberFrames,
-                                     AudioBufferList *ioData, yas::render_type renderType)
+                                     AudioBufferList *ioData, audio::render_type renderType)
 {
-    yas::render_parameters renderParameters = {
+    audio::render_parameters renderParameters = {
         .in_render_type = renderType,
         .io_action_flags = ioActionFlags,
         .io_time_stamp = inTimeStamp,
         .in_bus_number = inBusNumber,
         .in_number_frames = inNumberFrames,
         .io_data = ioData,
-        .render_id = (render_id){inRefCon},
+        .render_id = (audio::render_id){inRefCon},
     };
 
     audio::graph::audio_unit_render(renderParameters);
@@ -40,7 +40,7 @@ static OSStatus RenderCallback(void *inRefCon, AudioUnitRenderActionFlags *ioAct
                                AudioBufferList *ioData)
 {
     return CommonRenderCallback(inRefCon, ioActionFlags, inTimeStamp, inBusNumber, inNumberFrames, ioData,
-                                yas::render_type::normal);
+                                audio::render_type::normal);
 }
 
 static OSStatus ClearCallback(void *inRefCon, AudioUnitRenderActionFlags *ioActionFlags,
@@ -65,7 +65,7 @@ static OSStatus NotifyRenderCallback(void *inRefCon, AudioUnitRenderActionFlags 
                                      AudioBufferList *ioData)
 {
     return CommonRenderCallback(inRefCon, ioActionFlags, inTimeStamp, inBusNumber, inNumberFrames, ioData,
-                                yas::render_type::notify);
+                                audio::render_type::notify);
 }
 
 static OSStatus InputRenderCallback(void *inRefCon, AudioUnitRenderActionFlags *ioActionFlags,
@@ -73,7 +73,7 @@ static OSStatus InputRenderCallback(void *inRefCon, AudioUnitRenderActionFlags *
                                     AudioBufferList *ioData)
 {
     return CommonRenderCallback(inRefCon, ioActionFlags, inTimeStamp, inBusNumber, inNumberFrames, ioData,
-                                yas::render_type::input);
+                                audio::render_type::input);
 }
 
 #pragma mark - core
@@ -116,7 +116,7 @@ void audio::unit::impl::create_audio_unit(const AudioComponentDescription &acd)
 
     CFStringRef cf_name = nullptr;
     yas_raise_if_au_error(AudioComponentCopyName(component, &cf_name));
-    _core->name = yas::to_string(cf_name);
+    _core->name = to_string(cf_name);
     CFRelease(cf_name);
 
     AudioUnit au = nullptr;
@@ -477,7 +477,7 @@ void audio::unit::impl::set_channel_map(const channel_map_t &map, const AudioUni
     set_property_data(map, kAudioOutputUnitProperty_ChannelMap, scope, element);
 }
 
-channel_map_t audio::unit::impl::channel_map(const AudioUnitScope scope, const AudioUnitElement element) const
+audio::channel_map_t audio::unit::impl::channel_map(const AudioUnitScope scope, const AudioUnitElement element) const
 {
     if (acd().componentType != kAudioUnitType_Output) {
         throw std::runtime_error(std::string(__PRETTY_FUNCTION__) +
@@ -574,7 +574,7 @@ const AudioUnit audio::unit::impl::audio_unit_instance() const
 
 #pragma mark - render thread
 
-void audio::unit::impl::callback_render(yas::render_parameters &render_parameters)
+void audio::unit::impl::callback_render(render_parameters &render_parameters)
 {
     yas_raise_if_main_thread;
 
@@ -599,7 +599,7 @@ void audio::unit::impl::callback_render(yas::render_parameters &render_parameter
     }
 }
 
-audio::unit::au_result_t audio::unit::impl::audio_unit_render(yas::render_parameters &render_parameters)
+audio::unit::au_result_t audio::unit::impl::audio_unit_render(render_parameters &render_parameters)
 {
     yas_raise_if_main_thread;
 

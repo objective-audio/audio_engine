@@ -104,8 +104,9 @@ class audio::pcm_buffer::impl
     const abl_data_uptr _data;
 };
 
-std::pair<abl_uptr, abl_data_uptr> yas::audio::allocate_audio_buffer_list(const UInt32 buffer_count,
-                                                                          const UInt32 channel_count, const UInt32 size)
+std::pair<audio::abl_uptr, audio::abl_data_uptr> yas::audio::allocate_audio_buffer_list(const UInt32 buffer_count,
+                                                                                        const UInt32 channel_count,
+                                                                                        const UInt32 size)
 {
     abl_uptr abl_ptr((AudioBufferList *)calloc(1, sizeof(AudioBufferList) + buffer_count * sizeof(AudioBuffer)),
                      [](AudioBufferList *abl) { free(abl); });
@@ -148,16 +149,16 @@ static void reset_data_byte_size(audio::pcm_buffer &data)
 }
 
 template <typename T>
-static bool validate_pcm_format(const yas::pcm_format &pcm_format)
+static bool validate_pcm_format(const yas::audio::pcm_format &pcm_format)
 {
     switch (pcm_format) {
-        case yas::pcm_format::float32:
+        case yas::audio::pcm_format::float32:
             return typeid(T) == typeid(Float32);
-        case yas::pcm_format::float64:
+        case yas::audio::pcm_format::float64:
             return typeid(T) == typeid(Float64);
-        case yas::pcm_format::fixed824:
+        case yas::audio::pcm_format::fixed824:
             return typeid(T) == typeid(SInt32);
-        case yas::pcm_format::int16:
+        case yas::audio::pcm_format::int16:
             return typeid(T) == typeid(SInt16);
         default:
             return false;

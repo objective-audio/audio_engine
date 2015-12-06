@@ -21,7 +21,7 @@ namespace yas
             explicit format(const AudioStreamBasicDescription &asbd);
             explicit format(const CFDictionaryRef &settings);
             format(const Float64 sample_rate, const UInt32 channel_count,
-                   const yas::pcm_format pcm_format = yas::pcm_format::float32, const bool interleaved = false);
+                   const audio::pcm_format pcm_format = audio::pcm_format::float32, const bool interleaved = false);
 
             format(const format &) = default;
             format(format &&) = default;
@@ -37,7 +37,7 @@ namespace yas
 
             bool is_empty() const;
             bool is_standard() const;
-            yas::pcm_format pcm_format() const;
+            audio::pcm_format pcm_format() const;
             UInt32 channel_count() const;
             UInt32 buffer_count() const;
             UInt32 stride() const;
@@ -56,9 +56,9 @@ namespace yas
         };
     }
 
-    std::string to_string(const yas::pcm_format &pcm_format);
+    std::string to_string(const audio::pcm_format &pcm_format);
     AudioStreamBasicDescription to_stream_description(const CFDictionaryRef &settings);
     AudioStreamBasicDescription to_stream_description(const Float64 sample_rate, const UInt32 channels,
-                                                      const yas::pcm_format pcm_format, const bool interleaved);
+                                                      const audio::pcm_format pcm_format, const bool interleaved);
     bool is_equal(const AudioStreamBasicDescription &asbd1, const AudioStreamBasicDescription &asbd2);
 }

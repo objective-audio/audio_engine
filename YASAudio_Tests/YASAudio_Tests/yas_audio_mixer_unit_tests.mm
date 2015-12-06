@@ -36,7 +36,7 @@
      NonInterleaved
      */
 
-    auto format = yas::audio::format(48000.0, 2, yas::pcm_format::float32, false);
+    auto format = yas::audio::format(48000.0, 2, yas::audio::pcm_format::float32, false);
 
     XCTAssertNoThrow(mixer_unit.set_output_format(format.stream_description(), 0));
 
@@ -59,7 +59,7 @@
      Fixed8.24
      */
 
-    format = yas::audio::format(48000.0, 2, yas::pcm_format::fixed824, false);
+    format = yas::audio::format(48000.0, 2, yas::audio::pcm_format::fixed824, false);
 
     XCTAssertNoThrow(mixer_unit.set_output_format(format.stream_description(), 0));
 
@@ -87,7 +87,7 @@
      Initialized
      */
 
-    auto format = yas::audio::format(48000.0, 2, yas::pcm_format::float32, false);
+    auto format = yas::audio::format(48000.0, 2, yas::audio::pcm_format::float32, false);
 
     yas::audio::unit::private_access::initialize(mixer_unit);
     XCTAssertThrows(mixer_unit.set_output_format(format.stream_description(), 0));
@@ -98,14 +98,14 @@
      Float64
      */
 
-    format = yas::audio::format(48000.0, 2, yas::pcm_format::float64, false);
+    format = yas::audio::format(48000.0, 2, yas::audio::pcm_format::float64, false);
     XCTAssertThrows(mixer_unit.set_output_format(format.stream_description(), 0));
 
     /*
      Int16
      */
 
-    format = yas::audio::format(48000.0, 2, yas::pcm_format::int16, false);
+    format = yas::audio::format(48000.0, 2, yas::audio::pcm_format::int16, false);
     XCTAssertThrows(mixer_unit.set_output_format(format.stream_description(), 0));
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
@@ -113,7 +113,7 @@
      Fixed8.24
      */
 
-    format = yas::audio::format(48000.0, 2, yas::pcm_format::fixed824, false);
+    format = yas::audio::format(48000.0, 2, yas::audio::pcm_format::fixed824, false);
     XCTAssertThrows(mixer_unit.set_output_format(format.stream_description(), 0));
 #endif
 
@@ -121,7 +121,7 @@
      Interleaved
      */
 
-    format = yas::audio::format(48000.0, 2, yas::pcm_format::float32, true);
+    format = yas::audio::format(48000.0, 2, yas::audio::pcm_format::float32, true);
     XCTAssertThrows(mixer_unit.set_output_format(format.stream_description(), 0));
     XCTAssertThrows(mixer_unit.set_input_format(format.stream_description(), 0));
 }

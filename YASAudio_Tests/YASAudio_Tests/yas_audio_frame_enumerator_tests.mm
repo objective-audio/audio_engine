@@ -63,7 +63,7 @@
     const UInt32 frame_length = 16;
     const UInt32 channels = 3;
 
-    auto format = yas::audio::format(48000, channels, yas::pcm_format::float32, true);
+    auto format = yas::audio::format(48000, channels, yas::audio::pcm_format::float32, true);
     yas::audio::pcm_buffer buffer(format, frame_length);
 
     XCTAssertEqual(format.stride(), channels);
@@ -100,7 +100,7 @@
     const UInt32 frame_length = 16;
     const UInt32 channels = 3;
 
-    auto format = yas::audio::format(48000, channels, yas::pcm_format::float32, true);
+    auto format = yas::audio::format(48000, channels, yas::audio::pcm_format::float32, true);
     yas::audio::pcm_buffer data(format, frame_length);
 
     XCTAssertEqual(format.stride(), channels);
@@ -256,7 +256,7 @@
 {
     const UInt32 channels = 4;
 
-    auto format = yas::audio::format(48000, channels, yas::pcm_format::float32, true);
+    auto format = yas::audio::format(48000, channels, yas::audio::pcm_format::float32, true);
     yas::audio::pcm_buffer buffer(format, 1);
 
     auto bufferPointer = buffer.flex_ptr_at_index(0);
@@ -284,9 +284,9 @@
     const UInt32 frame_length = 16;
     const UInt32 channels = 4;
 
-    for (UInt32 i = static_cast<UInt32>(yas::pcm_format::float32); i <= static_cast<UInt32>(yas::pcm_format::fixed824);
-         ++i) {
-        auto pcmFormat = static_cast<yas::pcm_format>(i);
+    for (UInt32 i = static_cast<UInt32>(yas::audio::pcm_format::float32);
+         i <= static_cast<UInt32>(yas::audio::pcm_format::fixed824); ++i) {
+        auto pcmFormat = static_cast<yas::audio::pcm_format>(i);
         auto format = yas::audio::format(48000.0, channels, pcmFormat, false);
         yas::audio::pcm_buffer buffer(format, frame_length);
 
@@ -302,16 +302,16 @@
                 UInt32 test_value =
                     (Float64)yas::test::test_value(static_cast<UInt32>(*frame), 0, static_cast<UInt32>(*channel));
                 switch (pcmFormat) {
-                    case yas::pcm_format::float32:
+                    case yas::audio::pcm_format::float32:
                         XCTAssertEqual(*pointer->f32, static_cast<Float32>(test_value));
                         break;
-                    case yas::pcm_format::float64:
+                    case yas::audio::pcm_format::float64:
                         XCTAssertEqual(*pointer->f64, static_cast<Float64>(test_value));
                         break;
-                    case yas::pcm_format::int16:
+                    case yas::audio::pcm_format::int16:
                         XCTAssertEqual(*pointer->i16, static_cast<SInt16>(test_value));
                         break;
-                    case yas::pcm_format::fixed824:
+                    case yas::audio::pcm_format::fixed824:
                         XCTAssertEqual(*pointer->i32, static_cast<SInt32>(test_value));
                         break;
                     default:
@@ -336,7 +336,7 @@
     const NSUInteger stopFrame = 8;
     const NSUInteger stopChannel = 2;
 
-    auto format = yas::audio::format(48000.0, channels, yas::pcm_format::float32, true);
+    auto format = yas::audio::format(48000.0, channels, yas::audio::pcm_format::float32, true);
     yas::audio::pcm_buffer buffer(format, frame_length);
 
     yas::audio::frame_enumerator enumerator(buffer);

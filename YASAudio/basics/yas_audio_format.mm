@@ -44,7 +44,7 @@ class audio::format::impl
 {
    public:
     AudioStreamBasicDescription asbd;
-    yas::pcm_format pcm_format;
+    audio::pcm_format pcm_format;
     bool standard;
 };
 
@@ -58,16 +58,16 @@ audio::format::format(const AudioStreamBasicDescription &asbd) : _impl(std::make
 {
     _impl->asbd = asbd;
     _impl->asbd.mReserved = 0;
-    _impl->pcm_format = yas::pcm_format::other;
+    _impl->pcm_format = audio::pcm_format::other;
     _impl->standard = false;
     if (asbd.mFormatID == kAudioFormatLinearPCM) {
         if ((asbd.mFormatFlags & kAudioFormatFlagIsFloat) &&
             ((asbd.mFormatFlags & kAudioFormatFlagIsBigEndian) == kAudioFormatFlagsNativeEndian) &&
             (asbd.mFormatFlags & kAudioFormatFlagIsPacked)) {
             if (asbd.mBitsPerChannel == 64) {
-                _impl->pcm_format = yas::pcm_format::float64;
+                _impl->pcm_format = audio::pcm_format::float64;
             } else if (asbd.mBitsPerChannel == 32) {
-                _impl->pcm_format = yas::pcm_format::float32;
+                _impl->pcm_format = audio::pcm_format::float32;
                 if (asbd.mFormatFlags & kAudioFormatFlagIsNonInterleaved) {
                     _impl->standard = true;
                 }
@@ -78,9 +78,9 @@ audio::format::format(const AudioStreamBasicDescription &asbd) : _impl(std::make
             UInt32 fraction = (asbd.mFormatFlags & kLinearPCMFormatFlagsSampleFractionMask) >>
                               kLinearPCMFormatFlagsSampleFractionShift;
             if (asbd.mBitsPerChannel == 32 && fraction == 24) {
-                _impl->pcm_format = yas::pcm_format::fixed824;
+                _impl->pcm_format = audio::pcm_format::fixed824;
             } else if (asbd.mBitsPerChannel == 16) {
-                _impl->pcm_format = yas::pcm_format::int16;
+                _impl->pcm_format = audio::pcm_format::int16;
             }
         }
     }
@@ -90,7 +90,7 @@ audio::format::format(const CFDictionaryRef &settings) : format(to_stream_descri
 {
 }
 
-audio::format::format(const Float64 sample_rate, const UInt32 channel_count, const yas::pcm_format pcm_format,
+audio::format::format(const Float64 sample_rate, const UInt32 channel_count, const audio::pcm_format pcm_format,
                       const bool interleaved)
     : format(to_stream_description(sample_rate, channel_count, pcm_format, interleaved))
 {
@@ -129,7 +129,7 @@ bool audio::format::is_standard() const
     }
 }
 
-yas::pcm_format audio::format::pcm_format() const
+audio::pcm_format audio::format::pcm_format() const
 {
     if (_impl) {
         return _impl->pcm_format;
@@ -196,12 +196,12 @@ UInt32 audio::format::sample_byte_count() const
 {
     if (_impl) {
         switch (_impl->pcm_format) {
-            case yas::pcm_format::float32:
-            case yas::pcm_format::fixed824:
+            case audio::pcm_format::float32:
+            case audio::pcm_format::fixed824:
                 return 4;
-            case yas::pcm_format::int16:
+            case audio::pcm_format::int16:
                 return 2;
-            case yas::pcm_format::float64:
+            case audio::pcm_format::float64:
                 return 8;
             default:
                 return 0;
@@ -242,18 +242,18 @@ const audio::format &audio::format::null_format()
 
 #pragma mark - utility
 
-std::string yas::to_string(const yas::pcm_format &pcm_format)
+std::string yas::to_string(const audio::pcm_format &pcm_format)
 {
     switch (pcm_format) {
-        case yas::pcm_format::float32:
+        case audio::pcm_format::float32:
             return "Float32";
-        case yas::pcm_format::float64:
+        case audio::pcm_format::float64:
             return "Float64";
-        case yas::pcm_format::int16:
+        case audio::pcm_format::int16:
             return "Int16";
-        case yas::pcm_format::fixed824:
+        case audio::pcm_format::fixed824:
             return "Fixed8.24";
-        case yas::pcm_format::other:
+        case audio::pcm_format::other:
             return "Other";
     }
     return "";
@@ -336,9 +336,9 @@ AudioStreamBasicDescription yas::to_stream_description(const CFDictionaryRef &se
 }
 
 AudioStreamBasicDescription yas::to_stream_description(const Float64 sample_rate, const UInt32 channel_count,
-                                                       const yas::pcm_format pcm_format, const bool interleaved)
+                                                       const audio::pcm_format pcm_format, const bool interleaved)
 {
-    if (pcm_format == yas::pcm_format::other || channel_count == 0) {
+    if (pcm_format == audio::pcm_format::other || channel_count == 0) {
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : invalid argument. pcm_format(" +
                                     to_string(pcm_format) + ") channel_count(" + std::to_string(channel_count) + ")");
     }
@@ -349,11 +349,11 @@ AudioStreamBasicDescription yas::to_stream_description(const Float64 sample_rate
 
     asbd.mFormatFlags = kAudioFormatFlagsNativeEndian | kAudioFormatFlagIsPacked;
 
-    if (pcm_format == yas::pcm_format::float32 || pcm_format == yas::pcm_format::float64) {
+    if (pcm_format == audio::pcm_format::float32 || pcm_format == audio::pcm_format::float64) {
         asbd.mFormatFlags |= kAudioFormatFlagIsFloat;
-    } else if (pcm_format == yas::pcm_format::int16) {
+    } else if (pcm_format == audio::pcm_format::int16) {
         asbd.mFormatFlags |= kAudioFormatFlagIsSignedInteger;
-    } else if (pcm_format == yas::pcm_format::fixed824) {
+    } else if (pcm_format == audio::pcm_format::fixed824) {
         asbd.mFormatFlags |= kAudioFormatFlagIsSignedInteger | (24 << kLinearPCMFormatFlagsSampleFractionShift);
     }
 
@@ -361,9 +361,9 @@ AudioStreamBasicDescription yas::to_stream_description(const Float64 sample_rate
         asbd.mFormatFlags |= kAudioFormatFlagIsNonInterleaved;
     }
 
-    if (pcm_format == yas::pcm_format::float64) {
+    if (pcm_format == audio::pcm_format::float64) {
         asbd.mBitsPerChannel = 64;
-    } else if (pcm_format == yas::pcm_format::int16) {
+    } else if (pcm_format == audio::pcm_format::int16) {
         asbd.mBitsPerChannel = 16;
     } else {
         asbd.mBitsPerChannel = 32;

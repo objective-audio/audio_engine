@@ -200,7 +200,7 @@ void audio::unit_node::impl::update_connections()
         auto input_bus_count = input_element_count();
         if (input_bus_count > 0) {
             auto weak_node = to_weak(cast<unit_node>());
-            audio_unit.set_render_callback([weak_node](yas::render_parameters &render_parameters) {
+            audio_unit.set_render_callback([weak_node](yas::audio::render_parameters &render_parameters) {
                 if (auto node = weak_node.lock()) {
                     if (auto kernel = node.impl_ptr<impl>()->kernel_cast()) {
                         if (auto connection = kernel->input_connection(render_parameters.in_bus_number)) {

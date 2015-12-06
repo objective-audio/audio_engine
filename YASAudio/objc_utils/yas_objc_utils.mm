@@ -13,7 +13,7 @@ using namespace yas;
 
 #if TARGET_OS_IPHONE
 
-channel_map_t yas::to_channel_map(NSArray *const channelDescriptions, const yas::direction dir)
+audio::channel_map_t yas::to_channel_map(NSArray *const channelDescriptions, const audio::direction dir)
 {
     AVAudioSession *const audioSession = [AVAudioSession sharedInstance];
     AVAudioSessionRouteDescription *const routeDesc = audioSession.currentRoute;
@@ -21,7 +21,7 @@ channel_map_t yas::to_channel_map(NSArray *const channelDescriptions, const yas:
     NSInteger channel_count = 0;
     NSArray *portDescriptions = nil;
 
-    if (dir == yas::direction::input) {
+    if (dir == audio::direction::input) {
         channel_count = audioSession.inputNumberOfChannels;
         portDescriptions = routeDesc.inputs;
     } else {
@@ -30,10 +30,10 @@ channel_map_t yas::to_channel_map(NSArray *const channelDescriptions, const yas:
     }
 
     if (channel_count == 0) {
-        return channel_map_t();
+        return audio::channel_map_t();
     }
 
-    channel_map_t map;
+    audio::channel_map_t map;
     map.reserve(channel_count);
 
     for (AVAudioSessionPortDescription *portDescription in portDescriptions) {

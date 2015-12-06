@@ -257,7 +257,7 @@ void audio::unit::set_channel_map(const channel_map_t &map, const AudioUnitScope
     impl_ptr<impl>()->set_channel_map(map, scope, element);
 }
 
-channel_map_t audio::unit::channel_map(const AudioUnitScope scope, const AudioUnitElement element) const
+audio::channel_map_t audio::unit::channel_map(const AudioUnitScope scope, const AudioUnitElement element) const
 {
     return impl_ptr<impl>()->channel_map(scope, element);
 }
@@ -296,12 +296,12 @@ void audio::unit::reset()
 
 #pragma mark - render thread
 
-void audio::unit::callback_render(yas::render_parameters &render_parameters)
+void audio::unit::callback_render(render_parameters &render_parameters)
 {
     impl_ptr<impl>()->callback_render(render_parameters);
 }
 
-audio::unit::au_result_t audio::unit::audio_unit_render(yas::render_parameters &render_parameters)
+audio::unit::au_result_t audio::unit::audio_unit_render(render_parameters &render_parameters)
 {
     return impl_ptr<impl>()->audio_unit_render(render_parameters);
 }

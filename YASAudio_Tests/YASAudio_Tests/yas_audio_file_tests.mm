@@ -16,7 +16,7 @@ namespace yas
             UInt32 file_bit_depth;
             UInt32 frame_length;
             UInt32 loop_count;
-            pcm_format pcm_format;
+            audio::pcm_format pcm_format;
             bool interleaved;
             bool standard;
             bool async;
@@ -95,14 +95,14 @@ namespace yas
     Float64 sample_rates[] = {44100.0, 382000.0};
     UInt32 channels[] = {1, 2};
     UInt32 file_bit_depths[] = {16, 24};
-    yas::pcm_format pcm_formats[] = {yas::pcm_format::float32, yas::pcm_format::float64};
+    yas::audio::pcm_format pcm_formats[] = {yas::audio::pcm_format::float32, yas::audio::pcm_format::float64};
     bool interleaveds[] = {YES, NO};
 #else
     Float64 sample_rates[] = {8000.0, 44100.0, 48000.0, 382000.0};
     UInt32 channels[] = {1, 2, 3, 6};
     UInt32 file_bit_depths[] = {16, 24, 32};
-    yas::pcm_format pcm_formats[] = {yas::pcm_format::float32, yas::pcm_format::float64, yas::pcm_format::int16,
-                                     yas::pcm_format::fixed824};
+    yas::audio::pcm_format::pcm_formats[] = {yas::audio::pcm_format::float32, yas::audio::pcm_format::float64,
+                                             yas::audio::pcm_format::int16, yas::audio::pcm_format::fixed824};
     bool interleaveds[] = {YES, NO};
 #endif
 
@@ -118,7 +118,7 @@ namespace yas
         for (Float64 processing_sample_rate : sample_rates) {
             for (UInt32 channel : channels) {
                 for (UInt32 file_bit_depth : file_bit_depths) {
-                    for (yas::pcm_format pcm_format : pcm_formats) {
+                    for (yas::audio::pcm_format pcm_format : pcm_formats) {
                         for (bool interleved : interleaveds) {
                             test_data.file_sample_rate = file_sample_rate;
                             test_data.channels = channel;
@@ -142,7 +142,7 @@ namespace yas
     test_data.channels = 2;
     test_data.file_bit_depth = 32;
     test_data.processing_sample_rate = 44100;
-    test_data.pcm_format = yas::pcm_format::float32;
+    test_data.pcm_format = yas::audio::pcm_format::float32;
     test_data.interleaved = NO;
 
     [self _commonAudioFileTest:test_data];
@@ -163,7 +163,7 @@ namespace yas
     const UInt32 loopCount = test_data.loop_count;
     const Float64 file_sample_rate = test_data.file_sample_rate;
     const Float64 processing_sample_rate = test_data.processing_sample_rate;
-    const yas::pcm_format pcm_format = test_data.pcm_format;
+    const yas::audio::pcm_format pcm_format = test_data.pcm_format;
     const bool interleaved = test_data.interleaved;
     const bool async = test_data.async;
     CFDictionaryRef settings = test_data.settings();
@@ -256,17 +256,17 @@ namespace yas
             SInt16 value = frameIndex + startIndex + 1;
             for (NSInteger ch_idx = 0; ch_idx < stride; ch_idx++) {
                 switch (format.pcm_format()) {
-                    case yas::pcm_format::int16: {
+                    case yas::audio::pcm_format::int16: {
                         pointer.i16[frameIndex * stride + ch_idx] = value;
                     } break;
-                    case yas::pcm_format::fixed824: {
+                    case yas::audio::pcm_format::fixed824: {
                         pointer.i32[frameIndex * stride + ch_idx] = value << 16;
                     } break;
-                    case yas::pcm_format::float32: {
+                    case yas::audio::pcm_format::float32: {
                         Float32 float32Value = (Float32)value / INT16_MAX;
                         pointer.f32[frameIndex * stride + ch_idx] = float32Value;
                     } break;
-                    case yas::pcm_format::float64: {
+                    case yas::audio::pcm_format::float64: {
                         Float64 float64Value = (Float64)value / INT16_MAX;
                         pointer.f64[frameIndex * stride + ch_idx] = (Float64)float64Value;
                     } break;
@@ -293,16 +293,16 @@ namespace yas
             for (NSInteger ch_idx = 0; ch_idx < stride; ch_idx++) {
                 SInt16 ptrValue = 0;
                 switch (format.pcm_format()) {
-                    case yas::pcm_format::int16: {
+                    case yas::audio::pcm_format::int16: {
                         ptrValue = pointer.i16[frameIndex * stride + ch_idx];
                     } break;
-                    case yas::pcm_format::fixed824: {
+                    case yas::audio::pcm_format::fixed824: {
                         ptrValue = pointer.i32[frameIndex * stride + ch_idx] >> 16;
                     } break;
-                    case yas::pcm_format::float32: {
+                    case yas::audio::pcm_format::float32: {
                         ptrValue = roundf(pointer.f32[frameIndex * stride + ch_idx] * INT16_MAX);
                     } break;
-                    case yas::pcm_format::float64: {
+                    case yas::audio::pcm_format::float64: {
                         ptrValue = round(pointer.f64[frameIndex * stride + ch_idx] * INT16_MAX);
                     } break;
                     default:

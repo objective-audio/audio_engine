@@ -24,8 +24,8 @@
 - (void)testSetFormatSuccess
 {
     yas::audio::unit converter_unit(kAudioUnitType_FormatConverter, kAudioUnitSubType_AUConverter);
-    const yas::pcm_format pcm_formats[] = {yas::pcm_format::float32, yas::pcm_format::float64, yas::pcm_format::int16,
-                                           yas::pcm_format::fixed824};
+    const yas::audio::pcm_format pcm_formats[] = {yas::audio::pcm_format::float32, yas::audio::pcm_format::float64,
+                                                  yas::audio::pcm_format::int16, yas::audio::pcm_format::fixed824};
     const Float64 sample_rates[] = {4000, 8000, 16000, 22050, 44100, 48000, 88100, 96000, 192000, 382000};
     const bool interleaves[] = {false, true};
 

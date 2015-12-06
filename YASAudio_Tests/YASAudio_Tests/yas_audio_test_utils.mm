@@ -15,7 +15,7 @@ UInt32 yas::test::test_value(const UInt32 frame, const UInt32 ch_idx, const UInt
 void yas::test::fill_test_values_to_buffer(const audio::pcm_buffer &buffer)
 {
     const auto &format = buffer.format();
-    const yas::pcm_format pcmFormat = format.pcm_format();
+    const yas::audio::pcm_format pcmFormat = format.pcm_format();
     const UInt32 buffer_count = format.buffer_count();
     const UInt32 stride = format.stride();
 
@@ -26,16 +26,16 @@ void yas::test::fill_test_values_to_buffer(const audio::pcm_buffer &buffer)
                 UInt32 index = frame * stride + ch_idx;
                 UInt32 value = test_value(frame, ch_idx, buf_idx);
                 switch (pcmFormat) {
-                    case yas::pcm_format::float32: {
+                    case yas::audio::pcm_format::float32: {
                         pointer.f32[index] = value;
                     } break;
-                    case yas::pcm_format::float64: {
+                    case yas::audio::pcm_format::float64: {
                         pointer.f64[index] = value;
                     } break;
-                    case yas::pcm_format::int16: {
+                    case yas::audio::pcm_format::int16: {
                         pointer.i16[index] = value;
                     } break;
-                    case yas::pcm_format::fixed824: {
+                    case yas::audio::pcm_format::fixed824: {
                         pointer.i32[index] = value;
                     } break;
                     default:
@@ -156,8 +156,8 @@ void yas::test::audio_unit_render_on_sub_thread(audio::unit &unit, audio::format
             yas::audio::time time(frame_length * i, format.sample_rate());
             AudioTimeStamp timeStamp = time.audio_time_stamp();
 
-            yas::render_parameters parameters = {
-                .in_render_type = yas::render_type::normal,
+            audio::render_parameters parameters = {
+                .in_render_type = audio::render_type::normal,
                 .io_action_flags = &action_flags,
                 .io_time_stamp = &timeStamp,
                 .in_bus_number = 0,

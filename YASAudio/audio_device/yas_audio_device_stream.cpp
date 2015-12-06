@@ -151,7 +151,7 @@ bool audio::device::stream::is_active() const
     return false;
 }
 
-direction audio::device::stream::direction() const
+audio::direction audio::device::stream::direction() const
 {
     auto data = _property_data<UInt32>(stream_id(), kAudioStreamPropertyDirection);
     if (data) {

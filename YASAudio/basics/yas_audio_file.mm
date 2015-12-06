@@ -211,7 +211,7 @@ audio::file::open_result_t audio::file::open(const CFURLRef file_url, const pcm_
         return open_result_t(open_error_t::opened);
     }
 
-    if (!file_url || pcm_format == yas::pcm_format::other) {
+    if (!file_url || pcm_format == yas::audio::pcm_format::other) {
         return open_result_t(open_error_t::invalid_argument);
     }
 

@@ -90,7 +90,7 @@
     const UInt32 frame_length = 16;
     const UInt32 channels = 4;
 
-    auto format = yas::audio::format(48000.0, channels, yas::pcm_format::float32, true);
+    auto format = yas::audio::format(48000.0, channels, yas::audio::pcm_format::float32, true);
     yas::audio::pcm_buffer buffer(format, frame_length);
 
     XCTAssertEqual(format.stride(), channels);

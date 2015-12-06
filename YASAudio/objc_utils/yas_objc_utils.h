@@ -12,7 +12,7 @@
 namespace yas
 {
 #if TARGET_OS_IPHONE
-    channel_map_t to_channel_map(NSArray *const channelDescriptions, const yas::direction dir);
+    audio::channel_map_t to_channel_map(NSArray *const channelDescriptions, const audio::direction dir);
 #endif
 
     AVAudioTime *to_objc_object(const audio::time &time);

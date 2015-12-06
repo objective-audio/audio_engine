@@ -30,8 +30,8 @@ namespace yas
             audio::device device() const;
 #endif
 
-            void set_channel_map(const channel_map_t &map, const yas::direction dir);
-            const channel_map_t &channel_map(const yas::direction dir) const;
+            void set_channel_map(const channel_map_t &map, const direction dir);
+            const channel_map_t &channel_map(const direction dir) const;
 
             Float64 device_sample_rate() const;
             UInt32 output_device_channel_count() const;

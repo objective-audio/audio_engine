@@ -86,7 +86,7 @@ audio::format audio::node::impl::output_format(const UInt32 bus_idx)
     return nullptr;
 }
 
-bus_result_t audio::node::impl::next_available_input_bus() const
+audio::bus_result_t audio::node::impl::next_available_input_bus() const
 {
     auto key = min_empty_key(_core->input_connections);
     if (key && *key < input_bus_count()) {
@@ -95,7 +95,7 @@ bus_result_t audio::node::impl::next_available_input_bus() const
     return nullopt;
 }
 
-bus_result_t audio::node::impl::next_available_output_bus() const
+audio::bus_result_t audio::node::impl::next_available_output_bus() const
 {
     auto key = min_empty_key(_core->output_connections);
     if (key && *key < output_bus_count()) {

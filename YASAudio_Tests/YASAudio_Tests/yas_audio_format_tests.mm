@@ -27,7 +27,7 @@
 
     XCTAssertEqual(format.is_empty(), true);
     XCTAssertEqual(format.is_standard(), false);
-    XCTAssertEqual(format.pcm_format(), yas::pcm_format::other);
+    XCTAssertEqual(format.pcm_format(), yas::audio::pcm_format::other);
     XCTAssertEqual(format.channel_count(), 0);
     XCTAssertEqual(format.buffer_count(), 0);
     XCTAssertEqual(format.stride(), 0);
@@ -43,7 +43,7 @@
 
     XCTAssertEqual(format.is_empty(), true);
     XCTAssertEqual(format.is_standard(), false);
-    XCTAssertEqual(format.pcm_format(), yas::pcm_format::other);
+    XCTAssertEqual(format.pcm_format(), yas::audio::pcm_format::other);
     XCTAssertEqual(format.channel_count(), 0);
     XCTAssertEqual(format.buffer_count(), 0);
     XCTAssertEqual(format.stride(), 0);
@@ -70,7 +70,7 @@
     const UInt32 bufferCount = channelCount;
     const UInt32 stride = 1;
     const BOOL interleaved = NO;
-    const yas::pcm_format pcmFormat = yas::pcm_format::float32;
+    const yas::audio::pcm_format pcmFormat = yas::audio::pcm_format::float32;
     const UInt32 bitsPerChannel = 32;
     const UInt32 bytesPerFrame = bitsPerChannel / 8;
 
@@ -104,7 +104,7 @@
     const UInt32 bufferCount = 1;
     const UInt32 stride = channelCount;
     const BOOL interleaved = YES;
-    const yas::pcm_format pcmFormat = yas::pcm_format::float64;
+    const yas::audio::pcm_format pcmFormat = yas::audio::pcm_format::float64;
     const UInt32 bitsPerChannel = 64;
     const UInt32 bytesPerFrame = bitsPerChannel / 8 * channelCount;
 
@@ -138,7 +138,7 @@
     const UInt32 bufferCount = 1;
     const UInt32 stride = channelCount;
     const BOOL interleaved = YES;
-    const yas::pcm_format pcmFormat = yas::pcm_format::int16;
+    const yas::audio::pcm_format pcmFormat = yas::audio::pcm_format::int16;
     const UInt32 bitsPerChannel = 16;
     const UInt32 bytesPerFrame = bitsPerChannel / 8 * channelCount;
 
@@ -219,7 +219,7 @@
     auto format = yas::audio::format(settings);
 
     if (kAudioFormatFlagIsBigEndian != kAudioFormatFlagsNativeEndian) {
-        XCTAssertEqual(format.pcm_format(), yas::pcm_format::float32);
+        XCTAssertEqual(format.pcm_format(), yas::audio::pcm_format::float32);
         XCTAssertEqual(format.channel_count(), 2);
         XCTAssertEqual(format.buffer_count(), 2);
         XCTAssertEqual(format.stride(), 1);
@@ -227,7 +227,7 @@
         XCTAssertEqual(format.is_interleaved(), NO);
         XCTAssertEqual(format.sample_byte_count(), 4);
     } else {
-        XCTAssertEqual(format.pcm_format(), yas::pcm_format::other);
+        XCTAssertEqual(format.pcm_format(), yas::audio::pcm_format::other);
     }
 
     settings = yas::audio::linear_pcm_file_settings(sampleRate, 4, 16, true, false, false);
@@ -235,7 +235,7 @@
     format = yas::audio::format(settings);
 
     if (kAudioFormatFlagIsBigEndian == kAudioFormatFlagsNativeEndian) {
-        XCTAssertEqual(format.pcm_format(), yas::pcm_format::int16);
+        XCTAssertEqual(format.pcm_format(), yas::audio::pcm_format::int16);
         XCTAssertEqual(format.channel_count(), 4);
         XCTAssertEqual(format.buffer_count(), 1);
         XCTAssertEqual(format.stride(), 4);
@@ -243,7 +243,7 @@
         XCTAssertEqual(format.is_interleaved(), YES);
         XCTAssertEqual(format.sample_byte_count(), 2);
     } else {
-        XCTAssertEqual(format.pcm_format(), yas::pcm_format::other);
+        XCTAssertEqual(format.pcm_format(), yas::audio::pcm_format::other);
     }
 }
 
@@ -307,11 +307,11 @@
 
 - (void)test_pcm_format_to_string
 {
-    XCTAssertTrue(yas::to_string(yas::pcm_format::float32) == "Float32");
-    XCTAssertTrue(yas::to_string(yas::pcm_format::float64) == "Float64");
-    XCTAssertTrue(yas::to_string(yas::pcm_format::int16) == "Int16");
-    XCTAssertTrue(yas::to_string(yas::pcm_format::fixed824) == "Fixed8.24");
-    XCTAssertTrue(yas::to_string(yas::pcm_format::other) == "Other");
+    XCTAssertTrue(yas::to_string(yas::audio::pcm_format::float32) == "Float32");
+    XCTAssertTrue(yas::to_string(yas::audio::pcm_format::float64) == "Float64");
+    XCTAssertTrue(yas::to_string(yas::audio::pcm_format::int16) == "Int16");
+    XCTAssertTrue(yas::to_string(yas::audio::pcm_format::fixed824) == "Fixed8.24");
+    XCTAssertTrue(yas::to_string(yas::audio::pcm_format::other) == "Other");
 }
 
 - (void)test_null_format
