@@ -12,7 +12,6 @@
 #include "yas_property.h"
 #include "yas_exception.h"
 #include "yas_result.h"
-#include "yas_any.h"
 #include "yas_audio_math.h"
 #include "yas_flex_ptr.h"
 #include "yas_operation.h"
