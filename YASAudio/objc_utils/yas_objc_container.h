@@ -7,7 +7,6 @@
 
 #include <objc/objc.h>
 #include <mutex>
-#include "yas_audio_types.h"
 #include "yas_objc_macros.h"
 
 namespace yas {
