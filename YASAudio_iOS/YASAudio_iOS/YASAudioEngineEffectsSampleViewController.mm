@@ -132,7 +132,7 @@ namespace sample {
             component = AudioComponentFindNext(component, &baseAcd);
             if (component != NULL) {
                 AudioComponentDescription acd;
-                yas_raise_if_au_error(AudioComponentGetDescription(component, &acd));
+                raise_if_au_error(AudioComponentGetDescription(component, &acd));
                 _audio_units.push_back(yas::audio::unit(acd));
             } else {
                 break;

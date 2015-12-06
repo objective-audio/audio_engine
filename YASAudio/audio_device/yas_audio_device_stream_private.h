@@ -8,7 +8,7 @@
 #include <TargetConditionals.h>
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
 
-#include "yas_exception.h"
+#include "yas_audio_exception.h"
 
 template <typename T>
 std::unique_ptr<std::vector<T>> yas::audio::device::stream::_property_data(
@@ -18,13 +18,13 @@ std::unique_ptr<std::vector<T>> yas::audio::device::stream::_property_data(
                                                 .mElement = kAudioObjectPropertyElementMaster};
 
     UInt32 byte_size = 0;
-    yas_raise_if_au_error(AudioObjectGetPropertyDataSize(stream_id, &address, 0, nullptr, &byte_size));
+    raise_if_au_error(AudioObjectGetPropertyDataSize(stream_id, &address, 0, nullptr, &byte_size));
     UInt32 vector_size = byte_size / sizeof(T);
 
     if (vector_size > 0) {
         auto data = std::make_unique<std::vector<T>>(vector_size);
         byte_size = vector_size * sizeof(T);
-        yas_raise_if_au_error(AudioObjectGetPropertyData(stream_id, &address, 0, nullptr, &byte_size, data->data()));
+        raise_if_au_error(AudioObjectGetPropertyData(stream_id, &address, 0, nullptr, &byte_size, data->data()));
         return data;
     }
 

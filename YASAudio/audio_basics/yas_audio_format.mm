@@ -4,7 +4,7 @@
 //
 
 #include "yas_audio_format.h"
-#include "yas_exception.h"
+#include "yas_audio_exception.h"
 #include "yas_cf_utils.h"
 #include <unordered_map>
 #import <AVFoundation/AVFoundation.h>
@@ -306,7 +306,7 @@ AudioStreamBasicDescription yas::to_stream_description(const CFDictionaryRef &se
     }
 
     UInt32 size = sizeof(AudioStreamBasicDescription);
-    yas_raise_if_au_error(AudioFormatGetProperty(kAudioFormatProperty_FormatInfo, 0, NULL, &size, &asbd));
+    raise_if_au_error(AudioFormatGetProperty(kAudioFormatProperty_FormatInfo, 0, NULL, &size, &asbd));
 
     return asbd;
 }
@@ -347,7 +347,7 @@ AudioStreamBasicDescription yas::to_stream_description(const Float64 sample_rate
     asbd.mChannelsPerFrame = channel_count;
 
     UInt32 size = sizeof(AudioStreamBasicDescription);
-    yas_raise_if_au_error(AudioFormatGetProperty(kAudioFormatProperty_FormatInfo, 0, NULL, &size, &asbd));
+    raise_if_au_error(AudioFormatGetProperty(kAudioFormatProperty_FormatInfo, 0, NULL, &size, &asbd));
 
     return asbd;
 }

@@ -4,7 +4,7 @@
 //
 
 #include "yas_audio_file_utils.h"
-#include "yas_exception.h"
+#include "yas_audio_exception.h"
 
 using namespace yas;
 
@@ -144,8 +144,8 @@ Boolean audio::ext_audio_file_utils::set_client_format(const AudioStreamBasicDes
                                                        const ExtAudioFileRef ext_audio_file) {
     UInt32 size = sizeof(AudioStreamBasicDescription);
     OSStatus err = noErr;
-    yas_raise_if_au_error(
-        err = ExtAudioFileSetProperty(ext_audio_file, kExtAudioFileProperty_ClientDataFormat, size, &asbd));
+    raise_if_au_error(err =
+                          ExtAudioFileSetProperty(ext_audio_file, kExtAudioFileProperty_ClientDataFormat, size, &asbd));
     return err == noErr;
 }
 
@@ -153,23 +153,21 @@ Boolean audio::ext_audio_file_utils::get_audio_file_format(AudioStreamBasicDescr
                                                            const ExtAudioFileRef ext_audio_file) {
     UInt32 size = sizeof(AudioStreamBasicDescription);
     OSStatus err = noErr;
-    yas_raise_if_au_error(
-        err = ExtAudioFileGetProperty(ext_audio_file, kExtAudioFileProperty_FileDataFormat, &size, asbd));
+    raise_if_au_error(err = ExtAudioFileGetProperty(ext_audio_file, kExtAudioFileProperty_FileDataFormat, &size, asbd));
     return err == noErr;
 }
 
 AudioFileID audio::ext_audio_file_utils::get_audio_file_id(const ExtAudioFileRef ext_audio_file) {
     UInt32 size = sizeof(AudioFileID);
     AudioFileID file_id = 0;
-    yas_raise_if_au_error(ExtAudioFileGetProperty(ext_audio_file, kExtAudioFileProperty_AudioFile, &size, &file_id));
+    raise_if_au_error(ExtAudioFileGetProperty(ext_audio_file, kExtAudioFileProperty_AudioFile, &size, &file_id));
     return file_id;
 }
 
 SInt64 audio::ext_audio_file_utils::get_file_length_frames(const ExtAudioFileRef ext_audio_file) {
     SInt64 result = 0;
     UInt32 size = sizeof(SInt64);
-    yas_raise_if_au_error(
-        ExtAudioFileGetProperty(ext_audio_file, kExtAudioFileProperty_FileLengthFrames, &size, &result));
+    raise_if_au_error(ExtAudioFileGetProperty(ext_audio_file, kExtAudioFileProperty_FileLengthFrames, &size, &result));
     return result;
 }
 

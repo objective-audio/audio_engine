@@ -166,8 +166,7 @@ class audio::device_io::impl : public base::impl {
             }
         };
 
-        yas_raise_if_au_error(
-            AudioDeviceCreateIOProcIDWithBlock(&io_proc_id, device.audio_device_id(), nullptr, function));
+        raise_if_au_error(AudioDeviceCreateIOProcIDWithBlock(&io_proc_id, device.audio_device_id(), nullptr, function));
 
         update_kernel();
     }
@@ -180,7 +179,7 @@ class audio::device_io::impl : public base::impl {
         }
 
         if (device::is_available_device(device)) {
-            yas_raise_if_au_error(AudioDeviceDestroyIOProcID(device.audio_device_id(), io_proc_id));
+            raise_if_au_error(AudioDeviceDestroyIOProcID(device.audio_device_id(), io_proc_id));
         }
 
         io_proc_id = nullptr;
@@ -194,7 +193,7 @@ class audio::device_io::impl : public base::impl {
             return;
         }
 
-        yas_raise_if_au_error(AudioDeviceStart(device.audio_device_id(), io_proc_id));
+        raise_if_au_error(AudioDeviceStart(device.audio_device_id(), io_proc_id));
     }
 
     void stop() {
@@ -209,7 +208,7 @@ class audio::device_io::impl : public base::impl {
         }
 
         if (device::is_available_device(device)) {
-            yas_raise_if_au_error(AudioDeviceStop(device.audio_device_id(), io_proc_id));
+            raise_if_au_error(AudioDeviceStop(device.audio_device_id(), io_proc_id));
         }
     }
 

@@ -83,7 +83,7 @@ class audio::device::stream::impl : public base::impl {
                                                     .mScope = kAudioObjectPropertyScopeGlobal,
                                                     .mElement = kAudioObjectPropertyElementMaster};
 
-        yas_raise_if_au_error(
+        raise_if_au_error(
             AudioObjectAddPropertyListenerBlock(stream_id, &address, dispatch_get_main_queue(),
                                                 ^(UInt32 address_count, const AudioObjectPropertyAddress *addresses) {
                                                     function(address_count, addresses);

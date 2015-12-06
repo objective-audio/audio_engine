@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "yas_audio_exception.h"
 #include <AudioToolbox/AudioToolbox.h>
 #include <memory>
 #include <vector>
@@ -15,7 +16,7 @@ void yas::audio::unit::impl::set_property_data(const std::vector<T> &data, const
     const UInt32 size = static_cast<UInt32>(data.size());
     const void *raw_data = size > 0 ? data.data() : nullptr;
 
-    yas_raise_if_au_error(
+    raise_if_au_error(
         AudioUnitSetProperty(audio_unit_instance(), property_id, scope, element, raw_data, size * sizeof(T)));
 }
 
@@ -25,14 +26,14 @@ std::vector<T> yas::audio::unit::impl::property_data(const AudioUnitPropertyID p
     AudioUnit au = audio_unit_instance();
 
     UInt32 byte_size = 0;
-    yas_raise_if_au_error(AudioUnitGetPropertyInfo(au, property_id, scope, element, &byte_size, nullptr));
+    raise_if_au_error(AudioUnitGetPropertyInfo(au, property_id, scope, element, &byte_size, nullptr));
     UInt32 vector_size = byte_size / sizeof(T);
 
     auto data = std::vector<T>(vector_size);
 
     if (vector_size > 0) {
         byte_size = vector_size * sizeof(T);
-        yas_raise_if_au_error(AudioUnitGetProperty(au, property_id, scope, element, data.data(), &byte_size));
+        raise_if_au_error(AudioUnitGetProperty(au, property_id, scope, element, data.data(), &byte_size));
     }
 
     return data;
