@@ -28,8 +28,7 @@ audio::unit_node::unit_node(const OSType type, const OSType sub_type)
 {
 }
 
-audio::unit_node::unit_node(std::shared_ptr<impl> &&imp, const AudioComponentDescription &acd)
-    : audio_node(std::move(imp))
+audio::unit_node::unit_node(std::shared_ptr<impl> &&imp, const AudioComponentDescription &acd) : node(std::move(imp))
 {
     impl_ptr<impl>()->prepare(*this, acd);
 }

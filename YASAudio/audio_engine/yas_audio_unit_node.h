@@ -16,9 +16,9 @@ namespace yas
     {
         class graph;
 
-        class unit_node : public audio_node, public audio_unit_node_from_engine
+        class unit_node : public node, public unit_node_from_engine
         {
-            using super_class = audio_node;
+            using super_class = node;
 
            public:
             class impl;

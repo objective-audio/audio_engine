@@ -12,9 +12,9 @@ namespace yas
 {
     namespace audio
     {
-        class offline_output_node : public audio_node, public offline_output_unit_from_engine
+        class offline_output_node : public node, public offline_output_unit_from_engine
         {
-            using super_class = audio_node;
+            using super_class = node;
 
            public:
             class impl;

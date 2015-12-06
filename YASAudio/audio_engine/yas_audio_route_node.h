@@ -11,9 +11,9 @@ namespace yas
 {
     namespace audio
     {
-        class route_node : public audio_node
+        class route_node : public node
         {
-            using super_class = audio_node;
+            using super_class = node;
             class kernel;
             class impl;
 

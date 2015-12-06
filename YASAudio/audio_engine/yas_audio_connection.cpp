@@ -18,8 +18,8 @@ class audio::connection::impl : public base::impl
     audio::format format;
     mutable std::recursive_mutex mutex;
 
-    impl(const audio_node &source_node, const UInt32 source_bus, const audio_node &destination_node,
-         const UInt32 destination_bus, const audio::format &format)
+    impl(const node &source_node, const UInt32 source_bus, const node &destination_node, const UInt32 destination_bus,
+         const audio::format &format)
         : source_bus(source_bus),
           destination_bus(destination_bus),
           format(format),
@@ -31,20 +31,20 @@ class audio::connection::impl : public base::impl
     void remove_connection_from_nodes(const audio::connection &connection)
     {
         if (auto node = _destination_node.lock()) {
-            static_cast<audio_node_from_connection &>(node)._remove_connection(connection);
+            static_cast<node_from_connection &>(node)._remove_connection(connection);
         }
         if (auto node = _source_node.lock()) {
-            static_cast<audio_node_from_connection &>(node)._remove_connection(connection);
+            static_cast<node_from_connection &>(node)._remove_connection(connection);
         }
     }
 
-    audio_node source_node() const
+    node source_node() const
     {
         std::lock_guard<std::recursive_mutex> lock(mutex);
         return _source_node.lock();
     }
 
-    audio_node destination_node() const
+    node destination_node() const
     {
         std::lock_guard<std::recursive_mutex> lock(mutex);
         return _destination_node.lock();
@@ -70,8 +70,8 @@ class audio::connection::impl : public base::impl
     }
 
    private:
-    weak<audio_node> _source_node;
-    weak<audio_node> _destination_node;
+    weak<node> _source_node;
+    weak<node> _destination_node;
 };
 
 audio::connection::connection(std::nullptr_t) : super_class(nullptr)
@@ -88,7 +88,7 @@ audio::connection::~connection()
     }
 }
 
-audio::connection::connection(audio_node &source_node, const UInt32 source_bus, audio_node &destination_node,
+audio::connection::connection(node &source_node, const UInt32 source_bus, node &destination_node,
                               const UInt32 destination_bus, const audio::format &format)
     : super_class(std::make_shared<impl>(source_node, source_bus, destination_node, destination_bus, format))
 {
@@ -96,8 +96,8 @@ audio::connection::connection(audio_node &source_node, const UInt32 source_bus, 
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : invalid argument.");
     }
 
-    static_cast<audio_node_from_connection &>(source_node)._add_connection(*this);
-    static_cast<audio_node_from_connection &>(destination_node)._add_connection(*this);
+    static_cast<node_from_connection &>(source_node)._add_connection(*this);
+    static_cast<node_from_connection &>(destination_node)._add_connection(*this);
 }
 
 UInt32 audio::connection::source_bus() const
@@ -110,20 +110,20 @@ UInt32 audio::connection::destination_bus() const
     return impl_ptr<impl>()->destination_bus;
 }
 
-audio_node audio::connection::source_node() const
+audio::node audio::connection::source_node() const
 {
     if (impl_ptr()) {
         return impl_ptr<impl>()->source_node();
     }
-    return audio_node(nullptr);
+    return node{nullptr};
 }
 
-audio_node audio::connection::destination_node() const
+audio::node audio::connection::destination_node() const
 {
     if (impl_ptr()) {
         return impl_ptr<impl>()->destination_node();
     }
-    return audio_node(nullptr);
+    return node{nullptr};
 }
 
 const audio::format &audio::connection::format() const

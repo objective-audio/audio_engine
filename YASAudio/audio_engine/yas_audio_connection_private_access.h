@@ -14,7 +14,7 @@ namespace yas
         class connection::private_access
         {
            public:
-            static connection create(audio_node &source_node, const UInt32 source_bus, audio_node &destination_node,
+            static connection create(node &source_node, const UInt32 source_bus, node &destination_node,
                                      const UInt32 destination_bus, const audio::format &format)
             {
                 return connection(source_node, source_bus, destination_node, destination_bus, format);

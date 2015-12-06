@@ -5,7 +5,7 @@
 
 #pragma once
 
-class yas::audio_node::kernel : public kernel_from_node
+class yas::audio::node::kernel : public kernel_from_node
 {
    public:
     kernel();

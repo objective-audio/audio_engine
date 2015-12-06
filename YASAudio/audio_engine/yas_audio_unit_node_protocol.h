@@ -7,13 +7,16 @@
 
 namespace yas
 {
-    class audio_unit_node_from_engine
+    namespace audio
     {
-       public:
-        virtual ~audio_unit_node_from_engine() = default;
+        class unit_node_from_engine
+        {
+           public:
+            virtual ~unit_node_from_engine() = default;
 
-        virtual void _prepare_audio_unit() = 0;
-        virtual void _prepare_parameters() = 0;
-        virtual void _reload_audio_unit() = 0;
-    };
+            virtual void _prepare_audio_unit() = 0;
+            virtual void _prepare_parameters() = 0;
+            virtual void _reload_audio_unit() = 0;
+        };
+    }
 }

@@ -27,36 +27,36 @@ class yas::audio::engine::impl : public yas::base::impl
     observer<audio::device::change_info> &device_observer();
 #endif
 
-    bool node_exists(const audio_node &node);
+    bool node_exists(const node &node);
 
-    void attach_node(audio_node &node);
-    void detach_node(audio_node &node);
-    void detach_node_if_unused(audio_node &node);
+    void attach_node(node &node);
+    void detach_node(node &node);
+    void detach_node_if_unused(node &node);
 
     bool prepare();
 
-    audio::connection connect(audio_node &source_node, audio_node &destination_node, const UInt32 source_bus_idx,
+    audio::connection connect(node &source_node, node &destination_node, const UInt32 source_bus_idx,
                               const UInt32 destination_bus_idx, const audio::format &format);
     void disconnect(audio::connection &connection);
-    void disconnect(audio_node &node);
+    void disconnect(node &node);
     void disconnect_node_with_predicate(std::function<bool(const audio::connection &)> predicate);
 
-    void add_node_to_graph(const audio_node &node);
-    void remove_node_from_graph(const audio_node &node);
+    void add_node_to_graph(const node &node);
+    void remove_node_from_graph(const node &node);
 
     bool add_connection(const audio::connection &connection);
     void remove_connection_from_nodes(const audio::connection &connection);
-    void update_node_connections(audio_node &node);
+    void update_node_connections(node &node);
     void update_all_node_connections();
 
-    audio::connection_set input_connections_for_destination_node(const audio_node &node) const;
-    audio::connection_set output_connections_for_source_node(const audio_node &node) const;
+    audio::connection_set input_connections_for_destination_node(const node &node) const;
+    audio::connection_set output_connections_for_source_node(const node &node) const;
 
     void set_graph(const yas::audio::graph &graph);
     yas::audio::graph graph() const;
     void reload_graph();
 
-    std::unordered_set<audio_node> &nodes() const;
+    std::unordered_set<node> &nodes() const;
     audio::connection_set &connections() const;
     audio::offline_output_node &offline_output_node() const;
 

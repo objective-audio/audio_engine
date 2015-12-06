@@ -11,9 +11,9 @@ namespace yas
 {
     namespace audio
     {
-        class tap_node : public audio_node
+        class tap_node : public node
         {
-            using super_class = audio_node;
+            using super_class = node;
 
            public:
             class kernel;

@@ -7,7 +7,7 @@
 
 using namespace yas;
 
-class audio::tap_node::kernel : public audio_node::kernel
+class audio::tap_node::kernel : public node::kernel
 {
    public:
     ~kernel() = default;
@@ -22,7 +22,7 @@ class audio::tap_node::impl::core
     std::shared_ptr<kernel> kernel_on_render;
 };
 
-audio::tap_node::impl::impl() : audio_node::impl(), _core(std::make_unique<core>())
+audio::tap_node::impl::impl() : node::impl(), _core(std::make_unique<core>())
 {
 }
 
@@ -44,12 +44,12 @@ UInt32 audio::tap_node::impl::output_bus_count() const
     return 1;
 }
 
-std::shared_ptr<audio_node::kernel> audio::tap_node::impl::make_kernel()
+std::shared_ptr<audio::node::kernel> audio::tap_node::impl::make_kernel()
 {
     return std::shared_ptr<kernel>(new audio::tap_node::kernel());
 }
 
-void audio::tap_node::impl::prepare_kernel(const std::shared_ptr<audio_node::kernel> &kernel)
+void audio::tap_node::impl::prepare_kernel(const std::shared_ptr<node::kernel> &kernel)
 {
     super_class::prepare_kernel(kernel);
 

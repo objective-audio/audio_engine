@@ -12,10 +12,10 @@
 
 namespace yas
 {
-    class audio_node;
-
     namespace audio
     {
+        class node;
+
         class connection : public base, public connection_from_engine
         {
             using super_class = base;
@@ -32,13 +32,13 @@ namespace yas
 
             UInt32 source_bus() const;
             UInt32 destination_bus() const;
-            audio_node source_node() const;
-            audio_node destination_node() const;
+            node source_node() const;
+            node destination_node() const;
             const audio::format &format() const;
 
            protected:
-            connection(audio_node &source_node, const UInt32 source_bus, audio_node &destination_node,
-                       const UInt32 destination_bus, const audio::format &format);
+            connection(node &source_node, const UInt32 source_bus, node &destination_node, const UInt32 destination_bus,
+                       const audio::format &format);
 
             void _remove_nodes() override;
             void _remove_source_node() override;

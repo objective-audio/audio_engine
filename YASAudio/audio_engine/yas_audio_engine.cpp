@@ -26,8 +26,7 @@ audio::engine &audio::engine::operator=(std::nullptr_t)
     return *this;
 }
 
-audio::connection audio::engine::connect(audio_node &source_node, audio_node &destination_node,
-                                         const audio::format &format)
+audio::connection audio::engine::connect(node &source_node, node &destination_node, const audio::format &format)
 {
     if (!source_node || !destination_node) {
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
@@ -43,9 +42,8 @@ audio::connection audio::engine::connect(audio_node &source_node, audio_node &de
     return connect(source_node, destination_node, *source_bus_result, *destination_bus_result, format);
 }
 
-audio::connection audio::engine::connect(audio_node &source_node, audio_node &destination_node,
-                                         const UInt32 src_bus_idx, const UInt32 dst_bus_idx,
-                                         const audio::format &format)
+audio::connection audio::engine::connect(node &source_node, node &destination_node, const UInt32 src_bus_idx,
+                                         const UInt32 dst_bus_idx, const audio::format &format)
 {
     return impl_ptr<impl>()->connect(source_node, destination_node, src_bus_idx, dst_bus_idx, format);
 }
@@ -55,12 +53,12 @@ void audio::engine::disconnect(audio::connection &connection)
     impl_ptr<impl>()->disconnect(connection);
 }
 
-void audio::engine::disconnect(audio_node &node)
+void audio::engine::disconnect(node &node)
 {
     impl_ptr<impl>()->disconnect(node);
 }
 
-void audio::engine::disconnect_input(const audio_node &node)
+void audio::engine::disconnect_input(const node &node)
 {
     if (!node) {
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
@@ -70,7 +68,7 @@ void audio::engine::disconnect_input(const audio_node &node)
         [node](const audio::connection &connection) { return (connection.destination_node() == node); });
 }
 
-void audio::engine::disconnect_input(const audio_node &node, const UInt32 bus_idx)
+void audio::engine::disconnect_input(const node &node, const UInt32 bus_idx)
 {
     if (!node) {
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
@@ -81,7 +79,7 @@ void audio::engine::disconnect_input(const audio_node &node, const UInt32 bus_id
     });
 }
 
-void audio::engine::disconnect_output(const audio_node &node)
+void audio::engine::disconnect_output(const node &node)
 {
     if (!node) {
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
@@ -91,7 +89,7 @@ void audio::engine::disconnect_output(const audio_node &node)
         [node](const audio::connection &connection) { return (connection.source_node() == node); });
 }
 
-void audio::engine::disconnect_output(const audio_node &node, const UInt32 bus_idx)
+void audio::engine::disconnect_output(const node &node, const UInt32 bus_idx)
 {
     if (!node) {
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");

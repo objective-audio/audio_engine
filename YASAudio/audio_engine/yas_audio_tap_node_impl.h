@@ -18,8 +18,8 @@ class yas::audio::tap_node::impl : public super_class::impl
     virtual UInt32 input_bus_count() const override;
     virtual UInt32 output_bus_count() const override;
 
-    virtual std::shared_ptr<audio_node::kernel> make_kernel() override;
-    virtual void prepare_kernel(const std::shared_ptr<audio_node::kernel> &kernel) override;
+    virtual std::shared_ptr<node::kernel> make_kernel() override;
+    virtual void prepare_kernel(const std::shared_ptr<node::kernel> &kernel) override;
 
     void set_render_function(const render_f &);
 

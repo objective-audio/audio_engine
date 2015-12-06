@@ -40,7 +40,7 @@ class audio::unit_node::impl::core
 
 #pragma mark - impl
 
-audio::unit_node::impl::impl() : audio_node::impl(), _core(std::make_unique<audio::unit_node::impl::core>())
+audio::unit_node::impl::impl() : node::impl(), _core(std::make_unique<audio::unit_node::impl::core>())
 {
 }
 

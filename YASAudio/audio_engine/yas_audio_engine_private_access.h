@@ -14,7 +14,7 @@ namespace yas
         class engine::private_access
         {
            public:
-            static std::unordered_set<audio_node> &nodes(const engine &engine)
+            static std::unordered_set<node> &nodes(const engine &engine)
             {
                 return engine.impl_ptr<impl>()->nodes();
             }

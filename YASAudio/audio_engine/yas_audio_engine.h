@@ -48,18 +48,18 @@ namespace yas
 
             engine &operator=(std::nullptr_t);
 
-            audio::connection connect(audio_node &source_node, audio_node &destination_node,
+            audio::connection connect(node &source_node, node &destination_node,
                                       const audio::format &format);
-            audio::connection connect(audio_node &source_node, audio_node &destination_node,
+            audio::connection connect(node &source_node, node &destination_node,
                                       const UInt32 source_bus_idx, const UInt32 destination_bus_idx,
                                       const audio::format &format);
 
             void disconnect(audio::connection &);
-            void disconnect(audio_node &);
-            void disconnect_input(const audio_node &);
-            void disconnect_input(const audio_node &, const UInt32 bus_idx);
-            void disconnect_output(const audio_node &);
-            void disconnect_output(const audio_node &, const UInt32 bus_idx);
+            void disconnect(node &);
+            void disconnect_input(const node &);
+            void disconnect_input(const node &, const UInt32 bus_idx);
+            void disconnect_output(const node &);
+            void disconnect_output(const node &, const UInt32 bus_idx);
 
             start_result_t start_render();
             start_result_t start_offline_render(const offline_render_f &render_function,

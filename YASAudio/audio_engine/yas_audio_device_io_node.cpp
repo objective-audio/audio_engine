@@ -20,7 +20,7 @@ audio::device_io_node::device_io_node(std::nullptr_t) : super_class(nullptr)
 }
 
 audio::device_io_node::device_io_node(const audio::device &device)
-    : audio_node(std::make_unique<audio::device_io_node::impl>())
+    : node(std::make_unique<audio::device_io_node::impl>())
 {
     impl_ptr<impl>()->prepare(*this, device);
 }

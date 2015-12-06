@@ -5,7 +5,7 @@
 
 #pragma once
 
-class yas::audio_node::impl : public base::impl
+class yas::audio::node::impl : public base::impl
 {
    public:
     impl();
@@ -41,7 +41,7 @@ class yas::audio_node::impl : public base::impl
     virtual void prepare_kernel(const std::shared_ptr<kernel> &kernel);  // requires super
     void update_kernel();
 
-    template <typename T = audio_node::kernel>
+    template <typename T = audio::node::kernel>
     std::shared_ptr<T> kernel_cast() const
     {
         return std::static_pointer_cast<T>(_kernel());

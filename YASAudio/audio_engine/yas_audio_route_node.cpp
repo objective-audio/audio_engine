@@ -10,7 +10,7 @@ using namespace yas;
 
 #pragma mark - kernel
 
-class audio::route_node::kernel : public audio_node::kernel
+class audio::route_node::kernel : public audio::node::kernel
 {
    public:
     ~kernel() = default;
@@ -20,7 +20,7 @@ class audio::route_node::kernel : public audio_node::kernel
 
 #pragma mark - impl
 
-class audio::route_node::impl : public audio_node::impl
+class audio::route_node::impl : public audio::node::impl
 {
     using super_class = super_class::impl;
 
@@ -43,7 +43,7 @@ class audio::route_node::impl : public audio_node::impl
         }
     };
 
-    impl() : audio_node::impl(), _core(std::make_unique<core>())
+    impl() : audio::node::impl(), _core(std::make_unique<core>())
     {
     }
 
@@ -65,12 +65,12 @@ class audio::route_node::impl : public audio_node::impl
         return std::numeric_limits<UInt32>::max();
     }
 
-    virtual std::shared_ptr<audio_node::kernel> make_kernel() override
+    virtual std::shared_ptr<audio::node::kernel> make_kernel() override
     {
-        return std::shared_ptr<audio_node::kernel>(new audio::route_node::kernel());
+        return std::shared_ptr<audio::node::kernel>(new audio::route_node::kernel());
     }
 
-    virtual void prepare_kernel(const std::shared_ptr<audio_node::kernel> &kernel) override
+    virtual void prepare_kernel(const std::shared_ptr<audio::node::kernel> &kernel) override
     {
         super_class::prepare_kernel(kernel);
 

@@ -42,7 +42,7 @@ class audio::device_io_node::impl::core
     audio::device _device;
 };
 
-audio::device_io_node::impl::impl() : audio_node::impl(), _core(std::make_unique<core>())
+audio::device_io_node::impl::impl() : node::impl(), _core(std::make_unique<core>())
 {
 }
 
