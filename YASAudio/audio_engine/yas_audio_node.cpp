@@ -14,7 +14,7 @@ audio::node::node(std::nullptr_t) : super_class(nullptr)
 {
 }
 
-audio::node::node(const std::shared_ptr<audio::node::impl> &impl) : super_class(impl)
+audio::node::node(const std::shared_ptr<impl> &impl) : super_class(impl)
 {
 }
 
@@ -80,12 +80,12 @@ UInt32 audio::node::output_bus_count() const
 
 #pragma mark render thread
 
-void audio::node::render(audio::pcm_buffer &buffer, const UInt32 bus_idx, const audio::time &when)
+void audio::node::render(pcm_buffer &buffer, const UInt32 bus_idx, const time &when)
 {
     impl_ptr<impl>()->render(buffer, bus_idx, when);
 }
 
-void audio::node::set_render_time_on_render(const audio::time &time)
+void audio::node::set_render_time_on_render(const time &time)
 {
     impl_ptr<impl>()->set_render_time_on_render(time);
 }
@@ -112,12 +112,12 @@ const audio::connection_wmap &audio::node::_output_connections() const
     return impl_ptr<impl>()->output_connections();
 }
 
-void audio::node::_add_connection(const audio::connection &connection)
+void audio::node::_add_connection(const connection &connection)
 {
     impl_ptr<impl>()->add_connection(connection);
 }
 
-void audio::node::_remove_connection(const audio::connection &connection)
+void audio::node::_remove_connection(const connection &connection)
 {
     impl_ptr<impl>()->remove_connection(connection);
 }
