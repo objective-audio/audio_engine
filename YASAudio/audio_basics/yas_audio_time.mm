@@ -16,14 +16,14 @@ class audio::time::impl {
    public:
     AVAudioTime *av_audio_time;
 
-    impl(AVAudioTime *av_audio_time) : av_audio_time(YASRetain(av_audio_time)) {
+    impl(AVAudioTime *av_audio_time) : av_audio_time(yas_retain(av_audio_time)) {
         if (!av_audio_time) {
             throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is nil.");
         }
     }
 
     ~impl() {
-        YASRelease(av_audio_time);
+        yas_release(av_audio_time);
     }
 
     impl(const impl &) = delete;
@@ -37,23 +37,23 @@ audio::time::time(std::nullptr_t) : _impl(nullptr) {
 
 audio::time::time(const AudioTimeStamp &ts, const Float64 sample_rate)
     : _impl(std::make_shared<impl>([[AVAudioTime alloc] initWithAudioTimeStamp:&ts sampleRate:sample_rate])) {
-    YASRelease(_impl->av_audio_time);
+    yas_release(_impl->av_audio_time);
 }
 
 audio::time::time(const UInt64 host_time)
     : _impl(std::make_shared<impl>([[AVAudioTime alloc] initWithHostTime:host_time])) {
-    YASRelease(_impl->av_audio_time);
+    yas_release(_impl->av_audio_time);
 }
 
 audio::time::time(const SInt64 sample_time, const Float64 sample_rate)
     : _impl(std::make_shared<impl>([[AVAudioTime alloc] initWithSampleTime:sample_time atRate:sample_rate])) {
-    YASRelease(_impl->av_audio_time);
+    yas_release(_impl->av_audio_time);
 }
 
 audio::time::time(const UInt64 host_time, const SInt64 sample_time, const Float64 sample_rate)
     : _impl(std::make_shared<impl>(
           [[AVAudioTime alloc] initWithHostTime:host_time sampleTime:sample_time atRate:sample_rate])) {
-    YASRelease(_impl->av_audio_time);
+    yas_release(_impl->av_audio_time);
 }
 
 bool audio::time::operator==(const audio::time &rhs) const {

@@ -20,15 +20,15 @@
 }
 
 - (void)dealloc {
-    YASRelease(_nameLabel);
-    YASRelease(_valueLabel);
-    YASRelease(_valueSlider);
+    yas_release(_nameLabel);
+    yas_release(_valueLabel);
+    yas_release(_valueSlider);
 
     _nameLabel = nil;
     _valueLabel = nil;
     _valueSlider = nil;
 
-    YASSuperDealloc;
+    yas_super_dealloc();
 }
 
 - (void)awakeFromNib {

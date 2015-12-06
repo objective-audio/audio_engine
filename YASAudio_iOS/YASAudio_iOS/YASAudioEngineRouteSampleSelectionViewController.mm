@@ -16,13 +16,13 @@
 @implementation YASAudioEngineRouteSampleSelectionViewController
 
 - (void)dealloc {
-    YASRelease(_fromCellIndexPath);
-    YASRelease(_selectedIndexPath);
+    yas_release(_fromCellIndexPath);
+    yas_release(_selectedIndexPath);
 
     _fromCellIndexPath = nil;
     _selectedIndexPath = nil;
 
-    YASSuperDealloc;
+    yas_super_dealloc();
 }
 
 - (void)viewDidLoad {

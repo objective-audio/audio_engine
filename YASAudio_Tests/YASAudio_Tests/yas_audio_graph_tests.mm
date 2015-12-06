@@ -80,7 +80,7 @@
     }
 
     XCTestExpectation *ioExpectation = [self expectationWithDescription:@"io_unit render"];
-    YASRetainOrIgnore(ioExpectation);
+    yas_retain_or_ignore(ioExpectation);
 
     io_unit.set_render_callback([ioExpectation, frame_length, output_format, &mixer_unit, &self](
         yas::audio::render_parameters &render_parameters) mutable {
@@ -103,7 +103,7 @@
 
             mixer_unit.audio_unit_render(render_parameters);
 
-            YASRelease(ioExpectation);
+            yas_release(ioExpectation);
             ioExpectation = nil;
         }
     });
@@ -114,7 +114,7 @@
         mixerExpectations[@(i)] = [self expectationWithDescription:description];
     }
 
-    YASRetainOrIgnore(mixerExpectations);
+    yas_retain_or_ignore(mixerExpectations);
 
     mixer_unit.set_render_callback([mixerExpectations, output_format, frame_length, &self](
         yas::audio::render_parameters &render_parameters) mutable {
@@ -141,7 +141,7 @@
             }
 
             if (mixerExpectations.count == 0) {
-                YASRelease(mixerExpectations);
+                yas_release(mixerExpectations);
                 mixerExpectations = nil;
             }
         }

@@ -25,7 +25,7 @@
 - (instancetype)init {
     self = [super init];
     if (self) {
-        NSNumberFormatter *formatter = YASAutorelease([[NSNumberFormatter alloc] init]);
+        NSNumberFormatter *formatter = yas_autorelease([[NSNumberFormatter alloc] init]);
         formatter.numberStyle = NSNumberFormatterDecimalStyle;
         formatter.minimumFractionDigits = 1;
         formatter.maximumFractionDigits = 1;
@@ -35,11 +35,11 @@
 }
 
 - (void)dealloc {
-    YASRelease(_numberFormatter);
+    yas_release(_numberFormatter);
 
     _numberFormatter = nil;
 
-    YASSuperDealloc;
+    yas_super_dealloc();
 }
 
 - (id)transformedValue:(id)value {

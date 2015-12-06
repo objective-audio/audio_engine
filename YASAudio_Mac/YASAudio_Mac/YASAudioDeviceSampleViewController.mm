@@ -156,11 +156,11 @@ namespace sample {
 - (void)setup {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        YASDecibelValueTransformer *decibelValueFormatter = YASAutorelease([[YASDecibelValueTransformer alloc] init]);
+        YASDecibelValueTransformer *decibelValueFormatter = yas_autorelease([[YASDecibelValueTransformer alloc] init]);
         [NSValueTransformer setValueTransformer:decibelValueFormatter
                                         forName:NSStringFromClass([YASDecibelValueTransformer class])];
 
-        YASFrequencyValueFormatter *freqValueFormatter = YASAutorelease([[YASFrequencyValueFormatter alloc] init]);
+        YASFrequencyValueFormatter *freqValueFormatter = yas_autorelease([[YASFrequencyValueFormatter alloc] init]);
         [NSValueTransformer setValueTransformer:freqValueFormatter
                                         forName:NSStringFromClass([YASFrequencyValueFormatter class])];
     });
@@ -235,14 +235,14 @@ namespace sample {
 - (void)dealloc {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 
-    YASRelease(_deviceNames);
-    YASRelease(_deviceInfo);
-    YASRelease(_ioThroughTextColor);
-    YASRelease(_sineTextColor);
+    yas_release(_deviceNames);
+    yas_release(_deviceInfo);
+    yas_release(_ioThroughTextColor);
+    yas_release(_sineTextColor);
     if (_internal.self_container) {
         _internal.self_container.set_object(nil);
     }
-    YASSuperDealloc;
+    yas_super_dealloc();
 }
 
 #pragma mark -

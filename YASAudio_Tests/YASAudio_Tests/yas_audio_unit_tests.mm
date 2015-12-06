@@ -57,7 +57,7 @@
 
     XCTestExpectation *expectation = [self expectationWithDescription:@"ConverterUnit Render"];
 
-    YASRetainOrIgnore(expectation);
+    yas_retain_or_ignore(expectation);
 
     converter_unit.set_render_callback(
         [expectation, input_format, &self](yas::audio::render_parameters &render_parameters) mutable {
@@ -72,7 +72,7 @@
                 }
                 [expectation fulfill];
 
-                YASRelease(expectation);
+                yas_release(expectation);
                 expectation = nil;
             }
         });
@@ -113,14 +113,14 @@
     XCTestExpectation *preRenderExpectation = [self expectationWithDescription:@"ConverterUnit PreRender"];
     XCTestExpectation *postRenderExpectation = [self expectationWithDescription:@"ConverterUnit PostRender"];
 
-    YASRetainOrIgnore(renderExpectation);
-    YASRetainOrIgnore(preRenderExpectation);
-    YASRetainOrIgnore(postRenderExpectation);
+    yas_retain_or_ignore(renderExpectation);
+    yas_retain_or_ignore(preRenderExpectation);
+    yas_retain_or_ignore(postRenderExpectation);
 
     converter_unit.set_render_callback([renderExpectation](yas::audio::render_parameters &render_parameters) mutable {
         if (renderExpectation) {
             [renderExpectation fulfill];
-            YASRelease(renderExpectation);
+            yas_release(renderExpectation);
             renderExpectation = nil;
         }
     });
@@ -131,13 +131,13 @@
             if (flags & kAudioUnitRenderAction_PreRender) {
                 if (preRenderExpectation) {
                     [preRenderExpectation fulfill];
-                    YASRelease(preRenderExpectation);
+                    yas_release(preRenderExpectation);
                     preRenderExpectation = nil;
                 }
             } else if (flags & kAudioUnitRenderAction_PostRender) {
                 if (postRenderExpectation) {
                     [postRenderExpectation fulfill];
-                    YASRelease(postRenderExpectation);
+                    yas_release(postRenderExpectation);
                     postRenderExpectation = nil;
                 }
             }
