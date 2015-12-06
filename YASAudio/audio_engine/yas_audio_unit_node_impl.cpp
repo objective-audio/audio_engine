@@ -15,20 +15,20 @@ class audio::unit_node::impl::core
 {
    public:
     AudioComponentDescription acd;
-    std::unordered_map<AudioUnitScope, audio::unit::parameter_map_t> parameters;
-    yas::audio::unit _au;
+    std::unordered_map<AudioUnitScope, unit::parameter_map_t> parameters;
+    unit _au;
 
     core() : acd(), parameters(), _au(nullptr), _mutex()
     {
     }
 
-    void set_au(const yas::audio::unit &au)
+    void set_au(const audio::unit &au)
     {
         std::lock_guard<std::recursive_mutex> lock(_mutex);
         _au = au;
     }
 
-    yas::audio::unit au() const
+    unit au() const
     {
         std::lock_guard<std::recursive_mutex> lock(_mutex);
         return _au;
@@ -40,7 +40,7 @@ class audio::unit_node::impl::core
 
 #pragma mark - impl
 
-audio::unit_node::impl::impl() : node::impl(), _core(std::make_unique<audio::unit_node::impl::core>())
+audio::unit_node::impl::impl() : node::impl(), _core(std::make_unique<core>())
 {
 }
 
@@ -50,7 +50,7 @@ void audio::unit_node::impl::prepare(const unit_node &node, const AudioComponent
 {
     _core->acd = acd;
 
-    yas::audio::unit unit(acd);
+    unit unit(acd);
     _core->set_au(unit);
 
     _core->parameters.clear();
@@ -205,8 +205,8 @@ void audio::unit_node::impl::update_connections()
                     if (auto kernel = node.impl_ptr<impl>()->kernel_cast()) {
                         if (auto connection = kernel->input_connection(render_parameters.in_bus_number)) {
                             if (auto source_node = connection.source_node()) {
-                                auto buffer = yas::audio::pcm_buffer(connection.format(), render_parameters.io_data);
-                                audio::time when(*render_parameters.io_time_stamp, connection.format().sample_rate());
+                                pcm_buffer buffer{connection.format(), render_parameters.io_data};
+                                time when(*render_parameters.io_time_stamp, connection.format().sample_rate());
                                 source_node.render(buffer, connection.source_bus(), when);
                             }
                         }
@@ -263,10 +263,10 @@ void audio::unit_node::impl::prepare_parameters()
 
 void audio::unit_node::impl::reload_audio_unit()
 {
-    _core->set_au(yas::audio::unit(_core->acd));
+    _core->set_au(unit(_core->acd));
 }
 
-void audio::unit_node::impl::render(audio::pcm_buffer &buffer, const UInt32 bus_idx, const audio::time &when)
+void audio::unit_node::impl::render(pcm_buffer &buffer, const UInt32 bus_idx, const time &when)
 {
     super_class::render(buffer, bus_idx, when);
 
