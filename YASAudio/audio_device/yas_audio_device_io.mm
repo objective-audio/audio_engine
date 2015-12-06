@@ -21,12 +21,12 @@ using namespace yas;
 class audio::device_io::kernel
 {
    public:
-    audio::pcm_buffer input_buffer;
-    audio::pcm_buffer output_buffer;
+    pcm_buffer input_buffer;
+    pcm_buffer output_buffer;
 
     kernel(const audio::format &input_format, const audio::format &output_format, const UInt32 frame_capacity)
-        : input_buffer(input_format ? audio::pcm_buffer(input_format, frame_capacity) : nullptr),
-          output_buffer(output_format ? audio::pcm_buffer(output_format, frame_capacity) : nullptr)
+        : input_buffer(input_format ? pcm_buffer(input_format, frame_capacity) : nullptr),
+          output_buffer(output_format ? pcm_buffer(output_format, frame_capacity) : nullptr)
     {
     }
 
@@ -44,9 +44,9 @@ class audio::device_io::impl : public base::impl
     audio::device device;
     bool is_running;
     AudioDeviceIOProcID io_proc_id;
-    audio::pcm_buffer input_buffer_on_render;
+    pcm_buffer input_buffer_on_render;
     audio::time input_time_on_render;
-    observer<audio::device::change_info> observer;
+    observer<device::change_info> observer;
 
     impl()
         : weak_device_io(),
@@ -65,7 +65,7 @@ class audio::device_io::impl : public base::impl
 
     ~impl()
     {
-        observer.remove_handler(audio::device::system_subject(), audio::device::hardware_did_change_key);
+        observer.remove_handler(device::system_subject(), device::hardware_did_change_key);
 
         uninitialize();
     }
@@ -75,10 +75,10 @@ class audio::device_io::impl : public base::impl
         weak_device_io = to_weak(device_io);
 
         observer.add_handler(
-            audio::device::system_subject(), audio::device::hardware_did_change_key,
+            device::system_subject(), device::hardware_did_change_key,
             [weak_device_io = weak_device_io](const auto &method, const auto &infos) {
                 if (auto device_io = weak_device_io.lock()) {
-                    if (device_io.device() && !audio::device::device_for_id(device_io.device().audio_device_id())) {
+                    if (device_io.device() && !device::device_for_id(device_io.device().audio_device_id())) {
                         device_io.set_device(nullptr);
                     }
                 }
@@ -95,13 +95,13 @@ class audio::device_io::impl : public base::impl
             uninitialize();
 
             if (device) {
-                observer.remove_handler(device.subject(), audio::device::device_did_change_key);
+                observer.remove_handler(device.subject(), device::device_did_change_key);
             }
 
             device = dev;
 
             if (device) {
-                observer.add_handler(device.subject(), audio::device::device_did_change_key,
+                observer.add_handler(device.subject(), device::device_did_change_key,
                                      [weak_device_io = weak_device_io](const auto &method, const auto &infos) {
                                          if (auto device_io = weak_device_io.lock()) {
                                              device_io.impl_ptr<impl>()->update_kernel();
@@ -165,7 +165,7 @@ class audio::device_io::impl : public base::impl
                                 }
                             }
                         } else if (kernel->input_buffer) {
-                            yas::audio::pcm_buffer null_buffer;
+                            pcm_buffer null_buffer;
                             render_callback(null_buffer, nullptr);
                         }
                     }
@@ -190,7 +190,7 @@ class audio::device_io::impl : public base::impl
             return;
         }
 
-        if (audio::device::is_available_device(device)) {
+        if (device::is_available_device(device)) {
             yas_raise_if_au_error(AudioDeviceDestroyIOProcID(device.audio_device_id(), io_proc_id));
         }
 
@@ -221,7 +221,7 @@ class audio::device_io::impl : public base::impl
             return;
         }
 
-        if (audio::device::is_available_device(device)) {
+        if (device::is_available_device(device)) {
             yas_raise_if_au_error(AudioDeviceStop(device.audio_device_id(), io_proc_id));
         }
     }
