@@ -5,6 +5,8 @@ branches:
     - master
 notifications:
   email: false
+git:
+  submodules: false
 before_install:
   - make setup-coverage
   - make submodule-update
