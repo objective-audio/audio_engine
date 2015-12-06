@@ -6,7 +6,7 @@
 #include "yas_audio_time.h"
 #include "yas_audio_objc_utils.h"
 #include <AVFoundation/AVFoundation.h>
-#include "YASMacros.h"
+#include "yas_objc_macros.h"
 #include <exception>
 #include <string>
 

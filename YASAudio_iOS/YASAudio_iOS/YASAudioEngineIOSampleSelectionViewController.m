@@ -5,7 +5,7 @@
 
 #import "YASAudioEngineIOSampleSelectionViewController.h"
 #import "YASAudioEngineIOSampleViewController.h"
-#import "YASMacros.h"
+#import "yas_objc_macros.h"
 
 @interface YASAudioEngineIOSampleSelectionViewController ()
 

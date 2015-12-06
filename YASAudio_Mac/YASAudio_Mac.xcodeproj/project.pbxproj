@@ -142,7 +142,7 @@
 		B6FF03EE1BEB914A0026777E /* yas_stl_utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = yas_stl_utils.h; path = utils/yas_stl_utils.h; sourceTree = "<group>"; };
 		B6FF03F61BEB91540026777E /* yas_objc_container.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = yas_objc_container.h; path = objc_utils/yas_objc_container.h; sourceTree = "<group>"; };
 		B6FF03F71BEB91540026777E /* yas_objc_container.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = yas_objc_container.mm; path = objc_utils/yas_objc_container.mm; sourceTree = "<group>"; };
-		B6FF03FA1BEB91540026777E /* YASMacros.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = YASMacros.h; path = objc_utils/YASMacros.h; sourceTree = "<group>"; };
+		B6FF03FA1BEB91540026777E /* yas_objc_macros.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = yas_objc_macros.h; path = objc_utils/yas_objc_macros.h; sourceTree = "<group>"; };
 		B6FF03FD1BEB915D0026777E /* yas_audio_connection_private_access.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = yas_audio_connection_private_access.h; path = audio_engine/yas_audio_connection_private_access.h; sourceTree = "<group>"; };
 		B6FF03FE1BEB915D0026777E /* yas_audio_connection_protocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = yas_audio_connection_protocol.h; path = audio_engine/yas_audio_connection_protocol.h; sourceTree = "<group>"; };
 		B6FF03FF1BEB915D0026777E /* yas_audio_connection.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = yas_audio_connection.cpp; path = audio_engine/yas_audio_connection.cpp; sourceTree = "<group>"; };
@@ -444,7 +444,7 @@
 			children = (
 				B6FF03F61BEB91540026777E /* yas_objc_container.h */,
 				B6FF03F71BEB91540026777E /* yas_objc_container.mm */,
-				B6FF03FA1BEB91540026777E /* YASMacros.h */,
+				B6FF03FA1BEB91540026777E /* yas_objc_macros.h */,
 			);
 			name = objc_utils;
 			sourceTree = "<group>";

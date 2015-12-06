@@ -477,7 +477,7 @@
 		B6FF027A1BEAF0200026777E /* yas_audio_unit_node.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = yas_audio_unit_node.h; path = audio_engine/yas_audio_unit_node.h; sourceTree = "<group>"; };
 		B6FF03021BEAF03F0026777E /* yas_objc_container.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = yas_objc_container.h; path = objc_utils/yas_objc_container.h; sourceTree = "<group>"; };
 		B6FF03031BEAF03F0026777E /* yas_objc_container.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = yas_objc_container.mm; path = objc_utils/yas_objc_container.mm; sourceTree = "<group>"; };
-		B6FF03061BEAF03F0026777E /* YASMacros.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = YASMacros.h; path = objc_utils/YASMacros.h; sourceTree = "<group>"; };
+		B6FF03061BEAF03F0026777E /* yas_objc_macros.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = yas_objc_macros.h; path = objc_utils/yas_objc_macros.h; sourceTree = "<group>"; };
 		B6FF030F1BEAF0480026777E /* yas_any_private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = yas_any_private.h; path = utils/yas_any_private.h; sourceTree = "<group>"; };
 		B6FF03101BEAF0480026777E /* yas_any.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = yas_any.cpp; path = utils/yas_any.cpp; sourceTree = "<group>"; };
 		B6FF03111BEAF0480026777E /* yas_any.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = yas_any.h; path = utils/yas_any.h; sourceTree = "<group>"; };
@@ -867,7 +867,7 @@
 			children = (
 				B6FF03021BEAF03F0026777E /* yas_objc_container.h */,
 				B6FF03031BEAF03F0026777E /* yas_objc_container.mm */,
-				B6FF03061BEAF03F0026777E /* YASMacros.h */,
+				B6FF03061BEAF03F0026777E /* yas_objc_macros.h */,
 			);
 			name = objc_utils;
 			sourceTree = "<group>";

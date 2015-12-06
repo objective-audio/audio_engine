@@ -4,7 +4,7 @@
 //
 
 #import "YASFrequencyValueFormatter.h"
-#import "YASMacros.h"
+#import "yas_objc_macros.h"
 
 @interface YASFrequencyValueFormatter ()
 

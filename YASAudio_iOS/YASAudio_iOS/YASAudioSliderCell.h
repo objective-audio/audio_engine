@@ -4,7 +4,7 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "YASMacros.h"
+#import "yas_objc_macros.h"
 
 @interface YASAudioSliderCell : UITableViewCell
 
