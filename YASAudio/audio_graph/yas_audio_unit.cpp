@@ -178,11 +178,11 @@ audio::unit::parameter_map_t audio::unit::create_parameters(const AudioUnitScope
 {
     auto parameter_list =
         impl_ptr<impl>()->property_data<AudioUnitParameterID>(kAudioUnitProperty_ParameterList, scope, 0);
-    auto parameters = audio::unit::parameter_map_t{};
+    auto parameters = parameter_map_t{};
 
     if (parameter_list.size() > 0) {
         for (const AudioUnitParameterID &parameter_id : parameter_list) {
-            auto parameter = audio::unit::create_parameter(parameter_id, scope);
+            auto parameter = create_parameter(parameter_id, scope);
             parameters.insert(std::make_pair(parameter_id, std::move(parameter)));
         }
     }
