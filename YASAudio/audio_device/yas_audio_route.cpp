@@ -38,17 +38,17 @@ audio::route::route(const point &src_point, const point &dst_point) : source(src
 {
 }
 
-bool audio::route::operator==(const audio::route &rhs) const
+bool audio::route::operator==(const route &rhs) const
 {
     return source == rhs.source && destination == rhs.destination;
 }
 
-bool audio::route::operator!=(const audio::route &rhs) const
+bool audio::route::operator!=(const route &rhs) const
 {
     return source != rhs.source || destination != rhs.destination;
 }
 
-bool audio::route::operator<(const audio::route &rhs) const
+bool audio::route::operator<(const route &rhs) const
 {
     if (source.bus != rhs.source.bus) {
         return source.bus < rhs.source.bus;
