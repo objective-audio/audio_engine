@@ -87,7 +87,7 @@ namespace yas
             };
 
            public:
-            static std::unordered_map<AudioDeviceID, audio::device> &all_devices_map()
+            static std::unordered_map<AudioDeviceID, device> &all_devices_map()
             {
                 _initialize();
                 return device_global::instance()._all_devices;
@@ -98,15 +98,15 @@ namespace yas
                 return [](UInt32 address_count, const AudioObjectPropertyAddress *addresses) {
                     update_all_devices();
 
-                    std::vector<audio::device::property_info> property_infos;
+                    std::vector<device::property_info> property_infos;
                     for (UInt32 i = 0; i < address_count; i++) {
-                        property_infos.push_back(audio::device::property_info{audio::device::property::system,
-                                                                              kAudioObjectSystemObject, addresses[i]});
+                        property_infos.push_back(
+                            device::property_info{device::property::system, kAudioObjectSystemObject, addresses[i]});
                     }
-                    auto &subject = audio::device::system_subject();
-                    audio::device::change_info change_info{std::move(property_infos)};
-                    subject.notify(audio::device::hardware_did_change_key, change_info);
-                    subject.notify(audio::device::configuration_change_key, change_info);
+                    auto &subject = device::system_subject();
+                    device::change_info change_info{std::move(property_infos)};
+                    subject.notify(device::hardware_did_change_key, change_info);
+                    subject.notify(device::configuration_change_key, change_info);
                 };
             }
 
@@ -128,7 +128,7 @@ namespace yas
             }
 
            private:
-            std::unordered_map<AudioDeviceID, audio::device> _all_devices;
+            std::unordered_map<AudioDeviceID, device> _all_devices;
             listener_f _system_listener = nullptr;
 
             static void _initialize()
@@ -168,13 +168,13 @@ namespace yas
 
 #pragma mark - property_info
 
-audio::device::property_info::property_info(const audio::device::property property, const AudioObjectID object_id,
+audio::device::property_info::property_info(const device::property property, const AudioObjectID object_id,
                                             const AudioObjectPropertyAddress &address)
     : property(property), object_id(object_id), address(address)
 {
 }
 
-bool audio::device::property_info::operator<(const audio::device::property_info &info) const
+bool audio::device::property_info::operator<(const device::property_info &info) const
 {
     if (property != info.property) {
         return property < info.property;
@@ -197,8 +197,7 @@ bool audio::device::property_info::operator<(const audio::device::property_info 
 
 #pragma mark - chnage_info
 
-audio::device::change_info::change_info(std::vector<audio::device::property_info> &&infos)
-    : property_infos(std::move(infos))
+audio::device::change_info::change_info(std::vector<device::property_info> &&infos) : property_infos(std::move(infos))
 {
 }
 
@@ -210,7 +209,7 @@ class audio::device::impl : public base::impl
     const AudioDeviceID audio_device_id;
     std::unordered_map<AudioStreamID, stream> input_streams_map;
     std::unordered_map<AudioStreamID, stream> output_streams_map;
-    yas::subject<audio::device::change_info> subject;
+    yas::subject<device::change_info> subject;
 
     impl(AudioDeviceID device_id)
         : _input_format(nullptr),
@@ -267,11 +266,11 @@ class audio::device::impl : public base::impl
         const AudioDeviceID device_id = audio_device_id;
 
         return [device_id](const UInt32 address_count, const AudioObjectPropertyAddress *addresses) {
-            auto device = audio::device::device_for_id(device_id);
+            auto device = device::device_for_id(device_id);
             if (device) {
                 const AudioObjectID object_id = device.audio_device_id();
 
-                std::vector<audio::device::property_info> property_infos;
+                std::vector<device::property_info> property_infos;
                 for (UInt32 i = 0; i < address_count; ++i) {
                     if (addresses[i].mSelector == kAudioDevicePropertyStreams) {
                         property_infos.push_back(property_info(property::stream, object_id, addresses[i]));
@@ -301,9 +300,9 @@ class audio::device::impl : public base::impl
                     }
                 }
 
-                audio::device::change_info change_info{std::move(property_infos)};
-                device.subject().notify(audio::device::device_did_change_key, change_info);
-                audio::device::system_subject().notify(audio::device::configuration_change_key, change_info);
+                device::change_info change_info{std::move(property_infos)};
+                device.subject().notify(device::device_did_change_key, change_info);
+                device::system_subject().notify(device::configuration_change_key, change_info);
             }
         };
     }
@@ -378,7 +377,7 @@ class audio::device::impl : public base::impl
 
 std::vector<audio::device> audio::device::all_devices()
 {
-    std::vector<audio::device> devices;
+    std::vector<device> devices;
     for (auto &pair : device_global::all_devices_map()) {
         devices.push_back(pair.second);
     }
@@ -387,7 +386,7 @@ std::vector<audio::device> audio::device::all_devices()
 
 std::vector<audio::device> audio::device::output_devices()
 {
-    std::vector<audio::device> devices;
+    std::vector<device> devices;
     for (auto &pair : device_global::all_devices_map()) {
         if (pair.second.output_streams().size() > 0) {
             devices.push_back(pair.second);
@@ -398,7 +397,7 @@ std::vector<audio::device> audio::device::output_devices()
 
 std::vector<audio::device> audio::device::input_devices()
 {
-    std::vector<audio::device> devices;
+    std::vector<device> devices;
     for (auto &pair : device_global::all_devices_map()) {
         if (pair.second.input_streams().size() > 0) {
             devices.push_back(pair.second);
@@ -453,10 +452,10 @@ audio::device audio::device::device_for_id(const AudioDeviceID audio_device_id)
     return nullptr;
 }
 
-std::experimental::optional<size_t> audio::device::index_of_device(const audio::device &device)
+std::experimental::optional<size_t> audio::device::index_of_device(const device &device)
 {
     if (device) {
-        auto all_devices = audio::device::all_devices();
+        auto all_devices = device::all_devices();
         auto it = std::find(all_devices.begin(), all_devices.end(), device);
         if (it != all_devices.end()) {
             return std::experimental::make_optional<size_t>(it - all_devices.begin());
@@ -465,7 +464,7 @@ std::experimental::optional<size_t> audio::device::index_of_device(const audio::
     return nullopt;
 }
 
-bool audio::device::is_available_device(const audio::device &device)
+bool audio::device::is_available_device(const device &device)
 {
     auto it = device_global::all_devices_map().find(device.audio_device_id());
     return it != device_global::all_devices_map().end();
@@ -473,7 +472,7 @@ bool audio::device::is_available_device(const audio::device &device)
 
 subject<audio::device::change_info> &audio::device::system_subject()
 {
-    static yas::subject<audio::device::change_info> _system_subject;
+    static yas::subject<device::change_info> _system_subject;
     return _system_subject;
 }
 
@@ -489,7 +488,7 @@ audio::device::device(const AudioDeviceID device_id) : super_class(std::make_sha
 {
 }
 
-bool audio::device::operator==(const audio::device &rhs) const
+bool audio::device::operator==(const device &rhs) const
 {
     if (impl_ptr() && rhs.impl_ptr()) {
         return audio_device_id() == rhs.audio_device_id();
@@ -497,7 +496,7 @@ bool audio::device::operator==(const audio::device &rhs) const
     return false;
 }
 
-bool audio::device::operator!=(const audio::device &rhs) const
+bool audio::device::operator!=(const device &rhs) const
 {
     if (impl_ptr() && rhs.impl_ptr()) {
         return audio_device_id() != rhs.audio_device_id();
