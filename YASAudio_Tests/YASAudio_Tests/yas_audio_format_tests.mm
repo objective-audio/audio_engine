@@ -11,18 +11,15 @@
 
 @implementation YASCppAudioFormatTests
 
-- (void)setUp
-{
+- (void)setUp {
     [super setUp];
 }
 
-- (void)tearDown
-{
+- (void)tearDown {
     [super tearDown];
 }
 
-- (void)test_create_empty
-{
+- (void)test_create_empty {
     yas::audio::format format;
 
     XCTAssertEqual(format.is_empty(), true);
@@ -37,8 +34,7 @@
     XCTAssertEqual(format.buffer_frame_byte_count(), 0);
 }
 
-- (void)test_create_with_nullptr
-{
+- (void)test_create_with_nullptr {
     yas::audio::format format(nullptr);
 
     XCTAssertEqual(format.is_empty(), true);
@@ -53,8 +49,7 @@
     XCTAssertEqual(format.buffer_frame_byte_count(), 0);
 }
 
-- (void)test_nullptr_parameter
-{
+- (void)test_nullptr_parameter {
     auto lambda = [self](const yas::audio::format &format) {
         yas::audio::format empty_format;
         XCTAssertEqual(empty_format, format);
@@ -63,8 +58,7 @@
     lambda(nullptr);
 }
 
-- (void)test_create_standard_format
-{
+- (void)test_create_standard_format {
     const Float64 sampleRate = 44100.0;
     const UInt32 channelCount = 2;
     const UInt32 bufferCount = channelCount;
@@ -97,8 +91,7 @@
     XCTAssertTrue(yas::is_equal(format.stream_description(), asbd));
 }
 
-- (void)test_create_format_48000kHz_1ch_64bits_interleaved
-{
+- (void)test_create_format_48000kHz_1ch_64bits_interleaved {
     const Float64 sampleRate = 48000.0;
     const UInt32 channelCount = 1;
     const UInt32 bufferCount = 1;
@@ -131,8 +124,7 @@
     XCTAssertTrue(yas::is_equal(format.stream_description(), asbd));
 }
 
-- (void)test_create_format_32000kHz_4ch_16bits_interleaved
-{
+- (void)test_create_format_32000kHz_4ch_16bits_interleaved {
     const Float64 sampleRate = 32000.0;
     const UInt32 channelCount = 4;
     const UInt32 bufferCount = 1;
@@ -165,8 +157,7 @@
     XCTAssertTrue(yas::is_equal(format.stream_description(), asbd));
 }
 
-- (void)test_create_format_with_streadm_description
-{
+- (void)test_create_format_with_streadm_description {
     const Float64 sampleRate = 2348739.1;
     const UInt32 channelCount = 6;
     const UInt32 bufferCount = 1;
@@ -197,8 +188,7 @@
     XCTAssertTrue(yas::is_equal(format.stream_description(), asbd));
 }
 
-- (void)test_equal_formats
-{
+- (void)test_equal_formats {
     const Float64 sampleRate = 44100;
     const UInt32 channelCount = 2;
 
@@ -210,8 +200,7 @@
     XCTAssert(audio_format1 == audio_format2);
 }
 
-- (void)test_create_format_with_settings
-{
+- (void)test_create_format_with_settings {
     const Float64 sampleRate = 44100.0;
 
     CFDictionaryRef settings = yas::audio::linear_pcm_file_settings(sampleRate, 2, 32, false, true, true);
@@ -247,8 +236,7 @@
     }
 }
 
-- (void)test_is_equal_asbd
-{
+- (void)test_is_equal_asbd {
     AudioStreamBasicDescription asbd1 = {
         .mSampleRate = 1,
         .mFormatID = 1,
@@ -305,8 +293,7 @@
     XCTAssertFalse(yas::is_equal(asbd1, asbd2));
 }
 
-- (void)test_pcm_format_to_string
-{
+- (void)test_pcm_format_to_string {
     XCTAssertTrue(yas::to_string(yas::audio::pcm_format::float32) == "Float32");
     XCTAssertTrue(yas::to_string(yas::audio::pcm_format::float64) == "Float64");
     XCTAssertTrue(yas::to_string(yas::audio::pcm_format::int16) == "Int16");
@@ -314,22 +301,19 @@
     XCTAssertTrue(yas::to_string(yas::audio::pcm_format::other) == "Other");
 }
 
-- (void)test_null_format
-{
+- (void)test_null_format {
     const auto null_format = yas::audio::format::null_format();
     XCTAssertFalse(null_format);
 }
 
-- (void)test_is_empty
-{
+- (void)test_is_empty {
     yas::audio::format format{AudioStreamBasicDescription{}};
     XCTAssertTrue(format.is_empty());
 
     XCTAssertTrue(yas::audio::format::null_format().is_empty());
 }
 
-- (void)test_smoke
-{
+- (void)test_smoke {
     yas::audio::format format{48000.0, 2};
     format.description();
 }

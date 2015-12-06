@@ -1,9 +1,9 @@
 //
-//  yas_objc_utils.mm
+//  yas_audio_objc_utils.mm
 //  Copyright (c) 2015 Yuki Yasoshima.
 //
 
-#include "yas_objc_utils.h"
+#include "yas_audio_objc_utils.h"
 
 #if TARGET_OS_IPHONE
 #import <AVFoundation/AVFoundation.h>
@@ -13,8 +13,7 @@ using namespace yas;
 
 #if TARGET_OS_IPHONE
 
-audio::channel_map_t yas::to_channel_map(NSArray *const channelDescriptions, const audio::direction dir)
-{
+audio::channel_map_t yas::to_channel_map(NSArray *const channelDescriptions, const audio::direction dir) {
     AVAudioSession *const audioSession = [AVAudioSession sharedInstance];
     AVAudioSessionRouteDescription *const routeDesc = audioSession.currentRoute;
 
@@ -59,14 +58,12 @@ audio::channel_map_t yas::to_channel_map(NSArray *const channelDescriptions, con
 
 #endif
 
-AVAudioTime *yas::to_objc_object(const audio::time &time)
-{
+AVAudioTime *yas::to_objc_object(const audio::time &time) {
     const AudioTimeStamp time_stamp = time.audio_time_stamp();
     return [AVAudioTime timeWithAudioTimeStamp:&time_stamp sampleRate:time.sample_rate()];
 }
 
-audio::time yas::to_time(AVAudioTime *const av_time)
-{
+audio::time yas::to_time(AVAudioTime *const av_time) {
     const AudioTimeStamp time_stamp = av_time.audioTimeStamp;
     return audio::time(time_stamp, av_time.sampleRate);
 }

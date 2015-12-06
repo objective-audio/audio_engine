@@ -13,18 +13,15 @@ static NSInteger testCount = 8;
 
 @implementation yas_audio_time_tests
 
-- (void)setUp
-{
+- (void)setUp {
     [super setUp];
 }
 
-- (void)tearDown
-{
+- (void)tearDown {
     [super tearDown];
 }
 
-- (void)testCreateAudioTimeWithHostTime
-{
+- (void)testCreateAudioTimeWithHostTime {
     for (NSInteger i = 0; i < testCount; i++) {
         UInt64 hostTime = arc4random();
 
@@ -35,8 +32,7 @@ static NSInteger testCount = 8;
     }
 }
 
-- (void)testCreateAudioTimeSampleTime
-{
+- (void)testCreateAudioTimeSampleTime {
     for (NSInteger i = 0; i < testCount; i++) {
         SInt64 sampleTime = arc4random();
         Float64 rate = arc4random_uniform(378000 - 4000) + 4000;
@@ -48,8 +44,7 @@ static NSInteger testCount = 8;
     }
 }
 
-- (void)testCreateAudioTimeWithHostTimeAndSampleTime
-{
+- (void)testCreateAudioTimeWithHostTimeAndSampleTime {
     for (NSInteger i = 0; i < testCount; i++) {
         UInt64 hostTime = arc4random();
         SInt64 sampleTime = arc4random();
@@ -62,8 +57,7 @@ static NSInteger testCount = 8;
     }
 }
 
-- (void)testConvert
-{
+- (void)testConvert {
     for (NSInteger i = 0; i < testCount; i++) {
         UInt64 hostTime = arc4random();
 
@@ -76,8 +70,7 @@ static NSInteger testCount = 8;
     }
 }
 
-- (void)testExtrapolateTime
-{
+- (void)testExtrapolateTime {
     for (NSInteger i = 0; i < testCount; i++) {
         UInt64 hostTime = arc4random();
         SInt64 sampleTime = arc4random();
@@ -96,8 +89,7 @@ static NSInteger testCount = 8;
     }
 }
 
-- (void)test_compare_objc_to_cpp
-{
+- (void)test_compare_objc_to_cpp {
     for (NSInteger i = 0; i < testCount; i++) {
         SInt64 sampleTime = arc4random();
         Float64 rate = arc4random_uniform(378000 - 4000) + 4000;
@@ -109,8 +101,7 @@ static NSInteger testCount = 8;
     }
 }
 
-- (void)test_compare_cpp_to_objc
-{
+- (void)test_compare_cpp_to_objc {
     for (NSInteger i = 0; i < testCount; i++) {
         SInt64 sampleTime = arc4random();
         Float64 rate = arc4random_uniform(378000 - 4000) + 4000;
@@ -122,8 +113,7 @@ static NSInteger testCount = 8;
     }
 }
 
-- (void)test_bool
-{
+- (void)test_bool {
     yas::audio::time time{100};
 
     XCTAssertTrue(time);
@@ -133,8 +123,7 @@ static NSInteger testCount = 8;
     XCTAssertFalse(null_time);
 }
 
-- (void)test_host_time
-{
+- (void)test_host_time {
     const UInt64 host_time = 1000;
     yas::audio::time time{host_time};
 
@@ -142,8 +131,7 @@ static NSInteger testCount = 8;
     XCTAssertTrue(time.host_time() == 1000);
 }
 
-- (void)test_sample_time
-{
+- (void)test_sample_time {
     const SInt64 sample_time = 2000;
     const Float64 sample_rate = 48000.0;
     yas::audio::time time{sample_time, sample_rate};
@@ -152,8 +140,7 @@ static NSInteger testCount = 8;
     XCTAssertTrue(time.sample_time() == 2000);
 }
 
-- (void)test_equal_null_false
-{
+- (void)test_equal_null_false {
     const yas::audio::time time1{4000, 48000.0};
     const yas::audio::time time2{nullptr};
     const yas::audio::time time3{nullptr};
@@ -165,8 +152,7 @@ static NSInteger testCount = 8;
 
 #pragma mark -
 
-- (BOOL)compareAudioTimeStamp:(AVAudioTime *)avTime to:(yas::audio::time &)yasTime
-{
+- (BOOL)compareAudioTimeStamp:(AVAudioTime *)avTime to:(yas::audio::time &)yasTime {
     AudioTimeStamp avTimeStamp = avTime.audioTimeStamp;
     const AudioTimeStamp &yasTimeStamp = yasTime.audio_time_stamp();
     return yas::test::is_equal(&avTimeStamp, &yasTimeStamp);

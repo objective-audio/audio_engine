@@ -11,18 +11,15 @@
 
 @implementation yas_observing_tests
 
-- (void)setUp
-{
+- (void)setUp {
     [super setUp];
 }
 
-- (void)tearDown
-{
+- (void)tearDown {
     [super tearDown];
 }
 
-- (void)test_single
-{
+- (void)test_single {
     int sender = 100;
 
     const std::string key("key");
@@ -67,8 +64,7 @@
     XCTAssertFalse(called);
 }
 
-- (void)test_multi_keys
-{
+- (void)test_multi_keys {
     int sender = 100;
 
     const std::string key1("key1");
@@ -114,8 +110,7 @@
     XCTAssertFalse(called2);
 }
 
-- (void)test_multi_observers
-{
+- (void)test_multi_observers {
     int sender = 100;
 
     const std::string key("key");
@@ -144,8 +139,7 @@
     XCTAssertTrue(called2);
 }
 
-- (void)test_multi_subjects
-{
+- (void)test_multi_subjects {
     int sender = 100;
 
     const std::string key("key");
@@ -183,8 +177,7 @@
     XCTAssertTrue(called2);
 }
 
-- (void)test_wild_card
-{
+- (void)test_wild_card {
     yas::subject<std::string> subject;
     yas::observer<std::string> observer;
 
@@ -224,8 +217,7 @@
     XCTAssertEqual(receive_20, sender_20);
 }
 
-- (void)test_remove_wild_card
-{
+- (void)test_remove_wild_card {
     yas::subject<std::string> subject;
     yas::observer<std::string> observer;
 
@@ -260,8 +252,7 @@
     XCTAssertNotEqual(receive_20, sender_20);
 }
 
-- (void)test_subject_dispatcher
-{
+- (void)test_subject_dispatcher {
     static const std::string property_method1 = "p1";
     static const std::string property_method2 = "p2";
 
@@ -272,12 +263,10 @@
         yas::observer<std::string> dispatcher;
         yas::subject<std::string> properties_subject;
 
-        test_class() : dispatcher(yas::make_subject_dispatcher(properties_subject, {&property1, &property2}))
-        {
+        test_class() : dispatcher(yas::make_subject_dispatcher(properties_subject, {&property1, &property2})) {
         }
 
-        ~test_class()
-        {
+        ~test_class() {
         }
     };
 
@@ -303,8 +292,7 @@
     XCTAssertEqual(value2, "property2");
 }
 
-- (void)test_clear_observer
-{
+- (void)test_clear_observer {
     int sender = 100;
 
     const std::string key("key");
@@ -333,8 +321,7 @@
     XCTAssertFalse(called);
 }
 
-- (void)test_remove_observer
-{
+- (void)test_remove_observer {
     int sender = 100;
 
     const std::string key("key");
@@ -364,8 +351,7 @@
     XCTAssertFalse(called);
 }
 
-- (void)test_remove_subject
-{
+- (void)test_remove_subject {
     int sender = 100;
 
     const std::string key("key");
@@ -391,8 +377,7 @@
     observer.clear();
 }
 
-- (void)test_make_observer
-{
+- (void)test_make_observer {
     yas::subject<int> subject;
     const int sender = 101;
     int receiver = 0;
@@ -408,8 +393,7 @@
     XCTAssertEqual(receiver, 101);
 }
 
-- (void)test_make_wild_card_observer
-{
+- (void)test_make_wild_card_observer {
     yas::subject<int> subject;
     int receiver = 0;
     std::string key1 = "key1";
@@ -434,8 +418,7 @@
     XCTAssertNotEqual(receiver, 103);
 }
 
-- (void)test_observer_hold_by_base
-{
+- (void)test_observer_hold_by_base {
     yas::base base{nullptr};
     yas::subject<int> subject;
     bool called = false;

@@ -16,8 +16,7 @@
 
 using namespace yas;
 
-class audio::unit_io_node::impl::core
-{
+class audio::unit_io_node::impl::core {
    public:
     static const UInt32 channel_map_count = 2;
     channel_map_t channel_map[2];
@@ -25,21 +24,18 @@ class audio::unit_io_node::impl::core
 
 #pragma mark - audio::unit_io_node::impl
 
-audio::unit_io_node::impl::impl() : super_class::impl(), _core(std::make_unique<core>())
-{
+audio::unit_io_node::impl::impl() : super_class::impl(), _core(std::make_unique<core>()) {
 }
 
 audio::unit_io_node::impl::~impl() = default;
 
-void audio::unit_io_node::impl::reset()
-{
+void audio::unit_io_node::impl::reset() {
     super_class::reset();
 }
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
 
-void audio::unit_io_node::impl::set_device(const audio::device &device)
-{
+void audio::unit_io_node::impl::set_device(const audio::device &device) {
     if (!device) {
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
     }
@@ -47,15 +43,13 @@ void audio::unit_io_node::impl::set_device(const audio::device &device)
     au().set_current_device(device.audio_device_id());
 }
 
-audio::device audio::unit_io_node::impl::device() const
-{
+audio::device audio::unit_io_node::impl::device() const {
     return device::device_for_id(au().current_device());
 }
 
 #endif
 
-Float64 audio::unit_io_node::impl::device_sample_rate() const
-{
+Float64 audio::unit_io_node::impl::device_sample_rate() const {
 #if TARGET_OS_IPHONE
     return [AVAudioSession sharedInstance].sampleRate;
 #elif TARGET_OS_MAC
@@ -66,8 +60,7 @@ Float64 audio::unit_io_node::impl::device_sample_rate() const
 #endif
 }
 
-UInt32 audio::unit_io_node::impl::output_device_channel_count() const
-{
+UInt32 audio::unit_io_node::impl::output_device_channel_count() const {
 #if TARGET_OS_IPHONE
     return static_cast<UInt32>([AVAudioSession sharedInstance].outputNumberOfChannels);
 #elif TARGET_OS_MAC
@@ -78,8 +71,7 @@ UInt32 audio::unit_io_node::impl::output_device_channel_count() const
 #endif
 }
 
-UInt32 audio::unit_io_node::impl::input_device_channel_count() const
-{
+UInt32 audio::unit_io_node::impl::input_device_channel_count() const {
 #if TARGET_OS_IPHONE
     return static_cast<UInt32>([AVAudioSession sharedInstance].inputNumberOfChannels);
 #elif TARGET_OS_MAC
@@ -90,8 +82,7 @@ UInt32 audio::unit_io_node::impl::input_device_channel_count() const
 #endif
 }
 
-void audio::unit_io_node::impl::set_channel_map(const channel_map_t &map, const direction dir)
-{
+void audio::unit_io_node::impl::set_channel_map(const channel_map_t &map, const direction dir) {
     _core->channel_map[yas::to_uint32(dir)] = map;
 
     if (auto unit = au()) {
@@ -99,13 +90,11 @@ void audio::unit_io_node::impl::set_channel_map(const channel_map_t &map, const 
     }
 }
 
-const audio::channel_map_t &audio::unit_io_node::impl::channel_map(const direction dir) const
-{
+const audio::channel_map_t &audio::unit_io_node::impl::channel_map(const direction dir) const {
     return _core->channel_map[yas::to_uint32(dir)];
 }
 
-audio::bus_result_t audio::unit_io_node::impl::next_available_output_bus() const
-{
+audio::bus_result_t audio::unit_io_node::impl::next_available_output_bus() const {
     auto result = super_class::next_available_output_bus();
     if (result && *result == 0) {
         return 1;
@@ -113,16 +102,14 @@ audio::bus_result_t audio::unit_io_node::impl::next_available_output_bus() const
     return result;
 }
 
-bool audio::unit_io_node::impl::is_available_output_bus(const UInt32 bus_idx) const
-{
+bool audio::unit_io_node::impl::is_available_output_bus(const UInt32 bus_idx) const {
     if (bus_idx == 1) {
         return super_class::is_available_output_bus(0);
     }
     return false;
 }
 
-void audio::unit_io_node::impl::update_connections()
-{
+void audio::unit_io_node::impl::update_connections() {
     super_class::update_connections();
 
     auto unit = au();
@@ -155,8 +142,7 @@ void audio::unit_io_node::impl::update_connections()
     unit.set_channel_map(input_map, kAudioUnitScope_Output, input_idx);
 }
 
-void audio::unit_io_node::impl::prepare_audio_unit()
-{
+void audio::unit_io_node::impl::prepare_audio_unit() {
     auto unit = au();
     unit.set_enable_output(true);
     unit.set_enable_input(true);
@@ -165,18 +151,15 @@ void audio::unit_io_node::impl::prepare_audio_unit()
 
 #pragma mark - aduio_unit_output_node::impl
 
-UInt32 audio::unit_output_node::impl::input_bus_count() const
-{
+UInt32 audio::unit_output_node::impl::input_bus_count() const {
     return 1;
 }
 
-UInt32 audio::unit_output_node::impl::output_bus_count() const
-{
+UInt32 audio::unit_output_node::impl::output_bus_count() const {
     return 0;
 }
 
-void audio::unit_output_node::impl::prepare_audio_unit()
-{
+void audio::unit_output_node::impl::prepare_audio_unit() {
     auto unit = au();
     unit.set_enable_output(true);
     unit.set_enable_input(false);
@@ -185,31 +168,26 @@ void audio::unit_output_node::impl::prepare_audio_unit()
 
 #pragma mark - aduio_unit_input_node::impl
 
-class audio::unit_input_node::impl::core
-{
+class audio::unit_input_node::impl::core {
    public:
     pcm_buffer input_buffer;
     time render_time;
 };
 
-audio::unit_input_node::impl::impl() : audio::unit_io_node::impl(), _core(std::make_unique<core>())
-{
+audio::unit_input_node::impl::impl() : audio::unit_io_node::impl(), _core(std::make_unique<core>()) {
 }
 
 audio::unit_input_node::impl::~impl() = default;
 
-UInt32 audio::unit_input_node::impl::input_bus_count() const
-{
+UInt32 audio::unit_input_node::impl::input_bus_count() const {
     return 0;
 }
 
-UInt32 audio::unit_input_node::impl::output_bus_count() const
-{
+UInt32 audio::unit_input_node::impl::output_bus_count() const {
     return 1;
 }
 
-void audio::unit_input_node::impl::update_connections()
-{
+void audio::unit_input_node::impl::update_connections() {
     super_class::update_connections();
 
     auto unit = au();
@@ -254,8 +232,7 @@ void audio::unit_input_node::impl::update_connections()
     }
 }
 
-void audio::unit_input_node::impl::prepare_audio_unit()
-{
+void audio::unit_input_node::impl::prepare_audio_unit() {
     auto unit = au();
     unit.set_enable_output(false);
     unit.set_enable_input(true);

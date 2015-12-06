@@ -11,8 +11,7 @@
 #include "yas_audio_device.h"
 #endif
 
-class yas::audio::engine::impl : public yas::base::impl
-{
+class yas::audio::engine::impl : public yas::base::impl {
    public:
     impl();
     virtual ~impl();

@@ -19,8 +19,7 @@
     UInt32 _index;
 }
 
-- (void)dealloc
-{
+- (void)dealloc {
     YASRelease(_nameLabel);
     YASRelease(_valueLabel);
     YASRelease(_valueSlider);
@@ -32,24 +31,20 @@
     YASSuperDealloc;
 }
 
-- (void)awakeFromNib
-{
+- (void)awakeFromNib {
     [self reset];
 }
 
-- (void)prepareForReuse
-{
+- (void)prepareForReuse {
     [super prepareForReuse];
     [self reset];
 }
 
-- (void)reset
-{
+- (void)reset {
     [self set_node:yas::nullopt index:0];
 }
 
-- (void)set_node:(const std::experimental::optional<yas::audio::unit_node> &)node_opt index:(const UInt32)index
-{
+- (void)set_node:(const std::experimental::optional<yas::audio::unit_node> &)node_opt index:(const UInt32)index {
     _node_opt = node_opt;
     _index = index;
 
@@ -70,8 +65,7 @@
     [self updateValueLabel];
 }
 
-- (void)updateValueLabel
-{
+- (void)updateValueLabel {
     Float32 value = 0;
 
     if (_node_opt) {
@@ -85,8 +79,7 @@
     self.valueLabel.text = @(value).stringValue;
 }
 
-- (IBAction)sliderValueChanged:(UISlider *)sender
-{
+- (IBAction)sliderValueChanged:(UISlider *)sender {
     if (_node_opt) {
         auto &node = *_node_opt;
         if (node && node.global_parameters().count(_index)) {

@@ -20,8 +20,7 @@ struct test_class {
     test_class()
         : property1(test_key::property1, 1),
           property2(test_key::property2, 2),
-          dispatcher(yas::make_subject_dispatcher(properties_subject, {&property1.subject(), &property2.subject()}))
-    {
+          dispatcher(yas::make_subject_dispatcher(properties_subject, {&property1.subject(), &property2.subject()})) {
     }
 };
 
@@ -31,18 +30,15 @@ struct test_class {
 
 @implementation yas_property_tests
 
-- (void)setUp
-{
+- (void)setUp {
     [super setUp];
 }
 
-- (void)tearDown
-{
+- (void)tearDown {
     [super tearDown];
 }
 
-- (void)test_create_property
-{
+- (void)test_create_property {
     yas::property<float> float_property;
 
     float_property.set_value(1.0f);
@@ -50,8 +46,7 @@ struct test_class {
     XCTAssertEqual(float_property.value(), 1.0f);
 }
 
-- (void)test_create_property_with_key
-{
+- (void)test_create_property_with_key {
     int key = 1;
     float value1 = 1.5;
 
@@ -68,8 +63,7 @@ struct test_class {
     XCTAssertNotEqual(float_property.value(), value1);
 }
 
-- (void)test_change_value
-{
+- (void)test_change_value {
     yas::property<int, int> property(1, 2);
 
     XCTAssertEqual(property.value(), 2);
@@ -80,8 +74,7 @@ struct test_class {
     XCTAssertEqual(property.value(), 3);
 }
 
-- (void)test_observe_value
-{
+- (void)test_observe_value {
     yas::property<bool, int> property(1, false);
     yas::observer<yas::property<bool, int>> observer;
 
@@ -129,8 +122,7 @@ struct test_class {
     XCTAssertEqual(wildcard_called_count, 2);
 }
 
-- (void)test_dispatcher
-{
+- (void)test_dispatcher {
     test_class test_object;
     yas::observer<yas::property<int, test_key>> observer;
 
@@ -162,8 +154,7 @@ struct test_class {
     XCTAssertEqual(receive_value2, 2);
 }
 
-- (void)test_recursive_guard
-{
+- (void)test_recursive_guard {
     test_class test_object;
     yas::observer<yas::property<int, test_key>> observer;
 
@@ -192,8 +183,7 @@ struct test_class {
     XCTAssertEqual(test_object.property2.value(), 20);
 }
 
-- (void)test_equal
-{
+- (void)test_equal {
     yas::property<float> property1;
     yas::property<float> property2;
 
@@ -201,8 +191,7 @@ struct test_class {
     XCTAssertFalse(property1 == property2);
 }
 
-- (void)test_not_equal
-{
+- (void)test_not_equal {
     yas::property<float> property1;
     yas::property<float> property2;
 
@@ -210,8 +199,7 @@ struct test_class {
     XCTAssertTrue(property1 != property2);
 }
 
-- (void)test_equal_to_value_true
-{
+- (void)test_equal_to_value_true {
     float value = 3.0f;
 
     yas::property<float, int> property1{1, value};
@@ -221,8 +209,7 @@ struct test_class {
     XCTAssertTrue(value == property1);
 }
 
-- (void)test_equal_to_value_false
-{
+- (void)test_equal_to_value_false {
     float value1 = 3.0f;
     float value2 = 5.0f;
 
@@ -233,8 +220,7 @@ struct test_class {
     XCTAssertFalse(value1 == property2);
 }
 
-- (void)test_not_equal_to_value_true
-{
+- (void)test_not_equal_to_value_true {
     float value1 = 3.0f;
     float value2 = 5.0f;
 
@@ -245,8 +231,7 @@ struct test_class {
     XCTAssertTrue(value1 != property2);
 }
 
-- (void)test_not_equal_to_value_false
-{
+- (void)test_not_equal_to_value_false {
     float value = 3.0f;
 
     yas::property<float, int> property1{1, value};

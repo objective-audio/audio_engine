@@ -4,7 +4,7 @@
 //
 
 #import "YASFrequencyValueFormatter.h"
-#import "YASMacros.h"
+#import "yas_objc_macros.h"
 
 @interface YASFrequencyValueFormatter ()
 
@@ -14,18 +14,15 @@
 
 @implementation YASFrequencyValueFormatter
 
-+ (Class)transformedValueClass
-{
++ (Class)transformedValueClass {
     return [NSString class];
 }
 
-+ (BOOL)allowsReverseTransformation
-{
++ (BOOL)allowsReverseTransformation {
     return NO;
 }
 
-- (instancetype)init
-{
+- (instancetype)init {
     self = [super init];
     if (self) {
         NSNumberFormatter *formatter = YASAutorelease([[NSNumberFormatter alloc] init]);
@@ -37,8 +34,7 @@
     return self;
 }
 
-- (void)dealloc
-{
+- (void)dealloc {
     YASRelease(_numberFormatter);
 
     _numberFormatter = nil;
@@ -46,8 +42,7 @@
     YASSuperDealloc;
 }
 
-- (id)transformedValue:(id)value
-{
+- (id)transformedValue:(id)value {
     if ([value isKindOfClass:[NSNumber class]]) {
         return [self.numberFormatter stringFromNumber:value];
     }

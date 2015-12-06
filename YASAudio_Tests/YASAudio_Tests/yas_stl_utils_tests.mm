@@ -11,18 +11,15 @@
 
 @implementation yas_stl_utils_tests
 
-- (void)setUp
-{
+- (void)setUp {
     [super setUp];
 }
 
-- (void)tearDown
-{
+- (void)tearDown {
     [super tearDown];
 }
 
-- (void)test_min_empty_key_insert
-{
+- (void)test_min_empty_key_insert {
     std::map<UInt8, UInt8> map;
 
     auto key = yas::min_empty_key(map);
@@ -36,8 +33,7 @@
     XCTAssertEqual(*key, 1);
 }
 
-- (void)test_min_empty_key_insert_gappy
-{
+- (void)test_min_empty_key_insert_gappy {
     std::map<UInt8, UInt8> map;
 
     map.insert(std::make_pair(1, 1));
@@ -47,8 +43,7 @@
     XCTAssertEqual(*key, 0);
 }
 
-- (void)test_min_empty_key_filled
-{
+- (void)test_min_empty_key_filled {
     std::map<UInt8, UInt8> map;
 
     for (UInt16 i = 0; i < std::numeric_limits<UInt8>::max(); ++i) {
@@ -59,8 +54,7 @@
     XCTAssertFalse(key);
 }
 
-- (void)test_filter_vector
-{
+- (void)test_filter_vector {
     std::vector<int> vec{1, 4, 5, 3, 2};
     auto filtered_vec = yas::filter(vec, [](const auto &val) { return (val % 2) != 0; });
 
@@ -70,8 +64,7 @@
     XCTAssertEqual(filtered_vec[2], 3);
 }
 
-- (void)test_filter_map
-{
+- (void)test_filter_map {
     std::map<int, int> map{{0, 12}, {1, 11}, {2, 10}, {3, 9}, {4, 8}};
     auto filtered_map = yas::filter(map, [](const auto &pair) { return (pair.second % 2) != 0; });
 
@@ -85,8 +78,7 @@
     XCTAssertThrows(filtered_map.at(4));
 }
 
-- (void)test_erase_if
-{
+- (void)test_erase_if {
     std::unordered_set<int> set{0, 1, 2, 3, 4};
     yas::erase_if(set, [](const auto &val) { return (val % 2) != 0; });
 
@@ -99,8 +91,7 @@
     XCTAssertTrue(set.count(4));
 }
 
-- (void)test_enumerate
-{
+- (void)test_enumerate {
     int count = 0;
     int sum = 0;
 
@@ -116,8 +107,7 @@
     XCTAssertEqual(sum, (3 + 6 + 9));
 }
 
-- (void)test_to_vector
-{
+- (void)test_to_vector {
     std::unordered_set<int> set{1, 3, 5};
     auto vec = yas::to_vector(set);
 

@@ -11,18 +11,15 @@
 
 @implementation yas_audio_node_tests
 
-- (void)setUp
-{
+- (void)setUp {
     [super setUp];
 }
 
-- (void)tearDown
-{
+- (void)tearDown {
     [super tearDown];
 }
 
-- (void)test_create_audio_node
-{
+- (void)test_create_audio_node {
     yas::test::audio_test_node node;
 
     XCTAssertEqual(node.input_bus_count(), 2);
@@ -34,8 +31,7 @@
     XCTAssertEqual(*node.next_available_output_bus(), 0);
 }
 
-- (void)test_connection
-{
+- (void)test_connection {
     yas::test::audio_test_node source_node;
     yas::test::audio_test_node destination_node;
     auto format = yas::audio::format(44100.0, 2);
@@ -75,8 +71,7 @@
     XCTAssertEqual(*destination_bus_result, 0);
 }
 
-- (void)test_reset
-{
+- (void)test_reset {
     yas::test::audio_test_node source_node;
     yas::test::audio_test_node destination_node;
     auto format = yas::audio::format(48000.0, 2);
@@ -96,8 +91,7 @@
     XCTAssertEqual(yas::audio::node::private_access::input_connections(destination_node).size(), 0);
 }
 
-- (void)test_render_time
-{
+- (void)test_render_time {
     auto node = yas::audio::node::private_access::create();
     yas::audio::time time(100, 48000.0);
 
@@ -119,8 +113,7 @@
     XCTAssertEqual(time, node.last_render_time());
 }
 
-- (void)test_set_engine
-{
+- (void)test_set_engine {
     auto node = yas::audio::node::private_access::create();
     yas::audio::engine engine;
 
@@ -135,8 +128,7 @@
     XCTAssertFalse(node.engine());
 }
 
-- (void)test_kernel
-{
+- (void)test_kernel {
     auto output_format = yas::audio::format(48000.0, 2);
     auto input_format = yas::audio::format(44100.0, 1);
 
@@ -179,8 +171,7 @@
                                  }];
 }
 
-- (void)test_available_bus
-{
+- (void)test_available_bus {
     auto format = yas::audio::format(48000.0, 2);
     yas::test::audio_test_node source_node_0;
     yas::test::audio_test_node source_node_1;

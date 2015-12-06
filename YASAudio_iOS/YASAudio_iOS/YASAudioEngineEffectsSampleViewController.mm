@@ -23,41 +23,38 @@ static const AudioComponentDescription baseAcd = {.componentType = kAudioUnitTyp
 
 @end
 
-namespace yas
-{
-    namespace sample
-    {
-        struct effects_vc_internal {
-            yas::audio::engine engine;
-            yas::audio::unit_output_node output_node;
-            yas::audio::connection through_connection = nullptr;
-            yas::audio::tap_node tap_node;
-            yas::audio::unit_node effect_node = nullptr;
+namespace yas {
+namespace sample {
+    struct effects_vc_internal {
+        yas::audio::engine engine;
+        yas::audio::unit_output_node output_node;
+        yas::audio::connection through_connection = nullptr;
+        yas::audio::tap_node tap_node;
+        yas::audio::unit_node effect_node = nullptr;
 
-            void replace_effect_node(const AudioComponentDescription *acd)
-            {
-                if (effect_node) {
-                    engine.disconnect(effect_node);
-                    effect_node = nullptr;
-                }
-
-                if (through_connection) {
-                    engine.disconnect(through_connection);
-                    through_connection = nullptr;
-                }
-
-                auto format = yas::audio::format([AVAudioSession sharedInstance].sampleRate, 2);
-
-                if (acd) {
-                    effect_node = yas::audio::unit_node(*acd);
-                    engine.connect(effect_node, output_node, format);
-                    engine.connect(tap_node, effect_node, format);
-                } else {
-                    through_connection = engine.connect(tap_node, output_node, format);
-                }
+        void replace_effect_node(const AudioComponentDescription *acd) {
+            if (effect_node) {
+                engine.disconnect(effect_node);
+                effect_node = nullptr;
             }
-        };
-    }
+
+            if (through_connection) {
+                engine.disconnect(through_connection);
+                through_connection = nullptr;
+            }
+
+            auto format = yas::audio::format([AVAudioSession sharedInstance].sampleRate, 2);
+
+            if (acd) {
+                effect_node = yas::audio::unit_node(*acd);
+                engine.connect(effect_node, output_node, format);
+                engine.connect(tap_node, effect_node, format);
+            } else {
+                through_connection = engine.connect(tap_node, output_node, format);
+            }
+        }
+    };
+}
 }
 
 @implementation YASAudioEngineEffectsSampleViewController {
@@ -66,8 +63,7 @@ namespace yas
     yas::sample::effects_vc_internal _internal;
 }
 
-- (void)viewDidAppear:(BOOL)animated
-{
+- (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
 
     if (self.isMovingToParentViewController) {
@@ -96,8 +92,7 @@ namespace yas
     }
 }
 
-- (void)viewWillDisappear:(BOOL)animated
-{
+- (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
 
     if (self.isMovingFromParentViewController) {
@@ -112,16 +107,14 @@ namespace yas
     }
 }
 
-- (BOOL)shouldPerformSegueWithIdentifier:(NSString *)identifier sender:(id)sender
-{
+- (BOOL)shouldPerformSegueWithIdentifier:(NSString *)identifier sender:(id)sender {
     if (!_index) {
         return NO;
     }
     return YES;
 }
 
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
-{
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
     id destinationViewController = segue.destinationViewController;
     if ([destinationViewController isKindOfClass:[YASAudioEngineEffectsSampleEditViewController class]]) {
         YASAudioEngineEffectsSampleEditViewController *controller = destinationViewController;
@@ -131,8 +124,7 @@ namespace yas
 
 #pragma mark -
 
-- (void)setupAudioEngine
-{
+- (void)setupAudioEngine {
     if (_audio_units.size() == 0) {
         AudioComponent component = NULL;
 
@@ -179,16 +171,14 @@ namespace yas
 
 #pragma mark -
 
-- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
-{
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
     if (_internal.engine) {
         return YASAudioEngineEffectsSampleSectionCount;
     }
     return 0;
 }
 
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
-{
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     switch (section) {
         case YASAudioEngineEffectsSampleSectionNone:
             return 1;
@@ -199,8 +189,7 @@ namespace yas
     }
 }
 
-- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
-{
+- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
     switch (section) {
         case YASAudioEngineEffectsSampleSectionEffects:
             return @"Effects";
@@ -210,8 +199,7 @@ namespace yas
     return nil;
 }
 
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
-{
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     UITableViewCell *cell = [self _dequeueCellWithIndexPath:indexPath];
 
     if (indexPath.section == YASAudioEngineEffectsSampleSectionNone) {
@@ -230,8 +218,7 @@ namespace yas
     return cell;
 }
 
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
-{
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     switch (indexPath.section) {
         case YASAudioEngineEffectsSampleSectionNone: {
             _index = yas::nullopt;
@@ -253,8 +240,7 @@ namespace yas
 
 #pragma mark - Private
 
-- (void)_showErrorAlertWithMessage:(NSString *)message
-{
+- (void)_showErrorAlertWithMessage:(NSString *)message {
     UIAlertController *controller = [UIAlertController alertControllerWithTitle:@"Error"
                                                                         message:message
                                                                  preferredStyle:UIAlertControllerStyleAlert];
@@ -266,8 +252,7 @@ namespace yas
     [self presentViewController:controller animated:YES completion:NULL];
 }
 
-- (UITableViewCell *)_dequeueCellWithIndexPath:(NSIndexPath *)indexPath
-{
+- (UITableViewCell *)_dequeueCellWithIndexPath:(NSIndexPath *)indexPath {
     UITableViewCell *cell = [self.tableView dequeueReusableCellWithIdentifier:@"Cell" forIndexPath:indexPath];
     cell.textLabel.text = nil;
     cell.accessoryType = UITableViewCellAccessoryNone;

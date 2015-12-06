@@ -12,71 +12,66 @@
 #include "yas_audio_connection.h"
 #include "yas_audio_offline_output_node_protocol.h"
 
-namespace yas
-{
-    namespace audio
-    {
-        class graph;
-        class offline_output_node;
+namespace yas {
+namespace audio {
+    class graph;
+    class offline_output_node;
 
-        class engine : public base
-        {
-            using super_class = base;
-            class impl;
+    class engine : public base {
+        using super_class = base;
+        class impl;
 
-           public:
-            constexpr static auto configuration_change_key = "yas.audio.engine.configuration_change";
+       public:
+        constexpr static auto configuration_change_key = "yas.audio.engine.configuration_change";
 
-            enum class start_error_t {
-                already_running,
-                prepare_failure,
-                connection_not_found,
-                offline_output_not_found,
-                offline_output_starting_failure,
-            };
+        enum class start_error_t {
+            already_running,
+            prepare_failure,
+            connection_not_found,
+            offline_output_not_found,
+            offline_output_starting_failure,
+        };
 
-            using start_result_t = yas::result<std::nullptr_t, start_error_t>;
+        using start_result_t = yas::result<std::nullptr_t, start_error_t>;
 
-            engine();
-            engine(std::nullptr_t);
-            ~engine();
+        engine();
+        engine(std::nullptr_t);
+        ~engine();
 
-            engine(const engine &) = default;
-            engine(engine &&) = default;
-            engine &operator=(const engine &) = default;
-            engine &operator=(engine &&) = default;
+        engine(const engine &) = default;
+        engine(engine &&) = default;
+        engine &operator=(const engine &) = default;
+        engine &operator=(engine &&) = default;
 
-            engine &operator=(std::nullptr_t);
+        engine &operator=(std::nullptr_t);
 
-            audio::connection connect(node &source_node, node &destination_node,
-                                      const audio::format &format);
-            audio::connection connect(node &source_node, node &destination_node,
-                                      const UInt32 source_bus_idx, const UInt32 destination_bus_idx,
-                                      const audio::format &format);
+        audio::connection connect(node &source_node, node &destination_node, const audio::format &format);
+        audio::connection connect(node &source_node, node &destination_node, const UInt32 source_bus_idx,
+                                  const UInt32 destination_bus_idx, const audio::format &format);
 
-            void disconnect(audio::connection &);
-            void disconnect(node &);
-            void disconnect_input(const node &);
-            void disconnect_input(const node &, const UInt32 bus_idx);
-            void disconnect_output(const node &);
-            void disconnect_output(const node &, const UInt32 bus_idx);
+        void disconnect(audio::connection &);
+        void disconnect(node &);
+        void disconnect_input(const node &);
+        void disconnect_input(const node &, const UInt32 bus_idx);
+        void disconnect_output(const node &);
+        void disconnect_output(const node &, const UInt32 bus_idx);
 
-            start_result_t start_render();
-            start_result_t start_offline_render(const offline_render_f &render_function,
-                                                const offline_completion_f &completion_function);
-            void stop();
+        start_result_t start_render();
+        start_result_t start_offline_render(const offline_render_f &render_function,
+                                            const offline_completion_f &completion_function);
+        void stop();
 
-            subject<engine> &subject() const;
+        subject<engine> &subject() const;
 
 #if YAS_TEST
-           public:
-            class private_access;
-            friend private_access;
+       public:
+        class private_access;
+        friend private_access;
 #endif
-        };
-    }
+    };
+}
 
-    std::string to_string(const audio::engine::start_error_t &error);
+std::string to_string(const audio::engine::start_error_t &error);
 }
 
 #include "yas_audio_engine_impl.h"

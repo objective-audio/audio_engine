@@ -8,13 +8,11 @@
 
 using namespace yas;
 
-UInt32 yas::to_uint32(const audio::direction &dir)
-{
+UInt32 yas::to_uint32(const audio::direction &dir) {
     return static_cast<UInt32>(dir);
 }
 
-std::string yas::to_string(const audio::direction &dir)
-{
+std::string yas::to_string(const audio::direction &dir) {
     switch (dir) {
         case audio::direction::output:
             return "output";
@@ -23,8 +21,7 @@ std::string yas::to_string(const audio::direction &dir)
     }
 }
 
-std::string yas::to_string(const AudioUnitScope scope)
-{
+std::string yas::to_string(const AudioUnitScope scope) {
     switch (scope) {
         case kAudioUnitScope_Global:
             return "global";
@@ -47,8 +44,7 @@ std::string yas::to_string(const AudioUnitScope scope)
     return "unknown";
 }
 
-std::string yas::to_string(const audio::render_type &type)
-{
+std::string yas::to_string(const audio::render_type &type) {
     switch (type) {
         case audio::render_type::normal:
             return "normal";
@@ -61,8 +57,7 @@ std::string yas::to_string(const audio::render_type &type)
     }
 }
 
-std::string yas::to_string(const OSStatus err)
-{
+std::string yas::to_string(const OSStatus err) {
     switch (err) {
         case noErr:
             return "noErr";

@@ -16,90 +16,84 @@
 #include <map>
 #include <experimental/optional>
 
-namespace yas
-{
-    namespace audio
-    {
-        class time;
-        class engine;
+namespace yas {
+namespace audio {
+    class time;
+    class engine;
 
-        class node : public base, public node_from_engine, public node_from_connection
-        {
-            using super_class = base;
+    class node : public base, public node_from_engine, public node_from_connection {
+        using super_class = base;
 
-           public:
-            class kernel;
+       public:
+        class kernel;
 
-            struct create_tag_t {
-            };
-            constexpr static create_tag_t create_tag{};
+        struct create_tag_t {};
+        constexpr static create_tag_t create_tag{};
 
-            explicit node(std::nullptr_t);
-            virtual ~node();
+        explicit node(std::nullptr_t);
+        virtual ~node();
 
-            node(const node &) = default;
-            node(node &&) = default;
-            node &operator=(const node &) = default;
-            node &operator=(node &&) = default;
-            node &operator=(std::nullptr_t);
+        node(const node &) = default;
+        node(node &&) = default;
+        node &operator=(const node &) = default;
+        node &operator=(node &&) = default;
+        node &operator=(std::nullptr_t);
 
-            void reset();
+        void reset();
 
-            audio::format input_format(const UInt32 bus_idx) const;
-            audio::format output_format(const UInt32 bus_idx) const;
-            bus_result_t next_available_input_bus() const;
-            bus_result_t next_available_output_bus() const;
-            bool is_available_input_bus(const UInt32 bus_idx) const;
-            bool is_available_output_bus(const UInt32 bus_idx) const;
-            audio::engine engine() const;
-            audio::time last_render_time() const;
+        audio::format input_format(const UInt32 bus_idx) const;
+        audio::format output_format(const UInt32 bus_idx) const;
+        bus_result_t next_available_input_bus() const;
+        bus_result_t next_available_output_bus() const;
+        bool is_available_input_bus(const UInt32 bus_idx) const;
+        bool is_available_output_bus(const UInt32 bus_idx) const;
+        audio::engine engine() const;
+        audio::time last_render_time() const;
 
-            UInt32 input_bus_count() const;
-            UInt32 output_bus_count() const;
+        UInt32 input_bus_count() const;
+        UInt32 output_bus_count() const;
 
-            void render(audio::pcm_buffer &buffer, const UInt32 bus_idx, const audio::time &when);
-            void set_render_time_on_render(const audio::time &time);
+        void render(audio::pcm_buffer &buffer, const UInt32 bus_idx, const audio::time &when);
+        void set_render_time_on_render(const audio::time &time);
 
-           protected:
-            class kernel_from_node;
-            class impl;
+       protected:
+        class kernel_from_node;
+        class impl;
 
-            explicit node(const std::shared_ptr<impl> &);
+        explicit node(const std::shared_ptr<impl> &);
 
-            // from engine
+        // from engine
 
-            audio::connection _input_connection(const UInt32 bus_idx) const override;
-            audio::connection _output_connection(const UInt32 bus_idx) const override;
-            const audio::connection_wmap &_input_connections() const override;
-            const audio::connection_wmap &_output_connections() const override;
-            void _add_connection(const audio::connection &connection) override;
-            void _remove_connection(const audio::connection &connection) override;
-            void _set_engine(const audio::engine &engine) override;
-            audio::engine _engine() const override;
-            void _update_kernel() override;
-            void _update_connections() override;
+        audio::connection _input_connection(const UInt32 bus_idx) const override;
+        audio::connection _output_connection(const UInt32 bus_idx) const override;
+        const audio::connection_wmap &_input_connections() const override;
+        const audio::connection_wmap &_output_connections() const override;
+        void _add_connection(const audio::connection &connection) override;
+        void _remove_connection(const audio::connection &connection) override;
+        void _set_engine(const audio::engine &engine) override;
+        audio::engine _engine() const override;
+        void _update_kernel() override;
+        void _update_connections() override;
 
 #if YAS_TEST
-           public:
-            class private_access;
-            friend private_access;
+       public:
+        class private_access;
+        friend private_access;
 #endif
-        };
+    };
 
-        class node::kernel_from_node
-        {
-           public:
-            virtual ~kernel_from_node() = default;
-            virtual void _set_input_connections(const audio::connection_wmap &) = 0;
-            virtual void _set_output_connections(const audio::connection_wmap &) = 0;
-        };
-    }
+    class node::kernel_from_node {
+       public:
+        virtual ~kernel_from_node() = default;
+        virtual void _set_input_connections(const audio::connection_wmap &) = 0;
+        virtual void _set_output_connections(const audio::connection_wmap &) = 0;
+    };
+}
 }
 
 template <>
 struct std::hash<yas::audio::node> {
-    std::size_t operator()(yas::audio::node const &key) const
-    {
+    std::size_t operator()(yas::audio::node const &key) const {
         return std::hash<uintptr_t>()(key.identifier());
     }
 };

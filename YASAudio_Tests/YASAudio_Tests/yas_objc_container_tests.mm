@@ -13,8 +13,7 @@ static int _objc_object_count = 0;
 
 @implementation YASObjCContainerTest
 
-- (instancetype)init
-{
+- (instancetype)init {
     self = [super init];
     if (self) {
         _objc_object_count++;
@@ -22,8 +21,7 @@ static int _objc_object_count = 0;
     return self;
 }
 
-- (void)dealloc
-{
+- (void)dealloc {
     _objc_object_count--;
     [super dealloc];
 }
@@ -36,20 +34,17 @@ static int _objc_object_count = 0;
 
 @implementation yas_objc_container_tests
 
-- (void)setUp
-{
+- (void)setUp {
     [super setUp];
 
     _objc_object_count = 0;
 }
 
-- (void)tearDown
-{
+- (void)tearDown {
     [super tearDown];
 }
 
-- (void)test_retain_objc_object_on_strong_container
-{
+- (void)test_retain_objc_object_on_strong_container {
     YASObjCContainerTest *objc_object = [[YASObjCContainerTest alloc] init];
 
     XCTAssertEqual(_objc_object_count, 1);
@@ -66,8 +61,7 @@ static int _objc_object_count = 0;
     XCTAssertEqual(_objc_object_count, 0);
 }
 
-- (void)test_unretain_objc_object_on_weak_container
-{
+- (void)test_unretain_objc_object_on_weak_container {
     YASObjCContainerTest *objc_object = [[YASObjCContainerTest alloc] init];
 
     XCTAssertEqual(_objc_object_count, 1);
@@ -84,8 +78,7 @@ static int _objc_object_count = 0;
     XCTAssertEqual(_objc_object_count, 0);
 }
 
-- (void)test_set_objc_object_on_weak_container
-{
+- (void)test_set_objc_object_on_weak_container {
     YASObjCContainerTest *objc_object = [[YASObjCContainerTest alloc] init];
 
     auto objc_weak_container = yas::objc::container<yas::objc::weak>(nil);
@@ -106,8 +99,7 @@ static int _objc_object_count = 0;
 
     XCTAssertEqual([objc_object retainCount], 1);
 
-    @autoreleasepool
-    {
+    @autoreleasepool {
         id autoreleased_object = objc_weak_container.autoreleased_object();
 
         XCTAssertNotNil(autoreleased_object);
@@ -129,8 +121,7 @@ static int _objc_object_count = 0;
     XCTAssertEqual(_objc_object_count, 0);
 }
 
-- (void)test_set_objec_object_on_strong_container
-{
+- (void)test_set_objec_object_on_strong_container {
     YASObjCContainerTest *objc_object = [[YASObjCContainerTest alloc] init];
 
     auto objc_strong_container = yas::objc::container<>(nil);
@@ -153,8 +144,7 @@ static int _objc_object_count = 0;
 
     XCTAssertEqual([objc_object retainCount], 2);
 
-    @autoreleasepool
-    {
+    @autoreleasepool {
         id autoreleased_object = objc_strong_container.autoreleased_object();
 
         XCTAssertNotNil(autoreleased_object);
@@ -178,8 +168,7 @@ static int _objc_object_count = 0;
 
 #pragma mark - copy
 
-- (void)test_copy_strong_to_strong
-{
+- (void)test_copy_strong_to_strong {
     YASObjCContainerTest *objc_object = [[YASObjCContainerTest alloc] init];
 
     XCTAssertEqual([objc_object retainCount], 1);
@@ -206,8 +195,7 @@ static int _objc_object_count = 0;
     XCTAssertEqual(_objc_object_count, 0);
 }
 
-- (void)test_copy_weak_to_strong
-{
+- (void)test_copy_weak_to_strong {
     YASObjCContainerTest *objc_object = [[YASObjCContainerTest alloc] init];
 
     XCTAssertEqual([objc_object retainCount], 1);
@@ -234,8 +222,7 @@ static int _objc_object_count = 0;
     XCTAssertEqual(_objc_object_count, 0);
 }
 
-- (void)test_copy_strong_to_weak
-{
+- (void)test_copy_strong_to_weak {
     YASObjCContainerTest *objc_object = [[YASObjCContainerTest alloc] init];
 
     XCTAssertEqual([objc_object retainCount], 1);
@@ -262,8 +249,7 @@ static int _objc_object_count = 0;
     XCTAssertEqual(_objc_object_count, 0);
 }
 
-- (void)test_copy_weak_to_weak
-{
+- (void)test_copy_weak_to_weak {
     YASObjCContainerTest *objc_object = [[YASObjCContainerTest alloc] init];
 
     XCTAssertEqual([objc_object retainCount], 1);
@@ -290,8 +276,7 @@ static int _objc_object_count = 0;
     XCTAssertEqual(_objc_object_count, 0);
 }
 
-- (void)test_copy_constructor_strong
-{
+- (void)test_copy_constructor_strong {
     YASObjCContainerTest *objc_object = [[YASObjCContainerTest alloc] init];
 
     XCTAssertEqual([objc_object retainCount], 1);
@@ -314,8 +299,7 @@ static int _objc_object_count = 0;
     XCTAssertEqual(_objc_object_count, 0);
 }
 
-- (void)test_copy_constructor_weak
-{
+- (void)test_copy_constructor_weak {
     YASObjCContainerTest *objc_object = [[YASObjCContainerTest alloc] init];
 
     XCTAssertEqual([objc_object retainCount], 1);
@@ -338,8 +322,7 @@ static int _objc_object_count = 0;
     XCTAssertEqual(_objc_object_count, 0);
 }
 
-- (void)test_copy_different_objc_objects
-{
+- (void)test_copy_different_objc_objects {
     YASObjCContainerTest *objc_object1 = [[YASObjCContainerTest alloc] init];
     YASObjCContainerTest *objc_object2 = [[YASObjCContainerTest alloc] init];
 
@@ -366,8 +349,7 @@ static int _objc_object_count = 0;
 
 #pragma mark - move
 
-- (void)test_move
-{
+- (void)test_move {
     YASObjCContainerTest *objc_object = [[YASObjCContainerTest alloc] init];
 
     {
@@ -393,8 +375,7 @@ static int _objc_object_count = 0;
     XCTAssertEqual(_objc_object_count, 0);
 }
 
-- (void)test_move_constructor
-{
+- (void)test_move_constructor {
     YASObjCContainerTest *objc_object = [[YASObjCContainerTest alloc] init];
 
     {
@@ -419,8 +400,7 @@ static int _objc_object_count = 0;
     XCTAssertEqual(_objc_object_count, 0);
 }
 
-- (void)test_direct_set
-{
+- (void)test_direct_set {
     YASObjCContainerTest *objc_object = [[YASObjCContainerTest alloc] init];
 
     {

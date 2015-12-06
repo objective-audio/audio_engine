@@ -5,68 +5,58 @@
 
 #import "yas_audio_test_utils.h"
 
-namespace yas
-{
-    namespace test
-    {
-        struct audio_file_test_data {
-            Float64 file_sample_rate;
-            Float64 processing_sample_rate;
-            UInt32 channels;
-            UInt32 file_bit_depth;
-            UInt32 frame_length;
-            UInt32 loop_count;
-            audio::pcm_format pcm_format;
-            bool interleaved;
-            bool standard;
-            bool async;
+namespace yas {
+namespace test {
+    struct audio_file_test_data {
+        Float64 file_sample_rate;
+        Float64 processing_sample_rate;
+        UInt32 channels;
+        UInt32 file_bit_depth;
+        UInt32 frame_length;
+        UInt32 loop_count;
+        audio::pcm_format pcm_format;
+        bool interleaved;
+        bool standard;
+        bool async;
 
-            audio_file_test_data() : _file_name(nullptr), _file_type(nullptr)
-            {
+        audio_file_test_data() : _file_name(nullptr), _file_type(nullptr) {
+        }
+
+        ~audio_file_test_data() {
+            set_file_type(nullptr);
+            set_file_name(nullptr);
+        }
+
+        void set_file_type(const CFStringRef file_type) {
+            yas::set_cf_property(_file_type, file_type);
+        }
+
+        CFStringRef file_type() const {
+            return yas::get_cf_property(_file_type);
+        }
+
+        void set_file_name(const CFStringRef file_name) {
+            yas::set_cf_property(_file_name, file_name);
+        }
+
+        CFStringRef file_name() const {
+            return yas::get_cf_property(_file_name);
+        }
+
+        CFDictionaryRef settings() const {
+            if (CFStringCompare(file_type(), yas::audio::file_type::wave, kNilOptions) == kCFCompareEqualTo) {
+                return yas::audio::wave_file_settings(file_sample_rate, channels, file_bit_depth);
+            } else if (CFStringCompare(file_type(), yas::audio::file_type::aiff, kNilOptions) == kCFCompareEqualTo) {
+                return yas::audio::aiff_file_settings(file_sample_rate, channels, file_bit_depth);
             }
+            return nullptr;
+        }
 
-            ~audio_file_test_data()
-            {
-                set_file_type(nullptr);
-                set_file_name(nullptr);
-            }
-
-            void set_file_type(const CFStringRef file_type)
-            {
-                yas::set_cf_property(_file_type, file_type);
-            }
-
-            CFStringRef file_type() const
-            {
-                return yas::get_cf_property(_file_type);
-            }
-
-            void set_file_name(const CFStringRef file_name)
-            {
-                yas::set_cf_property(_file_name, file_name);
-            }
-
-            CFStringRef file_name() const
-            {
-                return yas::get_cf_property(_file_name);
-            }
-
-            CFDictionaryRef settings() const
-            {
-                if (CFStringCompare(file_type(), yas::audio::file_type::wave, kNilOptions) == kCFCompareEqualTo) {
-                    return yas::audio::wave_file_settings(file_sample_rate, channels, file_bit_depth);
-                } else if (CFStringCompare(file_type(), yas::audio::file_type::aiff, kNilOptions) ==
-                           kCFCompareEqualTo) {
-                    return yas::audio::aiff_file_settings(file_sample_rate, channels, file_bit_depth);
-                }
-                return nullptr;
-            }
-
-           private:
-            CFStringRef _file_type;
-            CFStringRef _file_name;
-        };
-    }
+       private:
+        CFStringRef _file_type;
+        CFStringRef _file_name;
+    };
+}
 }
 
 @interface yas_audio_file_tests : XCTestCase
@@ -75,22 +65,19 @@ namespace yas
 
 @implementation yas_audio_file_tests
 
-- (void)setUp
-{
+- (void)setUp {
     [super setUp];
 
     [self setupDirectory];
 }
 
-- (void)tearDown
-{
+- (void)tearDown {
     [self removeAllFiles];
 
     [super tearDown];
 }
 
-- (void)testWAVEFile
-{
+- (void)testWAVEFile {
 #if WAVEFILE_LIGHT_TEST
     Float64 sample_rates[] = {44100.0, 382000.0};
     UInt32 channels[] = {1, 2};
@@ -126,8 +113,7 @@ namespace yas
                             test_data.processing_sample_rate = processing_sample_rate;
                             test_data.pcm_format = pcm_format;
                             test_data.interleaved = interleved;
-                            @autoreleasepool
-                            {
+                            @autoreleasepool {
                                 [self _commonAudioFileTest:test_data];
                             }
                         }
@@ -154,8 +140,7 @@ namespace yas
 
 #pragma mark -
 
-- (void)_commonAudioFileTest:(yas::test::audio_file_test_data &)test_data
-{
+- (void)_commonAudioFileTest:(yas::test::audio_file_test_data &)test_data {
     NSString *filePath =
         [[self temporaryTestDirectory] stringByAppendingPathComponent:(__bridge NSString *)test_data.file_name()];
     CFURLRef fileURL = (__bridge CFURLRef)[NSURL fileURLWithPath:filePath];
@@ -173,8 +158,7 @@ namespace yas
 
     // write
 
-    @autoreleasepool
-    {
+    @autoreleasepool {
         yas::audio::file audio_file;
 
         if (test_data.standard) {
@@ -202,8 +186,7 @@ namespace yas
 
     // read
 
-    @autoreleasepool
-    {
+    @autoreleasepool {
         yas::audio::file audio_file;
 
         if (test_data.standard) {
@@ -244,8 +227,7 @@ namespace yas
 
 - (void)_writeToBuffer:(yas::audio::pcm_buffer &)buffer
             fileFormat:(const yas::audio::format &)fileFormat
-            startIndex:(NSInteger)startIndex
-{
+            startIndex:(NSInteger)startIndex {
     const auto &format = buffer.format();
     const UInt32 buffer_count = format.buffer_count();
     const UInt32 stride = format.stride();
@@ -280,8 +262,7 @@ namespace yas
 
 - (bool)_compareData:(yas::audio::pcm_buffer &)buffer
           fileFormat:(const yas::audio::format &)fileFormat
-          startIndex:(NSInteger)startIndex
-{
+          startIndex:(NSInteger)startIndex {
     const auto &format = buffer.format();
     const UInt32 buffer_count = format.buffer_count();
     const UInt32 stride = format.stride();
@@ -319,13 +300,11 @@ namespace yas
 
 #pragma mark -
 
-- (NSString *)temporaryTestDirectory
-{
+- (NSString *)temporaryTestDirectory {
     return [NSTemporaryDirectory() stringByAppendingPathComponent:@"yas_audio_test_files"];
 }
 
-- (void)setupDirectory
-{
+- (void)setupDirectory {
     [self removeAllFiles];
 
     NSString *path = [self temporaryTestDirectory];
@@ -337,8 +316,7 @@ namespace yas
     YASRelease(fileManager);
 }
 
-- (void)removeAllFiles
-{
+- (void)removeAllFiles {
     NSString *path = [self temporaryTestDirectory];
 
     NSFileManager *fileManager = [[NSFileManager alloc] init];

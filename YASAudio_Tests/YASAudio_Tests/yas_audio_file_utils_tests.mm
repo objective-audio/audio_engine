@@ -11,18 +11,15 @@
 
 @implementation yas_audio_file_utils_tests
 
-- (void)setUp
-{
+- (void)setUp {
     [super setUp];
 }
 
-- (void)tearDown
-{
+- (void)tearDown {
     [super tearDown];
 }
 
-- (void)testWaveFileSettingsInt16
-{
+- (void)testWaveFileSettingsInt16 {
     const Float64 sampleRate = 44100;
     const UInt32 channels = 2;
     const UInt32 bitDepth = 16;
@@ -39,8 +36,7 @@
     XCTAssertNotNil(settings[AVChannelLayoutKey]);
 }
 
-- (void)testWaveFileSettingsFloat32
-{
+- (void)testWaveFileSettingsFloat32 {
     const Float64 sampleRate = 48000;
     const UInt32 channels = 4;
     const UInt32 bitDepth = 32;
@@ -57,8 +53,7 @@
     XCTAssertNotNil(settings[AVChannelLayoutKey]);
 }
 
-- (void)testAIFFSettingsInt16
-{
+- (void)testAIFFSettingsInt16 {
     const Float64 sampleRate = 32000;
     const UInt32 channels = 2;
     const UInt32 bitDepth = 16;
@@ -75,8 +70,7 @@
     XCTAssertNotNil(settings[AVChannelLayoutKey]);
 }
 
-- (void)testAIFFSettingsFloat32
-{
+- (void)testAIFFSettingsFloat32 {
     const Float64 sampleRate = 96000;
     const UInt32 channels = 3;
     const UInt32 bitDepth = 32;
@@ -93,8 +87,7 @@
     XCTAssertNotNil(settings[AVChannelLayoutKey]);
 }
 
-- (void)testAACSettings
-{
+- (void)testAACSettings {
     const Float64 sampleRate = 48000;
     const UInt32 channels = 2;
     const UInt32 bitDepth = 16;
@@ -119,8 +112,7 @@
     XCTAssertEqualObjects(settings[AVSampleRateConverterAudioQualityKey], @(converterQuality));
 }
 
-- (void)testAudioFileTypeIDFromFileType
-{
+- (void)testAudioFileTypeIDFromFileType {
     XCTAssertEqual(yas::audio::to_audio_file_type_id(yas::audio::file_type::three_gpp), kAudioFile3GPType);
     XCTAssertEqual(yas::audio::to_audio_file_type_id(yas::audio::file_type::three_gpp2), kAudioFile3GP2Type);
     XCTAssertEqual(yas::audio::to_audio_file_type_id(yas::audio::file_type::aifc), kAudioFileAIFCType);
@@ -134,8 +126,7 @@
     XCTAssertEqual(yas::audio::to_audio_file_type_id(yas::audio::file_type::wave), kAudioFileWAVEType);
 }
 
-- (void)testFileTypeFromAudioFileTypeID
-{
+- (void)testFileTypeFromAudioFileTypeID {
     XCTAssertEqual(yas::audio::to_file_type(kAudioFile3GPType), yas::audio::file_type::three_gpp);
     XCTAssertEqual(yas::audio::to_file_type(kAudioFile3GP2Type), yas::audio::file_type::three_gpp2);
     XCTAssertEqual(yas::audio::to_file_type(kAudioFileAIFCType), yas::audio::file_type::aifc);

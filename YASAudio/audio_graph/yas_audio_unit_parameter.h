@@ -8,8 +8,7 @@
 #include "yas_observing.h"
 #include <AudioToolbox/AudioToolbox.h>
 
-class yas::audio::unit::parameter
-{
+class yas::audio::unit::parameter {
    public:
     struct change_info {
         const parameter &parameter;

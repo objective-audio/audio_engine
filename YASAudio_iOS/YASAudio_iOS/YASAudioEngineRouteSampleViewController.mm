@@ -28,54 +28,48 @@ typedef NS_ENUM(NSUInteger, YASAudioEngineRouteSampleSourceIndex) {
 
 @end
 
-namespace yas
-{
-    namespace sample
-    {
-        struct route_vc_internal {
-            yas::audio::engine engine;
-            yas::audio::unit_io_node io_node;
-            yas::audio::unit_mixer_node mixer_node;
-            yas::audio::route_node route_node;
-            yas::audio::tap_node sine_node;
+namespace yas {
+namespace sample {
+    struct route_vc_internal {
+        yas::audio::engine engine;
+        yas::audio::unit_io_node io_node;
+        yas::audio::unit_mixer_node mixer_node;
+        yas::audio::route_node route_node;
+        yas::audio::tap_node sine_node;
 
-            yas::base engine_observer = nullptr;
-            yas::objc::container<yas::objc::weak> self_container;
+        yas::base engine_observer = nullptr;
+        yas::objc::container<yas::objc::weak> self_container;
 
-            ~route_vc_internal()
-            {
-                self_container.set_object(nil);
-            }
+        ~route_vc_internal() {
+            self_container.set_object(nil);
+        }
 
-            void disconnectNodes()
-            {
-                engine.disconnect(mixer_node);
-                engine.disconnect(route_node);
-                engine.disconnect(sine_node);
-                engine.disconnect(io_node);
-            }
+        void disconnectNodes() {
+            engine.disconnect(mixer_node);
+            engine.disconnect(route_node);
+            engine.disconnect(sine_node);
+            engine.disconnect(io_node);
+        }
 
-            void connect_nodes()
-            {
-                const auto sample_rate = io_node.device_sample_rate();
+        void connect_nodes() {
+            const auto sample_rate = io_node.device_sample_rate();
 
-                const auto format = yas::audio::format(sample_rate, 2);
+            const auto format = yas::audio::format(sample_rate, 2);
 
-                engine.connect(mixer_node, io_node, format);
-                engine.connect(route_node, mixer_node, format);
-                engine.connect(sine_node, route_node, 0, YASAudioEngineRouteSampleSourceIndexSine, format);
-                engine.connect(io_node, route_node, 1, YASAudioEngineRouteSampleSourceIndexInput, format);
-            }
-        };
-    }
+            engine.connect(mixer_node, io_node, format);
+            engine.connect(route_node, mixer_node, format);
+            engine.connect(sine_node, route_node, 0, YASAudioEngineRouteSampleSourceIndexSine, format);
+            engine.connect(io_node, route_node, 1, YASAudioEngineRouteSampleSourceIndexInput, format);
+        }
+    };
+}
 }
 
 @implementation YASAudioEngineRouteSampleViewController {
     yas::sample::route_vc_internal _internal;
 }
 
-- (void)dealloc
-{
+- (void)dealloc {
     YASRelease(_slider);
 
     _slider = nil;
@@ -83,8 +77,7 @@ namespace yas
     YASSuperDealloc;
 }
 
-- (void)viewDidAppear:(BOOL)animated
-{
+- (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
 
     if (self.isMovingToParentViewController) {
@@ -114,8 +107,7 @@ namespace yas
     }
 }
 
-- (void)viewWillDisappear:(BOOL)animated
-{
+- (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
 
     if (self.isMovingFromParentViewController) {
@@ -127,8 +119,7 @@ namespace yas
     }
 }
 
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(UITableViewCell *)cell
-{
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(UITableViewCell *)cell {
     id destinationViewController = segue.destinationViewController;
     if ([destinationViewController isKindOfClass:[YASAudioEngineRouteSampleSelectionViewController class]]) {
         YASAudioEngineRouteSampleSelectionViewController *controller = destinationViewController;
@@ -137,8 +128,7 @@ namespace yas
     }
 }
 
-- (IBAction)unwindForSegue:(UIStoryboardSegue *)segue
-{
+- (IBAction)unwindForSegue:(UIStoryboardSegue *)segue {
     id sourceViewController = segue.sourceViewController;
     if ([sourceViewController isKindOfClass:[YASAudioEngineRouteSampleSelectionViewController class]]) {
         YASAudioEngineRouteSampleSelectionViewController *controller = sourceViewController;
@@ -173,8 +163,7 @@ namespace yas
 
 #pragma mark - Table view data source
 
-- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
-{
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
     if (!_internal.engine) {
         return 0;
     }
@@ -182,8 +171,7 @@ namespace yas
     return YASAudioEngineRouteSampleSectionCount;
 }
 
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
-{
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     if (!_internal.engine) {
         return 0;
     }
@@ -199,8 +187,7 @@ namespace yas
     return 0;
 }
 
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
-{
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     switch (indexPath.section) {
         case YASAudioEngineRouteSampleSectionSlider: {
             YASAudioSliderCell *cell =
@@ -235,8 +222,7 @@ namespace yas
 
 #pragma mark -
 
-- (IBAction)volumeSliderChanged:(UISlider *)sender
-{
+- (IBAction)volumeSliderChanged:(UISlider *)sender {
     const Float32 value = sender.value;
     if (_internal.mixer_node) {
         _internal.mixer_node.set_input_volume(value, 0);
@@ -245,8 +231,7 @@ namespace yas
 
 #pragma mark -
 
-- (void)setupEngine
-{
+- (void)setupEngine {
     _internal = yas::sample::route_vc_internal();
 
     _internal.mixer_node.set_input_volume(1.0, 0);
@@ -290,8 +275,7 @@ namespace yas
     _internal.connect_nodes();
 }
 
-- (void)_updateEngine
-{
+- (void)_updateEngine {
     _internal.disconnectNodes();
     _internal.connect_nodes();
 
@@ -301,8 +285,7 @@ namespace yas
 
 #pragma mark -
 
-- (void)_showErrorAlertWithMessage:(NSString *)message
-{
+- (void)_showErrorAlertWithMessage:(NSString *)message {
     UIAlertController *controller = [UIAlertController alertControllerWithTitle:@"Error"
                                                                         message:message
                                                                  preferredStyle:UIAlertControllerStyleAlert];
@@ -314,8 +297,7 @@ namespace yas
     [self presentViewController:controller animated:YES completion:NULL];
 }
 
-- (void)_updateSlider
-{
+- (void)_updateSlider {
     if (_internal.mixer_node) {
         NSIndexPath *indexPath = [NSIndexPath indexPathForRow:0 inSection:YASAudioEngineRouteSampleSectionSlider];
         UITableViewCell *cell = [self.tableView cellForRowAtIndexPath:indexPath];

@@ -4,7 +4,6 @@ ColumnLimit: 120
 IndentWidth: 4
 DerivePointerBinding: false
 PointerBindsToType: false
-BreakBeforeBraces: Linux
 BreakBeforeTernaryOperators: false
 ObjCSpaceAfterProperty: true
 ObjCSpaceBeforeProtocolList: true
@@ -12,4 +11,4 @@ AllowShortFunctionsOnASingleLine: false
 AllowShortLoopsOnASingleLine: false
 ObjCBlockIndentWidth: 4
 SpacesInContainerLiterals: false
-NamespaceIndentation: All
+NamespaceIndentation: Inner

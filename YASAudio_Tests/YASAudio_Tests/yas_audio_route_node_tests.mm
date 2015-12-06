@@ -11,18 +11,15 @@
 
 @implementation yas_audio_route_node_tests
 
-- (void)setUp
-{
+- (void)setUp {
     [super setUp];
 }
 
-- (void)tearDown
-{
+- (void)tearDown {
     [super tearDown];
 }
 
-- (void)test_add_and_remove_route
-{
+- (void)test_add_and_remove_route {
     yas::audio::route_node route_node;
 
     XCTAssertEqual(route_node.routes().size(), 0);
@@ -48,8 +45,7 @@
     XCTAssertEqual(route_node.routes().size(), 0);
 }
 
-- (void)test_replace_route
-{
+- (void)test_replace_route {
     yas::audio::route_node route_node;
 
     XCTAssertEqual(route_node.routes().size(), 0);
@@ -74,8 +70,7 @@
     XCTAssertNotEqual(route_node.routes(), routes);
 }
 
-- (void)test_render
-{
+- (void)test_render {
     yas::audio::engine engine;
 
     auto format = yas::audio::format(44100.0, 2);
@@ -146,8 +141,7 @@
     XCTAssertTrue(tap_node_called);
 }
 
-- (void)test_render_many_source
-{
+- (void)test_render_many_source {
     const auto src_count = 2;
 
     yas::audio::engine engine;
@@ -213,8 +207,7 @@
     }
 }
 
-- (void)test_render_gappy_source
-{
+- (void)test_render_gappy_source {
     const auto src_count = 2;
 
     yas::audio::engine engine;

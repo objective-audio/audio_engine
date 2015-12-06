@@ -11,18 +11,15 @@
 
 @implementation yas_audio_unit_tests
 
-- (void)setUp
-{
+- (void)setUp {
     [super setUp];
 }
 
-- (void)tearDown
-{
+- (void)tearDown {
     [super tearDown];
 }
 
-- (void)testConverterUnit
-{
+- (void)testConverterUnit {
     const Float64 output_sample_rate = 44100;
     const Float64 input_sample_rate = 48000;
     const UInt32 channels = 2;
@@ -92,8 +89,7 @@
     XCTAssertFalse(converter_unit.is_initialized());
 }
 
-- (void)testRenderCallback
-{
+- (void)testRenderCallback {
     const Float64 sampleRate = 44100;
     const UInt32 channels = 2;
     const UInt32 frame_length = 1024;
@@ -173,8 +169,7 @@
     XCTAssertFalse(is_render_notify_callback);
 }
 
-- (void)testParameter
-{
+- (void)testParameter {
     yas::audio::unit delay_unit(kAudioUnitType_Effect, kAudioUnitSubType_Delay);
 
     const AudioUnitScope scope = kAudioUnitScope_Global;
@@ -197,16 +192,14 @@
     XCTAssertTrue(parameter.unit() == kAudioUnitParameterUnit_Seconds);
 }
 
-- (void)testParameterCreateFailed
-{
+- (void)testParameterCreateFailed {
     yas::audio::unit delay_unit(kAudioUnitType_Effect, kAudioUnitSubType_Delay);
 
     XCTAssertThrows(delay_unit.create_parameter(kDelayParam_DelayTime, kAudioUnitScope_Input));
     XCTAssertThrows(delay_unit.create_parameter(kDelayParam_DelayTime, kAudioUnitScope_Output));
 }
 
-- (void)testParameters
-{
+- (void)testParameters {
     yas::audio::unit delay_unit(kAudioUnitType_Effect, kAudioUnitSubType_Delay);
 
     auto parameters = delay_unit.create_parameters(kAudioUnitScope_Global);
@@ -222,8 +215,7 @@
     }
 }
 
-- (void)testPropertyData
-{
+- (void)testPropertyData {
     const Float64 sampleRate = 48000;
     const UInt32 channels = 4;
     const AudioUnitPropertyID property_id = kAudioUnitProperty_StreamFormat;

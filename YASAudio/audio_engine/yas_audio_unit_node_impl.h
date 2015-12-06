@@ -8,8 +8,7 @@
 
 #pragma once
 
-class yas::audio::unit_node::impl : public node::impl
-{
+class yas::audio::unit_node::impl : public node::impl {
     using super_class = node::impl;
 
    public:

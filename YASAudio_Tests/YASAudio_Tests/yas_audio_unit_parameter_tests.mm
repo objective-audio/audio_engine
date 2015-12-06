@@ -11,18 +11,15 @@
 
 @implementation yas_audio_unit_parameter_tests
 
-- (void)setUp
-{
+- (void)setUp {
     [super setUp];
 }
 
-- (void)tearDown
-{
+- (void)tearDown {
     [super tearDown];
 }
 
-- (void)test_create
-{
+- (void)test_create {
     AudioUnitParameterInfo info{.unitName = CFSTR("unit_name"),
                                 .clumpID = 3,
                                 .cfNameString = CFSTR("cf_name_string"),
@@ -48,8 +45,7 @@
     XCTAssertEqual(parameter.has_clump(), true);
 }
 
-- (void)test_subject_will_change
-{
+- (void)test_subject_will_change {
     yas::audio::unit::parameter parameter{AudioUnitParameterInfo{}, 0, 0};
 
     bool called = false;
@@ -71,8 +67,7 @@
     XCTAssertTrue(called);
 }
 
-- (void)test_subject_did_change
-{
+- (void)test_subject_did_change {
     yas::audio::unit::parameter parameter{AudioUnitParameterInfo{}, 0, 0};
 
     parameter.set_value(-1.0f, 10);
@@ -96,8 +91,7 @@
     XCTAssertTrue(called);
 }
 
-- (void)test_values
-{
+- (void)test_values {
     yas::audio::unit::parameter parameter{AudioUnitParameterInfo{}, 0, 0};
 
     parameter.set_value(1.0f, 1);

@@ -11,18 +11,15 @@
 
 @implementation yas_audio_connection_tests
 
-- (void)setUp
-{
+- (void)setUp {
     [super setUp];
 }
 
-- (void)tearDown
-{
+- (void)tearDown {
     [super tearDown];
 }
 
-- (void)test_create_connention_success
-{
+- (void)test_create_connention_success {
     auto format = yas::audio::format(48000.0, 2);
     yas::test::audio_test_node source_node;
     yas::test::audio_test_node destination_node;
@@ -42,8 +39,7 @@
     XCTAssertTrue(yas::audio::node::private_access::input_connection(destination_node, destination_bus) == connection);
 }
 
-- (void)test_remove_nodes
-{
+- (void)test_remove_nodes {
     auto format = yas::audio::format(44100.0, 2);
     yas::test::audio_test_node source_node;
     yas::test::audio_test_node destination_node;
@@ -59,8 +55,7 @@
     XCTAssertFalse(connection.destination_node());
 }
 
-- (void)test_remove_nodes_separately
-{
+- (void)test_remove_nodes_separately {
     auto format = yas::audio::format(8000.0, 2);
     yas::test::audio_test_node source_node;
     yas::test::audio_test_node destination_node;
@@ -80,8 +75,7 @@
     XCTAssertFalse(connection.destination_node());
 }
 
-- (void)test_create_connection_failed
-{
+- (void)test_create_connection_failed {
     auto format = yas::audio::format(48000.0, 2);
     yas::test::audio_test_node source_node;
     yas::test::audio_test_node destination_node;
@@ -95,8 +89,7 @@
         yas::audio::connection::private_access::create(source_node, source_bus, null_node, destination_bus, format));
 }
 
-- (void)test_empty_connection
-{
+- (void)test_empty_connection {
     yas::audio::connection connection(nullptr);
 
     XCTAssertFalse(connection.source_node());

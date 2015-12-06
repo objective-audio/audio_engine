@@ -11,18 +11,15 @@
 
 @implementation yas_cf_tests
 
-- (void)setUp
-{
+- (void)setUp {
     [super setUp];
 }
 
-- (void)tearDown
-{
+- (void)tearDown {
     [super tearDown];
 }
 
-- (void)testRetaining
-{
+- (void)testRetaining {
     CFMutableArrayRef _property_array = nullptr;
     CFMutableArrayRef array = CFArrayCreateMutable(nullptr, 1, nullptr);
 
@@ -37,8 +34,7 @@
 
     XCTAssertEqual(CFGetRetainCount(array), 1);
 
-    @autoreleasepool
-    {
+    @autoreleasepool {
         CFMutableArrayRef array2 = yas::get_cf_property(_property_array);
 
         XCTAssertEqual(_property_array, array2);
@@ -50,8 +46,7 @@
     CFRelease(array);
 }
 
-- (void)testStringToCFString
-{
+- (void)testStringToCFString {
     std::string string("test_string");
 
     CFStringRef cf_string = yas::to_cf_object(string);
@@ -61,8 +56,7 @@
     XCTAssertEqual(result, kCFCompareEqualTo);
 }
 
-- (void)testCFStringToString
-{
+- (void)testCFStringToString {
     CFStringRef cf_string = CFSTR("test_cf_string");
 
     std::string string = yas::to_string(cf_string);
@@ -72,8 +66,7 @@
     CFRelease(cf_string);
 }
 
-- (void)testFloat32ToCFNumber
-{
+- (void)testFloat32ToCFNumber {
     Float32 value = 1.5;
 
     CFNumberRef cf_number = yas::to_cf_object(value);
@@ -81,8 +74,7 @@
     XCTAssertEqual(CFNumberCompare(cf_number, (CFNumberRef)(@1.5), nullptr), kCFCompareEqualTo);
 }
 
-- (void)testFloat64ToCFNumber
-{
+- (void)testFloat64ToCFNumber {
     Float64 value = 2.6;
 
     CFNumberRef cf_number = yas::to_cf_object(value);
@@ -90,8 +82,7 @@
     XCTAssertEqual(CFNumberCompare(cf_number, (CFNumberRef)(@2.6), nullptr), kCFCompareEqualTo);
 }
 
-- (void)testSInt32ToCFNumber
-{
+- (void)testSInt32ToCFNumber {
     SInt32 value = 3;
 
     CFNumberRef cf_number = yas::to_cf_object(value);
@@ -99,8 +90,7 @@
     XCTAssertEqual(CFNumberCompare(cf_number, (CFNumberRef)(@3), nullptr), kCFCompareEqualTo);
 }
 
-- (void)testSInt16ToCFNumber
-{
+- (void)testSInt16ToCFNumber {
     SInt16 value = 123;
 
     CFNumberRef cf_number = yas::to_cf_object(value);
@@ -108,8 +98,7 @@
     XCTAssertEqual(CFNumberCompare(cf_number, (CFNumberRef)(@123), nullptr), kCFCompareEqualTo);
 }
 
-- (void)testVectorToCFArray
-{
+- (void)testVectorToCFArray {
     std::string value1 = "test_value_1";
     std::string value2 = "test_value_2";
     std::vector<std::string> vector{value1, value2};
@@ -125,8 +114,7 @@
     XCTAssertTrue(CFStringCompare(cf_value2, CFSTR("test_value_2"), kNilOptions) == kCFCompareEqualTo);
 }
 
-- (void)testMapToCFDictionary
-{
+- (void)testMapToCFDictionary {
     const std::string key1 = "key_1";
     const SInt16 value1 = 10;
 
@@ -153,63 +141,53 @@
 
 #pragma mark -
 
-- (void)testFileTypeStringWithHFSTypeCodeSuccess
-{
+- (void)testFileTypeStringWithHFSTypeCodeSuccess {
     CFStringRef fileType = yas::file_type_for_hfs_type_code('abcd');
     XCTAssertEqualObjects((__bridge NSString *)fileType, @"'abcd'");
 }
 
-- (void)testFileTypeStringWithHFSTypeCodeZeroSuccess
-{
+- (void)testFileTypeStringWithHFSTypeCodeZeroSuccess {
     OSType fcc = 0;
     CFStringRef fileType = yas::file_type_for_hfs_type_code(fcc);
     XCTAssertEqualObjects((__bridge NSString *)fileType, @"''");
 }
 
-- (void)testHFSTypeCodeSuccess
-{
+- (void)testHFSTypeCodeSuccess {
     OSType fcc = yas::hfs_type_code_from_file_type(CFSTR("'abcd'"));
     XCTAssertEqual(fcc, 'abcd');
 }
 
-- (void)testHFSTypeCodeIncludeQuoteSuccess
-{
+- (void)testHFSTypeCodeIncludeQuoteSuccess {
     OSType fcc = yas::hfs_type_code_from_file_type(CFSTR("'ab'c'"));
     XCTAssertEqual(fcc, 'ab\'c');
 }
 
-- (void)testHFSTypeCodeNoQuotesFail
-{
+- (void)testHFSTypeCodeNoQuotesFail {
     OSType fcc = yas::hfs_type_code_from_file_type(CFSTR("abcd"));
     XCTAssertEqual(fcc, 0);
 }
 
-- (void)testHFSTypeCodeGapQuotesFail
-{
+- (void)testHFSTypeCodeGapQuotesFail {
     OSType fcc = yas::hfs_type_code_from_file_type(CFSTR("'abc'd"));
     XCTAssertEqual(fcc, 0);
 }
 
-- (void)testHFSTypeCodeShortCharacterFail
-{
+- (void)testHFSTypeCodeShortCharacterFail {
     OSType fcc = yas::hfs_type_code_from_file_type(CFSTR("'abc'"));
     XCTAssertEqual(fcc, 0);
 }
 
-- (void)testHFSTypeCodeLongCharacterFail
-{
+- (void)testHFSTypeCodeLongCharacterFail {
     OSType fcc = yas::hfs_type_code_from_file_type(CFSTR("'abcde'"));
     XCTAssertEqual(fcc, 0);
 }
 
-- (void)testHFSTypeCodeJapaneseFail
-{
+- (void)testHFSTypeCodeJapaneseFail {
     OSType fcc = yas::hfs_type_code_from_file_type(CFSTR("'あいうえ'"));
     XCTAssertEqual(fcc, 0);
 }
 
-- (void)testHFSTypeCodeEmojiFail
-{
+- (void)testHFSTypeCodeEmojiFail {
     OSType fcc = yas::hfs_type_code_from_file_type(CFSTR("'😊😓💦😱'"));
     XCTAssertEqual(fcc, 0);
 }

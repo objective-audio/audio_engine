@@ -11,18 +11,15 @@
 
 @implementation yas_audio_graph_tests
 
-- (void)setUp
-{
+- (void)setUp {
     [super setUp];
 }
 
-- (void)tearDown
-{
+- (void)tearDown {
     [super tearDown];
 }
 
-- (void)testRunning
-{
+- (void)testRunning {
     yas::audio::graph graph;
 
     graph.start();
@@ -34,8 +31,7 @@
     XCTAssertFalse(graph.is_running());
 }
 
-- (void)testIORendering
-{
+- (void)testIORendering {
     const Float64 output_sample_rate = 48000;
     const Float64 mixer_sample_rate = 44100;
     const UInt32 channels = 2;

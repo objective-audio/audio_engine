@@ -12,18 +12,15 @@
 
 @implementation yas_operation_tests
 
-- (void)setUp
-{
+- (void)setUp {
     [super setUp];
 }
 
-- (void)tearDown
-{
+- (void)tearDown {
     [super tearDown];
 }
 
-- (void)test_call_one_operation
-{
+- (void)test_call_one_operation {
     XCTestExpectation *exe_ex = [self expectationWithDescription:@"call execution"];
 
     yas::operation_queue queue;
@@ -33,8 +30,7 @@
     [self waitForExpectationsWithTimeout:1.0 handler:nil];
 }
 
-- (void)test_call_many_operation
-{
+- (void)test_call_many_operation {
     XCTestExpectation *exe_ex = [self expectationWithDescription:@"call execution"];
 
     std::atomic<int> count;
@@ -65,8 +61,7 @@
     XCTAssertEqual(count.load(), 3);
 }
 
-- (void)test_suspend
-{
+- (void)test_suspend {
     XCTestExpectation *exe_ex = [self expectationWithDescription:@"call execution"];
 
     yas::operation_queue queue;
@@ -93,8 +88,7 @@
     XCTAssertTrue(called);
 }
 
-- (void)test_insert_to_top
-{
+- (void)test_insert_to_top {
     XCTestExpectation *exe_ex = [self expectationWithDescription:@"call execution"];
 
     std::atomic<int> count;
@@ -129,8 +123,7 @@
     XCTAssertEqual(count.load(), 3);
 }
 
-- (void)test_operation_cancel
-{
+- (void)test_operation_cancel {
     yas::operation_queue queue;
 
     queue.suspend();
@@ -150,8 +143,7 @@
     XCTAssertFalse(called);
 }
 
-- (void)test_cancel_operation_from_queue
-{
+- (void)test_cancel_operation_from_queue {
     yas::operation_queue queue;
 
     queue.suspend();
@@ -171,8 +163,7 @@
     XCTAssertFalse(called);
 }
 
-- (void)test_cancel_current_operation
-{
+- (void)test_cancel_current_operation {
     yas::operation_queue queue;
 
     queue.suspend();
@@ -203,8 +194,7 @@
     XCTAssertTrue(end_future.get());
 }
 
-- (void)test_null_created
-{
+- (void)test_null_created {
     yas::operation_queue queue{nullptr};
     yas::operation operation{nullptr};
 
@@ -212,8 +202,7 @@
     XCTAssertFalse(operation);
 }
 
-- (void)test_priority
-{
+- (void)test_priority {
     XCTestExpectation *exe_ex = [self expectationWithDescription:@"call execution"];
 
     std::atomic<int> count;

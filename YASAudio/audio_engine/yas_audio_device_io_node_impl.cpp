@@ -14,27 +14,23 @@
 
 using namespace yas;
 
-class audio::device_io_node::impl::core
-{
+class audio::device_io_node::impl::core {
    public:
     audio::device_io device_io;
 
-    core() : _device(nullptr), device_io(nullptr)
-    {
+    core() : _device(nullptr), device_io(nullptr) {
     }
 
     ~core() = default;
 
-    void set_device(const audio::device &device)
-    {
+    void set_device(const audio::device &device) {
         _device = device;
         if (device_io) {
             device_io.set_device(device);
         }
     }
 
-    audio::device device() const
-    {
+    audio::device device() const {
         return _device;
     }
 
@@ -42,29 +38,24 @@ class audio::device_io_node::impl::core
     audio::device _device;
 };
 
-audio::device_io_node::impl::impl() : node::impl(), _core(std::make_unique<core>())
-{
+audio::device_io_node::impl::impl() : node::impl(), _core(std::make_unique<core>()) {
 }
 
 audio::device_io_node::impl::~impl() = default;
 
-void audio::device_io_node::impl::prepare(const device_io_node &node, const audio::device &device)
-{
+void audio::device_io_node::impl::prepare(const device_io_node &node, const audio::device &device) {
     set_device(device ?: device::default_output_device());
 }
 
-UInt32 audio::device_io_node::impl::input_bus_count() const
-{
+UInt32 audio::device_io_node::impl::input_bus_count() const {
     return 1;
 }
 
-UInt32 audio::device_io_node::impl::output_bus_count() const
-{
+UInt32 audio::device_io_node::impl::output_bus_count() const {
     return 1;
 }
 
-void audio::device_io_node::impl::update_connections()
-{
+void audio::device_io_node::impl::update_connections() {
     auto &device_io = _core->device_io;
     if (!device_io) {
         return;
@@ -118,8 +109,7 @@ void audio::device_io_node::impl::update_connections()
     device_io.set_render_callback(render_function);
 }
 
-bool audio::device_io_node::impl::_validate_connections() const
-{
+bool audio::device_io_node::impl::_validate_connections() const {
     if (const auto &device_io = _core->device_io) {
         if (input_connections().size() > 0) {
             const auto connections = yas::lock_values(input_connections());
@@ -151,33 +141,27 @@ bool audio::device_io_node::impl::_validate_connections() const
     return true;
 }
 
-void audio::device_io_node::impl::add_device_io()
-{
+void audio::device_io_node::impl::add_device_io() {
     _core->device_io = audio::device_io{_core->device()};
 }
 
-void audio::device_io_node::impl::remove_device_io()
-{
+void audio::device_io_node::impl::remove_device_io() {
     _core->device_io = nullptr;
 }
 
-audio::device_io &audio::device_io_node::impl::device_io() const
-{
+audio::device_io &audio::device_io_node::impl::device_io() const {
     return _core->device_io;
 }
 
-void audio::device_io_node::impl::set_device(const audio::device &device)
-{
+void audio::device_io_node::impl::set_device(const audio::device &device) {
     _core->set_device(device);
 }
 
-audio::device audio::device_io_node::impl::device() const
-{
+audio::device audio::device_io_node::impl::device() const {
     return _core->device();
 }
 
-void audio::device_io_node::impl::render(pcm_buffer &buffer, const UInt32 bus_idx, const time &when)
-{
+void audio::device_io_node::impl::render(pcm_buffer &buffer, const UInt32 bus_idx, const time &when) {
     super_class::render(buffer, bus_idx, when);
 
     if (const auto &device_io = _core->device_io) {

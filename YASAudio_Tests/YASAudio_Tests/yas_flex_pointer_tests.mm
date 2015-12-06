@@ -11,18 +11,15 @@
 
 @implementation yas_flex_pointer_tests
 
-- (void)setUp
-{
+- (void)setUp {
     [super setUp];
 }
 
-- (void)tearDown
-{
+- (void)tearDown {
     [super tearDown];
 }
 
-- (void)test_flex_ptr
-{
+- (void)test_flex_ptr {
     Float32 float32_value = 1.0f;
     Float64 float64_value = 2.0;
     SInt32 int32_value = 3;
@@ -73,8 +70,7 @@
     XCTAssertEqual(*u8_ptr.u8, 17);
 }
 
-- (void)test_copy
-{
+- (void)test_copy {
     Float32 value = 20.0f;
 
     yas::flex_ptr flex_ptr(&value);
