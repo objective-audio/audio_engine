@@ -18,8 +18,8 @@ using namespace yas;
 class audio::file::impl
 {
    public:
-    audio::format file_format;
-    audio::format processing_format;
+    format file_format;
+    format processing_format;
     SInt64 file_frame_position;
     ExtAudioFileRef ext_audio_file;
 
@@ -84,10 +84,9 @@ class audio::file::impl
             return false;
         }
 
-        file_format = audio::format(asbd);
+        file_format = format{asbd};
 
-        processing_format =
-            audio::format(file_format.sample_rate(), file_format.channel_count(), pcm_format, interleaved);
+        processing_format = format{file_format.sample_rate(), file_format.channel_count(), pcm_format, interleaved};
 
         if (!ext_audio_file_utils::set_client_format(processing_format.stream_description(), ext_audio_file)) {
             close();
@@ -99,7 +98,7 @@ class audio::file::impl
 
     bool create(const CFDictionaryRef &settings, const pcm_format pcm_format, const bool interleaved)
     {
-        file_format = audio::format(settings);
+        file_format = format{settings};
 
         AudioFileTypeID file_type_id = to_audio_file_type_id(file_type());
         if (!file_type_id) {
@@ -111,8 +110,7 @@ class audio::file::impl
             return false;
         }
 
-        processing_format =
-            audio::format(file_format.sample_rate(), file_format.channel_count(), pcm_format, interleaved);
+        processing_format = format{file_format.sample_rate(), file_format.channel_count(), pcm_format, interleaved};
 
         if (!ext_audio_file_utils::set_client_format(processing_format.stream_description(), ext_audio_file)) {
             close();
@@ -271,7 +269,7 @@ audio::file::read_result_t audio::file::read_into_buffer(audio::pcm_buffer &buff
     UInt32 out_frame_length = 0;
     UInt32 remain_frames = frame_length > 0 ?: buffer.frame_capacity();
 
-    const audio::format &format = buffer.format();
+    const auto &format = buffer.format();
     const UInt32 buffer_count = format.buffer_count();
     const UInt32 stride = format.stride();
 
