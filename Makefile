@@ -11,3 +11,6 @@ setup-coverage:
 
 send-coverage:
 	coveralls --exclude-pattern ".*Tests" --exclude-pattern ".*\.h" -e Submodules -e
+
+submodule-update:
+	git submodule update --init --recursive
