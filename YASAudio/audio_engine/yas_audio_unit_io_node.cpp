@@ -12,17 +12,20 @@
 
 namespace yas
 {
-    constexpr AudioComponentDescription audio_unit_io_node_acd = {
-        .componentType = kAudioUnitType_Output,
+    namespace audio
+    {
+        constexpr AudioComponentDescription audio_unit_io_node_acd = {
+            .componentType = kAudioUnitType_Output,
 #if TARGET_OS_IPHONE
-        .componentSubType = kAudioUnitSubType_RemoteIO,
+            .componentSubType = kAudioUnitSubType_RemoteIO,
 #elif TARGET_OS_MAC
-        .componentSubType = kAudioUnitSubType_HALOutput,
+            .componentSubType = kAudioUnitSubType_HALOutput,
 #endif
-        .componentManufacturer = kAudioUnitManufacturer_Apple,
-        .componentFlags = 0,
-        .componentFlagsMask = 0,
-    };
+            .componentManufacturer = kAudioUnitManufacturer_Apple,
+            .componentFlags = 0,
+            .componentFlagsMask = 0,
+        };
+    }
 }
 
 using namespace yas;
