@@ -58,7 +58,7 @@ namespace offline_sample {
                     if (auto node = weak_node.lock()) {
                         if (node.is_playing()) {
                             const Float64 start_phase = node.impl_ptr<impl>()->phase_on_render;
-                            const Float64 phase_per_frame = node.frequency() / sample_rate * yas::audio_math::two_pi;
+                            const Float64 phase_per_frame = node.frequency() / sample_rate * yas::audio::math::two_pi;
                             Float64 next_phase = start_phase;
                             const UInt32 frame_length = buffer.frame_length();
 
@@ -66,7 +66,7 @@ namespace offline_sample {
                                 yas::audio::frame_enumerator enumerator(buffer);
                                 const auto *flex_ptr = enumerator.pointer();
                                 while (flex_ptr->v) {
-                                    next_phase = yas::audio_math::fill_sine(flex_ptr->f32, frame_length, start_phase,
+                                    next_phase = yas::audio::math::fill_sine(flex_ptr->f32, frame_length, start_phase,
                                                                             phase_per_frame);
                                     yas_audio_frame_enumerator_move_channel(enumerator);
                                 }

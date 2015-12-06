@@ -132,7 +132,7 @@ namespace sample {
             component = AudioComponentFindNext(component, &baseAcd);
             if (component != NULL) {
                 AudioComponentDescription acd;
-                raise_if_au_error(AudioComponentGetDescription(component, &acd));
+                yas::raise_if_au_error(AudioComponentGetDescription(component, &acd));
                 _audio_units.push_back(yas::audio::unit(acd));
             } else {
                 break;
@@ -149,7 +149,7 @@ namespace sample {
             buffer.clear();
 
             const Float64 start_phase = phase;
-            const Float64 phase_per_frame = 1000.0 / buffer.format().sample_rate() * yas::audio_math::two_pi;
+            const Float64 phase_per_frame = 1000.0 / buffer.format().sample_rate() * yas::audio::math::two_pi;
             yas::audio::frame_enumerator enumerator(buffer);
             const auto *flex_ptr = enumerator.pointer();
             const UInt32 length = enumerator.frame_length();
@@ -157,7 +157,7 @@ namespace sample {
             UInt32 idx = 0;
             while (flex_ptr->v) {
                 if (idx == 0) {
-                    phase = yas::audio_math::fill_sine(flex_ptr->f32, length, start_phase, phase_per_frame);
+                    phase = yas::audio::math::fill_sine(flex_ptr->f32, length, start_phase, phase_per_frame);
                 }
                 idx++;
                 yas_audio_frame_enumerator_move_channel(enumerator);

@@ -244,13 +244,13 @@ namespace sample {
             buffer.clear();
 
             const Float64 start_phase = phase;
-            const Float64 phase_per_frame = 1000.0 / buffer.format().sample_rate() * yas::audio_math::two_pi;
+            const Float64 phase_per_frame = 1000.0 / buffer.format().sample_rate() * yas::audio::math::two_pi;
             yas::audio::frame_enumerator enumerator(buffer);
             const auto *flex_ptr = enumerator.pointer();
             const UInt32 length = enumerator.frame_length();
 
             while (flex_ptr->v) {
-                phase = yas::audio_math::fill_sine(flex_ptr->f32, length, start_phase, phase_per_frame);
+                phase = yas::audio::math::fill_sine(flex_ptr->f32, length, start_phase, phase_per_frame);
                 yas_audio_frame_enumerator_move_channel(enumerator);
             }
         };
