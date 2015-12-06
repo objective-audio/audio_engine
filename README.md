@@ -5,8 +5,9 @@ YASAudioEngine
 
 Requirements
 ==============
-iOS 8.1 or later  
-OS X 10.10 or later
+iOS 9.1 or later  
+OS X 10.11 or later
+C++14
 
 License
 ==============
