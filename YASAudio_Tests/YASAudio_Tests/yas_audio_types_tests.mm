@@ -23,14 +23,14 @@
 
 - (void)test_to_uint32_direction
 {
-    XCTAssertEqual(yas::to_uint32(yas::direction::output), 0);
-    XCTAssertEqual(yas::to_uint32(yas::direction::input), 1);
+    XCTAssertEqual(yas::to_uint32(yas::audio::direction::output), 0);
+    XCTAssertEqual(yas::to_uint32(yas::audio::direction::input), 1);
 }
 
 - (void)test_to_string_direction
 {
-    XCTAssertEqual(yas::to_string(yas::direction::output), "output");
-    XCTAssertEqual(yas::to_string(yas::direction::input), "input");
+    XCTAssertEqual(yas::to_string(yas::audio::direction::output), "output");
+    XCTAssertEqual(yas::to_string(yas::audio::direction::input), "input");
 }
 
 - (void)test_to_string_scope
@@ -48,10 +48,10 @@
 
 - (void)test_to_string_render_type
 {
-    XCTAssertEqual(yas::to_string(yas::render_type::normal), "normal");
-    XCTAssertEqual(yas::to_string(yas::render_type::notify), "notify");
-    XCTAssertEqual(yas::to_string(yas::render_type::input), "input");
-    XCTAssertEqual(yas::to_string(yas::render_type::unknown), "unknown");
+    XCTAssertEqual(yas::to_string(yas::audio::render_type::normal), "normal");
+    XCTAssertEqual(yas::to_string(yas::audio::render_type::notify), "notify");
+    XCTAssertEqual(yas::to_string(yas::audio::render_type::input), "input");
+    XCTAssertEqual(yas::to_string(yas::audio::render_type::unknown), "unknown");
 }
 
 - (void)test_to_string_audio_error

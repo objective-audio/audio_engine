@@ -5,16 +5,16 @@
 
 #pragma once
 
-class yas::audio_node::kernel : public kernel_from_node
+class yas::audio::node::kernel : public kernel_from_node
 {
    public:
     kernel();
     virtual ~kernel();
 
-    audio_connection_smap input_connections() const;
-    audio_connection_smap output_connections() const;
-    audio_connection input_connection(const UInt32 bus_idx);
-    audio_connection output_connection(const UInt32 bus_idx);
+    audio::connection_smap input_connections() const;
+    audio::connection_smap output_connections() const;
+    audio::connection input_connection(const UInt32 bus_idx);
+    audio::connection output_connection(const UInt32 bus_idx);
 
    private:
     class impl;
@@ -27,8 +27,8 @@ class yas::audio_node::kernel : public kernel_from_node
 
     // from node
 
-    void _set_input_connections(const audio_connection_wmap &) override;
-    void _set_output_connections(const audio_connection_wmap &) override;
+    void _set_input_connections(const audio::connection_wmap &) override;
+    void _set_output_connections(const audio::connection_wmap &) override;
 
 #if YAS_TEST
    public:

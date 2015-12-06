@@ -7,13 +7,13 @@
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
 
-class yas::audio_device_io_node::impl : public audio_node::impl
+class yas::audio::device_io_node::impl : public node::impl
 {
    public:
     impl();
     virtual ~impl();
 
-    void prepare(const audio_device_io_node &, const audio_device &);
+    void prepare(const device_io_node &, const audio::device &);
 
     virtual UInt32 input_bus_count() const override;
     virtual UInt32 output_bus_count() const override;
@@ -22,12 +22,12 @@ class yas::audio_device_io_node::impl : public audio_node::impl
 
     void add_device_io();
     void remove_device_io();
-    audio_device_io &device_io() const;
+    audio::device_io &device_io() const;
 
-    void set_device(const audio_device &device);
-    audio_device device() const;
+    void set_device(const audio::device &device);
+    audio::device device() const;
 
-    virtual void render(audio_pcm_buffer &buffer, const UInt32 bus_idx, const audio_time &when) override;
+    virtual void render(pcm_buffer &buffer, const UInt32 bus_idx, const time &when) override;
 
    private:
     using super_class = super_class::impl;

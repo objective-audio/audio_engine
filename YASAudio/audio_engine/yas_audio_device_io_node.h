@@ -14,40 +14,42 @@
 
 namespace yas
 {
-    class audio_device;
-    class audio_graph;
-
-    class audio_device_io_node : public audio_node, public audio_device_io_node_from_engine
+    namespace audio
     {
-        using super_class = audio_node;
+        class device;
 
-       public:
-        class impl;
+        class device_io_node : public node, public device_io_node_from_engine
+        {
+            using super_class = node;
 
-        audio_device_io_node();
-        audio_device_io_node(std::nullptr_t);
-        audio_device_io_node(const audio_device &device);
+           public:
+            class impl;
 
-        virtual ~audio_device_io_node();
+            device_io_node();
+            device_io_node(std::nullptr_t);
+            device_io_node(const audio::device &device);
 
-        void set_device(const audio_device &device);
-        audio_device device() const;
+            virtual ~device_io_node();
 
-       private:
-        // from engine
-        void _add_device_io() override;
-        void _remove_device_io() override;
-        audio_device_io &_device_io() const override;
+            void set_device(const audio::device &device);
+            audio::device device() const;
 
-       protected:
-        audio_device_io_node(const std::shared_ptr<audio_device_io_node::impl> &impl);
+           private:
+            // from engine
+            void _add_device_io() override;
+            void _remove_device_io() override;
+            audio::device_io &_device_io() const override;
+
+           protected:
+            device_io_node(const std::shared_ptr<device_io_node::impl> &impl);
 
 #if YAS_TEST
-       public:
-        class private_access;
-        friend private_access;
+           public:
+            class private_access;
+            friend private_access;
 #endif
-    };
+        };
+    }
 }
 
 #include "yas_audio_device_io_node_impl.h"

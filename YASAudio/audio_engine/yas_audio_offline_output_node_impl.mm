@@ -10,7 +10,7 @@
 
 using namespace yas;
 
-class audio_offline_output_node::impl::core
+class audio::offline_output_node::impl::core
 {
     using completion_function_map_t = std::map<UInt8, offline_completion_f>;
 
@@ -64,15 +64,15 @@ class audio_offline_output_node::impl::core
     completion_function_map_t _completion_functions;
 };
 
-audio_offline_output_node::impl::impl()
-    : super_class::impl(), _core(std::make_unique<audio_offline_output_node::impl::core>())
+audio::offline_output_node::impl::impl()
+    : super_class::impl(), _core(std::make_unique<audio::offline_output_node::impl::core>())
 {
 }
 
-audio_offline_output_node::impl::~impl() = default;
+audio::offline_output_node::impl::~impl() = default;
 
-offline_start_result_t audio_offline_output_node::impl::start(const offline_render_f &render_func,
-                                                              const offline_completion_f &completion_func)
+audio::offline_start_result_t audio::offline_output_node::impl::start(const offline_render_f &render_func,
+                                                                      const offline_completion_f &completion_func)
 {
     if (_core->queue_container) {
         return offline_start_result_t(offline_start_error_t::already_running);
@@ -85,19 +85,19 @@ offline_start_result_t audio_offline_output_node::impl::start(const offline_rend
             }
         }
 
-        yas::audio_pcm_buffer render_buffer(connection.format(), 1024);
+        yas::audio::pcm_buffer render_buffer(connection.format(), 1024);
 
         NSBlockOperation *blockOperation = [[NSBlockOperation alloc] init];
         objc::container<objc::weak> operation_container(blockOperation);
 
-        auto weak_node = to_weak(cast<audio_offline_output_node>());
+        auto weak_node = to_weak(cast<offline_output_node>());
         auto operation_lambda = [weak_node, operation_container, render_buffer, render_func, key]() mutable {
             bool cancelled = false;
             UInt32 current_sample_time = 0;
             bool stop = false;
 
             while (!stop) {
-                audio_time when(current_sample_time, render_buffer.format().sample_rate());
+                audio::time when(current_sample_time, render_buffer.format().sample_rate());
                 auto offline_node = weak_node.lock();
                 if (!offline_node) {
                     cancelled = true;
@@ -177,7 +177,7 @@ offline_start_result_t audio_offline_output_node::impl::start(const offline_rend
     return offline_start_result_t(nullptr);
 }
 
-void audio_offline_output_node::impl::stop()
+void audio::offline_output_node::impl::stop()
 {
     auto completion_functions = _core->pull_completion_functions();
 
@@ -196,23 +196,23 @@ void audio_offline_output_node::impl::stop()
     }
 }
 
-void audio_offline_output_node::impl::reset()
+void audio::offline_output_node::impl::reset()
 {
     stop();
     super_class::reset();
 }
 
-UInt32 audio_offline_output_node::impl::output_bus_count() const
+UInt32 audio::offline_output_node::impl::output_bus_count() const
 {
     return 0;
 }
 
-UInt32 audio_offline_output_node::impl::input_bus_count() const
+UInt32 audio::offline_output_node::impl::input_bus_count() const
 {
     return 1;
 }
 
-bool audio_offline_output_node::impl::is_running() const
+bool audio::offline_output_node::impl::is_running() const
 {
     return !!_core->queue_container;
 }

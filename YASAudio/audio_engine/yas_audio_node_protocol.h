@@ -9,32 +9,34 @@
 
 namespace yas
 {
-    class audio_engine;
-    class audio_graph;
-
-    class audio_node_from_engine
+    namespace audio
     {
-       public:
-        virtual ~audio_node_from_engine() = default;
+        class engine;
 
-        virtual audio_connection _input_connection(const UInt32 bus_idx) const = 0;
-        virtual audio_connection _output_connection(const UInt32 bus_idx) const = 0;
-        virtual const audio_connection_wmap &_input_connections() const = 0;
-        virtual const audio_connection_wmap &_output_connections() const = 0;
-        virtual void _add_connection(const audio_connection &connection) = 0;
-        virtual void _remove_connection(const audio_connection &connection) = 0;
-        virtual void _set_engine(const audio_engine &engine) = 0;
-        virtual audio_engine _engine() const = 0;
-        virtual void _update_kernel() = 0;
-        virtual void _update_connections() = 0;
-    };
+        class node_from_engine
+        {
+           public:
+            virtual ~node_from_engine() = default;
 
-    class audio_node_from_connection
-    {
-       public:
-        virtual ~audio_node_from_connection() = default;
+            virtual audio::connection _input_connection(const UInt32 bus_idx) const = 0;
+            virtual audio::connection _output_connection(const UInt32 bus_idx) const = 0;
+            virtual const audio::connection_wmap &_input_connections() const = 0;
+            virtual const audio::connection_wmap &_output_connections() const = 0;
+            virtual void _add_connection(const audio::connection &connection) = 0;
+            virtual void _remove_connection(const audio::connection &connection) = 0;
+            virtual void _set_engine(const audio::engine &engine) = 0;
+            virtual audio::engine _engine() const = 0;
+            virtual void _update_kernel() = 0;
+            virtual void _update_connections() = 0;
+        };
 
-        virtual void _add_connection(const audio_connection &connection) = 0;
-        virtual void _remove_connection(const audio_connection &connection) = 0;
-    };
+        class node_from_connection
+        {
+           public:
+            virtual ~node_from_connection() = default;
+
+            virtual void _add_connection(const audio::connection &connection) = 0;
+            virtual void _remove_connection(const audio::connection &connection) = 0;
+        };
+    }
 }

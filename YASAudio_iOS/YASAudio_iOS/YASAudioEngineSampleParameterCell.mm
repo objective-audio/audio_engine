@@ -15,7 +15,7 @@
 @end
 
 @implementation YASAudioEngineSampleParameterCell {
-    std::experimental::optional<yas::audio_unit_node> _node_opt;
+    std::experimental::optional<yas::audio::unit_node> _node_opt;
     UInt32 _index;
 }
 
@@ -48,7 +48,7 @@
     [self set_node:yas::nullopt index:0];
 }
 
-- (void)set_node:(const std::experimental::optional<yas::audio_unit_node> &)node_opt index:(const UInt32)index
+- (void)set_node:(const std::experimental::optional<yas::audio::unit_node> &)node_opt index:(const UInt32)index
 {
     _node_opt = node_opt;
     _index = index;

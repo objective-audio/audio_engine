@@ -13,10 +13,10 @@ namespace yas
     {
         static Float64 sample_rate = 44100.0;
 
-        class sine_node : public audio_tap_node
+        class sine_node : public audio::tap_node
         {
            public:
-            using super_class = audio_tap_node;
+            using super_class = audio::tap_node;
 
             class impl : public super_class::impl
             {
@@ -60,8 +60,8 @@ namespace yas
 
                 auto weak_node = yas::to_weak(*this);
 
-                auto render_function = [weak_node](audio_pcm_buffer &buffer, const UInt32 bus_idx,
-                                                   const audio_time &when) {
+                auto render_function = [weak_node](audio::pcm_buffer &buffer, const UInt32 bus_idx,
+                                                   const audio::time &when) {
                     buffer.clear();
 
                     if (auto node = weak_node.lock()) {
@@ -72,7 +72,7 @@ namespace yas
                             const UInt32 frame_length = buffer.frame_length();
 
                             if (frame_length > 0) {
-                                yas::audio_frame_enumerator enumerator(buffer);
+                                yas::audio::frame_enumerator enumerator(buffer);
                                 const auto *flex_ptr = enumerator.pointer();
                                 while (flex_ptr->v) {
                                     next_phase = yas::audio_math::fill_sine(flex_ptr->f32, frame_length, start_phase,
@@ -134,12 +134,12 @@ namespace yas
     namespace sample
     {
         struct offline_vc_internal {
-            yas::audio_engine play_engine;
-            yas::audio_unit_mixer_node play_mixer_node;
+            yas::audio::engine play_engine;
+            yas::audio::unit_mixer_node play_mixer_node;
             yas::offline_sample::sine_node play_sine_node;
 
-            yas::audio_engine offline_engine;
-            yas::audio_unit_mixer_node offline_mixer_node;
+            yas::audio::engine offline_engine;
+            yas::audio::unit_mixer_node offline_mixer_node;
             yas::offline_sample::sine_node offline_sine_node;
 
             yas::base engine_observer = nullptr;
@@ -148,9 +148,10 @@ namespace yas
 
             offline_vc_internal()
             {
-                auto format = yas::audio_format(yas::offline_sample::sample_rate, 2, yas::pcm_format::float32, false);
+                auto format =
+                    yas::audio::format(yas::offline_sample::sample_rate, 2, yas::audio::pcm_format::float32, false);
 
-                yas::audio_unit_output_node play_output_node;
+                yas::audio::unit_output_node play_output_node;
 
                 play_mixer_node.reset();
                 play_mixer_node.set_input_pan(0.0f, 0);
@@ -161,7 +162,7 @@ namespace yas
                 play_engine.connect(play_mixer_node, play_output_node, format);
                 play_engine.connect(play_sine_node, play_mixer_node, format);
 
-                yas::audio_offline_output_node offline_output_node;
+                yas::audio::offline_output_node offline_output_node;
 
                 offline_mixer_node.reset();
                 offline_mixer_node.set_input_pan(0.0f, 0);
@@ -173,10 +174,10 @@ namespace yas
                 offline_engine.connect(offline_sine_node, offline_mixer_node, format);
 
                 engine_observer = play_engine.subject().make_observer(
-                    yas::audio_engine_method::configuration_change,
+                    yas::audio::engine::configuration_change_key,
                     [weak_play_output_node = to_weak(play_output_node)](const auto &, const auto &) {
                         if (auto play_output_node = weak_play_output_node.lock()) {
-                            play_output_node.set_device(yas::audio_device::default_output_device());
+                            play_output_node.set_device(yas::audio::device::default_output_device());
                         }
                     });
             }
@@ -279,9 +280,9 @@ namespace yas
 
 - (void)startOfflineFileWritingWithURL:(NSURL *)url
 {
-    auto wave_settings = yas::wave_file_settings(yas::offline_sample::sample_rate, 2, 16);
-    yas::audio_file file_writer;
-    auto create_result = file_writer.create((__bridge CFURLRef)url, yas::audio_file_type::wave, wave_settings);
+    auto wave_settings = yas::audio::wave_file_settings(yas::offline_sample::sample_rate, 2, 16);
+    yas::audio::file file_writer;
+    auto create_result = file_writer.create((__bridge CFURLRef)url, yas::audio::file_type::wave, wave_settings);
 
     if (!create_result) {
         std::cout << __PRETTY_FUNCTION__ << " - error:" << yas::to_string(create_result.error()) << std::endl;
@@ -301,10 +302,10 @@ namespace yas
     UInt32 remain = self.length * yas::offline_sample::sample_rate;
 
     auto start_result = _internal.offline_engine.start_offline_render(
-        [remain, file_writer = std::move(file_writer)](yas::audio_pcm_buffer & buffer, const auto &when,
+        [remain, file_writer = std::move(file_writer)](yas::audio::pcm_buffer & buffer, const auto &when,
                                                        bool &stop) mutable {
-            auto format = yas::audio_format(buffer.format().stream_description());
-            yas::audio_pcm_buffer pcm_buffer(format, buffer.audio_buffer_list());
+            auto format = yas::audio::format(buffer.format().stream_description());
+            yas::audio::pcm_buffer pcm_buffer(format, buffer.audio_buffer_list());
             pcm_buffer.set_frame_length(buffer.frame_length());
 
             UInt32 frame_length = MIN(remain, pcm_buffer.frame_length());

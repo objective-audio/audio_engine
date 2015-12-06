@@ -13,7 +13,7 @@ using namespace yas;
 
 #if TARGET_OS_IPHONE
 
-channel_map_t yas::to_channel_map(NSArray *const channelDescriptions, const yas::direction dir)
+audio::channel_map_t yas::to_channel_map(NSArray *const channelDescriptions, const audio::direction dir)
 {
     AVAudioSession *const audioSession = [AVAudioSession sharedInstance];
     AVAudioSessionRouteDescription *const routeDesc = audioSession.currentRoute;
@@ -21,7 +21,7 @@ channel_map_t yas::to_channel_map(NSArray *const channelDescriptions, const yas:
     NSInteger channel_count = 0;
     NSArray *portDescriptions = nil;
 
-    if (dir == yas::direction::input) {
+    if (dir == audio::direction::input) {
         channel_count = audioSession.inputNumberOfChannels;
         portDescriptions = routeDesc.inputs;
     } else {
@@ -30,10 +30,10 @@ channel_map_t yas::to_channel_map(NSArray *const channelDescriptions, const yas:
     }
 
     if (channel_count == 0) {
-        return channel_map_t();
+        return audio::channel_map_t();
     }
 
-    channel_map_t map;
+    audio::channel_map_t map;
     map.reserve(channel_count);
 
     for (AVAudioSessionPortDescription *portDescription in portDescriptions) {
@@ -59,14 +59,14 @@ channel_map_t yas::to_channel_map(NSArray *const channelDescriptions, const yas:
 
 #endif
 
-AVAudioTime *yas::to_objc_object(const audio_time &time)
+AVAudioTime *yas::to_objc_object(const audio::time &time)
 {
     const AudioTimeStamp time_stamp = time.audio_time_stamp();
     return [AVAudioTime timeWithAudioTimeStamp:&time_stamp sampleRate:time.sample_rate()];
 }
 
-audio_time yas::to_audio_time(AVAudioTime *const av_time)
+audio::time yas::to_time(AVAudioTime *const av_time)
 {
     const AudioTimeStamp time_stamp = av_time.audioTimeStamp;
-    return audio_time(time_stamp, av_time.sampleRate);
+    return audio::time(time_stamp, av_time.sampleRate);
 }

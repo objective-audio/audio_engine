@@ -6,64 +6,68 @@
 #pragma once
 
 #include "yas_audio_node.h"
+#include "yas_audio_unit.h"
 #include "yas_audio_unit_node_protocol.h"
 #include <unordered_map>
 
 namespace yas
 {
-    class audio_graph;
-    class audio_unit;
-    class audio_unit_parameter;
-
-    class audio_unit_node : public audio_node, public audio_unit_node_from_engine
+    namespace audio
     {
-        using super_class = audio_node;
+        class graph;
 
-       public:
-        class impl;
+        class unit_node : public node, public unit_node_from_engine
+        {
+            using super_class = node;
 
-        audio_unit_node(std::nullptr_t);
-        audio_unit_node(const AudioComponentDescription &);
-        audio_unit_node(const OSType type, const OSType sub_type);
+           public:
+            class impl;
 
-        virtual ~audio_unit_node();
+            unit_node(std::nullptr_t);
+            unit_node(const AudioComponentDescription &);
+            unit_node(const OSType type, const OSType sub_type);
 
-        audio_unit audio_unit() const;
-        const std::unordered_map<AudioUnitScope, std::unordered_map<AudioUnitParameterID, audio_unit_parameter>>
-            &parameters() const;
-        const std::unordered_map<AudioUnitParameterID, audio_unit_parameter> &global_parameters() const;
-        const std::unordered_map<AudioUnitParameterID, audio_unit_parameter> &input_parameters() const;
-        const std::unordered_map<AudioUnitParameterID, audio_unit_parameter> &output_parameters() const;
+            virtual ~unit_node();
 
-        UInt32 input_element_count() const;
-        UInt32 output_element_count() const;
+            audio::unit audio_unit() const;
+            const std::unordered_map<AudioUnitScope, std::unordered_map<AudioUnitParameterID, audio::unit::parameter>>
+                &parameters() const;
+            const std::unordered_map<AudioUnitParameterID, audio::unit::parameter> &global_parameters() const;
+            const std::unordered_map<AudioUnitParameterID, audio::unit::parameter> &input_parameters() const;
+            const std::unordered_map<AudioUnitParameterID, audio::unit::parameter> &output_parameters() const;
 
-        void set_global_parameter_value(const AudioUnitParameterID parameter_id, const Float32 value);
-        Float32 global_parameter_value(const AudioUnitParameterID parameter_id) const;
-        void set_input_parameter_value(const AudioUnitParameterID parameter_id, const Float32 value,
-                                       const AudioUnitElement element);
-        Float32 input_parameter_value(const AudioUnitParameterID parameter_id, const AudioUnitElement element) const;
-        void set_output_parameter_value(const AudioUnitParameterID parameter_id, const Float32 value,
-                                        const AudioUnitElement element);
-        Float32 output_parameter_value(const AudioUnitParameterID parameter_id, const AudioUnitElement element) const;
+            UInt32 input_element_count() const;
+            UInt32 output_element_count() const;
 
-       protected:
-        audio_unit_node(std::shared_ptr<impl> &&, const AudioComponentDescription &);
-        explicit audio_unit_node(const std::shared_ptr<impl> &);
+            void set_global_parameter_value(const AudioUnitParameterID parameter_id, const Float32 value);
+            Float32 global_parameter_value(const AudioUnitParameterID parameter_id) const;
+            void set_input_parameter_value(const AudioUnitParameterID parameter_id, const Float32 value,
+                                           const AudioUnitElement element);
+            Float32 input_parameter_value(const AudioUnitParameterID parameter_id,
+                                          const AudioUnitElement element) const;
+            void set_output_parameter_value(const AudioUnitParameterID parameter_id, const Float32 value,
+                                            const AudioUnitElement element);
+            Float32 output_parameter_value(const AudioUnitParameterID parameter_id,
+                                           const AudioUnitElement element) const;
 
-       private:
-        // from engine
+           protected:
+            unit_node(std::shared_ptr<impl> &&, const AudioComponentDescription &);
+            explicit unit_node(const std::shared_ptr<impl> &);
 
-        void _prepare_audio_unit() override;
-        void _prepare_parameters() override;
-        void _reload_audio_unit() override;
+           private:
+            // from engine
+
+            void _prepare_audio_unit() override;
+            void _prepare_parameters() override;
+            void _reload_audio_unit() override;
 
 #if YAS_TEST
-       public:
-        class private_access;
-        friend private_access;
+           public:
+            class private_access;
+            friend private_access;
 #endif
-    };
+        };
+    }
 }
 
 #include "yas_audio_unit_node_impl.h"

@@ -12,10 +12,10 @@ UInt32 yas::test::test_value(const UInt32 frame, const UInt32 ch_idx, const UInt
     return frame + 1024 * (ch_idx + 1) + 512 * (buf_idx + 1);
 }
 
-void yas::test::fill_test_values_to_buffer(const audio_pcm_buffer &buffer)
+void yas::test::fill_test_values_to_buffer(const audio::pcm_buffer &buffer)
 {
     const auto &format = buffer.format();
-    const yas::pcm_format pcmFormat = format.pcm_format();
+    const yas::audio::pcm_format pcmFormat = format.pcm_format();
     const UInt32 buffer_count = format.buffer_count();
     const UInt32 stride = format.stride();
 
@@ -26,16 +26,16 @@ void yas::test::fill_test_values_to_buffer(const audio_pcm_buffer &buffer)
                 UInt32 index = frame * stride + ch_idx;
                 UInt32 value = test_value(frame, ch_idx, buf_idx);
                 switch (pcmFormat) {
-                    case yas::pcm_format::float32: {
+                    case yas::audio::pcm_format::float32: {
                         pointer.f32[index] = value;
                     } break;
-                    case yas::pcm_format::float64: {
+                    case yas::audio::pcm_format::float64: {
                         pointer.f64[index] = value;
                     } break;
-                    case yas::pcm_format::int16: {
+                    case yas::audio::pcm_format::int16: {
                         pointer.i16[index] = value;
                     } break;
-                    case yas::pcm_format::fixed824: {
+                    case yas::audio::pcm_format::fixed824: {
                         pointer.i32[index] = value;
                     } break;
                     default:
@@ -46,7 +46,7 @@ void yas::test::fill_test_values_to_buffer(const audio_pcm_buffer &buffer)
     }
 }
 
-bool yas::test::is_cleared_buffer(const audio_pcm_buffer &buffer)
+bool yas::test::is_cleared_buffer(const audio::pcm_buffer &buffer)
 {
     const AudioBufferList *abl = buffer.audio_buffer_list();
 
@@ -62,14 +62,14 @@ bool yas::test::is_cleared_buffer(const audio_pcm_buffer &buffer)
     return true;
 }
 
-bool yas::test::is_filled_buffer(const audio_pcm_buffer &buffer)
+bool yas::test::is_filled_buffer(const audio::pcm_buffer &buffer)
 {
     __block BOOL isFilled = YES;
     const UInt32 sample_byte_count = buffer.format().sample_byte_count();
     NSData *zeroData = [NSMutableData dataWithLength:sample_byte_count];
     const void *zeroBytes = [zeroData bytes];
 
-    audio_frame_enumerator enumerator(buffer);
+    audio::frame_enumerator enumerator(buffer);
     const flex_ptr *pointer = enumerator.pointer();
 
     while (pointer->v) {
@@ -83,7 +83,7 @@ bool yas::test::is_filled_buffer(const audio_pcm_buffer &buffer)
     return isFilled;
 }
 
-bool yas::test::is_equal_buffer_flexibly(const audio_pcm_buffer &buffer1, const audio_pcm_buffer &buffer2)
+bool yas::test::is_equal_buffer_flexibly(const audio::pcm_buffer &buffer1, const audio::pcm_buffer &buffer2)
 {
     if (buffer1.format().channel_count() != buffer2.format().channel_count()) {
         return NO;
@@ -136,28 +136,28 @@ bool test::is_equal(const AudioTimeStamp *const ts1, const AudioTimeStamp *const
     }
 }
 
-yas::flex_ptr yas::test::data_ptr_from_buffer(const audio_pcm_buffer &buffer, const UInt32 channel, const UInt32 frame)
+yas::flex_ptr yas::test::data_ptr_from_buffer(const audio::pcm_buffer &buffer, const UInt32 channel, const UInt32 frame)
 {
-    audio_frame_enumerator enumerator(buffer);
+    audio::frame_enumerator enumerator(buffer);
     enumerator.set_frame_position(frame);
     enumerator.set_channel_position(channel);
     return *enumerator.pointer();
 }
 
-void yas::test::audio_unit_render_on_sub_thread(audio_unit &unit, yas::audio_format &format, const UInt32 frame_length,
+void yas::test::audio_unit_render_on_sub_thread(audio::unit &unit, audio::format &format, const UInt32 frame_length,
                                                 const NSUInteger count, const NSTimeInterval wait)
 {
     auto lambda = [unit, format, frame_length, count, wait]() mutable {
         AudioUnitRenderActionFlags action_flags = 0;
 
-        yas::audio_pcm_buffer buffer(format, frame_length);
+        yas::audio::pcm_buffer buffer(format, frame_length);
 
         for (NSInteger i = 0; i < count; i++) {
-            yas::audio_time audio_time(frame_length * i, format.sample_rate());
-            AudioTimeStamp timeStamp = audio_time.audio_time_stamp();
+            yas::audio::time time(frame_length * i, format.sample_rate());
+            AudioTimeStamp timeStamp = time.audio_time_stamp();
 
-            yas::render_parameters parameters = {
-                .in_render_type = yas::render_type::normal,
+            audio::render_parameters parameters = {
+                .in_render_type = audio::render_type::normal,
                 .io_action_flags = &action_flags,
                 .io_time_stamp = &timeStamp,
                 .in_bus_number = 0,
@@ -176,7 +176,7 @@ void yas::test::audio_unit_render_on_sub_thread(audio_unit &unit, yas::audio_for
     }
 }
 
-class test::audio_test_node::impl : public yas::audio_node::impl
+class test::audio_test_node::impl : public yas::audio::node::impl
 {
    public:
     UInt32 input_bus_count() const override
@@ -194,7 +194,7 @@ class test::audio_test_node::impl : public yas::audio_node::impl
 };
 
 yas::test::audio_test_node::audio_test_node(const UInt32 input_bus_count, const UInt32 output_bus_count)
-    : audio_node(std::make_unique<impl>())
+    : node(std::make_unique<impl>())
 {
     set_input_bus_count(input_bus_count);
     set_output_bus_count(output_bus_count);

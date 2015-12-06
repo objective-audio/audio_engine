@@ -23,11 +23,11 @@
 
 - (void)test_add_and_remove_route
 {
-    yas::audio_route_node route_node;
+    yas::audio::route_node route_node;
 
     XCTAssertEqual(route_node.routes().size(), 0);
 
-    yas::audio_route route{0, 1, 2, 3};
+    yas::audio::route route{0, 1, 2, 3};
     route_node.add_route(route);
 
     XCTAssertEqual(route_node.routes().size(), 1);
@@ -50,7 +50,7 @@
 
 - (void)test_replace_route
 {
-    yas::audio_route_node route_node;
+    yas::audio::route_node route_node;
 
     XCTAssertEqual(route_node.routes().size(), 0);
 
@@ -58,7 +58,7 @@
 
     XCTAssertEqual(route_node.routes().size(), 1);
 
-    std::set<yas::audio_route> routes{{4, 5, 6, 7}, {8, 9, 10, 11}};
+    std::set<yas::audio::route> routes{{4, 5, 6, 7}, {8, 9, 10, 11}};
     route_node.set_routes(routes);
 
     XCTAssertEqual(route_node.routes().size(), 2);
@@ -76,12 +76,12 @@
 
 - (void)test_render
 {
-    yas::audio_engine engine;
+    yas::audio::engine engine;
 
-    auto format = yas::audio_format(44100.0, 2);
-    yas::audio_offline_output_node output_node;
-    yas::audio_route_node route_node;
-    yas::audio_tap_node tap_node;
+    auto format = yas::audio::format(44100.0, 2);
+    yas::audio::offline_output_node output_node;
+    yas::audio::route_node route_node;
+    yas::audio::tap_node tap_node;
 
     engine.connect(route_node, output_node, format);
     engine.connect(tap_node, route_node, format);
@@ -118,9 +118,9 @@
         XCTestExpectation *expectation = [self expectationWithDescription:@"second render"];
 
         XCTAssertTrue(engine.start_offline_render(
-            [self](yas::audio_pcm_buffer &buffer, const yas::audio_time &when, bool &stop) {
+            [self](yas::audio::pcm_buffer &buffer, const yas::audio::time &when, bool &stop) {
                 stop = true;
-                yas::audio_frame_enumerator enumerator(buffer);
+                yas::audio::frame_enumerator enumerator(buffer);
                 auto pointer = enumerator.pointer();
                 const UInt32 *frm_idx = enumerator.frame();
                 const UInt32 *ch_idx = enumerator.channel();
@@ -150,12 +150,12 @@
 {
     const auto src_count = 2;
 
-    yas::audio_engine engine;
+    yas::audio::engine engine;
 
-    auto dst_format = yas::audio_format(44100.0, 2);
-    auto src_format = yas::audio_format(44100.0, 1);
-    yas::audio_offline_output_node output_node;
-    yas::audio_route_node route_node;
+    auto dst_format = yas::audio::format(44100.0, 2);
+    auto src_format = yas::audio::format(44100.0, 1);
+    yas::audio::offline_output_node output_node;
+    yas::audio::route_node route_node;
 
     engine.connect(route_node, output_node, dst_format);
 
@@ -164,9 +164,9 @@
         tap_node_called = false;
     }
 
-    std::vector<yas::audio_tap_node> tap_nodes;
+    std::vector<yas::audio::tap_node> tap_nodes;
     for (UInt32 i = 0; i < src_count; ++i) {
-        tap_nodes.push_back(yas::audio_tap_node());
+        tap_nodes.push_back(yas::audio::tap_node{});
         auto &tap_node = tap_nodes.at(i);
 
         engine.connect(tap_node, route_node, 0, i, src_format);
@@ -184,9 +184,9 @@
     XCTestExpectation *expectation = [self expectationWithDescription:@"render"];
 
     XCTAssertTrue(engine.start_offline_render(
-        [self](yas::audio_pcm_buffer &buffer, const yas::audio_time &when, bool &stop) {
+        [self](yas::audio::pcm_buffer &buffer, const yas::audio::time &when, bool &stop) {
             stop = true;
-            yas::audio_frame_enumerator enumerator(buffer);
+            yas::audio::frame_enumerator enumerator(buffer);
             auto pointer = enumerator.pointer();
             const UInt32 *frm_idx = enumerator.frame();
             const UInt32 *ch_idx = enumerator.channel();
@@ -217,12 +217,12 @@
 {
     const auto src_count = 2;
 
-    yas::audio_engine engine;
+    yas::audio::engine engine;
 
-    auto dst_format = yas::audio_format(44100.0, 4);
-    auto src_format = yas::audio_format(44100.0, 2);
-    yas::audio_offline_output_node output_node;
-    yas::audio_route_node route_node;
+    auto dst_format = yas::audio::format(44100.0, 4);
+    auto src_format = yas::audio::format(44100.0, 2);
+    yas::audio::offline_output_node output_node;
+    yas::audio::route_node route_node;
 
     engine.connect(route_node, output_node, dst_format);
 
@@ -231,9 +231,9 @@
         tap_node_called = false;
     }
 
-    std::vector<yas::audio_tap_node> tap_nodes;
+    std::vector<yas::audio::tap_node> tap_nodes;
     for (UInt32 i = 0; i < src_count; ++i) {
-        tap_nodes.push_back(yas::audio_tap_node());
+        tap_nodes.push_back(yas::audio::tap_node{});
         auto &tap_node = tap_nodes.at(i);
 
         engine.connect(tap_node, route_node, 0, i, src_format);
@@ -251,9 +251,9 @@
     XCTestExpectation *expectation = [self expectationWithDescription:@"render"];
 
     XCTAssertTrue(engine.start_offline_render(
-        [self](yas::audio_pcm_buffer &buffer, const yas::audio_time &when, bool &stop) {
+        [self](yas::audio::pcm_buffer &buffer, const yas::audio::time &when, bool &stop) {
             stop = true;
-            yas::audio_frame_enumerator enumerator(buffer);
+            yas::audio::frame_enumerator enumerator(buffer);
             auto pointer = enumerator.pointer();
             const UInt32 *frm_idx = enumerator.frame();
             const UInt32 *ch_idx = enumerator.channel();

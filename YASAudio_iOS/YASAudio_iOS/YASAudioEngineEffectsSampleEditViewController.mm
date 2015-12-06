@@ -12,7 +12,7 @@
 @end
 
 @implementation YASAudioEngineEffectsSampleEditViewController {
-    std::experimental::optional<yas::audio_unit_node> _node_opt;
+    std::experimental::optional<yas::audio::unit_node> _node_opt;
 }
 
 - (void)viewDidLoad
@@ -20,7 +20,7 @@
     [super viewDidLoad];
 }
 
-- (void)set_audio_unit_node:(const yas::audio_unit_node &)node
+- (void)set_audio_unit_node:(const yas::audio::unit_node &)node
 {
     _node_opt = node;
 

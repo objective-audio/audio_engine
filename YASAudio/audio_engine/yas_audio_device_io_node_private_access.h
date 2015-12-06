@@ -10,12 +10,13 @@
 
 namespace yas
 {
-    class audio_graph;
-
-    class audio_device_io_node::private_access
+    namespace audio
     {
-       public:
-    };
+        class device_io_node::private_access
+        {
+           public:
+        };
+    }
 }
 
 #endif

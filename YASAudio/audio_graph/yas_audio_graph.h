@@ -17,36 +17,39 @@
 
 namespace yas
 {
-    class audio_graph : public base
+    namespace audio
     {
-        using super_class = base;
+        class graph : public base
+        {
+            using super_class = base;
 
-       public:
-        class impl;
+           public:
+            class impl;
 
-        audio_graph();
-        audio_graph(std::nullptr_t);
-        ~audio_graph();
+            graph();
+            graph(std::nullptr_t);
+            ~graph();
 
-        audio_graph(const audio_graph &) = default;
-        audio_graph(audio_graph &&) = default;
-        audio_graph &operator=(const audio_graph &) = default;
-        audio_graph &operator=(audio_graph &&) = default;
+            graph(const graph &) = default;
+            graph(graph &&) = default;
+            graph &operator=(const graph &) = default;
+            graph &operator=(graph &&) = default;
 
-        void add_audio_unit(audio_unit &audio_unit);
-        void remove_audio_unit(audio_unit &audio_unit);
-        void remove_all_units();
+            void add_audio_unit(unit &audio_unit);
+            void remove_audio_unit(unit &audio_unit);
+            void remove_all_units();
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
-        void add_audio_device_io(audio_device_io &audio_device_io);
-        void remove_audio_device_io(audio_device_io &audio_device_io);
+            void add_audio_device_io(audio::device_io &);
+            void remove_audio_device_io(audio::device_io &);
 #endif
 
-        void start();
-        void stop();
-        bool is_running() const;
+            void start();
+            void stop();
+            bool is_running() const;
 
-        // render thread
-        static void audio_unit_render(render_parameters &render_parameters);
-    };
+            // render thread
+            static void audio_unit_render(render_parameters &render_parameters);
+        };
+    }
 }

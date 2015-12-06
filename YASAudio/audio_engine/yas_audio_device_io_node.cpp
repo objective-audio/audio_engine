@@ -11,49 +11,48 @@
 
 using namespace yas;
 
-audio_device_io_node::audio_device_io_node() : audio_device_io_node(audio_device(nullptr))
+audio::device_io_node::device_io_node() : device_io_node(audio::device(nullptr))
 {
 }
 
-audio_device_io_node::audio_device_io_node(std::nullptr_t) : super_class(nullptr)
+audio::device_io_node::device_io_node(std::nullptr_t) : super_class(nullptr)
 {
 }
 
-audio_device_io_node::audio_device_io_node(const audio_device &device)
-    : audio_node(std::make_unique<audio_device_io_node::impl>())
+audio::device_io_node::device_io_node(const audio::device &device) : node(std::make_unique<impl>())
 {
     impl_ptr<impl>()->prepare(*this, device);
 }
 
-audio_device_io_node::audio_device_io_node(const std::shared_ptr<audio_device_io_node::impl> &impl) : super_class(impl)
+audio::device_io_node::device_io_node(const std::shared_ptr<impl> &impl) : super_class(impl)
 {
 }
 
-audio_device_io_node::~audio_device_io_node() = default;
+audio::device_io_node::~device_io_node() = default;
 
-void audio_device_io_node::set_device(const audio_device &device)
+void audio::device_io_node::set_device(const audio::device &device)
 {
     impl_ptr<impl>()->set_device(device);
 }
 
-audio_device audio_device_io_node::device() const
+audio::device audio::device_io_node::device() const
 {
     return impl_ptr<impl>()->device();
 }
 
 #pragma mark - private
 
-void audio_device_io_node::_add_device_io()
+void audio::device_io_node::_add_device_io()
 {
     impl_ptr<impl>()->add_device_io();
 }
 
-void audio_device_io_node::_remove_device_io()
+void audio::device_io_node::_remove_device_io()
 {
     impl_ptr<impl>()->remove_device_io();
 }
 
-audio_device_io &audio_device_io_node::_device_io() const
+audio::device_io &audio::device_io_node::_device_io() const
 {
     return impl_ptr<impl>()->device_io();
 }

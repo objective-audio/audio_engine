@@ -11,59 +11,62 @@
 
 namespace yas
 {
-    class audio_node::private_access
+    namespace audio
     {
-       public:
-        static audio_node create()
+        class node::private_access
         {
-            return audio_node(std::make_shared<audio_node::impl>());
-        }
+           public:
+            static node create()
+            {
+                return node(std::make_shared<node::impl>());
+            }
 
-        static audio_connection input_connection(const audio_node &node, const UInt32 bus_idx)
-        {
-            return node._input_connection(bus_idx);
-        }
+            static audio::connection input_connection(const node &node, const UInt32 bus_idx)
+            {
+                return node._input_connection(bus_idx);
+            }
 
-        static audio_connection output_connection(const audio_node &node, const UInt32 bus_idx)
-        {
-            return node._output_connection(bus_idx);
-        }
+            static audio::connection output_connection(const node &node, const UInt32 bus_idx)
+            {
+                return node._output_connection(bus_idx);
+            }
 
-        static const audio_connection_wmap &input_connections(const audio_node &node)
-        {
-            return node._input_connections();
-        }
+            static const audio::connection_wmap &input_connections(const node &node)
+            {
+                return node._input_connections();
+            }
 
-        static const audio_connection_wmap &output_connections(const audio_node &node)
-        {
-            return node._output_connections();
-        }
+            static const audio::connection_wmap &output_connections(const node &node)
+            {
+                return node._output_connections();
+            }
 
-        static void add_connection(audio_node &node, const audio_connection &connection)
-        {
-            node._add_connection(connection);
-        }
+            static void add_connection(node &node, const audio::connection &connection)
+            {
+                node._add_connection(connection);
+            }
 
-        static void remove_connection(audio_node &node, const audio_connection &connection)
-        {
-            node.impl_ptr<impl>()->remove_connection(connection);
-        }
+            static void remove_connection(node &node, const audio::connection &connection)
+            {
+                node.impl_ptr<impl>()->remove_connection(connection);
+            }
 
-        static void set_engine(audio_node &node, const audio_engine &engine)
-        {
-            node._set_engine(engine);
-        }
+            static void set_engine(node &node, const audio::engine &engine)
+            {
+                node._set_engine(engine);
+            }
 
-        static void update_kernel(audio_node &node)
-        {
-            node.impl_ptr<impl>()->update_kernel();
-        }
+            static void update_kernel(node &node)
+            {
+                node.impl_ptr<impl>()->update_kernel();
+            }
 
-        static std::shared_ptr<kernel> kernel(const audio_node &node)
-        {
-            return node.impl_ptr<impl>()->kernel_cast();
-        }
-    };
+            static std::shared_ptr<kernel> kernel(const node &node)
+            {
+                return node.impl_ptr<impl>()->kernel_cast();
+            }
+        };
+    }
 }
 
 #endif

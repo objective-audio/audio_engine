@@ -18,15 +18,15 @@
 
 using namespace yas;
 
-class audio_device_io::kernel
+class audio::device_io::kernel
 {
    public:
-    audio_pcm_buffer input_buffer;
-    audio_pcm_buffer output_buffer;
+    pcm_buffer input_buffer;
+    pcm_buffer output_buffer;
 
-    kernel(const audio_format &input_format, const audio_format &output_format, const UInt32 frame_capacity)
-        : input_buffer(input_format ? audio_pcm_buffer(input_format, frame_capacity) : nullptr),
-          output_buffer(output_format ? audio_pcm_buffer(output_format, frame_capacity) : nullptr)
+    kernel(const audio::format &input_format, const audio::format &output_format, const UInt32 frame_capacity)
+        : input_buffer(input_format ? pcm_buffer(input_format, frame_capacity) : nullptr),
+          output_buffer(output_format ? pcm_buffer(output_format, frame_capacity) : nullptr)
     {
     }
 
@@ -37,16 +37,16 @@ class audio_device_io::kernel
     }
 };
 
-class audio_device_io::impl : public base::impl
+class audio::device_io::impl : public base::impl
 {
    public:
-    weak<audio_device_io> weak_device_io;
-    audio_device device;
+    weak<device_io> weak_device_io;
+    audio::device device;
     bool is_running;
     AudioDeviceIOProcID io_proc_id;
-    audio_pcm_buffer input_buffer_on_render;
-    audio_time input_time_on_render;
-    observer<audio_device::change_info> observer;
+    pcm_buffer input_buffer_on_render;
+    audio::time input_time_on_render;
+    observer<device::change_info> observer;
 
     impl()
         : weak_device_io(),
@@ -65,20 +65,20 @@ class audio_device_io::impl : public base::impl
 
     ~impl()
     {
-        observer.remove_handler(audio_device::system_subject(), audio_device::hardware_did_change_key);
+        observer.remove_handler(device::system_subject(), device::hardware_did_change_key);
 
         uninitialize();
     }
 
-    void prepare(const audio_device_io &device_io, const audio_device dev)
+    void prepare(const device_io &device_io, const audio::device dev)
     {
         weak_device_io = to_weak(device_io);
 
         observer.add_handler(
-            audio_device::system_subject(), audio_device::hardware_did_change_key,
+            device::system_subject(), device::hardware_did_change_key,
             [weak_device_io = weak_device_io](const auto &method, const auto &infos) {
                 if (auto device_io = weak_device_io.lock()) {
-                    if (device_io.device() && !audio_device::device_for_id(device_io.device().audio_device_id())) {
+                    if (device_io.device() && !device::device_for_id(device_io.device().audio_device_id())) {
                         device_io.set_device(nullptr);
                     }
                 }
@@ -87,7 +87,7 @@ class audio_device_io::impl : public base::impl
         set_device(dev);
     }
 
-    void set_device(const audio_device &dev)
+    void set_device(const audio::device &dev)
     {
         if (device != dev) {
             bool running = is_running;
@@ -95,13 +95,13 @@ class audio_device_io::impl : public base::impl
             uninitialize();
 
             if (device) {
-                observer.remove_handler(device.subject(), audio_device::device_did_change_key);
+                observer.remove_handler(device.subject(), device::device_did_change_key);
             }
 
             device = dev;
 
             if (device) {
-                observer.add_handler(device.subject(), audio_device::device_did_change_key,
+                observer.add_handler(device.subject(), device::device_did_change_key,
                                      [weak_device_io = weak_device_io](const auto &method, const auto &infos) {
                                          if (auto device_io = weak_device_io.lock()) {
                                              device_io.impl_ptr<impl>()->update_kernel();
@@ -132,7 +132,7 @@ class audio_device_io::impl : public base::impl
             AudioBufferList *outOutputData, const AudioTimeStamp *inOutputTime)
         {
             if (outOutputData) {
-                clear(outOutputData);
+                audio::clear(outOutputData);
             }
 
             if (auto device_io = weak_device_io.lock()) {
@@ -147,7 +147,7 @@ class audio_device_io::impl : public base::impl
                             if (input_frame_length > 0) {
                                 imp->input_buffer_on_render = input_buffer;
                                 imp->input_time_on_render =
-                                    audio_time(*inInputTime, input_buffer.format().sample_rate());
+                                    audio::time(*inInputTime, input_buffer.format().sample_rate());
                             }
                         }
                     }
@@ -156,16 +156,16 @@ class audio_device_io::impl : public base::impl
                         if (auto &output_buffer = kernel->output_buffer) {
                             if (outOutputData) {
                                 const UInt32 frame_length =
-                                    yas::frame_length(outOutputData, output_buffer.format().sample_byte_count());
+                                    audio::frame_length(outOutputData, output_buffer.format().sample_byte_count());
                                 if (frame_length > 0) {
                                     output_buffer.set_frame_length(frame_length);
-                                    audio_time time(*inOutputTime, output_buffer.format().sample_rate());
+                                    audio::time time(*inOutputTime, output_buffer.format().sample_rate());
                                     render_callback(output_buffer, time);
                                     output_buffer.copy_to(outOutputData);
                                 }
                             }
                         } else if (kernel->input_buffer) {
-                            yas::audio_pcm_buffer null_buffer;
+                            pcm_buffer null_buffer;
                             render_callback(null_buffer, nullptr);
                         }
                     }
@@ -190,7 +190,7 @@ class audio_device_io::impl : public base::impl
             return;
         }
 
-        if (audio_device::is_available_device(device)) {
+        if (device::is_available_device(device)) {
             yas_raise_if_au_error(AudioDeviceDestroyIOProcID(device.audio_device_id(), io_proc_id));
         }
 
@@ -221,7 +221,7 @@ class audio_device_io::impl : public base::impl
             return;
         }
 
-        if (audio_device::is_available_device(device)) {
+        if (device::is_available_device(device)) {
             yas_raise_if_au_error(AudioDeviceStop(device.audio_device_id(), io_proc_id));
         }
     }
@@ -276,86 +276,85 @@ class audio_device_io::impl : public base::impl
             return;
         }
 
-        set_kernel(
-            std::make_shared<audio_device_io::kernel>(device.input_format(), device.output_format(), _maximum_frames));
+        set_kernel(std::make_shared<device_io::kernel>(device.input_format(), device.output_format(), _maximum_frames));
     }
 
    private:
     render_f _render_callback;
     UInt32 _maximum_frames;
-    std::shared_ptr<audio_device_io::kernel> _kernel;
+    std::shared_ptr<device_io::kernel> _kernel;
     mutable std::recursive_mutex _mutex;
 };
 
 #pragma mark -
 
-audio_device_io::audio_device_io(std::nullptr_t) : super_class(nullptr)
+audio::device_io::device_io(std::nullptr_t) : super_class(nullptr)
 {
 }
 
-audio_device_io::audio_device_io(const audio_device &device) : super_class(std::make_shared<impl>())
+audio::device_io::device_io(const audio::device &device) : super_class(std::make_shared<impl>())
 {
     impl_ptr<impl>()->prepare(*this, device);
 }
 
-audio_device_io::~audio_device_io() = default;
+audio::device_io::~device_io() = default;
 
-void audio_device_io::_initialize() const
+void audio::device_io::_initialize() const
 {
     impl_ptr<impl>()->initialize();
 }
 
-void audio_device_io::_uninitialize() const
+void audio::device_io::_uninitialize() const
 {
     impl_ptr<impl>()->uninitialize();
 }
 
-void audio_device_io::set_device(const audio_device device)
+void audio::device_io::set_device(const audio::device device)
 {
     impl_ptr<impl>()->set_device(device);
 }
 
-audio_device audio_device_io::device() const
+audio::device audio::device_io::device() const
 {
     return impl_ptr<impl>()->device;
 }
 
-bool audio_device_io::is_running() const
+bool audio::device_io::is_running() const
 {
     return impl_ptr<impl>()->is_running;
 }
 
-void audio_device_io::set_render_callback(const render_f &callback)
+void audio::device_io::set_render_callback(const render_f &callback)
 {
     impl_ptr<impl>()->set_render_callback(callback);
 }
 
-void audio_device_io::set_maximum_frames_per_slice(const UInt32 frames)
+void audio::device_io::set_maximum_frames_per_slice(const UInt32 frames)
 {
     impl_ptr<impl>()->set_maximum_frames(frames);
 }
 
-UInt32 audio_device_io::maximum_frames_per_slice() const
+UInt32 audio::device_io::maximum_frames_per_slice() const
 {
     return impl_ptr<impl>()->maximum_frames();
 }
 
-void audio_device_io::start() const
+void audio::device_io::start() const
 {
     impl_ptr<impl>()->start();
 }
 
-void audio_device_io::stop() const
+void audio::device_io::stop() const
 {
     impl_ptr<impl>()->stop();
 }
 
-const audio_pcm_buffer &audio_device_io::input_buffer_on_render() const
+const audio::pcm_buffer &audio::device_io::input_buffer_on_render() const
 {
     return impl_ptr<impl>()->input_buffer_on_render;
 }
 
-const audio_time &audio_device_io::input_time_on_render() const
+const audio::time &audio::device_io::input_time_on_render() const
 {
     return impl_ptr<impl>()->input_time_on_render;
 }

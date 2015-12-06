@@ -23,12 +23,12 @@
 
 - (void)test_render_with_lambda
 {
-    yas::audio_engine engine;
+    yas::audio::engine engine;
 
-    yas::audio_offline_output_node output_node;
-    yas::audio_tap_node to_node;
-    yas::audio_tap_node from_node;
-    const auto format = yas::audio_format(48000.0, 2);
+    yas::audio::offline_output_node output_node;
+    yas::audio::tap_node to_node;
+    yas::audio::tap_node from_node;
+    const auto format = yas::audio::format(48000.0, 2);
 
     const auto to_connection = engine.connect(to_node, output_node, format);
     const auto from_connection = engine.connect(from_node, to_node, format);
@@ -76,12 +76,12 @@
 
 - (void)test_render_without_lambda
 {
-    yas::audio_engine engine;
+    yas::audio::engine engine;
 
-    yas::audio_offline_output_node output_node;
-    yas::audio_tap_node to_node;
-    yas::audio_tap_node from_node;
-    const auto format = yas::audio_format(48000.0, 2);
+    yas::audio::offline_output_node output_node;
+    yas::audio::tap_node to_node;
+    yas::audio::tap_node from_node;
+    const auto format = yas::audio::format(48000.0, 2);
 
     const auto to_connection = engine.connect(to_node, output_node, format);
     const auto from_connection = engine.connect(from_node, to_node, format);
@@ -101,7 +101,7 @@
 
 - (void)test_bus_count
 {
-    yas::audio_tap_node node;
+    yas::audio::tap_node node;
 
     XCTAssertEqual(node.input_bus_count(), 1);
     XCTAssertEqual(node.output_bus_count(), 1);

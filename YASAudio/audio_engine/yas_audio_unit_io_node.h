@@ -10,65 +10,67 @@
 
 namespace yas
 {
+    namespace audio
+    {
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
-    class audio_device;
+        class device;
+#endif
+        class unit_io_node : public unit_node
+        {
+            using super_class = unit_node;
+
+           public:
+            unit_io_node();
+            unit_io_node(std::nullptr_t);
+
+            virtual ~unit_io_node();
+
+#if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
+            void set_device(const audio::device &device);
+            audio::device device() const;
 #endif
 
-    class audio_unit_io_node : public audio_unit_node
-    {
-        using super_class = audio_unit_node;
+            void set_channel_map(const channel_map_t &map, const direction dir);
+            const channel_map_t &channel_map(const direction dir) const;
 
-       public:
-        audio_unit_io_node();
-        audio_unit_io_node(std::nullptr_t);
+            Float64 device_sample_rate() const;
+            UInt32 output_device_channel_count() const;
+            UInt32 input_device_channel_count() const;
 
-        virtual ~audio_unit_io_node();
+           protected:
+            class impl;
 
-#if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
-        void set_device(const audio_device &device);
-        audio_device device() const;
-#endif
+            unit_io_node(const std::shared_ptr<impl> &, const AudioComponentDescription &);
+        };
 
-        void set_channel_map(const channel_map_t &map, const yas::direction dir);
-        const channel_map_t &channel_map(const yas::direction dir) const;
+        class unit_output_node : public unit_io_node
+        {
+            using super_class = unit_io_node;
 
-        Float64 device_sample_rate() const;
-        UInt32 output_device_channel_count() const;
-        UInt32 input_device_channel_count() const;
+           public:
+            class impl;
 
-       protected:
-        class impl;
+            unit_output_node();
+            unit_output_node(std::nullptr_t);
 
-        audio_unit_io_node(const std::shared_ptr<impl> &, const AudioComponentDescription &);
-    };
+            void set_channel_map(const channel_map_t &map);
+            const channel_map_t &channel_map() const;
+        };
 
-    class audio_unit_output_node : public audio_unit_io_node
-    {
-        using super_class = audio_unit_io_node;
+        class unit_input_node : public unit_io_node
+        {
+            using super_class = unit_io_node;
 
-       public:
-        class impl;
+           public:
+            class impl;
 
-        audio_unit_output_node();
-        audio_unit_output_node(std::nullptr_t);
+            unit_input_node();
+            unit_input_node(std::nullptr_t);
 
-        void set_channel_map(const channel_map_t &map);
-        const channel_map_t &channel_map() const;
-    };
-
-    class audio_unit_input_node : public audio_unit_io_node
-    {
-        using super_class = audio_unit_io_node;
-
-       public:
-        class impl;
-
-        audio_unit_input_node();
-        audio_unit_input_node(std::nullptr_t);
-
-        void set_channel_map(const channel_map_t &map);
-        const channel_map_t &channel_map() const;
-    };
+            void set_channel_map(const channel_map_t &map);
+            const channel_map_t &channel_map() const;
+        };
+    }
 }
 
 #include "yas_audio_unit_io_node_impl.h"

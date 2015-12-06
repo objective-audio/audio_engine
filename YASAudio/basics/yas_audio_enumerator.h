@@ -12,61 +12,64 @@
 
 namespace yas
 {
-    class audio_enumerator
+    namespace audio
     {
-       public:
-        audio_enumerator(const flex_ptr &pointer, const UInt32 byte_stride, const UInt32 length);
-        audio_enumerator(const audio_pcm_buffer &buffer, const UInt32 channel);
+        class enumerator
+        {
+           public:
+            enumerator(const flex_ptr &pointer, const UInt32 byte_stride, const UInt32 length);
+            enumerator(const pcm_buffer &buffer, const UInt32 channel);
 
-        const flex_ptr *pointer() const;
-        const UInt32 *index() const;
-        UInt32 length() const;
+            const flex_ptr *pointer() const;
+            const UInt32 *index() const;
+            UInt32 length() const;
 
-        void move();
-        void stop();
-        void set_position(const UInt32 index);
-        void reset();
+            void move();
+            void stop();
+            void set_position(const UInt32 index);
+            void reset();
 
-        audio_enumerator &operator++();
+            enumerator &operator++();
 
-        flex_ptr _pointer;
-        flex_ptr _top_pointer;
-        UInt32 _byte_stride;
-        UInt32 _length;
-        UInt32 _index;
-    };
+            flex_ptr _pointer;
+            flex_ptr _top_pointer;
+            UInt32 _byte_stride;
+            UInt32 _length;
+            UInt32 _index;
+        };
 
-    class audio_frame_enumerator
-    {
-       public:
-        explicit audio_frame_enumerator(const audio_pcm_buffer &buffer);
+        class frame_enumerator
+        {
+           public:
+            explicit frame_enumerator(const pcm_buffer &buffer);
 
-        const flex_ptr *pointer() const;
-        const UInt32 *frame() const;
-        const UInt32 *channel() const;
-        UInt32 frame_length() const;
-        UInt32 channel_count() const;
+            const flex_ptr *pointer() const;
+            const UInt32 *frame() const;
+            const UInt32 *channel() const;
+            UInt32 frame_length() const;
+            UInt32 channel_count() const;
 
-        void move_frame();
-        void move_channel();
-        void move();
-        void stop();
-        void set_frame_position(const UInt32 frame);
-        void set_channel_position(const UInt32 channel);
-        void reset();
+            void move_frame();
+            void move_channel();
+            void move();
+            void stop();
+            void set_frame_position(const UInt32 frame);
+            void set_channel_position(const UInt32 channel);
+            void reset();
 
-        audio_frame_enumerator &operator++();
+            frame_enumerator &operator++();
 
-        flex_ptr _pointer;
-        std::vector<flex_ptr> _pointers;
-        std::vector<flex_ptr> _top_pointers;
-        UInt32 _pointers_size;
-        UInt32 _frame_byte_stride;
-        UInt32 _frame_length;
-        UInt32 _frame;
-        UInt32 _channel;
-        UInt32 _channel_count;
-    };
+            flex_ptr _pointer;
+            std::vector<flex_ptr> _pointers;
+            std::vector<flex_ptr> _top_pointers;
+            UInt32 _pointers_size;
+            UInt32 _frame_byte_stride;
+            UInt32 _frame_length;
+            UInt32 _frame;
+            UInt32 _channel;
+            UInt32 _channel_count;
+        };
+    }
 }
 
 #define yas_audio_enumerator_move(__v)           \

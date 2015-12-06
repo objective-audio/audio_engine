@@ -16,18 +16,21 @@ using namespace yas;
 
 namespace yas
 {
-    static std::recursive_mutex _global_mutex;
-    static bool _interrupting;
-    static std::map<UInt8, weak<audio_graph>> _graphs;
+    namespace audio
+    {
+        static std::recursive_mutex _global_mutex;
+        static bool _interrupting;
+        static std::map<UInt8, weak<graph>> _graphs;
 #if TARGET_OS_IPHONE
-    static yas::objc::container<> _did_become_active_observer;
-    static yas::objc::container<> _interruption_observer;
+        static yas::objc::container<> _did_become_active_observer;
+        static yas::objc::container<> _interruption_observer;
 #endif
+    }
 }
 
 #pragma mark - impl
 
-class audio_graph::impl : public base::impl
+class audio::graph::impl : public base::impl
 {
    public:
     impl(const UInt8 key) : _running(false), _mutex(), _units(), _io_units(), _key(key){};
@@ -128,7 +131,7 @@ class audio_graph::impl : public base::impl
         }
     }
 
-    static void add_graph(const audio_graph &graph)
+    static void add_graph(const graph &graph)
     {
         std::lock_guard<std::recursive_mutex> lock(_global_mutex);
         _graphs.insert(std::make_pair(graph.impl_ptr<impl>()->key(), to_weak(graph)));
@@ -140,7 +143,7 @@ class audio_graph::impl : public base::impl
         _graphs.erase(key);
     }
 
-    static audio_graph graph_for_key(const UInt8 key)
+    static graph graph_for_key(const UInt8 key)
     {
         std::lock_guard<std::recursive_mutex> lock(_global_mutex);
         if (_graphs.count(key) > 0) {
@@ -156,30 +159,30 @@ class audio_graph::impl : public base::impl
         return min_empty_key(_units);
     }
 
-    audio_unit unit_for_key(const UInt16 key) const
+    unit unit_for_key(const UInt16 key) const
     {
         std::lock_guard<std::recursive_mutex> lock(_mutex);
         return _units.at(key);
     }
 
-    void add_unit_to_units(audio_unit &unit)
+    void add_unit_to_units(unit &unit)
     {
         if (!unit) {
             throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
         }
 
-        auto &unit_from_graph = static_cast<audio_unit_from_graph &>(unit);
+        auto &unit_for_graph = static_cast<unit_from_graph &>(unit);
 
-        if (unit_from_graph._key()) {
-            throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : audio_unit.key is not null.");
+        if (unit_for_graph._key()) {
+            throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : unit.key is not null.");
         }
 
         std::lock_guard<std::recursive_mutex> lock(_mutex);
 
         auto unit_key = next_unit_key();
         if (unit_key) {
-            unit_from_graph._set_graph_key(key());
-            unit_from_graph._set_key(*unit_key);
+            unit_for_graph._set_graph_key(key());
+            unit_for_graph._set_key(*unit_key);
             auto pair = std::make_pair(*unit_key, unit);
             _units.insert(pair);
             if (unit.is_output_unit()) {
@@ -188,46 +191,46 @@ class audio_graph::impl : public base::impl
         }
     }
 
-    void remove_unit_from_units(audio_unit &unit)
+    void remove_unit_from_units(unit &unit)
     {
         std::lock_guard<std::recursive_mutex> lock(_mutex);
 
-        auto &unit_from_graph = static_cast<audio_unit_from_graph &>(unit);
+        auto &unit_for_graph = static_cast<unit_from_graph &>(unit);
 
-        if (auto key = unit_from_graph._key()) {
+        if (auto key = unit_for_graph._key()) {
             _units.erase(*key);
             _io_units.erase(*key);
-            unit_from_graph._set_key(nullopt);
-            unit_from_graph._set_graph_key(nullopt);
+            unit_for_graph._set_key(nullopt);
+            unit_for_graph._set_graph_key(nullopt);
         }
     }
 
-    void add_audio_unit(audio_unit &unit)
+    void add_audio_unit(unit &unit)
     {
-        auto &unit_from_graph = static_cast<audio_unit_from_graph &>(unit);
+        auto &unit_for_graph = static_cast<unit_from_graph &>(unit);
 
-        if (unit_from_graph._key()) {
-            throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : audio_unit.key is already assigned.");
+        if (unit_for_graph._key()) {
+            throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : unit.key is already assigned.");
         }
 
         add_unit_to_units(unit);
 
-        unit_from_graph._initialize();
+        unit_for_graph._initialize();
 
         if (unit.is_output_unit() && _running && !is_interrupting()) {
             unit.start();
         }
     }
 
-    void remove_audio_unit(audio_unit &unit)
+    void remove_audio_unit(unit &unit)
     {
-        auto &unit_from_graph = static_cast<audio_unit_from_graph &>(unit);
+        auto &unit_for_graph = static_cast<unit_from_graph &>(unit);
 
-        if (!unit_from_graph._key()) {
-            throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : audio_unit.key is not assigned.");
+        if (!unit_for_graph._key()) {
+            throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : unit.key is not assigned.");
         }
 
-        unit_from_graph._uninitialize();
+        unit_for_graph._uninitialize();
 
         remove_unit_from_units(unit);
     }
@@ -251,8 +254,8 @@ class audio_graph::impl : public base::impl
 #endif
 
         for (auto &pair : _io_units) {
-            auto &audio_unit = pair.second;
-            audio_unit.start();
+            auto &unit = pair.second;
+            unit.start();
         }
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
         for (auto &device_io : _device_ios) {
@@ -264,8 +267,8 @@ class audio_graph::impl : public base::impl
     void stop_all_ios()
     {
         for (auto &pair : _io_units) {
-            auto &audio_unit = pair.second;
-            audio_unit.stop();
+            auto &unit = pair.second;
+            unit.stop();
         }
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
         for (auto &device_io : _device_ios) {
@@ -275,7 +278,7 @@ class audio_graph::impl : public base::impl
     }
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
-    void add_audio_device_io(audio_device_io &device_io)
+    void add_audio_device_io(device_io &device_io)
     {
         {
             std::lock_guard<std::recursive_mutex> lock(_mutex);
@@ -286,7 +289,7 @@ class audio_graph::impl : public base::impl
         }
     }
 
-    void remove_audio_device_io(audio_device_io &device_io)
+    void remove_audio_device_io(device_io &device_io)
     {
         device_io.stop();
         {
@@ -326,73 +329,73 @@ class audio_graph::impl : public base::impl
     UInt8 _key;
     bool _running;
     mutable std::recursive_mutex _mutex;
-    std::map<UInt16, audio_unit> _units;
-    std::map<UInt16, audio_unit> _io_units;
+    std::map<UInt16, unit> _units;
+    std::map<UInt16, unit> _io_units;
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
-    std::unordered_set<audio_device_io> _device_ios;
+    std::unordered_set<device_io> _device_ios;
 #endif
 };
 
 #pragma mark - main
 
-audio_graph::audio_graph() : super_class(impl::make_shared())
+audio::graph::graph() : super_class(impl::make_shared())
 {
     if (impl_ptr()) {
-        audio_graph::impl::add_graph(*this);
+        impl::add_graph(*this);
     }
 }
 
-audio_graph::audio_graph(std::nullptr_t) : super_class(nullptr)
+audio::graph::graph(std::nullptr_t) : super_class(nullptr)
 {
 }
 
-audio_graph::~audio_graph() = default;
+audio::graph::~graph() = default;
 
-void audio_graph::add_audio_unit(audio_unit &unit)
+void audio::graph::add_audio_unit(unit &unit)
 {
     impl_ptr<impl>()->add_audio_unit(unit);
 }
 
-void audio_graph::remove_audio_unit(audio_unit &unit)
+void audio::graph::remove_audio_unit(unit &unit)
 {
     impl_ptr<impl>()->remove_audio_unit(unit);
 }
 
-void audio_graph::remove_all_units()
+void audio::graph::remove_all_units()
 {
     impl_ptr<impl>()->remove_all_units();
 }
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
 
-void audio_graph::add_audio_device_io(audio_device_io &device_io)
+void audio::graph::add_audio_device_io(device_io &device_io)
 {
     impl_ptr<impl>()->add_audio_device_io(device_io);
 }
 
-void audio_graph::remove_audio_device_io(audio_device_io &device_io)
+void audio::graph::remove_audio_device_io(device_io &device_io)
 {
     impl_ptr<impl>()->remove_audio_device_io(device_io);
 }
 
 #endif
 
-void audio_graph::start()
+void audio::graph::start()
 {
     impl_ptr<impl>()->start();
 }
 
-void audio_graph::stop()
+void audio::graph::stop()
 {
     impl_ptr<impl>()->stop();
 }
 
-bool audio_graph::is_running() const
+bool audio::graph::is_running() const
 {
     return impl_ptr<impl>()->is_running();
 }
 
-void audio_graph::audio_unit_render(render_parameters &render_parameters)
+void audio::graph::audio_unit_render(render_parameters &render_parameters)
 {
     yas_raise_if_main_thread;
 

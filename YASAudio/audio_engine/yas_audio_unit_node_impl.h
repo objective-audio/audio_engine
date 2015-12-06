@@ -8,24 +8,24 @@
 
 #pragma once
 
-class yas::audio_unit_node::impl : public audio_node::impl
+class yas::audio::unit_node::impl : public node::impl
 {
-    using super_class = audio_node::impl;
+    using super_class = node::impl;
 
    public:
     impl();
     virtual ~impl();
 
-    void prepare(const audio_unit_node &node, const AudioComponentDescription &acd);
+    void prepare(const unit_node &node, const AudioComponentDescription &acd);
     virtual void reset() override;
 
-    yas::audio_unit au() const;
+    yas::audio::unit au() const;
 
-    const std::unordered_map<AudioUnitScope, std::unordered_map<AudioUnitParameterID, audio_unit_parameter>>
+    const std::unordered_map<AudioUnitScope, std::unordered_map<AudioUnitParameterID, audio::unit::parameter>>
         &parameters() const;
-    const std::unordered_map<AudioUnitParameterID, audio_unit_parameter> &global_parameters() const;
-    const std::unordered_map<AudioUnitParameterID, audio_unit_parameter> &input_parameters() const;
-    const std::unordered_map<AudioUnitParameterID, audio_unit_parameter> &output_parameters() const;
+    const std::unordered_map<AudioUnitParameterID, audio::unit::parameter> &global_parameters() const;
+    const std::unordered_map<AudioUnitParameterID, audio::unit::parameter> &input_parameters() const;
+    const std::unordered_map<AudioUnitParameterID, audio::unit::parameter> &output_parameters() const;
 
     UInt32 input_element_count() const;
     UInt32 output_element_count() const;
@@ -47,9 +47,9 @@ class yas::audio_unit_node::impl : public audio_node::impl
     virtual void prepare_parameters();  // NS_REQUIRES_SUPER
 
     void reload_audio_unit();
-    void set_graph(const audio_graph &);
+    void set_graph(const audio::graph &);
 
-    virtual void render(audio_pcm_buffer &buffer, const UInt32 bus_idx, const audio_time &when) override;
+    virtual void render(audio::pcm_buffer &buffer, const UInt32 bus_idx, const audio::time &when) override;
 
    private:
     class core;

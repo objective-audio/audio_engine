@@ -28,11 +28,11 @@ namespace yas
     namespace sample
     {
         struct effects_vc_internal {
-            yas::audio_engine engine;
-            yas::audio_unit_output_node output_node;
-            yas::audio_connection through_connection = nullptr;
-            yas::audio_tap_node tap_node;
-            yas::audio_unit_node effect_node = nullptr;
+            yas::audio::engine engine;
+            yas::audio::unit_output_node output_node;
+            yas::audio::connection through_connection = nullptr;
+            yas::audio::tap_node tap_node;
+            yas::audio::unit_node effect_node = nullptr;
 
             void replace_effect_node(const AudioComponentDescription *acd)
             {
@@ -46,10 +46,10 @@ namespace yas
                     through_connection = nullptr;
                 }
 
-                auto format = yas::audio_format([AVAudioSession sharedInstance].sampleRate, 2);
+                auto format = yas::audio::format([AVAudioSession sharedInstance].sampleRate, 2);
 
                 if (acd) {
-                    effect_node = yas::audio_unit_node(*acd);
+                    effect_node = yas::audio::unit_node(*acd);
                     engine.connect(effect_node, output_node, format);
                     engine.connect(tap_node, effect_node, format);
                 } else {
@@ -61,7 +61,7 @@ namespace yas
 }
 
 @implementation YASAudioEngineEffectsSampleViewController {
-    std::vector<yas::audio_unit> _audio_units;
+    std::vector<yas::audio::unit> _audio_units;
     std::experimental::optional<UInt32> _index;
     yas::sample::effects_vc_internal _internal;
 }
@@ -141,7 +141,7 @@ namespace yas
             if (component != NULL) {
                 AudioComponentDescription acd;
                 yas_raise_if_au_error(AudioComponentGetDescription(component, &acd));
-                _audio_units.push_back(yas::audio_unit(acd));
+                _audio_units.push_back(yas::audio::unit(acd));
             } else {
                 break;
             }
@@ -153,12 +153,12 @@ namespace yas
     Float64 phase = 0;
 
     auto tap_render_function =
-        [phase](yas::audio_pcm_buffer &buffer, const UInt32 bus_idx, const yas::audio_time &when) mutable {
+        [phase](yas::audio::pcm_buffer &buffer, const UInt32 bus_idx, const yas::audio::time &when) mutable {
             buffer.clear();
 
             const Float64 start_phase = phase;
             const Float64 phase_per_frame = 1000.0 / buffer.format().sample_rate() * yas::audio_math::two_pi;
-            yas::audio_frame_enumerator enumerator(buffer);
+            yas::audio::frame_enumerator enumerator(buffer);
             const auto *flex_ptr = enumerator.pointer();
             const UInt32 length = enumerator.frame_length();
 

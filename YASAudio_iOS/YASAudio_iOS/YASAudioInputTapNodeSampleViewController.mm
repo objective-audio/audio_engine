@@ -24,9 +24,9 @@ namespace yas
                 input_level,
             };
 
-            yas::audio_engine engine;
-            yas::audio_unit_input_node input_node;
-            yas::audio_input_tap_node input_tap_node;
+            yas::audio::engine engine;
+            yas::audio::unit_input_node input_node;
+            yas::audio::input_tap_node input_tap_node;
 
             yas::property<Float32, property_key> input_level;
 
@@ -38,12 +38,12 @@ namespace yas
             void prepare()
             {
                 const Float64 sample_rate = input_node.device_sample_rate();
-                yas::audio_format format{sample_rate, 2};
+                yas::audio::format format{sample_rate, 2};
                 engine.connect(input_node, input_tap_node, format);
 
                 input_tap_node.set_render_function([input_level = input_level, sample_rate](
-                    audio_pcm_buffer & buffer, const UInt32 bus_idx, const audio_time &when) mutable {
-                    yas::audio_frame_enumerator enumerator(buffer);
+                    audio::pcm_buffer & buffer, const UInt32 bus_idx, const audio::time &when) mutable {
+                    yas::audio::frame_enumerator enumerator(buffer);
                     const auto *flex_ptr = enumerator.pointer();
                     const int frame_length = enumerator.frame_length();
                     Float32 level = 0;
