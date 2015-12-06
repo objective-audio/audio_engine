@@ -57,12 +57,12 @@ class audio::engine::impl::core
     objc::container<> route_change_observer;
     yas::subject<engine> subject;
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
-    observer<audio::device::change_info> device_observer;
+    observer<device::change_info> device_observer;
 #endif
 
-    yas::audio::graph graph = nullptr;
+    audio::graph graph = nullptr;
     std::unordered_set<node> nodes;
-    audio::connection_set connections;
+    connection_set connections;
     audio::offline_output_node offline_output_node = nullptr;
 };
 
@@ -106,7 +106,7 @@ void audio::engine::impl::prepare(const engine &engine)
     _core->route_change_observer.set_object(route_change_observer);
 
 #elif TARGET_OS_MAC
-    _core->device_observer.add_handler(audio::device::system_subject(), audio::device::configuration_change_key,
+    _core->device_observer.add_handler(device::system_subject(), device::configuration_change_key,
                                        [weak_engine = _core->weak_engine](const auto &method, const auto &infos) {
                                            if (auto engine = weak_engine.lock()) {
                                                engine.impl_ptr<impl>()->post_configuration_change();
@@ -174,7 +174,7 @@ void audio::engine::impl::detach_node(node &node)
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : node is not attached.");
     }
 
-    disconnect_node_with_predicate([&node](const audio::connection &connection) {
+    disconnect_node_with_predicate([&node](const connection &connection) {
         return (connection.destination_node() == node || connection.source_node() == node);
     });
 
@@ -202,7 +202,7 @@ bool audio::engine::impl::prepare()
         return true;
     }
 
-    _core->graph = yas::audio::graph{};
+    _core->graph = audio::graph{};
 
     for (auto &node : _core->nodes) {
         add_node_to_graph(node);
@@ -220,7 +220,7 @@ bool audio::engine::impl::prepare()
 }
 
 audio::connection audio::engine::impl::connect(node &source_node, node &destination_node, const UInt32 source_bus_idx,
-                                               const UInt32 destination_bus_idx, const audio::format &format)
+                                               const UInt32 destination_bus_idx, const format &format)
 {
     if (!source_node || !destination_node) {
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
@@ -244,7 +244,7 @@ audio::connection audio::engine::impl::connect(node &source_node, node &destinat
         attach_node(destination_node);
     }
 
-    audio::connection_for_engine connection(source_node, source_bus_idx, destination_node, destination_bus_idx, format);
+    connection_for_engine connection(source_node, source_bus_idx, destination_node, destination_bus_idx, format);
 
     connections().insert(connection);
 
@@ -262,7 +262,7 @@ void audio::engine::impl::disconnect(audio::connection &connection)
     std::vector<node> update_nodes{connection.source_node(), connection.destination_node()};
 
     remove_connection_from_nodes(connection);
-    static_cast<audio::connection_from_engine &>(connection)._remove_nodes();
+    static_cast<connection_from_engine &>(connection)._remove_nodes();
 
     for (auto &node : update_nodes) {
         static_cast<node_from_engine &>(node)._update_connections();
@@ -279,7 +279,7 @@ void audio::engine::impl::disconnect(node &node)
     }
 }
 
-void audio::engine::impl::disconnect_node_with_predicate(std::function<bool(const audio::connection &)> predicate)
+void audio::engine::impl::disconnect_node_with_predicate(std::function<bool(const connection &)> predicate)
 {
     auto connections =
         filter(_core->connections, [&predicate](const auto &connection) { return predicate(connection); });
@@ -290,7 +290,7 @@ void audio::engine::impl::disconnect_node_with_predicate(std::function<bool(cons
         update_nodes.insert(connection.source_node());
         update_nodes.insert(connection.destination_node());
         remove_connection_from_nodes(connection);
-        static_cast<audio::connection_from_engine &>(connection)._remove_nodes();
+        static_cast<connection_from_engine &>(connection)._remove_nodes();
     }
 
     for (auto node : update_nodes) {
@@ -364,7 +364,7 @@ void audio::engine::impl::remove_node_from_graph(const node &node)
     }
 }
 
-bool audio::engine::impl::add_connection(const audio::connection &connection)
+bool audio::engine::impl::add_connection(const connection &connection)
 {
     if (!connection) {
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
@@ -385,7 +385,7 @@ bool audio::engine::impl::add_connection(const audio::connection &connection)
     return true;
 }
 
-void audio::engine::impl::remove_connection_from_nodes(const audio::connection &connection)
+void audio::engine::impl::remove_connection_from_nodes(const connection &connection)
 {
     if (!connection) {
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
@@ -431,7 +431,7 @@ audio::connection_set audio::engine::impl::output_connections_for_source_node(co
     return filter(_core->connections, [node](const auto &connection) { return connection.source_node() == node; });
 }
 
-void audio::engine::impl::set_graph(const yas::audio::graph &graph)
+void audio::engine::impl::set_graph(const audio::graph &graph)
 {
     _core->graph = graph;
 }
