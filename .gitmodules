@@ -1,0 +1,3 @@
+[submodule "YASAudio/submodules/objc_utils"]
+	path = YASAudio/submodules/objc_utils
+	url = git@github.com:objective-audio/objc_utils.git
