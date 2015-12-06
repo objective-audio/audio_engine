@@ -101,7 +101,7 @@ void audio::unit::impl::create_audio_unit(const AudioComponentDescription &acd) 
 
     AudioComponent component = AudioComponentFindNext(nullptr, &acd);
     if (!component) {
-        yas_raise_with_reason(std::string(__PRETTY_FUNCTION__) + " - Can't create audio component.");
+        raise_with_reason(std::string(__PRETTY_FUNCTION__) + " - Can't create audio component.");
         return;
     }
 
@@ -134,7 +134,7 @@ void audio::unit::impl::initialize() {
     }
 
     if (!_core->au_instance) {
-        yas_raise_with_reason(std::string(__PRETTY_FUNCTION__) + " - AudioUnit is null.");
+        raise_with_reason(std::string(__PRETTY_FUNCTION__) + " - AudioUnit is null.");
         return;
     }
 
@@ -149,7 +149,7 @@ void audio::unit::impl::uninitialize() {
     }
 
     if (!_core->au_instance) {
-        yas_raise_with_reason(std::string(__PRETTY_FUNCTION__) + " - AudioUnit is null.");
+        raise_with_reason(std::string(__PRETTY_FUNCTION__) + " - AudioUnit is null.");
         return;
     }
 
@@ -178,8 +178,8 @@ const std::string &audio::unit::impl::name() const {
 
 void audio::unit::impl::attach_render_callback(const UInt32 &bus_idx) {
     if (!graph_key || !key) {
-        yas_raise_with_reason(std::string(__PRETTY_FUNCTION__) + " - Key is not assigned. graphKey(" +
-                              std::to_string(*graph_key) + ") unitKey(" + std::to_string(*key) + ")");
+        raise_with_reason(std::string(__PRETTY_FUNCTION__) + " - Key is not assigned. graphKey(" +
+                          std::to_string(*graph_key) + ") unitKey(" + std::to_string(*key) + ")");
         return;
     }
 
@@ -202,8 +202,8 @@ void audio::unit::impl::detach_render_callback(const UInt32 &bus_idx) {
 
 void audio::unit::impl::attach_render_notify() {
     if (!graph_key || !key) {
-        yas_raise_with_reason(std::string(__PRETTY_FUNCTION__) + " - Key is not assigned. graphKey(" +
-                              std::to_string(*graph_key) + ") unitKey(" + std::to_string(*key) + ")");
+        raise_with_reason(std::string(__PRETTY_FUNCTION__) + " - Key is not assigned. graphKey(" +
+                          std::to_string(*graph_key) + ") unitKey(" + std::to_string(*key) + ")");
         return;
     }
 
@@ -218,13 +218,13 @@ void audio::unit::impl::detach_render_notify() {
 
 void audio::unit::impl::attach_input_callback() {
     if (acd().componentType != kAudioUnitType_Output) {
-        yas_raise_with_reason(std::string(__PRETTY_FUNCTION__) + " - Not output unit.");
+        raise_with_reason(std::string(__PRETTY_FUNCTION__) + " - Not output unit.");
         return;
     }
 
     if (!graph_key || !key) {
-        yas_raise_with_reason(std::string(__PRETTY_FUNCTION__) + " - Key is not assigned. graphKey(" +
-                              std::to_string(*graph_key) + ") unitKey(" + std::to_string(*key) + ")");
+        raise_with_reason(std::string(__PRETTY_FUNCTION__) + " - Key is not assigned. graphKey(" +
+                          std::to_string(*graph_key) + ") unitKey(" + std::to_string(*key) + ")");
         return;
     }
 
@@ -240,7 +240,7 @@ void audio::unit::impl::attach_input_callback() {
 
 void audio::unit::impl::detach_input_callback() {
     if (acd().componentType != kAudioUnitType_Output) {
-        yas_raise_with_reason(std::string(__PRETTY_FUNCTION__) + " - Not output unit.");
+        raise_with_reason(std::string(__PRETTY_FUNCTION__) + " - Not output unit.");
         return;
     }
 
@@ -342,7 +342,7 @@ void audio::unit::impl::set_enable_output(const bool enable_output) {
     }
 
     if (_core->initialized) {
-        yas_raise_with_reason(std::string(__PRETTY_FUNCTION__) + " - AudioUnit is initialized.");
+        raise_with_reason(std::string(__PRETTY_FUNCTION__) + " - AudioUnit is initialized.");
         return;
     }
 
@@ -369,7 +369,7 @@ void audio::unit::impl::set_enable_input(const bool enable_input) {
     }
 
     if (_core->initialized) {
-        yas_raise_with_reason(std::string(__PRETTY_FUNCTION__) + " - AudioUnit is initialized.");
+        raise_with_reason(std::string(__PRETTY_FUNCTION__) + " - AudioUnit is initialized.");
         return;
     }
 
@@ -467,7 +467,7 @@ const AudioDeviceID audio::unit::impl::current_device() const {
 
 void audio::unit::impl::start() {
     if (acd().componentType != kAudioUnitType_Output) {
-        yas_raise_with_reason(std::string(__PRETTY_FUNCTION__) + " - Not output unit.");
+        raise_with_reason(std::string(__PRETTY_FUNCTION__) + " - Not output unit.");
         return;
     }
 
@@ -478,7 +478,7 @@ void audio::unit::impl::start() {
 
 void audio::unit::impl::stop() {
     if (acd().componentType != kAudioUnitType_Output) {
-        yas_raise_with_reason(std::string(__PRETTY_FUNCTION__) + " - Not output unit.");
+        raise_with_reason(std::string(__PRETTY_FUNCTION__) + " - Not output unit.");
         return;
     }
 
@@ -517,7 +517,7 @@ const AudioUnit audio::unit::impl::audio_unit_instance() const {
 #pragma mark - render thread
 
 void audio::unit::impl::callback_render(render_parameters &render_parameters) {
-    yas_raise_if_main_thread;
+    raise_if_main_thread();
 
     render_f function = nullptr;
 
@@ -541,7 +541,7 @@ void audio::unit::impl::callback_render(render_parameters &render_parameters) {
 }
 
 audio::unit::au_result_t audio::unit::impl::audio_unit_render(render_parameters &render_parameters) {
-    yas_raise_if_main_thread;
+    raise_if_main_thread();
 
     AudioUnit au = audio_unit_instance();
     if (au) {

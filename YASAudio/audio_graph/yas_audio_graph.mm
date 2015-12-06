@@ -359,7 +359,7 @@ bool audio::graph::is_running() const {
 }
 
 void audio::graph::audio_unit_render(render_parameters &render_parameters) {
-    yas_raise_if_main_thread;
+    raise_if_main_thread();
 
     if (auto graph = impl::graph_for_key(render_parameters.render_id.graph)) {
         if (auto unit = graph.impl_ptr<impl>()->unit_for_key(render_parameters.render_id.unit)) {
