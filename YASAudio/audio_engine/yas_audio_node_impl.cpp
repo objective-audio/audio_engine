@@ -14,8 +14,8 @@ class audio::node::impl::core
 {
    public:
     weak<audio::engine> weak_engine;
-    audio::connection_wmap input_connections;
-    audio::connection_wmap output_connections;
+    connection_wmap input_connections;
+    connection_wmap output_connections;
 
     core() : weak_engine(), input_connections(), output_connections(), _kernel(nullptr), _render_time(), _mutex()
     {
@@ -40,21 +40,21 @@ class audio::node::impl::core
         return _kernel;
     }
 
-    void set_render_time(const audio::time &render_time)
+    void set_render_time(const time &render_time)
     {
         std::lock_guard<std::recursive_mutex> lock(_mutex);
         _render_time = render_time;
     }
 
-    audio::time render_time() const
+    time render_time() const
     {
         std::lock_guard<std::recursive_mutex> lock(_mutex);
         return _render_time;
     }
 
    private:
-    std::shared_ptr<audio::node::kernel> _kernel;
-    audio::time _render_time;
+    std::shared_ptr<node::kernel> _kernel;
+    time _render_time;
     mutable std::recursive_mutex _mutex;
 };
 
@@ -198,7 +198,7 @@ void audio::node::impl::set_engine(const audio::engine &engine)
     _core->weak_engine = engine;
 }
 
-void audio::node::impl::add_connection(const audio::connection &connection)
+void audio::node::impl::add_connection(const connection &connection)
 {
     if (connection.destination_node().impl_ptr<impl>()->_core == _core) {
         auto bus_idx = connection.destination_bus();
@@ -213,7 +213,7 @@ void audio::node::impl::add_connection(const audio::connection &connection)
     update_kernel();
 }
 
-void audio::node::impl::remove_connection(const audio::connection &connection)
+void audio::node::impl::remove_connection(const connection &connection)
 {
     if (auto destination_node = connection.destination_node()) {
         if (connection.destination_node().impl_ptr<impl>()->_core == _core) {
@@ -230,7 +230,7 @@ void audio::node::impl::remove_connection(const audio::connection &connection)
     update_kernel();
 }
 
-void audio::node::impl::render(audio::pcm_buffer &buffer, const UInt32 bus_idx, const audio::time &when)
+void audio::node::impl::render(pcm_buffer &buffer, const UInt32 bus_idx, const time &when)
 {
     set_render_time_on_render(when);
 }
@@ -240,7 +240,7 @@ audio::time audio::node::impl::render_time() const
     return _core->render_time();
 }
 
-void audio::node::impl::set_render_time_on_render(const audio::time &time)
+void audio::node::impl::set_render_time_on_render(const time &time)
 {
     _core->set_render_time(time);
 }
