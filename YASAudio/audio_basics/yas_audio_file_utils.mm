@@ -4,7 +4,7 @@
 //
 
 #include "yas_audio_file_utils.h"
-#include "yas_exception.h"
+#include "yas_audio_exception.h"
 
 using namespace yas;
 
@@ -79,28 +79,30 @@ CFStringRef yas::audio::to_file_type(const AudioFileTypeID fileTypeID) {
 
 #pragma mark - audio file
 
+namespace yas {
 namespace audio_file_utils {
-static Boolean open(AudioFileID *file_id, const CFURLRef url) {
-    OSStatus err = AudioFileOpenURL(url, kAudioFileReadPermission, kAudioFileWAVEType, file_id);
-    return err == noErr;
-}
+    static Boolean open(AudioFileID *file_id, const CFURLRef url) {
+        OSStatus err = AudioFileOpenURL(url, kAudioFileReadPermission, kAudioFileWAVEType, file_id);
+        return err == noErr;
+    }
 
-static Boolean close(const AudioFileID file_id) {
-    OSStatus err = AudioFileClose(file_id);
-    return err == noErr;
-}
+    static Boolean close(const AudioFileID file_id) {
+        OSStatus err = AudioFileClose(file_id);
+        return err == noErr;
+    }
 
-static AudioFileTypeID get_audio_file_type_id(const AudioFileID file_id) {
-    UInt32 fileType;
-    UInt32 size = sizeof(AudioFileTypeID);
-    yas_raise_if_au_error(AudioFileGetProperty(file_id, kAudioFilePropertyFileFormat, &size, &fileType));
-    return fileType;
-}
+    static AudioFileTypeID get_audio_file_type_id(const AudioFileID file_id) {
+        UInt32 fileType;
+        UInt32 size = sizeof(AudioFileTypeID);
+        raise_if_au_error(AudioFileGetProperty(file_id, kAudioFilePropertyFileFormat, &size, &fileType));
+        return fileType;
+    }
 
-static Boolean get_audio_file_format(AudioStreamBasicDescription *asbd, const AudioFileID file_id) {
-    UInt32 size = sizeof(AudioStreamBasicDescription);
-    OSStatus err = AudioFileGetProperty(file_id, kAudioFilePropertyDataFormat, &size, asbd);
-    return err == noErr;
+    static Boolean get_audio_file_format(AudioStreamBasicDescription *asbd, const AudioFileID file_id) {
+        UInt32 size = sizeof(AudioStreamBasicDescription);
+        OSStatus err = AudioFileGetProperty(file_id, kAudioFilePropertyDataFormat, &size, asbd);
+        return err == noErr;
+    }
 }
 }
 
@@ -142,8 +144,8 @@ Boolean audio::ext_audio_file_utils::set_client_format(const AudioStreamBasicDes
                                                        const ExtAudioFileRef ext_audio_file) {
     UInt32 size = sizeof(AudioStreamBasicDescription);
     OSStatus err = noErr;
-    yas_raise_if_au_error(
-        err = ExtAudioFileSetProperty(ext_audio_file, kExtAudioFileProperty_ClientDataFormat, size, &asbd));
+    raise_if_au_error(err =
+                          ExtAudioFileSetProperty(ext_audio_file, kExtAudioFileProperty_ClientDataFormat, size, &asbd));
     return err == noErr;
 }
 
@@ -151,23 +153,21 @@ Boolean audio::ext_audio_file_utils::get_audio_file_format(AudioStreamBasicDescr
                                                            const ExtAudioFileRef ext_audio_file) {
     UInt32 size = sizeof(AudioStreamBasicDescription);
     OSStatus err = noErr;
-    yas_raise_if_au_error(
-        err = ExtAudioFileGetProperty(ext_audio_file, kExtAudioFileProperty_FileDataFormat, &size, asbd));
+    raise_if_au_error(err = ExtAudioFileGetProperty(ext_audio_file, kExtAudioFileProperty_FileDataFormat, &size, asbd));
     return err == noErr;
 }
 
 AudioFileID audio::ext_audio_file_utils::get_audio_file_id(const ExtAudioFileRef ext_audio_file) {
     UInt32 size = sizeof(AudioFileID);
     AudioFileID file_id = 0;
-    yas_raise_if_au_error(ExtAudioFileGetProperty(ext_audio_file, kExtAudioFileProperty_AudioFile, &size, &file_id));
+    raise_if_au_error(ExtAudioFileGetProperty(ext_audio_file, kExtAudioFileProperty_AudioFile, &size, &file_id));
     return file_id;
 }
 
 SInt64 audio::ext_audio_file_utils::get_file_length_frames(const ExtAudioFileRef ext_audio_file) {
     SInt64 result = 0;
     UInt32 size = sizeof(SInt64);
-    yas_raise_if_au_error(
-        ExtAudioFileGetProperty(ext_audio_file, kExtAudioFileProperty_FileLengthFrames, &size, &result));
+    raise_if_au_error(ExtAudioFileGetProperty(ext_audio_file, kExtAudioFileProperty_FileLengthFrames, &size, &result));
     return result;
 }
 

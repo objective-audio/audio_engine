@@ -166,9 +166,8 @@ audio::unit::parameter audio::unit::create_parameter(const AudioUnitParameterID 
     UInt32 size = sizeof(AudioUnitParameterInfo);
     OSStatus err = noErr;
 
-    yas_raise_if_au_error(err = AudioUnitGetProperty(impl_ptr<impl>()->audio_unit_instance(),
-                                                     kAudioUnitProperty_ParameterInfo, scope, parameter_id, &info,
-                                                     &size));
+    raise_if_au_error(err = AudioUnitGetProperty(impl_ptr<impl>()->audio_unit_instance(),
+                                                 kAudioUnitProperty_ParameterInfo, scope, parameter_id, &info, &size));
 
     parameter parameter(info, parameter_id, scope);
 

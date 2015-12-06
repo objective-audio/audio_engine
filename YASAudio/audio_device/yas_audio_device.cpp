@@ -26,13 +26,13 @@ namespace audio {
             .mSelector = selector, .mScope = scope, .mElement = kAudioObjectPropertyElementMaster};
 
         UInt32 byte_size = 0;
-        yas_raise_if_au_error(AudioObjectGetPropertyDataSize(object_id, &address, 0, nullptr, &byte_size));
+        raise_if_au_error(AudioObjectGetPropertyDataSize(object_id, &address, 0, nullptr, &byte_size));
         UInt32 vector_size = byte_size / sizeof(T);
 
         if (vector_size > 0) {
             auto data = std::make_unique<std::vector<T>>(vector_size);
             byte_size = vector_size * sizeof(T);
-            yas_raise_if_au_error(
+            raise_if_au_error(
                 AudioObjectGetPropertyData(object_id, &address, 0, nullptr, &byte_size, data->data()));
             return data;
         }
@@ -47,7 +47,7 @@ namespace audio {
 
         CFStringRef cfString = nullptr;
         UInt32 size = sizeof(CFStringRef);
-        yas_raise_if_au_error(AudioObjectGetPropertyData(object_id, &address, 0, nullptr, &size, &cfString));
+        raise_if_au_error(AudioObjectGetPropertyData(object_id, &address, 0, nullptr, &size, &cfString));
         if (cfString) {
             return (CFStringRef)CFAutorelease(cfString);
         }
@@ -60,7 +60,7 @@ namespace audio {
         const AudioObjectPropertyAddress address = {
             .mSelector = selector, .mScope = scope, .mElement = kAudioObjectPropertyElementMaster};
 
-        yas_raise_if_au_error(
+        raise_if_au_error(
             AudioObjectAddPropertyListenerBlock(object_id, &address, dispatch_get_main_queue(),
                                                 ^(UInt32 address_count, const AudioObjectPropertyAddress *addresses) {
                                                     function(address_count, addresses);
