@@ -20,7 +20,7 @@ namespace yas
     {
         static std::recursive_mutex _global_mutex;
         static bool _interrupting;
-        static std::map<UInt8, weak<audio::graph>> _graphs;
+        static std::map<UInt8, weak<graph>> _graphs;
 #if TARGET_OS_IPHONE
         static yas::objc::container<> _did_become_active_observer;
         static yas::objc::container<> _interruption_observer;
@@ -278,7 +278,7 @@ class audio::graph::impl : public base::impl
     }
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
-    void add_audio_device_io(audio::device_io &device_io)
+    void add_audio_device_io(device_io &device_io)
     {
         {
             std::lock_guard<std::recursive_mutex> lock(_mutex);
@@ -289,7 +289,7 @@ class audio::graph::impl : public base::impl
         }
     }
 
-    void remove_audio_device_io(audio::device_io &device_io)
+    void remove_audio_device_io(device_io &device_io)
     {
         device_io.stop();
         {
@@ -332,7 +332,7 @@ class audio::graph::impl : public base::impl
     std::map<UInt16, unit> _units;
     std::map<UInt16, unit> _io_units;
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
-    std::unordered_set<audio::device_io> _device_ios;
+    std::unordered_set<device_io> _device_ios;
 #endif
 };
 
@@ -341,7 +341,7 @@ class audio::graph::impl : public base::impl
 audio::graph::graph() : super_class(impl::make_shared())
 {
     if (impl_ptr()) {
-        audio::graph::impl::add_graph(*this);
+        impl::add_graph(*this);
     }
 }
 
@@ -368,12 +368,12 @@ void audio::graph::remove_all_units()
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
 
-void audio::graph::add_audio_device_io(audio::device_io &device_io)
+void audio::graph::add_audio_device_io(device_io &device_io)
 {
     impl_ptr<impl>()->add_audio_device_io(device_io);
 }
 
-void audio::graph::remove_audio_device_io(audio::device_io &device_io)
+void audio::graph::remove_audio_device_io(device_io &device_io)
 {
     impl_ptr<impl>()->remove_audio_device_io(device_io);
 }
