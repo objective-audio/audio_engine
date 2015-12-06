@@ -5,8 +5,11 @@ branches:
     - master
 notifications:
   email: false
+git:
+  submodules: false
 before_install:
   - make setup-coverage
+  - make submodule-update
 script:
   - make test SCHEME=YASAudio_iOS_Tests SDK=iphonesimulator
   - make test SCHEME=YASAudio_iOS_NonARC_Tests SDK=iphonesimulator
