@@ -148,7 +148,8 @@ namespace yas
 
             offline_vc_internal()
             {
-                auto format = yas::audio::format(yas::offline_sample::sample_rate, 2, yas::audio::pcm_format::::float32, false);
+                auto format =
+                    yas::audio::format(yas::offline_sample::sample_rate, 2, yas::audio::pcm_format::float32, false);
 
                 yas::audio::unit_output_node play_output_node;
 

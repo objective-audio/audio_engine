@@ -44,33 +44,33 @@ namespace yas
                 mixer_node.set_input_volume(1.0, 0);
             }
 
-            yas::direction direction_for_section(const NSInteger section)
+            yas::audio::direction direction_for_section(const NSInteger section)
             {
                 if (section - YASAudioEngineIOSampleSectionChannelMapOutput) {
-                    return yas::direction::input;
+                    return yas::audio::direction::input;
                 } else {
-                    return yas::direction::output;
+                    return yas::audio::direction::output;
                 }
             }
 
-            UInt32 connection_channel_count_for_direction(const yas::direction dir)
+            UInt32 connection_channel_count_for_direction(const yas::audio::direction dir)
             {
                 switch (dir) {
-                    case yas::direction::output:
+                    case yas::audio::direction::output:
                         return MIN(io_node.output_device_channel_count(), YASAudioEngineIOSampleConnectionMaxChannels);
-                    case yas::direction::input:
+                    case yas::audio::direction::input:
                         return MIN(io_node.input_device_channel_count(), YASAudioEngineIOSampleConnectionMaxChannels);
                     default:
                         return 0;
                 }
             }
 
-            UInt32 device_channel_count_for_direction(const yas::direction dir)
+            UInt32 device_channel_count_for_direction(const yas::audio::direction dir)
             {
                 switch (dir) {
-                    case yas::direction::output:
+                    case yas::audio::direction::output:
                         return io_node.output_device_channel_count();
-                    case yas::direction::input:
+                    case yas::audio::direction::input:
                         return io_node.input_device_channel_count();
                     default:
                         return 0;
@@ -242,13 +242,13 @@ namespace yas
 {
     const Float64 sample_rate = _internal.io_node.device_sample_rate();
 
-    const auto output_channel_count = _internal.connection_channel_count_for_direction(yas::direction::output);
+    const auto output_channel_count = _internal.connection_channel_count_for_direction(yas::audio::direction::output);
     if (output_channel_count > 0) {
         auto output_format = yas::audio::format(sample_rate, output_channel_count);
         _internal.engine.connect(_internal.mixer_node, _internal.io_node, output_format);
     }
 
-    const auto input_channel_count = _internal.connection_channel_count_for_direction(yas::direction::input);
+    const auto input_channel_count = _internal.connection_channel_count_for_direction(yas::audio::direction::input);
     if (input_channel_count > 0) {
         auto input_format = yas::audio::format(sample_rate, input_channel_count);
         _internal.engine.connect(_internal.io_node, _internal.mixer_node, input_format);
@@ -335,7 +335,7 @@ namespace yas
         case YASAudioEngineIOSampleSectionChannelMapInput: {
             UITableViewCell *cell = [self _dequeueChannelMapCellWithIndexPath:indexPath];
 
-            yas::direction dir = _internal.direction_for_section(indexPath.section);
+            yas::audio::direction dir = _internal.direction_for_section(indexPath.section);
             UInt32 map_size = _internal.device_channel_count_for_direction(dir);
 
             if (indexPath.row < map_size) {
@@ -388,7 +388,7 @@ namespace yas
 
         case YASAudioEngineIOSampleSectionChannelMapOutput:
         case YASAudioEngineIOSampleSectionChannelMapInput: {
-            yas::direction dir = _internal.direction_for_section(indexPath.section);
+            yas::audio::direction dir = _internal.direction_for_section(indexPath.section);
             auto map = _internal.io_node.channel_map(dir);
             if (indexPath.row == _internal.device_channel_count_for_section(indexPath.section)) {
                 map.clear();
@@ -401,8 +401,8 @@ namespace yas
 
         case YASAudioEngineIOSampleSectionChannelRouteOutput: {
             AVAudioSessionPortDescription *port = [AVAudioSession sharedInstance].currentRoute.outputs[indexPath.row];
-            auto map = yas::to_channel_map(port.channels, yas::direction::output);
-            _internal.io_node.set_channel_map(map, yas::direction::output);
+            auto map = yas::to_channel_map(port.channels, yas::audio::direction::output);
+            _internal.io_node.set_channel_map(map, yas::audio::direction::output);
 
             [self.tableView reloadSections:[NSIndexSet indexSetWithIndex:YASAudioEngineIOSampleSectionChannelMapOutput]
                           withRowAnimation:UITableViewRowAnimationAutomatic];
@@ -410,8 +410,8 @@ namespace yas
 
         case YASAudioEngineIOSampleSectionChannelRouteInput: {
             AVAudioSessionPortDescription *port = [AVAudioSession sharedInstance].currentRoute.inputs[indexPath.row];
-            auto map = yas::to_channel_map(port.channels, yas::direction::input);
-            _internal.io_node.set_channel_map(map, yas::direction::input);
+            auto map = yas::to_channel_map(port.channels, yas::audio::direction::input);
+            _internal.io_node.set_channel_map(map, yas::audio::direction::input);
 
             [self.tableView reloadSections:[NSIndexSet indexSetWithIndex:YASAudioEngineIOSampleSectionChannelMapInput]
                           withRowAnimation:UITableViewRowAnimationAutomatic];
