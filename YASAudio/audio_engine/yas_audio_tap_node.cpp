@@ -46,7 +46,7 @@ audio::connection_smap audio::tap_node::output_connections_on_render() const
     return impl_ptr<impl>()->output_connections_on_render();
 }
 
-void audio::tap_node::render_source(audio::pcm_buffer &buffer, const UInt32 bus_idx, const audio::time &when)
+void audio::tap_node::render_source(pcm_buffer &buffer, const UInt32 bus_idx, const time &when)
 {
     impl_ptr<impl>()->render_source(buffer, bus_idx, when);
 }
