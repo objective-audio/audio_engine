@@ -20,7 +20,7 @@ audio::device::stream::property_info::property_info(const stream::property prope
 {
 }
 
-bool audio::device::stream::property_info::operator<(const stream::property_info &info) const
+bool audio::device::stream::property_info::operator<(const property_info &info) const
 {
     if (property != info.property) {
         return property < info.property;
@@ -61,7 +61,7 @@ class audio::device::stream::impl : public base::impl
     {
     }
 
-    listener_f listener(const device::stream &stream)
+    listener_f listener(const stream &stream)
     {
         auto weak_stream = to_weak(stream);
 
@@ -116,7 +116,7 @@ audio::device::stream::stream(const AudioStreamID stream_id, const AudioDeviceID
 
 audio::device::stream::~stream() = default;
 
-bool audio::device::stream::operator==(const device::stream &rhs) const
+bool audio::device::stream::operator==(const stream &rhs) const
 {
     if (impl_ptr() && rhs.impl_ptr()) {
         return stream_id() == rhs.stream_id();
@@ -124,7 +124,7 @@ bool audio::device::stream::operator==(const device::stream &rhs) const
     return false;
 }
 
-bool audio::device::stream::operator!=(const device::stream &rhs) const
+bool audio::device::stream::operator!=(const stream &rhs) const
 {
     if (impl_ptr() && rhs.impl_ptr()) {
         return stream_id() != rhs.stream_id();
