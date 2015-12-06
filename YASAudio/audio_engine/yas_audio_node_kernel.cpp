@@ -10,8 +10,8 @@ using namespace yas;
 class audio::node::kernel::impl
 {
    public:
-    audio::connection_wmap input_connections;
-    audio::connection_wmap output_connections;
+    connection_wmap input_connections;
+    connection_wmap output_connections;
 };
 
 audio::node::kernel::kernel() : _impl(std::make_unique<impl>())
@@ -46,12 +46,12 @@ audio::connection audio::node::kernel::output_connection(const UInt32 bus_idx)
     return nullptr;
 }
 
-void audio::node::kernel::_set_input_connections(const audio::connection_wmap &connections)
+void audio::node::kernel::_set_input_connections(const connection_wmap &connections)
 {
     _impl->input_connections = connections;
 }
 
-void audio::node::kernel::_set_output_connections(const audio::connection_wmap &connections)
+void audio::node::kernel::_set_output_connections(const connection_wmap &connections)
 {
     _impl->output_connections = connections;
 }
