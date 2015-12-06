@@ -46,14 +46,14 @@ UInt32 audio::tap_node::impl::output_bus_count() const
 
 std::shared_ptr<audio::node::kernel> audio::tap_node::impl::make_kernel()
 {
-    return std::shared_ptr<kernel>(new audio::tap_node::kernel());
+    return std::shared_ptr<kernel>(new kernel());
 }
 
 void audio::tap_node::impl::prepare_kernel(const std::shared_ptr<node::kernel> &kernel)
 {
     super_class::prepare_kernel(kernel);
 
-    auto tap_kernel = std::static_pointer_cast<audio::tap_node::kernel>(kernel);
+    auto tap_kernel = std::static_pointer_cast<tap_node::kernel>(kernel);
     tap_kernel->render_function = _core->render_function;
 }
 
@@ -84,11 +84,11 @@ audio::connection_smap audio::tap_node::impl::output_connections_on_render() con
     return _core->kernel_on_render->output_connections();
 }
 
-void audio::tap_node::impl::render(audio::pcm_buffer &buffer, const UInt32 bus_idx, const audio::time &when)
+void audio::tap_node::impl::render(pcm_buffer &buffer, const UInt32 bus_idx, const time &when)
 {
     super_class::render(buffer, bus_idx, when);
 
-    if (auto kernel = kernel_cast<audio::tap_node::kernel>()) {
+    if (auto kernel = kernel_cast<tap_node::kernel>()) {
         _core->kernel_on_render = kernel;
 
         auto &render_function = kernel->render_function;
@@ -103,7 +103,7 @@ void audio::tap_node::impl::render(audio::pcm_buffer &buffer, const UInt32 bus_i
     }
 }
 
-void audio::tap_node::impl::render_source(audio::pcm_buffer &buffer, const UInt32 bus_idx, const audio::time &when)
+void audio::tap_node::impl::render_source(pcm_buffer &buffer, const UInt32 bus_idx, const time &when)
 {
     if (auto connection = _core->kernel_on_render->input_connection(bus_idx)) {
         if (auto node = connection.source_node()) {
