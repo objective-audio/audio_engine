@@ -81,9 +81,8 @@ struct test_class {
     bool will_change_called = false;
 
     observer.add_handler(property.subject(), yas::property_method::will_change,
-                         [self, &will_change_called](const std::string &method, const yas::any &sender) {
+                         [self, &will_change_called](const std::string &method, const auto &property) {
                              XCTAssertEqual(method, yas::property_method::will_change);
-                             auto &property = sender.get<yas::property<bool, int>>();
                              XCTAssertEqual(property.key(), 1);
                              XCTAssertEqual(property.value(), false);
                              will_change_called = true;
@@ -92,9 +91,8 @@ struct test_class {
     bool did_change_called = false;
 
     observer.add_handler(property.subject(), yas::property_method::did_change,
-                         [self, &did_change_called](const std::string &method, const yas::any &sender) {
+                         [self, &did_change_called](const std::string &method, const auto &property) {
                              XCTAssertEqual(method, yas::property_method::did_change);
-                             auto &property = sender.get<yas::property<bool, int>>();
                              XCTAssertEqual(property.key(), 1);
                              XCTAssertEqual(property.value(), true);
                              did_change_called = true;
@@ -103,8 +101,7 @@ struct test_class {
     int wildcard_called_count = 0;
 
     observer.add_wild_card_handler(property.subject(),
-                                   [self, &wildcard_called_count](const std::string &method, const yas::any &sender) {
-                                       auto &property = sender.get<yas::property<bool, int>>();
+                                   [self, &wildcard_called_count](const std::string &method, const auto &property) {
                                        if (method == yas::property_method::will_change) {
                                            XCTAssertEqual(property.key(), 1);
                                            XCTAssertEqual(property.value(), false);

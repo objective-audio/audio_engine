@@ -39,7 +39,6 @@
 		B6E52AE91ABD3B5500D2C45A /* YASAudioEngineSampleParameterCell.mm in Sources */ = {isa = PBXBuildFile; fileRef = B6E52AE81ABD3B5500D2C45A /* YASAudioEngineSampleParameterCell.mm */; };
 		B6F5DED81C01765D000F1A90 /* yas_base.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6F5DED71C01765D000F1A90 /* yas_base.cpp */; };
 		B6F81E1A1BE6F9E90022D6BD /* YASAudioInputTapNodeSampleViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = B6F81E191BE6F9E90022D6BD /* YASAudioInputTapNodeSampleViewController.mm */; };
-		B6FF035B1BEB90AC0026777E /* yas_any.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6FF03451BEB90AC0026777E /* yas_any.cpp */; };
 		B6FF035C1BEB90AC0026777E /* yas_audio_math.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6FF03471BEB90AC0026777E /* yas_audio_math.cpp */; };
 		B6FF035D1BEB90AC0026777E /* yas_audio_types.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6FF03491BEB90AC0026777E /* yas_audio_types.cpp */; };
 		B6FF035E1BEB90AC0026777E /* yas_cf_utils.mm in Sources */ = {isa = PBXBuildFile; fileRef = B6FF034E1BEB90AC0026777E /* yas_cf_utils.mm */; };
@@ -133,9 +132,6 @@
 		B6F5DED71C01765D000F1A90 /* yas_base.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = yas_base.cpp; path = utils/yas_base.cpp; sourceTree = "<group>"; };
 		B6F81E181BE6F9E90022D6BD /* YASAudioInputTapNodeSampleViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YASAudioInputTapNodeSampleViewController.h; sourceTree = "<group>"; };
 		B6F81E191BE6F9E90022D6BD /* YASAudioInputTapNodeSampleViewController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = YASAudioInputTapNodeSampleViewController.mm; sourceTree = "<group>"; };
-		B6FF03441BEB90AC0026777E /* yas_any_private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = yas_any_private.h; path = utils/yas_any_private.h; sourceTree = "<group>"; };
-		B6FF03451BEB90AC0026777E /* yas_any.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = yas_any.cpp; path = utils/yas_any.cpp; sourceTree = "<group>"; };
-		B6FF03461BEB90AC0026777E /* yas_any.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = yas_any.h; path = utils/yas_any.h; sourceTree = "<group>"; };
 		B6FF03471BEB90AC0026777E /* yas_audio_math.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = yas_audio_math.cpp; path = utils/yas_audio_math.cpp; sourceTree = "<group>"; };
 		B6FF03481BEB90AC0026777E /* yas_audio_math.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = yas_audio_math.h; path = utils/yas_audio_math.h; sourceTree = "<group>"; };
 		B6FF03491BEB90AC0026777E /* yas_audio_types.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = yas_audio_types.cpp; path = utils/yas_audio_types.cpp; sourceTree = "<group>"; };
@@ -332,9 +328,6 @@
 		B661C4441B58A5C3005EA207 /* utils */ = {
 			isa = PBXGroup;
 			children = (
-				B6FF03441BEB90AC0026777E /* yas_any_private.h */,
-				B6FF03451BEB90AC0026777E /* yas_any.cpp */,
-				B6FF03461BEB90AC0026777E /* yas_any.h */,
 				B6FF03471BEB90AC0026777E /* yas_audio_math.cpp */,
 				B6FF03481BEB90AC0026777E /* yas_audio_math.h */,
 				B6FF03491BEB90AC0026777E /* yas_audio_types.cpp */,
@@ -611,7 +604,6 @@
 				B6FF03C91BEB90EA0026777E /* yas_audio_engine_impl.mm in Sources */,
 				B6E52AE61ABD362300D2C45A /* YASAudioEngineEffectsSampleEditViewController.mm in Sources */,
 				B61E57D01B77A07B008620ED /* YASAudioEngineIOSampleViewController.mm in Sources */,
-				B6FF035B1BEB90AC0026777E /* yas_any.cpp in Sources */,
 				B699BECA1BF4D1DB0007B597 /* yas_audio_unit_impl.mm in Sources */,
 				B6FF03D41BEB90EA0026777E /* yas_audio_unit_io_node.cpp in Sources */,
 				B60F44011C140E490028C68A /* yas_audio_pcm_buffer.cpp in Sources */,
