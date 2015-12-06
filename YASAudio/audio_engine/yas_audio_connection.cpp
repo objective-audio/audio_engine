@@ -28,7 +28,7 @@ class audio::connection::impl : public base::impl
     {
     }
 
-    void remove_connection_from_nodes(const audio::connection &connection)
+    void remove_connection_from_nodes(const connection &connection)
     {
         if (auto node = _destination_node.lock()) {
             static_cast<node_from_connection &>(node)._remove_connection(connection);
