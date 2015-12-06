@@ -9,7 +9,7 @@
 
 using namespace yas;
 
-audio::engine::engine() : super_class(std::make_shared<audio::engine::impl>())
+audio::engine::engine() : super_class(std::make_shared<impl>())
 {
     impl_ptr<impl>()->prepare(*this);
 }
@@ -48,7 +48,7 @@ audio::connection audio::engine::connect(node &source_node, node &destination_no
     return impl_ptr<impl>()->connect(source_node, destination_node, src_bus_idx, dst_bus_idx, format);
 }
 
-void audio::engine::disconnect(audio::connection &connection)
+void audio::engine::disconnect(connection &connection)
 {
     impl_ptr<impl>()->disconnect(connection);
 }
@@ -65,7 +65,7 @@ void audio::engine::disconnect_input(const node &node)
     }
 
     impl_ptr<impl>()->disconnect_node_with_predicate(
-        [node](const audio::connection &connection) { return (connection.destination_node() == node); });
+        [node](const connection &connection) { return (connection.destination_node() == node); });
 }
 
 void audio::engine::disconnect_input(const node &node, const UInt32 bus_idx)
@@ -74,7 +74,7 @@ void audio::engine::disconnect_input(const node &node, const UInt32 bus_idx)
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
     }
 
-    impl_ptr<impl>()->disconnect_node_with_predicate([node, bus_idx](const audio::connection &connection) {
+    impl_ptr<impl>()->disconnect_node_with_predicate([node, bus_idx](const auto &connection) {
         return (connection.destination_node() == node && connection.destination_bus() == bus_idx);
     });
 }
@@ -86,7 +86,7 @@ void audio::engine::disconnect_output(const node &node)
     }
 
     impl_ptr<impl>()->disconnect_node_with_predicate(
-        [node](const audio::connection &connection) { return (connection.source_node() == node); });
+        [node](const connection &connection) { return (connection.source_node() == node); });
 }
 
 void audio::engine::disconnect_output(const node &node, const UInt32 bus_idx)
@@ -95,7 +95,7 @@ void audio::engine::disconnect_output(const node &node, const UInt32 bus_idx)
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
     }
 
-    impl_ptr<impl>()->disconnect_node_with_predicate([node, bus_idx](const audio::connection &connection) {
+    impl_ptr<impl>()->disconnect_node_with_predicate([node, bus_idx](const auto &connection) {
         return (connection.source_node() == node && connection.source_bus() == bus_idx);
     });
 }
