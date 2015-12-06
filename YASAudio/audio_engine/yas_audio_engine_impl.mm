@@ -63,7 +63,7 @@ class audio::engine::impl::core
     yas::audio::graph graph = nullptr;
     std::unordered_set<audio_node> nodes;
     audio::connection_set connections;
-    audio_offline_output_node offline_output_node = nullptr;
+    audio::offline_output_node offline_output_node = nullptr;
 };
 
 audio::engine::impl::impl() : base::impl(), _core(std::make_unique<core>())
@@ -327,7 +327,7 @@ void audio::engine::impl::add_node_to_graph(const audio_node &node)
     }
 #endif
 
-    if (auto offline_output_node = node.cast<audio_offline_output_node>()) {
+    if (auto offline_output_node = node.cast<audio::offline_output_node>()) {
         if (_core->offline_output_node) {
             throw std::runtime_error(std::string(__PRETTY_FUNCTION__) + " : offline_output_node is already attached.");
         } else {
@@ -358,7 +358,7 @@ void audio::engine::impl::remove_node_from_graph(const audio_node &node)
     }
 #endif
 
-    if (auto offline_output_node = node.cast<audio_offline_output_node>()) {
+    if (auto offline_output_node = node.cast<audio::offline_output_node>()) {
         if (offline_output_node == _core->offline_output_node) {
             _core->offline_output_node = nullptr;
         }
@@ -475,7 +475,7 @@ audio::connection_set &audio::engine::impl::connections() const
     return _core->connections;
 }
 
-audio_offline_output_node &audio::engine::impl::offline_output_node() const
+audio::offline_output_node &audio::engine::impl::offline_output_node() const
 {
     return _core->offline_output_node;
 }
@@ -528,7 +528,7 @@ audio::engine::start_result_t audio::engine::impl::start_offline_render(const of
         return start_result_t(start_error_t::offline_output_not_found);
     }
 
-    auto &node_from_engine = static_cast<audio_offline_output_unit_from_engine &>(offline_output_node);
+    auto &node_from_engine = static_cast<offline_output_unit_from_engine &>(offline_output_node);
     auto result = node_from_engine._start(render_function, completion_function);
 
     if (result) {
@@ -545,7 +545,7 @@ void audio::engine::impl::stop()
     }
 
     if (auto offline_output_node = _core->offline_output_node) {
-        static_cast<audio_offline_output_unit_from_engine &>(offline_output_node)._stop();
+        static_cast<offline_output_unit_from_engine &>(offline_output_node)._stop();
     }
 }
 

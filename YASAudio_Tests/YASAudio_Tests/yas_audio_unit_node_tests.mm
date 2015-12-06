@@ -26,7 +26,7 @@
     yas::audio::engine engine;
 
     auto format = yas::audio::format(44100.0, 2);
-    yas::audio_offline_output_node output_node;
+    yas::audio::offline_output_node output_node;
     yas::audio::unit_node delay_node(kAudioUnitType_Effect, kAudioUnitSubType_Delay);
 
     const auto &parameters = delay_node.parameters();

@@ -28,7 +28,7 @@
 
     auto format = yas::audio::format(sample_rate, 2);
     yas::audio::engine engine;
-    yas::audio_offline_output_node output_node;
+    yas::audio::offline_output_node output_node;
     yas::audio::unit_node sample_delay_node(kAudioUnitType_Effect, kAudioUnitSubType_SampleDelay);
     yas::audio::tap_node tap_node;
 
@@ -116,7 +116,7 @@
 {
     const Float64 sample_rate = 48000.0;
     auto format = yas::audio::format(sample_rate, 2);
-    yas::audio_offline_output_node output_node;
+    yas::audio::offline_output_node output_node;
     yas::audio::tap_node tap_node;
 
     auto connection = yas::audio::connection::private_access::create(tap_node, 0, output_node, 0, format);
@@ -202,7 +202,7 @@
     };
 
     auto result =
-        yas::audio_offline_output_node::private_access::start(output_node, start_render_function, completion_function);
+        yas::audio::offline_output_node::private_access::start(output_node, start_render_function, completion_function);
 
     XCTAssertTrue(result);
 
@@ -214,7 +214,7 @@
 
 - (void)test_bus_count
 {
-    yas::audio_offline_output_node node;
+    yas::audio::offline_output_node node;
 
     XCTAssertEqual(node.output_bus_count(), 0);
     XCTAssertEqual(node.input_bus_count(), 1);
@@ -223,7 +223,7 @@
 - (void)test_reset_to_stop
 {
     auto format = yas::audio::format(48000.0, 2);
-    yas::audio_offline_output_node output_node;
+    yas::audio::offline_output_node output_node;
     yas::audio::tap_node tap_node;
 
     auto connection = yas::audio::connection::private_access::create(tap_node, 0, output_node, 0, format);
@@ -252,8 +252,8 @@
         }
     };
 
-    auto result =
-        yas::audio_offline_output_node::private_access::start(output_node, std::move(render_func), completion_function);
+    auto result = yas::audio::offline_output_node::private_access::start(output_node, std::move(render_func),
+                                                                         completion_function);
 
     XCTAssertTrue(result);
 
@@ -269,9 +269,9 @@
 
 - (void)test_to_string_error
 {
-    XCTAssertTrue(yas::to_string(yas::offline_start_error_t::already_running) == "already_running");
-    XCTAssertTrue(yas::to_string(yas::offline_start_error_t::prepare_failure) == "prepare_failure");
-    XCTAssertTrue(yas::to_string(yas::offline_start_error_t::connection_not_found) == "connection_not_found");
+    XCTAssertTrue(yas::to_string(yas::audio::offline_start_error_t::already_running) == "already_running");
+    XCTAssertTrue(yas::to_string(yas::audio::offline_start_error_t::prepare_failure) == "prepare_failure");
+    XCTAssertTrue(yas::to_string(yas::audio::offline_start_error_t::connection_not_found) == "connection_not_found");
 }
 
 @end

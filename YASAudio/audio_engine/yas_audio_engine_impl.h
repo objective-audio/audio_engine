@@ -58,7 +58,7 @@ class yas::audio::engine::impl : public yas::base::impl
 
     std::unordered_set<audio_node> &nodes() const;
     audio::connection_set &connections() const;
-    audio_offline_output_node &offline_output_node() const;
+    audio::offline_output_node &offline_output_node() const;
 
     engine::start_result_t start_render();
     engine::start_result_t start_offline_render(const offline_render_f &, const offline_completion_f &);

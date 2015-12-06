@@ -25,7 +25,7 @@
 {
     yas::audio::engine engine;
 
-    yas::audio_offline_output_node output_node;
+    yas::audio::offline_output_node output_node;
     yas::audio::tap_node to_node;
     yas::audio::tap_node from_node;
     const auto format = yas::audio::format(48000.0, 2);
@@ -78,7 +78,7 @@
 {
     yas::audio::engine engine;
 
-    yas::audio_offline_output_node output_node;
+    yas::audio::offline_output_node output_node;
     yas::audio::tap_node to_node;
     yas::audio::tap_node from_node;
     const auto format = yas::audio::format(48000.0, 2);

@@ -14,11 +14,10 @@
 
 namespace yas
 {
-    class audio_offline_output_node;
-
     namespace audio
     {
         class graph;
+        class offline_output_node;
 
         class engine : public base
         {

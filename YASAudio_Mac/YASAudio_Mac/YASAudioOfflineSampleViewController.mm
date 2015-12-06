@@ -161,7 +161,7 @@ namespace yas
                 play_engine.connect(play_mixer_node, play_output_node, format);
                 play_engine.connect(play_sine_node, play_mixer_node, format);
 
-                yas::audio_offline_output_node offline_output_node;
+                yas::audio::offline_output_node offline_output_node;
 
                 offline_mixer_node.reset();
                 offline_mixer_node.set_input_pan(0.0f, 0);
