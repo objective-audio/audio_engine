@@ -8,6 +8,6 @@
 
 @interface YASAudioSliderCell : UITableViewCell
 
-@property (nonatomic, YASWeakForProperty) IBOutlet UISlider *slider;
+@property (nonatomic, yas_weak_for_property) IBOutlet UISlider *slider;
 
 @end

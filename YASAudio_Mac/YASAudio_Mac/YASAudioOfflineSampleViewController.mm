@@ -177,7 +177,7 @@ namespace sample {
         _internal.self_container.set_object(nil);
     }
 
-    YASSuperDealloc;
+    yas_super_dealloc();
 }
 
 - (void)viewDidLoad {

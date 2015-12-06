@@ -161,8 +161,8 @@ audio::offline_start_result_t audio::offline_output_node::impl::start(const offl
 
         [queue addOperation:blockOperation];
 
-        YASRelease(blockOperation);
-        YASRelease(queue);
+        yas_release(blockOperation);
+        yas_release(queue);
     } else {
         return offline_start_result_t(offline_start_error_t::connection_not_found);
     }

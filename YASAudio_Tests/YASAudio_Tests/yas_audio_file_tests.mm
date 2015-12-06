@@ -313,7 +313,7 @@ namespace test {
 
     [fileManager createDirectoryAtPath:path withIntermediateDirectories:YES attributes:nil error:nil];
 
-    YASRelease(fileManager);
+    yas_release(fileManager);
 }
 
 - (void)removeAllFiles {
@@ -328,7 +328,7 @@ namespace test {
 
     [fileManager removeItemAtPath:path error:nil];
 
-    YASRelease(fileManager);
+    yas_release(fileManager);
 }
 
 @end

@@ -79,11 +79,11 @@ namespace sample {
 }
 
 - (void)dealloc {
-    YASRelease(_slider);
+    yas_release(_slider);
 
     _slider = nil;
 
-    YASSuperDealloc;
+    yas_super_dealloc();
 }
 
 - (void)viewDidAppear:(BOOL)animated {

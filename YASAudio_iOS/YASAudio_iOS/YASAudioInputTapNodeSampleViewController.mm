@@ -69,13 +69,13 @@ namespace sample {
 }
 
 - (void)dealloc {
-    YASRelease(_label);
-    YASRelease(_progressView);
+    yas_release(_label);
+    yas_release(_progressView);
 
     _label = nil;
     _progressView = nil;
 
-    YASSuperDealloc;
+    yas_super_dealloc();
 }
 
 - (void)viewDidAppear:(BOOL)animated {

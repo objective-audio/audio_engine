@@ -31,7 +31,7 @@ typedef NS_ENUM(NSUInteger, YASAudioDeviceRouteSampleInputType) {
 @implementation YASAudioDeviceRouteSampleOutputData
 
 + (instancetype)data {
-    return YASAutorelease([[self alloc] init]);
+    return yas_autorelease([[self alloc] init]);
 }
 
 - (NSString *)indexTitle {
@@ -67,7 +67,7 @@ typedef NS_ENUM(NSUInteger, YASAudioDeviceRouteSampleInputType) {
 @implementation YASAudioDeviceRouteSampleInputData
 
 + (instancetype)data {
-    return YASAutorelease([[self alloc] init]);
+    return yas_autorelease([[self alloc] init]);
 }
 
 - (NSString *)indexTitle {
@@ -118,15 +118,15 @@ namespace sample {
 }
 
 - (void)dealloc {
-    YASRelease(_deviceNames);
-    YASRelease(_outputRoutes);
-    YASRelease(_inputRoutes);
+    yas_release(_deviceNames);
+    yas_release(_outputRoutes);
+    yas_release(_inputRoutes);
 
     _deviceNames = nil;
     _outputRoutes = nil;
     _inputRoutes = nil;
 
-    YASSuperDealloc;
+    yas_super_dealloc();
 }
 
 - (void)viewDidLoad {

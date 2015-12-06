@@ -14,11 +14,11 @@
 @implementation YASAudioEngineIOSampleSelectionViewController
 
 - (void)dealloc {
-    YASRelease(_fromCellIndexPath);
+    yas_release(_fromCellIndexPath);
 
     _fromCellIndexPath = nil;
 
-    YASSuperDealloc;
+    yas_super_dealloc();
 }
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(UITableViewCell *)cell {
