@@ -95,8 +95,8 @@ namespace audio_device_sample {
                 const Float64 freq = sine_frequency();
 
                 if (frame_length < kSineDataMaxCount) {
-                    _phase = yas::audio_math::fill_sine(&_sine_data[0], frame_length, start_phase,
-                                                        freq / sample_rate * yas::audio_math::two_pi);
+                    _phase = yas::audio::math::fill_sine(&_sine_data[0], frame_length, start_phase,
+                                                        freq / sample_rate * yas::audio::math::two_pi);
 
                     while (pointer->v) {
                         cblas_saxpy(frame_length, sine_vol, &_sine_data[0], 1, pointer->f32, 1);

@@ -22,6 +22,7 @@
 #include "yas_audio_enumerator.h"
 #include "yas_audio_file.h"
 #include "yas_audio_file_utils.h"
+#include "yas_audio_exception.h"
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
 

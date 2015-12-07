@@ -45,7 +45,7 @@
 - (id)transformedValue:(id)value {
     if ([value isKindOfClass:[NSNumber class]]) {
         NSNumber *numberValue = value;
-        numberValue = @(yas::audio_math::decibel_from_linear(numberValue.doubleValue));
+        numberValue = @(yas::audio::math::decibel_from_linear(numberValue.doubleValue));
         return [self.numberFormatter stringFromNumber:numberValue];
     }
 

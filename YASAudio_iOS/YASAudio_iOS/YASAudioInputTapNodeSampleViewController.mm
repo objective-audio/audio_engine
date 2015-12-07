@@ -29,7 +29,7 @@ namespace sample {
         yas::property<Float32, property_key> input_level;
 
         input_tap_node_vc_internal()
-            : input_level(property_key::input_level, yas::audio_math::decibel_from_linear(0.0)) {
+            : input_level(property_key::input_level, yas::audio::math::decibel_from_linear(0.0)) {
         }
 
         void prepare() {
@@ -49,7 +49,7 @@ namespace sample {
                 }
 
                 Float32 prev_level = input_level.value() - frame_length / sample_rate * 30.0f;
-                level = MAX(prev_level, yas::audio_math::decibel_from_linear(level));
+                level = MAX(prev_level, yas::audio::math::decibel_from_linear(level));
                 input_level.set_value(level);
             });
         }

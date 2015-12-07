@@ -193,9 +193,9 @@ namespace sample {
         yas::audio::frame_enumerator enumerator(buffer);
         const auto *flex_ptr = enumerator.pointer();
         const Float64 start_phase = next_phase;
-        const Float64 phase_per_frame = 1000.0 / buffer.format().sample_rate() * yas::audio_math::two_pi;
+        const Float64 phase_per_frame = 1000.0 / buffer.format().sample_rate() * yas::audio::math::two_pi;
         while (flex_ptr->v) {
-            next_phase = yas::audio_math::fill_sine(flex_ptr->f32, buffer.frame_length(), start_phase, phase_per_frame);
+            next_phase = yas::audio::math::fill_sine(flex_ptr->f32, buffer.frame_length(), start_phase, phase_per_frame);
             cblas_sscal(buffer.frame_length(), 0.2, flex_ptr->f32, 1);
             yas_audio_frame_enumerator_move_channel(enumerator);
         }
