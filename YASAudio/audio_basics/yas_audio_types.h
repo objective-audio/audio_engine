@@ -64,6 +64,4 @@ std::string to_string(const audio::direction &);
 std::string to_string(const AudioUnitScope scope);
 std::string to_string(const audio::render_type &);
 std::string to_string(const OSStatus err);
-
-constexpr std::experimental::nullopt_t nullopt = std::experimental::nullopt;
 }
