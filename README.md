@@ -1,7 +1,7 @@
-YASAudioEngine
+yas::audio_engine
 ==============
 [![MIT Lincese](http://img.shields.io/badge/license-MIT-blue.svg?style=flat)](LICENSE)
-[![Coverage Status](https://coveralls.io/repos/objective-audio/YASAudio/badge.svg?branch=master)](https://coveralls.io/r/objective-audio/YASAudio?branch=master)
+[![Coverage Status](https://coveralls.io/repos/objective-audio/audio_engine/badge.svg?branch=master)](https://coveralls.io/r/objective-audio/audio_engine?branch=master)
 
 Requirements
 ==============
@@ -11,4 +11,4 @@ C++14
 
 License
 ==============
-YASAudioEngine is available under the MIT license. See the LICENSE file for more info.
+yas::audio_engine is available under the MIT license. See the LICENSE file for more info.
