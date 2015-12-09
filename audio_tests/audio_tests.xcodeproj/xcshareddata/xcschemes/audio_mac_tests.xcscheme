@@ -14,10 +14,10 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "B66E53311A75CF0E008B9D4E"
-               BuildableName = "YASAudio_iOS_NonARC_Tests.xctest"
-               BlueprintName = "YASAudio_iOS_NonARC_Tests"
-               ReferencedContainer = "container:YASAudio_Tests.xcodeproj">
+               BlueprintIdentifier = "B62ED5AC1A62870F007DDE96"
+               BuildableName = "audio_mac_tests.xctest"
+               BlueprintName = "audio_mac_tests"
+               ReferencedContainer = "container:audio_tests.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -33,20 +33,20 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "B66E53311A75CF0E008B9D4E"
-               BuildableName = "YASAudio_iOS_NonARC_Tests.xctest"
-               BlueprintName = "YASAudio_iOS_NonARC_Tests"
-               ReferencedContainer = "container:YASAudio_Tests.xcodeproj">
+               BlueprintIdentifier = "B62ED5AC1A62870F007DDE96"
+               BuildableName = "audio_mac_tests.xctest"
+               BlueprintName = "audio_mac_tests"
+               ReferencedContainer = "container:audio_tests.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "B66E53311A75CF0E008B9D4E"
-            BuildableName = "YASAudio_iOS_NonARC_Tests.xctest"
-            BlueprintName = "YASAudio_iOS_NonARC_Tests"
-            ReferencedContainer = "container:YASAudio_Tests.xcodeproj">
+            BlueprintIdentifier = "B62ED5AC1A62870F007DDE96"
+            BuildableName = "audio_mac_tests.xctest"
+            BlueprintName = "audio_mac_tests"
+            ReferencedContainer = "container:audio_tests.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
       <AdditionalOptions>
@@ -65,10 +65,10 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "B66E53311A75CF0E008B9D4E"
-            BuildableName = "YASAudio_iOS_NonARC_Tests.xctest"
-            BlueprintName = "YASAudio_iOS_NonARC_Tests"
-            ReferencedContainer = "container:YASAudio_Tests.xcodeproj">
+            BlueprintIdentifier = "B62ED5AC1A62870F007DDE96"
+            BuildableName = "audio_mac_tests.xctest"
+            BlueprintName = "audio_mac_tests"
+            ReferencedContainer = "container:audio_tests.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
       <AdditionalOptions>
@@ -83,10 +83,10 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "B66E53311A75CF0E008B9D4E"
-            BuildableName = "YASAudio_iOS_NonARC_Tests.xctest"
-            BlueprintName = "YASAudio_iOS_NonARC_Tests"
-            ReferencedContainer = "container:YASAudio_Tests.xcodeproj">
+            BlueprintIdentifier = "B62ED5AC1A62870F007DDE96"
+            BuildableName = "audio_mac_tests.xctest"
+            BlueprintName = "audio_mac_tests"
+            ReferencedContainer = "container:audio_tests.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
    </ProfileAction>

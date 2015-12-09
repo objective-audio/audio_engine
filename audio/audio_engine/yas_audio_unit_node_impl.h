@@ -1,9 +1,6 @@
 //
 //  yas_audio_unit_node_impl.h
-//  YASAudio_Tests
-//
-//  Created by Yuki Yasoshima on 2015/10/24.
-//
+//  Copyright (c) 2015 Yuki Yasoshima.
 //
 
 #pragma once
