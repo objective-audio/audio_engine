@@ -227,7 +227,7 @@
 				B60F44611C1423120028C68A /* yas_objc_macros.h */,
 			);
 			name = objc_utils;
-			path = submodules/objc_utils/objc_utils;
+			path = ../submodules/objc_utils/objc_utils;
 			sourceTree = "<group>";
 		};
 		B61D52D11B9C82DB00A449C5 /* Framework */ = {
@@ -360,7 +360,7 @@
 				B6626BB51C17167A0038175B /* yas_types.h */,
 			);
 			name = cpp_utils;
-			path = submodules/cpp_utils/cpp_utils;
+			path = ../submodules/cpp_utils/cpp_utils;
 			sourceTree = "<group>";
 		};
 		B699BE9A1BF4D1A10007B597 /* audio_graph */ = {
