@@ -2,12 +2,12 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "group:/Users/yuki/Documents/Programming/Project/Git/YASAudio/YASAudio_iOS/audio_sample_ios.xcodeproj">
+      location = "group:audio_sample_ios/audio_sample_ios.xcodeproj">
    </FileRef>
    <FileRef
-      location = "group:/Users/yuki/Documents/Programming/Project/Git/YASAudio/YASAudio_Mac/audio_sample_mac.xcodeproj">
+      location = "group:audio_sample_mac/audio_sample_mac.xcodeproj">
    </FileRef>
    <FileRef
-      location = "group:/Users/yuki/Documents/Programming/Project/Git/YASAudio/YASAudio_Tests/audio_tests.xcodeproj">
+      location = "group:audio_tests/audio_tests.xcodeproj">
    </FileRef>
 </Workspace>

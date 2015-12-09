@@ -280,8 +280,7 @@
 				B62ED5351A6280C0007DDE96 /* LaunchScreen.xib */,
 				B62ED5261A6280C0007DDE96 /* Supporting Files */,
 			);
-			name = audio_sample_ios;
-			path = YASAudio_iOS;
+			path = audio_sample_ios;
 			sourceTree = "<group>";
 		};
 		B62ED5261A6280C0007DDE96 /* Supporting Files */ = {
@@ -306,7 +305,7 @@
 				B6C8FD871B3B071700DB72E7 /* audio_device */,
 			);
 			name = audio;
-			path = ../YASAudio;
+			path = ../audio;
 			sourceTree = "<group>";
 		};
 		B6626A561C146E240038175B /* audio_basics */ = {
@@ -728,7 +727,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				INFOPLIST_FILE = YASAudio_iOS/Info.plist;
+				INFOPLIST_FILE = audio_sample_ios/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "jp.objective-audio.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = audio_sample_ios;
@@ -739,7 +738,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				INFOPLIST_FILE = YASAudio_iOS/Info.plist;
+				INFOPLIST_FILE = audio_sample_ios/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "jp.objective-audio.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = audio_sample_ios;

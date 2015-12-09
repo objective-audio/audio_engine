@@ -279,8 +279,7 @@
 				B62ED5641A62812F007DDE96 /* Main.storyboard */,
 				B62ED5581A62812F007DDE96 /* Supporting Files */,
 			);
-			name = audio_sample_mac;
-			path = YASAudio_Mac;
+			path = audio_sample_mac;
 			sourceTree = "<group>";
 		};
 		B62ED5581A62812F007DDE96 /* Supporting Files */ = {
@@ -305,7 +304,7 @@
 				B6C8FD3A1B3B062900DB72E7 /* audio_device */,
 			);
 			name = audio;
-			path = ../YASAudio;
+			path = ../audio;
 			sourceTree = "<group>";
 		};
 		B6626A721C146E2D0038175B /* audio_basics */ = {
@@ -669,7 +668,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				COMBINE_HIDPI_IMAGES = YES;
-				INFOPLIST_FILE = YASAudio_Mac/Info.plist;
+				INFOPLIST_FILE = audio_sample_mac/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "jp.objective-audio.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = audio_sample_mac;
@@ -681,7 +680,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				COMBINE_HIDPI_IMAGES = YES;
-				INFOPLIST_FILE = YASAudio_Mac/Info.plist;
+				INFOPLIST_FILE = audio_sample_mac/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "jp.objective-audio.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = audio_sample_mac;
