@@ -515,7 +515,7 @@
 				B60F44541C1422ED0028C68A /* yas_objc_macros.h */,
 			);
 			name = objc_utils;
-			path = submodules/objc_utils/objc_utils;
+			path = ../submodules/objc_utils/objc_utils;
 			sourceTree = "<group>";
 		};
 		B61D52D31B9C82F700A449C5 /* Mac Framework */ = {
@@ -654,7 +654,7 @@
 				B6626B2D1C1715750038175B /* yas_types.h */,
 			);
 			name = cpp_utils;
-			path = submodules/cpp_utils/cpp_utils;
+			path = ../submodules/cpp_utils/cpp_utils;
 			sourceTree = "<group>";
 		};
 		B66C22F11B61CCEB0086EB73 /* audio_engine */ = {
