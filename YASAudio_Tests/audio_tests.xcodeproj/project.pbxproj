@@ -546,8 +546,8 @@
 			children = (
 				B61D52D41B9C82FE00A449C5 /* iOS Framework */,
 				B61D52D31B9C82F700A449C5 /* Mac Framework */,
-				B65BAA8F1A63F6D900E7C3D8 /* YASAudio */,
-				B62ED5881A628554007DDE96 /* YASAudio_Tests */,
+				B65BAA8F1A63F6D900E7C3D8 /* audio */,
+				B62ED5881A628554007DDE96 /* audio_tests */,
 				B62ED5871A628554007DDE96 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -563,7 +563,7 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		B62ED5881A628554007DDE96 /* YASAudio_Tests */ = {
+		B62ED5881A628554007DDE96 /* audio_tests */ = {
 			isa = PBXGroup;
 			children = (
 				B6FF022C1BEAEC5E0026777E /* test_utils */,
@@ -573,7 +573,7 @@
 				B6FF022F1BEAEC800026777E /* audio_engine */,
 				B62ED5891A628554007DDE96 /* Supporting Files */,
 			);
-			name = YASAudio_Tests;
+			name = audio_tests;
 			path = YASAudio_iOS_Tests;
 			sourceTree = "<group>";
 		};
@@ -585,7 +585,7 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
-		B65BAA8F1A63F6D900E7C3D8 /* YASAudio */ = {
+		B65BAA8F1A63F6D900E7C3D8 /* audio */ = {
 			isa = PBXGroup;
 			children = (
 				B6C49DC11BA1C6C800CCFB14 /* yas_audio.h */,
@@ -597,7 +597,7 @@
 				B699BE591BF4D13F0007B597 /* audio_graph */,
 				B66C22F11B61CCEB0086EB73 /* audio_engine */,
 			);
-			name = YASAudio;
+			name = audio;
 			path = ../YASAudio;
 			sourceTree = "<group>";
 		};
@@ -811,9 +811,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		B62ED5851A628554007DDE96 /* YASAudio_iOS_Tests */ = {
+		B62ED5851A628554007DDE96 /* audio_ios_tests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = B62ED58D1A628554007DDE96 /* Build configuration list for PBXNativeTarget "YASAudio_iOS_Tests" */;
+			buildConfigurationList = B62ED58D1A628554007DDE96 /* Build configuration list for PBXNativeTarget "audio_ios_tests" */;
 			buildPhases = (
 				B62ED5821A628554007DDE96 /* Sources */,
 				B62ED5831A628554007DDE96 /* Frameworks */,
@@ -823,14 +823,14 @@
 			);
 			dependencies = (
 			);
-			name = YASAudio_iOS_Tests;
+			name = audio_ios_tests;
 			productName = YASAudio_iOS_Tests;
 			productReference = B62ED5861A628554007DDE96 /* YASAudio_Tests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		B62ED5AC1A62870F007DDE96 /* YASAudio_Mac_Tests */ = {
+		B62ED5AC1A62870F007DDE96 /* audio_mac_tests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = B62ED5B31A62870F007DDE96 /* Build configuration list for PBXNativeTarget "YASAudio_Mac_Tests" */;
+			buildConfigurationList = B62ED5B31A62870F007DDE96 /* Build configuration list for PBXNativeTarget "audio_mac_tests" */;
 			buildPhases = (
 				B62ED5A91A62870F007DDE96 /* Sources */,
 				B62ED5AA1A62870F007DDE96 /* Frameworks */,
@@ -840,14 +840,14 @@
 			);
 			dependencies = (
 			);
-			name = YASAudio_Mac_Tests;
+			name = audio_mac_tests;
 			productName = YASAudio_Mac_Tests;
 			productReference = B62ED5AD1A62870F007DDE96 /* YASAudio_Mac_Tests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		B63450511AD10A7100CF7784 /* YASAudio_Mac_NonARC_Tests */ = {
+		B63450511AD10A7100CF7784 /* audio_mac_non_arc_tests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = B63450891AD10A7100CF7784 /* Build configuration list for PBXNativeTarget "YASAudio_Mac_NonARC_Tests" */;
+			buildConfigurationList = B63450891AD10A7100CF7784 /* Build configuration list for PBXNativeTarget "audio_mac_non_arc_tests" */;
 			buildPhases = (
 				B63450521AD10A7100CF7784 /* Sources */,
 				B63450871AD10A7100CF7784 /* Frameworks */,
@@ -857,14 +857,14 @@
 			);
 			dependencies = (
 			);
-			name = YASAudio_Mac_NonARC_Tests;
+			name = audio_mac_non_arc_tests;
 			productName = YASAudio_Mac_Tests;
 			productReference = B634508C1AD10A7100CF7784 /* YASAudio_Mac_NonARC_Tests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		B66E53311A75CF0E008B9D4E /* YASAudio_iOS_NonARC_Tests */ = {
+		B66E53311A75CF0E008B9D4E /* audio_ios_non_arc_tests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = B66E534A1A75CF0E008B9D4E /* Build configuration list for PBXNativeTarget "YASAudio_iOS_NonARC_Tests" */;
+			buildConfigurationList = B66E534A1A75CF0E008B9D4E /* Build configuration list for PBXNativeTarget "audio_ios_non_arc_tests" */;
 			buildPhases = (
 				B66E53321A75CF0E008B9D4E /* Sources */,
 				B66E53481A75CF0E008B9D4E /* Frameworks */,
@@ -874,7 +874,7 @@
 			);
 			dependencies = (
 			);
-			name = YASAudio_iOS_NonARC_Tests;
+			name = audio_ios_non_arc_tests;
 			productName = YASAudio_iOS_Tests;
 			productReference = B66E534D1A75CF0E008B9D4E /* YASAudio_iOS_NonARC_Tests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
@@ -895,7 +895,7 @@
 					};
 				};
 			};
-			buildConfigurationList = B62ED57F1A628529007DDE96 /* Build configuration list for PBXProject "YASAudio_Tests" */;
+			buildConfigurationList = B62ED57F1A628529007DDE96 /* Build configuration list for PBXProject "audio_tests" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
@@ -907,10 +907,10 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				B62ED5851A628554007DDE96 /* YASAudio_iOS_Tests */,
-				B66E53311A75CF0E008B9D4E /* YASAudio_iOS_NonARC_Tests */,
-				B62ED5AC1A62870F007DDE96 /* YASAudio_Mac_Tests */,
-				B63450511AD10A7100CF7784 /* YASAudio_Mac_NonARC_Tests */,
+				B62ED5851A628554007DDE96 /* audio_ios_tests */,
+				B66E53311A75CF0E008B9D4E /* audio_ios_non_arc_tests */,
+				B62ED5AC1A62870F007DDE96 /* audio_mac_tests */,
+				B63450511AD10A7100CF7784 /* audio_mac_non_arc_tests */,
 			);
 		};
 /* End PBXProject section */
@@ -1315,7 +1315,7 @@
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = "jp.objective-audio.$(PRODUCT_NAME:rfc1034identifier)";
-				PRODUCT_NAME = YASAudio_Tests;
+				PRODUCT_NAME = audio_tests;
 				SDKROOT = iphoneos;
 			};
 			name = Debug;
@@ -1360,7 +1360,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				MTL_ENABLE_DEBUG_INFO = NO;
 				PRODUCT_BUNDLE_IDENTIFIER = "jp.objective-audio.$(PRODUCT_NAME:rfc1034identifier)";
-				PRODUCT_NAME = YASAudio_Tests;
+				PRODUCT_NAME = audio_tests;
 				SDKROOT = iphoneos;
 				VALIDATE_PRODUCT = YES;
 			};
@@ -1654,7 +1654,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		B62ED57F1A628529007DDE96 /* Build configuration list for PBXProject "YASAudio_Tests" */ = {
+		B62ED57F1A628529007DDE96 /* Build configuration list for PBXProject "audio_tests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				B62ED5801A628529007DDE96 /* Debug */,
@@ -1663,7 +1663,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		B62ED58D1A628554007DDE96 /* Build configuration list for PBXNativeTarget "YASAudio_iOS_Tests" */ = {
+		B62ED58D1A628554007DDE96 /* Build configuration list for PBXNativeTarget "audio_ios_tests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				B62ED58E1A628554007DDE96 /* Debug */,
@@ -1672,7 +1672,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		B62ED5B31A62870F007DDE96 /* Build configuration list for PBXNativeTarget "YASAudio_Mac_Tests" */ = {
+		B62ED5B31A62870F007DDE96 /* Build configuration list for PBXNativeTarget "audio_mac_tests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				B62ED5B41A62870F007DDE96 /* Debug */,
@@ -1681,7 +1681,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		B63450891AD10A7100CF7784 /* Build configuration list for PBXNativeTarget "YASAudio_Mac_NonARC_Tests" */ = {
+		B63450891AD10A7100CF7784 /* Build configuration list for PBXNativeTarget "audio_mac_non_arc_tests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				B634508A1AD10A7100CF7784 /* Debug */,
@@ -1690,7 +1690,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		B66E534A1A75CF0E008B9D4E /* Build configuration list for PBXNativeTarget "YASAudio_iOS_NonARC_Tests" */ = {
+		B66E534A1A75CF0E008B9D4E /* Build configuration list for PBXNativeTarget "audio_ios_non_arc_tests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				B66E534B1A75CF0E008B9D4E /* Debug */,

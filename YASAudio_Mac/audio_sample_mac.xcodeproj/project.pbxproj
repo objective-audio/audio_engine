@@ -74,7 +74,7 @@
 		B61D529E1B9C70D400A449C5 /* AudioUnit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioUnit.framework; path = System/Library/Frameworks/AudioUnit.framework; sourceTree = SDKROOT; };
 		B61D52A01B9C70DB00A449C5 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
 		B61D52FB1B9D268900A449C5 /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = System/Library/Frameworks/Accelerate.framework; sourceTree = SDKROOT; };
-		B62ED5551A62812F007DDE96 /* YASAudio_Mac.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = YASAudio_Mac.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		B62ED5551A62812F007DDE96 /* audio_sample_mac.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = audio_sample_mac.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B62ED5591A62812F007DDE96 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B62ED55A1A62812F007DDE96 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		B62ED55B1A62812F007DDE96 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -246,8 +246,8 @@
 			isa = PBXGroup;
 			children = (
 				B61D52D11B9C82DB00A449C5 /* Framework */,
-				B65BAA4B1A636A5200E7C3D8 /* YASAudio */,
-				B62ED5571A62812F007DDE96 /* YASAudio_Mac */,
+				B65BAA4B1A636A5200E7C3D8 /* audio */,
+				B62ED5571A62812F007DDE96 /* audio_sample_mac */,
 				B62ED5561A62812F007DDE96 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -255,12 +255,12 @@
 		B62ED5561A62812F007DDE96 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				B62ED5551A62812F007DDE96 /* YASAudio_Mac.app */,
+				B62ED5551A62812F007DDE96 /* audio_sample_mac.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		B62ED5571A62812F007DDE96 /* YASAudio_Mac */ = {
+		B62ED5571A62812F007DDE96 /* audio_sample_mac */ = {
 			isa = PBXGroup;
 			children = (
 				B62ED55A1A62812F007DDE96 /* AppDelegate.h */,
@@ -279,6 +279,7 @@
 				B62ED5641A62812F007DDE96 /* Main.storyboard */,
 				B62ED5581A62812F007DDE96 /* Supporting Files */,
 			);
+			name = audio_sample_mac;
 			path = YASAudio_Mac;
 			sourceTree = "<group>";
 		};
@@ -291,7 +292,7 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
-		B65BAA4B1A636A5200E7C3D8 /* YASAudio */ = {
+		B65BAA4B1A636A5200E7C3D8 /* audio */ = {
 			isa = PBXGroup;
 			children = (
 				B6C49DC31BA1D67700CCFB14 /* yas_audio.h */,
@@ -303,7 +304,7 @@
 				B699BE9A1BF4D1A10007B597 /* audio_graph */,
 				B6C8FD3A1B3B062900DB72E7 /* audio_device */,
 			);
-			name = YASAudio;
+			name = audio;
 			path = ../YASAudio;
 			sourceTree = "<group>";
 		};
@@ -454,9 +455,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		B62ED5541A62812F007DDE96 /* YASAudio_Mac */ = {
+		B62ED5541A62812F007DDE96 /* audio_sample_mac */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = B62ED5751A62812F007DDE96 /* Build configuration list for PBXNativeTarget "YASAudio_Mac" */;
+			buildConfigurationList = B62ED5751A62812F007DDE96 /* Build configuration list for PBXNativeTarget "audio_sample_mac" */;
 			buildPhases = (
 				B62ED5511A62812F007DDE96 /* Sources */,
 				B62ED5521A62812F007DDE96 /* Frameworks */,
@@ -466,9 +467,9 @@
 			);
 			dependencies = (
 			);
-			name = YASAudio_Mac;
+			name = audio_sample_mac;
 			productName = YASAudio_Mac;
-			productReference = B62ED5551A62812F007DDE96 /* YASAudio_Mac.app */;
+			productReference = B62ED5551A62812F007DDE96 /* audio_sample_mac.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -485,7 +486,7 @@
 					};
 				};
 			};
-			buildConfigurationList = B62ED5501A62812F007DDE96 /* Build configuration list for PBXProject "YASAudio_Mac" */;
+			buildConfigurationList = B62ED5501A62812F007DDE96 /* Build configuration list for PBXProject "audio_sample_mac" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
@@ -498,7 +499,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				B62ED5541A62812F007DDE96 /* YASAudio_Mac */,
+				B62ED5541A62812F007DDE96 /* audio_sample_mac */,
 			);
 		};
 /* End PBXProject section */
@@ -671,7 +672,7 @@
 				INFOPLIST_FILE = YASAudio_Mac/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "jp.objective-audio.$(PRODUCT_NAME:rfc1034identifier)";
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = audio_sample_mac;
 			};
 			name = Debug;
 		};
@@ -683,14 +684,14 @@
 				INFOPLIST_FILE = YASAudio_Mac/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "jp.objective-audio.$(PRODUCT_NAME:rfc1034identifier)";
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = audio_sample_mac;
 			};
 			name = Release;
 		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		B62ED5501A62812F007DDE96 /* Build configuration list for PBXProject "YASAudio_Mac" */ = {
+		B62ED5501A62812F007DDE96 /* Build configuration list for PBXProject "audio_sample_mac" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				B62ED5731A62812F007DDE96 /* Debug */,
@@ -699,7 +700,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		B62ED5751A62812F007DDE96 /* Build configuration list for PBXNativeTarget "YASAudio_Mac" */ = {
+		B62ED5751A62812F007DDE96 /* Build configuration list for PBXNativeTarget "audio_sample_mac" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				B62ED5761A62812F007DDE96 /* Debug */,
