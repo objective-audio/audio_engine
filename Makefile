@@ -10,4 +10,4 @@ setup-coverage:
 	sudo easy_install cpp-coveralls
 
 send-coverage:
-	coveralls --exclude-pattern ".*Tests" --exclude-pattern ".*\.h" -e Submodules -e
+	coveralls --exclude-pattern ".*Tests" --exclude-pattern ".*\.h" -e submodules -e
