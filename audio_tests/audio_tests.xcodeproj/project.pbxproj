@@ -316,10 +316,10 @@
 		B61D52DC1B9C855300A449C5 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS8.4.sdk/System/Library/Frameworks/AudioToolbox.framework; sourceTree = DEVELOPER_DIR; };
 		B61D52F31B9D23C700A449C5 /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = System/Library/Frameworks/Accelerate.framework; sourceTree = SDKROOT; };
 		B61D52F61B9D23E500A449C5 /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS8.4.sdk/System/Library/Frameworks/Accelerate.framework; sourceTree = DEVELOPER_DIR; };
-		B62ED5861A628554007DDE96 /* YASAudio_Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; name = YASAudio_Tests.xctest; path = audio_tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		B62ED5AD1A62870F007DDE96 /* YASAudio_Mac_Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; name = YASAudio_Mac_Tests.xctest; path = audio_mac_tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		B62ED5861A628554007DDE96 /* audio_tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = audio_tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		B62ED5AD1A62870F007DDE96 /* audio_mac_tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = audio_mac_tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B62ED5FD1A629B84007DDE96 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = Info.plist; path = audio_tests/Info.plist; sourceTree = SOURCE_ROOT; };
-		B634508C1AD10A7100CF7784 /* YASAudio_Mac_NonARC_Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = YASAudio_Mac_NonARC_Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		B634508C1AD10A7100CF7784 /* audio_mac_non_arc_tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = audio_mac_non_arc_tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B6626A201C146D380038175B /* yas_audio_enumerator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = yas_audio_enumerator.cpp; sourceTree = "<group>"; };
 		B6626A211C146D380038175B /* yas_audio_enumerator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yas_audio_enumerator.h; sourceTree = "<group>"; };
 		B6626A221C146D380038175B /* yas_audio_file.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yas_audio_file.h; sourceTree = "<group>"; };
@@ -361,7 +361,7 @@
 		B6626B2B1C1715750038175B /* yas_stl_utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yas_stl_utils.h; sourceTree = "<group>"; };
 		B6626B2C1C1715750038175B /* yas_stl_utils_private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yas_stl_utils_private.h; sourceTree = "<group>"; };
 		B6626B2D1C1715750038175B /* yas_types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yas_types.h; sourceTree = "<group>"; };
-		B66E534D1A75CF0E008B9D4E /* YASAudio_iOS_NonARC_Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = YASAudio_iOS_NonARC_Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		B66E534D1A75CF0E008B9D4E /* audio_ios_non_arc_tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = audio_ios_non_arc_tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B699BE571BF4D1110007B597 /* yas_audio_route.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = yas_audio_route.h; path = audio_device/yas_audio_route.h; sourceTree = "<group>"; };
 		B699BE5A1BF4D1530007B597 /* yas_audio_graph.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = yas_audio_graph.h; path = audio_graph/yas_audio_graph.h; sourceTree = "<group>"; };
 		B699BE5B1BF4D1530007B597 /* yas_audio_graph.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = yas_audio_graph.mm; path = audio_graph/yas_audio_graph.mm; sourceTree = "<group>"; };
@@ -559,10 +559,10 @@
 		B62ED5871A628554007DDE96 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				B62ED5861A628554007DDE96 /* YASAudio_Tests.xctest */,
-				B62ED5AD1A62870F007DDE96 /* YASAudio_Mac_Tests.xctest */,
-				B66E534D1A75CF0E008B9D4E /* YASAudio_iOS_NonARC_Tests.xctest */,
-				B634508C1AD10A7100CF7784 /* YASAudio_Mac_NonARC_Tests.xctest */,
+				B62ED5861A628554007DDE96 /* audio_tests.xctest */,
+				B62ED5AD1A62870F007DDE96 /* audio_mac_tests.xctest */,
+				B66E534D1A75CF0E008B9D4E /* audio_ios_non_arc_tests.xctest */,
+				B634508C1AD10A7100CF7784 /* audio_mac_non_arc_tests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -828,7 +828,7 @@
 			);
 			name = audio_ios_tests;
 			productName = YASAudio_iOS_Tests;
-			productReference = B62ED5861A628554007DDE96 /* YASAudio_Tests.xctest */;
+			productReference = B62ED5861A628554007DDE96 /* audio_tests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
 		B62ED5AC1A62870F007DDE96 /* audio_mac_tests */ = {
@@ -845,7 +845,7 @@
 			);
 			name = audio_mac_tests;
 			productName = YASAudio_Mac_Tests;
-			productReference = B62ED5AD1A62870F007DDE96 /* YASAudio_Mac_Tests.xctest */;
+			productReference = B62ED5AD1A62870F007DDE96 /* audio_mac_tests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
 		B63450511AD10A7100CF7784 /* audio_mac_non_arc_tests */ = {
@@ -862,7 +862,7 @@
 			);
 			name = audio_mac_non_arc_tests;
 			productName = YASAudio_Mac_Tests;
-			productReference = B634508C1AD10A7100CF7784 /* YASAudio_Mac_NonARC_Tests.xctest */;
+			productReference = B634508C1AD10A7100CF7784 /* audio_mac_non_arc_tests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
 		B66E53311A75CF0E008B9D4E /* audio_ios_non_arc_tests */ = {
@@ -879,7 +879,7 @@
 			);
 			name = audio_ios_non_arc_tests;
 			productName = YASAudio_iOS_Tests;
-			productReference = B66E534D1A75CF0E008B9D4E /* YASAudio_iOS_NonARC_Tests.xctest */;
+			productReference = B66E534D1A75CF0E008B9D4E /* audio_ios_non_arc_tests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
 /* End PBXNativeTarget section */

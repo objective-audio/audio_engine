@@ -1,5 +1,5 @@
-WORKSPACE = YASAudio.xcworkspace
-SCHEME = YASAudio_iOS_Tests
+WORKSPACE = audio.xcworkspace
+SCHEME = audio_ios_tests
 CONFIGURATION = Release
 SDK = iphonesimulator
 
