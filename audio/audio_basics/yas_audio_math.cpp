@@ -3,9 +3,9 @@
 //  Copyright (c) 2015 Yuki Yasoshima.
 //
 
-#include "yas_audio_math.h"
-#include <math.h>
 #include <Accelerate/Accelerate.h>
+#include <math.h>
+#include "yas_audio_math.h"
 
 using namespace yas;
 
@@ -65,4 +65,114 @@ Float32 audio::math::fill_sine(Float32 *const out_data, const UInt32 length, con
     vvsinf(out_data, out_data, &len);
 
     return phase;
+}
+
+#pragma mark - level
+
+template <>
+audio::level<Float64>::level() : _value(0.0) {
+}
+
+template <>
+audio::level<Float32>::level() : _value(0.0f) {
+}
+
+template <>
+audio::level<Float64>::level(const Float64 val) : _value(val) {
+}
+
+template <>
+audio::level<Float32>::level(const Float32 val) : _value(val) {
+}
+
+template <>
+bool audio::level<Float64>::operator==(const level &rhs) const {
+    return _value == rhs._value;
+}
+
+template <>
+bool audio::level<Float32>::operator==(const level &rhs) const {
+    return _value == rhs._value;
+}
+
+template <>
+bool audio::level<Float64>::operator!=(const level &rhs) const {
+    return _value != rhs._value;
+}
+
+template <>
+bool audio::level<Float32>::operator!=(const level &rhs) const {
+    return _value != rhs._value;
+}
+
+template <>
+void audio::level<Float64>::set_linear(const Float64 val) {
+    _value = val;
+}
+
+template <>
+void audio::level<Float32>::set_linear(const Float32 val) {
+    _value = val;
+}
+
+template <>
+Float64 audio::level<Float64>::linear() const {
+    return _value;
+}
+
+template <>
+Float32 audio::level<Float32>::linear() const {
+    return _value;
+}
+
+template <>
+void audio::level<Float64>::set_decibel(const Float64 val) {
+    _value = math::linear_from_decibel(val);
+}
+
+template <>
+void audio::level<Float32>::set_decibel(const Float32 val) {
+    _value = math::linear_from_decibel(val);
+}
+
+template <>
+Float64 audio::level<Float64>::decibel() const {
+    return math::decibel_from_linear(_value);
+}
+
+template <>
+Float32 audio::level<Float32>::decibel() const {
+    return math::decibel_from_linear(_value);
+}
+
+#pragma mark - duration
+
+audio::duration::duration() : _value(0.0) {
+}
+
+audio::duration::duration(const Float64 val) : _value(val) {
+}
+
+bool audio::duration::operator==(const duration &rhs) const {
+    return _value == rhs._value;
+}
+
+bool audio::duration::operator!=(const duration &rhs) const {
+    return _value != rhs._value;
+}
+
+void audio::duration::set_seconds(const Float64 val) {
+    _value = val;
+}
+
+Float64 audio::duration::seconds() const {
+    return _value;
+}
+
+void audio::duration::set_tempo(const Float64 val) {
+    _value = math::seconds_from_tempo(val);
+}
+
+Float64 audio::duration::tempo() const {
+    return math::tempo_from_seconds(_value);
 }
