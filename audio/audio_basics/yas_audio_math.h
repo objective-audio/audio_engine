@@ -33,5 +33,42 @@ namespace audio {
         static auto fill_sine(T *const out_data, const UInt32 length, const Float64 start_phase,
                               const Float64 phase_per_frame) -> T;
     };
+
+    template <typename T>
+    class level {
+       public:
+        level();
+        level(const T val);
+
+        bool operator==(const level &) const;
+        bool operator!=(const level &) const;
+
+        void set_linear(const T val);
+        T linear() const;
+
+        void set_decibel(const T val);
+        T decibel() const;
+
+       private:
+        T _value;
+    };
+
+    class duration {
+       public:
+        duration();
+        duration(const Float64 val);
+
+        bool operator==(const duration &) const;
+        bool operator!=(const duration &) const;
+
+        void set_seconds(const Float64 val);
+        Float64 seconds() const;
+
+        void set_tempo(const Float64 val);
+        Float64 tempo() const;
+
+       private:
+        Float64 _value;
+    };
 }
 }

@@ -100,4 +100,131 @@
     free(data);
 }
 
+- (void)test_level_init_float64 {
+    yas::audio::level<Float64> level;
+    XCTAssertEqual(level.linear(), 0.0);
+    XCTAssertEqualWithAccuracy(level.decibel(), -HUGE_VAL, 0.01f);
+}
+
+- (void)test_level_init_with_value_float64 {
+    yas::audio::level<Float64> level{1.0};
+    XCTAssertEqual(level.linear(), 1.0);
+    XCTAssertEqual(level.decibel(), 0.0);
+}
+
+- (void)test_level_equal_float64 {
+    yas::audio::level<Float64> level_a{1.0};
+    yas::audio::level<Float64> level_b{1.0};
+
+    XCTAssertTrue(level_a == level_b);
+    XCTAssertFalse(level_a != level_b);
+
+    level_b.set_linear(0.5);
+
+    XCTAssertTrue(level_a != level_b);
+    XCTAssertFalse(level_a == level_b);
+}
+
+- (void)test_set_linear_float64 {
+    yas::audio::level<Float64> level;
+    level.set_linear(1.0);
+
+    XCTAssertEqual(level.linear(), 1.0);
+    XCTAssertEqual(level.decibel(), 0.0);
+}
+
+- (void)test_set_decibel_float64 {
+    yas::audio::level<Float64> level;
+    level.set_decibel(0.0);
+
+    XCTAssertEqual(level.linear(), 1.0);
+    XCTAssertEqual(level.decibel(), 0.0);
+}
+
+- (void)test_level_init_float32 {
+    yas::audio::level<Float32> level;
+    XCTAssertEqual(level.linear(), 0.0);
+    XCTAssertEqualWithAccuracy(level.decibel(), -HUGE_VAL, 0.01f);
+}
+
+- (void)test_level_init_with_value_float32 {
+    yas::audio::level<Float32> level{1.0};
+    XCTAssertEqual(level.linear(), 1.0);
+    XCTAssertEqual(level.decibel(), 0.0);
+}
+
+- (void)test_level_equal_float32 {
+    yas::audio::level<Float32> level_a{1.0};
+    yas::audio::level<Float32> level_b{1.0};
+
+    XCTAssertTrue(level_a == level_b);
+    XCTAssertFalse(level_a != level_b);
+
+    level_b.set_linear(0.5);
+
+    XCTAssertTrue(level_a != level_b);
+    XCTAssertFalse(level_a == level_b);
+}
+
+- (void)test_set_linear_float32 {
+    yas::audio::level<Float32> level;
+    level.set_linear(1.0);
+
+    XCTAssertEqual(level.linear(), 1.0);
+    XCTAssertEqual(level.decibel(), 0.0);
+}
+
+- (void)test_set_decibel_float32 {
+    yas::audio::level<Float32> level;
+    level.set_decibel(0.0);
+
+    XCTAssertEqual(level.linear(), 1.0);
+    XCTAssertEqual(level.decibel(), 0.0);
+}
+
+- (void)test_duration_init {
+    yas::audio::duration duration;
+
+    XCTAssertEqual(duration.seconds(), 0.0);
+    XCTAssertEqualWithAccuracy(duration.tempo(), HUGE_VAL, 0.01);
+}
+
+- (void)test_duration_init_with_value {
+    yas::audio::duration duration{1.0};
+
+    XCTAssertEqual(duration.seconds(), 1.0);
+    XCTAssertEqual(duration.tempo(), 60.0);
+}
+
+- (void)test_duration_equal {
+    yas::audio::duration duration_a{1.0};
+    yas::audio::duration duration_b{1.0};
+
+    XCTAssertTrue(duration_a == duration_b);
+    XCTAssertFalse(duration_a != duration_b);
+
+    duration_b.set_seconds(0.5);
+
+    XCTAssertTrue(duration_a != duration_b);
+    XCTAssertFalse(duration_a == duration_b);
+}
+
+- (void)test_set_seconds {
+    yas::audio::duration duration;
+
+    duration.set_seconds(1.0);
+
+    XCTAssertEqual(duration.seconds(), 1.0);
+    XCTAssertEqual(duration.tempo(), 60.0);
+}
+
+- (void)test_set_tempo {
+    yas::audio::duration duration;
+
+    duration.set_tempo(60.0);
+
+    XCTAssertEqual(duration.seconds(), 1.0);
+    XCTAssertEqual(duration.tempo(), 60.0);
+}
+
 @end
