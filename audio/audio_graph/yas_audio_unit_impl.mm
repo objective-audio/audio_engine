@@ -3,9 +3,9 @@
 //  Copyright (c) 2015 Yuki Yasoshima.
 //
 
-#include "yas_audio_unit.h"
 #include "yas_audio_graph.h"
 #include "yas_audio_pcm_buffer.h"
+#include "yas_audio_unit.h"
 #include "yas_cf_utils.h"
 
 #if TARGET_OS_IPHONE
@@ -16,9 +16,11 @@ using namespace yas;
 
 #pragma mark - c functions
 
-static OSStatus CommonRenderCallback(void *inRefCon, AudioUnitRenderActionFlags *ioActionFlags,
-                                     const AudioTimeStamp *inTimeStamp, UInt32 inBusNumber, UInt32 inNumberFrames,
-                                     AudioBufferList *ioData, audio::render_type renderType) {
+namespace yas {
+static OSStatus common_render_callback(void *inRefCon, AudioUnitRenderActionFlags *ioActionFlags,
+                                       const AudioTimeStamp *inTimeStamp, UInt32 inBusNumber, UInt32 inNumberFrames,
+                                       AudioBufferList *ioData, audio::render_type renderType) {
+    audio::render_id render_id{.v = inRefCon};
     audio::render_parameters renderParameters = {
         .in_render_type = renderType,
         .io_action_flags = ioActionFlags,
@@ -26,49 +28,48 @@ static OSStatus CommonRenderCallback(void *inRefCon, AudioUnitRenderActionFlags 
         .in_bus_number = inBusNumber,
         .in_number_frames = inNumberFrames,
         .io_data = ioData,
-        .render_id = (audio::render_id){inRefCon},
+        .render_id = render_id,
     };
 
     audio::graph::audio_unit_render(renderParameters);
 
     return noErr;
-}
+};
 
-static OSStatus RenderCallback(void *inRefCon, AudioUnitRenderActionFlags *ioActionFlags,
-                               const AudioTimeStamp *inTimeStamp, UInt32 inBusNumber, UInt32 inNumberFrames,
+static OSStatus render_callback(void *inRefCon, AudioUnitRenderActionFlags *ioActionFlags,
+                                const AudioTimeStamp *inTimeStamp, UInt32 inBusNumber, UInt32 inNumberFrames,
+                                AudioBufferList *ioData) {
+    return common_render_callback(inRefCon, ioActionFlags, inTimeStamp, inBusNumber, inNumberFrames, ioData,
+                                  audio::render_type::normal);
+};
+
+static OSStatus clear_callback(void *, AudioUnitRenderActionFlags *, const AudioTimeStamp *, UInt32, UInt32,
                                AudioBufferList *ioData) {
-    return CommonRenderCallback(inRefCon, ioActionFlags, inTimeStamp, inBusNumber, inNumberFrames, ioData,
-                                audio::render_type::normal);
-}
-
-static OSStatus ClearCallback(void *inRefCon, AudioUnitRenderActionFlags *ioActionFlags,
-                              const AudioTimeStamp *inTimeStamp, UInt32 inBusNumber, UInt32 inNumberFrames,
-                              AudioBufferList *ioData) {
     if (ioData) {
         audio::clear(ioData);
     }
     return noErr;
-}
+};
 
-static OSStatus EmptyCallback(void *inRefCon, AudioUnitRenderActionFlags *ioActionFlags,
-                              const AudioTimeStamp *inTimeStamp, UInt32 inBusNumber, UInt32 inNumberFrames,
-                              AudioBufferList *ioData) {
+static OSStatus empty_callback(void *, AudioUnitRenderActionFlags *, const AudioTimeStamp *, UInt32, UInt32,
+                               AudioBufferList *) {
     return noErr;
+};
 }
 
-static OSStatus NotifyRenderCallback(void *inRefCon, AudioUnitRenderActionFlags *ioActionFlags,
-                                     const AudioTimeStamp *inTimeStamp, UInt32 inBusNumber, UInt32 inNumberFrames,
-                                     AudioBufferList *ioData) {
-    return CommonRenderCallback(inRefCon, ioActionFlags, inTimeStamp, inBusNumber, inNumberFrames, ioData,
-                                audio::render_type::notify);
-}
+static OSStatus notify_render_callback(void *inRefCon, AudioUnitRenderActionFlags *ioActionFlags,
+                                       const AudioTimeStamp *inTimeStamp, UInt32 inBusNumber, UInt32 inNumberFrames,
+                                       AudioBufferList *ioData) {
+    return common_render_callback(inRefCon, ioActionFlags, inTimeStamp, inBusNumber, inNumberFrames, ioData,
+                                  audio::render_type::notify);
+};
 
-static OSStatus InputRenderCallback(void *inRefCon, AudioUnitRenderActionFlags *ioActionFlags,
-                                    const AudioTimeStamp *inTimeStamp, UInt32 inBusNumber, UInt32 inNumberFrames,
-                                    AudioBufferList *ioData) {
-    return CommonRenderCallback(inRefCon, ioActionFlags, inTimeStamp, inBusNumber, inNumberFrames, ioData,
-                                audio::render_type::input);
-}
+static OSStatus input_render_callback(void *inRefCon, AudioUnitRenderActionFlags *ioActionFlags,
+                                      const AudioTimeStamp *inTimeStamp, UInt32 inBusNumber, UInt32 inNumberFrames,
+                                      AudioBufferList *ioData) {
+    return common_render_callback(inRefCon, ioActionFlags, inTimeStamp, inBusNumber, inNumberFrames, ioData,
+                                  audio::render_type::input);
+};
 
 #pragma mark - core
 
@@ -184,8 +185,7 @@ void audio::unit::impl::attach_render_callback(const UInt32 &bus_idx) {
     }
 
     render_id render_id{.graph = *graph_key, .unit = *key};
-
-    AURenderCallbackStruct callbackStruct{.inputProc = RenderCallback, .inputProcRefCon = render_id.v};
+    AURenderCallbackStruct callbackStruct{.inputProc = yas::render_callback, .inputProcRefCon = render_id.v};
 
     raise_if_au_error(AudioUnitSetProperty(_core->au_instance, kAudioUnitProperty_SetRenderCallback,
                                            kAudioUnitScope_Input, bus_idx, &callbackStruct,
@@ -193,7 +193,7 @@ void audio::unit::impl::attach_render_callback(const UInt32 &bus_idx) {
 }
 
 void audio::unit::impl::detach_render_callback(const UInt32 &bus_idx) {
-    AURenderCallbackStruct callbackStruct{.inputProc = ClearCallback, .inputProcRefCon = nullptr};
+    AURenderCallbackStruct callbackStruct{.inputProc = clear_callback, .inputProcRefCon = nullptr};
 
     raise_if_au_error(AudioUnitSetProperty(_core->au_instance, kAudioUnitProperty_SetRenderCallback,
                                            kAudioUnitScope_Input, bus_idx, &callbackStruct,
@@ -209,11 +209,11 @@ void audio::unit::impl::attach_render_notify() {
 
     render_id render_id{.graph = *graph_key, .unit = *key};
 
-    raise_if_au_error(AudioUnitAddRenderNotify(_core->au_instance, NotifyRenderCallback, render_id.v));
+    raise_if_au_error(AudioUnitAddRenderNotify(_core->au_instance, notify_render_callback, render_id.v));
 }
 
 void audio::unit::impl::detach_render_notify() {
-    raise_if_au_error(AudioUnitRemoveRenderNotify(_core->au_instance, NotifyRenderCallback, nullptr));
+    raise_if_au_error(AudioUnitRemoveRenderNotify(_core->au_instance, notify_render_callback, nullptr));
 }
 
 void audio::unit::impl::attach_input_callback() {
@@ -230,9 +230,7 @@ void audio::unit::impl::attach_input_callback() {
 
     render_id render_id{.graph = *graph_key, .unit = *key};
 
-    AURenderCallbackStruct callbackStruct;
-    callbackStruct.inputProc = InputRenderCallback;
-    callbackStruct.inputProcRefCon = render_id.v;
+    AURenderCallbackStruct callbackStruct = {.inputProc = input_render_callback, .inputProcRefCon = render_id.v};
 
     raise_if_au_error(AudioUnitSetProperty(_core->au_instance, kAudioOutputUnitProperty_SetInputCallback,
                                            kAudioUnitScope_Global, 0, &callbackStruct, sizeof(AURenderCallbackStruct)));
@@ -244,9 +242,7 @@ void audio::unit::impl::detach_input_callback() {
         return;
     }
 
-    AURenderCallbackStruct callbackStruct;
-    callbackStruct.inputProc = EmptyCallback;
-    callbackStruct.inputProcRefCon = NULL;
+    AURenderCallbackStruct callbackStruct = {.inputProc = empty_callback, .inputProcRefCon = NULL};
 
     raise_if_au_error(AudioUnitSetProperty(_core->au_instance, kAudioOutputUnitProperty_SetInputCallback,
                                            kAudioUnitScope_Global, 0, &callbackStruct, sizeof(AURenderCallbackStruct)));
