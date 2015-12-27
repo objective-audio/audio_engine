@@ -5,16 +5,16 @@
 
 #pragma once
 
-#include "yas_audio_types.h"
-#include "yas_audio_node_protocol.h"
-#include "yas_result.h"
-#include "yas_audio_format.h"
-#include "yas_audio_pcm_buffer.h"
-#include "yas_audio_connection.h"
-#include "yas_base.h"
-#include <memory>
-#include <map>
 #include <experimental/optional>
+#include <map>
+#include <memory>
+#include "yas_audio_connection.h"
+#include "yas_audio_format.h"
+#include "yas_audio_node_protocol.h"
+#include "yas_audio_pcm_buffer.h"
+#include "yas_audio_types.h"
+#include "yas_base.h"
+#include "yas_result.h"
 
 namespace yas {
 namespace audio {
@@ -26,9 +26,6 @@ namespace audio {
 
        public:
         class kernel;
-
-        struct create_tag_t {};
-        constexpr static create_tag_t create_tag{};
 
         explicit node(std::nullptr_t);
         virtual ~node();
@@ -98,8 +95,8 @@ struct std::hash<yas::audio::node> {
     }
 };
 
-#include "yas_audio_node_kernel.h"
 #include "yas_audio_node_impl.h"
+#include "yas_audio_node_kernel.h"
 
 #if YAS_TEST
 #include "yas_audio_node_private_access.h"
