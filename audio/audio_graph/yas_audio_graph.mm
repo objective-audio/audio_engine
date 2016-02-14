@@ -7,9 +7,9 @@
 #include "yas_stl_utils.h"
 
 #if TARGET_OS_IPHONE
-#include "yas_objc_container.h"
 #import <AVFoundation/AVFoundation.h>
 #import <UIKit/UIKit.h>
+#include "yas_objc_container.h"
 #endif
 
 using namespace yas;
@@ -220,7 +220,7 @@ class audio::graph::impl : public base::impl {
     void remove_all_units() {
         std::lock_guard<std::recursive_mutex> lock(_mutex);
 
-        enumerate(_units, [this](const auto &it) {
+        for_each(_units, [this](const auto &it) {
             auto unit = it->second;
             auto next = std::next(it);
             remove_audio_unit(unit);
