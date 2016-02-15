@@ -5,29 +5,29 @@
 
 #pragma once
 
-#include "yas_audio_types.h"
 #include <AudioToolbox/AudioToolbox.h>
 #include <memory>
+#include "yas_audio_types.h"
 
 namespace yas {
 namespace audio {
     class time {
        public:
-        time(std::nullptr_t n = nullptr);
-        time(const AudioTimeStamp &ts, const Float64 sample_rate);
-        explicit time(const UInt64 host_time);
-        time(const SInt64 sample_time, const Float64 sample_rate);
-        time(const UInt64 host_time, const SInt64 sample_time, const Float64 sample_rate);
+        time(std::nullptr_t);
+        time(AudioTimeStamp const &ts, Float64 const sample_rate);
+        explicit time(UInt64 const host_time);
+        time(SInt64 const sample_time, Float64 const sample_rate);
+        time(UInt64 const host_time, SInt64 const sample_time, Float64 const sample_rate);
 
         ~time() = default;
 
-        time(const time &) = default;
+        time(time const &) = default;
         time(time &&) = default;
-        time &operator=(const time &) = default;
+        time &operator=(time const &) = default;
         time &operator=(time &&) = default;
 
-        bool operator==(const time &) const;
-        bool operator!=(const time &) const;
+        bool operator==(time const &) const;
+        bool operator!=(time const &) const;
 
         explicit operator bool() const;
 
@@ -38,7 +38,7 @@ namespace audio {
         Float64 sample_rate() const;
         AudioTimeStamp audio_time_stamp() const;
 
-        time extrapolate_time_from_anchor(const time &anchor_time);
+        time extrapolate_time_from_anchor(time const &anchor_time);
 
        private:
         class impl;

@@ -3,12 +3,12 @@
 //  Copyright (c) 2015 Yuki Yasoshima.
 //
 
-#include "yas_audio_time.h"
-#include "yas_audio_objc_utils.h"
 #include <AVFoundation/AVFoundation.h>
-#include "yas_objc_macros.h"
 #include <exception>
 #include <string>
+#include "yas_audio_objc_utils.h"
+#include "yas_audio_time.h"
+#include "yas_objc_macros.h"
 
 using namespace yas;
 
@@ -26,37 +26,37 @@ class audio::time::impl {
         yas_release(av_audio_time);
     }
 
-    impl(const impl &) = delete;
+    impl(impl const &) = delete;
     impl(impl &&) = delete;
-    impl &operator=(const impl &) = delete;
+    impl &operator=(impl const &) = delete;
     impl &operator=(impl &&) = delete;
 };
 
 audio::time::time(std::nullptr_t) : _impl(nullptr) {
 }
 
-audio::time::time(const AudioTimeStamp &ts, const Float64 sample_rate)
+audio::time::time(AudioTimeStamp const &ts, Float64 const sample_rate)
     : _impl(std::make_shared<impl>([[AVAudioTime alloc] initWithAudioTimeStamp:&ts sampleRate:sample_rate])) {
     yas_release(_impl->av_audio_time);
 }
 
-audio::time::time(const UInt64 host_time)
+audio::time::time(UInt64 const host_time)
     : _impl(std::make_shared<impl>([[AVAudioTime alloc] initWithHostTime:host_time])) {
     yas_release(_impl->av_audio_time);
 }
 
-audio::time::time(const SInt64 sample_time, const Float64 sample_rate)
+audio::time::time(SInt64 const sample_time, Float64 const sample_rate)
     : _impl(std::make_shared<impl>([[AVAudioTime alloc] initWithSampleTime:sample_time atRate:sample_rate])) {
     yas_release(_impl->av_audio_time);
 }
 
-audio::time::time(const UInt64 host_time, const SInt64 sample_time, const Float64 sample_rate)
+audio::time::time(UInt64 const host_time, SInt64 const sample_time, Float64 const sample_rate)
     : _impl(std::make_shared<impl>(
           [[AVAudioTime alloc] initWithHostTime:host_time sampleTime:sample_time atRate:sample_rate])) {
     yas_release(_impl->av_audio_time);
 }
 
-bool audio::time::operator==(const audio::time &rhs) const {
+bool audio::time::operator==(audio::time const &rhs) const {
     if (_impl && rhs._impl) {
         if (_impl == rhs._impl) {
             return true;
@@ -68,7 +68,7 @@ bool audio::time::operator==(const audio::time &rhs) const {
     }
 }
 
-bool audio::time::operator!=(const audio::time &rhs) const {
+bool audio::time::operator!=(audio::time const &rhs) const {
     return !(*this == rhs);
 }
 
@@ -124,12 +124,12 @@ AudioTimeStamp audio::time::audio_time_stamp() const {
     }
 }
 
-audio::time audio::time::extrapolate_time_from_anchor(const audio::time &anchor_time) {
+audio::time audio::time::extrapolate_time_from_anchor(audio::time const &anchor_time) {
     if (_impl) {
         AVAudioTime *time = [_impl->av_audio_time extrapolateTimeFromAnchor:anchor_time._impl->av_audio_time];
         return to_time(time);
     } else {
-        return time();
+        return time{nullptr};
     }
 }
 
