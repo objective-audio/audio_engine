@@ -3,44 +3,44 @@
 //  Copyright (c) 2015 Yuki Yasoshima.
 //
 
-#include "yas_audio_route.h"
-#include "yas_audio_format.h"
-#include "yas_cf_utils.h"
 #include <exception>
+#include "yas_audio_format.h"
+#include "yas_audio_route.h"
+#include "yas_cf_utils.h"
 
 using namespace yas;
 
-audio::route::point::point(const UInt32 bus_idx, const UInt32 ch_idx) : bus(bus_idx), channel(ch_idx) {
+audio::route::point::point(UInt32 const bus_idx, UInt32 const ch_idx) : bus(bus_idx), channel(ch_idx) {
 }
 
-bool audio::route::point::operator==(const point &rhs) const {
+bool audio::route::point::operator==(point const &rhs) const {
     return bus == rhs.bus && channel == rhs.channel;
 }
 
-bool audio::route::point::operator!=(const point &rhs) const {
+bool audio::route::point::operator!=(point const &rhs) const {
     return bus != rhs.bus || channel != rhs.channel;
 }
 
-audio::route::route(const UInt32 src_bus_idx, const UInt32 src_ch_idx, const UInt32 dst_bus_idx,
-                    const UInt32 dst_ch_idx)
+audio::route::route(UInt32 const src_bus_idx, UInt32 const src_ch_idx, UInt32 const dst_bus_idx,
+                    UInt32 const dst_ch_idx)
     : source(src_bus_idx, src_ch_idx), destination(dst_bus_idx, dst_ch_idx) {
 }
 
-audio::route::route(const UInt32 bus_idx, const UInt32 ch_idx) : source(bus_idx, ch_idx), destination(bus_idx, ch_idx) {
+audio::route::route(UInt32 const bus_idx, UInt32 const ch_idx) : source(bus_idx, ch_idx), destination(bus_idx, ch_idx) {
 }
 
-audio::route::route(const point &src_point, const point &dst_point) : source(src_point), destination(dst_point) {
+audio::route::route(point const &src_point, point const &dst_point) : source(src_point), destination(dst_point) {
 }
 
-bool audio::route::operator==(const route &rhs) const {
+bool audio::route::operator==(route const &rhs) const {
     return source == rhs.source && destination == rhs.destination;
 }
 
-bool audio::route::operator!=(const route &rhs) const {
+bool audio::route::operator!=(route const &rhs) const {
     return source != rhs.source || destination != rhs.destination;
 }
 
-bool audio::route::operator<(const route &rhs) const {
+bool audio::route::operator<(route const &rhs) const {
     if (source.bus != rhs.source.bus) {
         return source.bus < rhs.source.bus;
     }
@@ -58,13 +58,13 @@ bool audio::route::operator<(const route &rhs) const {
 
 #pragma mark -
 
-audio::channel_map_result yas::audio::channel_map_from_routes(const route_set_t &routes, const UInt32 src_bus_idx,
-                                                              const UInt32 src_ch_count, const UInt32 dst_bus_idx,
-                                                              const UInt32 dst_ch_count) {
+audio::channel_map_result yas::audio::channel_map_from_routes(route_set_t const &routes, UInt32 const src_bus_idx,
+                                                              UInt32 const src_ch_count, UInt32 const dst_bus_idx,
+                                                              UInt32 const dst_ch_count) {
     channel_map_t channel_map(src_ch_count, -1);
     bool exists = false;
 
-    for (const auto &route : routes) {
+    for (auto const &route : routes) {
         if (route.source.bus == src_bus_idx && route.destination.bus == dst_bus_idx &&
             route.source.channel < src_ch_count && route.destination.channel < dst_ch_count) {
             channel_map.at(route.source.channel) = route.destination.channel;

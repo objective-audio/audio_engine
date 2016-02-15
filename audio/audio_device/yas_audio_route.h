@@ -5,13 +5,13 @@
 
 #pragma once
 
-#include "yas_audio_types.h"
-#include "yas_audio_format.h"
-#include "yas_result.h"
 #include <MacTypes.h>
-#include <string>
 #include <memory>
+#include <string>
 #include <vector>
+#include "yas_audio_format.h"
+#include "yas_audio_types.h"
+#include "yas_result.h"
 
 namespace yas {
 namespace audio {
@@ -20,19 +20,19 @@ namespace audio {
             UInt32 bus;
             UInt32 channel;
 
-            point(const UInt32 bus_idx, const UInt32 ch_idx);
+            point(UInt32 const bus_idx, UInt32 const ch_idx);
 
-            bool operator==(const point &) const;
-            bool operator!=(const point &) const;
+            bool operator==(point const &) const;
+            bool operator!=(point const &) const;
         };
 
-        route(const UInt32 src_bus_idx, const UInt32 src_ch_idx, const UInt32 dst_bus_idx, const UInt32 dst_ch_idx);
-        route(const UInt32 bus_idx, const UInt32 ch_idx);
-        route(const point &src_point, const point &dst_point);
+        route(UInt32 const src_bus_idx, UInt32 const src_ch_idx, UInt32 const dst_bus_idx, UInt32 const dst_ch_idx);
+        route(UInt32 const bus_idx, UInt32 const ch_idx);
+        route(point const &src_point, point const &dst_point);
 
-        bool operator==(const route &) const;
-        bool operator!=(const route &) const;
-        bool operator<(const route &) const;
+        bool operator==(route const &) const;
+        bool operator!=(route const &) const;
+        bool operator<(route const &) const;
 
         point source;
         point destination;
@@ -41,8 +41,8 @@ namespace audio {
     using route_set_t = std::set<route>;
 
     using channel_map_result = result<channel_map_t, std::nullptr_t>;
-    channel_map_result channel_map_from_routes(const route_set_t &routes, const UInt32 src_bus_idx,
-                                               const UInt32 src_ch_count, const UInt32 dst_bus_idx,
-                                               const UInt32 dst_ch_count);
+    channel_map_result channel_map_from_routes(route_set_t const &routes, UInt32 const src_bus_idx,
+                                               UInt32 const src_ch_count, UInt32 const dst_bus_idx,
+                                               UInt32 const dst_ch_count);
 }
 }
