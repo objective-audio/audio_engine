@@ -3,13 +3,13 @@
 //  Copyright (c) 2015 Yuki Yasoshima.
 //
 
+#include <AudioToolbox/AudioToolbox.h>
 #include "yas_audio_file.h"
 #include "yas_audio_file_utils.h"
-#include "yas_audio_pcm_buffer.h"
 #include "yas_audio_format.h"
+#include "yas_audio_pcm_buffer.h"
 #include "yas_cf_utils.h"
 #include "yas_exception.h"
-#include <AudioToolbox/AudioToolbox.h>
 
 using namespace yas;
 
@@ -37,7 +37,7 @@ class audio::file::impl {
         close();
     }
 
-    void set_url(const CFURLRef url) {
+    void set_url(CFURLRef const url) {
         yas::set_cf_property(_url, url);
     }
 
@@ -45,7 +45,7 @@ class audio::file::impl {
         return _url;
     }
 
-    void set_file_type(const CFStringRef file_type) {
+    void set_file_type(CFStringRef const file_type) {
         yas::set_cf_property(_file_type, file_type);
     }
 
@@ -53,7 +53,7 @@ class audio::file::impl {
         return _file_type;
     }
 
-    bool open(const pcm_format pcm_format, const bool interleaved) {
+    bool open(pcm_format const pcm_format, bool const interleaved) {
         if (!ext_audio_file_utils::can_open(url())) {
             return false;
         }
@@ -88,7 +88,7 @@ class audio::file::impl {
         return true;
     }
 
-    bool create(const CFDictionaryRef &settings, const pcm_format pcm_format, const bool interleaved) {
+    bool create(CFDictionaryRef const &settings, pcm_format const pcm_format, bool const interleaved) {
         file_format = format{settings};
 
         AudioFileTypeID file_type_id = to_audio_file_type_id(file_type());
@@ -141,18 +141,18 @@ CFURLRef audio::file::url() const {
     return _impl->url();
 }
 
-const audio::format &audio::file::file_format() const {
+audio::format const &audio::file::file_format() const {
     return _impl->file_format;
 }
 
-void audio::file::set_processing_format(const audio::format &format) {
+void audio::file::set_processing_format(audio::format const &format) {
     _impl->processing_format = format;
     if (_impl->ext_audio_file) {
         ext_audio_file_utils::set_client_format(format.stream_description(), _impl->ext_audio_file);
     }
 }
 
-const audio::format &audio::file::processing_format() const {
+audio::format const &audio::file::processing_format() const {
     return _impl->processing_format;
 }
 
@@ -164,13 +164,13 @@ SInt64 audio::file::file_length() const {
 }
 
 SInt64 audio::file::processing_length() const {
-    const SInt64 fileLength = file_length();
-    const Float64 rate =
+    SInt64 const fileLength = file_length();
+    Float64 const rate =
         _impl->processing_format.stream_description().mSampleRate / _impl->file_format.stream_description().mSampleRate;
     return fileLength * rate;
 }
 
-void audio::file::set_file_frame_position(const UInt32 position) {
+void audio::file::set_file_frame_position(UInt32 const position) {
     if (_impl->file_frame_position != position) {
         OSStatus err = ExtAudioFileSeek(_impl->ext_audio_file, position);
         if (err == noErr) {
@@ -183,8 +183,8 @@ SInt64 audio::file::file_frame_position() const {
     return _impl->file_frame_position;
 }
 
-audio::file::open_result_t audio::file::open(const CFURLRef file_url, const pcm_format pcm_format,
-                                             const bool interleaved) {
+audio::file::open_result_t audio::file::open(CFURLRef const file_url, pcm_format const pcm_format,
+                                             bool const interleaved) {
     if (_impl->ext_audio_file) {
         return open_result_t(open_error_t::opened);
     }
@@ -202,9 +202,9 @@ audio::file::open_result_t audio::file::open(const CFURLRef file_url, const pcm_
     return open_result_t(nullptr);
 }
 
-audio::file::create_result_t audio::file::create(const CFURLRef file_url, const CFStringRef file_type,
-                                                 const CFDictionaryRef settings, const pcm_format pcm_format,
-                                                 const bool interleaved) {
+audio::file::create_result_t audio::file::create(CFURLRef const file_url, CFStringRef const file_type,
+                                                 CFDictionaryRef const settings, pcm_format const pcm_format,
+                                                 bool const interleaved) {
     if (_impl->ext_audio_file) {
         return create_result_t(create_error_t::created);
     }
@@ -227,7 +227,7 @@ void audio::file::close() {
     _impl->close();
 }
 
-audio::file::read_result_t audio::file::read_into_buffer(audio::pcm_buffer &buffer, const UInt32 frame_length) {
+audio::file::read_result_t audio::file::read_into_buffer(audio::pcm_buffer &buffer, UInt32 const frame_length) {
     if (!_impl->ext_audio_file) {
         return read_result_t(read_error_t::closed);
     }
@@ -244,9 +244,9 @@ audio::file::read_result_t audio::file::read_into_buffer(audio::pcm_buffer &buff
     UInt32 out_frame_length = 0;
     UInt32 remain_frames = frame_length > 0 ?: buffer.frame_capacity();
 
-    const auto &format = buffer.format();
-    const UInt32 buffer_count = format.buffer_count();
-    const UInt32 stride = format.stride();
+    auto const &format = buffer.format();
+    UInt32 const buffer_count = format.buffer_count();
+    UInt32 const stride = format.stride();
 
     if (auto abl_ptr = allocate_audio_buffer_list(buffer_count, 0, 0).first) {
         AudioBufferList *io_abl = abl_ptr.get();
@@ -293,7 +293,7 @@ audio::file::read_result_t audio::file::read_into_buffer(audio::pcm_buffer &buff
     return read_result_t(nullptr);
 }
 
-audio::file::write_result_t audio::file::write_from_buffer(const audio::pcm_buffer &buffer, const bool async) {
+audio::file::write_result_t audio::file::write_from_buffer(audio::pcm_buffer const &buffer, bool const async) {
     if (!_impl->ext_audio_file) {
         return write_result_t(write_error_t::closed);
     }
@@ -326,7 +326,7 @@ audio::file::write_result_t audio::file::write_from_buffer(const audio::pcm_buff
     return write_result_t(nullptr);
 }
 
-std::string yas::to_string(const audio::file::open_error_t &error_t) {
+std::string yas::to_string(audio::file::open_error_t const &error_t) {
     switch (error_t) {
         case audio::file::open_error_t::opened:
             return "opened";
@@ -337,7 +337,7 @@ std::string yas::to_string(const audio::file::open_error_t &error_t) {
     }
 }
 
-std::string yas::to_string(const audio::file::read_error_t &error_t) {
+std::string yas::to_string(audio::file::read_error_t const &error_t) {
     switch (error_t) {
         case audio::file::read_error_t::closed:
             return "closed";
@@ -352,7 +352,7 @@ std::string yas::to_string(const audio::file::read_error_t &error_t) {
     }
 }
 
-std::string yas::to_string(const audio::file::create_error_t &error_t) {
+std::string yas::to_string(audio::file::create_error_t const &error_t) {
     switch (error_t) {
         case audio::file::create_error_t::created:
             return "created";
@@ -363,7 +363,7 @@ std::string yas::to_string(const audio::file::create_error_t &error_t) {
     }
 }
 
-std::string yas::to_string(const audio::file::write_error_t &error_t) {
+std::string yas::to_string(audio::file::write_error_t const &error_t) {
     switch (error_t) {
         case audio::file::write_error_t::closed:
             return "closed";
