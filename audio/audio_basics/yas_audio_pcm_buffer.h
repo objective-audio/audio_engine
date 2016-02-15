@@ -5,12 +5,12 @@
 
 #pragma once
 
-#include "yas_audio_types.h"
-#include "yas_result.h"
-#include "yas_audio_route.h"
-#include "yas_flex_ptr.h"
 #include <memory>
 #include <vector>
+#include "yas_audio_route.h"
+#include "yas_audio_types.h"
+#include "yas_flex_ptr.h"
+#include "yas_result.h"
 
 namespace yas {
 namespace audio {
@@ -27,47 +27,47 @@ namespace audio {
         using copy_result = result<UInt32, copy_error_t>;
 
         pcm_buffer(std::nullptr_t n = nullptr);
-        pcm_buffer(const audio::format &format, AudioBufferList *abl);
-        pcm_buffer(const audio::format &format, const UInt32 frame_capacity);
-        pcm_buffer(const audio::format &format, const pcm_buffer &from_buffer, const channel_map_t &channel_map);
+        pcm_buffer(audio::format const &format, AudioBufferList *abl);
+        pcm_buffer(audio::format const &format, UInt32 const frame_capacity);
+        pcm_buffer(audio::format const &format, pcm_buffer const &from_buffer, const channel_map_t &channel_map);
 
-        pcm_buffer(const pcm_buffer &) = default;
+        pcm_buffer(pcm_buffer const &) = default;
         pcm_buffer(pcm_buffer &&) = default;
-        pcm_buffer &operator=(const pcm_buffer &) = default;
+        pcm_buffer &operator=(pcm_buffer const &) = default;
         pcm_buffer &operator=(pcm_buffer &&) = default;
 
         explicit operator bool() const;
 
-        const audio::format &format() const;
+        audio::format const &format() const;
         AudioBufferList *audio_buffer_list();
         const AudioBufferList *audio_buffer_list() const;
 
-        flex_ptr flex_ptr_at_index(const UInt32 buf_idx) const;
-        flex_ptr flex_ptr_at_channel(const UInt32 ch_idx) const;
+        flex_ptr flex_ptr_at_index(UInt32 const buf_idx) const;
+        flex_ptr flex_ptr_at_channel(UInt32 const ch_idx) const;
 
         template <typename T>
-        T *data_ptr_at_index(const UInt32 buf_idx);
+        T *data_ptr_at_index(UInt32 const buf_idx);
         template <typename T>
-        T *data_ptr_at_channel(const UInt32 ch_idx);
+        T *data_ptr_at_channel(UInt32 const ch_idx);
         template <typename T>
-        const T *data_ptr_at_index(const UInt32 buf_idx) const;
+        const T *data_ptr_at_index(UInt32 const buf_idx) const;
         template <typename T>
-        const T *data_ptr_at_channel(const UInt32 ch_idx) const;
+        const T *data_ptr_at_channel(UInt32 const ch_idx) const;
 
-        const UInt32 frame_capacity() const;
-        const UInt32 frame_length() const;
-        void set_frame_length(const UInt32 length);
+        UInt32 frame_capacity() const;
+        UInt32 frame_length() const;
+        void set_frame_length(UInt32 const length);
 
         void reset();
         void clear();
-        void clear(const UInt32 start_frame, const UInt32 length);
+        void clear(UInt32 const start_frame, UInt32 const length);
 
-        pcm_buffer::copy_result copy_from(const pcm_buffer &from_buffer, const UInt32 from_start_frame = 0,
-                                          const UInt32 to_start_frame = 0, const UInt32 length = 0);
-        pcm_buffer::copy_result copy_from(const AudioBufferList *from_abl, const UInt32 from_start_frame = 0,
-                                          const UInt32 to_start_frame = 0, const UInt32 length = 0);
-        pcm_buffer::copy_result copy_to(AudioBufferList *to_abl, const UInt32 from_start_frame = 0,
-                                        const UInt32 to_start_frame = 0, const UInt32 length = 0);
+        pcm_buffer::copy_result copy_from(pcm_buffer const &from_buffer, UInt32 const from_start_frame = 0,
+                                          UInt32 const to_start_frame = 0, UInt32 const length = 0);
+        pcm_buffer::copy_result copy_from(const AudioBufferList *const from_abl, UInt32 const from_start_frame = 0,
+                                          UInt32 const to_start_frame = 0, UInt32 const length = 0);
+        pcm_buffer::copy_result copy_to(AudioBufferList *const to_abl, UInt32 const from_start_frame = 0,
+                                        UInt32 const to_start_frame = 0, UInt32 const length = 0);
 
        private:
         class impl;
@@ -76,16 +76,16 @@ namespace audio {
 
     void clear(AudioBufferList *abl);
 
-    pcm_buffer::copy_result copy(const AudioBufferList *from_abl, AudioBufferList *to_abl,
-                                 const UInt32 sample_byte_count, const UInt32 from_start_frame = 0,
-                                 const UInt32 to_start_frame = 0, const UInt32 length = 0);
+    pcm_buffer::copy_result copy(const AudioBufferList *const from_abl, AudioBufferList *const to_abl,
+                                 UInt32 const sample_byte_count, UInt32 const from_start_frame = 0,
+                                 UInt32 const to_start_frame = 0, UInt32 const length = 0);
 
-    UInt32 frame_length(const AudioBufferList *abl, const UInt32 sample_byte_count);
+    UInt32 frame_length(const AudioBufferList *const abl, UInt32 const sample_byte_count);
 
-    std::pair<abl_uptr, abl_data_uptr> allocate_audio_buffer_list(const UInt32 buffer_count, const UInt32 channel_count,
-                                                                  const UInt32 size = 0);
-    bool is_equal_structure(const AudioBufferList &abl1, const AudioBufferList &abl2);
+    std::pair<abl_uptr, abl_data_uptr> allocate_audio_buffer_list(UInt32 const buffer_count, UInt32 const channel_count,
+                                                                  UInt32 const size = 0);
+    bool is_equal_structure(AudioBufferList const &abl1, AudioBufferList const &abl2);
 }
 
-std::string to_string(const audio::pcm_buffer::copy_error_t &error);
+std::string to_string(audio::pcm_buffer::copy_error_t const &error);
 }

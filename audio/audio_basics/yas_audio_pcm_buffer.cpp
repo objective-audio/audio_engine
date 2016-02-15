@@ -3,14 +3,14 @@
 //  Copyright (c) 2015 Yuki Yasoshima.
 //
 
-#include "yas_audio_pcm_buffer.h"
-#include "yas_audio_format.h"
-#include "yas_stl_utils.h"
-#include <string>
+#include <Accelerate/Accelerate.h>
 #include <exception>
 #include <functional>
 #include <iostream>
-#include <Accelerate/Accelerate.h>
+#include <string>
+#include "yas_audio_format.h"
+#include "yas_audio_pcm_buffer.h"
+#include "yas_stl_utils.h"
 
 using namespace yas;
 
@@ -18,12 +18,12 @@ using namespace yas;
 
 class audio::pcm_buffer::impl {
    public:
-    const audio::format format;
+    audio::format const format;
     const AudioBufferList *abl_ptr;
-    const UInt32 frame_capacity;
+    UInt32 const frame_capacity;
     UInt32 frame_length;
 
-    impl(const audio::format &format, AudioBufferList *ptr, const UInt32 frame_capacity)
+    impl(audio::format const &format, AudioBufferList *ptr, UInt32 const frame_capacity)
         : format(format),
           abl_ptr(ptr),
           frame_capacity(frame_capacity),
@@ -32,7 +32,7 @@ class audio::pcm_buffer::impl {
           _data(nullptr) {
     }
 
-    impl(const audio::format &format, abl_uptr &&abl, abl_data_uptr &&data, const UInt32 frame_capacity)
+    impl(audio::format const &format, abl_uptr &&abl, abl_data_uptr &&data, UInt32 const frame_capacity)
         : format(format),
           frame_capacity(frame_capacity),
           frame_length(frame_capacity),
@@ -41,7 +41,7 @@ class audio::pcm_buffer::impl {
           _data(std::move(data)) {
     }
 
-    impl(const audio::format &format, abl_uptr &&abl, const UInt32 frame_capacity)
+    impl(audio::format const &format, abl_uptr &&abl, UInt32 const frame_capacity)
         : format(format),
           frame_capacity(frame_capacity),
           frame_length(frame_capacity),
@@ -50,7 +50,7 @@ class audio::pcm_buffer::impl {
           _data(nullptr) {
     }
 
-    flex_ptr flex_ptr_at_index(const UInt32 buf_idx) {
+    flex_ptr flex_ptr_at_index(UInt32 const buf_idx) {
         if (buf_idx >= abl_ptr->mNumberBuffers) {
             throw std::out_of_range(std::string(__PRETTY_FUNCTION__) + " : out of range. buf_idx(" +
                                     std::to_string(buf_idx) + ") _impl->abl_ptr.mNumberBuffers(" +
@@ -60,7 +60,7 @@ class audio::pcm_buffer::impl {
         return flex_ptr(abl_ptr->mBuffers[buf_idx].mData);
     }
 
-    flex_ptr flex_ptr_at_channel(const UInt32 ch_idx) {
+    flex_ptr flex_ptr_at_channel(UInt32 const ch_idx) {
         flex_ptr pointer;
 
         if (format.stride() > 1) {
@@ -93,13 +93,13 @@ class audio::pcm_buffer::impl {
     }
 
    private:
-    const abl_uptr _abl;
-    const abl_data_uptr _data;
+    abl_uptr const _abl;
+    abl_data_uptr const _data;
 };
 
-std::pair<audio::abl_uptr, audio::abl_data_uptr> yas::audio::allocate_audio_buffer_list(const UInt32 buffer_count,
-                                                                                        const UInt32 channel_count,
-                                                                                        const UInt32 size) {
+std::pair<audio::abl_uptr, audio::abl_data_uptr> yas::audio::allocate_audio_buffer_list(UInt32 const buffer_count,
+                                                                                        UInt32 const channel_count,
+                                                                                        UInt32 const size) {
     abl_uptr abl_ptr((AudioBufferList *)calloc(1, sizeof(AudioBufferList) + buffer_count * sizeof(AudioBuffer)),
                      [](AudioBufferList *abl) { free(abl); });
 
@@ -125,7 +125,7 @@ std::pair<audio::abl_uptr, audio::abl_data_uptr> yas::audio::allocate_audio_buff
     return std::make_pair(std::move(abl_ptr), std::move(data_ptr));
 }
 
-static void set_data_byte_size(audio::pcm_buffer &data, const UInt32 data_byte_size) {
+static void set_data_byte_size(audio::pcm_buffer &data, UInt32 const data_byte_size) {
     AudioBufferList *abl = data.audio_buffer_list();
     for (UInt32 i = 0; i < abl->mNumberBuffers; i++) {
         abl->mBuffers[i].mDataByteSize = data_byte_size;
@@ -133,13 +133,13 @@ static void set_data_byte_size(audio::pcm_buffer &data, const UInt32 data_byte_s
 }
 
 static void reset_data_byte_size(audio::pcm_buffer &data) {
-    const UInt32 data_byte_size =
-        (const UInt32)(data.frame_capacity() * data.format().stream_description().mBytesPerFrame);
+    UInt32 const data_byte_size =
+        (UInt32 const)(data.frame_capacity() * data.format().stream_description().mBytesPerFrame);
     set_data_byte_size(data, data_byte_size);
 }
 
 template <typename T>
-static bool validate_pcm_format(const yas::audio::pcm_format &pcm_format) {
+static bool validate_pcm_format(yas::audio::pcm_format const &pcm_format) {
     switch (pcm_format) {
         case yas::audio::pcm_format::float32:
             return typeid(T) == typeid(Float32);
@@ -168,18 +168,18 @@ namespace audio {
 
     using get_abl_info_result_t = result<abl_info, pcm_buffer::copy_error_t>;
 
-    static get_abl_info_result_t get_abl_info(const AudioBufferList *abl, const UInt32 sample_byte_count) {
+    static get_abl_info_result_t get_abl_info(const AudioBufferList *abl, UInt32 const sample_byte_count) {
         if (!abl || sample_byte_count == 0 || sample_byte_count > 8) {
             return get_abl_info_result_t(pcm_buffer::copy_error_t::invalid_argument);
         }
 
-        const UInt32 buffer_count = abl->mNumberBuffers;
+        UInt32 const buffer_count = abl->mNumberBuffers;
 
         audio::abl_info data_info;
 
         for (UInt32 buf_idx = 0; buf_idx < buffer_count; ++buf_idx) {
-            const UInt32 stride = abl->mBuffers[buf_idx].mNumberChannels;
-            const UInt32 frame_length = abl->mBuffers[buf_idx].mDataByteSize / stride / sample_byte_count;
+            UInt32 const stride = abl->mBuffers[buf_idx].mNumberChannels;
+            UInt32 const frame_length = abl->mBuffers[buf_idx].mDataByteSize / stride / sample_byte_count;
             if (data_info.frame_length == 0) {
                 data_info.frame_length = frame_length;
             } else if (data_info.frame_length != frame_length) {
@@ -190,7 +190,7 @@ namespace audio {
 
         if (data_info.channel_count > 0) {
             for (UInt32 buf_idx = 0; buf_idx < buffer_count; buf_idx++) {
-                const UInt32 stride = abl->mBuffers[buf_idx].mNumberChannels;
+                UInt32 const stride = abl->mBuffers[buf_idx].mNumberChannels;
                 UInt8 *data = static_cast<UInt8 *>(abl->mBuffers[buf_idx].mData);
                 for (UInt32 ch_idx = 0; ch_idx < stride; ++ch_idx) {
                     data_info.datas.push_back(&data[ch_idx * sample_byte_count]);
@@ -209,7 +209,7 @@ namespace audio {
 audio::pcm_buffer::pcm_buffer(std::nullptr_t) : _impl(nullptr) {
 }
 
-audio::pcm_buffer::pcm_buffer(const audio::format &format, AudioBufferList *abl) {
+audio::pcm_buffer::pcm_buffer(audio::format const &format, AudioBufferList *abl) {
     if (!format || !abl) {
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
     }
@@ -218,7 +218,7 @@ audio::pcm_buffer::pcm_buffer(const audio::format &format, AudioBufferList *abl)
                                    abl->mBuffers[0].mDataByteSize / format.stream_description().mBytesPerFrame);
 }
 
-audio::pcm_buffer::pcm_buffer(const audio::format &format, const UInt32 frame_capacity) {
+audio::pcm_buffer::pcm_buffer(audio::format const &format, UInt32 const frame_capacity) {
     if (frame_capacity == 0) {
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
     }
@@ -228,9 +228,9 @@ audio::pcm_buffer::pcm_buffer(const audio::format &format, const UInt32 frame_ca
     _impl = std::make_shared<impl>(format, std::move(pair.first), std::move(pair.second), frame_capacity);
 }
 
-audio::pcm_buffer::pcm_buffer(const audio::format &format, const audio::pcm_buffer &from_buffer,
-                              const channel_map_t &channel_map) {
-    const auto &from_format = from_buffer.format();
+audio::pcm_buffer::pcm_buffer(audio::format const &format, audio::pcm_buffer const &from_buffer,
+                              channel_map_t const &channel_map) {
+    auto const &from_format = from_buffer.format();
 
     if (channel_map.size() != format.channel_count() || format.is_interleaved() || from_format.is_interleaved() ||
         format.pcm_format() != from_format.pcm_format()) {
@@ -240,13 +240,13 @@ audio::pcm_buffer::pcm_buffer(const audio::format &format, const audio::pcm_buff
     auto pair = allocate_audio_buffer_list(format.buffer_count(), format.stride(), 0);
     abl_uptr &to_abl = pair.first;
 
-    const AudioBufferList *from_abl = from_buffer.audio_buffer_list();
+    const AudioBufferList *const from_abl = from_buffer.audio_buffer_list();
     UInt32 bytesPerFrame = format.stream_description().mBytesPerFrame;
-    const UInt32 frame_length = from_buffer.frame_length();
+    UInt32 const frame_length = from_buffer.frame_length();
     UInt32 to_ch_idx = 0;
     abl_data_uptr data = nullptr;
 
-    for (const auto &from_ch_idx : channel_map) {
+    for (auto const &from_ch_idx : channel_map) {
         if (from_ch_idx != -1) {
             to_abl->mBuffers[to_ch_idx].mData = from_abl->mBuffers[from_ch_idx].mData;
             to_abl->mBuffers[to_ch_idx].mDataByteSize = from_abl->mBuffers[from_ch_idx].mDataByteSize;
@@ -258,7 +258,7 @@ audio::pcm_buffer::pcm_buffer(const audio::format &format, const audio::pcm_buff
             }
         } else {
             if (to_abl->mBuffers[to_ch_idx].mData == nullptr) {
-                const UInt32 size = bytesPerFrame * frame_length;
+                UInt32 const size = bytesPerFrame * frame_length;
                 auto dummy_data = pcm_buffer::impl::dummy_data();
                 if (size <= dummy_data.size()) {
                     to_abl->mBuffers[to_ch_idx].mData = dummy_data.data();
@@ -279,7 +279,7 @@ audio::pcm_buffer::operator bool() const {
     return _impl != nullptr;
 }
 
-const audio::format &audio::pcm_buffer::format() const {
+audio::format const &audio::pcm_buffer::format() const {
     if (_impl) {
         return _impl->format;
     }
@@ -300,14 +300,14 @@ const AudioBufferList *audio::pcm_buffer::audio_buffer_list() const {
     return nullptr;
 }
 
-flex_ptr audio::pcm_buffer::flex_ptr_at_index(const UInt32 buf_idx) const {
+flex_ptr audio::pcm_buffer::flex_ptr_at_index(UInt32 const buf_idx) const {
     if (_impl) {
         return _impl->flex_ptr_at_index(buf_idx);
     }
     return nullptr;
 }
 
-flex_ptr audio::pcm_buffer::flex_ptr_at_channel(const UInt32 ch_idx) const {
+flex_ptr audio::pcm_buffer::flex_ptr_at_channel(UInt32 const ch_idx) const {
     if (_impl) {
         return _impl->flex_ptr_at_channel(ch_idx);
     }
@@ -315,7 +315,7 @@ flex_ptr audio::pcm_buffer::flex_ptr_at_channel(const UInt32 ch_idx) const {
 }
 
 template <typename T>
-T *yas::audio::pcm_buffer::data_ptr_at_index(const UInt32 buf_idx) {
+T *yas::audio::pcm_buffer::data_ptr_at_index(UInt32 const buf_idx) {
     if (_impl) {
         if (!validate_pcm_format<T>(format().pcm_format())) {
             throw std::runtime_error(std::string(__PRETTY_FUNCTION__) + " : invalid pcm_format.");
@@ -327,13 +327,13 @@ T *yas::audio::pcm_buffer::data_ptr_at_index(const UInt32 buf_idx) {
     return nullptr;
 }
 
-template Float32 *yas::audio::pcm_buffer::data_ptr_at_index(const UInt32 buf_idx);
-template Float64 *yas::audio::pcm_buffer::data_ptr_at_index(const UInt32 buf_idx);
-template SInt32 *yas::audio::pcm_buffer::data_ptr_at_index(const UInt32 buf_idx);
-template SInt16 *yas::audio::pcm_buffer::data_ptr_at_index(const UInt32 buf_idx);
+template Float32 *yas::audio::pcm_buffer::data_ptr_at_index(UInt32 const buf_idx);
+template Float64 *yas::audio::pcm_buffer::data_ptr_at_index(UInt32 const buf_idx);
+template SInt32 *yas::audio::pcm_buffer::data_ptr_at_index(UInt32 const buf_idx);
+template SInt16 *yas::audio::pcm_buffer::data_ptr_at_index(UInt32 const buf_idx);
 
 template <typename T>
-T *yas::audio::pcm_buffer::data_ptr_at_channel(const UInt32 ch_idx) {
+T *yas::audio::pcm_buffer::data_ptr_at_channel(UInt32 const ch_idx) {
     if (_impl) {
         if (!validate_pcm_format<T>(format().pcm_format())) {
             throw std::runtime_error(std::string(__PRETTY_FUNCTION__) + " : invalid pcm_format.");
@@ -345,13 +345,13 @@ T *yas::audio::pcm_buffer::data_ptr_at_channel(const UInt32 ch_idx) {
     return nullptr;
 }
 
-template Float32 *yas::audio::pcm_buffer::data_ptr_at_channel(const UInt32 ch_idx);
-template Float64 *yas::audio::pcm_buffer::data_ptr_at_channel(const UInt32 ch_idx);
-template SInt32 *yas::audio::pcm_buffer::data_ptr_at_channel(const UInt32 ch_idx);
-template SInt16 *yas::audio::pcm_buffer::data_ptr_at_channel(const UInt32 ch_idx);
+template Float32 *yas::audio::pcm_buffer::data_ptr_at_channel(UInt32 const ch_idx);
+template Float64 *yas::audio::pcm_buffer::data_ptr_at_channel(UInt32 const ch_idx);
+template SInt32 *yas::audio::pcm_buffer::data_ptr_at_channel(UInt32 const ch_idx);
+template SInt16 *yas::audio::pcm_buffer::data_ptr_at_channel(UInt32 const ch_idx);
 
 template <typename T>
-const T *yas::audio::pcm_buffer::data_ptr_at_index(const UInt32 buf_idx) const {
+const T *yas::audio::pcm_buffer::data_ptr_at_index(UInt32 const buf_idx) const {
     if (_impl) {
         if (!validate_pcm_format<T>(format().pcm_format())) {
             throw std::runtime_error(std::string(__PRETTY_FUNCTION__) + " : invalid pcm_format.");
@@ -363,13 +363,13 @@ const T *yas::audio::pcm_buffer::data_ptr_at_index(const UInt32 buf_idx) const {
     return nullptr;
 }
 
-template const Float32 *yas::audio::pcm_buffer::data_ptr_at_index(const UInt32 buf_idx) const;
-template const Float64 *yas::audio::pcm_buffer::data_ptr_at_index(const UInt32 buf_idx) const;
-template const SInt32 *yas::audio::pcm_buffer::data_ptr_at_index(const UInt32 buf_idx) const;
-template const SInt16 *yas::audio::pcm_buffer::data_ptr_at_index(const UInt32 buf_idx) const;
+template const Float32 *yas::audio::pcm_buffer::data_ptr_at_index(UInt32 const buf_idx) const;
+template const Float64 *yas::audio::pcm_buffer::data_ptr_at_index(UInt32 const buf_idx) const;
+template const SInt32 *yas::audio::pcm_buffer::data_ptr_at_index(UInt32 const buf_idx) const;
+template const SInt16 *yas::audio::pcm_buffer::data_ptr_at_index(UInt32 const buf_idx) const;
 
 template <typename T>
-const T *yas::audio::pcm_buffer::data_ptr_at_channel(const UInt32 ch_idx) const {
+const T *yas::audio::pcm_buffer::data_ptr_at_channel(UInt32 const ch_idx) const {
     if (_impl) {
         if (!validate_pcm_format<T>(format().pcm_format())) {
             throw std::runtime_error(std::string(__PRETTY_FUNCTION__) + " : invalid pcm_format.");
@@ -381,26 +381,26 @@ const T *yas::audio::pcm_buffer::data_ptr_at_channel(const UInt32 ch_idx) const 
     return nullptr;
 }
 
-template const Float32 *yas::audio::pcm_buffer::data_ptr_at_channel(const UInt32 ch_idx) const;
-template const Float64 *yas::audio::pcm_buffer::data_ptr_at_channel(const UInt32 ch_idx) const;
-template const SInt32 *yas::audio::pcm_buffer::data_ptr_at_channel(const UInt32 ch_idx) const;
-template const SInt16 *yas::audio::pcm_buffer::data_ptr_at_channel(const UInt32 ch_idx) const;
+template const Float32 *yas::audio::pcm_buffer::data_ptr_at_channel(UInt32 const ch_idx) const;
+template const Float64 *yas::audio::pcm_buffer::data_ptr_at_channel(UInt32 const ch_idx) const;
+template const SInt32 *yas::audio::pcm_buffer::data_ptr_at_channel(UInt32 const ch_idx) const;
+template const SInt16 *yas::audio::pcm_buffer::data_ptr_at_channel(UInt32 const ch_idx) const;
 
-const UInt32 audio::pcm_buffer::frame_capacity() const {
+UInt32 audio::pcm_buffer::frame_capacity() const {
     if (_impl) {
         return _impl->frame_capacity;
     }
     return 0;
 }
 
-const UInt32 audio::pcm_buffer::frame_length() const {
+UInt32 audio::pcm_buffer::frame_length() const {
     if (_impl) {
         return _impl->frame_length;
     }
     return 0;
 }
 
-void audio::pcm_buffer::set_frame_length(const UInt32 length) {
+void audio::pcm_buffer::set_frame_length(UInt32 const length) {
     if (_impl) {
         if (length > frame_capacity()) {
             throw std::out_of_range(std::string(__PRETTY_FUNCTION__) + " : out of range. frame_length(" +
@@ -411,7 +411,7 @@ void audio::pcm_buffer::set_frame_length(const UInt32 length) {
 
         _impl->frame_length = length;
 
-        const UInt32 data_byte_size = format().stream_description().mBytesPerFrame * length;
+        UInt32 const data_byte_size = format().stream_description().mBytesPerFrame * length;
         set_data_byte_size(*this, data_byte_size);
     }
 }
@@ -427,7 +427,7 @@ void audio::pcm_buffer::clear() {
     clear(0, frame_length());
 }
 
-void audio::pcm_buffer::clear(const UInt32 start_frame, const UInt32 length) {
+void audio::pcm_buffer::clear(UInt32 const start_frame, UInt32 const length) {
     if (_impl) {
         if ((start_frame + length) > frame_length()) {
             throw std::out_of_range(std::string(__PRETTY_FUNCTION__) + " : out of range. frame(" +
@@ -435,7 +435,7 @@ void audio::pcm_buffer::clear(const UInt32 start_frame, const UInt32 length) {
                                     " frame_length(" + std::to_string(frame_length()) + ")");
         }
 
-        const UInt32 bytes_per_frame = format().stream_description().mBytesPerFrame;
+        UInt32 const bytes_per_frame = format().stream_description().mBytesPerFrame;
         for (UInt32 i = 0; i < format().buffer_count(); i++) {
             UInt8 *byte_data = static_cast<UInt8 *>(audio_buffer_list()->mBuffers[i].mData);
             memset(&byte_data[start_frame * bytes_per_frame], 0, length * bytes_per_frame);
@@ -443,9 +443,9 @@ void audio::pcm_buffer::clear(const UInt32 start_frame, const UInt32 length) {
     }
 }
 
-audio::pcm_buffer::copy_result audio::pcm_buffer::copy_from(const audio::pcm_buffer &from_buffer,
-                                                            const UInt32 from_start_frame, const UInt32 to_start_frame,
-                                                            const UInt32 length) {
+audio::pcm_buffer::copy_result audio::pcm_buffer::copy_from(audio::pcm_buffer const &from_buffer,
+                                                            UInt32 const from_start_frame, UInt32 const to_start_frame,
+                                                            UInt32 const length) {
     if (!_impl || !from_buffer) {
         return pcm_buffer::copy_result(pcm_buffer::copy_error_t::buffer_is_null);
     }
@@ -457,8 +457,8 @@ audio::pcm_buffer::copy_result audio::pcm_buffer::copy_from(const audio::pcm_buf
         return pcm_buffer::copy_result(pcm_buffer::copy_error_t::invalid_format);
     }
 
-    const AudioBufferList *from_abl = from_buffer.audio_buffer_list();
-    AudioBufferList *to_abl = audio_buffer_list();
+    const AudioBufferList *const from_abl = from_buffer.audio_buffer_list();
+    AudioBufferList *const to_abl = audio_buffer_list();
 
     auto result = copy(from_abl, to_abl, from_format.sample_byte_count(), from_start_frame, to_start_frame, length);
 
@@ -469,9 +469,9 @@ audio::pcm_buffer::copy_result audio::pcm_buffer::copy_from(const audio::pcm_buf
     return result;
 }
 
-audio::pcm_buffer::copy_result audio::pcm_buffer::copy_from(const AudioBufferList *from_abl,
-                                                            const UInt32 from_start_frame, const UInt32 to_start_frame,
-                                                            const UInt32 length) {
+audio::pcm_buffer::copy_result audio::pcm_buffer::copy_from(const AudioBufferList *const from_abl,
+                                                            UInt32 const from_start_frame, UInt32 const to_start_frame,
+                                                            UInt32 const length) {
     if (!_impl) {
         return pcm_buffer::copy_result(pcm_buffer::copy_error_t::buffer_is_null);
     }
@@ -490,13 +490,13 @@ audio::pcm_buffer::copy_result audio::pcm_buffer::copy_from(const AudioBufferLis
     return result;
 }
 
-audio::pcm_buffer::copy_result audio::pcm_buffer::copy_to(AudioBufferList *to_abl, const UInt32 from_start_frame,
-                                                          const UInt32 to_start_frame, const UInt32 length) {
+audio::pcm_buffer::copy_result audio::pcm_buffer::copy_to(AudioBufferList *const to_abl, UInt32 const from_start_frame,
+                                                          UInt32 const to_start_frame, UInt32 const length) {
     if (!_impl) {
         return pcm_buffer::copy_result(pcm_buffer::copy_error_t::buffer_is_null);
     }
 
-    const AudioBufferList *from_abl = audio_buffer_list();
+    const AudioBufferList *const from_abl = audio_buffer_list();
 
     return copy(from_abl, to_abl, format().sample_byte_count(), from_start_frame, to_start_frame, length);
 }
@@ -511,9 +511,9 @@ void yas::audio::clear(AudioBufferList *abl) {
     }
 }
 
-audio::pcm_buffer::copy_result yas::audio::copy(const AudioBufferList *from_abl, AudioBufferList *to_abl,
-                                                const UInt32 sample_byte_count, const UInt32 from_start_frame,
-                                                const UInt32 to_start_frame, const UInt32 length) {
+audio::pcm_buffer::copy_result yas::audio::copy(const AudioBufferList *const from_abl, AudioBufferList *const to_abl,
+                                                UInt32 const sample_byte_count, UInt32 const from_start_frame,
+                                                UInt32 const to_start_frame, UInt32 const length) {
     auto from_result = get_abl_info(from_abl, sample_byte_count);
     if (!from_result) {
         return pcm_buffer::copy_result(from_result.error());
@@ -527,7 +527,7 @@ audio::pcm_buffer::copy_result yas::audio::copy(const AudioBufferList *from_abl,
     auto from_info = from_result.value();
     auto to_info = to_result.value();
 
-    const UInt32 copy_length = length ?: (from_info.frame_length - from_start_frame);
+    UInt32 const copy_length = length ?: (from_info.frame_length - from_start_frame);
 
     if ((from_start_frame + copy_length) > from_info.frame_length ||
         (to_start_frame + copy_length) > to_info.frame_length || from_info.channel_count > to_info.channel_count) {
@@ -535,8 +535,8 @@ audio::pcm_buffer::copy_result yas::audio::copy(const AudioBufferList *from_abl,
     }
 
     for (UInt32 ch_idx = 0; ch_idx < from_info.channel_count; ch_idx++) {
-        const UInt32 &from_stride = from_info.strides[ch_idx];
-        const UInt32 &to_stride = to_info.strides[ch_idx];
+        UInt32 const &from_stride = from_info.strides[ch_idx];
+        UInt32 const &to_stride = to_info.strides[ch_idx];
         const void *from_data = &(from_info.datas[ch_idx][from_start_frame * sample_byte_count * from_stride]);
         void *to_data = &(to_info.datas[ch_idx][to_start_frame * sample_byte_count * to_stride]);
 
@@ -553,7 +553,7 @@ audio::pcm_buffer::copy_result yas::audio::copy(const AudioBufferList *from_abl,
                 cblas_dcopy(copy_length, from_float64_data, from_stride, to_float64_data, to_stride);
             } else {
                 for (UInt32 frame = 0; frame < copy_length; ++frame) {
-                    const UInt32 sample_frame = frame * sample_byte_count;
+                    UInt32 const sample_frame = frame * sample_byte_count;
                     auto from_byte_data = static_cast<const UInt8 *>(from_data);
                     auto to_byte_data = static_cast<UInt8 *>(to_data);
                     memcpy(&to_byte_data[sample_frame * to_stride], &from_byte_data[sample_frame * from_stride],
@@ -566,13 +566,13 @@ audio::pcm_buffer::copy_result yas::audio::copy(const AudioBufferList *from_abl,
     return pcm_buffer::copy_result(copy_length);
 }
 
-UInt32 yas::audio::frame_length(const AudioBufferList *abl, const UInt32 sample_byte_count) {
+UInt32 yas::audio::frame_length(const AudioBufferList *const abl, UInt32 const sample_byte_count) {
     if (sample_byte_count > 0) {
         UInt32 out_frame_length = 0;
         for (UInt32 buf = 0; buf < abl->mNumberBuffers; buf++) {
-            const AudioBuffer *ab = &abl->mBuffers[buf];
-            const UInt32 stride = ab->mNumberChannels;
-            const UInt32 frame_length = ab->mDataByteSize / stride / sample_byte_count;
+            const AudioBuffer *const ab = &abl->mBuffers[buf];
+            UInt32 const stride = ab->mNumberChannels;
+            UInt32 const frame_length = ab->mDataByteSize / stride / sample_byte_count;
             if (buf == 0) {
                 out_frame_length = frame_length;
             } else if (out_frame_length != frame_length) {
@@ -585,7 +585,7 @@ UInt32 yas::audio::frame_length(const AudioBufferList *abl, const UInt32 sample_
     }
 }
 
-bool yas::audio::is_equal_structure(const AudioBufferList &abl1, const AudioBufferList &abl2) {
+bool yas::audio::is_equal_structure(AudioBufferList const &abl1, AudioBufferList const &abl2) {
     if (abl1.mNumberBuffers != abl2.mNumberBuffers) {
         return false;
     }
@@ -601,7 +601,7 @@ bool yas::audio::is_equal_structure(const AudioBufferList &abl1, const AudioBuff
     return true;
 }
 
-std::string yas::to_string(const audio::pcm_buffer::copy_error_t &error) {
+std::string yas::to_string(audio::pcm_buffer::copy_error_t const &error) {
     switch (error) {
         case audio::pcm_buffer::copy_error_t::invalid_argument:
             return "invalid_argument";
