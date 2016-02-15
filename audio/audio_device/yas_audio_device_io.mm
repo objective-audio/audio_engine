@@ -7,14 +7,14 @@
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
 
-#include "yas_audio_device.h"
-#include "yas_audio_pcm_buffer.h"
-#include "yas_audio_format.h"
-#include "yas_audio_time.h"
-#include "yas_observing.h"
-#include "yas_exception.h"
 #include <memory>
 #include <mutex>
+#include "yas_audio_device.h"
+#include "yas_audio_format.h"
+#include "yas_audio_pcm_buffer.h"
+#include "yas_audio_time.h"
+#include "yas_exception.h"
+#include "yas_observing.h"
 
 using namespace yas;
 
@@ -50,7 +50,7 @@ class audio::device_io::impl : public base::impl {
           is_running(false),
           io_proc_id(nullptr),
           input_buffer_on_render(nullptr),
-          input_time_on_render(),
+          input_time_on_render(nullptr),
           observer(),
           _render_callback(nullptr),
           _maximum_frames(4096),

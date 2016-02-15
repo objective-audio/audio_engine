@@ -3,10 +3,10 @@
 //  Copyright (c) 2015 Yuki Yasoshima.
 //
 
-#include "yas_audio_unit_io_node.h"
 #include "yas_audio_tap_node.h"
-#include "yas_audio_unit.h"
 #include "yas_audio_time.h"
+#include "yas_audio_unit.h"
+#include "yas_audio_unit_io_node.h"
 
 #if TARGET_OS_IPHONE
 #import <AVFoundation/AVFoundation.h>
@@ -171,7 +171,7 @@ void audio::unit_output_node::impl::prepare_audio_unit() {
 class audio::unit_input_node::impl::core {
    public:
     pcm_buffer input_buffer;
-    time render_time;
+    time render_time = nullptr;
 };
 
 audio::unit_input_node::impl::impl() : audio::unit_io_node::impl(), _core(std::make_unique<core>()) {

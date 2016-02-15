@@ -3,8 +3,8 @@
 //  Copyright (c) 2015 Yuki Yasoshima.
 //
 
-#include "yas_audio_node.h"
 #include "yas_audio_engine.h"
+#include "yas_audio_node.h"
 #include "yas_audio_time.h"
 #include "yas_stl_utils.h"
 
@@ -16,7 +16,8 @@ class audio::node::impl::core {
     connection_wmap input_connections;
     connection_wmap output_connections;
 
-    core() : weak_engine(), input_connections(), output_connections(), _kernel(nullptr), _render_time(), _mutex() {
+    core()
+        : weak_engine(), input_connections(), output_connections(), _kernel(nullptr), _render_time(nullptr), _mutex() {
     }
 
     void reset() {
