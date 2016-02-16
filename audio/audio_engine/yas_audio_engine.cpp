@@ -23,7 +23,7 @@ audio::engine &audio::engine::operator=(std::nullptr_t) {
     return *this;
 }
 
-audio::connection audio::engine::connect(node &source_node, node &destination_node, const audio::format &format) {
+audio::connection audio::engine::connect(node &source_node, node &destination_node, audio::format const &format) {
     if (!source_node || !destination_node) {
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
     }
@@ -38,8 +38,8 @@ audio::connection audio::engine::connect(node &source_node, node &destination_no
     return connect(source_node, destination_node, *source_bus_result, *destination_bus_result, format);
 }
 
-audio::connection audio::engine::connect(node &source_node, node &destination_node, const UInt32 src_bus_idx,
-                                         const UInt32 dst_bus_idx, const audio::format &format) {
+audio::connection audio::engine::connect(node &source_node, node &destination_node, UInt32 const src_bus_idx,
+                                         UInt32 const dst_bus_idx, audio::format const &format) {
     return impl_ptr<impl>()->connect(source_node, destination_node, src_bus_idx, dst_bus_idx, format);
 }
 
@@ -51,40 +51,40 @@ void audio::engine::disconnect(node &node) {
     impl_ptr<impl>()->disconnect(node);
 }
 
-void audio::engine::disconnect_input(const node &node) {
+void audio::engine::disconnect_input(node const &node) {
     if (!node) {
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
     }
 
     impl_ptr<impl>()->disconnect_node_with_predicate(
-        [node](const connection &connection) { return (connection.destination_node() == node); });
+        [node](connection const &connection) { return (connection.destination_node() == node); });
 }
 
-void audio::engine::disconnect_input(const node &node, const UInt32 bus_idx) {
+void audio::engine::disconnect_input(node const &node, UInt32 const bus_idx) {
     if (!node) {
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
     }
 
-    impl_ptr<impl>()->disconnect_node_with_predicate([node, bus_idx](const auto &connection) {
+    impl_ptr<impl>()->disconnect_node_with_predicate([node, bus_idx](auto const &connection) {
         return (connection.destination_node() == node && connection.destination_bus() == bus_idx);
     });
 }
 
-void audio::engine::disconnect_output(const node &node) {
+void audio::engine::disconnect_output(node const &node) {
     if (!node) {
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
     }
 
     impl_ptr<impl>()->disconnect_node_with_predicate(
-        [node](const connection &connection) { return (connection.source_node() == node); });
+        [node](connection const &connection) { return (connection.source_node() == node); });
 }
 
-void audio::engine::disconnect_output(const node &node, const UInt32 bus_idx) {
+void audio::engine::disconnect_output(node const &node, UInt32 const bus_idx) {
     if (!node) {
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
     }
 
-    impl_ptr<impl>()->disconnect_node_with_predicate([node, bus_idx](const auto &connection) {
+    impl_ptr<impl>()->disconnect_node_with_predicate([node, bus_idx](auto const &connection) {
         return (connection.source_node() == node && connection.source_bus() == bus_idx);
     });
 }
@@ -93,8 +93,8 @@ audio::engine::start_result_t audio::engine::start_render() {
     return impl_ptr<impl>()->start_render();
 }
 
-audio::engine::start_result_t audio::engine::start_offline_render(const offline_render_f &render_function,
-                                                                  const offline_completion_f &completion_function) {
+audio::engine::start_result_t audio::engine::start_offline_render(offline_render_f const &render_function,
+                                                                  offline_completion_f const &completion_function) {
     return impl_ptr<impl>()->start_offline_render(render_function, completion_function);
 }
 
@@ -106,7 +106,7 @@ subject<audio::engine> &audio::engine::subject() const {
     return impl_ptr<impl>()->subject();
 }
 
-std::string yas::to_string(const audio::engine::start_error_t &error) {
+std::string yas::to_string(audio::engine::start_error_t const &error) {
     switch (error) {
         case audio::engine::start_error_t::already_running:
             return "already_running";

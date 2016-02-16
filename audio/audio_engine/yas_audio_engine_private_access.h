@@ -11,11 +11,11 @@ namespace yas {
 namespace audio {
     class engine::private_access {
        public:
-        static std::unordered_set<node> &nodes(const engine &engine) {
+        static std::unordered_set<node> &nodes(engine const &engine) {
             return engine.impl_ptr<impl>()->nodes();
         }
 
-        static audio::connection_set &connections(const engine &engine) {
+        static audio::connection_set &connections(engine const &engine) {
             return engine.impl_ptr<impl>()->connections();
         }
     };
