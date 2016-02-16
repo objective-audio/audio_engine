@@ -3,23 +3,23 @@
 //  Copyright (c) 2015 Yuki Yasoshima.
 //
 
-#include "yas_audio_enumerator.h"
-#include "yas_audio_pcm_buffer.h"
-#include "yas_audio_format.h"
 #include <string>
+#include "yas_audio_enumerator.h"
+#include "yas_audio_format.h"
+#include "yas_audio_pcm_buffer.h"
 
 using namespace yas;
 
 #pragma mark - enumerator
 
-audio::enumerator::enumerator(const flex_ptr &pointer, const UInt32 byte_stride, const UInt32 length)
+audio::enumerator::enumerator(flex_ptr const &pointer, UInt32 const byte_stride, UInt32 const length)
     : _pointer(pointer), _top_pointer(pointer), _byte_stride(byte_stride), _length(length), _index(0) {
     if (!pointer.v || byte_stride == 0 || length == 0) {
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : invalid argument.");
     }
 }
 
-audio::enumerator::enumerator(const pcm_buffer &buffer, const UInt32 channel)
+audio::enumerator::enumerator(pcm_buffer const &buffer, UInt32 const channel)
     : enumerator(buffer.flex_ptr_at_channel(channel), buffer.format().buffer_frame_byte_count(),
                  buffer.frame_length()) {
 }
@@ -44,7 +44,7 @@ void audio::enumerator::stop() {
     yas_audio_enumerator_stop(*this);
 }
 
-void audio::enumerator::set_position(const UInt32 index) {
+void audio::enumerator::set_position(UInt32 const index) {
     if (index >= _length) {
         throw std::out_of_range(std::string(__PRETTY_FUNCTION__) + " : out of range. position(" +
                                 std::to_string(index) + ") length(" + std::to_string(_length) + ")");
@@ -65,7 +65,7 @@ audio::enumerator &audio::enumerator::operator++() {
 
 #pragma mark - frame enumerator
 
-audio::frame_enumerator::frame_enumerator(const pcm_buffer &buffer)
+audio::frame_enumerator::frame_enumerator(pcm_buffer const &buffer)
     : _frame(0),
       _channel(0),
       _frame_length(buffer.frame_length()),
@@ -75,10 +75,10 @@ audio::frame_enumerator::frame_enumerator(const pcm_buffer &buffer)
       _top_pointers(std::vector<flex_ptr>(buffer.format().channel_count())),
       _pointers_size(buffer.format().channel_count() * sizeof(flex_ptr *)),
       _pointer(nullptr) {
-    const auto &format = buffer.format();
-    const UInt32 bufferCount = format.buffer_count();
-    const UInt32 stride = format.stride();
-    const UInt32 sampleByteCount = format.sample_byte_count();
+    auto const &format = buffer.format();
+    UInt32 const bufferCount = format.buffer_count();
+    UInt32 const stride = format.stride();
+    UInt32 const sampleByteCount = format.sample_byte_count();
 
     UInt32 channel = 0;
     for (UInt32 buf_idx = 0; buf_idx < bufferCount; buf_idx++) {
@@ -129,7 +129,7 @@ void audio::frame_enumerator::stop() {
     yas_audio_frame_enumerator_stop(*this);
 }
 
-void audio::frame_enumerator::set_frame_position(const UInt32 frame) {
+void audio::frame_enumerator::set_frame_position(UInt32 const frame) {
     if (frame >= _frame_length) {
         throw std::out_of_range(std::string(__PRETTY_FUNCTION__) + " : out of range. frame(" + std::to_string(frame) +
                                 ")");
@@ -137,7 +137,7 @@ void audio::frame_enumerator::set_frame_position(const UInt32 frame) {
 
     _frame = frame;
 
-    const UInt32 stride = _frame_byte_stride * frame;
+    UInt32 const stride = _frame_byte_stride * frame;
     UInt32 index = _channel_count;
     while (index--) {
         _pointers[index].v = _top_pointers[index].u8 + stride;
@@ -148,7 +148,7 @@ void audio::frame_enumerator::set_frame_position(const UInt32 frame) {
     }
 }
 
-void audio::frame_enumerator::set_channel_position(const UInt32 channel) {
+void audio::frame_enumerator::set_channel_position(UInt32 const channel) {
     if (channel >= _channel_count) {
         throw std::out_of_range(std::string(__PRETTY_FUNCTION__) + " : out of range. channel(" +
                                 std::to_string(channel) + ") count(" + std::to_string(_channel_count) + ")");

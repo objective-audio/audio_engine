@@ -5,17 +5,17 @@
 
 #pragma once
 
-#include "yas_audio_types.h"
-#include "yas_audio_pcm_buffer.h"
-#include "yas_flex_ptr.h"
 #include <vector>
+#include "yas_audio_pcm_buffer.h"
+#include "yas_audio_types.h"
+#include "yas_flex_ptr.h"
 
 namespace yas {
 namespace audio {
     class enumerator {
        public:
-        enumerator(const flex_ptr &pointer, const UInt32 byte_stride, const UInt32 length);
-        enumerator(const pcm_buffer &buffer, const UInt32 channel);
+        enumerator(flex_ptr const &pointer, UInt32 const byte_stride, UInt32 const length);
+        enumerator(pcm_buffer const &buffer, UInt32 const channel);
 
         const flex_ptr *pointer() const;
         const UInt32 *index() const;
@@ -23,7 +23,7 @@ namespace audio {
 
         void move();
         void stop();
-        void set_position(const UInt32 index);
+        void set_position(UInt32 const index);
         void reset();
 
         enumerator &operator++();
@@ -37,7 +37,7 @@ namespace audio {
 
     class frame_enumerator {
        public:
-        explicit frame_enumerator(const pcm_buffer &buffer);
+        explicit frame_enumerator(pcm_buffer const &buffer);
 
         const flex_ptr *pointer() const;
         const UInt32 *frame() const;
@@ -49,8 +49,8 @@ namespace audio {
         void move_channel();
         void move();
         void stop();
-        void set_frame_position(const UInt32 frame);
-        void set_channel_position(const UInt32 channel);
+        void set_frame_position(UInt32 const frame);
+        void set_channel_position(UInt32 const channel);
         void reset();
 
         frame_enumerator &operator++();

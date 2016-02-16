@@ -5,10 +5,10 @@
 
 #pragma once
 
+#include <memory>
 #include "yas_audio_connection_protocol.h"
 #include "yas_audio_format.h"
 #include "yas_base.h"
-#include <memory>
 
 namespace yas {
 namespace audio {
@@ -22,20 +22,20 @@ namespace audio {
         connection(std::nullptr_t);
         ~connection();
 
-        connection(const connection &) = default;
+        connection(connection const &) = default;
         connection(connection &&) = default;
-        connection &operator=(const connection &) = default;
+        connection &operator=(connection const &) = default;
         connection &operator=(connection &&) = default;
 
         UInt32 source_bus() const;
         UInt32 destination_bus() const;
         node source_node() const;
         node destination_node() const;
-        const audio::format &format() const;
+        audio::format const &format() const;
 
        protected:
-        connection(node &source_node, const UInt32 source_bus, node &destination_node, const UInt32 destination_bus,
-                   const audio::format &format);
+        connection(node &source_node, UInt32 const source_bus, node &destination_node, UInt32 const destination_bus,
+                   audio::format const &format);
 
         void _remove_nodes() override;
         void _remove_source_node() override;

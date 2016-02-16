@@ -3,15 +3,15 @@
 //  Copyright (c) 2015 Yuki Yasoshima.
 //
 
-#include "yas_audio_engine.h"
-#include "yas_audio_node.h"
-#include "yas_audio_unit_node.h"
-#include "yas_audio_device_io_node.h"
-#include "yas_audio_offline_output_node.h"
-#include "yas_audio_graph.h"
-#include "yas_stl_utils.h"
-#include <CoreFoundation/CoreFoundation.h>
 #include <AVFoundation/AVFoundation.h>
+#include <CoreFoundation/CoreFoundation.h>
+#include "yas_audio_device_io_node.h"
+#include "yas_audio_engine.h"
+#include "yas_audio_graph.h"
+#include "yas_audio_node.h"
+#include "yas_audio_offline_output_node.h"
+#include "yas_audio_unit_node.h"
+#include "yas_stl_utils.h"
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
 #include "yas_audio_device.h"
@@ -25,8 +25,8 @@ namespace audio {
         using super_class = connection;
 
        public:
-        connection_for_engine(node &source_node, const UInt32 source_bus, node &destination_node,
-                              const UInt32 destination_bus, const audio::format &format)
+        connection_for_engine(node &source_node, UInt32 const source_bus, node &destination_node,
+                              UInt32 const destination_bus, audio::format const &format)
             : super_class(source_node, source_bus, destination_node, destination_bus, format) {
         }
     };
@@ -65,7 +65,7 @@ audio::engine::impl::impl() : base::impl(), _core(std::make_unique<core>()) {
 
 audio::engine::impl::~impl() = default;
 
-void audio::engine::impl::prepare(const engine &engine) {
+void audio::engine::impl::prepare(engine const &engine) {
     _core->weak_engine = engine;
 
 #if TARGET_OS_IPHONE
@@ -97,7 +97,7 @@ void audio::engine::impl::prepare(const engine &engine) {
 
 #elif TARGET_OS_MAC
     _core->device_observer.add_handler(device::system_subject(), device::configuration_change_key,
-                                       [weak_engine = _core->weak_engine](const auto &method, const auto &infos) {
+                                       [weak_engine = _core->weak_engine](auto const &method, auto const &infos) {
                                            if (auto engine = weak_engine.lock()) {
                                                engine.impl_ptr<impl>()->post_configuration_change();
                                            }
@@ -127,7 +127,7 @@ observer<audio::device::change_info> &audio::engine::impl::device_observer() {
 }
 #endif
 
-bool audio::engine::impl::node_exists(const node &node) {
+bool audio::engine::impl::node_exists(node const &node) {
     return _core->nodes.count(node) > 0;
 }
 
@@ -156,7 +156,7 @@ void audio::engine::impl::detach_node(node &node) {
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : node is not attached.");
     }
 
-    disconnect_node_with_predicate([&node](const connection &connection) {
+    disconnect_node_with_predicate([&node](connection const &connection) {
         return (connection.destination_node() == node || connection.source_node() == node);
     });
 
@@ -168,7 +168,7 @@ void audio::engine::impl::detach_node(node &node) {
 }
 
 void audio::engine::impl::detach_node_if_unused(node &node) {
-    auto filtered_connection = filter(_core->connections, [node](const auto &connection) {
+    auto filtered_connection = filter(_core->connections, [node](auto const &connection) {
         return (connection.destination_node() == node || connection.source_node() == node);
     });
 
@@ -199,8 +199,8 @@ bool audio::engine::impl::prepare() {
     return true;
 }
 
-audio::connection audio::engine::impl::connect(node &source_node, node &destination_node, const UInt32 source_bus_idx,
-                                               const UInt32 destination_bus_idx, const format &format) {
+audio::connection audio::engine::impl::connect(node &source_node, node &destination_node, UInt32 const source_bus_idx,
+                                               UInt32 const destination_bus_idx, const format &format) {
     if (!source_node || !destination_node) {
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
     }
@@ -256,9 +256,9 @@ void audio::engine::impl::disconnect(node &node) {
     }
 }
 
-void audio::engine::impl::disconnect_node_with_predicate(std::function<bool(const connection &)> predicate) {
+void audio::engine::impl::disconnect_node_with_predicate(std::function<bool(connection const &)> predicate) {
     auto connections =
-        filter(_core->connections, [&predicate](const auto &connection) { return predicate(connection); });
+        filter(_core->connections, [&predicate](auto const &connection) { return predicate(connection); });
 
     std::unordered_set<node> update_nodes;
 
@@ -279,7 +279,7 @@ void audio::engine::impl::disconnect_node_with_predicate(std::function<bool(cons
     }
 }
 
-void audio::engine::impl::add_node_to_graph(const node &node) {
+void audio::engine::impl::add_node_to_graph(node const &node) {
     if (!_core->graph) {
         return;
     }
@@ -310,7 +310,7 @@ void audio::engine::impl::add_node_to_graph(const node &node) {
     }
 }
 
-void audio::engine::impl::remove_node_from_graph(const node &node) {
+void audio::engine::impl::remove_node_from_graph(node const &node) {
     if (!_core->graph) {
         return;
     }
@@ -338,7 +338,7 @@ void audio::engine::impl::remove_node_from_graph(const node &node) {
     }
 }
 
-bool audio::engine::impl::add_connection(const connection &connection) {
+bool audio::engine::impl::add_connection(connection const &connection) {
     if (!connection) {
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
         return false;
@@ -358,7 +358,7 @@ bool audio::engine::impl::add_connection(const connection &connection) {
     return true;
 }
 
-void audio::engine::impl::remove_connection_from_nodes(const connection &connection) {
+void audio::engine::impl::remove_connection_from_nodes(connection const &connection) {
     if (!connection) {
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
         return;
@@ -391,15 +391,15 @@ void audio::engine::impl::update_all_node_connections() {
     }
 }
 
-audio::connection_set audio::engine::impl::input_connections_for_destination_node(const node &node) const {
-    return filter(_core->connections, [node](const auto &connection) { return connection.destination_node() == node; });
+audio::connection_set audio::engine::impl::input_connections_for_destination_node(node const &node) const {
+    return filter(_core->connections, [node](auto const &connection) { return connection.destination_node() == node; });
 }
 
-audio::connection_set audio::engine::impl::output_connections_for_source_node(const node &node) const {
-    return filter(_core->connections, [node](const auto &connection) { return connection.source_node() == node; });
+audio::connection_set audio::engine::impl::output_connections_for_source_node(node const &node) const {
+    return filter(_core->connections, [node](auto const &connection) { return connection.source_node() == node; });
 }
 
-void audio::engine::impl::set_graph(const audio::graph &graph) {
+void audio::engine::impl::set_graph(audio::graph const &graph) {
     _core->graph = graph;
 }
 
@@ -409,7 +409,7 @@ yas::audio::graph audio::engine::impl::graph() const {
 
 void audio::engine::impl::reload_graph() {
     if (auto prev_graph = graph()) {
-        const bool prev_runnging = prev_graph.is_running();
+        bool const prev_runnging = prev_graph.is_running();
 
         prev_graph.stop();
 
@@ -442,13 +442,13 @@ audio::offline_output_node &audio::engine::impl::offline_output_node() const {
 }
 
 audio::engine::start_result_t audio::engine::impl::start_render() {
-    if (const auto graph = _core->graph) {
+    if (auto const graph = _core->graph) {
         if (graph.is_running()) {
             return start_result_t(start_error_t::already_running);
         }
     }
 
-    if (const auto offline_output_node = _core->offline_output_node) {
+    if (auto const offline_output_node = _core->offline_output_node) {
         if (offline_output_node.is_running()) {
             return start_result_t(start_error_t::already_running);
         }
@@ -464,14 +464,14 @@ audio::engine::start_result_t audio::engine::impl::start_render() {
 }
 
 audio::engine::start_result_t audio::engine::impl::start_offline_render(
-    const offline_render_f &render_function, const offline_completion_f &completion_function) {
-    if (const auto graph = _core->graph) {
+    offline_render_f const &render_function, offline_completion_f const &completion_function) {
+    if (auto const graph = _core->graph) {
         if (graph.is_running()) {
             return start_result_t(start_error_t::already_running);
         }
     }
 
-    if (const auto offline_output_node = _core->offline_output_node) {
+    if (auto const offline_output_node = _core->offline_output_node) {
         if (offline_output_node.is_running()) {
             return start_result_t(start_error_t::already_running);
         }

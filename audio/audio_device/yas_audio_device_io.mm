@@ -7,14 +7,14 @@
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
 
-#include "yas_audio_device.h"
-#include "yas_audio_pcm_buffer.h"
-#include "yas_audio_format.h"
-#include "yas_audio_time.h"
-#include "yas_observing.h"
-#include "yas_exception.h"
 #include <memory>
 #include <mutex>
+#include "yas_audio_device.h"
+#include "yas_audio_format.h"
+#include "yas_audio_pcm_buffer.h"
+#include "yas_audio_time.h"
+#include "yas_exception.h"
+#include "yas_observing.h"
 
 using namespace yas;
 
@@ -23,7 +23,7 @@ class audio::device_io::kernel {
     pcm_buffer input_buffer;
     pcm_buffer output_buffer;
 
-    kernel(const audio::format &input_format, const audio::format &output_format, const UInt32 frame_capacity)
+    kernel(audio::format const &input_format, audio::format const &output_format, UInt32 const frame_capacity)
         : input_buffer(input_format ? pcm_buffer(input_format, frame_capacity) : nullptr),
           output_buffer(output_format ? pcm_buffer(output_format, frame_capacity) : nullptr) {
     }
@@ -50,7 +50,7 @@ class audio::device_io::impl : public base::impl {
           is_running(false),
           io_proc_id(nullptr),
           input_buffer_on_render(nullptr),
-          input_time_on_render(),
+          input_time_on_render(nullptr),
           observer(),
           _render_callback(nullptr),
           _maximum_frames(4096),
@@ -64,12 +64,12 @@ class audio::device_io::impl : public base::impl {
         uninitialize();
     }
 
-    void prepare(const device_io &device_io, const audio::device dev) {
+    void prepare(device_io const &device_io, audio::device const dev) {
         weak_device_io = to_weak(device_io);
 
         observer.add_handler(
             device::system_subject(), device::hardware_did_change_key,
-            [weak_device_io = weak_device_io](const auto &method, const auto &infos) {
+            [weak_device_io = weak_device_io](auto const &method, auto const &infos) {
                 if (auto device_io = weak_device_io.lock()) {
                     if (device_io.device() && !device::device_for_id(device_io.device().audio_device_id())) {
                         device_io.set_device(nullptr);
@@ -80,7 +80,7 @@ class audio::device_io::impl : public base::impl {
         set_device(dev);
     }
 
-    void set_device(const audio::device &dev) {
+    void set_device(audio::device const &dev) {
         if (device != dev) {
             bool running = is_running;
 
@@ -94,7 +94,7 @@ class audio::device_io::impl : public base::impl {
 
             if (device) {
                 observer.add_handler(device.subject(), device::device_did_change_key,
-                                     [weak_device_io = weak_device_io](const auto &method, const auto &infos) {
+                                     [weak_device_io = weak_device_io](auto const &method, auto const &infos) {
                                          if (auto device_io = weak_device_io.lock()) {
                                              device_io.impl_ptr<impl>()->update_kernel();
                                          }
@@ -133,7 +133,7 @@ class audio::device_io::impl : public base::impl {
                         if (auto &input_buffer = kernel->input_buffer) {
                             input_buffer.copy_from(inInputData);
 
-                            const UInt32 input_frame_length = input_buffer.frame_length();
+                            UInt32 const input_frame_length = input_buffer.frame_length();
                             if (input_frame_length > 0) {
                                 imp->input_buffer_on_render = input_buffer;
                                 imp->input_time_on_render =
@@ -145,7 +145,7 @@ class audio::device_io::impl : public base::impl {
                     if (auto render_callback = imp->render_callback()) {
                         if (auto &output_buffer = kernel->output_buffer) {
                             if (outOutputData) {
-                                const UInt32 frame_length =
+                                UInt32 const frame_length =
                                     audio::frame_length(outOutputData, output_buffer.format().sample_byte_count());
                                 if (frame_length > 0) {
                                     output_buffer.set_frame_length(frame_length);
@@ -212,7 +212,7 @@ class audio::device_io::impl : public base::impl {
         }
     }
 
-    void set_render_callback(const render_f &render_callback) {
+    void set_render_callback(render_f const &render_callback) {
         std::lock_guard<std::recursive_mutex> lock(_mutex);
         _render_callback = render_callback;
     }
@@ -222,7 +222,7 @@ class audio::device_io::impl : public base::impl {
         return _render_callback;
     }
 
-    void set_maximum_frames(const UInt32 frames) {
+    void set_maximum_frames(UInt32 const frames) {
         std::lock_guard<std::recursive_mutex> lock(_mutex);
         _maximum_frames = frames;
         update_kernel();
@@ -270,7 +270,7 @@ class audio::device_io::impl : public base::impl {
 audio::device_io::device_io(std::nullptr_t) : super_class(nullptr) {
 }
 
-audio::device_io::device_io(const audio::device &device) : super_class(std::make_shared<impl>()) {
+audio::device_io::device_io(audio::device const &device) : super_class(std::make_shared<impl>()) {
     impl_ptr<impl>()->prepare(*this, device);
 }
 
@@ -284,7 +284,7 @@ void audio::device_io::_uninitialize() const {
     impl_ptr<impl>()->uninitialize();
 }
 
-void audio::device_io::set_device(const audio::device device) {
+void audio::device_io::set_device(audio::device const device) {
     impl_ptr<impl>()->set_device(device);
 }
 
@@ -296,11 +296,11 @@ bool audio::device_io::is_running() const {
     return impl_ptr<impl>()->is_running;
 }
 
-void audio::device_io::set_render_callback(const render_f &callback) {
+void audio::device_io::set_render_callback(render_f const &callback) {
     impl_ptr<impl>()->set_render_callback(callback);
 }
 
-void audio::device_io::set_maximum_frames_per_slice(const UInt32 frames) {
+void audio::device_io::set_maximum_frames_per_slice(UInt32 const frames) {
     impl_ptr<impl>()->set_maximum_frames(frames);
 }
 
@@ -316,11 +316,11 @@ void audio::device_io::stop() const {
     impl_ptr<impl>()->stop();
 }
 
-const audio::pcm_buffer &audio::device_io::input_buffer_on_render() const {
+audio::pcm_buffer const &audio::device_io::input_buffer_on_render() const {
     return impl_ptr<impl>()->input_buffer_on_render;
 }
 
-const audio::time &audio::device_io::input_time_on_render() const {
+audio::time const &audio::device_io::input_time_on_render() const {
     return impl_ptr<impl>()->input_time_on_render;
 }
 

@@ -8,16 +8,16 @@
 #include <TargetConditionals.h>
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
 
+#include <AudioToolbox/AudioToolbox.h>
+#include <experimental/optional>
+#include <memory>
+#include <set>
+#include <string>
+#include <unordered_map>
+#include <vector>
+#include "yas_audio_format.h"
 #include "yas_audio_types.h"
 #include "yas_observing.h"
-#include "yas_audio_format.h"
-#include <AudioToolbox/AudioToolbox.h>
-#include <vector>
-#include <unordered_map>
-#include <set>
-#include <memory>
-#include <string>
-#include <experimental/optional>
 
 namespace yas {
 namespace audio {
@@ -35,23 +35,23 @@ namespace audio {
             format,
         };
 
-        constexpr static auto hardware_did_change_key = "yas.audio.device.hardware_did_change";
-        constexpr static auto device_did_change_key = "yas.audio.device.device_did_change";
-        constexpr static auto configuration_change_key = "yas.audio.device.configuration_change";
+        static auto constexpr hardware_did_change_key = "yas.audio.device.hardware_did_change";
+        static auto constexpr device_did_change_key = "yas.audio.device.device_did_change";
+        static auto constexpr configuration_change_key = "yas.audio.device.configuration_change";
 
         struct property_info {
-            const AudioObjectID object_id;
-            const device::property property;
-            const AudioObjectPropertyAddress address;
+            AudioObjectID const object_id;
+            device::property const property;
+            AudioObjectPropertyAddress const address;
 
-            property_info(const device::property property, const AudioObjectID object_id,
-                          const AudioObjectPropertyAddress &address);
+            property_info(device::property const property, AudioObjectID const object_id,
+                          AudioObjectPropertyAddress const &address);
 
-            bool operator<(const property_info &info) const;
+            bool operator<(property_info const &info) const;
         };
 
         struct change_info {
-            const std::vector<property_info> property_infos;
+            std::vector<property_info> const property_infos;
 
             change_info(std::vector<property_info> &&infos);
         };
@@ -62,21 +62,21 @@ namespace audio {
         static device default_system_output_device();
         static device default_output_device();
         static device default_input_device();
-        static device device_for_id(const AudioDeviceID);
-        static std::experimental::optional<size_t> index_of_device(const device &);
-        static bool is_available_device(const device &);
+        static device device_for_id(AudioDeviceID const);
+        static std::experimental::optional<size_t> index_of_device(device const &);
+        static bool is_available_device(device const &);
 
         device(std::nullptr_t);
 
         ~device();
 
-        device(const device &) = default;
+        device(device const &) = default;
         device(device &&) = default;
-        device &operator=(const device &) = default;
+        device &operator=(device const &) = default;
         device &operator=(device &&) = default;
 
-        bool operator==(const device &) const;
-        bool operator!=(const device &) const;
+        bool operator==(device const &) const;
+        bool operator!=(device const &) const;
 
         explicit operator bool() const;
 
@@ -96,7 +96,7 @@ namespace audio {
         subject<change_info> &subject() const;
 
        protected:
-        explicit device(const AudioDeviceID device_id);
+        explicit device(AudioDeviceID const device_id);
 
        private:
         class impl;

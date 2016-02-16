@@ -26,24 +26,24 @@ audio::connection_smap audio::node::kernel::output_connections() const {
     return yas::lock_values(_impl->output_connections);
 }
 
-audio::connection audio::node::kernel::input_connection(const UInt32 bus_idx) {
+audio::connection audio::node::kernel::input_connection(UInt32 const bus_idx) {
     if (_impl->input_connections.count(bus_idx) > 0) {
         return _impl->input_connections.at(bus_idx).lock();
     }
     return nullptr;
 }
 
-audio::connection audio::node::kernel::output_connection(const UInt32 bus_idx) {
+audio::connection audio::node::kernel::output_connection(UInt32 const bus_idx) {
     if (_impl->output_connections.count(bus_idx) > 0) {
         return _impl->output_connections.at(bus_idx).lock();
     }
     return nullptr;
 }
 
-void audio::node::kernel::_set_input_connections(const connection_wmap &connections) {
+void audio::node::kernel::_set_input_connections(connection_wmap const &connections) {
     _impl->input_connections = connections;
 }
 
-void audio::node::kernel::_set_output_connections(const connection_wmap &connections) {
+void audio::node::kernel::_set_output_connections(connection_wmap const &connections) {
     _impl->output_connections = connections;
 }

@@ -5,8 +5,8 @@
 
 #pragma once
 
-#include "yas_objc_container.h"
 #include <unordered_set>
+#include "yas_objc_container.h"
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
 #include "yas_audio_device.h"
 #endif
@@ -16,7 +16,7 @@ class yas::audio::engine::impl : public yas::base::impl {
     impl();
     virtual ~impl();
 
-    void prepare(const engine &);
+    void prepare(engine const &);
 
     weak<engine> &weak_engine() const;
     objc::container<> &reset_observer() const;
@@ -26,7 +26,7 @@ class yas::audio::engine::impl : public yas::base::impl {
     observer<audio::device::change_info> &device_observer();
 #endif
 
-    bool node_exists(const node &node);
+    bool node_exists(node const &node);
 
     void attach_node(node &node);
     void detach_node(node &node);
@@ -34,24 +34,24 @@ class yas::audio::engine::impl : public yas::base::impl {
 
     bool prepare();
 
-    audio::connection connect(node &source_node, node &destination_node, const UInt32 source_bus_idx,
-                              const UInt32 destination_bus_idx, const audio::format &format);
+    audio::connection connect(node &source_node, node &destination_node, UInt32 const source_bus_idx,
+                              UInt32 const destination_bus_idx, audio::format const &format);
     void disconnect(audio::connection &connection);
     void disconnect(node &node);
-    void disconnect_node_with_predicate(std::function<bool(const audio::connection &)> predicate);
+    void disconnect_node_with_predicate(std::function<bool(audio::connection const &)> predicate);
 
-    void add_node_to_graph(const node &node);
-    void remove_node_from_graph(const node &node);
+    void add_node_to_graph(node const &node);
+    void remove_node_from_graph(node const &node);
 
-    bool add_connection(const audio::connection &connection);
-    void remove_connection_from_nodes(const audio::connection &connection);
+    bool add_connection(audio::connection const &connection);
+    void remove_connection_from_nodes(audio::connection const &connection);
     void update_node_connections(node &node);
     void update_all_node_connections();
 
-    audio::connection_set input_connections_for_destination_node(const node &node) const;
-    audio::connection_set output_connections_for_source_node(const node &node) const;
+    audio::connection_set input_connections_for_destination_node(node const &node) const;
+    audio::connection_set output_connections_for_source_node(node const &node) const;
 
-    void set_graph(const yas::audio::graph &graph);
+    void set_graph(yas::audio::graph const &graph);
     yas::audio::graph graph() const;
     void reload_graph();
 
@@ -60,7 +60,7 @@ class yas::audio::engine::impl : public yas::base::impl {
     audio::offline_output_node &offline_output_node() const;
 
     engine::start_result_t start_render();
-    engine::start_result_t start_offline_render(const offline_render_f &, const offline_completion_f &);
+    engine::start_result_t start_offline_render(offline_render_f const &, offline_completion_f const &);
     void stop();
 
     void post_configuration_change() const;

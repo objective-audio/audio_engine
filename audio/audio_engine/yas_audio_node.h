@@ -30,44 +30,44 @@ namespace audio {
         explicit node(std::nullptr_t);
         virtual ~node();
 
-        node(const node &) = default;
+        node(node const &) = default;
         node(node &&) = default;
-        node &operator=(const node &) = default;
+        node &operator=(node const &) = default;
         node &operator=(node &&) = default;
         node &operator=(std::nullptr_t);
 
         void reset();
 
-        audio::format input_format(const UInt32 bus_idx) const;
-        audio::format output_format(const UInt32 bus_idx) const;
+        audio::format input_format(UInt32 const bus_idx) const;
+        audio::format output_format(UInt32 const bus_idx) const;
         bus_result_t next_available_input_bus() const;
         bus_result_t next_available_output_bus() const;
-        bool is_available_input_bus(const UInt32 bus_idx) const;
-        bool is_available_output_bus(const UInt32 bus_idx) const;
+        bool is_available_input_bus(UInt32 const bus_idx) const;
+        bool is_available_output_bus(UInt32 const bus_idx) const;
         audio::engine engine() const;
         audio::time last_render_time() const;
 
         UInt32 input_bus_count() const;
         UInt32 output_bus_count() const;
 
-        void render(audio::pcm_buffer &buffer, const UInt32 bus_idx, const audio::time &when);
-        void set_render_time_on_render(const audio::time &time);
+        void render(audio::pcm_buffer &buffer, UInt32 const bus_idx, audio::time const &when);
+        void set_render_time_on_render(audio::time const &time);
 
        protected:
         class kernel_from_node;
         class impl;
 
-        explicit node(const std::shared_ptr<impl> &);
+        explicit node(std::shared_ptr<impl> const &);
 
         // from engine
 
-        audio::connection _input_connection(const UInt32 bus_idx) const override;
-        audio::connection _output_connection(const UInt32 bus_idx) const override;
-        const audio::connection_wmap &_input_connections() const override;
-        const audio::connection_wmap &_output_connections() const override;
-        void _add_connection(const audio::connection &connection) override;
-        void _remove_connection(const audio::connection &connection) override;
-        void _set_engine(const audio::engine &engine) override;
+        audio::connection _input_connection(UInt32 const bus_idx) const override;
+        audio::connection _output_connection(UInt32 const bus_idx) const override;
+        audio::connection_wmap const &_input_connections() const override;
+        audio::connection_wmap const &_output_connections() const override;
+        void _add_connection(audio::connection const &connection) override;
+        void _remove_connection(audio::connection const &connection) override;
+        void _set_engine(audio::engine const &engine) override;
         audio::engine _engine() const override;
         void _update_kernel() override;
         void _update_connections() override;
@@ -82,8 +82,8 @@ namespace audio {
     class node::kernel_from_node {
        public:
         virtual ~kernel_from_node() = default;
-        virtual void _set_input_connections(const audio::connection_wmap &) = 0;
-        virtual void _set_output_connections(const audio::connection_wmap &) = 0;
+        virtual void _set_input_connections(audio::connection_wmap const &) = 0;
+        virtual void _set_output_connections(audio::connection_wmap const &) = 0;
     };
 }
 }

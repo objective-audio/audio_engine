@@ -5,11 +5,11 @@
 
 #pragma once
 
+#include <memory>
 #include "yas_audio_types.h"
 #include "yas_audio_unit.h"
-#include "yas_result.h"
 #include "yas_base.h"
-#include <memory>
+#include "yas_result.h"
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
 #include "yas_audio_device_io.h"
@@ -27,9 +27,9 @@ namespace audio {
         graph(std::nullptr_t);
         ~graph();
 
-        graph(const graph &) = default;
+        graph(graph const &) = default;
         graph(graph &&) = default;
-        graph &operator=(const graph &) = default;
+        graph &operator=(graph const &) = default;
         graph &operator=(graph &&) = default;
 
         void add_audio_unit(unit &audio_unit);

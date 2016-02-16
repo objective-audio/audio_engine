@@ -23,7 +23,7 @@ class yas::audio::unit::parameter::impl {
     std::string name;
     yas::subject<audio::unit::parameter::change_info> subject;
 
-    impl(const AudioUnitParameterInfo &info, const AudioUnitParameterID parameter_id, const AudioUnitScope scope)
+    impl(AudioUnitParameterInfo const &info, AudioUnitParameterID const parameter_id, AudioUnitScope const scope)
         : parameter_id(parameter_id),
           scope(scope),
           has_clump(info.flags & kAudioUnitParameterFlag_HasClump),
@@ -71,8 +71,8 @@ class yas::audio::unit::parameter::impl {
     }
 };
 
-audio::unit::parameter::parameter(const AudioUnitParameterInfo &info, const AudioUnitParameterID parameter_id,
-                                  const AudioUnitScope scope)
+audio::unit::parameter::parameter(AudioUnitParameterInfo const &info, AudioUnitParameterID const parameter_id,
+                                  AudioUnitScope const scope)
     : _impl(std::make_unique<impl>(info, parameter_id, scope)) {
 }
 
@@ -132,11 +132,11 @@ AudioUnitParameterValue audio::unit::parameter::default_value() const {
     return _impl->default_value;
 }
 
-Float32 audio::unit::parameter::value(const AudioUnitElement element) const {
+Float32 audio::unit::parameter::value(AudioUnitElement const element) const {
     return _impl->values.at(element);
 }
 
-void audio::unit::parameter::set_value(const AudioUnitParameterValue value, const AudioUnitElement element) {
+void audio::unit::parameter::set_value(AudioUnitParameterValue const value, AudioUnitElement const element) {
     change_info info{
         .element = element, .old_value = _impl->values[element], .new_value = value, .parameter = *this,
     };
@@ -146,7 +146,7 @@ void audio::unit::parameter::set_value(const AudioUnitParameterValue value, cons
     _impl->subject.notify(did_change_key, info);
 }
 
-const std::unordered_map<AudioUnitElement, AudioUnitParameterValue> &audio::unit::parameter::values() const {
+std::unordered_map<AudioUnitElement, AudioUnitParameterValue> const &audio::unit::parameter::values() const {
     return _impl->values;
 }
 

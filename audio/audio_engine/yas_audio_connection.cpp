@@ -3,9 +3,9 @@
 //  Copyright (c) 2015 Yuki Yasoshima.
 //
 
+#include <mutex>
 #include "yas_audio_connection.h"
 #include "yas_audio_node.h"
-#include <mutex>
 
 using namespace yas;
 
@@ -17,8 +17,8 @@ class audio::connection::impl : public base::impl {
     audio::format format;
     mutable std::recursive_mutex mutex;
 
-    impl(const node &source_node, const UInt32 source_bus, const node &destination_node, const UInt32 destination_bus,
-         const audio::format &format)
+    impl(node const &source_node, UInt32 const source_bus, node const &destination_node, UInt32 const destination_bus,
+         audio::format const &format)
         : source_bus(source_bus),
           destination_bus(destination_bus),
           format(format),
@@ -26,7 +26,7 @@ class audio::connection::impl : public base::impl {
           _destination_node(destination_node) {
     }
 
-    void remove_connection_from_nodes(const connection &connection) {
+    void remove_connection_from_nodes(connection const &connection) {
         if (auto node = _destination_node.lock()) {
             static_cast<node_from_connection &>(node)._remove_connection(connection);
         }
@@ -78,8 +78,8 @@ audio::connection::~connection() {
     }
 }
 
-audio::connection::connection(node &source_node, const UInt32 source_bus, node &destination_node,
-                              const UInt32 destination_bus, const audio::format &format)
+audio::connection::connection(node &source_node, UInt32 const source_bus, node &destination_node,
+                              UInt32 const destination_bus, audio::format const &format)
     : super_class(std::make_shared<impl>(source_node, source_bus, destination_node, destination_bus, format)) {
     if (!source_node || !destination_node) {
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : invalid argument.");
@@ -111,7 +111,7 @@ audio::node audio::connection::destination_node() const {
     return node{nullptr};
 }
 
-const audio::format &audio::connection::format() const {
+audio::format const &audio::connection::format() const {
     return impl_ptr<impl>()->format;
 }
 

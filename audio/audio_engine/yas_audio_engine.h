@@ -5,12 +5,12 @@
 
 #pragma once
 
-#include "yas_audio_types.h"
-#include "yas_base.h"
-#include "yas_result.h"
-#include "yas_observing.h"
 #include "yas_audio_connection.h"
 #include "yas_audio_offline_output_node_protocol.h"
+#include "yas_audio_types.h"
+#include "yas_base.h"
+#include "yas_observing.h"
+#include "yas_result.h"
 
 namespace yas {
 namespace audio {
@@ -22,7 +22,7 @@ namespace audio {
         class impl;
 
        public:
-        constexpr static auto configuration_change_key = "yas.audio.engine.configuration_change";
+        static auto constexpr configuration_change_key = "yas.audio.engine.configuration_change";
 
         enum class start_error_t {
             already_running,
@@ -38,27 +38,27 @@ namespace audio {
         engine(std::nullptr_t);
         ~engine();
 
-        engine(const engine &) = default;
+        engine(engine const &) = default;
         engine(engine &&) = default;
-        engine &operator=(const engine &) = default;
+        engine &operator=(engine const &) = default;
         engine &operator=(engine &&) = default;
 
         engine &operator=(std::nullptr_t);
 
-        audio::connection connect(node &source_node, node &destination_node, const audio::format &format);
-        audio::connection connect(node &source_node, node &destination_node, const UInt32 source_bus_idx,
-                                  const UInt32 destination_bus_idx, const audio::format &format);
+        audio::connection connect(node &source_node, node &destination_node, audio::format const &format);
+        audio::connection connect(node &source_node, node &destination_node, UInt32 const source_bus_idx,
+                                  UInt32 const destination_bus_idx, audio::format const &format);
 
         void disconnect(audio::connection &);
         void disconnect(node &);
-        void disconnect_input(const node &);
-        void disconnect_input(const node &, const UInt32 bus_idx);
-        void disconnect_output(const node &);
-        void disconnect_output(const node &, const UInt32 bus_idx);
+        void disconnect_input(node const &);
+        void disconnect_input(node const &, UInt32 const bus_idx);
+        void disconnect_output(node const &);
+        void disconnect_output(node const &, UInt32 const bus_idx);
 
         start_result_t start_render();
-        start_result_t start_offline_render(const offline_render_f &render_function,
-                                            const offline_completion_f &completion_function);
+        start_result_t start_offline_render(offline_render_f const &render_function,
+                                            offline_completion_f const &completion_function);
         void stop();
 
         subject<engine> &subject() const;
@@ -71,7 +71,7 @@ namespace audio {
     };
 }
 
-std::string to_string(const audio::engine::start_error_t &error);
+std::string to_string(audio::engine::start_error_t const &error);
 }
 
 #include "yas_audio_engine_impl.h"

@@ -24,12 +24,12 @@ namespace audio {
         bool is_running() const;
 
        private:
-        offline_output_node(const std::shared_ptr<impl> &);
+        offline_output_node(std::shared_ptr<impl> const &);
 
         // from engine
 
-        offline_start_result_t _start(const offline_render_f &callback_func,
-                                      const offline_completion_f &completion_func) const override;
+        offline_start_result_t _start(offline_render_f const &callback_func,
+                                      offline_completion_f const &completion_func) const override;
         void _stop() const override;
 
 #if YAS_TEST
@@ -40,7 +40,7 @@ namespace audio {
     };
 }
 
-std::string to_string(const audio::offline_start_error_t &error);
+std::string to_string(audio::offline_start_error_t const &error);
 }
 
 #include "yas_audio_offline_output_node_impl.h"

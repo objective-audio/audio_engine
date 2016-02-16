@@ -17,31 +17,31 @@ namespace audio {
             return node(std::make_shared<node::impl>());
         }
 
-        static audio::connection input_connection(const node &node, const UInt32 bus_idx) {
+        static audio::connection input_connection(node const &node, UInt32 const bus_idx) {
             return node._input_connection(bus_idx);
         }
 
-        static audio::connection output_connection(const node &node, const UInt32 bus_idx) {
+        static audio::connection output_connection(node const &node, UInt32 const bus_idx) {
             return node._output_connection(bus_idx);
         }
 
-        static const audio::connection_wmap &input_connections(const node &node) {
+        static audio::connection_wmap const &input_connections(node const &node) {
             return node._input_connections();
         }
 
-        static const audio::connection_wmap &output_connections(const node &node) {
+        static audio::connection_wmap const &output_connections(node const &node) {
             return node._output_connections();
         }
 
-        static void add_connection(node &node, const audio::connection &connection) {
+        static void add_connection(node &node, audio::connection const &connection) {
             node._add_connection(connection);
         }
 
-        static void remove_connection(node &node, const audio::connection &connection) {
+        static void remove_connection(node &node, audio::connection const &connection) {
             node.impl_ptr<impl>()->remove_connection(connection);
         }
 
-        static void set_engine(node &node, const audio::engine &engine) {
+        static void set_engine(node &node, audio::engine const &engine) {
             node._set_engine(engine);
         }
 
@@ -49,7 +49,7 @@ namespace audio {
             node.impl_ptr<impl>()->update_kernel();
         }
 
-        static std::shared_ptr<kernel> kernel(const node &node) {
+        static std::shared_ptr<kernel> kernel(node const &node) {
             return node.impl_ptr<impl>()->kernel_cast();
         }
     };

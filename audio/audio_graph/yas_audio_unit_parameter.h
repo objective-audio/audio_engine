@@ -5,22 +5,22 @@
 
 #pragma once
 
-#include "yas_observing.h"
 #include <AudioToolbox/AudioToolbox.h>
+#include "yas_observing.h"
 
 class yas::audio::unit::parameter {
    public:
     struct change_info {
-        const parameter &parameter;
-        const AudioUnitElement element;
-        const AudioUnitParameterValue old_value;
-        const AudioUnitParameterValue new_value;
+        parameter const &parameter;
+        AudioUnitElement const element;
+        AudioUnitParameterValue const old_value;
+        AudioUnitParameterValue const new_value;
     };
 
-    constexpr static auto will_change_key = "yas.audio.audio_unit.parameter.will_change";
-    constexpr static auto did_change_key = "yas.audio.audio_unit.parameter.did_change";
+    static auto constexpr will_change_key = "yas.audio.audio_unit.parameter.will_change";
+    static auto constexpr did_change_key = "yas.audio.audio_unit.parameter.did_change";
 
-    parameter(const AudioUnitParameterInfo &info, const AudioUnitParameterID paramter_id, const AudioUnitScope scope);
+    parameter(AudioUnitParameterInfo const &info, AudioUnitParameterID const paramter_id, AudioUnitScope const scope);
     ~parameter();
 
     parameter(parameter &&);
@@ -37,9 +37,9 @@ class yas::audio::unit::parameter {
     AudioUnitParameterValue max_value() const;
     AudioUnitParameterValue default_value() const;
 
-    Float32 value(const AudioUnitElement element) const;
-    void set_value(const Float32 value, const AudioUnitElement element);
-    const std::unordered_map<AudioUnitElement, AudioUnitParameterValue> &values() const;
+    Float32 value(AudioUnitElement const element) const;
+    void set_value(Float32 const value, AudioUnitElement const element);
+    std::unordered_map<AudioUnitElement, AudioUnitParameterValue> const &values() const;
 
     yas::subject<change_info> &subject();
 
@@ -47,6 +47,6 @@ class yas::audio::unit::parameter {
     class impl;
     std::unique_ptr<impl> _impl;
 
-    parameter(const parameter &) = delete;
-    parameter &operator=(const parameter &) = delete;
+    parameter(parameter const &) = delete;
+    parameter &operator=(parameter const &) = delete;
 };

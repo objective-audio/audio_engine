@@ -10,16 +10,16 @@
 using namespace yas;
 
 using listener_f =
-    std::function<void(const UInt32 in_number_addresses, const AudioObjectPropertyAddress *in_addresses)>;
+    std::function<void(UInt32 const in_number_addresses, const AudioObjectPropertyAddress *const in_addresses)>;
 
 #pragma mark - property_info
 
-audio::device::stream::property_info::property_info(const stream::property property, const AudioObjectID object_id,
-                                                    const AudioObjectPropertyAddress &address)
+audio::device::stream::property_info::property_info(stream::property const property, AudioObjectID const object_id,
+                                                    AudioObjectPropertyAddress const &address)
     : property(property), object_id(object_id), address(address) {
 }
 
-bool audio::device::stream::property_info::operator<(const property_info &info) const {
+bool audio::device::stream::property_info::operator<(property_info const &info) const {
     if (property != info.property) {
         return property < info.property;
     }
@@ -52,16 +52,16 @@ class audio::device::stream::impl : public base::impl {
     AudioDeviceID device_id;
     yas::subject<change_info> subject;
 
-    impl(const AudioStreamID stream_id, const AudioDeviceID device_id)
+    impl(AudioStreamID const stream_id, AudioDeviceID const device_id)
         : stream_id(stream_id), device_id(device_id), subject() {
     }
 
-    listener_f listener(const stream &stream) {
+    listener_f listener(stream const &stream) {
         auto weak_stream = to_weak(stream);
 
-        return [weak_stream](UInt32 address_count, const AudioObjectPropertyAddress *addresses) {
+        return [weak_stream](UInt32 const address_count, const AudioObjectPropertyAddress *const addresses) {
             if (auto stream = weak_stream.lock()) {
-                const AudioStreamID object_id = stream.stream_id();
+                AudioStreamID const object_id = stream.stream_id();
                 std::vector<property_info> infos;
                 for (UInt32 i = 0; i < address_count; i++) {
                     if (addresses[i].mSelector == kAudioStreamPropertyVirtualFormat) {
@@ -78,8 +78,8 @@ class audio::device::stream::impl : public base::impl {
         };
     }
 
-    void add_listener(const AudioObjectPropertySelector &selector, listener_f function) {
-        const AudioObjectPropertyAddress address = {.mSelector = selector,
+    void add_listener(AudioObjectPropertySelector const &selector, listener_f function) {
+        AudioObjectPropertyAddress const address = {.mSelector = selector,
                                                     .mScope = kAudioObjectPropertyScopeGlobal,
                                                     .mElement = kAudioObjectPropertyElementMaster};
 
@@ -96,7 +96,7 @@ class audio::device::stream::impl : public base::impl {
 audio::device::stream::stream(std::nullptr_t) : super_class(nullptr) {
 }
 
-audio::device::stream::stream(const AudioStreamID stream_id, const AudioDeviceID device_id)
+audio::device::stream::stream(AudioStreamID const stream_id, AudioDeviceID const device_id)
     : super_class(std::make_shared<impl>(stream_id, device_id)) {
     auto imp = impl_ptr<impl>();
     auto function = imp->listener(*this);
@@ -107,14 +107,14 @@ audio::device::stream::stream(const AudioStreamID stream_id, const AudioDeviceID
 
 audio::device::stream::~stream() = default;
 
-bool audio::device::stream::operator==(const stream &rhs) const {
+bool audio::device::stream::operator==(stream const &rhs) const {
     if (impl_ptr() && rhs.impl_ptr()) {
         return stream_id() == rhs.stream_id();
     }
     return false;
 }
 
-bool audio::device::stream::operator!=(const stream &rhs) const {
+bool audio::device::stream::operator!=(stream const &rhs) const {
     if (impl_ptr() && rhs.impl_ptr()) {
         return stream_id() != rhs.stream_id();
     }

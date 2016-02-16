@@ -9,8 +9,8 @@
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
 
-#include "yas_audio_node.h"
 #include "yas_audio_device_io_node_protocol.h"
+#include "yas_audio_node.h"
 
 namespace yas {
 namespace audio {
@@ -24,11 +24,11 @@ namespace audio {
 
         device_io_node();
         device_io_node(std::nullptr_t);
-        device_io_node(const audio::device &device);
+        device_io_node(audio::device const &device);
 
         virtual ~device_io_node();
 
-        void set_device(const audio::device &device);
+        void set_device(audio::device const &device);
         audio::device device() const;
 
        private:
@@ -38,7 +38,7 @@ namespace audio {
         audio::device_io &_device_io() const override;
 
        protected:
-        device_io_node(const std::shared_ptr<device_io_node::impl> &impl);
+        device_io_node(std::shared_ptr<device_io_node::impl> const &impl);
 
 #if YAS_TEST
        public:

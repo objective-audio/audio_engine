@@ -5,13 +5,13 @@
 
 #pragma once
 
+#include <AudioUnit/AUComponent.h>
+#include <experimental/optional>
+#include <map>
 #include <memory>
+#include <set>
 #include <string>
 #include <vector>
-#include <map>
-#include <set>
-#include <experimental/optional>
-#include <AudioUnit/AUComponent.h>
 
 namespace yas {
 namespace audio {
@@ -59,9 +59,9 @@ namespace audio {
     using channel_map_t = std::vector<UInt32>;
 }
 
-UInt32 to_uint32(const audio::direction &);
-std::string to_string(const audio::direction &);
-std::string to_string(const AudioUnitScope scope);
-std::string to_string(const audio::render_type &);
-std::string to_string(const OSStatus err);
+UInt32 to_uint32(audio::direction const &);
+std::string to_string(audio::direction const &);
+std::string to_string(AudioUnitScope const scope);
+std::string to_string(audio::render_type const &);
+std::string to_string(OSStatus const err);
 }

@@ -5,30 +5,30 @@
 
 #pragma once
 
-#include "yas_audio_types.h"
 #include <AudioToolbox/AudioToolbox.h>
 #include <memory>
 #include <string>
+#include "yas_audio_types.h"
 
 namespace yas {
 namespace audio {
     class format {
        public:
         format(std::nullptr_t n = nullptr);
-        explicit format(const AudioStreamBasicDescription &asbd);
-        explicit format(const CFDictionaryRef &settings);
-        format(const Float64 sample_rate, const UInt32 channel_count,
-               const audio::pcm_format pcm_format = audio::pcm_format::float32, const bool interleaved = false);
+        explicit format(AudioStreamBasicDescription const &asbd);
+        explicit format(CFDictionaryRef const &settings);
+        format(Float64 const sample_rate, UInt32 const channel_count,
+               audio::pcm_format const pcm_format = audio::pcm_format::float32, bool const interleaved = false);
 
-        format(const format &) = default;
+        format(format const &) = default;
         format(format &&) = default;
-        format &operator=(const format &) = default;
+        format &operator=(format const &) = default;
         format &operator=(format &&) = default;
 
         ~format() = default;
 
-        bool operator==(const format &) const;
-        bool operator!=(const format &) const;
+        bool operator==(format const &) const;
+        bool operator!=(format const &) const;
 
         explicit operator bool() const;
 
@@ -40,12 +40,12 @@ namespace audio {
         UInt32 stride() const;
         Float64 sample_rate() const;
         bool is_interleaved() const;
-        const AudioStreamBasicDescription &stream_description() const;
+        AudioStreamBasicDescription const &stream_description() const;
         UInt32 sample_byte_count() const;
         UInt32 buffer_frame_byte_count() const;
         CFStringRef description() const;
 
-        static const format &null_format();
+        static format const &null_format();
 
        private:
         class impl;
@@ -53,9 +53,9 @@ namespace audio {
     };
 }
 
-std::string to_string(const audio::pcm_format &pcm_format);
-AudioStreamBasicDescription to_stream_description(const CFDictionaryRef &settings);
-AudioStreamBasicDescription to_stream_description(const Float64 sample_rate, const UInt32 channels,
-                                                  const audio::pcm_format pcm_format, const bool interleaved);
-bool is_equal(const AudioStreamBasicDescription &asbd1, const AudioStreamBasicDescription &asbd2);
+std::string to_string(audio::pcm_format const &pcm_format);
+AudioStreamBasicDescription to_stream_description(CFDictionaryRef const &settings);
+AudioStreamBasicDescription to_stream_description(Float64 const sample_rate, UInt32 const channels,
+                                                  audio::pcm_format const pcm_format, bool const interleaved);
+bool is_equal(AudioStreamBasicDescription const &asbd1, AudioStreamBasicDescription const &asbd2);
 }

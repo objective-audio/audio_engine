@@ -5,10 +5,10 @@
 
 #pragma once
 
-#include "yas_audio_types.h"
-#include "yas_audio_pcm_buffer.h"
-#include <memory>
 #include <CoreFoundation/CoreFoundation.h>
+#include <memory>
+#include "yas_audio_pcm_buffer.h"
+#include "yas_audio_types.h"
 
 namespace yas {
 namespace audio {
@@ -50,30 +50,30 @@ namespace audio {
         file();
         virtual ~file() = default;
 
-        file(const file &) = default;
+        file(file const &) = default;
         file(file &&) = default;
-        file &operator=(const file &) = default;
+        file &operator=(file const &) = default;
         file &operator=(file &&) = default;
 
         explicit operator bool() const;
 
         CFURLRef url() const;
-        const audio::format &file_format() const;
-        void set_processing_format(const audio::format &format);
-        const audio::format &processing_format() const;
+        audio::format const &file_format() const;
+        void set_processing_format(audio::format const &format);
+        audio::format const &processing_format() const;
         SInt64 file_length() const;
         SInt64 processing_length() const;
-        void set_file_frame_position(const UInt32 position);
+        void set_file_frame_position(UInt32 const position);
         SInt64 file_frame_position() const;
 
-        open_result_t open(const CFURLRef file_url, const pcm_format pcm_format = pcm_format::float32,
-                           const bool interleaved = false);
-        create_result_t create(const CFURLRef file_url, const CFStringRef file_type, const CFDictionaryRef settings,
-                               const pcm_format pcm_format = pcm_format::float32, const bool interleaved = false);
+        open_result_t open(CFURLRef const file_url, pcm_format const pcm_format = pcm_format::float32,
+                           bool const interleaved = false);
+        create_result_t create(CFURLRef const file_url, const CFStringRef file_type, const CFDictionaryRef settings,
+                               pcm_format const pcm_format = pcm_format::float32, bool const interleaved = false);
         void close();
 
-        read_result_t read_into_buffer(audio::pcm_buffer &buffer, const UInt32 frame_length = 0);
-        write_result_t write_from_buffer(const audio::pcm_buffer &buffer, const bool async = false);
+        read_result_t read_into_buffer(audio::pcm_buffer &buffer, UInt32 const frame_length = 0);
+        write_result_t write_from_buffer(audio::pcm_buffer const &buffer, bool const async = false);
 
        protected:
         class impl;
@@ -81,8 +81,8 @@ namespace audio {
     };
 }
 
-std::string to_string(const audio::file::open_error_t &);
-std::string to_string(const audio::file::read_error_t &);
-std::string to_string(const audio::file::create_error_t &);
-std::string to_string(const audio::file::write_error_t &);
+std::string to_string(audio::file::open_error_t const &);
+std::string to_string(audio::file::read_error_t const &);
+std::string to_string(audio::file::create_error_t const &);
+std::string to_string(audio::file::write_error_t const &);
 }

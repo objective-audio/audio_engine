@@ -13,7 +13,7 @@ using namespace yas;
 
 #if TARGET_OS_IPHONE
 
-audio::channel_map_t yas::to_channel_map(NSArray *const channelDescriptions, const audio::direction dir) {
+audio::channel_map_t yas::to_channel_map(NSArray *const channelDescriptions, audio::direction const dir) {
     AVAudioSession *const audioSession = [AVAudioSession sharedInstance];
     AVAudioSessionRouteDescription *const routeDesc = audioSession.currentRoute;
 
@@ -58,12 +58,12 @@ audio::channel_map_t yas::to_channel_map(NSArray *const channelDescriptions, con
 
 #endif
 
-AVAudioTime *yas::to_objc_object(const audio::time &time) {
-    const AudioTimeStamp time_stamp = time.audio_time_stamp();
+AVAudioTime *yas::to_objc_object(audio::time const &time) {
+    AudioTimeStamp const time_stamp = time.audio_time_stamp();
     return [AVAudioTime timeWithAudioTimeStamp:&time_stamp sampleRate:time.sample_rate()];
 }
 
 audio::time yas::to_time(AVAudioTime *const av_time) {
-    const AudioTimeStamp time_stamp = av_time.audioTimeStamp;
+    AudioTimeStamp const time_stamp = av_time.audioTimeStamp;
     return audio::time(time_stamp, av_time.sampleRate);
 }

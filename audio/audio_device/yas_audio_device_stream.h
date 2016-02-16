@@ -21,37 +21,37 @@ class yas::audio::device::stream : public base {
         starting_channel,
     };
 
-    constexpr static auto stream_did_change_key = "yas.audio.device.stream.stream_did_change";
+    static auto constexpr stream_did_change_key = "yas.audio.device.stream.stream_did_change";
 
     struct property_info {
-        const AudioObjectID object_id;
-        const stream::property property;
-        const AudioObjectPropertyAddress address;
+        AudioObjectID const object_id;
+        stream::property const property;
+        AudioObjectPropertyAddress const address;
 
-        property_info(const stream::property property, const AudioObjectID object_id,
-                      const AudioObjectPropertyAddress &address);
+        property_info(stream::property const property, AudioObjectID const object_id,
+                      AudioObjectPropertyAddress const &address);
 
-        bool operator<(const property_info &info) const;
+        bool operator<(property_info const &info) const;
     };
 
     struct change_info {
-        const std::vector<property_info> property_infos;
+        std::vector<property_info> const property_infos;
 
         change_info(std::vector<property_info> &&);
     };
 
     stream(std::nullptr_t);
-    stream(const AudioStreamID, const AudioDeviceID);
+    stream(AudioStreamID const, AudioDeviceID const);
 
     ~stream();
 
-    stream(const stream &) = default;
+    stream(stream const &) = default;
     stream(stream &&) = default;
-    stream &operator=(const stream &) = default;
+    stream &operator=(stream const &) = default;
     stream &operator=(stream &&) = default;
 
-    bool operator==(const stream &) const;
-    bool operator!=(const stream &) const;
+    bool operator==(stream const &) const;
+    bool operator!=(stream const &) const;
 
     AudioStreamID stream_id() const;
     audio::device device() const;
@@ -64,8 +64,8 @@ class yas::audio::device::stream : public base {
 
    private:
     template <typename T>
-    std::unique_ptr<std::vector<T>> _property_data(const AudioStreamID stream_id,
-                                                   const AudioObjectPropertySelector selector) const;
+    std::unique_ptr<std::vector<T>> _property_data(AudioStreamID const stream_id,
+                                                   AudioObjectPropertySelector const selector) const;
 };
 
 #include "yas_audio_device_stream_private.h"
