@@ -27,13 +27,13 @@ class audio::route_node::impl : public node::impl {
        public:
         route_set_t routes;
 
-        void erase_route_if_either_matched(const route &route) {
-            erase_route_if([&route](const audio::route &route_of_set) {
+        void erase_route_if_either_matched(route const &route) {
+            erase_route_if([&route](audio::route const &route_of_set) {
                 return route_of_set.source == route.source || route_of_set.destination == route.destination;
             });
         }
 
-        void erase_route_if(std::function<bool(const route &)> pred) {
+        void erase_route_if(std::function<bool(route const &)> pred) {
             erase_if(routes, pred);
         }
     };
@@ -60,29 +60,29 @@ class audio::route_node::impl : public node::impl {
         return std::shared_ptr<node::kernel>(new route_node::kernel());
     }
 
-    virtual void prepare_kernel(const std::shared_ptr<node::kernel> &kernel) override {
+    virtual void prepare_kernel(std::shared_ptr<node::kernel> const &kernel) override {
         super_class::prepare_kernel(kernel);
 
         auto route_kernel = std::static_pointer_cast<route_node::kernel>(kernel);
         route_kernel->routes = _core->routes;
     }
 
-    virtual void render(pcm_buffer &dst_buffer, const UInt32 dst_bus_idx, const time &when) override {
+    virtual void render(pcm_buffer &dst_buffer, UInt32 const dst_bus_idx, time const &when) override {
         super_class::render(dst_buffer, dst_bus_idx, when);
 
         if (auto kernel = kernel_cast<route_node::kernel>()) {
             auto &routes = kernel->routes;
             auto output_connection = kernel->output_connection(dst_bus_idx);
             auto input_connections = kernel->input_connections();
-            const UInt32 dst_ch_count = dst_buffer.format().channel_count();
+            UInt32 const dst_ch_count = dst_buffer.format().channel_count();
 
-            for (const auto &pair : input_connections) {
-                if (const auto &input_connection = pair.second) {
+            for (auto const &pair : input_connections) {
+                if (auto const &input_connection = pair.second) {
                     if (auto node = input_connection.source_node()) {
-                        const auto &src_format = input_connection.format();
-                        const auto &src_bus_idx = pair.first;
-                        const UInt32 src_ch_count = src_format.channel_count();
-                        if (const auto result =
+                        auto const &src_format = input_connection.format();
+                        auto const &src_bus_idx = pair.first;
+                        UInt32 const src_ch_count = src_format.channel_count();
+                        if (auto const result =
                                 channel_map_from_routes(routes, src_bus_idx, src_ch_count, dst_bus_idx, dst_ch_count)) {
                             pcm_buffer src_buffer(src_format, dst_buffer, result.value());
                             node.render(src_buffer, src_bus_idx, when);
@@ -95,11 +95,11 @@ class audio::route_node::impl : public node::impl {
 
 #pragma mark -
 
-    const audio::route_set_t &routes() const {
+    audio::route_set_t const &routes() const {
         return _core->routes;
     }
 
-    void add_route(const route &route) {
+    void add_route(route const &route) {
         _core->erase_route_if_either_matched(route);
         _core->routes.insert(route);
         update_kernel();
@@ -111,22 +111,22 @@ class audio::route_node::impl : public node::impl {
         update_kernel();
     }
 
-    void remove_route(const route &route) {
+    void remove_route(route const &route) {
         _core->routes.erase(route);
         update_kernel();
     }
 
-    void remove_route_for_source(const route::point &src_pt) {
-        _core->erase_route_if([&src_pt](const route &route_of_set) { return route_of_set.source == src_pt; });
+    void remove_route_for_source(route::point const &src_pt) {
+        _core->erase_route_if([&src_pt](route const &route_of_set) { return route_of_set.source == src_pt; });
         update_kernel();
     }
 
-    void remove_route_for_destination(const route::point &dst_pt) {
-        _core->erase_route_if([&dst_pt](const route &route_of_set) { return route_of_set.destination == dst_pt; });
+    void remove_route_for_destination(route::point const &dst_pt) {
+        _core->erase_route_if([&dst_pt](route const &route_of_set) { return route_of_set.destination == dst_pt; });
         update_kernel();
     }
 
-    void set_routes(const route_set_t &routes) {
+    void set_routes(route_set_t const &routes) {
         _core->routes.clear();
         _core->routes = routes;
         update_kernel();
@@ -155,11 +155,11 @@ audio::route_node::route_node() : super_class(std::make_unique<impl>()) {
 audio::route_node::route_node(std::nullptr_t) : super_class(nullptr) {
 }
 
-const audio::route_set_t &audio::route_node::routes() const {
+audio::route_set_t const &audio::route_node::routes() const {
     return impl_ptr<impl>()->routes();
 }
 
-void audio::route_node::add_route(const route &route) {
+void audio::route_node::add_route(route const &route) {
     impl_ptr<impl>()->add_route(route);
 }
 
@@ -167,19 +167,19 @@ void audio::route_node::add_route(route &&route) {
     impl_ptr<impl>()->add_route(std::move(route));
 }
 
-void audio::route_node::remove_route(const route &route) {
+void audio::route_node::remove_route(route const &route) {
     impl_ptr<impl>()->remove_route(route);
 }
 
-void audio::route_node::remove_route_for_source(const route::point &src_pt) {
+void audio::route_node::remove_route_for_source(route::point const &src_pt) {
     impl_ptr<impl>()->remove_route_for_source(src_pt);
 }
 
-void audio::route_node::remove_route_for_destination(const route::point &dst_pt) {
+void audio::route_node::remove_route_for_destination(route::point const &dst_pt) {
     impl_ptr<impl>()->remove_route_for_destination(dst_pt);
 }
 
-void audio::route_node::set_routes(const route_set_t &routes) {
+void audio::route_node::set_routes(route_set_t const &routes) {
     impl_ptr<impl>()->set_routes(routes);
 }
 
