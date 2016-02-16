@@ -17,16 +17,16 @@ audio::device_io_node::device_io_node() : device_io_node(audio::device(nullptr))
 audio::device_io_node::device_io_node(std::nullptr_t) : super_class(nullptr) {
 }
 
-audio::device_io_node::device_io_node(const audio::device &device) : node(std::make_unique<impl>()) {
+audio::device_io_node::device_io_node(audio::device const &device) : node(std::make_unique<impl>()) {
     impl_ptr<impl>()->prepare(*this, device);
 }
 
-audio::device_io_node::device_io_node(const std::shared_ptr<impl> &impl) : super_class(impl) {
+audio::device_io_node::device_io_node(std::shared_ptr<impl> const &impl) : super_class(impl) {
 }
 
 audio::device_io_node::~device_io_node() = default;
 
-void audio::device_io_node::set_device(const audio::device &device) {
+void audio::device_io_node::set_device(audio::device const &device) {
     impl_ptr<impl>()->set_device(device);
 }
 
