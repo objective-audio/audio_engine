@@ -23,12 +23,12 @@ namespace audio {
         virtual ~unit_io_node();
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
-        void set_device(const audio::device &device);
+        void set_device(audio::device const &device);
         audio::device device() const;
 #endif
 
-        void set_channel_map(const channel_map_t &map, const direction dir);
-        const channel_map_t &channel_map(const direction dir) const;
+        void set_channel_map(channel_map_t const &map, direction const dir);
+        channel_map_t const &channel_map(direction const dir) const;
 
         Float64 device_sample_rate() const;
         UInt32 output_device_channel_count() const;
@@ -37,7 +37,7 @@ namespace audio {
        protected:
         class impl;
 
-        unit_io_node(const std::shared_ptr<impl> &, const AudioComponentDescription &);
+        unit_io_node(std::shared_ptr<impl> const &, AudioComponentDescription const &);
     };
 
     class unit_output_node : public unit_io_node {
@@ -49,8 +49,8 @@ namespace audio {
         unit_output_node();
         unit_output_node(std::nullptr_t);
 
-        void set_channel_map(const channel_map_t &map);
-        const channel_map_t &channel_map() const;
+        void set_channel_map(channel_map_t const &map);
+        channel_map_t const &channel_map() const;
     };
 
     class unit_input_node : public unit_io_node {
@@ -62,8 +62,8 @@ namespace audio {
         unit_input_node();
         unit_input_node(std::nullptr_t);
 
-        void set_channel_map(const channel_map_t &map);
-        const channel_map_t &channel_map() const;
+        void set_channel_map(channel_map_t const &map);
+        channel_map_t const &channel_map() const;
     };
 }
 }
