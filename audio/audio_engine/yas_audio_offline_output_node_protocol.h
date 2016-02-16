@@ -1,6 +1,5 @@
 //
 //  yas_audio_offline_output_node_protocol.h
-//  Copyright (c) 2015 Yuki Yasoshima.
 //
 
 #pragma once

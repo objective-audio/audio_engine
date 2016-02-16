@@ -1,6 +1,5 @@
 //
 //  yas_audio_node_kernel.cpp
-//  Copyright (c) 2015 Yuki Yasoshima.
 //
 
 #include "yas_audio_node.h"

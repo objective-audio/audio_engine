@@ -1,6 +1,5 @@
 //
 //  yas_audio_unit_parameter.cpp
-//  Copyright (c) 2015 Yuki Yasoshima.
 //
 
 #include "yas_audio_unit.h"

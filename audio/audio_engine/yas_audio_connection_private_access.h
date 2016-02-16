@@ -1,6 +1,5 @@
 //
 //  yas_audio_connection_private_access.h
-//  Copyright (c) 2015 Yuki Yasoshima.
 //
 
 #pragma once

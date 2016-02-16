@@ -1,6 +1,5 @@
 //
 //  YASAudioEngineIOSampleViewController.m
-//  Copyright (c) 2015 Yuki Yasoshima.
 //
 
 #import "YASAudioEngineIOSampleViewController.h"

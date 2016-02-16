@@ -1,6 +1,5 @@
 //
 //  yas_audio_objc_utils.h
-//  Copyright (c) 2015 Yuki Yasoshima.
 //
 
 #pragma once

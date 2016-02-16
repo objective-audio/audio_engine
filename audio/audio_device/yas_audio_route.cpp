@@ -1,6 +1,5 @@
 //
 //  yas_audio_route.cpp
-//  Copyright (c) 2015 Yuki Yasoshima.
 //
 
 #include <exception>

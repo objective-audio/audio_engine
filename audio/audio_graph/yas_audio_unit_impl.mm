@@ -1,6 +1,5 @@
 //
 //  yas_audio_unit_impl.mm
-//  Copyright (c) 2015 Yuki Yasoshima.
 //
 
 #include "yas_audio_graph.h"

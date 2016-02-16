@@ -1,6 +1,5 @@
 //
 //  YASAudioEngineSampleParameterCell.m
-//  Copyright (c) 2015 Yuki Yasoshima.
 //
 
 #import "YASAudioEngineSampleParameterCell.h"

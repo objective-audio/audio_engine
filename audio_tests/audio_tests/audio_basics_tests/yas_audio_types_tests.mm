@@ -1,6 +1,5 @@
 //
 //  yas_audio_types_tests.mm
-//  Copyright (c) 2015 Yuki Yasoshima.
 //
 
 #import "yas_audio_test_utils.h"

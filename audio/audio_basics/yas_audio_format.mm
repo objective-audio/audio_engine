@@ -1,6 +1,5 @@
 //
 //  yas_audio_format.mm
-//  Copyright (c) 2015 Yuki Yasoshima.
 //
 
 #import <AVFoundation/AVFoundation.h>

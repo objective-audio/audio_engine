@@ -1,6 +1,5 @@
 //
 //  yas_audio_time.mm
-//  Copyright (c) 2015 Yuki Yasoshima.
 //
 
 #include <AVFoundation/AVFoundation.h>

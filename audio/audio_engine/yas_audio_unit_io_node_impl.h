@@ -1,6 +1,5 @@
 //
 //  yas_audio_unit_io_node_impl.h
-//  Copyright (c) 2015 Yuki Yasoshima.
 //
 
 #pragma once

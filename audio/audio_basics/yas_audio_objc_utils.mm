@@ -1,6 +1,5 @@
 //
 //  yas_audio_objc_utils.mm
-//  Copyright (c) 2015 Yuki Yasoshima.
 //
 
 #include "yas_audio_objc_utils.h"
