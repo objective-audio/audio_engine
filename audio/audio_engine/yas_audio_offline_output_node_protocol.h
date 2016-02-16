@@ -5,8 +5,8 @@
 
 #pragma once
 
-#include "yas_result.h"
 #include <functional>
+#include "yas_result.h"
 
 namespace yas {
 namespace audio {
@@ -19,15 +19,15 @@ namespace audio {
         connection_not_found,
     };
 
-    using offline_render_f = std::function<void(audio::pcm_buffer &buffer, const audio::time &when, bool &stop)>;
-    using offline_completion_f = std::function<void(const bool cancelled)>;
+    using offline_render_f = std::function<void(audio::pcm_buffer &buffer, audio::time const &when, bool &stop)>;
+    using offline_completion_f = std::function<void(bool const cancelled)>;
     using offline_start_result_t = yas::result<std::nullptr_t, offline_start_error_t>;
 
     class offline_output_unit_from_engine {
        public:
         virtual ~offline_output_unit_from_engine() = default;
 
-        virtual offline_start_result_t _start(const offline_render_f &, const offline_completion_f &) const = 0;
+        virtual offline_start_result_t _start(offline_render_f const &, offline_completion_f const &) const = 0;
         virtual void _stop() const = 0;
     };
 }
