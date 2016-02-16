@@ -12,22 +12,22 @@ class yas::audio::node::kernel : public kernel_from_node {
 
     audio::connection_smap input_connections() const;
     audio::connection_smap output_connections() const;
-    audio::connection input_connection(const UInt32 bus_idx);
-    audio::connection output_connection(const UInt32 bus_idx);
+    audio::connection input_connection(UInt32 const bus_idx);
+    audio::connection output_connection(UInt32 const bus_idx);
 
    private:
     class impl;
     std::unique_ptr<impl> _impl;
 
-    kernel(const kernel &) = delete;
+    kernel(kernel const &) = delete;
     kernel(kernel &&) = delete;
-    kernel &operator=(const kernel &) = delete;
+    kernel &operator=(kernel const &) = delete;
     kernel &operator=(kernel &&) = delete;
 
     // from node
 
-    void _set_input_connections(const audio::connection_wmap &) override;
-    void _set_output_connections(const audio::connection_wmap &) override;
+    void _set_input_connections(audio::connection_wmap const &) override;
+    void _set_output_connections(audio::connection_wmap const &) override;
 
 #if YAS_TEST
    public:
