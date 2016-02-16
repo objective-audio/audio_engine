@@ -10,7 +10,7 @@ using namespace yas;
 
 #pragma mark -
 
-const OSType audio::unit::sub_type_default_io() {
+OSType audio::unit::sub_type_default_io() {
 #if TARGET_OS_IPHONE
     return kAudioUnitSubType_RemoteIO;
 #elif TARGET_OS_MAC
@@ -21,11 +21,11 @@ const OSType audio::unit::sub_type_default_io() {
 audio::unit::unit(std::nullptr_t) : super_class(nullptr) {
 }
 
-audio::unit::unit(const AudioComponentDescription &acd) : super_class(std::make_shared<impl>()) {
+audio::unit::unit(AudioComponentDescription const &acd) : super_class(std::make_shared<impl>()) {
     impl_ptr<impl>()->create_audio_unit(acd);
 }
 
-audio::unit::unit(const OSType &type, const OSType &sub_type)
+audio::unit::unit(OSType const type, OSType const sub_type)
     : unit({
           .componentType = type,
           .componentSubType = sub_type,
@@ -59,11 +59,11 @@ AudioUnit audio::unit::audio_unit_instance() const {
 
 #pragma mark - render callback
 
-void audio::unit::attach_render_callback(const UInt32 &bus_idx) {
+void audio::unit::attach_render_callback(UInt32 const bus_idx) {
     impl_ptr<impl>()->attach_render_callback(bus_idx);
 }
 
-void audio::unit::detach_render_callback(const UInt32 &bus_idx) {
+void audio::unit::detach_render_callback(UInt32 const bus_idx) {
     impl_ptr<impl>()->detach_render_callback(bus_idx);
 }
 
@@ -83,37 +83,37 @@ void audio::unit::detach_input_callback() {
     impl_ptr<impl>()->detach_input_callback();
 }
 
-void audio::unit::set_render_callback(const render_f &callback) {
+void audio::unit::set_render_callback(render_f const &callback) {
     impl_ptr<impl>()->set_render_callback(callback);
 }
 
-void audio::unit::set_notify_callback(const render_f &callback) {
+void audio::unit::set_notify_callback(render_f const &callback) {
     impl_ptr<impl>()->set_notify_callback(callback);
 }
 
-void audio::unit::set_input_callback(const render_f &callback) {
+void audio::unit::set_input_callback(render_f const &callback) {
     impl_ptr<impl>()->set_input_callback(callback);
 }
 
 #pragma mark - property
 
-void audio::unit::set_input_format(const AudioStreamBasicDescription &asbd, const UInt32 bus_idx) {
+void audio::unit::set_input_format(AudioStreamBasicDescription const &asbd, UInt32 const bus_idx) {
     impl_ptr<impl>()->set_input_format(asbd, bus_idx);
 }
 
-void audio::unit::set_output_format(const AudioStreamBasicDescription &asbd, const UInt32 bus_idx) {
+void audio::unit::set_output_format(AudioStreamBasicDescription const &asbd, UInt32 const bus_idx) {
     impl_ptr<impl>()->set_output_format(asbd, bus_idx);
 }
 
-AudioStreamBasicDescription audio::unit::input_format(const UInt32 bus_idx) const {
+AudioStreamBasicDescription audio::unit::input_format(UInt32 const bus_idx) const {
     return impl_ptr<impl>()->input_format(bus_idx);
 }
 
-AudioStreamBasicDescription audio::unit::output_format(const UInt32 bus_idx) const {
+AudioStreamBasicDescription audio::unit::output_format(UInt32 const bus_idx) const {
     return impl_ptr<impl>()->output_format(bus_idx);
 }
 
-void audio::unit::set_maximum_frames_per_slice(const UInt32 frames) {
+void audio::unit::set_maximum_frames_per_slice(UInt32 const frames) {
     impl_ptr<impl>()->set_maximum_frames_per_slice(frames);
 }
 
@@ -125,33 +125,33 @@ bool audio::unit::is_initialized() const {
     return impl_ptr<impl>()->is_initialized();
 }
 
-void audio::unit::set_element_count(const UInt32 &count, const AudioUnitScope &scope) {
+void audio::unit::set_element_count(UInt32 const count, AudioUnitScope const scope) {
     impl_ptr<impl>()->set_element_count(count, scope);
 }
 
-UInt32 audio::unit::element_count(const AudioUnitScope &scope) const {
+UInt32 audio::unit::element_count(AudioUnitScope const scope) const {
     return impl_ptr<impl>()->element_count(scope);
 }
 
 #pragma mark - parameter
 
-void audio::unit::set_parameter_value(const AudioUnitParameterValue value, const AudioUnitParameterID parameter_id,
-                                      const AudioUnitScope scope, const AudioUnitElement element) {
+void audio::unit::set_parameter_value(AudioUnitParameterValue const value, AudioUnitParameterID const parameter_id,
+                                      AudioUnitScope const scope, AudioUnitElement const element) {
     impl_ptr<impl>()->set_parameter_value(value, parameter_id, scope, element);
 }
 
-AudioUnitParameterValue audio::unit::parameter_value(const AudioUnitParameterID parameter_id,
-                                                     const AudioUnitScope scope, const AudioUnitElement element) const {
+AudioUnitParameterValue audio::unit::parameter_value(AudioUnitParameterID const parameter_id,
+                                                     AudioUnitScope const scope, AudioUnitElement const element) const {
     return impl_ptr<impl>()->parameter_value(parameter_id, scope, element);
 }
 
-audio::unit::parameter_map_t audio::unit::create_parameters(const AudioUnitScope scope) const {
+audio::unit::parameter_map_t audio::unit::create_parameters(AudioUnitScope const scope) const {
     auto parameter_list =
         impl_ptr<impl>()->property_data<AudioUnitParameterID>(kAudioUnitProperty_ParameterList, scope, 0);
     auto parameters = parameter_map_t{};
 
     if (parameter_list.size() > 0) {
-        for (const AudioUnitParameterID &parameter_id : parameter_list) {
+        for (AudioUnitParameterID const &parameter_id : parameter_list) {
             auto parameter = create_parameter(parameter_id, scope);
             parameters.insert(std::make_pair(parameter_id, std::move(parameter)));
         }
@@ -160,8 +160,8 @@ audio::unit::parameter_map_t audio::unit::create_parameters(const AudioUnitScope
     return parameters;
 }
 
-audio::unit::parameter audio::unit::create_parameter(const AudioUnitParameterID &parameter_id,
-                                                     const AudioUnitScope scope) const {
+audio::unit::parameter audio::unit::create_parameter(AudioUnitParameterID const parameter_id,
+                                                     AudioUnitScope const scope) const {
     AudioUnitParameterInfo info = {0};
     UInt32 size = sizeof(AudioUnitParameterInfo);
     OSStatus err = noErr;
@@ -185,7 +185,7 @@ audio::unit::parameter audio::unit::create_parameter(const AudioUnitParameterID 
 
 #pragma mark - io
 
-void audio::unit::set_enable_output(const bool enable_output) {
+void audio::unit::set_enable_output(bool const enable_output) {
     impl_ptr<impl>()->set_enable_output(enable_output);
 }
 
@@ -193,7 +193,7 @@ bool audio::unit::is_enable_output() const {
     return impl_ptr<impl>()->is_enable_input();
 }
 
-void audio::unit::set_enable_input(const bool enable_input) {
+void audio::unit::set_enable_input(bool const enable_input) {
     impl_ptr<impl>()->set_enable_input(enable_input);
 }
 
@@ -213,25 +213,25 @@ bool audio::unit::is_running() const {
     return impl_ptr<impl>()->is_running();
 }
 
-void audio::unit::set_channel_map(const channel_map_t &map, const AudioUnitScope scope,
-                                  const AudioUnitElement element) {
+void audio::unit::set_channel_map(channel_map_t const &map, AudioUnitScope const scope,
+                                  AudioUnitElement const element) {
     impl_ptr<impl>()->set_channel_map(map, scope, element);
 }
 
-audio::channel_map_t audio::unit::channel_map(const AudioUnitScope scope, const AudioUnitElement element) const {
+audio::channel_map_t audio::unit::channel_map(AudioUnitScope const scope, AudioUnitElement const element) const {
     return impl_ptr<impl>()->channel_map(scope, element);
 }
 
-UInt32 audio::unit::channel_map_count(const AudioUnitScope scope, const AudioUnitElement element) const {
+UInt32 audio::unit::channel_map_count(AudioUnitScope const scope, AudioUnitElement const element) const {
     return impl_ptr<impl>()->channel_map_count(scope, element);
 }
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
-void audio::unit::set_current_device(const AudioDeviceID &device) {
+void audio::unit::set_current_device(AudioDeviceID const device) {
     impl_ptr<impl>()->set_current_device(device);
 }
 
-const AudioDeviceID audio::unit::current_device() const {
+AudioDeviceID const audio::unit::current_device() const {
     return impl_ptr<impl>()->current_device();
 }
 #endif
@@ -268,25 +268,25 @@ void audio::unit::_uninitialize() {
     impl_ptr<impl>()->uninitialize();
 }
 
-void audio::unit::_set_graph_key(const std::experimental::optional<UInt8> &key) {
+void audio::unit::_set_graph_key(std::experimental::optional<UInt8> const &key) {
     impl_ptr<impl>()->graph_key = key;
 }
 
-const std::experimental::optional<UInt8> &audio::unit::_graph_key() const {
+std::experimental::optional<UInt8> const &audio::unit::_graph_key() const {
     return impl_ptr<impl>()->graph_key;
 }
 
-void audio::unit::_set_key(const std::experimental::optional<UInt16> &key) {
+void audio::unit::_set_key(std::experimental::optional<UInt16> const &key) {
     impl_ptr<impl>()->key = key;
 }
 
-const std::experimental::optional<UInt16> &audio::unit::_key() const {
+std::experimental::optional<UInt16> const &audio::unit::_key() const {
     return impl_ptr<impl>()->key;
 }
 
 #pragma mark - global
 
-audio::unit::au_result_t yas::to_result(const OSStatus err) {
+audio::unit::au_result_t yas::to_result(OSStatus const err) {
     if (err == noErr) {
         return audio::unit::au_result_t(nullptr);
     } else {
