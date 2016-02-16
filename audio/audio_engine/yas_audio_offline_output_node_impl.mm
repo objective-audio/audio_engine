@@ -21,7 +21,7 @@ class audio::offline_output_node::impl::core {
 
     ~core() = default;
 
-    const std::experimental::optional<UInt8> push_completion_function(const offline_completion_f &function) {
+    std::experimental::optional<UInt8> const push_completion_function(offline_completion_f const &function) {
         if (!function) {
             return nullopt;
         }
@@ -33,7 +33,7 @@ class audio::offline_output_node::impl::core {
         return key;
     }
 
-    const std::experimental::optional<offline_completion_f> pull_completion_function(UInt8 key) {
+    std::experimental::optional<offline_completion_f> const pull_completion_function(UInt8 key) {
         if (_completion_functions.count(key) > 0) {
             auto func = _completion_functions.at(key);
             _completion_functions.erase(key);
@@ -59,8 +59,8 @@ audio::offline_output_node::impl::impl()
 
 audio::offline_output_node::impl::~impl() = default;
 
-audio::offline_start_result_t audio::offline_output_node::impl::start(const offline_render_f &render_func,
-                                                                      const offline_completion_f &completion_func) {
+audio::offline_start_result_t audio::offline_output_node::impl::start(offline_render_f const &render_func,
+                                                                      offline_completion_f const &completion_func) {
     if (_core->queue) {
         return offline_start_result_t(offline_start_error_t::already_running);
     } else if (auto connection = input_connection(0)) {
