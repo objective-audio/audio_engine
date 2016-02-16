@@ -13,10 +13,10 @@ namespace audio {
 
         virtual void _initialize() = 0;
         virtual void _uninitialize() = 0;
-        virtual void _set_graph_key(const std::experimental::optional<UInt8> &key) = 0;
-        virtual const std::experimental::optional<UInt8> &_graph_key() const = 0;
-        virtual void _set_key(const std::experimental::optional<UInt16> &key) = 0;
-        virtual const std::experimental::optional<UInt16> &_key() const = 0;
+        virtual void _set_graph_key(std::experimental::optional<UInt8> const &key) = 0;
+        virtual std::experimental::optional<UInt8> const &_graph_key() const = 0;
+        virtual void _set_key(std::experimental::optional<UInt16> const &key) = 0;
+        virtual std::experimental::optional<UInt16> const &_key() const = 0;
     };
 }
 }
