@@ -16,18 +16,18 @@ namespace audio {
         unit_mixer_node();
         unit_mixer_node(std::nullptr_t);
 
-        void set_output_volume(const Float32 volume, const UInt32 bus_idx);
-        Float32 output_volume(const UInt32 bus_idx) const;
-        void set_output_pan(const Float32 pan, const UInt32 bus_idx);
-        Float32 output_pan(const UInt32 bus_idx) const;
+        void set_output_volume(Float32 const volume, UInt32 const bus_idx);
+        Float32 output_volume(UInt32 const bus_idx) const;
+        void set_output_pan(Float32 const pan, UInt32 const bus_idx);
+        Float32 output_pan(UInt32 const bus_idx) const;
 
-        void set_input_volume(const Float32 volume, const UInt32 bus_idx);
-        Float32 input_volume(const UInt32 bus_idx) const;
-        void set_input_pan(const Float32 pan, const UInt32 bus_idx);
-        Float32 input_pan(const UInt32 bus_idx) const;
+        void set_input_volume(Float32 const volume, UInt32 const bus_idx);
+        Float32 input_volume(UInt32 const bus_idx) const;
+        void set_input_pan(Float32 const pan, UInt32 const bus_idx);
+        Float32 input_pan(UInt32 const bus_idx) const;
 
-        void set_input_enabled(const bool enabled, UInt32 bus_idx);
-        bool input_enabled(UInt32 bus_idx) const;
+        void set_input_enabled(bool const enabled, UInt32 const bus_idx);
+        bool input_enabled(UInt32 const bus_idx) const;
 
        private:
         class impl;
