@@ -12,7 +12,7 @@ class yas::audio::device_io_node::impl : public node::impl {
     impl();
     virtual ~impl();
 
-    void prepare(const device_io_node &, const audio::device &);
+    void prepare(device_io_node const &, audio::device const &);
 
     virtual UInt32 input_bus_count() const override;
     virtual UInt32 output_bus_count() const override;
@@ -23,10 +23,10 @@ class yas::audio::device_io_node::impl : public node::impl {
     void remove_device_io();
     audio::device_io &device_io() const;
 
-    void set_device(const audio::device &device);
+    void set_device(audio::device const &device);
     audio::device device() const;
 
-    virtual void render(pcm_buffer &buffer, const UInt32 bus_idx, const time &when) override;
+    virtual void render(pcm_buffer &buffer, UInt32 const bus_idx, time const &when) override;
 
    private:
     using super_class = super_class::impl;
