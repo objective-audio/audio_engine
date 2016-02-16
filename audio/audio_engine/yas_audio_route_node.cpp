@@ -98,12 +98,6 @@ class audio::route_node::impl : public node::impl {
         return _core->routes;
     }
 
-    void add_route(route const &route) {
-        _core->erase_route_if_either_matched(route);
-        _core->routes.insert(route);
-        update_kernel();
-    }
-
     void add_route(route &&route) {
         _core->erase_route_if_either_matched(route);
         _core->routes.insert(std::move(route));
@@ -122,12 +116,6 @@ class audio::route_node::impl : public node::impl {
 
     void remove_route_for_destination(route::point const &dst_pt) {
         _core->erase_route_if([&dst_pt](route const &route_of_set) { return route_of_set.destination == dst_pt; });
-        update_kernel();
-    }
-
-    void set_routes(route_set_t const &routes) {
-        _core->routes.clear();
-        _core->routes = routes;
         update_kernel();
     }
 
@@ -158,11 +146,7 @@ audio::route_set_t const &audio::route_node::routes() const {
     return impl_ptr<impl>()->routes();
 }
 
-void audio::route_node::add_route(route const &route) {
-    impl_ptr<impl>()->add_route(route);
-}
-
-void audio::route_node::add_route(route &&route) {
+void audio::route_node::add_route(route route) {
     impl_ptr<impl>()->add_route(std::move(route));
 }
 
@@ -178,11 +162,7 @@ void audio::route_node::remove_route_for_destination(route::point const &dst_pt)
     impl_ptr<impl>()->remove_route_for_destination(dst_pt);
 }
 
-void audio::route_node::set_routes(route_set_t const &routes) {
-    impl_ptr<impl>()->set_routes(routes);
-}
-
-void audio::route_node::set_routes(route_set_t &&routes) {
+void audio::route_node::set_routes(route_set_t routes) {
     impl_ptr<impl>()->set_routes(std::move(routes));
 }
 
