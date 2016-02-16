@@ -12,10 +12,10 @@ using namespace yas;
 audio::unit_node::unit_node(std::nullptr_t) : super_class(nullptr) {
 }
 
-audio::unit_node::unit_node(const AudioComponentDescription &acd) : unit_node(std::make_shared<impl>(), acd) {
+audio::unit_node::unit_node(AudioComponentDescription const &acd) : unit_node(std::make_shared<impl>(), acd) {
 }
 
-audio::unit_node::unit_node(const OSType type, const OSType sub_type)
+audio::unit_node::unit_node(OSType const type, OSType const sub_type)
     : unit_node(AudioComponentDescription{
           .componentType = type,
           .componentSubType = sub_type,
@@ -25,11 +25,11 @@ audio::unit_node::unit_node(const OSType type, const OSType sub_type)
       }) {
 }
 
-audio::unit_node::unit_node(std::shared_ptr<impl> &&imp, const AudioComponentDescription &acd) : node(std::move(imp)) {
+audio::unit_node::unit_node(std::shared_ptr<impl> &&imp, AudioComponentDescription const &acd) : node(std::move(imp)) {
     impl_ptr<impl>()->prepare(*this, acd);
 }
 
-audio::unit_node::unit_node(const std::shared_ptr<impl> &impl) : super_class(impl) {
+audio::unit_node::unit_node(std::shared_ptr<impl> const &impl) : super_class(impl) {
 }
 
 audio::unit_node::~unit_node() = default;
@@ -38,19 +38,19 @@ audio::unit audio::unit_node::audio_unit() const {
     return impl_ptr<impl>()->au();
 }
 
-const std::unordered_map<AudioUnitParameterID, audio::unit::parameter_map_t> &audio::unit_node::parameters() const {
+std::unordered_map<AudioUnitParameterID, audio::unit::parameter_map_t> const &audio::unit_node::parameters() const {
     return impl_ptr<impl>()->parameters();
 }
 
-const audio::unit::parameter_map_t &audio::unit_node::global_parameters() const {
+audio::unit::parameter_map_t const &audio::unit_node::global_parameters() const {
     return impl_ptr<impl>()->global_parameters();
 }
 
-const audio::unit::parameter_map_t &audio::unit_node::input_parameters() const {
+audio::unit::parameter_map_t const &audio::unit_node::input_parameters() const {
     return impl_ptr<impl>()->input_parameters();
 }
 
-const audio::unit::parameter_map_t &audio::unit_node::output_parameters() const {
+audio::unit::parameter_map_t const &audio::unit_node::output_parameters() const {
     return impl_ptr<impl>()->output_parameters();
 }
 
@@ -62,31 +62,31 @@ UInt32 audio::unit_node::output_element_count() const {
     return impl_ptr<impl>()->output_element_count();
 }
 
-void audio::unit_node::set_global_parameter_value(const AudioUnitParameterID parameter_id, const Float32 value) {
+void audio::unit_node::set_global_parameter_value(AudioUnitParameterID const parameter_id, Float32 const value) {
     impl_ptr<impl>()->set_global_parameter_value(parameter_id, value);
 }
 
-Float32 audio::unit_node::global_parameter_value(const AudioUnitParameterID parameter_id) const {
+Float32 audio::unit_node::global_parameter_value(AudioUnitParameterID const parameter_id) const {
     return impl_ptr<impl>()->global_parameter_value(parameter_id);
 }
 
-void audio::unit_node::set_input_parameter_value(const AudioUnitParameterID parameter_id, const Float32 value,
-                                                 const AudioUnitElement element) {
+void audio::unit_node::set_input_parameter_value(AudioUnitParameterID const parameter_id, Float32 const value,
+                                                 AudioUnitElement const element) {
     impl_ptr<impl>()->set_input_parameter_value(parameter_id, value, element);
 }
 
-Float32 audio::unit_node::input_parameter_value(const AudioUnitParameterID parameter_id,
-                                                const AudioUnitElement element) const {
+Float32 audio::unit_node::input_parameter_value(AudioUnitParameterID const parameter_id,
+                                                AudioUnitElement const element) const {
     return impl_ptr<impl>()->input_parameter_value(parameter_id, element);
 }
 
-void audio::unit_node::set_output_parameter_value(const AudioUnitParameterID parameter_id, const Float32 value,
-                                                  const AudioUnitElement element) {
+void audio::unit_node::set_output_parameter_value(AudioUnitParameterID const parameter_id, Float32 const value,
+                                                  AudioUnitElement const element) {
     impl_ptr<impl>()->set_output_parameter_value(parameter_id, value, element);
 }
 
-Float32 audio::unit_node::output_parameter_value(const AudioUnitParameterID parameter_id,
-                                                 const AudioUnitElement element) const {
+Float32 audio::unit_node::output_parameter_value(AudioUnitParameterID const parameter_id,
+                                                 AudioUnitElement const element) const {
     return impl_ptr<impl>()->output_parameter_value(parameter_id, element);
 }
 
