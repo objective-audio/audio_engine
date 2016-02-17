@@ -1,6 +1,5 @@
 //
 //  yas_audio_engine_impl.cpp
-//  Copyright (c) 2015 Yuki Yasoshima.
 //
 
 #include <AVFoundation/AVFoundation.h>

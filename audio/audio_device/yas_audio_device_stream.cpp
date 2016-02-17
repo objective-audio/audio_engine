@@ -1,6 +1,5 @@
 //
 //  yas_audio_device_stream.cpp
-//  Copyright (c) 2015 Yuki Yasoshima.
 //
 
 #include "yas_audio_device.h"

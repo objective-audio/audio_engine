@@ -1,6 +1,5 @@
 //
 //  yas_audio_test_utils.h
-//  Copyright (c) 2015 Yuki Yasoshima.
 //
 
 #import <XCTest/XCTest.h>

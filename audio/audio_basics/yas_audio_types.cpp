@@ -1,6 +1,5 @@
 //
 //  yas_audio_types.cpp
-//  Copyright (c) 2015 Yuki Yasoshima.
 //
 
 #import <AudioToolbox/AudioToolbox.h>

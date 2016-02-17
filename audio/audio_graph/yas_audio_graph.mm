@@ -1,6 +1,5 @@
 //
 //  yas_audio_graph.mm
-//  Copyright (c) 2015 Yuki Yasoshima.
 //
 
 #include "yas_audio_graph.h"

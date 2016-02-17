@@ -1,6 +1,5 @@
 //
 //  yas_audio_file_utils.mm
-//  Copyright (c) 2015 Yuki Yasoshima.
 //
 
 #include "yas_audio_exception.h"

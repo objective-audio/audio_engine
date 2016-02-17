@@ -1,6 +1,5 @@
 //
 //  yas_audio_offline_output_node_impl.mm
-//  Copyright (c) 2015 Yuki Yasoshima.
 //
 
 #include "yas_audio_offline_output_node.h"

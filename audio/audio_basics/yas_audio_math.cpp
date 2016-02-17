@@ -1,6 +1,5 @@
 //
 //  yas_audio_math.cpp
-//  Copyright (c) 2015 Yuki Yasoshima.
 //
 
 #include <Accelerate/Accelerate.h>

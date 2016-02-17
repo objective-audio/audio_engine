@@ -1,6 +1,5 @@
 //
 //  yas_audio_unit_mixer_node_tests.m
-//  Copyright (c) 2015 Yuki Yasoshima.
 //
 
 #import "yas_audio_test_utils.h"

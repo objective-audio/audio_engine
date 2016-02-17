@@ -1,6 +1,5 @@
 //
 //  yas_audio_pcm_buffer.cpp
-//  Copyright (c) 2015 Yuki Yasoshima.
 //
 
 #include <Accelerate/Accelerate.h>

@@ -1,6 +1,5 @@
 //
 //  yas_audio_connection.cpp
-//  Copyright (c) 2015 Yuki Yasoshima.
 //
 
 #include <mutex>

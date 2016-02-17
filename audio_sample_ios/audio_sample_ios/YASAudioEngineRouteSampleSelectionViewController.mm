@@ -1,6 +1,5 @@
 //
 //  YASAudioEngineRouteSampleSelectionViewController.mm
-//  Copyright (c) 2015 Yuki Yasoshima.
 //
 
 #import "YASAudioEngineRouteSampleSelectionViewController.h"

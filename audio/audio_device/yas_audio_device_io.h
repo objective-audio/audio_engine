@@ -1,6 +1,5 @@
 //
 //  yas_audio_device_io.h
-//  Copyright (c) 2015 Yuki Yasoshima.
 //
 
 #pragma once

@@ -1,6 +1,5 @@
 //
 //  yas_audio_enumerator.cpp
-//  Copyright (c) 2015 Yuki Yasoshima.
 //
 
 #include <string>

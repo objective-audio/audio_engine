@@ -1,6 +1,5 @@
 //
 //  yas_audio_unit_impl_private.h
-//  Copyright (c) 2015 Yuki Yasoshima.
 //
 
 #pragma once
