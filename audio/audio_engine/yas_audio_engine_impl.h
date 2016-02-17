@@ -59,7 +59,7 @@ class yas::audio::engine::impl : public yas::base::impl {
     audio::offline_output_node &offline_output_node() const;
 
     engine::start_result_t start_render();
-    engine::start_result_t start_offline_render(offline_render_f const &, offline_completion_f const &);
+    engine::start_result_t start_offline_render(offline_render_f, offline_completion_f);
     void stop();
 
     void post_configuration_change() const;

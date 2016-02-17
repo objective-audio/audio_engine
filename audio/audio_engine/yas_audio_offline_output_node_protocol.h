@@ -26,7 +26,7 @@ namespace audio {
        public:
         virtual ~offline_output_unit_from_engine() = default;
 
-        virtual offline_start_result_t _start(offline_render_f const &, offline_completion_f const &) const = 0;
+        virtual offline_start_result_t _start(offline_render_f &&, offline_completion_f &&) const = 0;
         virtual void _stop() const = 0;
     };
 }

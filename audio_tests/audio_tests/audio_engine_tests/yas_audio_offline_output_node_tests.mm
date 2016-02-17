@@ -2,8 +2,8 @@
 //  yas_audio_offline_output_node_tests.m
 //
 
-#import "yas_audio_test_utils.h"
 #import <future>
+#import "yas_audio_test_utils.h"
 
 @interface yas_audio_offline_output_node_tests : XCTestCase
 
@@ -37,26 +37,26 @@
     const UInt32 length = 4192;
     UInt32 tap_render_frame = 0;
 
-    auto tap_render_function =
-        [=](yas::audio::pcm_buffer &buffer, const UInt32 bus_idx, const yas::audio::time &when) mutable {
-            XCTAssertEqual(when.sample_time(), tap_render_frame);
-            XCTAssertEqual(when.sample_rate(), sample_rate);
-            XCTAssertEqual(buffer.frame_length(), frames_per_render);
-            XCTAssertTrue(buffer.format() == format);
+    auto tap_render_function = [=](yas::audio::pcm_buffer &buffer, const UInt32 bus_idx,
+                                   const yas::audio::time &when) mutable {
+        XCTAssertEqual(when.sample_time(), tap_render_frame);
+        XCTAssertEqual(when.sample_rate(), sample_rate);
+        XCTAssertEqual(buffer.frame_length(), frames_per_render);
+        XCTAssertTrue(buffer.format() == format);
 
-            for (UInt32 buf_idx = 0; buf_idx < buffer.format().buffer_count(); ++buf_idx) {
-                Float32 *ptr = buffer.data_ptr_at_index<Float32>(buf_idx);
-                for (UInt32 frm_idx = 0; frm_idx < buffer.frame_length(); ++frm_idx) {
-                    ptr[frm_idx] = yas::test::test_value(frm_idx + tap_render_frame, 0, buf_idx);
-                }
+        for (UInt32 buf_idx = 0; buf_idx < buffer.format().buffer_count(); ++buf_idx) {
+            Float32 *ptr = buffer.data_ptr_at_index<Float32>(buf_idx);
+            for (UInt32 frm_idx = 0; frm_idx < buffer.frame_length(); ++frm_idx) {
+                ptr[frm_idx] = yas::test::test_value(frm_idx + tap_render_frame, 0, buf_idx);
             }
+        }
 
-            tap_render_frame += buffer.frame_length();
-            if (tapNodeExpectation && tap_render_frame >= length) {
-                [tapNodeExpectation fulfill];
-                tapNodeExpectation = nil;
-            }
-        };
+        tap_render_frame += buffer.frame_length();
+        if (tapNodeExpectation && tap_render_frame >= length) {
+            [tapNodeExpectation fulfill];
+            tapNodeExpectation = nil;
+        }
+    };
 
     tap_node.set_render_function(tap_render_function);
 
@@ -127,28 +127,28 @@
     const UInt32 length = 4196;
     UInt32 tap_render_frame = 0;
 
-    auto tap_render_function =
-        [=](yas::audio::pcm_buffer &buffer, const UInt32 bus_idx, const yas::audio::time &when) mutable {
-            XCTAssertEqual(when.sample_time(), tap_render_frame);
-            XCTAssertEqual(when.sample_rate(), sample_rate);
-            XCTAssertEqual(buffer.frame_length(), frames_per_render);
-            XCTAssertTrue(buffer.format() == format);
+    auto tap_render_function = [=](yas::audio::pcm_buffer &buffer, const UInt32 bus_idx,
+                                   const yas::audio::time &when) mutable {
+        XCTAssertEqual(when.sample_time(), tap_render_frame);
+        XCTAssertEqual(when.sample_rate(), sample_rate);
+        XCTAssertEqual(buffer.frame_length(), frames_per_render);
+        XCTAssertTrue(buffer.format() == format);
 
-            auto enumerator = yas::audio::frame_enumerator(buffer);
-            auto *flex_ptr = enumerator.pointer();
-            auto *frm_idx = enumerator.frame();
-            auto *ch_idx = enumerator.channel();
-            while (flex_ptr->v) {
-                *flex_ptr->f32 = yas::test::test_value(*frm_idx + tap_render_frame, 0, *ch_idx);
-                yas_audio_frame_enumerator_move(enumerator);
-            }
+        auto enumerator = yas::audio::frame_enumerator(buffer);
+        auto *flex_ptr = enumerator.pointer();
+        auto *frm_idx = enumerator.frame();
+        auto *ch_idx = enumerator.channel();
+        while (flex_ptr->v) {
+            *flex_ptr->f32 = yas::test::test_value(*frm_idx + tap_render_frame, 0, *ch_idx);
+            yas_audio_frame_enumerator_move(enumerator);
+        }
 
-            tap_render_frame += buffer.frame_length();
-            if (tap_render_frame && tap_render_frame >= length) {
-                [tapNodeExpectation fulfill];
-                tapNodeExpectation = nil;
-            }
-        };
+        tap_render_frame += buffer.frame_length();
+        if (tap_render_frame && tap_render_frame >= length) {
+            [tapNodeExpectation fulfill];
+            tapNodeExpectation = nil;
+        }
+    };
 
     tap_node.set_render_function(tap_render_function);
 
@@ -196,8 +196,8 @@
         }
     };
 
-    auto result =
-        yas::audio::offline_output_node::private_access::start(output_node, start_render_function, completion_function);
+    auto result = yas::audio::offline_output_node::private_access::start(output_node, std::move(start_render_function),
+                                                                         std::move(completion_function));
 
     XCTAssertTrue(result);
 
