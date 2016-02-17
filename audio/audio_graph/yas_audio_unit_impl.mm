@@ -247,19 +247,19 @@ void audio::unit::impl::detach_input_callback() {
                                            kAudioUnitScope_Global, 0, &callbackStruct, sizeof(AURenderCallbackStruct)));
 }
 
-void audio::unit::impl::set_render_callback(render_f const &callback) {
+void audio::unit::impl::set_render_callback(render_f &&callback) {
     std::lock_guard<std::recursive_mutex> lock(_core->mutex);
-    _core->render_callback = callback;
+    _core->render_callback = std::move(callback);
 }
 
-void audio::unit::impl::set_notify_callback(render_f const &callback) {
+void audio::unit::impl::set_notify_callback(render_f &&callback) {
     std::lock_guard<std::recursive_mutex> lock(_core->mutex);
-    _core->notify_callback = callback;
+    _core->notify_callback = std::move(callback);
 }
 
-void audio::unit::impl::set_input_callback(render_f const &callback) {
+void audio::unit::impl::set_input_callback(render_f &&callback) {
     std::lock_guard<std::recursive_mutex> lock(_core->mutex);
-    _core->input_callback = callback;
+    _core->input_callback = std::move(callback);
 }
 
 void audio::unit::impl::set_input_format(AudioStreamBasicDescription const &asbd, UInt32 const bus_idx) {

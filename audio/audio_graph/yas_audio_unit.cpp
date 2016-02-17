@@ -82,16 +82,16 @@ void audio::unit::detach_input_callback() {
     impl_ptr<impl>()->detach_input_callback();
 }
 
-void audio::unit::set_render_callback(render_f const &callback) {
-    impl_ptr<impl>()->set_render_callback(callback);
+void audio::unit::set_render_callback(render_f callback) {
+    impl_ptr<impl>()->set_render_callback(std::move(callback));
 }
 
-void audio::unit::set_notify_callback(render_f const &callback) {
-    impl_ptr<impl>()->set_notify_callback(callback);
+void audio::unit::set_notify_callback(render_f callback) {
+    impl_ptr<impl>()->set_notify_callback(std::move(callback));
 }
 
-void audio::unit::set_input_callback(render_f const &callback) {
-    impl_ptr<impl>()->set_input_callback(callback);
+void audio::unit::set_input_callback(render_f callback) {
+    impl_ptr<impl>()->set_input_callback(std::move(callback));
 }
 
 #pragma mark - property

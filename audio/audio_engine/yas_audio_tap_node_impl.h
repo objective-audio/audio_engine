@@ -19,7 +19,7 @@ class yas::audio::tap_node::impl : public super_class::impl {
     virtual std::shared_ptr<node::kernel> make_kernel() override;
     virtual void prepare_kernel(std::shared_ptr<node::kernel> const &kernel) override;
 
-    void set_render_function(render_f const &);
+    void set_render_function(render_f &&);
 
     audio::connection input_connection_on_render(UInt32 const bus_idx) const;
     audio::connection output_connection_on_render(UInt32 const bus_idx) const;

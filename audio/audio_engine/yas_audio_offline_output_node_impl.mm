@@ -20,14 +20,14 @@ class audio::offline_output_node::impl::core {
 
     ~core() = default;
 
-    std::experimental::optional<UInt8> const push_completion_function(offline_completion_f const &function) {
+    std::experimental::optional<UInt8> const push_completion_function(offline_completion_f &&function) {
         if (!function) {
             return nullopt;
         }
 
         auto key = min_empty_key(_completion_functions);
         if (key) {
-            _completion_functions.insert(std::make_pair(*key, function));
+            _completion_functions.insert(std::make_pair(*key, std::move(function)));
         }
         return key;
     }
@@ -36,7 +36,7 @@ class audio::offline_output_node::impl::core {
         if (_completion_functions.count(key) > 0) {
             auto func = _completion_functions.at(key);
             _completion_functions.erase(key);
-            return func;
+            return std::move(func);
         } else {
             return nullopt;
         }
@@ -58,14 +58,14 @@ audio::offline_output_node::impl::impl()
 
 audio::offline_output_node::impl::~impl() = default;
 
-audio::offline_start_result_t audio::offline_output_node::impl::start(offline_render_f const &render_func,
-                                                                      offline_completion_f const &completion_func) {
+audio::offline_start_result_t audio::offline_output_node::impl::start(offline_render_f &&render_func,
+                                                                      offline_completion_f &&completion_func) {
     if (_core->queue) {
         return offline_start_result_t(offline_start_error_t::already_running);
     } else if (auto connection = input_connection(0)) {
         std::experimental::optional<UInt8> key;
         if (completion_func) {
-            key = _core->push_completion_function(completion_func);
+            key = _core->push_completion_function(std::move(completion_func));
             if (!key) {
                 return offline_start_result_t(offline_start_error_t::prepare_failure);
             }
@@ -74,7 +74,8 @@ audio::offline_start_result_t audio::offline_output_node::impl::start(offline_re
         yas::audio::pcm_buffer render_buffer(connection.format(), 1024);
 
         auto weak_node = to_weak(cast<offline_output_node>());
-        auto operation_lambda = [weak_node, render_buffer, render_func, key](operation const &op) mutable {
+        auto operation_lambda =
+            [weak_node, render_buffer, render_func = std::move(render_func), key](operation const &op) mutable {
             bool cancelled = false;
             UInt32 current_sample_time = 0;
             bool stop = false;

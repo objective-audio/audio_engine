@@ -17,8 +17,8 @@ audio::tap_node::tap_node(std::shared_ptr<impl> const &impl) : super_class(impl)
 
 audio::tap_node::~tap_node() = default;
 
-void audio::tap_node::set_render_function(render_f const &func) {
-    impl_ptr<impl>()->set_render_function(func);
+void audio::tap_node::set_render_function(render_f func) {
+    impl_ptr<impl>()->set_render_function(std::move(func));
 }
 
 audio::connection audio::tap_node::input_connection_on_render(UInt32 const bus_idx) const {

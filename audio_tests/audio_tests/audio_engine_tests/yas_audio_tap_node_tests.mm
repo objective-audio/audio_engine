@@ -53,7 +53,7 @@
         [to_expectation fulfill];
     };
 
-    to_node.set_render_function(to_render_func);
+    to_node.set_render_function(std::move(to_render_func));
 
     from_node.set_render_function(
         [from_expectation](const auto &, const auto &, const auto &) { [from_expectation fulfill]; });

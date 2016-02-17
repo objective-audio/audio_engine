@@ -23,9 +23,9 @@ bool audio::offline_output_node::is_running() const {
     return impl_ptr<impl>()->is_running();
 }
 
-audio::offline_start_result_t audio::offline_output_node::_start(offline_render_f const &callback_func,
-                                                                 offline_completion_f const &completion_func) const {
-    return impl_ptr<impl>()->start(callback_func, completion_func);
+audio::offline_start_result_t audio::offline_output_node::_start(offline_render_f &&callback_func,
+                                                                 offline_completion_f &&completion_func) const {
+    return impl_ptr<impl>()->start(std::move(callback_func), std::move(completion_func));
 }
 
 void audio::offline_output_node::_stop() const {

@@ -27,8 +27,8 @@ namespace audio {
 
         // from engine
 
-        offline_start_result_t _start(offline_render_f const &callback_func,
-                                      offline_completion_f const &completion_func) const override;
+        offline_start_result_t _start(offline_render_f &&callback_func,
+                                      offline_completion_f &&completion_func) const override;
         void _stop() const override;
 
 #if YAS_TEST

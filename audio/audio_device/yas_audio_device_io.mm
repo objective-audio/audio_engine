@@ -211,9 +211,9 @@ class audio::device_io::impl : public base::impl {
         }
     }
 
-    void set_render_callback(render_f const &render_callback) {
+    void set_render_callback(render_f &&render_callback) {
         std::lock_guard<std::recursive_mutex> lock(_mutex);
-        _render_callback = render_callback;
+        _render_callback = std::move(render_callback);
     }
 
     render_f render_callback() const {
@@ -295,8 +295,8 @@ bool audio::device_io::is_running() const {
     return impl_ptr<impl>()->is_running;
 }
 
-void audio::device_io::set_render_callback(render_f const &callback) {
-    impl_ptr<impl>()->set_render_callback(callback);
+void audio::device_io::set_render_callback(render_f callback) {
+    impl_ptr<impl>()->set_render_callback(std::move(callback));
 }
 
 void audio::device_io::set_maximum_frames_per_slice(UInt32 const frames) {

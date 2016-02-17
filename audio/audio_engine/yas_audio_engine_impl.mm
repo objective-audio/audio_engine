@@ -462,8 +462,8 @@ audio::engine::start_result_t audio::engine::impl::start_render() {
     return start_result_t(nullptr);
 }
 
-audio::engine::start_result_t audio::engine::impl::start_offline_render(
-    offline_render_f const &render_function, offline_completion_f const &completion_function) {
+audio::engine::start_result_t audio::engine::impl::start_offline_render(offline_render_f render_function,
+                                                                        offline_completion_f completion_function) {
     if (auto const graph = _core->graph) {
         if (graph.is_running()) {
             return start_result_t(start_error_t::already_running);
@@ -487,7 +487,7 @@ audio::engine::start_result_t audio::engine::impl::start_offline_render(
     }
 
     auto &node_from_engine = static_cast<offline_output_unit_from_engine &>(offline_output_node);
-    auto result = node_from_engine._start(render_function, completion_function);
+    auto result = node_from_engine._start(std::move(render_function), std::move(completion_function));
 
     if (result) {
         return start_result_t(nullptr);
