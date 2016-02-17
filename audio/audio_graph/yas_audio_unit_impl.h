@@ -32,9 +32,9 @@ class yas::audio::unit::impl : public base::impl {
     void attach_input_callback();  // for io
     void detach_input_callback();  // for io
 
-    void set_render_callback(render_f const &callback);
-    void set_notify_callback(render_f const &callback);
-    void set_input_callback(render_f const &callback);  // for io
+    void set_render_callback(render_f &&callback);
+    void set_notify_callback(render_f &&callback);
+    void set_input_callback(render_f &&callback);  // for io
 
     void set_input_format(AudioStreamBasicDescription const &asbd, UInt32 const bus_idx);
     void set_output_format(AudioStreamBasicDescription const &asbd, UInt32 const bus_idx);
