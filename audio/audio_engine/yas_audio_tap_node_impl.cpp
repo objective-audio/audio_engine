@@ -48,7 +48,7 @@ void audio::tap_node::impl::prepare_kernel(std::shared_ptr<node::kernel> const &
     tap_kernel->render_function = _core->render_function;
 }
 
-void audio::tap_node::impl::set_render_function(render_f const &func) {
+void audio::tap_node::impl::set_render_function(render_f &&func) {
     _core->render_function = func;
 
     update_kernel();

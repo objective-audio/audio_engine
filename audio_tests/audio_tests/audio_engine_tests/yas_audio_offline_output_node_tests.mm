@@ -58,7 +58,7 @@
         }
     };
 
-    tap_node.set_render_function(tap_render_function);
+    tap_node.set_render_function(std::move(tap_render_function));
 
     XCTestExpectation *renderExpectation = [self expectationWithDescription:@"offline output node render"];
     XCTestExpectation *completionExpectation = [self expectationWithDescription:@"offline output node completion"];
@@ -150,7 +150,7 @@
         }
     };
 
-    tap_node.set_render_function(tap_render_function);
+    tap_node.set_render_function(std::move(tap_render_function));
 
     XCTestExpectation *renderExpectation = [self expectationWithDescription:@"offline output node render"];
     XCTestExpectation *completionExpectation = [self expectationWithDescription:@"offline output node completion"];

@@ -22,7 +22,7 @@ namespace audio {
 
         using render_f = std::function<void(audio::pcm_buffer &buffer, UInt32 const bus_idx, audio::time const &when)>;
 
-        void set_render_function(render_f const &);
+        void set_render_function(render_f);
 
         audio::connection input_connection_on_render(UInt32 const bus_idx) const;
         audio::connection output_connection_on_render(UInt32 const bus_idx) const;
