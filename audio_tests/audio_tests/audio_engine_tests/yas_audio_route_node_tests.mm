@@ -87,7 +87,7 @@
     {
         XCTestExpectation *expectation = [self expectationWithDescription:@"first render"];
 
-        XCTAssertTrue(engine.start_offline_render([](const auto &, const auto &, auto &stop) { stop = true; },
+        XCTAssertTrue(engine.start_offline_render([](const auto &, const auto &, auto &out_stop) { out_stop = true; },
                                                   [expectation](const bool cancelled) { [expectation fulfill]; }));
 
         [self waitForExpectationsWithTimeout:0.5
@@ -112,8 +112,8 @@
         XCTestExpectation *expectation = [self expectationWithDescription:@"second render"];
 
         XCTAssertTrue(engine.start_offline_render(
-            [self](yas::audio::pcm_buffer &buffer, const yas::audio::time &when, bool &stop) {
-                stop = true;
+            [self](yas::audio::pcm_buffer &buffer, const yas::audio::time &when, bool &out_stop) {
+                out_stop = true;
                 yas::audio::frame_enumerator enumerator(buffer);
                 auto pointer = enumerator.pointer();
                 const UInt32 *frm_idx = enumerator.frame();
@@ -177,8 +177,8 @@
     XCTestExpectation *expectation = [self expectationWithDescription:@"render"];
 
     XCTAssertTrue(engine.start_offline_render(
-        [self](yas::audio::pcm_buffer &buffer, const yas::audio::time &when, bool &stop) {
-            stop = true;
+        [self](yas::audio::pcm_buffer &buffer, const yas::audio::time &when, bool &out_stop) {
+            out_stop = true;
             yas::audio::frame_enumerator enumerator(buffer);
             auto pointer = enumerator.pointer();
             const UInt32 *frm_idx = enumerator.frame();
@@ -243,8 +243,8 @@
     XCTestExpectation *expectation = [self expectationWithDescription:@"render"];
 
     XCTAssertTrue(engine.start_offline_render(
-        [self](yas::audio::pcm_buffer &buffer, const yas::audio::time &when, bool &stop) {
-            stop = true;
+        [self](yas::audio::pcm_buffer &buffer, const yas::audio::time &when, bool &out_stop) {
+            out_stop = true;
             yas::audio::frame_enumerator enumerator(buffer);
             auto pointer = enumerator.pointer();
             const UInt32 *frm_idx = enumerator.frame();

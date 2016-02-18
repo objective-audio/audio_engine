@@ -18,7 +18,7 @@ namespace audio {
         connection_not_found,
     };
 
-    using offline_render_f = std::function<void(audio::pcm_buffer &buffer, audio::time const &when, bool &stop)>;
+    using offline_render_f = std::function<void(audio::pcm_buffer &buffer, audio::time const &when, bool &out_stop)>;
     using offline_completion_f = std::function<void(bool const cancelled)>;
     using offline_start_result_t = yas::result<std::nullptr_t, offline_start_error_t>;
 

@@ -59,7 +59,7 @@
         [from_expectation](const auto &, const auto &, const auto &) { [from_expectation fulfill]; });
 
     XCTAssertTrue(engine.start_offline_render(
-        [](const auto &, const auto &, auto &stop) { stop = true; },
+        [](const auto &, const auto &, auto &out_stop) { out_stop = true; },
         [completion_expectation](const auto cancelled) { [completion_expectation fulfill]; }));
 
     [self waitForExpectationsWithTimeout:0.5
@@ -86,7 +86,8 @@
     from_node.set_render_function(
         [from_expectation](const auto &, const auto &, const auto &) { [from_expectation fulfill]; });
 
-    XCTAssertTrue(engine.start_offline_render([](const auto &, const auto &, auto &stop) { stop = true; }, nullptr));
+    XCTAssertTrue(
+        engine.start_offline_render([](const auto &, const auto &, auto &out_stop) { out_stop = true; }, nullptr));
 
     [self waitForExpectationsWithTimeout:0.5
                                  handler:^(NSError *error){
