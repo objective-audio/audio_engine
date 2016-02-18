@@ -2,9 +2,9 @@
 //  YASAudioOfflineSampleViewController.m
 //
 
+#import <Accelerate/Accelerate.h>
 #import "YASAudioOfflineSampleViewController.h"
 #import "yas_audio.h"
-#import <Accelerate/Accelerate.h>
 
 namespace yas {
 namespace offline_sample {
@@ -50,31 +50,31 @@ namespace offline_sample {
 
             auto weak_node = yas::to_weak(*this);
 
-            auto render_function =
-                [weak_node](audio::pcm_buffer &buffer, const UInt32 bus_idx, const audio::time &when) {
-                    buffer.clear();
+            auto render_function = [weak_node](audio::pcm_buffer &buffer, const UInt32 bus_idx,
+                                               const audio::time &when) {
+                buffer.clear();
 
-                    if (auto node = weak_node.lock()) {
-                        if (node.is_playing()) {
-                            const Float64 start_phase = node.impl_ptr<impl>()->phase_on_render;
-                            const Float64 phase_per_frame = node.frequency() / sample_rate * yas::audio::math::two_pi;
-                            Float64 next_phase = start_phase;
-                            const UInt32 frame_length = buffer.frame_length();
+                if (auto node = weak_node.lock()) {
+                    if (node.is_playing()) {
+                        const Float64 start_phase = node.impl_ptr<impl>()->phase_on_render;
+                        const Float64 phase_per_frame = node.frequency() / sample_rate * yas::audio::math::two_pi;
+                        Float64 next_phase = start_phase;
+                        const UInt32 frame_length = buffer.frame_length();
 
-                            if (frame_length > 0) {
-                                yas::audio::frame_enumerator enumerator(buffer);
-                                const auto *flex_ptr = enumerator.pointer();
-                                while (flex_ptr->v) {
-                                    next_phase = yas::audio::math::fill_sine(flex_ptr->f32, frame_length, start_phase,
-                                                                            phase_per_frame);
-                                    yas_audio_frame_enumerator_move_channel(enumerator);
-                                }
-
-                                node.impl_ptr<impl>()->phase_on_render = next_phase;
+                        if (frame_length > 0) {
+                            yas::audio::frame_enumerator enumerator(buffer);
+                            const auto *flex_ptr = enumerator.pointer();
+                            while (flex_ptr->v) {
+                                next_phase = yas::audio::math::fill_sine(flex_ptr->f32, frame_length, start_phase,
+                                                                         phase_per_frame);
+                                yas_audio_frame_enumerator_move_channel(enumerator);
                             }
+
+                            node.impl_ptr<impl>()->phase_on_render = next_phase;
                         }
                     }
-                };
+                }
+            };
 
             set_render_function(render_function);
         }
@@ -271,7 +271,7 @@ namespace sample {
 
     auto start_result = _internal.offline_engine.start_offline_render(
         [remain, file_writer = std::move(file_writer)](yas::audio::pcm_buffer & buffer, const auto &when,
-                                                       bool &stop) mutable {
+                                                       bool &out_stop) mutable {
             auto format = yas::audio::format(buffer.format().stream_description());
             yas::audio::pcm_buffer pcm_buffer(format, buffer.audio_buffer_list());
             pcm_buffer.set_frame_length(buffer.frame_length());
@@ -289,7 +289,7 @@ namespace sample {
             remain -= frame_length;
             if (remain == 0) {
                 file_writer.close();
-                stop = YES;
+                out_stop = YES;
             }
         },
         [weak_container = _internal.self_container](const bool cancelled) {

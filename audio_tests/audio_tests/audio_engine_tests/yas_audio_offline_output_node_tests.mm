@@ -65,7 +65,8 @@
 
     UInt32 output_render_frame = 0;
 
-    auto start_render_function = [=](yas::audio::pcm_buffer &buffer, const yas::audio::time &when, bool &stop) mutable {
+    auto start_render_function = [=](yas::audio::pcm_buffer &buffer, const yas::audio::time &when,
+                                     bool &out_stop) mutable {
         XCTAssertEqual(when.sample_time(), output_render_frame);
         XCTAssertEqual(when.sample_rate(), sample_rate);
         XCTAssertEqual(buffer.frame_length(), frames_per_render);
@@ -77,7 +78,7 @@
                 bool is_equal_value = ptr[frm_idx] == yas::test::test_value(frm_idx + output_render_frame, 0, buf_idx);
                 XCTAssertTrue(is_equal_value);
                 if (!is_equal_value) {
-                    stop = true;
+                    out_stop = true;
                     return;
                 }
             }
@@ -85,7 +86,7 @@
 
         output_render_frame += buffer.frame_length();
         if (output_render_frame >= length) {
-            stop = true;
+            out_stop = true;
             if (renderExpectation) {
                 [renderExpectation fulfill];
                 renderExpectation = nil;
@@ -157,7 +158,8 @@
 
     UInt32 output_render_frame = 0;
 
-    auto start_render_function = [=](yas::audio::pcm_buffer &buffer, const yas::audio::time &when, bool &stop) mutable {
+    auto start_render_function = [=](yas::audio::pcm_buffer &buffer, const yas::audio::time &when,
+                                     bool &out_stop) mutable {
         XCTAssertEqual(when.sample_time(), output_render_frame);
         XCTAssertEqual(when.sample_rate(), sample_rate);
         XCTAssertEqual(buffer.frame_length(), frames_per_render);
@@ -172,7 +174,7 @@
             bool is_equal_value = *flex_ptr->f32 == yas::test::test_value(*frm_idx + output_render_frame, 0, *ch_idx);
             XCTAssertTrue(is_equal_value);
             if (!is_equal_value) {
-                stop = YES;
+                out_stop = YES;
                 return;
             }
             yas_audio_frame_enumerator_move(enumerator);
@@ -180,7 +182,7 @@
 
         output_render_frame += buffer.frame_length();
         if (output_render_frame >= length) {
-            stop = true;
+            out_stop = true;
             if (renderExpectation) {
                 [renderExpectation fulfill];
                 renderExpectation = nil;
@@ -231,7 +233,7 @@
 
     XCTestExpectation *completionExpectation = [self expectationWithDescription:@"offline output node completion"];
 
-    auto render_func = [promise](yas::audio::pcm_buffer &buffer, const yas::audio::time &when, bool &stop) mutable {
+    auto render_func = [promise](yas::audio::pcm_buffer &buffer, const yas::audio::time &when, bool &out_stop) mutable {
         if (when.sample_time() == 0) {
             promise->set_value();
         }
