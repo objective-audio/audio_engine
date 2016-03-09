@@ -144,7 +144,7 @@ audio::offline_start_result_t audio::offline_output_node::impl::start(offline_re
 
         yas::operation operation{std::move(operation_lambda)};
         _core->queue = operation_queue{1};
-        _core->queue.add_operation(operation);
+        _core->queue.push_back(operation);
     } else {
         return offline_start_result_t(offline_start_error_t::connection_not_found);
     }
@@ -155,7 +155,7 @@ void audio::offline_output_node::impl::stop() {
     auto completion_functions = _core->pull_completion_functions();
 
     if (auto &queue = _core->queue) {
-        queue.cancel_all_operations();
+        queue.cancel();
         queue.wait_until_all_operations_are_finished();
         _core->queue = nullptr;
     }
