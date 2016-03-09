@@ -6,9 +6,9 @@
 
 namespace yas {
 namespace audio {
-    class unit_node_from_engine {
+    class manageable_unit_node {
        public:
-        virtual ~unit_node_from_engine() = default;
+        virtual ~manageable_unit_node() = default;
 
         virtual void _prepare_audio_unit() = 0;
         virtual void _prepare_parameters() = 0;

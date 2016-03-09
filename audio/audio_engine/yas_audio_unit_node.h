@@ -13,7 +13,7 @@ namespace yas {
 namespace audio {
     class graph;
 
-    class unit_node : public node, public unit_node_from_engine {
+    class unit_node : public node, public manageable_unit_node {
         using super_class = node;
 
        public:

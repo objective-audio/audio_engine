@@ -4,7 +4,7 @@
 
 #pragma once
 
-class yas::audio::node::kernel : public kernel_from_node {
+class yas::audio::node::kernel : public manageable_kernel {
    public:
     kernel();
     virtual ~kernel();

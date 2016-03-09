@@ -4,9 +4,9 @@
 
 #pragma once
 
-#include "yas_base.h"
-#include <unordered_set>
 #include <MacTypes.h>
+#include <unordered_set>
+#include "yas_base.h"
 
 namespace yas {
 namespace audio {
@@ -16,9 +16,9 @@ namespace audio {
     using connection_smap = std::map<UInt32, connection>;
     using connection_wmap = std::map<UInt32, weak<connection>>;
 
-    class connection_from_engine {
+    class manageable_connection {
        public:
-        virtual ~connection_from_engine() = default;
+        virtual ~manageable_connection() = default;
 
         virtual void _remove_nodes() = 0;
         virtual void _remove_source_node() = 0;

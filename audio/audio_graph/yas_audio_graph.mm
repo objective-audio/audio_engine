@@ -155,9 +155,9 @@ class audio::graph::impl : public base::impl {
             throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
         }
 
-        auto &unit_for_graph = static_cast<unit_from_graph &>(unit);
+        auto &unt = static_cast<manageable_unit &>(unit);
 
-        if (unit_for_graph._key()) {
+        if (unt._key()) {
             throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : unit.key is not null.");
         }
 
@@ -165,8 +165,8 @@ class audio::graph::impl : public base::impl {
 
         auto unit_key = next_unit_key();
         if (unit_key) {
-            unit_for_graph._set_graph_key(key());
-            unit_for_graph._set_key(*unit_key);
+            unt._set_graph_key(key());
+            unt._set_key(*unit_key);
             auto pair = std::make_pair(*unit_key, unit);
             _units.insert(pair);
             if (unit.is_output_unit()) {
@@ -178,26 +178,26 @@ class audio::graph::impl : public base::impl {
     void remove_unit_from_units(unit &unit) {
         std::lock_guard<std::recursive_mutex> lock(_mutex);
 
-        auto &unit_for_graph = static_cast<unit_from_graph &>(unit);
+        auto &unt = static_cast<manageable_unit &>(unit);
 
-        if (auto key = unit_for_graph._key()) {
+        if (auto key = unt._key()) {
             _units.erase(*key);
             _io_units.erase(*key);
-            unit_for_graph._set_key(nullopt);
-            unit_for_graph._set_graph_key(nullopt);
+            unt._set_key(nullopt);
+            unt._set_graph_key(nullopt);
         }
     }
 
     void add_audio_unit(unit &unit) {
-        auto &unit_for_graph = static_cast<unit_from_graph &>(unit);
+        auto &unt = static_cast<manageable_unit &>(unit);
 
-        if (unit_for_graph._key()) {
+        if (unt._key()) {
             throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : unit.key is already assigned.");
         }
 
         add_unit_to_units(unit);
 
-        unit_for_graph._initialize();
+        unt._initialize();
 
         if (unit.is_output_unit() && _running && !is_interrupting()) {
             unit.start();
@@ -205,13 +205,13 @@ class audio::graph::impl : public base::impl {
     }
 
     void remove_audio_unit(unit &unit) {
-        auto &unit_for_graph = static_cast<unit_from_graph &>(unit);
+        auto &unt = static_cast<manageable_unit &>(unit);
 
-        if (!unit_for_graph._key()) {
+        if (!unt._key()) {
             throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : unit.key is not assigned.");
         }
 
-        unit_for_graph._uninitialize();
+        unt._uninitialize();
 
         remove_unit_from_units(unit);
     }

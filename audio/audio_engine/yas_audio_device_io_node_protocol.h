@@ -8,9 +8,9 @@ namespace yas {
 namespace audio {
     class device_io;
 
-    class device_io_node_from_engine {
+    class manageable_device_io_node {
        public:
-        virtual ~device_io_node_from_engine() = default;
+        virtual ~manageable_device_io_node() = default;
 
         virtual void _add_device_io() = 0;
         virtual void _remove_device_io() = 0;

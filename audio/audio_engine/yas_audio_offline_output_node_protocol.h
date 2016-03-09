@@ -22,9 +22,9 @@ namespace audio {
     using offline_completion_f = std::function<void(bool const cancelled)>;
     using offline_start_result_t = yas::result<std::nullptr_t, offline_start_error_t>;
 
-    class offline_output_unit_from_engine {
+    class manageable_offline_output_unit {
        public:
-        virtual ~offline_output_unit_from_engine() = default;
+        virtual ~manageable_offline_output_unit() = default;
 
         virtual offline_start_result_t _start(offline_render_f &&, offline_completion_f &&) const = 0;
         virtual void _stop() const = 0;
