@@ -15,7 +15,7 @@ namespace yas {
 namespace audio {
     class device;
 
-    class device_io_node : public node, public device_io_node_from_engine {
+    class device_io_node : public node, public manageable_device_io_node {
         using super_class = node;
 
        public:

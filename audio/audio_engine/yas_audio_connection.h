@@ -13,7 +13,7 @@ namespace yas {
 namespace audio {
     class node;
 
-    class connection : public base, public connection_from_engine {
+    class connection : public base, public manageable_connection {
         using super_class = base;
         class impl;
 

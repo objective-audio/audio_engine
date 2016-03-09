@@ -6,9 +6,9 @@
 
 namespace yas {
 namespace audio {
-    class unit_from_graph {
+    class manageable_unit {
        public:
-        virtual ~unit_from_graph() = default;
+        virtual ~manageable_unit() = default;
 
         virtual void _initialize() = 0;
         virtual void _uninitialize() = 0;

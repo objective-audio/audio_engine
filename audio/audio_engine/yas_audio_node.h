@@ -20,7 +20,7 @@ namespace audio {
     class time;
     class engine;
 
-    class node : public base, public node_from_engine, public node_from_connection {
+    class node : public base, public manageable_node, public connectable_node {
         using super_class = base;
 
        public:
@@ -53,7 +53,7 @@ namespace audio {
         void set_render_time_on_render(audio::time const &time);
 
        protected:
-        class kernel_from_node;
+        class manageable_kernel;
         class impl;
 
         explicit node(std::shared_ptr<impl> const &);
@@ -78,9 +78,9 @@ namespace audio {
 #endif
     };
 
-    class node::kernel_from_node {
+    class node::manageable_kernel {
        public:
-        virtual ~kernel_from_node() = default;
+        virtual ~manageable_kernel() = default;
         virtual void _set_input_connections(audio::connection_wmap const &) = 0;
         virtual void _set_output_connections(audio::connection_wmap const &) = 0;
     };
