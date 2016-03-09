@@ -88,7 +88,7 @@ void audio::device_io_node::impl::update_connections() {
                     if (connections.count(0) > 0) {
                         auto const &connection = connections.at(0);
                         if (auto destination_node = connection.destination_node()) {
-                            if (auto tap_node = destination_node.cast<input_tap_node>()) {
+                            if (auto tap_node = yas::cast<input_tap_node>(destination_node)) {
                                 auto input_buffer = device_io.input_buffer_on_render();
                                 auto const &input_time = device_io.input_time_on_render();
                                 if (input_buffer && input_time) {

@@ -283,7 +283,7 @@ void audio::engine::impl::add_node_to_graph(node const &node) {
         return;
     }
 
-    if (auto unit_node = node.cast<audio::unit_node>()) {
+    if (auto unit_node = yas::cast<audio::unit_node>(node)) {
         auto &node = static_cast<unit_node_from_engine &>(unit_node);
         node._prepare_audio_unit();
         if (auto unit = unit_node.audio_unit()) {
@@ -293,14 +293,14 @@ void audio::engine::impl::add_node_to_graph(node const &node) {
     }
 
 #if (!TARGET_OS_IPHONE & TARGET_OS_MAC)
-    if (auto device_io_node = node.cast<audio::device_io_node>()) {
+    if (auto device_io_node = yas::cast<audio::device_io_node>(node)) {
         auto &node = static_cast<device_io_node_from_engine &>(device_io_node);
         node._add_device_io();
         _core->graph.add_audio_device_io(node._device_io());
     }
 #endif
 
-    if (auto offline_output_node = node.cast<audio::offline_output_node>()) {
+    if (auto offline_output_node = yas::cast<audio::offline_output_node>(node)) {
         if (_core->offline_output_node) {
             throw std::runtime_error(std::string(__PRETTY_FUNCTION__) + " : offline_output_node is already attached.");
         } else {
@@ -314,14 +314,14 @@ void audio::engine::impl::remove_node_from_graph(node const &node) {
         return;
     }
 
-    if (auto unit_node = node.cast<audio::unit_node>()) {
+    if (auto unit_node = yas::cast<audio::unit_node>(node)) {
         if (auto unit = unit_node.audio_unit()) {
             _core->graph.remove_audio_unit(unit);
         }
     }
 
 #if (!TARGET_OS_IPHONE & TARGET_OS_MAC)
-    if (auto device_io_node = node.cast<audio::device_io_node>()) {
+    if (auto device_io_node = yas::cast<audio::device_io_node>(node)) {
         auto &node = static_cast<device_io_node_from_engine &>(device_io_node);
         if (auto &device_io = node._device_io()) {
             _core->graph.remove_audio_device_io(device_io);
@@ -330,7 +330,7 @@ void audio::engine::impl::remove_node_from_graph(node const &node) {
     }
 #endif
 
-    if (auto offline_output_node = node.cast<audio::offline_output_node>()) {
+    if (auto offline_output_node = yas::cast<audio::offline_output_node>(node)) {
         if (offline_output_node == _core->offline_output_node) {
             _core->offline_output_node = nullptr;
         }

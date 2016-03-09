@@ -217,7 +217,7 @@ void audio::unit_input_node::impl::update_connections() {
 
                         auto destination_node = connection.destination_node();
 
-                        if (auto tap_node = destination_node.cast<input_tap_node>()) {
+                        if (auto tap_node = yas::cast<input_tap_node>(destination_node)) {
                             tap_node.render(input_buffer, 0, time);
                         }
                     }
