@@ -29,7 +29,7 @@ namespace audio {
 
         void set_device(audio::device const &device);
         audio::device device() const;
-        
+
         manageable_device_io_node manageable_device_io_node();
 
        protected:
@@ -45,9 +45,5 @@ namespace audio {
 }
 
 #include "yas_audio_device_io_node_impl.h"
-
-#if YAS_TEST
-#include "yas_audio_device_io_node_private_access.h"
-#endif
 
 #endif
