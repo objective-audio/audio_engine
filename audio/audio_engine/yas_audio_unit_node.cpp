@@ -89,14 +89,6 @@ Float32 audio::unit_node::output_parameter_value(AudioUnitParameterID const para
     return impl_ptr<impl>()->output_parameter_value(parameter_id, element);
 }
 
-void audio::unit_node::_prepare_audio_unit() {
-    impl_ptr<impl>()->prepare_audio_unit();
-}
-
-void audio::unit_node::_prepare_parameters() {
-    impl_ptr<impl>()->prepare_parameters();
-}
-
-void audio::unit_node::_reload_audio_unit() {
-    impl_ptr<impl>()->reload_audio_unit();
+audio::manageable_unit_node audio::unit_node::manageable_unit_node() {
+    return audio::manageable_unit_node{impl_ptr<manageable_unit_node::impl>()};
 }

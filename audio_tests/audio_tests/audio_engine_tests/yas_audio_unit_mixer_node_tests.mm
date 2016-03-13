@@ -82,7 +82,7 @@
     XCTAssertEqual(mixer_node.output_volume(bus_idx), output_volume);
     XCTAssertEqual(mixer_node.output_pan(bus_idx), output_pan);
 
-    yas::audio::unit_node::private_access::reload_audio_unit(mixer_node);
+    mixer_node.manageable_unit_node().reload_audio_unit();
 
     XCTAssertNotEqual(mixer_node.input_volume(bus_idx), input_volume);
     XCTAssertNotEqual(mixer_node.input_pan(bus_idx), input_pan);
@@ -90,7 +90,7 @@
     XCTAssertNotEqual(mixer_node.output_volume(bus_idx), output_volume);
     XCTAssertNotEqual(mixer_node.output_pan(bus_idx), output_pan);
 
-    yas::audio::unit_node::private_access::prepare_parameters(mixer_node);
+    mixer_node.manageable_unit_node().prepare_parameters();
 
     XCTAssertEqual(mixer_node.input_volume(bus_idx), input_volume);
     XCTAssertEqual(mixer_node.input_pan(bus_idx), input_pan);

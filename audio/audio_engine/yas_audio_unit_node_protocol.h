@@ -4,15 +4,31 @@
 
 #pragma once
 
+#include "yas_protocol.h"
+
 namespace yas {
 namespace audio {
-    class manageable_unit_node {
-       public:
-        virtual ~manageable_unit_node() = default;
+    struct manageable_unit_node : protocol {
+        struct impl : protocol::impl {
+            virtual void prepare_audio_unit() = 0;
+            virtual void prepare_parameters() = 0;
+            virtual void reload_audio_unit() = 0;
+        };
 
-        virtual void _prepare_audio_unit() = 0;
-        virtual void _prepare_parameters() = 0;
-        virtual void _reload_audio_unit() = 0;
+        explicit manageable_unit_node(std::shared_ptr<impl> impl) : protocol(std::move(impl)) {
+        }
+
+        void prepare_audio_unit() {
+            impl_ptr<impl>()->prepare_audio_unit();
+        }
+
+        void prepare_parameters() {
+            impl_ptr<impl>()->prepare_parameters();
+        }
+
+        void reload_audio_unit() {
+            impl_ptr<impl>()->reload_audio_unit();
+        }
     };
 }
 }

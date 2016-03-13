@@ -284,12 +284,12 @@ void audio::engine::impl::add_node_to_graph(node const &node) {
     }
 
     if (auto unit_node = yas::cast<audio::unit_node>(node)) {
-        auto &node = static_cast<manageable_unit_node &>(unit_node);
-        node._prepare_audio_unit();
+        auto node = unit_node.manageable_unit_node();
+        node.prepare_audio_unit();
         if (auto unit = unit_node.audio_unit()) {
             _core->graph.add_audio_unit(unit);
         }
-        node._prepare_parameters();
+        node.prepare_parameters();
     }
 
 #if (!TARGET_OS_IPHONE & TARGET_OS_MAC)

@@ -13,7 +13,7 @@ namespace yas {
 namespace audio {
     class graph;
 
-    class unit_node : public node, public manageable_unit_node {
+    class unit_node : public node {
         using super_class = node;
 
        public:
@@ -44,16 +44,11 @@ namespace audio {
                                         AudioUnitElement const element);
         Float32 output_parameter_value(AudioUnitParameterID const parameter_id, AudioUnitElement const element) const;
 
+        manageable_unit_node manageable_unit_node();
+
        protected:
         unit_node(std::shared_ptr<impl> &&, AudioComponentDescription const &);
         explicit unit_node(std::shared_ptr<impl> const &);
-
-       private:
-        // from engine
-
-        void _prepare_audio_unit() override;
-        void _prepare_parameters() override;
-        void _reload_audio_unit() override;
 
 #if YAS_TEST
        public:
