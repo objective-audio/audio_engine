@@ -74,44 +74,14 @@ void audio::node::set_render_time_on_render(const time &time) {
     impl_ptr<impl>()->set_render_time_on_render(time);
 }
 
-#pragma mark - private
-
-audio::connection audio::node::_input_connection(UInt32 const bus_idx) const {
-    return impl_ptr<impl>()->input_connection(bus_idx);
+audio::connectable_node audio::node::connectable() {
+    return audio::connectable_node{impl_ptr<connectable_node::impl>()};
 }
 
-audio::connection audio::node::_output_connection(UInt32 const bus_idx) const {
-    return impl_ptr<impl>()->output_connection(bus_idx);
+audio::manageable_node const audio::node::manageable() const {
+    return audio::manageable_node{impl_ptr<manageable_node::impl>()};
 }
 
-audio::connection_wmap const &audio::node::_input_connections() const {
-    return impl_ptr<impl>()->input_connections();
-}
-
-audio::connection_wmap const &audio::node::_output_connections() const {
-    return impl_ptr<impl>()->output_connections();
-}
-
-void audio::node::_add_connection(connection const &connection) {
-    impl_ptr<impl>()->add_connection(connection);
-}
-
-void audio::node::_remove_connection(connection const &connection) {
-    impl_ptr<impl>()->remove_connection(connection);
-}
-
-void audio::node::_set_engine(audio::engine const &engine) {
-    impl_ptr<impl>()->set_engine(engine);
-}
-
-audio::engine audio::node::_engine() const {
-    return impl_ptr<impl>()->engine();
-}
-
-void audio::node::_update_kernel() {
-    impl_ptr<impl>()->update_kernel();
-}
-
-void audio::node::_update_connections() {
-    impl_ptr<impl>()->update_connections();
+audio::manageable_node audio::node::manageable() {
+    return audio::manageable_node{impl_ptr<manageable_node::impl>()};
 }

@@ -141,7 +141,7 @@ void audio::engine::impl::attach_node(node &node) {
 
     _core->nodes.insert(node);
 
-    static_cast<manageable_node &>(node)._set_engine(_core->weak_engine.lock());
+    node.manageable().set_engine(_core->weak_engine.lock());
 
     add_node_to_graph(node);
 }
@@ -161,7 +161,7 @@ void audio::engine::impl::detach_node(node &node) {
 
     remove_node_from_graph(node);
 
-    static_cast<manageable_node &>(node)._set_engine(engine{nullptr});
+    node.manageable().set_engine(engine{nullptr});
 
     _core->nodes.erase(node);
 }
@@ -242,7 +242,7 @@ void audio::engine::impl::disconnect(audio::connection &connection) {
     connection.node_removable().remove_nodes();
 
     for (auto &node : update_nodes) {
-        static_cast<manageable_node &>(node)._update_connections();
+        node.manageable().update_connections();
         detach_node_if_unused(node);
     }
 
@@ -269,7 +269,7 @@ void audio::engine::impl::disconnect_node_with_predicate(std::function<bool(conn
     }
 
     for (auto node : update_nodes) {
-        static_cast<manageable_node &>(node)._update_connections();
+        node.manageable().update_connections();
         detach_node_if_unused(node);
     }
 
@@ -351,8 +351,8 @@ bool audio::engine::impl::add_connection(connection const &connection) {
         return false;
     }
 
-    static_cast<manageable_node &>(destination_node)._add_connection(connection);
-    static_cast<manageable_node &>(source_node)._add_connection(connection);
+    destination_node.manageable().add_connection(connection);
+    source_node.manageable().add_connection(connection);
 
     return true;
 }
@@ -364,11 +364,11 @@ void audio::engine::impl::remove_connection_from_nodes(connection const &connect
     }
 
     if (auto source_node = connection.source_node()) {
-        static_cast<manageable_node &>(source_node)._remove_connection(connection);
+        source_node.manageable().remove_connection(connection);
     }
 
     if (auto destination_node = connection.destination_node()) {
-        static_cast<manageable_node &>(destination_node)._remove_connection(connection);
+        destination_node.manageable().remove_connection(connection);
     }
 }
 
@@ -377,7 +377,7 @@ void audio::engine::impl::update_node_connections(node &node) {
         return;
     }
 
-    static_cast<manageable_node &>(node)._update_connections();
+    node.manageable().update_connections();
 }
 
 void audio::engine::impl::update_all_node_connections() {
@@ -386,7 +386,7 @@ void audio::engine::impl::update_all_node_connections() {
     }
 
     for (auto node : _core->nodes) {
-        static_cast<manageable_node &>(node)._update_connections();
+        node.manageable().update_connections();
     }
 }
 

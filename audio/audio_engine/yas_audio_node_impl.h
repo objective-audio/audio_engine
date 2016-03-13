@@ -4,7 +4,9 @@
 
 #pragma once
 
-class yas::audio::node::impl : public base::impl {
+#include "yas_audio_node_protocol.h"
+
+class yas::audio::node::impl : public base::impl, public manageable_node::impl {
    public:
     impl();
     virtual ~impl();
