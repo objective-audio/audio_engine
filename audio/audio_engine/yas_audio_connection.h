@@ -13,7 +13,7 @@ namespace yas {
 namespace audio {
     class node;
 
-    class connection : public base, public manageable_connection {
+    class connection : public base {
         using super_class = base;
         class impl;
 
@@ -32,13 +32,11 @@ namespace audio {
         node destination_node() const;
         audio::format const &format() const;
 
+        node_removable node_removable();
+
        protected:
         connection(node &source_node, UInt32 const source_bus, node &destination_node, UInt32 const destination_bus,
                    audio::format const &format);
-
-        void _remove_nodes() override;
-        void _remove_source_node() override;
-        void _remove_destination_node() override;
 #if YAS_TEST
        public:
         class private_access;

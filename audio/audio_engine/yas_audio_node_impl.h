@@ -4,7 +4,9 @@
 
 #pragma once
 
-class yas::audio::node::impl : public base::impl {
+#include "yas_audio_node_protocol.h"
+
+class yas::audio::node::impl : public base::impl, public manageable_node::impl {
    public:
     impl();
     virtual ~impl();
@@ -26,26 +28,26 @@ class yas::audio::node::impl : public base::impl {
     virtual UInt32 input_bus_count() const;
     virtual UInt32 output_bus_count() const;
 
-    audio::connection input_connection(UInt32 const bus_idx) const;
-    audio::connection output_connection(UInt32 const bus_idx) const;
-    audio::connection_wmap &input_connections() const;
-    audio::connection_wmap &output_connections() const;
+    audio::connection input_connection(UInt32 const bus_idx) const override;
+    audio::connection output_connection(UInt32 const bus_idx) const override;
+    audio::connection_wmap &input_connections() const override;
+    audio::connection_wmap &output_connections() const override;
 
-    void add_connection(audio::connection const &connection);
-    void remove_connection(audio::connection const &connection);
+    void add_connection(audio::connection const &connection) override;
+    void remove_connection(audio::connection const &connection) override;
 
-    virtual void update_connections();
+    virtual void update_connections() override;
     virtual std::shared_ptr<kernel> make_kernel();
     virtual void prepare_kernel(std::shared_ptr<kernel> const &kernel);  // requires super
-    void update_kernel();
+    void update_kernel() override;
 
     template <typename T = audio::node::kernel>
     std::shared_ptr<T> kernel_cast() const {
         return std::static_pointer_cast<T>(_kernel());
     }
 
-    audio::engine engine() const;
-    void set_engine(audio::engine const &);
+    audio::engine engine() const override;
+    void set_engine(audio::engine const &) override;
 
     virtual void render(audio::pcm_buffer &buffer, UInt32 const bus_idx, audio::time const &when);
     audio::time render_time() const;

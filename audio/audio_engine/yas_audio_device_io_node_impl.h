@@ -6,7 +6,7 @@
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
 
-class yas::audio::device_io_node::impl : public node::impl {
+class yas::audio::device_io_node::impl : public node::impl, public manageable_device_io_node::impl {
    public:
     impl();
     virtual ~impl();
@@ -18,9 +18,9 @@ class yas::audio::device_io_node::impl : public node::impl {
 
     virtual void update_connections() override;
 
-    void add_device_io();
-    void remove_device_io();
-    audio::device_io &device_io() const;
+    void add_device_io() override;
+    void remove_device_io() override;
+    audio::device_io &device_io() const override;
 
     void set_device(audio::device const &device);
     audio::device device() const;

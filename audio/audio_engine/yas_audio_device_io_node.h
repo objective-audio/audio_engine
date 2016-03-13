@@ -15,7 +15,7 @@ namespace yas {
 namespace audio {
     class device;
 
-    class device_io_node : public node, public manageable_device_io_node {
+    class device_io_node : public node {
         using super_class = node;
 
        public:
@@ -30,11 +30,7 @@ namespace audio {
         void set_device(audio::device const &device);
         audio::device device() const;
 
-       private:
-        // from engine
-        void _add_device_io() override;
-        void _remove_device_io() override;
-        audio::device_io &_device_io() const override;
+        manageable_device_io_node manageable_device_io_node();
 
        protected:
         device_io_node(std::shared_ptr<device_io_node::impl> const &impl);
@@ -49,9 +45,5 @@ namespace audio {
 }
 
 #include "yas_audio_device_io_node_impl.h"
-
-#if YAS_TEST
-#include "yas_audio_device_io_node_private_access.h"
-#endif
 
 #endif

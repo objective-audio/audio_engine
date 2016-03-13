@@ -8,7 +8,7 @@
 
 using namespace yas;
 
-class audio::connection::impl : public base::impl {
+class audio::connection::impl : public base::impl, public node_removable::impl {
    public:
     UInt32 source_bus;
 
@@ -27,10 +27,10 @@ class audio::connection::impl : public base::impl {
 
     void remove_connection_from_nodes(connection const &connection) {
         if (auto node = _destination_node.lock()) {
-            static_cast<connectable_node &>(node)._remove_connection(connection);
+            node.connectable().remove_connection(connection);
         }
         if (auto node = _source_node.lock()) {
-            static_cast<connectable_node &>(node)._remove_connection(connection);
+            node.connectable().remove_connection(connection);
         }
     }
 
@@ -84,8 +84,8 @@ audio::connection::connection(node &source_node, UInt32 const source_bus, node &
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : invalid argument.");
     }
 
-    static_cast<connectable_node &>(source_node)._add_connection(*this);
-    static_cast<connectable_node &>(destination_node)._add_connection(*this);
+    source_node.connectable().add_connection(*this);
+    destination_node.connectable().add_connection(*this);
 }
 
 UInt32 audio::connection::source_bus() const {
@@ -114,14 +114,6 @@ audio::format const &audio::connection::format() const {
     return impl_ptr<impl>()->format;
 }
 
-void audio::connection::_remove_nodes() {
-    impl_ptr<impl>()->remove_nodes();
-}
-
-void audio::connection::_remove_source_node() {
-    impl_ptr<impl>()->remove_source_node();
-}
-
-void audio::connection::_remove_destination_node() {
-    impl_ptr<impl>()->remove_destination_node();
+audio::node_removable audio::connection::node_removable() {
+    return audio::node_removable{impl_ptr<node_removable::impl>()};
 }

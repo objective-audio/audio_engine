@@ -4,7 +4,7 @@
 
 #pragma once
 
-class yas::audio::unit_node::impl : public node::impl {
+class yas::audio::unit_node::impl : public node::impl, public manageable_unit_node::impl {
     using super_class = node::impl;
 
    public:
@@ -38,10 +38,10 @@ class yas::audio::unit_node::impl : public node::impl {
     virtual UInt32 output_bus_count() const override;
 
     virtual void update_connections() override;
-    virtual void prepare_audio_unit();
-    virtual void prepare_parameters();  // NS_REQUIRES_SUPER
+    virtual void prepare_audio_unit() override;
+    virtual void prepare_parameters() override;  // NS_REQUIRES_SUPER
 
-    void reload_audio_unit();
+    void reload_audio_unit() override;
     void set_graph(audio::graph const &);
 
     virtual void render(audio::pcm_buffer &buffer, UInt32 const bus_idx, audio::time const &when) override;

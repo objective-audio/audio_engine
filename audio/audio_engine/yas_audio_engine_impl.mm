@@ -141,7 +141,7 @@ void audio::engine::impl::attach_node(node &node) {
 
     _core->nodes.insert(node);
 
-    static_cast<manageable_node &>(node)._set_engine(_core->weak_engine.lock());
+    node.manageable_node().set_engine(_core->weak_engine.lock());
 
     add_node_to_graph(node);
 }
@@ -161,7 +161,7 @@ void audio::engine::impl::detach_node(node &node) {
 
     remove_node_from_graph(node);
 
-    static_cast<manageable_node &>(node)._set_engine(engine{nullptr});
+    node.manageable_node().set_engine(engine{nullptr});
 
     _core->nodes.erase(node);
 }
@@ -239,10 +239,10 @@ void audio::engine::impl::disconnect(audio::connection &connection) {
     std::vector<node> update_nodes{connection.source_node(), connection.destination_node()};
 
     remove_connection_from_nodes(connection);
-    static_cast<manageable_connection &>(connection)._remove_nodes();
+    connection.node_removable().remove_nodes();
 
     for (auto &node : update_nodes) {
-        static_cast<manageable_node &>(node)._update_connections();
+        node.manageable_node().update_connections();
         detach_node_if_unused(node);
     }
 
@@ -265,11 +265,11 @@ void audio::engine::impl::disconnect_node_with_predicate(std::function<bool(conn
         update_nodes.insert(connection.source_node());
         update_nodes.insert(connection.destination_node());
         remove_connection_from_nodes(connection);
-        static_cast<manageable_connection &>(connection)._remove_nodes();
+        connection.node_removable().remove_nodes();
     }
 
     for (auto node : update_nodes) {
-        static_cast<manageable_node &>(node)._update_connections();
+        node.manageable_node().update_connections();
         detach_node_if_unused(node);
     }
 
@@ -284,19 +284,19 @@ void audio::engine::impl::add_node_to_graph(node const &node) {
     }
 
     if (auto unit_node = yas::cast<audio::unit_node>(node)) {
-        auto &node = static_cast<manageable_unit_node &>(unit_node);
-        node._prepare_audio_unit();
+        auto node = unit_node.manageable_unit_node();
+        node.prepare_audio_unit();
         if (auto unit = unit_node.audio_unit()) {
             _core->graph.add_audio_unit(unit);
         }
-        node._prepare_parameters();
+        node.prepare_parameters();
     }
 
 #if (!TARGET_OS_IPHONE & TARGET_OS_MAC)
     if (auto device_io_node = yas::cast<audio::device_io_node>(node)) {
-        auto &node = static_cast<manageable_device_io_node &>(device_io_node);
-        node._add_device_io();
-        _core->graph.add_audio_device_io(node._device_io());
+        auto manageable_node = device_io_node.manageable_device_io_node();
+        manageable_node.add_device_io();
+        _core->graph.add_audio_device_io(manageable_node.device_io());
     }
 #endif
 
@@ -322,10 +322,10 @@ void audio::engine::impl::remove_node_from_graph(node const &node) {
 
 #if (!TARGET_OS_IPHONE & TARGET_OS_MAC)
     if (auto device_io_node = yas::cast<audio::device_io_node>(node)) {
-        auto &node = static_cast<manageable_device_io_node &>(device_io_node);
-        if (auto &device_io = node._device_io()) {
+        auto manageable_node = device_io_node.manageable_device_io_node();
+        if (auto &device_io = manageable_node.device_io()) {
             _core->graph.remove_audio_device_io(device_io);
-            node._remove_device_io();
+            manageable_node.remove_device_io();
         }
     }
 #endif
@@ -351,8 +351,8 @@ bool audio::engine::impl::add_connection(connection const &connection) {
         return false;
     }
 
-    static_cast<manageable_node &>(destination_node)._add_connection(connection);
-    static_cast<manageable_node &>(source_node)._add_connection(connection);
+    destination_node.manageable_node().add_connection(connection);
+    source_node.manageable_node().add_connection(connection);
 
     return true;
 }
@@ -364,11 +364,11 @@ void audio::engine::impl::remove_connection_from_nodes(connection const &connect
     }
 
     if (auto source_node = connection.source_node()) {
-        static_cast<manageable_node &>(source_node)._remove_connection(connection);
+        source_node.manageable_node().remove_connection(connection);
     }
 
     if (auto destination_node = connection.destination_node()) {
-        static_cast<manageable_node &>(destination_node)._remove_connection(connection);
+        destination_node.manageable_node().remove_connection(connection);
     }
 }
 
@@ -377,7 +377,7 @@ void audio::engine::impl::update_node_connections(node &node) {
         return;
     }
 
-    static_cast<manageable_node &>(node)._update_connections();
+    node.manageable_node().update_connections();
 }
 
 void audio::engine::impl::update_all_node_connections() {
@@ -386,7 +386,7 @@ void audio::engine::impl::update_all_node_connections() {
     }
 
     for (auto node : _core->nodes) {
-        static_cast<manageable_node &>(node)._update_connections();
+        node.manageable_node().update_connections();
     }
 }
 
@@ -486,8 +486,8 @@ audio::engine::start_result_t audio::engine::impl::start_offline_render(offline_
         return start_result_t(start_error_t::offline_output_not_found);
     }
 
-    auto &node = static_cast<manageable_offline_output_unit &>(offline_output_node);
-    auto result = node._start(std::move(render_function), std::move(completion_function));
+    auto node = offline_output_node.manageable_offline_output_unit();
+    auto result = node.start(std::move(render_function), std::move(completion_function));
 
     if (result) {
         return start_result_t(nullptr);
@@ -502,7 +502,7 @@ void audio::engine::impl::stop() {
     }
 
     if (auto offline_output_node = _core->offline_output_node) {
-        static_cast<manageable_offline_output_unit &>(offline_output_node)._stop();
+        offline_output_node.manageable_offline_output_unit().stop();
     }
 }
 

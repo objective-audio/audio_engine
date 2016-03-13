@@ -14,18 +14,6 @@ namespace audio {
                                  UInt32 const destination_bus, audio::format const &format) {
             return connection(source_node, source_bus, destination_node, destination_bus, format);
         }
-
-        static void remove_nodes(connection &connection) {
-            connection._remove_nodes();
-        }
-
-        static void remove_source_node(connection &connection) {
-            connection._remove_source_node();
-        }
-
-        static void remove_destination_node(connection &connection) {
-            connection._remove_destination_node();
-        }
     };
 }
 }

@@ -34,8 +34,8 @@
     XCTAssertTrue(connection.destination_bus() == destination_bus);
     XCTAssertTrue(connection.format() == format);
 
-    XCTAssertTrue(yas::audio::node::private_access::output_connection(source_node, source_bus) == connection);
-    XCTAssertTrue(yas::audio::node::private_access::input_connection(destination_node, destination_bus) == connection);
+    XCTAssertTrue(source_node.manageable_node().output_connection(source_bus) == connection);
+    XCTAssertTrue(destination_node.manageable_node().input_connection(destination_bus) == connection);
 }
 
 - (void)test_remove_nodes {
@@ -48,7 +48,7 @@
     auto connection = yas::audio::connection::private_access::create(source_node, source_bus, destination_node,
                                                                      destination_bus, format);
 
-    yas::audio::connection::private_access::remove_nodes(connection);
+    connection.node_removable().remove_nodes();
 
     XCTAssertFalse(connection.source_node());
     XCTAssertFalse(connection.destination_node());
@@ -64,12 +64,12 @@
     auto connection = yas::audio::connection::private_access::create(source_node, source_bus, destination_node,
                                                                      destination_bus, format);
 
-    yas::audio::connection::private_access::remove_source_node(connection);
+    connection.node_removable().remove_source_node();
 
     XCTAssertFalse(connection.source_node());
     XCTAssertTrue(connection.destination_node());
 
-    yas::audio::connection::private_access::remove_destination_node(connection);
+    connection.node_removable().remove_destination_node();
 
     XCTAssertFalse(connection.destination_node());
 }

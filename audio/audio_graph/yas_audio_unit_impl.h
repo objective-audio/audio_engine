@@ -4,10 +4,10 @@
 
 #pragma once
 
-class yas::audio::unit::impl : public base::impl {
+class yas::audio::unit::impl : public base::impl, public manageable_unit::impl {
    public:
-    std::experimental::optional<UInt8> graph_key;
-    std::experimental::optional<UInt16> key;
+    std::experimental::optional<UInt8> _graph_key;
+    std::experimental::optional<UInt16> _key;
     bool initialized;
 
     impl();
@@ -16,8 +16,8 @@ class yas::audio::unit::impl : public base::impl {
     void create_audio_unit(AudioComponentDescription const &acd);
     void dispose_audio_unit();
 
-    void initialize();
-    void uninitialize();
+    void initialize() override;
+    void uninitialize() override;
     bool is_initialized() const;
 
     void reset();
@@ -89,6 +89,11 @@ class yas::audio::unit::impl : public base::impl {
     template <typename T>
     std::vector<T> property_data(AudioUnitPropertyID const property_id, AudioUnitScope const scope,
                                  AudioUnitElement const element) const;
+
+    void set_graph_key(std::experimental::optional<UInt8> const &key) override;
+    std::experimental::optional<UInt8> const &graph_key() const override;
+    void set_key(std::experimental::optional<UInt16> const &) override;
+    std::experimental::optional<UInt16> const &key() const override;
 
    private:
     class core;

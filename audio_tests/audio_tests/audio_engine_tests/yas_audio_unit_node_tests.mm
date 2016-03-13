@@ -67,7 +67,7 @@
 
     engine.disconnect(connection);
 
-    yas::audio::unit_node::private_access::reload_audio_unit(delay_node);
+    delay_node.manageable_unit_node().reload_audio_unit();
 
     engine.connect(delay_node, output_node, format);
 

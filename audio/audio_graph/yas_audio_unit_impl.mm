@@ -177,13 +177,13 @@ std::string const &audio::unit::impl::name() const {
 }
 
 void audio::unit::impl::attach_render_callback(UInt32 const bus_idx) {
-    if (!graph_key || !key) {
+    if (!_graph_key || !_key) {
         raise_with_reason(std::string(__PRETTY_FUNCTION__) + " - Key is not assigned. graphKey(" +
-                          std::to_string(*graph_key) + ") unitKey(" + std::to_string(*key) + ")");
+                          std::to_string(*_graph_key) + ") unitKey(" + std::to_string(*_key) + ")");
         return;
     }
 
-    render_id render_id{.graph = *graph_key, .unit = *key};
+    render_id render_id{.graph = *_graph_key, .unit = *_key};
     AURenderCallbackStruct callbackStruct{.inputProc = yas::render_callback, .inputProcRefCon = render_id.v};
 
     raise_if_au_error(AudioUnitSetProperty(_core->au_instance, kAudioUnitProperty_SetRenderCallback,
@@ -200,13 +200,13 @@ void audio::unit::impl::detach_render_callback(UInt32 const bus_idx) {
 }
 
 void audio::unit::impl::attach_render_notify() {
-    if (!graph_key || !key) {
+    if (!_graph_key || !_key) {
         raise_with_reason(std::string(__PRETTY_FUNCTION__) + " - Key is not assigned. graphKey(" +
-                          std::to_string(*graph_key) + ") unitKey(" + std::to_string(*key) + ")");
+                          std::to_string(*_graph_key) + ") unitKey(" + std::to_string(*_key) + ")");
         return;
     }
 
-    render_id render_id{.graph = *graph_key, .unit = *key};
+    render_id render_id{.graph = *_graph_key, .unit = *_key};
 
     raise_if_au_error(AudioUnitAddRenderNotify(_core->au_instance, notify_render_callback, render_id.v));
 }
@@ -221,13 +221,13 @@ void audio::unit::impl::attach_input_callback() {
         return;
     }
 
-    if (!graph_key || !key) {
+    if (!_graph_key || !_key) {
         raise_with_reason(std::string(__PRETTY_FUNCTION__) + " - Key is not assigned. graphKey(" +
-                          std::to_string(*graph_key) + ") unitKey(" + std::to_string(*key) + ")");
+                          std::to_string(*_graph_key) + ") unitKey(" + std::to_string(*_key) + ")");
         return;
     }
 
-    render_id render_id{.graph = *graph_key, .unit = *key};
+    render_id render_id{.graph = *_graph_key, .unit = *_key};
 
     AURenderCallbackStruct callbackStruct = {.inputProc = input_render_callback, .inputProcRefCon = render_id.v};
 
@@ -480,6 +480,22 @@ void audio::unit::impl::stop() {
     if (is_running()) {
         raise_if_au_error(AudioOutputUnitStop(_core->au_instance));
     }
+}
+
+void audio::unit::impl::set_graph_key(std::experimental::optional<UInt8> const &key) {
+    _graph_key = key;
+}
+
+std::experimental::optional<UInt8> const &audio::unit::impl::graph_key() const {
+    return _graph_key;
+}
+
+void audio::unit::impl::set_key(std::experimental::optional<UInt16> const &key) {
+    _key = key;
+}
+
+std::experimental::optional<UInt16> const &audio::unit::impl::key() const {
+    return _key;
 }
 
 #pragma mark - atomic

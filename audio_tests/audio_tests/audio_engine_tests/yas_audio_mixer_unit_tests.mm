@@ -36,7 +36,7 @@
 
     XCTAssertNoThrow(mixer_unit.set_output_format(format.stream_description(), 0));
 
-    XCTAssertNoThrow(yas::audio::unit::private_access::initialize(mixer_unit));
+    XCTAssertNoThrow(mixer_unit.manageable().initialize());
 
     XCTAssertNoThrow(mixer_unit.set_input_format(format.stream_description(), 0));
 
@@ -48,7 +48,7 @@
     XCTAssertNoThrow(asbd = mixer_unit.input_format(0));
     XCTAssertTrue(yas::is_equal(format.stream_description(), asbd));
 
-    XCTAssertNoThrow(yas::audio::unit::private_access::uninitialize(mixer_unit));
+    XCTAssertNoThrow(mixer_unit.manageable().uninitialize());
 
 #if TARGET_OS_IPHONE
     /*
@@ -59,7 +59,7 @@
 
     XCTAssertNoThrow(mixer_unit.set_output_format(format.stream_description(), 0));
 
-    XCTAssertNoThrow(yas::audio::unit::private_access::initialize(mixer_unit));
+    XCTAssertNoThrow(mixer_unit.manageable().initialize());
 
     XCTAssertNoThrow(mixer_unit.set_input_format(format.stream_description(), 0));
 
@@ -71,7 +71,7 @@
     XCTAssertNoThrow(asbd = mixer_unit.input_format(0));
     XCTAssertTrue(yas::is_equal(format.stream_description(), asbd));
 
-    XCTAssertNoThrow(yas::audio::unit::private_access::uninitialize(mixer_unit));
+    XCTAssertNoThrow(mixer_unit.manageable().uninitialize());
 #endif
 }
 
@@ -84,9 +84,9 @@
 
     auto format = yas::audio::format(48000.0, 2, yas::audio::pcm_format::float32, false);
 
-    yas::audio::unit::private_access::initialize(mixer_unit);
+    mixer_unit.manageable().initialize();
     XCTAssertThrows(mixer_unit.set_output_format(format.stream_description(), 0));
-    yas::audio::unit::private_access::uninitialize(mixer_unit);
+    mixer_unit.manageable().uninitialize();
     XCTAssertNoThrow(mixer_unit.set_output_format(format.stream_description(), 0));
 
     /*

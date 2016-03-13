@@ -20,7 +20,7 @@ namespace audio {
     class time;
     class engine;
 
-    class node : public base, public manageable_node, public connectable_node {
+    class node : public base {
         using super_class = base;
 
        public:
@@ -52,24 +52,15 @@ namespace audio {
         void render(audio::pcm_buffer &buffer, UInt32 const bus_idx, audio::time const &when);
         void set_render_time_on_render(audio::time const &time);
 
+        audio::connectable_node connectable();
+        audio::manageable_node const manageable_node() const;
+        audio::manageable_node manageable_node();
+
        protected:
         class manageable_kernel;
         class impl;
 
         explicit node(std::shared_ptr<impl> const &);
-
-        // from engine
-
-        audio::connection _input_connection(UInt32 const bus_idx) const override;
-        audio::connection _output_connection(UInt32 const bus_idx) const override;
-        audio::connection_wmap const &_input_connections() const override;
-        audio::connection_wmap const &_output_connections() const override;
-        void _add_connection(audio::connection const &connection) override;
-        void _remove_connection(audio::connection const &connection) override;
-        void _set_engine(audio::engine const &engine) override;
-        audio::engine _engine() const override;
-        void _update_kernel() override;
-        void _update_connections() override;
 
 #if YAS_TEST
        public:
