@@ -22,7 +22,7 @@
 
 namespace yas {
 namespace audio {
-    class unit : public base, public manageable_unit {
+    class unit : public base {
         using super_class = base;
         class impl;
 
@@ -102,20 +102,12 @@ namespace audio {
         void stop();   // for io
         void reset();
 
+        manageable_unit manageable();
+
         // render thread
 
         void callback_render(render_parameters &render_parameters);
         au_result_t audio_unit_render(render_parameters &render_parameters);
-
-       private:
-        // from graph
-
-        void _initialize() override;
-        void _uninitialize() override;
-        void _set_graph_key(std::experimental::optional<UInt8> const &key) override;
-        std::experimental::optional<UInt8> const &_graph_key() const override;
-        void _set_key(std::experimental::optional<UInt16> const &key) override;
-        std::experimental::optional<UInt16> const &_key() const override;
 
 #if YAS_TEST
        public:

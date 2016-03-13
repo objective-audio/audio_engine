@@ -247,6 +247,10 @@ void audio::unit::reset() {
     impl_ptr<impl>()->reset();
 }
 
+audio::manageable_unit audio::unit::manageable() {
+    return audio::manageable_unit{impl_ptr<manageable_unit::impl>()};
+}
+
 #pragma mark - render thread
 
 void audio::unit::callback_render(render_parameters &render_parameters) {
@@ -255,32 +259,6 @@ void audio::unit::callback_render(render_parameters &render_parameters) {
 
 audio::unit::au_result_t audio::unit::audio_unit_render(render_parameters &render_parameters) {
     return impl_ptr<impl>()->audio_unit_render(render_parameters);
-}
-
-#pragma mark - private function
-
-void audio::unit::_initialize() {
-    impl_ptr<impl>()->initialize();
-}
-
-void audio::unit::_uninitialize() {
-    impl_ptr<impl>()->uninitialize();
-}
-
-void audio::unit::_set_graph_key(std::experimental::optional<UInt8> const &key) {
-    impl_ptr<impl>()->graph_key = key;
-}
-
-std::experimental::optional<UInt8> const &audio::unit::_graph_key() const {
-    return impl_ptr<impl>()->graph_key;
-}
-
-void audio::unit::_set_key(std::experimental::optional<UInt16> const &key) {
-    impl_ptr<impl>()->key = key;
-}
-
-std::experimental::optional<UInt16> const &audio::unit::_key() const {
-    return impl_ptr<impl>()->key;
 }
 
 #pragma mark - global

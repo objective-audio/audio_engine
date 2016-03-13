@@ -155,9 +155,9 @@ class audio::graph::impl : public base::impl {
             throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
         }
 
-        auto &unt = static_cast<manageable_unit &>(unit);
+        auto unt = unit.manageable();
 
-        if (unt._key()) {
+        if (unt.key()) {
             throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : unit.key is not null.");
         }
 
@@ -165,8 +165,8 @@ class audio::graph::impl : public base::impl {
 
         auto unit_key = next_unit_key();
         if (unit_key) {
-            unt._set_graph_key(key());
-            unt._set_key(*unit_key);
+            unt.set_graph_key(key());
+            unt.set_key(*unit_key);
             auto pair = std::make_pair(*unit_key, unit);
             _units.insert(pair);
             if (unit.is_output_unit()) {
@@ -178,26 +178,26 @@ class audio::graph::impl : public base::impl {
     void remove_unit_from_units(unit &unit) {
         std::lock_guard<std::recursive_mutex> lock(_mutex);
 
-        auto &unt = static_cast<manageable_unit &>(unit);
+        auto unt = unit.manageable();
 
-        if (auto key = unt._key()) {
+        if (auto key = unt.key()) {
             _units.erase(*key);
             _io_units.erase(*key);
-            unt._set_key(nullopt);
-            unt._set_graph_key(nullopt);
+            unt.set_key(nullopt);
+            unt.set_graph_key(nullopt);
         }
     }
 
     void add_audio_unit(unit &unit) {
-        auto &unt = static_cast<manageable_unit &>(unit);
+        auto unt = unit.manageable();
 
-        if (unt._key()) {
+        if (unt.key()) {
             throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : unit.key is already assigned.");
         }
 
         add_unit_to_units(unit);
 
-        unt._initialize();
+        unt.initialize();
 
         if (unit.is_output_unit() && _running && !is_interrupting()) {
             unit.start();
@@ -205,13 +205,13 @@ class audio::graph::impl : public base::impl {
     }
 
     void remove_audio_unit(unit &unit) {
-        auto &unt = static_cast<manageable_unit &>(unit);
+        auto unt = unit.manageable();
 
-        if (!unt._key()) {
+        if (!unt.key()) {
             throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : unit.key is not assigned.");
         }
 
-        unt._uninitialize();
+        unt.uninitialize();
 
         remove_unit_from_units(unit);
     }
