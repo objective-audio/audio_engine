@@ -78,10 +78,10 @@ audio::connectable_node audio::node::connectable() {
     return audio::connectable_node{impl_ptr<connectable_node::impl>()};
 }
 
-audio::manageable_node const audio::node::manageable() const {
+audio::manageable_node const audio::node::manageable_node() const {
     return audio::manageable_node{impl_ptr<manageable_node::impl>()};
 }
 
-audio::manageable_node audio::node::manageable() {
+audio::manageable_node audio::node::manageable_node() {
     return audio::manageable_node{impl_ptr<manageable_node::impl>()};
 }

@@ -53,8 +53,8 @@ namespace audio {
         void set_render_time_on_render(audio::time const &time);
 
         audio::connectable_node connectable();
-        audio::manageable_node const manageable() const;
-        audio::manageable_node manageable();
+        audio::manageable_node const manageable_node() const;
+        audio::manageable_node manageable_node();
 
        protected:
         class manageable_kernel;

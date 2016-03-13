@@ -24,8 +24,8 @@
     XCTAssertEqual(node.input_bus_count(), 2);
     XCTAssertEqual(node.output_bus_count(), 1);
 
-    XCTAssertEqual(node.manageable().input_connections().size(), 0);
-    XCTAssertEqual(node.manageable().output_connections().size(), 0);
+    XCTAssertEqual(node.manageable_node().input_connections().size(), 0);
+    XCTAssertEqual(node.manageable_node().output_connections().size(), 0);
     XCTAssertEqual(*node.next_available_input_bus(), 0);
     XCTAssertEqual(*node.next_available_output_bus(), 0);
 }
@@ -47,10 +47,10 @@
 
     if (auto connection = yas::audio::connection::private_access::create(source_node, source_bus, destination_node,
                                                                          destination_bus, format)) {
-        XCTAssertEqual(source_node.manageable().output_connections().size(), 1);
-        XCTAssertEqual(destination_node.manageable().input_connections().size(), 1);
-        XCTAssertEqual(source_node.manageable().output_connection(source_bus), connection);
-        XCTAssertEqual(destination_node.manageable().input_connection(destination_bus), connection);
+        XCTAssertEqual(source_node.manageable_node().output_connections().size(), 1);
+        XCTAssertEqual(destination_node.manageable_node().input_connections().size(), 1);
+        XCTAssertEqual(source_node.manageable_node().output_connection(source_bus), connection);
+        XCTAssertEqual(destination_node.manageable_node().input_connection(destination_bus), connection);
         XCTAssertEqual(source_node.output_format(source_bus), format);
         XCTAssertEqual(destination_node.input_format(destination_bus), format);
 
@@ -79,14 +79,14 @@
     auto connection = yas::audio::connection::private_access::create(source_node, source_bus, destination_node,
                                                                      destination_bus, format);
 
-    XCTAssertEqual(source_node.manageable().output_connections().size(), 1);
-    XCTAssertEqual(destination_node.manageable().input_connections().size(), 1);
+    XCTAssertEqual(source_node.manageable_node().output_connections().size(), 1);
+    XCTAssertEqual(destination_node.manageable_node().input_connections().size(), 1);
 
     source_node.reset();
-    XCTAssertEqual(source_node.manageable().output_connections().size(), 0);
+    XCTAssertEqual(source_node.manageable_node().output_connections().size(), 0);
 
     destination_node.reset();
-    XCTAssertEqual(destination_node.manageable().input_connections().size(), 0);
+    XCTAssertEqual(destination_node.manageable_node().input_connections().size(), 0);
 }
 
 - (void)test_render_time {
@@ -117,11 +117,11 @@
 
     XCTAssertFalse(node.engine());
 
-    node.manageable().set_engine(engine);
+    node.manageable_node().set_engine(engine);
 
     XCTAssertEqual(engine, node.engine());
 
-    node.manageable().set_engine(yas::audio::engine(nullptr));
+    node.manageable_node().set_engine(yas::audio::engine(nullptr));
 
     XCTAssertFalse(node.engine());
 }
@@ -143,11 +143,11 @@
         yas::test::audio_test_node input_node;
         auto input_connection =
             yas::audio::connection::private_access::create(input_node, 0, relay_node, i, input_format);
-        input_node.manageable().add_connection(input_connection);
+        input_node.manageable_node().add_connection(input_connection);
         input_connections.push_back(input_connection);
     }
 
-    relay_node.manageable().update_kernel();
+    relay_node.manageable_node().update_kernel();
 
     XCTestExpectation *expectation = [self expectationWithDescription:@"kernel connections"];
 

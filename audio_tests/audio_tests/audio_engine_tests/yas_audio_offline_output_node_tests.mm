@@ -117,10 +117,10 @@
 
     auto connection = yas::audio::connection::private_access::create(tap_node, 0, output_node, 0, format);
 
-    output_node.manageable().add_connection(connection);
-    output_node.manageable().update_kernel();
-    tap_node.manageable().add_connection(connection);
-    tap_node.manageable().update_kernel();
+    output_node.manageable_node().add_connection(connection);
+    output_node.manageable_node().update_kernel();
+    tap_node.manageable_node().add_connection(connection);
+    tap_node.manageable_node().update_kernel();
 
     XCTestExpectation *tapNodeExpectation = [self expectationWithDescription:@"tap node render"];
 
@@ -223,10 +223,10 @@
 
     auto connection = yas::audio::connection::private_access::create(tap_node, 0, output_node, 0, format);
 
-    output_node.manageable().add_connection(connection);
-    output_node.manageable().update_kernel();
-    tap_node.manageable().add_connection(connection);
-    tap_node.manageable().update_kernel();
+    output_node.manageable_node().add_connection(connection);
+    output_node.manageable_node().update_kernel();
+    tap_node.manageable_node().add_connection(connection);
+    tap_node.manageable_node().update_kernel();
 
     auto promise = std::make_shared<std::promise<void>>();
     auto future = promise->get_future();
