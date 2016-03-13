@@ -294,9 +294,9 @@ void audio::engine::impl::add_node_to_graph(node const &node) {
 
 #if (!TARGET_OS_IPHONE & TARGET_OS_MAC)
     if (auto device_io_node = yas::cast<audio::device_io_node>(node)) {
-        auto &node = static_cast<manageable_device_io_node &>(device_io_node);
-        node._add_device_io();
-        _core->graph.add_audio_device_io(node._device_io());
+        auto manageable_node = device_io_node.manageable_device_io_node();
+        manageable_node.add_device_io();
+        _core->graph.add_audio_device_io(manageable_node.device_io());
     }
 #endif
 
@@ -322,10 +322,10 @@ void audio::engine::impl::remove_node_from_graph(node const &node) {
 
 #if (!TARGET_OS_IPHONE & TARGET_OS_MAC)
     if (auto device_io_node = yas::cast<audio::device_io_node>(node)) {
-        auto &node = static_cast<manageable_device_io_node &>(device_io_node);
-        if (auto &device_io = node._device_io()) {
+        auto manageable_node = device_io_node.manageable_device_io_node();
+        if (auto &device_io = manageable_node.device_io()) {
             _core->graph.remove_audio_device_io(device_io);
-            node._remove_device_io();
+            manageable_node.remove_device_io();
         }
     }
 #endif

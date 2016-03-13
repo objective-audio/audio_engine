@@ -33,18 +33,8 @@ audio::device audio::device_io_node::device() const {
     return impl_ptr<impl>()->device();
 }
 
-#pragma mark - private
-
-void audio::device_io_node::_add_device_io() {
-    impl_ptr<impl>()->add_device_io();
-}
-
-void audio::device_io_node::_remove_device_io() {
-    impl_ptr<impl>()->remove_device_io();
-}
-
-audio::device_io &audio::device_io_node::_device_io() const {
-    return impl_ptr<impl>()->device_io();
+audio::manageable_device_io_node audio::device_io_node::manageable_device_io_node() {
+    return audio::manageable_device_io_node{impl_ptr<manageable_device_io_node::impl>()};
 }
 
 #endif
