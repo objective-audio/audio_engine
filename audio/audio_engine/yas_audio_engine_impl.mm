@@ -239,7 +239,7 @@ void audio::engine::impl::disconnect(audio::connection &connection) {
     std::vector<node> update_nodes{connection.source_node(), connection.destination_node()};
 
     remove_connection_from_nodes(connection);
-    static_cast<manageable_connection &>(connection)._remove_nodes();
+    connection.node_removable().remove_nodes();
 
     for (auto &node : update_nodes) {
         static_cast<manageable_node &>(node)._update_connections();
@@ -265,7 +265,7 @@ void audio::engine::impl::disconnect_node_with_predicate(std::function<bool(conn
         update_nodes.insert(connection.source_node());
         update_nodes.insert(connection.destination_node());
         remove_connection_from_nodes(connection);
-        static_cast<manageable_connection &>(connection)._remove_nodes();
+        connection.node_removable().remove_nodes();
     }
 
     for (auto node : update_nodes) {

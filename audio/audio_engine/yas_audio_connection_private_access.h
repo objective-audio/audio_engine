@@ -16,15 +16,15 @@ namespace audio {
         }
 
         static void remove_nodes(connection &connection) {
-            connection._remove_nodes();
+            connection.node_removable().remove_nodes();
         }
 
         static void remove_source_node(connection &connection) {
-            connection._remove_source_node();
+            connection.node_removable().remove_source_node();
         }
 
         static void remove_destination_node(connection &connection) {
-            connection._remove_destination_node();
+            connection.node_removable().remove_destination_node();
         }
     };
 }

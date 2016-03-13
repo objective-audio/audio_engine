@@ -8,7 +8,7 @@
 
 using namespace yas;
 
-class audio::connection::impl : public base::impl {
+class audio::connection::impl : public base::impl, public node_removable::impl {
    public:
     UInt32 source_bus;
 
@@ -114,14 +114,6 @@ audio::format const &audio::connection::format() const {
     return impl_ptr<impl>()->format;
 }
 
-void audio::connection::_remove_nodes() {
-    impl_ptr<impl>()->remove_nodes();
-}
-
-void audio::connection::_remove_source_node() {
-    impl_ptr<impl>()->remove_source_node();
-}
-
-void audio::connection::_remove_destination_node() {
-    impl_ptr<impl>()->remove_destination_node();
+audio::node_removable audio::connection::node_removable() {
+    return audio::node_removable{impl_ptr<node_removable::impl>()};
 }

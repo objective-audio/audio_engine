@@ -7,6 +7,7 @@
 #include <MacTypes.h>
 #include <unordered_set>
 #include "yas_base.h"
+#include "yas_protocol.h"
 
 namespace yas {
 namespace audio {
@@ -16,13 +17,27 @@ namespace audio {
     using connection_smap = std::map<UInt32, connection>;
     using connection_wmap = std::map<UInt32, weak<connection>>;
 
-    class manageable_connection {
-       public:
-        virtual ~manageable_connection() = default;
+    struct node_removable : protocol {
+        struct impl : protocol::impl {
+            virtual void remove_nodes() = 0;
+            virtual void remove_source_node() = 0;
+            virtual void remove_destination_node() = 0;
+        };
 
-        virtual void _remove_nodes() = 0;
-        virtual void _remove_source_node() = 0;
-        virtual void _remove_destination_node() = 0;
+        explicit node_removable(std::shared_ptr<impl> impl) : protocol(impl) {
+        }
+
+        void remove_nodes() {
+            impl_ptr<impl>()->remove_nodes();
+        }
+
+        void remove_source_node() {
+            impl_ptr<impl>()->remove_source_node();
+        }
+
+        void remove_destination_node() {
+            impl_ptr<impl>()->remove_destination_node();
+        }
     };
 }
 }
