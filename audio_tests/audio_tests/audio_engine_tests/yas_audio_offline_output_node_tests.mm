@@ -198,8 +198,8 @@
         }
     };
 
-    auto result = yas::audio::offline_output_node::private_access::start(output_node, std::move(start_render_function),
-                                                                         std::move(completion_function));
+    auto result = output_node.manageable_offline_output_unit().start(std::move(start_render_function),
+                                                                     std::move(completion_function));
 
     XCTAssertTrue(result);
 
@@ -247,8 +247,7 @@
         }
     };
 
-    auto result = yas::audio::offline_output_node::private_access::start(output_node, std::move(render_func),
-                                                                         completion_function);
+    auto result = output_node.manageable_offline_output_unit().start(std::move(render_func), completion_function);
 
     XCTAssertTrue(result);
 

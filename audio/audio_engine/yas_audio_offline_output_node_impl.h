@@ -4,15 +4,15 @@
 
 #pragma once
 
-class yas::audio::offline_output_node::impl : public super_class::impl {
+class yas::audio::offline_output_node::impl : public super_class::impl, public manageable_offline_output_unit::impl {
     using super_class = super_class::impl;
 
    public:
     impl();
     ~impl();
 
-    offline_start_result_t start(offline_render_f &&render_func, offline_completion_f &&completion_func);
-    void stop();
+    offline_start_result_t start(offline_render_f &&render_func, offline_completion_f &&completion_func) override;
+    void stop() override;
 
     virtual void reset() override;
 
