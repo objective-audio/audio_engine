@@ -5,7 +5,6 @@
 #pragma once
 
 #include <unordered_set>
-#include "yas_objc_ptr.h"
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
 #include "yas_audio_device.h"
 #endif
@@ -18,8 +17,6 @@ class yas::audio::engine::impl : public yas::base::impl {
     void prepare(engine const &);
 
     weak<engine> &weak_engine() const;
-    objc::container<> &reset_observer() const;
-    objc::container<> &route_change_observer() const;
     yas::subject<engine> &subject() const;
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
     observer<audio::device::change_info> &device_observer();
