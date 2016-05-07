@@ -3,6 +3,7 @@
 //
 
 #import <Accelerate/Accelerate.h>
+#import <iostream>
 #import "YASAudioOfflineSampleViewController.h"
 #import "yas_audio.h"
 
@@ -157,7 +158,7 @@ namespace sample {
 
             engine_observer = play_engine.subject().make_observer(
                 yas::audio::engine::configuration_change_key,
-                [weak_play_output_node = to_weak(play_output_node)](const auto &, const auto &) {
+                [weak_play_output_node = to_weak(play_output_node)](const auto &) {
                     if (auto play_output_node = weak_play_output_node.lock()) {
                         play_output_node.set_device(yas::audio::device::default_output_device());
                     }

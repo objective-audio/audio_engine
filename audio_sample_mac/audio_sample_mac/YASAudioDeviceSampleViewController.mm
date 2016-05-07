@@ -2,12 +2,12 @@
 //  YASAudioDeviceSampleViewController.m
 //
 
+#import <Accelerate/Accelerate.h>
+#import <atomic>
 #import "YASAudioDeviceSampleViewController.h"
 #import "YASDecibelValueTransformer.h"
 #import "YASFrequencyValueFormatter.h"
 #import "yas_audio.h"
-#import <atomic>
-#import <Accelerate/Accelerate.h>
 
 static const UInt32 kSineDataMaxCount = 4096;
 
@@ -95,7 +95,7 @@ namespace audio_device_sample {
 
                 if (frame_length < kSineDataMaxCount) {
                     _phase = yas::audio::math::fill_sine(&_sine_data[0], frame_length, start_phase,
-                                                        freq / sample_rate * yas::audio::math::two_pi);
+                                                         freq / sample_rate * yas::audio::math::two_pi);
 
                     while (pointer->v) {
                         cblas_saxpy(frame_length, sine_vol, &_sine_data[0], 1, pointer->f32, 1);
@@ -179,8 +179,7 @@ namespace sample {
     self.sineFrequency = _internal.kernel->sine_frequency();
 
     _internal.system_observer = yas::audio::device::system_subject().make_observer(
-        yas::audio::device::hardware_did_change_key,
-        [weak_container = _internal.self_container](const auto &, const auto &) {
+        yas::audio::device::hardware_did_change_key, [weak_container = _internal.self_container](const auto &) {
             if (auto strong_container = weak_container.lock()) {
                 YASAudioDeviceSampleViewController *strongSelf = strong_container.object();
                 [strongSelf _updateDeviceNames];
@@ -309,8 +308,9 @@ namespace sample {
         _internal.device_io.set_device(selected_device);
 
         _internal.device_observer = selected_device.subject().make_observer(
-            yas::audio::device::device_did_change_key, [selected_device, weak_container = _internal.self_container](
-                                                           const std::string &method, const auto &change_info) {
+            yas::audio::device::device_did_change_key,
+            [selected_device, weak_container = _internal.self_container](auto const &context) {
+                const auto &change_info = context.value;
                 const auto &infos = change_info.property_infos;
                 if (infos.size() > 0) {
                     auto &device_id = infos.at(0).object_id;
