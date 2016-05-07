@@ -96,7 +96,7 @@ void audio::engine::impl::prepare(engine const &engine) {
 
 #elif TARGET_OS_MAC
     _core->device_observer.add_handler(device::system_subject(), device::configuration_change_key,
-                                       [weak_engine = _core->weak_engine](auto const &method, auto const &infos) {
+                                       [weak_engine = _core->weak_engine](auto const &context) {
                                            if (auto engine = weak_engine.lock()) {
                                                engine.impl_ptr<impl>()->post_configuration_change();
                                            }

@@ -50,10 +50,11 @@
     bool called = false;
 
     auto will_observer = parameter.subject().make_observer(
-        yas::audio::unit::parameter::will_change_key,
-        [self, &called](const auto &key, const yas::audio::unit::parameter::change_info &change_info) {
-            XCTAssertTrue(key == yas::audio::unit::parameter::will_change_key);
-            const AudioUnitElement element = change_info.element;
+        yas::audio::unit::parameter::will_change_key, [self, &called](auto const &context) {
+            auto const &change_info = context.value;
+
+            XCTAssertTrue(context.key == yas::audio::unit::parameter::will_change_key);
+            const AudioUnitElement element = context.value.element;
             XCTAssertEqual(element, 2);
             XCTAssertEqual(change_info.old_value, 0.0f);
             XCTAssertEqual(change_info.new_value, 1.0f);
@@ -74,9 +75,10 @@
     bool called = false;
 
     auto will_observer = parameter.subject().make_observer(
-        yas::audio::unit::parameter::did_change_key,
-        [self, &called](const auto &key, const yas::audio::unit::parameter::change_info &change_info) {
-            XCTAssertTrue(key == yas::audio::unit::parameter::did_change_key);
+        yas::audio::unit::parameter::did_change_key, [self, &called](auto const &context) {
+            auto const &change_info = context.value;
+
+            XCTAssertTrue(context.key == yas::audio::unit::parameter::did_change_key);
             const AudioUnitElement element = change_info.element;
             XCTAssertEqual(element, 10);
             XCTAssertEqual(change_info.old_value, -1.0f);

@@ -2,6 +2,7 @@
 //  yas_audio_unit_node_impl.cpp
 //
 
+#include <iostream>
 #include "yas_audio_graph.h"
 #include "yas_audio_time.h"
 #include "yas_audio_unit.h"

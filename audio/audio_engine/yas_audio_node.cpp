@@ -2,6 +2,7 @@
 //  yas_audio_node.cpp
 //
 
+#include <iostream>
 #include "yas_audio_connection.h"
 #include "yas_audio_engine.h"
 #include "yas_audio_node.h"

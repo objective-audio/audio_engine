@@ -2,9 +2,9 @@
 //  YASAudioEngineSampleViewController.m
 //
 
+#import <Accelerate/Accelerate.h>
 #import "YASAudioEngineDeviceIOSampleViewController.h"
 #import "yas_audio.h"
-#import <Accelerate/Accelerate.h>
 
 typedef NS_ENUM(NSUInteger, YASAudioDeviceRouteSampleSourceBus) {
     YASAudioDeviceRouteSampleSourceBusSine = 0,
@@ -194,7 +194,8 @@ namespace sample {
         const Float64 start_phase = next_phase;
         const Float64 phase_per_frame = 1000.0 / buffer.format().sample_rate() * yas::audio::math::two_pi;
         while (flex_ptr->v) {
-            next_phase = yas::audio::math::fill_sine(flex_ptr->f32, buffer.frame_length(), start_phase, phase_per_frame);
+            next_phase =
+                yas::audio::math::fill_sine(flex_ptr->f32, buffer.frame_length(), start_phase, phase_per_frame);
             cblas_sscal(buffer.frame_length(), 0.2, flex_ptr->f32, 1);
             yas_audio_frame_enumerator_move_channel(enumerator);
         }
@@ -203,8 +204,7 @@ namespace sample {
     _internal.tap_node.set_render_function(render_function);
 
     _internal.system_observer = yas::audio::device::system_subject().make_observer(
-        yas::audio::device::hardware_did_change_key,
-        [weak_container = _internal.self_container](const auto &method, const auto &infos) {
+        yas::audio::device::hardware_did_change_key, [weak_container = _internal.self_container](const auto &context) {
             if (auto strong_container = weak_container.lock()) {
                 YASAudioEngineDeviceIOSampleViewController *strongSelf = strong_container.object();
                 [strongSelf _updateDeviceNames];
@@ -392,8 +392,9 @@ namespace sample {
         _internal.device_io_node.set_device(selected_device);
 
         _internal.device_observer = selected_device.subject().make_observer(
-            yas::audio::device::device_did_change_key, [selected_device, weak_container = _internal.self_container](
-                                                           const std::string &method, const auto &change_info) {
+            yas::audio::device::device_did_change_key,
+            [selected_device, weak_container = _internal.self_container](auto const &context) {
+                const auto &change_info = context.value;
                 const auto &infos = change_info.property_infos;
                 if (change_info.property_infos.size() > 0) {
                     const auto &device_id = infos.at(0).object_id;
