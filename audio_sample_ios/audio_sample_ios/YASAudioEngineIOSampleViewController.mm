@@ -197,7 +197,7 @@ namespace sample {
 
     _internal.engine_observer = _internal.engine.subject().make_observer(
         yas::audio::engine::configuration_change_key,
-        [weak_container = _internal.self_container](const auto &method, const auto &sender) {
+        [weak_container = _internal.self_container](const auto &context) {
             if (auto strong_self = weak_container.lock()) {
                 if ([UIApplication sharedApplication].applicationState == UIApplicationStateActive) {
                     YASAudioEngineIOSampleViewController *controller = strong_self.object();

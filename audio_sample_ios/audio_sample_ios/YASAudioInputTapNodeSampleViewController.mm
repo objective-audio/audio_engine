@@ -2,9 +2,9 @@
 //  YASAudioInputTapNodeSampleViewController.mm
 //
 
+#import <Accelerate/Accelerate.h>
 #import "YASAudioInputTapNodeSampleViewController.h"
 #import "yas_audio.h"
-#import <Accelerate/Accelerate.h>
 
 @interface YASAudioInputTapNodeSampleViewController ()
 
@@ -25,11 +25,10 @@ namespace sample {
         yas::audio::unit_input_node input_node;
         yas::audio::input_tap_node input_tap_node;
 
-        yas::property<Float32, property_key> input_level;
+        yas::property<Float32, property_key> input_level{
+            {.key = property_key::input_level, .value = yas::audio::math::decibel_from_linear(0.0f)}};
 
-        input_tap_node_vc_internal()
-            : input_level(property_key::input_level, yas::audio::math::decibel_from_linear(0.0)) {
-        }
+        input_tap_node_vc_internal() = default;
 
         void prepare() {
             const Float64 sample_rate = input_node.device_sample_rate();

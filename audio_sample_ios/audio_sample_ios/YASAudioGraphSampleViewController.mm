@@ -2,6 +2,7 @@
 //  YASAudioGraphSampleViewController.m
 //
 
+#import <iostream>
 #import "YASAudioGraphSampleViewController.h"
 #import "yas_audio.h"
 

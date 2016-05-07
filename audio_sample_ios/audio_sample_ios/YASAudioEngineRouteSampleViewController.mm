@@ -2,8 +2,8 @@
 //  YASAudioEngineRouteSampleViewController.m
 //
 
-#import "YASAudioEngineRouteSampleViewController.h"
 #import "YASAudioEngineRouteSampleSelectionViewController.h"
+#import "YASAudioEngineRouteSampleViewController.h"
 #import "YASAudioSliderCell.h"
 #import "yas_audio.h"
 
@@ -238,21 +238,21 @@ namespace sample {
 
     Float64 phase = 0;
 
-    auto tap_render_function =
-        [phase](yas::audio::pcm_buffer &buffer, const UInt32 bus_idx, const yas::audio::time &when) mutable {
-            buffer.clear();
+    auto tap_render_function = [phase](yas::audio::pcm_buffer &buffer, const UInt32 bus_idx,
+                                       const yas::audio::time &when) mutable {
+        buffer.clear();
 
-            const Float64 start_phase = phase;
-            const Float64 phase_per_frame = 1000.0 / buffer.format().sample_rate() * yas::audio::math::two_pi;
-            yas::audio::frame_enumerator enumerator(buffer);
-            const auto *flex_ptr = enumerator.pointer();
-            const UInt32 length = enumerator.frame_length();
+        const Float64 start_phase = phase;
+        const Float64 phase_per_frame = 1000.0 / buffer.format().sample_rate() * yas::audio::math::two_pi;
+        yas::audio::frame_enumerator enumerator(buffer);
+        const auto *flex_ptr = enumerator.pointer();
+        const UInt32 length = enumerator.frame_length();
 
-            while (flex_ptr->v) {
-                phase = yas::audio::math::fill_sine(flex_ptr->f32, length, start_phase, phase_per_frame);
-                yas_audio_frame_enumerator_move_channel(enumerator);
-            }
-        };
+        while (flex_ptr->v) {
+            phase = yas::audio::math::fill_sine(flex_ptr->f32, length, start_phase, phase_per_frame);
+            yas_audio_frame_enumerator_move_channel(enumerator);
+        }
+    };
 
     _internal.sine_node.set_render_function(tap_render_function);
 
@@ -261,8 +261,7 @@ namespace sample {
     }
 
     _internal.engine_observer = _internal.engine.subject().make_observer(
-        yas::audio::engine::configuration_change_key,
-        [weak_container = _internal.self_container](const auto &method, const auto &sender) {
+        yas::audio::engine::configuration_change_key, [weak_container = _internal.self_container](const auto &context) {
             if (auto strong_self = weak_container.lock()) {
                 if ([UIApplication sharedApplication].applicationState == UIApplicationStateActive) {
                     YASAudioEngineRouteSampleViewController *controller = strong_self.object();
