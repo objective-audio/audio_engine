@@ -68,7 +68,7 @@ class audio::device_io::impl : public base::impl {
 
         observer.add_handler(
             device::system_subject(), device::hardware_did_change_key,
-            [weak_device_io = weak_device_io](auto const &method, auto const &infos) {
+            [weak_device_io = weak_device_io](auto const &context) {
                 if (auto device_io = weak_device_io.lock()) {
                     if (device_io.device() && !device::device_for_id(device_io.device().audio_device_id())) {
                         device_io.set_device(nullptr);
@@ -93,7 +93,7 @@ class audio::device_io::impl : public base::impl {
 
             if (device) {
                 observer.add_handler(device.subject(), device::device_did_change_key,
-                                     [weak_device_io = weak_device_io](auto const &method, auto const &infos) {
+                                     [weak_device_io = weak_device_io](auto const &context) {
                                          if (auto device_io = weak_device_io.lock()) {
                                              device_io.impl_ptr<impl>()->update_kernel();
                                          }
