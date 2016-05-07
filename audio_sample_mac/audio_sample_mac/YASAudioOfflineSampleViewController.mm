@@ -6,6 +6,7 @@
 #import <iostream>
 #import "YASAudioOfflineSampleViewController.h"
 #import "yas_audio.h"
+#import "yas_objc_unowned.h"
 
 namespace yas {
 namespace offline_sample {
@@ -128,8 +129,6 @@ namespace sample {
 
         yas::base engine_observer = nullptr;
 
-        yas::objc::container<yas::objc::weak> self_container;
-
         offline_vc_internal() {
             auto format =
                 yas::audio::format(yas::offline_sample::sample_rate, 2, yas::audio::pcm_format::float32, false);
@@ -170,14 +169,6 @@ namespace sample {
 
 @implementation YASAudioOfflineSampleViewController {
     yas::sample::offline_vc_internal _internal;
-}
-
-- (void)dealloc {
-    if (_internal.self_container) {
-        _internal.self_container.set_object(nil);
-    }
-
-    yas_super_dealloc();
 }
 
 - (void)viewDidLoad {
@@ -264,11 +255,10 @@ namespace sample {
 
     self.processing = YES;
 
-    if (!_internal.self_container) {
-        _internal.self_container.set_object(self);
-    }
-
     UInt32 remain = self.length * yas::offline_sample::sample_rate;
+
+    auto unowned_self = yas::make_objc_ptr([[YASUnownedObject<YASAudioOfflineSampleViewController *> alloc] init]);
+    [unowned_self.object() setObject:self];
 
     auto start_result = _internal.offline_engine.start_offline_render(
         [remain, file_writer = std::move(file_writer)](yas::audio::pcm_buffer & buffer, const auto &when,
@@ -293,12 +283,7 @@ namespace sample {
                 out_stop = YES;
             }
         },
-        [weak_container = _internal.self_container](const bool cancelled) {
-            if (auto strong_container = weak_container.lock()) {
-                YASAudioOfflineSampleViewController *controller = strong_container.object();
-                controller.processing = NO;
-            }
-        });
+        [unowned_self](const bool cancelled) { [unowned_self.object() object].processing = NO; });
 
     if (!start_result) {
         self.processing = NO;
