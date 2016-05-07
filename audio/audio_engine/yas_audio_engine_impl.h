@@ -5,7 +5,7 @@
 #pragma once
 
 #include <unordered_set>
-#include "yas_objc_container.h"
+#include "yas_objc_ptr.h"
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
 #include "yas_audio_device.h"
 #endif
