@@ -53,11 +53,11 @@ audio::unit::parameter_map_t const &audio::unit_node::output_parameters() const 
     return impl_ptr<impl>()->output_parameters();
 }
 
-UInt32 audio::unit_node::input_element_count() const {
+uint32_t audio::unit_node::input_element_count() const {
     return impl_ptr<impl>()->input_element_count();
 }
 
-UInt32 audio::unit_node::output_element_count() const {
+uint32_t audio::unit_node::output_element_count() const {
     return impl_ptr<impl>()->output_element_count();
 }
 

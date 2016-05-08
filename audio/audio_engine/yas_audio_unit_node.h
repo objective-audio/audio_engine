@@ -30,8 +30,8 @@ namespace audio {
         std::unordered_map<AudioUnitParameterID, audio::unit::parameter> const &input_parameters() const;
         std::unordered_map<AudioUnitParameterID, audio::unit::parameter> const &output_parameters() const;
 
-        UInt32 input_element_count() const;
-        UInt32 output_element_count() const;
+        uint32_t input_element_count() const;
+        uint32_t output_element_count() const;
 
         void set_global_parameter_value(AudioUnitParameterID const parameter_id, Float32 const value);
         Float32 global_parameter_value(AudioUnitParameterID const parameter_id) const;
