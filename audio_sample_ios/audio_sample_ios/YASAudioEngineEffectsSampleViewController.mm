@@ -2,9 +2,11 @@
 //  YASAudioEngineEffectsSampleViewController.m
 //
 
-#import "YASAudioEngineEffectsSampleViewController.h"
 #import "YASAudioEngineEffectsSampleEditViewController.h"
+#import "YASAudioEngineEffectsSampleViewController.h"
 #import "yas_audio.h"
+
+using namespace yas;
 
 typedef NS_ENUM(NSUInteger, YASAudioEngineEffectsSampleSection) {
     YASAudioEngineEffectsSampleSectionNone,
@@ -25,11 +27,11 @@ static const AudioComponentDescription baseAcd = {.componentType = kAudioUnitTyp
 namespace yas {
 namespace sample {
     struct effects_vc_internal {
-        yas::audio::engine engine;
-        yas::audio::unit_output_node output_node;
-        yas::audio::connection through_connection = nullptr;
-        yas::audio::tap_node tap_node;
-        yas::audio::unit_node effect_node = nullptr;
+        audio::engine engine;
+        audio::unit_output_node output_node;
+        audio::connection through_connection = nullptr;
+        audio::tap_node tap_node;
+        audio::unit_node effect_node = nullptr;
 
         void replace_effect_node(const AudioComponentDescription *acd) {
             if (effect_node) {
@@ -42,10 +44,10 @@ namespace sample {
                 through_connection = nullptr;
             }
 
-            auto format = yas::audio::format([AVAudioSession sharedInstance].sampleRate, 2);
+            auto format = audio::format([AVAudioSession sharedInstance].sampleRate, 2);
 
             if (acd) {
-                effect_node = yas::audio::unit_node(*acd);
+                effect_node = audio::unit_node(*acd);
                 engine.connect(effect_node, output_node, format);
                 engine.connect(tap_node, effect_node, format);
             } else {
@@ -57,9 +59,9 @@ namespace sample {
 }
 
 @implementation YASAudioEngineEffectsSampleViewController {
-    std::vector<yas::audio::unit> _audio_units;
+    std::vector<audio::unit> _audio_units;
     std::experimental::optional<UInt32> _index;
-    yas::sample::effects_vc_internal _internal;
+    sample::effects_vc_internal _internal;
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -78,8 +80,8 @@ namespace sample {
                 success = YES;
                 [self.tableView reloadData];
             } else {
-                const auto error_string = yas::to_string(start_result.error());
-                errorMessage = (__bridge NSString *)yas::to_cf_object(error_string);
+                const auto error_string = to_string(start_result.error());
+                errorMessage = (__bridge NSString *)to_cf_object(error_string);
             }
         } else {
             errorMessage = error.description;
@@ -131,37 +133,37 @@ namespace sample {
             component = AudioComponentFindNext(component, &baseAcd);
             if (component != NULL) {
                 AudioComponentDescription acd;
-                yas::raise_if_au_error(AudioComponentGetDescription(component, &acd));
-                _audio_units.push_back(yas::audio::unit(acd));
+                raise_if_au_error(AudioComponentGetDescription(component, &acd));
+                _audio_units.push_back(audio::unit(acd));
             } else {
                 break;
             }
         }
     }
 
-    _internal = yas::sample::effects_vc_internal();
+    _internal = sample::effects_vc_internal();
 
     Float64 phase = 0;
 
-    auto tap_render_function =
-        [phase](yas::audio::pcm_buffer &buffer, const UInt32 bus_idx, const yas::audio::time &when) mutable {
-            buffer.clear();
+    auto tap_render_function = [phase](audio::pcm_buffer &buffer, const UInt32 bus_idx,
+                                       const audio::time &when) mutable {
+        buffer.clear();
 
-            const Float64 start_phase = phase;
-            const Float64 phase_per_frame = 1000.0 / buffer.format().sample_rate() * yas::audio::math::two_pi;
-            yas::audio::frame_enumerator enumerator(buffer);
-            const auto *flex_ptr = enumerator.pointer();
-            const UInt32 length = enumerator.frame_length();
+        const Float64 start_phase = phase;
+        const Float64 phase_per_frame = 1000.0 / buffer.format().sample_rate() * audio::math::two_pi;
+        audio::frame_enumerator enumerator(buffer);
+        const auto *flex_ptr = enumerator.pointer();
+        const UInt32 length = enumerator.frame_length();
 
-            UInt32 idx = 0;
-            while (flex_ptr->v) {
-                if (idx == 0) {
-                    phase = yas::audio::math::fill_sine(flex_ptr->f32, length, start_phase, phase_per_frame);
-                }
-                idx++;
-                yas_audio_frame_enumerator_move_channel(enumerator);
+        UInt32 idx = 0;
+        while (flex_ptr->v) {
+            if (idx == 0) {
+                phase = audio::math::fill_sine(flex_ptr->f32, length, start_phase, phase_per_frame);
             }
-        };
+            idx++;
+            yas_audio_frame_enumerator_move_channel(enumerator);
+        }
+    };
 
     _internal.tap_node.set_render_function(tap_render_function);
 

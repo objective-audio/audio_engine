@@ -6,6 +6,8 @@
 #import "YASAudioGraphSampleViewController.h"
 #import "yas_audio.h"
 
+using namespace yas;
+
 @interface YASAudioGraphSampleViewController ()
 
 @property (nonatomic, strong) IBOutlet UISlider *slider;
@@ -15,20 +17,20 @@
 namespace yas {
 namespace sample {
     struct graph_vc_internal {
-        yas::audio::graph graph = nullptr;
-        yas::audio::unit io_unit = nullptr;
-        yas::audio::unit mixer_unit = nullptr;
+        audio::graph graph = nullptr;
+        audio::unit io_unit = nullptr;
+        audio::unit mixer_unit = nullptr;
 
         graph_vc_internal() {
             AVAudioSession *audioSession = [AVAudioSession sharedInstance];
             [audioSession setCategory:AVAudioSessionCategoryPlayAndRecord error:nil];
             const Float64 sample_rate = [audioSession sampleRate];
 
-            auto format = yas::audio::format(sample_rate, 2);
+            auto format = audio::format(sample_rate, 2);
 
-            graph = yas::audio::graph{};
+            graph = audio::graph{};
 
-            io_unit = yas::audio::unit(kAudioUnitType_Output, yas::audio::unit::sub_type_default_io());
+            io_unit = audio::unit(kAudioUnitType_Output, audio::unit::sub_type_default_io());
             io_unit.set_enable_input(true);
             io_unit.set_enable_output(true);
             io_unit.set_maximum_frames_per_slice(4096);
@@ -39,7 +41,7 @@ namespace sample {
             io_unit.set_input_format(format.stream_description(), 0);
             io_unit.set_output_format(format.stream_description(), 1);
 
-            mixer_unit = yas::audio::unit(kAudioUnitType_Mixer, kAudioUnitSubType_MultiChannelMixer);
+            mixer_unit = audio::unit(kAudioUnitType_Mixer, kAudioUnitSubType_MultiChannelMixer);
             mixer_unit.set_maximum_frames_per_slice(4096);
 
             graph.add_audio_unit(mixer_unit);
@@ -49,17 +51,17 @@ namespace sample {
             mixer_unit.set_output_format(format.stream_description(), 0);
             mixer_unit.set_input_format(format.stream_description(), 0);
 
-            auto weak_mixer_unit = yas::weak<yas::audio::unit>(mixer_unit);
+            auto weak_mixer_unit = weak<audio::unit>(mixer_unit);
 
-            io_unit.set_render_callback([weak_mixer_unit](yas::audio::render_parameters &render_parameters) {
+            io_unit.set_render_callback([weak_mixer_unit](audio::render_parameters &render_parameters) {
                 if (auto shared_mixer_unit = weak_mixer_unit.lock()) {
                     shared_mixer_unit.audio_unit_render(render_parameters);
                 }
             });
 
-            auto weak_io_unit = yas::weak<yas::audio::unit>(io_unit);
+            auto weak_io_unit = weak<audio::unit>(io_unit);
 
-            mixer_unit.set_render_callback([weak_io_unit](yas::audio::render_parameters &render_parameters) {
+            mixer_unit.set_render_callback([weak_io_unit](audio::render_parameters &render_parameters) {
                 if (auto shared_io_unit = weak_io_unit.lock()) {
                     render_parameters.in_bus_number = 1;
                     try {
@@ -75,7 +77,7 @@ namespace sample {
 }
 
 @implementation YASAudioGraphSampleViewController {
-    yas::sample::graph_vc_internal _internal;
+    sample::graph_vc_internal _internal;
 }
 
 - (void)dealloc {
