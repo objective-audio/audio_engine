@@ -27,11 +27,11 @@ void audio::tap_node::impl::reset() {
     node::impl::reset();
 }
 
-UInt32 audio::tap_node::impl::input_bus_count() const {
+uint32_t audio::tap_node::impl::input_bus_count() const {
     return 1;
 }
 
-UInt32 audio::tap_node::impl::output_bus_count() const {
+uint32_t audio::tap_node::impl::output_bus_count() const {
     return 1;
 }
 
@@ -52,11 +52,11 @@ void audio::tap_node::impl::set_render_function(render_f &&func) {
     update_kernel();
 }
 
-audio::connection audio::tap_node::impl::input_connection_on_render(UInt32 const bus_idx) const {
+audio::connection audio::tap_node::impl::input_connection_on_render(uint32_t const bus_idx) const {
     return _core->kernel_on_render->input_connection(bus_idx);
 }
 
-audio::connection audio::tap_node::impl::output_connection_on_render(UInt32 const bus_idx) const {
+audio::connection audio::tap_node::impl::output_connection_on_render(uint32_t const bus_idx) const {
     return _core->kernel_on_render->output_connection(bus_idx);
 }
 
@@ -68,7 +68,7 @@ audio::connection_smap audio::tap_node::impl::output_connections_on_render() con
     return _core->kernel_on_render->output_connections();
 }
 
-void audio::tap_node::impl::render(pcm_buffer &buffer, UInt32 const bus_idx, time const &when) {
+void audio::tap_node::impl::render(pcm_buffer &buffer, uint32_t const bus_idx, time const &when) {
     node::impl::render(buffer, bus_idx, when);
 
     if (auto kernel = kernel_cast<tap_node::kernel>()) {
@@ -86,7 +86,7 @@ void audio::tap_node::impl::render(pcm_buffer &buffer, UInt32 const bus_idx, tim
     }
 }
 
-void audio::tap_node::impl::render_source(pcm_buffer &buffer, UInt32 const bus_idx, time const &when) {
+void audio::tap_node::impl::render_source(pcm_buffer &buffer, uint32_t const bus_idx, time const &when) {
     if (auto connection = _core->kernel_on_render->input_connection(bus_idx)) {
         if (auto node = connection.source_node()) {
             node.render(buffer, connection.source_bus(), when);
@@ -96,10 +96,10 @@ void audio::tap_node::impl::render_source(pcm_buffer &buffer, UInt32 const bus_i
 
 #pragma mark - input_tap_node
 
-UInt32 audio::input_tap_node::impl::input_bus_count() const {
+uint32_t audio::input_tap_node::impl::input_bus_count() const {
     return 1;
 }
 
-UInt32 audio::input_tap_node::impl::output_bus_count() const {
+uint32_t audio::input_tap_node::impl::output_bus_count() const {
     return 0;
 }
