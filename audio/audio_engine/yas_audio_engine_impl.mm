@@ -107,7 +107,7 @@ weak<audio::engine> &audio::engine::impl::weak_engine() const {
     return _core->weak_engine;
 }
 
-yas::subject<audio::engine> &audio::engine::impl::subject() const {
+subject<audio::engine> &audio::engine::impl::subject() const {
     return _core->subject;
 }
 
@@ -393,7 +393,7 @@ void audio::engine::impl::set_graph(audio::graph const &graph) {
     _core->graph = graph;
 }
 
-yas::audio::graph audio::engine::impl::graph() const {
+audio::graph audio::engine::impl::graph() const {
     return _core->graph;
 }
 

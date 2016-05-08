@@ -36,7 +36,7 @@ struct audio::file::impl {
     }
 
     void set_url(CFURLRef const url) {
-        yas::set_cf_property(_url, url);
+        set_cf_property(_url, url);
     }
 
     CFURLRef url() const {
@@ -44,7 +44,7 @@ struct audio::file::impl {
     }
 
     void set_file_type(CFStringRef const file_type) {
-        yas::set_cf_property(_file_type, file_type);
+        set_cf_property(_file_type, file_type);
     }
 
     CFStringRef file_type() const {
@@ -190,7 +190,7 @@ audio::file::open_result_t audio::file::open(open_args args) {
         return open_result_t(open_error_t::opened);
     }
 
-    if (!args.file_url || args.pcm_format == yas::audio::pcm_format::other) {
+    if (!args.file_url || args.pcm_format == audio::pcm_format::other) {
         return open_result_t(open_error_t::invalid_argument);
     }
 

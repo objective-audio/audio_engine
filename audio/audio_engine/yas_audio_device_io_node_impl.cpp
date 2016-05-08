@@ -105,13 +105,13 @@ void audio::device_io_node::impl::update_connections() {
         }
     };
 
-    device_io.set_render_callback(render_function);
+    device_io.set_render_callback(std::move(render_function));
 }
 
 bool audio::device_io_node::impl::_validate_connections() const {
     if (auto const &device_io = _core->device_io) {
         if (input_connections().size() > 0) {
-            auto const connections = yas::lock_values(input_connections());
+            auto const connections = lock_values(input_connections());
             if (connections.count(0) > 0) {
                 auto const &connection = connections.at(0);
                 auto const &connection_format = connection.format();
@@ -124,7 +124,7 @@ bool audio::device_io_node::impl::_validate_connections() const {
         }
 
         if (output_connections().size() > 0) {
-            auto const connections = yas::lock_values(output_connections());
+            auto const connections = lock_values(output_connections());
             if (connections.count(0) > 0) {
                 auto const &connection = connections.at(0);
                 auto const &connection_format = connection.format();

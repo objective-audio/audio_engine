@@ -30,7 +30,7 @@ namespace audio {
             offline_output_starting_failure,
         };
 
-        using start_result_t = yas::result<std::nullptr_t, start_error_t>;
+        using start_result_t = result<std::nullptr_t, start_error_t>;
 
         engine();
         engine(std::nullptr_t);
