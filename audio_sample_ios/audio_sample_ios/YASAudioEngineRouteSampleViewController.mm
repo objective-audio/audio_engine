@@ -6,6 +6,7 @@
 #import "YASAudioEngineRouteSampleViewController.h"
 #import "YASAudioSliderCell.h"
 #import "yas_audio.h"
+#import "yas_objc_unowned.h"
 
 static UInt32 const YASAudioEngineRouteSampleDestinationChannelCount = 2;
 
@@ -37,11 +38,6 @@ namespace sample {
         yas::audio::tap_node sine_node;
 
         yas::base engine_observer = nullptr;
-        yas::objc::container<yas::objc::weak> self_container;
-
-        ~route_vc_internal() {
-            self_container.set_object(nil);
-        }
 
         void disconnectNodes() {
             engine.disconnect(mixer_node);
@@ -256,17 +252,13 @@ namespace sample {
 
     _internal.sine_node.set_render_function(tap_render_function);
 
-    if (!_internal.self_container) {
-        _internal.self_container.set_object(self);
-    }
+    auto unowned_self = yas::make_objc_ptr([[YASUnownedObject alloc] init]);
+    [unowned_self.object() setObject:self];
 
     _internal.engine_observer = _internal.engine.subject().make_observer(
-        yas::audio::engine::configuration_change_key, [weak_container = _internal.self_container](const auto &context) {
-            if (auto strong_self = weak_container.lock()) {
-                if ([UIApplication sharedApplication].applicationState == UIApplicationStateActive) {
-                    YASAudioEngineRouteSampleViewController *controller = strong_self.object();
-                    [controller _updateEngine];
-                }
+        yas::audio::engine::configuration_change_key, [unowned_self](const auto &context) {
+            if ([UIApplication sharedApplication].applicationState == UIApplicationStateActive) {
+                [[unowned_self.object() object] _updateEngine];
             }
         });
 

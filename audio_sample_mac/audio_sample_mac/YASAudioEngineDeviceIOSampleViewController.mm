@@ -5,6 +5,7 @@
 #import <Accelerate/Accelerate.h>
 #import "YASAudioEngineDeviceIOSampleViewController.h"
 #import "yas_audio.h"
+#import "yas_objc_unowned.h"
 
 typedef NS_ENUM(NSUInteger, YASAudioDeviceRouteSampleSourceBus) {
     YASAudioDeviceRouteSampleSourceBusSine = 0,
@@ -102,12 +103,6 @@ namespace sample {
 
         yas::base system_observer = nullptr;
         yas::base device_observer = nullptr;
-
-        yas::objc::container<yas::objc::weak> self_container;
-
-        ~device_io_vc_internal() {
-            self_container.set_object(nil);
-        }
     };
 }
 }
@@ -177,16 +172,12 @@ namespace sample {
     _internal.route_node = yas::audio::route_node{};
     _internal.tap_node = yas::audio::tap_node{};
 
-    if (!_internal.self_container) {
-        _internal.self_container.set_object(self);
-    }
-
     auto weak_node = yas::to_weak(_internal.tap_node);
 
     Float64 next_phase = 0.0;
 
-    auto render_function = [next_phase, weak_node, weak_container = _internal.self_container](
-        yas::audio::pcm_buffer & buffer, const UInt32 bus_idx, const yas::audio::time &when) mutable {
+    auto render_function = [next_phase, weak_node](yas::audio::pcm_buffer &buffer, const UInt32 bus_idx,
+                                                   const yas::audio::time &when) mutable {
         buffer.clear();
 
         yas::audio::frame_enumerator enumerator(buffer);
@@ -203,13 +194,12 @@ namespace sample {
 
     _internal.tap_node.set_render_function(render_function);
 
+    auto unowned_self = yas::make_objc_ptr([[YASUnownedObject alloc] init]);
+    [unowned_self.object() setObject:self];
+
     _internal.system_observer = yas::audio::device::system_subject().make_observer(
-        yas::audio::device::hardware_did_change_key, [weak_container = _internal.self_container](const auto &context) {
-            if (auto strong_container = weak_container.lock()) {
-                YASAudioEngineDeviceIOSampleViewController *strongSelf = strong_container.object();
-                [strongSelf _updateDeviceNames];
-            }
-        });
+        yas::audio::device::hardware_did_change_key,
+        [unowned_self](const auto &context) { [[unowned_self.object() object] _updateDeviceNames]; });
 
     [self _updateDeviceNames];
 
@@ -391,18 +381,17 @@ namespace sample {
     if (selected_device && std::find(all_devices.begin(), all_devices.end(), selected_device) != all_devices.end()) {
         _internal.device_io_node.set_device(selected_device);
 
+        auto unowned_self = yas::make_objc_ptr([[YASUnownedObject alloc] init]);
+        [unowned_self.object() setObject:self];
+
         _internal.device_observer = selected_device.subject().make_observer(
-            yas::audio::device::device_did_change_key,
-            [selected_device, weak_container = _internal.self_container](auto const &context) {
+            yas::audio::device::device_did_change_key, [selected_device, unowned_self](auto const &context) {
                 const auto &change_info = context.value;
                 const auto &infos = change_info.property_infos;
                 if (change_info.property_infos.size() > 0) {
                     const auto &device_id = infos.at(0).object_id;
                     if (selected_device.audio_device_id() == device_id) {
-                        if (const auto strong_container = weak_container.lock()) {
-                            YASAudioEngineDeviceIOSampleViewController *controller = strong_container.object();
-                            [controller _updateConnection];
-                        }
+                        [[unowned_self.object() object] _updateConnection];
                     }
                 }
             });

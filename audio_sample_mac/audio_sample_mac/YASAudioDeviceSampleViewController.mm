@@ -8,6 +8,7 @@
 #import "YASDecibelValueTransformer.h"
 #import "YASFrequencyValueFormatter.h"
 #import "yas_audio.h"
+#import "yas_objc_unowned.h"
 
 static const UInt32 kSineDataMaxCount = 4096;
 
@@ -135,11 +136,6 @@ namespace sample {
         yas::base system_observer = nullptr;
         yas::base device_observer = nullptr;
         sample_kernel_sptr kernel;
-        yas::objc::container<yas::objc::weak> self_container;
-
-        ~device_vc_internal() {
-            self_container.set_object(nil);
-        }
     };
 }
 }
@@ -164,10 +160,6 @@ namespace sample {
                                         forName:NSStringFromClass([YASFrequencyValueFormatter class])];
     });
 
-    if (!_internal.self_container) {
-        _internal.self_container.set_object(self);
-    }
-
     _internal.graph = yas::audio::graph{};
     _internal.device_io = yas::audio::device_io{yas::audio::device(nullptr)};
     _internal.graph.add_audio_device_io(_internal.device_io);
@@ -178,13 +170,12 @@ namespace sample {
     self.sineVolume = _internal.kernel->sine_volume();
     self.sineFrequency = _internal.kernel->sine_frequency();
 
+    auto unowned_self = yas::make_objc_ptr([[YASUnownedObject alloc] init]);
+    [unowned_self.object() setObject:self];
+
     _internal.system_observer = yas::audio::device::system_subject().make_observer(
-        yas::audio::device::hardware_did_change_key, [weak_container = _internal.self_container](const auto &) {
-            if (auto strong_container = weak_container.lock()) {
-                YASAudioDeviceSampleViewController *strongSelf = strong_container.object();
-                [strongSelf _updateDeviceNames];
-            }
-        });
+        yas::audio::device::hardware_did_change_key,
+        [unowned_self](const auto &) { [[unowned_self.object() object] _updateDeviceNames]; });
 
     auto weak_device_io = yas::to_weak(_internal.device_io);
     _internal.device_io.set_render_callback([weak_device_io, kernel = _internal.kernel](
@@ -237,9 +228,7 @@ namespace sample {
     yas_release(_deviceInfo);
     yas_release(_ioThroughTextColor);
     yas_release(_sineTextColor);
-    if (_internal.self_container) {
-        _internal.self_container.set_object(nil);
-    }
+
     yas_super_dealloc();
 }
 
@@ -307,18 +296,17 @@ namespace sample {
     if (selected_device && std::find(all_devices.begin(), all_devices.end(), selected_device) != all_devices.end()) {
         _internal.device_io.set_device(selected_device);
 
+        auto unowned_self = yas::make_objc_ptr([[YASUnownedObject alloc] init]);
+        [unowned_self.object() setObject:self];
+
         _internal.device_observer = selected_device.subject().make_observer(
-            yas::audio::device::device_did_change_key,
-            [selected_device, weak_container = _internal.self_container](auto const &context) {
+            yas::audio::device::device_did_change_key, [selected_device, unowned_self](auto const &context) {
                 const auto &change_info = context.value;
                 const auto &infos = change_info.property_infos;
                 if (infos.size() > 0) {
                     auto &device_id = infos.at(0).object_id;
                     if (selected_device.audio_device_id() == device_id) {
-                        if (auto strong_container = weak_container.lock()) {
-                            YASAudioDeviceSampleViewController *strongSelf = strong_container.object();
-                            [strongSelf _updateDeviceInfo];
-                        }
+                        [[unowned_self.object() object] _updateDeviceInfo];
                     }
                 }
             });

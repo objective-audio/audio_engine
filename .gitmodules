@@ -1,6 +1,3 @@
-[submodule "submodules/objc_utils"]
-	path = submodules/objc_utils
-	url = https://github.com/objective-audio/objc_utils.git
 [submodule "submodules/cpp_utils"]
 	path = submodules/cpp_utils
 	url = https://github.com/objective-audio/cpp_utils.git

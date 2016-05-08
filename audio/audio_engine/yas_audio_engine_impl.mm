@@ -10,6 +10,7 @@
 #include "yas_audio_node.h"
 #include "yas_audio_offline_output_node.h"
 #include "yas_audio_unit_node.h"
+#include "yas_objc_ptr.h"
 #include "yas_stl_utils.h"
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
@@ -46,8 +47,8 @@ class audio::engine::impl::core {
     }
 
     weak<engine> weak_engine;
-    objc::container<> reset_observer;
-    objc::container<> route_change_observer;
+    objc_ptr<id> reset_observer;
+    objc_ptr<id> route_change_observer;
     yas::subject<engine> subject;
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
     observer<device::change_info> device_observer;
@@ -106,14 +107,6 @@ void audio::engine::impl::prepare(engine const &engine) {
 
 weak<audio::engine> &audio::engine::impl::weak_engine() const {
     return _core->weak_engine;
-}
-
-objc::container<> &audio::engine::impl::reset_observer() const {
-    return _core->reset_observer;
-}
-
-objc::container<> &audio::engine::impl::route_change_observer() const {
-    return _core->route_change_observer;
 }
 
 yas::subject<audio::engine> &audio::engine::impl::subject() const {
