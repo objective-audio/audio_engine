@@ -10,10 +10,10 @@
 
 using namespace yas;
 
-audio::node::node(std::nullptr_t) : super_class(nullptr) {
+audio::node::node(std::nullptr_t) : base(nullptr) {
 }
 
-audio::node::node(std::shared_ptr<impl> const &impl) : super_class(impl) {
+audio::node::node(std::shared_ptr<impl> const &impl) : base(impl) {
 }
 
 audio::node::~node() = default;

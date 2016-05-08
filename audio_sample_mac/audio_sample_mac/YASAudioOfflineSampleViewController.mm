@@ -14,9 +14,7 @@ namespace offline_sample {
 
     class sine_node : public audio::tap_node {
        public:
-        using super_class = audio::tap_node;
-
-        class impl : public super_class::impl {
+        class impl : public audio::tap_node::impl {
            public:
             Float64 phase_on_render;
 
@@ -47,7 +45,7 @@ namespace offline_sample {
         };
 
        public:
-        sine_node() : super_class(std::make_unique<impl>()) {
+        sine_node() : audio::tap_node(std::make_unique<impl>()) {
             set_frequency(1000.0);
 
             auto weak_node = yas::to_weak(*this);
@@ -81,7 +79,7 @@ namespace offline_sample {
             set_render_function(render_function);
         }
 
-        sine_node(std::nullptr_t) : super_class(nullptr) {
+        sine_node(std::nullptr_t) : audio::tap_node(nullptr) {
         }
 
         virtual ~sine_node() = default;

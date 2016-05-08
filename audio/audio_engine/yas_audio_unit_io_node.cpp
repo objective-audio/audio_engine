@@ -29,14 +29,14 @@ using namespace yas;
 
 #pragma mark - main
 
-audio::unit_io_node::unit_io_node(std::nullptr_t) : super_class(nullptr) {
+audio::unit_io_node::unit_io_node(std::nullptr_t) : unit_node(nullptr) {
 }
 
 audio::unit_io_node::unit_io_node() : unit_io_node(std::make_shared<impl>(), audio_unit_io_node_acd) {
 }
 
 audio::unit_io_node::unit_io_node(std::shared_ptr<impl> const &impl, AudioComponentDescription const &acd)
-    : super_class(impl, acd) {
+    : unit_node(impl, acd) {
 }
 
 audio::unit_io_node::~unit_io_node() = default;
@@ -75,32 +75,32 @@ audio::device audio::unit_io_node::device() const {
 
 #pragma mark - audio_unit_output_node
 
-audio::unit_output_node::unit_output_node(std::nullptr_t) : super_class() {
+audio::unit_output_node::unit_output_node(std::nullptr_t) : unit_io_node() {
 }
 
-audio::unit_output_node::unit_output_node() : super_class(std::make_unique<impl>(), audio_unit_io_node_acd) {
+audio::unit_output_node::unit_output_node() : unit_io_node(std::make_unique<impl>(), audio_unit_io_node_acd) {
 }
 
 void audio::unit_output_node::set_channel_map(channel_map_t const &map) {
-    super_class::set_channel_map(map, direction::output);
+    unit_io_node::set_channel_map(map, direction::output);
 }
 
 audio::channel_map_t const &audio::unit_output_node::channel_map() const {
-    return super_class::channel_map(direction::output);
+    return unit_io_node::channel_map(direction::output);
 }
 
 #pragma mark - audio_unit_input_node
 
-audio::unit_input_node::unit_input_node(std::nullptr_t) : super_class(nullptr) {
+audio::unit_input_node::unit_input_node(std::nullptr_t) : unit_io_node(nullptr) {
 }
 
-audio::unit_input_node::unit_input_node() : super_class(std::make_unique<impl>(), audio_unit_io_node_acd) {
+audio::unit_input_node::unit_input_node() : unit_io_node(std::make_unique<impl>(), audio_unit_io_node_acd) {
 }
 
 void audio::unit_input_node::set_channel_map(channel_map_t const &map) {
-    super_class::set_channel_map(map, direction::input);
+    unit_io_node::set_channel_map(map, direction::input);
 }
 
 audio::channel_map_t const &audio::unit_input_node::channel_map() const {
-    return super_class::channel_map(direction::input);
+    return unit_io_node::channel_map(direction::input);
 }

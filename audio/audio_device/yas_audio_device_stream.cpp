@@ -92,11 +92,11 @@ class audio::device::stream::impl : public base::impl {
 
 #pragma mark - main
 
-audio::device::stream::stream(std::nullptr_t) : super_class(nullptr) {
+audio::device::stream::stream(std::nullptr_t) : base(nullptr) {
 }
 
 audio::device::stream::stream(AudioStreamID const stream_id, AudioDeviceID const device_id)
-    : super_class(std::make_shared<impl>(stream_id, device_id)) {
+    : base(std::make_shared<impl>(stream_id, device_id)) {
     auto imp = impl_ptr<impl>();
     auto function = imp->listener(*this);
     imp->add_listener(kAudioStreamPropertyVirtualFormat, function);

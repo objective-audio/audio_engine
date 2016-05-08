@@ -19,8 +19,6 @@ namespace audio {
     class time;
 
     class device_io : public base {
-        using super_class = base;
-
        public:
         using render_f = std::function<void(audio::pcm_buffer &output_buffer, audio::time const &when)>;
 

@@ -22,12 +22,10 @@ using namespace yas;
 namespace yas {
 namespace audio {
     class connection_for_engine : public connection {
-        using super_class = connection;
-
        public:
         connection_for_engine(node &source_node, UInt32 const source_bus, node &destination_node,
                               UInt32 const destination_bus, audio::format const &format)
-            : super_class(source_node, source_bus, destination_node, destination_bus, format) {
+            : connection(source_node, source_bus, destination_node, destination_bus, format) {
         }
     };
 }

@@ -16,8 +16,6 @@ namespace audio {
     class device;
 
     class device_io_node : public node {
-        using super_class = node;
-
        public:
         class impl;
 

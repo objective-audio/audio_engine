@@ -9,8 +9,6 @@
 namespace yas {
 namespace audio {
     class unit_mixer_node : public unit_node {
-        using super_class = unit_node;
-
        public:
         unit_mixer_node();
         unit_mixer_node(std::nullptr_t);

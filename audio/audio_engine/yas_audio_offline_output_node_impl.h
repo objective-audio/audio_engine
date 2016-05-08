@@ -4,9 +4,7 @@
 
 #pragma once
 
-class yas::audio::offline_output_node::impl : public super_class::impl, public manageable_offline_output_unit::impl {
-    using super_class = super_class::impl;
-
+class yas::audio::offline_output_node::impl : public node::impl, public manageable_offline_output_unit::impl {
    public:
     impl();
     ~impl();

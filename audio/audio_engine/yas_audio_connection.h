@@ -14,7 +14,6 @@ namespace audio {
     class node;
 
     class connection : public base {
-        using super_class = base;
         class impl;
 
        public:

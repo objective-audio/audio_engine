@@ -14,8 +14,6 @@ namespace audio {
     class graph;
 
     class unit_node : public node {
-        using super_class = node;
-
        public:
         class impl;
 

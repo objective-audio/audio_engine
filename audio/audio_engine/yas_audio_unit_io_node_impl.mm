@@ -23,13 +23,13 @@ class audio::unit_io_node::impl::core {
 
 #pragma mark - audio::unit_io_node::impl
 
-audio::unit_io_node::impl::impl() : super_class::impl(), _core(std::make_unique<core>()) {
+audio::unit_io_node::impl::impl() : unit_node::impl(), _core(std::make_unique<core>()) {
 }
 
 audio::unit_io_node::impl::~impl() = default;
 
 void audio::unit_io_node::impl::reset() {
-    super_class::reset();
+    unit_node::impl::reset();
 }
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
@@ -94,7 +94,7 @@ audio::channel_map_t const &audio::unit_io_node::impl::channel_map(direction con
 }
 
 audio::bus_result_t audio::unit_io_node::impl::next_available_output_bus() const {
-    auto result = super_class::next_available_output_bus();
+    auto result = unit_node::impl::next_available_output_bus();
     if (result && *result == 0) {
         return 1;
     }
@@ -103,13 +103,13 @@ audio::bus_result_t audio::unit_io_node::impl::next_available_output_bus() const
 
 bool audio::unit_io_node::impl::is_available_output_bus(UInt32 const bus_idx) const {
     if (bus_idx == 1) {
-        return super_class::is_available_output_bus(0);
+        return unit_node::impl::is_available_output_bus(0);
     }
     return false;
 }
 
 void audio::unit_io_node::impl::update_connections() {
-    super_class::update_connections();
+    unit_node::impl::update_connections();
 
     auto unit = au();
 
@@ -187,7 +187,7 @@ UInt32 audio::unit_input_node::impl::output_bus_count() const {
 }
 
 void audio::unit_input_node::impl::update_connections() {
-    super_class::update_connections();
+    unit_io_node::impl::update_connections();
 
     auto unit = au();
 

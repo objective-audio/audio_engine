@@ -53,7 +53,7 @@ class audio::offline_output_node::impl::core {
 };
 
 audio::offline_output_node::impl::impl()
-    : super_class::impl(), _core(std::make_unique<audio::offline_output_node::impl::core>()) {
+    : node::impl::impl(), _core(std::make_unique<audio::offline_output_node::impl::core>()) {
 }
 
 audio::offline_output_node::impl::~impl() = default;
@@ -170,7 +170,7 @@ void audio::offline_output_node::impl::stop() {
 
 void audio::offline_output_node::impl::reset() {
     stop();
-    super_class::reset();
+    node::impl::reset();
 }
 
 UInt32 audio::offline_output_node::impl::output_bus_count() const {

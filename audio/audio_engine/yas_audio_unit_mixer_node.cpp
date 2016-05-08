@@ -9,9 +9,7 @@ using namespace yas;
 
 #pragma mark - impl
 
-class audio::unit_mixer_node::impl : public super_class::impl {
-    using super_class = unit_node::impl;
-
+struct audio::unit_mixer_node::impl : public unit_node::impl {
    private:
     virtual UInt32 input_bus_count() const override {
         return std::numeric_limits<UInt32>::max();
@@ -32,23 +30,23 @@ class audio::unit_mixer_node::impl : public super_class::impl {
             }
         }
 
-        super_class::update_connections();
+        unit_node::impl::update_connections();
     }
 };
 
 #pragma mark - main
 
 audio::unit_mixer_node::unit_mixer_node()
-    : super_class(std::make_unique<impl>(), AudioComponentDescription{
-                                                .componentType = kAudioUnitType_Mixer,
-                                                .componentSubType = kAudioUnitSubType_MultiChannelMixer,
-                                                .componentManufacturer = kAudioUnitManufacturer_Apple,
-                                                .componentFlags = 0,
-                                                .componentFlagsMask = 0,
-                                            }) {
+    : unit_node(std::make_unique<impl>(), AudioComponentDescription{
+                                              .componentType = kAudioUnitType_Mixer,
+                                              .componentSubType = kAudioUnitSubType_MultiChannelMixer,
+                                              .componentManufacturer = kAudioUnitManufacturer_Apple,
+                                              .componentFlags = 0,
+                                              .componentFlagsMask = 0,
+                                          }) {
 }
 
-audio::unit_mixer_node::unit_mixer_node(std::nullptr_t) : super_class(nullptr) {
+audio::unit_mixer_node::unit_mixer_node(std::nullptr_t) : unit_node(nullptr) {
 }
 
 void audio::unit_mixer_node::set_output_volume(Float32 const volume, UInt32 const bus_idx) {

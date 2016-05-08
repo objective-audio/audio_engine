@@ -266,10 +266,10 @@ class audio::device_io::impl : public base::impl {
 
 #pragma mark -
 
-audio::device_io::device_io(std::nullptr_t) : super_class(nullptr) {
+audio::device_io::device_io(std::nullptr_t) : base(nullptr) {
 }
 
-audio::device_io::device_io(audio::device const &device) : super_class(std::make_shared<impl>()) {
+audio::device_io::device_io(audio::device const &device) : base(std::make_shared<impl>()) {
     impl_ptr<impl>()->prepare(*this, device);
 }
 

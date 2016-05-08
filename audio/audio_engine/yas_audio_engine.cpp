@@ -8,11 +8,11 @@
 
 using namespace yas;
 
-audio::engine::engine() : super_class(std::make_shared<impl>()) {
+audio::engine::engine() : base(std::make_shared<impl>()) {
     impl_ptr<impl>()->prepare(*this);
 }
 
-audio::engine::engine(std::nullptr_t) : super_class(nullptr) {
+audio::engine::engine(std::nullptr_t) : base(nullptr) {
 }
 
 audio::engine::~engine() = default;

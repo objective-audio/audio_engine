@@ -19,8 +19,6 @@ class audio::route_node::kernel : public node::kernel {
 #pragma mark - impl
 
 class audio::route_node::impl : public node::impl {
-    using super_class = super_class::impl;
-
    public:
     class core {
        public:
@@ -44,7 +42,7 @@ class audio::route_node::impl : public node::impl {
 
     virtual void reset() override {
         _core->routes.clear();
-        super_class::reset();
+        node::impl::reset();
     }
 
     virtual UInt32 input_bus_count() const override {
@@ -60,14 +58,14 @@ class audio::route_node::impl : public node::impl {
     }
 
     virtual void prepare_kernel(std::shared_ptr<node::kernel> const &kernel) override {
-        super_class::prepare_kernel(kernel);
+        node::impl::prepare_kernel(kernel);
 
         auto route_kernel = std::static_pointer_cast<route_node::kernel>(kernel);
         route_kernel->routes = _core->routes;
     }
 
     virtual void render(pcm_buffer &dst_buffer, UInt32 const dst_bus_idx, time const &when) override {
-        super_class::render(dst_buffer, dst_bus_idx, when);
+        node::impl::render(dst_buffer, dst_bus_idx, when);
 
         if (auto kernel = kernel_cast<route_node::kernel>()) {
             auto &routes = kernel->routes;
@@ -136,10 +134,10 @@ class audio::route_node::impl : public node::impl {
 
 #pragma mark - main
 
-audio::route_node::route_node() : super_class(std::make_unique<impl>()) {
+audio::route_node::route_node() : node(std::make_unique<impl>()) {
 }
 
-audio::route_node::route_node(std::nullptr_t) : super_class(nullptr) {
+audio::route_node::route_node(std::nullptr_t) : node(nullptr) {
 }
 
 audio::route_set_t const &audio::route_node::routes() const {

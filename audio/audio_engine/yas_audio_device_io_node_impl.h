@@ -28,8 +28,6 @@ class yas::audio::device_io_node::impl : public node::impl, public manageable_de
     virtual void render(pcm_buffer &buffer, UInt32 const bus_idx, time const &when) override;
 
    private:
-    using super_class = super_class::impl;
-
     class core;
     std::unique_ptr<core> _core;
 

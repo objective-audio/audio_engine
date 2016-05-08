@@ -10,7 +10,6 @@
 #include "yas_observing.h"
 
 class yas::audio::device::stream : public base {
-    using super_class = base;
     class impl;
 
    public:
