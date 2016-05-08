@@ -8,7 +8,7 @@
 #if TARGET_OS_IPHONE
 #import <AVFoundation/AVFoundation.h>
 #import <UIKit/UIKit.h>
-#include "yas_objc_container.h"
+#include "yas_objc_ptr.h"
 #endif
 
 using namespace yas;
@@ -19,8 +19,8 @@ namespace audio {
     static bool _interrupting;
     static std::map<UInt8, weak<graph>> _graphs;
 #if TARGET_OS_IPHONE
-    static yas::objc::container<> _did_become_active_observer;
-    static yas::objc::container<> _interruption_observer;
+    static yas::objc_ptr<> _did_become_active_observer;
+    static yas::objc_ptr<> _interruption_observer;
 #endif
 }
 }
@@ -55,7 +55,7 @@ class audio::graph::impl : public base::impl {
                                                                   object:nil
                                                                    queue:[NSOperationQueue mainQueue]
                                                               usingBlock:lambda];
-            _did_become_active_observer = yas::objc::container<>(observer);
+            _did_become_active_observer.set_object(observer);
         }
 
         if (!_interruption_observer) {
@@ -80,7 +80,7 @@ class audio::graph::impl : public base::impl {
                                                                   object:nil
                                                                    queue:[NSOperationQueue mainQueue]
                                                               usingBlock:lambda];
-            _interruption_observer = yas::objc::container<>(observer);
+            _interruption_observer.set_object(observer);
         }
     }
 #endif
