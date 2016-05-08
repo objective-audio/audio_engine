@@ -35,19 +35,19 @@ namespace audio {
 
         void reset();
 
-        audio::format input_format(UInt32 const bus_idx) const;
-        audio::format output_format(UInt32 const bus_idx) const;
+        audio::format input_format(uint32_t const bus_idx) const;
+        audio::format output_format(uint32_t const bus_idx) const;
         bus_result_t next_available_input_bus() const;
         bus_result_t next_available_output_bus() const;
-        bool is_available_input_bus(UInt32 const bus_idx) const;
-        bool is_available_output_bus(UInt32 const bus_idx) const;
+        bool is_available_input_bus(uint32_t const bus_idx) const;
+        bool is_available_output_bus(uint32_t const bus_idx) const;
         audio::engine engine() const;
         audio::time last_render_time() const;
 
-        UInt32 input_bus_count() const;
-        UInt32 output_bus_count() const;
+        uint32_t input_bus_count() const;
+        uint32_t output_bus_count() const;
 
-        void render(audio::pcm_buffer &buffer, UInt32 const bus_idx, audio::time const &when);
+        void render(audio::pcm_buffer &buffer, uint32_t const bus_idx, audio::time const &when);
         void set_render_time_on_render(audio::time const &time);
 
         audio::connectable_node connectable();
