@@ -11,7 +11,7 @@ namespace yas {
 namespace audio {
     class math {
        public:
-        static Float64 constexpr two_pi = M_PI * 2.0;
+        static double constexpr two_pi = M_PI * 2.0;
 
         template <typename T>
         static auto decibel_from_linear(T const linear) -> T;
@@ -25,12 +25,12 @@ namespace audio {
         template <typename T>
         static auto seconds_from_tempo(T const tempo) -> T;
 
-        static Float64 seconds_from_frames(const UInt32 frames, Float64 const sample_rate);
-        static UInt32 frames_from_seconds(Float64 const seconds, Float64 const sample_rate);
+        static double seconds_from_frames(const uint32_t frames, double const sample_rate);
+        static uint32_t frames_from_seconds(double const seconds, double const sample_rate);
 
         template <typename T>
-        static auto fill_sine(T *const out_data, const UInt32 length, Float64 const start_phase,
-                              Float64 const phase_per_frame) -> T;
+        static auto fill_sine(T *const out_data, const uint32_t length, double const start_phase,
+                              double const phase_per_frame) -> T;
     };
 
     template <typename T>
@@ -55,19 +55,19 @@ namespace audio {
     class duration {
        public:
         duration();
-        duration(Float64 const val);
+        duration(double const val);
 
         bool operator==(duration const &) const;
         bool operator!=(duration const &) const;
 
-        void set_seconds(Float64 const val);
-        Float64 seconds() const;
+        void set_seconds(double const val);
+        double seconds() const;
 
-        void set_tempo(Float64 const val);
-        Float64 tempo() const;
+        void set_tempo(double const val);
+        double tempo() const;
 
        private:
-        Float64 _value;
+        double _value;
     };
 }
 }

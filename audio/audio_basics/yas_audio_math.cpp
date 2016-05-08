@@ -9,53 +9,53 @@
 using namespace yas;
 
 template <>
-Float64 audio::math::decibel_from_linear(Float64 const linear) {
+double audio::math::decibel_from_linear(double const linear) {
     return 20.0 * log10(linear);
 }
 
 template <>
-Float32 audio::math::decibel_from_linear(Float32 const linear) {
+float audio::math::decibel_from_linear(float const linear) {
     return 20.0f * log10f(linear);
 }
 
 template <>
-Float64 audio::math::linear_from_decibel(Float64 const decibel) {
+double audio::math::linear_from_decibel(double const decibel) {
     return pow(10.0, decibel / 20.0);
 }
 
 template <>
-Float32 audio::math::linear_from_decibel(Float32 const decibel) {
+float audio::math::linear_from_decibel(float const decibel) {
     return powf(10.0f, decibel / 20.0f);
 }
 
 template <>
-Float64 audio::math::tempo_from_seconds(Float64 const seconds) {
+double audio::math::tempo_from_seconds(double const seconds) {
     return pow(2, -log2(seconds)) * 60.0;
 }
 
 template <>
-Float64 audio::math::seconds_from_tempo(Float64 const tempo) {
+double audio::math::seconds_from_tempo(double const tempo) {
     return powf(2, -log2f(tempo / 60.0f));
 }
 
-Float64 audio::math::seconds_from_frames(UInt32 const frames, Float64 const sample_rate) {
-    return static_cast<Float64>(frames) / sample_rate;
+double audio::math::seconds_from_frames(uint32_t const frames, double const sample_rate) {
+    return static_cast<double>(frames) / sample_rate;
 }
 
-UInt32 audio::math::frames_from_seconds(Float64 const seconds, Float64 const sample_rate) {
+uint32_t audio::math::frames_from_seconds(double const seconds, double const sample_rate) {
     return seconds * sample_rate;
 }
 
 template <>
-Float32 audio::math::fill_sine(Float32 *const out_data, UInt32 const length, Float64 const start_phase,
-                               Float64 const phase_per_frame) {
+float audio::math::fill_sine(float *const out_data, uint32_t const length, double const start_phase,
+                             double const phase_per_frame) {
     if (!out_data || length == 0) {
         return start_phase;
     }
 
-    Float64 phase = start_phase;
+    double phase = start_phase;
 
-    for (UInt32 i = 0; i < length; ++i) {
+    for (uint32_t i = 0; i < length; ++i) {
         out_data[i] = phase;
         phase = fmod(phase + phase_per_frame, two_pi);
     }
@@ -69,78 +69,78 @@ Float32 audio::math::fill_sine(Float32 *const out_data, UInt32 const length, Flo
 #pragma mark - level
 
 template <>
-audio::level<Float64>::level() : _value(0.0) {
+audio::level<double>::level() : _value(0.0) {
 }
 
 template <>
-audio::level<Float32>::level() : _value(0.0f) {
+audio::level<float>::level() : _value(0.0f) {
 }
 
 template <>
-audio::level<Float64>::level(Float64 const val) : _value(val) {
+audio::level<double>::level(double const val) : _value(val) {
 }
 
 template <>
-audio::level<Float32>::level(Float32 const val) : _value(val) {
+audio::level<float>::level(float const val) : _value(val) {
 }
 
 template <>
-bool audio::level<Float64>::operator==(level const &rhs) const {
+bool audio::level<double>::operator==(level const &rhs) const {
     return _value == rhs._value;
 }
 
 template <>
-bool audio::level<Float32>::operator==(level const &rhs) const {
+bool audio::level<float>::operator==(level const &rhs) const {
     return _value == rhs._value;
 }
 
 template <>
-bool audio::level<Float64>::operator!=(level const &rhs) const {
+bool audio::level<double>::operator!=(level const &rhs) const {
     return _value != rhs._value;
 }
 
 template <>
-bool audio::level<Float32>::operator!=(level const &rhs) const {
+bool audio::level<float>::operator!=(level const &rhs) const {
     return _value != rhs._value;
 }
 
 template <>
-void audio::level<Float64>::set_linear(Float64 const val) {
+void audio::level<double>::set_linear(double const val) {
     _value = val;
 }
 
 template <>
-void audio::level<Float32>::set_linear(Float32 const val) {
+void audio::level<float>::set_linear(float const val) {
     _value = val;
 }
 
 template <>
-Float64 audio::level<Float64>::linear() const {
+double audio::level<double>::linear() const {
     return _value;
 }
 
 template <>
-Float32 audio::level<Float32>::linear() const {
+float audio::level<float>::linear() const {
     return _value;
 }
 
 template <>
-void audio::level<Float64>::set_decibel(Float64 const val) {
+void audio::level<double>::set_decibel(double const val) {
     _value = math::linear_from_decibel(val);
 }
 
 template <>
-void audio::level<Float32>::set_decibel(Float32 const val) {
+void audio::level<float>::set_decibel(float const val) {
     _value = math::linear_from_decibel(val);
 }
 
 template <>
-Float64 audio::level<Float64>::decibel() const {
+double audio::level<double>::decibel() const {
     return math::decibel_from_linear(_value);
 }
 
 template <>
-Float32 audio::level<Float32>::decibel() const {
+float audio::level<float>::decibel() const {
     return math::decibel_from_linear(_value);
 }
 
@@ -149,7 +149,7 @@ Float32 audio::level<Float32>::decibel() const {
 audio::duration::duration() : _value(0.0) {
 }
 
-audio::duration::duration(Float64 const val) : _value(val) {
+audio::duration::duration(double const val) : _value(val) {
 }
 
 bool audio::duration::operator==(duration const &rhs) const {
@@ -160,18 +160,18 @@ bool audio::duration::operator!=(duration const &rhs) const {
     return _value != rhs._value;
 }
 
-void audio::duration::set_seconds(Float64 const val) {
+void audio::duration::set_seconds(double const val) {
     _value = val;
 }
 
-Float64 audio::duration::seconds() const {
+double audio::duration::seconds() const {
     return _value;
 }
 
-void audio::duration::set_tempo(Float64 const val) {
+void audio::duration::set_tempo(double const val) {
     _value = math::seconds_from_tempo(val);
 }
 
-Float64 audio::duration::tempo() const {
+double audio::duration::tempo() const {
     return math::tempo_from_seconds(_value);
 }
