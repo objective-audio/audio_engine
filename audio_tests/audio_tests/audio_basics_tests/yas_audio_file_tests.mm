@@ -137,6 +137,38 @@ namespace test {
 #endif
 }
 
+- (void)test_make_create_and_open_file {
+    auto file_name = CFSTR("test.wav");
+    NSString *filePath = [[self temporaryTestDirectory] stringByAppendingPathComponent:(__bridge NSString *)file_name];
+    CFURLRef fileURL = (__bridge CFURLRef)[NSURL fileURLWithPath:filePath];
+
+    {
+        auto file = yas::audio::create_file({.file_url = fileURL,
+                                             .file_type = yas::audio::file_type::wave,
+                                             .settings = yas::audio::wave_file_settings(48000.0, 2, 16)});
+
+        XCTAssertTrue(CFEqual(file.url(), fileURL));
+        XCTAssertTrue(CFEqual(file.file_type(), yas::audio::file_type::wave));
+        auto const &file_format = file.file_format();
+        XCTAssertEqual(file_format.buffer_count(), 1);
+        XCTAssertEqual(file_format.channel_count(), 2);
+        XCTAssertEqual(file_format.sample_rate(), 48000.0);
+        XCTAssertEqual(file_format.pcm_format(), yas::audio::pcm_format::int16);
+        XCTAssertEqual(file_format.is_interleaved(), true);
+    }
+
+    if (auto file = yas::audio::open_file({.file_url = fileURL})) {
+        XCTAssertTrue(CFEqual(file.url(), fileURL));
+        XCTAssertTrue(CFEqual(file.file_type(), yas::audio::file_type::wave));
+        auto const &file_format = file.file_format();
+        XCTAssertEqual(file_format.buffer_count(), 1);
+        XCTAssertEqual(file_format.channel_count(), 2);
+        XCTAssertEqual(file_format.sample_rate(), 48000.0);
+        XCTAssertEqual(file_format.pcm_format(), yas::audio::pcm_format::int16);
+        XCTAssertEqual(file_format.is_interleaved(), true);
+    }
+}
+
 #pragma mark -
 
 - (void)_commonAudioFileTest:(yas::test::audio_file_test_data &)test_data {
