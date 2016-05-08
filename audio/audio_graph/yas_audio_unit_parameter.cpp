@@ -11,7 +11,7 @@ struct audio::unit::parameter::impl {
     AudioUnitParameterID parameter_id;
     AudioUnitScope scope;
     bool has_clump;
-    UInt32 clump_id;
+    uint32_t clump_id;
     AudioUnitParameterUnit unit;
     AudioUnitParameterValue min_value;
     AudioUnitParameterValue max_value;
@@ -106,7 +106,7 @@ bool audio::unit::parameter::has_clump() const {
     return _impl->has_clump;
 }
 
-UInt32 audio::unit::parameter::clump_id() const {
+uint32_t audio::unit::parameter::clump_id() const {
     return _impl->clump_id;
 }
 
@@ -130,7 +130,7 @@ AudioUnitParameterValue audio::unit::parameter::default_value() const {
     return _impl->default_value;
 }
 
-Float32 audio::unit::parameter::value(AudioUnitElement const element) const {
+float audio::unit::parameter::value(AudioUnitElement const element) const {
     return _impl->values.at(element);
 }
 
