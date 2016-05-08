@@ -139,6 +139,10 @@ CFURLRef audio::file::url() const {
     return _impl->url();
 }
 
+CFStringRef audio::file::file_type() const {
+    return _impl->file_type();
+}
+
 audio::format const &audio::file::file_format() const {
     return _impl->file_format;
 }

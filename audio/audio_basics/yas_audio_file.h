@@ -71,6 +71,7 @@ namespace audio {
         explicit operator bool() const;
 
         CFURLRef url() const;
+        CFStringRef file_type() const;
         audio::format const &file_format() const;
         void set_processing_format(audio::format const &format);
         audio::format const &processing_format() const;
