@@ -13,6 +13,20 @@ namespace yas {
 namespace audio {
     class file {
        public:
+        struct open_args {
+            CFURLRef file_url = nullptr;
+            pcm_format pcm_format = pcm_format::float32;
+            bool interleaved = false;
+        };
+
+        struct create_args {
+            CFURLRef file_url = nullptr;
+            CFStringRef file_type = nullptr;
+            CFDictionaryRef settings = nullptr;
+            pcm_format pcm_format = pcm_format::float32;
+            bool interleaved = false;
+        };
+
         enum class open_error_t : UInt32 {
             opened,
             invalid_argument,
@@ -65,10 +79,8 @@ namespace audio {
         void set_file_frame_position(UInt32 const position);
         SInt64 file_frame_position() const;
 
-        open_result_t open(CFURLRef const file_url, pcm_format const pcm_format = pcm_format::float32,
-                           bool const interleaved = false);
-        create_result_t create(CFURLRef const file_url, const CFStringRef file_type, const CFDictionaryRef settings,
-                               pcm_format const pcm_format = pcm_format::float32, bool const interleaved = false);
+        open_result_t open(open_args);
+        create_result_t create(create_args);
         void close();
 
         read_result_t read_into_buffer(audio::pcm_buffer &buffer, UInt32 const frame_length = 0);
