@@ -9,8 +9,6 @@
 namespace yas {
 namespace audio {
     class tap_node : public node {
-        using super_class = node;
-
        public:
         class kernel;
         class impl;
@@ -40,9 +38,6 @@ namespace audio {
 
         input_tap_node();
         input_tap_node(std::nullptr_t);
-
-       private:
-        using super_class = tap_node;
     };
 }
 }

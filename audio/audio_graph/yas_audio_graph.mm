@@ -27,7 +27,7 @@ namespace audio {
 
 #pragma mark - impl
 
-class audio::graph::impl : public base::impl {
+struct audio::graph::impl : base::impl {
    public:
     impl(UInt8 const key) : _running(false), _mutex(), _units(), _io_units(), _key(key){};
 
@@ -310,13 +310,13 @@ class audio::graph::impl : public base::impl {
 
 #pragma mark - main
 
-audio::graph::graph() : super_class(impl::make_shared()) {
+audio::graph::graph() : base(impl::make_shared()) {
     if (impl_ptr()) {
         impl::add_graph(*this);
     }
 }
 
-audio::graph::graph(std::nullptr_t) : super_class(nullptr) {
+audio::graph::graph(std::nullptr_t) : base(nullptr) {
 }
 
 audio::graph::~graph() = default;

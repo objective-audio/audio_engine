@@ -17,10 +17,10 @@ OSType audio::unit::sub_type_default_io() {
 #endif
 }
 
-audio::unit::unit(std::nullptr_t) : super_class(nullptr) {
+audio::unit::unit(std::nullptr_t) : base(nullptr) {
 }
 
-audio::unit::unit(AudioComponentDescription const &acd) : super_class(std::make_shared<impl>()) {
+audio::unit::unit(AudioComponentDescription const &acd) : base(std::make_shared<impl>()) {
     impl_ptr<impl>()->create_audio_unit(acd);
 }
 

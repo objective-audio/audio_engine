@@ -8,10 +8,8 @@
 
 using namespace yas;
 
-class audio::connection::impl : public base::impl, public node_removable::impl {
-   public:
+struct audio::connection::impl : base::impl, node_removable::impl {
     UInt32 source_bus;
-
     UInt32 destination_bus;
     audio::format format;
     mutable std::recursive_mutex mutex;
@@ -65,7 +63,7 @@ class audio::connection::impl : public base::impl, public node_removable::impl {
     weak<node> _destination_node;
 };
 
-audio::connection::connection(std::nullptr_t) : super_class(nullptr) {
+audio::connection::connection(std::nullptr_t) : base(nullptr) {
 }
 
 audio::connection::~connection() {
@@ -79,7 +77,7 @@ audio::connection::~connection() {
 
 audio::connection::connection(node &source_node, UInt32 const source_bus, node &destination_node,
                               UInt32 const destination_bus, audio::format const &format)
-    : super_class(std::make_shared<impl>(source_node, source_bus, destination_node, destination_bus, format)) {
+    : base(std::make_shared<impl>(source_node, source_bus, destination_node, destination_bus, format)) {
     if (!source_node || !destination_node) {
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : invalid argument.");
     }

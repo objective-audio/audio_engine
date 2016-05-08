@@ -23,7 +23,6 @@
 namespace yas {
 namespace audio {
     class unit : public base {
-        using super_class = base;
         class impl;
 
        public:

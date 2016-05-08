@@ -17,8 +17,6 @@
 namespace yas {
 namespace audio {
     class graph : public base {
-        using super_class = base;
-
        public:
         class impl;
 

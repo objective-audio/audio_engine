@@ -72,8 +72,7 @@ static OSStatus input_render_callback(void *inRefCon, AudioUnitRenderActionFlags
 
 #pragma mark - core
 
-class audio::unit::impl::core {
-   public:
+struct audio::unit::impl::core {
     AudioUnit au_instance;
     AudioComponentDescription acd;
     bool initialized;

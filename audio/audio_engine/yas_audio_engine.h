@@ -17,7 +17,6 @@ namespace audio {
     class offline_output_node;
 
     class engine : public base {
-        using super_class = base;
         class impl;
 
        public:

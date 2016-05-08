@@ -166,8 +166,7 @@ void yas::test::audio_unit_render_on_sub_thread(audio::unit &unit, audio::format
     }
 }
 
-class test::audio_test_node::impl : public yas::audio::node::impl {
-   public:
+struct test::audio_test_node::impl : yas::audio::node::impl {
     UInt32 input_bus_count() const override {
         return _input_bus_count;
     }

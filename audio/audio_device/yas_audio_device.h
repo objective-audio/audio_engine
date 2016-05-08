@@ -23,8 +23,6 @@ namespace audio {
     class device_global;
 
     class device : public base {
-        using super_class = base;
-
        public:
         class stream;
 

@@ -6,8 +6,7 @@
 
 #include "yas_audio_node_protocol.h"
 
-class yas::audio::node::impl : public base::impl, public manageable_node::impl {
-   public:
+struct yas::audio::node::impl : base::impl, manageable_node::impl {
     impl();
     virtual ~impl();
 

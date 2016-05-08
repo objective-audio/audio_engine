@@ -9,8 +9,7 @@
 #include "yas_audio_device.h"
 #endif
 
-class yas::audio::engine::impl : public yas::base::impl {
-   public:
+struct yas::audio::engine::impl : yas::base::impl {
     impl();
     virtual ~impl();
 

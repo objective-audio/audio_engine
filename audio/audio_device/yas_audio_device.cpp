@@ -69,10 +69,8 @@ namespace audio {
 
     class device_global {
         class audio_device_for_global : public device {
-            using super_class = device;
-
            public:
-            audio_device_for_global(AudioDeviceID const device_id) : super_class(device_id) {
+            audio_device_for_global(AudioDeviceID const device_id) : device(device_id) {
             }
         };
 
@@ -185,8 +183,7 @@ audio::device::change_info::change_info(std::vector<device::property_info> &&inf
 
 #pragma mark - private
 
-class audio::device::impl : public base::impl {
-   public:
+struct audio::device::impl : base::impl {
     AudioDeviceID const audio_device_id;
     std::unordered_map<AudioStreamID, stream> input_streams_map;
     std::unordered_map<AudioStreamID, stream> output_streams_map;
@@ -440,12 +437,12 @@ subject<audio::device::change_info> &audio::device::system_subject() {
 
 #pragma mark - main
 
-audio::device::device(std::nullptr_t) : super_class(nullptr) {
+audio::device::device(std::nullptr_t) : base(nullptr) {
 }
 
 audio::device::~device() = default;
 
-audio::device::device(AudioDeviceID const device_id) : super_class(std::make_shared<impl>(device_id)) {
+audio::device::device(AudioDeviceID const device_id) : base(std::make_shared<impl>(device_id)) {
 }
 
 bool audio::device::operator==(device const &rhs) const {

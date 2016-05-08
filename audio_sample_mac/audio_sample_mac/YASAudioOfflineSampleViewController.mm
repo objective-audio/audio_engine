@@ -12,12 +12,8 @@ namespace yas {
 namespace offline_sample {
     static Float64 sample_rate = 44100.0;
 
-    class sine_node : public audio::tap_node {
-       public:
-        using super_class = audio::tap_node;
-
-        class impl : public super_class::impl {
-           public:
+    struct sine_node : audio::tap_node {
+        struct impl : audio::tap_node::impl {
             Float64 phase_on_render;
 
             void set_frequency(const Float32 frequency) {
@@ -46,8 +42,7 @@ namespace offline_sample {
             mutable std::recursive_mutex _mutex;
         };
 
-       public:
-        sine_node() : super_class(std::make_unique<impl>()) {
+        sine_node() : audio::tap_node(std::make_unique<impl>()) {
             set_frequency(1000.0);
 
             auto weak_node = yas::to_weak(*this);
@@ -81,7 +76,7 @@ namespace offline_sample {
             set_render_function(render_function);
         }
 
-        sine_node(std::nullptr_t) : super_class(nullptr) {
+        sine_node(std::nullptr_t) : audio::tap_node(nullptr) {
         }
 
         virtual ~sine_node() = default;

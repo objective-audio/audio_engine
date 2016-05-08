@@ -13,14 +13,14 @@ using namespace yas;
 audio::device_io_node::device_io_node() : device_io_node(audio::device(nullptr)) {
 }
 
-audio::device_io_node::device_io_node(std::nullptr_t) : super_class(nullptr) {
+audio::device_io_node::device_io_node(std::nullptr_t) : node(nullptr) {
 }
 
 audio::device_io_node::device_io_node(audio::device const &device) : node(std::make_unique<impl>()) {
     impl_ptr<impl>()->prepare(*this, device);
 }
 
-audio::device_io_node::device_io_node(std::shared_ptr<impl> const &impl) : super_class(impl) {
+audio::device_io_node::device_io_node(std::shared_ptr<impl> const &impl) : node(impl) {
 }
 
 audio::device_io_node::~device_io_node() = default;

@@ -10,8 +10,6 @@
 namespace yas {
 namespace audio {
     class offline_output_node : public node {
-        using super_class = node;
-
        public:
         class impl;
 

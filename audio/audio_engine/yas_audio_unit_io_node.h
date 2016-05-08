@@ -13,8 +13,6 @@ namespace audio {
     class device;
 #endif
     class unit_io_node : public unit_node {
-        using super_class = unit_node;
-
        public:
         unit_io_node();
         unit_io_node(std::nullptr_t);
@@ -40,8 +38,6 @@ namespace audio {
     };
 
     class unit_output_node : public unit_io_node {
-        using super_class = unit_io_node;
-
        public:
         class impl;
 
@@ -53,8 +49,6 @@ namespace audio {
     };
 
     class unit_input_node : public unit_io_node {
-        using super_class = unit_io_node;
-
        public:
         class impl;
 

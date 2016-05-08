@@ -8,13 +8,13 @@ using namespace yas;
 
 #pragma mark - main
 
-audio::offline_output_node::offline_output_node() : super_class(std::make_unique<impl>()) {
+audio::offline_output_node::offline_output_node() : node(std::make_unique<impl>()) {
 }
 
-audio::offline_output_node::offline_output_node(std::nullptr_t) : super_class(nullptr) {
+audio::offline_output_node::offline_output_node(std::nullptr_t) : node(nullptr) {
 }
 
-audio::offline_output_node::offline_output_node(std::shared_ptr<impl> const &impl) : super_class(impl) {
+audio::offline_output_node::offline_output_node(std::shared_ptr<impl> const &impl) : node(impl) {
 }
 
 audio::offline_output_node::~offline_output_node() = default;

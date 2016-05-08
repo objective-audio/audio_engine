@@ -4,10 +4,7 @@
 
 #pragma once
 
-class yas::audio::unit_io_node::impl : public super_class::impl {
-    using super_class = unit_node::impl;
-
-   public:
+struct yas::audio::unit_io_node::impl : unit_node::impl {
     impl();
     virtual ~impl();
 
@@ -35,16 +32,13 @@ class yas::audio::unit_io_node::impl : public super_class::impl {
     std::unique_ptr<core> _core;
 };
 
-class yas::audio::unit_output_node::impl : public super_class::impl {
+struct yas::audio::unit_output_node::impl : unit_io_node::impl {
     virtual UInt32 input_bus_count() const override;
     virtual UInt32 output_bus_count() const override;
     virtual void prepare_audio_unit() override;
 };
 
-class yas::audio::unit_input_node::impl : public super_class::impl {
-    using super_class = unit_io_node::impl;
-
-   public:
+struct yas::audio::unit_input_node::impl : unit_io_node::impl {
     impl();
     virtual ~impl();
 

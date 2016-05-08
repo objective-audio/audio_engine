@@ -8,7 +8,6 @@
 
 namespace yas {
 namespace audio {
-
     struct connectable_node : protocol {
         struct impl : protocol::impl {
             virtual void add_connection(audio::connection const &) = 0;

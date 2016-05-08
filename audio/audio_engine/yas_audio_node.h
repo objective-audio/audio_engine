@@ -21,8 +21,6 @@ namespace audio {
     class engine;
 
     class node : public base {
-        using super_class = base;
-
        public:
         class kernel;
 

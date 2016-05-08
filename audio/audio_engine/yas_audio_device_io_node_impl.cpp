@@ -14,8 +14,7 @@
 
 using namespace yas;
 
-class audio::device_io_node::impl::core {
-   public:
+struct audio::device_io_node::impl::core {
     audio::device_io device_io;
 
     core() : _device(nullptr), device_io(nullptr) {
@@ -162,7 +161,7 @@ audio::device audio::device_io_node::impl::device() const {
 }
 
 void audio::device_io_node::impl::render(pcm_buffer &buffer, const UInt32 bus_idx, time const &when) {
-    super_class::render(buffer, bus_idx, when);
+    node::impl::render(buffer, bus_idx, when);
 
     if (auto const &device_io = _core->device_io) {
         auto &input_buffer = device_io.input_buffer_on_render();

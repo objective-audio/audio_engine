@@ -33,8 +33,7 @@ static std::string format_flags_string(AudioStreamBasicDescription const &asbd) 
 
 static AudioStreamBasicDescription const empty_asbd = {0};
 
-class audio::format::impl {
-   public:
+struct audio::format::impl {
     AudioStreamBasicDescription asbd;
     audio::pcm_format pcm_format;
     bool standard;

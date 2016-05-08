@@ -8,7 +8,7 @@ using namespace yas;
 
 #pragma mark - main
 
-audio::unit_node::unit_node(std::nullptr_t) : super_class(nullptr) {
+audio::unit_node::unit_node(std::nullptr_t) : node(nullptr) {
 }
 
 audio::unit_node::unit_node(AudioComponentDescription const &acd) : unit_node(std::make_shared<impl>(), acd) {
@@ -28,7 +28,7 @@ audio::unit_node::unit_node(std::shared_ptr<impl> &&imp, AudioComponentDescripti
     impl_ptr<impl>()->prepare(*this, acd);
 }
 
-audio::unit_node::unit_node(std::shared_ptr<impl> const &impl) : super_class(impl) {
+audio::unit_node::unit_node(std::shared_ptr<impl> const &impl) : node(impl) {
 }
 
 audio::unit_node::~unit_node() = default;

@@ -4,7 +4,7 @@
 
 #pragma once
 
-class yas::audio::unit::impl : public base::impl, public manageable_unit::impl {
+struct yas::audio::unit::impl : base::impl, manageable_unit::impl {
    public:
     std::experimental::optional<UInt8> _graph_key;
     std::experimental::optional<UInt16> _key;

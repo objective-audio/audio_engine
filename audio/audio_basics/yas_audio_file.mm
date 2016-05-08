@@ -14,8 +14,7 @@ using namespace yas;
 
 #pragma mark -
 
-class audio::file::impl {
-   public:
+struct audio::file::impl {
     format file_format;
     format processing_format;
     SInt64 file_frame_position;

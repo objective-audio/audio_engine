@@ -11,8 +11,7 @@
 
 using namespace yas;
 
-class audio::unit_node::impl::core {
-   public:
+struct audio::unit_node::impl::core {
     AudioComponentDescription acd;
     std::unordered_map<AudioUnitScope, unit::parameter_map_t> parameters;
     unit _au;
@@ -75,7 +74,7 @@ void audio::unit_node::impl::reset() {
         }
     }
 
-    super_class::reset();
+    node::impl::reset();
 }
 
 audio::unit audio::unit_node::impl::au() const {
@@ -242,7 +241,7 @@ void audio::unit_node::impl::reload_audio_unit() {
 }
 
 void audio::unit_node::impl::render(pcm_buffer &buffer, UInt32 const bus_idx, time const &when) {
-    super_class::render(buffer, bus_idx, when);
+    node::impl::render(buffer, bus_idx, when);
 
     if (auto audio_unit = _core->au()) {
         AudioUnitRenderActionFlags action_flags = 0;

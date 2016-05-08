@@ -17,8 +17,7 @@
 
 using namespace yas;
 
-class audio::device_io::kernel {
-   public:
+struct audio::device_io::kernel {
     pcm_buffer input_buffer;
     pcm_buffer output_buffer;
 
@@ -33,8 +32,7 @@ class audio::device_io::kernel {
     }
 };
 
-class audio::device_io::impl : public base::impl {
-   public:
+struct audio::device_io::impl : base::impl {
     weak<device_io> weak_device_io;
     audio::device device;
     bool is_running;
@@ -266,10 +264,10 @@ class audio::device_io::impl : public base::impl {
 
 #pragma mark -
 
-audio::device_io::device_io(std::nullptr_t) : super_class(nullptr) {
+audio::device_io::device_io(std::nullptr_t) : base(nullptr) {
 }
 
-audio::device_io::device_io(audio::device const &device) : super_class(std::make_shared<impl>()) {
+audio::device_io::device_io(audio::device const &device) : base(std::make_shared<impl>()) {
     impl_ptr<impl>()->prepare(*this, device);
 }
 

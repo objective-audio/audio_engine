@@ -6,15 +6,13 @@
 
 using namespace yas;
 
-class audio::tap_node::kernel : public node::kernel {
-   public:
+struct audio::tap_node::kernel : node::kernel {
     ~kernel() = default;
 
     audio::tap_node::render_f render_function;
 };
 
-class audio::tap_node::impl::core {
-   public:
+struct audio::tap_node::impl::core {
     render_f render_function;
     std::shared_ptr<kernel> kernel_on_render;
 };
@@ -26,7 +24,7 @@ audio::tap_node::impl::~impl() = default;
 
 void audio::tap_node::impl::reset() {
     _core->render_function = nullptr;
-    super_class::reset();
+    node::impl::reset();
 }
 
 UInt32 audio::tap_node::impl::input_bus_count() const {
@@ -42,7 +40,7 @@ std::shared_ptr<audio::node::kernel> audio::tap_node::impl::make_kernel() {
 }
 
 void audio::tap_node::impl::prepare_kernel(std::shared_ptr<node::kernel> const &kernel) {
-    super_class::prepare_kernel(kernel);
+    node::impl::prepare_kernel(kernel);
 
     auto tap_kernel = std::static_pointer_cast<tap_node::kernel>(kernel);
     tap_kernel->render_function = _core->render_function;
@@ -71,7 +69,7 @@ audio::connection_smap audio::tap_node::impl::output_connections_on_render() con
 }
 
 void audio::tap_node::impl::render(pcm_buffer &buffer, UInt32 const bus_idx, time const &when) {
-    super_class::render(buffer, bus_idx, when);
+    node::impl::render(buffer, bus_idx, when);
 
     if (auto kernel = kernel_cast<tap_node::kernel>()) {
         _core->kernel_on_render = kernel;
