@@ -18,15 +18,16 @@ namespace audio {
 
         virtual ~tap_node();
 
-        using render_f = std::function<void(audio::pcm_buffer &buffer, UInt32 const bus_idx, audio::time const &when)>;
+        using render_f =
+            std::function<void(audio::pcm_buffer &buffer, uint32_t const bus_idx, audio::time const &when)>;
 
         void set_render_function(render_f);
 
-        audio::connection input_connection_on_render(UInt32 const bus_idx) const;
-        audio::connection output_connection_on_render(UInt32 const bus_idx) const;
+        audio::connection input_connection_on_render(uint32_t const bus_idx) const;
+        audio::connection output_connection_on_render(uint32_t const bus_idx) const;
         audio::connection_smap input_connections_on_render() const;
         audio::connection_smap output_connections_on_render() const;
-        void render_source(audio::pcm_buffer &buffer, UInt32 const bus_idx, audio::time const &when);
+        void render_source(audio::pcm_buffer &buffer, uint32_t const bus_idx, audio::time const &when);
 
        protected:
         explicit tap_node(std::shared_ptr<impl> const &);
