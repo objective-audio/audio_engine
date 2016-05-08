@@ -200,10 +200,10 @@ CFStringRef audio::format::description() const {
     string += "    bytesPerPacket = " + std::to_string(asbd.mBytesPerPacket) + ";\n";
     string += "    channelsPerFrame = " + std::to_string(asbd.mChannelsPerFrame) + ";\n";
     string += "    formatFlags = " + format_flags_string(stream_description()) + ";\n";
-    string += "    formatID = " + yas::to_string(yas::file_type_for_hfs_type_code(asbd.mFormatID)) + ";\n";
+    string += "    formatID = " + to_string(file_type_for_hfs_type_code(asbd.mFormatID)) + ";\n";
     string += "    framesPerPacket = " + std::to_string(asbd.mFramesPerPacket) + ";\n";
     string += "}\n";
-    return yas::to_cf_object(string);
+    return to_cf_object(string);
 }
 
 audio::format const &audio::format::null_format() {

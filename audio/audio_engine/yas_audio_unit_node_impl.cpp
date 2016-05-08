@@ -177,7 +177,7 @@ void audio::unit_node::impl::update_connections() {
         auto input_bus_count = input_element_count();
         if (input_bus_count > 0) {
             auto weak_node = to_weak(cast<unit_node>());
-            audio_unit.set_render_callback([weak_node](yas::audio::render_parameters &render_parameters) {
+            audio_unit.set_render_callback([weak_node](audio::render_parameters &render_parameters) {
                 if (auto node = weak_node.lock()) {
                     if (auto kernel = node.impl_ptr<impl>()->kernel_cast()) {
                         if (auto connection = kernel->input_connection(render_parameters.in_bus_number)) {
@@ -255,8 +255,7 @@ void audio::unit_node::impl::render(pcm_buffer &buffer, UInt32 const bus_idx, ti
                                             .io_data = buffer.audio_buffer_list()};
 
         if (auto err = audio_unit.audio_unit_render(render_parameters).error_opt()) {
-            std::cout << "audio unit render error : " << std::to_string(*err) << " - " << yas::to_string(*err)
-                      << std::endl;
+            std::cout << "audio unit render error : " << std::to_string(*err) << " - " << to_string(*err) << std::endl;
         }
     }
 }

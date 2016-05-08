@@ -57,9 +57,9 @@ bool audio::route::operator<(route const &rhs) const {
 
 #pragma mark -
 
-audio::channel_map_result yas::audio::channel_map_from_routes(route_set_t const &routes, UInt32 const src_bus_idx,
-                                                              UInt32 const src_ch_count, UInt32 const dst_bus_idx,
-                                                              UInt32 const dst_ch_count) {
+audio::channel_map_result audio::channel_map_from_routes(route_set_t const &routes, UInt32 const src_bus_idx,
+                                                         UInt32 const src_ch_count, UInt32 const dst_bus_idx,
+                                                         UInt32 const dst_ch_count) {
     channel_map_t channel_map(src_ch_count, -1);
     bool exists = false;
 
