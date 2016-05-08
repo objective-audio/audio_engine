@@ -12,8 +12,8 @@ namespace audio {
 
         audio::connection_smap input_connections() const;
         audio::connection_smap output_connections() const;
-        audio::connection input_connection(UInt32 const bus_idx);
-        audio::connection output_connection(UInt32 const bus_idx);
+        audio::connection input_connection(uint32_t const bus_idx);
+        audio::connection output_connection(uint32_t const bus_idx);
 
        private:
         class impl;
