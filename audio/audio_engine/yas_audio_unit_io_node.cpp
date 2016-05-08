@@ -49,15 +49,15 @@ audio::channel_map_t const &audio::unit_io_node::channel_map(direction const dir
     return impl_ptr<impl>()->channel_map(dir);
 }
 
-Float64 audio::unit_io_node::device_sample_rate() const {
+double audio::unit_io_node::device_sample_rate() const {
     return impl_ptr<impl>()->device_sample_rate();
 }
 
-UInt32 audio::unit_io_node::output_device_channel_count() const {
+uint32_t audio::unit_io_node::output_device_channel_count() const {
     return impl_ptr<impl>()->output_device_channel_count();
 }
 
-UInt32 audio::unit_io_node::input_device_channel_count() const {
+uint32_t audio::unit_io_node::input_device_channel_count() const {
     return impl_ptr<impl>()->input_device_channel_count();
 }
 
