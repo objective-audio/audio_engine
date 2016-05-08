@@ -42,12 +42,12 @@ struct audio::route_node::impl : node::impl {
         node::impl::reset();
     }
 
-    virtual UInt32 input_bus_count() const override {
-        return std::numeric_limits<UInt32>::max();
+    virtual uint32_t input_bus_count() const override {
+        return std::numeric_limits<uint32_t>::max();
     }
 
-    virtual UInt32 output_bus_count() const override {
-        return std::numeric_limits<UInt32>::max();
+    virtual uint32_t output_bus_count() const override {
+        return std::numeric_limits<uint32_t>::max();
     }
 
     virtual std::shared_ptr<node::kernel> make_kernel() override {
@@ -61,21 +61,21 @@ struct audio::route_node::impl : node::impl {
         route_kernel->routes = _core->routes;
     }
 
-    virtual void render(pcm_buffer &dst_buffer, UInt32 const dst_bus_idx, time const &when) override {
+    virtual void render(pcm_buffer &dst_buffer, uint32_t const dst_bus_idx, time const &when) override {
         node::impl::render(dst_buffer, dst_bus_idx, when);
 
         if (auto kernel = kernel_cast<route_node::kernel>()) {
             auto &routes = kernel->routes;
             auto output_connection = kernel->output_connection(dst_bus_idx);
             auto input_connections = kernel->input_connections();
-            UInt32 const dst_ch_count = dst_buffer.format().channel_count();
+            uint32_t const dst_ch_count = dst_buffer.format().channel_count();
 
             for (auto const &pair : input_connections) {
                 if (auto const &input_connection = pair.second) {
                     if (auto node = input_connection.source_node()) {
                         auto const &src_format = input_connection.format();
                         auto const &src_bus_idx = pair.first;
-                        UInt32 const src_ch_count = src_format.channel_count();
+                        uint32_t const src_ch_count = src_format.channel_count();
                         if (auto const result =
                                 channel_map_from_routes(routes, src_bus_idx, src_ch_count, dst_bus_idx, dst_ch_count)) {
                             pcm_buffer src_buffer(src_format, dst_buffer, result.value());
