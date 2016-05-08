@@ -12,18 +12,18 @@ using namespace yas;
 
 namespace yas {
 namespace offline_sample {
-    static Float64 sample_rate = 44100.0;
+    static double sample_rate = 44100.0;
 
     struct sine_node : audio::tap_node {
         struct impl : audio::tap_node::impl {
-            Float64 phase_on_render;
+            double phase_on_render;
 
-            void set_frequency(const Float32 frequency) {
+            void set_frequency(const float frequency) {
                 std::lock_guard<std::recursive_mutex> lock(_mutex);
                 _frequency = frequency;
             }
 
-            Float32 frequency() const {
+            float frequency() const {
                 std::lock_guard<std::recursive_mutex> lock(_mutex);
                 return _frequency;
             }
@@ -39,7 +39,7 @@ namespace offline_sample {
             }
 
            private:
-            Float32 _frequency;
+            float _frequency;
             bool _playing;
             mutable std::recursive_mutex _mutex;
         };
@@ -49,16 +49,16 @@ namespace offline_sample {
 
             auto weak_node = to_weak(*this);
 
-            auto render_function = [weak_node](audio::pcm_buffer &buffer, const UInt32 bus_idx,
+            auto render_function = [weak_node](audio::pcm_buffer &buffer, const uint32_t bus_idx,
                                                const audio::time &when) {
                 buffer.clear();
 
                 if (auto node = weak_node.lock()) {
                     if (node.is_playing()) {
-                        const Float64 start_phase = node.impl_ptr<impl>()->phase_on_render;
-                        const Float64 phase_per_frame = node.frequency() / sample_rate * audio::math::two_pi;
-                        Float64 next_phase = start_phase;
-                        const UInt32 frame_length = buffer.frame_length();
+                        const double start_phase = node.impl_ptr<impl>()->phase_on_render;
+                        const double phase_per_frame = node.frequency() / sample_rate * audio::math::two_pi;
+                        double next_phase = start_phase;
+                        const uint32_t frame_length = buffer.frame_length();
 
                         if (frame_length > 0) {
                             audio::frame_enumerator enumerator(buffer);
@@ -83,11 +83,11 @@ namespace offline_sample {
 
         virtual ~sine_node() = default;
 
-        void set_frequency(const Float32 frequency) {
+        void set_frequency(const float frequency) {
             impl_ptr<impl>()->set_frequency(frequency);
         }
 
-        Float32 frequency() const {
+        float frequency() const {
             return impl_ptr<impl>()->frequency();
         }
 
@@ -104,9 +104,9 @@ namespace offline_sample {
 
 @interface YASAudioOfflineSampleViewController ()
 
-@property (nonatomic, assign) Float32 volume;
-@property (nonatomic, assign) Float32 frequency;
-@property (nonatomic, assign) Float32 length;
+@property (nonatomic, assign) float volume;
+@property (nonatomic, assign) float frequency;
+@property (nonatomic, assign) float length;
 
 @property (nonatomic, assign) BOOL playing;
 @property (nonatomic, assign, getter=isProcessing) BOOL processing;
@@ -190,19 +190,19 @@ namespace sample {
     _internal.play_engine.stop();
 }
 
-- (void)setVolume:(Float32)volume {
+- (void)setVolume:(float)volume {
     _internal.play_mixer_node.set_input_volume(volume, 0);
 }
 
-- (Float32)volume {
+- (float)volume {
     return _internal.play_mixer_node.input_volume(0);
 }
 
-- (void)setFrequency:(Float32)frequency {
+- (void)setFrequency:(float)frequency {
     _internal.play_sine_node.set_frequency(frequency);
 }
 
-- (Float32)frequency {
+- (float)frequency {
     return _internal.play_sine_node.frequency();
 }
 
@@ -252,7 +252,7 @@ namespace sample {
 
     self.processing = YES;
 
-    UInt32 remain = self.length * offline_sample::sample_rate;
+    uint32_t remain = self.length * offline_sample::sample_rate;
 
     auto unowned_self = make_objc_ptr([[YASUnownedObject<YASAudioOfflineSampleViewController *> alloc] init]);
     [unowned_self.object() setObject:self];
@@ -264,7 +264,7 @@ namespace sample {
             audio::pcm_buffer pcm_buffer(format, buffer.audio_buffer_list());
             pcm_buffer.set_frame_length(buffer.frame_length());
 
-            UInt32 frame_length = MIN(remain, pcm_buffer.frame_length());
+            uint32_t frame_length = MIN(remain, pcm_buffer.frame_length());
             if (frame_length > 0) {
                 pcm_buffer.set_frame_length(frame_length);
                 auto write_result = file_writer.write_from_buffer(pcm_buffer);
