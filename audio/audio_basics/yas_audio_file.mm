@@ -139,6 +139,10 @@ CFURLRef audio::file::url() const {
     return _impl->url();
 }
 
+CFStringRef audio::file::file_type() const {
+    return _impl->file_type();
+}
+
 audio::format const &audio::file::file_format() const {
     return _impl->file_format;
 }
@@ -181,40 +185,37 @@ SInt64 audio::file::file_frame_position() const {
     return _impl->file_frame_position;
 }
 
-audio::file::open_result_t audio::file::open(CFURLRef const file_url, pcm_format const pcm_format,
-                                             bool const interleaved) {
+audio::file::open_result_t audio::file::open(open_args args) {
     if (_impl->ext_audio_file) {
         return open_result_t(open_error_t::opened);
     }
 
-    if (!file_url || pcm_format == yas::audio::pcm_format::other) {
+    if (!args.file_url || args.pcm_format == yas::audio::pcm_format::other) {
         return open_result_t(open_error_t::invalid_argument);
     }
 
-    _impl->set_url(file_url);
+    _impl->set_url(args.file_url);
 
-    if (!_impl->open(pcm_format, interleaved)) {
+    if (!_impl->open(args.pcm_format, args.interleaved)) {
         return open_result_t(open_error_t::open_failed);
     }
 
     return open_result_t(nullptr);
 }
 
-audio::file::create_result_t audio::file::create(CFURLRef const file_url, CFStringRef const file_type,
-                                                 CFDictionaryRef const settings, pcm_format const pcm_format,
-                                                 bool const interleaved) {
+audio::file::create_result_t audio::file::create(create_args args) {
     if (_impl->ext_audio_file) {
         return create_result_t(create_error_t::created);
     }
 
-    if (!file_url || !file_type || !settings) {
+    if (!args.file_url || !args.file_type || !args.settings) {
         return create_result_t(create_error_t::invalid_argument);
     }
 
-    _impl->set_url(file_url);
-    _impl->set_file_type(file_type);
+    _impl->set_url(args.file_url);
+    _impl->set_file_type(args.file_type);
 
-    if (!_impl->create(settings, pcm_format, interleaved)) {
+    if (!_impl->create(args.settings, args.pcm_format, args.interleaved)) {
         return create_result_t(create_error_t::create_failed);
     }
 
@@ -322,6 +323,18 @@ audio::file::write_result_t audio::file::write_from_buffer(audio::pcm_buffer con
     }
 
     return write_result_t(nullptr);
+}
+
+audio::file audio::open_file(file::open_args args) {
+    audio::file file;
+    file.open(std::move(args));
+    return file;
+}
+
+audio::file audio::create_file(file::create_args args) {
+    audio::file file;
+    file.create(std::move(args));
+    return file;
 }
 
 std::string yas::to_string(audio::file::open_error_t const &error_t) {

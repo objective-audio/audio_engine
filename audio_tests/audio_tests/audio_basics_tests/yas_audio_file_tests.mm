@@ -137,6 +137,38 @@ namespace test {
 #endif
 }
 
+- (void)test_make_create_and_open_file {
+    auto file_name = CFSTR("test.wav");
+    NSString *filePath = [[self temporaryTestDirectory] stringByAppendingPathComponent:(__bridge NSString *)file_name];
+    CFURLRef fileURL = (__bridge CFURLRef)[NSURL fileURLWithPath:filePath];
+
+    {
+        auto file = yas::audio::create_file({.file_url = fileURL,
+                                             .file_type = yas::audio::file_type::wave,
+                                             .settings = yas::audio::wave_file_settings(48000.0, 2, 16)});
+
+        XCTAssertTrue(CFEqual(file.url(), fileURL));
+        XCTAssertTrue(CFEqual(file.file_type(), yas::audio::file_type::wave));
+        auto const &file_format = file.file_format();
+        XCTAssertEqual(file_format.buffer_count(), 1);
+        XCTAssertEqual(file_format.channel_count(), 2);
+        XCTAssertEqual(file_format.sample_rate(), 48000.0);
+        XCTAssertEqual(file_format.pcm_format(), yas::audio::pcm_format::int16);
+        XCTAssertEqual(file_format.is_interleaved(), true);
+    }
+
+    if (auto file = yas::audio::open_file({.file_url = fileURL})) {
+        XCTAssertTrue(CFEqual(file.url(), fileURL));
+        XCTAssertTrue(CFEqual(file.file_type(), yas::audio::file_type::wave));
+        auto const &file_format = file.file_format();
+        XCTAssertEqual(file_format.buffer_count(), 1);
+        XCTAssertEqual(file_format.channel_count(), 2);
+        XCTAssertEqual(file_format.sample_rate(), 48000.0);
+        XCTAssertEqual(file_format.pcm_format(), yas::audio::pcm_format::int16);
+        XCTAssertEqual(file_format.is_interleaved(), true);
+    }
+}
+
 #pragma mark -
 
 - (void)_commonAudioFileTest:(yas::test::audio_file_test_data &)test_data {
@@ -161,9 +193,14 @@ namespace test {
         yas::audio::file audio_file;
 
         if (test_data.standard) {
-            XCTAssertTrue(audio_file.create(fileURL, test_data.file_type(), settings));
+            XCTAssertTrue(
+                audio_file.create({.file_url = fileURL, .file_type = test_data.file_type(), .settings = settings}));
         } else {
-            XCTAssertTrue(audio_file.create(fileURL, test_data.file_type(), settings, pcm_format, interleaved));
+            XCTAssertTrue(audio_file.create({.file_url = fileURL,
+                                             .file_type = test_data.file_type(),
+                                             .settings = settings,
+                                             .pcm_format = pcm_format,
+                                             .interleaved = interleaved}));
         }
 
         XCTAssertTrue(audio_file.processing_format() == default_processing_format);
@@ -189,9 +226,9 @@ namespace test {
         yas::audio::file audio_file;
 
         if (test_data.standard) {
-            XCTAssertTrue(audio_file.open(fileURL));
+            XCTAssertTrue(audio_file.open({.file_url = fileURL}));
         } else {
-            XCTAssertTrue(audio_file.open(fileURL, pcm_format, interleaved));
+            XCTAssertTrue(audio_file.open({.file_url = fileURL, .pcm_format = pcm_format, .interleaved = interleaved}));
         }
 
         SInt64 looped_frame_length = frame_length * loopCount;
