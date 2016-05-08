@@ -76,7 +76,7 @@ audio::offline_start_result_t audio::offline_output_node::impl::start(offline_re
         auto operation_lambda =
             [weak_node, render_buffer, render_func = std::move(render_func), key](operation const &op) mutable {
             bool cancelled = false;
-            UInt32 current_sample_time = 0;
+            uint32_t current_sample_time = 0;
             bool stop = false;
 
             while (!stop) {
@@ -172,11 +172,11 @@ void audio::offline_output_node::impl::reset() {
     node::impl::reset();
 }
 
-UInt32 audio::offline_output_node::impl::output_bus_count() const {
+uint32_t audio::offline_output_node::impl::output_bus_count() const {
     return 0;
 }
 
-UInt32 audio::offline_output_node::impl::input_bus_count() const {
+uint32_t audio::offline_output_node::impl::input_bus_count() const {
     return 1;
 }
 
