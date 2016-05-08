@@ -91,6 +91,9 @@ namespace audio {
         class impl;
         std::shared_ptr<impl> _impl;
     };
+
+    file open_file(file::open_args);
+    file create_file(file::create_args);
 }
 
 std::string to_string(audio::file::open_error_t const &);

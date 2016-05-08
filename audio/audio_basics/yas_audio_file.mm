@@ -325,6 +325,18 @@ audio::file::write_result_t audio::file::write_from_buffer(audio::pcm_buffer con
     return write_result_t(nullptr);
 }
 
+audio::file audio::open_file(file::open_args args) {
+    audio::file file;
+    file.open(std::move(args));
+    return file;
+}
+
+audio::file audio::create_file(file::create_args args) {
+    audio::file file;
+    file.create(std::move(args));
+    return file;
+}
+
 std::string yas::to_string(audio::file::open_error_t const &error_t) {
     switch (error_t) {
         case audio::file::open_error_t::opened:
