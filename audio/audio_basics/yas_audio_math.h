@@ -25,11 +25,11 @@ namespace audio {
         template <typename T>
         static auto seconds_from_tempo(T const tempo) -> T;
 
-        static double seconds_from_frames(const uint32_t frames, double const sample_rate);
+        static double seconds_from_frames(uint32_t const frames, double const sample_rate);
         static uint32_t frames_from_seconds(double const seconds, double const sample_rate);
 
         template <typename T>
-        static auto fill_sine(T *const out_data, const uint32_t length, double const start_phase,
+        static auto fill_sine(T *const out_data, uint32_t const length, double const start_phase,
                               double const phase_per_frame) -> T;
     };
 
