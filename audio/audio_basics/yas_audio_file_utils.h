@@ -41,13 +41,15 @@ namespace audio {
         CFStringRef get_audio_file_type(ExtAudioFileRef const ext_auidio_file);
     }
 
-    CFDictionaryRef wave_file_settings(Float64 const sample_rate, UInt32 const channel_count, UInt32 const bit_depth);
-    CFDictionaryRef aiff_file_settings(Float64 const sample_rate, UInt32 const channel_count, UInt32 const bit_depth);
-    CFDictionaryRef linear_pcm_file_settings(Float64 const sample_rate, UInt32 const channel_count,
-                                             UInt32 const bit_depth, const bool is_big_endian, const bool is_float,
+    CFDictionaryRef wave_file_settings(double const sample_rate, uint32_t const channel_count,
+                                       uint32_t const bit_depth);
+    CFDictionaryRef aiff_file_settings(double const sample_rate, uint32_t const channel_count,
+                                       uint32_t const bit_depth);
+    CFDictionaryRef linear_pcm_file_settings(double const sample_rate, uint32_t const channel_count,
+                                             uint32_t const bit_depth, const bool is_big_endian, const bool is_float,
                                              const bool is_non_interleaved);
-    CFDictionaryRef aac_settings(Float64 const sample_rate, UInt32 const channel_count, UInt32 const bit_depth,
-                                 const AVAudioQuality encoder_quality, UInt32 const bit_rate,
-                                 UInt32 const bit_depth_hint, const AVAudioQuality converter_quality);
+    CFDictionaryRef aac_settings(double const sample_rate, uint32_t const channel_count, uint32_t const bit_depth,
+                                 const AVAudioQuality encoder_quality, uint32_t const bit_rate,
+                                 uint32_t const bit_depth_hint, const AVAudioQuality converter_quality);
 }
 }
