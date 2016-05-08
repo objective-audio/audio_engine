@@ -4,6 +4,8 @@
 
 #import "yas_audio_test_utils.h"
 
+using namespace yas;
+
 @interface yas_audio_connection_tests : XCTestCase
 
 @end
@@ -19,14 +21,14 @@
 }
 
 - (void)test_create_connention_success {
-    auto format = yas::audio::format(48000.0, 2);
-    yas::test::audio_test_node source_node;
-    yas::test::audio_test_node destination_node;
+    auto format = audio::format(48000.0, 2);
+    test::audio_test_node source_node;
+    test::audio_test_node destination_node;
     const UInt32 source_bus = 0;
     const UInt32 destination_bus = 1;
 
-    auto connection = yas::audio::connection::private_access::create(source_node, source_bus, destination_node,
-                                                                     destination_bus, format);
+    auto connection =
+        audio::connection::private_access::create(source_node, source_bus, destination_node, destination_bus, format);
 
     XCTAssertTrue(connection.source_node() == source_node);
     XCTAssertTrue(connection.source_bus() == source_bus);
@@ -39,14 +41,14 @@
 }
 
 - (void)test_remove_nodes {
-    auto format = yas::audio::format(44100.0, 2);
-    yas::test::audio_test_node source_node;
-    yas::test::audio_test_node destination_node;
+    auto format = audio::format(44100.0, 2);
+    test::audio_test_node source_node;
+    test::audio_test_node destination_node;
     const UInt32 source_bus = 0;
     const UInt32 destination_bus = 1;
 
-    auto connection = yas::audio::connection::private_access::create(source_node, source_bus, destination_node,
-                                                                     destination_bus, format);
+    auto connection =
+        audio::connection::private_access::create(source_node, source_bus, destination_node, destination_bus, format);
 
     connection.node_removable().remove_nodes();
 
@@ -55,14 +57,14 @@
 }
 
 - (void)test_remove_nodes_separately {
-    auto format = yas::audio::format(8000.0, 2);
-    yas::test::audio_test_node source_node;
-    yas::test::audio_test_node destination_node;
+    auto format = audio::format(8000.0, 2);
+    test::audio_test_node source_node;
+    test::audio_test_node destination_node;
     const UInt32 source_bus = 0;
     const UInt32 destination_bus = 1;
 
-    auto connection = yas::audio::connection::private_access::create(source_node, source_bus, destination_node,
-                                                                     destination_bus, format);
+    auto connection =
+        audio::connection::private_access::create(source_node, source_bus, destination_node, destination_bus, format);
 
     connection.node_removable().remove_source_node();
 
@@ -75,21 +77,21 @@
 }
 
 - (void)test_create_connection_failed {
-    auto format = yas::audio::format(48000.0, 2);
-    yas::test::audio_test_node source_node;
-    yas::test::audio_test_node destination_node;
+    auto format = audio::format(48000.0, 2);
+    test::audio_test_node source_node;
+    test::audio_test_node destination_node;
     const UInt32 source_bus = 0;
     const UInt32 destination_bus = 1;
 
-    yas::audio::node null_node(nullptr);
-    XCTAssertThrows(yas::audio::connection::private_access::create(null_node, source_bus, destination_node,
-                                                                   destination_bus, format));
+    audio::node null_node(nullptr);
     XCTAssertThrows(
-        yas::audio::connection::private_access::create(source_node, source_bus, null_node, destination_bus, format));
+        audio::connection::private_access::create(null_node, source_bus, destination_node, destination_bus, format));
+    XCTAssertThrows(
+        audio::connection::private_access::create(source_node, source_bus, null_node, destination_bus, format));
 }
 
 - (void)test_empty_connection {
-    yas::audio::connection connection(nullptr);
+    audio::connection connection(nullptr);
 
     XCTAssertFalse(connection.source_node());
     XCTAssertFalse(connection.destination_node());

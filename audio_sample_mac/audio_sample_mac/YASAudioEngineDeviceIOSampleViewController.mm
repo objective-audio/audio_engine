@@ -7,6 +7,8 @@
 #import "yas_audio.h"
 #import "yas_objc_unowned.h"
 
+using namespace yas;
+
 typedef NS_ENUM(NSUInteger, YASAudioDeviceRouteSampleSourceBus) {
     YASAudioDeviceRouteSampleSourceBusSine = 0,
     YASAudioDeviceRouteSampleSourceBusInput = 1,
@@ -96,19 +98,19 @@ typedef NS_ENUM(NSUInteger, YASAudioDeviceRouteSampleInputType) {
 namespace yas {
 namespace sample {
     struct device_io_vc_internal {
-        yas::audio::engine engine = nullptr;
-        yas::audio::device_io_node device_io_node = nullptr;
-        yas::audio::route_node route_node = nullptr;
-        yas::audio::tap_node tap_node = nullptr;
+        audio::engine engine = nullptr;
+        audio::device_io_node device_io_node = nullptr;
+        audio::route_node route_node = nullptr;
+        audio::tap_node tap_node = nullptr;
 
-        yas::base system_observer = nullptr;
-        yas::base device_observer = nullptr;
+        base system_observer = nullptr;
+        base device_observer = nullptr;
     };
 }
 }
 
 @implementation YASAudioEngineDeviceIOSampleViewController {
-    yas::sample::device_io_vc_internal _internal;
+    sample::device_io_vc_internal _internal;
 }
 
 - (void)dealloc {
@@ -133,8 +135,8 @@ namespace sample {
     [self setupEngine];
 
     if (auto error = _internal.engine.start_render().error_opt()) {
-        const auto error_str = yas::to_string(*error);
-        NSLog(@"audio engine start failed. error : %@", (__bridge NSString *)yas::to_cf_object(error_str));
+        const auto error_str = to_string(*error);
+        NSLog(@"audio engine start failed. error : %@", (__bridge NSString *)to_cf_object(error_str));
     }
 }
 
@@ -167,26 +169,25 @@ namespace sample {
 }
 
 - (void)setupEngine {
-    _internal.engine = yas::audio::engine{};
-    _internal.device_io_node = yas::audio::device_io_node{};
-    _internal.route_node = yas::audio::route_node{};
-    _internal.tap_node = yas::audio::tap_node{};
+    _internal.engine = audio::engine{};
+    _internal.device_io_node = audio::device_io_node{};
+    _internal.route_node = audio::route_node{};
+    _internal.tap_node = audio::tap_node{};
 
-    auto weak_node = yas::to_weak(_internal.tap_node);
+    auto weak_node = to_weak(_internal.tap_node);
 
     Float64 next_phase = 0.0;
 
-    auto render_function = [next_phase, weak_node](yas::audio::pcm_buffer &buffer, const UInt32 bus_idx,
-                                                   const yas::audio::time &when) mutable {
+    auto render_function = [next_phase, weak_node](audio::pcm_buffer &buffer, const UInt32 bus_idx,
+                                                   const audio::time &when) mutable {
         buffer.clear();
 
-        yas::audio::frame_enumerator enumerator(buffer);
+        audio::frame_enumerator enumerator(buffer);
         const auto *flex_ptr = enumerator.pointer();
         const Float64 start_phase = next_phase;
-        const Float64 phase_per_frame = 1000.0 / buffer.format().sample_rate() * yas::audio::math::two_pi;
+        const Float64 phase_per_frame = 1000.0 / buffer.format().sample_rate() * audio::math::two_pi;
         while (flex_ptr->v) {
-            next_phase =
-                yas::audio::math::fill_sine(flex_ptr->f32, buffer.frame_length(), start_phase, phase_per_frame);
+            next_phase = audio::math::fill_sine(flex_ptr->f32, buffer.frame_length(), start_phase, phase_per_frame);
             cblas_sscal(buffer.frame_length(), 0.2, flex_ptr->f32, 1);
             yas_audio_frame_enumerator_move_channel(enumerator);
         }
@@ -194,17 +195,17 @@ namespace sample {
 
     _internal.tap_node.set_render_function(render_function);
 
-    auto unowned_self = yas::make_objc_ptr([[YASUnownedObject alloc] init]);
+    auto unowned_self = make_objc_ptr([[YASUnownedObject alloc] init]);
     [unowned_self.object() setObject:self];
 
-    _internal.system_observer = yas::audio::device::system_subject().make_observer(
-        yas::audio::device::hardware_did_change_key,
+    _internal.system_observer = audio::device::system_subject().make_observer(
+        audio::device::hardware_did_change_key,
         [unowned_self](const auto &context) { [[unowned_self.object() object] _updateDeviceNames]; });
 
     [self _updateDeviceNames];
 
-    auto default_device = yas::audio::device::default_output_device();
-    if (auto index = yas::audio::device::index_of_device(default_device)) {
+    auto default_device = audio::device::default_output_device();
+    if (auto index = audio::device::index_of_device(default_device)) {
         self.selectedDeviceIndex = *index;
     }
 }
@@ -220,7 +221,7 @@ namespace sample {
     _internal.system_observer = nullptr;
     _internal.device_observer = nullptr;
 
-    self.selectedDeviceIndex = yas::audio::device::all_devices().size();
+    self.selectedDeviceIndex = audio::device::all_devices().size();
 
     [self _removeObservers];
 
@@ -231,7 +232,7 @@ namespace sample {
 #pragma mark - update
 
 - (void)_updateDeviceNames {
-    auto all_devices = yas::audio::device::all_devices();
+    auto all_devices = audio::device::all_devices();
 
     NSMutableArray *titles = [NSMutableArray arrayWithCapacity:all_devices.size()];
 
@@ -244,7 +245,7 @@ namespace sample {
     self.deviceNames = titles;
 
     auto device = _internal.device_io_node.device();
-    auto index = yas::audio::device::index_of_device(device);
+    auto index = audio::device::index_of_device(device);
     if (index) {
         self.selectedDeviceIndex = *index;
     } else {
@@ -329,7 +330,7 @@ namespace sample {
     auto &routes = _internal.route_node.routes();
     for (YASAudioDeviceRouteSampleOutputData *data in self.outputRoutes) {
         const UInt32 dst_ch_idx = data.outputIndex;
-        auto it = std::find_if(routes.begin(), routes.end(), [dst_ch_idx](const yas::audio::route &route) {
+        auto it = std::find_if(routes.begin(), routes.end(), [dst_ch_idx](const audio::route &route) {
             return route.destination.channel == dst_ch_idx;
         });
 
@@ -359,7 +360,7 @@ namespace sample {
 - (void)setSelectedDeviceIndex:(NSUInteger)selectedDeviceIndex {
     _selectedDeviceIndex = selectedDeviceIndex;
 
-    auto all_devices = yas::audio::device::all_devices();
+    auto all_devices = audio::device::all_devices();
 
     if (selectedDeviceIndex < all_devices.size()) {
         auto device = all_devices[selectedDeviceIndex];
@@ -369,23 +370,23 @@ namespace sample {
     }
 }
 
-- (void)setDevice:(const yas::audio::device &)selected_device {
+- (void)setDevice:(const audio::device &)selected_device {
     _internal.device_observer = nullptr;
 
     if (!_internal.device_io_node) {
         return;
     }
 
-    const auto all_devices = yas::audio::device::all_devices();
+    const auto all_devices = audio::device::all_devices();
 
     if (selected_device && std::find(all_devices.begin(), all_devices.end(), selected_device) != all_devices.end()) {
         _internal.device_io_node.set_device(selected_device);
 
-        auto unowned_self = yas::make_objc_ptr([[YASUnownedObject alloc] init]);
+        auto unowned_self = make_objc_ptr([[YASUnownedObject alloc] init]);
         [unowned_self.object() setObject:self];
 
         _internal.device_observer = selected_device.subject().make_observer(
-            yas::audio::device::device_did_change_key, [selected_device, unowned_self](auto const &context) {
+            audio::device::device_did_change_key, [selected_device, unowned_self](auto const &context) {
                 const auto &change_info = context.value;
                 const auto &infos = change_info.property_infos;
                 if (change_info.property_infos.size() > 0) {

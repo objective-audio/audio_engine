@@ -70,7 +70,7 @@ audio::offline_start_result_t audio::offline_output_node::impl::start(offline_re
             }
         }
 
-        yas::audio::pcm_buffer render_buffer(connection.format(), 1024);
+        audio::pcm_buffer render_buffer(connection.format(), 1024);
 
         auto weak_node = to_weak(cast<offline_output_node>());
         auto operation_lambda =
@@ -141,7 +141,7 @@ audio::offline_start_result_t audio::offline_output_node::impl::start(offline_re
             dispatch_async(dispatch_get_main_queue(), completion_lambda);
         };
 
-        yas::operation operation{std::move(operation_lambda)};
+        operation operation{std::move(operation_lambda)};
         _core->queue = operation_queue{1};
         _core->queue.push_back(operation);
     } else {

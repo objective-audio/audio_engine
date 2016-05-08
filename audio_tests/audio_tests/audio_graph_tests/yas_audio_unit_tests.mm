@@ -4,6 +4,8 @@
 
 #import "yas_audio_test_utils.h"
 
+using namespace yas;
+
 @interface yas_audio_unit_tests : XCTestCase
 
 @end
@@ -27,12 +29,12 @@
     const OSType type = kAudioUnitType_FormatConverter;
     const OSType sub_type = kAudioUnitSubType_AUConverter;
 
-    auto output_format = yas::audio::format(output_sample_rate, channels, yas::audio::pcm_format::float32, false);
-    auto input_format = yas::audio::format(input_sample_rate, channels, yas::audio::pcm_format::int16, true);
+    auto output_format = audio::format(output_sample_rate, channels, audio::pcm_format::float32, false);
+    auto input_format = audio::format(input_sample_rate, channels, audio::pcm_format::int16, true);
 
-    yas::audio::graph graph;
+    audio::graph graph;
 
-    yas::audio::unit converter_unit(kAudioUnitType_FormatConverter, kAudioUnitSubType_AUConverter);
+    audio::unit converter_unit(kAudioUnitType_FormatConverter, kAudioUnitSubType_AUConverter);
     converter_unit.set_maximum_frames_per_slice(maximum_frame_length);
 
     graph.add_audio_unit(converter_unit);
@@ -49,17 +51,17 @@
     converter_unit.set_input_format(input_format.stream_description(), 0);
 
     AudioStreamBasicDescription outputASBD = converter_unit.output_format(0);
-    XCTAssertTrue(yas::is_equal(output_format.stream_description(), outputASBD));
+    XCTAssertTrue(is_equal(output_format.stream_description(), outputASBD));
 
     AudioStreamBasicDescription inputASBD = converter_unit.input_format(0);
-    XCTAssertTrue(yas::is_equal(input_format.stream_description(), inputASBD));
+    XCTAssertTrue(is_equal(input_format.stream_description(), inputASBD));
 
     XCTestExpectation *expectation = [self expectationWithDescription:@"ConverterUnit Render"];
 
     yas_retain_or_ignore(expectation);
 
     converter_unit.set_render_callback(
-        [expectation, input_format, &self](yas::audio::render_parameters &render_parameters) mutable {
+        [expectation, input_format, &self](audio::render_parameters &render_parameters) mutable {
             if (expectation) {
                 const AudioBufferList *ioData = render_parameters.io_data;
                 XCTAssertNotEqual(ioData, nullptr);
@@ -76,7 +78,7 @@
             }
         });
 
-    yas::test::audio_unit_render_on_sub_thread(converter_unit, output_format, frame_length, 1, 0);
+    test::audio_unit_render_on_sub_thread(converter_unit, output_format, frame_length, 1, 0);
 
     [self waitForExpectationsWithTimeout:0.5
                                  handler:^(NSError *error){
@@ -94,11 +96,11 @@
     const UInt32 frame_length = 1024;
     const UInt32 maximum_frame_length = 4096;
 
-    auto format = yas::audio::format(sampleRate, channels, yas::audio::pcm_format::float32, false);
+    auto format = audio::format(sampleRate, channels, audio::pcm_format::float32, false);
 
-    yas::audio::graph graph;
+    audio::graph graph;
 
-    yas::audio::unit converter_unit(kAudioUnitType_FormatConverter, kAudioUnitSubType_AUConverter);
+    audio::unit converter_unit(kAudioUnitType_FormatConverter, kAudioUnitSubType_AUConverter);
     converter_unit.set_maximum_frames_per_slice(maximum_frame_length);
 
     graph.add_audio_unit(converter_unit);
@@ -116,7 +118,7 @@
     yas_retain_or_ignore(preRenderExpectation);
     yas_retain_or_ignore(postRenderExpectation);
 
-    converter_unit.set_render_callback([renderExpectation](yas::audio::render_parameters &render_parameters) mutable {
+    converter_unit.set_render_callback([renderExpectation](audio::render_parameters &render_parameters) mutable {
         if (renderExpectation) {
             [renderExpectation fulfill];
             yas_release(renderExpectation);
@@ -125,7 +127,7 @@
     });
 
     converter_unit.set_notify_callback(
-        [preRenderExpectation, postRenderExpectation](yas::audio::render_parameters &render_parameters) mutable {
+        [preRenderExpectation, postRenderExpectation](audio::render_parameters &render_parameters) mutable {
             AudioUnitRenderActionFlags flags = *render_parameters.io_action_flags;
             if (flags & kAudioUnitRenderAction_PreRender) {
                 if (preRenderExpectation) {
@@ -142,7 +144,7 @@
             }
         });
 
-    yas::test::audio_unit_render_on_sub_thread(converter_unit, format, frame_length, 1, 0);
+    test::audio_unit_render_on_sub_thread(converter_unit, format, frame_length, 1, 0);
 
     [self waitForExpectationsWithTimeout:0.5
                                  handler:^(NSError *error){
@@ -156,20 +158,20 @@
     bool is_render_notify_callback = false;
 
     converter_unit.set_render_callback(
-        [&is_render_callback](yas::audio::render_parameters &render_parameters) { is_render_callback = true; });
+        [&is_render_callback](audio::render_parameters &render_parameters) { is_render_callback = true; });
 
-    converter_unit.set_notify_callback([&is_render_notify_callback](yas::audio::render_parameters &render_parameters) {
+    converter_unit.set_notify_callback([&is_render_notify_callback](audio::render_parameters &render_parameters) {
         is_render_notify_callback = true;
     });
 
-    yas::test::audio_unit_render_on_sub_thread(converter_unit, format, frame_length, 1, 0.2);
+    test::audio_unit_render_on_sub_thread(converter_unit, format, frame_length, 1, 0.2);
 
     XCTAssertFalse(is_render_callback);
     XCTAssertFalse(is_render_notify_callback);
 }
 
 - (void)testParameter {
-    yas::audio::unit delay_unit(kAudioUnitType_Effect, kAudioUnitSubType_Delay);
+    audio::unit delay_unit(kAudioUnitType_Effect, kAudioUnitSubType_Delay);
 
     const AudioUnitScope scope = kAudioUnitScope_Global;
     auto parameter = delay_unit.create_parameter(kDelayParam_DelayTime, scope);
@@ -192,14 +194,14 @@
 }
 
 - (void)testParameterCreateFailed {
-    yas::audio::unit delay_unit(kAudioUnitType_Effect, kAudioUnitSubType_Delay);
+    audio::unit delay_unit(kAudioUnitType_Effect, kAudioUnitSubType_Delay);
 
     XCTAssertThrows(delay_unit.create_parameter(kDelayParam_DelayTime, kAudioUnitScope_Input));
     XCTAssertThrows(delay_unit.create_parameter(kDelayParam_DelayTime, kAudioUnitScope_Output));
 }
 
 - (void)testParameters {
-    yas::audio::unit delay_unit(kAudioUnitType_Effect, kAudioUnitSubType_Delay);
+    audio::unit delay_unit(kAudioUnitType_Effect, kAudioUnitSubType_Delay);
 
     auto parameters = delay_unit.create_parameters(kAudioUnitScope_Global);
 
@@ -221,25 +223,25 @@
     const AudioUnitScope scope = kAudioUnitScope_Input;
     const AudioUnitElement element = 0;
 
-    auto format = yas::audio::format(sampleRate, channels, yas::audio::pcm_format::float32, false);
+    auto format = audio::format(sampleRate, channels, audio::pcm_format::float32, false);
 
     std::vector<AudioStreamBasicDescription> set_data;
     set_data.push_back(format.stream_description());
 
-    yas::audio::unit converter_unit(kAudioUnitType_FormatConverter, kAudioUnitSubType_AUConverter);
+    audio::unit converter_unit(kAudioUnitType_FormatConverter, kAudioUnitSubType_AUConverter);
 
-    yas::audio::unit::private_access::set_property_data(converter_unit, set_data, property_id, scope, element);
+    audio::unit::private_access::set_property_data(converter_unit, set_data, property_id, scope, element);
 
     std::vector<AudioStreamBasicDescription> get_data;
 
-    XCTAssertNoThrow(get_data = yas::audio::unit::private_access::property_data<AudioStreamBasicDescription>(
+    XCTAssertNoThrow(get_data = audio::unit::private_access::property_data<AudioStreamBasicDescription>(
                          converter_unit, property_id, scope, element));
 
-    XCTAssertTrue(yas::is_equal(set_data.at(0), get_data.at(0)));
+    XCTAssertTrue(is_equal(set_data.at(0), get_data.at(0)));
 
     std::vector<AudioStreamBasicDescription> zero_data;
     XCTAssertThrows(
-        yas::audio::unit::private_access::set_property_data(converter_unit, zero_data, property_id, scope, element));
+        audio::unit::private_access::set_property_data(converter_unit, zero_data, property_id, scope, element));
 }
 
 @end

@@ -5,6 +5,8 @@
 #import "YASDecibelValueTransformer.h"
 #import "yas_audio.h"
 
+using namespace yas;
+
 @interface YASDecibelValueTransformer ()
 
 @property (nonatomic, strong) NSNumberFormatter *numberFormatter;
@@ -44,7 +46,7 @@
 - (id)transformedValue:(id)value {
     if ([value isKindOfClass:[NSNumber class]]) {
         NSNumber *numberValue = value;
-        numberValue = @(yas::audio::math::decibel_from_linear(numberValue.doubleValue));
+        numberValue = @(audio::math::decibel_from_linear(numberValue.doubleValue));
         return [self.numberFormatter stringFromNumber:numberValue];
     }
 

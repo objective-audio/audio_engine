@@ -19,8 +19,8 @@ namespace audio {
     static bool _interrupting;
     static std::map<UInt8, weak<graph>> _graphs;
 #if TARGET_OS_IPHONE
-    static yas::objc_ptr<> _did_become_active_observer;
-    static yas::objc_ptr<> _interruption_observer;
+    static objc_ptr<> _did_become_active_observer;
+    static objc_ptr<> _interruption_observer;
 #endif
 }
 }
@@ -54,7 +54,7 @@ struct audio::graph::impl : base::impl {
                 [[NSNotificationCenter defaultCenter] addObserverForName:UIApplicationDidBecomeActiveNotification
                                                                   object:nil
                                                                    queue:[NSOperationQueue mainQueue]
-                                                              usingBlock:lambda];
+                                                              usingBlock:std::move(lambda)];
             _did_become_active_observer.set_object(observer);
         }
 
@@ -79,7 +79,7 @@ struct audio::graph::impl : base::impl {
                 [[NSNotificationCenter defaultCenter] addObserverForName:AVAudioSessionInterruptionNotification
                                                                   object:nil
                                                                    queue:[NSOperationQueue mainQueue]
-                                                              usingBlock:lambda];
+                                                              usingBlock:std::move(lambda)];
             _interruption_observer.set_object(observer);
         }
     }

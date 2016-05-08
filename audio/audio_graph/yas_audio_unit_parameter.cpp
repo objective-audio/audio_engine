@@ -7,7 +7,7 @@
 
 using namespace yas;
 
-struct yas::audio::unit::parameter::impl {
+struct audio::unit::parameter::impl {
     AudioUnitParameterID parameter_id;
     AudioUnitScope scope;
     bool has_clump;
@@ -31,8 +31,8 @@ struct yas::audio::unit::parameter::impl {
           max_value(info.maxValue),
           default_value(info.defaultValue),
           values(),
-          unit_name(yas::to_string(info.unitName)),
-          name(yas::to_string(info.cfNameString)) {
+          unit_name(to_string(info.unitName)),
+          name(to_string(info.cfNameString)) {
     }
 
     ~impl() {

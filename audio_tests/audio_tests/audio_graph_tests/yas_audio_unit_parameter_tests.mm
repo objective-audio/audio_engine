@@ -4,6 +4,8 @@
 
 #import "yas_audio_test_utils.h"
 
+using namespace yas;
+
 @interface yas_audio_unit_parameter_tests : XCTestCase
 
 @end
@@ -30,7 +32,7 @@
     AudioUnitParameterID parameterID = 20;
     AudioUnitScope scope = kAudioUnitScope_Output;
 
-    yas::audio::unit::parameter parameter{info, parameterID, scope};
+    audio::unit::parameter parameter{info, parameterID, scope};
 
     XCTAssertEqual(parameter.parameter_id(), 20);
     XCTAssertEqual(parameter.scope(), kAudioUnitScope_Output);
@@ -45,15 +47,15 @@
 }
 
 - (void)test_subject_will_change {
-    yas::audio::unit::parameter parameter{AudioUnitParameterInfo{}, 0, 0};
+    audio::unit::parameter parameter{AudioUnitParameterInfo{}, 0, 0};
 
     bool called = false;
 
     auto will_observer = parameter.subject().make_observer(
-        yas::audio::unit::parameter::will_change_key, [self, &called](auto const &context) {
+        audio::unit::parameter::will_change_key, [self, &called](auto const &context) {
             auto const &change_info = context.value;
 
-            XCTAssertTrue(context.key == yas::audio::unit::parameter::will_change_key);
+            XCTAssertTrue(context.key == audio::unit::parameter::will_change_key);
             const AudioUnitElement element = context.value.element;
             XCTAssertEqual(element, 2);
             XCTAssertEqual(change_info.old_value, 0.0f);
@@ -68,17 +70,17 @@
 }
 
 - (void)test_subject_did_change {
-    yas::audio::unit::parameter parameter{AudioUnitParameterInfo{}, 0, 0};
+    audio::unit::parameter parameter{AudioUnitParameterInfo{}, 0, 0};
 
     parameter.set_value(-1.0f, 10);
 
     bool called = false;
 
-    auto will_observer = parameter.subject().make_observer(
-        yas::audio::unit::parameter::did_change_key, [self, &called](auto const &context) {
+    auto will_observer =
+        parameter.subject().make_observer(audio::unit::parameter::did_change_key, [self, &called](auto const &context) {
             auto const &change_info = context.value;
 
-            XCTAssertTrue(context.key == yas::audio::unit::parameter::did_change_key);
+            XCTAssertTrue(context.key == audio::unit::parameter::did_change_key);
             const AudioUnitElement element = change_info.element;
             XCTAssertEqual(element, 10);
             XCTAssertEqual(change_info.old_value, -1.0f);
@@ -93,7 +95,7 @@
 }
 
 - (void)test_values {
-    yas::audio::unit::parameter parameter{AudioUnitParameterInfo{}, 0, 0};
+    audio::unit::parameter parameter{AudioUnitParameterInfo{}, 0, 0};
 
     parameter.set_value(1.0f, 1);
     parameter.set_value(2.0f, 2);

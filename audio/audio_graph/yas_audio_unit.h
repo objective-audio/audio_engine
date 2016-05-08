@@ -30,7 +30,7 @@ namespace audio {
         using parameter_map_t = std::unordered_map<AudioUnitParameterID, parameter>;
 
         using render_f = std::function<void(render_parameters &)>;
-        using au_result_t = yas::result<std::nullptr_t, OSStatus>;
+        using au_result_t = result<std::nullptr_t, OSStatus>;
 
         static OSType sub_type_default_io();
 

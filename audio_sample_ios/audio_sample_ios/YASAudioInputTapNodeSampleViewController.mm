@@ -6,6 +6,8 @@
 #import "YASAudioInputTapNodeSampleViewController.h"
 #import "yas_audio.h"
 
+using namespace yas;
+
 @interface YASAudioInputTapNodeSampleViewController ()
 
 @property (nonatomic, strong) IBOutlet UIProgressView *progressView;
@@ -21,23 +23,23 @@ namespace sample {
             input_level,
         };
 
-        yas::audio::engine engine;
-        yas::audio::unit_input_node input_node;
-        yas::audio::input_tap_node input_tap_node;
+        audio::engine engine;
+        audio::unit_input_node input_node;
+        audio::input_tap_node input_tap_node;
 
-        yas::property<Float32, property_key> input_level{
-            {.key = property_key::input_level, .value = yas::audio::math::decibel_from_linear(0.0f)}};
+        property<Float32, property_key> input_level{
+            {.key = property_key::input_level, .value = audio::math::decibel_from_linear(0.0f)}};
 
         input_tap_node_vc_internal() = default;
 
         void prepare() {
             const Float64 sample_rate = input_node.device_sample_rate();
-            yas::audio::format format{sample_rate, 2};
+            audio::format format{sample_rate, 2};
             engine.connect(input_node, input_tap_node, format);
 
             input_tap_node.set_render_function([input_level = input_level, sample_rate](
                 audio::pcm_buffer & buffer, const UInt32 bus_idx, const audio::time &when) mutable {
-                yas::audio::frame_enumerator enumerator(buffer);
+                audio::frame_enumerator enumerator(buffer);
                 const auto *flex_ptr = enumerator.pointer();
                 const int frame_length = enumerator.frame_length();
                 Float32 level = 0;
@@ -47,7 +49,7 @@ namespace sample {
                 }
 
                 Float32 prev_level = input_level.value() - frame_length / sample_rate * 30.0f;
-                level = MAX(prev_level, yas::audio::math::decibel_from_linear(level));
+                level = MAX(prev_level, audio::math::decibel_from_linear(level));
                 input_level.set_value(level);
             });
         }
@@ -62,7 +64,7 @@ namespace sample {
 }
 
 @implementation YASAudioInputTapNodeSampleViewController {
-    yas::sample::input_tap_node_vc_internal _internal;
+    sample::input_tap_node_vc_internal _internal;
     CFTimeInterval _lastLabelUpdatedTime;
 }
 
@@ -91,8 +93,8 @@ namespace sample {
             self.displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(updateUI:)];
             [self.displayLink addToRunLoop:[NSRunLoop mainRunLoop] forMode:NSDefaultRunLoopMode];
         } else {
-            const auto error_string = yas::to_string(start_result.error());
-            errorMessage = (__bridge NSString *)yas::to_cf_object(error_string);
+            const auto error_string = to_string(start_result.error());
+            errorMessage = (__bridge NSString *)to_cf_object(error_string);
         }
     } else {
         errorMessage = error.description;

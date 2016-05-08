@@ -8,6 +8,8 @@
 #import "yas_audio.h"
 #import "yas_objc_unowned.h"
 
+using namespace yas;
+
 static UInt32 const YASAudioEngineRouteSampleDestinationChannelCount = 2;
 
 typedef NS_ENUM(NSUInteger, YASAudioEngineRouteSampleSection) {
@@ -31,13 +33,13 @@ typedef NS_ENUM(NSUInteger, YASAudioEngineRouteSampleSourceIndex) {
 namespace yas {
 namespace sample {
     struct route_vc_internal {
-        yas::audio::engine engine;
-        yas::audio::unit_io_node io_node;
-        yas::audio::unit_mixer_node mixer_node;
-        yas::audio::route_node route_node;
-        yas::audio::tap_node sine_node;
+        audio::engine engine;
+        audio::unit_io_node io_node;
+        audio::unit_mixer_node mixer_node;
+        audio::route_node route_node;
+        audio::tap_node sine_node;
 
-        yas::base engine_observer = nullptr;
+        base engine_observer = nullptr;
 
         void disconnectNodes() {
             engine.disconnect(mixer_node);
@@ -49,7 +51,7 @@ namespace sample {
         void connect_nodes() {
             const auto sample_rate = io_node.device_sample_rate();
 
-            const auto format = yas::audio::format(sample_rate, 2);
+            const auto format = audio::format(sample_rate, 2);
 
             engine.connect(mixer_node, io_node, format);
             engine.connect(route_node, mixer_node, format);
@@ -61,7 +63,7 @@ namespace sample {
 }
 
 @implementation YASAudioEngineRouteSampleViewController {
-    yas::sample::route_vc_internal _internal;
+    sample::route_vc_internal _internal;
 }
 
 - (void)dealloc {
@@ -89,8 +91,8 @@ namespace sample {
                 [self _updateSlider];
                 success = YES;
             } else {
-                const auto error_string = yas::to_string(start_result.error());
-                errorMessage = (__bridge NSString *)yas::to_cf_object(error_string);
+                const auto error_string = to_string(start_result.error());
+                errorMessage = (__bridge NSString *)to_cf_object(error_string);
             }
         } else {
             errorMessage = error.description;
@@ -193,9 +195,9 @@ namespace sample {
         case YASAudioEngineRouteSampleSectionDestinations: {
             UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"Cell" forIndexPath:indexPath];
             const auto &routes = _internal.route_node.routes();
-            yas::audio::route::point dst_point{0, static_cast<UInt32>(indexPath.row)};
+            audio::route::point dst_point{0, static_cast<UInt32>(indexPath.row)};
             auto it = std::find_if(routes.begin(), routes.end(),
-                                   [dst_point = std::move(dst_point)](const yas::audio::route &route) {
+                                   [dst_point = std::move(dst_point)](const audio::route &route) {
                                        return route.destination == dst_point;
                                    });
             NSString *sourceIndexText = nil;
@@ -227,36 +229,36 @@ namespace sample {
 #pragma mark -
 
 - (void)setupEngine {
-    _internal = yas::sample::route_vc_internal();
+    _internal = sample::route_vc_internal();
 
     _internal.mixer_node.set_input_volume(1.0, 0);
     _internal.route_node.set_routes({{0, 0, 0, 0}, {0, 1, 0, 1}});
 
     Float64 phase = 0;
 
-    auto tap_render_function = [phase](yas::audio::pcm_buffer &buffer, const UInt32 bus_idx,
-                                       const yas::audio::time &when) mutable {
+    auto tap_render_function = [phase](audio::pcm_buffer &buffer, const UInt32 bus_idx,
+                                       const audio::time &when) mutable {
         buffer.clear();
 
         const Float64 start_phase = phase;
-        const Float64 phase_per_frame = 1000.0 / buffer.format().sample_rate() * yas::audio::math::two_pi;
-        yas::audio::frame_enumerator enumerator(buffer);
+        const Float64 phase_per_frame = 1000.0 / buffer.format().sample_rate() * audio::math::two_pi;
+        audio::frame_enumerator enumerator(buffer);
         const auto *flex_ptr = enumerator.pointer();
         const UInt32 length = enumerator.frame_length();
 
         while (flex_ptr->v) {
-            phase = yas::audio::math::fill_sine(flex_ptr->f32, length, start_phase, phase_per_frame);
+            phase = audio::math::fill_sine(flex_ptr->f32, length, start_phase, phase_per_frame);
             yas_audio_frame_enumerator_move_channel(enumerator);
         }
     };
 
     _internal.sine_node.set_render_function(tap_render_function);
 
-    auto unowned_self = yas::make_objc_ptr([[YASUnownedObject alloc] init]);
+    auto unowned_self = make_objc_ptr([[YASUnownedObject alloc] init]);
     [unowned_self.object() setObject:self];
 
     _internal.engine_observer = _internal.engine.subject().make_observer(
-        yas::audio::engine::configuration_change_key, [unowned_self](const auto &context) {
+        audio::engine::configuration_change_key, [unowned_self](const auto &context) {
             if ([UIApplication sharedApplication].applicationState == UIApplicationStateActive) {
                 [[unowned_self.object() object] _updateEngine];
             }

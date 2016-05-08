@@ -133,10 +133,10 @@ audio::time audio::time::extrapolate_time_from_anchor(audio::time const &anchor_
 
 #pragma mark - global
 
-UInt64 yas::audio::host_time_for_seconds(Float64 seconds) {
+UInt64 audio::host_time_for_seconds(Float64 seconds) {
     return [AVAudioTime hostTimeForSeconds:seconds];
 }
 
-Float64 yas::audio::seconds_for_host_time(UInt64 host_time) {
+Float64 audio::seconds_for_host_time(UInt64 host_time) {
     return [AVAudioTime secondsForHostTime:host_time];
 }

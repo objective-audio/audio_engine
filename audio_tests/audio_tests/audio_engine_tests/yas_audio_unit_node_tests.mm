@@ -4,6 +4,8 @@
 
 #import "yas_audio_test_utils.h"
 
+using namespace yas;
+
 @interface yas_audio_unit_node_tests : XCTestCase
 
 @end
@@ -19,11 +21,11 @@
 }
 
 - (void)test_restore_parameters {
-    yas::audio::engine engine;
+    audio::engine engine;
 
-    auto format = yas::audio::format(44100.0, 2);
-    yas::audio::offline_output_node output_node;
-    yas::audio::unit_node delay_node(kAudioUnitType_Effect, kAudioUnitSubType_Delay);
+    auto format = audio::format(44100.0, 2);
+    audio::offline_output_node output_node;
+    audio::unit_node delay_node(kAudioUnitType_Effect, kAudioUnitSubType_Delay);
 
     const auto &parameters = delay_node.parameters();
     XCTAssertGreaterThanOrEqual(parameters.count(kAudioUnitScope_Global), 1);
@@ -89,7 +91,7 @@
 }
 
 - (void)test_get_parameters {
-    yas::audio::unit_node delay_node(kAudioUnitType_Effect, kAudioUnitSubType_Delay);
+    audio::unit_node delay_node(kAudioUnitType_Effect, kAudioUnitSubType_Delay);
 
     const auto &global_parameters = delay_node.global_parameters();
     const auto &output_parameters = delay_node.output_parameters();
@@ -113,7 +115,7 @@
 }
 
 - (void)test_reset_parameters {
-    yas::audio::unit_node delay_node(kAudioUnitType_Effect, kAudioUnitSubType_Delay);
+    audio::unit_node delay_node(kAudioUnitType_Effect, kAudioUnitSubType_Delay);
 
     const float delay_time_value = 0.5f;
     const float feedback_value = -50.0f;

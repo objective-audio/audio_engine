@@ -4,6 +4,8 @@
 
 #import "yas_audio_test_utils.h"
 
+using namespace yas;
+
 namespace yas {
 namespace test {
     struct audio_file_test_data {
@@ -27,26 +29,26 @@ namespace test {
         }
 
         void set_file_type(const CFStringRef file_type) {
-            yas::set_cf_property(_file_type, file_type);
+            set_cf_property(_file_type, file_type);
         }
 
         CFStringRef file_type() const {
-            return yas::get_cf_property(_file_type);
+            return get_cf_property(_file_type);
         }
 
         void set_file_name(const CFStringRef file_name) {
-            yas::set_cf_property(_file_name, file_name);
+            set_cf_property(_file_name, file_name);
         }
 
         CFStringRef file_name() const {
-            return yas::get_cf_property(_file_name);
+            return get_cf_property(_file_name);
         }
 
         CFDictionaryRef settings() const {
-            if (CFStringCompare(file_type(), yas::audio::file_type::wave, kNilOptions) == kCFCompareEqualTo) {
-                return yas::audio::wave_file_settings(file_sample_rate, channels, file_bit_depth);
-            } else if (CFStringCompare(file_type(), yas::audio::file_type::aiff, kNilOptions) == kCFCompareEqualTo) {
-                return yas::audio::aiff_file_settings(file_sample_rate, channels, file_bit_depth);
+            if (CFStringCompare(file_type(), audio::file_type::wave, kNilOptions) == kCFCompareEqualTo) {
+                return audio::wave_file_settings(file_sample_rate, channels, file_bit_depth);
+            } else if (CFStringCompare(file_type(), audio::file_type::aiff, kNilOptions) == kCFCompareEqualTo) {
+                return audio::aiff_file_settings(file_sample_rate, channels, file_bit_depth);
             }
             return nullptr;
         }
@@ -81,22 +83,22 @@ namespace test {
     Float64 sample_rates[] = {44100.0, 382000.0};
     UInt32 channels[] = {1, 2};
     UInt32 file_bit_depths[] = {16, 24};
-    yas::audio::pcm_format pcm_formats[] = {yas::audio::pcm_format::float32, yas::audio::pcm_format::float64};
+    audio::pcm_format pcm_formats[] = {audio::pcm_format::float32, audio::pcm_format::float64};
     bool interleaveds[] = {YES, NO};
 #else
     Float64 sample_rates[] = {8000.0, 44100.0, 48000.0, 382000.0};
     UInt32 channels[] = {1, 2, 3, 6};
     UInt32 file_bit_depths[] = {16, 24, 32};
-    yas::audio::pcm_format pcm_formats[] = {yas::audio::pcm_format::float32, yas::audio::pcm_format::float64,
-                                            yas::audio::pcm_format::int16, yas::audio::pcm_format::fixed824};
+    audio::pcm_format pcm_formats[] = {audio::pcm_format::float32, audio::pcm_format::float64, audio::pcm_format::int16,
+                                       audio::pcm_format::fixed824};
     bool interleaveds[] = {YES, NO};
 #endif
 
-    yas::test::audio_file_test_data test_data;
+    test::audio_file_test_data test_data;
     test_data.frame_length = 8;
     test_data.loop_count = 4;
     test_data.set_file_name(CFSTR("test.wav"));
-    test_data.set_file_type(yas::audio::file_type::wave);
+    test_data.set_file_type(audio::file_type::wave);
     test_data.standard = NO;
     test_data.async = NO;
 
@@ -104,7 +106,7 @@ namespace test {
         for (Float64 processing_sample_rate : sample_rates) {
             for (UInt32 channel : channels) {
                 for (UInt32 file_bit_depth : file_bit_depths) {
-                    for (yas::audio::pcm_format pcm_format : pcm_formats) {
+                    for (audio::pcm_format pcm_format : pcm_formats) {
                         for (bool interleved : interleaveds) {
                             test_data.file_sample_rate = file_sample_rate;
                             test_data.channels = channel;
@@ -127,7 +129,7 @@ namespace test {
     test_data.channels = 2;
     test_data.file_bit_depth = 32;
     test_data.processing_sample_rate = 44100;
-    test_data.pcm_format = yas::audio::pcm_format::float32;
+    test_data.pcm_format = audio::pcm_format::float32;
     test_data.interleaved = NO;
 
     [self _commonAudioFileTest:test_data];
@@ -143,35 +145,35 @@ namespace test {
     CFURLRef fileURL = (__bridge CFURLRef)[NSURL fileURLWithPath:filePath];
 
     {
-        auto file = yas::audio::create_file({.file_url = fileURL,
-                                             .file_type = yas::audio::file_type::wave,
-                                             .settings = yas::audio::wave_file_settings(48000.0, 2, 16)});
+        auto file = audio::create_file({.file_url = fileURL,
+                                        .file_type = audio::file_type::wave,
+                                        .settings = audio::wave_file_settings(48000.0, 2, 16)});
 
         XCTAssertTrue(CFEqual(file.url(), fileURL));
-        XCTAssertTrue(CFEqual(file.file_type(), yas::audio::file_type::wave));
+        XCTAssertTrue(CFEqual(file.file_type(), audio::file_type::wave));
         auto const &file_format = file.file_format();
         XCTAssertEqual(file_format.buffer_count(), 1);
         XCTAssertEqual(file_format.channel_count(), 2);
         XCTAssertEqual(file_format.sample_rate(), 48000.0);
-        XCTAssertEqual(file_format.pcm_format(), yas::audio::pcm_format::int16);
+        XCTAssertEqual(file_format.pcm_format(), audio::pcm_format::int16);
         XCTAssertEqual(file_format.is_interleaved(), true);
     }
 
-    if (auto file = yas::audio::open_file({.file_url = fileURL})) {
+    if (auto file = audio::open_file({.file_url = fileURL})) {
         XCTAssertTrue(CFEqual(file.url(), fileURL));
-        XCTAssertTrue(CFEqual(file.file_type(), yas::audio::file_type::wave));
+        XCTAssertTrue(CFEqual(file.file_type(), audio::file_type::wave));
         auto const &file_format = file.file_format();
         XCTAssertEqual(file_format.buffer_count(), 1);
         XCTAssertEqual(file_format.channel_count(), 2);
         XCTAssertEqual(file_format.sample_rate(), 48000.0);
-        XCTAssertEqual(file_format.pcm_format(), yas::audio::pcm_format::int16);
+        XCTAssertEqual(file_format.pcm_format(), audio::pcm_format::int16);
         XCTAssertEqual(file_format.is_interleaved(), true);
     }
 }
 
 #pragma mark -
 
-- (void)_commonAudioFileTest:(yas::test::audio_file_test_data &)test_data {
+- (void)_commonAudioFileTest:(test::audio_file_test_data &)test_data {
     NSString *filePath =
         [[self temporaryTestDirectory] stringByAppendingPathComponent:(__bridge NSString *)test_data.file_name()];
     CFURLRef fileURL = (__bridge CFURLRef)[NSURL fileURLWithPath:filePath];
@@ -179,18 +181,18 @@ namespace test {
     const UInt32 loopCount = test_data.loop_count;
     const Float64 file_sample_rate = test_data.file_sample_rate;
     const Float64 processing_sample_rate = test_data.processing_sample_rate;
-    const yas::audio::pcm_format pcm_format = test_data.pcm_format;
+    const audio::pcm_format pcm_format = test_data.pcm_format;
     const bool interleaved = test_data.interleaved;
     const bool async = test_data.async;
     CFDictionaryRef settings = test_data.settings();
 
-    auto default_processing_format = yas::audio::format(file_sample_rate, test_data.channels, pcm_format, interleaved);
-    auto processing_format = yas::audio::format(processing_sample_rate, test_data.channels, pcm_format, interleaved);
+    auto default_processing_format = audio::format(file_sample_rate, test_data.channels, pcm_format, interleaved);
+    auto processing_format = audio::format(processing_sample_rate, test_data.channels, pcm_format, interleaved);
 
     // write
 
     @autoreleasepool {
-        yas::audio::file audio_file;
+        audio::file audio_file;
 
         if (test_data.standard) {
             XCTAssertTrue(
@@ -207,7 +209,7 @@ namespace test {
 
         audio_file.set_processing_format(processing_format);
 
-        yas::audio::pcm_buffer buffer(processing_format, frame_length);
+        audio::pcm_buffer buffer(processing_format, frame_length);
 
         UInt32 startIndex = 0;
 
@@ -223,7 +225,7 @@ namespace test {
     // read
 
     @autoreleasepool {
-        yas::audio::file audio_file;
+        audio::file audio_file;
 
         if (test_data.standard) {
             XCTAssertTrue(audio_file.open({.file_url = fileURL}));
@@ -240,7 +242,7 @@ namespace test {
         XCTAssertEqualWithAccuracy(audio_file.processing_length(),
                                    audio_file.file_length() * (processing_sample_rate / file_sample_rate), 1);
 
-        yas::audio::pcm_buffer buffer(processing_format, frame_length);
+        audio::pcm_buffer buffer(processing_format, frame_length);
 
         UInt32 startIndex = 0;
 
@@ -261,8 +263,8 @@ namespace test {
 
 #pragma mark -
 
-- (void)_writeToBuffer:(yas::audio::pcm_buffer &)buffer
-            fileFormat:(const yas::audio::format &)fileFormat
+- (void)_writeToBuffer:(audio::pcm_buffer &)buffer
+            fileFormat:(const audio::format &)fileFormat
             startIndex:(NSInteger)startIndex {
     const auto &format = buffer.format();
     const UInt32 buffer_count = format.buffer_count();
@@ -274,17 +276,17 @@ namespace test {
             SInt16 value = frameIndex + startIndex + 1;
             for (NSInteger ch_idx = 0; ch_idx < stride; ch_idx++) {
                 switch (format.pcm_format()) {
-                    case yas::audio::pcm_format::int16: {
+                    case audio::pcm_format::int16: {
                         pointer.i16[frameIndex * stride + ch_idx] = value;
                     } break;
-                    case yas::audio::pcm_format::fixed824: {
+                    case audio::pcm_format::fixed824: {
                         pointer.i32[frameIndex * stride + ch_idx] = value << 16;
                     } break;
-                    case yas::audio::pcm_format::float32: {
+                    case audio::pcm_format::float32: {
                         Float32 float32Value = (Float32)value / INT16_MAX;
                         pointer.f32[frameIndex * stride + ch_idx] = float32Value;
                     } break;
-                    case yas::audio::pcm_format::float64: {
+                    case audio::pcm_format::float64: {
                         Float64 float64Value = (Float64)value / INT16_MAX;
                         pointer.f64[frameIndex * stride + ch_idx] = (Float64)float64Value;
                     } break;
@@ -296,8 +298,8 @@ namespace test {
     }
 }
 
-- (bool)_compareData:(yas::audio::pcm_buffer &)buffer
-          fileFormat:(const yas::audio::format &)fileFormat
+- (bool)_compareData:(audio::pcm_buffer &)buffer
+          fileFormat:(const audio::format &)fileFormat
           startIndex:(NSInteger)startIndex {
     const auto &format = buffer.format();
     const UInt32 buffer_count = format.buffer_count();
@@ -310,16 +312,16 @@ namespace test {
             for (NSInteger ch_idx = 0; ch_idx < stride; ch_idx++) {
                 SInt16 ptrValue = 0;
                 switch (format.pcm_format()) {
-                    case yas::audio::pcm_format::int16: {
+                    case audio::pcm_format::int16: {
                         ptrValue = pointer.i16[frameIndex * stride + ch_idx];
                     } break;
-                    case yas::audio::pcm_format::fixed824: {
+                    case audio::pcm_format::fixed824: {
                         ptrValue = pointer.i32[frameIndex * stride + ch_idx] >> 16;
                     } break;
-                    case yas::audio::pcm_format::float32: {
+                    case audio::pcm_format::float32: {
                         ptrValue = roundf(pointer.f32[frameIndex * stride + ch_idx] * INT16_MAX);
                     } break;
-                    case yas::audio::pcm_format::float64: {
+                    case audio::pcm_format::float64: {
                         ptrValue = round(pointer.f64[frameIndex * stride + ch_idx] * INT16_MAX);
                     } break;
                     default:

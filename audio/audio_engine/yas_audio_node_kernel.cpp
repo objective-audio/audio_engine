@@ -17,11 +17,11 @@ audio::node::kernel::kernel() : _impl(std::make_unique<impl>()) {
 audio::node::kernel::~kernel() = default;
 
 audio::connection_smap audio::node::kernel::input_connections() const {
-    return yas::lock_values(_impl->input_connections);
+    return lock_values(_impl->input_connections);
 }
 
 audio::connection_smap audio::node::kernel::output_connections() const {
-    return yas::lock_values(_impl->output_connections);
+    return lock_values(_impl->output_connections);
 }
 
 audio::connection audio::node::kernel::input_connection(UInt32 const bus_idx) {

@@ -19,7 +19,7 @@ CFStringRef const audio::file_type::mpeg4 = CFSTR("public.mpeg-4");
 CFStringRef const audio::file_type::apple_m4a = CFSTR("com.apple.m4a-audio");
 CFStringRef const audio::file_type::wave = CFSTR("com.microsoft.waveform-audio");
 
-AudioFileTypeID yas::audio::to_audio_file_type_id(CFStringRef const fileType) {
+AudioFileTypeID audio::to_audio_file_type_id(CFStringRef const fileType) {
     if (CFEqual(fileType, file_type::three_gpp)) {
         return kAudioFile3GPType;
     } else if (CFEqual(fileType, file_type::three_gpp2)) {
@@ -46,7 +46,7 @@ AudioFileTypeID yas::audio::to_audio_file_type_id(CFStringRef const fileType) {
     return 0;
 }
 
-CFStringRef yas::audio::to_file_type(AudioFileTypeID const fileTypeID) {
+CFStringRef audio::to_file_type(AudioFileTypeID const fileTypeID) {
     switch (fileTypeID) {
         case kAudioFile3GPType:
             return file_type::three_gpp;
@@ -181,19 +181,19 @@ CFStringRef get_audio_file_type(ExtAudioFileRef const ext_audio_file) {
 
 #pragma mark -
 
-CFDictionaryRef yas::audio::wave_file_settings(Float64 const sample_rate, UInt32 const channel_count,
-                                               UInt32 const bit_depth) {
+CFDictionaryRef audio::wave_file_settings(Float64 const sample_rate, UInt32 const channel_count,
+                                          UInt32 const bit_depth) {
     return linear_pcm_file_settings(sample_rate, channel_count, bit_depth, false, bit_depth >= 32, false);
 }
 
-CFDictionaryRef yas::audio::aiff_file_settings(Float64 const sample_rate, UInt32 const channel_count,
-                                               UInt32 const bit_depth) {
+CFDictionaryRef audio::aiff_file_settings(Float64 const sample_rate, UInt32 const channel_count,
+                                          UInt32 const bit_depth) {
     return linear_pcm_file_settings(sample_rate, channel_count, bit_depth, true, bit_depth >= 32, false);
 }
 
-CFDictionaryRef yas::audio::linear_pcm_file_settings(Float64 const sample_rate, UInt32 const channel_count,
-                                                     UInt32 const bit_depth, bool const is_big_endian,
-                                                     bool const is_float, bool const is_non_interleaved) {
+CFDictionaryRef audio::linear_pcm_file_settings(Float64 const sample_rate, UInt32 const channel_count,
+                                                UInt32 const bit_depth, bool const is_big_endian, bool const is_float,
+                                                bool const is_non_interleaved) {
     return (__bridge CFDictionaryRef) @{
         AVFormatIDKey: @(kAudioFormatLinearPCM),
         AVSampleRateKey: @(sample_rate),
@@ -206,9 +206,9 @@ CFDictionaryRef yas::audio::linear_pcm_file_settings(Float64 const sample_rate, 
     };
 }
 
-CFDictionaryRef yas::audio::aac_settings(Float64 const sample_rate, UInt32 const channel_count, UInt32 const bit_depth,
-                                         AVAudioQuality const encoder_quality, UInt32 const bit_rate,
-                                         UInt32 const bit_depth_hint, AVAudioQuality const converter_quality) {
+CFDictionaryRef audio::aac_settings(Float64 const sample_rate, UInt32 const channel_count, UInt32 const bit_depth,
+                                    AVAudioQuality const encoder_quality, UInt32 const bit_rate,
+                                    UInt32 const bit_depth_hint, AVAudioQuality const converter_quality) {
     return (__bridge CFDictionaryRef) @{
         AVFormatIDKey: @(kAudioFormatMPEG4AAC),
         AVSampleRateKey: @(sample_rate),
