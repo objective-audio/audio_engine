@@ -4,8 +4,7 @@
 
 #pragma once
 
-class yas::audio::offline_output_node::impl : public node::impl, public manageable_offline_output_unit::impl {
-   public:
+struct yas::audio::offline_output_node::impl : node::impl, manageable_offline_output_unit::impl {
     impl();
     ~impl();
 

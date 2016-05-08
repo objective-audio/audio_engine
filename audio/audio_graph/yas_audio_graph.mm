@@ -27,7 +27,7 @@ namespace audio {
 
 #pragma mark - impl
 
-class audio::graph::impl : public base::impl {
+struct audio::graph::impl : base::impl {
    public:
     impl(UInt8 const key) : _running(false), _mutex(), _units(), _io_units(), _key(key){};
 

@@ -9,10 +9,9 @@
 
 using namespace yas;
 
-class audio::offline_output_node::impl::core {
+struct audio::offline_output_node::impl::core {
     using completion_function_map_t = std::map<UInt8, offline_completion_f>;
 
-   public:
     operation_queue queue;
 
     core() : queue(nullptr), _completion_functions() {

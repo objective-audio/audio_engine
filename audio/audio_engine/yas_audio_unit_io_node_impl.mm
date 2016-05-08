@@ -15,8 +15,7 @@
 
 using namespace yas;
 
-class audio::unit_io_node::impl::core {
-   public:
+struct audio::unit_io_node::impl::core {
     static UInt32 const channel_map_count = 2;
     channel_map_t channel_map[2];
 };
@@ -167,8 +166,7 @@ void audio::unit_output_node::impl::prepare_audio_unit() {
 
 #pragma mark - aduio_unit_input_node::impl
 
-class audio::unit_input_node::impl::core {
-   public:
+struct audio::unit_input_node::impl::core {
     pcm_buffer input_buffer;
     time render_time = nullptr;
 };

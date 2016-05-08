@@ -6,8 +6,7 @@
 
 using namespace yas;
 
-class audio::node::kernel::impl {
-   public:
+struct audio::node::kernel::impl {
     connection_wmap input_connections;
     connection_wmap output_connections;
 };

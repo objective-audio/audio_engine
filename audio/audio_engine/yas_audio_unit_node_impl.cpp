@@ -11,8 +11,7 @@
 
 using namespace yas;
 
-class audio::unit_node::impl::core {
-   public:
+struct audio::unit_node::impl::core {
     AudioComponentDescription acd;
     std::unordered_map<AudioUnitScope, unit::parameter_map_t> parameters;
     unit _au;

@@ -4,7 +4,7 @@
 
 #pragma once
 
-struct yas::audio::tap_node::impl : public node::impl {
+struct yas::audio::tap_node::impl : node::impl {
     impl();
     virtual ~impl();
 
@@ -31,7 +31,7 @@ struct yas::audio::tap_node::impl : public node::impl {
     std::unique_ptr<core> _core;
 };
 
-struct yas::audio::input_tap_node::impl : public tap_node::impl {
+struct yas::audio::input_tap_node::impl : tap_node::impl {
     virtual UInt32 input_bus_count() const override;
     virtual UInt32 output_bus_count() const override;
 };

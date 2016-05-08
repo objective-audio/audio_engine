@@ -15,8 +15,7 @@ using namespace yas;
 
 #pragma mark - private
 
-class audio::pcm_buffer::impl {
-   public:
+struct audio::pcm_buffer::impl {
     audio::format const format;
     const AudioBufferList *abl_ptr;
     UInt32 const frame_capacity;

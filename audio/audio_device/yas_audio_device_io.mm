@@ -17,8 +17,7 @@
 
 using namespace yas;
 
-class audio::device_io::kernel {
-   public:
+struct audio::device_io::kernel {
     pcm_buffer input_buffer;
     pcm_buffer output_buffer;
 
@@ -33,8 +32,7 @@ class audio::device_io::kernel {
     }
 };
 
-class audio::device_io::impl : public base::impl {
-   public:
+struct audio::device_io::impl : base::impl {
     weak<device_io> weak_device_io;
     audio::device device;
     bool is_running;

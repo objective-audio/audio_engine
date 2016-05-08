@@ -9,8 +9,7 @@ using namespace yas;
 
 #pragma mark - kernel
 
-class audio::route_node::kernel : public node::kernel {
-   public:
+struct audio::route_node::kernel : node::kernel {
     ~kernel() = default;
 
     route_set_t routes;
@@ -18,10 +17,8 @@ class audio::route_node::kernel : public node::kernel {
 
 #pragma mark - impl
 
-class audio::route_node::impl : public node::impl {
-   public:
-    class core {
-       public:
+struct audio::route_node::impl : node::impl {
+    struct core {
         route_set_t routes;
 
         void erase_route_if_either_matched(route const &route) {

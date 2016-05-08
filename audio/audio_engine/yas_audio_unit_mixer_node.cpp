@@ -9,7 +9,7 @@ using namespace yas;
 
 #pragma mark - impl
 
-struct audio::unit_mixer_node::impl : public unit_node::impl {
+struct audio::unit_mixer_node::impl : unit_node::impl {
    private:
     virtual UInt32 input_bus_count() const override {
         return std::numeric_limits<UInt32>::max();

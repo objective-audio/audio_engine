@@ -12,10 +12,8 @@ namespace yas {
 namespace offline_sample {
     static Float64 sample_rate = 44100.0;
 
-    class sine_node : public audio::tap_node {
-       public:
-        class impl : public audio::tap_node::impl {
-           public:
+    struct sine_node : audio::tap_node {
+        struct impl : audio::tap_node::impl {
             Float64 phase_on_render;
 
             void set_frequency(const Float32 frequency) {
@@ -44,7 +42,6 @@ namespace offline_sample {
             mutable std::recursive_mutex _mutex;
         };
 
-       public:
         sine_node() : audio::tap_node(std::make_unique<impl>()) {
             set_frequency(1000.0);
 

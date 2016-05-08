@@ -183,8 +183,7 @@ audio::device::change_info::change_info(std::vector<device::property_info> &&inf
 
 #pragma mark - private
 
-class audio::device::impl : public base::impl {
-   public:
+struct audio::device::impl : base::impl {
     AudioDeviceID const audio_device_id;
     std::unordered_map<AudioStreamID, stream> input_streams_map;
     std::unordered_map<AudioStreamID, stream> output_streams_map;

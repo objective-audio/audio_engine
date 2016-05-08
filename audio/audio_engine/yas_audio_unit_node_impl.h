@@ -4,7 +4,7 @@
 
 #pragma once
 
-struct yas::audio::unit_node::impl : public node::impl, public manageable_unit_node::impl {
+struct yas::audio::unit_node::impl : node::impl, manageable_unit_node::impl {
     impl();
     virtual ~impl();
 

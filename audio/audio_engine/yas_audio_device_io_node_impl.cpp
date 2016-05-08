@@ -14,8 +14,7 @@
 
 using namespace yas;
 
-class audio::device_io_node::impl::core {
-   public:
+struct audio::device_io_node::impl::core {
     audio::device_io device_io;
 
     core() : _device(nullptr), device_io(nullptr) {

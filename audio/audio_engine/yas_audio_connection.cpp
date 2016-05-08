@@ -8,10 +8,8 @@
 
 using namespace yas;
 
-class audio::connection::impl : public base::impl, public node_removable::impl {
-   public:
+struct audio::connection::impl : base::impl, node_removable::impl {
     UInt32 source_bus;
-
     UInt32 destination_bus;
     audio::format format;
     mutable std::recursive_mutex mutex;

@@ -9,8 +9,7 @@
 
 using namespace yas;
 
-class audio::node::impl::core {
-   public:
+struct audio::node::impl::core {
     weak<audio::engine> weak_engine;
     connection_wmap input_connections;
     connection_wmap output_connections;

@@ -45,7 +45,7 @@ audio::device::stream::change_info::change_info(std::vector<property_info> &&inf
 
 #pragma mark - private
 
-class audio::device::stream::impl : public base::impl {
+struct audio::device::stream::impl : base::impl {
    public:
     AudioStreamID stream_id;
     AudioDeviceID device_id;

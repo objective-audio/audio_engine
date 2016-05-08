@@ -6,15 +6,13 @@
 
 using namespace yas;
 
-class audio::tap_node::kernel : public node::kernel {
-   public:
+struct audio::tap_node::kernel : node::kernel {
     ~kernel() = default;
 
     audio::tap_node::render_f render_function;
 };
 
-class audio::tap_node::impl::core {
-   public:
+struct audio::tap_node::impl::core {
     render_f render_function;
     std::shared_ptr<kernel> kernel_on_render;
 };

@@ -7,8 +7,7 @@
 
 using namespace yas;
 
-class yas::audio::unit::parameter::impl {
-   public:
+struct yas::audio::unit::parameter::impl {
     AudioUnitParameterID parameter_id;
     AudioUnitScope scope;
     bool has_clump;

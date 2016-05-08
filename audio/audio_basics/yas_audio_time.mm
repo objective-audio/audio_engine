@@ -11,8 +11,7 @@
 
 using namespace yas;
 
-class audio::time::impl {
-   public:
+struct audio::time::impl {
     AVAudioTime *av_audio_time;
 
     impl(AVAudioTime *av_audio_time) : av_audio_time(yas_retain(av_audio_time)) {
