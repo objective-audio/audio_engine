@@ -60,14 +60,14 @@ void audio::node::impl::reset() {
     update_kernel();
 }
 
-audio::format audio::node::impl::input_format(UInt32 const bus_idx) {
+audio::format audio::node::impl::input_format(uint32_t const bus_idx) {
     if (auto connection = input_connection(bus_idx)) {
         return connection.format();
     }
     return nullptr;
 }
 
-audio::format audio::node::impl::output_format(UInt32 const bus_idx) {
+audio::format audio::node::impl::output_format(uint32_t const bus_idx) {
     if (auto connection = output_connection(bus_idx)) {
         return connection.format();
     }
@@ -90,36 +90,36 @@ audio::bus_result_t audio::node::impl::next_available_output_bus() const {
     return nullopt;
 }
 
-bool audio::node::impl::is_available_input_bus(UInt32 const bus_idx) const {
+bool audio::node::impl::is_available_input_bus(uint32_t const bus_idx) const {
     if (bus_idx >= input_bus_count()) {
         return false;
     }
     return _core->input_connections.count(bus_idx) == 0;
 }
 
-bool audio::node::impl::is_available_output_bus(UInt32 const bus_idx) const {
+bool audio::node::impl::is_available_output_bus(uint32_t const bus_idx) const {
     if (bus_idx >= output_bus_count()) {
         return false;
     }
     return _core->output_connections.count(bus_idx) == 0;
 }
 
-UInt32 audio::node::impl::input_bus_count() const {
+uint32_t audio::node::impl::input_bus_count() const {
     return 0;
 }
 
-UInt32 audio::node::impl::output_bus_count() const {
+uint32_t audio::node::impl::output_bus_count() const {
     return 0;
 }
 
-audio::connection audio::node::impl::input_connection(UInt32 const bus_idx) const {
+audio::connection audio::node::impl::input_connection(uint32_t const bus_idx) const {
     if (_core->input_connections.count(bus_idx) > 0) {
         return _core->input_connections.at(bus_idx).lock();
     }
     return nullptr;
 }
 
-audio::connection audio::node::impl::output_connection(UInt32 const bus_idx) const {
+audio::connection audio::node::impl::output_connection(uint32_t const bus_idx) const {
     if (_core->output_connections.count(bus_idx) > 0) {
         return _core->output_connections.at(bus_idx).lock();
     }
@@ -199,7 +199,7 @@ void audio::node::impl::remove_connection(connection const &connection) {
     update_kernel();
 }
 
-void audio::node::impl::render(pcm_buffer &buffer, UInt32 const bus_idx, time const &when) {
+void audio::node::impl::render(pcm_buffer &buffer, uint32_t const bus_idx, time const &when) {
     set_render_time_on_render(when);
 }
 
