@@ -237,7 +237,8 @@ namespace sample {
 - (void)startOfflineFileWritingWithURL:(NSURL *)url {
     auto wave_settings = yas::audio::wave_file_settings(yas::offline_sample::sample_rate, 2, 16);
     yas::audio::file file_writer;
-    auto create_result = file_writer.create((__bridge CFURLRef)url, yas::audio::file_type::wave, wave_settings);
+    auto create_result = file_writer.create(
+        {.file_url = (__bridge CFURLRef)url, .file_type = yas::audio::file_type::wave, .settings = wave_settings});
 
     if (!create_result) {
         std::cout << __PRETTY_FUNCTION__ << " - error:" << yas::to_string(create_result.error()) << std::endl;
