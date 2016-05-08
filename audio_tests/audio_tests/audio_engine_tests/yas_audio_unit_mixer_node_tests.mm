@@ -4,6 +4,8 @@
 
 #import "yas_audio_test_utils.h"
 
+using namespace yas;
+
 @interface yas_audio_unit_mixer_node_tests : XCTestCase
 
 @end
@@ -19,7 +21,7 @@
 }
 
 - (void)test_parameter_exists {
-    yas::audio::unit_mixer_node mixer_node;
+    audio::unit_mixer_node mixer_node;
 
     const auto &paramters = mixer_node.parameters();
     const auto &input_parameters = paramters.at(kAudioUnitScope_Input);
@@ -28,9 +30,12 @@
     XCTAssertGreaterThanOrEqual(input_parameters.size(), 1);
     XCTAssertGreaterThanOrEqual(output_parameters.size(), 1);
 
-    auto input_parameter_ids = {kMultiChannelMixerParam_Volume, kMultiChannelMixerParam_Enable,
-                                kMultiChannelMixerParam_Pan, kMultiChannelMixerParam_PreAveragePower,
-                                kMultiChannelMixerParam_PrePeakHoldLevel, kMultiChannelMixerParam_PostAveragePower,
+    auto input_parameter_ids = {kMultiChannelMixerParam_Volume,
+                                kMultiChannelMixerParam_Enable,
+                                kMultiChannelMixerParam_Pan,
+                                kMultiChannelMixerParam_PreAveragePower,
+                                kMultiChannelMixerParam_PrePeakHoldLevel,
+                                kMultiChannelMixerParam_PostAveragePower,
                                 kMultiChannelMixerParam_PostPeakHoldLevel};
 
     for (auto &key : input_parameter_ids) {
@@ -45,7 +50,7 @@
 }
 
 - (void)testElement {
-    yas::audio::unit_mixer_node mixer_node;
+    audio::unit_mixer_node mixer_node;
     const UInt32 default_element_count = mixer_node.input_element_count();
 
     XCTAssertGreaterThanOrEqual(default_element_count, 1);
@@ -61,7 +66,7 @@
 }
 
 - (void)testRestoreParamters {
-    yas::audio::unit_mixer_node mixer_node;
+    audio::unit_mixer_node mixer_node;
 
     const UInt32 bus_idx = 0;
     const Float32 input_volume = 0.5f;

@@ -4,6 +4,8 @@
 
 #import "yas_audio_test_utils.h"
 
+using namespace yas;
+
 @interface yas_audio_test_utils_tests : XCTestCase
 
 @end
@@ -23,19 +25,19 @@
     const Float64 accuracy = 0.1;
 
     Float64 val2 = 1.0;
-    XCTAssertTrue(yas::test::is_equal(val1, val2, accuracy));
+    XCTAssertTrue(test::is_equal(val1, val2, accuracy));
 
     val2 = 1.05;
-    XCTAssertTrue(yas::test::is_equal(val1, val2, accuracy));
+    XCTAssertTrue(test::is_equal(val1, val2, accuracy));
 
     val2 = 0.95;
-    XCTAssertTrue(yas::test::is_equal(val1, val2, accuracy));
+    XCTAssertTrue(test::is_equal(val1, val2, accuracy));
 
     val2 = 1.2;
-    XCTAssertFalse(yas::test::is_equal(val1, val2, accuracy));
+    XCTAssertFalse(test::is_equal(val1, val2, accuracy));
 
     val2 = 0.85;
-    XCTAssertFalse(yas::test::is_equal(val1, val2, accuracy));
+    XCTAssertFalse(test::is_equal(val1, val2, accuracy));
 }
 
 - (void)testIsEqualAudioTimeStamp {
@@ -57,37 +59,37 @@
 
     AudioTimeStamp timeStamp2 = timeStamp1;
 
-    XCTAssertTrue(yas::test::is_equal(&timeStamp1, &timeStamp2));
+    XCTAssertTrue(test::is_equal(&timeStamp1, &timeStamp2));
 
     timeStamp2 = timeStamp1;
     timeStamp2.mSampleTime = 2;
 
-    XCTAssertFalse(yas::test::is_equal(&timeStamp1, &timeStamp2));
+    XCTAssertFalse(test::is_equal(&timeStamp1, &timeStamp2));
 
     timeStamp2 = timeStamp1;
     timeStamp2.mHostTime = 2;
 
-    XCTAssertFalse(yas::test::is_equal(&timeStamp1, &timeStamp2));
+    XCTAssertFalse(test::is_equal(&timeStamp1, &timeStamp2));
 
     timeStamp2 = timeStamp1;
     timeStamp2.mRateScalar = 2;
 
-    XCTAssertFalse(yas::test::is_equal(&timeStamp1, &timeStamp2));
+    XCTAssertFalse(test::is_equal(&timeStamp1, &timeStamp2));
 
     timeStamp2 = timeStamp1;
     timeStamp2.mWordClockTime = 2;
 
-    XCTAssertFalse(yas::test::is_equal(&timeStamp1, &timeStamp2));
+    XCTAssertFalse(test::is_equal(&timeStamp1, &timeStamp2));
 
     timeStamp2 = timeStamp1;
     timeStamp2.mSMPTETime.mType = kSMPTETimeType30Drop;
 
-    XCTAssertFalse(yas::test::is_equal(&timeStamp1, &timeStamp2));
+    XCTAssertFalse(test::is_equal(&timeStamp1, &timeStamp2));
 
     timeStamp2 = timeStamp1;
     timeStamp2.mFlags = 2;
 
-    XCTAssertFalse(yas::test::is_equal(&timeStamp1, &timeStamp2));
+    XCTAssertFalse(test::is_equal(&timeStamp1, &timeStamp2));
 }
 
 - (void)testIsEqualData {
@@ -100,11 +102,11 @@
         vec1[i] = vec2[i] = i;
     }
 
-    XCTAssertTrue(yas::test::is_equal_data(vec1.data(), vec2.data(), size));
+    XCTAssertTrue(test::is_equal_data(vec1.data(), vec2.data(), size));
 
     vec2[0] = 4;
 
-    XCTAssertFalse(yas::test::is_equal_data(vec1.data(), vec2.data(), size));
+    XCTAssertFalse(test::is_equal_data(vec1.data(), vec2.data(), size));
 }
 
 @end

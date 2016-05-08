@@ -5,6 +5,8 @@
 #import <future>
 #import "yas_audio_test_utils.h"
 
+using namespace yas;
+
 @interface yas_audio_offline_output_node_tests : XCTestCase
 
 @end
@@ -22,11 +24,11 @@
 - (void)test_offline_render_with_audio_engine {
     const Float64 sample_rate = 44100.0;
 
-    auto format = yas::audio::format(sample_rate, 2);
-    yas::audio::engine engine;
-    yas::audio::offline_output_node output_node;
-    yas::audio::unit_node sample_delay_node(kAudioUnitType_Effect, kAudioUnitSubType_SampleDelay);
-    yas::audio::tap_node tap_node;
+    auto format = audio::format(sample_rate, 2);
+    audio::engine engine;
+    audio::offline_output_node output_node;
+    audio::unit_node sample_delay_node(kAudioUnitType_Effect, kAudioUnitSubType_SampleDelay);
+    audio::tap_node tap_node;
 
     engine.connect(sample_delay_node, output_node, format);
     engine.connect(tap_node, sample_delay_node, format);
@@ -37,8 +39,7 @@
     const UInt32 length = 4192;
     UInt32 tap_render_frame = 0;
 
-    auto tap_render_function = [=](yas::audio::pcm_buffer &buffer, const UInt32 bus_idx,
-                                   const yas::audio::time &when) mutable {
+    auto tap_render_function = [=](audio::pcm_buffer &buffer, const UInt32 bus_idx, const audio::time &when) mutable {
         XCTAssertEqual(when.sample_time(), tap_render_frame);
         XCTAssertEqual(when.sample_rate(), sample_rate);
         XCTAssertEqual(buffer.frame_length(), frames_per_render);
@@ -47,7 +48,7 @@
         for (UInt32 buf_idx = 0; buf_idx < buffer.format().buffer_count(); ++buf_idx) {
             Float32 *ptr = buffer.data_ptr_at_index<Float32>(buf_idx);
             for (UInt32 frm_idx = 0; frm_idx < buffer.frame_length(); ++frm_idx) {
-                ptr[frm_idx] = yas::test::test_value(frm_idx + tap_render_frame, 0, buf_idx);
+                ptr[frm_idx] = test::test_value(frm_idx + tap_render_frame, 0, buf_idx);
             }
         }
 
@@ -65,8 +66,7 @@
 
     UInt32 output_render_frame = 0;
 
-    auto start_render_function = [=](yas::audio::pcm_buffer &buffer, const yas::audio::time &when,
-                                     bool &out_stop) mutable {
+    auto start_render_function = [=](audio::pcm_buffer &buffer, const audio::time &when, bool &out_stop) mutable {
         XCTAssertEqual(when.sample_time(), output_render_frame);
         XCTAssertEqual(when.sample_rate(), sample_rate);
         XCTAssertEqual(buffer.frame_length(), frames_per_render);
@@ -75,7 +75,7 @@
         for (UInt32 buf_idx = 0; buf_idx < buffer.format().buffer_count(); ++buf_idx) {
             Float32 *ptr = buffer.data_ptr_at_index<Float32>(buf_idx);
             for (UInt32 frm_idx = 0; frm_idx < buffer.frame_length(); ++frm_idx) {
-                bool is_equal_value = ptr[frm_idx] == yas::test::test_value(frm_idx + output_render_frame, 0, buf_idx);
+                bool is_equal_value = ptr[frm_idx] == test::test_value(frm_idx + output_render_frame, 0, buf_idx);
                 XCTAssertTrue(is_equal_value);
                 if (!is_equal_value) {
                     out_stop = true;
@@ -111,11 +111,11 @@
 
 - (void)test_offline_render_without_audio_engine {
     const Float64 sample_rate = 48000.0;
-    auto format = yas::audio::format(sample_rate, 2);
-    yas::audio::offline_output_node output_node;
-    yas::audio::tap_node tap_node;
+    auto format = audio::format(sample_rate, 2);
+    audio::offline_output_node output_node;
+    audio::tap_node tap_node;
 
-    auto connection = yas::audio::connection::private_access::create(tap_node, 0, output_node, 0, format);
+    auto connection = audio::connection::private_access::create(tap_node, 0, output_node, 0, format);
 
     output_node.manageable_node().add_connection(connection);
     output_node.manageable_node().update_kernel();
@@ -128,19 +128,18 @@
     const UInt32 length = 4196;
     UInt32 tap_render_frame = 0;
 
-    auto tap_render_function = [=](yas::audio::pcm_buffer &buffer, const UInt32 bus_idx,
-                                   const yas::audio::time &when) mutable {
+    auto tap_render_function = [=](audio::pcm_buffer &buffer, const UInt32 bus_idx, const audio::time &when) mutable {
         XCTAssertEqual(when.sample_time(), tap_render_frame);
         XCTAssertEqual(when.sample_rate(), sample_rate);
         XCTAssertEqual(buffer.frame_length(), frames_per_render);
         XCTAssertTrue(buffer.format() == format);
 
-        auto enumerator = yas::audio::frame_enumerator(buffer);
+        auto enumerator = audio::frame_enumerator(buffer);
         auto *flex_ptr = enumerator.pointer();
         auto *frm_idx = enumerator.frame();
         auto *ch_idx = enumerator.channel();
         while (flex_ptr->v) {
-            *flex_ptr->f32 = yas::test::test_value(*frm_idx + tap_render_frame, 0, *ch_idx);
+            *flex_ptr->f32 = test::test_value(*frm_idx + tap_render_frame, 0, *ch_idx);
             yas_audio_frame_enumerator_move(enumerator);
         }
 
@@ -158,20 +157,19 @@
 
     UInt32 output_render_frame = 0;
 
-    auto start_render_function = [=](yas::audio::pcm_buffer &buffer, const yas::audio::time &when,
-                                     bool &out_stop) mutable {
+    auto start_render_function = [=](audio::pcm_buffer &buffer, const audio::time &when, bool &out_stop) mutable {
         XCTAssertEqual(when.sample_time(), output_render_frame);
         XCTAssertEqual(when.sample_rate(), sample_rate);
         XCTAssertEqual(buffer.frame_length(), frames_per_render);
         XCTAssertTrue(buffer.format() == format);
 
-        auto enumerator = yas::audio::frame_enumerator(buffer);
+        auto enumerator = audio::frame_enumerator(buffer);
 
         auto *flex_ptr = enumerator.pointer();
         auto *frm_idx = enumerator.frame();
         auto *ch_idx = enumerator.channel();
         while (flex_ptr->v) {
-            bool is_equal_value = *flex_ptr->f32 == yas::test::test_value(*frm_idx + output_render_frame, 0, *ch_idx);
+            bool is_equal_value = *flex_ptr->f32 == test::test_value(*frm_idx + output_render_frame, 0, *ch_idx);
             XCTAssertTrue(is_equal_value);
             if (!is_equal_value) {
                 out_stop = YES;
@@ -210,18 +208,18 @@
 }
 
 - (void)test_bus_count {
-    yas::audio::offline_output_node node;
+    audio::offline_output_node node;
 
     XCTAssertEqual(node.output_bus_count(), 0);
     XCTAssertEqual(node.input_bus_count(), 1);
 }
 
 - (void)test_reset_to_stop {
-    auto format = yas::audio::format(48000.0, 2);
-    yas::audio::offline_output_node output_node;
-    yas::audio::tap_node tap_node;
+    auto format = audio::format(48000.0, 2);
+    audio::offline_output_node output_node;
+    audio::tap_node tap_node;
 
-    auto connection = yas::audio::connection::private_access::create(tap_node, 0, output_node, 0, format);
+    auto connection = audio::connection::private_access::create(tap_node, 0, output_node, 0, format);
 
     output_node.manageable_node().add_connection(connection);
     output_node.manageable_node().update_kernel();
@@ -233,7 +231,7 @@
 
     XCTestExpectation *completionExpectation = [self expectationWithDescription:@"offline output node completion"];
 
-    auto render_func = [promise](yas::audio::pcm_buffer &buffer, const yas::audio::time &when, bool &out_stop) mutable {
+    auto render_func = [promise](audio::pcm_buffer &buffer, const audio::time &when, bool &out_stop) mutable {
         if (when.sample_time() == 0) {
             promise->set_value();
         }
@@ -262,9 +260,9 @@
 }
 
 - (void)test_to_string_error {
-    XCTAssertTrue(yas::to_string(yas::audio::offline_start_error_t::already_running) == "already_running");
-    XCTAssertTrue(yas::to_string(yas::audio::offline_start_error_t::prepare_failure) == "prepare_failure");
-    XCTAssertTrue(yas::to_string(yas::audio::offline_start_error_t::connection_not_found) == "connection_not_found");
+    XCTAssertTrue(to_string(audio::offline_start_error_t::already_running) == "already_running");
+    XCTAssertTrue(to_string(audio::offline_start_error_t::prepare_failure) == "prepare_failure");
+    XCTAssertTrue(to_string(audio::offline_start_error_t::connection_not_found) == "connection_not_found");
 }
 
 @end

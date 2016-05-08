@@ -4,6 +4,8 @@
 
 #import "yas_audio_test_utils.h"
 
+using namespace yas;
+
 @interface yas_audio_tap_node_tests : XCTestCase
 
 @end
@@ -19,12 +21,12 @@
 }
 
 - (void)test_render_with_lambda {
-    yas::audio::engine engine;
+    audio::engine engine;
 
-    yas::audio::offline_output_node output_node;
-    yas::audio::tap_node to_node;
-    yas::audio::tap_node from_node;
-    const auto format = yas::audio::format(48000.0, 2);
+    audio::offline_output_node output_node;
+    audio::tap_node to_node;
+    audio::tap_node from_node;
+    const auto format = audio::format(48000.0, 2);
 
     const auto to_connection = engine.connect(to_node, output_node, format);
     const auto from_connection = engine.connect(from_node, to_node, format);
@@ -33,7 +35,7 @@
     XCTestExpectation *from_expectation = [self expectationWithDescription:@"from node"];
     XCTestExpectation *completion_expectation = [self expectationWithDescription:@"completion"];
 
-    auto weak_to_node = yas::to_weak(to_node);
+    auto weak_to_node = to_weak(to_node);
     auto to_render_func = [weak_to_node, self, to_connection, from_connection, to_expectation](
         auto &buffer, const auto &bus_idx, const auto &when) {
         auto node = weak_to_node.lock();
@@ -71,12 +73,12 @@
 }
 
 - (void)test_render_without_lambda {
-    yas::audio::engine engine;
+    audio::engine engine;
 
-    yas::audio::offline_output_node output_node;
-    yas::audio::tap_node to_node;
-    yas::audio::tap_node from_node;
-    const auto format = yas::audio::format(48000.0, 2);
+    audio::offline_output_node output_node;
+    audio::tap_node to_node;
+    audio::tap_node from_node;
+    const auto format = audio::format(48000.0, 2);
 
     const auto to_connection = engine.connect(to_node, output_node, format);
     const auto from_connection = engine.connect(from_node, to_node, format);
@@ -96,7 +98,7 @@
 }
 
 - (void)test_bus_count {
-    yas::audio::tap_node node;
+    audio::tap_node node;
 
     XCTAssertEqual(node.input_bus_count(), 1);
     XCTAssertEqual(node.output_bus_count(), 1);

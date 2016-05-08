@@ -4,6 +4,8 @@
 
 #import "yas_audio_test_utils.h"
 
+using namespace yas;
+
 @interface yas_audio_file_utils_tests : XCTestCase
 
 @end
@@ -23,7 +25,7 @@
     const UInt32 channels = 2;
     const UInt32 bitDepth = 16;
 
-    NSDictionary *settings = (__bridge NSDictionary *)yas::audio::wave_file_settings(sampleRate, channels, bitDepth);
+    NSDictionary *settings = (__bridge NSDictionary *)audio::wave_file_settings(sampleRate, channels, bitDepth);
 
     XCTAssertEqualObjects(settings[AVFormatIDKey], @(kAudioFormatLinearPCM));
     XCTAssertEqualObjects(settings[AVSampleRateKey], @(sampleRate));
@@ -40,7 +42,7 @@
     const UInt32 channels = 4;
     const UInt32 bitDepth = 32;
 
-    NSDictionary *settings = (__bridge NSDictionary *)yas::audio::wave_file_settings(sampleRate, channels, bitDepth);
+    NSDictionary *settings = (__bridge NSDictionary *)audio::wave_file_settings(sampleRate, channels, bitDepth);
 
     XCTAssertEqualObjects(settings[AVFormatIDKey], @(kAudioFormatLinearPCM));
     XCTAssertEqualObjects(settings[AVSampleRateKey], @(sampleRate));
@@ -57,7 +59,7 @@
     const UInt32 channels = 2;
     const UInt32 bitDepth = 16;
 
-    NSDictionary *settings = (__bridge NSDictionary *)yas::audio::aiff_file_settings(sampleRate, channels, bitDepth);
+    NSDictionary *settings = (__bridge NSDictionary *)audio::aiff_file_settings(sampleRate, channels, bitDepth);
 
     XCTAssertEqualObjects(settings[AVFormatIDKey], @(kAudioFormatLinearPCM));
     XCTAssertEqualObjects(settings[AVSampleRateKey], @(sampleRate));
@@ -74,7 +76,7 @@
     const UInt32 channels = 3;
     const UInt32 bitDepth = 32;
 
-    NSDictionary *settings = (__bridge NSDictionary *)yas::audio::aiff_file_settings(sampleRate, channels, bitDepth);
+    NSDictionary *settings = (__bridge NSDictionary *)audio::aiff_file_settings(sampleRate, channels, bitDepth);
 
     XCTAssertEqualObjects(settings[AVFormatIDKey], @(kAudioFormatLinearPCM));
     XCTAssertEqualObjects(settings[AVSampleRateKey], @(sampleRate));
@@ -95,7 +97,7 @@
     const UInt32 bitDepthHint = 16;
     const AVAudioQuality converterQuality = AVAudioQualityMax;
 
-    NSDictionary *settings = (__bridge NSDictionary *)yas::audio::aac_settings(
+    NSDictionary *settings = (__bridge NSDictionary *)audio::aac_settings(
         sampleRate, channels, bitDepth, encoderQuality, bitRate, bitDepthHint, converterQuality);
 
     XCTAssertEqualObjects(settings[AVFormatIDKey], @(kAudioFormatMPEG4AAC));
@@ -112,33 +114,33 @@
 }
 
 - (void)testAudioFileTypeIDFromFileType {
-    XCTAssertEqual(yas::audio::to_audio_file_type_id(yas::audio::file_type::three_gpp), kAudioFile3GPType);
-    XCTAssertEqual(yas::audio::to_audio_file_type_id(yas::audio::file_type::three_gpp2), kAudioFile3GP2Type);
-    XCTAssertEqual(yas::audio::to_audio_file_type_id(yas::audio::file_type::aifc), kAudioFileAIFCType);
-    XCTAssertEqual(yas::audio::to_audio_file_type_id(yas::audio::file_type::aiff), kAudioFileAIFFType);
-    XCTAssertEqual(yas::audio::to_audio_file_type_id(yas::audio::file_type::amr), kAudioFileAMRType);
-    XCTAssertEqual(yas::audio::to_audio_file_type_id(yas::audio::file_type::ac3), kAudioFileAC3Type);
-    XCTAssertEqual(yas::audio::to_audio_file_type_id(yas::audio::file_type::mpeg_layer3), kAudioFileMP3Type);
-    XCTAssertEqual(yas::audio::to_audio_file_type_id(yas::audio::file_type::core_audio_format), kAudioFileCAFType);
-    XCTAssertEqual(yas::audio::to_audio_file_type_id(yas::audio::file_type::mpeg4), kAudioFileMPEG4Type);
-    XCTAssertEqual(yas::audio::to_audio_file_type_id(yas::audio::file_type::apple_m4a), kAudioFileM4AType);
-    XCTAssertEqual(yas::audio::to_audio_file_type_id(yas::audio::file_type::wave), kAudioFileWAVEType);
+    XCTAssertEqual(audio::to_audio_file_type_id(audio::file_type::three_gpp), kAudioFile3GPType);
+    XCTAssertEqual(audio::to_audio_file_type_id(audio::file_type::three_gpp2), kAudioFile3GP2Type);
+    XCTAssertEqual(audio::to_audio_file_type_id(audio::file_type::aifc), kAudioFileAIFCType);
+    XCTAssertEqual(audio::to_audio_file_type_id(audio::file_type::aiff), kAudioFileAIFFType);
+    XCTAssertEqual(audio::to_audio_file_type_id(audio::file_type::amr), kAudioFileAMRType);
+    XCTAssertEqual(audio::to_audio_file_type_id(audio::file_type::ac3), kAudioFileAC3Type);
+    XCTAssertEqual(audio::to_audio_file_type_id(audio::file_type::mpeg_layer3), kAudioFileMP3Type);
+    XCTAssertEqual(audio::to_audio_file_type_id(audio::file_type::core_audio_format), kAudioFileCAFType);
+    XCTAssertEqual(audio::to_audio_file_type_id(audio::file_type::mpeg4), kAudioFileMPEG4Type);
+    XCTAssertEqual(audio::to_audio_file_type_id(audio::file_type::apple_m4a), kAudioFileM4AType);
+    XCTAssertEqual(audio::to_audio_file_type_id(audio::file_type::wave), kAudioFileWAVEType);
 }
 
 - (void)testFileTypeFromAudioFileTypeID {
-    XCTAssertEqual(yas::audio::to_file_type(kAudioFile3GPType), yas::audio::file_type::three_gpp);
-    XCTAssertEqual(yas::audio::to_file_type(kAudioFile3GP2Type), yas::audio::file_type::three_gpp2);
-    XCTAssertEqual(yas::audio::to_file_type(kAudioFileAIFCType), yas::audio::file_type::aifc);
-    XCTAssertEqual(yas::audio::to_file_type(kAudioFileAIFFType), yas::audio::file_type::aiff);
-    XCTAssertEqual(yas::audio::to_file_type(kAudioFileAMRType), yas::audio::file_type::amr);
-    XCTAssertEqual(yas::audio::to_file_type(kAudioFileAC3Type), yas::audio::file_type::ac3);
-    XCTAssertEqual(yas::audio::to_file_type(kAudioFileMP3Type), yas::audio::file_type::mpeg_layer3);
-    XCTAssertEqual(yas::audio::to_file_type(kAudioFileCAFType), yas::audio::file_type::core_audio_format);
-    XCTAssertEqual(yas::audio::to_file_type(kAudioFileMPEG4Type), yas::audio::file_type::mpeg4);
-    XCTAssertEqual(yas::audio::to_file_type(kAudioFileM4AType), yas::audio::file_type::apple_m4a);
-    XCTAssertEqual(yas::audio::to_file_type(kAudioFileWAVEType), yas::audio::file_type::wave);
+    XCTAssertEqual(audio::to_file_type(kAudioFile3GPType), audio::file_type::three_gpp);
+    XCTAssertEqual(audio::to_file_type(kAudioFile3GP2Type), audio::file_type::three_gpp2);
+    XCTAssertEqual(audio::to_file_type(kAudioFileAIFCType), audio::file_type::aifc);
+    XCTAssertEqual(audio::to_file_type(kAudioFileAIFFType), audio::file_type::aiff);
+    XCTAssertEqual(audio::to_file_type(kAudioFileAMRType), audio::file_type::amr);
+    XCTAssertEqual(audio::to_file_type(kAudioFileAC3Type), audio::file_type::ac3);
+    XCTAssertEqual(audio::to_file_type(kAudioFileMP3Type), audio::file_type::mpeg_layer3);
+    XCTAssertEqual(audio::to_file_type(kAudioFileCAFType), audio::file_type::core_audio_format);
+    XCTAssertEqual(audio::to_file_type(kAudioFileMPEG4Type), audio::file_type::mpeg4);
+    XCTAssertEqual(audio::to_file_type(kAudioFileM4AType), audio::file_type::apple_m4a);
+    XCTAssertEqual(audio::to_file_type(kAudioFileWAVEType), audio::file_type::wave);
 
-    XCTAssert(!yas::audio::to_file_type(0));
+    XCTAssert(!audio::to_file_type(0));
 }
 
 @end

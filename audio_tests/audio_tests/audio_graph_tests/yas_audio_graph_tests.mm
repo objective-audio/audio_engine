@@ -4,6 +4,8 @@
 
 #import "yas_audio_test_utils.h"
 
+using namespace yas;
+
 @interface yas_audio_graph_tests : XCTestCase
 
 @end
@@ -19,7 +21,7 @@
 }
 
 - (void)testRunning {
-    yas::audio::graph graph;
+    audio::graph graph;
 
     graph.start();
 
@@ -37,12 +39,12 @@
     const UInt32 frame_length = 1024;
     const UInt32 maximum_frame_length = 4096;
 
-    auto output_format = yas::audio::format(output_sample_rate, channels);
-    auto mixer_format = yas::audio::format(mixer_sample_rate, channels);
+    auto output_format = audio::format(output_sample_rate, channels);
+    auto mixer_format = audio::format(mixer_sample_rate, channels);
 
-    yas::audio::graph graph;
+    audio::graph graph;
 
-    yas::audio::unit io_unit(kAudioUnitType_Output, kAudioUnitSubType_GenericOutput);
+    audio::unit io_unit(kAudioUnitType_Output, kAudioUnitSubType_GenericOutput);
     io_unit.set_maximum_frames_per_slice(maximum_frame_length);
     graph.add_audio_unit(io_unit);
 
@@ -50,7 +52,7 @@
 
     const UInt32 mixerInputCount = 16;
 
-    yas::audio::unit mixer_unit(kAudioUnitType_Mixer, kAudioUnitSubType_MultiChannelMixer);
+    audio::unit mixer_unit(kAudioUnitType_Mixer, kAudioUnitSubType_MultiChannelMixer);
     mixer_unit.set_maximum_frames_per_slice(maximum_frame_length);
     graph.add_audio_unit(mixer_unit);
 
@@ -81,14 +83,14 @@
     XCTestExpectation *ioExpectation = [self expectationWithDescription:@"io_unit render"];
     yas_retain_or_ignore(ioExpectation);
 
-    io_unit.set_render_callback([ioExpectation, frame_length, output_format, &mixer_unit, &self](
-        yas::audio::render_parameters &render_parameters) mutable {
+    io_unit.set_render_callback([ioExpectation, frame_length, output_format, &mixer_unit,
+                                 &self](audio::render_parameters &render_parameters) mutable {
         if (ioExpectation) {
             [ioExpectation fulfill];
 
             XCTAssertEqual(render_parameters.in_number_frames, frame_length);
             XCTAssertEqual(render_parameters.in_bus_number, 0);
-            XCTAssertEqual(render_parameters.in_render_type, yas::audio::render_type::normal);
+            XCTAssertEqual(render_parameters.in_render_type, audio::render_type::normal);
             XCTAssertEqual(*render_parameters.io_action_flags, 0);
             const AudioBufferList *ioData = render_parameters.io_data;
             XCTAssertNotEqual(ioData, nullptr);
@@ -115,46 +117,46 @@
 
     yas_retain_or_ignore(mixerExpectations);
 
-    mixer_unit.set_render_callback([mixerExpectations, output_format, frame_length, &self](
-        yas::audio::render_parameters &render_parameters) mutable {
-        if (mixerExpectations) {
-            const UInt32 bus_idx = render_parameters.in_bus_number;
-            NSNumber *busKey = @(bus_idx);
-            XCTestExpectation *mixerExpectation = mixerExpectations[busKey];
+    mixer_unit.set_render_callback(
+        [mixerExpectations, output_format, frame_length, &self](audio::render_parameters &render_parameters) mutable {
             if (mixerExpectations) {
-                [mixerExpectation fulfill];
-                [mixerExpectations removeObjectForKey:busKey];
+                const UInt32 bus_idx = render_parameters.in_bus_number;
+                NSNumber *busKey = @(bus_idx);
+                XCTestExpectation *mixerExpectation = mixerExpectations[busKey];
+                if (mixerExpectations) {
+                    [mixerExpectation fulfill];
+                    [mixerExpectations removeObjectForKey:busKey];
 
-                XCTAssertEqual(render_parameters.in_number_frames, frame_length);
-                XCTAssertEqual(render_parameters.in_render_type, yas::audio::render_type::normal);
-                XCTAssertEqual(*render_parameters.io_action_flags, 0);
-                const AudioBufferList *ioData = render_parameters.io_data;
-                XCTAssertNotEqual(ioData, nullptr);
-                XCTAssertEqual(ioData->mNumberBuffers, output_format.buffer_count());
-                for (UInt32 i = 0; i < output_format.buffer_count(); i++) {
-                    XCTAssertEqual(ioData->mBuffers[i].mNumberChannels, output_format.stride());
-                    XCTAssertEqual(ioData->mBuffers[i].mDataByteSize, output_format.sample_byte_count() *
-                                                                          output_format.stride() *
-                                                                          render_parameters.in_number_frames);
+                    XCTAssertEqual(render_parameters.in_number_frames, frame_length);
+                    XCTAssertEqual(render_parameters.in_render_type, audio::render_type::normal);
+                    XCTAssertEqual(*render_parameters.io_action_flags, 0);
+                    const AudioBufferList *ioData = render_parameters.io_data;
+                    XCTAssertNotEqual(ioData, nullptr);
+                    XCTAssertEqual(ioData->mNumberBuffers, output_format.buffer_count());
+                    for (UInt32 i = 0; i < output_format.buffer_count(); i++) {
+                        XCTAssertEqual(ioData->mBuffers[i].mNumberChannels, output_format.stride());
+                        XCTAssertEqual(ioData->mBuffers[i].mDataByteSize, output_format.sample_byte_count() *
+                                                                              output_format.stride() *
+                                                                              render_parameters.in_number_frames);
+                    }
+                }
+
+                if (mixerExpectations.count == 0) {
+                    yas_release(mixerExpectations);
+                    mixerExpectations = nil;
                 }
             }
-
-            if (mixerExpectations.count == 0) {
-                yas_release(mixerExpectations);
-                mixerExpectations = nil;
-            }
-        }
-    });
+        });
 
     auto dispatch_labmda = [io_unit, output_format, output_sample_rate]() mutable {
         AudioUnitRenderActionFlags actionFlags = 0;
-        yas::audio::time time(0, output_sample_rate);
+        audio::time time(0, output_sample_rate);
         AudioTimeStamp timeStamp = time.audio_time_stamp();
 
-        yas::audio::pcm_buffer buffer(output_format, frame_length);
+        audio::pcm_buffer buffer(output_format, frame_length);
 
-        yas::audio::render_parameters parameters = {
-            .in_render_type = yas::audio::render_type::normal,
+        audio::render_parameters parameters = {
+            .in_render_type = audio::render_type::normal,
             .io_action_flags = &actionFlags,
             .io_time_stamp = &timeStamp,
             .in_bus_number = 0,
