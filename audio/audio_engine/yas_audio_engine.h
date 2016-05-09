@@ -44,15 +44,15 @@ namespace audio {
         engine &operator=(std::nullptr_t);
 
         audio::connection connect(node &source_node, node &destination_node, audio::format const &format);
-        audio::connection connect(node &source_node, node &destination_node, UInt32 const source_bus_idx,
-                                  UInt32 const destination_bus_idx, audio::format const &format);
+        audio::connection connect(node &source_node, node &destination_node, uint32_t const source_bus_idx,
+                                  uint32_t const destination_bus_idx, audio::format const &format);
 
         void disconnect(audio::connection &);
         void disconnect(node &);
         void disconnect_input(node const &);
-        void disconnect_input(node const &, UInt32 const bus_idx);
+        void disconnect_input(node const &, uint32_t const bus_idx);
         void disconnect_output(node const &);
-        void disconnect_output(node const &, UInt32 const bus_idx);
+        void disconnect_output(node const &, uint32_t const bus_idx);
 
         start_result_t start_render();
         start_result_t start_offline_render(offline_render_f const &render_function,
