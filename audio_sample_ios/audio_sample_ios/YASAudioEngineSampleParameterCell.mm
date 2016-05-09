@@ -67,7 +67,7 @@ using namespace yas;
 }
 
 - (void)updateValueLabel {
-    Float32 value = 0;
+    float value = 0;
 
     if (_node_opt) {
         auto &node = *_node_opt;

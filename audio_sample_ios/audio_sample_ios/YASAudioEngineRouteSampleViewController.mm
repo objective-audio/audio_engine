@@ -220,7 +220,7 @@ namespace sample {
 #pragma mark -
 
 - (IBAction)volumeSliderChanged:(UISlider *)sender {
-    const Float32 value = sender.value;
+    const float value = sender.value;
     if (_internal.mixer_node) {
         _internal.mixer_node.set_input_volume(value, 0);
     }
