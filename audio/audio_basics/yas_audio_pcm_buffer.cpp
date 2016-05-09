@@ -140,9 +140,9 @@ template <typename T>
 static bool validate_pcm_format(audio::pcm_format const &pcm_format) {
     switch (pcm_format) {
         case audio::pcm_format::float32:
-            return typeid(T) == typeid(Float32);
+            return typeid(T) == typeid(float);
         case audio::pcm_format::float64:
-            return typeid(T) == typeid(Float64);
+            return typeid(T) == typeid(double);
         case audio::pcm_format::fixed824:
             return typeid(T) == typeid(SInt32);
         case audio::pcm_format::int16:
@@ -325,8 +325,8 @@ T *audio::pcm_buffer::data_ptr_at_index(uint32_t const buf_idx) {
     return nullptr;
 }
 
-template Float32 *audio::pcm_buffer::data_ptr_at_index(uint32_t const buf_idx);
-template Float64 *audio::pcm_buffer::data_ptr_at_index(uint32_t const buf_idx);
+template float *audio::pcm_buffer::data_ptr_at_index(uint32_t const buf_idx);
+template double *audio::pcm_buffer::data_ptr_at_index(uint32_t const buf_idx);
 template SInt32 *audio::pcm_buffer::data_ptr_at_index(uint32_t const buf_idx);
 template SInt16 *audio::pcm_buffer::data_ptr_at_index(uint32_t const buf_idx);
 
@@ -343,8 +343,8 @@ T *audio::pcm_buffer::data_ptr_at_channel(uint32_t const ch_idx) {
     return nullptr;
 }
 
-template Float32 *audio::pcm_buffer::data_ptr_at_channel(uint32_t const ch_idx);
-template Float64 *audio::pcm_buffer::data_ptr_at_channel(uint32_t const ch_idx);
+template float *audio::pcm_buffer::data_ptr_at_channel(uint32_t const ch_idx);
+template double *audio::pcm_buffer::data_ptr_at_channel(uint32_t const ch_idx);
 template SInt32 *audio::pcm_buffer::data_ptr_at_channel(uint32_t const ch_idx);
 template SInt16 *audio::pcm_buffer::data_ptr_at_channel(uint32_t const ch_idx);
 
@@ -361,8 +361,8 @@ const T *audio::pcm_buffer::data_ptr_at_index(uint32_t const buf_idx) const {
     return nullptr;
 }
 
-template const Float32 *audio::pcm_buffer::data_ptr_at_index(uint32_t const buf_idx) const;
-template const Float64 *audio::pcm_buffer::data_ptr_at_index(uint32_t const buf_idx) const;
+template const float *audio::pcm_buffer::data_ptr_at_index(uint32_t const buf_idx) const;
+template const double *audio::pcm_buffer::data_ptr_at_index(uint32_t const buf_idx) const;
 template const SInt32 *audio::pcm_buffer::data_ptr_at_index(uint32_t const buf_idx) const;
 template const SInt16 *audio::pcm_buffer::data_ptr_at_index(uint32_t const buf_idx) const;
 
@@ -379,8 +379,8 @@ const T *audio::pcm_buffer::data_ptr_at_channel(uint32_t const ch_idx) const {
     return nullptr;
 }
 
-template const Float32 *audio::pcm_buffer::data_ptr_at_channel(uint32_t const ch_idx) const;
-template const Float64 *audio::pcm_buffer::data_ptr_at_channel(uint32_t const ch_idx) const;
+template const float *audio::pcm_buffer::data_ptr_at_channel(uint32_t const ch_idx) const;
+template const double *audio::pcm_buffer::data_ptr_at_channel(uint32_t const ch_idx) const;
 template const SInt32 *audio::pcm_buffer::data_ptr_at_channel(uint32_t const ch_idx) const;
 template const SInt16 *audio::pcm_buffer::data_ptr_at_channel(uint32_t const ch_idx) const;
 
@@ -542,13 +542,13 @@ audio::pcm_buffer::copy_result audio::copy(const AudioBufferList *const from_abl
         if (from_stride == 1 && to_stride == 1) {
             memcpy(to_data, from_data, copy_length * sample_byte_count);
         } else {
-            if (sample_byte_count == sizeof(Float32)) {
-                auto from_float_data = static_cast<const Float32 *>(from_data);
-                auto to_float_data = static_cast<Float32 *>(to_data);
-                cblas_scopy(copy_length, from_float_data, from_stride, to_float_data, to_stride);
-            } else if (sample_byte_count == sizeof(Float64)) {
-                auto from_float64_data = static_cast<const Float64 *>(from_data);
-                auto to_float64_data = static_cast<Float64 *>(to_data);
+            if (sample_byte_count == sizeof(float)) {
+                auto from_float32_data = static_cast<const float *>(from_data);
+                auto to_float_data = static_cast<float *>(to_data);
+                cblas_scopy(copy_length, from_float32_data, from_stride, to_float_data, to_stride);
+            } else if (sample_byte_count == sizeof(double)) {
+                auto from_float64_data = static_cast<const double *>(from_data);
+                auto to_float64_data = static_cast<double *>(to_data);
                 cblas_dcopy(copy_length, from_float64_data, from_stride, to_float64_data, to_stride);
             } else {
                 for (uint32_t frame = 0; frame < copy_length; ++frame) {
