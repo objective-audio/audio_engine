@@ -481,19 +481,19 @@ void audio::unit::impl::stop() {
     }
 }
 
-void audio::unit::impl::set_graph_key(std::experimental::optional<UInt8> const &key) {
+void audio::unit::impl::set_graph_key(std::experimental::optional<uint8_t> const &key) {
     _graph_key = key;
 }
 
-std::experimental::optional<UInt8> const &audio::unit::impl::graph_key() const {
+std::experimental::optional<uint8_t> const &audio::unit::impl::graph_key() const {
     return _graph_key;
 }
 
-void audio::unit::impl::set_key(std::experimental::optional<UInt16> const &key) {
+void audio::unit::impl::set_key(std::experimental::optional<uint16_t> const &key) {
     _key = key;
 }
 
-std::experimental::optional<UInt16> const &audio::unit::impl::key() const {
+std::experimental::optional<uint16_t> const &audio::unit::impl::key() const {
     return _key;
 }
 

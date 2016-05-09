@@ -8,8 +8,8 @@ namespace yas {
 namespace audio {
     struct unit::impl : base::impl, manageable_unit::impl {
        public:
-        std::experimental::optional<UInt8> _graph_key;
-        std::experimental::optional<UInt16> _key;
+        std::experimental::optional<uint8_t> _graph_key;
+        std::experimental::optional<uint16_t> _key;
         bool initialized;
 
         impl();
@@ -92,10 +92,10 @@ namespace audio {
         std::vector<T> property_data(AudioUnitPropertyID const property_id, AudioUnitScope const scope,
                                      AudioUnitElement const element) const;
 
-        void set_graph_key(std::experimental::optional<UInt8> const &key) override;
-        std::experimental::optional<UInt8> const &graph_key() const override;
-        void set_key(std::experimental::optional<UInt16> const &) override;
-        std::experimental::optional<UInt16> const &key() const override;
+        void set_graph_key(std::experimental::optional<uint8_t> const &key) override;
+        std::experimental::optional<uint8_t> const &graph_key() const override;
+        void set_key(std::experimental::optional<uint16_t> const &) override;
+        std::experimental::optional<uint16_t> const &key() const override;
 
        private:
         class core;
