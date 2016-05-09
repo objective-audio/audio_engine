@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include <MacTypes.h>
 #include <unordered_set>
 #include "yas_base.h"
 #include "yas_protocol.h"

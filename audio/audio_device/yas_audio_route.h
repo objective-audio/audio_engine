@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include <MacTypes.h>
 #include <memory>
 #include <string>
 #include <vector>
