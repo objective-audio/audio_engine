@@ -95,8 +95,8 @@ using namespace yas;
 - (void)testIsEqualData {
     const uint32_t size = 4;
 
-    std::vector<int8_t> vec1(size);
-    std::vector<int8_t> vec2(size);
+    std::vector<uint8_t> vec1(size);
+    std::vector<uint8_t> vec2(size);
 
     for (Byte i = 0; i < size; i++) {
         vec1[i] = vec2[i] = i;
