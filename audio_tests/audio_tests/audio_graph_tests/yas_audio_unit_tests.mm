@@ -23,9 +23,9 @@ using namespace yas;
 - (void)testConverterUnit {
     const Float64 output_sample_rate = 44100;
     const Float64 input_sample_rate = 48000;
-    const UInt32 channels = 2;
-    const UInt32 frame_length = 1024;
-    const UInt32 maximum_frame_length = 4096;
+    const uint32_t channels = 2;
+    const uint32_t frame_length = 1024;
+    const uint32_t maximum_frame_length = 4096;
     const OSType type = kAudioUnitType_FormatConverter;
     const OSType sub_type = kAudioUnitSubType_AUConverter;
 
@@ -66,7 +66,7 @@ using namespace yas;
                 const AudioBufferList *ioData = render_parameters.io_data;
                 XCTAssertNotEqual(ioData, nullptr);
                 XCTAssertEqual(ioData->mNumberBuffers, input_format.buffer_count());
-                for (UInt32 i = 0; i < input_format.buffer_count(); i++) {
+                for (uint32_t i = 0; i < input_format.buffer_count(); i++) {
                     XCTAssertEqual(ioData->mBuffers[i].mNumberChannels, input_format.stride());
                     XCTAssertEqual(ioData->mBuffers[i].mDataByteSize,
                                    input_format.buffer_frame_byte_count() * render_parameters.in_number_frames);
@@ -92,9 +92,9 @@ using namespace yas;
 
 - (void)testRenderCallback {
     const Float64 sampleRate = 44100;
-    const UInt32 channels = 2;
-    const UInt32 frame_length = 1024;
-    const UInt32 maximum_frame_length = 4096;
+    const uint32_t channels = 2;
+    const uint32_t frame_length = 1024;
+    const uint32_t maximum_frame_length = 4096;
 
     auto format = audio::format(sampleRate, channels, audio::pcm_format::float32, false);
 
@@ -218,7 +218,7 @@ using namespace yas;
 
 - (void)testPropertyData {
     const Float64 sampleRate = 48000;
-    const UInt32 channels = 4;
+    const uint32_t channels = 4;
     const AudioUnitPropertyID property_id = kAudioUnitProperty_StreamFormat;
     const AudioUnitScope scope = kAudioUnitScope_Input;
     const AudioUnitElement element = 0;

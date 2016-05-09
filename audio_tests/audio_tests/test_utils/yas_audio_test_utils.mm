@@ -6,22 +6,22 @@
 
 using namespace yas;
 
-UInt32 test::test_value(const UInt32 frame, const UInt32 ch_idx, const UInt32 buf_idx) {
+uint32_t test::test_value(const uint32_t frame, const uint32_t ch_idx, const uint32_t buf_idx) {
     return frame + 1024 * (ch_idx + 1) + 512 * (buf_idx + 1);
 }
 
 void test::fill_test_values_to_buffer(const audio::pcm_buffer &buffer) {
     const auto &format = buffer.format();
     const audio::pcm_format pcmFormat = format.pcm_format();
-    const UInt32 buffer_count = format.buffer_count();
-    const UInt32 stride = format.stride();
+    const uint32_t buffer_count = format.buffer_count();
+    const uint32_t stride = format.stride();
 
-    for (UInt32 buf_idx = 0; buf_idx < buffer_count; buf_idx++) {
+    for (uint32_t buf_idx = 0; buf_idx < buffer_count; buf_idx++) {
         flex_ptr pointer = buffer.flex_ptr_at_index(buf_idx);
-        for (UInt32 frame = 0; frame < buffer.frame_length(); frame++) {
-            for (UInt32 ch_idx = 0; ch_idx < stride; ch_idx++) {
-                UInt32 index = frame * stride + ch_idx;
-                UInt32 value = test_value(frame, ch_idx, buf_idx);
+        for (uint32_t frame = 0; frame < buffer.frame_length(); frame++) {
+            for (uint32_t ch_idx = 0; ch_idx < stride; ch_idx++) {
+                uint32_t index = frame * stride + ch_idx;
+                uint32_t value = test_value(frame, ch_idx, buf_idx);
                 switch (pcmFormat) {
                     case audio::pcm_format::float32: {
                         pointer.f32[index] = value;
@@ -46,9 +46,9 @@ void test::fill_test_values_to_buffer(const audio::pcm_buffer &buffer) {
 bool test::is_cleared_buffer(const audio::pcm_buffer &buffer) {
     const AudioBufferList *abl = buffer.audio_buffer_list();
 
-    for (UInt32 buf_idx = 0; buf_idx < abl->mNumberBuffers; buf_idx++) {
+    for (uint32_t buf_idx = 0; buf_idx < abl->mNumberBuffers; buf_idx++) {
         Byte *ptr = (Byte *)abl->mBuffers[buf_idx].mData;
-        for (UInt32 frame = 0; frame < abl->mBuffers[buf_idx].mDataByteSize; frame++) {
+        for (uint32_t frame = 0; frame < abl->mBuffers[buf_idx].mDataByteSize; frame++) {
             if (ptr[frame] != 0) {
                 return false;
             }
@@ -60,7 +60,7 @@ bool test::is_cleared_buffer(const audio::pcm_buffer &buffer) {
 
 bool test::is_filled_buffer(const audio::pcm_buffer &buffer) {
     __block BOOL isFilled = YES;
-    const UInt32 sample_byte_count = buffer.format().sample_byte_count();
+    const uint32_t sample_byte_count = buffer.format().sample_byte_count();
     NSData *zeroData = [NSMutableData dataWithLength:sample_byte_count];
     const void *zeroBytes = [zeroData bytes];
 
@@ -95,8 +95,8 @@ bool test::is_equal_buffer_flexibly(const audio::pcm_buffer &buffer1, const audi
         return NO;
     }
 
-    for (UInt32 ch_idx = 0; ch_idx < buffer1.format().channel_count(); ch_idx++) {
-        for (UInt32 frame = 0; frame < buffer1.frame_length(); frame++) {
+    for (uint32_t ch_idx = 0; ch_idx < buffer1.format().channel_count(); ch_idx++) {
+        for (uint32_t frame = 0; frame < buffer1.frame_length(); frame++) {
             auto ptr1 = data_ptr_from_buffer(buffer1, ch_idx, frame);
             auto ptr2 = data_ptr_from_buffer(buffer2, ch_idx, frame);
             if (!is_equal_data(ptr1.v, ptr2.v, buffer1.format().sample_byte_count())) {
@@ -127,14 +127,14 @@ bool test::is_equal(const AudioTimeStamp *const ts1, const AudioTimeStamp *const
     }
 }
 
-flex_ptr test::data_ptr_from_buffer(const audio::pcm_buffer &buffer, const UInt32 channel, const UInt32 frame) {
+flex_ptr test::data_ptr_from_buffer(const audio::pcm_buffer &buffer, const uint32_t channel, const uint32_t frame) {
     audio::frame_enumerator enumerator(buffer);
     enumerator.set_frame_position(frame);
     enumerator.set_channel_position(channel);
     return *enumerator.pointer();
 }
 
-void test::audio_unit_render_on_sub_thread(audio::unit &unit, audio::format &format, const UInt32 frame_length,
+void test::audio_unit_render_on_sub_thread(audio::unit &unit, audio::format &format, const uint32_t frame_length,
                                            const NSUInteger count, const NSTimeInterval wait) {
     auto lambda = [unit, format, frame_length, count, wait]() mutable {
         AudioUnitRenderActionFlags action_flags = 0;
@@ -166,28 +166,28 @@ void test::audio_unit_render_on_sub_thread(audio::unit &unit, audio::format &for
 }
 
 struct test::audio_test_node::impl : audio::node::impl {
-    UInt32 input_bus_count() const override {
+    uint32_t input_bus_count() const override {
         return _input_bus_count;
     }
 
-    UInt32 output_bus_count() const override {
+    uint32_t output_bus_count() const override {
         return _output_bus_count;
     }
 
-    UInt32 _input_bus_count;
-    UInt32 _output_bus_count;
+    uint32_t _input_bus_count;
+    uint32_t _output_bus_count;
 };
 
-test::audio_test_node::audio_test_node(const UInt32 input_bus_count, const UInt32 output_bus_count)
+test::audio_test_node::audio_test_node(const uint32_t input_bus_count, const uint32_t output_bus_count)
     : node(std::make_unique<impl>()) {
     set_input_bus_count(input_bus_count);
     set_output_bus_count(output_bus_count);
 }
 
-void test::audio_test_node::set_input_bus_count(const UInt32 &count) {
+void test::audio_test_node::set_input_bus_count(const uint32_t &count) {
     impl_ptr<impl>()->_input_bus_count = count;
 }
 
-void test::audio_test_node::set_output_bus_count(const UInt32 &count) {
+void test::audio_test_node::set_output_bus_count(const uint32_t &count) {
     impl_ptr<impl>()->_output_bus_count = count;
 }

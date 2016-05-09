@@ -81,7 +81,7 @@ using namespace yas;
 }
 
 - (void)test_fill_sine {
-    const UInt32 count = 8;
+    const uint32_t count = 8;
     const Float64 startPhase = 0.1;
     const Float64 phasePerFrame = 1.0 / (Float64)count * audio::math::two_pi;
     Float32 *data = static_cast<Float32 *>(calloc(count, sizeof(Float32)));
@@ -89,7 +89,7 @@ using namespace yas;
     audio::math::fill_sine(data, count, startPhase, phasePerFrame);
 
     Float64 phase = startPhase;
-    for (UInt32 i = 0; i < count; i++) {
+    for (uint32_t i = 0; i < count; i++) {
         Float32 value = sinf(phase);
         phase = fmod(phase + phasePerFrame, audio::math::two_pi);
 

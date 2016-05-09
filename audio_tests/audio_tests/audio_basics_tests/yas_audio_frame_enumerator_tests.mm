@@ -21,8 +21,8 @@ using namespace yas;
 }
 
 - (void)testReadFrameEnumeratorNonInterleaved {
-    const UInt32 frame_length = 16;
-    const UInt32 channels = 4;
+    const uint32_t frame_length = 16;
+    const uint32_t channels = 4;
 
     auto format = audio::format(48000.0, channels);
     audio::pcm_buffer buffer(format, frame_length);
@@ -33,14 +33,14 @@ using namespace yas;
 
     audio::frame_enumerator enumerator(buffer);
     auto pointer = enumerator.pointer();
-    const UInt32 *pointer_frame = enumerator.frame();
-    const UInt32 *pointer_channel = enumerator.channel();
+    const uint32_t *pointer_frame = enumerator.frame();
+    const uint32_t *pointer_channel = enumerator.channel();
 
     for (NSInteger i = 0; i < 2; i++) {
-        UInt32 frame = 0;
+        uint32_t frame = 0;
         while (pointer->v) {
             XCTAssertEqual(*pointer_frame, frame);
-            UInt32 channel = 0;
+            uint32_t channel = 0;
             while (pointer->v) {
                 XCTAssertEqual(*pointer_channel, channel);
                 XCTAssertEqual(*pointer->f32, (Float32)test::test_value(frame, 0, channel));
@@ -57,8 +57,8 @@ using namespace yas;
 }
 
 - (void)testReadFrameEnumeratorInterleavedUseMacro {
-    const UInt32 frame_length = 16;
-    const UInt32 channels = 3;
+    const uint32_t frame_length = 16;
+    const uint32_t channels = 3;
 
     auto format = audio::format(48000, channels, audio::pcm_format::float32, true);
     audio::pcm_buffer buffer(format, frame_length);
@@ -69,14 +69,14 @@ using namespace yas;
 
     audio::frame_enumerator enumerator(buffer);
     auto pointer = enumerator.pointer();
-    const UInt32 *pointer_frame = enumerator.frame();
-    const UInt32 *pointer_channel = enumerator.channel();
+    const uint32_t *pointer_frame = enumerator.frame();
+    const uint32_t *pointer_channel = enumerator.channel();
 
     for (NSInteger i = 0; i < 2; i++) {
-        UInt32 frame = 0;
+        uint32_t frame = 0;
         while (pointer->v) {
             XCTAssertEqual(*pointer_frame, frame);
-            UInt32 channel = 0;
+            uint32_t channel = 0;
             while (pointer->v) {
                 XCTAssertEqual(*pointer_channel, channel);
                 XCTAssertEqual(*pointer->f32, (Float32)test::test_value(frame, channel, 0));
@@ -93,8 +93,8 @@ using namespace yas;
 }
 
 - (void)testReadFrameEnumeratorUseFunction {
-    const UInt32 frame_length = 16;
-    const UInt32 channels = 3;
+    const uint32_t frame_length = 16;
+    const uint32_t channels = 3;
 
     auto format = audio::format(48000, channels, audio::pcm_format::float32, true);
     audio::pcm_buffer data(format, frame_length);
@@ -108,14 +108,14 @@ using namespace yas;
     XCTAssertEqual(enumerator.channel_count(), channels);
 
     auto pointer = enumerator.pointer();
-    const UInt32 *pointer_frame = enumerator.frame();
-    const UInt32 *pointer_channel = enumerator.channel();
+    const uint32_t *pointer_frame = enumerator.frame();
+    const uint32_t *pointer_channel = enumerator.channel();
 
     for (NSInteger i = 0; i < 2; i++) {
-        UInt32 frame = 0;
+        uint32_t frame = 0;
         while (pointer->v) {
             XCTAssertEqual(*pointer_frame, frame);
-            UInt32 channel = 0;
+            uint32_t channel = 0;
             while (pointer->v) {
                 XCTAssertEqual(*pointer_channel, channel);
                 XCTAssertEqual(*pointer->f32, (Float32)test::test_value(frame, channel, 0));
@@ -132,8 +132,8 @@ using namespace yas;
 }
 
 - (void)testReadFrameEnumeratorByMove {
-    const UInt32 frame_length = 16;
-    const UInt32 channels = 4;
+    const uint32_t frame_length = 16;
+    const uint32_t channels = 4;
 
     auto format = audio::format(48000, channels);
     audio::pcm_buffer buffer(format, frame_length);
@@ -142,15 +142,15 @@ using namespace yas;
 
     audio::frame_enumerator enumerator(buffer);
     auto pointer = enumerator.pointer();
-    const UInt32 *pointer_frame = enumerator.frame();
-    const UInt32 *pointer_channel = enumerator.channel();
+    const uint32_t *pointer_frame = enumerator.frame();
+    const uint32_t *pointer_channel = enumerator.channel();
 
     NSUInteger frame = 0;
     NSUInteger channel = 0;
     while (pointer->v) {
         XCTAssertEqual(frame, *pointer_frame);
         XCTAssertEqual(channel, *pointer_channel);
-        XCTAssertEqual(*pointer->f32, test::test_value((UInt32)*pointer_frame, 0, (UInt32)*pointer_channel));
+        XCTAssertEqual(*pointer->f32, test::test_value((uint32_t)*pointer_frame, 0, (uint32_t)*pointer_channel));
 
         ++enumerator;  // enumerator.move();
 
@@ -165,8 +165,8 @@ using namespace yas;
 }
 
 - (void)testWriteFrameEnumerator {
-    const UInt32 frame_length = 16;
-    const UInt32 channels = 4;
+    const uint32_t frame_length = 16;
+    const uint32_t channels = 4;
 
     auto format = audio::format(48000, channels);
     audio::pcm_buffer buffer(format, frame_length);
@@ -175,17 +175,17 @@ using namespace yas;
 
     audio::frame_enumerator mutable_enumerator(buffer);
     const auto *mutable_pointer = mutable_enumerator.pointer();
-    const UInt32 *mutable_pointer_frame = mutable_enumerator.frame();
-    const UInt32 *mutable_pointer_channel = mutable_enumerator.channel();
+    const uint32_t *mutable_pointer_frame = mutable_enumerator.frame();
+    const uint32_t *mutable_pointer_channel = mutable_enumerator.channel();
 
     NSUInteger frame = 0;
     while (mutable_pointer->v) {
         XCTAssertEqual(*mutable_pointer_frame, frame);
-        UInt32 channel = 0;
+        uint32_t channel = 0;
         while (mutable_pointer->v) {
             XCTAssertEqual(*mutable_pointer_channel, channel);
             *mutable_pointer->f32 =
-                (Float32)test::test_value((UInt32)*mutable_pointer_frame, 0, (UInt32)*mutable_pointer_channel);
+                (Float32)test::test_value((uint32_t)*mutable_pointer_frame, 0, (uint32_t)*mutable_pointer_channel);
             yas_audio_frame_enumerator_move_channel(mutable_enumerator);
             ++channel;
         }
@@ -196,11 +196,12 @@ using namespace yas;
 
     audio::frame_enumerator enumerator(buffer);
     auto pointer = enumerator.pointer();
-    const UInt32 *pointer_frame = enumerator.frame();
-    const UInt32 *pointer_channel = enumerator.channel();
+    const uint32_t *pointer_frame = enumerator.frame();
+    const uint32_t *pointer_channel = enumerator.channel();
 
     while (pointer->v) {
-        XCTAssertEqual(*pointer->f32, (Float32)test::test_value((UInt32)*pointer_frame, 0, (UInt32)*pointer_channel));
+        XCTAssertEqual(*pointer->f32,
+                       (Float32)test::test_value((uint32_t)*pointer_frame, 0, (uint32_t)*pointer_channel));
         yas_audio_frame_enumerator_move(enumerator);
     }
 
@@ -209,19 +210,19 @@ using namespace yas;
 }
 
 - (void)testSetFramePosition {
-    const UInt32 frame_length = 16;
+    const uint32_t frame_length = 16;
 
     auto format = audio::format(48000, 1);
     audio::pcm_buffer buffer(format, frame_length);
 
     auto bufferPointer = buffer.flex_ptr_at_index(0);
-    for (UInt32 frame = 0; frame < frame_length; ++frame) {
+    for (uint32_t frame = 0; frame < frame_length; ++frame) {
         bufferPointer.f32[frame] = test::test_value(frame, 0, 0);
     }
 
     audio::frame_enumerator enumerator(buffer);
     auto pointer = enumerator.pointer();
-    const UInt32 *pointer_frame = enumerator.frame();
+    const uint32_t *pointer_frame = enumerator.frame();
 
     XCTAssertEqual(*pointer_frame, 0);
     XCTAssertEqual(*pointer->f32, test::test_value(0, 0, 0));
@@ -245,19 +246,19 @@ using namespace yas;
 }
 
 - (void)testSetChannelPosition {
-    const UInt32 channels = 4;
+    const uint32_t channels = 4;
 
     auto format = audio::format(48000, channels, audio::pcm_format::float32, true);
     audio::pcm_buffer buffer(format, 1);
 
     auto bufferPointer = buffer.flex_ptr_at_index(0);
-    for (UInt32 ch_idx = 0; ch_idx < channels; ch_idx++) {
+    for (uint32_t ch_idx = 0; ch_idx < channels; ch_idx++) {
         bufferPointer.f32[ch_idx] = test::test_value(0, ch_idx, 0);
     }
 
     audio::frame_enumerator enumerator(buffer);
     auto pointer = enumerator.pointer();
-    const UInt32 *pointer_channel = enumerator.channel();
+    const uint32_t *pointer_channel = enumerator.channel();
 
     XCTAssertEqual(*pointer_channel, 0);
     XCTAssertEqual(*pointer->f32, test::test_value(0, 0, 0));
@@ -271,11 +272,11 @@ using namespace yas;
 }
 
 - (void)testReadFrameEnumeratorEachPCMFormat {
-    const UInt32 frame_length = 16;
-    const UInt32 channels = 4;
+    const uint32_t frame_length = 16;
+    const uint32_t channels = 4;
 
-    for (UInt32 i = static_cast<UInt32>(audio::pcm_format::float32);
-         i <= static_cast<UInt32>(audio::pcm_format::fixed824); ++i) {
+    for (uint32_t i = static_cast<uint32_t>(audio::pcm_format::float32);
+         i <= static_cast<uint32_t>(audio::pcm_format::fixed824); ++i) {
         auto pcmFormat = static_cast<audio::pcm_format>(i);
         auto format = audio::format(48000.0, channels, pcmFormat, false);
         audio::pcm_buffer buffer(format, frame_length);
@@ -284,13 +285,13 @@ using namespace yas;
 
         audio::frame_enumerator enumerator(buffer);
         auto pointer = enumerator.pointer();
-        const UInt32 *frame = enumerator.frame();
-        const UInt32 *channel = enumerator.channel();
+        const uint32_t *frame = enumerator.frame();
+        const uint32_t *channel = enumerator.channel();
 
         while (pointer->v) {
             while (pointer->v) {
-                UInt32 test_value =
-                    (Float64)test::test_value(static_cast<UInt32>(*frame), 0, static_cast<UInt32>(*channel));
+                uint32_t test_value =
+                    (Float64)test::test_value(static_cast<uint32_t>(*frame), 0, static_cast<uint32_t>(*channel));
                 switch (pcmFormat) {
                     case audio::pcm_format::float32:
                         XCTAssertEqual(*pointer->f32, static_cast<Float32>(test_value));
@@ -320,8 +321,8 @@ using namespace yas;
 }
 
 - (void)testStop {
-    const UInt32 frame_length = 16;
-    const UInt32 channels = 4;
+    const uint32_t frame_length = 16;
+    const uint32_t channels = 4;
     const NSUInteger stopFrame = 8;
     const NSUInteger stopChannel = 2;
 
@@ -330,8 +331,8 @@ using namespace yas;
 
     audio::frame_enumerator enumerator(buffer);
     auto pointer = enumerator.pointer();
-    const UInt32 *frame = enumerator.frame();
-    const UInt32 *channel = enumerator.channel();
+    const uint32_t *frame = enumerator.frame();
+    const uint32_t *channel = enumerator.channel();
 
     NSUInteger fr = 0;
     NSUInteger ch_idx;

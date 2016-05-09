@@ -93,7 +93,7 @@ using namespace yas;
 }
 
 - (void)testIsEqualData {
-    const UInt32 size = 4;
+    const uint32_t size = 4;
 
     std::vector<UInt8> vec1(size);
     std::vector<UInt8> vec2(size);

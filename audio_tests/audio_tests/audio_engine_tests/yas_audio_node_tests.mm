@@ -140,7 +140,7 @@ using namespace yas;
     std::vector<audio::connection> input_connections;
     input_connections.reserve(relay_node.input_bus_count());
 
-    for (UInt32 i = 0; i < relay_node.input_bus_count(); ++i) {
+    for (uint32_t i = 0; i < relay_node.input_bus_count(); ++i) {
         test::audio_test_node input_node;
         auto input_connection = audio::connection::private_access::create(input_node, 0, relay_node, i, input_format);
         input_node.manageable_node().add_connection(input_connection);

@@ -51,13 +51,13 @@ using namespace yas;
 
 - (void)testElement {
     audio::unit_mixer_node mixer_node;
-    const UInt32 default_element_count = mixer_node.input_element_count();
+    const uint32_t default_element_count = mixer_node.input_element_count();
 
     XCTAssertGreaterThanOrEqual(default_element_count, 1);
     XCTAssertNoThrow(mixer_node.set_input_volume(0.5f, 0));
     XCTAssertThrows(mixer_node.set_input_volume(0.5f, default_element_count));
 
-    const UInt32 element_count = default_element_count + 8;
+    const uint32_t element_count = default_element_count + 8;
     XCTAssertNoThrow(mixer_node.audio_unit().set_element_count(element_count, kAudioUnitScope_Input));
 
     XCTAssertGreaterThanOrEqual(mixer_node.input_element_count(), element_count);
@@ -68,7 +68,7 @@ using namespace yas;
 - (void)testRestoreParamters {
     audio::unit_mixer_node mixer_node;
 
-    const UInt32 bus_idx = 0;
+    const uint32_t bus_idx = 0;
     const Float32 input_volume = 0.5f;
     const Float32 input_pan = 0.75f;
     const bool enabled = false;
