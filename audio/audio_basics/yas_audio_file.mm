@@ -259,7 +259,7 @@ audio::file::read_result_t audio::file::read_into_buffer(audio::pcm_buffer &buff
                 AudioBuffer *ab = &io_abl->mBuffers[i];
                 ab->mNumberChannels = stride;
                 ab->mDataByteSize = dataByteSize;
-                UInt8 *byte_data = static_cast<UInt8 *>(buffer.audio_buffer_list()->mBuffers[i].mData);
+                uint8_t *byte_data = static_cast<uint8_t *>(buffer.audio_buffer_list()->mBuffers[i].mData);
                 ab->mData = &byte_data[dataIndex];
             }
 

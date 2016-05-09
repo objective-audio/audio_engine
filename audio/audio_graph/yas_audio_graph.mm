@@ -17,7 +17,7 @@ namespace yas {
 namespace audio {
     static std::recursive_mutex _global_mutex;
     static bool _interrupting;
-    static std::map<UInt8, weak<graph>> _graphs;
+    static std::map<int8_t, weak<graph>> _graphs;
 #if TARGET_OS_IPHONE
     static objc_ptr<> _did_become_active_observer;
     static objc_ptr<> _interruption_observer;
@@ -29,7 +29,7 @@ namespace audio {
 
 struct audio::graph::impl : base::impl {
    public:
-    impl(UInt8 const key) : _running(false), _mutex(), _units(), _io_units(), _key(key){};
+    impl(int8_t const key) : _running(false), _mutex(), _units(), _io_units(), _key(key){};
 
     ~impl() {
         stop_all_ios();
@@ -126,12 +126,12 @@ struct audio::graph::impl : base::impl {
         _graphs.insert(std::make_pair(graph.impl_ptr<impl>()->key(), to_weak(graph)));
     }
 
-    static void remove_graph_for_key(UInt8 const key) {
+    static void remove_graph_for_key(int8_t const key) {
         std::lock_guard<std::recursive_mutex> lock(_global_mutex);
         _graphs.erase(key);
     }
 
-    static graph graph_for_key(UInt8 const key) {
+    static graph graph_for_key(int8_t const key) {
         std::lock_guard<std::recursive_mutex> lock(_global_mutex);
         if (_graphs.count(key) > 0) {
             auto weak_graph = _graphs.at(key);
@@ -289,7 +289,7 @@ struct audio::graph::impl : base::impl {
         }
     }
 
-    UInt8 key() const {
+    int8_t key() const {
         return _key;
     }
 
@@ -298,7 +298,7 @@ struct audio::graph::impl : base::impl {
     }
 
    private:
-    UInt8 _key;
+    int8_t _key;
     bool _running;
     mutable std::recursive_mutex _mutex;
     std::map<UInt16, unit> _units;
