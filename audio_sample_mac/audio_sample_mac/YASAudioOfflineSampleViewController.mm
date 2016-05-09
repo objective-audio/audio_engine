@@ -12,7 +12,7 @@ using namespace yas;
 
 namespace yas {
 namespace offline_sample {
-    static double sample_rate = 44100.0;
+    static double constexpr sample_rate = 44100.0;
 
     struct sine_node : audio::tap_node {
         struct impl : audio::tap_node::impl {

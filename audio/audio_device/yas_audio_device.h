@@ -26,7 +26,7 @@ namespace audio {
        public:
         class stream;
 
-        enum class property : UInt32 {
+        enum class property : uint32_t {
             system,
             stream,
             format,
@@ -86,8 +86,8 @@ namespace audio {
 
         audio::format input_format() const;
         audio::format output_format() const;
-        UInt32 input_channel_count() const;
-        UInt32 output_channel_count() const;
+        uint32_t input_channel_count() const;
+        uint32_t output_channel_count() const;
 
         static subject<change_info> &system_subject();
         subject<change_info> &subject() const;
