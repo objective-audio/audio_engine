@@ -13,10 +13,10 @@ namespace audio {
     class time {
        public:
         time(std::nullptr_t);
-        time(AudioTimeStamp const &ts, Float64 const sample_rate);
-        explicit time(UInt64 const host_time);
-        time(SInt64 const sample_time, Float64 const sample_rate);
-        time(UInt64 const host_time, SInt64 const sample_time, Float64 const sample_rate);
+        time(AudioTimeStamp const &ts, double const sample_rate);
+        explicit time(uint64_t const host_time);
+        time(int64_t const sample_time, double const sample_rate);
+        time(uint64_t const host_time, int64_t const sample_time, double const sample_rate);
 
         ~time() = default;
 
@@ -31,10 +31,10 @@ namespace audio {
         explicit operator bool() const;
 
         bool is_host_time_valid() const;
-        UInt64 host_time() const;
+        uint64_t host_time() const;
         bool is_sample_time_valid() const;
-        SInt64 sample_time() const;
-        Float64 sample_rate() const;
+        int64_t sample_time() const;
+        double sample_rate() const;
         AudioTimeStamp audio_time_stamp() const;
 
         time extrapolate_time_from_anchor(time const &anchor_time);
@@ -44,7 +44,7 @@ namespace audio {
         std::shared_ptr<impl> _impl;
     };
 
-    UInt64 host_time_for_seconds(Float64 seconds);
-    Float64 seconds_for_host_time(UInt64 host_time);
+    uint64_t host_time_for_seconds(double seconds);
+    double seconds_for_host_time(uint64_t host_time);
 }
 }
