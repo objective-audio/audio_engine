@@ -10,7 +10,7 @@
 
 using namespace yas;
 
-static UInt32 const YASAudioEngineIOSampleConnectionMaxChannels = 2;
+static uint32_t const YASAudioEngineIOSampleConnectionMaxChannels = 2;
 
 typedef NS_ENUM(NSUInteger, YASAudioEngineIOSampleSection) {
     YASAudioEngineIOSampleSectionInfo,
@@ -50,7 +50,7 @@ namespace sample {
             }
         }
 
-        UInt32 connection_channel_count_for_direction(const audio::direction dir) {
+        uint32_t connection_channel_count_for_direction(const audio::direction dir) {
             switch (dir) {
                 case audio::direction::output:
                     return MIN(io_node.output_device_channel_count(), YASAudioEngineIOSampleConnectionMaxChannels);
@@ -61,7 +61,7 @@ namespace sample {
             }
         }
 
-        UInt32 device_channel_count_for_direction(const audio::direction dir) {
+        uint32_t device_channel_count_for_direction(const audio::direction dir) {
             switch (dir) {
                 case audio::direction::output:
                     return io_node.output_device_channel_count();
@@ -72,7 +72,7 @@ namespace sample {
             }
         }
 
-        UInt32 device_channel_count_for_section(const NSInteger section) {
+        uint32_t device_channel_count_for_section(const NSInteger section) {
             switch (section) {
                 case YASAudioEngineIOSampleSectionChannelMapOutput:
                     return io_node.output_device_channel_count();
@@ -311,7 +311,7 @@ namespace sample {
             UITableViewCell *cell = [self _dequeueChannelMapCellWithIndexPath:indexPath];
 
             audio::direction dir = _internal.direction_for_section(indexPath.section);
-            UInt32 map_size = _internal.device_channel_count_for_direction(dir);
+            uint32_t map_size = _internal.device_channel_count_for_direction(dir);
 
             if (indexPath.row < map_size) {
                 const auto &map = _internal.io_node.channel_map(dir);

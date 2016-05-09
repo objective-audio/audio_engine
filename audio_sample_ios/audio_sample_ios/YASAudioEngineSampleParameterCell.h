@@ -3,8 +3,8 @@
 //
 
 #import <UIKit/UIKit.h>
-#import <memory>
 #import <experimental/optional>
+#import <memory>
 
 namespace yas {
 namespace audio {
@@ -14,6 +14,6 @@ namespace audio {
 
 @interface YASAudioEngineSampleParameterCell : UITableViewCell
 
-- (void)set_node:(const std::experimental::optional<yas::audio::unit_node> &)node_opt index:(const UInt32)index;
+- (void)set_node:(const std::experimental::optional<yas::audio::unit_node> &)node_opt index:(const uint32_t)index;
 
 @end

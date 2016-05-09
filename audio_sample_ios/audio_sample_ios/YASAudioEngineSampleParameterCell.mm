@@ -17,7 +17,7 @@ using namespace yas;
 
 @implementation YASAudioEngineSampleParameterCell {
     std::experimental::optional<audio::unit_node> _node_opt;
-    UInt32 _index;
+    uint32_t _index;
 }
 
 - (void)dealloc {
@@ -45,7 +45,7 @@ using namespace yas;
     [self set_node:yas::nullopt index:0];
 }
 
-- (void)set_node:(const std::experimental::optional<audio::unit_node> &)node_opt index:(const UInt32)index {
+- (void)set_node:(const std::experimental::optional<audio::unit_node> &)node_opt index:(const uint32_t)index {
     _node_opt = node_opt;
     _index = index;
 

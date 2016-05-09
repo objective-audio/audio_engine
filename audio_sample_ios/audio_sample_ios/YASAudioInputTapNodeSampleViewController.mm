@@ -38,7 +38,7 @@ namespace sample {
             engine.connect(input_node, input_tap_node, format);
 
             input_tap_node.set_render_function([input_level = input_level, sample_rate](
-                audio::pcm_buffer & buffer, const UInt32 bus_idx, const audio::time &when) mutable {
+                audio::pcm_buffer & buffer, const uint32_t bus_idx, const audio::time &when) mutable {
                 audio::frame_enumerator enumerator(buffer);
                 const auto *flex_ptr = enumerator.pointer();
                 const int frame_length = enumerator.frame_length();
