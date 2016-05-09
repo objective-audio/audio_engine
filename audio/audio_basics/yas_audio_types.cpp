@@ -7,8 +7,8 @@
 
 using namespace yas;
 
-UInt32 yas::to_uint32(audio::direction const &dir) {
-    return static_cast<UInt32>(dir);
+uint32_t yas::to_uint32(audio::direction const &dir) {
+    return static_cast<uint32_t>(dir);
 }
 
 std::string yas::to_string(audio::direction const &dir) {
