@@ -530,14 +530,14 @@ using namespace yas;
     audio::pcm_buffer buffer(audio::format(44100.0, 1, audio::pcm_format::int16), 1);
     auto abl = buffer.audio_buffer_list();
 
-    XCTAssertEqual(buffer.data_ptr_at_index<SInt16>(0), abl->mBuffers[0].mData);
+    XCTAssertEqual(buffer.data_ptr_at_index<int16_t>(0), abl->mBuffers[0].mData);
 }
 
 - (void)test_data_ptr_at_index_fixed824 {
     audio::pcm_buffer buffer(audio::format(44100.0, 1, audio::pcm_format::fixed824), 1);
     auto abl = buffer.audio_buffer_list();
 
-    XCTAssertEqual(buffer.data_ptr_at_index<SInt32>(0), abl->mBuffers[0].mData);
+    XCTAssertEqual(buffer.data_ptr_at_index<int32_t>(0), abl->mBuffers[0].mData);
 }
 
 - (void)test_const_data_ptr_at_index {

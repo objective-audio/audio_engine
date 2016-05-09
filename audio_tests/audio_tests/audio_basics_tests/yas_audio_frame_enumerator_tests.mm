@@ -299,10 +299,10 @@ using namespace yas;
                         XCTAssertEqual(*pointer->f64, static_cast<double>(test_value));
                         break;
                     case audio::pcm_format::int16:
-                        XCTAssertEqual(*pointer->i16, static_cast<SInt16>(test_value));
+                        XCTAssertEqual(*pointer->i16, static_cast<int16_t>(test_value));
                         break;
                     case audio::pcm_format::fixed824:
-                        XCTAssertEqual(*pointer->i32, static_cast<SInt32>(test_value));
+                        XCTAssertEqual(*pointer->i32, static_cast<int32_t>(test_value));
                         break;
                     default:
                         XCTAssert(0);
