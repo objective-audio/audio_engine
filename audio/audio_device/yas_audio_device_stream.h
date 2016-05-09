@@ -15,7 +15,7 @@ namespace audio {
         class impl;
 
        public:
-        enum class property : UInt32 {
+        enum class property : uint32_t {
             virtual_format = 0,
             is_active,
             starting_channel,
@@ -58,7 +58,7 @@ namespace audio {
         bool is_active() const;
         direction direction() const;
         audio::format virtual_format() const;
-        UInt32 starting_channel() const;
+        uint32_t starting_channel() const;
 
         yas::subject<change_info> &subject() const;
 
