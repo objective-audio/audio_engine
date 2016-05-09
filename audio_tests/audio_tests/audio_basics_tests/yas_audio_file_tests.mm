@@ -273,7 +273,7 @@ namespace test {
     for (uint32_t buf_idx = 0; buf_idx < buffer_count; buf_idx++) {
         auto pointer = buffer.flex_ptr_at_index(buf_idx);
         for (NSInteger frameIndex = 0; frameIndex < buffer.frame_length(); frameIndex++) {
-            SInt16 value = frameIndex + startIndex + 1;
+            int16_t value = frameIndex + startIndex + 1;
             for (NSInteger ch_idx = 0; ch_idx < stride; ch_idx++) {
                 switch (format.pcm_format()) {
                     case audio::pcm_format::int16: {
@@ -308,9 +308,9 @@ namespace test {
     for (uint32_t buf_idx = 0; buf_idx < buffer_count; buf_idx++) {
         const auto pointer = buffer.flex_ptr_at_index(buf_idx);
         for (NSInteger frameIndex = 0; frameIndex < buffer.frame_length(); frameIndex++) {
-            SInt16 value = frameIndex + startIndex + 1;
+            int16_t value = frameIndex + startIndex + 1;
             for (NSInteger ch_idx = 0; ch_idx < stride; ch_idx++) {
-                SInt16 ptrValue = 0;
+                int16_t ptrValue = 0;
                 switch (format.pcm_format()) {
                     case audio::pcm_format::int16: {
                         ptrValue = pointer.i16[frameIndex * stride + ch_idx];

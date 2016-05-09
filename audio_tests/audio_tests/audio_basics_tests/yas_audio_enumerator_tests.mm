@@ -207,7 +207,7 @@ using namespace yas;
 
     XCTAssertThrows(audio::enumerator(pointer, 1, 1));
 
-    SInt16 val = 0;
+    int16_t val = 0;
     pointer.v = &val;
 
     XCTAssertThrows(audio::enumerator(pointer, 0, 1));
