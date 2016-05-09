@@ -36,7 +36,7 @@ namespace audio {
         Boolean set_client_format(AudioStreamBasicDescription const &asbd, ExtAudioFileRef const ext_audio_file);
         Boolean get_audio_file_format(AudioStreamBasicDescription *asbd, ExtAudioFileRef const ext_audio_file);
         AudioFileID get_audio_file_id(ExtAudioFileRef const ext_audio_file);
-        SInt64 get_file_length_frames(ExtAudioFileRef const ext_audio_file);
+        int64_t get_file_length_frames(ExtAudioFileRef const ext_audio_file);
         AudioFileTypeID get_audio_file_type_id(ExtAudioFileRef const ext_audio_file);
         CFStringRef get_audio_file_type(ExtAudioFileRef const ext_auidio_file);
     }
