@@ -21,10 +21,10 @@ using namespace yas;
 }
 
 - (void)testIsEqualFloat64WithAccuracy {
-    const Float64 val1 = 1.0;
-    const Float64 accuracy = 0.1;
+    const double val1 = 1.0;
+    const double accuracy = 0.1;
 
-    Float64 val2 = 1.0;
+    double val2 = 1.0;
     XCTAssertTrue(test::is_equal(val1, val2, accuracy));
 
     val2 = 1.05;
@@ -93,10 +93,10 @@ using namespace yas;
 }
 
 - (void)testIsEqualData {
-    const UInt32 size = 4;
+    const uint32_t size = 4;
 
-    std::vector<UInt8> vec1(size);
-    std::vector<UInt8> vec2(size);
+    std::vector<uint8_t> vec1(size);
+    std::vector<uint8_t> vec2(size);
 
     for (Byte i = 0; i < size; i++) {
         vec1[i] = vec2[i] = i;

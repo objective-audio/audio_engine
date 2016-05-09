@@ -16,7 +16,7 @@
 using namespace yas;
 
 struct audio::unit_io_node::impl::core {
-    static UInt32 const channel_map_count = 2;
+    static uint32_t const channel_map_count = 2;
     channel_map_t channel_map[2];
 };
 
@@ -47,7 +47,7 @@ audio::device audio::unit_io_node::impl::device() const {
 
 #endif
 
-Float64 audio::unit_io_node::impl::device_sample_rate() const {
+double audio::unit_io_node::impl::device_sample_rate() const {
 #if TARGET_OS_IPHONE
     return [AVAudioSession sharedInstance].sampleRate;
 #elif TARGET_OS_MAC
@@ -58,9 +58,9 @@ Float64 audio::unit_io_node::impl::device_sample_rate() const {
 #endif
 }
 
-UInt32 audio::unit_io_node::impl::output_device_channel_count() const {
+uint32_t audio::unit_io_node::impl::output_device_channel_count() const {
 #if TARGET_OS_IPHONE
-    return static_cast<UInt32>([AVAudioSession sharedInstance].outputNumberOfChannels);
+    return static_cast<uint32_t>([AVAudioSession sharedInstance].outputNumberOfChannels);
 #elif TARGET_OS_MAC
     if (auto const &dev = device()) {
         return dev.output_channel_count();
@@ -69,9 +69,9 @@ UInt32 audio::unit_io_node::impl::output_device_channel_count() const {
 #endif
 }
 
-UInt32 audio::unit_io_node::impl::input_device_channel_count() const {
+uint32_t audio::unit_io_node::impl::input_device_channel_count() const {
 #if TARGET_OS_IPHONE
-    return static_cast<UInt32>([AVAudioSession sharedInstance].inputNumberOfChannels);
+    return static_cast<uint32_t>([AVAudioSession sharedInstance].inputNumberOfChannels);
 #elif TARGET_OS_MAC
     if (auto const &dev = device()) {
         return dev.input_channel_count();
@@ -100,7 +100,7 @@ audio::bus_result_t audio::unit_io_node::impl::next_available_output_bus() const
     return result;
 }
 
-bool audio::unit_io_node::impl::is_available_output_bus(UInt32 const bus_idx) const {
+bool audio::unit_io_node::impl::is_available_output_bus(uint32_t const bus_idx) const {
     if (bus_idx == 1) {
         return unit_node::impl::is_available_output_bus(0);
     }
@@ -112,10 +112,10 @@ void audio::unit_io_node::impl::update_connections() {
 
     auto unit = au();
 
-    auto update_channel_map = [](channel_map_t &map, format const &format, UInt32 const dev_ch_count) {
+    auto update_channel_map = [](channel_map_t &map, format const &format, uint32_t const dev_ch_count) {
         if (map.size() > 0) {
             if (format) {
-                UInt32 const ch_count = format.channel_count();
+                uint32_t const ch_count = format.channel_count();
                 if (map.size() != ch_count) {
                     map.resize(ch_count, -1);
                 }
@@ -149,11 +149,11 @@ void audio::unit_io_node::impl::prepare_audio_unit() {
 
 #pragma mark - aduio_unit_output_node::impl
 
-UInt32 audio::unit_output_node::impl::input_bus_count() const {
+uint32_t audio::unit_output_node::impl::input_bus_count() const {
     return 1;
 }
 
-UInt32 audio::unit_output_node::impl::output_bus_count() const {
+uint32_t audio::unit_output_node::impl::output_bus_count() const {
     return 0;
 }
 
@@ -176,11 +176,11 @@ audio::unit_input_node::impl::impl() : audio::unit_io_node::impl(), _core(std::m
 
 audio::unit_input_node::impl::~impl() = default;
 
-UInt32 audio::unit_input_node::impl::input_bus_count() const {
+uint32_t audio::unit_input_node::impl::input_bus_count() const {
     return 0;
 }
 
-UInt32 audio::unit_input_node::impl::output_bus_count() const {
+uint32_t audio::unit_input_node::impl::output_bus_count() const {
     return 1;
 }
 

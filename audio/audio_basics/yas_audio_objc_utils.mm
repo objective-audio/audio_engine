@@ -36,8 +36,8 @@ audio::channel_map_t yas::to_channel_map(NSArray *const channelDescriptions, aud
 
     for (AVAudioSessionPortDescription *portDescription in portDescriptions) {
         for (AVAudioSessionChannelDescription *channelDescription in portDescription.channels) {
-            UInt32 idx = 0;
-            UInt32 assign_idx = -1;
+            uint32_t idx = 0;
+            uint32_t assign_idx = -1;
 
             for (AVAudioSessionChannelDescription *assignChannelDescription in channelDescriptions) {
                 if ([assignChannelDescription.owningPortUID isEqualToString:portDescription.UID] &&

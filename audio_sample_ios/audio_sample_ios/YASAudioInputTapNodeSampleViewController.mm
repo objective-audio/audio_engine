@@ -27,7 +27,7 @@ namespace sample {
         audio::unit_input_node input_node;
         audio::input_tap_node input_tap_node;
 
-        property<Float32, property_key> input_level{
+        property<float, property_key> input_level{
             {.key = property_key::input_level, .value = audio::math::decibel_from_linear(0.0f)}};
 
         input_tap_node_vc_internal() = default;
@@ -38,17 +38,17 @@ namespace sample {
             engine.connect(input_node, input_tap_node, format);
 
             input_tap_node.set_render_function([input_level = input_level, sample_rate](
-                audio::pcm_buffer & buffer, const UInt32 bus_idx, const audio::time &when) mutable {
+                audio::pcm_buffer & buffer, const uint32_t bus_idx, const audio::time &when) mutable {
                 audio::frame_enumerator enumerator(buffer);
                 const auto *flex_ptr = enumerator.pointer();
                 const int frame_length = enumerator.frame_length();
-                Float32 level = 0;
+                float level = 0;
                 while (flex_ptr->v) {
                     level = MAX(fabsf(flex_ptr->f32[cblas_isamax(frame_length, flex_ptr->f32, 1)]), level);
                     yas_audio_frame_enumerator_move_channel(enumerator);
                 }
 
-                Float32 prev_level = input_level.value() - frame_length / sample_rate * 30.0f;
+                float prev_level = input_level.value() - frame_length / sample_rate * 30.0f;
                 level = MAX(prev_level, audio::math::decibel_from_linear(level));
                 input_level.set_value(level);
             });
@@ -115,7 +115,7 @@ namespace sample {
 }
 
 - (void)updateUI:(CADisplayLink *)sender {
-    Float32 value = _internal.input_level.value();
+    float value = _internal.input_level.value();
 
     self.progressView.progress = MAX((value + 72.0f) / 72.0f, 0.0f);
 

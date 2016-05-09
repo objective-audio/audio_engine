@@ -33,22 +33,22 @@ struct audio::time::impl {
 audio::time::time(std::nullptr_t) : _impl(nullptr) {
 }
 
-audio::time::time(AudioTimeStamp const &ts, Float64 const sample_rate)
+audio::time::time(AudioTimeStamp const &ts, double const sample_rate)
     : _impl(std::make_shared<impl>([[AVAudioTime alloc] initWithAudioTimeStamp:&ts sampleRate:sample_rate])) {
     yas_release(_impl->av_audio_time);
 }
 
-audio::time::time(UInt64 const host_time)
+audio::time::time(uint64_t const host_time)
     : _impl(std::make_shared<impl>([[AVAudioTime alloc] initWithHostTime:host_time])) {
     yas_release(_impl->av_audio_time);
 }
 
-audio::time::time(SInt64 const sample_time, Float64 const sample_rate)
+audio::time::time(int64_t const sample_time, double const sample_rate)
     : _impl(std::make_shared<impl>([[AVAudioTime alloc] initWithSampleTime:sample_time atRate:sample_rate])) {
     yas_release(_impl->av_audio_time);
 }
 
-audio::time::time(UInt64 const host_time, SInt64 const sample_time, Float64 const sample_rate)
+audio::time::time(uint64_t const host_time, int64_t const sample_time, double const sample_rate)
     : _impl(std::make_shared<impl>(
           [[AVAudioTime alloc] initWithHostTime:host_time sampleTime:sample_time atRate:sample_rate])) {
     yas_release(_impl->av_audio_time);
@@ -82,7 +82,7 @@ bool audio::time::is_host_time_valid() const {
     }
 }
 
-UInt64 audio::time::host_time() const {
+uint64_t audio::time::host_time() const {
     if (_impl) {
         return _impl->av_audio_time.hostTime;
     } else {
@@ -98,7 +98,7 @@ bool audio::time::is_sample_time_valid() const {
     }
 }
 
-SInt64 audio::time::sample_time() const {
+int64_t audio::time::sample_time() const {
     if (_impl) {
         return _impl->av_audio_time.sampleTime;
     } else {
@@ -106,7 +106,7 @@ SInt64 audio::time::sample_time() const {
     }
 }
 
-Float64 audio::time::sample_rate() const {
+double audio::time::sample_rate() const {
     if (_impl) {
         return _impl->av_audio_time.sampleRate;
     } else {
@@ -133,10 +133,10 @@ audio::time audio::time::extrapolate_time_from_anchor(audio::time const &anchor_
 
 #pragma mark - global
 
-UInt64 audio::host_time_for_seconds(Float64 seconds) {
+uint64_t audio::host_time_for_seconds(double seconds) {
     return [AVAudioTime hostTimeForSeconds:seconds];
 }
 
-Float64 audio::seconds_for_host_time(UInt64 host_time) {
+double audio::seconds_for_host_time(uint64_t host_time) {
     return [AVAudioTime secondsForHostTime:host_time];
 }

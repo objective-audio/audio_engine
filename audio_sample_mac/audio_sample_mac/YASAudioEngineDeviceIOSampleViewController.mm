@@ -23,8 +23,8 @@ typedef NS_ENUM(NSUInteger, YASAudioDeviceRouteSampleInputType) {
 
 @interface YASAudioDeviceRouteSampleOutputData : NSObject
 
-@property (nonatomic, assign) UInt32 outputIndex;
-@property (nonatomic, assign) UInt32 inputSelectIndex;
+@property (nonatomic, assign) uint32_t outputIndex;
+@property (nonatomic, assign) uint32_t inputSelectIndex;
 
 + (instancetype)data;
 
@@ -52,7 +52,7 @@ typedef NS_ENUM(NSUInteger, YASAudioDeviceRouteSampleInputType) {
     return self.inputSelectIndex >= YASAudioDeviceRouteSampleInputTypeInput;
 }
 
-- (UInt32)inputIndex {
+- (uint32_t)inputIndex {
     return self.inputSelectIndex - YASAudioDeviceRouteSampleInputTypeInput;
 }
 
@@ -60,7 +60,7 @@ typedef NS_ENUM(NSUInteger, YASAudioDeviceRouteSampleInputType) {
 
 @interface YASAudioDeviceRouteSampleInputData : NSObject
 
-@property (nonatomic, assign) UInt32 index;
+@property (nonatomic, assign) uint32_t index;
 
 + (instancetype)data;
 
@@ -178,7 +178,7 @@ namespace sample {
 
     Float64 next_phase = 0.0;
 
-    auto render_function = [next_phase, weak_node](audio::pcm_buffer &buffer, const UInt32 bus_idx,
+    auto render_function = [next_phase, weak_node](audio::pcm_buffer &buffer, const uint32_t bus_idx,
                                                    const audio::time &when) mutable {
         buffer.clear();
 
@@ -280,18 +280,18 @@ namespace sample {
     }
 
     if (auto const device = _internal.device_io_node.device()) {
-        const UInt32 output_channel_count = device.output_channel_count();
-        const UInt32 input_channel_count = device.input_channel_count();
+        const uint32_t output_channel_count = device.output_channel_count();
+        const uint32_t input_channel_count = device.input_channel_count();
         NSMutableArray *outputRoutes = [NSMutableArray arrayWithCapacity:output_channel_count];
         NSMutableArray *inputRoutes = [NSMutableArray arrayWithCapacity:input_channel_count];
 
-        for (UInt32 i = 0; i < output_channel_count; ++i) {
+        for (uint32_t i = 0; i < output_channel_count; ++i) {
             YASAudioDeviceRouteSampleOutputData *data = [YASAudioDeviceRouteSampleOutputData data];
             data.outputIndex = i;
             [outputRoutes addObject:data];
         }
 
-        for (UInt32 i = 0; i < input_channel_count + 2; ++i) {
+        for (uint32_t i = 0; i < input_channel_count + 2; ++i) {
             YASAudioDeviceRouteSampleInputData *data = [YASAudioDeviceRouteSampleInputData data];
             data.index = i;
             [inputRoutes addObject:data];
@@ -329,12 +329,12 @@ namespace sample {
 
     auto &routes = _internal.route_node.routes();
     for (YASAudioDeviceRouteSampleOutputData *data in self.outputRoutes) {
-        const UInt32 dst_ch_idx = data.outputIndex;
+        const uint32_t dst_ch_idx = data.outputIndex;
         auto it = std::find_if(routes.begin(), routes.end(), [dst_ch_idx](const audio::route &route) {
             return route.destination.channel == dst_ch_idx;
         });
 
-        UInt32 inputSelectIndex = 0;
+        uint32_t inputSelectIndex = 0;
 
         if (it != routes.end()) {
             const auto &route = *it;

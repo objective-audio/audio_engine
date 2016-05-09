@@ -21,9 +21,9 @@ using namespace yas;
 }
 
 - (void)testWaveFileSettingsInt16 {
-    const Float64 sampleRate = 44100;
-    const UInt32 channels = 2;
-    const UInt32 bitDepth = 16;
+    const double sampleRate = 44100;
+    const uint32_t channels = 2;
+    const uint32_t bitDepth = 16;
 
     NSDictionary *settings = (__bridge NSDictionary *)audio::wave_file_settings(sampleRate, channels, bitDepth);
 
@@ -38,9 +38,9 @@ using namespace yas;
 }
 
 - (void)testWaveFileSettingsFloat32 {
-    const Float64 sampleRate = 48000;
-    const UInt32 channels = 4;
-    const UInt32 bitDepth = 32;
+    const double sampleRate = 48000;
+    const uint32_t channels = 4;
+    const uint32_t bitDepth = 32;
 
     NSDictionary *settings = (__bridge NSDictionary *)audio::wave_file_settings(sampleRate, channels, bitDepth);
 
@@ -55,9 +55,9 @@ using namespace yas;
 }
 
 - (void)testAIFFSettingsInt16 {
-    const Float64 sampleRate = 32000;
-    const UInt32 channels = 2;
-    const UInt32 bitDepth = 16;
+    const double sampleRate = 32000;
+    const uint32_t channels = 2;
+    const uint32_t bitDepth = 16;
 
     NSDictionary *settings = (__bridge NSDictionary *)audio::aiff_file_settings(sampleRate, channels, bitDepth);
 
@@ -72,9 +72,9 @@ using namespace yas;
 }
 
 - (void)testAIFFSettingsFloat32 {
-    const Float64 sampleRate = 96000;
-    const UInt32 channels = 3;
-    const UInt32 bitDepth = 32;
+    const double sampleRate = 96000;
+    const uint32_t channels = 3;
+    const uint32_t bitDepth = 32;
 
     NSDictionary *settings = (__bridge NSDictionary *)audio::aiff_file_settings(sampleRate, channels, bitDepth);
 
@@ -89,12 +89,12 @@ using namespace yas;
 }
 
 - (void)testAACSettings {
-    const Float64 sampleRate = 48000;
-    const UInt32 channels = 2;
-    const UInt32 bitDepth = 16;
+    const double sampleRate = 48000;
+    const uint32_t channels = 2;
+    const uint32_t bitDepth = 16;
     const AVAudioQuality encoderQuality = AVAudioQualityMedium;
-    const UInt32 bitRate = 128000;
-    const UInt32 bitDepthHint = 16;
+    const uint32_t bitRate = 128000;
+    const uint32_t bitDepthHint = 16;
     const AVAudioQuality converterQuality = AVAudioQualityMax;
 
     NSDictionary *settings = (__bridge NSDictionary *)audio::aac_settings(

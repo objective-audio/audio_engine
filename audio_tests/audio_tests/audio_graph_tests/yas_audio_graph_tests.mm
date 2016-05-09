@@ -33,11 +33,11 @@ using namespace yas;
 }
 
 - (void)testIORendering {
-    const Float64 output_sample_rate = 48000;
-    const Float64 mixer_sample_rate = 44100;
-    const UInt32 channels = 2;
-    const UInt32 frame_length = 1024;
-    const UInt32 maximum_frame_length = 4096;
+    const double output_sample_rate = 48000;
+    const double mixer_sample_rate = 44100;
+    const uint32_t channels = 2;
+    const uint32_t frame_length = 1024;
+    const uint32_t maximum_frame_length = 4096;
 
     auto output_format = audio::format(output_sample_rate, channels);
     auto mixer_format = audio::format(mixer_sample_rate, channels);
@@ -50,7 +50,7 @@ using namespace yas;
 
     io_unit.attach_render_callback(0);
 
-    const UInt32 mixerInputCount = 16;
+    const uint32_t mixerInputCount = 16;
 
     audio::unit mixer_unit(kAudioUnitType_Mixer, kAudioUnitSubType_MultiChannelMixer);
     mixer_unit.set_maximum_frames_per_slice(maximum_frame_length);
@@ -68,7 +68,7 @@ using namespace yas;
     mixer_unit.set_element_count(mixerInputCount, kAudioUnitScope_Input);
     XCTAssertEqual(mixer_unit.element_count(kAudioUnitScope_Input), mixerInputCount);
 
-    for (UInt32 i = 0; i < mixerInputCount; i++) {
+    for (uint32_t i = 0; i < mixerInputCount; i++) {
         mixer_unit.attach_render_callback(i);
 
         mixer_unit.set_input_format(output_format.stream_description(), i);
@@ -95,7 +95,7 @@ using namespace yas;
             const AudioBufferList *ioData = render_parameters.io_data;
             XCTAssertNotEqual(ioData, nullptr);
             XCTAssertEqual(ioData->mNumberBuffers, output_format.buffer_count());
-            for (UInt32 i = 0; i < output_format.buffer_count(); i++) {
+            for (uint32_t i = 0; i < output_format.buffer_count(); i++) {
                 XCTAssertEqual(ioData->mBuffers[i].mNumberChannels, output_format.stride());
                 XCTAssertEqual(
                     ioData->mBuffers[i].mDataByteSize,
@@ -110,7 +110,7 @@ using namespace yas;
     });
 
     NSMutableDictionary *mixerExpectations = [NSMutableDictionary dictionaryWithCapacity:mixerInputCount];
-    for (UInt32 i = 0; i < mixerInputCount; i++) {
+    for (uint32_t i = 0; i < mixerInputCount; i++) {
         NSString *description = [NSString stringWithFormat:@"MixerUnit Render Bus=%@", @(i)];
         mixerExpectations[@(i)] = [self expectationWithDescription:description];
     }
@@ -120,7 +120,7 @@ using namespace yas;
     mixer_unit.set_render_callback(
         [mixerExpectations, output_format, frame_length, &self](audio::render_parameters &render_parameters) mutable {
             if (mixerExpectations) {
-                const UInt32 bus_idx = render_parameters.in_bus_number;
+                const uint32_t bus_idx = render_parameters.in_bus_number;
                 NSNumber *busKey = @(bus_idx);
                 XCTestExpectation *mixerExpectation = mixerExpectations[busKey];
                 if (mixerExpectations) {
@@ -133,7 +133,7 @@ using namespace yas;
                     const AudioBufferList *ioData = render_parameters.io_data;
                     XCTAssertNotEqual(ioData, nullptr);
                     XCTAssertEqual(ioData->mNumberBuffers, output_format.buffer_count());
-                    for (UInt32 i = 0; i < output_format.buffer_count(); i++) {
+                    for (uint32_t i = 0; i < output_format.buffer_count(); i++) {
                         XCTAssertEqual(ioData->mBuffers[i].mNumberChannels, output_format.stride());
                         XCTAssertEqual(ioData->mBuffers[i].mDataByteSize, output_format.sample_byte_count() *
                                                                               output_format.stride() *

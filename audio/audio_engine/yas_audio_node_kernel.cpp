@@ -24,14 +24,14 @@ audio::connection_smap audio::node::kernel::output_connections() const {
     return lock_values(_impl->output_connections);
 }
 
-audio::connection audio::node::kernel::input_connection(UInt32 const bus_idx) {
+audio::connection audio::node::kernel::input_connection(uint32_t const bus_idx) {
     if (_impl->input_connections.count(bus_idx) > 0) {
         return _impl->input_connections.at(bus_idx).lock();
     }
     return nullptr;
 }
 
-audio::connection audio::node::kernel::output_connection(UInt32 const bus_idx) {
+audio::connection audio::node::kernel::output_connection(uint32_t const bus_idx) {
     if (_impl->output_connections.count(bus_idx) > 0) {
         return _impl->output_connections.at(bus_idx).lock();
     }

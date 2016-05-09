@@ -32,15 +32,15 @@ namespace audio {
         AudioUnitScope scope() const;
         CFStringRef unit_name() const;
         bool has_clump() const;
-        UInt32 clump_id() const;
+        uint32_t clump_id() const;
         CFStringRef name() const;
         AudioUnitParameterUnit unit() const;
         AudioUnitParameterValue min_value() const;
         AudioUnitParameterValue max_value() const;
         AudioUnitParameterValue default_value() const;
 
-        Float32 value(AudioUnitElement const element) const;
-        void set_value(Float32 const value, AudioUnitElement const element);
+        float value(AudioUnitElement const element) const;
+        void set_value(float const value, AudioUnitElement const element);
         std::unordered_map<AudioUnitElement, AudioUnitParameterValue> const &values() const;
 
         yas::subject<change_info> &subject();

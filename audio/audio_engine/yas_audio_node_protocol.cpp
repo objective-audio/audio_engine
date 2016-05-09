@@ -25,11 +25,11 @@ void audio::connectable_node::remove_connection(audio::connection const &connect
 audio::manageable_node::manageable_node(std::shared_ptr<impl> impl) : connectable_node(std::move(impl)) {
 }
 
-audio::connection audio::manageable_node::input_connection(UInt32 const bus_idx) const {
+audio::connection audio::manageable_node::input_connection(uint32_t const bus_idx) const {
     return impl_ptr<impl>()->input_connection(bus_idx);
 }
 
-audio::connection audio::manageable_node::output_connection(UInt32 const bus_idx) const {
+audio::connection audio::manageable_node::output_connection(uint32_t const bus_idx) const {
     return impl_ptr<impl>()->output_connection(bus_idx);
 }
 

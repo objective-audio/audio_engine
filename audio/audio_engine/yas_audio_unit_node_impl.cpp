@@ -98,15 +98,15 @@ audio::unit::parameter_map_t const &audio::unit_node::impl::output_parameters() 
     return _core->parameters.at(kAudioUnitScope_Output);
 }
 
-UInt32 audio::unit_node::impl::input_element_count() const {
+uint32_t audio::unit_node::impl::input_element_count() const {
     return _core->au().element_count(kAudioUnitScope_Input);
 }
 
-UInt32 audio::unit_node::impl::output_element_count() const {
+uint32_t audio::unit_node::impl::output_element_count() const {
     return _core->au().element_count(kAudioUnitScope_Output);
 }
 
-void audio::unit_node::impl::set_global_parameter_value(AudioUnitParameterID const parameter_id, Float32 const value) {
+void audio::unit_node::impl::set_global_parameter_value(AudioUnitParameterID const parameter_id, float const value) {
     auto &global_parameters = _core->parameters.at(kAudioUnitScope_Global);
     if (global_parameters.count(parameter_id) > 0) {
         auto &parameter = global_parameters.at(parameter_id);
@@ -117,14 +117,14 @@ void audio::unit_node::impl::set_global_parameter_value(AudioUnitParameterID con
     }
 }
 
-Float32 audio::unit_node::impl::global_parameter_value(AudioUnitParameterID const parameter_id) const {
+float audio::unit_node::impl::global_parameter_value(AudioUnitParameterID const parameter_id) const {
     if (auto &audio_unit = _core->_au) {
         return audio_unit.parameter_value(parameter_id, kAudioUnitScope_Global, 0);
     }
     return 0;
 }
 
-void audio::unit_node::impl::set_input_parameter_value(AudioUnitParameterID const parameter_id, Float32 const value,
+void audio::unit_node::impl::set_input_parameter_value(AudioUnitParameterID const parameter_id, float const value,
                                                        AudioUnitElement const element) {
     auto &input_parameters = _core->parameters.at(kAudioUnitScope_Input);
     if (input_parameters.count(parameter_id) > 0) {
@@ -136,15 +136,15 @@ void audio::unit_node::impl::set_input_parameter_value(AudioUnitParameterID cons
     }
 }
 
-Float32 audio::unit_node::impl::input_parameter_value(AudioUnitParameterID const parameter_id,
-                                                      AudioUnitElement const element) const {
+float audio::unit_node::impl::input_parameter_value(AudioUnitParameterID const parameter_id,
+                                                    AudioUnitElement const element) const {
     if (auto &audio_unit = _core->_au) {
         return audio_unit.parameter_value(parameter_id, kAudioUnitScope_Input, element);
     }
     return 0;
 }
 
-void audio::unit_node::impl::set_output_parameter_value(AudioUnitParameterID const parameter_id, Float32 const value,
+void audio::unit_node::impl::set_output_parameter_value(AudioUnitParameterID const parameter_id, float const value,
                                                         AudioUnitElement const element) {
     auto &output_parameters = _core->parameters.at(kAudioUnitScope_Output);
     if (output_parameters.count(parameter_id) > 0) {
@@ -156,19 +156,19 @@ void audio::unit_node::impl::set_output_parameter_value(AudioUnitParameterID con
     }
 }
 
-Float32 audio::unit_node::impl::output_parameter_value(AudioUnitParameterID const parameter_id,
-                                                       AudioUnitElement const element) const {
+float audio::unit_node::impl::output_parameter_value(AudioUnitParameterID const parameter_id,
+                                                     AudioUnitElement const element) const {
     if (auto &audio_unit = _core->_au) {
         return audio_unit.parameter_value(parameter_id, kAudioUnitScope_Output, element);
     }
     return 0;
 }
 
-UInt32 audio::unit_node::impl::input_bus_count() const {
+uint32_t audio::unit_node::impl::input_bus_count() const {
     return 1;
 }
 
-UInt32 audio::unit_node::impl::output_bus_count() const {
+uint32_t audio::unit_node::impl::output_bus_count() const {
     return 1;
 }
 
@@ -191,7 +191,7 @@ void audio::unit_node::impl::update_connections() {
                 }
             });
 
-            for (UInt32 bus_idx = 0; bus_idx < input_bus_count; ++bus_idx) {
+            for (uint32_t bus_idx = 0; bus_idx < input_bus_count; ++bus_idx) {
                 if (auto connection = input_connection(bus_idx)) {
                     audio_unit.set_input_format(connection.format().stream_description(), bus_idx);
                     audio_unit.attach_render_callback(bus_idx);
@@ -205,7 +205,7 @@ void audio::unit_node::impl::update_connections() {
 
         auto output_bus_count = output_element_count();
         if (output_bus_count > 0) {
-            for (UInt32 bus_idx = 0; bus_idx < output_bus_count; ++bus_idx) {
+            for (uint32_t bus_idx = 0; bus_idx < output_bus_count; ++bus_idx) {
                 if (auto connection = output_connection(bus_idx)) {
                     audio_unit.set_output_format(connection.format().stream_description(), bus_idx);
                 }
@@ -240,7 +240,7 @@ void audio::unit_node::impl::reload_audio_unit() {
     _core->set_au(unit(_core->acd));
 }
 
-void audio::unit_node::impl::render(pcm_buffer &buffer, UInt32 const bus_idx, time const &when) {
+void audio::unit_node::impl::render(pcm_buffer &buffer, uint32_t const bus_idx, time const &when) {
     node::impl::render(buffer, bus_idx, when);
 
     if (auto audio_unit = _core->au()) {

@@ -15,8 +15,8 @@ namespace audio {
 
         virtual void reset() override;
 
-        virtual UInt32 output_bus_count() const override;
-        virtual UInt32 input_bus_count() const override;
+        virtual uint32_t output_bus_count() const override;
+        virtual uint32_t input_bus_count() const override;
 
         bool is_running() const;
 

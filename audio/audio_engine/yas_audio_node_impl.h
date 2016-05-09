@@ -19,18 +19,18 @@ namespace audio {
 
         virtual void reset();  // requires super
 
-        audio::format input_format(UInt32 const bus_idx);
-        audio::format output_format(UInt32 const bus_idx);
+        audio::format input_format(uint32_t const bus_idx);
+        audio::format output_format(uint32_t const bus_idx);
         virtual bus_result_t next_available_input_bus() const;
         virtual bus_result_t next_available_output_bus() const;
-        virtual bool is_available_input_bus(UInt32 const bus_idx) const;
-        virtual bool is_available_output_bus(UInt32 const bus_idx) const;
+        virtual bool is_available_input_bus(uint32_t const bus_idx) const;
+        virtual bool is_available_output_bus(uint32_t const bus_idx) const;
 
-        virtual UInt32 input_bus_count() const;
-        virtual UInt32 output_bus_count() const;
+        virtual uint32_t input_bus_count() const;
+        virtual uint32_t output_bus_count() const;
 
-        audio::connection input_connection(UInt32 const bus_idx) const override;
-        audio::connection output_connection(UInt32 const bus_idx) const override;
+        audio::connection input_connection(uint32_t const bus_idx) const override;
+        audio::connection output_connection(uint32_t const bus_idx) const override;
         audio::connection_wmap &input_connections() const override;
         audio::connection_wmap &output_connections() const override;
 
@@ -50,7 +50,7 @@ namespace audio {
         audio::engine engine() const override;
         void set_engine(audio::engine const &) override;
 
-        virtual void render(audio::pcm_buffer &buffer, UInt32 const bus_idx, audio::time const &when);
+        virtual void render(audio::pcm_buffer &buffer, uint32_t const bus_idx, audio::time const &when);
         audio::time render_time() const;
         void set_render_time_on_render(audio::time const &time);
 

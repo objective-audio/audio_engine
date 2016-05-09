@@ -21,20 +21,20 @@ namespace audio {
         std::unordered_map<AudioUnitParameterID, audio::unit::parameter> const &input_parameters() const;
         std::unordered_map<AudioUnitParameterID, audio::unit::parameter> const &output_parameters() const;
 
-        UInt32 input_element_count() const;
-        UInt32 output_element_count() const;
+        uint32_t input_element_count() const;
+        uint32_t output_element_count() const;
 
-        void set_global_parameter_value(AudioUnitParameterID const parameter_id, Float32 const value);
-        Float32 global_parameter_value(AudioUnitParameterID const parameter_id) const;
-        void set_input_parameter_value(AudioUnitParameterID const parameter_id, Float32 const value,
+        void set_global_parameter_value(AudioUnitParameterID const parameter_id, float const value);
+        float global_parameter_value(AudioUnitParameterID const parameter_id) const;
+        void set_input_parameter_value(AudioUnitParameterID const parameter_id, float const value,
                                        AudioUnitElement const element);
-        Float32 input_parameter_value(AudioUnitParameterID const parameter_id, AudioUnitElement const element) const;
-        void set_output_parameter_value(AudioUnitParameterID const parameter_id, Float32 const value,
+        float input_parameter_value(AudioUnitParameterID const parameter_id, AudioUnitElement const element) const;
+        void set_output_parameter_value(AudioUnitParameterID const parameter_id, float const value,
                                         AudioUnitElement const element);
-        Float32 output_parameter_value(AudioUnitParameterID const parameter_id, AudioUnitElement const element) const;
+        float output_parameter_value(AudioUnitParameterID const parameter_id, AudioUnitElement const element) const;
 
-        virtual UInt32 input_bus_count() const override;
-        virtual UInt32 output_bus_count() const override;
+        virtual uint32_t input_bus_count() const override;
+        virtual uint32_t output_bus_count() const override;
 
         virtual void update_connections() override;
         virtual void prepare_audio_unit() override;
@@ -43,7 +43,7 @@ namespace audio {
         void reload_audio_unit() override;
         void set_graph(audio::graph const &);
 
-        virtual void render(audio::pcm_buffer &buffer, UInt32 const bus_idx, audio::time const &when) override;
+        virtual void render(audio::pcm_buffer &buffer, uint32_t const bus_idx, audio::time const &when) override;
 
        private:
         class core;

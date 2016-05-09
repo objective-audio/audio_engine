@@ -118,12 +118,12 @@ using namespace yas;
                 out_stop = true;
                 audio::frame_enumerator enumerator(buffer);
                 auto pointer = enumerator.pointer();
-                const UInt32 *frm_idx = enumerator.frame();
-                const UInt32 *ch_idx = enumerator.channel();
+                const uint32_t *frm_idx = enumerator.frame();
+                const uint32_t *ch_idx = enumerator.channel();
 
                 while (pointer->v) {
                     while (pointer->v) {
-                        Float32 test_value = (Float32)test::test_value(*frm_idx, 0, *ch_idx);
+                        float test_value = (float)test::test_value(*frm_idx, 0, *ch_idx);
                         XCTAssertEqual(*pointer->f32, test_value);
                         yas_audio_frame_enumerator_move_channel(enumerator);
                     }
@@ -160,7 +160,7 @@ using namespace yas;
     }
 
     std::vector<audio::tap_node> tap_nodes;
-    for (UInt32 i = 0; i < src_count; ++i) {
+    for (uint32_t i = 0; i < src_count; ++i) {
         tap_nodes.push_back(audio::tap_node{});
         auto &tap_node = tap_nodes.at(i);
 
@@ -183,12 +183,12 @@ using namespace yas;
             out_stop = true;
             audio::frame_enumerator enumerator(buffer);
             auto pointer = enumerator.pointer();
-            const UInt32 *frm_idx = enumerator.frame();
-            const UInt32 *ch_idx = enumerator.channel();
+            const uint32_t *frm_idx = enumerator.frame();
+            const uint32_t *ch_idx = enumerator.channel();
 
             while (pointer->v) {
                 while (pointer->v) {
-                    Float32 test_value = (Float32)test::test_value(*frm_idx, 0, 0);
+                    float test_value = (float)test::test_value(*frm_idx, 0, 0);
                     XCTAssertEqual(*pointer->f32, test_value);
                     yas_audio_frame_enumerator_move_channel(enumerator);
                 }
@@ -226,7 +226,7 @@ using namespace yas;
     }
 
     std::vector<audio::tap_node> tap_nodes;
-    for (UInt32 i = 0; i < src_count; ++i) {
+    for (uint32_t i = 0; i < src_count; ++i) {
         tap_nodes.push_back(audio::tap_node{});
         auto &tap_node = tap_nodes.at(i);
 
@@ -249,13 +249,13 @@ using namespace yas;
             out_stop = true;
             audio::frame_enumerator enumerator(buffer);
             auto pointer = enumerator.pointer();
-            const UInt32 *frm_idx = enumerator.frame();
-            const UInt32 *ch_idx = enumerator.channel();
+            const uint32_t *frm_idx = enumerator.frame();
+            const uint32_t *ch_idx = enumerator.channel();
 
             while (pointer->v) {
                 while (pointer->v) {
                     if (*ch_idx == 0 || *ch_idx == 2) {
-                        Float32 test_value = (Float32)test::test_value(*frm_idx, 0, 0);
+                        float test_value = (float)test::test_value(*frm_idx, 0, 0);
                         XCTAssertEqual(*pointer->f32, test_value);
                     }
                     yas_audio_frame_enumerator_move_channel(enumerator);

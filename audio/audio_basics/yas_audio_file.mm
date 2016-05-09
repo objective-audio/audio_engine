@@ -17,7 +17,7 @@ using namespace yas;
 struct audio::file::impl {
     format file_format;
     format processing_format;
-    SInt64 file_frame_position;
+    int64_t file_frame_position;
     ExtAudioFileRef ext_audio_file;
 
     impl()
@@ -158,21 +158,21 @@ audio::format const &audio::file::processing_format() const {
     return _impl->processing_format;
 }
 
-SInt64 audio::file::file_length() const {
+int64_t audio::file::file_length() const {
     if (_impl->ext_audio_file) {
         return ext_audio_file_utils::get_file_length_frames(_impl->ext_audio_file);
     }
     return 0;
 }
 
-SInt64 audio::file::processing_length() const {
-    SInt64 const fileLength = file_length();
-    Float64 const rate =
+int64_t audio::file::processing_length() const {
+    int64_t const fileLength = file_length();
+    double const rate =
         _impl->processing_format.stream_description().mSampleRate / _impl->file_format.stream_description().mSampleRate;
     return fileLength * rate;
 }
 
-void audio::file::set_file_frame_position(UInt32 const position) {
+void audio::file::set_file_frame_position(uint32_t const position) {
     if (_impl->file_frame_position != position) {
         OSStatus err = ExtAudioFileSeek(_impl->ext_audio_file, position);
         if (err == noErr) {
@@ -181,7 +181,7 @@ void audio::file::set_file_frame_position(UInt32 const position) {
     }
 }
 
-SInt64 audio::file::file_frame_position() const {
+int64_t audio::file::file_frame_position() const {
     return _impl->file_frame_position;
 }
 
@@ -226,7 +226,7 @@ void audio::file::close() {
     _impl->close();
 }
 
-audio::file::read_result_t audio::file::read_into_buffer(audio::pcm_buffer &buffer, UInt32 const frame_length) {
+audio::file::read_result_t audio::file::read_into_buffer(audio::pcm_buffer &buffer, uint32_t const frame_length) {
     if (!_impl->ext_audio_file) {
         return read_result_t(read_error_t::closed);
     }
@@ -240,26 +240,26 @@ audio::file::read_result_t audio::file::read_into_buffer(audio::pcm_buffer &buff
     }
 
     OSStatus err = noErr;
-    UInt32 out_frame_length = 0;
-    UInt32 remain_frames = frame_length > 0 ?: buffer.frame_capacity();
+    uint32_t out_frame_length = 0;
+    uint32_t remain_frames = frame_length > 0 ?: buffer.frame_capacity();
 
     auto const &format = buffer.format();
-    UInt32 const buffer_count = format.buffer_count();
-    UInt32 const stride = format.stride();
+    uint32_t const buffer_count = format.buffer_count();
+    uint32_t const stride = format.stride();
 
     if (auto abl_ptr = allocate_audio_buffer_list(buffer_count, 0, 0).first) {
         AudioBufferList *io_abl = abl_ptr.get();
 
         while (remain_frames) {
-            UInt32 bytesPerFrame = format.stream_description().mBytesPerFrame;
-            UInt32 dataByteSize = remain_frames * bytesPerFrame;
-            UInt32 dataIndex = out_frame_length * bytesPerFrame;
+            uint32_t bytesPerFrame = format.stream_description().mBytesPerFrame;
+            uint32_t dataByteSize = remain_frames * bytesPerFrame;
+            uint32_t dataIndex = out_frame_length * bytesPerFrame;
 
             for (NSInteger i = 0; i < buffer_count; i++) {
                 AudioBuffer *ab = &io_abl->mBuffers[i];
                 ab->mNumberChannels = stride;
                 ab->mDataByteSize = dataByteSize;
-                UInt8 *byte_data = static_cast<UInt8 *>(buffer.audio_buffer_list()->mBuffers[i].mData);
+                uint8_t *byte_data = static_cast<uint8_t *>(buffer.audio_buffer_list()->mBuffers[i].mData);
                 ab->mData = &byte_data[dataIndex];
             }
 

@@ -9,7 +9,7 @@
 using namespace yas;
 
 using listener_f =
-    std::function<void(UInt32 const in_number_addresses, const AudioObjectPropertyAddress *const in_addresses)>;
+    std::function<void(uint32_t const in_number_addresses, const AudioObjectPropertyAddress *const in_addresses)>;
 
 #pragma mark - property_info
 
@@ -58,11 +58,11 @@ struct audio::device::stream::impl : base::impl {
     listener_f listener(stream const &stream) {
         auto weak_stream = to_weak(stream);
 
-        return [weak_stream](UInt32 const address_count, const AudioObjectPropertyAddress *const addresses) {
+        return [weak_stream](uint32_t const address_count, const AudioObjectPropertyAddress *const addresses) {
             if (auto stream = weak_stream.lock()) {
                 AudioStreamID const object_id = stream.stream_id();
                 std::vector<property_info> infos;
-                for (UInt32 i = 0; i < address_count; i++) {
+                for (uint32_t i = 0; i < address_count; i++) {
                     if (addresses[i].mSelector == kAudioStreamPropertyVirtualFormat) {
                         infos.push_back(property_info(stream::property::virtual_format, object_id, addresses[i]));
                     } else if (addresses[i].mSelector == kAudioStreamPropertyIsActive) {
@@ -84,7 +84,7 @@ struct audio::device::stream::impl : base::impl {
 
         raise_if_au_error(
             AudioObjectAddPropertyListenerBlock(stream_id, &address, dispatch_get_main_queue(),
-                                                ^(UInt32 address_count, const AudioObjectPropertyAddress *addresses) {
+                                                ^(uint32_t address_count, const AudioObjectPropertyAddress *addresses) {
                                                     function(address_count, addresses);
                                                 }));
     }
@@ -129,7 +129,7 @@ audio::device audio::device::stream::device() const {
 }
 
 bool audio::device::stream::is_active() const {
-    auto data = _property_data<UInt32>(stream_id(), kAudioStreamPropertyIsActive);
+    auto data = _property_data<uint32_t>(stream_id(), kAudioStreamPropertyIsActive);
     if (data) {
         return *data->data() > 0;
     }
@@ -137,7 +137,7 @@ bool audio::device::stream::is_active() const {
 }
 
 audio::direction audio::device::stream::direction() const {
-    auto data = _property_data<UInt32>(stream_id(), kAudioStreamPropertyDirection);
+    auto data = _property_data<uint32_t>(stream_id(), kAudioStreamPropertyDirection);
     if (data) {
         if (*data->data() == 1) {
             return direction::input;
@@ -154,8 +154,8 @@ audio::format audio::device::stream::virtual_format() const {
     return audio::format(*data->data());
 }
 
-UInt32 audio::device::stream::starting_channel() const {
-    auto data = _property_data<UInt32>(stream_id(), kAudioStreamPropertyStartingChannel);
+uint32_t audio::device::stream::starting_channel() const {
+    auto data = _property_data<uint32_t>(stream_id(), kAudioStreamPropertyStartingChannel);
     if (data) {
         return *data->data();
     }

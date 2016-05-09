@@ -51,8 +51,8 @@ namespace audio {
         bool is_output_unit() const;
         AudioUnit audio_unit_instance() const;
 
-        void attach_render_callback(UInt32 const bus_idx);
-        void detach_render_callback(UInt32 const bus_idx);
+        void attach_render_callback(uint32_t const bus_idx);
+        void detach_render_callback(uint32_t const bus_idx);
         void attach_render_notify();
         void detach_render_notify();
         void attach_input_callback();  // for io
@@ -62,12 +62,12 @@ namespace audio {
         void set_notify_callback(render_f callback);
         void set_input_callback(render_f callback);  // for io
 
-        void set_input_format(AudioStreamBasicDescription const &asbd, UInt32 const bus_idx);
-        void set_output_format(AudioStreamBasicDescription const &asbd, UInt32 const bus_idx);
-        AudioStreamBasicDescription input_format(UInt32 const bus_idx) const;
-        AudioStreamBasicDescription output_format(UInt32 const bus_idx) const;
-        void set_maximum_frames_per_slice(UInt32 const frames);
-        UInt32 maximum_frames_per_slice() const;
+        void set_input_format(AudioStreamBasicDescription const &asbd, uint32_t const bus_idx);
+        void set_output_format(AudioStreamBasicDescription const &asbd, uint32_t const bus_idx);
+        AudioStreamBasicDescription input_format(uint32_t const bus_idx) const;
+        AudioStreamBasicDescription output_format(uint32_t const bus_idx) const;
+        void set_maximum_frames_per_slice(uint32_t const frames);
+        uint32_t maximum_frames_per_slice() const;
         bool is_initialized() const;
 
         void set_parameter_value(AudioUnitParameterValue const value, AudioUnitParameterID const parameter_id,
@@ -78,8 +78,8 @@ namespace audio {
         parameter_map_t create_parameters(AudioUnitScope const scope) const;
         parameter create_parameter(AudioUnitParameterID const parameter_id, AudioUnitScope const scope) const;
 
-        void set_element_count(UInt32 const count, AudioUnitScope const scope);  // for mixer
-        UInt32 element_count(AudioUnitScope const scope) const;                  // for mixer
+        void set_element_count(uint32_t const count, AudioUnitScope const scope);  // for mixer
+        uint32_t element_count(AudioUnitScope const scope) const;                  // for mixer
 
         void set_enable_output(bool const enable_output);  // for io
         bool is_enable_output() const;                     // for io
@@ -89,9 +89,9 @@ namespace audio {
         bool has_input() const;                            // for io
         bool is_running() const;                           // for io
         void set_channel_map(channel_map_t const &map, AudioUnitScope const scope,
-                             AudioUnitElement const element);                                         // for io
-        channel_map_t channel_map(AudioUnitScope const scope, AudioUnitElement const element) const;  // for io
-        UInt32 channel_map_count(AudioUnitScope const scope, AudioUnitElement const element) const;   // for io
+                             AudioUnitElement const element);                                          // for io
+        channel_map_t channel_map(AudioUnitScope const scope, AudioUnitElement const element) const;   // for io
+        uint32_t channel_map_count(AudioUnitScope const scope, AudioUnitElement const element) const;  // for io
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
         void set_current_device(AudioDeviceID const device);  // for io
         AudioDeviceID const current_device() const;           // for io

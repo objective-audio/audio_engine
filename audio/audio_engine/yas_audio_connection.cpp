@@ -9,13 +9,13 @@
 using namespace yas;
 
 struct audio::connection::impl : base::impl, node_removable::impl {
-    UInt32 source_bus;
-    UInt32 destination_bus;
+    uint32_t source_bus;
+    uint32_t destination_bus;
     audio::format format;
     mutable std::recursive_mutex mutex;
 
-    impl(node const &source_node, UInt32 const source_bus, node const &destination_node, UInt32 const destination_bus,
-         audio::format const &format)
+    impl(node const &source_node, uint32_t const source_bus, node const &destination_node,
+         uint32_t const destination_bus, audio::format const &format)
         : source_bus(source_bus),
           destination_bus(destination_bus),
           format(format),
@@ -75,8 +75,8 @@ audio::connection::~connection() {
     }
 }
 
-audio::connection::connection(node &source_node, UInt32 const source_bus, node &destination_node,
-                              UInt32 const destination_bus, audio::format const &format)
+audio::connection::connection(node &source_node, uint32_t const source_bus, node &destination_node,
+                              uint32_t const destination_bus, audio::format const &format)
     : base(std::make_shared<impl>(source_node, source_bus, destination_node, destination_bus, format)) {
     if (!source_node || !destination_node) {
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : invalid argument.");
@@ -86,11 +86,11 @@ audio::connection::connection(node &source_node, UInt32 const source_bus, node &
     destination_node.connectable().add_connection(*this);
 }
 
-UInt32 audio::connection::source_bus() const {
+uint32_t audio::connection::source_bus() const {
     return impl_ptr<impl>()->source_bus;
 }
 
-UInt32 audio::connection::destination_bus() const {
+uint32_t audio::connection::destination_bus() const {
     return impl_ptr<impl>()->destination_bus;
 }
 

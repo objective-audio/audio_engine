@@ -9,12 +9,12 @@ using namespace yas;
 namespace yas {
 namespace test {
     struct audio_file_test_data {
-        Float64 file_sample_rate;
-        Float64 processing_sample_rate;
-        UInt32 channels;
-        UInt32 file_bit_depth;
-        UInt32 frame_length;
-        UInt32 loop_count;
+        double file_sample_rate;
+        double processing_sample_rate;
+        uint32_t channels;
+        uint32_t file_bit_depth;
+        uint32_t frame_length;
+        uint32_t loop_count;
         audio::pcm_format pcm_format;
         bool interleaved;
         bool standard;
@@ -80,15 +80,15 @@ namespace test {
 
 - (void)testWAVEFile {
 #if WAVEFILE_LIGHT_TEST
-    Float64 sample_rates[] = {44100.0, 382000.0};
-    UInt32 channels[] = {1, 2};
-    UInt32 file_bit_depths[] = {16, 24};
+    double sample_rates[] = {44100.0, 382000.0};
+    uint32_t channels[] = {1, 2};
+    uint32_t file_bit_depths[] = {16, 24};
     audio::pcm_format pcm_formats[] = {audio::pcm_format::float32, audio::pcm_format::float64};
     bool interleaveds[] = {YES, NO};
 #else
-    Float64 sample_rates[] = {8000.0, 44100.0, 48000.0, 382000.0};
-    UInt32 channels[] = {1, 2, 3, 6};
-    UInt32 file_bit_depths[] = {16, 24, 32};
+    double sample_rates[] = {8000.0, 44100.0, 48000.0, 382000.0};
+    uint32_t channels[] = {1, 2, 3, 6};
+    uint32_t file_bit_depths[] = {16, 24, 32};
     audio::pcm_format pcm_formats[] = {audio::pcm_format::float32, audio::pcm_format::float64, audio::pcm_format::int16,
                                        audio::pcm_format::fixed824};
     bool interleaveds[] = {YES, NO};
@@ -102,10 +102,10 @@ namespace test {
     test_data.standard = NO;
     test_data.async = NO;
 
-    for (Float64 file_sample_rate : sample_rates) {
-        for (Float64 processing_sample_rate : sample_rates) {
-            for (UInt32 channel : channels) {
-                for (UInt32 file_bit_depth : file_bit_depths) {
+    for (double file_sample_rate : sample_rates) {
+        for (double processing_sample_rate : sample_rates) {
+            for (uint32_t channel : channels) {
+                for (uint32_t file_bit_depth : file_bit_depths) {
                     for (audio::pcm_format pcm_format : pcm_formats) {
                         for (bool interleved : interleaveds) {
                             test_data.file_sample_rate = file_sample_rate;
@@ -177,10 +177,10 @@ namespace test {
     NSString *filePath =
         [[self temporaryTestDirectory] stringByAppendingPathComponent:(__bridge NSString *)test_data.file_name()];
     CFURLRef fileURL = (__bridge CFURLRef)[NSURL fileURLWithPath:filePath];
-    const UInt32 frame_length = test_data.frame_length;
-    const UInt32 loopCount = test_data.loop_count;
-    const Float64 file_sample_rate = test_data.file_sample_rate;
-    const Float64 processing_sample_rate = test_data.processing_sample_rate;
+    const uint32_t frame_length = test_data.frame_length;
+    const uint32_t loopCount = test_data.loop_count;
+    const double file_sample_rate = test_data.file_sample_rate;
+    const double processing_sample_rate = test_data.processing_sample_rate;
     const audio::pcm_format pcm_format = test_data.pcm_format;
     const bool interleaved = test_data.interleaved;
     const bool async = test_data.async;
@@ -211,7 +211,7 @@ namespace test {
 
         audio::pcm_buffer buffer(processing_format, frame_length);
 
-        UInt32 startIndex = 0;
+        uint32_t startIndex = 0;
 
         for (NSInteger i = 0; i < loopCount; i++) {
             [self _writeToBuffer:buffer fileFormat:audio_file.file_format() startIndex:startIndex];
@@ -233,9 +233,9 @@ namespace test {
             XCTAssertTrue(audio_file.open({.file_url = fileURL, .pcm_format = pcm_format, .interleaved = interleaved}));
         }
 
-        SInt64 looped_frame_length = frame_length * loopCount;
+        int64_t looped_frame_length = frame_length * loopCount;
         XCTAssertEqualWithAccuracy(audio_file.file_length(),
-                                   (SInt64)(looped_frame_length * (file_sample_rate / processing_sample_rate)), 1);
+                                   (int64_t)(looped_frame_length * (file_sample_rate / processing_sample_rate)), 1);
 
         audio_file.set_processing_format(processing_format);
 
@@ -244,7 +244,7 @@ namespace test {
 
         audio::pcm_buffer buffer(processing_format, frame_length);
 
-        UInt32 startIndex = 0;
+        uint32_t startIndex = 0;
 
         for (NSInteger i = 0; i < loopCount; i++) {
             XCTAssertTrue(audio_file.read_into_buffer(buffer));
@@ -267,13 +267,13 @@ namespace test {
             fileFormat:(const audio::format &)fileFormat
             startIndex:(NSInteger)startIndex {
     const auto &format = buffer.format();
-    const UInt32 buffer_count = format.buffer_count();
-    const UInt32 stride = format.stride();
+    const uint32_t buffer_count = format.buffer_count();
+    const uint32_t stride = format.stride();
 
-    for (UInt32 buf_idx = 0; buf_idx < buffer_count; buf_idx++) {
+    for (uint32_t buf_idx = 0; buf_idx < buffer_count; buf_idx++) {
         auto pointer = buffer.flex_ptr_at_index(buf_idx);
         for (NSInteger frameIndex = 0; frameIndex < buffer.frame_length(); frameIndex++) {
-            SInt16 value = frameIndex + startIndex + 1;
+            int16_t value = frameIndex + startIndex + 1;
             for (NSInteger ch_idx = 0; ch_idx < stride; ch_idx++) {
                 switch (format.pcm_format()) {
                     case audio::pcm_format::int16: {
@@ -283,12 +283,12 @@ namespace test {
                         pointer.i32[frameIndex * stride + ch_idx] = value << 16;
                     } break;
                     case audio::pcm_format::float32: {
-                        Float32 float32Value = (Float32)value / INT16_MAX;
+                        float float32Value = (float)value / INT16_MAX;
                         pointer.f32[frameIndex * stride + ch_idx] = float32Value;
                     } break;
                     case audio::pcm_format::float64: {
-                        Float64 float64Value = (Float64)value / INT16_MAX;
-                        pointer.f64[frameIndex * stride + ch_idx] = (Float64)float64Value;
+                        double float64Value = (double)value / INT16_MAX;
+                        pointer.f64[frameIndex * stride + ch_idx] = (double)float64Value;
                     } break;
                     default:
                         break;
@@ -302,15 +302,15 @@ namespace test {
           fileFormat:(const audio::format &)fileFormat
           startIndex:(NSInteger)startIndex {
     const auto &format = buffer.format();
-    const UInt32 buffer_count = format.buffer_count();
-    const UInt32 stride = format.stride();
+    const uint32_t buffer_count = format.buffer_count();
+    const uint32_t stride = format.stride();
 
-    for (UInt32 buf_idx = 0; buf_idx < buffer_count; buf_idx++) {
+    for (uint32_t buf_idx = 0; buf_idx < buffer_count; buf_idx++) {
         const auto pointer = buffer.flex_ptr_at_index(buf_idx);
         for (NSInteger frameIndex = 0; frameIndex < buffer.frame_length(); frameIndex++) {
-            SInt16 value = frameIndex + startIndex + 1;
+            int16_t value = frameIndex + startIndex + 1;
             for (NSInteger ch_idx = 0; ch_idx < stride; ch_idx++) {
-                SInt16 ptrValue = 0;
+                int16_t ptrValue = 0;
                 switch (format.pcm_format()) {
                     case audio::pcm_format::int16: {
                         ptrValue = pointer.i16[frameIndex * stride + ch_idx];

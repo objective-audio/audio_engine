@@ -13,7 +13,7 @@ using namespace yas;
 namespace yas {
 namespace audio {
     using listener_f =
-        std::function<void(UInt32 const in_number_addresses, const AudioObjectPropertyAddress *const in_addresses)>;
+        std::function<void(uint32_t const in_number_addresses, const AudioObjectPropertyAddress *const in_addresses)>;
 
 #pragma mark - utility
 
@@ -26,7 +26,7 @@ namespace audio {
 
         UInt32 byte_size = 0;
         raise_if_au_error(AudioObjectGetPropertyDataSize(object_id, &address, 0, nullptr, &byte_size));
-        UInt32 vector_size = byte_size / sizeof(T);
+        uint32_t vector_size = byte_size / sizeof(T);
 
         if (vector_size > 0) {
             auto data = std::make_unique<std::vector<T>>(vector_size);
@@ -60,7 +60,7 @@ namespace audio {
 
         raise_if_au_error(AudioObjectAddPropertyListenerBlock(
             object_id, &address, dispatch_get_main_queue(),
-            ^(UInt32 const address_count, const AudioObjectPropertyAddress *const addresses) {
+            ^(uint32_t const address_count, const AudioObjectPropertyAddress *const addresses) {
                 function(address_count, addresses);
             }));
     }
@@ -81,11 +81,11 @@ namespace audio {
         }
 
         static listener_f system_listener() {
-            return [](UInt32 const address_count, const AudioObjectPropertyAddress *const addresses) {
+            return [](uint32_t const address_count, const AudioObjectPropertyAddress *const addresses) {
                 update_all_devices();
 
                 std::vector<device::property_info> property_infos;
-                for (UInt32 i = 0; i < address_count; i++) {
+                for (uint32_t i = 0; i < address_count; i++) {
                     property_infos.push_back(
                         device::property_info{device::property::system, kAudioObjectSystemObject, addresses[i]});
                 }
@@ -236,13 +236,13 @@ struct audio::device::impl : base::impl {
     listener_f _listener() {
         AudioDeviceID const device_id = audio_device_id;
 
-        return [device_id](UInt32 const address_count, const AudioObjectPropertyAddress *const addresses) {
+        return [device_id](uint32_t const address_count, const AudioObjectPropertyAddress *const addresses) {
             auto device = device::device_for_id(device_id);
             if (device) {
                 AudioObjectID const object_id = device.audio_device_id();
 
                 std::vector<device::property_info> property_infos;
-                for (UInt32 i = 0; i < address_count; ++i) {
+                for (uint32_t i = 0; i < address_count; ++i) {
                     if (addresses[i].mSelector == kAudioDevicePropertyStreams) {
                         property_infos.push_back(property_info(property::stream, object_id, addresses[i]));
                     } else if (addresses[i].mSelector == kAudioDevicePropertyStreamConfiguration) {
@@ -319,9 +319,9 @@ struct audio::device::impl : base::impl {
 
         auto data = _property_data<AudioBufferList>(audio_device_id, kAudioDevicePropertyStreamConfiguration, scope);
         if (data) {
-            UInt32 channel_count = 0;
+            uint32_t channel_count = 0;
             for (auto &abl : *data) {
-                for (UInt32 i = 0; i < abl.mNumberBuffers; i++) {
+                for (uint32_t i = 0; i < abl.mNumberBuffers; i++) {
                     channel_count += abl.mBuffers[i].mNumberChannels;
                 }
 
@@ -507,11 +507,11 @@ audio::format audio::device::output_format() const {
     return impl_ptr<impl>()->output_format();
 }
 
-UInt32 audio::device::input_channel_count() const {
+uint32_t audio::device::input_channel_count() const {
     return impl_ptr<impl>()->input_format().channel_count();
 }
 
-UInt32 audio::device::output_channel_count() const {
+uint32_t audio::device::output_channel_count() const {
     return impl_ptr<impl>()->output_format().channel_count();
 }
 

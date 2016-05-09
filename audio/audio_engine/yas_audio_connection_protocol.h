@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include <MacTypes.h>
 #include <unordered_set>
 #include "yas_base.h"
 #include "yas_protocol.h"
@@ -14,8 +13,8 @@ namespace audio {
     class connection;
 
     using connection_set = std::unordered_set<connection>;
-    using connection_smap = std::map<UInt32, connection>;
-    using connection_wmap = std::map<UInt32, weak<connection>>;
+    using connection_smap = std::map<uint32_t, connection>;
+    using connection_wmap = std::map<uint32_t, weak<connection>>;
 
     struct node_removable : protocol {
         struct impl : protocol::impl {

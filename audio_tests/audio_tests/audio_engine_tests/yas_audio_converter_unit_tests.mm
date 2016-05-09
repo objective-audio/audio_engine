@@ -24,7 +24,7 @@ using namespace yas;
     audio::unit converter_unit(kAudioUnitType_FormatConverter, kAudioUnitSubType_AUConverter);
     const audio::pcm_format pcm_formats[] = {audio::pcm_format::float32, audio::pcm_format::float64,
                                              audio::pcm_format::int16, audio::pcm_format::fixed824};
-    const Float64 sample_rates[] = {4000, 8000, 16000, 22050, 44100, 48000, 88100, 96000, 192000, 382000};
+    const double sample_rates[] = {4000, 8000, 16000, 22050, 44100, 48000, 88100, 96000, 192000, 382000};
     const bool interleaves[] = {false, true};
 
     for (const auto &pcm_format : pcm_formats) {

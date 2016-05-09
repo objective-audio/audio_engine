@@ -21,11 +21,11 @@ void audio::tap_node::set_render_function(render_f func) {
     impl_ptr<impl>()->set_render_function(std::move(func));
 }
 
-audio::connection audio::tap_node::input_connection_on_render(UInt32 const bus_idx) const {
+audio::connection audio::tap_node::input_connection_on_render(uint32_t const bus_idx) const {
     return impl_ptr<impl>()->input_connection_on_render(bus_idx);
 }
 
-audio::connection audio::tap_node::output_connection_on_render(UInt32 const bus_idx) const {
+audio::connection audio::tap_node::output_connection_on_render(uint32_t const bus_idx) const {
     return impl_ptr<impl>()->output_connection_on_render(bus_idx);
 }
 
@@ -37,7 +37,7 @@ audio::connection_smap audio::tap_node::output_connections_on_render() const {
     return impl_ptr<impl>()->output_connections_on_render();
 }
 
-void audio::tap_node::render_source(pcm_buffer &buffer, UInt32 const bus_idx, time const &when) {
+void audio::tap_node::render_source(pcm_buffer &buffer, uint32_t const bus_idx, time const &when) {
     impl_ptr<impl>()->render_source(buffer, bus_idx, when);
 }
 

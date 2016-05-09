@@ -24,7 +24,7 @@
     id destinationViewController = segue.destinationViewController;
     if ([destinationViewController isKindOfClass:[YASAudioEngineIOSampleViewController class]]) {
         NSIndexPath *indexPath = [self.tableView indexPathForCell:cell];
-        _selectedValue = (UInt32)[self valueAtIndex:indexPath.row];
+        _selectedValue = (uint32_t)[self valueAtIndex:indexPath.row];
     }
 }
 

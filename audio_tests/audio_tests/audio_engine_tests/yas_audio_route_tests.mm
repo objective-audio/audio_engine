@@ -21,10 +21,10 @@ using namespace yas;
 }
 
 - (void)test_create_route_full {
-    const UInt32 src_bus_idx = 0;
-    const UInt32 src_ch_idx = 1;
-    const UInt32 dst_bus_idx = 2;
-    const UInt32 dst_ch_idx = 3;
+    const uint32_t src_bus_idx = 0;
+    const uint32_t src_ch_idx = 1;
+    const uint32_t dst_bus_idx = 2;
+    const uint32_t dst_ch_idx = 3;
 
     auto route = audio::route(src_bus_idx, src_ch_idx, dst_bus_idx, dst_ch_idx);
 
@@ -35,8 +35,8 @@ using namespace yas;
 }
 
 - (void)test_create_route_common {
-    const UInt32 bus_idx = 4;
-    const UInt32 ch_idx = 5;
+    const uint32_t bus_idx = 4;
+    const uint32_t ch_idx = 5;
 
     auto route = audio::route(bus_idx, ch_idx);
 

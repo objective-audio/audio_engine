@@ -27,13 +27,13 @@ namespace audio {
             bool interleaved = false;
         };
 
-        enum class open_error_t : UInt32 {
+        enum class open_error_t : uint32_t {
             opened,
             invalid_argument,
             open_failed,
         };
 
-        enum class read_error_t : UInt32 {
+        enum class read_error_t : uint32_t {
             closed,
             invalid_argument,
             invalid_format,
@@ -41,13 +41,13 @@ namespace audio {
             tell_failed,
         };
 
-        enum class create_error_t : UInt32 {
+        enum class create_error_t : uint32_t {
             created,
             invalid_argument,
             create_failed,
         };
 
-        enum class write_error_t : UInt32 {
+        enum class write_error_t : uint32_t {
             closed,
             invalid_argument,
             invalid_format,
@@ -75,16 +75,16 @@ namespace audio {
         audio::format const &file_format() const;
         void set_processing_format(audio::format const &format);
         audio::format const &processing_format() const;
-        SInt64 file_length() const;
-        SInt64 processing_length() const;
-        void set_file_frame_position(UInt32 const position);
-        SInt64 file_frame_position() const;
+        int64_t file_length() const;
+        int64_t processing_length() const;
+        void set_file_frame_position(uint32_t const position);
+        int64_t file_frame_position() const;
 
         open_result_t open(open_args);
         create_result_t create(create_args);
         void close();
 
-        read_result_t read_into_buffer(audio::pcm_buffer &buffer, UInt32 const frame_length = 0);
+        read_result_t read_into_buffer(audio::pcm_buffer &buffer, uint32_t const frame_length = 0);
         write_result_t write_from_buffer(audio::pcm_buffer const &buffer, bool const async = false);
 
        protected:

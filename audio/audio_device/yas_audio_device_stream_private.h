@@ -18,7 +18,7 @@ std::unique_ptr<std::vector<T>> yas::audio::device::stream::_property_data(
 
     UInt32 byte_size = 0;
     raise_if_au_error(AudioObjectGetPropertyDataSize(stream_id, &address, 0, nullptr, &byte_size));
-    UInt32 vector_size = byte_size / sizeof(T);
+    uint32_t vector_size = byte_size / sizeof(T);
 
     if (vector_size > 0) {
         auto data = std::make_unique<std::vector<T>>(vector_size);

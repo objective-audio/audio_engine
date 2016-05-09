@@ -12,18 +12,18 @@
 
 using namespace yas;
 
-static const UInt32 kSineDataMaxCount = 4096;
+static const uint32_t kSineDataMaxCount = 4096;
 
 namespace yas {
 namespace audio_device_sample {
     class kernel {
        private:
-        std::atomic<Float64> _through_volume;
-        std::atomic<Float64> _sine_frequency;
-        std::atomic<Float64> _sine_volume;
+        std::atomic<double> _through_volume;
+        std::atomic<double> _sine_frequency;
+        std::atomic<double> _sine_volume;
 
-        Float64 _phase;
-        std::vector<Float32> _sine_data;
+        double _phase;
+        std::vector<float> _sine_data;
 
        public:
         kernel() : _phase(0), _sine_data(kSineDataMaxCount) {
@@ -37,27 +37,27 @@ namespace audio_device_sample {
         kernel &operator=(const kernel &) = delete;
         kernel &operator=(kernel &&) = delete;
 
-        void set_througn_volume(Float64 value) {
+        void set_througn_volume(double value) {
             _through_volume.store(value);
         }
 
-        Float64 through_volume() const {
+        double through_volume() const {
             return _through_volume.load();
         }
 
-        void set_sine_frequency(Float64 value) {
+        void set_sine_frequency(double value) {
             _sine_frequency.store(value);
         }
 
-        Float64 sine_frequency() const {
+        double sine_frequency() const {
             return _sine_frequency.load();
         }
 
-        void set_sine_volume(Float64 value) {
+        void set_sine_volume(double value) {
             _sine_volume.store(value);
         }
 
-        Float64 sine_volume() const {
+        double sine_volume() const {
             return _sine_volume.load();
         }
 
@@ -66,7 +66,7 @@ namespace audio_device_sample {
                 return;
             }
 
-            const UInt32 frame_length = output_buffer.frame_length();
+            const uint32_t frame_length = output_buffer.frame_length();
 
             if (frame_length == 0) {
                 return;
@@ -81,7 +81,7 @@ namespace audio_device_sample {
                     if (input_buffer.frame_length() >= frame_length) {
                         output_buffer.copy_from(input_buffer);
 
-                        const Float32 throughVol = through_volume();
+                        const float throughVol = through_volume();
 
                         while (pointer->v) {
                             cblas_sscal(frame_length, throughVol, pointer->f32, 1);
@@ -91,10 +91,10 @@ namespace audio_device_sample {
                     }
                 }
 
-                const Float64 sample_rate = format.sample_rate();
-                const Float64 start_phase = _phase;
-                const Float64 sine_vol = sine_volume();
-                const Float64 freq = sine_frequency();
+                const double sample_rate = format.sample_rate();
+                const double start_phase = _phase;
+                const double sine_vol = sine_volume();
+                const double freq = sine_frequency();
 
                 if (frame_length < kSineDataMaxCount) {
                     _phase = audio::math::fill_sine(&_sine_data[0], frame_length, start_phase,
@@ -118,15 +118,15 @@ using sample_kernel_sptr = std::shared_ptr<sample_kernel_t>;
 @interface YASAudioDeviceSampleViewController ()
 
 @property (nonatomic, strong) NSArray *deviceNames;
-@property (nonatomic, assign) Float64 nominalSampleRate;
+@property (nonatomic, assign) double nominalSampleRate;
 @property (nonatomic, assign) NSUInteger selectedDeviceIndex;
 @property (nonatomic, copy) NSString *deviceInfo;
 @property (nonatomic, strong) NSColor *ioThroughTextColor;
 @property (nonatomic, strong) NSColor *sineTextColor;
 
-@property (nonatomic, assign) Float64 throughVolume;
-@property (nonatomic, assign) Float64 sineVolume;
-@property (nonatomic, assign) Float64 sineFrequency;
+@property (nonatomic, assign) double throughVolume;
+@property (nonatomic, assign) double sineVolume;
+@property (nonatomic, assign) double sineFrequency;
 
 @end
 
@@ -236,17 +236,17 @@ namespace sample {
 
 #pragma mark -
 
-- (void)setThroughVolume:(Float64)throughVolume {
+- (void)setThroughVolume:(double)throughVolume {
     _throughVolume = throughVolume;
     _internal.kernel->set_througn_volume(throughVolume);
 }
 
-- (void)setSineFrequency:(Float64)sineFrequency {
+- (void)setSineFrequency:(double)sineFrequency {
     _sineFrequency = sineFrequency;
     _internal.kernel->set_sine_frequency(sineFrequency);
 }
 
-- (void)setSineVolume:(Float64)sineVolume {
+- (void)setSineVolume:(double)sineVolume {
     _sineVolume = sineVolume;
     _internal.kernel->set_sine_volume(sineVolume);
 }

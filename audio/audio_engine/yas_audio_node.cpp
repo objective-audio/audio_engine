@@ -25,11 +25,11 @@ void audio::node::reset() {
     impl_ptr<impl>()->reset();
 }
 
-audio::format audio::node::input_format(UInt32 const bus_idx) const {
+audio::format audio::node::input_format(uint32_t const bus_idx) const {
     return impl_ptr<impl>()->input_format(bus_idx);
 }
 
-audio::format audio::node::output_format(UInt32 const bus_idx) const {
+audio::format audio::node::output_format(uint32_t const bus_idx) const {
     return impl_ptr<impl>()->output_format(bus_idx);
 }
 
@@ -41,11 +41,11 @@ audio::bus_result_t audio::node::next_available_output_bus() const {
     return impl_ptr<impl>()->next_available_output_bus();
 }
 
-bool audio::node::is_available_input_bus(UInt32 const bus_idx) const {
+bool audio::node::is_available_input_bus(uint32_t const bus_idx) const {
     return impl_ptr<impl>()->is_available_input_bus(bus_idx);
 }
 
-bool audio::node::is_available_output_bus(UInt32 const bus_idx) const {
+bool audio::node::is_available_output_bus(uint32_t const bus_idx) const {
     return impl_ptr<impl>()->is_available_output_bus(bus_idx);
 }
 
@@ -57,17 +57,17 @@ audio::time audio::node::last_render_time() const {
     return impl_ptr<impl>()->render_time();
 }
 
-UInt32 audio::node::input_bus_count() const {
+uint32_t audio::node::input_bus_count() const {
     return impl_ptr<impl>()->input_bus_count();
 }
 
-UInt32 audio::node::output_bus_count() const {
+uint32_t audio::node::output_bus_count() const {
     return impl_ptr<impl>()->output_bus_count();
 }
 
 #pragma mark render thread
 
-void audio::node::render(pcm_buffer &buffer, UInt32 const bus_idx, const time &when) {
+void audio::node::render(pcm_buffer &buffer, uint32_t const bus_idx, const time &when) {
     impl_ptr<impl>()->render(buffer, bus_idx, when);
 }
 

@@ -13,25 +13,25 @@ namespace yas {
 namespace audio {
     class enumerator {
        public:
-        enumerator(flex_ptr const &pointer, UInt32 const byte_stride, UInt32 const length);
-        enumerator(pcm_buffer const &buffer, UInt32 const channel);
+        enumerator(flex_ptr const &pointer, uint32_t const byte_stride, uint32_t const length);
+        enumerator(pcm_buffer const &buffer, uint32_t const channel);
 
         const flex_ptr *pointer() const;
-        const UInt32 *index() const;
-        UInt32 length() const;
+        const uint32_t *index() const;
+        uint32_t length() const;
 
         void move();
         void stop();
-        void set_position(UInt32 const index);
+        void set_position(uint32_t const index);
         void reset();
 
         enumerator &operator++();
 
         flex_ptr _pointer;
         flex_ptr _top_pointer;
-        UInt32 _byte_stride;
-        UInt32 _length;
-        UInt32 _index;
+        uint32_t _byte_stride;
+        uint32_t _length;
+        uint32_t _index;
     };
 
     class frame_enumerator {
@@ -39,17 +39,17 @@ namespace audio {
         explicit frame_enumerator(pcm_buffer const &buffer);
 
         const flex_ptr *pointer() const;
-        const UInt32 *frame() const;
-        const UInt32 *channel() const;
-        UInt32 frame_length() const;
-        UInt32 channel_count() const;
+        const uint32_t *frame() const;
+        const uint32_t *channel() const;
+        uint32_t frame_length() const;
+        uint32_t channel_count() const;
 
         void move_frame();
         void move_channel();
         void move();
         void stop();
-        void set_frame_position(UInt32 const frame);
-        void set_channel_position(UInt32 const channel);
+        void set_frame_position(uint32_t const frame);
+        void set_channel_position(uint32_t const channel);
         void reset();
 
         frame_enumerator &operator++();
@@ -57,12 +57,12 @@ namespace audio {
         flex_ptr _pointer;
         std::vector<flex_ptr> _pointers;
         std::vector<flex_ptr> _top_pointers;
-        UInt32 _pointers_size;
-        UInt32 _frame_byte_stride;
-        UInt32 _frame_length;
-        UInt32 _frame;
-        UInt32 _channel;
-        UInt32 _channel_count;
+        uint32_t _pointers_size;
+        uint32_t _frame_byte_stride;
+        uint32_t _frame_length;
+        uint32_t _frame;
+        uint32_t _channel;
+        uint32_t _channel_count;
     };
 }
 }
@@ -87,7 +87,7 @@ namespace audio {
         memset(&(__v)._pointers[0], 0, (__v)._pointers_size);      \
         (__v)._pointer.v = nullptr;                                \
     } else {                                                       \
-        UInt32 index = (__v)._channel_count;                       \
+        uint32_t index = (__v)._channel_count;                     \
         while (index--) {                                          \
             (__v)._pointers[index].u8 += (__v)._frame_byte_stride; \
         }                                                          \

@@ -58,11 +58,11 @@ AudioUnit audio::unit::audio_unit_instance() const {
 
 #pragma mark - render callback
 
-void audio::unit::attach_render_callback(UInt32 const bus_idx) {
+void audio::unit::attach_render_callback(uint32_t const bus_idx) {
     impl_ptr<impl>()->attach_render_callback(bus_idx);
 }
 
-void audio::unit::detach_render_callback(UInt32 const bus_idx) {
+void audio::unit::detach_render_callback(uint32_t const bus_idx) {
     impl_ptr<impl>()->detach_render_callback(bus_idx);
 }
 
@@ -96,27 +96,27 @@ void audio::unit::set_input_callback(render_f callback) {
 
 #pragma mark - property
 
-void audio::unit::set_input_format(AudioStreamBasicDescription const &asbd, UInt32 const bus_idx) {
+void audio::unit::set_input_format(AudioStreamBasicDescription const &asbd, uint32_t const bus_idx) {
     impl_ptr<impl>()->set_input_format(asbd, bus_idx);
 }
 
-void audio::unit::set_output_format(AudioStreamBasicDescription const &asbd, UInt32 const bus_idx) {
+void audio::unit::set_output_format(AudioStreamBasicDescription const &asbd, uint32_t const bus_idx) {
     impl_ptr<impl>()->set_output_format(asbd, bus_idx);
 }
 
-AudioStreamBasicDescription audio::unit::input_format(UInt32 const bus_idx) const {
+AudioStreamBasicDescription audio::unit::input_format(uint32_t const bus_idx) const {
     return impl_ptr<impl>()->input_format(bus_idx);
 }
 
-AudioStreamBasicDescription audio::unit::output_format(UInt32 const bus_idx) const {
+AudioStreamBasicDescription audio::unit::output_format(uint32_t const bus_idx) const {
     return impl_ptr<impl>()->output_format(bus_idx);
 }
 
-void audio::unit::set_maximum_frames_per_slice(UInt32 const frames) {
+void audio::unit::set_maximum_frames_per_slice(uint32_t const frames) {
     impl_ptr<impl>()->set_maximum_frames_per_slice(frames);
 }
 
-UInt32 audio::unit::maximum_frames_per_slice() const {
+uint32_t audio::unit::maximum_frames_per_slice() const {
     return impl_ptr<impl>()->maximum_frames_per_slice();
 }
 
@@ -124,11 +124,11 @@ bool audio::unit::is_initialized() const {
     return impl_ptr<impl>()->is_initialized();
 }
 
-void audio::unit::set_element_count(UInt32 const count, AudioUnitScope const scope) {
+void audio::unit::set_element_count(uint32_t const count, AudioUnitScope const scope) {
     impl_ptr<impl>()->set_element_count(count, scope);
 }
 
-UInt32 audio::unit::element_count(AudioUnitScope const scope) const {
+uint32_t audio::unit::element_count(AudioUnitScope const scope) const {
     return impl_ptr<impl>()->element_count(scope);
 }
 
@@ -221,7 +221,7 @@ audio::channel_map_t audio::unit::channel_map(AudioUnitScope const scope, AudioU
     return impl_ptr<impl>()->channel_map(scope, element);
 }
 
-UInt32 audio::unit::channel_map_count(AudioUnitScope const scope, AudioUnitElement const element) const {
+uint32_t audio::unit::channel_map_count(AudioUnitScope const scope, AudioUnitElement const element) const {
     return impl_ptr<impl>()->channel_map_count(scope, element);
 }
 

@@ -10,7 +10,7 @@
 
 using namespace yas;
 
-static UInt32 const YASAudioEngineRouteSampleDestinationChannelCount = 2;
+static uint32_t const YASAudioEngineRouteSampleDestinationChannelCount = 2;
 
 typedef NS_ENUM(NSUInteger, YASAudioEngineRouteSampleSection) {
     YASAudioEngineRouteSampleSectionSlider,
@@ -134,16 +134,16 @@ namespace sample {
 
         if (selectedIndexPath) {
             const auto dst_bus_idx = 0;
-            const auto dst_ch_idx = static_cast<UInt32>(fromIndexPath.row);
-            UInt32 src_bus_idx = -1;
-            UInt32 src_ch_idx = -1;
+            const auto dst_ch_idx = static_cast<uint32_t>(fromIndexPath.row);
+            uint32_t src_bus_idx = -1;
+            uint32_t src_ch_idx = -1;
 
             if (selectedIndexPath.section == YASAudioEngineRouteSampleSelectionSectionSine) {
                 src_bus_idx = YASAudioEngineRouteSampleSourceIndexSine;
-                src_ch_idx = static_cast<UInt32>(selectedIndexPath.row);
+                src_ch_idx = static_cast<uint32_t>(selectedIndexPath.row);
             } else if (selectedIndexPath.section == YASAudioEngineRouteSampleSelectionSectionInput) {
                 src_bus_idx = YASAudioEngineRouteSampleSourceIndexInput;
-                src_ch_idx = static_cast<UInt32>(selectedIndexPath.row);
+                src_ch_idx = static_cast<uint32_t>(selectedIndexPath.row);
             }
 
             if (src_bus_idx == -1 || src_ch_idx == -1) {
@@ -195,7 +195,7 @@ namespace sample {
         case YASAudioEngineRouteSampleSectionDestinations: {
             UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"Cell" forIndexPath:indexPath];
             const auto &routes = _internal.route_node.routes();
-            audio::route::point dst_point{0, static_cast<UInt32>(indexPath.row)};
+            audio::route::point dst_point{0, static_cast<uint32_t>(indexPath.row)};
             auto it = std::find_if(routes.begin(), routes.end(),
                                    [dst_point = std::move(dst_point)](const audio::route &route) {
                                        return route.destination == dst_point;
@@ -220,7 +220,7 @@ namespace sample {
 #pragma mark -
 
 - (IBAction)volumeSliderChanged:(UISlider *)sender {
-    const Float32 value = sender.value;
+    const float value = sender.value;
     if (_internal.mixer_node) {
         _internal.mixer_node.set_input_volume(value, 0);
     }
@@ -236,7 +236,7 @@ namespace sample {
 
     Float64 phase = 0;
 
-    auto tap_render_function = [phase](audio::pcm_buffer &buffer, const UInt32 bus_idx,
+    auto tap_render_function = [phase](audio::pcm_buffer &buffer, const uint32_t bus_idx,
                                        const audio::time &when) mutable {
         buffer.clear();
 
@@ -244,7 +244,7 @@ namespace sample {
         const Float64 phase_per_frame = 1000.0 / buffer.format().sample_rate() * audio::math::two_pi;
         audio::frame_enumerator enumerator(buffer);
         const auto *flex_ptr = enumerator.pointer();
-        const UInt32 length = enumerator.frame_length();
+        const uint32_t length = enumerator.frame_length();
 
         while (flex_ptr->v) {
             phase = audio::math::fill_sine(flex_ptr->f32, length, start_phase, phase_per_frame);

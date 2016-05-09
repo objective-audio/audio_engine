@@ -44,7 +44,7 @@ using namespace yas;
     YASAudioEngineSampleParameterCell *cell =
         [tableView dequeueReusableCellWithIdentifier:@"ParameterCell" forIndexPath:indexPath];
 
-    [cell set_node:*_node_opt index:static_cast<UInt32>(indexPath.row)];
+    [cell set_node:*_node_opt index:static_cast<uint32_t>(indexPath.row)];
 
     return cell;
 }

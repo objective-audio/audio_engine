@@ -22,7 +22,7 @@ using namespace yas;
 }
 
 - (void)test_offline_render_with_audio_engine {
-    const Float64 sample_rate = 44100.0;
+    const double sample_rate = 44100.0;
 
     auto format = audio::format(sample_rate, 2);
     audio::engine engine;
@@ -35,19 +35,19 @@ using namespace yas;
 
     XCTestExpectation *tapNodeExpectation = [self expectationWithDescription:@"tap node render"];
 
-    const UInt32 frames_per_render = 1024;
-    const UInt32 length = 4192;
-    UInt32 tap_render_frame = 0;
+    const uint32_t frames_per_render = 1024;
+    const uint32_t length = 4192;
+    uint32_t tap_render_frame = 0;
 
-    auto tap_render_function = [=](audio::pcm_buffer &buffer, const UInt32 bus_idx, const audio::time &when) mutable {
+    auto tap_render_function = [=](audio::pcm_buffer &buffer, const uint32_t bus_idx, const audio::time &when) mutable {
         XCTAssertEqual(when.sample_time(), tap_render_frame);
         XCTAssertEqual(when.sample_rate(), sample_rate);
         XCTAssertEqual(buffer.frame_length(), frames_per_render);
         XCTAssertTrue(buffer.format() == format);
 
-        for (UInt32 buf_idx = 0; buf_idx < buffer.format().buffer_count(); ++buf_idx) {
-            Float32 *ptr = buffer.data_ptr_at_index<Float32>(buf_idx);
-            for (UInt32 frm_idx = 0; frm_idx < buffer.frame_length(); ++frm_idx) {
+        for (uint32_t buf_idx = 0; buf_idx < buffer.format().buffer_count(); ++buf_idx) {
+            float *ptr = buffer.data_ptr_at_index<float>(buf_idx);
+            for (uint32_t frm_idx = 0; frm_idx < buffer.frame_length(); ++frm_idx) {
                 ptr[frm_idx] = test::test_value(frm_idx + tap_render_frame, 0, buf_idx);
             }
         }
@@ -64,7 +64,7 @@ using namespace yas;
     XCTestExpectation *renderExpectation = [self expectationWithDescription:@"offline output node render"];
     XCTestExpectation *completionExpectation = [self expectationWithDescription:@"offline output node completion"];
 
-    UInt32 output_render_frame = 0;
+    uint32_t output_render_frame = 0;
 
     auto start_render_function = [=](audio::pcm_buffer &buffer, const audio::time &when, bool &out_stop) mutable {
         XCTAssertEqual(when.sample_time(), output_render_frame);
@@ -72,9 +72,9 @@ using namespace yas;
         XCTAssertEqual(buffer.frame_length(), frames_per_render);
         XCTAssertTrue(buffer.format() == format);
 
-        for (UInt32 buf_idx = 0; buf_idx < buffer.format().buffer_count(); ++buf_idx) {
-            Float32 *ptr = buffer.data_ptr_at_index<Float32>(buf_idx);
-            for (UInt32 frm_idx = 0; frm_idx < buffer.frame_length(); ++frm_idx) {
+        for (uint32_t buf_idx = 0; buf_idx < buffer.format().buffer_count(); ++buf_idx) {
+            float *ptr = buffer.data_ptr_at_index<float>(buf_idx);
+            for (uint32_t frm_idx = 0; frm_idx < buffer.frame_length(); ++frm_idx) {
                 bool is_equal_value = ptr[frm_idx] == test::test_value(frm_idx + output_render_frame, 0, buf_idx);
                 XCTAssertTrue(is_equal_value);
                 if (!is_equal_value) {
@@ -110,7 +110,7 @@ using namespace yas;
 }
 
 - (void)test_offline_render_without_audio_engine {
-    const Float64 sample_rate = 48000.0;
+    const double sample_rate = 48000.0;
     auto format = audio::format(sample_rate, 2);
     audio::offline_output_node output_node;
     audio::tap_node tap_node;
@@ -124,11 +124,11 @@ using namespace yas;
 
     XCTestExpectation *tapNodeExpectation = [self expectationWithDescription:@"tap node render"];
 
-    const UInt32 frames_per_render = 1024;
-    const UInt32 length = 4196;
-    UInt32 tap_render_frame = 0;
+    const uint32_t frames_per_render = 1024;
+    const uint32_t length = 4196;
+    uint32_t tap_render_frame = 0;
 
-    auto tap_render_function = [=](audio::pcm_buffer &buffer, const UInt32 bus_idx, const audio::time &when) mutable {
+    auto tap_render_function = [=](audio::pcm_buffer &buffer, const uint32_t bus_idx, const audio::time &when) mutable {
         XCTAssertEqual(when.sample_time(), tap_render_frame);
         XCTAssertEqual(when.sample_rate(), sample_rate);
         XCTAssertEqual(buffer.frame_length(), frames_per_render);
@@ -155,7 +155,7 @@ using namespace yas;
     XCTestExpectation *renderExpectation = [self expectationWithDescription:@"offline output node render"];
     XCTestExpectation *completionExpectation = [self expectationWithDescription:@"offline output node completion"];
 
-    UInt32 output_render_frame = 0;
+    uint32_t output_render_frame = 0;
 
     auto start_render_function = [=](audio::pcm_buffer &buffer, const audio::time &when, bool &out_stop) mutable {
         XCTAssertEqual(when.sample_time(), output_render_frame);

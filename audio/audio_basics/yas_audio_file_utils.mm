@@ -91,7 +91,7 @@ namespace audio_file_utils {
     }
 
     static AudioFileTypeID get_audio_file_type_id(AudioFileID const file_id) {
-        UInt32 fileType;
+        uint32_t fileType;
         UInt32 size = sizeof(AudioFileTypeID);
         raise_if_au_error(AudioFileGetProperty(file_id, kAudioFilePropertyFileFormat, &size, &fileType));
         return fileType;
@@ -141,7 +141,7 @@ Boolean audio::ext_audio_file_utils::dispose(ExtAudioFileRef const ext_audio_fil
 
 Boolean audio::ext_audio_file_utils::set_client_format(AudioStreamBasicDescription const &asbd,
                                                        ExtAudioFileRef const ext_audio_file) {
-    UInt32 size = sizeof(AudioStreamBasicDescription);
+    uint32_t size = sizeof(AudioStreamBasicDescription);
     OSStatus err = noErr;
     raise_if_au_error(err =
                           ExtAudioFileSetProperty(ext_audio_file, kExtAudioFileProperty_ClientDataFormat, size, &asbd));
@@ -163,9 +163,9 @@ AudioFileID audio::ext_audio_file_utils::get_audio_file_id(ExtAudioFileRef const
     return file_id;
 }
 
-SInt64 audio::ext_audio_file_utils::get_file_length_frames(ExtAudioFileRef const ext_audio_file) {
-    SInt64 result = 0;
-    UInt32 size = sizeof(SInt64);
+int64_t audio::ext_audio_file_utils::get_file_length_frames(ExtAudioFileRef const ext_audio_file) {
+    int64_t result = 0;
+    UInt32 size = sizeof(int64_t);
     raise_if_au_error(ExtAudioFileGetProperty(ext_audio_file, kExtAudioFileProperty_FileLengthFrames, &size, &result));
     return result;
 }
@@ -181,18 +181,18 @@ CFStringRef get_audio_file_type(ExtAudioFileRef const ext_audio_file) {
 
 #pragma mark -
 
-CFDictionaryRef audio::wave_file_settings(Float64 const sample_rate, UInt32 const channel_count,
-                                          UInt32 const bit_depth) {
+CFDictionaryRef audio::wave_file_settings(double const sample_rate, uint32_t const channel_count,
+                                          uint32_t const bit_depth) {
     return linear_pcm_file_settings(sample_rate, channel_count, bit_depth, false, bit_depth >= 32, false);
 }
 
-CFDictionaryRef audio::aiff_file_settings(Float64 const sample_rate, UInt32 const channel_count,
-                                          UInt32 const bit_depth) {
+CFDictionaryRef audio::aiff_file_settings(double const sample_rate, uint32_t const channel_count,
+                                          uint32_t const bit_depth) {
     return linear_pcm_file_settings(sample_rate, channel_count, bit_depth, true, bit_depth >= 32, false);
 }
 
-CFDictionaryRef audio::linear_pcm_file_settings(Float64 const sample_rate, UInt32 const channel_count,
-                                                UInt32 const bit_depth, bool const is_big_endian, bool const is_float,
+CFDictionaryRef audio::linear_pcm_file_settings(double const sample_rate, uint32_t const channel_count,
+                                                uint32_t const bit_depth, bool const is_big_endian, bool const is_float,
                                                 bool const is_non_interleaved) {
     return (__bridge CFDictionaryRef) @{
         AVFormatIDKey: @(kAudioFormatLinearPCM),
@@ -206,9 +206,9 @@ CFDictionaryRef audio::linear_pcm_file_settings(Float64 const sample_rate, UInt3
     };
 }
 
-CFDictionaryRef audio::aac_settings(Float64 const sample_rate, UInt32 const channel_count, UInt32 const bit_depth,
-                                    AVAudioQuality const encoder_quality, UInt32 const bit_rate,
-                                    UInt32 const bit_depth_hint, AVAudioQuality const converter_quality) {
+CFDictionaryRef audio::aac_settings(double const sample_rate, uint32_t const channel_count, uint32_t const bit_depth,
+                                    AVAudioQuality const encoder_quality, uint32_t const bit_rate,
+                                    uint32_t const bit_depth_hint, AVAudioQuality const converter_quality) {
     return (__bridge CFDictionaryRef) @{
         AVFormatIDKey: @(kAudioFormatMPEG4AAC),
         AVSampleRateKey: @(sample_rate),
