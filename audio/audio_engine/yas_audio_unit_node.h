@@ -33,14 +33,14 @@ namespace audio {
         uint32_t input_element_count() const;
         uint32_t output_element_count() const;
 
-        void set_global_parameter_value(AudioUnitParameterID const parameter_id, Float32 const value);
-        Float32 global_parameter_value(AudioUnitParameterID const parameter_id) const;
-        void set_input_parameter_value(AudioUnitParameterID const parameter_id, Float32 const value,
+        void set_global_parameter_value(AudioUnitParameterID const parameter_id, float const value);
+        float global_parameter_value(AudioUnitParameterID const parameter_id) const;
+        void set_input_parameter_value(AudioUnitParameterID const parameter_id, float const value,
                                        AudioUnitElement const element);
-        Float32 input_parameter_value(AudioUnitParameterID const parameter_id, AudioUnitElement const element) const;
-        void set_output_parameter_value(AudioUnitParameterID const parameter_id, Float32 const value,
+        float input_parameter_value(AudioUnitParameterID const parameter_id, AudioUnitElement const element) const;
+        void set_output_parameter_value(AudioUnitParameterID const parameter_id, float const value,
                                         AudioUnitElement const element);
-        Float32 output_parameter_value(AudioUnitParameterID const parameter_id, AudioUnitElement const element) const;
+        float output_parameter_value(AudioUnitParameterID const parameter_id, AudioUnitElement const element) const;
 
         manageable_unit_node manageable_unit_node();
 
