@@ -10,7 +10,7 @@
 using namespace yas;
 
 struct audio::offline_output_node::impl::core {
-    using completion_function_map_t = std::map<UInt8, offline_completion_f>;
+    using completion_function_map_t = std::map<uint8_t, offline_completion_f>;
 
     operation_queue queue;
 
@@ -19,7 +19,7 @@ struct audio::offline_output_node::impl::core {
 
     ~core() = default;
 
-    std::experimental::optional<UInt8> const push_completion_function(offline_completion_f &&function) {
+    std::experimental::optional<uint8_t> const push_completion_function(offline_completion_f &&function) {
         if (!function) {
             return nullopt;
         }
@@ -31,7 +31,7 @@ struct audio::offline_output_node::impl::core {
         return key;
     }
 
-    std::experimental::optional<offline_completion_f> const pull_completion_function(UInt8 key) {
+    std::experimental::optional<offline_completion_f> const pull_completion_function(uint8_t key) {
         if (_completion_functions.count(key) > 0) {
             auto func = _completion_functions.at(key);
             _completion_functions.erase(key);
@@ -62,7 +62,7 @@ audio::offline_start_result_t audio::offline_output_node::impl::start(offline_re
     if (_core->queue) {
         return offline_start_result_t(offline_start_error_t::already_running);
     } else if (auto connection = input_connection(0)) {
-        std::experimental::optional<UInt8> key;
+        std::experimental::optional<uint8_t> key;
         if (completion_func) {
             key = _core->push_completion_function(std::move(completion_func));
             if (!key) {
