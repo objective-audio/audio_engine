@@ -85,8 +85,8 @@ struct audio::pcm_buffer::impl {
         return pointer;
     }
 
-    static std::vector<UInt8> &dummy_data() {
-        static std::vector<UInt8> _dummy_data(4096 * 4);
+    static std::vector<uint8_t> &dummy_data() {
+        static std::vector<uint8_t> _dummy_data(4096 * 4);
         return _dummy_data;
     }
 
@@ -102,7 +102,7 @@ std::pair<audio::abl_uptr, audio::abl_data_uptr> audio::allocate_audio_buffer_li
                      [](AudioBufferList *abl) { free(abl); });
 
     abl_ptr->mNumberBuffers = buffer_count;
-    auto data_ptr = std::make_unique<std::vector<std::vector<UInt8>>>();
+    auto data_ptr = std::make_unique<std::vector<std::vector<uint8_t>>>();
     if (size > 0) {
         data_ptr->reserve(buffer_count);
     } else {
@@ -113,7 +113,7 @@ std::pair<audio::abl_uptr, audio::abl_data_uptr> audio::allocate_audio_buffer_li
         abl_ptr->mBuffers[i].mNumberChannels = channel_count;
         abl_ptr->mBuffers[i].mDataByteSize = size;
         if (size > 0) {
-            data_ptr->push_back(std::vector<UInt8>(size));
+            data_ptr->push_back(std::vector<uint8_t>(size));
             abl_ptr->mBuffers[i].mData = data_ptr->at(i).data();
         } else {
             abl_ptr->mBuffers[i].mData = nullptr;
@@ -157,7 +157,7 @@ namespace audio {
     struct abl_info {
         uint32_t channel_count;
         uint32_t frame_length;
-        std::vector<UInt8 *> datas;
+        std::vector<uint8_t *> datas;
         std::vector<uint32_t> strides;
 
         abl_info() : channel_count(0), frame_length(0), datas(0), strides(0) {
@@ -189,7 +189,7 @@ namespace audio {
         if (data_info.channel_count > 0) {
             for (uint32_t buf_idx = 0; buf_idx < buffer_count; buf_idx++) {
                 uint32_t const stride = abl->mBuffers[buf_idx].mNumberChannels;
-                UInt8 *data = static_cast<UInt8 *>(abl->mBuffers[buf_idx].mData);
+                uint8_t *data = static_cast<uint8_t *>(abl->mBuffers[buf_idx].mData);
                 for (uint32_t ch_idx = 0; ch_idx < stride; ++ch_idx) {
                     data_info.datas.push_back(&data[ch_idx * sample_byte_count]);
                     data_info.strides.push_back(stride);
@@ -435,7 +435,7 @@ void audio::pcm_buffer::clear(uint32_t const start_frame, uint32_t const length)
 
         uint32_t const bytes_per_frame = format().stream_description().mBytesPerFrame;
         for (uint32_t i = 0; i < format().buffer_count(); i++) {
-            UInt8 *byte_data = static_cast<UInt8 *>(audio_buffer_list()->mBuffers[i].mData);
+            uint8_t *byte_data = static_cast<uint8_t *>(audio_buffer_list()->mBuffers[i].mData);
             memset(&byte_data[start_frame * bytes_per_frame], 0, length * bytes_per_frame);
         }
     }
@@ -553,8 +553,8 @@ audio::pcm_buffer::copy_result audio::copy(const AudioBufferList *const from_abl
             } else {
                 for (uint32_t frame = 0; frame < copy_length; ++frame) {
                     uint32_t const sample_frame = frame * sample_byte_count;
-                    auto from_byte_data = static_cast<const UInt8 *>(from_data);
-                    auto to_byte_data = static_cast<UInt8 *>(to_data);
+                    auto from_byte_data = static_cast<const uint8_t *>(from_data);
+                    auto to_byte_data = static_cast<uint8_t *>(to_data);
                     memcpy(&to_byte_data[sample_frame * to_stride], &from_byte_data[sample_frame * from_stride],
                            sample_byte_count);
                 }
