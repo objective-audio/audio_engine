@@ -25,8 +25,8 @@ namespace audio {
         connection &operator=(connection const &) = default;
         connection &operator=(connection &&) = default;
 
-        UInt32 source_bus() const;
-        UInt32 destination_bus() const;
+        uint32_t source_bus() const;
+        uint32_t destination_bus() const;
         node source_node() const;
         node destination_node() const;
         audio::format const &format() const;
@@ -34,7 +34,7 @@ namespace audio {
         node_removable node_removable();
 
        protected:
-        connection(node &source_node, UInt32 const source_bus, node &destination_node, UInt32 const destination_bus,
+        connection(node &source_node, uint32_t const source_bus, node &destination_node, uint32_t const destination_bus,
                    audio::format const &format);
 #if YAS_TEST
        public:
