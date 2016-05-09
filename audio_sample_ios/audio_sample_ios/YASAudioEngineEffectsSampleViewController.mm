@@ -60,7 +60,7 @@ namespace sample {
 
 @implementation YASAudioEngineEffectsSampleViewController {
     std::vector<audio::unit> _audio_units;
-    std::experimental::optional<UInt32> _index;
+    std::experimental::optional<uint32_t> _index;
     sample::effects_vc_internal _internal;
 }
 
@@ -145,7 +145,7 @@ namespace sample {
 
     Float64 phase = 0;
 
-    auto tap_render_function = [phase](audio::pcm_buffer &buffer, const UInt32 bus_idx,
+    auto tap_render_function = [phase](audio::pcm_buffer &buffer, const uint32_t bus_idx,
                                        const audio::time &when) mutable {
         buffer.clear();
 
@@ -153,9 +153,9 @@ namespace sample {
         const Float64 phase_per_frame = 1000.0 / buffer.format().sample_rate() * audio::math::two_pi;
         audio::frame_enumerator enumerator(buffer);
         const auto *flex_ptr = enumerator.pointer();
-        const UInt32 length = enumerator.frame_length();
+        const uint32_t length = enumerator.frame_length();
 
-        UInt32 idx = 0;
+        uint32_t idx = 0;
         while (flex_ptr->v) {
             if (idx == 0) {
                 phase = audio::math::fill_sine(flex_ptr->f32, length, start_phase, phase_per_frame);
@@ -226,7 +226,7 @@ namespace sample {
             _internal.replace_effect_node(nullptr);
         } break;
         case YASAudioEngineEffectsSampleSectionEffects: {
-            _index = static_cast<UInt32>(indexPath.row);
+            _index = static_cast<uint32_t>(indexPath.row);
             AudioComponentDescription acd = baseAcd;
             const auto &audio_unit = _audio_units.at(indexPath.row);
             acd.componentSubType = audio_unit.sub_type();
