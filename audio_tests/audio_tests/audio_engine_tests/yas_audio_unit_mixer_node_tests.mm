@@ -69,11 +69,11 @@ using namespace yas;
     audio::unit_mixer_node mixer_node;
 
     const uint32_t bus_idx = 0;
-    const Float32 input_volume = 0.5f;
-    const Float32 input_pan = 0.75f;
+    const float input_volume = 0.5f;
+    const float input_pan = 0.75f;
     const bool enabled = false;
-    const Float32 output_volume = 0.25f;
-    const Float32 output_pan = 0.1f;
+    const float output_volume = 0.25f;
+    const float output_pan = 0.1f;
 
     mixer_node.set_input_volume(input_volume, bus_idx);
     mixer_node.set_input_pan(input_pan, bus_idx);

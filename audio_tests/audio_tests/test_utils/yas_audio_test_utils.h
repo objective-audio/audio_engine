@@ -19,7 +19,7 @@ namespace test {
     bool is_filled_buffer(const audio::pcm_buffer &data);
     bool is_equal_buffer_flexibly(const audio::pcm_buffer &data1, const audio::pcm_buffer &data2);
     flex_ptr data_ptr_from_buffer(const audio::pcm_buffer &data, const uint32_t ch_idx, const uint32_t frame);
-    bool is_equal(const Float64 val1, const Float64 val2, const Float64 accuracy = 0);
+    bool is_equal(const double val1, const double val2, const double accuracy = 0);
     bool is_equal_data(const void *const inData1, const void *const inData2, const size_t inSize);
     bool is_equal(const AudioTimeStamp *const ts1, const AudioTimeStamp *const ts2);
 

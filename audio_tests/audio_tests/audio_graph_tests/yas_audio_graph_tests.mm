@@ -33,8 +33,8 @@ using namespace yas;
 }
 
 - (void)testIORendering {
-    const Float64 output_sample_rate = 48000;
-    const Float64 mixer_sample_rate = 44100;
+    const double output_sample_rate = 48000;
+    const double mixer_sample_rate = 44100;
     const uint32_t channels = 2;
     const uint32_t frame_length = 1024;
     const uint32_t maximum_frame_length = 4096;

@@ -21,8 +21,8 @@ using namespace yas;
 }
 
 - (void)testConverterUnit {
-    const Float64 output_sample_rate = 44100;
-    const Float64 input_sample_rate = 48000;
+    const double output_sample_rate = 44100;
+    const double input_sample_rate = 48000;
     const uint32_t channels = 2;
     const uint32_t frame_length = 1024;
     const uint32_t maximum_frame_length = 4096;
@@ -91,7 +91,7 @@ using namespace yas;
 }
 
 - (void)testRenderCallback {
-    const Float64 sampleRate = 44100;
+    const double sampleRate = 44100;
     const uint32_t channels = 2;
     const uint32_t frame_length = 1024;
     const uint32_t maximum_frame_length = 4096;
@@ -217,7 +217,7 @@ using namespace yas;
 }
 
 - (void)testPropertyData {
-    const Float64 sampleRate = 48000;
+    const double sampleRate = 48000;
     const uint32_t channels = 4;
     const AudioUnitPropertyID property_id = kAudioUnitProperty_StreamFormat;
     const AudioUnitScope scope = kAudioUnitScope_Input;

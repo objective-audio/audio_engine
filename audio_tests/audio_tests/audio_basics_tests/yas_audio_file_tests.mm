@@ -9,8 +9,8 @@ using namespace yas;
 namespace yas {
 namespace test {
     struct audio_file_test_data {
-        Float64 file_sample_rate;
-        Float64 processing_sample_rate;
+        double file_sample_rate;
+        double processing_sample_rate;
         uint32_t channels;
         uint32_t file_bit_depth;
         uint32_t frame_length;
@@ -80,13 +80,13 @@ namespace test {
 
 - (void)testWAVEFile {
 #if WAVEFILE_LIGHT_TEST
-    Float64 sample_rates[] = {44100.0, 382000.0};
+    double sample_rates[] = {44100.0, 382000.0};
     uint32_t channels[] = {1, 2};
     uint32_t file_bit_depths[] = {16, 24};
     audio::pcm_format pcm_formats[] = {audio::pcm_format::float32, audio::pcm_format::float64};
     bool interleaveds[] = {YES, NO};
 #else
-    Float64 sample_rates[] = {8000.0, 44100.0, 48000.0, 382000.0};
+    double sample_rates[] = {8000.0, 44100.0, 48000.0, 382000.0};
     uint32_t channels[] = {1, 2, 3, 6};
     uint32_t file_bit_depths[] = {16, 24, 32};
     audio::pcm_format pcm_formats[] = {audio::pcm_format::float32, audio::pcm_format::float64, audio::pcm_format::int16,
@@ -102,8 +102,8 @@ namespace test {
     test_data.standard = NO;
     test_data.async = NO;
 
-    for (Float64 file_sample_rate : sample_rates) {
-        for (Float64 processing_sample_rate : sample_rates) {
+    for (double file_sample_rate : sample_rates) {
+        for (double processing_sample_rate : sample_rates) {
             for (uint32_t channel : channels) {
                 for (uint32_t file_bit_depth : file_bit_depths) {
                     for (audio::pcm_format pcm_format : pcm_formats) {
@@ -179,8 +179,8 @@ namespace test {
     CFURLRef fileURL = (__bridge CFURLRef)[NSURL fileURLWithPath:filePath];
     const uint32_t frame_length = test_data.frame_length;
     const uint32_t loopCount = test_data.loop_count;
-    const Float64 file_sample_rate = test_data.file_sample_rate;
-    const Float64 processing_sample_rate = test_data.processing_sample_rate;
+    const double file_sample_rate = test_data.file_sample_rate;
+    const double processing_sample_rate = test_data.processing_sample_rate;
     const audio::pcm_format pcm_format = test_data.pcm_format;
     const bool interleaved = test_data.interleaved;
     const bool async = test_data.async;
@@ -283,12 +283,12 @@ namespace test {
                         pointer.i32[frameIndex * stride + ch_idx] = value << 16;
                     } break;
                     case audio::pcm_format::float32: {
-                        Float32 float32Value = (Float32)value / INT16_MAX;
+                        float float32Value = (float)value / INT16_MAX;
                         pointer.f32[frameIndex * stride + ch_idx] = float32Value;
                     } break;
                     case audio::pcm_format::float64: {
-                        Float64 float64Value = (Float64)value / INT16_MAX;
-                        pointer.f64[frameIndex * stride + ch_idx] = (Float64)float64Value;
+                        double float64Value = (double)value / INT16_MAX;
+                        pointer.f64[frameIndex * stride + ch_idx] = (double)float64Value;
                     } break;
                     default:
                         break;

@@ -108,7 +108,7 @@ bool test::is_equal_buffer_flexibly(const audio::pcm_buffer &buffer1, const audi
     return YES;
 }
 
-bool test::is_equal(const Float64 val1, const Float64 val2, const Float64 accuracy) {
+bool test::is_equal(const double val1, const double val2, const double accuracy) {
     return ((val1 - accuracy) <= val2 && val2 <= (val1 + accuracy));
 }
 

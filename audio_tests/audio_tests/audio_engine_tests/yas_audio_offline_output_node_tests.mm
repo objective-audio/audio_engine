@@ -22,7 +22,7 @@ using namespace yas;
 }
 
 - (void)test_offline_render_with_audio_engine {
-    const Float64 sample_rate = 44100.0;
+    const double sample_rate = 44100.0;
 
     auto format = audio::format(sample_rate, 2);
     audio::engine engine;
@@ -46,7 +46,7 @@ using namespace yas;
         XCTAssertTrue(buffer.format() == format);
 
         for (uint32_t buf_idx = 0; buf_idx < buffer.format().buffer_count(); ++buf_idx) {
-            Float32 *ptr = buffer.data_ptr_at_index<Float32>(buf_idx);
+            float *ptr = buffer.data_ptr_at_index<float>(buf_idx);
             for (uint32_t frm_idx = 0; frm_idx < buffer.frame_length(); ++frm_idx) {
                 ptr[frm_idx] = test::test_value(frm_idx + tap_render_frame, 0, buf_idx);
             }
@@ -73,7 +73,7 @@ using namespace yas;
         XCTAssertTrue(buffer.format() == format);
 
         for (uint32_t buf_idx = 0; buf_idx < buffer.format().buffer_count(); ++buf_idx) {
-            Float32 *ptr = buffer.data_ptr_at_index<Float32>(buf_idx);
+            float *ptr = buffer.data_ptr_at_index<float>(buf_idx);
             for (uint32_t frm_idx = 0; frm_idx < buffer.frame_length(); ++frm_idx) {
                 bool is_equal_value = ptr[frm_idx] == test::test_value(frm_idx + output_render_frame, 0, buf_idx);
                 XCTAssertTrue(is_equal_value);
@@ -110,7 +110,7 @@ using namespace yas;
 }
 
 - (void)test_offline_render_without_audio_engine {
-    const Float64 sample_rate = 48000.0;
+    const double sample_rate = 48000.0;
     auto format = audio::format(sample_rate, 2);
     audio::offline_output_node output_node;
     audio::tap_node tap_node;

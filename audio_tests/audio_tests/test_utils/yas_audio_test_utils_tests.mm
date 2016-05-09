@@ -21,10 +21,10 @@ using namespace yas;
 }
 
 - (void)testIsEqualFloat64WithAccuracy {
-    const Float64 val1 = 1.0;
-    const Float64 accuracy = 0.1;
+    const double val1 = 1.0;
+    const double accuracy = 0.1;
 
-    Float64 val2 = 1.0;
+    double val2 = 1.0;
     XCTAssertTrue(test::is_equal(val1, val2, accuracy));
 
     val2 = 1.05;

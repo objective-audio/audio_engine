@@ -36,7 +36,7 @@ static NSInteger testCount = 8;
 - (void)testCreateAudioTimeSampleTime {
     for (NSInteger i = 0; i < testCount; i++) {
         SInt64 sampleTime = arc4random();
-        Float64 rate = arc4random_uniform(378000 - 4000) + 4000;
+        double rate = arc4random_uniform(378000 - 4000) + 4000;
 
         AVAudioTime *avTime = [AVAudioTime timeWithSampleTime:sampleTime atRate:rate];
         auto yas_time = audio::time(sampleTime, rate);
@@ -49,7 +49,7 @@ static NSInteger testCount = 8;
     for (NSInteger i = 0; i < testCount; i++) {
         UInt64 hostTime = arc4random();
         SInt64 sampleTime = arc4random();
-        Float64 rate = arc4random_uniform(378000 - 4000) + 4000;
+        double rate = arc4random_uniform(378000 - 4000) + 4000;
 
         AVAudioTime *avTime = [AVAudioTime timeWithHostTime:hostTime sampleTime:sampleTime atRate:rate];
         auto yas_time = audio::time(hostTime, sampleTime, rate);
@@ -75,7 +75,7 @@ static NSInteger testCount = 8;
     for (NSInteger i = 0; i < testCount; i++) {
         UInt64 hostTime = arc4random();
         SInt64 sampleTime = arc4random();
-        Float64 rate = arc4random_uniform(378000 - 4000) + 4000;
+        double rate = arc4random_uniform(378000 - 4000) + 4000;
 
         AVAudioTime *avTime = [AVAudioTime timeWithHostTime:hostTime sampleTime:sampleTime atRate:rate];
         auto yas_time = audio::time(hostTime, sampleTime, rate);
@@ -93,7 +93,7 @@ static NSInteger testCount = 8;
 - (void)test_compare_objc_to_cpp {
     for (NSInteger i = 0; i < testCount; i++) {
         SInt64 sampleTime = arc4random();
-        Float64 rate = arc4random_uniform(378000 - 4000) + 4000;
+        double rate = arc4random_uniform(378000 - 4000) + 4000;
 
         AVAudioTime *avTime = [AVAudioTime timeWithSampleTime:sampleTime atRate:rate];
         auto yas_time = to_time(avTime);
@@ -105,7 +105,7 @@ static NSInteger testCount = 8;
 - (void)test_compare_cpp_to_objc {
     for (NSInteger i = 0; i < testCount; i++) {
         SInt64 sampleTime = arc4random();
-        Float64 rate = arc4random_uniform(378000 - 4000) + 4000;
+        double rate = arc4random_uniform(378000 - 4000) + 4000;
 
         auto yas_time = audio::time(sampleTime, rate);
         AVAudioTime *avTime = to_objc_object(yas_time);
@@ -134,7 +134,7 @@ static NSInteger testCount = 8;
 
 - (void)test_sample_time {
     const SInt64 sample_time = 2000;
-    const Float64 sample_rate = 48000.0;
+    const double sample_rate = 48000.0;
     audio::time time{sample_time, sample_rate};
 
     XCTAssertTrue(time.is_sample_time_valid());

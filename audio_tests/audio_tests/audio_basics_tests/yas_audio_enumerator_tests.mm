@@ -40,7 +40,7 @@ using namespace yas;
             uint32_t frame = 0;
             while (pointer->v) {
                 XCTAssertEqual(*index, frame);
-                XCTAssertEqual(*pointer->f32, (Float32)test::test_value(frame, 0, buf_idx));
+                XCTAssertEqual(*pointer->f32, (float)test::test_value(frame, 0, buf_idx));
                 yas_audio_enumerator_move(enumerator);
                 ++frame;
             }
@@ -72,7 +72,7 @@ using namespace yas;
             uint32_t frame = 0;
             while (pointer->v) {
                 XCTAssertEqual(*index, frame);
-                XCTAssertEqual(*pointer->f32, (Float32)test::test_value(frame, 0, buf_idx));
+                XCTAssertEqual(*pointer->f32, (float)test::test_value(frame, 0, buf_idx));
                 ++enumerator;  // enumerator.move()
                 ++frame;
             }
@@ -101,7 +101,7 @@ using namespace yas;
         uint32_t frame = 0;
         while (pointer->v) {
             XCTAssertEqual(frame, *index);
-            XCTAssertEqual(*pointer->f32, (Float32)test::test_value(frame, ch_idx, 0));
+            XCTAssertEqual(*pointer->f32, (float)test::test_value(frame, ch_idx, 0));
             yas_audio_enumerator_move(enumerator);
             ++frame;
         }
@@ -125,7 +125,7 @@ using namespace yas;
         uint32_t frame = 0;
         while (pointer->v) {
             XCTAssertEqual(*index, frame);
-            *pointer->f32 = (Float32)test::test_value(frame, 0, buf_idx);
+            *pointer->f32 = (float)test::test_value(frame, 0, buf_idx);
             yas_audio_enumerator_move(enumerator);
             ++frame;
         }
@@ -141,7 +141,7 @@ using namespace yas;
         uint32_t frame = 0;
         while (pointer->v) {
             XCTAssertEqual(*index, frame);
-            XCTAssertEqual(*pointer->f32, (Float32)test::test_value(frame, 0, buf_idx));
+            XCTAssertEqual(*pointer->f32, (float)test::test_value(frame, 0, buf_idx));
             yas_audio_enumerator_move(enumerator);
             ++frame;
         }
@@ -163,17 +163,17 @@ using namespace yas;
     XCTAssertEqual(*index, 0);
 
     while (pointer->v) {
-        *pointer->f32 = (Float32)test::test_value((uint32_t)*index, 0, 0);
+        *pointer->f32 = (float)test::test_value((uint32_t)*index, 0, 0);
         yas_audio_enumerator_move(enumerator);
     }
 
     enumerator.set_position(3);
     XCTAssertEqual(*index, 3);
-    XCTAssertEqual(*pointer->f32, (Float32)test::test_value(3, 0, 0));
+    XCTAssertEqual(*pointer->f32, (float)test::test_value(3, 0, 0));
 
     enumerator.set_position(0);
     XCTAssertEqual(*index, 0);
-    XCTAssertEqual(*pointer->f32, (Float32)test::test_value(0, 0, 0));
+    XCTAssertEqual(*pointer->f32, (float)test::test_value(0, 0, 0));
 
     XCTAssertThrows(enumerator.set_position(16));
     XCTAssertThrows(enumerator.set_position(100));

@@ -60,7 +60,7 @@ using namespace yas;
 }
 
 - (void)test_create_standard_format {
-    const Float64 sampleRate = 44100.0;
+    const double sampleRate = 44100.0;
     const uint32_t channelCount = 2;
     const uint32_t bufferCount = channelCount;
     const uint32_t stride = 1;
@@ -93,7 +93,7 @@ using namespace yas;
 }
 
 - (void)test_create_format_48000kHz_1ch_64bits_interleaved {
-    const Float64 sampleRate = 48000.0;
+    const double sampleRate = 48000.0;
     const uint32_t channelCount = 1;
     const uint32_t bufferCount = 1;
     const uint32_t stride = channelCount;
@@ -126,7 +126,7 @@ using namespace yas;
 }
 
 - (void)test_create_format_32000kHz_4ch_16bits_interleaved {
-    const Float64 sampleRate = 32000.0;
+    const double sampleRate = 32000.0;
     const uint32_t channelCount = 4;
     const uint32_t bufferCount = 1;
     const uint32_t stride = channelCount;
@@ -159,7 +159,7 @@ using namespace yas;
 }
 
 - (void)test_create_format_with_streadm_description {
-    const Float64 sampleRate = 2348739.1;
+    const double sampleRate = 2348739.1;
     const uint32_t channelCount = 6;
     const uint32_t bufferCount = 1;
     const uint32_t stride = channelCount;
@@ -190,7 +190,7 @@ using namespace yas;
 }
 
 - (void)test_equal_formats {
-    const Float64 sampleRate = 44100;
+    const double sampleRate = 44100;
     const uint32_t channelCount = 2;
 
     auto audio_format1 = audio::format(sampleRate, channelCount);
@@ -202,7 +202,7 @@ using namespace yas;
 }
 
 - (void)test_create_format_with_settings {
-    const Float64 sampleRate = 44100.0;
+    const double sampleRate = 44100.0;
 
     CFDictionaryRef settings = audio::linear_pcm_file_settings(sampleRate, 2, 32, false, true, true);
 

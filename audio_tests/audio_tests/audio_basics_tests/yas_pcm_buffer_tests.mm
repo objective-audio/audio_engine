@@ -105,7 +105,7 @@ using namespace yas;
         const uint32_t stride = buffer.format().stride();
 
         for (uint32_t buffer_index = 0; buffer_index < buffer_count; buffer_index++) {
-            Float32 *ptr = buffer.data_ptr_at_index<Float32>(buffer_index);
+            float *ptr = buffer.data_ptr_at_index<float>(buffer_index);
             for (uint32_t frame = 0; frame < buffer.frame_length(); frame++) {
                 for (uint32_t ch_idx = 0; ch_idx < stride; ch_idx++) {
                     if (frame == 1 || frame == 2) {
@@ -146,7 +146,7 @@ using namespace yas;
 }
 
 - (void)test_copy_data_defferent_interleaved_format_success {
-    const Float64 sample_rate = 48000;
+    const double sample_rate = 48000;
     const uint32_t frame_length = 4;
     const uint32_t channels = 3;
 
@@ -166,7 +166,7 @@ using namespace yas;
 }
 
 - (void)test_copy_data_different_frame_length {
-    const Float64 sample_rate = 48000;
+    const double sample_rate = 48000;
     const uint32_t channels = 1;
     const uint32_t from_frame_length = 4;
     const uint32_t to_frame_length = 2;
@@ -188,7 +188,7 @@ using namespace yas;
 
 - (void)test_copy_data_start_frame {
     auto test = [self](bool interleaved) {
-        const Float64 sample_rate = 48000;
+        const double sample_rate = 48000;
         const uint32_t from_frame_length = 4;
         const uint32_t to_frame_length = 8;
         const uint32_t from_start_frame = 2;
@@ -236,7 +236,7 @@ using namespace yas;
 
 - (void)test_copy_data_flexibly_same_format {
     auto test = [self](bool interleaved) {
-        const Float64 sample_rate = 48000.0;
+        const double sample_rate = 48000.0;
         const uint32_t frame_length = 4;
         const uint32_t channels = 2;
 
@@ -261,7 +261,7 @@ using namespace yas;
 
 - (void)test_copy_data_flexibly_different_format_success {
     auto test = [self](bool interleaved) {
-        const Float64 sample_rate = 48000.0;
+        const double sample_rate = 48000.0;
         const uint32_t frame_length = 4;
         const uint32_t channels = 2;
 
@@ -287,7 +287,7 @@ using namespace yas;
 }
 
 - (void)test_copy_data_flexibly_different_pcm_format_failed {
-    const Float64 sample_rate = 48000.0;
+    const double sample_rate = 48000.0;
     const uint32_t frame_length = 4;
     const uint32_t channels = 2;
     const auto from_pcm_format = audio::pcm_format::float32;
@@ -303,7 +303,7 @@ using namespace yas;
 }
 
 - (void)test_copy_data_flexibly_from_abl_same_format {
-    const Float64 sample_rate = 48000.0;
+    const double sample_rate = 48000.0;
     const uint32_t frame_length = 4;
     const uint32_t channels = 2;
 
@@ -333,7 +333,7 @@ using namespace yas;
 }
 
 - (void)test_copy_data_flexibly_to_abl {
-    const Float64 sample_rate = 48000.0;
+    const double sample_rate = 48000.0;
     const uint32_t frame_length = 4;
     const uint32_t channels = 2;
 
@@ -515,15 +515,15 @@ using namespace yas;
     audio::pcm_buffer buffer(audio::format(44100.0, 2), 1);
     auto abl = buffer.audio_buffer_list();
 
-    XCTAssertEqual(buffer.data_ptr_at_index<Float32>(0), abl->mBuffers[0].mData);
-    XCTAssertEqual(buffer.data_ptr_at_index<Float32>(1), abl->mBuffers[1].mData);
+    XCTAssertEqual(buffer.data_ptr_at_index<float>(0), abl->mBuffers[0].mData);
+    XCTAssertEqual(buffer.data_ptr_at_index<float>(1), abl->mBuffers[1].mData);
 }
 
 - (void)test_data_ptr_at_index_f64 {
     audio::pcm_buffer buffer(audio::format(44100.0, 1, audio::pcm_format::float64), 1);
     auto abl = buffer.audio_buffer_list();
 
-    XCTAssertEqual(buffer.data_ptr_at_index<Float64>(0), abl->mBuffers[0].mData);
+    XCTAssertEqual(buffer.data_ptr_at_index<double>(0), abl->mBuffers[0].mData);
 }
 
 - (void)test_data_ptr_at_index_i16 {
@@ -544,42 +544,42 @@ using namespace yas;
     const audio::pcm_buffer buffer(audio::format(44100.0, 2), 1);
     auto abl = buffer.audio_buffer_list();
 
-    XCTAssertEqual(buffer.data_ptr_at_index<Float32>(0), abl->mBuffers[0].mData);
-    XCTAssertEqual(buffer.data_ptr_at_index<Float32>(1), abl->mBuffers[1].mData);
+    XCTAssertEqual(buffer.data_ptr_at_index<float>(0), abl->mBuffers[0].mData);
+    XCTAssertEqual(buffer.data_ptr_at_index<float>(1), abl->mBuffers[1].mData);
 }
 
 - (void)test_data_ptr_at_channel_deinterleaved {
     audio::pcm_buffer buffer(audio::format(44100.0, 2, audio::pcm_format::float32, false), 1);
     auto abl = buffer.audio_buffer_list();
 
-    XCTAssertEqual(buffer.data_ptr_at_channel<Float32>(0), abl->mBuffers[0].mData);
-    XCTAssertEqual(buffer.data_ptr_at_channel<Float32>(1), abl->mBuffers[1].mData);
+    XCTAssertEqual(buffer.data_ptr_at_channel<float>(0), abl->mBuffers[0].mData);
+    XCTAssertEqual(buffer.data_ptr_at_channel<float>(1), abl->mBuffers[1].mData);
 }
 
 - (void)test_const_data_ptr_at_channel_deinterleaved {
     const audio::pcm_buffer buffer(audio::format(44100.0, 2, audio::pcm_format::float32, false), 1);
     auto abl = buffer.audio_buffer_list();
 
-    XCTAssertEqual(buffer.data_ptr_at_channel<Float32>(0), abl->mBuffers[0].mData);
-    XCTAssertEqual(buffer.data_ptr_at_channel<Float32>(1), abl->mBuffers[1].mData);
+    XCTAssertEqual(buffer.data_ptr_at_channel<float>(0), abl->mBuffers[0].mData);
+    XCTAssertEqual(buffer.data_ptr_at_channel<float>(1), abl->mBuffers[1].mData);
 }
 
 - (void)test_data_ptr_at_channel_interleaved {
     audio::pcm_buffer buffer(audio::format(44100.0, 2, audio::pcm_format::float32, true), 1);
     auto abl = buffer.audio_buffer_list();
 
-    Float32 *data = static_cast<Float32 *>(abl->mBuffers[0].mData);
-    XCTAssertEqual(buffer.data_ptr_at_channel<Float32>(0), data);
-    XCTAssertEqual(buffer.data_ptr_at_channel<Float32>(1), &data[1]);
+    float *data = static_cast<float *>(abl->mBuffers[0].mData);
+    XCTAssertEqual(buffer.data_ptr_at_channel<float>(0), data);
+    XCTAssertEqual(buffer.data_ptr_at_channel<float>(1), &data[1]);
 }
 
 - (void)test_const_data_ptr_at_channel_interleaved {
     const audio::pcm_buffer buffer(audio::format(44100.0, 2, audio::pcm_format::float32, true), 1);
     auto abl = buffer.audio_buffer_list();
 
-    Float32 *data = static_cast<Float32 *>(abl->mBuffers[0].mData);
-    XCTAssertEqual(buffer.data_ptr_at_channel<Float32>(0), data);
-    XCTAssertEqual(buffer.data_ptr_at_channel<Float32>(1), &data[1]);
+    float *data = static_cast<float *>(abl->mBuffers[0].mData);
+    XCTAssertEqual(buffer.data_ptr_at_channel<float>(0), data);
+    XCTAssertEqual(buffer.data_ptr_at_channel<float>(1), &data[1]);
 }
 
 - (void)test_copy_error_to_string {
@@ -592,7 +592,7 @@ using namespace yas;
 
 - (void)test_clear {
     audio::pcm_buffer buffer(audio::format(44100.0, 1), 1);
-    auto *data = buffer.data_ptr_at_channel<Float32>(0);
+    auto *data = buffer.data_ptr_at_channel<float>(0);
     *data = 1.0f;
 
     XCTAssertFalse(*data == 0.0f);
@@ -627,7 +627,7 @@ using namespace yas;
             auto src_ptr = src_buffer.flex_ptr_at_index(src_ch_idx);
             XCTAssertEqual(dst_ptr.v, src_ptr.v);
             for (uint32_t frame = 0; frame < frame_length; frame++) {
-                Float32 test_value = test::test_value(frame, 0, dst_ch_idx);
+                float test_value = test::test_value(frame, 0, dst_ch_idx);
                 XCTAssertEqual(test_value, src_ptr.f32[frame]);
             }
         } else {
