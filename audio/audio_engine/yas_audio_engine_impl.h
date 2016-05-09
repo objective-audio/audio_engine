@@ -31,8 +31,8 @@ namespace audio {
 
         bool prepare();
 
-        audio::connection connect(node &source_node, node &destination_node, UInt32 const source_bus_idx,
-                                  UInt32 const destination_bus_idx, audio::format const &format);
+        audio::connection connect(node &source_node, node &destination_node, uint32_t const source_bus_idx,
+                                  uint32_t const destination_bus_idx, audio::format const &format);
         void disconnect(audio::connection &connection);
         void disconnect(node &node);
         void disconnect_node_with_predicate(std::function<bool(audio::connection const &)> predicate);
