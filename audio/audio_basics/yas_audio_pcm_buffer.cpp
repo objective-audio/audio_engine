@@ -144,9 +144,9 @@ static bool validate_pcm_format(audio::pcm_format const &pcm_format) {
         case audio::pcm_format::float64:
             return typeid(T) == typeid(double);
         case audio::pcm_format::fixed824:
-            return typeid(T) == typeid(SInt32);
+            return typeid(T) == typeid(int32_t);
         case audio::pcm_format::int16:
-            return typeid(T) == typeid(SInt16);
+            return typeid(T) == typeid(int16_t);
         default:
             return false;
     }
@@ -327,8 +327,8 @@ T *audio::pcm_buffer::data_ptr_at_index(uint32_t const buf_idx) {
 
 template float *audio::pcm_buffer::data_ptr_at_index(uint32_t const buf_idx);
 template double *audio::pcm_buffer::data_ptr_at_index(uint32_t const buf_idx);
-template SInt32 *audio::pcm_buffer::data_ptr_at_index(uint32_t const buf_idx);
-template SInt16 *audio::pcm_buffer::data_ptr_at_index(uint32_t const buf_idx);
+template int32_t *audio::pcm_buffer::data_ptr_at_index(uint32_t const buf_idx);
+template int16_t *audio::pcm_buffer::data_ptr_at_index(uint32_t const buf_idx);
 
 template <typename T>
 T *audio::pcm_buffer::data_ptr_at_channel(uint32_t const ch_idx) {
@@ -345,8 +345,8 @@ T *audio::pcm_buffer::data_ptr_at_channel(uint32_t const ch_idx) {
 
 template float *audio::pcm_buffer::data_ptr_at_channel(uint32_t const ch_idx);
 template double *audio::pcm_buffer::data_ptr_at_channel(uint32_t const ch_idx);
-template SInt32 *audio::pcm_buffer::data_ptr_at_channel(uint32_t const ch_idx);
-template SInt16 *audio::pcm_buffer::data_ptr_at_channel(uint32_t const ch_idx);
+template int32_t *audio::pcm_buffer::data_ptr_at_channel(uint32_t const ch_idx);
+template int16_t *audio::pcm_buffer::data_ptr_at_channel(uint32_t const ch_idx);
 
 template <typename T>
 const T *audio::pcm_buffer::data_ptr_at_index(uint32_t const buf_idx) const {
@@ -363,8 +363,8 @@ const T *audio::pcm_buffer::data_ptr_at_index(uint32_t const buf_idx) const {
 
 template const float *audio::pcm_buffer::data_ptr_at_index(uint32_t const buf_idx) const;
 template const double *audio::pcm_buffer::data_ptr_at_index(uint32_t const buf_idx) const;
-template const SInt32 *audio::pcm_buffer::data_ptr_at_index(uint32_t const buf_idx) const;
-template const SInt16 *audio::pcm_buffer::data_ptr_at_index(uint32_t const buf_idx) const;
+template const int32_t *audio::pcm_buffer::data_ptr_at_index(uint32_t const buf_idx) const;
+template const int16_t *audio::pcm_buffer::data_ptr_at_index(uint32_t const buf_idx) const;
 
 template <typename T>
 const T *audio::pcm_buffer::data_ptr_at_channel(uint32_t const ch_idx) const {
@@ -381,8 +381,8 @@ const T *audio::pcm_buffer::data_ptr_at_channel(uint32_t const ch_idx) const {
 
 template const float *audio::pcm_buffer::data_ptr_at_channel(uint32_t const ch_idx) const;
 template const double *audio::pcm_buffer::data_ptr_at_channel(uint32_t const ch_idx) const;
-template const SInt32 *audio::pcm_buffer::data_ptr_at_channel(uint32_t const ch_idx) const;
-template const SInt16 *audio::pcm_buffer::data_ptr_at_channel(uint32_t const ch_idx) const;
+template const int32_t *audio::pcm_buffer::data_ptr_at_channel(uint32_t const ch_idx) const;
+template const int16_t *audio::pcm_buffer::data_ptr_at_channel(uint32_t const ch_idx) const;
 
 uint32_t audio::pcm_buffer::frame_capacity() const {
     if (_impl) {
