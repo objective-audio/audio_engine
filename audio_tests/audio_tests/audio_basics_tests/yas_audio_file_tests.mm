@@ -233,9 +233,9 @@ namespace test {
             XCTAssertTrue(audio_file.open({.file_url = fileURL, .pcm_format = pcm_format, .interleaved = interleaved}));
         }
 
-        SInt64 looped_frame_length = frame_length * loopCount;
+        int64_t looped_frame_length = frame_length * loopCount;
         XCTAssertEqualWithAccuracy(audio_file.file_length(),
-                                   (SInt64)(looped_frame_length * (file_sample_rate / processing_sample_rate)), 1);
+                                   (int64_t)(looped_frame_length * (file_sample_rate / processing_sample_rate)), 1);
 
         audio_file.set_processing_format(processing_format);
 
