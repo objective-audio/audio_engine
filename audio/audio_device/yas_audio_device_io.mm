@@ -21,7 +21,7 @@ struct audio::device_io::kernel {
     pcm_buffer input_buffer;
     pcm_buffer output_buffer;
 
-    kernel(audio::format const &input_format, audio::format const &output_format, UInt32 const frame_capacity)
+    kernel(audio::format const &input_format, audio::format const &output_format, uint32_t const frame_capacity)
         : input_buffer(input_format ? pcm_buffer(input_format, frame_capacity) : nullptr),
           output_buffer(output_format ? pcm_buffer(output_format, frame_capacity) : nullptr) {
     }
@@ -130,7 +130,7 @@ struct audio::device_io::impl : base::impl {
                         if (auto &input_buffer = kernel->input_buffer) {
                             input_buffer.copy_from(inInputData);
 
-                            UInt32 const input_frame_length = input_buffer.frame_length();
+                            uint32_t const input_frame_length = input_buffer.frame_length();
                             if (input_frame_length > 0) {
                                 imp->input_buffer_on_render = input_buffer;
                                 imp->input_time_on_render =
@@ -142,7 +142,7 @@ struct audio::device_io::impl : base::impl {
                     if (auto render_callback = imp->render_callback()) {
                         if (auto &output_buffer = kernel->output_buffer) {
                             if (outOutputData) {
-                                UInt32 const frame_length =
+                                uint32_t const frame_length =
                                     audio::frame_length(outOutputData, output_buffer.format().sample_byte_count());
                                 if (frame_length > 0) {
                                     output_buffer.set_frame_length(frame_length);
@@ -219,13 +219,13 @@ struct audio::device_io::impl : base::impl {
         return _render_callback;
     }
 
-    void set_maximum_frames(UInt32 const frames) {
+    void set_maximum_frames(uint32_t const frames) {
         std::lock_guard<std::recursive_mutex> lock(_mutex);
         _maximum_frames = frames;
         update_kernel();
     }
 
-    UInt32 maximum_frames() const {
+    uint32_t maximum_frames() const {
         std::lock_guard<std::recursive_mutex> lock(_mutex);
         return _maximum_frames;
     }
@@ -257,7 +257,7 @@ struct audio::device_io::impl : base::impl {
 
    private:
     render_f _render_callback;
-    UInt32 _maximum_frames;
+    uint32_t _maximum_frames;
     std::shared_ptr<device_io::kernel> _kernel;
     mutable std::recursive_mutex _mutex;
 };
@@ -297,11 +297,11 @@ void audio::device_io::set_render_callback(render_f callback) {
     impl_ptr<impl>()->set_render_callback(std::move(callback));
 }
 
-void audio::device_io::set_maximum_frames_per_slice(UInt32 const frames) {
+void audio::device_io::set_maximum_frames_per_slice(uint32_t const frames) {
     impl_ptr<impl>()->set_maximum_frames(frames);
 }
 
-UInt32 audio::device_io::maximum_frames_per_slice() const {
+uint32_t audio::device_io::maximum_frames_per_slice() const {
     return impl_ptr<impl>()->maximum_frames();
 }
 
