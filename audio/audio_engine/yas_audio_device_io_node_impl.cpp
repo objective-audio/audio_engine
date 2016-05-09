@@ -46,11 +46,11 @@ void audio::device_io_node::impl::prepare(device_io_node const &node, audio::dev
     set_device(device ?: device::default_output_device());
 }
 
-UInt32 audio::device_io_node::impl::input_bus_count() const {
+uint32_t audio::device_io_node::impl::input_bus_count() const {
     return 1;
 }
 
-UInt32 audio::device_io_node::impl::output_bus_count() const {
+uint32_t audio::device_io_node::impl::output_bus_count() const {
     return 1;
 }
 
@@ -160,7 +160,7 @@ audio::device audio::device_io_node::impl::device() const {
     return _core->device();
 }
 
-void audio::device_io_node::impl::render(pcm_buffer &buffer, const UInt32 bus_idx, time const &when) {
+void audio::device_io_node::impl::render(pcm_buffer &buffer, const uint32_t bus_idx, time const &when) {
     node::impl::render(buffer, bus_idx, when);
 
     if (auto const &device_io = _core->device_io) {
