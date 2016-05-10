@@ -141,6 +141,14 @@ static NSInteger testCount = 8;
     XCTAssertTrue(time.sample_time() == 2000);
 }
 
+- (void)test_equal {
+    audio::time const time1{4000, 48000.0};
+    audio::time const time3{8000, 48000.0};
+
+    XCTAssertTrue(time1 == time1);
+    XCTAssertFalse(time1 == time3);
+}
+
 - (void)test_equal_null_false {
     const audio::time time1{4000, 48000.0};
     const audio::time time2{nullptr};
