@@ -21,40 +21,19 @@ using namespace yas;
 }
 
 - (void)test_create_empty {
-    audio::format format;
+    audio::format format{AudioStreamBasicDescription{0}};
 
     XCTAssertEqual(format.is_empty(), true);
-    XCTAssertEqual(format.is_standard(), false);
-    XCTAssertEqual(format.pcm_format(), audio::pcm_format::other);
-    XCTAssertEqual(format.channel_count(), 0);
-    XCTAssertEqual(format.buffer_count(), 0);
-    XCTAssertEqual(format.stride(), 0);
-    XCTAssertEqual(format.sample_rate(), 0.0);
-    XCTAssertEqual(format.is_interleaved(), false);
-    XCTAssertEqual(format.sample_byte_count(), 0);
-    XCTAssertEqual(format.buffer_frame_byte_count(), 0);
 }
 
 - (void)test_create_with_nullptr {
     audio::format format(nullptr);
 
-    XCTAssertEqual(format.is_empty(), true);
-    XCTAssertEqual(format.is_standard(), false);
-    XCTAssertEqual(format.pcm_format(), audio::pcm_format::other);
-    XCTAssertEqual(format.channel_count(), 0);
-    XCTAssertEqual(format.buffer_count(), 0);
-    XCTAssertEqual(format.stride(), 0);
-    XCTAssertEqual(format.sample_rate(), 0.0);
-    XCTAssertEqual(format.is_interleaved(), false);
-    XCTAssertEqual(format.sample_byte_count(), 0);
-    XCTAssertEqual(format.buffer_frame_byte_count(), 0);
+    XCTAssertFalse(format);
 }
 
 - (void)test_nullptr_parameter {
-    auto lambda = [self](const audio::format &format) {
-        audio::format empty_format;
-        XCTAssertEqual(empty_format, format);
-    };
+    auto lambda = [self](const audio::format &format) { XCTAssertFalse(format); };
 
     lambda(nullptr);
 }
@@ -308,10 +287,8 @@ using namespace yas;
 }
 
 - (void)test_is_empty {
-    audio::format format{AudioStreamBasicDescription{}};
+    audio::format format{AudioStreamBasicDescription{0}};
     XCTAssertTrue(format.is_empty());
-
-    XCTAssertTrue(audio::format::null_format().is_empty());
 }
 
 - (void)test_smoke {
