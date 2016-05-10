@@ -8,28 +8,19 @@
 #include <memory>
 #include <string>
 #include "yas_audio_types.h"
+#include "yas_base.h"
 
 namespace yas {
 namespace audio {
-    class format {
+    class format : public base {
+        class impl;
+
        public:
-        format(std::nullptr_t n = nullptr);
-        explicit format(AudioStreamBasicDescription const &asbd);
+        explicit format(AudioStreamBasicDescription asbd);
         explicit format(CFDictionaryRef const &settings);
         format(double const sample_rate, uint32_t const channel_count,
                audio::pcm_format const pcm_format = audio::pcm_format::float32, bool const interleaved = false);
-
-        format(format const &) = default;
-        format(format &&) = default;
-        format &operator=(format const &) = default;
-        format &operator=(format &&) = default;
-
-        ~format() = default;
-
-        bool operator==(format const &) const;
-        bool operator!=(format const &) const;
-
-        explicit operator bool() const;
+        format(std::nullptr_t);
 
         bool is_empty() const;
         bool is_standard() const;
@@ -45,10 +36,6 @@ namespace audio {
         CFStringRef description() const;
 
         static format const &null_format();
-
-       private:
-        class impl;
-        std::shared_ptr<impl> _impl;
     };
 }
 
