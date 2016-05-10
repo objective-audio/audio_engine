@@ -508,11 +508,17 @@ audio::format audio::device::output_format() const {
 }
 
 uint32_t audio::device::input_channel_count() const {
-    return impl_ptr<impl>()->input_format().channel_count();
+    if (auto input_format = impl_ptr<impl>()->input_format()) {
+        return input_format.channel_count();
+    }
+    return 0;
 }
 
 uint32_t audio::device::output_channel_count() const {
-    return impl_ptr<impl>()->output_format().channel_count();
+    if (auto output_format = impl_ptr<impl>()->output_format()) {
+        return output_format.channel_count();
+    }
+    return 0;
 }
 
 subject<audio::device::change_info> &audio::device::subject() const {
