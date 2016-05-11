@@ -5,12 +5,15 @@
 #pragma once
 
 #include <AudioToolbox/AudioToolbox.h>
+#include "yas_base.h"
 #include "yas_observing.h"
 
 namespace yas {
 namespace audio {
-    class unit::parameter {
+    class unit::parameter : public base {
        public:
+        class impl;
+
         struct change_info {
             parameter const &parameter;
             AudioUnitElement const element;
@@ -18,15 +21,13 @@ namespace audio {
             AudioUnitParameterValue const new_value;
         };
 
-        static auto constexpr will_change_key = "yas.audio.audio_unit.parameter.will_change";
-        static auto constexpr did_change_key = "yas.audio.audio_unit.parameter.did_change";
+        enum class method { will_change, did_change };
+
+        using subject_t = subject<change_info, method>;
 
         parameter(AudioUnitParameterInfo const &info, AudioUnitParameterID const paramter_id,
                   AudioUnitScope const scope);
-        ~parameter();
-
-        parameter(parameter &&);
-        parameter &operator=(parameter &&);
+        parameter(std::nullptr_t);
 
         AudioUnitParameterID parameter_id() const;
         AudioUnitScope scope() const;
@@ -43,14 +44,8 @@ namespace audio {
         void set_value(float const value, AudioUnitElement const element);
         std::unordered_map<AudioUnitElement, AudioUnitParameterValue> const &values() const;
 
-        yas::subject<change_info> &subject();
-
-       private:
-        class impl;
-        std::unique_ptr<impl> _impl;
-
-        parameter(parameter const &) = delete;
-        parameter &operator=(parameter const &) = delete;
+        subject_t &subject();
     };
 }
+std::string to_string(audio::unit::parameter::method const &);
 }
