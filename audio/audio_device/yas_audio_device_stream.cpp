@@ -49,10 +49,17 @@ struct audio::device::stream::impl : base::impl {
    public:
     AudioStreamID stream_id;
     AudioDeviceID device_id;
-    yas::subject<change_info> subject;
+    subject_t subject;
 
     impl(AudioStreamID const stream_id, AudioDeviceID const device_id)
         : stream_id(stream_id), device_id(device_id), subject() {
+    }
+
+    bool is_equal(std::shared_ptr<base::impl> const &rhs) const override {
+        if (auto casted_rhs = std::dynamic_pointer_cast<audio::device::stream::impl>(rhs)) {
+            return stream_id == casted_rhs->stream_id;
+        }
+        return false;
     }
 
     listener_f listener(stream const &stream) {
@@ -72,7 +79,7 @@ struct audio::device::stream::impl : base::impl {
                     }
                 }
                 change_info change_info{std::move(infos)};
-                stream.subject().notify(stream::stream_did_change_key, change_info);
+                stream.subject().notify(method::did_change, change_info);
             }
         };
     }
@@ -92,9 +99,6 @@ struct audio::device::stream::impl : base::impl {
 
 #pragma mark - main
 
-audio::device::stream::stream(std::nullptr_t) : base(nullptr) {
-}
-
 audio::device::stream::stream(AudioStreamID const stream_id, AudioDeviceID const device_id)
     : base(std::make_shared<impl>(stream_id, device_id)) {
     auto imp = impl_ptr<impl>();
@@ -104,21 +108,10 @@ audio::device::stream::stream(AudioStreamID const stream_id, AudioDeviceID const
     imp->add_listener(kAudioStreamPropertyStartingChannel, function);
 }
 
+audio::device::stream::stream(std::nullptr_t) : base(nullptr) {
+}
+
 audio::device::stream::~stream() = default;
-
-bool audio::device::stream::operator==(stream const &rhs) const {
-    if (impl_ptr() && rhs.impl_ptr()) {
-        return stream_id() == rhs.stream_id();
-    }
-    return false;
-}
-
-bool audio::device::stream::operator!=(stream const &rhs) const {
-    if (impl_ptr() && rhs.impl_ptr()) {
-        return stream_id() != rhs.stream_id();
-    }
-    return true;
-}
 
 AudioStreamID audio::device::stream::stream_id() const {
     return impl_ptr<impl>()->stream_id;
@@ -162,7 +155,7 @@ uint32_t audio::device::stream::starting_channel() const {
     return 0;
 }
 
-yas::subject<yas::audio::device::stream::change_info> &audio::device::stream::subject() const {
+audio::device::stream::subject_t &audio::device::stream::subject() const {
     return impl_ptr<impl>()->subject;
 }
 
