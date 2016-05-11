@@ -152,7 +152,7 @@ struct audio::device_io::impl : base::impl {
                                 }
                             }
                         } else if (kernel->input_buffer) {
-                            pcm_buffer null_buffer;
+                            pcm_buffer null_buffer{nullptr};
                             render_callback(null_buffer, nullptr);
                         }
                     }
