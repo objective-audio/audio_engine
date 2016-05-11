@@ -167,7 +167,7 @@ void audio::unit_output_node::impl::prepare_audio_unit() {
 #pragma mark - aduio_unit_input_node::impl
 
 struct audio::unit_input_node::impl::core {
-    pcm_buffer input_buffer;
+    pcm_buffer input_buffer = nullptr;
     time render_time = nullptr;
 };
 

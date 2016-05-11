@@ -8,12 +8,15 @@
 #include <vector>
 #include "yas_audio_route.h"
 #include "yas_audio_types.h"
+#include "yas_base.h"
 #include "yas_flex_ptr.h"
 #include "yas_result.h"
 
 namespace yas {
 namespace audio {
-    class pcm_buffer {
+    class pcm_buffer : public base {
+        class impl;
+
        public:
         enum class copy_error_t {
             invalid_argument,
@@ -25,17 +28,10 @@ namespace audio {
 
         using copy_result = result<uint32_t, copy_error_t>;
 
-        pcm_buffer(std::nullptr_t n = nullptr);
         pcm_buffer(audio::format const &format, AudioBufferList *abl);
         pcm_buffer(audio::format const &format, uint32_t const frame_capacity);
         pcm_buffer(audio::format const &format, pcm_buffer const &from_buffer, const channel_map_t &channel_map);
-
-        pcm_buffer(pcm_buffer const &) = default;
-        pcm_buffer(pcm_buffer &&) = default;
-        pcm_buffer &operator=(pcm_buffer const &) = default;
-        pcm_buffer &operator=(pcm_buffer &&) = default;
-
-        explicit operator bool() const;
+        pcm_buffer(std::nullptr_t);
 
         audio::format const &format() const;
         AudioBufferList *audio_buffer_list();
@@ -67,10 +63,6 @@ namespace audio {
                                           uint32_t const to_start_frame = 0, uint32_t const length = 0);
         pcm_buffer::copy_result copy_to(AudioBufferList *const to_abl, uint32_t const from_start_frame = 0,
                                         uint32_t const to_start_frame = 0, uint32_t const length = 0);
-
-       private:
-        class impl;
-        std::shared_ptr<impl> _impl;
     };
 
     void clear(AudioBufferList *abl);

@@ -27,8 +27,13 @@ struct audio::device_io::kernel {
     }
 
     void reset_buffers() {
-        input_buffer.reset();
-        output_buffer.reset();
+        if (input_buffer) {
+            input_buffer.reset();
+        }
+
+        if (output_buffer) {
+            output_buffer.reset();
+        }
     }
 };
 
@@ -152,7 +157,7 @@ struct audio::device_io::impl : base::impl {
                                 }
                             }
                         } else if (kernel->input_buffer) {
-                            pcm_buffer null_buffer;
+                            pcm_buffer null_buffer{nullptr};
                             render_callback(null_buffer, nullptr);
                         }
                     }
