@@ -5,12 +5,15 @@
 #pragma once
 
 #include <AudioToolbox/AudioToolbox.h>
+#include "yas_base.h"
 #include "yas_observing.h"
 
 namespace yas {
 namespace audio {
-    class unit::parameter {
+    class unit::parameter : public base {
        public:
+        class impl;
+
         struct change_info {
             parameter const &parameter;
             AudioUnitElement const element;
@@ -23,10 +26,7 @@ namespace audio {
 
         parameter(AudioUnitParameterInfo const &info, AudioUnitParameterID const paramter_id,
                   AudioUnitScope const scope);
-        ~parameter();
-
-        parameter(parameter &&);
-        parameter &operator=(parameter &&);
+        parameter(std::nullptr_t);
 
         AudioUnitParameterID parameter_id() const;
         AudioUnitScope scope() const;
@@ -44,13 +44,6 @@ namespace audio {
         std::unordered_map<AudioUnitElement, AudioUnitParameterValue> const &values() const;
 
         yas::subject<change_info> &subject();
-
-       private:
-        class impl;
-        std::unique_ptr<impl> _impl;
-
-        parameter(parameter const &) = delete;
-        parameter &operator=(parameter const &) = delete;
     };
 }
 }
