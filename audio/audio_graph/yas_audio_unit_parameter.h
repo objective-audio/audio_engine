@@ -21,8 +21,9 @@ namespace audio {
             AudioUnitParameterValue const new_value;
         };
 
-        static auto constexpr will_change_key = "yas.audio.audio_unit.parameter.will_change";
-        static auto constexpr did_change_key = "yas.audio.audio_unit.parameter.did_change";
+        enum class method { will_change, did_change };
+
+        using subject_t = subject<change_info, method>;
 
         parameter(AudioUnitParameterInfo const &info, AudioUnitParameterID const paramter_id,
                   AudioUnitScope const scope);
@@ -43,7 +44,8 @@ namespace audio {
         void set_value(float const value, AudioUnitElement const element);
         std::unordered_map<AudioUnitElement, AudioUnitParameterValue> const &values() const;
 
-        yas::subject<change_info> &subject();
+        subject_t &subject();
     };
 }
+std::string to_string(audio::unit::parameter::method const &);
 }

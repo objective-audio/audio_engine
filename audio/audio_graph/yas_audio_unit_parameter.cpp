@@ -19,7 +19,7 @@ struct audio::unit::parameter::impl : base::impl {
     std::unordered_map<AudioUnitElement, AudioUnitParameterValue> values;
     std::string unit_name;
     std::string name;
-    yas::subject<audio::unit::parameter::change_info> subject;
+    subject_t subject;
 
     impl(AudioUnitParameterInfo const &info, AudioUnitParameterID const parameter_id, AudioUnitScope const scope)
         : parameter_id(parameter_id),
@@ -46,9 +46,9 @@ struct audio::unit::parameter::impl : base::impl {
             .parameter = cast<audio::unit::parameter>(),
         };
 
-        subject.notify(will_change_key, info);
+        subject.notify(method::will_change, info);
         values[element] = value;
-        subject.notify(did_change_key, info);
+        subject.notify(method::did_change, info);
     }
 };
 
@@ -114,6 +114,17 @@ std::unordered_map<AudioUnitElement, AudioUnitParameterValue> const &audio::unit
     return impl_ptr<impl>()->values;
 }
 
-subject<audio::unit::parameter::change_info> &audio::unit::parameter::subject() {
+audio::unit::parameter::subject_t &audio::unit::parameter::subject() {
     return impl_ptr<impl>()->subject;
+}
+
+#pragma mark -
+
+std::string yas::to_string(audio::unit::parameter::method const &method) {
+    switch (method) {
+        case audio::unit::parameter::method::will_change:
+            return "will_change";
+        case audio::unit::parameter::method::did_change:
+            return "did_change";
+    }
 }
