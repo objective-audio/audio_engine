@@ -145,9 +145,12 @@ namespace test {
     CFURLRef fileURL = (__bridge CFURLRef)[NSURL fileURLWithPath:filePath];
 
     {
-        auto file = audio::create_file({.file_url = fileURL,
-                                        .file_type = audio::file_type::wave,
-                                        .settings = audio::wave_file_settings(48000.0, 2, 16)});
+        auto file_result = audio::make_created_file({.file_url = fileURL,
+                                                     .file_type = audio::file_type::wave,
+                                                     .settings = audio::wave_file_settings(48000.0, 2, 16)});
+        XCTAssertTrue(file_result);
+
+        auto file = file_result.value();
 
         XCTAssertTrue(CFEqual(file.url(), fileURL));
         XCTAssertTrue(CFEqual(file.file_type(), audio::file_type::wave));
@@ -159,7 +162,12 @@ namespace test {
         XCTAssertEqual(file_format.is_interleaved(), true);
     }
 
-    if (auto file = audio::open_file({.file_url = fileURL})) {
+    {
+        auto file_result = audio::make_opened_file({.file_url = fileURL});
+        XCTAssertTrue(file_result);
+
+        auto file = file_result.value();
+
         XCTAssertTrue(CFEqual(file.url(), fileURL));
         XCTAssertTrue(CFEqual(file.file_type(), audio::file_type::wave));
         auto const &file_format = file.file_format();

@@ -8,10 +8,13 @@
 #include <memory>
 #include "yas_audio_pcm_buffer.h"
 #include "yas_audio_types.h"
+#include "yas_base.h"
 
 namespace yas {
 namespace audio {
-    class file {
+    class file : public base {
+        class impl;
+
        public:
         struct open_args {
             CFURLRef file_url = nullptr;
@@ -59,41 +62,34 @@ namespace audio {
         using read_result_t = result<std::nullptr_t, read_error_t>;
         using create_result_t = result<std::nullptr_t, create_error_t>;
         using write_result_t = result<std::nullptr_t, write_error_t>;
+        using make_opened_result_t = result<audio::file, open_error_t>;
+        using make_created_result_t = result<audio::file, create_error_t>;
 
         file();
-        virtual ~file() = default;
-
-        file(file const &) = default;
-        file(file &&) = default;
-        file &operator=(file const &) = default;
-        file &operator=(file &&) = default;
-
-        explicit operator bool() const;
-
-        CFURLRef url() const;
-        CFStringRef file_type() const;
-        audio::format const &file_format() const;
-        void set_processing_format(audio::format const &format);
-        audio::format const &processing_format() const;
-        int64_t file_length() const;
-        int64_t processing_length() const;
-        void set_file_frame_position(uint32_t const position);
-        int64_t file_frame_position() const;
+        file(std::nullptr_t);
 
         open_result_t open(open_args);
         create_result_t create(create_args);
         void close();
 
+        bool is_opened() const;
+        CFURLRef url() const;
+        CFStringRef file_type() const;
+        audio::format const &file_format() const;
+        audio::format const &processing_format() const;
+        int64_t file_length() const;
+        int64_t processing_length() const;
+        int64_t file_frame_position() const;
+
+        void set_processing_format(audio::format format);
+        void set_file_frame_position(uint32_t const position);
+
         read_result_t read_into_buffer(audio::pcm_buffer &buffer, uint32_t const frame_length = 0);
         write_result_t write_from_buffer(audio::pcm_buffer const &buffer, bool const async = false);
-
-       protected:
-        class impl;
-        std::shared_ptr<impl> _impl;
     };
 
-    file open_file(file::open_args);
-    file create_file(file::create_args);
+    file::make_opened_result_t make_opened_file(file::open_args);
+    file::make_created_result_t make_created_file(file::create_args);
 }
 
 std::string to_string(audio::file::open_error_t const &);
