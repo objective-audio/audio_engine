@@ -27,8 +27,13 @@ struct audio::device_io::kernel {
     }
 
     void reset_buffers() {
-        input_buffer.reset();
-        output_buffer.reset();
+        if (input_buffer) {
+            input_buffer.reset();
+        }
+
+        if (output_buffer) {
+            output_buffer.reset();
+        }
     }
 };
 
