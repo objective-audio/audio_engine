@@ -7,9 +7,10 @@
 #include <TargetConditionals.h>
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
 
-#include "yas_observing.h"
-
 namespace yas {
+template <typename T, typename K>
+class subject;
+
 namespace audio {
     class device::stream : public base {
         class impl;
