@@ -20,7 +20,7 @@ namespace audio {
         weak<engine> &weak_engine() const;
         yas::subject<engine> &subject() const;
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
-        observer<audio::device::change_info> &device_observer();
+        audio::device::observer_t &device_observer();
 #endif
 
         bool node_exists(node const &node);
