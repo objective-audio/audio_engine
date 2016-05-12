@@ -90,9 +90,9 @@ namespace audio {
                         device::property_info{device::property::system, kAudioObjectSystemObject, addresses[i]});
                 }
                 auto &subject = device::system_subject();
-                device::change_info change_info{std::move(property_infos)};
-                subject.notify(device::hardware_did_change_key, change_info);
-                subject.notify(device::configuration_change_key, change_info);
+                device::change_info change_info{.property_infos = std::move(property_infos)};
+                subject.notify(device::method::hardware_did_change, change_info);
+                subject.notify(device::method::configuration_change, change_info);
             };
         }
 
@@ -176,18 +176,13 @@ bool audio::device::property_info::operator<(device::property_info const &info) 
     return address.mElement < info.address.mElement;
 }
 
-#pragma mark - chnage_info
-
-audio::device::change_info::change_info(std::vector<device::property_info> &&infos) : property_infos(std::move(infos)) {
-}
-
 #pragma mark - private
 
 struct audio::device::impl : base::impl {
     AudioDeviceID const audio_device_id;
     std::unordered_map<AudioStreamID, stream> input_streams_map;
     std::unordered_map<AudioStreamID, stream> output_streams_map;
-    yas::subject<device::change_info> subject;
+    subject_t subject;
 
     impl(AudioDeviceID device_id)
         : _input_format(nullptr),
@@ -210,7 +205,11 @@ struct audio::device::impl : base::impl {
         _add_listener(device_id, kAudioDevicePropertyStreamConfiguration, kAudioObjectPropertyScopeOutput, listener);
     }
 
-    ~impl() {
+    bool is_equal(std::shared_ptr<base::impl> const &rhs) const override {
+        if (auto casted_rhs = std::dynamic_pointer_cast<audio::device::impl>(rhs)) {
+            return audio_device_id == casted_rhs->audio_device_id;
+        }
+        return false;
     }
 
     void set_input_format(audio::format const &format) {
@@ -272,8 +271,8 @@ struct audio::device::impl : base::impl {
                 }
 
                 device::change_info change_info{std::move(property_infos)};
-                device.subject().notify(device::device_did_change_key, change_info);
-                device::system_subject().notify(device::configuration_change_key, change_info);
+                device.subject().notify(device::method::device_did_change, change_info);
+                device::system_subject().notify(device::method::configuration_change, change_info);
             }
         };
     }
@@ -430,38 +429,20 @@ bool audio::device::is_available_device(device const &device) {
     return it != device_global::all_devices_map().end();
 }
 
-subject<audio::device::change_info> &audio::device::system_subject() {
-    static yas::subject<device::change_info> _system_subject;
+audio::device::subject_t &audio::device::system_subject() {
+    static subject_t _system_subject;
     return _system_subject;
 }
 
 #pragma mark - main
 
+audio::device::device(AudioDeviceID const device_id) : base(std::make_shared<impl>(device_id)) {
+}
+
 audio::device::device(std::nullptr_t) : base(nullptr) {
 }
 
 audio::device::~device() = default;
-
-audio::device::device(AudioDeviceID const device_id) : base(std::make_shared<impl>(device_id)) {
-}
-
-bool audio::device::operator==(device const &rhs) const {
-    if (impl_ptr() && rhs.impl_ptr()) {
-        return audio_device_id() == rhs.audio_device_id();
-    }
-    return false;
-}
-
-bool audio::device::operator!=(device const &rhs) const {
-    if (impl_ptr() && rhs.impl_ptr()) {
-        return audio_device_id() != rhs.audio_device_id();
-    }
-    return true;
-}
-
-audio::device::operator bool() const {
-    return impl_ptr() != nullptr;
-}
 
 AudioDeviceID audio::device::audio_device_id() const {
     return impl_ptr<impl>()->audio_device_id;
@@ -521,7 +502,7 @@ uint32_t audio::device::output_channel_count() const {
     return 0;
 }
 
-subject<audio::device::change_info> &audio::device::subject() const {
+audio::device::subject_t &audio::device::subject() const {
     return impl_ptr<impl>()->subject;
 }
 

@@ -23,6 +23,8 @@ namespace audio {
     class device_global;
 
     class device : public base {
+        class impl;
+
        public:
         class stream;
 
@@ -32,9 +34,7 @@ namespace audio {
             format,
         };
 
-        static auto constexpr hardware_did_change_key = "yas.audio.device.hardware_did_change";
-        static auto constexpr device_did_change_key = "yas.audio.device.device_did_change";
-        static auto constexpr configuration_change_key = "yas.audio.device.configuration_change";
+        enum class method { hardware_did_change, device_did_change, configuration_change };
 
         struct property_info {
             AudioObjectID const object_id;
@@ -49,9 +49,10 @@ namespace audio {
 
         struct change_info {
             std::vector<property_info> const property_infos;
-
-            change_info(std::vector<property_info> &&infos);
         };
+
+        using subject_t = subject<change_info, method>;
+        using observer_t = observer<change_info, method>;
 
         static std::vector<device> all_devices();
         static std::vector<device> output_devices();
@@ -67,16 +68,6 @@ namespace audio {
 
         ~device();
 
-        device(device const &) = default;
-        device(device &&) = default;
-        device &operator=(device const &) = default;
-        device &operator=(device &&) = default;
-
-        bool operator==(device const &) const;
-        bool operator!=(device const &) const;
-
-        explicit operator bool() const;
-
         AudioDeviceID audio_device_id() const;
         CFStringRef name() const;
         CFStringRef manufacture() const;
@@ -89,14 +80,11 @@ namespace audio {
         uint32_t input_channel_count() const;
         uint32_t output_channel_count() const;
 
-        static subject<change_info> &system_subject();
-        subject<change_info> &subject() const;
+        static subject_t &system_subject();
+        subject_t &subject() const;
 
        protected:
         explicit device(AudioDeviceID const device_id);
-
-       private:
-        class impl;
     };
 }
 }
