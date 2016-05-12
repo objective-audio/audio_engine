@@ -18,7 +18,7 @@ namespace audio {
         void prepare(engine const &);
 
         weak<engine> &weak_engine() const;
-        yas::subject<engine> &subject() const;
+        subject_t &subject() const;
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
         audio::device::observer_t &device_observer();
 #endif

@@ -20,7 +20,7 @@ namespace audio {
         class impl;
 
        public:
-        static auto constexpr configuration_change_key = "yas.audio.engine.configuration_change";
+        enum class method { configuration_change };
 
         enum class start_error_t {
             already_running,
@@ -31,6 +31,8 @@ namespace audio {
         };
 
         using start_result_t = result<std::nullptr_t, start_error_t>;
+        using subject_t = subject<engine, method>;
+        using observer_t = observer<engine, method>;
 
         engine();
         engine(std::nullptr_t);
@@ -59,7 +61,7 @@ namespace audio {
                                             offline_completion_f const &completion_function);
         void stop();
 
-        subject<engine> &subject() const;
+        subject_t &subject() const;
 
 #if YAS_TEST
        public:
