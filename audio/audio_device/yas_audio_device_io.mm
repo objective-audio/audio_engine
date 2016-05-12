@@ -44,7 +44,7 @@ struct audio::device_io::impl : base::impl {
     AudioDeviceIOProcID io_proc_id;
     pcm_buffer input_buffer_on_render;
     audio::time input_time_on_render;
-    observer<device::change_info> observer;
+    audio::device::observer_t observer;
 
     impl()
         : weak_device_io(),
@@ -61,7 +61,7 @@ struct audio::device_io::impl : base::impl {
     }
 
     ~impl() {
-        observer.remove_handler(device::system_subject(), device::hardware_did_change_key);
+        observer.remove_handler(device::system_subject(), device::method::hardware_did_change);
 
         uninitialize();
     }
@@ -70,7 +70,7 @@ struct audio::device_io::impl : base::impl {
         weak_device_io = to_weak(device_io);
 
         observer.add_handler(
-            device::system_subject(), device::hardware_did_change_key,
+            device::system_subject(), device::method::hardware_did_change,
             [weak_device_io = weak_device_io](auto const &context) {
                 if (auto device_io = weak_device_io.lock()) {
                     if (device_io.device() && !device::device_for_id(device_io.device().audio_device_id())) {
@@ -89,13 +89,13 @@ struct audio::device_io::impl : base::impl {
             uninitialize();
 
             if (device) {
-                observer.remove_handler(device.subject(), device::device_did_change_key);
+                observer.remove_handler(device.subject(), device::method::device_did_change);
             }
 
             device = dev;
 
             if (device) {
-                observer.add_handler(device.subject(), device::device_did_change_key,
+                observer.add_handler(device.subject(), device::method::device_did_change,
                                      [weak_device_io = weak_device_io](auto const &context) {
                                          if (auto device_io = weak_device_io.lock()) {
                                              device_io.impl_ptr<impl>()->update_kernel();
