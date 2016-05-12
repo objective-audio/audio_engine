@@ -7,6 +7,7 @@
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
 
 #include <mutex>
+#include "yas_audio_format.h"
 
 using namespace yas;
 

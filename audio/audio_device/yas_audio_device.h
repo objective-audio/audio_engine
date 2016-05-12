@@ -14,13 +14,13 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
-#include "yas_audio_format.h"
 #include "yas_audio_types.h"
 #include "yas_observing.h"
 
 namespace yas {
 namespace audio {
     class device_global;
+    class format;
 
     class device : public base {
         class impl;
