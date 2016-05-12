@@ -3,7 +3,6 @@
 //
 
 #include <exception>
-#include "yas_audio_format.h"
 #include "yas_audio_route.h"
 #include "yas_cf_utils.h"
 

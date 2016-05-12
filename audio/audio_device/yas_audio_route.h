@@ -7,7 +7,6 @@
 #include <memory>
 #include <string>
 #include <vector>
-#include "yas_audio_format.h"
 #include "yas_audio_types.h"
 #include "yas_result.h"
 
