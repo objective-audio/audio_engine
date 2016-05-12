@@ -6,14 +6,16 @@
 
 #include <memory>
 #include <vector>
-#include "yas_audio_route.h"
 #include "yas_audio_types.h"
 #include "yas_base.h"
-#include "yas_flex_ptr.h"
 #include "yas_result.h"
 
 namespace yas {
+class flex_ptr;
+
 namespace audio {
+    class format;
+
     class pcm_buffer : public base {
         class impl;
 
