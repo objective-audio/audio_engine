@@ -176,7 +176,7 @@ namespace sample {
     [unowned_self.object() setObject:self];
 
     _internal.system_observer = audio::device::system_subject().make_observer(
-        audio::device::hardware_did_change_key,
+        audio::device::method::hardware_did_change,
         [unowned_self](const auto &) { [[unowned_self.object() object] _updateDeviceNames]; });
 
     auto weak_device_io = to_weak(_internal.device_io);
@@ -302,7 +302,7 @@ namespace sample {
         [unowned_self.object() setObject:self];
 
         _internal.device_observer = selected_device.subject().make_observer(
-            audio::device::device_did_change_key, [selected_device, unowned_self](auto const &context) {
+            audio::device::method::device_did_change, [selected_device, unowned_self](auto const &context) {
                 const auto &change_info = context.value;
                 const auto &infos = change_info.property_infos;
                 if (infos.size() > 0) {

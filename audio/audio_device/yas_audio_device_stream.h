@@ -21,7 +21,7 @@ namespace audio {
             starting_channel,
         };
 
-        static auto constexpr stream_did_change_key = "yas.audio.device.stream.stream_did_change";
+        enum class method { did_change };
 
         struct property_info {
             AudioObjectID const object_id;
@@ -40,18 +40,12 @@ namespace audio {
             change_info(std::vector<property_info> &&);
         };
 
-        stream(std::nullptr_t);
+        using subject_t = yas::subject<change_info, method>;
+
         stream(AudioStreamID const, AudioDeviceID const);
+        stream(std::nullptr_t);
 
         ~stream();
-
-        stream(stream const &) = default;
-        stream(stream &&) = default;
-        stream &operator=(stream const &) = default;
-        stream &operator=(stream &&) = default;
-
-        bool operator==(stream const &) const;
-        bool operator!=(stream const &) const;
 
         AudioStreamID stream_id() const;
         audio::device device() const;
@@ -60,7 +54,7 @@ namespace audio {
         audio::format virtual_format() const;
         uint32_t starting_channel() const;
 
-        yas::subject<change_info> &subject() const;
+        subject_t &subject() const;
 
        private:
         template <typename T>

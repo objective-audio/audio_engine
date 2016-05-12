@@ -94,7 +94,7 @@ using namespace yas;
 #if TARGET_OS_IPHONE
     [[NSNotificationCenter defaultCenter] postNotificationName:AVAudioSessionRouteChangeNotification object:nil];
 #elif TARGET_OS_MAC
-    audio::device::system_subject().notify(audio::device::configuration_change_key,
+    audio::device::system_subject().notify(audio::device::method::configuration_change,
                                            audio::device::change_info{std::vector<audio::device::property_info>{}});
 #endif
 
