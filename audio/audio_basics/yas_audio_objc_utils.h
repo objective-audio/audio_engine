@@ -5,10 +5,12 @@
 #pragma once
 
 #import <AVFoundation/AVFoundation.h>
-#include "yas_audio_time.h"
 #include "yas_audio_types.h"
 
 namespace yas {
+namespace audio {
+    class time;
+}
 #if TARGET_OS_IPHONE
 audio::channel_map_t to_channel_map(NSArray *const channelDescriptions, audio::direction const dir);
 #endif

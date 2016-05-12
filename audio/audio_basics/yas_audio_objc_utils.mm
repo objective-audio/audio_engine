@@ -3,6 +3,7 @@
 //
 
 #include "yas_audio_objc_utils.h"
+#include "yas_audio_time.h"
 
 #if TARGET_OS_IPHONE
 #import <AVFoundation/AVFoundation.h>
