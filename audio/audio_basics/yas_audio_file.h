@@ -6,12 +6,15 @@
 
 #include <CoreFoundation/CoreFoundation.h>
 #include <memory>
-#include "yas_audio_pcm_buffer.h"
 #include "yas_audio_types.h"
 #include "yas_base.h"
+#include "yas_result.h"
 
 namespace yas {
 namespace audio {
+    class format;
+    class pcm_buffer;
+
     class file : public base {
         class impl;
 
