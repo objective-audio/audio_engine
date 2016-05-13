@@ -7,7 +7,6 @@
 #include <memory>
 #include "yas_audio_types.h"
 #include "yas_base.h"
-#include "yas_result.h"
 
 namespace yas {
 namespace audio {

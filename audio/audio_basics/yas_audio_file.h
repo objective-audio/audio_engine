@@ -8,9 +8,11 @@
 #include <memory>
 #include "yas_audio_types.h"
 #include "yas_base.h"
-#include "yas_result.h"
 
 namespace yas {
+template <typename T, typename U>
+class result;
+
 namespace audio {
     class format;
     class pcm_buffer;

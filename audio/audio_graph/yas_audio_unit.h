@@ -18,9 +18,11 @@
 #include "yas_audio_unit_protocol.h"
 #include "yas_base.h"
 #include "yas_exception.h"
-#include "yas_result.h"
 
 namespace yas {
+template <typename T, typename U>
+class result;
+
 namespace audio {
     class unit : public base {
         class impl;

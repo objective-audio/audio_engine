@@ -8,10 +8,11 @@
 #include <vector>
 #include "yas_audio_types.h"
 #include "yas_base.h"
-#include "yas_result.h"
 
 namespace yas {
 class flex_ptr;
+template <typename T, typename U>
+class result;
 
 namespace audio {
     class format;

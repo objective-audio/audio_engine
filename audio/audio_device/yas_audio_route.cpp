@@ -5,6 +5,7 @@
 #include <exception>
 #include "yas_audio_route.h"
 #include "yas_cf_utils.h"
+#include "yas_result.h"
 
 using namespace yas;
 

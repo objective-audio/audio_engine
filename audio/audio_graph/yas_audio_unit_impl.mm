@@ -6,6 +6,7 @@
 #include "yas_audio_pcm_buffer.h"
 #include "yas_audio_unit.h"
 #include "yas_cf_utils.h"
+#include "yas_result.h"
 
 #if TARGET_OS_IPHONE
 #import <AVFoundation/AVFoundation.h>

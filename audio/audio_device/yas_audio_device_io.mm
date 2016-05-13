@@ -15,6 +15,7 @@
 #include "yas_audio_time.h"
 #include "yas_exception.h"
 #include "yas_observing.h"
+#include "yas_result.h"
 
 using namespace yas;
 

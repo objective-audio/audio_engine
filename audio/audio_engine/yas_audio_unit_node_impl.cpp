@@ -8,6 +8,7 @@
 #include "yas_audio_unit.h"
 #include "yas_audio_unit_node.h"
 #include "yas_audio_unit_parameter.h"
+#include "yas_result.h"
 
 using namespace yas;
 
