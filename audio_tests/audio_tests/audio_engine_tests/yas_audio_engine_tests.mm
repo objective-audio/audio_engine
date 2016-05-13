@@ -88,7 +88,7 @@ using namespace yas;
 
     XCTestExpectation *expectation = [self expectationWithDescription:@"configuration change"];
 
-    observer<audio::engine> observer;
+    audio::engine::observer_t observer;
     observer.add_wild_card_handler(engine.subject(), [expectation](auto const &) { [expectation fulfill]; });
 
 #if TARGET_OS_IPHONE

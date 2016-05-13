@@ -258,7 +258,7 @@ namespace sample {
     [unowned_self.object() setObject:self];
 
     _internal.engine_observer = _internal.engine.subject().make_observer(
-        audio::engine::configuration_change_key, [unowned_self](const auto &context) {
+        audio::engine::method::configuration_change, [unowned_self](const auto &context) {
             if ([UIApplication sharedApplication].applicationState == UIApplicationStateActive) {
                 [[unowned_self.object() object] _updateEngine];
             }
