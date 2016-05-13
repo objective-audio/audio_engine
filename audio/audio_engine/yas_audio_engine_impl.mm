@@ -4,7 +4,6 @@
 
 #include <AVFoundation/AVFoundation.h>
 #include <CoreFoundation/CoreFoundation.h>
-#include "yas_audio_device_io_node.h"
 #include "yas_audio_engine.h"
 #include "yas_audio_graph.h"
 #include "yas_audio_node.h"
@@ -15,6 +14,8 @@
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
 #include "yas_audio_device.h"
+#include "yas_audio_device_io.h"
+#include "yas_audio_device_io_node.h"
 #endif
 
 using namespace yas;

@@ -3,12 +3,17 @@
 //
 
 #include "yas_audio_graph.h"
+#include "yas_audio_unit.h"
 #include "yas_stl_utils.h"
 
 #if TARGET_OS_IPHONE
 #import <AVFoundation/AVFoundation.h>
 #import <UIKit/UIKit.h>
 #include "yas_objc_ptr.h"
+#endif
+
+#if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
+#include "yas_audio_device_io.h"
 #endif
 
 using namespace yas;
