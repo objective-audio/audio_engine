@@ -8,6 +8,7 @@
 
 #include <mutex>
 #include "yas_audio_format.h"
+#include "yas_observing.h"
 
 using namespace yas;
 

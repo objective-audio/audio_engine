@@ -15,9 +15,14 @@
 #include <unordered_map>
 #include <vector>
 #include "yas_audio_types.h"
-#include "yas_observing.h"
+#include "yas_base.h"
 
 namespace yas {
+template <typename T, typename K>
+class subject;
+template <typename T, typename K>
+class observer;
+
 namespace audio {
     class device_global;
     class format;
