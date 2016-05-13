@@ -4,6 +4,7 @@
 
 #include "yas_audio_unit.h"
 #include "yas_cf_utils.h"
+#include "yas_observing.h"
 
 using namespace yas;
 
