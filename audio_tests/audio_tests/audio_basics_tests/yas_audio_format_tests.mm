@@ -39,16 +39,16 @@ using namespace yas;
 }
 
 - (void)test_create_standard_format {
-    const double sampleRate = 44100.0;
-    const uint32_t channelCount = 2;
-    const uint32_t bufferCount = channelCount;
-    const uint32_t stride = 1;
-    const BOOL interleaved = NO;
-    const audio::pcm_format pcmFormat = audio::pcm_format::float32;
-    const uint32_t bitsPerChannel = 32;
-    const uint32_t bytesPerFrame = bitsPerChannel / 8;
+    double const sampleRate = 44100.0;
+    uint32_t const channelCount = 2;
+    uint32_t const bufferCount = channelCount;
+    uint32_t const stride = 1;
+    bool const interleaved = NO;
+    audio::pcm_format const pcmFormat = audio::pcm_format::float32;
+    uint32_t const bitsPerChannel = 32;
+    uint32_t const bytesPerFrame = bitsPerChannel / 8;
 
-    const AudioStreamBasicDescription asbd = {
+    AudioStreamBasicDescription const asbd = {
         .mFormatID = kAudioFormatLinearPCM,
         .mFramesPerPacket = 1,
         .mSampleRate = sampleRate,
@@ -72,16 +72,16 @@ using namespace yas;
 }
 
 - (void)test_create_format_48000kHz_1ch_64bits_interleaved {
-    const double sampleRate = 48000.0;
-    const uint32_t channelCount = 1;
-    const uint32_t bufferCount = 1;
-    const uint32_t stride = channelCount;
-    const BOOL interleaved = YES;
-    const audio::pcm_format pcmFormat = audio::pcm_format::float64;
-    const uint32_t bitsPerChannel = 64;
-    const uint32_t bytesPerFrame = bitsPerChannel / 8 * channelCount;
+    double const sampleRate = 48000.0;
+    uint32_t const channelCount = 1;
+    uint32_t const bufferCount = 1;
+    uint32_t const stride = channelCount;
+    bool const interleaved = YES;
+    audio::pcm_format const pcmFormat = audio::pcm_format::float64;
+    uint32_t const bitsPerChannel = 64;
+    uint32_t const bytesPerFrame = bitsPerChannel / 8 * channelCount;
 
-    const AudioStreamBasicDescription asbd = {
+    AudioStreamBasicDescription const asbd = {
         .mFormatID = kAudioFormatLinearPCM,
         .mFramesPerPacket = 1,
         .mSampleRate = sampleRate,
@@ -105,16 +105,16 @@ using namespace yas;
 }
 
 - (void)test_create_format_32000kHz_4ch_16bits_interleaved {
-    const double sampleRate = 32000.0;
-    const uint32_t channelCount = 4;
-    const uint32_t bufferCount = 1;
-    const uint32_t stride = channelCount;
-    const BOOL interleaved = YES;
-    const audio::pcm_format pcmFormat = audio::pcm_format::int16;
-    const uint32_t bitsPerChannel = 16;
-    const uint32_t bytesPerFrame = bitsPerChannel / 8 * channelCount;
+    double const sampleRate = 32000.0;
+    uint32_t const channelCount = 4;
+    uint32_t const bufferCount = 1;
+    uint32_t const stride = channelCount;
+    bool const interleaved = YES;
+    audio::pcm_format const pcmFormat = audio::pcm_format::int16;
+    uint32_t const bitsPerChannel = 16;
+    uint32_t const bytesPerFrame = bitsPerChannel / 8 * channelCount;
 
-    const AudioStreamBasicDescription asbd = {
+    AudioStreamBasicDescription const asbd = {
         .mFormatID = kAudioFormatLinearPCM,
         .mFramesPerPacket = 1,
         .mSampleRate = sampleRate,
@@ -138,14 +138,14 @@ using namespace yas;
 }
 
 - (void)test_create_format_with_streadm_description {
-    const double sampleRate = 2348739.1;
-    const uint32_t channelCount = 6;
-    const uint32_t bufferCount = 1;
-    const uint32_t stride = channelCount;
-    const BOOL interleaved = YES;
-    const uint32_t framesPerPacket = 23;
-    const uint32_t bitsPerChannel = 16;
-    const uint32_t bytesPerFrame = bitsPerChannel / 8;
+    double const sampleRate = 2348739.1;
+    uint32_t const channelCount = 6;
+    uint32_t const bufferCount = 1;
+    uint32_t const stride = channelCount;
+    bool const interleaved = YES;
+    uint32_t const framesPerPacket = 23;
+    uint32_t const bitsPerChannel = 16;
+    uint32_t const bytesPerFrame = bitsPerChannel / 8;
 
     AudioStreamBasicDescription asbd = {
         .mFormatID = kAudioFormatAppleLossless,
@@ -169,8 +169,8 @@ using namespace yas;
 }
 
 - (void)test_equal_formats {
-    const double sampleRate = 44100;
-    const uint32_t channelCount = 2;
+    double const sampleRate = 44100;
+    uint32_t const channelCount = 2;
 
     auto audio_format1 = audio::format(sampleRate, channelCount);
     auto audio_format1b = audio_format1;
@@ -181,7 +181,7 @@ using namespace yas;
 }
 
 - (void)test_create_format_with_settings {
-    const double sampleRate = 44100.0;
+    double const sampleRate = 44100.0;
 
     CFDictionaryRef settings = audio::linear_pcm_file_settings(sampleRate, 2, 32, false, true, true);
 
@@ -282,7 +282,7 @@ using namespace yas;
 }
 
 - (void)test_null_format {
-    const auto null_format = audio::format::null_format();
+    auto const null_format = audio::format::null_format();
     XCTAssertFalse(null_format);
 }
 

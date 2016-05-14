@@ -81,9 +81,9 @@ using namespace yas;
 }
 
 - (void)test_fill_sine {
-    const uint32_t count = 8;
-    const double startPhase = 0.1;
-    const double phasePerFrame = 1.0 / (double)count * audio::math::two_pi;
+    uint32_t const count = 8;
+    double const startPhase = 0.1;
+    double const phasePerFrame = 1.0 / (double)count * audio::math::two_pi;
     float *data = static_cast<float *>(calloc(count, sizeof(float)));
 
     audio::math::fill_sine(data, count, startPhase, phasePerFrame);

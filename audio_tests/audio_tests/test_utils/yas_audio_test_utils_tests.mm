@@ -21,8 +21,8 @@ using namespace yas;
 }
 
 - (void)testIsEqualFloat64WithAccuracy {
-    const double val1 = 1.0;
-    const double accuracy = 0.1;
+    double const val1 = 1.0;
+    double const accuracy = 0.1;
 
     double val2 = 1.0;
     XCTAssertTrue(test::is_equal(val1, val2, accuracy));
@@ -93,7 +93,7 @@ using namespace yas;
 }
 
 - (void)testIsEqualData {
-    const uint32_t size = 4;
+    uint32_t const size = 4;
 
     std::vector<uint8_t> vec1(size);
     std::vector<uint8_t> vec2(size);

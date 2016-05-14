@@ -49,9 +49,9 @@ namespace sample {
         }
 
         void connect_nodes() {
-            const auto sample_rate = io_node.device_sample_rate();
+            auto const sample_rate = io_node.device_sample_rate();
 
-            const auto format = audio::format(sample_rate, 2);
+            auto const format = audio::format(sample_rate, 2);
 
             engine.connect(mixer_node, io_node, format);
             engine.connect(route_node, mixer_node, format);
@@ -85,13 +85,13 @@ namespace sample {
         if ([[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayAndRecord error:&error]) {
             [self setupEngine];
 
-            const auto start_result = _internal.engine.start_render();
+            auto const start_result = _internal.engine.start_render();
             if (start_result) {
                 [self.tableView reloadData];
                 [self _updateSlider];
                 success = YES;
             } else {
-                const auto error_string = to_string(start_result.error());
+                auto const error_string = to_string(start_result.error());
                 errorMessage = (__bridge NSString *)to_cf_object(error_string);
             }
         } else {
@@ -133,8 +133,8 @@ namespace sample {
         NSIndexPath *selectedIndexPath = controller.selectedIndexPath;
 
         if (selectedIndexPath) {
-            const auto dst_bus_idx = 0;
-            const auto dst_ch_idx = static_cast<uint32_t>(fromIndexPath.row);
+            auto const dst_bus_idx = 0;
+            auto const dst_ch_idx = static_cast<uint32_t>(fromIndexPath.row);
             uint32_t src_bus_idx = -1;
             uint32_t src_ch_idx = -1;
 
@@ -194,7 +194,7 @@ namespace sample {
 
         case YASAudioEngineRouteSampleSectionDestinations: {
             UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"Cell" forIndexPath:indexPath];
-            const auto &routes = _internal.route_node.routes();
+            auto const &routes = _internal.route_node.routes();
             audio::route::point dst_point{0, static_cast<uint32_t>(indexPath.row)};
             auto it = std::find_if(routes.begin(), routes.end(),
                                    [dst_point = std::move(dst_point)](const audio::route &route) {
@@ -202,7 +202,7 @@ namespace sample {
                                    });
             NSString *sourceIndexText = nil;
             if (it != routes.end()) {
-                const auto &route = *it;
+                auto const &route = *it;
                 sourceIndexText =
                     [NSString stringWithFormat:@"bus=%@ ch=%@", @(route.source.bus), @(route.source.channel)];
             } else {
@@ -220,7 +220,7 @@ namespace sample {
 #pragma mark -
 
 - (IBAction)volumeSliderChanged:(UISlider *)sender {
-    const float value = sender.value;
+    float const value = sender.value;
     if (_internal.mixer_node) {
         _internal.mixer_node.set_input_volume(value, 0);
     }
@@ -234,17 +234,17 @@ namespace sample {
     _internal.mixer_node.set_input_volume(1.0, 0);
     _internal.route_node.set_routes({{0, 0, 0, 0}, {0, 1, 0, 1}});
 
-    Float64 phase = 0;
+    double phase = 0;
 
-    auto tap_render_function = [phase](audio::pcm_buffer &buffer, const uint32_t bus_idx,
+    auto tap_render_function = [phase](audio::pcm_buffer &buffer, uint32_t const bus_idx,
                                        const audio::time &when) mutable {
         buffer.clear();
 
-        const Float64 start_phase = phase;
-        const Float64 phase_per_frame = 1000.0 / buffer.format().sample_rate() * audio::math::two_pi;
+        double const start_phase = phase;
+        double const phase_per_frame = 1000.0 / buffer.format().sample_rate() * audio::math::two_pi;
         audio::frame_enumerator enumerator(buffer);
-        const auto *flex_ptr = enumerator.pointer();
-        const uint32_t length = enumerator.frame_length();
+        auto const *flex_ptr = enumerator.pointer();
+        uint32_t const length = enumerator.frame_length();
 
         while (flex_ptr->v) {
             phase = audio::math::fill_sine(flex_ptr->f32, length, start_phase, phase_per_frame);
@@ -258,7 +258,7 @@ namespace sample {
     [unowned_self.object() setObject:self];
 
     _internal.engine_observer = _internal.engine.subject().make_observer(
-        audio::engine::method::configuration_change, [unowned_self](const auto &context) {
+        audio::engine::method::configuration_change, [unowned_self](auto const &context) {
             if ([UIApplication sharedApplication].applicationState == UIApplicationStateActive) {
                 [[unowned_self.object() object] _updateEngine];
             }

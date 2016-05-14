@@ -21,13 +21,13 @@ using namespace yas;
 }
 
 - (void)testConverterUnit {
-    const double output_sample_rate = 44100;
-    const double input_sample_rate = 48000;
-    const uint32_t channels = 2;
-    const uint32_t frame_length = 1024;
-    const uint32_t maximum_frame_length = 4096;
-    const OSType type = kAudioUnitType_FormatConverter;
-    const OSType sub_type = kAudioUnitSubType_AUConverter;
+    double const output_sample_rate = 44100;
+    double const input_sample_rate = 48000;
+    uint32_t const channels = 2;
+    uint32_t const frame_length = 1024;
+    uint32_t const maximum_frame_length = 4096;
+    OSType const type = kAudioUnitType_FormatConverter;
+    OSType const sub_type = kAudioUnitSubType_AUConverter;
 
     auto output_format = audio::format(output_sample_rate, channels, audio::pcm_format::float32, false);
     auto input_format = audio::format(input_sample_rate, channels, audio::pcm_format::int16, true);
@@ -91,10 +91,10 @@ using namespace yas;
 }
 
 - (void)testRenderCallback {
-    const double sampleRate = 44100;
-    const uint32_t channels = 2;
-    const uint32_t frame_length = 1024;
-    const uint32_t maximum_frame_length = 4096;
+    double const sampleRate = 44100;
+    uint32_t const channels = 2;
+    uint32_t const frame_length = 1024;
+    uint32_t const maximum_frame_length = 4096;
 
     auto format = audio::format(sampleRate, channels, audio::pcm_format::float32, false);
 
@@ -173,7 +173,7 @@ using namespace yas;
 - (void)testParameter {
     audio::unit delay_unit(kAudioUnitType_Effect, kAudioUnitSubType_Delay);
 
-    const AudioUnitScope scope = kAudioUnitScope_Global;
+    AudioUnitScope const scope = kAudioUnitScope_Global;
     auto parameter = delay_unit.create_parameter(kDelayParam_DelayTime, scope);
 
     delay_unit.set_parameter_value(parameter.min_value(), kDelayParam_DelayTime, scope, 0);
@@ -217,11 +217,11 @@ using namespace yas;
 }
 
 - (void)testPropertyData {
-    const double sampleRate = 48000;
-    const uint32_t channels = 4;
-    const AudioUnitPropertyID property_id = kAudioUnitProperty_StreamFormat;
-    const AudioUnitScope scope = kAudioUnitScope_Input;
-    const AudioUnitElement element = 0;
+    double const sampleRate = 48000;
+    uint32_t const channels = 4;
+    AudioUnitPropertyID const property_id = kAudioUnitProperty_StreamFormat;
+    AudioUnitScope const scope = kAudioUnitScope_Input;
+    AudioUnitElement const element = 0;
 
     auto format = audio::format(sampleRate, channels, audio::pcm_format::float32, false);
 

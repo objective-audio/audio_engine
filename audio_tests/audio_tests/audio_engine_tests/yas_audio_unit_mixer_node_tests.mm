@@ -23,9 +23,9 @@ using namespace yas;
 - (void)test_parameter_exists {
     audio::unit_mixer_node mixer_node;
 
-    const auto &paramters = mixer_node.parameters();
-    const auto &input_parameters = paramters.at(kAudioUnitScope_Input);
-    const auto &output_parameters = paramters.at(kAudioUnitScope_Output);
+    auto const &paramters = mixer_node.parameters();
+    auto const &input_parameters = paramters.at(kAudioUnitScope_Input);
+    auto const &output_parameters = paramters.at(kAudioUnitScope_Output);
 
     XCTAssertGreaterThanOrEqual(input_parameters.size(), 1);
     XCTAssertGreaterThanOrEqual(output_parameters.size(), 1);
@@ -51,13 +51,13 @@ using namespace yas;
 
 - (void)testElement {
     audio::unit_mixer_node mixer_node;
-    const uint32_t default_element_count = mixer_node.input_element_count();
+    uint32_t const default_element_count = mixer_node.input_element_count();
 
     XCTAssertGreaterThanOrEqual(default_element_count, 1);
     XCTAssertNoThrow(mixer_node.set_input_volume(0.5f, 0));
     XCTAssertThrows(mixer_node.set_input_volume(0.5f, default_element_count));
 
-    const uint32_t element_count = default_element_count + 8;
+    uint32_t const element_count = default_element_count + 8;
     XCTAssertNoThrow(mixer_node.audio_unit().set_element_count(element_count, kAudioUnitScope_Input));
 
     XCTAssertGreaterThanOrEqual(mixer_node.input_element_count(), element_count);
@@ -68,12 +68,12 @@ using namespace yas;
 - (void)testRestoreParamters {
     audio::unit_mixer_node mixer_node;
 
-    const uint32_t bus_idx = 0;
-    const float input_volume = 0.5f;
-    const float input_pan = 0.75f;
-    const bool enabled = false;
-    const float output_volume = 0.25f;
-    const float output_pan = 0.1f;
+    uint32_t const bus_idx = 0;
+    float const input_volume = 0.5f;
+    float const input_pan = 0.75f;
+    bool const enabled = false;
+    float const output_volume = 0.25f;
+    float const output_pan = 0.1f;
 
     mixer_node.set_input_volume(input_volume, bus_idx);
     mixer_node.set_input_pan(input_pan, bus_idx);

@@ -28,7 +28,7 @@ namespace test {
             set_file_name(nullptr);
         }
 
-        void set_file_type(const CFStringRef file_type) {
+        void set_file_type(CFStringRef const file_type) {
             set_cf_property(_file_type, file_type);
         }
 
@@ -36,7 +36,7 @@ namespace test {
             return get_cf_property(_file_type);
         }
 
-        void set_file_name(const CFStringRef file_name) {
+        void set_file_name(CFStringRef const file_name) {
             set_cf_property(_file_name, file_name);
         }
 
@@ -185,17 +185,17 @@ namespace test {
     NSString *filePath =
         [[self temporaryTestDirectory] stringByAppendingPathComponent:(__bridge NSString *)test_data.file_name()];
     CFURLRef fileURL = (__bridge CFURLRef)[NSURL fileURLWithPath:filePath];
-    const uint32_t frame_length = test_data.frame_length;
-    const uint32_t loopCount = test_data.loop_count;
-    const double file_sample_rate = test_data.file_sample_rate;
-    const double processing_sample_rate = test_data.processing_sample_rate;
-    const audio::pcm_format pcm_format = test_data.pcm_format;
-    const bool interleaved = test_data.interleaved;
-    const bool async = test_data.async;
+    uint32_t const frame_length = test_data.frame_length;
+    uint32_t const loopCount = test_data.loop_count;
+    double const file_sample_rate = test_data.file_sample_rate;
+    double const processing_sample_rate = test_data.processing_sample_rate;
+    audio::pcm_format const pcm_format = test_data.pcm_format;
+    bool const interleaved = test_data.interleaved;
+    bool const async = test_data.async;
     CFDictionaryRef settings = test_data.settings();
 
-    auto default_processing_format = audio::format(file_sample_rate, test_data.channels, pcm_format, interleaved);
-    auto processing_format = audio::format(processing_sample_rate, test_data.channels, pcm_format, interleaved);
+    auto const default_processing_format = audio::format(file_sample_rate, test_data.channels, pcm_format, interleaved);
+    auto const processing_format = audio::format(processing_sample_rate, test_data.channels, pcm_format, interleaved);
 
     // write
 
@@ -272,11 +272,11 @@ namespace test {
 #pragma mark -
 
 - (void)_writeToBuffer:(audio::pcm_buffer &)buffer
-            fileFormat:(const audio::format &)fileFormat
+            fileFormat:(audio::format const &)fileFormat
             startIndex:(NSInteger)startIndex {
-    const auto &format = buffer.format();
-    const uint32_t buffer_count = format.buffer_count();
-    const uint32_t stride = format.stride();
+    auto const &format = buffer.format();
+    uint32_t const buffer_count = format.buffer_count();
+    uint32_t const stride = format.stride();
 
     for (uint32_t buf_idx = 0; buf_idx < buffer_count; buf_idx++) {
         auto pointer = buffer.flex_ptr_at_index(buf_idx);
@@ -307,14 +307,14 @@ namespace test {
 }
 
 - (bool)_compareData:(audio::pcm_buffer &)buffer
-          fileFormat:(const audio::format &)fileFormat
+          fileFormat:(audio::format const &)fileFormat
           startIndex:(NSInteger)startIndex {
-    const auto &format = buffer.format();
-    const uint32_t buffer_count = format.buffer_count();
-    const uint32_t stride = format.stride();
+    auto const &format = buffer.format();
+    uint32_t const buffer_count = format.buffer_count();
+    uint32_t const stride = format.stride();
 
     for (uint32_t buf_idx = 0; buf_idx < buffer_count; buf_idx++) {
-        const auto pointer = buffer.flex_ptr_at_index(buf_idx);
+        auto const pointer = buffer.flex_ptr_at_index(buf_idx);
         for (NSInteger frameIndex = 0; frameIndex < buffer.frame_length(); frameIndex++) {
             int16_t value = frameIndex + startIndex + 1;
             for (NSInteger ch_idx = 0; ch_idx < stride; ch_idx++) {

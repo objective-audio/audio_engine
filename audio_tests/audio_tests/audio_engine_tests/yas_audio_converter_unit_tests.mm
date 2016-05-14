@@ -22,15 +22,15 @@ using namespace yas;
 
 - (void)testSetFormatSuccess {
     audio::unit converter_unit(kAudioUnitType_FormatConverter, kAudioUnitSubType_AUConverter);
-    const audio::pcm_format pcm_formats[] = {audio::pcm_format::float32, audio::pcm_format::float64,
+    audio::pcm_format const pcm_formats[] = {audio::pcm_format::float32, audio::pcm_format::float64,
                                              audio::pcm_format::int16, audio::pcm_format::fixed824};
-    const double sample_rates[] = {4000, 8000, 16000, 22050, 44100, 48000, 88100, 96000, 192000, 382000};
-    const bool interleaves[] = {false, true};
+    double const sample_rates[] = {4000, 8000, 16000, 22050, 44100, 48000, 88100, 96000, 192000, 382000};
+    bool const interleaves[] = {false, true};
 
-    for (const auto &pcm_format : pcm_formats) {
-        for (const auto &sample_rate : sample_rates) {
-            for (const auto &interleaved : interleaves) {
-                const auto format = audio::format(sample_rate, 2, pcm_format, interleaved);
+    for (auto const &pcm_format : pcm_formats) {
+        for (auto const &sample_rate : sample_rates) {
+            for (auto const &interleaved : interleaves) {
+                auto const format = audio::format(sample_rate, 2, pcm_format, interleaved);
                 XCTAssertNoThrow(converter_unit.manageable().initialize());
                 XCTAssertNoThrow(converter_unit.set_output_format(format.stream_description(), 0));
                 XCTAssertNoThrow(converter_unit.set_input_format(format.stream_description(), 0));

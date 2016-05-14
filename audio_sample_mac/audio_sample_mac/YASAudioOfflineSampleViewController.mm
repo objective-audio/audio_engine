@@ -18,7 +18,7 @@ namespace offline_sample {
         struct impl : audio::tap_node::impl {
             double phase_on_render;
 
-            void set_frequency(const float frequency) {
+            void set_frequency(float const frequency) {
                 std::lock_guard<std::recursive_mutex> lock(_mutex);
                 _frequency = frequency;
             }
@@ -49,20 +49,20 @@ namespace offline_sample {
 
             auto weak_node = to_weak(*this);
 
-            auto render_function = [weak_node](audio::pcm_buffer &buffer, const uint32_t bus_idx,
+            auto render_function = [weak_node](audio::pcm_buffer &buffer, uint32_t const bus_idx,
                                                const audio::time &when) {
                 buffer.clear();
 
                 if (auto node = weak_node.lock()) {
                     if (node.is_playing()) {
-                        const double start_phase = node.impl_ptr<impl>()->phase_on_render;
-                        const double phase_per_frame = node.frequency() / sample_rate * audio::math::two_pi;
+                        double const start_phase = node.impl_ptr<impl>()->phase_on_render;
+                        double const phase_per_frame = node.frequency() / sample_rate * audio::math::two_pi;
                         double next_phase = start_phase;
-                        const uint32_t frame_length = buffer.frame_length();
+                        uint32_t const frame_length = buffer.frame_length();
 
                         if (frame_length > 0) {
                             audio::frame_enumerator enumerator(buffer);
-                            const auto *flex_ptr = enumerator.pointer();
+                            auto const *flex_ptr = enumerator.pointer();
                             while (flex_ptr->v) {
                                 next_phase =
                                     audio::math::fill_sine(flex_ptr->f32, frame_length, start_phase, phase_per_frame);
@@ -83,7 +83,7 @@ namespace offline_sample {
 
         virtual ~sine_node() = default;
 
-        void set_frequency(const float frequency) {
+        void set_frequency(float const frequency) {
             impl_ptr<impl>()->set_frequency(frequency);
         }
 
@@ -153,7 +153,7 @@ namespace sample {
 
             engine_observer = play_engine.subject().make_observer(
                 audio::engine::method::configuration_change,
-                [weak_play_output_node = to_weak(play_output_node)](const auto &) {
+                [weak_play_output_node = to_weak(play_output_node)](auto const &) {
                     if (auto play_output_node = weak_play_output_node.lock()) {
                         play_output_node.set_device(audio::device::default_output_device());
                     }
@@ -258,7 +258,7 @@ namespace sample {
     [unowned_self.object() setObject:self];
 
     auto start_result = _internal.offline_engine.start_offline_render(
-        [remain, file_writer = std::move(file_writer)](audio::pcm_buffer & buffer, const auto &when,
+        [remain, file_writer = std::move(file_writer)](audio::pcm_buffer & buffer, auto const &when,
                                                        bool &out_stop) mutable {
             auto format = audio::format(buffer.format().stream_description());
             audio::pcm_buffer pcm_buffer(format, buffer.audio_buffer_list());

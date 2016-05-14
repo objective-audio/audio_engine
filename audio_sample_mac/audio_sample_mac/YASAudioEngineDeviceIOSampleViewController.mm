@@ -87,7 +87,7 @@ typedef NS_ENUM(NSUInteger, YASAudioDeviceRouteSampleInputType) {
 @interface YASAudioEngineDeviceIOSampleViewController () <NSTableViewDataSource, NSTableViewDelegate>
 
 @property (nonatomic, strong) NSArray *deviceNames;
-@property (nonatomic, assign) Float64 nominalSampleRate;
+@property (nonatomic, assign) double nominalSampleRate;
 @property (nonatomic, assign) NSUInteger selectedDeviceIndex;
 
 @property (atomic, strong) NSMutableArray *outputRoutes;
@@ -135,7 +135,7 @@ namespace sample {
     [self setupEngine];
 
     if (auto error = _internal.engine.start_render().error_opt()) {
-        const auto error_str = to_string(*error);
+        auto const error_str = to_string(*error);
         NSLog(@"audio engine start failed. error : %@", (__bridge NSString *)to_cf_object(error_str));
     }
 }
@@ -176,16 +176,16 @@ namespace sample {
 
     auto weak_node = to_weak(_internal.tap_node);
 
-    Float64 next_phase = 0.0;
+    double next_phase = 0.0;
 
-    auto render_function = [next_phase, weak_node](audio::pcm_buffer &buffer, const uint32_t bus_idx,
+    auto render_function = [next_phase, weak_node](audio::pcm_buffer &buffer, uint32_t const bus_idx,
                                                    const audio::time &when) mutable {
         buffer.clear();
 
         audio::frame_enumerator enumerator(buffer);
-        const auto *flex_ptr = enumerator.pointer();
-        const Float64 start_phase = next_phase;
-        const Float64 phase_per_frame = 1000.0 / buffer.format().sample_rate() * audio::math::two_pi;
+        auto const *flex_ptr = enumerator.pointer();
+        double const start_phase = next_phase;
+        double const phase_per_frame = 1000.0 / buffer.format().sample_rate() * audio::math::two_pi;
         while (flex_ptr->v) {
             next_phase = audio::math::fill_sine(flex_ptr->f32, buffer.frame_length(), start_phase, phase_per_frame);
             cblas_sscal(buffer.frame_length(), 0.2, flex_ptr->f32, 1);
@@ -200,7 +200,7 @@ namespace sample {
 
     _internal.system_observer = audio::device::system_subject().make_observer(
         audio::device::method::hardware_did_change,
-        [unowned_self](const auto &context) { [[unowned_self.object() object] _updateDeviceNames]; });
+        [unowned_self](auto const &context) { [[unowned_self.object() object] _updateDeviceNames]; });
 
     [self _updateDeviceNames];
 
@@ -264,9 +264,9 @@ namespace sample {
         _internal.engine.disconnect(_internal.route_node);
         _internal.route_node.clear_routes();
 
-        if (const auto &device = _internal.device_io_node.device()) {
+        if (auto const &device = _internal.device_io_node.device()) {
             if (device.output_channel_count() > 0) {
-                const auto output_format = device.output_format();
+                auto const output_format = device.output_format();
                 _internal.engine.connect(_internal.route_node, _internal.device_io_node, output_format);
                 _internal.engine.connect(_internal.tap_node, _internal.route_node, 0,
                                          YASAudioDeviceRouteSampleSourceBusSine, output_format);
@@ -280,8 +280,8 @@ namespace sample {
     }
 
     if (auto const device = _internal.device_io_node.device()) {
-        const uint32_t output_channel_count = device.output_channel_count();
-        const uint32_t input_channel_count = device.input_channel_count();
+        uint32_t const output_channel_count = device.output_channel_count();
+        uint32_t const input_channel_count = device.input_channel_count();
         NSMutableArray *outputRoutes = [NSMutableArray arrayWithCapacity:output_channel_count];
         NSMutableArray *inputRoutes = [NSMutableArray arrayWithCapacity:input_channel_count];
 
@@ -329,7 +329,7 @@ namespace sample {
 
     auto &routes = _internal.route_node.routes();
     for (YASAudioDeviceRouteSampleOutputData *data in self.outputRoutes) {
-        const uint32_t dst_ch_idx = data.outputIndex;
+        uint32_t const dst_ch_idx = data.outputIndex;
         auto it = std::find_if(routes.begin(), routes.end(), [dst_ch_idx](const audio::route &route) {
             return route.destination.channel == dst_ch_idx;
         });
@@ -337,7 +337,7 @@ namespace sample {
         uint32_t inputSelectIndex = 0;
 
         if (it != routes.end()) {
-            const auto &route = *it;
+            auto const &route = *it;
             if (route.source.bus == YASAudioDeviceRouteSampleSourceBusSine) {
                 inputSelectIndex = YASAudioDeviceRouteSampleInputTypeSine;
             } else if (route.source.bus == YASAudioDeviceRouteSampleSourceBusInput) {
@@ -377,7 +377,7 @@ namespace sample {
         return;
     }
 
-    const auto all_devices = audio::device::all_devices();
+    auto const all_devices = audio::device::all_devices();
 
     if (selected_device && std::find(all_devices.begin(), all_devices.end(), selected_device) != all_devices.end()) {
         _internal.device_io_node.set_device(selected_device);
@@ -387,10 +387,10 @@ namespace sample {
 
         _internal.device_observer = selected_device.subject().make_observer(
             audio::device::method::device_did_change, [selected_device, unowned_self](auto const &context) {
-                const auto &change_info = context.value;
-                const auto &infos = change_info.property_infos;
+                auto const &change_info = context.value;
+                auto const &infos = change_info.property_infos;
                 if (change_info.property_infos.size() > 0) {
-                    const auto &device_id = infos.at(0).object_id;
+                    auto const &device_id = infos.at(0).object_id;
                     if (selected_device.audio_device_id() == device_id) {
                         [[unowned_self.object() object] _updateConnection];
                     }

@@ -84,13 +84,13 @@ using namespace yas;
 
     bool tap_node_called = false;
     tap_node.set_render_function(
-        [&tap_node_called](const auto &, const auto, const auto &) { tap_node_called = true; });
+        [&tap_node_called](auto const &, auto const, auto const &) { tap_node_called = true; });
 
     {
         XCTestExpectation *expectation = [self expectationWithDescription:@"first render"];
 
-        XCTAssertTrue(engine.start_offline_render([](const auto &, const auto &, auto &out_stop) { out_stop = true; },
-                                                  [expectation](const bool cancelled) { [expectation fulfill]; }));
+        XCTAssertTrue(engine.start_offline_render([](auto const &, auto const &, auto &out_stop) { out_stop = true; },
+                                                  [expectation](bool const cancelled) { [expectation fulfill]; }));
 
         [self waitForExpectationsWithTimeout:0.5
                                      handler:^(NSError *error){
@@ -104,7 +104,7 @@ using namespace yas;
     route_node.add_route({0, 1, 0, 1});
 
     tap_node_called = false;
-    tap_node.set_render_function([&tap_node_called, self](const auto &buffer, const bool bus_idx, const auto &when) {
+    tap_node.set_render_function([&tap_node_called, self](auto const &buffer, bool const bus_idx, auto const &when) {
         tap_node_called = true;
         XCTAssertEqual(bus_idx, 0);
         test::fill_test_values_to_buffer(buffer);
@@ -114,12 +114,12 @@ using namespace yas;
         XCTestExpectation *expectation = [self expectationWithDescription:@"second render"];
 
         XCTAssertTrue(engine.start_offline_render(
-            [self](audio::pcm_buffer &buffer, const audio::time &when, bool &out_stop) {
+            [self](audio::pcm_buffer &buffer, audio::time const &when, bool &out_stop) {
                 out_stop = true;
                 audio::frame_enumerator enumerator(buffer);
                 auto pointer = enumerator.pointer();
-                const uint32_t *frm_idx = enumerator.frame();
-                const uint32_t *ch_idx = enumerator.channel();
+                uint32_t const *frm_idx = enumerator.frame();
+                uint32_t const *ch_idx = enumerator.channel();
 
                 while (pointer->v) {
                     while (pointer->v) {
@@ -131,7 +131,7 @@ using namespace yas;
                     yas_audio_frame_enumerator_move_frame(enumerator);
                 }
             },
-            [expectation](const bool cancelled) { [expectation fulfill]; }));
+            [expectation](bool const cancelled) { [expectation fulfill]; }));
 
         [self waitForExpectationsWithTimeout:0.5
                                      handler:^(NSError *error){
@@ -143,7 +143,7 @@ using namespace yas;
 }
 
 - (void)test_render_many_source {
-    const auto src_count = 2;
+    auto const src_count = 2;
 
     audio::engine engine;
 
@@ -167,7 +167,7 @@ using namespace yas;
         engine.connect(tap_node, route_node, 0, i, src_format);
 
         auto &tap_node_called = tap_node_calleds[i];
-        tap_node.set_render_function([&tap_node_called](const auto &buffer, const bool bus_idx, const auto &when) {
+        tap_node.set_render_function([&tap_node_called](auto const &buffer, bool const bus_idx, auto const &when) {
             tap_node_called = true;
             test::fill_test_values_to_buffer(buffer);
         });
@@ -179,12 +179,12 @@ using namespace yas;
     XCTestExpectation *expectation = [self expectationWithDescription:@"render"];
 
     XCTAssertTrue(engine.start_offline_render(
-        [self](audio::pcm_buffer &buffer, const audio::time &when, bool &out_stop) {
+        [self](audio::pcm_buffer &buffer, audio::time const &when, bool &out_stop) {
             out_stop = true;
             audio::frame_enumerator enumerator(buffer);
             auto pointer = enumerator.pointer();
-            const uint32_t *frm_idx = enumerator.frame();
-            const uint32_t *ch_idx = enumerator.channel();
+            uint32_t const *frm_idx = enumerator.frame();
+            uint32_t const *ch_idx = enumerator.channel();
 
             while (pointer->v) {
                 while (pointer->v) {
@@ -196,20 +196,20 @@ using namespace yas;
                 yas_audio_frame_enumerator_move_frame(enumerator);
             }
         },
-        [expectation](const bool cancelled) { [expectation fulfill]; }));
+        [expectation](bool const cancelled) { [expectation fulfill]; }));
 
     [self waitForExpectationsWithTimeout:0.5
                                  handler:^(NSError *error){
 
                                  }];
 
-    for (const auto &tap_node_called : tap_node_calleds) {
+    for (auto const &tap_node_called : tap_node_calleds) {
         XCTAssertTrue(tap_node_called);
     }
 }
 
 - (void)test_render_gappy_source {
-    const auto src_count = 2;
+    auto const src_count = 2;
 
     audio::engine engine;
 
@@ -233,7 +233,7 @@ using namespace yas;
         engine.connect(tap_node, route_node, 0, i, src_format);
 
         auto &tap_node_called = tap_node_calleds[i];
-        tap_node.set_render_function([&tap_node_called](const auto &buffer, const bool bus_idx, const auto &when) {
+        tap_node.set_render_function([&tap_node_called](auto const &buffer, bool const bus_idx, auto const &when) {
             tap_node_called = true;
             test::fill_test_values_to_buffer(buffer);
         });
@@ -245,12 +245,12 @@ using namespace yas;
     XCTestExpectation *expectation = [self expectationWithDescription:@"render"];
 
     XCTAssertTrue(engine.start_offline_render(
-        [self](audio::pcm_buffer &buffer, const audio::time &when, bool &out_stop) {
+        [self](audio::pcm_buffer &buffer, audio::time const &when, bool &out_stop) {
             out_stop = true;
             audio::frame_enumerator enumerator(buffer);
             auto pointer = enumerator.pointer();
-            const uint32_t *frm_idx = enumerator.frame();
-            const uint32_t *ch_idx = enumerator.channel();
+            uint32_t const *const frm_idx = enumerator.frame();
+            uint32_t const *const ch_idx = enumerator.channel();
 
             while (pointer->v) {
                 while (pointer->v) {
@@ -264,14 +264,14 @@ using namespace yas;
                 yas_audio_frame_enumerator_move_frame(enumerator);
             }
         },
-        [expectation](const bool cancelled) { [expectation fulfill]; }));
+        [expectation](bool const cancelled) { [expectation fulfill]; }));
 
     [self waitForExpectationsWithTimeout:0.5
                                  handler:^(NSError *error){
 
                                  }];
 
-    for (const auto &tap_node_called : tap_node_calleds) {
+    for (auto const &tap_node_called : tap_node_calleds) {
         XCTAssertTrue(tap_node_called);
     }
 }

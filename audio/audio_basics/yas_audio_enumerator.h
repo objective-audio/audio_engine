@@ -17,8 +17,8 @@ namespace audio {
         enumerator(flex_ptr const &pointer, uint32_t const byte_stride, uint32_t const length);
         enumerator(pcm_buffer const &buffer, uint32_t const channel);
 
-        const flex_ptr *pointer() const;
-        const uint32_t *index() const;
+        flex_ptr const *pointer() const;
+        uint32_t const *index() const;
         uint32_t length() const;
 
         void move();
@@ -39,9 +39,9 @@ namespace audio {
        public:
         explicit frame_enumerator(pcm_buffer const &buffer);
 
-        const flex_ptr *pointer() const;
-        const uint32_t *frame() const;
-        const uint32_t *channel() const;
+        flex_ptr const *pointer() const;
+        uint32_t const *frame() const;
+        uint32_t const *channel() const;
         uint32_t frame_length() const;
         uint32_t channel_count() const;
 

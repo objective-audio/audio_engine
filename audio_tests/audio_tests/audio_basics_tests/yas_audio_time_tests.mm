@@ -125,7 +125,7 @@ static NSInteger testCount = 8;
 }
 
 - (void)test_host_time {
-    const uint64_t host_time = 1000;
+    uint64_t const host_time = 1000;
     audio::time time{host_time};
 
     XCTAssertTrue(time.is_host_time_valid());
@@ -133,8 +133,8 @@ static NSInteger testCount = 8;
 }
 
 - (void)test_sample_time {
-    const int64_t sample_time = 2000;
-    const double sample_rate = 48000.0;
+    int64_t const sample_time = 2000;
+    double const sample_rate = 48000.0;
     audio::time time{sample_time, sample_rate};
 
     XCTAssertTrue(time.is_sample_time_valid());
@@ -150,9 +150,9 @@ static NSInteger testCount = 8;
 }
 
 - (void)test_equal_null_false {
-    const audio::time time1{4000, 48000.0};
-    const audio::time time2{nullptr};
-    const audio::time time3{nullptr};
+    audio::time const time1{4000, 48000.0};
+    audio::time const time2{nullptr};
+    audio::time const time3{nullptr};
 
     XCTAssertFalse(time1 == time2);
     XCTAssertFalse(time2 == time1);

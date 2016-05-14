@@ -78,7 +78,7 @@ namespace audio {
         CFStringRef manufacture() const;
         std::vector<stream> input_streams() const;
         std::vector<stream> output_streams() const;
-        Float64 nominal_sample_rate() const;
+        double nominal_sample_rate() const;
 
         audio::format input_format() const;
         audio::format output_format() const;

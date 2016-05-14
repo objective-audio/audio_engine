@@ -80,7 +80,7 @@ namespace sample {
                 success = YES;
                 [self.tableView reloadData];
             } else {
-                const auto error_string = to_string(start_result.error());
+                auto const error_string = to_string(start_result.error());
                 errorMessage = (__bridge NSString *)to_cf_object(error_string);
             }
         } else {
@@ -143,17 +143,17 @@ namespace sample {
 
     _internal = sample::effects_vc_internal();
 
-    Float64 phase = 0;
+    double phase = 0;
 
-    auto tap_render_function = [phase](audio::pcm_buffer &buffer, const uint32_t bus_idx,
+    auto tap_render_function = [phase](audio::pcm_buffer &buffer, uint32_t const bus_idx,
                                        const audio::time &when) mutable {
         buffer.clear();
 
-        const Float64 start_phase = phase;
-        const Float64 phase_per_frame = 1000.0 / buffer.format().sample_rate() * audio::math::two_pi;
+        double const start_phase = phase;
+        double const phase_per_frame = 1000.0 / buffer.format().sample_rate() * audio::math::two_pi;
         audio::frame_enumerator enumerator(buffer);
-        const auto *flex_ptr = enumerator.pointer();
-        const uint32_t length = enumerator.frame_length();
+        auto const *flex_ptr = enumerator.pointer();
+        uint32_t const length = enumerator.frame_length();
 
         uint32_t idx = 0;
         while (flex_ptr->v) {
@@ -209,7 +209,7 @@ namespace sample {
             cell.accessoryType = UITableViewCellAccessoryCheckmark;
         }
     } else if (indexPath.section == YASAudioEngineEffectsSampleSectionEffects) {
-        const auto &audio_unit = _audio_units.at(indexPath.row);
+        auto const &audio_unit = _audio_units.at(indexPath.row);
         cell.textLabel.text = (__bridge NSString *)audio_unit.name();
         if (_index && indexPath.row == *_index) {
             cell.accessoryType = UITableViewCellAccessoryCheckmark;
@@ -228,7 +228,7 @@ namespace sample {
         case YASAudioEngineEffectsSampleSectionEffects: {
             _index = static_cast<uint32_t>(indexPath.row);
             AudioComponentDescription acd = baseAcd;
-            const auto &audio_unit = _audio_units.at(indexPath.row);
+            auto const &audio_unit = _audio_units.at(indexPath.row);
             acd.componentSubType = audio_unit.sub_type();
             _internal.replace_effect_node(&acd);
         } break;

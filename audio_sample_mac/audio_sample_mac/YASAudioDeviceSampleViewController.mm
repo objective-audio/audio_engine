@@ -12,7 +12,7 @@
 
 using namespace yas;
 
-static const uint32_t kSineDataMaxCount = 4096;
+static uint32_t const kSineDataMaxCount = 4096;
 
 namespace yas {
 namespace audio_device_sample {
@@ -66,13 +66,13 @@ namespace audio_device_sample {
                 return;
             }
 
-            const uint32_t frame_length = output_buffer.frame_length();
+            uint32_t const frame_length = output_buffer.frame_length();
 
             if (frame_length == 0) {
                 return;
             }
 
-            const auto &format = output_buffer.format();
+            auto const &format = output_buffer.format();
             if (format.pcm_format() == audio::pcm_format::float32 && format.stride() == 1) {
                 audio::frame_enumerator enumerator(output_buffer);
                 auto pointer = enumerator.pointer();
@@ -81,7 +81,7 @@ namespace audio_device_sample {
                     if (input_buffer.frame_length() >= frame_length) {
                         output_buffer.copy_from(input_buffer);
 
-                        const float throughVol = through_volume();
+                        float const throughVol = through_volume();
 
                         while (pointer->v) {
                             cblas_sscal(frame_length, throughVol, pointer->f32, 1);
@@ -91,10 +91,10 @@ namespace audio_device_sample {
                     }
                 }
 
-                const double sample_rate = format.sample_rate();
-                const double start_phase = _phase;
-                const double sine_vol = sine_volume();
-                const double freq = sine_frequency();
+                double const sample_rate = format.sample_rate();
+                double const start_phase = _phase;
+                double const sine_vol = sine_volume();
+                double const freq = sine_frequency();
 
                 if (frame_length < kSineDataMaxCount) {
                     _phase = audio::math::fill_sine(&_sine_data[0], frame_length, start_phase,
@@ -177,7 +177,7 @@ namespace sample {
 
     _internal.system_observer = audio::device::system_subject().make_observer(
         audio::device::method::hardware_did_change,
-        [unowned_self](const auto &) { [[unowned_self.object() object] _updateDeviceNames]; });
+        [unowned_self](auto const &) { [[unowned_self.object() object] _updateDeviceNames]; });
 
     auto weak_device_io = to_weak(_internal.device_io);
     _internal.device_io.set_render_callback(
@@ -303,8 +303,8 @@ namespace sample {
 
         _internal.device_observer = selected_device.subject().make_observer(
             audio::device::method::device_did_change, [selected_device, unowned_self](auto const &context) {
-                const auto &change_info = context.value;
-                const auto &infos = change_info.property_infos;
+                auto const &change_info = context.value;
+                auto const &infos = change_info.property_infos;
                 if (infos.size() > 0) {
                     auto &device_id = infos.at(0).object_id;
                     if (selected_device.audio_device_id() == device_id) {

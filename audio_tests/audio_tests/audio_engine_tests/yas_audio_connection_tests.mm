@@ -24,8 +24,8 @@ using namespace yas;
     auto format = audio::format(48000.0, 2);
     test::audio_test_node source_node;
     test::audio_test_node destination_node;
-    const uint32_t source_bus = 0;
-    const uint32_t destination_bus = 1;
+    uint32_t const source_bus = 0;
+    uint32_t const destination_bus = 1;
 
     auto connection =
         audio::connection::private_access::create(source_node, source_bus, destination_node, destination_bus, format);
@@ -44,8 +44,8 @@ using namespace yas;
     auto format = audio::format(44100.0, 2);
     test::audio_test_node source_node;
     test::audio_test_node destination_node;
-    const uint32_t source_bus = 0;
-    const uint32_t destination_bus = 1;
+    uint32_t const source_bus = 0;
+    uint32_t const destination_bus = 1;
 
     auto connection =
         audio::connection::private_access::create(source_node, source_bus, destination_node, destination_bus, format);
@@ -60,8 +60,8 @@ using namespace yas;
     auto format = audio::format(8000.0, 2);
     test::audio_test_node source_node;
     test::audio_test_node destination_node;
-    const uint32_t source_bus = 0;
-    const uint32_t destination_bus = 1;
+    uint32_t const source_bus = 0;
+    uint32_t const destination_bus = 1;
 
     auto connection =
         audio::connection::private_access::create(source_node, source_bus, destination_node, destination_bus, format);
@@ -80,8 +80,8 @@ using namespace yas;
     auto format = audio::format(48000.0, 2);
     test::audio_test_node source_node;
     test::audio_test_node destination_node;
-    const uint32_t source_bus = 0;
-    const uint32_t destination_bus = 1;
+    uint32_t const source_bus = 0;
+    uint32_t const destination_bus = 1;
 
     audio::node null_node(nullptr);
     XCTAssertThrows(

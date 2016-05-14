@@ -24,7 +24,7 @@ namespace sample {
         graph_vc_internal() {
             AVAudioSession *audioSession = [AVAudioSession sharedInstance];
             [audioSession setCategory:AVAudioSessionCategoryPlayAndRecord error:nil];
-            const Float64 sample_rate = [audioSession sampleRate];
+            double const sample_rate = [audioSession sampleRate];
 
             auto format = audio::format(sample_rate, 2);
 

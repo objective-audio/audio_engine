@@ -27,9 +27,9 @@ using namespace yas;
     audio::offline_output_node output_node;
     audio::unit_node delay_node(kAudioUnitType_Effect, kAudioUnitSubType_Delay);
 
-    const auto &parameters = delay_node.parameters();
+    auto const &parameters = delay_node.parameters();
     XCTAssertGreaterThanOrEqual(parameters.count(kAudioUnitScope_Global), 1);
-    const auto &global_parameters = parameters.at(kAudioUnitScope_Global);
+    auto const &global_parameters = parameters.at(kAudioUnitScope_Global);
     XCTAssertEqual(global_parameters.size(), 4);
     for (auto &pair : global_parameters) {
         auto &parameter = pair.second;
@@ -41,14 +41,14 @@ using namespace yas;
     XCTestExpectation *expectation = [self expectationWithDescription:@"First Render"];
 
     auto start_result =
-        engine.start_offline_render(nullptr, [expectation](const bool cancelled) { [expectation fulfill]; });
+        engine.start_offline_render(nullptr, [expectation](bool const cancelled) { [expectation fulfill]; });
 
     XCTAssertTrue(start_result);
 
-    const float delay_time_value = 0.5f;
-    const float feedback_value = -50.0f;
-    const float lopass_cutoff_value = 100.0f;
-    const float wet_dry_mix = 10.0f;
+    float const delay_time_value = 0.5f;
+    float const feedback_value = -50.0f;
+    float const lopass_cutoff_value = 100.0f;
+    float const wet_dry_mix = 10.0f;
 
     delay_node.set_global_parameter_value(kDelayParam_DelayTime, delay_time_value);
     delay_node.set_global_parameter_value(kDelayParam_Feedback, feedback_value);
@@ -75,7 +75,7 @@ using namespace yas;
 
     expectation = [self expectationWithDescription:@"Second Render"];
 
-    engine.start_offline_render(nullptr, [expectation](const bool cancelled) { [expectation fulfill]; });
+    engine.start_offline_render(nullptr, [expectation](bool const cancelled) { [expectation fulfill]; });
 
     XCTAssertEqual(delay_node.global_parameter_value(kDelayParam_DelayTime), delay_time_value);
     XCTAssertEqual(delay_node.global_parameter_value(kDelayParam_Feedback), feedback_value);
@@ -93,9 +93,9 @@ using namespace yas;
 - (void)test_get_parameters {
     audio::unit_node delay_node(kAudioUnitType_Effect, kAudioUnitSubType_Delay);
 
-    const auto &global_parameters = delay_node.global_parameters();
-    const auto &output_parameters = delay_node.output_parameters();
-    const auto &input_parameters = delay_node.input_parameters();
+    auto const &global_parameters = delay_node.global_parameters();
+    auto const &output_parameters = delay_node.output_parameters();
+    auto const &input_parameters = delay_node.input_parameters();
 
     XCTAssertGreaterThan(global_parameters.size(), 0);
     XCTAssertEqual(output_parameters.size(), 0);
@@ -117,10 +117,10 @@ using namespace yas;
 - (void)test_reset_parameters {
     audio::unit_node delay_node(kAudioUnitType_Effect, kAudioUnitSubType_Delay);
 
-    const float delay_time_value = 0.5f;
-    const float feedback_value = -50.0f;
-    const float lopass_cutoff_value = 100.0f;
-    const float wet_dry_mix = 10.0f;
+    float const delay_time_value = 0.5f;
+    float const feedback_value = -50.0f;
+    float const lopass_cutoff_value = 100.0f;
+    float const wet_dry_mix = 10.0f;
 
     XCTAssertNotEqual(delay_node.global_parameter_value(kDelayParam_DelayTime), delay_time_value);
     XCTAssertNotEqual(delay_node.global_parameter_value(kDelayParam_Feedback), feedback_value);

@@ -23,11 +23,11 @@ audio::enumerator::enumerator(pcm_buffer const &buffer, uint32_t const channel)
                  buffer.frame_length()) {
 }
 
-const flex_ptr *audio::enumerator::pointer() const {
+flex_ptr const *audio::enumerator::pointer() const {
     return &_pointer;
 }
 
-const uint32_t *audio::enumerator::index() const {
+uint32_t const *audio::enumerator::index() const {
     return &_index;
 }
 
@@ -92,15 +92,15 @@ audio::frame_enumerator::frame_enumerator(pcm_buffer const &buffer)
     _pointer.v = _pointers[0].v;
 }
 
-const flex_ptr *audio::frame_enumerator::pointer() const {
+flex_ptr const *audio::frame_enumerator::pointer() const {
     return &_pointer;
 }
 
-const uint32_t *audio::frame_enumerator::frame() const {
+uint32_t const *audio::frame_enumerator::frame() const {
     return &_frame;
 }
 
-const uint32_t *audio::frame_enumerator::channel() const {
+uint32_t const *audio::frame_enumerator::channel() const {
     return &_channel;
 }
 
