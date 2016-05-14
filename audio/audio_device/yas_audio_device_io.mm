@@ -19,23 +19,44 @@
 
 using namespace yas;
 
-struct audio::device_io::kernel {
-    pcm_buffer input_buffer;
-    pcm_buffer output_buffer;
+struct audio::device_io::kernel : base {
+    struct impl : base::impl {
+        pcm_buffer input_buffer;
+        pcm_buffer output_buffer;
+
+        impl(audio::format const &input_format, audio::format const &output_format, uint32_t const frame_capacity)
+            : input_buffer(input_format ? pcm_buffer{input_format, frame_capacity} : nullptr),
+              output_buffer(output_format ? pcm_buffer{output_format, frame_capacity} : nullptr) {
+        }
+
+        void reset_buffers() {
+            if (input_buffer) {
+                input_buffer.reset();
+            }
+
+            if (output_buffer) {
+                output_buffer.reset();
+            }
+        }
+    };
 
     kernel(audio::format const &input_format, audio::format const &output_format, uint32_t const frame_capacity)
-        : input_buffer(input_format ? pcm_buffer(input_format, frame_capacity) : nullptr),
-          output_buffer(output_format ? pcm_buffer(output_format, frame_capacity) : nullptr) {
+        : base(std::make_shared<impl>(input_format, output_format, frame_capacity)) {
+    }
+
+    kernel(std::nullptr_t) : base(nullptr) {
+    }
+
+    pcm_buffer &input_buffer() {
+        return impl_ptr<impl>()->input_buffer;
+    }
+
+    pcm_buffer &output_buffer() {
+        return impl_ptr<impl>()->output_buffer;
     }
 
     void reset_buffers() {
-        if (input_buffer) {
-            input_buffer.reset();
-        }
-
-        if (output_buffer) {
-            output_buffer.reset();
-        }
+        impl_ptr<impl>()->reset_buffers();
     }
 };
 
@@ -132,9 +153,9 @@ struct audio::device_io::impl : base::impl {
             if (auto device_io = weak_device_io.lock()) {
                 auto imp = device_io.impl_ptr<impl>();
                 if (auto kernel = imp->kernel()) {
-                    kernel->reset_buffers();
+                    kernel.reset_buffers();
                     if (inInputData) {
-                        if (auto &input_buffer = kernel->input_buffer) {
+                        if (auto &input_buffer = kernel.input_buffer()) {
                             input_buffer.copy_from(inInputData);
 
                             uint32_t const input_frame_length = input_buffer.frame_length();
@@ -147,7 +168,7 @@ struct audio::device_io::impl : base::impl {
                     }
 
                     if (auto render_callback = imp->render_callback()) {
-                        if (auto &output_buffer = kernel->output_buffer) {
+                        if (auto &output_buffer = kernel.output_buffer()) {
                             if (outOutputData) {
                                 uint32_t const frame_length =
                                     audio::frame_length(outOutputData, output_buffer.format().sample_byte_count());
@@ -158,7 +179,7 @@ struct audio::device_io::impl : base::impl {
                                     output_buffer.copy_to(outOutputData);
                                 }
                             }
-                        } else if (kernel->input_buffer) {
+                        } else if (kernel.input_buffer()) {
                             pcm_buffer null_buffer{nullptr};
                             render_callback(null_buffer, nullptr);
                         }
@@ -237,15 +258,15 @@ struct audio::device_io::impl : base::impl {
         return _maximum_frames;
     }
 
-    void set_kernel(const std::shared_ptr<kernel> &kernel) {
+    void set_kernel(device_io::kernel kernel) {
         std::lock_guard<std::recursive_mutex> lock(_mutex);
         _kernel = nullptr;
         if (kernel) {
-            _kernel = kernel;
+            _kernel = std::move(kernel);
         }
     }
 
-    std::shared_ptr<kernel> kernel() const {
+    device_io::kernel kernel() const {
         std::lock_guard<std::recursive_mutex> lock(_mutex);
         return _kernel;
     }
@@ -259,13 +280,13 @@ struct audio::device_io::impl : base::impl {
             return;
         }
 
-        set_kernel(std::make_shared<device_io::kernel>(device.input_format(), device.output_format(), _maximum_frames));
+        set_kernel(device_io::kernel{device.input_format(), device.output_format(), _maximum_frames});
     }
 
    private:
     render_f _render_callback;
     uint32_t _maximum_frames;
-    std::shared_ptr<device_io::kernel> _kernel;
+    device_io::kernel _kernel = nullptr;
     mutable std::recursive_mutex _mutex;
 };
 
