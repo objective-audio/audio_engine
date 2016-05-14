@@ -474,9 +474,9 @@ std::vector<audio::device::stream> audio::device::output_streams() const {
     return streams;
 }
 
-Float64 audio::device::nominal_sample_rate() const {
-    if (auto const data = _property_data<Float64>(audio_device_id(), kAudioDevicePropertyNominalSampleRate,
-                                                  kAudioObjectPropertyScopeGlobal)) {
+double audio::device::nominal_sample_rate() const {
+    if (auto const data = _property_data<double>(audio_device_id(), kAudioDevicePropertyNominalSampleRate,
+                                                 kAudioObjectPropertyScopeGlobal)) {
         return *data->data();
     }
     return 0;

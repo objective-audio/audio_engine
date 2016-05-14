@@ -14,6 +14,6 @@ namespace audio {
 
 @interface YASAudioEngineSampleParameterCell : UITableViewCell
 
-- (void)set_node:(const std::experimental::optional<yas::audio::unit_node> &)node_opt index:(const uint32_t)index;
+- (void)set_node:(const std::experimental::optional<yas::audio::unit_node> &)node_opt index:(uint32_t const)index;
 
 @end

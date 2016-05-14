@@ -21,12 +21,12 @@ using namespace yas;
 }
 
 - (void)test_create_route_full {
-    const uint32_t src_bus_idx = 0;
-    const uint32_t src_ch_idx = 1;
-    const uint32_t dst_bus_idx = 2;
-    const uint32_t dst_ch_idx = 3;
+    uint32_t const src_bus_idx = 0;
+    uint32_t const src_ch_idx = 1;
+    uint32_t const dst_bus_idx = 2;
+    uint32_t const dst_ch_idx = 3;
 
-    auto route = audio::route(src_bus_idx, src_ch_idx, dst_bus_idx, dst_ch_idx);
+    auto const route = audio::route(src_bus_idx, src_ch_idx, dst_bus_idx, dst_ch_idx);
 
     XCTAssertEqual(route.source.bus, src_bus_idx);
     XCTAssertEqual(route.source.channel, src_ch_idx);
@@ -35,10 +35,10 @@ using namespace yas;
 }
 
 - (void)test_create_route_common {
-    const uint32_t bus_idx = 4;
-    const uint32_t ch_idx = 5;
+    uint32_t const bus_idx = 4;
+    uint32_t const ch_idx = 5;
 
-    auto route = audio::route(bus_idx, ch_idx);
+    auto const route = audio::route(bus_idx, ch_idx);
 
     XCTAssertEqual(route.source.bus, bus_idx);
     XCTAssertEqual(route.source.channel, ch_idx);
@@ -47,10 +47,10 @@ using namespace yas;
 }
 
 - (void)test_create_route_points {
-    const audio::route::point src_point(0, 1);
-    const audio::route::point dst_point(2, 3);
+    audio::route::point const src_point(0, 1);
+    audio::route::point const dst_point(2, 3);
 
-    auto route = audio::route(src_point, dst_point);
+    auto const route = audio::route(src_point, dst_point);
 
     XCTAssertEqual(route.source.bus, 0);
     XCTAssertEqual(route.source.channel, 1);
@@ -64,7 +64,7 @@ using namespace yas;
     auto result = audio::channel_map_from_routes(routes, 0, 2, 0, 2);
     XCTAssertTrue(result);
 
-    const auto &map = result.value();
+    auto const &map = result.value();
     XCTAssertEqual(map.at(0), 0);
     XCTAssertEqual(map.at(1), 1);
 }
@@ -75,7 +75,7 @@ using namespace yas;
     auto result = audio::channel_map_from_routes(routes, 0, 1, 0, 2);
     XCTAssertTrue(result);
 
-    const auto &map = result.value();
+    auto const &map = result.value();
     XCTAssertEqual(map.size(), 1);
     XCTAssertEqual(map.at(0), 0);
 }
@@ -86,7 +86,7 @@ using namespace yas;
     auto result = audio::channel_map_from_routes(routes, 0, 2, 0, 1);
     XCTAssertTrue(result);
 
-    const auto &map = result.value();
+    auto const &map = result.value();
     XCTAssertEqual(map.at(0), 0);
     XCTAssertEqual(map.at(1), -1);
 }
@@ -97,7 +97,7 @@ using namespace yas;
     auto result_0_0 = audio::channel_map_from_routes(routes, 0, 2, 0, 2);
     XCTAssertTrue(result_0_0);
     if (result_0_0) {
-        const auto &map = result_0_0.value();
+        auto const &map = result_0_0.value();
         XCTAssertEqual(map.at(0), 0);
         XCTAssertEqual(map.at(1), -1);
     }
@@ -105,7 +105,7 @@ using namespace yas;
     auto result_0_1 = audio::channel_map_from_routes(routes, 0, 2, 1, 2);
     XCTAssertTrue(result_0_1);
     if (result_0_1) {
-        const auto &map = result_0_1.value();
+        auto const &map = result_0_1.value();
         XCTAssertEqual(map.at(0), -1);
         XCTAssertEqual(map.at(1), 1);
     }
@@ -113,7 +113,7 @@ using namespace yas;
     auto result_1_0 = audio::channel_map_from_routes(routes, 1, 2, 0, 2);
     XCTAssertTrue(result_1_0);
     if (result_1_0) {
-        const auto &map = result_1_0.value();
+        auto const &map = result_1_0.value();
         XCTAssertEqual(map.at(0), 1);
         XCTAssertEqual(map.at(1), -1);
     }
@@ -121,7 +121,7 @@ using namespace yas;
     auto result_1_1 = audio::channel_map_from_routes(routes, 1, 2, 1, 2);
     XCTAssertTrue(result_1_1);
     if (result_1_1) {
-        const auto &map = result_1_1.value();
+        auto const &map = result_1_1.value();
         XCTAssertEqual(map.at(0), -1);
         XCTAssertEqual(map.at(1), 0);
     }

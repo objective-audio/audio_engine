@@ -59,10 +59,10 @@ using namespace yas;
 }
 
 - (void)test_set_frame_length {
-    const uint32_t frame_capacity = 4;
+    uint32_t const frame_capacity = 4;
 
     audio::pcm_buffer pcm_buffer(audio::format(48000.0, 1), frame_capacity);
-    const auto &format = pcm_buffer.format();
+    auto const &format = pcm_buffer.format();
 
     XCTAssertEqual(pcm_buffer.frame_length(), frame_capacity);
     XCTAssertEqual(pcm_buffer.audio_buffer_list()->mBuffers[0].mDataByteSize,
@@ -84,7 +84,7 @@ using namespace yas;
 
 - (void)test_clear_data {
     auto test = [self](bool interleaved) {
-        const uint32_t frame_length = 4;
+        uint32_t const frame_length = 4;
 
         auto format = audio::format(48000.0, 2, audio::pcm_format::float32, interleaved);
         audio::pcm_buffer buffer(format, frame_length);
@@ -101,8 +101,8 @@ using namespace yas;
 
         buffer.clear(1, 2);
 
-        const uint32_t buffer_count = buffer.format().buffer_count();
-        const uint32_t stride = buffer.format().stride();
+        uint32_t const buffer_count = buffer.format().buffer_count();
+        uint32_t const stride = buffer.format().stride();
 
         for (uint32_t buffer_index = 0; buffer_index < buffer_count; buffer_index++) {
             float *ptr = buffer.data_ptr_at_index<float>(buffer_index);
@@ -124,11 +124,11 @@ using namespace yas;
 
 - (void)test_copy_data_interleaved_format_success {
     auto test = [self](bool interleaved) {
-        const uint32_t frame_length = 4;
+        uint32_t const frame_length = 4;
 
         for (auto i = static_cast<int>(audio::pcm_format::float32); i <= static_cast<int>(audio::pcm_format::fixed824);
              ++i) {
-            const auto pcm_format = static_cast<audio::pcm_format>(i);
+            auto const pcm_format = static_cast<audio::pcm_format>(i);
             auto format = audio::format(48000.0, 2, pcm_format, interleaved);
 
             audio::pcm_buffer from_buffer(format, frame_length);
@@ -146,13 +146,13 @@ using namespace yas;
 }
 
 - (void)test_copy_data_defferent_interleaved_format_success {
-    const double sample_rate = 48000;
-    const uint32_t frame_length = 4;
-    const uint32_t channels = 3;
+    double const sample_rate = 48000;
+    uint32_t const frame_length = 4;
+    uint32_t const channels = 3;
 
     for (auto i = static_cast<int>(audio::pcm_format::float32); i <= static_cast<int>(audio::pcm_format::fixed824);
          ++i) {
-        const auto pcm_format = static_cast<audio::pcm_format>(i);
+        auto const pcm_format = static_cast<audio::pcm_format>(i);
         auto from_format = audio::format(sample_rate, channels, pcm_format, true);
         auto to_format = audio::format(sample_rate, channels, pcm_format, false);
         audio::pcm_buffer from_buffer(from_format, frame_length);
@@ -166,14 +166,14 @@ using namespace yas;
 }
 
 - (void)test_copy_data_different_frame_length {
-    const double sample_rate = 48000;
-    const uint32_t channels = 1;
-    const uint32_t from_frame_length = 4;
-    const uint32_t to_frame_length = 2;
+    double const sample_rate = 48000;
+    uint32_t const channels = 1;
+    uint32_t const from_frame_length = 4;
+    uint32_t const to_frame_length = 2;
 
     for (auto i = static_cast<int>(audio::pcm_format::float32); i <= static_cast<int>(audio::pcm_format::fixed824);
          ++i) {
-        const auto pcm_format = static_cast<audio::pcm_format>(i);
+        auto const pcm_format = static_cast<audio::pcm_format>(i);
         auto format = audio::format(sample_rate, channels, pcm_format, true);
         audio::pcm_buffer from_buffer(format, from_frame_length);
         audio::pcm_buffer to_buffer(format, to_frame_length);
@@ -188,16 +188,16 @@ using namespace yas;
 
 - (void)test_copy_data_start_frame {
     auto test = [self](bool interleaved) {
-        const double sample_rate = 48000;
-        const uint32_t from_frame_length = 4;
-        const uint32_t to_frame_length = 8;
-        const uint32_t from_start_frame = 2;
-        const uint32_t to_start_frame = 4;
-        const uint32_t channels = 2;
+        double const sample_rate = 48000;
+        uint32_t const from_frame_length = 4;
+        uint32_t const to_frame_length = 8;
+        uint32_t const from_start_frame = 2;
+        uint32_t const to_start_frame = 4;
+        uint32_t const channels = 2;
 
         for (auto i = static_cast<int>(audio::pcm_format::float32); i <= static_cast<int>(audio::pcm_format::fixed824);
              ++i) {
-            const auto pcm_format = static_cast<audio::pcm_format>(i);
+            auto const pcm_format = static_cast<audio::pcm_format>(i);
             auto format = audio::format(sample_rate, channels, pcm_format, interleaved);
 
             audio::pcm_buffer from_buffer(format, from_frame_length);
@@ -205,7 +205,7 @@ using namespace yas;
 
             test::fill_test_values_to_buffer(from_buffer);
 
-            const uint32_t length = 2;
+            uint32_t const length = 2;
             XCTAssertTrue(to_buffer.copy_from(from_buffer, from_start_frame, to_start_frame, length));
 
             for (uint32_t ch_idx = 0; ch_idx < channels; ch_idx++) {
@@ -236,13 +236,13 @@ using namespace yas;
 
 - (void)test_copy_data_flexibly_same_format {
     auto test = [self](bool interleaved) {
-        const double sample_rate = 48000.0;
-        const uint32_t frame_length = 4;
-        const uint32_t channels = 2;
+        double const sample_rate = 48000.0;
+        uint32_t const frame_length = 4;
+        uint32_t const channels = 2;
 
         for (auto i = static_cast<int>(audio::pcm_format::float32); i <= static_cast<int>(audio::pcm_format::fixed824);
              ++i) {
-            const auto pcm_format = static_cast<audio::pcm_format>(i);
+            auto const pcm_format = static_cast<audio::pcm_format>(i);
             auto format = audio::format(sample_rate, channels, pcm_format, interleaved);
 
             audio::pcm_buffer from_buffer(format, frame_length);
@@ -261,9 +261,9 @@ using namespace yas;
 
 - (void)test_copy_data_flexibly_different_format_success {
     auto test = [self](bool interleaved) {
-        const double sample_rate = 48000.0;
-        const uint32_t frame_length = 4;
-        const uint32_t channels = 2;
+        double const sample_rate = 48000.0;
+        uint32_t const frame_length = 4;
+        uint32_t const channels = 2;
 
         for (auto i = static_cast<int>(audio::pcm_format::float32); i <= static_cast<int>(audio::pcm_format::fixed824);
              ++i) {
@@ -287,11 +287,11 @@ using namespace yas;
 }
 
 - (void)test_copy_data_flexibly_different_pcm_format_failed {
-    const double sample_rate = 48000.0;
-    const uint32_t frame_length = 4;
-    const uint32_t channels = 2;
-    const auto from_pcm_format = audio::pcm_format::float32;
-    const auto to_pcm_format = audio::pcm_format::fixed824;
+    double const sample_rate = 48000.0;
+    uint32_t const frame_length = 4;
+    uint32_t const channels = 2;
+    auto const from_pcm_format = audio::pcm_format::float32;
+    auto const to_pcm_format = audio::pcm_format::fixed824;
 
     auto from_format = audio::format(sample_rate, channels, from_pcm_format, false);
     auto to_format = audio::format(sample_rate, channels, to_pcm_format, true);
@@ -303,9 +303,9 @@ using namespace yas;
 }
 
 - (void)test_copy_data_flexibly_from_abl_same_format {
-    const double sample_rate = 48000.0;
-    const uint32_t frame_length = 4;
-    const uint32_t channels = 2;
+    double const sample_rate = 48000.0;
+    uint32_t const frame_length = 4;
+    uint32_t const channels = 2;
 
     for (auto i = static_cast<int>(audio::pcm_format::float32); i <= static_cast<int>(audio::pcm_format::fixed824);
          ++i) {
@@ -333,9 +333,9 @@ using namespace yas;
 }
 
 - (void)test_copy_data_flexibly_to_abl {
-    const double sample_rate = 48000.0;
-    const uint32_t frame_length = 4;
-    const uint32_t channels = 2;
+    double const sample_rate = 48000.0;
+    uint32_t const frame_length = 4;
+    uint32_t const channels = 2;
 
     for (auto i = static_cast<int>(audio::pcm_format::float32); i <= static_cast<int>(audio::pcm_format::fixed824);
          ++i) {
@@ -361,18 +361,18 @@ using namespace yas;
 }
 
 - (void)test_create_buffer_with_channel_map_many_destination {
-    const uint32_t frame_length = 4;
-    const uint32_t src_ch_count = 2;
-    const uint32_t dst_ch_count = 4;
-    const uint32_t sample_rate = 48000;
-    const audio::channel_map_t channel_map{3, 0};
+    uint32_t const frame_length = 4;
+    uint32_t const src_ch_count = 2;
+    uint32_t const dst_ch_count = 4;
+    uint32_t const sample_rate = 48000;
+    audio::channel_map_t const channel_map{3, 0};
 
-    const auto dst_format = audio::format(sample_rate, dst_ch_count);
+    auto const dst_format = audio::format(sample_rate, dst_ch_count);
     audio::pcm_buffer dst_buffer(dst_format, frame_length);
     test::fill_test_values_to_buffer(dst_buffer);
 
-    const auto src_format = audio::format(sample_rate, src_ch_count);
-    const audio::pcm_buffer src_buffer(src_format, dst_buffer, channel_map);
+    auto const src_format = audio::format(sample_rate, src_ch_count);
+    audio::pcm_buffer const src_buffer(src_format, dst_buffer, channel_map);
 
     [self assert_buffer_with_channel_map:channel_map
                            source_buffer:src_buffer
@@ -381,18 +381,18 @@ using namespace yas;
 }
 
 - (void)test_create_buffer_with_channel_map_many_source {
-    const uint32_t frame_length = 4;
-    const uint32_t src_ch_count = 4;
-    const uint32_t dst_ch_count = 2;
-    const uint32_t sample_rate = 48000;
-    const audio::channel_map_t channel_map{1, static_cast<uint32_t>(-1), static_cast<uint32_t>(-1), 0};
+    uint32_t const frame_length = 4;
+    uint32_t const src_ch_count = 4;
+    uint32_t const dst_ch_count = 2;
+    uint32_t const sample_rate = 48000;
+    audio::channel_map_t const channel_map{1, static_cast<uint32_t>(-1), static_cast<uint32_t>(-1), 0};
 
-    const auto dst_format = audio::format(sample_rate, dst_ch_count);
+    auto const dst_format = audio::format(sample_rate, dst_ch_count);
     audio::pcm_buffer dst_buffer(dst_format, frame_length);
     test::fill_test_values_to_buffer(dst_buffer);
 
-    const auto src_format = audio::format(sample_rate, src_ch_count);
-    const audio::pcm_buffer src_buffer(src_format, dst_buffer, channel_map);
+    auto const src_format = audio::format(sample_rate, src_ch_count);
+    audio::pcm_buffer const src_buffer(src_format, dst_buffer, channel_map);
 
     [self assert_buffer_with_channel_map:channel_map
                            source_buffer:src_buffer
@@ -401,11 +401,11 @@ using namespace yas;
 }
 
 - (void)test_allocate_abl_interleaved {
-    const uint32_t ch_idx = 2;
-    const uint32_t size = 4;
+    uint32_t const ch_idx = 2;
+    uint32_t const size = 4;
 
-    const auto pair = audio::allocate_audio_buffer_list(1, ch_idx, size);
-    const audio::abl_uptr &abl = pair.first;
+    auto const pair = audio::allocate_audio_buffer_list(1, ch_idx, size);
+    audio::abl_uptr const &abl = pair.first;
 
     XCTAssertEqual(abl->mNumberBuffers, 1);
     XCTAssertEqual(abl->mBuffers[0].mNumberChannels, ch_idx);
@@ -414,11 +414,11 @@ using namespace yas;
 }
 
 - (void)test_allocate_abl_deinterleaved {
-    const uint32_t buf = 2;
-    const uint32_t size = 4;
+    uint32_t const buf = 2;
+    uint32_t const size = 4;
 
-    const auto pair = audio::allocate_audio_buffer_list(buf, 1, size);
-    const audio::abl_uptr &abl = pair.first;
+    auto const pair = audio::allocate_audio_buffer_list(buf, 1, size);
+    audio::abl_uptr const &abl = pair.first;
 
     XCTAssertTrue(abl != nullptr);
     XCTAssertEqual(abl->mNumberBuffers, buf);
@@ -433,8 +433,8 @@ using namespace yas;
     uint32_t buf = 1;
     uint32_t ch_idx = 1;
 
-    const auto pair1 = audio::allocate_audio_buffer_list(buf, ch_idx, 0);
-    const audio::abl_uptr &abl1 = pair1.first;
+    auto const pair1 = audio::allocate_audio_buffer_list(buf, ch_idx, 0);
+    audio::abl_uptr const &abl1 = pair1.first;
 
     XCTAssertTrue(abl1 != nullptr);
     for (uint32_t i = 0; i < buf; i++) {
@@ -443,8 +443,8 @@ using namespace yas;
         XCTAssertTrue(abl1->mBuffers[i].mData == nullptr);
     }
 
-    const auto pair2 = audio::allocate_audio_buffer_list(buf, ch_idx);
-    const audio::abl_uptr &abl2 = pair2.first;
+    auto const pair2 = audio::allocate_audio_buffer_list(buf, ch_idx);
+    audio::abl_uptr const &abl2 = pair2.first;
 
     XCTAssertTrue(abl2 != nullptr);
     XCTAssertEqual(abl2->mNumberBuffers, buf);
@@ -541,7 +541,7 @@ using namespace yas;
 }
 
 - (void)test_const_data_ptr_at_index {
-    const audio::pcm_buffer buffer(audio::format(44100.0, 2), 1);
+    audio::pcm_buffer const buffer(audio::format(44100.0, 2), 1);
     auto abl = buffer.audio_buffer_list();
 
     XCTAssertEqual(buffer.data_ptr_at_index<float>(0), abl->mBuffers[0].mData);
@@ -557,7 +557,7 @@ using namespace yas;
 }
 
 - (void)test_const_data_ptr_at_channel_deinterleaved {
-    const audio::pcm_buffer buffer(audio::format(44100.0, 2, audio::pcm_format::float32, false), 1);
+    audio::pcm_buffer const buffer(audio::format(44100.0, 2, audio::pcm_format::float32, false), 1);
     auto abl = buffer.audio_buffer_list();
 
     XCTAssertEqual(buffer.data_ptr_at_channel<float>(0), abl->mBuffers[0].mData);
@@ -574,7 +574,7 @@ using namespace yas;
 }
 
 - (void)test_const_data_ptr_at_channel_interleaved {
-    const audio::pcm_buffer buffer(audio::format(44100.0, 2, audio::pcm_format::float32, true), 1);
+    audio::pcm_buffer const buffer(audio::format(44100.0, 2, audio::pcm_format::float32, true), 1);
     auto abl = buffer.audio_buffer_list();
 
     float *data = static_cast<float *>(abl->mBuffers[0].mData);
@@ -611,17 +611,17 @@ using namespace yas;
 
 #pragma mark -
 
-- (void)assert_buffer_with_channel_map:(const audio::channel_map_t &)channel_map
-                         source_buffer:(const audio::pcm_buffer &)src_buffer
-                    destination_buffer:(const audio::pcm_buffer &)dst_buffer
-                          frame_length:(const uint32_t)frame_length {
+- (void)assert_buffer_with_channel_map:(audio::channel_map_t const &)channel_map
+                         source_buffer:(audio::pcm_buffer const &)src_buffer
+                    destination_buffer:(audio::pcm_buffer const &)dst_buffer
+                          frame_length:(uint32_t const)frame_length {
     if (src_buffer.format().channel_count() != channel_map.size()) {
         XCTAssert(0);
         return;
     }
 
     uint32_t src_ch_idx = 0;
-    for (const auto &dst_ch_idx : channel_map) {
+    for (auto const &dst_ch_idx : channel_map) {
         if (dst_ch_idx != -1) {
             auto dst_ptr = dst_buffer.flex_ptr_at_index(dst_ch_idx);
             auto src_ptr = src_buffer.flex_ptr_at_index(src_ch_idx);

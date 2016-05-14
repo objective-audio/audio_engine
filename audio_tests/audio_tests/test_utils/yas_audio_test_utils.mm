@@ -6,15 +6,15 @@
 
 using namespace yas;
 
-uint32_t test::test_value(const uint32_t frame, const uint32_t ch_idx, const uint32_t buf_idx) {
+uint32_t test::test_value(uint32_t const frame, uint32_t const ch_idx, uint32_t const buf_idx) {
     return frame + 1024 * (ch_idx + 1) + 512 * (buf_idx + 1);
 }
 
-void test::fill_test_values_to_buffer(const audio::pcm_buffer &buffer) {
-    const auto &format = buffer.format();
-    const audio::pcm_format pcmFormat = format.pcm_format();
-    const uint32_t buffer_count = format.buffer_count();
-    const uint32_t stride = format.stride();
+void test::fill_test_values_to_buffer(audio::pcm_buffer const &buffer) {
+    auto const &format = buffer.format();
+    audio::pcm_format const pcmFormat = format.pcm_format();
+    uint32_t const buffer_count = format.buffer_count();
+    uint32_t const stride = format.stride();
 
     for (uint32_t buf_idx = 0; buf_idx < buffer_count; buf_idx++) {
         flex_ptr pointer = buffer.flex_ptr_at_index(buf_idx);
@@ -43,8 +43,8 @@ void test::fill_test_values_to_buffer(const audio::pcm_buffer &buffer) {
     }
 }
 
-bool test::is_cleared_buffer(const audio::pcm_buffer &buffer) {
-    const AudioBufferList *abl = buffer.audio_buffer_list();
+bool test::is_cleared_buffer(audio::pcm_buffer const &buffer) {
+    AudioBufferList const *abl = buffer.audio_buffer_list();
 
     for (uint32_t buf_idx = 0; buf_idx < abl->mNumberBuffers; buf_idx++) {
         Byte *ptr = (Byte *)abl->mBuffers[buf_idx].mData;
@@ -58,14 +58,14 @@ bool test::is_cleared_buffer(const audio::pcm_buffer &buffer) {
     return true;
 }
 
-bool test::is_filled_buffer(const audio::pcm_buffer &buffer) {
+bool test::is_filled_buffer(audio::pcm_buffer const &buffer) {
     __block BOOL isFilled = YES;
-    const uint32_t sample_byte_count = buffer.format().sample_byte_count();
+    uint32_t const sample_byte_count = buffer.format().sample_byte_count();
     NSData *zeroData = [NSMutableData dataWithLength:sample_byte_count];
-    const void *zeroBytes = [zeroData bytes];
+    void const *zeroBytes = [zeroData bytes];
 
     audio::frame_enumerator enumerator(buffer);
-    const flex_ptr *pointer = enumerator.pointer();
+    flex_ptr const *pointer = enumerator.pointer();
 
     while (pointer->v) {
         if (is_equal_data(pointer->v, zeroBytes, sample_byte_count)) {
@@ -78,7 +78,7 @@ bool test::is_filled_buffer(const audio::pcm_buffer &buffer) {
     return isFilled;
 }
 
-bool test::is_equal_buffer_flexibly(const audio::pcm_buffer &buffer1, const audio::pcm_buffer &buffer2) {
+bool test::is_equal_buffer_flexibly(audio::pcm_buffer const &buffer1, audio::pcm_buffer const &buffer2) {
     if (buffer1.format().channel_count() != buffer2.format().channel_count()) {
         return NO;
     }
@@ -108,15 +108,15 @@ bool test::is_equal_buffer_flexibly(const audio::pcm_buffer &buffer1, const audi
     return YES;
 }
 
-bool test::is_equal(const double val1, const double val2, const double accuracy) {
+bool test::is_equal(double const val1, double const val2, double const accuracy) {
     return ((val1 - accuracy) <= val2 && val2 <= (val1 + accuracy));
 }
 
-bool test::is_equal_data(const void *const inbuffer1, const void *const inbuffer2, const size_t inSize) {
+bool test::is_equal_data(void const *const inbuffer1, void const *const inbuffer2, std::size_t const inSize) {
     return memcmp(inbuffer1, inbuffer2, inSize) == 0;
 }
 
-bool test::is_equal(const AudioTimeStamp *const ts1, const AudioTimeStamp *const ts2) {
+bool test::is_equal(AudioTimeStamp const *const ts1, AudioTimeStamp const *const ts2) {
     if (is_equal_data(ts1, ts2, sizeof(AudioTimeStamp))) {
         return true;
     } else {
@@ -127,16 +127,16 @@ bool test::is_equal(const AudioTimeStamp *const ts1, const AudioTimeStamp *const
     }
 }
 
-flex_ptr test::data_ptr_from_buffer(const audio::pcm_buffer &buffer, const uint32_t channel, const uint32_t frame) {
+flex_ptr test::data_ptr_from_buffer(audio::pcm_buffer const &buffer, uint32_t const channel, uint32_t const frame) {
     audio::frame_enumerator enumerator(buffer);
     enumerator.set_frame_position(frame);
     enumerator.set_channel_position(channel);
     return *enumerator.pointer();
 }
 
-void test::audio_unit_render_on_sub_thread(audio::unit &unit, audio::format &format, const uint32_t frame_length,
-                                           const NSUInteger count, const NSTimeInterval wait) {
-    auto lambda = [unit, format, frame_length, count, wait]() mutable {
+void test::audio_unit_render_on_sub_thread(audio::unit &unit, audio::format &format, uint32_t const frame_length,
+                                           std::size_t const count, NSTimeInterval const wait) {
+    auto lambda = [unit, format, frame_length, count]() mutable {
         AudioUnitRenderActionFlags action_flags = 0;
 
         audio::pcm_buffer buffer(format, frame_length);
@@ -178,16 +178,16 @@ struct test::audio_test_node::impl : audio::node::impl {
     uint32_t _output_bus_count;
 };
 
-test::audio_test_node::audio_test_node(const uint32_t input_bus_count, const uint32_t output_bus_count)
+test::audio_test_node::audio_test_node(uint32_t const input_bus_count, uint32_t const output_bus_count)
     : node(std::make_unique<impl>()) {
     set_input_bus_count(input_bus_count);
     set_output_bus_count(output_bus_count);
 }
 
-void test::audio_test_node::set_input_bus_count(const uint32_t &count) {
+void test::audio_test_node::set_input_bus_count(uint32_t const &count) {
     impl_ptr<impl>()->_input_bus_count = count;
 }
 
-void test::audio_test_node::set_output_bus_count(const uint32_t &count) {
+void test::audio_test_node::set_output_bus_count(uint32_t const &count) {
     impl_ptr<impl>()->_output_bus_count = count;
 }

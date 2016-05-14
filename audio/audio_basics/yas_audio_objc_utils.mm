@@ -63,7 +63,7 @@ AVAudioTime *yas::to_objc_object(audio::time const &time) {
     return [AVAudioTime timeWithAudioTimeStamp:&time_stamp sampleRate:time.sample_rate()];
 }
 
-audio::time yas::to_time(AVAudioTime *const av_time) {
+audio::time yas::to_time(AVAudioTime const *const av_time) {
     AudioTimeStamp const time_stamp = av_time.audioTimeStamp;
     return audio::time(time_stamp, av_time.sampleRate);
 }

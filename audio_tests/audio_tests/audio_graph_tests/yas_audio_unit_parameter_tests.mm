@@ -56,7 +56,7 @@ using namespace yas;
             auto const &change_info = context.value;
 
             XCTAssertTrue(context.key == audio::unit::parameter::method::will_change);
-            const AudioUnitElement element = context.value.element;
+            AudioUnitElement const element = context.value.element;
             XCTAssertEqual(element, 2);
             XCTAssertEqual(change_info.old_value, 0.0f);
             XCTAssertEqual(change_info.new_value, 1.0f);
@@ -81,7 +81,7 @@ using namespace yas;
             auto const &change_info = context.value;
 
             XCTAssertTrue(context.key == audio::unit::parameter::method::did_change);
-            const AudioUnitElement element = change_info.element;
+            AudioUnitElement const element = change_info.element;
             XCTAssertEqual(element, 10);
             XCTAssertEqual(change_info.old_value, -1.0f);
             XCTAssertEqual(change_info.new_value, 3.5f);

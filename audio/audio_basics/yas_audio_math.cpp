@@ -60,7 +60,7 @@ float audio::math::fill_sine(float *const out_data, uint32_t const length, doubl
         phase = fmod(phase + phase_per_frame, two_pi);
     }
 
-    const int len = length;
+    int const len = length;
     vvsinf(out_data, out_data, &len);
 
     return phase;

@@ -109,13 +109,13 @@ namespace sample {
         if ([[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryMultiRoute error:&error]) {
             [self setupEngine];
 
-            const auto start_result = _internal.engine.start_render();
+            auto const start_result = _internal.engine.start_render();
             if (start_result) {
                 [self.tableView reloadData];
                 [self _updateSlider];
                 success = YES;
             } else {
-                const auto error_string = to_string(start_result.error());
+                auto const error_string = to_string(start_result.error());
                 errorMessage = (__bridge NSString *)to_cf_object(error_string);
             }
         } else {
@@ -184,7 +184,7 @@ namespace sample {
 }
 
 - (IBAction)volumeSliderChanged:(UISlider *)sender {
-    const float value = sender.value;
+    float const value = sender.value;
     if (_internal.mixer_node) {
         _internal.mixer_node.set_input_volume(value, 0);
     }
@@ -197,7 +197,7 @@ namespace sample {
     [unowned_self.object() setObject:self];
 
     _internal.engine_observer = _internal.engine.subject().make_observer(
-        audio::engine::method::configuration_change, [unowned_self](const auto &context) {
+        audio::engine::method::configuration_change, [unowned_self](auto const &context) {
             if ([UIApplication sharedApplication].applicationState == UIApplicationStateActive) {
                 [[unowned_self.object() object] _updateEngine];
             }
@@ -219,15 +219,15 @@ namespace sample {
 }
 
 - (void)_connectNodes {
-    const Float64 sample_rate = _internal.io_node.device_sample_rate();
+    double const sample_rate = _internal.io_node.device_sample_rate();
 
-    const auto output_channel_count = _internal.connection_channel_count_for_direction(audio::direction::output);
+    auto const output_channel_count = _internal.connection_channel_count_for_direction(audio::direction::output);
     if (output_channel_count > 0) {
         auto output_format = audio::format(sample_rate, output_channel_count);
         _internal.engine.connect(_internal.mixer_node, _internal.io_node, output_format);
     }
 
-    const auto input_channel_count = _internal.connection_channel_count_for_direction(audio::direction::input);
+    auto const input_channel_count = _internal.connection_channel_count_for_direction(audio::direction::input);
     if (input_channel_count > 0) {
         auto input_format = audio::format(sample_rate, input_channel_count);
         _internal.engine.connect(_internal.io_node, _internal.mixer_node, input_format);
@@ -314,7 +314,7 @@ namespace sample {
             uint32_t map_size = _internal.device_channel_count_for_direction(dir);
 
             if (indexPath.row < map_size) {
-                const auto &map = _internal.io_node.channel_map(dir);
+                auto const &map = _internal.io_node.channel_map(dir);
                 NSString *selected = nil;
                 if (map.empty()) {
                     selected = @"empty";

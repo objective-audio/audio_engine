@@ -33,15 +33,15 @@ namespace sample {
         input_tap_node_vc_internal() = default;
 
         void prepare() {
-            const Float64 sample_rate = input_node.device_sample_rate();
+            double const sample_rate = input_node.device_sample_rate();
             audio::format format{sample_rate, 2};
             engine.connect(input_node, input_tap_node, format);
 
             input_tap_node.set_render_function([input_level = input_level, sample_rate](
-                audio::pcm_buffer & buffer, const uint32_t bus_idx, const audio::time &when) mutable {
+                audio::pcm_buffer & buffer, uint32_t const bus_idx, const audio::time &when) mutable {
                 audio::frame_enumerator enumerator(buffer);
-                const auto *flex_ptr = enumerator.pointer();
-                const int frame_length = enumerator.frame_length();
+                auto const *flex_ptr = enumerator.pointer();
+                int const frame_length = enumerator.frame_length();
                 float level = 0;
                 while (flex_ptr->v) {
                     level = MAX(fabsf(flex_ptr->f32[cblas_isamax(frame_length, flex_ptr->f32, 1)]), level);
@@ -93,7 +93,7 @@ namespace sample {
             self.displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(updateUI:)];
             [self.displayLink addToRunLoop:[NSRunLoop mainRunLoop] forMode:NSDefaultRunLoopMode];
         } else {
-            const auto error_string = to_string(start_result.error());
+            auto const error_string = to_string(start_result.error());
             errorMessage = (__bridge NSString *)to_cf_object(error_string);
         }
     } else {

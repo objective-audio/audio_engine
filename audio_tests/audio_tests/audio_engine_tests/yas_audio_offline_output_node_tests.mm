@@ -22,7 +22,7 @@ using namespace yas;
 }
 
 - (void)test_offline_render_with_audio_engine {
-    const double sample_rate = 44100.0;
+    double const sample_rate = 44100.0;
 
     auto format = audio::format(sample_rate, 2);
     audio::engine engine;
@@ -35,11 +35,11 @@ using namespace yas;
 
     XCTestExpectation *tapNodeExpectation = [self expectationWithDescription:@"tap node render"];
 
-    const uint32_t frames_per_render = 1024;
-    const uint32_t length = 4192;
+    uint32_t const frames_per_render = 1024;
+    uint32_t const length = 4192;
     uint32_t tap_render_frame = 0;
 
-    auto tap_render_function = [=](audio::pcm_buffer &buffer, const uint32_t bus_idx, const audio::time &when) mutable {
+    auto tap_render_function = [=](audio::pcm_buffer &buffer, uint32_t const bus_idx, audio::time const &when) mutable {
         XCTAssertEqual(when.sample_time(), tap_render_frame);
         XCTAssertEqual(when.sample_rate(), sample_rate);
         XCTAssertEqual(buffer.frame_length(), frames_per_render);
@@ -66,7 +66,7 @@ using namespace yas;
 
     uint32_t output_render_frame = 0;
 
-    auto start_render_function = [=](audio::pcm_buffer &buffer, const audio::time &when, bool &out_stop) mutable {
+    auto start_render_function = [=](audio::pcm_buffer &buffer, audio::time const &when, bool &out_stop) mutable {
         XCTAssertEqual(when.sample_time(), output_render_frame);
         XCTAssertEqual(when.sample_rate(), sample_rate);
         XCTAssertEqual(buffer.frame_length(), frames_per_render);
@@ -94,7 +94,7 @@ using namespace yas;
         }
     };
 
-    auto completion_function = [=](const bool cancelled) mutable {
+    auto completion_function = [=](bool const cancelled) mutable {
         XCTAssertFalse(cancelled);
         if (completionExpectation) {
             [completionExpectation fulfill];
@@ -110,7 +110,7 @@ using namespace yas;
 }
 
 - (void)test_offline_render_without_audio_engine {
-    const double sample_rate = 48000.0;
+    double const sample_rate = 48000.0;
     auto format = audio::format(sample_rate, 2);
     audio::offline_output_node output_node;
     audio::tap_node tap_node;
@@ -124,11 +124,11 @@ using namespace yas;
 
     XCTestExpectation *tapNodeExpectation = [self expectationWithDescription:@"tap node render"];
 
-    const uint32_t frames_per_render = 1024;
-    const uint32_t length = 4196;
+    uint32_t const frames_per_render = 1024;
+    uint32_t const length = 4196;
     uint32_t tap_render_frame = 0;
 
-    auto tap_render_function = [=](audio::pcm_buffer &buffer, const uint32_t bus_idx, const audio::time &when) mutable {
+    auto tap_render_function = [=](audio::pcm_buffer &buffer, uint32_t const bus_idx, audio::time const &when) mutable {
         XCTAssertEqual(when.sample_time(), tap_render_frame);
         XCTAssertEqual(when.sample_rate(), sample_rate);
         XCTAssertEqual(buffer.frame_length(), frames_per_render);
@@ -157,7 +157,7 @@ using namespace yas;
 
     uint32_t output_render_frame = 0;
 
-    auto start_render_function = [=](audio::pcm_buffer &buffer, const audio::time &when, bool &out_stop) mutable {
+    auto start_render_function = [=](audio::pcm_buffer &buffer, audio::time const &when, bool &out_stop) mutable {
         XCTAssertEqual(when.sample_time(), output_render_frame);
         XCTAssertEqual(when.sample_rate(), sample_rate);
         XCTAssertEqual(buffer.frame_length(), frames_per_render);
@@ -188,7 +188,7 @@ using namespace yas;
         }
     };
 
-    auto completion_function = [=](const bool cancelled) mutable {
+    auto completion_function = [=](bool const cancelled) mutable {
         XCTAssertFalse(cancelled);
         if (completionExpectation) {
             [completionExpectation fulfill];
@@ -231,13 +231,13 @@ using namespace yas;
 
     XCTestExpectation *completionExpectation = [self expectationWithDescription:@"offline output node completion"];
 
-    auto render_func = [promise](audio::pcm_buffer &buffer, const audio::time &when, bool &out_stop) mutable {
+    auto render_func = [promise](audio::pcm_buffer &buffer, audio::time const &when, bool &out_stop) mutable {
         if (when.sample_time() == 0) {
             promise->set_value();
         }
     };
 
-    auto completion_function = [=](const bool cancelled) mutable {
+    auto completion_function = [=](bool const cancelled) mutable {
         XCTAssertTrue(cancelled);
         if (completionExpectation) {
             [completionExpectation fulfill];
