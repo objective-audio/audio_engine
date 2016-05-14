@@ -6,6 +6,9 @@
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
 
+#include "yas_audio_format.h"
+#include "yas_observing.h"
+
 using namespace yas;
 
 using listener_f =

@@ -5,12 +5,13 @@
 #pragma once
 
 #include <vector>
-#include "yas_audio_pcm_buffer.h"
 #include "yas_audio_types.h"
 #include "yas_flex_ptr.h"
 
 namespace yas {
 namespace audio {
+    class pcm_buffer;
+
     class enumerator {
        public:
         enumerator(flex_ptr const &pointer, uint32_t const byte_stride, uint32_t const length);

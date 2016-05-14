@@ -6,9 +6,11 @@
 
 #include <AudioToolbox/AudioToolbox.h>
 #include "yas_base.h"
-#include "yas_observing.h"
 
 namespace yas {
+template <typename T, typename K>
+class subject;
+
 namespace audio {
     class unit::parameter : public base {
        public:

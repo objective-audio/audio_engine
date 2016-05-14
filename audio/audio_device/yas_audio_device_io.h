@@ -9,7 +9,6 @@
 
 #include <functional>
 #include <memory>
-#include "yas_audio_device.h"
 #include "yas_audio_types.h"
 #include "yas_base.h"
 
@@ -17,6 +16,7 @@ namespace yas {
 namespace audio {
     class pcm_buffer;
     class time;
+    class device;
 
     class device_io : public base {
        public:

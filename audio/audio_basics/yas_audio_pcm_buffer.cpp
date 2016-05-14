@@ -9,6 +9,8 @@
 #include <string>
 #include "yas_audio_format.h"
 #include "yas_audio_pcm_buffer.h"
+#include "yas_flex_ptr.h"
+#include "yas_result.h"
 #include "yas_stl_utils.h"
 
 using namespace yas;

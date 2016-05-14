@@ -9,11 +9,13 @@
 #include <memory>
 #include <mutex>
 #include "yas_audio_device.h"
+#include "yas_audio_device.h"
 #include "yas_audio_format.h"
 #include "yas_audio_pcm_buffer.h"
 #include "yas_audio_time.h"
 #include "yas_exception.h"
 #include "yas_observing.h"
+#include "yas_result.h"
 
 using namespace yas;
 

@@ -5,6 +5,7 @@
 #pragma once
 
 #include "yas_audio_node.h"
+#include "yas_audio_route.h"
 
 namespace yas {
 namespace audio {

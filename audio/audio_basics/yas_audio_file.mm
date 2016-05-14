@@ -9,6 +9,7 @@
 #include "yas_audio_pcm_buffer.h"
 #include "yas_cf_utils.h"
 #include "yas_exception.h"
+#include "yas_result.h"
 
 using namespace yas;
 

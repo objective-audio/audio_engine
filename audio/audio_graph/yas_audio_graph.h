@@ -6,16 +6,15 @@
 
 #include <memory>
 #include "yas_audio_types.h"
-#include "yas_audio_unit.h"
 #include "yas_base.h"
-#include "yas_result.h"
-
-#if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
-#include "yas_audio_device_io.h"
-#endif
 
 namespace yas {
 namespace audio {
+    class unit;
+#if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
+    class device_io;
+#endif
+
     class graph : public base {
        public:
         class impl;

@@ -4,6 +4,7 @@
 
 #include "yas_audio_route_node.h"
 #include "yas_stl_utils.h"
+#include "yas_result.h"
 
 using namespace yas;
 
