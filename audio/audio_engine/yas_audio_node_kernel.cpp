@@ -43,6 +43,9 @@ void audio::node::kernel::impl::set_output_connections(audio::connection_wmap &&
 audio::node::kernel::kernel() : base(std::make_unique<impl>()) {
 }
 
+audio::node::kernel::kernel(std::shared_ptr<impl> &&impl) : base(std::move(impl)) {
+}
+
 audio::connection_smap audio::node::kernel::input_connections() const {
     return impl_ptr<impl>()->input_connections();
 }

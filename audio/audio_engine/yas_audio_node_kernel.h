@@ -34,6 +34,9 @@ namespace audio {
 
         manageable_kernel manageable();
 
+       protected:
+        kernel(std::shared_ptr<impl> &&);
+
 #if YAS_TEST
        public:
         class private_access;
