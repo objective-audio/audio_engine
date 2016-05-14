@@ -10,6 +10,7 @@
 #include "yas_audio_offline_output_node.h"
 #include "yas_audio_unit_node.h"
 #include "yas_objc_ptr.h"
+#include "yas_observing.h"
 #include "yas_stl_utils.h"
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)

@@ -8,11 +8,14 @@
 #include "yas_audio_offline_output_node_protocol.h"
 #include "yas_audio_types.h"
 #include "yas_base.h"
-#include "yas_observing.h"
 
 namespace yas {
 template <typename T, typename U>
 class result;
+template <typename T, typename K>
+class subject;
+template <typename T, typename K>
+class observer;
 
 namespace audio {
     class graph;
