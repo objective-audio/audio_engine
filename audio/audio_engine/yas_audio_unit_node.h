@@ -50,8 +50,8 @@ namespace audio {
 
 #if YAS_TEST
        public:
-        class private_access;
-        friend private_access;
+        class testable;
+        friend testable;
 #endif
     };
 }

@@ -58,8 +58,8 @@ namespace audio {
 
 #if YAS_TEST
        public:
-        class private_access;
-        friend private_access;
+        class testable;
+        friend testable;
 #endif
     };
 
@@ -93,5 +93,5 @@ struct std::hash<yas::audio::node> {
 #include "yas_audio_node_impl.h"
 
 #if YAS_TEST
-#include "yas_audio_node_private_access.h"
+#include "yas_audio_node_testable.h"
 #endif

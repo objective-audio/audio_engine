@@ -230,18 +230,18 @@ using namespace yas;
 
     audio::unit converter_unit(kAudioUnitType_FormatConverter, kAudioUnitSubType_AUConverter);
 
-    audio::unit::private_access::set_property_data(converter_unit, set_data, property_id, scope, element);
+    audio::unit::testable::set_property_data(converter_unit, set_data, property_id, scope, element);
 
     std::vector<AudioStreamBasicDescription> get_data;
 
-    XCTAssertNoThrow(get_data = audio::unit::private_access::property_data<AudioStreamBasicDescription>(
+    XCTAssertNoThrow(get_data = audio::unit::testable::property_data<AudioStreamBasicDescription>(
                          converter_unit, property_id, scope, element));
 
     XCTAssertTrue(is_equal(set_data.at(0), get_data.at(0)));
 
     std::vector<AudioStreamBasicDescription> zero_data;
     XCTAssertThrows(
-        audio::unit::private_access::set_property_data(converter_unit, zero_data, property_id, scope, element));
+        audio::unit::testable::set_property_data(converter_unit, zero_data, property_id, scope, element));
 }
 
 @end

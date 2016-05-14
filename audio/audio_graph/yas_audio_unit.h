@@ -105,8 +105,8 @@ namespace audio {
 
 #if YAS_TEST
        public:
-        class private_access;
-        friend private_access;
+        class testable;
+        friend testable;
 #endif
     };
 }
@@ -118,5 +118,5 @@ audio::unit::au_result_t to_result(OSStatus const err);
 #include "yas_audio_unit_parameter.h"
 
 #if YAS_TEST
-#include "yas_audio_unit_private_access.h"
+#include "yas_audio_unit_testable.h"
 #endif

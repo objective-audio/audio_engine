@@ -1,12 +1,12 @@
 //
-//  yas_audio_unit_private_access.h
+//  yas_audio_unit_testable.h
 //
 
 #pragma once
 
 #if YAS_TEST
 
-class yas::audio::unit::private_access {
+class yas::audio::unit::testable {
    public:
     template <typename T>
     static void set_property_data(unit const &unit, std::vector<T> const &data, AudioUnitPropertyID const property_id,

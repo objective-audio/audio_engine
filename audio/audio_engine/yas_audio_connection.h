@@ -33,8 +33,8 @@ namespace audio {
                    audio::format const &format);
 #if YAS_TEST
        public:
-        class private_access;
-        friend private_access;
+        class testable;
+        friend testable;
 #endif
     };
 }
@@ -48,5 +48,5 @@ struct std::hash<yas::audio::connection> {
 };
 
 #if YAS_TEST
-#include "yas_audio_connection_private_access.h"
+#include "yas_audio_connection_testable.h"
 #endif
