@@ -63,6 +63,17 @@ struct audio::connection::impl : base::impl, node_removable::impl {
     weak<node> _destination_node;
 };
 
+audio::connection::connection(node &source_node, uint32_t const source_bus, node &destination_node,
+                              uint32_t const destination_bus, audio::format const &format)
+    : base(std::make_shared<impl>(source_node, source_bus, destination_node, destination_bus, format)) {
+    if (!source_node || !destination_node) {
+        throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : invalid argument.");
+    }
+
+    source_node.connectable().add_connection(*this);
+    destination_node.connectable().add_connection(*this);
+}
+
 audio::connection::connection(std::nullptr_t) : base(nullptr) {
 }
 
@@ -73,17 +84,6 @@ audio::connection::~connection() {
         }
         impl_ptr().reset();
     }
-}
-
-audio::connection::connection(node &source_node, uint32_t const source_bus, node &destination_node,
-                              uint32_t const destination_bus, audio::format const &format)
-    : base(std::make_shared<impl>(source_node, source_bus, destination_node, destination_bus, format)) {
-    if (!source_node || !destination_node) {
-        throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : invalid argument.");
-    }
-
-    source_node.connectable().add_connection(*this);
-    destination_node.connectable().add_connection(*this);
 }
 
 uint32_t audio::connection::source_bus() const {

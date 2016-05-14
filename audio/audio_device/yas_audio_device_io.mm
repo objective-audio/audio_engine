@@ -278,8 +278,6 @@ audio::device_io::device_io(audio::device const &device) : base(std::make_shared
     impl_ptr<impl>()->prepare(*this, device);
 }
 
-audio::device_io::~device_io() = default;
-
 void audio::device_io::_initialize() const {
     impl_ptr<impl>()->initialize();
 }

@@ -114,8 +114,6 @@ audio::device::stream::stream(AudioStreamID const stream_id, AudioDeviceID const
 audio::device::stream::stream(std::nullptr_t) : base(nullptr) {
 }
 
-audio::device::stream::~stream() = default;
-
 AudioStreamID audio::device::stream::stream_id() const {
     return impl_ptr<impl>()->stream_id;
 }

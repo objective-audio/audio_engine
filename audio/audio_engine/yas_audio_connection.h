@@ -20,11 +20,6 @@ namespace audio {
         connection(std::nullptr_t);
         ~connection();
 
-        connection(connection const &) = default;
-        connection(connection &&) = default;
-        connection &operator=(connection const &) = default;
-        connection &operator=(connection &&) = default;
-
         uint32_t source_bus() const;
         uint32_t destination_bus() const;
         node source_node() const;

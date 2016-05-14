@@ -17,8 +17,6 @@ audio::node::node(std::nullptr_t) : base(nullptr) {
 audio::node::node(std::shared_ptr<impl> const &impl) : base(impl) {
 }
 
-audio::node::~node() = default;
-
 void audio::node::reset() {
     if (!impl_ptr()) {
         std::cout << "_impl is null" << std::endl;

@@ -21,12 +21,6 @@ namespace audio {
 
         graph();
         graph(std::nullptr_t);
-        ~graph();
-
-        graph(graph const &) = default;
-        graph(graph &&) = default;
-        graph &operator=(graph const &) = default;
-        graph &operator=(graph &&) = default;
 
         void add_audio_unit(unit &audio_unit);
         void remove_audio_unit(unit &audio_unit);

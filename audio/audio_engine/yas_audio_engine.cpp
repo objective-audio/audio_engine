@@ -17,8 +17,6 @@ audio::engine::engine() : base(std::make_shared<impl>()) {
 audio::engine::engine(std::nullptr_t) : base(nullptr) {
 }
 
-audio::engine::~engine() = default;
-
 audio::engine &audio::engine::operator=(std::nullptr_t) {
     set_impl_ptr(nullptr);
     return *this;

@@ -46,8 +46,6 @@ namespace audio {
         stream(AudioStreamID const, AudioDeviceID const);
         stream(std::nullptr_t);
 
-        ~stream();
-
         AudioStreamID stream_id() const;
         audio::device device() const;
         bool is_active() const;

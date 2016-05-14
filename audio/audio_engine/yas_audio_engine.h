@@ -41,12 +41,6 @@ namespace audio {
 
         engine();
         engine(std::nullptr_t);
-        ~engine();
-
-        engine(engine const &) = default;
-        engine(engine &&) = default;
-        engine &operator=(engine const &) = default;
-        engine &operator=(engine &&) = default;
 
         engine &operator=(std::nullptr_t);
 
