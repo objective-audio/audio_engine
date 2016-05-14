@@ -4,30 +4,23 @@
 
 #pragma once
 
+#include "yas_base.h"
+#include "yas_protocol.h"
+
 namespace yas {
 namespace audio {
-    struct yas::audio::node::kernel : manageable_kernel {
+    struct yas::audio::node::kernel : base {
         kernel();
-        virtual ~kernel();
 
         audio::connection_smap input_connections() const;
         audio::connection_smap output_connections() const;
         audio::connection input_connection(uint32_t const bus_idx);
         audio::connection output_connection(uint32_t const bus_idx);
 
+        manageable_kernel manageable();
+
        private:
         class impl;
-        std::unique_ptr<impl> _impl;
-
-        kernel(kernel const &) = delete;
-        kernel(kernel &&) = delete;
-        kernel &operator=(kernel const &) = delete;
-        kernel &operator=(kernel &&) = delete;
-
-        // from node
-
-        void _set_input_connections(audio::connection_wmap const &) override;
-        void _set_output_connections(audio::connection_wmap const &) override;
 
 #if YAS_TEST
        public:

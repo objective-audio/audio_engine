@@ -6,42 +6,52 @@
 
 using namespace yas;
 
-struct audio::node::kernel::impl {
+struct audio::node::kernel::impl : base::impl, manageable_kernel::impl {
     connection_wmap input_connections;
     connection_wmap output_connections;
+
+    audio::connection input_connection(uint32_t const bus_idx) {
+        if (input_connections.count(bus_idx) > 0) {
+            return input_connections.at(bus_idx).lock();
+        }
+        return nullptr;
+    }
+
+    audio::connection output_connection(uint32_t const bus_idx) {
+        if (output_connections.count(bus_idx) > 0) {
+            return output_connections.at(bus_idx).lock();
+        }
+        return nullptr;
+    }
+
+    void set_input_connections(audio::connection_wmap &&connections) override {
+        input_connections = std::move(connections);
+    }
+
+    void set_output_connections(audio::connection_wmap &&connections) override {
+        output_connections = std::move(connections);
+    }
 };
 
-audio::node::kernel::kernel() : _impl(std::make_unique<impl>()) {
+audio::node::kernel::kernel() : base(std::make_unique<impl>()) {
 }
 
-audio::node::kernel::~kernel() = default;
-
 audio::connection_smap audio::node::kernel::input_connections() const {
-    return lock_values(_impl->input_connections);
+    return lock_values(impl_ptr<impl>()->input_connections);
 }
 
 audio::connection_smap audio::node::kernel::output_connections() const {
-    return lock_values(_impl->output_connections);
+    return lock_values(impl_ptr<impl>()->output_connections);
 }
 
 audio::connection audio::node::kernel::input_connection(uint32_t const bus_idx) {
-    if (_impl->input_connections.count(bus_idx) > 0) {
-        return _impl->input_connections.at(bus_idx).lock();
-    }
-    return nullptr;
+    return impl_ptr<impl>()->input_connection(bus_idx);
 }
 
 audio::connection audio::node::kernel::output_connection(uint32_t const bus_idx) {
-    if (_impl->output_connections.count(bus_idx) > 0) {
-        return _impl->output_connections.at(bus_idx).lock();
-    }
-    return nullptr;
+    return impl_ptr<impl>()->output_connection(bus_idx);
 }
 
-void audio::node::kernel::_set_input_connections(connection_wmap const &connections) {
-    _impl->input_connections = connections;
-}
-
-void audio::node::kernel::_set_output_connections(connection_wmap const &connections) {
-    _impl->output_connections = connections;
+audio::node::manageable_kernel audio::node::kernel::manageable() {
+    return audio::node::manageable_kernel{impl_ptr<audio::node::manageable_kernel::impl>()};
 }
