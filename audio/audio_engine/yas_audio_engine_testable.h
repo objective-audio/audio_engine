@@ -1,5 +1,5 @@
 //
-//  yas_audio_engine_private_access.h
+//  yas_audio_engine_testable.h
 //
 
 #pragma once
@@ -8,8 +8,7 @@
 
 namespace yas {
 namespace audio {
-    class engine::private_access {
-       public:
+    struct engine::testable {
         static std::unordered_set<node> &nodes(engine const &engine) {
             return engine.impl_ptr<impl>()->nodes();
         }

@@ -27,15 +27,15 @@ using namespace yas;
     test::audio_test_node source_node(1, 1);
     test::audio_test_node destination_node(1, 1);
 
-    XCTAssertEqual(audio::engine::private_access::nodes(engine).size(), 0);
-    XCTAssertEqual(audio::engine::private_access::connections(engine).size(), 0);
+    XCTAssertEqual(audio::engine::testable::nodes(engine).size(), 0);
+    XCTAssertEqual(audio::engine::testable::connections(engine).size(), 0);
 
     audio::connection connection = nullptr;
     XCTAssertNoThrow(connection = engine.connect(source_node, destination_node, format));
     XCTAssertTrue(connection);
 
-    auto &nodes = audio::engine::private_access::nodes(engine);
-    auto &connections = audio::engine::private_access::connections(engine);
+    auto &nodes = audio::engine::testable::nodes(engine);
+    auto &connections = audio::engine::testable::connections(engine);
     XCTAssertGreaterThanOrEqual(nodes.count(source_node), 1);
     XCTAssertGreaterThanOrEqual(nodes.count(destination_node), 1);
     XCTAssertEqual(connections.size(), 1);
@@ -52,7 +52,7 @@ using namespace yas;
     audio::connection connection = nullptr;
     XCTAssertThrows(connection = engine.connect(source_node, destination_node, format));
     XCTAssertFalse(connection);
-    XCTAssertEqual(audio::engine::private_access::connections(engine).size(), 0);
+    XCTAssertEqual(audio::engine::testable::connections(engine).size(), 0);
 }
 
 - (void)testConnectAndDisconnect {
@@ -65,7 +65,7 @@ using namespace yas;
 
     engine.connect(source_node, relay_node, format);
 
-    auto &nodes = audio::engine::private_access::nodes(engine);
+    auto &nodes = audio::engine::testable::nodes(engine);
     XCTAssertGreaterThanOrEqual(nodes.count(source_node), 1);
     XCTAssertGreaterThanOrEqual(nodes.count(relay_node), 1);
     XCTAssertEqual(nodes.count(destination_node), 0);

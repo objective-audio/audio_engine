@@ -1,5 +1,5 @@
 //
-//  yas_audio_node_private_access.h
+//  yas_audio_node_testable.h
 //
 
 #pragma once
@@ -10,8 +10,7 @@
 
 namespace yas {
 namespace audio {
-    class node::private_access {
-       public:
+    struct node::testable {
         static node create() {
             return node(std::make_shared<node::impl>());
         }
