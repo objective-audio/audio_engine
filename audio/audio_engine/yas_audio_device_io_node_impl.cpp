@@ -74,7 +74,7 @@ void audio::device_io_node::impl::update_connections() {
         if (auto node = weak_node.lock()) {
             if (auto kernel = node.impl_ptr<impl>()->kernel_cast()) {
                 if (output_buffer) {
-                    auto const connections = kernel->input_connections();
+                    auto const connections = kernel.input_connections();
                     if (connections.count(0) > 0) {
                         auto const &connection = connections.at(0);
                         if (auto source_node = connection.source_node()) {
@@ -86,7 +86,7 @@ void audio::device_io_node::impl::update_connections() {
                 }
 
                 if (auto const device_io = weak_device_io.lock()) {
-                    auto const connections = kernel->output_connections();
+                    auto const connections = kernel.output_connections();
                     if (connections.count(0) > 0) {
                         auto const &connection = connections.at(0);
                         if (auto destination_node = connection.destination_node()) {

@@ -65,24 +65,24 @@ struct audio::route_node::impl : node::impl {
         return std::numeric_limits<uint32_t>::max();
     }
 
-    virtual std::shared_ptr<node::kernel> make_kernel() override {
-        return std::shared_ptr<node::kernel>(new route_node::kernel());
+    virtual node::kernel make_kernel() override {
+        return route_node::kernel{};
     }
 
-    virtual void prepare_kernel(std::shared_ptr<node::kernel> const &kernel) override {
+    virtual void prepare_kernel(node::kernel &kernel) override {
         node::impl::prepare_kernel(kernel);
 
-        auto route_kernel = std::static_pointer_cast<route_node::kernel>(kernel);
-        route_kernel->set_routes(_core->routes);
+        auto route_kernel = yas::cast<route_node::kernel>(kernel);
+        route_kernel.set_routes(_core->routes);
     }
 
     virtual void render(pcm_buffer &dst_buffer, uint32_t const dst_bus_idx, time const &when) override {
         node::impl::render(dst_buffer, dst_bus_idx, when);
 
         if (auto kernel = kernel_cast<route_node::kernel>()) {
-            auto const &routes = kernel->routes();
-            auto output_connection = kernel->output_connection(dst_bus_idx);
-            auto input_connections = kernel->input_connections();
+            auto const &routes = kernel.routes();
+            auto output_connection = kernel.output_connection(dst_bus_idx);
+            auto input_connections = kernel.input_connections();
             uint32_t const dst_ch_count = dst_buffer.format().channel_count();
 
             for (auto const &pair : input_connections) {

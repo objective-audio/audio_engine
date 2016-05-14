@@ -24,12 +24,12 @@ struct audio::node::impl::core {
         set_render_time(nullptr);
     }
 
-    void set_kernel(std::shared_ptr<kernel> const &kernel) {
+    void set_kernel(node::kernel kernel) {
         std::lock_guard<std::recursive_mutex> lock(_mutex);
-        _kernel = kernel;
+        _kernel = std::move(kernel);
     }
 
-    std::shared_ptr<kernel> kernel() const {
+    node::kernel kernel() const {
         std::lock_guard<std::recursive_mutex> lock(_mutex);
         return _kernel;
     }
@@ -45,7 +45,7 @@ struct audio::node::impl::core {
     }
 
    private:
-    std::shared_ptr<node::kernel> _kernel;
+    node::kernel _kernel = nullptr;
     time _render_time;
     mutable std::recursive_mutex _mutex;
 };
@@ -137,16 +137,16 @@ audio::connection_wmap &audio::node::impl::output_connections() const {
 void audio::node::impl::update_connections() {
 }
 
-std::shared_ptr<audio::node::kernel> audio::node::impl::make_kernel() {
-    return std::shared_ptr<kernel>(new kernel());
+audio::node::kernel audio::node::impl::make_kernel() {
+    return audio::node::kernel{};
 }
 
-void audio::node::impl::prepare_kernel(std::shared_ptr<kernel> const &kernel) {
+void audio::node::impl::prepare_kernel(audio::node::kernel &kernel) {
     if (!kernel) {
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
     }
 
-    auto manageable_kernel = kernel->manageable();
+    auto manageable_kernel = kernel.manageable();
     manageable_kernel.set_input_connections(_core->input_connections);
     manageable_kernel.set_output_connections(_core->output_connections);
 }
@@ -157,7 +157,7 @@ void audio::node::impl::update_kernel() {
     _core->set_kernel(kernel);
 }
 
-std::shared_ptr<audio::node::kernel> audio::node::impl::_kernel() const {
+audio::node::kernel audio::node::impl::_kernel() const {
     return _core->kernel();
 }
 

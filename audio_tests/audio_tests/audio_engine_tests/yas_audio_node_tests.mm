@@ -153,11 +153,11 @@ using namespace yas;
 
     auto lambda = [self, expectation, relay_node, input_connections, output_connection]() {
         auto kernel = audio::node::private_access::kernel(relay_node);
-        XCTAssertEqual(kernel->output_connections().size(), 1);
-        XCTAssertEqual(kernel->input_connections().size(), 2);
-        XCTAssertEqual(kernel->output_connection(0), output_connection);
-        XCTAssertEqual(kernel->input_connection(0), input_connections.at(0));
-        XCTAssertEqual(kernel->input_connection(1), input_connections.at(1));
+        XCTAssertEqual(kernel.output_connections().size(), 1);
+        XCTAssertEqual(kernel.input_connections().size(), 2);
+        XCTAssertEqual(kernel.output_connection(0), output_connection);
+        XCTAssertEqual(kernel.input_connection(0), input_connections.at(0));
+        XCTAssertEqual(kernel.input_connection(1), input_connections.at(1));
         [expectation fulfill];
     };
 
