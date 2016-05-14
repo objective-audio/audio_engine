@@ -318,8 +318,6 @@ audio::graph::graph() : base(impl::make_shared()) {
 audio::graph::graph(std::nullptr_t) : base(nullptr) {
 }
 
-audio::graph::~graph() = default;
-
 void audio::graph::add_audio_unit(unit &unit) {
     impl_ptr<impl>()->add_audio_unit(unit);
 }

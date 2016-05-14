@@ -25,13 +25,6 @@ namespace audio {
         device_io(std::nullptr_t);
         explicit device_io(audio::device const &);
 
-        ~device_io();
-
-        device_io(device_io const &) = default;
-        device_io(device_io &&) = default;
-        device_io &operator=(device_io const &) = default;
-        device_io &operator=(device_io &&) = default;
-
         void set_device(audio::device const device);
         audio::device device() const;
         bool is_running() const;

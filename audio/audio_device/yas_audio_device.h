@@ -71,8 +71,6 @@ namespace audio {
 
         device(std::nullptr_t);
 
-        ~device();
-
         AudioDeviceID audio_device_id() const;
         CFStringRef name() const;
         CFStringRef manufacture() const;

@@ -27,14 +27,7 @@ namespace audio {
        public:
         class kernel;
 
-        explicit node(std::nullptr_t);
-        virtual ~node();
-
-        node(node const &) = default;
-        node(node &&) = default;
-        node &operator=(node const &) = default;
-        node &operator=(node &&) = default;
-        node &operator=(std::nullptr_t);
+        node(std::nullptr_t);
 
         void reset();
 

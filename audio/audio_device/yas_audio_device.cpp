@@ -444,8 +444,6 @@ audio::device::device(AudioDeviceID const device_id) : base(std::make_shared<imp
 audio::device::device(std::nullptr_t) : base(nullptr) {
 }
 
-audio::device::~device() = default;
-
 AudioDeviceID audio::device::audio_device_id() const {
     return impl_ptr<impl>()->audio_device_id;
 }

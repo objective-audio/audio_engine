@@ -40,13 +40,6 @@ namespace audio {
         explicit unit(AudioComponentDescription const &acd);
         unit(OSType const type, OSType const subType);
 
-        ~unit() = default;
-
-        unit(unit const &) = default;
-        unit(unit &&) = default;
-        unit &operator=(unit const &) = default;
-        unit &operator=(unit &&) = default;
-
         CFStringRef name() const;
         OSType type() const;
         OSType sub_type() const;
