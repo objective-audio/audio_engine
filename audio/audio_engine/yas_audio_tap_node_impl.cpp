@@ -7,9 +7,23 @@
 using namespace yas;
 
 struct audio::tap_node::kernel : node::kernel {
-    ~kernel() = default;
+    struct impl : node::kernel::impl {
+        audio::tap_node::render_f render_function;
+    };
 
-    audio::tap_node::render_f render_function;
+    kernel() : node::kernel(std::make_shared<impl>()) {
+    }
+
+    kernel(std::nullptr_t) : node::kernel(nullptr) {
+    }
+
+    void set_render_function(audio::tap_node::render_f func) {
+        impl_ptr<impl>()->render_function = std::move(func);
+    }
+
+    audio::tap_node::render_f const &render_function() {
+        return impl_ptr<impl>()->render_function;
+    }
 };
 
 struct audio::tap_node::impl::core {
@@ -43,7 +57,7 @@ void audio::tap_node::impl::prepare_kernel(std::shared_ptr<node::kernel> const &
     node::impl::prepare_kernel(kernel);
 
     auto tap_kernel = std::static_pointer_cast<tap_node::kernel>(kernel);
-    tap_kernel->render_function = _core->render_function;
+    tap_kernel->set_render_function(_core->render_function);
 }
 
 void audio::tap_node::impl::set_render_function(render_f &&func) {
@@ -74,7 +88,7 @@ void audio::tap_node::impl::render(pcm_buffer &buffer, uint32_t const bus_idx, t
     if (auto kernel = kernel_cast<tap_node::kernel>()) {
         _core->kernel_on_render = kernel;
 
-        auto &render_function = kernel->render_function;
+        auto const &render_function = kernel->render_function();
 
         if (render_function) {
             render_function(buffer, bus_idx, when);
