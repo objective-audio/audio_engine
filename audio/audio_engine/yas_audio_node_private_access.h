@@ -16,7 +16,7 @@ namespace audio {
             return node(std::make_shared<node::impl>());
         }
 
-        static std::shared_ptr<kernel> kernel(node const &node) {
+        static audio::node::kernel kernel(node const &node) {
             return node.impl_ptr<impl>()->kernel_cast();
         }
     };

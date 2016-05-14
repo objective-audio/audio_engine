@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "yas_audio_node_kernel.h"
 #include "yas_audio_node_protocol.h"
 
 namespace yas {
@@ -38,13 +39,13 @@ namespace audio {
         void remove_connection(audio::connection const &connection) override;
 
         virtual void update_connections() override;
-        virtual std::shared_ptr<kernel> make_kernel();
-        virtual void prepare_kernel(std::shared_ptr<kernel> const &kernel);  // requires super
+        virtual node::kernel make_kernel();
+        virtual void prepare_kernel(node::kernel &kernel);  // requires super
         void update_kernel() override;
 
         template <typename T = audio::node::kernel>
-        std::shared_ptr<T> kernel_cast() const {
-            return std::static_pointer_cast<T>(_kernel());
+        T kernel_cast() const {
+            return yas::cast<T>(_kernel());
         }
 
         audio::engine engine() const override;
@@ -57,7 +58,7 @@ namespace audio {
        private:
         class core;
         std::unique_ptr<core> _core;
-        std::shared_ptr<kernel> _kernel() const;
+        node::kernel _kernel() const;
     };
 }
 }

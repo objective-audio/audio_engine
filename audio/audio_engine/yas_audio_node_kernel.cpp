@@ -46,6 +46,9 @@ audio::node::kernel::kernel() : base(std::make_unique<impl>()) {
 audio::node::kernel::kernel(std::shared_ptr<impl> &&impl) : base(std::move(impl)) {
 }
 
+audio::node::kernel::kernel(std::nullptr_t) : base(nullptr) {
+}
+
 audio::connection_smap audio::node::kernel::input_connections() const {
     return impl_ptr<impl>()->input_connections();
 }
@@ -54,11 +57,11 @@ audio::connection_smap audio::node::kernel::output_connections() const {
     return impl_ptr<impl>()->output_connections();
 }
 
-audio::connection audio::node::kernel::input_connection(uint32_t const bus_idx) {
+audio::connection audio::node::kernel::input_connection(uint32_t const bus_idx) const {
     return impl_ptr<impl>()->input_connection(bus_idx);
 }
 
-audio::connection audio::node::kernel::output_connection(uint32_t const bus_idx) {
+audio::connection audio::node::kernel::output_connection(uint32_t const bus_idx) const {
     return impl_ptr<impl>()->output_connection(bus_idx);
 }
 

@@ -26,11 +26,12 @@ namespace audio {
         };
 
         kernel();
+        kernel(std::nullptr_t);
 
         audio::connection_smap input_connections() const;
         audio::connection_smap output_connections() const;
-        audio::connection input_connection(uint32_t const bus_idx);
-        audio::connection output_connection(uint32_t const bus_idx);
+        audio::connection input_connection(uint32_t const bus_idx) const;
+        audio::connection output_connection(uint32_t const bus_idx) const;
 
         manageable_kernel manageable();
 

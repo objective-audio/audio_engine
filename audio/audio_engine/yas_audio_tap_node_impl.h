@@ -15,8 +15,8 @@ namespace audio {
         virtual uint32_t input_bus_count() const override;
         virtual uint32_t output_bus_count() const override;
 
-        virtual std::shared_ptr<node::kernel> make_kernel() override;
-        virtual void prepare_kernel(std::shared_ptr<node::kernel> const &kernel) override;
+        virtual node::kernel make_kernel() override;
+        virtual void prepare_kernel(node::kernel &kernel) override;
 
         void set_render_function(render_f &&);
 

@@ -181,7 +181,7 @@ void audio::unit_node::impl::update_connections() {
             audio_unit.set_render_callback([weak_node](audio::render_parameters &render_parameters) {
                 if (auto node = weak_node.lock()) {
                     if (auto kernel = node.impl_ptr<impl>()->kernel_cast()) {
-                        if (auto connection = kernel->input_connection(render_parameters.in_bus_number)) {
+                        if (auto connection = kernel.input_connection(render_parameters.in_bus_number)) {
                             if (auto source_node = connection.source_node()) {
                                 pcm_buffer buffer{connection.format(), render_parameters.io_data};
                                 time when(*render_parameters.io_time_stamp, connection.format().sample_rate());
