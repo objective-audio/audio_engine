@@ -4,30 +4,38 @@
 
 #pragma once
 
+#include "yas_base.h"
+#include "yas_protocol.h"
+
 namespace yas {
 namespace audio {
-    struct yas::audio::node::kernel : manageable_kernel {
+    struct yas::audio::node::kernel : base {
+        struct impl : base::impl, manageable_kernel::impl {
+            audio::connection input_connection(uint32_t const bus_idx);
+            audio::connection output_connection(uint32_t const bus_idx);
+
+            audio::connection_smap input_connections();
+            audio::connection_smap output_connections();
+
+            void set_input_connections(audio::connection_wmap &&connections) override;
+            void set_output_connections(audio::connection_wmap &&connections) override;
+
+           private:
+            connection_wmap _input_connections;
+            connection_wmap _output_connections;
+        };
+
         kernel();
-        virtual ~kernel();
 
         audio::connection_smap input_connections() const;
         audio::connection_smap output_connections() const;
         audio::connection input_connection(uint32_t const bus_idx);
         audio::connection output_connection(uint32_t const bus_idx);
 
-       private:
-        class impl;
-        std::unique_ptr<impl> _impl;
+        manageable_kernel manageable();
 
-        kernel(kernel const &) = delete;
-        kernel(kernel &&) = delete;
-        kernel &operator=(kernel const &) = delete;
-        kernel &operator=(kernel &&) = delete;
-
-        // from node
-
-        void _set_input_connections(audio::connection_wmap const &) override;
-        void _set_output_connections(audio::connection_wmap const &) override;
+       protected:
+        kernel(std::shared_ptr<impl> &&);
 
 #if YAS_TEST
        public:

@@ -13,11 +13,12 @@
 #include "yas_audio_pcm_buffer.h"
 #include "yas_audio_types.h"
 #include "yas_base.h"
+#include "yas_protocol.h"
 
 namespace yas {
-    template <typename T, typename U>
-    class result;
-    
+template <typename T, typename U>
+class result;
+
 namespace audio {
     class time;
     class engine;
@@ -69,11 +70,22 @@ namespace audio {
 #endif
     };
 
-    class node::manageable_kernel {
-       public:
-        virtual ~manageable_kernel() = default;
-        virtual void _set_input_connections(audio::connection_wmap const &) = 0;
-        virtual void _set_output_connections(audio::connection_wmap const &) = 0;
+    struct node::manageable_kernel : protocol {
+        struct impl : protocol::impl {
+            virtual void set_input_connections(audio::connection_wmap &&) = 0;
+            virtual void set_output_connections(audio::connection_wmap &&) = 0;
+        };
+
+        explicit manageable_kernel(std::shared_ptr<impl> &&impl) : protocol(std::move(impl)) {
+        }
+
+        void set_input_connections(audio::connection_wmap connections) {
+            impl_ptr<impl>()->set_input_connections(std::move(connections));
+        }
+
+        void set_output_connections(audio::connection_wmap connections) {
+            impl_ptr<impl>()->set_output_connections(std::move(connections));
+        }
     };
 }
 }

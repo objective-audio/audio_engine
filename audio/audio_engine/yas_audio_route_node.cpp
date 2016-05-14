@@ -3,17 +3,31 @@
 //
 
 #include "yas_audio_route_node.h"
-#include "yas_stl_utils.h"
 #include "yas_result.h"
+#include "yas_stl_utils.h"
 
 using namespace yas;
 
 #pragma mark - kernel
 
 struct audio::route_node::kernel : node::kernel {
-    ~kernel() = default;
+    struct impl : node::kernel::impl {
+        route_set_t routes;
+    };
 
-    route_set_t routes;
+    kernel() : node::kernel(std::make_shared<impl>()) {
+    }
+
+    kernel(std::nullptr_t) : node::kernel(nullptr) {
+    }
+
+    void set_routes(route_set_t routes) {
+        impl_ptr<impl>()->routes = std::move(routes);
+    }
+
+    route_set_t const &routes() {
+        return impl_ptr<impl>()->routes;
+    }
 };
 
 #pragma mark - impl
@@ -59,14 +73,14 @@ struct audio::route_node::impl : node::impl {
         node::impl::prepare_kernel(kernel);
 
         auto route_kernel = std::static_pointer_cast<route_node::kernel>(kernel);
-        route_kernel->routes = _core->routes;
+        route_kernel->set_routes(_core->routes);
     }
 
     virtual void render(pcm_buffer &dst_buffer, uint32_t const dst_bus_idx, time const &when) override {
         node::impl::render(dst_buffer, dst_bus_idx, when);
 
         if (auto kernel = kernel_cast<route_node::kernel>()) {
-            auto &routes = kernel->routes;
+            auto const &routes = kernel->routes();
             auto output_connection = kernel->output_connection(dst_bus_idx);
             auto input_connections = kernel->input_connections();
             uint32_t const dst_ch_count = dst_buffer.format().channel_count();
