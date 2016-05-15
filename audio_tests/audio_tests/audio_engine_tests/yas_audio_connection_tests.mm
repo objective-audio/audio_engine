@@ -28,7 +28,7 @@ using namespace yas;
     uint32_t const destination_bus = 1;
 
     auto connection =
-        audio::connection::testable::create(source_node, source_bus, destination_node, destination_bus, format);
+        audio::testable_connection::create(source_node, source_bus, destination_node, destination_bus, format);
 
     XCTAssertTrue(connection.source_node() == source_node);
     XCTAssertTrue(connection.source_bus() == source_bus);
@@ -48,7 +48,7 @@ using namespace yas;
     uint32_t const destination_bus = 1;
 
     auto connection =
-        audio::connection::testable::create(source_node, source_bus, destination_node, destination_bus, format);
+        audio::testable_connection::create(source_node, source_bus, destination_node, destination_bus, format);
 
     connection.node_removable().remove_nodes();
 
@@ -64,7 +64,7 @@ using namespace yas;
     uint32_t const destination_bus = 1;
 
     auto connection =
-        audio::connection::testable::create(source_node, source_bus, destination_node, destination_bus, format);
+        audio::testable_connection::create(source_node, source_bus, destination_node, destination_bus, format);
 
     connection.node_removable().remove_source_node();
 
@@ -85,8 +85,8 @@ using namespace yas;
 
     audio::node null_node(nullptr);
     XCTAssertThrows(
-        audio::connection::testable::create(null_node, source_bus, destination_node, destination_bus, format));
-    XCTAssertThrows(audio::connection::testable::create(source_node, source_bus, null_node, destination_bus, format));
+        audio::testable_connection::create(null_node, source_bus, destination_node, destination_bus, format));
+    XCTAssertThrows(audio::testable_connection::create(source_node, source_bus, null_node, destination_bus, format));
 }
 
 - (void)test_empty_connection {

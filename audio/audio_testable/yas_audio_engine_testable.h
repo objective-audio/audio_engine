@@ -4,20 +4,26 @@
 
 #pragma once
 
-#if YAS_TEST
+#include "yas_protocol.h"
 
 namespace yas {
 namespace audio {
-    struct engine::testable {
-        static std::unordered_set<node> &nodes(engine const &engine) {
-            return engine.impl_ptr<impl>()->nodes();
+    struct testable_engine : protocol {
+        struct impl : protocol::impl {
+            virtual std::unordered_set<node> &nodes() const = 0;
+            virtual audio::connection_set &connections() const = 0;
+        };
+
+        explicit testable_engine(std::shared_ptr<impl> &&impl) : protocol(std::move(impl)) {
         }
 
-        static audio::connection_set &connections(engine const &engine) {
-            return engine.impl_ptr<impl>()->connections();
+        std::unordered_set<node> &nodes() const {
+            return impl_ptr<impl>()->nodes();
+        }
+
+        audio::connection_set &connections() const {
+            return impl_ptr<impl>()->connections();
         }
     };
 }
 }
-
-#endif

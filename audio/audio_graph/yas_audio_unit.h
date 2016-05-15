@@ -24,6 +24,8 @@ template <typename T, typename U>
 class result;
 
 namespace audio {
+    class testable_unit;
+
     class unit : public base {
         class impl;
 
@@ -105,8 +107,7 @@ namespace audio {
 
 #if YAS_TEST
        public:
-        class testable;
-        friend testable;
+        friend testable_unit;
 #endif
     };
 }

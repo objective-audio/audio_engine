@@ -22,6 +22,7 @@ class result;
 namespace audio {
     class time;
     class engine;
+    class testable_node;
 
     class node : public base {
        public:
@@ -58,8 +59,7 @@ namespace audio {
 
 #if YAS_TEST
        public:
-        class testable;
-        friend testable;
+        friend testable_node;
 #endif
     };
 

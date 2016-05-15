@@ -4,6 +4,7 @@
 
 #include "yas_audio_engine.h"
 #include "yas_audio_engine_impl.h"
+#include "yas_audio_engine_testable.h"
 #include "yas_audio_node.h"
 #include "yas_observing.h"
 #include "yas_result.h"
@@ -104,6 +105,12 @@ void audio::engine::stop() {
 audio::engine::subject_t &audio::engine::subject() const {
     return impl_ptr<impl>()->subject();
 }
+
+#if YAS_TEST
+audio::testable_engine audio::engine::testable() {
+    return audio::testable_engine{impl_ptr<audio::testable_engine::impl>()};
+}
+#endif
 
 std::string yas::to_string(audio::engine::start_error_t const &error) {
     switch (error) {

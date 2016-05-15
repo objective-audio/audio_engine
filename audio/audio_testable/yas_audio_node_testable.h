@@ -6,17 +6,19 @@
 
 #if YAS_TEST
 
-#include "yas_audio_engine.h"
+#include "yas_protocol.h"
 
 namespace yas {
 namespace audio {
-    struct node::testable {
+    struct testable_node : protocol {
+        struct impl : protocol::impl {};
+
         static node create() {
-            return node(std::make_shared<node::impl>());
+            return audio::node(std::make_shared<audio::node::impl>());
         }
 
-        static audio::node::kernel kernel(node const &node) {
-            return node.impl_ptr<impl>()->kernel_cast();
+        static audio::node::kernel kernel(audio::node const &node) {
+            return node.impl_ptr<audio::node::impl>()->kernel_cast();
         }
     };
 }

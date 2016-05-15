@@ -47,8 +47,8 @@ using namespace yas;
     auto destination_bus = *destination_bus_result;
     XCTAssertEqual(destination_bus, 0);
 
-    if (auto connection = audio::connection::testable::create(source_node, source_bus, destination_node,
-                                                                    destination_bus, format)) {
+    if (auto connection =
+            audio::testable_connection::create(source_node, source_bus, destination_node, destination_bus, format)) {
         XCTAssertEqual(source_node.manageable_node().output_connections().size(), 1);
         XCTAssertEqual(destination_node.manageable_node().input_connections().size(), 1);
         XCTAssertEqual(source_node.manageable_node().output_connection(source_bus), connection);
@@ -79,7 +79,7 @@ using namespace yas;
     auto destination_bus = *destination_node.next_available_input_bus();
 
     auto connection =
-        audio::connection::testable::create(source_node, source_bus, destination_node, destination_bus, format);
+        audio::testable_connection::create(source_node, source_bus, destination_node, destination_bus, format);
 
     XCTAssertEqual(source_node.manageable_node().output_connections().size(), 1);
     XCTAssertEqual(destination_node.manageable_node().input_connections().size(), 1);
@@ -92,7 +92,7 @@ using namespace yas;
 }
 
 - (void)test_render_time {
-    auto node = audio::node::testable::create();
+    auto node = audio::testable_node::create();
     audio::time time(100, 48000.0);
 
     XCTestExpectation *render_expectation = [self expectationWithDescription:@"node render"];
@@ -114,7 +114,7 @@ using namespace yas;
 }
 
 - (void)test_set_engine {
-    auto node = audio::node::testable::create();
+    auto node = audio::testable_node::create();
     audio::engine engine;
 
     XCTAssertFalse(node.engine());
@@ -135,14 +135,14 @@ using namespace yas;
     test::audio_test_node output_node;
     test::audio_test_node relay_node;
 
-    auto output_connection = audio::connection::testable::create(relay_node, 0, output_node, 0, output_format);
+    auto output_connection = audio::testable_connection::create(relay_node, 0, output_node, 0, output_format);
 
     std::vector<audio::connection> input_connections;
     input_connections.reserve(relay_node.input_bus_count());
 
     for (uint32_t i = 0; i < relay_node.input_bus_count(); ++i) {
         test::audio_test_node input_node;
-        auto input_connection = audio::connection::testable::create(input_node, 0, relay_node, i, input_format);
+        auto input_connection = audio::testable_connection::create(input_node, 0, relay_node, i, input_format);
         input_node.manageable_node().add_connection(input_connection);
         input_connections.push_back(input_connection);
     }
@@ -152,7 +152,7 @@ using namespace yas;
     XCTestExpectation *expectation = [self expectationWithDescription:@"kernel connections"];
 
     auto lambda = [self, expectation, relay_node, input_connections, output_connection]() {
-        auto kernel = audio::node::testable::kernel(relay_node);
+        auto kernel = audio::testable_node::kernel(relay_node);
         XCTAssertEqual(kernel.output_connections().size(), 1);
         XCTAssertEqual(kernel.input_connections().size(), 2);
         XCTAssertEqual(kernel.output_connection(0), output_connection);
@@ -182,13 +182,13 @@ using namespace yas;
     XCTAssertTrue(destination_node.is_available_input_bus(1));
     XCTAssertFalse(destination_node.is_available_input_bus(2));
 
-    auto connection_1 = audio::connection::testable::create(source_node_1, 0, destination_node, 1, format);
+    auto connection_1 = audio::testable_connection::create(source_node_1, 0, destination_node, 1, format);
 
     XCTAssertFalse(source_node_1.is_available_output_bus(0));
     XCTAssertTrue(destination_node.is_available_input_bus(0));
     XCTAssertFalse(destination_node.is_available_input_bus(1));
 
-    auto connection_0 = audio::connection::testable::create(source_node_0, 0, destination_node, 0, format);
+    auto connection_0 = audio::testable_connection::create(source_node_0, 0, destination_node, 0, format);
 
     XCTAssertFalse(source_node_0.is_available_output_bus(0));
     XCTAssertFalse(destination_node.is_available_input_bus(0));

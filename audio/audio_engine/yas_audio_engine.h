@@ -20,6 +20,7 @@ class observer;
 namespace audio {
     class graph;
     class offline_output_node;
+    class testable_engine;
 
     class engine : public base {
         class impl;
@@ -63,9 +64,7 @@ namespace audio {
         subject_t &subject() const;
 
 #if YAS_TEST
-       public:
-        class testable;
-        friend testable;
+        audio::testable_engine testable();
 #endif
     };
 }
