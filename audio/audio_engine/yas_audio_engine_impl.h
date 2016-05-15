@@ -5,13 +5,14 @@
 #pragma once
 
 #include <unordered_set>
+#include "yas_audio_engine_testable.h"
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
 #include "yas_audio_device.h"
 #endif
 
 namespace yas {
 namespace audio {
-    struct engine::impl : base::impl {
+    struct engine::impl : base::impl, testable_engine::impl {
         impl();
         virtual ~impl();
 
@@ -52,8 +53,8 @@ namespace audio {
         yas::audio::graph graph() const;
         void reload_graph();
 
-        std::unordered_set<node> &nodes() const;
-        audio::connection_set &connections() const;
+        std::unordered_set<node> &nodes() const override;
+        audio::connection_set &connections() const override;
         audio::offline_output_node &offline_output_node() const;
 
         engine::start_result_t start_render();
