@@ -6,9 +6,13 @@
 
 #if YAS_TEST
 
+#include "yas_protocol.h"
+
 namespace yas {
 namespace audio {
-    struct testable_unit {
+    struct testable_unit : protocol {
+        struct impl : protocol::impl {};
+
         template <typename T>
         static void set_property_data(unit const &unit, std::vector<T> const &data,
                                       AudioUnitPropertyID const property_id, AudioUnitScope const scope,

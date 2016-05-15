@@ -6,9 +6,13 @@
 
 #if YAS_TEST
 
+#include "yas_protocol.h"
+
 namespace yas {
 namespace audio {
-    struct testable_node {
+    struct testable_node : protocol {
+        struct impl : protocol::impl {};
+
         static node create() {
             return audio::node(std::make_shared<audio::node::impl>());
         }
