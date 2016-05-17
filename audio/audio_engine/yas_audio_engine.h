@@ -43,8 +43,6 @@ namespace audio {
         engine();
         engine(std::nullptr_t);
 
-        engine &operator=(std::nullptr_t);
-
         audio::connection connect(node &source_node, node &destination_node, audio::format const &format);
         audio::connection connect(node &source_node, node &destination_node, uint32_t const source_bus_idx,
                                   uint32_t const destination_bus_idx, audio::format const &format);
