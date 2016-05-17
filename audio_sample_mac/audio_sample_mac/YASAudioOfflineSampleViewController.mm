@@ -127,7 +127,10 @@ namespace sample {
         base engine_observer = nullptr;
 
         offline_vc_internal() {
-            auto format = audio::format(offline_sample::sample_rate, 2, audio::pcm_format::float32, false);
+            auto format = audio::format({.sample_rate = offline_sample::sample_rate,
+                                         .channel_count = 2,
+                                         .pcm_format = audio::pcm_format::float32,
+                                         .interleaved = false});
 
             audio::unit_output_node play_output_node;
 

@@ -24,7 +24,7 @@ using namespace yas;
     uint32_t const frame_length = 16;
     uint32_t const channels = 4;
 
-    auto format = audio::format(48000.0, channels);
+    auto format = audio::format({.sample_rate = 48000.0, .channel_count = channels});
     audio::pcm_buffer buffer(format, frame_length);
 
     XCTAssertEqual(format.buffer_count(), channels);
@@ -54,7 +54,7 @@ using namespace yas;
     uint32_t const frame_length = 16;
     uint32_t const channels = 4;
 
-    auto format = audio::format(48000.0, channels);
+    auto format = audio::format({.sample_rate = 48000.0, .channel_count = channels});
     audio::pcm_buffer buffer(format, frame_length);
 
     XCTAssertEqual(format.buffer_count(), channels);
@@ -86,7 +86,10 @@ using namespace yas;
     uint32_t const frame_length = 16;
     uint32_t const channels = 4;
 
-    auto format = audio::format(48000.0, channels, audio::pcm_format::float32, true);
+    auto format = audio::format({.sample_rate = 48000.0,
+                                 .channel_count = channels,
+                                 .pcm_format = audio::pcm_format::float32,
+                                 .interleaved = true});
     audio::pcm_buffer buffer(format, frame_length);
 
     XCTAssertEqual(format.stride(), channels);
@@ -112,7 +115,7 @@ using namespace yas;
     uint32_t const frame_length = 16;
     uint32_t const channels = 4;
 
-    auto const format = audio::format(48000, channels);
+    auto const format = audio::format({.sample_rate = 48000.0, .channel_count = channels});
     audio::pcm_buffer buffer(format, frame_length);
 
     XCTAssertEqual(format.buffer_count(), channels);
@@ -153,7 +156,7 @@ using namespace yas;
 - (void)testSetPosition {
     std::size_t const frame_length = 16;
 
-    auto const format = audio::format(48000.0, 1);
+    auto const format = audio::format({.sample_rate = 48000.0, .channel_count = 1});
     audio::pcm_buffer buffer(format, frame_length);
     audio::enumerator enumerator({.buffer = buffer, .channel = 0});
 
@@ -183,7 +186,7 @@ using namespace yas;
     std::size_t const frame_length = 16;
     std::size_t const stopIndex = 8;
 
-    auto format = audio::format(48000.0, 1);
+    auto format = audio::format({.sample_rate = 48000.0, .channel_count = 1});
     audio::pcm_buffer buffer(format, frame_length);
 
     audio::enumerator enumerator({.buffer = buffer, .channel = 0});

@@ -74,7 +74,7 @@ using namespace yas;
 - (void)test_render {
     audio::engine engine;
 
-    auto format = audio::format(44100.0, 2);
+    auto format = audio::format({.sample_rate = 44100.0, .channel_count = 2});
     audio::offline_output_node output_node;
     audio::route_node route_node;
     audio::tap_node tap_node;
@@ -147,8 +147,8 @@ using namespace yas;
 
     audio::engine engine;
 
-    auto dst_format = audio::format(44100.0, 2);
-    auto src_format = audio::format(44100.0, 1);
+    auto dst_format = audio::format({.sample_rate = 44100.0, .channel_count = 2});
+    auto src_format = audio::format({.sample_rate = 44100.0, .channel_count = 1});
     audio::offline_output_node output_node;
     audio::route_node route_node;
 
@@ -213,8 +213,8 @@ using namespace yas;
 
     audio::engine engine;
 
-    auto dst_format = audio::format(44100.0, 4);
-    auto src_format = audio::format(44100.0, 2);
+    auto dst_format = audio::format({.sample_rate = 44100.0, .channel_count = 4});
+    auto src_format = audio::format({.sample_rate = 44100.0, .channel_count = 2});
     audio::offline_output_node output_node;
     audio::route_node route_node;
 

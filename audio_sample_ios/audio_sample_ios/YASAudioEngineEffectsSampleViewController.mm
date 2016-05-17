@@ -44,7 +44,8 @@ namespace sample {
                 through_connection = nullptr;
             }
 
-            auto format = audio::format([AVAudioSession sharedInstance].sampleRate, 2);
+            auto format =
+                audio::format({.sample_rate = [AVAudioSession sharedInstance].sampleRate, .channel_count = 2});
 
             if (acd) {
                 effect_node = audio::unit_node(*acd);

@@ -29,8 +29,14 @@ using namespace yas;
     OSType const type = kAudioUnitType_FormatConverter;
     OSType const sub_type = kAudioUnitSubType_AUConverter;
 
-    auto output_format = audio::format(output_sample_rate, channels, audio::pcm_format::float32, false);
-    auto input_format = audio::format(input_sample_rate, channels, audio::pcm_format::int16, true);
+    auto output_format = audio::format({.sample_rate = output_sample_rate,
+                                        .channel_count = channels,
+                                        .pcm_format = audio::pcm_format::float32,
+                                        .interleaved = false});
+    auto input_format = audio::format({.sample_rate = input_sample_rate,
+                                       .channel_count = channels,
+                                       .pcm_format = audio::pcm_format::int16,
+                                       .interleaved = true});
 
     audio::graph graph;
 
@@ -96,7 +102,10 @@ using namespace yas;
     uint32_t const frame_length = 1024;
     uint32_t const maximum_frame_length = 4096;
 
-    auto format = audio::format(sampleRate, channels, audio::pcm_format::float32, false);
+    auto format = audio::format({.sample_rate = sampleRate,
+                                 .channel_count = channels,
+                                 .pcm_format = audio::pcm_format::float32,
+                                 .interleaved = false});
 
     audio::graph graph;
 
@@ -223,7 +232,10 @@ using namespace yas;
     AudioUnitScope const scope = kAudioUnitScope_Input;
     AudioUnitElement const element = 0;
 
-    auto format = audio::format(sampleRate, channels, audio::pcm_format::float32, false);
+    auto format = audio::format({.sample_rate = sampleRate,
+                                 .channel_count = channels,
+                                 .pcm_format = audio::pcm_format::float32,
+                                 .interleaved = false});
 
     std::vector<AudioStreamBasicDescription> set_data;
     set_data.push_back(format.stream_description());
@@ -240,8 +252,7 @@ using namespace yas;
     XCTAssertTrue(is_equal(set_data.at(0), get_data.at(0)));
 
     std::vector<AudioStreamBasicDescription> zero_data;
-    XCTAssertThrows(
-        audio::testable_unit::set_property_data(converter_unit, zero_data, property_id, scope, element));
+    XCTAssertThrows(audio::testable_unit::set_property_data(converter_unit, zero_data, property_id, scope, element));
 }
 
 @end

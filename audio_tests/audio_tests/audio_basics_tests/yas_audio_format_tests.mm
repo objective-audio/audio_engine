@@ -59,7 +59,7 @@ using namespace yas;
         .mBytesPerPacket = bytesPerFrame,
     };
 
-    auto format = audio::format(sampleRate, channelCount);
+    auto format = audio::format({.sample_rate = sampleRate, .channel_count = channelCount});
 
     XCTAssert(format.is_standard());
     XCTAssert(format.channel_count() == channelCount);
@@ -92,7 +92,10 @@ using namespace yas;
         .mBytesPerPacket = bytesPerFrame,
     };
 
-    auto format = audio::format(sampleRate, channelCount, pcmFormat, interleaved);
+    auto format = audio::format({.sample_rate = sampleRate,
+                                 .channel_count = channelCount,
+                                 .pcm_format = pcmFormat,
+                                 .interleaved = interleaved});
 
     XCTAssert(!format.is_standard());
     XCTAssert(format.channel_count() == channelCount);
@@ -125,7 +128,10 @@ using namespace yas;
         .mBytesPerPacket = bytesPerFrame,
     };
 
-    auto format = audio::format(sampleRate, channelCount, pcmFormat, interleaved);
+    auto format = audio::format({.sample_rate = sampleRate,
+                                 .channel_count = channelCount,
+                                 .pcm_format = pcmFormat,
+                                 .interleaved = interleaved});
 
     XCTAssert(!format.is_standard());
     XCTAssert(format.channel_count() == channelCount);
@@ -172,9 +178,9 @@ using namespace yas;
     double const sampleRate = 44100;
     uint32_t const channelCount = 2;
 
-    auto audio_format1 = audio::format(sampleRate, channelCount);
+    auto audio_format1 = audio::format({.sample_rate = sampleRate, .channel_count = channelCount});
     auto audio_format1b = audio_format1;
-    auto audio_format2 = audio::format(sampleRate, channelCount);
+    auto audio_format2 = audio::format({.sample_rate = sampleRate, .channel_count = channelCount});
 
     XCTAssert(audio_format1 == audio_format1b);
     XCTAssert(audio_format1 == audio_format2);
@@ -292,7 +298,7 @@ using namespace yas;
 }
 
 - (void)test_smoke {
-    audio::format format{48000.0, 2};
+    audio::format format{{.sample_rate = 48000.0, .channel_count = 2}};
     format.description();
 }
 

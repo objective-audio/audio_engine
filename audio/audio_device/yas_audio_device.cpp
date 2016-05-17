@@ -326,7 +326,10 @@ struct audio::device::impl : base::impl {
                     channel_count += abl.mBuffers[i].mNumberChannels;
                 }
 
-                audio::format format(stream_format.sample_rate(), channel_count, stream_format.pcm_format(), false);
+                audio::format format({.sample_rate = stream_format.sample_rate(),
+                                      .channel_count = channel_count,
+                                      .pcm_format = stream_format.pcm_format(),
+                                      .interleaved = false});
 
                 if (scope == kAudioObjectPropertyScopeInput) {
                     set_input_format(format);

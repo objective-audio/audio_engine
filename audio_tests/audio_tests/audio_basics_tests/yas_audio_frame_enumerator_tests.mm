@@ -24,7 +24,7 @@ using namespace yas;
     uint32_t const frame_length = 16;
     uint32_t const channels = 4;
 
-    auto format = audio::format(48000.0, channels);
+    auto format = audio::format({.sample_rate = 48000.0, .channel_count = channels});
     audio::pcm_buffer buffer(format, frame_length);
 
     XCTAssertEqual(format.buffer_count(), channels);
@@ -60,7 +60,10 @@ using namespace yas;
     uint32_t const frame_length = 16;
     uint32_t const channels = 3;
 
-    auto format = audio::format(48000, channels, audio::pcm_format::float32, true);
+    auto format = audio::format({.sample_rate = 48000.0,
+                                 .channel_count = channels,
+                                 .pcm_format = audio::pcm_format::float32,
+                                 .interleaved = true});
     audio::pcm_buffer buffer(format, frame_length);
 
     XCTAssertEqual(format.stride(), channels);
@@ -96,7 +99,10 @@ using namespace yas;
     uint32_t const frame_length = 16;
     uint32_t const channels = 3;
 
-    auto format = audio::format(48000, channels, audio::pcm_format::float32, true);
+    auto format = audio::format({.sample_rate = 48000.0,
+                                 .channel_count = channels,
+                                 .pcm_format = audio::pcm_format::float32,
+                                 .interleaved = true});
     audio::pcm_buffer data(format, frame_length);
 
     XCTAssertEqual(format.stride(), channels);
@@ -135,7 +141,7 @@ using namespace yas;
     uint32_t const frame_length = 16;
     uint32_t const channels = 4;
 
-    auto format = audio::format(48000, channels);
+    auto format = audio::format({.sample_rate = 48000.0, .channel_count = channels});
     audio::pcm_buffer buffer(format, frame_length);
 
     test::fill_test_values_to_buffer(buffer);
@@ -168,7 +174,7 @@ using namespace yas;
     uint32_t const frame_length = 16;
     uint32_t const channels = 4;
 
-    auto format = audio::format(48000, channels);
+    auto format = audio::format({.sample_rate = 48000.0, .channel_count = channels});
     audio::pcm_buffer buffer(format, frame_length);
 
     XCTAssertEqual(format.buffer_count(), channels);
@@ -211,7 +217,7 @@ using namespace yas;
 - (void)testSetFramePosition {
     uint32_t const frame_length = 16;
 
-    auto format = audio::format(48000, 1);
+    auto format = audio::format({.sample_rate = 48000.0, .channel_count = 1});
     audio::pcm_buffer buffer(format, frame_length);
 
     auto bufferPointer = buffer.flex_ptr_at_index(0);
@@ -247,7 +253,10 @@ using namespace yas;
 - (void)testSetChannelPosition {
     uint32_t const channels = 4;
 
-    auto format = audio::format(48000, channels, audio::pcm_format::float32, true);
+    auto format = audio::format({.sample_rate = 48000.0,
+                                 .channel_count = channels,
+                                 .pcm_format = audio::pcm_format::float32,
+                                 .interleaved = true});
     audio::pcm_buffer buffer(format, 1);
 
     auto bufferPointer = buffer.flex_ptr_at_index(0);
@@ -277,7 +286,8 @@ using namespace yas;
     for (uint32_t i = static_cast<uint32_t>(audio::pcm_format::float32);
          i <= static_cast<uint32_t>(audio::pcm_format::fixed824); ++i) {
         auto pcmFormat = static_cast<audio::pcm_format>(i);
-        auto format = audio::format(48000.0, channels, pcmFormat, false);
+        auto format = audio::format(
+            {.sample_rate = 48000.0, .channel_count = channels, .pcm_format = pcmFormat, .interleaved = false});
         audio::pcm_buffer buffer(format, frame_length);
 
         test::fill_test_values_to_buffer(buffer);
@@ -325,7 +335,10 @@ using namespace yas;
     std::size_t const stopFrame = 8;
     std::size_t const stopChannel = 2;
 
-    auto format = audio::format(48000.0, channels, audio::pcm_format::float32, true);
+    auto format = audio::format({.sample_rate = 48000.0,
+                                 .channel_count = channels,
+                                 .pcm_format = audio::pcm_format::float32,
+                                 .interleaved = true});
     audio::pcm_buffer buffer(format, frame_length);
 
     audio::frame_enumerator enumerator(buffer);
