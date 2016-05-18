@@ -70,16 +70,16 @@ void audio::device_io_node::impl::update_connections() {
     auto weak_node = to_weak(cast<device_io_node>());
     auto weak_device_io = to_weak(device_io);
 
-    auto render_function = [weak_node, weak_device_io](pcm_buffer &output_buffer, time const &when) {
+    auto render_function = [weak_node, weak_device_io](auto args) {
         if (auto node = weak_node.lock()) {
             if (auto kernel = node.impl_ptr<impl>()->kernel_cast()) {
-                if (output_buffer) {
+                if (args.output_buffer) {
                     auto const connections = kernel.input_connections();
                     if (connections.count(0) > 0) {
                         auto const &connection = connections.at(0);
                         if (auto source_node = connection.source_node()) {
                             if (connection.format() == source_node.output_format(connection.source_bus())) {
-                                source_node.render(output_buffer, connection.source_bus(), when);
+                                source_node.render(args.output_buffer, connection.source_bus(), args.when);
                             }
                         }
                     }
