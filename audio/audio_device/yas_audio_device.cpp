@@ -289,7 +289,8 @@ struct audio::device::impl : base::impl {
                 if (prev_streams.count(stream_id) > 0) {
                     new_streams.insert(std::make_pair(stream_id, prev_streams.at(stream_id)));
                 } else {
-                    new_streams.insert(std::make_pair(stream_id, stream(stream_id, audio_device_id)));
+                    new_streams.insert(
+                        std::make_pair(stream_id, stream({.stream_id = stream_id, .device_id = audio_device_id})));
                 }
             }
         }
