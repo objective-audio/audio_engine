@@ -175,13 +175,13 @@ struct audio::device_io::impl : base::impl {
                                 if (frame_length > 0) {
                                     output_buffer.set_frame_length(frame_length);
                                     audio::time time(*inOutputTime, output_buffer.format().sample_rate());
-                                    render_callback(output_buffer, time);
+                                    render_callback({.output_buffer = output_buffer, .when = time});
                                     output_buffer.copy_to(outOutputData);
                                 }
                             }
                         } else if (kernel.input_buffer()) {
                             pcm_buffer null_buffer{nullptr};
-                            render_callback(null_buffer, nullptr);
+                            render_callback({.output_buffer = null_buffer, .when = nullptr});
                         }
                     }
                 }

@@ -16,10 +16,16 @@ namespace audio {
         class impl;
 
        public:
+        struct args {
+            double sample_rate;
+            uint32_t channel_count;
+            audio::pcm_format pcm_format = audio::pcm_format::float32;
+            bool interleaved = false;
+        };
+
         explicit format(AudioStreamBasicDescription asbd);
         explicit format(CFDictionaryRef const &settings);
-        format(double const sample_rate, uint32_t const channel_count,
-               audio::pcm_format const pcm_format = audio::pcm_format::float32, bool const interleaved = false);
+        format(args args);
         format(std::nullptr_t);
 
         bool is_empty() const;

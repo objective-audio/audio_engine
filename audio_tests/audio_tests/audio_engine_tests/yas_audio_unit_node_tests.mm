@@ -23,7 +23,7 @@ using namespace yas;
 - (void)test_restore_parameters {
     audio::engine engine;
 
-    auto format = audio::format(44100.0, 2);
+    auto format = audio::format({.sample_rate = 44100.0, .channel_count = 2});
     audio::offline_output_node output_node;
     audio::unit_node delay_node(kAudioUnitType_Effect, kAudioUnitSubType_Delay);
 

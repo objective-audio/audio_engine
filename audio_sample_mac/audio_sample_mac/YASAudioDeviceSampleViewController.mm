@@ -180,12 +180,11 @@ namespace sample {
         [unowned_self](auto const &) { [[unowned_self.object() object] _updateDeviceNames]; });
 
     auto weak_device_io = to_weak(_internal.device_io);
-    _internal.device_io.set_render_callback(
-        [weak_device_io, kernel = _internal.kernel](audio::pcm_buffer & output_buffer, const audio::time &when) {
-            if (auto device_io = weak_device_io.lock()) {
-                kernel->process(device_io.input_buffer_on_render(), output_buffer);
-            }
-        });
+    _internal.device_io.set_render_callback([weak_device_io, kernel = _internal.kernel](auto args) {
+        if (auto device_io = weak_device_io.lock()) {
+            kernel->process(device_io.input_buffer_on_render(), args.output_buffer);
+        }
+    });
 
     [self _updateDeviceNames];
 

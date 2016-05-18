@@ -33,7 +33,7 @@ namespace audio {
 
         pcm_buffer(audio::format const &format, AudioBufferList *abl);
         pcm_buffer(audio::format const &format, uint32_t const frame_capacity);
-        pcm_buffer(audio::format const &format, pcm_buffer const &from_buffer, const channel_map_t &channel_map);
+        pcm_buffer(audio::format const &format, pcm_buffer const &from_buffer, channel_map_t const &channel_map);
         pcm_buffer(std::nullptr_t);
 
         audio::format const &format() const;
@@ -62,7 +62,7 @@ namespace audio {
 
         pcm_buffer::copy_result copy_from(pcm_buffer const &from_buffer, uint32_t const from_start_frame = 0,
                                           uint32_t const to_start_frame = 0, uint32_t const length = 0);
-        pcm_buffer::copy_result copy_from(const AudioBufferList *const from_abl, uint32_t const from_start_frame = 0,
+        pcm_buffer::copy_result copy_from(AudioBufferList const *const from_abl, uint32_t const from_start_frame = 0,
                                           uint32_t const to_start_frame = 0, uint32_t const length = 0);
         pcm_buffer::copy_result copy_to(AudioBufferList *const to_abl, uint32_t const from_start_frame = 0,
                                         uint32_t const to_start_frame = 0, uint32_t const length = 0);
@@ -70,7 +70,7 @@ namespace audio {
 
     void clear(AudioBufferList *abl);
 
-    pcm_buffer::copy_result copy(const AudioBufferList *const from_abl, AudioBufferList *const to_abl,
+    pcm_buffer::copy_result copy(AudioBufferList const *const from_abl, AudioBufferList *const to_abl,
                                  uint32_t const sample_byte_count, uint32_t const from_start_frame = 0,
                                  uint32_t const to_start_frame = 0, uint32_t const length = 0);
 

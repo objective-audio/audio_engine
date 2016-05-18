@@ -21,7 +21,7 @@ using namespace yas;
 }
 
 - (void)test_create_connention_success {
-    auto format = audio::format(48000.0, 2);
+    auto format = audio::format({.sample_rate = 48000.0, .channel_count = 2});
     test::audio_test_node source_node;
     test::audio_test_node destination_node;
     uint32_t const source_bus = 0;
@@ -41,7 +41,7 @@ using namespace yas;
 }
 
 - (void)test_remove_nodes {
-    auto format = audio::format(44100.0, 2);
+    auto format = audio::format({.sample_rate = 44100.0, .channel_count = 2});
     test::audio_test_node source_node;
     test::audio_test_node destination_node;
     uint32_t const source_bus = 0;
@@ -57,7 +57,7 @@ using namespace yas;
 }
 
 - (void)test_remove_nodes_separately {
-    auto format = audio::format(8000.0, 2);
+    auto format = audio::format({.sample_rate = 8000.0, .channel_count = 2});
     test::audio_test_node source_node;
     test::audio_test_node destination_node;
     uint32_t const source_bus = 0;
@@ -77,7 +77,7 @@ using namespace yas;
 }
 
 - (void)test_create_connection_failed {
-    auto format = audio::format(48000.0, 2);
+    auto format = audio::format({.sample_rate = 48000.0, .channel_count = 2});
     test::audio_test_node source_node;
     test::audio_test_node destination_node;
     uint32_t const source_bus = 0;

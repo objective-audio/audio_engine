@@ -51,7 +51,7 @@ namespace sample {
         void connect_nodes() {
             auto const sample_rate = io_node.device_sample_rate();
 
-            auto const format = audio::format(sample_rate, 2);
+            auto const format = audio::format({.sample_rate = sample_rate, .channel_count = 2});
 
             engine.connect(mixer_node, io_node, format);
             engine.connect(route_node, mixer_node, format);

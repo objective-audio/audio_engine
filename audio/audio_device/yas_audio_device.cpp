@@ -289,7 +289,8 @@ struct audio::device::impl : base::impl {
                 if (prev_streams.count(stream_id) > 0) {
                     new_streams.insert(std::make_pair(stream_id, prev_streams.at(stream_id)));
                 } else {
-                    new_streams.insert(std::make_pair(stream_id, stream(stream_id, audio_device_id)));
+                    new_streams.insert(
+                        std::make_pair(stream_id, stream({.stream_id = stream_id, .device_id = audio_device_id})));
                 }
             }
         }
@@ -326,7 +327,10 @@ struct audio::device::impl : base::impl {
                     channel_count += abl.mBuffers[i].mNumberChannels;
                 }
 
-                audio::format format(stream_format.sample_rate(), channel_count, stream_format.pcm_format(), false);
+                audio::format format({.sample_rate = stream_format.sample_rate(),
+                                      .channel_count = channel_count,
+                                      .pcm_format = stream_format.pcm_format(),
+                                      .interleaved = false});
 
                 if (scope == kAudioObjectPropertyScopeInput) {
                     set_input_format(format);

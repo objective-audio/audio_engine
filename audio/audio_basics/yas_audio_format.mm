@@ -84,9 +84,8 @@ audio::format::format(AudioStreamBasicDescription asbd) : base(std::make_shared<
 audio::format::format(CFDictionaryRef const &settings) : format(to_stream_description(settings)) {
 }
 
-audio::format::format(double const sample_rate, uint32_t const channel_count, audio::pcm_format const pcm_format,
-                      bool const interleaved)
-    : format(to_stream_description(sample_rate, channel_count, pcm_format, interleaved)) {
+audio::format::format(args args)
+    : format(to_stream_description(args.sample_rate, args.channel_count, args.pcm_format, args.interleaved)) {
 }
 
 audio::format::format(std::nullptr_t) : base(nullptr) {

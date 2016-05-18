@@ -30,7 +30,10 @@ using namespace yas;
     for (auto const &pcm_format : pcm_formats) {
         for (auto const &sample_rate : sample_rates) {
             for (auto const &interleaved : interleaves) {
-                auto const format = audio::format(sample_rate, 2, pcm_format, interleaved);
+                auto const format = audio::format({.sample_rate = sample_rate,
+                                                   .channel_count = 2,
+                                                   .pcm_format = pcm_format,
+                                                   .interleaved = interleaved});
                 XCTAssertNoThrow(converter_unit.manageable().initialize());
                 XCTAssertNoThrow(converter_unit.set_output_format(format.stream_description(), 0));
                 XCTAssertNoThrow(converter_unit.set_input_format(format.stream_description(), 0));

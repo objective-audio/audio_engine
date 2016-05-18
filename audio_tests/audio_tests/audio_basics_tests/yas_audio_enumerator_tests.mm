@@ -24,7 +24,7 @@ using namespace yas;
     uint32_t const frame_length = 16;
     uint32_t const channels = 4;
 
-    auto format = audio::format(48000.0, channels);
+    auto format = audio::format({.sample_rate = 48000.0, .channel_count = channels});
     audio::pcm_buffer buffer(format, frame_length);
 
     XCTAssertEqual(format.buffer_count(), channels);
@@ -32,7 +32,7 @@ using namespace yas;
     test::fill_test_values_to_buffer(buffer);
 
     for (uint32_t buf_idx = 0; buf_idx < channels; buf_idx++) {
-        audio::enumerator enumerator(buffer, buf_idx);
+        audio::enumerator enumerator({.buffer = buffer, .channel = buf_idx});
         auto const pointer = enumerator.pointer();
         auto const index = enumerator.index();
 
@@ -54,7 +54,7 @@ using namespace yas;
     uint32_t const frame_length = 16;
     uint32_t const channels = 4;
 
-    auto format = audio::format(48000.0, channels);
+    auto format = audio::format({.sample_rate = 48000.0, .channel_count = channels});
     audio::pcm_buffer buffer(format, frame_length);
 
     XCTAssertEqual(format.buffer_count(), channels);
@@ -62,7 +62,7 @@ using namespace yas;
     test::fill_test_values_to_buffer(buffer);
 
     for (uint32_t buf_idx = 0; buf_idx < channels; buf_idx++) {
-        audio::enumerator enumerator(buffer, buf_idx);
+        audio::enumerator enumerator({.buffer = buffer, .channel = buf_idx});
         XCTAssertEqual(enumerator.length(), frame_length);
 
         auto const pointer = enumerator.pointer();
@@ -86,7 +86,10 @@ using namespace yas;
     uint32_t const frame_length = 16;
     uint32_t const channels = 4;
 
-    auto format = audio::format(48000.0, channels, audio::pcm_format::float32, true);
+    auto format = audio::format({.sample_rate = 48000.0,
+                                 .channel_count = channels,
+                                 .pcm_format = audio::pcm_format::float32,
+                                 .interleaved = true});
     audio::pcm_buffer buffer(format, frame_length);
 
     XCTAssertEqual(format.stride(), channels);
@@ -94,7 +97,7 @@ using namespace yas;
     test::fill_test_values_to_buffer(buffer);
 
     for (uint32_t ch_idx = 0; ch_idx < channels; ch_idx++) {
-        audio::enumerator enumerator(buffer, ch_idx);
+        audio::enumerator enumerator({.buffer = buffer, .channel = ch_idx});
         auto const pointer = enumerator.pointer();
         auto const index = enumerator.index();
 
@@ -112,13 +115,13 @@ using namespace yas;
     uint32_t const frame_length = 16;
     uint32_t const channels = 4;
 
-    auto const format = audio::format(48000, channels);
+    auto const format = audio::format({.sample_rate = 48000.0, .channel_count = channels});
     audio::pcm_buffer buffer(format, frame_length);
 
     XCTAssertEqual(format.buffer_count(), channels);
 
     for (uint32_t buf_idx = 0; buf_idx < channels; buf_idx++) {
-        audio::enumerator enumerator(buffer, buf_idx);
+        audio::enumerator enumerator({.buffer = buffer, .channel = buf_idx});
         auto const pointer = enumerator.pointer();
         auto const index = enumerator.index();
 
@@ -134,7 +137,7 @@ using namespace yas;
     }
 
     for (uint32_t buf_idx = 0; buf_idx < channels; buf_idx++) {
-        audio::enumerator enumerator(buffer, buf_idx);
+        audio::enumerator enumerator({.buffer = buffer, .channel = buf_idx});
         auto const pointer = enumerator.pointer();
         auto const index = enumerator.index();
 
@@ -153,9 +156,9 @@ using namespace yas;
 - (void)testSetPosition {
     std::size_t const frame_length = 16;
 
-    auto const format = audio::format(48000.0, 1);
+    auto const format = audio::format({.sample_rate = 48000.0, .channel_count = 1});
     audio::pcm_buffer buffer(format, frame_length);
-    audio::enumerator enumerator(buffer, 0);
+    audio::enumerator enumerator({.buffer = buffer, .channel = 0});
 
     auto const pointer = enumerator.pointer();
     auto const index = enumerator.index();
@@ -183,10 +186,10 @@ using namespace yas;
     std::size_t const frame_length = 16;
     std::size_t const stopIndex = 8;
 
-    auto format = audio::format(48000.0, 1);
+    auto format = audio::format({.sample_rate = 48000.0, .channel_count = 1});
     audio::pcm_buffer buffer(format, frame_length);
 
-    audio::enumerator enumerator(buffer, 0);
+    audio::enumerator enumerator({.buffer = buffer, .channel = 0});
     auto const pointer = enumerator.pointer();
     auto const index = enumerator.index();
 
@@ -205,13 +208,13 @@ using namespace yas;
 - (void)testInitFailed {
     flex_ptr pointer(nullptr);
 
-    XCTAssertThrows(audio::enumerator(pointer, 1, 1));
+    XCTAssertThrows(audio::enumerator({.pointer = pointer, .byte_stride = 1, .length = 1}));
 
     int16_t val = 0;
     pointer.v = &val;
 
-    XCTAssertThrows(audio::enumerator(pointer, 0, 1));
-    XCTAssertThrows(audio::enumerator(pointer, 1, 0));
+    XCTAssertThrows(audio::enumerator({.pointer = pointer, .byte_stride = 0, .length = 1}));
+    XCTAssertThrows(audio::enumerator({.pointer = pointer, .byte_stride = 1, .length = 0}));
 }
 
 @end

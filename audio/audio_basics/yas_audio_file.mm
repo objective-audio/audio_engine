@@ -249,7 +249,10 @@ struct audio::file::impl : base::impl {
 
         file_format = format{asbd};
 
-        processing_format = format{file_format.sample_rate(), file_format.channel_count(), pcm_format, interleaved};
+        processing_format = format{{.sample_rate = file_format.sample_rate(),
+                                    .channel_count = file_format.channel_count(),
+                                    .pcm_format = pcm_format,
+                                    .interleaved = interleaved}};
 
         if (!ext_audio_file_utils::set_client_format(processing_format.stream_description(), ext_audio_file)) {
             close();
@@ -272,7 +275,10 @@ struct audio::file::impl : base::impl {
             return false;
         }
 
-        processing_format = format{file_format.sample_rate(), file_format.channel_count(), pcm_format, interleaved};
+        processing_format = format{{.sample_rate = file_format.sample_rate(),
+                                    .channel_count = file_format.channel_count(),
+                                    .pcm_format = pcm_format,
+                                    .interleaved = interleaved}};
 
         if (!ext_audio_file_utils::set_client_format(processing_format.stream_description(), ext_audio_file)) {
             close();

@@ -194,8 +194,14 @@ namespace test {
     bool const async = test_data.async;
     CFDictionaryRef settings = test_data.settings();
 
-    auto const default_processing_format = audio::format(file_sample_rate, test_data.channels, pcm_format, interleaved);
-    auto const processing_format = audio::format(processing_sample_rate, test_data.channels, pcm_format, interleaved);
+    auto const default_processing_format = audio::format({.sample_rate = file_sample_rate,
+                                                          .channel_count = test_data.channels,
+                                                          .pcm_format = pcm_format,
+                                                          .interleaved = interleaved});
+    auto const processing_format = audio::format({.sample_rate = processing_sample_rate,
+                                                  .channel_count = test_data.channels,
+                                                  .pcm_format = pcm_format,
+                                                  .interleaved = interleaved});
 
     // write
 

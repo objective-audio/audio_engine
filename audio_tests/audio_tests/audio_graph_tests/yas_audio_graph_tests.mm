@@ -39,8 +39,8 @@ using namespace yas;
     uint32_t const frame_length = 1024;
     uint32_t const maximum_frame_length = 4096;
 
-    auto output_format = audio::format(output_sample_rate, channels);
-    auto mixer_format = audio::format(mixer_sample_rate, channels);
+    auto output_format = audio::format({.sample_rate = output_sample_rate, .channel_count = channels});
+    auto mixer_format = audio::format({.sample_rate = mixer_sample_rate, .channel_count = channels});
 
     audio::graph graph;
 

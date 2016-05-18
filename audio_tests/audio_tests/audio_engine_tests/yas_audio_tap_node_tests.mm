@@ -26,7 +26,7 @@ using namespace yas;
     audio::offline_output_node output_node;
     audio::tap_node to_node;
     audio::tap_node from_node;
-    auto const format = audio::format(48000.0, 2);
+    auto const format = audio::format({.sample_rate = 48000.0, .channel_count = 2});
 
     auto const to_connection = engine.connect(to_node, output_node, format);
     auto const from_connection = engine.connect(from_node, to_node, format);
@@ -61,7 +61,7 @@ using namespace yas;
         [from_expectation](auto const &, auto const &, auto const &) { [from_expectation fulfill]; });
 
     XCTAssertTrue(engine.start_offline_render(
-        [](auto const &, auto const &, auto &out_stop) { out_stop = true; },
+        [](auto args) { args.out_stop = true; },
         [completion_expectation](auto const cancelled) { [completion_expectation fulfill]; }));
 
     [self waitForExpectationsWithTimeout:0.5
@@ -78,7 +78,7 @@ using namespace yas;
     audio::offline_output_node output_node;
     audio::tap_node to_node;
     audio::tap_node from_node;
-    auto const format = audio::format(48000.0, 2);
+    auto const format = audio::format({.sample_rate = 48000.0, .channel_count = 2});
 
     auto const to_connection = engine.connect(to_node, output_node, format);
     auto const from_connection = engine.connect(from_node, to_node, format);
@@ -88,8 +88,7 @@ using namespace yas;
     from_node.set_render_function(
         [from_expectation](auto const &, auto const &, auto const &) { [from_expectation fulfill]; });
 
-    XCTAssertTrue(
-        engine.start_offline_render([](auto const &, auto const &, auto &out_stop) { out_stop = true; }, nullptr));
+    XCTAssertTrue(engine.start_offline_render([](auto args) { args.out_stop = true; }, nullptr));
 
     [self waitForExpectationsWithTimeout:0.5
                                  handler:^(NSError *error){

@@ -20,7 +20,12 @@ namespace audio {
 
     class device_io : public base {
        public:
-        using render_f = std::function<void(audio::pcm_buffer &output_buffer, audio::time const &when)>;
+        struct render_args {
+            audio::pcm_buffer &output_buffer;
+            audio::time const &when;
+        };
+
+        using render_f = std::function<void(render_args args)>;
 
         device_io(std::nullptr_t);
         explicit device_io(audio::device const &);

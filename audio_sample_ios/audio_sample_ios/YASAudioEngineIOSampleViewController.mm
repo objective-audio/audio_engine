@@ -223,13 +223,13 @@ namespace sample {
 
     auto const output_channel_count = _internal.connection_channel_count_for_direction(audio::direction::output);
     if (output_channel_count > 0) {
-        auto output_format = audio::format(sample_rate, output_channel_count);
+        auto output_format = audio::format({.sample_rate = sample_rate, .channel_count = output_channel_count});
         _internal.engine.connect(_internal.mixer_node, _internal.io_node, output_format);
     }
 
     auto const input_channel_count = _internal.connection_channel_count_for_direction(audio::direction::input);
     if (input_channel_count > 0) {
-        auto input_format = audio::format(sample_rate, input_channel_count);
+        auto input_format = audio::format({.sample_rate = sample_rate, .channel_count = input_channel_count});
         _internal.engine.connect(_internal.io_node, _internal.mixer_node, input_format);
     }
 }

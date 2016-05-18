@@ -75,6 +75,10 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		B602AFDE1CEB5C7200309B3A /* yas_audio_connection_testable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yas_audio_connection_testable.h; sourceTree = "<group>"; };
+		B602AFDF1CEB5C7200309B3A /* yas_audio_engine_testable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yas_audio_engine_testable.h; sourceTree = "<group>"; };
+		B602AFE01CEB5C7200309B3A /* yas_audio_node_testable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yas_audio_node_testable.h; sourceTree = "<group>"; };
+		B602AFE11CEB5C7200309B3A /* yas_audio_unit_testable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yas_audio_unit_testable.h; sourceTree = "<group>"; };
 		B617CD301C95563400B3A934 /* yas_audio_node_protocol.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = yas_audio_node_protocol.cpp; path = audio_engine/yas_audio_node_protocol.cpp; sourceTree = "<group>"; };
 		B61A24D71AB06F1400883B4A /* YASAudioEngineIOSampleViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YASAudioEngineIOSampleViewController.h; sourceTree = "<group>"; };
 		B61D52941B9C708E00A449C5 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
@@ -243,6 +247,17 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		B602AFDD1CEB5C7200309B3A /* audio_testable */ = {
+			isa = PBXGroup;
+			children = (
+				B602AFDE1CEB5C7200309B3A /* yas_audio_connection_testable.h */,
+				B602AFDF1CEB5C7200309B3A /* yas_audio_engine_testable.h */,
+				B602AFE01CEB5C7200309B3A /* yas_audio_node_testable.h */,
+				B602AFE11CEB5C7200309B3A /* yas_audio_unit_testable.h */,
+			);
+			path = audio_testable;
+			sourceTree = "<group>";
+		};
 		B60F44591C1423090028C68A /* objc_utils */ = {
 			isa = PBXGroup;
 			children = (
@@ -323,6 +338,7 @@
 				B681DA371B77128D0010FCAE /* audio_engine */,
 				B699BEBD1BF4D1D30007B597 /* audio_graph */,
 				B6C8FD871B3B071700DB72E7 /* audio_device */,
+				B602AFDD1CEB5C7200309B3A /* audio_testable */,
 			);
 			name = audio;
 			path = ../audio;

@@ -26,7 +26,7 @@ namespace sample {
             [audioSession setCategory:AVAudioSessionCategoryPlayAndRecord error:nil];
             double const sample_rate = [audioSession sampleRate];
 
-            auto format = audio::format(sample_rate, 2);
+            auto format = audio::format({.sample_rate = sample_rate, .channel_count = 2});
 
             graph = audio::graph{};
 

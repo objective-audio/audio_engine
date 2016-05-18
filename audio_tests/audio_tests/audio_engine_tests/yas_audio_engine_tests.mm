@@ -23,7 +23,7 @@ using namespace yas;
 - (void)test_connect_success {
     audio::engine engine;
 
-    auto format = audio::format(48000.0, 2);
+    auto format = audio::format({.sample_rate = 48000.0, .channel_count = 2});
     test::audio_test_node source_node(1, 1);
     test::audio_test_node destination_node(1, 1);
 
@@ -45,7 +45,7 @@ using namespace yas;
 - (void)test_connect_failed_no_bus {
     audio::engine engine;
 
-    auto format = audio::format(48000.0, 2);
+    auto format = audio::format({.sample_rate = 48000.0, .channel_count = 2});
     test::audio_test_node source_node(0, 0);
     test::audio_test_node destination_node(0, 0);
 
@@ -58,7 +58,7 @@ using namespace yas;
 - (void)testConnectAndDisconnect {
     audio::engine engine;
 
-    auto format = audio::format(48000.0, 2);
+    auto format = audio::format({.sample_rate = 48000.0, .channel_count = 2});
     test::audio_test_node source_node(1, 1);
     test::audio_test_node relay_node(1, 1);
     test::audio_test_node destination_node(1, 1);

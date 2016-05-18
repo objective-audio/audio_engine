@@ -14,8 +14,19 @@ namespace audio {
 
     class enumerator {
        public:
-        enumerator(flex_ptr const &pointer, uint32_t const byte_stride, uint32_t const length);
-        enumerator(pcm_buffer const &buffer, uint32_t const channel);
+        struct pointer_args {
+            flex_ptr const &pointer;
+            uint32_t const byte_stride;
+            uint32_t const length;
+        };
+
+        struct buffer_args {
+            pcm_buffer const &buffer;
+            uint32_t const channel;
+        };
+
+        enumerator(pointer_args args);
+        enumerator(buffer_args args);
 
         flex_ptr const *pointer() const;
         uint32_t const *index() const;
