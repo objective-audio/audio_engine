@@ -89,7 +89,7 @@ using namespace yas;
     {
         XCTestExpectation *expectation = [self expectationWithDescription:@"first render"];
 
-        XCTAssertTrue(engine.start_offline_render([](auto const &, auto const &, auto &out_stop) { out_stop = true; },
+        XCTAssertTrue(engine.start_offline_render([](auto args) { args.out_stop = true; },
                                                   [expectation](bool const cancelled) { [expectation fulfill]; }));
 
         [self waitForExpectationsWithTimeout:0.5
@@ -114,9 +114,9 @@ using namespace yas;
         XCTestExpectation *expectation = [self expectationWithDescription:@"second render"];
 
         XCTAssertTrue(engine.start_offline_render(
-            [self](audio::pcm_buffer &buffer, audio::time const &when, bool &out_stop) {
-                out_stop = true;
-                audio::frame_enumerator enumerator(buffer);
+            [self](auto args) {
+                args.out_stop = true;
+                audio::frame_enumerator enumerator(args.buffer);
                 auto pointer = enumerator.pointer();
                 uint32_t const *frm_idx = enumerator.frame();
                 uint32_t const *ch_idx = enumerator.channel();
@@ -179,9 +179,9 @@ using namespace yas;
     XCTestExpectation *expectation = [self expectationWithDescription:@"render"];
 
     XCTAssertTrue(engine.start_offline_render(
-        [self](audio::pcm_buffer &buffer, audio::time const &when, bool &out_stop) {
-            out_stop = true;
-            audio::frame_enumerator enumerator(buffer);
+        [self](auto args) {
+            args.out_stop = true;
+            audio::frame_enumerator enumerator(args.buffer);
             auto pointer = enumerator.pointer();
             uint32_t const *frm_idx = enumerator.frame();
             uint32_t const *ch_idx = enumerator.channel();
@@ -245,9 +245,9 @@ using namespace yas;
     XCTestExpectation *expectation = [self expectationWithDescription:@"render"];
 
     XCTAssertTrue(engine.start_offline_render(
-        [self](audio::pcm_buffer &buffer, audio::time const &when, bool &out_stop) {
-            out_stop = true;
-            audio::frame_enumerator enumerator(buffer);
+        [self](auto args) {
+            args.out_stop = true;
+            audio::frame_enumerator enumerator(args.buffer);
             auto pointer = enumerator.pointer();
             uint32_t const *const frm_idx = enumerator.frame();
             uint32_t const *const ch_idx = enumerator.channel();

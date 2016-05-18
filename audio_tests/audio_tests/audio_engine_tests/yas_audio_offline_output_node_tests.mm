@@ -66,7 +66,11 @@ using namespace yas;
 
     uint32_t output_render_frame = 0;
 
-    auto start_render_function = [=](audio::pcm_buffer &buffer, audio::time const &when, bool &out_stop) mutable {
+    auto start_render_function = [=](auto args) mutable {
+        audio::pcm_buffer &buffer = args.buffer;
+        audio::time const &when = args.when;
+        bool &out_stop = args.out_stop;
+
         XCTAssertEqual(when.sample_time(), output_render_frame);
         XCTAssertEqual(when.sample_rate(), sample_rate);
         XCTAssertEqual(buffer.frame_length(), frames_per_render);
@@ -157,7 +161,11 @@ using namespace yas;
 
     uint32_t output_render_frame = 0;
 
-    auto start_render_function = [=](audio::pcm_buffer &buffer, audio::time const &when, bool &out_stop) mutable {
+    auto start_render_function = [=](auto args) mutable {
+        audio::pcm_buffer &buffer = args.buffer;
+        audio::time const &when = args.when;
+        bool &out_stop = args.out_stop;
+
         XCTAssertEqual(when.sample_time(), output_render_frame);
         XCTAssertEqual(when.sample_rate(), sample_rate);
         XCTAssertEqual(buffer.frame_length(), frames_per_render);
@@ -231,8 +239,8 @@ using namespace yas;
 
     XCTestExpectation *completionExpectation = [self expectationWithDescription:@"offline output node completion"];
 
-    auto render_func = [promise](audio::pcm_buffer &buffer, audio::time const &when, bool &out_stop) mutable {
-        if (when.sample_time() == 0) {
+    auto render_func = [promise](auto args) mutable {
+        if (args.when.sample_time() == 0) {
             promise->set_value();
         }
     };
