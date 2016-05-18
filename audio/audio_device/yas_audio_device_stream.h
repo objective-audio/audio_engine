@@ -43,7 +43,12 @@ namespace audio {
 
         using subject_t = yas::subject<change_info, method>;
 
-        stream(AudioStreamID const, AudioDeviceID const);
+        struct args {
+            AudioStreamID stream_id;
+            AudioDeviceID device_id;
+        };
+
+        stream(args args);
         stream(std::nullptr_t);
 
         AudioStreamID stream_id() const;

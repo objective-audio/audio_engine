@@ -102,8 +102,7 @@ struct audio::device::stream::impl : base::impl {
 
 #pragma mark - main
 
-audio::device::stream::stream(AudioStreamID const stream_id, AudioDeviceID const device_id)
-    : base(std::make_shared<impl>(stream_id, device_id)) {
+audio::device::stream::stream(args args) : base(std::make_shared<impl>(args.stream_id, args.device_id)) {
     auto imp = impl_ptr<impl>();
     auto function = imp->listener(*this);
     imp->add_listener(kAudioStreamPropertyVirtualFormat, function);
