@@ -112,7 +112,7 @@ audio::offline_start_result_t audio::offline_output_node::impl::start(offline_re
                 }
 
                 if (render_func) {
-                    render_func(render_buffer, when, stop);
+                    render_func({.buffer = render_buffer, .when = when, .out_stop = stop});
                 }
 
                 if (op.is_canceled()) {

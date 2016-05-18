@@ -261,8 +261,9 @@ namespace sample {
     [unowned_self.object() setObject:self];
 
     auto start_result = _internal.offline_engine.start_offline_render(
-        [remain, file_writer = std::move(file_writer)](audio::pcm_buffer & buffer, auto const &when,
-                                                       bool &out_stop) mutable {
+        [remain, file_writer = std::move(file_writer)](auto args) mutable {
+            audio::pcm_buffer &buffer = args.buffer;
+
             auto format = audio::format(buffer.format().stream_description());
             audio::pcm_buffer pcm_buffer(format, buffer.audio_buffer_list());
             pcm_buffer.set_frame_length(buffer.frame_length());
@@ -279,7 +280,7 @@ namespace sample {
             remain -= frame_length;
             if (remain == 0) {
                 file_writer.close();
-                out_stop = YES;
+                args.out_stop = YES;
             }
         },
         [unowned_self](const bool cancelled) { [unowned_self.object() object].processing = NO; });

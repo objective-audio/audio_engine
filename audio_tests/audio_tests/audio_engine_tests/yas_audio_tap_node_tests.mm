@@ -61,7 +61,7 @@ using namespace yas;
         [from_expectation](auto const &, auto const &, auto const &) { [from_expectation fulfill]; });
 
     XCTAssertTrue(engine.start_offline_render(
-        [](auto const &, auto const &, auto &out_stop) { out_stop = true; },
+        [](auto args) { args.out_stop = true; },
         [completion_expectation](auto const cancelled) { [completion_expectation fulfill]; }));
 
     [self waitForExpectationsWithTimeout:0.5
@@ -88,8 +88,7 @@ using namespace yas;
     from_node.set_render_function(
         [from_expectation](auto const &, auto const &, auto const &) { [from_expectation fulfill]; });
 
-    XCTAssertTrue(
-        engine.start_offline_render([](auto const &, auto const &, auto &out_stop) { out_stop = true; }, nullptr));
+    XCTAssertTrue(engine.start_offline_render([](auto args) { args.out_stop = true; }, nullptr));
 
     [self waitForExpectationsWithTimeout:0.5
                                  handler:^(NSError *error){
