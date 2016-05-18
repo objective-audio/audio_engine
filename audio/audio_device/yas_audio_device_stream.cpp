@@ -11,9 +11,6 @@
 
 using namespace yas;
 
-using listener_f =
-    std::function<void(uint32_t const in_number_addresses, const AudioObjectPropertyAddress *const in_addresses)>;
-
 #pragma mark - property_info
 
 audio::device::stream::property_info::property_info(stream::property const property, AudioObjectID const object_id,
@@ -49,6 +46,9 @@ audio::device::stream::change_info::change_info(std::vector<property_info> &&inf
 #pragma mark - private
 
 struct audio::device::stream::impl : base::impl {
+    using listener_f =
+        std::function<void(uint32_t const in_number_addresses, const AudioObjectPropertyAddress *const in_addresses)>;
+
    public:
     AudioStreamID stream_id;
     AudioDeviceID device_id;
