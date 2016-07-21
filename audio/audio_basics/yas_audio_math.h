@@ -8,28 +8,27 @@
 
 namespace yas {
 namespace audio {
-    class math {
-       public:
-        static double constexpr two_pi = M_PI * 2.0;
+    namespace math {
+        double constexpr two_pi = M_PI * 2.0;
 
         template <typename T>
-        static auto decibel_from_linear(T const linear) -> T;
+        auto decibel_from_linear(T const linear) -> T;
 
         template <typename T>
-        static auto linear_from_decibel(T const decibel) -> T;
+        auto linear_from_decibel(T const decibel) -> T;
 
         template <typename T>
-        static auto tempo_from_seconds(T const seconds) -> T;
+        auto tempo_from_seconds(T const seconds) -> T;
 
         template <typename T>
-        static auto seconds_from_tempo(T const tempo) -> T;
+        auto seconds_from_tempo(T const tempo) -> T;
 
-        static double seconds_from_frames(uint32_t const frames, double const sample_rate);
-        static uint32_t frames_from_seconds(double const seconds, double const sample_rate);
+        double seconds_from_frames(uint32_t const frames, double const sample_rate);
+        uint32_t frames_from_seconds(double const seconds, double const sample_rate);
 
         template <typename T>
-        static auto fill_sine(T *const out_data, uint32_t const length, double const start_phase,
-                              double const phase_per_frame) -> T;
+        auto fill_sine(T *const out_data, uint32_t const length, double const start_phase, double const phase_per_frame)
+            -> T;
     };
 
     template <typename T>
