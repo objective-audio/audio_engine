@@ -4,8 +4,6 @@
 
 #pragma once
 
-#include <memory>
-#include <vector>
 #include "yas_audio_types.h"
 #include "yas_base.h"
 
@@ -38,7 +36,7 @@ namespace audio {
 
         audio::format const &format() const;
         AudioBufferList *audio_buffer_list();
-        const AudioBufferList *audio_buffer_list() const;
+        AudioBufferList const *audio_buffer_list() const;
 
         flex_ptr flex_ptr_at_index(uint32_t const buf_idx) const;
         flex_ptr flex_ptr_at_channel(uint32_t const ch_idx) const;
@@ -48,9 +46,9 @@ namespace audio {
         template <typename T>
         T *data_ptr_at_channel(uint32_t const ch_idx);
         template <typename T>
-        const T *data_ptr_at_index(uint32_t const buf_idx) const;
+        T const *data_ptr_at_index(uint32_t const buf_idx) const;
         template <typename T>
-        const T *data_ptr_at_channel(uint32_t const ch_idx) const;
+        T const *data_ptr_at_channel(uint32_t const ch_idx) const;
 
         uint32_t frame_capacity() const;
         uint32_t frame_length() const;
@@ -74,7 +72,7 @@ namespace audio {
                                  uint32_t const sample_byte_count, uint32_t const from_start_frame = 0,
                                  uint32_t const to_start_frame = 0, uint32_t const length = 0);
 
-    uint32_t frame_length(const AudioBufferList *const abl, uint32_t const sample_byte_count);
+    uint32_t frame_length(AudioBufferList const *const abl, uint32_t const sample_byte_count);
 
     std::pair<abl_uptr, abl_data_uptr> allocate_audio_buffer_list(uint32_t const buffer_count,
                                                                   uint32_t const channel_count,

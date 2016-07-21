@@ -53,7 +53,7 @@ namespace audio {
 
         virtual void render(audio::pcm_buffer &buffer, uint32_t const bus_idx, audio::time const &when);
         audio::time render_time() const;
-        void set_render_time_on_render(audio::time const &time);
+        void set_render_time_on_render(audio::time const &);
 
        private:
         class core;

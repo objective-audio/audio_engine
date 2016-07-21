@@ -54,7 +54,7 @@ namespace audio {
         AudioStreamID stream_id() const;
         audio::device device() const;
         bool is_active() const;
-        direction direction() const;
+        audio::direction direction() const;
         audio::format virtual_format() const;
         uint32_t starting_channel() const;
 

@@ -6,9 +6,7 @@
 
 #include <AudioUnit/AUComponent.h>
 #include <experimental/optional>
-#include <map>
 #include <memory>
-#include <set>
 #include <string>
 #include <vector>
 

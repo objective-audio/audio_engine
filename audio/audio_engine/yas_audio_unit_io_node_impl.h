@@ -20,8 +20,8 @@ namespace audio {
         uint32_t output_device_channel_count() const;
         uint32_t input_device_channel_count() const;
 
-        void set_channel_map(channel_map_t const &map, direction const dir);
-        channel_map_t const &channel_map(direction const dir) const;
+        void set_channel_map(channel_map_t const &, audio::direction const);
+        channel_map_t const &channel_map(audio::direction const) const;
 
         virtual bus_result_t next_available_output_bus() const override;
         virtual bool is_available_output_bus(uint32_t const bus_idx) const override;

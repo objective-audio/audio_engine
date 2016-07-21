@@ -12,8 +12,7 @@ namespace yas {
 namespace audio {
     class pcm_buffer;
 
-    class enumerator {
-       public:
+    struct enumerator {
         struct pointer_args {
             flex_ptr const &pointer;
             uint32_t const byte_stride;
@@ -25,8 +24,8 @@ namespace audio {
             uint32_t const channel;
         };
 
-        enumerator(pointer_args args);
-        enumerator(buffer_args args);
+        explicit enumerator(pointer_args args);
+        explicit enumerator(buffer_args args);
 
         flex_ptr const *pointer() const;
         uint32_t const *index() const;
@@ -46,8 +45,7 @@ namespace audio {
         uint32_t _index;
     };
 
-    class frame_enumerator {
-       public:
+    struct frame_enumerator {
         explicit frame_enumerator(pcm_buffer const &buffer);
 
         flex_ptr const *pointer() const;

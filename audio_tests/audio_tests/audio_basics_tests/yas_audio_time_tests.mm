@@ -108,9 +108,9 @@ static NSInteger testCount = 8;
         double rate = arc4random_uniform(378000 - 4000) + 4000;
 
         auto yas_time = audio::time(sampleTime, rate);
-        AVAudioTime *avTime = to_objc_object(yas_time);
-        XCTAssertTrue([self compareAudioTimeStamp:avTime to:yas_time]);
-        XCTAssertTrue(test::is_equal(avTime.sampleRate, yas_time.sample_rate(), 0.00001), @"");
+        auto av_time = to_objc_object(yas_time);
+        XCTAssertTrue([self compareAudioTimeStamp:av_time.object() to:yas_time]);
+        XCTAssertTrue(test::is_equal(av_time.object().sampleRate, yas_time.sample_rate(), 0.00001), @"");
     }
 }
 

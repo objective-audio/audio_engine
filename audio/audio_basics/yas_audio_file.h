@@ -5,7 +5,6 @@
 #pragma once
 
 #include <CoreFoundation/CoreFoundation.h>
-#include <memory>
 #include "yas_audio_types.h"
 #include "yas_base.h"
 
@@ -23,7 +22,7 @@ namespace audio {
        public:
         struct open_args {
             CFURLRef file_url = nullptr;
-            pcm_format pcm_format = pcm_format::float32;
+            audio::pcm_format pcm_format = pcm_format::float32;
             bool interleaved = false;
         };
 
@@ -31,7 +30,7 @@ namespace audio {
             CFURLRef file_url = nullptr;
             CFStringRef file_type = nullptr;
             CFDictionaryRef settings = nullptr;
-            pcm_format pcm_format = pcm_format::float32;
+            audio::pcm_format pcm_format = pcm_format::float32;
             bool interleaved = false;
         };
 

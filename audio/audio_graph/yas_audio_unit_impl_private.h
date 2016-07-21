@@ -5,7 +5,6 @@
 #pragma once
 
 #include <AudioToolbox/AudioToolbox.h>
-#include <memory>
 #include <vector>
 #include "yas_audio_exception.h"
 

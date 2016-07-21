@@ -20,12 +20,12 @@ namespace audio {
         virtual ~unit_io_node();
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
-        void set_device(audio::device const &device);
+        void set_device(audio::device const &);
         audio::device device() const;
 #endif
 
-        void set_channel_map(channel_map_t const &map, direction const dir);
-        channel_map_t const &channel_map(direction const dir) const;
+        void set_channel_map(channel_map_t const &, audio::direction const);
+        channel_map_t const &channel_map(audio::direction const) const;
 
         double device_sample_rate() const;
         uint32_t output_device_channel_count() const;
@@ -44,7 +44,7 @@ namespace audio {
         unit_output_node();
         unit_output_node(std::nullptr_t);
 
-        void set_channel_map(channel_map_t const &map);
+        void set_channel_map(channel_map_t const &);
         channel_map_t const &channel_map() const;
     };
 
@@ -55,7 +55,7 @@ namespace audio {
         unit_input_node();
         unit_input_node(std::nullptr_t);
 
-        void set_channel_map(channel_map_t const &map);
+        void set_channel_map(channel_map_t const &);
         channel_map_t const &channel_map() const;
     };
 }

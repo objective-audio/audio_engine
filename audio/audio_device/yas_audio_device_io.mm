@@ -6,7 +6,6 @@
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
 
-#include <memory>
 #include <mutex>
 #include "yas_audio_device.h"
 #include "yas_audio_device.h"
