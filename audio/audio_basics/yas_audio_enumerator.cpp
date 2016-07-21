@@ -69,7 +69,7 @@ audio::enumerator &audio::enumerator::operator++() {
 
 #pragma mark - frame enumerator
 
-audio::frame_enumerator::frame_enumerator(pcm_buffer const &buffer)
+audio::frame_enumerator::frame_enumerator(audio::pcm_buffer const &buffer)
     : _frame(0),
       _channel(0),
       _frame_length(buffer.frame_length()),

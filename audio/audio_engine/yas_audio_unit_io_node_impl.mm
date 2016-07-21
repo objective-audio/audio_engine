@@ -81,7 +81,7 @@ uint32_t audio::unit_io_node::impl::input_device_channel_count() const {
 #endif
 }
 
-void audio::unit_io_node::impl::set_channel_map(channel_map_t const &map, direction const dir) {
+void audio::unit_io_node::impl::set_channel_map(channel_map_t const &map, audio::direction const dir) {
     _core->channel_map[to_uint32(dir)] = map;
 
     if (auto unit = au()) {
@@ -89,7 +89,7 @@ void audio::unit_io_node::impl::set_channel_map(channel_map_t const &map, direct
     }
 }
 
-audio::channel_map_t const &audio::unit_io_node::impl::channel_map(direction const dir) const {
+audio::channel_map_t const &audio::unit_io_node::impl::channel_map(audio::direction const dir) const {
     return _core->channel_map[to_uint32(dir)];
 }
 

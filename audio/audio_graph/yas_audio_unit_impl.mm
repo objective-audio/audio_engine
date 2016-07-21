@@ -2,6 +2,7 @@
 //  yas_audio_unit_impl.mm
 //
 
+#include <mutex>
 #include "yas_audio_graph.h"
 #include "yas_audio_pcm_buffer.h"
 #include "yas_audio_unit.h"

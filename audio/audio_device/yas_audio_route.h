@@ -4,9 +4,7 @@
 
 #pragma once
 
-#include <memory>
-#include <string>
-#include <vector>
+#include <set>
 #include "yas_audio_types.h"
 
 namespace yas {

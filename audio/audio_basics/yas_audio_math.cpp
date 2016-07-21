@@ -3,39 +3,38 @@
 //
 
 #include <Accelerate/Accelerate.h>
-#include <math.h>
 #include "yas_audio_math.h"
 
 using namespace yas;
 
 template <>
 double audio::math::decibel_from_linear(double const linear) {
-    return 20.0 * log10(linear);
+    return 20.0 * std::log10(linear);
 }
 
 template <>
 float audio::math::decibel_from_linear(float const linear) {
-    return 20.0f * log10f(linear);
+    return 20.0f * std::log10f(linear);
 }
 
 template <>
 double audio::math::linear_from_decibel(double const decibel) {
-    return pow(10.0, decibel / 20.0);
+    return std::pow(10.0, decibel / 20.0);
 }
 
 template <>
 float audio::math::linear_from_decibel(float const decibel) {
-    return powf(10.0f, decibel / 20.0f);
+    return std::powf(10.0f, decibel / 20.0f);
 }
 
 template <>
 double audio::math::tempo_from_seconds(double const seconds) {
-    return pow(2, -log2(seconds)) * 60.0;
+    return std::pow(2.0, -std::log2(seconds)) * 60.0;
 }
 
 template <>
 double audio::math::seconds_from_tempo(double const tempo) {
-    return powf(2, -log2f(tempo / 60.0f));
+    return std::powf(2.0, -std::log2f(tempo / 60.0f));
 }
 
 double audio::math::seconds_from_frames(uint32_t const frames, double const sample_rate) {

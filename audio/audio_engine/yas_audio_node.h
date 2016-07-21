@@ -5,8 +5,6 @@
 #pragma once
 
 #include <experimental/optional>
-#include <map>
-#include <memory>
 #include "yas_audio_connection.h"
 #include "yas_audio_format.h"
 #include "yas_audio_node_protocol.h"

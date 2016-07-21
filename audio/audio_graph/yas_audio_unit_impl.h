@@ -10,7 +10,6 @@ namespace audio {
        public:
         std::experimental::optional<uint8_t> _graph_key;
         std::experimental::optional<uint16_t> _key;
-        bool initialized;
 
         impl();
         ~impl();

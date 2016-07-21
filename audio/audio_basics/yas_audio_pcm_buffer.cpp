@@ -494,7 +494,7 @@ audio::pcm_buffer::copy_result audio::copy(AudioBufferList const *const from_abl
     for (uint32_t ch_idx = 0; ch_idx < from_info.channel_count; ch_idx++) {
         uint32_t const &from_stride = from_info.strides[ch_idx];
         uint32_t const &to_stride = to_info.strides[ch_idx];
-        const void *from_data = &(from_info.datas[ch_idx][from_start_frame * sample_byte_count * from_stride]);
+        void const *from_data = &(from_info.datas[ch_idx][from_start_frame * sample_byte_count * from_stride]);
         void *to_data = &(to_info.datas[ch_idx][to_start_frame * sample_byte_count * to_stride]);
 
         if (from_stride == 1 && to_stride == 1) {

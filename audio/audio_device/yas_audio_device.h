@@ -9,10 +9,7 @@
 
 #include <AudioToolbox/AudioToolbox.h>
 #include <experimental/optional>
-#include <memory>
-#include <set>
 #include <string>
-#include <unordered_map>
 #include <vector>
 #include "yas_audio_types.h"
 #include "yas_base.h"
