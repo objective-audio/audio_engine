@@ -101,3 +101,8 @@ std::string to_string(audio::file::read_error_t const &);
 std::string to_string(audio::file::create_error_t const &);
 std::string to_string(audio::file::write_error_t const &);
 }
+
+std::ostream &operator<<(std::ostream &, yas::audio::file::open_error_t const &);
+std::ostream &operator<<(std::ostream &, yas::audio::file::read_error_t const &);
+std::ostream &operator<<(std::ostream &, yas::audio::file::create_error_t const &);
+std::ostream &operator<<(std::ostream &, yas::audio::file::write_error_t const &);

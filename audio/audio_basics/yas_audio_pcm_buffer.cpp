@@ -572,3 +572,8 @@ std::string yas::to_string(audio::pcm_buffer::copy_error_t const &error) {
             return "buffer_is_null";
     }
 }
+
+std::ostream &operator<<(std::ostream &os, yas::audio::pcm_buffer::copy_error_t const &value) {
+    os << to_string(value);
+    return os;
+}

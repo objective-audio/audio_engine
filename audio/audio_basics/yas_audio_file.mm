@@ -427,3 +427,23 @@ std::string yas::to_string(audio::file::write_error_t const &error_t) {
             return "tell_failed";
     }
 }
+
+std::ostream &operator<<(std::ostream &os, yas::audio::file::open_error_t const &value) {
+    os << to_string(value);
+    return os;
+}
+
+std::ostream &operator<<(std::ostream &os, yas::audio::file::read_error_t const &value) {
+    os << to_string(value);
+    return os;
+}
+
+std::ostream &operator<<(std::ostream &os, yas::audio::file::create_error_t const &value) {
+    os << to_string(value);
+    return os;
+}
+
+std::ostream &operator<<(std::ostream &os, yas::audio::file::write_error_t const &value) {
+    os << to_string(value);
+    return os;
+}

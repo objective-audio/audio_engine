@@ -129,3 +129,8 @@ std::string yas::to_string(audio::unit::parameter::method const &method) {
             return "did_change";
     }
 }
+
+std::ostream &operator<<(std::ostream &os, yas::audio::unit::parameter::method const &value) {
+    os << to_string(value);
+    return os;
+}

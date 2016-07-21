@@ -304,3 +304,8 @@ AudioStreamBasicDescription yas::to_stream_description(double const sample_rate,
 bool yas::is_equal(AudioStreamBasicDescription const &asbd1, AudioStreamBasicDescription const &asbd2) {
     return memcmp(&asbd1, &asbd2, sizeof(AudioStreamBasicDescription)) == 0;
 }
+
+std::ostream &operator<<(std::ostream &os, yas::audio::pcm_format const &value) {
+    os << to_string(value);
+    return os;
+}

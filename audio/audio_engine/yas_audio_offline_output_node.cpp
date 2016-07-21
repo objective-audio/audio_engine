@@ -37,3 +37,8 @@ std::string yas::to_string(audio::offline_start_error_t const &error) {
             return "connection_not_found";
     }
 }
+
+std::ostream &operator<<(std::ostream &os, yas::audio::offline_start_error_t const &value) {
+    os << to_string(value);
+    return os;
+}

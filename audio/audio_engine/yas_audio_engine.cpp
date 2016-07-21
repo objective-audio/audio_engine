@@ -121,3 +121,8 @@ std::string yas::to_string(audio::engine::start_error_t const &error) {
             return "offline_output_starting_failure";
     }
 }
+
+std::ostream &operator<<(std::ostream &os, yas::audio::engine::start_error_t const &value) {
+    os << to_string(value);
+    return os;
+}

@@ -50,3 +50,5 @@ AudioStreamBasicDescription to_stream_description(double const sample_rate, uint
                                                   audio::pcm_format const pcm_format, bool const interleaved);
 bool is_equal(AudioStreamBasicDescription const &asbd1, AudioStreamBasicDescription const &asbd2);
 }
+
+std::ostream &operator<<(std::ostream &, yas::audio::pcm_format const &);

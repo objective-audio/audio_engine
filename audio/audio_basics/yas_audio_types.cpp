@@ -122,3 +122,23 @@ std::string yas::to_string(OSStatus const err) {
             return "Unknown";
     }
 }
+
+std::ostream &operator<<(std::ostream &os, yas::audio::direction const &value) {
+    os << to_string(value);
+    return os;
+}
+
+std::ostream &operator<<(std::ostream &os, AudioUnitScope const value) {
+    os << to_string(value);
+    return os;
+}
+
+std::ostream &operator<<(std::ostream &os, yas::audio::render_type const &value) {
+    os << to_string(value);
+    return os;
+}
+
+std::ostream &operator<<(std::ostream &os, OSStatus const value) {
+    os << to_string(value);
+    return os;
+}
