@@ -287,6 +287,17 @@ using namespace yas;
     XCTAssertTrue(to_string(audio::pcm_format::other) == "Other");
 }
 
+- (void)test_pcm_format_ostream {
+    auto const errors = {audio::pcm_format::float32, audio::pcm_format::float64, audio::pcm_format::int16,
+                         audio::pcm_format::fixed824, audio::pcm_format::other};
+
+    for (auto const &error : errors) {
+        std::ostringstream stream;
+        stream << error;
+        XCTAssertEqual(stream.str(), to_string(error));
+    }
+}
+
 - (void)test_null_format {
     auto const null_format = audio::format::null_format();
     XCTAssertFalse(null_format);

@@ -128,17 +128,7 @@ std::ostream &operator<<(std::ostream &os, yas::audio::direction const &value) {
     return os;
 }
 
-std::ostream &operator<<(std::ostream &os, AudioUnitScope const value) {
-    os << to_string(value);
-    return os;
-}
-
 std::ostream &operator<<(std::ostream &os, yas::audio::render_type const &value) {
-    os << to_string(value);
-    return os;
-}
-
-std::ostream &operator<<(std::ostream &os, OSStatus const value) {
     os << to_string(value);
     return os;
 }

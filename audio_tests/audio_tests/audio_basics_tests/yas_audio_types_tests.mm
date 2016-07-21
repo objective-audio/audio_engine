@@ -20,17 +20,27 @@ using namespace yas;
     [super tearDown];
 }
 
-- (void)test_to_uint32_direction {
+- (void)test_direction_to_uint32 {
     XCTAssertEqual(to_uint32(audio::direction::output), 0);
     XCTAssertEqual(to_uint32(audio::direction::input), 1);
 }
 
-- (void)test_to_string_direction {
+- (void)test_direction_to_string {
     XCTAssertEqual(to_string(audio::direction::output), "output");
     XCTAssertEqual(to_string(audio::direction::input), "input");
 }
 
-- (void)test_to_string_scope {
+- (void)test_direction_ostream {
+    auto const values = {audio::direction::output, audio::direction::input};
+
+    for (auto const &value : values) {
+        std::ostringstream stream;
+        stream << value;
+        XCTAssertEqual(stream.str(), to_string(value));
+    }
+}
+
+- (void)test_scope_to_string {
     XCTAssertEqual(to_string(kAudioUnitScope_Global), "global");
     XCTAssertEqual(to_string(kAudioUnitScope_Input), "input");
     XCTAssertEqual(to_string(kAudioUnitScope_Output), "output");
@@ -42,14 +52,25 @@ using namespace yas;
     XCTAssertEqual(to_string((AudioUnitScope)-1), "unknown");
 }
 
-- (void)test_to_string_render_type {
+- (void)test_render_type_to_string {
     XCTAssertEqual(to_string(audio::render_type::normal), "normal");
     XCTAssertEqual(to_string(audio::render_type::notify), "notify");
     XCTAssertEqual(to_string(audio::render_type::input), "input");
     XCTAssertEqual(to_string(audio::render_type::unknown), "unknown");
 }
 
-- (void)test_to_string_audio_error {
+- (void)test_render_type_ostream {
+    auto const values = {audio::render_type::normal, audio::render_type::notify, audio::render_type::input,
+                         audio::render_type::unknown};
+
+    for (auto const &value : values) {
+        std::ostringstream stream;
+        stream << value;
+        XCTAssertEqual(stream.str(), to_string(value));
+    }
+}
+
+- (void)test_audio_error_to_string {
     OSStatus err = noErr;
     XCTAssertEqual(to_string(err), "noErr");
 
