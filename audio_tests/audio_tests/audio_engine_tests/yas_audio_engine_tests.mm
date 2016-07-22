@@ -101,6 +101,10 @@ using namespace yas;
     [self waitForExpectationsWithTimeout:1.0 handler:nil];
 }
 
+- (void)test_method_to_string {
+    XCTAssertEqual(to_string(audio::engine::method::configuration_change), "configuration_change");
+}
+
 - (void)test_start_error_to_string {
     XCTAssertEqual(to_string(audio::engine::start_error_t::already_running), "already_running");
     XCTAssertEqual(to_string(audio::engine::start_error_t::prepare_failure), "prepare_failure");
@@ -108,6 +112,16 @@ using namespace yas;
     XCTAssertEqual(to_string(audio::engine::start_error_t::offline_output_not_found), "offline_output_not_found");
     XCTAssertEqual(to_string(audio::engine::start_error_t::offline_output_starting_failure),
                    "offline_output_starting_failure");
+}
+
+- (void)test_method_ostream {
+    auto const values = {audio::engine::method::configuration_change};
+
+    for (auto const &value : values) {
+        std::ostringstream stream;
+        stream << value;
+        XCTAssertEqual(stream.str(), to_string(value));
+    }
 }
 
 - (void)test_start_error_ostream {
