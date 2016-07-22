@@ -107,6 +107,13 @@ audio::testable_engine audio::engine::testable() {
 }
 #endif
 
+std::string yas::to_string(audio::engine::method const &method) {
+    switch (method) {
+        case audio::engine::method::configuration_change:
+            return "configuration_change";
+    }
+}
+
 std::string yas::to_string(audio::engine::start_error_t const &error) {
     switch (error) {
         case audio::engine::start_error_t::already_running:
@@ -120,6 +127,11 @@ std::string yas::to_string(audio::engine::start_error_t const &error) {
         case audio::engine::start_error_t::offline_output_starting_failure:
             return "offline_output_starting_failure";
     }
+}
+
+std::ostream &operator<<(std::ostream &os, yas::audio::engine::method const &value) {
+    os << to_string(value);
+    return os;
 }
 
 std::ostream &operator<<(std::ostream &os, yas::audio::engine::start_error_t const &value) {

@@ -66,7 +66,11 @@ namespace audio {
                                                        AudioObjectPropertySelector const selector) const;
     };
 }
+
+std::string to_string(audio::device::stream::method const &);
 }
+
+std::ostream &operator<<(std::ostream &, yas::audio::device::stream::method const &);
 
 #include "yas_audio_device_stream_private.h"
 

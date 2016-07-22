@@ -87,7 +87,11 @@ namespace audio {
         explicit device(AudioDeviceID const device_id);
     };
 }
+
+std::string to_string(audio::device::method const &);
 }
+
+std::ostream &operator<<(std::ostream &, yas::audio::device::method const &);
 
 #include "yas_audio_device_stream.h"
 

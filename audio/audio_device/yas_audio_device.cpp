@@ -510,4 +510,20 @@ audio::device::subject_t &audio::device::subject() const {
     return impl_ptr<impl>()->subject;
 }
 
+std::string yas::to_string(audio::device::method const &method) {
+    switch (method) {
+        case audio::device::method::hardware_did_change:
+            return "hardware_did_change";
+        case audio::device::method::device_did_change:
+            return "device_did_change";
+        case audio::device::method::configuration_change:
+            return "configuration_change";
+    }
+}
+
+std::ostream &operator<<(std::ostream &os, yas::audio::device::method const &value) {
+    os << to_string(value);
+    return os;
+}
+
 #endif
