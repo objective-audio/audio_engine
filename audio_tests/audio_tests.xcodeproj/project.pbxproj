@@ -121,12 +121,8 @@
 		B6AC9F091C1860BB00DD2F4D /* yas_pcm_buffer_tests.mm in Sources */ = {isa = PBXBuildFile; fileRef = B6AC9ED01C1860BB00DD2F4D /* yas_pcm_buffer_tests.mm */; };
 		B6AC9F0A1C1860BB00DD2F4D /* yas_pcm_buffer_tests.mm in Sources */ = {isa = PBXBuildFile; fileRef = B6AC9ED01C1860BB00DD2F4D /* yas_pcm_buffer_tests.mm */; };
 		B6AC9F0B1C1860BB00DD2F4D /* yas_pcm_buffer_tests.mm in Sources */ = {isa = PBXBuildFile; fileRef = B6AC9ED01C1860BB00DD2F4D /* yas_pcm_buffer_tests.mm */; };
-		B6AC9F0C1C1860BB00DD2F4D /* yas_audio_device_stream_tests.mm in Sources */ = {isa = PBXBuildFile; fileRef = B6AC9ED21C1860BB00DD2F4D /* yas_audio_device_stream_tests.mm */; };
-		B6AC9F0D1C1860BB00DD2F4D /* yas_audio_device_stream_tests.mm in Sources */ = {isa = PBXBuildFile; fileRef = B6AC9ED21C1860BB00DD2F4D /* yas_audio_device_stream_tests.mm */; };
 		B6AC9F0E1C1860BB00DD2F4D /* yas_audio_device_stream_tests.mm in Sources */ = {isa = PBXBuildFile; fileRef = B6AC9ED21C1860BB00DD2F4D /* yas_audio_device_stream_tests.mm */; };
 		B6AC9F0F1C1860BB00DD2F4D /* yas_audio_device_stream_tests.mm in Sources */ = {isa = PBXBuildFile; fileRef = B6AC9ED21C1860BB00DD2F4D /* yas_audio_device_stream_tests.mm */; };
-		B6AC9F101C1860BB00DD2F4D /* yas_audio_device_tests.mm in Sources */ = {isa = PBXBuildFile; fileRef = B6AC9ED31C1860BB00DD2F4D /* yas_audio_device_tests.mm */; };
-		B6AC9F111C1860BB00DD2F4D /* yas_audio_device_tests.mm in Sources */ = {isa = PBXBuildFile; fileRef = B6AC9ED31C1860BB00DD2F4D /* yas_audio_device_tests.mm */; };
 		B6AC9F121C1860BB00DD2F4D /* yas_audio_device_tests.mm in Sources */ = {isa = PBXBuildFile; fileRef = B6AC9ED31C1860BB00DD2F4D /* yas_audio_device_tests.mm */; };
 		B6AC9F131C1860BB00DD2F4D /* yas_audio_device_tests.mm in Sources */ = {isa = PBXBuildFile; fileRef = B6AC9ED31C1860BB00DD2F4D /* yas_audio_device_tests.mm */; };
 		B6AC9F141C1860BB00DD2F4D /* yas_audio_connection_tests.mm in Sources */ = {isa = PBXBuildFile; fileRef = B6AC9ED51C1860BB00DD2F4D /* yas_audio_connection_tests.mm */; };
@@ -1073,7 +1069,6 @@
 				B699BE711BF4D1530007B597 /* yas_audio_unit.cpp in Sources */,
 				B6FF02A31BEAF0200026777E /* yas_audio_route_node.cpp in Sources */,
 				B6626A3E1C146D380038175B /* yas_audio_format.mm in Sources */,
-				B6AC9F101C1860BB00DD2F4D /* yas_audio_device_tests.mm in Sources */,
 				B6AC9F241C1860BB00DD2F4D /* yas_audio_node_tests.mm in Sources */,
 				B6FF023C1BEAF0150026777E /* yas_audio_device_io.mm in Sources */,
 				B6AC9F001C1860BB00DD2F4D /* yas_audio_time_tests.mm in Sources */,
@@ -1087,7 +1082,6 @@
 				B617CD221C95517500B3A934 /* yas_audio_node_protocol.cpp in Sources */,
 				B6FF02401BEAF0150026777E /* yas_audio_device_stream.cpp in Sources */,
 				B6FF02B71BEAF0200026777E /* yas_audio_unit_mixer_node.cpp in Sources */,
-				B6AC9F0C1C1860BB00DD2F4D /* yas_audio_device_stream_tests.mm in Sources */,
 				B6AC9F481C1860BB00DD2F4D /* yas_audio_unit_tests.mm in Sources */,
 				B6AC9F281C1860BB00DD2F4D /* yas_audio_offline_output_node_tests.mm in Sources */,
 				B6626A421C146D380038175B /* yas_audio_math.cpp in Sources */,
@@ -1322,7 +1316,6 @@
 				B6FF028C1BEAF0200026777E /* yas_audio_engine.cpp in Sources */,
 				B6FF02881BEAF0200026777E /* yas_audio_engine_impl.mm in Sources */,
 				B6626A3F1C146D380038175B /* yas_audio_format.mm in Sources */,
-				B6AC9F111C1860BB00DD2F4D /* yas_audio_device_tests.mm in Sources */,
 				B6AC9F251C1860BB00DD2F4D /* yas_audio_node_tests.mm in Sources */,
 				B6FF02841BEAF0200026777E /* yas_audio_device_io_node.cpp in Sources */,
 				B6AC9F011C1860BB00DD2F4D /* yas_audio_time_tests.mm in Sources */,
@@ -1337,7 +1330,6 @@
 				B6FF02801BEAF0200026777E /* yas_audio_device_io_node_impl.cpp in Sources */,
 				B6FF029C1BEAF0200026777E /* yas_audio_offline_output_node_impl.mm in Sources */,
 				B699BE6A1BF4D1530007B597 /* yas_audio_unit_impl.mm in Sources */,
-				B6AC9F0D1C1860BB00DD2F4D /* yas_audio_device_stream_tests.mm in Sources */,
 				B6AC9F491C1860BB00DD2F4D /* yas_audio_unit_tests.mm in Sources */,
 				B6AC9F291C1860BB00DD2F4D /* yas_audio_offline_output_node_tests.mm in Sources */,
 				B699BE661BF4D1530007B597 /* yas_audio_graph.mm in Sources */,
