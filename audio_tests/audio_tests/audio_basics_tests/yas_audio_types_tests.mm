@@ -25,6 +25,25 @@ using namespace yas;
     XCTAssertEqual(to_uint32(audio::direction::input), 1);
 }
 
+- (void)test_pcm_format_to_string {
+    XCTAssertTrue(to_string(audio::pcm_format::float32) == "Float32");
+    XCTAssertTrue(to_string(audio::pcm_format::float64) == "Float64");
+    XCTAssertTrue(to_string(audio::pcm_format::int16) == "Int16");
+    XCTAssertTrue(to_string(audio::pcm_format::fixed824) == "Fixed8.24");
+    XCTAssertTrue(to_string(audio::pcm_format::other) == "Other");
+}
+
+- (void)test_pcm_format_ostream {
+    auto const errors = {audio::pcm_format::float32, audio::pcm_format::float64, audio::pcm_format::int16,
+                         audio::pcm_format::fixed824, audio::pcm_format::other};
+
+    for (auto const &error : errors) {
+        std::ostringstream stream;
+        stream << error;
+        XCTAssertEqual(stream.str(), to_string(error));
+    }
+}
+
 - (void)test_direction_to_string {
     XCTAssertEqual(to_string(audio::direction::output), "output");
     XCTAssertEqual(to_string(audio::direction::input), "input");

@@ -44,11 +44,8 @@ namespace audio {
     };
 }
 
-std::string to_string(audio::pcm_format const &pcm_format);
 AudioStreamBasicDescription to_stream_description(CFDictionaryRef const &settings);
 AudioStreamBasicDescription to_stream_description(double const sample_rate, uint32_t const channels,
                                                   audio::pcm_format const pcm_format, bool const interleaved);
 bool is_equal(AudioStreamBasicDescription const &asbd1, AudioStreamBasicDescription const &asbd2);
 }
-
-std::ostream &operator<<(std::ostream &, yas::audio::pcm_format const &);
