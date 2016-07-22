@@ -110,4 +110,19 @@ using namespace yas;
     XCTAssertEqual(parameter.values().at(3), 3.0f);
 }
 
+- (void)test_method_to_string {
+    XCTAssertEqual(to_string(audio::unit::parameter::method::will_change), "will_change");
+    XCTAssertEqual(to_string(audio::unit::parameter::method::did_change), "did_change");
+}
+
+- (void)test_method_ostream {
+    auto const values = {audio::unit::parameter::method::will_change, audio::unit::parameter::method::did_change};
+
+    for (auto const &value : values) {
+        std::ostringstream stream;
+        stream << value;
+        XCTAssertEqual(stream.str(), to_string(value));
+    }
+}
+
 @end

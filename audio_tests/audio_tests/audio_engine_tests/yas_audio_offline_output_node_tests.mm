@@ -267,10 +267,21 @@ using namespace yas;
                                  }];
 }
 
-- (void)test_to_string_error {
+- (void)test_offline_start_error_to_string {
     XCTAssertTrue(to_string(audio::offline_start_error_t::already_running) == "already_running");
     XCTAssertTrue(to_string(audio::offline_start_error_t::prepare_failure) == "prepare_failure");
     XCTAssertTrue(to_string(audio::offline_start_error_t::connection_not_found) == "connection_not_found");
+}
+
+- (void)test_offline_start_error_ostream {
+    auto const errors = {audio::offline_start_error_t::already_running, audio::offline_start_error_t::prepare_failure,
+                         audio::offline_start_error_t::connection_not_found};
+
+    for (auto const &error : errors) {
+        std::ostringstream stream;
+        stream << error;
+        XCTAssertEqual(stream.str(), to_string(error));
+    }
 }
 
 @end

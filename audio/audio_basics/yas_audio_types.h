@@ -57,8 +57,13 @@ namespace audio {
 }
 
 uint32_t to_uint32(audio::direction const &);
+std::string to_string(audio::pcm_format const &);
 std::string to_string(audio::direction const &);
 std::string to_string(AudioUnitScope const scope);
 std::string to_string(audio::render_type const &);
 std::string to_string(OSStatus const err);
 }
+
+std::ostream &operator<<(std::ostream &, yas::audio::pcm_format const &);
+std::ostream &operator<<(std::ostream &, yas::audio::direction const &);
+std::ostream &operator<<(std::ostream &, yas::audio::render_type const &);

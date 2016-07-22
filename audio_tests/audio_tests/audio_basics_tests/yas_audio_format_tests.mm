@@ -279,14 +279,6 @@ using namespace yas;
     XCTAssertFalse(is_equal(asbd1, asbd2));
 }
 
-- (void)test_pcm_format_to_string {
-    XCTAssertTrue(to_string(audio::pcm_format::float32) == "Float32");
-    XCTAssertTrue(to_string(audio::pcm_format::float64) == "Float64");
-    XCTAssertTrue(to_string(audio::pcm_format::int16) == "Int16");
-    XCTAssertTrue(to_string(audio::pcm_format::fixed824) == "Fixed8.24");
-    XCTAssertTrue(to_string(audio::pcm_format::other) == "Other");
-}
-
 - (void)test_null_format {
     auto const null_format = audio::format::null_format();
     XCTAssertFalse(null_format);

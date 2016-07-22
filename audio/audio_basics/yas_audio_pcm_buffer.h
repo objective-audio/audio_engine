@@ -82,3 +82,5 @@ namespace audio {
 
 std::string to_string(audio::pcm_buffer::copy_error_t const &error);
 }
+
+std::ostream &operator<<(std::ostream &, yas::audio::pcm_buffer::copy_error_t const &);

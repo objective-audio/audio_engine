@@ -169,22 +169,6 @@ audio::format const &audio::format::null_format() {
 
 #pragma mark - utility
 
-std::string yas::to_string(audio::pcm_format const &pcm_format) {
-    switch (pcm_format) {
-        case audio::pcm_format::float32:
-            return "Float32";
-        case audio::pcm_format::float64:
-            return "Float64";
-        case audio::pcm_format::int16:
-            return "Int16";
-        case audio::pcm_format::fixed824:
-            return "Fixed8.24";
-        case audio::pcm_format::other:
-            return "Other";
-    }
-    return "";
-}
-
 AudioStreamBasicDescription yas::to_stream_description(CFDictionaryRef const &settings) {
     AudioStreamBasicDescription asbd = {0};
 

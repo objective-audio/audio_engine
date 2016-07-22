@@ -179,6 +179,80 @@ namespace test {
     }
 }
 
+- (void)test_open_error_to_string {
+    XCTAssertEqual(to_string(audio::file::open_error_t::opened), "opened");
+    XCTAssertEqual(to_string(audio::file::open_error_t::invalid_argument), "invalid_argument");
+    XCTAssertEqual(to_string(audio::file::open_error_t::open_failed), "open_failed");
+}
+
+- (void)test_read_error_to_string {
+    XCTAssertEqual(to_string(audio::file::read_error_t::closed), "closed");
+    XCTAssertEqual(to_string(audio::file::read_error_t::invalid_argument), "invalid_argument");
+    XCTAssertEqual(to_string(audio::file::read_error_t::invalid_format), "invalid_format");
+    XCTAssertEqual(to_string(audio::file::read_error_t::read_failed), "read_failed");
+    XCTAssertEqual(to_string(audio::file::read_error_t::tell_failed), "tell_failed");
+}
+
+- (void)test_create_error_to_string {
+    XCTAssertEqual(to_string(audio::file::create_error_t::created), "created");
+    XCTAssertEqual(to_string(audio::file::create_error_t::invalid_argument), "invalid_argument");
+    XCTAssertEqual(to_string(audio::file::create_error_t::create_failed), "create_failed");
+}
+
+- (void)test_write_error_to_string {
+    XCTAssertEqual(to_string(audio::file::write_error_t::closed), "closed");
+    XCTAssertEqual(to_string(audio::file::write_error_t::invalid_argument), "invalid_argument");
+    XCTAssertEqual(to_string(audio::file::write_error_t::invalid_format), "invalid_format");
+    XCTAssertEqual(to_string(audio::file::write_error_t::write_failed), "write_failed");
+    XCTAssertEqual(to_string(audio::file::write_error_t::tell_failed), "tell_failed");
+}
+
+- (void)test_open_error_ostream {
+    auto const errors = {audio::file::open_error_t::opened, audio::file::open_error_t::invalid_argument,
+                         audio::file::open_error_t::open_failed};
+
+    for (auto const &error : errors) {
+        std::ostringstream stream;
+        stream << error;
+        XCTAssertEqual(stream.str(), to_string(error));
+    }
+}
+
+- (void)test_read_error_ostream {
+    auto const errors = {audio::file::read_error_t::closed, audio::file::read_error_t::invalid_argument,
+                         audio::file::read_error_t::invalid_format, audio::file::read_error_t::read_failed,
+                         audio::file::read_error_t::tell_failed};
+
+    for (auto const &error : errors) {
+        std::ostringstream stream;
+        stream << error;
+        XCTAssertEqual(stream.str(), to_string(error));
+    }
+}
+
+- (void)test_create_error_ostream {
+    auto const errors = {audio::file::create_error_t::created, audio::file::create_error_t::invalid_argument,
+                         audio::file::create_error_t::create_failed};
+
+    for (auto const &error : errors) {
+        std::ostringstream stream;
+        stream << error;
+        XCTAssertEqual(stream.str(), to_string(error));
+    }
+}
+
+- (void)test_write_error_ostream {
+    auto const errors = {audio::file::write_error_t::closed, audio::file::write_error_t::invalid_argument,
+                         audio::file::write_error_t::invalid_format, audio::file::write_error_t::write_failed,
+                         audio::file::write_error_t::tell_failed};
+
+    for (auto const &error : errors) {
+        std::ostringstream stream;
+        stream << error;
+        XCTAssertEqual(stream.str(), to_string(error));
+    }
+}
+
 #pragma mark -
 
 - (void)_commonAudioFileTest:(test::audio_file_test_data &)test_data {

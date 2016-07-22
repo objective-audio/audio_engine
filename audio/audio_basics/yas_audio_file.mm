@@ -409,7 +409,7 @@ std::string yas::to_string(audio::file::create_error_t const &error_t) {
         case audio::file::create_error_t::invalid_argument:
             return "invalid_argument";
         case audio::file::create_error_t::create_failed:
-            return "open_failed";
+            return "create_failed";
     }
 }
 
@@ -422,8 +422,28 @@ std::string yas::to_string(audio::file::write_error_t const &error_t) {
         case audio::file::write_error_t::invalid_format:
             return "invalid_format";
         case audio::file::write_error_t::write_failed:
-            return "read_failed";
+            return "write_failed";
         case audio::file::write_error_t::tell_failed:
             return "tell_failed";
     }
+}
+
+std::ostream &operator<<(std::ostream &os, yas::audio::file::open_error_t const &value) {
+    os << to_string(value);
+    return os;
+}
+
+std::ostream &operator<<(std::ostream &os, yas::audio::file::read_error_t const &value) {
+    os << to_string(value);
+    return os;
+}
+
+std::ostream &operator<<(std::ostream &os, yas::audio::file::create_error_t const &value) {
+    os << to_string(value);
+    return os;
+}
+
+std::ostream &operator<<(std::ostream &os, yas::audio::file::write_error_t const &value) {
+    os << to_string(value);
+    return os;
 }

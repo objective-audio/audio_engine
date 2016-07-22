@@ -51,3 +51,5 @@ namespace audio {
 }
 std::string to_string(audio::unit::parameter::method const &);
 }
+
+std::ostream &operator<<(std::ostream &, yas::audio::unit::parameter::method const &);

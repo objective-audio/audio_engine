@@ -68,8 +68,12 @@ namespace audio {
     };
 }
 
-std::string to_string(audio::engine::start_error_t const &error);
+std::string to_string(audio::engine::method const &);
+std::string to_string(audio::engine::start_error_t const &);
 }
+
+std::ostream &operator<<(std::ostream &, yas::audio::engine::method const &);
+std::ostream &operator<<(std::ostream &, yas::audio::engine::start_error_t const &);
 
 #include "yas_audio_engine_impl.h"
 

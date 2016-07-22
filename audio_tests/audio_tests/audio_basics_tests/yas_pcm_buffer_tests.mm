@@ -649,6 +649,19 @@ using namespace yas;
     XCTAssertTrue(to_string(audio::pcm_buffer::copy_error_t::buffer_is_null) == "buffer_is_null");
 }
 
+- (void)test_copy_error_ostream {
+    auto const errors = {audio::pcm_buffer::copy_error_t::invalid_argument,
+                         audio::pcm_buffer::copy_error_t::invalid_abl, audio::pcm_buffer::copy_error_t::invalid_format,
+                         audio::pcm_buffer::copy_error_t::out_of_range,
+                         audio::pcm_buffer::copy_error_t::buffer_is_null};
+
+    for (auto const &error : errors) {
+        std::ostringstream stream;
+        stream << error;
+        XCTAssertEqual(stream.str(), to_string(error));
+    }
+}
+
 - (void)test_clear {
     audio::pcm_buffer buffer(audio::format({.sample_rate = 44100.0, .channel_count = 1}), 1);
     auto *data = buffer.data_ptr_at_channel<float>(0);

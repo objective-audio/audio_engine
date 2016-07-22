@@ -11,6 +11,21 @@ uint32_t yas::to_uint32(audio::direction const &dir) {
     return static_cast<uint32_t>(dir);
 }
 
+std::string yas::to_string(audio::pcm_format const &pcm_format) {
+    switch (pcm_format) {
+        case audio::pcm_format::float32:
+            return "Float32";
+        case audio::pcm_format::float64:
+            return "Float64";
+        case audio::pcm_format::int16:
+            return "Int16";
+        case audio::pcm_format::fixed824:
+            return "Fixed8.24";
+        case audio::pcm_format::other:
+            return "Other";
+    }
+}
+
 std::string yas::to_string(audio::direction const &dir) {
     switch (dir) {
         case audio::direction::output:
@@ -121,4 +136,19 @@ std::string yas::to_string(OSStatus const err) {
         default:
             return "Unknown";
     }
+}
+
+std::ostream &operator<<(std::ostream &os, yas::audio::pcm_format const &value) {
+    os << to_string(value);
+    return os;
+}
+
+std::ostream &operator<<(std::ostream &os, yas::audio::direction const &value) {
+    os << to_string(value);
+    return os;
+}
+
+std::ostream &operator<<(std::ostream &os, yas::audio::render_type const &value) {
+    os << to_string(value);
+    return os;
 }
