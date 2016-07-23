@@ -26,10 +26,30 @@ using namespace yas;
     XCTAssertEqual(node.input_bus_count(), 2);
     XCTAssertEqual(node.output_bus_count(), 1);
 
+    XCTAssertTrue(node.manageable());
+    XCTAssertTrue(node.connectable());
+
     XCTAssertEqual(node.manageable().input_connections().size(), 0);
     XCTAssertEqual(node.manageable().output_connections().size(), 0);
     XCTAssertEqual(*node.next_available_input_bus(), 0);
     XCTAssertEqual(*node.next_available_output_bus(), 0);
+}
+
+- (void)test_create_null {
+    audio::node node{nullptr};
+
+    XCTAssertFalse(node);
+}
+
+- (void)test_create_kernel {
+    audio::node::kernel kernel;
+
+    XCTAssertTrue(kernel);
+
+    XCTAssertEqual(kernel.input_connections().size(), 0);
+    XCTAssertEqual(kernel.output_connections().size(), 0);
+
+    XCTAssertTrue(kernel.manageable());
 }
 
 - (void)test_connection {

@@ -20,6 +20,20 @@ using namespace yas;
     [super tearDown];
 }
 
+- (void)test_create {
+    audio::unit_node node(kAudioUnitType_Effect, kAudioUnitSubType_Delay);
+
+    XCTAssertTrue(node);
+
+    XCTAssertTrue(node.manageable_unit_node());
+}
+
+- (void)test_create_null {
+    audio::unit_node node{nullptr};
+
+    XCTAssertFalse(node);
+}
+
 - (void)test_restore_parameters {
     audio::engine engine;
 

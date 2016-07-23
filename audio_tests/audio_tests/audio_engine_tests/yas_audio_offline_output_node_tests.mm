@@ -21,6 +21,21 @@ using namespace yas;
     [super tearDown];
 }
 
+- (void)test_create {
+    audio::offline_output_node node;
+
+    XCTAssertTrue(node);
+
+    XCTAssertFalse(node.is_running());
+    XCTAssertTrue(node.manageable());
+}
+
+- (void)test_create_null {
+    audio::offline_output_node node{nullptr};
+
+    XCTAssertFalse(node);
+}
+
 - (void)test_offline_render_with_audio_engine {
     double const sample_rate = 44100.0;
 
