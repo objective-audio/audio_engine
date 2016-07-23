@@ -31,10 +31,6 @@ namespace audio {
        protected:
         connection(audio::node &source_node, uint32_t const source_bus_idx, audio::node &destination_node,
                    uint32_t const destination_bus_idx, audio::format const &format);
-#if YAS_TEST
-       public:
-        friend testable_connection;
-#endif
     };
 }
 }
@@ -45,7 +41,3 @@ struct std::hash<yas::audio::connection> {
         return std::hash<uintptr_t>()(key.identifier());
     }
 };
-
-#if YAS_TEST
-#include "yas_audio_connection_testable.h"
-#endif

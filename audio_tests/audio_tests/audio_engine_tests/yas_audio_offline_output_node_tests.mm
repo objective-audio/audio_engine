@@ -119,7 +119,7 @@ using namespace yas;
     audio::offline_output_node output_node;
     audio::tap_node tap_node;
 
-    auto connection = audio::testable_connection::create(tap_node, 0, output_node, 0, format);
+    auto connection = test::connection(tap_node, 0, output_node, 0, format);
 
     output_node.manageable_node().add_connection(connection);
     output_node.manageable_node().update_kernel();
@@ -227,7 +227,7 @@ using namespace yas;
     audio::offline_output_node output_node;
     audio::tap_node tap_node;
 
-    auto connection = audio::testable_connection::create(tap_node, 0, output_node, 0, format);
+    auto connection = test::connection(tap_node, 0, output_node, 0, format);
 
     output_node.manageable_node().add_connection(connection);
     output_node.manageable_node().update_kernel();

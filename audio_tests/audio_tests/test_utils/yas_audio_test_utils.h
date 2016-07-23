@@ -35,5 +35,10 @@ namespace test {
         void set_input_bus_count(uint32_t const &);
         void set_output_bus_count(uint32_t const &);
     };
+
+    struct connection : audio::connection {
+        connection(audio::node &source_node, uint32_t const source_bus, audio::node &destination_node,
+                   uint32_t const destination_bus, audio::format const &format);
+    };
 }
 }

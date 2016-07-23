@@ -73,7 +73,6 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		B602AFE31CEB5D9700309B3A /* yas_audio_connection_testable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yas_audio_connection_testable.h; sourceTree = "<group>"; };
 		B602AFE41CEB5D9700309B3A /* yas_audio_engine_testable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yas_audio_engine_testable.h; sourceTree = "<group>"; };
 		B602AFE51CEB5D9700309B3A /* yas_audio_node_testable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yas_audio_node_testable.h; sourceTree = "<group>"; };
 		B602AFE61CEB5D9700309B3A /* yas_audio_unit_testable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yas_audio_unit_testable.h; sourceTree = "<group>"; };
@@ -246,7 +245,6 @@
 		B602AFE21CEB5D9700309B3A /* audio_testable */ = {
 			isa = PBXGroup;
 			children = (
-				B602AFE31CEB5D9700309B3A /* yas_audio_connection_testable.h */,
 				B602AFE41CEB5D9700309B3A /* yas_audio_engine_testable.h */,
 				B602AFE51CEB5D9700309B3A /* yas_audio_node_testable.h */,
 				B602AFE61CEB5D9700309B3A /* yas_audio_unit_testable.h */,

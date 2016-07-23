@@ -191,3 +191,8 @@ void test::audio_test_node::set_input_bus_count(uint32_t const &count) {
 void test::audio_test_node::set_output_bus_count(uint32_t const &count) {
     impl_ptr<impl>()->_output_bus_count = count;
 }
+
+test::connection::connection(audio::node &source_node, uint32_t const source_bus, audio::node &destination_node,
+                             uint32_t const destination_bus, audio::format const &format)
+    : audio::connection(source_node, source_bus, destination_node, destination_bus, format) {
+}
