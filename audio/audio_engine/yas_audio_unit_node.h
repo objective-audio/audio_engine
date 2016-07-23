@@ -47,12 +47,6 @@ namespace audio {
        protected:
         unit_node(std::shared_ptr<impl> &&, AudioComponentDescription const &);
         explicit unit_node(std::shared_ptr<impl> const &);
-
-#if YAS_TEST
-       public:
-        class testable;
-        friend testable;
-#endif
     };
 }
 }

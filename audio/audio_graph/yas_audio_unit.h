@@ -18,12 +18,9 @@ template <typename T, typename U>
 class result;
 
 namespace audio {
-    class testable_unit;
-
     class unit : public base {
-        class impl;
-
        public:
+        class impl;
         class parameter;
         using parameter_map_t = std::unordered_map<AudioUnitParameterID, parameter>;
 
@@ -99,8 +96,8 @@ namespace audio {
         au_result_t audio_unit_render(render_parameters &render_parameters);
 
 #if YAS_TEST
-       public:
-        friend testable_unit;
+       protected:
+        explicit unit(std::shared_ptr<impl> const &);
 #endif
     };
 }
@@ -110,7 +107,3 @@ audio::unit::au_result_t to_result(OSStatus const err);
 
 #include "yas_audio_unit_impl.h"
 #include "yas_audio_unit_parameter.h"
-
-#if YAS_TEST
-#include "yas_audio_unit_testable.h"
-#endif

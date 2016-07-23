@@ -78,5 +78,5 @@ std::ostream &operator<<(std::ostream &, yas::audio::engine::start_error_t const
 #include "yas_audio_engine_impl.h"
 
 #if YAS_TEST
-#include "yas_audio_engine_testable.h"
+#include "yas_audio_engine_protocol.h"
 #endif

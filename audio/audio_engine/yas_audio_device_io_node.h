@@ -32,12 +32,6 @@ namespace audio {
 
        protected:
         device_io_node(std::shared_ptr<device_io_node::impl> const &impl);
-
-#if YAS_TEST
-       public:
-        class testable;
-        friend testable;
-#endif
     };
 }
 }

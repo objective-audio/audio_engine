@@ -24,12 +24,6 @@ namespace audio {
 
        private:
         offline_output_node(std::shared_ptr<impl> const &);
-
-#if YAS_TEST
-       public:
-        class testable;
-        friend testable;
-#endif
     };
 }
 

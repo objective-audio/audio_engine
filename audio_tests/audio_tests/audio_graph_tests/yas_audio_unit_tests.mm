@@ -242,17 +242,17 @@ using namespace yas;
 
     audio::unit converter_unit(kAudioUnitType_FormatConverter, kAudioUnitSubType_AUConverter);
 
-    audio::testable_unit::set_property_data(converter_unit, set_data, property_id, scope, element);
+    test::unit(converter_unit).set_property_data(set_data, property_id, scope, element);
 
     std::vector<AudioStreamBasicDescription> get_data;
 
-    XCTAssertNoThrow(get_data = audio::testable_unit::property_data<AudioStreamBasicDescription>(
-                         converter_unit, property_id, scope, element));
+    XCTAssertNoThrow(
+        get_data = test::unit(converter_unit).property_data<AudioStreamBasicDescription>(property_id, scope, element));
 
     XCTAssertTrue(is_equal(set_data.at(0), get_data.at(0)));
 
     std::vector<AudioStreamBasicDescription> zero_data;
-    XCTAssertThrows(audio::testable_unit::set_property_data(converter_unit, zero_data, property_id, scope, element));
+    XCTAssertThrows(test::unit(converter_unit).set_property_data(zero_data, property_id, scope, element));
 }
 
 @end

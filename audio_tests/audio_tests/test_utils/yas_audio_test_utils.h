@@ -35,5 +35,34 @@ namespace test {
         void set_input_bus_count(uint32_t const &);
         void set_output_bus_count(uint32_t const &);
     };
+
+    struct connection : audio::connection {
+        connection(audio::node &source_node, uint32_t const source_bus, audio::node &destination_node,
+                   uint32_t const destination_bus, audio::format const &format);
+    };
+
+    struct node : audio::node {
+        node();
+        node(audio::node const &);
+
+        audio::node::kernel kernel();
+    };
+
+    struct unit : audio::unit {
+        unit();
+        unit(audio::unit const &);
+
+        template <typename T>
+        void set_property_data(std::vector<T> const &data, AudioUnitPropertyID const property_id,
+                               AudioUnitScope const scope, AudioUnitElement const element) {
+            impl_ptr<audio::unit::impl>()->set_property_data(data, property_id, scope, element);
+        }
+
+        template <typename T>
+        std::vector<T> property_data(AudioUnitPropertyID const property_id, AudioUnitScope const scope,
+                                     AudioUnitElement const element) {
+            return impl_ptr<audio::unit::impl>()->property_data<T>(property_id, scope, element);
+        }
+    };
 }
 }
