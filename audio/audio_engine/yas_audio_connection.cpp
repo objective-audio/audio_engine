@@ -112,6 +112,9 @@ audio::format const &audio::connection::format() const {
     return impl_ptr<impl>()->format;
 }
 
-audio::node_removable audio::connection::node_removable() {
-    return audio::node_removable{impl_ptr<node_removable::impl>()};
+audio::node_removable &audio::connection::node_removable() {
+    if (!_node_removable) {
+        _node_removable = audio::node_removable{impl_ptr<node_removable::impl>()};
+    }
+    return _node_removable;
 }

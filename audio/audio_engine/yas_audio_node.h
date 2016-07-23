@@ -44,15 +44,19 @@ namespace audio {
         void render(audio::pcm_buffer &buffer, uint32_t const bus_idx, audio::time const &when);
         void set_render_time_on_render(audio::time const &time);
 
-        audio::connectable_node connectable();
-        audio::manageable_node const manageable_node() const;
-        audio::manageable_node manageable_node();
+        audio::connectable_node &connectable();
+        audio::manageable_node const &manageable_node() const;
+        audio::manageable_node &manageable_node();
 
        protected:
         class manageable_kernel;
         class impl;
 
         explicit node(std::shared_ptr<impl> const &);
+
+       private:
+        audio::connectable_node _connectable = nullptr;
+        mutable audio::manageable_node _manageable = nullptr;
     };
 
     struct node::manageable_kernel : protocol {
@@ -61,16 +65,11 @@ namespace audio {
             virtual void set_output_connections(audio::connection_wmap &&) = 0;
         };
 
-        explicit manageable_kernel(std::shared_ptr<impl> &&impl) : protocol(std::move(impl)) {
-        }
+        explicit manageable_kernel(std::shared_ptr<impl> &&impl);
+        manageable_kernel(std::nullptr_t);
 
-        void set_input_connections(audio::connection_wmap connections) {
-            impl_ptr<impl>()->set_input_connections(std::move(connections));
-        }
-
-        void set_output_connections(audio::connection_wmap connections) {
-            impl_ptr<impl>()->set_output_connections(std::move(connections));
-        }
+        void set_input_connections(audio::connection_wmap connections);
+        void set_output_connections(audio::connection_wmap connections);
     };
 }
 }

@@ -146,7 +146,7 @@ void audio::node::impl::prepare_kernel(audio::node::kernel &kernel) {
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
     }
 
-    auto manageable_kernel = kernel.manageable();
+    auto &manageable_kernel = kernel.manageable();
     manageable_kernel.set_input_connections(_core->input_connections);
     manageable_kernel.set_output_connections(_core->output_connections);
 }

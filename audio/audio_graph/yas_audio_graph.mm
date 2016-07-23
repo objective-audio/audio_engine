@@ -160,7 +160,7 @@ struct audio::graph::impl : base::impl {
             throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
         }
 
-        auto unt = unit.manageable();
+        auto &unt = unit.manageable();
 
         if (unt.key()) {
             throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : unit.key is not null.");
@@ -183,7 +183,7 @@ struct audio::graph::impl : base::impl {
     void remove_unit_from_units(unit &unit) {
         std::lock_guard<std::recursive_mutex> lock(_mutex);
 
-        auto unt = unit.manageable();
+        auto &unt = unit.manageable();
 
         if (auto key = unt.key()) {
             _units.erase(*key);
@@ -194,7 +194,7 @@ struct audio::graph::impl : base::impl {
     }
 
     void add_audio_unit(unit &unit) {
-        auto unt = unit.manageable();
+        auto &unt = unit.manageable();
 
         if (unt.key()) {
             throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : unit.key is already assigned.");

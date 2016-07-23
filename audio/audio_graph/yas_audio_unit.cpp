@@ -255,8 +255,11 @@ void audio::unit::reset() {
     impl_ptr<impl>()->reset();
 }
 
-audio::manageable_unit audio::unit::manageable() {
-    return audio::manageable_unit{impl_ptr<manageable_unit::impl>()};
+audio::manageable_unit &audio::unit::manageable() {
+    if (!_manageable) {
+        _manageable = audio::manageable_unit{impl_ptr<manageable_unit::impl>()};
+    }
+    return _manageable;
 }
 
 #pragma mark - render thread
