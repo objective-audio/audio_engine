@@ -33,10 +33,13 @@ namespace audio {
         audio::connection input_connection(uint32_t const bus_idx) const;
         audio::connection output_connection(uint32_t const bus_idx) const;
 
-        manageable_kernel manageable();
+        manageable_kernel &manageable();
 
        protected:
         kernel(std::shared_ptr<impl> &&);
+
+       private:
+        manageable_kernel _manageable = nullptr;
     };
 }
 }

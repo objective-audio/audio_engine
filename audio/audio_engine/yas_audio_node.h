@@ -65,16 +65,11 @@ namespace audio {
             virtual void set_output_connections(audio::connection_wmap &&) = 0;
         };
 
-        explicit manageable_kernel(std::shared_ptr<impl> &&impl) : protocol(std::move(impl)) {
-        }
+        explicit manageable_kernel(std::shared_ptr<impl> &&impl);
+        manageable_kernel(std::nullptr_t);
 
-        void set_input_connections(audio::connection_wmap connections) {
-            impl_ptr<impl>()->set_input_connections(std::move(connections));
-        }
-
-        void set_output_connections(audio::connection_wmap connections) {
-            impl_ptr<impl>()->set_output_connections(std::move(connections));
-        }
+        void set_input_connections(audio::connection_wmap connections);
+        void set_output_connections(audio::connection_wmap connections);
     };
 }
 }

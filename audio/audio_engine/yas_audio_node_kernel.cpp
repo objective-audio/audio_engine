@@ -65,6 +65,9 @@ audio::connection audio::node::kernel::output_connection(uint32_t const bus_idx)
     return impl_ptr<impl>()->output_connection(bus_idx);
 }
 
-audio::node::manageable_kernel audio::node::kernel::manageable() {
-    return audio::node::manageable_kernel{impl_ptr<audio::node::manageable_kernel::impl>()};
+audio::node::manageable_kernel &audio::node::kernel::manageable() {
+    if (!_manageable) {
+        _manageable = audio::node::manageable_kernel{impl_ptr<audio::node::manageable_kernel::impl>()};
+    }
+    return _manageable;
 }
