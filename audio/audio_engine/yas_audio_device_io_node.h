@@ -28,10 +28,13 @@ namespace audio {
         void set_device(audio::device const &device);
         audio::device device() const;
 
-        manageable_device_io_node manageable_device_io_node();
+        manageable_device_io_node &manageable();
 
        protected:
         device_io_node(std::shared_ptr<device_io_node::impl> const &impl);
+
+       private:
+        manageable_device_io_node _manageable = nullptr;
     };
 }
 }

@@ -20,6 +20,9 @@ namespace audio {
         explicit manageable_device_io_node(std::shared_ptr<impl> impl) : protocol(impl) {
         }
 
+        manageable_device_io_node(std::nullptr_t) : protocol(nullptr) {
+        }
+
         void add_device_io() {
             impl_ptr<impl>()->add_device_io();
         }
