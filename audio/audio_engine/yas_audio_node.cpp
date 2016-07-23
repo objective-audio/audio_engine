@@ -81,14 +81,14 @@ audio::connectable_node &audio::node::connectable() {
     return _connectable;
 }
 
-audio::manageable_node const &audio::node::manageable_node() const {
+audio::manageable_node const &audio::node::manageable() const {
     if (!_manageable) {
         _manageable = audio::manageable_node{impl_ptr<manageable_node::impl>()};
     }
     return _manageable;
 }
 
-audio::manageable_node &audio::node::manageable_node() {
+audio::manageable_node &audio::node::manageable() {
     if (!_manageable) {
         _manageable = audio::manageable_node{impl_ptr<manageable_node::impl>()};
     }

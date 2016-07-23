@@ -9,7 +9,7 @@
 
 namespace yas {
 namespace audio {
-    struct node::impl : base::impl, manageable_node::impl {
+    struct node::impl : base::impl, manageable_node::impl, connectable_node::impl {
         impl();
         virtual ~impl();
 

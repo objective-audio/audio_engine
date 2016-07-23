@@ -23,8 +23,8 @@ namespace audio {
         void remove_connection(audio::connection const &);
     };
 
-    struct manageable_node : connectable_node {
-        struct impl : connectable_node::impl {
+    struct manageable_node : protocol {
+        struct impl : protocol::impl {
             virtual audio::connection input_connection(uint32_t const bus_idx) const = 0;
             virtual audio::connection output_connection(uint32_t const bus_idx) const = 0;
             virtual audio::connection_wmap const &input_connections() const = 0;

@@ -25,10 +25,10 @@ void audio::connectable_node::remove_connection(audio::connection const &connect
 
 #pragma mark - manageable_node
 
-audio::manageable_node::manageable_node(std::shared_ptr<impl> impl) : connectable_node(std::move(impl)) {
+audio::manageable_node::manageable_node(std::shared_ptr<impl> impl) : protocol(std::move(impl)) {
 }
 
-audio::manageable_node::manageable_node(std::nullptr_t) : connectable_node(nullptr) {
+audio::manageable_node::manageable_node(std::nullptr_t) : protocol(nullptr) {
 }
 
 audio::connection audio::manageable_node::input_connection(uint32_t const bus_idx) const {
