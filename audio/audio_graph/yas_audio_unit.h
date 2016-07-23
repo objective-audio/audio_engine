@@ -88,12 +88,15 @@ namespace audio {
         void stop();   // for io
         void reset();
 
-        manageable_unit manageable();
+        manageable_unit &manageable();
 
         // render thread
 
         void callback_render(render_parameters &render_parameters);
         au_result_t audio_unit_render(render_parameters &render_parameters);
+
+       private:
+        manageable_unit _manageable = nullptr;
 
 #if YAS_TEST
        protected:

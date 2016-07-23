@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <experimental/optional>
 #include "yas_protocol.h"
 
 namespace yas {
@@ -18,32 +19,15 @@ namespace audio {
             virtual std::experimental::optional<uint16_t> const &key() const = 0;
         };
 
-        explicit manageable_unit(std::shared_ptr<impl> impl) : protocol(impl) {
-        }
+        explicit manageable_unit(std::shared_ptr<impl> impl);
+        manageable_unit(std::nullptr_t);
 
-        void initialize() {
-            impl_ptr<impl>()->initialize();
-        }
-
-        void uninitialize() {
-            impl_ptr<impl>()->uninitialize();
-        }
-
-        void set_graph_key(std::experimental::optional<uint8_t> const &key) {
-            impl_ptr<impl>()->set_graph_key(key);
-        }
-
-        std::experimental::optional<uint8_t> const &graph_key() const {
-            return impl_ptr<impl>()->graph_key();
-        }
-
-        void set_key(std::experimental::optional<uint16_t> const &key) {
-            impl_ptr<impl>()->set_key(key);
-        }
-
-        std::experimental::optional<uint16_t> const &key() const {
-            return impl_ptr<impl>()->key();
-        }
+        void initialize();
+        void uninitialize();
+        void set_graph_key(std::experimental::optional<uint8_t> const &key);
+        std::experimental::optional<uint8_t> const &graph_key() const;
+        void set_key(std::experimental::optional<uint16_t> const &key);
+        std::experimental::optional<uint16_t> const &key() const;
     };
 }
 }
