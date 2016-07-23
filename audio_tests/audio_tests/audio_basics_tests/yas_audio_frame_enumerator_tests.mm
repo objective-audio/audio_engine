@@ -20,7 +20,7 @@ using namespace yas;
     [super tearDown];
 }
 
-- (void)testReadFrameEnumeratorNonInterleaved {
+- (void)test_read_frame_enumerator_non_interleaved {
     uint32_t const frame_length = 16;
     uint32_t const channels = 4;
 
@@ -56,7 +56,7 @@ using namespace yas;
     }
 }
 
-- (void)testReadFrameEnumeratorInterleavedUseMacro {
+- (void)test_read_frame_enumerator_interleaved_use_macro {
     uint32_t const frame_length = 16;
     uint32_t const channels = 3;
 
@@ -95,7 +95,7 @@ using namespace yas;
     }
 }
 
-- (void)testReadFrameEnumeratorUseFunction {
+- (void)test_read_frame_enumerator_use_function {
     uint32_t const frame_length = 16;
     uint32_t const channels = 3;
 
@@ -137,7 +137,7 @@ using namespace yas;
     }
 }
 
-- (void)testReadFrameEnumeratorByMove {
+- (void)test_read_frame_enumerator_by_move {
     uint32_t const frame_length = 16;
     uint32_t const channels = 4;
 
@@ -170,7 +170,7 @@ using namespace yas;
     XCTAssertEqual(frame, frame_length);
 }
 
-- (void)testWriteFrameEnumerator {
+- (void)test_write_frame_enumerator {
     uint32_t const frame_length = 16;
     uint32_t const channels = 4;
 
@@ -214,7 +214,7 @@ using namespace yas;
     XCTAssertEqual(*pointer_channel, channels);
 }
 
-- (void)testSetFramePosition {
+- (void)test_set_frame_position {
     uint32_t const frame_length = 16;
 
     auto format = audio::format({.sample_rate = 48000.0, .channel_count = 1});
@@ -250,7 +250,7 @@ using namespace yas;
     XCTAssertThrows(enumerator.set_frame_position(100));
 }
 
-- (void)testSetChannelPosition {
+- (void)test_set_channel_position {
     uint32_t const channels = 4;
 
     auto format = audio::format({.sample_rate = 48000.0,
@@ -279,7 +279,7 @@ using namespace yas;
     XCTAssertThrows(enumerator.set_channel_position(100));
 }
 
-- (void)testReadFrameEnumeratorEachPCMFormat {
+- (void)test_read_frame_enumerator_each_pcm_format {
     uint32_t const frame_length = 16;
     uint32_t const channels = 4;
 
@@ -329,7 +329,7 @@ using namespace yas;
     }
 }
 
-- (void)testStop {
+- (void)test_stop {
     uint32_t const frame_length = 16;
     uint32_t const channels = 4;
     std::size_t const stopFrame = 8;

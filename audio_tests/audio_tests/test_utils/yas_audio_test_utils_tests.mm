@@ -20,7 +20,7 @@ using namespace yas;
     [super tearDown];
 }
 
-- (void)testIsEqualFloat64WithAccuracy {
+- (void)test_is_equal_float64_with_accuracy {
     double const val1 = 1.0;
     double const accuracy = 0.1;
 
@@ -40,7 +40,7 @@ using namespace yas;
     XCTAssertFalse(test::is_equal(val1, val2, accuracy));
 }
 
-- (void)testIsEqualAudioTimeStamp {
+- (void)test_is_equal_audio_time_stamp {
     SMPTETime smpteTime = {
         .mSubframes = 1,
         .mSubframeDivisor = 1,
@@ -92,7 +92,7 @@ using namespace yas;
     XCTAssertFalse(test::is_equal(&timeStamp1, &timeStamp2));
 }
 
-- (void)testIsEqualData {
+- (void)test_is_equal_data {
     uint32_t const size = 4;
 
     std::vector<uint8_t> vec1(size);

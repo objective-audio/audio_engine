@@ -78,7 +78,7 @@ namespace test {
     [super tearDown];
 }
 
-- (void)testWAVEFile {
+- (void)test_wave_file {
 #if WAVEFILE_LIGHT_TEST
     double sample_rates[] = {44100.0, 382000.0};
     uint32_t channels[] = {1, 2};

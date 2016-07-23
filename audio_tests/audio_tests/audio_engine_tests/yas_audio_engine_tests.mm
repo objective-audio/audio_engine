@@ -55,7 +55,7 @@ using namespace yas;
     XCTAssertEqual(engine.testable().connections().size(), 0);
 }
 
-- (void)testConnectAndDisconnect {
+- (void)test_connect_and_disconnect {
     audio::engine engine;
 
     auto format = audio::format({.sample_rate = 48000.0, .channel_count = 2});
@@ -83,7 +83,7 @@ using namespace yas;
     XCTAssertEqual(nodes.count(destination_node), 0);
 }
 
-- (void)testConfigurationChangeNotification {
+- (void)test_configuration_change_notification {
     audio::engine engine;
 
     XCTestExpectation *expectation = [self expectationWithDescription:@"configuration change"];
