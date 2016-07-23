@@ -41,6 +41,12 @@ using namespace yas;
     XCTAssertTrue(destination_node.manageable().input_connection(destination_bus) == connection);
 }
 
+- (void)test_create_null {
+    audio::connection connection{nullptr};
+
+    XCTAssertFalse(connection);
+}
+
 - (void)test_remove_nodes {
     auto format = audio::format({.sample_rate = 44100.0, .channel_count = 2});
     test::audio_test_node source_node;
