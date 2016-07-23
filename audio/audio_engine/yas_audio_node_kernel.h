@@ -37,12 +37,6 @@ namespace audio {
 
        protected:
         kernel(std::shared_ptr<impl> &&);
-
-#if YAS_TEST
-       public:
-        class testable;
-        friend testable;
-#endif
     };
 }
 }

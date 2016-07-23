@@ -11,7 +11,6 @@
 namespace yas {
 namespace audio {
     class node;
-    class testable_connection;
 
     class connection : public base {
         class impl;
