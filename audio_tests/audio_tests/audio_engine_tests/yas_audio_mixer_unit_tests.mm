@@ -6,11 +6,11 @@
 
 using namespace yas;
 
-@interface YASAudioMixerUnitTests : XCTestCase
+@interface yas_audio_mixer_unit_tests : XCTestCase
 
 @end
 
-@implementation YASAudioMixerUnitTests
+@implementation yas_audio_mixer_unit_tests
 
 - (void)setUp {
     [super setUp];
