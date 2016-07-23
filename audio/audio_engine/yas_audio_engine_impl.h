@@ -5,7 +5,7 @@
 #pragma once
 
 #include <unordered_set>
-#include "yas_audio_engine_testable.h"
+#include "yas_audio_engine_protocol.h"
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
 #include "yas_audio_device.h"
 #endif
