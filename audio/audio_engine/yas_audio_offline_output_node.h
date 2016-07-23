@@ -20,10 +20,12 @@ namespace audio {
 
         bool is_running() const;
 
-        manageable_offline_output_unit manageable_offline_output_unit();
+        manageable_offline_output_unit &manageable();
 
        private:
         offline_output_node(std::shared_ptr<impl> const &);
+
+        manageable_offline_output_unit _manageable = nullptr;
     };
 }
 

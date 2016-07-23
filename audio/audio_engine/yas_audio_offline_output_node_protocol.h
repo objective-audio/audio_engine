@@ -35,16 +35,11 @@ namespace audio {
             virtual void stop() = 0;
         };
 
-        explicit manageable_offline_output_unit(std::shared_ptr<impl> impl) : protocol(impl) {
-        }
+        explicit manageable_offline_output_unit(std::shared_ptr<impl> impl);
+        manageable_offline_output_unit(std::nullptr_t);
 
-        offline_start_result_t start(offline_render_f &&callback_func, offline_completion_f &&completion_func) {
-            return impl_ptr<impl>()->start(std::move(callback_func), std::move(completion_func));
-        }
-
-        void stop() {
-            impl_ptr<impl>()->stop();
-        }
+        offline_start_result_t start(offline_render_f &&, offline_completion_f &&);
+        void stop();
     };
 }
 }

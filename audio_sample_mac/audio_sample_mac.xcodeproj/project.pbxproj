@@ -38,6 +38,7 @@
 		B69B08841D43393B00F12D36 /* yas_audio_unit_protocol.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B69B08831D43393B00F12D36 /* yas_audio_unit_protocol.cpp */; };
 		B69B088D1D43493B00F12D36 /* yas_audio_node_kernel_protocol.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B69B088B1D43493B00F12D36 /* yas_audio_node_kernel_protocol.cpp */; };
 		B69B08971D437CC500F12D36 /* yas_audio_device_io_node_protocol.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B69B08961D437CC500F12D36 /* yas_audio_device_io_node_protocol.cpp */; };
+		B69B08A01D437F2A00F12D36 /* yas_audio_offline_output_node_protocol.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B69B089F1D437F2A00F12D36 /* yas_audio_offline_output_node_protocol.cpp */; };
 		B69C84881AF1144F00B9EB3D /* YASAudioOfflineSampleViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = B69C84871AF1144F00B9EB3D /* YASAudioOfflineSampleViewController.mm */; };
 		B6AB1C411A9230420054349E /* YASAudioDeviceSampleViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = B6AB1C401A9230420054349E /* YASAudioDeviceSampleViewController.mm */; };
 		B6F2CAD51CDE0FBC00EF584B /* yas_base.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6F2CAAE1CDE0FBC00EF584B /* yas_base.cpp */; };
@@ -132,6 +133,7 @@
 		B69B088B1D43493B00F12D36 /* yas_audio_node_kernel_protocol.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = yas_audio_node_kernel_protocol.cpp; path = audio_engine/yas_audio_node_kernel_protocol.cpp; sourceTree = "<group>"; };
 		B69B088C1D43493B00F12D36 /* yas_audio_node_kernel_protocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = yas_audio_node_kernel_protocol.h; path = audio_engine/yas_audio_node_kernel_protocol.h; sourceTree = "<group>"; };
 		B69B08961D437CC500F12D36 /* yas_audio_device_io_node_protocol.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = yas_audio_device_io_node_protocol.cpp; path = audio_engine/yas_audio_device_io_node_protocol.cpp; sourceTree = "<group>"; };
+		B69B089F1D437F2A00F12D36 /* yas_audio_offline_output_node_protocol.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = yas_audio_offline_output_node_protocol.cpp; path = audio_engine/yas_audio_offline_output_node_protocol.cpp; sourceTree = "<group>"; };
 		B69C84861AF1144F00B9EB3D /* YASAudioOfflineSampleViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YASAudioOfflineSampleViewController.h; sourceTree = "<group>"; };
 		B69C84871AF1144F00B9EB3D /* YASAudioOfflineSampleViewController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = YASAudioOfflineSampleViewController.mm; sourceTree = "<group>"; };
 		B6AB1C3F1A9230420054349E /* YASAudioDeviceSampleViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YASAudioDeviceSampleViewController.h; sourceTree = "<group>"; };
@@ -427,6 +429,7 @@
 				B6FF04131BEB915D0026777E /* yas_audio_node.h */,
 				B6FF04141BEB915D0026777E /* yas_audio_offline_output_node_impl.h */,
 				B6FF04151BEB915D0026777E /* yas_audio_offline_output_node_impl.mm */,
+				B69B089F1D437F2A00F12D36 /* yas_audio_offline_output_node_protocol.cpp */,
 				B6FF04171BEB915D0026777E /* yas_audio_offline_output_node_protocol.h */,
 				B6FF04181BEB915D0026777E /* yas_audio_offline_output_node.cpp */,
 				B6FF04191BEB915D0026777E /* yas_audio_offline_output_node.h */,
@@ -610,6 +613,7 @@
 				B6626A881C146E2D0038175B /* yas_audio_format.mm in Sources */,
 				B6FF042F1BEB915D0026777E /* yas_audio_engine_impl.mm in Sources */,
 				B699BEBB1BF4D1B60007B597 /* yas_audio_unit.cpp in Sources */,
+				B69B08A01D437F2A00F12D36 /* yas_audio_offline_output_node_protocol.cpp in Sources */,
 				B699BEB81BF4D1B60007B597 /* yas_audio_graph.mm in Sources */,
 				B6FF04311BEB915D0026777E /* yas_audio_node_impl.cpp in Sources */,
 				B62ED55E1A62812F007DDE96 /* main.m in Sources */,

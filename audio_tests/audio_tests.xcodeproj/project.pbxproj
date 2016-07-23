@@ -101,6 +101,10 @@
 		B69B08931D437C4300F12D36 /* yas_audio_device_io_node_protocol.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B69B08911D437C4300F12D36 /* yas_audio_device_io_node_protocol.cpp */; };
 		B69B08941D437C4300F12D36 /* yas_audio_device_io_node_protocol.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B69B08911D437C4300F12D36 /* yas_audio_device_io_node_protocol.cpp */; };
 		B69B08951D437C4300F12D36 /* yas_audio_device_io_node_protocol.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B69B08911D437C4300F12D36 /* yas_audio_device_io_node_protocol.cpp */; };
+		B69B089B1D437E4800F12D36 /* yas_audio_offline_output_node_protocol.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B69B089A1D437E4800F12D36 /* yas_audio_offline_output_node_protocol.cpp */; };
+		B69B089C1D437E4800F12D36 /* yas_audio_offline_output_node_protocol.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B69B089A1D437E4800F12D36 /* yas_audio_offline_output_node_protocol.cpp */; };
+		B69B089D1D437E4800F12D36 /* yas_audio_offline_output_node_protocol.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B69B089A1D437E4800F12D36 /* yas_audio_offline_output_node_protocol.cpp */; };
+		B69B089E1D437E4800F12D36 /* yas_audio_offline_output_node_protocol.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B69B089A1D437E4800F12D36 /* yas_audio_offline_output_node_protocol.cpp */; };
 		B6AC9EE81C1860BB00DD2F4D /* yas_audio_enumerator_tests.mm in Sources */ = {isa = PBXBuildFile; fileRef = B6AC9EC81C1860BB00DD2F4D /* yas_audio_enumerator_tests.mm */; };
 		B6AC9EE91C1860BB00DD2F4D /* yas_audio_enumerator_tests.mm in Sources */ = {isa = PBXBuildFile; fileRef = B6AC9EC81C1860BB00DD2F4D /* yas_audio_enumerator_tests.mm */; };
 		B6AC9EEA1C1860BB00DD2F4D /* yas_audio_enumerator_tests.mm in Sources */ = {isa = PBXBuildFile; fileRef = B6AC9EC81C1860BB00DD2F4D /* yas_audio_enumerator_tests.mm */; };
@@ -395,6 +399,7 @@
 		B69B08851D43476300F12D36 /* yas_audio_node_kernel_protocol.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = yas_audio_node_kernel_protocol.cpp; path = audio_engine/yas_audio_node_kernel_protocol.cpp; sourceTree = "<group>"; };
 		B69B08861D43476300F12D36 /* yas_audio_node_kernel_protocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = yas_audio_node_kernel_protocol.h; path = audio_engine/yas_audio_node_kernel_protocol.h; sourceTree = "<group>"; };
 		B69B08911D437C4300F12D36 /* yas_audio_device_io_node_protocol.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = yas_audio_device_io_node_protocol.cpp; path = audio_engine/yas_audio_device_io_node_protocol.cpp; sourceTree = "<group>"; };
+		B69B089A1D437E4800F12D36 /* yas_audio_offline_output_node_protocol.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = yas_audio_offline_output_node_protocol.cpp; path = audio_engine/yas_audio_offline_output_node_protocol.cpp; sourceTree = "<group>"; };
 		B6AC9EC81C1860BB00DD2F4D /* yas_audio_enumerator_tests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = yas_audio_enumerator_tests.mm; sourceTree = "<group>"; };
 		B6AC9EC91C1860BB00DD2F4D /* yas_audio_file_tests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = yas_audio_file_tests.mm; sourceTree = "<group>"; };
 		B6AC9ECA1C1860BB00DD2F4D /* yas_audio_file_utils_tests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = yas_audio_file_utils_tests.mm; sourceTree = "<group>"; };
@@ -719,6 +724,7 @@
 				B6FF02621BEAF0200026777E /* yas_audio_node.h */,
 				B6FF02631BEAF0200026777E /* yas_audio_offline_output_node_impl.h */,
 				B6FF02641BEAF0200026777E /* yas_audio_offline_output_node_impl.mm */,
+				B69B089A1D437E4800F12D36 /* yas_audio_offline_output_node_protocol.cpp */,
 				B6FF02661BEAF0200026777E /* yas_audio_offline_output_node_protocol.h */,
 				B6FF02671BEAF0200026777E /* yas_audio_offline_output_node.cpp */,
 				B6FF02681BEAF0200026777E /* yas_audio_offline_output_node.h */,
@@ -1078,6 +1084,7 @@
 				B6626A521C146D380038175B /* yas_audio_types.cpp in Sources */,
 				B6F2CA6F1CDDEAAF00EF584B /* yas_stl_utils.cpp in Sources */,
 				B699BE6D1BF4D1530007B597 /* yas_audio_unit_parameter.cpp in Sources */,
+				B69B089B1D437E4800F12D36 /* yas_audio_offline_output_node_protocol.cpp in Sources */,
 				B69B087D1D43389D00F12D36 /* yas_audio_unit_protocol.cpp in Sources */,
 				B699BE691BF4D1530007B597 /* yas_audio_unit_impl.mm in Sources */,
 				B6AC9F4C1C1860BB00DD2F4D /* yas_audio_test_utils.mm in Sources */,
@@ -1150,6 +1157,7 @@
 				B6FF02B51BEAF0200026777E /* yas_audio_unit_io_node.cpp in Sources */,
 				B69B08761D4336AB00F12D36 /* yas_audio_connection_protocol.cpp in Sources */,
 				B6AC9EFA1C1860BB00DD2F4D /* yas_audio_frame_enumerator_tests.mm in Sources */,
+				B69B089D1D437E4800F12D36 /* yas_audio_offline_output_node_protocol.cpp in Sources */,
 				B6AC9F3E1C1860BB00DD2F4D /* yas_audio_unit_node_tests.mm in Sources */,
 				B6AC9F3A1C1860BB00DD2F4D /* yas_audio_unit_mixer_node_tests.mm in Sources */,
 				B6FF02991BEAF0200026777E /* yas_audio_node.cpp in Sources */,
@@ -1237,6 +1245,7 @@
 				B6FF028E1BEAF0200026777E /* yas_audio_engine.cpp in Sources */,
 				B69B08771D4336AB00F12D36 /* yas_audio_connection_protocol.cpp in Sources */,
 				B6AC9EFB1C1860BB00DD2F4D /* yas_audio_frame_enumerator_tests.mm in Sources */,
+				B69B089E1D437E4800F12D36 /* yas_audio_offline_output_node_protocol.cpp in Sources */,
 				B6AC9F3F1C1860BB00DD2F4D /* yas_audio_unit_node_tests.mm in Sources */,
 				B6AC9F3B1C1860BB00DD2F4D /* yas_audio_unit_mixer_node_tests.mm in Sources */,
 				B6AC9F331C1860BB00DD2F4D /* yas_audio_route_tests.mm in Sources */,
@@ -1337,6 +1346,7 @@
 				B6FF02B41BEAF0200026777E /* yas_audio_unit_io_node.cpp in Sources */,
 				B6F2CA701CDDEAAF00EF584B /* yas_stl_utils.cpp in Sources */,
 				B6FF02981BEAF0200026777E /* yas_audio_node.cpp in Sources */,
+				B69B089C1D437E4800F12D36 /* yas_audio_offline_output_node_protocol.cpp in Sources */,
 				B69B087E1D43389D00F12D36 /* yas_audio_unit_protocol.cpp in Sources */,
 				B6FF02A41BEAF0200026777E /* yas_audio_route_node.cpp in Sources */,
 				B6AC9F4D1C1860BB00DD2F4D /* yas_audio_test_utils.mm in Sources */,

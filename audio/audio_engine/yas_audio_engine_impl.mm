@@ -479,7 +479,7 @@ audio::engine::start_result_t audio::engine::impl::start_offline_render(offline_
         return start_result_t(start_error_t::offline_output_not_found);
     }
 
-    auto node = offline_output_node.manageable_offline_output_unit();
+    auto node = offline_output_node.manageable();
     auto result = node.start(std::move(render_function), std::move(completion_function));
 
     if (result) {
@@ -495,7 +495,7 @@ void audio::engine::impl::stop() {
     }
 
     if (auto offline_output_node = _core->offline_output_node) {
-        offline_output_node.manageable_offline_output_unit().stop();
+        offline_output_node.manageable().stop();
     }
 }
 
