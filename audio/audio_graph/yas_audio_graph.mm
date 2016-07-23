@@ -183,26 +183,26 @@ struct audio::graph::impl : base::impl {
     void remove_unit_from_units(unit &unit) {
         std::lock_guard<std::recursive_mutex> lock(_mutex);
 
-        auto &unt = unit.manageable();
+        auto &manageable_unit = unit.manageable();
 
-        if (auto key = unt.key()) {
+        if (auto key = manageable_unit.key()) {
             _units.erase(*key);
             _io_units.erase(*key);
-            unt.set_key(nullopt);
-            unt.set_graph_key(nullopt);
+            manageable_unit.set_key(nullopt);
+            manageable_unit.set_graph_key(nullopt);
         }
     }
 
     void add_audio_unit(unit &unit) {
-        auto &unt = unit.manageable();
+        auto &manageable_unit = unit.manageable();
 
-        if (unt.key()) {
+        if (manageable_unit.key()) {
             throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : unit.key is already assigned.");
         }
 
         add_unit_to_units(unit);
 
-        unt.initialize();
+        manageable_unit.initialize();
 
         if (unit.is_output_unit() && _running && !is_interrupting()) {
             unit.start();
