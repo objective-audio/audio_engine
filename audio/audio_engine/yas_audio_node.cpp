@@ -74,14 +74,23 @@ void audio::node::set_render_time_on_render(const time &time) {
     impl_ptr<impl>()->set_render_time_on_render(time);
 }
 
-audio::connectable_node audio::node::connectable() {
-    return audio::connectable_node{impl_ptr<connectable_node::impl>()};
+audio::connectable_node &audio::node::connectable() {
+    if (!_connectable) {
+        _connectable = audio::connectable_node{impl_ptr<connectable_node::impl>()};
+    }
+    return _connectable;
 }
 
-audio::manageable_node const audio::node::manageable_node() const {
-    return audio::manageable_node{impl_ptr<manageable_node::impl>()};
+audio::manageable_node const &audio::node::manageable_node() const {
+    if (!_manageable) {
+        _manageable = audio::manageable_node{impl_ptr<manageable_node::impl>()};
+    }
+    return _manageable;
 }
 
-audio::manageable_node audio::node::manageable_node() {
-    return audio::manageable_node{impl_ptr<manageable_node::impl>()};
+audio::manageable_node &audio::node::manageable_node() {
+    if (!_manageable) {
+        _manageable = audio::manageable_node{impl_ptr<manageable_node::impl>()};
+    }
+    return _manageable;
 }

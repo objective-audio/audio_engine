@@ -44,15 +44,19 @@ namespace audio {
         void render(audio::pcm_buffer &buffer, uint32_t const bus_idx, audio::time const &when);
         void set_render_time_on_render(audio::time const &time);
 
-        audio::connectable_node connectable();
-        audio::manageable_node const manageable_node() const;
-        audio::manageable_node manageable_node();
+        audio::connectable_node &connectable();
+        audio::manageable_node const &manageable_node() const;
+        audio::manageable_node &manageable_node();
 
        protected:
         class manageable_kernel;
         class impl;
 
         explicit node(std::shared_ptr<impl> const &);
+
+       private:
+        audio::connectable_node _connectable = nullptr;
+        mutable audio::manageable_node _manageable = nullptr;
     };
 
     struct node::manageable_kernel : protocol {

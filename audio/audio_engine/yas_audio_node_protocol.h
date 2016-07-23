@@ -15,6 +15,7 @@ namespace audio {
         };
 
         explicit connectable_node(std::shared_ptr<impl>);
+        connectable_node(std::nullptr_t);
 
         void add_connection(audio::connection const &);
         void remove_connection(audio::connection const &);
@@ -35,6 +36,7 @@ namespace audio {
         };
 
         explicit manageable_node(std::shared_ptr<impl>);
+        manageable_node(std::nullptr_t);
 
         audio::connection input_connection(uint32_t const bus_idx) const;
         audio::connection output_connection(uint32_t const bus_idx) const;
