@@ -40,5 +40,12 @@ namespace test {
         connection(audio::node &source_node, uint32_t const source_bus, audio::node &destination_node,
                    uint32_t const destination_bus, audio::format const &format);
     };
+
+    struct node : audio::node {
+        node();
+        node(audio::node const &);
+
+        audio::node::kernel kernel();
+    };
 }
 }

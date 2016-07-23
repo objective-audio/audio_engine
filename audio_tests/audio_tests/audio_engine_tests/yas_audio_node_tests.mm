@@ -90,7 +90,7 @@ using namespace yas;
 }
 
 - (void)test_render_time {
-    auto node = audio::testable_node::create();
+    auto node = test::node();
     audio::time time(100, 48000.0);
 
     XCTestExpectation *render_expectation = [self expectationWithDescription:@"node render"];
@@ -112,7 +112,7 @@ using namespace yas;
 }
 
 - (void)test_set_engine {
-    auto node = audio::testable_node::create();
+    auto node = test::node();
     audio::engine engine;
 
     XCTAssertFalse(node.engine());
@@ -150,7 +150,7 @@ using namespace yas;
     XCTestExpectation *expectation = [self expectationWithDescription:@"kernel connections"];
 
     auto lambda = [self, expectation, relay_node, input_connections, output_connection]() {
-        auto kernel = audio::testable_node::kernel(relay_node);
+        auto kernel = test::node(relay_node).kernel();
         XCTAssertEqual(kernel.output_connections().size(), 1);
         XCTAssertEqual(kernel.input_connections().size(), 2);
         XCTAssertEqual(kernel.output_connection(0), output_connection);

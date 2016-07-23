@@ -20,7 +20,6 @@ class result;
 namespace audio {
     class time;
     class engine;
-    class testable_node;
 
     class node : public base {
        public:
@@ -54,11 +53,6 @@ namespace audio {
         class impl;
 
         explicit node(std::shared_ptr<impl> const &);
-
-#if YAS_TEST
-       public:
-        friend testable_node;
-#endif
     };
 
     struct node::manageable_kernel : protocol {
@@ -89,7 +83,3 @@ struct std::hash<yas::audio::node> {
 };
 
 #include "yas_audio_node_impl.h"
-
-#if YAS_TEST
-#include "yas_audio_node_testable.h"
-#endif

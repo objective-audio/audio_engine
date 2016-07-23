@@ -74,7 +74,6 @@
 
 /* Begin PBXFileReference section */
 		B602AFE41CEB5D9700309B3A /* yas_audio_engine_protocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = yas_audio_engine_protocol.h; path = audio_testable/yas_audio_engine_protocol.h; sourceTree = "<group>"; };
-		B602AFE51CEB5D9700309B3A /* yas_audio_node_testable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yas_audio_node_testable.h; sourceTree = "<group>"; };
 		B602AFE61CEB5D9700309B3A /* yas_audio_unit_testable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yas_audio_unit_testable.h; sourceTree = "<group>"; };
 		B617CD261C95558E00B3A934 /* yas_audio_node_protocol.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = yas_audio_node_protocol.cpp; path = audio_engine/yas_audio_node_protocol.cpp; sourceTree = "<group>"; };
 		B61D52981B9C70AF00A449C5 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
@@ -245,7 +244,6 @@
 		B602AFE21CEB5D9700309B3A /* audio_testable */ = {
 			isa = PBXGroup;
 			children = (
-				B602AFE51CEB5D9700309B3A /* yas_audio_node_testable.h */,
 				B602AFE61CEB5D9700309B3A /* yas_audio_unit_testable.h */,
 			);
 			path = audio_testable;
