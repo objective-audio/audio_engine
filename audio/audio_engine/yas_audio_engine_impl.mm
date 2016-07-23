@@ -277,7 +277,7 @@ void audio::engine::impl::add_node_to_graph(node const &node) {
     }
 
     if (auto unit_node = yas::cast<audio::unit_node>(node)) {
-        auto node = unit_node.manageable_unit_node();
+        auto &node = unit_node.manageable();
         node.prepare_audio_unit();
         if (auto unit = unit_node.audio_unit()) {
             _core->graph.add_audio_unit(unit);

@@ -25,7 +25,7 @@ using namespace yas;
 
     XCTAssertTrue(node);
 
-    XCTAssertTrue(node.manageable_unit_node());
+    XCTAssertTrue(node.manageable());
 }
 
 - (void)test_create_null {
@@ -83,7 +83,7 @@ using namespace yas;
 
     engine.disconnect(connection);
 
-    delay_node.manageable_unit_node().reload_audio_unit();
+    delay_node.manageable().reload_audio_unit();
 
     engine.connect(delay_node, output_node, format);
 
