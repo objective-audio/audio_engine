@@ -8,6 +8,8 @@
 
 namespace yas {
 namespace audio {
+    class engine;
+
     struct connectable_node : protocol {
         struct impl : protocol::impl {
             virtual void add_connection(audio::connection const &) = 0;
@@ -20,8 +22,6 @@ namespace audio {
         void add_connection(audio::connection const &);
         void remove_connection(audio::connection const &);
     };
-
-    class engine;
 
     struct manageable_node : connectable_node {
         struct impl : connectable_node::impl {
