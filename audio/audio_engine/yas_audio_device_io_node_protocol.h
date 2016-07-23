@@ -17,20 +17,12 @@ namespace audio {
             virtual audio::device_io &device_io() const = 0;
         };
 
-        explicit manageable_device_io_node(std::shared_ptr<impl> impl) : protocol(impl) {
-        }
+        explicit manageable_device_io_node(std::shared_ptr<impl>);
+        manageable_device_io_node(std::nullptr_t);
 
-        void add_device_io() {
-            impl_ptr<impl>()->add_device_io();
-        }
-
-        void remove_device_io() {
-            impl_ptr<impl>()->remove_device_io();
-        }
-
-        audio::device_io &device_io() const {
-            return impl_ptr<impl>()->device_io();
-        }
+        void add_device_io();
+        void remove_device_io();
+        audio::device_io &device_io() const;
     };
 }
 }

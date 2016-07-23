@@ -20,6 +20,20 @@ using namespace yas;
     [super tearDown];
 }
 
+- (void)test_create {
+    audio::unit_node node(kAudioUnitType_Effect, kAudioUnitSubType_Delay);
+
+    XCTAssertTrue(node);
+
+    XCTAssertTrue(node.manageable());
+}
+
+- (void)test_create_null {
+    audio::unit_node node{nullptr};
+
+    XCTAssertFalse(node);
+}
+
 - (void)test_restore_parameters {
     audio::engine engine;
 
@@ -69,7 +83,7 @@ using namespace yas;
 
     engine.disconnect(connection);
 
-    delay_node.manageable_unit_node().reload_audio_unit();
+    delay_node.manageable().reload_audio_unit();
 
     engine.connect(delay_node, output_node, format);
 

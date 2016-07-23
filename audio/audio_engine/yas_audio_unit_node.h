@@ -42,11 +42,14 @@ namespace audio {
                                         AudioUnitElement const element);
         float output_parameter_value(AudioUnitParameterID const parameter_id, AudioUnitElement const element) const;
 
-        manageable_unit_node manageable_unit_node();
+        manageable_unit_node &manageable();
 
        protected:
         unit_node(std::shared_ptr<impl> &&, AudioComponentDescription const &);
         explicit unit_node(std::shared_ptr<impl> const &);
+
+       private:
+        manageable_unit_node _manageable = nullptr;
     };
 }
 }

@@ -15,20 +15,12 @@ namespace audio {
             virtual void reload_audio_unit() = 0;
         };
 
-        explicit manageable_unit_node(std::shared_ptr<impl> impl) : protocol(std::move(impl)) {
-        }
+        explicit manageable_unit_node(std::shared_ptr<impl>);
+        manageable_unit_node(std::nullptr_t);
 
-        void prepare_audio_unit() {
-            impl_ptr<impl>()->prepare_audio_unit();
-        }
-
-        void prepare_parameters() {
-            impl_ptr<impl>()->prepare_parameters();
-        }
-
-        void reload_audio_unit() {
-            impl_ptr<impl>()->reload_audio_unit();
-        }
+        void prepare_audio_unit();
+        void prepare_parameters();
+        void reload_audio_unit();
     };
 }
 }

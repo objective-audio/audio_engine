@@ -21,6 +21,21 @@ using namespace yas;
     [super tearDown];
 }
 
+- (void)test_create {
+    audio::offline_output_node node;
+
+    XCTAssertTrue(node);
+
+    XCTAssertFalse(node.is_running());
+    XCTAssertTrue(node.manageable());
+}
+
+- (void)test_create_null {
+    audio::offline_output_node node{nullptr};
+
+    XCTAssertFalse(node);
+}
+
 - (void)test_offline_render_with_audio_engine {
     double const sample_rate = 44100.0;
 
@@ -122,7 +137,7 @@ using namespace yas;
     auto connection = test::connection(tap_node, 0, output_node, 0, format);
 
     output_node.connectable().add_connection(connection);
-    output_node.manageable().update_kernel();
+    static_cast<audio::node>(output_node).manageable().update_kernel();
     tap_node.connectable().add_connection(connection);
     tap_node.manageable().update_kernel();
 
@@ -204,8 +219,7 @@ using namespace yas;
         }
     };
 
-    auto result = output_node.manageable_offline_output_unit().start(std::move(start_render_function),
-                                                                     std::move(completion_function));
+    auto result = output_node.manageable().start(std::move(start_render_function), std::move(completion_function));
 
     XCTAssertTrue(result);
 
@@ -230,7 +244,7 @@ using namespace yas;
     auto connection = test::connection(tap_node, 0, output_node, 0, format);
 
     output_node.connectable().add_connection(connection);
-    output_node.manageable().update_kernel();
+    static_cast<audio::node>(output_node).manageable().update_kernel();
     tap_node.connectable().add_connection(connection);
     tap_node.manageable().update_kernel();
 
@@ -253,7 +267,7 @@ using namespace yas;
         }
     };
 
-    auto result = output_node.manageable_offline_output_unit().start(std::move(render_func), completion_function);
+    auto result = output_node.manageable().start(std::move(render_func), completion_function);
 
     XCTAssertTrue(result);
 

@@ -20,6 +20,20 @@ using namespace yas;
     [super tearDown];
 }
 
+- (void)test_create {
+    audio::unit unit(kAudioUnitType_FormatConverter, kAudioUnitSubType_AUConverter);
+
+    XCTAssertTrue(unit);
+
+    XCTAssertTrue(unit.manageable());
+}
+
+- (void)test_create_null {
+    audio::unit unit{nullptr};
+
+    XCTAssertFalse(unit);
+}
+
 - (void)testConverterUnit {
     double const output_sample_rate = 44100;
     double const input_sample_rate = 48000;

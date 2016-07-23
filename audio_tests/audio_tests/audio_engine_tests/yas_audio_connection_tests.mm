@@ -35,8 +35,16 @@ using namespace yas;
     XCTAssertTrue(connection.destination_bus() == destination_bus);
     XCTAssertTrue(connection.format() == format);
 
+    XCTAssertTrue(connection.node_removable());
+
     XCTAssertTrue(source_node.manageable().output_connection(source_bus) == connection);
     XCTAssertTrue(destination_node.manageable().input_connection(destination_bus) == connection);
+}
+
+- (void)test_create_null {
+    audio::connection connection{nullptr};
+
+    XCTAssertFalse(connection);
 }
 
 - (void)test_remove_nodes {

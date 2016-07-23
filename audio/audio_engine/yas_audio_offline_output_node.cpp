@@ -23,8 +23,11 @@ bool audio::offline_output_node::is_running() const {
     return impl_ptr<impl>()->is_running();
 }
 
-audio::manageable_offline_output_unit audio::offline_output_node::manageable_offline_output_unit() {
-    return audio::manageable_offline_output_unit{impl_ptr<manageable_offline_output_unit::impl>()};
+audio::manageable_offline_output_unit &audio::offline_output_node::manageable() {
+    if (!_manageable) {
+        _manageable = audio::manageable_offline_output_unit{impl_ptr<manageable_offline_output_unit::impl>()};
+    }
+    return _manageable;
 }
 
 std::string yas::to_string(audio::offline_start_error_t const &error) {

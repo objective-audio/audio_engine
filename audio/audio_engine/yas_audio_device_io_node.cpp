@@ -33,8 +33,11 @@ audio::device audio::device_io_node::device() const {
     return impl_ptr<impl>()->device();
 }
 
-audio::manageable_device_io_node audio::device_io_node::manageable_device_io_node() {
-    return audio::manageable_device_io_node{impl_ptr<manageable_device_io_node::impl>()};
+audio::manageable_device_io_node &audio::device_io_node::manageable() {
+    if (!_manageable) {
+        _manageable = audio::manageable_device_io_node{impl_ptr<manageable_device_io_node::impl>()};
+    }
+    return _manageable;
 }
 
 #endif
