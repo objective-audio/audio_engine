@@ -23,20 +23,12 @@ namespace audio {
             virtual void remove_destination_node() = 0;
         };
 
-        explicit node_removable(std::shared_ptr<impl> impl) : protocol(impl) {
-        }
+        explicit node_removable(std::shared_ptr<impl> impl);
+        node_removable(std::nullptr_t);
 
-        void remove_nodes() {
-            impl_ptr<impl>()->remove_nodes();
-        }
-
-        void remove_source_node() {
-            impl_ptr<impl>()->remove_source_node();
-        }
-
-        void remove_destination_node() {
-            impl_ptr<impl>()->remove_destination_node();
-        }
+        void remove_nodes();
+        void remove_source_node();
+        void remove_destination_node();
     };
 }
 }

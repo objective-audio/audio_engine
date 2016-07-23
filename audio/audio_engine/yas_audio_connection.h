@@ -25,11 +25,14 @@ namespace audio {
         audio::node destination_node() const;
         audio::format const &format() const;
 
-        audio::node_removable node_removable();
+        audio::node_removable &node_removable();
 
        protected:
         connection(audio::node &source_node, uint32_t const source_bus_idx, audio::node &destination_node,
                    uint32_t const destination_bus_idx, audio::format const &format);
+
+       private:
+        audio::node_removable _node_removable = nullptr;
     };
 }
 }
