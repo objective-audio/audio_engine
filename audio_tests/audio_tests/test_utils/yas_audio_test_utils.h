@@ -47,5 +47,19 @@ namespace test {
 
         audio::node::kernel kernel();
     };
+
+    struct unit : audio::unit {
+        template <typename T>
+        void set_property_data(std::vector<T> const &data, AudioUnitPropertyID const property_id,
+                               AudioUnitScope const scope, AudioUnitElement const element) {
+            impl_ptr<audio::unit::impl>()->set_property_data(data, property_id, scope, element);
+        }
+
+        template <typename T>
+        std::vector<T> property_data(AudioUnitPropertyID const property_id, AudioUnitScope const scope,
+                                     AudioUnitElement const element) {
+            return impl_ptr<audio::unit::impl>()->property_data<T>(property_id, scope, element);
+        }
+    };
 }
 }
