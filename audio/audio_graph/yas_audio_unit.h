@@ -94,6 +94,11 @@ namespace audio {
 
         void callback_render(render_parameters &render_parameters);
         au_result_t audio_unit_render(render_parameters &render_parameters);
+
+#if YAS_TEST
+       protected:
+        explicit unit(std::shared_ptr<impl> const &);
+#endif
     };
 }
 

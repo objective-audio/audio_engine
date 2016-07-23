@@ -49,6 +49,9 @@ namespace test {
     };
 
     struct unit : audio::unit {
+        unit();
+        unit(audio::unit const &);
+
         template <typename T>
         void set_property_data(std::vector<T> const &data, AudioUnitPropertyID const property_id,
                                AudioUnitScope const scope, AudioUnitElement const element) {

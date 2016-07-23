@@ -35,6 +35,13 @@ audio::unit::unit(OSType const type, OSType const sub_type)
       }) {
 }
 
+#if YAS_TEST
+
+audio::unit::unit(std::shared_ptr<impl> const &impl) : base(impl) {
+}
+
+#endif
+
 #pragma mark - accessor
 
 CFStringRef audio::unit::name() const {

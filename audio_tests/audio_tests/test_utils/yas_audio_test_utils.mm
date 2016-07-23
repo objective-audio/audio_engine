@@ -203,6 +203,12 @@ test::node::node() : audio::node(std::make_shared<audio::node::impl>()) {
 test::node::node(audio::node const &node) : audio::node(node.impl_ptr<audio::node::impl>()) {
 }
 
+test::unit::unit() : audio::unit(std::make_shared<audio::unit::impl>()) {
+}
+
+test::unit::unit(audio::unit const &unit) : audio::unit(unit.impl_ptr<audio::unit::impl>()) {
+}
+
 audio::node::kernel test::node::kernel() {
     return impl_ptr<audio::node::impl>()->kernel_cast();
 }
