@@ -4,12 +4,12 @@
 
 #pragma once
 
+#include "yas_audio_node_kernel_protocol.h"
 #include "yas_base.h"
-#include "yas_protocol.h"
 
 namespace yas {
 namespace audio {
-    struct yas::audio::node::kernel : base {
+    struct node::kernel : base {
         struct impl : base::impl, manageable_kernel::impl {
             audio::connection input_connection(uint32_t const bus_idx);
             audio::connection output_connection(uint32_t const bus_idx);
