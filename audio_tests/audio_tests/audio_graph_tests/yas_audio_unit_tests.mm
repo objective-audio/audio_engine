@@ -34,7 +34,7 @@ using namespace yas;
     XCTAssertFalse(unit);
 }
 
-- (void)testConverterUnit {
+- (void)test_converter_unit {
     double const output_sample_rate = 44100;
     double const input_sample_rate = 48000;
     uint32_t const channels = 2;
@@ -110,7 +110,7 @@ using namespace yas;
     XCTAssertFalse(converter_unit.is_initialized());
 }
 
-- (void)testRenderCallback {
+- (void)test_render_callback {
     double const sampleRate = 44100;
     uint32_t const channels = 2;
     uint32_t const frame_length = 1024;
@@ -193,7 +193,7 @@ using namespace yas;
     XCTAssertFalse(is_render_notify_callback);
 }
 
-- (void)testParameter {
+- (void)test_parameter {
     audio::unit delay_unit(kAudioUnitType_Effect, kAudioUnitSubType_Delay);
 
     AudioUnitScope const scope = kAudioUnitScope_Global;
@@ -216,14 +216,14 @@ using namespace yas;
     XCTAssertTrue(parameter.unit() == kAudioUnitParameterUnit_Seconds);
 }
 
-- (void)testParameterCreateFailed {
+- (void)test_parameter_create_failed {
     audio::unit delay_unit(kAudioUnitType_Effect, kAudioUnitSubType_Delay);
 
     XCTAssertThrows(delay_unit.create_parameter(kDelayParam_DelayTime, kAudioUnitScope_Input));
     XCTAssertThrows(delay_unit.create_parameter(kDelayParam_DelayTime, kAudioUnitScope_Output));
 }
 
-- (void)testParameters {
+- (void)test_parameters {
     audio::unit delay_unit(kAudioUnitType_Effect, kAudioUnitSubType_Delay);
 
     auto parameters = delay_unit.create_parameters(kAudioUnitScope_Global);
@@ -239,7 +239,7 @@ using namespace yas;
     }
 }
 
-- (void)testPropertyData {
+- (void)test_property_data {
     double const sampleRate = 48000;
     uint32_t const channels = 4;
     AudioUnitPropertyID const property_id = kAudioUnitProperty_StreamFormat;

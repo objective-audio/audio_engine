@@ -20,7 +20,7 @@ using namespace yas;
     [super tearDown];
 }
 
-- (void)testSetFormatSuccess {
+- (void)test_set_format_success {
     audio::unit converter_unit(kAudioUnitType_FormatConverter, kAudioUnitSubType_AUConverter);
     audio::pcm_format const pcm_formats[] = {audio::pcm_format::float32, audio::pcm_format::float64,
                                              audio::pcm_format::int16, audio::pcm_format::fixed824};

@@ -20,7 +20,7 @@ using namespace yas;
     [super tearDown];
 }
 
-- (void)testReadEnumeratorNonInterleavedUseMacro {
+- (void)test_read_enumerator_non_interleaved_use_macro {
     uint32_t const frame_length = 16;
     uint32_t const channels = 4;
 
@@ -50,7 +50,7 @@ using namespace yas;
     }
 }
 
-- (void)testReadEnumeratorNonInterleavedUseFunction {
+- (void)test_read_enumerator_non_interleaved_use_function {
     uint32_t const frame_length = 16;
     uint32_t const channels = 4;
 
@@ -82,7 +82,7 @@ using namespace yas;
     }
 }
 
-- (void)testReadEnumeratorInterleaved {
+- (void)test_read_enumerator_interleaved {
     uint32_t const frame_length = 16;
     uint32_t const channels = 4;
 
@@ -111,7 +111,7 @@ using namespace yas;
     }
 }
 
-- (void)testWriteEnumerator {
+- (void)test_write_enumerator {
     uint32_t const frame_length = 16;
     uint32_t const channels = 4;
 
@@ -153,7 +153,7 @@ using namespace yas;
     }
 }
 
-- (void)testSetPosition {
+- (void)test_set_position {
     std::size_t const frame_length = 16;
 
     auto const format = audio::format({.sample_rate = 48000.0, .channel_count = 1});
@@ -182,7 +182,7 @@ using namespace yas;
     XCTAssertThrows(enumerator.set_position(100));
 }
 
-- (void)testStop {
+- (void)test_stop {
     std::size_t const frame_length = 16;
     std::size_t const stopIndex = 8;
 
@@ -205,7 +205,7 @@ using namespace yas;
     XCTAssertEqual(frame, stopIndex + 1);
 }
 
-- (void)testInitFailed {
+- (void)test_init_failed {
     flex_ptr pointer(nullptr);
 
     XCTAssertThrows(audio::enumerator({.pointer = pointer, .byte_stride = 1, .length = 1}));

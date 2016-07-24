@@ -41,7 +41,7 @@ using namespace yas;
     XCTAssertThrows(pcm_buffer.flex_ptr_at_index(1));
 }
 
-- (void)testCreateFloat64NonInterleaved2chBuffer {
+- (void)test_create_float64_non_interleaved_2ch_buffer {
     audio::pcm_buffer pcm_buffer(audio::format({.sample_rate = 48000.0,
                                                 .channel_count = 2,
                                                 .pcm_format = audio::pcm_format::float64,

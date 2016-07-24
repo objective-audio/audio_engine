@@ -22,7 +22,7 @@ static NSInteger testCount = 8;
     [super tearDown];
 }
 
-- (void)testCreateAudioTimeWithHostTime {
+- (void)test_create_audio_time_with_host_time {
     for (NSInteger i = 0; i < testCount; i++) {
         uint64_t hostTime = arc4random();
 
@@ -33,7 +33,7 @@ static NSInteger testCount = 8;
     }
 }
 
-- (void)testCreateAudioTimeSampleTime {
+- (void)test_create_audio_time_with_sample_time {
     for (NSInteger i = 0; i < testCount; i++) {
         int64_t sampleTime = arc4random();
         double rate = arc4random_uniform(378000 - 4000) + 4000;
@@ -45,7 +45,7 @@ static NSInteger testCount = 8;
     }
 }
 
-- (void)testCreateAudioTimeWithHostTimeAndSampleTime {
+- (void)test_create_audio_time_with_host_time_and_sample_time {
     for (NSInteger i = 0; i < testCount; i++) {
         uint64_t hostTime = arc4random();
         int64_t sampleTime = arc4random();
@@ -58,7 +58,7 @@ static NSInteger testCount = 8;
     }
 }
 
-- (void)testConvert {
+- (void)test_convert {
     for (NSInteger i = 0; i < testCount; i++) {
         uint64_t hostTime = arc4random();
 
@@ -71,7 +71,7 @@ static NSInteger testCount = 8;
     }
 }
 
-- (void)testExtrapolateTime {
+- (void)test_extrapolate_time {
     for (NSInteger i = 0; i < testCount; i++) {
         uint64_t hostTime = arc4random();
         int64_t sampleTime = arc4random();

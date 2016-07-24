@@ -49,7 +49,7 @@ using namespace yas;
     }
 }
 
-- (void)testElement {
+- (void)test_element {
     audio::unit_mixer_node mixer_node;
     uint32_t const default_element_count = mixer_node.input_element_count();
 
@@ -65,7 +65,7 @@ using namespace yas;
     XCTAssertThrows(mixer_node.set_input_volume(0.5f, element_count));
 }
 
-- (void)testRestoreParamters {
+- (void)test_restore_parameters {
     audio::unit_mixer_node mixer_node;
 
     uint32_t const bus_idx = 0;

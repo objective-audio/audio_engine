@@ -20,7 +20,7 @@ using namespace yas;
     [super tearDown];
 }
 
-- (void)testRunning {
+- (void)test_running {
     audio::graph graph;
 
     graph.start();
@@ -32,7 +32,7 @@ using namespace yas;
     XCTAssertFalse(graph.is_running());
 }
 
-- (void)testIORendering {
+- (void)test_io_rendering {
     double const output_sample_rate = 48000;
     double const mixer_sample_rate = 44100;
     uint32_t const channels = 2;
