@@ -18,7 +18,7 @@ namespace audio {
         impl &operator=(impl const &) = delete;
         impl &operator=(impl &&) = delete;
 
-        virtual void reset();  // requires super
+        void reset();
 
         audio::format input_format(uint32_t const bus_idx);
         audio::format output_format(uint32_t const bus_idx);
