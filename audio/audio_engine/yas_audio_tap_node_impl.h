@@ -10,7 +10,9 @@ namespace audio {
         impl();
         virtual ~impl();
 
-        virtual void reset() override;
+        void prepare(tap_node const &);
+
+        void will_reset();
 
         virtual uint32_t input_bus_count() const override;
         virtual uint32_t output_bus_count() const override;

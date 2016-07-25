@@ -7,6 +7,7 @@
 using namespace yas;
 
 audio::tap_node::tap_node() : node(std::make_unique<impl>()) {
+    impl_ptr<impl>()->prepare(*this);
 }
 
 audio::tap_node::tap_node(std::nullptr_t) : node(nullptr) {
