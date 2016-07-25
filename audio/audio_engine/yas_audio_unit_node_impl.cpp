@@ -16,6 +16,7 @@ struct audio::unit_node::impl::core {
     AudioComponentDescription acd;
     std::unordered_map<AudioUnitScope, unit::parameter_map_t> parameters;
     unit _au;
+    audio::unit_node::subject_t _subject;
     audio::node::observer_t _reset_observer;
     audio::node::observer_t _connections_observer;
 
@@ -55,14 +56,14 @@ void audio::unit_node::impl::prepare(unit_node const &node, AudioComponentDescri
     _core->parameters.insert(std::make_pair(kAudioUnitScope_Output, unit.create_parameters(kAudioUnitScope_Output)));
 
     _core->_reset_observer =
-        subject().make_observer(audio::node::method::will_reset, [weak_node = to_weak(node)](auto const &) {
+        node::impl::subject().make_observer(audio::node::method::will_reset, [weak_node = to_weak(node)](auto const &) {
             if (auto node = weak_node.lock()) {
                 node.impl_ptr<audio::unit_node::impl>()->will_reset();
             }
         });
 
-    _core->_connections_observer =
-        subject().make_observer(audio::node::method::update_connections, [weak_node = to_weak(node)](auto const &) {
+    _core->_connections_observer = node::impl::subject().make_observer(
+        audio::node::method::update_connections, [weak_node = to_weak(node)](auto const &) {
             if (auto node = weak_node.lock()) {
                 node.impl_ptr<audio::unit_node::impl>()->update_unit_connections();
             }
@@ -189,6 +190,10 @@ uint32_t audio::unit_node::impl::output_bus_count() const {
 
 #warning todo update_connectionsにリネームしたい
 void audio::unit_node::impl::update_unit_connections() {
+    if (subject().has_observer()) {
+        subject().notify(audio::unit_node::method::will_update_connections, cast<audio::unit_node>());
+    }
+
     if (auto audio_unit = _core->au()) {
         auto input_bus_count = input_element_count();
         if (input_bus_count > 0) {
@@ -254,6 +259,10 @@ void audio::unit_node::impl::prepare_parameters() {
 
 void audio::unit_node::impl::reload_audio_unit() {
     _core->set_au(unit(_core->acd));
+}
+
+audio::unit_node::subject_t &audio::unit_node::impl::subject() {
+    return _core->_subject;
 }
 
 void audio::unit_node::impl::render(pcm_buffer &buffer, uint32_t const bus_idx, time const &when) {

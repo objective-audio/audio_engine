@@ -42,6 +42,8 @@ namespace audio {
         void reload_audio_unit() override;
         void set_graph(audio::graph const &);
 
+        audio::unit_node::subject_t &subject();
+
         virtual void render(audio::pcm_buffer &buffer, uint32_t const bus_idx, audio::time const &when) override;
 
        private:

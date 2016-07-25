@@ -89,6 +89,10 @@ float audio::unit_node::output_parameter_value(AudioUnitParameterID const parame
     return impl_ptr<impl>()->output_parameter_value(parameter_id, element);
 }
 
+audio::unit_node::subject_t &audio::unit_node::subject() {
+    return impl_ptr<impl>()->subject();
+}
+
 audio::manageable_unit_node &audio::unit_node::manageable() {
     if (!_manageable) {
         _manageable = audio::manageable_unit_node{impl_ptr<manageable_unit_node::impl>()};
