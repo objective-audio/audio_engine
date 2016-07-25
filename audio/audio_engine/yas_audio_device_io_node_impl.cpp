@@ -18,6 +18,7 @@ using namespace yas;
 
 struct audio::device_io_node::impl::core {
     audio::device_io device_io;
+    audio::node::observer_t _connections_observer;
 
     core() : _device(nullptr), device_io(nullptr) {
     }
@@ -46,6 +47,13 @@ audio::device_io_node::impl::~impl() = default;
 
 void audio::device_io_node::impl::prepare(device_io_node const &node, audio::device const &device) {
     set_device(device ?: device::default_output_device());
+
+    _core->_connections_observer =
+        subject().make_observer(audio::node::method::update_connections, [weak_node = to_weak(node)](auto const &) {
+            if (auto node = weak_node.lock()) {
+                node.impl_ptr<impl>()->update_device_io_connections();
+            }
+        });
 }
 
 uint32_t audio::device_io_node::impl::input_bus_count() const {
@@ -56,7 +64,8 @@ uint32_t audio::device_io_node::impl::output_bus_count() const {
     return 1;
 }
 
-void audio::device_io_node::impl::update_connections() {
+#warning todo update_connectionsにリネームしたい
+void audio::device_io_node::impl::update_device_io_connections() {
     auto &device_io = _core->device_io;
     if (!device_io) {
         return;
