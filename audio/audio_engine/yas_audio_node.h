@@ -11,6 +11,7 @@
 #include "yas_audio_pcm_buffer.h"
 #include "yas_audio_types.h"
 #include "yas_base.h"
+#include "yas_observing.h"
 #include "yas_protocol.h"
 
 namespace yas {
@@ -23,7 +24,15 @@ namespace audio {
 
     class node : public base {
        public:
+        class impl;
         class kernel;
+
+        enum class method {
+            will_reset,
+        };
+
+        using subject_t = subject<node, method>;
+        using observer_t = observer<node, method>;
 
         node(std::nullptr_t);
 
@@ -44,13 +53,14 @@ namespace audio {
         void render(audio::pcm_buffer &buffer, uint32_t const bus_idx, audio::time const &when);
         void set_render_time_on_render(audio::time const &time);
 
+        subject_t &subject();
+
         audio::connectable_node &connectable();
         audio::manageable_node const &manageable() const;
         audio::manageable_node &manageable();
 
        protected:
         class manageable_kernel;
-        class impl;
 
         explicit node(std::shared_ptr<impl> const &);
 
@@ -59,7 +69,11 @@ namespace audio {
         mutable audio::manageable_node _manageable = nullptr;
     };
 }
+
+std::string to_string(audio::node::method const &);
 }
+
+std::ostream &operator<<(std::ostream &, yas::audio::node::method const &);
 
 template <>
 struct std::hash<yas::audio::node> {

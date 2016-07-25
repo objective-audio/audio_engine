@@ -16,6 +16,7 @@ struct audio::unit_node::impl::core {
     AudioComponentDescription acd;
     std::unordered_map<AudioUnitScope, unit::parameter_map_t> parameters;
     unit _au;
+    audio::node::observer_t _reset_observer;
 
     core() : acd(), parameters(), _au(nullptr), _mutex() {
     }
@@ -51,9 +52,16 @@ void audio::unit_node::impl::prepare(unit_node const &node, AudioComponentDescri
     _core->parameters.insert(std::make_pair(kAudioUnitScope_Global, unit.create_parameters(kAudioUnitScope_Global)));
     _core->parameters.insert(std::make_pair(kAudioUnitScope_Input, unit.create_parameters(kAudioUnitScope_Input)));
     _core->parameters.insert(std::make_pair(kAudioUnitScope_Output, unit.create_parameters(kAudioUnitScope_Output)));
+
+    _core->_reset_observer =
+        subject().make_observer(audio::node::method::will_reset, [weak_node = to_weak(node)](auto const &) {
+            if (auto node = weak_node.lock()) {
+                node.impl_ptr<audio::unit_node::impl>()->will_reset();
+            }
+        });
 }
 
-void audio::unit_node::impl::reset() {
+void audio::unit_node::impl::will_reset() {
     auto unit = au();
     unit.reset();
 
@@ -74,8 +82,6 @@ void audio::unit_node::impl::reset() {
             }
         }
     }
-
-    node::impl::reset();
 }
 
 audio::unit audio::unit_node::impl::au() const {

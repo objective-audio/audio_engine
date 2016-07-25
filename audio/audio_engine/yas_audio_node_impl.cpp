@@ -10,17 +10,17 @@
 using namespace yas;
 
 struct audio::node::impl::core {
-    weak<audio::engine> weak_engine;
-    connection_wmap input_connections;
-    connection_wmap output_connections;
+    weak<audio::engine> _weak_engine;
+    subject_t _subject;
+    connection_wmap _input_connections;
+    connection_wmap _output_connections;
 
-    core()
-        : weak_engine(), input_connections(), output_connections(), _kernel(nullptr), _render_time(nullptr), _mutex() {
+    core() {
     }
 
     void reset() {
-        input_connections.clear();
-        output_connections.clear();
+        _input_connections.clear();
+        _output_connections.clear();
         set_render_time(nullptr);
     }
 
@@ -46,7 +46,7 @@ struct audio::node::impl::core {
 
    private:
     node::kernel _kernel = nullptr;
-    time _render_time;
+    time _render_time = nullptr;
     mutable std::recursive_mutex _mutex;
 };
 
@@ -56,6 +56,10 @@ audio::node::impl::impl() : _core(std::make_unique<core>()) {
 audio::node::impl::~impl() = default;
 
 void audio::node::impl::reset() {
+    if (_core->_subject.has_observer()) {
+        _core->_subject.notify(audio::node::method::will_reset, cast<audio::node>());
+    }
+
     _core->reset();
     update_kernel();
 }
@@ -75,7 +79,7 @@ audio::format audio::node::impl::output_format(uint32_t const bus_idx) {
 }
 
 audio::bus_result_t audio::node::impl::next_available_input_bus() const {
-    auto key = min_empty_key(_core->input_connections);
+    auto key = min_empty_key(_core->_input_connections);
     if (key && *key < input_bus_count()) {
         return key;
     }
@@ -83,7 +87,7 @@ audio::bus_result_t audio::node::impl::next_available_input_bus() const {
 }
 
 audio::bus_result_t audio::node::impl::next_available_output_bus() const {
-    auto key = min_empty_key(_core->output_connections);
+    auto key = min_empty_key(_core->_output_connections);
     if (key && *key < output_bus_count()) {
         return key;
     }
@@ -94,14 +98,14 @@ bool audio::node::impl::is_available_input_bus(uint32_t const bus_idx) const {
     if (bus_idx >= input_bus_count()) {
         return false;
     }
-    return _core->input_connections.count(bus_idx) == 0;
+    return _core->_input_connections.count(bus_idx) == 0;
 }
 
 bool audio::node::impl::is_available_output_bus(uint32_t const bus_idx) const {
     if (bus_idx >= output_bus_count()) {
         return false;
     }
-    return _core->output_connections.count(bus_idx) == 0;
+    return _core->_output_connections.count(bus_idx) == 0;
 }
 
 uint32_t audio::node::impl::input_bus_count() const {
@@ -113,25 +117,25 @@ uint32_t audio::node::impl::output_bus_count() const {
 }
 
 audio::connection audio::node::impl::input_connection(uint32_t const bus_idx) const {
-    if (_core->input_connections.count(bus_idx) > 0) {
-        return _core->input_connections.at(bus_idx).lock();
+    if (_core->_input_connections.count(bus_idx) > 0) {
+        return _core->_input_connections.at(bus_idx).lock();
     }
     return nullptr;
 }
 
 audio::connection audio::node::impl::output_connection(uint32_t const bus_idx) const {
-    if (_core->output_connections.count(bus_idx) > 0) {
-        return _core->output_connections.at(bus_idx).lock();
+    if (_core->_output_connections.count(bus_idx) > 0) {
+        return _core->_output_connections.at(bus_idx).lock();
     }
     return nullptr;
 }
 
 audio::connection_wmap &audio::node::impl::input_connections() const {
-    return _core->input_connections;
+    return _core->_input_connections;
 }
 
 audio::connection_wmap &audio::node::impl::output_connections() const {
-    return _core->output_connections;
+    return _core->_output_connections;
 }
 
 void audio::node::impl::update_connections() {
@@ -147,8 +151,8 @@ void audio::node::impl::prepare_kernel(audio::node::kernel &kernel) {
     }
 
     auto &manageable_kernel = kernel.manageable();
-    manageable_kernel.set_input_connections(_core->input_connections);
-    manageable_kernel.set_output_connections(_core->output_connections);
+    manageable_kernel.set_input_connections(_core->_input_connections);
+    manageable_kernel.set_output_connections(_core->_output_connections);
 }
 
 void audio::node::impl::update_kernel() {
@@ -162,20 +166,20 @@ audio::node::kernel audio::node::impl::_kernel() const {
 }
 
 audio::engine audio::node::impl::engine() const {
-    return _core->weak_engine.lock();
+    return _core->_weak_engine.lock();
 }
 
 void audio::node::impl::set_engine(audio::engine const &engine) {
-    _core->weak_engine = engine;
+    _core->_weak_engine = engine;
 }
 
 void audio::node::impl::add_connection(connection const &connection) {
     if (connection.destination_node().impl_ptr<impl>()->_core == _core) {
         auto bus_idx = connection.destination_bus();
-        _core->input_connections.insert(std::make_pair(bus_idx, weak<audio::connection>(connection)));
+        _core->_input_connections.insert(std::make_pair(bus_idx, weak<audio::connection>(connection)));
     } else if (connection.source_node().impl_ptr<impl>()->_core == _core) {
         auto bus_idx = connection.source_bus();
-        _core->output_connections.insert(std::make_pair(bus_idx, weak<audio::connection>(connection)));
+        _core->_output_connections.insert(std::make_pair(bus_idx, weak<audio::connection>(connection)));
     } else {
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : connection does not exist in a node.");
     }
@@ -183,16 +187,20 @@ void audio::node::impl::add_connection(connection const &connection) {
     update_kernel();
 }
 
+audio::node::subject_t &audio::node::impl::subject() {
+    return _core->_subject;
+}
+
 void audio::node::impl::remove_connection(connection const &connection) {
     if (auto destination_node = connection.destination_node()) {
         if (connection.destination_node().impl_ptr<impl>()->_core == _core) {
-            _core->input_connections.erase(connection.destination_bus());
+            _core->_input_connections.erase(connection.destination_bus());
         }
     }
 
     if (auto source_node = connection.source_node()) {
         if (connection.source_node().impl_ptr<impl>()->_core == _core) {
-            _core->output_connections.erase(connection.source_bus());
+            _core->_output_connections.erase(connection.source_bus());
         }
     }
 

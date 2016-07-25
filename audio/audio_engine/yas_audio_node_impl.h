@@ -18,7 +18,7 @@ namespace audio {
         impl &operator=(impl const &) = delete;
         impl &operator=(impl &&) = delete;
 
-        virtual void reset();  // requires super
+        virtual void reset() final;
 
         audio::format input_format(uint32_t const bus_idx);
         audio::format output_format(uint32_t const bus_idx);
@@ -50,6 +50,8 @@ namespace audio {
 
         audio::engine engine() const override;
         void set_engine(audio::engine const &) override;
+
+        subject_t &subject();
 
         virtual void render(audio::pcm_buffer &buffer, uint32_t const bus_idx, audio::time const &when);
         audio::time render_time() const;

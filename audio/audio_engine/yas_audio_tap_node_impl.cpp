@@ -29,6 +29,7 @@ struct audio::tap_node::kernel : node::kernel {
 struct audio::tap_node::impl::core {
     render_f render_function;
     tap_node::kernel kernel_on_render;
+    audio::node::observer_t _reset_observer;
 };
 
 audio::tap_node::impl::impl() : node::impl(), _core(std::make_unique<core>()) {
@@ -36,9 +37,17 @@ audio::tap_node::impl::impl() : node::impl(), _core(std::make_unique<core>()) {
 
 audio::tap_node::impl::~impl() = default;
 
-void audio::tap_node::impl::reset() {
+void audio::tap_node::impl::prepare(tap_node const &node) {
+    _core->_reset_observer =
+        subject().make_observer(audio::node::method::will_reset, [weak_node = to_weak(node)](auto const &) {
+            if (auto node = weak_node.lock()) {
+                node.impl_ptr<audio::tap_node::impl>()->will_reset();
+            }
+        });
+}
+
+void audio::tap_node::impl::will_reset() {
     _core->render_function = nullptr;
-    node::impl::reset();
 }
 
 uint32_t audio::tap_node::impl::input_bus_count() const {

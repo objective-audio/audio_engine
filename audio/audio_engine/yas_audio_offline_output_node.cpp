@@ -9,6 +9,7 @@ using namespace yas;
 #pragma mark - main
 
 audio::offline_output_node::offline_output_node() : node(std::make_unique<impl>()) {
+    impl_ptr<impl>()->prepare(*this);
 }
 
 audio::offline_output_node::offline_output_node(std::nullptr_t) : node(nullptr) {

@@ -28,10 +28,6 @@ audio::unit_io_node::impl::impl() : unit_node::impl(), _core(std::make_unique<co
 
 audio::unit_io_node::impl::~impl() = default;
 
-void audio::unit_io_node::impl::reset() {
-    unit_node::impl::reset();
-}
-
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
 
 void audio::unit_io_node::impl::set_device(audio::device const &device) {

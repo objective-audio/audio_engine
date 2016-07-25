@@ -13,6 +13,7 @@ struct audio::offline_output_node::impl::core {
     using completion_function_map_t = std::map<uint8_t, offline_completion_f>;
 
     operation_queue queue;
+    audio::node::observer_t _reset_observer;
 
     core() : queue(nullptr), _completion_functions() {
     }
@@ -56,6 +57,19 @@ audio::offline_output_node::impl::impl()
 }
 
 audio::offline_output_node::impl::~impl() = default;
+
+void audio::offline_output_node::impl::prepare(offline_output_node const &node) {
+    _core->_reset_observer =
+        subject().make_observer(audio::node::method::will_reset, [weak_node = to_weak(node)](auto const &) {
+            if (auto node = weak_node.lock()) {
+                node.impl_ptr<audio::offline_output_node::impl>()->will_reset();
+            }
+        });
+}
+
+void audio::offline_output_node::impl::will_reset() {
+    stop();
+}
 
 audio::offline_start_result_t audio::offline_output_node::impl::start(offline_render_f &&render_func,
                                                                       offline_completion_f &&completion_func) {
@@ -165,11 +179,6 @@ void audio::offline_output_node::impl::stop() {
             func(true);
         }
     }
-}
-
-void audio::offline_output_node::impl::reset() {
-    stop();
-    node::impl::reset();
 }
 
 uint32_t audio::offline_output_node::impl::output_bus_count() const {

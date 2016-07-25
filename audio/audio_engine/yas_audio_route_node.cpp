@@ -35,6 +35,7 @@ struct audio::route_node::kernel : node::kernel {
 struct audio::route_node::impl : node::impl {
     struct core {
         route_set_t routes;
+        audio::node::observer_t _reset_observer;
 
         void erase_route_if_either_matched(route const &route) {
             erase_route_if([&route](audio::route const &route_of_set) {
@@ -52,9 +53,17 @@ struct audio::route_node::impl : node::impl {
 
     ~impl() = default;
 
-    virtual void reset() override {
+    void prepare(audio::route_node const &node) {
+        _core->_reset_observer =
+            subject().make_observer(audio::node::method::will_reset, [weak_node = to_weak(node)](auto const &) {
+                if (auto node = weak_node.lock()) {
+                    node.impl_ptr<audio::route_node::impl>()->will_reset();
+                }
+            });
+    }
+
+    void will_reset() {
         _core->routes.clear();
-        node::impl::reset();
     }
 
     virtual uint32_t input_bus_count() const override {
@@ -147,6 +156,7 @@ struct audio::route_node::impl : node::impl {
 #pragma mark - main
 
 audio::route_node::route_node() : node(std::make_unique<impl>()) {
+    impl_ptr<impl>()->prepare(*this);
 }
 
 audio::route_node::route_node(std::nullptr_t) : node(nullptr) {
