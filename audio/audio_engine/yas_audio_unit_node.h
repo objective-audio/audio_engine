@@ -19,6 +19,7 @@ namespace audio {
 
         enum class method {
             will_update_connections,
+            did_update_connections,
         };
 
         using subject_t = yas::subject<unit_node, method>;

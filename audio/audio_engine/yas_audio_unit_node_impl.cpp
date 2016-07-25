@@ -190,7 +190,9 @@ uint32_t audio::unit_node::impl::output_bus_count() const {
 
 #warning todo update_connectionsにリネームしたい
 void audio::unit_node::impl::update_unit_connections() {
-    if (subject().has_observer()) {
+    bool const has_observer = subject().has_observer();
+
+    if (has_observer) {
         subject().notify(audio::unit_node::method::will_update_connections, cast<audio::unit_node>());
     }
 
@@ -232,6 +234,10 @@ void audio::unit_node::impl::update_unit_connections() {
                 }
             }
         }
+    }
+
+    if (has_observer) {
+        subject().notify(audio::unit_node::method::did_update_connections, cast<audio::unit_node>());
     }
 }
 
