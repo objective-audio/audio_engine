@@ -139,6 +139,7 @@ audio::connection_wmap &audio::node::impl::output_connections() const {
 }
 
 void audio::node::impl::update_connections() {
+    _core->_subject.notify(audio::node::method::update_connections, cast<audio::node>());
 }
 
 audio::node::kernel audio::node::impl::make_kernel() {

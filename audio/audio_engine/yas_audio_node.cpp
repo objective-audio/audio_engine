@@ -101,6 +101,8 @@ std::string yas::to_string(audio::node::method const &method) {
     switch (method) {
         case audio::node::method::will_reset:
             return "will_reset";
+        case audio::node::method::update_connections:
+            return "update_connections";
     }
 }
 

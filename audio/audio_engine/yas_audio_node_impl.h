@@ -38,10 +38,10 @@ namespace audio {
         void add_connection(audio::connection const &connection) override;
         void remove_connection(audio::connection const &connection) override;
 
-        virtual void update_connections() override;
+        virtual void update_connections() override final;
         virtual node::kernel make_kernel();
         virtual void prepare_kernel(node::kernel &kernel);  // requires super
-        void update_kernel() override;
+        void update_kernel() override final;
 
         template <typename T = audio::node::kernel>
         T kernel_cast() const {
