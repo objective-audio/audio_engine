@@ -69,7 +69,11 @@ namespace audio {
         mutable audio::manageable_node _manageable = nullptr;
     };
 }
+
+std::string to_string(audio::node::method const &);
 }
+
+std::ostream &operator<<(std::ostream &, yas::audio::node::method const &);
 
 template <>
 struct std::hash<yas::audio::node> {

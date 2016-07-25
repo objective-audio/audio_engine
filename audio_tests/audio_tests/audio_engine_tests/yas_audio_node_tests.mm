@@ -212,4 +212,18 @@ using namespace yas;
     XCTAssertFalse(destination_node.is_available_input_bus(0));
 }
 
+- (void)test_method_to_string {
+    XCTAssertEqual(to_string(audio::node::method::will_reset), "will_reset");
+}
+
+- (void)test_method_ostream {
+    auto const values = {audio::node::method::will_reset};
+
+    for (auto const &value : values) {
+        std::ostringstream stream;
+        stream << value;
+        XCTAssertEqual(stream.str(), to_string(value));
+    }
+}
+
 @end

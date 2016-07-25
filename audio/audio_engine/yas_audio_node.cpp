@@ -94,3 +94,17 @@ audio::manageable_node &audio::node::manageable() {
     }
     return _manageable;
 }
+
+#pragma mark -
+
+std::string yas::to_string(audio::node::method const &method) {
+    switch (method) {
+        case audio::node::method::will_reset:
+            return "will_reset";
+    }
+}
+
+std::ostream &operator<<(std::ostream &os, yas::audio::node::method const &value) {
+    os << to_string(value);
+    return os;
+}
