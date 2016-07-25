@@ -29,7 +29,6 @@ namespace audio {
 
         enum class method {
             will_reset,
-            did_reset,
         };
 
         using subject_t = subject<node, method>;

@@ -56,19 +56,12 @@ audio::node::impl::impl() : _core(std::make_unique<core>()) {
 audio::node::impl::~impl() = default;
 
 void audio::node::impl::reset() {
-    bool const has_observer = _core->_subject.has_observer();
-    auto node = cast<audio::node>();
-
-    if (has_observer && node) {
-        _core->_subject.notify(audio::node::method::will_reset, node);
+    if (_core->_subject.has_observer()) {
+        _core->_subject.notify(audio::node::method::will_reset, cast<audio::node>());
     }
 
     _core->reset();
     update_kernel();
-
-    if (has_observer && node) {
-        _core->_subject.notify(audio::node::method::did_reset, node);
-    }
 }
 
 audio::format audio::node::impl::input_format(uint32_t const bus_idx) {
