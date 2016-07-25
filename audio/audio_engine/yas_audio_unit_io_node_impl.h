@@ -10,8 +10,6 @@ namespace audio {
         impl();
         virtual ~impl();
 
-        virtual void reset() override;
-
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
         void set_device(audio::device const &device);
         audio::device device() const;
