@@ -10,6 +10,8 @@ namespace audio {
         impl();
         virtual ~impl();
 
+        void prepare(audio::unit_io_node &node);
+
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
         void set_device(audio::device const &device);
         audio::device device() const;
@@ -24,12 +26,15 @@ namespace audio {
         virtual bus_result_t next_available_output_bus() const override;
         virtual bool is_available_output_bus(uint32_t const bus_idx) const override;
 
-        virtual void update_connections() override;
         virtual void prepare_audio_unit() override;
+
+        audio::unit_io_node::subject_t &subject();
 
        private:
         class core;
         std::unique_ptr<core> _core;
+
+        void update_unit_io_connections();
     };
 
     struct unit_output_node::impl : unit_io_node::impl {
@@ -42,10 +47,12 @@ namespace audio {
         impl();
         virtual ~impl();
 
+        void prepare(audio::unit_input_node const &);
+
         virtual uint32_t input_bus_count() const override;
         virtual uint32_t output_bus_count() const override;
 
-        virtual void update_connections() override;
+        void update_unit_input_connections();
         virtual void prepare_audio_unit() override;
 
        private:

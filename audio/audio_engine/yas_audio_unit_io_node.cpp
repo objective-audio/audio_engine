@@ -73,6 +73,10 @@ audio::device audio::unit_io_node::device() const {
 
 #endif
 
+audio::unit_io_node::subject_t &audio::unit_io_node::subject() {
+    return impl_ptr<impl>()->subject();
+}
+
 #pragma mark - audio_unit_output_node
 
 audio::unit_output_node::unit_output_node(std::nullptr_t) : unit_io_node() {

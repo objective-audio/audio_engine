@@ -19,6 +19,8 @@ using namespace yas;
 struct audio::unit_io_node::impl::core {
     static uint32_t const channel_map_count = 2;
     channel_map_t channel_map[2];
+    audio::unit_io_node::subject_t _subject;
+    audio::unit_node::observer_t _connection_observer;
 };
 
 #pragma mark - audio::unit_io_node::impl
@@ -27,6 +29,15 @@ audio::unit_io_node::impl::impl() : unit_node::impl(), _core(std::make_unique<co
 }
 
 audio::unit_io_node::impl::~impl() = default;
+
+void audio::unit_io_node::impl::prepare(audio::unit_io_node &node) {
+    _core->_connection_observer = audio::unit_node::impl::subject().make_observer(
+        audio::unit_node::method::did_update_connections, [weak_node = to_weak(node)](auto const &) {
+            if (auto node = weak_node.lock()) {
+                node.impl_ptr<impl>()->update_unit_io_connections();
+            }
+        });
+}
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
 
@@ -104,9 +115,7 @@ bool audio::unit_io_node::impl::is_available_output_bus(uint32_t const bus_idx) 
     return false;
 }
 
-void audio::unit_io_node::impl::update_connections() {
-    unit_node::impl::update_connections();
-
+void audio::unit_io_node::impl::update_unit_io_connections() {
     auto unit = au();
 
     auto update_channel_map = [](channel_map_t &map, format const &format, uint32_t const dev_ch_count) {
@@ -135,6 +144,8 @@ void audio::unit_io_node::impl::update_connections() {
 
     unit.set_channel_map(output_map, kAudioUnitScope_Output, output_idx);
     unit.set_channel_map(input_map, kAudioUnitScope_Output, input_idx);
+
+#warning todo send notification
 }
 
 void audio::unit_io_node::impl::prepare_audio_unit() {
@@ -142,6 +153,10 @@ void audio::unit_io_node::impl::prepare_audio_unit() {
     unit.set_enable_output(true);
     unit.set_enable_input(true);
     unit.set_maximum_frames_per_slice(4096);
+}
+
+audio::unit_io_node::subject_t &audio::unit_io_node::impl::subject() {
+    return _core->_subject;
 }
 
 #pragma mark - aduio_unit_output_node::impl
@@ -166,12 +181,22 @@ void audio::unit_output_node::impl::prepare_audio_unit() {
 struct audio::unit_input_node::impl::core {
     pcm_buffer input_buffer = nullptr;
     time render_time = nullptr;
+    audio::unit_io_node::observer_t _connections_observer;
 };
 
 audio::unit_input_node::impl::impl() : audio::unit_io_node::impl(), _core(std::make_unique<core>()) {
 }
 
 audio::unit_input_node::impl::~impl() = default;
+
+void audio::unit_input_node::impl::prepare(audio::unit_input_node const &node) {
+    _core->_connections_observer = audio::unit_io_node::impl::subject().make_observer(
+        audio::unit_io_node::method::did_update_connection, [weak_node = to_weak(node)](auto const &) {
+            if (auto node = weak_node.lock()) {
+                node.impl_ptr<impl>()->update_unit_input_connections();
+            }
+        });
+}
 
 uint32_t audio::unit_input_node::impl::input_bus_count() const {
     return 0;
@@ -181,9 +206,8 @@ uint32_t audio::unit_input_node::impl::output_bus_count() const {
     return 1;
 }
 
-void audio::unit_input_node::impl::update_connections() {
-    unit_io_node::impl::update_connections();
-
+#warning todo update_connectionsにリネームしたい
+void audio::unit_input_node::impl::update_unit_input_connections() {
     auto unit = au();
 
     if (auto out_connection = output_connection(1)) {
