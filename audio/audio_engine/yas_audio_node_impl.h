@@ -51,6 +51,8 @@ namespace audio {
         audio::engine engine() const override;
         void set_engine(audio::engine const &) override;
 
+        subject_t &subject();
+
         virtual void render(audio::pcm_buffer &buffer, uint32_t const bus_idx, audio::time const &when);
         audio::time render_time() const;
         void set_render_time_on_render(audio::time const &);

@@ -11,6 +11,7 @@ using namespace yas;
 
 struct audio::node::impl::core {
     weak<audio::engine> _weak_engine;
+    subject_t _subject;
     connection_wmap _input_connections;
     connection_wmap _output_connections;
 
@@ -55,8 +56,19 @@ audio::node::impl::impl() : _core(std::make_unique<core>()) {
 audio::node::impl::~impl() = default;
 
 void audio::node::impl::reset() {
+    bool const has_observer = _core->_subject.has_observer();
+    auto node = cast<audio::node>();
+
+    if (has_observer && node) {
+        _core->_subject.notify(audio::node::method::will_reset, node);
+    }
+
     _core->reset();
     update_kernel();
+
+    if (has_observer && node) {
+        _core->_subject.notify(audio::node::method::did_reset, node);
+    }
 }
 
 audio::format audio::node::impl::input_format(uint32_t const bus_idx) {
@@ -180,6 +192,10 @@ void audio::node::impl::add_connection(connection const &connection) {
     }
 
     update_kernel();
+}
+
+audio::node::subject_t &audio::node::impl::subject() {
+    return _core->_subject;
 }
 
 void audio::node::impl::remove_connection(connection const &connection) {
