@@ -17,6 +17,7 @@ struct audio::unit_node::impl::core {
     std::unordered_map<AudioUnitScope, unit::parameter_map_t> parameters;
     unit _au;
     audio::node::observer_t _reset_observer;
+    audio::node::observer_t _connections_observer;
 
     core() : acd(), parameters(), _au(nullptr), _mutex() {
     }
@@ -57,6 +58,13 @@ void audio::unit_node::impl::prepare(unit_node const &node, AudioComponentDescri
         subject().make_observer(audio::node::method::will_reset, [weak_node = to_weak(node)](auto const &) {
             if (auto node = weak_node.lock()) {
                 node.impl_ptr<audio::unit_node::impl>()->will_reset();
+            }
+        });
+
+    _core->_connections_observer =
+        subject().make_observer(audio::node::method::update_connections, [weak_node = to_weak(node)](auto const &) {
+            if (auto node = weak_node.lock()) {
+                node.impl_ptr<audio::unit_node::impl>()->update_unit_connections();
             }
         });
 }
@@ -179,7 +187,8 @@ uint32_t audio::unit_node::impl::output_bus_count() const {
     return 1;
 }
 
-void audio::unit_node::impl::update_connections() {
+#warning todo update_connectionsにリネームしたい
+void audio::unit_node::impl::update_unit_connections() {
     if (auto audio_unit = _core->au()) {
         auto input_bus_count = input_element_count();
         if (input_bus_count > 0) {
