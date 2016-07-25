@@ -11,7 +11,6 @@ namespace audio {
         virtual ~impl();
 
         void prepare(unit_node const &node, AudioComponentDescription const &acd);
-        virtual void reset() override;
 
         audio::unit au() const;
 
@@ -48,6 +47,8 @@ namespace audio {
        private:
         class core;
         std::unique_ptr<core> _core;
+
+        void will_reset();
     };
 }
 }
