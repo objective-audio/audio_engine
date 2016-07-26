@@ -51,6 +51,8 @@ namespace audio {
         uint32_t input_bus_count() const;
         uint32_t output_bus_count() const;
 
+        void set_make_kernel(std::function<node::kernel(void)>);
+
         void render(audio::pcm_buffer &buffer, uint32_t const bus_idx, audio::time const &when);
         void set_render_time_on_render(audio::time const &time);
 

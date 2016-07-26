@@ -14,6 +14,7 @@ struct audio::node::impl::core {
     subject_t _subject;
     connection_wmap _input_connections;
     connection_wmap _output_connections;
+    std::function<node::kernel(void)> _make_kernel;
 
     core() {
     }
@@ -142,8 +143,16 @@ void audio::node::impl::update_connections() {
     _core->_subject.notify(audio::node::method::update_connections, cast<audio::node>());
 }
 
-audio::node::kernel audio::node::impl::make_kernel() {
-    return audio::node::kernel{};
+audio::node::kernel audio::node::impl::_make_kernel() {
+    if (_core->_make_kernel) {
+        return _core->_make_kernel();
+    } else {
+        return audio::node::kernel{};
+    }
+}
+
+void audio::node::impl::set_make_kernel(std::function<node::kernel(void)> &&func) {
+    _core->_make_kernel = std::move(func);
 }
 
 void audio::node::impl::prepare_kernel(audio::node::kernel &kernel) {
@@ -157,7 +166,7 @@ void audio::node::impl::prepare_kernel(audio::node::kernel &kernel) {
 }
 
 void audio::node::impl::update_kernel() {
-    auto kernel = make_kernel();
+    auto kernel = _make_kernel();
     prepare_kernel(kernel);
     _core->set_kernel(kernel);
 }

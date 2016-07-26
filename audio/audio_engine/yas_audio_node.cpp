@@ -64,6 +64,10 @@ uint32_t audio::node::output_bus_count() const {
     return impl_ptr<impl>()->output_bus_count();
 }
 
+void audio::node::set_make_kernel(std::function<node::kernel(void)> func) {
+    impl_ptr<impl>()->set_make_kernel(std::move(func));
+}
+
 #pragma mark render thread
 
 void audio::node::render(pcm_buffer &buffer, uint32_t const bus_idx, const time &when) {

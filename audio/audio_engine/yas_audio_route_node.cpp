@@ -54,6 +54,8 @@ struct audio::route_node::impl : node::impl {
     ~impl() = default;
 
     void prepare(audio::route_node const &node) {
+        set_make_kernel([]() { return route_node::kernel{}; });
+
         _core->_reset_observer =
             subject().make_observer(audio::node::method::will_reset, [weak_node = to_weak(node)](auto const &) {
                 if (auto node = weak_node.lock()) {
@@ -72,10 +74,6 @@ struct audio::route_node::impl : node::impl {
 
     virtual uint32_t output_bus_count() const override {
         return std::numeric_limits<uint32_t>::max();
-    }
-
-    virtual node::kernel make_kernel() override {
-        return route_node::kernel{};
     }
 
     virtual void prepare_kernel(node::kernel &kernel) override {

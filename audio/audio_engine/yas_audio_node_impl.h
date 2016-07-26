@@ -39,7 +39,7 @@ namespace audio {
         void remove_connection(audio::connection const &connection) override;
 
         virtual void update_connections() override final;
-        virtual node::kernel make_kernel();
+        void set_make_kernel(std::function<node::kernel(void)> &&);
         virtual void prepare_kernel(node::kernel &kernel);  // requires super
         void update_kernel() override final;
 
@@ -60,6 +60,7 @@ namespace audio {
        private:
         class core;
         std::unique_ptr<core> _core;
+        node::kernel _make_kernel();
         node::kernel _kernel() const;
     };
 }
