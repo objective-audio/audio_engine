@@ -17,6 +17,14 @@ namespace audio {
        public:
         class impl;
 
+        enum class method {
+            will_update_connections,
+            did_update_connections,
+        };
+
+        using subject_t = yas::subject<unit_node, method>;
+        using observer_t = yas::observer<unit_node, method>;
+
         unit_node(std::nullptr_t);
         unit_node(AudioComponentDescription const &);
         unit_node(OSType const type, OSType const sub_type);
@@ -41,6 +49,8 @@ namespace audio {
         void set_output_parameter_value(AudioUnitParameterID const parameter_id, float const value,
                                         AudioUnitElement const element);
         float output_parameter_value(AudioUnitParameterID const parameter_id, AudioUnitElement const element) const;
+
+        subject_t &subject();
 
         manageable_unit_node &manageable();
 

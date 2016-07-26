@@ -10,6 +10,15 @@ using namespace yas;
 #pragma mark - impl
 
 struct audio::unit_mixer_node::impl : unit_node::impl {
+    void prepare(audio::unit_mixer_node const &node) {
+        _connections_observer = subject().make_observer(audio::unit_node::method::will_update_connections,
+                                                        [weak_node = to_weak(node)](auto const &) {
+                                                            if (auto node = weak_node.lock()) {
+                                                                node.impl_ptr<impl>()->update_unit_mixer_connections();
+                                                            }
+                                                        });
+    }
+
    private:
     virtual uint32_t input_bus_count() const override {
         return std::numeric_limits<uint32_t>::max();
@@ -19,7 +28,8 @@ struct audio::unit_mixer_node::impl : unit_node::impl {
         return 1;
     }
 
-    virtual void update_connections() override {
+#warning todo update_connectionsにリネームしたい
+    void update_unit_mixer_connections() {
         auto &connections = input_connections();
         if (connections.size() > 0) {
             auto last = connections.end();
@@ -29,9 +39,9 @@ struct audio::unit_mixer_node::impl : unit_node::impl {
                 unit.set_element_count(pair.first + 1, kAudioUnitScope_Input);
             }
         }
-
-        unit_node::impl::update_connections();
     }
+
+    audio::unit_node::observer_t _connections_observer;
 };
 
 #pragma mark - main

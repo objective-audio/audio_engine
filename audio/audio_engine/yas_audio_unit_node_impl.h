@@ -35,12 +35,14 @@ namespace audio {
         virtual uint32_t input_bus_count() const override;
         virtual uint32_t output_bus_count() const override;
 
-        virtual void update_connections() override;
+        void update_unit_connections();
         virtual void prepare_audio_unit() override;
         virtual void prepare_parameters() override;  // NS_REQUIRES_SUPER
 
         void reload_audio_unit() override;
         void set_graph(audio::graph const &);
+
+        audio::unit_node::subject_t &subject();
 
         virtual void render(audio::pcm_buffer &buffer, uint32_t const bus_idx, audio::time const &when) override;
 

@@ -33,10 +33,12 @@ audio::unit_io_node::unit_io_node(std::nullptr_t) : unit_node(nullptr) {
 }
 
 audio::unit_io_node::unit_io_node() : unit_io_node(std::make_shared<impl>(), audio_unit_io_node_acd) {
+    impl_ptr<impl>()->prepare(*this);
 }
 
-audio::unit_io_node::unit_io_node(std::shared_ptr<impl> const &impl, AudioComponentDescription const &acd)
-    : unit_node(impl, acd) {
+audio::unit_io_node::unit_io_node(std::shared_ptr<impl> const &imp, AudioComponentDescription const &acd)
+    : unit_node(imp, acd) {
+    impl_ptr<impl>()->prepare(*this);
 }
 
 audio::unit_io_node::~unit_io_node() = default;
@@ -73,6 +75,10 @@ audio::device audio::unit_io_node::device() const {
 
 #endif
 
+audio::unit_io_node::subject_t &audio::unit_io_node::subject() {
+    return impl_ptr<impl>()->subject();
+}
+
 #pragma mark - audio_unit_output_node
 
 audio::unit_output_node::unit_output_node(std::nullptr_t) : unit_io_node() {
@@ -95,6 +101,7 @@ audio::unit_input_node::unit_input_node(std::nullptr_t) : unit_io_node(nullptr) 
 }
 
 audio::unit_input_node::unit_input_node() : unit_io_node(std::make_unique<impl>(), audio_unit_io_node_acd) {
+    impl_ptr<impl>()->prepare(*this);
 }
 
 void audio::unit_input_node::set_channel_map(channel_map_t const &map) {

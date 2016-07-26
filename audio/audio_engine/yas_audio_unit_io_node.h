@@ -14,6 +14,15 @@ namespace audio {
 #endif
     class unit_io_node : public unit_node {
        public:
+        class impl;
+
+        enum class method {
+            did_update_connection,
+        };
+
+        using subject_t = yas::subject<unit_io_node, method>;
+        using observer_t = yas::observer<unit_io_node, method>;
+
         unit_io_node();
         unit_io_node(std::nullptr_t);
 
@@ -31,9 +40,9 @@ namespace audio {
         uint32_t output_device_channel_count() const;
         uint32_t input_device_channel_count() const;
 
-       protected:
-        class impl;
+        subject_t &subject();
 
+       protected:
         unit_io_node(std::shared_ptr<impl> const &, AudioComponentDescription const &);
     };
 
