@@ -145,7 +145,9 @@ void audio::unit_io_node::impl::update_unit_io_connections() {
     unit.set_channel_map(output_map, kAudioUnitScope_Output, output_idx);
     unit.set_channel_map(input_map, kAudioUnitScope_Output, input_idx);
 
-#warning todo send notification
+    if (subject().has_observer()) {
+        subject().notify(audio::unit_io_node::method::did_update_connection, cast<audio::unit_io_node>());
+    }
 }
 
 void audio::unit_io_node::impl::prepare_audio_unit() {

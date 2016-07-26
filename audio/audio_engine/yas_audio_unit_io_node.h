@@ -14,6 +14,8 @@ namespace audio {
 #endif
     class unit_io_node : public unit_node {
        public:
+        class impl;
+
         enum class method {
             did_update_connection,
         };
@@ -41,8 +43,6 @@ namespace audio {
         subject_t &subject();
 
        protected:
-        class impl;
-
         unit_io_node(std::shared_ptr<impl> const &, AudioComponentDescription const &);
     };
 
