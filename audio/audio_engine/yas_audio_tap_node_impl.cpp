@@ -38,6 +38,8 @@ audio::tap_node::impl::impl() : node::impl(), _core(std::make_unique<core>()) {
 audio::tap_node::impl::~impl() = default;
 
 void audio::tap_node::impl::prepare(tap_node const &node) {
+    set_make_kernel([]() { return audio::tap_node::kernel{}; });
+
     _core->_reset_observer =
         subject().make_observer(audio::node::method::will_reset, [weak_node = to_weak(node)](auto const &) {
             if (auto node = weak_node.lock()) {
@@ -56,10 +58,6 @@ uint32_t audio::tap_node::impl::input_bus_count() const {
 
 uint32_t audio::tap_node::impl::output_bus_count() const {
     return 1;
-}
-
-audio::node::kernel audio::tap_node::impl::make_kernel() {
-    return audio::tap_node::kernel{};
 }
 
 void audio::tap_node::impl::prepare_kernel(audio::node::kernel &kernel) {
