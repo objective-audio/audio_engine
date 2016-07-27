@@ -36,6 +36,7 @@ struct audio::route_node::impl : node::impl {
     struct core {
         route_set_t routes;
         audio::node::observer_t _reset_observer;
+        audio::node::kernel_observer_t _kernel_observer;
 
         void erase_route_if_either_matched(route const &route) {
             erase_route_if([&route](audio::route const &route_of_set) {
@@ -56,16 +57,20 @@ struct audio::route_node::impl : node::impl {
     void prepare(audio::route_node const &node) {
         set_make_kernel([]() { return route_node::kernel{}; });
 
-        _core->_reset_observer =
-            subject().make_observer(audio::node::method::will_reset, [weak_node = to_weak(node)](auto const &) {
+        auto weak_node = to_weak(node);
+
+        _core->_reset_observer = subject().make_observer(audio::node::method::will_reset, [weak_node](auto const &) {
+            if (auto node = weak_node.lock()) {
+                node.impl_ptr<audio::route_node::impl>()->_will_reset();
+            }
+        });
+
+        _core->_kernel_observer =
+            kernel_subject().make_observer(audio::node::kernel_method::did_prepare, [weak_node](auto const &context) {
                 if (auto node = weak_node.lock()) {
-                    node.impl_ptr<audio::route_node::impl>()->will_reset();
+                    node.impl_ptr<audio::route_node::impl>()->_did_prepare_kernel(context.value);
                 }
             });
-    }
-
-    void will_reset() {
-        _core->routes.clear();
     }
 
     virtual uint32_t input_bus_count() const override {
@@ -74,13 +79,6 @@ struct audio::route_node::impl : node::impl {
 
     virtual uint32_t output_bus_count() const override {
         return std::numeric_limits<uint32_t>::max();
-    }
-
-    virtual void prepare_kernel(node::kernel &kernel) override {
-        node::impl::prepare_kernel(kernel);
-
-        auto route_kernel = yas::cast<route_node::kernel>(kernel);
-        route_kernel.set_routes(_core->routes);
     }
 
     virtual void render(pcm_buffer &dst_buffer, uint32_t const dst_bus_idx, time const &when) override {
@@ -149,6 +147,15 @@ struct audio::route_node::impl : node::impl {
 
    private:
     std::unique_ptr<core> _core;
+
+    void _will_reset() {
+        _core->routes.clear();
+    }
+
+    void _did_prepare_kernel(node::kernel const &kernel) {
+        auto route_kernel = yas::cast<route_node::kernel>(kernel);
+        route_kernel.set_routes(_core->routes);
+    }
 };
 
 #pragma mark - main

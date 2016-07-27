@@ -12,6 +12,7 @@ using namespace yas;
 struct audio::node::impl::core {
     weak<audio::engine> _weak_engine;
     subject_t _subject;
+    kernel_subject_t _kernel_subject;
     connection_wmap _input_connections;
     connection_wmap _output_connections;
     std::function<node::kernel(void)> _make_kernel;
@@ -163,6 +164,10 @@ void audio::node::impl::prepare_kernel(audio::node::kernel &kernel) {
     auto &manageable_kernel = kernel.manageable();
     manageable_kernel.set_input_connections(_core->_input_connections);
     manageable_kernel.set_output_connections(_core->_output_connections);
+
+    if (_core->_kernel_subject.has_observer()) {
+        _core->_kernel_subject.notify(audio::node::kernel_method::did_prepare, kernel);
+    }
 }
 
 void audio::node::impl::update_kernel() {
@@ -199,6 +204,10 @@ void audio::node::impl::add_connection(connection const &connection) {
 
 audio::node::subject_t &audio::node::impl::subject() {
     return _core->_subject;
+}
+
+audio::node::kernel_subject_t &audio::node::impl::kernel_subject() {
+    return _core->_kernel_subject;
 }
 
 void audio::node::impl::remove_connection(connection const &connection) {

@@ -35,6 +35,13 @@ namespace audio {
         using subject_t = subject<node, method>;
         using observer_t = observer<node, method>;
 
+        enum class kernel_method {
+            did_prepare,
+        };
+
+        using kernel_subject_t = subject<kernel, kernel_method>;
+        using kernel_observer_t = observer<kernel, kernel_method>;
+
         node(std::nullptr_t);
 
         void reset();
@@ -57,6 +64,7 @@ namespace audio {
         void set_render_time_on_render(audio::time const &time);
 
         subject_t &subject();
+        kernel_subject_t &kernel_subject();
 
         audio::connectable_node &connectable();
         audio::manageable_node const &manageable() const;

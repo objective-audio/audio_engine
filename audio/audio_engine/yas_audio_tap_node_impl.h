@@ -12,12 +12,8 @@ namespace audio {
 
         void prepare(tap_node const &);
 
-        void will_reset();
-
         virtual uint32_t input_bus_count() const override;
         virtual uint32_t output_bus_count() const override;
-
-        virtual void prepare_kernel(node::kernel &kernel) override;
 
         void set_render_function(render_f &&);
 
@@ -32,6 +28,9 @@ namespace audio {
        private:
         class core;
         std::unique_ptr<core> _core;
+
+        void _will_reset();
+        void _did_prepare_kernel(node::kernel const &kernel);
     };
 
     struct input_tap_node::impl : tap_node::impl {

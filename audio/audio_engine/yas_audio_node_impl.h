@@ -40,7 +40,7 @@ namespace audio {
 
         virtual void update_connections() override final;
         void set_make_kernel(std::function<node::kernel(void)> &&);
-        virtual void prepare_kernel(node::kernel &kernel);  // requires super
+        virtual void prepare_kernel(node::kernel &kernel) final;
         void update_kernel() override final;
 
         template <typename T = audio::node::kernel>
@@ -52,6 +52,7 @@ namespace audio {
         void set_engine(audio::engine const &) override;
 
         subject_t &subject();
+        kernel_subject_t &kernel_subject();
 
         virtual void render(audio::pcm_buffer &buffer, uint32_t const bus_idx, audio::time const &when);
         audio::time render_time() const;
