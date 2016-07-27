@@ -54,6 +54,8 @@ struct audio::offline_output_node::impl::core {
 
 audio::offline_output_node::impl::impl()
     : node::impl::impl(), _core(std::make_unique<audio::offline_output_node::impl::core>()) {
+    set_input_bus_count(1);
+    set_output_bus_count(0);
 }
 
 audio::offline_output_node::impl::~impl() = default;
@@ -62,12 +64,12 @@ void audio::offline_output_node::impl::prepare(offline_output_node const &node) 
     _core->_reset_observer =
         subject().make_observer(audio::node::method::will_reset, [weak_node = to_weak(node)](auto const &) {
             if (auto node = weak_node.lock()) {
-                node.impl_ptr<audio::offline_output_node::impl>()->will_reset();
+                node.impl_ptr<audio::offline_output_node::impl>()->_will_reset();
             }
         });
 }
 
-void audio::offline_output_node::impl::will_reset() {
+void audio::offline_output_node::impl::_will_reset() {
     stop();
 }
 
@@ -179,14 +181,6 @@ void audio::offline_output_node::impl::stop() {
             func(true);
         }
     }
-}
-
-uint32_t audio::offline_output_node::impl::output_bus_count() const {
-    return 0;
-}
-
-uint32_t audio::offline_output_node::impl::input_bus_count() const {
-    return 1;
 }
 
 bool audio::offline_output_node::impl::is_running() const {

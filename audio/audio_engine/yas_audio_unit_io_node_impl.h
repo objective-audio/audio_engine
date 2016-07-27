@@ -38,8 +38,8 @@ namespace audio {
     };
 
     struct unit_output_node::impl : unit_io_node::impl {
-        virtual uint32_t input_bus_count() const override;
-        virtual uint32_t output_bus_count() const override;
+        impl();
+        
         virtual void prepare_audio_unit() override;
     };
 
@@ -48,9 +48,6 @@ namespace audio {
         virtual ~impl();
 
         void prepare(audio::unit_input_node const &);
-
-        virtual uint32_t input_bus_count() const override;
-        virtual uint32_t output_bus_count() const override;
 
         void update_unit_input_connections();
         virtual void prepare_audio_unit() override;

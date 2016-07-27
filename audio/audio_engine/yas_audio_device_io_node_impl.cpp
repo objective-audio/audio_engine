@@ -41,6 +41,8 @@ struct audio::device_io_node::impl::core {
 };
 
 audio::device_io_node::impl::impl() : node::impl(), _core(std::make_unique<core>()) {
+    set_input_bus_count(1);
+    set_output_bus_count(1);
 }
 
 audio::device_io_node::impl::~impl() = default;
@@ -54,14 +56,6 @@ void audio::device_io_node::impl::prepare(device_io_node const &node, audio::dev
                 node.impl_ptr<impl>()->update_device_io_connections();
             }
         });
-}
-
-uint32_t audio::device_io_node::impl::input_bus_count() const {
-    return 1;
-}
-
-uint32_t audio::device_io_node::impl::output_bus_count() const {
-    return 1;
 }
 
 #warning todo update_connectionsにリネームしたい

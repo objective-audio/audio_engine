@@ -50,6 +50,8 @@ struct audio::route_node::impl : node::impl {
     };
 
     impl() : node::impl(), _core(std::make_unique<core>()) {
+        audio::node::impl::set_input_bus_count(std::numeric_limits<uint32_t>::max());
+        audio::node::impl::set_output_bus_count(std::numeric_limits<uint32_t>::max());
     }
 
     ~impl() = default;
@@ -71,14 +73,6 @@ struct audio::route_node::impl : node::impl {
                     node.impl_ptr<audio::route_node::impl>()->_did_prepare_kernel(context.value);
                 }
             });
-    }
-
-    virtual uint32_t input_bus_count() const override {
-        return std::numeric_limits<uint32_t>::max();
-    }
-
-    virtual uint32_t output_bus_count() const override {
-        return std::numeric_limits<uint32_t>::max();
     }
 
     virtual void render(pcm_buffer &dst_buffer, uint32_t const dst_bus_idx, time const &when) override {
