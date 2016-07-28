@@ -40,6 +40,8 @@ struct audio::unit_node::impl::core {
 #pragma mark - impl
 
 audio::unit_node::impl::impl() : node::impl(), _core(std::make_unique<core>()) {
+    audio::node::impl::set_input_bus_count(1);
+    audio::node::impl::set_output_bus_count(1);
 }
 
 audio::unit_node::impl::~impl() = default;
@@ -178,14 +180,6 @@ float audio::unit_node::impl::output_parameter_value(AudioUnitParameterID const 
         return audio_unit.parameter_value(parameter_id, kAudioUnitScope_Output, element);
     }
     return 0;
-}
-
-uint32_t audio::unit_node::impl::input_bus_count() const {
-    return 1;
-}
-
-uint32_t audio::unit_node::impl::output_bus_count() const {
-    return 1;
 }
 
 #warning todo update_connectionsにリネームしたい

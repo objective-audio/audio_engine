@@ -165,18 +165,7 @@ void test::audio_unit_render_on_sub_thread(audio::unit &unit, audio::format &for
     }
 }
 
-struct test::audio_test_node::impl : audio::node::impl {
-    uint32_t input_bus_count() const override {
-        return _input_bus_count;
-    }
-
-    uint32_t output_bus_count() const override {
-        return _output_bus_count;
-    }
-
-    uint32_t _input_bus_count;
-    uint32_t _output_bus_count;
-};
+struct test::audio_test_node::impl : audio::node::impl {};
 
 test::audio_test_node::audio_test_node(uint32_t const input_bus_count, uint32_t const output_bus_count)
     : node(std::make_unique<impl>()) {
@@ -185,11 +174,11 @@ test::audio_test_node::audio_test_node(uint32_t const input_bus_count, uint32_t 
 }
 
 void test::audio_test_node::set_input_bus_count(uint32_t const &count) {
-    impl_ptr<impl>()->_input_bus_count = count;
+    impl_ptr<impl>()->set_input_bus_count(count);
 }
 
 void test::audio_test_node::set_output_bus_count(uint32_t const &count) {
-    impl_ptr<impl>()->_output_bus_count = count;
+    impl_ptr<impl>()->set_output_bus_count(count);
 }
 
 test::connection::connection(audio::node &source_node, uint32_t const source_bus, audio::node &destination_node,

@@ -12,9 +12,6 @@ struct yas::audio::device_io_node::impl : node::impl, manageable_device_io_node:
 
     void prepare(device_io_node const &, audio::device const &);
 
-    virtual uint32_t input_bus_count() const override;
-    virtual uint32_t output_bus_count() const override;
-
     void update_device_io_connections();
 
     void add_device_io() override;

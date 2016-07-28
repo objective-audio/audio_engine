@@ -27,8 +27,10 @@ namespace audio {
         virtual bool is_available_input_bus(uint32_t const bus_idx) const;
         virtual bool is_available_output_bus(uint32_t const bus_idx) const;
 
-        virtual uint32_t input_bus_count() const;
-        virtual uint32_t output_bus_count() const;
+        void set_input_bus_count(uint32_t const);
+        void set_output_bus_count(uint32_t const);
+        virtual uint32_t input_bus_count() const final;
+        virtual uint32_t output_bus_count() const final;
 
         audio::connection input_connection(uint32_t const bus_idx) const override;
         audio::connection output_connection(uint32_t const bus_idx) const override;

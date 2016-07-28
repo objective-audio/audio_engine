@@ -34,6 +34,8 @@ struct audio::tap_node::impl::core {
 };
 
 audio::tap_node::impl::impl() : node::impl(), _core(std::make_unique<core>()) {
+    set_input_bus_count(1);
+    set_output_bus_count(1);
 }
 
 audio::tap_node::impl::~impl() = default;
@@ -59,14 +61,6 @@ void audio::tap_node::impl::prepare(tap_node const &node) {
 
 void audio::tap_node::impl::_will_reset() {
     _core->render_function = nullptr;
-}
-
-uint32_t audio::tap_node::impl::input_bus_count() const {
-    return 1;
-}
-
-uint32_t audio::tap_node::impl::output_bus_count() const {
-    return 1;
 }
 
 void audio::tap_node::impl::_did_prepare_kernel(audio::node::kernel const &kernel) {
@@ -124,10 +118,7 @@ void audio::tap_node::impl::render_source(pcm_buffer &buffer, uint32_t const bus
 
 #pragma mark - input_tap_node
 
-uint32_t audio::input_tap_node::impl::input_bus_count() const {
-    return 1;
-}
-
-uint32_t audio::input_tap_node::impl::output_bus_count() const {
-    return 0;
+audio::input_tap_node::impl::impl() {
+    set_input_bus_count(1);
+    set_output_bus_count(0);
 }

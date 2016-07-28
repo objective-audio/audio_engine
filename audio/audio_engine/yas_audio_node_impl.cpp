@@ -13,6 +13,8 @@ struct audio::node::impl::core {
     weak<audio::engine> _weak_engine;
     subject_t _subject;
     kernel_subject_t _kernel_subject;
+    uint32_t _input_bus_count = 0;
+    uint32_t _output_bus_count = 0;
     connection_wmap _input_connections;
     connection_wmap _output_connections;
     std::function<node::kernel(void)> _make_kernel;
@@ -110,12 +112,20 @@ bool audio::node::impl::is_available_output_bus(uint32_t const bus_idx) const {
     return _core->_output_connections.count(bus_idx) == 0;
 }
 
+void audio::node::impl::set_input_bus_count(uint32_t const count) {
+    _core->_input_bus_count = count;
+}
+
+void audio::node::impl::set_output_bus_count(uint32_t const count) {
+    _core->_output_bus_count = count;
+}
+
 uint32_t audio::node::impl::input_bus_count() const {
-    return 0;
+    return _core->_input_bus_count;
 }
 
 uint32_t audio::node::impl::output_bus_count() const {
-    return 0;
+    return _core->_output_bus_count;
 }
 
 audio::connection audio::node::impl::input_connection(uint32_t const bus_idx) const {

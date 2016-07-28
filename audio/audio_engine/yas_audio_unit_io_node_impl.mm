@@ -163,12 +163,9 @@ audio::unit_io_node::subject_t &audio::unit_io_node::impl::subject() {
 
 #pragma mark - aduio_unit_output_node::impl
 
-uint32_t audio::unit_output_node::impl::input_bus_count() const {
-    return 1;
-}
-
-uint32_t audio::unit_output_node::impl::output_bus_count() const {
-    return 0;
+audio::unit_output_node::impl::impl() {
+    set_input_bus_count(1);
+    set_output_bus_count(0);
 }
 
 void audio::unit_output_node::impl::prepare_audio_unit() {
@@ -187,6 +184,8 @@ struct audio::unit_input_node::impl::core {
 };
 
 audio::unit_input_node::impl::impl() : audio::unit_io_node::impl(), _core(std::make_unique<core>()) {
+    set_input_bus_count(0);
+    set_output_bus_count(1);
 }
 
 audio::unit_input_node::impl::~impl() = default;
@@ -198,14 +197,6 @@ void audio::unit_input_node::impl::prepare(audio::unit_input_node const &node) {
                 node.impl_ptr<impl>()->update_unit_input_connections();
             }
         });
-}
-
-uint32_t audio::unit_input_node::impl::input_bus_count() const {
-    return 0;
-}
-
-uint32_t audio::unit_input_node::impl::output_bus_count() const {
-    return 1;
 }
 
 #warning todo update_connectionsにリネームしたい

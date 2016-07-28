@@ -32,9 +32,6 @@ namespace audio {
                                         AudioUnitElement const element);
         float output_parameter_value(AudioUnitParameterID const parameter_id, AudioUnitElement const element) const;
 
-        virtual uint32_t input_bus_count() const override;
-        virtual uint32_t output_bus_count() const override;
-
         void update_unit_connections();
         virtual void prepare_audio_unit() override;
         virtual void prepare_parameters() override;  // NS_REQUIRES_SUPER

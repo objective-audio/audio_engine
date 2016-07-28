@@ -12,9 +12,6 @@ namespace audio {
 
         void prepare(tap_node const &);
 
-        virtual uint32_t input_bus_count() const override;
-        virtual uint32_t output_bus_count() const override;
-
         void set_render_function(render_f &&);
 
         audio::connection input_connection_on_render(uint32_t const bus_idx) const;
@@ -34,8 +31,7 @@ namespace audio {
     };
 
     struct input_tap_node::impl : tap_node::impl {
-        virtual uint32_t input_bus_count() const override;
-        virtual uint32_t output_bus_count() const override;
+        impl();
     };
 }
 }

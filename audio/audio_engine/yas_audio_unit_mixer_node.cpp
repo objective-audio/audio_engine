@@ -10,6 +10,11 @@ using namespace yas;
 #pragma mark - impl
 
 struct audio::unit_mixer_node::impl : unit_node::impl {
+    impl() {
+        set_input_bus_count(std::numeric_limits<uint32_t>::max());
+        set_output_bus_count(1);
+    }
+
     void prepare(audio::unit_mixer_node const &node) {
         _connections_observer = subject().make_observer(audio::unit_node::method::will_update_connections,
                                                         [weak_node = to_weak(node)](auto const &) {
@@ -20,14 +25,6 @@ struct audio::unit_mixer_node::impl : unit_node::impl {
     }
 
    private:
-    virtual uint32_t input_bus_count() const override {
-        return std::numeric_limits<uint32_t>::max();
-    }
-
-    virtual uint32_t output_bus_count() const override {
-        return 1;
-    }
-
 #warning todo update_connectionsにリネームしたい
     void update_unit_mixer_connections() {
         auto &connections = input_connections();
