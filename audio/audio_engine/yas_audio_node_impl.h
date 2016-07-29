@@ -22,8 +22,8 @@ namespace audio {
 
         audio::format input_format(uint32_t const bus_idx);
         audio::format output_format(uint32_t const bus_idx);
-        virtual bus_result_t next_available_input_bus() const;
-        virtual bus_result_t next_available_output_bus() const;
+        virtual bus_result_t next_available_input_bus() const final;
+        virtual bus_result_t next_available_output_bus() const final;
         virtual bool is_available_input_bus(uint32_t const bus_idx) const final;
         virtual bool is_available_output_bus(uint32_t const bus_idx) const final;
         void override_output_bus(std::experimental::optional<uint32_t> bus_idx);
