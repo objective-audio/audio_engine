@@ -26,6 +26,7 @@ namespace audio {
         virtual bus_result_t next_available_output_bus() const;
         virtual bool is_available_input_bus(uint32_t const bus_idx) const;
         virtual bool is_available_output_bus(uint32_t const bus_idx) const;
+        void override_output_bus(std::experimental::optional<uint32_t> bus_idx);
 
         void set_input_bus_count(uint32_t const);
         void set_output_bus_count(uint32_t const);
