@@ -26,6 +26,7 @@ struct audio::unit_io_node::impl::core {
 #pragma mark - audio::unit_io_node::impl
 
 audio::unit_io_node::impl::impl() : unit_node::impl(), _core(std::make_unique<core>()) {
+    audio::node::impl::override_output_bus(1);
 }
 
 audio::unit_io_node::impl::~impl() = default;
@@ -98,21 +99,6 @@ void audio::unit_io_node::impl::set_channel_map(channel_map_t const &map, audio:
 
 audio::channel_map_t const &audio::unit_io_node::impl::channel_map(audio::direction const dir) const {
     return _core->channel_map[to_uint32(dir)];
-}
-
-audio::bus_result_t audio::unit_io_node::impl::next_available_output_bus() const {
-    auto result = unit_node::impl::next_available_output_bus();
-    if (result && *result == 0) {
-        return 1;
-    }
-    return result;
-}
-
-bool audio::unit_io_node::impl::is_available_output_bus(uint32_t const bus_idx) const {
-    if (bus_idx == 1) {
-        return unit_node::impl::is_available_output_bus(0);
-    }
-    return false;
 }
 
 void audio::unit_io_node::impl::update_unit_io_connections() {

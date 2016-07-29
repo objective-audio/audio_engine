@@ -15,6 +15,7 @@ struct audio::node::impl::core {
     kernel_subject_t _kernel_subject;
     uint32_t _input_bus_count = 0;
     uint32_t _output_bus_count = 0;
+    std::experimental::optional<uint32_t> _override_output_bus_idx;
     connection_wmap _input_connections;
     connection_wmap _output_connections;
     std::function<node::kernel(void)> _make_kernel;
@@ -93,6 +94,10 @@ audio::bus_result_t audio::node::impl::next_available_input_bus() const {
 audio::bus_result_t audio::node::impl::next_available_output_bus() const {
     auto key = min_empty_key(_core->_output_connections);
     if (key && *key < output_bus_count()) {
+        auto &override_bus_idx = _core->_override_output_bus_idx;
+        if (override_bus_idx && *key == 0) {
+            return *override_bus_idx;
+        }
         return key;
     }
     return nullopt;
@@ -106,10 +111,16 @@ bool audio::node::impl::is_available_input_bus(uint32_t const bus_idx) const {
 }
 
 bool audio::node::impl::is_available_output_bus(uint32_t const bus_idx) const {
-    if (bus_idx >= output_bus_count()) {
+    auto &override_bus_idx = _core->_override_output_bus_idx;
+    auto target_bus_idx = (override_bus_idx && *override_bus_idx == bus_idx) ? 0 : bus_idx;
+    if (target_bus_idx >= output_bus_count()) {
         return false;
     }
-    return _core->_output_connections.count(bus_idx) == 0;
+    return _core->_output_connections.count(target_bus_idx) == 0;
+}
+
+void audio::node::impl::override_output_bus(std::experimental::optional<uint32_t> bus_idx) {
+    _core->_override_output_bus_idx = bus_idx;
 }
 
 void audio::node::impl::set_input_bus_count(uint32_t const count) {

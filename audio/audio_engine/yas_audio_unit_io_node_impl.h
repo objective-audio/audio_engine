@@ -23,9 +23,6 @@ namespace audio {
         void set_channel_map(channel_map_t const &, audio::direction const);
         channel_map_t const &channel_map(audio::direction const) const;
 
-        virtual bus_result_t next_available_output_bus() const override;
-        virtual bool is_available_output_bus(uint32_t const bus_idx) const override;
-
         virtual void prepare_audio_unit() override;
 
         audio::unit_io_node::subject_t &subject();
@@ -39,7 +36,7 @@ namespace audio {
 
     struct unit_output_node::impl : unit_io_node::impl {
         impl();
-        
+
         virtual void prepare_audio_unit() override;
     };
 
