@@ -82,6 +82,14 @@ void audio::node::set_render_time_on_render(const time &time) {
     impl_ptr<impl>()->set_render_time_on_render(time);
 }
 
+audio::node::subject_t &audio::node::subject() {
+    return impl_ptr<impl>()->subject();
+}
+
+audio::node::kernel_subject_t &audio::node::kernel_subject() {
+    return impl_ptr<impl>()->kernel_subject();
+}
+
 audio::connectable_node &audio::node::connectable() {
     if (!_connectable) {
         _connectable = audio::connectable_node{impl_ptr<connectable_node::impl>()};
