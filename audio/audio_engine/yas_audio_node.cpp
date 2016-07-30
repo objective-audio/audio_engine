@@ -68,6 +68,10 @@ void audio::node::set_make_kernel_handler(make_kernel_f func) {
     impl_ptr<impl>()->set_make_kernel_handler(std::move(func));
 }
 
+void audio::node::set_render_handler(render_f handler) {
+    impl_ptr<impl>()->set_render_handler(std::move(handler));
+}
+
 #pragma mark render thread
 
 void audio::node::render(pcm_buffer &buffer, uint32_t const bus_idx, const time &when) {

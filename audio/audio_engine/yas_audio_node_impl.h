@@ -57,7 +57,8 @@ namespace audio {
         subject_t &subject();
         kernel_subject_t &kernel_subject();
 
-        virtual void render(audio::pcm_buffer &buffer, uint32_t const bus_idx, audio::time const &when);
+        void set_render_handler(audio::node::render_f &&);
+        virtual void render(audio::pcm_buffer &buffer, uint32_t const bus_idx, audio::time const &when) final;
         audio::time render_time() const;
         void set_render_time_on_render(audio::time const &);
 

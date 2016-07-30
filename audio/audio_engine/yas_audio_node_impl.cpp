@@ -19,6 +19,7 @@ struct audio::node::impl::core {
     connection_wmap _input_connections;
     connection_wmap _output_connections;
     std::function<node::kernel(void)> _make_kernel;
+    audio::node::render_f _render_handler;
 
     core() {
     }
@@ -247,8 +248,16 @@ void audio::node::impl::remove_connection(connection const &connection) {
     update_kernel();
 }
 
+void audio::node::impl::set_render_handler(audio::node::render_f &&handler) {
+    _core->_render_handler = std::move(handler);
+}
+
 void audio::node::impl::render(pcm_buffer &buffer, uint32_t const bus_idx, time const &when) {
     set_render_time_on_render(when);
+
+    if (_core->_render_handler) {
+        _core->_render_handler(buffer, bus_idx, when);
+    }
 }
 
 audio::time audio::node::impl::render_time() const {
