@@ -45,6 +45,12 @@ namespace audio {
         using make_kernel_f = std::function<node::kernel(void)>;
         using render_f = std::function<void(audio::pcm_buffer &, uint32_t const, audio::time const &)>;
 
+        struct args {
+            uint32_t input_bus_count = 0;
+            uint32_t output_bus_count = 0;
+        };
+
+        node(args const);
         node(std::nullptr_t);
 
         void reset();

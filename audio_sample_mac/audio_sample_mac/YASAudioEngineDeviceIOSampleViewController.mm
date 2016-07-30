@@ -267,13 +267,13 @@ namespace sample {
         if (auto const &device = _internal.device_io_node.device()) {
             if (device.output_channel_count() > 0) {
                 auto const output_format = device.output_format();
-                _internal.engine.connect(_internal.route_node, _internal.device_io_node, output_format);
+                _internal.engine.connect(_internal.route_node, _internal.device_io_node.node(), output_format);
                 _internal.engine.connect(_internal.tap_node, _internal.route_node, 0,
                                          YASAudioDeviceRouteSampleSourceBusSine, output_format);
             }
 
             if (device.input_channel_count() > 0) {
-                _internal.engine.connect(_internal.device_io_node, _internal.route_node, 0,
+                _internal.engine.connect(_internal.device_io_node.node(), _internal.route_node, 0,
                                          YASAudioDeviceRouteSampleSourceBusInput, device.input_format());
             }
         }

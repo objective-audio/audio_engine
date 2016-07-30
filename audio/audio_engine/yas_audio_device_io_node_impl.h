@@ -6,7 +6,7 @@
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
 
-struct yas::audio::device_io_node::impl : node::impl, manageable_device_io_node::impl {
+struct yas::audio::device_io_node::impl : base::impl, manageable_device_io_node::impl {
     impl();
     virtual ~impl();
 
@@ -20,6 +20,9 @@ struct yas::audio::device_io_node::impl : node::impl, manageable_device_io_node:
 
     void set_device(audio::device const &device);
     audio::device device() const;
+
+    audio::node const &node() const;
+    audio::node &node();
 
    private:
     class core;

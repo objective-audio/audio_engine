@@ -11,6 +11,11 @@
 
 using namespace yas;
 
+audio::node::node(args const args) : base(std::make_shared<impl>()) {
+    impl_ptr<impl>()->set_input_bus_count(args.input_bus_count);
+    impl_ptr<impl>()->set_output_bus_count(args.output_bus_count);
+}
+
 audio::node::node(std::nullptr_t) : base(nullptr) {
 }
 
@@ -80,6 +85,14 @@ void audio::node::render(pcm_buffer &buffer, uint32_t const bus_idx, const time 
 
 void audio::node::set_render_time_on_render(const time &time) {
     impl_ptr<impl>()->set_render_time_on_render(time);
+}
+
+audio::node::subject_t &audio::node::subject() {
+    return impl_ptr<impl>()->subject();
+}
+
+audio::node::kernel_subject_t &audio::node::kernel_subject() {
+    return impl_ptr<impl>()->kernel_subject();
 }
 
 audio::connectable_node &audio::node::connectable() {
