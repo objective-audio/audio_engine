@@ -45,6 +45,26 @@ void audio::tap_node::impl::prepare(tap_node const &node) {
 
     auto weak_node = to_weak(node);
 
+    audio::node::impl::set_render_handler(
+        [weak_node](audio::pcm_buffer &buffer, uint32_t const bus_idx, audio::time const &when) {
+            if (auto node = weak_node.lock()) {
+                auto impl_ptr = node.impl_ptr<impl>();
+                if (auto kernel = impl_ptr->kernel_cast<tap_node::kernel>()) {
+                    impl_ptr->_core->kernel_on_render = kernel;
+
+                    auto const &render_function = kernel.render_function();
+
+                    if (render_function) {
+                        render_function(buffer, bus_idx, when);
+                    } else {
+                        impl_ptr->render_source(buffer, bus_idx, when);
+                    }
+
+                    impl_ptr->_core->kernel_on_render = nullptr;
+                }
+            }
+        });
+
     _core->_reset_observer = subject().make_observer(audio::node::method::will_reset, [weak_node](auto const &) {
         if (auto node = weak_node.lock()) {
             node.impl_ptr<audio::tap_node::impl>()->_will_reset();
@@ -88,24 +108,6 @@ audio::connection_smap audio::tap_node::impl::input_connections_on_render() cons
 
 audio::connection_smap audio::tap_node::impl::output_connections_on_render() const {
     return _core->kernel_on_render.output_connections();
-}
-
-void audio::tap_node::impl::render(pcm_buffer &buffer, uint32_t const bus_idx, time const &when) {
-    node::impl::render(buffer, bus_idx, when);
-
-    if (auto kernel = kernel_cast<tap_node::kernel>()) {
-        _core->kernel_on_render = kernel;
-
-        auto const &render_function = kernel.render_function();
-
-        if (render_function) {
-            render_function(buffer, bus_idx, when);
-        } else {
-            render_source(buffer, bus_idx, when);
-        }
-
-        _core->kernel_on_render = nullptr;
-    }
 }
 
 void audio::tap_node::impl::render_source(pcm_buffer &buffer, uint32_t const bus_idx, time const &when) {
