@@ -11,6 +11,11 @@
 
 using namespace yas;
 
+audio::node::node(args const args) : base(std::make_shared<impl>()) {
+    impl_ptr<impl>()->set_input_bus_count(args.input_bus_count);
+    impl_ptr<impl>()->set_output_bus_count(args.output_bus_count);
+}
+
 audio::node::node(std::nullptr_t) : base(nullptr) {
 }
 
