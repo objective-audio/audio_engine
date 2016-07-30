@@ -11,7 +11,7 @@ namespace yas {
 namespace audio {
     struct node::impl : base::impl, manageable_node::impl, connectable_node::impl {
         impl();
-        virtual ~impl();
+        ~impl();
 
         impl(impl const &) = delete;
         impl(impl &&) = delete;
@@ -22,28 +22,28 @@ namespace audio {
 
         audio::format input_format(uint32_t const bus_idx);
         audio::format output_format(uint32_t const bus_idx);
-        virtual bus_result_t next_available_input_bus() const final;
-        virtual bus_result_t next_available_output_bus() const final;
-        virtual bool is_available_input_bus(uint32_t const bus_idx) const final;
-        virtual bool is_available_output_bus(uint32_t const bus_idx) const final;
+        bus_result_t next_available_input_bus() const;
+        bus_result_t next_available_output_bus() const;
+        bool is_available_input_bus(uint32_t const bus_idx) const;
+        bool is_available_output_bus(uint32_t const bus_idx) const;
         void override_output_bus(std::experimental::optional<uint32_t> bus_idx);
 
         void set_input_bus_count(uint32_t const);
         void set_output_bus_count(uint32_t const);
-        virtual uint32_t input_bus_count() const final;
-        virtual uint32_t output_bus_count() const final;
+        uint32_t input_bus_count() const;
+        uint32_t output_bus_count() const;
 
-        audio::connection input_connection(uint32_t const bus_idx) const override;
-        audio::connection output_connection(uint32_t const bus_idx) const override;
-        audio::connection_wmap &input_connections() const override;
-        audio::connection_wmap &output_connections() const override;
+        audio::connection input_connection(uint32_t const bus_idx) const override final;
+        audio::connection output_connection(uint32_t const bus_idx) const override final;
+        audio::connection_wmap &input_connections() const override final;
+        audio::connection_wmap &output_connections() const override final;
 
-        void add_connection(audio::connection const &connection) override;
-        void remove_connection(audio::connection const &connection) override;
+        void add_connection(audio::connection const &connection) override final;
+        void remove_connection(audio::connection const &connection) override final;
 
-        virtual void update_connections() override final;
+        void update_connections() override final;
         void set_make_kernel_handler(std::function<node::kernel(void)> &&);
-        virtual void prepare_kernel(node::kernel &kernel) final;
+        void prepare_kernel(node::kernel &kernel);
         void update_kernel() override final;
 
         template <typename T = audio::node::kernel>
@@ -51,14 +51,14 @@ namespace audio {
             return yas::cast<T>(_kernel());
         }
 
-        audio::engine engine() const override;
-        void set_engine(audio::engine const &) override;
+        audio::engine engine() const override final;
+        void set_engine(audio::engine const &) override final;
 
         subject_t &subject();
         kernel_subject_t &kernel_subject();
 
         void set_render_handler(audio::node::render_f &&);
-        virtual void render(audio::pcm_buffer &buffer, uint32_t const bus_idx, audio::time const &when) final;
+        void render(audio::pcm_buffer &buffer, uint32_t const bus_idx, audio::time const &when);
         audio::time render_time() const;
         void set_render_time_on_render(audio::time const &);
 
