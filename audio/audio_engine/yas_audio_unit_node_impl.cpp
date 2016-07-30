@@ -57,15 +57,39 @@ void audio::unit_node::impl::prepare(unit_node const &node, AudioComponentDescri
     _core->parameters.insert(std::make_pair(kAudioUnitScope_Input, unit.create_parameters(kAudioUnitScope_Input)));
     _core->parameters.insert(std::make_pair(kAudioUnitScope_Output, unit.create_parameters(kAudioUnitScope_Output)));
 
+    auto weak_node = to_weak(node);
+
+    audio::node::impl::set_render_handler(
+        [weak_node](audio::pcm_buffer &buffer, uint32_t const bus_idx, audio::time const &when) {
+            if (auto node = weak_node.lock()) {
+                if (auto audio_unit = node.impl_ptr<impl>()->_core->au()) {
+                    AudioUnitRenderActionFlags action_flags = 0;
+                    AudioTimeStamp const time_stamp = when.audio_time_stamp();
+
+                    render_parameters render_parameters{.in_render_type = render_type::normal,
+                                                        .io_action_flags = &action_flags,
+                                                        .io_time_stamp = &time_stamp,
+                                                        .in_bus_number = bus_idx,
+                                                        .in_number_frames = buffer.frame_length(),
+                                                        .io_data = buffer.audio_buffer_list()};
+
+                    if (auto err = audio_unit.audio_unit_render(render_parameters).error_opt()) {
+                        std::cout << "audio unit render error : " << std::to_string(*err) << " - " << to_string(*err)
+                                  << std::endl;
+                    }
+                }
+            }
+        });
+
     _core->_reset_observer =
-        node::impl::subject().make_observer(audio::node::method::will_reset, [weak_node = to_weak(node)](auto const &) {
+        node::impl::subject().make_observer(audio::node::method::will_reset, [weak_node](auto const &) {
             if (auto node = weak_node.lock()) {
                 node.impl_ptr<audio::unit_node::impl>()->will_reset();
             }
         });
 
-    _core->_connections_observer = node::impl::subject().make_observer(
-        audio::node::method::update_connections, [weak_node = to_weak(node)](auto const &) {
+    _core->_connections_observer =
+        node::impl::subject().make_observer(audio::node::method::update_connections, [weak_node](auto const &) {
             if (auto node = weak_node.lock()) {
                 node.impl_ptr<audio::unit_node::impl>()->update_unit_connections();
             }
@@ -263,24 +287,4 @@ void audio::unit_node::impl::reload_audio_unit() {
 
 audio::unit_node::subject_t &audio::unit_node::impl::subject() {
     return _core->_subject;
-}
-
-void audio::unit_node::impl::render(pcm_buffer &buffer, uint32_t const bus_idx, time const &when) {
-    node::impl::render(buffer, bus_idx, when);
-
-    if (auto audio_unit = _core->au()) {
-        AudioUnitRenderActionFlags action_flags = 0;
-        AudioTimeStamp const time_stamp = when.audio_time_stamp();
-
-        render_parameters render_parameters{.in_render_type = render_type::normal,
-                                            .io_action_flags = &action_flags,
-                                            .io_time_stamp = &time_stamp,
-                                            .in_bus_number = bus_idx,
-                                            .in_number_frames = buffer.frame_length(),
-                                            .io_data = buffer.audio_buffer_list()};
-
-        if (auto err = audio_unit.audio_unit_render(render_parameters).error_opt()) {
-            std::cout << "audio unit render error : " << std::to_string(*err) << " - " << to_string(*err) << std::endl;
-        }
-    }
 }

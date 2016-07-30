@@ -64,8 +64,12 @@ uint32_t audio::node::output_bus_count() const {
     return impl_ptr<impl>()->output_bus_count();
 }
 
-void audio::node::set_make_kernel(std::function<node::kernel(void)> func) {
-    impl_ptr<impl>()->set_make_kernel(std::move(func));
+void audio::node::set_make_kernel_handler(make_kernel_f func) {
+    impl_ptr<impl>()->set_make_kernel_handler(std::move(func));
+}
+
+void audio::node::set_render_handler(render_f handler) {
+    impl_ptr<impl>()->set_render_handler(std::move(handler));
 }
 
 #pragma mark render thread

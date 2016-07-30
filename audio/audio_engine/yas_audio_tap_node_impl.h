@@ -19,7 +19,6 @@ namespace audio {
         audio::connection_smap input_connections_on_render() const;
         audio::connection_smap output_connections_on_render() const;
 
-        virtual void render(audio::pcm_buffer &buffer, uint32_t const bus_idx, audio::time const &when) override;
         void render_source(audio::pcm_buffer &buffer, uint32_t const bus_idx, audio::time const &when);
 
        private:

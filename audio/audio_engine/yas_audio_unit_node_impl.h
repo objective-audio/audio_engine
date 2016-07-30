@@ -41,8 +41,6 @@ namespace audio {
 
         audio::unit_node::subject_t &subject();
 
-        virtual void render(audio::pcm_buffer &buffer, uint32_t const bus_idx, audio::time const &when) override;
-
        private:
         class core;
         std::unique_ptr<core> _core;

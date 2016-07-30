@@ -21,8 +21,6 @@ struct yas::audio::device_io_node::impl : node::impl, manageable_device_io_node:
     void set_device(audio::device const &device);
     audio::device device() const;
 
-    virtual void render(pcm_buffer &buffer, uint32_t const bus_idx, time const &when) override;
-
    private:
     class core;
     std::unique_ptr<core> _core;
