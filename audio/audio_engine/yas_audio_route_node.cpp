@@ -61,6 +61,33 @@ struct audio::route_node::impl : node::impl {
 
         auto weak_node = to_weak(node);
 
+        audio::node::impl::set_render_handler(
+            [weak_node](audio::pcm_buffer &dst_buffer, uint32_t const dst_bus_idx, audio::time const &when) {
+                if (auto node = weak_node.lock()) {
+                    if (auto kernel = node.impl_ptr<impl>()->kernel_cast<route_node::kernel>()) {
+                        auto const &routes = kernel.routes();
+                        auto output_connection = kernel.output_connection(dst_bus_idx);
+                        auto input_connections = kernel.input_connections();
+                        uint32_t const dst_ch_count = dst_buffer.format().channel_count();
+
+                        for (auto const &pair : input_connections) {
+                            if (auto const &input_connection = pair.second) {
+                                if (auto node = input_connection.source_node()) {
+                                    auto const &src_format = input_connection.format();
+                                    auto const &src_bus_idx = pair.first;
+                                    uint32_t const src_ch_count = src_format.channel_count();
+                                    if (auto const result = channel_map_from_routes(routes, src_bus_idx, src_ch_count,
+                                                                                    dst_bus_idx, dst_ch_count)) {
+                                        pcm_buffer src_buffer(src_format, dst_buffer, result.value());
+                                        node.render(src_buffer, src_bus_idx, when);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
         _core->_reset_observer = subject().make_observer(audio::node::method::will_reset, [weak_node](auto const &) {
             if (auto node = weak_node.lock()) {
                 node.impl_ptr<audio::route_node::impl>()->_will_reset();
@@ -73,32 +100,6 @@ struct audio::route_node::impl : node::impl {
                     node.impl_ptr<audio::route_node::impl>()->_did_prepare_kernel(context.value);
                 }
             });
-    }
-
-    virtual void render(pcm_buffer &dst_buffer, uint32_t const dst_bus_idx, time const &when) override {
-        node::impl::render(dst_buffer, dst_bus_idx, when);
-
-        if (auto kernel = kernel_cast<route_node::kernel>()) {
-            auto const &routes = kernel.routes();
-            auto output_connection = kernel.output_connection(dst_bus_idx);
-            auto input_connections = kernel.input_connections();
-            uint32_t const dst_ch_count = dst_buffer.format().channel_count();
-
-            for (auto const &pair : input_connections) {
-                if (auto const &input_connection = pair.second) {
-                    if (auto node = input_connection.source_node()) {
-                        auto const &src_format = input_connection.format();
-                        auto const &src_bus_idx = pair.first;
-                        uint32_t const src_ch_count = src_format.channel_count();
-                        if (auto const result =
-                                channel_map_from_routes(routes, src_bus_idx, src_ch_count, dst_bus_idx, dst_ch_count)) {
-                            pcm_buffer src_buffer(src_format, dst_buffer, result.value());
-                            node.render(src_buffer, src_bus_idx, when);
-                        }
-                    }
-                }
-            }
-        }
     }
 
 #pragma mark -
