@@ -41,7 +41,7 @@ audio::tap_node::impl::impl() : node::impl(), _core(std::make_unique<core>()) {
 audio::tap_node::impl::~impl() = default;
 
 void audio::tap_node::impl::prepare(tap_node const &node) {
-    set_make_kernel([]() { return audio::tap_node::kernel{}; });
+    set_make_kernel_handler([]() { return audio::tap_node::kernel{}; });
 
     auto weak_node = to_weak(node);
 

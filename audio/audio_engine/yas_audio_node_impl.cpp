@@ -173,7 +173,7 @@ audio::node::kernel audio::node::impl::_make_kernel() {
     }
 }
 
-void audio::node::impl::set_make_kernel(std::function<node::kernel(void)> &&func) {
+void audio::node::impl::set_make_kernel_handler(std::function<node::kernel(void)> &&func) {
     _core->_make_kernel = std::move(func);
 }
 

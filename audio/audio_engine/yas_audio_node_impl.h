@@ -42,7 +42,7 @@ namespace audio {
         void remove_connection(audio::connection const &connection) override;
 
         virtual void update_connections() override final;
-        void set_make_kernel(std::function<node::kernel(void)> &&);
+        void set_make_kernel_handler(std::function<node::kernel(void)> &&);
         virtual void prepare_kernel(node::kernel &kernel) final;
         void update_kernel() override final;
 

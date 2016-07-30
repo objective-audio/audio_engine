@@ -57,7 +57,7 @@ struct audio::route_node::impl : node::impl {
     ~impl() = default;
 
     void prepare(audio::route_node const &node) {
-        set_make_kernel([]() { return route_node::kernel{}; });
+        set_make_kernel_handler([]() { return route_node::kernel{}; });
 
         auto weak_node = to_weak(node);
 

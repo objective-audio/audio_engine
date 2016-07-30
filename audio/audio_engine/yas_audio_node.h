@@ -42,6 +42,7 @@ namespace audio {
         using kernel_subject_t = subject<kernel, kernel_method>;
         using kernel_observer_t = observer<kernel, kernel_method>;
 
+        using make_kernel_f = std::function<node::kernel(void)>;
         node(std::nullptr_t);
 
         void reset();
@@ -58,7 +59,7 @@ namespace audio {
         uint32_t input_bus_count() const;
         uint32_t output_bus_count() const;
 
-        void set_make_kernel(std::function<node::kernel(void)>);
+        void set_make_kernel_handler(make_kernel_f);
 
         void render(audio::pcm_buffer &buffer, uint32_t const bus_idx, audio::time const &when);
         void set_render_time_on_render(audio::time const &time);
