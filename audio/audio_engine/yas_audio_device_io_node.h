@@ -9,13 +9,14 @@
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
 
 #include "yas_audio_device_io_node_protocol.h"
-#include "yas_audio_node.h"
+#include "yas_base.h"
 
 namespace yas {
 namespace audio {
+    class node;
     class device;
 
-    class device_io_node : public node {
+    class device_io_node : public base {
        public:
         class impl;
 
@@ -27,6 +28,9 @@ namespace audio {
 
         void set_device(audio::device const &device);
         audio::device device() const;
+
+        audio::node const &node() const;
+        audio::node &node();
 
         manageable_device_io_node &manageable();
 
