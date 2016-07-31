@@ -50,7 +50,7 @@ using namespace yas;
         XCTAssertEqual(parameter.default_value(), delay_node.global_parameter_value(parameter.parameter_id()));
     }
 
-    auto connection = engine.connect(delay_node, output_node, format);
+    auto connection = engine.connect(delay_node, output_node.node(), format);
 
     XCTestExpectation *expectation = [self expectationWithDescription:@"First Render"];
 
@@ -85,7 +85,7 @@ using namespace yas;
 
     delay_node.manageable().reload_audio_unit();
 
-    engine.connect(delay_node, output_node, format);
+    engine.connect(delay_node, output_node.node(), format);
 
     expectation = [self expectationWithDescription:@"Second Render"];
 

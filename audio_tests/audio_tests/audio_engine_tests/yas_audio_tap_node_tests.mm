@@ -28,7 +28,7 @@ using namespace yas;
     audio::tap_node from_node;
     auto const format = audio::format({.sample_rate = 48000.0, .channel_count = 2});
 
-    auto const to_connection = engine.connect(to_node, output_node, format);
+    auto const to_connection = engine.connect(to_node, output_node.node(), format);
     auto const from_connection = engine.connect(from_node, to_node, format);
 
     XCTestExpectation *to_expectation = [self expectationWithDescription:@"to node"];
@@ -80,7 +80,7 @@ using namespace yas;
     audio::tap_node from_node;
     auto const format = audio::format({.sample_rate = 48000.0, .channel_count = 2});
 
-    auto const to_connection = engine.connect(to_node, output_node, format);
+    auto const to_connection = engine.connect(to_node, output_node.node(), format);
     auto const from_connection = engine.connect(from_node, to_node, format);
 
     XCTestExpectation *from_expectation = [self expectationWithDescription:@"from node"];

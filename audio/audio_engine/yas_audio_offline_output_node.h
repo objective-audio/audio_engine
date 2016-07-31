@@ -4,12 +4,14 @@
 
 #pragma once
 
-#include "yas_audio_node.h"
 #include "yas_audio_offline_output_node_protocol.h"
+#include "yas_base.h"
 
 namespace yas {
 namespace audio {
-    class offline_output_node : public node {
+    class node;
+
+    class offline_output_node : public base {
        public:
         class impl;
 
@@ -19,6 +21,9 @@ namespace audio {
         ~offline_output_node();
 
         bool is_running() const;
+
+        audio::node const &node() const;
+        audio::node &node();
 
         manageable_offline_output_unit &manageable();
 

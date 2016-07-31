@@ -293,14 +293,6 @@ void audio::engine::impl::add_node_to_graph(node const &node) {
         }
         node.prepare_parameters();
     }
-
-    if (auto offline_output_node = yas::cast<audio::offline_output_node>(node)) {
-        if (_core->offline_output_node) {
-            throw std::runtime_error(std::string(__PRETTY_FUNCTION__) + " : offline_output_node is already attached.");
-        } else {
-            _core->offline_output_node = offline_output_node;
-        }
-    }
 }
 
 void audio::engine::impl::remove_node_from_graph(node const &node) {
@@ -311,12 +303,6 @@ void audio::engine::impl::remove_node_from_graph(node const &node) {
     if (auto unit_node = yas::cast<audio::unit_node>(node)) {
         if (auto unit = unit_node.audio_unit()) {
             _core->graph.remove_audio_unit(unit);
-        }
-    }
-
-    if (auto offline_output_node = yas::cast<audio::offline_output_node>(node)) {
-        if (offline_output_node == _core->offline_output_node) {
-            _core->offline_output_node = nullptr;
         }
     }
 }
