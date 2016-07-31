@@ -51,6 +51,7 @@ class audio::engine::impl::core {
     objc_ptr<id> route_change_observer;
     subject_t subject;
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
+    audio::device_io_node _device_io_node = nullptr;
     audio::device::observer_t device_observer;
 #endif
 
@@ -176,6 +177,14 @@ bool audio::engine::impl::prepare() {
 
     _core->graph = audio::graph{};
 
+#if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
+    if (device_io_node()) {
+        auto &manageable_device_io_node = device_io_node().manageable();
+        manageable_device_io_node.add_device_io();
+        _core->graph.add_audio_device_io(manageable_device_io_node.device_io());
+    }
+#endif
+
     for (auto &node : _core->nodes) {
         add_node_to_graph(node);
     }
@@ -285,14 +294,6 @@ void audio::engine::impl::add_node_to_graph(node const &node) {
         node.prepare_parameters();
     }
 
-#if (!TARGET_OS_IPHONE & TARGET_OS_MAC)
-    if (auto device_io_node = yas::cast<audio::device_io_node>(node)) {
-        auto &manageable_node = device_io_node.manageable();
-        manageable_node.add_device_io();
-        _core->graph.add_audio_device_io(manageable_node.device_io());
-    }
-#endif
-
     if (auto offline_output_node = yas::cast<audio::offline_output_node>(node)) {
         if (_core->offline_output_node) {
             throw std::runtime_error(std::string(__PRETTY_FUNCTION__) + " : offline_output_node is already attached.");
@@ -312,16 +313,6 @@ void audio::engine::impl::remove_node_from_graph(node const &node) {
             _core->graph.remove_audio_unit(unit);
         }
     }
-
-#if (!TARGET_OS_IPHONE & TARGET_OS_MAC)
-    if (auto device_io_node = yas::cast<audio::device_io_node>(node)) {
-        auto &manageable_node = device_io_node.manageable();
-        if (auto &device_io = manageable_node.device_io()) {
-            _core->graph.remove_audio_device_io(device_io);
-            manageable_node.remove_device_io();
-        }
-    }
-#endif
 
     if (auto offline_output_node = yas::cast<audio::offline_output_node>(node)) {
         if (offline_output_node == _core->offline_output_node) {
@@ -432,6 +423,37 @@ audio::connection_set &audio::engine::impl::connections() const {
 audio::offline_output_node &audio::engine::impl::offline_output_node() const {
     return _core->offline_output_node;
 }
+
+#if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
+void audio::engine::impl::set_device_io_node(audio::device_io_node &&node) {
+    if (node) {
+        _core->_device_io_node = std::move(node);
+
+        if (graph()) {
+            auto &manageable_device_io_node = _core->_device_io_node.manageable();
+            manageable_device_io_node.add_device_io();
+            _core->graph.add_audio_device_io(manageable_device_io_node.device_io());
+        }
+    } else {
+        if (_core->_device_io_node) {
+            auto &manageable_node = _core->_device_io_node.manageable();
+            if (graph()) {
+                if (auto &device_io = manageable_node.device_io()) {
+                    _core->graph.remove_audio_device_io(device_io);
+                }
+            }
+
+            manageable_node.remove_device_io();
+            _core->_device_io_node = nullptr;
+        }
+    }
+}
+
+audio::device_io_node &audio::engine::impl::device_io_node() {
+    return _core->_device_io_node;
+}
+
+#endif
 
 audio::engine::start_result_t audio::engine::impl::start_render() {
     if (auto const graph = _core->graph) {
