@@ -6,6 +6,7 @@
 #include "yas_audio_engine.h"
 #include "yas_audio_engine_impl.h"
 #include "yas_audio_node.h"
+#include "yas_audio_offline_output_node.h"
 #include "yas_observing.h"
 #include "yas_result.h"
 
@@ -82,6 +83,32 @@ void audio::engine::disconnect_output(node const &node, uint32_t const bus_idx) 
     impl_ptr<impl>()->disconnect_node_with_predicate([node, bus_idx](auto const &connection) {
         return (connection.source_node() == node && connection.source_bus() == bus_idx);
     });
+}
+
+audio::engine::add_result_t audio::engine::add_offline_output_node() {
+    if (impl_ptr<impl>()->offline_output_node()) {
+        return add_result_t{add_error_t::already_added};
+    } else {
+        impl_ptr<impl>()->set_offline_output_node(audio::offline_output_node{});
+        return add_result_t{nullptr};
+    }
+}
+
+audio::engine::remove_result_t audio::engine::remove_offline_output_node() {
+    if (impl_ptr<impl>()->offline_output_node()) {
+        impl_ptr<impl>()->set_offline_output_node(nullptr);
+        return remove_result_t{nullptr};
+    } else {
+        return remove_result_t{remove_error_t::already_removed};
+    }
+}
+
+audio::offline_output_node const &audio::engine::offline_output_node() const {
+    return impl_ptr<impl>()->offline_output_node();
+}
+
+audio::offline_output_node &audio::engine::offline_output_node() {
+    return impl_ptr<impl>()->offline_output_node();
 }
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)

@@ -101,6 +101,28 @@ using namespace yas;
     [self waitForExpectationsWithTimeout:1.0 handler:nil];
 }
 
+- (void)test_add_and_remove_offline_output_node {
+    audio::engine engine;
+
+    XCTAssertFalse(engine.offline_output_node());
+
+    XCTAssertTrue(engine.add_offline_output_node());
+
+    auto add_result = engine.add_offline_output_node();
+    XCTAssertFalse(add_result);
+    XCTAssertEqual(add_result.error(), audio::engine::add_error_t::already_added);
+
+    XCTAssertTrue(engine.offline_output_node());
+
+    XCTAssertTrue(engine.remove_offline_output_node());
+
+    auto remove_result = engine.remove_offline_output_node();
+    XCTAssertFalse(remove_result);
+    XCTAssertEqual(remove_result.error(), audio::engine::remove_error_t::already_removed);
+
+    XCTAssertFalse(engine.offline_output_node());
+}
+
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
 
 - (void)test_add_and_remove_device_io_node {

@@ -421,7 +421,11 @@ audio::connection_set &audio::engine::impl::connections() const {
     return _core->connections;
 }
 
-audio::offline_output_node &audio::engine::impl::offline_output_node() const {
+void audio::engine::impl::set_offline_output_node(audio::offline_output_node &&offline_output_node) {
+    _core->offline_output_node = std::move(offline_output_node);
+}
+
+audio::offline_output_node &audio::engine::impl::offline_output_node() {
     return _core->offline_output_node;
 }
 
