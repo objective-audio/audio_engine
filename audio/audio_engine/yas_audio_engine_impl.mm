@@ -375,11 +375,12 @@ void audio::engine::impl::update_all_node_connections() {
 }
 
 audio::connection_set audio::engine::impl::input_connections_for_destination_node(node const &node) const {
-    return filter(_core->connections, [node](auto const &connection) { return connection.destination_node() == node; });
+    return filter(_core->connections,
+                  [&node](auto const &connection) { return connection.destination_node() == node; });
 }
 
 audio::connection_set audio::engine::impl::output_connections_for_source_node(node const &node) const {
-    return filter(_core->connections, [node](auto const &connection) { return connection.source_node() == node; });
+    return filter(_core->connections, [&node](auto const &connection) { return connection.source_node() == node; });
 }
 
 void audio::engine::impl::set_graph(audio::graph const &graph) {
