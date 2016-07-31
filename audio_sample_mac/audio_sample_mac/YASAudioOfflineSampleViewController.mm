@@ -287,7 +287,7 @@ namespace sample {
 
     if (!start_result) {
         self.processing = NO;
-        NSLog(@"%s start offline render error", __PRETTY_FUNCTION__);
+        NSLog(@"%s start offline render error %@", __PRETTY_FUNCTION__, to_cf_object(to_string(start_result.error())));
     }
 }
 
