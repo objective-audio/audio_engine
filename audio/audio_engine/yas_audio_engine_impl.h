@@ -12,6 +12,10 @@
 
 namespace yas {
 namespace audio {
+#if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
+    class device_io_node;
+#endif
+
     struct engine::impl : base::impl, testable_engine::impl {
         impl();
         virtual ~impl();
@@ -57,6 +61,11 @@ namespace audio {
         std::unordered_set<audio::node> &nodes() const override;
         audio::connection_set &connections() const override;
         audio::offline_output_node &offline_output_node() const;
+
+#if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
+        void set_device_io_node(audio::device_io_node &&);
+        audio::device_io_node &device_io_node();
+#endif
 
         engine::start_result_t start_render();
         engine::start_result_t start_offline_render(offline_render_f, offline_completion_f);

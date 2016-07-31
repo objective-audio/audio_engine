@@ -101,6 +101,32 @@ using namespace yas;
     [self waitForExpectationsWithTimeout:1.0 handler:nil];
 }
 
+#if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
+
+- (void)test_add_and_remove_device_io_node {
+    audio::engine engine;
+
+    XCTAssertFalse(engine.device_io_node());
+
+    XCTAssertTrue(engine.add_device_io_node());
+
+    auto add_result = engine.add_device_io_node();
+    XCTAssertFalse(add_result);
+    XCTAssertEqual(add_result.error(), audio::engine::add_error_t::already_added);
+
+    XCTAssertTrue(engine.device_io_node());
+
+    XCTAssertTrue(engine.remove_device_io_node());
+
+    auto remove_result = engine.remove_device_io_node();
+    XCTAssertFalse(remove_result);
+    XCTAssertEqual(remove_result.error(), audio::engine::remove_error_t::already_removed);
+
+    XCTAssertFalse(engine.device_io_node());
+}
+
+#endif
+
 - (void)test_method_to_string {
     XCTAssertEqual(to_string(audio::engine::method::configuration_change), "configuration_change");
 }

@@ -20,6 +20,7 @@ class observer;
 namespace audio {
     class graph;
     class offline_output_node;
+    class device_io_node;
     class testable_engine;
 
     class engine : public base {
@@ -36,7 +37,12 @@ namespace audio {
             offline_output_starting_failure,
         };
 
+        enum class add_error_t { already_added };
+        enum class remove_error_t { already_removed };
+
         using start_result_t = result<std::nullptr_t, start_error_t>;
+        using add_result_t = result<std::nullptr_t, add_error_t>;
+        using remove_result_t = result<std::nullptr_t, remove_error_t>;
         using subject_t = subject<engine, method>;
         using observer_t = observer<engine, method>;
 
@@ -54,6 +60,13 @@ namespace audio {
         void disconnect_input(audio::node const &, uint32_t const bus_idx);
         void disconnect_output(audio::node const &);
         void disconnect_output(audio::node const &, uint32_t const bus_idx);
+
+#if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
+        add_result_t add_device_io_node();
+        remove_result_t remove_device_io_node();
+        audio::device_io_node const &device_io_node() const;
+        audio::device_io_node &device_io_node();
+#endif
 
         start_result_t start_render();
         start_result_t start_offline_render(offline_render_f const &render_function,

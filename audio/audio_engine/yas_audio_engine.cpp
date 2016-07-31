@@ -2,6 +2,7 @@
 //  yas_audio_engine.cpp
 //
 
+#include "yas_audio_device_io_node.h"
 #include "yas_audio_engine.h"
 #include "yas_audio_engine_impl.h"
 #include "yas_audio_node.h"
@@ -82,6 +83,36 @@ void audio::engine::disconnect_output(node const &node, uint32_t const bus_idx) 
         return (connection.source_node() == node && connection.source_bus() == bus_idx);
     });
 }
+
+#if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
+
+audio::engine::add_result_t audio::engine::add_device_io_node() {
+    if (impl_ptr<impl>()->device_io_node()) {
+        return add_result_t{add_error_t::already_added};
+    } else {
+        impl_ptr<impl>()->set_device_io_node(audio::device_io_node{});
+        return add_result_t{nullptr};
+    }
+}
+
+audio::engine::remove_result_t audio::engine::remove_device_io_node() {
+    if (impl_ptr<impl>()->device_io_node()) {
+        impl_ptr<impl>()->set_device_io_node(nullptr);
+        return remove_result_t{nullptr};
+    } else {
+        return remove_result_t{remove_error_t::already_removed};
+    }
+}
+
+audio::device_io_node const &audio::engine::device_io_node() const {
+    return impl_ptr<impl>()->device_io_node();
+}
+
+audio::device_io_node &audio::engine::device_io_node() {
+    return impl_ptr<impl>()->device_io_node();
+}
+
+#endif
 
 audio::engine::start_result_t audio::engine::start_render() {
     return impl_ptr<impl>()->start_render();
