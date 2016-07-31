@@ -39,9 +39,11 @@ using namespace yas;
 - (void)test_offline_render_with_audio_engine {
     double const sample_rate = 44100.0;
 
-    auto format = audio::format({.sample_rate = sample_rate, .channel_count = 2});
     audio::engine engine;
-    audio::offline_output_node output_node;
+    engine.add_offline_output_node();
+
+    auto format = audio::format({.sample_rate = sample_rate, .channel_count = 2});
+    audio::offline_output_node &output_node = engine.offline_output_node();
     audio::unit_node sample_delay_node(kAudioUnitType_Effect, kAudioUnitSubType_SampleDelay);
     audio::tap_node tap_node;
 

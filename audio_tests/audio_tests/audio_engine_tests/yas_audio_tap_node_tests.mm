@@ -22,8 +22,9 @@ using namespace yas;
 
 - (void)test_render_with_lambda {
     audio::engine engine;
+    engine.add_offline_output_node();
 
-    audio::offline_output_node output_node;
+    audio::offline_output_node &output_node = engine.offline_output_node();
     audio::tap_node to_node;
     audio::tap_node from_node;
     auto const format = audio::format({.sample_rate = 48000.0, .channel_count = 2});
@@ -74,8 +75,9 @@ using namespace yas;
 
 - (void)test_render_without_lambda {
     audio::engine engine;
+    engine.add_offline_output_node();
 
-    audio::offline_output_node output_node;
+    audio::offline_output_node &output_node = engine.offline_output_node();
     audio::tap_node to_node;
     audio::tap_node from_node;
     auto const format = audio::format({.sample_rate = 48000.0, .channel_count = 2});
