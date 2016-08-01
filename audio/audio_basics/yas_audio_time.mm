@@ -13,18 +13,18 @@
 using namespace yas;
 
 struct audio::time::impl : base::impl {
-    objc_ptr<AVAudioTime *> av_audio_time;
+    objc_ptr<AVAudioTime *> _av_audio_time;
 
-    impl(objc_ptr<AVAudioTime *> &&time) : av_audio_time(std::move(time)) {
-        if (!av_audio_time) {
+    impl(objc_ptr<AVAudioTime *> &&time) : _av_audio_time(std::move(time)) {
+        if (!_av_audio_time) {
             throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is nil.");
         }
     }
 
     bool is_equal(std::shared_ptr<base::impl> const &rhs) const override {
         if (auto casted_rhs = std::dynamic_pointer_cast<impl>(rhs)) {
-            if (auto rhs_av_audio_time = casted_rhs->av_audio_time) {
-                return [av_audio_time.object() isEqual:rhs_av_audio_time.object()];
+            if (auto rhs_av_audio_time = casted_rhs->_av_audio_time) {
+                return [_av_audio_time.object() isEqual:rhs_av_audio_time.object()];
             }
         }
         return false;
@@ -54,33 +54,33 @@ audio::time::time(uint64_t const host_time, int64_t const sample_time, double co
 }
 
 bool audio::time::is_host_time_valid() const {
-    return impl_ptr<impl>()->av_audio_time.object().isHostTimeValid;
+    return impl_ptr<impl>()->_av_audio_time.object().isHostTimeValid;
 }
 
 uint64_t audio::time::host_time() const {
-    return impl_ptr<impl>()->av_audio_time.object().hostTime;
+    return impl_ptr<impl>()->_av_audio_time.object().hostTime;
 }
 
 bool audio::time::is_sample_time_valid() const {
-    return impl_ptr<impl>()->av_audio_time.object().isSampleTimeValid;
+    return impl_ptr<impl>()->_av_audio_time.object().isSampleTimeValid;
 }
 
 int64_t audio::time::sample_time() const {
-    return impl_ptr<impl>()->av_audio_time.object().sampleTime;
+    return impl_ptr<impl>()->_av_audio_time.object().sampleTime;
 }
 
 double audio::time::sample_rate() const {
-    return impl_ptr<impl>()->av_audio_time.object().sampleRate;
+    return impl_ptr<impl>()->_av_audio_time.object().sampleRate;
 }
 
 AudioTimeStamp audio::time::audio_time_stamp() const {
-    return impl_ptr<impl>()->av_audio_time.object().audioTimeStamp;
+    return impl_ptr<impl>()->_av_audio_time.object().audioTimeStamp;
 }
 
 audio::time audio::time::extrapolate_time_from_anchor(audio::time const &anchor_time) {
     return to_time([impl_ptr<impl>()
-                        ->av_audio_time.object()
-        extrapolateTimeFromAnchor:anchor_time.impl_ptr<impl>()->av_audio_time.object()]);
+                        ->_av_audio_time.object()
+        extrapolateTimeFromAnchor:anchor_time.impl_ptr<impl>()->_av_audio_time.object()]);
 }
 
 #pragma mark - global
