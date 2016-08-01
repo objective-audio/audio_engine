@@ -47,8 +47,8 @@ using namespace yas;
 }
 
 - (void)test_create_route_points {
-    audio::route::point const src_point(0, 1);
-    audio::route::point const dst_point(2, 3);
+    audio::route::point const src_point{.bus = 0, .channel = 1};
+    audio::route::point const dst_point{.bus = 2, .channel = 3};
 
     auto const route = audio::route(src_point, dst_point);
 
