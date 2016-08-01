@@ -88,8 +88,9 @@ namespace audio {
 
                 std::vector<device::property_info> property_infos;
                 for (uint32_t i = 0; i < address_count; i++) {
-                    property_infos.push_back(
-                        device::property_info{device::property::system, kAudioObjectSystemObject, addresses[i]});
+                    property_infos.push_back(device::property_info{.property = device::property::system,
+                                                                   .object_id = kAudioObjectSystemObject,
+                                                                   .address = addresses[i]});
                 }
                 auto &subject = device::system_subject();
                 device::change_info change_info{.property_infos = std::move(property_infos)};
@@ -152,11 +153,6 @@ namespace audio {
 }
 
 #pragma mark - property_info
-
-audio::device::property_info::property_info(device::property const property, AudioObjectID const object_id,
-                                            AudioObjectPropertyAddress const &address)
-    : property(property), object_id(object_id), address(address) {
-}
 
 bool audio::device::property_info::operator<(device::property_info const &info) const {
     if (property != info.property) {
@@ -245,16 +241,20 @@ struct audio::device::impl : base::impl {
                 std::vector<device::property_info> property_infos;
                 for (uint32_t i = 0; i < address_count; ++i) {
                     if (addresses[i].mSelector == kAudioDevicePropertyStreams) {
-                        property_infos.push_back(property_info(property::stream, object_id, addresses[i]));
+                        property_infos.emplace_back(property_info{
+                            .property = property::stream, .object_id = object_id, .address = addresses[i]});
                     } else if (addresses[i].mSelector == kAudioDevicePropertyStreamConfiguration) {
-                        property_infos.push_back(property_info(property::format, object_id, addresses[i]));
+                        property_infos.emplace_back(property_info{
+                            .property = property::format, .object_id = object_id, .address = addresses[i]});
                     } else if (addresses[i].mSelector == kAudioDevicePropertyNominalSampleRate) {
                         if (addresses[i].mScope == kAudioObjectPropertyScopeGlobal) {
                             AudioObjectPropertyAddress address = addresses[i];
                             address.mScope = kAudioObjectPropertyScopeOutput;
-                            property_infos.push_back(property_info(property::format, object_id, address));
+                            property_infos.emplace_back(property_info{
+                                .property = property::format, .object_id = object_id, .address = address});
                             address.mScope = kAudioObjectPropertyScopeInput;
-                            property_infos.push_back(property_info(property::format, object_id, address));
+                            property_infos.emplace_back(property_info{
+                                .property = property::format, .object_id = object_id, .address = address});
                         }
                     }
                 }
