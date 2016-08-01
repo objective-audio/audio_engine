@@ -17,8 +17,6 @@ namespace audio {
             uint32_t bus;
             uint32_t channel;
 
-            point(uint32_t const bus_idx, uint32_t const ch_idx);
-
             bool operator==(point const &) const;
             bool operator!=(point const &) const;
         };

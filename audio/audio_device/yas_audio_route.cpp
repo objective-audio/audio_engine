@@ -9,9 +9,6 @@
 
 using namespace yas;
 
-audio::route::point::point(uint32_t const bus_idx, uint32_t const ch_idx) : bus(bus_idx), channel(ch_idx) {
-}
-
 bool audio::route::point::operator==(point const &rhs) const {
     return bus == rhs.bus && channel == rhs.channel;
 }
@@ -22,11 +19,11 @@ bool audio::route::point::operator!=(point const &rhs) const {
 
 audio::route::route(uint32_t const src_bus_idx, uint32_t const src_ch_idx, uint32_t const dst_bus_idx,
                     uint32_t const dst_ch_idx)
-    : source(src_bus_idx, src_ch_idx), destination(dst_bus_idx, dst_ch_idx) {
+    : source({.bus = src_bus_idx, .channel = src_ch_idx}), destination({.bus = dst_bus_idx, .channel = dst_ch_idx}) {
 }
 
 audio::route::route(uint32_t const bus_idx, uint32_t const ch_idx)
-    : source(bus_idx, ch_idx), destination(bus_idx, ch_idx) {
+    : source({.bus = bus_idx, .channel = ch_idx}), destination({.bus = bus_idx, .channel = ch_idx}) {
 }
 
 audio::route::route(point const &src_point, point const &dst_point) : source(src_point), destination(dst_point) {
