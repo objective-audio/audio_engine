@@ -13,11 +13,6 @@ using namespace yas;
 
 #pragma mark - property_info
 
-audio::device::stream::property_info::property_info(stream::property const property, AudioObjectID const object_id,
-                                                    AudioObjectPropertyAddress const &address)
-    : property(property), object_id(object_id), address(address) {
-}
-
 bool audio::device::stream::property_info::operator<(property_info const &info) const {
     if (property != info.property) {
         return property < info.property;
@@ -74,11 +69,16 @@ struct audio::device::stream::impl : base::impl {
                 std::vector<property_info> infos;
                 for (uint32_t i = 0; i < address_count; i++) {
                     if (addresses[i].mSelector == kAudioStreamPropertyVirtualFormat) {
-                        infos.push_back(property_info(stream::property::virtual_format, object_id, addresses[i]));
+                        infos.emplace_back(property_info{.property = stream::property::virtual_format,
+                                                         .object_id = object_id,
+                                                         .address = addresses[i]});
                     } else if (addresses[i].mSelector == kAudioStreamPropertyIsActive) {
-                        infos.push_back(property_info(stream::property::is_active, object_id, addresses[i]));
+                        infos.emplace_back(property_info{
+                            .property = stream::property::is_active, .object_id = object_id, .address = addresses[i]});
                     } else if (addresses[i].mSelector == kAudioStreamPropertyStartingChannel) {
-                        infos.push_back(property_info(stream::property::starting_channel, object_id, addresses[i]));
+                        infos.emplace_back(property_info{.property = stream::property::starting_channel,
+                                                         .object_id = object_id,
+                                                         .address = addresses[i]});
                     }
                 }
                 change_info change_info{std::move(infos)};

@@ -29,9 +29,6 @@ namespace audio {
             stream::property const property;
             AudioObjectPropertyAddress const address;
 
-            property_info(stream::property const property, AudioObjectID const object_id,
-                          AudioObjectPropertyAddress const &address);
-
             bool operator<(property_info const &info) const;
         };
 
