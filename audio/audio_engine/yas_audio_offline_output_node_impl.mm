@@ -2,6 +2,7 @@
 //  yas_audio_offline_output_node_impl.mm
 //
 
+#include "yas_audio_node.h"
 #include "yas_audio_offline_output_node.h"
 #include "yas_audio_time.h"
 #include "yas_operation.h"
@@ -13,6 +14,7 @@ struct audio::offline_output_node::impl::core {
     using completion_function_map_t = std::map<uint8_t, offline_completion_f>;
 
     operation_queue queue;
+    audio::node _node = {{.input_bus_count = 1, .output_bus_count = 0}};
     audio::node::observer_t _reset_observer;
 
     core() : queue(nullptr), _completion_functions() {
@@ -52,17 +54,14 @@ struct audio::offline_output_node::impl::core {
     completion_function_map_t _completion_functions;
 };
 
-audio::offline_output_node::impl::impl()
-    : node::impl::impl(), _core(std::make_unique<audio::offline_output_node::impl::core>()) {
-    set_input_bus_count(1);
-    set_output_bus_count(0);
+audio::offline_output_node::impl::impl() : _core(std::make_unique<audio::offline_output_node::impl::core>()) {
 }
 
 audio::offline_output_node::impl::~impl() = default;
 
 void audio::offline_output_node::impl::prepare(offline_output_node const &node) {
-    _core->_reset_observer =
-        subject().make_observer(audio::node::method::will_reset, [weak_node = to_weak(node)](auto const &) {
+    _core->_reset_observer = _core->_node.subject().make_observer(
+        audio::node::method::will_reset, [weak_node = to_weak(node)](auto const &) {
             if (auto node = weak_node.lock()) {
                 node.impl_ptr<audio::offline_output_node::impl>()->_will_reset();
             }
@@ -77,7 +76,7 @@ audio::offline_start_result_t audio::offline_output_node::impl::start(offline_re
                                                                       offline_completion_f &&completion_func) {
     if (_core->queue) {
         return offline_start_result_t(offline_start_error_t::already_running);
-    } else if (auto connection = input_connection(0)) {
+    } else if (auto connection = _core->_node.impl_ptr<audio::node::impl>()->input_connection(0)) {
         std::experimental::optional<uint8_t> key;
         if (completion_func) {
             key = _core->push_completion_function(std::move(completion_func));
@@ -103,7 +102,7 @@ audio::offline_start_result_t audio::offline_output_node::impl::start(offline_re
                     break;
                 }
 
-                auto kernel = offline_node.impl_ptr<impl>()->kernel_cast();
+                auto kernel = offline_node.node().impl_ptr<audio::node::impl>()->kernel_cast();
                 if (!kernel) {
                     cancelled = true;
                     break;
@@ -185,4 +184,8 @@ void audio::offline_output_node::impl::stop() {
 
 bool audio::offline_output_node::impl::is_running() const {
     return _core->queue != nullptr;
+}
+
+audio::node &audio::offline_output_node::impl::node() {
+    return _core->_node;
 }

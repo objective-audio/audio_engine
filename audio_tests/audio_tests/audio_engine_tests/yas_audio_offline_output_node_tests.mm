@@ -39,13 +39,15 @@ using namespace yas;
 - (void)test_offline_render_with_audio_engine {
     double const sample_rate = 44100.0;
 
-    auto format = audio::format({.sample_rate = sample_rate, .channel_count = 2});
     audio::engine engine;
-    audio::offline_output_node output_node;
+    engine.add_offline_output_node();
+
+    auto format = audio::format({.sample_rate = sample_rate, .channel_count = 2});
+    audio::offline_output_node &output_node = engine.offline_output_node();
     audio::unit_node sample_delay_node(kAudioUnitType_Effect, kAudioUnitSubType_SampleDelay);
     audio::tap_node tap_node;
 
-    engine.connect(sample_delay_node, output_node, format);
+    engine.connect(sample_delay_node, output_node.node(), format);
     engine.connect(tap_node, sample_delay_node, format);
 
     XCTestExpectation *tapNodeExpectation = [self expectationWithDescription:@"tap node render"];
@@ -134,10 +136,10 @@ using namespace yas;
     audio::offline_output_node output_node;
     audio::tap_node tap_node;
 
-    auto connection = test::connection(tap_node, 0, output_node, 0, format);
+    auto connection = test::connection(tap_node, 0, output_node.node(), 0, format);
 
-    output_node.connectable().add_connection(connection);
-    static_cast<audio::node>(output_node).manageable().update_kernel();
+    output_node.node().connectable().add_connection(connection);
+    output_node.node().manageable().update_kernel();
     tap_node.connectable().add_connection(connection);
     tap_node.manageable().update_kernel();
 
@@ -230,10 +232,10 @@ using namespace yas;
 }
 
 - (void)test_bus_count {
-    audio::offline_output_node node;
+    audio::offline_output_node output_node;
 
-    XCTAssertEqual(node.output_bus_count(), 0);
-    XCTAssertEqual(node.input_bus_count(), 1);
+    XCTAssertEqual(output_node.node().output_bus_count(), 0);
+    XCTAssertEqual(output_node.node().input_bus_count(), 1);
 }
 
 - (void)test_reset_to_stop {
@@ -241,10 +243,10 @@ using namespace yas;
     audio::offline_output_node output_node;
     audio::tap_node tap_node;
 
-    auto connection = test::connection(tap_node, 0, output_node, 0, format);
+    auto connection = test::connection(tap_node, 0, output_node.node(), 0, format);
 
-    output_node.connectable().add_connection(connection);
-    static_cast<audio::node>(output_node).manageable().update_kernel();
+    output_node.node().connectable().add_connection(connection);
+    output_node.node().manageable().update_kernel();
     tap_node.connectable().add_connection(connection);
     tap_node.manageable().update_kernel();
 
@@ -273,7 +275,7 @@ using namespace yas;
 
     future.get();
 
-    output_node.reset();
+    output_node.node().reset();
 
     [self waitForExpectationsWithTimeout:10.0
                                  handler:^(NSError *error){

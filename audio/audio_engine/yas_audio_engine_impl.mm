@@ -293,14 +293,6 @@ void audio::engine::impl::add_node_to_graph(node const &node) {
         }
         node.prepare_parameters();
     }
-
-    if (auto offline_output_node = yas::cast<audio::offline_output_node>(node)) {
-        if (_core->offline_output_node) {
-            throw std::runtime_error(std::string(__PRETTY_FUNCTION__) + " : offline_output_node is already attached.");
-        } else {
-            _core->offline_output_node = offline_output_node;
-        }
-    }
 }
 
 void audio::engine::impl::remove_node_from_graph(node const &node) {
@@ -311,12 +303,6 @@ void audio::engine::impl::remove_node_from_graph(node const &node) {
     if (auto unit_node = yas::cast<audio::unit_node>(node)) {
         if (auto unit = unit_node.audio_unit()) {
             _core->graph.remove_audio_unit(unit);
-        }
-    }
-
-    if (auto offline_output_node = yas::cast<audio::offline_output_node>(node)) {
-        if (offline_output_node == _core->offline_output_node) {
-            _core->offline_output_node = nullptr;
         }
     }
 }
@@ -375,11 +361,12 @@ void audio::engine::impl::update_all_node_connections() {
 }
 
 audio::connection_set audio::engine::impl::input_connections_for_destination_node(node const &node) const {
-    return filter(_core->connections, [node](auto const &connection) { return connection.destination_node() == node; });
+    return filter(_core->connections,
+                  [&node](auto const &connection) { return connection.destination_node() == node; });
 }
 
 audio::connection_set audio::engine::impl::output_connections_for_source_node(node const &node) const {
-    return filter(_core->connections, [node](auto const &connection) { return connection.source_node() == node; });
+    return filter(_core->connections, [&node](auto const &connection) { return connection.source_node() == node; });
 }
 
 void audio::engine::impl::set_graph(audio::graph const &graph) {
@@ -420,7 +407,11 @@ audio::connection_set &audio::engine::impl::connections() const {
     return _core->connections;
 }
 
-audio::offline_output_node &audio::engine::impl::offline_output_node() const {
+void audio::engine::impl::set_offline_output_node(audio::offline_output_node &&offline_output_node) {
+    _core->offline_output_node = std::move(offline_output_node);
+}
+
+audio::offline_output_node &audio::engine::impl::offline_output_node() {
     return _core->offline_output_node;
 }
 

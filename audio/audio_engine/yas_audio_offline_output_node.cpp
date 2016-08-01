@@ -8,14 +8,14 @@ using namespace yas;
 
 #pragma mark - main
 
-audio::offline_output_node::offline_output_node() : node(std::make_unique<impl>()) {
+audio::offline_output_node::offline_output_node() : base(std::make_unique<impl>()) {
     impl_ptr<impl>()->prepare(*this);
 }
 
-audio::offline_output_node::offline_output_node(std::nullptr_t) : node(nullptr) {
+audio::offline_output_node::offline_output_node(std::nullptr_t) : base(nullptr) {
 }
 
-audio::offline_output_node::offline_output_node(std::shared_ptr<impl> const &imp) : node(imp) {
+audio::offline_output_node::offline_output_node(std::shared_ptr<impl> const &imp) : base(imp) {
     impl_ptr<impl>()->prepare(*this);
 }
 
@@ -23,6 +23,13 @@ audio::offline_output_node::~offline_output_node() = default;
 
 bool audio::offline_output_node::is_running() const {
     return impl_ptr<impl>()->is_running();
+}
+
+audio::node const &audio::offline_output_node::node() const {
+    return impl_ptr<impl>()->node();
+}
+audio::node &audio::offline_output_node::node() {
+    return impl_ptr<impl>()->node();
 }
 
 audio::manageable_offline_output_unit &audio::offline_output_node::manageable() {

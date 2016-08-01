@@ -60,7 +60,9 @@ namespace audio {
 
         std::unordered_set<audio::node> &nodes() const override;
         audio::connection_set &connections() const override;
-        audio::offline_output_node &offline_output_node() const;
+
+        void set_offline_output_node(audio::offline_output_node &&);
+        audio::offline_output_node &offline_output_node();
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
         void set_device_io_node(audio::device_io_node &&);

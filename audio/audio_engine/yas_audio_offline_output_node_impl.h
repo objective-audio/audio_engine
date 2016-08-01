@@ -6,7 +6,7 @@
 
 namespace yas {
 namespace audio {
-    struct offline_output_node::impl : node::impl, manageable_offline_output_unit::impl {
+    struct offline_output_node::impl : base::impl, manageable_offline_output_unit::impl {
         impl();
         ~impl();
 
@@ -18,6 +18,8 @@ namespace audio {
         void _will_reset();
 
         bool is_running() const;
+
+        audio::node &node();
 
        private:
         class core;

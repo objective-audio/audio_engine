@@ -73,13 +73,14 @@ using namespace yas;
 
 - (void)test_render {
     audio::engine engine;
+    engine.add_offline_output_node();
 
     auto format = audio::format({.sample_rate = 44100.0, .channel_count = 2});
-    audio::offline_output_node output_node;
+    audio::offline_output_node &output_node = engine.offline_output_node();
     audio::route_node route_node;
     audio::tap_node tap_node;
 
-    engine.connect(route_node, output_node, format);
+    engine.connect(route_node, output_node.node(), format);
     engine.connect(tap_node, route_node, format);
 
     bool tap_node_called = false;
@@ -146,13 +147,14 @@ using namespace yas;
     auto const src_count = 2;
 
     audio::engine engine;
+    engine.add_offline_output_node();
 
     auto dst_format = audio::format({.sample_rate = 44100.0, .channel_count = 2});
     auto src_format = audio::format({.sample_rate = 44100.0, .channel_count = 1});
-    audio::offline_output_node output_node;
+    audio::offline_output_node &output_node = engine.offline_output_node();
     audio::route_node route_node;
 
-    engine.connect(route_node, output_node, dst_format);
+    engine.connect(route_node, output_node.node(), dst_format);
 
     bool tap_node_calleds[src_count];
     for (auto &tap_node_called : tap_node_calleds) {
@@ -212,13 +214,14 @@ using namespace yas;
     auto const src_count = 2;
 
     audio::engine engine;
+    engine.add_offline_output_node();
 
     auto dst_format = audio::format({.sample_rate = 44100.0, .channel_count = 4});
     auto src_format = audio::format({.sample_rate = 44100.0, .channel_count = 2});
-    audio::offline_output_node output_node;
+    audio::offline_output_node &output_node = engine.offline_output_node();
     audio::route_node route_node;
 
-    engine.connect(route_node, output_node, dst_format);
+    engine.connect(route_node, output_node.node(), dst_format);
 
     bool tap_node_calleds[src_count];
     for (auto &tap_node_called : tap_node_calleds) {
