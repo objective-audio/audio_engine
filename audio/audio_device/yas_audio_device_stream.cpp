@@ -45,17 +45,16 @@ struct audio::device::stream::impl : base::impl {
         std::function<void(uint32_t const in_number_addresses, const AudioObjectPropertyAddress *const in_addresses)>;
 
    public:
-    AudioStreamID stream_id;
-    AudioDeviceID device_id;
-    subject_t subject;
+    AudioStreamID _stream_id;
+    AudioDeviceID _device_id;
+    subject_t _subject;
 
-    impl(AudioStreamID const stream_id, AudioDeviceID const device_id)
-        : stream_id(stream_id), device_id(device_id), subject() {
+    impl(AudioStreamID const stream_id, AudioDeviceID const device_id) : _stream_id(stream_id), _device_id(device_id) {
     }
 
     bool is_equal(std::shared_ptr<base::impl> const &rhs) const override {
         if (auto casted_rhs = std::dynamic_pointer_cast<audio::device::stream::impl>(rhs)) {
-            return stream_id == casted_rhs->stream_id;
+            return _stream_id == casted_rhs->_stream_id;
         }
         return false;
     }
@@ -93,7 +92,7 @@ struct audio::device::stream::impl : base::impl {
                                                     .mElement = kAudioObjectPropertyElementMaster};
 
         raise_if_au_error(
-            AudioObjectAddPropertyListenerBlock(stream_id, &address, dispatch_get_main_queue(),
+            AudioObjectAddPropertyListenerBlock(_stream_id, &address, dispatch_get_main_queue(),
                                                 ^(uint32_t address_count, const AudioObjectPropertyAddress *addresses) {
                                                     function(address_count, addresses);
                                                 }));
@@ -114,11 +113,11 @@ audio::device::stream::stream(std::nullptr_t) : base(nullptr) {
 }
 
 AudioStreamID audio::device::stream::stream_id() const {
-    return impl_ptr<impl>()->stream_id;
+    return impl_ptr<impl>()->_stream_id;
 }
 
 audio::device audio::device::stream::device() const {
-    return device::device_for_id(impl_ptr<impl>()->device_id);
+    return device::device_for_id(impl_ptr<impl>()->_device_id);
 }
 
 bool audio::device::stream::is_active() const {
@@ -156,7 +155,7 @@ uint32_t audio::device::stream::starting_channel() const {
 }
 
 audio::device::stream::subject_t &audio::device::stream::subject() const {
-    return impl_ptr<impl>()->subject;
+    return impl_ptr<impl>()->_subject;
 }
 
 std::string yas::to_string(audio::device::stream::method const &method) {
