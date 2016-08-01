@@ -16,10 +16,10 @@ using namespace yas;
 #pragma mark -
 
 struct audio::file::impl : base::impl {
-    format file_format = nullptr;
-    format processing_format = nullptr;
-    SInt64 file_frame_position = 0;
-    ExtAudioFileRef ext_audio_file = nullptr;
+    format _file_format = nullptr;
+    format _processing_format = nullptr;
+    SInt64 _file_frame_position = 0;
+    ExtAudioFileRef _ext_audio_file = nullptr;
 
     impl() : _url(nullptr), _file_type(nullptr) {
     }
@@ -47,15 +47,15 @@ struct audio::file::impl : base::impl {
     }
 
     void set_processing_format(audio::format &&format) {
-        processing_format = std::move(format);
-        if (ext_audio_file) {
-            ext_audio_file_utils::set_client_format(processing_format.stream_description(), ext_audio_file);
+        _processing_format = std::move(format);
+        if (_ext_audio_file) {
+            ext_audio_file_utils::set_client_format(_processing_format.stream_description(), _ext_audio_file);
         }
     }
 
     int64_t file_length() {
-        if (ext_audio_file) {
-            return ext_audio_file_utils::get_file_length_frames(ext_audio_file);
+        if (_ext_audio_file) {
+            return ext_audio_file_utils::get_file_length_frames(_ext_audio_file);
         }
         return 0;
     }
@@ -63,21 +63,21 @@ struct audio::file::impl : base::impl {
     int64_t processing_length() {
         auto const fileLength = file_length();
         auto const rate =
-            processing_format.stream_description().mSampleRate / file_format.stream_description().mSampleRate;
+            _processing_format.stream_description().mSampleRate / _file_format.stream_description().mSampleRate;
         return fileLength * rate;
     }
 
     void set_file_frame_position(uint32_t const position) {
-        if (file_frame_position != position) {
-            OSStatus err = ExtAudioFileSeek(ext_audio_file, position);
+        if (_file_frame_position != position) {
+            OSStatus err = ExtAudioFileSeek(_ext_audio_file, position);
             if (err == noErr) {
-                file_frame_position = position;
+                _file_frame_position = position;
             }
         }
     }
 
     open_result_t open(open_args &&args) {
-        if (ext_audio_file) {
+        if (_ext_audio_file) {
             return open_result_t(open_error_t::opened);
         }
 
@@ -95,7 +95,7 @@ struct audio::file::impl : base::impl {
     }
 
     create_result_t create(create_args &&args) {
-        if (ext_audio_file) {
+        if (_ext_audio_file) {
             return create_result_t(create_error_t::created);
         }
 
@@ -114,18 +114,18 @@ struct audio::file::impl : base::impl {
     }
 
     void close() {
-        if (ext_audio_file) {
-            ext_audio_file_utils::dispose(ext_audio_file);
-            ext_audio_file = nullptr;
+        if (_ext_audio_file) {
+            ext_audio_file_utils::dispose(_ext_audio_file);
+            _ext_audio_file = nullptr;
         }
     }
 
     bool is_opened() const {
-        return ext_audio_file != nullptr;
+        return _ext_audio_file != nullptr;
     }
 
     read_result_t read_into_buffer(audio::pcm_buffer &buffer, uint32_t const frame_length) {
-        if (!ext_audio_file) {
+        if (!_ext_audio_file) {
             return read_result_t(read_error_t::closed);
         }
 
@@ -133,7 +133,7 @@ struct audio::file::impl : base::impl {
             return read_result_t(read_error_t::invalid_argument);
         }
 
-        if (buffer.format() != processing_format) {
+        if (buffer.format() != _processing_format) {
             return read_result_t(read_error_t::invalid_format);
         }
 
@@ -163,7 +163,7 @@ struct audio::file::impl : base::impl {
 
                 UInt32 io_frames = remain_frames;
 
-                err = ExtAudioFileRead(ext_audio_file, &io_frames, io_abl);
+                err = ExtAudioFileRead(_ext_audio_file, &io_frames, io_abl);
                 if (err != noErr) {
                     break;
                 }
@@ -181,7 +181,7 @@ struct audio::file::impl : base::impl {
         if (err != noErr) {
             return read_result_t(read_error_t::read_failed);
         } else {
-            err = ExtAudioFileTell(ext_audio_file, &file_frame_position);
+            err = ExtAudioFileTell(_ext_audio_file, &_file_frame_position);
             if (err != noErr) {
                 return read_result_t(read_error_t::tell_failed);
             }
@@ -191,7 +191,7 @@ struct audio::file::impl : base::impl {
     }
 
     write_result_t write_from_buffer(audio::pcm_buffer const &buffer, bool const async) {
-        if (!ext_audio_file) {
+        if (!_ext_audio_file) {
             return write_result_t(write_error_t::closed);
         }
 
@@ -199,22 +199,22 @@ struct audio::file::impl : base::impl {
             return write_result_t(write_error_t::invalid_argument);
         }
 
-        if (buffer.format() != processing_format) {
+        if (buffer.format() != _processing_format) {
             return write_result_t(write_error_t::invalid_format);
         }
 
         OSStatus err = noErr;
 
         if (async) {
-            err = ExtAudioFileWriteAsync(ext_audio_file, buffer.frame_length(), buffer.audio_buffer_list());
+            err = ExtAudioFileWriteAsync(_ext_audio_file, buffer.frame_length(), buffer.audio_buffer_list());
         } else {
-            err = ExtAudioFileWrite(ext_audio_file, buffer.frame_length(), buffer.audio_buffer_list());
+            err = ExtAudioFileWrite(_ext_audio_file, buffer.frame_length(), buffer.audio_buffer_list());
         }
 
         if (err != noErr) {
             return write_result_t(write_error_t::write_failed);
         } else {
-            err = ExtAudioFileTell(ext_audio_file, &file_frame_position);
+            err = ExtAudioFileTell(_ext_audio_file, &_file_frame_position);
             if (err != noErr) {
                 return write_result_t(write_error_t::tell_failed);
             }
@@ -229,32 +229,32 @@ struct audio::file::impl : base::impl {
             return false;
         }
 
-        if (!ext_audio_file_utils::open(&ext_audio_file, url())) {
-            ext_audio_file = nullptr;
+        if (!ext_audio_file_utils::open(&_ext_audio_file, url())) {
+            _ext_audio_file = nullptr;
             return false;
         };
 
         AudioStreamBasicDescription asbd;
-        if (!ext_audio_file_utils::get_audio_file_format(&asbd, ext_audio_file)) {
+        if (!ext_audio_file_utils::get_audio_file_format(&asbd, _ext_audio_file)) {
             close();
             return false;
         }
 
-        AudioFileTypeID file_type_id = ext_audio_file_utils::get_audio_file_type_id(ext_audio_file);
+        AudioFileTypeID file_type_id = ext_audio_file_utils::get_audio_file_type_id(_ext_audio_file);
         set_file_type(to_file_type(file_type_id));
         if (!file_type()) {
             close();
             return false;
         }
 
-        file_format = format{asbd};
+        _file_format = format{asbd};
 
-        processing_format = format{{.sample_rate = file_format.sample_rate(),
-                                    .channel_count = file_format.channel_count(),
-                                    .pcm_format = pcm_format,
-                                    .interleaved = interleaved}};
+        _processing_format = format{{.sample_rate = _file_format.sample_rate(),
+                                     .channel_count = _file_format.channel_count(),
+                                     .pcm_format = pcm_format,
+                                     .interleaved = interleaved}};
 
-        if (!ext_audio_file_utils::set_client_format(processing_format.stream_description(), ext_audio_file)) {
+        if (!ext_audio_file_utils::set_client_format(_processing_format.stream_description(), _ext_audio_file)) {
             close();
             return false;
         }
@@ -263,24 +263,24 @@ struct audio::file::impl : base::impl {
     }
 
     bool _create_ext_audio_file(CFDictionaryRef const &settings, pcm_format const pcm_format, bool const interleaved) {
-        file_format = format{settings};
+        _file_format = format{settings};
 
         AudioFileTypeID file_type_id = to_audio_file_type_id(file_type());
         if (!file_type_id) {
             return false;
         }
 
-        if (!ext_audio_file_utils::create(&ext_audio_file, url(), file_type_id, file_format.stream_description())) {
-            ext_audio_file = nullptr;
+        if (!ext_audio_file_utils::create(&_ext_audio_file, url(), file_type_id, _file_format.stream_description())) {
+            _ext_audio_file = nullptr;
             return false;
         }
 
-        processing_format = format{{.sample_rate = file_format.sample_rate(),
-                                    .channel_count = file_format.channel_count(),
-                                    .pcm_format = pcm_format,
-                                    .interleaved = interleaved}};
+        _processing_format = format{{.sample_rate = _file_format.sample_rate(),
+                                     .channel_count = _file_format.channel_count(),
+                                     .pcm_format = pcm_format,
+                                     .interleaved = interleaved}};
 
-        if (!ext_audio_file_utils::set_client_format(processing_format.stream_description(), ext_audio_file)) {
+        if (!ext_audio_file_utils::set_client_format(_processing_format.stream_description(), _ext_audio_file)) {
             close();
             return false;
         }
@@ -323,11 +323,11 @@ CFStringRef audio::file::file_type() const {
 }
 
 audio::format const &audio::file::file_format() const {
-    return impl_ptr<impl>()->file_format;
+    return impl_ptr<impl>()->_file_format;
 }
 
 audio::format const &audio::file::processing_format() const {
-    return impl_ptr<impl>()->processing_format;
+    return impl_ptr<impl>()->_processing_format;
 }
 
 int64_t audio::file::file_length() const {
@@ -339,7 +339,7 @@ int64_t audio::file::processing_length() const {
 }
 
 int64_t audio::file::file_frame_position() const {
-    return impl_ptr<impl>()->file_frame_position;
+    return impl_ptr<impl>()->_file_frame_position;
 }
 
 void audio::file::set_processing_format(audio::format format) {
