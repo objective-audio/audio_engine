@@ -4,12 +4,14 @@
 
 #pragma once
 
-#include "yas_audio_node.h"
 #include "yas_audio_route.h"
+#include "yas_base.h"
 
 namespace yas {
 namespace audio {
-    class route_node : public node {
+    class node;
+
+    class route_node : public base {
         class kernel;
         class impl;
 
@@ -24,6 +26,9 @@ namespace audio {
         void remove_route_for_destination(audio::route::point const &);
         void set_routes(audio::route_set_t routes);
         void clear_routes();
+
+        audio::node const &node() const;
+        audio::node &node();
     };
 }
 }

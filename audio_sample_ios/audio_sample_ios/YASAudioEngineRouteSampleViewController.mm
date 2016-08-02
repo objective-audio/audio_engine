@@ -43,7 +43,7 @@ namespace sample {
 
         void disconnectNodes() {
             engine.disconnect(mixer_node);
-            engine.disconnect(route_node);
+            engine.disconnect(route_node.node());
             engine.disconnect(sine_node);
             engine.disconnect(io_node);
         }
@@ -54,9 +54,9 @@ namespace sample {
             auto const format = audio::format({.sample_rate = sample_rate, .channel_count = 2});
 
             engine.connect(mixer_node, io_node, format);
-            engine.connect(route_node, mixer_node, format);
-            engine.connect(sine_node, route_node, 0, YASAudioEngineRouteSampleSourceIndexSine, format);
-            engine.connect(io_node, route_node, 1, YASAudioEngineRouteSampleSourceIndexInput, format);
+            engine.connect(route_node.node(), mixer_node, format);
+            engine.connect(sine_node, route_node.node(), 0, YASAudioEngineRouteSampleSourceIndexSine, format);
+            engine.connect(io_node, route_node.node(), 1, YASAudioEngineRouteSampleSourceIndexInput, format);
         }
     };
 }

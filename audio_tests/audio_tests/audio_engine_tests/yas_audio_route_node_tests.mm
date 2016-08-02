@@ -80,8 +80,8 @@ using namespace yas;
     audio::route_node route_node;
     audio::tap_node tap_node;
 
-    engine.connect(route_node, output_node.node(), format);
-    engine.connect(tap_node, route_node, format);
+    engine.connect(route_node.node(), output_node.node(), format);
+    engine.connect(tap_node, route_node.node(), format);
 
     bool tap_node_called = false;
     tap_node.set_render_function(
@@ -154,7 +154,7 @@ using namespace yas;
     audio::offline_output_node &output_node = engine.offline_output_node();
     audio::route_node route_node;
 
-    engine.connect(route_node, output_node.node(), dst_format);
+    engine.connect(route_node.node(), output_node.node(), dst_format);
 
     bool tap_node_calleds[src_count];
     for (auto &tap_node_called : tap_node_calleds) {
@@ -166,7 +166,7 @@ using namespace yas;
         tap_nodes.push_back(audio::tap_node{});
         auto &tap_node = tap_nodes.at(i);
 
-        engine.connect(tap_node, route_node, 0, i, src_format);
+        engine.connect(tap_node, route_node.node(), 0, i, src_format);
 
         auto &tap_node_called = tap_node_calleds[i];
         tap_node.set_render_function([&tap_node_called](auto const &buffer, bool const bus_idx, auto const &when) {
@@ -221,7 +221,7 @@ using namespace yas;
     audio::offline_output_node &output_node = engine.offline_output_node();
     audio::route_node route_node;
 
-    engine.connect(route_node, output_node.node(), dst_format);
+    engine.connect(route_node.node(), output_node.node(), dst_format);
 
     bool tap_node_calleds[src_count];
     for (auto &tap_node_called : tap_node_calleds) {
@@ -233,7 +233,7 @@ using namespace yas;
         tap_nodes.push_back(audio::tap_node{});
         auto &tap_node = tap_nodes.at(i);
 
-        engine.connect(tap_node, route_node, 0, i, src_format);
+        engine.connect(tap_node, route_node.node(), 0, i, src_format);
 
         auto &tap_node_called = tap_node_calleds[i];
         tap_node.set_render_function([&tap_node_called](auto const &buffer, bool const bus_idx, auto const &when) {
