@@ -48,6 +48,7 @@ namespace audio {
         struct args {
             uint32_t input_bus_count = 0;
             uint32_t output_bus_count = 0;
+            bool input_renderable = false;
         };
 
         node(args const);
@@ -66,6 +67,7 @@ namespace audio {
 
         uint32_t input_bus_count() const;
         uint32_t output_bus_count() const;
+        bool is_input_renderable() const;
 
         void set_make_kernel_handler(make_kernel_f);
         void set_render_handler(render_f);

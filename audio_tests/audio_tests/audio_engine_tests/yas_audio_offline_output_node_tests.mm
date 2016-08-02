@@ -48,7 +48,7 @@ using namespace yas;
     audio::tap_node tap_node;
 
     engine.connect(sample_delay_node, output_node.node(), format);
-    engine.connect(tap_node, sample_delay_node, format);
+    engine.connect(tap_node.node(), sample_delay_node, format);
 
     XCTestExpectation *tapNodeExpectation = [self expectationWithDescription:@"tap node render"];
 
@@ -136,12 +136,12 @@ using namespace yas;
     audio::offline_output_node output_node;
     audio::tap_node tap_node;
 
-    auto connection = test::connection(tap_node, 0, output_node.node(), 0, format);
+    auto connection = test::connection(tap_node.node(), 0, output_node.node(), 0, format);
 
     output_node.node().connectable().add_connection(connection);
     output_node.node().manageable().update_kernel();
-    tap_node.connectable().add_connection(connection);
-    tap_node.manageable().update_kernel();
+    tap_node.node().connectable().add_connection(connection);
+    tap_node.node().manageable().update_kernel();
 
     XCTestExpectation *tapNodeExpectation = [self expectationWithDescription:@"tap node render"];
 
@@ -243,12 +243,12 @@ using namespace yas;
     audio::offline_output_node output_node;
     audio::tap_node tap_node;
 
-    auto connection = test::connection(tap_node, 0, output_node.node(), 0, format);
+    auto connection = test::connection(tap_node.node(), 0, output_node.node(), 0, format);
 
     output_node.node().connectable().add_connection(connection);
     output_node.node().manageable().update_kernel();
-    tap_node.connectable().add_connection(connection);
-    tap_node.manageable().update_kernel();
+    tap_node.node().connectable().add_connection(connection);
+    tap_node.node().manageable().update_kernel();
 
     auto promise = std::make_shared<std::promise<void>>();
     auto future = promise->get_future();

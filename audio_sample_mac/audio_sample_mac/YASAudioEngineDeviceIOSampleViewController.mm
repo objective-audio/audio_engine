@@ -258,7 +258,7 @@ namespace sample {
     self.inputRoutes = nil;
 
     if (_internal.engine) {
-        _internal.engine.disconnect(_internal.tap_node);
+        _internal.engine.disconnect(_internal.tap_node.node());
         _internal.engine.disconnect(_internal.route_node.node());
         _internal.route_node.clear_routes();
 
@@ -267,7 +267,7 @@ namespace sample {
                 auto const output_format = device.output_format();
                 _internal.engine.connect(_internal.route_node.node(), _internal.engine.device_io_node().node(),
                                          output_format);
-                _internal.engine.connect(_internal.tap_node, _internal.route_node.node(), 0,
+                _internal.engine.connect(_internal.tap_node.node(), _internal.route_node.node(), 0,
                                          YASAudioDeviceRouteSampleSourceBusSine, output_format);
             }
 

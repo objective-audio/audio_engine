@@ -6,14 +6,14 @@
 
 using namespace yas;
 
-audio::tap_node::tap_node() : node(std::make_unique<impl>()) {
+audio::tap_node::tap_node() : base(std::make_unique<impl>()) {
     impl_ptr<impl>()->prepare(*this);
 }
 
-audio::tap_node::tap_node(std::nullptr_t) : node(nullptr) {
+audio::tap_node::tap_node(std::nullptr_t) : base(nullptr) {
 }
 
-audio::tap_node::tap_node(std::shared_ptr<impl> const &imp) : node(imp) {
+audio::tap_node::tap_node(std::shared_ptr<impl> const &imp) : base(imp) {
     impl_ptr<impl>()->prepare(*this);
 }
 
@@ -21,6 +21,14 @@ audio::tap_node::~tap_node() = default;
 
 void audio::tap_node::set_render_function(render_f func) {
     impl_ptr<impl>()->set_render_function(std::move(func));
+}
+
+audio::node const &audio::tap_node::node() const {
+    return impl_ptr<impl>()->node();
+}
+
+audio::node &audio::tap_node::node() {
+    return impl_ptr<impl>()->node();
 }
 
 audio::connection audio::tap_node::input_connection_on_render(uint32_t const bus_idx) const {
