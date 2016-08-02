@@ -2,6 +2,7 @@
 //  yas_audio_route_node.cpp
 //
 
+#include "yas_audio_node.h"
 #include "yas_audio_route_node.h"
 #include "yas_result.h"
 #include "yas_stl_utils.h"
@@ -32,8 +33,10 @@ struct audio::route_node::kernel : node::kernel {
 
 #pragma mark - impl
 
-struct audio::route_node::impl : node::impl {
+struct audio::route_node::impl : base::impl {
     struct core {
+        audio::node _node = {{.input_bus_count = std::numeric_limits<uint32_t>::max(),
+                              .output_bus_count = std::numeric_limits<uint32_t>::max()}};
         route_set_t routes;
         audio::node::observer_t _reset_observer;
         audio::node::kernel_observer_t _kernel_observer;
@@ -49,22 +52,22 @@ struct audio::route_node::impl : node::impl {
         }
     };
 
-    impl() : node::impl(), _core(std::make_unique<core>()) {
-        audio::node::impl::set_input_bus_count(std::numeric_limits<uint32_t>::max());
-        audio::node::impl::set_output_bus_count(std::numeric_limits<uint32_t>::max());
+    impl() : _core(std::make_unique<core>()) {
     }
 
     ~impl() = default;
 
     void prepare(audio::route_node const &node) {
-        set_make_kernel_handler([]() { return route_node::kernel{}; });
+        _core->_node.set_make_kernel_handler([]() { return route_node::kernel{}; });
 
         auto weak_node = to_weak(node);
 
-        audio::node::impl::set_render_handler(
+        _core->_node.set_render_handler(
             [weak_node](audio::pcm_buffer &dst_buffer, uint32_t const dst_bus_idx, audio::time const &when) {
                 if (auto node = weak_node.lock()) {
-                    if (auto kernel = node.impl_ptr<impl>()->kernel_cast<route_node::kernel>()) {
+                    if (auto kernel = node.impl_ptr<impl>()
+                                          ->_core->_node.impl_ptr<audio::node::impl>()
+                                          ->kernel_cast<route_node::kernel>()) {
                         auto const &routes = kernel.routes();
                         auto output_connection = kernel.output_connection(dst_bus_idx);
                         auto input_connections = kernel.input_connections();
@@ -88,14 +91,15 @@ struct audio::route_node::impl : node::impl {
                 }
             });
 
-        _core->_reset_observer = subject().make_observer(audio::node::method::will_reset, [weak_node](auto const &) {
-            if (auto node = weak_node.lock()) {
-                node.impl_ptr<audio::route_node::impl>()->_will_reset();
-            }
-        });
+        _core->_reset_observer =
+            _core->_node.subject().make_observer(audio::node::method::will_reset, [weak_node](auto const &) {
+                if (auto node = weak_node.lock()) {
+                    node.impl_ptr<audio::route_node::impl>()->_will_reset();
+                }
+            });
 
-        _core->_kernel_observer =
-            kernel_subject().make_observer(audio::node::kernel_method::did_prepare, [weak_node](auto const &context) {
+        _core->_kernel_observer = _core->_node.kernel_subject().make_observer(
+            audio::node::kernel_method::did_prepare, [weak_node](auto const &context) {
                 if (auto node = weak_node.lock()) {
                     node.impl_ptr<audio::route_node::impl>()->_did_prepare_kernel(context.value);
                 }
@@ -111,33 +115,37 @@ struct audio::route_node::impl : node::impl {
     void add_route(route &&route) {
         _core->erase_route_if_either_matched(route);
         _core->routes.insert(std::move(route));
-        update_kernel();
+        _core->_node.impl_ptr<audio::node::impl>()->update_kernel();
     }
 
     void remove_route(route const &route) {
         _core->routes.erase(route);
-        update_kernel();
+        _core->_node.impl_ptr<audio::node::impl>()->update_kernel();
     }
 
     void remove_route_for_source(route::point const &src_pt) {
         _core->erase_route_if([&src_pt](route const &route_of_set) { return route_of_set.source == src_pt; });
-        update_kernel();
+        _core->_node.impl_ptr<audio::node::impl>()->update_kernel();
     }
 
     void remove_route_for_destination(route::point const &dst_pt) {
         _core->erase_route_if([&dst_pt](route const &route_of_set) { return route_of_set.destination == dst_pt; });
-        update_kernel();
+        _core->_node.impl_ptr<audio::node::impl>()->update_kernel();
     }
 
     void set_routes(route_set_t &&routes) {
         _core->routes.clear();
         _core->routes = std::move(routes);
-        update_kernel();
+        _core->_node.impl_ptr<audio::node::impl>()->update_kernel();
     }
 
     void clear_routes() {
         _core->routes.clear();
-        update_kernel();
+        _core->_node.impl_ptr<audio::node::impl>()->update_kernel();
+    }
+
+    audio::node &node() {
+        return _core->_node;
     }
 
    private:
@@ -155,11 +163,11 @@ struct audio::route_node::impl : node::impl {
 
 #pragma mark - main
 
-audio::route_node::route_node() : node(std::make_unique<impl>()) {
+audio::route_node::route_node() : base(std::make_unique<impl>()) {
     impl_ptr<impl>()->prepare(*this);
 }
 
-audio::route_node::route_node(std::nullptr_t) : node(nullptr) {
+audio::route_node::route_node(std::nullptr_t) : base(nullptr) {
 }
 
 audio::route_set_t const &audio::route_node::routes() const {
@@ -188,4 +196,12 @@ void audio::route_node::set_routes(route_set_t routes) {
 
 void audio::route_node::clear_routes() {
     impl_ptr<impl>()->clear_routes();
+}
+
+audio::node const &audio::route_node::node() const {
+    return impl_ptr<impl>()->node();
+}
+
+audio::node &audio::route_node::node() {
+    return impl_ptr<impl>()->node();
 }
