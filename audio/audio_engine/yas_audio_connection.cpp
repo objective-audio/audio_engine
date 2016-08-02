@@ -9,16 +9,16 @@
 using namespace yas;
 
 struct audio::connection::impl : base::impl, node_removable::impl {
-    uint32_t source_bus;
-    uint32_t destination_bus;
-    audio::format format;
-    mutable std::recursive_mutex mutex;
+    uint32_t _source_bus;
+    uint32_t _destination_bus;
+    audio::format _format;
+    mutable std::recursive_mutex _mutex;
 
     impl(node const &source_node, uint32_t const source_bus, node const &destination_node,
          uint32_t const destination_bus, audio::format const &format)
-        : source_bus(source_bus),
-          destination_bus(destination_bus),
-          format(format),
+        : _source_bus(source_bus),
+          _destination_bus(destination_bus),
+          _format(format),
           _source_node(source_node),
           _destination_node(destination_node) {
     }
@@ -33,28 +33,28 @@ struct audio::connection::impl : base::impl, node_removable::impl {
     }
 
     node source_node() const {
-        std::lock_guard<std::recursive_mutex> lock(mutex);
+        std::lock_guard<std::recursive_mutex> lock(_mutex);
         return _source_node.lock();
     }
 
     node destination_node() const {
-        std::lock_guard<std::recursive_mutex> lock(mutex);
+        std::lock_guard<std::recursive_mutex> lock(_mutex);
         return _destination_node.lock();
     }
 
     void remove_nodes() {
-        std::lock_guard<std::recursive_mutex> lock(mutex);
+        std::lock_guard<std::recursive_mutex> lock(_mutex);
         _source_node.reset();
         _destination_node.reset();
     }
 
     void remove_source_node() {
-        std::lock_guard<std::recursive_mutex> lock(mutex);
+        std::lock_guard<std::recursive_mutex> lock(_mutex);
         _source_node.reset();
     }
 
     void remove_destination_node() {
-        std::lock_guard<std::recursive_mutex> lock(mutex);
+        std::lock_guard<std::recursive_mutex> lock(_mutex);
         _destination_node.reset();
     }
 
@@ -87,11 +87,11 @@ audio::connection::~connection() {
 }
 
 uint32_t audio::connection::source_bus() const {
-    return impl_ptr<impl>()->source_bus;
+    return impl_ptr<impl>()->_source_bus;
 }
 
 uint32_t audio::connection::destination_bus() const {
-    return impl_ptr<impl>()->destination_bus;
+    return impl_ptr<impl>()->_destination_bus;
 }
 
 audio::node audio::connection::source_node() const {
@@ -109,7 +109,7 @@ audio::node audio::connection::destination_node() const {
 }
 
 audio::format const &audio::connection::format() const {
-    return impl_ptr<impl>()->format;
+    return impl_ptr<impl>()->_format;
 }
 
 audio::node_removable &audio::connection::node_removable() {
