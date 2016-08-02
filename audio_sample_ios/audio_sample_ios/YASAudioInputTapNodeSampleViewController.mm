@@ -35,7 +35,7 @@ namespace sample {
         void prepare() {
             double const sample_rate = input_node.device_sample_rate();
             audio::format format{{.sample_rate = sample_rate, .channel_count = 2}};
-            engine.connect(input_node, input_tap_node, format);
+            engine.connect(input_node, input_tap_node.node(), format);
 
             input_tap_node.set_render_function([input_level = input_level, sample_rate](
                 audio::pcm_buffer & buffer, uint32_t const bus_idx, const audio::time &when) mutable {
