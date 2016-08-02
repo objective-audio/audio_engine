@@ -259,19 +259,20 @@ namespace sample {
 
     if (_internal.engine) {
         _internal.engine.disconnect(_internal.tap_node);
-        _internal.engine.disconnect(_internal.route_node);
+        _internal.engine.disconnect(_internal.route_node.node());
         _internal.route_node.clear_routes();
 
         if (auto const &device = _internal.engine.device_io_node().device()) {
             if (device.output_channel_count() > 0) {
                 auto const output_format = device.output_format();
-                _internal.engine.connect(_internal.route_node, _internal.engine.device_io_node().node(), output_format);
-                _internal.engine.connect(_internal.tap_node, _internal.route_node, 0,
+                _internal.engine.connect(_internal.route_node.node(), _internal.engine.device_io_node().node(),
+                                         output_format);
+                _internal.engine.connect(_internal.tap_node, _internal.route_node.node(), 0,
                                          YASAudioDeviceRouteSampleSourceBusSine, output_format);
             }
 
             if (device.input_channel_count() > 0) {
-                _internal.engine.connect(_internal.engine.device_io_node().node(), _internal.route_node, 0,
+                _internal.engine.connect(_internal.engine.device_io_node().node(), _internal.route_node.node(), 0,
                                          YASAudioDeviceRouteSampleSourceBusInput, device.input_format());
             }
         }
