@@ -18,7 +18,7 @@ using namespace yas;
 
 struct audio::device_io_node::impl::core {
     audio::node _node = {{.input_bus_count = 1, .output_bus_count = 1}};
-    audio::device_io device_io = nullptr;
+    audio::device_io _device_io = nullptr;
     audio::node::observer_t _connections_observer;
 
     core() {
@@ -28,8 +28,8 @@ struct audio::device_io_node::impl::core {
 
     void set_device(audio::device const &device) {
         _device = device;
-        if (device_io) {
-            device_io.set_device(device);
+        if (_device_io) {
+            _device_io.set_device(device);
         }
     }
 
@@ -54,7 +54,7 @@ void audio::device_io_node::impl::prepare(device_io_node const &device_io_node, 
     _core->_node.set_render_handler(
         [weak_node](audio::pcm_buffer &buffer, uint32_t const bus_idx, audio::time const &when) {
             if (auto device_io_node = weak_node.lock()) {
-                if (auto const &device_io = device_io_node.impl_ptr<impl>()->_core->device_io) {
+                if (auto const &device_io = device_io_node.impl_ptr<impl>()->_core->_device_io) {
                     auto &input_buffer = device_io.input_buffer_on_render();
                     if (input_buffer && input_buffer.format() == buffer.format()) {
                         buffer.copy_from(input_buffer);
@@ -73,7 +73,7 @@ void audio::device_io_node::impl::prepare(device_io_node const &device_io_node, 
 
 #warning todo update_connectionsにリネームしたい
 void audio::device_io_node::impl::update_device_io_connections() {
-    auto &device_io = _core->device_io;
+    auto &device_io = _core->_device_io;
     if (!device_io) {
         return;
     }
@@ -127,7 +127,7 @@ void audio::device_io_node::impl::update_device_io_connections() {
 }
 
 bool audio::device_io_node::impl::_validate_connections() const {
-    if (auto const &device_io = _core->device_io) {
+    if (auto const &device_io = _core->_device_io) {
         auto &input_connections = node().impl_ptr<audio::node::impl>()->input_connections();
         if (input_connections.size() > 0) {
             auto const connections = lock_values(input_connections);
@@ -161,15 +161,15 @@ bool audio::device_io_node::impl::_validate_connections() const {
 }
 
 void audio::device_io_node::impl::add_device_io() {
-    _core->device_io = audio::device_io{_core->device()};
+    _core->_device_io = audio::device_io{_core->device()};
 }
 
 void audio::device_io_node::impl::remove_device_io() {
-    _core->device_io = nullptr;
+    _core->_device_io = nullptr;
 }
 
 audio::device_io &audio::device_io_node::impl::device_io() const {
-    return _core->device_io;
+    return _core->_device_io;
 }
 
 void audio::device_io_node::impl::set_device(audio::device const &device) {
