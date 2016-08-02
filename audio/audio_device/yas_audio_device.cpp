@@ -88,8 +88,9 @@ namespace audio {
 
                 std::vector<device::property_info> property_infos;
                 for (uint32_t i = 0; i < address_count; i++) {
-                    property_infos.push_back(
-                        device::property_info{device::property::system, kAudioObjectSystemObject, addresses[i]});
+                    property_infos.push_back(device::property_info{.property = device::property::system,
+                                                                   .object_id = kAudioObjectSystemObject,
+                                                                   .address = addresses[i]});
                 }
                 auto &subject = device::system_subject();
                 device::change_info change_info{.property_infos = std::move(property_infos)};
@@ -153,11 +154,6 @@ namespace audio {
 
 #pragma mark - property_info
 
-audio::device::property_info::property_info(device::property const property, AudioObjectID const object_id,
-                                            AudioObjectPropertyAddress const &address)
-    : property(property), object_id(object_id), address(address) {
-}
-
 bool audio::device::property_info::operator<(device::property_info const &info) const {
     if (property != info.property) {
         return property < info.property;
@@ -181,19 +177,12 @@ bool audio::device::property_info::operator<(device::property_info const &info) 
 #pragma mark - private
 
 struct audio::device::impl : base::impl {
-    AudioDeviceID const audio_device_id;
+    AudioDeviceID const _audio_device_id;
     std::unordered_map<AudioStreamID, stream> input_streams_map;
     std::unordered_map<AudioStreamID, stream> output_streams_map;
-    subject_t subject;
+    subject_t _subject;
 
-    impl(AudioDeviceID device_id)
-        : _input_format(nullptr),
-          _output_format(nullptr),
-          _mutex(),
-          audio_device_id(device_id),
-          input_streams_map(),
-          output_streams_map(),
-          subject() {
+    impl(AudioDeviceID device_id) : _input_format(nullptr), _output_format(nullptr), _audio_device_id(device_id) {
         udpate_streams(kAudioObjectPropertyScopeInput);
         udpate_streams(kAudioObjectPropertyScopeOutput);
         update_format(kAudioObjectPropertyScopeInput);
@@ -209,7 +198,7 @@ struct audio::device::impl : base::impl {
 
     bool is_equal(std::shared_ptr<base::impl> const &rhs) const override {
         if (auto casted_rhs = std::dynamic_pointer_cast<audio::device::impl>(rhs)) {
-            return audio_device_id == casted_rhs->audio_device_id;
+            return _audio_device_id == casted_rhs->_audio_device_id;
         }
         return false;
     }
@@ -235,7 +224,7 @@ struct audio::device::impl : base::impl {
     }
 
     listener_f _listener() {
-        AudioDeviceID const device_id = audio_device_id;
+        AudioDeviceID const device_id = _audio_device_id;
 
         return [device_id](uint32_t const address_count, const AudioObjectPropertyAddress *const addresses) {
             auto device = device::device_for_id(device_id);
@@ -245,16 +234,20 @@ struct audio::device::impl : base::impl {
                 std::vector<device::property_info> property_infos;
                 for (uint32_t i = 0; i < address_count; ++i) {
                     if (addresses[i].mSelector == kAudioDevicePropertyStreams) {
-                        property_infos.push_back(property_info(property::stream, object_id, addresses[i]));
+                        property_infos.emplace_back(property_info{
+                            .property = property::stream, .object_id = object_id, .address = addresses[i]});
                     } else if (addresses[i].mSelector == kAudioDevicePropertyStreamConfiguration) {
-                        property_infos.push_back(property_info(property::format, object_id, addresses[i]));
+                        property_infos.emplace_back(property_info{
+                            .property = property::format, .object_id = object_id, .address = addresses[i]});
                     } else if (addresses[i].mSelector == kAudioDevicePropertyNominalSampleRate) {
                         if (addresses[i].mScope == kAudioObjectPropertyScopeGlobal) {
                             AudioObjectPropertyAddress address = addresses[i];
                             address.mScope = kAudioObjectPropertyScopeOutput;
-                            property_infos.push_back(property_info(property::format, object_id, address));
+                            property_infos.emplace_back(property_info{
+                                .property = property::format, .object_id = object_id, .address = address});
                             address.mScope = kAudioObjectPropertyScopeInput;
-                            property_infos.push_back(property_info(property::format, object_id, address));
+                            property_infos.emplace_back(property_info{
+                                .property = property::format, .object_id = object_id, .address = address});
                         }
                     }
                 }
@@ -282,7 +275,7 @@ struct audio::device::impl : base::impl {
     void udpate_streams(AudioObjectPropertyScope const scope) {
         auto prev_streams =
             std::move((scope == kAudioObjectPropertyScopeInput) ? input_streams_map : output_streams_map);
-        auto data = _property_data<AudioStreamID>(audio_device_id, kAudioDevicePropertyStreams, scope);
+        auto data = _property_data<AudioStreamID>(_audio_device_id, kAudioDevicePropertyStreams, scope);
         auto &new_streams = (scope == kAudioObjectPropertyScopeInput) ? input_streams_map : output_streams_map;
         if (data) {
             for (auto &stream_id : *data) {
@@ -290,7 +283,7 @@ struct audio::device::impl : base::impl {
                     new_streams.insert(std::make_pair(stream_id, prev_streams.at(stream_id)));
                 } else {
                     new_streams.insert(
-                        std::make_pair(stream_id, stream({.stream_id = stream_id, .device_id = audio_device_id})));
+                        std::make_pair(stream_id, stream({.stream_id = stream_id, .device_id = _audio_device_id})));
                 }
             }
         }
@@ -319,7 +312,7 @@ struct audio::device::impl : base::impl {
 
         auto stream_format = stream.virtual_format();
 
-        auto data = _property_data<AudioBufferList>(audio_device_id, kAudioDevicePropertyStreamConfiguration, scope);
+        auto data = _property_data<AudioBufferList>(_audio_device_id, kAudioDevicePropertyStreamConfiguration, scope);
         if (data) {
             uint32_t channel_count = 0;
             for (auto &abl : *data) {
@@ -449,7 +442,7 @@ audio::device::device(std::nullptr_t) : base(nullptr) {
 }
 
 AudioDeviceID audio::device::audio_device_id() const {
-    return impl_ptr<impl>()->audio_device_id;
+    return impl_ptr<impl>()->_audio_device_id;
 }
 
 CFStringRef audio::device::name() const {
@@ -507,7 +500,7 @@ uint32_t audio::device::output_channel_count() const {
 }
 
 audio::device::subject_t &audio::device::subject() const {
-    return impl_ptr<impl>()->subject;
+    return impl_ptr<impl>()->_subject;
 }
 
 std::string yas::to_string(audio::device::method const &method) {

@@ -43,9 +43,6 @@ namespace audio {
             device::property const property;
             AudioObjectPropertyAddress const address;
 
-            property_info(device::property const property, AudioObjectID const object_id,
-                          AudioObjectPropertyAddress const &address);
-
             bool operator<(property_info const &info) const;
         };
 

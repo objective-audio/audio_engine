@@ -34,7 +34,7 @@ namespace audio {
 
 struct audio::graph::impl : base::impl {
    public:
-    impl(uint8_t const key) : _running(false), _mutex(), _units(), _io_units(), _key(key){};
+    impl(uint8_t const key) : _key(key){};
 
     ~impl() {
         stop_all_ios();
@@ -298,7 +298,7 @@ struct audio::graph::impl : base::impl {
 
    private:
     uint8_t _key;
-    bool _running;
+    bool _running = false;
     mutable std::recursive_mutex _mutex;
     std::map<uint16_t, unit> _units;
     std::map<uint16_t, unit> _io_units;

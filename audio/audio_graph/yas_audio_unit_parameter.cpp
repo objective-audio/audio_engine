@@ -9,31 +9,30 @@
 using namespace yas;
 
 struct audio::unit::parameter::impl : base::impl {
-    AudioUnitParameterID parameter_id;
-    AudioUnitScope scope;
-    bool has_clump;
-    uint32_t clump_id;
-    AudioUnitParameterUnit unit;
-    AudioUnitParameterValue min_value;
-    AudioUnitParameterValue max_value;
-    AudioUnitParameterValue default_value;
-    std::unordered_map<AudioUnitElement, AudioUnitParameterValue> values;
-    std::string unit_name;
-    std::string name;
-    subject_t subject;
+    AudioUnitParameterID _parameter_id;
+    AudioUnitScope _scope;
+    bool _has_clump;
+    uint32_t _clump_id;
+    AudioUnitParameterUnit _unit;
+    AudioUnitParameterValue _min_value;
+    AudioUnitParameterValue _max_value;
+    AudioUnitParameterValue _default_value;
+    std::unordered_map<AudioUnitElement, AudioUnitParameterValue> _values;
+    std::string _unit_name;
+    std::string _name;
+    subject_t _subject;
 
     impl(AudioUnitParameterInfo const &info, AudioUnitParameterID const parameter_id, AudioUnitScope const scope)
-        : parameter_id(parameter_id),
-          scope(scope),
-          has_clump(info.flags & kAudioUnitParameterFlag_HasClump),
-          clump_id(info.clumpID),
-          unit(info.unit),
-          min_value(info.minValue),
-          max_value(info.maxValue),
-          default_value(info.defaultValue),
-          values(),
-          unit_name(to_string(info.unitName)),
-          name(to_string(info.cfNameString)) {
+        : _parameter_id(parameter_id),
+          _scope(scope),
+          _has_clump(info.flags & kAudioUnitParameterFlag_HasClump),
+          _clump_id(info.clumpID),
+          _unit(info.unit),
+          _min_value(info.minValue),
+          _max_value(info.maxValue),
+          _default_value(info.defaultValue),
+          _unit_name(to_string(info.unitName)),
+          _name(to_string(info.cfNameString)) {
     }
 
     ~impl() {
@@ -42,14 +41,14 @@ struct audio::unit::parameter::impl : base::impl {
     void set_value(AudioUnitParameterValue const value, AudioUnitElement const element) {
         change_info info{
             .element = element,
-            .old_value = values[element],
+            .old_value = _values[element],
             .new_value = value,
             .parameter = cast<audio::unit::parameter>(),
         };
 
-        subject.notify(method::will_change, info);
-        values[element] = value;
-        subject.notify(method::did_change, info);
+        _subject.notify(method::will_change, info);
+        _values[element] = value;
+        _subject.notify(method::did_change, info);
     }
 };
 
@@ -64,47 +63,47 @@ audio::unit::parameter::parameter(std::nullptr_t) : base(nullptr) {
 #pragma mark - accessor
 
 AudioUnitParameterID audio::unit::parameter::parameter_id() const {
-    return impl_ptr<impl>()->parameter_id;
+    return impl_ptr<impl>()->_parameter_id;
 }
 
 AudioUnitScope audio::unit::parameter::scope() const {
-    return impl_ptr<impl>()->scope;
+    return impl_ptr<impl>()->_scope;
 }
 
 CFStringRef audio::unit::parameter::unit_name() const {
-    return to_cf_object(impl_ptr<impl>()->unit_name);
+    return to_cf_object(impl_ptr<impl>()->_unit_name);
 }
 
 bool audio::unit::parameter::has_clump() const {
-    return impl_ptr<impl>()->has_clump;
+    return impl_ptr<impl>()->_has_clump;
 }
 
 uint32_t audio::unit::parameter::clump_id() const {
-    return impl_ptr<impl>()->clump_id;
+    return impl_ptr<impl>()->_clump_id;
 }
 
 CFStringRef audio::unit::parameter::name() const {
-    return to_cf_object(impl_ptr<impl>()->name);
+    return to_cf_object(impl_ptr<impl>()->_name);
 }
 
 AudioUnitParameterUnit audio::unit::parameter::unit() const {
-    return impl_ptr<impl>()->unit;
+    return impl_ptr<impl>()->_unit;
 }
 
 AudioUnitParameterValue audio::unit::parameter::min_value() const {
-    return impl_ptr<impl>()->min_value;
+    return impl_ptr<impl>()->_min_value;
 }
 
 AudioUnitParameterValue audio::unit::parameter::max_value() const {
-    return impl_ptr<impl>()->max_value;
+    return impl_ptr<impl>()->_max_value;
 }
 
 AudioUnitParameterValue audio::unit::parameter::default_value() const {
-    return impl_ptr<impl>()->default_value;
+    return impl_ptr<impl>()->_default_value;
 }
 
 float audio::unit::parameter::value(AudioUnitElement const element) const {
-    return impl_ptr<impl>()->values.at(element);
+    return impl_ptr<impl>()->_values.at(element);
 }
 
 void audio::unit::parameter::set_value(AudioUnitParameterValue const value, AudioUnitElement const element) {
@@ -112,11 +111,11 @@ void audio::unit::parameter::set_value(AudioUnitParameterValue const value, Audi
 }
 
 std::unordered_map<AudioUnitElement, AudioUnitParameterValue> const &audio::unit::parameter::values() const {
-    return impl_ptr<impl>()->values;
+    return impl_ptr<impl>()->_values;
 }
 
 audio::unit::parameter::subject_t &audio::unit::parameter::subject() {
-    return impl_ptr<impl>()->subject;
+    return impl_ptr<impl>()->_subject;
 }
 
 #pragma mark -

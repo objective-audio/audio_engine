@@ -18,10 +18,10 @@ using namespace yas;
 #pragma mark - private
 
 struct audio::pcm_buffer::impl : base::impl {
-    audio::format const format;
-    AudioBufferList const *abl_ptr;
-    uint32_t const frame_capacity;
-    uint32_t frame_length;
+    audio::format const _format;
+    AudioBufferList const *_abl_ptr;
+    uint32_t const _frame_capacity;
+    uint32_t _frame_length;
 
     impl(audio::format const &format, std::pair<audio::abl_uptr, audio::abl_data_uptr> &&abl_pair,
          uint32_t const frame_capacity)
@@ -74,63 +74,63 @@ struct audio::pcm_buffer::impl : base::impl {
     }
 
     impl(audio::format const &format, AudioBufferList *ptr, uint32_t const frame_capacity)
-        : format(format),
-          abl_ptr(ptr),
-          frame_capacity(frame_capacity),
-          frame_length(frame_capacity),
+        : _format(format),
+          _abl_ptr(ptr),
+          _frame_capacity(frame_capacity),
+          _frame_length(frame_capacity),
           _abl(nullptr),
           _data(nullptr) {
     }
 
     impl(audio::format const &format, abl_uptr &&abl, abl_data_uptr &&data, uint32_t const frame_capacity)
-        : format(format),
-          frame_capacity(frame_capacity),
-          frame_length(frame_capacity),
-          abl_ptr(abl.get()),
+        : _format(format),
+          _frame_capacity(frame_capacity),
+          _frame_length(frame_capacity),
+          _abl_ptr(abl.get()),
           _abl(std::move(abl)),
           _data(std::move(data)) {
     }
 
     impl(audio::format const &format, abl_uptr &&abl, uint32_t const frame_capacity)
-        : format(format),
-          frame_capacity(frame_capacity),
-          frame_length(frame_capacity),
-          abl_ptr(abl.get()),
+        : _format(format),
+          _frame_capacity(frame_capacity),
+          _frame_length(frame_capacity),
+          _abl_ptr(abl.get()),
           _abl(std::move(abl)),
           _data(nullptr) {
     }
 
     flex_ptr flex_ptr_at_index(uint32_t const buf_idx) {
-        if (buf_idx >= abl_ptr->mNumberBuffers) {
+        if (buf_idx >= _abl_ptr->mNumberBuffers) {
             throw std::out_of_range(std::string(__PRETTY_FUNCTION__) + " : out of range. buf_idx(" +
                                     std::to_string(buf_idx) + ") _impl->abl_ptr.mNumberBuffers(" +
-                                    std::to_string(abl_ptr->mNumberBuffers) + ")");
+                                    std::to_string(_abl_ptr->mNumberBuffers) + ")");
         }
 
-        return flex_ptr(abl_ptr->mBuffers[buf_idx].mData);
+        return flex_ptr(_abl_ptr->mBuffers[buf_idx].mData);
     }
 
     flex_ptr flex_ptr_at_channel(uint32_t const ch_idx) {
         flex_ptr pointer;
 
-        if (format.stride() > 1) {
-            if (ch_idx < abl_ptr->mBuffers[0].mNumberChannels) {
-                pointer.v = abl_ptr->mBuffers[0].mData;
+        if (_format.stride() > 1) {
+            if (ch_idx < _abl_ptr->mBuffers[0].mNumberChannels) {
+                pointer.v = _abl_ptr->mBuffers[0].mData;
                 if (ch_idx > 0) {
-                    pointer.u8 += ch_idx * format.sample_byte_count();
+                    pointer.u8 += ch_idx * _format.sample_byte_count();
                 }
             } else {
                 throw std::out_of_range(std::string(__PRETTY_FUNCTION__) + " : out of range. ch_idx(" +
                                         std::to_string(ch_idx) + ") mNumberChannels(" +
-                                        std::to_string(abl_ptr->mBuffers[0].mNumberChannels) + ")");
+                                        std::to_string(_abl_ptr->mBuffers[0].mNumberChannels) + ")");
             }
         } else {
-            if (ch_idx < abl_ptr->mNumberBuffers) {
-                pointer.v = abl_ptr->mBuffers[ch_idx].mData;
+            if (ch_idx < _abl_ptr->mNumberBuffers) {
+                pointer.v = _abl_ptr->mBuffers[ch_idx].mData;
             } else {
                 throw std::out_of_range(std::string(__PRETTY_FUNCTION__) + " : out of range. ch_idx(" +
                                         std::to_string(ch_idx) + ") mNumberChannels(" +
-                                        std::to_string(abl_ptr->mBuffers[0].mNumberChannels) + ")");
+                                        std::to_string(_abl_ptr->mBuffers[0].mNumberChannels) + ")");
             }
         }
 
@@ -284,15 +284,15 @@ audio::pcm_buffer::pcm_buffer(audio::format const &format, audio::pcm_buffer con
 }
 
 audio::format const &audio::pcm_buffer::format() const {
-    return impl_ptr<impl>()->format;
+    return impl_ptr<impl>()->_format;
 }
 
 AudioBufferList *audio::pcm_buffer::audio_buffer_list() {
-    return const_cast<AudioBufferList *>(impl_ptr<impl>()->abl_ptr);
+    return const_cast<AudioBufferList *>(impl_ptr<impl>()->_abl_ptr);
 }
 
 AudioBufferList const *audio::pcm_buffer::audio_buffer_list() const {
-    return impl_ptr<impl>()->abl_ptr;
+    return impl_ptr<impl>()->_abl_ptr;
 }
 
 flex_ptr audio::pcm_buffer::flex_ptr_at_index(uint32_t const buf_idx) const {
@@ -364,11 +364,11 @@ template int32_t const *audio::pcm_buffer::data_ptr_at_channel(uint32_t const ch
 template int16_t const *audio::pcm_buffer::data_ptr_at_channel(uint32_t const ch_idx) const;
 
 uint32_t audio::pcm_buffer::frame_capacity() const {
-    return impl_ptr<impl>()->frame_capacity;
+    return impl_ptr<impl>()->_frame_capacity;
 }
 
 uint32_t audio::pcm_buffer::frame_length() const {
-    return impl_ptr<impl>()->frame_length;
+    return impl_ptr<impl>()->_frame_length;
 }
 
 void audio::pcm_buffer::set_frame_length(uint32_t const length) {
@@ -378,7 +378,7 @@ void audio::pcm_buffer::set_frame_length(uint32_t const length) {
         return;
     }
 
-    impl_ptr<impl>()->frame_length = length;
+    impl_ptr<impl>()->_frame_length = length;
 
     uint32_t const data_byte_size = format().stream_description().mBytesPerFrame * length;
     set_data_byte_size(*this, data_byte_size);

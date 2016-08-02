@@ -13,11 +13,11 @@ using namespace yas;
 struct audio::offline_output_node::impl::core {
     using completion_function_map_t = std::map<uint8_t, offline_completion_f>;
 
-    operation_queue queue;
+    operation_queue _queue;
     audio::node _node = {{.input_bus_count = 1, .output_bus_count = 0}};
     audio::node::observer_t _reset_observer;
 
-    core() : queue(nullptr), _completion_functions() {
+    core() : _queue(nullptr), _completion_functions() {
     }
 
     ~core() = default;
@@ -74,7 +74,7 @@ void audio::offline_output_node::impl::_will_reset() {
 
 audio::offline_start_result_t audio::offline_output_node::impl::start(offline_render_f &&render_func,
                                                                       offline_completion_f &&completion_func) {
-    if (_core->queue) {
+    if (_core->_queue) {
         return offline_start_result_t(offline_start_error_t::already_running);
     } else if (auto connection = _core->_node.impl_ptr<audio::node::impl>()->input_connection(0)) {
         std::experimental::optional<uint8_t> key;
@@ -145,7 +145,7 @@ audio::offline_start_result_t audio::offline_output_node::impl::start(offline_re
                         node_completion_func = offline_node.impl_ptr<impl>()->_core->pull_completion_function(*key);
                     }
 
-                    offline_node.impl_ptr<impl>()->_core->queue = nullptr;
+                    offline_node.impl_ptr<impl>()->_core->_queue = nullptr;
 
                     if (node_completion_func) {
                         (*node_completion_func)(cancelled);
@@ -157,8 +157,8 @@ audio::offline_start_result_t audio::offline_output_node::impl::start(offline_re
         };
 
         operation operation{std::move(operation_lambda)};
-        _core->queue = operation_queue{1};
-        _core->queue.push_back(operation);
+        _core->_queue = operation_queue{1};
+        _core->_queue.push_back(operation);
     } else {
         return offline_start_result_t(offline_start_error_t::connection_not_found);
     }
@@ -168,10 +168,10 @@ audio::offline_start_result_t audio::offline_output_node::impl::start(offline_re
 void audio::offline_output_node::impl::stop() {
     auto completion_functions = _core->pull_completion_functions();
 
-    if (auto &queue = _core->queue) {
+    if (auto &queue = _core->_queue) {
         queue.cancel();
         queue.wait_until_all_operations_are_finished();
-        _core->queue = nullptr;
+        _core->_queue = nullptr;
     }
 
     for (auto &pair : completion_functions) {
@@ -183,7 +183,7 @@ void audio::offline_output_node::impl::stop() {
 }
 
 bool audio::offline_output_node::impl::is_running() const {
-    return _core->queue != nullptr;
+    return _core->_queue != nullptr;
 }
 
 audio::node &audio::offline_output_node::impl::node() {

@@ -20,21 +20,21 @@ using namespace yas;
 
 struct audio::device_io::kernel : base {
     struct impl : base::impl {
-        pcm_buffer input_buffer;
-        pcm_buffer output_buffer;
+        pcm_buffer _input_buffer;
+        pcm_buffer _output_buffer;
 
         impl(audio::format const &input_format, audio::format const &output_format, uint32_t const frame_capacity)
-            : input_buffer(input_format ? pcm_buffer{input_format, frame_capacity} : nullptr),
-              output_buffer(output_format ? pcm_buffer{output_format, frame_capacity} : nullptr) {
+            : _input_buffer(input_format ? pcm_buffer{input_format, frame_capacity} : nullptr),
+              _output_buffer(output_format ? pcm_buffer{output_format, frame_capacity} : nullptr) {
         }
 
         void reset_buffers() {
-            if (input_buffer) {
-                input_buffer.reset();
+            if (_input_buffer) {
+                _input_buffer.reset();
             }
 
-            if (output_buffer) {
-                output_buffer.reset();
+            if (_output_buffer) {
+                _output_buffer.reset();
             }
         }
     };
@@ -47,11 +47,11 @@ struct audio::device_io::kernel : base {
     }
 
     pcm_buffer &input_buffer() {
-        return impl_ptr<impl>()->input_buffer;
+        return impl_ptr<impl>()->_input_buffer;
     }
 
     pcm_buffer &output_buffer() {
-        return impl_ptr<impl>()->output_buffer;
+        return impl_ptr<impl>()->_output_buffer;
     }
 
     void reset_buffers() {
@@ -60,40 +60,29 @@ struct audio::device_io::kernel : base {
 };
 
 struct audio::device_io::impl : base::impl {
-    weak<device_io> weak_device_io;
-    audio::device device;
-    bool is_running;
-    AudioDeviceIOProcID io_proc_id;
-    pcm_buffer input_buffer_on_render;
-    audio::time input_time_on_render;
-    audio::device::observer_t observer;
+    weak<device_io> _weak_device_io;
+    audio::device _device = nullptr;
+    bool _is_running = false;
+    AudioDeviceIOProcID _io_proc_id = nullptr;
+    pcm_buffer _input_buffer_on_render = nullptr;
+    audio::time _input_time_on_render = nullptr;
+    audio::device::observer_t _observer;
 
-    impl()
-        : weak_device_io(),
-          device(nullptr),
-          is_running(false),
-          io_proc_id(nullptr),
-          input_buffer_on_render(nullptr),
-          input_time_on_render(nullptr),
-          observer(),
-          _render_callback(nullptr),
-          _maximum_frames(4096),
-          _kernel(nullptr),
-          _mutex() {
+    impl() {
     }
 
     ~impl() {
-        observer.remove_handler(device::system_subject(), device::method::hardware_did_change);
+        _observer.remove_handler(device::system_subject(), device::method::hardware_did_change);
 
         uninitialize();
     }
 
     void prepare(device_io const &device_io, audio::device const dev) {
-        weak_device_io = to_weak(device_io);
+        _weak_device_io = to_weak(device_io);
 
-        observer.add_handler(
+        _observer.add_handler(
             device::system_subject(), device::method::hardware_did_change,
-            [weak_device_io = weak_device_io](auto const &context) {
+            [weak_device_io = _weak_device_io](auto const &context) {
                 if (auto device_io = weak_device_io.lock()) {
                     if (device_io.device() && !device::device_for_id(device_io.device().audio_device_id())) {
                         device_io.set_device(nullptr);
@@ -105,24 +94,24 @@ struct audio::device_io::impl : base::impl {
     }
 
     void set_device(audio::device const &dev) {
-        if (device != dev) {
-            bool running = is_running;
+        if (_device != dev) {
+            bool running = _is_running;
 
             uninitialize();
 
-            if (device) {
-                observer.remove_handler(device.subject(), device::method::device_did_change);
+            if (_device) {
+                _observer.remove_handler(_device.subject(), device::method::device_did_change);
             }
 
-            device = dev;
+            _device = dev;
 
-            if (device) {
-                observer.add_handler(device.subject(), device::method::device_did_change,
-                                     [weak_device_io = weak_device_io](auto const &context) {
-                                         if (auto device_io = weak_device_io.lock()) {
-                                             device_io.impl_ptr<impl>()->update_kernel();
-                                         }
-                                     });
+            if (_device) {
+                _observer.add_handler(_device.subject(), device::method::device_did_change,
+                                      [weak_device_io = _weak_device_io](auto const &context) {
+                                          if (auto device_io = weak_device_io.lock()) {
+                                              device_io.impl_ptr<impl>()->update_kernel();
+                                          }
+                                      });
             }
 
             initialize();
@@ -134,15 +123,15 @@ struct audio::device_io::impl : base::impl {
     }
 
     void initialize() {
-        if (!device || io_proc_id) {
+        if (!_device || _io_proc_id) {
             return;
         }
 
-        if (!device.input_format() && !device.output_format()) {
+        if (!_device.input_format() && !_device.output_format()) {
             return;
         }
 
-        auto function = [weak_device_io = weak_device_io](
+        auto function = [weak_device_io = _weak_device_io](
             const AudioTimeStamp *inNow, const AudioBufferList *inInputData, const AudioTimeStamp *inInputTime,
             AudioBufferList *outOutputData, const AudioTimeStamp *inOutputTime) {
             if (outOutputData) {
@@ -159,8 +148,8 @@ struct audio::device_io::impl : base::impl {
 
                             uint32_t const input_frame_length = input_buffer.frame_length();
                             if (input_frame_length > 0) {
-                                imp->input_buffer_on_render = input_buffer;
-                                imp->input_time_on_render =
+                                imp->_input_buffer_on_render = input_buffer;
+                                imp->_input_time_on_render =
                                     audio::time(*inInputTime, input_buffer.format().sample_rate());
                             }
                         }
@@ -185,12 +174,13 @@ struct audio::device_io::impl : base::impl {
                     }
                 }
 
-                imp->input_buffer_on_render = nullptr;
-                imp->input_time_on_render = nullptr;
+                imp->_input_buffer_on_render = nullptr;
+                imp->_input_time_on_render = nullptr;
             }
         };
 
-        raise_if_au_error(AudioDeviceCreateIOProcIDWithBlock(&io_proc_id, device.audio_device_id(), nullptr, function));
+        raise_if_au_error(
+            AudioDeviceCreateIOProcIDWithBlock(&_io_proc_id, _device.audio_device_id(), nullptr, function));
 
         update_kernel();
     }
@@ -198,41 +188,41 @@ struct audio::device_io::impl : base::impl {
     void uninitialize() {
         stop();
 
-        if (!device || !io_proc_id) {
+        if (!_device || !_io_proc_id) {
             return;
         }
 
-        if (device::is_available_device(device)) {
-            raise_if_au_error(AudioDeviceDestroyIOProcID(device.audio_device_id(), io_proc_id));
+        if (device::is_available_device(_device)) {
+            raise_if_au_error(AudioDeviceDestroyIOProcID(_device.audio_device_id(), _io_proc_id));
         }
 
-        io_proc_id = nullptr;
+        _io_proc_id = nullptr;
         update_kernel();
     }
 
     void start() {
-        is_running = true;
+        _is_running = true;
 
-        if (!device || !io_proc_id) {
+        if (!_device || !_io_proc_id) {
             return;
         }
 
-        raise_if_au_error(AudioDeviceStart(device.audio_device_id(), io_proc_id));
+        raise_if_au_error(AudioDeviceStart(_device.audio_device_id(), _io_proc_id));
     }
 
     void stop() {
-        if (!is_running) {
+        if (!_is_running) {
             return;
         }
 
-        is_running = false;
+        _is_running = false;
 
-        if (!device || !io_proc_id) {
+        if (!_device || !_io_proc_id) {
             return;
         }
 
-        if (device::is_available_device(device)) {
-            raise_if_au_error(AudioDeviceStop(device.audio_device_id(), io_proc_id));
+        if (device::is_available_device(_device)) {
+            raise_if_au_error(AudioDeviceStop(_device.audio_device_id(), _io_proc_id));
         }
     }
 
@@ -275,16 +265,16 @@ struct audio::device_io::impl : base::impl {
 
         set_kernel(nullptr);
 
-        if (!device || !io_proc_id) {
+        if (!_device || !_io_proc_id) {
             return;
         }
 
-        set_kernel(device_io::kernel{device.input_format(), device.output_format(), _maximum_frames});
+        set_kernel(device_io::kernel{_device.input_format(), _device.output_format(), _maximum_frames});
     }
 
    private:
-    render_f _render_callback;
-    uint32_t _maximum_frames;
+    render_f _render_callback = nullptr;
+    uint32_t _maximum_frames = 4096;
     device_io::kernel _kernel = nullptr;
     mutable std::recursive_mutex _mutex;
 };
@@ -311,11 +301,11 @@ void audio::device_io::set_device(audio::device const device) {
 }
 
 audio::device audio::device_io::device() const {
-    return impl_ptr<impl>()->device;
+    return impl_ptr<impl>()->_device;
 }
 
 bool audio::device_io::is_running() const {
-    return impl_ptr<impl>()->is_running;
+    return impl_ptr<impl>()->_is_running;
 }
 
 void audio::device_io::set_render_callback(render_f callback) {
@@ -339,11 +329,11 @@ void audio::device_io::stop() const {
 }
 
 audio::pcm_buffer const &audio::device_io::input_buffer_on_render() const {
-    return impl_ptr<impl>()->input_buffer_on_render;
+    return impl_ptr<impl>()->_input_buffer_on_render;
 }
 
 audio::time const &audio::device_io::input_time_on_render() const {
-    return impl_ptr<impl>()->input_time_on_render;
+    return impl_ptr<impl>()->_input_time_on_render;
 }
 
 #endif
