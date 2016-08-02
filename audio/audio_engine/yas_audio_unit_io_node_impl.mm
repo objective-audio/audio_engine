@@ -18,7 +18,7 @@ using namespace yas;
 
 struct audio::unit_io_node::impl::core {
     static uint32_t const channel_map_count = 2;
-    channel_map_t channel_map[2];
+    channel_map_t _channel_map[2];
     audio::unit_io_node::subject_t _subject;
     audio::unit_node::observer_t _connection_observer;
 };
@@ -90,7 +90,7 @@ uint32_t audio::unit_io_node::impl::input_device_channel_count() const {
 }
 
 void audio::unit_io_node::impl::set_channel_map(channel_map_t const &map, audio::direction const dir) {
-    _core->channel_map[to_uint32(dir)] = map;
+    _core->_channel_map[to_uint32(dir)] = map;
 
     if (auto unit = au()) {
         unit.set_channel_map(map, kAudioUnitScope_Output, to_uint32(dir));
@@ -98,7 +98,7 @@ void audio::unit_io_node::impl::set_channel_map(channel_map_t const &map, audio:
 }
 
 audio::channel_map_t const &audio::unit_io_node::impl::channel_map(audio::direction const dir) const {
-    return _core->channel_map[to_uint32(dir)];
+    return _core->_channel_map[to_uint32(dir)];
 }
 
 void audio::unit_io_node::impl::update_unit_io_connections() {
@@ -121,11 +121,11 @@ void audio::unit_io_node::impl::update_unit_io_connections() {
     };
 
     auto const output_idx = to_uint32(direction::output);
-    auto &output_map = _core->channel_map[output_idx];
+    auto &output_map = _core->_channel_map[output_idx];
     update_channel_map(output_map, input_format(output_idx), output_device_channel_count());
 
     auto const input_idx = to_uint32(direction::input);
-    auto &input_map = _core->channel_map[input_idx];
+    auto &input_map = _core->_channel_map[input_idx];
     update_channel_map(input_map, output_format(input_idx), input_device_channel_count());
 
     unit.set_channel_map(output_map, kAudioUnitScope_Output, output_idx);
