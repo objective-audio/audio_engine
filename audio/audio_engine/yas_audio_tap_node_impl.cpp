@@ -27,8 +27,8 @@ struct audio::tap_node::kernel : node::kernel {
 };
 
 struct audio::tap_node::impl::core {
-    render_f render_function;
-    tap_node::kernel kernel_on_render;
+    render_f _render_function;
+    tap_node::kernel _kernel_on_render;
     audio::node::observer_t _reset_observer;
     audio::node::kernel_observer_t _kernel_observer;
 };
@@ -50,7 +50,7 @@ void audio::tap_node::impl::prepare(tap_node const &node) {
             if (auto node = weak_node.lock()) {
                 auto impl_ptr = node.impl_ptr<impl>();
                 if (auto kernel = impl_ptr->kernel_cast<tap_node::kernel>()) {
-                    impl_ptr->_core->kernel_on_render = kernel;
+                    impl_ptr->_core->_kernel_on_render = kernel;
 
                     auto const &render_function = kernel.render_function();
 
@@ -60,7 +60,7 @@ void audio::tap_node::impl::prepare(tap_node const &node) {
                         impl_ptr->render_source(buffer, bus_idx, when);
                     }
 
-                    impl_ptr->_core->kernel_on_render = nullptr;
+                    impl_ptr->_core->_kernel_on_render = nullptr;
                 }
             }
         });
@@ -80,38 +80,38 @@ void audio::tap_node::impl::prepare(tap_node const &node) {
 }
 
 void audio::tap_node::impl::_will_reset() {
-    _core->render_function = nullptr;
+    _core->_render_function = nullptr;
 }
 
 void audio::tap_node::impl::_did_prepare_kernel(audio::node::kernel const &kernel) {
     auto tap_kernel = yas::cast<audio::tap_node::kernel>(kernel);
-    tap_kernel.set_render_function(_core->render_function);
+    tap_kernel.set_render_function(_core->_render_function);
 }
 
 void audio::tap_node::impl::set_render_function(render_f &&func) {
-    _core->render_function = func;
+    _core->_render_function = func;
 
     update_kernel();
 }
 
 audio::connection audio::tap_node::impl::input_connection_on_render(uint32_t const bus_idx) const {
-    return _core->kernel_on_render.input_connection(bus_idx);
+    return _core->_kernel_on_render.input_connection(bus_idx);
 }
 
 audio::connection audio::tap_node::impl::output_connection_on_render(uint32_t const bus_idx) const {
-    return _core->kernel_on_render.output_connection(bus_idx);
+    return _core->_kernel_on_render.output_connection(bus_idx);
 }
 
 audio::connection_smap audio::tap_node::impl::input_connections_on_render() const {
-    return _core->kernel_on_render.input_connections();
+    return _core->_kernel_on_render.input_connections();
 }
 
 audio::connection_smap audio::tap_node::impl::output_connections_on_render() const {
-    return _core->kernel_on_render.output_connections();
+    return _core->_kernel_on_render.output_connections();
 }
 
 void audio::tap_node::impl::render_source(pcm_buffer &buffer, uint32_t const bus_idx, time const &when) {
-    if (auto connection = _core->kernel_on_render.input_connection(bus_idx)) {
+    if (auto connection = _core->_kernel_on_render.input_connection(bus_idx)) {
         if (auto node = connection.source_node()) {
             node.render(buffer, connection.source_bus(), when);
         }
