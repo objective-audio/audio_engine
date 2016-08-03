@@ -50,9 +50,9 @@ namespace sample {
             if (acd) {
                 effect_node = audio::unit_node(*acd);
                 engine.connect(effect_node, output_node, format);
-                engine.connect(tap_node, effect_node, format);
+                engine.connect(tap_node.node(), effect_node, format);
             } else {
-                through_connection = engine.connect(tap_node, output_node, format);
+                through_connection = engine.connect(tap_node.node(), output_node, format);
             }
         }
     };

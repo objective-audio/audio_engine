@@ -15,6 +15,7 @@ struct audio::node::impl::core {
     kernel_subject_t _kernel_subject;
     uint32_t _input_bus_count = 0;
     uint32_t _output_bus_count = 0;
+    bool _input_renderable;
     std::experimental::optional<uint32_t> _override_output_bus_idx;
     connection_wmap _input_connections;
     connection_wmap _output_connections;
@@ -138,6 +139,14 @@ uint32_t audio::node::impl::input_bus_count() const {
 
 uint32_t audio::node::impl::output_bus_count() const {
     return _core->_output_bus_count;
+}
+
+void audio::node::impl::set_input_renderable(bool const renderable) {
+    _core->_input_renderable = renderable;
+}
+
+bool audio::node::impl::is_input_renderable() {
+    return _core->_input_renderable;
 }
 
 audio::connection audio::node::impl::input_connection(uint32_t const bus_idx) const {

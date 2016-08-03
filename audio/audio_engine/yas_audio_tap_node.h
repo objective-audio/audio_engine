@@ -8,7 +8,7 @@
 
 namespace yas {
 namespace audio {
-    class tap_node : public node {
+    class tap_node : public base {
        public:
         class kernel;
         class impl;
@@ -22,6 +22,9 @@ namespace audio {
             std::function<void(audio::pcm_buffer &buffer, uint32_t const bus_idx, audio::time const &when)>;
 
         void set_render_function(render_f);
+
+        audio::node const &node() const;
+        audio::node &node();
 
         audio::connection input_connection_on_render(uint32_t const bus_idx) const;
         audio::connection output_connection_on_render(uint32_t const bus_idx) const;

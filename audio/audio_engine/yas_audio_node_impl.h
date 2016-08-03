@@ -33,6 +33,9 @@ namespace audio {
         uint32_t input_bus_count() const;
         uint32_t output_bus_count() const;
 
+        void set_input_renderable(bool const);
+        bool is_input_renderable();
+
         audio::connection input_connection(uint32_t const bus_idx) const override final;
         audio::connection output_connection(uint32_t const bus_idx) const override final;
         audio::connection_wmap &input_connections() const override final;

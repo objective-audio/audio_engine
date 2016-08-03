@@ -14,6 +14,7 @@ using namespace yas;
 audio::node::node(args const args) : base(std::make_shared<impl>()) {
     impl_ptr<impl>()->set_input_bus_count(args.input_bus_count);
     impl_ptr<impl>()->set_output_bus_count(args.output_bus_count);
+    impl_ptr<impl>()->set_input_renderable(args.input_renderable);
 }
 
 audio::node::node(std::nullptr_t) : base(nullptr) {
@@ -67,6 +68,10 @@ uint32_t audio::node::input_bus_count() const {
 
 uint32_t audio::node::output_bus_count() const {
     return impl_ptr<impl>()->output_bus_count();
+}
+
+bool audio::node::is_input_renderable() const {
+    return impl_ptr<impl>()->is_input_renderable();
 }
 
 void audio::node::set_make_kernel_handler(make_kernel_f func) {

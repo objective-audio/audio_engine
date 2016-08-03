@@ -106,13 +106,13 @@ void audio::device_io_node::impl::update_device_io_connections() {
                     if (connections.count(0) > 0) {
                         auto const &connection = connections.at(0);
                         if (auto destination_node = connection.destination_node()) {
-                            if (auto tap_node = yas::cast<input_tap_node>(destination_node)) {
+                            if (destination_node.is_input_renderable()) {
                                 auto input_buffer = device_io.input_buffer_on_render();
                                 auto const &input_time = device_io.input_time_on_render();
                                 if (input_buffer && input_time) {
                                     if (connection.format() ==
                                         destination_node.input_format(connection.destination_bus())) {
-                                        tap_node.render(input_buffer, 0, input_time);
+                                        destination_node.render(input_buffer, 0, input_time);
                                     }
                                 }
                             }
