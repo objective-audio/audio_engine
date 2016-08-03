@@ -51,7 +51,7 @@ using namespace yas;
         XCTAssertEqual(parameter.default_value(), delay_node.global_parameter_value(parameter.parameter_id()));
     }
 
-    auto connection = engine.connect(delay_node, output_node.node(), format);
+    auto connection = engine.connect(delay_node.node(), output_node.node(), format);
 
     XCTestExpectation *expectation = [self expectationWithDescription:@"First Render"];
 
@@ -86,7 +86,7 @@ using namespace yas;
 
     delay_node.manageable().reload_audio_unit();
 
-    engine.connect(delay_node, output_node.node(), format);
+    engine.connect(delay_node.node(), output_node.node(), format);
 
     expectation = [self expectationWithDescription:@"Second Render"];
 
@@ -152,7 +152,7 @@ using namespace yas;
     XCTAssertEqual(delay_node.global_parameter_value(kDelayParam_LopassCutoff), lopass_cutoff_value);
     XCTAssertEqual(delay_node.global_parameter_value(kDelayParam_WetDryMix), wet_dry_mix);
 
-    delay_node.reset();
+    delay_node.node().reset();
 
     XCTAssertNotEqual(delay_node.global_parameter_value(kDelayParam_DelayTime), delay_time_value);
     XCTAssertNotEqual(delay_node.global_parameter_value(kDelayParam_Feedback), feedback_value);

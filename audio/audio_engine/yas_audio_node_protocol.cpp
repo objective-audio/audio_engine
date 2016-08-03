@@ -62,3 +62,19 @@ void audio::manageable_node::update_kernel() {
 void audio::manageable_node::update_connections() {
     impl_ptr<impl>()->update_connections();
 }
+
+void audio::manageable_node::set_add_to_graph_handler(std::function<void(audio::graph &graph)> handler) {
+    impl_ptr<impl>()->set_add_to_graph_handler(std::move(handler));
+}
+
+void audio::manageable_node::set_remove_from_graph_handler(std::function<void(audio::graph &graph)> handler) {
+    impl_ptr<impl>()->set_remove_from_graph_handler(std::move(handler));
+}
+
+std::function<void(audio::graph &graph)> const &audio::manageable_node::add_to_graph_handler() const {
+    return impl_ptr<impl>()->add_to_graph_handler();
+}
+
+std::function<void(audio::graph &graph)> const &audio::manageable_node::remove_from_graph_handler() const {
+    return impl_ptr<impl>()->remove_from_graph_handler();
+}

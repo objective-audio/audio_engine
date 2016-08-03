@@ -8,10 +8,10 @@ using namespace yas;
 
 #pragma mark - main
 
-audio::unit_node::unit_node(std::nullptr_t) : node(nullptr) {
+audio::unit_node::unit_node(std::nullptr_t) : base(nullptr) {
 }
 
-audio::unit_node::unit_node(AudioComponentDescription const &acd) : unit_node(std::make_shared<impl>(), acd) {
+audio::unit_node::unit_node(AudioComponentDescription const &acd) : unit_node(std::make_shared<impl>(1, 1), acd) {
 }
 
 audio::unit_node::unit_node(OSType const type, OSType const sub_type)
@@ -24,11 +24,11 @@ audio::unit_node::unit_node(OSType const type, OSType const sub_type)
       }) {
 }
 
-audio::unit_node::unit_node(std::shared_ptr<impl> &&imp, AudioComponentDescription const &acd) : node(std::move(imp)) {
+audio::unit_node::unit_node(std::shared_ptr<impl> &&imp, AudioComponentDescription const &acd) : base(std::move(imp)) {
     impl_ptr<impl>()->prepare(*this, acd);
 }
 
-audio::unit_node::unit_node(std::shared_ptr<impl> const &impl) : node(impl) {
+audio::unit_node::unit_node(std::shared_ptr<impl> const &impl) : base(impl) {
 }
 
 audio::unit_node::~unit_node() = default;
@@ -91,6 +91,14 @@ float audio::unit_node::output_parameter_value(AudioUnitParameterID const parame
 
 audio::unit_node::subject_t &audio::unit_node::subject() {
     return impl_ptr<impl>()->subject();
+}
+
+audio::node const &audio::unit_node::node() const {
+    return impl_ptr<impl>()->node();
+}
+
+audio::node &audio::unit_node::node() {
+    return impl_ptr<impl>()->node();
 }
 
 audio::manageable_unit_node &audio::unit_node::manageable() {

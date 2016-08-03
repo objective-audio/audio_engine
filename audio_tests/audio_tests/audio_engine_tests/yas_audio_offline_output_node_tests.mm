@@ -47,8 +47,8 @@ using namespace yas;
     audio::unit_node sample_delay_node(kAudioUnitType_Effect, kAudioUnitSubType_SampleDelay);
     audio::tap_node tap_node;
 
-    engine.connect(sample_delay_node, output_node.node(), format);
-    engine.connect(tap_node.node(), sample_delay_node, format);
+    engine.connect(sample_delay_node.node(), output_node.node(), format);
+    engine.connect(tap_node.node(), sample_delay_node.node(), format);
 
     XCTestExpectation *tapNodeExpectation = [self expectationWithDescription:@"tap node render"];
 

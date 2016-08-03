@@ -71,7 +71,6 @@ void audio::device_io_node::impl::prepare(device_io_node const &device_io_node, 
         });
 }
 
-#warning todo update_connectionsにリネームしたい
 void audio::device_io_node::impl::update_device_io_connections() {
     auto &device_io = _core->_device_io;
     if (!device_io) {
@@ -88,7 +87,7 @@ void audio::device_io_node::impl::update_device_io_connections() {
 
     auto render_function = [weak_node, weak_device_io](auto args) {
         if (auto node = weak_node.lock()) {
-            if (auto kernel = node.impl_ptr<impl>()->node().impl_ptr<audio::node::impl>()->kernel_cast()) {
+            if (auto kernel = node.node().impl_ptr<audio::node::impl>()->kernel_cast()) {
                 if (args.output_buffer) {
                     auto const connections = kernel.input_connections();
                     if (connections.count(0) > 0) {
