@@ -117,6 +117,7 @@ namespace yas {
 namespace sample {
     struct offline_vc_internal {
         audio::engine play_engine;
+        audio::unit_output_node play_output_node;
         audio::unit_mixer_node play_mixer_node;
         offline_sample::sine_node play_sine_node;
 
@@ -132,28 +133,26 @@ namespace sample {
                                          .pcm_format = audio::pcm_format::float32,
                                          .interleaved = false});
 
-            audio::unit_output_node play_output_node;
-
-            play_mixer_node.reset();
+            play_mixer_node.node().reset();
             play_mixer_node.set_input_pan(0.0f, 0);
             play_mixer_node.set_input_enabled(true, 0);
             play_mixer_node.set_output_volume(1.0f, 0);
             play_mixer_node.set_output_pan(0.0f, 0);
 
-            play_engine.connect(play_mixer_node, play_output_node, format);
-            play_engine.connect(play_sine_node.node(), play_mixer_node, format);
+            play_engine.connect(play_mixer_node.node(), play_output_node.node(), format);
+            play_engine.connect(play_sine_node.node(), play_mixer_node.node(), format);
 
             offline_engine.add_offline_output_node();
             audio::offline_output_node &offline_output_node = offline_engine.offline_output_node();
 
-            offline_mixer_node.reset();
+            offline_mixer_node.node().reset();
             offline_mixer_node.set_input_pan(0.0f, 0);
             offline_mixer_node.set_input_enabled(true, 0);
             offline_mixer_node.set_output_volume(1.0f, 0);
             offline_mixer_node.set_output_pan(0.0f, 0);
 
-            offline_engine.connect(offline_mixer_node, offline_output_node.node(), format);
-            offline_engine.connect(offline_sine_node.node(), offline_mixer_node, format);
+            offline_engine.connect(offline_mixer_node.node(), offline_output_node.node(), format);
+            offline_engine.connect(offline_sine_node.node(), offline_mixer_node.node(), format);
 
             engine_observer = play_engine.subject().make_observer(
                 audio::engine::method::configuration_change,
