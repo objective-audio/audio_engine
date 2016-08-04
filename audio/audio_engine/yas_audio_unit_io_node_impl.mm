@@ -18,6 +18,7 @@ using namespace yas;
 
 struct audio::unit_io_node::impl::core {
     static uint32_t const channel_map_count = 2;
+
     channel_map_t _channel_map[2];
     audio::unit_io_node::subject_t _subject;
     audio::unit_node::observer_t _connection_observer;
