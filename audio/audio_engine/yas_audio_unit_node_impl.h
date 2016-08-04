@@ -6,8 +6,8 @@
 
 namespace yas {
 namespace audio {
-    struct unit_node::impl : node::impl, manageable_unit_node::impl {
-        impl();
+    struct unit_node::impl : base::impl, manageable_unit_node::impl {
+        impl(uint32_t const input_bus_count, uint32_t const output_bus_count);
         virtual ~impl();
 
         void prepare(unit_node const &node, AudioComponentDescription const &acd);
@@ -40,6 +40,8 @@ namespace audio {
         void set_graph(audio::graph const &);
 
         audio::unit_node::subject_t &subject();
+
+        audio::node &node();
 
        private:
         class core;

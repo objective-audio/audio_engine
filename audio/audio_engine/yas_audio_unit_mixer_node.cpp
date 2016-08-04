@@ -2,6 +2,7 @@
 //  yas_audio_unit_mixer_node.cpp
 //
 
+#include "yas_audio_node.h"
 #include "yas_audio_unit.h"
 #include "yas_audio_unit_mixer_node.h"
 
@@ -10,9 +11,7 @@ using namespace yas;
 #pragma mark - impl
 
 struct audio::unit_mixer_node::impl : unit_node::impl {
-    impl() {
-        set_input_bus_count(std::numeric_limits<uint32_t>::max());
-        set_output_bus_count(1);
+    impl() : unit_node::impl(std::numeric_limits<uint32_t>::max(), 1) {
     }
 
     void prepare(audio::unit_mixer_node const &node) {
@@ -25,9 +24,8 @@ struct audio::unit_mixer_node::impl : unit_node::impl {
     }
 
    private:
-#warning todo update_connectionsにリネームしたい
     void update_unit_mixer_connections() {
-        auto &connections = input_connections();
+        auto &connections = node().impl_ptr<audio::node::impl>()->input_connections();
         if (connections.size() > 0) {
             auto last = connections.end();
             --last;

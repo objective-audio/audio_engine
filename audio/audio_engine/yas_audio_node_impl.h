@@ -57,6 +57,11 @@ namespace audio {
         audio::engine engine() const override final;
         void set_engine(audio::engine const &) override final;
 
+        void set_add_to_graph_handler(std::function<void(audio::graph &)> &&) override final;
+        void set_remove_from_graph_handler(std::function<void(audio::graph &)> &&) override final;
+        std::function<void(audio::graph &)> const &add_to_graph_handler() const override final;
+        std::function<void(audio::graph &)> const &remove_from_graph_handler() const override final;
+
         subject_t &subject();
         kernel_subject_t &kernel_subject();
 

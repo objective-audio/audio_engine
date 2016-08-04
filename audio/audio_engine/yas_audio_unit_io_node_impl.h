@@ -8,6 +8,7 @@ namespace yas {
 namespace audio {
     struct unit_io_node::impl : unit_node::impl {
         impl();
+        impl(uint32_t const input_bus_count, uint32_t const output_bus_count);
         virtual ~impl();
 
         void prepare(audio::unit_io_node &node);

@@ -4,6 +4,7 @@
 
 #include <iostream>
 #include "yas_audio_graph.h"
+#include "yas_audio_node.h"
 #include "yas_audio_time.h"
 #include "yas_audio_unit.h"
 #include "yas_audio_unit_node.h"
@@ -13,6 +14,7 @@
 using namespace yas;
 
 struct audio::unit_node::impl::core {
+    audio::node _node;
     AudioComponentDescription _acd;
     std::unordered_map<AudioUnitScope, unit::parameter_map_t> _parameters;
     unit _au;
@@ -20,7 +22,8 @@ struct audio::unit_node::impl::core {
     audio::node::observer_t _reset_observer;
     audio::node::observer_t _connections_observer;
 
-    core() : _au(nullptr) {
+    core(uint32_t const input_bus_count, uint32_t const output_bus_count)
+        : _node({.input_bus_count = input_bus_count, .output_bus_count = output_bus_count}), _au(nullptr) {
     }
 
     void set_au(audio::unit const &au) {
@@ -39,9 +42,8 @@ struct audio::unit_node::impl::core {
 
 #pragma mark - impl
 
-audio::unit_node::impl::impl() : node::impl(), _core(std::make_unique<core>()) {
-    audio::node::impl::set_input_bus_count(1);
-    audio::node::impl::set_output_bus_count(1);
+audio::unit_node::impl::impl(uint32_t const input_bus_count, uint32_t const output_bus_count)
+    : _core(std::make_unique<core>(input_bus_count, output_bus_count)) {
 }
 
 audio::unit_node::impl::~impl() = default;
@@ -59,7 +61,7 @@ void audio::unit_node::impl::prepare(unit_node const &node, AudioComponentDescri
 
     auto weak_node = to_weak(node);
 
-    audio::node::impl::set_render_handler(
+    _core->_node.set_render_handler(
         [weak_node](audio::pcm_buffer &buffer, uint32_t const bus_idx, audio::time const &when) {
             if (auto node = weak_node.lock()) {
                 if (auto audio_unit = node.impl_ptr<impl>()->_core->au()) {
@@ -82,18 +84,37 @@ void audio::unit_node::impl::prepare(unit_node const &node, AudioComponentDescri
         });
 
     _core->_reset_observer =
-        node::impl::subject().make_observer(audio::node::method::will_reset, [weak_node](auto const &) {
+        _core->_node.subject().make_observer(audio::node::method::will_reset, [weak_node](auto const &) {
             if (auto node = weak_node.lock()) {
                 node.impl_ptr<audio::unit_node::impl>()->will_reset();
             }
         });
 
     _core->_connections_observer =
-        node::impl::subject().make_observer(audio::node::method::update_connections, [weak_node](auto const &) {
+        _core->_node.subject().make_observer(audio::node::method::update_connections, [weak_node](auto const &) {
             if (auto node = weak_node.lock()) {
                 node.impl_ptr<audio::unit_node::impl>()->update_unit_connections();
             }
         });
+
+    _core->_node.manageable().set_add_to_graph_handler([weak_node](audio::graph &graph) {
+        if (auto node = weak_node.lock()) {
+            auto &manageable = node.manageable();
+            manageable.prepare_audio_unit();
+            if (auto unit = node.audio_unit()) {
+                graph.add_audio_unit(unit);
+            }
+            manageable.prepare_parameters();
+        }
+    });
+
+    _core->_node.manageable().set_remove_from_graph_handler([weak_node](audio::graph &graph) {
+        if (auto node = weak_node.lock()) {
+            if (auto unit = node.audio_unit()) {
+                graph.remove_audio_unit(unit);
+            }
+        }
+    });
 }
 
 void audio::unit_node::impl::will_reset() {
@@ -206,7 +227,6 @@ float audio::unit_node::impl::output_parameter_value(AudioUnitParameterID const 
     return 0;
 }
 
-#warning todo update_connectionsにリネームしたい
 void audio::unit_node::impl::update_unit_connections() {
     bool const has_observer = subject().has_observer();
 
@@ -220,7 +240,8 @@ void audio::unit_node::impl::update_unit_connections() {
             auto weak_node = to_weak(cast<unit_node>());
             audio_unit.set_render_callback([weak_node](audio::render_parameters &render_parameters) {
                 if (auto node = weak_node.lock()) {
-                    if (auto kernel = node.impl_ptr<impl>()->kernel_cast()) {
+                    if (auto kernel =
+                            node.impl_ptr<impl>()->_core->_node.impl_ptr<audio::node::impl>()->kernel_cast()) {
                         if (auto connection = kernel.input_connection(render_parameters.in_bus_number)) {
                             if (auto source_node = connection.source_node()) {
                                 pcm_buffer buffer{connection.format(), render_parameters.io_data};
@@ -233,7 +254,7 @@ void audio::unit_node::impl::update_unit_connections() {
             });
 
             for (uint32_t bus_idx = 0; bus_idx < input_bus_count; ++bus_idx) {
-                if (auto connection = input_connection(bus_idx)) {
+                if (auto connection = _core->_node.impl_ptr<audio::node::impl>()->input_connection(bus_idx)) {
                     audio_unit.set_input_format(connection.format().stream_description(), bus_idx);
                     audio_unit.attach_render_callback(bus_idx);
                 } else {
@@ -247,7 +268,7 @@ void audio::unit_node::impl::update_unit_connections() {
         auto output_bus_count = output_element_count();
         if (output_bus_count > 0) {
             for (uint32_t bus_idx = 0; bus_idx < output_bus_count; ++bus_idx) {
-                if (auto connection = output_connection(bus_idx)) {
+                if (auto connection = _core->_node.impl_ptr<audio::node::impl>()->output_connection(bus_idx)) {
                     audio_unit.set_output_format(connection.format().stream_description(), bus_idx);
                 }
             }
@@ -287,4 +308,8 @@ void audio::unit_node::impl::reload_audio_unit() {
 
 audio::unit_node::subject_t &audio::unit_node::impl::subject() {
     return _core->_subject;
+}
+
+audio::node &audio::unit_node::impl::node() {
+    return _core->_node;
 }

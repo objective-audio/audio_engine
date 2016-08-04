@@ -285,13 +285,8 @@ void audio::engine::impl::add_node_to_graph(node const &node) {
         return;
     }
 
-    if (auto unit_node = yas::cast<audio::unit_node>(node)) {
-        auto &node = unit_node.manageable();
-        node.prepare_audio_unit();
-        if (auto unit = unit_node.audio_unit()) {
-            _core->_graph.add_audio_unit(unit);
-        }
-        node.prepare_parameters();
+    if (auto const &handler = node.manageable().add_to_graph_handler()) {
+        handler(_core->_graph);
     }
 }
 
@@ -300,10 +295,8 @@ void audio::engine::impl::remove_node_from_graph(node const &node) {
         return;
     }
 
-    if (auto unit_node = yas::cast<audio::unit_node>(node)) {
-        if (auto unit = unit_node.audio_unit()) {
-            _core->_graph.remove_audio_unit(unit);
-        }
+    if (auto const &handler = node.manageable().remove_from_graph_handler()) {
+        handler(_core->_graph);
     }
 }
 

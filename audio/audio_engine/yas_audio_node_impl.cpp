@@ -19,6 +19,8 @@ struct audio::node::impl::core {
     std::experimental::optional<uint32_t> _override_output_bus_idx;
     connection_wmap _input_connections;
     connection_wmap _output_connections;
+    std::function<void(audio::graph &)> _add_to_graph_handler;
+    std::function<void(audio::graph &)> _remove_from_graph_handler;
     std::function<node::kernel(void)> _make_kernel;
     audio::node::render_f _render_handler;
 
@@ -217,6 +219,22 @@ audio::engine audio::node::impl::engine() const {
 
 void audio::node::impl::set_engine(audio::engine const &engine) {
     _core->_weak_engine = engine;
+}
+
+void audio::node::impl::set_add_to_graph_handler(std::function<void(audio::graph &)> &&handler) {
+    _core->_add_to_graph_handler = std::move(handler);
+}
+
+void audio::node::impl::set_remove_from_graph_handler(std::function<void(audio::graph &)> &&handler) {
+    _core->_remove_from_graph_handler = std::move(handler);
+}
+
+std::function<void(audio::graph &)> const &audio::node::impl::add_to_graph_handler() const {
+    return _core->_add_to_graph_handler;
+}
+
+std::function<void(audio::graph &)> const &audio::node::impl::remove_from_graph_handler() const {
+    return _core->_remove_from_graph_handler;
 }
 
 void audio::node::impl::add_connection(connection const &connection) {

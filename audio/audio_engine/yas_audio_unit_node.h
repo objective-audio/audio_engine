@@ -5,15 +5,17 @@
 #pragma once
 
 #include <unordered_map>
-#include "yas_audio_node.h"
 #include "yas_audio_unit.h"
 #include "yas_audio_unit_node_protocol.h"
+#include "yas_base.h"
+#include "yas_observing.h"
 
 namespace yas {
 namespace audio {
     class graph;
+    class node;
 
-    class unit_node : public node {
+    class unit_node : public base {
        public:
         class impl;
 
@@ -51,6 +53,9 @@ namespace audio {
         float output_parameter_value(AudioUnitParameterID const parameter_id, AudioUnitElement const element) const;
 
         subject_t &subject();
+        
+        audio::node const &node() const;
+        audio::node &node();
 
         manageable_unit_node &manageable();
 

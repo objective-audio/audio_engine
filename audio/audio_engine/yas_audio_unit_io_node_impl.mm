@@ -25,8 +25,13 @@ struct audio::unit_io_node::impl::core {
 
 #pragma mark - audio::unit_io_node::impl
 
-audio::unit_io_node::impl::impl() : unit_node::impl(), _core(std::make_unique<core>()) {
-    audio::node::impl::override_output_bus(1);
+audio::unit_io_node::impl::impl() : impl(1, 1) {
+}
+
+#warning todo bus_countはunit_nodeのデフォルト値を使うか、argsでoverride_output_busも渡したい
+audio::unit_io_node::impl::impl(uint32_t const input_bus_count, uint32_t const output_bus_count)
+    : unit_node::impl(input_bus_count, output_bus_count), _core(std::make_unique<core>()) {
+    node().impl_ptr<audio::node::impl>()->override_output_bus(1);
 }
 
 audio::unit_io_node::impl::~impl() = default;
@@ -122,11 +127,11 @@ void audio::unit_io_node::impl::update_unit_io_connections() {
 
     auto const output_idx = to_uint32(direction::output);
     auto &output_map = _core->_channel_map[output_idx];
-    update_channel_map(output_map, input_format(output_idx), output_device_channel_count());
+    update_channel_map(output_map, node().input_format(output_idx), output_device_channel_count());
 
     auto const input_idx = to_uint32(direction::input);
     auto &input_map = _core->_channel_map[input_idx];
-    update_channel_map(input_map, output_format(input_idx), input_device_channel_count());
+    update_channel_map(input_map, node().output_format(input_idx), input_device_channel_count());
 
     unit.set_channel_map(output_map, kAudioUnitScope_Output, output_idx);
     unit.set_channel_map(input_map, kAudioUnitScope_Output, input_idx);
@@ -149,9 +154,7 @@ audio::unit_io_node::subject_t &audio::unit_io_node::impl::subject() {
 
 #pragma mark - aduio_unit_output_node::impl
 
-audio::unit_output_node::impl::impl() {
-    set_input_bus_count(1);
-    set_output_bus_count(0);
+audio::unit_output_node::impl::impl() : unit_io_node::impl(1, 0) {
 }
 
 void audio::unit_output_node::impl::prepare_audio_unit() {
@@ -169,9 +172,7 @@ struct audio::unit_input_node::impl::core {
     audio::unit_io_node::observer_t _connections_observer;
 };
 
-audio::unit_input_node::impl::impl() : audio::unit_io_node::impl(), _core(std::make_unique<core>()) {
-    set_input_bus_count(0);
-    set_output_bus_count(1);
+audio::unit_input_node::impl::impl() : unit_io_node::impl(0, 1), _core(std::make_unique<core>()) {
 }
 
 audio::unit_input_node::impl::~impl() = default;
@@ -185,11 +186,10 @@ void audio::unit_input_node::impl::prepare(audio::unit_input_node const &node) {
         });
 }
 
-#warning todo update_connectionsにリネームしたい
 void audio::unit_input_node::impl::update_unit_input_connections() {
     auto unit = au();
 
-    if (auto out_connection = output_connection(1)) {
+    if (auto out_connection = node().impl_ptr<audio::node::impl>()->output_connection(1)) {
         unit.attach_input_callback();
 
         pcm_buffer input_buffer(out_connection.format(), 4096);
@@ -202,11 +202,11 @@ void audio::unit_input_node::impl::update_unit_input_connections() {
                 input_buffer.set_frame_length(render_parameters.in_number_frames);
                 render_parameters.io_data = input_buffer.audio_buffer_list();
 
-                if (auto const kernel = input_node.impl_ptr<impl>()->kernel_cast()) {
+                if (auto const kernel = input_node.node().impl_ptr<audio::node::impl>()->kernel_cast()) {
                     if (auto const connection = kernel.output_connection(1)) {
                         auto format = connection.format();
                         time time(*render_parameters.io_time_stamp, format.sample_rate());
-                        input_node.set_render_time_on_render(time);
+                        input_node.node().set_render_time_on_render(time);
 
                         if (auto io_unit = input_node.audio_unit()) {
                             render_parameters.in_bus_number = 1;

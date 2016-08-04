@@ -35,7 +35,7 @@ namespace sample {
 
         void replace_effect_node(const AudioComponentDescription *acd) {
             if (effect_node) {
-                engine.disconnect(effect_node);
+                engine.disconnect(effect_node.node());
                 effect_node = nullptr;
             }
 
@@ -49,10 +49,10 @@ namespace sample {
 
             if (acd) {
                 effect_node = audio::unit_node(*acd);
-                engine.connect(effect_node, output_node, format);
-                engine.connect(tap_node.node(), effect_node, format);
+                engine.connect(effect_node.node(), output_node.node(), format);
+                engine.connect(tap_node.node(), effect_node.node(), format);
             } else {
-                through_connection = engine.connect(tap_node.node(), output_node, format);
+                through_connection = engine.connect(tap_node.node(), output_node.node(), format);
             }
         }
     };
