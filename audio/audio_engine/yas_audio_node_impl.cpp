@@ -15,8 +15,8 @@ struct audio::node::impl::core {
     kernel_subject_t _kernel_subject;
     uint32_t _input_bus_count = 0;
     uint32_t _output_bus_count = 0;
-    bool _input_renderable;
-    std::experimental::optional<uint32_t> _override_output_bus_idx;
+    bool _input_renderable = false;
+    std::experimental::optional<uint32_t> _override_output_bus_idx = nullopt;
     connection_wmap _input_connections;
     connection_wmap _output_connections;
     std::function<void(audio::graph &)> _add_to_graph_handler;
@@ -24,7 +24,11 @@ struct audio::node::impl::core {
     std::function<node::kernel(void)> _make_kernel;
     audio::node::render_f _render_handler;
 
-    core() {
+    core(node_args &&args)
+        : _input_bus_count(args.input_bus_count),
+          _output_bus_count(args.output_bus_count),
+          _input_renderable(args.input_renderable),
+          _override_output_bus_idx(args.override_output_bus_idx) {
     }
 
     void reset() {
@@ -59,7 +63,7 @@ struct audio::node::impl::core {
     mutable std::recursive_mutex _mutex;
 };
 
-audio::node::impl::impl() : _core(std::make_unique<core>()) {
+audio::node::impl::impl(node_args &&args) : _core(std::make_unique<core>(std::move(args))) {
 }
 
 audio::node::impl::~impl() = default;
@@ -123,7 +127,7 @@ bool audio::node::impl::is_available_output_bus(uint32_t const bus_idx) const {
     return _core->_output_connections.count(target_bus_idx) == 0;
 }
 
-void audio::node::impl::override_output_bus(std::experimental::optional<uint32_t> bus_idx) {
+void audio::node::impl::override_output_bus_idx(std::experimental::optional<uint32_t> bus_idx) {
     _core->_override_output_bus_idx = bus_idx;
 }
 

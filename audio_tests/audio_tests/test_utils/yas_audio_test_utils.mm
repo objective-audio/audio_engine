@@ -165,20 +165,21 @@ void test::audio_unit_render_on_sub_thread(audio::unit &unit, audio::format &for
     }
 }
 
-struct test::audio_test_node::impl : audio::node::impl {};
+struct test::audio_test_node_decorator::impl : base::impl {
+    audio::node _node;
 
-test::audio_test_node::audio_test_node(uint32_t const input_bus_count, uint32_t const output_bus_count)
-    : node(std::make_unique<impl>()) {
-    set_input_bus_count(input_bus_count);
-    set_output_bus_count(output_bus_count);
+    impl(audio::node_args &&args) : _node(std::move(args)) {
+    }
+};
+
+test::audio_test_node_decorator::audio_test_node_decorator(uint32_t const input_bus_count,
+                                                           uint32_t const output_bus_count)
+    : base(std::make_unique<impl>(
+          audio::node_args{.input_bus_count = input_bus_count, .output_bus_count = output_bus_count})) {
 }
 
-void test::audio_test_node::set_input_bus_count(uint32_t const &count) {
-    impl_ptr<impl>()->set_input_bus_count(count);
-}
-
-void test::audio_test_node::set_output_bus_count(uint32_t const &count) {
-    impl_ptr<impl>()->set_output_bus_count(count);
+audio::node &test::audio_test_node_decorator::node() {
+    return impl_ptr<impl>()->_node;
 }
 
 test::connection::connection(audio::node &source_node, uint32_t const source_bus, audio::node &destination_node,
@@ -186,7 +187,7 @@ test::connection::connection(audio::node &source_node, uint32_t const source_bus
     : audio::connection(source_node, source_bus, destination_node, destination_bus, format) {
 }
 
-test::node::node() : audio::node(std::make_shared<audio::node::impl>()) {
+test::node::node() : audio::node(std::make_shared<audio::node::impl>(audio::node_args{})) {
 }
 
 test::node::node(audio::node const &node) : audio::node(node.impl_ptr<audio::node::impl>()) {

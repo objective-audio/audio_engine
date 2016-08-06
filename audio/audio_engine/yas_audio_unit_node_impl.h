@@ -7,8 +7,10 @@
 namespace yas {
 namespace audio {
     struct unit_node::impl : base::impl, manageable_unit_node::impl {
-        impl(uint32_t const input_bus_count, uint32_t const output_bus_count);
+        explicit impl(node_args &&args);
         virtual ~impl();
+        
+        void set_prepare_audio_unit_handler(prepare_au_f &&);
 
         void prepare(unit_node const &node, AudioComponentDescription const &acd);
 

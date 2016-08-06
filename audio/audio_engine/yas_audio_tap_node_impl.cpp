@@ -33,14 +33,14 @@ struct audio::tap_node::impl::core {
     audio::node::observer_t _reset_observer;
     audio::node::kernel_observer_t _kernel_observer;
 
-    core(audio::node::args &&args) : _node(args) {
+    core(audio::node_args &&args) : _node(args) {
     }
 };
 
 audio::tap_node::impl::impl() : impl({.input_bus_count = 1, .output_bus_count = 1}) {
 }
 
-audio::tap_node::impl::impl(audio::node::args &&args) : _core(std::make_unique<core>(std::move(args))) {
+audio::tap_node::impl::impl(audio::node_args &&args) : _core(std::make_unique<core>(std::move(args))) {
 }
 
 audio::tap_node::impl::~impl() = default;

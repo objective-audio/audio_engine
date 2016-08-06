@@ -215,7 +215,7 @@ namespace sample {
 }
 
 - (void)_disconnectNodes {
-    _internal.engine.disconnect(_internal.mixer_node.node());
+    _internal.engine.disconnect(_internal.mixer_node.unit_node().node());
 }
 
 - (void)_connectNodes {
@@ -224,13 +224,13 @@ namespace sample {
     auto const output_channel_count = _internal.connection_channel_count_for_direction(audio::direction::output);
     if (output_channel_count > 0) {
         auto output_format = audio::format({.sample_rate = sample_rate, .channel_count = output_channel_count});
-        _internal.engine.connect(_internal.mixer_node.node(), _internal.io_node.node(), output_format);
+        _internal.engine.connect(_internal.mixer_node.unit_node().node(), _internal.io_node.unit_node().node(), output_format);
     }
 
     auto const input_channel_count = _internal.connection_channel_count_for_direction(audio::direction::input);
     if (input_channel_count > 0) {
         auto input_format = audio::format({.sample_rate = sample_rate, .channel_count = input_channel_count});
-        _internal.engine.connect(_internal.io_node.node(), _internal.mixer_node.node(), input_format);
+        _internal.engine.connect(_internal.io_node.unit_node().node(), _internal.mixer_node.unit_node().node(), input_format);
     }
 }
 

@@ -23,7 +23,7 @@ using namespace yas;
 - (void)test_parameter_exists {
     audio::unit_mixer_node mixer_node;
 
-    auto const &paramters = mixer_node.parameters();
+    auto const &paramters = mixer_node.unit_node().parameters();
     auto const &input_parameters = paramters.at(kAudioUnitScope_Input);
     auto const &output_parameters = paramters.at(kAudioUnitScope_Output);
 
@@ -51,16 +51,16 @@ using namespace yas;
 
 - (void)test_element {
     audio::unit_mixer_node mixer_node;
-    uint32_t const default_element_count = mixer_node.input_element_count();
+    uint32_t const default_element_count = mixer_node.unit_node().input_element_count();
 
     XCTAssertGreaterThanOrEqual(default_element_count, 1);
     XCTAssertNoThrow(mixer_node.set_input_volume(0.5f, 0));
     XCTAssertThrows(mixer_node.set_input_volume(0.5f, default_element_count));
 
     uint32_t const element_count = default_element_count + 8;
-    XCTAssertNoThrow(mixer_node.audio_unit().set_element_count(element_count, kAudioUnitScope_Input));
+    XCTAssertNoThrow(mixer_node.unit_node().audio_unit().set_element_count(element_count, kAudioUnitScope_Input));
 
-    XCTAssertGreaterThanOrEqual(mixer_node.input_element_count(), element_count);
+    XCTAssertGreaterThanOrEqual(mixer_node.unit_node().input_element_count(), element_count);
     XCTAssertNoThrow(mixer_node.set_input_volume(0.5f, element_count - 1));
     XCTAssertThrows(mixer_node.set_input_volume(0.5f, element_count));
 }
@@ -87,7 +87,7 @@ using namespace yas;
     XCTAssertEqual(mixer_node.output_volume(bus_idx), output_volume);
     XCTAssertEqual(mixer_node.output_pan(bus_idx), output_pan);
 
-    mixer_node.manageable().reload_audio_unit();
+    mixer_node.unit_node().manageable().reload_audio_unit();
 
     XCTAssertNotEqual(mixer_node.input_volume(bus_idx), input_volume);
     XCTAssertNotEqual(mixer_node.input_pan(bus_idx), input_pan);
@@ -95,7 +95,7 @@ using namespace yas;
     XCTAssertNotEqual(mixer_node.output_volume(bus_idx), output_volume);
     XCTAssertNotEqual(mixer_node.output_pan(bus_idx), output_pan);
 
-    mixer_node.manageable().prepare_parameters();
+    mixer_node.unit_node().manageable().prepare_parameters();
 
     XCTAssertEqual(mixer_node.input_volume(bus_idx), input_volume);
     XCTAssertEqual(mixer_node.input_pan(bus_idx), input_pan);

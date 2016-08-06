@@ -5,14 +5,16 @@
 #pragma once
 
 #include "yas_audio_types.h"
-#include "yas_audio_unit_node.h"
+#include "yas_base.h"
+#include "yas_observing.h"
 
 namespace yas {
 namespace audio {
+    class unit_node;
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
     class device;
 #endif
-    class unit_io_node : public unit_node {
+    class unit_io_node : public base {
        public:
         class impl;
 
@@ -23,7 +25,13 @@ namespace audio {
         using subject_t = yas::subject<unit_io_node, method>;
         using observer_t = yas::observer<unit_io_node, method>;
 
+        struct args {
+            bool enable_input = true;
+            bool enable_output = true;
+        };
+
         unit_io_node();
+        unit_io_node(args);
         unit_io_node(std::nullptr_t);
 
         virtual ~unit_io_node();
@@ -42,11 +50,11 @@ namespace audio {
 
         subject_t &subject();
 
-       protected:
-        unit_io_node(std::shared_ptr<impl> const &, AudioComponentDescription const &);
+        audio::unit_node const &unit_node() const;
+        audio::unit_node &unit_node();
     };
 
-    class unit_output_node : public unit_io_node {
+    class unit_output_node : public base {
        public:
         class impl;
 
@@ -55,9 +63,12 @@ namespace audio {
 
         void set_channel_map(channel_map_t const &);
         channel_map_t const &channel_map() const;
+
+        audio::unit_io_node const &unit_io_node() const;
+        audio::unit_io_node &unit_io_node();
     };
 
-    class unit_input_node : public unit_io_node {
+    class unit_input_node : public base {
        public:
         class impl;
 
@@ -66,6 +77,9 @@ namespace audio {
 
         void set_channel_map(channel_map_t const &);
         channel_map_t const &channel_map() const;
+
+        audio::unit_io_node const &unit_io_node() const;
+        audio::unit_io_node &unit_io_node();
     };
 }
 }
