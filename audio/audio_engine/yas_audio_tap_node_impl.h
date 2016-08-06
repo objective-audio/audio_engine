@@ -8,14 +8,14 @@ namespace yas {
 namespace audio {
     struct tap_node::impl : base::impl {
         impl();
-        impl(audio::node::args &&);
-        
+        impl(audio::node_args &&);
+
         virtual ~impl();
 
         void prepare(tap_node const &);
 
         void set_render_function(render_f &&);
-        
+
         audio::node &node();
 
         audio::connection input_connection_on_render(uint32_t const bus_idx) const;

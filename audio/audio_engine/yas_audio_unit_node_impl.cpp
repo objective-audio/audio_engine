@@ -21,9 +21,9 @@ struct audio::unit_node::impl::core {
     audio::unit_node::subject_t _subject;
     audio::node::observer_t _reset_observer;
     audio::node::observer_t _connections_observer;
+    prepare_au_f _prepare_au_handler;
 
-    core(uint32_t const input_bus_count, uint32_t const output_bus_count)
-        : _node({.input_bus_count = input_bus_count, .output_bus_count = output_bus_count}), _au(nullptr) {
+    core(node_args &&args) : _node(std::move(args)), _au(nullptr) {
     }
 
     void set_au(audio::unit const &au) {
@@ -42,11 +42,14 @@ struct audio::unit_node::impl::core {
 
 #pragma mark - impl
 
-audio::unit_node::impl::impl(uint32_t const input_bus_count, uint32_t const output_bus_count)
-    : _core(std::make_unique<core>(input_bus_count, output_bus_count)) {
+audio::unit_node::impl::impl(node_args &&args) : _core(std::make_unique<core>(std::move(args))) {
 }
 
 audio::unit_node::impl::~impl() = default;
+
+void audio::unit_node::impl::set_prepare_audio_unit_handler(prepare_au_f &&handler) {
+    _core->_prepare_au_handler = std::move(handler);
+}
 
 void audio::unit_node::impl::prepare(unit_node const &node, AudioComponentDescription const &acd) {
     _core->_acd = acd;
@@ -282,7 +285,11 @@ void audio::unit_node::impl::update_unit_connections() {
 
 void audio::unit_node::impl::prepare_audio_unit() {
     if (auto &audio_unit = _core->_au) {
-        audio_unit.set_maximum_frames_per_slice(4096);
+        if (auto const &handler = _core->_prepare_au_handler) {
+            handler(audio_unit);
+        } else {
+            audio_unit.set_maximum_frames_per_slice(4096);
+        }
     }
 }
 

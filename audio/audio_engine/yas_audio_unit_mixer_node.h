@@ -4,11 +4,13 @@
 
 #pragma once
 
-#include "yas_audio_unit_node.h"
+#include "yas_base.h"
 
 namespace yas {
 namespace audio {
-    class unit_mixer_node : public unit_node {
+    class unit_node;
+
+    class unit_mixer_node : public base {
        public:
         unit_mixer_node();
         unit_mixer_node(std::nullptr_t);
@@ -25,6 +27,9 @@ namespace audio {
 
         void set_input_enabled(bool const enabled, uint32_t const bus_idx);
         bool input_enabled(uint32_t const bus_idx) const;
+
+        audio::unit_node const &unit_node() const;
+        audio::unit_node &unit_node();
 
        private:
         class impl;

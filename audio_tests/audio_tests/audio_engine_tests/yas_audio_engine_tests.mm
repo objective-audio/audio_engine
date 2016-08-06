@@ -24,20 +24,20 @@ using namespace yas;
     audio::engine engine;
 
     auto format = audio::format({.sample_rate = 48000.0, .channel_count = 2});
-    test::audio_test_node source_node(1, 1);
-    test::audio_test_node destination_node(1, 1);
+    test::audio_test_node_decorator source_decor(1, 1);
+    test::audio_test_node_decorator destination_decor(1, 1);
 
     XCTAssertEqual(engine.testable().nodes().size(), 0);
     XCTAssertEqual(engine.testable().connections().size(), 0);
 
     audio::connection connection = nullptr;
-    XCTAssertNoThrow(connection = engine.connect(source_node, destination_node, format));
+    XCTAssertNoThrow(connection = engine.connect(source_decor.node(), destination_decor.node(), format));
     XCTAssertTrue(connection);
 
     auto &nodes = engine.testable().nodes();
     auto &connections = engine.testable().connections();
-    XCTAssertGreaterThanOrEqual(nodes.count(source_node), 1);
-    XCTAssertGreaterThanOrEqual(nodes.count(destination_node), 1);
+    XCTAssertGreaterThanOrEqual(nodes.count(source_decor.node()), 1);
+    XCTAssertGreaterThanOrEqual(nodes.count(destination_decor.node()), 1);
     XCTAssertEqual(connections.size(), 1);
     XCTAssertEqual(*connections.begin(), connection);
 }
@@ -46,11 +46,11 @@ using namespace yas;
     audio::engine engine;
 
     auto format = audio::format({.sample_rate = 48000.0, .channel_count = 2});
-    test::audio_test_node source_node(0, 0);
-    test::audio_test_node destination_node(0, 0);
+    test::audio_test_node_decorator source_decor(0, 0);
+    test::audio_test_node_decorator destination_decor(0, 0);
 
     audio::connection connection = nullptr;
-    XCTAssertThrows(connection = engine.connect(source_node, destination_node, format));
+    XCTAssertThrows(connection = engine.connect(source_decor.node(), destination_decor.node(), format));
     XCTAssertFalse(connection);
     XCTAssertEqual(engine.testable().connections().size(), 0);
 }
@@ -59,28 +59,28 @@ using namespace yas;
     audio::engine engine;
 
     auto format = audio::format({.sample_rate = 48000.0, .channel_count = 2});
-    test::audio_test_node source_node(1, 1);
-    test::audio_test_node relay_node(1, 1);
-    test::audio_test_node destination_node(1, 1);
+    test::audio_test_node_decorator source_decor(1, 1);
+    test::audio_test_node_decorator relay_decor(1, 1);
+    test::audio_test_node_decorator destination_decor(1, 1);
 
-    engine.connect(source_node, relay_node, format);
+    engine.connect(source_decor.node(), relay_decor.node(), format);
 
     auto &nodes = engine.testable().nodes();
-    XCTAssertGreaterThanOrEqual(nodes.count(source_node), 1);
-    XCTAssertGreaterThanOrEqual(nodes.count(relay_node), 1);
-    XCTAssertEqual(nodes.count(destination_node), 0);
+    XCTAssertGreaterThanOrEqual(nodes.count(source_decor.node()), 1);
+    XCTAssertGreaterThanOrEqual(nodes.count(relay_decor.node()), 1);
+    XCTAssertEqual(nodes.count(destination_decor.node()), 0);
 
-    engine.connect(relay_node, destination_node, format);
+    engine.connect(relay_decor.node(), destination_decor.node(), format);
 
-    XCTAssertGreaterThanOrEqual(nodes.count(source_node), 1);
-    XCTAssertGreaterThanOrEqual(nodes.count(relay_node), 1);
-    XCTAssertGreaterThanOrEqual(nodes.count(destination_node), 1);
+    XCTAssertGreaterThanOrEqual(nodes.count(source_decor.node()), 1);
+    XCTAssertGreaterThanOrEqual(nodes.count(relay_decor.node()), 1);
+    XCTAssertGreaterThanOrEqual(nodes.count(destination_decor.node()), 1);
 
-    engine.disconnect(relay_node);
+    engine.disconnect(relay_decor.node());
 
-    XCTAssertEqual(nodes.count(source_node), 0);
-    XCTAssertEqual(nodes.count(relay_node), 0);
-    XCTAssertEqual(nodes.count(destination_node), 0);
+    XCTAssertEqual(nodes.count(source_decor.node()), 0);
+    XCTAssertEqual(nodes.count(relay_decor.node()), 0);
+    XCTAssertEqual(nodes.count(destination_decor.node()), 0);
 }
 
 - (void)test_configuration_change_notification {

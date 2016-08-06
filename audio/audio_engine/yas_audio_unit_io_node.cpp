@@ -3,41 +3,24 @@
 //
 
 #include "yas_audio_unit_io_node.h"
+#include "yas_audio_unit_node.h"
 
 #if TARGET_OS_IPHONE
 #elif TARGET_OS_MAC
 #include "yas_audio_device.h"
 #endif
 
-namespace yas {
-namespace audio {
-    AudioComponentDescription constexpr audio_unit_io_node_acd = {
-        .componentType = kAudioUnitType_Output,
-#if TARGET_OS_IPHONE
-        .componentSubType = kAudioUnitSubType_RemoteIO,
-#elif TARGET_OS_MAC
-        .componentSubType = kAudioUnitSubType_HALOutput,
-#endif
-        .componentManufacturer = kAudioUnitManufacturer_Apple,
-        .componentFlags = 0,
-        .componentFlagsMask = 0,
-    };
-}
-}
-
 using namespace yas;
 
 #pragma mark - main
 
-audio::unit_io_node::unit_io_node(std::nullptr_t) : unit_node(nullptr) {
+audio::unit_io_node::unit_io_node(std::nullptr_t) : base(nullptr) {
 }
 
-audio::unit_io_node::unit_io_node() : unit_io_node(std::make_shared<impl>(), audio_unit_io_node_acd) {
-    impl_ptr<impl>()->prepare(*this);
+audio::unit_io_node::unit_io_node() : unit_io_node(args{}) {
 }
 
-audio::unit_io_node::unit_io_node(std::shared_ptr<impl> const &imp, AudioComponentDescription const &acd)
-    : unit_node(imp, acd) {
+audio::unit_io_node::unit_io_node(args args) : base(std::make_shared<impl>(std::move(args))) {
     impl_ptr<impl>()->prepare(*this);
 }
 
@@ -79,35 +62,59 @@ audio::unit_io_node::subject_t &audio::unit_io_node::subject() {
     return impl_ptr<impl>()->subject();
 }
 
-#pragma mark - audio_unit_output_node
-
-audio::unit_output_node::unit_output_node(std::nullptr_t) : unit_io_node() {
+audio::unit_node const &audio::unit_io_node::unit_node() const {
+    return impl_ptr<impl>()->unit_node();
 }
 
-audio::unit_output_node::unit_output_node() : unit_io_node(std::make_unique<impl>(), audio_unit_io_node_acd) {
+audio::unit_node &audio::unit_io_node::unit_node() {
+    return impl_ptr<impl>()->unit_node();
+}
+
+#pragma mark - audio_unit_output_node
+
+audio::unit_output_node::unit_output_node(std::nullptr_t) : base(nullptr) {
+}
+
+audio::unit_output_node::unit_output_node() : base(std::make_unique<impl>()) {
 }
 
 void audio::unit_output_node::set_channel_map(channel_map_t const &map) {
-    unit_io_node::set_channel_map(map, direction::output);
+    unit_io_node().set_channel_map(map, direction::output);
 }
 
 audio::channel_map_t const &audio::unit_output_node::channel_map() const {
-    return unit_io_node::channel_map(direction::output);
+    return unit_io_node().channel_map(direction::output);
+}
+
+audio::unit_io_node const &audio::unit_output_node::unit_io_node() const {
+    return impl_ptr<impl>()->_unit_io_node;
+}
+
+audio::unit_io_node &audio::unit_output_node::unit_io_node() {
+    return impl_ptr<impl>()->_unit_io_node;
 }
 
 #pragma mark - audio_unit_input_node
 
-audio::unit_input_node::unit_input_node(std::nullptr_t) : unit_io_node(nullptr) {
+audio::unit_input_node::unit_input_node(std::nullptr_t) : base(nullptr) {
 }
 
-audio::unit_input_node::unit_input_node() : unit_io_node(std::make_unique<impl>(), audio_unit_io_node_acd) {
+audio::unit_input_node::unit_input_node() : base(std::make_unique<impl>()) {
     impl_ptr<impl>()->prepare(*this);
 }
 
 void audio::unit_input_node::set_channel_map(channel_map_t const &map) {
-    unit_io_node::set_channel_map(map, direction::input);
+    unit_io_node().set_channel_map(map, direction::input);
 }
 
 audio::channel_map_t const &audio::unit_input_node::channel_map() const {
-    return unit_io_node::channel_map(direction::input);
+    return unit_io_node().channel_map(direction::input);
+}
+
+audio::unit_io_node const &audio::unit_input_node::unit_io_node() const {
+    return impl_ptr<impl>()->_unit_io_node;
+}
+
+audio::unit_io_node &audio::unit_input_node::unit_io_node() {
+    return impl_ptr<impl>()->_unit_io_node;
 }

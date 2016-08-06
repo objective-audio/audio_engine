@@ -49,10 +49,11 @@ namespace sample {
 
             if (acd) {
                 effect_node = audio::unit_node(*acd);
-                engine.connect(effect_node.node(), output_node.node(), format);
+                engine.connect(effect_node.node(), output_node.unit_io_node().unit_node().node(), format);
                 engine.connect(tap_node.node(), effect_node.node(), format);
             } else {
-                through_connection = engine.connect(tap_node.node(), output_node.node(), format);
+                through_connection =
+                    engine.connect(tap_node.node(), output_node.unit_io_node().unit_node().node(), format);
             }
         }
     };

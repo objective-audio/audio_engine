@@ -5,6 +5,7 @@
 #pragma once
 
 #include <unordered_map>
+#include "yas_audio_node_protocol.h"
 #include "yas_audio_unit.h"
 #include "yas_audio_unit_node_protocol.h"
 #include "yas_base.h"
@@ -26,12 +27,21 @@ namespace audio {
 
         using subject_t = yas::subject<unit_node, method>;
         using observer_t = yas::observer<unit_node, method>;
+        using prepare_au_f = std::function<void(audio::unit &)>;
 
-        unit_node(std::nullptr_t);
-        unit_node(AudioComponentDescription const &);
+        struct args {
+            audio::node_args node_args;
+            AudioComponentDescription acd;
+        };
+
         unit_node(OSType const type, OSType const sub_type);
+        explicit unit_node(AudioComponentDescription const &);
+        unit_node(args &&);
+        unit_node(std::nullptr_t);
 
         virtual ~unit_node();
+
+        void set_prepare_audio_unit_handler(prepare_au_f);
 
         audio::unit audio_unit() const;
         std::unordered_map<AudioUnitScope, std::unordered_map<AudioUnitParameterID, audio::unit::parameter>> const &
@@ -53,15 +63,11 @@ namespace audio {
         float output_parameter_value(AudioUnitParameterID const parameter_id, AudioUnitElement const element) const;
 
         subject_t &subject();
-        
+
         audio::node const &node() const;
         audio::node &node();
 
         manageable_unit_node &manageable();
-
-       protected:
-        unit_node(std::shared_ptr<impl> &&, AudioComponentDescription const &);
-        explicit unit_node(std::shared_ptr<impl> const &);
 
        private:
         manageable_unit_node _manageable = nullptr;

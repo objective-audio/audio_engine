@@ -8,12 +8,6 @@ using namespace yas;
 
 #pragma mark - main
 
-audio::unit_node::unit_node(std::nullptr_t) : base(nullptr) {
-}
-
-audio::unit_node::unit_node(AudioComponentDescription const &acd) : unit_node(std::make_shared<impl>(1, 1), acd) {
-}
-
 audio::unit_node::unit_node(OSType const type, OSType const sub_type)
     : unit_node(AudioComponentDescription{
           .componentType = type,
@@ -24,14 +18,22 @@ audio::unit_node::unit_node(OSType const type, OSType const sub_type)
       }) {
 }
 
-audio::unit_node::unit_node(std::shared_ptr<impl> &&imp, AudioComponentDescription const &acd) : base(std::move(imp)) {
-    impl_ptr<impl>()->prepare(*this, acd);
+audio::unit_node::unit_node(AudioComponentDescription const &acd)
+    : unit_node({.acd = acd, .node_args = {.input_bus_count = 1, .output_bus_count = 1}}) {
 }
 
-audio::unit_node::unit_node(std::shared_ptr<impl> const &impl) : base(impl) {
+audio::unit_node::unit_node(args &&args) : base(std::make_shared<impl>(std::move(args.node_args))) {
+    impl_ptr<impl>()->prepare(*this, args.acd);
+}
+
+audio::unit_node::unit_node(std::nullptr_t) : base(nullptr) {
 }
 
 audio::unit_node::~unit_node() = default;
+
+void audio::unit_node::set_prepare_audio_unit_handler(prepare_au_f handler) {
+    impl_ptr<impl>()->set_prepare_audio_unit_handler(std::move(handler));
+}
 
 audio::unit audio::unit_node::audio_unit() const {
     return impl_ptr<impl>()->au();
