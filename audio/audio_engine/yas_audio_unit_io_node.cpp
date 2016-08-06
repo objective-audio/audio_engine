@@ -11,7 +11,7 @@
 
 namespace yas {
 namespace audio {
-    AudioComponentDescription constexpr audio_unit_io_node_acd = {
+    static AudioComponentDescription constexpr audio_unit_io_node_acd = {
         .componentType = kAudioUnitType_Output,
 #if TARGET_OS_IPHONE
         .componentSubType = kAudioUnitSubType_RemoteIO,
