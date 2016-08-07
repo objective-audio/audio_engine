@@ -105,5 +105,4 @@ namespace audio {
 audio::unit::au_result_t to_result(OSStatus const err);
 }
 
-#include "yas_audio_unit_impl.h"
 #include "yas_audio_unit_parameter.h"
