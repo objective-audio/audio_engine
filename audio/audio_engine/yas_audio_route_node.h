@@ -18,6 +18,8 @@ namespace audio {
        public:
         route_node();
         route_node(std::nullptr_t);
+        
+        virtual ~route_node() final;
 
         audio::route_set_t const &routes() const;
         void add_route(audio::route);
