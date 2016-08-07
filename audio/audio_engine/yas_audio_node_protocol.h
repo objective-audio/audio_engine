@@ -34,10 +34,10 @@ namespace audio {
 
     struct manageable_node : protocol {
         struct impl : protocol::impl {
-            virtual audio::connection input_connection(uint32_t const bus_idx) const = 0;
-            virtual audio::connection output_connection(uint32_t const bus_idx) const = 0;
-            virtual audio::connection_wmap const &input_connections() const = 0;
-            virtual audio::connection_wmap const &output_connections() const = 0;
+            virtual audio::connection input_connection(uint32_t const bus_idx) = 0;
+            virtual audio::connection output_connection(uint32_t const bus_idx) = 0;
+            virtual audio::connection_wmap const &input_connections() = 0;
+            virtual audio::connection_wmap const &output_connections() = 0;
             virtual void set_engine(audio::engine const &engine) = 0;
             virtual audio::engine engine() const = 0;
             virtual void update_kernel() = 0;

@@ -14,8 +14,9 @@ namespace yas {
 namespace offline_sample {
     static double constexpr sample_rate = 44100.0;
 
-    struct sine_node : audio::tap_node {
-        struct impl : audio::tap_node::impl {
+    struct sine_node : base {
+        struct impl : base::impl {
+            audio::tap_node _tap_node;
             double phase_on_render;
 
             void set_frequency(float const frequency) {
@@ -44,7 +45,7 @@ namespace offline_sample {
             mutable std::recursive_mutex _mutex;
         };
 
-        sine_node() : audio::tap_node(std::make_unique<impl>()) {
+        sine_node() : base(std::make_unique<impl>()) {
             set_frequency(1000.0);
 
             auto weak_node = to_weak(*this);
@@ -75,10 +76,10 @@ namespace offline_sample {
                 }
             };
 
-            set_render_function(render_function);
+            tap_node().set_render_function(render_function);
         }
 
-        sine_node(std::nullptr_t) : audio::tap_node(nullptr) {
+        sine_node(std::nullptr_t) : base(nullptr) {
         }
 
         virtual ~sine_node() = default;
@@ -97,6 +98,10 @@ namespace offline_sample {
 
         bool is_playing() const {
             return impl_ptr<impl>()->is_playing();
+        }
+
+        audio::tap_node &tap_node() {
+            return impl_ptr<impl>()->_tap_node;
         }
     };
 }
@@ -141,7 +146,7 @@ namespace sample {
 
             play_engine.connect(play_mixer_node.unit_node().node(), play_output_node.unit_io_node().unit_node().node(),
                                 format);
-            play_engine.connect(play_sine_node.node(), play_mixer_node.unit_node().node(), format);
+            play_engine.connect(play_sine_node.tap_node().node(), play_mixer_node.unit_node().node(), format);
 
             offline_engine.add_offline_output_node();
             audio::offline_output_node &offline_output_node = offline_engine.offline_output_node();
@@ -153,7 +158,7 @@ namespace sample {
             offline_mixer_node.set_output_pan(0.0f, 0);
 
             offline_engine.connect(offline_mixer_node.unit_node().node(), offline_output_node.node(), format);
-            offline_engine.connect(offline_sine_node.node(), offline_mixer_node.unit_node().node(), format);
+            offline_engine.connect(offline_sine_node.tap_node().node(), offline_mixer_node.unit_node().node(), format);
 
             engine_observer = play_engine.subject().make_observer(
                 audio::engine::method::configuration_change,

@@ -38,5 +38,3 @@ std::string to_string(audio::offline_start_error_t const &error);
 }
 
 std::ostream &operator<<(std::ostream &, yas::audio::offline_start_error_t const &);
-
-#include "yas_audio_offline_output_node_impl.h"

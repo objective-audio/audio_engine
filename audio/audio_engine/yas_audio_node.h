@@ -26,6 +26,7 @@ namespace audio {
        public:
         class impl;
         class kernel;
+        class manageable_kernel;
 
         enum class method {
             will_reset,
@@ -50,6 +51,11 @@ namespace audio {
 
         void reset();
 
+        audio::connection input_connection(uint32_t const bus_idx) const;
+        audio::connection output_connection(uint32_t const bus_idx) const;
+        audio::connection_wmap const &input_connections() const;
+        audio::connection_wmap const &output_connections() const;
+
         audio::format input_format(uint32_t const bus_idx) const;
         audio::format output_format(uint32_t const bus_idx) const;
         bus_result_t next_available_input_bus() const;
@@ -66,6 +72,8 @@ namespace audio {
         void set_make_kernel_handler(make_kernel_f);
         void set_render_handler(render_f);
 
+        audio::node::kernel get_kernel() const;
+
         void render(audio::pcm_buffer &buffer, uint32_t const bus_idx, audio::time const &when);
         void set_render_time_on_render(audio::time const &time);
 
@@ -75,11 +83,6 @@ namespace audio {
         audio::connectable_node &connectable();
         audio::manageable_node const &manageable() const;
         audio::manageable_node &manageable();
-
-       protected:
-        class manageable_kernel;
-
-        explicit node(std::shared_ptr<impl> const &);
 
        private:
         audio::connectable_node _connectable = nullptr;
@@ -99,4 +102,4 @@ struct std::hash<yas::audio::node> {
     }
 };
 
-#include "yas_audio_node_impl.h"
+#include "yas_audio_node_kernel.h"

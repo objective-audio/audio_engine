@@ -34,7 +34,7 @@ namespace audio {
         unit_io_node(args);
         unit_io_node(std::nullptr_t);
 
-        virtual ~unit_io_node();
+        ~unit_io_node();
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
         void set_device(audio::device const &);
@@ -83,5 +83,3 @@ namespace audio {
     };
 }
 }
-
-#include "yas_audio_unit_io_node_impl.h"
