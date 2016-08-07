@@ -40,12 +40,7 @@ namespace test {
                    uint32_t const destination_bus, audio::format const &format);
     };
 
-    struct node : audio::node {
-        node();
-        node(audio::node const &);
-
-        audio::node::kernel kernel();
-    };
+    audio::node make_node();
 
     struct unit : audio::unit {
         unit();
