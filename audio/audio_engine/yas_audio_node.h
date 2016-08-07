@@ -36,14 +36,7 @@ namespace audio {
         using subject_t = subject<node, method>;
         using observer_t = observer<node, method>;
 
-        enum class kernel_method {
-            did_prepare,
-        };
-
-        using kernel_subject_t = subject<kernel, kernel_method>;
-        using kernel_observer_t = observer<kernel, kernel_method>;
-
-        using make_kernel_f = std::function<node::kernel(void)>;
+        using prepare_kernel_f = std::function<void(node::kernel &)>;
         using render_f = std::function<void(audio::pcm_buffer &, uint32_t const, audio::time const &)>;
 
         node(node_args);
@@ -69,7 +62,7 @@ namespace audio {
         uint32_t output_bus_count() const;
         bool is_input_renderable() const;
 
-        void set_make_kernel_handler(make_kernel_f);
+        void set_prepare_kernel_handler(prepare_kernel_f);
         void set_render_handler(render_f);
 
         audio::node::kernel get_kernel() const;
@@ -78,7 +71,6 @@ namespace audio {
         void set_render_time_on_render(audio::time const &time);
 
         subject_t &subject();
-        kernel_subject_t &kernel_subject();
 
         audio::connectable_node &connectable();
         audio::manageable_node const &manageable() const;
