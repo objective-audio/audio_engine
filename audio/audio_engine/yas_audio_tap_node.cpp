@@ -33,9 +33,6 @@ struct audio::tap_node::kernel : base {
 struct audio::tap_node::impl : base::impl {
     audio::node _node;
 
-    impl() : impl({.input_bus_count = 1, .output_bus_count = 1}) {
-    }
-
     impl(audio::node_args &&args) : _node(std::move(args)) {
     }
 
@@ -118,15 +115,16 @@ struct audio::tap_node::impl : base::impl {
 
 #pragma mark - audio::tap_node
 
-audio::tap_node::tap_node() : base(std::make_unique<impl>()) {
+audio::tap_node::tap_node() : tap_node({.is_input = false}) {
+}
+
+audio::tap_node::tap_node(args args)
+    : base(std::make_unique<impl>(std::move(args.is_input ? node_args{.input_bus_count = 1, .input_renderable = true} :
+                                                            node_args{.input_bus_count = 1, .output_bus_count = 1}))) {
     impl_ptr<impl>()->prepare(*this);
 }
 
 audio::tap_node::tap_node(std::nullptr_t) : base(nullptr) {
-}
-
-audio::tap_node::tap_node(std::shared_ptr<impl> const &imp) : base(imp) {
-    impl_ptr<impl>()->prepare(*this);
 }
 
 audio::tap_node::~tap_node() = default;
@@ -161,20 +159,4 @@ audio::connection_smap audio::tap_node::output_connections_on_render() const {
 
 void audio::tap_node::render_source(pcm_buffer &buffer, uint32_t const bus_idx, time const &when) {
     impl_ptr<impl>()->render_source(buffer, bus_idx, when);
-}
-
-#pragma mark - input_tap_node::impl
-
-struct audio::input_tap_node::impl : tap_node::impl {
-    impl() : audio::tap_node::impl({.input_bus_count = 1, .output_bus_count = 0, .input_renderable = true}) {
-    }
-};
-
-#pragma mark - input_tap_node
-
-audio::input_tap_node::input_tap_node() : tap_node(std::make_unique<impl>()) {
-    audio::tap_node::impl_ptr<impl>()->prepare(*this);
-}
-
-audio::input_tap_node::input_tap_node(std::nullptr_t) : tap_node(nullptr) {
 }
