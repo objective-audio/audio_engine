@@ -187,18 +187,12 @@ test::connection::connection(audio::node &source_node, uint32_t const source_bus
     : audio::connection(source_node, source_bus, destination_node, destination_bus, format) {
 }
 
-test::node::node() : audio::node(std::make_shared<audio::node::impl>(audio::node_args{})) {
-}
-
-test::node::node(audio::node const &node) : audio::node(node.impl_ptr<audio::node::impl>()) {
+audio::node test::make_node() {
+    return audio::node{audio::node_args{}};
 }
 
 test::unit::unit() : audio::unit(std::make_shared<audio::unit::impl>()) {
 }
 
 test::unit::unit(audio::unit const &unit) : audio::unit(unit.impl_ptr<audio::unit::impl>()) {
-}
-
-audio::node::kernel test::node::kernel() {
-    return impl_ptr<audio::node::impl>()->kernel_cast();
 }

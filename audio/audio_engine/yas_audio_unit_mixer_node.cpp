@@ -37,7 +37,7 @@ struct audio::unit_mixer_node::impl : base::impl {
 
    private:
     void update_unit_mixer_connections() {
-        auto &connections = _unit_node.node().impl_ptr<audio::node::impl>()->input_connections();
+        auto &connections = _unit_node.node().input_connections();
         if (connections.size() > 0) {
             auto last = connections.end();
             --last;

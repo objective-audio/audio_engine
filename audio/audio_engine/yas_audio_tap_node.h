@@ -45,5 +45,3 @@ namespace audio {
     };
 }
 }
-
-#include "yas_audio_tap_node_impl.h"

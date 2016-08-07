@@ -87,7 +87,7 @@ void audio::device_io_node::impl::update_device_io_connections() {
 
     auto render_function = [weak_node, weak_device_io](auto args) {
         if (auto node = weak_node.lock()) {
-            if (auto kernel = node.node().impl_ptr<audio::node::impl>()->kernel_cast()) {
+            if (auto kernel = node.node().get_kernel()) {
                 if (args.output_buffer) {
                     auto const connections = kernel.input_connections();
                     if (connections.count(0) > 0) {
@@ -127,7 +127,7 @@ void audio::device_io_node::impl::update_device_io_connections() {
 
 bool audio::device_io_node::impl::_validate_connections() const {
     if (auto const &device_io = _core->_device_io) {
-        auto &input_connections = node().impl_ptr<audio::node::impl>()->input_connections();
+        auto &input_connections = node().input_connections();
         if (input_connections.size() > 0) {
             auto const connections = lock_values(input_connections);
             if (connections.count(0) > 0) {
@@ -141,7 +141,7 @@ bool audio::device_io_node::impl::_validate_connections() const {
             }
         }
 
-        auto &output_connections = node().impl_ptr<audio::node::impl>()->output_connections();
+        auto &output_connections = node().output_connections();
         if (output_connections.size() > 0) {
             auto const connections = lock_values(output_connections);
             if (connections.count(0) > 0) {
