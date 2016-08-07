@@ -44,12 +44,12 @@ namespace sample {
                 int const frame_length = enumerator.frame_length();
                 float level = 0;
                 while (flex_ptr->v) {
-                    level = MAX(fabsf(flex_ptr->f32[cblas_isamax(frame_length, flex_ptr->f32, 1)]), level);
+                    level = std::max(fabsf(flex_ptr->f32[cblas_isamax(frame_length, flex_ptr->f32, 1)]), level);
                     yas_audio_frame_enumerator_move_channel(enumerator);
                 }
 
                 float prev_level = input_level.value() - frame_length / sample_rate * 30.0f;
-                level = MAX(prev_level, audio::math::decibel_from_linear(level));
+                level = std::max(prev_level, audio::math::decibel_from_linear(level));
                 input_level.set_value(level);
             });
         }
@@ -117,7 +117,7 @@ namespace sample {
 - (void)updateUI:(CADisplayLink *)sender {
     float value = _internal.input_level.value();
 
-    self.progressView.progress = MAX((value + 72.0f) / 72.0f, 0.0f);
+    self.progressView.progress = std::max((value + 72.0f) / 72.0f, 0.0f);
 
     CFTimeInterval currentTime = CFAbsoluteTimeGetCurrent();
     if (currentTime - _lastLabelUpdatedTime > 0.1) {
