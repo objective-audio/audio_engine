@@ -19,6 +19,8 @@ audio::engine::engine() : base(std::make_shared<impl>()) {
 audio::engine::engine(std::nullptr_t) : base(nullptr) {
 }
 
+audio::engine::~engine() = default;
+
 audio::connection audio::engine::connect(node &source_node, node &destination_node, audio::format const &format) {
     if (!source_node || !destination_node) {
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");

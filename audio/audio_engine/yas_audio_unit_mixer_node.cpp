@@ -59,6 +59,8 @@ audio::unit_mixer_node::unit_mixer_node() : base(std::make_unique<impl>()) {
 audio::unit_mixer_node::unit_mixer_node(std::nullptr_t) : base(nullptr) {
 }
 
+audio::unit_mixer_node::~unit_mixer_node() = default;
+
 void audio::unit_mixer_node::set_output_volume(float const volume, uint32_t const bus_idx) {
     unit_node().set_output_parameter_value(kMultiChannelMixerParam_Volume, volume, bus_idx);
 }

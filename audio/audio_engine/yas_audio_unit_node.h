@@ -39,7 +39,7 @@ namespace audio {
         unit_node(args &&);
         unit_node(std::nullptr_t);
 
-        ~unit_node();
+        virtual ~unit_node() final;
 
         void set_prepare_audio_unit_handler(prepare_au_f);
 

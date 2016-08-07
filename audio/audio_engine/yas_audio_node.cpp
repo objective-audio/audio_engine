@@ -299,6 +299,8 @@ audio::node::node(node_args args) : base(std::make_shared<impl>(std::move(args))
 audio::node::node(std::nullptr_t) : base(nullptr) {
 }
 
+audio::node::~node() = default;
+
 void audio::node::reset() {
     if (!impl_ptr()) {
         std::cout << "_impl is null" << std::endl;

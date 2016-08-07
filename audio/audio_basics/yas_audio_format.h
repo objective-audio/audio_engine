@@ -27,6 +27,8 @@ namespace audio {
         format(args args);
         format(std::nullptr_t);
 
+        virtual ~format() final;
+
         bool is_empty() const;
         bool is_standard() const;
         audio::pcm_format pcm_format() const;

@@ -248,6 +248,8 @@ audio::unit_output_node::unit_output_node(std::nullptr_t) : base(nullptr) {
 audio::unit_output_node::unit_output_node() : base(std::make_unique<impl>()) {
 }
 
+audio::unit_output_node::~unit_output_node() = default;
+
 void audio::unit_output_node::set_channel_map(channel_map_t const &map) {
     unit_io_node().set_channel_map(map, direction::output);
 }
@@ -338,6 +340,8 @@ audio::unit_input_node::unit_input_node(std::nullptr_t) : base(nullptr) {
 audio::unit_input_node::unit_input_node() : base(std::make_unique<impl>()) {
     impl_ptr<impl>()->prepare(*this);
 }
+
+audio::unit_input_node::~unit_input_node() = default;
 
 void audio::unit_input_node::set_channel_map(channel_map_t const &map) {
     unit_io_node().set_channel_map(map, direction::input);

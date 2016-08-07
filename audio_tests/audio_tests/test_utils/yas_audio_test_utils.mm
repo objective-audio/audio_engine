@@ -190,9 +190,3 @@ test::connection::connection(audio::node &source_node, uint32_t const source_bus
 audio::node test::make_node() {
     return audio::node{audio::node_args{}};
 }
-
-test::unit::unit() : audio::unit(std::make_shared<audio::unit::impl>()) {
-}
-
-test::unit::unit(audio::unit const &unit) : audio::unit(unit.impl_ptr<audio::unit::impl>()) {
-}

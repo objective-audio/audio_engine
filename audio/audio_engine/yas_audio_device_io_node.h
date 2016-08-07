@@ -24,7 +24,7 @@ namespace audio {
         device_io_node(std::nullptr_t);
         device_io_node(audio::device const &device);
 
-        virtual ~device_io_node();
+        virtual ~device_io_node() final;
 
         void set_device(audio::device const &device);
         audio::device device() const;

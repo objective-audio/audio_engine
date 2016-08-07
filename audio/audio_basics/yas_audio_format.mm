@@ -91,6 +91,8 @@ audio::format::format(args args)
 audio::format::format(std::nullptr_t) : base(nullptr) {
 }
 
+audio::format::~format() = default;
+
 bool audio::format::is_empty() const {
     return memcmp(&impl_ptr<impl>()->_asbd, &empty_asbd, sizeof(AudioStreamBasicDescription)) == 0;
 }

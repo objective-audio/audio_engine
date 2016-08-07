@@ -49,6 +49,8 @@ namespace audio {
         engine();
         engine(std::nullptr_t);
 
+        virtual ~engine() final;
+
         audio::connection connect(audio::node &source_node, audio::node &destination_node, audio::format const &format);
         audio::connection connect(audio::node &source_node, audio::node &destination_node,
                                   uint32_t const source_bus_idx, uint32_t const destination_bus_idx,

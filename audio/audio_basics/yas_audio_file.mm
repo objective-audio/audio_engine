@@ -298,6 +298,8 @@ audio::file::file() : base(std::make_shared<impl>()) {
 audio::file::file(std::nullptr_t) : base(nullptr) {
 }
 
+audio::file::~file() = default;
+
 audio::file::open_result_t audio::file::open(open_args args) {
     return impl_ptr<impl>()->open(std::move(args));
 }
