@@ -13,25 +13,29 @@ using namespace yas;
 #pragma mark - audio::offline_output_node::impl
 
 struct audio::offline_output_node::impl : base::impl, manageable_offline_output_unit::impl {
+    operation_queue _queue = nullptr;
+    audio::node _node = {{.input_bus_count = 1, .output_bus_count = 0}};
+    audio::node::observer_t _reset_observer;
+
     impl() : _core(std::make_unique<audio::offline_output_node::impl::core>()) {
     }
 
     ~impl() = default;
 
     void prepare(offline_output_node const &node) {
-        _core->_reset_observer = _core->_node.subject().make_observer(
-            audio::node::method::will_reset, [weak_node = to_weak(node)](auto const &) {
+        _reset_observer =
+            _node.subject().make_observer(audio::node::method::will_reset, [weak_node = to_weak(node)](auto const &) {
                 if (auto node = weak_node.lock()) {
-                    node.impl_ptr<audio::offline_output_node::impl>()->_will_reset();
+                    node.impl_ptr<audio::offline_output_node::impl>()->stop();
                 }
             });
     }
 
     audio::offline_start_result_t start(offline_render_f &&render_func,
                                         offline_completion_f &&completion_func) override {
-        if (_core->_queue) {
+        if (_queue) {
             return offline_start_result_t(offline_start_error_t::already_running);
-        } else if (auto connection = _core->_node.input_connection(0)) {
+        } else if (auto connection = _node.input_connection(0)) {
             std::experimental::optional<uint8_t> key;
             if (completion_func) {
                 key = _core->push_completion_function(std::move(completion_func));
@@ -100,7 +104,7 @@ struct audio::offline_output_node::impl : base::impl, manageable_offline_output_
                             node_completion_func = offline_node.impl_ptr<impl>()->_core->pull_completion_function(*key);
                         }
 
-                        offline_node.impl_ptr<impl>()->_core->_queue = nullptr;
+                        offline_node.impl_ptr<impl>()->_queue = nullptr;
 
                         if (node_completion_func) {
                             (*node_completion_func)(cancelled);
@@ -112,8 +116,8 @@ struct audio::offline_output_node::impl : base::impl, manageable_offline_output_
             };
 
             operation operation{std::move(operation_lambda)};
-            _core->_queue = operation_queue{1};
-            _core->_queue.push_back(operation);
+            _queue = operation_queue{1};
+            _queue.push_back(operation);
         } else {
             return offline_start_result_t(offline_start_error_t::connection_not_found);
         }
@@ -121,12 +125,12 @@ struct audio::offline_output_node::impl : base::impl, manageable_offline_output_
     }
 
     void stop() override {
-        auto completion_functions = _core->pull_completion_functions();
+        auto completion_functions = _core->pull_completion_handlers();
 
-        if (auto &queue = _core->_queue) {
+        if (auto &queue = _queue) {
             queue.cancel();
             queue.wait_until_all_operations_are_finished();
-            _core->_queue = nullptr;
+            _queue = nullptr;
         }
 
         for (auto &pair : completion_functions) {
@@ -138,60 +142,47 @@ struct audio::offline_output_node::impl : base::impl, manageable_offline_output_
     }
 
     bool is_running() {
-        return _core->_queue != nullptr;
+        return _queue != nullptr;
     }
 
     audio::node &node() {
-        return _core->_node;
+        return _node;
     }
 
    private:
-    void _will_reset() {
-        stop();
-    }
-
     struct core {
         using completion_function_map_t = std::map<uint8_t, offline_completion_f>;
-
-        operation_queue _queue;
-        audio::node _node = {{.input_bus_count = 1, .output_bus_count = 0}};
-        audio::node::observer_t _reset_observer;
-
-        core() : _queue(nullptr), _completion_functions() {
-        }
-
-        ~core() = default;
 
         std::experimental::optional<uint8_t> const push_completion_function(offline_completion_f &&function) {
             if (!function) {
                 return nullopt;
             }
 
-            auto key = min_empty_key(_completion_functions);
+            auto key = min_empty_key(_completion_handlers);
             if (key) {
-                _completion_functions.insert(std::make_pair(*key, std::move(function)));
+                _completion_handlers.insert(std::make_pair(*key, std::move(function)));
             }
             return key;
         }
 
         std::experimental::optional<offline_completion_f> const pull_completion_function(uint8_t key) {
-            if (_completion_functions.count(key) > 0) {
-                auto func = _completion_functions.at(key);
-                _completion_functions.erase(key);
+            if (_completion_handlers.count(key) > 0) {
+                auto func = _completion_handlers.at(key);
+                _completion_handlers.erase(key);
                 return std::move(func);
             } else {
                 return nullopt;
             }
         }
 
-        completion_function_map_t pull_completion_functions() {
-            auto map = _completion_functions;
-            _completion_functions.clear();
+        completion_function_map_t pull_completion_handlers() {
+            auto map = _completion_handlers;
+            _completion_handlers.clear();
             return map;
         }
 
        private:
-        completion_function_map_t _completion_functions;
+        completion_function_map_t _completion_handlers;
     };
 
     std::unique_ptr<core> _core;

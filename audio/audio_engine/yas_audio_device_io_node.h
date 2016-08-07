@@ -34,15 +34,10 @@ namespace audio {
 
         manageable_device_io_node &manageable();
 
-       protected:
-        device_io_node(std::shared_ptr<device_io_node::impl> const &impl);
-
        private:
         manageable_device_io_node _manageable = nullptr;
     };
 }
 }
-
-#include "yas_audio_device_io_node_impl.h"
 
 #endif
