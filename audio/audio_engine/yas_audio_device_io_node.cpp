@@ -109,7 +109,7 @@ struct yas::audio::device_io_node::impl : base::impl, manageable_device_io_node:
 
         auto render_function = [weak_node, weak_device_io](auto args) {
             if (auto node = weak_node.lock()) {
-                if (auto kernel = node.node().get_kernel()) {
+                if (auto kernel = node.node().kernel()) {
                     if (args.output_buffer) {
                         auto const connections = kernel.input_connections();
                         if (connections.count(0) > 0) {

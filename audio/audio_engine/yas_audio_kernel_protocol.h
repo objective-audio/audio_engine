@@ -1,5 +1,5 @@
 //
-//  yas_audio_node_kernel_protocol.h
+//  yas_audio_kernel_protocol.h
 //
 
 #pragma once
@@ -8,7 +8,7 @@
 
 namespace yas {
 namespace audio {
-    struct node::manageable_kernel : protocol {
+    struct manageable_kernel : protocol {
         struct impl : protocol::impl {
             virtual void set_input_connections(audio::connection_wmap &&) = 0;
             virtual void set_output_connections(audio::connection_wmap &&) = 0;

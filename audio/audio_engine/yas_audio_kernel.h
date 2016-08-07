@@ -1,15 +1,15 @@
 //
-//  yas_audio_node_kernel.h
+//  yas_audio_kernel.h
 //
 
 #pragma once
 
-#include "yas_audio_node_kernel_protocol.h"
+#include "yas_audio_kernel_protocol.h"
 #include "yas_base.h"
 
 namespace yas {
 namespace audio {
-    struct node::kernel : base {
+    struct kernel : base {
         kernel();
         kernel(std::nullptr_t);
 
