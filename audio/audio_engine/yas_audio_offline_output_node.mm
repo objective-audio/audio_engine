@@ -61,7 +61,7 @@ struct audio::offline_output_node::impl : base::impl, manageable_offline_output_
                         break;
                     }
 
-                    auto kernel = offline_node.node().get_kernel();
+                    auto kernel = offline_node.node().kernel();
                     if (!kernel) {
                         cancelled = true;
                         break;

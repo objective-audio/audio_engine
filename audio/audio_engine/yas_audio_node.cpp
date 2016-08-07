@@ -17,12 +17,12 @@ using namespace yas;
 struct audio::node::impl : base::impl, manageable_node::impl, connectable_node::impl {
    private:
     struct core {
-        void set_kernel(node::kernel kernel) {
+        void set_kernel(audio::kernel kernel) {
             std::lock_guard<std::recursive_mutex> lock(_mutex);
             _kernel = std::move(kernel);
         }
 
-        node::kernel kernel() {
+        audio::kernel kernel() {
             std::lock_guard<std::recursive_mutex> lock(_mutex);
             return _kernel;
         }
@@ -32,14 +32,14 @@ struct audio::node::impl : base::impl, manageable_node::impl, connectable_node::
             _render_time = render_time;
         }
 
-        time render_time() const {
+        audio::time render_time() const {
             std::lock_guard<std::recursive_mutex> lock(_mutex);
             return _render_time;
         }
 
        private:
-        node::kernel _kernel = nullptr;
-        time _render_time = nullptr;
+        audio::kernel _kernel = nullptr;
+        audio::time _render_time = nullptr;
         mutable std::recursive_mutex _mutex;
     };
 
@@ -50,8 +50,8 @@ struct audio::node::impl : base::impl, manageable_node::impl, connectable_node::
     uint32_t _output_bus_count = 0;
     bool _is_input_renderable = false;
     std::experimental::optional<uint32_t> _override_output_bus_idx = nullopt;
-    connection_wmap _input_connections;
-    connection_wmap _output_connections;
+    audio::connection_wmap _input_connections;
+    audio::connection_wmap _output_connections;
     std::function<void(audio::graph &)> _add_to_graph_handler;
     std::function<void(audio::graph &)> _remove_from_graph_handler;
     prepare_kernel_f _prepare_kernel_handler;
@@ -215,7 +215,7 @@ struct audio::node::impl : base::impl, manageable_node::impl, connectable_node::
         _prepare_kernel_handler = std::move(handler);
     }
 
-    void prepare_kernel(audio::node::kernel &kernel) {
+    void prepare_kernel(audio::kernel &kernel) {
         if (!kernel) {
             throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
         }
@@ -230,12 +230,12 @@ struct audio::node::impl : base::impl, manageable_node::impl, connectable_node::
     }
 
     void update_kernel() override {
-        auto kernel = audio::node::kernel{};
+        auto kernel = audio::kernel{};
         prepare_kernel(kernel);
         _core->set_kernel(kernel);
     }
 
-    audio::node::kernel kernel() {
+    audio::kernel kernel() {
         return _core->kernel();
     }
 
@@ -376,7 +376,7 @@ void audio::node::set_render_handler(render_f handler) {
     impl_ptr<impl>()->set_render_handler(std::move(handler));
 }
 
-audio::node::kernel audio::node::get_kernel() const {
+audio::kernel audio::node::kernel() const {
     return impl_ptr<impl>()->kernel();
 }
 

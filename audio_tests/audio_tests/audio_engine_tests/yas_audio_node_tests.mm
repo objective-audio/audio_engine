@@ -42,7 +42,7 @@ using namespace yas;
 }
 
 - (void)test_create_kernel {
-    audio::node::kernel kernel;
+    audio::kernel kernel;
 
     XCTAssertTrue(kernel);
 
@@ -98,7 +98,8 @@ using namespace yas;
     auto source_bus = *source_decor.node().next_available_output_bus();
     auto destination_bus = *destination_decor.node().next_available_input_bus();
 
-    auto connection = test::connection(source_decor.node(), source_bus, destination_decor.node(), destination_bus, format);
+    auto connection =
+        test::connection(source_decor.node(), source_bus, destination_decor.node(), destination_bus, format);
 
     XCTAssertEqual(source_decor.node().manageable().output_connections().size(), 1);
     XCTAssertEqual(destination_decor.node().manageable().input_connections().size(), 1);
@@ -171,7 +172,7 @@ using namespace yas;
     XCTestExpectation *expectation = [self expectationWithDescription:@"kernel connections"];
 
     auto lambda = [self, expectation, relay_node = relay_decor.node(), input_connections, output_connection]() {
-        auto kernel = relay_node.get_kernel();
+        auto kernel = relay_node.kernel();
         XCTAssertEqual(kernel.output_connections().size(), 1);
         XCTAssertEqual(kernel.input_connections().size(), 2);
         XCTAssertEqual(kernel.output_connection(0), output_connection);

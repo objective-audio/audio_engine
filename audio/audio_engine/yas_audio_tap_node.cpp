@@ -6,7 +6,7 @@
 
 using namespace yas;
 
-#pragma mark - audio::tap_node::kernel
+#pragma mark - audio::tap_kernel
 
 struct audio::tap_node::kernel : base {
     struct impl : base::impl {
@@ -45,7 +45,7 @@ struct audio::tap_node::impl : base::impl {
             [weak_node](audio::pcm_buffer &buffer, uint32_t const bus_idx, audio::time const &when) {
                 if (auto node = weak_node.lock()) {
                     auto impl_ptr = node.impl_ptr<impl>();
-                    if (auto kernel = impl_ptr->_node.get_kernel()) {
+                    if (auto kernel = impl_ptr->_node.kernel()) {
                         impl_ptr->_kernel_on_render = kernel;
 
                         auto tap_kernel = yas::cast<tap_node::kernel>(kernel.decorator());
@@ -68,7 +68,7 @@ struct audio::tap_node::impl : base::impl {
             }
         });
 
-        _node.set_prepare_kernel_handler([weak_node](audio::node::kernel &kernel) {
+        _node.set_prepare_kernel_handler([weak_node](audio::kernel &kernel) {
             if (auto node = weak_node.lock()) {
                 audio::tap_node::kernel tap_kernel{};
                 tap_kernel.set_render_function(node.impl_ptr<audio::tap_node::impl>()->_render_function);
@@ -110,7 +110,7 @@ struct audio::tap_node::impl : base::impl {
    private:
     render_f _render_function;
     audio::node::observer_t _reset_observer;
-    node::kernel _kernel_on_render;
+    audio::kernel _kernel_on_render;
 };
 
 #pragma mark - audio::tap_node

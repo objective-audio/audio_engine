@@ -299,7 +299,7 @@ struct yas::audio::unit_input_node::impl : base::impl {
                     input_buffer.set_frame_length(render_parameters.in_number_frames);
                     render_parameters.io_data = input_buffer.audio_buffer_list();
 
-                    if (auto const kernel = input_node.unit_io_node().unit_node().node().get_kernel()) {
+                    if (auto const kernel = input_node.unit_io_node().unit_node().node().kernel()) {
                         if (auto const connection = kernel.output_connection(1)) {
                             auto format = connection.format();
                             time time(*render_parameters.io_time_stamp, format.sample_rate());

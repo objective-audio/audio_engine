@@ -47,7 +47,7 @@ struct audio::route_node::impl : base::impl {
         _node.set_render_handler(
             [weak_node](audio::pcm_buffer &dst_buffer, uint32_t const dst_bus_idx, audio::time const &when) {
                 if (auto node = weak_node.lock()) {
-                    if (auto kernel = node.node().get_kernel()) {
+                    if (auto kernel = node.node().kernel()) {
                         auto const &routes = yas::cast<audio::route_node::kernel>(kernel.decorator()).routes();
                         auto output_connection = kernel.output_connection(dst_bus_idx);
                         auto input_connections = kernel.input_connections();
@@ -77,7 +77,7 @@ struct audio::route_node::impl : base::impl {
             }
         });
 
-        _node.set_prepare_kernel_handler([weak_node](audio::node::kernel &kernel) {
+        _node.set_prepare_kernel_handler([weak_node](audio::kernel &kernel) {
             if (auto node = weak_node.lock()) {
                 audio::route_node::kernel route_kernel{};
                 route_kernel.set_routes(node.impl_ptr<impl>()->_routes);

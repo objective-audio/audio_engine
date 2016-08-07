@@ -21,12 +21,11 @@ class result;
 namespace audio {
     class time;
     class engine;
+    class kernel;
 
     class node : public base {
        public:
         class impl;
-        class kernel;
-        class manageable_kernel;
 
         enum class method {
             will_reset,
@@ -36,7 +35,7 @@ namespace audio {
         using subject_t = subject<node, method>;
         using observer_t = observer<node, method>;
 
-        using prepare_kernel_f = std::function<void(node::kernel &)>;
+        using prepare_kernel_f = std::function<void(kernel &)>;
         using render_f = std::function<void(audio::pcm_buffer &, uint32_t const, audio::time const &)>;
 
         node(node_args);
@@ -67,7 +66,7 @@ namespace audio {
         void set_prepare_kernel_handler(prepare_kernel_f);
         void set_render_handler(render_f);
 
-        audio::node::kernel get_kernel() const;
+        audio::kernel kernel() const;
 
         void render(audio::pcm_buffer &buffer, uint32_t const bus_idx, audio::time const &when);
         void set_render_time_on_render(audio::time const &time);
@@ -96,4 +95,4 @@ struct std::hash<yas::audio::node> {
     }
 };
 
-#include "yas_audio_node_kernel.h"
+#include "yas_audio_kernel.h"
