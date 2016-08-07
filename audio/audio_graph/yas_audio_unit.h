@@ -33,6 +33,8 @@ namespace audio {
         explicit unit(AudioComponentDescription const &acd);
         unit(OSType const type, OSType const subType);
 
+        virtual ~unit() final;
+
         CFStringRef name() const;
         OSType type() const;
         OSType sub_type() const;

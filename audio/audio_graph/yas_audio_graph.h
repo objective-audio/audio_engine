@@ -21,6 +21,8 @@ namespace audio {
         graph();
         graph(std::nullptr_t);
 
+        virtual ~graph() final;
+
         void add_audio_unit(unit &audio_unit);
         void remove_audio_unit(unit &audio_unit);
         void remove_all_units();

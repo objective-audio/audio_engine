@@ -42,6 +42,8 @@ audio::unit::unit(std::shared_ptr<impl> const &impl) : base(impl) {
 
 #endif
 
+audio::unit::~unit() = default;
+
 #pragma mark - accessor
 
 CFStringRef audio::unit::name() const {

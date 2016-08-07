@@ -42,6 +42,8 @@ namespace audio {
         node(node_args);
         node(std::nullptr_t);
 
+        virtual ~node() final;
+
         void reset();
 
         audio::connection input_connection(uint32_t const bus_idx) const;

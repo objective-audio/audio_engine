@@ -283,6 +283,8 @@ audio::pcm_buffer::pcm_buffer(audio::format const &format, audio::pcm_buffer con
                                   from_buffer, channel_map)) {
 }
 
+audio::pcm_buffer::~pcm_buffer() = default;
+
 audio::format const &audio::pcm_buffer::format() const {
     return impl_ptr<impl>()->_format;
 }

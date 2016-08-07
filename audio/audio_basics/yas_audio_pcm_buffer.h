@@ -34,6 +34,8 @@ namespace audio {
         pcm_buffer(audio::format const &format, pcm_buffer const &from_buffer, channel_map_t const &channel_map);
         pcm_buffer(std::nullptr_t);
 
+        virtual ~pcm_buffer() final;
+
         audio::format const &format() const;
         AudioBufferList *audio_buffer_list();
         AudioBufferList const *audio_buffer_list() const;

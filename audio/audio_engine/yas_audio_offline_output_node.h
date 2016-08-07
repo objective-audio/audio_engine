@@ -18,7 +18,7 @@ namespace audio {
         offline_output_node();
         offline_output_node(std::nullptr_t);
 
-        ~offline_output_node();
+        virtual ~offline_output_node() final;
 
         bool is_running() const;
 

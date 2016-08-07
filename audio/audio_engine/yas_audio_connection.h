@@ -17,7 +17,8 @@ namespace audio {
 
        public:
         connection(std::nullptr_t);
-        ~connection();
+
+        virtual ~connection();
 
         uint32_t source_bus() const;
         uint32_t destination_bus() const;

@@ -72,6 +72,8 @@ namespace audio {
         file();
         file(std::nullptr_t);
 
+        virtual ~file() final;
+
         open_result_t open(open_args);
         create_result_t create(create_args);
         void close();

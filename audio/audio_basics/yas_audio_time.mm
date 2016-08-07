@@ -53,6 +53,8 @@ audio::time::time(uint64_t const host_time, int64_t const sample_time, double co
           make_objc_ptr([[AVAudioTime alloc] initWithHostTime:host_time sampleTime:sample_time atRate:sample_rate]))) {
 }
 
+audio::time::~time() = default;
+
 bool audio::time::is_host_time_valid() const {
     return impl_ptr<impl>()->_av_audio_time.object().isHostTimeValid;
 }

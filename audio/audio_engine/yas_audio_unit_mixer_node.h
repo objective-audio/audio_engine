@@ -15,6 +15,8 @@ namespace audio {
         unit_mixer_node();
         unit_mixer_node(std::nullptr_t);
 
+        virtual ~unit_mixer_node() final;
+
         void set_output_volume(float const volume, uint32_t const bus_idx);
         float output_volume(uint32_t const bus_idx) const;
         void set_output_pan(float const pan, uint32_t const bus_idx);
