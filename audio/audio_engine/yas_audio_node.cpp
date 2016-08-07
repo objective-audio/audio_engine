@@ -46,7 +46,6 @@ struct audio::node::impl : base::impl, manageable_node::impl, connectable_node::
    public:
     weak<audio::engine> _weak_engine;
     subject_t _subject;
-    kernel_subject_t _kernel_subject;
     uint32_t _input_bus_count = 0;
     uint32_t _output_bus_count = 0;
     bool _is_input_renderable = false;
@@ -55,7 +54,7 @@ struct audio::node::impl : base::impl, manageable_node::impl, connectable_node::
     connection_wmap _output_connections;
     std::function<void(audio::graph &)> _add_to_graph_handler;
     std::function<void(audio::graph &)> _remove_from_graph_handler;
-    std::function<node::kernel(void)> _make_kernel_handler;
+    prepare_kernel_f _prepare_kernel_handler;
     audio::node::render_f _render_handler;
 
     explicit impl(node_args &&args)
@@ -212,8 +211,8 @@ struct audio::node::impl : base::impl, manageable_node::impl, connectable_node::
         update_kernel();
     }
 
-    void set_make_kernel_handler(std::function<node::kernel(void)> &&func) {
-        _make_kernel_handler = std::move(func);
+    void set_prepare_kernel_handler(prepare_kernel_f &&handler) {
+        _prepare_kernel_handler = std::move(handler);
     }
 
     void prepare_kernel(audio::node::kernel &kernel) {
@@ -225,13 +224,13 @@ struct audio::node::impl : base::impl, manageable_node::impl, connectable_node::
         manageable_kernel.set_input_connections(_input_connections);
         manageable_kernel.set_output_connections(_output_connections);
 
-        if (_kernel_subject.has_observer()) {
-            _kernel_subject.notify(audio::node::kernel_method::did_prepare, kernel);
+        if (_prepare_kernel_handler) {
+            _prepare_kernel_handler(kernel);
         }
     }
 
     void update_kernel() override {
-        auto kernel = _make_kernel();
+        auto kernel = audio::node::kernel{};
         prepare_kernel(kernel);
         _core->set_kernel(kernel);
     }
@@ -268,10 +267,6 @@ struct audio::node::impl : base::impl, manageable_node::impl, connectable_node::
         return _subject;
     }
 
-    audio::node::kernel_subject_t &kernel_subject() {
-        return _kernel_subject;
-    }
-
     void set_render_handler(audio::node::render_f &&handler) {
         _render_handler = std::move(handler);
     }
@@ -294,14 +289,6 @@ struct audio::node::impl : base::impl, manageable_node::impl, connectable_node::
 
    private:
     std::unique_ptr<core> _core;
-
-    audio::node::kernel _make_kernel() {
-        if (_make_kernel_handler) {
-            return _make_kernel_handler();
-        } else {
-            return audio::node::kernel{};
-        }
-    }
 };
 
 #pragma mark - audio::node
@@ -379,8 +366,8 @@ bool audio::node::is_input_renderable() const {
     return impl_ptr<impl>()->is_input_renderable();
 }
 
-void audio::node::set_make_kernel_handler(make_kernel_f func) {
-    impl_ptr<impl>()->set_make_kernel_handler(std::move(func));
+void audio::node::set_prepare_kernel_handler(prepare_kernel_f handler) {
+    impl_ptr<impl>()->set_prepare_kernel_handler(std::move(handler));
 }
 
 void audio::node::set_render_handler(render_f handler) {
@@ -403,10 +390,6 @@ void audio::node::set_render_time_on_render(const time &time) {
 
 audio::node::subject_t &audio::node::subject() {
     return impl_ptr<impl>()->subject();
-}
-
-audio::node::kernel_subject_t &audio::node::kernel_subject() {
-    return impl_ptr<impl>()->kernel_subject();
 }
 
 audio::connectable_node &audio::node::connectable() {
