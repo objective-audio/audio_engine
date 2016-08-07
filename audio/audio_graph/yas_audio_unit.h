@@ -99,11 +99,6 @@ namespace audio {
 
        private:
         manageable_unit _manageable = nullptr;
-
-#if YAS_TEST
-       protected:
-        explicit unit(std::shared_ptr<impl> const &);
-#endif
     };
 }
 

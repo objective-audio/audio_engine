@@ -239,34 +239,4 @@ using namespace yas;
     }
 }
 
-- (void)test_property_data {
-    double const sampleRate = 48000;
-    uint32_t const channels = 4;
-    AudioUnitPropertyID const property_id = kAudioUnitProperty_StreamFormat;
-    AudioUnitScope const scope = kAudioUnitScope_Input;
-    AudioUnitElement const element = 0;
-
-    auto format = audio::format({.sample_rate = sampleRate,
-                                 .channel_count = channels,
-                                 .pcm_format = audio::pcm_format::float32,
-                                 .interleaved = false});
-
-    std::vector<AudioStreamBasicDescription> set_data;
-    set_data.push_back(format.stream_description());
-
-    audio::unit converter_unit(kAudioUnitType_FormatConverter, kAudioUnitSubType_AUConverter);
-
-    test::unit(converter_unit).set_property_data(set_data, property_id, scope, element);
-
-    std::vector<AudioStreamBasicDescription> get_data;
-
-    XCTAssertNoThrow(
-        get_data = test::unit(converter_unit).property_data<AudioStreamBasicDescription>(property_id, scope, element));
-
-    XCTAssertTrue(is_equal(set_data.at(0), get_data.at(0)));
-
-    std::vector<AudioStreamBasicDescription> zero_data;
-    XCTAssertThrows(test::unit(converter_unit).set_property_data(zero_data, property_id, scope, element));
-}
-
 @end
