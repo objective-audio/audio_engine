@@ -34,32 +34,17 @@ struct audio::route_node::kernel : base {
 #pragma mark - impl
 
 struct audio::route_node::impl : base::impl {
-    struct core {
-        audio::node _node = {{.input_bus_count = std::numeric_limits<uint32_t>::max(),
-                              .output_bus_count = std::numeric_limits<uint32_t>::max()}};
-        route_set_t _routes;
-        audio::node::observer_t _reset_observer;
+    audio::node _node = {{.input_bus_count = std::numeric_limits<uint32_t>::max(),
+                          .output_bus_count = std::numeric_limits<uint32_t>::max()}};
+    route_set_t _routes;
+    audio::node::observer_t _reset_observer;
 
-        void erase_route_if_either_matched(route const &route) {
-            erase_route_if([&route](audio::route const &route_of_set) {
-                return route_of_set.source == route.source || route_of_set.destination == route.destination;
-            });
-        }
-
-        void erase_route_if(std::function<bool(route const &)> pred) {
-            erase_if(_routes, pred);
-        }
-    };
-
-    impl() : _core(std::make_unique<core>()) {
-    }
-
-    ~impl() = default;
+    virtual ~impl() final = default;
 
     void prepare(audio::route_node const &node) {
         auto weak_node = to_weak(node);
 
-        _core->_node.set_render_handler(
+        _node.set_render_handler(
             [weak_node](audio::pcm_buffer &dst_buffer, uint32_t const dst_bus_idx, audio::time const &when) {
                 if (auto node = weak_node.lock()) {
                     if (auto kernel = node.node().get_kernel()) {
@@ -86,69 +71,74 @@ struct audio::route_node::impl : base::impl {
                 }
             });
 
-        _core->_reset_observer =
-            _core->_node.subject().make_observer(audio::node::method::will_reset, [weak_node](auto const &) {
-                if (auto node = weak_node.lock()) {
-                    node.impl_ptr<audio::route_node::impl>()->_will_reset();
-                }
-            });
+        _reset_observer = _node.subject().make_observer(audio::node::method::will_reset, [weak_node](auto const &) {
+            if (auto node = weak_node.lock()) {
+                node.impl_ptr<audio::route_node::impl>()->_will_reset();
+            }
+        });
 
-        _core->_node.set_prepare_kernel_handler([weak_node](audio::node::kernel &kernel) {
+        _node.set_prepare_kernel_handler([weak_node](audio::node::kernel &kernel) {
             if (auto node = weak_node.lock()) {
                 audio::route_node::kernel route_kernel{};
-                route_kernel.set_routes(node.impl_ptr<impl>()->_core->_routes);
+                route_kernel.set_routes(node.impl_ptr<impl>()->_routes);
                 kernel.set_decorator(std::move(route_kernel));
             }
         });
     }
 
-#pragma mark -
-
     audio::route_set_t const &routes() const {
-        return _core->_routes;
+        return _routes;
     }
 
     void add_route(route &&route) {
-        _core->erase_route_if_either_matched(route);
-        _core->_routes.insert(std::move(route));
-        _core->_node.manageable().update_kernel();
+        _erase_route_if_either_matched(route);
+        _routes.insert(std::move(route));
+        _node.manageable().update_kernel();
     }
 
     void remove_route(route const &route) {
-        _core->_routes.erase(route);
-        _core->_node.manageable().update_kernel();
+        _routes.erase(route);
+        _node.manageable().update_kernel();
     }
 
     void remove_route_for_source(route::point const &src_pt) {
-        _core->erase_route_if([&src_pt](route const &route_of_set) { return route_of_set.source == src_pt; });
-        _core->_node.manageable().update_kernel();
+        _erase_route_if([&src_pt](route const &route_of_set) { return route_of_set.source == src_pt; });
+        _node.manageable().update_kernel();
     }
 
     void remove_route_for_destination(route::point const &dst_pt) {
-        _core->erase_route_if([&dst_pt](route const &route_of_set) { return route_of_set.destination == dst_pt; });
-        _core->_node.manageable().update_kernel();
+        _erase_route_if([&dst_pt](route const &route_of_set) { return route_of_set.destination == dst_pt; });
+        _node.manageable().update_kernel();
     }
 
     void set_routes(route_set_t &&routes) {
-        _core->_routes.clear();
-        _core->_routes = std::move(routes);
-        _core->_node.manageable().update_kernel();
+        _routes.clear();
+        _routes = std::move(routes);
+        _node.manageable().update_kernel();
     }
 
     void clear_routes() {
-        _core->_routes.clear();
-        _core->_node.manageable().update_kernel();
+        _routes.clear();
+        _node.manageable().update_kernel();
     }
 
     audio::node &node() {
-        return _core->_node;
+        return _node;
     }
 
    private:
-    std::unique_ptr<core> _core;
-
     void _will_reset() {
-        _core->_routes.clear();
+        _routes.clear();
+    }
+
+    void _erase_route_if_either_matched(route const &route) {
+        _erase_route_if([&route](audio::route const &route_of_set) {
+            return route_of_set.source == route.source || route_of_set.destination == route.destination;
+        });
+    }
+
+    void _erase_route_if(std::function<bool(route const &)> pred) {
+        erase_if(_routes, pred);
     }
 };
 
@@ -160,6 +150,8 @@ audio::route_node::route_node() : base(std::make_unique<impl>()) {
 
 audio::route_node::route_node(std::nullptr_t) : base(nullptr) {
 }
+
+audio::route_node::~route_node() = default;
 
 audio::route_set_t const &audio::route_node::routes() const {
     return impl_ptr<impl>()->routes();
