@@ -22,9 +22,6 @@ struct yas::audio::device_io_node::impl : base::impl, manageable_device_io_node:
     audio::node _node = {{.input_bus_count = 1, .output_bus_count = 1}};
     audio::node::observer_t _connections_observer;
 
-    impl() : _core(std::make_unique<core>()) {
-    }
-
     virtual ~impl() final = default;
 
     void prepare(device_io_node const &device_io_node, audio::device const &device) {
@@ -53,23 +50,23 @@ struct yas::audio::device_io_node::impl : base::impl, manageable_device_io_node:
     }
 
     void add_device_io() override {
-        _core->_device_io = audio::device_io{_core->device()};
+        _core._device_io = audio::device_io{_core.device()};
     }
 
     void remove_device_io() override {
-        _core->_device_io = nullptr;
+        _core._device_io = nullptr;
     }
 
     audio::device_io &device_io() override {
-        return _core->_device_io;
+        return _core._device_io;
     }
 
     void set_device(audio::device const &device) {
-        _core->set_device(device);
+        _core.set_device(device);
     }
 
-    audio::device device() const {
-        return _core->device();
+    audio::device device() {
+        return _core.device();
     }
 
    private:
@@ -83,7 +80,7 @@ struct yas::audio::device_io_node::impl : base::impl, manageable_device_io_node:
             }
         }
 
-        audio::device device() const {
+        audio::device device() {
             return _device;
         }
 
@@ -91,10 +88,10 @@ struct yas::audio::device_io_node::impl : base::impl, manageable_device_io_node:
         audio::device _device = nullptr;
     };
 
-    std::unique_ptr<core> _core;
+    core _core;
 
     void _update_device_io_connections() {
-        auto &device_io = _core->_device_io;
+        auto &device_io = _core._device_io;
         if (!device_io) {
             return;
         }
@@ -148,7 +145,7 @@ struct yas::audio::device_io_node::impl : base::impl, manageable_device_io_node:
     }
 
     bool _validate_connections() {
-        if (auto const &device_io = _core->_device_io) {
+        if (auto const &device_io = _core._device_io) {
             auto &input_connections = _node.input_connections();
             if (input_connections.size() > 0) {
                 auto const connections = lock_values(input_connections);

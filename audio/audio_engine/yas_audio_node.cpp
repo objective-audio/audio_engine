@@ -16,33 +16,6 @@ using namespace yas;
 
 struct audio::node::impl : base::impl, manageable_node::impl, connectable_node::impl {
    private:
-    struct core {
-        void set_kernel(audio::kernel kernel) {
-            std::lock_guard<std::recursive_mutex> lock(_mutex);
-            _kernel = std::move(kernel);
-        }
-
-        audio::kernel kernel() {
-            std::lock_guard<std::recursive_mutex> lock(_mutex);
-            return _kernel;
-        }
-
-        void set_render_time(time const &render_time) {
-            std::lock_guard<std::recursive_mutex> lock(_mutex);
-            _render_time = render_time;
-        }
-
-        audio::time render_time() const {
-            std::lock_guard<std::recursive_mutex> lock(_mutex);
-            return _render_time;
-        }
-
-       private:
-        audio::kernel _kernel = nullptr;
-        audio::time _render_time = nullptr;
-        mutable std::recursive_mutex _mutex;
-    };
-
    public:
     weak<audio::engine> _weak_engine;
     subject_t _subject;
@@ -58,8 +31,7 @@ struct audio::node::impl : base::impl, manageable_node::impl, connectable_node::
     audio::node::render_f _render_handler;
 
     explicit impl(node_args &&args)
-        : _core(std::make_unique<core>()),
-          _input_bus_count(args.input_bus_count),
+        : _input_bus_count(args.input_bus_count),
           _output_bus_count(args.output_bus_count),
           _is_input_renderable(args.input_renderable),
           _override_output_bus_idx(args.override_output_bus_idx) {
@@ -72,7 +44,7 @@ struct audio::node::impl : base::impl, manageable_node::impl, connectable_node::
 
         _input_connections.clear();
         _output_connections.clear();
-        _core->set_render_time(nullptr);
+        _core.set_render_time(nullptr);
 
         update_kernel();
     }
@@ -182,10 +154,10 @@ struct audio::node::impl : base::impl, manageable_node::impl, connectable_node::
     }
 
     void add_connection(connection const &connection) override {
-        if (connection.destination_node().impl_ptr<impl>()->_core == _core) {
+        if (connection.destination_node().impl_ptr<impl>().get() == this) {
             auto bus_idx = connection.destination_bus();
             _input_connections.insert(std::make_pair(bus_idx, weak<audio::connection>(connection)));
-        } else if (connection.source_node().impl_ptr<impl>()->_core == _core) {
+        } else if (connection.source_node().impl_ptr<impl>().get() == this) {
             auto bus_idx = connection.source_bus();
             _output_connections.insert(std::make_pair(bus_idx, weak<audio::connection>(connection)));
         } else {
@@ -197,13 +169,13 @@ struct audio::node::impl : base::impl, manageable_node::impl, connectable_node::
 
     void remove_connection(connection const &connection) override {
         if (auto destination_node = connection.destination_node()) {
-            if (connection.destination_node().impl_ptr<impl>()->_core == _core) {
+            if (connection.destination_node().impl_ptr<impl>().get() == this) {
                 _input_connections.erase(connection.destination_bus());
             }
         }
 
         if (auto source_node = connection.source_node()) {
-            if (connection.source_node().impl_ptr<impl>()->_core == _core) {
+            if (connection.source_node().impl_ptr<impl>().get() == this) {
                 _output_connections.erase(connection.source_bus());
             }
         }
@@ -232,11 +204,11 @@ struct audio::node::impl : base::impl, manageable_node::impl, connectable_node::
     void update_kernel() override {
         auto kernel = audio::kernel{};
         prepare_kernel(kernel);
-        _core->set_kernel(kernel);
+        _core.set_kernel(kernel);
     }
 
     audio::kernel kernel() {
-        return _core->kernel();
+        return _core.kernel();
     }
 
     audio::engine engine() const override {
@@ -280,15 +252,42 @@ struct audio::node::impl : base::impl, manageable_node::impl, connectable_node::
     }
 
     audio::time render_time() {
-        return _core->render_time();
+        return _core.render_time();
     }
 
     void set_render_time_on_render(time const &time) {
-        _core->set_render_time(time);
+        _core.set_render_time(time);
     }
 
    private:
-    std::unique_ptr<core> _core;
+    struct core {
+        void set_kernel(audio::kernel kernel) {
+            std::lock_guard<std::recursive_mutex> lock(_mutex);
+            _kernel = std::move(kernel);
+        }
+
+        audio::kernel kernel() {
+            std::lock_guard<std::recursive_mutex> lock(_mutex);
+            return _kernel;
+        }
+
+        void set_render_time(time const &render_time) {
+            std::lock_guard<std::recursive_mutex> lock(_mutex);
+            _render_time = render_time;
+        }
+
+        audio::time render_time() const {
+            std::lock_guard<std::recursive_mutex> lock(_mutex);
+            return _render_time;
+        }
+
+       private:
+        audio::kernel _kernel = nullptr;
+        audio::time _render_time = nullptr;
+        mutable std::recursive_mutex _mutex;
+    };
+
+    core _core;
 };
 
 #pragma mark - audio::node
