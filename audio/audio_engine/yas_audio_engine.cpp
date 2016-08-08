@@ -147,9 +147,9 @@ audio::engine::start_result_t audio::engine::start_render() {
     return impl_ptr<impl>()->start_render();
 }
 
-audio::engine::start_result_t audio::engine::start_offline_render(offline_render_f const &render_function,
-                                                                  offline_completion_f const &completion_function) {
-    return impl_ptr<impl>()->start_offline_render(render_function, completion_function);
+audio::engine::start_result_t audio::engine::start_offline_render(offline_render_f render_handler,
+                                                                  offline_completion_f completion_handler) {
+    return impl_ptr<impl>()->start_offline_render(std::move(render_handler), std::move(completion_handler));
 }
 
 void audio::engine::stop() {

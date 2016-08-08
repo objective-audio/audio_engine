@@ -10,7 +10,7 @@ using namespace yas;
 
 struct audio::tap_node::kernel : base {
     struct impl : base::impl {
-        audio::tap_node::render_f render_function;
+        audio::tap_node::render_f _render_handler;
     };
 
     kernel() : base(std::make_shared<impl>()) {
@@ -19,12 +19,12 @@ struct audio::tap_node::kernel : base {
     kernel(std::nullptr_t) : base(nullptr) {
     }
 
-    void set_render_function(audio::tap_node::render_f func) {
-        impl_ptr<impl>()->render_function = std::move(func);
+    void set_render_handler(audio::tap_node::render_f handler) {
+        impl_ptr<impl>()->_render_handler = std::move(handler);
     }
 
-    audio::tap_node::render_f const &render_function() {
-        return impl_ptr<impl>()->render_function;
+    audio::tap_node::render_f const &render_handler() {
+        return impl_ptr<impl>()->_render_handler;
     }
 };
 
@@ -49,10 +49,10 @@ struct audio::tap_node::impl : base::impl {
                         impl_ptr->_kernel_on_render = kernel;
 
                         auto tap_kernel = yas::cast<tap_node::kernel>(kernel.decorator());
-                        auto const &render_function = tap_kernel.render_function();
+                        auto const &handler = tap_kernel.render_handler();
 
-                        if (render_function) {
-                            render_function(buffer, bus_idx, when);
+                        if (handler) {
+                            handler(buffer, bus_idx, when);
                         } else {
                             impl_ptr->render_source(buffer, bus_idx, when);
                         }
@@ -64,21 +64,21 @@ struct audio::tap_node::impl : base::impl {
 
         _reset_observer = _node.subject().make_observer(audio::node::method::will_reset, [weak_node](auto const &) {
             if (auto node = weak_node.lock()) {
-                node.impl_ptr<audio::tap_node::impl>()->_render_function = nullptr;
+                node.impl_ptr<audio::tap_node::impl>()->_render_handler = nullptr;
             }
         });
 
         _node.set_prepare_kernel_handler([weak_node](audio::kernel &kernel) {
             if (auto node = weak_node.lock()) {
                 audio::tap_node::kernel tap_kernel{};
-                tap_kernel.set_render_function(node.impl_ptr<audio::tap_node::impl>()->_render_function);
+                tap_kernel.set_render_handler(node.impl_ptr<audio::tap_node::impl>()->_render_handler);
                 kernel.set_decorator(std::move(tap_kernel));
             }
         });
     }
 
-    void set_render_function(render_f &&func) {
-        _render_function = func;
+    void set_render_handler(render_f &&func) {
+        _render_handler = func;
 
         _node.manageable().update_kernel();
     }
@@ -108,7 +108,7 @@ struct audio::tap_node::impl : base::impl {
     }
 
    private:
-    render_f _render_function;
+    render_f _render_handler;
     audio::node::observer_t _reset_observer;
     audio::kernel _kernel_on_render;
 };
@@ -129,8 +129,8 @@ audio::tap_node::tap_node(std::nullptr_t) : base(nullptr) {
 
 audio::tap_node::~tap_node() = default;
 
-void audio::tap_node::set_render_function(render_f func) {
-    impl_ptr<impl>()->set_render_function(std::move(func));
+void audio::tap_node::set_render_handler(render_f handler) {
+    impl_ptr<impl>()->set_render_handler(std::move(handler));
 }
 
 audio::node const &audio::tap_node::node() const {

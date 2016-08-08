@@ -28,14 +28,14 @@ struct audio::offline_output_node::impl : base::impl, manageable_offline_output_
             });
     }
 
-    audio::offline_start_result_t start(offline_render_f &&render_func,
-                                        offline_completion_f &&completion_func) override {
+    audio::offline_start_result_t start(offline_render_f &&render_handler,
+                                        offline_completion_f &&completion_handler) override {
         if (_queue) {
             return offline_start_result_t(offline_start_error_t::already_running);
         } else if (auto connection = _node.input_connection(0)) {
             std::experimental::optional<uint8_t> key;
-            if (completion_func) {
-                key = _core.push_completion_function(std::move(completion_func));
+            if (completion_handler) {
+                key = _core.push_completion_handler(std::move(completion_handler));
                 if (!key) {
                     return offline_start_result_t(offline_start_error_t::prepare_failure);
                 }
@@ -44,8 +44,8 @@ struct audio::offline_output_node::impl : base::impl, manageable_offline_output_
             audio::pcm_buffer render_buffer(connection.format(), 1024);
 
             auto weak_node = to_weak(cast<offline_output_node>());
-            auto operation_lambda =
-                [weak_node, render_buffer, render_func = std::move(render_func), key](operation const &op) mutable {
+            auto operation_lambda = [weak_node, render_buffer, render_handler = std::move(render_handler), key](
+                operation const &op) mutable {
                 bool cancelled = false;
                 uint32_t current_sample_time = 0;
                 bool stop = false;
@@ -82,8 +82,8 @@ struct audio::offline_output_node::impl : base::impl, manageable_offline_output_
                         source_node.render(render_buffer, connection_on_block.source_bus(), when);
                     }
 
-                    if (render_func) {
-                        render_func({.buffer = render_buffer, .when = when, .out_stop = stop});
+                    if (render_handler) {
+                        render_handler({.buffer = render_buffer, .when = when, .out_stop = stop});
                     }
 
                     if (op.is_canceled()) {
@@ -96,15 +96,16 @@ struct audio::offline_output_node::impl : base::impl, manageable_offline_output_
 
                 auto completion_lambda = [weak_node, cancelled, key]() {
                     if (auto offline_node = weak_node.lock()) {
-                        std::experimental::optional<offline_completion_f> node_completion_func;
+                        std::experimental::optional<offline_completion_f> node_completion_handler;
                         if (key) {
-                            node_completion_func = offline_node.impl_ptr<impl>()->_core.pull_completion_function(*key);
+                            node_completion_handler =
+                                offline_node.impl_ptr<impl>()->_core.pull_completion_handler(*key);
                         }
 
                         offline_node.impl_ptr<impl>()->_queue = nullptr;
 
-                        if (node_completion_func) {
-                            (*node_completion_func)(cancelled);
+                        if (node_completion_handler) {
+                            (*node_completion_handler)(cancelled);
                         }
                     }
                 };
@@ -122,7 +123,7 @@ struct audio::offline_output_node::impl : base::impl, manageable_offline_output_
     }
 
     void stop() override {
-        auto completion_functions = _core.pull_completion_handlers();
+        auto completion_handlers = _core.pull_completion_handlers();
 
         if (auto &queue = _queue) {
             queue.cancel();
@@ -130,7 +131,7 @@ struct audio::offline_output_node::impl : base::impl, manageable_offline_output_
             _queue = nullptr;
         }
 
-        for (auto &pair : completion_functions) {
+        for (auto &pair : completion_handlers) {
             auto &func = pair.second;
             if (func) {
                 func(true);
@@ -148,21 +149,21 @@ struct audio::offline_output_node::impl : base::impl, manageable_offline_output_
 
    private:
     struct core {
-        using completion_function_map_t = std::map<uint8_t, offline_completion_f>;
+        using completion_handler_map_t = std::map<uint8_t, offline_completion_f>;
 
-        std::experimental::optional<uint8_t> const push_completion_function(offline_completion_f &&function) {
-            if (!function) {
+        std::experimental::optional<uint8_t> const push_completion_handler(offline_completion_f &&handler) {
+            if (!handler) {
                 return nullopt;
             }
 
             auto key = min_empty_key(_completion_handlers);
             if (key) {
-                _completion_handlers.insert(std::make_pair(*key, std::move(function)));
+                _completion_handlers.insert(std::make_pair(*key, std::move(handler)));
             }
             return key;
         }
 
-        std::experimental::optional<offline_completion_f> const pull_completion_function(uint8_t key) {
+        std::experimental::optional<offline_completion_f> const pull_completion_handler(uint8_t key) {
             if (_completion_handlers.count(key) > 0) {
                 auto func = _completion_handlers.at(key);
                 _completion_handlers.erase(key);
@@ -172,14 +173,14 @@ struct audio::offline_output_node::impl : base::impl, manageable_offline_output_
             }
         }
 
-        completion_function_map_t pull_completion_handlers() {
+        completion_handler_map_t pull_completion_handlers() {
             auto map = _completion_handlers;
             _completion_handlers.clear();
             return map;
         }
 
        private:
-        completion_function_map_t _completion_handlers;
+        completion_handler_map_t _completion_handlers;
     };
 
     core _core;

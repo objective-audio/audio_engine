@@ -76,8 +76,7 @@ namespace audio {
 #endif
 
         start_result_t start_render();
-        start_result_t start_offline_render(offline_render_f const &render_function,
-                                            offline_completion_f const &completion_function);
+        start_result_t start_offline_render(offline_render_f, offline_completion_f);
         void stop();
 
         subject_t &subject() const;

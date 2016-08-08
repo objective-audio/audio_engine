@@ -32,7 +32,7 @@ namespace audio {
         void set_device(audio::device const device);
         audio::device device() const;
         bool is_running() const;
-        void set_render_callback(render_f callback);
+        void set_render_handler(render_f);
         void set_maximum_frames_per_slice(uint32_t const frames);
         uint32_t maximum_frames_per_slice() const;
 

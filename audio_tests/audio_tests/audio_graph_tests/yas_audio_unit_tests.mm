@@ -80,7 +80,7 @@ using namespace yas;
 
     yas_retain_or_ignore(expectation);
 
-    converter_unit.set_render_callback(
+    converter_unit.set_render_handler(
         [expectation, input_format, &self](audio::render_parameters &render_parameters) mutable {
             if (expectation) {
                 const AudioBufferList *ioData = render_parameters.io_data;
@@ -141,7 +141,7 @@ using namespace yas;
     yas_retain_or_ignore(preRenderExpectation);
     yas_retain_or_ignore(postRenderExpectation);
 
-    converter_unit.set_render_callback([renderExpectation](audio::render_parameters &render_parameters) mutable {
+    converter_unit.set_render_handler([renderExpectation](audio::render_parameters &render_parameters) mutable {
         if (renderExpectation) {
             [renderExpectation fulfill];
             yas_release(renderExpectation);
@@ -149,7 +149,7 @@ using namespace yas;
         }
     });
 
-    converter_unit.set_notify_callback(
+    converter_unit.set_notify_handler(
         [preRenderExpectation, postRenderExpectation](audio::render_parameters &render_parameters) mutable {
             AudioUnitRenderActionFlags flags = *render_parameters.io_action_flags;
             if (flags & kAudioUnitRenderAction_PreRender) {
@@ -180,10 +180,10 @@ using namespace yas;
     bool is_render_callback = false;
     bool is_render_notify_callback = false;
 
-    converter_unit.set_render_callback(
+    converter_unit.set_render_handler(
         [&is_render_callback](audio::render_parameters &render_parameters) { is_render_callback = true; });
 
-    converter_unit.set_notify_callback([&is_render_notify_callback](audio::render_parameters &render_parameters) {
+    converter_unit.set_notify_handler([&is_render_notify_callback](audio::render_parameters &render_parameters) {
         is_render_notify_callback = true;
     });
 

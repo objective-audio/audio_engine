@@ -70,7 +70,7 @@ namespace audio {
 #endif
 
         engine::start_result_t start_render();
-        engine::start_result_t start_offline_render(offline_render_f, offline_completion_f);
+        engine::start_result_t start_offline_render(offline_render_f &&, offline_completion_f &&);
         void stop();
 
         void post_configuration_change() const;

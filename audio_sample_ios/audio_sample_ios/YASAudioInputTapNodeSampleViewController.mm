@@ -37,7 +37,7 @@ namespace sample {
             audio::format format{{.sample_rate = sample_rate, .channel_count = 2}};
             engine.connect(input_node.unit_io_node().unit_node().node(), input_tap_node.node(), format);
 
-            input_tap_node.set_render_function([input_level = input_level, sample_rate](
+            input_tap_node.set_render_handler([input_level = input_level, sample_rate](
                 audio::pcm_buffer & buffer, uint32_t const bus_idx, const audio::time &when) mutable {
                 audio::frame_enumerator enumerator(buffer);
                 auto const *flex_ptr = enumerator.pointer();

@@ -13,9 +13,9 @@ audio::manageable_offline_output_unit::manageable_offline_output_unit(std::share
 audio::manageable_offline_output_unit::manageable_offline_output_unit(std::nullptr_t) : protocol(nullptr) {
 }
 
-audio::offline_start_result_t audio::manageable_offline_output_unit::start(offline_render_f &&render_func,
-                                                                           offline_completion_f &&completion_func) {
-    return impl_ptr<impl>()->start(std::move(render_func), std::move(completion_func));
+audio::offline_start_result_t audio::manageable_offline_output_unit::start(offline_render_f &&render_handler,
+                                                                           offline_completion_f &&completion_handler) {
+    return impl_ptr<impl>()->start(std::move(render_handler), std::move(completion_handler));
 }
 
 void audio::manageable_offline_output_unit::stop() {

@@ -50,8 +50,8 @@ namespace offline_sample {
 
             auto weak_node = to_weak(*this);
 
-            auto render_function = [weak_node](audio::pcm_buffer &buffer, uint32_t const bus_idx,
-                                               const audio::time &when) {
+            auto render_handler = [weak_node](audio::pcm_buffer &buffer, uint32_t const bus_idx,
+                                              const audio::time &when) {
                 buffer.clear();
 
                 if (auto node = weak_node.lock()) {
@@ -76,7 +76,7 @@ namespace offline_sample {
                 }
             };
 
-            tap_node().set_render_function(render_function);
+            tap_node().set_render_handler(render_handler);
         }
 
         sine_node(std::nullptr_t) : base(nullptr) {

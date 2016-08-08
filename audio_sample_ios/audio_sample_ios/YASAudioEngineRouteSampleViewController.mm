@@ -56,7 +56,8 @@ namespace sample {
             engine.connect(mixer_node.unit_node().node(), io_node.unit_node().node(), format);
             engine.connect(route_node.node(), mixer_node.unit_node().node(), format);
             engine.connect(sine_node.node(), route_node.node(), 0, YASAudioEngineRouteSampleSourceIndexSine, format);
-            engine.connect(io_node.unit_node().node(), route_node.node(), 1, YASAudioEngineRouteSampleSourceIndexInput, format);
+            engine.connect(io_node.unit_node().node(), route_node.node(), 1, YASAudioEngineRouteSampleSourceIndexInput,
+                           format);
         }
     };
 }
@@ -236,8 +237,8 @@ namespace sample {
 
     double phase = 0;
 
-    auto tap_render_function = [phase](audio::pcm_buffer &buffer, uint32_t const bus_idx,
-                                       const audio::time &when) mutable {
+    auto tap_render_handler = [phase](audio::pcm_buffer &buffer, uint32_t const bus_idx,
+                                      const audio::time &when) mutable {
         buffer.clear();
 
         double const start_phase = phase;
@@ -252,7 +253,7 @@ namespace sample {
         }
     };
 
-    _internal.sine_node.set_render_function(tap_render_function);
+    _internal.sine_node.set_render_handler(tap_render_handler);
 
     auto unowned_self = make_objc_ptr([[YASUnownedObject alloc] init]);
     [unowned_self.object() setObject:self];

@@ -56,14 +56,14 @@ namespace audio {
     }
 
     static void _add_listener(AudioObjectID const object_id, AudioObjectPropertySelector const selector,
-                              AudioObjectPropertyScope const scope, listener_f const function) {
+                              AudioObjectPropertyScope const scope, listener_f const handler) {
         AudioObjectPropertyAddress const address = {
             .mSelector = selector, .mScope = scope, .mElement = kAudioObjectPropertyElementMaster};
 
         raise_if_au_error(AudioObjectAddPropertyListenerBlock(
             object_id, &address, dispatch_get_main_queue(),
             ^(uint32_t const address_count, const AudioObjectPropertyAddress *const addresses) {
-                function(address_count, addresses);
+                handler(address_count, addresses);
             }));
     }
 
