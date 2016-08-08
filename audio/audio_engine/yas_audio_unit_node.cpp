@@ -16,7 +16,7 @@ using namespace yas;
 #pragma mark - core
 
 struct audio::unit_node::impl : base::impl, manageable_unit_node::impl {
-    explicit impl(node_args &&args) : _core(std::make_unique<core>()), _node(std::move(args)) {
+    explicit impl(node_args &&args) : _node(std::move(args)) {
     }
 
     ~impl() = default;
@@ -33,7 +33,7 @@ struct audio::unit_node::impl : base::impl, manageable_unit_node::impl {
         _parameters.insert(std::make_pair(kAudioUnitScope_Global, unit.create_parameters(kAudioUnitScope_Global)));
         _parameters.insert(std::make_pair(kAudioUnitScope_Input, unit.create_parameters(kAudioUnitScope_Input)));
         _parameters.insert(std::make_pair(kAudioUnitScope_Output, unit.create_parameters(kAudioUnitScope_Output)));
-        _core->set_au(unit);
+        _core.set_au(unit);
 
         auto weak_node = to_weak(node);
 
@@ -93,7 +93,7 @@ struct audio::unit_node::impl : base::impl, manageable_unit_node::impl {
     }
 
     audio::unit au() {
-        return _core->au();
+        return _core.au();
     }
 
     std::unordered_map<AudioUnitParameterID, audio::unit::parameter_map_t> const &parameters() {
@@ -255,7 +255,7 @@ struct audio::unit_node::impl : base::impl, manageable_unit_node::impl {
     }
 
     void reload_audio_unit() override {
-        _core->set_au(unit(_acd));
+        _core.set_au(unit(_acd));
     }
 
     audio::node _node;
@@ -307,7 +307,7 @@ struct audio::unit_node::impl : base::impl, manageable_unit_node::impl {
         mutable std::recursive_mutex _mutex;
     };
 
-    std::unique_ptr<core> _core;
+    core _core;
 };
 
 #pragma mark - audio::unit_node

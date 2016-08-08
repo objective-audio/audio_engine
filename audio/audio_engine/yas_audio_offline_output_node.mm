@@ -17,9 +17,6 @@ struct audio::offline_output_node::impl : base::impl, manageable_offline_output_
     audio::node _node = {{.input_bus_count = 1, .output_bus_count = 0}};
     audio::node::observer_t _reset_observer;
 
-    impl() : _core(std::make_unique<audio::offline_output_node::impl::core>()) {
-    }
-
     ~impl() = default;
 
     void prepare(offline_output_node const &node) {
@@ -38,7 +35,7 @@ struct audio::offline_output_node::impl : base::impl, manageable_offline_output_
         } else if (auto connection = _node.input_connection(0)) {
             std::experimental::optional<uint8_t> key;
             if (completion_func) {
-                key = _core->push_completion_function(std::move(completion_func));
+                key = _core.push_completion_function(std::move(completion_func));
                 if (!key) {
                     return offline_start_result_t(offline_start_error_t::prepare_failure);
                 }
@@ -101,7 +98,7 @@ struct audio::offline_output_node::impl : base::impl, manageable_offline_output_
                     if (auto offline_node = weak_node.lock()) {
                         std::experimental::optional<offline_completion_f> node_completion_func;
                         if (key) {
-                            node_completion_func = offline_node.impl_ptr<impl>()->_core->pull_completion_function(*key);
+                            node_completion_func = offline_node.impl_ptr<impl>()->_core.pull_completion_function(*key);
                         }
 
                         offline_node.impl_ptr<impl>()->_queue = nullptr;
@@ -125,7 +122,7 @@ struct audio::offline_output_node::impl : base::impl, manageable_offline_output_
     }
 
     void stop() override {
-        auto completion_functions = _core->pull_completion_handlers();
+        auto completion_functions = _core.pull_completion_handlers();
 
         if (auto &queue = _queue) {
             queue.cancel();
@@ -185,7 +182,7 @@ struct audio::offline_output_node::impl : base::impl, manageable_offline_output_
         completion_function_map_t _completion_handlers;
     };
 
-    std::unique_ptr<core> _core;
+    core _core;
 };
 
 #pragma mark - audio::offline_output_node
