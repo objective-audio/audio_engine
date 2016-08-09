@@ -5,7 +5,6 @@
 #pragma once
 
 #include <unordered_set>
-#include "yas_audio_engine_protocol.h"
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
 #include "yas_audio_device.h"
 #endif
@@ -16,7 +15,7 @@ namespace audio {
     class device_io_node;
 #endif
 
-    struct engine::impl : base::impl, testable_engine::impl {
+    struct engine::impl : base::impl {
         impl();
         virtual ~impl();
 
@@ -58,8 +57,8 @@ namespace audio {
         audio::graph graph() const;
         void reload_graph();
 
-        std::unordered_set<audio::node> &nodes() const override;
-        audio::connection_set &connections() const override;
+        std::unordered_set<audio::node> &nodes();
+        audio::connection_set &connections();
 
         void set_offline_output_node(audio::offline_output_node &&);
         audio::offline_output_node &offline_output_node();

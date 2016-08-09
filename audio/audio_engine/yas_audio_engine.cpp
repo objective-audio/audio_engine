@@ -161,9 +161,15 @@ audio::engine::subject_t &audio::engine::subject() const {
 }
 
 #if YAS_TEST
-audio::testable_engine audio::engine::testable() {
-    return audio::testable_engine{impl_ptr<audio::testable_engine::impl>()};
+
+std::unordered_set<audio::node> &audio::engine::nodes() const {
+    return impl_ptr<impl>()->nodes();
 }
+
+audio::connection_set &audio::engine::connections() const {
+    return impl_ptr<impl>()->connections();
+}
+
 #endif
 
 std::string yas::to_string(audio::engine::method const &method) {

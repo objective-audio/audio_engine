@@ -82,7 +82,8 @@ namespace audio {
         subject_t &subject() const;
 
 #if YAS_TEST
-        audio::testable_engine testable();
+        std::unordered_set<node> &nodes() const;
+        audio::connection_set &connections() const;
 #endif
     };
 }
@@ -95,7 +96,3 @@ std::ostream &operator<<(std::ostream &, yas::audio::engine::method const &);
 std::ostream &operator<<(std::ostream &, yas::audio::engine::start_error_t const &);
 
 #include "yas_audio_engine_impl.h"
-
-#if YAS_TEST
-#include "yas_audio_engine_protocol.h"
-#endif

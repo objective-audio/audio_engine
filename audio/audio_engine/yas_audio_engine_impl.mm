@@ -392,11 +392,11 @@ void audio::engine::impl::reload_graph() {
     }
 }
 
-std::unordered_set<audio::node> &audio::engine::impl::nodes() const {
+std::unordered_set<audio::node> &audio::engine::impl::nodes() {
     return _core->_nodes;
 }
 
-audio::connection_set &audio::engine::impl::connections() const {
+audio::connection_set &audio::engine::impl::connections() {
     return _core->_connections;
 }
 
