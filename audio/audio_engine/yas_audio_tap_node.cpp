@@ -157,6 +157,10 @@ audio::connection_smap audio::tap_node::output_connections_on_render() const {
     return impl_ptr<impl>()->output_connections_on_render();
 }
 
+#if YAS_TEST
+
 void audio::tap_node::render_source(pcm_buffer &buffer, uint32_t const bus_idx, time const &when) {
     impl_ptr<impl>()->render_source(buffer, bus_idx, when);
 }
+
+#endif
