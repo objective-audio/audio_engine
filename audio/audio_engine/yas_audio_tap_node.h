@@ -26,7 +26,7 @@ namespace audio {
         using render_f =
             std::function<void(audio::pcm_buffer &buffer, uint32_t const bus_idx, audio::time const &when)>;
 
-        void set_render_function(render_f);
+        void set_render_handler(render_f);
 
         audio::node const &node() const;
         audio::node &node();

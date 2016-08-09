@@ -86,7 +86,7 @@ struct audio::device::stream::impl : base::impl {
         };
     }
 
-    void add_listener(AudioObjectPropertySelector const &selector, listener_f function) {
+    void add_listener(AudioObjectPropertySelector const &selector, listener_f handler) {
         AudioObjectPropertyAddress const address = {.mSelector = selector,
                                                     .mScope = kAudioObjectPropertyScopeGlobal,
                                                     .mElement = kAudioObjectPropertyElementMaster};
@@ -94,7 +94,7 @@ struct audio::device::stream::impl : base::impl {
         raise_if_au_error(
             AudioObjectAddPropertyListenerBlock(_stream_id, &address, dispatch_get_main_queue(),
                                                 ^(uint32_t address_count, const AudioObjectPropertyAddress *addresses) {
-                                                    function(address_count, addresses);
+                                                    handler(address_count, addresses);
                                                 }));
     }
 };
@@ -103,10 +103,10 @@ struct audio::device::stream::impl : base::impl {
 
 audio::device::stream::stream(args args) : base(std::make_shared<impl>(args.stream_id, args.device_id)) {
     auto imp = impl_ptr<impl>();
-    auto function = imp->listener(*this);
-    imp->add_listener(kAudioStreamPropertyVirtualFormat, function);
-    imp->add_listener(kAudioStreamPropertyIsActive, function);
-    imp->add_listener(kAudioStreamPropertyStartingChannel, function);
+    auto listener = imp->listener(*this);
+    imp->add_listener(kAudioStreamPropertyVirtualFormat, listener);
+    imp->add_listener(kAudioStreamPropertyIsActive, listener);
+    imp->add_listener(kAudioStreamPropertyStartingChannel, listener);
 }
 
 audio::device::stream::stream(std::nullptr_t) : base(nullptr) {

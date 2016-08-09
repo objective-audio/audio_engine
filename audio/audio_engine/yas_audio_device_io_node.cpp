@@ -97,14 +97,14 @@ struct yas::audio::device_io_node::impl : base::impl, manageable_device_io_node:
         }
 
         if (!_validate_connections()) {
-            device_io.set_render_callback(nullptr);
+            device_io.set_render_handler(nullptr);
             return;
         }
 
         auto weak_node = to_weak(cast<device_io_node>());
         auto weak_device_io = to_weak(device_io);
 
-        auto render_function = [weak_node, weak_device_io](auto args) {
+        auto render_handler = [weak_node, weak_device_io](auto args) {
             if (auto node = weak_node.lock()) {
                 if (auto kernel = node.node().kernel()) {
                     if (args.output_buffer) {
@@ -141,7 +141,7 @@ struct yas::audio::device_io_node::impl : base::impl, manageable_device_io_node:
             }
         };
 
-        device_io.set_render_callback(std::move(render_function));
+        device_io.set_render_handler(std::move(render_handler));
     }
 
     bool _validate_connections() {

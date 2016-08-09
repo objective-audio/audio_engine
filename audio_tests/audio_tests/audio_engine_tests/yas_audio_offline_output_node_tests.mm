@@ -56,7 +56,7 @@ using namespace yas;
     uint32_t const length = 4192;
     uint32_t tap_render_frame = 0;
 
-    auto tap_render_function = [=](audio::pcm_buffer &buffer, uint32_t const bus_idx, audio::time const &when) mutable {
+    auto tap_render_handler = [=](audio::pcm_buffer &buffer, uint32_t const bus_idx, audio::time const &when) mutable {
         XCTAssertEqual(when.sample_time(), tap_render_frame);
         XCTAssertEqual(when.sample_rate(), sample_rate);
         XCTAssertEqual(buffer.frame_length(), frames_per_render);
@@ -76,14 +76,14 @@ using namespace yas;
         }
     };
 
-    tap_node.set_render_function(std::move(tap_render_function));
+    tap_node.set_render_handler(std::move(tap_render_handler));
 
     XCTestExpectation *renderExpectation = [self expectationWithDescription:@"offline output node render"];
     XCTestExpectation *completionExpectation = [self expectationWithDescription:@"offline output node completion"];
 
     uint32_t output_render_frame = 0;
 
-    auto start_render_function = [=](auto args) mutable {
+    auto start_render_handler = [=](auto args) mutable {
         audio::pcm_buffer &buffer = args.buffer;
         audio::time const &when = args.when;
         bool &out_stop = args.out_stop;
@@ -115,7 +115,7 @@ using namespace yas;
         }
     };
 
-    auto completion_function = [=](bool const cancelled) mutable {
+    auto completion_handler = [=](bool const cancelled) mutable {
         XCTAssertFalse(cancelled);
         if (completionExpectation) {
             [completionExpectation fulfill];
@@ -123,7 +123,7 @@ using namespace yas;
         }
     };
 
-    auto result = engine.start_offline_render(start_render_function, completion_function);
+    auto result = engine.start_offline_render(start_render_handler, completion_handler);
 
     XCTAssertTrue(result);
 
@@ -149,7 +149,7 @@ using namespace yas;
     uint32_t const length = 4196;
     uint32_t tap_render_frame = 0;
 
-    auto tap_render_function = [=](audio::pcm_buffer &buffer, uint32_t const bus_idx, audio::time const &when) mutable {
+    auto tap_render_handler = [=](audio::pcm_buffer &buffer, uint32_t const bus_idx, audio::time const &when) mutable {
         XCTAssertEqual(when.sample_time(), tap_render_frame);
         XCTAssertEqual(when.sample_rate(), sample_rate);
         XCTAssertEqual(buffer.frame_length(), frames_per_render);
@@ -171,14 +171,14 @@ using namespace yas;
         }
     };
 
-    tap_node.set_render_function(std::move(tap_render_function));
+    tap_node.set_render_handler(std::move(tap_render_handler));
 
     XCTestExpectation *renderExpectation = [self expectationWithDescription:@"offline output node render"];
     XCTestExpectation *completionExpectation = [self expectationWithDescription:@"offline output node completion"];
 
     uint32_t output_render_frame = 0;
 
-    auto start_render_function = [=](auto args) mutable {
+    auto start_render_handler = [=](auto args) mutable {
         audio::pcm_buffer &buffer = args.buffer;
         audio::time const &when = args.when;
         bool &out_stop = args.out_stop;
@@ -213,7 +213,7 @@ using namespace yas;
         }
     };
 
-    auto completion_function = [=](bool const cancelled) mutable {
+    auto completion_handler = [=](bool const cancelled) mutable {
         XCTAssertFalse(cancelled);
         if (completionExpectation) {
             [completionExpectation fulfill];
@@ -221,7 +221,7 @@ using namespace yas;
         }
     };
 
-    auto result = output_node.manageable().start(std::move(start_render_function), std::move(completion_function));
+    auto result = output_node.manageable().start(std::move(start_render_handler), std::move(completion_handler));
 
     XCTAssertTrue(result);
 
@@ -255,13 +255,13 @@ using namespace yas;
 
     XCTestExpectation *completionExpectation = [self expectationWithDescription:@"offline output node completion"];
 
-    auto render_func = [promise](auto args) mutable {
+    auto render_handler = [promise](auto args) mutable {
         if (args.when.sample_time() == 0) {
             promise->set_value();
         }
     };
 
-    auto completion_function = [=](bool const cancelled) mutable {
+    auto completion_handler = [=](bool const cancelled) mutable {
         XCTAssertTrue(cancelled);
         if (completionExpectation) {
             [completionExpectation fulfill];
@@ -269,7 +269,7 @@ using namespace yas;
         }
     };
 
-    auto result = output_node.manageable().start(std::move(render_func), completion_function);
+    auto result = output_node.manageable().start(std::move(render_handler), completion_handler);
 
     XCTAssertTrue(result);
 

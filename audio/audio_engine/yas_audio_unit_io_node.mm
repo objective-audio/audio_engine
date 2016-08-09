@@ -293,7 +293,7 @@ struct yas::audio::unit_input_node::impl : base::impl {
             _input_buffer = input_buffer;
 
             auto weak_node = to_weak(cast<unit_input_node>());
-            unit.set_input_callback([weak_node, input_buffer](render_parameters &render_parameters) mutable {
+            unit.set_input_handler([weak_node, input_buffer](render_parameters &render_parameters) mutable {
                 auto input_node = weak_node.lock();
                 if (input_node && render_parameters.in_number_frames <= input_buffer.frame_capacity()) {
                     input_buffer.set_frame_length(render_parameters.in_number_frames);
@@ -321,7 +321,7 @@ struct yas::audio::unit_input_node::impl : base::impl {
             });
         } else {
             unit.detach_input_callback();
-            unit.set_input_callback(nullptr);
+            unit.set_input_handler(nullptr);
             _input_buffer = nullptr;
         }
     }

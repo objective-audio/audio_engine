@@ -187,7 +187,7 @@ struct audio::unit_node::impl : base::impl, manageable_unit_node::impl {
             auto input_bus_count = input_element_count();
             if (input_bus_count > 0) {
                 auto weak_node = to_weak(cast<unit_node>());
-                audio_unit.set_render_callback([weak_node](audio::render_parameters &render_parameters) {
+                audio_unit.set_render_handler([weak_node](audio::render_parameters &render_parameters) {
                     if (auto node = weak_node.lock()) {
                         if (auto kernel = node.node().kernel()) {
                             if (auto connection = kernel.input_connection(render_parameters.in_bus_number)) {
@@ -210,7 +210,7 @@ struct audio::unit_node::impl : base::impl, manageable_unit_node::impl {
                     }
                 }
             } else {
-                audio_unit.set_render_callback(nullptr);
+                audio_unit.set_render_handler(nullptr);
             }
 
             auto output_bus_count = output_element_count();

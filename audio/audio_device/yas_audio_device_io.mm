@@ -131,7 +131,7 @@ struct audio::device_io::impl : base::impl {
             return;
         }
 
-        auto function = [weak_device_io = _weak_device_io](
+        auto handler = [weak_device_io = _weak_device_io](
             const AudioTimeStamp *inNow, const AudioBufferList *inInputData, const AudioTimeStamp *inInputTime,
             AudioBufferList *outOutputData, const AudioTimeStamp *inOutputTime) {
             if (outOutputData) {
@@ -155,7 +155,7 @@ struct audio::device_io::impl : base::impl {
                         }
                     }
 
-                    if (auto render_callback = imp->render_callback()) {
+                    if (auto render_handler = imp->render_handler()) {
                         if (auto &output_buffer = kernel.output_buffer()) {
                             if (outOutputData) {
                                 uint32_t const frame_length =
@@ -163,13 +163,13 @@ struct audio::device_io::impl : base::impl {
                                 if (frame_length > 0) {
                                     output_buffer.set_frame_length(frame_length);
                                     audio::time time(*inOutputTime, output_buffer.format().sample_rate());
-                                    render_callback({.output_buffer = output_buffer, .when = time});
+                                    render_handler({.output_buffer = output_buffer, .when = time});
                                     output_buffer.copy_to(outOutputData);
                                 }
                             }
                         } else if (kernel.input_buffer()) {
                             pcm_buffer null_buffer{nullptr};
-                            render_callback({.output_buffer = null_buffer, .when = nullptr});
+                            render_handler({.output_buffer = null_buffer, .when = nullptr});
                         }
                     }
                 }
@@ -180,7 +180,7 @@ struct audio::device_io::impl : base::impl {
         };
 
         raise_if_au_error(
-            AudioDeviceCreateIOProcIDWithBlock(&_io_proc_id, _device.audio_device_id(), nullptr, function));
+            AudioDeviceCreateIOProcIDWithBlock(&_io_proc_id, _device.audio_device_id(), nullptr, handler));
 
         update_kernel();
     }
@@ -226,14 +226,14 @@ struct audio::device_io::impl : base::impl {
         }
     }
 
-    void set_render_callback(render_f &&render_callback) {
+    void set_render_handler(render_f &&handler) {
         std::lock_guard<std::recursive_mutex> lock(_mutex);
-        _render_callback = std::move(render_callback);
+        _render_handler = std::move(handler);
     }
 
-    render_f render_callback() const {
+    render_f render_handler() const {
         std::lock_guard<std::recursive_mutex> lock(_mutex);
-        return _render_callback;
+        return _render_handler;
     }
 
     void set_maximum_frames(uint32_t const frames) {
@@ -273,7 +273,7 @@ struct audio::device_io::impl : base::impl {
     }
 
    private:
-    render_f _render_callback = nullptr;
+    render_f _render_handler = nullptr;
     uint32_t _maximum_frames = 4096;
     device_io::kernel _kernel = nullptr;
     mutable std::recursive_mutex _mutex;
@@ -308,8 +308,8 @@ bool audio::device_io::is_running() const {
     return impl_ptr<impl>()->_is_running;
 }
 
-void audio::device_io::set_render_callback(render_f callback) {
-    impl_ptr<impl>()->set_render_callback(std::move(callback));
+void audio::device_io::set_render_handler(render_f callback) {
+    impl_ptr<impl>()->set_render_handler(std::move(callback));
 }
 
 void audio::device_io::set_maximum_frames_per_slice(uint32_t const frames) {

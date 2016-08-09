@@ -147,8 +147,8 @@ namespace sample {
 
     double phase = 0;
 
-    auto tap_render_function = [phase](audio::pcm_buffer &buffer, uint32_t const bus_idx,
-                                       const audio::time &when) mutable {
+    auto tap_render_handler = [phase](audio::pcm_buffer &buffer, uint32_t const bus_idx,
+                                      const audio::time &when) mutable {
         buffer.clear();
 
         double const start_phase = phase;
@@ -167,7 +167,7 @@ namespace sample {
         }
     };
 
-    _internal.tap_node.set_render_function(tap_render_function);
+    _internal.tap_node.set_render_handler(tap_render_handler);
 
     _internal.replace_effect_node(nullptr);
 }

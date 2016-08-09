@@ -499,16 +499,16 @@ struct audio::unit::impl : base::impl, manageable_unit::impl {
         return _key;
     }
 
-    void set_render_callback(render_f &&callback) {
-        _core.set_render_callback(std::move(callback));
+    void set_render_handler(render_f &&callback) {
+        _core.set_render_handler(std::move(callback));
     }
 
-    void set_notify_callback(render_f &&callback) {
-        _core.set_notify_callback(std::move(callback));
+    void set_notify_handler(render_f &&callback) {
+        _core.set_notify_handler(std::move(callback));
     }
 
-    void set_input_callback(render_f &&callback) {
-        _core.set_input_callback(std::move(callback));
+    void set_input_handler(render_f &&callback) {
+        _core.set_input_handler(std::move(callback));
     }
 
     void set_audio_unit_instance(AudioUnit const au) {
@@ -524,24 +524,24 @@ struct audio::unit::impl : base::impl, manageable_unit::impl {
     void callback_render(render_parameters &render_parameters) {
         raise_if_main_thread();
 
-        render_f function = nullptr;
+        render_f handler = nullptr;
 
         switch (render_parameters.in_render_type) {
             case render_type::normal:
-                function = _core.render_callback();
+                handler = _core.render_handler();
                 break;
             case render_type::notify:
-                function = _core.notify_callback();
+                handler = _core.notify_handler();
                 break;
             case render_type::input:
-                function = _core.input_callback();
+                handler = _core.input_handler();
                 break;
             default:
                 break;
         }
 
-        if (function) {
-            function(render_parameters);
+        if (handler) {
+            handler(render_parameters);
         }
     }
 
@@ -559,34 +559,34 @@ struct audio::unit::impl : base::impl, manageable_unit::impl {
 
    private:
     struct core {
-        void set_render_callback(render_f &&callback) {
+        void set_render_handler(render_f &&callback) {
             std::lock_guard<std::recursive_mutex> lock(_mutex);
-            _render_callback = std::move(callback);
+            _render_handler = std::move(callback);
         }
 
-        audio::unit::render_f render_callback() {
+        audio::unit::render_f render_handler() {
             std::lock_guard<std::recursive_mutex> lock(_mutex);
-            return _render_callback;
+            return _render_handler;
         }
 
-        void set_notify_callback(render_f &&callback) {
+        void set_notify_handler(render_f &&callback) {
             std::lock_guard<std::recursive_mutex> lock(_mutex);
-            _notify_callback = std::move(callback);
+            _notify_handler = std::move(callback);
         }
 
-        audio::unit::render_f notify_callback() {
+        audio::unit::render_f notify_handler() {
             std::lock_guard<std::recursive_mutex> lock(_mutex);
-            return _notify_callback;
+            return _notify_handler;
         }
 
-        void set_input_callback(render_f &&callback) {
+        void set_input_handler(render_f &&callback) {
             std::lock_guard<std::recursive_mutex> lock(_mutex);
-            _input_callback = std::move(callback);
+            _input_handler = std::move(callback);
         }
 
-        audio::unit::render_f input_callback() {
+        audio::unit::render_f input_handler() {
             std::lock_guard<std::recursive_mutex> lock(_mutex);
-            return _input_callback;
+            return _input_handler;
         }
 
         void set_audio_unit_instance(AudioUnit const au) {
@@ -601,9 +601,9 @@ struct audio::unit::impl : base::impl, manageable_unit::impl {
 
        private:
         AudioUnit _au_instance;
-        render_f _render_callback;
-        render_f _notify_callback;
-        render_f _input_callback;
+        render_f _render_handler;
+        render_f _notify_handler;
+        render_f _input_handler;
         mutable std::recursive_mutex _mutex;
     };
 
@@ -687,16 +687,16 @@ void audio::unit::detach_input_callback() {
     impl_ptr<impl>()->detach_input_callback();
 }
 
-void audio::unit::set_render_callback(render_f callback) {
-    impl_ptr<impl>()->set_render_callback(std::move(callback));
+void audio::unit::set_render_handler(render_f callback) {
+    impl_ptr<impl>()->set_render_handler(std::move(callback));
 }
 
-void audio::unit::set_notify_callback(render_f callback) {
-    impl_ptr<impl>()->set_notify_callback(std::move(callback));
+void audio::unit::set_notify_handler(render_f callback) {
+    impl_ptr<impl>()->set_notify_handler(std::move(callback));
 }
 
-void audio::unit::set_input_callback(render_f callback) {
-    impl_ptr<impl>()->set_input_callback(std::move(callback));
+void audio::unit::set_input_handler(render_f callback) {
+    impl_ptr<impl>()->set_input_handler(std::move(callback));
 }
 
 #pragma mark - property

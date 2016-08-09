@@ -83,8 +83,8 @@ using namespace yas;
     XCTestExpectation *ioExpectation = [self expectationWithDescription:@"io_unit render"];
     yas_retain_or_ignore(ioExpectation);
 
-    io_unit.set_render_callback([ioExpectation, frame_length, output_format, &mixer_unit,
-                                 &self](audio::render_parameters &render_parameters) mutable {
+    io_unit.set_render_handler([ioExpectation, frame_length, output_format, &mixer_unit,
+                                &self](audio::render_parameters &render_parameters) mutable {
         if (ioExpectation) {
             [ioExpectation fulfill];
 
@@ -117,7 +117,7 @@ using namespace yas;
 
     yas_retain_or_ignore(mixerExpectations);
 
-    mixer_unit.set_render_callback(
+    mixer_unit.set_render_handler(
         [mixerExpectations, output_format, frame_length, &self](audio::render_parameters &render_parameters) mutable {
             if (mixerExpectations) {
                 uint32_t const bus_idx = render_parameters.in_bus_number;
