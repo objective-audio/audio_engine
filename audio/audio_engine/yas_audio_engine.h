@@ -82,7 +82,8 @@ namespace audio {
         subject_t &subject() const;
 
 #if YAS_TEST
-        audio::testable_engine testable();
+        std::unordered_set<node> &nodes() const;
+        audio::connection_set &connections() const;
 #endif
     };
 }

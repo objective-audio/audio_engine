@@ -27,15 +27,15 @@ using namespace yas;
     test::audio_test_node_decorator source_decor(1, 1);
     test::audio_test_node_decorator destination_decor(1, 1);
 
-    XCTAssertEqual(engine.testable().nodes().size(), 0);
-    XCTAssertEqual(engine.testable().connections().size(), 0);
+    XCTAssertEqual(engine.nodes().size(), 0);
+    XCTAssertEqual(engine.connections().size(), 0);
 
     audio::connection connection = nullptr;
     XCTAssertNoThrow(connection = engine.connect(source_decor.node(), destination_decor.node(), format));
     XCTAssertTrue(connection);
 
-    auto &nodes = engine.testable().nodes();
-    auto &connections = engine.testable().connections();
+    auto &nodes = engine.nodes();
+    auto &connections = engine.connections();
     XCTAssertGreaterThanOrEqual(nodes.count(source_decor.node()), 1);
     XCTAssertGreaterThanOrEqual(nodes.count(destination_decor.node()), 1);
     XCTAssertEqual(connections.size(), 1);
@@ -52,7 +52,7 @@ using namespace yas;
     audio::connection connection = nullptr;
     XCTAssertThrows(connection = engine.connect(source_decor.node(), destination_decor.node(), format));
     XCTAssertFalse(connection);
-    XCTAssertEqual(engine.testable().connections().size(), 0);
+    XCTAssertEqual(engine.connections().size(), 0);
 }
 
 - (void)test_connect_and_disconnect {
@@ -65,7 +65,7 @@ using namespace yas;
 
     engine.connect(source_decor.node(), relay_decor.node(), format);
 
-    auto &nodes = engine.testable().nodes();
+    auto &nodes = engine.nodes();
     XCTAssertGreaterThanOrEqual(nodes.count(source_decor.node()), 1);
     XCTAssertGreaterThanOrEqual(nodes.count(relay_decor.node()), 1);
     XCTAssertEqual(nodes.count(destination_decor.node()), 0);
