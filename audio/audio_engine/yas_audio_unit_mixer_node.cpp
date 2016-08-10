@@ -93,7 +93,7 @@ float audio::unit_mixer_node::input_pan(uint32_t const bus_idx) const {
     return unit_node().input_parameter_value(kMultiChannelMixerParam_Pan, bus_idx);
 }
 
-void audio::unit_mixer_node::set_input_enabled(const bool enabled, uint32_t const bus_idx) {
+void audio::unit_mixer_node::set_input_enabled(bool const enabled, uint32_t const bus_idx) {
     unit_node().set_input_parameter_value(kMultiChannelMixerParam_Enable, enabled ? 1.0f : 0.0f, bus_idx);
 }
 

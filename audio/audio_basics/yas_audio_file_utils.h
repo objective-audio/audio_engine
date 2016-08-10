@@ -46,8 +46,8 @@ namespace audio {
     CFDictionaryRef aiff_file_settings(double const sample_rate, uint32_t const channel_count,
                                        uint32_t const bit_depth);
     CFDictionaryRef linear_pcm_file_settings(double const sample_rate, uint32_t const channel_count,
-                                             uint32_t const bit_depth, const bool is_big_endian, const bool is_float,
-                                             const bool is_non_interleaved);
+                                             uint32_t const bit_depth, bool const is_big_endian, bool const is_float,
+                                             bool const is_non_interleaved);
     CFDictionaryRef aac_settings(double const sample_rate, uint32_t const channel_count, uint32_t const bit_depth,
                                  const AVAudioQuality encoder_quality, uint32_t const bit_rate,
                                  uint32_t const bit_depth_hint, const AVAudioQuality converter_quality);

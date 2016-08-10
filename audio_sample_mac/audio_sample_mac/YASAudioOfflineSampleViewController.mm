@@ -29,7 +29,7 @@ namespace offline_sample {
                 return _frequency;
             }
 
-            void set_playing(const bool playing) {
+            void set_playing(bool const playing) {
                 std::lock_guard<std::recursive_mutex> lock(_mutex);
                 _playing = playing;
             }
@@ -92,7 +92,7 @@ namespace offline_sample {
             return impl_ptr<impl>()->frequency();
         }
 
-        void set_playing(const bool playing) {
+        void set_playing(bool const playing) {
             impl_ptr<impl>()->set_playing(playing);
         }
 
@@ -289,7 +289,7 @@ namespace sample {
                 args.out_stop = YES;
             }
         },
-        [unowned_self](const bool cancelled) { [unowned_self.object() object].processing = NO; });
+        [unowned_self](bool const cancelled) { [unowned_self.object() object].processing = NO; });
 
     if (!start_result) {
         self.processing = NO;
