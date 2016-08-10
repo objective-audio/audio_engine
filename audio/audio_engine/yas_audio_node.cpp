@@ -243,11 +243,11 @@ struct audio::node::impl : base::impl, manageable_node::impl, connectable_node::
         _render_handler = std::move(handler);
     }
 
-    void render(pcm_buffer &buffer, uint32_t const bus_idx, time const &when) {
-        set_render_time_on_render(when);
+    void render(render_args &&args) {
+        set_render_time_on_render(args.when);
 
         if (_render_handler) {
-            _render_handler(buffer, bus_idx, when);
+            _render_handler(std::move(args));
         }
     }
 
@@ -381,8 +381,8 @@ audio::kernel audio::node::kernel() const {
 
 #pragma mark render thread
 
-void audio::node::render(pcm_buffer &buffer, uint32_t const bus_idx, const time &when) {
-    impl_ptr<impl>()->render(buffer, bus_idx, when);
+void audio::node::render(render_args args) {
+    impl_ptr<impl>()->render(std::move(args));
 }
 
 void audio::node::set_render_time_on_render(const time &time) {

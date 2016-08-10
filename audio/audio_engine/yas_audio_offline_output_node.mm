@@ -79,7 +79,8 @@ struct audio::offline_output_node::impl : base::impl, manageable_offline_output_
                     render_buffer.reset();
 
                     if (auto source_node = connection_on_block.source_node()) {
-                        source_node.render(render_buffer, connection_on_block.source_bus(), when);
+                        source_node.render(
+                            {.buffer = render_buffer, .bus_idx = connection_on_block.source_bus(), .when = when});
                     }
 
                     if (render_handler) {

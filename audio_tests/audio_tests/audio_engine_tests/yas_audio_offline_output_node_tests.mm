@@ -56,7 +56,10 @@ using namespace yas;
     uint32_t const length = 4192;
     uint32_t tap_render_frame = 0;
 
-    auto tap_render_handler = [=](audio::pcm_buffer &buffer, uint32_t const bus_idx, audio::time const &when) mutable {
+    auto tap_render_handler = [=](audio::node::render_args args) mutable {
+        auto &buffer = args.buffer;
+        auto const &when = args.when;
+
         XCTAssertEqual(when.sample_time(), tap_render_frame);
         XCTAssertEqual(when.sample_rate(), sample_rate);
         XCTAssertEqual(buffer.frame_length(), frames_per_render);
@@ -83,9 +86,9 @@ using namespace yas;
 
     uint32_t output_render_frame = 0;
 
-    auto start_render_handler = [=](auto args) mutable {
-        audio::pcm_buffer &buffer = args.buffer;
-        audio::time const &when = args.when;
+    auto start_render_handler = [=](audio::offline_render_args args) mutable {
+        auto &buffer = args.buffer;
+        auto const &when = args.when;
         bool &out_stop = args.out_stop;
 
         XCTAssertEqual(when.sample_time(), output_render_frame);
@@ -149,7 +152,10 @@ using namespace yas;
     uint32_t const length = 4196;
     uint32_t tap_render_frame = 0;
 
-    auto tap_render_handler = [=](audio::pcm_buffer &buffer, uint32_t const bus_idx, audio::time const &when) mutable {
+    auto tap_render_handler = [=](auto args) mutable {
+        auto &buffer = args.buffer;
+        auto const &when = args.when;
+
         XCTAssertEqual(when.sample_time(), tap_render_frame);
         XCTAssertEqual(when.sample_rate(), sample_rate);
         XCTAssertEqual(buffer.frame_length(), frames_per_render);
@@ -179,8 +185,8 @@ using namespace yas;
     uint32_t output_render_frame = 0;
 
     auto start_render_handler = [=](auto args) mutable {
-        audio::pcm_buffer &buffer = args.buffer;
-        audio::time const &when = args.when;
+        auto &buffer = args.buffer;
+        auto const &when = args.when;
         bool &out_stop = args.out_stop;
 
         XCTAssertEqual(when.sample_time(), output_render_frame);

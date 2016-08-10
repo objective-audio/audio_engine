@@ -177,8 +177,9 @@ namespace sample {
 
     double next_phase = 0.0;
 
-    auto render_handler = [next_phase, weak_node](audio::pcm_buffer &buffer, uint32_t const bus_idx,
-                                                  const audio::time &when) mutable {
+    auto render_handler = [next_phase, weak_node](auto args) mutable {
+        auto &buffer = args.buffer;
+
         buffer.clear();
 
         audio::frame_enumerator enumerator(buffer);

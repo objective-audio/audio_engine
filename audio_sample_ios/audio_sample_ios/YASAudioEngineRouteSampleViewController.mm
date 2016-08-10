@@ -237,8 +237,9 @@ namespace sample {
 
     double phase = 0;
 
-    auto tap_render_handler = [phase](audio::pcm_buffer &buffer, uint32_t const bus_idx,
-                                      const audio::time &when) mutable {
+    auto tap_render_handler = [phase](auto args) mutable {
+        auto &buffer = args.buffer;
+
         buffer.clear();
 
         double const start_phase = phase;

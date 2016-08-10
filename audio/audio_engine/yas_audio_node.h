@@ -35,8 +35,14 @@ namespace audio {
         using subject_t = subject<node, method>;
         using observer_t = observer<node, method>;
 
+        struct render_args {
+            audio::pcm_buffer &buffer;
+            uint32_t const bus_idx;
+            audio::time const &when;
+        };
+
         using prepare_kernel_f = std::function<void(kernel &)>;
-        using render_f = std::function<void(audio::pcm_buffer &, uint32_t const, audio::time const &)>;
+        using render_f = std::function<void(render_args)>;
 
         node(node_args);
         node(std::nullptr_t);
@@ -68,7 +74,7 @@ namespace audio {
 
         audio::kernel kernel() const;
 
-        void render(audio::pcm_buffer &buffer, uint32_t const bus_idx, audio::time const &when);
+        void render(render_args);
         void set_render_time_on_render(audio::time const &time);
 
         subject_t &subject();

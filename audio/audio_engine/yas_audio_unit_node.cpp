@@ -37,27 +37,28 @@ struct audio::unit_node::impl : base::impl, manageable_unit_node::impl {
 
         auto weak_node = to_weak(node);
 
-        _node.set_render_handler(
-            [weak_node](audio::pcm_buffer &buffer, uint32_t const bus_idx, audio::time const &when) {
-                if (auto node = weak_node.lock()) {
-                    if (auto audio_unit = node.impl_ptr<impl>()->au()) {
-                        AudioUnitRenderActionFlags action_flags = 0;
-                        AudioTimeStamp const time_stamp = when.audio_time_stamp();
+        _node.set_render_handler([weak_node](auto args) {
+            auto &buffer = args.buffer;
 
-                        render_parameters render_parameters{.in_render_type = render_type::normal,
-                                                            .io_action_flags = &action_flags,
-                                                            .io_time_stamp = &time_stamp,
-                                                            .in_bus_number = bus_idx,
-                                                            .in_number_frames = buffer.frame_length(),
-                                                            .io_data = buffer.audio_buffer_list()};
+            if (auto node = weak_node.lock()) {
+                if (auto audio_unit = node.impl_ptr<impl>()->au()) {
+                    AudioUnitRenderActionFlags action_flags = 0;
+                    AudioTimeStamp const time_stamp = args.when.audio_time_stamp();
 
-                        if (auto err = audio_unit.audio_unit_render(render_parameters).error_opt()) {
-                            std::cout << "audio unit render error : " << std::to_string(*err) << " - "
-                                      << to_string(*err) << std::endl;
-                        }
+                    render_parameters render_parameters{.in_render_type = render_type::normal,
+                                                        .io_action_flags = &action_flags,
+                                                        .io_time_stamp = &time_stamp,
+                                                        .in_bus_number = args.bus_idx,
+                                                        .in_number_frames = buffer.frame_length(),
+                                                        .io_data = buffer.audio_buffer_list()};
+
+                    if (auto err = audio_unit.audio_unit_render(render_parameters).error_opt()) {
+                        std::cout << "audio unit render error : " << std::to_string(*err) << " - " << to_string(*err)
+                                  << std::endl;
                     }
                 }
-            });
+            }
+        });
 
         _reset_observer = _node.subject().make_observer(audio::node::method::will_reset, [weak_node](auto const &) {
             if (auto node = weak_node.lock()) {
@@ -194,7 +195,8 @@ struct audio::unit_node::impl : base::impl, manageable_unit_node::impl {
                                 if (auto source_node = connection.source_node()) {
                                     pcm_buffer buffer{connection.format(), render_parameters.io_data};
                                     time when(*render_parameters.io_time_stamp, connection.format().sample_rate());
-                                    source_node.render(buffer, connection.source_bus(), when);
+                                    source_node.render(
+                                        {.buffer = buffer, .bus_idx = connection.source_bus(), .when = when});
                                 }
                             }
                         }

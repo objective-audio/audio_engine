@@ -313,7 +313,7 @@ struct yas::audio::unit_input_node::impl : base::impl {
                             auto destination_node = connection.destination_node();
 
                             if (destination_node.is_input_renderable()) {
-                                destination_node.render(input_buffer, 0, time);
+                                destination_node.render({.buffer = input_buffer, .bus_idx = 0, .when = time});
                             }
                         }
                     }
