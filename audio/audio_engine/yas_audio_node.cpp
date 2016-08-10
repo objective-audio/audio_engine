@@ -25,8 +25,8 @@ struct audio::node::impl : base::impl, manageable_node::impl, connectable_node::
     std::experimental::optional<uint32_t> _override_output_bus_idx = nullopt;
     audio::connection_wmap _input_connections;
     audio::connection_wmap _output_connections;
-    std::function<void(audio::graph &)> _add_to_graph_handler;
-    std::function<void(audio::graph &)> _remove_from_graph_handler;
+    edit_graph_f _add_to_graph_handler;
+    edit_graph_f _remove_from_graph_handler;
     prepare_kernel_f _prepare_kernel_handler;
     audio::node::render_f _render_handler;
 
@@ -219,19 +219,19 @@ struct audio::node::impl : base::impl, manageable_node::impl, connectable_node::
         _weak_engine = engine;
     }
 
-    void set_add_to_graph_handler(std::function<void(audio::graph &)> &&handler) override {
+    void set_add_to_graph_handler(edit_graph_f &&handler) override {
         _add_to_graph_handler = std::move(handler);
     }
 
-    void set_remove_from_graph_handler(std::function<void(audio::graph &)> &&handler) override {
+    void set_remove_from_graph_handler(edit_graph_f &&handler) override {
         _remove_from_graph_handler = std::move(handler);
     }
 
-    std::function<void(audio::graph &)> const &add_to_graph_handler() const override {
+    edit_graph_f const &add_to_graph_handler() const override {
         return _add_to_graph_handler;
     }
 
-    std::function<void(audio::graph &)> const &remove_from_graph_handler() const override {
+    edit_graph_f const &remove_from_graph_handler() const override {
         return _remove_from_graph_handler;
     }
 
