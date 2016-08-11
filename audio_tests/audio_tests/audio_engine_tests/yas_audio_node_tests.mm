@@ -119,7 +119,7 @@ using namespace yas;
 
     auto lambda = [self, node, time, render_expectation]() mutable {
         audio::pcm_buffer null_buffer{nullptr};
-        node.render(null_buffer, 0, time);
+        node.render({.buffer = null_buffer, .bus_idx = 0, .when = time});
         [render_expectation fulfill];
     };
 

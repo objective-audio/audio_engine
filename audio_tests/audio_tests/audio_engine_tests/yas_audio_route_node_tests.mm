@@ -84,7 +84,7 @@ using namespace yas;
     engine.connect(tap_node.node(), route_node.node(), format);
 
     bool tap_node_called = false;
-    tap_node.set_render_handler([&tap_node_called](auto const &, auto const, auto const &) { tap_node_called = true; });
+    tap_node.set_render_handler([&tap_node_called](auto) { tap_node_called = true; });
 
     {
         XCTestExpectation *expectation = [self expectationWithDescription:@"first render"];
@@ -104,10 +104,10 @@ using namespace yas;
     route_node.add_route({0, 1, 0, 1});
 
     tap_node_called = false;
-    tap_node.set_render_handler([&tap_node_called, self](auto const &buffer, bool const bus_idx, auto const &when) {
+    tap_node.set_render_handler([&tap_node_called, self](auto args) {
         tap_node_called = true;
-        XCTAssertEqual(bus_idx, 0);
-        test::fill_test_values_to_buffer(buffer);
+        XCTAssertEqual(args.bus_idx, 0);
+        test::fill_test_values_to_buffer(args.buffer);
     });
 
     {
@@ -168,9 +168,9 @@ using namespace yas;
         engine.connect(tap_node.node(), route_node.node(), 0, i, src_format);
 
         auto &tap_node_called = tap_node_calleds[i];
-        tap_node.set_render_handler([&tap_node_called](auto const &buffer, bool const bus_idx, auto const &when) {
+        tap_node.set_render_handler([&tap_node_called](auto args) {
             tap_node_called = true;
-            test::fill_test_values_to_buffer(buffer);
+            test::fill_test_values_to_buffer(args.buffer);
         });
     }
 
@@ -235,9 +235,9 @@ using namespace yas;
         engine.connect(tap_node.node(), route_node.node(), 0, i, src_format);
 
         auto &tap_node_called = tap_node_calleds[i];
-        tap_node.set_render_handler([&tap_node_called](auto const &buffer, bool const bus_idx, auto const &when) {
+        tap_node.set_render_handler([&tap_node_called](auto args) {
             tap_node_called = true;
-            test::fill_test_values_to_buffer(buffer);
+            test::fill_test_values_to_buffer(args.buffer);
         });
     }
 

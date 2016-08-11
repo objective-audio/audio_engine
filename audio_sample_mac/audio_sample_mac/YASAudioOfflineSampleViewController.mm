@@ -50,8 +50,9 @@ namespace offline_sample {
 
             auto weak_node = to_weak(*this);
 
-            auto render_handler = [weak_node](audio::pcm_buffer &buffer, uint32_t const bus_idx,
-                                              const audio::time &when) {
+            auto render_handler = [weak_node](auto args) {
+                auto &buffer = args.buffer;
+
                 buffer.clear();
 
                 if (auto node = weak_node.lock()) {
@@ -268,7 +269,7 @@ namespace sample {
 
     auto start_result = _internal.offline_engine.start_offline_render(
         [remain, file_writer = std::move(file_writer)](auto args) mutable {
-            audio::pcm_buffer &buffer = args.buffer;
+            auto &buffer = args.buffer;
 
             auto format = audio::format(buffer.format().stream_description());
             audio::pcm_buffer pcm_buffer(format, buffer.audio_buffer_list());

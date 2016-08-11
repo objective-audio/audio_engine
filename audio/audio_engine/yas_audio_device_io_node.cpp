@@ -29,17 +29,18 @@ struct yas::audio::device_io_node::impl : base::impl, manageable_device_io_node:
 
         auto weak_node = to_weak(device_io_node);
 
-        _node.set_render_handler(
-            [weak_node](audio::pcm_buffer &buffer, uint32_t const bus_idx, audio::time const &when) {
-                if (auto device_io_node = weak_node.lock()) {
-                    if (auto const &device_io = device_io_node.impl_ptr<impl>()->device_io()) {
-                        auto &input_buffer = device_io.input_buffer_on_render();
-                        if (input_buffer && input_buffer.format() == buffer.format()) {
-                            buffer.copy_from(input_buffer);
-                        }
+        _node.set_render_handler([weak_node](auto args) {
+            auto &buffer = args.buffer;
+
+            if (auto device_io_node = weak_node.lock()) {
+                if (auto const &device_io = device_io_node.impl_ptr<impl>()->device_io()) {
+                    auto &input_buffer = device_io.input_buffer_on_render();
+                    if (input_buffer && input_buffer.format() == buffer.format()) {
+                        buffer.copy_from(input_buffer);
                     }
                 }
-            });
+            }
+        });
 
         _connections_observer =
             _node.subject().make_observer(audio::node::method::update_connections, [weak_node](auto const &) {
@@ -113,7 +114,9 @@ struct yas::audio::device_io_node::impl : base::impl, manageable_device_io_node:
                             auto const &connection = connections.at(0);
                             if (auto source_node = connection.source_node()) {
                                 if (connection.format() == source_node.output_format(connection.source_bus())) {
-                                    source_node.render(args.output_buffer, connection.source_bus(), args.when);
+                                    source_node.render({.buffer = args.output_buffer,
+                                                        .bus_idx = connection.source_bus(),
+                                                        .when = args.when});
                                 }
                             }
                         }
@@ -130,7 +133,8 @@ struct yas::audio::device_io_node::impl : base::impl, manageable_device_io_node:
                                     if (input_buffer && input_time) {
                                         if (connection.format() ==
                                             destination_node.input_format(connection.destination_bus())) {
-                                            destination_node.render(input_buffer, 0, input_time);
+                                            destination_node.render(
+                                                {.buffer = input_buffer, .bus_idx = 0, .when = input_time});
                                         }
                                     }
                                 }

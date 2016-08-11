@@ -24,7 +24,7 @@ namespace audio {
             audio::time const &when;
         };
 
-        using render_f = std::function<void(render_args args)>;
+        using render_f = std::function<void(render_args)>;
 
         device_io(std::nullptr_t);
         explicit device_io(audio::device const &);

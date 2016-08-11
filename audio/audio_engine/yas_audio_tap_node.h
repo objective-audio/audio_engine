@@ -23,10 +23,7 @@ namespace audio {
 
         virtual ~tap_node() final;
 
-        using render_f =
-            std::function<void(audio::pcm_buffer &buffer, uint32_t const bus_idx, audio::time const &when)>;
-
-        void set_render_handler(render_f);
+        void set_render_handler(audio::node::render_f);
 
         audio::node const &node() const;
         audio::node &node();
@@ -37,7 +34,7 @@ namespace audio {
         audio::connection_smap output_connections_on_render() const;
 
 #if YAS_TEST
-        void render_source(audio::pcm_buffer &buffer, uint32_t const bus_idx, audio::time const &when);
+        void render_source(audio::node::render_args args);
 #endif
     };
 }

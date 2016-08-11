@@ -37,8 +37,10 @@ using namespace yas;
     XCTestExpectation *completion_expectation = [self expectationWithDescription:@"completion"];
 
     auto weak_to_node = to_weak(to_node);
-    auto to_render_handler = [weak_to_node, self, to_connection, from_connection, to_expectation](
-        auto &buffer, auto const &bus_idx, auto const &when) {
+    auto to_render_handler = [weak_to_node, self, to_connection, from_connection, to_expectation](auto args) {
+        auto &buffer = args.buffer;
+        auto const &when = args.when;
+
         auto node = weak_to_node.lock();
         XCTAssertTrue(node);
         if (node) {
@@ -50,7 +52,7 @@ using namespace yas;
             XCTAssertEqual(from_connection, node.input_connection_on_render(0));
             XCTAssertFalse(node.input_connection_on_render(1));
 
-            node.render_source(buffer, 0, when);
+            node.render_source({.buffer = buffer, .bus_idx = 0, .when = when});
         }
 
         [to_expectation fulfill];
@@ -58,8 +60,7 @@ using namespace yas;
 
     to_node.set_render_handler(std::move(to_render_handler));
 
-    from_node.set_render_handler(
-        [from_expectation](auto const &, auto const &, auto const &) { [from_expectation fulfill]; });
+    from_node.set_render_handler([from_expectation](auto) { [from_expectation fulfill]; });
 
     XCTAssertTrue(engine.start_offline_render(
         [](auto args) { args.out_stop = true; },
@@ -87,8 +88,7 @@ using namespace yas;
 
     XCTestExpectation *from_expectation = [self expectationWithDescription:@"from node"];
 
-    from_node.set_render_handler(
-        [from_expectation](auto const &, auto const &, auto const &) { [from_expectation fulfill]; });
+    from_node.set_render_handler([from_expectation](auto) { [from_expectation fulfill]; });
 
     XCTAssertTrue(engine.start_offline_render([](auto args) { args.out_stop = true; }, nullptr));
 
