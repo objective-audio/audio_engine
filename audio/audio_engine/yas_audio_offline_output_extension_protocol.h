@@ -1,5 +1,5 @@
 //
-//  yas_audio_offline_output_node_protocol.h
+//  yas_audio_offline_output_extension_protocol.h
 //
 
 #pragma once

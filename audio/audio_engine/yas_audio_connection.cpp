@@ -14,7 +14,7 @@ struct audio::connection::impl : base::impl, node_removable::impl {
     audio::format _format;
     mutable std::recursive_mutex _mutex;
 
-    impl(node const &source_node, uint32_t const source_bus, node const &destination_node,
+    impl(audio::node const &source_node, uint32_t const source_bus, audio::node const &destination_node,
          uint32_t const destination_bus, audio::format const &format)
         : _source_bus(source_bus),
           _destination_bus(destination_bus),
@@ -32,12 +32,12 @@ struct audio::connection::impl : base::impl, node_removable::impl {
         }
     }
 
-    node source_node() const {
+    audio::node source_node() const {
         std::lock_guard<std::recursive_mutex> lock(_mutex);
         return _source_node.lock();
     }
 
-    node destination_node() const {
+    audio::node destination_node() const {
         std::lock_guard<std::recursive_mutex> lock(_mutex);
         return _destination_node.lock();
     }
@@ -59,8 +59,8 @@ struct audio::connection::impl : base::impl, node_removable::impl {
     }
 
    private:
-    weak<node> _source_node;
-    weak<node> _destination_node;
+    weak<audio::node> _source_node;
+    weak<audio::node> _destination_node;
 };
 
 audio::connection::connection(node &source_node, uint32_t const source_bus, node &destination_node,

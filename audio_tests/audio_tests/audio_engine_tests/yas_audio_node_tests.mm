@@ -21,7 +21,7 @@ using namespace yas;
 }
 
 - (void)test_create_audio_node {
-    test::audio_test_node_decorator decor;
+    test::audio_test_node_ext decor;
 
     XCTAssertEqual(decor.node().input_bus_count(), 2);
     XCTAssertEqual(decor.node().output_bus_count(), 1);
@@ -53,11 +53,11 @@ using namespace yas;
 }
 
 - (void)test_connection {
-    test::audio_test_node_decorator source_decor;
-    test::audio_test_node_decorator destination_decor;
+    test::audio_test_node_ext source_ext;
+    test::audio_test_node_ext destination_ext;
     auto format = audio::format({.sample_rate = 44100.0, .channel_count = 2});
-    auto source_bus_result = source_decor.node().next_available_input_bus();
-    auto destination_bus_result = destination_decor.node().next_available_output_bus();
+    auto source_bus_result = source_ext.node().next_available_input_bus();
+    auto destination_bus_result = destination_ext.node().next_available_output_bus();
 
     XCTAssertTrue(source_bus_result);
     auto source_bus = *source_bus_result;
@@ -68,47 +68,47 @@ using namespace yas;
     XCTAssertEqual(destination_bus, 0);
 
     if (auto connection =
-            test::connection(source_decor.node(), source_bus, destination_decor.node(), destination_bus, format)) {
-        XCTAssertEqual(source_decor.node().manageable().output_connections().size(), 1);
-        XCTAssertEqual(destination_decor.node().manageable().input_connections().size(), 1);
-        XCTAssertEqual(source_decor.node().manageable().output_connection(source_bus), connection);
-        XCTAssertEqual(destination_decor.node().manageable().input_connection(destination_bus), connection);
-        XCTAssertEqual(source_decor.node().output_format(source_bus), format);
-        XCTAssertEqual(destination_decor.node().input_format(destination_bus), format);
+            test::connection(source_ext.node(), source_bus, destination_ext.node(), destination_bus, format)) {
+        XCTAssertEqual(source_ext.node().manageable().output_connections().size(), 1);
+        XCTAssertEqual(destination_ext.node().manageable().input_connections().size(), 1);
+        XCTAssertEqual(source_ext.node().manageable().output_connection(source_bus), connection);
+        XCTAssertEqual(destination_ext.node().manageable().input_connection(destination_bus), connection);
+        XCTAssertEqual(source_ext.node().output_format(source_bus), format);
+        XCTAssertEqual(destination_ext.node().input_format(destination_bus), format);
 
-        XCTAssertFalse(source_decor.node().output_format(source_bus + 1));
-        XCTAssertFalse(destination_decor.node().input_format(destination_bus + 1));
+        XCTAssertFalse(source_ext.node().output_format(source_bus + 1));
+        XCTAssertFalse(destination_ext.node().input_format(destination_bus + 1));
 
-        XCTAssertFalse(source_decor.node().next_available_output_bus());
-        XCTAssertTrue(destination_decor.node().next_available_input_bus());
-        destination_bus_result = destination_decor.node().next_available_input_bus();
+        XCTAssertFalse(source_ext.node().next_available_output_bus());
+        XCTAssertTrue(destination_ext.node().next_available_input_bus());
+        destination_bus_result = destination_ext.node().next_available_input_bus();
         XCTAssertEqual(*destination_bus_result, 1);
     }
 
-    source_bus_result = source_decor.node().next_available_output_bus();
-    destination_bus_result = destination_decor.node().next_available_input_bus();
+    source_bus_result = source_ext.node().next_available_output_bus();
+    destination_bus_result = destination_ext.node().next_available_input_bus();
     XCTAssertEqual(*source_bus_result, 0);
     XCTAssertEqual(*destination_bus_result, 0);
 }
 
 - (void)test_reset {
-    test::audio_test_node_decorator source_decor;
-    test::audio_test_node_decorator destination_decor;
+    test::audio_test_node_ext source_ext;
+    test::audio_test_node_ext destination_ext;
     auto format = audio::format({.sample_rate = 48000.0, .channel_count = 2});
-    auto source_bus = *source_decor.node().next_available_output_bus();
-    auto destination_bus = *destination_decor.node().next_available_input_bus();
+    auto source_bus = *source_ext.node().next_available_output_bus();
+    auto destination_bus = *destination_ext.node().next_available_input_bus();
 
     auto connection =
-        test::connection(source_decor.node(), source_bus, destination_decor.node(), destination_bus, format);
+        test::connection(source_ext.node(), source_bus, destination_ext.node(), destination_bus, format);
 
-    XCTAssertEqual(source_decor.node().manageable().output_connections().size(), 1);
-    XCTAssertEqual(destination_decor.node().manageable().input_connections().size(), 1);
+    XCTAssertEqual(source_ext.node().manageable().output_connections().size(), 1);
+    XCTAssertEqual(destination_ext.node().manageable().input_connections().size(), 1);
 
-    source_decor.node().reset();
-    XCTAssertEqual(source_decor.node().manageable().output_connections().size(), 0);
+    source_ext.node().reset();
+    XCTAssertEqual(source_ext.node().manageable().output_connections().size(), 0);
 
-    destination_decor.node().reset();
-    XCTAssertEqual(destination_decor.node().manageable().input_connections().size(), 0);
+    destination_ext.node().reset();
+    XCTAssertEqual(destination_ext.node().manageable().input_connections().size(), 0);
 }
 
 - (void)test_render_time {
@@ -152,26 +152,26 @@ using namespace yas;
     auto output_format = audio::format({.sample_rate = 48000.0, .channel_count = 2});
     auto input_format = audio::format({.sample_rate = 44100.0, .channel_count = 1});
 
-    test::audio_test_node_decorator output_decor;
-    test::audio_test_node_decorator relay_decor;
+    test::audio_test_node_ext output_ext;
+    test::audio_test_node_ext relay_ext;
 
-    auto output_connection = test::connection(relay_decor.node(), 0, output_decor.node(), 0, output_format);
+    auto output_connection = test::connection(relay_ext.node(), 0, output_ext.node(), 0, output_format);
 
     std::vector<audio::connection> input_connections;
-    input_connections.reserve(relay_decor.node().input_bus_count());
+    input_connections.reserve(relay_ext.node().input_bus_count());
 
-    for (uint32_t i = 0; i < relay_decor.node().input_bus_count(); ++i) {
-        test::audio_test_node_decorator input_decor;
-        auto input_connection = test::connection(input_decor.node(), 0, relay_decor.node(), i, input_format);
-        input_decor.node().connectable().add_connection(input_connection);
+    for (uint32_t i = 0; i < relay_ext.node().input_bus_count(); ++i) {
+        test::audio_test_node_ext input_ext;
+        auto input_connection = test::connection(input_ext.node(), 0, relay_ext.node(), i, input_format);
+        input_ext.node().connectable().add_connection(input_connection);
         input_connections.push_back(input_connection);
     }
 
-    relay_decor.node().manageable().update_kernel();
+    relay_ext.node().manageable().update_kernel();
 
     XCTestExpectation *expectation = [self expectationWithDescription:@"kernel connections"];
 
-    auto lambda = [self, expectation, relay_node = relay_decor.node(), input_connections, output_connection]() {
+    auto lambda = [self, expectation, relay_node = relay_ext.node(), input_connections, output_connection]() {
         auto kernel = relay_node.kernel();
         XCTAssertEqual(kernel.output_connections().size(), 1);
         XCTAssertEqual(kernel.input_connections().size(), 2);
@@ -191,27 +191,27 @@ using namespace yas;
 
 - (void)test_available_bus {
     auto format = audio::format({.sample_rate = 48000.0, .channel_count = 2});
-    test::audio_test_node_decorator source_decor_0;
-    test::audio_test_node_decorator source_decor_1;
-    test::audio_test_node_decorator destination_decor;
+    test::audio_test_node_ext source_ext_0;
+    test::audio_test_node_ext source_ext_1;
+    test::audio_test_node_ext destination_ext;
 
-    XCTAssertTrue(source_decor_0.node().is_available_output_bus(0));
-    XCTAssertFalse(source_decor_0.node().is_available_output_bus(1));
-    XCTAssertTrue(source_decor_1.node().is_available_output_bus(0));
-    XCTAssertTrue(destination_decor.node().is_available_input_bus(0));
-    XCTAssertTrue(destination_decor.node().is_available_input_bus(1));
-    XCTAssertFalse(destination_decor.node().is_available_input_bus(2));
+    XCTAssertTrue(source_ext_0.node().is_available_output_bus(0));
+    XCTAssertFalse(source_ext_0.node().is_available_output_bus(1));
+    XCTAssertTrue(source_ext_1.node().is_available_output_bus(0));
+    XCTAssertTrue(destination_ext.node().is_available_input_bus(0));
+    XCTAssertTrue(destination_ext.node().is_available_input_bus(1));
+    XCTAssertFalse(destination_ext.node().is_available_input_bus(2));
 
-    auto connection_1 = test::connection(source_decor_1.node(), 0, destination_decor.node(), 1, format);
+    auto connection_1 = test::connection(source_ext_1.node(), 0, destination_ext.node(), 1, format);
 
-    XCTAssertFalse(source_decor_1.node().is_available_output_bus(0));
-    XCTAssertTrue(destination_decor.node().is_available_input_bus(0));
-    XCTAssertFalse(destination_decor.node().is_available_input_bus(1));
+    XCTAssertFalse(source_ext_1.node().is_available_output_bus(0));
+    XCTAssertTrue(destination_ext.node().is_available_input_bus(0));
+    XCTAssertFalse(destination_ext.node().is_available_input_bus(1));
 
-    auto connection_0 = test::connection(source_decor_0.node(), 0, destination_decor.node(), 0, format);
+    auto connection_0 = test::connection(source_ext_0.node(), 0, destination_ext.node(), 0, format);
 
-    XCTAssertFalse(source_decor_0.node().is_available_output_bus(0));
-    XCTAssertFalse(destination_decor.node().is_available_input_bus(0));
+    XCTAssertFalse(source_ext_0.node().is_available_output_bus(0));
+    XCTAssertFalse(destination_ext.node().is_available_input_bus(0));
 }
 
 - (void)test_method_to_string {

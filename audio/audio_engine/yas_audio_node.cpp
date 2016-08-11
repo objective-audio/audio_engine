@@ -166,14 +166,14 @@ struct audio::node::impl : base::impl, manageable_node::impl, connectable_node::
     }
 
     void remove_connection(connection const &connection) override {
-        if (auto destination_node = connection.destination_node()) {
-            if (connection.destination_node().impl_ptr<impl>().get() == this) {
+        if (auto dst_node = connection.destination_node()) {
+            if (dst_node.impl_ptr<impl>().get() == this) {
                 _input_connections.erase(connection.destination_bus());
             }
         }
 
-        if (auto source_node = connection.source_node()) {
-            if (connection.source_node().impl_ptr<impl>().get() == this) {
+        if (auto src_node = connection.source_node()) {
+            if (src_node.impl_ptr<impl>().get() == this) {
                 _output_connections.erase(connection.source_bus());
             }
         }

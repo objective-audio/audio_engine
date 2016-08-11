@@ -20,9 +20,9 @@ namespace audio {
         audio::connection input_connection(uint32_t const bus_idx) const;
         audio::connection output_connection(uint32_t const bus_idx) const;
 
-        void set_decorator(base);
-        base const &decorator() const;
-        base &decorator();
+        void set_extension(base);
+        base const &extension() const;
+        base &extension();
 
         manageable_kernel &manageable();
 

@@ -1,14 +1,14 @@
 //
-//  yas_audio_tap_node.cpp
+//  yas_audio_tap_extension.cpp
 //
 
-#include "yas_audio_tap_node.h"
+#include "yas_audio_tap_extension.h"
 
 using namespace yas;
 
 #pragma mark - audio::tap_kernel
 
-struct audio::tap_node::kernel : base {
+struct audio::tap_extension::kernel : base {
     struct impl : base::impl {
         audio::node::render_f _render_handler;
     };
@@ -28,9 +28,9 @@ struct audio::tap_node::kernel : base {
     }
 };
 
-#pragma mark - audio::tap_node::impl
+#pragma mark - audio::tap_extension::impl
 
-struct audio::tap_node::impl : base::impl {
+struct audio::tap_extension::impl : base::impl {
     audio::node _node;
 
     impl(audio::node_args &&args) : _node(std::move(args)) {
@@ -38,16 +38,16 @@ struct audio::tap_node::impl : base::impl {
 
     ~impl() = default;
 
-    void prepare(tap_node const &node) {
-        auto weak_node = to_weak(node);
+    void prepare(tap_extension const &ext) {
+        auto weak_ext = to_weak(ext);
 
-        _node.set_render_handler([weak_node](auto args) {
-            if (auto node = weak_node.lock()) {
-                auto impl_ptr = node.impl_ptr<impl>();
+        _node.set_render_handler([weak_ext](auto args) {
+            if (auto ext = weak_ext.lock()) {
+                auto impl_ptr = ext.impl_ptr<impl>();
                 if (auto kernel = impl_ptr->_node.kernel()) {
                     impl_ptr->_kernel_on_render = kernel;
 
-                    auto tap_kernel = yas::cast<tap_node::kernel>(kernel.decorator());
+                    auto tap_kernel = yas::cast<tap_extension::kernel>(kernel.extension());
                     auto const &handler = tap_kernel.render_handler();
 
                     if (handler) {
@@ -61,17 +61,17 @@ struct audio::tap_node::impl : base::impl {
             }
         });
 
-        _reset_observer = _node.subject().make_observer(audio::node::method::will_reset, [weak_node](auto const &) {
-            if (auto node = weak_node.lock()) {
-                node.impl_ptr<audio::tap_node::impl>()->_render_handler = nullptr;
+        _reset_observer = _node.subject().make_observer(audio::node::method::will_reset, [weak_ext](auto const &) {
+            if (auto ext = weak_ext.lock()) {
+                ext.impl_ptr<audio::tap_extension::impl>()->_render_handler = nullptr;
             }
         });
 
-        _node.set_prepare_kernel_handler([weak_node](audio::kernel &kernel) {
-            if (auto node = weak_node.lock()) {
-                audio::tap_node::kernel tap_kernel{};
-                tap_kernel.set_render_handler(node.impl_ptr<audio::tap_node::impl>()->_render_handler);
-                kernel.set_decorator(std::move(tap_kernel));
+        _node.set_prepare_kernel_handler([weak_ext](audio::kernel &kernel) {
+            if (auto ext = weak_ext.lock()) {
+                audio::tap_extension::kernel tap_kernel{};
+                tap_kernel.set_render_handler(ext.impl_ptr<audio::tap_extension::impl>()->_render_handler);
+                kernel.set_extension(std::move(tap_kernel));
             }
         });
     }
@@ -100,8 +100,8 @@ struct audio::tap_node::impl : base::impl {
 
     void render_source(audio::node::render_args &&args) {
         if (auto connection = _kernel_on_render.input_connection(args.bus_idx)) {
-            if (auto node = connection.source_node()) {
-                node.render({.buffer = args.buffer, .bus_idx = connection.source_bus(), .when = args.when});
+            if (auto src_node = connection.source_node()) {
+                src_node.render({.buffer = args.buffer, .bus_idx = connection.source_bus(), .when = args.when});
             }
         }
     }
@@ -112,53 +112,53 @@ struct audio::tap_node::impl : base::impl {
     audio::kernel _kernel_on_render;
 };
 
-#pragma mark - audio::tap_node
+#pragma mark - audio::tap_extension
 
-audio::tap_node::tap_node() : tap_node({.is_input = false}) {
+audio::tap_extension::tap_extension() : tap_extension({.is_input = false}) {
 }
 
-audio::tap_node::tap_node(args args)
+audio::tap_extension::tap_extension(args args)
     : base(std::make_unique<impl>(std::move(args.is_input ? node_args{.input_bus_count = 1, .input_renderable = true} :
                                                             node_args{.input_bus_count = 1, .output_bus_count = 1}))) {
     impl_ptr<impl>()->prepare(*this);
 }
 
-audio::tap_node::tap_node(std::nullptr_t) : base(nullptr) {
+audio::tap_extension::tap_extension(std::nullptr_t) : base(nullptr) {
 }
 
-audio::tap_node::~tap_node() = default;
+audio::tap_extension::~tap_extension() = default;
 
-void audio::tap_node::set_render_handler(audio::node::render_f handler) {
+void audio::tap_extension::set_render_handler(audio::node::render_f handler) {
     impl_ptr<impl>()->set_render_handler(std::move(handler));
 }
 
-audio::node const &audio::tap_node::node() const {
+audio::node const &audio::tap_extension::node() const {
     return impl_ptr<impl>()->_node;
 }
 
-audio::node &audio::tap_node::node() {
+audio::node &audio::tap_extension::node() {
     return impl_ptr<impl>()->_node;
 }
 
-audio::connection audio::tap_node::input_connection_on_render(uint32_t const bus_idx) const {
+audio::connection audio::tap_extension::input_connection_on_render(uint32_t const bus_idx) const {
     return impl_ptr<impl>()->input_connection_on_render(bus_idx);
 }
 
-audio::connection audio::tap_node::output_connection_on_render(uint32_t const bus_idx) const {
+audio::connection audio::tap_extension::output_connection_on_render(uint32_t const bus_idx) const {
     return impl_ptr<impl>()->output_connection_on_render(bus_idx);
 }
 
-audio::connection_smap audio::tap_node::input_connections_on_render() const {
+audio::connection_smap audio::tap_extension::input_connections_on_render() const {
     return impl_ptr<impl>()->input_connections_on_render();
 }
 
-audio::connection_smap audio::tap_node::output_connections_on_render() const {
+audio::connection_smap audio::tap_extension::output_connections_on_render() const {
     return impl_ptr<impl>()->output_connections_on_render();
 }
 
 #if YAS_TEST
 
-void audio::tap_node::render_source(audio::node::render_args args) {
+void audio::tap_extension::render_source(audio::node::render_args args) {
     impl_ptr<impl>()->render_source(std::move(args));
 }
 

@@ -1,5 +1,5 @@
 //
-//  yas_audio_offline_output_node_tests.m
+//  yas_audio_offline_output_extension_tests.m
 //
 
 #import <future>
@@ -7,11 +7,11 @@
 
 using namespace yas;
 
-@interface yas_audio_offline_output_node_tests : XCTestCase
+@interface yas_audio_offline_output_extension_tests : XCTestCase
 
 @end
 
-@implementation yas_audio_offline_output_node_tests
+@implementation yas_audio_offline_output_extension_tests
 
 - (void)setUp {
     [super setUp];
@@ -22,33 +22,33 @@ using namespace yas;
 }
 
 - (void)test_create {
-    audio::offline_output_node node;
+    audio::offline_output_extension ext;
 
-    XCTAssertTrue(node);
+    XCTAssertTrue(ext);
 
-    XCTAssertFalse(node.is_running());
-    XCTAssertTrue(node.manageable());
+    XCTAssertFalse(ext.is_running());
+    XCTAssertTrue(ext.manageable());
 }
 
 - (void)test_create_null {
-    audio::offline_output_node node{nullptr};
+    audio::offline_output_extension ext{nullptr};
 
-    XCTAssertFalse(node);
+    XCTAssertFalse(ext);
 }
 
 - (void)test_offline_render_with_audio_engine {
     double const sample_rate = 44100.0;
 
     audio::engine engine;
-    engine.add_offline_output_node();
+    engine.add_offline_output_extension();
 
     auto format = audio::format({.sample_rate = sample_rate, .channel_count = 2});
-    audio::offline_output_node &output_node = engine.offline_output_node();
-    audio::unit_node sample_delay_node(kAudioUnitType_Effect, kAudioUnitSubType_SampleDelay);
-    audio::tap_node tap_node;
+    audio::offline_output_extension &output_ext = engine.offline_output_extension();
+    audio::unit_extension sample_delay_ext(kAudioUnitType_Effect, kAudioUnitSubType_SampleDelay);
+    audio::tap_extension tap_ext;
 
-    engine.connect(sample_delay_node.node(), output_node.node(), format);
-    engine.connect(tap_node.node(), sample_delay_node.node(), format);
+    engine.connect(sample_delay_ext.node(), output_ext.node(), format);
+    engine.connect(tap_ext.node(), sample_delay_ext.node(), format);
 
     XCTestExpectation *tapNodeExpectation = [self expectationWithDescription:@"tap node render"];
 
@@ -79,7 +79,7 @@ using namespace yas;
         }
     };
 
-    tap_node.set_render_handler(std::move(tap_render_handler));
+    tap_ext.set_render_handler(std::move(tap_render_handler));
 
     XCTestExpectation *renderExpectation = [self expectationWithDescription:@"offline output node render"];
     XCTestExpectation *completionExpectation = [self expectationWithDescription:@"offline output node completion"];
@@ -136,15 +136,15 @@ using namespace yas;
 - (void)test_offline_render_without_audio_engine {
     double const sample_rate = 48000.0;
     auto format = audio::format({.sample_rate = sample_rate, .channel_count = 2});
-    audio::offline_output_node output_node;
-    audio::tap_node tap_node;
+    audio::offline_output_extension output_ext;
+    audio::tap_extension tap_ext;
 
-    auto connection = test::connection(tap_node.node(), 0, output_node.node(), 0, format);
+    auto connection = test::connection(tap_ext.node(), 0, output_ext.node(), 0, format);
 
-    output_node.node().connectable().add_connection(connection);
-    output_node.node().manageable().update_kernel();
-    tap_node.node().connectable().add_connection(connection);
-    tap_node.node().manageable().update_kernel();
+    output_ext.node().connectable().add_connection(connection);
+    output_ext.node().manageable().update_kernel();
+    tap_ext.node().connectable().add_connection(connection);
+    tap_ext.node().manageable().update_kernel();
 
     XCTestExpectation *tapNodeExpectation = [self expectationWithDescription:@"tap node render"];
 
@@ -177,7 +177,7 @@ using namespace yas;
         }
     };
 
-    tap_node.set_render_handler(std::move(tap_render_handler));
+    tap_ext.set_render_handler(std::move(tap_render_handler));
 
     XCTestExpectation *renderExpectation = [self expectationWithDescription:@"offline output node render"];
     XCTestExpectation *completionExpectation = [self expectationWithDescription:@"offline output node completion"];
@@ -227,7 +227,7 @@ using namespace yas;
         }
     };
 
-    auto result = output_node.manageable().start(std::move(start_render_handler), std::move(completion_handler));
+    auto result = output_ext.manageable().start(std::move(start_render_handler), std::move(completion_handler));
 
     XCTAssertTrue(result);
 
@@ -238,28 +238,28 @@ using namespace yas;
 }
 
 - (void)test_bus_count {
-    audio::offline_output_node output_node;
+    audio::offline_output_extension output_ext;
 
-    XCTAssertEqual(output_node.node().output_bus_count(), 0);
-    XCTAssertEqual(output_node.node().input_bus_count(), 1);
+    XCTAssertEqual(output_ext.node().output_bus_count(), 0);
+    XCTAssertEqual(output_ext.node().input_bus_count(), 1);
 }
 
 - (void)test_reset_to_stop {
     auto format = audio::format({.sample_rate = 48000.0, .channel_count = 2});
-    audio::offline_output_node output_node;
-    audio::tap_node tap_node;
+    audio::offline_output_extension output_ext;
+    audio::tap_extension tap_ext;
 
-    auto connection = test::connection(tap_node.node(), 0, output_node.node(), 0, format);
+    auto connection = test::connection(tap_ext.node(), 0, output_ext.node(), 0, format);
 
-    output_node.node().connectable().add_connection(connection);
-    output_node.node().manageable().update_kernel();
-    tap_node.node().connectable().add_connection(connection);
-    tap_node.node().manageable().update_kernel();
+    output_ext.node().connectable().add_connection(connection);
+    output_ext.node().manageable().update_kernel();
+    tap_ext.node().connectable().add_connection(connection);
+    tap_ext.node().manageable().update_kernel();
 
     auto promise = std::make_shared<std::promise<void>>();
     auto future = promise->get_future();
 
-    XCTestExpectation *completionExpectation = [self expectationWithDescription:@"offline output node completion"];
+    XCTestExpectation *completionExpectation = [self expectationWithDescription:@"offline output ext completion"];
 
     auto render_handler = [promise](auto args) mutable {
         if (args.when.sample_time() == 0) {
@@ -275,13 +275,13 @@ using namespace yas;
         }
     };
 
-    auto result = output_node.manageable().start(std::move(render_handler), completion_handler);
+    auto result = output_ext.manageable().start(std::move(render_handler), completion_handler);
 
     XCTAssertTrue(result);
 
     future.get();
 
-    output_node.node().reset();
+    output_ext.node().reset();
 
     [self waitForExpectationsWithTimeout:10.0
                                  handler:^(NSError *error){

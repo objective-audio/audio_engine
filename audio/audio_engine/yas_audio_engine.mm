@@ -7,8 +7,8 @@
 #include "yas_audio_engine.h"
 #include "yas_audio_graph.h"
 #include "yas_audio_node.h"
-#include "yas_audio_offline_output_node.h"
-#include "yas_audio_unit_node.h"
+#include "yas_audio_offline_output_extension.h"
+#include "yas_audio_unit_extension.h"
 #include "yas_objc_ptr.h"
 #include "yas_observing.h"
 #include "yas_result.h"
@@ -17,7 +17,7 @@
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
 #include "yas_audio_device.h"
 #include "yas_audio_device_io.h"
-#include "yas_audio_device_io_node.h"
+#include "yas_audio_device_io_extension.h"
 #endif
 
 using namespace yas;
@@ -26,9 +26,9 @@ namespace yas {
 namespace audio {
     class connection_for_engine : public audio::connection {
        public:
-        connection_for_engine(audio::node &source_node, uint32_t const source_bus, audio::node &destination_node,
-                              uint32_t const destination_bus, audio::format const &format)
-            : audio::connection(source_node, source_bus, destination_node, destination_bus, format) {
+        connection_for_engine(audio::node &src_node, uint32_t const src_bus_idx, audio::node &dst_node,
+                              uint32_t const dst_bus_idx, audio::format const &format)
+            : audio::connection(src_node, src_bus_idx, dst_node, dst_bus_idx, format) {
         }
     };
 }
@@ -149,10 +149,10 @@ struct audio::engine::impl : base::impl {
         _graph = audio::graph{};
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
-        if (device_io_node()) {
-            auto &manageable_device_io_node = device_io_node().manageable();
-            manageable_device_io_node.add_device_io();
-            _graph.add_audio_device_io(manageable_device_io_node.device_io());
+        if (device_io_extension()) {
+            auto &manageable_ext = device_io_extension().manageable();
+            manageable_ext.add_device_io();
+            _graph.add_audio_device_io(manageable_ext.device_io());
         }
 #endif
 
@@ -171,45 +171,45 @@ struct audio::engine::impl : base::impl {
         return true;
     }
 
-    audio::connection connect(audio::node &source_node, audio::node &destination_node, uint32_t const source_bus_idx,
+    audio::connection connect(audio::node &src_node, audio::node &dst_node, uint32_t const source_bus_idx,
                               uint32_t const destination_bus_idx, const audio::format &format) {
-        if (!source_node || !destination_node) {
+        if (!src_node || !dst_node) {
             throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
         }
 
-        if (!source_node.is_available_output_bus(source_bus_idx)) {
+        if (!src_node.is_available_output_bus(source_bus_idx)) {
             throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : output bus(" +
                                         std::to_string(source_bus_idx) + ") is not available.");
         }
 
-        if (!destination_node.is_available_input_bus(destination_bus_idx)) {
+        if (!dst_node.is_available_input_bus(destination_bus_idx)) {
             throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : input bus(" +
                                         std::to_string(destination_bus_idx) + ") is not available.");
         }
 
-        if (!node_exists(source_node)) {
-            attach_node(source_node);
+        if (!node_exists(src_node)) {
+            attach_node(src_node);
         }
 
-        if (!node_exists(destination_node)) {
-            attach_node(destination_node);
+        if (!node_exists(dst_node)) {
+            attach_node(dst_node);
         }
 
-        connection_for_engine connection(source_node, source_bus_idx, destination_node, destination_bus_idx, format);
+        connection_for_engine connection(src_node, source_bus_idx, dst_node, destination_bus_idx, format);
 
         _connections.insert(connection);
 
         if (_graph) {
             add_connection(connection);
-            update_node_connections(source_node);
-            update_node_connections(destination_node);
+            update_node_connections(src_node);
+            update_node_connections(dst_node);
         }
 
         return connection;
     }
 
     void disconnect(audio::connection &connection) {
-        std::vector<node> update_nodes{connection.source_node(), connection.destination_node()};
+        std::vector<audio::node> update_nodes{connection.source_node(), connection.destination_node()};
 
         remove_connection_from_nodes(connection);
         connection.node_removable().remove_nodes();
@@ -361,55 +361,55 @@ struct audio::engine::impl : base::impl {
         }
     }
 
-    audio::engine::add_result_t add_offline_output_node() {
-        if (_offline_output_node) {
+    audio::engine::add_result_t add_offline_output_extension() {
+        if (_offline_output_extension) {
             return add_result_t{add_error_t::already_added};
         } else {
-            _offline_output_node = audio::offline_output_node{};
+            _offline_output_extension = audio::offline_output_extension{};
             return add_result_t{nullptr};
         }
     }
 
-    audio::engine::remove_result_t remove_offline_output_node() {
-        if (_offline_output_node) {
-            _offline_output_node = nullptr;
+    audio::engine::remove_result_t remove_offline_output_extension() {
+        if (_offline_output_extension) {
+            _offline_output_extension = nullptr;
             return remove_result_t{nullptr};
         } else {
             return remove_result_t{remove_error_t::already_removed};
         }
     }
 
-    audio::offline_output_node &offline_output_node() {
-        return _offline_output_node;
+    audio::offline_output_extension &offline_output_extension() {
+        return _offline_output_extension;
     }
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
-    void set_device_io_node(audio::device_io_node &&node) {
-        if (node) {
-            _device_io_node = std::move(node);
+    void set_device_io_extension(audio::device_io_extension &&ext) {
+        if (ext) {
+            _device_io_extension = std::move(ext);
 
             if (_graph) {
-                auto &manageable_device_io_node = _device_io_node.manageable();
-                manageable_device_io_node.add_device_io();
-                _graph.add_audio_device_io(manageable_device_io_node.device_io());
+                auto &manageable_ext = _device_io_extension.manageable();
+                manageable_ext.add_device_io();
+                _graph.add_audio_device_io(manageable_ext.device_io());
             }
         } else {
-            if (_device_io_node) {
-                auto &manageable_node = _device_io_node.manageable();
+            if (_device_io_extension) {
+                auto &manageable_ext = _device_io_extension.manageable();
                 if (_graph) {
-                    if (auto &device_io = manageable_node.device_io()) {
+                    if (auto &device_io = manageable_ext.device_io()) {
                         _graph.remove_audio_device_io(device_io);
                     }
                 }
 
-                manageable_node.remove_device_io();
-                _device_io_node = nullptr;
+                manageable_ext.remove_device_io();
+                _device_io_extension = nullptr;
             }
         }
     }
 
-    audio::device_io_node &device_io_node() {
-        return _device_io_node;
+    audio::device_io_extension &device_io_extension() {
+        return _device_io_extension;
     }
 
 #endif
@@ -421,8 +421,8 @@ struct audio::engine::impl : base::impl {
             }
         }
 
-        if (auto const offline_output_node = _offline_output_node) {
-            if (offline_output_node.is_running()) {
+        if (auto const offline_output_ext = _offline_output_extension) {
+            if (offline_output_ext.is_running()) {
                 return start_result_t(start_error_t::already_running);
             }
         }
@@ -444,8 +444,8 @@ struct audio::engine::impl : base::impl {
             }
         }
 
-        if (auto const offline_output_node = _offline_output_node) {
-            if (offline_output_node.is_running()) {
+        if (auto const offline_output_ext = _offline_output_extension) {
+            if (offline_output_ext.is_running()) {
                 return start_result_t(start_error_t::already_running);
             }
         }
@@ -454,14 +454,13 @@ struct audio::engine::impl : base::impl {
             return start_result_t(start_error_t::prepare_failure);
         }
 
-        auto offline_output_node = _offline_output_node;
+        auto offline_output_ext = _offline_output_extension;
 
-        if (!offline_output_node) {
+        if (!offline_output_ext) {
             return start_result_t(start_error_t::offline_output_not_found);
         }
 
-        auto &node = offline_output_node.manageable();
-        auto result = node.start(std::move(render_handler), std::move(completion_handler));
+        auto result = offline_output_ext.manageable().start(std::move(render_handler), std::move(completion_handler));
 
         if (result) {
             return start_result_t(nullptr);
@@ -475,8 +474,8 @@ struct audio::engine::impl : base::impl {
             graph.stop();
         }
 
-        if (auto offline_output_node = _offline_output_node) {
-            offline_output_node.manageable().stop();
+        if (auto offline_output_ext = _offline_output_extension) {
+            offline_output_ext.manageable().stop();
         }
     }
 
@@ -488,14 +487,14 @@ struct audio::engine::impl : base::impl {
     objc_ptr<id> _reset_observer;
     objc_ptr<id> _route_change_observer;
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
-    audio::device_io_node _device_io_node = nullptr;
+    audio::device_io_extension _device_io_extension = nullptr;
     audio::device::observer_t _device_observer;
 #endif
 
     audio::graph _graph = nullptr;
     std::unordered_set<node> _nodes;
     audio::connection_set _connections;
-    audio::offline_output_node _offline_output_node = nullptr;
+    audio::offline_output_extension _offline_output_extension = nullptr;
 };
 
 #pragma mark - audio::engine
@@ -509,24 +508,24 @@ audio::engine::engine(std::nullptr_t) : base(nullptr) {
 
 audio::engine::~engine() = default;
 
-audio::connection audio::engine::connect(node &source_node, node &destination_node, audio::format const &format) {
-    if (!source_node || !destination_node) {
+audio::connection audio::engine::connect(node &src_node, node &dst_node, audio::format const &format) {
+    if (!src_node || !dst_node) {
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
     }
 
-    auto source_bus_result = source_node.next_available_output_bus();
-    auto destination_bus_result = destination_node.next_available_input_bus();
+    auto source_bus_result = src_node.next_available_output_bus();
+    auto destination_bus_result = dst_node.next_available_input_bus();
 
     if (!source_bus_result || !destination_bus_result) {
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : bus is not available.");
     }
 
-    return connect(source_node, destination_node, *source_bus_result, *destination_bus_result, format);
+    return connect(src_node, dst_node, *source_bus_result, *destination_bus_result, format);
 }
 
-audio::connection audio::engine::connect(node &source_node, node &destination_node, uint32_t const src_bus_idx,
+audio::connection audio::engine::connect(node &src_node, node &dst_node, uint32_t const src_bus_idx,
                                          uint32_t const dst_bus_idx, audio::format const &format) {
-    return impl_ptr<impl>()->connect(source_node, destination_node, src_bus_idx, dst_bus_idx, format);
+    return impl_ptr<impl>()->connect(src_node, dst_node, src_bus_idx, dst_bus_idx, format);
 }
 
 void audio::engine::disconnect(connection &connection) {
@@ -575,48 +574,48 @@ void audio::engine::disconnect_output(node const &node, uint32_t const bus_idx) 
     });
 }
 
-audio::engine::add_result_t audio::engine::add_offline_output_node() {
-    return impl_ptr<impl>()->add_offline_output_node();
+audio::engine::add_result_t audio::engine::add_offline_output_extension() {
+    return impl_ptr<impl>()->add_offline_output_extension();
 }
 
-audio::engine::remove_result_t audio::engine::remove_offline_output_node() {
-    return impl_ptr<impl>()->remove_offline_output_node();
+audio::engine::remove_result_t audio::engine::remove_offline_output_extension() {
+    return impl_ptr<impl>()->remove_offline_output_extension();
 }
 
-audio::offline_output_node const &audio::engine::offline_output_node() const {
-    return impl_ptr<impl>()->offline_output_node();
+audio::offline_output_extension const &audio::engine::offline_output_extension() const {
+    return impl_ptr<impl>()->offline_output_extension();
 }
 
-audio::offline_output_node &audio::engine::offline_output_node() {
-    return impl_ptr<impl>()->offline_output_node();
+audio::offline_output_extension &audio::engine::offline_output_extension() {
+    return impl_ptr<impl>()->offline_output_extension();
 }
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
 
-audio::engine::add_result_t audio::engine::add_device_io_node() {
-    if (impl_ptr<impl>()->device_io_node()) {
+audio::engine::add_result_t audio::engine::add_device_io_extension() {
+    if (impl_ptr<impl>()->device_io_extension()) {
         return add_result_t{add_error_t::already_added};
     } else {
-        impl_ptr<impl>()->set_device_io_node(audio::device_io_node{});
+        impl_ptr<impl>()->set_device_io_extension(audio::device_io_extension{});
         return add_result_t{nullptr};
     }
 }
 
-audio::engine::remove_result_t audio::engine::remove_device_io_node() {
-    if (impl_ptr<impl>()->device_io_node()) {
-        impl_ptr<impl>()->set_device_io_node(nullptr);
+audio::engine::remove_result_t audio::engine::remove_device_io_extension() {
+    if (impl_ptr<impl>()->device_io_extension()) {
+        impl_ptr<impl>()->set_device_io_extension(nullptr);
         return remove_result_t{nullptr};
     } else {
         return remove_result_t{remove_error_t::already_removed};
     }
 }
 
-audio::device_io_node const &audio::engine::device_io_node() const {
-    return impl_ptr<impl>()->device_io_node();
+audio::device_io_extension const &audio::engine::device_io_extension() const {
+    return impl_ptr<impl>()->device_io_extension();
 }
 
-audio::device_io_node &audio::engine::device_io_node() {
-    return impl_ptr<impl>()->device_io_node();
+audio::device_io_extension &audio::engine::device_io_extension() {
+    return impl_ptr<impl>()->device_io_extension();
 }
 
 #endif

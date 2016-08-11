@@ -22,24 +22,24 @@ using namespace yas;
 
 - (void)test_create_connention_success {
     auto format = audio::format({.sample_rate = 48000.0, .channel_count = 2});
-    test::audio_test_node_decorator source_decor;
-    test::audio_test_node_decorator destination_decor;
+    test::audio_test_node_ext source_ext;
+    test::audio_test_node_ext destination_ext;
     uint32_t const source_bus = 0;
     uint32_t const destination_bus = 1;
 
     auto connection =
-        test::connection(source_decor.node(), source_bus, destination_decor.node(), destination_bus, format);
+        test::connection(source_ext.node(), source_bus, destination_ext.node(), destination_bus, format);
 
-    XCTAssertTrue(connection.source_node() == source_decor.node());
+    XCTAssertTrue(connection.source_node() == source_ext.node());
     XCTAssertTrue(connection.source_bus() == source_bus);
-    XCTAssertTrue(connection.destination_node() == destination_decor.node());
+    XCTAssertTrue(connection.destination_node() == destination_ext.node());
     XCTAssertTrue(connection.destination_bus() == destination_bus);
     XCTAssertTrue(connection.format() == format);
 
     XCTAssertTrue(connection.node_removable());
 
-    XCTAssertTrue(source_decor.node().manageable().output_connection(source_bus) == connection);
-    XCTAssertTrue(destination_decor.node().manageable().input_connection(destination_bus) == connection);
+    XCTAssertTrue(source_ext.node().manageable().output_connection(source_bus) == connection);
+    XCTAssertTrue(destination_ext.node().manageable().input_connection(destination_bus) == connection);
 }
 
 - (void)test_create_null {
@@ -50,13 +50,13 @@ using namespace yas;
 
 - (void)test_remove_nodes {
     auto format = audio::format({.sample_rate = 44100.0, .channel_count = 2});
-    test::audio_test_node_decorator source_decor;
-    test::audio_test_node_decorator destination_decor;
+    test::audio_test_node_ext source_ext;
+    test::audio_test_node_ext destination_ext;
     uint32_t const source_bus = 0;
     uint32_t const destination_bus = 1;
 
     auto connection =
-        test::connection(source_decor.node(), source_bus, destination_decor.node(), destination_bus, format);
+        test::connection(source_ext.node(), source_bus, destination_ext.node(), destination_bus, format);
 
     connection.node_removable().remove_nodes();
 
@@ -66,13 +66,13 @@ using namespace yas;
 
 - (void)test_remove_nodes_separately {
     auto format = audio::format({.sample_rate = 8000.0, .channel_count = 2});
-    test::audio_test_node_decorator source_decor;
-    test::audio_test_node_decorator destination_decor;
+    test::audio_test_node_ext source_ext;
+    test::audio_test_node_ext destination_ext;
     uint32_t const source_bus = 0;
     uint32_t const destination_bus = 1;
 
     auto connection =
-        test::connection(source_decor.node(), source_bus, destination_decor.node(), destination_bus, format);
+        test::connection(source_ext.node(), source_bus, destination_ext.node(), destination_bus, format);
 
     connection.node_removable().remove_source_node();
 
@@ -86,14 +86,14 @@ using namespace yas;
 
 - (void)test_create_connection_failed {
     auto format = audio::format({.sample_rate = 48000.0, .channel_count = 2});
-    test::audio_test_node_decorator source_decor;
-    test::audio_test_node_decorator destination_decor;
+    test::audio_test_node_ext source_ext;
+    test::audio_test_node_ext destination_ext;
     uint32_t const source_bus = 0;
     uint32_t const destination_bus = 1;
 
     audio::node null_node(nullptr);
-    XCTAssertThrows(test::connection(null_node, source_bus, destination_decor.node(), destination_bus, format));
-    XCTAssertThrows(test::connection(source_decor.node(), source_bus, null_node, destination_bus, format));
+    XCTAssertThrows(test::connection(null_node, source_bus, destination_ext.node(), destination_bus, format));
+    XCTAssertThrows(test::connection(source_ext.node(), source_bus, null_node, destination_bus, format));
 }
 
 - (void)test_empty_connection {

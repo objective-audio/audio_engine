@@ -1,5 +1,5 @@
 //
-//  yas_audio_unit_mixer_node.h
+//  yas_audio_unit_mixer_extension.h
 //
 
 #pragma once
@@ -8,14 +8,14 @@
 
 namespace yas {
 namespace audio {
-    class unit_node;
+    class unit_extension;
 
-    class unit_mixer_node : public base {
+    class unit_mixer_extension : public base {
        public:
-        unit_mixer_node();
-        unit_mixer_node(std::nullptr_t);
+        unit_mixer_extension();
+        unit_mixer_extension(std::nullptr_t);
 
-        virtual ~unit_mixer_node() final;
+        virtual ~unit_mixer_extension() final;
 
         void set_output_volume(float const volume, uint32_t const bus_idx);
         float output_volume(uint32_t const bus_idx) const;
@@ -30,8 +30,8 @@ namespace audio {
         void set_input_enabled(bool const enabled, uint32_t const bus_idx);
         bool input_enabled(uint32_t const bus_idx) const;
 
-        audio::unit_node const &unit_node() const;
-        audio::unit_node &unit_node();
+        audio::unit_extension const &unit_extension() const;
+        audio::unit_extension &unit_extension();
 
        private:
         class impl;
