@@ -29,7 +29,7 @@
 #include "yas_audio_device.h"
 #include "yas_audio_device_stream.h"
 #include "yas_audio_device_io.h"
-#include "yas_audio_device_io_node.h"
+#include "yas_audio_device_io_extension.h"
 
 #endif
 
@@ -39,10 +39,10 @@
 
 #include "yas_audio_engine.h"
 #include "yas_audio_node.h"
-#include "yas_audio_unit_node.h"
-#include "yas_audio_unit_mixer_node.h"
-#include "yas_audio_unit_io_node.h"
-#include "yas_audio_offline_output_node.h"
-#include "yas_audio_tap_node.h"
+#include "yas_audio_unit_extension.h"
+#include "yas_audio_unit_mixer_extension.h"
+#include "yas_audio_unit_io_extension.h"
+#include "yas_audio_offline_output_extension.h"
+#include "yas_audio_tap_extension.h"
 #include "yas_audio_connection.h"
-#include "yas_audio_route_node.h"
+#include "yas_audio_route_extension.h"

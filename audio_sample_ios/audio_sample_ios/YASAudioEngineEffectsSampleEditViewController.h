@@ -7,12 +7,12 @@
 
 namespace yas {
 namespace audio {
-    class unit_node;
+    class unit_extension;
 }
 }
 
 @interface YASAudioEngineEffectsSampleEditViewController : UITableViewController
 
-- (void)set_audio_unit_node:(const yas::audio::unit_node &)node;
+- (void)set_audio_unit_extension:(const yas::audio::unit_extension &)node;
 
 @end

@@ -1,24 +1,24 @@
 //
-//  yas_audio_offline_output_node.h
+//  yas_audio_offline_output_extension.h
 //
 
 #pragma once
 
-#include "yas_audio_offline_output_node_protocol.h"
+#include "yas_audio_offline_output_extension_protocol.h"
 #include "yas_base.h"
 
 namespace yas {
 namespace audio {
     class node;
 
-    class offline_output_node : public base {
+    class offline_output_extension : public base {
        public:
         class impl;
 
-        offline_output_node();
-        offline_output_node(std::nullptr_t);
+        offline_output_extension();
+        offline_output_extension(std::nullptr_t);
 
-        virtual ~offline_output_node() final;
+        virtual ~offline_output_extension() final;
 
         bool is_running() const;
 
@@ -28,7 +28,7 @@ namespace audio {
         manageable_offline_output_unit &manageable();
 
        private:
-        offline_output_node(std::shared_ptr<impl> const &);
+        offline_output_extension(std::shared_ptr<impl> const &);
 
         manageable_offline_output_unit _manageable = nullptr;
     };

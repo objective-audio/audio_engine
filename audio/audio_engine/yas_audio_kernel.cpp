@@ -39,18 +39,18 @@ struct audio::kernel::impl : base::impl, manageable_kernel::impl {
         _output_connections = std::move(connections);
     }
 
-    void set_decorator(base &&decor) {
-        _decorator = std::move(decor);
+    void set_extension(base &&ext) {
+        _extension = std::move(ext);
     }
 
-    base &decorator() {
-        return _decorator;
+    base &extension() {
+        return _extension;
     }
 
    private:
     connection_wmap _input_connections;
     connection_wmap _output_connections;
-    base _decorator = nullptr;
+    base _extension = nullptr;
 };
 
 #pragma mark - audio::kernel
@@ -79,16 +79,16 @@ audio::connection audio::kernel::output_connection(uint32_t const bus_idx) const
     return impl_ptr<impl>()->output_connection(bus_idx);
 }
 
-void audio::kernel::set_decorator(base decor) {
-    impl_ptr<impl>()->set_decorator(std::move(decor));
+void audio::kernel::set_extension(base ext) {
+    impl_ptr<impl>()->set_extension(std::move(ext));
 }
 
-base const &audio::kernel::decorator() const {
-    return impl_ptr<impl>()->decorator();
+base const &audio::kernel::extension() const {
+    return impl_ptr<impl>()->extension();
 }
 
-base &audio::kernel::decorator() {
-    return impl_ptr<impl>()->decorator();
+base &audio::kernel::extension() {
+    return impl_ptr<impl>()->extension();
 }
 
 audio::manageable_kernel &audio::kernel::manageable() {

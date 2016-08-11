@@ -14,9 +14,9 @@ namespace yas {
 namespace offline_sample {
     static double constexpr sample_rate = 44100.0;
 
-    struct sine_node : base {
+    struct sine_extension : base {
         struct impl : base::impl {
-            audio::tap_node _tap_node;
+            audio::tap_extension _tap_extension;
             double phase_on_render;
 
             void set_frequency(float const frequency) {
@@ -45,20 +45,20 @@ namespace offline_sample {
             mutable std::recursive_mutex _mutex;
         };
 
-        sine_node() : base(std::make_unique<impl>()) {
+        sine_extension() : base(std::make_unique<impl>()) {
             set_frequency(1000.0);
 
-            auto weak_node = to_weak(*this);
+            auto weak_ext = to_weak(*this);
 
-            auto render_handler = [weak_node](auto args) {
+            auto render_handler = [weak_ext](auto args) {
                 auto &buffer = args.buffer;
 
                 buffer.clear();
 
-                if (auto node = weak_node.lock()) {
-                    if (node.is_playing()) {
-                        double const start_phase = node.impl_ptr<impl>()->phase_on_render;
-                        double const phase_per_frame = node.frequency() / sample_rate * audio::math::two_pi;
+                if (auto ext = weak_ext.lock()) {
+                    if (ext.is_playing()) {
+                        double const start_phase = ext.impl_ptr<impl>()->phase_on_render;
+                        double const phase_per_frame = ext.frequency() / sample_rate * audio::math::two_pi;
                         double next_phase = start_phase;
                         uint32_t const frame_length = buffer.frame_length();
 
@@ -71,19 +71,19 @@ namespace offline_sample {
                                 yas_audio_frame_enumerator_move_channel(enumerator);
                             }
 
-                            node.impl_ptr<impl>()->phase_on_render = next_phase;
+                            ext.impl_ptr<impl>()->phase_on_render = next_phase;
                         }
                     }
                 }
             };
 
-            tap_node().set_render_handler(render_handler);
+            tap_extension().set_render_handler(render_handler);
         }
 
-        sine_node(std::nullptr_t) : base(nullptr) {
+        sine_extension(std::nullptr_t) : base(nullptr) {
         }
 
-        virtual ~sine_node() = default;
+        virtual ~sine_extension() = default;
 
         void set_frequency(float const frequency) {
             impl_ptr<impl>()->set_frequency(frequency);
@@ -101,8 +101,8 @@ namespace offline_sample {
             return impl_ptr<impl>()->is_playing();
         }
 
-        audio::tap_node &tap_node() {
-            return impl_ptr<impl>()->_tap_node;
+        audio::tap_extension &tap_extension() {
+            return impl_ptr<impl>()->_tap_extension;
         }
     };
 }
@@ -123,13 +123,13 @@ namespace yas {
 namespace sample {
     struct offline_vc_internal {
         audio::engine play_engine;
-        audio::unit_output_node play_output_node;
-        audio::unit_mixer_node play_mixer_node;
-        offline_sample::sine_node play_sine_node;
+        audio::unit_output_extension play_output_ext;
+        audio::unit_mixer_extension play_mixer_ext;
+        offline_sample::sine_extension play_sine_ext;
 
         audio::engine offline_engine;
-        audio::unit_mixer_node offline_mixer_node;
-        offline_sample::sine_node offline_sine_node;
+        audio::unit_mixer_extension offline_mixer_ext;
+        offline_sample::sine_extension offline_sine_ext;
 
         base engine_observer = nullptr;
 
@@ -139,33 +139,34 @@ namespace sample {
                                          .pcm_format = audio::pcm_format::float32,
                                          .interleaved = false});
 
-            play_mixer_node.unit_node().node().reset();
-            play_mixer_node.set_input_pan(0.0f, 0);
-            play_mixer_node.set_input_enabled(true, 0);
-            play_mixer_node.set_output_volume(1.0f, 0);
-            play_mixer_node.set_output_pan(0.0f, 0);
+            play_mixer_ext.unit_extension().node().reset();
+            play_mixer_ext.set_input_pan(0.0f, 0);
+            play_mixer_ext.set_input_enabled(true, 0);
+            play_mixer_ext.set_output_volume(1.0f, 0);
+            play_mixer_ext.set_output_pan(0.0f, 0);
 
-            play_engine.connect(play_mixer_node.unit_node().node(), play_output_node.unit_io_node().unit_node().node(),
-                                format);
-            play_engine.connect(play_sine_node.tap_node().node(), play_mixer_node.unit_node().node(), format);
+            play_engine.connect(play_mixer_ext.unit_extension().node(),
+                                play_output_ext.unit_io_extension().unit_extension().node(), format);
+            play_engine.connect(play_sine_ext.tap_extension().node(), play_mixer_ext.unit_extension().node(), format);
 
-            offline_engine.add_offline_output_node();
-            audio::offline_output_node &offline_output_node = offline_engine.offline_output_node();
+            offline_engine.add_offline_output_extension();
+            audio::offline_output_extension &offline_output_extension = offline_engine.offline_output_extension();
 
-            offline_mixer_node.unit_node().node().reset();
-            offline_mixer_node.set_input_pan(0.0f, 0);
-            offline_mixer_node.set_input_enabled(true, 0);
-            offline_mixer_node.set_output_volume(1.0f, 0);
-            offline_mixer_node.set_output_pan(0.0f, 0);
+            offline_mixer_ext.unit_extension().node().reset();
+            offline_mixer_ext.set_input_pan(0.0f, 0);
+            offline_mixer_ext.set_input_enabled(true, 0);
+            offline_mixer_ext.set_output_volume(1.0f, 0);
+            offline_mixer_ext.set_output_pan(0.0f, 0);
 
-            offline_engine.connect(offline_mixer_node.unit_node().node(), offline_output_node.node(), format);
-            offline_engine.connect(offline_sine_node.tap_node().node(), offline_mixer_node.unit_node().node(), format);
+            offline_engine.connect(offline_mixer_ext.unit_extension().node(), offline_output_extension.node(), format);
+            offline_engine.connect(offline_sine_ext.tap_extension().node(), offline_mixer_ext.unit_extension().node(),
+                                   format);
 
             engine_observer = play_engine.subject().make_observer(
                 audio::engine::method::configuration_change,
-                [weak_play_output_node = to_weak(play_output_node)](auto const &) {
-                    if (auto play_output_node = weak_play_output_node.lock()) {
-                        play_output_node.unit_io_node().set_device(audio::device::default_output_device());
+                [weak_play_output_ext = to_weak(play_output_ext)](auto const &) {
+                    if (auto play_output_ext = weak_play_output_ext.lock()) {
+                        play_output_ext.unit_io_extension().set_device(audio::device::default_output_device());
                     }
                 });
         }
@@ -201,27 +202,27 @@ namespace sample {
 }
 
 - (void)setVolume:(float)volume {
-    _internal.play_mixer_node.set_input_volume(volume, 0);
+    _internal.play_mixer_ext.set_input_volume(volume, 0);
 }
 
 - (float)volume {
-    return _internal.play_mixer_node.input_volume(0);
+    return _internal.play_mixer_ext.input_volume(0);
 }
 
 - (void)setFrequency:(float)frequency {
-    _internal.play_sine_node.set_frequency(frequency);
+    _internal.play_sine_ext.set_frequency(frequency);
 }
 
 - (float)frequency {
-    return _internal.play_sine_node.frequency();
+    return _internal.play_sine_ext.frequency();
 }
 
 - (void)setPlaying:(BOOL)playing {
-    _internal.play_sine_node.set_playing(playing);
+    _internal.play_sine_ext.set_playing(playing);
 }
 
 - (BOOL)playing {
-    return _internal.play_sine_node.is_playing();
+    return _internal.play_sine_ext.is_playing();
 }
 
 - (IBAction)playButtonTapped:(id)sender {
@@ -256,9 +257,9 @@ namespace sample {
         return;
     }
 
-    _internal.offline_sine_node.set_frequency(_internal.play_sine_node.frequency());
-    _internal.offline_sine_node.set_playing(true);
-    _internal.offline_mixer_node.set_input_volume(self.volume, 0);
+    _internal.offline_sine_ext.set_frequency(_internal.play_sine_ext.frequency());
+    _internal.offline_sine_ext.set_playing(true);
+    _internal.offline_mixer_ext.set_input_volume(self.volume, 0);
 
     self.processing = YES;
 
