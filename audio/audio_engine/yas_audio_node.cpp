@@ -15,8 +15,6 @@ using namespace yas;
 #pragma mark - audio::node::impl
 
 struct audio::node::impl : base::impl, manageable_node::impl, connectable_node::impl {
-   private:
-   public:
     weak<audio::engine> _weak_engine;
     subject_t _subject;
     uint32_t _input_bus_count = 0;
