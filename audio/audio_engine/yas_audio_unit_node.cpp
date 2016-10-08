@@ -178,11 +178,7 @@ struct audio::unit_node::impl : base::impl, manageable_unit_node::impl {
     }
 
     void update_unit_connections() {
-        bool const has_observer = _subject.has_observer();
-
-        if (has_observer) {
-            _subject.notify(audio::unit_node::method::will_update_connections, cast<audio::unit_node>());
-        }
+        _subject.notify(audio::unit_node::method::will_update_connections, cast<audio::unit_node>());
 
         if (auto audio_unit = au()) {
             auto input_bus_count = input_element_count();
@@ -225,9 +221,7 @@ struct audio::unit_node::impl : base::impl, manageable_unit_node::impl {
             }
         }
 
-        if (has_observer) {
-            _subject.notify(audio::unit_node::method::did_update_connections, cast<audio::unit_node>());
-        }
+        _subject.notify(audio::unit_node::method::did_update_connections, cast<audio::unit_node>());
     }
 
     void prepare_audio_unit() override {

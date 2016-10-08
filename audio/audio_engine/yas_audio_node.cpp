@@ -36,9 +36,7 @@ struct audio::node::impl : base::impl, manageable_node::impl, connectable_node::
     }
 
     void reset() {
-        if (_subject.has_observer()) {
-            _subject.notify(audio::node::method::will_reset, cast<audio::node>());
-        }
+        _subject.notify(audio::node::method::will_reset, cast<audio::node>());
 
         _input_connections.clear();
         _output_connections.clear();

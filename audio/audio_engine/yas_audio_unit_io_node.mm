@@ -154,9 +154,7 @@ struct yas::audio::unit_io_node::impl : base::impl {
         unit.set_channel_map(output_map, kAudioUnitScope_Output, output_idx);
         unit.set_channel_map(input_map, kAudioUnitScope_Output, input_idx);
 
-        if (subject().has_observer()) {
-            subject().notify(audio::unit_io_node::method::did_update_connection, cast<audio::unit_io_node>());
-        }
+        subject().notify(audio::unit_io_node::method::did_update_connection, cast<audio::unit_io_node>());
     }
 
     audio::unit_io_node::subject_t &subject() {
