@@ -1,5 +1,5 @@
 //
-//  yas_audio_route_extension.h
+//  yas_audio_route_node.h
 //
 
 #pragma once
@@ -11,15 +11,15 @@ namespace yas {
 namespace audio {
     class node;
 
-    class route_extension : public base {
+    class route_node : public base {
         class kernel;
         class impl;
 
        public:
-        route_extension();
-        route_extension(std::nullptr_t);
-
-        virtual ~route_extension() final;
+        route_node();
+        route_node(std::nullptr_t);
+        
+        virtual ~route_node() final;
 
         audio::route_set_t const &routes() const;
         void add_route(audio::route);

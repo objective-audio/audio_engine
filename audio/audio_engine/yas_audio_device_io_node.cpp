@@ -1,8 +1,8 @@
 //
-//  yas_audio_device_io_extension.cpp
+//  yas_audio_device_io_node.cpp
 //
 
-#include "yas_audio_device_io_extension.h"
+#include "yas_audio_device_io_node.h"
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
 
@@ -10,30 +10,30 @@
 #include "yas_audio_device.h"
 #include "yas_audio_device_io.h"
 #include "yas_audio_graph.h"
-#include "yas_audio_tap_extension.h"
+#include "yas_audio_tap_node.h"
 #include "yas_audio_time.h"
 #include "yas_result.h"
 
 using namespace yas;
 
-#pragma mark - audio::device_io_extension::impl
+#pragma mark - audio::device_io_node::impl
 
-struct yas::audio::device_io_extension::impl : base::impl, manageable_device_io_extension::impl {
+struct yas::audio::device_io_node::impl : base::impl, manageable_device_io_node::impl {
     audio::node _node = {{.input_bus_count = 1, .output_bus_count = 1}};
     audio::node::observer_t _connections_observer;
 
     virtual ~impl() final = default;
 
-    void prepare(device_io_extension const &device_io_ext, audio::device const &device) {
+    void prepare(device_io_node const &device_io_node, audio::device const &device) {
         set_device(device ?: device::default_output_device());
 
-        auto weak_ext = to_weak(device_io_ext);
+        auto weak_node = to_weak(device_io_node);
 
-        _node.set_render_handler([weak_ext](auto args) {
+        _node.set_render_handler([weak_node](auto args) {
             auto &buffer = args.buffer;
 
-            if (auto device_io_ext = weak_ext.lock()) {
-                if (auto const &device_io = device_io_ext.impl_ptr<impl>()->device_io()) {
+            if (auto device_io_node = weak_node.lock()) {
+                if (auto const &device_io = device_io_node.impl_ptr<impl>()->device_io()) {
                     auto &input_buffer = device_io.input_buffer_on_render();
                     if (input_buffer && input_buffer.format() == buffer.format()) {
                         buffer.copy_from(input_buffer);
@@ -43,9 +43,9 @@ struct yas::audio::device_io_extension::impl : base::impl, manageable_device_io_
         });
 
         _connections_observer =
-            _node.subject().make_observer(audio::node::method::update_connections, [weak_ext](auto const &) {
-                if (auto device_io_ext = weak_ext.lock()) {
-                    device_io_ext.impl_ptr<impl>()->_update_device_io_connections();
+            _node.subject().make_observer(audio::node::method::update_connections, [weak_node](auto const &) {
+                if (auto device_io_node = weak_node.lock()) {
+                    device_io_node.impl_ptr<impl>()->_update_device_io_connections();
                 }
             });
     }
@@ -102,21 +102,21 @@ struct yas::audio::device_io_extension::impl : base::impl, manageable_device_io_
             return;
         }
 
-        auto weak_ext = to_weak(cast<audio::device_io_extension>());
+        auto weak_node = to_weak(cast<device_io_node>());
         auto weak_device_io = to_weak(device_io);
 
-        auto render_handler = [weak_ext, weak_device_io](auto args) {
-            if (auto ext = weak_ext.lock()) {
-                if (auto kernel = ext.node().kernel()) {
+        auto render_handler = [weak_node, weak_device_io](auto args) {
+            if (auto node = weak_node.lock()) {
+                if (auto kernel = node.node().kernel()) {
                     if (args.output_buffer) {
                         auto const connections = kernel.input_connections();
                         if (connections.count(0) > 0) {
                             auto const &connection = connections.at(0);
-                            if (auto src_node = connection.source_node()) {
-                                if (connection.format() == src_node.output_format(connection.source_bus())) {
-                                    src_node.render({.buffer = args.output_buffer,
-                                                     .bus_idx = connection.source_bus(),
-                                                     .when = args.when});
+                            if (auto source_node = connection.source_node()) {
+                                if (connection.format() == source_node.output_format(connection.source_bus())) {
+                                    source_node.render({.buffer = args.output_buffer,
+                                                        .bus_idx = connection.source_bus(),
+                                                        .when = args.when});
                                 }
                             }
                         }
@@ -126,14 +126,15 @@ struct yas::audio::device_io_extension::impl : base::impl, manageable_device_io_
                         auto const connections = kernel.output_connections();
                         if (connections.count(0) > 0) {
                             auto const &connection = connections.at(0);
-                            if (auto dst_node = connection.destination_node()) {
-                                if (dst_node.is_input_renderable()) {
+                            if (auto destination_node = connection.destination_node()) {
+                                if (destination_node.is_input_renderable()) {
                                     auto input_buffer = device_io.input_buffer_on_render();
                                     auto const &input_time = device_io.input_time_on_render();
                                     if (input_buffer && input_time) {
                                         if (connection.format() ==
-                                            dst_node.input_format(connection.destination_bus())) {
-                                            dst_node.render({.buffer = input_buffer, .bus_idx = 0, .when = input_time});
+                                            destination_node.input_format(connection.destination_bus())) {
+                                            destination_node.render(
+                                                {.buffer = input_buffer, .bus_idx = 0, .when = input_time});
                                         }
                                     }
                                 }
@@ -182,39 +183,39 @@ struct yas::audio::device_io_extension::impl : base::impl, manageable_device_io_
     }
 };
 
-#pragma mark - audio::device_io_extension
+#pragma mark - audio::device_io_node
 
-audio::device_io_extension::device_io_extension() : device_io_extension(audio::device(nullptr)) {
+audio::device_io_node::device_io_node() : device_io_node(audio::device(nullptr)) {
 }
 
-audio::device_io_extension::device_io_extension(std::nullptr_t) : base(nullptr) {
+audio::device_io_node::device_io_node(std::nullptr_t) : base(nullptr) {
 }
 
-audio::device_io_extension::device_io_extension(audio::device const &device) : base(std::make_unique<impl>()) {
+audio::device_io_node::device_io_node(audio::device const &device) : base(std::make_unique<impl>()) {
     impl_ptr<impl>()->prepare(*this, device);
 }
 
-audio::device_io_extension::~device_io_extension() = default;
+audio::device_io_node::~device_io_node() = default;
 
-void audio::device_io_extension::set_device(audio::device const &device) {
+void audio::device_io_node::set_device(audio::device const &device) {
     impl_ptr<impl>()->set_device(device);
 }
 
-audio::device audio::device_io_extension::device() const {
+audio::device audio::device_io_node::device() const {
     return impl_ptr<impl>()->device();
 }
 
-audio::node const &audio::device_io_extension::node() const {
+audio::node const &audio::device_io_node::node() const {
     return impl_ptr<impl>()->_node;
 }
 
-audio::node &audio::device_io_extension::node() {
+audio::node &audio::device_io_node::node() {
     return impl_ptr<impl>()->_node;
 }
 
-audio::manageable_device_io_extension &audio::device_io_extension::manageable() {
+audio::manageable_device_io_node &audio::device_io_node::manageable() {
     if (!_manageable) {
-        _manageable = audio::manageable_device_io_extension{impl_ptr<manageable_device_io_extension::impl>()};
+        _manageable = audio::manageable_device_io_node{impl_ptr<manageable_device_io_node::impl>()};
     }
     return _manageable;
 }

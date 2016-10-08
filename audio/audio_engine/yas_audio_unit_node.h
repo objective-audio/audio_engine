@@ -1,5 +1,5 @@
 //
-//  yas_audio_unit_extension.h
+//  yas_audio_unit_node.h
 //
 
 #pragma once
@@ -7,7 +7,7 @@
 #include <unordered_map>
 #include "yas_audio_node_protocol.h"
 #include "yas_audio_unit.h"
-#include "yas_audio_unit_extension_protocol.h"
+#include "yas_audio_unit_node_protocol.h"
 #include "yas_base.h"
 #include "yas_observing.h"
 
@@ -16,7 +16,7 @@ namespace audio {
     class graph;
     class node;
 
-    class unit_extension : public base {
+    class unit_node : public base {
        public:
         class impl;
 
@@ -25,8 +25,8 @@ namespace audio {
             did_update_connections,
         };
 
-        using subject_t = yas::subject<unit_extension, method>;
-        using observer_t = yas::observer<unit_extension, method>;
+        using subject_t = yas::subject<unit_node, method>;
+        using observer_t = yas::observer<unit_node, method>;
         using prepare_au_f = std::function<void(audio::unit &)>;
 
         struct args {
@@ -34,12 +34,12 @@ namespace audio {
             AudioComponentDescription acd;
         };
 
-        unit_extension(OSType const type, OSType const sub_type);
-        explicit unit_extension(AudioComponentDescription const &);
-        unit_extension(args &&);
-        unit_extension(std::nullptr_t);
+        unit_node(OSType const type, OSType const sub_type);
+        explicit unit_node(AudioComponentDescription const &);
+        unit_node(args &&);
+        unit_node(std::nullptr_t);
 
-        virtual ~unit_extension() final;
+        virtual ~unit_node() final;
 
         void set_prepare_audio_unit_handler(prepare_au_f);
 
@@ -67,10 +67,10 @@ namespace audio {
         audio::node const &node() const;
         audio::node &node();
 
-        manageable_unit_extension &manageable();
+        manageable_unit_node &manageable();
 
        private:
-        manageable_unit_extension _manageable = nullptr;
+        manageable_unit_node _manageable = nullptr;
     };
 }
 }

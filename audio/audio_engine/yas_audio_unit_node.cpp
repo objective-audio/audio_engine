@@ -1,5 +1,5 @@
 //
-//  yas_audio_unit_extension.cpp
+//  yas_audio_unit_node.cpp
 //
 
 #include <iostream>
@@ -7,7 +7,7 @@
 #include "yas_audio_node.h"
 #include "yas_audio_time.h"
 #include "yas_audio_unit.h"
-#include "yas_audio_unit_extension.h"
+#include "yas_audio_unit_node.h"
 #include "yas_audio_unit_parameter.h"
 #include "yas_result.h"
 
@@ -15,7 +15,7 @@ using namespace yas;
 
 #pragma mark - core
 
-struct audio::unit_extension::impl : base::impl, manageable_unit_extension::impl {
+struct audio::unit_node::impl : base::impl, manageable_unit_node::impl {
     explicit impl(node_args &&args) : _node(std::move(args)) {
     }
 
@@ -25,7 +25,7 @@ struct audio::unit_extension::impl : base::impl, manageable_unit_extension::impl
         _prepare_au_handler = std::move(handler);
     }
 
-    void prepare(unit_extension const &ext, AudioComponentDescription const &acd) {
+    void prepare(unit_node const &node, AudioComponentDescription const &acd) {
         _acd = acd;
 
         unit unit(acd);
@@ -35,13 +35,13 @@ struct audio::unit_extension::impl : base::impl, manageable_unit_extension::impl
         _parameters.insert(std::make_pair(kAudioUnitScope_Output, unit.create_parameters(kAudioUnitScope_Output)));
         _core.set_au(unit);
 
-        auto weak_ext = to_weak(ext);
+        auto weak_node = to_weak(node);
 
-        _node.set_render_handler([weak_ext](auto args) {
+        _node.set_render_handler([weak_node](auto args) {
             auto &buffer = args.buffer;
 
-            if (auto ext = weak_ext.lock()) {
-                if (auto audio_unit = ext.impl_ptr<impl>()->au()) {
+            if (auto node = weak_node.lock()) {
+                if (auto audio_unit = node.impl_ptr<impl>()->au()) {
                     AudioUnitRenderActionFlags action_flags = 0;
                     AudioTimeStamp const time_stamp = args.when.audio_time_stamp();
 
@@ -60,33 +60,33 @@ struct audio::unit_extension::impl : base::impl, manageable_unit_extension::impl
             }
         });
 
-        _reset_observer = _node.subject().make_observer(audio::node::method::will_reset, [weak_ext](auto const &) {
-            if (auto ext = weak_ext.lock()) {
-                ext.impl_ptr<audio::unit_extension::impl>()->will_reset();
+        _reset_observer = _node.subject().make_observer(audio::node::method::will_reset, [weak_node](auto const &) {
+            if (auto node = weak_node.lock()) {
+                node.impl_ptr<audio::unit_node::impl>()->will_reset();
             }
         });
 
         _connections_observer =
-            _node.subject().make_observer(audio::node::method::update_connections, [weak_ext](auto const &) {
-                if (auto ext = weak_ext.lock()) {
-                    ext.impl_ptr<audio::unit_extension::impl>()->update_unit_connections();
+            _node.subject().make_observer(audio::node::method::update_connections, [weak_node](auto const &) {
+                if (auto node = weak_node.lock()) {
+                    node.impl_ptr<audio::unit_node::impl>()->update_unit_connections();
                 }
             });
 
-        _node.manageable().set_add_to_graph_handler([weak_ext](audio::graph &graph) {
-            if (auto ext = weak_ext.lock()) {
-                auto &manageable = ext.manageable();
+        _node.manageable().set_add_to_graph_handler([weak_node](audio::graph &graph) {
+            if (auto node = weak_node.lock()) {
+                auto &manageable = node.manageable();
                 manageable.prepare_audio_unit();
-                if (auto unit = ext.audio_unit()) {
+                if (auto unit = node.audio_unit()) {
                     graph.add_audio_unit(unit);
                 }
                 manageable.prepare_parameters();
             }
         });
 
-        _node.manageable().set_remove_from_graph_handler([weak_ext](audio::graph &graph) {
-            if (auto ext = weak_ext.lock()) {
-                if (auto unit = ext.audio_unit()) {
+        _node.manageable().set_remove_from_graph_handler([weak_node](audio::graph &graph) {
+            if (auto node = weak_node.lock()) {
+                if (auto unit = node.audio_unit()) {
                     graph.remove_audio_unit(unit);
                 }
             }
@@ -181,21 +181,21 @@ struct audio::unit_extension::impl : base::impl, manageable_unit_extension::impl
         bool const has_observer = _subject.has_observer();
 
         if (has_observer) {
-            _subject.notify(audio::unit_extension::method::will_update_connections, cast<audio::unit_extension>());
+            _subject.notify(audio::unit_node::method::will_update_connections, cast<audio::unit_node>());
         }
 
         if (auto audio_unit = au()) {
             auto input_bus_count = input_element_count();
             if (input_bus_count > 0) {
-                auto weak_ext = to_weak(cast<unit_extension>());
-                audio_unit.set_render_handler([weak_ext](audio::render_parameters &render_parameters) {
-                    if (auto ext = weak_ext.lock()) {
-                        if (auto kernel = ext.node().kernel()) {
+                auto weak_node = to_weak(cast<unit_node>());
+                audio_unit.set_render_handler([weak_node](audio::render_parameters &render_parameters) {
+                    if (auto node = weak_node.lock()) {
+                        if (auto kernel = node.node().kernel()) {
                             if (auto connection = kernel.input_connection(render_parameters.in_bus_number)) {
-                                if (auto src_node = connection.source_node()) {
+                                if (auto source_node = connection.source_node()) {
                                     pcm_buffer buffer{connection.format(), render_parameters.io_data};
                                     time when(*render_parameters.io_time_stamp, connection.format().sample_rate());
-                                    src_node.render(
+                                    source_node.render(
                                         {.buffer = buffer, .bus_idx = connection.source_bus(), .when = when});
                                 }
                             }
@@ -226,7 +226,7 @@ struct audio::unit_extension::impl : base::impl, manageable_unit_extension::impl
         }
 
         if (has_observer) {
-            _subject.notify(audio::unit_extension::method::did_update_connections, cast<audio::unit_extension>());
+            _subject.notify(audio::unit_node::method::did_update_connections, cast<audio::unit_node>());
         }
     }
 
@@ -263,7 +263,7 @@ struct audio::unit_extension::impl : base::impl, manageable_unit_extension::impl
     audio::node _node;
     AudioComponentDescription _acd;
     std::unordered_map<AudioUnitScope, unit::parameter_map_t> _parameters;
-    audio::unit_extension::subject_t _subject;
+    audio::unit_node::subject_t _subject;
     audio::node::observer_t _reset_observer;
     audio::node::observer_t _connections_observer;
     prepare_au_f _prepare_au_handler;
@@ -312,10 +312,10 @@ struct audio::unit_extension::impl : base::impl, manageable_unit_extension::impl
     core _core;
 };
 
-#pragma mark - audio::unit_extension
+#pragma mark - audio::unit_node
 
-audio::unit_extension::unit_extension(OSType const type, OSType const sub_type)
-    : unit_extension(AudioComponentDescription{
+audio::unit_node::unit_node(OSType const type, OSType const sub_type)
+    : unit_node(AudioComponentDescription{
           .componentType = type,
           .componentSubType = sub_type,
           .componentManufacturer = kAudioUnitManufacturer_Apple,
@@ -324,95 +324,94 @@ audio::unit_extension::unit_extension(OSType const type, OSType const sub_type)
       }) {
 }
 
-audio::unit_extension::unit_extension(AudioComponentDescription const &acd)
-    : unit_extension({.acd = acd, .node_args = {.input_bus_count = 1, .output_bus_count = 1}}) {
+audio::unit_node::unit_node(AudioComponentDescription const &acd)
+    : unit_node({.acd = acd, .node_args = {.input_bus_count = 1, .output_bus_count = 1}}) {
 }
 
-audio::unit_extension::unit_extension(args &&args) : base(std::make_shared<impl>(std::move(args.node_args))) {
+audio::unit_node::unit_node(args &&args) : base(std::make_shared<impl>(std::move(args.node_args))) {
     impl_ptr<impl>()->prepare(*this, args.acd);
 }
 
-audio::unit_extension::unit_extension(std::nullptr_t) : base(nullptr) {
+audio::unit_node::unit_node(std::nullptr_t) : base(nullptr) {
 }
 
-audio::unit_extension::~unit_extension() = default;
+audio::unit_node::~unit_node() = default;
 
-void audio::unit_extension::set_prepare_audio_unit_handler(prepare_au_f handler) {
+void audio::unit_node::set_prepare_audio_unit_handler(prepare_au_f handler) {
     impl_ptr<impl>()->set_prepare_audio_unit_handler(std::move(handler));
 }
 
-audio::unit audio::unit_extension::audio_unit() const {
+audio::unit audio::unit_node::audio_unit() const {
     return impl_ptr<impl>()->au();
 }
 
-std::unordered_map<AudioUnitParameterID, audio::unit::parameter_map_t> const &audio::unit_extension::parameters()
-    const {
+std::unordered_map<AudioUnitParameterID, audio::unit::parameter_map_t> const &audio::unit_node::parameters() const {
     return impl_ptr<impl>()->parameters();
 }
 
-audio::unit::parameter_map_t const &audio::unit_extension::global_parameters() const {
+audio::unit::parameter_map_t const &audio::unit_node::global_parameters() const {
     return impl_ptr<impl>()->global_parameters();
 }
 
-audio::unit::parameter_map_t const &audio::unit_extension::input_parameters() const {
+audio::unit::parameter_map_t const &audio::unit_node::input_parameters() const {
     return impl_ptr<impl>()->input_parameters();
 }
 
-audio::unit::parameter_map_t const &audio::unit_extension::output_parameters() const {
+audio::unit::parameter_map_t const &audio::unit_node::output_parameters() const {
     return impl_ptr<impl>()->output_parameters();
 }
 
-uint32_t audio::unit_extension::input_element_count() const {
+uint32_t audio::unit_node::input_element_count() const {
     return impl_ptr<impl>()->input_element_count();
 }
 
-uint32_t audio::unit_extension::output_element_count() const {
+uint32_t audio::unit_node::output_element_count() const {
     return impl_ptr<impl>()->output_element_count();
 }
 
-void audio::unit_extension::set_global_parameter_value(AudioUnitParameterID const parameter_id, float const value) {
+void audio::unit_node::set_global_parameter_value(AudioUnitParameterID const parameter_id, float const value) {
     impl_ptr<impl>()->set_global_parameter_value(parameter_id, value);
 }
 
-float audio::unit_extension::global_parameter_value(AudioUnitParameterID const parameter_id) const {
+float audio::unit_node::global_parameter_value(AudioUnitParameterID const parameter_id) const {
     return impl_ptr<impl>()->global_parameter_value(parameter_id);
 }
 
-void audio::unit_extension::set_input_parameter_value(AudioUnitParameterID const parameter_id, float const value,
-                                                      AudioUnitElement const element) {
+void audio::unit_node::set_input_parameter_value(AudioUnitParameterID const parameter_id, float const value,
+                                                 AudioUnitElement const element) {
     impl_ptr<impl>()->set_input_parameter_value(parameter_id, value, element);
 }
 
-float audio::unit_extension::input_parameter_value(AudioUnitParameterID const parameter_id,
-                                                   AudioUnitElement const element) const {
+float audio::unit_node::input_parameter_value(AudioUnitParameterID const parameter_id,
+                                              AudioUnitElement const element) const {
     return impl_ptr<impl>()->input_parameter_value(parameter_id, element);
 }
 
-void audio::unit_extension::set_output_parameter_value(AudioUnitParameterID const parameter_id, float const value,
-                                                       AudioUnitElement const element) {
+void audio::unit_node::set_output_parameter_value(AudioUnitParameterID const parameter_id, float const value,
+                                                  AudioUnitElement const element) {
     impl_ptr<impl>()->set_output_parameter_value(parameter_id, value, element);
 }
 
-float audio::unit_extension::output_parameter_value(AudioUnitParameterID const parameter_id,
-                                                    AudioUnitElement const element) const {
+float audio::unit_node::output_parameter_value(AudioUnitParameterID const parameter_id,
+                                               AudioUnitElement const element) const {
     return impl_ptr<impl>()->output_parameter_value(parameter_id, element);
 }
 
-audio::unit_extension::subject_t &audio::unit_extension::subject() {
+audio::unit_node::subject_t &audio::unit_node::subject() {
     return impl_ptr<impl>()->_subject;
 }
 
-audio::node const &audio::unit_extension::node() const {
+audio::node const &audio::unit_node::node() const {
     return impl_ptr<impl>()->_node;
 }
 
-audio::node &audio::unit_extension::node() {
+audio::node &audio::unit_node::node() {
     return impl_ptr<impl>()->_node;
 }
 
-audio::manageable_unit_extension &audio::unit_extension::manageable() {
+audio::manageable_unit_node &audio::unit_node::manageable() {
     if (!_manageable) {
-        _manageable = audio::manageable_unit_extension{impl_ptr<manageable_unit_extension::impl>()};
+        _manageable = audio::manageable_unit_node{impl_ptr<manageable_unit_node::impl>()};
     }
     return _manageable;
 }

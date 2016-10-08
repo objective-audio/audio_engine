@@ -18,26 +18,26 @@ using namespace yas;
 
 namespace yas {
 namespace sample {
-    struct input_tap_extension_vc_internal {
+    struct input_tap_node_vc_internal {
         enum class property_key {
             input_level,
         };
 
         audio::engine engine;
-        audio::unit_input_extension input_ext;
-        audio::tap_extension input_tap_ext = {{.is_input = true}};
+        audio::unit_input_node input_node;
+        audio::tap_node input_tap_node = {{.is_input = true}};
 
         property<float, property_key> input_level{
             {.key = property_key::input_level, .value = audio::math::decibel_from_linear(0.0f)}};
 
-        input_tap_extension_vc_internal() = default;
+        input_tap_node_vc_internal() = default;
 
         void prepare() {
-            double const sample_rate = input_ext.unit_io_extension().device_sample_rate();
+            double const sample_rate = input_node.unit_io_node().device_sample_rate();
             audio::format format{{.sample_rate = sample_rate, .channel_count = 2}};
-            engine.connect(input_ext.unit_io_extension().unit_extension().node(), input_tap_ext.node(), format);
+            engine.connect(input_node.unit_io_node().unit_node().node(), input_tap_node.node(), format);
 
-            input_tap_ext.set_render_handler([input_level = input_level, sample_rate](auto args) mutable {
+            input_tap_node.set_render_handler([input_level = input_level, sample_rate](auto args) mutable {
                 auto &buffer = args.buffer;
 
                 audio::frame_enumerator enumerator(buffer);
@@ -65,7 +65,7 @@ namespace sample {
 }
 
 @implementation YASAudioInputTapNodeSampleViewController {
-    sample::input_tap_extension_vc_internal _internal;
+    sample::input_tap_node_vc_internal _internal;
     CFTimeInterval _lastLabelUpdatedTime;
 }
 

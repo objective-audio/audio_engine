@@ -1,16 +1,16 @@
 //
-//  yas_audio_route_extension_tests.m
+//  yas_audio_route_node_tests.m
 //
 
 #import "yas_audio_test_utils.h"
 
 using namespace yas;
 
-@interface yas_audio_route_extension_tests : XCTestCase
+@interface yas_audio_route_node_tests : XCTestCase
 
 @end
 
-@implementation yas_audio_route_extension_tests
+@implementation yas_audio_route_node_tests
 
 - (void)setUp {
     [super setUp];
@@ -21,70 +21,70 @@ using namespace yas;
 }
 
 - (void)test_add_and_remove_route {
-    audio::route_extension route_ext;
+    audio::route_node route_node;
 
-    XCTAssertEqual(route_ext.routes().size(), 0);
+    XCTAssertEqual(route_node.routes().size(), 0);
 
     audio::route route{0, 1, 2, 3};
-    route_ext.add_route(route);
+    route_node.add_route(route);
 
-    XCTAssertEqual(route_ext.routes().size(), 1);
-    for (auto route_in_ext : route_ext.routes()) {
-        XCTAssertEqual(route_in_ext, route);
+    XCTAssertEqual(route_node.routes().size(), 1);
+    for (auto route_in_node : route_node.routes()) {
+        XCTAssertEqual(route_in_node, route);
     }
 
-    route_ext.remove_route(route);
+    route_node.remove_route(route);
 
-    XCTAssertEqual(route_ext.routes().size(), 0);
+    XCTAssertEqual(route_node.routes().size(), 0);
 
-    route_ext.add_route(std::move(route));
+    route_node.add_route(std::move(route));
 
-    XCTAssertEqual(route_ext.routes().size(), 1);
+    XCTAssertEqual(route_node.routes().size(), 1);
 
-    route_ext.clear_routes();
+    route_node.clear_routes();
 
-    XCTAssertEqual(route_ext.routes().size(), 0);
+    XCTAssertEqual(route_node.routes().size(), 0);
 }
 
 - (void)test_replace_route {
-    audio::route_extension route_ext;
+    audio::route_node route_node;
 
-    XCTAssertEqual(route_ext.routes().size(), 0);
+    XCTAssertEqual(route_node.routes().size(), 0);
 
-    route_ext.add_route({0, 1, 2, 3});
+    route_node.add_route({0, 1, 2, 3});
 
-    XCTAssertEqual(route_ext.routes().size(), 1);
+    XCTAssertEqual(route_node.routes().size(), 1);
 
     std::set<audio::route> routes{{4, 5, 6, 7}, {8, 9, 10, 11}};
-    route_ext.set_routes(routes);
+    route_node.set_routes(routes);
 
-    XCTAssertEqual(route_ext.routes().size(), 2);
-    XCTAssertEqual(route_ext.routes(), routes);
+    XCTAssertEqual(route_node.routes().size(), 2);
+    XCTAssertEqual(route_node.routes(), routes);
 
-    route_ext.clear_routes();
+    route_node.clear_routes();
 
-    XCTAssertEqual(route_ext.routes().size(), 0);
+    XCTAssertEqual(route_node.routes().size(), 0);
 
-    route_ext.set_routes(std::move(routes));
+    route_node.set_routes(std::move(routes));
 
-    XCTAssertEqual(route_ext.routes().size(), 2);
-    XCTAssertNotEqual(route_ext.routes(), routes);
+    XCTAssertEqual(route_node.routes().size(), 2);
+    XCTAssertNotEqual(route_node.routes(), routes);
 }
 
 - (void)test_render {
     audio::engine engine;
-    engine.add_offline_output_extension();
+    engine.add_offline_output_node();
 
     auto format = audio::format({.sample_rate = 44100.0, .channel_count = 2});
-    audio::offline_output_extension &output_ext = engine.offline_output_extension();
-    audio::route_extension route_ext;
-    audio::tap_extension tap_ext;
+    audio::offline_output_node &output_node = engine.offline_output_node();
+    audio::route_node route_node;
+    audio::tap_node tap_node;
 
-    engine.connect(route_ext.node(), output_ext.node(), format);
-    engine.connect(tap_ext.node(), route_ext.node(), format);
+    engine.connect(route_node.node(), output_node.node(), format);
+    engine.connect(tap_node.node(), route_node.node(), format);
 
-    bool tap_ext_called = false;
-    tap_ext.set_render_handler([&tap_ext_called](auto) { tap_ext_called = true; });
+    bool tap_node_called = false;
+    tap_node.set_render_handler([&tap_node_called](auto) { tap_node_called = true; });
 
     {
         XCTestExpectation *expectation = [self expectationWithDescription:@"first render"];
@@ -98,14 +98,14 @@ using namespace yas;
                                      }];
     }
 
-    XCTAssertFalse(tap_ext_called);
+    XCTAssertFalse(tap_node_called);
 
-    route_ext.add_route({0, 0, 0, 0});
-    route_ext.add_route({0, 1, 0, 1});
+    route_node.add_route({0, 0, 0, 0});
+    route_node.add_route({0, 1, 0, 1});
 
-    tap_ext_called = false;
-    tap_ext.set_render_handler([&tap_ext_called, self](auto args) {
-        tap_ext_called = true;
+    tap_node_called = false;
+    tap_node.set_render_handler([&tap_node_called, self](auto args) {
+        tap_node_called = true;
         XCTAssertEqual(args.bus_idx, 0);
         test::fill_test_values_to_buffer(args.buffer);
     });
@@ -139,43 +139,43 @@ using namespace yas;
                                      }];
     }
 
-    XCTAssertTrue(tap_ext_called);
+    XCTAssertTrue(tap_node_called);
 }
 
 - (void)test_render_many_source {
     auto const src_count = 2;
 
     audio::engine engine;
-    engine.add_offline_output_extension();
+    engine.add_offline_output_node();
 
     auto dst_format = audio::format({.sample_rate = 44100.0, .channel_count = 2});
     auto src_format = audio::format({.sample_rate = 44100.0, .channel_count = 1});
-    audio::offline_output_extension &output_ext = engine.offline_output_extension();
-    audio::route_extension route_ext;
+    audio::offline_output_node &output_node = engine.offline_output_node();
+    audio::route_node route_node;
 
-    engine.connect(route_ext.node(), output_ext.node(), dst_format);
+    engine.connect(route_node.node(), output_node.node(), dst_format);
 
-    bool tap_ext_calleds[src_count];
-    for (auto &tap_ext_called : tap_ext_calleds) {
-        tap_ext_called = false;
+    bool tap_node_calleds[src_count];
+    for (auto &tap_node_called : tap_node_calleds) {
+        tap_node_called = false;
     }
 
-    std::vector<audio::tap_extension> tap_exts;
+    std::vector<audio::tap_node> tap_nodes;
     for (uint32_t i = 0; i < src_count; ++i) {
-        tap_exts.push_back(audio::tap_extension{});
-        auto &tap_ext = tap_exts.at(i);
+        tap_nodes.push_back(audio::tap_node{});
+        auto &tap_node = tap_nodes.at(i);
 
-        engine.connect(tap_ext.node(), route_ext.node(), 0, i, src_format);
+        engine.connect(tap_node.node(), route_node.node(), 0, i, src_format);
 
-        auto &tap_ext_called = tap_ext_calleds[i];
-        tap_ext.set_render_handler([&tap_ext_called](auto args) {
-            tap_ext_called = true;
+        auto &tap_node_called = tap_node_calleds[i];
+        tap_node.set_render_handler([&tap_node_called](auto args) {
+            tap_node_called = true;
             test::fill_test_values_to_buffer(args.buffer);
         });
     }
 
-    route_ext.add_route({0, 0, 0, 0});
-    route_ext.add_route({1, 0, 0, 1});
+    route_node.add_route({0, 0, 0, 0});
+    route_node.add_route({1, 0, 0, 1});
 
     XCTestExpectation *expectation = [self expectationWithDescription:@"render"];
 
@@ -204,8 +204,8 @@ using namespace yas;
 
                                  }];
 
-    for (auto const &tap_ext_called : tap_ext_calleds) {
-        XCTAssertTrue(tap_ext_called);
+    for (auto const &tap_node_called : tap_node_calleds) {
+        XCTAssertTrue(tap_node_called);
     }
 }
 
@@ -213,36 +213,36 @@ using namespace yas;
     auto const src_count = 2;
 
     audio::engine engine;
-    engine.add_offline_output_extension();
+    engine.add_offline_output_node();
 
     auto dst_format = audio::format({.sample_rate = 44100.0, .channel_count = 4});
     auto src_format = audio::format({.sample_rate = 44100.0, .channel_count = 2});
-    audio::offline_output_extension &output_ext = engine.offline_output_extension();
-    audio::route_extension route_ext;
+    audio::offline_output_node &output_node = engine.offline_output_node();
+    audio::route_node route_node;
 
-    engine.connect(route_ext.node(), output_ext.node(), dst_format);
+    engine.connect(route_node.node(), output_node.node(), dst_format);
 
-    bool tap_ext_calleds[src_count];
-    for (auto &tap_ext_called : tap_ext_calleds) {
-        tap_ext_called = false;
+    bool tap_node_calleds[src_count];
+    for (auto &tap_node_called : tap_node_calleds) {
+        tap_node_called = false;
     }
 
-    std::vector<audio::tap_extension> tap_exts;
+    std::vector<audio::tap_node> tap_nodes;
     for (uint32_t i = 0; i < src_count; ++i) {
-        tap_exts.push_back(audio::tap_extension{});
-        auto &tap_ext = tap_exts.at(i);
+        tap_nodes.push_back(audio::tap_node{});
+        auto &tap_node = tap_nodes.at(i);
 
-        engine.connect(tap_ext.node(), route_ext.node(), 0, i, src_format);
+        engine.connect(tap_node.node(), route_node.node(), 0, i, src_format);
 
-        auto &tap_ext_called = tap_ext_calleds[i];
-        tap_ext.set_render_handler([&tap_ext_called](auto args) {
-            tap_ext_called = true;
+        auto &tap_node_called = tap_node_calleds[i];
+        tap_node.set_render_handler([&tap_node_called](auto args) {
+            tap_node_called = true;
             test::fill_test_values_to_buffer(args.buffer);
         });
     }
 
-    route_ext.add_route({0, 0, 0, 0});
-    route_ext.add_route({1, 0, 0, 2});
+    route_node.add_route({0, 0, 0, 0});
+    route_node.add_route({1, 0, 0, 2});
 
     XCTestExpectation *expectation = [self expectationWithDescription:@"render"];
 
@@ -273,8 +273,8 @@ using namespace yas;
 
                                  }];
 
-    for (auto const &tap_ext_called : tap_ext_calleds) {
-        XCTAssertTrue(tap_ext_called);
+    for (auto const &tap_node_called : tap_node_calleds) {
+        XCTAssertTrue(tap_node_called);
     }
 }
 

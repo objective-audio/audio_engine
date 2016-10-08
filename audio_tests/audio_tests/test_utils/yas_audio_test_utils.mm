@@ -165,20 +165,20 @@ void test::audio_unit_render_on_sub_thread(audio::unit &unit, audio::format &for
     }
 }
 
-struct test::audio_test_node_ext::impl : base::impl {
+struct test::audio_test_node_decorator::impl : base::impl {
     audio::node _node;
 
     impl(audio::node_args &&args) : _node(std::move(args)) {
     }
 };
 
-test::audio_test_node_ext::audio_test_node_ext(uint32_t const input_bus_count,
+test::audio_test_node_decorator::audio_test_node_decorator(uint32_t const input_bus_count,
                                                            uint32_t const output_bus_count)
     : base(std::make_unique<impl>(
           audio::node_args{.input_bus_count = input_bus_count, .output_bus_count = output_bus_count})) {
 }
 
-audio::node &test::audio_test_node_ext::node() {
+audio::node &test::audio_test_node_decorator::node() {
     return impl_ptr<impl>()->_node;
 }
 
