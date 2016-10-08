@@ -28,15 +28,15 @@ namespace yas {
 namespace sample {
     struct effects_vc_internal {
         audio::engine engine;
-        audio::unit_output_extension output_ext;
+        audio::unit_output_node output_node;
         audio::connection through_connection = nullptr;
-        audio::tap_extension tap_ext;
-        audio::unit_extension effect_ext = nullptr;
+        audio::tap_node tap_node;
+        audio::unit_node effect_node = nullptr;
 
-        void replace_effect_ext(const AudioComponentDescription *acd) {
-            if (effect_ext) {
-                engine.disconnect(effect_ext.node());
-                effect_ext = nullptr;
+        void replace_effect_node(const AudioComponentDescription *acd) {
+            if (effect_node) {
+                engine.disconnect(effect_node.node());
+                effect_node = nullptr;
             }
 
             if (through_connection) {
@@ -48,12 +48,12 @@ namespace sample {
                 audio::format({.sample_rate = [AVAudioSession sharedInstance].sampleRate, .channel_count = 2});
 
             if (acd) {
-                effect_ext = audio::unit_extension(*acd);
-                engine.connect(effect_ext.node(), output_ext.unit_io_extension().unit_extension().node(), format);
-                engine.connect(tap_ext.node(), effect_ext.node(), format);
+                effect_node = audio::unit_node(*acd);
+                engine.connect(effect_node.node(), output_node.unit_io_node().unit_node().node(), format);
+                engine.connect(tap_node.node(), effect_node.node(), format);
             } else {
                 through_connection =
-                    engine.connect(tap_ext.node(), output_ext.unit_io_extension().unit_extension().node(), format);
+                    engine.connect(tap_node.node(), output_node.unit_io_node().unit_node().node(), format);
             }
         }
     };
@@ -121,7 +121,7 @@ namespace sample {
     id destinationViewController = segue.destinationViewController;
     if ([destinationViewController isKindOfClass:[YASAudioEngineEffectsSampleEditViewController class]]) {
         YASAudioEngineEffectsSampleEditViewController *controller = destinationViewController;
-        [controller set_audio_unit_extension:_internal.effect_ext];
+        [controller set_audio_unit_node:_internal.effect_node];
     }
 }
 
@@ -168,9 +168,9 @@ namespace sample {
         }
     };
 
-    _internal.tap_ext.set_render_handler(tap_render_handler);
+    _internal.tap_node.set_render_handler(tap_render_handler);
 
-    _internal.replace_effect_ext(nullptr);
+    _internal.replace_effect_node(nullptr);
 }
 
 #pragma mark -
@@ -226,14 +226,14 @@ namespace sample {
     switch (indexPath.section) {
         case YASAudioEngineEffectsSampleSectionNone: {
             _index = yas::nullopt;
-            _internal.replace_effect_ext(nullptr);
+            _internal.replace_effect_node(nullptr);
         } break;
         case YASAudioEngineEffectsSampleSectionEffects: {
             _index = static_cast<uint32_t>(indexPath.row);
             AudioComponentDescription acd = baseAcd;
             auto const &audio_unit = _audio_units.at(indexPath.row);
             acd.componentSubType = audio_unit.sub_type();
-            _internal.replace_effect_ext(&acd);
+            _internal.replace_effect_node(&acd);
         } break;
     }
 

@@ -26,11 +26,11 @@ namespace test {
     void audio_unit_render_on_sub_thread(audio::unit &audio_unit, audio::format &format, uint32_t const frame_length,
                                          std::size_t const count, NSTimeInterval const wait);
 
-    class audio_test_node_ext : public base {
+    class audio_test_node_decorator : public base {
         class impl;
 
        public:
-        audio_test_node_ext(uint32_t const input_bus_count = 2, uint32_t const output_bus_count = 1);
+        audio_test_node_decorator(uint32_t const input_bus_count = 2, uint32_t const output_bus_count = 1);
 
         audio::node &node();
     };

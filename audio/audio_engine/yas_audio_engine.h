@@ -5,7 +5,7 @@
 #pragma once
 
 #include "yas_audio_connection.h"
-#include "yas_audio_offline_output_extension_protocol.h"
+#include "yas_audio_offline_output_node_protocol.h"
 #include "yas_audio_types.h"
 #include "yas_base.h"
 
@@ -19,8 +19,8 @@ class observer;
 
 namespace audio {
     class graph;
-    class offline_output_extension;
-    class device_io_extension;
+    class offline_output_node;
+    class device_io_node;
     class testable_engine;
 
     class engine : public base {
@@ -63,16 +63,16 @@ namespace audio {
         void disconnect_output(audio::node const &);
         void disconnect_output(audio::node const &, uint32_t const bus_idx);
 
-        add_result_t add_offline_output_extension();
-        remove_result_t remove_offline_output_extension();
-        audio::offline_output_extension const &offline_output_extension() const;
-        audio::offline_output_extension &offline_output_extension();
+        add_result_t add_offline_output_node();
+        remove_result_t remove_offline_output_node();
+        audio::offline_output_node const &offline_output_node() const;
+        audio::offline_output_node &offline_output_node();
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
-        add_result_t add_device_io_extension();
-        remove_result_t remove_device_io_extension();
-        audio::device_io_extension const &device_io_extension() const;
-        audio::device_io_extension &device_io_extension();
+        add_result_t add_device_io_node();
+        remove_result_t remove_device_io_node();
+        audio::device_io_node const &device_io_node() const;
+        audio::device_io_node &device_io_node();
 #endif
 
         start_result_t start_render();

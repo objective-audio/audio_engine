@@ -1,8 +1,8 @@
 //
-//  yas_audio_offline_output_extension_protocol.cpp
+//  yas_audio_offline_output_node_protocol.cpp
 //
 
-#include "yas_audio_offline_output_extension_protocol.h"
+#include "yas_audio_offline_output_node_protocol.h"
 
 using namespace yas;
 

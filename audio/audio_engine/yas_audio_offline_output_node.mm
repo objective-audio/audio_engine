@@ -1,29 +1,29 @@
 //
-//  yas_audio_offline_output_extension.cpp
+//  yas_audio_offline_output_node.cpp
 //
 
 #include "yas_audio_node.h"
-#include "yas_audio_offline_output_extension.h"
+#include "yas_audio_offline_output_node.h"
 #include "yas_audio_time.h"
 #include "yas_operation.h"
 #include "yas_stl_utils.h"
 
 using namespace yas;
 
-#pragma mark - audio::offline_output_extension::impl
+#pragma mark - audio::offline_output_node::impl
 
-struct audio::offline_output_extension::impl : base::impl, manageable_offline_output_unit::impl {
+struct audio::offline_output_node::impl : base::impl, manageable_offline_output_unit::impl {
     operation_queue _queue = nullptr;
     audio::node _node = {{.input_bus_count = 1, .output_bus_count = 0}};
     audio::node::observer_t _reset_observer;
 
     ~impl() = default;
 
-    void prepare(offline_output_extension const &ext) {
+    void prepare(offline_output_node const &node) {
         _reset_observer =
-            _node.subject().make_observer(audio::node::method::will_reset, [weak_ext = to_weak(ext)](auto const &) {
-                if (auto ext = weak_ext.lock()) {
-                    ext.impl_ptr<audio::offline_output_extension::impl>()->stop();
+            _node.subject().make_observer(audio::node::method::will_reset, [weak_node = to_weak(node)](auto const &) {
+                if (auto node = weak_node.lock()) {
+                    node.impl_ptr<audio::offline_output_node::impl>()->stop();
                 }
             });
     }
@@ -43,8 +43,8 @@ struct audio::offline_output_extension::impl : base::impl, manageable_offline_ou
 
             audio::pcm_buffer render_buffer(connection.format(), 1024);
 
-            auto weak_ext = to_weak(cast<offline_output_extension>());
-            auto operation_lambda = [weak_ext, render_buffer, render_handler = std::move(render_handler), key](
+            auto weak_node = to_weak(cast<offline_output_node>());
+            auto operation_lambda = [weak_node, render_buffer, render_handler = std::move(render_handler), key](
                 operation const &op) mutable {
                 bool cancelled = false;
                 uint32_t current_sample_time = 0;
@@ -52,13 +52,13 @@ struct audio::offline_output_extension::impl : base::impl, manageable_offline_ou
 
                 while (!stop) {
                     audio::time when(current_sample_time, render_buffer.format().sample_rate());
-                    auto offline_ext = weak_ext.lock();
-                    if (!offline_ext) {
+                    auto offline_node = weak_node.lock();
+                    if (!offline_node) {
                         cancelled = true;
                         break;
                     }
 
-                    auto kernel = offline_ext.node().kernel();
+                    auto kernel = offline_node.node().kernel();
                     if (!kernel) {
                         cancelled = true;
                         break;
@@ -78,8 +78,8 @@ struct audio::offline_output_extension::impl : base::impl, manageable_offline_ou
 
                     render_buffer.reset();
 
-                    if (auto src_node = connection_on_block.source_node()) {
-                        src_node.render(
+                    if (auto source_node = connection_on_block.source_node()) {
+                        source_node.render(
                             {.buffer = render_buffer, .bus_idx = connection_on_block.source_bus(), .when = when});
                     }
 
@@ -95,17 +95,18 @@ struct audio::offline_output_extension::impl : base::impl, manageable_offline_ou
                     current_sample_time += 1024;
                 }
 
-                auto completion_lambda = [weak_ext, cancelled, key]() {
-                    if (auto offline_ext = weak_ext.lock()) {
-                        std::experimental::optional<offline_completion_f> handler;
+                auto completion_lambda = [weak_node, cancelled, key]() {
+                    if (auto offline_node = weak_node.lock()) {
+                        std::experimental::optional<offline_completion_f> node_completion_handler;
                         if (key) {
-                            handler = offline_ext.impl_ptr<impl>()->_core.pull_completion_handler(*key);
+                            node_completion_handler =
+                                offline_node.impl_ptr<impl>()->_core.pull_completion_handler(*key);
                         }
 
-                        offline_ext.impl_ptr<impl>()->_queue = nullptr;
+                        offline_node.impl_ptr<impl>()->_queue = nullptr;
 
-                        if (handler) {
-                            (*handler)(cancelled);
+                        if (node_completion_handler) {
+                            (*node_completion_handler)(cancelled);
                         }
                     }
                 };
@@ -186,33 +187,33 @@ struct audio::offline_output_extension::impl : base::impl, manageable_offline_ou
     core _core;
 };
 
-#pragma mark - audio::offline_output_extension
+#pragma mark - audio::offline_output_node
 
-audio::offline_output_extension::offline_output_extension() : base(std::make_unique<impl>()) {
+audio::offline_output_node::offline_output_node() : base(std::make_unique<impl>()) {
     impl_ptr<impl>()->prepare(*this);
 }
 
-audio::offline_output_extension::offline_output_extension(std::nullptr_t) : base(nullptr) {
+audio::offline_output_node::offline_output_node(std::nullptr_t) : base(nullptr) {
 }
 
-audio::offline_output_extension::offline_output_extension(std::shared_ptr<impl> const &imp) : base(imp) {
+audio::offline_output_node::offline_output_node(std::shared_ptr<impl> const &imp) : base(imp) {
     impl_ptr<impl>()->prepare(*this);
 }
 
-audio::offline_output_extension::~offline_output_extension() = default;
+audio::offline_output_node::~offline_output_node() = default;
 
-bool audio::offline_output_extension::is_running() const {
+bool audio::offline_output_node::is_running() const {
     return impl_ptr<impl>()->is_running();
 }
 
-audio::node const &audio::offline_output_extension::node() const {
+audio::node const &audio::offline_output_node::node() const {
     return impl_ptr<impl>()->node();
 }
-audio::node &audio::offline_output_extension::node() {
+audio::node &audio::offline_output_node::node() {
     return impl_ptr<impl>()->node();
 }
 
-audio::manageable_offline_output_unit &audio::offline_output_extension::manageable() {
+audio::manageable_offline_output_unit &audio::offline_output_node::manageable() {
     if (!_manageable) {
         _manageable = audio::manageable_offline_output_unit{impl_ptr<manageable_offline_output_unit::impl>()};
     }

@@ -1,5 +1,5 @@
 //
-//  yas_audio_tap_extension.h
+//  yas_audio_tap_node.h
 //
 
 #pragma once
@@ -8,7 +8,7 @@
 
 namespace yas {
 namespace audio {
-    class tap_extension : public base {
+    class tap_node : public base {
        public:
         class kernel;
         class impl;
@@ -17,11 +17,11 @@ namespace audio {
             bool is_input = false;
         };
 
-        tap_extension();
-        tap_extension(args);
-        tap_extension(std::nullptr_t);
+        tap_node();
+        tap_node(args);
+        tap_node(std::nullptr_t);
 
-        virtual ~tap_extension() final;
+        virtual ~tap_node() final;
 
         void set_render_handler(audio::node::render_f);
 
