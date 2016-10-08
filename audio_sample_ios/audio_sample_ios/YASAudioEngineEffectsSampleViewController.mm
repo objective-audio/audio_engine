@@ -30,7 +30,7 @@ namespace sample {
         audio::engine::manager manager;
         audio::unit_output_node output_node;
         audio::engine::connection through_connection = nullptr;
-        audio::tap_node tap_node;
+        audio::engine::tap_node tap_node;
         audio::unit_node effect_node = nullptr;
 
         void replace_effect_node(const AudioComponentDescription *acd) {

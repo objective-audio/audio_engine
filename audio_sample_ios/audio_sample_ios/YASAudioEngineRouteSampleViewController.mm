@@ -37,7 +37,7 @@ namespace sample {
         audio::unit_io_node io_node;
         audio::unit_mixer_node mixer_node;
         audio::engine::route_node route_node;
-        audio::tap_node sine_node;
+        audio::engine::tap_node sine_node;
 
         base engine_observer = nullptr;
 

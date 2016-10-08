@@ -25,7 +25,7 @@ namespace sample {
 
         audio::engine::manager manager;
         audio::unit_input_node input_node;
-        audio::tap_node input_tap_node = {{.is_input = true}};
+        audio::engine::tap_node input_tap_node = {{.is_input = true}};
 
         property<float, property_key> input_level{
             {.key = property_key::input_level, .value = audio::math::decibel_from_linear(0.0f)}};

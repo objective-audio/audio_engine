@@ -100,7 +100,7 @@ namespace sample {
     struct device_io_vc_internal {
         audio::engine::manager manager = nullptr;
         audio::engine::route_node route_node = nullptr;
-        audio::tap_node tap_node = nullptr;
+        audio::engine::tap_node tap_node = nullptr;
 
         base system_observer = nullptr;
         base device_observer = nullptr;
@@ -171,7 +171,7 @@ namespace sample {
     _internal.manager = audio::engine::manager{};
     _internal.manager.add_device_io_node();
     _internal.route_node = audio::engine::route_node{};
-    _internal.tap_node = audio::tap_node{};
+    _internal.tap_node = audio::engine::tap_node{};
 
     auto weak_node = to_weak(_internal.tap_node);
 

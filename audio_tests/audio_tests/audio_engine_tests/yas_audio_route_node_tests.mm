@@ -78,7 +78,7 @@ using namespace yas;
     auto format = audio::format({.sample_rate = 44100.0, .channel_count = 2});
     audio::engine::offline_output_node &output_node = manager.offline_output_node();
     audio::engine::route_node route_node;
-    audio::tap_node tap_node;
+    audio::engine::tap_node tap_node;
 
     manager.connect(route_node.node(), output_node.node(), format);
     manager.connect(tap_node.node(), route_node.node(), format);
@@ -160,9 +160,9 @@ using namespace yas;
         tap_node_called = false;
     }
 
-    std::vector<audio::tap_node> tap_nodes;
+    std::vector<audio::engine::tap_node> tap_nodes;
     for (uint32_t i = 0; i < src_count; ++i) {
-        tap_nodes.push_back(audio::tap_node{});
+        tap_nodes.push_back(audio::engine::tap_node{});
         auto &tap_node = tap_nodes.at(i);
 
         manager.connect(tap_node.node(), route_node.node(), 0, i, src_format);
@@ -227,9 +227,9 @@ using namespace yas;
         tap_node_called = false;
     }
 
-    std::vector<audio::tap_node> tap_nodes;
+    std::vector<audio::engine::tap_node> tap_nodes;
     for (uint32_t i = 0; i < src_count; ++i) {
-        tap_nodes.push_back(audio::tap_node{});
+        tap_nodes.push_back(audio::engine::tap_node{});
         auto &tap_node = tap_nodes.at(i);
 
         manager.connect(tap_node.node(), route_node.node(), 0, i, src_format);

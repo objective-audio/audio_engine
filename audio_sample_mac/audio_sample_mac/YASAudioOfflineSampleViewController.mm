@@ -16,7 +16,7 @@ namespace offline_sample {
 
     struct sine_node : base {
         struct impl : base::impl {
-            audio::tap_node _tap_node;
+            audio::engine::tap_node _tap_node;
             double phase_on_render;
 
             void set_frequency(float const frequency) {
@@ -101,7 +101,7 @@ namespace offline_sample {
             return impl_ptr<impl>()->is_playing();
         }
 
-        audio::tap_node &tap_node() {
+        audio::engine::tap_node &tap_node() {
             return impl_ptr<impl>()->_tap_node;
         }
     };

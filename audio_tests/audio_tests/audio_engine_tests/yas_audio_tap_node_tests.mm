@@ -25,8 +25,8 @@ using namespace yas;
     manager.add_offline_output_node();
 
     audio::engine::offline_output_node &output_node = manager.offline_output_node();
-    audio::tap_node to_node;
-    audio::tap_node from_node;
+    audio::engine::tap_node to_node;
+    audio::engine::tap_node from_node;
     auto const format = audio::format({.sample_rate = 48000.0, .channel_count = 2});
 
     auto const to_connection = manager.connect(to_node.node(), output_node.node(), format);
@@ -79,8 +79,8 @@ using namespace yas;
     manager.add_offline_output_node();
 
     audio::engine::offline_output_node &output_node = manager.offline_output_node();
-    audio::tap_node to_node;
-    audio::tap_node from_node;
+    audio::engine::tap_node to_node;
+    audio::engine::tap_node from_node;
     auto const format = audio::format({.sample_rate = 48000.0, .channel_count = 2});
 
     auto const to_connection = manager.connect(to_node.node(), output_node.node(), format);
@@ -99,7 +99,7 @@ using namespace yas;
 }
 
 - (void)test_bus_count {
-    audio::tap_node tap_node;
+    audio::engine::tap_node tap_node;
 
     XCTAssertEqual(tap_node.node().input_bus_count(), 1);
     XCTAssertEqual(tap_node.node().output_bus_count(), 1);
