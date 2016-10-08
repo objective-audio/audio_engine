@@ -21,7 +21,7 @@ using namespace yas;
 }
 
 - (void)test_add_and_remove_route {
-    audio::route_node route_node;
+    audio::engine::route_node route_node;
 
     XCTAssertEqual(route_node.routes().size(), 0);
 
@@ -47,7 +47,7 @@ using namespace yas;
 }
 
 - (void)test_replace_route {
-    audio::route_node route_node;
+    audio::engine::route_node route_node;
 
     XCTAssertEqual(route_node.routes().size(), 0);
 
@@ -77,7 +77,7 @@ using namespace yas;
 
     auto format = audio::format({.sample_rate = 44100.0, .channel_count = 2});
     audio::engine::offline_output_node &output_node = manager.offline_output_node();
-    audio::route_node route_node;
+    audio::engine::route_node route_node;
     audio::tap_node tap_node;
 
     manager.connect(route_node.node(), output_node.node(), format);
@@ -151,7 +151,7 @@ using namespace yas;
     auto dst_format = audio::format({.sample_rate = 44100.0, .channel_count = 2});
     auto src_format = audio::format({.sample_rate = 44100.0, .channel_count = 1});
     audio::engine::offline_output_node &output_node = manager.offline_output_node();
-    audio::route_node route_node;
+    audio::engine::route_node route_node;
 
     manager.connect(route_node.node(), output_node.node(), dst_format);
 
@@ -218,7 +218,7 @@ using namespace yas;
     auto dst_format = audio::format({.sample_rate = 44100.0, .channel_count = 4});
     auto src_format = audio::format({.sample_rate = 44100.0, .channel_count = 2});
     audio::engine::offline_output_node &output_node = manager.offline_output_node();
-    audio::route_node route_node;
+    audio::engine::route_node route_node;
 
     manager.connect(route_node.node(), output_node.node(), dst_format);
 
