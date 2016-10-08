@@ -67,7 +67,7 @@ struct audio::tap_node::impl : base::impl {
             }
         });
 
-        _node.set_prepare_kernel_handler([weak_node](audio::kernel &kernel) {
+        _node.set_prepare_kernel_handler([weak_node](audio::engine::kernel &kernel) {
             if (auto node = weak_node.lock()) {
                 audio::tap_node::kernel tap_kernel{};
                 tap_kernel.set_render_handler(node.impl_ptr<audio::tap_node::impl>()->_render_handler);
@@ -109,7 +109,7 @@ struct audio::tap_node::impl : base::impl {
    private:
     audio::engine::node::render_f _render_handler;
     audio::engine::node::observer_t _reset_observer;
-    audio::kernel _kernel_on_render;
+    audio::engine::kernel _kernel_on_render;
 };
 
 #pragma mark - audio::tap_node

@@ -79,7 +79,7 @@ struct audio::route_node::impl : base::impl {
             }
         });
 
-        _node.set_prepare_kernel_handler([weak_node](audio::kernel &kernel) {
+        _node.set_prepare_kernel_handler([weak_node](audio::engine::kernel &kernel) {
             if (auto node = weak_node.lock()) {
                 audio::route_node::kernel route_kernel{};
                 route_kernel.set_routes(node.impl_ptr<impl>()->_routes);

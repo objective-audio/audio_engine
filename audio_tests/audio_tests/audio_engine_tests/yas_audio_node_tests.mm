@@ -42,7 +42,7 @@ using namespace yas;
 }
 
 - (void)test_create_kernel {
-    audio::kernel kernel;
+    audio::engine::kernel kernel;
 
     XCTAssertTrue(kernel);
 

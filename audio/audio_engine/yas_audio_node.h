@@ -20,10 +20,10 @@ class result;
 
 namespace audio {
     class time;
-    class kernel;
 
     namespace engine {
         class manager;
+        class kernel;
 
         class node : public base {
            public:
@@ -74,7 +74,7 @@ namespace audio {
             void set_prepare_kernel_handler(prepare_kernel_f);
             void set_render_handler(render_f);
 
-            audio::kernel kernel() const;
+            audio::engine::kernel kernel() const;
 
             void render(render_args);
             void set_render_time_on_render(audio::time const &time);

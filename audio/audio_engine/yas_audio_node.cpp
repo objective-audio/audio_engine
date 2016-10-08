@@ -183,7 +183,7 @@ struct audio::engine::node::impl : base::impl, manageable_node::impl, connectabl
         _prepare_kernel_handler = std::move(handler);
     }
 
-    void prepare_kernel(audio::kernel &kernel) {
+    void prepare_kernel(audio::engine::kernel &kernel) {
         if (!kernel) {
             throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
         }
@@ -198,12 +198,12 @@ struct audio::engine::node::impl : base::impl, manageable_node::impl, connectabl
     }
 
     void update_kernel() override {
-        auto kernel = audio::kernel{};
+        auto kernel = audio::engine::kernel{};
         prepare_kernel(kernel);
         _core.set_kernel(kernel);
     }
 
-    audio::kernel kernel() {
+    audio::engine::kernel kernel() {
         return _core.kernel();
     }
 
@@ -257,12 +257,12 @@ struct audio::engine::node::impl : base::impl, manageable_node::impl, connectabl
 
    private:
     struct core {
-        void set_kernel(audio::kernel kernel) {
+        void set_kernel(audio::engine::kernel kernel) {
             std::lock_guard<std::recursive_mutex> lock(_mutex);
             _kernel = std::move(kernel);
         }
 
-        audio::kernel kernel() {
+        audio::engine::kernel kernel() {
             std::lock_guard<std::recursive_mutex> lock(_mutex);
             return _kernel;
         }
@@ -278,7 +278,7 @@ struct audio::engine::node::impl : base::impl, manageable_node::impl, connectabl
         }
 
        private:
-        audio::kernel _kernel = nullptr;
+        audio::engine::kernel _kernel = nullptr;
         audio::time _render_time = nullptr;
         mutable std::recursive_mutex _mutex;
     };
@@ -371,7 +371,7 @@ void audio::engine::node::set_render_handler(render_f handler) {
     impl_ptr<impl>()->set_render_handler(std::move(handler));
 }
 
-audio::kernel audio::engine::node::kernel() const {
+audio::engine::kernel audio::engine::node::kernel() const {
     return impl_ptr<impl>()->kernel();
 }
 
