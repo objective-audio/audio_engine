@@ -10,9 +10,9 @@
 
 namespace yas {
 namespace audio {
-    class node;
-
     namespace engine {
+        class node;
+        
         class connection : public base {
             class impl;
 
@@ -23,18 +23,18 @@ namespace audio {
 
             uint32_t source_bus() const;
             uint32_t destination_bus() const;
-            audio::node source_node() const;
-            audio::node destination_node() const;
+            audio::engine::node source_node() const;
+            audio::engine::node destination_node() const;
             audio::format const &format() const;
 
-            audio::node_removable &node_removable();
+            audio::engine::node_removable &node_removable();
 
            protected:
-            connection(audio::node &source_node, uint32_t const source_bus_idx, audio::node &destination_node,
+            connection(audio::engine::node &source_node, uint32_t const source_bus_idx, audio::engine::node &destination_node,
                        uint32_t const destination_bus_idx, audio::format const &format);
 
            private:
-            audio::node_removable _node_removable = nullptr;
+            audio::engine::node_removable _node_removable = nullptr;
         };
     }
 }

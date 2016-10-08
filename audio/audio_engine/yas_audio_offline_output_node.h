@@ -9,7 +9,9 @@
 
 namespace yas {
 namespace audio {
-    class node;
+    namespace engine {
+        class node;
+    }
 
     class offline_output_node : public base {
        public:
@@ -22,8 +24,8 @@ namespace audio {
 
         bool is_running() const;
 
-        audio::node const &node() const;
-        audio::node &node();
+        audio::engine::node const &node() const;
+        audio::engine::node &node();
 
         manageable_offline_output_unit &manageable();
 

@@ -9,67 +9,68 @@
 
 namespace yas {
 namespace audio {
-    namespace engine {
-        class manager;
-    }
     class graph;
 
     using edit_graph_f = std::function<void(audio::graph &)>;
 
-    struct node_args {
-        uint32_t input_bus_count = 0;
-        uint32_t output_bus_count = 0;
-        std::experimental::optional<uint32_t> override_output_bus_idx;
-        bool input_renderable = false;
-    };
+    namespace engine {
+        class manager;
 
-    struct connectable_node : protocol {
-        struct impl : protocol::impl {
-            virtual void add_connection(audio::engine::connection const &) = 0;
-            virtual void remove_connection(audio::engine::connection const &) = 0;
+        struct node_args {
+            uint32_t input_bus_count = 0;
+            uint32_t output_bus_count = 0;
+            std::experimental::optional<uint32_t> override_output_bus_idx;
+            bool input_renderable = false;
         };
 
-        explicit connectable_node(std::shared_ptr<impl>);
-        connectable_node(std::nullptr_t);
+        struct connectable_node : protocol {
+            struct impl : protocol::impl {
+                virtual void add_connection(audio::engine::connection const &) = 0;
+                virtual void remove_connection(audio::engine::connection const &) = 0;
+            };
 
-        void add_connection(audio::engine::connection const &);
-        void remove_connection(audio::engine::connection const &);
-    };
+            explicit connectable_node(std::shared_ptr<impl>);
+            connectable_node(std::nullptr_t);
 
-    struct manageable_node : protocol {
-        struct impl : protocol::impl {
-            virtual audio::engine::connection input_connection(uint32_t const bus_idx) = 0;
-            virtual audio::engine::connection output_connection(uint32_t const bus_idx) = 0;
-            virtual audio::engine::connection_wmap const &input_connections() = 0;
-            virtual audio::engine::connection_wmap const &output_connections() = 0;
-            virtual void set_manager(audio::engine::manager const &) = 0;
-            virtual audio::engine::manager manager() const = 0;
-            virtual void update_kernel() = 0;
-            virtual void update_connections() = 0;
-            virtual void set_add_to_graph_handler(edit_graph_f &&) = 0;
-            virtual void set_remove_from_graph_handler(edit_graph_f &&) = 0;
-            virtual edit_graph_f const &add_to_graph_handler() const = 0;
-            virtual edit_graph_f const &remove_from_graph_handler() const = 0;
+            void add_connection(audio::engine::connection const &);
+            void remove_connection(audio::engine::connection const &);
         };
 
-        explicit manageable_node(std::shared_ptr<impl>);
-        manageable_node(std::nullptr_t);
+        struct manageable_node : protocol {
+            struct impl : protocol::impl {
+                virtual audio::engine::connection input_connection(uint32_t const bus_idx) = 0;
+                virtual audio::engine::connection output_connection(uint32_t const bus_idx) = 0;
+                virtual audio::engine::connection_wmap const &input_connections() = 0;
+                virtual audio::engine::connection_wmap const &output_connections() = 0;
+                virtual void set_manager(audio::engine::manager const &) = 0;
+                virtual audio::engine::manager manager() const = 0;
+                virtual void update_kernel() = 0;
+                virtual void update_connections() = 0;
+                virtual void set_add_to_graph_handler(edit_graph_f &&) = 0;
+                virtual void set_remove_from_graph_handler(edit_graph_f &&) = 0;
+                virtual edit_graph_f const &add_to_graph_handler() const = 0;
+                virtual edit_graph_f const &remove_from_graph_handler() const = 0;
+            };
 
-        audio::engine::connection input_connection(uint32_t const bus_idx) const;
-        audio::engine::connection output_connection(uint32_t const bus_idx) const;
-        audio::engine::connection_wmap const &input_connections() const;
-        audio::engine::connection_wmap const &output_connections() const;
+            explicit manageable_node(std::shared_ptr<impl>);
+            manageable_node(std::nullptr_t);
 
-        void set_manager(audio::engine::manager const &);
-        audio::engine::manager manager() const;
+            audio::engine::connection input_connection(uint32_t const bus_idx) const;
+            audio::engine::connection output_connection(uint32_t const bus_idx) const;
+            audio::engine::connection_wmap const &input_connections() const;
+            audio::engine::connection_wmap const &output_connections() const;
 
-        void update_kernel();
-        void update_connections();
+            void set_manager(audio::engine::manager const &);
+            audio::engine::manager manager() const;
 
-        void set_add_to_graph_handler(edit_graph_f);
-        void set_remove_from_graph_handler(edit_graph_f);
-        edit_graph_f const &add_to_graph_handler() const;
-        edit_graph_f const &remove_from_graph_handler() const;
-    };
+            void update_kernel();
+            void update_connections();
+
+            void set_add_to_graph_handler(edit_graph_f);
+            void set_remove_from_graph_handler(edit_graph_f);
+            edit_graph_f const &add_to_graph_handler() const;
+            edit_graph_f const &remove_from_graph_handler() const;
+        };
+    }
 }
 }

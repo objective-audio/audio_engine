@@ -36,7 +36,7 @@ using namespace yas;
 }
 
 - (void)test_create_null {
-    audio::node node{nullptr};
+    audio::engine::node node{nullptr};
 
     XCTAssertFalse(node);
 }
@@ -215,11 +215,11 @@ using namespace yas;
 }
 
 - (void)test_method_to_string {
-    XCTAssertEqual(to_string(audio::node::method::will_reset), "will_reset");
+    XCTAssertEqual(to_string(audio::engine::node::method::will_reset), "will_reset");
 }
 
 - (void)test_method_ostream {
-    auto const values = {audio::node::method::will_reset};
+    auto const values = {audio::engine::node::method::will_reset};
 
     for (auto const &value : values) {
         std::ostringstream stream;

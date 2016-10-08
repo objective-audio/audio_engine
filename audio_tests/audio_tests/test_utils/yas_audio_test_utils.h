@@ -32,14 +32,14 @@ namespace test {
        public:
         audio_test_node_decorator(uint32_t const input_bus_count = 2, uint32_t const output_bus_count = 1);
 
-        audio::node &node();
+        audio::engine::node &node();
     };
 
     struct connection : audio::engine::connection {
-        connection(audio::node &source_node, uint32_t const source_bus, audio::node &destination_node,
+        connection(audio::engine::node &source_node, uint32_t const source_bus, audio::engine::node &destination_node,
                    uint32_t const destination_bus, audio::format const &format);
     };
 
-    audio::node make_node();
+    audio::engine::node make_node();
 }
 }

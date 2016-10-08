@@ -34,10 +34,10 @@ struct audio::route_node::kernel : base {
 #pragma mark - impl
 
 struct audio::route_node::impl : base::impl {
-    audio::node _node = {{.input_bus_count = std::numeric_limits<uint32_t>::max(),
+    audio::engine::node _node = {{.input_bus_count = std::numeric_limits<uint32_t>::max(),
                           .output_bus_count = std::numeric_limits<uint32_t>::max()}};
     route_set_t _routes;
-    audio::node::observer_t _reset_observer;
+    audio::engine::node::observer_t _reset_observer;
 
     virtual ~impl() final = default;
 
@@ -73,7 +73,7 @@ struct audio::route_node::impl : base::impl {
             }
         });
 
-        _reset_observer = _node.subject().make_observer(audio::node::method::will_reset, [weak_node](auto const &) {
+        _reset_observer = _node.subject().make_observer(audio::engine::node::method::will_reset, [weak_node](auto const &) {
             if (auto node = weak_node.lock()) {
                 node.impl_ptr<audio::route_node::impl>()->_will_reset();
             }
@@ -124,7 +124,7 @@ struct audio::route_node::impl : base::impl {
         _node.manageable().update_kernel();
     }
 
-    audio::node &node() {
+    audio::engine::node &node() {
         return _node;
     }
 
@@ -183,10 +183,10 @@ void audio::route_node::clear_routes() {
     impl_ptr<impl>()->clear_routes();
 }
 
-audio::node const &audio::route_node::node() const {
+audio::engine::node const &audio::route_node::node() const {
     return impl_ptr<impl>()->node();
 }
 
-audio::node &audio::route_node::node() {
+audio::engine::node &audio::route_node::node() {
     return impl_ptr<impl>()->node();
 }

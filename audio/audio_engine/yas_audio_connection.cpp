@@ -94,14 +94,14 @@ uint32_t audio::engine::connection::destination_bus() const {
     return impl_ptr<impl>()->_destination_bus;
 }
 
-audio::node audio::engine::connection::source_node() const {
+audio::engine::node audio::engine::connection::source_node() const {
     if (impl_ptr()) {
         return impl_ptr<impl>()->source_node();
     }
     return node{nullptr};
 }
 
-audio::node audio::engine::connection::destination_node() const {
+audio::engine::node audio::engine::connection::destination_node() const {
     if (impl_ptr()) {
         return impl_ptr<impl>()->destination_node();
     }
@@ -112,9 +112,9 @@ audio::format const &audio::engine::connection::format() const {
     return impl_ptr<impl>()->_format;
 }
 
-audio::node_removable &audio::engine::connection::node_removable() {
+audio::engine::node_removable &audio::engine::connection::node_removable() {
     if (!_node_removable) {
-        _node_removable = audio::node_removable{impl_ptr<node_removable::impl>()};
+        _node_removable = audio::engine::node_removable{impl_ptr<node_removable::impl>()};
     }
     return _node_removable;
 }

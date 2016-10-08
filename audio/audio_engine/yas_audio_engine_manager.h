@@ -52,18 +52,18 @@ namespace audio {
 
             virtual ~manager() final;
 
-            audio::engine::connection connect(audio::node &source_node, audio::node &destination_node,
+            audio::engine::connection connect(audio::engine::node &source_node, audio::engine::node &destination_node,
                                               audio::format const &format);
-            audio::engine::connection connect(audio::node &source_node, audio::node &destination_node,
+            audio::engine::connection connect(audio::engine::node &source_node, audio::engine::node &destination_node,
                                               uint32_t const source_bus_idx, uint32_t const destination_bus_idx,
                                               audio::format const &format);
 
             void disconnect(audio::engine::connection &);
-            void disconnect(audio::node &);
-            void disconnect_input(audio::node const &);
-            void disconnect_input(audio::node const &, uint32_t const bus_idx);
-            void disconnect_output(audio::node const &);
-            void disconnect_output(audio::node const &, uint32_t const bus_idx);
+            void disconnect(audio::engine::node &);
+            void disconnect_input(audio::engine::node const &);
+            void disconnect_input(audio::engine::node const &, uint32_t const bus_idx);
+            void disconnect_output(audio::engine::node const &);
+            void disconnect_output(audio::engine::node const &, uint32_t const bus_idx);
 
             add_result_t add_offline_output_node();
             remove_result_t remove_offline_output_node();

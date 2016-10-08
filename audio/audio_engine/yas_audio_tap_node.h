@@ -23,10 +23,10 @@ namespace audio {
 
         virtual ~tap_node() final;
 
-        void set_render_handler(audio::node::render_f);
+        void set_render_handler(audio::engine::node::render_f);
 
-        audio::node const &node() const;
-        audio::node &node();
+        audio::engine::node const &node() const;
+        audio::engine::node &node();
 
         audio::engine::connection input_connection_on_render(uint32_t const bus_idx) const;
         audio::engine::connection output_connection_on_render(uint32_t const bus_idx) const;
@@ -34,7 +34,7 @@ namespace audio {
         audio::engine::connection_smap output_connections_on_render() const;
 
 #if YAS_TEST
-        void render_source(audio::node::render_args args);
+        void render_source(audio::engine::node::render_args args);
 #endif
     };
 }

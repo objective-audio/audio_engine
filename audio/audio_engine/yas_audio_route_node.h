@@ -9,7 +9,9 @@
 
 namespace yas {
 namespace audio {
-    class node;
+    namespace engine {
+        class node;
+    }
 
     class route_node : public base {
         class kernel;
@@ -29,8 +31,8 @@ namespace audio {
         void set_routes(audio::route_set_t routes);
         void clear_routes();
 
-        audio::node const &node() const;
-        audio::node &node();
+        audio::engine::node const &node() const;
+        audio::engine::node &node();
     };
 }
 }

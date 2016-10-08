@@ -12,9 +12,9 @@
 
 using namespace yas;
 
-#pragma mark - audio::node::impl
+#pragma mark - audio::engine::node::impl
 
-struct audio::node::impl : base::impl, manageable_node::impl, connectable_node::impl {
+struct audio::engine::node::impl : base::impl, manageable_node::impl, connectable_node::impl {
     weak<audio::engine::manager> _weak_manager;
     subject_t _subject;
     uint32_t _input_bus_count = 0;
@@ -26,7 +26,7 @@ struct audio::node::impl : base::impl, manageable_node::impl, connectable_node::
     edit_graph_f _add_to_graph_handler;
     edit_graph_f _remove_from_graph_handler;
     prepare_kernel_f _prepare_kernel_handler;
-    audio::node::render_f _render_handler;
+    audio::engine::node::render_f _render_handler;
 
     explicit impl(node_args &&args)
         : _input_bus_count(args.input_bus_count),
@@ -36,7 +36,7 @@ struct audio::node::impl : base::impl, manageable_node::impl, connectable_node::
     }
 
     void reset() {
-        _subject.notify(audio::node::method::will_reset, cast<audio::node>());
+        _subject.notify(audio::engine::node::method::will_reset, cast<audio::engine::node>());
 
         _input_connections.clear();
         _output_connections.clear();
@@ -146,7 +146,7 @@ struct audio::node::impl : base::impl, manageable_node::impl, connectable_node::
     }
 
     void update_connections() override {
-        _subject.notify(audio::node::method::update_connections, cast<audio::node>());
+        _subject.notify(audio::engine::node::method::update_connections, cast<audio::engine::node>());
     }
 
     void add_connection(engine::connection const &connection) override {
@@ -231,11 +231,11 @@ struct audio::node::impl : base::impl, manageable_node::impl, connectable_node::
         return _remove_from_graph_handler;
     }
 
-    audio::node::subject_t &subject() {
+    audio::engine::node::subject_t &subject() {
         return _subject;
     }
 
-    void set_render_handler(audio::node::render_f &&handler) {
+    void set_render_handler(audio::engine::node::render_f &&handler) {
         _render_handler = std::move(handler);
     }
 
@@ -286,142 +286,142 @@ struct audio::node::impl : base::impl, manageable_node::impl, connectable_node::
     core _core;
 };
 
-#pragma mark - audio::node
+#pragma mark - audio::engine::node
 
-audio::node::node(node_args args) : base(std::make_shared<impl>(std::move(args))) {
+audio::engine::node::node(node_args args) : base(std::make_shared<impl>(std::move(args))) {
 }
 
-audio::node::node(std::nullptr_t) : base(nullptr) {
+audio::engine::node::node(std::nullptr_t) : base(nullptr) {
 }
 
-audio::node::~node() = default;
+audio::engine::node::~node() = default;
 
-void audio::node::reset() {
+void audio::engine::node::reset() {
     if (!impl_ptr()) {
         std::cout << "_impl is null" << std::endl;
     }
     impl_ptr<impl>()->reset();
 }
 
-audio::engine::connection audio::node::input_connection(uint32_t const bus_idx) const {
+audio::engine::connection audio::engine::node::input_connection(uint32_t const bus_idx) const {
     return impl_ptr<impl>()->input_connection(bus_idx);
 }
 
-audio::engine::connection audio::node::output_connection(uint32_t const bus_idx) const {
+audio::engine::connection audio::engine::node::output_connection(uint32_t const bus_idx) const {
     return impl_ptr<impl>()->output_connection(bus_idx);
 }
 
-audio::engine::connection_wmap const &audio::node::input_connections() const {
+audio::engine::connection_wmap const &audio::engine::node::input_connections() const {
     return impl_ptr<impl>()->input_connections();
 }
 
-audio::engine::connection_wmap const &audio::node::output_connections() const {
+audio::engine::connection_wmap const &audio::engine::node::output_connections() const {
     return impl_ptr<impl>()->output_connections();
 }
 
-audio::format audio::node::input_format(uint32_t const bus_idx) const {
+audio::format audio::engine::node::input_format(uint32_t const bus_idx) const {
     return impl_ptr<impl>()->input_format(bus_idx);
 }
 
-audio::format audio::node::output_format(uint32_t const bus_idx) const {
+audio::format audio::engine::node::output_format(uint32_t const bus_idx) const {
     return impl_ptr<impl>()->output_format(bus_idx);
 }
 
-audio::bus_result_t audio::node::next_available_input_bus() const {
+audio::bus_result_t audio::engine::node::next_available_input_bus() const {
     return impl_ptr<impl>()->next_available_input_bus();
 }
 
-audio::bus_result_t audio::node::next_available_output_bus() const {
+audio::bus_result_t audio::engine::node::next_available_output_bus() const {
     return impl_ptr<impl>()->next_available_output_bus();
 }
 
-bool audio::node::is_available_input_bus(uint32_t const bus_idx) const {
+bool audio::engine::node::is_available_input_bus(uint32_t const bus_idx) const {
     return impl_ptr<impl>()->is_available_input_bus(bus_idx);
 }
 
-bool audio::node::is_available_output_bus(uint32_t const bus_idx) const {
+bool audio::engine::node::is_available_output_bus(uint32_t const bus_idx) const {
     return impl_ptr<impl>()->is_available_output_bus(bus_idx);
 }
 
-audio::engine::manager audio::node::manager() const {
+audio::engine::manager audio::engine::node::manager() const {
     return impl_ptr<impl>()->manager();
 }
 
-audio::time audio::node::last_render_time() const {
+audio::time audio::engine::node::last_render_time() const {
     return impl_ptr<impl>()->render_time();
 }
 
-uint32_t audio::node::input_bus_count() const {
+uint32_t audio::engine::node::input_bus_count() const {
     return impl_ptr<impl>()->input_bus_count();
 }
 
-uint32_t audio::node::output_bus_count() const {
+uint32_t audio::engine::node::output_bus_count() const {
     return impl_ptr<impl>()->output_bus_count();
 }
 
-bool audio::node::is_input_renderable() const {
+bool audio::engine::node::is_input_renderable() const {
     return impl_ptr<impl>()->is_input_renderable();
 }
 
-void audio::node::set_prepare_kernel_handler(prepare_kernel_f handler) {
+void audio::engine::node::set_prepare_kernel_handler(prepare_kernel_f handler) {
     impl_ptr<impl>()->set_prepare_kernel_handler(std::move(handler));
 }
 
-void audio::node::set_render_handler(render_f handler) {
+void audio::engine::node::set_render_handler(render_f handler) {
     impl_ptr<impl>()->set_render_handler(std::move(handler));
 }
 
-audio::kernel audio::node::kernel() const {
+audio::kernel audio::engine::node::kernel() const {
     return impl_ptr<impl>()->kernel();
 }
 
 #pragma mark render thread
 
-void audio::node::render(render_args args) {
+void audio::engine::node::render(render_args args) {
     impl_ptr<impl>()->render(std::move(args));
 }
 
-void audio::node::set_render_time_on_render(const time &time) {
+void audio::engine::node::set_render_time_on_render(const time &time) {
     impl_ptr<impl>()->set_render_time_on_render(time);
 }
 
-audio::node::subject_t &audio::node::subject() {
+audio::engine::node::subject_t &audio::engine::node::subject() {
     return impl_ptr<impl>()->subject();
 }
 
-audio::connectable_node &audio::node::connectable() {
+audio::engine::connectable_node &audio::engine::node::connectable() {
     if (!_connectable) {
-        _connectable = audio::connectable_node{impl_ptr<connectable_node::impl>()};
+        _connectable = audio::engine::connectable_node{impl_ptr<connectable_node::impl>()};
     }
     return _connectable;
 }
 
-audio::manageable_node const &audio::node::manageable() const {
+audio::engine::manageable_node const &audio::engine::node::manageable() const {
     if (!_manageable) {
-        _manageable = audio::manageable_node{impl_ptr<manageable_node::impl>()};
+        _manageable = audio::engine::manageable_node{impl_ptr<manageable_node::impl>()};
     }
     return _manageable;
 }
 
-audio::manageable_node &audio::node::manageable() {
+audio::engine::manageable_node &audio::engine::node::manageable() {
     if (!_manageable) {
-        _manageable = audio::manageable_node{impl_ptr<manageable_node::impl>()};
+        _manageable = audio::engine::manageable_node{impl_ptr<manageable_node::impl>()};
     }
     return _manageable;
 }
 
 #pragma mark -
 
-std::string yas::to_string(audio::node::method const &method) {
+std::string yas::to_string(audio::engine::node::method const &method) {
     switch (method) {
-        case audio::node::method::will_reset:
+        case audio::engine::node::method::will_reset:
             return "will_reset";
-        case audio::node::method::update_connections:
+        case audio::engine::node::method::update_connections:
             return "update_connections";
     }
 }
 
-std::ostream &operator<<(std::ostream &os, yas::audio::node::method const &value) {
+std::ostream &operator<<(std::ostream &os, yas::audio::engine::node::method const &value) {
     os << to_string(value);
     return os;
 }

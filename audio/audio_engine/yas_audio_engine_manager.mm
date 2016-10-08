@@ -26,7 +26,7 @@ namespace yas {
 namespace audio {
     class connection_for_engine : public audio::engine::connection {
        public:
-        connection_for_engine(audio::node &source_node, uint32_t const source_bus, audio::node &destination_node,
+        connection_for_engine(audio::engine::node &source_node, uint32_t const source_bus, audio::engine::node &destination_node,
                               uint32_t const destination_bus, audio::format const &format)
             : audio::engine::connection(source_node, source_bus, destination_node, destination_bus, format) {
         }
@@ -91,11 +91,11 @@ struct audio::engine::manager::impl : base::impl {
 #endif
     }
 
-    bool node_exists(audio::node const &node) {
+    bool node_exists(audio::engine::node const &node) {
         return _nodes.count(node) > 0;
     }
 
-    void attach_node(audio::node &node) {
+    void attach_node(audio::engine::node &node) {
         if (!node) {
             throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
         }
@@ -111,7 +111,7 @@ struct audio::engine::manager::impl : base::impl {
         add_node_to_graph(node);
     }
 
-    void detach_node(audio::node &node) {
+    void detach_node(audio::engine::node &node) {
         if (!node) {
             throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
         }
@@ -131,7 +131,7 @@ struct audio::engine::manager::impl : base::impl {
         _nodes.erase(node);
     }
 
-    void detach_node_if_unused(audio::node &node) {
+    void detach_node_if_unused(audio::engine::node &node) {
         auto filtered_connection = filter(_connections, [node](auto const &connection) {
             return (connection.destination_node() == node || connection.source_node() == node);
         });
@@ -171,7 +171,7 @@ struct audio::engine::manager::impl : base::impl {
         return true;
     }
 
-    audio::engine::connection connect(audio::node &source_node, audio::node &destination_node,
+    audio::engine::connection connect(audio::engine::node &source_node, audio::engine::node &destination_node,
                                       uint32_t const source_bus_idx, uint32_t const destination_bus_idx,
                                       const audio::format &format) {
         if (!source_node || !destination_node) {
@@ -223,7 +223,7 @@ struct audio::engine::manager::impl : base::impl {
         _connections.erase(connection);
     }
 
-    void disconnect(audio::node &node) {
+    void disconnect(audio::engine::node &node) {
         if (node_exists(node)) {
             detach_node(node);
         }
@@ -251,7 +251,7 @@ struct audio::engine::manager::impl : base::impl {
         }
     }
 
-    void add_node_to_graph(audio::node const &node) {
+    void add_node_to_graph(audio::engine::node const &node) {
         if (!_graph) {
             return;
         }
@@ -261,7 +261,7 @@ struct audio::engine::manager::impl : base::impl {
         }
     }
 
-    void remove_node_from_graph(audio::node const &node) {
+    void remove_node_from_graph(audio::engine::node const &node) {
         if (!_graph) {
             return;
         }
@@ -306,7 +306,7 @@ struct audio::engine::manager::impl : base::impl {
         }
     }
 
-    void update_node_connections(audio::node &node) {
+    void update_node_connections(audio::engine::node &node) {
         if (!_graph) {
             return;
         }
@@ -332,11 +332,11 @@ struct audio::engine::manager::impl : base::impl {
         return _connections;
     }
 
-    audio::engine::connection_set input_connections_for_destination_node(audio::node const &node) {
+    audio::engine::connection_set input_connections_for_destination_node(audio::engine::node const &node) {
         return filter(_connections, [&node](auto const &connection) { return connection.destination_node() == node; });
     }
 
-    audio::engine::connection_set output_connections_for_source_node(audio::node const &node) {
+    audio::engine::connection_set output_connections_for_source_node(audio::engine::node const &node) {
         return filter(_connections, [&node](auto const &connection) { return connection.source_node() == node; });
     }
 
@@ -643,7 +643,7 @@ audio::engine::manager::subject_t &audio::engine::manager::subject() const {
 
 #if YAS_TEST
 
-std::unordered_set<audio::node> &audio::engine::manager::nodes() const {
+std::unordered_set<audio::engine::node> &audio::engine::manager::nodes() const {
     return impl_ptr<impl>()->nodes();
 }
 

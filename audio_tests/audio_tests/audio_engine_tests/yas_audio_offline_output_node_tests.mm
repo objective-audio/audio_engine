@@ -56,7 +56,7 @@ using namespace yas;
     uint32_t const length = 4192;
     uint32_t tap_render_frame = 0;
 
-    auto tap_render_handler = [=](audio::node::render_args args) mutable {
+    auto tap_render_handler = [=](audio::engine::node::render_args args) mutable {
         auto &buffer = args.buffer;
         auto const &when = args.when;
 

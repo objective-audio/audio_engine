@@ -13,7 +13,10 @@
 
 namespace yas {
 namespace audio {
-    class node;
+    namespace engine {
+        class node;
+    }
+    
     class device;
 
     class device_io_node : public base {
@@ -29,8 +32,8 @@ namespace audio {
         void set_device(audio::device const &device);
         audio::device device() const;
 
-        audio::node const &node() const;
-        audio::node &node();
+        audio::engine::node const &node() const;
+        audio::engine::node &node();
 
         manageable_device_io_node &manageable();
 

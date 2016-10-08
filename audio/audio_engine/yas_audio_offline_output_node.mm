@@ -14,14 +14,14 @@ using namespace yas;
 
 struct audio::offline_output_node::impl : base::impl, manageable_offline_output_unit::impl {
     operation_queue _queue = nullptr;
-    audio::node _node = {{.input_bus_count = 1, .output_bus_count = 0}};
-    audio::node::observer_t _reset_observer;
+    audio::engine::node _node = {{.input_bus_count = 1, .output_bus_count = 0}};
+    audio::engine::node::observer_t _reset_observer;
 
     ~impl() = default;
 
     void prepare(offline_output_node const &node) {
         _reset_observer =
-            _node.subject().make_observer(audio::node::method::will_reset, [weak_node = to_weak(node)](auto const &) {
+            _node.subject().make_observer(audio::engine::node::method::will_reset, [weak_node = to_weak(node)](auto const &) {
                 if (auto node = weak_node.lock()) {
                     node.impl_ptr<audio::offline_output_node::impl>()->stop();
                 }
@@ -144,7 +144,7 @@ struct audio::offline_output_node::impl : base::impl, manageable_offline_output_
         return _queue != nullptr;
     }
 
-    audio::node &node() {
+    audio::engine::node &node() {
         return _node;
     }
 
@@ -206,10 +206,10 @@ bool audio::offline_output_node::is_running() const {
     return impl_ptr<impl>()->is_running();
 }
 
-audio::node const &audio::offline_output_node::node() const {
+audio::engine::node const &audio::offline_output_node::node() const {
     return impl_ptr<impl>()->node();
 }
-audio::node &audio::offline_output_node::node() {
+audio::engine::node &audio::offline_output_node::node() {
     return impl_ptr<impl>()->node();
 }
 

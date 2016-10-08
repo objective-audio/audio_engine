@@ -19,8 +19,8 @@ using namespace yas;
 #pragma mark - audio::device_io_node::impl
 
 struct yas::audio::device_io_node::impl : base::impl, manageable_device_io_node::impl {
-    audio::node _node = {{.input_bus_count = 1, .output_bus_count = 1}};
-    audio::node::observer_t _connections_observer;
+    audio::engine::node _node = {{.input_bus_count = 1, .output_bus_count = 1}};
+    audio::engine::node::observer_t _connections_observer;
 
     virtual ~impl() final = default;
 
@@ -43,7 +43,7 @@ struct yas::audio::device_io_node::impl : base::impl, manageable_device_io_node:
         });
 
         _connections_observer =
-            _node.subject().make_observer(audio::node::method::update_connections, [weak_node](auto const &) {
+            _node.subject().make_observer(audio::engine::node::method::update_connections, [weak_node](auto const &) {
                 if (auto device_io_node = weak_node.lock()) {
                     device_io_node.impl_ptr<impl>()->_update_device_io_connections();
                 }
@@ -205,11 +205,11 @@ audio::device audio::device_io_node::device() const {
     return impl_ptr<impl>()->device();
 }
 
-audio::node const &audio::device_io_node::node() const {
+audio::engine::node const &audio::device_io_node::node() const {
     return impl_ptr<impl>()->_node;
 }
 
-audio::node &audio::device_io_node::node() {
+audio::engine::node &audio::device_io_node::node() {
     return impl_ptr<impl>()->_node;
 }
 

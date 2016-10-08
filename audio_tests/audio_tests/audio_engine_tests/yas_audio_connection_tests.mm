@@ -91,7 +91,7 @@ using namespace yas;
     uint32_t const source_bus = 0;
     uint32_t const destination_bus = 1;
 
-    audio::node null_node(nullptr);
+    audio::engine::node null_node(nullptr);
     XCTAssertThrows(test::connection(null_node, source_bus, destination_decor.node(), destination_bus, format));
     XCTAssertThrows(test::connection(source_decor.node(), source_bus, null_node, destination_bus, format));
 }

@@ -16,7 +16,7 @@ using namespace yas;
 #pragma mark - core
 
 struct audio::unit_node::impl : base::impl, manageable_unit_node::impl {
-    explicit impl(node_args &&args) : _node(std::move(args)) {
+    explicit impl(engine::node_args &&args) : _node(std::move(args)) {
     }
 
     ~impl() = default;
@@ -60,14 +60,14 @@ struct audio::unit_node::impl : base::impl, manageable_unit_node::impl {
             }
         });
 
-        _reset_observer = _node.subject().make_observer(audio::node::method::will_reset, [weak_node](auto const &) {
+        _reset_observer = _node.subject().make_observer(audio::engine::node::method::will_reset, [weak_node](auto const &) {
             if (auto node = weak_node.lock()) {
                 node.impl_ptr<audio::unit_node::impl>()->will_reset();
             }
         });
 
         _connections_observer =
-            _node.subject().make_observer(audio::node::method::update_connections, [weak_node](auto const &) {
+            _node.subject().make_observer(audio::engine::node::method::update_connections, [weak_node](auto const &) {
                 if (auto node = weak_node.lock()) {
                     node.impl_ptr<audio::unit_node::impl>()->update_unit_connections();
                 }
@@ -254,12 +254,12 @@ struct audio::unit_node::impl : base::impl, manageable_unit_node::impl {
         _core.set_au(unit(_acd));
     }
 
-    audio::node _node;
+    audio::engine::node _node;
     AudioComponentDescription _acd;
     std::unordered_map<AudioUnitScope, unit::parameter_map_t> _parameters;
     audio::unit_node::subject_t _subject;
-    audio::node::observer_t _reset_observer;
-    audio::node::observer_t _connections_observer;
+    audio::engine::node::observer_t _reset_observer;
+    audio::engine::node::observer_t _connections_observer;
     prepare_au_f _prepare_au_handler;
 
    private:
@@ -395,11 +395,11 @@ audio::unit_node::subject_t &audio::unit_node::subject() {
     return impl_ptr<impl>()->_subject;
 }
 
-audio::node const &audio::unit_node::node() const {
+audio::engine::node const &audio::unit_node::node() const {
     return impl_ptr<impl>()->_node;
 }
 
-audio::node &audio::unit_node::node() {
+audio::engine::node &audio::unit_node::node() {
     return impl_ptr<impl>()->_node;
 }
 

@@ -42,7 +42,7 @@ struct yas::audio::unit_io_node::impl : base::impl {
     impl(args &&args)
         : _unit_node(
               {.acd = audio_unit_io_node_acd,
-               .node_args = audio::node_args{.input_bus_count = static_cast<uint32_t>(args.enable_input ? 1 : 0),
+               .node_args = audio::engine::node_args{.input_bus_count = static_cast<uint32_t>(args.enable_input ? 1 : 0),
                                              .output_bus_count = static_cast<uint32_t>(args.enable_output ? 1 : 0),
                                              .override_output_bus_idx = 1}}) {
         _unit_node.set_prepare_audio_unit_handler([args = std::move(args)](audio::unit & unit) {

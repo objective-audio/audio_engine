@@ -14,7 +14,10 @@
 namespace yas {
 namespace audio {
     class graph;
-    class node;
+    
+    namespace engine {
+        class node;
+    }
 
     class unit_node : public base {
        public:
@@ -30,7 +33,7 @@ namespace audio {
         using prepare_au_f = std::function<void(audio::unit &)>;
 
         struct args {
-            audio::node_args node_args;
+            audio::engine::node_args node_args;
             AudioComponentDescription acd;
         };
 
@@ -64,8 +67,8 @@ namespace audio {
 
         subject_t &subject();
 
-        audio::node const &node() const;
-        audio::node &node();
+        audio::engine::node const &node() const;
+        audio::engine::node &node();
 
         manageable_unit_node &manageable();
 
