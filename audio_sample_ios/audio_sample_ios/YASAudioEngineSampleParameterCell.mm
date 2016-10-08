@@ -33,6 +33,8 @@ using namespace yas;
 }
 
 - (void)awakeFromNib {
+    [super awakeFromNib];
+    
     [self reset];
 }
 
