@@ -118,8 +118,8 @@ audio::tap_node::tap_node() : tap_node({.is_input = false}) {
 }
 
 audio::tap_node::tap_node(args args)
-    : base(std::make_unique<impl>(std::move(args.is_input ? node_args{.input_bus_count = 1, .input_renderable = true} :
-                                                            node_args{.input_bus_count = 1, .output_bus_count = 1}))) {
+: base(std::make_unique<impl>(args.is_input ? node_args{.input_bus_count = 1, .input_renderable = true} :
+                              node_args{.input_bus_count = 1, .output_bus_count = 1})) {
     impl_ptr<impl>()->prepare(*this);
 }
 
