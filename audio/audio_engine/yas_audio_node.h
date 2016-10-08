@@ -53,10 +53,10 @@ namespace audio {
 
         void reset();
 
-        audio::connection input_connection(uint32_t const bus_idx) const;
-        audio::connection output_connection(uint32_t const bus_idx) const;
-        audio::connection_wmap const &input_connections() const;
-        audio::connection_wmap const &output_connections() const;
+        audio::engine::connection input_connection(uint32_t const bus_idx) const;
+        audio::engine::connection output_connection(uint32_t const bus_idx) const;
+        audio::engine::connection_wmap const &input_connections() const;
+        audio::engine::connection_wmap const &output_connections() const;
 
         audio::format input_format(uint32_t const bus_idx) const;
         audio::format output_format(uint32_t const bus_idx) const;

@@ -184,7 +184,7 @@ audio::node &test::audio_test_node_decorator::node() {
 
 test::connection::connection(audio::node &source_node, uint32_t const source_bus, audio::node &destination_node,
                              uint32_t const destination_bus, audio::format const &format)
-    : audio::connection(source_node, source_bus, destination_node, destination_bus, format) {
+    : audio::engine::connection(source_node, source_bus, destination_node, destination_bus, format) {
 }
 
 audio::node test::make_node() {

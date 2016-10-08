@@ -10,11 +10,13 @@
 
 namespace yas {
 namespace audio {
-    class connection;
-
-    using connection_set = std::unordered_set<connection>;
-    using connection_smap = std::map<uint32_t, connection>;
-    using connection_wmap = std::map<uint32_t, weak<connection>>;
+    namespace engine {
+        class connection;
+        
+        using connection_set = std::unordered_set<connection>;
+        using connection_smap = std::map<uint32_t, connection>;
+        using connection_wmap = std::map<uint32_t, weak<connection>>;
+    }
 
     struct node_removable : protocol {
         struct impl : protocol::impl {

@@ -35,7 +35,7 @@ namespace test {
         audio::node &node();
     };
 
-    struct connection : audio::connection {
+    struct connection : audio::engine::connection {
         connection(audio::node &source_node, uint32_t const source_bus, audio::node &destination_node,
                    uint32_t const destination_bus, audio::format const &format);
     };

@@ -82,19 +82,19 @@ struct audio::tap_node::impl : base::impl {
         _node.manageable().update_kernel();
     }
 
-    audio::connection input_connection_on_render(uint32_t const bus_idx) {
+    audio::engine::connection input_connection_on_render(uint32_t const bus_idx) {
         return _kernel_on_render.input_connection(bus_idx);
     }
 
-    audio::connection output_connection_on_render(uint32_t const bus_idx) {
+    audio::engine::connection output_connection_on_render(uint32_t const bus_idx) {
         return _kernel_on_render.output_connection(bus_idx);
     }
 
-    audio::connection_smap input_connections_on_render() {
+    audio::engine::connection_smap input_connections_on_render() {
         return _kernel_on_render.input_connections();
     }
 
-    audio::connection_smap output_connections_on_render() {
+    audio::engine::connection_smap output_connections_on_render() {
         return _kernel_on_render.output_connections();
     }
 
@@ -140,19 +140,19 @@ audio::node &audio::tap_node::node() {
     return impl_ptr<impl>()->_node;
 }
 
-audio::connection audio::tap_node::input_connection_on_render(uint32_t const bus_idx) const {
+audio::engine::connection audio::tap_node::input_connection_on_render(uint32_t const bus_idx) const {
     return impl_ptr<impl>()->input_connection_on_render(bus_idx);
 }
 
-audio::connection audio::tap_node::output_connection_on_render(uint32_t const bus_idx) const {
+audio::engine::connection audio::tap_node::output_connection_on_render(uint32_t const bus_idx) const {
     return impl_ptr<impl>()->output_connection_on_render(bus_idx);
 }
 
-audio::connection_smap audio::tap_node::input_connections_on_render() const {
+audio::engine::connection_smap audio::tap_node::input_connections_on_render() const {
     return impl_ptr<impl>()->input_connections_on_render();
 }
 
-audio::connection_smap audio::tap_node::output_connections_on_render() const {
+audio::engine::connection_smap audio::tap_node::output_connections_on_render() const {
     return impl_ptr<impl>()->output_connections_on_render();
 }
 

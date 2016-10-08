@@ -29,7 +29,7 @@ namespace sample {
     struct effects_vc_internal {
         audio::engine::manager manager;
         audio::unit_output_node output_node;
-        audio::connection through_connection = nullptr;
+        audio::engine::connection through_connection = nullptr;
         audio::tap_node tap_node;
         audio::unit_node effect_node = nullptr;
 

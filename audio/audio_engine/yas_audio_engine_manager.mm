@@ -24,11 +24,11 @@ using namespace yas;
 
 namespace yas {
 namespace audio {
-    class connection_for_engine : public audio::connection {
+    class connection_for_engine : public audio::engine::connection {
        public:
         connection_for_engine(audio::node &source_node, uint32_t const source_bus, audio::node &destination_node,
                               uint32_t const destination_bus, audio::format const &format)
-            : audio::connection(source_node, source_bus, destination_node, destination_bus, format) {
+            : audio::engine::connection(source_node, source_bus, destination_node, destination_bus, format) {
         }
     };
 }
@@ -171,8 +171,9 @@ struct audio::engine::manager::impl : base::impl {
         return true;
     }
 
-    audio::connection connect(audio::node &source_node, audio::node &destination_node, uint32_t const source_bus_idx,
-                              uint32_t const destination_bus_idx, const audio::format &format) {
+    audio::engine::connection connect(audio::node &source_node, audio::node &destination_node,
+                                      uint32_t const source_bus_idx, uint32_t const destination_bus_idx,
+                                      const audio::format &format) {
         if (!source_node || !destination_node) {
             throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
         }
@@ -208,7 +209,7 @@ struct audio::engine::manager::impl : base::impl {
         return connection;
     }
 
-    void disconnect(audio::connection &connection) {
+    void disconnect(audio::engine::connection &connection) {
         std::vector<node> update_nodes{connection.source_node(), connection.destination_node()};
 
         remove_connection_from_nodes(connection);
@@ -270,7 +271,7 @@ struct audio::engine::manager::impl : base::impl {
         }
     }
 
-    bool add_connection(audio::connection const &connection) {
+    bool add_connection(audio::engine::connection const &connection) {
         if (!connection) {
             throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
             return false;
@@ -290,7 +291,7 @@ struct audio::engine::manager::impl : base::impl {
         return true;
     }
 
-    void remove_connection_from_nodes(audio::connection const &connection) {
+    void remove_connection_from_nodes(audio::engine::connection const &connection) {
         if (!connection) {
             throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
             return;
@@ -327,15 +328,15 @@ struct audio::engine::manager::impl : base::impl {
         return _nodes;
     }
 
-    audio::connection_set &connections() {
+    audio::engine::connection_set &connections() {
         return _connections;
     }
 
-    audio::connection_set input_connections_for_destination_node(audio::node const &node) {
+    audio::engine::connection_set input_connections_for_destination_node(audio::node const &node) {
         return filter(_connections, [&node](auto const &connection) { return connection.destination_node() == node; });
     }
 
-    audio::connection_set output_connections_for_source_node(audio::node const &node) {
+    audio::engine::connection_set output_connections_for_source_node(audio::node const &node) {
         return filter(_connections, [&node](auto const &connection) { return connection.source_node() == node; });
     }
 
@@ -437,7 +438,7 @@ struct audio::engine::manager::impl : base::impl {
     }
 
     audio::engine::manager::start_result_t start_offline_render(offline_render_f &&render_handler,
-                                                       offline_completion_f &&completion_handler) {
+                                                                offline_completion_f &&completion_handler) {
         if (auto const graph = _graph) {
             if (graph.is_running()) {
                 return start_result_t(start_error_t::already_running);
@@ -494,7 +495,7 @@ struct audio::engine::manager::impl : base::impl {
 
     audio::graph _graph = nullptr;
     std::unordered_set<node> _nodes;
-    audio::connection_set _connections;
+    audio::engine::connection_set _connections;
     audio::offline_output_node _offline_output_node = nullptr;
 };
 
@@ -509,7 +510,8 @@ audio::engine::manager::manager(std::nullptr_t) : base(nullptr) {
 
 audio::engine::manager::~manager() = default;
 
-audio::connection audio::engine::manager::connect(node &source_node, node &destination_node, audio::format const &format) {
+audio::engine::connection audio::engine::manager::connect(node &source_node, node &destination_node,
+                                                          audio::format const &format) {
     if (!source_node || !destination_node) {
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
     }
@@ -524,8 +526,9 @@ audio::connection audio::engine::manager::connect(node &source_node, node &desti
     return connect(source_node, destination_node, *source_bus_result, *destination_bus_result, format);
 }
 
-audio::connection audio::engine::manager::connect(node &source_node, node &destination_node, uint32_t const src_bus_idx,
-                                         uint32_t const dst_bus_idx, audio::format const &format) {
+audio::engine::connection audio::engine::manager::connect(node &source_node, node &destination_node,
+                                                          uint32_t const src_bus_idx, uint32_t const dst_bus_idx,
+                                                          audio::format const &format) {
     return impl_ptr<impl>()->connect(source_node, destination_node, src_bus_idx, dst_bus_idx, format);
 }
 
@@ -625,8 +628,8 @@ audio::engine::manager::start_result_t audio::engine::manager::start_render() {
     return impl_ptr<impl>()->start_render();
 }
 
-audio::engine::manager::start_result_t audio::engine::manager::start_offline_render(offline_render_f render_handler,
-                                                                  offline_completion_f completion_handler) {
+audio::engine::manager::start_result_t audio::engine::manager::start_offline_render(
+    offline_render_f render_handler, offline_completion_f completion_handler) {
     return impl_ptr<impl>()->start_offline_render(std::move(render_handler), std::move(completion_handler));
 }
 
@@ -644,7 +647,7 @@ std::unordered_set<audio::node> &audio::engine::manager::nodes() const {
     return impl_ptr<impl>()->nodes();
 }
 
-audio::connection_set &audio::engine::manager::connections() const {
+audio::engine::connection_set &audio::engine::manager::connections() const {
     return impl_ptr<impl>()->connections();
 }
 

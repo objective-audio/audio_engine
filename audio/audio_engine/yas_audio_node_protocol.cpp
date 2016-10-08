@@ -15,11 +15,11 @@ audio::connectable_node::connectable_node(std::shared_ptr<impl> impl) : protocol
 audio::connectable_node::connectable_node(std::nullptr_t) : protocol(nullptr) {
 }
 
-void audio::connectable_node::add_connection(audio::connection const &connection) {
+void audio::connectable_node::add_connection(audio::engine::connection const &connection) {
     impl_ptr<impl>()->add_connection(connection);
 }
 
-void audio::connectable_node::remove_connection(audio::connection const &connection) {
+void audio::connectable_node::remove_connection(audio::engine::connection const &connection) {
     impl_ptr<impl>()->remove_connection(connection);
 }
 
@@ -31,19 +31,19 @@ audio::manageable_node::manageable_node(std::shared_ptr<impl> impl) : protocol(s
 audio::manageable_node::manageable_node(std::nullptr_t) : protocol(nullptr) {
 }
 
-audio::connection audio::manageable_node::input_connection(uint32_t const bus_idx) const {
+audio::engine::connection audio::manageable_node::input_connection(uint32_t const bus_idx) const {
     return impl_ptr<impl>()->input_connection(bus_idx);
 }
 
-audio::connection audio::manageable_node::output_connection(uint32_t const bus_idx) const {
+audio::engine::connection audio::manageable_node::output_connection(uint32_t const bus_idx) const {
     return impl_ptr<impl>()->output_connection(bus_idx);
 }
 
-audio::connection_wmap const &audio::manageable_node::input_connections() const {
+audio::engine::connection_wmap const &audio::manageable_node::input_connections() const {
     return impl_ptr<impl>()->input_connections();
 }
 
-audio::connection_wmap const &audio::manageable_node::output_connections() const {
+audio::engine::connection_wmap const &audio::manageable_node::output_connections() const {
     return impl_ptr<impl>()->output_connections();
 }
 

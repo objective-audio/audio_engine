@@ -21,8 +21,8 @@ struct audio::node::impl : base::impl, manageable_node::impl, connectable_node::
     uint32_t _output_bus_count = 0;
     bool _is_input_renderable = false;
     std::experimental::optional<uint32_t> _override_output_bus_idx = nullopt;
-    audio::connection_wmap _input_connections;
-    audio::connection_wmap _output_connections;
+    audio::engine::connection_wmap _input_connections;
+    audio::engine::connection_wmap _output_connections;
     edit_graph_f _add_to_graph_handler;
     edit_graph_f _remove_from_graph_handler;
     prepare_kernel_f _prepare_kernel_handler;
@@ -123,25 +123,25 @@ struct audio::node::impl : base::impl, manageable_node::impl, connectable_node::
         return _is_input_renderable;
     }
 
-    audio::connection input_connection(uint32_t const bus_idx) override {
+    audio::engine::connection input_connection(uint32_t const bus_idx) override {
         if (_input_connections.count(bus_idx) > 0) {
             return _input_connections.at(bus_idx).lock();
         }
         return nullptr;
     }
 
-    audio::connection output_connection(uint32_t const bus_idx) override {
+    audio::engine::connection output_connection(uint32_t const bus_idx) override {
         if (_output_connections.count(bus_idx) > 0) {
             return _output_connections.at(bus_idx).lock();
         }
         return nullptr;
     }
 
-    audio::connection_wmap &input_connections() override {
+    audio::engine::connection_wmap &input_connections() override {
         return _input_connections;
     }
 
-    audio::connection_wmap &output_connections() override {
+    audio::engine::connection_wmap &output_connections() override {
         return _output_connections;
     }
 
@@ -149,13 +149,13 @@ struct audio::node::impl : base::impl, manageable_node::impl, connectable_node::
         _subject.notify(audio::node::method::update_connections, cast<audio::node>());
     }
 
-    void add_connection(connection const &connection) override {
+    void add_connection(engine::connection const &connection) override {
         if (connection.destination_node().impl_ptr<impl>().get() == this) {
             auto bus_idx = connection.destination_bus();
-            _input_connections.insert(std::make_pair(bus_idx, weak<audio::connection>(connection)));
+            _input_connections.insert(std::make_pair(bus_idx, weak<audio::engine::connection>(connection)));
         } else if (connection.source_node().impl_ptr<impl>().get() == this) {
             auto bus_idx = connection.source_bus();
-            _output_connections.insert(std::make_pair(bus_idx, weak<audio::connection>(connection)));
+            _output_connections.insert(std::make_pair(bus_idx, weak<audio::engine::connection>(connection)));
         } else {
             throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : connection does not exist in a node.");
         }
@@ -163,7 +163,7 @@ struct audio::node::impl : base::impl, manageable_node::impl, connectable_node::
         update_kernel();
     }
 
-    void remove_connection(connection const &connection) override {
+    void remove_connection(engine::connection const &connection) override {
         if (auto destination_node = connection.destination_node()) {
             if (connection.destination_node().impl_ptr<impl>().get() == this) {
                 _input_connections.erase(connection.destination_bus());
@@ -303,19 +303,19 @@ void audio::node::reset() {
     impl_ptr<impl>()->reset();
 }
 
-audio::connection audio::node::input_connection(uint32_t const bus_idx) const {
+audio::engine::connection audio::node::input_connection(uint32_t const bus_idx) const {
     return impl_ptr<impl>()->input_connection(bus_idx);
 }
 
-audio::connection audio::node::output_connection(uint32_t const bus_idx) const {
+audio::engine::connection audio::node::output_connection(uint32_t const bus_idx) const {
     return impl_ptr<impl>()->output_connection(bus_idx);
 }
 
-audio::connection_wmap const &audio::node::input_connections() const {
+audio::engine::connection_wmap const &audio::node::input_connections() const {
     return impl_ptr<impl>()->input_connections();
 }
 
-audio::connection_wmap const &audio::node::output_connections() const {
+audio::engine::connection_wmap const &audio::node::output_connections() const {
     return impl_ptr<impl>()->output_connections();
 }
 

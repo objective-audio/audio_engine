@@ -14,10 +14,10 @@ audio::manageable_kernel::manageable_kernel(std::shared_ptr<impl> &&impl) : prot
 audio::manageable_kernel::manageable_kernel(std::nullptr_t) : protocol(nullptr) {
 }
 
-void audio::manageable_kernel::set_input_connections(audio::connection_wmap connections) {
+void audio::manageable_kernel::set_input_connections(audio::engine::connection_wmap connections) {
     impl_ptr<impl>()->set_input_connections(std::move(connections));
 }
 
-void audio::manageable_kernel::set_output_connections(audio::connection_wmap connections) {
+void audio::manageable_kernel::set_output_connections(audio::engine::connection_wmap connections) {
     impl_ptr<impl>()->set_output_connections(std::move(connections));
 }

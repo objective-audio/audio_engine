@@ -157,7 +157,7 @@ using namespace yas;
 
     auto output_connection = test::connection(relay_decor.node(), 0, output_decor.node(), 0, output_format);
 
-    std::vector<audio::connection> input_connections;
+    std::vector<audio::engine::connection> input_connections;
     input_connections.reserve(relay_decor.node().input_bus_count());
 
     for (uint32_t i = 0; i < relay_decor.node().input_bus_count(); ++i) {

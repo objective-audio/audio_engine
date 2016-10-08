@@ -52,13 +52,13 @@ namespace audio {
 
             virtual ~manager() final;
 
-            audio::connection connect(audio::node &source_node, audio::node &destination_node,
-                                      audio::format const &format);
-            audio::connection connect(audio::node &source_node, audio::node &destination_node,
-                                      uint32_t const source_bus_idx, uint32_t const destination_bus_idx,
-                                      audio::format const &format);
+            audio::engine::connection connect(audio::node &source_node, audio::node &destination_node,
+                                              audio::format const &format);
+            audio::engine::connection connect(audio::node &source_node, audio::node &destination_node,
+                                              uint32_t const source_bus_idx, uint32_t const destination_bus_idx,
+                                              audio::format const &format);
 
-            void disconnect(audio::connection &);
+            void disconnect(audio::engine::connection &);
             void disconnect(audio::node &);
             void disconnect_input(audio::node const &);
             void disconnect_input(audio::node const &, uint32_t const bus_idx);
@@ -69,29 +69,29 @@ namespace audio {
             remove_result_t remove_offline_output_node();
             audio::offline_output_node const &offline_output_node() const;
             audio::offline_output_node &offline_output_node();
-        
+
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
-        add_result_t add_device_io_node();
-        remove_result_t remove_device_io_node();
-        audio::device_io_node const &device_io_node() const;
-        audio::device_io_node &device_io_node();
+            add_result_t add_device_io_node();
+            remove_result_t remove_device_io_node();
+            audio::device_io_node const &device_io_node() const;
+            audio::device_io_node &device_io_node();
 #endif
-        
-        start_result_t start_render();
-        start_result_t start_offline_render(offline_render_f, offline_completion_f);
-        void stop();
-        
-        subject_t &subject() const;
-        
+
+            start_result_t start_render();
+            start_result_t start_offline_render(offline_render_f, offline_completion_f);
+            void stop();
+
+            subject_t &subject() const;
+
 #if YAS_TEST
-        std::unordered_set<node> &nodes() const;
-        audio::connection_set &connections() const;
+            std::unordered_set<node> &nodes() const;
+            audio::engine::connection_set &connections() const;
 #endif
-    };
-}
+        };
+    }
 }
 
-    std::string to_string(audio::engine::manager::method const &);
+std::string to_string(audio::engine::manager::method const &);
 std::string to_string(audio::engine::manager::start_error_t const &);
 }
 

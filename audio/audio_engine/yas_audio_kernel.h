@@ -15,10 +15,10 @@ namespace audio {
 
         virtual ~kernel() final;
 
-        audio::connection_smap input_connections() const;
-        audio::connection_smap output_connections() const;
-        audio::connection input_connection(uint32_t const bus_idx) const;
-        audio::connection output_connection(uint32_t const bus_idx) const;
+        audio::engine::connection_smap input_connections() const;
+        audio::engine::connection_smap output_connections() const;
+        audio::engine::connection input_connection(uint32_t const bus_idx) const;
+        audio::engine::connection output_connection(uint32_t const bus_idx) const;
 
         void set_decorator(base);
         base const &decorator() const;

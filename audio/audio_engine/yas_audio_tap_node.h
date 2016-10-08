@@ -28,10 +28,10 @@ namespace audio {
         audio::node const &node() const;
         audio::node &node();
 
-        audio::connection input_connection_on_render(uint32_t const bus_idx) const;
-        audio::connection output_connection_on_render(uint32_t const bus_idx) const;
-        audio::connection_smap input_connections_on_render() const;
-        audio::connection_smap output_connections_on_render() const;
+        audio::engine::connection input_connection_on_render(uint32_t const bus_idx) const;
+        audio::engine::connection output_connection_on_render(uint32_t const bus_idx) const;
+        audio::engine::connection_smap input_connections_on_render() const;
+        audio::engine::connection_smap output_connections_on_render() const;
 
 #if YAS_TEST
         void render_source(audio::node::render_args args);

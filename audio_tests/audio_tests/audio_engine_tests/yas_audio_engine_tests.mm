@@ -30,7 +30,7 @@ using namespace yas;
     XCTAssertEqual(manager.nodes().size(), 0);
     XCTAssertEqual(manager.connections().size(), 0);
 
-    audio::connection connection = nullptr;
+    audio::engine::connection connection = nullptr;
     XCTAssertNoThrow(connection = manager.connect(source_decor.node(), destination_decor.node(), format));
     XCTAssertTrue(connection);
 
@@ -49,7 +49,7 @@ using namespace yas;
     test::audio_test_node_decorator source_decor(0, 0);
     test::audio_test_node_decorator destination_decor(0, 0);
 
-    audio::connection connection = nullptr;
+    audio::engine::connection connection = nullptr;
     XCTAssertThrows(connection = manager.connect(source_decor.node(), destination_decor.node(), format));
     XCTAssertFalse(connection);
     XCTAssertEqual(manager.connections().size(), 0);

@@ -25,23 +25,23 @@ namespace audio {
 
     struct connectable_node : protocol {
         struct impl : protocol::impl {
-            virtual void add_connection(audio::connection const &) = 0;
-            virtual void remove_connection(audio::connection const &) = 0;
+            virtual void add_connection(audio::engine::connection const &) = 0;
+            virtual void remove_connection(audio::engine::connection const &) = 0;
         };
 
         explicit connectable_node(std::shared_ptr<impl>);
         connectable_node(std::nullptr_t);
 
-        void add_connection(audio::connection const &);
-        void remove_connection(audio::connection const &);
+        void add_connection(audio::engine::connection const &);
+        void remove_connection(audio::engine::connection const &);
     };
 
     struct manageable_node : protocol {
         struct impl : protocol::impl {
-            virtual audio::connection input_connection(uint32_t const bus_idx) = 0;
-            virtual audio::connection output_connection(uint32_t const bus_idx) = 0;
-            virtual audio::connection_wmap const &input_connections() = 0;
-            virtual audio::connection_wmap const &output_connections() = 0;
+            virtual audio::engine::connection input_connection(uint32_t const bus_idx) = 0;
+            virtual audio::engine::connection output_connection(uint32_t const bus_idx) = 0;
+            virtual audio::engine::connection_wmap const &input_connections() = 0;
+            virtual audio::engine::connection_wmap const &output_connections() = 0;
             virtual void set_manager(audio::engine::manager const &) = 0;
             virtual audio::engine::manager manager() const = 0;
             virtual void update_kernel() = 0;
@@ -55,10 +55,10 @@ namespace audio {
         explicit manageable_node(std::shared_ptr<impl>);
         manageable_node(std::nullptr_t);
 
-        audio::connection input_connection(uint32_t const bus_idx) const;
-        audio::connection output_connection(uint32_t const bus_idx) const;
-        audio::connection_wmap const &input_connections() const;
-        audio::connection_wmap const &output_connections() const;
+        audio::engine::connection input_connection(uint32_t const bus_idx) const;
+        audio::engine::connection output_connection(uint32_t const bus_idx) const;
+        audio::engine::connection_wmap const &input_connections() const;
+        audio::engine::connection_wmap const &output_connections() const;
 
         void set_manager(audio::engine::manager const &);
         audio::engine::manager manager() const;

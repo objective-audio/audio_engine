@@ -43,7 +43,7 @@ using namespace yas;
 }
 
 - (void)test_create_null {
-    audio::connection connection{nullptr};
+    audio::engine::connection connection{nullptr};
 
     XCTAssertFalse(connection);
 }
@@ -97,7 +97,7 @@ using namespace yas;
 }
 
 - (void)test_empty_connection {
-    audio::connection connection(nullptr);
+    audio::engine::connection connection(nullptr);
 
     XCTAssertFalse(connection.source_node());
     XCTAssertFalse(connection.destination_node());
