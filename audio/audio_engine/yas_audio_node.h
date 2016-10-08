@@ -19,8 +19,10 @@ template <typename T, typename U>
 class result;
 
 namespace audio {
+    namespace engine {
+        class manager;
+    }
     class time;
-    class engine;
     class kernel;
 
     class node : public base {
@@ -62,7 +64,7 @@ namespace audio {
         bus_result_t next_available_output_bus() const;
         bool is_available_input_bus(uint32_t const bus_idx) const;
         bool is_available_output_bus(uint32_t const bus_idx) const;
-        audio::engine engine() const;
+        audio::engine::manager manager() const;
         audio::time last_render_time() const;
 
         uint32_t input_bus_count() const;

@@ -33,7 +33,7 @@ typedef NS_ENUM(NSUInteger, YASAudioEngineRouteSampleSourceIndex) {
 namespace yas {
 namespace sample {
     struct route_vc_internal {
-        audio::engine engine;
+        audio::engine::manager manager;
         audio::unit_io_node io_node;
         audio::unit_mixer_node mixer_node;
         audio::route_node route_node;
@@ -42,10 +42,10 @@ namespace sample {
         base engine_observer = nullptr;
 
         void disconnectNodes() {
-            engine.disconnect(mixer_node.unit_node().node());
-            engine.disconnect(route_node.node());
-            engine.disconnect(sine_node.node());
-            engine.disconnect(io_node.unit_node().node());
+            manager.disconnect(mixer_node.unit_node().node());
+            manager.disconnect(route_node.node());
+            manager.disconnect(sine_node.node());
+            manager.disconnect(io_node.unit_node().node());
         }
 
         void connect_nodes() {
@@ -53,11 +53,11 @@ namespace sample {
 
             auto const format = audio::format({.sample_rate = sample_rate, .channel_count = 2});
 
-            engine.connect(mixer_node.unit_node().node(), io_node.unit_node().node(), format);
-            engine.connect(route_node.node(), mixer_node.unit_node().node(), format);
-            engine.connect(sine_node.node(), route_node.node(), 0, YASAudioEngineRouteSampleSourceIndexSine, format);
-            engine.connect(io_node.unit_node().node(), route_node.node(), 1, YASAudioEngineRouteSampleSourceIndexInput,
-                           format);
+            manager.connect(mixer_node.unit_node().node(), io_node.unit_node().node(), format);
+            manager.connect(route_node.node(), mixer_node.unit_node().node(), format);
+            manager.connect(sine_node.node(), route_node.node(), 0, YASAudioEngineRouteSampleSourceIndexSine, format);
+            manager.connect(io_node.unit_node().node(), route_node.node(), 1, YASAudioEngineRouteSampleSourceIndexInput,
+                            format);
         }
     };
 }
@@ -86,7 +86,7 @@ namespace sample {
         if ([[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayAndRecord error:&error]) {
             [self setupEngine];
 
-            auto const start_result = _internal.engine.start_render();
+            auto const start_result = _internal.manager.start_render();
             if (start_result) {
                 [self.tableView reloadData];
                 [self _updateSlider];
@@ -109,8 +109,8 @@ namespace sample {
     [super viewWillDisappear:animated];
 
     if (self.isMovingFromParentViewController) {
-        if (_internal.engine) {
-            _internal.engine.stop();
+        if (_internal.manager) {
+            _internal.manager.stop();
         }
 
         [[AVAudioSession sharedInstance] setActive:NO error:nil];
@@ -162,7 +162,7 @@ namespace sample {
 #pragma mark - Table view data source
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    if (!_internal.engine) {
+    if (!_internal.manager) {
         return 0;
     }
 
@@ -170,7 +170,7 @@ namespace sample {
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    if (!_internal.engine) {
+    if (!_internal.manager) {
         return 0;
     }
 
@@ -259,8 +259,8 @@ namespace sample {
     auto unowned_self = make_objc_ptr([[YASUnownedObject alloc] init]);
     [unowned_self.object() setObject:self];
 
-    _internal.engine_observer = _internal.engine.subject().make_observer(
-        audio::engine::method::configuration_change, [unowned_self](auto const &context) {
+    _internal.engine_observer = _internal.manager.subject().make_observer(
+        audio::engine::manager::method::configuration_change, [unowned_self](auto const &context) {
             if ([UIApplication sharedApplication].applicationState == UIApplicationStateActive) {
                 [[unowned_self.object() object] _updateEngine];
             }

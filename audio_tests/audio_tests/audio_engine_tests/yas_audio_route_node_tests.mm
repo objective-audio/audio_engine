@@ -72,16 +72,16 @@ using namespace yas;
 }
 
 - (void)test_render {
-    audio::engine engine;
-    engine.add_offline_output_node();
+    audio::engine::manager manager;
+    manager.add_offline_output_node();
 
     auto format = audio::format({.sample_rate = 44100.0, .channel_count = 2});
-    audio::offline_output_node &output_node = engine.offline_output_node();
+    audio::offline_output_node &output_node = manager.offline_output_node();
     audio::route_node route_node;
     audio::tap_node tap_node;
 
-    engine.connect(route_node.node(), output_node.node(), format);
-    engine.connect(tap_node.node(), route_node.node(), format);
+    manager.connect(route_node.node(), output_node.node(), format);
+    manager.connect(tap_node.node(), route_node.node(), format);
 
     bool tap_node_called = false;
     tap_node.set_render_handler([&tap_node_called](auto) { tap_node_called = true; });
@@ -89,7 +89,7 @@ using namespace yas;
     {
         XCTestExpectation *expectation = [self expectationWithDescription:@"first render"];
 
-        XCTAssertTrue(engine.start_offline_render([](auto args) { args.out_stop = true; },
+        XCTAssertTrue(manager.start_offline_render([](auto args) { args.out_stop = true; },
                                                   [expectation](bool const cancelled) { [expectation fulfill]; }));
 
         [self waitForExpectationsWithTimeout:0.5
@@ -113,7 +113,7 @@ using namespace yas;
     {
         XCTestExpectation *expectation = [self expectationWithDescription:@"second render"];
 
-        XCTAssertTrue(engine.start_offline_render(
+        XCTAssertTrue(manager.start_offline_render(
             [self](auto args) {
                 args.out_stop = true;
                 audio::frame_enumerator enumerator(args.buffer);
@@ -145,15 +145,15 @@ using namespace yas;
 - (void)test_render_many_source {
     auto const src_count = 2;
 
-    audio::engine engine;
-    engine.add_offline_output_node();
+    audio::engine::manager manager;
+    manager.add_offline_output_node();
 
     auto dst_format = audio::format({.sample_rate = 44100.0, .channel_count = 2});
     auto src_format = audio::format({.sample_rate = 44100.0, .channel_count = 1});
-    audio::offline_output_node &output_node = engine.offline_output_node();
+    audio::offline_output_node &output_node = manager.offline_output_node();
     audio::route_node route_node;
 
-    engine.connect(route_node.node(), output_node.node(), dst_format);
+    manager.connect(route_node.node(), output_node.node(), dst_format);
 
     bool tap_node_calleds[src_count];
     for (auto &tap_node_called : tap_node_calleds) {
@@ -165,7 +165,7 @@ using namespace yas;
         tap_nodes.push_back(audio::tap_node{});
         auto &tap_node = tap_nodes.at(i);
 
-        engine.connect(tap_node.node(), route_node.node(), 0, i, src_format);
+        manager.connect(tap_node.node(), route_node.node(), 0, i, src_format);
 
         auto &tap_node_called = tap_node_calleds[i];
         tap_node.set_render_handler([&tap_node_called](auto args) {
@@ -179,7 +179,7 @@ using namespace yas;
 
     XCTestExpectation *expectation = [self expectationWithDescription:@"render"];
 
-    XCTAssertTrue(engine.start_offline_render(
+    XCTAssertTrue(manager.start_offline_render(
         [self](auto args) {
             args.out_stop = true;
             audio::frame_enumerator enumerator(args.buffer);
@@ -212,15 +212,15 @@ using namespace yas;
 - (void)test_render_gappy_source {
     auto const src_count = 2;
 
-    audio::engine engine;
-    engine.add_offline_output_node();
+    audio::engine::manager manager;
+    manager.add_offline_output_node();
 
     auto dst_format = audio::format({.sample_rate = 44100.0, .channel_count = 4});
     auto src_format = audio::format({.sample_rate = 44100.0, .channel_count = 2});
-    audio::offline_output_node &output_node = engine.offline_output_node();
+    audio::offline_output_node &output_node = manager.offline_output_node();
     audio::route_node route_node;
 
-    engine.connect(route_node.node(), output_node.node(), dst_format);
+    manager.connect(route_node.node(), output_node.node(), dst_format);
 
     bool tap_node_calleds[src_count];
     for (auto &tap_node_called : tap_node_calleds) {
@@ -232,7 +232,7 @@ using namespace yas;
         tap_nodes.push_back(audio::tap_node{});
         auto &tap_node = tap_nodes.at(i);
 
-        engine.connect(tap_node.node(), route_node.node(), 0, i, src_format);
+        manager.connect(tap_node.node(), route_node.node(), 0, i, src_format);
 
         auto &tap_node_called = tap_node_calleds[i];
         tap_node.set_render_handler([&tap_node_called](auto args) {
@@ -246,7 +246,7 @@ using namespace yas;
 
     XCTestExpectation *expectation = [self expectationWithDescription:@"render"];
 
-    XCTAssertTrue(engine.start_offline_render(
+    XCTAssertTrue(manager.start_offline_render(
         [self](auto args) {
             args.out_stop = true;
             audio::frame_enumerator enumerator(args.buffer);

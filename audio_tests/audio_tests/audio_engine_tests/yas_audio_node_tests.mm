@@ -133,19 +133,19 @@ using namespace yas;
     XCTAssertEqual(time, node.last_render_time());
 }
 
-- (void)test_set_engine {
+- (void)test_set_manager {
     auto node = test::make_node();
-    audio::engine engine;
+    audio::engine::manager manager;
 
-    XCTAssertFalse(node.engine());
+    XCTAssertFalse(node.manager());
 
-    node.manageable().set_engine(engine);
+    node.manageable().set_manager(manager);
 
-    XCTAssertEqual(engine, node.engine());
+    XCTAssertEqual(manager, node.manager());
 
-    node.manageable().set_engine(audio::engine(nullptr));
+    node.manageable().set_manager(audio::engine::manager{nullptr});
 
-    XCTAssertFalse(node.engine());
+    XCTAssertFalse(node.manager());
 }
 
 - (void)test_kernel {

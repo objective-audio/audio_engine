@@ -39,16 +39,16 @@ using namespace yas;
 - (void)test_offline_render_with_audio_engine {
     double const sample_rate = 44100.0;
 
-    audio::engine engine;
-    engine.add_offline_output_node();
+    audio::engine::manager manager;
+    manager.add_offline_output_node();
 
     auto format = audio::format({.sample_rate = sample_rate, .channel_count = 2});
-    audio::offline_output_node &output_node = engine.offline_output_node();
+    audio::offline_output_node &output_node = manager.offline_output_node();
     audio::unit_node sample_delay_node(kAudioUnitType_Effect, kAudioUnitSubType_SampleDelay);
     audio::tap_node tap_node;
 
-    engine.connect(sample_delay_node.node(), output_node.node(), format);
-    engine.connect(tap_node.node(), sample_delay_node.node(), format);
+    manager.connect(sample_delay_node.node(), output_node.node(), format);
+    manager.connect(tap_node.node(), sample_delay_node.node(), format);
 
     XCTestExpectation *tapNodeExpectation = [self expectationWithDescription:@"tap node render"];
 
@@ -126,7 +126,7 @@ using namespace yas;
         }
     };
 
-    auto result = engine.start_offline_render(start_render_handler, completion_handler);
+    auto result = manager.start_offline_render(start_render_handler, completion_handler);
 
     XCTAssertTrue(result);
 

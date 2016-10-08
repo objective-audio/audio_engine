@@ -2,7 +2,7 @@
 //  yas_audio_node_protocol.cpp
 //
 
-#include "yas_audio_engine.h"
+#include "yas_audio_engine_manager.h"
 #include "yas_audio_node_protocol.h"
 
 using namespace yas;
@@ -47,12 +47,12 @@ audio::connection_wmap const &audio::manageable_node::output_connections() const
     return impl_ptr<impl>()->output_connections();
 }
 
-void audio::manageable_node::set_engine(audio::engine const &engine) {
-    impl_ptr<impl>()->set_engine(engine);
+void audio::manageable_node::set_manager(audio::engine::manager const &manager) {
+    impl_ptr<impl>()->set_manager(manager);
 }
 
-audio::engine audio::manageable_node::engine() const {
-    return impl_ptr<impl>()->engine();
+audio::engine::manager audio::manageable_node::manager() const {
+    return impl_ptr<impl>()->manager();
 }
 
 void audio::manageable_node::update_kernel() {

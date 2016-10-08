@@ -9,7 +9,9 @@
 
 namespace yas {
 namespace audio {
-    class engine;
+    namespace engine {
+        class manager;
+    }
     class graph;
 
     using edit_graph_f = std::function<void(audio::graph &)>;
@@ -40,8 +42,8 @@ namespace audio {
             virtual audio::connection output_connection(uint32_t const bus_idx) = 0;
             virtual audio::connection_wmap const &input_connections() = 0;
             virtual audio::connection_wmap const &output_connections() = 0;
-            virtual void set_engine(audio::engine const &engine) = 0;
-            virtual audio::engine engine() const = 0;
+            virtual void set_manager(audio::engine::manager const &) = 0;
+            virtual audio::engine::manager manager() const = 0;
             virtual void update_kernel() = 0;
             virtual void update_connections() = 0;
             virtual void set_add_to_graph_handler(edit_graph_f &&) = 0;
@@ -58,8 +60,8 @@ namespace audio {
         audio::connection_wmap const &input_connections() const;
         audio::connection_wmap const &output_connections() const;
 
-        void set_engine(audio::engine const &);
-        audio::engine engine() const;
+        void set_manager(audio::engine::manager const &);
+        audio::engine::manager manager() const;
 
         void update_kernel();
         void update_connections();

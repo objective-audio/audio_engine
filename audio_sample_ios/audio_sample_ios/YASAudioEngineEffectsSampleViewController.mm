@@ -27,7 +27,7 @@ static const AudioComponentDescription baseAcd = {.componentType = kAudioUnitTyp
 namespace yas {
 namespace sample {
     struct effects_vc_internal {
-        audio::engine engine;
+        audio::engine::manager manager;
         audio::unit_output_node output_node;
         audio::connection through_connection = nullptr;
         audio::tap_node tap_node;
@@ -35,12 +35,12 @@ namespace sample {
 
         void replace_effect_node(const AudioComponentDescription *acd) {
             if (effect_node) {
-                engine.disconnect(effect_node.node());
+                manager.disconnect(effect_node.node());
                 effect_node = nullptr;
             }
 
             if (through_connection) {
-                engine.disconnect(through_connection);
+                manager.disconnect(through_connection);
                 through_connection = nullptr;
             }
 
@@ -49,11 +49,11 @@ namespace sample {
 
             if (acd) {
                 effect_node = audio::unit_node(*acd);
-                engine.connect(effect_node.node(), output_node.unit_io_node().unit_node().node(), format);
-                engine.connect(tap_node.node(), effect_node.node(), format);
+                manager.connect(effect_node.node(), output_node.unit_io_node().unit_node().node(), format);
+                manager.connect(tap_node.node(), effect_node.node(), format);
             } else {
                 through_connection =
-                    engine.connect(tap_node.node(), output_node.unit_io_node().unit_node().node(), format);
+                    manager.connect(tap_node.node(), output_node.unit_io_node().unit_node().node(), format);
             }
         }
     };
@@ -77,7 +77,7 @@ namespace sample {
         AVAudioSession *audioSession = [AVAudioSession sharedInstance];
         if ([audioSession setCategory:AVAudioSessionCategoryPlayback error:&error]) {
             [self setupAudioEngine];
-            auto start_result = _internal.engine.start_render();
+            auto start_result = _internal.manager.start_render();
             if (start_result) {
                 success = YES;
                 [self.tableView reloadData];
@@ -99,8 +99,8 @@ namespace sample {
     [super viewWillDisappear:animated];
 
     if (self.isMovingFromParentViewController) {
-        if (_internal.engine) {
-            _internal.engine.stop();
+        if (_internal.manager) {
+            _internal.manager.stop();
         }
 
         NSError *error = nil;
@@ -176,7 +176,7 @@ namespace sample {
 #pragma mark -
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    if (_internal.engine) {
+    if (_internal.manager) {
         return YASAudioEngineEffectsSampleSectionCount;
     }
     return 0;

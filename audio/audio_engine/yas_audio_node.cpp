@@ -4,7 +4,7 @@
 
 #include <iostream>
 #include "yas_audio_connection.h"
-#include "yas_audio_engine.h"
+#include "yas_audio_engine_manager.h"
 #include "yas_audio_node.h"
 #include "yas_audio_time.h"
 #include "yas_result.h"
@@ -15,7 +15,7 @@ using namespace yas;
 #pragma mark - audio::node::impl
 
 struct audio::node::impl : base::impl, manageable_node::impl, connectable_node::impl {
-    weak<audio::engine> _weak_engine;
+    weak<audio::engine::manager> _weak_manager;
     subject_t _subject;
     uint32_t _input_bus_count = 0;
     uint32_t _output_bus_count = 0;
@@ -207,12 +207,12 @@ struct audio::node::impl : base::impl, manageable_node::impl, connectable_node::
         return _core.kernel();
     }
 
-    audio::engine engine() const override {
-        return _weak_engine.lock();
+    audio::engine::manager manager() const override {
+        return _weak_manager.lock();
     }
 
-    void set_engine(audio::engine const &engine) override {
-        _weak_engine = engine;
+    void set_manager(audio::engine::manager const &manager) override {
+        _weak_manager = manager;
     }
 
     void set_add_to_graph_handler(edit_graph_f &&handler) override {
@@ -343,8 +343,8 @@ bool audio::node::is_available_output_bus(uint32_t const bus_idx) const {
     return impl_ptr<impl>()->is_available_output_bus(bus_idx);
 }
 
-audio::engine audio::node::engine() const {
-    return impl_ptr<impl>()->engine();
+audio::engine::manager audio::node::manager() const {
+    return impl_ptr<impl>()->manager();
 }
 
 audio::time audio::node::last_render_time() const {
