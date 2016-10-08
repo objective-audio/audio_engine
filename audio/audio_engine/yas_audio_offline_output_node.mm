@@ -10,9 +10,9 @@
 
 using namespace yas;
 
-#pragma mark - audio::offline_output_node::impl
+#pragma mark - audio::engine::offline_output_node::impl
 
-struct audio::offline_output_node::impl : base::impl, manageable_offline_output_unit::impl {
+struct audio::engine::offline_output_node::impl : base::impl, manageable_offline_output_unit::impl {
     operation_queue _queue = nullptr;
     audio::engine::node _node = {{.input_bus_count = 1, .output_bus_count = 0}};
     audio::engine::node::observer_t _reset_observer;
@@ -23,7 +23,7 @@ struct audio::offline_output_node::impl : base::impl, manageable_offline_output_
         _reset_observer =
             _node.subject().make_observer(audio::engine::node::method::will_reset, [weak_node = to_weak(node)](auto const &) {
                 if (auto node = weak_node.lock()) {
-                    node.impl_ptr<audio::offline_output_node::impl>()->stop();
+                    node.impl_ptr<audio::engine::offline_output_node::impl>()->stop();
                 }
             });
     }
@@ -187,33 +187,33 @@ struct audio::offline_output_node::impl : base::impl, manageable_offline_output_
     core _core;
 };
 
-#pragma mark - audio::offline_output_node
+#pragma mark - audio::engine::offline_output_node
 
-audio::offline_output_node::offline_output_node() : base(std::make_unique<impl>()) {
+audio::engine::offline_output_node::offline_output_node() : base(std::make_unique<impl>()) {
     impl_ptr<impl>()->prepare(*this);
 }
 
-audio::offline_output_node::offline_output_node(std::nullptr_t) : base(nullptr) {
+audio::engine::offline_output_node::offline_output_node(std::nullptr_t) : base(nullptr) {
 }
 
-audio::offline_output_node::offline_output_node(std::shared_ptr<impl> const &imp) : base(imp) {
+audio::engine::offline_output_node::offline_output_node(std::shared_ptr<impl> const &imp) : base(imp) {
     impl_ptr<impl>()->prepare(*this);
 }
 
-audio::offline_output_node::~offline_output_node() = default;
+audio::engine::offline_output_node::~offline_output_node() = default;
 
-bool audio::offline_output_node::is_running() const {
+bool audio::engine::offline_output_node::is_running() const {
     return impl_ptr<impl>()->is_running();
 }
 
-audio::engine::node const &audio::offline_output_node::node() const {
+audio::engine::node const &audio::engine::offline_output_node::node() const {
     return impl_ptr<impl>()->node();
 }
-audio::engine::node &audio::offline_output_node::node() {
+audio::engine::node &audio::engine::offline_output_node::node() {
     return impl_ptr<impl>()->node();
 }
 
-audio::manageable_offline_output_unit &audio::offline_output_node::manageable() {
+audio::manageable_offline_output_unit &audio::engine::offline_output_node::manageable() {
     if (!_manageable) {
         _manageable = audio::manageable_offline_output_unit{impl_ptr<manageable_offline_output_unit::impl>()};
     }

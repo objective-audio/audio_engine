@@ -150,7 +150,7 @@ namespace sample {
             play_manager.connect(play_sine_node.tap_node().node(), play_mixer_node.unit_node().node(), format);
 
             offline_manager.add_offline_output_node();
-            audio::offline_output_node &offline_output_node = offline_manager.offline_output_node();
+            audio::engine::offline_output_node &offline_output_node = offline_manager.offline_output_node();
 
             offline_mixer_node.unit_node().node().reset();
             offline_mixer_node.set_input_pan(0.0f, 0);

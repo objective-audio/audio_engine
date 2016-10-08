@@ -366,7 +366,7 @@ struct audio::engine::manager::impl : base::impl {
         if (_offline_output_node) {
             return add_result_t{add_error_t::already_added};
         } else {
-            _offline_output_node = audio::offline_output_node{};
+            _offline_output_node = audio::engine::offline_output_node{};
             return add_result_t{nullptr};
         }
     }
@@ -380,7 +380,7 @@ struct audio::engine::manager::impl : base::impl {
         }
     }
 
-    audio::offline_output_node &offline_output_node() {
+    audio::engine::offline_output_node &offline_output_node() {
         return _offline_output_node;
     }
 
@@ -496,7 +496,7 @@ struct audio::engine::manager::impl : base::impl {
     audio::graph _graph = nullptr;
     std::unordered_set<node> _nodes;
     audio::engine::connection_set _connections;
-    audio::offline_output_node _offline_output_node = nullptr;
+    audio::engine::offline_output_node _offline_output_node = nullptr;
 };
 
 #pragma mark - audio::engine::manager
@@ -586,11 +586,11 @@ audio::engine::manager::remove_result_t audio::engine::manager::remove_offline_o
     return impl_ptr<impl>()->remove_offline_output_node();
 }
 
-audio::offline_output_node const &audio::engine::manager::offline_output_node() const {
+audio::engine::offline_output_node const &audio::engine::manager::offline_output_node() const {
     return impl_ptr<impl>()->offline_output_node();
 }
 
-audio::offline_output_node &audio::engine::manager::offline_output_node() {
+audio::engine::offline_output_node &audio::engine::manager::offline_output_node() {
     return impl_ptr<impl>()->offline_output_node();
 }
 

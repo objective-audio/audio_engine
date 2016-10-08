@@ -24,7 +24,7 @@ using namespace yas;
     audio::engine::manager manager;
     manager.add_offline_output_node();
 
-    audio::offline_output_node &output_node = manager.offline_output_node();
+    audio::engine::offline_output_node &output_node = manager.offline_output_node();
     audio::tap_node to_node;
     audio::tap_node from_node;
     auto const format = audio::format({.sample_rate = 48000.0, .channel_count = 2});
@@ -78,7 +78,7 @@ using namespace yas;
     audio::engine::manager manager;
     manager.add_offline_output_node();
 
-    audio::offline_output_node &output_node = manager.offline_output_node();
+    audio::engine::offline_output_node &output_node = manager.offline_output_node();
     audio::tap_node to_node;
     audio::tap_node from_node;
     auto const format = audio::format({.sample_rate = 48000.0, .channel_count = 2});

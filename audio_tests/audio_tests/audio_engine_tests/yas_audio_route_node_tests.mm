@@ -76,7 +76,7 @@ using namespace yas;
     manager.add_offline_output_node();
 
     auto format = audio::format({.sample_rate = 44100.0, .channel_count = 2});
-    audio::offline_output_node &output_node = manager.offline_output_node();
+    audio::engine::offline_output_node &output_node = manager.offline_output_node();
     audio::route_node route_node;
     audio::tap_node tap_node;
 
@@ -150,7 +150,7 @@ using namespace yas;
 
     auto dst_format = audio::format({.sample_rate = 44100.0, .channel_count = 2});
     auto src_format = audio::format({.sample_rate = 44100.0, .channel_count = 1});
-    audio::offline_output_node &output_node = manager.offline_output_node();
+    audio::engine::offline_output_node &output_node = manager.offline_output_node();
     audio::route_node route_node;
 
     manager.connect(route_node.node(), output_node.node(), dst_format);
@@ -217,7 +217,7 @@ using namespace yas;
 
     auto dst_format = audio::format({.sample_rate = 44100.0, .channel_count = 4});
     auto src_format = audio::format({.sample_rate = 44100.0, .channel_count = 2});
-    audio::offline_output_node &output_node = manager.offline_output_node();
+    audio::engine::offline_output_node &output_node = manager.offline_output_node();
     audio::route_node route_node;
 
     manager.connect(route_node.node(), output_node.node(), dst_format);

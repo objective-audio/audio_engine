@@ -19,11 +19,11 @@ class observer;
 
 namespace audio {
     class graph;
-    class offline_output_node;
     class testable_engine;
 
     namespace engine {
         class device_io_node;
+        class offline_output_node;
         
         class manager : public base {
             class impl;
@@ -68,8 +68,8 @@ namespace audio {
 
             add_result_t add_offline_output_node();
             remove_result_t remove_offline_output_node();
-            audio::offline_output_node const &offline_output_node() const;
-            audio::offline_output_node &offline_output_node();
+            audio::engine::offline_output_node const &offline_output_node() const;
+            audio::engine::offline_output_node &offline_output_node();
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
             add_result_t add_device_io_node();
