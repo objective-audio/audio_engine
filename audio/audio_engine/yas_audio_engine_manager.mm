@@ -385,7 +385,7 @@ struct audio::engine::manager::impl : base::impl {
     }
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
-    void set_device_io_node(audio::device_io_node &&node) {
+    void set_device_io_node(audio::engine::device_io_node &&node) {
         if (node) {
             _device_io_node = std::move(node);
 
@@ -409,7 +409,7 @@ struct audio::engine::manager::impl : base::impl {
         }
     }
 
-    audio::device_io_node &device_io_node() {
+    audio::engine::device_io_node &device_io_node() {
         return _device_io_node;
     }
 
@@ -489,7 +489,7 @@ struct audio::engine::manager::impl : base::impl {
     objc_ptr<id> _reset_observer;
     objc_ptr<id> _route_change_observer;
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
-    audio::device_io_node _device_io_node = nullptr;
+    audio::engine::device_io_node _device_io_node = nullptr;
     audio::device::observer_t _device_observer;
 #endif
 
@@ -600,7 +600,7 @@ audio::engine::manager::add_result_t audio::engine::manager::add_device_io_node(
     if (impl_ptr<impl>()->device_io_node()) {
         return add_result_t{add_error_t::already_added};
     } else {
-        impl_ptr<impl>()->set_device_io_node(audio::device_io_node{});
+        impl_ptr<impl>()->set_device_io_node(audio::engine::device_io_node{});
         return add_result_t{nullptr};
     }
 }
@@ -614,11 +614,11 @@ audio::engine::manager::remove_result_t audio::engine::manager::remove_device_io
     }
 }
 
-audio::device_io_node const &audio::engine::manager::device_io_node() const {
+audio::engine::device_io_node const &audio::engine::manager::device_io_node() const {
     return impl_ptr<impl>()->device_io_node();
 }
 
-audio::device_io_node &audio::engine::manager::device_io_node() {
+audio::engine::device_io_node &audio::engine::manager::device_io_node() {
     return impl_ptr<impl>()->device_io_node();
 }
 

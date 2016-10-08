@@ -13,33 +13,33 @@
 
 namespace yas {
 namespace audio {
-    namespace engine {
-        class node;
-    }
-    
     class device;
 
-    class device_io_node : public base {
-       public:
-        class impl;
+    namespace engine {
+        class node;
 
-        device_io_node();
-        device_io_node(std::nullptr_t);
-        device_io_node(audio::device const &device);
+        class device_io_node : public base {
+           public:
+            class impl;
 
-        virtual ~device_io_node() final;
+            device_io_node();
+            device_io_node(std::nullptr_t);
+            device_io_node(audio::device const &device);
 
-        void set_device(audio::device const &device);
-        audio::device device() const;
+            virtual ~device_io_node() final;
 
-        audio::engine::node const &node() const;
-        audio::engine::node &node();
+            void set_device(audio::device const &device);
+            audio::device device() const;
 
-        manageable_device_io_node &manageable();
+            audio::engine::node const &node() const;
+            audio::engine::node &node();
 
-       private:
-        manageable_device_io_node _manageable = nullptr;
-    };
+            manageable_device_io_node &manageable();
+
+           private:
+            manageable_device_io_node _manageable = nullptr;
+        };
+    }
 }
 }
 
