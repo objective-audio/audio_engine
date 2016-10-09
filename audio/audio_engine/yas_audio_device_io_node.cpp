@@ -213,9 +213,9 @@ audio::engine::node &audio::engine::device_io_node::node() {
     return impl_ptr<impl>()->_node;
 }
 
-audio::manageable_device_io_node &audio::engine::device_io_node::manageable() {
+audio::engine::manageable_device_io_node &audio::engine::device_io_node::manageable() {
     if (!_manageable) {
-        _manageable = audio::manageable_device_io_node{impl_ptr<manageable_device_io_node::impl>()};
+        _manageable = audio::engine::manageable_device_io_node{impl_ptr<manageable_device_io_node::impl>()};
     }
     return _manageable;
 }
