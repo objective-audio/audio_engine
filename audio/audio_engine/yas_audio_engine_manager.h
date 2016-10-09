@@ -19,7 +19,6 @@ class observer;
 
 namespace audio {
     class graph;
-    class testable_engine;
 
     namespace engine {
         class device_io_node;
