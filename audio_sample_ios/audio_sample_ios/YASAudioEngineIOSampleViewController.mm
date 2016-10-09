@@ -33,7 +33,7 @@ namespace yas {
 namespace sample {
     struct engine_io_vc_internal {
         audio::engine::manager manager;
-        audio::unit_mixer_node mixer_node;
+        audio::engine::unit_mixer_node mixer_node;
         audio::unit_io_node io_node;
 
         base engine_observer = nullptr;

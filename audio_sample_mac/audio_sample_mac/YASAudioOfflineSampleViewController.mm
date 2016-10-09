@@ -124,11 +124,11 @@ namespace sample {
     struct offline_vc_internal {
         audio::engine::manager play_manager;
         audio::unit_output_node play_output_node;
-        audio::unit_mixer_node play_mixer_node;
+        audio::engine::unit_mixer_node play_mixer_node;
         offline_sample::sine_node play_sine_node;
 
         audio::engine::manager offline_manager;
-        audio::unit_mixer_node offline_mixer_node;
+        audio::engine::unit_mixer_node offline_mixer_node;
         offline_sample::sine_node offline_sine_node;
 
         base engine_observer = nullptr;
