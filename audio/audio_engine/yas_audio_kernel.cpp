@@ -91,9 +91,9 @@ base &audio::engine::kernel::decorator() {
     return impl_ptr<impl>()->decorator();
 }
 
-audio::manageable_kernel &audio::engine::kernel::manageable() {
+audio::engine::manageable_kernel &audio::engine::kernel::manageable() {
     if (!_manageable) {
-        _manageable = audio::manageable_kernel{impl_ptr<audio::manageable_kernel::impl>()};
+        _manageable = audio::engine::manageable_kernel{impl_ptr<audio::engine::manageable_kernel::impl>()};
     }
     return _manageable;
 }
