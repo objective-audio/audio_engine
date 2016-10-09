@@ -7,7 +7,9 @@
 
 namespace yas {
 namespace audio {
-    class unit_node;
+    namespace engine {
+        class unit_node;
+    }
 }
 }
 

@@ -403,9 +403,9 @@ audio::engine::node &audio::engine::unit_node::node() {
     return impl_ptr<impl>()->_node;
 }
 
-audio::manageable_unit_node &audio::engine::unit_node::manageable() {
+audio::engine::manageable_unit_node &audio::engine::unit_node::manageable() {
     if (!_manageable) {
-        _manageable = audio::manageable_unit_node{impl_ptr<manageable_unit_node::impl>()};
+        _manageable = audio::engine::manageable_unit_node{impl_ptr<manageable_unit_node::impl>()};
     }
     return _manageable;
 }
