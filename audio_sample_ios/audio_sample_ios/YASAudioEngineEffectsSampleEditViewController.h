@@ -13,6 +13,6 @@ namespace audio {
 
 @interface YASAudioEngineEffectsSampleEditViewController : UITableViewController
 
-- (void)set_audio_unit_node:(const yas::audio::unit_node &)node;
+- (void)set_audio_unit_node:(const yas::audio::engine::unit_node &)node;
 
 @end

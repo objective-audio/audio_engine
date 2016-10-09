@@ -8,7 +8,9 @@
 
 namespace yas {
 namespace audio {
-    class unit_node;
+    namespace engine {
+        class unit_node;
+    }
 
     class unit_mixer_node : public base {
        public:
@@ -30,8 +32,8 @@ namespace audio {
         void set_input_enabled(bool const enabled, uint32_t const bus_idx);
         bool input_enabled(uint32_t const bus_idx) const;
 
-        audio::unit_node const &unit_node() const;
-        audio::unit_node &unit_node();
+        audio::engine::unit_node const &unit_node() const;
+        audio::engine::unit_node &unit_node();
 
        private:
         class impl;

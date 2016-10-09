@@ -10,7 +10,9 @@
 
 namespace yas {
 namespace audio {
-    class unit_node;
+    namespace engine {
+        class unit_node;
+    }
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
     class device;
 #endif
@@ -50,8 +52,8 @@ namespace audio {
 
         subject_t &subject();
 
-        audio::unit_node const &unit_node() const;
-        audio::unit_node &unit_node();
+        audio::engine::unit_node const &unit_node() const;
+        audio::engine::unit_node &unit_node();
     };
 
     class unit_output_node : public base {

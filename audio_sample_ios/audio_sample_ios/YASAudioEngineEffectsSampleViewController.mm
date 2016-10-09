@@ -31,7 +31,7 @@ namespace sample {
         audio::unit_output_node output_node;
         audio::engine::connection through_connection = nullptr;
         audio::engine::tap_node tap_node;
-        audio::unit_node effect_node = nullptr;
+        audio::engine::unit_node effect_node = nullptr;
 
         void replace_effect_node(const AudioComponentDescription *acd) {
             if (effect_node) {
@@ -48,7 +48,7 @@ namespace sample {
                 audio::format({.sample_rate = [AVAudioSession sharedInstance].sampleRate, .channel_count = 2});
 
             if (acd) {
-                effect_node = audio::unit_node(*acd);
+                effect_node = audio::engine::unit_node(*acd);
                 manager.connect(effect_node.node(), output_node.unit_io_node().unit_node().node(), format);
                 manager.connect(tap_node.node(), effect_node.node(), format);
             } else {

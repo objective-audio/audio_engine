@@ -21,7 +21,7 @@ using namespace yas;
 }
 
 - (void)test_create {
-    audio::unit_node node(kAudioUnitType_Effect, kAudioUnitSubType_Delay);
+    audio::engine::unit_node node(kAudioUnitType_Effect, kAudioUnitSubType_Delay);
 
     XCTAssertTrue(node);
 
@@ -29,7 +29,7 @@ using namespace yas;
 }
 
 - (void)test_create_null {
-    audio::unit_node node{nullptr};
+    audio::engine::unit_node node{nullptr};
 
     XCTAssertFalse(node);
 }
@@ -40,7 +40,7 @@ using namespace yas;
 
     auto format = audio::format({.sample_rate = 44100.0, .channel_count = 2});
     audio::engine::offline_output_node &output_node = manager.offline_output_node();
-    audio::unit_node delay_node(kAudioUnitType_Effect, kAudioUnitSubType_Delay);
+    audio::engine::unit_node delay_node(kAudioUnitType_Effect, kAudioUnitSubType_Delay);
 
     auto const &parameters = delay_node.parameters();
     XCTAssertGreaterThanOrEqual(parameters.count(kAudioUnitScope_Global), 1);
@@ -106,7 +106,7 @@ using namespace yas;
 }
 
 - (void)test_get_parameters {
-    audio::unit_node delay_node(kAudioUnitType_Effect, kAudioUnitSubType_Delay);
+    audio::engine::unit_node delay_node(kAudioUnitType_Effect, kAudioUnitSubType_Delay);
 
     auto const &global_parameters = delay_node.global_parameters();
     auto const &output_parameters = delay_node.output_parameters();
@@ -130,7 +130,7 @@ using namespace yas;
 }
 
 - (void)test_reset_parameters {
-    audio::unit_node delay_node(kAudioUnitType_Effect, kAudioUnitSubType_Delay);
+    audio::engine::unit_node delay_node(kAudioUnitType_Effect, kAudioUnitSubType_Delay);
 
     float const delay_time_value = 0.5f;
     float const feedback_value = -50.0f;

@@ -56,7 +56,7 @@ struct yas::audio::unit_io_node::impl : base::impl {
 
     void prepare(audio::unit_io_node &node) {
         _connection_observer = unit_node().subject().make_observer(
-            audio::unit_node::method::did_update_connections, [weak_node = to_weak(node)](auto const &) {
+            audio::engine::unit_node::method::did_update_connections, [weak_node = to_weak(node)](auto const &) {
                 if (auto node = weak_node.lock()) {
                     node.impl_ptr<impl>()->update_unit_io_connections();
                 }
@@ -161,14 +161,14 @@ struct yas::audio::unit_io_node::impl : base::impl {
         return _subject;
     }
 
-    audio::unit_node &unit_node() {
+    audio::engine::unit_node &unit_node() {
         return _unit_node;
     }
 
-    audio::unit_node _unit_node;
+    audio::engine::unit_node _unit_node;
     channel_map_t _channel_map[2];
     audio::unit_io_node::subject_t _subject;
-    audio::unit_node::observer_t _connection_observer;
+    audio::engine::unit_node::observer_t _connection_observer;
 };
 
 #pragma mark - audio::unit_io_node
@@ -221,11 +221,11 @@ audio::unit_io_node::subject_t &audio::unit_io_node::subject() {
     return impl_ptr<impl>()->subject();
 }
 
-audio::unit_node const &audio::unit_io_node::unit_node() const {
+audio::engine::unit_node const &audio::unit_io_node::unit_node() const {
     return impl_ptr<impl>()->unit_node();
 }
 
-audio::unit_node &audio::unit_io_node::unit_node() {
+audio::engine::unit_node &audio::unit_io_node::unit_node() {
     return impl_ptr<impl>()->unit_node();
 }
 
