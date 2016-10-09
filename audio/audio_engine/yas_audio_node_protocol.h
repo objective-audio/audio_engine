@@ -11,7 +11,7 @@ namespace yas {
 namespace audio {
     class graph;
 
-    using edit_graph_f = std::function<void(audio::graph &)>;
+    using graph_editing_f = std::function<void(audio::graph &)>;
 
     namespace engine {
         class manager;
@@ -46,10 +46,10 @@ namespace audio {
                 virtual audio::engine::manager manager() const = 0;
                 virtual void update_kernel() = 0;
                 virtual void update_connections() = 0;
-                virtual void set_add_to_graph_handler(edit_graph_f &&) = 0;
-                virtual void set_remove_from_graph_handler(edit_graph_f &&) = 0;
-                virtual edit_graph_f const &add_to_graph_handler() const = 0;
-                virtual edit_graph_f const &remove_from_graph_handler() const = 0;
+                virtual void set_add_to_graph_handler(graph_editing_f &&) = 0;
+                virtual void set_remove_from_graph_handler(graph_editing_f &&) = 0;
+                virtual graph_editing_f const &add_to_graph_handler() const = 0;
+                virtual graph_editing_f const &remove_from_graph_handler() const = 0;
             };
 
             explicit manageable_node(std::shared_ptr<impl>);
@@ -66,10 +66,10 @@ namespace audio {
             void update_kernel();
             void update_connections();
 
-            void set_add_to_graph_handler(edit_graph_f);
-            void set_remove_from_graph_handler(edit_graph_f);
-            edit_graph_f const &add_to_graph_handler() const;
-            edit_graph_f const &remove_from_graph_handler() const;
+            void set_add_to_graph_handler(graph_editing_f);
+            void set_remove_from_graph_handler(graph_editing_f);
+            graph_editing_f const &add_to_graph_handler() const;
+            graph_editing_f const &remove_from_graph_handler() const;
         };
     }
 }

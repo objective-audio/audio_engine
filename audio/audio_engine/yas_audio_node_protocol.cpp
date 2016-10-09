@@ -63,18 +63,18 @@ void audio::engine::manageable_node::update_connections() {
     impl_ptr<impl>()->update_connections();
 }
 
-void audio::engine::manageable_node::set_add_to_graph_handler(edit_graph_f handler) {
+void audio::engine::manageable_node::set_add_to_graph_handler(graph_editing_f handler) {
     impl_ptr<impl>()->set_add_to_graph_handler(std::move(handler));
 }
 
-void audio::engine::manageable_node::set_remove_from_graph_handler(edit_graph_f handler) {
+void audio::engine::manageable_node::set_remove_from_graph_handler(graph_editing_f handler) {
     impl_ptr<impl>()->set_remove_from_graph_handler(std::move(handler));
 }
 
-audio::edit_graph_f const &audio::engine::manageable_node::add_to_graph_handler() const {
+audio::graph_editing_f const &audio::engine::manageable_node::add_to_graph_handler() const {
     return impl_ptr<impl>()->add_to_graph_handler();
 }
 
-audio::edit_graph_f const &audio::engine::manageable_node::remove_from_graph_handler() const {
+audio::graph_editing_f const &audio::engine::manageable_node::remove_from_graph_handler() const {
     return impl_ptr<impl>()->remove_from_graph_handler();
 }
