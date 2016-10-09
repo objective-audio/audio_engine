@@ -34,7 +34,7 @@ namespace sample {
     struct engine_io_vc_internal {
         audio::engine::manager manager;
         audio::engine::unit_mixer_node mixer_node;
-        audio::unit_io_node io_node;
+        audio::engine::unit_io_node io_node;
 
         base engine_observer = nullptr;
 

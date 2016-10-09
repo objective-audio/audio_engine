@@ -33,9 +33,9 @@ namespace audio {
 }
 }
 
-#pragma mark - audio::unit_io_node::impl
+#pragma mark - audio::engine::unit_io_node::impl
 
-struct yas::audio::unit_io_node::impl : base::impl {
+struct yas::audio::engine::unit_io_node::impl : base::impl {
     impl() : impl(args{}) {
     }
 
@@ -54,7 +54,7 @@ struct yas::audio::unit_io_node::impl : base::impl {
 
     ~impl() = default;
 
-    void prepare(audio::unit_io_node &node) {
+    void prepare(audio::engine::unit_io_node &node) {
         _connection_observer = unit_node().subject().make_observer(
             audio::engine::unit_node::method::did_update_connections, [weak_node = to_weak(node)](auto const &) {
                 if (auto node = weak_node.lock()) {
@@ -154,10 +154,10 @@ struct yas::audio::unit_io_node::impl : base::impl {
         unit.set_channel_map(output_map, kAudioUnitScope_Output, output_idx);
         unit.set_channel_map(input_map, kAudioUnitScope_Output, input_idx);
 
-        subject().notify(audio::unit_io_node::method::did_update_connection, cast<audio::unit_io_node>());
+        subject().notify(audio::engine::unit_io_node::method::did_update_connection, cast<audio::engine::unit_io_node>());
     }
 
-    audio::unit_io_node::subject_t &subject() {
+    audio::engine::unit_io_node::subject_t &subject() {
         return _subject;
     }
 
@@ -167,114 +167,114 @@ struct yas::audio::unit_io_node::impl : base::impl {
 
     audio::engine::unit_node _unit_node;
     channel_map_t _channel_map[2];
-    audio::unit_io_node::subject_t _subject;
+    audio::engine::unit_io_node::subject_t _subject;
     audio::engine::unit_node::observer_t _connection_observer;
 };
 
-#pragma mark - audio::unit_io_node
+#pragma mark - audio::engine::unit_io_node
 
-audio::unit_io_node::unit_io_node(std::nullptr_t) : base(nullptr) {
+audio::engine::unit_io_node::unit_io_node(std::nullptr_t) : base(nullptr) {
 }
 
-audio::unit_io_node::unit_io_node() : unit_io_node(args{}) {
+audio::engine::unit_io_node::unit_io_node() : unit_io_node(args{}) {
 }
 
-audio::unit_io_node::unit_io_node(args args) : base(std::make_shared<impl>(std::move(args))) {
+audio::engine::unit_io_node::unit_io_node(args args) : base(std::make_shared<impl>(std::move(args))) {
     impl_ptr<impl>()->prepare(*this);
 }
 
-audio::unit_io_node::~unit_io_node() = default;
+audio::engine::unit_io_node::~unit_io_node() = default;
 
-void audio::unit_io_node::set_channel_map(channel_map_t const &map, direction const dir) {
+void audio::engine::unit_io_node::set_channel_map(channel_map_t const &map, direction const dir) {
     impl_ptr<impl>()->set_channel_map(map, dir);
 }
 
-audio::channel_map_t const &audio::unit_io_node::channel_map(direction const dir) const {
+audio::channel_map_t const &audio::engine::unit_io_node::channel_map(direction const dir) const {
     return impl_ptr<impl>()->channel_map(dir);
 }
 
-double audio::unit_io_node::device_sample_rate() const {
+double audio::engine::unit_io_node::device_sample_rate() const {
     return impl_ptr<impl>()->device_sample_rate();
 }
 
-uint32_t audio::unit_io_node::output_device_channel_count() const {
+uint32_t audio::engine::unit_io_node::output_device_channel_count() const {
     return impl_ptr<impl>()->output_device_channel_count();
 }
 
-uint32_t audio::unit_io_node::input_device_channel_count() const {
+uint32_t audio::engine::unit_io_node::input_device_channel_count() const {
     return impl_ptr<impl>()->input_device_channel_count();
 }
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
 
-void audio::unit_io_node::set_device(audio::device const &device) {
+void audio::engine::unit_io_node::set_device(audio::device const &device) {
     impl_ptr<impl>()->set_device(device);
 }
 
-audio::device audio::unit_io_node::device() const {
+audio::device audio::engine::unit_io_node::device() const {
     return impl_ptr<impl>()->device();
 }
 
 #endif
 
-audio::unit_io_node::subject_t &audio::unit_io_node::subject() {
+audio::engine::unit_io_node::subject_t &audio::engine::unit_io_node::subject() {
     return impl_ptr<impl>()->subject();
 }
 
-audio::engine::unit_node const &audio::unit_io_node::unit_node() const {
+audio::engine::unit_node const &audio::engine::unit_io_node::unit_node() const {
     return impl_ptr<impl>()->unit_node();
 }
 
-audio::engine::unit_node &audio::unit_io_node::unit_node() {
+audio::engine::unit_node &audio::engine::unit_io_node::unit_node() {
     return impl_ptr<impl>()->unit_node();
 }
 
-#pragma mark - audio::unit_output_node::impl
+#pragma mark - audio::engine::unit_output_node::impl
 
-struct yas::audio::unit_output_node::impl : base::impl {
+struct yas::audio::engine::unit_output_node::impl : base::impl {
     impl() : _unit_io_node({.enable_output = false}) {
     }
 
-    audio::unit_io_node _unit_io_node;
+    audio::engine::unit_io_node _unit_io_node;
 };
 
-#pragma mark - audio::unit_output_node
+#pragma mark - audio::engine::unit_output_node
 
-audio::unit_output_node::unit_output_node(std::nullptr_t) : base(nullptr) {
+audio::engine::unit_output_node::unit_output_node(std::nullptr_t) : base(nullptr) {
 }
 
-audio::unit_output_node::unit_output_node() : base(std::make_unique<impl>()) {
+audio::engine::unit_output_node::unit_output_node() : base(std::make_unique<impl>()) {
 }
 
-audio::unit_output_node::~unit_output_node() = default;
+audio::engine::unit_output_node::~unit_output_node() = default;
 
-void audio::unit_output_node::set_channel_map(channel_map_t const &map) {
+void audio::engine::unit_output_node::set_channel_map(channel_map_t const &map) {
     unit_io_node().set_channel_map(map, direction::output);
 }
 
-audio::channel_map_t const &audio::unit_output_node::channel_map() const {
+audio::channel_map_t const &audio::engine::unit_output_node::channel_map() const {
     return unit_io_node().channel_map(direction::output);
 }
 
-audio::unit_io_node const &audio::unit_output_node::unit_io_node() const {
+audio::engine::unit_io_node const &audio::engine::unit_output_node::unit_io_node() const {
     return impl_ptr<impl>()->_unit_io_node;
 }
 
-audio::unit_io_node &audio::unit_output_node::unit_io_node() {
+audio::engine::unit_io_node &audio::engine::unit_output_node::unit_io_node() {
     return impl_ptr<impl>()->_unit_io_node;
 }
 
-#pragma mark - audio::unit_input_node::impl
+#pragma mark - audio::engine::unit_input_node::impl
 
-struct yas::audio::unit_input_node::impl : base::impl {
+struct yas::audio::engine::unit_input_node::impl : base::impl {
     impl() : _unit_io_node({.enable_input = false}) {
     }
 
     ~impl() = default;
 
-    void prepare(audio::unit_input_node const &node) {
+    void prepare(audio::engine::unit_input_node const &node) {
         _connections_observer = _unit_io_node.subject().make_observer(
-            audio::unit_io_node::method::did_update_connection, [weak_node = to_weak(node)](auto const &) {
+            audio::engine::unit_io_node::method::did_update_connection, [weak_node = to_weak(node)](auto const &) {
                 if (auto node = weak_node.lock()) {
                     node.impl_ptr<impl>()->update_unit_input_connections();
                 }
@@ -324,35 +324,35 @@ struct yas::audio::unit_input_node::impl : base::impl {
         }
     }
 
-    audio::unit_io_node _unit_io_node;
+    audio::engine::unit_io_node _unit_io_node;
 
     pcm_buffer _input_buffer = nullptr;
-    audio::unit_io_node::observer_t _connections_observer;
+    audio::engine::unit_io_node::observer_t _connections_observer;
 };
 
-#pragma mark - audio::unit_input_node
+#pragma mark - audio::engine::unit_input_node
 
-audio::unit_input_node::unit_input_node(std::nullptr_t) : base(nullptr) {
+audio::engine::unit_input_node::unit_input_node(std::nullptr_t) : base(nullptr) {
 }
 
-audio::unit_input_node::unit_input_node() : base(std::make_unique<impl>()) {
+audio::engine::unit_input_node::unit_input_node() : base(std::make_unique<impl>()) {
     impl_ptr<impl>()->prepare(*this);
 }
 
-audio::unit_input_node::~unit_input_node() = default;
+audio::engine::unit_input_node::~unit_input_node() = default;
 
-void audio::unit_input_node::set_channel_map(channel_map_t const &map) {
+void audio::engine::unit_input_node::set_channel_map(channel_map_t const &map) {
     unit_io_node().set_channel_map(map, direction::input);
 }
 
-audio::channel_map_t const &audio::unit_input_node::channel_map() const {
+audio::channel_map_t const &audio::engine::unit_input_node::channel_map() const {
     return unit_io_node().channel_map(direction::input);
 }
 
-audio::unit_io_node const &audio::unit_input_node::unit_io_node() const {
+audio::engine::unit_io_node const &audio::engine::unit_input_node::unit_io_node() const {
     return impl_ptr<impl>()->_unit_io_node;
 }
 
-audio::unit_io_node &audio::unit_input_node::unit_io_node() {
+audio::engine::unit_io_node &audio::engine::unit_input_node::unit_io_node() {
     return impl_ptr<impl>()->_unit_io_node;
 }

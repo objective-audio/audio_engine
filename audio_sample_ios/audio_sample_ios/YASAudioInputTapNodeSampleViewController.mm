@@ -24,7 +24,7 @@ namespace sample {
         };
 
         audio::engine::manager manager;
-        audio::unit_input_node input_node;
+        audio::engine::unit_input_node input_node;
         audio::engine::tap_node input_tap_node = {{.is_input = true}};
 
         property<float, property_key> input_level{

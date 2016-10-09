@@ -34,7 +34,7 @@ namespace yas {
 namespace sample {
     struct route_vc_internal {
         audio::engine::manager manager;
-        audio::unit_io_node io_node;
+        audio::engine::unit_io_node io_node;
         audio::engine::unit_mixer_node mixer_node;
         audio::engine::route_node route_node;
         audio::engine::tap_node sine_node;

@@ -123,7 +123,7 @@ namespace yas {
 namespace sample {
     struct offline_vc_internal {
         audio::engine::manager play_manager;
-        audio::unit_output_node play_output_node;
+        audio::engine::unit_output_node play_output_node;
         audio::engine::unit_mixer_node play_mixer_node;
         offline_sample::sine_node play_sine_node;
 

@@ -28,7 +28,7 @@ namespace yas {
 namespace sample {
     struct effects_vc_internal {
         audio::engine::manager manager;
-        audio::unit_output_node output_node;
+        audio::engine::unit_output_node output_node;
         audio::engine::connection through_connection = nullptr;
         audio::engine::tap_node tap_node;
         audio::engine::unit_node effect_node = nullptr;
