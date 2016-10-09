@@ -6,18 +6,18 @@
 
 using namespace yas;
 
-audio::manageable_offline_output_unit::manageable_offline_output_unit(std::shared_ptr<impl> impl)
+audio::engine::manageable_offline_output_unit::manageable_offline_output_unit(std::shared_ptr<impl> impl)
     : protocol(std::move(impl)) {
 }
 
-audio::manageable_offline_output_unit::manageable_offline_output_unit(std::nullptr_t) : protocol(nullptr) {
+audio::engine::manageable_offline_output_unit::manageable_offline_output_unit(std::nullptr_t) : protocol(nullptr) {
 }
 
-audio::offline_start_result_t audio::manageable_offline_output_unit::start(offline_render_f &&render_handler,
+audio::engine::offline_start_result_t audio::engine::manageable_offline_output_unit::start(offline_render_f &&render_handler,
                                                                            offline_completion_f &&completion_handler) {
     return impl_ptr<impl>()->start(std::move(render_handler), std::move(completion_handler));
 }
 
-void audio::manageable_offline_output_unit::stop() {
+void audio::engine::manageable_offline_output_unit::stop() {
     impl_ptr<impl>()->stop();
 }

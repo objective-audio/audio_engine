@@ -36,7 +36,7 @@ namespace audio {
     }
 }
 
-std::string to_string(audio::offline_start_error_t const &error);
+std::string to_string(audio::engine::offline_start_error_t const &error);
 }
 
-std::ostream &operator<<(std::ostream &, yas::audio::offline_start_error_t const &);
+std::ostream &operator<<(std::ostream &, yas::audio::engine::offline_start_error_t const &);

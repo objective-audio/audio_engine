@@ -28,7 +28,7 @@ struct audio::engine::offline_output_node::impl : base::impl, manageable_offline
             });
     }
 
-    audio::offline_start_result_t start(offline_render_f &&render_handler,
+    audio::engine::offline_start_result_t start(offline_render_f &&render_handler,
                                         offline_completion_f &&completion_handler) override {
         if (_queue) {
             return offline_start_result_t(offline_start_error_t::already_running);
@@ -213,25 +213,25 @@ audio::engine::node &audio::engine::offline_output_node::node() {
     return impl_ptr<impl>()->node();
 }
 
-audio::manageable_offline_output_unit &audio::engine::offline_output_node::manageable() {
+audio::engine::manageable_offline_output_unit &audio::engine::offline_output_node::manageable() {
     if (!_manageable) {
-        _manageable = audio::manageable_offline_output_unit{impl_ptr<manageable_offline_output_unit::impl>()};
+        _manageable = audio::engine::manageable_offline_output_unit{impl_ptr<manageable_offline_output_unit::impl>()};
     }
     return _manageable;
 }
 
-std::string yas::to_string(audio::offline_start_error_t const &error) {
+std::string yas::to_string(audio::engine::offline_start_error_t const &error) {
     switch (error) {
-        case audio::offline_start_error_t::already_running:
+        case audio::engine::offline_start_error_t::already_running:
             return "already_running";
-        case audio::offline_start_error_t::prepare_failure:
+        case audio::engine::offline_start_error_t::prepare_failure:
             return "prepare_failure";
-        case audio::offline_start_error_t::connection_not_found:
+        case audio::engine::offline_start_error_t::connection_not_found:
             return "connection_not_found";
     }
 }
 
-std::ostream &operator<<(std::ostream &os, yas::audio::offline_start_error_t const &value) {
+std::ostream &operator<<(std::ostream &os, yas::audio::engine::offline_start_error_t const &value) {
     os << to_string(value);
     return os;
 }

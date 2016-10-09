@@ -86,7 +86,7 @@ using namespace yas;
 
     uint32_t output_render_frame = 0;
 
-    auto start_render_handler = [=](audio::offline_render_args args) mutable {
+    auto start_render_handler = [=](audio::engine::offline_render_args args) mutable {
         auto &buffer = args.buffer;
         auto const &when = args.when;
         bool &out_stop = args.out_stop;
@@ -290,14 +290,14 @@ using namespace yas;
 }
 
 - (void)test_offline_start_error_to_string {
-    XCTAssertTrue(to_string(audio::offline_start_error_t::already_running) == "already_running");
-    XCTAssertTrue(to_string(audio::offline_start_error_t::prepare_failure) == "prepare_failure");
-    XCTAssertTrue(to_string(audio::offline_start_error_t::connection_not_found) == "connection_not_found");
+    XCTAssertTrue(to_string(audio::engine::offline_start_error_t::already_running) == "already_running");
+    XCTAssertTrue(to_string(audio::engine::offline_start_error_t::prepare_failure) == "prepare_failure");
+    XCTAssertTrue(to_string(audio::engine::offline_start_error_t::connection_not_found) == "connection_not_found");
 }
 
 - (void)test_offline_start_error_ostream {
-    auto const errors = {audio::offline_start_error_t::already_running, audio::offline_start_error_t::prepare_failure,
-                         audio::offline_start_error_t::connection_not_found};
+    auto const errors = {audio::engine::offline_start_error_t::already_running, audio::engine::offline_start_error_t::prepare_failure,
+                         audio::engine::offline_start_error_t::connection_not_found};
 
     for (auto const &error : errors) {
         std::ostringstream stream;
