@@ -98,9 +98,9 @@ typedef NS_ENUM(NSUInteger, YASAudioDeviceRouteSampleInputType) {
 namespace yas {
 namespace sample {
     struct device_io_vc_internal {
-        audio::engine engine = nullptr;
-        audio::route_node route_node = nullptr;
-        audio::tap_node tap_node = nullptr;
+        audio::engine::manager manager = nullptr;
+        audio::engine::route_node route_node = nullptr;
+        audio::engine::tap_node tap_node = nullptr;
 
         base system_observer = nullptr;
         base device_observer = nullptr;
@@ -133,7 +133,7 @@ namespace sample {
 
     [self setupEngine];
 
-    if (auto error = _internal.engine.start_render().error_opt()) {
+    if (auto error = _internal.manager.start_render().error_opt()) {
         auto const error_str = to_string(*error);
         NSLog(@"audio engine start failed. error : %@", (__bridge NSString *)to_cf_object(error_str));
     }
@@ -168,10 +168,10 @@ namespace sample {
 }
 
 - (void)setupEngine {
-    _internal.engine = audio::engine{};
-    _internal.engine.add_device_io_node();
-    _internal.route_node = audio::route_node{};
-    _internal.tap_node = audio::tap_node{};
+    _internal.manager = audio::engine::manager{};
+    _internal.manager.add_device_io_node();
+    _internal.route_node = audio::engine::route_node{};
+    _internal.tap_node = audio::engine::tap_node{};
 
     auto weak_node = to_weak(_internal.tap_node);
 
@@ -211,11 +211,11 @@ namespace sample {
 }
 
 - (void)dispose {
-    _internal.engine.stop();
+    _internal.manager.stop();
 
     _internal.route_node = nullptr;
     _internal.tap_node = nullptr;
-    _internal.engine = nullptr;
+    _internal.manager = nullptr;
 
     _internal.system_observer = nullptr;
     _internal.device_observer = nullptr;
@@ -243,7 +243,7 @@ namespace sample {
 
     self.deviceNames = titles;
 
-    auto const &device = _internal.engine.device_io_node().device();
+    auto const &device = _internal.manager.device_io_node().device();
     auto index = audio::device::index_of_device(device);
     if (index) {
         self.selectedDeviceIndex = *index;
@@ -258,28 +258,28 @@ namespace sample {
     self.outputRoutes = nil;
     self.inputRoutes = nil;
 
-    if (_internal.engine) {
-        _internal.engine.disconnect(_internal.tap_node.node());
-        _internal.engine.disconnect(_internal.route_node.node());
+    if (_internal.manager) {
+        _internal.manager.disconnect(_internal.tap_node.node());
+        _internal.manager.disconnect(_internal.route_node.node());
         _internal.route_node.clear_routes();
 
-        if (auto const &device = _internal.engine.device_io_node().device()) {
+        if (auto const &device = _internal.manager.device_io_node().device()) {
             if (device.output_channel_count() > 0) {
                 auto const output_format = device.output_format();
-                _internal.engine.connect(_internal.route_node.node(), _internal.engine.device_io_node().node(),
-                                         output_format);
-                _internal.engine.connect(_internal.tap_node.node(), _internal.route_node.node(), 0,
-                                         YASAudioDeviceRouteSampleSourceBusSine, output_format);
+                _internal.manager.connect(_internal.route_node.node(), _internal.manager.device_io_node().node(),
+                                          output_format);
+                _internal.manager.connect(_internal.tap_node.node(), _internal.route_node.node(), 0,
+                                          YASAudioDeviceRouteSampleSourceBusSine, output_format);
             }
 
             if (device.input_channel_count() > 0) {
-                _internal.engine.connect(_internal.engine.device_io_node().node(), _internal.route_node.node(), 0,
-                                         YASAudioDeviceRouteSampleSourceBusInput, device.input_format());
+                _internal.manager.connect(_internal.manager.device_io_node().node(), _internal.route_node.node(), 0,
+                                          YASAudioDeviceRouteSampleSourceBusInput, device.input_format());
             }
         }
     }
 
-    if (auto const device = _internal.engine.device_io_node().device()) {
+    if (auto const device = _internal.manager.device_io_node().device()) {
         uint32_t const output_channel_count = device.output_channel_count();
         uint32_t const input_channel_count = device.input_channel_count();
         NSMutableArray *outputRoutes = [NSMutableArray arrayWithCapacity:output_channel_count];
@@ -373,14 +373,14 @@ namespace sample {
 - (void)setDevice:(const audio::device &)selected_device {
     _internal.device_observer = nullptr;
 
-    if (!_internal.engine || !_internal.engine.device_io_node()) {
+    if (!_internal.manager || !_internal.manager.device_io_node()) {
         return;
     }
 
     auto const all_devices = audio::device::all_devices();
 
     if (selected_device && std::find(all_devices.begin(), all_devices.end(), selected_device) != all_devices.end()) {
-        _internal.engine.device_io_node().set_device(selected_device);
+        _internal.manager.device_io_node().set_device(selected_device);
 
         auto unowned_self = make_objc_ptr([[YASUnownedObject alloc] init]);
         [unowned_self.object() setObject:self];
@@ -397,7 +397,7 @@ namespace sample {
                 }
             });
     } else {
-        _internal.engine.device_io_node().set_device(nullptr);
+        _internal.manager.device_io_node().set_device(nullptr);
     }
 
     [self _updateConnection];

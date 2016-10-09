@@ -16,7 +16,7 @@ namespace offline_sample {
 
     struct sine_node : base {
         struct impl : base::impl {
-            audio::tap_node _tap_node;
+            audio::engine::tap_node _tap_node;
             double phase_on_render;
 
             void set_frequency(float const frequency) {
@@ -101,7 +101,7 @@ namespace offline_sample {
             return impl_ptr<impl>()->is_playing();
         }
 
-        audio::tap_node &tap_node() {
+        audio::engine::tap_node &tap_node() {
             return impl_ptr<impl>()->_tap_node;
         }
     };
@@ -122,13 +122,13 @@ namespace offline_sample {
 namespace yas {
 namespace sample {
     struct offline_vc_internal {
-        audio::engine play_engine;
-        audio::unit_output_node play_output_node;
-        audio::unit_mixer_node play_mixer_node;
+        audio::engine::manager play_manager;
+        audio::engine::unit_output_node play_output_node;
+        audio::engine::unit_mixer_node play_mixer_node;
         offline_sample::sine_node play_sine_node;
 
-        audio::engine offline_engine;
-        audio::unit_mixer_node offline_mixer_node;
+        audio::engine::manager offline_manager;
+        audio::engine::unit_mixer_node offline_mixer_node;
         offline_sample::sine_node offline_sine_node;
 
         base engine_observer = nullptr;
@@ -145,12 +145,12 @@ namespace sample {
             play_mixer_node.set_output_volume(1.0f, 0);
             play_mixer_node.set_output_pan(0.0f, 0);
 
-            play_engine.connect(play_mixer_node.unit_node().node(), play_output_node.unit_io_node().unit_node().node(),
-                                format);
-            play_engine.connect(play_sine_node.tap_node().node(), play_mixer_node.unit_node().node(), format);
+            play_manager.connect(play_mixer_node.unit_node().node(), play_output_node.unit_io_node().unit_node().node(),
+                                 format);
+            play_manager.connect(play_sine_node.tap_node().node(), play_mixer_node.unit_node().node(), format);
 
-            offline_engine.add_offline_output_node();
-            audio::offline_output_node &offline_output_node = offline_engine.offline_output_node();
+            offline_manager.add_offline_output_node();
+            audio::engine::offline_output_node &offline_output_node = offline_manager.offline_output_node();
 
             offline_mixer_node.unit_node().node().reset();
             offline_mixer_node.set_input_pan(0.0f, 0);
@@ -158,11 +158,11 @@ namespace sample {
             offline_mixer_node.set_output_volume(1.0f, 0);
             offline_mixer_node.set_output_pan(0.0f, 0);
 
-            offline_engine.connect(offline_mixer_node.unit_node().node(), offline_output_node.node(), format);
-            offline_engine.connect(offline_sine_node.tap_node().node(), offline_mixer_node.unit_node().node(), format);
+            offline_manager.connect(offline_mixer_node.unit_node().node(), offline_output_node.node(), format);
+            offline_manager.connect(offline_sine_node.tap_node().node(), offline_mixer_node.unit_node().node(), format);
 
-            engine_observer = play_engine.subject().make_observer(
-                audio::engine::method::configuration_change,
+            engine_observer = play_manager.subject().make_observer(
+                audio::engine::manager::method::configuration_change,
                 [weak_play_output_node = to_weak(play_output_node)](auto const &) {
                     if (auto play_output_node = weak_play_output_node.lock()) {
                         play_output_node.unit_io_node().set_device(audio::device::default_output_device());
@@ -189,7 +189,7 @@ namespace sample {
 - (void)viewDidAppear {
     [super viewDidAppear];
 
-    if (_internal.play_engine && !_internal.play_engine.start_render()) {
+    if (_internal.play_manager && !_internal.play_manager.start_render()) {
         NSLog(@"%s error", __PRETTY_FUNCTION__);
     }
 }
@@ -197,7 +197,7 @@ namespace sample {
 - (void)viewWillDisappear {
     [super viewWillDisappear];
 
-    _internal.play_engine.stop();
+    _internal.play_manager.stop();
 }
 
 - (void)setVolume:(float)volume {
@@ -267,7 +267,7 @@ namespace sample {
     auto unowned_self = make_objc_ptr([[YASUnownedObject<YASAudioOfflineSampleViewController *> alloc] init]);
     [unowned_self.object() setObject:self];
 
-    auto start_result = _internal.offline_engine.start_offline_render(
+    auto start_result = _internal.offline_manager.start_offline_render(
         [remain, file_writer = std::move(file_writer)](auto args) mutable {
             auto &buffer = args.buffer;
 

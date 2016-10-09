@@ -16,7 +16,7 @@ using namespace yas;
 @end
 
 @implementation YASAudioEngineSampleParameterCell {
-    std::experimental::optional<audio::unit_node> _node_opt;
+    std::experimental::optional<audio::engine::unit_node> _node_opt;
     uint32_t _index;
 }
 
@@ -33,6 +33,8 @@ using namespace yas;
 }
 
 - (void)awakeFromNib {
+    [super awakeFromNib];
+    
     [self reset];
 }
 
@@ -45,7 +47,7 @@ using namespace yas;
     [self set_node:yas::nullopt index:0];
 }
 
-- (void)set_node:(const std::experimental::optional<audio::unit_node> &)node_opt index:(uint32_t const)index {
+- (void)set_node:(const std::experimental::optional<audio::engine::unit_node> &)node_opt index:(uint32_t const)index {
     _node_opt = node_opt;
     _index = index;
 

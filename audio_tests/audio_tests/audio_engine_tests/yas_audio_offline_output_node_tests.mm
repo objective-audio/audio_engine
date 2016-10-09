@@ -22,7 +22,7 @@ using namespace yas;
 }
 
 - (void)test_create {
-    audio::offline_output_node node;
+    audio::engine::offline_output_node node;
 
     XCTAssertTrue(node);
 
@@ -31,7 +31,7 @@ using namespace yas;
 }
 
 - (void)test_create_null {
-    audio::offline_output_node node{nullptr};
+    audio::engine::offline_output_node node{nullptr};
 
     XCTAssertFalse(node);
 }
@@ -39,16 +39,16 @@ using namespace yas;
 - (void)test_offline_render_with_audio_engine {
     double const sample_rate = 44100.0;
 
-    audio::engine engine;
-    engine.add_offline_output_node();
+    audio::engine::manager manager;
+    manager.add_offline_output_node();
 
     auto format = audio::format({.sample_rate = sample_rate, .channel_count = 2});
-    audio::offline_output_node &output_node = engine.offline_output_node();
-    audio::unit_node sample_delay_node(kAudioUnitType_Effect, kAudioUnitSubType_SampleDelay);
-    audio::tap_node tap_node;
+    audio::engine::offline_output_node &output_node = manager.offline_output_node();
+    audio::engine::unit_node sample_delay_node(kAudioUnitType_Effect, kAudioUnitSubType_SampleDelay);
+    audio::engine::tap_node tap_node;
 
-    engine.connect(sample_delay_node.node(), output_node.node(), format);
-    engine.connect(tap_node.node(), sample_delay_node.node(), format);
+    manager.connect(sample_delay_node.node(), output_node.node(), format);
+    manager.connect(tap_node.node(), sample_delay_node.node(), format);
 
     XCTestExpectation *tapNodeExpectation = [self expectationWithDescription:@"tap node render"];
 
@@ -56,7 +56,7 @@ using namespace yas;
     uint32_t const length = 4192;
     uint32_t tap_render_frame = 0;
 
-    auto tap_render_handler = [=](audio::node::render_args args) mutable {
+    auto tap_render_handler = [=](audio::engine::node::render_args args) mutable {
         auto &buffer = args.buffer;
         auto const &when = args.when;
 
@@ -86,7 +86,7 @@ using namespace yas;
 
     uint32_t output_render_frame = 0;
 
-    auto start_render_handler = [=](audio::offline_render_args args) mutable {
+    auto start_render_handler = [=](audio::engine::offline_render_args args) mutable {
         auto &buffer = args.buffer;
         auto const &when = args.when;
         bool &out_stop = args.out_stop;
@@ -126,7 +126,7 @@ using namespace yas;
         }
     };
 
-    auto result = engine.start_offline_render(start_render_handler, completion_handler);
+    auto result = manager.start_offline_render(start_render_handler, completion_handler);
 
     XCTAssertTrue(result);
 
@@ -136,8 +136,8 @@ using namespace yas;
 - (void)test_offline_render_without_audio_engine {
     double const sample_rate = 48000.0;
     auto format = audio::format({.sample_rate = sample_rate, .channel_count = 2});
-    audio::offline_output_node output_node;
-    audio::tap_node tap_node;
+    audio::engine::offline_output_node output_node;
+    audio::engine::tap_node tap_node;
 
     auto connection = test::connection(tap_node.node(), 0, output_node.node(), 0, format);
 
@@ -238,7 +238,7 @@ using namespace yas;
 }
 
 - (void)test_bus_count {
-    audio::offline_output_node output_node;
+    audio::engine::offline_output_node output_node;
 
     XCTAssertEqual(output_node.node().output_bus_count(), 0);
     XCTAssertEqual(output_node.node().input_bus_count(), 1);
@@ -246,8 +246,8 @@ using namespace yas;
 
 - (void)test_reset_to_stop {
     auto format = audio::format({.sample_rate = 48000.0, .channel_count = 2});
-    audio::offline_output_node output_node;
-    audio::tap_node tap_node;
+    audio::engine::offline_output_node output_node;
+    audio::engine::tap_node tap_node;
 
     auto connection = test::connection(tap_node.node(), 0, output_node.node(), 0, format);
 
@@ -290,14 +290,14 @@ using namespace yas;
 }
 
 - (void)test_offline_start_error_to_string {
-    XCTAssertTrue(to_string(audio::offline_start_error_t::already_running) == "already_running");
-    XCTAssertTrue(to_string(audio::offline_start_error_t::prepare_failure) == "prepare_failure");
-    XCTAssertTrue(to_string(audio::offline_start_error_t::connection_not_found) == "connection_not_found");
+    XCTAssertTrue(to_string(audio::engine::offline_start_error_t::already_running) == "already_running");
+    XCTAssertTrue(to_string(audio::engine::offline_start_error_t::prepare_failure) == "prepare_failure");
+    XCTAssertTrue(to_string(audio::engine::offline_start_error_t::connection_not_found) == "connection_not_found");
 }
 
 - (void)test_offline_start_error_ostream {
-    auto const errors = {audio::offline_start_error_t::already_running, audio::offline_start_error_t::prepare_failure,
-                         audio::offline_start_error_t::connection_not_found};
+    auto const errors = {audio::engine::offline_start_error_t::already_running, audio::engine::offline_start_error_t::prepare_failure,
+                         audio::engine::offline_start_error_t::connection_not_found};
 
     for (auto const &error : errors) {
         std::ostringstream stream;

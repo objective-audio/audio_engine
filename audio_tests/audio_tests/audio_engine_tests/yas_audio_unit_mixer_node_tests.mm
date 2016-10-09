@@ -21,7 +21,7 @@ using namespace yas;
 }
 
 - (void)test_parameter_exists {
-    audio::unit_mixer_node mixer_node;
+    audio::engine::unit_mixer_node mixer_node;
 
     auto const &paramters = mixer_node.unit_node().parameters();
     auto const &input_parameters = paramters.at(kAudioUnitScope_Input);
@@ -50,7 +50,7 @@ using namespace yas;
 }
 
 - (void)test_element {
-    audio::unit_mixer_node mixer_node;
+    audio::engine::unit_mixer_node mixer_node;
     uint32_t const default_element_count = mixer_node.unit_node().input_element_count();
 
     XCTAssertGreaterThanOrEqual(default_element_count, 1);
@@ -66,7 +66,7 @@ using namespace yas;
 }
 
 - (void)test_restore_parameters {
-    audio::unit_mixer_node mixer_node;
+    audio::engine::unit_mixer_node mixer_node;
 
     uint32_t const bus_idx = 0;
     float const input_volume = 0.5f;

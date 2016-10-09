@@ -36,13 +36,13 @@ using namespace yas;
 }
 
 - (void)test_create_null {
-    audio::node node{nullptr};
+    audio::engine::node node{nullptr};
 
     XCTAssertFalse(node);
 }
 
 - (void)test_create_kernel {
-    audio::kernel kernel;
+    audio::engine::kernel kernel;
 
     XCTAssertTrue(kernel);
 
@@ -133,19 +133,19 @@ using namespace yas;
     XCTAssertEqual(time, node.last_render_time());
 }
 
-- (void)test_set_engine {
+- (void)test_set_manager {
     auto node = test::make_node();
-    audio::engine engine;
+    audio::engine::manager manager;
 
-    XCTAssertFalse(node.engine());
+    XCTAssertFalse(node.manager());
 
-    node.manageable().set_engine(engine);
+    node.manageable().set_manager(manager);
 
-    XCTAssertEqual(engine, node.engine());
+    XCTAssertEqual(manager, node.manager());
 
-    node.manageable().set_engine(audio::engine(nullptr));
+    node.manageable().set_manager(audio::engine::manager{nullptr});
 
-    XCTAssertFalse(node.engine());
+    XCTAssertFalse(node.manager());
 }
 
 - (void)test_kernel {
@@ -157,7 +157,7 @@ using namespace yas;
 
     auto output_connection = test::connection(relay_decor.node(), 0, output_decor.node(), 0, output_format);
 
-    std::vector<audio::connection> input_connections;
+    std::vector<audio::engine::connection> input_connections;
     input_connections.reserve(relay_decor.node().input_bus_count());
 
     for (uint32_t i = 0; i < relay_decor.node().input_bus_count(); ++i) {
@@ -215,11 +215,11 @@ using namespace yas;
 }
 
 - (void)test_method_to_string {
-    XCTAssertEqual(to_string(audio::node::method::will_reset), "will_reset");
+    XCTAssertEqual(to_string(audio::engine::node::method::will_reset), "will_reset");
 }
 
 - (void)test_method_ostream {
-    auto const values = {audio::node::method::will_reset};
+    auto const values = {audio::engine::node::method::will_reset};
 
     for (auto const &value : values) {
         std::ostringstream stream;

@@ -10,25 +10,25 @@
 
 using namespace yas;
 
-#pragma mark - audio::offline_output_node::impl
+#pragma mark - audio::engine::offline_output_node::impl
 
-struct audio::offline_output_node::impl : base::impl, manageable_offline_output_unit::impl {
+struct audio::engine::offline_output_node::impl : base::impl, manageable_offline_output_unit::impl {
     operation_queue _queue = nullptr;
-    audio::node _node = {{.input_bus_count = 1, .output_bus_count = 0}};
-    audio::node::observer_t _reset_observer;
+    audio::engine::node _node = {{.input_bus_count = 1, .output_bus_count = 0}};
+    audio::engine::node::observer_t _reset_observer;
 
     ~impl() = default;
 
     void prepare(offline_output_node const &node) {
         _reset_observer =
-            _node.subject().make_observer(audio::node::method::will_reset, [weak_node = to_weak(node)](auto const &) {
+            _node.subject().make_observer(audio::engine::node::method::will_reset, [weak_node = to_weak(node)](auto const &) {
                 if (auto node = weak_node.lock()) {
-                    node.impl_ptr<audio::offline_output_node::impl>()->stop();
+                    node.impl_ptr<audio::engine::offline_output_node::impl>()->stop();
                 }
             });
     }
 
-    audio::offline_start_result_t start(offline_render_f &&render_handler,
+    audio::engine::offline_start_result_t start(offline_render_f &&render_handler,
                                         offline_completion_f &&completion_handler) override {
         if (_queue) {
             return offline_start_result_t(offline_start_error_t::already_running);
@@ -144,7 +144,7 @@ struct audio::offline_output_node::impl : base::impl, manageable_offline_output_
         return _queue != nullptr;
     }
 
-    audio::node &node() {
+    audio::engine::node &node() {
         return _node;
     }
 
@@ -187,51 +187,51 @@ struct audio::offline_output_node::impl : base::impl, manageable_offline_output_
     core _core;
 };
 
-#pragma mark - audio::offline_output_node
+#pragma mark - audio::engine::offline_output_node
 
-audio::offline_output_node::offline_output_node() : base(std::make_unique<impl>()) {
+audio::engine::offline_output_node::offline_output_node() : base(std::make_unique<impl>()) {
     impl_ptr<impl>()->prepare(*this);
 }
 
-audio::offline_output_node::offline_output_node(std::nullptr_t) : base(nullptr) {
+audio::engine::offline_output_node::offline_output_node(std::nullptr_t) : base(nullptr) {
 }
 
-audio::offline_output_node::offline_output_node(std::shared_ptr<impl> const &imp) : base(imp) {
+audio::engine::offline_output_node::offline_output_node(std::shared_ptr<impl> const &imp) : base(imp) {
     impl_ptr<impl>()->prepare(*this);
 }
 
-audio::offline_output_node::~offline_output_node() = default;
+audio::engine::offline_output_node::~offline_output_node() = default;
 
-bool audio::offline_output_node::is_running() const {
+bool audio::engine::offline_output_node::is_running() const {
     return impl_ptr<impl>()->is_running();
 }
 
-audio::node const &audio::offline_output_node::node() const {
+audio::engine::node const &audio::engine::offline_output_node::node() const {
     return impl_ptr<impl>()->node();
 }
-audio::node &audio::offline_output_node::node() {
+audio::engine::node &audio::engine::offline_output_node::node() {
     return impl_ptr<impl>()->node();
 }
 
-audio::manageable_offline_output_unit &audio::offline_output_node::manageable() {
+audio::engine::manageable_offline_output_unit &audio::engine::offline_output_node::manageable() {
     if (!_manageable) {
-        _manageable = audio::manageable_offline_output_unit{impl_ptr<manageable_offline_output_unit::impl>()};
+        _manageable = audio::engine::manageable_offline_output_unit{impl_ptr<manageable_offline_output_unit::impl>()};
     }
     return _manageable;
 }
 
-std::string yas::to_string(audio::offline_start_error_t const &error) {
+std::string yas::to_string(audio::engine::offline_start_error_t const &error) {
     switch (error) {
-        case audio::offline_start_error_t::already_running:
+        case audio::engine::offline_start_error_t::already_running:
             return "already_running";
-        case audio::offline_start_error_t::prepare_failure:
+        case audio::engine::offline_start_error_t::prepare_failure:
             return "prepare_failure";
-        case audio::offline_start_error_t::connection_not_found:
+        case audio::engine::offline_start_error_t::connection_not_found:
             return "connection_not_found";
     }
 }
 
-std::ostream &operator<<(std::ostream &os, yas::audio::offline_start_error_t const &value) {
+std::ostream &operator<<(std::ostream &os, yas::audio::engine::offline_start_error_t const &value) {
     os << to_string(value);
     return os;
 }

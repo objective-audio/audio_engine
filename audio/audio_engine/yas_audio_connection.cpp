@@ -8,7 +8,7 @@
 
 using namespace yas;
 
-struct audio::connection::impl : base::impl, node_removable::impl {
+struct audio::engine::connection::impl : base::impl, node_removable::impl {
     uint32_t _source_bus;
     uint32_t _destination_bus;
     audio::format _format;
@@ -63,8 +63,8 @@ struct audio::connection::impl : base::impl, node_removable::impl {
     weak<node> _destination_node;
 };
 
-audio::connection::connection(node &source_node, uint32_t const source_bus, node &destination_node,
-                              uint32_t const destination_bus, audio::format const &format)
+audio::engine::connection::connection(node &source_node, uint32_t const source_bus, node &destination_node,
+                                      uint32_t const destination_bus, audio::format const &format)
     : base(std::make_shared<impl>(source_node, source_bus, destination_node, destination_bus, format)) {
     if (!source_node || !destination_node) {
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : invalid argument.");
@@ -74,10 +74,10 @@ audio::connection::connection(node &source_node, uint32_t const source_bus, node
     destination_node.connectable().add_connection(*this);
 }
 
-audio::connection::connection(std::nullptr_t) : base(nullptr) {
+audio::engine::connection::connection(std::nullptr_t) : base(nullptr) {
 }
 
-audio::connection::~connection() {
+audio::engine::connection::~connection() {
     if (impl_ptr() && impl_ptr().unique()) {
         if (auto imp = impl_ptr<impl>()) {
             imp->remove_connection_from_nodes(*this);
@@ -86,35 +86,35 @@ audio::connection::~connection() {
     }
 }
 
-uint32_t audio::connection::source_bus() const {
+uint32_t audio::engine::connection::source_bus() const {
     return impl_ptr<impl>()->_source_bus;
 }
 
-uint32_t audio::connection::destination_bus() const {
+uint32_t audio::engine::connection::destination_bus() const {
     return impl_ptr<impl>()->_destination_bus;
 }
 
-audio::node audio::connection::source_node() const {
+audio::engine::node audio::engine::connection::source_node() const {
     if (impl_ptr()) {
         return impl_ptr<impl>()->source_node();
     }
     return node{nullptr};
 }
 
-audio::node audio::connection::destination_node() const {
+audio::engine::node audio::engine::connection::destination_node() const {
     if (impl_ptr()) {
         return impl_ptr<impl>()->destination_node();
     }
     return node{nullptr};
 }
 
-audio::format const &audio::connection::format() const {
+audio::format const &audio::engine::connection::format() const {
     return impl_ptr<impl>()->_format;
 }
 
-audio::node_removable &audio::connection::node_removable() {
+audio::engine::node_removable &audio::engine::connection::node_removable() {
     if (!_node_removable) {
-        _node_removable = audio::node_removable{impl_ptr<node_removable::impl>()};
+        _node_removable = audio::engine::node_removable{impl_ptr<node_removable::impl>()};
     }
     return _node_removable;
 }

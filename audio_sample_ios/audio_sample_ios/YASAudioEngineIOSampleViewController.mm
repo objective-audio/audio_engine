@@ -32,9 +32,9 @@ typedef NS_ENUM(NSUInteger, YASAudioEngineIOSampleSection) {
 namespace yas {
 namespace sample {
     struct engine_io_vc_internal {
-        audio::engine engine;
-        audio::unit_mixer_node mixer_node;
-        audio::unit_io_node io_node;
+        audio::engine::manager manager;
+        audio::engine::unit_mixer_node mixer_node;
+        audio::engine::unit_io_node io_node;
 
         base engine_observer = nullptr;
 
@@ -109,7 +109,7 @@ namespace sample {
         if ([[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryMultiRoute error:&error]) {
             [self setupEngine];
 
-            auto const start_result = _internal.engine.start_render();
+            auto const start_result = _internal.manager.start_render();
             if (start_result) {
                 [self.tableView reloadData];
                 [self _updateSlider];
@@ -132,8 +132,8 @@ namespace sample {
     [super viewWillDisappear:animated];
 
     if (self.isMovingFromParentViewController) {
-        if (_internal.engine) {
-            _internal.engine.stop();
+        if (_internal.manager) {
+            _internal.manager.stop();
         }
 
         [[AVAudioSession sharedInstance] setActive:NO error:nil];
@@ -196,8 +196,8 @@ namespace sample {
     auto unowned_self = make_objc_ptr([[YASUnownedObject alloc] init]);
     [unowned_self.object() setObject:self];
 
-    _internal.engine_observer = _internal.engine.subject().make_observer(
-        audio::engine::method::configuration_change, [unowned_self](auto const &context) {
+    _internal.engine_observer = _internal.manager.subject().make_observer(
+        audio::engine::manager::method::configuration_change, [unowned_self](auto const &context) {
             if ([UIApplication sharedApplication].applicationState == UIApplicationStateActive) {
                 [[unowned_self.object() object] _updateEngine];
             }
@@ -215,7 +215,7 @@ namespace sample {
 }
 
 - (void)_disconnectNodes {
-    _internal.engine.disconnect(_internal.mixer_node.unit_node().node());
+    _internal.manager.disconnect(_internal.mixer_node.unit_node().node());
 }
 
 - (void)_connectNodes {
@@ -224,20 +224,20 @@ namespace sample {
     auto const output_channel_count = _internal.connection_channel_count_for_direction(audio::direction::output);
     if (output_channel_count > 0) {
         auto output_format = audio::format({.sample_rate = sample_rate, .channel_count = output_channel_count});
-        _internal.engine.connect(_internal.mixer_node.unit_node().node(), _internal.io_node.unit_node().node(), output_format);
+        _internal.manager.connect(_internal.mixer_node.unit_node().node(), _internal.io_node.unit_node().node(), output_format);
     }
 
     auto const input_channel_count = _internal.connection_channel_count_for_direction(audio::direction::input);
     if (input_channel_count > 0) {
         auto input_format = audio::format({.sample_rate = sample_rate, .channel_count = input_channel_count});
-        _internal.engine.connect(_internal.io_node.unit_node().node(), _internal.mixer_node.unit_node().node(), input_format);
+        _internal.manager.connect(_internal.io_node.unit_node().node(), _internal.mixer_node.unit_node().node(), input_format);
     }
 }
 
 #pragma mark -
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    if (!_internal.engine) {
+    if (!_internal.manager) {
         return 0;
     }
 
@@ -245,7 +245,7 @@ namespace sample {
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    if (!_internal.engine) {
+    if (!_internal.manager) {
         return 0;
     }
 
@@ -354,9 +354,9 @@ namespace sample {
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     switch (indexPath.section) {
         case YASAudioEngineIOSampleSectionNotify: {
-            if (_internal.engine) {
-                auto &engine = _internal.engine;
-                engine.subject().notify(audio::engine::method::configuration_change, engine);
+            if (_internal.manager) {
+                auto &manager = _internal.manager;
+                manager.subject().notify(audio::engine::manager::method::configuration_change, manager);
             }
         } break;
 

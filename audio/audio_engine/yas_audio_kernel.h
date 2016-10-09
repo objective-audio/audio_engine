@@ -9,27 +9,29 @@
 
 namespace yas {
 namespace audio {
-    struct kernel : base {
-        kernel();
-        kernel(std::nullptr_t);
+    namespace engine {
+        struct kernel : base {
+            kernel();
+            kernel(std::nullptr_t);
 
-        virtual ~kernel() final;
+            virtual ~kernel() final;
 
-        audio::connection_smap input_connections() const;
-        audio::connection_smap output_connections() const;
-        audio::connection input_connection(uint32_t const bus_idx) const;
-        audio::connection output_connection(uint32_t const bus_idx) const;
+            audio::engine::connection_smap input_connections() const;
+            audio::engine::connection_smap output_connections() const;
+            audio::engine::connection input_connection(uint32_t const bus_idx) const;
+            audio::engine::connection output_connection(uint32_t const bus_idx) const;
 
-        void set_decorator(base);
-        base const &decorator() const;
-        base &decorator();
+            void set_decorator(base);
+            base const &decorator() const;
+            base &decorator();
 
-        manageable_kernel &manageable();
+            manageable_kernel &manageable();
 
-       private:
-        struct impl;
+           private:
+            struct impl;
 
-        manageable_kernel _manageable = nullptr;
-    };
+            manageable_kernel _manageable = nullptr;
+        };
+    }
 }
 }

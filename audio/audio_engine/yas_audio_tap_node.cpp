@@ -8,9 +8,9 @@ using namespace yas;
 
 #pragma mark - audio::tap_kernel
 
-struct audio::tap_node::kernel : base {
+struct audio::engine::tap_node::kernel : base {
     struct impl : base::impl {
-        audio::node::render_f _render_handler;
+        audio::engine::node::render_f _render_handler;
     };
 
     kernel() : base(std::make_shared<impl>()) {
@@ -19,21 +19,21 @@ struct audio::tap_node::kernel : base {
     kernel(std::nullptr_t) : base(nullptr) {
     }
 
-    void set_render_handler(audio::node::render_f handler) {
+    void set_render_handler(audio::engine::node::render_f handler) {
         impl_ptr<impl>()->_render_handler = std::move(handler);
     }
 
-    audio::node::render_f const &render_handler() {
+    audio::engine::node::render_f const &render_handler() {
         return impl_ptr<impl>()->_render_handler;
     }
 };
 
-#pragma mark - audio::tap_node::impl
+#pragma mark - audio::engine::tap_node::impl
 
-struct audio::tap_node::impl : base::impl {
-    audio::node _node;
+struct audio::engine::tap_node::impl : base::impl {
+    audio::engine::node _node;
 
-    impl(audio::node_args &&args) : _node(std::move(args)) {
+    impl(audio::engine::node_args &&args) : _node(std::move(args)) {
     }
 
     ~impl() = default;
@@ -61,44 +61,44 @@ struct audio::tap_node::impl : base::impl {
             }
         });
 
-        _reset_observer = _node.subject().make_observer(audio::node::method::will_reset, [weak_node](auto const &) {
+        _reset_observer = _node.subject().make_observer(audio::engine::node::method::will_reset, [weak_node](auto const &) {
             if (auto node = weak_node.lock()) {
-                node.impl_ptr<audio::tap_node::impl>()->_render_handler = nullptr;
+                node.impl_ptr<audio::engine::tap_node::impl>()->_render_handler = nullptr;
             }
         });
 
-        _node.set_prepare_kernel_handler([weak_node](audio::kernel &kernel) {
+        _node.set_prepare_kernel_handler([weak_node](audio::engine::kernel &kernel) {
             if (auto node = weak_node.lock()) {
-                audio::tap_node::kernel tap_kernel{};
-                tap_kernel.set_render_handler(node.impl_ptr<audio::tap_node::impl>()->_render_handler);
+                audio::engine::tap_node::kernel tap_kernel{};
+                tap_kernel.set_render_handler(node.impl_ptr<audio::engine::tap_node::impl>()->_render_handler);
                 kernel.set_decorator(std::move(tap_kernel));
             }
         });
     }
 
-    void set_render_handler(audio::node::render_f &&func) {
+    void set_render_handler(audio::engine::node::render_f &&func) {
         _render_handler = func;
 
         _node.manageable().update_kernel();
     }
 
-    audio::connection input_connection_on_render(uint32_t const bus_idx) {
+    audio::engine::connection input_connection_on_render(uint32_t const bus_idx) {
         return _kernel_on_render.input_connection(bus_idx);
     }
 
-    audio::connection output_connection_on_render(uint32_t const bus_idx) {
+    audio::engine::connection output_connection_on_render(uint32_t const bus_idx) {
         return _kernel_on_render.output_connection(bus_idx);
     }
 
-    audio::connection_smap input_connections_on_render() {
+    audio::engine::connection_smap input_connections_on_render() {
         return _kernel_on_render.input_connections();
     }
 
-    audio::connection_smap output_connections_on_render() {
+    audio::engine::connection_smap output_connections_on_render() {
         return _kernel_on_render.output_connections();
     }
 
-    void render_source(audio::node::render_args &&args) {
+    void render_source(audio::engine::node::render_args &&args) {
         if (auto connection = _kernel_on_render.input_connection(args.bus_idx)) {
             if (auto node = connection.source_node()) {
                 node.render({.buffer = args.buffer, .bus_idx = connection.source_bus(), .when = args.when});
@@ -107,58 +107,58 @@ struct audio::tap_node::impl : base::impl {
     }
 
    private:
-    audio::node::render_f _render_handler;
-    audio::node::observer_t _reset_observer;
-    audio::kernel _kernel_on_render;
+    audio::engine::node::render_f _render_handler;
+    audio::engine::node::observer_t _reset_observer;
+    audio::engine::kernel _kernel_on_render;
 };
 
-#pragma mark - audio::tap_node
+#pragma mark - audio::engine::tap_node
 
-audio::tap_node::tap_node() : tap_node({.is_input = false}) {
+audio::engine::tap_node::tap_node() : tap_node({.is_input = false}) {
 }
 
-audio::tap_node::tap_node(args args)
-: base(std::make_unique<impl>(args.is_input ? node_args{.input_bus_count = 1, .input_renderable = true} :
-                              node_args{.input_bus_count = 1, .output_bus_count = 1})) {
+audio::engine::tap_node::tap_node(args args)
+: base(std::make_unique<impl>(args.is_input ? engine::node_args{.input_bus_count = 1, .input_renderable = true} :
+                              engine::node_args{.input_bus_count = 1, .output_bus_count = 1})) {
     impl_ptr<impl>()->prepare(*this);
 }
 
-audio::tap_node::tap_node(std::nullptr_t) : base(nullptr) {
+audio::engine::tap_node::tap_node(std::nullptr_t) : base(nullptr) {
 }
 
-audio::tap_node::~tap_node() = default;
+audio::engine::tap_node::~tap_node() = default;
 
-void audio::tap_node::set_render_handler(audio::node::render_f handler) {
+void audio::engine::tap_node::set_render_handler(audio::engine::node::render_f handler) {
     impl_ptr<impl>()->set_render_handler(std::move(handler));
 }
 
-audio::node const &audio::tap_node::node() const {
+audio::engine::node const &audio::engine::tap_node::node() const {
     return impl_ptr<impl>()->_node;
 }
 
-audio::node &audio::tap_node::node() {
+audio::engine::node &audio::engine::tap_node::node() {
     return impl_ptr<impl>()->_node;
 }
 
-audio::connection audio::tap_node::input_connection_on_render(uint32_t const bus_idx) const {
+audio::engine::connection audio::engine::tap_node::input_connection_on_render(uint32_t const bus_idx) const {
     return impl_ptr<impl>()->input_connection_on_render(bus_idx);
 }
 
-audio::connection audio::tap_node::output_connection_on_render(uint32_t const bus_idx) const {
+audio::engine::connection audio::engine::tap_node::output_connection_on_render(uint32_t const bus_idx) const {
     return impl_ptr<impl>()->output_connection_on_render(bus_idx);
 }
 
-audio::connection_smap audio::tap_node::input_connections_on_render() const {
+audio::engine::connection_smap audio::engine::tap_node::input_connections_on_render() const {
     return impl_ptr<impl>()->input_connections_on_render();
 }
 
-audio::connection_smap audio::tap_node::output_connections_on_render() const {
+audio::engine::connection_smap audio::engine::tap_node::output_connections_on_render() const {
     return impl_ptr<impl>()->output_connections_on_render();
 }
 
 #if YAS_TEST
 
-void audio::tap_node::render_source(audio::node::render_args args) {
+void audio::engine::tap_node::render_source(audio::engine::node::render_args args) {
     impl_ptr<impl>()->render_source(std::move(args));
 }
 

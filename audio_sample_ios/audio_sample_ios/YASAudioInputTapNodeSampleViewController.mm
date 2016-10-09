@@ -23,9 +23,9 @@ namespace sample {
             input_level,
         };
 
-        audio::engine engine;
-        audio::unit_input_node input_node;
-        audio::tap_node input_tap_node = {{.is_input = true}};
+        audio::engine::manager manager;
+        audio::engine::unit_input_node input_node;
+        audio::engine::tap_node input_tap_node = {{.is_input = true}};
 
         property<float, property_key> input_level{
             {.key = property_key::input_level, .value = audio::math::decibel_from_linear(0.0f)}};
@@ -35,7 +35,7 @@ namespace sample {
         void prepare() {
             double const sample_rate = input_node.unit_io_node().device_sample_rate();
             audio::format format{{.sample_rate = sample_rate, .channel_count = 2}};
-            engine.connect(input_node.unit_io_node().unit_node().node(), input_tap_node.node(), format);
+            manager.connect(input_node.unit_io_node().unit_node().node(), input_tap_node.node(), format);
 
             input_tap_node.set_render_handler([input_level = input_level, sample_rate](auto args) mutable {
                 auto &buffer = args.buffer;
@@ -56,7 +56,7 @@ namespace sample {
         }
 
         void stop() {
-            engine.stop();
+            manager.stop();
 
             [[AVAudioSession sharedInstance] setActive:NO error:nil];
         }
@@ -88,7 +88,7 @@ namespace sample {
 
     if ([[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayAndRecord error:&error]) {
         _internal.prepare();
-        auto start_result = _internal.engine.start_render();
+        auto start_result = _internal.manager.start_render();
         if (start_result) {
             success = YES;
             self.displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(updateUI:)];
@@ -112,7 +112,7 @@ namespace sample {
     [self.displayLink invalidate];
     self.displayLink = nil;
 
-    _internal.engine.stop();
+    _internal.manager.stop();
 }
 
 - (void)updateUI:(CADisplayLink *)sender {

@@ -16,11 +16,11 @@
 
 using namespace yas;
 
-#pragma mark - audio::device_io_node::impl
+#pragma mark - audio::engine::device_io_node::impl
 
-struct yas::audio::device_io_node::impl : base::impl, manageable_device_io_node::impl {
-    audio::node _node = {{.input_bus_count = 1, .output_bus_count = 1}};
-    audio::node::observer_t _connections_observer;
+struct yas::audio::engine::device_io_node::impl : base::impl, manageable_device_io_node::impl {
+    audio::engine::node _node = {{.input_bus_count = 1, .output_bus_count = 1}};
+    audio::engine::node::observer_t _connections_observer;
 
     virtual ~impl() final = default;
 
@@ -43,7 +43,7 @@ struct yas::audio::device_io_node::impl : base::impl, manageable_device_io_node:
         });
 
         _connections_observer =
-            _node.subject().make_observer(audio::node::method::update_connections, [weak_node](auto const &) {
+            _node.subject().make_observer(audio::engine::node::method::update_connections, [weak_node](auto const &) {
                 if (auto device_io_node = weak_node.lock()) {
                     device_io_node.impl_ptr<impl>()->_update_device_io_connections();
                 }
@@ -183,39 +183,39 @@ struct yas::audio::device_io_node::impl : base::impl, manageable_device_io_node:
     }
 };
 
-#pragma mark - audio::device_io_node
+#pragma mark - audio::engine::device_io_node
 
-audio::device_io_node::device_io_node() : device_io_node(audio::device(nullptr)) {
+audio::engine::device_io_node::device_io_node() : device_io_node(audio::device(nullptr)) {
 }
 
-audio::device_io_node::device_io_node(std::nullptr_t) : base(nullptr) {
+audio::engine::device_io_node::device_io_node(std::nullptr_t) : base(nullptr) {
 }
 
-audio::device_io_node::device_io_node(audio::device const &device) : base(std::make_unique<impl>()) {
+audio::engine::device_io_node::device_io_node(audio::device const &device) : base(std::make_unique<impl>()) {
     impl_ptr<impl>()->prepare(*this, device);
 }
 
-audio::device_io_node::~device_io_node() = default;
+audio::engine::device_io_node::~device_io_node() = default;
 
-void audio::device_io_node::set_device(audio::device const &device) {
+void audio::engine::device_io_node::set_device(audio::device const &device) {
     impl_ptr<impl>()->set_device(device);
 }
 
-audio::device audio::device_io_node::device() const {
+audio::device audio::engine::device_io_node::device() const {
     return impl_ptr<impl>()->device();
 }
 
-audio::node const &audio::device_io_node::node() const {
+audio::engine::node const &audio::engine::device_io_node::node() const {
     return impl_ptr<impl>()->_node;
 }
 
-audio::node &audio::device_io_node::node() {
+audio::engine::node &audio::engine::device_io_node::node() {
     return impl_ptr<impl>()->_node;
 }
 
-audio::manageable_device_io_node &audio::device_io_node::manageable() {
+audio::engine::manageable_device_io_node &audio::engine::device_io_node::manageable() {
     if (!_manageable) {
-        _manageable = audio::manageable_device_io_node{impl_ptr<manageable_device_io_node::impl>()};
+        _manageable = audio::engine::manageable_device_io_node{impl_ptr<manageable_device_io_node::impl>()};
     }
     return _manageable;
 }
