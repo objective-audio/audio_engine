@@ -20,110 +20,261 @@ using namespace yas;
     [super tearDown];
 }
 
-- (void)test_create_route_full {
-    uint32_t const src_bus_idx = 0;
-    uint32_t const src_ch_idx = 1;
-    uint32_t const dst_bus_idx = 2;
-    uint32_t const dst_ch_idx = 3;
+- (void)test_add_and_remove_route {
+    audio::engine::route engine_route;
 
-    auto const route = audio::route(src_bus_idx, src_ch_idx, dst_bus_idx, dst_ch_idx);
+    XCTAssertEqual(engine_route.routes().size(), 0);
 
-    XCTAssertEqual(route.source.bus, src_bus_idx);
-    XCTAssertEqual(route.source.channel, src_ch_idx);
-    XCTAssertEqual(route.destination.bus, dst_bus_idx);
-    XCTAssertEqual(route.destination.channel, dst_ch_idx);
-}
+    audio::route route{0, 1, 2, 3};
+    engine_route.add_route(route);
 
-- (void)test_create_route_common {
-    uint32_t const bus_idx = 4;
-    uint32_t const ch_idx = 5;
-
-    auto const route = audio::route(bus_idx, ch_idx);
-
-    XCTAssertEqual(route.source.bus, bus_idx);
-    XCTAssertEqual(route.source.channel, ch_idx);
-    XCTAssertEqual(route.destination.bus, bus_idx);
-    XCTAssertEqual(route.destination.channel, ch_idx);
-}
-
-- (void)test_create_route_points {
-    audio::route::point const src_point{.bus = 0, .channel = 1};
-    audio::route::point const dst_point{.bus = 2, .channel = 3};
-
-    auto const route = audio::route(src_point, dst_point);
-
-    XCTAssertEqual(route.source.bus, 0);
-    XCTAssertEqual(route.source.channel, 1);
-    XCTAssertEqual(route.destination.bus, 2);
-    XCTAssertEqual(route.destination.channel, 3);
-}
-
-- (void)test_channel_map_from_routes_normal {
-    audio::route_set_t routes{{0, 0, 0, 0}, {0, 1, 0, 1}};
-
-    auto result = audio::channel_map_from_routes(routes, 0, 2, 0, 2);
-    XCTAssertTrue(result);
-
-    auto const &map = result.value();
-    XCTAssertEqual(map.at(0), 0);
-    XCTAssertEqual(map.at(1), 1);
-}
-
-- (void)test_channel_map_from_routes_src_less_than_dst {
-    audio::route_set_t routes{{0, 0, 0, 0}, {0, 1, 0, 1}};
-
-    auto result = audio::channel_map_from_routes(routes, 0, 1, 0, 2);
-    XCTAssertTrue(result);
-
-    auto const &map = result.value();
-    XCTAssertEqual(map.size(), 1);
-    XCTAssertEqual(map.at(0), 0);
-}
-
-- (void)test_channel_map_from_routes_dst_less_than_src {
-    audio::route_set_t routes{{0, 0, 0, 0}, {0, 1, 0, 1}};
-
-    auto result = audio::channel_map_from_routes(routes, 0, 2, 0, 1);
-    XCTAssertTrue(result);
-
-    auto const &map = result.value();
-    XCTAssertEqual(map.at(0), 0);
-    XCTAssertEqual(map.at(1), -1);
-}
-
-- (void)test_channel_map_from_routes_filtered {
-    audio::route_set_t routes{{0, 0, 0, 0}, {0, 1, 1, 1}, {1, 0, 0, 1}, {1, 1, 1, 0}};
-
-    auto result_0_0 = audio::channel_map_from_routes(routes, 0, 2, 0, 2);
-    XCTAssertTrue(result_0_0);
-    if (result_0_0) {
-        auto const &map = result_0_0.value();
-        XCTAssertEqual(map.at(0), 0);
-        XCTAssertEqual(map.at(1), -1);
+    XCTAssertEqual(engine_route.routes().size(), 1);
+    for (auto route_in_engine : engine_route.routes()) {
+        XCTAssertEqual(route_in_engine, route);
     }
 
-    auto result_0_1 = audio::channel_map_from_routes(routes, 0, 2, 1, 2);
-    XCTAssertTrue(result_0_1);
-    if (result_0_1) {
-        auto const &map = result_0_1.value();
-        XCTAssertEqual(map.at(0), -1);
-        XCTAssertEqual(map.at(1), 1);
+    engine_route.remove_route(route);
+
+    XCTAssertEqual(engine_route.routes().size(), 0);
+
+    engine_route.add_route(std::move(route));
+
+    XCTAssertEqual(engine_route.routes().size(), 1);
+
+    engine_route.clear_routes();
+
+    XCTAssertEqual(engine_route.routes().size(), 0);
+}
+
+- (void)test_replace_route {
+    audio::engine::route engine_route;
+
+    XCTAssertEqual(engine_route.routes().size(), 0);
+
+    engine_route.add_route({0, 1, 2, 3});
+
+    XCTAssertEqual(engine_route.routes().size(), 1);
+
+    std::set<audio::route> routes{{4, 5, 6, 7}, {8, 9, 10, 11}};
+    engine_route.set_routes(routes);
+
+    XCTAssertEqual(engine_route.routes().size(), 2);
+    XCTAssertEqual(engine_route.routes(), routes);
+
+    engine_route.clear_routes();
+
+    XCTAssertEqual(engine_route.routes().size(), 0);
+
+    engine_route.set_routes(std::move(routes));
+
+    XCTAssertEqual(engine_route.routes().size(), 2);
+    XCTAssertNotEqual(engine_route.routes(), routes);
+}
+
+- (void)test_render {
+    audio::engine::manager manager;
+    manager.add_offline_output();
+
+    auto format = audio::format({.sample_rate = 44100.0, .channel_count = 2});
+    audio::engine::offline_output &output = manager.offline_output();
+    audio::engine::route engine_route;
+    audio::engine::tap tap;
+
+    manager.connect(engine_route.node(), output.node(), format);
+    manager.connect(tap.node(), engine_route.node(), format);
+
+    bool tap_called = false;
+    tap.set_render_handler([&tap_called](auto) { tap_called = true; });
+
+    {
+        XCTestExpectation *expectation = [self expectationWithDescription:@"first render"];
+
+        XCTAssertTrue(manager.start_offline_render([](auto args) { args.out_stop = true; },
+                                                  [expectation](bool const cancelled) { [expectation fulfill]; }));
+
+        [self waitForExpectationsWithTimeout:0.5
+                                     handler:^(NSError *error){
+
+                                     }];
     }
 
-    auto result_1_0 = audio::channel_map_from_routes(routes, 1, 2, 0, 2);
-    XCTAssertTrue(result_1_0);
-    if (result_1_0) {
-        auto const &map = result_1_0.value();
-        XCTAssertEqual(map.at(0), 1);
-        XCTAssertEqual(map.at(1), -1);
+    XCTAssertFalse(tap_called);
+
+    engine_route.add_route({0, 0, 0, 0});
+    engine_route.add_route({0, 1, 0, 1});
+
+    tap_called = false;
+    tap.set_render_handler([&tap_called, self](auto args) {
+        tap_called = true;
+        XCTAssertEqual(args.bus_idx, 0);
+        test::fill_test_values_to_buffer(args.buffer);
+    });
+
+    {
+        XCTestExpectation *expectation = [self expectationWithDescription:@"second render"];
+
+        XCTAssertTrue(manager.start_offline_render(
+            [self](auto args) {
+                args.out_stop = true;
+                audio::frame_enumerator enumerator(args.buffer);
+                auto pointer = enumerator.pointer();
+                uint32_t const *frm_idx = enumerator.frame();
+                uint32_t const *ch_idx = enumerator.channel();
+
+                while (pointer->v) {
+                    while (pointer->v) {
+                        float test_value = (float)test::test_value(*frm_idx, 0, *ch_idx);
+                        XCTAssertEqual(*pointer->f32, test_value);
+                        yas_audio_frame_enumerator_move_channel(enumerator);
+                    }
+                    XCTAssertEqual(*ch_idx, 2);
+                    yas_audio_frame_enumerator_move_frame(enumerator);
+                }
+            },
+            [expectation](bool const cancelled) { [expectation fulfill]; }));
+
+        [self waitForExpectationsWithTimeout:0.5
+                                     handler:^(NSError *error){
+
+                                     }];
     }
 
-    auto result_1_1 = audio::channel_map_from_routes(routes, 1, 2, 1, 2);
-    XCTAssertTrue(result_1_1);
-    if (result_1_1) {
-        auto const &map = result_1_1.value();
-        XCTAssertEqual(map.at(0), -1);
-        XCTAssertEqual(map.at(1), 0);
+    XCTAssertTrue(tap_called);
+}
+
+- (void)test_render_many_source {
+    auto const src_count = 2;
+
+    audio::engine::manager manager;
+    manager.add_offline_output();
+
+    auto dst_format = audio::format({.sample_rate = 44100.0, .channel_count = 2});
+    auto src_format = audio::format({.sample_rate = 44100.0, .channel_count = 1});
+    audio::engine::offline_output &output = manager.offline_output();
+    audio::engine::route engine_route;
+
+    manager.connect(engine_route.node(), output.node(), dst_format);
+
+    bool tap_calleds[src_count];
+    for (auto &tap_called : tap_calleds) {
+        tap_called = false;
+    }
+
+    std::vector<audio::engine::tap> taps;
+    for (uint32_t i = 0; i < src_count; ++i) {
+        taps.push_back(audio::engine::tap{});
+        auto &tap = taps.at(i);
+
+        manager.connect(tap.node(), engine_route.node(), 0, i, src_format);
+
+        auto &tap_called = tap_calleds[i];
+        tap.set_render_handler([&tap_called](auto args) {
+            tap_called = true;
+            test::fill_test_values_to_buffer(args.buffer);
+        });
+    }
+
+    engine_route.add_route({0, 0, 0, 0});
+    engine_route.add_route({1, 0, 0, 1});
+
+    XCTestExpectation *expectation = [self expectationWithDescription:@"render"];
+
+    XCTAssertTrue(manager.start_offline_render(
+        [self](auto args) {
+            args.out_stop = true;
+            audio::frame_enumerator enumerator(args.buffer);
+            auto pointer = enumerator.pointer();
+            uint32_t const *frm_idx = enumerator.frame();
+            uint32_t const *ch_idx = enumerator.channel();
+
+            while (pointer->v) {
+                while (pointer->v) {
+                    float test_value = (float)test::test_value(*frm_idx, 0, 0);
+                    XCTAssertEqual(*pointer->f32, test_value);
+                    yas_audio_frame_enumerator_move_channel(enumerator);
+                }
+                XCTAssertEqual(*ch_idx, 2);
+                yas_audio_frame_enumerator_move_frame(enumerator);
+            }
+        },
+        [expectation](bool const cancelled) { [expectation fulfill]; }));
+
+    [self waitForExpectationsWithTimeout:0.5
+                                 handler:^(NSError *error){
+
+                                 }];
+
+    for (auto const &tap_called : tap_calleds) {
+        XCTAssertTrue(tap_called);
+    }
+}
+
+- (void)test_render_gappy_source {
+    auto const src_count = 2;
+
+    audio::engine::manager manager;
+    manager.add_offline_output();
+
+    auto dst_format = audio::format({.sample_rate = 44100.0, .channel_count = 4});
+    auto src_format = audio::format({.sample_rate = 44100.0, .channel_count = 2});
+    audio::engine::offline_output &output = manager.offline_output();
+    audio::engine::route engine_route;
+
+    manager.connect(engine_route.node(), output.node(), dst_format);
+
+    bool tap_calleds[src_count];
+    for (auto &tap_called : tap_calleds) {
+        tap_called = false;
+    }
+
+    std::vector<audio::engine::tap> taps;
+    for (uint32_t i = 0; i < src_count; ++i) {
+        taps.push_back(audio::engine::tap{});
+        auto &tap = taps.at(i);
+
+        manager.connect(tap.node(), engine_route.node(), 0, i, src_format);
+
+        auto &tap_called = tap_calleds[i];
+        tap.set_render_handler([&tap_called](auto args) {
+            tap_called = true;
+            test::fill_test_values_to_buffer(args.buffer);
+        });
+    }
+
+    engine_route.add_route({0, 0, 0, 0});
+    engine_route.add_route({1, 0, 0, 2});
+
+    XCTestExpectation *expectation = [self expectationWithDescription:@"render"];
+
+    XCTAssertTrue(manager.start_offline_render(
+        [self](auto args) {
+            args.out_stop = true;
+            audio::frame_enumerator enumerator(args.buffer);
+            auto pointer = enumerator.pointer();
+            uint32_t const *const frm_idx = enumerator.frame();
+            uint32_t const *const ch_idx = enumerator.channel();
+
+            while (pointer->v) {
+                while (pointer->v) {
+                    if (*ch_idx == 0 || *ch_idx == 2) {
+                        float test_value = (float)test::test_value(*frm_idx, 0, 0);
+                        XCTAssertEqual(*pointer->f32, test_value);
+                    }
+                    yas_audio_frame_enumerator_move_channel(enumerator);
+                }
+                XCTAssertEqual(*ch_idx, 4);
+                yas_audio_frame_enumerator_move_frame(enumerator);
+            }
+        },
+        [expectation](bool const cancelled) { [expectation fulfill]; }));
+
+    [self waitForExpectationsWithTimeout:0.5
+                                 handler:^(NSError *error){
+
+                                 }];
+
+    for (auto const &tap_called : tap_calleds) {
+        XCTAssertTrue(tap_called);
     }
 }
 

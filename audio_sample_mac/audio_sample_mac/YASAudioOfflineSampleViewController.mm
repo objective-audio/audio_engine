@@ -14,97 +14,99 @@ namespace yas {
 namespace offline_sample {
     static double constexpr sample_rate = 44100.0;
 
-    struct sine_node : base {
-        struct impl : base::impl {
-            audio::engine::tap_node _tap_node;
-            double phase_on_render;
+    namespace engine {
+        struct sine : base {
+            struct impl : base::impl {
+                audio::engine::tap _tap;
+                double phase_on_render;
+
+                void set_frequency(float const frequency) {
+                    std::lock_guard<std::recursive_mutex> lock(_mutex);
+                    _frequency = frequency;
+                }
+
+                float frequency() const {
+                    std::lock_guard<std::recursive_mutex> lock(_mutex);
+                    return _frequency;
+                }
+
+                void set_playing(bool const playing) {
+                    std::lock_guard<std::recursive_mutex> lock(_mutex);
+                    _playing = playing;
+                }
+
+                bool is_playing() const {
+                    std::lock_guard<std::recursive_mutex> lock(_mutex);
+                    return _playing;
+                }
+
+               private:
+                float _frequency;
+                bool _playing;
+                mutable std::recursive_mutex _mutex;
+            };
+
+            sine() : base(std::make_unique<impl>()) {
+                set_frequency(1000.0);
+
+                auto weak_sine = to_weak(*this);
+
+                auto render_handler = [weak_sine](auto args) {
+                    auto &buffer = args.buffer;
+
+                    buffer.clear();
+
+                    if (auto sine = weak_sine.lock()) {
+                        if (sine.is_playing()) {
+                            double const start_phase = sine.impl_ptr<impl>()->phase_on_render;
+                            double const phase_per_frame = sine.frequency() / sample_rate * audio::math::two_pi;
+                            double next_phase = start_phase;
+                            uint32_t const frame_length = buffer.frame_length();
+
+                            if (frame_length > 0) {
+                                audio::frame_enumerator enumerator(buffer);
+                                auto const *flex_ptr = enumerator.pointer();
+                                while (flex_ptr->v) {
+                                    next_phase = audio::math::fill_sine(flex_ptr->f32, frame_length, start_phase,
+                                                                        phase_per_frame);
+                                    yas_audio_frame_enumerator_move_channel(enumerator);
+                                }
+
+                                sine.impl_ptr<impl>()->phase_on_render = next_phase;
+                            }
+                        }
+                    }
+                };
+
+                tap().set_render_handler(render_handler);
+            }
+
+            sine(std::nullptr_t) : base(nullptr) {
+            }
+
+            virtual ~sine() = default;
 
             void set_frequency(float const frequency) {
-                std::lock_guard<std::recursive_mutex> lock(_mutex);
-                _frequency = frequency;
+                impl_ptr<impl>()->set_frequency(frequency);
             }
 
             float frequency() const {
-                std::lock_guard<std::recursive_mutex> lock(_mutex);
-                return _frequency;
+                return impl_ptr<impl>()->frequency();
             }
 
             void set_playing(bool const playing) {
-                std::lock_guard<std::recursive_mutex> lock(_mutex);
-                _playing = playing;
+                impl_ptr<impl>()->set_playing(playing);
             }
 
             bool is_playing() const {
-                std::lock_guard<std::recursive_mutex> lock(_mutex);
-                return _playing;
+                return impl_ptr<impl>()->is_playing();
             }
 
-           private:
-            float _frequency;
-            bool _playing;
-            mutable std::recursive_mutex _mutex;
+            audio::engine::tap &tap() {
+                return impl_ptr<impl>()->_tap;
+            }
         };
-
-        sine_node() : base(std::make_unique<impl>()) {
-            set_frequency(1000.0);
-
-            auto weak_node = to_weak(*this);
-
-            auto render_handler = [weak_node](auto args) {
-                auto &buffer = args.buffer;
-
-                buffer.clear();
-
-                if (auto node = weak_node.lock()) {
-                    if (node.is_playing()) {
-                        double const start_phase = node.impl_ptr<impl>()->phase_on_render;
-                        double const phase_per_frame = node.frequency() / sample_rate * audio::math::two_pi;
-                        double next_phase = start_phase;
-                        uint32_t const frame_length = buffer.frame_length();
-
-                        if (frame_length > 0) {
-                            audio::frame_enumerator enumerator(buffer);
-                            auto const *flex_ptr = enumerator.pointer();
-                            while (flex_ptr->v) {
-                                next_phase =
-                                    audio::math::fill_sine(flex_ptr->f32, frame_length, start_phase, phase_per_frame);
-                                yas_audio_frame_enumerator_move_channel(enumerator);
-                            }
-
-                            node.impl_ptr<impl>()->phase_on_render = next_phase;
-                        }
-                    }
-                }
-            };
-
-            tap_node().set_render_handler(render_handler);
-        }
-
-        sine_node(std::nullptr_t) : base(nullptr) {
-        }
-
-        virtual ~sine_node() = default;
-
-        void set_frequency(float const frequency) {
-            impl_ptr<impl>()->set_frequency(frequency);
-        }
-
-        float frequency() const {
-            return impl_ptr<impl>()->frequency();
-        }
-
-        void set_playing(bool const playing) {
-            impl_ptr<impl>()->set_playing(playing);
-        }
-
-        bool is_playing() const {
-            return impl_ptr<impl>()->is_playing();
-        }
-
-        audio::engine::tap_node &tap_node() {
-            return impl_ptr<impl>()->_tap_node;
-        }
-    };
+    }
 }
 }
 
@@ -123,13 +125,13 @@ namespace yas {
 namespace sample {
     struct offline_vc_internal {
         audio::engine::manager play_manager;
-        audio::engine::unit_output_node play_output_node;
-        audio::engine::unit_mixer_node play_mixer_node;
-        offline_sample::sine_node play_sine_node;
+        audio::engine::au_output play_au_output;
+        audio::engine::au_mixer play_au_mixer;
+        offline_sample::engine::sine play_sine;
 
         audio::engine::manager offline_manager;
-        audio::engine::unit_mixer_node offline_mixer_node;
-        offline_sample::sine_node offline_sine_node;
+        audio::engine::au_mixer offline_au_mixer;
+        offline_sample::engine::sine offline_sine;
 
         base engine_observer = nullptr;
 
@@ -139,33 +141,32 @@ namespace sample {
                                          .pcm_format = audio::pcm_format::float32,
                                          .interleaved = false});
 
-            play_mixer_node.unit_node().node().reset();
-            play_mixer_node.set_input_pan(0.0f, 0);
-            play_mixer_node.set_input_enabled(true, 0);
-            play_mixer_node.set_output_volume(1.0f, 0);
-            play_mixer_node.set_output_pan(0.0f, 0);
+            play_au_mixer.au().node().reset();
+            play_au_mixer.set_input_pan(0.0f, 0);
+            play_au_mixer.set_input_enabled(true, 0);
+            play_au_mixer.set_output_volume(1.0f, 0);
+            play_au_mixer.set_output_pan(0.0f, 0);
 
-            play_manager.connect(play_mixer_node.unit_node().node(), play_output_node.unit_io_node().unit_node().node(),
-                                 format);
-            play_manager.connect(play_sine_node.tap_node().node(), play_mixer_node.unit_node().node(), format);
+            play_manager.connect(play_au_mixer.au().node(), play_au_output.au_io().au().node(), format);
+            play_manager.connect(play_sine.tap().node(), play_au_mixer.au().node(), format);
 
-            offline_manager.add_offline_output_node();
-            audio::engine::offline_output_node &offline_output_node = offline_manager.offline_output_node();
+            offline_manager.add_offline_output();
+            audio::engine::offline_output &offline_output = offline_manager.offline_output();
 
-            offline_mixer_node.unit_node().node().reset();
-            offline_mixer_node.set_input_pan(0.0f, 0);
-            offline_mixer_node.set_input_enabled(true, 0);
-            offline_mixer_node.set_output_volume(1.0f, 0);
-            offline_mixer_node.set_output_pan(0.0f, 0);
+            offline_au_mixer.au().node().reset();
+            offline_au_mixer.set_input_pan(0.0f, 0);
+            offline_au_mixer.set_input_enabled(true, 0);
+            offline_au_mixer.set_output_volume(1.0f, 0);
+            offline_au_mixer.set_output_pan(0.0f, 0);
 
-            offline_manager.connect(offline_mixer_node.unit_node().node(), offline_output_node.node(), format);
-            offline_manager.connect(offline_sine_node.tap_node().node(), offline_mixer_node.unit_node().node(), format);
+            offline_manager.connect(offline_au_mixer.au().node(), offline_output.node(), format);
+            offline_manager.connect(offline_sine.tap().node(), offline_au_mixer.au().node(), format);
 
             engine_observer = play_manager.subject().make_observer(
                 audio::engine::manager::method::configuration_change,
-                [weak_play_output_node = to_weak(play_output_node)](auto const &) {
-                    if (auto play_output_node = weak_play_output_node.lock()) {
-                        play_output_node.unit_io_node().set_device(audio::device::default_output_device());
+                [weak_play_au_output = to_weak(play_au_output)](auto const &) {
+                    if (auto play_au_output = weak_play_au_output.lock()) {
+                        play_au_output.au_io().set_device(audio::device::default_output_device());
                     }
                 });
         }
@@ -201,27 +202,27 @@ namespace sample {
 }
 
 - (void)setVolume:(float)volume {
-    _internal.play_mixer_node.set_input_volume(volume, 0);
+    _internal.play_au_mixer.set_input_volume(volume, 0);
 }
 
 - (float)volume {
-    return _internal.play_mixer_node.input_volume(0);
+    return _internal.play_au_mixer.input_volume(0);
 }
 
 - (void)setFrequency:(float)frequency {
-    _internal.play_sine_node.set_frequency(frequency);
+    _internal.play_sine.set_frequency(frequency);
 }
 
 - (float)frequency {
-    return _internal.play_sine_node.frequency();
+    return _internal.play_sine.frequency();
 }
 
 - (void)setPlaying:(BOOL)playing {
-    _internal.play_sine_node.set_playing(playing);
+    _internal.play_sine.set_playing(playing);
 }
 
 - (BOOL)playing {
-    return _internal.play_sine_node.is_playing();
+    return _internal.play_sine.is_playing();
 }
 
 - (IBAction)playButtonTapped:(id)sender {
@@ -256,9 +257,9 @@ namespace sample {
         return;
     }
 
-    _internal.offline_sine_node.set_frequency(_internal.play_sine_node.frequency());
-    _internal.offline_sine_node.set_playing(true);
-    _internal.offline_mixer_node.set_input_volume(self.volume, 0);
+    _internal.offline_sine.set_frequency(_internal.play_sine.frequency());
+    _internal.offline_sine.set_playing(true);
+    _internal.offline_au_mixer.set_input_volume(self.volume, 0);
 
     self.processing = YES;
 
