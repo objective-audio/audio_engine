@@ -3,7 +3,7 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "yas_audio_route.h"
+#import "yas_audio_engine_route.h"
 
 typedef NS_ENUM(NSUInteger, YASAudioEngineRouteSampleSelectionSection) {
     YASAudioEngineRouteSampleSelectionSectionNone,

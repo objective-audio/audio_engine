@@ -34,29 +34,29 @@ namespace yas {
 namespace sample {
     struct route_vc_internal {
         audio::engine::manager manager;
-        audio::engine::unit_io_node io_node;
-        audio::engine::unit_mixer_node mixer_node;
-        audio::engine::route_node route_node;
-        audio::engine::tap_node sine_node;
+        audio::engine::au_io au_io;
+        audio::engine::au_mixer au_mixer;
+        audio::engine::route route;
+        audio::engine::tap sine_tap;
 
         base engine_observer = nullptr;
 
         void disconnectNodes() {
-            manager.disconnect(mixer_node.unit_node().node());
-            manager.disconnect(route_node.node());
-            manager.disconnect(sine_node.node());
-            manager.disconnect(io_node.unit_node().node());
+            manager.disconnect(au_mixer.au().node());
+            manager.disconnect(route.node());
+            manager.disconnect(sine_tap.node());
+            manager.disconnect(au_io.au().node());
         }
 
         void connect_nodes() {
-            auto const sample_rate = io_node.device_sample_rate();
+            auto const sample_rate = au_io.device_sample_rate();
 
             auto const format = audio::format({.sample_rate = sample_rate, .channel_count = 2});
 
-            manager.connect(mixer_node.unit_node().node(), io_node.unit_node().node(), format);
-            manager.connect(route_node.node(), mixer_node.unit_node().node(), format);
-            manager.connect(sine_node.node(), route_node.node(), 0, YASAudioEngineRouteSampleSourceIndexSine, format);
-            manager.connect(io_node.unit_node().node(), route_node.node(), 1, YASAudioEngineRouteSampleSourceIndexInput,
+            manager.connect(au_mixer.au().node(), au_io.au().node(), format);
+            manager.connect(route.node(), au_mixer.au().node(), format);
+            manager.connect(sine_tap.node(), route.node(), 0, YASAudioEngineRouteSampleSourceIndexSine, format);
+            manager.connect(au_io.au().node(), route.node(), 1, YASAudioEngineRouteSampleSourceIndexInput,
                             format);
         }
     };
@@ -148,9 +148,9 @@ namespace sample {
             }
 
             if (src_bus_idx == -1 || src_ch_idx == -1) {
-                _internal.route_node.remove_route_for_destination({dst_bus_idx, dst_ch_idx});
+                _internal.route.remove_route_for_destination({dst_bus_idx, dst_ch_idx});
             } else {
-                _internal.route_node.add_route({src_bus_idx, src_ch_idx, dst_bus_idx, dst_ch_idx});
+                _internal.route.add_route({src_bus_idx, src_ch_idx, dst_bus_idx, dst_ch_idx});
             }
 
             [self.tableView reloadSections:[NSIndexSet indexSetWithIndex:fromIndexPath.section]
@@ -195,7 +195,7 @@ namespace sample {
 
         case YASAudioEngineRouteSampleSectionDestinations: {
             UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"Cell" forIndexPath:indexPath];
-            auto const &routes = _internal.route_node.routes();
+            auto const &routes = _internal.route.routes();
             audio::route::point dst_point{0, static_cast<uint32_t>(indexPath.row)};
             auto it = std::find_if(routes.begin(), routes.end(),
                                    [dst_point = std::move(dst_point)](const audio::route &route) {
@@ -222,8 +222,8 @@ namespace sample {
 
 - (IBAction)volumeSliderChanged:(UISlider *)sender {
     float const value = sender.value;
-    if (_internal.mixer_node) {
-        _internal.mixer_node.set_input_volume(value, 0);
+    if (_internal.au_mixer) {
+        _internal.au_mixer.set_input_volume(value, 0);
     }
 }
 
@@ -232,8 +232,8 @@ namespace sample {
 - (void)setupEngine {
     _internal = sample::route_vc_internal();
 
-    _internal.mixer_node.set_input_volume(1.0, 0);
-    _internal.route_node.set_routes({{0, 0, 0, 0}, {0, 1, 0, 1}});
+    _internal.au_mixer.set_input_volume(1.0, 0);
+    _internal.route.set_routes({{0, 0, 0, 0}, {0, 1, 0, 1}});
 
     double phase = 0;
 
@@ -254,7 +254,7 @@ namespace sample {
         }
     };
 
-    _internal.sine_node.set_render_handler(tap_render_handler);
+    _internal.sine_tap.set_render_handler(tap_render_handler);
 
     auto unowned_self = make_objc_ptr([[YASUnownedObject alloc] init]);
     [unowned_self.object() setObject:self];
@@ -292,14 +292,14 @@ namespace sample {
 }
 
 - (void)_updateSlider {
-    if (_internal.mixer_node) {
+    if (_internal.au_mixer) {
         NSIndexPath *indexPath = [NSIndexPath indexPathForRow:0 inSection:YASAudioEngineRouteSampleSectionSlider];
         UITableViewCell *cell = [self.tableView cellForRowAtIndexPath:indexPath];
         if (cell) {
             for (UIView *view in cell.contentView.subviews) {
                 if ([view isKindOfClass:[UISlider class]]) {
                     UISlider *slider = (UISlider *)view;
-                    slider.value = _internal.mixer_node.input_volume(0);
+                    slider.value = _internal.au_mixer.input_volume(0);
                 }
             }
         }

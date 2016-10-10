@@ -24,20 +24,20 @@ using namespace yas;
     audio::engine::manager manager;
 
     auto format = audio::format({.sample_rate = 48000.0, .channel_count = 2});
-    test::audio_test_node_decorator source_decor(1, 1);
-    test::audio_test_node_decorator destination_decor(1, 1);
+    test::audio_test_node_object source_obj(1, 1);
+    test::audio_test_node_object destination_obj(1, 1);
 
     XCTAssertEqual(manager.nodes().size(), 0);
     XCTAssertEqual(manager.connections().size(), 0);
 
     audio::engine::connection connection = nullptr;
-    XCTAssertNoThrow(connection = manager.connect(source_decor.node(), destination_decor.node(), format));
+    XCTAssertNoThrow(connection = manager.connect(source_obj.node(), destination_obj.node(), format));
     XCTAssertTrue(connection);
 
     auto &nodes = manager.nodes();
     auto &connections = manager.connections();
-    XCTAssertGreaterThanOrEqual(nodes.count(source_decor.node()), 1);
-    XCTAssertGreaterThanOrEqual(nodes.count(destination_decor.node()), 1);
+    XCTAssertGreaterThanOrEqual(nodes.count(source_obj.node()), 1);
+    XCTAssertGreaterThanOrEqual(nodes.count(destination_obj.node()), 1);
     XCTAssertEqual(connections.size(), 1);
     XCTAssertEqual(*connections.begin(), connection);
 }
@@ -46,11 +46,11 @@ using namespace yas;
     audio::engine::manager manager;
 
     auto format = audio::format({.sample_rate = 48000.0, .channel_count = 2});
-    test::audio_test_node_decorator source_decor(0, 0);
-    test::audio_test_node_decorator destination_decor(0, 0);
+    test::audio_test_node_object source_obj(0, 0);
+    test::audio_test_node_object destination_obj(0, 0);
 
     audio::engine::connection connection = nullptr;
-    XCTAssertThrows(connection = manager.connect(source_decor.node(), destination_decor.node(), format));
+    XCTAssertThrows(connection = manager.connect(source_obj.node(), destination_obj.node(), format));
     XCTAssertFalse(connection);
     XCTAssertEqual(manager.connections().size(), 0);
 }
@@ -59,28 +59,28 @@ using namespace yas;
     audio::engine::manager manager;
 
     auto format = audio::format({.sample_rate = 48000.0, .channel_count = 2});
-    test::audio_test_node_decorator source_decor(1, 1);
-    test::audio_test_node_decorator relay_decor(1, 1);
-    test::audio_test_node_decorator destination_decor(1, 1);
+    test::audio_test_node_object source_obj(1, 1);
+    test::audio_test_node_object relay_decor(1, 1);
+    test::audio_test_node_object destination_obj(1, 1);
 
-    manager.connect(source_decor.node(), relay_decor.node(), format);
+    manager.connect(source_obj.node(), relay_decor.node(), format);
 
     auto &nodes = manager.nodes();
-    XCTAssertGreaterThanOrEqual(nodes.count(source_decor.node()), 1);
+    XCTAssertGreaterThanOrEqual(nodes.count(source_obj.node()), 1);
     XCTAssertGreaterThanOrEqual(nodes.count(relay_decor.node()), 1);
-    XCTAssertEqual(nodes.count(destination_decor.node()), 0);
+    XCTAssertEqual(nodes.count(destination_obj.node()), 0);
 
-    manager.connect(relay_decor.node(), destination_decor.node(), format);
+    manager.connect(relay_decor.node(), destination_obj.node(), format);
 
-    XCTAssertGreaterThanOrEqual(nodes.count(source_decor.node()), 1);
+    XCTAssertGreaterThanOrEqual(nodes.count(source_obj.node()), 1);
     XCTAssertGreaterThanOrEqual(nodes.count(relay_decor.node()), 1);
-    XCTAssertGreaterThanOrEqual(nodes.count(destination_decor.node()), 1);
+    XCTAssertGreaterThanOrEqual(nodes.count(destination_obj.node()), 1);
 
     manager.disconnect(relay_decor.node());
 
-    XCTAssertEqual(nodes.count(source_decor.node()), 0);
+    XCTAssertEqual(nodes.count(source_obj.node()), 0);
     XCTAssertEqual(nodes.count(relay_decor.node()), 0);
-    XCTAssertEqual(nodes.count(destination_decor.node()), 0);
+    XCTAssertEqual(nodes.count(destination_obj.node()), 0);
 }
 
 - (void)test_configuration_change_notification {
@@ -101,50 +101,50 @@ using namespace yas;
     [self waitForExpectationsWithTimeout:1.0 handler:nil];
 }
 
-- (void)test_add_and_remove_offline_output_node {
+- (void)test_add_and_remove_offline_output {
     audio::engine::manager manager;
 
-    XCTAssertFalse(manager.offline_output_node());
+    XCTAssertFalse(manager.offline_output());
 
-    XCTAssertTrue(manager.add_offline_output_node());
+    XCTAssertTrue(manager.add_offline_output());
 
-    auto add_result = manager.add_offline_output_node();
+    auto add_result = manager.add_offline_output();
     XCTAssertFalse(add_result);
     XCTAssertEqual(add_result.error(), audio::engine::manager::add_error_t::already_added);
 
-    XCTAssertTrue(manager.offline_output_node());
+    XCTAssertTrue(manager.offline_output());
 
-    XCTAssertTrue(manager.remove_offline_output_node());
+    XCTAssertTrue(manager.remove_offline_output());
 
-    auto remove_result = manager.remove_offline_output_node();
+    auto remove_result = manager.remove_offline_output();
     XCTAssertFalse(remove_result);
     XCTAssertEqual(remove_result.error(), audio::engine::manager::remove_error_t::already_removed);
 
-    XCTAssertFalse(manager.offline_output_node());
+    XCTAssertFalse(manager.offline_output());
 }
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
 
-- (void)test_add_and_remove_device_io_node {
+- (void)test_add_and_remove_device_io {
     audio::engine::manager manager;
 
-    XCTAssertFalse(manager.device_io_node());
+    XCTAssertFalse(manager.device_io());
 
-    XCTAssertTrue(manager.add_device_io_node());
+    XCTAssertTrue(manager.add_device_io());
 
-    auto add_result = manager.add_device_io_node();
+    auto add_result = manager.add_device_io();
     XCTAssertFalse(add_result);
     XCTAssertEqual(add_result.error(), audio::engine::manager::add_error_t::already_added);
 
-    XCTAssertTrue(manager.device_io_node());
+    XCTAssertTrue(manager.device_io());
 
-    XCTAssertTrue(manager.remove_device_io_node());
+    XCTAssertTrue(manager.remove_device_io());
 
-    auto remove_result = manager.remove_device_io_node();
+    auto remove_result = manager.remove_device_io();
     XCTAssertFalse(remove_result);
     XCTAssertEqual(remove_result.error(), audio::engine::manager::remove_error_t::already_removed);
 
-    XCTAssertFalse(manager.device_io_node());
+    XCTAssertFalse(manager.device_io());
 }
 
 #endif
