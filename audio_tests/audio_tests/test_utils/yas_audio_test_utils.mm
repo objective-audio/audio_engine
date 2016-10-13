@@ -154,7 +154,7 @@ void test::audio_unit_render_on_sub_thread(audio::unit &unit, audio::format &for
                 .io_data = buffer.audio_buffer_list(),
             };
 
-            unit.audio_unit_render(parameters);
+            unit.raw_unit_render(parameters);
         }
     };
 

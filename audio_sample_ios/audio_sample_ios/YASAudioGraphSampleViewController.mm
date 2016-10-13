@@ -55,7 +55,7 @@ namespace sample {
 
             io_unit.set_render_handler([weak_mixer_unit](audio::render_parameters &render_parameters) {
                 if (auto shared_mixer_unit = weak_mixer_unit.lock()) {
-                    shared_mixer_unit.audio_unit_render(render_parameters);
+                    shared_mixer_unit.raw_unit_render(render_parameters);
                 }
             });
 
@@ -65,7 +65,7 @@ namespace sample {
                 if (auto shared_io_unit = weak_io_unit.lock()) {
                     render_parameters.in_bus_number = 1;
                     try {
-                        shared_io_unit.audio_unit_render(render_parameters);
+                        shared_io_unit.raw_unit_render(render_parameters);
                     } catch (std::runtime_error e) {
                         std::cout << e.what() << std::endl;
                     }

@@ -102,7 +102,7 @@ using namespace yas;
                     output_format.sample_byte_count() * output_format.stride() * render_parameters.in_number_frames);
             }
 
-            mixer_unit.audio_unit_render(render_parameters);
+            mixer_unit.raw_unit_render(render_parameters);
 
             yas_release(ioExpectation);
             ioExpectation = nil;
@@ -164,7 +164,7 @@ using namespace yas;
             .io_data = buffer.audio_buffer_list(),
         };
 
-        io_unit.audio_unit_render(parameters);
+        io_unit.raw_unit_render(parameters);
     };
 
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), dispatch_labmda);
