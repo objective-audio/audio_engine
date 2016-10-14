@@ -52,7 +52,7 @@ struct audio::engine::au::impl : base::impl, manageable_au::impl {
                                                         .in_number_frames = buffer.frame_length(),
                                                         .io_data = buffer.audio_buffer_list()};
 
-                    if (auto err = audio_unit.audio_unit_render(render_parameters).error_opt()) {
+                    if (auto err = audio_unit.raw_unit_render(render_parameters).error_opt()) {
                         std::cout << "audio unit render error : " << std::to_string(*err) << " - " << to_string(*err)
                                   << std::endl;
                     }

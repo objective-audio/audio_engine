@@ -305,7 +305,7 @@ struct yas::audio::engine::au_input::impl : base::impl {
 
                             if (auto io_unit = au_input.au_io().au().audio_unit()) {
                                 render_parameters.in_bus_number = 1;
-                                io_unit.audio_unit_render(render_parameters);
+                                io_unit.raw_unit_render(render_parameters);
                             }
 
                             auto dst_node = connection.destination_node();

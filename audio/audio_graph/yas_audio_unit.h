@@ -39,7 +39,7 @@ namespace audio {
         OSType type() const;
         OSType sub_type() const;
         bool is_output_unit() const;
-        AudioUnit audio_unit_instance() const;
+        AudioUnit raw_unit() const;
 
         void attach_render_callback(uint32_t const bus_idx);
         void detach_render_callback(uint32_t const bus_idx);
@@ -95,7 +95,7 @@ namespace audio {
         // render thread
 
         void callback_render(render_parameters &render_parameters);
-        au_result_t audio_unit_render(render_parameters &render_parameters);
+        au_result_t raw_unit_render(render_parameters &render_parameters);
 
        private:
         manageable_unit _manageable = nullptr;

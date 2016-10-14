@@ -63,7 +63,7 @@ using namespace yas;
     XCTAssertEqual(converter_unit.type(), type);
     XCTAssertEqual(converter_unit.sub_type(), sub_type);
     XCTAssertFalse(converter_unit.is_output_unit());
-    XCTAssertTrue(converter_unit.audio_unit_instance() != NULL);
+    XCTAssertTrue(converter_unit.raw_unit() != NULL);
     XCTAssertEqual(converter_unit.maximum_frames_per_slice(), maximum_frame_length);
 
     converter_unit.attach_render_callback(0);
