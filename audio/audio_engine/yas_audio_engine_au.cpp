@@ -21,19 +21,19 @@ struct audio::engine::au::impl : base::impl, manageable_au::impl {
 
     ~impl() = default;
 
-    void set_prepare_audio_unit_handler(prepare_au_f &&handler) {
+    void set_prepare_unit_handler(prepare_unit_f &&handler) {
         _prepare_au_handler = std::move(handler);
     }
 
     void prepare(audio::engine::au const &au, AudioComponentDescription const &acd) {
         _acd = acd;
 
-        unit unit(acd);
+        audio::unit unit(acd);
         _parameters.clear();
         _parameters.insert(std::make_pair(kAudioUnitScope_Global, unit.create_parameters(kAudioUnitScope_Global)));
         _parameters.insert(std::make_pair(kAudioUnitScope_Input, unit.create_parameters(kAudioUnitScope_Input)));
         _parameters.insert(std::make_pair(kAudioUnitScope_Output, unit.create_parameters(kAudioUnitScope_Output)));
-        _core.set_au(unit);
+        _core.set_unit(unit);
 
         auto weak_au = to_weak(au);
 
@@ -41,7 +41,7 @@ struct audio::engine::au::impl : base::impl, manageable_au::impl {
             auto &buffer = args.buffer;
 
             if (auto au = weak_au.lock()) {
-                if (auto audio_unit = au.impl_ptr<impl>()->au()) {
+                if (auto audio_unit = au.impl_ptr<impl>()->core_unit()) {
                     AudioUnitRenderActionFlags action_flags = 0;
                     AudioTimeStamp const time_stamp = args.when.audio_time_stamp();
 
@@ -76,8 +76,8 @@ struct audio::engine::au::impl : base::impl, manageable_au::impl {
         _node.manageable().set_add_to_graph_handler([weak_au](audio::graph &graph) {
             if (auto au = weak_au.lock()) {
                 auto &manageable = au.manageable();
-                manageable.prepare_audio_unit();
-                if (auto unit = au.audio_unit()) {
+                manageable.prepare_unit();
+                if (auto unit = au.unit()) {
                     graph.add_unit(unit);
                 }
                 manageable.prepare_parameters();
@@ -86,15 +86,15 @@ struct audio::engine::au::impl : base::impl, manageable_au::impl {
 
         _node.manageable().set_remove_from_graph_handler([weak_au](audio::graph &graph) {
             if (auto au = weak_au.lock()) {
-                if (auto unit = au.audio_unit()) {
+                if (auto unit = au.unit()) {
                     graph.remove_unit(unit);
                 }
             }
         });
     }
 
-    audio::unit au() {
-        return _core.au();
+    audio::unit core_unit() {
+        return _core.unit();
     }
 
     std::unordered_map<AudioUnitParameterID, audio::unit::parameter_map_t> const &parameters() {
@@ -114,11 +114,11 @@ struct audio::engine::au::impl : base::impl, manageable_au::impl {
     }
 
     uint32_t input_element_count() {
-        return au().element_count(kAudioUnitScope_Input);
+        return core_unit().element_count(kAudioUnitScope_Input);
     }
 
     uint32_t output_element_count() {
-        return au().element_count(kAudioUnitScope_Output);
+        return core_unit().element_count(kAudioUnitScope_Output);
     }
 
     void set_global_parameter_value(AudioUnitParameterID const parameter_id, float const value) {
@@ -126,15 +126,15 @@ struct audio::engine::au::impl : base::impl, manageable_au::impl {
         if (global_parameters.count(parameter_id) > 0) {
             auto &parameter = global_parameters.at(parameter_id);
             parameter.set_value(value, 0);
-            if (auto audio_unit = au()) {
-                audio_unit.set_parameter_value(value, parameter_id, kAudioUnitScope_Global, 0);
+            if (auto unit = core_unit()) {
+                unit.set_parameter_value(value, parameter_id, kAudioUnitScope_Global, 0);
             }
         }
     }
 
     float global_parameter_value(AudioUnitParameterID const parameter_id) {
-        if (auto const audio_unit = au()) {
-            return audio_unit.parameter_value(parameter_id, kAudioUnitScope_Global, 0);
+        if (auto const unit = core_unit()) {
+            return unit.parameter_value(parameter_id, kAudioUnitScope_Global, 0);
         }
         return 0;
     }
@@ -145,15 +145,15 @@ struct audio::engine::au::impl : base::impl, manageable_au::impl {
         if (input_parameters.count(parameter_id) > 0) {
             auto &parameter = input_parameters.at(parameter_id);
             parameter.set_value(value, element);
-            if (auto audio_unit = au()) {
-                audio_unit.set_parameter_value(value, parameter_id, kAudioUnitScope_Input, element);
+            if (auto unit = core_unit()) {
+                unit.set_parameter_value(value, parameter_id, kAudioUnitScope_Input, element);
             }
         }
     }
 
     float input_parameter_value(AudioUnitParameterID const parameter_id, AudioUnitElement const element) {
-        if (auto const audio_unit = au()) {
-            return audio_unit.parameter_value(parameter_id, kAudioUnitScope_Input, element);
+        if (auto const unit = core_unit()) {
+            return unit.parameter_value(parameter_id, kAudioUnitScope_Input, element);
         }
         return 0;
     }
@@ -164,15 +164,15 @@ struct audio::engine::au::impl : base::impl, manageable_au::impl {
         if (output_parameters.count(parameter_id) > 0) {
             auto &parameter = output_parameters.at(parameter_id);
             parameter.set_value(value, element);
-            if (auto audio_unit = au()) {
-                audio_unit.set_parameter_value(value, parameter_id, kAudioUnitScope_Output, element);
+            if (auto unit = core_unit()) {
+                unit.set_parameter_value(value, parameter_id, kAudioUnitScope_Output, element);
             }
         }
     }
 
     float output_parameter_value(AudioUnitParameterID const parameter_id, AudioUnitElement const element) {
-        if (auto const audio_unit = au()) {
-            return audio_unit.parameter_value(parameter_id, kAudioUnitScope_Output, element);
+        if (auto const unit = core_unit()) {
+            return unit.parameter_value(parameter_id, kAudioUnitScope_Output, element);
         }
         return 0;
     }
@@ -180,11 +180,11 @@ struct audio::engine::au::impl : base::impl, manageable_au::impl {
     void update_unit_connections() {
         _subject.notify(audio::engine::au::method::will_update_connections, cast<audio::engine::au>());
 
-        if (auto audio_unit = au()) {
+        if (auto unit = core_unit()) {
             auto input_bus_count = input_element_count();
             if (input_bus_count > 0) {
                 auto weak_au = to_weak(cast<engine::au>());
-                audio_unit.set_render_handler([weak_au](audio::render_parameters &render_parameters) {
+                unit.set_render_handler([weak_au](audio::render_parameters &render_parameters) {
                     if (auto au = weak_au.lock()) {
                         if (auto kernel = au.node().kernel()) {
                             if (auto connection = kernel.input_connection(render_parameters.in_bus_number)) {
@@ -201,21 +201,21 @@ struct audio::engine::au::impl : base::impl, manageable_au::impl {
 
                 for (uint32_t bus_idx = 0; bus_idx < input_bus_count; ++bus_idx) {
                     if (auto connection = _node.input_connection(bus_idx)) {
-                        audio_unit.set_input_format(connection.format().stream_description(), bus_idx);
-                        audio_unit.attach_render_callback(bus_idx);
+                        unit.set_input_format(connection.format().stream_description(), bus_idx);
+                        unit.attach_render_callback(bus_idx);
                     } else {
-                        audio_unit.detach_render_callback(bus_idx);
+                        unit.detach_render_callback(bus_idx);
                     }
                 }
             } else {
-                audio_unit.set_render_handler(nullptr);
+                unit.set_render_handler(nullptr);
             }
 
             auto output_bus_count = output_element_count();
             if (output_bus_count > 0) {
                 for (uint32_t bus_idx = 0; bus_idx < output_bus_count; ++bus_idx) {
                     if (auto connection = _node.output_connection(bus_idx)) {
-                        audio_unit.set_output_format(connection.format().stream_description(), bus_idx);
+                        unit.set_output_format(connection.format().stream_description(), bus_idx);
                     }
                 }
             }
@@ -224,18 +224,18 @@ struct audio::engine::au::impl : base::impl, manageable_au::impl {
         _subject.notify(audio::engine::au::method::did_update_connections, cast<audio::engine::au>());
     }
 
-    void prepare_audio_unit() override {
-        if (auto audio_unit = au()) {
+    void prepare_unit() override {
+        if (auto unit = core_unit()) {
             if (auto const &handler = _prepare_au_handler) {
-                handler(audio_unit);
+                handler(unit);
             } else {
-                audio_unit.set_maximum_frames_per_slice(4096);
+                unit.set_maximum_frames_per_slice(4096);
             }
         }
     }
 
     void prepare_parameters() override {
-        if (auto audio_unit = au()) {
+        if (auto unit = core_unit()) {
             for (auto &parameters_pair : _parameters) {
                 auto &scope = parameters_pair.first;
                 for (auto &parameter_pair : _parameters.at(scope)) {
@@ -243,15 +243,15 @@ struct audio::engine::au::impl : base::impl, manageable_au::impl {
                     for (auto &value_pair : parameter.values()) {
                         auto &element = value_pair.first;
                         auto &value = value_pair.second;
-                        audio_unit.set_parameter_value(value, parameter.parameter_id(), scope, element);
+                        unit.set_parameter_value(value, parameter.parameter_id(), scope, element);
                     }
                 }
             }
         }
     }
 
-    void reload_audio_unit() override {
-        _core.set_au(unit(_acd));
+    void reload_unit() override {
+        _core.set_unit(audio::unit{_acd});
     }
 
     audio::engine::node _node;
@@ -260,11 +260,11 @@ struct audio::engine::au::impl : base::impl, manageable_au::impl {
     audio::engine::au::subject_t _subject;
     audio::engine::node::observer_t _reset_observer;
     audio::engine::node::observer_t _connections_observer;
-    prepare_au_f _prepare_au_handler;
+    prepare_unit_f _prepare_au_handler;
 
    private:
     void will_reset() {
-        auto unit = au();
+        auto unit = core_unit();
         unit.reset();
 
         auto prev_parameters = std::move(_parameters);
@@ -288,18 +288,18 @@ struct audio::engine::au::impl : base::impl, manageable_au::impl {
 
    private:
     struct core {
-        void set_au(audio::unit const &au) {
+        void set_unit(audio::unit const &au) {
             std::lock_guard<std::recursive_mutex> lock(_mutex);
-            _au = au;
+            _unit = au;
         }
 
-        unit au() const {
+        audio::unit unit() const {
             std::lock_guard<std::recursive_mutex> lock(_mutex);
-            return _au;
+            return _unit;
         }
 
        private:
-        unit _au = nullptr;
+        audio::unit _unit = nullptr;
         mutable std::recursive_mutex _mutex;
     };
 
@@ -331,12 +331,12 @@ audio::engine::au::au(std::nullptr_t) : base(nullptr) {
 
 audio::engine::au::~au() = default;
 
-void audio::engine::au::set_prepare_audio_unit_handler(prepare_au_f handler) {
-    impl_ptr<impl>()->set_prepare_audio_unit_handler(std::move(handler));
+void audio::engine::au::set_prepare_unit_handler(prepare_unit_f handler) {
+    impl_ptr<impl>()->set_prepare_unit_handler(std::move(handler));
 }
 
-audio::unit audio::engine::au::audio_unit() const {
-    return impl_ptr<impl>()->au();
+audio::unit audio::engine::au::unit() const {
+    return impl_ptr<impl>()->core_unit();
 }
 
 std::unordered_map<AudioUnitParameterID, audio::unit::parameter_map_t> const &audio::engine::au::parameters() const {

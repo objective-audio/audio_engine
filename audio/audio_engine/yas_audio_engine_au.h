@@ -29,7 +29,7 @@ namespace audio {
 
             using subject_t = yas::subject<au, method>;
             using observer_t = yas::observer<au, method>;
-            using prepare_au_f = std::function<void(audio::unit &)>;
+            using prepare_unit_f = std::function<void(audio::unit &)>;
 
             struct args {
                 audio::engine::node_args node_args;
@@ -43,9 +43,9 @@ namespace audio {
 
             virtual ~au() final;
 
-            void set_prepare_audio_unit_handler(prepare_au_f);
+            void set_prepare_unit_handler(prepare_unit_f);
 
-            audio::unit audio_unit() const;
+            audio::unit unit() const;
             std::unordered_map<AudioUnitScope, std::unordered_map<AudioUnitParameterID, audio::unit::parameter>> const &
             parameters() const;
             std::unordered_map<AudioUnitParameterID, audio::unit::parameter> const &global_parameters() const;

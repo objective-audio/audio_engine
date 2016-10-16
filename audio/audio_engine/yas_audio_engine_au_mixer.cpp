@@ -41,7 +41,7 @@ struct audio::engine::au_mixer::impl : base::impl {
         if (connections.size() > 0) {
             auto last = connections.end();
             --last;
-            if (auto unit = _au.audio_unit()) {
+            if (auto unit = _au.unit()) {
                 auto &pair = *last;
                 unit.set_element_count(pair.first + 1, kAudioUnitScope_Input);
             }

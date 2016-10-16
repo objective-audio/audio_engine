@@ -155,7 +155,7 @@ struct audio::graph::impl : base::impl {
         return _units.at(key);
     }
 
-    void add_unit_to_units(unit &unit) {
+    void add_unit_to_units(audio::unit &unit) {
         if (!unit) {
             throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
         }
@@ -180,7 +180,7 @@ struct audio::graph::impl : base::impl {
         }
     }
 
-    void remove_unit_from_units(unit &unit) {
+    void remove_unit_from_units(audio::unit &unit) {
         std::lock_guard<std::recursive_mutex> lock(_mutex);
 
         auto &manageable_unit = unit.manageable();
@@ -193,7 +193,7 @@ struct audio::graph::impl : base::impl {
         }
     }
 
-    void add_unit(unit &unit) {
+    void add_unit(audio::unit &unit) {
         auto &manageable_unit = unit.manageable();
 
         if (manageable_unit.key()) {
@@ -209,7 +209,7 @@ struct audio::graph::impl : base::impl {
         }
     }
 
-    void remove_unit(unit &unit) {
+    void remove_unit(audio::unit &unit) {
         unit.manageable().uninitialize();
 
         remove_unit_from_units(unit);
@@ -320,11 +320,11 @@ audio::graph::graph(std::nullptr_t) : base(nullptr) {
 
 audio::graph::~graph() = default;
 
-void audio::graph::add_unit(unit &unit) {
+void audio::graph::add_unit(audio::unit &unit) {
     impl_ptr<impl>()->add_unit(unit);
 }
 
-void audio::graph::remove_unit(unit &unit) {
+void audio::graph::remove_unit(audio::unit &unit) {
     impl_ptr<impl>()->remove_unit(unit);
 }
 
@@ -356,7 +356,7 @@ bool audio::graph::is_running() const {
     return impl_ptr<impl>()->is_running();
 }
 
-void audio::graph::audio_unit_render(render_parameters &render_parameters) {
+void audio::graph::unit_render(render_parameters &render_parameters) {
     raise_if_main_thread();
 
     if (auto graph = impl::graph_for_key(render_parameters.render_id.graph)) {

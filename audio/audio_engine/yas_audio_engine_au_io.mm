@@ -45,7 +45,7 @@ struct yas::audio::engine::au_io::impl : base::impl {
                .node_args = audio::engine::node_args{.input_bus_count = static_cast<uint32_t>(args.enable_input ? 1 : 0),
                                              .output_bus_count = static_cast<uint32_t>(args.enable_output ? 1 : 0),
                                              .override_output_bus_idx = 1}}) {
-        _au.set_prepare_audio_unit_handler([args = std::move(args)](audio::unit & unit) {
+        _au.set_prepare_unit_handler([args = std::move(args)](audio::unit & unit) {
             unit.set_enable_output(args.enable_input);
             unit.set_enable_input(args.enable_output);
             unit.set_maximum_frames_per_slice(4096);
@@ -70,11 +70,11 @@ struct yas::audio::engine::au_io::impl : base::impl {
             throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
         }
 
-        au().audio_unit().set_current_device(device.audio_device_id());
+        au().unit().set_current_device(device.audio_device_id());
     }
 
     audio::device device() {
-        return device::device_for_id(_au.audio_unit().current_device());
+        return device::device_for_id(_au.unit().current_device());
     }
 
 #endif
@@ -115,7 +115,7 @@ struct yas::audio::engine::au_io::impl : base::impl {
     void set_channel_map(channel_map_t const &map, audio::direction const dir) {
         _channel_map[to_uint32(dir)] = map;
 
-        if (auto unit = au().audio_unit()) {
+        if (auto unit = au().unit()) {
             unit.set_channel_map(map, kAudioUnitScope_Output, to_uint32(dir));
         }
     }
@@ -125,7 +125,7 @@ struct yas::audio::engine::au_io::impl : base::impl {
     }
 
     void update_unit_io_connections() {
-        auto unit = au().audio_unit();
+        auto unit = au().unit();
 
         auto update_channel_map = [](channel_map_t &map, format const &format, uint32_t const dev_ch_count) {
             if (map.size() > 0) {
@@ -282,7 +282,7 @@ struct yas::audio::engine::au_input::impl : base::impl {
     }
 
     void update_unit_input_connections() {
-        auto unit = _au_io.au().audio_unit();
+        auto unit = _au_io.au().unit();
 
         if (auto out_connection = _au_io.au().node().output_connection(1)) {
             unit.attach_input_callback();
@@ -303,7 +303,7 @@ struct yas::audio::engine::au_input::impl : base::impl {
                             time time(*render_parameters.io_time_stamp, format.sample_rate());
                             au_input.au_io().au().node().set_render_time_on_render(time);
 
-                            if (auto io_unit = au_input.au_io().au().audio_unit()) {
+                            if (auto io_unit = au_input.au_io().au().unit()) {
                                 render_parameters.in_bus_number = 1;
                                 io_unit.raw_unit_render(render_parameters);
                             }

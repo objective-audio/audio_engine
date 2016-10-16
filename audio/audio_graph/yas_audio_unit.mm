@@ -35,7 +35,7 @@ static OSStatus common_render_callback(void *inRefCon, AudioUnitRenderActionFlag
         .render_id = render_id,
     };
 
-    audio::graph::audio_unit_render(renderParameters);
+    audio::graph::unit_render(renderParameters);
 
     return noErr;
 };
