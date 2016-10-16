@@ -193,7 +193,7 @@ struct audio::graph::impl : base::impl {
         }
     }
 
-    void add_audio_unit(unit &unit) {
+    void add_unit(unit &unit) {
         auto &manageable_unit = unit.manageable();
 
         if (manageable_unit.key()) {
@@ -209,7 +209,7 @@ struct audio::graph::impl : base::impl {
         }
     }
 
-    void remove_audio_unit(unit &unit) {
+    void remove_unit(unit &unit) {
         unit.manageable().uninitialize();
 
         remove_unit_from_units(unit);
@@ -221,7 +221,7 @@ struct audio::graph::impl : base::impl {
         for_each(_units, [this](auto const &it) {
             auto unit = it->second;
             auto next = std::next(it);
-            remove_audio_unit(unit);
+            remove_unit(unit);
             return next;
         });
     }
@@ -320,12 +320,12 @@ audio::graph::graph(std::nullptr_t) : base(nullptr) {
 
 audio::graph::~graph() = default;
 
-void audio::graph::add_audio_unit(unit &unit) {
-    impl_ptr<impl>()->add_audio_unit(unit);
+void audio::graph::add_unit(unit &unit) {
+    impl_ptr<impl>()->add_unit(unit);
 }
 
-void audio::graph::remove_audio_unit(unit &unit) {
-    impl_ptr<impl>()->remove_audio_unit(unit);
+void audio::graph::remove_unit(unit &unit) {
+    impl_ptr<impl>()->remove_unit(unit);
 }
 
 void audio::graph::remove_all_units() {

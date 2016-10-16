@@ -57,7 +57,7 @@ using namespace yas;
     audio::unit converter_unit(kAudioUnitType_FormatConverter, kAudioUnitSubType_AUConverter);
     converter_unit.set_maximum_frames_per_slice(maximum_frame_length);
 
-    graph.add_audio_unit(converter_unit);
+    graph.add_unit(converter_unit);
 
     XCTAssertTrue(converter_unit.is_initialized());
     XCTAssertEqual(converter_unit.type(), type);
@@ -105,7 +105,7 @@ using namespace yas;
 
                                  }];
 
-    graph.remove_audio_unit(converter_unit);
+    graph.remove_unit(converter_unit);
 
     XCTAssertFalse(converter_unit.is_initialized());
 }
@@ -126,7 +126,7 @@ using namespace yas;
     audio::unit converter_unit(kAudioUnitType_FormatConverter, kAudioUnitSubType_AUConverter);
     converter_unit.set_maximum_frames_per_slice(maximum_frame_length);
 
-    graph.add_audio_unit(converter_unit);
+    graph.add_unit(converter_unit);
 
     converter_unit.attach_render_callback(0);
     converter_unit.attach_render_notify();
