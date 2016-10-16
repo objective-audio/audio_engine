@@ -35,7 +35,7 @@ namespace sample {
             io_unit.set_enable_output(true);
             io_unit.set_maximum_frames_per_slice(4096);
 
-            graph.add_audio_unit(io_unit);
+            graph.add_unit(io_unit);
 
             io_unit.attach_render_callback(0);
             io_unit.set_input_format(format.stream_description(), 0);
@@ -44,7 +44,7 @@ namespace sample {
             mixer_unit = audio::unit(kAudioUnitType_Mixer, kAudioUnitSubType_MultiChannelMixer);
             mixer_unit.set_maximum_frames_per_slice(4096);
 
-            graph.add_audio_unit(mixer_unit);
+            graph.add_unit(mixer_unit);
 
             mixer_unit.attach_render_callback(0);
             mixer_unit.set_element_count(1, kAudioUnitScope_Input);

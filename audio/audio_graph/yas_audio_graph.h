@@ -23,8 +23,8 @@ namespace audio {
 
         virtual ~graph() final;
 
-        void add_audio_unit(unit &audio_unit);
-        void remove_audio_unit(unit &audio_unit);
+        void add_unit(unit &audio_unit);
+        void remove_unit(unit &audio_unit);
         void remove_all_units();
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)

@@ -78,7 +78,7 @@ struct audio::engine::au::impl : base::impl, manageable_au::impl {
                 auto &manageable = au.manageable();
                 manageable.prepare_audio_unit();
                 if (auto unit = au.audio_unit()) {
-                    graph.add_audio_unit(unit);
+                    graph.add_unit(unit);
                 }
                 manageable.prepare_parameters();
             }
@@ -87,7 +87,7 @@ struct audio::engine::au::impl : base::impl, manageable_au::impl {
         _node.manageable().set_remove_from_graph_handler([weak_au](audio::graph &graph) {
             if (auto au = weak_au.lock()) {
                 if (auto unit = au.audio_unit()) {
-                    graph.remove_audio_unit(unit);
+                    graph.remove_unit(unit);
                 }
             }
         });

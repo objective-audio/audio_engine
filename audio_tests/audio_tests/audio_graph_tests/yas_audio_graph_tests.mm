@@ -46,7 +46,7 @@ using namespace yas;
 
     audio::unit io_unit(kAudioUnitType_Output, kAudioUnitSubType_GenericOutput);
     io_unit.set_maximum_frames_per_slice(maximum_frame_length);
-    graph.add_audio_unit(io_unit);
+    graph.add_unit(io_unit);
 
     io_unit.attach_render_callback(0);
 
@@ -54,7 +54,7 @@ using namespace yas;
 
     audio::unit mixer_unit(kAudioUnitType_Mixer, kAudioUnitSubType_MultiChannelMixer);
     mixer_unit.set_maximum_frames_per_slice(maximum_frame_length);
-    graph.add_audio_unit(mixer_unit);
+    graph.add_unit(mixer_unit);
 
     mixer_unit.set_output_format(mixer_format.stream_description(), 0);
 
