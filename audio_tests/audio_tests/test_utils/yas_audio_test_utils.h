@@ -23,7 +23,7 @@ namespace test {
     bool is_equal_data(void const *const inData1, void const *const inData2, const size_t inSize);
     bool is_equal(AudioTimeStamp const *const ts1, AudioTimeStamp const *const ts2);
 
-    void audio_unit_render_on_sub_thread(audio::unit &audio_unit, audio::format &format, uint32_t const frame_length,
+    void raw_unit_render_on_sub_thread(audio::unit &unit, audio::format &format, uint32_t const frame_length,
                                          std::size_t const count, NSTimeInterval const wait);
 
     class audio_test_node_object : public base {

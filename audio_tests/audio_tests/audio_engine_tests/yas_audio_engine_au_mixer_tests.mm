@@ -58,7 +58,7 @@ using namespace yas;
     XCTAssertThrows(au_mixer.set_input_volume(0.5f, default_element_count));
 
     uint32_t const element_count = default_element_count + 8;
-    XCTAssertNoThrow(au_mixer.au().audio_unit().set_element_count(element_count, kAudioUnitScope_Input));
+    XCTAssertNoThrow(au_mixer.au().unit().set_element_count(element_count, kAudioUnitScope_Input));
 
     XCTAssertGreaterThanOrEqual(au_mixer.au().input_element_count(), element_count);
     XCTAssertNoThrow(au_mixer.set_input_volume(0.5f, element_count - 1));
@@ -87,7 +87,7 @@ using namespace yas;
     XCTAssertEqual(au_mixer.output_volume(bus_idx), output_volume);
     XCTAssertEqual(au_mixer.output_pan(bus_idx), output_pan);
 
-    au_mixer.au().manageable().reload_audio_unit();
+    au_mixer.au().manageable().reload_unit();
 
     XCTAssertNotEqual(au_mixer.input_volume(bus_idx), input_volume);
     XCTAssertNotEqual(au_mixer.input_pan(bus_idx), input_pan);

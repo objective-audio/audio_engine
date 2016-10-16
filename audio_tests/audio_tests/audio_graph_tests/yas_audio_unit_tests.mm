@@ -98,7 +98,7 @@ using namespace yas;
             }
         });
 
-    test::audio_unit_render_on_sub_thread(converter_unit, output_format, frame_length, 1, 0);
+    test::raw_unit_render_on_sub_thread(converter_unit, output_format, frame_length, 1, 0);
 
     [self waitForExpectationsWithTimeout:0.5
                                  handler:^(NSError *error){
@@ -167,7 +167,7 @@ using namespace yas;
             }
         });
 
-    test::audio_unit_render_on_sub_thread(converter_unit, format, frame_length, 1, 0);
+    test::raw_unit_render_on_sub_thread(converter_unit, format, frame_length, 1, 0);
 
     [self waitForExpectationsWithTimeout:0.5
                                  handler:^(NSError *error){
@@ -187,7 +187,7 @@ using namespace yas;
         is_render_notify_callback = true;
     });
 
-    test::audio_unit_render_on_sub_thread(converter_unit, format, frame_length, 1, 0.2);
+    test::raw_unit_render_on_sub_thread(converter_unit, format, frame_length, 1, 0.2);
 
     XCTAssertFalse(is_render_callback);
     XCTAssertFalse(is_render_notify_callback);

@@ -61,7 +61,7 @@ namespace sample {
 }
 
 @implementation YASAudioEngineEffectsSampleViewController {
-    std::vector<audio::unit> _audio_units;
+    std::vector<audio::unit> _units;
     std::experimental::optional<uint32_t> _index;
     sample::effects_vc_internal _internal;
 }
@@ -128,7 +128,7 @@ namespace sample {
 #pragma mark -
 
 - (void)setupAudioEngine {
-    if (_audio_units.size() == 0) {
+    if (_units.size() == 0) {
         AudioComponent component = NULL;
 
         while (true) {
@@ -136,7 +136,7 @@ namespace sample {
             if (component != NULL) {
                 AudioComponentDescription acd;
                 raise_if_au_error(AudioComponentGetDescription(component, &acd));
-                _audio_units.push_back(audio::unit(acd));
+                _units.push_back(audio::unit(acd));
             } else {
                 break;
             }
@@ -187,7 +187,7 @@ namespace sample {
         case YASAudioEngineEffectsSampleSectionNone:
             return 1;
         case YASAudioEngineEffectsSampleSectionEffects:
-            return _audio_units.size();
+            return _units.size();
         default:
             return 0;
     }
@@ -212,8 +212,8 @@ namespace sample {
             cell.accessoryType = UITableViewCellAccessoryCheckmark;
         }
     } else if (indexPath.section == YASAudioEngineEffectsSampleSectionEffects) {
-        auto const &audio_unit = _audio_units.at(indexPath.row);
-        cell.textLabel.text = (__bridge NSString *)audio_unit.name();
+        auto const &unit = _units.at(indexPath.row);
+        cell.textLabel.text = (__bridge NSString *)unit.name();
         if (_index && indexPath.row == *_index) {
             cell.accessoryType = UITableViewCellAccessoryCheckmark;
         }
@@ -231,8 +231,8 @@ namespace sample {
         case YASAudioEngineEffectsSampleSectionEffects: {
             _index = static_cast<uint32_t>(indexPath.row);
             AudioComponentDescription acd = baseAcd;
-            auto const &audio_unit = _audio_units.at(indexPath.row);
-            acd.componentSubType = audio_unit.sub_type();
+            auto const &unit = _units.at(indexPath.row);
+            acd.componentSubType = unit.sub_type();
             _internal.replace_effect_au(&acd);
         } break;
     }

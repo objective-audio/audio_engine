@@ -12,14 +12,14 @@ audio::engine::manageable_au::manageable_au(std::shared_ptr<impl> impl) : protoc
 audio::engine::manageable_au::manageable_au(std::nullptr_t) : protocol(nullptr) {
 }
 
-void audio::engine::manageable_au::prepare_audio_unit() {
-    impl_ptr<impl>()->prepare_audio_unit();
+void audio::engine::manageable_au::prepare_unit() {
+    impl_ptr<impl>()->prepare_unit();
 }
 
 void audio::engine::manageable_au::prepare_parameters() {
     impl_ptr<impl>()->prepare_parameters();
 }
 
-void audio::engine::manageable_au::reload_audio_unit() {
-    impl_ptr<impl>()->reload_audio_unit();
+void audio::engine::manageable_au::reload_unit() {
+    impl_ptr<impl>()->reload_unit();
 }

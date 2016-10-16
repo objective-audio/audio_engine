@@ -23,8 +23,8 @@ namespace audio {
 
         virtual ~graph() final;
 
-        void add_unit(unit &audio_unit);
-        void remove_unit(unit &audio_unit);
+        void add_unit(audio::unit &);
+        void remove_unit(audio::unit &);
         void remove_all_units();
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
@@ -37,7 +37,7 @@ namespace audio {
         bool is_running() const;
 
         // render thread
-        static void audio_unit_render(render_parameters &render_parameters);
+        static void unit_render(render_parameters &render_parameters);
     };
 }
 }
