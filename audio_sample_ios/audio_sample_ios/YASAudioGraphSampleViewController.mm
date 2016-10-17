@@ -54,18 +54,18 @@ namespace sample {
             auto weak_mixer_unit = weak<audio::unit>(mixer_unit);
 
             io_unit.set_render_handler([weak_mixer_unit](audio::render_parameters &render_parameters) {
-                if (auto shared_mixer_unit = weak_mixer_unit.lock()) {
-                    shared_mixer_unit.raw_unit_render(render_parameters);
+                if (auto mixer_unit = weak_mixer_unit.lock()) {
+                    mixer_unit.raw_unit_render(render_parameters);
                 }
             });
 
             auto weak_io_unit = weak<audio::unit>(io_unit);
 
             mixer_unit.set_render_handler([weak_io_unit](audio::render_parameters &render_parameters) {
-                if (auto shared_io_unit = weak_io_unit.lock()) {
+                if (auto io_unit = weak_io_unit.lock()) {
                     render_parameters.in_bus_number = 1;
                     try {
-                        shared_io_unit.raw_unit_render(render_parameters);
+                        io_unit.raw_unit_render(render_parameters);
                     } catch (std::runtime_error e) {
                         std::cout << e.what() << std::endl;
                     }
