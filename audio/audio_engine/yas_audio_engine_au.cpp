@@ -22,7 +22,7 @@ struct audio::engine::au::impl : base::impl, manageable_au::impl {
     ~impl() = default;
 
     void set_prepare_unit_handler(prepare_unit_f &&handler) {
-        _prepare_au_handler = std::move(handler);
+        _prepare_unit_handler = std::move(handler);
     }
 
     void prepare(audio::engine::au const &au, AudioComponentDescription const &acd) {
@@ -41,7 +41,7 @@ struct audio::engine::au::impl : base::impl, manageable_au::impl {
             auto &buffer = args.buffer;
 
             if (auto au = weak_au.lock()) {
-                if (auto audio_unit = au.impl_ptr<impl>()->core_unit()) {
+                if (auto unit = au.impl_ptr<impl>()->core_unit()) {
                     AudioUnitRenderActionFlags action_flags = 0;
                     AudioTimeStamp const time_stamp = args.when.audio_time_stamp();
 
@@ -52,7 +52,7 @@ struct audio::engine::au::impl : base::impl, manageable_au::impl {
                                                         .in_number_frames = buffer.frame_length(),
                                                         .io_data = buffer.audio_buffer_list()};
 
-                    if (auto err = audio_unit.raw_unit_render(render_parameters).error_opt()) {
+                    if (auto err = unit.raw_unit_render(render_parameters).error_opt()) {
                         std::cout << "audio unit render error : " << std::to_string(*err) << " - " << to_string(*err)
                                   << std::endl;
                     }
@@ -226,7 +226,7 @@ struct audio::engine::au::impl : base::impl, manageable_au::impl {
 
     void prepare_unit() override {
         if (auto unit = core_unit()) {
-            if (auto const &handler = _prepare_au_handler) {
+            if (auto const &handler = _prepare_unit_handler) {
                 handler(unit);
             } else {
                 unit.set_maximum_frames_per_slice(4096);
@@ -260,7 +260,7 @@ struct audio::engine::au::impl : base::impl, manageable_au::impl {
     audio::engine::au::subject_t _subject;
     audio::engine::node::observer_t _reset_observer;
     audio::engine::node::observer_t _connections_observer;
-    prepare_unit_f _prepare_au_handler;
+    prepare_unit_f _prepare_unit_handler;
 
    private:
     void will_reset() {
