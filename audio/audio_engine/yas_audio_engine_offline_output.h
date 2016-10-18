@@ -26,12 +26,12 @@ namespace audio {
             audio::engine::node const &node() const;
             audio::engine::node &node();
 
-            manageable_offline_output_unit &manageable();
+            manageable_offline_output &manageable();
 
            private:
             offline_output(std::shared_ptr<impl> const &);
 
-            manageable_offline_output_unit _manageable = nullptr;
+            manageable_offline_output _manageable = nullptr;
         };
     }
 }
