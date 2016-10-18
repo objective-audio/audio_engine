@@ -545,7 +545,7 @@ struct audio::unit::impl : base::impl, manageable_unit::impl {
         }
     }
 
-    audio::unit::au_result_t raw_unit_render(render_parameters &render_parameters) {
+    audio::unit::raw_unit_result_t raw_unit_render(render_parameters &render_parameters) {
         raise_if_main_thread();
 
         if (AudioUnit au = raw_unit()) {
@@ -554,7 +554,7 @@ struct audio::unit::impl : base::impl, manageable_unit::impl {
                                              render_parameters.io_data));
         }
 
-        return unit::au_result_t(nullptr);
+        return unit::raw_unit_result_t(nullptr);
     }
 
    private:
@@ -865,16 +865,16 @@ void audio::unit::callback_render(render_parameters &render_parameters) {
     impl_ptr<impl>()->callback_render(render_parameters);
 }
 
-audio::unit::au_result_t audio::unit::raw_unit_render(render_parameters &render_parameters) {
+audio::unit::raw_unit_result_t audio::unit::raw_unit_render(render_parameters &render_parameters) {
     return impl_ptr<impl>()->raw_unit_render(render_parameters);
 }
 
 #pragma mark - global
 
-audio::unit::au_result_t yas::to_result(OSStatus const err) {
+audio::unit::raw_unit_result_t yas::to_result(OSStatus const err) {
     if (err == noErr) {
-        return audio::unit::au_result_t(nullptr);
+        return audio::unit::raw_unit_result_t(nullptr);
     } else {
-        return audio::unit::au_result_t(err);
+        return audio::unit::raw_unit_result_t(err);
     }
 }
