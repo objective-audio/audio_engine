@@ -1,16 +1,16 @@
 //
-//  yas_audio_au_tests.m
+//  yas_audio_engine_au_tests.m
 //
 
 #import "yas_audio_test_utils.h"
 
 using namespace yas;
 
-@interface yas_audio_au_tests : XCTestCase
+@interface yas_audio_engine_au_tests : XCTestCase
 
 @end
 
-@implementation yas_audio_au_tests
+@implementation yas_audio_engine_au_tests
 
 - (void)setUp {
     [super setUp];
