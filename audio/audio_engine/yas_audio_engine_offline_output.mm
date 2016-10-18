@@ -12,7 +12,7 @@ using namespace yas;
 
 #pragma mark - audio::engine::offline_output::impl
 
-struct audio::engine::offline_output::impl : base::impl, manageable_offline_output_unit::impl {
+struct audio::engine::offline_output::impl : base::impl, manageable_offline_output::impl {
     operation_queue _queue = nullptr;
     audio::engine::node _node = {{.input_bus_count = 1, .output_bus_count = 0}};
     audio::engine::node::observer_t _reset_observer;
@@ -213,9 +213,9 @@ audio::engine::node &audio::engine::offline_output::node() {
     return impl_ptr<impl>()->node();
 }
 
-audio::engine::manageable_offline_output_unit &audio::engine::offline_output::manageable() {
+audio::engine::manageable_offline_output &audio::engine::offline_output::manageable() {
     if (!_manageable) {
-        _manageable = audio::engine::manageable_offline_output_unit{impl_ptr<manageable_offline_output_unit::impl>()};
+        _manageable = audio::engine::manageable_offline_output{impl_ptr<manageable_offline_output::impl>()};
     }
     return _manageable;
 }
