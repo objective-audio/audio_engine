@@ -91,7 +91,7 @@ struct audio::device::stream::impl : base::impl {
                                                     .mScope = kAudioObjectPropertyScopeGlobal,
                                                     .mElement = kAudioObjectPropertyElementMaster};
 
-        raise_if_au_error(
+        raise_if_raw_audio_error(
             AudioObjectAddPropertyListenerBlock(_stream_id, &address, dispatch_get_main_queue(),
                                                 ^(uint32_t address_count, const AudioObjectPropertyAddress *addresses) {
                                                     handler(address_count, addresses);

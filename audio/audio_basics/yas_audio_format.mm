@@ -241,7 +241,7 @@ AudioStreamBasicDescription yas::to_stream_description(CFDictionaryRef const &se
     }
 
     UInt32 size = sizeof(AudioStreamBasicDescription);
-    raise_if_au_error(AudioFormatGetProperty(kAudioFormatProperty_FormatInfo, 0, NULL, &size, &asbd));
+    raise_if_raw_audio_error(AudioFormatGetProperty(kAudioFormatProperty_FormatInfo, 0, NULL, &size, &asbd));
 
     return asbd;
 }
@@ -282,7 +282,7 @@ AudioStreamBasicDescription yas::to_stream_description(double const sample_rate,
     asbd.mChannelsPerFrame = channel_count;
 
     UInt32 size = sizeof(AudioStreamBasicDescription);
-    raise_if_au_error(AudioFormatGetProperty(kAudioFormatProperty_FormatInfo, 0, NULL, &size, &asbd));
+    raise_if_raw_audio_error(AudioFormatGetProperty(kAudioFormatProperty_FormatInfo, 0, NULL, &size, &asbd));
 
     return asbd;
 }

@@ -135,7 +135,7 @@ namespace sample {
             component = AudioComponentFindNext(component, &baseAcd);
             if (component != NULL) {
                 AudioComponentDescription acd;
-                raise_if_au_error(AudioComponentGetDescription(component, &acd));
+                raise_if_raw_audio_error(AudioComponentGetDescription(component, &acd));
                 _units.push_back(audio::unit(acd));
             } else {
                 break;
