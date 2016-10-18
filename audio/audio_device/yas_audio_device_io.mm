@@ -179,7 +179,7 @@ struct audio::device_io::impl : base::impl {
             }
         };
 
-        raise_if_au_error(
+        raise_if_raw_audio_error(
             AudioDeviceCreateIOProcIDWithBlock(&_io_proc_id, _device.audio_device_id(), nullptr, handler));
 
         update_kernel();
@@ -193,7 +193,7 @@ struct audio::device_io::impl : base::impl {
         }
 
         if (device::is_available_device(_device)) {
-            raise_if_au_error(AudioDeviceDestroyIOProcID(_device.audio_device_id(), _io_proc_id));
+            raise_if_raw_audio_error(AudioDeviceDestroyIOProcID(_device.audio_device_id(), _io_proc_id));
         }
 
         _io_proc_id = nullptr;
@@ -207,7 +207,7 @@ struct audio::device_io::impl : base::impl {
             return;
         }
 
-        raise_if_au_error(AudioDeviceStart(_device.audio_device_id(), _io_proc_id));
+        raise_if_raw_audio_error(AudioDeviceStart(_device.audio_device_id(), _io_proc_id));
     }
 
     void stop() {
@@ -222,7 +222,7 @@ struct audio::device_io::impl : base::impl {
         }
 
         if (device::is_available_device(_device)) {
-            raise_if_au_error(AudioDeviceStop(_device.audio_device_id(), _io_proc_id));
+            raise_if_raw_audio_error(AudioDeviceStop(_device.audio_device_id(), _io_proc_id));
         }
     }
 

@@ -93,7 +93,7 @@ namespace audio_file_utils {
     static AudioFileTypeID get_audio_file_type_id(AudioFileID const file_id) {
         uint32_t fileType;
         UInt32 size = sizeof(AudioFileTypeID);
-        raise_if_au_error(AudioFileGetProperty(file_id, kAudioFilePropertyFileFormat, &size, &fileType));
+        raise_if_raw_audio_error(AudioFileGetProperty(file_id, kAudioFilePropertyFileFormat, &size, &fileType));
         return fileType;
     }
 
@@ -143,7 +143,7 @@ Boolean audio::ext_audio_file_utils::set_client_format(AudioStreamBasicDescripti
                                                        ExtAudioFileRef const ext_audio_file) {
     uint32_t size = sizeof(AudioStreamBasicDescription);
     OSStatus err = noErr;
-    raise_if_au_error(err =
+    raise_if_raw_audio_error(err =
                           ExtAudioFileSetProperty(ext_audio_file, kExtAudioFileProperty_ClientDataFormat, size, &asbd));
     return err == noErr;
 }
@@ -152,21 +152,21 @@ Boolean audio::ext_audio_file_utils::get_audio_file_format(AudioStreamBasicDescr
                                                            ExtAudioFileRef const ext_audio_file) {
     UInt32 size = sizeof(AudioStreamBasicDescription);
     OSStatus err = noErr;
-    raise_if_au_error(err = ExtAudioFileGetProperty(ext_audio_file, kExtAudioFileProperty_FileDataFormat, &size, asbd));
+    raise_if_raw_audio_error(err = ExtAudioFileGetProperty(ext_audio_file, kExtAudioFileProperty_FileDataFormat, &size, asbd));
     return err == noErr;
 }
 
 AudioFileID audio::ext_audio_file_utils::get_audio_file_id(ExtAudioFileRef const ext_audio_file) {
     UInt32 size = sizeof(AudioFileID);
     AudioFileID file_id = 0;
-    raise_if_au_error(ExtAudioFileGetProperty(ext_audio_file, kExtAudioFileProperty_AudioFile, &size, &file_id));
+    raise_if_raw_audio_error(ExtAudioFileGetProperty(ext_audio_file, kExtAudioFileProperty_AudioFile, &size, &file_id));
     return file_id;
 }
 
 int64_t audio::ext_audio_file_utils::get_file_length_frames(ExtAudioFileRef const ext_audio_file) {
     int64_t result = 0;
     UInt32 size = sizeof(int64_t);
-    raise_if_au_error(ExtAudioFileGetProperty(ext_audio_file, kExtAudioFileProperty_FileLengthFrames, &size, &result));
+    raise_if_raw_audio_error(ExtAudioFileGetProperty(ext_audio_file, kExtAudioFileProperty_FileLengthFrames, &size, &result));
     return result;
 }
 

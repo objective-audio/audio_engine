@@ -7,5 +7,5 @@
 #include <AudioToolbox/AudioToolbox.h>
 
 namespace yas {
-void raise_if_au_error(OSStatus const &err);
+void raise_if_raw_audio_error(OSStatus const &err);
 }

@@ -17,13 +17,13 @@ std::unique_ptr<std::vector<T>> yas::audio::device::stream::_property_data(
                                                 .mElement = kAudioObjectPropertyElementMaster};
 
     UInt32 byte_size = 0;
-    raise_if_au_error(AudioObjectGetPropertyDataSize(stream_id, &address, 0, nullptr, &byte_size));
+    raise_if_raw_audio_error(AudioObjectGetPropertyDataSize(stream_id, &address, 0, nullptr, &byte_size));
     uint32_t vector_size = byte_size / sizeof(T);
 
     if (vector_size > 0) {
         auto data = std::make_unique<std::vector<T>>(vector_size);
         byte_size = vector_size * sizeof(T);
-        raise_if_au_error(AudioObjectGetPropertyData(stream_id, &address, 0, nullptr, &byte_size, data->data()));
+        raise_if_raw_audio_error(AudioObjectGetPropertyData(stream_id, &address, 0, nullptr, &byte_size, data->data()));
         return data;
     }
 

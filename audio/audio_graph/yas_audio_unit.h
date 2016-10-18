@@ -25,7 +25,7 @@ namespace audio {
         using parameter_map_t = std::unordered_map<AudioUnitParameterID, parameter>;
 
         using render_f = std::function<void(render_parameters &)>;
-        using au_result_t = result<std::nullptr_t, OSStatus>;
+        using raw_unit_result_t = result<std::nullptr_t, OSStatus>;
 
         static OSType sub_type_default_io();
 
@@ -95,14 +95,14 @@ namespace audio {
         // render thread
 
         void callback_render(render_parameters &render_parameters);
-        au_result_t raw_unit_render(render_parameters &render_parameters);
+        raw_unit_result_t raw_unit_render(render_parameters &render_parameters);
 
        private:
         manageable_unit _manageable = nullptr;
     };
 }
 
-audio::unit::au_result_t to_result(OSStatus const err);
+audio::unit::raw_unit_result_t to_result(OSStatus const err);
 }
 
 #include "yas_audio_unit_parameter.h"
