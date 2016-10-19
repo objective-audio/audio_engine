@@ -625,14 +625,14 @@
 		B6626A1F1C146D380038175B /* audio_basics */ = {
 			isa = PBXGroup;
 			children = (
-				B6626A8E1C146F500038175B /* yas_audio_exception.cpp */,
-				B6626A8F1C146F500038175B /* yas_audio_exception.h */,
 				B6626A201C146D380038175B /* yas_audio_enumerator.cpp */,
 				B6626A211C146D380038175B /* yas_audio_enumerator.h */,
-				B6626A221C146D380038175B /* yas_audio_file.h */,
-				B6626A231C146D380038175B /* yas_audio_file.mm */,
+				B6626A8E1C146F500038175B /* yas_audio_exception.cpp */,
+				B6626A8F1C146F500038175B /* yas_audio_exception.h */,
 				B6626A241C146D380038175B /* yas_audio_file_utils.h */,
 				B6626A251C146D380038175B /* yas_audio_file_utils.mm */,
+				B6626A221C146D380038175B /* yas_audio_file.h */,
+				B6626A231C146D380038175B /* yas_audio_file.mm */,
 				B6626A261C146D380038175B /* yas_audio_format.h */,
 				B6626A271C146D380038175B /* yas_audio_format.mm */,
 				B6626A281C146D380038175B /* yas_audio_math.cpp */,
@@ -652,6 +652,14 @@
 		B66C22F11B61CCEB0086EB73 /* audio_engine */ = {
 			isa = PBXGroup;
 			children = (
+				B6FF02721BEAF0200026777E /* yas_audio_engine_au_io.h */,
+				B6FF02711BEAF0200026777E /* yas_audio_engine_au_io.mm */,
+				B6FF02731BEAF0200026777E /* yas_audio_engine_au_mixer.cpp */,
+				B6FF02741BEAF0200026777E /* yas_audio_engine_au_mixer.h */,
+				B6CB50671D4387150045A977 /* yas_audio_engine_au_protocol.cpp */,
+				B6FF02781BEAF0200026777E /* yas_audio_engine_au_protocol.h */,
+				B6FF02791BEAF0200026777E /* yas_audio_engine_au.cpp */,
+				B6FF027A1BEAF0200026777E /* yas_audio_engine_au.h */,
 				B69B08731D4336AB00F12D36 /* yas_audio_engine_connection_protocol.cpp */,
 				B6FF024D1BEAF0200026777E /* yas_audio_engine_connection_protocol.h */,
 				B6FF024E1BEAF0200026777E /* yas_audio_engine_connection.cpp */,
@@ -660,32 +668,24 @@
 				B6FF02531BEAF0200026777E /* yas_audio_engine_device_io_protocol.h */,
 				B6FF02541BEAF0200026777E /* yas_audio_engine_device_io.cpp */,
 				B6FF02551BEAF0200026777E /* yas_audio_engine_device_io.h */,
-				B6FF02591BEAF0200026777E /* yas_audio_engine_manager.mm */,
-				B6FF025A1BEAF0200026777E /* yas_audio_engine_manager.h */,
 				B69B08851D43476300F12D36 /* yas_audio_engine_kernel_protocol.cpp */,
 				B69B08861D43476300F12D36 /* yas_audio_engine_kernel_protocol.h */,
 				B6FF025D1BEAF0200026777E /* yas_audio_engine_kernel.cpp */,
 				B6FF025E1BEAF0200026777E /* yas_audio_engine_kernel.h */,
+				B6FF025A1BEAF0200026777E /* yas_audio_engine_manager.h */,
+				B6FF02591BEAF0200026777E /* yas_audio_engine_manager.mm */,
 				B617CD211C95517500B3A934 /* yas_audio_engine_node_protocol.cpp */,
 				B6FF02601BEAF0200026777E /* yas_audio_engine_node_protocol.h */,
 				B6FF02611BEAF0200026777E /* yas_audio_engine_node.cpp */,
 				B6FF02621BEAF0200026777E /* yas_audio_engine_node.h */,
 				B69B089A1D437E4800F12D36 /* yas_audio_engine_offline_output_protocol.cpp */,
 				B6FF02661BEAF0200026777E /* yas_audio_engine_offline_output_protocol.h */,
-				B6FF02671BEAF0200026777E /* yas_audio_engine_offline_output.mm */,
 				B6FF02681BEAF0200026777E /* yas_audio_engine_offline_output.h */,
+				B6FF02671BEAF0200026777E /* yas_audio_engine_offline_output.mm */,
 				B6FF02691BEAF0200026777E /* yas_audio_engine_route.cpp */,
 				B6FF026A1BEAF0200026777E /* yas_audio_engine_route.h */,
 				B6FF026D1BEAF0200026777E /* yas_audio_engine_tap.cpp */,
 				B6FF026E1BEAF0200026777E /* yas_audio_engine_tap.h */,
-				B6FF02711BEAF0200026777E /* yas_audio_engine_au_io.mm */,
-				B6FF02721BEAF0200026777E /* yas_audio_engine_au_io.h */,
-				B6FF02731BEAF0200026777E /* yas_audio_engine_au_mixer.cpp */,
-				B6FF02741BEAF0200026777E /* yas_audio_engine_au_mixer.h */,
-				B6CB50671D4387150045A977 /* yas_audio_engine_au_protocol.cpp */,
-				B6FF02781BEAF0200026777E /* yas_audio_engine_au_protocol.h */,
-				B6FF02791BEAF0200026777E /* yas_audio_engine_au.cpp */,
-				B6FF027A1BEAF0200026777E /* yas_audio_engine_au.h */,
 			);
 			name = audio_engine;
 			sourceTree = "<group>";
@@ -699,8 +699,8 @@
 				B699BE601BF4D1530007B597 /* yas_audio_unit_parameter.h */,
 				B69B087C1D43389D00F12D36 /* yas_audio_unit_protocol.cpp */,
 				B699BE621BF4D1530007B597 /* yas_audio_unit_protocol.h */,
-				B699BE631BF4D1530007B597 /* yas_audio_unit.mm */,
 				B699BE641BF4D1530007B597 /* yas_audio_unit.h */,
+				B699BE631BF4D1530007B597 /* yas_audio_unit.mm */,
 			);
 			name = audio_graph;
 			sourceTree = "<group>";
