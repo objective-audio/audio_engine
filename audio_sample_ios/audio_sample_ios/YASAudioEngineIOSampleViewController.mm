@@ -193,8 +193,7 @@ namespace sample {
 - (void)setupEngine {
     _internal = sample::engine_io_vc_internal();
 
-    auto unowned_self = make_objc_ptr([[YASUnownedObject alloc] init]);
-    [unowned_self.object() setObject:self];
+    auto unowned_self = make_objc_ptr([[YASUnownedObject alloc] initWithObject:self]);
 
     _internal.engine_observer = _internal.manager.subject().make_observer(
         audio::engine::manager::method::configuration_change, [unowned_self](auto const &context) {
