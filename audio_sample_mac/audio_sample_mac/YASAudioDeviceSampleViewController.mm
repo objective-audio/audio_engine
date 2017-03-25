@@ -172,8 +172,7 @@ namespace sample {
     self.sineVolume = _internal.kernel->sine_volume();
     self.sineFrequency = _internal.kernel->sine_frequency();
 
-    auto unowned_self = make_objc_ptr([[YASUnownedObject alloc] init]);
-    [unowned_self.object() setObject:self];
+    auto unowned_self = make_objc_ptr([[YASUnownedObject alloc] initWithObject:self]);
 
     _internal.system_observer = audio::device::system_subject().make_observer(
         audio::device::method::hardware_did_change,
@@ -297,8 +296,7 @@ namespace sample {
     if (selected_device && std::find(all_devices.begin(), all_devices.end(), selected_device) != all_devices.end()) {
         _internal.device_io.set_device(selected_device);
 
-        auto unowned_self = make_objc_ptr([[YASUnownedObject alloc] init]);
-        [unowned_self.object() setObject:self];
+        auto unowned_self = make_objc_ptr([[YASUnownedObject alloc] initWithObject:self]);
 
         _internal.device_observer = selected_device.subject().make_observer(
             audio::device::method::device_did_change, [selected_device, unowned_self](auto const &context) {
