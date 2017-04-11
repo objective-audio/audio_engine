@@ -141,8 +141,6 @@
 		B6F2CAB61CDE0FBC00EF584B /* yas_chain_private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yas_chain_private.h; sourceTree = "<group>"; };
 		B6F2CAB71CDE0FBC00EF584B /* yas_each_dictionary.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = yas_each_dictionary.cpp; sourceTree = "<group>"; };
 		B6F2CAB81CDE0FBC00EF584B /* yas_each_dictionary.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yas_each_dictionary.h; sourceTree = "<group>"; };
-		B6F2CAB91CDE0FBC00EF584B /* yas_each_index.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yas_each_index.h; sourceTree = "<group>"; };
-		B6F2CABA1CDE0FBC00EF584B /* yas_each_index_private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yas_each_index_private.h; sourceTree = "<group>"; };
 		B6F2CABB1CDE0FBC00EF584B /* yas_exception.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = yas_exception.cpp; sourceTree = "<group>"; };
 		B6F2CABC1CDE0FBC00EF584B /* yas_exception.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yas_exception.h; sourceTree = "<group>"; };
 		B6F2CABD1CDE0FBC00EF584B /* yas_flex_ptr.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = yas_flex_ptr.cpp; sourceTree = "<group>"; };
@@ -427,8 +425,6 @@
 				B6F2CAB61CDE0FBC00EF584B /* yas_chain_private.h */,
 				B6F2CAB71CDE0FBC00EF584B /* yas_each_dictionary.cpp */,
 				B6F2CAB81CDE0FBC00EF584B /* yas_each_dictionary.h */,
-				B6F2CAB91CDE0FBC00EF584B /* yas_each_index.h */,
-				B6F2CABA1CDE0FBC00EF584B /* yas_each_index_private.h */,
 				B6F2CABB1CDE0FBC00EF584B /* yas_exception.cpp */,
 				B6F2CABC1CDE0FBC00EF584B /* yas_exception.h */,
 				B6F2CABD1CDE0FBC00EF584B /* yas_flex_ptr.cpp */,
