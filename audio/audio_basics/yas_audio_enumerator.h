@@ -5,7 +5,6 @@
 #pragma once
 
 #include <vector>
-#include "yas_audio_types.h"
 #include "yas_flex_ptr.h"
 
 namespace yas {
