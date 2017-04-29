@@ -8,7 +8,6 @@
 #include "yas_base.h"
 
 namespace yas {
-class flex_ptr;
 template <typename T, typename U>
 class result;
 
@@ -39,9 +38,6 @@ namespace audio {
         audio::format const &format() const;
         AudioBufferList *audio_buffer_list();
         AudioBufferList const *audio_buffer_list() const;
-
-        flex_ptr flex_ptr_at_index(uint32_t const buf_idx) const;
-        flex_ptr flex_ptr_at_channel(uint32_t const ch_idx) const;
 
         template <typename T>
         T *data_ptr_at_index(uint32_t const buf_idx);

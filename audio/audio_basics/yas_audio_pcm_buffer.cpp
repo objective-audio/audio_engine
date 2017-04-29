@@ -9,7 +9,6 @@
 #include <string>
 #include "yas_audio_format.h"
 #include "yas_audio_pcm_buffer.h"
-#include "yas_flex_ptr.h"
 #include "yas_result.h"
 #include "yas_stl_utils.h"
 
@@ -19,7 +18,7 @@ using namespace yas;
 
 struct audio::pcm_buffer::impl : base::impl {
     audio::format const _format;
-    AudioBufferList const *_abl_ptr;
+    AudioBufferList *_abl_ptr;
     uint32_t const _frame_capacity;
     uint32_t _frame_length;
 
@@ -100,24 +99,26 @@ struct audio::pcm_buffer::impl : base::impl {
           _data(nullptr) {
     }
 
-    flex_ptr flex_ptr_at_index(uint32_t const buf_idx) {
+    template <typename T>
+    T *data_ptr_at_index(uint32_t const buf_idx) {
         if (buf_idx >= _abl_ptr->mNumberBuffers) {
             throw std::out_of_range(std::string(__PRETTY_FUNCTION__) + " : out of range. buf_idx(" +
                                     std::to_string(buf_idx) + ") _impl->abl_ptr.mNumberBuffers(" +
                                     std::to_string(_abl_ptr->mNumberBuffers) + ")");
         }
 
-        return flex_ptr(_abl_ptr->mBuffers[buf_idx].mData);
+        return static_cast<T *>(_abl_ptr->mBuffers[buf_idx].mData);
     }
 
-    flex_ptr flex_ptr_at_channel(uint32_t const ch_idx) {
-        flex_ptr pointer;
+    template <typename T>
+    T *data_ptr_at_channel(uint32_t const ch_idx) {
+        T *ptr;
 
         if (_format.stride() > 1) {
             if (ch_idx < _abl_ptr->mBuffers[0].mNumberChannels) {
-                pointer.v = _abl_ptr->mBuffers[0].mData;
+                ptr = static_cast<T *>(_abl_ptr->mBuffers[0].mData);
                 if (ch_idx > 0) {
-                    pointer.u8 += ch_idx * _format.sample_byte_count();
+                    ptr += ch_idx;
                 }
             } else {
                 throw std::out_of_range(std::string(__PRETTY_FUNCTION__) + " : out of range. ch_idx(" +
@@ -126,7 +127,7 @@ struct audio::pcm_buffer::impl : base::impl {
             }
         } else {
             if (ch_idx < _abl_ptr->mNumberBuffers) {
-                pointer.v = _abl_ptr->mBuffers[ch_idx].mData;
+                ptr = static_cast<T *>(_abl_ptr->mBuffers[ch_idx].mData);
             } else {
                 throw std::out_of_range(std::string(__PRETTY_FUNCTION__) + " : out of range. ch_idx(" +
                                         std::to_string(ch_idx) + ") mNumberChannels(" +
@@ -134,7 +135,7 @@ struct audio::pcm_buffer::impl : base::impl {
             }
         }
 
-        return pointer;
+        return ptr;
     }
 
     static std::vector<uint8_t> &dummy_data() {
@@ -297,14 +298,6 @@ AudioBufferList const *audio::pcm_buffer::audio_buffer_list() const {
     return impl_ptr<impl>()->_abl_ptr;
 }
 
-flex_ptr audio::pcm_buffer::flex_ptr_at_index(uint32_t const buf_idx) const {
-    return impl_ptr<impl>()->flex_ptr_at_index(buf_idx);
-}
-
-flex_ptr audio::pcm_buffer::flex_ptr_at_channel(uint32_t const ch_idx) const {
-    return impl_ptr<impl>()->flex_ptr_at_channel(ch_idx);
-}
-
 template <typename T>
 T *audio::pcm_buffer::data_ptr_at_index(uint32_t const buf_idx) {
     if (!validate_pcm_format<T>(format().pcm_format())) {
@@ -312,7 +305,7 @@ T *audio::pcm_buffer::data_ptr_at_index(uint32_t const buf_idx) {
         return nullptr;
     }
 
-    return static_cast<T *>(flex_ptr_at_index(buf_idx).v);
+    return impl_ptr<impl>()->data_ptr_at_index<T>(buf_idx);
 }
 
 template float *audio::pcm_buffer::data_ptr_at_index(uint32_t const buf_idx);
@@ -327,7 +320,7 @@ T *audio::pcm_buffer::data_ptr_at_channel(uint32_t const ch_idx) {
         return nullptr;
     }
 
-    return static_cast<T *>(flex_ptr_at_channel(ch_idx).v);
+    return impl_ptr<impl>()->data_ptr_at_channel<T>(ch_idx);
 }
 
 template float *audio::pcm_buffer::data_ptr_at_channel(uint32_t const ch_idx);
@@ -342,7 +335,7 @@ T const *audio::pcm_buffer::data_ptr_at_index(uint32_t const buf_idx) const {
         return nullptr;
     }
 
-    return static_cast<T const *>(flex_ptr_at_index(buf_idx).v);
+    return impl_ptr<impl>()->data_ptr_at_index<T>(buf_idx);
 }
 
 template float const *audio::pcm_buffer::data_ptr_at_index(uint32_t const buf_idx) const;
@@ -357,7 +350,7 @@ T const *audio::pcm_buffer::data_ptr_at_channel(uint32_t const ch_idx) const {
         return nullptr;
     }
 
-    return static_cast<T const *>(flex_ptr_at_channel(ch_idx).v);
+    return impl_ptr<impl>()->data_ptr_at_channel<T>(ch_idx);
 }
 
 template float const *audio::pcm_buffer::data_ptr_at_channel(uint32_t const ch_idx) const;

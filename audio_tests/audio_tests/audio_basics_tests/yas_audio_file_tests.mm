@@ -359,24 +359,27 @@ namespace test {
     uint32_t const stride = format.stride();
 
     for (uint32_t buf_idx = 0; buf_idx < buffer_count; buf_idx++) {
-        auto pointer = buffer.flex_ptr_at_index(buf_idx);
         for (NSInteger frameIndex = 0; frameIndex < buffer.frame_length(); frameIndex++) {
             int16_t value = frameIndex + startIndex + 1;
             for (NSInteger ch_idx = 0; ch_idx < stride; ch_idx++) {
                 switch (format.pcm_format()) {
                     case audio::pcm_format::int16: {
-                        pointer.i16[frameIndex * stride + ch_idx] = value;
+                        auto *ptr = buffer.data_ptr_at_index<int16_t>(buf_idx);
+                        ptr[frameIndex * stride + ch_idx] = value;
                     } break;
                     case audio::pcm_format::fixed824: {
-                        pointer.i32[frameIndex * stride + ch_idx] = value << 16;
+                        auto *ptr = buffer.data_ptr_at_index<int32_t>(buf_idx);
+                        ptr[frameIndex * stride + ch_idx] = value << 16;
                     } break;
                     case audio::pcm_format::float32: {
+                        auto *ptr = buffer.data_ptr_at_index<float>(buf_idx);
                         float float32Value = (float)value / INT16_MAX;
-                        pointer.f32[frameIndex * stride + ch_idx] = float32Value;
+                        ptr[frameIndex * stride + ch_idx] = float32Value;
                     } break;
                     case audio::pcm_format::float64: {
+                        auto *ptr = buffer.data_ptr_at_index<double>(buf_idx);
                         double float64Value = (double)value / INT16_MAX;
-                        pointer.f64[frameIndex * stride + ch_idx] = (double)float64Value;
+                        ptr[frameIndex * stride + ch_idx] = (double)float64Value;
                     } break;
                     default:
                         break;
@@ -386,7 +389,7 @@ namespace test {
     }
 }
 
-- (bool)_compareData:(audio::pcm_buffer &)buffer
+- (bool)_compareData:(audio::pcm_buffer const &)buffer
           fileFormat:(audio::format const &)fileFormat
           startIndex:(NSInteger)startIndex {
     auto const &format = buffer.format();
@@ -394,23 +397,22 @@ namespace test {
     uint32_t const stride = format.stride();
 
     for (uint32_t buf_idx = 0; buf_idx < buffer_count; buf_idx++) {
-        auto const pointer = buffer.flex_ptr_at_index(buf_idx);
         for (NSInteger frameIndex = 0; frameIndex < buffer.frame_length(); frameIndex++) {
             int16_t value = frameIndex + startIndex + 1;
             for (NSInteger ch_idx = 0; ch_idx < stride; ch_idx++) {
                 int16_t ptrValue = 0;
                 switch (format.pcm_format()) {
                     case audio::pcm_format::int16: {
-                        ptrValue = pointer.i16[frameIndex * stride + ch_idx];
+                        ptrValue = buffer.data_ptr_at_index<int16_t>(buf_idx)[frameIndex * stride + ch_idx];
                     } break;
                     case audio::pcm_format::fixed824: {
-                        ptrValue = pointer.i32[frameIndex * stride + ch_idx] >> 16;
+                        ptrValue = buffer.data_ptr_at_index<int32_t>(buf_idx)[frameIndex * stride + ch_idx] >> 16;
                     } break;
                     case audio::pcm_format::float32: {
-                        ptrValue = roundf(pointer.f32[frameIndex * stride + ch_idx] * INT16_MAX);
+                        ptrValue = roundf(buffer.data_ptr_at_index<float>(buf_idx)[frameIndex * stride + ch_idx] * INT16_MAX);
                     } break;
                     case audio::pcm_format::float64: {
-                        ptrValue = round(pointer.f64[frameIndex * stride + ch_idx] * INT16_MAX);
+                        ptrValue = round(buffer.data_ptr_at_index<double>(buf_idx)[frameIndex * stride + ch_idx] * INT16_MAX);
                     } break;
                     default:
                         break;
