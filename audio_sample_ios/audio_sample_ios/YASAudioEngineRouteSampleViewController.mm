@@ -56,8 +56,7 @@ namespace sample {
             manager.connect(au_mixer.au().node(), au_io.au().node(), format);
             manager.connect(route.node(), au_mixer.au().node(), format);
             manager.connect(sine_tap.node(), route.node(), 0, YASAudioEngineRouteSampleSourceIndexSine, format);
-            manager.connect(au_io.au().node(), route.node(), 1, YASAudioEngineRouteSampleSourceIndexInput,
-                            format);
+            manager.connect(au_io.au().node(), route.node(), 1, YASAudioEngineRouteSampleSourceIndexInput, format);
         }
     };
 }
@@ -244,13 +243,12 @@ namespace sample {
 
         double const start_phase = phase;
         double const phase_per_frame = 1000.0 / buffer.format().sample_rate() * audio::math::two_pi;
-        audio::frame_enumerator enumerator(buffer);
-        auto const *flex_ptr = enumerator.pointer();
-        uint32_t const length = enumerator.frame_length();
 
-        while (flex_ptr->v) {
-            phase = audio::math::fill_sine(flex_ptr->f32, length, start_phase, phase_per_frame);
-            yas_audio_frame_enumerator_move_channel(enumerator);
+        auto each = audio::make_each_data<float>(buffer);
+        auto const length = buffer.frame_length();
+
+        while (yas_each_data_next_ch(each)) {
+            phase = audio::math::fill_sine(yas_each_data_ptr(each), length, start_phase, phase_per_frame);
         }
     };
 

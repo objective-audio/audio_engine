@@ -38,15 +38,15 @@ namespace sample {
             manager.connect(au_input.au_io().au().node(), input_tap.node(), format);
 
             input_tap.set_render_handler([input_level = input_level, sample_rate](auto args) mutable {
-                auto &buffer = args.buffer;
+                audio::pcm_buffer &buffer = args.buffer;
 
-                audio::frame_enumerator enumerator(buffer);
-                auto const *flex_ptr = enumerator.pointer();
-                int const frame_length = enumerator.frame_length();
+                auto each = audio::make_each_data<float>(buffer);
+                int const frame_length = buffer.frame_length();
                 float level = 0;
-                while (flex_ptr->v) {
-                    level = std::max(fabsf(flex_ptr->f32[cblas_isamax(frame_length, flex_ptr->f32, 1)]), level);
-                    yas_audio_frame_enumerator_move_channel(enumerator);
+
+                while (yas_each_data_next_ch(each)) {
+                    auto const *const ptr = yas_each_data_ptr(each);
+                    level = std::max(fabsf(ptr[cblas_isamax(frame_length, ptr, 1)]), level);
                 }
 
                 float prev_level = input_level.value() - frame_length / sample_rate * 30.0f;
