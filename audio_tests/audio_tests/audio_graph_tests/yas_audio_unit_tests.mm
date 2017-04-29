@@ -76,27 +76,24 @@ using namespace yas;
     AudioStreamBasicDescription inputASBD = converter_unit.input_format(0);
     XCTAssertTrue(is_equal(input_format.stream_description(), inputASBD));
 
-    XCTestExpectation *expectation = [self expectationWithDescription:@"ConverterUnit Render"];
+    auto exp = make_objc_ptr<XCTestExpectation *>(
+        [&self]() { return [self expectationWithDescription:@"ConverterUnit Render"]; });
 
-    yas_retain_or_ignore(expectation);
-
-    converter_unit.set_render_handler(
-        [expectation, input_format, &self](audio::render_parameters &render_parameters) mutable {
-            if (expectation) {
-                const AudioBufferList *ioData = render_parameters.io_data;
-                XCTAssertNotEqual(ioData, nullptr);
-                XCTAssertEqual(ioData->mNumberBuffers, input_format.buffer_count());
-                for (uint32_t i = 0; i < input_format.buffer_count(); i++) {
-                    XCTAssertEqual(ioData->mBuffers[i].mNumberChannels, input_format.stride());
-                    XCTAssertEqual(ioData->mBuffers[i].mDataByteSize,
-                                   input_format.buffer_frame_byte_count() * render_parameters.in_number_frames);
-                }
-                [expectation fulfill];
-
-                yas_release(expectation);
-                expectation = nil;
+    converter_unit.set_render_handler([exp, input_format, &self](audio::render_parameters &render_parameters) mutable {
+        if (exp) {
+            const AudioBufferList *ioData = render_parameters.io_data;
+            XCTAssertNotEqual(ioData, nullptr);
+            XCTAssertEqual(ioData->mNumberBuffers, input_format.buffer_count());
+            for (uint32_t i = 0; i < input_format.buffer_count(); i++) {
+                XCTAssertEqual(ioData->mBuffers[i].mNumberChannels, input_format.stride());
+                XCTAssertEqual(ioData->mBuffers[i].mDataByteSize,
+                               input_format.buffer_frame_byte_count() * render_parameters.in_number_frames);
             }
-        });
+            [exp.object() fulfill];
+
+            exp.set_object(nil);
+        }
+    });
 
     test::raw_unit_render_on_sub_thread(converter_unit, output_format, frame_length, 1, 0);
 
@@ -133,36 +130,32 @@ using namespace yas;
     converter_unit.set_output_format(format.stream_description(), 0);
     converter_unit.set_input_format(format.stream_description(), 0);
 
-    XCTestExpectation *renderExpectation = [self expectationWithDescription:@"ConverterUnit Render"];
-    XCTestExpectation *preRenderExpectation = [self expectationWithDescription:@"ConverterUnit PreRender"];
-    XCTestExpectation *postRenderExpectation = [self expectationWithDescription:@"ConverterUnit PostRender"];
+    auto render_exp = make_objc_ptr<XCTestExpectation *>(
+        [&self]() { return [self expectationWithDescription:@"ConverterUnit Render"]; });
+    auto pre_render_exp = make_objc_ptr<XCTestExpectation *>(
+        [&self]() { return [self expectationWithDescription:@"ConverterUnit PreRender"]; });
+    auto post_render_exp = make_objc_ptr<XCTestExpectation *>(
+        [&self]() { return [self expectationWithDescription:@"ConverterUnit PostRender"]; });
 
-    yas_retain_or_ignore(renderExpectation);
-    yas_retain_or_ignore(preRenderExpectation);
-    yas_retain_or_ignore(postRenderExpectation);
-
-    converter_unit.set_render_handler([renderExpectation](audio::render_parameters &render_parameters) mutable {
-        if (renderExpectation) {
-            [renderExpectation fulfill];
-            yas_release(renderExpectation);
-            renderExpectation = nil;
+    converter_unit.set_render_handler([render_exp](audio::render_parameters &render_parameters) mutable {
+        if (render_exp) {
+            [render_exp.object() fulfill];
+            render_exp.set_object(nil);
         }
     });
 
     converter_unit.set_notify_handler(
-        [preRenderExpectation, postRenderExpectation](audio::render_parameters &render_parameters) mutable {
+        [pre_render_exp, post_render_exp](audio::render_parameters &render_parameters) mutable {
             AudioUnitRenderActionFlags flags = *render_parameters.io_action_flags;
             if (flags & kAudioUnitRenderAction_PreRender) {
-                if (preRenderExpectation) {
-                    [preRenderExpectation fulfill];
-                    yas_release(preRenderExpectation);
-                    preRenderExpectation = nil;
+                if (pre_render_exp) {
+                    [pre_render_exp.object() fulfill];
+                    pre_render_exp.set_object(nil);
                 }
             } else if (flags & kAudioUnitRenderAction_PostRender) {
-                if (postRenderExpectation) {
-                    [postRenderExpectation fulfill];
-                    yas_release(postRenderExpectation);
-                    postRenderExpectation = nil;
+                if (post_render_exp) {
+                    [post_render_exp.object() fulfill];
+                    post_render_exp.set_object(nil);
                 }
             }
         });

@@ -3,6 +3,7 @@
 //
 
 #import "yas_audio_test_utils.h"
+#import "yas_objc_ptr.h"
 
 using namespace yas;
 
@@ -409,10 +410,12 @@ namespace test {
                         ptrValue = buffer.data_ptr_at_index<int32_t>(buf_idx)[frameIndex * stride + ch_idx] >> 16;
                     } break;
                     case audio::pcm_format::float32: {
-                        ptrValue = roundf(buffer.data_ptr_at_index<float>(buf_idx)[frameIndex * stride + ch_idx] * INT16_MAX);
+                        ptrValue =
+                            roundf(buffer.data_ptr_at_index<float>(buf_idx)[frameIndex * stride + ch_idx] * INT16_MAX);
                     } break;
                     case audio::pcm_format::float64: {
-                        ptrValue = round(buffer.data_ptr_at_index<double>(buf_idx)[frameIndex * stride + ch_idx] * INT16_MAX);
+                        ptrValue =
+                            round(buffer.data_ptr_at_index<double>(buf_idx)[frameIndex * stride + ch_idx] * INT16_MAX);
                     } break;
                     default:
                         break;
@@ -437,26 +440,22 @@ namespace test {
 
     NSString *path = [self temporaryTestDirectory];
 
-    NSFileManager *fileManager = [[NSFileManager alloc] init];
-
-    [fileManager createDirectoryAtPath:path withIntermediateDirectories:YES attributes:nil error:nil];
-
-    yas_release(fileManager);
+    if (auto file_manager = make_objc_ptr([[NSFileManager alloc] init])) {
+        [file_manager.object() createDirectoryAtPath:path withIntermediateDirectories:YES attributes:nil error:nil];
+    }
 }
 
 - (void)removeAllFiles {
     NSString *path = [self temporaryTestDirectory];
 
-    NSFileManager *fileManager = [[NSFileManager alloc] init];
+    if (auto file_manager = make_objc_ptr([[NSFileManager alloc] init])) {
+        for (NSString *fileName in [file_manager.object() contentsOfDirectoryAtPath:path error:nil]) {
+            NSString *fullPath = [path stringByAppendingPathComponent:fileName];
+            [file_manager.object() removeItemAtPath:fullPath error:nil];
+        }
 
-    for (NSString *fileName in [fileManager contentsOfDirectoryAtPath:path error:nil]) {
-        NSString *fullPath = [path stringByAppendingPathComponent:fileName];
-        [fileManager removeItemAtPath:fullPath error:nil];
+        [file_manager.object() removeItemAtPath:path error:nil];
     }
-
-    [fileManager removeItemAtPath:path error:nil];
-
-    yas_release(fileManager);
 }
 
 @end
