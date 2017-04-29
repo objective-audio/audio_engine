@@ -72,12 +72,16 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		B615C4DB1EAE1C1800F2EAF6 /* yas_fast_each_private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = yas_fast_each_private.h; sourceTree = "<group>"; };
+		B615C4DC1EAE1C1800F2EAF6 /* yas_fast_each.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = yas_fast_each.h; sourceTree = "<group>"; };
 		B617CD261C95558E00B3A934 /* yas_audio_engine_node_protocol.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = yas_audio_engine_node_protocol.cpp; path = audio_engine/yas_audio_engine_node_protocol.cpp; sourceTree = "<group>"; };
 		B61D52981B9C70AF00A449C5 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		B61D529C1B9C70CD00A449C5 /* CoreAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudio.framework; path = System/Library/Frameworks/CoreAudio.framework; sourceTree = SDKROOT; };
 		B61D529E1B9C70D400A449C5 /* AudioUnit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioUnit.framework; path = System/Library/Frameworks/AudioUnit.framework; sourceTree = SDKROOT; };
 		B61D52A01B9C70DB00A449C5 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
 		B61D52FB1B9D268900A449C5 /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = System/Library/Frameworks/Accelerate.framework; sourceTree = SDKROOT; };
+		B624CC991EAE1B1D00C0FE91 /* yas_audio_each_data_private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yas_audio_each_data_private.h; sourceTree = "<group>"; };
+		B624CC9A1EAE1B1D00C0FE91 /* yas_audio_each_data.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yas_audio_each_data.h; sourceTree = "<group>"; };
 		B62ED5551A62812F007DDE96 /* audio_sample_mac.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = audio_sample_mac.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B62ED5591A62812F007DDE96 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B62ED55A1A62812F007DDE96 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -322,6 +326,8 @@
 		B6626A721C146E2D0038175B /* audio_basics */ = {
 			isa = PBXGroup;
 			children = (
+				B624CC991EAE1B1D00C0FE91 /* yas_audio_each_data_private.h */,
+				B624CC9A1EAE1B1D00C0FE91 /* yas_audio_each_data.h */,
 				B6626A731C146E2D0038175B /* yas_audio_enumerator.cpp */,
 				B6626A741C146E2D0038175B /* yas_audio_enumerator.h */,
 				B6626A971C1470D40038175B /* yas_audio_exception.cpp */,
@@ -440,6 +446,8 @@
 				B6F2CAB91CDE0FBC00EF584B /* yas_each_index.h */,
 				B6F2CABB1CDE0FBC00EF584B /* yas_exception.cpp */,
 				B6F2CABC1CDE0FBC00EF584B /* yas_exception.h */,
+				B615C4DB1EAE1C1800F2EAF6 /* yas_fast_each_private.h */,
+				B615C4DC1EAE1C1800F2EAF6 /* yas_fast_each.h */,
 				B6F2CABD1CDE0FBC00EF584B /* yas_flex_ptr.cpp */,
 				B6F2CABE1CDE0FBC00EF584B /* yas_flex_ptr.h */,
 				B6F2CAC11CDE0FBC00EF584B /* yas_objc_ptr_private.h */,
