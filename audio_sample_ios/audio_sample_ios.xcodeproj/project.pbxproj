@@ -81,6 +81,8 @@
 		B61D52D51B9C845000A449C5 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		B61D52F91B9D257900A449C5 /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = System/Library/Frameworks/Accelerate.framework; sourceTree = SDKROOT; };
 		B61E57CF1B77A07B008620ED /* YASAudioEngineIOSampleViewController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = YASAudioEngineIOSampleViewController.mm; sourceTree = "<group>"; };
+		B624CC971EAD932A00C0FE91 /* yas_fast_each_private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yas_fast_each_private.h; sourceTree = "<group>"; };
+		B624CC981EAD932A00C0FE91 /* yas_fast_each.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yas_fast_each.h; sourceTree = "<group>"; };
 		B62C2D6A1BAD498D0036949D /* YASAudioEngineRouteSampleSelectionViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YASAudioEngineRouteSampleSelectionViewController.h; sourceTree = "<group>"; };
 		B62C2D6B1BAD498D0036949D /* YASAudioEngineRouteSampleSelectionViewController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = YASAudioEngineRouteSampleSelectionViewController.mm; sourceTree = "<group>"; };
 		B62ED5231A6280C0007DDE96 /* audio_sample_ios.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = audio_sample_ios.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -482,6 +484,8 @@
 				B6F2CA861CDE0FAC00EF584B /* yas_each_index.h */,
 				B6F2CA881CDE0FAC00EF584B /* yas_exception.cpp */,
 				B6F2CA891CDE0FAC00EF584B /* yas_exception.h */,
+				B624CC971EAD932A00C0FE91 /* yas_fast_each_private.h */,
+				B624CC981EAD932A00C0FE91 /* yas_fast_each.h */,
 				B6F2CA8A1CDE0FAC00EF584B /* yas_flex_ptr.cpp */,
 				B6F2CA8B1CDE0FAC00EF584B /* yas_flex_ptr.h */,
 				B6F2CA8E1CDE0FAC00EF584B /* yas_objc_ptr_private.h */,
