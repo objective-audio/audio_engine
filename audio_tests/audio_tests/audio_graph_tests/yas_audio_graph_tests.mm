@@ -80,13 +80,14 @@ using namespace yas;
         XCTAssertEqual(input_asbd.mSampleRate, mixer_sample_rate);
     }
 
-    XCTestExpectation *ioExpectation = [self expectationWithDescription:@"io_unit render"];
-    yas_retain_or_ignore(ioExpectation);
+    auto io_exp = make_objc_ptr<XCTestExpectation *>([&self](){
+        return [self expectationWithDescription:@"io_unit render"];
+    });
 
-    io_unit.set_render_handler([ioExpectation, frame_length, output_format, &mixer_unit,
+    io_unit.set_render_handler([io_exp, frame_length, output_format, &mixer_unit,
                                 &self](audio::render_parameters &render_parameters) mutable {
-        if (ioExpectation) {
-            [ioExpectation fulfill];
+        if (io_exp) {
+            [io_exp.object() fulfill];
 
             XCTAssertEqual(render_parameters.in_number_frames, frame_length);
             XCTAssertEqual(render_parameters.in_bus_number, 0);
@@ -104,28 +105,28 @@ using namespace yas;
 
             mixer_unit.raw_unit_render(render_parameters);
 
-            yas_release(ioExpectation);
-            ioExpectation = nil;
+            io_exp.set_object(nil);
         }
     });
 
-    NSMutableDictionary *mixerExpectations = [NSMutableDictionary dictionaryWithCapacity:mixerInputCount];
+    NSMutableDictionary<NSNumber *, XCTestExpectation *> *mixerExpectations =
+        [[NSMutableDictionary alloc] initWithCapacity:mixerInputCount];
     for (uint32_t i = 0; i < mixerInputCount; i++) {
         NSString *description = [NSString stringWithFormat:@"MixerUnit Render Bus=%@", @(i)];
         mixerExpectations[@(i)] = [self expectationWithDescription:description];
     }
 
-    yas_retain_or_ignore(mixerExpectations);
+    auto mixer_exps = make_objc_ptr(mixerExpectations);
 
     mixer_unit.set_render_handler(
-        [mixerExpectations, output_format, frame_length, &self](audio::render_parameters &render_parameters) mutable {
-            if (mixerExpectations) {
+        [mixer_exps, output_format, frame_length, &self](audio::render_parameters &render_parameters) mutable {
+            if (mixer_exps) {
                 uint32_t const bus_idx = render_parameters.in_bus_number;
                 NSNumber *busKey = @(bus_idx);
-                XCTestExpectation *mixerExpectation = mixerExpectations[busKey];
-                if (mixerExpectations) {
+                XCTestExpectation *mixerExpectation = mixer_exps.object()[busKey];
+                if (mixer_exps) {
                     [mixerExpectation fulfill];
-                    [mixerExpectations removeObjectForKey:busKey];
+                    [mixer_exps.object() removeObjectForKey:busKey];
 
                     XCTAssertEqual(render_parameters.in_number_frames, frame_length);
                     XCTAssertEqual(render_parameters.in_render_type, audio::render_type::normal);
@@ -141,9 +142,8 @@ using namespace yas;
                     }
                 }
 
-                if (mixerExpectations.count == 0) {
-                    yas_release(mixerExpectations);
-                    mixerExpectations = nil;
+                if (mixer_exps.object().count == 0) {
+                    mixer_exps.set_object(nil);
                 }
             }
         });

@@ -1,18 +1,17 @@
 //
-//  YASDecibelValueTransformer.mm
+//  YASFrequencyValueFormatter.m
 //
 
-#import "YASDecibelValueTransformer.h"
-#import "yas_audio.h"
+#import "YASFrequencyValueFormatter.h"
 #import "yas_objc_ptr.h"
 
 using namespace yas;
 
-@interface YASDecibelValueTransformer ()
+@interface YASFrequencyValueFormatter ()
 
 @end
 
-@implementation YASDecibelValueTransformer {
+@implementation YASFrequencyValueFormatter {
     objc_ptr<NSNumberFormatter *> _formatter;
 }
 
@@ -37,9 +36,7 @@ using namespace yas;
 
 - (id)transformedValue:(id)value {
     if ([value isKindOfClass:[NSNumber class]]) {
-        NSNumber *numberValue = value;
-        numberValue = @(audio::math::decibel_from_linear(numberValue.doubleValue));
-        return [_formatter.object() stringFromNumber:numberValue];
+        return [_formatter.object() stringFromNumber:value];
     }
 
     return nil;

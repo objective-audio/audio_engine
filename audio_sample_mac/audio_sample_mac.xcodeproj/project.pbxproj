@@ -28,7 +28,7 @@
 		B6626A8D1C146E2D0038175B /* yas_audio_types.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6626A831C146E2D0038175B /* yas_audio_types.cpp */; };
 		B6626A991C1470D40038175B /* yas_audio_exception.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6626A971C1470D40038175B /* yas_audio_exception.cpp */; };
 		B6841A901AAABD330035C704 /* YASDecibelValueTransformer.mm in Sources */ = {isa = PBXBuildFile; fileRef = B6841A8F1AAABD330035C704 /* YASDecibelValueTransformer.mm */; };
-		B6841A931AAAD3990035C704 /* YASFrequencyValueFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = B6841A921AAAD3990035C704 /* YASFrequencyValueFormatter.m */; };
+		B6841A931AAAD3990035C704 /* YASFrequencyValueFormatter.mm in Sources */ = {isa = PBXBuildFile; fileRef = B6841A921AAAD3990035C704 /* YASFrequencyValueFormatter.mm */; };
 		B68AC3531EAAD52C00E3BA12 /* yas_delaying_caller.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B68AC34F1EAAD52C00E3BA12 /* yas_delaying_caller.cpp */; };
 		B699BEB81BF4D1B60007B597 /* yas_audio_graph.mm in Sources */ = {isa = PBXBuildFile; fileRef = B699BEAE1BF4D1B60007B597 /* yas_audio_graph.mm */; };
 		B699BEBA1BF4D1B60007B597 /* yas_audio_unit_parameter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B699BEB21BF4D1B60007B597 /* yas_audio_unit_parameter.cpp */; };
@@ -110,7 +110,7 @@
 		B6841A8E1AAABD330035C704 /* YASDecibelValueTransformer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YASDecibelValueTransformer.h; sourceTree = "<group>"; };
 		B6841A8F1AAABD330035C704 /* YASDecibelValueTransformer.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = YASDecibelValueTransformer.mm; sourceTree = "<group>"; };
 		B6841A911AAAD3990035C704 /* YASFrequencyValueFormatter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YASFrequencyValueFormatter.h; sourceTree = "<group>"; };
-		B6841A921AAAD3990035C704 /* YASFrequencyValueFormatter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YASFrequencyValueFormatter.m; sourceTree = "<group>"; };
+		B6841A921AAAD3990035C704 /* YASFrequencyValueFormatter.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = YASFrequencyValueFormatter.mm; sourceTree = "<group>"; };
 		B68AC34F1EAAD52C00E3BA12 /* yas_delaying_caller.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = yas_delaying_caller.cpp; sourceTree = "<group>"; };
 		B68AC3501EAAD52C00E3BA12 /* yas_delaying_caller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yas_delaying_caller.h; sourceTree = "<group>"; };
 		B68AC3511EAAD52C00E3BA12 /* yas_each_data_private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yas_each_data_private.h; sourceTree = "<group>"; };
@@ -280,7 +280,7 @@
 				B6841A8E1AAABD330035C704 /* YASDecibelValueTransformer.h */,
 				B6841A8F1AAABD330035C704 /* YASDecibelValueTransformer.mm */,
 				B6841A911AAAD3990035C704 /* YASFrequencyValueFormatter.h */,
-				B6841A921AAAD3990035C704 /* YASFrequencyValueFormatter.m */,
+				B6841A921AAAD3990035C704 /* YASFrequencyValueFormatter.mm */,
 				B69C84861AF1144F00B9EB3D /* YASAudioOfflineSampleViewController.h */,
 				B69C84871AF1144F00B9EB3D /* YASAudioOfflineSampleViewController.mm */,
 				B637893D1AB430F300B95F55 /* YASAudioEngineDeviceIOSampleViewController.h */,
@@ -586,7 +586,7 @@
 				B6AB1C411A9230420054349E /* YASAudioDeviceSampleViewController.mm in Sources */,
 				B6F2CAD71CDE0FBC00EF584B /* yas_chain.cpp in Sources */,
 				B6FF04331BEB915D0026777E /* yas_audio_engine_node.cpp in Sources */,
-				B6841A931AAAD3990035C704 /* YASFrequencyValueFormatter.m in Sources */,
+				B6841A931AAAD3990035C704 /* YASFrequencyValueFormatter.mm in Sources */,
 				B6FF04591BEB917A0026777E /* yas_audio_device_io.mm in Sources */,
 				B6F2CADC1CDE0FBC00EF584B /* yas_operation.cpp in Sources */,
 			);
