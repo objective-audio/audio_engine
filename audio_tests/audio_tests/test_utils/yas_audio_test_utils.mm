@@ -21,7 +21,7 @@ namespace test {
         }
         
         template <typename T>
-        flex_ptr data_ptr_from_buffer(audio::pcm_buffer const &buffer, uint32_t const channel, uint32_t const frame) {
+        T const *data_ptr_from_buffer(audio::pcm_buffer const &buffer, uint32_t const channel, uint32_t const frame) {
             auto each_data = audio::make_each_data<T>(buffer);
             auto each_frame = make_fast_each(frame + 1);
             while (yas_each_next(each_frame)) {
@@ -31,7 +31,7 @@ namespace test {
             while (yas_each_next(each_ch)) {
                 yas_each_data_next_ch(each_data);
             }
-            return flex_ptr(yas_each_data_ptr(each_data));
+            return yas_each_data_ptr(each_data);
         }
     }
 }
@@ -41,30 +41,33 @@ uint32_t test::test_value(uint32_t const frame, uint32_t const ch_idx, uint32_t 
     return frame + 1024 * (ch_idx + 1) + 512 * (buf_idx + 1);
 }
 
-void test::fill_test_values_to_buffer(audio::pcm_buffer const &buffer) {
+void test::fill_test_values_to_buffer(audio::pcm_buffer &buffer) {
     auto const &format = buffer.format();
     audio::pcm_format const pcmFormat = format.pcm_format();
     uint32_t const buffer_count = format.buffer_count();
     uint32_t const stride = format.stride();
 
     for (uint32_t buf_idx = 0; buf_idx < buffer_count; buf_idx++) {
-        flex_ptr pointer = buffer.flex_ptr_at_index(buf_idx);
         for (uint32_t frame = 0; frame < buffer.frame_length(); frame++) {
             for (uint32_t ch_idx = 0; ch_idx < stride; ch_idx++) {
                 uint32_t index = frame * stride + ch_idx;
                 uint32_t value = test_value(frame, ch_idx, buf_idx);
                 switch (pcmFormat) {
                     case audio::pcm_format::float32: {
-                        pointer.f32[index] = value;
+                        auto *ptr = buffer.data_ptr_at_index<float>(buf_idx);
+                        ptr[index] = value;
                     } break;
                     case audio::pcm_format::float64: {
-                        pointer.f64[index] = value;
+                        auto *ptr = buffer.data_ptr_at_index<double>(buf_idx);
+                        ptr[index] = value;
                     } break;
                     case audio::pcm_format::int16: {
-                        pointer.i16[index] = value;
+                        auto *ptr = buffer.data_ptr_at_index<int16_t>(buf_idx);
+                        ptr[index] = value;
                     } break;
                     case audio::pcm_format::fixed824: {
-                        pointer.i32[index] = value;
+                        auto *ptr = buffer.data_ptr_at_index<int32_t>(buf_idx);
+                        ptr[index] = value;
                     } break;
                     default:
                         break;
@@ -126,7 +129,7 @@ bool test::is_equal_buffer_flexibly(audio::pcm_buffer const &buffer1, audio::pcm
         for (uint32_t frame = 0; frame < buffer1.frame_length(); frame++) {
             auto ptr1 = data_ptr_from_buffer(buffer1, ch_idx, frame);
             auto ptr2 = data_ptr_from_buffer(buffer2, ch_idx, frame);
-            if (!is_equal_data(ptr1.v, ptr2.v, buffer1.format().sample_byte_count())) {
+            if (!is_equal_data(ptr1, ptr2, buffer1.format().sample_byte_count())) {
                 return NO;
             }
         }
@@ -154,16 +157,16 @@ bool test::is_equal(AudioTimeStamp const *const ts1, AudioTimeStamp const *const
     }
 }
 
-flex_ptr test::data_ptr_from_buffer(audio::pcm_buffer const &buffer, uint32_t const channel, uint32_t const frame) {
+uint8_t const *test::data_ptr_from_buffer(audio::pcm_buffer const &buffer, uint32_t const channel, uint32_t const frame) {
     switch (buffer.format().pcm_format()) {
         case audio::pcm_format::float32:
-            return internal::data_ptr_from_buffer<float>(buffer, channel, frame);
+            return (uint8_t const *)internal::data_ptr_from_buffer<float>(buffer, channel, frame);
         case audio::pcm_format::float64:
-            return internal::data_ptr_from_buffer<double>(buffer, channel, frame);
+            return (uint8_t const *)internal::data_ptr_from_buffer<double>(buffer, channel, frame);
         case audio::pcm_format::int16:
-            return internal::data_ptr_from_buffer<int16_t>(buffer, channel, frame);
+            return (uint8_t const *)internal::data_ptr_from_buffer<int16_t>(buffer, channel, frame);
         case audio::pcm_format::fixed824:
-            return internal::data_ptr_from_buffer<int32_t>(buffer, channel, frame);
+            return (uint8_t const *)internal::data_ptr_from_buffer<int32_t>(buffer, channel, frame);
             
         default:
             throw "invalid pcm format.";
