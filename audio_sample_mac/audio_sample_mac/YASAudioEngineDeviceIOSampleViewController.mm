@@ -182,14 +182,14 @@ namespace sample {
 
         buffer.clear();
 
-        audio::frame_enumerator enumerator(buffer);
-        auto const *flex_ptr = enumerator.pointer();
         double const start_phase = next_phase;
+        auto const frame_length = buffer.frame_length();
         double const phase_per_frame = 1000.0 / buffer.format().sample_rate() * audio::math::two_pi;
-        while (flex_ptr->v) {
-            next_phase = audio::math::fill_sine(flex_ptr->f32, buffer.frame_length(), start_phase, phase_per_frame);
-            cblas_sscal(buffer.frame_length(), 0.2, flex_ptr->f32, 1);
-            yas_audio_frame_enumerator_move_channel(enumerator);
+        auto each = audio::make_each_data<float>(buffer);
+        while (yas_each_data_next_ch(each)) {
+            auto *const ptr = yas_each_data_ptr(each);
+            next_phase = audio::math::fill_sine(ptr, frame_length, start_phase, phase_per_frame);
+            cblas_sscal(buffer.frame_length(), 0.2, ptr, 1);
         }
     };
 

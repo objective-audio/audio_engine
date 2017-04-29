@@ -64,14 +64,11 @@ namespace offline_sample {
                             uint32_t const frame_length = buffer.frame_length();
 
                             if (frame_length > 0) {
-                                audio::frame_enumerator enumerator(buffer);
-                                auto const *flex_ptr = enumerator.pointer();
-                                while (flex_ptr->v) {
-                                    next_phase = audio::math::fill_sine(flex_ptr->f32, frame_length, start_phase,
-                                                                        phase_per_frame);
-                                    yas_audio_frame_enumerator_move_channel(enumerator);
+                                auto each = audio::make_each_data<float>(buffer);
+                                while (yas_each_data_next_ch(each)) {
+                                    next_phase = audio::math::fill_sine(yas_each_data_ptr(each), frame_length,
+                                                                        start_phase, phase_per_frame);
                                 }
-
                                 sine.impl_ptr<impl>()->phase_on_render = next_phase;
                             }
                         }
