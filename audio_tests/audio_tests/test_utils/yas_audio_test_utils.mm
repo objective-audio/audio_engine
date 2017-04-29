@@ -1,10 +1,41 @@
 //
-//  yas_audio_test_utils.cpp
+//  yas_audio_test_utils.mm
 //
 
 #include "yas_audio_test_utils.h"
 
 using namespace yas;
+
+namespace yas {
+namespace test {
+    namespace internal {
+        template <typename T>
+        bool is_filled_buffer(audio::pcm_buffer const &buffer) {
+            auto each = audio::make_each_data<T>(buffer);
+            while (yas_each_data_next(each)) {
+                if (yas_each_data_value(each) == 0) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        
+        template <typename T>
+        flex_ptr data_ptr_from_buffer(audio::pcm_buffer const &buffer, uint32_t const channel, uint32_t const frame) {
+            auto each_data = audio::make_each_data<T>(buffer);
+            auto each_frame = make_fast_each(frame + 1);
+            while (yas_each_next(each_frame)) {
+                yas_each_data_next_frame(each_data);
+            }
+            auto each_ch = make_fast_each(channel + 1);
+            while (yas_each_next(each_ch)) {
+                yas_each_data_next_ch(each_data);
+            }
+            return flex_ptr(yas_each_data_ptr(each_data));
+        }
+    }
+}
+}
 
 uint32_t test::test_value(uint32_t const frame, uint32_t const ch_idx, uint32_t const buf_idx) {
     return frame + 1024 * (ch_idx + 1) + 512 * (buf_idx + 1);
@@ -59,23 +90,19 @@ bool test::is_cleared_buffer(audio::pcm_buffer const &buffer) {
 }
 
 bool test::is_filled_buffer(audio::pcm_buffer const &buffer) {
-    __block BOOL isFilled = YES;
-    uint32_t const sample_byte_count = buffer.format().sample_byte_count();
-    NSData *zeroData = [NSMutableData dataWithLength:sample_byte_count];
-    void const *zeroBytes = [zeroData bytes];
-
-    audio::frame_enumerator enumerator(buffer);
-    flex_ptr const *pointer = enumerator.pointer();
-
-    while (pointer->v) {
-        if (is_equal_data(pointer->v, zeroBytes, sample_byte_count)) {
-            isFilled = NO;
-            yas_audio_frame_enumerator_stop(enumerator);
-        }
-        yas_audio_frame_enumerator_move(enumerator);
+    switch (buffer.format().pcm_format()) {
+        case audio::pcm_format::float32:
+            return internal::is_filled_buffer<float>(buffer);
+        case audio::pcm_format::float64:
+            return internal::is_filled_buffer<double>(buffer);
+        case audio::pcm_format::int16:
+            return internal::is_filled_buffer<int16_t>(buffer);
+        case audio::pcm_format::fixed824:
+            return internal::is_filled_buffer<int32_t>(buffer);
+            
+        default:
+            throw "invalid pcm format.";
     }
-
-    return isFilled;
 }
 
 bool test::is_equal_buffer_flexibly(audio::pcm_buffer const &buffer1, audio::pcm_buffer const &buffer2) {
@@ -128,10 +155,19 @@ bool test::is_equal(AudioTimeStamp const *const ts1, AudioTimeStamp const *const
 }
 
 flex_ptr test::data_ptr_from_buffer(audio::pcm_buffer const &buffer, uint32_t const channel, uint32_t const frame) {
-    audio::frame_enumerator enumerator(buffer);
-    enumerator.set_frame_position(frame);
-    enumerator.set_channel_position(channel);
-    return *enumerator.pointer();
+    switch (buffer.format().pcm_format()) {
+        case audio::pcm_format::float32:
+            return internal::data_ptr_from_buffer<float>(buffer, channel, frame);
+        case audio::pcm_format::float64:
+            return internal::data_ptr_from_buffer<double>(buffer, channel, frame);
+        case audio::pcm_format::int16:
+            return internal::data_ptr_from_buffer<int16_t>(buffer, channel, frame);
+        case audio::pcm_format::fixed824:
+            return internal::data_ptr_from_buffer<int32_t>(buffer, channel, frame);
+            
+        default:
+            throw "invalid pcm format.";
+    }
 }
 
 void test::raw_unit_render_on_sub_thread(audio::unit &unit, audio::format &format, uint32_t const frame_length,

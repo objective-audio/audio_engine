@@ -161,13 +161,10 @@ using namespace yas;
         XCTAssertEqual(buffer.frame_length(), frames_per_render);
         XCTAssertTrue(buffer.format() == format);
 
-        auto enumerator = audio::frame_enumerator(buffer);
-        auto *flex_ptr = enumerator.pointer();
-        auto *frm_idx = enumerator.frame();
-        auto *ch_idx = enumerator.channel();
-        while (flex_ptr->v) {
-            *flex_ptr->f32 = test::test_value(*frm_idx + tap_render_frame, 0, *ch_idx);
-            yas_audio_frame_enumerator_move(enumerator);
+        auto each = audio::make_each_data<float>(buffer);
+        while (yas_each_data_next(each)) {
+            yas_each_data_value(each) =
+                test::test_value((uint32_t)each.frm_idx + tap_render_frame, 0, (uint32_t)each.ptr_idx);
         }
 
         tap_render_frame += buffer.frame_length();
@@ -194,19 +191,16 @@ using namespace yas;
         XCTAssertEqual(buffer.frame_length(), frames_per_render);
         XCTAssertTrue(buffer.format() == format);
 
-        auto enumerator = audio::frame_enumerator(buffer);
-
-        auto *flex_ptr = enumerator.pointer();
-        auto *frm_idx = enumerator.frame();
-        auto *ch_idx = enumerator.channel();
-        while (flex_ptr->v) {
-            bool is_equal_value = *flex_ptr->f32 == test::test_value(*frm_idx + output_render_frame, 0, *ch_idx);
+        auto each = audio::make_each_data<float>(buffer);
+        while (yas_each_data_next(each)) {
+            bool is_equal_value =
+                yas_each_data_value(each) ==
+                test::test_value((uint32_t)each.frm_idx + output_render_frame, 0, (uint32_t)each.ptr_idx);
             XCTAssertTrue(is_equal_value);
             if (!is_equal_value) {
                 out_stop = YES;
                 return;
             }
-            yas_audio_frame_enumerator_move(enumerator);
         }
 
         output_render_frame += buffer.frame_length();
@@ -296,7 +290,8 @@ using namespace yas;
 }
 
 - (void)test_offline_start_error_ostream {
-    auto const errors = {audio::engine::offline_start_error_t::already_running, audio::engine::offline_start_error_t::prepare_failure,
+    auto const errors = {audio::engine::offline_start_error_t::already_running,
+                         audio::engine::offline_start_error_t::prepare_failure,
                          audio::engine::offline_start_error_t::connection_not_found};
 
     for (auto const &error : errors) {

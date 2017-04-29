@@ -12,6 +12,9 @@ namespace audio {
 
     template <typename T>
     each_data<T> make_each_data(pcm_buffer &buffer);
+
+    template <typename T>
+    const_each_data<T> make_each_data(pcm_buffer const &buffer);
 }
 }
 

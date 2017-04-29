@@ -90,7 +90,7 @@ using namespace yas;
         XCTestExpectation *expectation = [self expectationWithDescription:@"first render"];
 
         XCTAssertTrue(manager.start_offline_render([](auto args) { args.out_stop = true; },
-                                                  [expectation](bool const cancelled) { [expectation fulfill]; }));
+                                                   [expectation](bool const cancelled) { [expectation fulfill]; }));
 
         [self waitForExpectationsWithTimeout:0.5
                                      handler:^(NSError *error){
@@ -116,19 +116,10 @@ using namespace yas;
         XCTAssertTrue(manager.start_offline_render(
             [self](auto args) {
                 args.out_stop = true;
-                audio::frame_enumerator enumerator(args.buffer);
-                auto pointer = enumerator.pointer();
-                uint32_t const *frm_idx = enumerator.frame();
-                uint32_t const *ch_idx = enumerator.channel();
-
-                while (pointer->v) {
-                    while (pointer->v) {
-                        float test_value = (float)test::test_value(*frm_idx, 0, *ch_idx);
-                        XCTAssertEqual(*pointer->f32, test_value);
-                        yas_audio_frame_enumerator_move_channel(enumerator);
-                    }
-                    XCTAssertEqual(*ch_idx, 2);
-                    yas_audio_frame_enumerator_move_frame(enumerator);
+                auto each = audio::make_each_data<float>(args.buffer);
+                while (yas_each_data_next(each)) {
+                    float test_value = (float)test::test_value((uint32_t)each.frm_idx, 0, (uint32_t)each.ptr_idx);
+                    XCTAssertEqual(yas_each_data_value(each), test_value);
                 }
             },
             [expectation](bool const cancelled) { [expectation fulfill]; }));
@@ -182,19 +173,10 @@ using namespace yas;
     XCTAssertTrue(manager.start_offline_render(
         [self](auto args) {
             args.out_stop = true;
-            audio::frame_enumerator enumerator(args.buffer);
-            auto pointer = enumerator.pointer();
-            uint32_t const *frm_idx = enumerator.frame();
-            uint32_t const *ch_idx = enumerator.channel();
-
-            while (pointer->v) {
-                while (pointer->v) {
-                    float test_value = (float)test::test_value(*frm_idx, 0, 0);
-                    XCTAssertEqual(*pointer->f32, test_value);
-                    yas_audio_frame_enumerator_move_channel(enumerator);
-                }
-                XCTAssertEqual(*ch_idx, 2);
-                yas_audio_frame_enumerator_move_frame(enumerator);
+            auto each = audio::make_each_data<float>(args.buffer);
+            while (yas_each_data_next(each)) {
+                float test_value = (float)test::test_value((uint32_t)each.frm_idx, 0, 0);
+                XCTAssertEqual(yas_each_data_value(each), test_value);
             }
         },
         [expectation](bool const cancelled) { [expectation fulfill]; }));
@@ -249,21 +231,12 @@ using namespace yas;
     XCTAssertTrue(manager.start_offline_render(
         [self](auto args) {
             args.out_stop = true;
-            audio::frame_enumerator enumerator(args.buffer);
-            auto pointer = enumerator.pointer();
-            uint32_t const *const frm_idx = enumerator.frame();
-            uint32_t const *const ch_idx = enumerator.channel();
-
-            while (pointer->v) {
-                while (pointer->v) {
-                    if (*ch_idx == 0 || *ch_idx == 2) {
-                        float test_value = (float)test::test_value(*frm_idx, 0, 0);
-                        XCTAssertEqual(*pointer->f32, test_value);
-                    }
-                    yas_audio_frame_enumerator_move_channel(enumerator);
+            auto each = audio::make_each_data<float>(args.buffer);
+            while (yas_each_data_next(each)) {
+                if (each.ptr_idx == 0 || each.ptr_idx == 2) {
+                    float test_value = (float)test::test_value((uint32_t)each.frm_idx, 0, 0);
+                    XCTAssertEqual(yas_each_data_value(each), test_value);
                 }
-                XCTAssertEqual(*ch_idx, 4);
-                yas_audio_frame_enumerator_move_frame(enumerator);
             }
         },
         [expectation](bool const cancelled) { [expectation fulfill]; }));

@@ -52,8 +52,7 @@ namespace sample {
                 manager.connect(effect_au.node(), au_output.au_io().au().node(), format);
                 manager.connect(tap.node(), effect_au.node(), format);
             } else {
-                through_connection =
-                    manager.connect(tap.node(), au_output.au_io().au().node(), format);
+                through_connection = manager.connect(tap.node(), au_output.au_io().au().node(), format);
             }
         }
     };
@@ -154,17 +153,14 @@ namespace sample {
 
         double const start_phase = phase;
         double const phase_per_frame = 1000.0 / buffer.format().sample_rate() * audio::math::two_pi;
-        audio::frame_enumerator enumerator(buffer);
-        auto const *flex_ptr = enumerator.pointer();
-        uint32_t const length = enumerator.frame_length();
 
-        uint32_t idx = 0;
-        while (flex_ptr->v) {
-            if (idx == 0) {
-                phase = audio::math::fill_sine(flex_ptr->f32, length, start_phase, phase_per_frame);
+        auto each = audio::make_each_data<float>(buffer);
+        auto const length = buffer.frame_length();
+
+        while (yas_each_data_next_ch(each)) {
+            if (yas_each_data_index(each) == 0) {
+                phase = audio::math::fill_sine(yas_each_data_ptr(each), length, start_phase, phase_per_frame);
             }
-            idx++;
-            yas_audio_frame_enumerator_move_channel(enumerator);
         }
     };
 

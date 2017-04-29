@@ -74,20 +74,16 @@ namespace audio_device_sample {
 
             auto const &format = output_buffer.format();
             if (format.pcm_format() == audio::pcm_format::float32 && format.stride() == 1) {
-                audio::frame_enumerator enumerator(output_buffer);
-                auto pointer = enumerator.pointer();
-
                 if (input_buffer) {
                     if (input_buffer.frame_length() >= frame_length) {
                         output_buffer.copy_from(input_buffer);
 
                         float const throughVol = through_volume();
 
-                        while (pointer->v) {
-                            cblas_sscal(frame_length, throughVol, pointer->f32, 1);
-                            yas_audio_frame_enumerator_move_channel(enumerator);
+                        auto each = audio::make_each_data<float>(output_buffer);
+                        while (yas_each_data_next_ch(each)) {
+                            cblas_sscal(frame_length, throughVol, yas_each_data_ptr(each), 1);
                         }
-                        yas_audio_frame_enumerator_reset(enumerator);
                     }
                 }
 
@@ -100,11 +96,10 @@ namespace audio_device_sample {
                     _phase = audio::math::fill_sine(&_sine_data[0], frame_length, start_phase,
                                                     freq / sample_rate * audio::math::two_pi);
 
-                    while (pointer->v) {
-                        cblas_saxpy(frame_length, sine_vol, &_sine_data[0], 1, pointer->f32, 1);
-                        yas_audio_frame_enumerator_move_channel(enumerator);
+                    auto each = audio::make_each_data<float>(output_buffer);
+                    while (yas_each_data_next_ch(each)) {
+                        cblas_saxpy(frame_length, sine_vol, &_sine_data[0], 1, yas_each_data_ptr(each), 1);
                     }
-                    yas_audio_frame_enumerator_reset(enumerator);
                 }
             }
         }
