@@ -30,9 +30,12 @@ namespace audio {
         AudioTimeStamp audio_time_stamp() const;
 
         time extrapolate_time_from_anchor(time const &anchor_time);
+
+        std::string description() const;
     };
 
     uint64_t host_time_for_seconds(double seconds);
     double seconds_for_host_time(uint64_t host_time);
 }
+std::string to_string(audio::time const &);
 }
