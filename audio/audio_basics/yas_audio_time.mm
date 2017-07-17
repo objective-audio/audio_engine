@@ -9,6 +9,7 @@
 #include "yas_audio_time.h"
 #include "yas_objc_macros.h"
 #include "yas_objc_ptr.h"
+#include "yas_cf_utils.h"
 
 using namespace yas;
 
@@ -80,9 +81,13 @@ AudioTimeStamp audio::time::audio_time_stamp() const {
 }
 
 audio::time audio::time::extrapolate_time_from_anchor(audio::time const &anchor_time) {
-    return to_time([impl_ptr<impl>()
-                        ->_av_audio_time.object()
+    return to_time([impl_ptr<impl>()->_av_audio_time.object()
         extrapolateTimeFromAnchor:anchor_time.impl_ptr<impl>()->_av_audio_time.object()]);
+}
+
+std::string audio::time::description() const {
+    NSString *description = [impl_ptr<impl>()->_av_audio_time.object() description];
+    return to_string((__bridge CFStringRef)description);
 }
 
 #pragma mark - global
@@ -93,4 +98,10 @@ uint64_t audio::host_time_for_seconds(double seconds) {
 
 double audio::seconds_for_host_time(uint64_t host_time) {
     return [AVAudioTime secondsForHostTime:host_time];
+}
+
+#pragma mark -
+
+std::string yas::to_string(audio::time const &time) {
+    return time.description();
 }
