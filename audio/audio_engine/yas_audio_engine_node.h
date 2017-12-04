@@ -34,8 +34,8 @@ namespace audio {
                 update_connections,
             };
 
-            using subject_t = subject<node, method>;
-            using observer_t = observer<node, method>;
+            using subject_t = subject<method, node>;
+            using observer_t = observer<method, node>;
 
             struct render_args {
                 audio::pcm_buffer &buffer;

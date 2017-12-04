@@ -44,8 +44,8 @@ namespace audio {
             using start_result_t = result<std::nullptr_t, start_error_t>;
             using add_result_t = result<std::nullptr_t, add_error_t>;
             using remove_result_t = result<std::nullptr_t, remove_error_t>;
-            using subject_t = subject<manager, method>;
-            using observer_t = observer<manager, method>;
+            using subject_t = subject<method, manager>;
+            using observer_t = observer<method, manager>;
 
             manager();
             manager(std::nullptr_t);

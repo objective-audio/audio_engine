@@ -38,7 +38,7 @@ namespace audio {
             change_info(std::vector<property_info> &&);
         };
 
-        using subject_t = yas::subject<change_info, method>;
+        using subject_t = yas::subject<method, change_info>;
 
         struct args {
             AudioStreamID stream_id;

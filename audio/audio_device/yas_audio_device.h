@@ -50,8 +50,8 @@ namespace audio {
             std::vector<property_info> const property_infos;
         };
 
-        using subject_t = subject<change_info, method>;
-        using observer_t = observer<change_info, method>;
+        using subject_t = subject<method, change_info>;
+        using observer_t = observer<method, change_info>;
 
         static std::vector<device> all_devices();
         static std::vector<device> output_devices();
