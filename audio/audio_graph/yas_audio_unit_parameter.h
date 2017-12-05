@@ -10,6 +10,8 @@
 namespace yas {
 template <typename T, typename K>
 class subject;
+template <typename T, typename K>
+class observer;
 
 namespace audio {
     class unit::parameter : public base {
@@ -25,7 +27,8 @@ namespace audio {
 
         enum class method { will_change, did_change };
 
-        using subject_t = subject<change_info, method>;
+        using subject_t = subject<method, change_info>;
+        using observer_t = observer<method, change_info>;
 
         parameter(AudioUnitParameterInfo const &info, AudioUnitParameterID const paramter_id,
                   AudioUnitScope const scope);

@@ -27,8 +27,8 @@ namespace audio {
                 did_update_connections,
             };
 
-            using subject_t = yas::subject<au, method>;
-            using observer_t = yas::observer<au, method>;
+            using subject_t = subject<method, au>;
+            using observer_t = observer<method, au>;
             using prepare_unit_f = std::function<void(audio::unit &)>;
 
             struct args {

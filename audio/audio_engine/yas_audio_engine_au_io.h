@@ -25,8 +25,8 @@ namespace audio {
                 did_update_connection,
             };
 
-            using subject_t = yas::subject<au_io, method>;
-            using observer_t = yas::observer<au_io, method>;
+            using subject_t = subject<method, au_io>;
+            using observer_t = observer<method, au_io>;
 
             struct args {
                 bool enable_input = true;
