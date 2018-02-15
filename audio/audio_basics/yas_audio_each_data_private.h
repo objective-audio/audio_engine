@@ -8,38 +8,36 @@
 #include "yas_audio_format.h"
 #include "yas_fast_each.h"
 
-namespace yas {
-namespace audio {
-    template <typename T>
-    each_data<T> make_each_data(pcm_buffer &buffer) {
-        auto const &format = buffer.format();
-        auto const buffer_count = format.buffer_count();
+namespace yas::audio {
+template <typename T>
+each_data<T> make_each_data(pcm_buffer &buffer) {
+    auto const &format = buffer.format();
+    auto const buffer_count = format.buffer_count();
 
-        std::vector<T *> vec;
-        vec.reserve(buffer_count);
+    std::vector<T *> vec;
+    vec.reserve(buffer_count);
 
-        auto each = make_fast_each(buffer_count);
-        while (yas_each_next(each)) {
-            vec.push_back(buffer.data_ptr_at_index<T>(yas_each_index(each)));
-        }
-
-        return yas::make_each_data<T>(vec.data(), buffer.frame_length(), format.buffer_count(), format.stride());
+    auto each = make_fast_each(buffer_count);
+    while (yas_each_next(each)) {
+        vec.push_back(buffer.data_ptr_at_index<T>(yas_each_index(each)));
     }
 
-    template <typename T>
-    const_each_data<T> make_each_data(pcm_buffer const &buffer) {
-        auto const &format = buffer.format();
-        auto const buffer_count = format.buffer_count();
+    return yas::make_each_data<T>(vec.data(), buffer.frame_length(), format.buffer_count(), format.stride());
+}
 
-        std::vector<T const *> vec;
-        vec.reserve(buffer_count);
+template <typename T>
+const_each_data<T> make_each_data(pcm_buffer const &buffer) {
+    auto const &format = buffer.format();
+    auto const buffer_count = format.buffer_count();
 
-        auto each = make_fast_each(buffer_count);
-        while (yas_each_next(each)) {
-            vec.push_back(buffer.data_ptr_at_index<T>(yas_each_index(each)));
-        }
+    std::vector<T const *> vec;
+    vec.reserve(buffer_count);
 
-        return yas::make_each_data<T>(vec.data(), buffer.frame_length(), format.buffer_count(), format.stride());
+    auto each = make_fast_each(buffer_count);
+    while (yas_each_next(each)) {
+        vec.push_back(buffer.data_ptr_at_index<T>(yas_each_index(each)));
     }
+
+    return yas::make_each_data<T>(vec.data(), buffer.frame_length(), format.buffer_count(), format.stride());
 }
 }
