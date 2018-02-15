@@ -18,16 +18,14 @@
 
 using namespace yas;
 
-namespace yas {
-namespace audio {
-    static std::recursive_mutex _global_mutex;
-    static bool _interrupting;
-    static std::map<uint8_t, weak<graph>> _graphs;
+namespace yas::audio {
+static std::recursive_mutex _global_mutex;
+static bool _interrupting;
+static std::map<uint8_t, weak<graph>> _graphs;
 #if TARGET_OS_IPHONE
-    static objc_ptr<> _did_become_active_observer;
-    static objc_ptr<> _interruption_observer;
+static objc_ptr<> _did_become_active_observer;
+static objc_ptr<> _interruption_observer;
 #endif
-}
 }
 
 #pragma mark - impl

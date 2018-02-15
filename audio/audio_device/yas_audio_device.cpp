@@ -12,144 +12,142 @@
 
 using namespace yas;
 
-namespace yas {
-namespace audio {
-    using listener_f =
-        std::function<void(uint32_t const in_number_addresses, const AudioObjectPropertyAddress *const in_addresses)>;
+namespace yas::audio {
+using listener_f =
+    std::function<void(uint32_t const in_number_addresses, const AudioObjectPropertyAddress *const in_addresses)>;
 
 #pragma mark - utility
 
-    template <typename T>
-    static std::unique_ptr<std::vector<T>> _property_data(AudioObjectID const object_id,
-                                                          AudioObjectPropertySelector const selector,
-                                                          AudioObjectPropertyScope const scope) {
-        AudioObjectPropertyAddress const address = {
-            .mSelector = selector, .mScope = scope, .mElement = kAudioObjectPropertyElementMaster};
+template <typename T>
+static std::unique_ptr<std::vector<T>> _property_data(AudioObjectID const object_id,
+                                                      AudioObjectPropertySelector const selector,
+                                                      AudioObjectPropertyScope const scope) {
+    AudioObjectPropertyAddress const address = {
+        .mSelector = selector, .mScope = scope, .mElement = kAudioObjectPropertyElementMaster};
 
-        UInt32 byte_size = 0;
-        raise_if_raw_audio_error(AudioObjectGetPropertyDataSize(object_id, &address, 0, nullptr, &byte_size));
-        uint32_t vector_size = byte_size / sizeof(T);
+    UInt32 byte_size = 0;
+    raise_if_raw_audio_error(AudioObjectGetPropertyDataSize(object_id, &address, 0, nullptr, &byte_size));
+    uint32_t vector_size = byte_size / sizeof(T);
 
-        if (vector_size > 0) {
-            auto data = std::make_unique<std::vector<T>>(vector_size);
-            byte_size = vector_size * sizeof(T);
-            raise_if_raw_audio_error(AudioObjectGetPropertyData(object_id, &address, 0, nullptr, &byte_size, data->data()));
-            return data;
-        }
-
-        return nullptr;
+    if (vector_size > 0) {
+        auto data = std::make_unique<std::vector<T>>(vector_size);
+        byte_size = vector_size * sizeof(T);
+        raise_if_raw_audio_error(AudioObjectGetPropertyData(object_id, &address, 0, nullptr, &byte_size, data->data()));
+        return data;
     }
 
-    static CFStringRef _property_string(AudioObjectID const object_id, AudioObjectPropertySelector const selector) {
-        AudioObjectPropertyAddress const address = {.mSelector = selector,
-                                                    .mScope = kAudioObjectPropertyScopeGlobal,
-                                                    .mElement = kAudioObjectPropertyElementMaster};
+    return nullptr;
+}
 
-        CFStringRef cfString = nullptr;
-        UInt32 size = sizeof(CFStringRef);
-        raise_if_raw_audio_error(AudioObjectGetPropertyData(object_id, &address, 0, nullptr, &size, &cfString));
-        if (cfString) {
-            return (CFStringRef)CFAutorelease(cfString);
-        }
+static CFStringRef _property_string(AudioObjectID const object_id, AudioObjectPropertySelector const selector) {
+    AudioObjectPropertyAddress const address = {.mSelector = selector,
+                                                .mScope = kAudioObjectPropertyScopeGlobal,
+                                                .mElement = kAudioObjectPropertyElementMaster};
 
-        return nullptr;
+    CFStringRef cfString = nullptr;
+    UInt32 size = sizeof(CFStringRef);
+    raise_if_raw_audio_error(AudioObjectGetPropertyData(object_id, &address, 0, nullptr, &size, &cfString));
+    if (cfString) {
+        return (CFStringRef)CFAutorelease(cfString);
     }
 
-    static void _add_listener(AudioObjectID const object_id, AudioObjectPropertySelector const selector,
-                              AudioObjectPropertyScope const scope, listener_f const handler) {
-        AudioObjectPropertyAddress const address = {
-            .mSelector = selector, .mScope = scope, .mElement = kAudioObjectPropertyElementMaster};
+    return nullptr;
+}
 
-        raise_if_raw_audio_error(AudioObjectAddPropertyListenerBlock(
-            object_id, &address, dispatch_get_main_queue(),
-            ^(uint32_t const address_count, const AudioObjectPropertyAddress *const addresses) {
-                handler(address_count, addresses);
-            }));
-    }
+static void _add_listener(AudioObjectID const object_id, AudioObjectPropertySelector const selector,
+                          AudioObjectPropertyScope const scope, listener_f const handler) {
+    AudioObjectPropertyAddress const address = {
+        .mSelector = selector, .mScope = scope, .mElement = kAudioObjectPropertyElementMaster};
+
+    raise_if_raw_audio_error(AudioObjectAddPropertyListenerBlock(
+        object_id, &address, dispatch_get_main_queue(),
+        ^(uint32_t const address_count, const AudioObjectPropertyAddress *const addresses) {
+            handler(address_count, addresses);
+        }));
+}
 
 #pragma mark - device_global
 
-    class device_global {
-        class audio_device_for_global : public device {
-           public:
-            audio_device_for_global(AudioDeviceID const device_id) : device(device_id) {
-            }
-        };
-
+class device_global {
+    class audio_device_for_global : public device {
        public:
-        static std::unordered_map<AudioDeviceID, device> &all_devices_map() {
-            _initialize();
-            return device_global::instance()._all_devices;
+        audio_device_for_global(AudioDeviceID const device_id) : device(device_id) {
         }
-
-        static listener_f system_listener() {
-            return [](uint32_t const address_count, const AudioObjectPropertyAddress *const addresses) {
-                update_all_devices();
-
-                std::vector<device::property_info> property_infos;
-                for (uint32_t i = 0; i < address_count; i++) {
-                    property_infos.push_back(device::property_info{.property = device::property::system,
-                                                                   .object_id = kAudioObjectSystemObject,
-                                                                   .address = addresses[i]});
-                }
-                auto &subject = device::system_subject();
-                device::change_info change_info{.property_infos = std::move(property_infos)};
-                subject.notify(device::method::hardware_did_change, change_info);
-                subject.notify(device::method::configuration_change, change_info);
-            };
-        }
-
-        static void update_all_devices() {
-            auto prev_devices = std::move(all_devices_map());
-            auto data = _property_data<AudioDeviceID>(kAudioObjectSystemObject, kAudioHardwarePropertyDevices,
-                                                      kAudioObjectPropertyScopeGlobal);
-            if (data) {
-                auto &map = all_devices_map();
-                for (auto const &device_id : *data) {
-                    if (prev_devices.count(device_id) > 0) {
-                        map.insert(std::make_pair(device_id, prev_devices.at(device_id)));
-                    } else {
-                        map.insert(std::make_pair(device_id, audio_device_for_global(device_id)));
-                    }
-                }
-            }
-        }
-
-       private:
-        std::unordered_map<AudioDeviceID, device> _all_devices;
-        listener_f _system_listener = nullptr;
-
-        static void _initialize() {
-            static bool once = false;
-            if (!once) {
-                once = true;
-
-                update_all_devices();
-                auto listener = system_listener();
-                _add_listener(kAudioObjectSystemObject, kAudioHardwarePropertyDevices, kAudioObjectPropertyScopeGlobal,
-                              listener);
-                _add_listener(kAudioObjectSystemObject, kAudioHardwarePropertyDefaultSystemOutputDevice,
-                              kAudioObjectPropertyScopeGlobal, listener);
-                _add_listener(kAudioObjectSystemObject, kAudioHardwarePropertyDefaultOutputDevice,
-                              kAudioObjectPropertyScopeGlobal, listener);
-                _add_listener(kAudioObjectSystemObject, kAudioHardwarePropertyDefaultInputDevice,
-                              kAudioObjectPropertyScopeGlobal, listener);
-            }
-        }
-
-        static device_global &instance() {
-            static device_global _instance;
-            return _instance;
-        }
-
-        device_global() = default;
-
-        device_global(device_global const &) = delete;
-        device_global(device_global &&) = delete;
-        device_global &operator=(device_global const &) = delete;
-        device_global &operator=(device_global &&) = delete;
     };
-}
+
+   public:
+    static std::unordered_map<AudioDeviceID, device> &all_devices_map() {
+        _initialize();
+        return device_global::instance()._all_devices;
+    }
+
+    static listener_f system_listener() {
+        return [](uint32_t const address_count, const AudioObjectPropertyAddress *const addresses) {
+            update_all_devices();
+
+            std::vector<device::property_info> property_infos;
+            for (uint32_t i = 0; i < address_count; i++) {
+                property_infos.push_back(device::property_info{.property = device::property::system,
+                                                               .object_id = kAudioObjectSystemObject,
+                                                               .address = addresses[i]});
+            }
+            auto &subject = device::system_subject();
+            device::change_info change_info{.property_infos = std::move(property_infos)};
+            subject.notify(device::method::hardware_did_change, change_info);
+            subject.notify(device::method::configuration_change, change_info);
+        };
+    }
+
+    static void update_all_devices() {
+        auto prev_devices = std::move(all_devices_map());
+        auto data = _property_data<AudioDeviceID>(kAudioObjectSystemObject, kAudioHardwarePropertyDevices,
+                                                  kAudioObjectPropertyScopeGlobal);
+        if (data) {
+            auto &map = all_devices_map();
+            for (auto const &device_id : *data) {
+                if (prev_devices.count(device_id) > 0) {
+                    map.insert(std::make_pair(device_id, prev_devices.at(device_id)));
+                } else {
+                    map.insert(std::make_pair(device_id, audio_device_for_global(device_id)));
+                }
+            }
+        }
+    }
+
+   private:
+    std::unordered_map<AudioDeviceID, device> _all_devices;
+    listener_f _system_listener = nullptr;
+
+    static void _initialize() {
+        static bool once = false;
+        if (!once) {
+            once = true;
+
+            update_all_devices();
+            auto listener = system_listener();
+            _add_listener(kAudioObjectSystemObject, kAudioHardwarePropertyDevices, kAudioObjectPropertyScopeGlobal,
+                          listener);
+            _add_listener(kAudioObjectSystemObject, kAudioHardwarePropertyDefaultSystemOutputDevice,
+                          kAudioObjectPropertyScopeGlobal, listener);
+            _add_listener(kAudioObjectSystemObject, kAudioHardwarePropertyDefaultOutputDevice,
+                          kAudioObjectPropertyScopeGlobal, listener);
+            _add_listener(kAudioObjectSystemObject, kAudioHardwarePropertyDefaultInputDevice,
+                          kAudioObjectPropertyScopeGlobal, listener);
+        }
+    }
+
+    static device_global &instance() {
+        static device_global _instance;
+        return _instance;
+    }
+
+    device_global() = default;
+
+    device_global(device_global const &) = delete;
+    device_global(device_global &&) = delete;
+    device_global &operator=(device_global const &) = delete;
+    device_global &operator=(device_global &&) = delete;
+};
 }
 
 #pragma mark - property_info

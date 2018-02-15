@@ -6,34 +6,30 @@
 
 using namespace yas;
 
-namespace yas {
-namespace test {
-    namespace internal {
-        template <typename T>
-        bool is_filled_buffer(audio::pcm_buffer const &buffer) {
-            auto each = audio::make_each_data<T>(buffer);
-            while (yas_each_data_next(each)) {
-                if (yas_each_data_value(each) == 0) {
-                    return false;
-                }
-            }
-            return true;
-        }
-        
-        template <typename T>
-        T const *data_ptr_from_buffer(audio::pcm_buffer const &buffer, uint32_t const channel, uint32_t const frame) {
-            auto each_data = audio::make_each_data<T>(buffer);
-            auto each_frame = make_fast_each(frame + 1);
-            while (yas_each_next(each_frame)) {
-                yas_each_data_next_frame(each_data);
-            }
-            auto each_ch = make_fast_each(channel + 1);
-            while (yas_each_next(each_ch)) {
-                yas_each_data_next_ch(each_data);
-            }
-            return yas_each_data_ptr(each_data);
+namespace yas::test::internal {
+template <typename T>
+bool is_filled_buffer(audio::pcm_buffer const &buffer) {
+    auto each = audio::make_each_data<T>(buffer);
+    while (yas_each_data_next(each)) {
+        if (yas_each_data_value(each) == 0) {
+            return false;
         }
     }
+    return true;
+}
+
+template <typename T>
+T const *data_ptr_from_buffer(audio::pcm_buffer const &buffer, uint32_t const channel, uint32_t const frame) {
+    auto each_data = audio::make_each_data<T>(buffer);
+    auto each_frame = make_fast_each(frame + 1);
+    while (yas_each_next(each_frame)) {
+        yas_each_data_next_frame(each_data);
+    }
+    auto each_ch = make_fast_each(channel + 1);
+    while (yas_each_next(each_ch)) {
+        yas_each_data_next_ch(each_data);
+    }
+    return yas_each_data_ptr(each_data);
 }
 }
 
@@ -102,7 +98,7 @@ bool test::is_filled_buffer(audio::pcm_buffer const &buffer) {
             return internal::is_filled_buffer<int16_t>(buffer);
         case audio::pcm_format::fixed824:
             return internal::is_filled_buffer<int32_t>(buffer);
-            
+
         default:
             throw "invalid pcm format.";
     }
@@ -157,7 +153,8 @@ bool test::is_equal(AudioTimeStamp const *const ts1, AudioTimeStamp const *const
     }
 }
 
-uint8_t const *test::data_ptr_from_buffer(audio::pcm_buffer const &buffer, uint32_t const channel, uint32_t const frame) {
+uint8_t const *test::data_ptr_from_buffer(audio::pcm_buffer const &buffer, uint32_t const channel,
+                                          uint32_t const frame) {
     switch (buffer.format().pcm_format()) {
         case audio::pcm_format::float32:
             return (uint8_t const *)internal::data_ptr_from_buffer<float>(buffer, channel, frame);
@@ -167,14 +164,14 @@ uint8_t const *test::data_ptr_from_buffer(audio::pcm_buffer const &buffer, uint3
             return (uint8_t const *)internal::data_ptr_from_buffer<int16_t>(buffer, channel, frame);
         case audio::pcm_format::fixed824:
             return (uint8_t const *)internal::data_ptr_from_buffer<int32_t>(buffer, channel, frame);
-            
+
         default:
             throw "invalid pcm format.";
     }
 }
 
 void test::raw_unit_render_on_sub_thread(audio::unit &unit, audio::format &format, uint32_t const frame_length,
-                                           std::size_t const count, NSTimeInterval const wait) {
+                                         std::size_t const count, NSTimeInterval const wait) {
     auto lambda = [unit, format, frame_length, count]() mutable {
         AudioUnitRenderActionFlags action_flags = 0;
 
@@ -211,8 +208,7 @@ struct test::audio_test_node_object::impl : base::impl {
     }
 };
 
-test::audio_test_node_object::audio_test_node_object(uint32_t const input_bus_count,
-                                                           uint32_t const output_bus_count)
+test::audio_test_node_object::audio_test_node_object(uint32_t const input_bus_count, uint32_t const output_bus_count)
     : base(std::make_unique<impl>(
           audio::engine::node_args{.input_bus_count = input_bus_count, .output_bus_count = output_bus_count})) {
 }
@@ -221,8 +217,9 @@ audio::engine::node &test::audio_test_node_object::node() {
     return impl_ptr<impl>()->_node;
 }
 
-test::connection::connection(audio::engine::node &source_node, uint32_t const source_bus, audio::engine::node &destination_node,
-                             uint32_t const destination_bus, audio::format const &format)
+test::connection::connection(audio::engine::node &source_node, uint32_t const source_bus,
+                             audio::engine::node &destination_node, uint32_t const destination_bus,
+                             audio::format const &format)
     : audio::engine::connection(source_node, source_bus, destination_node, destination_bus, format) {
 }
 

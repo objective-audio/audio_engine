@@ -7,58 +7,56 @@
 
 using namespace yas;
 
-namespace yas {
-namespace test {
-    struct audio_file_test_data {
-        double file_sample_rate;
-        double processing_sample_rate;
-        uint32_t channels;
-        uint32_t file_bit_depth;
-        uint32_t frame_length;
-        uint32_t loop_count;
-        audio::pcm_format pcm_format;
-        bool interleaved;
-        bool standard;
-        bool async;
+namespace yas::test {
+struct audio_file_test_data {
+    double file_sample_rate;
+    double processing_sample_rate;
+    uint32_t channels;
+    uint32_t file_bit_depth;
+    uint32_t frame_length;
+    uint32_t loop_count;
+    audio::pcm_format pcm_format;
+    bool interleaved;
+    bool standard;
+    bool async;
 
-        audio_file_test_data() : _file_name(nullptr), _file_type(nullptr) {
+    audio_file_test_data() : _file_name(nullptr), _file_type(nullptr) {
+    }
+
+    ~audio_file_test_data() {
+        set_file_type(nullptr);
+        set_file_name(nullptr);
+    }
+
+    void set_file_type(CFStringRef const file_type) {
+        set_cf_property(_file_type, file_type);
+    }
+
+    CFStringRef file_type() const {
+        return get_cf_property(_file_type);
+    }
+
+    void set_file_name(CFStringRef const file_name) {
+        set_cf_property(_file_name, file_name);
+    }
+
+    CFStringRef file_name() const {
+        return get_cf_property(_file_name);
+    }
+
+    CFDictionaryRef settings() const {
+        if (CFStringCompare(file_type(), audio::file_type::wave, kNilOptions) == kCFCompareEqualTo) {
+            return audio::wave_file_settings(file_sample_rate, channels, file_bit_depth);
+        } else if (CFStringCompare(file_type(), audio::file_type::aiff, kNilOptions) == kCFCompareEqualTo) {
+            return audio::aiff_file_settings(file_sample_rate, channels, file_bit_depth);
         }
+        return nullptr;
+    }
 
-        ~audio_file_test_data() {
-            set_file_type(nullptr);
-            set_file_name(nullptr);
-        }
-
-        void set_file_type(CFStringRef const file_type) {
-            set_cf_property(_file_type, file_type);
-        }
-
-        CFStringRef file_type() const {
-            return get_cf_property(_file_type);
-        }
-
-        void set_file_name(CFStringRef const file_name) {
-            set_cf_property(_file_name, file_name);
-        }
-
-        CFStringRef file_name() const {
-            return get_cf_property(_file_name);
-        }
-
-        CFDictionaryRef settings() const {
-            if (CFStringCompare(file_type(), audio::file_type::wave, kNilOptions) == kCFCompareEqualTo) {
-                return audio::wave_file_settings(file_sample_rate, channels, file_bit_depth);
-            } else if (CFStringCompare(file_type(), audio::file_type::aiff, kNilOptions) == kCFCompareEqualTo) {
-                return audio::aiff_file_settings(file_sample_rate, channels, file_bit_depth);
-            }
-            return nullptr;
-        }
-
-       private:
-        CFStringRef _file_type;
-        CFStringRef _file_name;
-    };
-}
+   private:
+    CFStringRef _file_type;
+    CFStringRef _file_name;
+};
 }
 
 @interface yas_audio_file_tests : XCTestCase
