@@ -18,7 +18,7 @@ using namespace yas;
 
 #pragma mark - audio::engine::device_io::impl
 
-struct yas::audio::engine::device_io::impl : base::impl, manageable_device_io::impl {
+struct audio::engine::device_io::impl : base::impl, manageable_device_io::impl {
     audio::engine::node _node = {{.input_bus_count = 1, .output_bus_count = 1}};
     audio::engine::node::observer_t _connections_observer;
 

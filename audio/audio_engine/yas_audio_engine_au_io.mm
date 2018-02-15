@@ -17,34 +17,32 @@
 
 using namespace yas;
 
-namespace yas {
-namespace audio {
-    static AudioComponentDescription constexpr audio_au_io_acd = {
-        .componentType = kAudioUnitType_Output,
+namespace yas::audio {
+static AudioComponentDescription constexpr audio_au_io_acd = {
+    .componentType = kAudioUnitType_Output,
 #if TARGET_OS_IPHONE
-        .componentSubType = kAudioUnitSubType_RemoteIO,
+    .componentSubType = kAudioUnitSubType_RemoteIO,
 #elif TARGET_OS_MAC
-        .componentSubType = kAudioUnitSubType_HALOutput,
+    .componentSubType = kAudioUnitSubType_HALOutput,
 #endif
-        .componentManufacturer = kAudioUnitManufacturer_Apple,
-        .componentFlags = 0,
-        .componentFlagsMask = 0,
-    };
-}
+    .componentManufacturer = kAudioUnitManufacturer_Apple,
+    .componentFlags = 0,
+    .componentFlagsMask = 0,
+};
 }
 
 #pragma mark - audio::engine::au_io::impl
 
-struct yas::audio::engine::au_io::impl : base::impl {
+struct audio::engine::au_io::impl : base::impl {
     impl() : impl(args{}) {
     }
 
     impl(args &&args)
-        : _au(
-              {.acd = audio_au_io_acd,
-               .node_args = audio::engine::node_args{.input_bus_count = static_cast<uint32_t>(args.enable_input ? 1 : 0),
-                                             .output_bus_count = static_cast<uint32_t>(args.enable_output ? 1 : 0),
-                                             .override_output_bus_idx = 1}}) {
+        : _au({.acd = audio_au_io_acd,
+               .node_args =
+                   audio::engine::node_args{.input_bus_count = static_cast<uint32_t>(args.enable_input ? 1 : 0),
+                                            .output_bus_count = static_cast<uint32_t>(args.enable_output ? 1 : 0),
+                                            .override_output_bus_idx = 1}}) {
         _au.set_prepare_unit_handler([args = std::move(args)](audio::unit & unit) {
             unit.set_enable_output(args.enable_input);
             unit.set_enable_input(args.enable_output);

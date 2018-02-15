@@ -8,36 +8,32 @@
 #include "yas_audio_format.h"
 #include "yas_base.h"
 
-namespace yas {
-namespace audio {
-    namespace engine {
-        class node;
-        
-        class connection : public base {
-            class impl;
+namespace yas::audio::engine {
+class node;
 
-           public:
-            connection(std::nullptr_t);
+class connection : public base {
+    class impl;
 
-            virtual ~connection();
+   public:
+    connection(std::nullptr_t);
 
-            uint32_t source_bus() const;
-            uint32_t destination_bus() const;
-            audio::engine::node source_node() const;
-            audio::engine::node destination_node() const;
-            audio::format const &format() const;
+    virtual ~connection();
 
-            audio::engine::node_removable &node_removable();
+    uint32_t source_bus() const;
+    uint32_t destination_bus() const;
+    audio::engine::node source_node() const;
+    audio::engine::node destination_node() const;
+    audio::format const &format() const;
 
-           protected:
-            connection(audio::engine::node &source_node, uint32_t const source_bus_idx, audio::engine::node &destination_node,
-                       uint32_t const destination_bus_idx, audio::format const &format);
+    audio::engine::node_removable &node_removable();
 
-           private:
-            audio::engine::node_removable _node_removable = nullptr;
-        };
-    }
-}
+   protected:
+    connection(audio::engine::node &source_node, uint32_t const source_bus_idx, audio::engine::node &destination_node,
+               uint32_t const destination_bus_idx, audio::format const &format);
+
+   private:
+    audio::engine::node_removable _node_removable = nullptr;
+};
 }
 
 template <>

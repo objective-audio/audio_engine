@@ -7,35 +7,33 @@
 #include "yas_audio_engine_offline_output_protocol.h"
 #include "yas_base.h"
 
-namespace yas {
-namespace audio {
-    namespace engine {
-        class node;
+namespace yas::audio::engine {
+class node;
 
-        class offline_output : public base {
-           public:
-            class impl;
+class offline_output : public base {
+   public:
+    class impl;
 
-            offline_output();
-            offline_output(std::nullptr_t);
+    offline_output();
+    offline_output(std::nullptr_t);
 
-            virtual ~offline_output() final;
+    virtual ~offline_output() final;
 
-            bool is_running() const;
+    bool is_running() const;
 
-            audio::engine::node const &node() const;
-            audio::engine::node &node();
+    audio::engine::node const &node() const;
+    audio::engine::node &node();
 
-            manageable_offline_output &manageable();
+    manageable_offline_output &manageable();
 
-           private:
-            offline_output(std::shared_ptr<impl> const &);
+   private:
+    offline_output(std::shared_ptr<impl> const &);
 
-            manageable_offline_output _manageable = nullptr;
-        };
-    }
+    manageable_offline_output _manageable = nullptr;
+};
 }
 
+namespace yas {
 std::string to_string(audio::engine::offline_start_error_t const &error);
 }
 

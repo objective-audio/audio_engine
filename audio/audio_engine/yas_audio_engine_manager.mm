@@ -22,16 +22,14 @@
 
 using namespace yas;
 
-namespace yas {
-namespace audio {
-    class connection_for_engine : public audio::engine::connection {
-       public:
-        connection_for_engine(audio::engine::node &src_node, uint32_t const src_bus, audio::engine::node &dst_node,
-                              uint32_t const dst_bus, audio::format const &format)
-            : audio::engine::connection(src_node, src_bus, dst_node, dst_bus, format) {
-        }
-    };
-}
+namespace yas::audio {
+class connection_for_engine : public audio::engine::connection {
+   public:
+    connection_for_engine(audio::engine::node &src_node, uint32_t const src_bus, audio::engine::node &dst_node,
+                          uint32_t const dst_bus, audio::format const &format)
+        : audio::engine::connection(src_node, src_bus, dst_node, dst_bus, format) {
+    }
+};
 }
 
 #pragma mark - audio::engine::manager::impl
