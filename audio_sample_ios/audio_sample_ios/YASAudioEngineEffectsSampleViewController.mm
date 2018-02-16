@@ -24,39 +24,36 @@ static const AudioComponentDescription baseAcd = {.componentType = kAudioUnitTyp
 
 @end
 
-namespace yas {
-namespace sample {
-    struct effects_vc_internal {
-        audio::engine::manager manager;
-        audio::engine::au_output au_output;
-        audio::engine::connection through_connection = nullptr;
-        audio::engine::tap tap;
-        audio::engine::au effect_au = nullptr;
+namespace yas::sample {
+struct effects_vc_internal {
+    audio::engine::manager manager;
+    audio::engine::au_output au_output;
+    audio::engine::connection through_connection = nullptr;
+    audio::engine::tap tap;
+    audio::engine::au effect_au = nullptr;
 
-        void replace_effect_au(const AudioComponentDescription *acd) {
-            if (effect_au) {
-                manager.disconnect(effect_au.node());
-                effect_au = nullptr;
-            }
-
-            if (through_connection) {
-                manager.disconnect(through_connection);
-                through_connection = nullptr;
-            }
-
-            auto format =
-                audio::format({.sample_rate = [AVAudioSession sharedInstance].sampleRate, .channel_count = 2});
-
-            if (acd) {
-                effect_au = audio::engine::au(*acd);
-                manager.connect(effect_au.node(), au_output.au_io().au().node(), format);
-                manager.connect(tap.node(), effect_au.node(), format);
-            } else {
-                through_connection = manager.connect(tap.node(), au_output.au_io().au().node(), format);
-            }
+    void replace_effect_au(const AudioComponentDescription *acd) {
+        if (effect_au) {
+            manager.disconnect(effect_au.node());
+            effect_au = nullptr;
         }
-    };
-}
+
+        if (through_connection) {
+            manager.disconnect(through_connection);
+            through_connection = nullptr;
+        }
+
+        auto format = audio::format({.sample_rate = [AVAudioSession sharedInstance].sampleRate, .channel_count = 2});
+
+        if (acd) {
+            effect_au = audio::engine::au(*acd);
+            manager.connect(effect_au.node(), au_output.au_io().au().node(), format);
+            manager.connect(tap.node(), effect_au.node(), format);
+        } else {
+            through_connection = manager.connect(tap.node(), au_output.au_io().au().node(), format);
+        }
+    }
+};
 }
 
 @implementation YASAudioEngineEffectsSampleViewController {

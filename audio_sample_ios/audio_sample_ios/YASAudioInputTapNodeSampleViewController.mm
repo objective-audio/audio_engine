@@ -16,52 +16,50 @@ using namespace yas;
 
 @end
 
-namespace yas {
-namespace sample {
-    struct input_tap_vc_internal {
-        enum class property_key {
-            input_level,
-        };
-
-        audio::engine::manager manager;
-        audio::engine::au_input au_input;
-        audio::engine::tap input_tap = {{.is_input = true}};
-
-        property<float, property_key> input_level{
-            {.key = property_key::input_level, .value = audio::math::decibel_from_linear(0.0f)}};
-
-        input_tap_vc_internal() = default;
-
-        void prepare() {
-            double const sample_rate = au_input.au_io().device_sample_rate();
-            audio::format format{{.sample_rate = sample_rate, .channel_count = 2}};
-            manager.connect(au_input.au_io().au().node(), input_tap.node(), format);
-
-            input_tap.set_render_handler([input_level = input_level, sample_rate](auto args) mutable {
-                audio::pcm_buffer &buffer = args.buffer;
-
-                auto each = audio::make_each_data<float>(buffer);
-                int const frame_length = buffer.frame_length();
-                float level = 0;
-
-                while (yas_each_data_next_ch(each)) {
-                    auto const *const ptr = yas_each_data_ptr(each);
-                    level = std::max(fabsf(ptr[cblas_isamax(frame_length, ptr, 1)]), level);
-                }
-
-                float prev_level = input_level.value() - frame_length / sample_rate * 30.0f;
-                level = std::max(prev_level, audio::math::decibel_from_linear(level));
-                input_level.set_value(level);
-            });
-        }
-
-        void stop() {
-            manager.stop();
-
-            [[AVAudioSession sharedInstance] setActive:NO error:nil];
-        }
+namespace yas::sample {
+struct input_tap_vc_internal {
+    enum class property_key {
+        input_level,
     };
-}
+
+    audio::engine::manager manager;
+    audio::engine::au_input au_input;
+    audio::engine::tap input_tap = {{.is_input = true}};
+
+    property<float, property_key> input_level{
+        {.key = property_key::input_level, .value = audio::math::decibel_from_linear(0.0f)}};
+
+    input_tap_vc_internal() = default;
+
+    void prepare() {
+        double const sample_rate = au_input.au_io().device_sample_rate();
+        audio::format format{{.sample_rate = sample_rate, .channel_count = 2}};
+        manager.connect(au_input.au_io().au().node(), input_tap.node(), format);
+
+        input_tap.set_render_handler([input_level = input_level, sample_rate](auto args) mutable {
+            audio::pcm_buffer &buffer = args.buffer;
+
+            auto each = audio::make_each_data<float>(buffer);
+            int const frame_length = buffer.frame_length();
+            float level = 0;
+
+            while (yas_each_data_next_ch(each)) {
+                auto const *const ptr = yas_each_data_ptr(each);
+                level = std::max(fabsf(ptr[cblas_isamax(frame_length, ptr, 1)]), level);
+            }
+
+            float prev_level = input_level.value() - frame_length / sample_rate * 30.0f;
+            level = std::max(prev_level, audio::math::decibel_from_linear(level));
+            input_level.set_value(level);
+        });
+    }
+
+    void stop() {
+        manager.stop();
+
+        [[AVAudioSession sharedInstance] setActive:NO error:nil];
+    }
+};
 }
 
 @implementation YASAudioInputTapNodeSampleViewController {

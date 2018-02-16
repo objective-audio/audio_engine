@@ -6,12 +6,8 @@
 #import <experimental/optional>
 #import <memory>
 
-namespace yas {
-namespace audio {
-    namespace engine {
-        class au;
-    }
-}
+namespace yas::audio::engine {
+class au;
 }
 
 @interface YASAudioEngineSampleParameterCell : UITableViewCell
