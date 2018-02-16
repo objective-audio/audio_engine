@@ -95,17 +95,15 @@ typedef NS_ENUM(NSUInteger, YASAudioDeviceRouteSampleInputType) {
 
 @end
 
-namespace yas {
-namespace sample {
-    struct device_io_vc_internal {
-        audio::engine::manager manager = nullptr;
-        audio::engine::route route = nullptr;
-        audio::engine::tap tap = nullptr;
+namespace yas::sample {
+struct device_io_vc_internal {
+    audio::engine::manager manager = nullptr;
+    audio::engine::route route = nullptr;
+    audio::engine::tap tap = nullptr;
 
-        base system_observer = nullptr;
-        base device_observer = nullptr;
-    };
-}
+    base system_observer = nullptr;
+    base device_observer = nullptr;
+};
 }
 
 @implementation YASAudioEngineDeviceIOSampleViewController {
@@ -154,8 +152,7 @@ namespace sample {
         if ([data isNoneSelected]) {
             _internal.route.remove_route_for_destination({0, data.outputIndex});
         } else if ([data isSineSelected]) {
-            _internal.route.add_route(
-                {YASAudioDeviceRouteSampleSourceBusSine, data.outputIndex, 0, data.outputIndex});
+            _internal.route.add_route({YASAudioDeviceRouteSampleSourceBusSine, data.outputIndex, 0, data.outputIndex});
         } else if ([data isInputSelected]) {
             _internal.route.add_route(
                 {YASAudioDeviceRouteSampleSourceBusInput, [data inputIndex], 0, data.outputIndex});
@@ -265,8 +262,7 @@ namespace sample {
         if (auto const &device = _internal.manager.device_io().device()) {
             if (device.output_channel_count() > 0) {
                 auto const output_format = device.output_format();
-                _internal.manager.connect(_internal.route.node(), _internal.manager.device_io().node(),
-                                          output_format);
+                _internal.manager.connect(_internal.route.node(), _internal.manager.device_io().node(), output_format);
                 _internal.manager.connect(_internal.tap.node(), _internal.route.node(), 0,
                                           YASAudioDeviceRouteSampleSourceBusSine, output_format);
             }

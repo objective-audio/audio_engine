@@ -29,61 +29,59 @@ typedef NS_ENUM(NSUInteger, YASAudioEngineIOSampleSection) {
 
 @end
 
-namespace yas {
-namespace sample {
-    struct engine_io_vc_internal {
-        audio::engine::manager manager;
-        audio::engine::au_mixer au_mixer;
-        audio::engine::au_io au_io;
+namespace yas::sample {
+struct engine_io_vc_internal {
+    audio::engine::manager manager;
+    audio::engine::au_mixer au_mixer;
+    audio::engine::au_io au_io;
 
-        base engine_observer = nullptr;
+    base engine_observer = nullptr;
 
-        engine_io_vc_internal() {
-            au_mixer.set_input_volume(1.0, 0);
+    engine_io_vc_internal() {
+        au_mixer.set_input_volume(1.0, 0);
+    }
+
+    audio::direction direction_for_section(const NSInteger section) {
+        if (section - YASAudioEngineIOSampleSectionChannelMapOutput) {
+            return audio::direction::input;
+        } else {
+            return audio::direction::output;
         }
+    }
 
-        audio::direction direction_for_section(const NSInteger section) {
-            if (section - YASAudioEngineIOSampleSectionChannelMapOutput) {
-                return audio::direction::input;
-            } else {
-                return audio::direction::output;
-            }
+    uint32_t connection_channel_count_for_direction(const audio::direction dir) {
+        switch (dir) {
+            case audio::direction::output:
+                return MIN(au_io.output_device_channel_count(), YASAudioEngineIOSampleConnectionMaxChannels);
+            case audio::direction::input:
+                return MIN(au_io.input_device_channel_count(), YASAudioEngineIOSampleConnectionMaxChannels);
+            default:
+                return 0;
         }
+    }
 
-        uint32_t connection_channel_count_for_direction(const audio::direction dir) {
-            switch (dir) {
-                case audio::direction::output:
-                    return MIN(au_io.output_device_channel_count(), YASAudioEngineIOSampleConnectionMaxChannels);
-                case audio::direction::input:
-                    return MIN(au_io.input_device_channel_count(), YASAudioEngineIOSampleConnectionMaxChannels);
-                default:
-                    return 0;
-            }
+    uint32_t device_channel_count_for_direction(const audio::direction dir) {
+        switch (dir) {
+            case audio::direction::output:
+                return au_io.output_device_channel_count();
+            case audio::direction::input:
+                return au_io.input_device_channel_count();
+            default:
+                return 0;
         }
+    }
 
-        uint32_t device_channel_count_for_direction(const audio::direction dir) {
-            switch (dir) {
-                case audio::direction::output:
-                    return au_io.output_device_channel_count();
-                case audio::direction::input:
-                    return au_io.input_device_channel_count();
-                default:
-                    return 0;
-            }
+    uint32_t device_channel_count_for_section(const NSInteger section) {
+        switch (section) {
+            case YASAudioEngineIOSampleSectionChannelMapOutput:
+                return au_io.output_device_channel_count();
+            case YASAudioEngineIOSampleSectionChannelMapInput:
+                return au_io.input_device_channel_count();
+            default:
+                return 0;
         }
-
-        uint32_t device_channel_count_for_section(const NSInteger section) {
-            switch (section) {
-                case YASAudioEngineIOSampleSectionChannelMapOutput:
-                    return au_io.output_device_channel_count();
-                case YASAudioEngineIOSampleSectionChannelMapInput:
-                    return au_io.input_device_channel_count();
-                default:
-                    return 0;
-            }
-        }
-    };
-}
+    }
+};
 }
 
 @implementation YASAudioEngineIOSampleViewController {

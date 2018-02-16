@@ -14,66 +14,64 @@ using namespace yas;
 
 @end
 
-namespace yas {
-namespace sample {
-    struct graph_vc_internal {
-        audio::graph graph = nullptr;
-        audio::unit io_unit = nullptr;
-        audio::unit mixer_unit = nullptr;
+namespace yas::sample {
+struct graph_vc_internal {
+    audio::graph graph = nullptr;
+    audio::unit io_unit = nullptr;
+    audio::unit mixer_unit = nullptr;
 
-        graph_vc_internal() {
-            AVAudioSession *audioSession = [AVAudioSession sharedInstance];
-            [audioSession setCategory:AVAudioSessionCategoryPlayAndRecord error:nil];
-            double const sample_rate = [audioSession sampleRate];
+    graph_vc_internal() {
+        AVAudioSession *audioSession = [AVAudioSession sharedInstance];
+        [audioSession setCategory:AVAudioSessionCategoryPlayAndRecord error:nil];
+        double const sample_rate = [audioSession sampleRate];
 
-            auto format = audio::format({.sample_rate = sample_rate, .channel_count = 2});
+        auto format = audio::format({.sample_rate = sample_rate, .channel_count = 2});
 
-            graph = audio::graph{};
+        graph = audio::graph{};
 
-            io_unit = audio::unit(kAudioUnitType_Output, audio::unit::sub_type_default_io());
-            io_unit.set_enable_input(true);
-            io_unit.set_enable_output(true);
-            io_unit.set_maximum_frames_per_slice(4096);
+        io_unit = audio::unit(kAudioUnitType_Output, audio::unit::sub_type_default_io());
+        io_unit.set_enable_input(true);
+        io_unit.set_enable_output(true);
+        io_unit.set_maximum_frames_per_slice(4096);
 
-            graph.add_unit(io_unit);
+        graph.add_unit(io_unit);
 
-            io_unit.attach_render_callback(0);
-            io_unit.set_input_format(format.stream_description(), 0);
-            io_unit.set_output_format(format.stream_description(), 1);
+        io_unit.attach_render_callback(0);
+        io_unit.set_input_format(format.stream_description(), 0);
+        io_unit.set_output_format(format.stream_description(), 1);
 
-            mixer_unit = audio::unit(kAudioUnitType_Mixer, kAudioUnitSubType_MultiChannelMixer);
-            mixer_unit.set_maximum_frames_per_slice(4096);
+        mixer_unit = audio::unit(kAudioUnitType_Mixer, kAudioUnitSubType_MultiChannelMixer);
+        mixer_unit.set_maximum_frames_per_slice(4096);
 
-            graph.add_unit(mixer_unit);
+        graph.add_unit(mixer_unit);
 
-            mixer_unit.attach_render_callback(0);
-            mixer_unit.set_element_count(1, kAudioUnitScope_Input);
-            mixer_unit.set_output_format(format.stream_description(), 0);
-            mixer_unit.set_input_format(format.stream_description(), 0);
+        mixer_unit.attach_render_callback(0);
+        mixer_unit.set_element_count(1, kAudioUnitScope_Input);
+        mixer_unit.set_output_format(format.stream_description(), 0);
+        mixer_unit.set_input_format(format.stream_description(), 0);
 
-            auto weak_mixer_unit = weak<audio::unit>(mixer_unit);
+        auto weak_mixer_unit = weak<audio::unit>(mixer_unit);
 
-            io_unit.set_render_handler([weak_mixer_unit](audio::render_parameters &render_parameters) {
-                if (auto mixer_unit = weak_mixer_unit.lock()) {
-                    mixer_unit.raw_unit_render(render_parameters);
+        io_unit.set_render_handler([weak_mixer_unit](audio::render_parameters &render_parameters) {
+            if (auto mixer_unit = weak_mixer_unit.lock()) {
+                mixer_unit.raw_unit_render(render_parameters);
+            }
+        });
+
+        auto weak_io_unit = weak<audio::unit>(io_unit);
+
+        mixer_unit.set_render_handler([weak_io_unit](audio::render_parameters &render_parameters) {
+            if (auto io_unit = weak_io_unit.lock()) {
+                render_parameters.in_bus_number = 1;
+                try {
+                    io_unit.raw_unit_render(render_parameters);
+                } catch (std::runtime_error e) {
+                    std::cout << e.what() << std::endl;
                 }
-            });
-
-            auto weak_io_unit = weak<audio::unit>(io_unit);
-
-            mixer_unit.set_render_handler([weak_io_unit](audio::render_parameters &render_parameters) {
-                if (auto io_unit = weak_io_unit.lock()) {
-                    render_parameters.in_bus_number = 1;
-                    try {
-                        io_unit.raw_unit_render(render_parameters);
-                    } catch (std::runtime_error e) {
-                        std::cout << e.what() << std::endl;
-                    }
-                }
-            });
-        }
-    };
-}
+            }
+        });
+    }
+};
 }
 
 @implementation YASAudioGraphSampleViewController {

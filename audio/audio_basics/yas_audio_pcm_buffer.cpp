@@ -205,53 +205,51 @@ static bool validate_pcm_format(audio::pcm_format const &pcm_format) {
     }
 }
 
-namespace yas {
-namespace audio {
-    struct abl_info {
-        uint32_t channel_count;
-        uint32_t frame_length;
-        std::vector<uint8_t *> datas;
-        std::vector<uint32_t> strides;
+namespace yas::audio {
+struct abl_info {
+    uint32_t channel_count;
+    uint32_t frame_length;
+    std::vector<uint8_t *> datas;
+    std::vector<uint32_t> strides;
 
-        abl_info() : channel_count(0), frame_length(0), datas(0), strides(0) {
-        }
-    };
-
-    using get_abl_info_result_t = result<abl_info, pcm_buffer::copy_error_t>;
-
-    static get_abl_info_result_t get_abl_info(AudioBufferList const *abl, uint32_t const sample_byte_count) {
-        if (!abl || sample_byte_count == 0 || sample_byte_count > 8) {
-            return get_abl_info_result_t(pcm_buffer::copy_error_t::invalid_argument);
-        }
-
-        uint32_t const buffer_count = abl->mNumberBuffers;
-
-        audio::abl_info data_info;
-
-        for (uint32_t buf_idx = 0; buf_idx < buffer_count; ++buf_idx) {
-            uint32_t const stride = abl->mBuffers[buf_idx].mNumberChannels;
-            uint32_t const frame_length = abl->mBuffers[buf_idx].mDataByteSize / stride / sample_byte_count;
-            if (data_info.frame_length == 0) {
-                data_info.frame_length = frame_length;
-            } else if (data_info.frame_length != frame_length) {
-                return get_abl_info_result_t(pcm_buffer::copy_error_t::invalid_abl);
-            }
-            data_info.channel_count += stride;
-        }
-
-        if (data_info.channel_count > 0) {
-            for (uint32_t buf_idx = 0; buf_idx < buffer_count; buf_idx++) {
-                uint32_t const stride = abl->mBuffers[buf_idx].mNumberChannels;
-                uint8_t *data = static_cast<uint8_t *>(abl->mBuffers[buf_idx].mData);
-                for (uint32_t ch_idx = 0; ch_idx < stride; ++ch_idx) {
-                    data_info.datas.push_back(&data[ch_idx * sample_byte_count]);
-                    data_info.strides.push_back(stride);
-                }
-            }
-        }
-
-        return get_abl_info_result_t(std::move(data_info));
+    abl_info() : channel_count(0), frame_length(0), datas(0), strides(0) {
     }
+};
+
+using get_abl_info_result_t = result<abl_info, pcm_buffer::copy_error_t>;
+
+static get_abl_info_result_t get_abl_info(AudioBufferList const *abl, uint32_t const sample_byte_count) {
+    if (!abl || sample_byte_count == 0 || sample_byte_count > 8) {
+        return get_abl_info_result_t(pcm_buffer::copy_error_t::invalid_argument);
+    }
+
+    uint32_t const buffer_count = abl->mNumberBuffers;
+
+    audio::abl_info data_info;
+
+    for (uint32_t buf_idx = 0; buf_idx < buffer_count; ++buf_idx) {
+        uint32_t const stride = abl->mBuffers[buf_idx].mNumberChannels;
+        uint32_t const frame_length = abl->mBuffers[buf_idx].mDataByteSize / stride / sample_byte_count;
+        if (data_info.frame_length == 0) {
+            data_info.frame_length = frame_length;
+        } else if (data_info.frame_length != frame_length) {
+            return get_abl_info_result_t(pcm_buffer::copy_error_t::invalid_abl);
+        }
+        data_info.channel_count += stride;
+    }
+
+    if (data_info.channel_count > 0) {
+        for (uint32_t buf_idx = 0; buf_idx < buffer_count; buf_idx++) {
+            uint32_t const stride = abl->mBuffers[buf_idx].mNumberChannels;
+            uint8_t *data = static_cast<uint8_t *>(abl->mBuffers[buf_idx].mData);
+            for (uint32_t ch_idx = 0; ch_idx < stride; ++ch_idx) {
+                data_info.datas.push_back(&data[ch_idx * sample_byte_count]);
+                data_info.strides.push_back(stride);
+            }
+        }
+    }
+
+    return get_abl_info_result_t(std::move(data_info));
 }
 }
 
