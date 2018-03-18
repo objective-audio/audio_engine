@@ -5,9 +5,16 @@ yas::audio
 
 Requirements
 ==============
-iOS 9.1 or later  
-OS X 10.11 or later
-C++14
+C++17
+
+Frameworks
+==============
+AudioToolbox.framework  
+AVFoundation.framework  
+Accelerate.framework  
+
+AudioUnit.framework (OS X Only)  
+CoreAudio.framework (OS X Only)  
 
 License
 ==============
