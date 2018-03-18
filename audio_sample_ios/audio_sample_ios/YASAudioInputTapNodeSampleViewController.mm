@@ -26,7 +26,7 @@ struct input_tap_vc_internal {
     audio::engine::au_input au_input;
     audio::engine::tap input_tap = {{.is_input = true}};
 
-    property<float, property_key> input_level{
+    property<property_key, float> input_level{
         {.key = property_key::input_level, .value = audio::math::decibel_from_linear(0.0f)}};
 
     input_tap_vc_internal() = default;
