@@ -55,21 +55,33 @@ class pcm_buffer : public base {
 
     void reset();
     void clear();
-    void clear(uint32_t const start_frame, uint32_t const length);
+    void clear(uint32_t const begin_frame, uint32_t const length);
 
-    pcm_buffer::copy_result copy_from(pcm_buffer const &from_buffer, uint32_t const from_start_frame = 0,
-                                      uint32_t const to_start_frame = 0, uint32_t const length = 0);
-    pcm_buffer::copy_result copy_from(AudioBufferList const *const from_abl, uint32_t const from_start_frame = 0,
-                                      uint32_t const to_start_frame = 0, uint32_t const length = 0);
-    pcm_buffer::copy_result copy_to(AudioBufferList *const to_abl, uint32_t const from_start_frame = 0,
-                                    uint32_t const to_start_frame = 0, uint32_t const length = 0);
+    pcm_buffer::copy_result copy_from(pcm_buffer const &from_buffer, uint32_t const from_begin_frame = 0,
+                                      uint32_t const to_begin_frame = 0, uint32_t const length = 0);
+    pcm_buffer::copy_result copy_from(AudioBufferList const *const from_abl, uint32_t const from_begin_frame = 0,
+                                      uint32_t const to_begin_frame = 0, uint32_t const length = 0);
+    pcm_buffer::copy_result copy_to(AudioBufferList *const to_abl, uint32_t const from_begin_frame = 0,
+                                    uint32_t const to_begin_frame = 0, uint32_t const length = 0) const;
+
+    template <typename T>
+    pcm_buffer::copy_result copy_from(T const *const from_ptr, uint32_t const from_stride,
+                                      uint32_t const from_begin_frame, uint32_t const to_ch_idx,
+                                      uint32_t const to_begin_frame, uint32_t const copy_length);
+    template <typename T>
+    pcm_buffer::copy_result copy_to(T *const to_ptr, uint32_t const to_stride, uint32_t const to_begin_frame,
+                                    uint32_t const from_ch_idx, uint32_t const from_begin_frame,
+                                    uint32_t const copy_length) const;
 };
 
 void clear(AudioBufferList *abl);
 
+void copy(void const *const from_ptr, uint32_t const from_stride, void *const to_ptr, uint32_t const to_stride,
+          uint32_t const length, uint32_t const sample_byte_count);
+
 pcm_buffer::copy_result copy(AudioBufferList const *const from_abl, AudioBufferList *const to_abl,
-                             uint32_t const sample_byte_count, uint32_t const from_start_frame = 0,
-                             uint32_t const to_start_frame = 0, uint32_t const length = 0);
+                             uint32_t const sample_byte_count, uint32_t const from_begin_frame = 0,
+                             uint32_t const to_begin_frame = 0, uint32_t const length = 0);
 
 uint32_t frame_length(AudioBufferList const *const abl, uint32_t const sample_byte_count);
 
