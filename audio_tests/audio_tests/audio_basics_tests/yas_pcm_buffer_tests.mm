@@ -685,6 +685,122 @@ using namespace yas;
     XCTAssertEqual(audio::frame_length(buffer.audio_buffer_list(), format.sample_byte_count()), 4);
 }
 
+- (void)test_copy_deinterleaved_data_to_float_data {
+    double const sample_rate = 48000.0;
+    uint32_t const frame_length = 4;
+    uint32_t const channels = 2;
+    audio::pcm_format const pcm_format = audio::pcm_format::float32;
+
+    std::vector<float> to_vector;
+    to_vector.resize(frame_length);
+
+    auto deinterleaved_format = audio::format(
+        {.sample_rate = sample_rate, .channel_count = channels, .pcm_format = pcm_format, .interleaved = false});
+    audio::pcm_buffer deinterleaved_buffer(deinterleaved_format, frame_length);
+
+    test::fill_test_values_to_buffer(deinterleaved_buffer);
+
+    XCTAssertNoThrow(deinterleaved_buffer.copy_to(to_vector.data(), 1, 0, 0, 0, frame_length));
+
+    XCTAssertTrue(test::is_equal_data(deinterleaved_buffer.data_ptr_at_index<float>(0), to_vector.data(),
+                                      frame_length * sizeof(float)));
+
+    XCTAssertNoThrow(deinterleaved_buffer.copy_to(to_vector.data(), 1, 0, 1, 0, frame_length));
+
+    XCTAssertTrue(test::is_equal_data(deinterleaved_buffer.data_ptr_at_index<float>(1), to_vector.data(),
+                                      frame_length * sizeof(float)));
+}
+
+- (void)test_copy_interleaved_data_to_int32_data {
+    double const sample_rate = 48000.0;
+    uint32_t const frame_length = 4;
+    uint32_t const channels = 2;
+    audio::pcm_format const pcm_format = audio::pcm_format::fixed824;
+
+    std::vector<int32_t> to_vector;
+    to_vector.resize(frame_length);
+
+    auto interleaved_format = audio::format(
+        {.sample_rate = sample_rate, .channel_count = channels, .pcm_format = pcm_format, .interleaved = true});
+    audio::pcm_buffer interleaved_buffer(interleaved_format, frame_length);
+
+    test::fill_test_values_to_buffer(interleaved_buffer);
+
+    XCTAssertNoThrow(interleaved_buffer.copy_to(to_vector.data(), 1, 0, 0, 0, frame_length));
+
+    int32_t *data = interleaved_buffer.data_ptr_at_channel<int32_t>(0);
+    for (NSInteger i = 0; i < frame_length; ++i) {
+        XCTAssertTrue(test::is_equal(data[i * channels], to_vector.at(i)));
+    }
+
+    XCTAssertNoThrow(interleaved_buffer.copy_to(to_vector.data(), 1, 0, 1, 0, frame_length));
+
+    data = interleaved_buffer.data_ptr_at_channel<int32_t>(1);
+    for (NSInteger i = 0; i < frame_length; ++i) {
+        XCTAssertTrue(test::is_equal(data[i * channels], to_vector.at(i)));
+    }
+}
+
+- (void)test_copy_deinterleaved_data_from_double_data {
+    double const sample_rate = 48000.0;
+    uint32_t const frame_length = 4;
+    uint32_t const channels = 2;
+    audio::pcm_format const pcm_format = audio::pcm_format::float64;
+
+    std::vector<double> from_vector;
+    from_vector.reserve(frame_length);
+    for (NSInteger i = 0; i < frame_length; i++) {
+        from_vector.push_back(double(i));
+    }
+
+    auto deinterleaved_format = audio::format(
+        {.sample_rate = sample_rate, .channel_count = channels, .pcm_format = pcm_format, .interleaved = false});
+    audio::pcm_buffer deinterleaved_buffer(deinterleaved_format, frame_length);
+
+    XCTAssertNoThrow(deinterleaved_buffer.copy_from(from_vector.data(), 1, 0, 0, 0, frame_length));
+
+    XCTAssertTrue(test::is_equal_data(deinterleaved_buffer.data_ptr_at_index<double>(0), from_vector.data(),
+                                      frame_length * sizeof(double)));
+
+    XCTAssertNoThrow(deinterleaved_buffer.copy_from(from_vector.data(), 1, 0, 1, 0, frame_length));
+
+    XCTAssertTrue(test::is_equal_data(deinterleaved_buffer.data_ptr_at_index<double>(1), from_vector.data(),
+                                      frame_length * sizeof(double)));
+}
+
+- (void)test_copy_interleaved_data_from_int16_data {
+    double const sample_rate = 48000.0;
+    uint32_t const frame_length = 4;
+    uint32_t const channels = 2;
+    audio::pcm_format const pcm_format = audio::pcm_format::int16;
+
+    std::vector<int16_t> from_vector;
+    from_vector.reserve(frame_length);
+    for (int16_t i = 0; i < frame_length; i++) {
+        from_vector.push_back(i);
+    }
+
+    auto interleaved_format = audio::format(
+        {.sample_rate = sample_rate, .channel_count = channels, .pcm_format = pcm_format, .interleaved = true});
+    audio::pcm_buffer interleaved_buffer(interleaved_format, frame_length);
+
+    test::fill_test_values_to_buffer(interleaved_buffer);
+
+    XCTAssertNoThrow(interleaved_buffer.copy_from(from_vector.data(), 1, 0, 0, 0, frame_length));
+
+    int16_t *data = interleaved_buffer.data_ptr_at_channel<int16_t>(0);
+    for (NSInteger i = 0; i < frame_length; ++i) {
+        XCTAssertTrue(test::is_equal(data[i * channels], from_vector.at(i)));
+    }
+
+    XCTAssertNoThrow(interleaved_buffer.copy_from(from_vector.data(), 1, 0, 1, 0, frame_length));
+
+    data = interleaved_buffer.data_ptr_at_channel<int16_t>(1);
+    for (NSInteger i = 0; i < frame_length; ++i) {
+        XCTAssertTrue(test::is_equal(data[i * channels], from_vector.at(i)));
+    }
+}
+
 #pragma mark -
 
 - (void)assert_buffer_with_channel_map:(audio::channel_map_t const &)channel_map
