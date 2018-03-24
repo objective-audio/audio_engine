@@ -312,6 +312,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		B610E991206603AE004A46B5 /* yas_data.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = yas_data.h; sourceTree = "<group>"; };
+		B610E992206603AE004A46B5 /* yas_data_private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = yas_data_private.h; sourceTree = "<group>"; };
 		B617CD211C95517500B3A934 /* yas_audio_engine_node_protocol.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = yas_audio_engine_node_protocol.cpp; path = audio_engine/yas_audio_engine_node_protocol.cpp; sourceTree = "<group>"; };
 		B61D52BC1B9C81D000A449C5 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		B61D52BE1B9C81DF00A449C5 /* CoreAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudio.framework; path = System/Library/Frameworks/CoreAudio.framework; sourceTree = SDKROOT; };
@@ -824,6 +826,8 @@
 				B6F2CA481CDDEAAF00EF584B /* yas_unless.h */,
 				B6F2CA491CDDEAAF00EF584B /* yas_version.cpp */,
 				B6F2CA4A1CDDEAAF00EF584B /* yas_version.h */,
+				B610E992206603AE004A46B5 /* yas_data_private.h */,
+				B610E991206603AE004A46B5 /* yas_data.h */,
 			);
 			name = cpp_utils;
 			path = ../submodules/cpp_utils/cpp_utils;
