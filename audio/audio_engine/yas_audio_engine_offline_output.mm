@@ -2,8 +2,8 @@
 //  yas_audio_offline_output.cpp
 //
 
-#include "yas_audio_engine_node.h"
 #include "yas_audio_engine_offline_output.h"
+#include "yas_audio_engine_node.h"
 #include "yas_audio_time.h"
 #include "yas_operation.h"
 #include "yas_stl_utils.h"
@@ -20,8 +20,8 @@ struct audio::engine::offline_output::impl : base::impl, manageable_offline_outp
     ~impl() = default;
 
     void prepare(offline_output const &output) {
-        _reset_observer =
-            _node.subject().make_observer(audio::engine::node::method::will_reset, [weak_output = to_weak(output)](auto const &) {
+        _reset_observer = _node.subject().make_observer(
+            audio::engine::node::method::will_reset, [weak_output = to_weak(output)](auto const &) {
                 if (auto output = weak_output.lock()) {
                     output.impl_ptr<audio::engine::offline_output::impl>()->stop();
                 }
@@ -29,7 +29,7 @@ struct audio::engine::offline_output::impl : base::impl, manageable_offline_outp
     }
 
     audio::engine::offline_start_result_t start(offline_render_f &&render_handler,
-                                        offline_completion_f &&completion_handler) override {
+                                                offline_completion_f &&completion_handler) override {
         if (_queue) {
             return offline_start_result_t(offline_start_error_t::already_running);
         } else if (auto connection = _node.input_connection(0)) {
@@ -44,8 +44,8 @@ struct audio::engine::offline_output::impl : base::impl, manageable_offline_outp
             audio::pcm_buffer render_buffer(connection.format(), 1024);
 
             auto weak_output = to_weak(cast<offline_output>());
-            auto operation_lambda = [weak_output, render_buffer, render_handler = std::move(render_handler), key](
-                operation const &op) mutable {
+            auto operation_lambda = [weak_output, render_buffer, render_handler = std::move(render_handler),
+                                     key](operation const &op) mutable {
                 bool cancelled = false;
                 uint32_t current_sample_time = 0;
                 bool stop = false;
@@ -99,8 +99,7 @@ struct audio::engine::offline_output::impl : base::impl, manageable_offline_outp
                     if (auto output = weak_output.lock()) {
                         std::experimental::optional<offline_completion_f> completion_handler;
                         if (key) {
-                            completion_handler =
-                                output.impl_ptr<impl>()->_core.pull_completion_handler(*key);
+                            completion_handler = output.impl_ptr<impl>()->_core.pull_completion_handler(*key);
                         }
 
                         output.impl_ptr<impl>()->_queue = nullptr;

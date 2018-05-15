@@ -2,13 +2,13 @@
 //  yas_audio_unit.cpp
 //
 
+#include "yas_audio_unit.h"
 #include <AudioToolbox/AudioToolbox.h>
 #include <mutex>
 #include <vector>
 #include "yas_audio_exception.h"
 #include "yas_audio_graph.h"
 #include "yas_audio_pcm_buffer.h"
-#include "yas_audio_unit.h"
 #include "yas_cf_utils.h"
 #include "yas_result.h"
 
@@ -172,16 +172,16 @@ struct audio::unit::impl : base::impl, manageable_unit::impl {
         AURenderCallbackStruct callbackStruct{.inputProc = yas::render_callback, .inputProcRefCon = render_id.v};
 
         raise_if_raw_audio_error(AudioUnitSetProperty(_core.raw_unit(), kAudioUnitProperty_SetRenderCallback,
-                                               kAudioUnitScope_Input, bus_idx, &callbackStruct,
-                                               sizeof(AURenderCallbackStruct)));
+                                                      kAudioUnitScope_Input, bus_idx, &callbackStruct,
+                                                      sizeof(AURenderCallbackStruct)));
     }
 
     void detach_render_callback(uint32_t const bus_idx) {
         AURenderCallbackStruct callbackStruct{.inputProc = clear_callback, .inputProcRefCon = nullptr};
 
         raise_if_raw_audio_error(AudioUnitSetProperty(_core.raw_unit(), kAudioUnitProperty_SetRenderCallback,
-                                               kAudioUnitScope_Input, bus_idx, &callbackStruct,
-                                               sizeof(AURenderCallbackStruct)));
+                                                      kAudioUnitScope_Input, bus_idx, &callbackStruct,
+                                                      sizeof(AURenderCallbackStruct)));
     }
 
     void attach_render_notify() {
@@ -217,8 +217,8 @@ struct audio::unit::impl : base::impl, manageable_unit::impl {
         AURenderCallbackStruct callbackStruct = {.inputProc = input_render_callback, .inputProcRefCon = render_id.v};
 
         raise_if_raw_audio_error(AudioUnitSetProperty(_core.raw_unit(), kAudioOutputUnitProperty_SetInputCallback,
-                                               kAudioUnitScope_Global, 0, &callbackStruct,
-                                               sizeof(AURenderCallbackStruct)));
+                                                      kAudioUnitScope_Global, 0, &callbackStruct,
+                                                      sizeof(AURenderCallbackStruct)));
     }
 
     void detach_input_callback() {
@@ -230,27 +230,27 @@ struct audio::unit::impl : base::impl, manageable_unit::impl {
         AURenderCallbackStruct callbackStruct = {.inputProc = yas::empty_callback, .inputProcRefCon = NULL};
 
         raise_if_raw_audio_error(AudioUnitSetProperty(_core.raw_unit(), kAudioOutputUnitProperty_SetInputCallback,
-                                               kAudioUnitScope_Global, 0, &callbackStruct,
-                                               sizeof(AURenderCallbackStruct)));
+                                                      kAudioUnitScope_Global, 0, &callbackStruct,
+                                                      sizeof(AURenderCallbackStruct)));
     }
 
     void set_input_format(AudioStreamBasicDescription const &asbd, uint32_t const bus_idx) {
         raise_if_raw_audio_error(AudioUnitSetProperty(_core.raw_unit(), kAudioUnitProperty_StreamFormat,
-                                               kAudioUnitScope_Input, bus_idx, &asbd,
-                                               sizeof(AudioStreamBasicDescription)));
+                                                      kAudioUnitScope_Input, bus_idx, &asbd,
+                                                      sizeof(AudioStreamBasicDescription)));
     }
 
     void set_output_format(AudioStreamBasicDescription const &asbd, uint32_t const bus_idx) {
         raise_if_raw_audio_error(AudioUnitSetProperty(_core.raw_unit(), kAudioUnitProperty_StreamFormat,
-                                               kAudioUnitScope_Output, bus_idx, &asbd,
-                                               sizeof(AudioStreamBasicDescription)));
+                                                      kAudioUnitScope_Output, bus_idx, &asbd,
+                                                      sizeof(AudioStreamBasicDescription)));
     }
 
     AudioStreamBasicDescription input_format(uint32_t const bus_idx) {
         AudioStreamBasicDescription asbd = {0};
         UInt32 size = sizeof(AudioStreamBasicDescription);
         raise_if_raw_audio_error(AudioUnitGetProperty(_core.raw_unit(), kAudioUnitProperty_StreamFormat,
-                                               kAudioUnitScope_Input, bus_idx, &asbd, &size));
+                                                      kAudioUnitScope_Input, bus_idx, &asbd, &size));
         return asbd;
     }
 
@@ -258,20 +258,20 @@ struct audio::unit::impl : base::impl, manageable_unit::impl {
         AudioStreamBasicDescription asbd = {0};
         UInt32 size = sizeof(AudioStreamBasicDescription);
         raise_if_raw_audio_error(AudioUnitGetProperty(_core.raw_unit(), kAudioUnitProperty_StreamFormat,
-                                               kAudioUnitScope_Output, bus_idx, &asbd, &size));
+                                                      kAudioUnitScope_Output, bus_idx, &asbd, &size));
         return asbd;
     }
 
     void set_maximum_frames_per_slice(uint32_t const frames) {
         raise_if_raw_audio_error(AudioUnitSetProperty(_core.raw_unit(), kAudioUnitProperty_MaximumFramesPerSlice,
-                                               kAudioUnitScope_Global, 0, &frames, sizeof(uint32_t)));
+                                                      kAudioUnitScope_Global, 0, &frames, sizeof(uint32_t)));
     }
 
     uint32_t maximum_frames_per_slice() {
         UInt32 frames = 0;
         UInt32 size = sizeof(UInt32);
         raise_if_raw_audio_error(AudioUnitGetProperty(_core.raw_unit(), kAudioUnitProperty_MaximumFramesPerSlice,
-                                               kAudioUnitScope_Global, 0, &frames, &size));
+                                                      kAudioUnitScope_Global, 0, &frames, &size));
         return frames;
     }
 
@@ -289,14 +289,14 @@ struct audio::unit::impl : base::impl, manageable_unit::impl {
 
     void set_element_count(uint32_t const count, AudioUnitScope const scope) {
         raise_if_raw_audio_error(AudioUnitSetProperty(_core.raw_unit(), kAudioUnitProperty_ElementCount, scope, 0,
-                                               &count, sizeof(uint32_t)));
+                                                      &count, sizeof(uint32_t)));
     }
 
     uint32_t element_count(AudioUnitScope const scope) {
         UInt32 count = 0;
         UInt32 size = sizeof(UInt32);
-        raise_if_raw_audio_error(AudioUnitGetProperty(_core.raw_unit(), kAudioUnitProperty_ElementCount, scope, 0,
-                                               &count, &size));
+        raise_if_raw_audio_error(
+            AudioUnitGetProperty(_core.raw_unit(), kAudioUnitProperty_ElementCount, scope, 0, &count, &size));
         return count;
     }
 
@@ -316,14 +316,14 @@ struct audio::unit::impl : base::impl, manageable_unit::impl {
 
         uint32_t enableIO = enable_output ? 1 : 0;
         raise_if_raw_audio_error(AudioUnitSetProperty(_core.raw_unit(), kAudioOutputUnitProperty_EnableIO,
-                                               kAudioUnitScope_Output, 0, &enableIO, sizeof(uint32_t)));
+                                                      kAudioUnitScope_Output, 0, &enableIO, sizeof(uint32_t)));
     }
 
     bool is_enable_output() {
         UInt32 enableIO = 0;
         UInt32 size = sizeof(UInt32);
         raise_if_raw_audio_error(AudioUnitGetProperty(_core.raw_unit(), kAudioOutputUnitProperty_EnableIO,
-                                               kAudioUnitScope_Output, 0, &enableIO, &size));
+                                                      kAudioUnitScope_Output, 0, &enableIO, &size));
         return enableIO;
     }
 
@@ -343,14 +343,14 @@ struct audio::unit::impl : base::impl, manageable_unit::impl {
 
         uint32_t enableIO = enable_input ? 1 : 0;
         raise_if_raw_audio_error(AudioUnitSetProperty(_core.raw_unit(), kAudioOutputUnitProperty_EnableIO,
-                                               kAudioUnitScope_Input, 1, &enableIO, sizeof(uint32_t)));
+                                                      kAudioUnitScope_Input, 1, &enableIO, sizeof(uint32_t)));
     }
 
     bool is_enable_input() {
         UInt32 enableIO = 0;
         UInt32 size = sizeof(UInt32);
         raise_if_raw_audio_error(AudioUnitGetProperty(_core.raw_unit(), kAudioOutputUnitProperty_EnableIO,
-                                               kAudioUnitScope_Input, 1, &enableIO, &size));
+                                                      kAudioUnitScope_Input, 1, &enableIO, &size));
         return enableIO;
     }
 
@@ -361,7 +361,7 @@ struct audio::unit::impl : base::impl, manageable_unit::impl {
         UInt32 has_io = 0;
         UInt32 size = sizeof(UInt32);
         raise_if_raw_audio_error(AudioUnitGetProperty(_core.raw_unit(), kAudioOutputUnitProperty_HasIO,
-                                               kAudioUnitScope_Output, 0, &has_io, &size));
+                                                      kAudioUnitScope_Output, 0, &has_io, &size));
         return has_io;
 #endif
     }
@@ -375,7 +375,7 @@ struct audio::unit::impl : base::impl, manageable_unit::impl {
         UInt32 has_io = 0;
         UInt32 size = sizeof(UInt32);
         raise_if_raw_audio_error(AudioUnitGetProperty(_core.raw_unit(), kAudioOutputUnitProperty_HasIO,
-                                               kAudioUnitScope_Input, 1, &has_io, &size));
+                                                      kAudioUnitScope_Input, 1, &has_io, &size));
         return has_io;
 #endif
     }
@@ -384,7 +384,7 @@ struct audio::unit::impl : base::impl, manageable_unit::impl {
         UInt32 is_running = 0;
         UInt32 size = sizeof(UInt32);
         raise_if_raw_audio_error(AudioUnitGetProperty(_core.raw_unit(), kAudioOutputUnitProperty_IsRunning,
-                                               kAudioUnitScope_Global, 0, &is_running, &size));
+                                                      kAudioUnitScope_Global, 0, &is_running, &size));
         return is_running != 0;
     }
 
@@ -408,8 +408,8 @@ struct audio::unit::impl : base::impl, manageable_unit::impl {
 
     uint32_t channel_map_count(AudioUnitScope const scope, AudioUnitElement const element) {
         UInt32 byte_size = 0;
-        raise_if_raw_audio_error(AudioUnitGetPropertyInfo(_core.raw_unit(), kAudioOutputUnitProperty_ChannelMap,
-                                                   scope, element, &byte_size, nullptr));
+        raise_if_raw_audio_error(AudioUnitGetPropertyInfo(_core.raw_unit(), kAudioOutputUnitProperty_ChannelMap, scope,
+                                                          element, &byte_size, nullptr));
 
         if (byte_size) {
             return byte_size / sizeof(uint32_t);
@@ -420,14 +420,14 @@ struct audio::unit::impl : base::impl, manageable_unit::impl {
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
     void set_current_device(AudioDeviceID const device) {
         raise_if_raw_audio_error(AudioUnitSetProperty(_core.raw_unit(), kAudioOutputUnitProperty_CurrentDevice,
-                                               kAudioUnitScope_Global, 0, &device, sizeof(AudioDeviceID)));
+                                                      kAudioUnitScope_Global, 0, &device, sizeof(AudioDeviceID)));
     }
 
     AudioDeviceID current_device() {
         AudioDeviceID device = 0;
         UInt32 size = sizeof(AudioDeviceID);
         raise_if_raw_audio_error(AudioUnitGetProperty(_core.raw_unit(), kAudioOutputUnitProperty_CurrentDevice,
-                                               kAudioUnitScope_Global, 0, &device, &size));
+                                                      kAudioUnitScope_Global, 0, &device, &size));
         return device;
     }
 #endif
@@ -770,8 +770,8 @@ audio::unit::parameter audio::unit::create_parameter(AudioUnitParameterID const 
     UInt32 size = sizeof(AudioUnitParameterInfo);
     OSStatus err = noErr;
 
-    raise_if_raw_audio_error(err = AudioUnitGetProperty(impl_ptr<impl>()->raw_unit(),
-                                                 kAudioUnitProperty_ParameterInfo, scope, parameter_id, &info, &size));
+    raise_if_raw_audio_error(err = AudioUnitGetProperty(impl_ptr<impl>()->raw_unit(), kAudioUnitProperty_ParameterInfo,
+                                                        scope, parameter_id, &info, &size));
 
     parameter parameter(info, parameter_id, scope);
 

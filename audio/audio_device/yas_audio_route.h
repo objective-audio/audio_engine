@@ -40,4 +40,4 @@ using channel_map_result = result<channel_map_t, std::nullptr_t>;
 channel_map_result channel_map_from_routes(route_set_t const &routes, uint32_t const src_bus_idx,
                                            uint32_t const src_ch_count, uint32_t const dst_bus_idx,
                                            uint32_t const dst_ch_count);
-}
+}  // namespace yas::audio

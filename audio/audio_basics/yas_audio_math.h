@@ -5,6 +5,7 @@
 #pragma once
 
 #include <cmath>
+#include <cstdint>
 
 namespace yas::audio {
 namespace math {
@@ -28,7 +29,7 @@ namespace math {
     template <typename T>
     auto fill_sine(T *const out_data, uint32_t const length, double const start_phase, double const phase_per_frame)
         -> T;
-};
+};  // namespace math
 
 template <typename T>
 class level {
@@ -66,4 +67,4 @@ class duration {
    private:
     double _value;
 };
-}
+}  // namespace yas::audio

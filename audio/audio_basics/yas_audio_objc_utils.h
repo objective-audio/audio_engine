@@ -19,4 +19,4 @@ audio::channel_map_t to_channel_map(NSArray *const channelDescriptions, audio::d
 
 objc_ptr<AVAudioTime *> to_objc_object(audio::time const &time);
 audio::time to_time(AVAudioTime *const av_time);
-}
+}  // namespace yas

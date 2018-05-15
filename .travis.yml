@@ -5,6 +5,8 @@ branches:
     - master
 notifications:
   email: false
+install:
+  - brew install clang-format
 script:
   - make test_ios SCHEME=audio_ios_tests SDK=iphonesimulator
   - make test_ios SCHEME=audio_ios_non_arc_tests SDK=iphonesimulator

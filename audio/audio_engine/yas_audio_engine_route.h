@@ -31,4 +31,4 @@ class route : public base {
     audio::engine::node const &node() const;
     audio::engine::node &node();
 };
-}
+}  // namespace yas::audio::engine

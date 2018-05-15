@@ -29,4 +29,4 @@ struct manageable_unit : protocol {
     void set_key(std::experimental::optional<uint16_t> const &key);
     std::experimental::optional<uint16_t> const &key() const;
 };
-}
+}  // namespace yas::audio

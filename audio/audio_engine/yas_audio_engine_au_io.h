@@ -88,4 +88,4 @@ class au_input : public base {
     audio::engine::au_io const &au_io() const;
     audio::engine::au_io &au_io();
 };
-}
+}  // namespace yas::audio::engine

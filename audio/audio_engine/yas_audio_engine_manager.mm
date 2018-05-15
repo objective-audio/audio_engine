@@ -2,13 +2,13 @@
 //  yas_audio_engine.cpp
 //
 
+#include "yas_audio_engine_manager.h"
 #include <AVFoundation/AVFoundation.h>
 #include <CoreFoundation/CoreFoundation.h>
-#include "yas_audio_engine_manager.h"
-#include "yas_audio_graph.h"
+#include "yas_audio_engine_au.h"
 #include "yas_audio_engine_node.h"
 #include "yas_audio_engine_offline_output.h"
-#include "yas_audio_engine_au.h"
+#include "yas_audio_graph.h"
 #include "yas_objc_ptr.h"
 #include "yas_observing.h"
 #include "yas_result.h"
@@ -53,7 +53,7 @@ struct audio::engine::manager::impl : base::impl {
         _weak_manager = manager;
 
 #if TARGET_OS_IPHONE
-        auto reset_lambda = [weak_manager = _weak_manager](NSNotification * note) {
+        auto reset_lambda = [weak_manager = _weak_manager](NSNotification *note) {
             if (auto engine = weak_manager.lock()) {
                 engine.impl_ptr<impl>()->reload_graph();
             }
@@ -66,7 +66,7 @@ struct audio::engine::manager::impl : base::impl {
                                                           usingBlock:reset_lambda];
         _reset_observer.set_object(reset_observer);
 
-        auto route_change_lambda = [weak_manager = _weak_manager](NSNotification * note) {
+        auto route_change_lambda = [weak_manager = _weak_manager](NSNotification *note) {
             if (auto engine = weak_manager.lock()) {
                 engine.impl_ptr<impl>()->post_configuration_change();
             }

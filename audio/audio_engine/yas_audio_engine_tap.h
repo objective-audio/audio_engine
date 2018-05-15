@@ -36,4 +36,4 @@ class tap : public base {
     void render_source(audio::engine::node::render_args args);
 #endif
 };
-}
+}  // namespace yas::audio::engine

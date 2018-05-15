@@ -19,7 +19,7 @@ template <typename T, typename K>
 class subject;
 template <typename T, typename K>
 class observer;
-}
+}  // namespace yas
 
 namespace yas::audio {
 class device_global;
@@ -84,7 +84,7 @@ class device : public base {
    protected:
     explicit device(AudioDeviceID const device_id);
 };
-}
+}  // namespace yas::audio
 
 namespace yas {
 std::string to_string(audio::device::method const &);

@@ -2,8 +2,8 @@
 //  yas_audio_connection.cpp
 //
 
-#include <mutex>
 #include "yas_audio_engine_connection.h"
+#include <mutex>
 #include "yas_audio_engine_node.h"
 
 using namespace yas;

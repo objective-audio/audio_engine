@@ -5,9 +5,9 @@
 #pragma once
 
 #include <unordered_map>
+#include "yas_audio_engine_au_protocol.h"
 #include "yas_audio_engine_node_protocol.h"
 #include "yas_audio_unit.h"
-#include "yas_audio_engine_au_protocol.h"
 #include "yas_base.h"
 #include "yas_observing.h"
 
@@ -74,4 +74,4 @@ class au : public base {
    private:
     manageable_au _manageable = nullptr;
 };
-}
+}  // namespace yas::audio::engine

@@ -25,4 +25,4 @@ struct manageable_device_io : protocol {
     void remove_device_io();
     audio::device_io &device_io() const;
 };
-}
+}  // namespace yas::audio::engine

@@ -2,11 +2,11 @@
 //  yas_audio_au_io.cpp
 //
 
+#include "yas_audio_engine_au_io.h"
+#include "yas_audio_engine_au.h"
 #include "yas_audio_engine_tap.h"
 #include "yas_audio_time.h"
 #include "yas_audio_unit.h"
-#include "yas_audio_engine_au_io.h"
-#include "yas_audio_engine_au.h"
 #include "yas_result.h"
 
 #if TARGET_OS_IPHONE
@@ -43,7 +43,7 @@ struct audio::engine::au_io::impl : base::impl {
                    audio::engine::node_args{.input_bus_count = static_cast<uint32_t>(args.enable_input ? 1 : 0),
                                             .output_bus_count = static_cast<uint32_t>(args.enable_output ? 1 : 0),
                                             .override_output_bus_idx = 1}}) {
-        _au.set_prepare_unit_handler([args = std::move(args)](audio::unit & unit) {
+        _au.set_prepare_unit_handler([args = std::move(args)](audio::unit &unit) {
             unit.set_enable_output(args.enable_input);
             unit.set_enable_input(args.enable_output);
             unit.set_maximum_frames_per_slice(4096);

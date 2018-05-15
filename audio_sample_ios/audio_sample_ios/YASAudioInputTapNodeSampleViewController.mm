@@ -2,8 +2,8 @@
 //  YASAudioInputTapNodeSampleViewController.mm
 //
 
-#import <Accelerate/Accelerate.h>
 #import "YASAudioInputTapNodeSampleViewController.h"
+#import <Accelerate/Accelerate.h>
 #import "yas_audio.h"
 
 using namespace yas;

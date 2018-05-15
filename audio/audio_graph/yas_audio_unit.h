@@ -101,7 +101,7 @@ class unit : public base {
    private:
     manageable_unit _manageable = nullptr;
 };
-}
+}  // namespace yas::audio
 
 namespace yas {
 audio::unit::raw_unit_result_t to_result(OSStatus const err);

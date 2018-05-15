@@ -12,7 +12,7 @@ template <typename T, typename K>
 class subject;
 template <typename T, typename K>
 class observer;
-}
+}  // namespace yas
 
 namespace yas::audio {
 class unit::parameter : public base {
@@ -51,7 +51,7 @@ class unit::parameter : public base {
 
     subject_t &subject();
 };
-}
+}  // namespace yas::audio
 
 namespace yas {
 std::string to_string(audio::unit::parameter::method const &);

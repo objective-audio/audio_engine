@@ -2,8 +2,8 @@
 //  yas_audio_types.cpp
 //
 
-#import <AudioToolbox/AudioToolbox.h>
 #include "yas_audio_types.h"
+#import <AudioToolbox/AudioToolbox.h>
 
 using namespace yas;
 

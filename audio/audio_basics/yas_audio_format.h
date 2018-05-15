@@ -43,11 +43,11 @@ class format : public base {
 
     static format const &null_format();
 };
-}
+}  // namespace yas::audio
 
 namespace yas {
 AudioStreamBasicDescription to_stream_description(CFDictionaryRef const &settings);
 AudioStreamBasicDescription to_stream_description(double const sample_rate, uint32_t const channels,
                                                   audio::pcm_format const pcm_format, bool const interleaved);
 bool is_equal(AudioStreamBasicDescription const &asbd1, AudioStreamBasicDescription const &asbd2);
-}
+}  // namespace yas

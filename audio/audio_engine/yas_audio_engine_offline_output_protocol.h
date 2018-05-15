@@ -11,7 +11,7 @@
 namespace yas::audio {
 class pcm_buffer;
 class time;
-}
+}  // namespace yas::audio
 
 namespace yas::audio::engine {
 enum class offline_start_error_t {
@@ -42,4 +42,4 @@ struct manageable_offline_output : protocol {
     offline_start_result_t start(offline_render_f &&, offline_completion_f &&);
     void stop();
 };
-}
+}  // namespace yas::audio::engine

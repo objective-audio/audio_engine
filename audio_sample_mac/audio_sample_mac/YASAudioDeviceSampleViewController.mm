@@ -2,9 +2,9 @@
 //  YASAudioDeviceSampleViewController.m
 //
 
+#import "YASAudioDeviceSampleViewController.h"
 #import <Accelerate/Accelerate.h>
 #import <atomic>
-#import "YASAudioDeviceSampleViewController.h"
 #import "YASDecibelValueTransformer.h"
 #import "YASFrequencyValueFormatter.h"
 #import "yas_audio.h"

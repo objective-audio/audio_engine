@@ -435,9 +435,9 @@
 		B6F2CA481CDDEAAF00EF584B /* yas_unless.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yas_unless.h; sourceTree = "<group>"; };
 		B6F2CA491CDDEAAF00EF584B /* yas_version.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = yas_version.cpp; sourceTree = "<group>"; };
 		B6F2CA4A1CDDEAAF00EF584B /* yas_version.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yas_version.h; sourceTree = "<group>"; };
-		B6F2CA771CDE0F1C00EF584B /* yas_objc_macros.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = yas_objc_macros.h; path = ../../cpp_utils/submodules/objc_utils/objc_utils/yas_objc_macros.h; sourceTree = "<group>"; };
-		B6F2CAF51CDE33C700EF584B /* yas_objc_unowned.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = yas_objc_unowned.h; path = ../../cpp_utils/submodules/objc_utils/objc_utils/yas_objc_unowned.h; sourceTree = "<group>"; };
-		B6F2CAF61CDE33C700EF584B /* yas_objc_unowned.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = yas_objc_unowned.m; path = ../../cpp_utils/submodules/objc_utils/objc_utils/yas_objc_unowned.m; sourceTree = "<group>"; };
+		B6F2CA771CDE0F1C00EF584B /* yas_objc_macros.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yas_objc_macros.h; sourceTree = "<group>"; };
+		B6F2CAF51CDE33C700EF584B /* yas_objc_unowned.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yas_objc_unowned.h; sourceTree = "<group>"; };
+		B6F2CAF61CDE33C700EF584B /* yas_objc_unowned.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = yas_objc_unowned.m; sourceTree = "<group>"; };
 		B6FC1D0D1B5B44A10051243A /* yas_audio_cpp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yas_audio_cpp.h; sourceTree = "<group>"; };
 		B6FF02331BEAF0150026777E /* yas_audio_device_io.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = yas_audio_device_io.h; path = audio_device/yas_audio_device_io.h; sourceTree = "<group>"; };
 		B6FF02341BEAF0150026777E /* yas_audio_device_io.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = yas_audio_device_io.mm; path = audio_device/yas_audio_device_io.mm; sourceTree = "<group>"; };
@@ -534,7 +534,7 @@
 				B6F2CAF61CDE33C700EF584B /* yas_objc_unowned.m */,
 			);
 			name = objc_utils;
-			path = ../submodules/objc_utils/objc_utils;
+			path = ../submodules/cpp_utils/submodules/objc_utils/objc_utils;
 			sourceTree = "<group>";
 		};
 		B61D52D31B9C82F700A449C5 /* Mac Framework */ = {
@@ -840,6 +840,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = B62ED58D1A628554007DDE96 /* Build configuration list for PBXNativeTarget "audio_ios_tests" */;
 			buildPhases = (
+				B6302A0C20AA5A78009A5C2A /* ShellScript */,
 				B62ED5821A628554007DDE96 /* Sources */,
 				B62ED5831A628554007DDE96 /* Frameworks */,
 				B62ED5841A628554007DDE96 /* Resources */,
@@ -857,6 +858,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = B62ED5B31A62870F007DDE96 /* Build configuration list for PBXNativeTarget "audio_mac_tests" */;
 			buildPhases = (
+				B6302A0E20AA5A91009A5C2A /* ShellScript */,
 				B62ED5A91A62870F007DDE96 /* Sources */,
 				B62ED5AA1A62870F007DDE96 /* Frameworks */,
 				B62ED5AB1A62870F007DDE96 /* Resources */,
@@ -874,6 +876,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = B63450891AD10A7100CF7784 /* Build configuration list for PBXNativeTarget "audio_mac_non_arc_tests" */;
 			buildPhases = (
+				B6302A0F20AA5A9A009A5C2A /* ShellScript */,
 				B63450521AD10A7100CF7784 /* Sources */,
 				B63450871AD10A7100CF7784 /* Frameworks */,
 				B63450881AD10A7100CF7784 /* Resources */,
@@ -891,6 +894,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = B66E534A1A75CF0E008B9D4E /* Build configuration list for PBXNativeTarget "audio_ios_non_arc_tests" */;
 			buildPhases = (
+				B6302A0D20AA5A89009A5C2A /* ShellScript */,
 				B66E53321A75CF0E008B9D4E /* Sources */,
 				B66E53481A75CF0E008B9D4E /* Frameworks */,
 				B66E53491A75CF0E008B9D4E /* Resources */,
@@ -970,6 +974,61 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		B6302A0C20AA5A78009A5C2A /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = ../script/format.sh;
+		};
+		B6302A0D20AA5A89009A5C2A /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = ../script/format.sh;
+		};
+		B6302A0E20AA5A91009A5C2A /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = ../script/format.sh;
+		};
+		B6302A0F20AA5A9A009A5C2A /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = ../script/format.sh;
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		B62ED5821A628554007DDE96 /* Sources */ = {

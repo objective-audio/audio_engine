@@ -11,7 +11,7 @@ namespace yas::audio {
 class graph;
 
 using graph_editing_f = std::function<void(audio::graph &)>;
-}
+}  // namespace yas::audio
 
 namespace yas::audio::engine {
 class manager;
@@ -71,4 +71,4 @@ struct manageable_node : protocol {
     graph_editing_f const &add_to_graph_handler() const;
     graph_editing_f const &remove_from_graph_handler() const;
 };
-}
+}  // namespace yas::audio::engine

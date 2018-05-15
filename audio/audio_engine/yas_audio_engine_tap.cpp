@@ -61,11 +61,12 @@ struct audio::engine::tap::impl : base::impl {
             }
         });
 
-        _reset_observer = _node.subject().make_observer(audio::engine::node::method::will_reset, [weak_tap](auto const &) {
-            if (auto tap = weak_tap.lock()) {
-                tap.impl_ptr<audio::engine::tap::impl>()->_render_handler = nullptr;
-            }
-        });
+        _reset_observer =
+            _node.subject().make_observer(audio::engine::node::method::will_reset, [weak_tap](auto const &) {
+                if (auto tap = weak_tap.lock()) {
+                    tap.impl_ptr<audio::engine::tap::impl>()->_render_handler = nullptr;
+                }
+            });
 
         _node.set_prepare_kernel_handler([weak_tap](audio::engine::kernel &kernel) {
             if (auto tap = weak_tap.lock()) {
@@ -118,8 +119,8 @@ audio::engine::tap::tap() : tap({.is_input = false}) {
 }
 
 audio::engine::tap::tap(args args)
-: base(std::make_unique<impl>(args.is_input ? engine::node_args{.input_bus_count = 1, .input_renderable = true} :
-                              engine::node_args{.input_bus_count = 1, .output_bus_count = 1})) {
+    : base(std::make_unique<impl>(args.is_input ? engine::node_args{.input_bus_count = 1, .input_renderable = true} :
+                                                  engine::node_args{.input_bus_count = 1, .output_bus_count = 1})) {
     impl_ptr<impl>()->prepare(*this);
 }
 

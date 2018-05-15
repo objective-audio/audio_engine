@@ -97,14 +97,14 @@ class file : public base {
 
 file::make_opened_result_t make_opened_file(file::open_args);
 file::make_created_result_t make_created_file(file::create_args);
-}
+}  // namespace yas::audio
 
 namespace yas {
 std::string to_string(audio::file::open_error_t const &);
 std::string to_string(audio::file::read_error_t const &);
 std::string to_string(audio::file::create_error_t const &);
 std::string to_string(audio::file::write_error_t const &);
-}
+}  // namespace yas
 
 std::ostream &operator<<(std::ostream &, yas::audio::file::open_error_t const &);
 std::ostream &operator<<(std::ostream &, yas::audio::file::read_error_t const &);
