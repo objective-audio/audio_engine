@@ -148,7 +148,7 @@ class device_global {
     device_global &operator=(device_global const &) = delete;
     device_global &operator=(device_global &&) = delete;
 };
-}
+}  // namespace yas::audio
 
 #pragma mark - property_info
 

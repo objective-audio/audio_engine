@@ -34,7 +34,7 @@ class connection : public base {
    private:
     audio::engine::node_removable _node_removable = nullptr;
 };
-}
+}  // namespace yas::audio::engine
 
 template <>
 struct std::hash<yas::audio::engine::connection> {

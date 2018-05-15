@@ -53,7 +53,7 @@ using bus_result_t = std::experimental::optional<uint32_t>;
 using abl_uptr = std::unique_ptr<AudioBufferList, std::function<void(AudioBufferList *)>>;
 using abl_data_uptr = std::unique_ptr<std::vector<std::vector<uint8_t>>>;
 using channel_map_t = std::vector<uint32_t>;
-}
+}  // namespace yas::audio
 
 namespace yas {
 uint32_t to_uint32(audio::direction const &);
@@ -62,7 +62,7 @@ std::string to_string(audio::direction const &);
 std::string to_string(AudioUnitScope const scope);
 std::string to_string(audio::render_type const &);
 std::string to_string(OSStatus const err);
-}
+}  // namespace yas
 
 std::ostream &operator<<(std::ostream &, yas::audio::pcm_format const &);
 std::ostream &operator<<(std::ostream &, yas::audio::direction const &);

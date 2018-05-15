@@ -38,4 +38,4 @@ class graph : public base {
     // render thread
     static void unit_render(render_parameters &render_parameters);
 };
-}
+}  // namespace yas::audio

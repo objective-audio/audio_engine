@@ -2,10 +2,10 @@
 //  yas_audio_format.mm
 //
 
+#include "yas_audio_format.h"
 #import <AVFoundation/AVFoundation.h>
 #include <unordered_map>
 #include "yas_audio_exception.h"
-#include "yas_audio_format.h"
 #include "yas_cf_utils.h"
 #include "yas_stl_utils.h"
 
@@ -254,7 +254,8 @@ AudioStreamBasicDescription yas::to_stream_description(double const sample_rate,
     }
 
     AudioStreamBasicDescription asbd = {
-        .mSampleRate = sample_rate, .mFormatID = kAudioFormatLinearPCM,
+        .mSampleRate = sample_rate,
+        .mFormatID = kAudioFormatLinearPCM,
     };
 
     asbd.mFormatFlags = kAudioFormatFlagsNativeEndian | kAudioFormatFlagIsPacked;

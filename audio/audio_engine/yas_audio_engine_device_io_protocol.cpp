@@ -6,8 +6,7 @@
 
 using namespace yas;
 
-audio::engine::manageable_device_io::manageable_device_io(std::shared_ptr<impl> impl)
-    : protocol(std::move(impl)) {
+audio::engine::manageable_device_io::manageable_device_io(std::shared_ptr<impl> impl) : protocol(std::move(impl)) {
 }
 
 audio::engine::manageable_device_io::manageable_device_io(std::nullptr_t) : protocol(nullptr) {

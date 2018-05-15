@@ -48,7 +48,7 @@ class device_io : public base {
     void _initialize() const;
     void _uninitialize() const;
 };
-}
+}  // namespace yas::audio
 
 template <>
 struct std::hash<yas::audio::device_io> {

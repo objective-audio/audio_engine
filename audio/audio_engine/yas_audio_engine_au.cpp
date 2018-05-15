@@ -2,12 +2,12 @@
 //  yas_audio_au.cpp
 //
 
+#include "yas_audio_engine_au.h"
 #include <iostream>
-#include "yas_audio_graph.h"
 #include "yas_audio_engine_node.h"
+#include "yas_audio_graph.h"
 #include "yas_audio_time.h"
 #include "yas_audio_unit.h"
-#include "yas_audio_engine_au.h"
 #include "yas_audio_unit_parameter.h"
 #include "yas_result.h"
 
@@ -60,11 +60,12 @@ struct audio::engine::au::impl : base::impl, manageable_au::impl {
             }
         });
 
-        _reset_observer = _node.subject().make_observer(audio::engine::node::method::will_reset, [weak_au](auto const &) {
-            if (auto au = weak_au.lock()) {
-                au.impl_ptr<audio::engine::au::impl>()->will_reset();
-            }
-        });
+        _reset_observer =
+            _node.subject().make_observer(audio::engine::node::method::will_reset, [weak_au](auto const &) {
+                if (auto au = weak_au.lock()) {
+                    au.impl_ptr<audio::engine::au::impl>()->will_reset();
+                }
+            });
 
         _connections_observer =
             _node.subject().make_observer(audio::engine::node::method::update_connections, [weak_au](auto const &) {
@@ -372,22 +373,22 @@ float audio::engine::au::global_parameter_value(AudioUnitParameterID const param
 }
 
 void audio::engine::au::set_input_parameter_value(AudioUnitParameterID const parameter_id, float const value,
-                                                 AudioUnitElement const element) {
+                                                  AudioUnitElement const element) {
     impl_ptr<impl>()->set_input_parameter_value(parameter_id, value, element);
 }
 
 float audio::engine::au::input_parameter_value(AudioUnitParameterID const parameter_id,
-                                              AudioUnitElement const element) const {
+                                               AudioUnitElement const element) const {
     return impl_ptr<impl>()->input_parameter_value(parameter_id, element);
 }
 
 void audio::engine::au::set_output_parameter_value(AudioUnitParameterID const parameter_id, float const value,
-                                                  AudioUnitElement const element) {
+                                                   AudioUnitElement const element) {
     impl_ptr<impl>()->set_output_parameter_value(parameter_id, value, element);
 }
 
 float audio::engine::au::output_parameter_value(AudioUnitParameterID const parameter_id,
-                                               AudioUnitElement const element) const {
+                                                AudioUnitElement const element) const {
     return impl_ptr<impl>()->output_parameter_value(parameter_id, element);
 }
 

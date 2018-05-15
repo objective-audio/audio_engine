@@ -2,8 +2,8 @@
 //  YASAudioGraphSampleViewController.m
 //
 
-#import <iostream>
 #import "YASAudioGraphSampleViewController.h"
+#import <iostream>
 #import "yas_audio.h"
 
 using namespace yas;

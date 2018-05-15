@@ -16,7 +16,7 @@ template <typename T, typename K>
 class subject;
 template <typename T, typename K>
 class observer;
-}
+}  // namespace yas
 
 namespace yas::audio {
 class graph;
@@ -90,12 +90,12 @@ class manager : public base {
     audio::engine::connection_set &connections() const;
 #endif
 };
-}
+}  // namespace yas::audio::engine
 
 namespace yas {
 std::string to_string(audio::engine::manager::method const &);
 std::string to_string(audio::engine::manager::start_error_t const &);
-}
+}  // namespace yas
 
 std::ostream &operator<<(std::ostream &, yas::audio::engine::manager::method const &);
 std::ostream &operator<<(std::ostream &, yas::audio::engine::manager::start_error_t const &);

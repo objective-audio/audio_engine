@@ -2,8 +2,8 @@
 //  yas_audio_math.cpp
 //
 
-#include <Accelerate/Accelerate.h>
 #include "yas_audio_math.h"
+#include <Accelerate/Accelerate.h>
 
 using namespace yas;
 

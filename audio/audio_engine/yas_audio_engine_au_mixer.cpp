@@ -2,10 +2,10 @@
 //  yas_audio_au_mixer.cpp
 //
 
-#include "yas_audio_engine_node.h"
-#include "yas_audio_unit.h"
 #include "yas_audio_engine_au_mixer.h"
 #include "yas_audio_engine_au.h"
+#include "yas_audio_engine_node.h"
+#include "yas_audio_unit.h"
 
 using namespace yas;
 

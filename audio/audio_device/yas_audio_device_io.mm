@@ -8,7 +8,6 @@
 
 #include <mutex>
 #include "yas_audio_device.h"
-#include "yas_audio_device.h"
 #include "yas_audio_format.h"
 #include "yas_audio_pcm_buffer.h"
 #include "yas_audio_time.h"
@@ -132,8 +131,9 @@ struct audio::device_io::impl : base::impl {
         }
 
         auto handler = [weak_device_io = _weak_device_io](
-            const AudioTimeStamp *inNow, const AudioBufferList *inInputData, const AudioTimeStamp *inInputTime,
-            AudioBufferList *outOutputData, const AudioTimeStamp *inOutputTime) {
+                           const AudioTimeStamp *inNow, const AudioBufferList *inInputData,
+                           const AudioTimeStamp *inInputTime, AudioBufferList *outOutputData,
+                           const AudioTimeStamp *inOutputTime) {
             if (outOutputData) {
                 audio::clear(outOutputData);
             }

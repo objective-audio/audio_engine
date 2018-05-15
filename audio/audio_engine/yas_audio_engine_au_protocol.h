@@ -21,4 +21,4 @@ struct manageable_au : protocol {
     void prepare_parameters();
     void reload_unit();
 };
-}
+}  // namespace yas::audio::engine

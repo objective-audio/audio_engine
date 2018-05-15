@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include "yas_audio_pcm_buffer.h"
 #include "yas_audio_format.h"
+#include "yas_audio_pcm_buffer.h"
 #include "yas_fast_each.h"
 
 namespace yas::audio {
@@ -40,4 +40,4 @@ const_each_data<T> make_each_data(pcm_buffer const &buffer) {
 
     return yas::make_each_data<T>(vec.data(), buffer.frame_length(), format.buffer_count(), format.stride());
 }
-}
+}  // namespace yas::audio

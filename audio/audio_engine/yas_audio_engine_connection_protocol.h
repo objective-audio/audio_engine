@@ -29,4 +29,4 @@ struct node_removable : protocol {
     void remove_source_node();
     void remove_destination_node();
 };
-}
+}  // namespace yas::audio::engine

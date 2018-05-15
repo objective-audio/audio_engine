@@ -35,7 +35,7 @@ class time : public base {
 
 uint64_t host_time_for_seconds(double seconds);
 double seconds_for_host_time(uint64_t host_time);
-}
+}  // namespace yas::audio
 
 namespace yas {
 std::string to_string(audio::time const &);

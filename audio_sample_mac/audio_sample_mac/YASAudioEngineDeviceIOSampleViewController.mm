@@ -2,8 +2,8 @@
 //  YASAudioEngineSampleViewController.m
 //
 
-#import <Accelerate/Accelerate.h>
 #import "YASAudioEngineDeviceIOSampleViewController.h"
+#import <Accelerate/Accelerate.h>
 #import "yas_audio.h"
 #import "yas_objc_unowned.h"
 

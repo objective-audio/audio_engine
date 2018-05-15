@@ -39,6 +39,6 @@ class device_io : public base {
    private:
     manageable_device_io _manageable = nullptr;
 };
-}
+}  // namespace yas::audio::engine
 
 #endif

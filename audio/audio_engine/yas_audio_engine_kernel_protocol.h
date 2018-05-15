@@ -19,4 +19,4 @@ struct manageable_kernel : protocol {
     void set_input_connections(audio::engine::connection_wmap connections);
     void set_output_connections(audio::engine::connection_wmap connections);
 };
-}
+}  // namespace yas::audio::engine

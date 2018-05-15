@@ -63,7 +63,7 @@ class device::stream : public base {
     std::unique_ptr<std::vector<T>> _property_data(AudioStreamID const stream_id,
                                                    AudioObjectPropertySelector const selector) const;
 };
-}
+}  // namespace yas::audio
 
 namespace yas {
 std::string to_string(audio::device::stream::method const &);

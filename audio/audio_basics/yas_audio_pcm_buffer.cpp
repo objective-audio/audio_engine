@@ -2,13 +2,13 @@
 //  yas_audio_pcm_buffer.cpp
 //
 
+#include "yas_audio_pcm_buffer.h"
 #include <Accelerate/Accelerate.h>
 #include <exception>
 #include <functional>
 #include <iostream>
 #include <string>
 #include "yas_audio_format.h"
-#include "yas_audio_pcm_buffer.h"
 #include "yas_result.h"
 #include "yas_stl_utils.h"
 
@@ -251,7 +251,7 @@ static get_abl_info_result_t get_abl_info(AudioBufferList const *abl, uint32_t c
 
     return get_abl_info_result_t(std::move(data_info));
 }
-}
+}  // namespace yas::audio
 
 #pragma mark - public
 
@@ -268,8 +268,9 @@ audio::pcm_buffer::pcm_buffer(audio::format const &format, AudioBufferList *abl)
 
 audio::pcm_buffer::pcm_buffer(audio::format const &format, uint32_t const frame_capacity)
     : base(std::make_shared<impl>(
-          format, allocate_audio_buffer_list(format.buffer_count(), format.stride(),
-                                             frame_capacity * format.stream_description().mBytesPerFrame),
+          format,
+          allocate_audio_buffer_list(format.buffer_count(), format.stride(),
+                                     frame_capacity * format.stream_description().mBytesPerFrame),
           frame_capacity)) {
     if (frame_capacity == 0) {
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");

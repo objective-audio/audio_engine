@@ -6,8 +6,8 @@
 
 #include <experimental/optional>
 #include "yas_audio_engine_connection.h"
-#include "yas_audio_format.h"
 #include "yas_audio_engine_node_protocol.h"
+#include "yas_audio_format.h"
 #include "yas_audio_pcm_buffer.h"
 #include "yas_audio_types.h"
 #include "yas_base.h"
@@ -91,7 +91,7 @@ class node : public base {
     audio::engine::connectable_node _connectable = nullptr;
     mutable audio::engine::manageable_node _manageable = nullptr;
 };
-}
+}  // namespace yas::audio::engine
 
 namespace yas {
 std::string to_string(audio::engine::node::method const &);

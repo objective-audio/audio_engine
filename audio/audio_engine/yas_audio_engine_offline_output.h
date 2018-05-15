@@ -31,7 +31,7 @@ class offline_output : public base {
 
     manageable_offline_output _manageable = nullptr;
 };
-}
+}  // namespace yas::audio::engine
 
 namespace yas {
 std::string to_string(audio::engine::offline_start_error_t const &error);

@@ -35,4 +35,4 @@ class au_mixer : public base {
    private:
     class impl;
 };
-}
+}  // namespace yas::audio::engine

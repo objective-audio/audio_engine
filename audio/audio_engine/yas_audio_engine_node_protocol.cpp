@@ -2,8 +2,8 @@
 //  yas_audio_node_protocol.cpp
 //
 
-#include "yas_audio_engine_manager.h"
 #include "yas_audio_engine_node_protocol.h"
+#include "yas_audio_engine_manager.h"
 
 using namespace yas;
 

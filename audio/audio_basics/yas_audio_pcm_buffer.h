@@ -88,7 +88,7 @@ uint32_t frame_length(AudioBufferList const *const abl, uint32_t const sample_by
 std::pair<abl_uptr, abl_data_uptr> allocate_audio_buffer_list(uint32_t const buffer_count, uint32_t const channel_count,
                                                               uint32_t const size = 0);
 bool is_equal_structure(AudioBufferList const &abl1, AudioBufferList const &abl2);
-}
+}  // namespace yas::audio
 
 namespace yas {
 std::string to_string(audio::pcm_buffer::copy_error_t const &error);

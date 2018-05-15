@@ -30,4 +30,4 @@ struct kernel : base {
 
     manageable_kernel _manageable = nullptr;
 };
-}
+}  // namespace yas::audio::engine
