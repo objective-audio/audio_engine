@@ -5,7 +5,10 @@
 #pragma once
 
 #include <TargetConditionals.h>
+
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
+
+#import "yas_audio_device.h"
 
 namespace yas {
 template <typename T, typename K>
