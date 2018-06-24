@@ -12,7 +12,6 @@
 #include "yas_audio_pcm_buffer.h"
 #include "yas_audio_time.h"
 #include "yas_exception.h"
-#include "yas_observing.h"
 #include "yas_result.h"
 
 using namespace yas;
@@ -65,68 +64,74 @@ struct audio::device_io::impl : base::impl {
     AudioDeviceIOProcID _io_proc_id = nullptr;
     pcm_buffer _input_buffer_on_render = nullptr;
     audio::time _input_time_on_render = nullptr;
-    audio::device::observer_t _observer;
+    flow::observer _device_system_flow = nullptr;
+    std::unordered_map<std::uintptr_t, flow::observer> _device_flows;
 
     impl() {
     }
 
     ~impl() {
-        _observer.remove_handler(device::system_subject(), device::method::hardware_did_change);
+        this->_device_system_flow = nullptr;
 
         uninitialize();
     }
 
     void prepare(device_io const &device_io, audio::device const dev) {
-        _weak_device_io = to_weak(device_io);
+        this->_weak_device_io = to_weak(device_io);
 
-        _observer.add_handler(
-            device::system_subject(), device::method::hardware_did_change,
-            [weak_device_io = _weak_device_io](auto const &context) {
-                if (auto device_io = weak_device_io.lock()) {
-                    if (device_io.device() && !device::device_for_id(device_io.device().audio_device_id())) {
-                        device_io.set_device(nullptr);
+        this->_device_system_flow =
+            device::begin_system_flow(device::system_method::hardware_did_change)
+                .perform([weak_device_io = _weak_device_io](auto const &) {
+                    if (auto device_io = weak_device_io.lock()) {
+                        if (device_io.device() && !device::device_for_id(device_io.device().audio_device_id())) {
+                            device_io.set_device(nullptr);
+                        }
                     }
-                }
-            });
+                })
+                .end();
 
-        set_device(dev);
+        this->set_device(dev);
     }
 
     void set_device(audio::device const &dev) {
-        if (_device != dev) {
-            bool running = _is_running;
+        if (this->_device != dev) {
+            bool running = this->_is_running;
 
-            uninitialize();
+            this->uninitialize();
 
-            if (_device) {
-                _observer.remove_handler(_device.subject(), device::method::device_did_change);
+            if (this->_device) {
+                if (this->_device_flows.count(this->_device.identifier())) {
+                    this->_device_flows.erase(this->_device.identifier());
+                }
             }
 
-            _device = dev;
+            this->_device = dev;
 
-            if (_device) {
-                _observer.add_handler(_device.subject(), device::method::device_did_change,
-                                      [weak_device_io = _weak_device_io](auto const &context) {
-                                          if (auto device_io = weak_device_io.lock()) {
-                                              device_io.impl_ptr<impl>()->update_kernel();
-                                          }
-                                      });
+            if (this->_device) {
+                auto flow = this->_device.begin_flow(device::method::device_did_change)
+                                .perform([weak_device_io = _weak_device_io](auto const &) {
+                                    if (auto device_io = weak_device_io.lock()) {
+                                        device_io.impl_ptr<impl>()->update_kernel();
+                                    }
+                                })
+                                .end();
+                this->_device_flows.emplace(this->_device.identifier(), std::move(flow));
             }
 
-            initialize();
+            this->initialize();
 
             if (running) {
-                start();
+                this->start();
             }
         }
     }
 
     void initialize() {
-        if (!_device || _io_proc_id) {
+        if (!this->_device || this->_io_proc_id) {
             return;
         }
 
-        if (!_device.input_format() && !_device.output_format()) {
+        if (!this->_device.input_format() && !this->_device.output_format()) {
             return;
         }
 
@@ -182,94 +187,95 @@ struct audio::device_io::impl : base::impl {
         raise_if_raw_audio_error(
             AudioDeviceCreateIOProcIDWithBlock(&_io_proc_id, _device.audio_device_id(), nullptr, handler));
 
-        update_kernel();
+        this->update_kernel();
     }
 
     void uninitialize() {
-        stop();
+        this->stop();
 
-        if (!_device || !_io_proc_id) {
+        if (!this->_device || !this->_io_proc_id) {
             return;
         }
 
-        if (device::is_available_device(_device)) {
+        if (device::is_available_device(this->_device)) {
             raise_if_raw_audio_error(AudioDeviceDestroyIOProcID(_device.audio_device_id(), _io_proc_id));
         }
 
-        _io_proc_id = nullptr;
+        this->_io_proc_id = nullptr;
         update_kernel();
     }
 
     void start() {
-        _is_running = true;
+        this->_is_running = true;
 
-        if (!_device || !_io_proc_id) {
+        if (!this->_device || !this->_io_proc_id) {
             return;
         }
 
-        raise_if_raw_audio_error(AudioDeviceStart(_device.audio_device_id(), _io_proc_id));
+        raise_if_raw_audio_error(AudioDeviceStart(this->_device.audio_device_id(), this->_io_proc_id));
     }
 
     void stop() {
-        if (!_is_running) {
+        if (!this->_is_running) {
             return;
         }
 
         _is_running = false;
 
-        if (!_device || !_io_proc_id) {
+        if (!this->_device || !this->_io_proc_id) {
             return;
         }
 
-        if (device::is_available_device(_device)) {
-            raise_if_raw_audio_error(AudioDeviceStop(_device.audio_device_id(), _io_proc_id));
+        if (device::is_available_device(this->_device)) {
+            raise_if_raw_audio_error(AudioDeviceStop(this->_device.audio_device_id(), this->_io_proc_id));
         }
     }
 
     void set_render_handler(render_f &&handler) {
-        std::lock_guard<std::recursive_mutex> lock(_mutex);
-        _render_handler = std::move(handler);
+        std::lock_guard<std::recursive_mutex> lock(this->_mutex);
+        this->_render_handler = std::move(handler);
     }
 
     render_f render_handler() const {
-        std::lock_guard<std::recursive_mutex> lock(_mutex);
-        return _render_handler;
+        std::lock_guard<std::recursive_mutex> lock(this->_mutex);
+        return this->_render_handler;
     }
 
     void set_maximum_frames(uint32_t const frames) {
-        std::lock_guard<std::recursive_mutex> lock(_mutex);
-        _maximum_frames = frames;
+        std::lock_guard<std::recursive_mutex> lock(this->_mutex);
+        this->_maximum_frames = frames;
         update_kernel();
     }
 
     uint32_t maximum_frames() const {
-        std::lock_guard<std::recursive_mutex> lock(_mutex);
-        return _maximum_frames;
+        std::lock_guard<std::recursive_mutex> lock(this->_mutex);
+        return this->_maximum_frames;
     }
 
     void set_kernel(device_io::kernel kernel) {
-        std::lock_guard<std::recursive_mutex> lock(_mutex);
-        _kernel = nullptr;
+        std::lock_guard<std::recursive_mutex> lock(this->_mutex);
+        this->_kernel = nullptr;
         if (kernel) {
-            _kernel = std::move(kernel);
+            this->_kernel = std::move(kernel);
         }
     }
 
     device_io::kernel kernel() const {
-        std::lock_guard<std::recursive_mutex> lock(_mutex);
-        return _kernel;
+        std::lock_guard<std::recursive_mutex> lock(this->_mutex);
+        return this->_kernel;
     }
 
     void update_kernel() {
-        std::lock_guard<std::recursive_mutex> lock(_mutex);
+        std::lock_guard<std::recursive_mutex> lock(this->_mutex);
 
-        set_kernel(nullptr);
+        this->set_kernel(nullptr);
 
-        if (!_device || !_io_proc_id) {
+        if (!this->_device || !this->_io_proc_id) {
             return;
         }
 
-        set_kernel(device_io::kernel{_device.input_format(), _device.output_format(), _maximum_frames});
+        this->set_kernel(
+            device_io::kernel{this->_device.input_format(), this->_device.output_format(), this->_maximum_frames});
     }
 
    private:

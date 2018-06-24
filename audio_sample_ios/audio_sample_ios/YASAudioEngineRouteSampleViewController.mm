@@ -38,7 +38,7 @@ struct route_vc_internal {
     audio::engine::route route;
     audio::engine::tap sine_tap;
 
-    base engine_observer = nullptr;
+    flow::observer engine_flow = nullptr;
 
     void disconnectNodes() {
         manager.disconnect(au_mixer.au().node());
@@ -254,12 +254,14 @@ struct route_vc_internal {
 
     auto unowned_self = make_objc_ptr([[YASUnownedObject alloc] initWithObject:self]);
 
-    _internal.engine_observer = _internal.manager.subject().make_observer(
-        audio::engine::manager::method::configuration_change, [unowned_self](auto const &context) {
-            if ([UIApplication sharedApplication].applicationState == UIApplicationStateActive) {
-                [[unowned_self.object() object] _updateEngine];
-            }
-        });
+    _internal.engine_flow =
+        _internal.manager.begin_flow(audio::engine::manager::method::configuration_change)
+            .perform([unowned_self](auto const &) {
+                if ([UIApplication sharedApplication].applicationState == UIApplicationStateActive) {
+                    [[unowned_self.object() object] _updateEngine];
+                }
+            })
+            .end();
 
     _internal.connect_nodes();
 }

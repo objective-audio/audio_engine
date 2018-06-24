@@ -8,13 +8,14 @@
 
 #include <mutex>
 #include "yas_audio_format.h"
-#include "yas_observing.h"
 
 using namespace yas;
 
 namespace yas::audio {
 using listener_f =
     std::function<void(uint32_t const in_number_addresses, const AudioObjectPropertyAddress *const in_addresses)>;
+
+static flow::notifier<audio::device::flow_system_pair_t> _system_notifier;
 
 #pragma mark - utility
 
@@ -91,10 +92,9 @@ class device_global {
                                                                .object_id = kAudioObjectSystemObject,
                                                                .address = addresses[i]});
             }
-            auto &subject = device::system_subject();
             device::change_info change_info{.property_infos = std::move(property_infos)};
-            subject.notify(device::method::hardware_did_change, change_info);
-            subject.notify(device::method::configuration_change, change_info);
+            audio::_system_notifier.notify(std::make_pair(device::system_method::hardware_did_change, change_info));
+            audio::_system_notifier.notify(std::make_pair(device::system_method::configuration_change, change_info));
         };
     }
 
@@ -178,7 +178,7 @@ struct audio::device::impl : base::impl {
     AudioDeviceID const _audio_device_id;
     std::unordered_map<AudioStreamID, stream> input_streams_map;
     std::unordered_map<AudioStreamID, stream> output_streams_map;
-    subject_t _subject;
+    flow::notifier<audio::device::flow_pair_t> _notifier;
 
     impl(AudioDeviceID device_id) : _input_format(nullptr), _output_format(nullptr), _audio_device_id(device_id) {
         udpate_streams(kAudioObjectPropertyScopeInput);
@@ -227,6 +227,7 @@ struct audio::device::impl : base::impl {
         return [device_id](uint32_t const address_count, const AudioObjectPropertyAddress *const addresses) {
             auto device = device::device_for_id(device_id);
             if (device) {
+                auto device_impl = device.impl_ptr<impl>();
                 AudioObjectID const object_id = device.audio_device_id();
 
                 std::vector<device::property_info> property_infos;
@@ -253,10 +254,10 @@ struct audio::device::impl : base::impl {
                 for (auto &info : property_infos) {
                     switch (info.property) {
                         case property::stream:
-                            device.impl_ptr<impl>()->udpate_streams(info.address.mScope);
+                            device_impl->udpate_streams(info.address.mScope);
                             break;
                         case property::format:
-                            device.impl_ptr<impl>()->update_format(info.address.mScope);
+                            device_impl->update_format(info.address.mScope);
                             break;
                         default:
                             break;
@@ -264,8 +265,9 @@ struct audio::device::impl : base::impl {
                 }
 
                 device::change_info change_info{std::move(property_infos)};
-                device.subject().notify(device::method::device_did_change, change_info);
-                device::system_subject().notify(device::method::configuration_change, change_info);
+                device_impl->_notifier.notify(std::make_pair(method::device_did_change, change_info));
+                audio::_system_notifier.notify(
+                    std::make_pair(device::system_method::configuration_change, change_info));
             }
         };
     }
@@ -426,11 +428,6 @@ bool audio::device::is_available_device(device const &device) {
     return it != device_global::all_devices_map().end();
 }
 
-audio::device::subject_t &audio::device::system_subject() {
-    static subject_t _system_subject;
-    return _system_subject;
-}
-
 #pragma mark - main
 
 audio::device::device(AudioDeviceID const device_id) : base(std::make_shared<impl>(device_id)) {
@@ -497,22 +494,57 @@ uint32_t audio::device::output_channel_count() const {
     return 0;
 }
 
-audio::device::subject_t &audio::device::subject() const {
-    return impl_ptr<impl>()->_subject;
+flow::node_t<audio::device::flow_pair_t, false> audio::device::begin_flow() const {
+    return impl_ptr<impl>()->_notifier.begin_flow();
 }
+
+flow::node<audio::device::change_info, audio::device::flow_pair_t, audio::device::flow_pair_t, false>
+audio::device::begin_flow(method const method) const {
+    return impl_ptr<impl>()
+        ->_notifier.begin_flow()
+        .filter([method](audio::device::flow_pair_t const &pair) { return pair.first == method; })
+        .map([](audio::device::flow_pair_t const &pair) { return pair.second; });
+}
+
+flow::node_t<audio::device::flow_system_pair_t, false> audio::device::begin_system_flow() {
+    return audio::_system_notifier.begin_flow();
+}
+
+flow::node<audio::device::change_info, audio::device::flow_system_pair_t, audio::device::flow_system_pair_t, false>
+audio::device::begin_system_flow(system_method const method) {
+    return audio::_system_notifier.begin_flow()
+        .filter([method](flow_system_pair_t const &pair) { return pair.first == method; })
+        .map([](flow_system_pair_t const &pair) { return pair.second; });
+}
+
+#if YAS_TEST
+flow::notifier<audio::device::flow_system_pair_t> &audio::device::system_notifier() {
+    return audio::_system_notifier;
+}
+#endif
 
 std::string yas::to_string(audio::device::method const &method) {
     switch (method) {
-        case audio::device::method::hardware_did_change:
-            return "hardware_did_change";
         case audio::device::method::device_did_change:
             return "device_did_change";
-        case audio::device::method::configuration_change:
+    }
+}
+
+std::string yas::to_string(audio::device::system_method const &method) {
+    switch (method) {
+        case audio::device::system_method::hardware_did_change:
+            return "hardware_did_change";
+        case audio::device::system_method::configuration_change:
             return "configuration_change";
     }
 }
 
 std::ostream &operator<<(std::ostream &os, yas::audio::device::method const &value) {
+    os << to_string(value);
+    return os;
+}
+
+std::ostream &operator<<(std::ostream &os, yas::audio::device::system_method const &value) {
     os << to_string(value);
     return os;
 }

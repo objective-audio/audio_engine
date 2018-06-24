@@ -10,7 +10,6 @@
 #include "yas_audio_engine_offline_output.h"
 #include "yas_audio_graph.h"
 #include "yas_objc_ptr.h"
-#include "yas_observing.h"
 #include "yas_result.h"
 #include "yas_stl_utils.h"
 
@@ -36,7 +35,7 @@ class connection_for_engine : public audio::engine::connection {
 
 struct audio::engine::manager::impl : base::impl {
     weak<manager> _weak_manager;
-    subject_t _subject;
+    flow::notifier<flow_pair_t> _notifier;
 
     ~impl() {
 #if TARGET_OS_IPHONE
@@ -80,12 +79,13 @@ struct audio::engine::manager::impl : base::impl {
         _route_change_observer.set_object(route_change_observer);
 
 #elif TARGET_OS_MAC
-        _device_observer.add_handler(device::system_subject(), device::method::configuration_change,
-                                     [weak_manager = _weak_manager](auto const &context) {
-                                         if (auto engine = weak_manager.lock()) {
-                                             engine.impl_ptr<impl>()->post_configuration_change();
-                                         }
-                                     });
+        this->_device_system_flow = device::begin_system_flow(device::system_method::configuration_change)
+                                        .perform([weak_manager = this->_weak_manager](auto const &) {
+                                            if (auto engine = weak_manager.lock()) {
+                                                engine.impl_ptr<impl>()->post_configuration_change();
+                                            }
+                                        })
+                                        .end();
 #endif
     }
 
@@ -480,7 +480,7 @@ struct audio::engine::manager::impl : base::impl {
     }
 
     void post_configuration_change() {
-        _subject.notify(method::configuration_change, _weak_manager.lock());
+        this->_notifier.notify(std::make_pair(method::configuration_change, this->_weak_manager.lock()));
     }
 
    private:
@@ -488,7 +488,7 @@ struct audio::engine::manager::impl : base::impl {
     objc_ptr<id> _route_change_observer;
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
     audio::engine::device_io _device_io = nullptr;
-    audio::device::observer_t _device_observer;
+    flow::observer _device_system_flow = nullptr;
 #endif
 
     audio::graph _graph = nullptr;
@@ -635,8 +635,16 @@ void audio::engine::manager::stop() {
     impl_ptr<impl>()->stop();
 }
 
-audio::engine::manager::subject_t &audio::engine::manager::subject() const {
-    return impl_ptr<impl>()->_subject;
+flow::node_t<audio::engine::manager::flow_pair_t, false> audio::engine::manager::begin_flow() const {
+    return impl_ptr<impl>()->_notifier.begin_flow();
+}
+
+flow::node<audio::engine::manager, audio::engine::manager::flow_pair_t, audio::engine::manager::flow_pair_t, false>
+audio::engine::manager::begin_flow(method const method) const {
+    return impl_ptr<impl>()
+        ->_notifier.begin_flow()
+        .filter([method](auto const &pair) { return pair.first == method; })
+        .map([](flow_pair_t const &pair) { return pair.second; });
 }
 
 #if YAS_TEST
@@ -647,6 +655,10 @@ std::unordered_set<audio::engine::node> &audio::engine::manager::nodes() const {
 
 audio::engine::connection_set &audio::engine::manager::connections() const {
     return impl_ptr<impl>()->connections();
+}
+
+flow::notifier<audio::engine::manager::flow_pair_t> &audio::engine::manager::notifier() {
+    return impl_ptr<impl>()->_notifier;
 }
 
 #endif

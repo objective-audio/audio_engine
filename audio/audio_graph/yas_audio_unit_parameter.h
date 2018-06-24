@@ -6,13 +6,7 @@
 
 #include <AudioToolbox/AudioToolbox.h>
 #include "yas_base.h"
-
-namespace yas {
-template <typename T, typename K>
-class subject;
-template <typename T, typename K>
-class observer;
-}  // namespace yas
+#include "yas_flow.h"
 
 namespace yas::audio {
 class unit::parameter : public base {
@@ -28,8 +22,7 @@ class unit::parameter : public base {
 
     enum class method { will_change, did_change };
 
-    using subject_t = subject<method, change_info>;
-    using observer_t = observer<method, change_info>;
+    using flow_pair_t = std::pair<method, change_info>;
 
     parameter(AudioUnitParameterInfo const &info, AudioUnitParameterID const paramter_id, AudioUnitScope const scope);
     parameter(std::nullptr_t);
@@ -49,7 +42,8 @@ class unit::parameter : public base {
     void set_value(float const value, AudioUnitElement const element);
     std::unordered_map<AudioUnitElement, AudioUnitParameterValue> const &values() const;
 
-    subject_t &subject();
+    [[nodiscard]] flow::node_t<flow_pair_t, false> begin_flow() const;
+    [[nodiscard]] flow::node<change_info, flow_pair_t, flow_pair_t, false> begin_flow(method const) const;
 };
 }  // namespace yas::audio
 

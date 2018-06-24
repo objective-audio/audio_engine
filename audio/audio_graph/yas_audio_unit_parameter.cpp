@@ -4,7 +4,6 @@
 
 #include "yas_audio_unit.h"
 #include "yas_cf_utils.h"
-#include "yas_observing.h"
 
 using namespace yas;
 
@@ -20,7 +19,7 @@ struct audio::unit::parameter::impl : base::impl {
     std::unordered_map<AudioUnitElement, AudioUnitParameterValue> _values;
     std::string _unit_name;
     std::string _name;
-    subject_t _subject;
+    flow::notifier<flow_pair_t> _notifier;
 
     impl(AudioUnitParameterInfo const &info, AudioUnitParameterID const parameter_id, AudioUnitScope const scope)
         : _parameter_id(parameter_id),
@@ -41,14 +40,14 @@ struct audio::unit::parameter::impl : base::impl {
     void set_value(AudioUnitParameterValue const value, AudioUnitElement const element) {
         change_info info{
             .element = element,
-            .old_value = _values[element],
+            .old_value = this->_values[element],
             .new_value = value,
             .parameter = cast<audio::unit::parameter>(),
         };
 
-        _subject.notify(method::will_change, info);
+        this->_notifier.notify(std::make_pair(method::will_change, info));
         _values[element] = value;
-        _subject.notify(method::did_change, info);
+        this->_notifier.notify(std::make_pair(method::did_change, info));
     }
 };
 
@@ -114,8 +113,17 @@ std::unordered_map<AudioUnitElement, AudioUnitParameterValue> const &audio::unit
     return impl_ptr<impl>()->_values;
 }
 
-audio::unit::parameter::subject_t &audio::unit::parameter::subject() {
-    return impl_ptr<impl>()->_subject;
+flow::node_t<audio::unit::parameter::flow_pair_t, false> audio::unit::parameter::begin_flow() const {
+    return impl_ptr<impl>()->_notifier.begin_flow();
+}
+
+flow::node<audio::unit::parameter::change_info, audio::unit::parameter::flow_pair_t,
+           audio::unit::parameter::flow_pair_t, false>
+audio::unit::parameter::begin_flow(method const method) const {
+    return impl_ptr<impl>()
+        ->_notifier.begin_flow()
+        .filter([method](auto const &pair) { return pair.first == method; })
+        .map([](flow_pair_t const &pair) { return pair.second; });
 }
 
 #pragma mark -

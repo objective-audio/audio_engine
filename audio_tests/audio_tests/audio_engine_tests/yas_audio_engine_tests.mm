@@ -88,14 +88,12 @@ using namespace yas;
 
     XCTestExpectation *expectation = [self expectationWithDescription:@"configuration change"];
 
-    audio::engine::manager::observer_t observer;
-    observer.add_wild_card_handler(manager.subject(), [expectation](auto const &) { [expectation fulfill]; });
+    auto flow = manager.begin_flow().perform([expectation](auto const &){ [expectation fulfill]; }).end();
 
 #if TARGET_OS_IPHONE
     [[NSNotificationCenter defaultCenter] postNotificationName:AVAudioSessionRouteChangeNotification object:nil];
 #elif TARGET_OS_MAC
-    audio::device::system_subject().notify(audio::device::method::configuration_change,
-                                           audio::device::change_info{std::vector<audio::device::property_info>{}});
+    audio::device::system_notifier().notify(std::make_pair(audio::device::system_method::configuration_change, audio::device::change_info{std::vector<audio::device::property_info>{}}));
 #endif
 
     [self waitForExpectationsWithTimeout:1.0 handler:nil];

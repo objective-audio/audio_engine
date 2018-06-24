@@ -20,7 +20,7 @@ using namespace yas;
 
 struct audio::engine::device_io::impl : base::impl, manageable_device_io::impl {
     audio::engine::node _node = {{.input_bus_count = 1, .output_bus_count = 1}};
-    audio::engine::node::observer_t _connections_observer;
+    flow::observer _connections_flow = nullptr;
 
     virtual ~impl() final = default;
 
@@ -42,12 +42,13 @@ struct audio::engine::device_io::impl : base::impl, manageable_device_io::impl {
             }
         });
 
-        _connections_observer = _node.subject().make_observer(
-            audio::engine::node::method::update_connections, [weak_engine_device_io](auto const &) {
-                if (auto engine_device_io = weak_engine_device_io.lock()) {
-                    engine_device_io.impl_ptr<impl>()->_update_device_io_connections();
-                }
-            });
+        this->_connections_flow = this->_node.begin_flow(node::method::update_connections)
+                                      .perform([weak_engine_device_io](auto const &) {
+                                          if (auto engine_device_io = weak_engine_device_io.lock()) {
+                                              engine_device_io.impl_ptr<impl>()->_update_device_io_connections();
+                                          }
+                                      })
+                                      .end();
     }
 
     void add_device_io() override {

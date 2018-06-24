@@ -8,7 +8,6 @@
 #include "yas_audio_types.h"
 #include "yas_cf_utils.h"
 #include "yas_exception.h"
-#include "yas_observing.h"
 #include "yas_operation.h"
 #include "yas_property.h"
 #include "yas_result.h"

@@ -26,15 +26,28 @@ using namespace yas;
 }
 
 - (void)test_method_to_string {
-    XCTAssertEqual(to_string(audio::device::method::hardware_did_change), "hardware_did_change");
     XCTAssertEqual(to_string(audio::device::method::device_did_change), "device_did_change");
-    XCTAssertEqual(to_string(audio::device::method::configuration_change), "configuration_change");
+}
+
+- (void)test_system_method_string {
+    XCTAssertEqual(to_string(audio::device::system_method::hardware_did_change), "hardware_did_change");
+    XCTAssertEqual(to_string(audio::device::system_method::configuration_change), "configuration_change");
 }
 
 - (void)test_method_ostream {
-    auto const values = {audio::device::method::hardware_did_change, audio::device::method::device_did_change,
-                         audio::device::method::configuration_change};
+    auto const values = {audio::device::method::device_did_change};
 
+    for (auto const &value : values) {
+        std::ostringstream stream;
+        stream << value;
+        XCTAssertEqual(stream.str(), to_string(value));
+    }
+}
+
+- (void)test_system_method_ostream {
+    auto const values = {audio::device::system_method::hardware_did_change,
+        audio::device::system_method::configuration_change};
+    
     for (auto const &value : values) {
         std::ostringstream stream;
         stream << value;
