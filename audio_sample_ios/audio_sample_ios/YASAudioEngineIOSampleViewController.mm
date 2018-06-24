@@ -35,7 +35,7 @@ struct engine_io_vc_internal {
     audio::engine::au_mixer au_mixer;
     audio::engine::au_io au_io;
 
-    base engine_observer = nullptr;
+    flow::observer engine_flow = nullptr;
 
     engine_io_vc_internal() {
         au_mixer.set_input_volume(1.0, 0);
@@ -193,12 +193,14 @@ struct engine_io_vc_internal {
 
     auto unowned_self = make_objc_ptr([[YASUnownedObject alloc] initWithObject:self]);
 
-    _internal.engine_observer = _internal.manager.subject().make_observer(
-        audio::engine::manager::method::configuration_change, [unowned_self](auto const &context) {
-            if ([UIApplication sharedApplication].applicationState == UIApplicationStateActive) {
-                [[unowned_self.object() object] _updateEngine];
-            }
-        });
+    _internal.engine_flow =
+        _internal.manager.begin_flow(audio::engine::manager::method::configuration_change)
+            .perform([unowned_self](auto const &) {
+                if ([UIApplication sharedApplication].applicationState == UIApplicationStateActive) {
+                    [[unowned_self.object() object] _updateEngine];
+                }
+            })
+            .end();
 
     [self _connectNodes];
 }
@@ -353,7 +355,8 @@ struct engine_io_vc_internal {
         case YASAudioEngineIOSampleSectionNotify: {
             if (_internal.manager) {
                 auto &manager = _internal.manager;
-                manager.subject().notify(audio::engine::manager::method::configuration_change, manager);
+                manager.notifier().notify(
+                    std::make_pair(audio::engine::manager::method::configuration_change, manager));
             }
         } break;
 

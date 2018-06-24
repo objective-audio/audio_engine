@@ -37,7 +37,7 @@ struct audio::engine::route::impl : base::impl {
     audio::engine::node _node = {{.input_bus_count = std::numeric_limits<uint32_t>::max(),
                                   .output_bus_count = std::numeric_limits<uint32_t>::max()}};
     route_set_t _routes;
-    audio::engine::node::observer_t _reset_observer;
+    flow::observer _reset_flow = nullptr;
 
     virtual ~impl() final = default;
 
@@ -73,12 +73,13 @@ struct audio::engine::route::impl : base::impl {
             }
         });
 
-        _reset_observer =
-            _node.subject().make_observer(audio::engine::node::method::will_reset, [weak_route](auto const &) {
-                if (auto route = weak_route.lock()) {
-                    route.impl_ptr<audio::engine::route::impl>()->_will_reset();
-                }
-            });
+        this->_reset_flow = this->_node.begin_flow(node::method::will_reset)
+                                .perform([weak_route](auto const &) {
+                                    if (auto route = weak_route.lock()) {
+                                        route.impl_ptr<audio::engine::route::impl>()->_will_reset();
+                                    }
+                                })
+                                .end();
 
         _node.set_prepare_kernel_handler([weak_route](audio::engine::kernel &kernel) {
             if (auto route = weak_route.lock()) {

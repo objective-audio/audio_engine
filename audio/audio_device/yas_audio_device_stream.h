@@ -10,11 +10,6 @@
 
 #import "yas_audio_device.h"
 
-namespace yas {
-template <typename T, typename K>
-class subject;
-}
-
 namespace yas::audio {
 class device::stream : public base {
     class impl;
@@ -42,7 +37,7 @@ class device::stream : public base {
         change_info(std::vector<property_info> &&);
     };
 
-    using subject_t = yas::subject<method, change_info>;
+    using flow_pair_t = std::pair<method, change_info>;
 
     struct args {
         AudioStreamID stream_id;
@@ -59,7 +54,8 @@ class device::stream : public base {
     audio::format virtual_format() const;
     uint32_t starting_channel() const;
 
-    subject_t &subject() const;
+    [[nodiscard]] flow::node_t<flow_pair_t, false> begin_flow() const;
+    [[nodiscard]] flow::node<change_info, flow_pair_t, flow_pair_t, false> begin_flow(method const) const;
 
    private:
     template <typename T>

@@ -16,7 +16,6 @@ using namespace yas;
 
 struct audio::engine::node::impl : base::impl, manageable_node::impl, connectable_node::impl {
     weak<audio::engine::manager> _weak_manager;
-    subject_t _subject;
     uint32_t _input_bus_count = 0;
     uint32_t _output_bus_count = 0;
     bool _is_input_renderable = false;
@@ -27,6 +26,7 @@ struct audio::engine::node::impl : base::impl, manageable_node::impl, connectabl
     graph_editing_f _remove_from_graph_handler;
     prepare_kernel_f _prepare_kernel_handler;
     audio::engine::node::render_f _render_handler;
+    flow::notifier<flow_pair_t> _notifier;
 
     explicit impl(node_args &&args)
         : _input_bus_count(args.input_bus_count),
@@ -36,24 +36,24 @@ struct audio::engine::node::impl : base::impl, manageable_node::impl, connectabl
     }
 
     void reset() {
-        _subject.notify(audio::engine::node::method::will_reset, cast<audio::engine::node>());
+        this->_notifier.notify(std::make_pair(method::will_reset, cast<audio::engine::node>()));
 
-        _input_connections.clear();
-        _output_connections.clear();
-        _core.set_render_time(nullptr);
+        this->_input_connections.clear();
+        this->_output_connections.clear();
+        this->_core.set_render_time(nullptr);
 
-        update_kernel();
+        this->update_kernel();
     }
 
     audio::format input_format(uint32_t const bus_idx) {
-        if (auto connection = input_connection(bus_idx)) {
+        if (auto connection = this->input_connection(bus_idx)) {
             return connection.format();
         }
         return nullptr;
     }
 
     audio::format output_format(uint32_t const bus_idx) {
-        if (auto connection = output_connection(bus_idx)) {
+        if (auto connection = this->output_connection(bus_idx)) {
             return connection.format();
         }
         return nullptr;
@@ -61,16 +61,16 @@ struct audio::engine::node::impl : base::impl, manageable_node::impl, connectabl
 
     audio::bus_result_t next_available_input_bus() const {
         auto key = min_empty_key(_input_connections);
-        if (key && *key < input_bus_count()) {
+        if (key && *key < this->input_bus_count()) {
             return key;
         }
         return nullopt;
     }
 
     audio::bus_result_t next_available_output_bus() const {
-        auto key = min_empty_key(_output_connections);
+        auto key = min_empty_key(this->_output_connections);
         if (key && *key < output_bus_count()) {
-            auto &override_bus_idx = _override_output_bus_idx;
+            auto &override_bus_idx = this->_override_output_bus_idx;
             if (override_bus_idx && *key == 0) {
                 return *override_bus_idx;
             }
@@ -80,82 +80,82 @@ struct audio::engine::node::impl : base::impl, manageable_node::impl, connectabl
     }
 
     bool is_available_input_bus(uint32_t const bus_idx) const {
-        if (bus_idx >= input_bus_count()) {
+        if (bus_idx >= this->input_bus_count()) {
             return false;
         }
-        return _input_connections.count(bus_idx) == 0;
+        return this->_input_connections.count(bus_idx) == 0;
     }
 
     bool is_available_output_bus(uint32_t const bus_idx) const {
-        auto &override_bus_idx = _override_output_bus_idx;
+        auto &override_bus_idx = this->_override_output_bus_idx;
         auto target_bus_idx = (override_bus_idx && *override_bus_idx == bus_idx) ? 0 : bus_idx;
-        if (target_bus_idx >= output_bus_count()) {
+        if (target_bus_idx >= this->output_bus_count()) {
             return false;
         }
-        return _output_connections.count(target_bus_idx) == 0;
+        return this->_output_connections.count(target_bus_idx) == 0;
     }
 
     void override_output_bus_idx(std::experimental::optional<uint32_t> bus_idx) {
-        _override_output_bus_idx = bus_idx;
+        this->_override_output_bus_idx = bus_idx;
     }
 
     void set_input_bus_count(uint32_t const count) {
-        _input_bus_count = count;
+        this->_input_bus_count = count;
     }
 
     void set_output_bus_count(uint32_t const count) {
-        _output_bus_count = count;
+        this->_output_bus_count = count;
     }
 
     uint32_t input_bus_count() const {
-        return _input_bus_count;
+        return this->_input_bus_count;
     }
 
     uint32_t output_bus_count() const {
-        return _output_bus_count;
+        return this->_output_bus_count;
     }
 
     void set_is_input_renderable(bool const renderable) {
-        _is_input_renderable = renderable;
+        this->_is_input_renderable = renderable;
     }
 
     bool is_input_renderable() {
-        return _is_input_renderable;
+        return this->_is_input_renderable;
     }
 
     audio::engine::connection input_connection(uint32_t const bus_idx) override {
-        if (_input_connections.count(bus_idx) > 0) {
-            return _input_connections.at(bus_idx).lock();
+        if (this->_input_connections.count(bus_idx) > 0) {
+            return this->_input_connections.at(bus_idx).lock();
         }
         return nullptr;
     }
 
     audio::engine::connection output_connection(uint32_t const bus_idx) override {
-        if (_output_connections.count(bus_idx) > 0) {
-            return _output_connections.at(bus_idx).lock();
+        if (this->_output_connections.count(bus_idx) > 0) {
+            return this->_output_connections.at(bus_idx).lock();
         }
         return nullptr;
     }
 
     audio::engine::connection_wmap &input_connections() override {
-        return _input_connections;
+        return this->_input_connections;
     }
 
     audio::engine::connection_wmap &output_connections() override {
-        return _output_connections;
+        return this->_output_connections;
     }
 
     void update_connections() override {
-        _subject.notify(audio::engine::node::method::update_connections, cast<audio::engine::node>());
+        this->_notifier.notify(std::make_pair(method::update_connections, cast<audio::engine::node>()));
     }
 
     void add_connection(engine::connection const &connection) override {
         if (connection.destination_node().impl_ptr<impl>().get() == this) {
             auto bus_idx = connection.destination_bus();
-            _input_connections.insert(std::make_pair(bus_idx, weak<audio::engine::connection>(connection)));
+            this->_input_connections.insert(std::make_pair(bus_idx, weak<audio::engine::connection>(connection)));
         } else if (connection.source_node().impl_ptr<impl>().get() == this) {
             auto bus_idx = connection.source_bus();
-            _output_connections.insert(std::make_pair(bus_idx, weak<audio::engine::connection>(connection)));
+            this->_output_connections.insert(std::make_pair(bus_idx, weak<audio::engine::connection>(connection)));
         } else {
             throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : connection does not exist in a node.");
         }
@@ -166,13 +166,13 @@ struct audio::engine::node::impl : base::impl, manageable_node::impl, connectabl
     void remove_connection(engine::connection const &connection) override {
         if (auto destination_node = connection.destination_node()) {
             if (connection.destination_node().impl_ptr<impl>().get() == this) {
-                _input_connections.erase(connection.destination_bus());
+                this->_input_connections.erase(connection.destination_bus());
             }
         }
 
         if (auto source_node = connection.source_node()) {
             if (connection.source_node().impl_ptr<impl>().get() == this) {
-                _output_connections.erase(connection.source_bus());
+                this->_output_connections.erase(connection.source_bus());
             }
         }
 
@@ -180,7 +180,7 @@ struct audio::engine::node::impl : base::impl, manageable_node::impl, connectabl
     }
 
     void set_prepare_kernel_handler(prepare_kernel_f &&handler) {
-        _prepare_kernel_handler = std::move(handler);
+        this->_prepare_kernel_handler = std::move(handler);
     }
 
     void prepare_kernel(audio::engine::kernel &kernel) {
@@ -192,89 +192,85 @@ struct audio::engine::node::impl : base::impl, manageable_node::impl, connectabl
         manageable_kernel.set_input_connections(_input_connections);
         manageable_kernel.set_output_connections(_output_connections);
 
-        if (_prepare_kernel_handler) {
-            _prepare_kernel_handler(kernel);
+        if (this->_prepare_kernel_handler) {
+            this->_prepare_kernel_handler(kernel);
         }
     }
 
     void update_kernel() override {
         auto kernel = audio::engine::kernel{};
         prepare_kernel(kernel);
-        _core.set_kernel(kernel);
+        this->_core.set_kernel(kernel);
     }
 
     audio::engine::kernel kernel() {
-        return _core.kernel();
+        return this->_core.kernel();
     }
 
     audio::engine::manager manager() const override {
-        return _weak_manager.lock();
+        return this->_weak_manager.lock();
     }
 
     void set_manager(audio::engine::manager const &manager) override {
-        _weak_manager = manager;
+        this->_weak_manager = manager;
     }
 
     void set_add_to_graph_handler(graph_editing_f &&handler) override {
-        _add_to_graph_handler = std::move(handler);
+        this->_add_to_graph_handler = std::move(handler);
     }
 
     void set_remove_from_graph_handler(graph_editing_f &&handler) override {
-        _remove_from_graph_handler = std::move(handler);
+        this->_remove_from_graph_handler = std::move(handler);
     }
 
     graph_editing_f const &add_to_graph_handler() const override {
-        return _add_to_graph_handler;
+        return this->_add_to_graph_handler;
     }
 
     graph_editing_f const &remove_from_graph_handler() const override {
-        return _remove_from_graph_handler;
-    }
-
-    audio::engine::node::subject_t &subject() {
-        return _subject;
+        return this->_remove_from_graph_handler;
     }
 
     void set_render_handler(audio::engine::node::render_f &&handler) {
-        _render_handler = std::move(handler);
+        this->_render_handler = std::move(handler);
     }
 
     void render(render_args &&args) {
-        set_render_time_on_render(args.when);
+        this->set_render_time_on_render(args.when);
 
-        if (_render_handler) {
-            _render_handler(std::move(args));
+        if (this->_render_handler) {
+            this->_render_handler(std::move(args));
         }
     }
 
     audio::time render_time() {
-        return _core.render_time();
+        return this->_core.render_time();
     }
 
     void set_render_time_on_render(time const &time) {
-        _core.set_render_time(time);
+        this->_core.set_render_time(time);
     }
 
    private:
     struct core {
         void set_kernel(audio::engine::kernel kernel) {
-            std::lock_guard<std::recursive_mutex> lock(_mutex);
-            _kernel = std::move(kernel);
+            std::lock_guard<std::recursive_mutex> lock(this->_mutex);
+            this->_kernel = std::move(kernel);
         }
 
         audio::engine::kernel kernel() {
-            std::lock_guard<std::recursive_mutex> lock(_mutex);
-            return _kernel;
+            std::lock_guard<std::recursive_mutex> lock(this->_mutex);
+            return this->_kernel;
         }
 
         void set_render_time(time const &render_time) {
-            std::lock_guard<std::recursive_mutex> lock(_mutex);
-            _render_time = render_time;
+            std::lock_guard<std::recursive_mutex> lock(this->_mutex);
+            this->_render_time = render_time;
         }
 
         audio::time render_time() const {
-            std::lock_guard<std::recursive_mutex> lock(_mutex);
-            return _render_time;
+            std::lock_guard<std::recursive_mutex> lock(this->_mutex);
+            return this->_render_time;
         }
 
        private:
@@ -385,29 +381,37 @@ void audio::engine::node::set_render_time_on_render(const time &time) {
     impl_ptr<impl>()->set_render_time_on_render(time);
 }
 
-audio::engine::node::subject_t &audio::engine::node::subject() {
-    return impl_ptr<impl>()->subject();
+flow::node_t<audio::engine::node::flow_pair_t, false> audio::engine::node::begin_flow() const {
+    return impl_ptr<impl>()->_notifier.begin_flow();
+}
+
+flow::node<audio::engine::node, audio::engine::node::flow_pair_t, audio::engine::node::flow_pair_t, false>
+audio::engine::node::begin_flow(method const method) const {
+    return impl_ptr<impl>()
+        ->_notifier.begin_flow()
+        .filter([method](auto const &pair) { return pair.first == method; })
+        .map([](flow_pair_t const &pair) { return pair.second; });
 }
 
 audio::engine::connectable_node &audio::engine::node::connectable() {
-    if (!_connectable) {
-        _connectable = audio::engine::connectable_node{impl_ptr<connectable_node::impl>()};
+    if (!this->_connectable) {
+        this->_connectable = audio::engine::connectable_node{impl_ptr<connectable_node::impl>()};
     }
-    return _connectable;
+    return this->_connectable;
 }
 
 audio::engine::manageable_node const &audio::engine::node::manageable() const {
-    if (!_manageable) {
-        _manageable = audio::engine::manageable_node{impl_ptr<manageable_node::impl>()};
+    if (!this->_manageable) {
+        this->_manageable = audio::engine::manageable_node{impl_ptr<manageable_node::impl>()};
     }
-    return _manageable;
+    return this->_manageable;
 }
 
 audio::engine::manageable_node &audio::engine::node::manageable() {
-    if (!_manageable) {
-        _manageable = audio::engine::manageable_node{impl_ptr<manageable_node::impl>()};
+    if (!this->_manageable) {
+        this->_manageable = audio::engine::manageable_node{impl_ptr<manageable_node::impl>()};
     }
-    return _manageable;
+    return this->_manageable;
 }
 
 #pragma mark -

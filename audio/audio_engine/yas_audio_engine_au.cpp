@@ -60,19 +60,21 @@ struct audio::engine::au::impl : base::impl, manageable_au::impl {
             }
         });
 
-        _reset_observer =
-            _node.subject().make_observer(audio::engine::node::method::will_reset, [weak_au](auto const &) {
-                if (auto au = weak_au.lock()) {
-                    au.impl_ptr<audio::engine::au::impl>()->will_reset();
-                }
-            });
+        this->_reset_flow = this->_node.begin_flow(node::method::will_reset)
+                                .perform([weak_au](auto const &) {
+                                    if (auto au = weak_au.lock()) {
+                                        au.impl_ptr<audio::engine::au::impl>()->will_reset();
+                                    }
+                                })
+                                .end();
 
-        _connections_observer =
-            _node.subject().make_observer(audio::engine::node::method::update_connections, [weak_au](auto const &) {
-                if (auto au = weak_au.lock()) {
-                    au.impl_ptr<audio::engine::au::impl>()->update_unit_connections();
-                }
-            });
+        this->_connections_flow = this->_node.begin_flow(node::method::update_connections)
+                                      .perform([weak_au](auto const &) {
+                                          if (auto au = weak_au.lock()) {
+                                              au.impl_ptr<audio::engine::au::impl>()->update_unit_connections();
+                                          }
+                                      })
+                                      .end();
 
         _node.manageable().set_add_to_graph_handler([weak_au](audio::graph &graph) {
             if (auto au = weak_au.lock()) {
@@ -179,7 +181,7 @@ struct audio::engine::au::impl : base::impl, manageable_au::impl {
     }
 
     void update_unit_connections() {
-        _subject.notify(audio::engine::au::method::will_update_connections, cast<audio::engine::au>());
+        this->_notifier.notify(std::make_pair(au::method::will_update_connections, cast<audio::engine::au>()));
 
         if (auto unit = core_unit()) {
             auto input_bus_count = input_element_count();
@@ -222,7 +224,7 @@ struct audio::engine::au::impl : base::impl, manageable_au::impl {
             }
         }
 
-        _subject.notify(audio::engine::au::method::did_update_connections, cast<audio::engine::au>());
+        this->_notifier.notify(std::make_pair(au::method::did_update_connections, cast<audio::engine::au>()));
     }
 
     void prepare_unit() override {
@@ -258,9 +260,9 @@ struct audio::engine::au::impl : base::impl, manageable_au::impl {
     audio::engine::node _node;
     AudioComponentDescription _acd;
     std::unordered_map<AudioUnitScope, unit::parameter_map_t> _parameters;
-    audio::engine::au::subject_t _subject;
-    audio::engine::node::observer_t _reset_observer;
-    audio::engine::node::observer_t _connections_observer;
+    flow::notifier<flow_pair_t> _notifier;
+    flow::observer _reset_flow = nullptr;
+    flow::observer _connections_flow = nullptr;
     prepare_unit_f _prepare_unit_handler;
 
    private:
@@ -392,8 +394,16 @@ float audio::engine::au::output_parameter_value(AudioUnitParameterID const param
     return impl_ptr<impl>()->output_parameter_value(parameter_id, element);
 }
 
-audio::engine::au::subject_t &audio::engine::au::subject() {
-    return impl_ptr<impl>()->_subject;
+flow::node_t<audio::engine::au::flow_pair_t, false> audio::engine::au::begin_flow() const {
+    return impl_ptr<impl>()->_notifier.begin_flow();
+}
+
+flow::node<audio::engine::au, audio::engine::au::flow_pair_t, audio::engine::au::flow_pair_t, false>
+audio::engine::au::begin_flow(method const method) const {
+    return impl_ptr<impl>()
+        ->_notifier.begin_flow()
+        .filter([method](auto const &pair) { return pair.first == method; })
+        .map([](flow_pair_t const &pair) { return pair.second; });
 }
 
 audio::engine::node const &audio::engine::au::node() const {

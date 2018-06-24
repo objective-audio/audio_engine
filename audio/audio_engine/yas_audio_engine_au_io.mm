@@ -53,12 +53,14 @@ struct audio::engine::au_io::impl : base::impl {
     ~impl() = default;
 
     void prepare(audio::engine::au_io &au_io) {
-        _connection_observer = au().subject().make_observer(
-            audio::engine::au::method::did_update_connections, [weak_au_io = to_weak(au_io)](auto const &) {
-                if (auto au_io = weak_au_io.lock()) {
-                    au_io.impl_ptr<impl>()->update_unit_io_connections();
-                }
-            });
+        this->_connections_flow = this->au()
+                                      .begin_flow(au::method::did_update_connections)
+                                      .perform([weak_au_io = to_weak(au_io)](auto const &) {
+                                          if (auto au_io = weak_au_io.lock()) {
+                                              au_io.impl_ptr<impl>()->update_unit_io_connections();
+                                          }
+                                      })
+                                      .end();
     }
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
@@ -152,11 +154,7 @@ struct audio::engine::au_io::impl : base::impl {
         unit.set_channel_map(output_map, kAudioUnitScope_Output, output_idx);
         unit.set_channel_map(input_map, kAudioUnitScope_Output, input_idx);
 
-        subject().notify(audio::engine::au_io::method::did_update_connection, cast<audio::engine::au_io>());
-    }
-
-    audio::engine::au_io::subject_t &subject() {
-        return _subject;
+        this->_notifier.notify(std::make_pair(au_io::method::did_update_connection, cast<audio::engine::au_io>()));
     }
 
     audio::engine::au &au() {
@@ -165,8 +163,8 @@ struct audio::engine::au_io::impl : base::impl {
 
     audio::engine::au _au;
     channel_map_t _channel_map[2];
-    audio::engine::au_io::subject_t _subject;
-    audio::engine::au::observer_t _connection_observer;
+    flow::notifier<flow_pair_t> _notifier;
+    flow::observer _connections_flow = nullptr;
 };
 
 #pragma mark - audio::engine::au_io
@@ -215,8 +213,16 @@ audio::device audio::engine::au_io::device() const {
 
 #endif
 
-audio::engine::au_io::subject_t &audio::engine::au_io::subject() {
-    return impl_ptr<impl>()->subject();
+flow::node_t<audio::engine::au_io::flow_pair_t, false> audio::engine::au_io::begin_flow() const {
+    return impl_ptr<impl>()->_notifier.begin_flow();
+}
+
+flow::node<audio::engine::au_io, audio::engine::au_io::flow_pair_t, audio::engine::au_io::flow_pair_t, false>
+audio::engine::au_io::begin_flow(method const method) const {
+    return impl_ptr<impl>()
+        ->_notifier.begin_flow()
+        .filter([method](auto const &pair) { return pair.first == method; })
+        .map([](flow_pair_t const &pair) { return pair.second; });
 }
 
 audio::engine::au const &audio::engine::au_io::au() const {
@@ -271,12 +277,13 @@ struct yas::audio::engine::au_input::impl : base::impl {
     ~impl() = default;
 
     void prepare(audio::engine::au_input const &au_input) {
-        _connections_observer = _au_io.subject().make_observer(
-            audio::engine::au_io::method::did_update_connection, [weak_au_input = to_weak(au_input)](auto const &) {
-                if (auto au_input = weak_au_input.lock()) {
-                    au_input.impl_ptr<impl>()->update_unit_input_connections();
-                }
-            });
+        this->_connections_flow = this->_au_io.begin_flow(au_io::method::did_update_connection)
+                                      .perform([weak_au_input = to_weak(au_input)](auto const &) {
+                                          if (auto au_input = weak_au_input.lock()) {
+                                              au_input.impl_ptr<impl>()->update_unit_input_connections();
+                                          }
+                                      })
+                                      .end();
     }
 
     void update_unit_input_connections() {
@@ -325,7 +332,7 @@ struct yas::audio::engine::au_input::impl : base::impl {
     audio::engine::au_io _au_io;
 
     pcm_buffer _input_buffer = nullptr;
-    audio::engine::au_io::observer_t _connections_observer;
+    flow::observer _connections_flow = nullptr;
 };
 
 #pragma mark - audio::engine::au_input

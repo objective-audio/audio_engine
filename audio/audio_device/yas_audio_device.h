@@ -13,13 +13,7 @@
 #include <vector>
 #include "yas_audio_types.h"
 #include "yas_base.h"
-
-namespace yas {
-template <typename T, typename K>
-class subject;
-template <typename T, typename K>
-class observer;
-}  // namespace yas
+#include "yas_flow.h"
 
 namespace yas::audio {
 class device_global;
@@ -37,7 +31,8 @@ class device : public base {
         format,
     };
 
-    enum class method { hardware_did_change, device_did_change, configuration_change };
+    enum class method { device_did_change };
+    enum class system_method { hardware_did_change, configuration_change };
 
     struct property_info {
         AudioObjectID const object_id;
@@ -51,8 +46,8 @@ class device : public base {
         std::vector<property_info> const property_infos;
     };
 
-    using subject_t = subject<method, change_info>;
-    using observer_t = observer<method, change_info>;
+    using flow_pair_t = std::pair<method, change_info>;
+    using flow_system_pair_t = std::pair<system_method, change_info>;
 
     static std::vector<device> all_devices();
     static std::vector<device> output_devices();
@@ -78,8 +73,15 @@ class device : public base {
     uint32_t input_channel_count() const;
     uint32_t output_channel_count() const;
 
-    static subject_t &system_subject();
-    subject_t &subject() const;
+    [[nodiscard]] flow::node_t<flow_pair_t, false> begin_flow() const;
+    [[nodiscard]] flow::node<change_info, flow_pair_t, flow_pair_t, false> begin_flow(method const) const;
+    [[nodiscard]] static flow::node_t<flow_system_pair_t, false> begin_system_flow();
+    [[nodiscard]] static flow::node<change_info, flow_system_pair_t, flow_system_pair_t, false> begin_system_flow(
+        system_method const);
+
+#if YAS_TEST
+    static flow::notifier<flow_system_pair_t> &system_notifier();
+#endif
 
    protected:
     explicit device(AudioDeviceID const device_id);
@@ -88,9 +90,11 @@ class device : public base {
 
 namespace yas {
 std::string to_string(audio::device::method const &);
-}
+std::string to_string(audio::device::system_method const &);
+}  // namespace yas
 
 std::ostream &operator<<(std::ostream &, yas::audio::device::method const &);
+std::ostream &operator<<(std::ostream &, yas::audio::device::system_method const &);
 
 #include "yas_audio_device_stream.h"
 

@@ -9,7 +9,7 @@
 #include "yas_audio_engine_node_protocol.h"
 #include "yas_audio_unit.h"
 #include "yas_base.h"
-#include "yas_observing.h"
+#include "yas_flow.h"
 
 namespace yas::audio {
 class graph;
@@ -27,8 +27,7 @@ class au : public base {
         did_update_connections,
     };
 
-    using subject_t = subject<method, au>;
-    using observer_t = observer<method, au>;
+    using flow_pair_t = std::pair<method, au>;
     using prepare_unit_f = std::function<void(audio::unit &)>;
 
     struct args {
@@ -64,7 +63,8 @@ class au : public base {
                                     AudioUnitElement const element);
     float output_parameter_value(AudioUnitParameterID const parameter_id, AudioUnitElement const element) const;
 
-    subject_t &subject();
+    [[nodiscard]] flow::node_t<flow_pair_t, false> begin_flow() const;
+    [[nodiscard]] flow::node<au, flow_pair_t, flow_pair_t, false> begin_flow(method const) const;
 
     audio::engine::node const &node() const;
     audio::engine::node &node();

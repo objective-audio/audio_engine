@@ -7,7 +7,6 @@
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
 
 #include "yas_audio_format.h"
-#include "yas_observing.h"
 
 using namespace yas;
 
@@ -47,7 +46,7 @@ struct audio::device::stream::impl : base::impl {
    public:
     AudioStreamID _stream_id;
     AudioDeviceID _device_id;
-    subject_t _subject;
+    flow::notifier<flow_pair_t> _notifier;
 
     impl(AudioStreamID const stream_id, AudioDeviceID const device_id) : _stream_id(stream_id), _device_id(device_id) {
     }
@@ -81,7 +80,7 @@ struct audio::device::stream::impl : base::impl {
                     }
                 }
                 change_info change_info{std::move(infos)};
-                stream.subject().notify(method::did_change, change_info);
+                stream.impl_ptr<impl>()->_notifier.notify(std::make_pair(method::did_change, change_info));
             }
         };
     }
@@ -154,8 +153,17 @@ uint32_t audio::device::stream::starting_channel() const {
     return 0;
 }
 
-audio::device::stream::subject_t &audio::device::stream::subject() const {
-    return impl_ptr<impl>()->_subject;
+flow::node_t<audio::device::stream::flow_pair_t, false> audio::device::stream::begin_flow() const {
+    return impl_ptr<impl>()->_notifier.begin_flow();
+}
+
+flow::node<audio::device::stream::change_info, audio::device::stream::flow_pair_t, audio::device::stream::flow_pair_t,
+           false>
+audio::device::stream::begin_flow(method const method) const {
+    return impl_ptr<impl>()
+        ->_notifier.begin_flow()
+        .filter([method](auto const &pair) { return pair.first == method; })
+        .map([](audio::device::stream::flow_pair_t const &pair) { return pair.second; });
 }
 
 std::string yas::to_string(audio::device::stream::method const &method) {

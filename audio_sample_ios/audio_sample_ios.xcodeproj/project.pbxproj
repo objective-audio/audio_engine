@@ -147,6 +147,10 @@
 		B6E52AE51ABD362300D2C45A /* YASAudioEngineEffectsSampleEditViewController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = YASAudioEngineEffectsSampleEditViewController.mm; sourceTree = "<group>"; };
 		B6E52AE71ABD3B5500D2C45A /* YASAudioEngineSampleParameterCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YASAudioEngineSampleParameterCell.h; sourceTree = "<group>"; };
 		B6E52AE81ABD3B5500D2C45A /* YASAudioEngineSampleParameterCell.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = YASAudioEngineSampleParameterCell.mm; sourceTree = "<group>"; };
+		B6ECDEC920DE08B80032837E /* yas_flow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yas_flow.h; sourceTree = "<group>"; };
+		B6ECDECA20DE08B80032837E /* yas_flow_private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yas_flow_private.h; sourceTree = "<group>"; };
+		B6ECDECB20DE08B90032837E /* yas_flow_protocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yas_flow_protocol.h; sourceTree = "<group>"; };
+		B6ECDECC20DE08B90032837E /* yas_flow_utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yas_flow_utils.h; sourceTree = "<group>"; };
 		B6F2CA791CDE0F3600EF584B /* yas_objc_macros.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yas_objc_macros.h; sourceTree = "<group>"; };
 		B6F2CA7B1CDE0FAC00EF584B /* yas_base.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = yas_base.cpp; sourceTree = "<group>"; };
 		B6F2CA7C1CDE0FAC00EF584B /* yas_base.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yas_base.h; sourceTree = "<group>"; };
@@ -504,6 +508,10 @@
 				B6F2CAA11CDE0FAC00EF584B /* yas_version.h */,
 				B610E98E2066038A004A46B5 /* yas_data_private.h */,
 				B610E98D2066038A004A46B5 /* yas_data.h */,
+				B6ECDECA20DE08B80032837E /* yas_flow_private.h */,
+				B6ECDECB20DE08B90032837E /* yas_flow_protocol.h */,
+				B6ECDECC20DE08B90032837E /* yas_flow_utils.h */,
+				B6ECDEC920DE08B80032837E /* yas_flow.h */,
 			);
 			name = cpp_utils;
 			path = ../submodules/cpp_utils/cpp_utils;
@@ -545,7 +553,7 @@
 		B62ED51B1A6280C0007DDE96 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0910;
+				LastUpgradeCheck = 0940;
 				ORGANIZATIONNAME = "Objective-Audio";
 				TargetAttributes = {
 					B62ED5221A6280C0007DDE96 = {
@@ -697,12 +705,14 @@
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
@@ -721,6 +731,7 @@
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
+					"YAS_TEST=1",
 				);
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -749,12 +760,14 @@
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
@@ -768,6 +781,7 @@
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = "YAS_TEST=1";
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
@@ -786,6 +800,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_OBJC_WEAK = YES;
 				INFOPLIST_FILE = audio_sample_ios/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "jp.objective-audio.$(PRODUCT_NAME:rfc1034identifier)";
@@ -797,6 +812,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_OBJC_WEAK = YES;
 				INFOPLIST_FILE = audio_sample_ios/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "jp.objective-audio.$(PRODUCT_NAME:rfc1034identifier)";

@@ -27,12 +27,13 @@ struct audio::engine::au_mixer::impl : base::impl {
     }
 
     void prepare(audio::engine::au_mixer const &au_mixer) {
-        _connections_observer = _au.subject().make_observer(
-            audio::engine::au::method::will_update_connections, [weak_au_mixer = to_weak(au_mixer)](auto const &) {
-                if (auto au_mixer = weak_au_mixer.lock()) {
-                    au_mixer.impl_ptr<impl>()->update_unit_mixer_connections();
-                }
-            });
+        this->_connections_flow = this->_au.begin_flow(au::method::will_update_connections)
+                                      .perform([weak_au_mixer = to_weak(au_mixer)](auto const &) {
+                                          if (auto au_mixer = weak_au_mixer.lock()) {
+                                              au_mixer.impl_ptr<impl>()->update_unit_mixer_connections();
+                                          }
+                                      })
+                                      .end();
     }
 
    private:
@@ -48,7 +49,7 @@ struct audio::engine::au_mixer::impl : base::impl {
         }
     }
 
-    audio::engine::au::observer_t _connections_observer;
+    flow::observer _connections_flow = nullptr;
 };
 
 #pragma mark - main
