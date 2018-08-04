@@ -46,12 +46,12 @@ using namespace yas;
     XCTAssertEqual(parameter.has_clump(), true);
 }
 
-- (void)test_will_change_flow {
+- (void)test_will_change_chain {
     audio::unit::parameter parameter{AudioUnitParameterInfo{}, 0, 0};
 
     bool called = false;
 
-    auto will_flow = parameter.begin_flow(audio::unit::parameter::method::will_change).perform([self, &called](auto const &change_info){
+    auto will_chain = parameter.chain(audio::unit::parameter::method::will_change).perform([self, &called](auto const &change_info){
         AudioUnitElement const element = change_info.element;
         XCTAssertEqual(element, 2);
         XCTAssertEqual(change_info.old_value, 0.0f);
@@ -65,14 +65,14 @@ using namespace yas;
     XCTAssertTrue(called);
 }
 
-- (void)test_did_change_flow {
+- (void)test_did_change_chain {
     audio::unit::parameter parameter{AudioUnitParameterInfo{}, 0, 0};
 
     parameter.set_value(-1.0f, 10);
 
     bool called = false;
 
-    auto did_flow = parameter.begin_flow(audio::unit::parameter::method::did_change).perform([self, &called](auto const &change_info){
+    auto did_chain = parameter.chain(audio::unit::parameter::method::did_change).perform([self, &called](auto const &change_info){
         AudioUnitElement const element = change_info.element;
         XCTAssertEqual(element, 10);
         XCTAssertEqual(change_info.old_value, -1.0f);

@@ -88,7 +88,7 @@ using namespace yas;
 
     XCTestExpectation *expectation = [self expectationWithDescription:@"configuration change"];
 
-    auto flow = manager.begin_flow().perform([expectation](auto const &){ [expectation fulfill]; }).end();
+    auto chain = manager.chain().perform([expectation](auto const &){ [expectation fulfill]; }).end();
 
 #if TARGET_OS_IPHONE
     [[NSNotificationCenter defaultCenter] postNotificationName:AVAudioSessionRouteChangeNotification object:nil];

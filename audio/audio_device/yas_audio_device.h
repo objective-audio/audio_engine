@@ -13,7 +13,7 @@
 #include <vector>
 #include "yas_audio_types.h"
 #include "yas_base.h"
-#include "yas_flow.h"
+#include "yas_chaining.h"
 
 namespace yas::audio {
 class device_global;
@@ -46,8 +46,8 @@ class device : public base {
         std::vector<property_info> const property_infos;
     };
 
-    using flow_pair_t = std::pair<method, change_info>;
-    using flow_system_pair_t = std::pair<system_method, change_info>;
+    using chaining_pair_t = std::pair<method, change_info>;
+    using chaining_system_pair_t = std::pair<system_method, change_info>;
 
     static std::vector<device> all_devices();
     static std::vector<device> output_devices();
@@ -73,14 +73,14 @@ class device : public base {
     uint32_t input_channel_count() const;
     uint32_t output_channel_count() const;
 
-    [[nodiscard]] flow::node_t<flow_pair_t, false> begin_flow() const;
-    [[nodiscard]] flow::node<change_info, flow_pair_t, flow_pair_t, false> begin_flow(method const) const;
-    [[nodiscard]] static flow::node_t<flow_system_pair_t, false> begin_system_flow();
-    [[nodiscard]] static flow::node<change_info, flow_system_pair_t, flow_system_pair_t, false> begin_system_flow(
-        system_method const);
+    [[nodiscard]] chaining::node_t<chaining_pair_t, false> chain() const;
+    [[nodiscard]] chaining::node<change_info, chaining_pair_t, chaining_pair_t, false> chain(method const) const;
+    [[nodiscard]] static chaining::node_t<chaining_system_pair_t, false> system_chain();
+    [[nodiscard]] static chaining::node<change_info, chaining_system_pair_t, chaining_system_pair_t, false>
+    system_chain(system_method const);
 
 #if YAS_TEST
-    static flow::notifier<flow_system_pair_t> &system_notifier();
+    static chaining::notifier<chaining_system_pair_t> &system_notifier();
 #endif
 
    protected:

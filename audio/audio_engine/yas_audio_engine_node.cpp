@@ -26,7 +26,7 @@ struct audio::engine::node::impl : base::impl, manageable_node::impl, connectabl
     graph_editing_f _remove_from_graph_handler;
     prepare_kernel_f _prepare_kernel_handler;
     audio::engine::node::render_f _render_handler;
-    flow::notifier<flow_pair_t> _notifier;
+    chaining::notifier<chaining_pair_t> _notifier;
 
     explicit impl(node_args &&args)
         : _input_bus_count(args.input_bus_count),
@@ -381,16 +381,16 @@ void audio::engine::node::set_render_time_on_render(const time &time) {
     impl_ptr<impl>()->set_render_time_on_render(time);
 }
 
-flow::node_t<audio::engine::node::flow_pair_t, false> audio::engine::node::begin_flow() const {
-    return impl_ptr<impl>()->_notifier.begin_flow();
+chaining::node_t<audio::engine::node::chaining_pair_t, false> audio::engine::node::chain() const {
+    return impl_ptr<impl>()->_notifier.chain();
 }
 
-flow::node<audio::engine::node, audio::engine::node::flow_pair_t, audio::engine::node::flow_pair_t, false>
-audio::engine::node::begin_flow(method const method) const {
+chaining::node<audio::engine::node, audio::engine::node::chaining_pair_t, audio::engine::node::chaining_pair_t, false>
+audio::engine::node::chain(method const method) const {
     return impl_ptr<impl>()
-        ->_notifier.begin_flow()
-        .filter([method](auto const &pair) { return pair.first == method; })
-        .map([](flow_pair_t const &pair) { return pair.second; });
+        ->_notifier.chain()
+        .guard([method](auto const &pair) { return pair.first == method; })
+        .to([](chaining_pair_t const &pair) { return pair.second; });
 }
 
 audio::engine::connectable_node &audio::engine::node::connectable() {

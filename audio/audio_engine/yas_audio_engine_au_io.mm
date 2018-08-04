@@ -53,14 +53,14 @@ struct audio::engine::au_io::impl : base::impl {
     ~impl() = default;
 
     void prepare(audio::engine::au_io &au_io) {
-        this->_connections_flow = this->au()
-                                      .begin_flow(au::method::did_update_connections)
-                                      .perform([weak_au_io = to_weak(au_io)](auto const &) {
-                                          if (auto au_io = weak_au_io.lock()) {
-                                              au_io.impl_ptr<impl>()->update_unit_io_connections();
-                                          }
-                                      })
-                                      .end();
+        this->_connections_observer = this->au()
+                                       .chain(au::method::did_update_connections)
+                                       .perform([weak_au_io = to_weak(au_io)](auto const &) {
+                                           if (auto au_io = weak_au_io.lock()) {
+                                               au_io.impl_ptr<impl>()->update_unit_io_connections();
+                                           }
+                                       })
+                                       .end();
     }
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
@@ -163,8 +163,8 @@ struct audio::engine::au_io::impl : base::impl {
 
     audio::engine::au _au;
     channel_map_t _channel_map[2];
-    flow::notifier<flow_pair_t> _notifier;
-    flow::observer _connections_flow = nullptr;
+    chaining::notifier<chaining_pair_t> _notifier;
+    chaining::observer _connections_observer = nullptr;
 };
 
 #pragma mark - audio::engine::au_io
@@ -213,16 +213,17 @@ audio::device audio::engine::au_io::device() const {
 
 #endif
 
-flow::node_t<audio::engine::au_io::flow_pair_t, false> audio::engine::au_io::begin_flow() const {
-    return impl_ptr<impl>()->_notifier.begin_flow();
+chaining::node_t<audio::engine::au_io::chaining_pair_t, false> audio::engine::au_io::chain() const {
+    return impl_ptr<impl>()->_notifier.chain();
 }
 
-flow::node<audio::engine::au_io, audio::engine::au_io::flow_pair_t, audio::engine::au_io::flow_pair_t, false>
-audio::engine::au_io::begin_flow(method const method) const {
+chaining::node<audio::engine::au_io, audio::engine::au_io::chaining_pair_t, audio::engine::au_io::chaining_pair_t,
+               false>
+audio::engine::au_io::chain(method const method) const {
     return impl_ptr<impl>()
-        ->_notifier.begin_flow()
-        .filter([method](auto const &pair) { return pair.first == method; })
-        .map([](flow_pair_t const &pair) { return pair.second; });
+        ->_notifier.chain()
+        .guard([method](auto const &pair) { return pair.first == method; })
+        .to([](chaining_pair_t const &pair) { return pair.second; });
 }
 
 audio::engine::au const &audio::engine::au_io::au() const {
@@ -277,13 +278,13 @@ struct yas::audio::engine::au_input::impl : base::impl {
     ~impl() = default;
 
     void prepare(audio::engine::au_input const &au_input) {
-        this->_connections_flow = this->_au_io.begin_flow(au_io::method::did_update_connection)
-                                      .perform([weak_au_input = to_weak(au_input)](auto const &) {
-                                          if (auto au_input = weak_au_input.lock()) {
-                                              au_input.impl_ptr<impl>()->update_unit_input_connections();
-                                          }
-                                      })
-                                      .end();
+        this->_connections_observer = this->_au_io.chain(au_io::method::did_update_connection)
+                                       .perform([weak_au_input = to_weak(au_input)](auto const &) {
+                                           if (auto au_input = weak_au_input.lock()) {
+                                               au_input.impl_ptr<impl>()->update_unit_input_connections();
+                                           }
+                                       })
+                                       .end();
     }
 
     void update_unit_input_connections() {
@@ -332,7 +333,7 @@ struct yas::audio::engine::au_input::impl : base::impl {
     audio::engine::au_io _au_io;
 
     pcm_buffer _input_buffer = nullptr;
-    flow::observer _connections_flow = nullptr;
+    chaining::observer _connections_observer = nullptr;
 };
 
 #pragma mark - audio::engine::au_input

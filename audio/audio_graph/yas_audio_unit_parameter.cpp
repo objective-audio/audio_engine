@@ -19,7 +19,7 @@ struct audio::unit::parameter::impl : base::impl {
     std::unordered_map<AudioUnitElement, AudioUnitParameterValue> _values;
     std::string _unit_name;
     std::string _name;
-    flow::notifier<flow_pair_t> _notifier;
+    chaining::notifier<chaining_pair_t> _notifier;
 
     impl(AudioUnitParameterInfo const &info, AudioUnitParameterID const parameter_id, AudioUnitScope const scope)
         : _parameter_id(parameter_id),
@@ -113,17 +113,17 @@ std::unordered_map<AudioUnitElement, AudioUnitParameterValue> const &audio::unit
     return impl_ptr<impl>()->_values;
 }
 
-flow::node_t<audio::unit::parameter::flow_pair_t, false> audio::unit::parameter::begin_flow() const {
-    return impl_ptr<impl>()->_notifier.begin_flow();
+chaining::node_t<audio::unit::parameter::chaining_pair_t, false> audio::unit::parameter::chain() const {
+    return impl_ptr<impl>()->_notifier.chain();
 }
 
-flow::node<audio::unit::parameter::change_info, audio::unit::parameter::flow_pair_t,
-           audio::unit::parameter::flow_pair_t, false>
-audio::unit::parameter::begin_flow(method const method) const {
+chaining::node<audio::unit::parameter::change_info, audio::unit::parameter::chaining_pair_t,
+               audio::unit::parameter::chaining_pair_t, false>
+audio::unit::parameter::chain(method const method) const {
     return impl_ptr<impl>()
-        ->_notifier.begin_flow()
-        .filter([method](auto const &pair) { return pair.first == method; })
-        .map([](flow_pair_t const &pair) { return pair.second; });
+        ->_notifier.chain()
+        .guard([method](auto const &pair) { return pair.first == method; })
+        .to([](chaining_pair_t const &pair) { return pair.second; });
 }
 
 #pragma mark -

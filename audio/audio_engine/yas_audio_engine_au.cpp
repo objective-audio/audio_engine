@@ -60,21 +60,21 @@ struct audio::engine::au::impl : base::impl, manageable_au::impl {
             }
         });
 
-        this->_reset_flow = this->_node.begin_flow(node::method::will_reset)
-                                .perform([weak_au](auto const &) {
-                                    if (auto au = weak_au.lock()) {
-                                        au.impl_ptr<audio::engine::au::impl>()->will_reset();
-                                    }
-                                })
-                                .end();
+        this->_reset_observer = this->_node.chain(node::method::will_reset)
+                                    .perform([weak_au](auto const &) {
+                                        if (auto au = weak_au.lock()) {
+                                            au.impl_ptr<audio::engine::au::impl>()->will_reset();
+                                        }
+                                    })
+                                    .end();
 
-        this->_connections_flow = this->_node.begin_flow(node::method::update_connections)
-                                      .perform([weak_au](auto const &) {
-                                          if (auto au = weak_au.lock()) {
-                                              au.impl_ptr<audio::engine::au::impl>()->update_unit_connections();
-                                          }
-                                      })
-                                      .end();
+        this->_connections_observer = this->_node.chain(node::method::update_connections)
+                                          .perform([weak_au](auto const &) {
+                                              if (auto au = weak_au.lock()) {
+                                                  au.impl_ptr<audio::engine::au::impl>()->update_unit_connections();
+                                              }
+                                          })
+                                          .end();
 
         _node.manageable().set_add_to_graph_handler([weak_au](audio::graph &graph) {
             if (auto au = weak_au.lock()) {
@@ -260,9 +260,9 @@ struct audio::engine::au::impl : base::impl, manageable_au::impl {
     audio::engine::node _node;
     AudioComponentDescription _acd;
     std::unordered_map<AudioUnitScope, unit::parameter_map_t> _parameters;
-    flow::notifier<flow_pair_t> _notifier;
-    flow::observer _reset_flow = nullptr;
-    flow::observer _connections_flow = nullptr;
+    chaining::notifier<chaining_pair_t> _notifier;
+    chaining::observer _reset_observer = nullptr;
+    chaining::observer _connections_observer = nullptr;
     prepare_unit_f _prepare_unit_handler;
 
    private:
@@ -394,16 +394,16 @@ float audio::engine::au::output_parameter_value(AudioUnitParameterID const param
     return impl_ptr<impl>()->output_parameter_value(parameter_id, element);
 }
 
-flow::node_t<audio::engine::au::flow_pair_t, false> audio::engine::au::begin_flow() const {
-    return impl_ptr<impl>()->_notifier.begin_flow();
+chaining::node_t<audio::engine::au::chaining_pair_t, false> audio::engine::au::chain() const {
+    return impl_ptr<impl>()->_notifier.chain();
 }
 
-flow::node<audio::engine::au, audio::engine::au::flow_pair_t, audio::engine::au::flow_pair_t, false>
-audio::engine::au::begin_flow(method const method) const {
+chaining::node<audio::engine::au, audio::engine::au::chaining_pair_t, audio::engine::au::chaining_pair_t, false>
+audio::engine::au::chain(method const method) const {
     return impl_ptr<impl>()
-        ->_notifier.begin_flow()
-        .filter([method](auto const &pair) { return pair.first == method; })
-        .map([](flow_pair_t const &pair) { return pair.second; });
+        ->_notifier.chain()
+        .guard([method](auto const &pair) { return pair.first == method; })
+        .to([](chaining_pair_t const &pair) { return pair.second; });
 }
 
 audio::engine::node const &audio::engine::au::node() const {

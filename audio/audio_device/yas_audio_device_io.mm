@@ -64,14 +64,14 @@ struct audio::device_io::impl : base::impl {
     AudioDeviceIOProcID _io_proc_id = nullptr;
     pcm_buffer _input_buffer_on_render = nullptr;
     audio::time _input_time_on_render = nullptr;
-    flow::observer _device_system_flow = nullptr;
-    std::unordered_map<std::uintptr_t, flow::observer> _device_flows;
+    chaining::observer _device_system_observer = nullptr;
+    std::unordered_map<std::uintptr_t, chaining::observer> _device_observers;
 
     impl() {
     }
 
     ~impl() {
-        this->_device_system_flow = nullptr;
+        this->_device_system_observer = nullptr;
 
         uninitialize();
     }
@@ -79,8 +79,8 @@ struct audio::device_io::impl : base::impl {
     void prepare(device_io const &device_io, audio::device const dev) {
         this->_weak_device_io = to_weak(device_io);
 
-        this->_device_system_flow =
-            device::begin_system_flow(device::system_method::hardware_did_change)
+        this->_device_system_observer =
+            device::system_chain(device::system_method::hardware_did_change)
                 .perform([weak_device_io = _weak_device_io](auto const &) {
                     if (auto device_io = weak_device_io.lock()) {
                         if (device_io.device() && !device::device_for_id(device_io.device().audio_device_id())) {
@@ -100,22 +100,22 @@ struct audio::device_io::impl : base::impl {
             this->uninitialize();
 
             if (this->_device) {
-                if (this->_device_flows.count(this->_device.identifier())) {
-                    this->_device_flows.erase(this->_device.identifier());
+                if (this->_device_observers.count(this->_device.identifier())) {
+                    this->_device_observers.erase(this->_device.identifier());
                 }
             }
 
             this->_device = dev;
 
             if (this->_device) {
-                auto flow = this->_device.begin_flow(device::method::device_did_change)
+                auto flow = this->_device.chain(device::method::device_did_change)
                                 .perform([weak_device_io = _weak_device_io](auto const &) {
                                     if (auto device_io = weak_device_io.lock()) {
                                         device_io.impl_ptr<impl>()->update_kernel();
                                     }
                                 })
                                 .end();
-                this->_device_flows.emplace(this->_device.identifier(), std::move(flow));
+                this->_device_observers.emplace(this->_device.identifier(), std::move(flow));
             }
 
             this->initialize();

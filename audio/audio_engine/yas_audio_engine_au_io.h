@@ -6,7 +6,7 @@
 
 #include "yas_audio_types.h"
 #include "yas_base.h"
-#include "yas_flow.h"
+#include "yas_chaining.h"
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
 namespace yas::audio {
@@ -25,7 +25,7 @@ class au_io : public base {
         did_update_connection,
     };
 
-    using flow_pair_t = std::pair<method, au_io>;
+    using chaining_pair_t = std::pair<method, au_io>;
 
     struct args {
         bool enable_input = true;
@@ -50,8 +50,8 @@ class au_io : public base {
     uint32_t output_device_channel_count() const;
     uint32_t input_device_channel_count() const;
 
-    [[nodiscard]] flow::node_t<flow_pair_t, false> begin_flow() const;
-    [[nodiscard]] flow::node<au_io, flow_pair_t, flow_pair_t, false> begin_flow(method const) const;
+    [[nodiscard]] chaining::node_t<chaining_pair_t, false> chain() const;
+    [[nodiscard]] chaining::node<au_io, chaining_pair_t, chaining_pair_t, false> chain(method const) const;
 
     audio::engine::au const &au() const;
     audio::engine::au &au();

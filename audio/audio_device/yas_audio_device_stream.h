@@ -37,7 +37,7 @@ class device::stream : public base {
         change_info(std::vector<property_info> &&);
     };
 
-    using flow_pair_t = std::pair<method, change_info>;
+    using chaining_pair_t = std::pair<method, change_info>;
 
     struct args {
         AudioStreamID stream_id;
@@ -54,8 +54,8 @@ class device::stream : public base {
     audio::format virtual_format() const;
     uint32_t starting_channel() const;
 
-    [[nodiscard]] flow::node_t<flow_pair_t, false> begin_flow() const;
-    [[nodiscard]] flow::node<change_info, flow_pair_t, flow_pair_t, false> begin_flow(method const) const;
+    [[nodiscard]] chaining::node_t<chaining_pair_t, false> chain() const;
+    [[nodiscard]] chaining::node<change_info, chaining_pair_t, chaining_pair_t, false> chain(method const) const;
 
    private:
     template <typename T>

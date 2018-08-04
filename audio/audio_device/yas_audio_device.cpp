@@ -15,7 +15,7 @@ namespace yas::audio {
 using listener_f =
     std::function<void(uint32_t const in_number_addresses, const AudioObjectPropertyAddress *const in_addresses)>;
 
-static flow::notifier<audio::device::flow_system_pair_t> _system_notifier;
+static chaining::notifier<audio::device::chaining_system_pair_t> _system_notifier;
 
 #pragma mark - utility
 
@@ -178,7 +178,7 @@ struct audio::device::impl : base::impl {
     AudioDeviceID const _audio_device_id;
     std::unordered_map<AudioStreamID, stream> input_streams_map;
     std::unordered_map<AudioStreamID, stream> output_streams_map;
-    flow::notifier<audio::device::flow_pair_t> _notifier;
+    chaining::notifier<audio::device::chaining_pair_t> _notifier;
 
     impl(AudioDeviceID device_id) : _input_format(nullptr), _output_format(nullptr), _audio_device_id(device_id) {
         udpate_streams(kAudioObjectPropertyScopeInput);
@@ -494,31 +494,32 @@ uint32_t audio::device::output_channel_count() const {
     return 0;
 }
 
-flow::node_t<audio::device::flow_pair_t, false> audio::device::begin_flow() const {
-    return impl_ptr<impl>()->_notifier.begin_flow();
+chaining::node_t<audio::device::chaining_pair_t, false> audio::device::chain() const {
+    return impl_ptr<impl>()->_notifier.chain();
 }
 
-flow::node<audio::device::change_info, audio::device::flow_pair_t, audio::device::flow_pair_t, false>
-audio::device::begin_flow(method const method) const {
+chaining::node<audio::device::change_info, audio::device::chaining_pair_t, audio::device::chaining_pair_t, false>
+audio::device::chain(method const method) const {
     return impl_ptr<impl>()
-        ->_notifier.begin_flow()
-        .filter([method](audio::device::flow_pair_t const &pair) { return pair.first == method; })
-        .map([](audio::device::flow_pair_t const &pair) { return pair.second; });
+        ->_notifier.chain()
+        .guard([method](audio::device::chaining_pair_t const &pair) { return pair.first == method; })
+        .to([](audio::device::chaining_pair_t const &pair) { return pair.second; });
 }
 
-flow::node_t<audio::device::flow_system_pair_t, false> audio::device::begin_system_flow() {
-    return audio::_system_notifier.begin_flow();
+chaining::node_t<audio::device::chaining_system_pair_t, false> audio::device::system_chain() {
+    return audio::_system_notifier.chain();
 }
 
-flow::node<audio::device::change_info, audio::device::flow_system_pair_t, audio::device::flow_system_pair_t, false>
-audio::device::begin_system_flow(system_method const method) {
-    return audio::_system_notifier.begin_flow()
-        .filter([method](flow_system_pair_t const &pair) { return pair.first == method; })
-        .map([](flow_system_pair_t const &pair) { return pair.second; });
+chaining::node<audio::device::change_info, audio::device::chaining_system_pair_t, audio::device::chaining_system_pair_t,
+               false>
+audio::device::system_chain(system_method const method) {
+    return audio::_system_notifier.chain()
+        .guard([method](chaining_system_pair_t const &pair) { return pair.first == method; })
+        .to([](chaining_system_pair_t const &pair) { return pair.second; });
 }
 
 #if YAS_TEST
-flow::notifier<audio::device::flow_system_pair_t> &audio::device::system_notifier() {
+chaining::notifier<audio::device::chaining_system_pair_t> &audio::device::system_notifier() {
     return audio::_system_notifier;
 }
 #endif

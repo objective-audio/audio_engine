@@ -127,8 +127,8 @@ namespace yas::sample {
 struct device_vc_internal {
     audio::graph graph = nullptr;
     audio::device_io device_io = nullptr;
-    flow::observer system_flow = nullptr;
-    flow::observer device_flow = nullptr;
+    chaining::observer system_observer = nullptr;
+    chaining::observer device_observer = nullptr;
     sample_kernel_sptr kernel;
 };
 }
@@ -165,8 +165,8 @@ struct device_vc_internal {
 
     auto unowned_self = make_objc_ptr([[YASUnownedObject alloc] initWithObject:self]);
 
-    _internal.system_flow =
-        audio::device::begin_system_flow(audio::device::system_method::hardware_did_change)
+    _internal.system_observer =
+        audio::device::system_chain(audio::device::system_method::hardware_did_change)
             .perform([unowned_self](auto const &) { [[unowned_self.object() object] _updateDeviceNames]; })
             .end();
 
@@ -188,8 +188,8 @@ struct device_vc_internal {
 - (void)dispose {
     _internal.graph = nullptr;
     _internal.device_io = nullptr;
-    _internal.system_flow = nullptr;
-    _internal.device_flow = nullptr;
+    _internal.system_observer = nullptr;
+    _internal.device_observer = nullptr;
     _internal.kernel = nullptr;
 }
 
@@ -280,7 +280,7 @@ struct device_vc_internal {
 
 - (void)setDevice:(const audio::device &)selected_device {
     if (auto prev_audio_device = _internal.device_io.device()) {
-        _internal.device_flow = nullptr;
+        _internal.device_observer = nullptr;
     }
 
     auto all_devices = audio::device::all_devices();
@@ -290,17 +290,17 @@ struct device_vc_internal {
 
         auto unowned_self = make_objc_ptr([[YASUnownedObject alloc] initWithObject:self]);
 
-        _internal.device_flow = selected_device.begin_flow(audio::device::method::device_did_change)
-                                    .perform([selected_device, unowned_self](auto const &change_info) {
-                                        auto const &infos = change_info.property_infos;
-                                        if (infos.size() > 0) {
-                                            auto &device_id = infos.at(0).object_id;
-                                            if (selected_device.audio_device_id() == device_id) {
-                                                [[unowned_self.object() object] _updateDeviceInfo];
+        _internal.device_observer = selected_device.chain(audio::device::method::device_did_change)
+                                        .perform([selected_device, unowned_self](auto const &change_info) {
+                                            auto const &infos = change_info.property_infos;
+                                            if (infos.size() > 0) {
+                                                auto &device_id = infos.at(0).object_id;
+                                                if (selected_device.audio_device_id() == device_id) {
+                                                    [[unowned_self.object() object] _updateDeviceInfo];
+                                                }
                                             }
-                                        }
-                                    })
-                                    .end();
+                                        })
+                                        .end();
     } else {
         _internal.device_io.set_device(nullptr);
     }
