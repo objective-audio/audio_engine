@@ -54,13 +54,13 @@ struct audio::engine::au_io::impl : base::impl {
 
     void prepare(audio::engine::au_io &au_io) {
         this->_connections_observer = this->au()
-                                       .chain(au::method::did_update_connections)
-                                       .perform([weak_au_io = to_weak(au_io)](auto const &) {
-                                           if (auto au_io = weak_au_io.lock()) {
-                                               au_io.impl_ptr<impl>()->update_unit_io_connections();
-                                           }
-                                       })
-                                       .end();
+                                          .chain(au::method::did_update_connections)
+                                          .perform([weak_au_io = to_weak(au_io)](auto const &) {
+                                              if (auto au_io = weak_au_io.lock()) {
+                                                  au_io.impl_ptr<impl>()->update_unit_io_connections();
+                                              }
+                                          })
+                                          .end();
     }
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
@@ -279,12 +279,12 @@ struct yas::audio::engine::au_input::impl : base::impl {
 
     void prepare(audio::engine::au_input const &au_input) {
         this->_connections_observer = this->_au_io.chain(au_io::method::did_update_connection)
-                                       .perform([weak_au_input = to_weak(au_input)](auto const &) {
-                                           if (auto au_input = weak_au_input.lock()) {
-                                               au_input.impl_ptr<impl>()->update_unit_input_connections();
-                                           }
-                                       })
-                                       .end();
+                                          .perform([weak_au_input = to_weak(au_input)](auto const &) {
+                                              if (auto au_input = weak_au_input.lock()) {
+                                                  au_input.impl_ptr<impl>()->update_unit_input_connections();
+                                              }
+                                          })
+                                          .end();
     }
 
     void update_unit_input_connections() {

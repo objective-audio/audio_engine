@@ -28,12 +28,12 @@ struct audio::engine::au_mixer::impl : base::impl {
 
     void prepare(audio::engine::au_mixer const &au_mixer) {
         this->_connections_observer = this->_au.chain(au::method::will_update_connections)
-                                       .perform([weak_au_mixer = to_weak(au_mixer)](auto const &) {
-                                           if (auto au_mixer = weak_au_mixer.lock()) {
-                                               au_mixer.impl_ptr<impl>()->update_unit_mixer_connections();
-                                           }
-                                       })
-                                       .end();
+                                          .perform([weak_au_mixer = to_weak(au_mixer)](auto const &) {
+                                              if (auto au_mixer = weak_au_mixer.lock()) {
+                                                  au_mixer.impl_ptr<impl>()->update_unit_mixer_connections();
+                                              }
+                                          })
+                                          .end();
     }
 
    private:

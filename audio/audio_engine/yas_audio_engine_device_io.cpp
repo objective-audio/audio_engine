@@ -43,12 +43,12 @@ struct audio::engine::device_io::impl : base::impl, manageable_device_io::impl {
         });
 
         this->_connections_observer = this->_node.chain(node::method::update_connections)
-                                       .perform([weak_engine_device_io](auto const &) {
-                                           if (auto engine_device_io = weak_engine_device_io.lock()) {
-                                               engine_device_io.impl_ptr<impl>()->_update_device_io_connections();
-                                           }
-                                       })
-                                       .end();
+                                          .perform([weak_engine_device_io](auto const &) {
+                                              if (auto engine_device_io = weak_engine_device_io.lock()) {
+                                                  engine_device_io.impl_ptr<impl>()->_update_device_io_connections();
+                                              }
+                                          })
+                                          .end();
     }
 
     void add_device_io() override {
