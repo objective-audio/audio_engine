@@ -34,6 +34,8 @@
 		B630BBD62115407300D6219F /* yas_objc_ptr.mm in Sources */ = {isa = PBXBuildFile; fileRef = B630BBC22115407300D6219F /* yas_objc_ptr.mm */; };
 		B630BBD72115407300D6219F /* yas_boolean.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B630BBC52115407300D6219F /* yas_boolean.cpp */; };
 		B637893F1AB430F300B95F55 /* YASAudioEngineDeviceIOSampleViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = B637893E1AB430F300B95F55 /* YASAudioEngineDeviceIOSampleViewController.mm */; };
+		B63D205B214CCCDF005A5CBF /* yas_chaining_observer_pool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B63D204D214CCCDF005A5CBF /* yas_chaining_observer_pool.cpp */; };
+		B63D205C214CCCDF005A5CBF /* yas_chaining_any_observer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B63D205A214CCCDF005A5CBF /* yas_chaining_any_observer.cpp */; };
 		B6626A861C146E2D0038175B /* yas_audio_file.mm in Sources */ = {isa = PBXBuildFile; fileRef = B6626A761C146E2D0038175B /* yas_audio_file.mm */; };
 		B6626A871C146E2D0038175B /* yas_audio_file_utils.mm in Sources */ = {isa = PBXBuildFile; fileRef = B6626A781C146E2D0038175B /* yas_audio_file_utils.mm */; };
 		B6626A881C146E2D0038175B /* yas_audio_format.mm in Sources */ = {isa = PBXBuildFile; fileRef = B6626A7A1C146E2D0038175B /* yas_audio_format.mm */; };
@@ -157,6 +159,36 @@
 		B630BBC72115407300D6219F /* yas_operation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yas_operation.h; sourceTree = "<group>"; };
 		B637893D1AB430F300B95F55 /* YASAudioEngineDeviceIOSampleViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YASAudioEngineDeviceIOSampleViewController.h; sourceTree = "<group>"; };
 		B637893E1AB430F300B95F55 /* YASAudioEngineDeviceIOSampleViewController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = YASAudioEngineDeviceIOSampleViewController.mm; sourceTree = "<group>"; };
+		B63D203D214CCCDF005A5CBF /* yas_chaining_joint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yas_chaining_joint.h; sourceTree = "<group>"; };
+		B63D203E214CCCDF005A5CBF /* yas_chaining_holder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yas_chaining_holder.h; sourceTree = "<group>"; };
+		B63D203F214CCCDF005A5CBF /* yas_chaining_observer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yas_chaining_observer.h; sourceTree = "<group>"; };
+		B63D2040214CCCDF005A5CBF /* yas_chaining_notifier.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yas_chaining_notifier.h; sourceTree = "<group>"; };
+		B63D2041214CCCDF005A5CBF /* yas_chaining_sender_protocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yas_chaining_sender_protocol.h; sourceTree = "<group>"; };
+		B63D2042214CCCDF005A5CBF /* yas_chaining_fetcher_protocol_private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yas_chaining_fetcher_protocol_private.h; sourceTree = "<group>"; };
+		B63D2043214CCCDF005A5CBF /* yas_chaining_receiver_private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yas_chaining_receiver_private.h; sourceTree = "<group>"; };
+		B63D2044214CCCDF005A5CBF /* yas_chaining_fetcher.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yas_chaining_fetcher.h; sourceTree = "<group>"; };
+		B63D2045214CCCDF005A5CBF /* yas_chaining_sender_protocol_private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yas_chaining_sender_protocol_private.h; sourceTree = "<group>"; };
+		B63D2046214CCCDF005A5CBF /* yas_chaining_chain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yas_chaining_chain.h; sourceTree = "<group>"; };
+		B63D2047214CCCDF005A5CBF /* yas_chaining_receiver_protocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yas_chaining_receiver_protocol.h; sourceTree = "<group>"; };
+		B63D2048214CCCDF005A5CBF /* yas_chaining_utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yas_chaining_utils.h; sourceTree = "<group>"; };
+		B63D2049214CCCDF005A5CBF /* yas_chaining_chain_private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yas_chaining_chain_private.h; sourceTree = "<group>"; };
+		B63D204A214CCCDF005A5CBF /* yas_chaining_observer_pool.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yas_chaining_observer_pool.h; sourceTree = "<group>"; };
+		B63D204B214CCCDF005A5CBF /* yas_chaining_joint_private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yas_chaining_joint_private.h; sourceTree = "<group>"; };
+		B63D204C214CCCDF005A5CBF /* yas_chaining_holder_private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yas_chaining_holder_private.h; sourceTree = "<group>"; };
+		B63D204D214CCCDF005A5CBF /* yas_chaining_observer_pool.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = yas_chaining_observer_pool.cpp; sourceTree = "<group>"; };
+		B63D204E214CCCDF005A5CBF /* yas_chaining_observer_private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yas_chaining_observer_private.h; sourceTree = "<group>"; };
+		B63D204F214CCCDF005A5CBF /* yas_chaining.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yas_chaining.h; sourceTree = "<group>"; };
+		B63D2050214CCCDF005A5CBF /* yas_chaining_vector_holder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yas_chaining_vector_holder.h; sourceTree = "<group>"; };
+		B63D2051214CCCDF005A5CBF /* yas_chaining_any_observer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yas_chaining_any_observer.h; sourceTree = "<group>"; };
+		B63D2052214CCCDF005A5CBF /* yas_chaining_receiver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yas_chaining_receiver.h; sourceTree = "<group>"; };
+		B63D2053214CCCDF005A5CBF /* yas_chaining_sender.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yas_chaining_sender.h; sourceTree = "<group>"; };
+		B63D2054214CCCDF005A5CBF /* yas_chaining_vector_holder_private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yas_chaining_vector_holder_private.h; sourceTree = "<group>"; };
+		B63D2055214CCCDF005A5CBF /* yas_chaining_fetcher_private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yas_chaining_fetcher_private.h; sourceTree = "<group>"; };
+		B63D2056214CCCDF005A5CBF /* yas_chaining_notifier_private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yas_chaining_notifier_private.h; sourceTree = "<group>"; };
+		B63D2057214CCCDF005A5CBF /* yas_chaining_receiver_protocol_private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yas_chaining_receiver_protocol_private.h; sourceTree = "<group>"; };
+		B63D2058214CCCDF005A5CBF /* yas_chaining_fetcher_protocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yas_chaining_fetcher_protocol.h; sourceTree = "<group>"; };
+		B63D2059214CCCDF005A5CBF /* yas_chaining_sender_private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yas_chaining_sender_private.h; sourceTree = "<group>"; };
+		B63D205A214CCCDF005A5CBF /* yas_chaining_any_observer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = yas_chaining_any_observer.cpp; sourceTree = "<group>"; };
 		B6626A751C146E2D0038175B /* yas_audio_file.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yas_audio_file.h; sourceTree = "<group>"; };
 		B6626A761C146E2D0038175B /* yas_audio_file.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = yas_audio_file.mm; sourceTree = "<group>"; };
 		B6626A771C146E2D0038175B /* yas_audio_file_utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yas_audio_file_utils.h; sourceTree = "<group>"; };
@@ -401,11 +433,50 @@
 			path = ../submodules/cpp_utils/cpp_utils;
 			sourceTree = "<group>";
 		};
+		B63D203C214CCCDF005A5CBF /* chaining */ = {
+			isa = PBXGroup;
+			children = (
+				B63D203D214CCCDF005A5CBF /* yas_chaining_joint.h */,
+				B63D203E214CCCDF005A5CBF /* yas_chaining_holder.h */,
+				B63D203F214CCCDF005A5CBF /* yas_chaining_observer.h */,
+				B63D2040214CCCDF005A5CBF /* yas_chaining_notifier.h */,
+				B63D2041214CCCDF005A5CBF /* yas_chaining_sender_protocol.h */,
+				B63D2042214CCCDF005A5CBF /* yas_chaining_fetcher_protocol_private.h */,
+				B63D2043214CCCDF005A5CBF /* yas_chaining_receiver_private.h */,
+				B63D2044214CCCDF005A5CBF /* yas_chaining_fetcher.h */,
+				B63D2045214CCCDF005A5CBF /* yas_chaining_sender_protocol_private.h */,
+				B63D2046214CCCDF005A5CBF /* yas_chaining_chain.h */,
+				B63D2047214CCCDF005A5CBF /* yas_chaining_receiver_protocol.h */,
+				B63D2048214CCCDF005A5CBF /* yas_chaining_utils.h */,
+				B63D2049214CCCDF005A5CBF /* yas_chaining_chain_private.h */,
+				B63D204A214CCCDF005A5CBF /* yas_chaining_observer_pool.h */,
+				B63D204B214CCCDF005A5CBF /* yas_chaining_joint_private.h */,
+				B63D204C214CCCDF005A5CBF /* yas_chaining_holder_private.h */,
+				B63D204D214CCCDF005A5CBF /* yas_chaining_observer_pool.cpp */,
+				B63D204E214CCCDF005A5CBF /* yas_chaining_observer_private.h */,
+				B63D204F214CCCDF005A5CBF /* yas_chaining.h */,
+				B63D2050214CCCDF005A5CBF /* yas_chaining_vector_holder.h */,
+				B63D2051214CCCDF005A5CBF /* yas_chaining_any_observer.h */,
+				B63D2052214CCCDF005A5CBF /* yas_chaining_receiver.h */,
+				B63D2053214CCCDF005A5CBF /* yas_chaining_sender.h */,
+				B63D2054214CCCDF005A5CBF /* yas_chaining_vector_holder_private.h */,
+				B63D2055214CCCDF005A5CBF /* yas_chaining_fetcher_private.h */,
+				B63D2056214CCCDF005A5CBF /* yas_chaining_notifier_private.h */,
+				B63D2057214CCCDF005A5CBF /* yas_chaining_receiver_protocol_private.h */,
+				B63D2058214CCCDF005A5CBF /* yas_chaining_fetcher_protocol.h */,
+				B63D2059214CCCDF005A5CBF /* yas_chaining_sender_private.h */,
+				B63D205A214CCCDF005A5CBF /* yas_chaining_any_observer.cpp */,
+			);
+			name = chaining;
+			path = ../submodules/chaining/chaining;
+			sourceTree = "<group>";
+		};
 		B65BAA4B1A636A5200E7C3D8 /* audio */ = {
 			isa = PBXGroup;
 			children = (
 				B6C49DC31BA1D67700CCFB14 /* yas_audio.h */,
 				B6FC1D0E1B5B45EE0051243A /* yas_audio_cpp.h */,
+				B63D203C214CCCDF005A5CBF /* chaining */,
 				B630BB862115407300D6219F /* cpp_utils */,
 				B60F445E1C1423120028C68A /* objc_utils */,
 				B6626A721C146E2D0038175B /* audio_basics */,
@@ -625,6 +696,7 @@
 				B637893F1AB430F300B95F55 /* YASAudioEngineDeviceIOSampleViewController.mm in Sources */,
 				B630BBC82115407300D6219F /* yas_timer.mm in Sources */,
 				B6626A8C1C146E2D0038175B /* yas_audio_time.mm in Sources */,
+				B63D205B214CCCDF005A5CBF /* yas_chaining_observer_pool.cpp in Sources */,
 				B6626A991C1470D40038175B /* yas_audio_exception.cpp in Sources */,
 				B6FF042E1BEB915D0026777E /* yas_audio_engine_device_io.cpp in Sources */,
 				B6626A8A1C146E2D0038175B /* yas_audio_objc_utils.mm in Sources */,
@@ -642,6 +714,7 @@
 				B630BBC92115407300D6219F /* yas_delaying_caller.cpp in Sources */,
 				B6FF045A1BEB917A0026777E /* yas_audio_device_stream.cpp in Sources */,
 				B6626A881C146E2D0038175B /* yas_audio_format.mm in Sources */,
+				B63D205C214CCCDF005A5CBF /* yas_chaining_any_observer.cpp in Sources */,
 				B699BEBB1BF4D1B60007B597 /* yas_audio_unit.mm in Sources */,
 				B69B08A01D437F2A00F12D36 /* yas_audio_engine_offline_output_protocol.cpp in Sources */,
 				B699BEB81BF4D1B60007B597 /* yas_audio_graph.mm in Sources */,
