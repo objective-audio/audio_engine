@@ -54,8 +54,8 @@ class device::stream : public base {
     audio::format virtual_format() const;
     uint32_t starting_channel() const;
 
-    [[nodiscard]] chaining::node_t<chaining_pair_t, false> chain() const;
-    [[nodiscard]] chaining::node<change_info, chaining_pair_t, chaining_pair_t, false> chain(method const) const;
+    [[nodiscard]] chaining::chain<chaining_pair_t, chaining_pair_t, chaining_pair_t, false> chain() const;
+    [[nodiscard]] chaining::chain<change_info, chaining_pair_t, chaining_pair_t, false> chain(method const) const;
 
    private:
     template <typename T>

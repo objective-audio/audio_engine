@@ -164,7 +164,7 @@ struct audio::engine::au_io::impl : base::impl {
     audio::engine::au _au;
     channel_map_t _channel_map[2];
     chaining::notifier<chaining_pair_t> _notifier;
-    chaining::observer _connections_observer = nullptr;
+    chaining::any_observer _connections_observer = nullptr;
 };
 
 #pragma mark - audio::engine::au_io
@@ -213,12 +213,14 @@ audio::device audio::engine::au_io::device() const {
 
 #endif
 
-chaining::node_t<audio::engine::au_io::chaining_pair_t, false> audio::engine::au_io::chain() const {
+chaining::chain<audio::engine::au_io::chaining_pair_t, audio::engine::au_io::chaining_pair_t,
+                audio::engine::au_io::chaining_pair_t, false>
+audio::engine::au_io::chain() const {
     return impl_ptr<impl>()->_notifier.chain();
 }
 
-chaining::node<audio::engine::au_io, audio::engine::au_io::chaining_pair_t, audio::engine::au_io::chaining_pair_t,
-               false>
+chaining::chain<audio::engine::au_io, audio::engine::au_io::chaining_pair_t, audio::engine::au_io::chaining_pair_t,
+                false>
 audio::engine::au_io::chain(method const method) const {
     return impl_ptr<impl>()
         ->_notifier.chain()
@@ -333,7 +335,7 @@ struct yas::audio::engine::au_input::impl : base::impl {
     audio::engine::au_io _au_io;
 
     pcm_buffer _input_buffer = nullptr;
-    chaining::observer _connections_observer = nullptr;
+    chaining::any_observer _connections_observer = nullptr;
 };
 
 #pragma mark - audio::engine::au_input

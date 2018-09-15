@@ -153,12 +153,14 @@ uint32_t audio::device::stream::starting_channel() const {
     return 0;
 }
 
-chaining::node_t<audio::device::stream::chaining_pair_t, false> audio::device::stream::chain() const {
+chaining::chain<audio::device::stream::chaining_pair_t, audio::device::stream::chaining_pair_t,
+                audio::device::stream::chaining_pair_t, false>
+audio::device::stream::chain() const {
     return impl_ptr<impl>()->_notifier.chain();
 }
 
-chaining::node<audio::device::stream::change_info, audio::device::stream::chaining_pair_t,
-               audio::device::stream::chaining_pair_t, false>
+chaining::chain<audio::device::stream::change_info, audio::device::stream::chaining_pair_t,
+                audio::device::stream::chaining_pair_t, false>
 audio::device::stream::chain(method const method) const {
     return impl_ptr<impl>()
         ->_notifier.chain()

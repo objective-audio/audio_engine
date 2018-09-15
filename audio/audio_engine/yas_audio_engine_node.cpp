@@ -381,11 +381,13 @@ void audio::engine::node::set_render_time_on_render(const time &time) {
     impl_ptr<impl>()->set_render_time_on_render(time);
 }
 
-chaining::node_t<audio::engine::node::chaining_pair_t, false> audio::engine::node::chain() const {
+chaining::chain<audio::engine::node::chaining_pair_t, audio::engine::node::chaining_pair_t,
+                audio::engine::node::chaining_pair_t, false>
+audio::engine::node::chain() const {
     return impl_ptr<impl>()->_notifier.chain();
 }
 
-chaining::node<audio::engine::node, audio::engine::node::chaining_pair_t, audio::engine::node::chaining_pair_t, false>
+chaining::chain<audio::engine::node, audio::engine::node::chaining_pair_t, audio::engine::node::chaining_pair_t, false>
 audio::engine::node::chain(method const method) const {
     return impl_ptr<impl>()
         ->_notifier.chain()

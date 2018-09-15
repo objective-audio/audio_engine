@@ -113,12 +113,14 @@ std::unordered_map<AudioUnitElement, AudioUnitParameterValue> const &audio::unit
     return impl_ptr<impl>()->_values;
 }
 
-chaining::node_t<audio::unit::parameter::chaining_pair_t, false> audio::unit::parameter::chain() const {
+chaining::chain<audio::unit::parameter::chaining_pair_t, audio::unit::parameter::chaining_pair_t,
+                audio::unit::parameter::chaining_pair_t, false>
+audio::unit::parameter::chain() const {
     return impl_ptr<impl>()->_notifier.chain();
 }
 
-chaining::node<audio::unit::parameter::change_info, audio::unit::parameter::chaining_pair_t,
-               audio::unit::parameter::chaining_pair_t, false>
+chaining::chain<audio::unit::parameter::change_info, audio::unit::parameter::chaining_pair_t,
+                audio::unit::parameter::chaining_pair_t, false>
 audio::unit::parameter::chain(method const method) const {
     return impl_ptr<impl>()
         ->_notifier.chain()

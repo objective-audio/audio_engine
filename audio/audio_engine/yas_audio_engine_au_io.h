@@ -50,8 +50,8 @@ class au_io : public base {
     uint32_t output_device_channel_count() const;
     uint32_t input_device_channel_count() const;
 
-    [[nodiscard]] chaining::node_t<chaining_pair_t, false> chain() const;
-    [[nodiscard]] chaining::node<au_io, chaining_pair_t, chaining_pair_t, false> chain(method const) const;
+    [[nodiscard]] chaining::chain<chaining_pair_t, chaining_pair_t, chaining_pair_t, false> chain() const;
+    [[nodiscard]] chaining::chain<au_io, chaining_pair_t, chaining_pair_t, false> chain(method const) const;
 
     audio::engine::au const &au() const;
     audio::engine::au &au();

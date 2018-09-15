@@ -79,8 +79,8 @@ class manager : public base {
     start_result_t start_offline_render(offline_render_f, offline_completion_f);
     void stop();
 
-    [[nodiscard]] chaining::node_t<chaining_pair_t, false> chain() const;
-    [[nodiscard]] chaining::node<manager, chaining_pair_t, chaining_pair_t, false> chain(method const) const;
+    [[nodiscard]] chaining::chain<chaining_pair_t, chaining_pair_t, chaining_pair_t, false> chain() const;
+    [[nodiscard]] chaining::chain<manager, chaining_pair_t, chaining_pair_t, false> chain(method const) const;
 
 #if YAS_TEST
     std::unordered_set<node> &nodes() const;

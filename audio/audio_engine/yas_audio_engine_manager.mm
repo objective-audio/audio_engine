@@ -488,7 +488,7 @@ struct audio::engine::manager::impl : base::impl {
     objc_ptr<id> _route_change_observer;
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
     audio::engine::device_io _device_io = nullptr;
-    chaining::observer _device_system_observer = nullptr;
+    chaining::any_observer _device_system_observer = nullptr;
 #endif
 
     audio::graph _graph = nullptr;
@@ -635,12 +635,14 @@ void audio::engine::manager::stop() {
     impl_ptr<impl>()->stop();
 }
 
-chaining::node_t<audio::engine::manager::chaining_pair_t, false> audio::engine::manager::chain() const {
+chaining::chain<audio::engine::manager::chaining_pair_t, audio::engine::manager::chaining_pair_t,
+                audio::engine::manager::chaining_pair_t, false>
+audio::engine::manager::chain() const {
     return impl_ptr<impl>()->_notifier.chain();
 }
 
-chaining::node<audio::engine::manager, audio::engine::manager::chaining_pair_t, audio::engine::manager::chaining_pair_t,
-               false>
+chaining::chain<audio::engine::manager, audio::engine::manager::chaining_pair_t,
+                audio::engine::manager::chaining_pair_t, false>
 audio::engine::manager::chain(method const method) const {
     return impl_ptr<impl>()
         ->_notifier.chain()

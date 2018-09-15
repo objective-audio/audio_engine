@@ -73,10 +73,11 @@ class device : public base {
     uint32_t input_channel_count() const;
     uint32_t output_channel_count() const;
 
-    [[nodiscard]] chaining::node_t<chaining_pair_t, false> chain() const;
-    [[nodiscard]] chaining::node<change_info, chaining_pair_t, chaining_pair_t, false> chain(method const) const;
-    [[nodiscard]] static chaining::node_t<chaining_system_pair_t, false> system_chain();
-    [[nodiscard]] static chaining::node<change_info, chaining_system_pair_t, chaining_system_pair_t, false>
+    [[nodiscard]] chaining::chain<chaining_pair_t, chaining_pair_t, chaining_pair_t, false> chain() const;
+    [[nodiscard]] chaining::chain<change_info, chaining_pair_t, chaining_pair_t, false> chain(method const) const;
+    [[nodiscard]] static chaining::chain<chaining_system_pair_t, chaining_system_pair_t, chaining_system_pair_t, false>
+    system_chain();
+    [[nodiscard]] static chaining::chain<change_info, chaining_system_pair_t, chaining_system_pair_t, false>
     system_chain(system_method const);
 
 #if YAS_TEST

@@ -494,11 +494,12 @@ uint32_t audio::device::output_channel_count() const {
     return 0;
 }
 
-chaining::node_t<audio::device::chaining_pair_t, false> audio::device::chain() const {
+chaining::chain<audio::device::chaining_pair_t, audio::device::chaining_pair_t, audio::device::chaining_pair_t, false>
+audio::device::chain() const {
     return impl_ptr<impl>()->_notifier.chain();
 }
 
-chaining::node<audio::device::change_info, audio::device::chaining_pair_t, audio::device::chaining_pair_t, false>
+chaining::chain<audio::device::change_info, audio::device::chaining_pair_t, audio::device::chaining_pair_t, false>
 audio::device::chain(method const method) const {
     return impl_ptr<impl>()
         ->_notifier.chain()
@@ -506,12 +507,14 @@ audio::device::chain(method const method) const {
         .to([](audio::device::chaining_pair_t const &pair) { return pair.second; });
 }
 
-chaining::node_t<audio::device::chaining_system_pair_t, false> audio::device::system_chain() {
+chaining::chain<audio::device::chaining_system_pair_t, audio::device::chaining_system_pair_t,
+                audio::device::chaining_system_pair_t, false>
+audio::device::system_chain() {
     return audio::_system_notifier.chain();
 }
 
-chaining::node<audio::device::change_info, audio::device::chaining_system_pair_t, audio::device::chaining_system_pair_t,
-               false>
+chaining::chain<audio::device::change_info, audio::device::chaining_system_pair_t,
+                audio::device::chaining_system_pair_t, false>
 audio::device::system_chain(system_method const method) {
     return audio::_system_notifier.chain()
         .guard([method](chaining_system_pair_t const &pair) { return pair.first == method; })
