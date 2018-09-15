@@ -49,7 +49,7 @@ struct audio::engine::au_mixer::impl : base::impl {
         }
     }
 
-    chaining::observer _connections_observer = nullptr;
+    chaining::any_observer _connections_observer = nullptr;
 };
 
 #pragma mark - main

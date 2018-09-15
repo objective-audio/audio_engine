@@ -38,7 +38,7 @@ struct route_vc_internal {
     audio::engine::route route;
     audio::engine::tap sine_tap;
 
-    chaining::observer engine_observer = nullptr;
+    chaining::any_observer engine_observer = nullptr;
 
     void disconnectNodes() {
         manager.disconnect(au_mixer.au().node());

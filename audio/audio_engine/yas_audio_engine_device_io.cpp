@@ -20,7 +20,7 @@ using namespace yas;
 
 struct audio::engine::device_io::impl : base::impl, manageable_device_io::impl {
     audio::engine::node _node = {{.input_bus_count = 1, .output_bus_count = 1}};
-    chaining::observer _connections_observer = nullptr;
+    chaining::any_observer _connections_observer = nullptr;
 
     virtual ~impl() final = default;
 

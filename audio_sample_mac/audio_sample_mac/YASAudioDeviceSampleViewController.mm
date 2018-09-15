@@ -127,8 +127,8 @@ namespace yas::sample {
 struct device_vc_internal {
     audio::graph graph = nullptr;
     audio::device_io device_io = nullptr;
-    chaining::observer system_observer = nullptr;
-    chaining::observer device_observer = nullptr;
+    chaining::any_observer system_observer = nullptr;
+    chaining::any_observer device_observer = nullptr;
     sample_kernel_sptr kernel;
 };
 }

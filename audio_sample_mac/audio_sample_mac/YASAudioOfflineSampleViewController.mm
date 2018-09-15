@@ -127,7 +127,7 @@ struct offline_vc_internal {
     audio::engine::au_mixer offline_au_mixer;
     offline_sample::engine::sine offline_sine;
 
-    chaining::observer engine_observer = nullptr;
+    chaining::any_observer engine_observer = nullptr;
 
     offline_vc_internal() {
         auto format = audio::format({.sample_rate = offline_sample::sample_rate,

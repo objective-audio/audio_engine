@@ -101,8 +101,8 @@ struct device_io_vc_internal {
     audio::engine::route route = nullptr;
     audio::engine::tap tap = nullptr;
 
-    chaining::observer system_observer = nullptr;
-    chaining::observer device_observer = nullptr;
+    chaining::any_observer system_observer = nullptr;
+    chaining::any_observer device_observer = nullptr;
 };
 }
 
