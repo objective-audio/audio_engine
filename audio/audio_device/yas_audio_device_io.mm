@@ -108,14 +108,14 @@ struct audio::device_io::impl : base::impl {
             this->_device = dev;
 
             if (this->_device) {
-                auto flow = this->_device.chain(device::method::device_did_change)
-                                .perform([weak_device_io = _weak_device_io](auto const &) {
-                                    if (auto device_io = weak_device_io.lock()) {
-                                        device_io.impl_ptr<impl>()->update_kernel();
-                                    }
-                                })
-                                .end();
-                this->_device_observers.emplace(this->_device.identifier(), std::move(flow));
+                auto observer = this->_device.chain(device::method::device_did_change)
+                                    .perform([weak_device_io = _weak_device_io](auto const &) {
+                                        if (auto device_io = weak_device_io.lock()) {
+                                            device_io.impl_ptr<impl>()->update_kernel();
+                                        }
+                                    })
+                                    .end();
+                this->_device_observers.emplace(this->_device.identifier(), std::move(observer));
             }
 
             this->initialize();
