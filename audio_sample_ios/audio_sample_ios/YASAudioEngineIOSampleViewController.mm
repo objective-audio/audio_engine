@@ -35,7 +35,7 @@ struct engine_io_vc_internal {
     audio::engine::au_mixer au_mixer;
     audio::engine::au_io au_io;
 
-    flow::observer engine_flow = nullptr;
+    chaining::any_observer engine_observer = nullptr;
 
     engine_io_vc_internal() {
         au_mixer.set_input_volume(1.0, 0);
@@ -193,8 +193,8 @@ struct engine_io_vc_internal {
 
     auto unowned_self = make_objc_ptr([[YASUnownedObject alloc] initWithObject:self]);
 
-    _internal.engine_flow =
-        _internal.manager.begin_flow(audio::engine::manager::method::configuration_change)
+    _internal.engine_observer =
+        _internal.manager.chain(audio::engine::manager::method::configuration_change)
             .perform([unowned_self](auto const &) {
                 if ([UIApplication sharedApplication].applicationState == UIApplicationStateActive) {
                     [[unowned_self.object() object] _updateEngine];

@@ -15,18 +15,18 @@ using namespace yas;
 struct audio::engine::offline_output::impl : base::impl, manageable_offline_output::impl {
     operation_queue _queue = nullptr;
     audio::engine::node _node = {{.input_bus_count = 1, .output_bus_count = 0}};
-    flow::observer _reset_flow = nullptr;
+    chaining::any_observer _reset_observer = nullptr;
 
     ~impl() = default;
 
     void prepare(offline_output const &output) {
-        this->_reset_flow = this->_node.begin_flow(node::method::will_reset)
-                                .perform([weak_output = to_weak(output)](auto const &) {
-                                    if (auto output = weak_output.lock()) {
-                                        output.impl_ptr<audio::engine::offline_output::impl>()->stop();
-                                    }
-                                })
-                                .end();
+        this->_reset_observer = this->_node.chain(node::method::will_reset)
+                                    .perform([weak_output = to_weak(output)](auto const &) {
+                                        if (auto output = weak_output.lock()) {
+                                            output.impl_ptr<audio::engine::offline_output::impl>()->stop();
+                                        }
+                                    })
+                                    .end();
     }
 
     audio::engine::offline_start_result_t start(offline_render_f &&render_handler,

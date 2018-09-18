@@ -9,7 +9,6 @@
 #include "yas_cf_utils.h"
 #include "yas_exception.h"
 #include "yas_operation.h"
-#include "yas_property.h"
 #include "yas_result.h"
 #include "yas_stl_utils.h"
 

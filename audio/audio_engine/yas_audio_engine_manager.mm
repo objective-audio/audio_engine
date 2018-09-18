@@ -35,7 +35,7 @@ class connection_for_engine : public audio::engine::connection {
 
 struct audio::engine::manager::impl : base::impl {
     weak<manager> _weak_manager;
-    flow::notifier<flow_pair_t> _notifier;
+    chaining::notifier<chaining_pair_t> _notifier;
 
     ~impl() {
 #if TARGET_OS_IPHONE
@@ -79,13 +79,13 @@ struct audio::engine::manager::impl : base::impl {
         _route_change_observer.set_object(route_change_observer);
 
 #elif TARGET_OS_MAC
-        this->_device_system_flow = device::begin_system_flow(device::system_method::configuration_change)
-                                        .perform([weak_manager = this->_weak_manager](auto const &) {
-                                            if (auto engine = weak_manager.lock()) {
-                                                engine.impl_ptr<impl>()->post_configuration_change();
-                                            }
-                                        })
-                                        .end();
+        this->_device_system_observer = device::system_chain(device::system_method::configuration_change)
+                                            .perform([weak_manager = this->_weak_manager](auto const &) {
+                                                if (auto engine = weak_manager.lock()) {
+                                                    engine.impl_ptr<impl>()->post_configuration_change();
+                                                }
+                                            })
+                                            .end();
 #endif
     }
 
@@ -488,7 +488,7 @@ struct audio::engine::manager::impl : base::impl {
     objc_ptr<id> _route_change_observer;
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
     audio::engine::device_io _device_io = nullptr;
-    flow::observer _device_system_flow = nullptr;
+    chaining::any_observer _device_system_observer = nullptr;
 #endif
 
     audio::graph _graph = nullptr;
@@ -635,16 +635,19 @@ void audio::engine::manager::stop() {
     impl_ptr<impl>()->stop();
 }
 
-flow::node_t<audio::engine::manager::flow_pair_t, false> audio::engine::manager::begin_flow() const {
-    return impl_ptr<impl>()->_notifier.begin_flow();
+chaining::chain<audio::engine::manager::chaining_pair_t, audio::engine::manager::chaining_pair_t,
+                audio::engine::manager::chaining_pair_t, false>
+audio::engine::manager::chain() const {
+    return impl_ptr<impl>()->_notifier.chain();
 }
 
-flow::node<audio::engine::manager, audio::engine::manager::flow_pair_t, audio::engine::manager::flow_pair_t, false>
-audio::engine::manager::begin_flow(method const method) const {
+chaining::chain<audio::engine::manager, audio::engine::manager::chaining_pair_t,
+                audio::engine::manager::chaining_pair_t, false>
+audio::engine::manager::chain(method const method) const {
     return impl_ptr<impl>()
-        ->_notifier.begin_flow()
-        .filter([method](auto const &pair) { return pair.first == method; })
-        .map([](flow_pair_t const &pair) { return pair.second; });
+        ->_notifier.chain()
+        .guard([method](auto const &pair) { return pair.first == method; })
+        .to([](chaining_pair_t const &pair) { return pair.second; });
 }
 
 #if YAS_TEST
@@ -657,7 +660,7 @@ audio::engine::connection_set &audio::engine::manager::connections() const {
     return impl_ptr<impl>()->connections();
 }
 
-flow::notifier<audio::engine::manager::flow_pair_t> &audio::engine::manager::notifier() {
+chaining::notifier<audio::engine::manager::chaining_pair_t> &audio::engine::manager::notifier() {
     return impl_ptr<impl>()->_notifier;
 }
 

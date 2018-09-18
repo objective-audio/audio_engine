@@ -127,7 +127,7 @@ struct offline_vc_internal {
     audio::engine::au_mixer offline_au_mixer;
     offline_sample::engine::sine offline_sine;
 
-    flow::observer engine_flow = nullptr;
+    chaining::any_observer engine_observer = nullptr;
 
     offline_vc_internal() {
         auto format = audio::format({.sample_rate = offline_sample::sample_rate,
@@ -156,13 +156,13 @@ struct offline_vc_internal {
         offline_manager.connect(offline_au_mixer.au().node(), offline_output.node(), format);
         offline_manager.connect(offline_sine.tap().node(), offline_au_mixer.au().node(), format);
 
-        this->engine_flow = this->play_manager.begin_flow(audio::engine::manager::method::configuration_change)
-                                .perform([weak_play_au_output = to_weak(play_au_output)](auto const &) {
-                                    if (auto play_au_output = weak_play_au_output.lock()) {
-                                        play_au_output.au_io().set_device(audio::device::default_output_device());
-                                    }
-                                })
-                                .end();
+        this->engine_observer = this->play_manager.chain(audio::engine::manager::method::configuration_change)
+                                    .perform([weak_play_au_output = to_weak(play_au_output)](auto const &) {
+                                        if (auto play_au_output = weak_play_au_output.lock()) {
+                                            play_au_output.au_io().set_device(audio::device::default_output_device());
+                                        }
+                                    })
+                                    .end();
     }
 };
 }

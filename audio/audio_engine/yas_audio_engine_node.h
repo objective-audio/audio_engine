@@ -11,7 +11,7 @@
 #include "yas_audio_pcm_buffer.h"
 #include "yas_audio_types.h"
 #include "yas_base.h"
-#include "yas_flow.h"
+#include "yas_chaining.h"
 #include "yas_protocol.h"
 
 namespace yas {
@@ -36,7 +36,7 @@ class node : public base {
         update_connections,
     };
 
-    using flow_pair_t = std::pair<method, node>;
+    using chaining_pair_t = std::pair<method, node>;
 
     struct render_args {
         audio::pcm_buffer &buffer;
@@ -80,8 +80,8 @@ class node : public base {
     void render(render_args);
     void set_render_time_on_render(audio::time const &time);
 
-    [[nodiscard]] flow::node_t<flow_pair_t, false> begin_flow() const;
-    [[nodiscard]] flow::node<node, flow_pair_t, flow_pair_t, false> begin_flow(method const) const;
+    [[nodiscard]] chaining::chain<chaining_pair_t, chaining_pair_t, chaining_pair_t, false> chain() const;
+    [[nodiscard]] chaining::chain<node, chaining_pair_t, chaining_pair_t, false> chain(method const) const;
 
     audio::engine::connectable_node &connectable();
     audio::engine::manageable_node const &manageable() const;

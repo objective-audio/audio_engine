@@ -6,7 +6,7 @@
 
 #include <AudioToolbox/AudioToolbox.h>
 #include "yas_base.h"
-#include "yas_flow.h"
+#include "yas_chaining.h"
 
 namespace yas::audio {
 class unit::parameter : public base {
@@ -22,7 +22,7 @@ class unit::parameter : public base {
 
     enum class method { will_change, did_change };
 
-    using flow_pair_t = std::pair<method, change_info>;
+    using chaining_pair_t = std::pair<method, change_info>;
 
     parameter(AudioUnitParameterInfo const &info, AudioUnitParameterID const paramter_id, AudioUnitScope const scope);
     parameter(std::nullptr_t);
@@ -42,8 +42,8 @@ class unit::parameter : public base {
     void set_value(float const value, AudioUnitElement const element);
     std::unordered_map<AudioUnitElement, AudioUnitParameterValue> const &values() const;
 
-    [[nodiscard]] flow::node_t<flow_pair_t, false> begin_flow() const;
-    [[nodiscard]] flow::node<change_info, flow_pair_t, flow_pair_t, false> begin_flow(method const) const;
+    [[nodiscard]] chaining::chain<chaining_pair_t, chaining_pair_t, chaining_pair_t, false> chain() const;
+    [[nodiscard]] chaining::chain<change_info, chaining_pair_t, chaining_pair_t, false> chain(method const) const;
 };
 }  // namespace yas::audio
 

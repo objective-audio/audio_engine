@@ -61,13 +61,13 @@ struct audio::engine::tap::impl : base::impl {
             }
         });
 
-        this->_reset_flow = this->_node.begin_flow(node::method::will_reset)
-                                .perform([weak_tap](auto const &) {
-                                    if (auto tap = weak_tap.lock()) {
-                                        tap.impl_ptr<audio::engine::tap::impl>()->_render_handler = nullptr;
-                                    }
-                                })
-                                .end();
+        this->_reset_observer = this->_node.chain(node::method::will_reset)
+                                    .perform([weak_tap](auto const &) {
+                                        if (auto tap = weak_tap.lock()) {
+                                            tap.impl_ptr<audio::engine::tap::impl>()->_render_handler = nullptr;
+                                        }
+                                    })
+                                    .end();
 
         _node.set_prepare_kernel_handler([weak_tap](audio::engine::kernel &kernel) {
             if (auto tap = weak_tap.lock()) {
@@ -110,7 +110,7 @@ struct audio::engine::tap::impl : base::impl {
 
    private:
     audio::engine::node::render_f _render_handler;
-    flow::observer _reset_flow = nullptr;
+    chaining::any_observer _reset_observer = nullptr;
     audio::engine::kernel _kernel_on_render;
 };
 
