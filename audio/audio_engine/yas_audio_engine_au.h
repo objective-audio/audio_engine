@@ -63,7 +63,7 @@ class au : public base {
                                     AudioUnitElement const element);
     float output_parameter_value(AudioUnitParameterID const parameter_id, AudioUnitElement const element) const;
 
-    [[nodiscard]] chaining::chain<chaining_pair_t, chaining_pair_t, chaining_pair_t, false> chain() const;
+    [[nodiscard]] chaining::chain_unsyncable_t<chaining_pair_t> chain() const;
     [[nodiscard]] chaining::chain<au, chaining_pair_t, chaining_pair_t, false> chain(method const) const;
 
     audio::engine::node const &node() const;

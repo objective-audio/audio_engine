@@ -394,9 +394,7 @@ float audio::engine::au::output_parameter_value(AudioUnitParameterID const param
     return impl_ptr<impl>()->output_parameter_value(parameter_id, element);
 }
 
-chaining::chain<audio::engine::au::chaining_pair_t, audio::engine::au::chaining_pair_t,
-                audio::engine::au::chaining_pair_t, false>
-audio::engine::au::chain() const {
+chaining::chain_unsyncable_t<audio::engine::au::chaining_pair_t> audio::engine::au::chain() const {
     return impl_ptr<impl>()->_notifier.chain();
 }
 

@@ -80,7 +80,7 @@ class node : public base {
     void render(render_args);
     void set_render_time_on_render(audio::time const &time);
 
-    [[nodiscard]] chaining::chain<chaining_pair_t, chaining_pair_t, chaining_pair_t, false> chain() const;
+    [[nodiscard]] chaining::chain_unsyncable_t<chaining_pair_t> chain() const;
     [[nodiscard]] chaining::chain<node, chaining_pair_t, chaining_pair_t, false> chain(method const) const;
 
     audio::engine::connectable_node &connectable();
