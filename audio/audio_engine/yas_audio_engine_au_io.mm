@@ -213,9 +213,7 @@ audio::device audio::engine::au_io::device() const {
 
 #endif
 
-chaining::chain<audio::engine::au_io::chaining_pair_t, audio::engine::au_io::chaining_pair_t,
-                audio::engine::au_io::chaining_pair_t, false>
-audio::engine::au_io::chain() const {
+chaining::chain_unsyncable_t<audio::engine::au_io::chaining_pair_t> audio::engine::au_io::chain() const {
     return impl_ptr<impl>()->_notifier.chain();
 }
 
