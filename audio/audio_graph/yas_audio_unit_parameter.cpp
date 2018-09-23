@@ -46,7 +46,7 @@ struct audio::unit::parameter::impl : base::impl {
         };
 
         this->_notifier.notify(std::make_pair(method::will_change, info));
-        _values[element] = value;
+        this->_values[element] = value;
         this->_notifier.notify(std::make_pair(method::did_change, info));
     }
 };
