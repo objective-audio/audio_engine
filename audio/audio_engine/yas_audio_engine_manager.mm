@@ -39,17 +39,17 @@ struct audio::engine::manager::impl : base::impl {
 
     ~impl() {
 #if TARGET_OS_IPHONE
-        if (_reset_observer) {
+        if (this->_reset_observer) {
             [[NSNotificationCenter defaultCenter] removeObserver:_reset_observer.object()];
         }
-        if (_route_change_observer) {
+        if (this->_route_change_observer) {
             [[NSNotificationCenter defaultCenter] removeObserver:_route_change_observer.object()];
         }
 #endif
     }
 
     void prepare(manager const &manager) {
-        _weak_manager = manager;
+        this->_weak_manager = manager;
 
 #if TARGET_OS_IPHONE
         auto reset_lambda = [weak_manager = _weak_manager](NSNotification *note) {
@@ -63,9 +63,9 @@ struct audio::engine::manager::impl : base::impl {
                                                               object:nil
                                                                queue:[NSOperationQueue mainQueue]
                                                           usingBlock:reset_lambda];
-        _reset_observer.set_object(reset_observer);
+        this->_reset_observer.set_object(reset_observer);
 
-        auto route_change_lambda = [weak_manager = _weak_manager](NSNotification *note) {
+        auto route_change_lambda = [weak_manager = this->_weak_manager](NSNotification *note) {
             if (auto engine = weak_manager.lock()) {
                 engine.impl_ptr<impl>()->post_configuration_change();
             }
@@ -76,7 +76,7 @@ struct audio::engine::manager::impl : base::impl {
                                                               object:nil
                                                                queue:[NSOperationQueue mainQueue]
                                                           usingBlock:route_change_lambda];
-        _route_change_observer.set_object(route_change_observer);
+        this->_route_change_observer.set_object(route_change_observer);
 
 #elif TARGET_OS_MAC
         this->_device_system_observer = device::system_chain(device::system_method::configuration_change)
@@ -90,7 +90,7 @@ struct audio::engine::manager::impl : base::impl {
     }
 
     bool node_exists(audio::engine::node const &node) {
-        return _nodes.count(node) > 0;
+        return this->_nodes.count(node) > 0;
     }
 
     void attach_node(audio::engine::node &node) {
@@ -102,11 +102,11 @@ struct audio::engine::manager::impl : base::impl {
             throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : node is already attached.");
         }
 
-        _nodes.insert(node);
+        this->_nodes.insert(node);
 
         node.manageable().set_manager(_weak_manager.lock());
 
-        add_node_to_graph(node);
+        this->add_node_to_graph(node);
     }
 
     void detach_node(audio::engine::node &node) {
@@ -122,11 +122,11 @@ struct audio::engine::manager::impl : base::impl {
             return (connection.destination_node() == node || connection.source_node() == node);
         });
 
-        remove_node_from_graph(node);
+        this->remove_node_from_graph(node);
 
         node.manageable().set_manager(manager{nullptr});
 
-        _nodes.erase(node);
+        this->_nodes.erase(node);
     }
 
     void detach_node_if_unused(audio::engine::node &node) {
@@ -135,36 +135,36 @@ struct audio::engine::manager::impl : base::impl {
         });
 
         if (filtered_connection.size() == 0) {
-            detach_node(node);
+            this->detach_node(node);
         }
     }
 
     bool prepare_graph() {
-        if (_graph) {
+        if (this->_graph) {
             return true;
         }
 
-        _graph = audio::graph{};
+        this->_graph = audio::graph{};
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
-        if (device_io()) {
-            auto &manageable_device_io = device_io().manageable();
+        if (auto &device_io = this->device_io()) {
+            auto &manageable_device_io = device_io.manageable();
             manageable_device_io.add_device_io();
-            _graph.add_audio_device_io(manageable_device_io.device_io());
+            this->_graph.add_audio_device_io(manageable_device_io.device_io());
         }
 #endif
 
         for (auto &node : _nodes) {
-            add_node_to_graph(node);
+            this->add_node_to_graph(node);
         }
 
         for (auto &connection : _connections) {
-            if (!add_connection(connection)) {
+            if (!this->add_connection(connection)) {
                 return false;
             }
         }
 
-        update_all_node_connections();
+        this->update_all_node_connections();
 
         return true;
     }
@@ -186,22 +186,22 @@ struct audio::engine::manager::impl : base::impl {
                                         std::to_string(dst_bus_idx) + ") is not available.");
         }
 
-        if (!node_exists(src_node)) {
-            attach_node(src_node);
+        if (!this->node_exists(src_node)) {
+            this->attach_node(src_node);
         }
 
-        if (!node_exists(dst_node)) {
-            attach_node(dst_node);
+        if (!this->node_exists(dst_node)) {
+            this->attach_node(dst_node);
         }
 
         connection_for_engine connection(src_node, src_bus_idx, dst_node, dst_bus_idx, format);
 
-        _connections.insert(connection);
+        this->_connections.insert(connection);
 
         if (_graph) {
-            add_connection(connection);
-            update_node_connections(src_node);
-            update_node_connections(dst_node);
+            this->add_connection(connection);
+            this->update_node_connections(src_node);
+            this->update_node_connections(dst_node);
         }
 
         return connection;
@@ -210,20 +210,20 @@ struct audio::engine::manager::impl : base::impl {
     void disconnect(audio::engine::connection &connection) {
         std::vector<node> update_nodes{connection.source_node(), connection.destination_node()};
 
-        remove_connection_from_nodes(connection);
+        this->remove_connection_from_nodes(connection);
         connection.node_removable().remove_nodes();
 
         for (auto &node : update_nodes) {
             node.manageable().update_connections();
-            detach_node_if_unused(node);
+            this->detach_node_if_unused(node);
         }
 
-        _connections.erase(connection);
+        this->_connections.erase(connection);
     }
 
     void disconnect(audio::engine::node &node) {
-        if (node_exists(node)) {
-            detach_node(node);
+        if (this->node_exists(node)) {
+            this->detach_node(node);
         }
     }
 
@@ -235,7 +235,7 @@ struct audio::engine::manager::impl : base::impl {
         for (auto connection : connections) {
             update_nodes.insert(connection.source_node());
             update_nodes.insert(connection.destination_node());
-            remove_connection_from_nodes(connection);
+            this->remove_connection_from_nodes(connection);
             connection.node_removable().remove_nodes();
         }
 
@@ -245,12 +245,12 @@ struct audio::engine::manager::impl : base::impl {
         }
 
         for (auto &connection : connections) {
-            _connections.erase(connection);
+            this->_connections.erase(connection);
         }
     }
 
     void add_node_to_graph(audio::engine::node const &node) {
-        if (!_graph) {
+        if (!this->_graph) {
             return;
         }
 
@@ -260,7 +260,7 @@ struct audio::engine::manager::impl : base::impl {
     }
 
     void remove_node_from_graph(audio::engine::node const &node) {
-        if (!_graph) {
+        if (!this->_graph) {
             return;
         }
 
@@ -278,7 +278,7 @@ struct audio::engine::manager::impl : base::impl {
         auto destination_node = connection.destination_node();
         auto source_node = connection.source_node();
 
-        if (_nodes.count(destination_node) == 0 || _nodes.count(source_node) == 0) {
+        if (this->_nodes.count(destination_node) == 0 || this->_nodes.count(source_node) == 0) {
             throw std::runtime_error(std::string(__PRETTY_FUNCTION__) + " : node is not attached.");
             return false;
         }
@@ -305,7 +305,7 @@ struct audio::engine::manager::impl : base::impl {
     }
 
     void update_node_connections(audio::engine::node &node) {
-        if (!_graph) {
+        if (!this->_graph) {
             return;
         }
 
@@ -313,11 +313,11 @@ struct audio::engine::manager::impl : base::impl {
     }
 
     void update_all_node_connections() {
-        if (!_graph) {
+        if (!this->_graph) {
             return;
         }
 
-        for (auto node : _nodes) {
+        for (auto node : this->_nodes) {
             node.manageable().update_connections();
         }
     }
@@ -339,39 +339,39 @@ struct audio::engine::manager::impl : base::impl {
     }
 
     void reload_graph() {
-        if (auto prev_graph = graph()) {
+        if (auto prev_graph = this->graph()) {
             bool const prev_runnging = prev_graph.is_running();
 
             prev_graph.stop();
 
             for (auto &node : _nodes) {
-                remove_node_from_graph(node);
+                this->remove_node_from_graph(node);
             }
 
-            _graph = nullptr;
+            this->_graph = nullptr;
 
-            if (!prepare_graph()) {
+            if (!this->prepare_graph()) {
                 return;
             }
 
             if (prev_runnging) {
-                graph().start();
+                this->graph().start();
             }
         }
     }
 
     audio::engine::manager::add_result_t add_offline_output() {
-        if (_offline_output) {
+        if (this->_offline_output) {
             return add_result_t{add_error_t::already_added};
         } else {
-            _offline_output = audio::engine::offline_output{};
+            this->_offline_output = audio::engine::offline_output{};
             return add_result_t{nullptr};
         }
     }
 
     audio::engine::manager::remove_result_t remove_offline_output() {
-        if (_offline_output) {
-            _offline_output = nullptr;
+        if (this->_offline_output) {
+            this->_offline_output = nullptr;
             return remove_result_t{nullptr};
         } else {
             return remove_result_t{remove_error_t::already_removed};
@@ -379,30 +379,30 @@ struct audio::engine::manager::impl : base::impl {
     }
 
     audio::engine::offline_output &offline_output() {
-        return _offline_output;
+        return this->_offline_output;
     }
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
     void set_device_io(audio::engine::device_io &&node) {
         if (node) {
-            _device_io = std::move(node);
+            this->_device_io = std::move(node);
 
-            if (_graph) {
-                auto &manageable_device_io = _device_io.manageable();
+            if (this->_graph) {
+                auto &manageable_device_io = this->_device_io.manageable();
                 manageable_device_io.add_device_io();
-                _graph.add_audio_device_io(manageable_device_io.device_io());
+                this->_graph.add_audio_device_io(manageable_device_io.device_io());
             }
         } else {
-            if (_device_io) {
-                auto &manageable_node = _device_io.manageable();
-                if (_graph) {
+            if (this->_device_io) {
+                auto &manageable_node = this->_device_io.manageable();
+                if (this->_graph) {
                     if (auto &device_io = manageable_node.device_io()) {
-                        _graph.remove_audio_device_io(device_io);
+                        this->_graph.remove_audio_device_io(device_io);
                     }
                 }
 
-                manageable_node.remove_device_io();
-                _device_io = nullptr;
+                this->manageable_node.remove_device_io();
+                this->_device_io = nullptr;
             }
         }
     }
@@ -414,7 +414,7 @@ struct audio::engine::manager::impl : base::impl {
 #endif
 
     audio::engine::manager::start_result_t start_render() {
-        if (auto const graph = _graph) {
+        if (auto const graph = this->_graph) {
             if (graph.is_running()) {
                 return start_result_t(start_error_t::already_running);
             }
@@ -437,23 +437,23 @@ struct audio::engine::manager::impl : base::impl {
 
     audio::engine::manager::start_result_t start_offline_render(offline_render_f &&render_handler,
                                                                 offline_completion_f &&completion_handler) {
-        if (auto const graph = _graph) {
+        if (auto const graph = this->_graph) {
             if (graph.is_running()) {
                 return start_result_t(start_error_t::already_running);
             }
         }
 
-        if (auto const offline_output = _offline_output) {
+        if (auto const offline_output = this->_offline_output) {
             if (offline_output.is_running()) {
                 return start_result_t(start_error_t::already_running);
             }
         }
 
-        if (!prepare_graph()) {
+        if (!this->prepare_graph()) {
             return start_result_t(start_error_t::prepare_failure);
         }
 
-        auto offline_output = _offline_output;
+        auto offline_output = this->_offline_output;
 
         if (!offline_output) {
             return start_result_t(start_error_t::offline_output_not_found);
