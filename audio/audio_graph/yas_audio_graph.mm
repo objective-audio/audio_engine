@@ -35,9 +35,9 @@ struct audio::graph::impl : base::impl {
     impl(uint8_t const key) : _key(key){};
 
     ~impl() {
-        stop_all_ios();
-        remove_graph_for_key(key());
-        remove_all_units();
+        this->stop_all_ios();
+        this->remove_graph_for_key(key());
+        this->remove_all_units();
     }
 
     static std::shared_ptr<impl> make_shared() {
@@ -198,11 +198,11 @@ struct audio::graph::impl : base::impl {
             throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : unit.key is already assigned.");
         }
 
-        add_unit_to_units(unit);
+        this->add_unit_to_units(unit);
 
         manageable_unit.initialize();
 
-        if (unit.is_output_unit() && _running && !is_interrupting()) {
+        if (unit.is_output_unit() && this->_running && !this->is_interrupting()) {
             unit.start();
         }
     }
@@ -210,7 +210,7 @@ struct audio::graph::impl : base::impl {
     void remove_unit(audio::unit &unit) {
         unit.manageable().uninitialize();
 
-        remove_unit_from_units(unit);
+        this->remove_unit_from_units(unit);
     }
 
     void remove_all_units() {
@@ -219,7 +219,7 @@ struct audio::graph::impl : base::impl {
         for_each(_units, [this](auto const &it) {
             auto unit = it->second;
             auto next = std::next(it);
-            remove_unit(unit);
+            this->remove_unit(unit);
             return next;
         });
     }
@@ -258,7 +258,7 @@ struct audio::graph::impl : base::impl {
             std::lock_guard<std::recursive_mutex> lock(_mutex);
             _device_ios.insert(device_io);
         }
-        if (_running && !is_interrupting()) {
+        if (this->_running && !this->is_interrupting()) {
             device_io.start();
         }
     }
@@ -267,31 +267,31 @@ struct audio::graph::impl : base::impl {
         device_io.stop();
         {
             std::lock_guard<std::recursive_mutex> lock(_mutex);
-            _device_ios.erase(device_io);
+            this->_device_ios.erase(device_io);
         }
     }
 #endif
 
     void start() {
-        if (!_running) {
-            _running = true;
-            start_all_ios();
+        if (!this->_running) {
+            this->_running = true;
+            this->start_all_ios();
         }
     }
 
     void stop() {
-        if (_running) {
-            _running = false;
-            stop_all_ios();
+        if (this->_running) {
+            this->_running = false;
+            this->stop_all_ios();
         }
     }
 
     uint8_t key() const {
-        return _key;
+        return this->_key;
     }
 
     bool is_running() const {
-        return _running;
+        return this->_running;
     }
 
    private:
