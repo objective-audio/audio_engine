@@ -60,7 +60,7 @@ struct audio::engine::node::impl : base::impl, manageable_node::impl, connectabl
     }
 
     audio::bus_result_t next_available_input_bus() const {
-        auto key = min_empty_key(_input_connections);
+        auto key = min_empty_key(this->_input_connections);
         if (key && *key < this->input_bus_count()) {
             return key;
         }
@@ -69,7 +69,7 @@ struct audio::engine::node::impl : base::impl, manageable_node::impl, connectabl
 
     audio::bus_result_t next_available_output_bus() const {
         auto key = min_empty_key(this->_output_connections);
-        if (key && *key < output_bus_count()) {
+        if (key && *key < this->output_bus_count()) {
             auto &override_bus_idx = this->_override_output_bus_idx;
             if (override_bus_idx && *key == 0) {
                 return *override_bus_idx;
@@ -160,7 +160,7 @@ struct audio::engine::node::impl : base::impl, manageable_node::impl, connectabl
             throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : connection does not exist in a node.");
         }
 
-        update_kernel();
+        this->update_kernel();
     }
 
     void remove_connection(engine::connection const &connection) override {
