@@ -24,38 +24,38 @@ struct audio::engine::connection::impl : base::impl, node_removable::impl {
     }
 
     void remove_connection_from_nodes(connection const &connection) {
-        if (auto node = _destination_node.lock()) {
+        if (auto node = this->_destination_node.lock()) {
             node.connectable().remove_connection(connection);
         }
-        if (auto node = _source_node.lock()) {
+        if (auto node = this->_source_node.lock()) {
             node.connectable().remove_connection(connection);
         }
     }
 
     node source_node() const {
-        std::lock_guard<std::recursive_mutex> lock(_mutex);
-        return _source_node.lock();
+        std::lock_guard<std::recursive_mutex> lock(this->_mutex);
+        return this->_source_node.lock();
     }
 
     node destination_node() const {
-        std::lock_guard<std::recursive_mutex> lock(_mutex);
-        return _destination_node.lock();
+        std::lock_guard<std::recursive_mutex> lock(this->_mutex);
+        return this->_destination_node.lock();
     }
 
     void remove_nodes() {
-        std::lock_guard<std::recursive_mutex> lock(_mutex);
-        _source_node.reset();
-        _destination_node.reset();
+        std::lock_guard<std::recursive_mutex> lock(this->_mutex);
+        this->_source_node.reset();
+        this->_destination_node.reset();
     }
 
     void remove_source_node() {
-        std::lock_guard<std::recursive_mutex> lock(_mutex);
-        _source_node.reset();
+        std::lock_guard<std::recursive_mutex> lock(this->_mutex);
+        this->_source_node.reset();
     }
 
     void remove_destination_node() {
-        std::lock_guard<std::recursive_mutex> lock(_mutex);
-        _destination_node.reset();
+        std::lock_guard<std::recursive_mutex> lock(this->_mutex);
+        this->_destination_node.reset();
     }
 
    private:
@@ -113,8 +113,8 @@ audio::format const &audio::engine::connection::format() const {
 }
 
 audio::engine::node_removable &audio::engine::connection::node_removable() {
-    if (!_node_removable) {
-        _node_removable = audio::engine::node_removable{impl_ptr<node_removable::impl>()};
+    if (!this->_node_removable) {
+        this->_node_removable = audio::engine::node_removable{impl_ptr<node_removable::impl>()};
     }
-    return _node_removable;
+    return this->_node_removable;
 }
