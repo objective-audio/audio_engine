@@ -339,7 +339,7 @@ struct audio::engine::manager::impl : base::impl {
     }
 
     void reload_graph() {
-        if (auto prev_graph = this->graph()) {
+        if (auto prev_graph = this->_graph) {
             bool const prev_runnging = prev_graph.is_running();
 
             prev_graph.stop();
@@ -355,7 +355,7 @@ struct audio::engine::manager::impl : base::impl {
             }
 
             if (prev_runnging) {
-                this->graph().start();
+                this->_graph.start();
             }
         }
     }
