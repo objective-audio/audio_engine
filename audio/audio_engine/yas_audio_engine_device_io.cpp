@@ -25,11 +25,11 @@ struct audio::engine::device_io::impl : base::impl, manageable_device_io::impl {
     virtual ~impl() final = default;
 
     void prepare(engine::device_io const &engine_device_io, audio::device const &device) {
-        set_device(device ?: device::default_output_device());
+        this->set_device(device ?: device::default_output_device());
 
         auto weak_engine_device_io = to_weak(engine_device_io);
 
-        _node.set_render_handler([weak_engine_device_io](auto args) {
+        this->_node.set_render_handler([weak_engine_device_io](auto args) {
             auto &buffer = args.buffer;
 
             if (auto engine_device_io = weak_engine_device_io.lock()) {
@@ -52,23 +52,23 @@ struct audio::engine::device_io::impl : base::impl, manageable_device_io::impl {
     }
 
     void add_device_io() override {
-        _core._device_io = audio::device_io{_core.device()};
+        this->_core._device_io = audio::device_io{_core.device()};
     }
 
     void remove_device_io() override {
-        _core._device_io = nullptr;
+        this->_core._device_io = nullptr;
     }
 
     audio::device_io &device_io() override {
-        return _core._device_io;
+        return this->_core._device_io;
     }
 
     void set_device(audio::device const &device) {
-        _core.set_device(device);
+        this->_core.set_device(device);
     }
 
     audio::device device() {
-        return _core.device();
+        return this->_core.device();
     }
 
    private:
@@ -76,14 +76,14 @@ struct audio::engine::device_io::impl : base::impl, manageable_device_io::impl {
         audio::device_io _device_io = nullptr;
 
         void set_device(audio::device const &device) {
-            _device = device;
-            if (_device_io) {
-                _device_io.set_device(device);
+            this->_device = device;
+            if (this->_device_io) {
+                this->_device_io.set_device(device);
             }
         }
 
         audio::device device() {
-            return _device;
+            return this->_device;
         }
 
        private:
@@ -93,12 +93,12 @@ struct audio::engine::device_io::impl : base::impl, manageable_device_io::impl {
     core _core;
 
     void _update_device_io_connections() {
-        auto &device_io = _core._device_io;
+        auto &device_io = this->_core._device_io;
         if (!device_io) {
             return;
         }
 
-        if (!_validate_connections()) {
+        if (!this->_validate_connections()) {
             device_io.set_render_handler(nullptr);
             return;
         }
@@ -149,8 +149,8 @@ struct audio::engine::device_io::impl : base::impl, manageable_device_io::impl {
     }
 
     bool _validate_connections() {
-        if (auto const &device_io = _core._device_io) {
-            auto &input_connections = _node.input_connections();
+        if (auto const &device_io = this->_core._device_io) {
+            auto &input_connections = this->_node.input_connections();
             if (input_connections.size() > 0) {
                 auto const connections = lock_values(input_connections);
                 if (connections.count(0) > 0) {
@@ -214,10 +214,10 @@ audio::engine::node &audio::engine::device_io::node() {
 }
 
 audio::engine::manageable_device_io &audio::engine::device_io::manageable() {
-    if (!_manageable) {
-        _manageable = audio::engine::manageable_device_io{impl_ptr<manageable_device_io::impl>()};
+    if (!this->_manageable) {
+        this->_manageable = audio::engine::manageable_device_io{impl_ptr<manageable_device_io::impl>()};
     }
-    return _manageable;
+    return this->_manageable;
 }
 
 #endif
