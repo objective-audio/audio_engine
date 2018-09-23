@@ -32,12 +32,11 @@ struct audio::engine::device_io::impl : base::impl, manageable_device_io::impl {
         this->_node.set_render_handler([weak_engine_device_io](auto args) {
             auto &buffer = args.buffer;
 
-            if (auto engine_device_io = weak_engine_device_io.lock()) {
-                if (auto const &device_io = engine_device_io.impl_ptr<impl>()->device_io()) {
-                    auto &input_buffer = device_io.input_buffer_on_render();
-                    if (input_buffer && input_buffer.format() == buffer.format()) {
-                        buffer.copy_from(input_buffer);
-                    }
+            if (auto engine_device_io = weak_engine_device_io.lock();
+                auto const &device_io = engine_device_io.impl_ptr<impl>()->device_io()) {
+                auto &input_buffer = device_io.input_buffer_on_render();
+                if (input_buffer && input_buffer.format() == buffer.format()) {
+                    buffer.copy_from(input_buffer);
                 }
             }
         });
@@ -108,18 +107,14 @@ struct audio::engine::device_io::impl : base::impl, manageable_device_io::impl {
 
         auto render_handler = [weak_engine_device_io, weak_device_io](auto args) {
             if (auto engine_device_io = weak_engine_device_io.lock()) {
-                if (auto kernel = engine_device_io.node().kernel()) {
-                    if (args.output_buffer) {
-                        auto const connections = kernel.input_connections();
-                        if (connections.count(0) > 0) {
-                            auto const &connection = connections.at(0);
-                            if (auto src_node = connection.source_node()) {
-                                if (connection.format() == src_node.output_format(connection.source_bus())) {
-                                    src_node.render({.buffer = args.output_buffer,
-                                                     .bus_idx = connection.source_bus(),
-                                                     .when = args.when});
-                                }
-                            }
+                if (auto kernel = engine_device_io.node().kernel(); args.output_buffer) {
+                    auto const connections = kernel.input_connections();
+                    if (connections.count(0) > 0) {
+                        auto const &connection = connections.at(0);
+                        if (auto src_node = connection.source_node();
+                            connection.format() == src_node.output_format(connection.source_bus())) {
+                            src_node.render(
+                                {.buffer = args.output_buffer, .bus_idx = connection.source_bus(), .when = args.when});
                         }
                     }
 
@@ -127,15 +122,12 @@ struct audio::engine::device_io::impl : base::impl, manageable_device_io::impl {
                         auto const connections = kernel.output_connections();
                         if (connections.count(0) > 0) {
                             auto const &connection = connections.at(0);
-                            if (auto dst_node = connection.destination_node()) {
-                                if (dst_node.is_input_renderable()) {
-                                    auto input_buffer = device_io.input_buffer_on_render();
-                                    auto const &input_time = device_io.input_time_on_render();
-                                    if (input_buffer && input_time) {
-                                        if (connection.format() ==
-                                            dst_node.input_format(connection.destination_bus())) {
-                                            dst_node.render({.buffer = input_buffer, .bus_idx = 0, .when = input_time});
-                                        }
+                            if (auto dst_node = connection.destination_node(); dst_node.is_input_renderable()) {
+                                auto input_buffer = device_io.input_buffer_on_render();
+                                auto const &input_time = device_io.input_time_on_render();
+                                if (input_buffer && input_time) {
+                                    if (connection.format() == dst_node.input_format(connection.destination_bus())) {
+                                        dst_node.render({.buffer = input_buffer, .bus_idx = 0, .when = input_time});
                                     }
                                 }
                             }
