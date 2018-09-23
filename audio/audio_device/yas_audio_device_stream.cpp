@@ -53,7 +53,7 @@ struct audio::device::stream::impl : base::impl {
 
     bool is_equal(std::shared_ptr<base::impl> const &rhs) const override {
         if (auto casted_rhs = std::dynamic_pointer_cast<audio::device::stream::impl>(rhs)) {
-            return _stream_id == casted_rhs->_stream_id;
+            return this->_stream_id == casted_rhs->_stream_id;
         }
         return false;
     }
@@ -91,7 +91,7 @@ struct audio::device::stream::impl : base::impl {
                                                     .mElement = kAudioObjectPropertyElementMaster};
 
         raise_if_raw_audio_error(
-            AudioObjectAddPropertyListenerBlock(_stream_id, &address, dispatch_get_main_queue(),
+            AudioObjectAddPropertyListenerBlock(this->_stream_id, &address, dispatch_get_main_queue(),
                                                 ^(uint32_t address_count, const AudioObjectPropertyAddress *addresses) {
                                                     handler(address_count, addresses);
                                                 }));
