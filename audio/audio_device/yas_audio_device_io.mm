@@ -27,12 +27,12 @@ struct audio::device_io::kernel : base {
         }
 
         void reset_buffers() {
-            if (_input_buffer) {
-                _input_buffer.reset();
+            if (this->_input_buffer) {
+                this->_input_buffer.reset();
             }
 
-            if (_output_buffer) {
-                _output_buffer.reset();
+            if (this->_output_buffer) {
+                this->_output_buffer.reset();
             }
         }
     };
@@ -73,7 +73,7 @@ struct audio::device_io::impl : base::impl {
     ~impl() {
         this->_device_system_observer = nullptr;
 
-        uninitialize();
+        this->uninitialize();
     }
 
     void prepare(device_io const &device_io, audio::device const dev) {
@@ -202,7 +202,7 @@ struct audio::device_io::impl : base::impl {
         }
 
         this->_io_proc_id = nullptr;
-        update_kernel();
+        this->update_kernel();
     }
 
     void start() {
@@ -220,7 +220,7 @@ struct audio::device_io::impl : base::impl {
             return;
         }
 
-        _is_running = false;
+        this->_is_running = false;
 
         if (!this->_device || !this->_io_proc_id) {
             return;
@@ -244,7 +244,7 @@ struct audio::device_io::impl : base::impl {
     void set_maximum_frames(uint32_t const frames) {
         std::lock_guard<std::recursive_mutex> lock(this->_mutex);
         this->_maximum_frames = frames;
-        update_kernel();
+        this->update_kernel();
     }
 
     uint32_t maximum_frames() const {
