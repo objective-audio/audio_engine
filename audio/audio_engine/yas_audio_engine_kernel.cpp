@@ -10,41 +10,41 @@ using namespace yas;
 
 struct audio::engine::kernel::impl : base::impl, manageable_kernel::impl {
     audio::engine::connection input_connection(uint32_t const bus_idx) {
-        if (_input_connections.count(bus_idx) > 0) {
-            return _input_connections.at(bus_idx).lock();
+        if (this->_input_connections.count(bus_idx) > 0) {
+            return this->_input_connections.at(bus_idx).lock();
         }
         return nullptr;
     }
 
     audio::engine::connection output_connection(uint32_t const bus_idx) {
-        if (_output_connections.count(bus_idx) > 0) {
-            return _output_connections.at(bus_idx).lock();
+        if (this->_output_connections.count(bus_idx) > 0) {
+            return this->_output_connections.at(bus_idx).lock();
         }
         return nullptr;
     }
 
     audio::engine::connection_smap input_connections() {
-        return lock_values(_input_connections);
+        return lock_values(this->_input_connections);
     }
 
     audio::engine::connection_smap output_connections() {
-        return lock_values(_output_connections);
+        return lock_values(this->_output_connections);
     }
 
     void set_input_connections(audio::engine::connection_wmap &&connections) {
-        _input_connections = std::move(connections);
+        this->_input_connections = std::move(connections);
     }
 
     void set_output_connections(audio::engine::connection_wmap &&connections) {
-        _output_connections = std::move(connections);
+        this->_output_connections = std::move(connections);
     }
 
     void set_decorator(base &&decor) {
-        _decorator = std::move(decor);
+        this->_decorator = std::move(decor);
     }
 
     base &decorator() {
-        return _decorator;
+        return this->_decorator;
     }
 
    private:
