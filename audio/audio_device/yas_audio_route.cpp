@@ -10,11 +10,11 @@
 using namespace yas;
 
 bool audio::route::point::operator==(point const &rhs) const {
-    return bus == rhs.bus && channel == rhs.channel;
+    return this->bus == rhs.bus && this->channel == rhs.channel;
 }
 
 bool audio::route::point::operator!=(point const &rhs) const {
-    return bus != rhs.bus || channel != rhs.channel;
+    return this->bus != rhs.bus || this->channel != rhs.channel;
 }
 
 audio::route::route(uint32_t const src_bus_idx, uint32_t const src_ch_idx, uint32_t const dst_bus_idx,
@@ -30,27 +30,27 @@ audio::route::route(point const &src_point, point const &dst_point) : source(src
 }
 
 bool audio::route::operator==(route const &rhs) const {
-    return source == rhs.source && destination == rhs.destination;
+    return this->source == rhs.source && this->destination == rhs.destination;
 }
 
 bool audio::route::operator!=(route const &rhs) const {
-    return source != rhs.source || destination != rhs.destination;
+    return this->source != rhs.source || this->destination != rhs.destination;
 }
 
 bool audio::route::operator<(route const &rhs) const {
-    if (source.bus != rhs.source.bus) {
-        return source.bus < rhs.source.bus;
+    if (this->source.bus != rhs.source.bus) {
+        return this->source.bus < rhs.source.bus;
     }
 
-    if (destination.bus != rhs.destination.bus) {
-        return destination.bus < rhs.destination.bus;
+    if (this->destination.bus != rhs.destination.bus) {
+        return this->destination.bus < rhs.destination.bus;
     }
 
-    if (source.channel != rhs.source.channel) {
-        return source.channel < rhs.source.channel;
+    if (this->source.channel != rhs.source.channel) {
+        return this->source.channel < rhs.source.channel;
     }
 
-    return destination.channel < rhs.destination.channel;
+    return this->destination.channel < rhs.destination.channel;
 }
 
 #pragma mark -
