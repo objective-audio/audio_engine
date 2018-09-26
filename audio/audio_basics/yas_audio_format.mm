@@ -39,18 +39,18 @@ struct audio::format::impl : base::impl {
     bool _standard = false;
 
     impl(AudioStreamBasicDescription &&asbd) : _asbd(std::move(asbd)) {
-        _asbd.mReserved = 0;
+        this->_asbd.mReserved = 0;
 
         if (asbd.mFormatID == kAudioFormatLinearPCM) {
             if ((asbd.mFormatFlags & kAudioFormatFlagIsFloat) &&
                 ((asbd.mFormatFlags & kAudioFormatFlagIsBigEndian) == kAudioFormatFlagsNativeEndian) &&
                 (asbd.mFormatFlags & kAudioFormatFlagIsPacked)) {
                 if (asbd.mBitsPerChannel == 64) {
-                    _pcm_format = audio::pcm_format::float64;
+                    this->_pcm_format = audio::pcm_format::float64;
                 } else if (asbd.mBitsPerChannel == 32) {
-                    _pcm_format = audio::pcm_format::float32;
+                    this->_pcm_format = audio::pcm_format::float32;
                     if (asbd.mFormatFlags & kAudioFormatFlagIsNonInterleaved) {
-                        _standard = true;
+                        this->_standard = true;
                     }
                 }
             } else if ((asbd.mFormatFlags & kAudioFormatFlagIsSignedInteger) &&
@@ -59,9 +59,9 @@ struct audio::format::impl : base::impl {
                 uint32_t fraction = (asbd.mFormatFlags & kLinearPCMFormatFlagsSampleFractionMask) >>
                                     kLinearPCMFormatFlagsSampleFractionShift;
                 if (asbd.mBitsPerChannel == 32 && fraction == 24) {
-                    _pcm_format = audio::pcm_format::fixed824;
+                    this->_pcm_format = audio::pcm_format::fixed824;
                 } else if (asbd.mBitsPerChannel == 16) {
-                    _pcm_format = audio::pcm_format::int16;
+                    this->_pcm_format = audio::pcm_format::int16;
                 }
             }
         }
