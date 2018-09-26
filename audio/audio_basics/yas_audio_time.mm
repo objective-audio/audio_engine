@@ -17,7 +17,7 @@ struct audio::time::impl : base::impl {
     objc_ptr<AVAudioTime *> _av_audio_time;
 
     impl(objc_ptr<AVAudioTime *> &&time) : _av_audio_time(std::move(time)) {
-        if (!_av_audio_time) {
+        if (!this->_av_audio_time) {
             throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is nil.");
         }
     }
@@ -25,7 +25,7 @@ struct audio::time::impl : base::impl {
     bool is_equal(std::shared_ptr<base::impl> const &rhs) const override {
         if (auto casted_rhs = std::dynamic_pointer_cast<impl>(rhs)) {
             if (auto rhs_av_audio_time = casted_rhs->_av_audio_time) {
-                return [_av_audio_time.object() isEqual:rhs_av_audio_time.object()];
+                return [this->_av_audio_time.object() isEqual:rhs_av_audio_time.object()];
             }
         }
         return false;
