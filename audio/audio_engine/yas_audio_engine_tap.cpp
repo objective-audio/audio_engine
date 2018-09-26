@@ -41,7 +41,7 @@ struct audio::engine::tap::impl : base::impl {
     void prepare(engine::tap const &tap) {
         auto weak_tap = to_weak(tap);
 
-        _node.set_render_handler([weak_tap](auto args) {
+        this->_node.set_render_handler([weak_tap](auto args) {
             if (auto tap = weak_tap.lock()) {
                 auto impl_ptr = tap.impl_ptr<impl>();
                 if (auto kernel = impl_ptr->_node.kernel()) {
@@ -69,7 +69,7 @@ struct audio::engine::tap::impl : base::impl {
                                     })
                                     .end();
 
-        _node.set_prepare_kernel_handler([weak_tap](audio::engine::kernel &kernel) {
+        this->_node.set_prepare_kernel_handler([weak_tap](audio::engine::kernel &kernel) {
             if (auto tap = weak_tap.lock()) {
                 audio::engine::tap::kernel tap_kernel{};
                 tap_kernel.set_render_handler(tap.impl_ptr<audio::engine::tap::impl>()->_render_handler);
@@ -79,9 +79,9 @@ struct audio::engine::tap::impl : base::impl {
     }
 
     void set_render_handler(audio::engine::node::render_f &&func) {
-        _render_handler = func;
+        this->_render_handler = func;
 
-        _node.manageable().update_kernel();
+        this->_node.manageable().update_kernel();
     }
 
     audio::engine::connection input_connection_on_render(uint32_t const bus_idx) {
@@ -89,19 +89,19 @@ struct audio::engine::tap::impl : base::impl {
     }
 
     audio::engine::connection output_connection_on_render(uint32_t const bus_idx) {
-        return _kernel_on_render.output_connection(bus_idx);
+        return this->_kernel_on_render.output_connection(bus_idx);
     }
 
     audio::engine::connection_smap input_connections_on_render() {
-        return _kernel_on_render.input_connections();
+        return this->_kernel_on_render.input_connections();
     }
 
     audio::engine::connection_smap output_connections_on_render() {
-        return _kernel_on_render.output_connections();
+        return this->_kernel_on_render.output_connections();
     }
 
     void render_source(audio::engine::node::render_args &&args) {
-        if (auto connection = _kernel_on_render.input_connection(args.bus_idx)) {
+        if (auto connection = this->_kernel_on_render.input_connection(args.bus_idx)) {
             if (auto node = connection.source_node()) {
                 node.render({.buffer = args.buffer, .bus_idx = connection.source_bus(), .when = args.when});
             }
