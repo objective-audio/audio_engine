@@ -198,7 +198,7 @@ struct audio::device_io::impl : base::impl {
         }
 
         if (device::is_available_device(this->_device)) {
-            raise_if_raw_audio_error(AudioDeviceDestroyIOProcID(_device.audio_device_id(), _io_proc_id));
+            raise_if_raw_audio_error(AudioDeviceDestroyIOProcID(this->_device.audio_device_id(), this->_io_proc_id));
         }
 
         this->_io_proc_id = nullptr;
