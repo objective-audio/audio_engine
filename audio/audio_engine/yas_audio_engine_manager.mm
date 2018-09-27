@@ -401,7 +401,7 @@ struct audio::engine::manager::impl : base::impl {
                     }
                 }
 
-                this->manageable_node.remove_device_io();
+                manageable_node.remove_device_io();
                 this->_device_io = nullptr;
             }
         }
