@@ -560,42 +560,42 @@ struct audio::unit::impl : base::impl, manageable_unit::impl {
    private:
     struct core {
         void set_render_handler(render_f &&callback) {
-            std::lock_guard<std::recursive_mutex> lock(_mutex);
+            std::lock_guard<std::recursive_mutex> lock(this->_mutex);
             this->_render_handler = std::move(callback);
         }
 
         audio::unit::render_f render_handler() {
-            std::lock_guard<std::recursive_mutex> lock(_mutex);
+            std::lock_guard<std::recursive_mutex> lock(this->_mutex);
             return this->_render_handler;
         }
 
         void set_notify_handler(render_f &&callback) {
-            std::lock_guard<std::recursive_mutex> lock(_mutex);
+            std::lock_guard<std::recursive_mutex> lock(this->_mutex);
             this->_notify_handler = std::move(callback);
         }
 
         audio::unit::render_f notify_handler() {
-            std::lock_guard<std::recursive_mutex> lock(_mutex);
+            std::lock_guard<std::recursive_mutex> lock(this->_mutex);
             return this->_notify_handler;
         }
 
         void set_input_handler(render_f &&callback) {
-            std::lock_guard<std::recursive_mutex> lock(_mutex);
+            std::lock_guard<std::recursive_mutex> lock(this->_mutex);
             this->_input_handler = std::move(callback);
         }
 
         audio::unit::render_f input_handler() {
-            std::lock_guard<std::recursive_mutex> lock(_mutex);
+            std::lock_guard<std::recursive_mutex> lock(this->_mutex);
             return this->_input_handler;
         }
 
         void set_raw_unit(AudioUnit const au) {
-            std::lock_guard<std::recursive_mutex> lock(_mutex);
+            std::lock_guard<std::recursive_mutex> lock(this->_mutex);
             this->_au_instance = au;
         }
 
         AudioUnit raw_unit() {
-            std::lock_guard<std::recursive_mutex> lock(_mutex);
+            std::lock_guard<std::recursive_mutex> lock(this->_mutex);
             return this->_au_instance;
         }
 
