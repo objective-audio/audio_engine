@@ -19,7 +19,7 @@
 using namespace yas;
 
 namespace yas::audio {
-static std::recursive_mutex _global_mutex;
+static std::recursive_mutex global_mutex;
 static bool _interrupting;
 static std::map<uint8_t, weak<graph>> _graphs;
 #if TARGET_OS_IPHONE
@@ -41,7 +41,7 @@ struct audio::graph::impl : base::impl {
     }
 
     static std::shared_ptr<impl> make_shared() {
-        std::lock_guard<std::recursive_mutex> lock(_global_mutex);
+        std::lock_guard<std::recursive_mutex> lock(global_mutex);
         auto key = min_empty_key(_graphs);
         if (key && _graphs.count(*key) == 0) {
             return std::make_shared<impl>(*key);
@@ -102,7 +102,7 @@ struct audio::graph::impl : base::impl {
 #endif
 
         {
-            std::lock_guard<std::recursive_mutex> lock(_global_mutex);
+            std::lock_guard<std::recursive_mutex> lock(global_mutex);
             for (auto &pair : _graphs) {
                 if (auto graph = pair.second.lock()) {
                     if (graph.is_running()) {
@@ -116,7 +116,7 @@ struct audio::graph::impl : base::impl {
     }
 
     static void stop_all_graphs() {
-        std::lock_guard<std::recursive_mutex> lock(_global_mutex);
+        std::lock_guard<std::recursive_mutex> lock(global_mutex);
         for (auto const &pair : _graphs) {
             if (auto const graph = pair.second.lock()) {
                 graph.impl_ptr<impl>()->stop_all_ios();
@@ -125,17 +125,17 @@ struct audio::graph::impl : base::impl {
     }
 
     static void add_graph(graph const &graph) {
-        std::lock_guard<std::recursive_mutex> lock(_global_mutex);
+        std::lock_guard<std::recursive_mutex> lock(global_mutex);
         _graphs.insert(std::make_pair(graph.impl_ptr<impl>()->key(), to_weak(graph)));
     }
 
     static void remove_graph_for_key(uint8_t const key) {
-        std::lock_guard<std::recursive_mutex> lock(_global_mutex);
+        std::lock_guard<std::recursive_mutex> lock(global_mutex);
         _graphs.erase(key);
     }
 
     static graph graph_for_key(uint8_t const key) {
-        std::lock_guard<std::recursive_mutex> lock(_global_mutex);
+        std::lock_guard<std::recursive_mutex> lock(global_mutex);
         if (_graphs.count(key) > 0) {
             auto weak_graph = _graphs.at(key);
             return weak_graph.lock();
@@ -144,7 +144,7 @@ struct audio::graph::impl : base::impl {
     }
 
     std::experimental::optional<uint16_t> next_unit_key() {
-        std::lock_guard<std::recursive_mutex> lock(_global_mutex);
+        std::lock_guard<std::recursive_mutex> lock(global_mutex);
         return min_empty_key(_units);
     }
 
