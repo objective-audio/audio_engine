@@ -145,12 +145,12 @@ struct audio::graph::impl : base::impl {
 
     std::experimental::optional<uint16_t> next_unit_key() {
         std::lock_guard<std::recursive_mutex> lock(global_mutex);
-        return min_empty_key(_units);
+        return min_empty_key(this->_units);
     }
 
     unit unit_for_key(uint16_t const key) const {
         std::lock_guard<std::recursive_mutex> lock(_mutex);
-        return _units.at(key);
+        return this->_units.at(key);
     }
 
     void add_unit_to_units(audio::unit &unit) {
@@ -171,9 +171,9 @@ struct audio::graph::impl : base::impl {
             unt.set_graph_key(key());
             unt.set_key(*unit_key);
             auto pair = std::make_pair(*unit_key, unit);
-            _units.insert(pair);
+            this->_units.insert(pair);
             if (unit.is_output_unit()) {
-                _io_units.insert(pair);
+                this->_io_units.insert(pair);
             }
         }
     }
@@ -184,8 +184,8 @@ struct audio::graph::impl : base::impl {
         auto &manageable_unit = unit.manageable();
 
         if (auto key = manageable_unit.key()) {
-            _units.erase(*key);
-            _io_units.erase(*key);
+            this->_units.erase(*key);
+            this->_io_units.erase(*key);
             manageable_unit.set_key(nullopt);
             manageable_unit.set_graph_key(nullopt);
         }
@@ -216,7 +216,7 @@ struct audio::graph::impl : base::impl {
     void remove_all_units() {
         std::lock_guard<std::recursive_mutex> lock(_mutex);
 
-        for_each(_units, [this](auto const &it) {
+        for_each(this->_units, [this](auto const &it) {
             auto unit = it->second;
             auto next = std::next(it);
             this->remove_unit(unit);
@@ -229,24 +229,24 @@ struct audio::graph::impl : base::impl {
         setup_notifications();
 #endif
 
-        for (auto &pair : _io_units) {
+        for (auto &pair : this->_io_units) {
             auto &unit = pair.second;
             unit.start();
         }
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
-        for (auto &device_io : _device_ios) {
+        for (auto &device_io : this->_device_ios) {
             device_io.start();
         }
 #endif
     }
 
     void stop_all_ios() {
-        for (auto &pair : _io_units) {
+        for (auto &pair : this->_io_units) {
             auto &unit = pair.second;
             unit.stop();
         }
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
-        for (auto &device_io : _device_ios) {
+        for (auto &device_io : this->_device_ios) {
             device_io.stop();
         }
 #endif
@@ -256,7 +256,7 @@ struct audio::graph::impl : base::impl {
     void add_audio_device_io(device_io &device_io) {
         {
             std::lock_guard<std::recursive_mutex> lock(_mutex);
-            _device_ios.insert(device_io);
+            this->_device_ios.insert(device_io);
         }
         if (this->_running && !this->is_interrupting()) {
             device_io.start();
