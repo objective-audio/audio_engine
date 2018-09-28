@@ -23,7 +23,7 @@ static std::recursive_mutex global_mutex;
 static bool global_interrupting;
 static std::map<uint8_t, weak<graph>> global_graphs;
 #if TARGET_OS_IPHONE
-static objc_ptr<> _did_become_active_observer;
+static objc_ptr<> global_did_become_active_observer;
 static objc_ptr<> _interruption_observer;
 #endif
 }
@@ -51,14 +51,14 @@ struct audio::graph::impl : base::impl {
 
 #if TARGET_OS_IPHONE
     static void setup_notifications() {
-        if (!_did_become_active_observer) {
+        if (!global_did_become_active_observer) {
             auto const lambda = [](NSNotification *note) { start_all_graphs(); };
             id observer =
                 [[NSNotificationCenter defaultCenter] addObserverForName:UIApplicationDidBecomeActiveNotification
                                                                   object:nil
                                                                    queue:[NSOperationQueue mainQueue]
                                                               usingBlock:std::move(lambda)];
-            _did_become_active_observer.set_object(observer);
+            global_did_become_active_observer.set_object(observer);
         }
 
         if (!_interruption_observer) {
