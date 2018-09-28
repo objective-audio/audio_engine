@@ -389,7 +389,7 @@ struct audio::unit::impl : base::impl, manageable_unit::impl {
     }
 
     void set_channel_map(channel_map_t const &map, AudioUnitScope const scope, AudioUnitElement const element) {
-        if (_acd.componentType != kAudioUnitType_Output) {
+        if (this->_acd.componentType != kAudioUnitType_Output) {
             throw std::runtime_error(std::string(__PRETTY_FUNCTION__) +
                                      " : invalid component type. (not kAudioUnitType_Output)");
         }
@@ -398,7 +398,7 @@ struct audio::unit::impl : base::impl, manageable_unit::impl {
     }
 
     audio::channel_map_t channel_map(AudioUnitScope const scope, AudioUnitElement const element) {
-        if (_acd.componentType != kAudioUnitType_Output) {
+        if (this->_acd.componentType != kAudioUnitType_Output) {
             throw std::runtime_error(std::string(__PRETTY_FUNCTION__) +
                                      " : invalid component type. (not kAudioUnitType_Output)");
         }
