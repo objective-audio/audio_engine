@@ -176,7 +176,7 @@ struct audio::engine::node::impl : base::impl, manageable_node::impl, connectabl
             }
         }
 
-        update_kernel();
+        this->update_kernel();
     }
 
     void set_prepare_kernel_handler(prepare_kernel_f &&handler) {
@@ -199,7 +199,7 @@ struct audio::engine::node::impl : base::impl, manageable_node::impl, connectabl
 
     void update_kernel() override {
         auto kernel = audio::engine::kernel{};
-        prepare_kernel(kernel);
+        this->prepare_kernel(kernel);
         this->_core.set_kernel(kernel);
     }
 
