@@ -134,7 +134,7 @@ struct audio::file::impl : base::impl {
             return read_result_t(read_error_t::invalid_argument);
         }
 
-        if (buffer.format() != _processing_format) {
+        if (buffer.format() != this->_processing_format) {
             return read_result_t(read_error_t::invalid_format);
         }
 
@@ -200,7 +200,7 @@ struct audio::file::impl : base::impl {
             return write_result_t(write_error_t::invalid_argument);
         }
 
-        if (buffer.format() != _processing_format) {
+        if (buffer.format() != this->_processing_format) {
             return write_result_t(write_error_t::invalid_format);
         }
 
@@ -237,7 +237,7 @@ struct audio::file::impl : base::impl {
 
         AudioStreamBasicDescription asbd;
         if (!ext_audio_file_utils::get_audio_file_format(&asbd, this->_ext_audio_file)) {
-            close();
+            this->close();
             return false;
         }
 
@@ -251,7 +251,7 @@ struct audio::file::impl : base::impl {
         this->_file_format = format{asbd};
 
         this->_processing_format = format{{.sample_rate = _file_format.sample_rate(),
-                                           .channel_count = _file_format.channel_count(),
+                                           .channel_count = this->_file_format.channel_count(),
                                            .pcm_format = pcm_format,
                                            .interleaved = interleaved}};
 
@@ -278,8 +278,8 @@ struct audio::file::impl : base::impl {
             return false;
         }
 
-        this->_processing_format = format{{.sample_rate = _file_format.sample_rate(),
-                                           .channel_count = _file_format.channel_count(),
+        this->_processing_format = format{{.sample_rate = this->_file_format.sample_rate(),
+                                           .channel_count = this->_file_format.channel_count(),
                                            .pcm_format = pcm_format,
                                            .interleaved = interleaved}};
 
