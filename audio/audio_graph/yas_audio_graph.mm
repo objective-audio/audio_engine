@@ -21,7 +21,7 @@ using namespace yas;
 namespace yas::audio {
 static std::recursive_mutex global_mutex;
 static bool global_interrupting;
-static std::map<uint8_t, weak<graph>> _graphs;
+static std::map<uint8_t, weak<graph>> global_graphs;
 #if TARGET_OS_IPHONE
 static objc_ptr<> _did_become_active_observer;
 static objc_ptr<> _interruption_observer;
@@ -42,8 +42,8 @@ struct audio::graph::impl : base::impl {
 
     static std::shared_ptr<impl> make_shared() {
         std::lock_guard<std::recursive_mutex> lock(global_mutex);
-        auto key = min_empty_key(_graphs);
-        if (key && _graphs.count(*key) == 0) {
+        auto key = min_empty_key(global_graphs);
+        if (key && global_graphs.count(*key) == 0) {
             return std::make_shared<impl>(*key);
         }
         return nullptr;
@@ -103,7 +103,7 @@ struct audio::graph::impl : base::impl {
 
         {
             std::lock_guard<std::recursive_mutex> lock(global_mutex);
-            for (auto &pair : _graphs) {
+            for (auto &pair : global_graphs) {
                 if (auto graph = pair.second.lock()) {
                     if (graph.is_running()) {
                         graph.impl_ptr<impl>()->start_all_ios();
@@ -117,7 +117,7 @@ struct audio::graph::impl : base::impl {
 
     static void stop_all_graphs() {
         std::lock_guard<std::recursive_mutex> lock(global_mutex);
-        for (auto const &pair : _graphs) {
+        for (auto const &pair : global_graphs) {
             if (auto const graph = pair.second.lock()) {
                 graph.impl_ptr<impl>()->stop_all_ios();
             }
@@ -126,18 +126,18 @@ struct audio::graph::impl : base::impl {
 
     static void add_graph(graph const &graph) {
         std::lock_guard<std::recursive_mutex> lock(global_mutex);
-        _graphs.insert(std::make_pair(graph.impl_ptr<impl>()->key(), to_weak(graph)));
+        global_graphs.insert(std::make_pair(graph.impl_ptr<impl>()->key(), to_weak(graph)));
     }
 
     static void remove_graph_for_key(uint8_t const key) {
         std::lock_guard<std::recursive_mutex> lock(global_mutex);
-        _graphs.erase(key);
+        global_graphs.erase(key);
     }
 
     static graph graph_for_key(uint8_t const key) {
         std::lock_guard<std::recursive_mutex> lock(global_mutex);
-        if (_graphs.count(key) > 0) {
-            auto weak_graph = _graphs.at(key);
+        if (global_graphs.count(key) > 0) {
+            auto weak_graph = global_graphs.at(key);
             return weak_graph.lock();
         }
         return nullptr;
