@@ -40,10 +40,10 @@ struct audio::engine::manager::impl : base::impl {
     ~impl() {
 #if TARGET_OS_IPHONE
         if (this->_reset_observer) {
-            [[NSNotificationCenter defaultCenter] removeObserver:_reset_observer.object()];
+            [[NSNotificationCenter defaultCenter] removeObserver:this->_reset_observer.object()];
         }
         if (this->_route_change_observer) {
-            [[NSNotificationCenter defaultCenter] removeObserver:_route_change_observer.object()];
+            [[NSNotificationCenter defaultCenter] removeObserver:this->_route_change_observer.object()];
         }
 #endif
     }
@@ -98,13 +98,13 @@ struct audio::engine::manager::impl : base::impl {
             throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
         }
 
-        if (_nodes.count(node) > 0) {
+        if (this->_nodes.count(node) > 0) {
             throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : node is already attached.");
         }
 
         this->_nodes.insert(node);
 
-        node.manageable().set_manager(_weak_manager.lock());
+        node.manageable().set_manager(this->_weak_manager.lock());
 
         this->add_node_to_graph(node);
     }
@@ -114,7 +114,7 @@ struct audio::engine::manager::impl : base::impl {
             throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
         }
 
-        if (_nodes.count(node) == 0) {
+        if (this->_nodes.count(node) == 0) {
             throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : node is not attached.");
         }
 
@@ -154,11 +154,11 @@ struct audio::engine::manager::impl : base::impl {
         }
 #endif
 
-        for (auto &node : _nodes) {
+        for (auto &node : this->_nodes) {
             this->add_node_to_graph(node);
         }
 
-        for (auto &connection : _connections) {
+        for (auto &connection : this->_connections) {
             if (!this->add_connection(connection)) {
                 return false;
             }
@@ -198,7 +198,7 @@ struct audio::engine::manager::impl : base::impl {
 
         this->_connections.insert(connection);
 
-        if (_graph) {
+        if (this->_graph) {
             this->add_connection(connection);
             this->update_node_connections(src_node);
             this->update_node_connections(dst_node);
@@ -228,7 +228,8 @@ struct audio::engine::manager::impl : base::impl {
     }
 
     void disconnect_node_with_predicate(std::function<bool(connection const &)> predicate) {
-        auto connections = filter(_connections, [&predicate](auto const &connection) { return predicate(connection); });
+        auto connections =
+            filter(this->_connections, [&predicate](auto const &connection) { return predicate(connection); });
 
         std::unordered_set<node> update_nodes;
 
@@ -255,7 +256,7 @@ struct audio::engine::manager::impl : base::impl {
         }
 
         if (auto const &handler = node.manageable().add_to_graph_handler()) {
-            handler(_graph);
+            handler(this->_graph);
         }
     }
 
@@ -265,7 +266,7 @@ struct audio::engine::manager::impl : base::impl {
         }
 
         if (auto const &handler = node.manageable().remove_from_graph_handler()) {
-            handler(_graph);
+            handler(this->_graph);
         }
     }
 
@@ -323,19 +324,20 @@ struct audio::engine::manager::impl : base::impl {
     }
 
     std::unordered_set<node> &nodes() {
-        return _nodes;
+        return this->_nodes;
     }
 
     audio::engine::connection_set &connections() {
-        return _connections;
+        return this->_connections;
     }
 
     audio::engine::connection_set input_connections_for_destination_node(audio::engine::node const &node) {
-        return filter(_connections, [&node](auto const &connection) { return connection.destination_node() == node; });
+        return filter(this->_connections,
+                      [&node](auto const &connection) { return connection.destination_node() == node; });
     }
 
     audio::engine::connection_set output_connections_for_source_node(audio::engine::node const &node) {
-        return filter(_connections, [&node](auto const &connection) { return connection.source_node() == node; });
+        return filter(this->_connections, [&node](auto const &connection) { return connection.source_node() == node; });
     }
 
     void reload_graph() {
@@ -420,7 +422,7 @@ struct audio::engine::manager::impl : base::impl {
             }
         }
 
-        if (auto const offline_output = _offline_output) {
+        if (auto const offline_output = this->_offline_output) {
             if (offline_output.is_running()) {
                 return start_result_t(start_error_t::already_running);
             }
@@ -430,7 +432,7 @@ struct audio::engine::manager::impl : base::impl {
             return start_result_t(start_error_t::prepare_failure);
         }
 
-        _graph.start();
+        this->_graph.start();
 
         return start_result_t(nullptr);
     }
@@ -470,11 +472,11 @@ struct audio::engine::manager::impl : base::impl {
     }
 
     void stop() {
-        if (auto graph = _graph) {
+        if (auto graph = this->_graph) {
             graph.stop();
         }
 
-        if (auto offline_output = _offline_output) {
+        if (auto offline_output = this->_offline_output) {
             offline_output.manageable().stop();
         }
     }
