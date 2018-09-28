@@ -69,7 +69,7 @@ struct audio::format::impl : base::impl {
 
     bool is_equal(std::shared_ptr<base::impl> const &rhs) const override {
         if (auto casted_rhs = std::dynamic_pointer_cast<impl>(rhs)) {
-            return yas::is_equal(_asbd, casted_rhs->_asbd);
+            return yas::is_equal(this->_asbd, casted_rhs->_asbd);
         }
 
         return false;
