@@ -269,7 +269,7 @@ struct audio::engine::au::impl : base::impl, manageable_au::impl {
 
    private:
     void will_reset() {
-        auto unit = core_unit();
+        auto unit = this->core_unit();
         unit.reset();
 
         auto prev_parameters = std::move(this->_parameters);
