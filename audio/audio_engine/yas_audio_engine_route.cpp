@@ -128,7 +128,7 @@ struct audio::engine::route::impl : base::impl {
     }
 
     audio::engine::node &node() {
-        return _node;
+        return this->_node;
     }
 
    private:
@@ -143,7 +143,7 @@ struct audio::engine::route::impl : base::impl {
     }
 
     void _erase_route_if(std::function<bool(audio::route const &)> pred) {
-        erase_if(_routes, pred);
+        erase_if(this->_routes, pred);
     }
 };
 
