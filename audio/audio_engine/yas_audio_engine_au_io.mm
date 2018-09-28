@@ -45,7 +45,7 @@ struct audio::engine::au_io::impl : base::impl {
                    audio::engine::node_args{.input_bus_count = static_cast<uint32_t>(args.enable_input ? 1 : 0),
                                             .output_bus_count = static_cast<uint32_t>(args.enable_output ? 1 : 0),
                                             .override_output_bus_idx = 1}}) {
-        _au.set_prepare_unit_handler([args = std::move(args)](audio::unit &unit) {
+        this->_au.set_prepare_unit_handler([args = std::move(args)](audio::unit &unit) {
             unit.set_enable_output(args.enable_input);
             unit.set_enable_input(args.enable_output);
             unit.set_maximum_frames_per_slice(4096);
@@ -76,7 +76,7 @@ struct audio::engine::au_io::impl : base::impl {
     }
 
     audio::device device() {
-        return device::device_for_id(_au.unit().current_device());
+        return device::device_for_id(this->_au.unit().current_device());
     }
 
 #endif
