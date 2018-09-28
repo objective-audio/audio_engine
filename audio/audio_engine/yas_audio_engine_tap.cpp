@@ -85,7 +85,7 @@ struct audio::engine::tap::impl : base::impl {
     }
 
     audio::engine::connection input_connection_on_render(uint32_t const bus_idx) {
-        return _kernel_on_render.input_connection(bus_idx);
+        return this->_kernel_on_render.input_connection(bus_idx);
     }
 
     audio::engine::connection output_connection_on_render(uint32_t const bus_idx) {
