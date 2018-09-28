@@ -20,7 +20,7 @@ using namespace yas;
 
 namespace yas::audio {
 static std::recursive_mutex global_mutex;
-static bool _interrupting;
+static bool global_interrupting;
 static std::map<uint8_t, weak<graph>> _graphs;
 #if TARGET_OS_IPHONE
 static objc_ptr<> _did_become_active_observer;
@@ -69,12 +69,12 @@ struct audio::graph::impl : base::impl {
                     static_cast<AVAudioSessionInterruptionType>([typeNum unsignedIntegerValue]);
 
                 if (interruptionType == AVAudioSessionInterruptionTypeBegan) {
-                    _interrupting = true;
+                    global_interrupting = true;
                     stop_all_graphs();
                 } else if (interruptionType == AVAudioSessionInterruptionTypeEnded) {
                     if ([UIApplication sharedApplication].applicationState == UIApplicationStateActive) {
                         start_all_graphs();
-                        _interrupting = false;
+                        global_interrupting = false;
                     }
                 }
             };
@@ -89,7 +89,7 @@ struct audio::graph::impl : base::impl {
 #endif
 
     static bool const is_interrupting() {
-        return _interrupting;
+        return global_interrupting;
     }
 
     static void start_all_graphs() {
@@ -112,7 +112,7 @@ struct audio::graph::impl : base::impl {
             }
         }
 
-        _interrupting = false;
+        global_interrupting = false;
     }
 
     static void stop_all_graphs() {
