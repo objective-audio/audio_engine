@@ -22,7 +22,7 @@ struct audio::engine::au::impl : base::impl, manageable_au::impl {
     ~impl() = default;
 
     void set_prepare_unit_handler(prepare_unit_f &&handler) {
-        _prepare_unit_handler = std::move(handler);
+        this->_prepare_unit_handler = std::move(handler);
     }
 
     void prepare(audio::engine::au const &au, AudioComponentDescription const &acd) {
@@ -99,7 +99,7 @@ struct audio::engine::au::impl : base::impl, manageable_au::impl {
     }
 
     audio::unit core_unit() {
-        return _core.unit();
+        return this->_core.unit();
     }
 
     std::unordered_map<AudioUnitParameterID, audio::unit::parameter_map_t> const &parameters() {
@@ -296,12 +296,12 @@ struct audio::engine::au::impl : base::impl, manageable_au::impl {
    private:
     struct core {
         void set_unit(audio::unit const &au) {
-            std::lock_guard<std::recursive_mutex> lock(_mutex);
+            std::lock_guard<std::recursive_mutex> lock(this->_mutex);
             this->_unit = au;
         }
 
         audio::unit unit() const {
-            std::lock_guard<std::recursive_mutex> lock(_mutex);
+            std::lock_guard<std::recursive_mutex> lock(this->_mutex);
             return this->_unit;
         }
 
