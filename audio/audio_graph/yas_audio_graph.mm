@@ -24,7 +24,7 @@ static bool global_interrupting;
 static std::map<uint8_t, weak<graph>> global_graphs;
 #if TARGET_OS_IPHONE
 static objc_ptr<> global_did_become_active_observer;
-static objc_ptr<> _interruption_observer;
+static objc_ptr<> global_interruption_observer;
 #endif
 }
 
@@ -61,7 +61,7 @@ struct audio::graph::impl : base::impl {
             global_did_become_active_observer.set_object(observer);
         }
 
-        if (!_interruption_observer) {
+        if (!global_interruption_observer) {
             auto const lambda = [](NSNotification *note) {
                 NSDictionary *info = note.userInfo;
                 NSNumber *typeNum = [info valueForKey:AVAudioSessionInterruptionTypeKey];
@@ -83,7 +83,7 @@ struct audio::graph::impl : base::impl {
                                                                   object:nil
                                                                    queue:[NSOperationQueue mainQueue]
                                                               usingBlock:std::move(lambda)];
-            _interruption_observer.set_object(observer);
+            global_interruption_observer.set_object(observer);
         }
     }
 #endif
