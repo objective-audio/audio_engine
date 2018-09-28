@@ -215,7 +215,7 @@ struct audio::file::impl : base::impl {
         if (err != noErr) {
             return write_result_t(write_error_t::write_failed);
         } else {
-            err = ExtAudioFileTell(this->_ext_audio_file, &_file_frame_position);
+            err = ExtAudioFileTell(this->_ext_audio_file, &this->_file_frame_position);
             if (err != noErr) {
                 return write_result_t(write_error_t::tell_failed);
             }
@@ -243,8 +243,8 @@ struct audio::file::impl : base::impl {
 
         AudioFileTypeID file_type_id = ext_audio_file_utils::get_audio_file_type_id(this->_ext_audio_file);
         set_file_type(to_file_type(file_type_id));
-        if (!file_type()) {
-            close();
+        if (!this->file_type()) {
+            this->close();
             return false;
         }
 
