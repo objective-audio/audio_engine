@@ -19,12 +19,12 @@
 using namespace yas;
 
 namespace yas::audio {
-static std::recursive_mutex _global_mutex;
-static bool _interrupting;
-static std::map<uint8_t, weak<graph>> _graphs;
+static std::recursive_mutex global_mutex;
+static bool global_interrupting;
+static std::map<uint8_t, weak<graph>> global_graphs;
 #if TARGET_OS_IPHONE
-static objc_ptr<> _did_become_active_observer;
-static objc_ptr<> _interruption_observer;
+static objc_ptr<> global_did_become_active_observer;
+static objc_ptr<> global_interruption_observer;
 #endif
 }
 
@@ -35,15 +35,15 @@ struct audio::graph::impl : base::impl {
     impl(uint8_t const key) : _key(key){};
 
     ~impl() {
-        stop_all_ios();
-        remove_graph_for_key(key());
-        remove_all_units();
+        this->stop_all_ios();
+        this->remove_graph_for_key(key());
+        this->remove_all_units();
     }
 
     static std::shared_ptr<impl> make_shared() {
-        std::lock_guard<std::recursive_mutex> lock(_global_mutex);
-        auto key = min_empty_key(_graphs);
-        if (key && _graphs.count(*key) == 0) {
+        std::lock_guard<std::recursive_mutex> lock(global_mutex);
+        auto key = min_empty_key(global_graphs);
+        if (key && global_graphs.count(*key) == 0) {
             return std::make_shared<impl>(*key);
         }
         return nullptr;
@@ -51,17 +51,17 @@ struct audio::graph::impl : base::impl {
 
 #if TARGET_OS_IPHONE
     static void setup_notifications() {
-        if (!_did_become_active_observer) {
+        if (!global_did_become_active_observer) {
             auto const lambda = [](NSNotification *note) { start_all_graphs(); };
             id observer =
                 [[NSNotificationCenter defaultCenter] addObserverForName:UIApplicationDidBecomeActiveNotification
                                                                   object:nil
                                                                    queue:[NSOperationQueue mainQueue]
                                                               usingBlock:std::move(lambda)];
-            _did_become_active_observer.set_object(observer);
+            global_did_become_active_observer.set_object(observer);
         }
 
-        if (!_interruption_observer) {
+        if (!global_interruption_observer) {
             auto const lambda = [](NSNotification *note) {
                 NSDictionary *info = note.userInfo;
                 NSNumber *typeNum = [info valueForKey:AVAudioSessionInterruptionTypeKey];
@@ -69,12 +69,12 @@ struct audio::graph::impl : base::impl {
                     static_cast<AVAudioSessionInterruptionType>([typeNum unsignedIntegerValue]);
 
                 if (interruptionType == AVAudioSessionInterruptionTypeBegan) {
-                    _interrupting = true;
+                    global_interrupting = true;
                     stop_all_graphs();
                 } else if (interruptionType == AVAudioSessionInterruptionTypeEnded) {
                     if ([UIApplication sharedApplication].applicationState == UIApplicationStateActive) {
                         start_all_graphs();
-                        _interrupting = false;
+                        global_interrupting = false;
                     }
                 }
             };
@@ -83,13 +83,13 @@ struct audio::graph::impl : base::impl {
                                                                   object:nil
                                                                    queue:[NSOperationQueue mainQueue]
                                                               usingBlock:std::move(lambda)];
-            _interruption_observer.set_object(observer);
+            global_interruption_observer.set_object(observer);
         }
     }
 #endif
 
     static bool const is_interrupting() {
-        return _interrupting;
+        return global_interrupting;
     }
 
     static void start_all_graphs() {
@@ -102,8 +102,8 @@ struct audio::graph::impl : base::impl {
 #endif
 
         {
-            std::lock_guard<std::recursive_mutex> lock(_global_mutex);
-            for (auto &pair : _graphs) {
+            std::lock_guard<std::recursive_mutex> lock(global_mutex);
+            for (auto &pair : global_graphs) {
                 if (auto graph = pair.second.lock()) {
                     if (graph.is_running()) {
                         graph.impl_ptr<impl>()->start_all_ios();
@@ -112,12 +112,12 @@ struct audio::graph::impl : base::impl {
             }
         }
 
-        _interrupting = false;
+        global_interrupting = false;
     }
 
     static void stop_all_graphs() {
-        std::lock_guard<std::recursive_mutex> lock(_global_mutex);
-        for (auto const &pair : _graphs) {
+        std::lock_guard<std::recursive_mutex> lock(global_mutex);
+        for (auto const &pair : global_graphs) {
             if (auto const graph = pair.second.lock()) {
                 graph.impl_ptr<impl>()->stop_all_ios();
             }
@@ -125,32 +125,32 @@ struct audio::graph::impl : base::impl {
     }
 
     static void add_graph(graph const &graph) {
-        std::lock_guard<std::recursive_mutex> lock(_global_mutex);
-        _graphs.insert(std::make_pair(graph.impl_ptr<impl>()->key(), to_weak(graph)));
+        std::lock_guard<std::recursive_mutex> lock(global_mutex);
+        global_graphs.insert(std::make_pair(graph.impl_ptr<impl>()->key(), to_weak(graph)));
     }
 
     static void remove_graph_for_key(uint8_t const key) {
-        std::lock_guard<std::recursive_mutex> lock(_global_mutex);
-        _graphs.erase(key);
+        std::lock_guard<std::recursive_mutex> lock(global_mutex);
+        global_graphs.erase(key);
     }
 
     static graph graph_for_key(uint8_t const key) {
-        std::lock_guard<std::recursive_mutex> lock(_global_mutex);
-        if (_graphs.count(key) > 0) {
-            auto weak_graph = _graphs.at(key);
+        std::lock_guard<std::recursive_mutex> lock(global_mutex);
+        if (global_graphs.count(key) > 0) {
+            auto weak_graph = global_graphs.at(key);
             return weak_graph.lock();
         }
         return nullptr;
     }
 
     std::experimental::optional<uint16_t> next_unit_key() {
-        std::lock_guard<std::recursive_mutex> lock(_global_mutex);
-        return min_empty_key(_units);
+        std::lock_guard<std::recursive_mutex> lock(global_mutex);
+        return min_empty_key(this->_units);
     }
 
     unit unit_for_key(uint16_t const key) const {
         std::lock_guard<std::recursive_mutex> lock(_mutex);
-        return _units.at(key);
+        return this->_units.at(key);
     }
 
     void add_unit_to_units(audio::unit &unit) {
@@ -171,9 +171,9 @@ struct audio::graph::impl : base::impl {
             unt.set_graph_key(key());
             unt.set_key(*unit_key);
             auto pair = std::make_pair(*unit_key, unit);
-            _units.insert(pair);
+            this->_units.insert(pair);
             if (unit.is_output_unit()) {
-                _io_units.insert(pair);
+                this->_io_units.insert(pair);
             }
         }
     }
@@ -184,8 +184,8 @@ struct audio::graph::impl : base::impl {
         auto &manageable_unit = unit.manageable();
 
         if (auto key = manageable_unit.key()) {
-            _units.erase(*key);
-            _io_units.erase(*key);
+            this->_units.erase(*key);
+            this->_io_units.erase(*key);
             manageable_unit.set_key(nullopt);
             manageable_unit.set_graph_key(nullopt);
         }
@@ -198,11 +198,11 @@ struct audio::graph::impl : base::impl {
             throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : unit.key is already assigned.");
         }
 
-        add_unit_to_units(unit);
+        this->add_unit_to_units(unit);
 
         manageable_unit.initialize();
 
-        if (unit.is_output_unit() && _running && !is_interrupting()) {
+        if (unit.is_output_unit() && this->_running && !this->is_interrupting()) {
             unit.start();
         }
     }
@@ -210,16 +210,16 @@ struct audio::graph::impl : base::impl {
     void remove_unit(audio::unit &unit) {
         unit.manageable().uninitialize();
 
-        remove_unit_from_units(unit);
+        this->remove_unit_from_units(unit);
     }
 
     void remove_all_units() {
         std::lock_guard<std::recursive_mutex> lock(_mutex);
 
-        for_each(_units, [this](auto const &it) {
+        for_each(this->_units, [this](auto const &it) {
             auto unit = it->second;
             auto next = std::next(it);
-            remove_unit(unit);
+            this->remove_unit(unit);
             return next;
         });
     }
@@ -229,24 +229,24 @@ struct audio::graph::impl : base::impl {
         setup_notifications();
 #endif
 
-        for (auto &pair : _io_units) {
+        for (auto &pair : this->_io_units) {
             auto &unit = pair.second;
             unit.start();
         }
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
-        for (auto &device_io : _device_ios) {
+        for (auto &device_io : this->_device_ios) {
             device_io.start();
         }
 #endif
     }
 
     void stop_all_ios() {
-        for (auto &pair : _io_units) {
+        for (auto &pair : this->_io_units) {
             auto &unit = pair.second;
             unit.stop();
         }
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
-        for (auto &device_io : _device_ios) {
+        for (auto &device_io : this->_device_ios) {
             device_io.stop();
         }
 #endif
@@ -256,9 +256,9 @@ struct audio::graph::impl : base::impl {
     void add_audio_device_io(device_io &device_io) {
         {
             std::lock_guard<std::recursive_mutex> lock(_mutex);
-            _device_ios.insert(device_io);
+            this->_device_ios.insert(device_io);
         }
-        if (_running && !is_interrupting()) {
+        if (this->_running && !this->is_interrupting()) {
             device_io.start();
         }
     }
@@ -267,31 +267,31 @@ struct audio::graph::impl : base::impl {
         device_io.stop();
         {
             std::lock_guard<std::recursive_mutex> lock(_mutex);
-            _device_ios.erase(device_io);
+            this->_device_ios.erase(device_io);
         }
     }
 #endif
 
     void start() {
-        if (!_running) {
-            _running = true;
-            start_all_ios();
+        if (!this->_running) {
+            this->_running = true;
+            this->start_all_ios();
         }
     }
 
     void stop() {
-        if (_running) {
-            _running = false;
-            stop_all_ios();
+        if (this->_running) {
+            this->_running = false;
+            this->stop_all_ios();
         }
     }
 
     uint8_t key() const {
-        return _key;
+        return this->_key;
     }
 
     bool is_running() const {
-        return _running;
+        return this->_running;
     }
 
    private:

@@ -13,23 +13,23 @@ using namespace yas;
 #pragma mark - property_info
 
 bool audio::device::stream::property_info::operator<(property_info const &info) const {
-    if (property != info.property) {
-        return property < info.property;
+    if (this->property != info.property) {
+        return this->property < info.property;
     }
 
-    if (object_id != info.object_id) {
-        return object_id < info.object_id;
+    if (this->object_id != info.object_id) {
+        return this->object_id < info.object_id;
     }
 
-    if (address.mSelector != info.address.mSelector) {
-        return address.mSelector < info.address.mSelector;
+    if (this->address.mSelector != info.address.mSelector) {
+        return this->address.mSelector < info.address.mSelector;
     }
 
-    if (address.mScope != info.address.mScope) {
-        return address.mScope < info.address.mScope;
+    if (this->address.mScope != info.address.mScope) {
+        return this->address.mScope < info.address.mScope;
     }
 
-    return address.mElement < info.address.mElement;
+    return this->address.mElement < info.address.mElement;
 }
 
 #pragma mark - change_info
@@ -53,7 +53,7 @@ struct audio::device::stream::impl : base::impl {
 
     bool is_equal(std::shared_ptr<base::impl> const &rhs) const override {
         if (auto casted_rhs = std::dynamic_pointer_cast<audio::device::stream::impl>(rhs)) {
-            return _stream_id == casted_rhs->_stream_id;
+            return this->_stream_id == casted_rhs->_stream_id;
         }
         return false;
     }
@@ -91,7 +91,7 @@ struct audio::device::stream::impl : base::impl {
                                                     .mElement = kAudioObjectPropertyElementMaster};
 
         raise_if_raw_audio_error(
-            AudioObjectAddPropertyListenerBlock(_stream_id, &address, dispatch_get_main_queue(),
+            AudioObjectAddPropertyListenerBlock(this->_stream_id, &address, dispatch_get_main_queue(),
                                                 ^(uint32_t address_count, const AudioObjectPropertyAddress *addresses) {
                                                     handler(address_count, addresses);
                                                 }));
@@ -120,7 +120,7 @@ audio::device audio::device::stream::device() const {
 }
 
 bool audio::device::stream::is_active() const {
-    auto data = _property_data<uint32_t>(stream_id(), kAudioStreamPropertyIsActive);
+    auto data = this->_property_data<uint32_t>(stream_id(), kAudioStreamPropertyIsActive);
     if (data) {
         return *data->data() > 0;
     }
@@ -128,7 +128,7 @@ bool audio::device::stream::is_active() const {
 }
 
 audio::direction audio::device::stream::direction() const {
-    auto data = _property_data<uint32_t>(stream_id(), kAudioStreamPropertyDirection);
+    auto data = this->_property_data<uint32_t>(stream_id(), kAudioStreamPropertyDirection);
     if (data) {
         if (*data->data() == 1) {
             return direction::input;
@@ -138,7 +138,7 @@ audio::direction audio::device::stream::direction() const {
 }
 
 audio::format audio::device::stream::virtual_format() const {
-    auto data = _property_data<AudioStreamBasicDescription>(stream_id(), kAudioStreamPropertyVirtualFormat);
+    auto data = this->_property_data<AudioStreamBasicDescription>(stream_id(), kAudioStreamPropertyVirtualFormat);
     if (!data) {
         throw std::runtime_error(std::string(__PRETTY_FUNCTION__) + " : can't get virtual format.");
     }
@@ -146,16 +146,14 @@ audio::format audio::device::stream::virtual_format() const {
 }
 
 uint32_t audio::device::stream::starting_channel() const {
-    auto data = _property_data<uint32_t>(stream_id(), kAudioStreamPropertyStartingChannel);
+    auto data = this->_property_data<uint32_t>(stream_id(), kAudioStreamPropertyStartingChannel);
     if (data) {
         return *data->data();
     }
     return 0;
 }
 
-chaining::chain<audio::device::stream::chaining_pair_t, audio::device::stream::chaining_pair_t,
-                audio::device::stream::chaining_pair_t, false>
-audio::device::stream::chain() const {
+chaining::chain_unsyncable_t<audio::device::stream::chaining_pair_t> audio::device::stream::chain() const {
     return impl_ptr<impl>()->_notifier.chain();
 }
 

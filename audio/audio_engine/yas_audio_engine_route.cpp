@@ -44,7 +44,7 @@ struct audio::engine::route::impl : base::impl {
     void prepare(audio::engine::route const &route) {
         auto weak_route = to_weak(route);
 
-        _node.set_render_handler([weak_route](auto args) {
+        this->_node.set_render_handler([weak_route](auto args) {
             auto &dst_buffer = args.buffer;
             auto const dst_bus_idx = args.bus_idx;
 
@@ -81,7 +81,7 @@ struct audio::engine::route::impl : base::impl {
                                     })
                                     .end();
 
-        _node.set_prepare_kernel_handler([weak_route](audio::engine::kernel &kernel) {
+        this->_node.set_prepare_kernel_handler([weak_route](audio::engine::kernel &kernel) {
             if (auto route = weak_route.lock()) {
                 audio::engine::route::kernel route_kernel{};
                 route_kernel.set_routes(route.impl_ptr<impl>()->_routes);
@@ -95,54 +95,55 @@ struct audio::engine::route::impl : base::impl {
     }
 
     void add_route(audio::route &&route) {
-        _erase_route_if_either_matched(route);
-        _routes.insert(std::move(route));
-        _node.manageable().update_kernel();
+        this->_erase_route_if_either_matched(route);
+        this->_routes.insert(std::move(route));
+        this->_node.manageable().update_kernel();
     }
 
     void remove_route(audio::route const &route) {
-        _routes.erase(route);
-        _node.manageable().update_kernel();
+        this->_routes.erase(route);
+        this->_node.manageable().update_kernel();
     }
 
     void remove_route_for_source(audio::route::point const &src_pt) {
-        _erase_route_if([&src_pt](audio::route const &route_of_set) { return route_of_set.source == src_pt; });
-        _node.manageable().update_kernel();
+        this->_erase_route_if([&src_pt](audio::route const &route_of_set) { return route_of_set.source == src_pt; });
+        this->_node.manageable().update_kernel();
     }
 
     void remove_route_for_destination(audio::route::point const &dst_pt) {
-        _erase_route_if([&dst_pt](audio::route const &route_of_set) { return route_of_set.destination == dst_pt; });
-        _node.manageable().update_kernel();
+        this->_erase_route_if(
+            [&dst_pt](audio::route const &route_of_set) { return route_of_set.destination == dst_pt; });
+        this->_node.manageable().update_kernel();
     }
 
     void set_routes(route_set_t &&routes) {
-        _routes.clear();
-        _routes = std::move(routes);
-        _node.manageable().update_kernel();
+        this->_routes.clear();
+        this->_routes = std::move(routes);
+        this->_node.manageable().update_kernel();
     }
 
     void clear_routes() {
-        _routes.clear();
-        _node.manageable().update_kernel();
+        this->_routes.clear();
+        this->_node.manageable().update_kernel();
     }
 
     audio::engine::node &node() {
-        return _node;
+        return this->_node;
     }
 
    private:
     void _will_reset() {
-        _routes.clear();
+        this->_routes.clear();
     }
 
     void _erase_route_if_either_matched(audio::route const &route) {
-        _erase_route_if([&route](audio::route const &route_of_set) {
+        this->_erase_route_if([&route](audio::route const &route_of_set) {
             return route_of_set.source == route.source || route_of_set.destination == route.destination;
         });
     }
 
     void _erase_route_if(std::function<bool(audio::route const &)> pred) {
-        erase_if(_routes, pred);
+        erase_if(this->_routes, pred);
     }
 };
 

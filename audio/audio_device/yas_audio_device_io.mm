@@ -27,12 +27,12 @@ struct audio::device_io::kernel : base {
         }
 
         void reset_buffers() {
-            if (_input_buffer) {
-                _input_buffer.reset();
+            if (this->_input_buffer) {
+                this->_input_buffer.reset();
             }
 
-            if (_output_buffer) {
-                _output_buffer.reset();
+            if (this->_output_buffer) {
+                this->_output_buffer.reset();
             }
         }
     };
@@ -73,7 +73,7 @@ struct audio::device_io::impl : base::impl {
     ~impl() {
         this->_device_system_observer = nullptr;
 
-        uninitialize();
+        this->uninitialize();
     }
 
     void prepare(device_io const &device_io, audio::device const dev) {
@@ -108,14 +108,14 @@ struct audio::device_io::impl : base::impl {
             this->_device = dev;
 
             if (this->_device) {
-                auto flow = this->_device.chain(device::method::device_did_change)
-                                .perform([weak_device_io = _weak_device_io](auto const &) {
-                                    if (auto device_io = weak_device_io.lock()) {
-                                        device_io.impl_ptr<impl>()->update_kernel();
-                                    }
-                                })
-                                .end();
-                this->_device_observers.emplace(this->_device.identifier(), std::move(flow));
+                auto observer = this->_device.chain(device::method::device_did_change)
+                                    .perform([weak_device_io = _weak_device_io](auto const &) {
+                                        if (auto device_io = weak_device_io.lock()) {
+                                            device_io.impl_ptr<impl>()->update_kernel();
+                                        }
+                                    })
+                                    .end();
+                this->_device_observers.emplace(this->_device.identifier(), std::move(observer));
             }
 
             this->initialize();
@@ -198,11 +198,11 @@ struct audio::device_io::impl : base::impl {
         }
 
         if (device::is_available_device(this->_device)) {
-            raise_if_raw_audio_error(AudioDeviceDestroyIOProcID(_device.audio_device_id(), _io_proc_id));
+            raise_if_raw_audio_error(AudioDeviceDestroyIOProcID(this->_device.audio_device_id(), this->_io_proc_id));
         }
 
         this->_io_proc_id = nullptr;
-        update_kernel();
+        this->update_kernel();
     }
 
     void start() {
@@ -220,7 +220,7 @@ struct audio::device_io::impl : base::impl {
             return;
         }
 
-        _is_running = false;
+        this->_is_running = false;
 
         if (!this->_device || !this->_io_proc_id) {
             return;
@@ -244,7 +244,7 @@ struct audio::device_io::impl : base::impl {
     void set_maximum_frames(uint32_t const frames) {
         std::lock_guard<std::recursive_mutex> lock(this->_mutex);
         this->_maximum_frames = frames;
-        update_kernel();
+        this->update_kernel();
     }
 
     uint32_t maximum_frames() const {

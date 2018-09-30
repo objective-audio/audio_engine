@@ -34,6 +34,8 @@ static AudioComponentDescription constexpr audio_au_io_acd = {
 #pragma mark - audio::engine::au_io::impl
 
 struct audio::engine::au_io::impl : base::impl {
+    chaining::notifier<chaining_pair_t> _notifier;
+
     impl() : impl(args{}) {
     }
 
@@ -43,7 +45,7 @@ struct audio::engine::au_io::impl : base::impl {
                    audio::engine::node_args{.input_bus_count = static_cast<uint32_t>(args.enable_input ? 1 : 0),
                                             .output_bus_count = static_cast<uint32_t>(args.enable_output ? 1 : 0),
                                             .override_output_bus_idx = 1}}) {
-        _au.set_prepare_unit_handler([args = std::move(args)](audio::unit &unit) {
+        this->_au.set_prepare_unit_handler([args = std::move(args)](audio::unit &unit) {
             unit.set_enable_output(args.enable_input);
             unit.set_enable_input(args.enable_output);
             unit.set_maximum_frames_per_slice(4096);
@@ -70,11 +72,11 @@ struct audio::engine::au_io::impl : base::impl {
             throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
         }
 
-        au().unit().set_current_device(device.audio_device_id());
+        this->au().unit().set_current_device(device.audio_device_id());
     }
 
     audio::device device() {
-        return device::device_for_id(_au.unit().current_device());
+        return device::device_for_id(this->_au.unit().current_device());
     }
 
 #endif
@@ -113,7 +115,7 @@ struct audio::engine::au_io::impl : base::impl {
     }
 
     void set_channel_map(channel_map_t const &map, audio::direction const dir) {
-        _channel_map[to_uint32(dir)] = map;
+        this->_channel_map[to_uint32(dir)] = map;
 
         if (auto unit = au().unit()) {
             unit.set_channel_map(map, kAudioUnitScope_Output, to_uint32(dir));
@@ -121,11 +123,11 @@ struct audio::engine::au_io::impl : base::impl {
     }
 
     audio::channel_map_t const &channel_map(audio::direction const dir) {
-        return _channel_map[to_uint32(dir)];
+        return this->_channel_map[to_uint32(dir)];
     }
 
     void update_unit_io_connections() {
-        auto unit = au().unit();
+        auto unit = this->au().unit();
 
         auto update_channel_map = [](channel_map_t &map, format const &format, uint32_t const dev_ch_count) {
             if (map.size() > 0) {
@@ -144,12 +146,12 @@ struct audio::engine::au_io::impl : base::impl {
         };
 
         auto const output_idx = to_uint32(direction::output);
-        auto &output_map = _channel_map[output_idx];
-        update_channel_map(output_map, au().node().input_format(output_idx), output_device_channel_count());
+        auto &output_map = this->_channel_map[output_idx];
+        update_channel_map(output_map, au().node().input_format(output_idx), this->output_device_channel_count());
 
         auto const input_idx = to_uint32(direction::input);
-        auto &input_map = _channel_map[input_idx];
-        update_channel_map(input_map, au().node().output_format(input_idx), input_device_channel_count());
+        auto &input_map = this->_channel_map[input_idx];
+        update_channel_map(input_map, this->au().node().output_format(input_idx), this->input_device_channel_count());
 
         unit.set_channel_map(output_map, kAudioUnitScope_Output, output_idx);
         unit.set_channel_map(input_map, kAudioUnitScope_Output, input_idx);
@@ -158,12 +160,12 @@ struct audio::engine::au_io::impl : base::impl {
     }
 
     audio::engine::au &au() {
-        return _au;
+        return this->_au;
     }
 
+   private:
     audio::engine::au _au;
     channel_map_t _channel_map[2];
-    chaining::notifier<chaining_pair_t> _notifier;
     chaining::any_observer _connections_observer = nullptr;
 };
 

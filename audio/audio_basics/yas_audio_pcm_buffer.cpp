@@ -37,7 +37,7 @@ struct audio::pcm_buffer::impl : base::impl {
             throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : invalid format.");
         }
 
-        abl_uptr const &to_abl = _abl;
+        abl_uptr const &to_abl = this->_abl;
 
         AudioBufferList const *const from_abl = from_buffer.audio_buffer_list();
         uint32_t bytesPerFrame = format.stream_description().mBytesPerFrame;
@@ -101,13 +101,13 @@ struct audio::pcm_buffer::impl : base::impl {
 
     template <typename T>
     T *data_ptr_at_index(uint32_t const buf_idx) {
-        if (buf_idx >= _abl_ptr->mNumberBuffers) {
+        if (buf_idx >= this->_abl_ptr->mNumberBuffers) {
             throw std::out_of_range(std::string(__PRETTY_FUNCTION__) + " : out of range. buf_idx(" +
                                     std::to_string(buf_idx) + ") _impl->abl_ptr.mNumberBuffers(" +
-                                    std::to_string(_abl_ptr->mNumberBuffers) + ")");
+                                    std::to_string(this->_abl_ptr->mNumberBuffers) + ")");
         }
 
-        return static_cast<T *>(_abl_ptr->mBuffers[buf_idx].mData);
+        return static_cast<T *>(this->_abl_ptr->mBuffers[buf_idx].mData);
     }
 
     template <typename T>
@@ -115,23 +115,23 @@ struct audio::pcm_buffer::impl : base::impl {
         T *ptr;
 
         if (_format.stride() > 1) {
-            if (ch_idx < _abl_ptr->mBuffers[0].mNumberChannels) {
-                ptr = static_cast<T *>(_abl_ptr->mBuffers[0].mData);
+            if (ch_idx < this->_abl_ptr->mBuffers[0].mNumberChannels) {
+                ptr = static_cast<T *>(this->_abl_ptr->mBuffers[0].mData);
                 if (ch_idx > 0) {
                     ptr += ch_idx;
                 }
             } else {
                 throw std::out_of_range(std::string(__PRETTY_FUNCTION__) + " : out of range. ch_idx(" +
                                         std::to_string(ch_idx) + ") mNumberChannels(" +
-                                        std::to_string(_abl_ptr->mBuffers[0].mNumberChannels) + ")");
+                                        std::to_string(this->_abl_ptr->mBuffers[0].mNumberChannels) + ")");
             }
         } else {
-            if (ch_idx < _abl_ptr->mNumberBuffers) {
-                ptr = static_cast<T *>(_abl_ptr->mBuffers[ch_idx].mData);
+            if (ch_idx < this->_abl_ptr->mNumberBuffers) {
+                ptr = static_cast<T *>(this->_abl_ptr->mBuffers[ch_idx].mData);
             } else {
                 throw std::out_of_range(std::string(__PRETTY_FUNCTION__) + " : out of range. ch_idx(" +
                                         std::to_string(ch_idx) + ") mNumberChannels(" +
-                                        std::to_string(_abl_ptr->mBuffers[0].mNumberChannels) + ")");
+                                        std::to_string(this->_abl_ptr->mBuffers[0].mNumberChannels) + ")");
             }
         }
 

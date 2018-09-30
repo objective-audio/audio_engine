@@ -46,7 +46,7 @@ struct audio::unit::parameter::impl : base::impl {
         };
 
         this->_notifier.notify(std::make_pair(method::will_change, info));
-        _values[element] = value;
+        this->_values[element] = value;
         this->_notifier.notify(std::make_pair(method::did_change, info));
     }
 };
@@ -113,9 +113,7 @@ std::unordered_map<AudioUnitElement, AudioUnitParameterValue> const &audio::unit
     return impl_ptr<impl>()->_values;
 }
 
-chaining::chain<audio::unit::parameter::chaining_pair_t, audio::unit::parameter::chaining_pair_t,
-                audio::unit::parameter::chaining_pair_t, false>
-audio::unit::parameter::chain() const {
+chaining::chain_unsyncable_t<audio::unit::parameter::chaining_pair_t> audio::unit::parameter::chain() const {
     return impl_ptr<impl>()->_notifier.chain();
 }
 
