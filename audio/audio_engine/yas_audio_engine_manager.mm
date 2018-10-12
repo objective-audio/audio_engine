@@ -637,7 +637,7 @@ void audio::engine::manager::stop() {
     impl_ptr<impl>()->stop();
 }
 
-chaining::chain_unsyncable_t<audio::engine::manager::chaining_pair_t> audio::engine::manager::chain() const {
+chaining::chain_unsync_t<audio::engine::manager::chaining_pair_t> audio::engine::manager::chain() const {
     return impl_ptr<impl>()->_notifier.chain();
 }
 

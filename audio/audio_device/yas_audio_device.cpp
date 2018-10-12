@@ -494,7 +494,7 @@ uint32_t audio::device::output_channel_count() const {
     return 0;
 }
 
-chaining::chain_unsyncable_t<audio::device::chaining_pair_t> audio::device::chain() const {
+chaining::chain_unsync_t<audio::device::chaining_pair_t> audio::device::chain() const {
     return impl_ptr<impl>()->_notifier.chain();
 }
 
@@ -506,7 +506,7 @@ audio::device::chain(method const method) const {
         .to([](audio::device::chaining_pair_t const &pair) { return pair.second; });
 }
 
-chaining::chain_unsyncable_t<audio::device::chaining_system_pair_t> audio::device::system_chain() {
+chaining::chain_unsync_t<audio::device::chaining_system_pair_t> audio::device::system_chain() {
     return audio::_system_notifier.chain();
 }
 

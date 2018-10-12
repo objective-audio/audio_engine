@@ -153,7 +153,7 @@ uint32_t audio::device::stream::starting_channel() const {
     return 0;
 }
 
-chaining::chain_unsyncable_t<audio::device::stream::chaining_pair_t> audio::device::stream::chain() const {
+chaining::chain_unsync_t<audio::device::stream::chaining_pair_t> audio::device::stream::chain() const {
     return impl_ptr<impl>()->_notifier.chain();
 }
 
