@@ -43,7 +43,7 @@ class unit::parameter : public base {
     std::unordered_map<AudioUnitElement, AudioUnitParameterValue> const &values() const;
 
     [[nodiscard]] chaining::chain_unsync_t<chaining_pair_t> chain() const;
-    [[nodiscard]] chaining::chain<change_info, chaining_pair_t, chaining_pair_t, false> chain(method const) const;
+    [[nodiscard]] chaining::chain_relayed_unsync_t<change_info, chaining_pair_t> chain(method const) const;
 };
 }  // namespace yas::audio
 

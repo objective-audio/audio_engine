@@ -117,8 +117,7 @@ chaining::chain_unsync_t<audio::unit::parameter::chaining_pair_t> audio::unit::p
     return impl_ptr<impl>()->_notifier.chain();
 }
 
-chaining::chain<audio::unit::parameter::change_info, audio::unit::parameter::chaining_pair_t,
-                audio::unit::parameter::chaining_pair_t, false>
+chaining::chain_relayed_unsync_t<audio::unit::parameter::change_info, audio::unit::parameter::chaining_pair_t>
 audio::unit::parameter::chain(method const method) const {
     return impl_ptr<impl>()
         ->_notifier.chain()

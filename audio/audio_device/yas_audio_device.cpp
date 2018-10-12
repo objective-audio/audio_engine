@@ -498,8 +498,8 @@ chaining::chain_unsync_t<audio::device::chaining_pair_t> audio::device::chain() 
     return impl_ptr<impl>()->_notifier.chain();
 }
 
-chaining::chain<audio::device::change_info, audio::device::chaining_pair_t, audio::device::chaining_pair_t, false>
-audio::device::chain(method const method) const {
+chaining::chain_relayed_unsync_t<audio::device::change_info, audio::device::chaining_pair_t> audio::device::chain(
+    method const method) const {
     return impl_ptr<impl>()
         ->_notifier.chain()
         .guard([method](audio::device::chaining_pair_t const &pair) { return pair.first == method; })
