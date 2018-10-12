@@ -510,8 +510,7 @@ chaining::chain_unsync_t<audio::device::chaining_system_pair_t> audio::device::s
     return audio::_system_notifier.chain();
 }
 
-chaining::chain<audio::device::change_info, audio::device::chaining_system_pair_t,
-                audio::device::chaining_system_pair_t, false>
+chaining::chain_relayed_unsync_t<audio::device::change_info, audio::device::chaining_system_pair_t>
 audio::device::system_chain(system_method const method) {
     return audio::_system_notifier.chain()
         .guard([method](chaining_system_pair_t const &pair) { return pair.first == method; })

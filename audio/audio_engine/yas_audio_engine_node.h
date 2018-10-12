@@ -81,7 +81,7 @@ class node : public base {
     void set_render_time_on_render(audio::time const &time);
 
     [[nodiscard]] chaining::chain_unsync_t<chaining_pair_t> chain() const;
-    [[nodiscard]] chaining::chain<node, chaining_pair_t, chaining_pair_t, false> chain(method const) const;
+    [[nodiscard]] chaining::chain_relayed_unsync_t<node, chaining_pair_t> chain(method const) const;
 
     audio::engine::connectable_node &connectable();
     audio::engine::manageable_node const &manageable() const;

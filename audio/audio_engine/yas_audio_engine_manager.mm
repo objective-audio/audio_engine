@@ -641,8 +641,7 @@ chaining::chain_unsync_t<audio::engine::manager::chaining_pair_t> audio::engine:
     return impl_ptr<impl>()->_notifier.chain();
 }
 
-chaining::chain<audio::engine::manager, audio::engine::manager::chaining_pair_t,
-                audio::engine::manager::chaining_pair_t, false>
+chaining::chain_relayed_unsync_t<audio::engine::manager, audio::engine::manager::chaining_pair_t>
 audio::engine::manager::chain(method const method) const {
     return impl_ptr<impl>()
         ->_notifier.chain()

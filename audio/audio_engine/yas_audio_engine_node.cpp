@@ -385,8 +385,8 @@ chaining::chain_unsync_t<audio::engine::node::chaining_pair_t> audio::engine::no
     return impl_ptr<impl>()->_notifier.chain();
 }
 
-chaining::chain<audio::engine::node, audio::engine::node::chaining_pair_t, audio::engine::node::chaining_pair_t, false>
-audio::engine::node::chain(method const method) const {
+chaining::chain_relayed_unsync_t<audio::engine::node, audio::engine::node::chaining_pair_t> audio::engine::node::chain(
+    method const method) const {
     return impl_ptr<impl>()
         ->_notifier.chain()
         .guard([method](auto const &pair) { return pair.first == method; })
