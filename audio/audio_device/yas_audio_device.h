@@ -73,11 +73,11 @@ class device : public base {
     uint32_t input_channel_count() const;
     uint32_t output_channel_count() const;
 
-    [[nodiscard]] chaining::chain_unsyncable_t<chaining_pair_t> chain() const;
-    [[nodiscard]] chaining::chain<change_info, chaining_pair_t, chaining_pair_t, false> chain(method const) const;
-    [[nodiscard]] static chaining::chain_unsyncable_t<chaining_system_pair_t> system_chain();
-    [[nodiscard]] static chaining::chain<change_info, chaining_system_pair_t, chaining_system_pair_t, false>
-    system_chain(system_method const);
+    [[nodiscard]] chaining::chain_unsync_t<chaining_pair_t> chain() const;
+    [[nodiscard]] chaining::chain_relayed_unsync_t<change_info, chaining_pair_t> chain(method const) const;
+    [[nodiscard]] static chaining::chain_unsync_t<chaining_system_pair_t> system_chain();
+    [[nodiscard]] static chaining::chain_relayed_unsync_t<change_info, chaining_system_pair_t> system_chain(
+        system_method const);
 
 #if YAS_TEST
     static chaining::notifier<chaining_system_pair_t> &system_notifier();

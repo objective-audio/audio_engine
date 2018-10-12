@@ -215,12 +215,11 @@ audio::device audio::engine::au_io::device() const {
 
 #endif
 
-chaining::chain_unsyncable_t<audio::engine::au_io::chaining_pair_t> audio::engine::au_io::chain() const {
+chaining::chain_unsync_t<audio::engine::au_io::chaining_pair_t> audio::engine::au_io::chain() const {
     return impl_ptr<impl>()->_notifier.chain();
 }
 
-chaining::chain<audio::engine::au_io, audio::engine::au_io::chaining_pair_t, audio::engine::au_io::chaining_pair_t,
-                false>
+chaining::chain_relayed_unsync_t<audio::engine::au_io, audio::engine::au_io::chaining_pair_t>
 audio::engine::au_io::chain(method const method) const {
     return impl_ptr<impl>()
         ->_notifier.chain()
