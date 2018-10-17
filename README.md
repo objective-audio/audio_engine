@@ -12,5 +12,5 @@ AudioToolbox.framework
 AVFoundation.framework  
 Accelerate.framework  
 
-AudioUnit.framework (OS X Only)  
-CoreAudio.framework (OS X Only)
+AudioUnit.framework (macOS Only)  
+CoreAudio.framework (macOS Only)
