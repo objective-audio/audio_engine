@@ -82,8 +82,8 @@ struct audio::unit::impl : base::impl, manageable_unit::impl {
     AudioComponentDescription _acd = {0};
     bool _initialized = false;
     std::string _name;
-    std::experimental::optional<uint8_t> _graph_key = nullopt;
-    std::experimental::optional<uint16_t> _key = nullopt;
+    std::optional<uint8_t> _graph_key = std::nullopt;
+    std::optional<uint16_t> _key = std::nullopt;
 
     virtual ~impl() final {
         this->uninitialize();
@@ -483,19 +483,19 @@ struct audio::unit::impl : base::impl, manageable_unit::impl {
         return data;
     }
 
-    void set_graph_key(std::experimental::optional<uint8_t> const &key) override {
+    void set_graph_key(std::optional<uint8_t> const &key) override {
         this->_graph_key = key;
     }
 
-    std::experimental::optional<uint8_t> const &graph_key() const override {
+    std::optional<uint8_t> const &graph_key() const override {
         return this->_graph_key;
     }
 
-    void set_key(std::experimental::optional<uint16_t> const &key) override {
+    void set_key(std::optional<uint16_t> const &key) override {
         this->_key = key;
     }
 
-    std::experimental::optional<uint16_t> const &key() const override {
+    std::optional<uint16_t> const &key() const override {
         return this->_key;
     }
 

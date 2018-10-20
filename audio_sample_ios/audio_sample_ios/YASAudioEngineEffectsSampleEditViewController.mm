@@ -13,7 +13,7 @@ using namespace yas;
 @end
 
 @implementation YASAudioEngineEffectsSampleEditViewController {
-    std::experimental::optional<audio::engine::au> _au_opt;
+    std::optional<audio::engine::au> _au_opt;
 }
 
 - (void)viewDidLoad {

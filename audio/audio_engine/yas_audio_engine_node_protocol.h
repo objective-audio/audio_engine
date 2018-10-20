@@ -4,8 +4,8 @@
 
 #pragma once
 
+#include <optional>
 #include "yas_audio_engine_connection_protocol.h"
-#include "yas_types.h"
 
 namespace yas::audio {
 class graph;
@@ -19,7 +19,7 @@ class manager;
 struct node_args {
     uint32_t input_bus_count = 0;
     uint32_t output_bus_count = 0;
-    std::experimental::optional<uint32_t> override_output_bus_idx;
+    std::optional<uint32_t> override_output_bus_idx;
     bool input_renderable = false;
 };
 

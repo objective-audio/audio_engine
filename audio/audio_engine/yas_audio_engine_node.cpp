@@ -19,7 +19,7 @@ struct audio::engine::node::impl : base::impl, manageable_node::impl, connectabl
     uint32_t _input_bus_count = 0;
     uint32_t _output_bus_count = 0;
     bool _is_input_renderable = false;
-    std::experimental::optional<uint32_t> _override_output_bus_idx = nullopt;
+    std::optional<uint32_t> _override_output_bus_idx = std::nullopt;
     audio::engine::connection_wmap _input_connections;
     audio::engine::connection_wmap _output_connections;
     graph_editing_f _add_to_graph_handler;
@@ -64,7 +64,7 @@ struct audio::engine::node::impl : base::impl, manageable_node::impl, connectabl
         if (key && *key < this->input_bus_count()) {
             return key;
         }
-        return nullopt;
+        return std::nullopt;
     }
 
     audio::bus_result_t next_available_output_bus() const {
@@ -76,7 +76,7 @@ struct audio::engine::node::impl : base::impl, manageable_node::impl, connectabl
             }
             return key;
         }
-        return nullopt;
+        return std::nullopt;
     }
 
     bool is_available_input_bus(uint32_t const bus_idx) const {
@@ -95,7 +95,7 @@ struct audio::engine::node::impl : base::impl, manageable_node::impl, connectabl
         return this->_output_connections.count(target_bus_idx) == 0;
     }
 
-    void override_output_bus_idx(std::experimental::optional<uint32_t> bus_idx) {
+    void override_output_bus_idx(std::optional<uint32_t> bus_idx) {
         this->_override_output_bus_idx = bus_idx;
     }
 

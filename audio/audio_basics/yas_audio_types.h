@@ -5,8 +5,8 @@
 #pragma once
 
 #include <AudioUnit/AUComponent.h>
-#include <experimental/optional>
 #include <memory>
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -49,7 +49,7 @@ struct render_parameters {
     render_id render_id;
 };
 
-using bus_result_t = std::experimental::optional<uint32_t>;
+using bus_result_t = std::optional<uint32_t>;
 using abl_uptr = std::unique_ptr<AudioBufferList, std::function<void(AudioBufferList *)>>;
 using abl_data_uptr = std::unique_ptr<std::vector<std::vector<uint8_t>>>;
 using channel_map_t = std::vector<uint32_t>;
