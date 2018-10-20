@@ -8,7 +8,7 @@
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
 
 #include <AudioToolbox/AudioToolbox.h>
-#include <experimental/optional>
+#include <optional>
 #include <string>
 #include <vector>
 #include "yas_audio_types.h"
@@ -56,7 +56,7 @@ class device : public base {
     static device default_output_device();
     static device default_input_device();
     static device device_for_id(AudioDeviceID const);
-    static std::experimental::optional<size_t> index_of_device(device const &);
+    static std::optional<size_t> index_of_device(device const &);
     static bool is_available_device(device const &);
 
     device(std::nullptr_t);

@@ -412,15 +412,15 @@ audio::device audio::device::device_for_id(AudioDeviceID const audio_device_id) 
     return nullptr;
 }
 
-std::experimental::optional<size_t> audio::device::index_of_device(device const &device) {
+std::optional<size_t> audio::device::index_of_device(device const &device) {
     if (device) {
         auto all_devices = device::all_devices();
         auto it = std::find(all_devices.begin(), all_devices.end(), device);
         if (it != all_devices.end()) {
-            return std::experimental::make_optional<size_t>(it - all_devices.begin());
+            return std::make_optional<size_t>(it - all_devices.begin());
         }
     }
-    return nullopt;
+    return std::nullopt;
 }
 
 bool audio::device::is_available_device(device const &device) {

@@ -143,7 +143,7 @@ struct audio::graph::impl : base::impl {
         return nullptr;
     }
 
-    std::experimental::optional<uint16_t> next_unit_key() {
+    std::optional<uint16_t> next_unit_key() {
         std::lock_guard<std::recursive_mutex> lock(global_mutex);
         return min_empty_key(this->_units);
     }
@@ -186,8 +186,8 @@ struct audio::graph::impl : base::impl {
         if (auto key = manageable_unit.key()) {
             this->_units.erase(*key);
             this->_io_units.erase(*key);
-            manageable_unit.set_key(nullopt);
-            manageable_unit.set_graph_key(nullopt);
+            manageable_unit.set_key(std::nullopt);
+            manageable_unit.set_graph_key(std::nullopt);
         }
     }
 

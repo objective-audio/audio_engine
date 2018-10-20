@@ -20,18 +20,18 @@ void audio::manageable_unit::uninitialize() {
     impl_ptr<impl>()->uninitialize();
 }
 
-void audio::manageable_unit::set_graph_key(std::experimental::optional<uint8_t> const &key) {
+void audio::manageable_unit::set_graph_key(std::optional<uint8_t> const &key) {
     impl_ptr<impl>()->set_graph_key(key);
 }
 
-std::experimental::optional<uint8_t> const &audio::manageable_unit::graph_key() const {
+std::optional<uint8_t> const &audio::manageable_unit::graph_key() const {
     return impl_ptr<impl>()->graph_key();
 }
 
-void audio::manageable_unit::set_key(std::experimental::optional<uint16_t> const &key) {
+void audio::manageable_unit::set_key(std::optional<uint16_t> const &key) {
     impl_ptr<impl>()->set_key(key);
 }
 
-std::experimental::optional<uint16_t> const &audio::manageable_unit::key() const {
+std::optional<uint16_t> const &audio::manageable_unit::key() const {
     return impl_ptr<impl>()->key();
 }

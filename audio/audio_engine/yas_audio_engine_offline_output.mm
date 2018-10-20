@@ -34,7 +34,7 @@ struct audio::engine::offline_output::impl : base::impl, manageable_offline_outp
         if (this->_queue) {
             return offline_start_result_t(offline_start_error_t::already_running);
         } else if (auto connection = this->_node.input_connection(0)) {
-            std::experimental::optional<uint8_t> key;
+            std::optional<uint8_t> key;
             if (completion_handler) {
                 key = this->_core.push_completion_handler(std::move(completion_handler));
                 if (!key) {
@@ -98,7 +98,7 @@ struct audio::engine::offline_output::impl : base::impl, manageable_offline_outp
 
                 auto completion_lambda = [weak_output, cancelled, key]() {
                     if (auto output = weak_output.lock()) {
-                        std::experimental::optional<offline_completion_f> completion_handler;
+                        std::optional<offline_completion_f> completion_handler;
                         if (key) {
                             completion_handler = output.impl_ptr<impl>()->_core.pull_completion_handler(*key);
                         }
@@ -152,9 +152,9 @@ struct audio::engine::offline_output::impl : base::impl, manageable_offline_outp
     struct core {
         using completion_handler_map_t = std::map<uint8_t, offline_completion_f>;
 
-        std::experimental::optional<uint8_t> const push_completion_handler(offline_completion_f &&handler) {
+        std::optional<uint8_t> const push_completion_handler(offline_completion_f &&handler) {
             if (!handler) {
-                return nullopt;
+                return std::nullopt;
             }
 
             auto key = min_empty_key(this->_completion_handlers);
@@ -164,13 +164,13 @@ struct audio::engine::offline_output::impl : base::impl, manageable_offline_outp
             return key;
         }
 
-        std::experimental::optional<offline_completion_f> const pull_completion_handler(uint8_t key) {
+        std::optional<offline_completion_f> const pull_completion_handler(uint8_t key) {
             if (this->_completion_handlers.count(key) > 0) {
                 auto func = _completion_handlers.at(key);
                 this->_completion_handlers.erase(key);
                 return std::move(func);
             } else {
-                return nullopt;
+                return std::nullopt;
             }
         }
 

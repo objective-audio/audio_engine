@@ -16,7 +16,7 @@ using namespace yas;
 @end
 
 @implementation YASAudioEngineSampleParameterCell {
-    std::experimental::optional<audio::engine::au> _au_opt;
+    std::optional<audio::engine::au> _au_opt;
     uint32_t _index;
 }
 
@@ -44,10 +44,10 @@ using namespace yas;
 }
 
 - (void)reset {
-    [self set_engine_au:yas::nullopt index:0];
+    [self set_engine_au:std::nullopt index:0];
 }
 
-- (void)set_engine_au:(const std::experimental::optional<audio::engine::au> &)au_opt index:(uint32_t const)index {
+- (void)set_engine_au:(const std::optional<audio::engine::au> &)au_opt index:(uint32_t const)index {
     _au_opt = au_opt;
     _index = index;
 

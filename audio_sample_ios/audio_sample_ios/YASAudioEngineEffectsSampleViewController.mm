@@ -58,7 +58,7 @@ struct effects_vc_internal {
 
 @implementation YASAudioEngineEffectsSampleViewController {
     std::vector<audio::unit> _units;
-    std::experimental::optional<uint32_t> _index;
+    std::optional<uint32_t> _index;
     sample::effects_vc_internal _internal;
 }
 
@@ -218,7 +218,7 @@ struct effects_vc_internal {
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     switch (indexPath.section) {
         case YASAudioEngineEffectsSampleSectionNone: {
-            _index = yas::nullopt;
+            _index = std::nullopt;
             _internal.replace_effect_au(nullptr);
         } break;
         case YASAudioEngineEffectsSampleSectionEffects: {
