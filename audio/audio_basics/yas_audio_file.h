@@ -47,6 +47,7 @@ class file : public base {
         invalid_format,
         read_failed,
         tell_failed,
+        frame_length_out_of_range,
     };
 
     enum class create_error_t : uint32_t {

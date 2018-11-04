@@ -138,9 +138,13 @@ struct audio::file::impl : base::impl {
             return read_result_t(read_error_t::invalid_format);
         }
 
+        if (buffer.frame_capacity() < frame_length) {
+            return read_result_t(read_error_t::frame_length_out_of_range);
+        }
+
         OSStatus err = noErr;
         uint32_t out_frame_length = 0;
-        uint32_t remain_frames = frame_length > 0 ?: buffer.frame_capacity();
+        uint32_t remain_frames = frame_length > 0 ? frame_length : buffer.frame_capacity();
 
         auto const &format = buffer.format();
         uint32_t const buffer_count = format.buffer_count();
@@ -405,6 +409,8 @@ std::string yas::to_string(audio::file::read_error_t const &error_t) {
             return "read_failed";
         case audio::file::read_error_t::tell_failed:
             return "tell_failed";
+        case audio::file::read_error_t::frame_length_out_of_range:
+            return "frame_length_out_of_range";
     }
 }
 
