@@ -148,20 +148,7 @@ uint32_t audio::format::buffer_frame_byte_count() const {
 }
 
 CFStringRef audio::format::description() const {
-    std::string string;
-    AudioStreamBasicDescription const &asbd = stream_description();
-    string += "{\n";
-    string += "    pcmFormat = " + to_string(pcm_format()) + ";\n";
-    string += "    sampleRate = " + std::to_string(asbd.mSampleRate) + ";\n";
-    string += "    bitsPerChannel = " + std::to_string(asbd.mBitsPerChannel) + ";\n";
-    string += "    bytesPerFrame = " + std::to_string(asbd.mBytesPerFrame) + ";\n";
-    string += "    bytesPerPacket = " + std::to_string(asbd.mBytesPerPacket) + ";\n";
-    string += "    channelsPerFrame = " + std::to_string(asbd.mChannelsPerFrame) + ";\n";
-    string += "    formatFlags = " + format_flags_string(stream_description()) + ";\n";
-    string += "    formatID = " + to_string(file_type_for_hfs_type_code(asbd.mFormatID)) + ";\n";
-    string += "    framesPerPacket = " + std::to_string(asbd.mFramesPerPacket) + ";\n";
-    string += "}\n";
-    return to_cf_object(string);
+    return to_cf_object(to_string(*this));
 }
 
 audio::format const &audio::format::null_format() {
@@ -290,4 +277,21 @@ AudioStreamBasicDescription yas::to_stream_description(double const sample_rate,
 
 bool yas::is_equal(AudioStreamBasicDescription const &asbd1, AudioStreamBasicDescription const &asbd2) {
     return memcmp(&asbd1, &asbd2, sizeof(AudioStreamBasicDescription)) == 0;
+}
+
+std::string yas::to_string(audio::format const &format) {
+    std::string string;
+    AudioStreamBasicDescription const &asbd = format.stream_description();
+    string += "{\n";
+    string += "    pcmFormat = " + to_string(format.pcm_format()) + ";\n";
+    string += "    sampleRate = " + std::to_string(asbd.mSampleRate) + ";\n";
+    string += "    bitsPerChannel = " + std::to_string(asbd.mBitsPerChannel) + ";\n";
+    string += "    bytesPerFrame = " + std::to_string(asbd.mBytesPerFrame) + ";\n";
+    string += "    bytesPerPacket = " + std::to_string(asbd.mBytesPerPacket) + ";\n";
+    string += "    channelsPerFrame = " + std::to_string(asbd.mChannelsPerFrame) + ";\n";
+    string += "    formatFlags = " + format_flags_string(format.stream_description()) + ";\n";
+    string += "    formatID = " + to_string(file_type_for_hfs_type_code(asbd.mFormatID)) + ";\n";
+    string += "    framesPerPacket = " + std::to_string(asbd.mFramesPerPacket) + ";\n";
+    string += "}\n";
+    return string;
 }
