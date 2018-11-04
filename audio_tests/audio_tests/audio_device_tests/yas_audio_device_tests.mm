@@ -46,8 +46,8 @@ using namespace yas;
 
 - (void)test_system_method_ostream {
     auto const values = {audio::device::system_method::hardware_did_change,
-        audio::device::system_method::configuration_change};
-    
+                         audio::device::system_method::configuration_change};
+
     for (auto const &value : values) {
         std::ostringstream stream;
         stream << value;

@@ -40,4 +40,4 @@ struct connection : audio::engine::connection {
 };
 
 audio::engine::node make_node();
-}
+}  // namespace yas::test

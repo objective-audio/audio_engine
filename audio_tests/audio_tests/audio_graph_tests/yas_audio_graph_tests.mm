@@ -80,9 +80,8 @@ using namespace yas;
         XCTAssertEqual(input_asbd.mSampleRate, mixer_sample_rate);
     }
 
-    auto io_exp = make_objc_ptr<XCTestExpectation *>([&self](){
-        return [self expectationWithDescription:@"io_unit render"];
-    });
+    auto io_exp =
+        make_objc_ptr<XCTestExpectation *>([&self]() { return [self expectationWithDescription:@"io_unit render"]; });
 
     io_unit.set_render_handler([io_exp, frame_length, output_format, &mixer_unit,
                                 &self](audio::render_parameters &render_parameters) mutable {

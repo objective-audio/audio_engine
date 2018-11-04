@@ -51,14 +51,16 @@ using namespace yas;
 
     bool called = false;
 
-    auto will_chain = parameter.chain(audio::unit::parameter::method::will_change).perform([self, &called](auto const &change_info){
-        AudioUnitElement const element = change_info.element;
-        XCTAssertEqual(element, 2);
-        XCTAssertEqual(change_info.old_value, 0.0f);
-        XCTAssertEqual(change_info.new_value, 1.0f);
-        XCTAssertEqual(change_info.parameter.value(element), 0.0);
-        called = true;
-    }).end();
+    auto will_chain = parameter.chain(audio::unit::parameter::method::will_change)
+                          .perform([self, &called](auto const &change_info) {
+                              AudioUnitElement const element = change_info.element;
+                              XCTAssertEqual(element, 2);
+                              XCTAssertEqual(change_info.old_value, 0.0f);
+                              XCTAssertEqual(change_info.new_value, 1.0f);
+                              XCTAssertEqual(change_info.parameter.value(element), 0.0);
+                              called = true;
+                          })
+                          .end();
 
     parameter.set_value(1.0f, 2);
 
@@ -72,14 +74,16 @@ using namespace yas;
 
     bool called = false;
 
-    auto did_chain = parameter.chain(audio::unit::parameter::method::did_change).perform([self, &called](auto const &change_info){
-        AudioUnitElement const element = change_info.element;
-        XCTAssertEqual(element, 10);
-        XCTAssertEqual(change_info.old_value, -1.0f);
-        XCTAssertEqual(change_info.new_value, 3.5f);
-        XCTAssertEqual(change_info.parameter.value(element), 3.5f);
-        called = true;
-    }).end();
+    auto did_chain = parameter.chain(audio::unit::parameter::method::did_change)
+                         .perform([self, &called](auto const &change_info) {
+                             AudioUnitElement const element = change_info.element;
+                             XCTAssertEqual(element, 10);
+                             XCTAssertEqual(change_info.old_value, -1.0f);
+                             XCTAssertEqual(change_info.new_value, 3.5f);
+                             XCTAssertEqual(change_info.parameter.value(element), 3.5f);
+                             called = true;
+                         })
+                         .end();
 
     parameter.set_value(3.5f, 10);
 

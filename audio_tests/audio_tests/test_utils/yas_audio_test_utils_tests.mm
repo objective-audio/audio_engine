@@ -54,7 +54,12 @@ using namespace yas;
     };
 
     AudioTimeStamp timeStamp1 = {
-        .mSampleTime = 1, .mHostTime = 1, .mRateScalar = 1, .mWordClockTime = 1, .mSMPTETime = smpteTime, .mFlags = 1,
+        .mSampleTime = 1,
+        .mHostTime = 1,
+        .mRateScalar = 1,
+        .mWordClockTime = 1,
+        .mSMPTETime = smpteTime,
+        .mFlags = 1,
     };
 
     AudioTimeStamp timeStamp2 = timeStamp1;
