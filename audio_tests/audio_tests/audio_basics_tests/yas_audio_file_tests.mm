@@ -179,6 +179,25 @@ struct audio_file_test_data {
     }
 }
 
+- (void)test_read_into_buffer_error_frame_length_out_of_range {
+    auto file_name = CFSTR("test.wav");
+    NSString *filePath = [[self temporaryTestDirectory] stringByAppendingPathComponent:(__bridge NSString *)file_name];
+    CFURLRef fileURL = (__bridge CFURLRef)[NSURL fileURLWithPath:filePath];
+
+    auto file_result = audio::make_created_file({.file_url = fileURL,
+                                                 .file_type = audio::file_type::wave,
+                                                 .settings = audio::wave_file_settings(48000.0, 2, 16)});
+
+    auto &file = file_result.value();
+
+    uint32_t const frame_capacity = 10;
+    audio::pcm_buffer buffer{file.processing_format(), frame_capacity};
+
+    auto result = file.read_into_buffer(buffer, 11);
+    XCTAssertFalse(result);
+    XCTAssertEqual(result.error(), audio::file::read_error_t::frame_length_out_of_range);
+}
+
 - (void)test_open_error_to_string {
     XCTAssertEqual(to_string(audio::file::open_error_t::opened), "opened");
     XCTAssertEqual(to_string(audio::file::open_error_t::invalid_argument), "invalid_argument");
@@ -191,6 +210,7 @@ struct audio_file_test_data {
     XCTAssertEqual(to_string(audio::file::read_error_t::invalid_format), "invalid_format");
     XCTAssertEqual(to_string(audio::file::read_error_t::read_failed), "read_failed");
     XCTAssertEqual(to_string(audio::file::read_error_t::tell_failed), "tell_failed");
+    XCTAssertEqual(to_string(audio::file::read_error_t::frame_length_out_of_range), "frame_length_out_of_range");
 }
 
 - (void)test_create_error_to_string {

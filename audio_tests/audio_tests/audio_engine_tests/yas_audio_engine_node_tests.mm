@@ -67,8 +67,7 @@ using namespace yas;
     auto destination_bus = *destination_bus_result;
     XCTAssertEqual(destination_bus, 0);
 
-    if (auto connection =
-            test::connection(src_obj.node(), source_bus, dst_obj.node(), destination_bus, format)) {
+    if (auto connection = test::connection(src_obj.node(), source_bus, dst_obj.node(), destination_bus, format)) {
         XCTAssertEqual(src_obj.node().manageable().output_connections().size(), 1);
         XCTAssertEqual(dst_obj.node().manageable().input_connections().size(), 1);
         XCTAssertEqual(src_obj.node().manageable().output_connection(source_bus), connection);
@@ -98,8 +97,7 @@ using namespace yas;
     auto source_bus = *src_obj.node().next_available_output_bus();
     auto destination_bus = *dst_obj.node().next_available_input_bus();
 
-    auto connection =
-        test::connection(src_obj.node(), source_bus, dst_obj.node(), destination_bus, format);
+    auto connection = test::connection(src_obj.node(), source_bus, dst_obj.node(), destination_bus, format);
 
     XCTAssertEqual(src_obj.node().manageable().output_connections().size(), 1);
     XCTAssertEqual(dst_obj.node().manageable().input_connections().size(), 1);
