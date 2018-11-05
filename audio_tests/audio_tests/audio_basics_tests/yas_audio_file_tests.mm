@@ -3,12 +3,15 @@
 //
 
 #import "yas_audio_test_utils.h"
+#import "yas_file_manager.h"
 #import "yas_objc_ptr.h"
+#import "yas_system_url_utils.h"
 
 using namespace yas;
 
 namespace yas::test {
 struct audio_file_test_data {
+    std::string file_name;
     double file_sample_rate;
     double processing_sample_rate;
     uint32_t channels;
@@ -20,12 +23,11 @@ struct audio_file_test_data {
     bool standard;
     bool async;
 
-    audio_file_test_data() : _file_name(nullptr), _file_type(nullptr) {
+    audio_file_test_data() : _file_type(nullptr) {
     }
 
     ~audio_file_test_data() {
         set_file_type(nullptr);
-        set_file_name(nullptr);
     }
 
     void set_file_type(CFStringRef const file_type) {
@@ -34,14 +36,6 @@ struct audio_file_test_data {
 
     CFStringRef file_type() const {
         return get_cf_property(_file_type);
-    }
-
-    void set_file_name(CFStringRef const file_name) {
-        set_cf_property(_file_name, file_name);
-    }
-
-    CFStringRef file_name() const {
-        return get_cf_property(_file_name);
     }
 
     CFDictionaryRef settings() const {
@@ -55,8 +49,28 @@ struct audio_file_test_data {
 
    private:
     CFStringRef _file_type;
-    CFStringRef _file_name;
 };
+
+static yas::url temporary_test_dir_url() {
+    return system_url_utils::directory_url(system_url_utils::dir::temporary).appending("yas_audio_test_files");
+}
+
+static void removeAllFiles() {
+    auto url = test::temporary_test_dir_url();
+
+    if (auto result = file_manager::remove_files_in_directory(url.path()); result.is_error()) {
+        throw std::runtime_error("remove_files failed");
+    }
+}
+
+static void setupDirectory() {
+    test::removeAllFiles();
+
+    auto path = test::temporary_test_dir_url().path();
+    if (auto result = file_manager::create_directory_if_not_exists(path); result.is_error()) {
+        throw std::runtime_error("create_directory_if_not_exists failed");
+    }
+}
 }
 
 @interface yas_audio_file_tests : XCTestCase
@@ -68,11 +82,11 @@ struct audio_file_test_data {
 - (void)setUp {
     [super setUp];
 
-    [self setupDirectory];
+    test::setupDirectory();
 }
 
 - (void)tearDown {
-    [self removeAllFiles];
+    test::removeAllFiles();
 
     [super tearDown];
 }
@@ -97,7 +111,7 @@ struct audio_file_test_data {
     test::audio_file_test_data test_data;
     test_data.frame_length = 8;
     test_data.loop_count = 4;
-    test_data.set_file_name(CFSTR("test.wav"));
+    test_data.file_name = "test.wav";
     test_data.set_file_type(audio::file_type::wave);
     test_data.standard = NO;
     test_data.async = NO;
@@ -140,19 +154,18 @@ struct audio_file_test_data {
 }
 
 - (void)test_make_create_and_open_file {
-    auto file_name = CFSTR("test.wav");
-    NSString *filePath = [[self temporaryTestDirectory] stringByAppendingPathComponent:(__bridge NSString *)file_name];
-    CFURLRef fileURL = (__bridge CFURLRef)[NSURL fileURLWithPath:filePath];
+    auto const file_name = "test.wav";
+    auto file_url = test::temporary_test_dir_url().appending(file_name);
 
     {
-        auto file_result = audio::make_created_file({.file_url = fileURL,
+        auto file_result = audio::make_created_file({.file_url = file_url,
                                                      .file_type = audio::file_type::wave,
                                                      .settings = audio::wave_file_settings(48000.0, 2, 16)});
         XCTAssertTrue(file_result);
 
         auto file = file_result.value();
 
-        XCTAssertTrue(CFEqual(file.url(), fileURL));
+        XCTAssertEqual(file.url(), file_url);
         XCTAssertTrue(CFEqual(file.file_type(), audio::file_type::wave));
         auto const &file_format = file.file_format();
         XCTAssertEqual(file_format.buffer_count(), 1);
@@ -163,12 +176,12 @@ struct audio_file_test_data {
     }
 
     {
-        auto file_result = audio::make_opened_file({.file_url = fileURL});
+        auto file_result = audio::make_opened_file({.file_url = file_url});
         XCTAssertTrue(file_result);
 
         auto file = file_result.value();
 
-        XCTAssertTrue(CFEqual(file.url(), fileURL));
+        XCTAssertEqual(file.url(), file_url);
         XCTAssertTrue(CFEqual(file.file_type(), audio::file_type::wave));
         auto const &file_format = file.file_format();
         XCTAssertEqual(file_format.buffer_count(), 1);
@@ -180,11 +193,10 @@ struct audio_file_test_data {
 }
 
 - (void)test_read_into_buffer_error_frame_length_out_of_range {
-    auto file_name = CFSTR("test.wav");
-    NSString *filePath = [[self temporaryTestDirectory] stringByAppendingPathComponent:(__bridge NSString *)file_name];
-    CFURLRef fileURL = (__bridge CFURLRef)[NSURL fileURLWithPath:filePath];
+    auto const file_name = "test.wav";
+    auto file_url = test::temporary_test_dir_url().appending(file_name);
 
-    auto file_result = audio::make_created_file({.file_url = fileURL,
+    auto file_result = audio::make_created_file({.file_url = file_url,
                                                  .file_type = audio::file_type::wave,
                                                  .settings = audio::wave_file_settings(48000.0, 2, 16)});
 
@@ -276,9 +288,7 @@ struct audio_file_test_data {
 #pragma mark -
 
 - (void)_commonAudioFileTest:(test::audio_file_test_data &)test_data {
-    NSString *filePath =
-        [[self temporaryTestDirectory] stringByAppendingPathComponent:(__bridge NSString *)test_data.file_name()];
-    CFURLRef fileURL = (__bridge CFURLRef)[NSURL fileURLWithPath:filePath];
+    auto file_url = test::temporary_test_dir_url().appending(test_data.file_name);
     uint32_t const frame_length = test_data.frame_length;
     uint32_t const loopCount = test_data.loop_count;
     double const file_sample_rate = test_data.file_sample_rate;
@@ -304,9 +314,9 @@ struct audio_file_test_data {
 
         if (test_data.standard) {
             XCTAssertTrue(
-                audio_file.create({.file_url = fileURL, .file_type = test_data.file_type(), .settings = settings}));
+                audio_file.create({.file_url = file_url, .file_type = test_data.file_type(), .settings = settings}));
         } else {
-            XCTAssertTrue(audio_file.create({.file_url = fileURL,
+            XCTAssertTrue(audio_file.create({.file_url = file_url,
                                              .file_type = test_data.file_type(),
                                              .settings = settings,
                                              .pcm_format = pcm_format,
@@ -336,9 +346,10 @@ struct audio_file_test_data {
         audio::file audio_file;
 
         if (test_data.standard) {
-            XCTAssertTrue(audio_file.open({.file_url = fileURL}));
+            XCTAssertTrue(audio_file.open({.file_url = file_url}));
         } else {
-            XCTAssertTrue(audio_file.open({.file_url = fileURL, .pcm_format = pcm_format, .interleaved = interleaved}));
+            XCTAssertTrue(
+                audio_file.open({.file_url = file_url, .pcm_format = pcm_format, .interleaved = interleaved}));
         }
 
         int64_t looped_frame_length = frame_length * loopCount;
@@ -446,35 +457,6 @@ struct audio_file_test_data {
         }
     }
     return YES;
-}
-
-#pragma mark -
-
-- (NSString *)temporaryTestDirectory {
-    return [NSTemporaryDirectory() stringByAppendingPathComponent:@"yas_audio_test_files"];
-}
-
-- (void)setupDirectory {
-    [self removeAllFiles];
-
-    NSString *path = [self temporaryTestDirectory];
-
-    if (auto file_manager = make_objc_ptr([[NSFileManager alloc] init])) {
-        [file_manager.object() createDirectoryAtPath:path withIntermediateDirectories:YES attributes:nil error:nil];
-    }
-}
-
-- (void)removeAllFiles {
-    NSString *path = [self temporaryTestDirectory];
-
-    if (auto file_manager = make_objc_ptr([[NSFileManager alloc] init])) {
-        for (NSString *fileName in [file_manager.object() contentsOfDirectoryAtPath:path error:nil]) {
-            NSString *fullPath = [path stringByAppendingPathComponent:fileName];
-            [file_manager.object() removeItemAtPath:fullPath error:nil];
-        }
-
-        [file_manager.object() removeItemAtPath:path error:nil];
-    }
 }
 
 @end
