@@ -19,6 +19,60 @@ CFStringRef const audio::file_type_cf_string::mpeg4 = CFSTR("public.mpeg-4");
 CFStringRef const audio::file_type_cf_string::apple_m4a = CFSTR("com.apple.m4a-audio");
 CFStringRef const audio::file_type_cf_string::wave = CFSTR("com.microsoft.waveform-audio");
 
+AudioFileTypeID yas::to_audio_file_type_id(audio::file_type const file_type) {
+    switch (file_type) {
+        case audio::file_type::three_gpp:
+            return kAudioFile3GPType;
+        case audio::file_type::three_gpp2:
+            return kAudioFile3GP2Type;
+        case audio::file_type::aifc:
+            return kAudioFileAIFCType;
+        case audio::file_type::aiff:
+            return kAudioFileAIFFType;
+        case audio::file_type::amr:
+            return kAudioFileAMRType;
+        case audio::file_type::ac3:
+            return kAudioFileAC3Type;
+        case audio::file_type::mpeg_layer3:
+            return kAudioFileMP3Type;
+        case audio::file_type::core_audio_format:
+            return kAudioFileCAFType;
+        case audio::file_type::mpeg4:
+            return kAudioFileMPEG4Type;
+        case audio::file_type::apple_m4a:
+            return kAudioFileM4AType;
+        case audio::file_type::wave:
+            return kAudioFileWAVEType;
+    }
+}
+
+std::string yas::to_string(audio::file_type const file_type) {
+    switch (file_type) {
+        case audio::file_type::three_gpp:
+            return "public.3gpp";
+        case audio::file_type::three_gpp2:
+            return "public.3gpp2";
+        case audio::file_type::aifc:
+            return "public.aifc-audio";
+        case audio::file_type::aiff:
+            return "public.aiff-audio";
+        case audio::file_type::amr:
+            return "org.3gpp.adaptive-multi-rate-audio";
+        case audio::file_type::ac3:
+            return "public.ac3-audio";
+        case audio::file_type::mpeg_layer3:
+            return "public.mp3";
+        case audio::file_type::core_audio_format:
+            return "com.apple.coreaudio-format";
+        case audio::file_type::mpeg4:
+            return "public.mpeg-4";
+        case audio::file_type::apple_m4a:
+            return "com.apple.m4a-audio";
+        case audio::file_type::wave:
+            return "com.microsoft.waveform-audio";
+    }
+}
+
 AudioFileTypeID audio::to_audio_file_type_id(CFStringRef const fileType) {
     if (CFEqual(fileType, file_type_cf_string::three_gpp)) {
         return kAudioFile3GPType;

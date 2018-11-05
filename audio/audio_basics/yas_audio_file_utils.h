@@ -7,6 +7,7 @@
 #include <AVFoundation/AVFoundation.h>
 #include <AudioToolbox/AudioToolbox.h>
 #include <CoreFoundation/CoreFoundation.h>
+#include <string>
 
 namespace yas::audio::file_type_cf_string {
 extern CFStringRef const three_gpp;
@@ -23,9 +24,27 @@ extern CFStringRef const wave;
 }  // namespace yas::audio::file_type_cf_string
 
 namespace yas::audio {
+enum class file_type {
+    three_gpp,
+    three_gpp2,
+    aifc,
+    aiff,
+    amr,
+    ac3,
+    mpeg_layer3,
+    core_audio_format,
+    mpeg4,
+    apple_m4a,
+    wave,
+};
 AudioFileTypeID to_audio_file_type_id(CFStringRef const fileType);
 CFStringRef to_file_type(AudioFileTypeID const fileTypeID);
 }  // namespace yas::audio
+
+namespace yas {
+AudioFileTypeID to_audio_file_type_id(audio::file_type const);
+std::string to_string(audio::file_type const);
+}  // namespace yas
 
 namespace yas::audio::ext_audio_file_utils {
 Boolean can_open(CFURLRef const url);
