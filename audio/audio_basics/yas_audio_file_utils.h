@@ -8,7 +8,7 @@
 #include <AudioToolbox/AudioToolbox.h>
 #include <CoreFoundation/CoreFoundation.h>
 
-namespace yas::audio::file_type {
+namespace yas::audio::file_type_cf_string {
 extern CFStringRef const three_gpp;
 extern CFStringRef const three_gpp2;
 extern CFStringRef const aifc;
@@ -20,7 +20,7 @@ extern CFStringRef const core_audio_format;
 extern CFStringRef const mpeg4;
 extern CFStringRef const apple_m4a;
 extern CFStringRef const wave;
-}  // namespace yas::audio::file_type
+}  // namespace yas::audio::file_type_cf_string
 
 namespace yas::audio {
 AudioFileTypeID to_audio_file_type_id(CFStringRef const fileType);

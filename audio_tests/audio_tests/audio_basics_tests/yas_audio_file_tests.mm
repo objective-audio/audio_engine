@@ -39,9 +39,9 @@ struct audio_file_test_data {
     }
 
     CFDictionaryRef settings() const {
-        if (CFStringCompare(file_type(), audio::file_type::wave, kNilOptions) == kCFCompareEqualTo) {
+        if (CFStringCompare(file_type(), audio::file_type_cf_string::wave, kNilOptions) == kCFCompareEqualTo) {
             return audio::wave_file_settings(file_sample_rate, channels, file_bit_depth);
-        } else if (CFStringCompare(file_type(), audio::file_type::aiff, kNilOptions) == kCFCompareEqualTo) {
+        } else if (CFStringCompare(file_type(), audio::file_type_cf_string::aiff, kNilOptions) == kCFCompareEqualTo) {
             return audio::aiff_file_settings(file_sample_rate, channels, file_bit_depth);
         }
         return nullptr;
@@ -112,7 +112,7 @@ static void setupDirectory() {
     test_data.frame_length = 8;
     test_data.loop_count = 4;
     test_data.file_name = "test.wav";
-    test_data.set_file_type(audio::file_type::wave);
+    test_data.set_file_type(audio::file_type_cf_string::wave);
     test_data.standard = NO;
     test_data.async = NO;
 
@@ -159,14 +159,14 @@ static void setupDirectory() {
 
     {
         auto file_result = audio::make_created_file({.file_url = file_url,
-                                                     .file_type = audio::file_type::wave,
+                                                     .file_type = audio::file_type_cf_string::wave,
                                                      .settings = audio::wave_file_settings(48000.0, 2, 16)});
         XCTAssertTrue(file_result);
 
         auto file = file_result.value();
 
         XCTAssertEqual(file.url(), file_url);
-        XCTAssertTrue(CFEqual(file.file_type(), audio::file_type::wave));
+        XCTAssertTrue(CFEqual(file.file_type(), audio::file_type_cf_string::wave));
         auto const &file_format = file.file_format();
         XCTAssertEqual(file_format.buffer_count(), 1);
         XCTAssertEqual(file_format.channel_count(), 2);
@@ -182,7 +182,7 @@ static void setupDirectory() {
         auto file = file_result.value();
 
         XCTAssertEqual(file.url(), file_url);
-        XCTAssertTrue(CFEqual(file.file_type(), audio::file_type::wave));
+        XCTAssertTrue(CFEqual(file.file_type(), audio::file_type_cf_string::wave));
         auto const &file_format = file.file_format();
         XCTAssertEqual(file_format.buffer_count(), 1);
         XCTAssertEqual(file_format.channel_count(), 2);
@@ -197,7 +197,7 @@ static void setupDirectory() {
     auto file_url = test::temporary_test_dir_url().appending(file_name);
 
     auto file_result = audio::make_created_file({.file_url = file_url,
-                                                 .file_type = audio::file_type::wave,
+                                                 .file_type = audio::file_type_cf_string::wave,
                                                  .settings = audio::wave_file_settings(48000.0, 2, 16)});
 
     auto &file = file_result.value();
