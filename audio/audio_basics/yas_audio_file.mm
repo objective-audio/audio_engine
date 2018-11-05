@@ -20,22 +20,14 @@ struct audio::file::impl : base::impl {
     format _processing_format = nullptr;
     SInt64 _file_frame_position = 0;
     ExtAudioFileRef _ext_audio_file = nullptr;
+    yas::url _url;
 
     impl() : _url(nullptr), _file_type(nullptr) {
     }
 
     ~impl() {
-        this->set_url(nullptr);
         this->set_file_type(nullptr);
         this->close();
-    }
-
-    void set_url(CFURLRef const url) {
-        set_cf_property(this->_url, url);
-    }
-
-    CFURLRef url() const {
-        return this->_url;
     }
 
     void set_file_type(CFStringRef const file_type) {
@@ -86,7 +78,7 @@ struct audio::file::impl : base::impl {
             return open_result_t(open_error_t::invalid_argument);
         }
 
-        this->set_url(args.file_url);
+        this->_url = args.file_url;
 
         if (!this->_open_ext_audio_file(args.pcm_format, args.interleaved)) {
             return open_result_t(open_error_t::open_failed);
@@ -104,7 +96,7 @@ struct audio::file::impl : base::impl {
             return create_result_t(create_error_t::invalid_argument);
         }
 
-        this->set_url(args.file_url);
+        this->_url = args.file_url;
         this->set_file_type(args.file_type);
 
         if (!this->_create_ext_audio_file(args.settings, args.pcm_format, args.interleaved)) {
@@ -230,11 +222,11 @@ struct audio::file::impl : base::impl {
 
    private:
     bool _open_ext_audio_file(pcm_format const pcm_format, bool const interleaved) {
-        if (!ext_audio_file_utils::can_open(url())) {
+        if (!ext_audio_file_utils::can_open(this->_url.cf_url())) {
             return false;
         }
 
-        if (!ext_audio_file_utils::open(&this->_ext_audio_file, url())) {
+        if (!ext_audio_file_utils::open(&this->_ext_audio_file, this->_url.cf_url())) {
             this->_ext_audio_file = nullptr;
             return false;
         };
@@ -276,7 +268,7 @@ struct audio::file::impl : base::impl {
             return false;
         }
 
-        if (!ext_audio_file_utils::create(&this->_ext_audio_file, this->url(), file_type_id,
+        if (!ext_audio_file_utils::create(&this->_ext_audio_file, this->_url.cf_url(), file_type_id,
                                           this->_file_format.stream_description())) {
             this->_ext_audio_file = nullptr;
             return false;
@@ -296,7 +288,6 @@ struct audio::file::impl : base::impl {
         return true;
     }
 
-    CFURLRef _url = nullptr;
     CFStringRef _file_type = nullptr;
 };
 
@@ -324,8 +315,8 @@ bool audio::file::is_opened() const {
     return impl_ptr<impl>()->is_opened();
 }
 
-CFURLRef audio::file::url() const {
-    return impl_ptr<impl>()->url();
+yas::url const &audio::file::url() const {
+    return impl_ptr<impl>()->_url;
 }
 
 CFStringRef audio::file::file_type() const {

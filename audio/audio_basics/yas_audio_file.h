@@ -7,6 +7,7 @@
 #include <CoreFoundation/CoreFoundation.h>
 #include "yas_audio_types.h"
 #include "yas_base.h"
+#include "yas_url.h"
 
 namespace yas {
 template <typename T, typename U>
@@ -22,13 +23,13 @@ class file : public base {
 
    public:
     struct open_args {
-        CFURLRef file_url = nullptr;
+        url file_url;
         audio::pcm_format pcm_format = pcm_format::float32;
         bool interleaved = false;
     };
 
     struct create_args {
-        CFURLRef file_url = nullptr;
+        url file_url;
         CFStringRef file_type = nullptr;
         CFDictionaryRef settings = nullptr;
         audio::pcm_format pcm_format = pcm_format::float32;
@@ -81,7 +82,7 @@ class file : public base {
     void close();
 
     bool is_opened() const;
-    CFURLRef url() const;
+    yas::url const &url() const;
     CFStringRef file_type() const;
     audio::format const &file_format() const;
     audio::format const &processing_format() const;
