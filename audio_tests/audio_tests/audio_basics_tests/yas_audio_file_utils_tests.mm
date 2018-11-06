@@ -113,7 +113,7 @@ using namespace yas;
     XCTAssertEqualObjects(settings[AVSampleRateConverterAudioQualityKey], @(converterQuality));
 }
 
-- (void)test_audio_file_type_id_from_file_type {
+- (void)test_to_audio_file_type_id_from_file_type {
     XCTAssertEqual(audio::to_audio_file_type_id(audio::file_type_cf_string::three_gpp), kAudioFile3GPType);
     XCTAssertEqual(audio::to_audio_file_type_id(audio::file_type_cf_string::three_gpp2), kAudioFile3GP2Type);
     XCTAssertEqual(audio::to_audio_file_type_id(audio::file_type_cf_string::aifc), kAudioFileAIFCType);
@@ -127,20 +127,51 @@ using namespace yas;
     XCTAssertEqual(audio::to_audio_file_type_id(audio::file_type_cf_string::wave), kAudioFileWAVEType);
 }
 
-- (void)test_file_type_from_audio_file_type_id {
-    XCTAssertEqual(audio::to_file_type(kAudioFile3GPType), audio::file_type_cf_string::three_gpp);
-    XCTAssertEqual(audio::to_file_type(kAudioFile3GP2Type), audio::file_type_cf_string::three_gpp2);
-    XCTAssertEqual(audio::to_file_type(kAudioFileAIFCType), audio::file_type_cf_string::aifc);
-    XCTAssertEqual(audio::to_file_type(kAudioFileAIFFType), audio::file_type_cf_string::aiff);
-    XCTAssertEqual(audio::to_file_type(kAudioFileAMRType), audio::file_type_cf_string::amr);
-    XCTAssertEqual(audio::to_file_type(kAudioFileAC3Type), audio::file_type_cf_string::ac3);
-    XCTAssertEqual(audio::to_file_type(kAudioFileMP3Type), audio::file_type_cf_string::mpeg_layer3);
-    XCTAssertEqual(audio::to_file_type(kAudioFileCAFType), audio::file_type_cf_string::core_audio_format);
-    XCTAssertEqual(audio::to_file_type(kAudioFileMPEG4Type), audio::file_type_cf_string::mpeg4);
-    XCTAssertEqual(audio::to_file_type(kAudioFileM4AType), audio::file_type_cf_string::apple_m4a);
-    XCTAssertEqual(audio::to_file_type(kAudioFileWAVEType), audio::file_type_cf_string::wave);
+- (void)test_to_file_type_from_audio_file_type_id {
+    XCTAssertEqual(audio::to_file_type(kAudioFile3GPType), audio::file_type::three_gpp);
+    XCTAssertEqual(audio::to_file_type(kAudioFile3GP2Type), audio::file_type::three_gpp2);
+    XCTAssertEqual(audio::to_file_type(kAudioFileAIFCType), audio::file_type::aifc);
+    XCTAssertEqual(audio::to_file_type(kAudioFileAIFFType), audio::file_type::aiff);
+    XCTAssertEqual(audio::to_file_type(kAudioFileAMRType), audio::file_type::amr);
+    XCTAssertEqual(audio::to_file_type(kAudioFileAC3Type), audio::file_type::ac3);
+    XCTAssertEqual(audio::to_file_type(kAudioFileMP3Type), audio::file_type::mpeg_layer3);
+    XCTAssertEqual(audio::to_file_type(kAudioFileCAFType), audio::file_type::core_audio_format);
+    XCTAssertEqual(audio::to_file_type(kAudioFileMPEG4Type), audio::file_type::mpeg4);
+    XCTAssertEqual(audio::to_file_type(kAudioFileM4AType), audio::file_type::apple_m4a);
+    XCTAssertEqual(audio::to_file_type(kAudioFileWAVEType), audio::file_type::wave);
 
-    XCTAssert(!audio::to_file_type(0));
+    XCTAssertThrows(audio::to_file_type(0));
+}
+
+- (void)test_to_file_type_from_string {
+    XCTAssertEqual(audio::to_file_type(to_string(audio::file_type::three_gpp)), audio::file_type::three_gpp);
+    XCTAssertEqual(audio::to_file_type(to_string(audio::file_type::three_gpp2)), audio::file_type::three_gpp2);
+    XCTAssertEqual(audio::to_file_type(to_string(audio::file_type::aifc)), audio::file_type::aifc);
+    XCTAssertEqual(audio::to_file_type(to_string(audio::file_type::aiff)), audio::file_type::aiff);
+    XCTAssertEqual(audio::to_file_type(to_string(audio::file_type::amr)), audio::file_type::amr);
+    XCTAssertEqual(audio::to_file_type(to_string(audio::file_type::ac3)), audio::file_type::ac3);
+    XCTAssertEqual(audio::to_file_type(to_string(audio::file_type::mpeg_layer3)), audio::file_type::mpeg_layer3);
+    XCTAssertEqual(audio::to_file_type(to_string(audio::file_type::core_audio_format)),
+                   audio::file_type::core_audio_format);
+    XCTAssertEqual(audio::to_file_type(to_string(audio::file_type::mpeg4)), audio::file_type::mpeg4);
+    XCTAssertEqual(audio::to_file_type(to_string(audio::file_type::apple_m4a)), audio::file_type::apple_m4a);
+    XCTAssertEqual(audio::to_file_type(to_string(audio::file_type::wave)), audio::file_type::wave);
+
+    XCTAssertThrows(audio::to_file_type(""));
+}
+
+- (void)test_to_string_from_file_type {
+    XCTAssertEqual(to_string(audio::file_type::three_gpp), "public.3gpp");
+    XCTAssertEqual(to_string(audio::file_type::three_gpp2), "public.3gpp2");
+    XCTAssertEqual(to_string(audio::file_type::aifc), "public.aifc-audio");
+    XCTAssertEqual(to_string(audio::file_type::aiff), "public.aiff-audio");
+    XCTAssertEqual(to_string(audio::file_type::amr), "org.3gpp.adaptive-multi-rate-audio");
+    XCTAssertEqual(to_string(audio::file_type::ac3), "public.ac3-audio");
+    XCTAssertEqual(to_string(audio::file_type::mpeg_layer3), "public.mp3");
+    XCTAssertEqual(to_string(audio::file_type::core_audio_format), "com.apple.coreaudio-format");
+    XCTAssertEqual(to_string(audio::file_type::mpeg4), "public.mpeg-4");
+    XCTAssertEqual(to_string(audio::file_type::apple_m4a), "com.apple.m4a-audio");
+    XCTAssertEqual(to_string(audio::file_type::wave), "com.microsoft.waveform-audio");
 }
 
 @end
