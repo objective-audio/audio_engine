@@ -44,7 +44,6 @@ Boolean get_audio_file_format(AudioStreamBasicDescription *asbd, ExtAudioFileRef
 AudioFileID get_audio_file_id(ExtAudioFileRef const ext_audio_file);
 int64_t get_file_length_frames(ExtAudioFileRef const ext_audio_file);
 AudioFileTypeID get_audio_file_type_id(ExtAudioFileRef const ext_audio_file);
-CFStringRef get_audio_file_type(ExtAudioFileRef const ext_auidio_file);
 }  // namespace yas::audio::ext_audio_file_utils
 
 namespace yas::audio {

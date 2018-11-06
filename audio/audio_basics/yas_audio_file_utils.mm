@@ -217,11 +217,6 @@ AudioFileTypeID audio::ext_audio_file_utils::get_audio_file_type_id(ExtAudioFile
     return audio_file_utils::get_audio_file_type_id(file_id);
 }
 
-CFStringRef get_audio_file_type(ExtAudioFileRef const ext_audio_file) {
-    return to_cf_object(
-        to_string(audio::to_file_type(audio::ext_audio_file_utils::get_audio_file_type_id(ext_audio_file))));
-}
-
 #pragma mark -
 
 CFDictionaryRef audio::wave_file_settings(double const sample_rate, uint32_t const channel_count,
