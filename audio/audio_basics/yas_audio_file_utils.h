@@ -42,6 +42,7 @@ CFStringRef to_file_type(AudioFileTypeID const fileTypeID);
 }  // namespace yas::audio
 
 namespace yas {
+audio::file_type to_file_type(std::string const &);
 AudioFileTypeID to_audio_file_type_id(audio::file_type const);
 std::string to_string(audio::file_type const);
 }  // namespace yas

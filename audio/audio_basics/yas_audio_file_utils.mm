@@ -73,6 +73,33 @@ std::string yas::to_string(audio::file_type const file_type) {
     }
 }
 
+audio::file_type yas::to_file_type(std::string const &string) {
+    if (string == to_string(audio::file_type::three_gpp)) {
+        return audio::file_type::three_gpp;
+    } else if (string == to_string(audio::file_type::three_gpp2)) {
+        return audio::file_type::three_gpp2;
+    } else if (string == to_string(audio::file_type::aifc)) {
+        return audio::file_type::aifc;
+    } else if (string == to_string(audio::file_type::aiff)) {
+        return audio::file_type::aiff;
+    } else if (string == to_string(audio::file_type::amr)) {
+        return audio::file_type::amr;
+    } else if (string == to_string(audio::file_type::ac3)) {
+        return audio::file_type::ac3;
+    } else if (string == to_string(audio::file_type::mpeg_layer3)) {
+        return audio::file_type::mpeg_layer3;
+    } else if (string == to_string(audio::file_type::core_audio_format)) {
+        return audio::file_type::core_audio_format;
+    } else if (string == to_string(audio::file_type::mpeg4)) {
+        return audio::file_type::mpeg4;
+    } else if (string == to_string(audio::file_type::apple_m4a)) {
+        return audio::file_type::apple_m4a;
+    } else if (string == to_string(audio::file_type::wave)) {
+        return audio::file_type::wave;
+    }
+    throw std::invalid_argument("invalid fileTypeID.");
+}
+
 AudioFileTypeID audio::to_audio_file_type_id(CFStringRef const fileType) {
     if (CFEqual(fileType, file_type_cf_string::three_gpp)) {
         return kAudioFile3GPType;
