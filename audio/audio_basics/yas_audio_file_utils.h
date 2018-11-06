@@ -39,11 +39,13 @@ enum class file_type {
 };
 AudioFileTypeID to_audio_file_type_id(CFStringRef const fileType);
 CFStringRef to_file_type(AudioFileTypeID const fileTypeID);
+
+audio::file_type to_file_type(AudioFileTypeID const);
+audio::file_type to_file_type(std::string const &);
+AudioFileTypeID to_audio_file_type_id(audio::file_type const);
 }  // namespace yas::audio
 
 namespace yas {
-audio::file_type to_file_type(std::string const &);
-AudioFileTypeID to_audio_file_type_id(audio::file_type const);
 std::string to_string(audio::file_type const);
 }  // namespace yas
 

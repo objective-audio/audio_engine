@@ -19,7 +19,7 @@ CFStringRef const audio::file_type_cf_string::mpeg4 = CFSTR("public.mpeg-4");
 CFStringRef const audio::file_type_cf_string::apple_m4a = CFSTR("com.apple.m4a-audio");
 CFStringRef const audio::file_type_cf_string::wave = CFSTR("com.microsoft.waveform-audio");
 
-AudioFileTypeID yas::to_audio_file_type_id(audio::file_type const file_type) {
+AudioFileTypeID audio::to_audio_file_type_id(audio::file_type const file_type) {
     switch (file_type) {
         case audio::file_type::three_gpp:
             return kAudioFile3GPType;
@@ -73,7 +73,36 @@ std::string yas::to_string(audio::file_type const file_type) {
     }
 }
 
-audio::file_type yas::to_file_type(std::string const &string) {
+audio::file_type audio::to_file_type(AudioFileTypeID const fileTypeID) {
+    switch (fileTypeID) {
+        case kAudioFile3GPType:
+            return audio::file_type::three_gpp;
+        case kAudioFile3GP2Type:
+            return audio::file_type::three_gpp2;
+        case kAudioFileAIFCType:
+            return audio::file_type::aifc;
+        case kAudioFileAIFFType:
+            return audio::file_type::aiff;
+        case kAudioFileAMRType:
+            return audio::file_type::amr;
+        case kAudioFileAC3Type:
+            return audio::file_type::ac3;
+        case kAudioFileMP3Type:
+            return audio::file_type::mpeg_layer3;
+        case kAudioFileCAFType:
+            return audio::file_type::core_audio_format;
+        case kAudioFileMPEG4Type:
+            return audio::file_type::mpeg4;
+        case kAudioFileM4AType:
+            return audio::file_type::apple_m4a;
+        case kAudioFileWAVEType:
+            return audio::file_type::wave;
+        default:
+            throw std::invalid_argument("invalid file type id.");
+    }
+}
+
+audio::file_type audio::to_file_type(std::string const &string) {
     if (string == to_string(audio::file_type::three_gpp)) {
         return audio::file_type::three_gpp;
     } else if (string == to_string(audio::file_type::three_gpp2)) {
@@ -97,7 +126,7 @@ audio::file_type yas::to_file_type(std::string const &string) {
     } else if (string == to_string(audio::file_type::wave)) {
         return audio::file_type::wave;
     }
-    throw std::invalid_argument("invalid fileTypeID.");
+    throw std::invalid_argument("invalid file type string.");
 }
 
 AudioFileTypeID audio::to_audio_file_type_id(CFStringRef const fileType) {
