@@ -238,7 +238,7 @@ struct audio::file::impl : base::impl {
         }
 
         AudioFileTypeID file_type_id = ext_audio_file_utils::get_audio_file_type_id(this->_ext_audio_file);
-        set_file_type(to_file_type(file_type_id));
+        this->set_file_type(to_cf_object(to_string(to_file_type(file_type_id))));
         if (!this->file_type()) {
             this->close();
             return false;

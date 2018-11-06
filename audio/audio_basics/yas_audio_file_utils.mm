@@ -4,6 +4,7 @@
 
 #include "yas_audio_file_utils.h"
 #include "yas_audio_exception.h"
+#include "yas_cf_utils.h"
 
 using namespace yas;
 
@@ -256,7 +257,8 @@ AudioFileTypeID audio::ext_audio_file_utils::get_audio_file_type_id(ExtAudioFile
 }
 
 CFStringRef get_audio_file_type(ExtAudioFileRef const ext_audio_file) {
-    return audio::to_file_type(audio::ext_audio_file_utils::get_audio_file_type_id(ext_audio_file));
+    return to_cf_object(
+        to_string(audio::to_file_type(audio::ext_audio_file_utils::get_audio_file_type_id(ext_audio_file))));
 }
 
 #pragma mark -
