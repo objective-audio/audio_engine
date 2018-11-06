@@ -12,6 +12,7 @@ using namespace yas;
 namespace yas::test {
 struct audio_file_test_data {
     std::string file_name;
+    audio::file_type file_type;
     double file_sample_rate;
     double processing_sample_rate;
     uint32_t channels;
@@ -23,32 +24,14 @@ struct audio_file_test_data {
     bool standard;
     bool async;
 
-    audio_file_test_data() : _file_type(nullptr) {
-    }
-
-    ~audio_file_test_data() {
-        set_file_type(nullptr);
-    }
-
-    void set_file_type(CFStringRef const file_type) {
-        set_cf_property(_file_type, file_type);
-    }
-
-    CFStringRef file_type() const {
-        return get_cf_property(_file_type);
-    }
-
     CFDictionaryRef settings() const {
-        if (CFStringCompare(file_type(), audio::file_type_cf_string::wave, kNilOptions) == kCFCompareEqualTo) {
+        if (this->file_type == audio::file_type::wave) {
             return audio::wave_file_settings(file_sample_rate, channels, file_bit_depth);
-        } else if (CFStringCompare(file_type(), audio::file_type_cf_string::aiff, kNilOptions) == kCFCompareEqualTo) {
+        } else if (this->file_type == audio::file_type::aiff) {
             return audio::aiff_file_settings(file_sample_rate, channels, file_bit_depth);
         }
         return nullptr;
     }
-
-   private:
-    CFStringRef _file_type;
 };
 
 static yas::url temporary_test_dir_url() {
@@ -112,7 +95,7 @@ static void setupDirectory() {
     test_data.frame_length = 8;
     test_data.loop_count = 4;
     test_data.file_name = "test.wav";
-    test_data.set_file_type(audio::file_type_cf_string::wave);
+    test_data.file_type = audio::file_type::wave;
     test_data.standard = NO;
     test_data.async = NO;
 
@@ -159,14 +142,14 @@ static void setupDirectory() {
 
     {
         auto file_result = audio::make_created_file({.file_url = file_url,
-                                                     .file_type = audio::file_type_cf_string::wave,
+                                                     .file_type = audio::file_type::wave,
                                                      .settings = audio::wave_file_settings(48000.0, 2, 16)});
         XCTAssertTrue(file_result);
 
         auto file = file_result.value();
 
         XCTAssertEqual(file.url(), file_url);
-        XCTAssertTrue(CFEqual(file.file_type(), audio::file_type_cf_string::wave));
+        XCTAssertEqual(file.file_type(), audio::file_type::wave);
         auto const &file_format = file.file_format();
         XCTAssertEqual(file_format.buffer_count(), 1);
         XCTAssertEqual(file_format.channel_count(), 2);
@@ -182,7 +165,7 @@ static void setupDirectory() {
         auto file = file_result.value();
 
         XCTAssertEqual(file.url(), file_url);
-        XCTAssertTrue(CFEqual(file.file_type(), audio::file_type_cf_string::wave));
+        XCTAssertEqual(file.file_type(), audio::file_type::wave);
         auto const &file_format = file.file_format();
         XCTAssertEqual(file_format.buffer_count(), 1);
         XCTAssertEqual(file_format.channel_count(), 2);
@@ -197,7 +180,7 @@ static void setupDirectory() {
     auto file_url = test::temporary_test_dir_url().appending(file_name);
 
     auto file_result = audio::make_created_file({.file_url = file_url,
-                                                 .file_type = audio::file_type_cf_string::wave,
+                                                 .file_type = audio::file_type::wave,
                                                  .settings = audio::wave_file_settings(48000.0, 2, 16)});
 
     auto &file = file_result.value();
@@ -314,10 +297,10 @@ static void setupDirectory() {
 
         if (test_data.standard) {
             XCTAssertTrue(
-                audio_file.create({.file_url = file_url, .file_type = test_data.file_type(), .settings = settings}));
+                audio_file.create({.file_url = file_url, .file_type = test_data.file_type, .settings = settings}));
         } else {
             XCTAssertTrue(audio_file.create({.file_url = file_url,
-                                             .file_type = test_data.file_type(),
+                                             .file_type = test_data.file_type,
                                              .settings = settings,
                                              .pcm_format = pcm_format,
                                              .interleaved = interleaved}));
