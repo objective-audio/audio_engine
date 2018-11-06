@@ -156,36 +156,6 @@ AudioFileTypeID audio::to_audio_file_type_id(CFStringRef const fileType) {
     return 0;
 }
 
-CFStringRef audio::to_file_type(AudioFileTypeID const fileTypeID) {
-    switch (fileTypeID) {
-        case kAudioFile3GPType:
-            return file_type_cf_string::three_gpp;
-        case kAudioFile3GP2Type:
-            return file_type_cf_string::three_gpp2;
-        case kAudioFileAIFCType:
-            return file_type_cf_string::aifc;
-        case kAudioFileAIFFType:
-            return file_type_cf_string::aiff;
-        case kAudioFileAMRType:
-            return file_type_cf_string::amr;
-        case kAudioFileAC3Type:
-            return file_type_cf_string::ac3;
-        case kAudioFileMP3Type:
-            return file_type_cf_string::mpeg_layer3;
-        case kAudioFileCAFType:
-            return file_type_cf_string::core_audio_format;
-        case kAudioFileMPEG4Type:
-            return file_type_cf_string::mpeg4;
-        case kAudioFileM4AType:
-            return file_type_cf_string::apple_m4a;
-        case kAudioFileWAVEType:
-            return file_type_cf_string::wave;
-        default:
-            break;
-    }
-    return nil;
-}
-
 #pragma mark - audio file
 
 namespace yas::audio_file_utils {
