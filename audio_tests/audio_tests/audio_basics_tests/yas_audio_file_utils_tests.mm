@@ -113,20 +113,6 @@ using namespace yas;
     XCTAssertEqualObjects(settings[AVSampleRateConverterAudioQualityKey], @(converterQuality));
 }
 
-- (void)test_to_audio_file_type_id_from_file_type {
-    XCTAssertEqual(audio::to_audio_file_type_id(audio::file_type_cf_string::three_gpp), kAudioFile3GPType);
-    XCTAssertEqual(audio::to_audio_file_type_id(audio::file_type_cf_string::three_gpp2), kAudioFile3GP2Type);
-    XCTAssertEqual(audio::to_audio_file_type_id(audio::file_type_cf_string::aifc), kAudioFileAIFCType);
-    XCTAssertEqual(audio::to_audio_file_type_id(audio::file_type_cf_string::aiff), kAudioFileAIFFType);
-    XCTAssertEqual(audio::to_audio_file_type_id(audio::file_type_cf_string::amr), kAudioFileAMRType);
-    XCTAssertEqual(audio::to_audio_file_type_id(audio::file_type_cf_string::ac3), kAudioFileAC3Type);
-    XCTAssertEqual(audio::to_audio_file_type_id(audio::file_type_cf_string::mpeg_layer3), kAudioFileMP3Type);
-    XCTAssertEqual(audio::to_audio_file_type_id(audio::file_type_cf_string::core_audio_format), kAudioFileCAFType);
-    XCTAssertEqual(audio::to_audio_file_type_id(audio::file_type_cf_string::mpeg4), kAudioFileMPEG4Type);
-    XCTAssertEqual(audio::to_audio_file_type_id(audio::file_type_cf_string::apple_m4a), kAudioFileM4AType);
-    XCTAssertEqual(audio::to_audio_file_type_id(audio::file_type_cf_string::wave), kAudioFileWAVEType);
-}
-
 - (void)test_to_file_type_from_audio_file_type_id {
     XCTAssertEqual(audio::to_file_type(kAudioFile3GPType), audio::file_type::three_gpp);
     XCTAssertEqual(audio::to_file_type(kAudioFile3GP2Type), audio::file_type::three_gpp2);
