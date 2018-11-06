@@ -263,7 +263,7 @@ struct audio::file::impl : base::impl {
     bool _create_ext_audio_file(CFDictionaryRef const &settings, pcm_format const pcm_format, bool const interleaved) {
         this->_file_format = format{settings};
 
-        AudioFileTypeID file_type_id = to_audio_file_type_id(file_type());
+        AudioFileTypeID file_type_id = audio::to_audio_file_type_id(audio::to_file_type(to_string(file_type())));
         if (!file_type_id) {
             return false;
         }
