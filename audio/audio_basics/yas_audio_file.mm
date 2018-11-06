@@ -4,7 +4,6 @@
 
 #include "yas_audio_file.h"
 #include <AudioToolbox/AudioToolbox.h>
-#include "yas_audio_file_utils.h"
 #include "yas_audio_format.h"
 #include "yas_audio_pcm_buffer.h"
 #include "yas_cf_utils.h"
@@ -21,21 +20,13 @@ struct audio::file::impl : base::impl {
     SInt64 _file_frame_position = 0;
     ExtAudioFileRef _ext_audio_file = nullptr;
     yas::url _url;
+    audio::file_type _file_type;
 
-    impl() : _url(nullptr), _file_type(nullptr) {
+    impl() : _url(nullptr) {
     }
 
     ~impl() {
-        this->set_file_type(nullptr);
         this->close();
-    }
-
-    void set_file_type(CFStringRef const file_type) {
-        set_cf_property(this->_file_type, file_type);
-    }
-
-    CFStringRef file_type() const {
-        return this->_file_type;
     }
 
     void set_processing_format(audio::format &&format) {
@@ -92,12 +83,12 @@ struct audio::file::impl : base::impl {
             return create_result_t(create_error_t::created);
         }
 
-        if (!args.file_url || !args.file_type || !args.settings) {
+        if (!args.file_url || !args.settings) {
             return create_result_t(create_error_t::invalid_argument);
         }
 
         this->_url = args.file_url;
-        this->set_file_type(args.file_type);
+        this->_file_type = args.file_type;
 
         if (!this->_create_ext_audio_file(args.settings, args.pcm_format, args.interleaved)) {
             return create_result_t(create_error_t::create_failed);
@@ -238,8 +229,10 @@ struct audio::file::impl : base::impl {
         }
 
         AudioFileTypeID file_type_id = ext_audio_file_utils::get_audio_file_type_id(this->_ext_audio_file);
-        this->set_file_type(to_cf_object(to_string(to_file_type(file_type_id))));
-        if (!this->file_type()) {
+
+        try {
+            this->_file_type = to_file_type(file_type_id);
+        } catch (std::exception const &) {
             this->close();
             return false;
         }
@@ -263,10 +256,7 @@ struct audio::file::impl : base::impl {
     bool _create_ext_audio_file(CFDictionaryRef const &settings, pcm_format const pcm_format, bool const interleaved) {
         this->_file_format = format{settings};
 
-        AudioFileTypeID file_type_id = audio::to_audio_file_type_id(audio::to_file_type(to_string(file_type())));
-        if (!file_type_id) {
-            return false;
-        }
+        AudioFileTypeID file_type_id = audio::to_audio_file_type_id(this->_file_type);
 
         if (!ext_audio_file_utils::create(&this->_ext_audio_file, this->_url.cf_url(), file_type_id,
                                           this->_file_format.stream_description())) {
@@ -287,8 +277,6 @@ struct audio::file::impl : base::impl {
 
         return true;
     }
-
-    CFStringRef _file_type = nullptr;
 };
 
 audio::file::file() : base(std::make_shared<impl>()) {
@@ -319,8 +307,8 @@ yas::url const &audio::file::url() const {
     return impl_ptr<impl>()->_url;
 }
 
-CFStringRef audio::file::file_type() const {
-    return impl_ptr<impl>()->file_type();
+audio::file_type audio::file::file_type() const {
+    return impl_ptr<impl>()->_file_type;
 }
 
 audio::format const &audio::file::file_format() const {

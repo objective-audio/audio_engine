@@ -8,18 +8,6 @@
 
 using namespace yas;
 
-CFStringRef const audio::file_type_cf_string::three_gpp = CFSTR("public.3gpp");
-CFStringRef const audio::file_type_cf_string::three_gpp2 = CFSTR("public.3gpp2");
-CFStringRef const audio::file_type_cf_string::aifc = CFSTR("public.aifc-audio");
-CFStringRef const audio::file_type_cf_string::aiff = CFSTR("public.aiff-audio");
-CFStringRef const audio::file_type_cf_string::amr = CFSTR("org.3gpp.adaptive-multi-rate-audio");
-CFStringRef const audio::file_type_cf_string::ac3 = CFSTR("public.ac3-audio");
-CFStringRef const audio::file_type_cf_string::mpeg_layer3 = CFSTR("public.mp3");
-CFStringRef const audio::file_type_cf_string::core_audio_format = CFSTR("com.apple.coreaudio-format");
-CFStringRef const audio::file_type_cf_string::mpeg4 = CFSTR("public.mpeg-4");
-CFStringRef const audio::file_type_cf_string::apple_m4a = CFSTR("com.apple.m4a-audio");
-CFStringRef const audio::file_type_cf_string::wave = CFSTR("com.microsoft.waveform-audio");
-
 AudioFileTypeID audio::to_audio_file_type_id(audio::file_type const file_type) {
     switch (file_type) {
         case audio::file_type::three_gpp:

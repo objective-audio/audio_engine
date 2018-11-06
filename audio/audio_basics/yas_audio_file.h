@@ -5,6 +5,7 @@
 #pragma once
 
 #include <CoreFoundation/CoreFoundation.h>
+#include "yas_audio_file_utils.h"
 #include "yas_audio_types.h"
 #include "yas_base.h"
 #include "yas_url.h"
@@ -30,7 +31,7 @@ class file : public base {
 
     struct create_args {
         url file_url;
-        CFStringRef file_type = nullptr;
+        audio::file_type file_type = audio::file_type::wave;
         CFDictionaryRef settings = nullptr;
         audio::pcm_format pcm_format = pcm_format::float32;
         bool interleaved = false;
@@ -83,7 +84,7 @@ class file : public base {
 
     bool is_opened() const;
     yas::url const &url() const;
-    CFStringRef file_type() const;
+    audio::file_type file_type() const;
     audio::format const &file_format() const;
     audio::format const &processing_format() const;
     int64_t file_length() const;

@@ -9,20 +9,6 @@
 #include <CoreFoundation/CoreFoundation.h>
 #include <string>
 
-namespace yas::audio::file_type_cf_string {
-extern CFStringRef const three_gpp;
-extern CFStringRef const three_gpp2;
-extern CFStringRef const aifc;
-extern CFStringRef const aiff;
-extern CFStringRef const amr;
-extern CFStringRef const ac3;
-extern CFStringRef const mpeg_layer3;
-extern CFStringRef const core_audio_format;
-extern CFStringRef const mpeg4;
-extern CFStringRef const apple_m4a;
-extern CFStringRef const wave;
-}  // namespace yas::audio::file_type_cf_string
-
 namespace yas::audio {
 enum class file_type {
     three_gpp,
