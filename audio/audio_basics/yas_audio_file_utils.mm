@@ -130,33 +130,6 @@ audio::file_type audio::to_file_type(std::string const &string) {
     throw std::invalid_argument("invalid file type string.");
 }
 
-AudioFileTypeID audio::to_audio_file_type_id(CFStringRef const fileType) {
-    if (CFEqual(fileType, file_type_cf_string::three_gpp)) {
-        return kAudioFile3GPType;
-    } else if (CFEqual(fileType, file_type_cf_string::three_gpp2)) {
-        return kAudioFile3GP2Type;
-    } else if (CFEqual(fileType, file_type_cf_string::aifc)) {
-        return kAudioFileAIFCType;
-    } else if (CFEqual(fileType, file_type_cf_string::aiff)) {
-        return kAudioFileAIFFType;
-    } else if (CFEqual(fileType, file_type_cf_string::amr)) {
-        return kAudioFileAMRType;
-    } else if (CFEqual(fileType, file_type_cf_string::ac3)) {
-        return kAudioFileAC3Type;
-    } else if (CFEqual(fileType, file_type_cf_string::mpeg_layer3)) {
-        return kAudioFileMP3Type;
-    } else if (CFEqual(fileType, file_type_cf_string::core_audio_format)) {
-        return kAudioFileCAFType;
-    } else if (CFEqual(fileType, file_type_cf_string::mpeg4)) {
-        return kAudioFileMPEG4Type;
-    } else if (CFEqual(fileType, file_type_cf_string::apple_m4a)) {
-        return kAudioFileM4AType;
-    } else if (CFEqual(fileType, file_type_cf_string::wave)) {
-        return kAudioFileWAVEType;
-    }
-    return 0;
-}
-
 #pragma mark - audio file
 
 namespace yas::audio_file_utils {

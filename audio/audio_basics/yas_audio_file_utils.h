@@ -37,7 +37,6 @@ enum class file_type {
     apple_m4a,
     wave,
 };
-AudioFileTypeID to_audio_file_type_id(CFStringRef const fileType);
 
 audio::file_type to_file_type(AudioFileTypeID const);
 audio::file_type to_file_type(std::string const &);
