@@ -3,77 +3,120 @@
 //
 
 #include "yas_audio_file_utils.h"
+#include <AVFoundation/AVFoundation.h>
 #include "yas_audio_exception.h"
+#include "yas_cf_utils.h"
 
 using namespace yas;
 
-CFStringRef const audio::file_type::three_gpp = CFSTR("public.3gpp");
-CFStringRef const audio::file_type::three_gpp2 = CFSTR("public.3gpp2");
-CFStringRef const audio::file_type::aifc = CFSTR("public.aifc-audio");
-CFStringRef const audio::file_type::aiff = CFSTR("public.aiff-audio");
-CFStringRef const audio::file_type::amr = CFSTR("org.3gpp.adaptive-multi-rate-audio");
-CFStringRef const audio::file_type::ac3 = CFSTR("public.ac3-audio");
-CFStringRef const audio::file_type::mpeg_layer3 = CFSTR("public.mp3");
-CFStringRef const audio::file_type::core_audio_format = CFSTR("com.apple.coreaudio-format");
-CFStringRef const audio::file_type::mpeg4 = CFSTR("public.mpeg-4");
-CFStringRef const audio::file_type::apple_m4a = CFSTR("com.apple.m4a-audio");
-CFStringRef const audio::file_type::wave = CFSTR("com.microsoft.waveform-audio");
-
-AudioFileTypeID audio::to_audio_file_type_id(CFStringRef const fileType) {
-    if (CFEqual(fileType, file_type::three_gpp)) {
-        return kAudioFile3GPType;
-    } else if (CFEqual(fileType, file_type::three_gpp2)) {
-        return kAudioFile3GP2Type;
-    } else if (CFEqual(fileType, file_type::aifc)) {
-        return kAudioFileAIFCType;
-    } else if (CFEqual(fileType, file_type::aiff)) {
-        return kAudioFileAIFFType;
-    } else if (CFEqual(fileType, file_type::amr)) {
-        return kAudioFileAMRType;
-    } else if (CFEqual(fileType, file_type::ac3)) {
-        return kAudioFileAC3Type;
-    } else if (CFEqual(fileType, file_type::mpeg_layer3)) {
-        return kAudioFileMP3Type;
-    } else if (CFEqual(fileType, file_type::core_audio_format)) {
-        return kAudioFileCAFType;
-    } else if (CFEqual(fileType, file_type::mpeg4)) {
-        return kAudioFileMPEG4Type;
-    } else if (CFEqual(fileType, file_type::apple_m4a)) {
-        return kAudioFileM4AType;
-    } else if (CFEqual(fileType, file_type::wave)) {
-        return kAudioFileWAVEType;
+AudioFileTypeID audio::to_audio_file_type_id(audio::file_type const file_type) {
+    switch (file_type) {
+        case audio::file_type::three_gpp:
+            return kAudioFile3GPType;
+        case audio::file_type::three_gpp2:
+            return kAudioFile3GP2Type;
+        case audio::file_type::aifc:
+            return kAudioFileAIFCType;
+        case audio::file_type::aiff:
+            return kAudioFileAIFFType;
+        case audio::file_type::amr:
+            return kAudioFileAMRType;
+        case audio::file_type::ac3:
+            return kAudioFileAC3Type;
+        case audio::file_type::mpeg_layer3:
+            return kAudioFileMP3Type;
+        case audio::file_type::core_audio_format:
+            return kAudioFileCAFType;
+        case audio::file_type::mpeg4:
+            return kAudioFileMPEG4Type;
+        case audio::file_type::apple_m4a:
+            return kAudioFileM4AType;
+        case audio::file_type::wave:
+            return kAudioFileWAVEType;
     }
-    return 0;
 }
 
-CFStringRef audio::to_file_type(AudioFileTypeID const fileTypeID) {
+std::string yas::to_string(audio::file_type const file_type) {
+    switch (file_type) {
+        case audio::file_type::three_gpp:
+            return "public.3gpp";
+        case audio::file_type::three_gpp2:
+            return "public.3gpp2";
+        case audio::file_type::aifc:
+            return "public.aifc-audio";
+        case audio::file_type::aiff:
+            return "public.aiff-audio";
+        case audio::file_type::amr:
+            return "org.3gpp.adaptive-multi-rate-audio";
+        case audio::file_type::ac3:
+            return "public.ac3-audio";
+        case audio::file_type::mpeg_layer3:
+            return "public.mp3";
+        case audio::file_type::core_audio_format:
+            return "com.apple.coreaudio-format";
+        case audio::file_type::mpeg4:
+            return "public.mpeg-4";
+        case audio::file_type::apple_m4a:
+            return "com.apple.m4a-audio";
+        case audio::file_type::wave:
+            return "com.microsoft.waveform-audio";
+    }
+}
+
+audio::file_type audio::to_file_type(AudioFileTypeID const fileTypeID) {
     switch (fileTypeID) {
         case kAudioFile3GPType:
-            return file_type::three_gpp;
+            return audio::file_type::three_gpp;
         case kAudioFile3GP2Type:
-            return file_type::three_gpp2;
+            return audio::file_type::three_gpp2;
         case kAudioFileAIFCType:
-            return file_type::aifc;
+            return audio::file_type::aifc;
         case kAudioFileAIFFType:
-            return file_type::aiff;
+            return audio::file_type::aiff;
         case kAudioFileAMRType:
-            return file_type::amr;
+            return audio::file_type::amr;
         case kAudioFileAC3Type:
-            return file_type::ac3;
+            return audio::file_type::ac3;
         case kAudioFileMP3Type:
-            return file_type::mpeg_layer3;
+            return audio::file_type::mpeg_layer3;
         case kAudioFileCAFType:
-            return file_type::core_audio_format;
+            return audio::file_type::core_audio_format;
         case kAudioFileMPEG4Type:
-            return file_type::mpeg4;
+            return audio::file_type::mpeg4;
         case kAudioFileM4AType:
-            return file_type::apple_m4a;
+            return audio::file_type::apple_m4a;
         case kAudioFileWAVEType:
-            return file_type::wave;
+            return audio::file_type::wave;
         default:
-            break;
+            throw std::invalid_argument("invalid file type id.");
     }
-    return nil;
+}
+
+audio::file_type audio::to_file_type(std::string const &string) {
+    if (string == to_string(audio::file_type::three_gpp)) {
+        return audio::file_type::three_gpp;
+    } else if (string == to_string(audio::file_type::three_gpp2)) {
+        return audio::file_type::three_gpp2;
+    } else if (string == to_string(audio::file_type::aifc)) {
+        return audio::file_type::aifc;
+    } else if (string == to_string(audio::file_type::aiff)) {
+        return audio::file_type::aiff;
+    } else if (string == to_string(audio::file_type::amr)) {
+        return audio::file_type::amr;
+    } else if (string == to_string(audio::file_type::ac3)) {
+        return audio::file_type::ac3;
+    } else if (string == to_string(audio::file_type::mpeg_layer3)) {
+        return audio::file_type::mpeg_layer3;
+    } else if (string == to_string(audio::file_type::core_audio_format)) {
+        return audio::file_type::core_audio_format;
+    } else if (string == to_string(audio::file_type::mpeg4)) {
+        return audio::file_type::mpeg4;
+    } else if (string == to_string(audio::file_type::apple_m4a)) {
+        return audio::file_type::apple_m4a;
+    } else if (string == to_string(audio::file_type::wave)) {
+        return audio::file_type::wave;
+    }
+    throw std::invalid_argument("invalid file type string.");
 }
 
 #pragma mark - audio file
@@ -175,10 +218,6 @@ AudioFileTypeID audio::ext_audio_file_utils::get_audio_file_type_id(ExtAudioFile
     return audio_file_utils::get_audio_file_type_id(file_id);
 }
 
-CFStringRef get_audio_file_type(ExtAudioFileRef const ext_audio_file) {
-    return audio::to_file_type(audio::ext_audio_file_utils::get_audio_file_type_id(ext_audio_file));
-}
-
 #pragma mark -
 
 CFDictionaryRef audio::wave_file_settings(double const sample_rate, uint32_t const channel_count,
@@ -206,9 +245,26 @@ CFDictionaryRef audio::linear_pcm_file_settings(double const sample_rate, uint32
     };
 }
 
+namespace yas::audio {
+static AVAudioQuality to_av_audio_quality(audio::quality const quality) {
+    switch (quality) {
+        case quality::min:
+            return AVAudioQualityMin;
+        case quality::low:
+            return AVAudioQualityLow;
+        case quality::medium:
+            return AVAudioQualityMedium;
+        case quality::high:
+            return AVAudioQualityHigh;
+        case quality::max:
+            return AVAudioQualityMax;
+    }
+}
+}
+
 CFDictionaryRef audio::aac_settings(double const sample_rate, uint32_t const channel_count, uint32_t const bit_depth,
-                                    AVAudioQuality const encoder_quality, uint32_t const bit_rate,
-                                    uint32_t const bit_depth_hint, AVAudioQuality const converter_quality) {
+                                    audio::quality const encoder_quality, uint32_t const bit_rate,
+                                    uint32_t const bit_depth_hint, audio::quality const converter_quality) {
     return (__bridge CFDictionaryRef) @{
         AVFormatIDKey: @(kAudioFormatMPEG4AAC),
         AVSampleRateKey: @(sample_rate),
@@ -216,9 +272,9 @@ CFDictionaryRef audio::aac_settings(double const sample_rate, uint32_t const cha
         AVLinearPCMBitDepthKey: @(bit_depth),
         AVLinearPCMIsBigEndianKey: @(NO),
         AVLinearPCMIsFloatKey: @(NO),
-        AVEncoderAudioQualityKey: @(encoder_quality),
+        AVEncoderAudioQualityKey: @(to_av_audio_quality(encoder_quality)),
         AVEncoderBitRateKey: @(bit_rate),
         AVEncoderBitDepthHintKey: @(bit_depth_hint),
-        AVSampleRateConverterAudioQualityKey: @(converter_quality)
+        AVSampleRateConverterAudioQualityKey: @(to_av_audio_quality(converter_quality))
     };
 }

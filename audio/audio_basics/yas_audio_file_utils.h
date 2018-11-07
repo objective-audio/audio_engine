@@ -4,28 +4,33 @@
 
 #pragma once
 
-#include <AVFoundation/AVFoundation.h>
 #include <AudioToolbox/AudioToolbox.h>
 #include <CoreFoundation/CoreFoundation.h>
-
-namespace yas::audio::file_type {
-extern CFStringRef const three_gpp;
-extern CFStringRef const three_gpp2;
-extern CFStringRef const aifc;
-extern CFStringRef const aiff;
-extern CFStringRef const amr;
-extern CFStringRef const ac3;
-extern CFStringRef const mpeg_layer3;
-extern CFStringRef const core_audio_format;
-extern CFStringRef const mpeg4;
-extern CFStringRef const apple_m4a;
-extern CFStringRef const wave;
-}  // namespace yas::audio::file_type
+#include <string>
 
 namespace yas::audio {
-AudioFileTypeID to_audio_file_type_id(CFStringRef const fileType);
-CFStringRef to_file_type(AudioFileTypeID const fileTypeID);
+enum class file_type {
+    three_gpp,
+    three_gpp2,
+    aifc,
+    aiff,
+    amr,
+    ac3,
+    mpeg_layer3,
+    core_audio_format,
+    mpeg4,
+    apple_m4a,
+    wave,
+};
+
+audio::file_type to_file_type(AudioFileTypeID const);
+audio::file_type to_file_type(std::string const &);
+AudioFileTypeID to_audio_file_type_id(audio::file_type const);
 }  // namespace yas::audio
+
+namespace yas {
+std::string to_string(audio::file_type const);
+}  // namespace yas
 
 namespace yas::audio::ext_audio_file_utils {
 Boolean can_open(CFURLRef const url);
@@ -38,16 +43,23 @@ Boolean get_audio_file_format(AudioStreamBasicDescription *asbd, ExtAudioFileRef
 AudioFileID get_audio_file_id(ExtAudioFileRef const ext_audio_file);
 int64_t get_file_length_frames(ExtAudioFileRef const ext_audio_file);
 AudioFileTypeID get_audio_file_type_id(ExtAudioFileRef const ext_audio_file);
-CFStringRef get_audio_file_type(ExtAudioFileRef const ext_auidio_file);
 }  // namespace yas::audio::ext_audio_file_utils
 
 namespace yas::audio {
+enum class quality {
+    min,
+    low,
+    medium,
+    high,
+    max,
+};
+
 CFDictionaryRef wave_file_settings(double const sample_rate, uint32_t const channel_count, uint32_t const bit_depth);
 CFDictionaryRef aiff_file_settings(double const sample_rate, uint32_t const channel_count, uint32_t const bit_depth);
 CFDictionaryRef linear_pcm_file_settings(double const sample_rate, uint32_t const channel_count,
                                          uint32_t const bit_depth, bool const is_big_endian, bool const is_float,
                                          bool const is_non_interleaved);
 CFDictionaryRef aac_settings(double const sample_rate, uint32_t const channel_count, uint32_t const bit_depth,
-                             const AVAudioQuality encoder_quality, uint32_t const bit_rate,
-                             uint32_t const bit_depth_hint, const AVAudioQuality converter_quality);
+                             const quality encoder_quality, uint32_t const bit_rate, uint32_t const bit_depth_hint,
+                             const quality converter_quality);
 }  // namespace yas::audio

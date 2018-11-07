@@ -5,8 +5,10 @@
 #pragma once
 
 #include <CoreFoundation/CoreFoundation.h>
+#include "yas_audio_file_utils.h"
 #include "yas_audio_types.h"
 #include "yas_base.h"
+#include "yas_url.h"
 
 namespace yas {
 template <typename T, typename U>
@@ -22,14 +24,14 @@ class file : public base {
 
    public:
     struct open_args {
-        CFURLRef file_url = nullptr;
+        url file_url;
         audio::pcm_format pcm_format = pcm_format::float32;
         bool interleaved = false;
     };
 
     struct create_args {
-        CFURLRef file_url = nullptr;
-        CFStringRef file_type = nullptr;
+        url file_url;
+        audio::file_type file_type = audio::file_type::wave;
         CFDictionaryRef settings = nullptr;
         audio::pcm_format pcm_format = pcm_format::float32;
         bool interleaved = false;
@@ -81,8 +83,8 @@ class file : public base {
     void close();
 
     bool is_opened() const;
-    CFURLRef url() const;
-    CFStringRef file_type() const;
+    yas::url const &url() const;
+    audio::file_type file_type() const;
     audio::format const &file_format() const;
     audio::format const &processing_format() const;
     int64_t file_length() const;

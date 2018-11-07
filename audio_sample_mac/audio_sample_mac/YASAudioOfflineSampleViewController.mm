@@ -243,7 +243,7 @@ struct offline_vc_internal {
     auto wave_settings = audio::wave_file_settings(offline_sample::sample_rate, 2, 16);
     audio::file file_writer;
     auto create_result = file_writer.create(
-        {.file_url = (__bridge CFURLRef)url, .file_type = audio::file_type::wave, .settings = wave_settings});
+        {.file_url = (__bridge CFURLRef)url, .file_type = audio::file_type_cf_string::wave, .settings = wave_settings});
 
     if (!create_result) {
         std::cout << __PRETTY_FUNCTION__ << " - error:" << to_string(create_result.error()) << std::endl;

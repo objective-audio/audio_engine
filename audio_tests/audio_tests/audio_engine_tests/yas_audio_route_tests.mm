@@ -241,7 +241,7 @@ using namespace yas;
         },
         [expectation](bool const cancelled) { [expectation fulfill]; }));
 
-    [self waitForExpectationsWithTimeout:0.5
+    [self waitForExpectationsWithTimeout:10.0
                                  handler:^(NSError *error){
 
                                  }];
