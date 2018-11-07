@@ -37,7 +37,7 @@
 		B63D207C214CCCE8005A5CBF /* yas_chaining_observer_pool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B63D206E214CCCE8005A5CBF /* yas_chaining_observer_pool.cpp */; };
 		B63D207D214CCCE8005A5CBF /* yas_chaining_any_observer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B63D207B214CCCE8005A5CBF /* yas_chaining_any_observer.cpp */; };
 		B65BE8D21AB66D9C0073A07E /* YASAudioEngineEffectsSampleViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = B65BE8D11AB66D9C0073A07E /* YASAudioEngineEffectsSampleViewController.mm */; };
-		B6626A6A1C146E240038175B /* yas_audio_file.mm in Sources */ = {isa = PBXBuildFile; fileRef = B6626A5A1C146E240038175B /* yas_audio_file.mm */; };
+		B6626A6A1C146E240038175B /* yas_audio_file.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6626A5A1C146E240038175B /* yas_audio_file.cpp */; };
 		B6626A6B1C146E240038175B /* yas_audio_file_utils.mm in Sources */ = {isa = PBXBuildFile; fileRef = B6626A5C1C146E240038175B /* yas_audio_file_utils.mm */; };
 		B6626A6C1C146E240038175B /* yas_audio_format.mm in Sources */ = {isa = PBXBuildFile; fileRef = B6626A5E1C146E240038175B /* yas_audio_format.mm */; };
 		B6626A6D1C146E240038175B /* yas_audio_math.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6626A5F1C146E240038175B /* yas_audio_math.cpp */; };
@@ -189,7 +189,7 @@
 		B65BE8D01AB66D9C0073A07E /* YASAudioEngineEffectsSampleViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YASAudioEngineEffectsSampleViewController.h; sourceTree = "<group>"; };
 		B65BE8D11AB66D9C0073A07E /* YASAudioEngineEffectsSampleViewController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = YASAudioEngineEffectsSampleViewController.mm; sourceTree = "<group>"; };
 		B6626A591C146E240038175B /* yas_audio_file.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yas_audio_file.h; sourceTree = "<group>"; };
-		B6626A5A1C146E240038175B /* yas_audio_file.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = yas_audio_file.mm; sourceTree = "<group>"; };
+		B6626A5A1C146E240038175B /* yas_audio_file.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = yas_audio_file.cpp; sourceTree = "<group>"; };
 		B6626A5B1C146E240038175B /* yas_audio_file_utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yas_audio_file_utils.h; sourceTree = "<group>"; };
 		B6626A5C1C146E240038175B /* yas_audio_file_utils.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = yas_audio_file_utils.mm; sourceTree = "<group>"; };
 		B6626A5D1C146E240038175B /* yas_audio_format.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yas_audio_format.h; sourceTree = "<group>"; };
@@ -499,7 +499,7 @@
 				B6626A5B1C146E240038175B /* yas_audio_file_utils.h */,
 				B6626A5C1C146E240038175B /* yas_audio_file_utils.mm */,
 				B6626A591C146E240038175B /* yas_audio_file.h */,
-				B6626A5A1C146E240038175B /* yas_audio_file.mm */,
+				B6626A5A1C146E240038175B /* yas_audio_file.cpp */,
 				B6626A5D1C146E240038175B /* yas_audio_format.h */,
 				B6626A5E1C146E240038175B /* yas_audio_format.mm */,
 				B6626A5F1C146E240038175B /* yas_audio_math.cpp */,
@@ -744,7 +744,7 @@
 				B6F81E1A1BE6F9E90022D6BD /* YASAudioInputTapNodeSampleViewController.mm in Sources */,
 				B617CD311C95563400B3A934 /* yas_audio_engine_node_protocol.cpp in Sources */,
 				B6FF03D01BEB90EA0026777E /* yas_audio_engine_route.cpp in Sources */,
-				B6626A6A1C146E240038175B /* yas_audio_file.mm in Sources */,
+				B6626A6A1C146E240038175B /* yas_audio_file.cpp in Sources */,
 				B69B08901D43494800F12D36 /* yas_audio_engine_kernel_protocol.cpp in Sources */,
 				B699BECB1BF4D1DB0007B597 /* yas_audio_unit_parameter.cpp in Sources */,
 				B6FF03D51BEB90EA0026777E /* yas_audio_engine_au_mixer.cpp in Sources */,

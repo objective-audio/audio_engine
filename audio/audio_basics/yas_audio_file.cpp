@@ -8,6 +8,7 @@
 #include "yas_audio_pcm_buffer.h"
 #include "yas_cf_utils.h"
 #include "yas_exception.h"
+#include "yas_fast_each.h"
 #include "yas_result.h"
 
 using namespace yas;
@@ -141,11 +142,13 @@ struct audio::file::impl : base::impl {
                 uint32_t dataByteSize = remain_frames * bytesPerFrame;
                 uint32_t dataIndex = out_frame_length * bytesPerFrame;
 
-                for (NSInteger i = 0; i < buffer_count; i++) {
-                    AudioBuffer *ab = &io_abl->mBuffers[i];
+                auto each = make_fast_each(buffer_count);
+                while (yas_each_next(each)) {
+                    auto const &idx = yas_each_index(each);
+                    AudioBuffer *ab = &io_abl->mBuffers[idx];
                     ab->mNumberChannels = stride;
                     ab->mDataByteSize = dataByteSize;
-                    uint8_t *byte_data = static_cast<uint8_t *>(buffer.audio_buffer_list()->mBuffers[i].mData);
+                    uint8_t *byte_data = static_cast<uint8_t *>(buffer.audio_buffer_list()->mBuffers[idx].mData);
                     ab->mData = &byte_data[dataIndex];
                 }
 
