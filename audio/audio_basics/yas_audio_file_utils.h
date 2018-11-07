@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include <AVFoundation/AVFoundation.h>
 #include <AudioToolbox/AudioToolbox.h>
 #include <CoreFoundation/CoreFoundation.h>
 #include <string>
@@ -47,12 +46,20 @@ AudioFileTypeID get_audio_file_type_id(ExtAudioFileRef const ext_audio_file);
 }  // namespace yas::audio::ext_audio_file_utils
 
 namespace yas::audio {
+enum class quality {
+    min,
+    low,
+    medium,
+    high,
+    max,
+};
+
 CFDictionaryRef wave_file_settings(double const sample_rate, uint32_t const channel_count, uint32_t const bit_depth);
 CFDictionaryRef aiff_file_settings(double const sample_rate, uint32_t const channel_count, uint32_t const bit_depth);
 CFDictionaryRef linear_pcm_file_settings(double const sample_rate, uint32_t const channel_count,
                                          uint32_t const bit_depth, bool const is_big_endian, bool const is_float,
                                          bool const is_non_interleaved);
 CFDictionaryRef aac_settings(double const sample_rate, uint32_t const channel_count, uint32_t const bit_depth,
-                             const AVAudioQuality encoder_quality, uint32_t const bit_rate,
-                             uint32_t const bit_depth_hint, const AVAudioQuality converter_quality);
+                             const quality encoder_quality, uint32_t const bit_rate, uint32_t const bit_depth_hint,
+                             const quality converter_quality);
 }  // namespace yas::audio

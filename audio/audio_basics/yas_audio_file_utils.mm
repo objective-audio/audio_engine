@@ -3,6 +3,7 @@
 //
 
 #include "yas_audio_file_utils.h"
+#include <AVFoundation/AVFoundation.h>
 #include "yas_audio_exception.h"
 #include "yas_cf_utils.h"
 
@@ -244,9 +245,26 @@ CFDictionaryRef audio::linear_pcm_file_settings(double const sample_rate, uint32
     };
 }
 
+namespace yas::audio {
+static AVAudioQuality to_av_audio_quality(audio::quality const quality) {
+    switch (quality) {
+        case quality::min:
+            return AVAudioQualityMin;
+        case quality::low:
+            return AVAudioQualityLow;
+        case quality::medium:
+            return AVAudioQualityMedium;
+        case quality::high:
+            return AVAudioQualityHigh;
+        case quality::max:
+            return AVAudioQualityMax;
+    }
+}
+}
+
 CFDictionaryRef audio::aac_settings(double const sample_rate, uint32_t const channel_count, uint32_t const bit_depth,
-                                    AVAudioQuality const encoder_quality, uint32_t const bit_rate,
-                                    uint32_t const bit_depth_hint, AVAudioQuality const converter_quality) {
+                                    audio::quality const encoder_quality, uint32_t const bit_rate,
+                                    uint32_t const bit_depth_hint, audio::quality const converter_quality) {
     return (__bridge CFDictionaryRef) @{
         AVFormatIDKey: @(kAudioFormatMPEG4AAC),
         AVSampleRateKey: @(sample_rate),
@@ -254,9 +272,9 @@ CFDictionaryRef audio::aac_settings(double const sample_rate, uint32_t const cha
         AVLinearPCMBitDepthKey: @(bit_depth),
         AVLinearPCMIsBigEndianKey: @(NO),
         AVLinearPCMIsFloatKey: @(NO),
-        AVEncoderAudioQualityKey: @(encoder_quality),
+        AVEncoderAudioQualityKey: @(to_av_audio_quality(encoder_quality)),
         AVEncoderBitRateKey: @(bit_rate),
         AVEncoderBitDepthHintKey: @(bit_depth_hint),
-        AVSampleRateConverterAudioQualityKey: @(converter_quality)
+        AVSampleRateConverterAudioQualityKey: @(to_av_audio_quality(converter_quality))
     };
 }

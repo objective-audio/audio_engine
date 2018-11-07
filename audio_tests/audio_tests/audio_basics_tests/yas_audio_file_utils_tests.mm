@@ -92,10 +92,10 @@ using namespace yas;
     double const sampleRate = 48000;
     uint32_t const channels = 2;
     uint32_t const bitDepth = 16;
-    AVAudioQuality const encoderQuality = AVAudioQualityMedium;
+    audio::quality const encoderQuality = audio::quality::medium;
     uint32_t const bitRate = 128000;
     uint32_t const bitDepthHint = 16;
-    AVAudioQuality const converterQuality = AVAudioQualityMax;
+    audio::quality const converterQuality = audio::quality::max;
 
     NSDictionary *settings = (__bridge NSDictionary *)audio::aac_settings(
         sampleRate, channels, bitDepth, encoderQuality, bitRate, bitDepthHint, converterQuality);
@@ -107,10 +107,10 @@ using namespace yas;
     XCTAssertEqualObjects(settings[AVLinearPCMBitDepthKey], @(bitDepth));
     XCTAssertEqualObjects(settings[AVLinearPCMIsBigEndianKey], @(NO));
     XCTAssertEqualObjects(settings[AVLinearPCMIsFloatKey], @(NO));
-    XCTAssertEqualObjects(settings[AVEncoderAudioQualityKey], @(encoderQuality));
+    XCTAssertEqualObjects(settings[AVEncoderAudioQualityKey], @(AVAudioQualityMedium));
     XCTAssertEqualObjects(settings[AVEncoderBitRateKey], @(bitRate));
     XCTAssertEqualObjects(settings[AVEncoderBitDepthHintKey], @(bitDepthHint));
-    XCTAssertEqualObjects(settings[AVSampleRateConverterAudioQualityKey], @(converterQuality));
+    XCTAssertEqualObjects(settings[AVSampleRateConverterAudioQualityKey], @(AVAudioQualityMax));
 }
 
 - (void)test_to_file_type_from_audio_file_type_id {
