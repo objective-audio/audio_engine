@@ -408,7 +408,7 @@ audio::pcm_buffer::copy_result audio::pcm_buffer::copy_from(copy_args args) {
         return pcm_buffer::copy_result(pcm_buffer::copy_error_t::buffer_is_null);
     }
 
-    auto from_format = from_buffer.format();
+    audio::format const &from_format = from_buffer.format();
 
     if ((from_format.pcm_format() != format().pcm_format()) ||
         (from_format.channel_count() != format().channel_count())) {
