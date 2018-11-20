@@ -113,13 +113,13 @@ struct audio::pcm_buffer::impl : base::impl {
 
     template <typename T>
     T *data_ptr_at_channel(uint32_t const ch_idx) {
-        T *ptr;
+        uint8_t *ptr;
 
         if (this->_format.stride() > 1) {
             if (ch_idx < this->_abl_ptr->mBuffers[0].mNumberChannels) {
-                ptr = static_cast<T *>(this->_abl_ptr->mBuffers[0].mData);
+                ptr = static_cast<uint8_t *>(this->_abl_ptr->mBuffers[0].mData);
                 if (ch_idx > 0) {
-                    ptr += ch_idx;
+                    ptr += ch_idx * this->_format.sample_byte_count();
                 }
             } else {
                 throw std::out_of_range(std::string(__PRETTY_FUNCTION__) + " : out of range. ch_idx(" +
@@ -128,7 +128,7 @@ struct audio::pcm_buffer::impl : base::impl {
             }
         } else {
             if (ch_idx < this->_abl_ptr->mNumberBuffers) {
-                ptr = static_cast<T *>(this->_abl_ptr->mBuffers[ch_idx].mData);
+                ptr = static_cast<uint8_t *>(this->_abl_ptr->mBuffers[ch_idx].mData);
             } else {
                 throw std::out_of_range(std::string(__PRETTY_FUNCTION__) + " : out of range. ch_idx(" +
                                         std::to_string(ch_idx) + ") mNumberChannels(" +
@@ -136,7 +136,7 @@ struct audio::pcm_buffer::impl : base::impl {
             }
         }
 
-        return ptr;
+        return (T *)ptr;
     }
 
     static std::vector<uint8_t> &dummy_data() {
@@ -445,7 +445,7 @@ audio::pcm_buffer::copy_result audio::pcm_buffer::copy_channel_from(copy_channel
     if (args.from_channel >= from_format.channel_count() || args.to_channel >= this->format().channel_count()) {
         return copy_result(copy_error_t::out_of_range_channel);
     }
-    
+
 #warning todo
     return copy_result{0};
 }
