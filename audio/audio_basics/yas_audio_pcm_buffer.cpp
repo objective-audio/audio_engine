@@ -442,12 +442,21 @@ audio::pcm_buffer::copy_result audio::pcm_buffer::copy_channel_from(copy_channel
         return copy_result(copy_error_t::invalid_format);
     }
 
+    if (args.length >= from_buffer.frame_length() || args.length >= this->frame_length()) {
+        return copy_result(copy_error_t::out_of_range_frame);
+    }
+
     if (args.from_channel >= from_format.channel_count() || args.to_channel >= this->format().channel_count()) {
         return copy_result(copy_error_t::out_of_range_channel);
     }
 
-#warning todo
-    return copy_result{0};
+    uint8_t const *const from_ptr = from_buffer.data_ptr_at_channel<uint8_t>(args.from_channel);
+    uint8_t *const to_ptr = this->data_ptr_at_channel<uint8_t>(args.to_channel);
+
+    copy(from_ptr, from_format.stride(), to_ptr, this->format().stride(), args.length,
+         this->format().sample_byte_count());
+
+    return copy_result{args.length};
 }
 
 audio::pcm_buffer::copy_result audio::pcm_buffer::copy_from(AudioBufferList const *const from_abl,
