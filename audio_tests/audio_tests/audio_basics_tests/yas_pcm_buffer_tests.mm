@@ -159,7 +159,7 @@ using namespace yas;
 
             test::fill_test_values_to_buffer(from_buffer);
 
-            XCTAssertTrue(to_buffer.copy_from(from_buffer));
+            XCTAssertTrue(to_buffer.copy_from({.from_buffer = from_buffer}));
             XCTAssertTrue(test::is_equal_buffer_flexibly(from_buffer, to_buffer));
         }
     };
@@ -185,7 +185,7 @@ using namespace yas;
 
         test::fill_test_values_to_buffer(from_buffer);
 
-        XCTAssertTrue(to_buffer.copy_from(from_buffer));
+        XCTAssertTrue(to_buffer.copy_from({.from_buffer = from_buffer}));
         XCTAssertTrue(test::is_equal_buffer_flexibly(from_buffer, to_buffer));
     }
 }
@@ -206,8 +206,8 @@ using namespace yas;
 
         test::fill_test_values_to_buffer(from_buffer);
 
-        XCTAssertFalse(to_buffer.copy_from(from_buffer, 0, 0, from_frame_length));
-        XCTAssertTrue(to_buffer.copy_from(from_buffer, 0, 0, to_frame_length));
+        XCTAssertFalse(to_buffer.copy_from({.from_buffer = from_buffer, .length = from_frame_length}));
+        XCTAssertTrue(to_buffer.copy_from({.from_buffer = from_buffer, .length = to_frame_length}));
         XCTAssertFalse(test::is_equal_buffer_flexibly(from_buffer, to_buffer));
     }
 }
@@ -235,7 +235,10 @@ using namespace yas;
             test::fill_test_values_to_buffer(from_buffer);
 
             uint32_t const length = 2;
-            XCTAssertTrue(to_buffer.copy_from(from_buffer, from_start_frame, to_start_frame, length));
+            XCTAssertTrue(to_buffer.copy_from({.from_buffer = from_buffer,
+                                               .from_begin_frame = from_start_frame,
+                                               .to_begin_frame = to_start_frame,
+                                               .length = length}));
 
             for (uint32_t ch_idx = 0; ch_idx < channels; ch_idx++) {
                 for (uint32_t i = 0; i < length; i++) {
@@ -282,7 +285,7 @@ using namespace yas;
 
             test::fill_test_values_to_buffer(from_buffer);
 
-            XCTAssertNoThrow(to_buffer.copy_from(from_buffer));
+            XCTAssertNoThrow(to_buffer.copy_from({.from_buffer = from_buffer}));
             XCTAssertTrue(test::is_equal_buffer_flexibly(from_buffer, to_buffer));
         }
     };
@@ -314,7 +317,7 @@ using namespace yas;
 
             test::fill_test_values_to_buffer(from_buffer);
 
-            XCTAssertNoThrow(to_buffer.copy_from(from_buffer));
+            XCTAssertNoThrow(to_buffer.copy_from({.from_buffer = from_buffer}));
             XCTAssertTrue(test::is_equal_buffer_flexibly(from_buffer, to_buffer));
             XCTAssertEqual(to_buffer.frame_length(), frame_length);
         }
@@ -339,7 +342,7 @@ using namespace yas;
     audio::pcm_buffer from_buffer(from_format, frame_length);
     audio::pcm_buffer to_buffer(to_format, frame_length);
 
-    XCTAssertFalse(to_buffer.copy_from(from_buffer));
+    XCTAssertFalse(to_buffer.copy_from({.from_buffer = from_buffer}));
 }
 
 - (void)test_copy_data_flexibly_from_abl_same_format {

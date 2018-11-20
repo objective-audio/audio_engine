@@ -401,9 +401,9 @@ void audio::pcm_buffer::clear(uint32_t const begin_frame, uint32_t const length)
     }
 }
 
-audio::pcm_buffer::copy_result audio::pcm_buffer::copy_from(audio::pcm_buffer const &from_buffer,
-                                                            uint32_t const from_begin_frame,
-                                                            uint32_t const to_begin_frame, uint32_t const length) {
+audio::pcm_buffer::copy_result audio::pcm_buffer::copy_from(copy_args args) {
+    pcm_buffer const &from_buffer = args.from_buffer;
+
     if (!from_buffer) {
         return pcm_buffer::copy_result(pcm_buffer::copy_error_t::buffer_is_null);
     }
@@ -418,9 +418,10 @@ audio::pcm_buffer::copy_result audio::pcm_buffer::copy_from(audio::pcm_buffer co
     AudioBufferList const *const from_abl = from_buffer.audio_buffer_list();
     AudioBufferList *const to_abl = audio_buffer_list();
 
-    auto result = copy(from_abl, to_abl, from_format.sample_byte_count(), from_begin_frame, to_begin_frame, length);
+    auto result = copy(from_abl, to_abl, from_format.sample_byte_count(), args.from_begin_frame, args.to_begin_frame,
+                       args.length);
 
-    if (result && from_begin_frame == 0 && to_begin_frame == 0 && length == 0) {
+    if (result && args.from_begin_frame == 0 && args.to_begin_frame == 0 && args.length == 0) {
         set_frame_length(result.value());
     }
 
