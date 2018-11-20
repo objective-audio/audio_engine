@@ -13,6 +13,7 @@
 #include "yas_stl_utils.h"
 
 using namespace yas;
+using namespace yas::audio;
 
 #pragma mark - private
 
@@ -426,6 +427,27 @@ audio::pcm_buffer::copy_result audio::pcm_buffer::copy_from(copy_args args) {
     }
 
     return result;
+}
+
+audio::pcm_buffer::copy_result audio::pcm_buffer::copy_channel_from(copy_channel_args args) {
+    pcm_buffer const &from_buffer = args.from_buffer;
+
+    if (!from_buffer) {
+        return pcm_buffer::copy_result(pcm_buffer::copy_error_t::buffer_is_null);
+    }
+
+    audio::format const &from_format = from_buffer.format();
+
+    if (from_format.pcm_format() != format().pcm_format()) {
+        return copy_result(copy_error_t::invalid_format);
+    }
+
+    if (args.from_channel >= from_format.channel_count() || args.to_channel >= this->format().channel_count()) {
+        return copy_result(copy_error_t::out_of_range_channel);
+    }
+    
+#warning todo
+    return copy_result{0};
 }
 
 audio::pcm_buffer::copy_result audio::pcm_buffer::copy_from(AudioBufferList const *const from_abl,
