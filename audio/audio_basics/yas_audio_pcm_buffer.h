@@ -30,8 +30,9 @@ class pcm_buffer : public base {
         invalid_argument,
         invalid_abl,
         invalid_format,
-        out_of_range,
+        out_of_range_frame,
         buffer_is_null,
+        out_of_range_channel,
     };
 
     using copy_result = result<uint32_t, copy_error_t>;

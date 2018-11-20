@@ -472,11 +472,11 @@ audio::pcm_buffer::copy_result audio::pcm_buffer::copy_from(T const *const from_
     abl_info to_info = to_result.value();
 
     if ((to_begin_frame + copy_length) > to_info.frame_length) {
-        return pcm_buffer::copy_result(pcm_buffer::copy_error_t::out_of_range);
+        return pcm_buffer::copy_result(pcm_buffer::copy_error_t::out_of_range_frame);
     }
 
     if (to_info.channel_count <= to_ch_idx) {
-        return pcm_buffer::copy_result(pcm_buffer::copy_error_t::out_of_range);
+        return pcm_buffer::copy_result(pcm_buffer::copy_error_t::out_of_range_frame);
     }
 
     uint32_t const &to_stride = to_info.strides[to_ch_idx];
@@ -520,7 +520,7 @@ audio::pcm_buffer::copy_result audio::pcm_buffer::copy_to(T *const to_data, uint
     abl_info const &from_info = from_result.value();
 
     if ((from_begin_frame + copy_length) > from_info.frame_length) {
-        return pcm_buffer::copy_result(pcm_buffer::copy_error_t::out_of_range);
+        return pcm_buffer::copy_result(pcm_buffer::copy_error_t::out_of_range_frame);
     }
 
     uint32_t const &from_stride = from_info.strides[from_ch_idx];
@@ -607,8 +607,12 @@ audio::pcm_buffer::copy_result audio::copy(AudioBufferList const *const from_abl
     uint32_t const copy_length = length ?: (from_info.frame_length - from_begin_frame);
 
     if ((from_begin_frame + copy_length) > from_info.frame_length ||
-        (to_begin_frame + copy_length) > to_info.frame_length || from_info.channel_count > to_info.channel_count) {
-        return pcm_buffer::copy_result(pcm_buffer::copy_error_t::out_of_range);
+        (to_begin_frame + copy_length) > to_info.frame_length) {
+        return pcm_buffer::copy_result(pcm_buffer::copy_error_t::out_of_range_frame);
+    }
+
+    if (from_info.channel_count > to_info.channel_count) {
+        return pcm_buffer::copy_result(pcm_buffer::copy_error_t::out_of_range_channel);
     }
 
     for (uint32_t ch_idx = 0; ch_idx < from_info.channel_count; ch_idx++) {
@@ -666,10 +670,12 @@ std::string yas::to_string(audio::pcm_buffer::copy_error_t const &error) {
             return "invalid_abl";
         case audio::pcm_buffer::copy_error_t::invalid_format:
             return "invalid_format";
-        case audio::pcm_buffer::copy_error_t::out_of_range:
-            return "out_of_range";
+        case audio::pcm_buffer::copy_error_t::out_of_range_frame:
+            return "out_of_range_frame";
         case audio::pcm_buffer::copy_error_t::buffer_is_null:
             return "buffer_is_null";
+        case audio::pcm_buffer::copy_error_t::out_of_range_channel:
+            return "out_of_range_channel";
     }
 }
 
