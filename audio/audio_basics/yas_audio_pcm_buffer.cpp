@@ -442,7 +442,7 @@ audio::pcm_buffer::copy_result audio::pcm_buffer::copy_channel_from(copy_channel
         return copy_result(copy_error_t::invalid_format);
     }
 
-    if (args.length >= from_buffer.frame_length() || args.length >= this->frame_length()) {
+    if (args.length > 0 && (args.length >= from_buffer.frame_length() || args.length >= this->frame_length())) {
         return copy_result(copy_error_t::out_of_range_frame);
     }
 
@@ -450,10 +450,33 @@ audio::pcm_buffer::copy_result audio::pcm_buffer::copy_channel_from(copy_channel
         return copy_result(copy_error_t::out_of_range_channel);
     }
 
-    uint8_t const *const from_ptr = from_buffer.data_ptr_at_channel<uint8_t>(args.from_channel);
-    uint8_t *const to_ptr = this->data_ptr_at_channel<uint8_t>(args.to_channel);
+    void const *from_ptr = nullptr;
+    void *to_ptr = nullptr;
 
-    copy(from_ptr, from_format.stride(), to_ptr, this->format().stride(), args.length,
+    switch (from_format.pcm_format()) {
+        case audio::pcm_format::float32:
+            from_ptr = from_buffer.data_ptr_at_channel<Float32>(args.from_channel);
+            to_ptr = this->data_ptr_at_channel<Float32>(args.to_channel);
+            break;
+        case audio::pcm_format::float64:
+            from_ptr = from_buffer.data_ptr_at_channel<Float64>(args.from_channel);
+            to_ptr = this->data_ptr_at_channel<Float64>(args.to_channel);
+            break;
+        case audio::pcm_format::int16:
+            from_ptr = from_buffer.data_ptr_at_channel<int16_t>(args.from_channel);
+            to_ptr = this->data_ptr_at_channel<int16_t>(args.to_channel);
+            break;
+        case audio::pcm_format::fixed824:
+            from_ptr = from_buffer.data_ptr_at_channel<int32_t>(args.from_channel);
+            to_ptr = this->data_ptr_at_channel<int32_t>(args.to_channel);
+            break;
+        default:
+            throw std::runtime_error("invalid pcm_format");
+    }
+
+    uint32_t const copy_length = args.length ?: std::min(from_buffer.frame_length(), this->frame_length());
+
+    copy(from_ptr, from_format.stride(), to_ptr, this->format().stride(), copy_length,
          this->format().sample_byte_count());
 
     return copy_result{args.length};
