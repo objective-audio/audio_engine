@@ -407,6 +407,109 @@ using namespace yas;
     }
 }
 
+- (void)test_copy_channel_int16_data_each_interleaved {
+    double const sample_rate = 48000.0;
+    uint32_t const frame_length = 4;
+    uint32_t const channels = 2;
+
+    audio::format format{{.sample_rate = sample_rate,
+                          .channel_count = channels,
+                          .pcm_format = audio::pcm_format::int16,
+                          .interleaved = true}};
+    audio::pcm_buffer src_buffer{format, frame_length};
+    audio::pcm_buffer dst_buffer{format, frame_length};
+
+    int16_t *const src_ptr = src_buffer.data_ptr_at_channel<int16_t>(0);
+    src_ptr[0] = 10;
+    src_ptr[1] = 20;
+    src_ptr[2] = 11;
+    src_ptr[3] = 21;
+    src_ptr[4] = 12;
+    src_ptr[5] = 22;
+    src_ptr[6] = 13;
+    src_ptr[7] = 23;
+
+    dst_buffer.copy_channel_from({.from_buffer = src_buffer, .from_channel = 0, .to_channel = 1});
+
+    int16_t const *const dst_ptr = dst_buffer.data_ptr_at_channel<int16_t>(0);
+    XCTAssertEqual(dst_ptr[0], 0);
+    XCTAssertEqual(dst_ptr[1], 10);
+    XCTAssertEqual(dst_ptr[2], 0);
+    XCTAssertEqual(dst_ptr[3], 11);
+    XCTAssertEqual(dst_ptr[4], 0);
+    XCTAssertEqual(dst_ptr[5], 12);
+    XCTAssertEqual(dst_ptr[6], 0);
+    XCTAssertEqual(dst_ptr[7], 13);
+
+    dst_buffer.clear();
+    dst_buffer.copy_channel_from({.from_buffer = src_buffer, .from_channel = 1, .to_channel = 0});
+
+    XCTAssertEqual(dst_ptr[0], 20);
+    XCTAssertEqual(dst_ptr[1], 0);
+    XCTAssertEqual(dst_ptr[2], 21);
+    XCTAssertEqual(dst_ptr[3], 0);
+    XCTAssertEqual(dst_ptr[4], 22);
+    XCTAssertEqual(dst_ptr[5], 0);
+    XCTAssertEqual(dst_ptr[6], 23);
+    XCTAssertEqual(dst_ptr[7], 0);
+}
+
+- (void)test_copy_channel_float32_data_each_deinterleaved {
+    double const sample_rate = 48000.0;
+    uint32_t const frame_length = 4;
+    uint32_t const channels = 2;
+
+    audio::format format{{.sample_rate = sample_rate,
+                          .channel_count = channels,
+                          .pcm_format = audio::pcm_format::float32,
+                          .interleaved = false}};
+    audio::pcm_buffer src_buffer{format, frame_length};
+    audio::pcm_buffer dst_buffer{format, frame_length};
+
+    Float32 *const src_ptr_0 = src_buffer.data_ptr_at_channel<Float32>(0);
+    Float32 *const src_ptr_1 = src_buffer.data_ptr_at_channel<Float32>(1);
+    src_ptr_0[0] = 10;
+    src_ptr_0[1] = 11;
+    src_ptr_0[2] = 12;
+    src_ptr_0[3] = 13;
+    src_ptr_1[0] = 20;
+    src_ptr_1[1] = 21;
+    src_ptr_1[2] = 22;
+    src_ptr_1[3] = 23;
+
+    dst_buffer.copy_channel_from({.from_buffer = src_buffer, .from_channel = 0, .to_channel = 1});
+
+    Float32 const *const dst_ptr_0 = dst_buffer.data_ptr_at_channel<Float32>(0);
+    Float32 const *const dst_ptr_1 = dst_buffer.data_ptr_at_channel<Float32>(1);
+
+    XCTAssertEqual(dst_ptr_0[0], 0);
+    XCTAssertEqual(dst_ptr_0[1], 0);
+    XCTAssertEqual(dst_ptr_0[2], 0);
+    XCTAssertEqual(dst_ptr_0[3], 0);
+    XCTAssertEqual(dst_ptr_1[0], 10);
+    XCTAssertEqual(dst_ptr_1[1], 11);
+    XCTAssertEqual(dst_ptr_1[2], 12);
+    XCTAssertEqual(dst_ptr_1[3], 13);
+
+    dst_buffer.clear();
+    dst_buffer.copy_channel_from({.from_buffer = src_buffer, .from_channel = 1, .to_channel = 0});
+
+    XCTAssertEqual(dst_ptr_0[0], 20);
+    XCTAssertEqual(dst_ptr_0[1], 21);
+    XCTAssertEqual(dst_ptr_0[2], 22);
+    XCTAssertEqual(dst_ptr_0[3], 23);
+    XCTAssertEqual(dst_ptr_1[0], 0);
+    XCTAssertEqual(dst_ptr_1[1], 0);
+    XCTAssertEqual(dst_ptr_1[2], 0);
+    XCTAssertEqual(dst_ptr_1[3], 0);
+}
+
+- (void)test_copy_channel_data_interleaved_to_deinterleaved {
+}
+
+- (void)test_copy_channel_data_deinterleaved_to_interleaved {
+}
+
 - (void)test_create_buffer_with_channel_map_many_destination {
     uint32_t const frame_length = 4;
     uint32_t const src_ch_count = 2;
