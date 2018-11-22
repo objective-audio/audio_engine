@@ -159,7 +159,7 @@ using namespace yas;
 
             test::fill_test_values_to_buffer(from_buffer);
 
-            XCTAssertTrue(to_buffer.copy_from(from_buffer));
+            XCTAssertTrue(to_buffer.copy_from({.from_buffer = from_buffer}));
             XCTAssertTrue(test::is_equal_buffer_flexibly(from_buffer, to_buffer));
         }
     };
@@ -185,7 +185,7 @@ using namespace yas;
 
         test::fill_test_values_to_buffer(from_buffer);
 
-        XCTAssertTrue(to_buffer.copy_from(from_buffer));
+        XCTAssertTrue(to_buffer.copy_from({.from_buffer = from_buffer}));
         XCTAssertTrue(test::is_equal_buffer_flexibly(from_buffer, to_buffer));
     }
 }
@@ -206,8 +206,8 @@ using namespace yas;
 
         test::fill_test_values_to_buffer(from_buffer);
 
-        XCTAssertFalse(to_buffer.copy_from(from_buffer, 0, 0, from_frame_length));
-        XCTAssertTrue(to_buffer.copy_from(from_buffer, 0, 0, to_frame_length));
+        XCTAssertFalse(to_buffer.copy_from({.from_buffer = from_buffer, .length = from_frame_length}));
+        XCTAssertTrue(to_buffer.copy_from({.from_buffer = from_buffer, .length = to_frame_length}));
         XCTAssertFalse(test::is_equal_buffer_flexibly(from_buffer, to_buffer));
     }
 }
@@ -235,7 +235,10 @@ using namespace yas;
             test::fill_test_values_to_buffer(from_buffer);
 
             uint32_t const length = 2;
-            XCTAssertTrue(to_buffer.copy_from(from_buffer, from_start_frame, to_start_frame, length));
+            XCTAssertTrue(to_buffer.copy_from({.from_buffer = from_buffer,
+                                               .from_begin_frame = from_start_frame,
+                                               .to_begin_frame = to_start_frame,
+                                               .length = length}));
 
             for (uint32_t ch_idx = 0; ch_idx < channels; ch_idx++) {
                 for (uint32_t i = 0; i < length; i++) {
@@ -282,7 +285,7 @@ using namespace yas;
 
             test::fill_test_values_to_buffer(from_buffer);
 
-            XCTAssertNoThrow(to_buffer.copy_from(from_buffer));
+            XCTAssertNoThrow(to_buffer.copy_from({.from_buffer = from_buffer}));
             XCTAssertTrue(test::is_equal_buffer_flexibly(from_buffer, to_buffer));
         }
     };
@@ -314,7 +317,7 @@ using namespace yas;
 
             test::fill_test_values_to_buffer(from_buffer);
 
-            XCTAssertNoThrow(to_buffer.copy_from(from_buffer));
+            XCTAssertNoThrow(to_buffer.copy_from({.from_buffer = from_buffer}));
             XCTAssertTrue(test::is_equal_buffer_flexibly(from_buffer, to_buffer));
             XCTAssertEqual(to_buffer.frame_length(), frame_length);
         }
@@ -339,7 +342,7 @@ using namespace yas;
     audio::pcm_buffer from_buffer(from_format, frame_length);
     audio::pcm_buffer to_buffer(to_format, frame_length);
 
-    XCTAssertFalse(to_buffer.copy_from(from_buffer));
+    XCTAssertFalse(to_buffer.copy_from({.from_buffer = from_buffer}));
 }
 
 - (void)test_copy_data_flexibly_from_abl_same_format {
@@ -402,6 +405,208 @@ using namespace yas;
         XCTAssertNoThrow(deinterleaved_buffer.copy_to(interleaved_buffer.audio_buffer_list()));
         XCTAssertTrue(test::is_equal_buffer_flexibly(interleaved_buffer, deinterleaved_buffer));
     }
+}
+
+- (void)test_copy_channel_int16_data_each_interleaved {
+    double const sample_rate = 48000.0;
+    uint32_t const frame_length = 4;
+    uint32_t const channels = 2;
+
+    audio::format format{{.sample_rate = sample_rate,
+                          .channel_count = channels,
+                          .pcm_format = audio::pcm_format::int16,
+                          .interleaved = true}};
+    audio::pcm_buffer src_buffer{format, frame_length};
+    audio::pcm_buffer dst_buffer{format, frame_length};
+
+    int16_t *const src_ptr = src_buffer.data_ptr_at_channel<int16_t>(0);
+    src_ptr[0] = 10;
+    src_ptr[1] = 20;
+    src_ptr[2] = 11;
+    src_ptr[3] = 21;
+    src_ptr[4] = 12;
+    src_ptr[5] = 22;
+    src_ptr[6] = 13;
+    src_ptr[7] = 23;
+
+    dst_buffer.copy_channel_from({.from_buffer = src_buffer, .from_channel = 0, .to_channel = 1});
+
+    int16_t const *const dst_ptr = dst_buffer.data_ptr_at_channel<int16_t>(0);
+    XCTAssertEqual(dst_ptr[0], 0);
+    XCTAssertEqual(dst_ptr[1], 10);
+    XCTAssertEqual(dst_ptr[2], 0);
+    XCTAssertEqual(dst_ptr[3], 11);
+    XCTAssertEqual(dst_ptr[4], 0);
+    XCTAssertEqual(dst_ptr[5], 12);
+    XCTAssertEqual(dst_ptr[6], 0);
+    XCTAssertEqual(dst_ptr[7], 13);
+
+    dst_buffer.clear();
+    dst_buffer.copy_channel_from({.from_buffer = src_buffer, .from_channel = 1, .to_channel = 0});
+
+    XCTAssertEqual(dst_ptr[0], 20);
+    XCTAssertEqual(dst_ptr[1], 0);
+    XCTAssertEqual(dst_ptr[2], 21);
+    XCTAssertEqual(dst_ptr[3], 0);
+    XCTAssertEqual(dst_ptr[4], 22);
+    XCTAssertEqual(dst_ptr[5], 0);
+    XCTAssertEqual(dst_ptr[6], 23);
+    XCTAssertEqual(dst_ptr[7], 0);
+}
+
+- (void)test_copy_channel_float32_data_each_deinterleaved {
+    double const sample_rate = 48000.0;
+    uint32_t const frame_length = 4;
+    uint32_t const channels = 2;
+
+    audio::format format{{.sample_rate = sample_rate,
+                          .channel_count = channels,
+                          .pcm_format = audio::pcm_format::float32,
+                          .interleaved = false}};
+    audio::pcm_buffer src_buffer{format, frame_length};
+    audio::pcm_buffer dst_buffer{format, frame_length};
+
+    Float32 *const src_ptr_0 = src_buffer.data_ptr_at_channel<Float32>(0);
+    Float32 *const src_ptr_1 = src_buffer.data_ptr_at_channel<Float32>(1);
+    src_ptr_0[0] = 10;
+    src_ptr_0[1] = 11;
+    src_ptr_0[2] = 12;
+    src_ptr_0[3] = 13;
+    src_ptr_1[0] = 20;
+    src_ptr_1[1] = 21;
+    src_ptr_1[2] = 22;
+    src_ptr_1[3] = 23;
+
+    dst_buffer.copy_channel_from({.from_buffer = src_buffer, .from_channel = 0, .to_channel = 1});
+
+    Float32 const *const dst_ptr_0 = dst_buffer.data_ptr_at_channel<Float32>(0);
+    Float32 const *const dst_ptr_1 = dst_buffer.data_ptr_at_channel<Float32>(1);
+
+    XCTAssertEqual(dst_ptr_0[0], 0);
+    XCTAssertEqual(dst_ptr_0[1], 0);
+    XCTAssertEqual(dst_ptr_0[2], 0);
+    XCTAssertEqual(dst_ptr_0[3], 0);
+    XCTAssertEqual(dst_ptr_1[0], 10);
+    XCTAssertEqual(dst_ptr_1[1], 11);
+    XCTAssertEqual(dst_ptr_1[2], 12);
+    XCTAssertEqual(dst_ptr_1[3], 13);
+
+    dst_buffer.clear();
+    dst_buffer.copy_channel_from({.from_buffer = src_buffer, .from_channel = 1, .to_channel = 0});
+
+    XCTAssertEqual(dst_ptr_0[0], 20);
+    XCTAssertEqual(dst_ptr_0[1], 21);
+    XCTAssertEqual(dst_ptr_0[2], 22);
+    XCTAssertEqual(dst_ptr_0[3], 23);
+    XCTAssertEqual(dst_ptr_1[0], 0);
+    XCTAssertEqual(dst_ptr_1[1], 0);
+    XCTAssertEqual(dst_ptr_1[2], 0);
+    XCTAssertEqual(dst_ptr_1[3], 0);
+}
+
+- (void)test_copy_channel_fixed824_data_interleaved_to_deinterleaved {
+    double const sample_rate = 48000.0;
+    uint32_t const frame_length = 4;
+    uint32_t const channels = 2;
+
+    audio::format src_format{{.sample_rate = sample_rate,
+                              .channel_count = channels,
+                              .pcm_format = audio::pcm_format::fixed824,
+                              .interleaved = true}};
+    audio::format dst_format{{.sample_rate = sample_rate,
+                              .channel_count = channels,
+                              .pcm_format = audio::pcm_format::fixed824,
+                              .interleaved = false}};
+    audio::pcm_buffer src_buffer{src_format, frame_length};
+    audio::pcm_buffer dst_buffer{dst_format, frame_length};
+
+    int32_t *const src_ptr = src_buffer.data_ptr_at_channel<int32_t>(0);
+    src_ptr[0] = 10;
+    src_ptr[1] = 20;
+    src_ptr[2] = 11;
+    src_ptr[3] = 21;
+    src_ptr[4] = 12;
+    src_ptr[5] = 22;
+    src_ptr[6] = 13;
+    src_ptr[7] = 23;
+
+    dst_buffer.copy_channel_from({.from_buffer = src_buffer, .from_channel = 0, .to_channel = 1});
+
+    int32_t const *const dst_ptr_0 = dst_buffer.data_ptr_at_channel<int32_t>(0);
+    int32_t const *const dst_ptr_1 = dst_buffer.data_ptr_at_channel<int32_t>(1);
+
+    XCTAssertEqual(dst_ptr_0[0], 0);
+    XCTAssertEqual(dst_ptr_0[1], 0);
+    XCTAssertEqual(dst_ptr_0[2], 0);
+    XCTAssertEqual(dst_ptr_0[3], 0);
+    XCTAssertEqual(dst_ptr_1[0], 10);
+    XCTAssertEqual(dst_ptr_1[1], 11);
+    XCTAssertEqual(dst_ptr_1[2], 12);
+    XCTAssertEqual(dst_ptr_1[3], 13);
+
+    dst_buffer.clear();
+    dst_buffer.copy_channel_from({.from_buffer = src_buffer, .from_channel = 1, .to_channel = 0});
+
+    XCTAssertEqual(dst_ptr_0[0], 20);
+    XCTAssertEqual(dst_ptr_0[1], 21);
+    XCTAssertEqual(dst_ptr_0[2], 22);
+    XCTAssertEqual(dst_ptr_0[3], 23);
+    XCTAssertEqual(dst_ptr_1[0], 0);
+    XCTAssertEqual(dst_ptr_1[1], 0);
+    XCTAssertEqual(dst_ptr_1[2], 0);
+    XCTAssertEqual(dst_ptr_1[3], 0);
+}
+
+- (void)test_copy_channel_float64_data_deinterleaved_to_interleaved {
+    double const sample_rate = 48000.0;
+    uint32_t const frame_length = 4;
+    uint32_t const channels = 2;
+
+    audio::format src_format{{.sample_rate = sample_rate,
+                              .channel_count = channels,
+                              .pcm_format = audio::pcm_format::float64,
+                              .interleaved = false}};
+    audio::format dst_format{{.sample_rate = sample_rate,
+                              .channel_count = channels,
+                              .pcm_format = audio::pcm_format::float64,
+                              .interleaved = true}};
+    audio::pcm_buffer src_buffer{src_format, frame_length};
+    audio::pcm_buffer dst_buffer{dst_format, frame_length};
+
+    Float64 *const src_ptr_0 = src_buffer.data_ptr_at_channel<Float64>(0);
+    Float64 *const src_ptr_1 = src_buffer.data_ptr_at_channel<Float64>(1);
+    src_ptr_0[0] = 10;
+    src_ptr_0[1] = 11;
+    src_ptr_0[2] = 12;
+    src_ptr_0[3] = 13;
+    src_ptr_1[0] = 20;
+    src_ptr_1[1] = 21;
+    src_ptr_1[2] = 22;
+    src_ptr_1[3] = 23;
+
+    dst_buffer.copy_channel_from({.from_buffer = src_buffer, .from_channel = 0, .to_channel = 1});
+
+    Float64 const *const dst_ptr = dst_buffer.data_ptr_at_channel<Float64>(0);
+    XCTAssertEqual(dst_ptr[0], 0);
+    XCTAssertEqual(dst_ptr[1], 10);
+    XCTAssertEqual(dst_ptr[2], 0);
+    XCTAssertEqual(dst_ptr[3], 11);
+    XCTAssertEqual(dst_ptr[4], 0);
+    XCTAssertEqual(dst_ptr[5], 12);
+    XCTAssertEqual(dst_ptr[6], 0);
+    XCTAssertEqual(dst_ptr[7], 13);
+
+    dst_buffer.clear();
+    dst_buffer.copy_channel_from({.from_buffer = src_buffer, .from_channel = 1, .to_channel = 0});
+
+    XCTAssertEqual(dst_ptr[0], 20);
+    XCTAssertEqual(dst_ptr[1], 0);
+    XCTAssertEqual(dst_ptr[2], 21);
+    XCTAssertEqual(dst_ptr[3], 0);
+    XCTAssertEqual(dst_ptr[4], 22);
+    XCTAssertEqual(dst_ptr[5], 0);
+    XCTAssertEqual(dst_ptr[6], 23);
+    XCTAssertEqual(dst_ptr[7], 0);
 }
 
 - (void)test_create_buffer_with_channel_map_many_destination {
@@ -649,15 +854,16 @@ using namespace yas;
     XCTAssertTrue(to_string(audio::pcm_buffer::copy_error_t::invalid_argument) == "invalid_argument");
     XCTAssertTrue(to_string(audio::pcm_buffer::copy_error_t::invalid_abl) == "invalid_abl");
     XCTAssertTrue(to_string(audio::pcm_buffer::copy_error_t::invalid_format) == "invalid_format");
-    XCTAssertTrue(to_string(audio::pcm_buffer::copy_error_t::out_of_range) == "out_of_range");
+    XCTAssertTrue(to_string(audio::pcm_buffer::copy_error_t::out_of_range_frame) == "out_of_range_frame");
     XCTAssertTrue(to_string(audio::pcm_buffer::copy_error_t::buffer_is_null) == "buffer_is_null");
+    XCTAssertTrue(to_string(audio::pcm_buffer::copy_error_t::out_of_range_channel) == "out_of_range_channel");
 }
 
 - (void)test_copy_error_ostream {
-    auto const errors = {audio::pcm_buffer::copy_error_t::invalid_argument,
-                         audio::pcm_buffer::copy_error_t::invalid_abl, audio::pcm_buffer::copy_error_t::invalid_format,
-                         audio::pcm_buffer::copy_error_t::out_of_range,
-                         audio::pcm_buffer::copy_error_t::buffer_is_null};
+    auto const errors = {
+        audio::pcm_buffer::copy_error_t::invalid_argument, audio::pcm_buffer::copy_error_t::invalid_abl,
+        audio::pcm_buffer::copy_error_t::invalid_format,   audio::pcm_buffer::copy_error_t::out_of_range_frame,
+        audio::pcm_buffer::copy_error_t::buffer_is_null,   audio::pcm_buffer::copy_error_t::out_of_range_channel};
 
     for (auto const &error : errors) {
         std::ostringstream stream;
