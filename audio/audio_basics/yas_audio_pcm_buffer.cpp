@@ -402,7 +402,7 @@ void audio::pcm_buffer::clear(uint32_t const begin_frame, uint32_t const length)
     }
 }
 
-audio::pcm_buffer::copy_result audio::pcm_buffer::copy_from(copy_args args) {
+audio::pcm_buffer::copy_result audio::pcm_buffer::copy_from(copy_options args) {
     pcm_buffer const &from_buffer = args.from_buffer;
 
     if (!from_buffer) {
@@ -429,7 +429,7 @@ audio::pcm_buffer::copy_result audio::pcm_buffer::copy_from(copy_args args) {
     return result;
 }
 
-audio::pcm_buffer::copy_result audio::pcm_buffer::copy_channel_from(copy_channel_args args) {
+audio::pcm_buffer::copy_result audio::pcm_buffer::copy_channel_from(copy_channel_options args) {
     pcm_buffer const &from_buffer = args.from_buffer;
 
     if (!from_buffer) {
