@@ -36,7 +36,7 @@ struct audio::engine::device_io::impl : base::impl, manageable_device_io::impl {
                 auto const &device_io = engine_device_io.impl_ptr<impl>()->device_io()) {
                 auto &input_buffer = device_io.input_buffer_on_render();
                 if (input_buffer && input_buffer.format() == buffer.format()) {
-                    buffer.copy_from({.from_buffer = input_buffer});
+                    buffer.copy_from(input_buffer);
                 }
             }
         });

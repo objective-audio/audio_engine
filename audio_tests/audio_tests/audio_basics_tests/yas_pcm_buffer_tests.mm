@@ -159,7 +159,7 @@ using namespace yas;
 
             test::fill_test_values_to_buffer(from_buffer);
 
-            XCTAssertTrue(to_buffer.copy_from({.from_buffer = from_buffer}));
+            XCTAssertTrue(to_buffer.copy_from(from_buffer));
             XCTAssertTrue(test::is_equal_buffer_flexibly(from_buffer, to_buffer));
         }
     };
@@ -185,7 +185,7 @@ using namespace yas;
 
         test::fill_test_values_to_buffer(from_buffer);
 
-        XCTAssertTrue(to_buffer.copy_from({.from_buffer = from_buffer}));
+        XCTAssertTrue(to_buffer.copy_from(from_buffer));
         XCTAssertTrue(test::is_equal_buffer_flexibly(from_buffer, to_buffer));
     }
 }
@@ -206,8 +206,8 @@ using namespace yas;
 
         test::fill_test_values_to_buffer(from_buffer);
 
-        XCTAssertFalse(to_buffer.copy_from({.from_buffer = from_buffer, .length = from_frame_length}));
-        XCTAssertTrue(to_buffer.copy_from({.from_buffer = from_buffer, .length = to_frame_length}));
+        XCTAssertFalse(to_buffer.copy_from(from_buffer, {.length = from_frame_length}));
+        XCTAssertTrue(to_buffer.copy_from(from_buffer, {.length = to_frame_length}));
         XCTAssertFalse(test::is_equal_buffer_flexibly(from_buffer, to_buffer));
     }
 }
@@ -235,10 +235,9 @@ using namespace yas;
             test::fill_test_values_to_buffer(from_buffer);
 
             uint32_t const length = 2;
-            XCTAssertTrue(to_buffer.copy_from({.from_buffer = from_buffer,
-                                               .from_begin_frame = from_start_frame,
-                                               .to_begin_frame = to_start_frame,
-                                               .length = length}));
+            XCTAssertTrue(to_buffer.copy_from(
+                from_buffer,
+                {.from_begin_frame = from_start_frame, .to_begin_frame = to_start_frame, .length = length}));
 
             for (uint32_t ch_idx = 0; ch_idx < channels; ch_idx++) {
                 for (uint32_t i = 0; i < length; i++) {
@@ -285,7 +284,7 @@ using namespace yas;
 
             test::fill_test_values_to_buffer(from_buffer);
 
-            XCTAssertNoThrow(to_buffer.copy_from({.from_buffer = from_buffer}));
+            XCTAssertNoThrow(to_buffer.copy_from(from_buffer));
             XCTAssertTrue(test::is_equal_buffer_flexibly(from_buffer, to_buffer));
         }
     };
@@ -317,7 +316,7 @@ using namespace yas;
 
             test::fill_test_values_to_buffer(from_buffer);
 
-            XCTAssertNoThrow(to_buffer.copy_from({.from_buffer = from_buffer}));
+            XCTAssertNoThrow(to_buffer.copy_from(from_buffer));
             XCTAssertTrue(test::is_equal_buffer_flexibly(from_buffer, to_buffer));
             XCTAssertEqual(to_buffer.frame_length(), frame_length);
         }
@@ -342,7 +341,7 @@ using namespace yas;
     audio::pcm_buffer from_buffer(from_format, frame_length);
     audio::pcm_buffer to_buffer(to_format, frame_length);
 
-    XCTAssertFalse(to_buffer.copy_from({.from_buffer = from_buffer}));
+    XCTAssertFalse(to_buffer.copy_from(from_buffer));
 }
 
 - (void)test_copy_data_flexibly_from_abl_same_format {
@@ -429,7 +428,7 @@ using namespace yas;
     src_ptr[6] = 13;
     src_ptr[7] = 23;
 
-    dst_buffer.copy_channel_from({.from_buffer = src_buffer, .from_channel = 0, .to_channel = 1});
+    dst_buffer.copy_channel_from(src_buffer, {.from_channel = 0, .to_channel = 1});
 
     int16_t const *const dst_ptr = dst_buffer.data_ptr_at_channel<int16_t>(0);
     XCTAssertEqual(dst_ptr[0], 0);
@@ -442,7 +441,7 @@ using namespace yas;
     XCTAssertEqual(dst_ptr[7], 13);
 
     dst_buffer.clear();
-    dst_buffer.copy_channel_from({.from_buffer = src_buffer, .from_channel = 1, .to_channel = 0});
+    dst_buffer.copy_channel_from(src_buffer, {.from_channel = 1, .to_channel = 0});
 
     XCTAssertEqual(dst_ptr[0], 20);
     XCTAssertEqual(dst_ptr[1], 0);
@@ -477,7 +476,7 @@ using namespace yas;
     src_ptr_1[2] = 22;
     src_ptr_1[3] = 23;
 
-    dst_buffer.copy_channel_from({.from_buffer = src_buffer, .from_channel = 0, .to_channel = 1});
+    dst_buffer.copy_channel_from(src_buffer, {.from_channel = 0, .to_channel = 1});
 
     Float32 const *const dst_ptr_0 = dst_buffer.data_ptr_at_channel<Float32>(0);
     Float32 const *const dst_ptr_1 = dst_buffer.data_ptr_at_channel<Float32>(1);
@@ -492,7 +491,7 @@ using namespace yas;
     XCTAssertEqual(dst_ptr_1[3], 13);
 
     dst_buffer.clear();
-    dst_buffer.copy_channel_from({.from_buffer = src_buffer, .from_channel = 1, .to_channel = 0});
+    dst_buffer.copy_channel_from(src_buffer, {.from_channel = 1, .to_channel = 0});
 
     XCTAssertEqual(dst_ptr_0[0], 20);
     XCTAssertEqual(dst_ptr_0[1], 21);
@@ -530,7 +529,7 @@ using namespace yas;
     src_ptr[6] = 13;
     src_ptr[7] = 23;
 
-    dst_buffer.copy_channel_from({.from_buffer = src_buffer, .from_channel = 0, .to_channel = 1});
+    dst_buffer.copy_channel_from(src_buffer, {.from_channel = 0, .to_channel = 1});
 
     int32_t const *const dst_ptr_0 = dst_buffer.data_ptr_at_channel<int32_t>(0);
     int32_t const *const dst_ptr_1 = dst_buffer.data_ptr_at_channel<int32_t>(1);
@@ -545,7 +544,7 @@ using namespace yas;
     XCTAssertEqual(dst_ptr_1[3], 13);
 
     dst_buffer.clear();
-    dst_buffer.copy_channel_from({.from_buffer = src_buffer, .from_channel = 1, .to_channel = 0});
+    dst_buffer.copy_channel_from(src_buffer, {.from_channel = 1, .to_channel = 0});
 
     XCTAssertEqual(dst_ptr_0[0], 20);
     XCTAssertEqual(dst_ptr_0[1], 21);
@@ -584,7 +583,7 @@ using namespace yas;
     src_ptr_1[2] = 22;
     src_ptr_1[3] = 23;
 
-    dst_buffer.copy_channel_from({.from_buffer = src_buffer, .from_channel = 0, .to_channel = 1});
+    dst_buffer.copy_channel_from(src_buffer, {.from_channel = 0, .to_channel = 1});
 
     Float64 const *const dst_ptr = dst_buffer.data_ptr_at_channel<Float64>(0);
     XCTAssertEqual(dst_ptr[0], 0);
@@ -597,7 +596,7 @@ using namespace yas;
     XCTAssertEqual(dst_ptr[7], 13);
 
     dst_buffer.clear();
-    dst_buffer.copy_channel_from({.from_buffer = src_buffer, .from_channel = 1, .to_channel = 0});
+    dst_buffer.copy_channel_from(src_buffer, {.from_channel = 1, .to_channel = 0});
 
     XCTAssertEqual(dst_ptr[0], 20);
     XCTAssertEqual(dst_ptr[1], 0);

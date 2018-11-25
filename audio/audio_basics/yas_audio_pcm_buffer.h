@@ -19,15 +19,13 @@ class pcm_buffer : public base {
     class impl;
 
    public:
-    struct copy_args {
-        pcm_buffer const &from_buffer;
+    struct copy_options {
         uint32_t const from_begin_frame = 0;
         uint32_t const to_begin_frame = 0;
         uint32_t const length = 0;
     };
 
-    struct copy_channel_args {
-        pcm_buffer const &from_buffer;
+    struct copy_channel_options {
         uint32_t const from_begin_frame = 0;
         uint32_t const from_channel = 0;
         uint32_t const to_begin_frame = 0;
@@ -74,8 +72,10 @@ class pcm_buffer : public base {
     void clear();
     void clear(uint32_t const begin_frame, uint32_t const length);
 
-    pcm_buffer::copy_result copy_from(copy_args);
-    pcm_buffer::copy_result copy_channel_from(copy_channel_args);
+    pcm_buffer::copy_result copy_from(pcm_buffer const &);
+    pcm_buffer::copy_result copy_from(pcm_buffer const &, copy_options);
+    pcm_buffer::copy_result copy_channel_from(pcm_buffer const &);
+    pcm_buffer::copy_result copy_channel_from(pcm_buffer const &, copy_channel_options);
     pcm_buffer::copy_result copy_from(AudioBufferList const *const from_abl, uint32_t const from_begin_frame = 0,
                                       uint32_t const to_begin_frame = 0, uint32_t const length = 0);
     pcm_buffer::copy_result copy_to(AudioBufferList *const to_abl, uint32_t const from_begin_frame = 0,
