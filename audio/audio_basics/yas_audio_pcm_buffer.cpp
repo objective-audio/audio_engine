@@ -447,7 +447,12 @@ audio::pcm_buffer::copy_result audio::pcm_buffer::copy_channel_from(pcm_buffer c
         return copy_result(copy_error_t::invalid_format);
     }
 
-    if (args.length > 0 && (args.length >= from_buffer.frame_length() || args.length >= this->frame_length())) {
+    if (args.from_begin_frame >= from_buffer.frame_length() || args.to_begin_frame >= this->frame_length()) {
+        return copy_result(copy_error_t::out_of_range_frame);
+    }
+
+    if (args.length > 0 && (args.from_begin_frame + args.length > from_buffer.frame_length() ||
+                            args.to_begin_frame + args.length > this->frame_length())) {
         return copy_result(copy_error_t::out_of_range_frame);
     }
 
@@ -479,7 +484,9 @@ audio::pcm_buffer::copy_result audio::pcm_buffer::copy_channel_from(pcm_buffer c
             throw std::runtime_error("invalid pcm_format");
     }
 
-    uint32_t const copy_length = args.length ?: std::min(from_buffer.frame_length(), this->frame_length());
+    uint32_t const copy_length =
+        args.length ?:
+            std::min(from_buffer.frame_length() - args.from_begin_frame, this->frame_length() - args.to_begin_frame);
 
     copy(from_ptr, from_format.stride(), to_ptr, this->format().stride(), copy_length,
          this->format().sample_byte_count());
