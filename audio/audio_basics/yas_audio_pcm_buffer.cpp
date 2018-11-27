@@ -447,49 +447,56 @@ audio::pcm_buffer::copy_result audio::pcm_buffer::copy_channel_from(pcm_buffer c
         return copy_result(copy_error_t::invalid_format);
     }
 
-    if (args.from_begin_frame >= from_buffer.frame_length() || args.to_begin_frame >= this->frame_length()) {
+    uint32_t const from_frame_length = from_buffer.frame_length();
+
+    if (args.from_begin_frame >= from_frame_length || args.to_begin_frame >= this->frame_length()) {
         return copy_result(copy_error_t::out_of_range_frame);
     }
+
+    uint32_t const to_frame_length = this->frame_length();
 
     if (args.length > 0 && (args.from_begin_frame + args.length > from_buffer.frame_length() ||
-                            args.to_begin_frame + args.length > this->frame_length())) {
+                            args.to_begin_frame + args.length > to_frame_length)) {
         return copy_result(copy_error_t::out_of_range_frame);
     }
 
-    if (args.from_channel >= from_format.channel_count() || args.to_channel >= this->format().channel_count()) {
+    audio::format const &to_format = this->format();
+
+    if (args.from_channel >= from_format.channel_count() || args.to_channel >= to_format.channel_count()) {
         return copy_result(copy_error_t::out_of_range_channel);
     }
 
     void const *from_ptr = nullptr;
     void *to_ptr = nullptr;
 
+    uint32_t const from_idx = args.from_begin_frame * from_format.stride();
+    uint32_t const to_idx = args.to_begin_frame * to_format.stride();
+
     switch (from_format.pcm_format()) {
         case audio::pcm_format::float32:
-            from_ptr = from_buffer.data_ptr_at_channel<Float32>(args.from_channel);
-            to_ptr = this->data_ptr_at_channel<Float32>(args.to_channel);
+            from_ptr = &from_buffer.data_ptr_at_channel<Float32>(args.from_channel)[from_idx];
+            to_ptr = &this->data_ptr_at_channel<Float32>(args.to_channel)[to_idx];
             break;
         case audio::pcm_format::float64:
-            from_ptr = from_buffer.data_ptr_at_channel<Float64>(args.from_channel);
-            to_ptr = this->data_ptr_at_channel<Float64>(args.to_channel);
+            from_ptr = &from_buffer.data_ptr_at_channel<Float64>(args.from_channel)[from_idx];
+            to_ptr = &this->data_ptr_at_channel<Float64>(args.to_channel)[to_idx];
             break;
         case audio::pcm_format::int16:
-            from_ptr = from_buffer.data_ptr_at_channel<int16_t>(args.from_channel);
-            to_ptr = this->data_ptr_at_channel<int16_t>(args.to_channel);
+            from_ptr = &from_buffer.data_ptr_at_channel<int16_t>(args.from_channel)[from_idx];
+            to_ptr = &this->data_ptr_at_channel<int16_t>(args.to_channel)[to_idx];
             break;
         case audio::pcm_format::fixed824:
-            from_ptr = from_buffer.data_ptr_at_channel<int32_t>(args.from_channel);
-            to_ptr = this->data_ptr_at_channel<int32_t>(args.to_channel);
+            from_ptr = &from_buffer.data_ptr_at_channel<int32_t>(args.from_channel)[from_idx];
+            to_ptr = &this->data_ptr_at_channel<int32_t>(args.to_channel)[to_idx];
             break;
         default:
             throw std::runtime_error("invalid pcm_format");
     }
 
     uint32_t const copy_length =
-        args.length ?:
-            std::min(from_buffer.frame_length() - args.from_begin_frame, this->frame_length() - args.to_begin_frame);
+        args.length ?: std::min(from_frame_length - args.from_begin_frame, to_frame_length - args.to_begin_frame);
 
-    copy(from_ptr, from_format.stride(), to_ptr, this->format().stride(), copy_length,
-         this->format().sample_byte_count());
+    copy(from_ptr, from_format.stride(), to_ptr, to_format.stride(), copy_length, this->format().sample_byte_count());
 
     return copy_result{args.length};
 }
