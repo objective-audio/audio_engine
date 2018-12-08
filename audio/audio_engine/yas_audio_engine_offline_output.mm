@@ -127,7 +127,7 @@ struct audio::engine::offline_output::impl : base::impl, manageable_offline_outp
         auto completion_handlers = _core.pull_completion_handlers();
 
         if (auto &queue = this->_queue) {
-            queue.cancel();
+            queue.cancel_all();
             queue.wait_until_all_operations_are_finished();
             this->_queue = nullptr;
         }
