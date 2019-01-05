@@ -3,8 +3,8 @@
 //
 
 #import "YASAudioGraphSampleViewController.h"
+#import <audio/yas_audio.h>
 #import <iostream>
-#import "yas_audio.h"
 
 using namespace yas;
 

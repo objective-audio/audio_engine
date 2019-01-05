@@ -4,15 +4,16 @@
 
 #pragma once
 
+#include <chaining/yas_chaining_umbrella.h>
+#include <cpp_utils/yas_base.h>
+#include <cpp_utils/yas_protocol.h>
 #include <optional>
+#include <ostream>
 #include "yas_audio_engine_connection.h"
 #include "yas_audio_engine_node_protocol.h"
 #include "yas_audio_format.h"
 #include "yas_audio_pcm_buffer.h"
 #include "yas_audio_types.h"
-#include "yas_base.h"
-#include "yas_chaining.h"
-#include "yas_protocol.h"
 
 namespace yas {
 template <typename T, typename U>

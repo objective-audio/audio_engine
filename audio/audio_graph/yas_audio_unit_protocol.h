@@ -5,8 +5,8 @@
 
 #pragma once
 
+#include <cpp_utils/yas_protocol.h>
 #include <optional>
-#include "yas_protocol.h"
 
 namespace yas::audio {
 struct manageable_unit : protocol {

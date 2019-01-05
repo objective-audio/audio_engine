@@ -4,8 +4,8 @@
 
 #pragma once
 
+#include <cpp_utils/yas_base.h>
 #include "yas_audio_engine_kernel_protocol.h"
-#include "yas_base.h"
 
 namespace yas::audio::engine {
 struct kernel : base {

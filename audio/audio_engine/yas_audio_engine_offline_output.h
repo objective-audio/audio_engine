@@ -4,8 +4,9 @@
 
 #pragma once
 
+#include <cpp_utils/yas_base.h>
 #include "yas_audio_engine_offline_output_protocol.h"
-#include "yas_base.h"
+#include <ostream>
 
 namespace yas::audio::engine {
 class node;

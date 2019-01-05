@@ -4,9 +4,9 @@
 
 #pragma once
 
+#include <chaining/yas_chaining_umbrella.h>
+#include <cpp_utils/yas_base.h>
 #include "yas_audio_types.h"
-#include "yas_base.h"
-#include "yas_chaining.h"
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
 namespace yas::audio {

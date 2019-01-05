@@ -6,7 +6,7 @@
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
 
-#import "yas_audio_device_stream.h"
+#import <audio/yas_audio_device_stream.h>
 #import "yas_audio_test_utils.h"
 
 using namespace yas;

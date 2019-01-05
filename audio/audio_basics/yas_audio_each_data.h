@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "yas_each_data.h"
+#include <cpp_utils/yas_each_data.h>
 
 namespace yas::audio {
 class pcm_buffer;

@@ -6,13 +6,13 @@
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
 
+#include <cpp_utils/yas_exception.h>
+#include <cpp_utils/yas_result.h>
 #include <mutex>
 #include "yas_audio_device.h"
 #include "yas_audio_format.h"
 #include "yas_audio_pcm_buffer.h"
 #include "yas_audio_time.h"
-#include "yas_exception.h"
-#include "yas_result.h"
 
 using namespace yas;
 

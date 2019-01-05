@@ -3,8 +3,8 @@
 //
 
 #import "YASAudioEngineRouteSampleSelectionViewController.h"
+#import <audio/yas_audio.h>
 #import "YASAudioEngineRouteSampleViewController.h"
-#import "yas_audio.h"
 
 @interface YASAudioEngineRouteSampleSelectionViewController ()
 

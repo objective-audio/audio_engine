@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "yas_protocol.h"
+#include <cpp_utils/yas_protocol.h>
 
 namespace yas::audio::engine {
 struct manageable_kernel : protocol {

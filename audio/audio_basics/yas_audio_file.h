@@ -5,10 +5,11 @@
 #pragma once
 
 #include <CoreFoundation/CoreFoundation.h>
+#include <cpp_utils/yas_base.h>
+#include <cpp_utils/yas_url.h>
 #include "yas_audio_file_utils.h"
 #include "yas_audio_types.h"
-#include "yas_base.h"
-#include "yas_url.h"
+#include <ostream>
 
 namespace yas {
 template <typename T, typename U>

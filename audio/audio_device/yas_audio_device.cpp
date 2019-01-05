@@ -517,11 +517,9 @@ audio::device::system_chain(system_method const method) {
         .to([](chaining_system_pair_t const &pair) { return pair.second; });
 }
 
-#if YAS_TEST
 chaining::notifier<audio::device::chaining_system_pair_t> &audio::device::system_notifier() {
     return audio::_system_notifier;
 }
-#endif
 
 std::string yas::to_string(audio::device::method const &method) {
     switch (method) {

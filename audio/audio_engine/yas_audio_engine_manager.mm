@@ -5,13 +5,13 @@
 #include "yas_audio_engine_manager.h"
 #include <AVFoundation/AVFoundation.h>
 #include <CoreFoundation/CoreFoundation.h>
+#include <cpp_utils/yas_objc_ptr.h>
+#include <cpp_utils/yas_result.h>
+#include <cpp_utils/yas_stl_utils.h>
 #include "yas_audio_engine_au.h"
 #include "yas_audio_engine_node.h"
 #include "yas_audio_engine_offline_output.h"
 #include "yas_audio_graph.h"
-#include "yas_objc_ptr.h"
-#include "yas_result.h"
-#include "yas_stl_utils.h"
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
 #include "yas_audio_device.h"
@@ -649,8 +649,6 @@ audio::engine::manager::chain(method const method) const {
         .to([](chaining_pair_t const &pair) { return pair.second; });
 }
 
-#if YAS_TEST
-
 std::unordered_set<audio::engine::node> &audio::engine::manager::nodes() const {
     return impl_ptr<impl>()->nodes();
 }
@@ -662,8 +660,6 @@ audio::engine::connection_set &audio::engine::manager::connections() const {
 chaining::notifier<audio::engine::manager::chaining_pair_t> &audio::engine::manager::notifier() {
     return impl_ptr<impl>()->_notifier;
 }
-
-#endif
 
 std::string yas::to_string(audio::engine::manager::method const &method) {
     switch (method) {

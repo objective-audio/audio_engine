@@ -3,13 +3,13 @@
 //
 
 #include "yas_audio_graph.h"
+#include <cpp_utils/yas_stl_utils.h>
 #include "yas_audio_unit.h"
-#include "yas_stl_utils.h"
 
 #if TARGET_OS_IPHONE
 #import <AVFoundation/AVFoundation.h>
 #import <UIKit/UIKit.h>
-#include "yas_objc_ptr.h"
+#include <cpp_utils/yas_objc_ptr.h>
 #endif
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)

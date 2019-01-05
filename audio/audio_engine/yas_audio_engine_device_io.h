@@ -8,8 +8,8 @@
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
 
+#include <cpp_utils/yas_base.h>
 #include "yas_audio_engine_device_io_protocol.h"
-#include "yas_base.h"
 
 namespace yas::audio {
 class device;

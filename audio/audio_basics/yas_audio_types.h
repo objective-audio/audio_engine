@@ -9,6 +9,7 @@
 #include <optional>
 #include <string>
 #include <vector>
+#include <ostream>
 
 namespace yas::audio {
 union render_id {

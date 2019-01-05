@@ -4,11 +4,11 @@
 
 #import "YASAudioDeviceSampleViewController.h"
 #import <Accelerate/Accelerate.h>
+#import <audio/yas_audio.h>
+#import <objc_utils/yas_objc_unowned.h>
 #import <atomic>
 #import "YASDecibelValueTransformer.h"
 #import "YASFrequencyValueFormatter.h"
-#import "yas_audio.h"
-#import "yas_objc_unowned.h"
 
 using namespace yas;
 

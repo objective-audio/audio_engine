@@ -158,10 +158,6 @@ audio::engine::connection_smap audio::engine::tap::output_connections_on_render(
     return impl_ptr<impl>()->output_connections_on_render();
 }
 
-#if YAS_TEST
-
 void audio::engine::tap::render_source(audio::engine::node::render_args args) {
     impl_ptr<impl>()->render_source(std::move(args));
 }
-
-#endif

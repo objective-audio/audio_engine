@@ -8,12 +8,13 @@
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
 
 #include <AudioToolbox/AudioToolbox.h>
+#include <chaining/yas_chaining_umbrella.h>
+#include <cpp_utils/yas_base.h>
 #include <optional>
 #include <string>
 #include <vector>
+#include <ostream>
 #include "yas_audio_types.h"
-#include "yas_base.h"
-#include "yas_chaining.h"
 
 namespace yas::audio {
 class device_global;
@@ -79,9 +80,8 @@ class device : public base {
     [[nodiscard]] static chaining::chain_relayed_unsync_t<change_info, chaining_system_pair_t> system_chain(
         system_method const);
 
-#if YAS_TEST
+    // for Test
     static chaining::notifier<chaining_system_pair_t> &system_notifier();
-#endif
 
    protected:
     explicit device(AudioDeviceID const device_id);

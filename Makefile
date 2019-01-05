@@ -2,7 +2,7 @@ WORKSPACE = audio.xcworkspace
 SCHEME = audio_ios_tests
 CONFIGURATION = Release
 SDK = iphonesimulator
-DESTINATION = 'platform=iOS Simulator,name=iPhone 6,OS=10.3.1'
+DESTINATION = 'platform=iOS Simulator,name=iPhone 6,OS=12.1'
 
 test_ios:
 	xcodebuild -workspace $(WORKSPACE) -scheme $(SCHEME) -configuration $(CONFIGURATION) OBJROOT=build -sdk $(SDK) -destination $(DESTINATION) clean test

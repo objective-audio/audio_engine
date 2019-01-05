@@ -4,9 +4,9 @@
 
 #pragma once
 
+#include <cpp_utils/yas_base.h>
+#include <cpp_utils/yas_protocol.h>
 #include <unordered_set>
-#include "yas_base.h"
-#include "yas_protocol.h"
 
 namespace yas::audio::engine {
 class connection;

@@ -5,8 +5,8 @@
 #pragma once
 
 #import <AVFoundation/AVFoundation.h>
+#include <cpp_utils/yas_objc_ptr.h>
 #include "yas_audio_types.h"
-#include "yas_objc_ptr.h"
 
 namespace yas::audio {
 class time;
