@@ -12,10 +12,6 @@
 #include "yas_audio_graph.h"
 #include "yas_audio_pcm_buffer.h"
 
-#if TARGET_OS_IPHONE
-#import <AVFoundation/AVFoundation.h>
-#endif
-
 using namespace yas;
 
 #pragma mark - c functions
@@ -536,15 +532,12 @@ struct audio::unit::impl : base::impl, manageable_unit::impl {
 
         switch (render_parameters.in_render_type) {
             case render_type::normal:
-                NSLog(@"callback render normal");
                 handler = this->_core.render_handler();
                 break;
             case render_type::notify:
-                NSLog(@"callback render notify");
                 handler = this->_core.notify_handler();
                 break;
             case render_type::input:
-                NSLog(@"callback render input");
                 handler = this->_core.input_handler();
                 break;
             default:
@@ -553,7 +546,6 @@ struct audio::unit::impl : base::impl, manageable_unit::impl {
 
         if (handler) {
             handler(render_parameters);
-            NSLog(@"called");
         }
     }
 
