@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		B61B489C21E0F819007AF942 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B61B489B21E0F819007AF942 /* UIKit.framework */; };
 		B62579D021E0EC68003740D9 /* audio_ios_tests.m in Sources */ = {isa = PBXBuildFile; fileRef = B62579CF21E0EC68003740D9 /* audio_ios_tests.m */; };
 		B62579D721E0EC9B003740D9 /* audio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B62579D621E0EC9B003740D9 /* audio.framework */; };
 		B62579D921E0EC9B003740D9 /* chaining.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B62579D821E0EC9B003740D9 /* chaining.framework */; };
@@ -41,6 +42,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		B61B489B21E0F819007AF942 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS12.1.sdk/System/Library/Frameworks/UIKit.framework; sourceTree = DEVELOPER_DIR; };
 		B62579CC21E0EC68003740D9 /* audio_ios_tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = audio_ios_tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B62579CF21E0EC68003740D9 /* audio_ios_tests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = audio_ios_tests.m; sourceTree = "<group>"; };
 		B62579D121E0EC68003740D9 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -82,6 +84,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B61B489C21E0F819007AF942 /* UIKit.framework in Frameworks */,
 				B62579D721E0EC9B003740D9 /* audio.framework in Frameworks */,
 				B62579D921E0EC9B003740D9 /* chaining.framework in Frameworks */,
 				B62579DB21E0EC9B003740D9 /* cpp_utils.framework in Frameworks */,
@@ -124,6 +127,7 @@
 		B62579D521E0EC9B003740D9 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				B61B489B21E0F819007AF942 /* UIKit.framework */,
 				B62579DD21E0ECA4003740D9 /* Accelerate.framework */,
 				B62579DC21E0ECA4003740D9 /* AudioToolbox.framework */,
 				B62579DE21E0ECA4003740D9 /* AVFoundation.framework */,
