@@ -186,8 +186,8 @@ struct audio::unit::impl : base::impl, manageable_unit::impl {
 
     void attach_render_notify() {
         if (!this->_graph_key || !this->_key) {
-            raise_with_reason(std::string(__PRETTY_FUNCTION__) + " - Key is not assigned. graphKey(" +
-                              std::to_string(*this->_graph_key) + ") unitKey(" + std::to_string(*this->_key) + ")");
+            raise_with_reason(std::string(__PRETTY_FUNCTION__) + " - key is not assigned. graph_key(" +
+                              std::to_string(*this->_graph_key) + ") unit_key(" + std::to_string(*this->_key) + ")");
             return;
         }
 
@@ -197,7 +197,15 @@ struct audio::unit::impl : base::impl, manageable_unit::impl {
     }
 
     void detach_render_notify() {
-        raise_if_raw_audio_error(AudioUnitRemoveRenderNotify(this->_core.raw_unit(), notify_render_callback, nullptr));
+        if (!this->_graph_key || !this->_key) {
+            raise_with_reason(std::string(__PRETTY_FUNCTION__) + " - key is not assigned. graph_key(" +
+                              std::to_string(*this->_graph_key) + ") unit_key(" + std::to_string(*this->_key) + ")");
+            return;
+        }
+        
+        render_id render_id{.graph = *_graph_key, .unit = *_key};
+        
+        raise_if_raw_audio_error(AudioUnitRemoveRenderNotify(this->_core.raw_unit(), notify_render_callback, render_id.v));
     }
 
     void attach_input_callback() {
@@ -528,12 +536,15 @@ struct audio::unit::impl : base::impl, manageable_unit::impl {
 
         switch (render_parameters.in_render_type) {
             case render_type::normal:
+                NSLog(@"callback render normal");
                 handler = this->_core.render_handler();
                 break;
             case render_type::notify:
+                NSLog(@"callback render notify");
                 handler = this->_core.notify_handler();
                 break;
             case render_type::input:
+                NSLog(@"callback render input");
                 handler = this->_core.input_handler();
                 break;
             default:
@@ -542,6 +553,7 @@ struct audio::unit::impl : base::impl, manageable_unit::impl {
 
         if (handler) {
             handler(render_parameters);
+            NSLog(@"called");
         }
     }
 
