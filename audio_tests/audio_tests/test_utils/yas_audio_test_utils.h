@@ -7,9 +7,7 @@
 
 #pragma once
 
-#include "yas_audio.h"
-
-@class YASAudioFormat;
+#include <audio/yas_audio.h>
 
 namespace yas::test {
 uint32_t test_value(uint32_t const frame, uint32_t const ch_idx, uint32_t const buf_idx);

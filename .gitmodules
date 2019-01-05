@@ -4,3 +4,6 @@
 [submodule "submodules/chaining"]
 	path = submodules/chaining
 	url = https://github.com/objective-audio/chaining.git
+[submodule "submodules/objc_utils"]
+	path = submodules/objc_utils
+	url = https://github.com/objective-audio/objc_utils.git

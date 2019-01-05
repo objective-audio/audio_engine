@@ -7,9 +7,9 @@
 #include <TargetConditionals.h>
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
 
+#include <cpp_utils/yas_base.h>
 #include <functional>
 #include "yas_audio_types.h"
-#include "yas_base.h"
 
 namespace yas::audio {
 class pcm_buffer;

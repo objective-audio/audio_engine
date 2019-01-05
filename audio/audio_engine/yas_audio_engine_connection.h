@@ -4,9 +4,9 @@
 
 #pragma once
 
+#include <cpp_utils/yas_base.h>
 #include "yas_audio_engine_connection_protocol.h"
 #include "yas_audio_format.h"
-#include "yas_base.h"
 
 namespace yas::audio::engine {
 class node;

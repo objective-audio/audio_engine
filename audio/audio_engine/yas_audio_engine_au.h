@@ -4,12 +4,12 @@
 
 #pragma once
 
+#include <chaining/yas_chaining_umbrella.h>
+#include <cpp_utils/yas_base.h>
 #include <unordered_map>
 #include "yas_audio_engine_au_protocol.h"
 #include "yas_audio_engine_node_protocol.h"
 #include "yas_audio_unit.h"
-#include "yas_base.h"
-#include "yas_chaining.h"
 
 namespace yas::audio {
 class graph;

@@ -3,8 +3,8 @@
 //
 
 #import "YASDecibelValueTransformer.h"
-#import "yas_audio.h"
-#import "yas_objc_ptr.h"
+#import <audio/yas_audio.h>
+#import <cpp_utils/yas_objc_ptr.h>
 
 using namespace yas;
 

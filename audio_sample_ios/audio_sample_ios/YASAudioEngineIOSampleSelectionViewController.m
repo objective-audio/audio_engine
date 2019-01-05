@@ -3,8 +3,8 @@
 //
 
 #import "YASAudioEngineIOSampleSelectionViewController.h"
+#import <objc_utils/yas_objc_macros.h>
 #import "YASAudioEngineIOSampleViewController.h"
-#import "yas_objc_macros.h"
 
 @interface YASAudioEngineIOSampleSelectionViewController ()
 

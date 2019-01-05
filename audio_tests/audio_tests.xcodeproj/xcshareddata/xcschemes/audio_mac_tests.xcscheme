@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "0940"
+   LastUpgradeVersion = "1010"
    version = "1.3">
    <BuildAction
       parallelizeBuildables = "YES"
@@ -14,7 +14,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "B62ED5AC1A62870F007DDE96"
+               BlueprintIdentifier = "B604C0A821DF8D780059DE79"
                BuildableName = "audio_mac_tests.xctest"
                BlueprintName = "audio_mac_tests"
                ReferencedContainer = "container:audio_tests.xcodeproj">
@@ -33,7 +33,7 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "B62ED5AC1A62870F007DDE96"
+               BlueprintIdentifier = "B604C0A821DF8D780059DE79"
                BuildableName = "audio_mac_tests.xctest"
                BlueprintName = "audio_mac_tests"
                ReferencedContainer = "container:audio_tests.xcodeproj">
@@ -43,7 +43,7 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "B62ED5AC1A62870F007DDE96"
+            BlueprintIdentifier = "B604C0A821DF8D780059DE79"
             BuildableName = "audio_mac_tests.xctest"
             BlueprintName = "audio_mac_tests"
             ReferencedContainer = "container:audio_tests.xcodeproj">
@@ -65,7 +65,7 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "B62ED5AC1A62870F007DDE96"
+            BlueprintIdentifier = "B604C0A821DF8D780059DE79"
             BuildableName = "audio_mac_tests.xctest"
             BlueprintName = "audio_mac_tests"
             ReferencedContainer = "container:audio_tests.xcodeproj">
@@ -83,7 +83,7 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "B62ED5AC1A62870F007DDE96"
+            BlueprintIdentifier = "B604C0A821DF8D780059DE79"
             BuildableName = "audio_mac_tests.xctest"
             BlueprintName = "audio_mac_tests"
             ReferencedContainer = "container:audio_tests.xcodeproj">

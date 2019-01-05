@@ -4,9 +4,9 @@
 
 #import "YASAudioOfflineSampleViewController.h"
 #import <Accelerate/Accelerate.h>
+#import <audio/yas_audio.h>
+#import <objc_utils/yas_objc_unowned.h>
 #import <iostream>
-#import "yas_audio.h"
-#import "yas_objc_unowned.h"
 
 using namespace yas;
 
@@ -242,8 +242,9 @@ struct offline_vc_internal {
 - (void)startOfflineFileWritingWithURL:(NSURL *)url {
     auto wave_settings = audio::wave_file_settings(offline_sample::sample_rate, 2, 16);
     audio::file file_writer;
-    auto create_result = file_writer.create(
-        {.file_url = (__bridge CFURLRef)url, .file_type = audio::file_type_cf_string::wave, .settings = wave_settings});
+    auto create_result = file_writer.create({.file_url = yas::url{to_string((__bridge CFStringRef)url.path)},
+                                             .file_type = audio::file_type::wave,
+                                             .settings = wave_settings});
 
     if (!create_result) {
         std::cout << __PRETTY_FUNCTION__ << " - error:" << to_string(create_result.error()) << std::endl;

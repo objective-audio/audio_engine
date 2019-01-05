@@ -32,8 +32,7 @@ class tap : public base {
     audio::engine::connection_smap input_connections_on_render() const;
     audio::engine::connection_smap output_connections_on_render() const;
 
-#if YAS_TEST
+    // for Test
     void render_source(audio::engine::node::render_args args);
-#endif
 };
 }  // namespace yas::audio::engine

@@ -4,9 +4,9 @@
 
 #pragma once
 
+#include <cpp_utils/yas_protocol.h>
+#include <cpp_utils/yas_result.h>
 #include <functional>
-#include "yas_protocol.h"
-#include "yas_result.h"
 
 namespace yas::audio {
 class pcm_buffer;

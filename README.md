@@ -11,6 +11,7 @@ Frameworks
 AudioToolbox.framework  
 AVFoundation.framework  
 Accelerate.framework  
+UIKit.framework  
 
 AudioUnit.framework (macOS Only)  
 CoreAudio.framework (macOS Only)
