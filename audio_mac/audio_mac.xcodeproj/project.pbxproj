@@ -88,7 +88,6 @@
 		B6002E1621DCC7760013AA0E /* yas_audio_device.h in Headers */ = {isa = PBXBuildFile; fileRef = B6002DCC21DCC7760013AA0E /* yas_audio_device.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		B6002E1721DCC7760013AA0E /* yas_audio_device_stream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6002DCD21DCC7760013AA0E /* yas_audio_device_stream.cpp */; };
 		B6002E1821DCC7760013AA0E /* yas_audio_route.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6002DCE21DCC7760013AA0E /* yas_audio_route.cpp */; };
-		B6DB01B021DE57E80078B199 /* objc_utils.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B6002BC121DC70C50013AA0E /* objc_utils.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -185,7 +184,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B6DB01B021DE57E80078B199 /* objc_utils.framework in Frameworks */,
 				B6002D8021DCC7240013AA0E /* AVFoundation.framework in Frameworks */,
 				B6002D7C21DCC6ED0013AA0E /* Accelerate.framework in Frameworks */,
 				B6002D7D21DCC6F50013AA0E /* AudioToolbox.framework in Frameworks */,
