@@ -75,7 +75,6 @@
 		B62579B021E0EB21003740D9 /* audio.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = audio.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B62579B221E0EB21003740D9 /* chaining.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = chaining.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B62579B421E0EB21003740D9 /* cpp_utils.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = cpp_utils.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		B62579B621E0EB21003740D9 /* objc_utils.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = objc_utils.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B62579B821E0EB40003740D9 /* CoreAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudio.framework; path = System/Library/Frameworks/CoreAudio.framework; sourceTree = SDKROOT; };
 		B62579B921E0EB40003740D9 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
 		B62579BA21E0EB40003740D9 /* AudioUnit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioUnit.framework; path = System/Library/Frameworks/AudioUnit.framework; sourceTree = SDKROOT; };
@@ -211,7 +210,6 @@
 				B62579B021E0EB21003740D9 /* audio.framework */,
 				B62579B221E0EB21003740D9 /* chaining.framework */,
 				B62579B421E0EB21003740D9 /* cpp_utils.framework */,
-				B62579B621E0EB21003740D9 /* objc_utils.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
