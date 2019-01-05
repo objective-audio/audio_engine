@@ -82,12 +82,12 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B62579DF21E0ECA4003740D9 /* AudioToolbox.framework in Frameworks */,
-				B62579E021E0ECA4003740D9 /* Accelerate.framework in Frameworks */,
-				B62579E121E0ECA4003740D9 /* AVFoundation.framework in Frameworks */,
 				B62579D721E0EC9B003740D9 /* audio.framework in Frameworks */,
 				B62579D921E0EC9B003740D9 /* chaining.framework in Frameworks */,
 				B62579DB21E0EC9B003740D9 /* cpp_utils.framework in Frameworks */,
+				B62579DF21E0ECA4003740D9 /* AudioToolbox.framework in Frameworks */,
+				B62579E021E0ECA4003740D9 /* Accelerate.framework in Frameworks */,
+				B62579E121E0ECA4003740D9 /* AVFoundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
