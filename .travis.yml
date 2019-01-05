@@ -8,7 +8,5 @@ notifications:
 install:
   - brew install clang-format
 script:
-  # - make test_ios SCHEME=audio_ios_arc_tests SDK=iphonesimulator
-  # - make test_ios SCHEME=audio_ios_non_arc_tests SDK=iphonesimulator
-  # - make test_osx SCHEME=audio_mac_tests SDK=macosx
-  - make test_osx SCHEME=audio_mac_non_arc_tests SDK=macosx
+  - make test_ios SCHEME=audio_ios_tests SDK=iphonesimulator
+  - make test_osx SCHEME=audio_mac_tests SDK=macosx
