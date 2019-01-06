@@ -7,13 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		B61B489C21E0F819007AF942 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B61B489B21E0F819007AF942 /* UIKit.framework */; };
 		B62579D021E0EC68003740D9 /* audio_ios_tests.m in Sources */ = {isa = PBXBuildFile; fileRef = B62579CF21E0EC68003740D9 /* audio_ios_tests.m */; };
 		B62579D721E0EC9B003740D9 /* audio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B62579D621E0EC9B003740D9 /* audio.framework */; };
 		B62579D921E0EC9B003740D9 /* chaining.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B62579D821E0EC9B003740D9 /* chaining.framework */; };
 		B62579DB21E0EC9B003740D9 /* cpp_utils.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B62579DA21E0EC9B003740D9 /* cpp_utils.framework */; };
 		B62579DF21E0ECA4003740D9 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B62579DC21E0ECA4003740D9 /* AudioToolbox.framework */; };
-		B62579E021E0ECA4003740D9 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B62579DD21E0ECA4003740D9 /* Accelerate.framework */; };
 		B62579E121E0ECA4003740D9 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B62579DE21E0ECA4003740D9 /* AVFoundation.framework */; };
 		B6257A0521E0ED93003740D9 /* yas_audio_graph_tests.mm in Sources */ = {isa = PBXBuildFile; fileRef = B62579E621E0ED93003740D9 /* yas_audio_graph_tests.mm */; };
 		B6257A0621E0ED93003740D9 /* yas_audio_unit_tests.mm in Sources */ = {isa = PBXBuildFile; fileRef = B62579E721E0ED93003740D9 /* yas_audio_unit_tests.mm */; };
@@ -39,7 +37,6 @@
 		B6257A1A21E0ED93003740D9 /* yas_audio_math_tests.mm in Sources */ = {isa = PBXBuildFile; fileRef = B62579FF21E0ED93003740D9 /* yas_audio_math_tests.mm */; };
 		B6257A1B21E0ED93003740D9 /* yas_audio_time_tests.mm in Sources */ = {isa = PBXBuildFile; fileRef = B6257A0021E0ED93003740D9 /* yas_audio_time_tests.mm */; };
 		B6257A1C21E0ED93003740D9 /* yas_audio_format_tests.mm in Sources */ = {isa = PBXBuildFile; fileRef = B6257A0121E0ED93003740D9 /* yas_audio_format_tests.mm */; };
-		B6897B1A21E1868E00EF6897 /* objc_utils.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B6897B1921E1868E00EF6897 /* objc_utils.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -86,13 +83,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B61B489C21E0F819007AF942 /* UIKit.framework in Frameworks */,
 				B62579D721E0EC9B003740D9 /* audio.framework in Frameworks */,
 				B62579D921E0EC9B003740D9 /* chaining.framework in Frameworks */,
 				B62579DB21E0EC9B003740D9 /* cpp_utils.framework in Frameworks */,
-				B6897B1A21E1868E00EF6897 /* objc_utils.framework in Frameworks */,
 				B62579DF21E0ECA4003740D9 /* AudioToolbox.framework in Frameworks */,
-				B62579E021E0ECA4003740D9 /* Accelerate.framework in Frameworks */,
 				B62579E121E0ECA4003740D9 /* AVFoundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
