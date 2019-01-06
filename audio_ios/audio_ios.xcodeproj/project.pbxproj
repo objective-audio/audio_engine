@@ -77,7 +77,7 @@
 		B6002EBB21DCC8F20013AA0E /* yas_audio_engine_au_protocol.h in Headers */ = {isa = PBXBuildFile; fileRef = B6002E7021DCC8F20013AA0E /* yas_audio_engine_au_protocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		B6002EBC21DCC8F20013AA0E /* yas_audio_engine_connection_protocol.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6002E7121DCC8F20013AA0E /* yas_audio_engine_connection_protocol.cpp */; };
 		B6002EBD21DCC8F20013AA0E /* yas_audio_engine_kernel_protocol.h in Headers */ = {isa = PBXBuildFile; fileRef = B6002E7221DCC8F20013AA0E /* yas_audio_engine_kernel_protocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		B6002EBE21DCC8F20013AA0E /* yas_audio.h in Headers */ = {isa = PBXBuildFile; fileRef = B6002E7321DCC8F20013AA0E /* yas_audio.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		B6002EBE21DCC8F20013AA0E /* yas_audio_umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = B6002E7321DCC8F20013AA0E /* yas_audio_umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		B6002EBF21DCC8F20013AA0E /* yas_audio_device_io.mm in Sources */ = {isa = PBXBuildFile; fileRef = B6002E7521DCC8F20013AA0E /* yas_audio_device_io.mm */; };
 		B6002EC021DCC8F20013AA0E /* yas_audio_device_io.h in Headers */ = {isa = PBXBuildFile; fileRef = B6002E7621DCC8F20013AA0E /* yas_audio_device_io.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		B6002EC121DCC8F20013AA0E /* yas_audio_device_stream_private.h in Headers */ = {isa = PBXBuildFile; fileRef = B6002E7721DCC8F20013AA0E /* yas_audio_device_stream_private.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -164,7 +164,7 @@
 		B6002E7021DCC8F20013AA0E /* yas_audio_engine_au_protocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yas_audio_engine_au_protocol.h; sourceTree = "<group>"; };
 		B6002E7121DCC8F20013AA0E /* yas_audio_engine_connection_protocol.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = yas_audio_engine_connection_protocol.cpp; sourceTree = "<group>"; };
 		B6002E7221DCC8F20013AA0E /* yas_audio_engine_kernel_protocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yas_audio_engine_kernel_protocol.h; sourceTree = "<group>"; };
-		B6002E7321DCC8F20013AA0E /* yas_audio.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yas_audio.h; sourceTree = "<group>"; };
+		B6002E7321DCC8F20013AA0E /* yas_audio_umbrella.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yas_audio_umbrella.h; sourceTree = "<group>"; };
 		B6002E7521DCC8F20013AA0E /* yas_audio_device_io.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = yas_audio_device_io.mm; sourceTree = "<group>"; };
 		B6002E7621DCC8F20013AA0E /* yas_audio_device_io.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yas_audio_device_io.h; sourceTree = "<group>"; };
 		B6002E7721DCC8F20013AA0E /* yas_audio_device_stream_private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yas_audio_device_stream_private.h; sourceTree = "<group>"; };
@@ -247,7 +247,7 @@
 				B6002E5021DCC8F20013AA0E /* audio_engine */,
 				B6002E4621DCC8F20013AA0E /* audio_graph */,
 				B6002E4F21DCC8F20013AA0E /* yas_audio_cpp.h */,
-				B6002E7321DCC8F20013AA0E /* yas_audio.h */,
+				B6002E7321DCC8F20013AA0E /* yas_audio_umbrella.h */,
 			);
 			name = audio;
 			path = ../../audio;
@@ -365,7 +365,7 @@
 				B6002E8E21DCC8F20013AA0E /* yas_audio_exception.h in Headers */,
 				B6002E9321DCC8F20013AA0E /* yas_audio_graph.h in Headers */,
 				B6002E7F21DCC8F20013AA0E /* yas_audio_time.h in Headers */,
-				B6002EBE21DCC8F20013AA0E /* yas_audio.h in Headers */,
+				B6002EBE21DCC8F20013AA0E /* yas_audio_umbrella.h in Headers */,
 				B6002EAB21DCC8F20013AA0E /* yas_audio_engine_device_io_protocol.h in Headers */,
 				B6002E8B21DCC8F20013AA0E /* yas_audio_each_data_private.h in Headers */,
 				B6002EAA21DCC8F20013AA0E /* yas_audio_engine_au_io.h in Headers */,
