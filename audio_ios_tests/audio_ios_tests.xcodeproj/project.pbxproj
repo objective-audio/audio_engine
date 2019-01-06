@@ -39,6 +39,7 @@
 		B6257A1A21E0ED93003740D9 /* yas_audio_math_tests.mm in Sources */ = {isa = PBXBuildFile; fileRef = B62579FF21E0ED93003740D9 /* yas_audio_math_tests.mm */; };
 		B6257A1B21E0ED93003740D9 /* yas_audio_time_tests.mm in Sources */ = {isa = PBXBuildFile; fileRef = B6257A0021E0ED93003740D9 /* yas_audio_time_tests.mm */; };
 		B6257A1C21E0ED93003740D9 /* yas_audio_format_tests.mm in Sources */ = {isa = PBXBuildFile; fileRef = B6257A0121E0ED93003740D9 /* yas_audio_format_tests.mm */; };
+		B6897B1A21E1868E00EF6897 /* objc_utils.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B6897B1921E1868E00EF6897 /* objc_utils.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -77,6 +78,7 @@
 		B62579FF21E0ED93003740D9 /* yas_audio_math_tests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = yas_audio_math_tests.mm; sourceTree = "<group>"; };
 		B6257A0021E0ED93003740D9 /* yas_audio_time_tests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = yas_audio_time_tests.mm; sourceTree = "<group>"; };
 		B6257A0121E0ED93003740D9 /* yas_audio_format_tests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = yas_audio_format_tests.mm; sourceTree = "<group>"; };
+		B6897B1921E1868E00EF6897 /* objc_utils.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = objc_utils.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -88,6 +90,7 @@
 				B62579D721E0EC9B003740D9 /* audio.framework in Frameworks */,
 				B62579D921E0EC9B003740D9 /* chaining.framework in Frameworks */,
 				B62579DB21E0EC9B003740D9 /* cpp_utils.framework in Frameworks */,
+				B6897B1A21E1868E00EF6897 /* objc_utils.framework in Frameworks */,
 				B62579DF21E0ECA4003740D9 /* AudioToolbox.framework in Frameworks */,
 				B62579E021E0ECA4003740D9 /* Accelerate.framework in Frameworks */,
 				B62579E121E0ECA4003740D9 /* AVFoundation.framework in Frameworks */,
@@ -127,6 +130,7 @@
 		B62579D521E0EC9B003740D9 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				B6897B1921E1868E00EF6897 /* objc_utils.framework */,
 				B61B489B21E0F819007AF942 /* UIKit.framework */,
 				B62579DD21E0ECA4003740D9 /* Accelerate.framework */,
 				B62579DC21E0ECA4003740D9 /* AudioToolbox.framework */,
