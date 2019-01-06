@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		B623817F21E1931200234CC2 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B623817E21E1931200234CC2 /* Accelerate.framework */; };
 		B625799521E0EAF8003740D9 /* yas_audio_graph_tests.mm in Sources */ = {isa = PBXBuildFile; fileRef = B625797621E0EAF8003740D9 /* yas_audio_graph_tests.mm */; };
 		B625799621E0EAF8003740D9 /* yas_audio_unit_tests.mm in Sources */ = {isa = PBXBuildFile; fileRef = B625797721E0EAF8003740D9 /* yas_audio_unit_tests.mm */; };
 		B625799721E0EAF8003740D9 /* yas_audio_unit_parameter_tests.mm in Sources */ = {isa = PBXBuildFile; fileRef = B625797821E0EAF8003740D9 /* yas_audio_unit_parameter_tests.mm */; };
@@ -44,6 +45,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		B623817E21E1931200234CC2 /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = System/Library/Frameworks/Accelerate.framework; sourceTree = SDKROOT; };
 		B625796B21E0EAC0003740D9 /* audio_mac_tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = audio_mac_tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B625797021E0EAC0003740D9 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B625797621E0EAF8003740D9 /* yas_audio_graph_tests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = yas_audio_graph_tests.mm; sourceTree = "<group>"; };
@@ -92,6 +94,7 @@
 				B62579B321E0EB21003740D9 /* chaining.framework in Frameworks */,
 				B62579C021E0EB8D003740D9 /* cpp_utils.framework in Frameworks */,
 				B6897B1821E1867900EF6897 /* objc_utils.framework in Frameworks */,
+				B623817F21E1931200234CC2 /* Accelerate.framework in Frameworks */,
 				B62579BF21E0EB56003740D9 /* AVFoundation.framework in Frameworks */,
 				B62579BB21E0EB40003740D9 /* CoreAudio.framework in Frameworks */,
 				B62579BC21E0EB40003740D9 /* AudioToolbox.framework in Frameworks */,
@@ -206,6 +209,7 @@
 		B62579AF21E0EB21003740D9 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				B623817E21E1931200234CC2 /* Accelerate.framework */,
 				B6897B1721E1867900EF6897 /* objc_utils.framework */,
 				B62579BE21E0EB56003740D9 /* AVFoundation.framework */,
 				B62579B921E0EB40003740D9 /* AudioToolbox.framework */,
