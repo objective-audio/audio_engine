@@ -14,10 +14,10 @@
             buildForAnalyzing = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "B604C04521DF893F0059DE79"
+               BlueprintIdentifier = "B62579CB21E0EC68003740D9"
                BuildableName = "audio_ios_tests.xctest"
                BlueprintName = "audio_ios_tests"
-               ReferencedContainer = "container:audio_tests.xcodeproj">
+               ReferencedContainer = "container:audio_ios_tests.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -32,10 +32,10 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "B604C04521DF893F0059DE79"
+               BlueprintIdentifier = "B62579CB21E0EC68003740D9"
                BuildableName = "audio_ios_tests.xctest"
                BlueprintName = "audio_ios_tests"
-               ReferencedContainer = "container:audio_tests.xcodeproj">
+               ReferencedContainer = "container:audio_ios_tests.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -55,10 +55,10 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "B604C04521DF893F0059DE79"
+            BlueprintIdentifier = "B62579CB21E0EC68003740D9"
             BuildableName = "audio_ios_tests.xctest"
             BlueprintName = "audio_ios_tests"
-            ReferencedContainer = "container:audio_tests.xcodeproj">
+            ReferencedContainer = "container:audio_ios_tests.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
       <AdditionalOptions>
@@ -73,10 +73,10 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "B604C04521DF893F0059DE79"
+            BlueprintIdentifier = "B62579CB21E0EC68003740D9"
             BuildableName = "audio_ios_tests.xctest"
             BlueprintName = "audio_ios_tests"
-            ReferencedContainer = "container:audio_tests.xcodeproj">
+            ReferencedContainer = "container:audio_ios_tests.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
    </ProfileAction>
