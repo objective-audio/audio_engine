@@ -8,5 +8,5 @@ notifications:
 install:
   - brew install clang-format
 script:
-  - xcodebuild -workspace audio.xcworkspace -scheme audio_mac_tests -configuration Debug OBJROOT=build -sdk macosx clean test
-  - xcodebuild -workspace audio.xcworkspace -scheme audio_ios_tests -configuration Debug OBJROOT=build -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 6,OS=12.1' clean test
+  - xcodebuild -workspace audio_mac.xcworkspace -scheme audio_mac_tests -configuration Debug OBJROOT=build -sdk macosx clean test
+  - xcodebuild -workspace audio_ios.xcworkspace -scheme audio_ios_tests -configuration Debug OBJROOT=build -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 6,OS=12.1' clean test
