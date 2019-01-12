@@ -4,7 +4,7 @@
 
 #import "YASAudioEngineDeviceIOSampleViewController.h"
 #import <Accelerate/Accelerate.h>
-#import <audio/yas_audio.h>
+#import <audio/yas_audio_umbrella.h>
 #import <objc_utils/yas_objc_unowned.h>
 
 using namespace yas;
