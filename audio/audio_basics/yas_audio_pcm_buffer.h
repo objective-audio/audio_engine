@@ -5,8 +5,8 @@
 #pragma once
 
 #include <cpp_utils/yas_base.h>
-#include "yas_audio_types.h"
 #include <ostream>
+#include "yas_audio_types.h"
 
 namespace yas {
 template <typename T, typename U>

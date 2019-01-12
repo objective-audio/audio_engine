@@ -8,8 +8,8 @@
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
 
-#import "yas_audio_device.h"
 #include <ostream>
+#import "yas_audio_device.h"
 
 namespace yas::audio {
 class device::stream : public base {
