@@ -3,7 +3,7 @@
 //
 
 #import "YASAudioEngineSampleParameterCell.h"
-#import <audio/yas_audio.h>
+#import <audio/yas_audio_umbrella.h>
 
 using namespace yas;
 

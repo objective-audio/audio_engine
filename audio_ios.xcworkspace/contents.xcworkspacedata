@@ -5,6 +5,9 @@
       location = "group:audio_ios_tests/audio_ios_tests.xcodeproj">
    </FileRef>
    <FileRef
+      location = "group:audio_sample_ios/audio_sample_ios.xcodeproj">
+   </FileRef>
+   <FileRef
       location = "group:audio_ios/audio_ios.xcodeproj">
    </FileRef>
    <FileRef

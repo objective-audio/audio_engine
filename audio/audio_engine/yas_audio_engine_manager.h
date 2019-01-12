@@ -6,10 +6,10 @@
 
 #include <chaining/yas_chaining_umbrella.h>
 #include <cpp_utils/yas_base.h>
+#include <ostream>
 #include "yas_audio_engine_connection.h"
 #include "yas_audio_engine_offline_output_protocol.h"
 #include "yas_audio_types.h"
-#include <ostream>
 
 namespace yas {
 template <typename T, typename U>

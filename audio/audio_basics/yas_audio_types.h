@@ -7,9 +7,9 @@
 #include <AudioUnit/AUComponent.h>
 #include <memory>
 #include <optional>
+#include <ostream>
 #include <string>
 #include <vector>
-#include <ostream>
 
 namespace yas::audio {
 union render_id {
