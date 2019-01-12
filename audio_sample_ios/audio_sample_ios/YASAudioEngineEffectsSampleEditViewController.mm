@@ -3,7 +3,7 @@
 //
 
 #import "YASAudioEngineEffectsSampleEditViewController.h"
-#import <audio/yas_audio.h>
+#import <audio/yas_audio_umbrella.h>
 #import "YASAudioEngineSampleParameterCell.h"
 
 using namespace yas;

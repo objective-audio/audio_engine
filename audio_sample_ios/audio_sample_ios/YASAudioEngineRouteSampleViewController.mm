@@ -3,7 +3,7 @@
 //
 
 #import "YASAudioEngineRouteSampleViewController.h"
-#import <audio/yas_audio.h>
+#import <audio/yas_audio_umbrella.h>
 #import <objc_utils/yas_objc_unowned.h>
 #import "YASAudioEngineRouteSampleSelectionViewController.h"
 #import "YASAudioSliderCell.h"
