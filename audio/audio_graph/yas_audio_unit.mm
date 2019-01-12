@@ -1,5 +1,5 @@
 //
-//  yas_audio_unit.cpp
+//  yas_audio_unit.mm
 //
 
 #include "yas_audio_unit.h"
@@ -11,6 +11,10 @@
 #include "yas_audio_exception.h"
 #include "yas_audio_graph.h"
 #include "yas_audio_pcm_buffer.h"
+
+#if TARGET_OS_IPHONE
+#import <AVFoundation/AVFoundation.h>
+#endif
 
 using namespace yas;
 
@@ -55,7 +59,7 @@ static OSStatus empty_callback(void *, AudioUnitRenderActionFlags *, const Audio
                                AudioBufferList *) {
     return noErr;
 };
-}
+}  // namespace yas
 
 static OSStatus notify_render_callback(void *inRefCon, AudioUnitRenderActionFlags *ioActionFlags,
                                        const AudioTimeStamp *inTimeStamp, UInt32 inBusNumber, UInt32 inNumberFrames,
@@ -198,10 +202,11 @@ struct audio::unit::impl : base::impl, manageable_unit::impl {
                               std::to_string(*this->_graph_key) + ") unit_key(" + std::to_string(*this->_key) + ")");
             return;
         }
-        
+
         render_id render_id{.graph = *_graph_key, .unit = *_key};
-        
-        raise_if_raw_audio_error(AudioUnitRemoveRenderNotify(this->_core.raw_unit(), notify_render_callback, render_id.v));
+
+        raise_if_raw_audio_error(
+            AudioUnitRemoveRenderNotify(this->_core.raw_unit(), notify_render_callback, render_id.v));
     }
 
     void attach_input_callback() {
