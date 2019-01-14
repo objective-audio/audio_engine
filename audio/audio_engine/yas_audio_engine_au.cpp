@@ -220,11 +220,7 @@ struct audio::engine::au::impl : base::impl, manageable_au::impl {
             if (output_bus_count > 0) {
                 for (uint32_t bus_idx = 0; bus_idx < output_bus_count; ++bus_idx) {
                     if (auto connection = this->_node.output_connection(bus_idx)) {
-                        try {
-                            unit.set_output_format(connection.format().stream_description(), bus_idx);
-                        } catch (std::exception const &exception) {
-                            std::cout << "set_output_format exception:" << exception.what() << std::endl;
-                        }
+                        unit.set_output_format(connection.format().stream_description(), bus_idx);
                     }
                 }
             }
