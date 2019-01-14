@@ -105,6 +105,10 @@ struct engine_io_vc_internal {
         NSError *error = nil;
 
         if ([[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryMultiRoute error:&error]) {
+            [[AVAudioSession sharedInstance] setActive:YES error:&error];
+        }
+
+        if (!error) {
             [self setupEngine];
 
             auto const start_result = _internal.manager.start_render();
