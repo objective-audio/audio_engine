@@ -222,7 +222,7 @@ struct engine_io_vc_internal {
 }
 
 - (void)_connectNodes {
-    double const sample_rate = _internal.au_io.device_sample_rate();
+    double const sample_rate = 44100;
 
     auto const output_channel_count = _internal.connection_channel_count_for_direction(audio::direction::output);
     if (output_channel_count > 0) {
