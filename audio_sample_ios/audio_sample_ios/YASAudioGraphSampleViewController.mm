@@ -47,12 +47,12 @@ struct graph_vc_internal {
 
         mixer_unit.attach_render_callback(0);
         mixer_unit.set_element_count(1, kAudioUnitScope_Input);
+        mixer_unit.set_input_format(format.stream_description(), 0);
         try {
             mixer_unit.set_output_format(format.stream_description(), 0);
         } catch (std::exception const &exception) {
             std::cout << exception.what() << std::endl;
         }
-        mixer_unit.set_input_format(format.stream_description(), 0);
 
         auto weak_mixer_unit = weak<audio::unit>(mixer_unit);
 
