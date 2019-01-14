@@ -20,10 +20,8 @@ struct graph_vc_internal {
     audio::unit io_unit = nullptr;
     audio::unit mixer_unit = nullptr;
 
-    graph_vc_internal() {
-        AVAudioSession *audioSession = [AVAudioSession sharedInstance];
-        [audioSession setCategory:AVAudioSessionCategoryPlayAndRecord error:nil];
-        double const sample_rate = [audioSession sampleRate];
+    void setup_graph() {
+        double const sample_rate = [[AVAudioSession sharedInstance] sampleRate];
 
         auto format = audio::format({.sample_rate = sample_rate, .channel_count = 2});
 
@@ -47,8 +45,8 @@ struct graph_vc_internal {
 
         mixer_unit.attach_render_callback(0);
         mixer_unit.set_element_count(1, kAudioUnitScope_Input);
-        mixer_unit.set_output_format(format.stream_description(), 0);
         mixer_unit.set_input_format(format.stream_description(), 0);
+        mixer_unit.set_output_format(format.stream_description(), 0);
 
         auto weak_mixer_unit = weak<audio::unit>(mixer_unit);
 
@@ -70,6 +68,8 @@ struct graph_vc_internal {
                 }
             }
         });
+
+        this->graph.start();
     }
 };
 }
@@ -79,9 +79,9 @@ struct graph_vc_internal {
 }
 
 - (void)dealloc {
-    yas_release(_slider);
+    yas_release(self->_slider);
 
-    _slider = nil;
+    self->_slider = nil;
 
     yas_super_dealloc();
 }
@@ -91,8 +91,13 @@ struct graph_vc_internal {
 
     if (self.isMovingToParentViewController) {
         NSError *error = nil;
-        if ([[AVAudioSession sharedInstance] setActive:YES error:&error]) {
-            _internal.graph.start();
+
+        if ([[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayAndRecord error:&error]) {
+            [[AVAudioSession sharedInstance] setActive:YES error:&error];
+        }
+
+        if (!error) {
+            self->_internal.setup_graph();
             [self volumeSliderChanged:self.slider];
         } else {
             [self _showErrorAlertWithMessage:error.description];
@@ -104,7 +109,7 @@ struct graph_vc_internal {
     [super viewWillDisappear:animated];
 
     if (self.isMovingFromParentViewController) {
-        _internal.graph.stop();
+        self->_internal.graph.stop();
 
         [[AVAudioSession sharedInstance] setActive:NO error:nil];
     }
@@ -112,7 +117,7 @@ struct graph_vc_internal {
 
 - (IBAction)volumeSliderChanged:(UISlider *)sender {
     const AudioUnitParameterValue value = sender.value;
-    _internal.mixer_unit.set_parameter_value(value, kMultiChannelMixerParam_Volume, kAudioUnitScope_Input, 0);
+    self->_internal.mixer_unit.set_parameter_value(value, kMultiChannelMixerParam_Volume, kAudioUnitScope_Input, 0);
 }
 
 #pragma mark -
