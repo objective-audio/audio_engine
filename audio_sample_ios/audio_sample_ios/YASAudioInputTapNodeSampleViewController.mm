@@ -22,7 +22,7 @@ struct input_tap_vc_internal {
     audio::engine::au_input au_input;
     audio::engine::tap input_tap = {{.is_input = true}};
 
-    chaining::holder<float> input_level{audio::math::decibel_from_linear(0.0f)};
+    chaining::value::holder<float> input_level{audio::math::decibel_from_linear(0.0f)};
 
     input_tap_vc_internal() = default;
 
@@ -43,7 +43,7 @@ struct input_tap_vc_internal {
                 level = std::max(fabsf(ptr[cblas_isamax(frame_length, ptr, 1)]), level);
             }
 
-            float prev_level = input_level.value() - frame_length / sample_rate * 30.0f;
+            float prev_level = input_level.raw() - frame_length / sample_rate * 30.0f;
             level = std::max(prev_level, audio::math::decibel_from_linear(level));
             input_level.set_value(level);
         });
@@ -109,7 +109,7 @@ struct input_tap_vc_internal {
 }
 
 - (void)updateUI:(CADisplayLink *)sender {
-    float value = _internal.input_level.value();
+    float value = _internal.input_level.raw();
 
     self.progressView.progress = std::max((value + 72.0f) / 72.0f, 0.0f);
 
