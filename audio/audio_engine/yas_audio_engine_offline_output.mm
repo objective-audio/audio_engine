@@ -3,8 +3,8 @@
 //
 
 #include "yas_audio_engine_offline_output.h"
-#include <cpp_utils/yas_operation.h>
 #include <cpp_utils/yas_stl_utils.h>
+#include <cpp_utils/yas_task.h>
 #include "yas_audio_engine_node.h"
 #include "yas_audio_time.h"
 
@@ -13,7 +13,7 @@ using namespace yas;
 #pragma mark - audio::engine::offline_output::impl
 
 struct audio::engine::offline_output::impl : base::impl, manageable_offline_output::impl {
-    operation_queue _queue = nullptr;
+    task_queue _queue = nullptr;
     audio::engine::node _node = {{.input_bus_count = 1, .output_bus_count = 0}};
     chaining::any_observer _reset_observer = nullptr;
 
@@ -46,7 +46,7 @@ struct audio::engine::offline_output::impl : base::impl, manageable_offline_outp
 
             auto weak_output = to_weak(cast<offline_output>());
             auto operation_lambda = [weak_output, render_buffer, render_handler = std::move(render_handler),
-                                     key](operation const &op) mutable {
+                                     key](task const &op) mutable {
                 bool cancelled = false;
                 uint32_t current_sample_time = 0;
                 bool stop = false;
@@ -114,8 +114,8 @@ struct audio::engine::offline_output::impl : base::impl, manageable_offline_outp
                 dispatch_async(dispatch_get_main_queue(), completion_lambda);
             };
 
-            operation operation{std::move(operation_lambda)};
-            this->_queue = operation_queue{1};
+            task operation{std::move(operation_lambda)};
+            this->_queue = task_queue{1};
             this->_queue.push_back(operation);
         } else {
             return offline_start_result_t(offline_start_error_t::connection_not_found);
@@ -128,7 +128,7 @@ struct audio::engine::offline_output::impl : base::impl, manageable_offline_outp
 
         if (auto &queue = this->_queue) {
             queue.cancel_all();
-            queue.wait_until_all_operations_are_finished();
+            queue.wait_until_all_tasks_are_finished();
             this->_queue = nullptr;
         }
 

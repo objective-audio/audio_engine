@@ -4,7 +4,7 @@
 
 #import <cpp_utils/yas_file_manager.h>
 #import <cpp_utils/yas_objc_ptr.h>
-#import <cpp_utils/yas_system_url_utils.h>
+#import <cpp_utils/yas_system_path_utils.h>
 #import "yas_audio_test_utils.h"
 
 using namespace yas;
@@ -35,13 +35,13 @@ struct audio_file_test_data {
 };
 
 static yas::url temporary_test_dir_url() {
-    return system_url_utils::directory_url(system_url_utils::dir::temporary).appending("yas_audio_test_files");
+    return system_path_utils::directory_url(system_path_utils::dir::temporary).appending("yas_audio_test_files");
 }
 
 static void removeAllFiles() {
     auto url = test::temporary_test_dir_url();
 
-    if (auto result = file_manager::remove_files_in_directory(url.path()); result.is_error()) {
+    if (auto result = file_manager::remove_contents_in_directory(url.path()); result.is_error()) {
         throw std::runtime_error("remove_files failed");
     }
 }
