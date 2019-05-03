@@ -45,8 +45,8 @@ struct audio::engine::offline_output::impl : base::impl, manageable_offline_outp
             audio::pcm_buffer render_buffer(connection.format(), 1024);
 
             auto weak_output = to_weak(cast<offline_output>());
-            auto operation_lambda = [weak_output, render_buffer, render_handler = std::move(render_handler),
-                                     key](task const &op) mutable {
+            auto task_lambda = [weak_output, render_buffer, render_handler = std::move(render_handler),
+                                key](task const &task) mutable {
                 bool cancelled = false;
                 uint32_t current_sample_time = 0;
                 bool stop = false;
@@ -88,7 +88,7 @@ struct audio::engine::offline_output::impl : base::impl, manageable_offline_outp
                         render_handler({.buffer = render_buffer, .when = when, .out_stop = stop});
                     }
 
-                    if (op.is_canceled()) {
+                    if (task.is_canceled()) {
                         cancelled = true;
                         break;
                     }
@@ -114,9 +114,9 @@ struct audio::engine::offline_output::impl : base::impl, manageable_offline_outp
                 dispatch_async(dispatch_get_main_queue(), completion_lambda);
             };
 
-            task operation{std::move(operation_lambda)};
+            task task{std::move(task_lambda)};
             this->_queue = task_queue{1};
-            this->_queue.push_back(operation);
+            this->_queue.push_back(task);
         } else {
             return offline_start_result_t(offline_start_error_t::connection_not_found);
         }
