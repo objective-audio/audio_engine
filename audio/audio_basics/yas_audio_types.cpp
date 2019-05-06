@@ -26,6 +26,21 @@ std::string yas::to_string(audio::pcm_format const &pcm_format) {
     }
 }
 
+std::type_info const &yas::to_sample_type(audio::pcm_format const &pcm_format) {
+    switch (pcm_format) {
+        case audio::pcm_format::float32:
+            return typeid(float);
+        case audio::pcm_format::float64:
+            return typeid(double);
+        case audio::pcm_format::int16:
+            return typeid(int16_t);
+        case audio::pcm_format::fixed824:
+            return typeid(int32_t);
+        case audio::pcm_format::other:
+            return typeid(std::nullptr_t);
+    }
+}
+
 std::string yas::to_string(audio::direction const &dir) {
     switch (dir) {
         case audio::direction::output:
