@@ -33,6 +33,14 @@ using namespace yas;
     XCTAssertTrue(to_string(audio::pcm_format::other) == "Other");
 }
 
+- (void)test_pcm_format_to_sample_type {
+    XCTAssertTrue(to_sample_type(audio::pcm_format::float32) == typeid(float));
+    XCTAssertTrue(to_sample_type(audio::pcm_format::float64) == typeid(double));
+    XCTAssertTrue(to_sample_type(audio::pcm_format::int16) == typeid(int16_t));
+    XCTAssertTrue(to_sample_type(audio::pcm_format::fixed824) == typeid(int32_t));
+    XCTAssertTrue(to_sample_type(audio::pcm_format::other) == typeid(std::nullptr_t));
+}
+
 - (void)test_pcm_format_ostream {
     auto const errors = {audio::pcm_format::float32, audio::pcm_format::float64, audio::pcm_format::int16,
                          audio::pcm_format::fixed824, audio::pcm_format::other};
