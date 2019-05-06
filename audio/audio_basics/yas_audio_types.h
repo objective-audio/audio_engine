@@ -59,6 +59,7 @@ using channel_map_t = std::vector<uint32_t>;
 namespace yas {
 uint32_t to_uint32(audio::direction const &);
 std::string to_string(audio::pcm_format const &);
+std::type_info const &to_sample_type(audio::pcm_format const &);
 std::string to_string(audio::direction const &);
 std::string to_string(AudioUnitScope const scope);
 std::string to_string(audio::render_type const &);
