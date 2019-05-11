@@ -40,6 +40,11 @@ enum class direction {
     input = 1,
 };
 
+enum class continuation {
+    abort,
+    keep,
+};
+
 struct render_parameters {
     render_type in_render_type;
     AudioUnitRenderActionFlags *io_action_flags;
