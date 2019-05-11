@@ -89,7 +89,7 @@ using namespace yas;
     {
         XCTestExpectation *expectation = [self expectationWithDescription:@"first render"];
 
-        XCTAssertTrue(manager.start_offline_render([](auto args) { return false; },
+        XCTAssertTrue(manager.start_offline_render([](auto args) { return audio::continuation::abort; },
                                                    [expectation](bool const cancelled) { [expectation fulfill]; }));
 
         [self waitForExpectationsWithTimeout:0.5
@@ -120,7 +120,7 @@ using namespace yas;
                     float test_value = (float)test::test_value((uint32_t)each.frm_idx, 0, (uint32_t)each.ptr_idx);
                     XCTAssertEqual(yas_each_data_value(each), test_value);
                 }
-                return false;
+                return audio::continuation::abort;
             },
             [expectation](bool const cancelled) { [expectation fulfill]; }));
 
@@ -177,7 +177,7 @@ using namespace yas;
                 float test_value = (float)test::test_value((uint32_t)each.frm_idx, 0, 0);
                 XCTAssertEqual(yas_each_data_value(each), test_value);
             }
-            return false;
+            return audio::continuation::abort;
         },
         [expectation](bool const cancelled) { [expectation fulfill]; }));
 
@@ -237,7 +237,7 @@ using namespace yas;
                     XCTAssertEqual(yas_each_data_value(each), test_value);
                 }
             }
-            return false;
+            return audio::continuation::abort;
         },
         [expectation](bool const cancelled) { [expectation fulfill]; }));
 

@@ -282,10 +282,10 @@ struct offline_vc_internal {
             remain -= frame_length;
             if (remain == 0) {
                 file_writer.close();
-                return false;
+                return audio::continuation::abort;
             }
 
-            return true;
+            return audio::continuation::keep;
         },
         [unowned_self](bool const cancelled) { [unowned_self.object() object].processing = NO; });
 

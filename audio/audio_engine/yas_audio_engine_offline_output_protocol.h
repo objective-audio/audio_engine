@@ -7,6 +7,7 @@
 #include <cpp_utils/yas_protocol.h>
 #include <cpp_utils/yas_result.h>
 #include <functional>
+#include "yas_audio_types.h"
 
 namespace yas::audio {
 class pcm_buffer;
@@ -25,7 +26,7 @@ struct offline_render_args {
     audio::time const &when;
 };
 
-using offline_render_f = std::function<bool(offline_render_args)>;
+using offline_render_f = std::function<continuation(offline_render_args)>;
 using offline_completion_f = std::function<void(bool const cancelled)>;
 using offline_start_result_t = result<std::nullptr_t, offline_start_error_t>;
 

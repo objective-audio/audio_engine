@@ -63,7 +63,7 @@ using namespace yas;
     from_tap.set_render_handler([from_expectation](auto) { [from_expectation fulfill]; });
 
     XCTAssertTrue(manager.start_offline_render(
-        [](auto args) { return false; },
+        [](auto args) { return audio::continuation::abort; },
         [completion_expectation](auto const cancelled) { [completion_expectation fulfill]; }));
 
     [self waitForExpectationsWithTimeout:0.5
@@ -90,7 +90,7 @@ using namespace yas;
 
     from_tap.set_render_handler([from_expectation](auto) { [from_expectation fulfill]; });
 
-    XCTAssertTrue(manager.start_offline_render([](auto args) { return false; }, nullptr));
+    XCTAssertTrue(manager.start_offline_render([](auto args) { return audio::continuation::abort; }, nullptr));
 
     [self waitForExpectationsWithTimeout:0.5
                                  handler:^(NSError *error){

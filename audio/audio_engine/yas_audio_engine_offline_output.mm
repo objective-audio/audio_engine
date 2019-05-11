@@ -85,7 +85,7 @@ struct audio::engine::offline_output::impl : base::impl, manageable_offline_outp
                     }
 
                     if (render_handler) {
-                        if (!render_handler({.buffer = render_buffer, .when = when})) {
+                        if (render_handler({.buffer = render_buffer, .when = when}) == continuation::abort) {
                             break;
                         }
                     }

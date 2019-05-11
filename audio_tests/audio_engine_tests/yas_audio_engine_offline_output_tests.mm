@@ -101,7 +101,7 @@ using namespace yas;
                 bool is_equal_value = ptr[frm_idx] == test::test_value(frm_idx + output_render_frame, 0, buf_idx);
                 XCTAssertTrue(is_equal_value);
                 if (!is_equal_value) {
-                    return false;
+                    return audio::continuation::abort;
                 }
             }
         }
@@ -112,10 +112,10 @@ using namespace yas;
                 [renderExpectation fulfill];
                 renderExpectation = nil;
             }
-            return false;
+            return audio::continuation::abort;
         }
 
-        return true;
+        return audio::continuation::keep;
     };
 
     auto completion_handler = [=](bool const cancelled) mutable {
@@ -197,7 +197,7 @@ using namespace yas;
                 test::test_value((uint32_t)each.frm_idx + output_render_frame, 0, (uint32_t)each.ptr_idx);
             XCTAssertTrue(is_equal_value);
             if (!is_equal_value) {
-                return false;
+                return audio::continuation::abort;
             }
         }
 
@@ -207,10 +207,10 @@ using namespace yas;
                 [renderExpectation fulfill];
                 renderExpectation = nil;
             }
-            return false;
+            return audio::continuation::abort;
         }
 
-        return true;
+        return audio::continuation::keep;
     };
 
     auto completion_handler = [=](bool const cancelled) mutable {
@@ -259,7 +259,7 @@ using namespace yas;
         if (args.when.sample_time() == 0) {
             promise->set_value();
         }
-        return true;
+        return audio::continuation::keep;
     };
 
     auto completion_handler = [=](bool const cancelled) mutable {
