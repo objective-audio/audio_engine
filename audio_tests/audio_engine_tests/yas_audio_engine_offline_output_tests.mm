@@ -89,7 +89,6 @@ using namespace yas;
     auto start_render_handler = [=](audio::engine::offline_render_args args) mutable {
         auto &buffer = args.buffer;
         auto const &when = args.when;
-        bool &out_stop = args.out_stop;
 
         XCTAssertEqual(when.sample_time(), output_render_frame);
         XCTAssertEqual(when.sample_rate(), sample_rate);
@@ -102,20 +101,21 @@ using namespace yas;
                 bool is_equal_value = ptr[frm_idx] == test::test_value(frm_idx + output_render_frame, 0, buf_idx);
                 XCTAssertTrue(is_equal_value);
                 if (!is_equal_value) {
-                    out_stop = true;
-                    return;
+                    return false;
                 }
             }
         }
 
         output_render_frame += buffer.frame_length();
         if (output_render_frame >= length) {
-            out_stop = true;
             if (renderExpectation) {
                 [renderExpectation fulfill];
                 renderExpectation = nil;
             }
+            return false;
         }
+
+        return true;
     };
 
     auto completion_handler = [=](bool const cancelled) mutable {
@@ -184,7 +184,6 @@ using namespace yas;
     auto start_render_handler = [=](auto args) mutable {
         auto &buffer = args.buffer;
         auto const &when = args.when;
-        bool &out_stop = args.out_stop;
 
         XCTAssertEqual(when.sample_time(), output_render_frame);
         XCTAssertEqual(when.sample_rate(), sample_rate);
@@ -198,19 +197,20 @@ using namespace yas;
                 test::test_value((uint32_t)each.frm_idx + output_render_frame, 0, (uint32_t)each.ptr_idx);
             XCTAssertTrue(is_equal_value);
             if (!is_equal_value) {
-                out_stop = YES;
-                return;
+                return false;
             }
         }
 
         output_render_frame += buffer.frame_length();
         if (output_render_frame >= length) {
-            out_stop = true;
             if (renderExpectation) {
                 [renderExpectation fulfill];
                 renderExpectation = nil;
             }
+            return false;
         }
+
+        return true;
     };
 
     auto completion_handler = [=](bool const cancelled) mutable {
@@ -259,6 +259,7 @@ using namespace yas;
         if (args.when.sample_time() == 0) {
             promise->set_value();
         }
+        return true;
     };
 
     auto completion_handler = [=](bool const cancelled) mutable {

@@ -89,7 +89,7 @@ using namespace yas;
     {
         XCTestExpectation *expectation = [self expectationWithDescription:@"first render"];
 
-        XCTAssertTrue(manager.start_offline_render([](auto args) { args.out_stop = true; },
+        XCTAssertTrue(manager.start_offline_render([](auto args) { return false; },
                                                    [expectation](bool const cancelled) { [expectation fulfill]; }));
 
         [self waitForExpectationsWithTimeout:0.5
@@ -115,12 +115,12 @@ using namespace yas;
 
         XCTAssertTrue(manager.start_offline_render(
             [self](auto args) {
-                args.out_stop = true;
                 auto each = audio::make_each_data<float>(args.buffer);
                 while (yas_each_data_next(each)) {
                     float test_value = (float)test::test_value((uint32_t)each.frm_idx, 0, (uint32_t)each.ptr_idx);
                     XCTAssertEqual(yas_each_data_value(each), test_value);
                 }
+                return false;
             },
             [expectation](bool const cancelled) { [expectation fulfill]; }));
 
@@ -172,12 +172,12 @@ using namespace yas;
 
     XCTAssertTrue(manager.start_offline_render(
         [self](auto args) {
-            args.out_stop = true;
             auto each = audio::make_each_data<float>(args.buffer);
             while (yas_each_data_next(each)) {
                 float test_value = (float)test::test_value((uint32_t)each.frm_idx, 0, 0);
                 XCTAssertEqual(yas_each_data_value(each), test_value);
             }
+            return false;
         },
         [expectation](bool const cancelled) { [expectation fulfill]; }));
 
@@ -230,7 +230,6 @@ using namespace yas;
 
     XCTAssertTrue(manager.start_offline_render(
         [self](auto args) {
-            args.out_stop = true;
             auto each = audio::make_each_data<float>(args.buffer);
             while (yas_each_data_next(each)) {
                 if (each.ptr_idx == 0 || each.ptr_idx == 2) {
@@ -238,6 +237,7 @@ using namespace yas;
                     XCTAssertEqual(yas_each_data_value(each), test_value);
                 }
             }
+            return false;
         },
         [expectation](bool const cancelled) { [expectation fulfill]; }));
 
