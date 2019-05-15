@@ -20,6 +20,8 @@ union render_id {
     };
 };
 
+static_assert(sizeof(void *) == sizeof(render_id), "render_id size must be equal to pointer size.");
+
 enum class pcm_format : uint32_t {
     other = 0,
     float32,
