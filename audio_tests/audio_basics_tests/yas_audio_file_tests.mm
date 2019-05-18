@@ -74,8 +74,7 @@ static void setupDirectory() {
     [super tearDown];
 }
 
-#warning iOS11.4でsample_rateを変えた時にファイルサイズが大きくなっている
-- (void)_test_wave_file {
+- (void)test_wave_file {
 #if WAVEFILE_LIGHT_TEST
     double sample_rates[] = {44100.0, 382000.0};
     uint32_t channels[] = {1, 2};
