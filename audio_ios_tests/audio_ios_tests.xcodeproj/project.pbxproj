@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		B62579D021E0EC68003740D9 /* audio_ios_tests.m in Sources */ = {isa = PBXBuildFile; fileRef = B62579CF21E0EC68003740D9 /* audio_ios_tests.m */; };
 		B62579D721E0EC9B003740D9 /* audio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B62579D621E0EC9B003740D9 /* audio.framework */; };
 		B62579D921E0EC9B003740D9 /* chaining.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B62579D821E0EC9B003740D9 /* chaining.framework */; };
 		B62579DB21E0EC9B003740D9 /* cpp_utils.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B62579DA21E0EC9B003740D9 /* cpp_utils.framework */; };
@@ -42,7 +41,6 @@
 /* Begin PBXFileReference section */
 		B61B489B21E0F819007AF942 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS12.1.sdk/System/Library/Frameworks/UIKit.framework; sourceTree = DEVELOPER_DIR; };
 		B62579CC21E0EC68003740D9 /* audio_ios_tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = audio_ios_tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		B62579CF21E0EC68003740D9 /* audio_ios_tests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = audio_ios_tests.m; sourceTree = "<group>"; };
 		B62579D121E0EC68003740D9 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B62579D621E0EC9B003740D9 /* audio.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = audio.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B62579D821E0EC9B003740D9 /* chaining.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = chaining.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -115,7 +113,6 @@
 		B62579CE21E0EC68003740D9 /* audio_ios_tests */ = {
 			isa = PBXGroup;
 			children = (
-				B62579CF21E0EC68003740D9 /* audio_ios_tests.m */,
 				B62579D121E0EC68003740D9 /* Info.plist */,
 			);
 			path = audio_ios_tests;
@@ -307,7 +304,6 @@
 				B6257A0A21E0ED93003740D9 /* yas_audio_engine_tap_tests.mm in Sources */,
 				B6257A0621E0ED93003740D9 /* yas_audio_unit_tests.mm in Sources */,
 				B6257A1A21E0ED93003740D9 /* yas_audio_math_tests.mm in Sources */,
-				B62579D021E0EC68003740D9 /* audio_ios_tests.m in Sources */,
 				B6257A1221E0ED93003740D9 /* yas_audio_engine_tests.mm in Sources */,
 				B6257A0521E0ED93003740D9 /* yas_audio_graph_tests.mm in Sources */,
 				B6257A0F21E0ED93003740D9 /* yas_audio_engine_converter_unit_tests.mm in Sources */,
