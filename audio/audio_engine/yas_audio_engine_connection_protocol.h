@@ -13,7 +13,7 @@ class connection;
 
 using connection_set = std::unordered_set<connection>;
 using connection_smap = std::map<uint32_t, connection>;
-using connection_wmap = std::map<uint32_t, weak<connection>>;
+using connection_wmap = std::map<uint32_t, base::weak<connection>>;
 
 struct node_removable : protocol {
     struct impl : protocol::impl {
