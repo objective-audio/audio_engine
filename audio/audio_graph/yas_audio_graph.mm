@@ -21,7 +21,7 @@ using namespace yas;
 namespace yas::audio {
 static std::recursive_mutex global_mutex;
 static bool global_interrupting;
-static std::map<uint8_t, weak<graph>> global_graphs;
+static std::map<uint8_t, base::weak<graph>> global_graphs;
 #if TARGET_OS_IPHONE
 static objc_ptr<> global_did_become_active_observer;
 static objc_ptr<> global_interruption_observer;
