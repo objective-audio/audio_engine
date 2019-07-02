@@ -24,20 +24,22 @@ namespace yas {
 static OSStatus common_render_callback(void *inRefCon, AudioUnitRenderActionFlags *ioActionFlags,
                                        const AudioTimeStamp *inTimeStamp, UInt32 inBusNumber, UInt32 inNumberFrames,
                                        AudioBufferList *ioData, audio::render_type renderType) {
-    audio::render_id render_id{.v = inRefCon};
-    audio::render_parameters renderParameters = {
-        .in_render_type = renderType,
-        .io_action_flags = ioActionFlags,
-        .io_time_stamp = inTimeStamp,
-        .in_bus_number = inBusNumber,
-        .in_number_frames = inNumberFrames,
-        .io_data = ioData,
-        .render_id = render_id,
-    };
+    @autoreleasepool {
+        audio::render_id render_id{.v = inRefCon};
+        audio::render_parameters renderParameters = {
+            .in_render_type = renderType,
+            .io_action_flags = ioActionFlags,
+            .io_time_stamp = inTimeStamp,
+            .in_bus_number = inBusNumber,
+            .in_number_frames = inNumberFrames,
+            .io_data = ioData,
+            .render_id = render_id,
+        };
 
-    audio::graph::unit_render(renderParameters);
+        audio::graph::unit_render(renderParameters);
 
-    return noErr;
+        return noErr;
+    }
 };
 
 static OSStatus render_callback(void *inRefCon, AudioUnitRenderActionFlags *ioActionFlags,
