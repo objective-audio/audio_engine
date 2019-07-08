@@ -9,12 +9,12 @@
 namespace yas::audio::engine {
 class au;
 
-class au_mixer : public base {
+class au_mixer final : public base {
    public:
     au_mixer();
     au_mixer(std::nullptr_t);
 
-    virtual ~au_mixer() final;
+    virtual ~au_mixer();
 
     void set_output_volume(float const volume, uint32_t const bus_idx);
     float output_volume(uint32_t const bus_idx) const;

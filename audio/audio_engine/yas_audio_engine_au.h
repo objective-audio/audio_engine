@@ -18,7 +18,7 @@ class graph;
 namespace yas::audio::engine {
 class node;
 
-class au : public base {
+class au final : public base {
    public:
     class impl;
 
@@ -40,7 +40,7 @@ class au : public base {
     au(args &&);
     au(std::nullptr_t);
 
-    virtual ~au() final;
+    virtual ~au();
 
     void set_prepare_unit_handler(prepare_unit_f);
 

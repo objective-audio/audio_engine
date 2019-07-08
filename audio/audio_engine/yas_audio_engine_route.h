@@ -10,7 +10,7 @@
 namespace yas::audio::engine {
 class node;
 
-class route : public base {
+class route final : public base {
     class kernel;
     class impl;
 
@@ -18,7 +18,7 @@ class route : public base {
     route();
     route(std::nullptr_t);
 
-    virtual ~route() final;
+    virtual ~route();
 
     audio::route_set_t const &routes() const;
     void add_route(audio::route);

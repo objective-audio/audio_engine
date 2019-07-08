@@ -33,13 +33,13 @@ struct audio::engine::route::kernel : base {
 
 #pragma mark - impl
 
-struct audio::engine::route::impl : base::impl {
+struct audio::engine::route::impl final : base::impl {
     audio::engine::node _node = {{.input_bus_count = std::numeric_limits<uint32_t>::max(),
                                   .output_bus_count = std::numeric_limits<uint32_t>::max()}};
     route_set_t _routes;
     chaining::any_observer _reset_observer = nullptr;
 
-    virtual ~impl() final = default;
+    virtual ~impl() = default;
 
     void prepare(audio::engine::route const &route) {
         auto weak_route = to_weak(route);

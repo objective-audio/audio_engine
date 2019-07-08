@@ -7,7 +7,7 @@
 #include "yas_audio_engine_node.h"
 
 namespace yas::audio::engine {
-class tap : public base {
+class tap final : public base {
    public:
     class kernel;
     class impl;
@@ -20,7 +20,7 @@ class tap : public base {
     tap(args);
     tap(std::nullptr_t);
 
-    virtual ~tap() final;
+    virtual ~tap();
 
     void set_render_handler(audio::engine::node::render_f);
 

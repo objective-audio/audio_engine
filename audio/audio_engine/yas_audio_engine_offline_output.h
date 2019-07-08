@@ -11,14 +11,14 @@
 namespace yas::audio::engine {
 class node;
 
-class offline_output : public base {
+class offline_output final : public base {
    public:
     class impl;
 
     offline_output();
     offline_output(std::nullptr_t);
 
-    virtual ~offline_output() final;
+    virtual ~offline_output();
 
     bool is_running() const;
 

@@ -24,7 +24,7 @@ namespace yas::audio::engine {
 class device_io;
 class offline_output;
 
-class manager : public base {
+class manager final : public base {
     class impl;
 
    public:
@@ -49,7 +49,7 @@ class manager : public base {
     manager();
     manager(std::nullptr_t);
 
-    virtual ~manager() final;
+    virtual ~manager();
 
     audio::engine::connection connect(audio::engine::node &source_node, audio::engine::node &destination_node,
                                       audio::format const &format);

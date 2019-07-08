@@ -16,7 +16,7 @@ class result;
 namespace yas::audio {
 class format;
 
-class pcm_buffer : public base {
+class pcm_buffer final : public base {
     class impl;
 
    public:
@@ -50,7 +50,7 @@ class pcm_buffer : public base {
     pcm_buffer(audio::format const &format, pcm_buffer const &from_buffer, channel_map_t const &channel_map);
     pcm_buffer(std::nullptr_t);
 
-    virtual ~pcm_buffer() final;
+    virtual ~pcm_buffer();
 
     audio::format const &format() const;
     AudioBufferList *audio_buffer_list();

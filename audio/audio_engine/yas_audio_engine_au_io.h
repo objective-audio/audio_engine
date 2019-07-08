@@ -17,7 +17,7 @@ class device;
 namespace yas::audio::engine {
 class au;
 
-class au_io : public base {
+class au_io final : public base {
    public:
     class impl;
 
@@ -36,7 +36,7 @@ class au_io : public base {
     au_io(args);
     au_io(std::nullptr_t);
 
-    virtual ~au_io() final;
+    virtual ~au_io();
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
     void set_device(audio::device const &);
@@ -57,14 +57,14 @@ class au_io : public base {
     audio::engine::au &au();
 };
 
-class au_output : public base {
+class au_output final : public base {
    public:
     class impl;
 
     au_output();
     au_output(std::nullptr_t);
 
-    virtual ~au_output() final;
+    virtual ~au_output();
 
     void set_channel_map(channel_map_t const &);
     channel_map_t const &channel_map() const;
@@ -73,14 +73,14 @@ class au_output : public base {
     audio::engine::au_io &au_io();
 };
 
-class au_input : public base {
+class au_input final : public base {
    public:
     class impl;
 
     au_input();
     au_input(std::nullptr_t);
 
-    virtual ~au_input() final;
+    virtual ~au_input();
 
     void set_channel_map(channel_map_t const &);
     channel_map_t const &channel_map() const;

@@ -9,7 +9,7 @@
 #include "yas_audio_types.h"
 
 namespace yas::audio {
-class time : public base {
+class time final : public base {
     class impl;
 
    public:
@@ -19,7 +19,7 @@ class time : public base {
     time(int64_t const sample_time, double const sample_rate);
     time(uint64_t const host_time, int64_t const sample_time, double const sample_rate);
 
-    virtual ~time() final;
+    virtual ~time();
 
     bool is_host_time_valid() const;
     uint64_t host_time() const;

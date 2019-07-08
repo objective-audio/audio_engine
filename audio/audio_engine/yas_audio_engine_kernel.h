@@ -8,11 +8,11 @@
 #include "yas_audio_engine_kernel_protocol.h"
 
 namespace yas::audio::engine {
-struct kernel : base {
+struct kernel final : base {
     kernel();
     kernel(std::nullptr_t);
 
-    virtual ~kernel() final;
+    virtual ~kernel();
 
     audio::engine::connection_smap input_connections() const;
     audio::engine::connection_smap output_connections() const;

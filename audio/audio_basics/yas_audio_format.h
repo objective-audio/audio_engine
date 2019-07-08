@@ -10,7 +10,7 @@
 #include "yas_audio_types.h"
 
 namespace yas::audio {
-class format : public base {
+class format final : public base {
     class impl;
 
    public:
@@ -26,7 +26,7 @@ class format : public base {
     format(args args);
     format(std::nullptr_t);
 
-    virtual ~format() final;
+    virtual ~format();
 
     bool is_empty() const;
     bool is_standard() const;

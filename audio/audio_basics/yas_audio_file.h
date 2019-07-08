@@ -20,7 +20,7 @@ namespace yas::audio {
 class format;
 class pcm_buffer;
 
-class file : public base {
+class file final : public base {
     class impl;
 
    public:
@@ -77,7 +77,7 @@ class file : public base {
     file();
     file(std::nullptr_t);
 
-    virtual ~file() final;
+    virtual ~file();
 
     open_result_t open(open_args);
     create_result_t create(create_args);

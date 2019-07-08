@@ -19,7 +19,7 @@ class result;
 }
 
 namespace yas::audio {
-class unit : public base {
+class unit final : public base {
    public:
     class impl;
     class parameter;
@@ -34,7 +34,7 @@ class unit : public base {
     explicit unit(AudioComponentDescription const &acd);
     unit(OSType const type, OSType const subType);
 
-    virtual ~unit() final;
+    virtual ~unit();
 
     CFStringRef name() const;
     OSType type() const;

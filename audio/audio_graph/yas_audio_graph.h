@@ -13,14 +13,14 @@ class unit;
 class device_io;
 #endif
 
-class graph : public base {
+class graph final : public base {
    public:
     class impl;
 
     graph();
     graph(std::nullptr_t);
 
-    virtual ~graph() final;
+    virtual ~graph();
 
     void add_unit(audio::unit &);
     void remove_unit(audio::unit &);

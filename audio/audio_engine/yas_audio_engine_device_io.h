@@ -18,7 +18,7 @@ class device;
 namespace yas::audio::engine {
 class node;
 
-class device_io : public base {
+class device_io final : public base {
    public:
     class impl;
 
@@ -26,7 +26,7 @@ class device_io : public base {
     device_io(std::nullptr_t);
     device_io(audio::device const &device);
 
-    virtual ~device_io() final;
+    virtual ~device_io();
 
     void set_device(audio::device const &device);
     audio::device device() const;

@@ -79,7 +79,7 @@ static OSStatus input_render_callback(void *inRefCon, AudioUnitRenderActionFlags
 
 #pragma mark - audio::unit::impl
 
-struct audio::unit::impl : base::impl, manageable_unit::impl {
+struct audio::unit::impl final : base::impl, manageable_unit::impl {
    public:
     AudioComponentDescription _acd = {0};
     bool _initialized = false;
@@ -87,7 +87,7 @@ struct audio::unit::impl : base::impl, manageable_unit::impl {
     std::optional<uint8_t> _graph_key = std::nullopt;
     std::optional<uint16_t> _key = std::nullopt;
 
-    virtual ~impl() final {
+    virtual ~impl() {
         this->uninitialize();
         this->dispose_raw_unit();
     }

@@ -18,11 +18,11 @@ using namespace yas;
 
 #pragma mark - audio::engine::device_io::impl
 
-struct audio::engine::device_io::impl : base::impl, manageable_device_io::impl {
+struct audio::engine::device_io::impl final : base::impl, manageable_device_io::impl {
     audio::engine::node _node = {{.input_bus_count = 1, .output_bus_count = 1}};
     chaining::any_observer _connections_observer = nullptr;
 
-    virtual ~impl() final = default;
+    virtual ~impl() = default;
 
     void prepare(engine::device_io const &engine_device_io, audio::device const &device) {
         this->set_device(device ?: device::default_output_device());

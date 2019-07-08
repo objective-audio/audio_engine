@@ -28,7 +28,7 @@ namespace yas::audio::engine {
 class manager;
 class kernel;
 
-class node : public base {
+class node final : public base {
    public:
     class impl;
 
@@ -51,7 +51,7 @@ class node : public base {
     node(node_args);
     node(std::nullptr_t);
 
-    virtual ~node() final;
+    virtual ~node();
 
     void reset();
 
