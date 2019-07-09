@@ -263,8 +263,8 @@ struct audio::engine::au::impl : base::impl, manageable_au::impl {
     AudioComponentDescription _acd;
     std::unordered_map<AudioUnitScope, unit::parameter_map_t> _parameters;
     chaining::notifier<chaining_pair_t> _notifier;
-    chaining::any_observer _reset_observer = nullptr;
-    chaining::any_observer _connections_observer = nullptr;
+    chaining::any_observer_ptr _reset_observer = nullptr;
+    chaining::any_observer_ptr _connections_observer = nullptr;
     prepare_unit_f _prepare_unit_handler;
 
    private:

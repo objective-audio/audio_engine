@@ -110,7 +110,7 @@ struct audio::engine::tap::impl : base::impl {
 
    private:
     audio::engine::node::render_f _render_handler;
-    chaining::any_observer _reset_observer = nullptr;
+    chaining::any_observer_ptr _reset_observer = nullptr;
     audio::engine::kernel _kernel_on_render;
 };
 

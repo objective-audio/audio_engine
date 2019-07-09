@@ -64,7 +64,7 @@ struct audio::device_io::impl : base::impl {
     AudioDeviceIOProcID _io_proc_id = nullptr;
     pcm_buffer _input_buffer_on_render = nullptr;
     audio::time _input_time_on_render = nullptr;
-    chaining::any_observer _device_system_observer = nullptr;
+    chaining::any_observer_ptr _device_system_observer = nullptr;
     std::unordered_map<std::uintptr_t, chaining::any_observer> _device_observers;
 
     impl() {

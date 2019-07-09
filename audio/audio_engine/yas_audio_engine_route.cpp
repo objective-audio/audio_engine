@@ -37,7 +37,7 @@ struct audio::engine::route::impl final : base::impl {
     audio::engine::node _node = {{.input_bus_count = std::numeric_limits<uint32_t>::max(),
                                   .output_bus_count = std::numeric_limits<uint32_t>::max()}};
     route_set_t _routes;
-    chaining::any_observer _reset_observer = nullptr;
+    chaining::any_observer_ptr _reset_observer = nullptr;
 
     virtual ~impl() = default;
 

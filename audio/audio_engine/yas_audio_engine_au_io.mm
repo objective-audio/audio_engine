@@ -166,7 +166,7 @@ struct audio::engine::au_io::impl : base::impl {
    private:
     audio::engine::au _au;
     channel_map_t _channel_map[2];
-    chaining::any_observer _connections_observer = nullptr;
+    chaining::any_observer_ptr _connections_observer = nullptr;
 };
 
 #pragma mark - audio::engine::au_io
@@ -334,7 +334,7 @@ struct yas::audio::engine::au_input::impl : base::impl {
     audio::engine::au_io _au_io;
 
     pcm_buffer _input_buffer = nullptr;
-    chaining::any_observer _connections_observer = nullptr;
+    chaining::any_observer_ptr _connections_observer = nullptr;
 };
 
 #pragma mark - audio::engine::au_input

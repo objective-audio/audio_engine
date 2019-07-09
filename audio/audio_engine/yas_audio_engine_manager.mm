@@ -490,7 +490,7 @@ struct audio::engine::manager::impl : base::impl {
     objc_ptr<id> _route_change_observer;
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
     audio::engine::device_io _device_io = nullptr;
-    chaining::any_observer _device_system_observer = nullptr;
+    chaining::any_observer_ptr _device_system_observer = nullptr;
 #endif
 
     audio::graph _graph = nullptr;

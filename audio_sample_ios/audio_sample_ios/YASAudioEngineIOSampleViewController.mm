@@ -35,7 +35,7 @@ struct engine_io_vc_internal {
     audio::engine::au_mixer au_mixer;
     audio::engine::au_io au_io;
 
-    chaining::any_observer engine_observer = nullptr;
+    chaining::any_observer_ptr engine_observer = nullptr;
 
     engine_io_vc_internal() {
         au_mixer.set_input_volume(1.0, 0);

@@ -15,7 +15,7 @@ using namespace yas;
 struct audio::engine::offline_output::impl : base::impl, manageable_offline_output::impl {
     task_queue _queue = nullptr;
     audio::engine::node _node = {{.input_bus_count = 1, .output_bus_count = 0}};
-    chaining::any_observer _reset_observer = nullptr;
+    chaining::any_observer_ptr _reset_observer = nullptr;
 
     ~impl() = default;
 
