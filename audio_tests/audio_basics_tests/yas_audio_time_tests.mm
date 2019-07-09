@@ -114,16 +114,6 @@ static NSInteger testCount = 8;
     }
 }
 
-- (void)test_bool {
-    audio::time time{100};
-
-    XCTAssertTrue(time);
-
-    audio::time null_time{nullptr};
-
-    XCTAssertFalse(null_time);
-}
-
 - (void)test_host_time {
     uint64_t const host_time = 1000;
     audio::time time{host_time};
@@ -147,16 +137,6 @@ static NSInteger testCount = 8;
 
     XCTAssertTrue(time1 == time1);
     XCTAssertFalse(time1 == time3);
-}
-
-- (void)test_equal_null_false {
-    audio::time const time1{4000, 48000.0};
-    audio::time const time2{nullptr};
-    audio::time const time3{nullptr};
-
-    XCTAssertFalse(time1 == time2);
-    XCTAssertFalse(time2 == time1);
-    XCTAssertFalse(time2 == time2);
 }
 
 #pragma mark -

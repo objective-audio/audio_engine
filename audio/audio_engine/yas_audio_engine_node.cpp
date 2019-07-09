@@ -40,7 +40,7 @@ struct audio::engine::node::impl : base::impl, manageable_node::impl, connectabl
 
         this->_input_connections.clear();
         this->_output_connections.clear();
-        this->_core.set_render_time(nullptr);
+        this->_core.set_render_time(std::nullopt);
 
         this->update_kernel();
     }
@@ -243,7 +243,7 @@ struct audio::engine::node::impl : base::impl, manageable_node::impl, connectabl
         }
     }
 
-    audio::time render_time() {
+    std::optional<audio::time> render_time() {
         return this->_core.render_time();
     }
 
@@ -263,19 +263,19 @@ struct audio::engine::node::impl : base::impl, manageable_node::impl, connectabl
             return this->_kernel;
         }
 
-        void set_render_time(time const &render_time) {
+        void set_render_time(std::optional<time> const &render_time) {
             std::lock_guard<std::recursive_mutex> lock(this->_mutex);
             this->_render_time = render_time;
         }
 
-        audio::time render_time() const {
+        std::optional<audio::time> render_time() const {
             std::lock_guard<std::recursive_mutex> lock(this->_mutex);
             return this->_render_time;
         }
 
        private:
         audio::engine::kernel _kernel = nullptr;
-        audio::time _render_time = nullptr;
+        std::optional<audio::time> _render_time = std::nullopt;
         mutable std::recursive_mutex _mutex;
     };
 
@@ -343,7 +343,7 @@ audio::engine::manager audio::engine::node::manager() const {
     return impl_ptr<impl>()->manager();
 }
 
-audio::time audio::engine::node::last_render_time() const {
+std::optional<audio::time> audio::engine::node::last_render_time() const {
     return impl_ptr<impl>()->render_time();
 }
 

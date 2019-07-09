@@ -67,7 +67,7 @@ class node final : public base {
     bool is_available_input_bus(uint32_t const bus_idx) const;
     bool is_available_output_bus(uint32_t const bus_idx) const;
     audio::engine::manager manager() const;
-    audio::time last_render_time() const;
+    std::optional<audio::time> last_render_time() const;
 
     uint32_t input_bus_count() const;
     uint32_t output_bus_count() const;
