@@ -264,15 +264,19 @@ struct device_io_vc_internal {
 
         if (auto const &device = _internal.manager.device_io().device()) {
             if (device.output_channel_count() > 0) {
-                auto const output_format = device.output_format();
-                _internal.manager.connect(_internal.route.node(), _internal.manager.device_io().node(), output_format);
-                _internal.manager.connect(_internal.tap.node(), _internal.route.node(), 0,
-                                          YASAudioDeviceRouteSampleSourceBusSine, output_format);
+                if (auto const output_format = device.output_format()) {
+                    _internal.manager.connect(_internal.route.node(), _internal.manager.device_io().node(),
+                                              *output_format);
+                    _internal.manager.connect(_internal.tap.node(), _internal.route.node(), 0,
+                                              YASAudioDeviceRouteSampleSourceBusSine, *output_format);
+                }
             }
 
             if (device.input_channel_count() > 0) {
-                _internal.manager.connect(_internal.manager.device_io().node(), _internal.route.node(), 0,
-                                          YASAudioDeviceRouteSampleSourceBusInput, device.input_format());
+                if (auto const input_format = device.input_format()) {
+                    _internal.manager.connect(_internal.manager.device_io().node(), _internal.route.node(), 0,
+                                              YASAudioDeviceRouteSampleSourceBusInput, *input_format);
+                }
             }
         }
     }

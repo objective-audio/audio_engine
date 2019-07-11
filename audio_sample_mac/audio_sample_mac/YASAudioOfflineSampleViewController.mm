@@ -242,10 +242,10 @@ struct offline_vc_internal {
 
 - (void)startOfflineFileWritingWithURL:(NSURL *)url {
     auto wave_settings = audio::wave_file_settings(offline_sample::sample_rate, 2, 16);
-    audio::file file_writer;
-    auto create_result = file_writer.create({.file_url = yas::url{to_string((__bridge CFStringRef)url.path)},
-                                             .file_type = audio::file_type::wave,
-                                             .settings = wave_settings});
+    auto file_writer = std::make_shared<audio::file>();
+    auto create_result = file_writer->create({.file_url = yas::url{to_string((__bridge CFStringRef)url.path)},
+                                              .file_type = audio::file_type::wave,
+                                              .settings = wave_settings});
 
     if (!create_result) {
         std::cout << __PRETTY_FUNCTION__ << " - error:" << to_string(create_result.error()) << std::endl;
@@ -274,7 +274,7 @@ struct offline_vc_internal {
             uint32_t frame_length = MIN(remain, pcm_buffer.frame_length());
             if (frame_length > 0) {
                 pcm_buffer.set_frame_length(frame_length);
-                auto write_result = file_writer.write_from_buffer(pcm_buffer);
+                auto write_result = file_writer->write_from_buffer(pcm_buffer);
                 if (!write_result) {
                     std::cout << __PRETTY_FUNCTION__ << " - error:" << to_string(write_result.error()) << std::endl;
                 }
@@ -282,7 +282,7 @@ struct offline_vc_internal {
 
             remain -= frame_length;
             if (remain == 0) {
-                file_writer.close();
+                file_writer->close();
                 return audio::continuation::abort;
             }
 
