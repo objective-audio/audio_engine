@@ -113,8 +113,11 @@ struct audio::engine::device_io::impl final : base::impl, manageable_device_io::
                         auto const &connection = connections.at(0);
                         if (auto src_node = connection.source_node();
                             connection.format() == src_node.output_format(connection.source_bus())) {
-                            src_node.render(
-                                {.buffer = args.output_buffer, .bus_idx = connection.source_bus(), .when = args.when});
+                            if (auto const when = args.when) {
+                                src_node.render({.buffer = args.output_buffer,
+                                                 .bus_idx = connection.source_bus(),
+                                                 .when = *args.when});
+                            }
                         }
                     }
 
@@ -127,7 +130,7 @@ struct audio::engine::device_io::impl final : base::impl, manageable_device_io::
                                 auto const &input_time = device_io.input_time_on_render();
                                 if (input_buffer && input_time) {
                                     if (connection.format() == dst_node.input_format(connection.destination_bus())) {
-                                        dst_node.render({.buffer = input_buffer, .bus_idx = 0, .when = input_time});
+                                        dst_node.render({.buffer = input_buffer, .bus_idx = 0, .when = *input_time});
                                     }
                                 }
                             }

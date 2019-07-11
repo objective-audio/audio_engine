@@ -9,18 +9,18 @@
 
 #include <cpp_utils/yas_base.h>
 #include <functional>
+#include "yas_audio_time.h"
 #include "yas_audio_types.h"
 
 namespace yas::audio {
 class pcm_buffer;
-class time;
 class device;
 
 class device_io : public base {
    public:
     struct render_args {
         audio::pcm_buffer &output_buffer;
-        audio::time const &when;
+        std::optional<audio::time> const when;
     };
 
     using render_f = std::function<void(render_args)>;
@@ -39,7 +39,7 @@ class device_io : public base {
     void stop() const;
 
     audio::pcm_buffer const &input_buffer_on_render() const;
-    audio::time const &input_time_on_render() const;
+    std::shared_ptr<audio::time> const &input_time_on_render() const;
 
    private:
     class kernel;

@@ -12,7 +12,6 @@
 #include "yas_audio_device.h"
 #include "yas_audio_format.h"
 #include "yas_audio_pcm_buffer.h"
-#include "yas_audio_time.h"
 
 using namespace yas;
 
@@ -63,9 +62,9 @@ struct audio::device_io::impl : base::impl {
     bool _is_running = false;
     AudioDeviceIOProcID _io_proc_id = nullptr;
     pcm_buffer _input_buffer_on_render = nullptr;
-    audio::time _input_time_on_render = nullptr;
+    std::shared_ptr<audio::time> _input_time_on_render = nullptr;
     chaining::any_observer_ptr _device_system_observer = nullptr;
-    std::unordered_map<std::uintptr_t, chaining::any_observer> _device_observers;
+    std::unordered_map<std::uintptr_t, chaining::any_observer_ptr> _device_observers;
 
     impl() {
     }
@@ -155,7 +154,7 @@ struct audio::device_io::impl : base::impl {
                             if (input_frame_length > 0) {
                                 imp->_input_buffer_on_render = input_buffer;
                                 imp->_input_time_on_render =
-                                    audio::time(*inInputTime, input_buffer.format().sample_rate());
+                                    std::make_shared<audio::time>(*inInputTime, input_buffer.format().sample_rate());
                             }
                         }
                     }
@@ -168,13 +167,14 @@ struct audio::device_io::impl : base::impl {
                                 if (frame_length > 0) {
                                     output_buffer.set_frame_length(frame_length);
                                     audio::time time(*inOutputTime, output_buffer.format().sample_rate());
-                                    render_handler({.output_buffer = output_buffer, .when = time});
+                                    render_handler(
+                                        render_args{.output_buffer = output_buffer, .when = std::move(time)});
                                     output_buffer.copy_to(outOutputData);
                                 }
                             }
                         } else if (kernel.input_buffer()) {
                             pcm_buffer null_buffer{nullptr};
-                            render_handler({.output_buffer = null_buffer, .when = nullptr});
+                            render_handler(render_args{.output_buffer = null_buffer, .when = std::nullopt});
                         }
                     }
                 }
@@ -338,7 +338,7 @@ audio::pcm_buffer const &audio::device_io::input_buffer_on_render() const {
     return impl_ptr<impl>()->_input_buffer_on_render;
 }
 
-audio::time const &audio::device_io::input_time_on_render() const {
+std::shared_ptr<audio::time> const &audio::device_io::input_time_on_render() const {
     return impl_ptr<impl>()->_input_time_on_render;
 }
 
