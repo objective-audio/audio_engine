@@ -5,6 +5,8 @@
 #import "YASAudioDeviceSampleViewController.h"
 #import <Accelerate/Accelerate.h>
 #import <audio/yas_audio_umbrella.h>
+#import <cpp_utils/yas_objc_ptr.h>
+#import <objc_utils/yas_objc_macros.h>
 #import <objc_utils/yas_objc_unowned.h>
 #import <atomic>
 #import "YASDecibelValueTransformer.h"
@@ -127,8 +129,8 @@ namespace yas::sample {
 struct device_vc_internal {
     audio::graph graph = nullptr;
     audio::device_io device_io = nullptr;
-    chaining::any_observer system_observer = nullptr;
-    chaining::any_observer device_observer = nullptr;
+    chaining::any_observer_ptr system_observer = nullptr;
+    chaining::any_observer_ptr device_observer = nullptr;
     sample_kernel_sptr kernel;
 };
 }

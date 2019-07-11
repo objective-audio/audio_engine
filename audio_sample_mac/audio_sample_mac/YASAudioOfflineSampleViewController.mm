@@ -5,6 +5,7 @@
 #import "YASAudioOfflineSampleViewController.h"
 #import <Accelerate/Accelerate.h>
 #import <audio/yas_audio_umbrella.h>
+#import <cpp_utils/yas_objc_ptr.h>
 #import <objc_utils/yas_objc_unowned.h>
 #import <iostream>
 
@@ -127,7 +128,7 @@ struct offline_vc_internal {
     audio::engine::au_mixer offline_au_mixer;
     offline_sample::engine::sine offline_sine;
 
-    chaining::any_observer engine_observer = nullptr;
+    chaining::any_observer_ptr engine_observer = nullptr;
 
     offline_vc_internal() {
         auto format = audio::format({.sample_rate = offline_sample::sample_rate,
