@@ -3,7 +3,9 @@
 //
 
 #import "YASAudioEngineIOSampleViewController.h"
-#import <audio/yas_audio_umbrella.h>
+#import <AVFoundation/AVFoundation.h>
+#import <audio/audio.h>
+#import <cpp_utils/yas_objc_ptr.h>
 #import <objc_utils/yas_objc_unowned.h>
 #import "YASAudioEngineIOSampleSelectionViewController.h"
 #import "YASAudioSliderCell.h"

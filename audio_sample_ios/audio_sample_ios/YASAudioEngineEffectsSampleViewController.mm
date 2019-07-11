@@ -3,6 +3,7 @@
 //
 
 #import "YASAudioEngineEffectsSampleViewController.h"
+#import <AVFoundation/AVFoundation.h>
 #import <audio/yas_audio_umbrella.h>
 #import "YASAudioEngineEffectsSampleEditViewController.h"
 

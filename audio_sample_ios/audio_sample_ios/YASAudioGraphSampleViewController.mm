@@ -3,7 +3,9 @@
 //
 
 #import "YASAudioGraphSampleViewController.h"
+#import <AVFoundation/AVFoundation.h>
 #import <audio/yas_audio_umbrella.h>
+#import <objc_utils/yas_objc_macros.h>
 #import <iostream>
 
 using namespace yas;
@@ -48,7 +50,7 @@ struct graph_vc_internal {
         mixer_unit.set_input_format(format.stream_description(), 0);
         mixer_unit.set_output_format(format.stream_description(), 0);
 
-        auto weak_mixer_unit = weak<audio::unit>(mixer_unit);
+        auto weak_mixer_unit = base::weak<audio::unit>(mixer_unit);
 
         io_unit.set_render_handler([weak_mixer_unit](audio::render_parameters &render_parameters) {
             if (auto mixer_unit = weak_mixer_unit.lock()) {
@@ -56,7 +58,7 @@ struct graph_vc_internal {
             }
         });
 
-        auto weak_io_unit = weak<audio::unit>(io_unit);
+        auto weak_io_unit = base::weak<audio::unit>(io_unit);
 
         mixer_unit.set_render_handler([weak_io_unit](audio::render_parameters &render_parameters) {
             if (auto io_unit = weak_io_unit.lock()) {

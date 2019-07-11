@@ -4,6 +4,7 @@
 
 #import "YASAudioEngineSampleParameterCell.h"
 #import <audio/yas_audio_umbrella.h>
+#import <objc_utils/yas_objc_macros.h>
 
 using namespace yas;
 

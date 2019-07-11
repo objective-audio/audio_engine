@@ -3,7 +3,9 @@
 //
 
 #import "YASAudioEngineRouteSampleViewController.h"
+#import <AVFoundation/AVFoundation.h>
 #import <audio/yas_audio_umbrella.h>
+#import <cpp_utils/yas_objc_ptr.h>
 #import <objc_utils/yas_objc_unowned.h>
 #import "YASAudioEngineRouteSampleSelectionViewController.h"
 #import "YASAudioSliderCell.h"
@@ -38,7 +40,7 @@ struct route_vc_internal {
     audio::engine::route route;
     audio::engine::tap sine_tap;
 
-    chaining::any_observer engine_observer = nullptr;
+    chaining::any_observer_ptr engine_observer = nullptr;
 
     void disconnectNodes() {
         manager.disconnect(au_mixer.au().node());
