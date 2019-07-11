@@ -60,8 +60,8 @@ class node final : public base {
     audio::engine::connection_wmap const &input_connections() const;
     audio::engine::connection_wmap const &output_connections() const;
 
-    audio::format input_format(uint32_t const bus_idx) const;
-    audio::format output_format(uint32_t const bus_idx) const;
+    std::optional<audio::format> input_format(uint32_t const bus_idx) const;
+    std::optional<audio::format> output_format(uint32_t const bus_idx) const;
     bus_result_t next_available_input_bus() const;
     bus_result_t next_available_output_bus() const;
     bool is_available_input_bus(uint32_t const bus_idx) const;

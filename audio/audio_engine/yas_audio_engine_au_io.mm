@@ -129,10 +129,11 @@ struct audio::engine::au_io::impl : base::impl {
     void update_unit_io_connections() {
         auto unit = this->au().unit();
 
-        auto update_channel_map = [](channel_map_t &map, format const &format, uint32_t const dev_ch_count) {
+        auto update_channel_map = [](channel_map_t &map, std::optional<format> const &format,
+                                     uint32_t const dev_ch_count) {
             if (map.size() > 0) {
                 if (format) {
-                    uint32_t const ch_count = format.channel_count();
+                    uint32_t const ch_count = format->channel_count();
                     if (map.size() != ch_count) {
                         map.resize(ch_count, -1);
                     }

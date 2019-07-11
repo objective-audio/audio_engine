@@ -20,9 +20,10 @@ struct audio::device_io::kernel : base {
         pcm_buffer _input_buffer;
         pcm_buffer _output_buffer;
 
-        impl(audio::format const &input_format, audio::format const &output_format, uint32_t const frame_capacity)
-            : _input_buffer(input_format ? pcm_buffer{input_format, frame_capacity} : nullptr),
-              _output_buffer(output_format ? pcm_buffer{output_format, frame_capacity} : nullptr) {
+        impl(std::optional<audio::format> const &input_format, std::optional<audio::format> const &output_format,
+             uint32_t const frame_capacity)
+            : _input_buffer(input_format ? pcm_buffer{*input_format, frame_capacity} : nullptr),
+              _output_buffer(output_format ? pcm_buffer{*output_format, frame_capacity} : nullptr) {
         }
 
         void reset_buffers() {
@@ -36,7 +37,8 @@ struct audio::device_io::kernel : base {
         }
     };
 
-    kernel(audio::format const &input_format, audio::format const &output_format, uint32_t const frame_capacity)
+    kernel(std::optional<audio::format> const &input_format, std::optional<audio::format> const &output_format,
+           uint32_t const frame_capacity)
         : base(std::make_shared<impl>(input_format, output_format, frame_capacity)) {
     }
 

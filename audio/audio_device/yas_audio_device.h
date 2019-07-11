@@ -69,8 +69,8 @@ class device : public base {
     std::vector<stream> output_streams() const;
     double nominal_sample_rate() const;
 
-    audio::format input_format() const;
-    audio::format output_format() const;
+    std::optional<audio::format> input_format() const;
+    std::optional<audio::format> output_format() const;
     uint32_t input_channel_count() const;
     uint32_t output_channel_count() const;
 

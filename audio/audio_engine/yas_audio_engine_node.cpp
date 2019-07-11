@@ -45,18 +45,18 @@ struct audio::engine::node::impl : base::impl, manageable_node::impl, connectabl
         this->update_kernel();
     }
 
-    audio::format input_format(uint32_t const bus_idx) {
+    std::optional<audio::format> input_format(uint32_t const bus_idx) {
         if (auto connection = this->input_connection(bus_idx)) {
             return connection.format();
         }
-        return nullptr;
+        return std::nullopt;
     }
 
-    audio::format output_format(uint32_t const bus_idx) {
+    std::optional<audio::format> output_format(uint32_t const bus_idx) {
         if (auto connection = this->output_connection(bus_idx)) {
             return connection.format();
         }
-        return nullptr;
+        return std::nullopt;
     }
 
     audio::bus_result_t next_available_input_bus() const {
@@ -315,11 +315,11 @@ audio::engine::connection_wmap const &audio::engine::node::output_connections() 
     return impl_ptr<impl>()->output_connections();
 }
 
-audio::format audio::engine::node::input_format(uint32_t const bus_idx) const {
+std::optional<audio::format> audio::engine::node::input_format(uint32_t const bus_idx) const {
     return impl_ptr<impl>()->input_format(bus_idx);
 }
 
-audio::format audio::engine::node::output_format(uint32_t const bus_idx) const {
+std::optional<audio::format> audio::engine::node::output_format(uint32_t const bus_idx) const {
     return impl_ptr<impl>()->output_format(bus_idx);
 }
 

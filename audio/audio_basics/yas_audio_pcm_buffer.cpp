@@ -262,7 +262,7 @@ audio::pcm_buffer::pcm_buffer(std::nullptr_t) : base(nullptr) {
 audio::pcm_buffer::pcm_buffer(audio::format const &format, AudioBufferList *abl)
     : base(std::make_shared<impl>(format, abl,
                                   abl->mBuffers[0].mDataByteSize / format.stream_description().mBytesPerFrame)) {
-    if (!format || !abl) {
+    if (!abl) {
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
     }
 }

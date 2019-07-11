@@ -10,10 +10,7 @@
 #include "yas_audio_types.h"
 
 namespace yas::audio {
-class format final : public base {
-    class impl;
-
-   public:
+struct format final {
     struct args {
         double sample_rate;
         uint32_t channel_count;
@@ -23,10 +20,7 @@ class format final : public base {
 
     explicit format(AudioStreamBasicDescription asbd);
     explicit format(CFDictionaryRef const &settings);
-    format(args args);
-    format(std::nullptr_t);
-
-    virtual ~format();
+    explicit format(args args);
 
     bool is_empty() const;
     bool is_standard() const;
@@ -41,7 +35,13 @@ class format final : public base {
     uint32_t buffer_frame_byte_count() const;
     CFStringRef description() const;
 
-    static format const &null_format();
+    bool operator==(format const &) const;
+    bool operator!=(format const &) const;
+
+   private:
+    AudioStreamBasicDescription _asbd = {0};
+    audio::pcm_format _pcm_format = audio::pcm_format::other;
+    bool _standard = false;
 };
 }  // namespace yas::audio
 

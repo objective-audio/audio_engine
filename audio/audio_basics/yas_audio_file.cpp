@@ -16,8 +16,8 @@ using namespace yas;
 #pragma mark -
 
 struct audio::file::impl : base::impl {
-    format _file_format = nullptr;
-    format _processing_format = nullptr;
+    std::optional<format> _file_format = std::nullopt;
+    std::optional<format> _processing_format = std::nullopt;
     SInt64 _file_frame_position = 0;
     ExtAudioFileRef _ext_audio_file = nullptr;
     yas::url _url;
@@ -33,7 +33,7 @@ struct audio::file::impl : base::impl {
     void set_processing_format(audio::format &&format) {
         this->_processing_format = std::move(format);
         if (this->_ext_audio_file) {
-            ext_audio_file_utils::set_client_format(this->_processing_format.stream_description(),
+            ext_audio_file_utils::set_client_format(this->_processing_format->stream_description(),
                                                     this->_ext_audio_file);
         }
     }
@@ -46,9 +46,13 @@ struct audio::file::impl : base::impl {
     }
 
     int64_t processing_length() {
+        if (!this->_processing_format || !this->_file_format) {
+            return 0;
+        }
+
         auto const fileLength = file_length();
-        auto const rate = this->_processing_format.stream_description().mSampleRate /
-                          this->_file_format.stream_description().mSampleRate;
+        auto const rate = this->_processing_format->stream_description().mSampleRate /
+                          this->_file_format->stream_description().mSampleRate;
         return fileLength * rate;
     }
 
@@ -242,12 +246,12 @@ struct audio::file::impl : base::impl {
 
         this->_file_format = format{asbd};
 
-        this->_processing_format = format{{.sample_rate = _file_format.sample_rate(),
-                                           .channel_count = this->_file_format.channel_count(),
+        this->_processing_format = format{{.sample_rate = _file_format->sample_rate(),
+                                           .channel_count = this->_file_format->channel_count(),
                                            .pcm_format = pcm_format,
                                            .interleaved = interleaved}};
 
-        if (!ext_audio_file_utils::set_client_format(this->_processing_format.stream_description(),
+        if (!ext_audio_file_utils::set_client_format(this->_processing_format->stream_description(),
                                                      this->_ext_audio_file)) {
             this->close();
             return false;
@@ -262,17 +266,17 @@ struct audio::file::impl : base::impl {
         AudioFileTypeID file_type_id = audio::to_audio_file_type_id(this->_file_type);
 
         if (!ext_audio_file_utils::create(&this->_ext_audio_file, this->_url.cf_url(), file_type_id,
-                                          this->_file_format.stream_description())) {
+                                          this->_file_format->stream_description())) {
             this->_ext_audio_file = nullptr;
             return false;
         }
 
-        this->_processing_format = format{{.sample_rate = this->_file_format.sample_rate(),
-                                           .channel_count = this->_file_format.channel_count(),
+        this->_processing_format = format{{.sample_rate = this->_file_format->sample_rate(),
+                                           .channel_count = this->_file_format->channel_count(),
                                            .pcm_format = pcm_format,
                                            .interleaved = interleaved}};
 
-        if (!ext_audio_file_utils::set_client_format(this->_processing_format.stream_description(),
+        if (!ext_audio_file_utils::set_client_format(this->_processing_format->stream_description(),
                                                      this->_ext_audio_file)) {
             this->close();
             return false;
@@ -315,11 +319,11 @@ audio::file_type audio::file::file_type() const {
 }
 
 audio::format const &audio::file::file_format() const {
-    return impl_ptr<impl>()->_file_format;
+    return *impl_ptr<impl>()->_file_format;
 }
 
 audio::format const &audio::file::processing_format() const {
-    return impl_ptr<impl>()->_processing_format;
+    return *impl_ptr<impl>()->_processing_format;
 }
 
 int64_t audio::file::file_length() const {

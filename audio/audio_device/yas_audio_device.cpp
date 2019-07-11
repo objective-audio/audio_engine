@@ -180,7 +180,8 @@ struct audio::device::impl : base::impl {
     std::unordered_map<AudioStreamID, stream> output_streams_map;
     chaining::notifier<audio::device::chaining_pair_t> _notifier;
 
-    impl(AudioDeviceID device_id) : _input_format(nullptr), _output_format(nullptr), _audio_device_id(device_id) {
+    impl(AudioDeviceID device_id)
+        : _input_format(std::nullopt), _output_format(std::nullopt), _audio_device_id(device_id) {
         udpate_streams(kAudioObjectPropertyScopeInput);
         udpate_streams(kAudioObjectPropertyScopeOutput);
         update_format(kAudioObjectPropertyScopeInput);
@@ -201,22 +202,22 @@ struct audio::device::impl : base::impl {
         return false;
     }
 
-    void set_input_format(audio::format const &format) {
+    void set_input_format(std::optional<audio::format> const &format) {
         std::lock_guard<std::recursive_mutex> lock(_mutex);
         _input_format = format;
     }
 
-    audio::format input_format() const {
+    std::optional<audio::format> input_format() const {
         std::lock_guard<std::recursive_mutex> lock(_mutex);
         return _input_format;
     }
 
-    void set_output_format(audio::format const &format) {
+    void set_output_format(std::optional<audio::format> const &format) {
         std::lock_guard<std::recursive_mutex> lock(_mutex);
         _output_format = format;
     }
 
-    audio::format output_format() const {
+    std::optional<audio::format> output_format() const {
         std::lock_guard<std::recursive_mutex> lock(_mutex);
         return _output_format;
     }
@@ -296,13 +297,13 @@ struct audio::device::impl : base::impl {
             auto iterator = input_streams_map.begin();
             if (iterator != input_streams_map.end()) {
                 stream = iterator->second;
-                set_input_format(nullptr);
+                set_input_format(std::nullopt);
             }
         } else if (scope == kAudioObjectPropertyScopeOutput) {
             auto iterator = output_streams_map.begin();
             if (iterator != output_streams_map.end()) {
                 stream = iterator->second;
-                set_output_format(nullptr);
+                set_output_format(std::nullopt);
             }
         }
 
@@ -335,8 +336,8 @@ struct audio::device::impl : base::impl {
     }
 
    private:
-    audio::format _input_format;
-    audio::format _output_format;
+    std::optional<audio::format> _input_format = std::nullopt;
+    std::optional<audio::format> _output_format = std::nullopt;
     mutable std::recursive_mutex _mutex;
 };
 
@@ -472,24 +473,24 @@ double audio::device::nominal_sample_rate() const {
     return 0;
 }
 
-audio::format audio::device::input_format() const {
+std::optional<audio::format> audio::device::input_format() const {
     return impl_ptr<impl>()->input_format();
 }
 
-audio::format audio::device::output_format() const {
+std::optional<audio::format> audio::device::output_format() const {
     return impl_ptr<impl>()->output_format();
 }
 
 uint32_t audio::device::input_channel_count() const {
     if (auto input_format = impl_ptr<impl>()->input_format()) {
-        return input_format.channel_count();
+        return input_format->channel_count();
     }
     return 0;
 }
 
 uint32_t audio::device::output_channel_count() const {
     if (auto output_format = impl_ptr<impl>()->output_format()) {
-        return output_format.channel_count();
+        return output_format->channel_count();
     }
     return 0;
 }
