@@ -145,7 +145,7 @@ static void setupDirectory() {
                                                      .settings = audio::wave_file_settings(48000.0, 2, 16)});
         XCTAssertTrue(file_result);
 
-        auto file = file_result.value();
+        auto const &file = file_result.value();
 
         XCTAssertEqual(file.url(), file_url);
         XCTAssertEqual(file.file_type(), audio::file_type::wave);
@@ -161,7 +161,7 @@ static void setupDirectory() {
         auto file_result = audio::make_opened_file({.file_url = file_url});
         XCTAssertTrue(file_result);
 
-        auto file = file_result.value();
+        auto const &file = file_result.value();
 
         XCTAssertEqual(file.url(), file_url);
         XCTAssertEqual(file.file_type(), audio::file_type::wave);

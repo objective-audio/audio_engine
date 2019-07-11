@@ -9,6 +9,7 @@
 #include <cpp_utils/yas_url.h>
 #include <ostream>
 #include "yas_audio_file_utils.h"
+#include "yas_audio_format.h"
 #include "yas_audio_types.h"
 
 namespace yas {
@@ -17,13 +18,9 @@ class result;
 }
 
 namespace yas::audio {
-class format;
 class pcm_buffer;
 
-class file final : public base {
-    class impl;
-
-   public:
+struct file final {
     struct open_args {
         url file_url;
         audio::pcm_format pcm_format = pcm_format::float32;
@@ -75,9 +72,10 @@ class file final : public base {
     using make_created_result_t = result<audio::file, create_error_t>;
 
     file();
-    file(std::nullptr_t);
+    ~file();
 
-    virtual ~file();
+    file(file &&) = default;
+    file &operator=(file &&) = default;
 
     open_result_t open(open_args);
     create_result_t create(create_args);
@@ -97,6 +95,20 @@ class file final : public base {
 
     read_result_t read_into_buffer(audio::pcm_buffer &buffer, uint32_t const frame_length = 0);
     write_result_t write_from_buffer(audio::pcm_buffer const &buffer, bool const async = false);
+
+   private:
+    std::optional<format> _file_format = std::nullopt;
+    std::optional<format> _processing_format = std::nullopt;
+    int64_t _file_frame_position = 0;
+    ExtAudioFileRef _ext_audio_file = nullptr;
+    yas::url _url = nullptr;
+    audio::file_type _file_type;
+
+    bool _open_ext_audio_file(pcm_format const pcm_format, bool const interleaved);
+    bool _create_ext_audio_file(CFDictionaryRef const &settings, pcm_format const pcm_format, bool const interleaved);
+
+    file(file const &) = delete;
+    file &operator=(file const &) = delete;
 };
 
 file::make_opened_result_t make_opened_file(file::open_args);
