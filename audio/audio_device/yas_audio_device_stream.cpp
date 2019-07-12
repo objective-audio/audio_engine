@@ -39,11 +39,10 @@ audio::device::stream::change_info::change_info(std::vector<property_info> &&inf
 
 #pragma mark - private
 
-struct audio::device::stream::impl : base::impl {
+struct audio::device::stream::impl : weakable_impl {
     using listener_f =
         std::function<void(uint32_t const in_number_addresses, const AudioObjectPropertyAddress *const in_addresses)>;
 
-   public:
     AudioStreamID _stream_id;
     AudioDeviceID _device_id;
     chaining::notifier<chaining_pair_t> _notifier;
@@ -51,7 +50,7 @@ struct audio::device::stream::impl : base::impl {
     impl(AudioStreamID const stream_id, AudioDeviceID const device_id) : _stream_id(stream_id), _device_id(device_id) {
     }
 
-    bool is_equal(std::shared_ptr<base::impl> const &rhs) const override {
+    bool is_equal(std::shared_ptr<base::impl> const &rhs) const {
         if (auto casted_rhs = std::dynamic_pointer_cast<audio::device::stream::impl>(rhs)) {
             return this->_stream_id == casted_rhs->_stream_id;
         }
@@ -63,7 +62,7 @@ struct audio::device::stream::impl : base::impl {
 
         return [weak_stream](uint32_t const address_count, const AudioObjectPropertyAddress *const addresses) {
             if (auto stream = weak_stream.lock()) {
-                AudioStreamID const object_id = stream.stream_id();
+                AudioStreamID const object_id = stream->stream_id();
                 std::vector<property_info> infos;
                 for (uint32_t i = 0; i < address_count; i++) {
                     if (addresses[i].mSelector == kAudioStreamPropertyVirtualFormat) {
@@ -80,7 +79,7 @@ struct audio::device::stream::impl : base::impl {
                     }
                 }
                 change_info change_info{std::move(infos)};
-                stream.impl_ptr<impl>()->_notifier.notify(std::make_pair(method::did_change, change_info));
+                stream->_impl->_notifier.notify(std::make_pair(method::did_change, change_info));
             }
         };
     }
@@ -100,23 +99,22 @@ struct audio::device::stream::impl : base::impl {
 
 #pragma mark - main
 
-audio::device::stream::stream(args args) : base(std::make_shared<impl>(args.stream_id, args.device_id)) {
-    auto imp = impl_ptr<impl>();
-    auto listener = imp->listener(*this);
-    imp->add_listener(kAudioStreamPropertyVirtualFormat, listener);
-    imp->add_listener(kAudioStreamPropertyIsActive, listener);
-    imp->add_listener(kAudioStreamPropertyStartingChannel, listener);
+audio::device::stream::stream(args args) : _impl(std::make_shared<impl>(args.stream_id, args.device_id)) {
+    auto listener = this->_impl->listener(*this);
+    this->_impl->add_listener(kAudioStreamPropertyVirtualFormat, listener);
+    this->_impl->add_listener(kAudioStreamPropertyIsActive, listener);
+    this->_impl->add_listener(kAudioStreamPropertyStartingChannel, listener);
 }
 
-audio::device::stream::stream(std::nullptr_t) : base(nullptr) {
+audio::device::stream::stream(std::shared_ptr<impl> &&impl) : _impl(std::move(impl)) {
 }
 
 AudioStreamID audio::device::stream::stream_id() const {
-    return impl_ptr<impl>()->_stream_id;
+    return this->_impl->_stream_id;
 }
 
 audio::device audio::device::stream::device() const {
-    return device::device_for_id(impl_ptr<impl>()->_device_id);
+    return device::device_for_id(this->_impl->_device_id);
 }
 
 bool audio::device::stream::is_active() const {
@@ -154,15 +152,26 @@ uint32_t audio::device::stream::starting_channel() const {
 }
 
 chaining::chain_unsync_t<audio::device::stream::chaining_pair_t> audio::device::stream::chain() const {
-    return impl_ptr<impl>()->_notifier.chain();
+    return this->_impl->_notifier.chain();
 }
 
 chaining::chain_relayed_unsync_t<audio::device::stream::change_info, audio::device::stream::chaining_pair_t>
 audio::device::stream::chain(method const method) const {
-    return impl_ptr<impl>()
-        ->_notifier.chain()
+    return this->_impl->_notifier.chain()
         .guard([method](auto const &pair) { return pair.first == method; })
         .to([](audio::device::stream::chaining_pair_t const &pair) { return pair.second; });
+}
+
+bool audio::device::stream::operator==(stream const &rhs) const {
+    return this->stream_id() == rhs.stream_id();
+}
+
+bool audio::device::stream::operator!=(stream const &rhs) const {
+    return !(*this == rhs);
+}
+
+std::shared_ptr<weakable_impl> audio::device::stream::weakable_impl_ptr() const {
+    return this->_impl;
 }
 
 std::string yas::to_string(audio::device::stream::method const &method) {

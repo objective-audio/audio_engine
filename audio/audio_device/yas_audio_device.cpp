@@ -291,7 +291,7 @@ struct audio::device::impl : base::impl {
     }
 
     void update_format(AudioObjectPropertyScope const scope) {
-        stream stream = nullptr;
+        std::optional<stream> stream = std::nullopt;
 
         if (scope == kAudioObjectPropertyScopeInput) {
             auto iterator = input_streams_map.begin();
@@ -311,7 +311,7 @@ struct audio::device::impl : base::impl {
             return;
         }
 
-        auto stream_format = stream.virtual_format();
+        auto stream_format = stream->virtual_format();
 
         auto data = _property_data<AudioBufferList>(_audio_device_id, kAudioDevicePropertyStreamConfiguration, scope);
         if (data) {

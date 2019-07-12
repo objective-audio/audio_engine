@@ -8,14 +8,14 @@
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
 
+#import <cpp_utils/yas_weakable.h>
 #include <ostream>
 #import "yas_audio_device.h"
 
 namespace yas::audio {
-class device::stream : public base {
+struct device::stream : weakable<device::stream> {
     class impl;
 
-   public:
     enum class property : uint32_t {
         virtual_format = 0,
         is_active,
@@ -45,8 +45,8 @@ class device::stream : public base {
         AudioDeviceID device_id;
     };
 
-    stream(args args);
-    stream(std::nullptr_t);
+    explicit stream(args args);
+    explicit stream(std::shared_ptr<impl> &&);
 
     AudioStreamID stream_id() const;
     audio::device device() const;
@@ -58,7 +58,14 @@ class device::stream : public base {
     [[nodiscard]] chaining::chain_unsync_t<chaining_pair_t> chain() const;
     [[nodiscard]] chaining::chain_relayed_unsync_t<change_info, chaining_pair_t> chain(method const) const;
 
+    bool operator==(stream const &) const;
+    bool operator!=(stream const &) const;
+
+    std::shared_ptr<weakable_impl> weakable_impl_ptr() const override;
+
    private:
+    std::shared_ptr<impl> _impl;
+
     template <typename T>
     std::unique_ptr<std::vector<T>> _property_data(AudioStreamID const stream_id,
                                                    AudioObjectPropertySelector const selector) const;
