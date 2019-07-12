@@ -62,26 +62,27 @@ class kernel {
         return _sine_volume.load();
     }
 
-    void process(const audio::pcm_buffer &input_buffer, audio::pcm_buffer &output_buffer) {
+    void process(std::shared_ptr<audio::pcm_buffer> const &input_buffer,
+                 std::shared_ptr<audio::pcm_buffer> &output_buffer) {
         if (!output_buffer) {
             return;
         }
 
-        uint32_t const frame_length = output_buffer.frame_length();
+        uint32_t const frame_length = output_buffer->frame_length();
 
         if (frame_length == 0) {
             return;
         }
 
-        auto const &format = output_buffer.format();
+        auto const &format = output_buffer->format();
         if (format.pcm_format() == audio::pcm_format::float32 && format.stride() == 1) {
             if (input_buffer) {
-                if (input_buffer.frame_length() >= frame_length) {
-                    output_buffer.copy_from(input_buffer);
+                if (input_buffer->frame_length() >= frame_length) {
+                    output_buffer->copy_from(*input_buffer);
 
                     float const throughVol = through_volume();
 
-                    auto each = audio::make_each_data<float>(output_buffer);
+                    auto each = audio::make_each_data<float>(*output_buffer);
                     while (yas_each_data_next_ch(each)) {
                         cblas_sscal(frame_length, throughVol, yas_each_data_ptr(each), 1);
                     }
@@ -97,7 +98,7 @@ class kernel {
                 _phase = audio::math::fill_sine(&_sine_data[0], frame_length, start_phase,
                                                 freq / sample_rate * audio::math::two_pi);
 
-                auto each = audio::make_each_data<float>(output_buffer);
+                auto each = audio::make_each_data<float>(*output_buffer);
                 while (yas_each_data_next_ch(each)) {
                     cblas_saxpy(frame_length, sine_vol, &_sine_data[0], 1, yas_each_data_ptr(each), 1);
                 }
