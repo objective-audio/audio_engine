@@ -43,7 +43,6 @@ struct file final {
 
     enum class read_error_t : uint32_t {
         closed,
-        invalid_argument,
         invalid_format,
         read_failed,
         tell_failed,
@@ -58,7 +57,6 @@ struct file final {
 
     enum class write_error_t : uint32_t {
         closed,
-        invalid_argument,
         invalid_format,
         write_failed,
         tell_failed,

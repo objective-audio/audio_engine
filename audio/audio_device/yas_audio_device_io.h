@@ -19,7 +19,7 @@ class device;
 class device_io : public base {
    public:
     struct render_args {
-        audio::pcm_buffer &output_buffer;
+        std::shared_ptr<audio::pcm_buffer> &output_buffer;
         std::optional<audio::time> const when;
     };
 
@@ -38,7 +38,7 @@ class device_io : public base {
     void start() const;
     void stop() const;
 
-    audio::pcm_buffer const &input_buffer_on_render() const;
+    std::shared_ptr<pcm_buffer> &input_buffer_on_render();
     std::shared_ptr<audio::time> const &input_time_on_render() const;
 
    private:

@@ -128,10 +128,6 @@ audio::file::read_result_t audio::file::read_into_buffer(audio::pcm_buffer &buff
         return read_result_t(read_error_t::closed);
     }
 
-    if (!buffer) {
-        return read_result_t(read_error_t::invalid_argument);
-    }
-
     if (buffer.format() != this->_processing_format) {
         return read_result_t(read_error_t::invalid_format);
     }
@@ -198,10 +194,6 @@ audio::file::read_result_t audio::file::read_into_buffer(audio::pcm_buffer &buff
 audio::file::write_result_t audio::file::write_from_buffer(audio::pcm_buffer const &buffer, bool const async) {
     if (!this->_ext_audio_file) {
         return write_result_t(write_error_t::closed);
-    }
-
-    if (!buffer) {
-        return write_result_t(write_error_t::invalid_argument);
     }
 
     if (buffer.format() != this->_processing_format) {
@@ -332,8 +324,6 @@ std::string yas::to_string(audio::file::read_error_t const &error_t) {
     switch (error_t) {
         case audio::file::read_error_t::closed:
             return "closed";
-        case audio::file::read_error_t::invalid_argument:
-            return "invalid_argument";
         case audio::file::read_error_t::invalid_format:
             return "invalid_format";
         case audio::file::read_error_t::read_failed:
@@ -360,8 +350,6 @@ std::string yas::to_string(audio::file::write_error_t const &error_t) {
     switch (error_t) {
         case audio::file::write_error_t::closed:
             return "closed";
-        case audio::file::write_error_t::invalid_argument:
-            return "invalid_argument";
         case audio::file::write_error_t::invalid_format:
             return "invalid_format";
         case audio::file::write_error_t::write_failed:

@@ -295,46 +295,46 @@ struct yas::audio::engine::au_input::impl : base::impl {
         if (auto out_connection = _au_io.au().node().output_connection(1)) {
             unit.attach_input_callback();
 
-            pcm_buffer input_buffer(out_connection.format(), 4096);
-            _input_buffer = input_buffer;
+            this->_input_buffer = std::make_shared<pcm_buffer>(out_connection.format(), 4096);
 
             auto weak_au_input = to_weak(cast<au_input>());
-            unit.set_input_handler([weak_au_input, input_buffer](render_parameters &render_parameters) mutable {
-                auto au_input = weak_au_input.lock();
-                if (au_input && render_parameters.in_number_frames <= input_buffer.frame_capacity()) {
-                    input_buffer.set_frame_length(render_parameters.in_number_frames);
-                    render_parameters.io_data = input_buffer.audio_buffer_list();
+            unit.set_input_handler(
+                [weak_au_input, input_buffer = this->_input_buffer](render_parameters &render_parameters) mutable {
+                    auto au_input = weak_au_input.lock();
+                    if (au_input && render_parameters.in_number_frames <= input_buffer->frame_capacity()) {
+                        input_buffer->set_frame_length(render_parameters.in_number_frames);
+                        render_parameters.io_data = input_buffer->audio_buffer_list();
 
-                    if (auto const kernel = au_input.au_io().au().node().kernel()) {
-                        if (auto const connection = kernel.output_connection(1)) {
-                            auto format = connection.format();
-                            time time(*render_parameters.io_time_stamp, format.sample_rate());
-                            au_input.au_io().au().node().set_render_time_on_render(time);
+                        if (auto const kernel = au_input.au_io().au().node().kernel()) {
+                            if (auto const connection = kernel.output_connection(1)) {
+                                auto format = connection.format();
+                                time time(*render_parameters.io_time_stamp, format.sample_rate());
+                                au_input.au_io().au().node().set_render_time_on_render(time);
 
-                            if (auto io_unit = au_input.au_io().au().unit()) {
-                                render_parameters.in_bus_number = 1;
-                                io_unit.raw_unit_render(render_parameters);
-                            }
+                                if (auto io_unit = au_input.au_io().au().unit()) {
+                                    render_parameters.in_bus_number = 1;
+                                    io_unit.raw_unit_render(render_parameters);
+                                }
 
-                            auto dst_node = connection.destination_node();
+                                auto dst_node = connection.destination_node();
 
-                            if (dst_node.is_input_renderable()) {
-                                dst_node.render({.buffer = input_buffer, .bus_idx = 0, .when = time});
+                                if (dst_node.is_input_renderable()) {
+                                    dst_node.render({.buffer = *input_buffer, .bus_idx = 0, .when = time});
+                                }
                             }
                         }
                     }
-                }
-            });
+                });
         } else {
             unit.detach_input_callback();
             unit.set_input_handler(nullptr);
-            _input_buffer = nullptr;
+            this->_input_buffer = nullptr;
         }
     }
 
     audio::engine::au_io _au_io;
 
-    pcm_buffer _input_buffer = nullptr;
+    std::shared_ptr<pcm_buffer> _input_buffer = nullptr;
     chaining::any_observer_ptr _connections_observer = nullptr;
 };
 

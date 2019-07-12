@@ -42,7 +42,7 @@ struct audio::engine::offline_output::impl : base::impl, manageable_offline_outp
                 }
             }
 
-            audio::pcm_buffer render_buffer(connection.format(), 1024);
+            auto render_buffer = std::make_shared<audio::pcm_buffer>(connection.format(), 1024);
 
             auto weak_output = to_weak(cast<offline_output>());
             auto task_lambda = [weak_output, render_buffer, render_handler = std::move(render_handler),
@@ -52,7 +52,7 @@ struct audio::engine::offline_output::impl : base::impl, manageable_offline_outp
                 bool stop = false;
 
                 while (!stop) {
-                    audio::time when(current_sample_time, render_buffer.format().sample_rate());
+                    audio::time when(current_sample_time, render_buffer->format().sample_rate());
                     auto output = weak_output.lock();
                     if (!output) {
                         cancelled = true;
@@ -72,20 +72,20 @@ struct audio::engine::offline_output::impl : base::impl, manageable_offline_outp
                     }
 
                     auto format = connection_on_block.format();
-                    if (format != render_buffer.format()) {
+                    if (format != render_buffer->format()) {
                         cancelled = true;
                         break;
                     }
 
-                    render_buffer.reset();
+                    render_buffer->reset();
 
                     if (auto src_node = connection_on_block.source_node()) {
                         src_node.render(
-                            {.buffer = render_buffer, .bus_idx = connection_on_block.source_bus(), .when = when});
+                            {.buffer = *render_buffer, .bus_idx = connection_on_block.source_bus(), .when = when});
                     }
 
                     if (render_handler) {
-                        if (render_handler({.buffer = render_buffer, .when = when}) == continuation::abort) {
+                        if (render_handler({.buffer = *render_buffer, .when = when}) == continuation::abort) {
                             break;
                         }
                     }

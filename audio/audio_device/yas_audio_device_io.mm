@@ -17,22 +17,22 @@ using namespace yas;
 
 struct audio::device_io::kernel : base {
     struct impl : base::impl {
-        pcm_buffer _input_buffer;
-        pcm_buffer _output_buffer;
+        std::shared_ptr<pcm_buffer> _input_buffer;
+        std::shared_ptr<pcm_buffer> _output_buffer;
 
         impl(std::optional<audio::format> const &input_format, std::optional<audio::format> const &output_format,
              uint32_t const frame_capacity)
-            : _input_buffer(input_format ? pcm_buffer{*input_format, frame_capacity} : nullptr),
-              _output_buffer(output_format ? pcm_buffer{*output_format, frame_capacity} : nullptr) {
+            : _input_buffer(input_format ? std::make_shared<pcm_buffer>(*input_format, frame_capacity) : nullptr),
+              _output_buffer(output_format ? std::make_shared<pcm_buffer>(*output_format, frame_capacity) : nullptr) {
         }
 
         void reset_buffers() {
             if (this->_input_buffer) {
-                this->_input_buffer.reset();
+                this->_input_buffer->reset();
             }
 
             if (this->_output_buffer) {
-                this->_output_buffer.reset();
+                this->_output_buffer->reset();
             }
         }
     };
@@ -45,11 +45,11 @@ struct audio::device_io::kernel : base {
     kernel(std::nullptr_t) : base(nullptr) {
     }
 
-    pcm_buffer &input_buffer() {
+    std::shared_ptr<pcm_buffer> &input_buffer() {
         return impl_ptr<impl>()->_input_buffer;
     }
 
-    pcm_buffer &output_buffer() {
+    std::shared_ptr<pcm_buffer> &output_buffer() {
         return impl_ptr<impl>()->_output_buffer;
     }
 
@@ -63,7 +63,7 @@ struct audio::device_io::impl : base::impl {
     audio::device _device = nullptr;
     bool _is_running = false;
     AudioDeviceIOProcID _io_proc_id = nullptr;
-    pcm_buffer _input_buffer_on_render = nullptr;
+    std::shared_ptr<pcm_buffer> _input_buffer_on_render = nullptr;
     std::shared_ptr<audio::time> _input_time_on_render = nullptr;
     chaining::any_observer_ptr _device_system_observer = nullptr;
     std::unordered_map<std::uintptr_t, chaining::any_observer_ptr> _device_observers;
@@ -150,13 +150,13 @@ struct audio::device_io::impl : base::impl {
                     kernel.reset_buffers();
                     if (inInputData) {
                         if (auto &input_buffer = kernel.input_buffer()) {
-                            input_buffer.copy_from(inInputData);
+                            input_buffer->copy_from(inInputData);
 
-                            uint32_t const input_frame_length = input_buffer.frame_length();
+                            uint32_t const input_frame_length = input_buffer->frame_length();
                             if (input_frame_length > 0) {
                                 imp->_input_buffer_on_render = input_buffer;
                                 imp->_input_time_on_render =
-                                    std::make_shared<audio::time>(*inInputTime, input_buffer.format().sample_rate());
+                                    std::make_shared<audio::time>(*inInputTime, input_buffer->format().sample_rate());
                             }
                         }
                     }
@@ -165,17 +165,17 @@ struct audio::device_io::impl : base::impl {
                         if (auto &output_buffer = kernel.output_buffer()) {
                             if (outOutputData) {
                                 uint32_t const frame_length =
-                                    audio::frame_length(outOutputData, output_buffer.format().sample_byte_count());
+                                    audio::frame_length(outOutputData, output_buffer->format().sample_byte_count());
                                 if (frame_length > 0) {
-                                    output_buffer.set_frame_length(frame_length);
-                                    audio::time time(*inOutputTime, output_buffer.format().sample_rate());
+                                    output_buffer->set_frame_length(frame_length);
+                                    audio::time time(*inOutputTime, output_buffer->format().sample_rate());
                                     render_handler(
                                         render_args{.output_buffer = output_buffer, .when = std::move(time)});
-                                    output_buffer.copy_to(outOutputData);
+                                    output_buffer->copy_to(outOutputData);
                                 }
                             }
                         } else if (kernel.input_buffer()) {
-                            pcm_buffer null_buffer{nullptr};
+                            std::shared_ptr<pcm_buffer> null_buffer{nullptr};
                             render_handler(render_args{.output_buffer = null_buffer, .when = std::nullopt});
                         }
                     }
@@ -336,7 +336,7 @@ void audio::device_io::stop() const {
     impl_ptr<impl>()->stop();
 }
 
-audio::pcm_buffer const &audio::device_io::input_buffer_on_render() const {
+std::shared_ptr<audio::pcm_buffer> &audio::device_io::input_buffer_on_render() {
     return impl_ptr<impl>()->_input_buffer_on_render;
 }
 

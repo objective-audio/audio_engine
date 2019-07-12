@@ -116,8 +116,8 @@ using namespace yas;
     XCTestExpectation *render_expectation = [self expectationWithDescription:@"node render"];
 
     auto lambda = [self, node, time, render_expectation]() mutable {
-        audio::pcm_buffer null_buffer{nullptr};
-        node.render({.buffer = null_buffer, .bus_idx = 0, .when = time});
+        std::shared_ptr<audio::pcm_buffer> null_buffer{nullptr};
+        node.render({.buffer = *null_buffer, .bus_idx = 0, .when = time});
         [render_expectation fulfill];
     };
 

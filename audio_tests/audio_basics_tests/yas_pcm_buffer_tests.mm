@@ -1112,15 +1112,14 @@ using namespace yas;
     XCTAssertTrue(to_string(audio::pcm_buffer::copy_error_t::invalid_abl) == "invalid_abl");
     XCTAssertTrue(to_string(audio::pcm_buffer::copy_error_t::invalid_format) == "invalid_format");
     XCTAssertTrue(to_string(audio::pcm_buffer::copy_error_t::out_of_range_frame) == "out_of_range_frame");
-    XCTAssertTrue(to_string(audio::pcm_buffer::copy_error_t::buffer_is_null) == "buffer_is_null");
     XCTAssertTrue(to_string(audio::pcm_buffer::copy_error_t::out_of_range_channel) == "out_of_range_channel");
 }
 
 - (void)test_copy_error_ostream {
-    auto const errors = {
-        audio::pcm_buffer::copy_error_t::invalid_argument, audio::pcm_buffer::copy_error_t::invalid_abl,
-        audio::pcm_buffer::copy_error_t::invalid_format,   audio::pcm_buffer::copy_error_t::out_of_range_frame,
-        audio::pcm_buffer::copy_error_t::buffer_is_null,   audio::pcm_buffer::copy_error_t::out_of_range_channel};
+    auto const errors = {audio::pcm_buffer::copy_error_t::invalid_argument,
+                         audio::pcm_buffer::copy_error_t::invalid_abl, audio::pcm_buffer::copy_error_t::invalid_format,
+                         audio::pcm_buffer::copy_error_t::out_of_range_frame,
+                         audio::pcm_buffer::copy_error_t::out_of_range_channel};
 
     for (auto const &error : errors) {
         std::ostringstream stream;
