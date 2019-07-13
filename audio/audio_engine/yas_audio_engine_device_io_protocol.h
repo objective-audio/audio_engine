@@ -15,7 +15,7 @@ struct manageable_device_io : protocol {
     struct impl : protocol::impl {
         virtual void add_device_io() = 0;
         virtual void remove_device_io() = 0;
-        virtual audio::device_io &device_io() = 0;
+        virtual std::shared_ptr<audio::device_io> &device_io() = 0;
     };
 
     explicit manageable_device_io(std::shared_ptr<impl>);
@@ -23,6 +23,6 @@ struct manageable_device_io : protocol {
 
     void add_device_io();
     void remove_device_io();
-    audio::device_io &device_io() const;
+    std::shared_ptr<audio::device_io> &device_io() const;
 };
 }  // namespace yas::audio::engine

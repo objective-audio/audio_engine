@@ -58,8 +58,8 @@ struct audio::device_io::kernel : base {
     }
 };
 
-struct audio::device_io::impl : base::impl {
-    weak<device_io> _weak_device_io;
+struct audio::device_io::impl : weakable_impl {
+    std::optional<weak_ref<device_io>> _weak_device_io = std::nullopt;
     std::shared_ptr<audio::device> _device = nullptr;
     bool _is_running = false;
     AudioDeviceIOProcID _io_proc_id = nullptr;
@@ -82,7 +82,7 @@ struct audio::device_io::impl : base::impl {
 
         this->_device_system_observer =
             device::system_chain(device::system_method::hardware_did_change)
-                .perform([weak_device_io = _weak_device_io](auto const &) {
+                .perform([weak_device_io = this->_weak_device_io](auto const &) {
                     if (auto device_io = weak_device_io.lock()) {
                         if (device_io.device() && !device::device_for_id(device_io.device()->audio_device_id())) {
                             device_io.set_device(nullptr);
@@ -342,6 +342,10 @@ std::shared_ptr<audio::pcm_buffer> &audio::device_io::input_buffer_on_render() {
 
 std::shared_ptr<audio::time> const &audio::device_io::input_time_on_render() const {
     return impl_ptr<impl>()->_input_time_on_render;
+}
+
+std::shared_ptr<weakable_impl> audio::device_io::weakable_impl_ptr() const {
+    return this->_impl;
 }
 
 #endif

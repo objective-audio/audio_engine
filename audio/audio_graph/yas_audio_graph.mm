@@ -235,7 +235,7 @@ struct audio::graph::impl : base::impl {
         }
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
         for (auto &device_io : this->_device_ios) {
-            device_io.start();
+            device_io->start();
         }
 #endif
     }
@@ -247,24 +247,24 @@ struct audio::graph::impl : base::impl {
         }
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
         for (auto &device_io : this->_device_ios) {
-            device_io.stop();
+            device_io->stop();
         }
 #endif
     }
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
-    void add_audio_device_io(device_io &device_io) {
+    void add_audio_device_io(std::shared_ptr<device_io> &device_io) {
         {
             std::lock_guard<std::recursive_mutex> lock(_mutex);
             this->_device_ios.insert(device_io);
         }
         if (this->_running && !this->is_interrupting()) {
-            device_io.start();
+            device_io->start();
         }
     }
 
-    void remove_audio_device_io(device_io &device_io) {
-        device_io.stop();
+    void remove_audio_device_io(std::shared_ptr<device_io> &device_io) {
+        device_io->stop();
         {
             std::lock_guard<std::recursive_mutex> lock(_mutex);
             this->_device_ios.erase(device_io);
@@ -301,7 +301,7 @@ struct audio::graph::impl : base::impl {
     std::map<uint16_t, unit> _units;
     std::map<uint16_t, unit> _io_units;
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
-    std::unordered_set<device_io> _device_ios;
+    std::unordered_set<std::shared_ptr<device_io>> _device_ios;
 #endif
 };
 
@@ -332,11 +332,11 @@ void audio::graph::remove_all_units() {
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
 
-void audio::graph::add_audio_device_io(device_io &device_io) {
+void audio::graph::add_audio_device_io(std::shared_ptr<device_io> &device_io) {
     impl_ptr<impl>()->add_audio_device_io(device_io);
 }
 
-void audio::graph::remove_audio_device_io(device_io &device_io) {
+void audio::graph::remove_audio_device_io(std::shared_ptr<device_io> &device_io) {
     impl_ptr<impl>()->remove_audio_device_io(device_io);
 }
 

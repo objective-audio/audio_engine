@@ -20,6 +20,6 @@ void audio::engine::manageable_device_io::remove_device_io() {
     impl_ptr<impl>()->remove_device_io();
 }
 
-audio::device_io &audio::engine::manageable_device_io::device_io() const {
+std::shared_ptr<audio::device_io> &audio::engine::manageable_device_io::device_io() const {
     return impl_ptr<impl>()->device_io();
 }

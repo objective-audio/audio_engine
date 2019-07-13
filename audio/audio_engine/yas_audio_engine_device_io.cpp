@@ -34,7 +34,7 @@ struct audio::engine::device_io::impl final : base::impl, manageable_device_io::
 
             if (auto engine_device_io = weak_engine_device_io.lock();
                 auto &device_io = engine_device_io.impl_ptr<impl>()->device_io()) {
-                auto &input_buffer = device_io.input_buffer_on_render();
+                auto &input_buffer = device_io->input_buffer_on_render();
                 if (input_buffer && input_buffer->format() == buffer.format()) {
                     buffer.copy_from(*input_buffer);
                 }
@@ -51,14 +51,14 @@ struct audio::engine::device_io::impl final : base::impl, manageable_device_io::
     }
 
     void add_device_io() override {
-        this->_core._device_io = audio::device_io{_core.device()};
+        this->_core._device_io = std::make_shared<audio::device_io>(this->_core.device());
     }
 
     void remove_device_io() override {
         this->_core._device_io = nullptr;
     }
 
-    audio::device_io &device_io() override {
+    std::shared_ptr<audio::device_io> &device_io() override {
         return this->_core._device_io;
     }
 
@@ -72,12 +72,12 @@ struct audio::engine::device_io::impl final : base::impl, manageable_device_io::
 
    private:
     struct core {
-        audio::device_io _device_io = nullptr;
+        std::shared_ptr<audio::device_io> _device_io = nullptr;
 
         void set_device(std::shared_ptr<audio::device> const &device) {
             this->_device = device;
             if (this->_device_io) {
-                this->_device_io.set_device(device);
+                this->_device_io->set_device(device);
             }
         }
 
@@ -98,7 +98,7 @@ struct audio::engine::device_io::impl final : base::impl, manageable_device_io::
         }
 
         if (!this->_validate_connections()) {
-            device_io.set_render_handler(nullptr);
+            device_io->set_render_handler(nullptr);
             return;
         }
 
@@ -126,8 +126,8 @@ struct audio::engine::device_io::impl final : base::impl, manageable_device_io::
                         if (connections.count(0) > 0) {
                             auto const &connection = connections.at(0);
                             if (auto dst_node = connection.destination_node(); dst_node.is_input_renderable()) {
-                                auto &input_buffer = device_io.input_buffer_on_render();
-                                auto const &input_time = device_io.input_time_on_render();
+                                auto &input_buffer = device_io->input_buffer_on_render();
+                                auto const &input_time = device_io->input_time_on_render();
                                 if (input_buffer && input_time) {
                                     if (connection.format() == dst_node.input_format(connection.destination_bus())) {
                                         dst_node.render({.buffer = *input_buffer, .bus_idx = 0, .when = *input_time});
@@ -140,7 +140,7 @@ struct audio::engine::device_io::impl final : base::impl, manageable_device_io::
             }
         };
 
-        device_io.set_render_handler(std::move(render_handler));
+        device_io->set_render_handler(std::move(render_handler));
     }
 
     bool _validate_connections() {
@@ -151,7 +151,7 @@ struct audio::engine::device_io::impl final : base::impl, manageable_device_io::
                 if (connections.count(0) > 0) {
                     auto const &connection = connections.at(0);
                     auto const &connection_format = connection.format();
-                    auto const &device_format = device_io.device()->output_format();
+                    auto const &device_format = device_io->device()->output_format();
                     if (connection_format != device_format) {
                         std::cout << __PRETTY_FUNCTION__ << " : output device io format is not match." << std::endl;
                         return false;
@@ -165,7 +165,7 @@ struct audio::engine::device_io::impl final : base::impl, manageable_device_io::
                 if (connections.count(0) > 0) {
                     auto const &connection = connections.at(0);
                     auto const &connection_format = connection.format();
-                    auto const &device_format = device_io.device()->input_format();
+                    auto const &device_format = device_io->device()->input_format();
                     if (connection_format != device_format) {
                         std::cout << __PRETTY_FUNCTION__ << " : input device io format is not match." << std::endl;
                         return false;
