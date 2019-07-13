@@ -9,16 +9,16 @@ using namespace yas;
 
 audio::unit::parameter::parameter(AudioUnitParameterInfo const &info, AudioUnitParameterID const parameter_id,
                                   AudioUnitScope const scope)
-: _parameter_id(parameter_id),
-_scope(scope),
-_has_clump(info.flags & kAudioUnitParameterFlag_HasClump),
-_clump_id(info.clumpID),
-_unit(info.unit),
-_min_value(info.minValue),
-_max_value(info.maxValue),
-_default_value(info.defaultValue),
-_unit_name(to_string(info.unitName)),
-_name(to_string(info.cfNameString)) {
+    : _parameter_id(parameter_id),
+      _scope(scope),
+      _has_clump(info.flags & kAudioUnitParameterFlag_HasClump),
+      _clump_id(info.clumpID),
+      _unit(info.unit),
+      _min_value(info.minValue),
+      _max_value(info.maxValue),
+      _default_value(info.defaultValue),
+      _unit_name(to_string(info.unitName)),
+      _name(to_string(info.cfNameString)) {
 }
 
 #pragma mark - accessor
@@ -72,9 +72,9 @@ void audio::unit::parameter::set_value(AudioUnitParameterValue const value, Audi
         .element = element,
         .old_value = this->_values[element],
         .new_value = value,
-        .parameter = cast<audio::unit::parameter>(),
+        .parameter = *this,
     };
-    
+
     this->_notifier.notify(std::make_pair(method::will_change, info));
     this->_values[element] = value;
     this->_notifier.notify(std::make_pair(method::did_change, info));

@@ -41,8 +41,8 @@ struct unit::parameter {
 
     [[nodiscard]] chaining::chain_unsync_t<chaining_pair_t> chain() const;
     [[nodiscard]] chaining::chain_relayed_unsync_t<change_info, chaining_pair_t> chain(method const) const;
-    
-private:
+
+   private:
     AudioUnitParameterID _parameter_id;
     AudioUnitScope _scope;
     bool _has_clump;
