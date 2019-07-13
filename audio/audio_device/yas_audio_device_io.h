@@ -7,17 +7,18 @@
 #include <TargetConditionals.h>
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
 
+#include <cpp_utils/yas_weakable.h>
 #include <functional>
 #include "yas_audio_time.h"
 #include "yas_audio_types.h"
-#include <cpp_utils/yas_weakable.h>
 
 namespace yas::audio {
 class pcm_buffer;
 class device;
+
+struct device_io : weakable<device_io> {
     class impl;
 
-    struct device_io : weakable<device_io> {
     struct render_args {
         std::shared_ptr<audio::pcm_buffer> &output_buffer;
         std::optional<audio::time> const when;
@@ -27,6 +28,7 @@ class device;
 
     device_io(std::nullptr_t);
     explicit device_io(std::shared_ptr<audio::device> const &);
+    explicit device_io(std::shared_ptr<impl> &&);
 
     void set_device(std::shared_ptr<audio::device> const device);
     std::shared_ptr<audio::device> const &device() const;
@@ -42,9 +44,10 @@ class device;
     std::shared_ptr<audio::time> const &input_time_on_render() const;
 
     std::shared_ptr<weakable_impl> weakable_impl_ptr() const override;
+
    private:
     class kernel;
-    
+
     std::shared_ptr<impl> _impl;
 
     void _initialize() const;

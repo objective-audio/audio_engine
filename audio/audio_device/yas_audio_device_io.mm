@@ -53,8 +53,8 @@ struct audio::device_io::kernel {
     void reset_buffers() {
         this->_impl->reset_buffers();
     }
-    
-private:
+
+   private:
     std::shared_ptr<impl> _impl;
 };
 
@@ -144,7 +144,7 @@ struct audio::device_io::impl : weakable_impl {
             if (outOutputData) {
                 audio::clear(outOutputData);
             }
-            
+
             if (!weak_device_io) {
                 return;
             }
@@ -281,7 +281,8 @@ struct audio::device_io::impl : weakable_impl {
             return;
         }
 
-        this->set_kernel(std::make_shared<device_io::kernel>(this->_device->input_format(), this->_device->output_format(), this->_maximum_frames));
+        this->set_kernel(std::make_shared<device_io::kernel>(this->_device->input_format(),
+                                                             this->_device->output_format(), this->_maximum_frames));
     }
 
    private:
@@ -295,6 +296,9 @@ struct audio::device_io::impl : weakable_impl {
 
 audio::device_io::device_io(std::shared_ptr<audio::device> const &device) : _impl(std::make_shared<impl>()) {
     this->_impl->prepare(*this, device);
+}
+
+audio::device_io::device_io(std::shared_ptr<impl> &&impl) : _impl(std::move(impl)) {
 }
 
 void audio::device_io::_initialize() const {
