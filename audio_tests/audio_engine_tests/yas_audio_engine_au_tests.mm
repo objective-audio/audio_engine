@@ -48,7 +48,7 @@ using namespace yas;
     XCTAssertEqual(global_parameters.size(), 4);
     for (auto &pair : global_parameters) {
         auto &parameter = pair.second;
-        XCTAssertEqual(parameter.default_value(), delay_au.global_parameter_value(parameter.parameter_id()));
+        XCTAssertEqual(parameter.default_value, delay_au.global_parameter_value(parameter.parameter_id));
     }
 
     auto connection = manager.connect(delay_au.node(), output.node(), format);
@@ -117,16 +117,16 @@ using namespace yas;
     XCTAssertEqual(input_parameters.size(), 0);
 
     auto &wet_dry_mix = global_parameters.at(kDelayParam_WetDryMix);
-    XCTAssertEqual(wet_dry_mix.parameter_id(), kDelayParam_WetDryMix);
+    XCTAssertEqual(wet_dry_mix.parameter_id, kDelayParam_WetDryMix);
 
     auto &delay_time = global_parameters.at(kDelayParam_DelayTime);
-    XCTAssertEqual(delay_time.parameter_id(), kDelayParam_DelayTime);
+    XCTAssertEqual(delay_time.parameter_id, kDelayParam_DelayTime);
 
     auto &feedback = global_parameters.at(kDelayParam_Feedback);
-    XCTAssertEqual(feedback.parameter_id(), kDelayParam_Feedback);
+    XCTAssertEqual(feedback.parameter_id, kDelayParam_Feedback);
 
     auto &lopass = global_parameters.at(kDelayParam_LopassCutoff);
-    XCTAssertEqual(lopass.parameter_id(), kDelayParam_LopassCutoff);
+    XCTAssertEqual(lopass.parameter_id, kDelayParam_LopassCutoff);
 }
 
 - (void)test_reset_parameters {

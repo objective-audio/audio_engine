@@ -248,7 +248,7 @@ struct audio::engine::au::impl : base::impl, manageable_au::impl {
                     for (auto &value_pair : parameter.values()) {
                         auto &element = value_pair.first;
                         auto &value = value_pair.second;
-                        unit.set_parameter_value(value, parameter.parameter_id(), scope, element);
+                        unit.set_parameter_value(value, parameter.parameter_id, scope, element);
                     }
                 }
             }
@@ -284,7 +284,7 @@ struct audio::engine::au::impl : base::impl, manageable_au::impl {
             for (auto const &param_pair : prev_parameters.at(scope)) {
                 auto const &parameter_id = param_pair.first;
                 auto const &parameter = param_pair.second;
-                auto const default_value = parameter.default_value();
+                auto const &default_value = parameter.default_value;
                 for (auto &value_pair : parameter.values()) {
                     auto const &element = value_pair.first;
                     unit.set_parameter_value(default_value, parameter_id, scope, element);

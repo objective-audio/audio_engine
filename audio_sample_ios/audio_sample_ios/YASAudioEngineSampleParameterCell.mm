@@ -56,9 +56,9 @@ using namespace yas;
     if (au && au.global_parameters().count(_index)) {
         auto &parameter = au.global_parameters().at(_index);
         self.nameLabel.text = (__bridge NSString *)parameter.name();
-        self.valueSlider.minimumValue = parameter.min_value();
-        self.valueSlider.maximumValue = parameter.max_value();
-        self.valueSlider.value = au.global_parameter_value(parameter.parameter_id());
+        self.valueSlider.minimumValue = parameter.min_value;
+        self.valueSlider.maximumValue = parameter.max_value;
+        self.valueSlider.value = au.global_parameter_value(parameter.parameter_id);
     } else {
         self.nameLabel.text = nil;
         self.valueSlider.minimumValue = 0.0;
@@ -75,7 +75,7 @@ using namespace yas;
     if (_au_opt) {
         auto &au = *_au_opt;
         if (au.global_parameters().count(_index)) {
-            auto parameter_id = au.global_parameters().at(_index).parameter_id();
+            auto const parameter_id = au.global_parameters().at(_index).parameter_id;
             value = au.global_parameter_value(parameter_id);
         }
     }
@@ -87,7 +87,7 @@ using namespace yas;
     if (_au_opt) {
         auto &au = *_au_opt;
         if (au && au.global_parameters().count(_index)) {
-            auto parameter_id = au.global_parameters().at(_index).parameter_id();
+            auto const parameter_id = au.global_parameters().at(_index).parameter_id;
             au.set_global_parameter_value(parameter_id, sender.value);
         }
     }

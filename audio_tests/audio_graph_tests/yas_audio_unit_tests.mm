@@ -190,21 +190,21 @@ using namespace yas;
     AudioUnitScope const scope = kAudioUnitScope_Global;
     auto parameter = delay_unit.create_parameter(kDelayParam_DelayTime, scope);
 
-    delay_unit.set_parameter_value(parameter.min_value(), kDelayParam_DelayTime, scope, 0);
-    XCTAssertEqual(delay_unit.parameter_value(kDelayParam_DelayTime, scope, 0), parameter.min_value());
-    delay_unit.set_parameter_value(parameter.max_value(), kDelayParam_DelayTime, scope, 0);
-    XCTAssertEqual(delay_unit.parameter_value(kDelayParam_DelayTime, scope, 0), parameter.max_value());
-    delay_unit.set_parameter_value(parameter.default_value(), kDelayParam_DelayTime, scope, 0);
-    XCTAssertEqual(delay_unit.parameter_value(kDelayParam_DelayTime, scope, 0), parameter.default_value());
+    delay_unit.set_parameter_value(parameter.min_value, kDelayParam_DelayTime, scope, 0);
+    XCTAssertEqual(delay_unit.parameter_value(kDelayParam_DelayTime, scope, 0), parameter.min_value);
+    delay_unit.set_parameter_value(parameter.max_value, kDelayParam_DelayTime, scope, 0);
+    XCTAssertEqual(delay_unit.parameter_value(kDelayParam_DelayTime, scope, 0), parameter.max_value);
+    delay_unit.set_parameter_value(parameter.default_value, kDelayParam_DelayTime, scope, 0);
+    XCTAssertEqual(delay_unit.parameter_value(kDelayParam_DelayTime, scope, 0), parameter.default_value);
 
-    XCTAssertTrue(parameter.parameter_id() != 0);
-    XCTAssertTrue(parameter.scope() == scope);
+    XCTAssertTrue(parameter.parameter_id != 0);
+    XCTAssertTrue(parameter.scope == scope);
     XCTAssertTrue(parameter.unit_name() != nullptr);
-    if (parameter.has_clump()) {
-        XCTAssertTrue(parameter.clump_id() != 0);
+    if (parameter.has_clump) {
+        XCTAssertTrue(parameter.clump_id != 0);
     }
     XCTAssertTrue(parameter.name() != nullptr);
-    XCTAssertTrue(parameter.unit() == kAudioUnitParameterUnit_Seconds);
+    XCTAssertTrue(parameter.unit == kAudioUnitParameterUnit_Seconds);
 }
 
 - (void)test_parameter_create_failed {

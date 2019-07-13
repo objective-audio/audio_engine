@@ -9,58 +9,26 @@ using namespace yas;
 
 audio::unit::parameter::parameter(AudioUnitParameterInfo const &info, AudioUnitParameterID const parameter_id,
                                   AudioUnitScope const scope)
-    : _parameter_id(parameter_id),
-      _scope(scope),
-      _has_clump(info.flags & kAudioUnitParameterFlag_HasClump),
-      _clump_id(info.clumpID),
-      _unit(info.unit),
-      _min_value(info.minValue),
-      _max_value(info.maxValue),
-      _default_value(info.defaultValue),
+    : parameter_id(parameter_id),
+      scope(scope),
+      has_clump(info.flags & kAudioUnitParameterFlag_HasClump),
+      clump_id(info.clumpID),
+      unit(info.unit),
+      min_value(info.minValue),
+      max_value(info.maxValue),
+      default_value(info.defaultValue),
       _unit_name(to_string(info.unitName)),
       _name(to_string(info.cfNameString)) {
 }
 
 #pragma mark - accessor
 
-AudioUnitParameterID audio::unit::parameter::parameter_id() const {
-    return this->_parameter_id;
-}
-
-AudioUnitScope audio::unit::parameter::scope() const {
-    return this->_scope;
-}
-
 CFStringRef audio::unit::parameter::unit_name() const {
     return to_cf_object(this->_unit_name);
 }
 
-bool audio::unit::parameter::has_clump() const {
-    return this->_has_clump;
-}
-
-uint32_t audio::unit::parameter::clump_id() const {
-    return this->_clump_id;
-}
-
 CFStringRef audio::unit::parameter::name() const {
     return to_cf_object(this->_name);
-}
-
-AudioUnitParameterUnit audio::unit::parameter::unit() const {
-    return this->_unit;
-}
-
-AudioUnitParameterValue audio::unit::parameter::min_value() const {
-    return this->_min_value;
-}
-
-AudioUnitParameterValue audio::unit::parameter::max_value() const {
-    return this->_max_value;
-}
-
-AudioUnitParameterValue audio::unit::parameter::default_value() const {
-    return this->_default_value;
 }
 
 float audio::unit::parameter::value(AudioUnitElement const element) const {

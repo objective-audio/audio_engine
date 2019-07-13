@@ -24,16 +24,17 @@ struct unit::parameter {
 
     parameter(AudioUnitParameterInfo const &info, AudioUnitParameterID const paramter_id, AudioUnitScope const scope);
 
-    AudioUnitParameterID parameter_id() const;
-    AudioUnitScope scope() const;
+    AudioUnitParameterID const parameter_id;
+    AudioUnitScope const scope;
+    bool const has_clump;
+    uint32_t const clump_id;
+    AudioUnitParameterUnit const unit;
+    AudioUnitParameterValue const min_value;
+    AudioUnitParameterValue const max_value;
+    AudioUnitParameterValue const default_value;
+
     CFStringRef unit_name() const;
-    bool has_clump() const;
-    uint32_t clump_id() const;
     CFStringRef name() const;
-    AudioUnitParameterUnit unit() const;
-    AudioUnitParameterValue min_value() const;
-    AudioUnitParameterValue max_value() const;
-    AudioUnitParameterValue default_value() const;
 
     float value(AudioUnitElement const element) const;
     void set_value(float const value, AudioUnitElement const element);
@@ -43,14 +44,6 @@ struct unit::parameter {
     [[nodiscard]] chaining::chain_relayed_unsync_t<change_info, chaining_pair_t> chain(method const) const;
 
    private:
-    AudioUnitParameterID _parameter_id;
-    AudioUnitScope _scope;
-    bool _has_clump;
-    uint32_t _clump_id;
-    AudioUnitParameterUnit _unit;
-    AudioUnitParameterValue _min_value;
-    AudioUnitParameterValue _max_value;
-    AudioUnitParameterValue _default_value;
     std::unordered_map<AudioUnitElement, AudioUnitParameterValue> _values;
     std::string _unit_name;
     std::string _name;

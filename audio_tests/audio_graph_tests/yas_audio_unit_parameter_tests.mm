@@ -34,16 +34,16 @@ using namespace yas;
 
     audio::unit::parameter parameter{info, parameterID, scope};
 
-    XCTAssertEqual(parameter.parameter_id(), 20);
-    XCTAssertEqual(parameter.scope(), kAudioUnitScope_Output);
+    XCTAssertEqual(parameter.parameter_id, 20);
+    XCTAssertEqual(parameter.scope, kAudioUnitScope_Output);
     XCTAssertTrue(CFEqual(parameter.unit_name(), CFSTR("unit_name")));
-    XCTAssertEqual(parameter.clump_id(), 3);
+    XCTAssertEqual(parameter.clump_id, 3);
     XCTAssertTrue(CFEqual(parameter.name(), CFSTR("cf_name_string")));
-    XCTAssertEqual(parameter.unit(), kAudioUnitParameterUnit_Seconds);
-    XCTAssertEqual(parameter.min_value(), 0.5f);
-    XCTAssertEqual(parameter.max_value(), 100.0f);
-    XCTAssertEqual(parameter.default_value(), 1.0f);
-    XCTAssertEqual(parameter.has_clump(), true);
+    XCTAssertEqual(parameter.unit, kAudioUnitParameterUnit_Seconds);
+    XCTAssertEqual(parameter.min_value, 0.5f);
+    XCTAssertEqual(parameter.max_value, 100.0f);
+    XCTAssertEqual(parameter.default_value, 1.0f);
+    XCTAssertEqual(parameter.has_clump, true);
 }
 
 - (void)test_will_change_chain {
