@@ -15,6 +15,7 @@
 namespace yas::audio {
 class pcm_buffer;
 class device;
+    class impl;
 
     struct device_io : weakable<device_io> {
     struct render_args {
@@ -43,7 +44,6 @@ class device;
     std::shared_ptr<weakable_impl> weakable_impl_ptr() const override;
    private:
     class kernel;
-    class impl;
     
     std::shared_ptr<impl> _impl;
 

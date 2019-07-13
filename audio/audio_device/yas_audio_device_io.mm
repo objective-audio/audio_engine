@@ -15,8 +15,8 @@
 
 using namespace yas;
 
-struct audio::device_io::kernel : base {
-    struct impl : base::impl {
+struct audio::device_io::kernel {
+    struct impl {
         std::shared_ptr<pcm_buffer> _input_buffer;
         std::shared_ptr<pcm_buffer> _output_buffer;
 
@@ -39,23 +39,23 @@ struct audio::device_io::kernel : base {
 
     kernel(std::optional<audio::format> const &input_format, std::optional<audio::format> const &output_format,
            uint32_t const frame_capacity)
-        : base(std::make_shared<impl>(input_format, output_format, frame_capacity)) {
-    }
-
-    kernel(std::nullptr_t) : base(nullptr) {
+        : _impl(std::make_shared<impl>(input_format, output_format, frame_capacity)) {
     }
 
     std::shared_ptr<pcm_buffer> &input_buffer() {
-        return impl_ptr<impl>()->_input_buffer;
+        return this->_impl->_input_buffer;
     }
 
     std::shared_ptr<pcm_buffer> &output_buffer() {
-        return impl_ptr<impl>()->_output_buffer;
+        return this->_impl->_output_buffer;
     }
 
     void reset_buffers() {
-        impl_ptr<impl>()->reset_buffers();
+        this->_impl->reset_buffers();
     }
+    
+private:
+    std::shared_ptr<impl> _impl;
 };
 
 struct audio::device_io::impl : weakable_impl {
@@ -68,24 +68,23 @@ struct audio::device_io::impl : weakable_impl {
     chaining::any_observer_ptr _device_system_observer = nullptr;
     std::unordered_map<std::uintptr_t, chaining::any_observer_ptr> _device_observers;
 
-    impl() {
-    }
-
     ~impl() {
         this->_device_system_observer = nullptr;
 
         this->uninitialize();
     }
 
-    void prepare(device_io const &device_io, std::shared_ptr<audio::device> const device) {
-        this->_weak_device_io = to_weak(device_io);
+    void prepare(audio::device_io const &device_io, std::shared_ptr<audio::device> const device) {
+        this->_weak_device_io = std::make_optional<weak_ref<audio::device_io>>(to_weak(device_io));
 
         this->_device_system_observer =
             device::system_chain(device::system_method::hardware_did_change)
                 .perform([weak_device_io = this->_weak_device_io](auto const &) {
-                    if (auto device_io = weak_device_io.lock()) {
-                        if (device_io.device() && !device::device_for_id(device_io.device()->audio_device_id())) {
-                            device_io.set_device(nullptr);
+                    if (weak_device_io) {
+                        if (auto device_io = weak_device_io->lock()) {
+                            if (device_io->device() && !device::device_for_id(device_io->device()->audio_device_id())) {
+                                device_io->set_device(nullptr);
+                            }
                         }
                     }
                 })
@@ -111,8 +110,10 @@ struct audio::device_io::impl : weakable_impl {
             if (this->_device) {
                 auto observer = this->_device->chain(device::method::device_did_change)
                                     .perform([weak_device_io = _weak_device_io](auto const &) {
-                                        if (auto device_io = weak_device_io.lock()) {
-                                            device_io.impl_ptr<impl>()->update_kernel();
+                                        if (weak_device_io) {
+                                            if (auto device_io = weak_device_io->lock()) {
+                                                device_io->_impl->update_kernel();
+                                            }
                                         }
                                     })
                                     .end();
@@ -143,13 +144,17 @@ struct audio::device_io::impl : weakable_impl {
             if (outOutputData) {
                 audio::clear(outOutputData);
             }
+            
+            if (!weak_device_io) {
+                return;
+            }
 
-            if (auto device_io = weak_device_io.lock()) {
-                auto imp = device_io.impl_ptr<impl>();
+            if (auto device_io = weak_device_io->lock()) {
+                auto &imp = device_io->_impl;
                 if (auto kernel = imp->kernel()) {
-                    kernel.reset_buffers();
+                    kernel->reset_buffers();
                     if (inInputData) {
-                        if (auto &input_buffer = kernel.input_buffer()) {
+                        if (auto &input_buffer = kernel->input_buffer()) {
                             input_buffer->copy_from(inInputData);
 
                             uint32_t const input_frame_length = input_buffer->frame_length();
@@ -162,7 +167,7 @@ struct audio::device_io::impl : weakable_impl {
                     }
 
                     if (auto render_handler = imp->render_handler()) {
-                        if (auto &output_buffer = kernel.output_buffer()) {
+                        if (auto &output_buffer = kernel->output_buffer()) {
                             if (outOutputData) {
                                 uint32_t const frame_length =
                                     audio::frame_length(outOutputData, output_buffer->format().sample_byte_count());
@@ -174,7 +179,7 @@ struct audio::device_io::impl : weakable_impl {
                                     output_buffer->copy_to(outOutputData);
                                 }
                             }
-                        } else if (kernel.input_buffer()) {
+                        } else if (kernel->input_buffer()) {
                             std::shared_ptr<pcm_buffer> null_buffer{nullptr};
                             render_handler(render_args{.output_buffer = null_buffer, .when = std::nullopt});
                         }
@@ -254,7 +259,7 @@ struct audio::device_io::impl : weakable_impl {
         return this->_maximum_frames;
     }
 
-    void set_kernel(device_io::kernel kernel) {
+    void set_kernel(std::shared_ptr<device_io::kernel> kernel) {
         std::lock_guard<std::recursive_mutex> lock(this->_mutex);
         this->_kernel = nullptr;
         if (kernel) {
@@ -262,7 +267,7 @@ struct audio::device_io::impl : weakable_impl {
         }
     }
 
-    device_io::kernel kernel() const {
+    std::shared_ptr<device_io::kernel> kernel() const {
         std::lock_guard<std::recursive_mutex> lock(this->_mutex);
         return this->_kernel;
     }
@@ -276,72 +281,68 @@ struct audio::device_io::impl : weakable_impl {
             return;
         }
 
-        this->set_kernel(
-            device_io::kernel{this->_device->input_format(), this->_device->output_format(), this->_maximum_frames});
+        this->set_kernel(std::make_shared<device_io::kernel>(this->_device->input_format(), this->_device->output_format(), this->_maximum_frames));
     }
 
    private:
     render_f _render_handler = nullptr;
     uint32_t _maximum_frames = 4096;
-    device_io::kernel _kernel = nullptr;
+    std::shared_ptr<device_io::kernel> _kernel = nullptr;
     mutable std::recursive_mutex _mutex;
 };
 
 #pragma mark -
 
-audio::device_io::device_io(std::nullptr_t) : base(nullptr) {
-}
-
-audio::device_io::device_io(std::shared_ptr<audio::device> const &device) : base(std::make_shared<impl>()) {
-    impl_ptr<impl>()->prepare(*this, device);
+audio::device_io::device_io(std::shared_ptr<audio::device> const &device) : _impl(std::make_shared<impl>()) {
+    this->_impl->prepare(*this, device);
 }
 
 void audio::device_io::_initialize() const {
-    impl_ptr<impl>()->initialize();
+    this->_impl->initialize();
 }
 
 void audio::device_io::_uninitialize() const {
-    impl_ptr<impl>()->uninitialize();
+    this->_impl->uninitialize();
 }
 
 void audio::device_io::set_device(std::shared_ptr<audio::device> const device) {
-    impl_ptr<impl>()->set_device(device);
+    this->_impl->set_device(device);
 }
 
 std::shared_ptr<audio::device> const &audio::device_io::device() const {
-    return impl_ptr<impl>()->_device;
+    return this->_impl->_device;
 }
 
 bool audio::device_io::is_running() const {
-    return impl_ptr<impl>()->_is_running;
+    return this->_impl->_is_running;
 }
 
 void audio::device_io::set_render_handler(render_f callback) {
-    impl_ptr<impl>()->set_render_handler(std::move(callback));
+    this->_impl->set_render_handler(std::move(callback));
 }
 
 void audio::device_io::set_maximum_frames_per_slice(uint32_t const frames) {
-    impl_ptr<impl>()->set_maximum_frames(frames);
+    this->_impl->set_maximum_frames(frames);
 }
 
 uint32_t audio::device_io::maximum_frames_per_slice() const {
-    return impl_ptr<impl>()->maximum_frames();
+    return this->_impl->maximum_frames();
 }
 
 void audio::device_io::start() const {
-    impl_ptr<impl>()->start();
+    this->_impl->start();
 }
 
 void audio::device_io::stop() const {
-    impl_ptr<impl>()->stop();
+    this->_impl->stop();
 }
 
 std::shared_ptr<audio::pcm_buffer> &audio::device_io::input_buffer_on_render() {
-    return impl_ptr<impl>()->_input_buffer_on_render;
+    return this->_impl->_input_buffer_on_render;
 }
 
 std::shared_ptr<audio::time> const &audio::device_io::input_time_on_render() const {
-    return impl_ptr<impl>()->_input_time_on_render;
+    return this->_impl->_input_time_on_render;
 }
 
 std::shared_ptr<weakable_impl> audio::device_io::weakable_impl_ptr() const {
