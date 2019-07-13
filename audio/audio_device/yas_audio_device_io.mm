@@ -77,7 +77,7 @@ struct audio::device_io::impl : base::impl {
         this->uninitialize();
     }
 
-    void prepare(device_io const &device_io, std::shared_ptr<audio::device> const dev) {
+    void prepare(device_io const &device_io, std::shared_ptr<audio::device> const device) {
         this->_weak_device_io = to_weak(device_io);
 
         this->_device_system_observer =
@@ -91,11 +91,11 @@ struct audio::device_io::impl : base::impl {
                 })
                 .end();
 
-        this->set_device(dev);
+        this->set_device(device);
     }
 
-    void set_device(std::shared_ptr<audio::device> const &dev) {
-        if (this->_device != dev) {
+    void set_device(std::shared_ptr<audio::device> const &device) {
+        if (this->_device != device) {
             bool running = this->_is_running;
 
             this->uninitialize();
@@ -106,7 +106,7 @@ struct audio::device_io::impl : base::impl {
                 }
             }
 
-            this->_device = dev;
+            this->_device = device;
 
             if (this->_device) {
                 auto observer = this->_device->chain(device::method::device_did_change)
@@ -308,7 +308,7 @@ void audio::device_io::set_device(std::shared_ptr<audio::device> const device) {
     impl_ptr<impl>()->set_device(device);
 }
 
-std::shared_ptr<audio::device> audio::device_io::device() const {
+std::shared_ptr<audio::device> const &audio::device_io::device() const {
     return impl_ptr<impl>()->_device;
 }
 

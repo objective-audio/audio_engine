@@ -29,7 +29,7 @@ class device_io : public base {
     explicit device_io(std::shared_ptr<audio::device> const &);
 
     void set_device(std::shared_ptr<audio::device> const device);
-    std::shared_ptr<audio::device> device() const;
+    std::shared_ptr<audio::device> const &device() const;
     bool is_running() const;
     void set_render_handler(render_f);
     void set_maximum_frames_per_slice(uint32_t const frames);
