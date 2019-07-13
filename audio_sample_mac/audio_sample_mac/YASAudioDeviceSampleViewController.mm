@@ -129,7 +129,7 @@ using sample_kernel_sptr = std::shared_ptr<sample_kernel_t>;
 namespace yas::sample {
 struct device_vc_internal {
     audio::graph graph = nullptr;
-    audio::device_io device_io = nullptr;
+    std::shared_ptr<audio::device_io> device_io = nullptr;
     chaining::any_observer_ptr system_observer = nullptr;
     chaining::any_observer_ptr device_observer = nullptr;
     sample_kernel_sptr kernel;
@@ -157,7 +157,7 @@ struct device_vc_internal {
     });
 
     _internal.graph = audio::graph{};
-    _internal.device_io = audio::device_io{std::shared_ptr<audio::device>(nullptr)};
+    _internal.device_io = std::make_shared<audio::device_io>(std::shared_ptr<audio::device>(nullptr));
     _internal.graph.add_audio_device_io(_internal.device_io);
 
     _internal.kernel = std::make_shared<sample_kernel_t>();
@@ -174,9 +174,9 @@ struct device_vc_internal {
             .end();
 
     auto weak_device_io = to_weak(_internal.device_io);
-    _internal.device_io.set_render_handler([weak_device_io, kernel = _internal.kernel](auto args) {
+    _internal.device_io->set_render_handler([weak_device_io, kernel = _internal.kernel](auto args) {
         if (auto device_io = weak_device_io.lock()) {
-            kernel->process(device_io.input_buffer_on_render(), args.output_buffer);
+            kernel->process(device_io->input_buffer_on_render(), args.output_buffer);
         }
     });
 
@@ -275,7 +275,7 @@ struct device_vc_internal {
 
     std::optional<NSUInteger> index = std::nullopt;
 
-    if (auto const device = _internal.device_io.device()) {
+    if (auto const device = _internal.device_io->device()) {
         index = audio::device::index_of_device(*device);
     }
 
@@ -287,14 +287,14 @@ struct device_vc_internal {
 }
 
 - (void)setDevice:(std::shared_ptr<audio::device> const &)selected_device {
-    if (auto prev_audio_device = _internal.device_io.device()) {
+    if (auto prev_audio_device = _internal.device_io->device()) {
         _internal.device_observer = nullptr;
     }
 
     auto all_devices = audio::device::all_devices();
 
     if (selected_device && std::find(all_devices.begin(), all_devices.end(), selected_device) != all_devices.end()) {
-        _internal.device_io.set_device(selected_device);
+        _internal.device_io->set_device(selected_device);
 
         auto unowned_self = make_objc_ptr([[YASUnownedObject alloc] initWithObject:self]);
 
@@ -310,14 +310,14 @@ struct device_vc_internal {
                                         })
                                         .end();
     } else {
-        _internal.device_io.set_device(nullptr);
+        _internal.device_io->set_device(nullptr);
     }
 
     [self _updateDeviceInfo];
 }
 
 - (void)_updateDeviceInfo {
-    auto const device = _internal.device_io.device();
+    auto const &device = _internal.device_io->device();
     NSColor *onColor = [NSColor blackColor];
     NSColor *offColor = [NSColor lightGrayColor];
     if (device) {
