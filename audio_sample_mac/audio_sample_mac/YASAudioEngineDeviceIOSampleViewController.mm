@@ -286,7 +286,7 @@ struct device_io_vc_internal {
         }
     }
 
-    if (auto const device = _internal.manager.device_io().device()) {
+    if (auto const &device = _internal.manager.device_io().device()) {
         uint32_t const output_channel_count = device->output_channel_count();
         uint32_t const input_channel_count = device->input_channel_count();
         NSMutableArray *outputRoutes = [NSMutableArray arrayWithCapacity:output_channel_count];
