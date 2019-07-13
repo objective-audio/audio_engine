@@ -17,18 +17,18 @@ audio::unit::parameter::parameter(AudioUnitParameterInfo const &info, AudioUnitP
       min_value(info.minValue),
       max_value(info.maxValue),
       default_value(info.defaultValue),
-      _unit_name(to_string(info.unitName)),
-      _name(to_string(info.cfNameString)) {
+      unit_name(to_string(info.unitName)),
+      name(to_string(info.cfNameString)) {
 }
 
 #pragma mark - accessor
 
 CFStringRef audio::unit::parameter::cf_unit_name() const {
-    return to_cf_object(this->_unit_name);
+    return to_cf_object(this->unit_name);
 }
 
 CFStringRef audio::unit::parameter::cf_name() const {
-    return to_cf_object(this->_name);
+    return to_cf_object(this->name);
 }
 
 float audio::unit::parameter::value(AudioUnitElement const element) const {

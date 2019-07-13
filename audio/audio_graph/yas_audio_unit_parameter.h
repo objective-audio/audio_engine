@@ -33,6 +33,8 @@ struct unit::parameter {
     AudioUnitParameterValue const max_value;
     AudioUnitParameterValue const default_value;
 
+    std::string const unit_name;
+    std::string const name;
     CFStringRef cf_unit_name() const;
     CFStringRef cf_name() const;
 
@@ -45,8 +47,6 @@ struct unit::parameter {
 
    private:
     std::unordered_map<AudioUnitElement, AudioUnitParameterValue> _values;
-    std::string _unit_name;
-    std::string _name;
     chaining::notifier<chaining_pair_t> _notifier;
 };
 }  // namespace yas::audio
