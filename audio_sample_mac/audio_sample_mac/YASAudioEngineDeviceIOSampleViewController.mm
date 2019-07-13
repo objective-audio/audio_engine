@@ -266,7 +266,6 @@ struct device_io_vc_internal {
         _internal.manager.disconnect(_internal.route.node());
         _internal.route.clear_routes();
 
-#warning todo 参照で返るようにする？
         if (auto const &device = _internal.manager.device_io().device()) {
             if (device->output_channel_count() > 0) {
                 if (auto const output_format = device->output_format()) {
