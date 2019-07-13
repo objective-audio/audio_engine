@@ -243,7 +243,9 @@ std::shared_ptr<audio::device> audio::device::device_for_id(AudioDeviceID const 
 
 std::optional<size_t> audio::device::index_of_device(device const &device) {
     auto all_devices = device::all_devices();
-    auto it = std::find_if(all_devices.begin(), all_devices.end(), [&device](auto const &value){ return value->audio_device_id() == device.audio_device_id(); });
+    auto it = std::find_if(all_devices.begin(), all_devices.end(), [&device](auto const &value) {
+        return value->audio_device_id() == device.audio_device_id();
+    });
     if (it != all_devices.end()) {
         return std::make_optional<size_t>(it - all_devices.begin());
     } else {
@@ -258,12 +260,13 @@ bool audio::device::is_available_device(device const &device) {
 
 #pragma mark - main
 
-audio::device::device(AudioDeviceID const device_id) : _input_format(std::nullopt), _output_format(std::nullopt), _audio_device_id(device_id) {
+audio::device::device(AudioDeviceID const device_id)
+    : _input_format(std::nullopt), _output_format(std::nullopt), _audio_device_id(device_id) {
     this->_udpate_streams(kAudioObjectPropertyScopeInput);
     this->_udpate_streams(kAudioObjectPropertyScopeOutput);
     this->_update_format(kAudioObjectPropertyScopeInput);
     this->_update_format(kAudioObjectPropertyScopeOutput);
-    
+
     auto listener = this->_listener();
     _add_listener(device_id, kAudioDevicePropertyNominalSampleRate, kAudioObjectPropertyScopeGlobal, listener);
     _add_listener(device_id, kAudioDevicePropertyStreams, kAudioObjectPropertyScopeInput, listener);
@@ -366,33 +369,33 @@ audio::device::system_chain(system_method const method) {
 
 audio::device::listener_f audio::device::_listener() {
     AudioDeviceID const device_id = this->_audio_device_id;
-    
+
     return [device_id](uint32_t const address_count, const AudioObjectPropertyAddress *const addresses) {
         auto device = device::device_for_id(device_id);
         if (device) {
             AudioObjectID const object_id = device->audio_device_id();
-            
+
             std::vector<device::property_info> property_infos;
             for (uint32_t i = 0; i < address_count; ++i) {
                 if (addresses[i].mSelector == kAudioDevicePropertyStreams) {
-                    property_infos.emplace_back(property_info{
-                        .property = property::stream, .object_id = object_id, .address = addresses[i]});
+                    property_infos.emplace_back(
+                        property_info{.property = property::stream, .object_id = object_id, .address = addresses[i]});
                 } else if (addresses[i].mSelector == kAudioDevicePropertyStreamConfiguration) {
-                    property_infos.emplace_back(property_info{
-                        .property = property::format, .object_id = object_id, .address = addresses[i]});
+                    property_infos.emplace_back(
+                        property_info{.property = property::format, .object_id = object_id, .address = addresses[i]});
                 } else if (addresses[i].mSelector == kAudioDevicePropertyNominalSampleRate) {
                     if (addresses[i].mScope == kAudioObjectPropertyScopeGlobal) {
                         AudioObjectPropertyAddress address = addresses[i];
                         address.mScope = kAudioObjectPropertyScopeOutput;
-                        property_infos.emplace_back(property_info{
-                            .property = property::format, .object_id = object_id, .address = address});
+                        property_infos.emplace_back(
+                            property_info{.property = property::format, .object_id = object_id, .address = address});
                         address.mScope = kAudioObjectPropertyScopeInput;
-                        property_infos.emplace_back(property_info{
-                            .property = property::format, .object_id = object_id, .address = address});
+                        property_infos.emplace_back(
+                            property_info{.property = property::format, .object_id = object_id, .address = address});
                     }
                 }
             }
-            
+
             for (auto &info : property_infos) {
                 switch (info.property) {
                     case property::stream:
@@ -405,18 +408,17 @@ audio::device::listener_f audio::device::_listener() {
                         break;
                 }
             }
-            
+
             device::change_info change_info{std::move(property_infos)};
             device->_notifier.notify(std::make_pair(method::device_did_change, change_info));
-            audio::_system_notifier.notify(
-                                           std::make_pair(device::system_method::configuration_change, change_info));
+            audio::_system_notifier.notify(std::make_pair(device::system_method::configuration_change, change_info));
         }
     };
 }
 
 void audio::device::_udpate_streams(AudioObjectPropertyScope const scope) {
     auto prev_streams =
-    std::move((scope == kAudioObjectPropertyScopeInput) ? this->input_streams_map : this->output_streams_map);
+        std::move((scope == kAudioObjectPropertyScopeInput) ? this->input_streams_map : this->output_streams_map);
     auto data = _property_data<AudioStreamID>(this->_audio_device_id, kAudioDevicePropertyStreams, scope);
     auto &new_streams = (scope == kAudioObjectPropertyScopeInput) ? this->input_streams_map : this->output_streams_map;
     if (data) {
@@ -425,7 +427,7 @@ void audio::device::_udpate_streams(AudioObjectPropertyScope const scope) {
                 new_streams.insert(std::make_pair(stream_id, prev_streams.at(stream_id)));
             } else {
                 new_streams.insert(
-                                   std::make_pair(stream_id, stream({.stream_id = stream_id, .device_id = _audio_device_id})));
+                    std::make_pair(stream_id, stream({.stream_id = stream_id, .device_id = _audio_device_id})));
             }
         }
     }
@@ -433,7 +435,7 @@ void audio::device::_udpate_streams(AudioObjectPropertyScope const scope) {
 
 void audio::device::_update_format(AudioObjectPropertyScope const scope) {
     std::optional<stream> stream = std::nullopt;
-    
+
     if (scope == kAudioObjectPropertyScopeInput) {
         auto iterator = this->input_streams_map.begin();
         if (iterator != this->input_streams_map.end()) {
@@ -447,27 +449,26 @@ void audio::device::_update_format(AudioObjectPropertyScope const scope) {
             this->set_output_format(std::nullopt);
         }
     }
-    
+
     if (!stream) {
         return;
     }
-    
+
     auto stream_format = stream->virtual_format();
-    
-    auto data =
-    _property_data<AudioBufferList>(this->_audio_device_id, kAudioDevicePropertyStreamConfiguration, scope);
+
+    auto data = _property_data<AudioBufferList>(this->_audio_device_id, kAudioDevicePropertyStreamConfiguration, scope);
     if (data) {
         uint32_t channel_count = 0;
         for (auto &abl : *data) {
             for (uint32_t i = 0; i < abl.mNumberBuffers; i++) {
                 channel_count += abl.mBuffers[i].mNumberChannels;
             }
-            
+
             audio::format format({.sample_rate = stream_format.sample_rate(),
-                .channel_count = channel_count,
-                .pcm_format = stream_format.pcm_format(),
-                .interleaved = false});
-            
+                                  .channel_count = channel_count,
+                                  .pcm_format = stream_format.pcm_format(),
+                                  .interleaved = false});
+
             if (scope == kAudioObjectPropertyScopeInput) {
                 this->set_input_format(format);
             } else if (scope == kAudioObjectPropertyScopeOutput) {

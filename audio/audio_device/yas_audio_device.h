@@ -14,8 +14,8 @@
 #include <ostream>
 #include <string>
 #include <vector>
-#include "yas_audio_types.h"
 #include "yas_audio_format.h"
+#include "yas_audio_types.h"
 
 namespace yas::audio {
 class device_global;
@@ -79,18 +79,18 @@ struct device {
     static chaining::notifier<chaining_system_pair_t> &system_notifier();
 
     using listener_f =
-    std::function<void(uint32_t const in_number_addresses, const AudioObjectPropertyAddress *const in_addresses)>;
-    
+        std::function<void(uint32_t const in_number_addresses, const AudioObjectPropertyAddress *const in_addresses)>;
+
     bool operator==(device const &) const;
     bool operator!=(device const &) const;
-    
+
     device(device &&) = default;
     device &operator=(device &&) = default;
-    
+
    protected:
     explicit device(AudioDeviceID const device_id);
-    
-private:
+
+   private:
     AudioDeviceID const _audio_device_id;
     std::unordered_map<AudioStreamID, stream> input_streams_map;
     std::unordered_map<AudioStreamID, stream> output_streams_map;
@@ -98,14 +98,14 @@ private:
     std::optional<audio::format> _input_format = std::nullopt;
     std::optional<audio::format> _output_format = std::nullopt;
     mutable std::recursive_mutex _mutex;
-    
+
     void set_input_format(std::optional<audio::format> const &format);
     void set_output_format(std::optional<audio::format> const &format);
-    
+
     listener_f _listener();
     void _udpate_streams(AudioObjectPropertyScope const scope);
     void _update_format(AudioObjectPropertyScope const scope);
-    
+
     device(device const &) = delete;
     device &operator=(device const &) = delete;
 };

@@ -40,7 +40,7 @@ class au_io final : public base {
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
     void set_device(audio::device const &);
-    audio::device device() const;
+    std::shared_ptr<audio::device> device() const;
 #endif
 
     void set_channel_map(channel_map_t const &, audio::direction const);

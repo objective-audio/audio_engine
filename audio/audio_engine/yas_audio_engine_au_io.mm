@@ -68,14 +68,10 @@ struct audio::engine::au_io::impl : base::impl {
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
 
     void set_device(audio::device const &device) {
-        if (!device) {
-            throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
-        }
-
         this->au().unit().set_current_device(device.audio_device_id());
     }
 
-    audio::device device() {
+    std::shared_ptr<audio::device> device() {
         return device::device_for_id(this->_au.unit().current_device());
     }
 
@@ -86,7 +82,7 @@ struct audio::engine::au_io::impl : base::impl {
         return [AVAudioSession sharedInstance].sampleRate;
 #elif TARGET_OS_MAC
         if (auto const &dev = device()) {
-            return dev.nominal_sample_rate();
+            return dev->nominal_sample_rate();
         }
         return 0;
 #endif
@@ -97,7 +93,7 @@ struct audio::engine::au_io::impl : base::impl {
         return static_cast<uint32_t>([AVAudioSession sharedInstance].outputNumberOfChannels);
 #elif TARGET_OS_MAC
         if (auto const &dev = device()) {
-            return dev.output_channel_count();
+            return dev->output_channel_count();
         }
         return 0;
 #endif
@@ -108,7 +104,7 @@ struct audio::engine::au_io::impl : base::impl {
         return static_cast<uint32_t>([AVAudioSession sharedInstance].inputNumberOfChannels);
 #elif TARGET_OS_MAC
         if (auto const &dev = device()) {
-            return dev.input_channel_count();
+            return dev->input_channel_count();
         }
         return 0;
 #endif
@@ -210,7 +206,7 @@ void audio::engine::au_io::set_device(audio::device const &device) {
     impl_ptr<impl>()->set_device(device);
 }
 
-audio::device audio::engine::au_io::device() const {
+std::shared_ptr<audio::device> audio::engine::au_io::device() const {
     return impl_ptr<impl>()->device();
 }
 
