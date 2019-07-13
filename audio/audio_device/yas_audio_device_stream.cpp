@@ -113,7 +113,7 @@ AudioStreamID audio::device::stream::stream_id() const {
     return this->_impl->_stream_id;
 }
 
-audio::device audio::device::stream::device() const {
+std::shared_ptr<audio::device> audio::device::stream::device() const {
     return device::device_for_id(this->_impl->_device_id);
 }
 

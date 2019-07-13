@@ -60,7 +60,7 @@ struct audio::device_io::kernel : base {
 
 struct audio::device_io::impl : base::impl {
     weak<device_io> _weak_device_io;
-    audio::device _device = nullptr;
+    std::shared_ptr<audio::device> _device = nullptr;
     bool _is_running = false;
     AudioDeviceIOProcID _io_proc_id = nullptr;
     std::shared_ptr<pcm_buffer> _input_buffer_on_render = nullptr;
@@ -77,14 +77,14 @@ struct audio::device_io::impl : base::impl {
         this->uninitialize();
     }
 
-    void prepare(device_io const &device_io, audio::device const dev) {
+    void prepare(device_io const &device_io, std::shared_ptr<audio::device> const dev) {
         this->_weak_device_io = to_weak(device_io);
 
         this->_device_system_observer =
             device::system_chain(device::system_method::hardware_did_change)
                 .perform([weak_device_io = _weak_device_io](auto const &) {
                     if (auto device_io = weak_device_io.lock()) {
-                        if (device_io.device() && !device::device_for_id(device_io.device().audio_device_id())) {
+                        if (device_io.device() && !device::device_for_id(device_io.device()->audio_device_id())) {
                             device_io.set_device(nullptr);
                         }
                     }
@@ -94,29 +94,29 @@ struct audio::device_io::impl : base::impl {
         this->set_device(dev);
     }
 
-    void set_device(audio::device const &dev) {
+    void set_device(std::shared_ptr<audio::device> const &dev) {
         if (this->_device != dev) {
             bool running = this->_is_running;
 
             this->uninitialize();
 
             if (this->_device) {
-                if (this->_device_observers.count(this->_device.identifier())) {
-                    this->_device_observers.erase(this->_device.identifier());
+                if (this->_device_observers.count((uintptr_t)this->_device.get())) {
+                    this->_device_observers.erase((uintptr_t)this->_device.get());
                 }
             }
 
             this->_device = dev;
 
             if (this->_device) {
-                auto observer = this->_device.chain(device::method::device_did_change)
+                auto observer = this->_device->chain(device::method::device_did_change)
                                     .perform([weak_device_io = _weak_device_io](auto const &) {
                                         if (auto device_io = weak_device_io.lock()) {
                                             device_io.impl_ptr<impl>()->update_kernel();
                                         }
                                     })
                                     .end();
-                this->_device_observers.emplace(this->_device.identifier(), std::move(observer));
+                this->_device_observers.emplace((uintptr_t)this->_device.get(), std::move(observer));
             }
 
             this->initialize();
@@ -132,7 +132,7 @@ struct audio::device_io::impl : base::impl {
             return;
         }
 
-        if (!this->_device.input_format() && !this->_device.output_format()) {
+        if (!this->_device->input_format() && !this->_device->output_format()) {
             return;
         }
 
@@ -187,7 +187,7 @@ struct audio::device_io::impl : base::impl {
         };
 
         raise_if_raw_audio_error(
-            AudioDeviceCreateIOProcIDWithBlock(&_io_proc_id, _device.audio_device_id(), nullptr, handler));
+            AudioDeviceCreateIOProcIDWithBlock(&this->_io_proc_id, this->_device->audio_device_id(), nullptr, handler));
 
         this->update_kernel();
     }
@@ -199,8 +199,8 @@ struct audio::device_io::impl : base::impl {
             return;
         }
 
-        if (device::is_available_device(this->_device)) {
-            raise_if_raw_audio_error(AudioDeviceDestroyIOProcID(this->_device.audio_device_id(), this->_io_proc_id));
+        if (device::is_available_device(*this->_device)) {
+            raise_if_raw_audio_error(AudioDeviceDestroyIOProcID(this->_device->audio_device_id(), this->_io_proc_id));
         }
 
         this->_io_proc_id = nullptr;
@@ -214,7 +214,7 @@ struct audio::device_io::impl : base::impl {
             return;
         }
 
-        raise_if_raw_audio_error(AudioDeviceStart(this->_device.audio_device_id(), this->_io_proc_id));
+        raise_if_raw_audio_error(AudioDeviceStart(this->_device->audio_device_id(), this->_io_proc_id));
     }
 
     void stop() {
@@ -228,8 +228,8 @@ struct audio::device_io::impl : base::impl {
             return;
         }
 
-        if (device::is_available_device(this->_device)) {
-            raise_if_raw_audio_error(AudioDeviceStop(this->_device.audio_device_id(), this->_io_proc_id));
+        if (device::is_available_device(*this->_device)) {
+            raise_if_raw_audio_error(AudioDeviceStop(this->_device->audio_device_id(), this->_io_proc_id));
         }
     }
 
@@ -277,7 +277,7 @@ struct audio::device_io::impl : base::impl {
         }
 
         this->set_kernel(
-            device_io::kernel{this->_device.input_format(), this->_device.output_format(), this->_maximum_frames});
+            device_io::kernel{this->_device->input_format(), this->_device->output_format(), this->_maximum_frames});
     }
 
    private:
@@ -292,7 +292,7 @@ struct audio::device_io::impl : base::impl {
 audio::device_io::device_io(std::nullptr_t) : base(nullptr) {
 }
 
-audio::device_io::device_io(audio::device const &device) : base(std::make_shared<impl>()) {
+audio::device_io::device_io(std::shared_ptr<audio::device> const &device) : base(std::make_shared<impl>()) {
     impl_ptr<impl>()->prepare(*this, device);
 }
 
@@ -304,11 +304,11 @@ void audio::device_io::_uninitialize() const {
     impl_ptr<impl>()->uninitialize();
 }
 
-void audio::device_io::set_device(audio::device const device) {
+void audio::device_io::set_device(std::shared_ptr<audio::device> const device) {
     impl_ptr<impl>()->set_device(device);
 }
 
-audio::device audio::device_io::device() const {
+std::shared_ptr<audio::device> audio::device_io::device() const {
     return impl_ptr<impl>()->_device;
 }
 

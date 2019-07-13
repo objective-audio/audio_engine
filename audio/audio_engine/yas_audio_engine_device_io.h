@@ -24,12 +24,12 @@ class device_io final : public base {
 
     device_io();
     device_io(std::nullptr_t);
-    device_io(audio::device const &device);
+    explicit device_io(std::shared_ptr<audio::device> const &device);
 
     virtual ~device_io();
 
-    void set_device(audio::device const &device);
-    audio::device device() const;
+    void set_device(std::shared_ptr<audio::device> const &device);
+    std::shared_ptr<audio::device> device() const;
 
     audio::engine::node const &node() const;
     audio::engine::node &node();

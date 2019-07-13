@@ -24,7 +24,7 @@ struct audio::engine::device_io::impl final : base::impl, manageable_device_io::
 
     virtual ~impl() = default;
 
-    void prepare(engine::device_io const &engine_device_io, audio::device const &device) {
+    void prepare(engine::device_io const &engine_device_io, std::shared_ptr<audio::device> const &device) {
         this->set_device(device ?: device::default_output_device());
 
         auto weak_engine_device_io = to_weak(engine_device_io);
@@ -62,11 +62,11 @@ struct audio::engine::device_io::impl final : base::impl, manageable_device_io::
         return this->_core._device_io;
     }
 
-    void set_device(audio::device const &device) {
+    void set_device(std::shared_ptr<audio::device> const &device) {
         this->_core.set_device(device);
     }
 
-    audio::device device() {
+    std::shared_ptr<audio::device> device() {
         return this->_core.device();
     }
 
@@ -74,19 +74,19 @@ struct audio::engine::device_io::impl final : base::impl, manageable_device_io::
     struct core {
         audio::device_io _device_io = nullptr;
 
-        void set_device(audio::device const &device) {
+        void set_device(std::shared_ptr<audio::device> const &device) {
             this->_device = device;
             if (this->_device_io) {
                 this->_device_io.set_device(device);
             }
         }
 
-        audio::device device() {
+        std::shared_ptr<audio::device> device() {
             return this->_device;
         }
 
        private:
-        audio::device _device = nullptr;
+        std::shared_ptr<audio::device> _device = nullptr;
     };
 
     core _core;
@@ -151,7 +151,7 @@ struct audio::engine::device_io::impl final : base::impl, manageable_device_io::
                 if (connections.count(0) > 0) {
                     auto const &connection = connections.at(0);
                     auto const &connection_format = connection.format();
-                    auto const &device_format = device_io.device().output_format();
+                    auto const &device_format = device_io.device()->output_format();
                     if (connection_format != device_format) {
                         std::cout << __PRETTY_FUNCTION__ << " : output device io format is not match." << std::endl;
                         return false;
@@ -165,7 +165,7 @@ struct audio::engine::device_io::impl final : base::impl, manageable_device_io::
                 if (connections.count(0) > 0) {
                     auto const &connection = connections.at(0);
                     auto const &connection_format = connection.format();
-                    auto const &device_format = device_io.device().input_format();
+                    auto const &device_format = device_io.device()->input_format();
                     if (connection_format != device_format) {
                         std::cout << __PRETTY_FUNCTION__ << " : input device io format is not match." << std::endl;
                         return false;
@@ -180,23 +180,23 @@ struct audio::engine::device_io::impl final : base::impl, manageable_device_io::
 
 #pragma mark - audio::engine::device_io
 
-audio::engine::device_io::device_io() : device_io(audio::device(nullptr)) {
+audio::engine::device_io::device_io() : device_io(std::shared_ptr<audio::device>{nullptr}) {
 }
 
 audio::engine::device_io::device_io(std::nullptr_t) : base(nullptr) {
 }
 
-audio::engine::device_io::device_io(audio::device const &device) : base(std::make_unique<impl>()) {
+audio::engine::device_io::device_io(std::shared_ptr<audio::device> const &device) : base(std::make_unique<impl>()) {
     impl_ptr<impl>()->prepare(*this, device);
 }
 
 audio::engine::device_io::~device_io() = default;
 
-void audio::engine::device_io::set_device(audio::device const &device) {
+void audio::engine::device_io::set_device(std::shared_ptr<audio::device> const &device) {
     impl_ptr<impl>()->set_device(device);
 }
 
-audio::device audio::engine::device_io::device() const {
+std::shared_ptr<audio::device> audio::engine::device_io::device() const {
     return impl_ptr<impl>()->device();
 }
 

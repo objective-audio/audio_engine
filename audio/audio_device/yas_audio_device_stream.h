@@ -49,7 +49,7 @@ struct device::stream : weakable<device::stream> {
     explicit stream(std::shared_ptr<impl> &&);
 
     AudioStreamID stream_id() const;
-    audio::device device() const;
+    std::shared_ptr<audio::device> device() const;
     bool is_active() const;
     audio::direction direction() const;
     audio::format virtual_format() const;
