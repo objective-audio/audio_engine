@@ -160,7 +160,9 @@ struct offline_vc_internal {
         this->engine_observer = this->play_manager.chain(audio::engine::manager::method::configuration_change)
                                     .perform([weak_play_au_output = to_weak(play_au_output)](auto const &) {
                                         if (auto play_au_output = weak_play_au_output.lock()) {
-                                            play_au_output.au_io().set_device(audio::device::default_output_device());
+                                            if (auto const device = audio::device::default_output_device()) {
+                                                play_au_output.au_io().set_device(*device);
+                                            }
                                         }
                                     })
                                     .end();

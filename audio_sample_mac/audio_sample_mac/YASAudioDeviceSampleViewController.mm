@@ -157,7 +157,7 @@ struct device_vc_internal {
     });
 
     _internal.graph = audio::graph{};
-    _internal.device_io = audio::device_io{audio::device(nullptr)};
+    _internal.device_io = audio::device_io{std::shared_ptr<audio::device>(nullptr)};
     _internal.graph.add_audio_device_io(_internal.device_io);
 
     _internal.kernel = std::make_shared<sample_kernel_t>();
@@ -182,9 +182,10 @@ struct device_vc_internal {
 
     [self _updateDeviceNames];
 
-    auto default_device = audio::device::default_output_device();
-    if (auto index = audio::device::index_of_device(default_device)) {
-        self.selectedDeviceIndex = *index;
+    if (auto default_device = audio::device::default_output_device()) {
+        if (auto index = audio::device::index_of_device(*default_device)) {
+            self.selectedDeviceIndex = *index;
+        }
     }
 }
 
@@ -248,10 +249,10 @@ struct device_vc_internal {
     if (_selectedDeviceIndex != selectedDeviceIndex) {
         _selectedDeviceIndex = selectedDeviceIndex;
 
-        auto all_devices = audio::device::all_devices();
+        auto const all_devices = audio::device::all_devices();
 
         if (selectedDeviceIndex < all_devices.size()) {
-            auto device = all_devices[selectedDeviceIndex];
+            auto const &device = all_devices[selectedDeviceIndex];
             [self setDevice:device];
         } else {
             [self setDevice:nullptr];
@@ -265,15 +266,19 @@ struct device_vc_internal {
     NSMutableArray *titles = [NSMutableArray arrayWithCapacity:all_devices.size()];
 
     for (auto &device : all_devices) {
-        [titles addObject:(NSString *)device.name()];
+        [titles addObject:(NSString *)device->name()];
     }
 
     [titles addObject:@"None"];
 
     self.deviceNames = titles;
 
-    auto device = _internal.device_io.device();
-    auto index = audio::device::index_of_device(device);
+    std::optional<NSUInteger> index = std::nullopt;
+
+    if (auto const device = _internal.device_io.device()) {
+        index = audio::device::index_of_device(*device);
+    }
+
     if (index) {
         self.selectedDeviceIndex = *index;
     } else {
@@ -281,7 +286,7 @@ struct device_vc_internal {
     }
 }
 
-- (void)setDevice:(const audio::device &)selected_device {
+- (void)setDevice:(std::shared_ptr<audio::device> const &)selected_device {
     if (auto prev_audio_device = _internal.device_io.device()) {
         _internal.device_observer = nullptr;
     }
@@ -293,12 +298,12 @@ struct device_vc_internal {
 
         auto unowned_self = make_objc_ptr([[YASUnownedObject alloc] initWithObject:self]);
 
-        _internal.device_observer = selected_device.chain(audio::device::method::device_did_change)
+        _internal.device_observer = selected_device->chain(audio::device::method::device_did_change)
                                         .perform([selected_device, unowned_self](auto const &change_info) {
                                             auto const &infos = change_info.property_infos;
                                             if (infos.size() > 0) {
                                                 auto &device_id = infos.at(0).object_id;
-                                                if (selected_device.audio_device_id() == device_id) {
+                                                if (selected_device->audio_device_id() == device_id) {
                                                     [[unowned_self.object() object] _updateDeviceInfo];
                                                 }
                                             }
@@ -317,11 +322,11 @@ struct device_vc_internal {
     NSColor *offColor = [NSColor lightGrayColor];
     if (device) {
         self.deviceInfo = [NSString
-            stringWithFormat:@"name = %@\nnominal samplerate = %@", device.name(), @(device.nominal_sample_rate())];
+            stringWithFormat:@"name = %@\nnominal samplerate = %@", device->name(), @(device->nominal_sample_rate())];
         ;
-        self.nominalSampleRate = device.nominal_sample_rate();
-        self.ioThroughTextColor = (device.input_format() && device.output_format()) ? onColor : offColor;
-        self.sineTextColor = device.output_format() ? onColor : offColor;
+        self.nominalSampleRate = device->nominal_sample_rate();
+        self.ioThroughTextColor = (device->input_format() && device->output_format()) ? onColor : offColor;
+        self.sineTextColor = device->output_format() ? onColor : offColor;
     } else {
         self.deviceInfo = nil;
         self.nominalSampleRate = 0;
