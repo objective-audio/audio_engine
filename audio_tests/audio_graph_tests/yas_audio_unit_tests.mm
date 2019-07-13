@@ -199,11 +199,11 @@ using namespace yas;
 
     XCTAssertTrue(parameter.parameter_id != 0);
     XCTAssertTrue(parameter.scope == scope);
-    XCTAssertTrue(parameter.unit_name() != nullptr);
+    XCTAssertTrue(parameter.cf_unit_name() != nullptr);
     if (parameter.has_clump) {
         XCTAssertTrue(parameter.clump_id != 0);
     }
-    XCTAssertTrue(parameter.name() != nullptr);
+    XCTAssertTrue(parameter.cf_name() != nullptr);
     XCTAssertTrue(parameter.unit == kAudioUnitParameterUnit_Seconds);
 }
 

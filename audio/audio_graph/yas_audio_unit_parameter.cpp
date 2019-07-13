@@ -23,11 +23,11 @@ audio::unit::parameter::parameter(AudioUnitParameterInfo const &info, AudioUnitP
 
 #pragma mark - accessor
 
-CFStringRef audio::unit::parameter::unit_name() const {
+CFStringRef audio::unit::parameter::cf_unit_name() const {
     return to_cf_object(this->_unit_name);
 }
 
-CFStringRef audio::unit::parameter::name() const {
+CFStringRef audio::unit::parameter::cf_name() const {
     return to_cf_object(this->_name);
 }
 

@@ -33,8 +33,8 @@ struct unit::parameter {
     AudioUnitParameterValue const max_value;
     AudioUnitParameterValue const default_value;
 
-    CFStringRef unit_name() const;
-    CFStringRef name() const;
+    CFStringRef cf_unit_name() const;
+    CFStringRef cf_name() const;
 
     float value(AudioUnitElement const element) const;
     void set_value(float const value, AudioUnitElement const element);

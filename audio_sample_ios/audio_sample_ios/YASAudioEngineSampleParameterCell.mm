@@ -55,7 +55,7 @@ using namespace yas;
     auto au = au_opt ? *au_opt : nullptr;
     if (au && au.global_parameters().count(_index)) {
         auto &parameter = au.global_parameters().at(_index);
-        self.nameLabel.text = (__bridge NSString *)parameter.name();
+        self.nameLabel.text = (__bridge NSString *)parameter.cf_name();
         self.valueSlider.minimumValue = parameter.min_value;
         self.valueSlider.maximumValue = parameter.max_value;
         self.valueSlider.value = au.global_parameter_value(parameter.parameter_id);

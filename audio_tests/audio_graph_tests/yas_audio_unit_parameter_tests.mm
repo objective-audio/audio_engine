@@ -36,9 +36,9 @@ using namespace yas;
 
     XCTAssertEqual(parameter.parameter_id, 20);
     XCTAssertEqual(parameter.scope, kAudioUnitScope_Output);
-    XCTAssertTrue(CFEqual(parameter.unit_name(), CFSTR("unit_name")));
+    XCTAssertTrue(CFEqual(parameter.cf_unit_name(), CFSTR("unit_name")));
     XCTAssertEqual(parameter.clump_id, 3);
-    XCTAssertTrue(CFEqual(parameter.name(), CFSTR("cf_name_string")));
+    XCTAssertTrue(CFEqual(parameter.cf_name(), CFSTR("cf_name_string")));
     XCTAssertEqual(parameter.unit, kAudioUnitParameterUnit_Seconds);
     XCTAssertEqual(parameter.min_value, 0.5f);
     XCTAssertEqual(parameter.max_value, 100.0f);
