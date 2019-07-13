@@ -19,8 +19,7 @@ class result;
 }
 
 namespace yas::audio {
-class unit final : public base {
-   public:
+struct unit final : base, manageable_unit {
     class impl;
     class parameter;
     using parameter_map_t = std::unordered_map<AudioUnitParameterID, parameter>;
@@ -91,15 +90,17 @@ class unit final : public base {
     void stop();   // for io
     void reset();
 
-    manageable_unit &manageable();
+    void initialize() override;
+    void uninitialize() override;
+    void set_graph_key(std::optional<uint8_t> const &) override;
+    std::optional<uint8_t> const &graph_key() const override;
+    void set_key(std::optional<uint16_t> const &) override;
+    std::optional<uint16_t> const &key() const override;
 
     // render thread
 
     void callback_render(render_parameters &render_parameters);
     raw_unit_result_t raw_unit_render(render_parameters &render_parameters);
-
-   private:
-    manageable_unit _manageable = nullptr;
 };
 }  // namespace yas::audio
 

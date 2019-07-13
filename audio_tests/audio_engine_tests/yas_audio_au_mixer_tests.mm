@@ -39,7 +39,7 @@ using namespace yas;
 
     XCTAssertNoThrow(mixer_unit.set_output_format(format.stream_description(), 0));
 
-    XCTAssertNoThrow(mixer_unit.manageable().initialize());
+    XCTAssertNoThrow(mixer_unit.initialize());
 
     XCTAssertNoThrow(mixer_unit.set_input_format(format.stream_description(), 0));
 
@@ -51,7 +51,7 @@ using namespace yas;
     XCTAssertNoThrow(asbd = mixer_unit.input_format(0));
     XCTAssertTrue(is_equal(format.stream_description(), asbd));
 
-    XCTAssertNoThrow(mixer_unit.manageable().uninitialize());
+    XCTAssertNoThrow(mixer_unit.uninitialize());
 
 #if TARGET_OS_IPHONE
     /*
@@ -63,7 +63,7 @@ using namespace yas;
 
     XCTAssertNoThrow(mixer_unit.set_output_format(format.stream_description(), 0));
 
-    XCTAssertNoThrow(mixer_unit.manageable().initialize());
+    XCTAssertNoThrow(mixer_unit.initialize());
 
     XCTAssertNoThrow(mixer_unit.set_input_format(format.stream_description(), 0));
 
@@ -75,7 +75,7 @@ using namespace yas;
     XCTAssertNoThrow(asbd = mixer_unit.input_format(0));
     XCTAssertTrue(is_equal(format.stream_description(), asbd));
 
-    XCTAssertNoThrow(mixer_unit.manageable().uninitialize());
+    XCTAssertNoThrow(mixer_unit.uninitialize());
 #endif
 }
 
@@ -88,9 +88,9 @@ using namespace yas;
 
     auto format = audio::format({.sample_rate = 48000.0, 2, audio::pcm_format::float32, false});
 
-    mixer_unit.manageable().initialize();
+    mixer_unit.initialize();
     XCTAssertThrows(mixer_unit.set_output_format(format.stream_description(), 0));
-    mixer_unit.manageable().uninitialize();
+    mixer_unit.uninitialize();
     XCTAssertNoThrow(mixer_unit.set_output_format(format.stream_description(), 0));
 
     /*

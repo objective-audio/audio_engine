@@ -158,9 +158,7 @@ struct audio::graph::impl : base::impl {
             throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
         }
 
-        auto &unt = unit.manageable();
-
-        if (unt.key()) {
+        if (unit.key()) {
             throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : unit.key is not null.");
         }
 
@@ -168,8 +166,8 @@ struct audio::graph::impl : base::impl {
 
         auto unit_key = next_unit_key();
         if (unit_key) {
-            unt.set_graph_key(key());
-            unt.set_key(*unit_key);
+            unit.set_graph_key(key());
+            unit.set_key(*unit_key);
             auto pair = std::make_pair(*unit_key, unit);
             this->_units.insert(pair);
             if (unit.is_output_unit()) {
@@ -181,26 +179,22 @@ struct audio::graph::impl : base::impl {
     void remove_unit_from_units(audio::unit &unit) {
         std::lock_guard<std::recursive_mutex> lock(_mutex);
 
-        auto &manageable_unit = unit.manageable();
-
-        if (auto key = manageable_unit.key()) {
+        if (auto key = unit.key()) {
             this->_units.erase(*key);
             this->_io_units.erase(*key);
-            manageable_unit.set_key(std::nullopt);
-            manageable_unit.set_graph_key(std::nullopt);
+            unit.set_key(std::nullopt);
+            unit.set_graph_key(std::nullopt);
         }
     }
 
     void add_unit(audio::unit &unit) {
-        auto &manageable_unit = unit.manageable();
-
-        if (manageable_unit.key()) {
+        if (unit.key()) {
             throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : unit.key is already assigned.");
         }
 
         this->add_unit_to_units(unit);
 
-        manageable_unit.initialize();
+        unit.initialize();
 
         if (unit.is_output_unit() && this->_running && !this->is_interrupting()) {
             unit.start();
@@ -208,7 +202,7 @@ struct audio::graph::impl : base::impl {
     }
 
     void remove_unit(audio::unit &unit) {
-        unit.manageable().uninitialize();
+        unit.uninitialize();
 
         this->remove_unit_from_units(unit);
     }

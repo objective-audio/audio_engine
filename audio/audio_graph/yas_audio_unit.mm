@@ -79,7 +79,7 @@ static OSStatus input_render_callback(void *inRefCon, AudioUnitRenderActionFlags
 
 #pragma mark - audio::unit::impl
 
-struct audio::unit::impl final : base::impl, manageable_unit::impl {
+struct audio::unit::impl final : base::impl {
    public:
     AudioComponentDescription _acd = {0};
     bool _initialized = false;
@@ -125,7 +125,7 @@ struct audio::unit::impl final : base::impl, manageable_unit::impl {
         this->_name.clear();
     }
 
-    void initialize() override {
+    void initialize() {
         if (this->_initialized) {
             return;
         }
@@ -142,7 +142,7 @@ struct audio::unit::impl final : base::impl, manageable_unit::impl {
         this->_initialized = true;
     }
 
-    void uninitialize() override {
+    void uninitialize() {
         if (!this->_initialized) {
             return;
         }
@@ -494,19 +494,19 @@ struct audio::unit::impl final : base::impl, manageable_unit::impl {
         return data;
     }
 
-    void set_graph_key(std::optional<uint8_t> const &key) override {
+    void set_graph_key(std::optional<uint8_t> const &key) {
         this->_graph_key = key;
     }
 
-    std::optional<uint8_t> const &graph_key() const override {
+    std::optional<uint8_t> const &graph_key() const {
         return this->_graph_key;
     }
 
-    void set_key(std::optional<uint16_t> const &key) override {
+    void set_key(std::optional<uint16_t> const &key) {
         this->_key = key;
     }
 
-    std::optional<uint16_t> const &key() const override {
+    std::optional<uint16_t> const &key() const {
         return this->_key;
     }
 
@@ -863,11 +863,28 @@ void audio::unit::reset() {
     impl_ptr<impl>()->reset();
 }
 
-audio::manageable_unit &audio::unit::manageable() {
-    if (!_manageable) {
-        _manageable = audio::manageable_unit{impl_ptr<manageable_unit::impl>()};
-    }
-    return _manageable;
+void audio::unit::initialize() {
+    impl_ptr<impl>()->initialize();
+}
+
+void audio::unit::uninitialize() {
+    impl_ptr<impl>()->uninitialize();
+}
+
+void audio::unit::set_graph_key(std::optional<uint8_t> const &key) {
+    impl_ptr<impl>()->set_graph_key(key);
+}
+
+std::optional<uint8_t> const &audio::unit::graph_key() const {
+    return impl_ptr<impl>()->graph_key();
+}
+
+void audio::unit::set_key(std::optional<uint16_t> const &key) {
+    impl_ptr<impl>()->set_key(key);
+}
+
+std::optional<uint16_t> const &audio::unit::key() const {
+    return impl_ptr<impl>()->key();
 }
 
 #pragma mark - render thread

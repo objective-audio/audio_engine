@@ -24,8 +24,6 @@ using namespace yas;
     audio::unit unit(kAudioUnitType_FormatConverter, kAudioUnitSubType_AUConverter);
 
     XCTAssertTrue(unit);
-
-    XCTAssertTrue(unit.manageable());
 }
 
 - (void)test_create_null {

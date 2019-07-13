@@ -34,7 +34,7 @@ using namespace yas;
                                                    .channel_count = 2,
                                                    .pcm_format = pcm_format,
                                                    .interleaved = interleaved});
-                XCTAssertNoThrow(converter_unit.manageable().initialize());
+                XCTAssertNoThrow(converter_unit.initialize());
                 XCTAssertNoThrow(converter_unit.set_output_format(format.stream_description(), 0));
                 XCTAssertNoThrow(converter_unit.set_input_format(format.stream_description(), 0));
 
@@ -46,7 +46,7 @@ using namespace yas;
                 XCTAssertNoThrow(asbd = converter_unit.input_format(0));
                 XCTAssertTrue(is_equal(format.stream_description(), asbd));
 
-                XCTAssertNoThrow(converter_unit.manageable().uninitialize());
+                XCTAssertNoThrow(converter_unit.uninitialize());
             }
         }
     }
