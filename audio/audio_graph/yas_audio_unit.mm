@@ -696,6 +696,14 @@ void audio::unit::dispose_raw_unit() {
     this->_name.clear();
 }
 
+std::shared_ptr<audio::unit> audio::make_unit(AudioComponentDescription const &acd) {
+    return std::make_shared<unit>(acd);
+}
+
+std::shared_ptr<audio::unit> audio::make_unit(OSType const type, OSType const subType) {
+    return std::make_shared<unit>(type, subType);
+}
+
 #pragma mark - global
 
 audio::unit::raw_unit_result_t yas::to_result(OSStatus const err) {

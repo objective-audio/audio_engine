@@ -44,7 +44,7 @@ using namespace yas;
 
     audio::graph graph;
 
-    auto io_unit = std::make_shared<audio::unit>(kAudioUnitType_Output, kAudioUnitSubType_GenericOutput);
+    auto io_unit = audio::make_unit(kAudioUnitType_Output, kAudioUnitSubType_GenericOutput);
     io_unit->set_maximum_frames_per_slice(maximum_frame_length);
     graph.add_unit(io_unit);
 
@@ -52,7 +52,7 @@ using namespace yas;
 
     uint32_t const mixerInputCount = 16;
 
-    auto mixer_unit = std::make_shared<audio::unit>(kAudioUnitType_Mixer, kAudioUnitSubType_MultiChannelMixer);
+    auto mixer_unit = audio::make_unit(kAudioUnitType_Mixer, kAudioUnitSubType_MultiChannelMixer);
     mixer_unit->set_maximum_frames_per_slice(maximum_frame_length);
     graph.add_unit(mixer_unit);
 

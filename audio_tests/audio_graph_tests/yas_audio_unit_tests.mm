@@ -47,7 +47,7 @@ using namespace yas;
 
     audio::graph graph;
 
-    auto converter_unit = std::make_shared<audio::unit>(kAudioUnitType_FormatConverter, kAudioUnitSubType_AUConverter);
+    auto converter_unit = audio::make_unit(kAudioUnitType_FormatConverter, kAudioUnitSubType_AUConverter);
     converter_unit->set_maximum_frames_per_slice(maximum_frame_length);
 
     graph.add_unit(converter_unit);
@@ -113,7 +113,7 @@ using namespace yas;
 
     audio::graph graph;
 
-    auto converter_unit = std::make_shared<audio::unit>(kAudioUnitType_FormatConverter, kAudioUnitSubType_AUConverter);
+    auto converter_unit = audio::make_unit(kAudioUnitType_FormatConverter, kAudioUnitSubType_AUConverter);
     converter_unit->set_maximum_frames_per_slice(maximum_frame_length);
 
     graph.add_unit(converter_unit);

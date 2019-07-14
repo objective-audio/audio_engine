@@ -30,7 +30,7 @@ struct unit final : manageable_unit {
 
     explicit unit(AudioComponentDescription const &acd);
     unit(OSType const type, OSType const subType);
-    ~unit();
+    virtual ~unit();
 
     unit(unit &&) = default;
     unit &operator=(unit &&) = default;
@@ -117,6 +117,9 @@ struct unit final : manageable_unit {
     void create_raw_unit(AudioComponentDescription const &acd);
     void dispose_raw_unit();
 };
+
+std::shared_ptr<audio::unit> make_unit(AudioComponentDescription const &acd);
+std::shared_ptr<audio::unit> make_unit(OSType const type, OSType const subType);
 }  // namespace yas::audio
 
 namespace yas {

@@ -28,7 +28,7 @@ struct audio::engine::au::impl : base::impl {
     void prepare(audio::engine::au const &au, AudioComponentDescription const &acd) {
         this->_acd = acd;
 
-        auto unit = std::make_shared<audio::unit>(acd);
+        auto unit = audio::make_unit(acd);
         this->_parameters.clear();
         this->_parameters.insert(
             std::make_pair(kAudioUnitScope_Global, unit->create_parameters(kAudioUnitScope_Global)));
@@ -255,7 +255,7 @@ struct audio::engine::au::impl : base::impl {
     }
 
     void reload_unit() {
-        this->_core.set_unit(std::make_shared<audio::unit>(_acd));
+        this->_core.set_unit(audio::make_unit(this->_acd));
     }
 
     audio::engine::node _node;
