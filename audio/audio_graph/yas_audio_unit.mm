@@ -671,22 +671,22 @@ void audio::unit::dispose_raw_unit() {
 }
 
 void audio::unit::initialize() {
-    throw std::runtime_error("");
+    throw std::runtime_error("must be overridden");
 }
 void audio::unit::uninitialize() {
-    throw std::runtime_error("");
+    throw std::runtime_error("must be overridden");
 }
 void audio::unit::set_graph_key(std::optional<uint8_t> const &) {
-    throw std::runtime_error("");
+    throw std::runtime_error("must be overridden");
 }
 std::optional<uint8_t> const &audio::unit::graph_key() const {
-    throw std::runtime_error("");
+    throw std::runtime_error("must be overridden");
 }
 void audio::unit::set_key(std::optional<uint16_t> const &) {
-    throw std::runtime_error("");
+    throw std::runtime_error("must be overridden");
 }
 std::optional<uint16_t> const &audio::unit::key() const {
-    throw std::runtime_error("");
+    throw std::runtime_error("must be overridden");
 }
 
 namespace yas::audio {

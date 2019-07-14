@@ -34,11 +34,11 @@ audio::engine::connection audio::engine::kernel::output_connection(uint32_t cons
 }
 
 void audio::engine::kernel::set_input_connections(audio::engine::connection_wmap connections) {
-    throw std::runtime_error("");
+    throw std::runtime_error("must be overridden");
 }
 
 void audio::engine::kernel::set_output_connections(audio::engine::connection_wmap connections) {
-    throw std::runtime_error("");
+    throw std::runtime_error("must be overridden");
 }
 
 namespace yas::audio::engine {
