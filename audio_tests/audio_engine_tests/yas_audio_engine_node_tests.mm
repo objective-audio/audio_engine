@@ -44,8 +44,6 @@ using namespace yas;
 - (void)test_create_kernel {
     audio::engine::kernel kernel;
 
-    XCTAssertTrue(kernel);
-
     XCTAssertEqual(kernel.input_connections().size(), 0);
     XCTAssertEqual(kernel.output_connections().size(), 0);
 }
@@ -169,11 +167,11 @@ using namespace yas;
 
     auto lambda = [self, expectation, relay_obj = relay_obj.node(), input_connections, output_connection]() {
         auto kernel = relay_obj.kernel();
-        XCTAssertEqual(kernel.output_connections().size(), 1);
-        XCTAssertEqual(kernel.input_connections().size(), 2);
-        XCTAssertEqual(kernel.output_connection(0), output_connection);
-        XCTAssertEqual(kernel.input_connection(0), input_connections.at(0));
-        XCTAssertEqual(kernel.input_connection(1), input_connections.at(1));
+        XCTAssertEqual(kernel->output_connections().size(), 1);
+        XCTAssertEqual(kernel->input_connections().size(), 2);
+        XCTAssertEqual(kernel->output_connection(0), output_connection);
+        XCTAssertEqual(kernel->input_connection(0), input_connections.at(0));
+        XCTAssertEqual(kernel->input_connection(1), input_connections.at(1));
         [expectation fulfill];
     };
 

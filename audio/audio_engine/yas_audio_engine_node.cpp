@@ -184,10 +184,6 @@ struct audio::engine::node::impl : base::impl, manageable_node::impl, connectabl
     }
 
     void prepare_kernel(audio::engine::kernel &kernel) {
-        if (!kernel) {
-            throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
-        }
-
         kernel.set_input_connections(_input_connections);
         kernel.set_output_connections(_output_connections);
 
@@ -197,12 +193,12 @@ struct audio::engine::node::impl : base::impl, manageable_node::impl, connectabl
     }
 
     void update_kernel() override {
-        auto kernel = audio::engine::kernel{};
-        this->prepare_kernel(kernel);
+        auto kernel = std::make_shared<audio::engine::kernel>();
+        this->prepare_kernel(*kernel);
         this->_core.set_kernel(kernel);
     }
 
-    audio::engine::kernel kernel() {
+    std::shared_ptr<audio::engine::kernel> kernel() {
         return this->_core.kernel();
     }
 
@@ -252,12 +248,12 @@ struct audio::engine::node::impl : base::impl, manageable_node::impl, connectabl
 
    private:
     struct core {
-        void set_kernel(audio::engine::kernel kernel) {
+        void set_kernel(std::shared_ptr<audio::engine::kernel> kernel) {
             std::lock_guard<std::recursive_mutex> lock(this->_mutex);
             this->_kernel = std::move(kernel);
         }
 
-        audio::engine::kernel kernel() {
+        std::shared_ptr<audio::engine::kernel> kernel() {
             std::lock_guard<std::recursive_mutex> lock(this->_mutex);
             return this->_kernel;
         }
@@ -273,7 +269,7 @@ struct audio::engine::node::impl : base::impl, manageable_node::impl, connectabl
         }
 
        private:
-        audio::engine::kernel _kernel = nullptr;
+        std::shared_ptr<audio::engine::kernel> _kernel = nullptr;
         std::optional<audio::time> _render_time = std::nullopt;
         mutable std::recursive_mutex _mutex;
     };
@@ -366,7 +362,7 @@ void audio::engine::node::set_render_handler(render_f handler) {
     impl_ptr<impl>()->set_render_handler(std::move(handler));
 }
 
-audio::engine::kernel audio::engine::node::kernel() const {
+std::shared_ptr<audio::engine::kernel> audio::engine::node::kernel() const {
     return impl_ptr<impl>()->kernel();
 }
 

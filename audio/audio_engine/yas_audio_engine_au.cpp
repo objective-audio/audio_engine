@@ -192,7 +192,7 @@ struct audio::engine::au::impl : base::impl, manageable_au::impl {
                 unit->set_render_handler([weak_au](audio::render_parameters &render_parameters) {
                     if (auto au = weak_au.lock()) {
                         if (auto kernel = au.node().kernel()) {
-                            if (auto connection = kernel.input_connection(render_parameters.in_bus_number)) {
+                            if (auto connection = kernel->input_connection(render_parameters.in_bus_number)) {
                                 if (auto src_node = connection.source_node()) {
                                     pcm_buffer buffer{connection.format(), render_parameters.io_data};
                                     time when(*render_parameters.io_time_stamp, connection.format().sample_rate());

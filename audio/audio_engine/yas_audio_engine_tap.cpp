@@ -47,7 +47,7 @@ struct audio::engine::tap::impl : base::impl {
                 if (auto kernel = impl_ptr->_node.kernel()) {
                     impl_ptr->_kernel_on_render = kernel;
 
-                    auto tap_kernel = yas::cast<tap::kernel>(kernel.decorator());
+                    auto tap_kernel = yas::cast<tap::kernel>(kernel->decorator());
                     auto const &handler = tap_kernel.render_handler();
 
                     if (handler) {
@@ -85,23 +85,23 @@ struct audio::engine::tap::impl : base::impl {
     }
 
     audio::engine::connection input_connection_on_render(uint32_t const bus_idx) {
-        return this->_kernel_on_render.input_connection(bus_idx);
+        return this->_kernel_on_render->input_connection(bus_idx);
     }
 
     audio::engine::connection output_connection_on_render(uint32_t const bus_idx) {
-        return this->_kernel_on_render.output_connection(bus_idx);
+        return this->_kernel_on_render->output_connection(bus_idx);
     }
 
     audio::engine::connection_smap input_connections_on_render() {
-        return this->_kernel_on_render.input_connections();
+        return this->_kernel_on_render->input_connections();
     }
 
     audio::engine::connection_smap output_connections_on_render() {
-        return this->_kernel_on_render.output_connections();
+        return this->_kernel_on_render->output_connections();
     }
 
     void render_source(audio::engine::node::render_args &&args) {
-        if (auto connection = this->_kernel_on_render.input_connection(args.bus_idx)) {
+        if (auto connection = this->_kernel_on_render->input_connection(args.bus_idx)) {
             if (auto node = connection.source_node()) {
                 node.render({.buffer = args.buffer, .bus_idx = connection.source_bus(), .when = args.when});
             }
@@ -111,7 +111,7 @@ struct audio::engine::tap::impl : base::impl {
    private:
     audio::engine::node::render_f _render_handler;
     chaining::any_observer_ptr _reset_observer = nullptr;
-    audio::engine::kernel _kernel_on_render;
+    std::shared_ptr<audio::engine::kernel> _kernel_on_render;
 };
 
 #pragma mark - audio::engine::tap

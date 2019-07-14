@@ -50,9 +50,9 @@ struct audio::engine::route::impl final : base::impl {
 
             if (auto route = weak_route.lock()) {
                 if (auto kernel = route.node().kernel()) {
-                    auto const &routes = yas::cast<audio::engine::route::kernel>(kernel.decorator()).routes();
-                    auto output_connection = kernel.output_connection(dst_bus_idx);
-                    auto input_connections = kernel.input_connections();
+                    auto const &routes = yas::cast<audio::engine::route::kernel>(kernel->decorator()).routes();
+                    auto output_connection = kernel->output_connection(dst_bus_idx);
+                    auto input_connections = kernel->input_connections();
                     uint32_t const dst_ch_count = dst_buffer.format().channel_count();
 
                     for (auto const &pair : input_connections) {

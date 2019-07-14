@@ -302,7 +302,7 @@ struct yas::audio::engine::au_input::impl : base::impl {
                         render_parameters.io_data = input_buffer->audio_buffer_list();
 
                         if (auto const kernel = au_input.au_io().au().node().kernel()) {
-                            if (auto const connection = kernel.output_connection(1)) {
+                            if (auto const connection = kernel->output_connection(1)) {
                                 auto format = connection.format();
                                 time time(*render_parameters.io_time_stamp, format.sample_rate());
                                 au_input.au_io().au().node().set_render_time_on_render(time);

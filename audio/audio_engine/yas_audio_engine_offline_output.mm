@@ -65,7 +65,7 @@ struct audio::engine::offline_output::impl : base::impl, manageable_offline_outp
                         break;
                     }
 
-                    auto connection_on_block = kernel.input_connection(0);
+                    auto connection_on_block = kernel->input_connection(0);
                     if (!connection_on_block) {
                         cancelled = true;
                         break;

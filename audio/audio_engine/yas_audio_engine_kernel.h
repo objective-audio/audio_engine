@@ -8,11 +8,8 @@
 #include "yas_audio_engine_kernel_protocol.h"
 
 namespace yas::audio::engine {
-struct kernel final : base, manageable_kernel {
+struct kernel final : manageable_kernel {
     kernel();
-    kernel(std::nullptr_t);
-
-    virtual ~kernel();
 
     audio::engine::connection_smap input_connections() const;
     audio::engine::connection_smap output_connections() const;
@@ -27,6 +24,8 @@ struct kernel final : base, manageable_kernel {
     void set_output_connections(audio::engine::connection_wmap connections) override;
 
    private:
-    struct impl;
+    engine::connection_wmap _input_connections;
+    engine::connection_wmap _output_connections;
+    base _decorator = nullptr;
 };
 }  // namespace yas::audio::engine

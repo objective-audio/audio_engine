@@ -108,7 +108,7 @@ struct audio::engine::device_io::impl final : base::impl, manageable_device_io::
         auto render_handler = [weak_engine_device_io, weak_device_io](auto args) {
             if (auto engine_device_io = weak_engine_device_io.lock()) {
                 if (auto kernel = engine_device_io.node().kernel()) {
-                    auto const connections = kernel.input_connections();
+                    auto const connections = kernel->input_connections();
                     if (connections.count(0) > 0) {
                         auto const &connection = connections.at(0);
                         if (auto src_node = connection.source_node();
@@ -122,7 +122,7 @@ struct audio::engine::device_io::impl final : base::impl, manageable_device_io::
                     }
 
                     if (auto device_io = weak_device_io.lock()) {
-                        auto const connections = kernel.output_connections();
+                        auto const connections = kernel->output_connections();
                         if (connections.count(0) > 0) {
                             auto const &connection = connections.at(0);
                             if (auto dst_node = connection.destination_node(); dst_node.is_input_renderable()) {
