@@ -35,7 +35,8 @@ struct unit final : manageable_unit {
     unit(unit &&) = default;
     unit &operator=(unit &&) = default;
 
-    CFStringRef name() const;
+    std::string const &name() const;
+    CFStringRef cf_name() const;
     OSType type() const;
     OSType sub_type() const;
     bool is_output_unit() const;

@@ -181,7 +181,11 @@ audio::unit::~unit() {
 
 #pragma mark - accessor
 
-CFStringRef audio::unit::name() const {
+std::string const &audio::unit::name() const {
+    return this->_name;
+}
+
+CFStringRef audio::unit::cf_name() const {
     return to_cf_object(this->_name);
 }
 
