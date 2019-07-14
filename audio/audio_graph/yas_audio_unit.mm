@@ -164,16 +164,6 @@ audio::unit::unit(AudioComponentDescription const &acd) : _core(std::make_unique
     this->create_raw_unit(acd);
 }
 
-audio::unit::unit(OSType const type, OSType const sub_type)
-    : unit({
-          .componentType = type,
-          .componentSubType = sub_type,
-          .componentManufacturer = kAudioUnitManufacturer_Apple,
-          .componentFlags = 0,
-          .componentFlagsMask = 0,
-      }) {
-}
-
 audio::unit::~unit() {
     this->uninitialize();
     this->dispose_raw_unit();
@@ -696,12 +686,25 @@ void audio::unit::dispose_raw_unit() {
     this->_name.clear();
 }
 
-std::shared_ptr<audio::unit> audio::make_unit(AudioComponentDescription const &acd) {
-    return std::make_shared<unit>(acd);
+namespace yas::audio {
+struct unit_factory : unit {
+    explicit unit_factory(AudioComponentDescription const &acd) : unit(acd) {
+    }
+};
 }
 
-std::shared_ptr<audio::unit> audio::make_unit(OSType const type, OSType const subType) {
-    return std::make_shared<unit>(type, subType);
+std::shared_ptr<audio::unit> audio::make_unit(AudioComponentDescription const &acd) {
+    return std::make_shared<unit_factory>(acd);
+}
+
+std::shared_ptr<audio::unit> audio::make_unit(OSType const type, OSType const sub_type) {
+    return std::make_shared<unit_factory>(AudioComponentDescription{
+        .componentType = type,
+        .componentSubType = sub_type,
+        .componentManufacturer = kAudioUnitManufacturer_Apple,
+        .componentFlags = 0,
+        .componentFlagsMask = 0,
+    });
 }
 
 #pragma mark - global

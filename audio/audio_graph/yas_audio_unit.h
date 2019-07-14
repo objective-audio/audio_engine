@@ -18,7 +18,7 @@ class result;
 }
 
 namespace yas::audio {
-struct unit final : manageable_unit {
+struct unit : manageable_unit {
     class core;
     class parameter;
     using parameter_map_t = std::unordered_map<AudioUnitParameterID, parameter>;
@@ -28,8 +28,6 @@ struct unit final : manageable_unit {
 
     static OSType sub_type_default_io();
 
-    explicit unit(AudioComponentDescription const &acd);
-    unit(OSType const type, OSType const subType);
     virtual ~unit();
 
     unit(unit &&) = default;
@@ -103,6 +101,9 @@ struct unit final : manageable_unit {
     void callback_render(render_parameters &render_parameters);
     raw_unit_result_t raw_unit_render(render_parameters &render_parameters);
 
+   protected:
+    explicit unit(AudioComponentDescription const &acd);
+
    private:
     AudioComponentDescription _acd = {0};
     bool _initialized = false;
@@ -119,7 +120,7 @@ struct unit final : manageable_unit {
 };
 
 std::shared_ptr<audio::unit> make_unit(AudioComponentDescription const &acd);
-std::shared_ptr<audio::unit> make_unit(OSType const type, OSType const subType);
+std::shared_ptr<audio::unit> make_unit(OSType const type, OSType const sub_type);
 }  // namespace yas::audio
 
 namespace yas {

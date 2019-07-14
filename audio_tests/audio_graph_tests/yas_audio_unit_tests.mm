@@ -21,10 +21,10 @@ using namespace yas;
 }
 
 - (void)test_create {
-    audio::unit unit(kAudioUnitType_FormatConverter, kAudioUnitSubType_AUConverter);
+    auto unit = audio::make_unit(kAudioUnitType_FormatConverter, kAudioUnitSubType_AUConverter);
 
-    XCTAssertEqual(unit.type(), kAudioUnitType_FormatConverter);
-    XCTAssertEqual(unit.sub_type(), kAudioUnitSubType_AUConverter);
+    XCTAssertEqual(unit->type(), kAudioUnitType_FormatConverter);
+    XCTAssertEqual(unit->sub_type(), kAudioUnitSubType_AUConverter);
 }
 
 - (void)test_converter_unit {
@@ -180,17 +180,17 @@ using namespace yas;
 }
 
 - (void)test_parameter {
-    audio::unit delay_unit(kAudioUnitType_Effect, kAudioUnitSubType_Delay);
+    auto delay_unit = audio::make_unit(kAudioUnitType_Effect, kAudioUnitSubType_Delay);
 
     AudioUnitScope const scope = kAudioUnitScope_Global;
-    auto parameter = delay_unit.create_parameter(kDelayParam_DelayTime, scope);
+    auto parameter = delay_unit->create_parameter(kDelayParam_DelayTime, scope);
 
-    delay_unit.set_parameter_value(parameter.min_value, kDelayParam_DelayTime, scope, 0);
-    XCTAssertEqual(delay_unit.parameter_value(kDelayParam_DelayTime, scope, 0), parameter.min_value);
-    delay_unit.set_parameter_value(parameter.max_value, kDelayParam_DelayTime, scope, 0);
-    XCTAssertEqual(delay_unit.parameter_value(kDelayParam_DelayTime, scope, 0), parameter.max_value);
-    delay_unit.set_parameter_value(parameter.default_value, kDelayParam_DelayTime, scope, 0);
-    XCTAssertEqual(delay_unit.parameter_value(kDelayParam_DelayTime, scope, 0), parameter.default_value);
+    delay_unit->set_parameter_value(parameter.min_value, kDelayParam_DelayTime, scope, 0);
+    XCTAssertEqual(delay_unit->parameter_value(kDelayParam_DelayTime, scope, 0), parameter.min_value);
+    delay_unit->set_parameter_value(parameter.max_value, kDelayParam_DelayTime, scope, 0);
+    XCTAssertEqual(delay_unit->parameter_value(kDelayParam_DelayTime, scope, 0), parameter.max_value);
+    delay_unit->set_parameter_value(parameter.default_value, kDelayParam_DelayTime, scope, 0);
+    XCTAssertEqual(delay_unit->parameter_value(kDelayParam_DelayTime, scope, 0), parameter.default_value);
 
     XCTAssertTrue(parameter.parameter_id != 0);
     XCTAssertTrue(parameter.scope == scope);
@@ -203,16 +203,16 @@ using namespace yas;
 }
 
 - (void)test_parameter_create_failed {
-    audio::unit delay_unit(kAudioUnitType_Effect, kAudioUnitSubType_Delay);
+    auto delay_unit = audio::make_unit(kAudioUnitType_Effect, kAudioUnitSubType_Delay);
 
-    XCTAssertThrows(delay_unit.create_parameter(kDelayParam_DelayTime, kAudioUnitScope_Input));
-    XCTAssertThrows(delay_unit.create_parameter(kDelayParam_DelayTime, kAudioUnitScope_Output));
+    XCTAssertThrows(delay_unit->create_parameter(kDelayParam_DelayTime, kAudioUnitScope_Input));
+    XCTAssertThrows(delay_unit->create_parameter(kDelayParam_DelayTime, kAudioUnitScope_Output));
 }
 
 - (void)test_parameters {
-    audio::unit delay_unit(kAudioUnitType_Effect, kAudioUnitSubType_Delay);
+    auto delay_unit = audio::make_unit(kAudioUnitType_Effect, kAudioUnitSubType_Delay);
 
-    auto parameters = delay_unit.create_parameters(kAudioUnitScope_Global);
+    auto parameters = delay_unit->create_parameters(kAudioUnitScope_Global);
 
     XCTAssertEqual(parameters.size(), 4);
 
