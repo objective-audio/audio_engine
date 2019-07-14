@@ -18,8 +18,7 @@ class graph;
 namespace yas::audio::engine {
 class node;
 
-class au final : public base {
-   public:
+struct au final : base, manageable_au {
     class impl;
 
     enum class method {
@@ -69,9 +68,8 @@ class au final : public base {
     audio::engine::node const &node() const;
     audio::engine::node &node();
 
-    manageable_au &manageable();
-
-   private:
-    manageable_au _manageable = nullptr;
+    void prepare_unit() override;
+    void prepare_parameters() override;
+    void reload_unit() override;
 };
 }  // namespace yas::audio::engine

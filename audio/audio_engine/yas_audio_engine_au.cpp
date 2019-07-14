@@ -15,7 +15,7 @@ using namespace yas;
 
 #pragma mark - core
 
-struct audio::engine::au::impl : base::impl, manageable_au::impl {
+struct audio::engine::au::impl : base::impl {
     explicit impl(engine::node_args &&args) : _node(std::move(args)) {
     }
 
@@ -80,12 +80,11 @@ struct audio::engine::au::impl : base::impl, manageable_au::impl {
 
         this->_node.manageable().set_add_to_graph_handler([weak_au](audio::graph &graph) {
             if (auto au = weak_au.lock()) {
-                auto &manageable = au.manageable();
-                manageable.prepare_unit();
+                au.prepare_unit();
                 if (auto unit = au.unit()) {
                     graph.add_unit(unit);
                 }
-                manageable.prepare_parameters();
+                au.prepare_parameters();
             }
         });
 
@@ -229,7 +228,7 @@ struct audio::engine::au::impl : base::impl, manageable_au::impl {
         this->_notifier.notify(std::make_pair(au::method::did_update_connections, cast<audio::engine::au>()));
     }
 
-    void prepare_unit() override {
+    void prepare_unit() {
         if (auto unit = this->core_unit()) {
             if (auto const &handler = this->_prepare_unit_handler) {
                 handler(*unit);
@@ -239,7 +238,7 @@ struct audio::engine::au::impl : base::impl, manageable_au::impl {
         }
     }
 
-    void prepare_parameters() override {
+    void prepare_parameters() {
         if (auto unit = this->core_unit()) {
             for (auto &parameters_pair : this->_parameters) {
                 auto &scope = parameters_pair.first;
@@ -255,7 +254,7 @@ struct audio::engine::au::impl : base::impl, manageable_au::impl {
         }
     }
 
-    void reload_unit() override {
+    void reload_unit() {
         this->_core.set_unit(std::make_shared<audio::unit>(_acd));
     }
 
@@ -418,9 +417,14 @@ audio::engine::node &audio::engine::au::node() {
     return impl_ptr<impl>()->_node;
 }
 
-audio::engine::manageable_au &audio::engine::au::manageable() {
-    if (!this->_manageable) {
-        this->_manageable = audio::engine::manageable_au{impl_ptr<manageable_au::impl>()};
-    }
-    return this->_manageable;
+void audio::engine::au::prepare_unit() {
+    impl_ptr<impl>()->prepare_unit();
+}
+
+void audio::engine::au::prepare_parameters() {
+    impl_ptr<impl>()->prepare_parameters();
+}
+
+void audio::engine::au::reload_unit() {
+    impl_ptr<impl>()->reload_unit();
 }

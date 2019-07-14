@@ -24,8 +24,6 @@ using namespace yas;
     audio::engine::au node(kAudioUnitType_Effect, kAudioUnitSubType_Delay);
 
     XCTAssertTrue(node);
-
-    XCTAssertTrue(node.manageable());
 }
 
 - (void)test_create_null {
@@ -84,7 +82,7 @@ using namespace yas;
 
     manager.disconnect(connection);
 
-    delay_au.manageable().reload_unit();
+    delay_au.reload_unit();
 
     manager.connect(delay_au.node(), output.node(), format);
 

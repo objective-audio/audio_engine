@@ -7,18 +7,11 @@
 #include <cpp_utils/yas_protocol.h>
 
 namespace yas::audio::engine {
-struct manageable_au : protocol {
-    struct impl : protocol::impl {
-        virtual void prepare_unit() = 0;
-        virtual void prepare_parameters() = 0;
-        virtual void reload_unit() = 0;
-    };
+struct manageable_au {
+    virtual ~manageable_au() = default;
 
-    explicit manageable_au(std::shared_ptr<impl>);
-    manageable_au(std::nullptr_t);
-
-    void prepare_unit();
-    void prepare_parameters();
-    void reload_unit();
+    virtual void prepare_unit() = 0;
+    virtual void prepare_parameters() = 0;
+    virtual void reload_unit() = 0;
 };
 }  // namespace yas::audio::engine
