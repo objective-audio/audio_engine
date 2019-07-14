@@ -58,7 +58,7 @@ struct effects_vc_internal {
 }
 
 @implementation YASAudioEngineEffectsSampleViewController {
-    std::vector<audio::unit> _units;
+    std::vector<std::shared_ptr<audio::unit>> _units;
     std::optional<uint32_t> _index;
     sample::effects_vc_internal _internal;
 }
@@ -133,7 +133,7 @@ struct effects_vc_internal {
             if (component != NULL) {
                 AudioComponentDescription acd;
                 raise_if_raw_audio_error(AudioComponentGetDescription(component, &acd));
-                _units.push_back(audio::unit(acd));
+                _units.push_back(std::make_shared<audio::unit>(acd));
             } else {
                 break;
             }
@@ -207,7 +207,7 @@ struct effects_vc_internal {
         }
     } else if (indexPath.section == YASAudioEngineEffectsSampleSectionEffects) {
         auto const &unit = _units.at(indexPath.row);
-        cell.textLabel.text = (__bridge NSString *)unit.name();
+        cell.textLabel.text = (__bridge NSString *)unit->cf_name();
         if (_index && indexPath.row == *_index) {
             cell.accessoryType = UITableViewCellAccessoryCheckmark;
         }
@@ -226,7 +226,7 @@ struct effects_vc_internal {
             _index = static_cast<uint32_t>(indexPath.row);
             AudioComponentDescription acd = baseAcd;
             auto const &unit = _units.at(indexPath.row);
-            acd.componentSubType = unit.sub_type();
+            acd.componentSubType = unit->sub_type();
             _internal.replace_effect_au(&acd);
         } break;
     }
