@@ -47,7 +47,7 @@ struct audio::engine::tap::impl : base::impl {
                 if (auto kernel = impl_ptr->_node.kernel()) {
                     impl_ptr->_kernel_on_render = kernel;
 
-                    auto tap_kernel = yas::cast<tap::kernel>(kernel->decorator());
+                    auto tap_kernel = std::any_cast<tap::kernel>(kernel->decorator);
                     auto const &handler = tap_kernel.render_handler();
 
                     if (handler) {
@@ -73,7 +73,7 @@ struct audio::engine::tap::impl : base::impl {
             if (auto tap = weak_tap.lock()) {
                 audio::engine::tap::kernel tap_kernel{};
                 tap_kernel.set_render_handler(tap.impl_ptr<audio::engine::tap::impl>()->_render_handler);
-                kernel.set_decorator(std::move(tap_kernel));
+                kernel.decorator = std::move(tap_kernel);
             }
         });
     }

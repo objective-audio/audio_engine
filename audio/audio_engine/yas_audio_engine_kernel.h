@@ -5,6 +5,7 @@
 #pragma once
 
 #include <cpp_utils/yas_base.h>
+#include <any>
 #include "yas_audio_engine_kernel_protocol.h"
 
 namespace yas::audio::engine {
@@ -16,9 +17,7 @@ struct kernel final : manageable_kernel {
     audio::engine::connection input_connection(uint32_t const bus_idx) const;
     audio::engine::connection output_connection(uint32_t const bus_idx) const;
 
-    void set_decorator(base);
-    base const &decorator() const;
-    base &decorator();
+    std::any decorator = nullptr;
 
     void set_input_connections(audio::engine::connection_wmap connections) override;
     void set_output_connections(audio::engine::connection_wmap connections) override;
@@ -26,6 +25,5 @@ struct kernel final : manageable_kernel {
    private:
     engine::connection_wmap _input_connections;
     engine::connection_wmap _output_connections;
-    base _decorator = nullptr;
 };
 }  // namespace yas::audio::engine

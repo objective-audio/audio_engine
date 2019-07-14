@@ -33,18 +33,6 @@ audio::engine::connection audio::engine::kernel::output_connection(uint32_t cons
     return nullptr;
 }
 
-void audio::engine::kernel::set_decorator(base decor) {
-    this->_decorator = std::move(decor);
-}
-
-base const &audio::engine::kernel::decorator() const {
-    return this->_decorator;
-}
-
-base &audio::engine::kernel::decorator() {
-    return this->_decorator;
-}
-
 void audio::engine::kernel::set_input_connections(audio::engine::connection_wmap connections) {
     this->_input_connections = std::move(connections);
 }
