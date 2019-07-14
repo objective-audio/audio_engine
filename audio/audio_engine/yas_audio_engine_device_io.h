@@ -18,8 +18,7 @@ class device;
 namespace yas::audio::engine {
 class node;
 
-class device_io final : public base {
-   public:
+struct device_io final : base, manageable_device_io {
     class impl;
 
     device_io();
@@ -34,10 +33,9 @@ class device_io final : public base {
     audio::engine::node const &node() const;
     audio::engine::node &node();
 
-    manageable_device_io &manageable();
-
-   private:
-    manageable_device_io _manageable = nullptr;
+    void add_raw_device_io() override;
+    void remove_raw_device_io() override;
+    std::shared_ptr<audio::device_io> &raw_device_io() override;
 };
 }  // namespace yas::audio::engine
 

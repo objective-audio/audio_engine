@@ -18,7 +18,7 @@ using namespace yas;
 
 #pragma mark - audio::engine::device_io::impl
 
-struct audio::engine::device_io::impl final : base::impl, manageable_device_io::impl {
+struct audio::engine::device_io::impl final : base::impl {
     audio::engine::node _node = {{.input_bus_count = 1, .output_bus_count = 1}};
     chaining::any_observer_ptr _connections_observer = nullptr;
 
@@ -33,7 +33,7 @@ struct audio::engine::device_io::impl final : base::impl, manageable_device_io::
             auto &buffer = args.buffer;
 
             if (auto engine_device_io = weak_engine_device_io.lock();
-                auto &device_io = engine_device_io.impl_ptr<impl>()->device_io()) {
+                auto &device_io = engine_device_io.impl_ptr<impl>()->shared_device_io()) {
                 auto &input_buffer = device_io->input_buffer_on_render();
                 if (input_buffer && input_buffer->format() == buffer.format()) {
                     buffer.copy_from(*input_buffer);
@@ -50,15 +50,15 @@ struct audio::engine::device_io::impl final : base::impl, manageable_device_io::
                                           .end();
     }
 
-    void add_device_io() override {
+    void add_device_io() {
         this->_core._device_io = std::make_shared<audio::device_io>(this->_core.device());
     }
 
-    void remove_device_io() override {
+    void remove_device_io() {
         this->_core._device_io = nullptr;
     }
 
-    std::shared_ptr<audio::device_io> &device_io() override {
+    std::shared_ptr<audio::device_io> &shared_device_io() {
         return this->_core._device_io;
     }
 
@@ -208,11 +208,16 @@ audio::engine::node &audio::engine::device_io::node() {
     return impl_ptr<impl>()->_node;
 }
 
-audio::engine::manageable_device_io &audio::engine::device_io::manageable() {
-    if (!this->_manageable) {
-        this->_manageable = audio::engine::manageable_device_io{impl_ptr<manageable_device_io::impl>()};
-    }
-    return this->_manageable;
+void audio::engine::device_io::add_raw_device_io() {
+    impl_ptr<impl>()->add_device_io();
+}
+
+void audio::engine::device_io::remove_raw_device_io() {
+    impl_ptr<impl>()->remove_device_io();
+}
+
+std::shared_ptr<audio::device_io> &audio::engine::device_io::raw_device_io() {
+    return impl_ptr<impl>()->shared_device_io();
 }
 
 #endif

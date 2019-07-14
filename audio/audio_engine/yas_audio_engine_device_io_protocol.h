@@ -4,25 +4,18 @@
 
 #pragma once
 
-#include <cpp_utils/yas_protocol.h>
+#include <memory>
 
 namespace yas::audio {
 class device_io;
 }
 
 namespace yas::audio::engine {
-struct manageable_device_io : protocol {
-    struct impl : protocol::impl {
-        virtual void add_device_io() = 0;
-        virtual void remove_device_io() = 0;
-        virtual std::shared_ptr<audio::device_io> &device_io() = 0;
-    };
+struct manageable_device_io {
+    virtual ~manageable_device_io() = default;
 
-    explicit manageable_device_io(std::shared_ptr<impl>);
-    manageable_device_io(std::nullptr_t);
-
-    void add_device_io();
-    void remove_device_io();
-    std::shared_ptr<audio::device_io> &device_io() const;
+    virtual void add_raw_device_io() = 0;
+    virtual void remove_raw_device_io() = 0;
+    virtual std::shared_ptr<audio::device_io> &raw_device_io() = 0;
 };
 }  // namespace yas::audio::engine
