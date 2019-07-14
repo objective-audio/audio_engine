@@ -11,24 +11,17 @@ using namespace yas;
 
 #pragma mark - kernel
 
-struct audio::engine::route::kernel : base {
-    struct impl : base::impl {
-        route_set_t _routes;
-    };
-
-    kernel() : base(std::make_shared<impl>()) {
+struct audio::engine::route::kernel {
+    kernel() {
     }
 
-    kernel(std::nullptr_t) : base(nullptr) {
-    }
+    route_set_t routes;
 
-    void set_routes(route_set_t routes) {
-        impl_ptr<impl>()->_routes = std::move(routes);
-    }
-
-    route_set_t const &routes() {
-        return impl_ptr<impl>()->_routes;
-    }
+   private:
+    kernel(kernel const &) = delete;
+    kernel(kernel &&) = delete;
+    kernel &operator=(kernel const &) = delete;
+    kernel &operator=(kernel &&) = delete;
 };
 
 #pragma mark - impl
@@ -50,7 +43,8 @@ struct audio::engine::route::impl final : base::impl {
 
             if (auto route = weak_route.lock()) {
                 if (auto kernel = route.node().kernel()) {
-                    auto const &routes = std::any_cast<audio::engine::route::kernel>(kernel->decorator).routes();
+                    auto const &routes =
+                        std::any_cast<std::shared_ptr<audio::engine::route::kernel>>(kernel->decorator)->routes;
                     auto output_connection = kernel->output_connection(dst_bus_idx);
                     auto input_connections = kernel->input_connections();
                     uint32_t const dst_ch_count = dst_buffer.format().channel_count();
@@ -83,8 +77,8 @@ struct audio::engine::route::impl final : base::impl {
 
         this->_node.set_prepare_kernel_handler([weak_route](audio::engine::kernel &kernel) {
             if (auto route = weak_route.lock()) {
-                audio::engine::route::kernel route_kernel{};
-                route_kernel.set_routes(route.impl_ptr<impl>()->_routes);
+                auto route_kernel = std::make_shared<audio::engine::route::kernel>();
+                route_kernel->routes = route.impl_ptr<impl>()->_routes;
                 kernel.decorator = std::move(route_kernel);
             }
         });
