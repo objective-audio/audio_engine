@@ -16,46 +16,38 @@
 using namespace yas;
 
 struct audio::device_io::kernel {
-    struct impl {
-        std::shared_ptr<pcm_buffer> _input_buffer;
-        std::shared_ptr<pcm_buffer> _output_buffer;
-
-        impl(std::optional<audio::format> const &input_format, std::optional<audio::format> const &output_format,
-             uint32_t const frame_capacity)
-            : _input_buffer(input_format ? std::make_shared<pcm_buffer>(*input_format, frame_capacity) : nullptr),
-              _output_buffer(output_format ? std::make_shared<pcm_buffer>(*output_format, frame_capacity) : nullptr) {
-        }
-
-        void reset_buffers() {
-            if (this->_input_buffer) {
-                this->_input_buffer->reset();
-            }
-
-            if (this->_output_buffer) {
-                this->_output_buffer->reset();
-            }
-        }
-    };
-
     kernel(std::optional<audio::format> const &input_format, std::optional<audio::format> const &output_format,
            uint32_t const frame_capacity)
-        : _impl(std::make_shared<impl>(input_format, output_format, frame_capacity)) {
+        : _input_buffer(input_format ? std::make_shared<pcm_buffer>(*input_format, frame_capacity) : nullptr),
+          _output_buffer(output_format ? std::make_shared<pcm_buffer>(*output_format, frame_capacity) : nullptr) {
     }
 
     std::shared_ptr<pcm_buffer> &input_buffer() {
-        return this->_impl->_input_buffer;
+        return this->_input_buffer;
     }
 
     std::shared_ptr<pcm_buffer> &output_buffer() {
-        return this->_impl->_output_buffer;
+        return this->_output_buffer;
     }
 
     void reset_buffers() {
-        this->_impl->reset_buffers();
+        if (this->_input_buffer) {
+            this->_input_buffer->reset();
+        }
+
+        if (this->_output_buffer) {
+            this->_output_buffer->reset();
+        }
     }
 
    private:
-    std::shared_ptr<impl> _impl;
+    std::shared_ptr<pcm_buffer> _input_buffer;
+    std::shared_ptr<pcm_buffer> _output_buffer;
+
+    kernel(kernel const &) = delete;
+    kernel(kernel &&) = delete;
+    kernel &operator=(kernel const &) = delete;
+    kernel &operator=(kernel &&) = delete;
 };
 
 struct audio::device_io::impl : weakable_impl {
