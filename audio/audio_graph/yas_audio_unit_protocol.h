@@ -9,6 +9,8 @@
 
 namespace yas::audio {
 struct manageable_unit {
+    virtual ~manageable_unit() = default;
+
     virtual void initialize() = 0;
     virtual void uninitialize() = 0;
     virtual void set_graph_key(std::optional<uint8_t> const &) = 0;

@@ -20,6 +20,8 @@ union render_id {
     };
 };
 
+render_id make_render_id(uint8_t const graph, uint16_t const unit);
+
 static_assert(sizeof(void *) == sizeof(render_id), "render_id size must be equal to pointer size.");
 
 enum class pcm_format : uint32_t {

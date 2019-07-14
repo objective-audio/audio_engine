@@ -148,17 +148,17 @@ struct audio::graph::impl : base::impl {
         return min_empty_key(this->_units);
     }
 
-    unit unit_for_key(uint16_t const key) const {
+    std::shared_ptr<unit> unit_for_key(uint16_t const key) const {
         std::lock_guard<std::recursive_mutex> lock(_mutex);
         return this->_units.at(key);
     }
 
-    void add_unit_to_units(audio::unit &unit) {
+    void add_unit_to_units(std::shared_ptr<audio::unit> &unit) {
         if (!unit) {
             throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
         }
 
-        if (unit.key()) {
+        if (unit->key()) {
             throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : unit.key is not null.");
         }
 
@@ -166,11 +166,11 @@ struct audio::graph::impl : base::impl {
 
         auto unit_key = next_unit_key();
         if (unit_key) {
-            unit.set_graph_key(key());
-            unit.set_key(*unit_key);
+            unit->set_graph_key(key());
+            unit->set_key(*unit_key);
             auto pair = std::make_pair(*unit_key, unit);
             this->_units.insert(pair);
-            if (unit.is_output_unit()) {
+            if (unit->is_output_unit()) {
                 this->_io_units.insert(pair);
             }
         }
@@ -187,17 +187,17 @@ struct audio::graph::impl : base::impl {
         }
     }
 
-    void add_unit(audio::unit &unit) {
-        if (unit.key()) {
+    void add_unit(std::shared_ptr<audio::unit> &unit) {
+        if (unit->key()) {
             throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : unit.key is already assigned.");
         }
 
         this->add_unit_to_units(unit);
 
-        unit.initialize();
+        unit->initialize();
 
-        if (unit.is_output_unit() && this->_running && !this->is_interrupting()) {
-            unit.start();
+        if (unit->is_output_unit() && this->_running && !this->is_interrupting()) {
+            unit->start();
         }
     }
 
@@ -213,7 +213,7 @@ struct audio::graph::impl : base::impl {
         for_each(this->_units, [this](auto const &it) {
             auto unit = it->second;
             auto next = std::next(it);
-            this->remove_unit(unit);
+            this->remove_unit(*unit);
             return next;
         });
     }
@@ -225,7 +225,7 @@ struct audio::graph::impl : base::impl {
 
         for (auto &pair : this->_io_units) {
             auto &unit = pair.second;
-            unit.start();
+            unit->start();
         }
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
         for (auto &device_io : this->_device_ios) {
@@ -237,7 +237,7 @@ struct audio::graph::impl : base::impl {
     void stop_all_ios() {
         for (auto &pair : this->_io_units) {
             auto &unit = pair.second;
-            unit.stop();
+            unit->stop();
         }
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
         for (auto &device_io : this->_device_ios) {
@@ -292,8 +292,8 @@ struct audio::graph::impl : base::impl {
     uint8_t _key;
     bool _running = false;
     mutable std::recursive_mutex _mutex;
-    std::map<uint16_t, unit> _units;
-    std::map<uint16_t, unit> _io_units;
+    std::map<uint16_t, std::shared_ptr<unit>> _units;
+    std::map<uint16_t, std::shared_ptr<unit>> _io_units;
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
     std::unordered_set<std::shared_ptr<device_io>> _device_ios;
 #endif
@@ -312,7 +312,7 @@ audio::graph::graph(std::nullptr_t) : base(nullptr) {
 
 audio::graph::~graph() = default;
 
-void audio::graph::add_unit(audio::unit &unit) {
+void audio::graph::add_unit(std::shared_ptr<audio::unit> &unit) {
     impl_ptr<impl>()->add_unit(unit);
 }
 
@@ -353,7 +353,7 @@ void audio::graph::unit_render(render_parameters &render_parameters) {
 
     if (auto graph = impl::graph_for_key(render_parameters.render_id.graph)) {
         if (auto unit = graph.impl_ptr<impl>()->unit_for_key(render_parameters.render_id.unit)) {
-            unit.callback_render(render_parameters);
+            unit->callback_render(render_parameters);
         }
     }
 }

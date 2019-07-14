@@ -44,7 +44,7 @@ struct audio::engine::au_mixer::impl : base::impl {
             --last;
             if (auto unit = this->_au.unit()) {
                 auto &pair = *last;
-                unit.set_element_count(pair.first + 1, kAudioUnitScope_Input);
+                unit->set_element_count(pair.first + 1, kAudioUnitScope_Input);
             }
         }
     }

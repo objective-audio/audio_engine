@@ -22,7 +22,7 @@ class graph final : public base {
 
     virtual ~graph();
 
-    void add_unit(audio::unit &);
+    void add_unit(std::shared_ptr<audio::unit> &);
     void remove_unit(audio::unit &);
     void remove_all_units();
 

@@ -44,7 +44,7 @@ class au final : public base {
 
     void set_prepare_unit_handler(prepare_unit_f);
 
-    audio::unit unit() const;
+    std::shared_ptr<audio::unit> unit() const;
     std::unordered_map<AudioUnitScope, std::unordered_map<AudioUnitParameterID, audio::unit::parameter>> const &
     parameters() const;
     std::unordered_map<AudioUnitParameterID, audio::unit::parameter> const &global_parameters() const;

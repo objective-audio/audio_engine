@@ -68,11 +68,11 @@ struct audio::engine::au_io::impl : base::impl {
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
 
     void set_device(audio::device const &device) {
-        this->au().unit().set_current_device(device.audio_device_id());
+        this->au().unit()->set_current_device(device.audio_device_id());
     }
 
     std::shared_ptr<audio::device> device() {
-        return device::device_for_id(this->_au.unit().current_device());
+        return device::device_for_id(this->_au.unit()->current_device());
     }
 
 #endif
@@ -114,7 +114,7 @@ struct audio::engine::au_io::impl : base::impl {
         this->_channel_map[to_uint32(dir)] = map;
 
         if (auto unit = au().unit()) {
-            unit.set_channel_map(map, kAudioUnitScope_Output, to_uint32(dir));
+            unit->set_channel_map(map, kAudioUnitScope_Output, to_uint32(dir));
         }
     }
 
@@ -150,8 +150,8 @@ struct audio::engine::au_io::impl : base::impl {
         auto &input_map = this->_channel_map[input_idx];
         update_channel_map(input_map, this->au().node().output_format(input_idx), this->input_device_channel_count());
 
-        unit.set_channel_map(output_map, kAudioUnitScope_Output, output_idx);
-        unit.set_channel_map(input_map, kAudioUnitScope_Output, input_idx);
+        unit->set_channel_map(output_map, kAudioUnitScope_Output, output_idx);
+        unit->set_channel_map(input_map, kAudioUnitScope_Output, input_idx);
 
         this->_notifier.notify(std::make_pair(au_io::method::did_update_connection, cast<audio::engine::au_io>()));
     }
@@ -289,12 +289,12 @@ struct yas::audio::engine::au_input::impl : base::impl {
         auto unit = _au_io.au().unit();
 
         if (auto out_connection = _au_io.au().node().output_connection(1)) {
-            unit.attach_input_callback();
+            unit->attach_input_callback();
 
             this->_input_buffer = std::make_shared<pcm_buffer>(out_connection.format(), 4096);
 
             auto weak_au_input = to_weak(cast<au_input>());
-            unit.set_input_handler(
+            unit->set_input_handler(
                 [weak_au_input, input_buffer = this->_input_buffer](render_parameters &render_parameters) mutable {
                     auto au_input = weak_au_input.lock();
                     if (au_input && render_parameters.in_number_frames <= input_buffer->frame_capacity()) {
@@ -309,7 +309,7 @@ struct yas::audio::engine::au_input::impl : base::impl {
 
                                 if (auto io_unit = au_input.au_io().au().unit()) {
                                     render_parameters.in_bus_number = 1;
-                                    io_unit.raw_unit_render(render_parameters);
+                                    io_unit->raw_unit_render(render_parameters);
                                 }
 
                                 auto dst_node = connection.destination_node();
@@ -322,8 +322,8 @@ struct yas::audio::engine::au_input::impl : base::impl {
                     }
                 });
         } else {
-            unit.detach_input_callback();
-            unit.set_input_handler(nullptr);
+            unit->detach_input_callback();
+            unit->set_input_handler(nullptr);
             this->_input_buffer = nullptr;
         }
     }

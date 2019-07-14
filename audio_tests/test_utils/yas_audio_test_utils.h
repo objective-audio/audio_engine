@@ -20,8 +20,8 @@ bool is_equal(double const val1, double const val2, double const accuracy = 0);
 bool is_equal_data(void const *const inData1, void const *const inData2, const size_t inSize);
 bool is_equal(AudioTimeStamp const *const ts1, AudioTimeStamp const *const ts2);
 
-void raw_unit_render_on_sub_thread(audio::unit &unit, audio::format &format, uint32_t const frame_length,
-                                   std::size_t const count, NSTimeInterval const wait);
+void raw_unit_render_on_sub_thread(std::shared_ptr<audio::unit> &unit, audio::format &format,
+                                   uint32_t const frame_length, std::size_t const count, NSTimeInterval const wait);
 
 class audio_test_node_object : public base {
     class impl;

@@ -23,13 +23,8 @@ using namespace yas;
 - (void)test_create {
     audio::unit unit(kAudioUnitType_FormatConverter, kAudioUnitSubType_AUConverter);
 
-    XCTAssertTrue(unit);
-}
-
-- (void)test_create_null {
-    audio::unit unit{nullptr};
-
-    XCTAssertFalse(unit);
+    XCTAssertEqual(unit.type(), kAudioUnitType_FormatConverter);
+    XCTAssertEqual(unit.sub_type(), kAudioUnitSubType_AUConverter);
 }
 
 - (void)test_converter_unit {
@@ -52,32 +47,32 @@ using namespace yas;
 
     audio::graph graph;
 
-    audio::unit converter_unit(kAudioUnitType_FormatConverter, kAudioUnitSubType_AUConverter);
-    converter_unit.set_maximum_frames_per_slice(maximum_frame_length);
+    auto converter_unit = std::make_shared<audio::unit>(kAudioUnitType_FormatConverter, kAudioUnitSubType_AUConverter);
+    converter_unit->set_maximum_frames_per_slice(maximum_frame_length);
 
     graph.add_unit(converter_unit);
 
-    XCTAssertTrue(converter_unit.is_initialized());
-    XCTAssertEqual(converter_unit.type(), type);
-    XCTAssertEqual(converter_unit.sub_type(), sub_type);
-    XCTAssertFalse(converter_unit.is_output_unit());
-    XCTAssertTrue(converter_unit.raw_unit() != NULL);
-    XCTAssertEqual(converter_unit.maximum_frames_per_slice(), maximum_frame_length);
+    XCTAssertTrue(converter_unit->is_initialized());
+    XCTAssertEqual(converter_unit->type(), type);
+    XCTAssertEqual(converter_unit->sub_type(), sub_type);
+    XCTAssertFalse(converter_unit->is_output_unit());
+    XCTAssertTrue(converter_unit->raw_unit() != NULL);
+    XCTAssertEqual(converter_unit->maximum_frames_per_slice(), maximum_frame_length);
 
-    converter_unit.attach_render_callback(0);
-    converter_unit.set_output_format(output_format.stream_description(), 0);
-    converter_unit.set_input_format(input_format.stream_description(), 0);
+    converter_unit->attach_render_callback(0);
+    converter_unit->set_output_format(output_format.stream_description(), 0);
+    converter_unit->set_input_format(input_format.stream_description(), 0);
 
-    AudioStreamBasicDescription outputASBD = converter_unit.output_format(0);
+    AudioStreamBasicDescription outputASBD = converter_unit->output_format(0);
     XCTAssertTrue(is_equal(output_format.stream_description(), outputASBD));
 
-    AudioStreamBasicDescription inputASBD = converter_unit.input_format(0);
+    AudioStreamBasicDescription inputASBD = converter_unit->input_format(0);
     XCTAssertTrue(is_equal(input_format.stream_description(), inputASBD));
 
     auto exp = make_objc_ptr<XCTestExpectation *>(
         [&self]() { return [self expectationWithDescription:@"ConverterUnit Render"]; });
 
-    converter_unit.set_render_handler([exp, input_format, &self](audio::render_parameters &render_parameters) mutable {
+    converter_unit->set_render_handler([exp, input_format, &self](audio::render_parameters &render_parameters) mutable {
         if (exp) {
             const AudioBufferList *ioData = render_parameters.io_data;
             XCTAssertNotEqual(ioData, nullptr);
@@ -100,9 +95,9 @@ using namespace yas;
 
                                  }];
 
-    graph.remove_unit(converter_unit);
+    graph.remove_unit(*converter_unit);
 
-    XCTAssertFalse(converter_unit.is_initialized());
+    XCTAssertFalse(converter_unit->is_initialized());
 }
 
 - (void)test_render_callback {
@@ -118,15 +113,15 @@ using namespace yas;
 
     audio::graph graph;
 
-    audio::unit converter_unit(kAudioUnitType_FormatConverter, kAudioUnitSubType_AUConverter);
-    converter_unit.set_maximum_frames_per_slice(maximum_frame_length);
+    auto converter_unit = std::make_shared<audio::unit>(kAudioUnitType_FormatConverter, kAudioUnitSubType_AUConverter);
+    converter_unit->set_maximum_frames_per_slice(maximum_frame_length);
 
     graph.add_unit(converter_unit);
 
-    converter_unit.attach_render_callback(0);
-    converter_unit.attach_render_notify();
-    converter_unit.set_output_format(format.stream_description(), 0);
-    converter_unit.set_input_format(format.stream_description(), 0);
+    converter_unit->attach_render_callback(0);
+    converter_unit->attach_render_notify();
+    converter_unit->set_output_format(format.stream_description(), 0);
+    converter_unit->set_input_format(format.stream_description(), 0);
 
     auto render_exp = make_objc_ptr<XCTestExpectation *>(
         [&self]() { return [self expectationWithDescription:@"ConverterUnit Render"]; });
@@ -135,14 +130,14 @@ using namespace yas;
     auto post_render_exp = make_objc_ptr<XCTestExpectation *>(
         [&self]() { return [self expectationWithDescription:@"ConverterUnit PostRender"]; });
 
-    converter_unit.set_render_handler([render_exp](audio::render_parameters &render_parameters) mutable {
+    converter_unit->set_render_handler([render_exp](audio::render_parameters &render_parameters) mutable {
         if (render_exp) {
             [render_exp.object() fulfill];
             render_exp.set_object(nil);
         }
     });
 
-    converter_unit.set_notify_handler(
+    converter_unit->set_notify_handler(
         [pre_render_exp, post_render_exp](audio::render_parameters &render_parameters) mutable {
             AudioUnitRenderActionFlags flags = *render_parameters.io_action_flags;
             if (flags & kAudioUnitRenderAction_PreRender) {
@@ -165,16 +160,16 @@ using namespace yas;
 
                                  }];
 
-    converter_unit.detach_render_notify();
-    converter_unit.detach_render_callback(0);
+    converter_unit->detach_render_notify();
+    converter_unit->detach_render_callback(0);
 
     bool is_render_callback = false;
     bool is_render_notify_callback = false;
 
-    converter_unit.set_render_handler(
+    converter_unit->set_render_handler(
         [&is_render_callback](audio::render_parameters &render_parameters) { is_render_callback = true; });
 
-    converter_unit.set_notify_handler([&is_render_notify_callback](audio::render_parameters &render_parameters) {
+    converter_unit->set_notify_handler([&is_render_notify_callback](audio::render_parameters &render_parameters) {
         is_render_notify_callback = true;
     });
 

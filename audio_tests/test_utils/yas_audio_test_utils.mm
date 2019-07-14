@@ -170,8 +170,9 @@ uint8_t const *test::data_ptr_from_buffer(audio::pcm_buffer const &buffer, uint3
     }
 }
 
-void test::raw_unit_render_on_sub_thread(audio::unit &unit, audio::format &format, uint32_t const frame_length,
-                                         std::size_t const count, NSTimeInterval const wait) {
+void test::raw_unit_render_on_sub_thread(std::shared_ptr<audio::unit> &unit, audio::format &format,
+                                         uint32_t const frame_length, std::size_t const count,
+                                         NSTimeInterval const wait) {
     auto lambda = [unit, format, frame_length, count]() mutable {
         AudioUnitRenderActionFlags action_flags = 0;
 
@@ -190,7 +191,7 @@ void test::raw_unit_render_on_sub_thread(audio::unit &unit, audio::format &forma
                 .io_data = buffer.audio_buffer_list(),
             };
 
-            unit.raw_unit_render(parameters);
+            unit->raw_unit_render(parameters);
         }
     };
 
