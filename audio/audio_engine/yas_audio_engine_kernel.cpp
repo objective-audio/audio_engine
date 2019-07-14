@@ -8,7 +8,7 @@ using namespace yas;
 
 #pragma mark - audio::engine::kernel::impl
 
-struct audio::engine::kernel::impl : base::impl, manageable_kernel::impl {
+struct audio::engine::kernel::impl : base::impl {
     audio::engine::connection input_connection(uint32_t const bus_idx) {
         if (this->_input_connections.count(bus_idx) > 0) {
             return this->_input_connections.at(bus_idx).lock();
@@ -91,9 +91,10 @@ base &audio::engine::kernel::decorator() {
     return impl_ptr<impl>()->decorator();
 }
 
-audio::engine::manageable_kernel &audio::engine::kernel::manageable() {
-    if (!_manageable) {
-        _manageable = audio::engine::manageable_kernel{impl_ptr<audio::engine::manageable_kernel::impl>()};
-    }
-    return _manageable;
+void audio::engine::kernel::set_input_connections(audio::engine::connection_wmap connections) {
+    return impl_ptr<impl>()->set_input_connections(std::move(connections));
+}
+
+void audio::engine::kernel::set_output_connections(audio::engine::connection_wmap connections) {
+    return impl_ptr<impl>()->set_output_connections(std::move(connections));
 }

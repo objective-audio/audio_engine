@@ -188,9 +188,8 @@ struct audio::engine::node::impl : base::impl, manageable_node::impl, connectabl
             throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
         }
 
-        auto &manageable_kernel = kernel.manageable();
-        manageable_kernel.set_input_connections(_input_connections);
-        manageable_kernel.set_output_connections(_output_connections);
+        kernel.set_input_connections(_input_connections);
+        kernel.set_output_connections(_output_connections);
 
         if (this->_prepare_kernel_handler) {
             this->_prepare_kernel_handler(kernel);

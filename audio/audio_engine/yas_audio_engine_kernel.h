@@ -8,7 +8,7 @@
 #include "yas_audio_engine_kernel_protocol.h"
 
 namespace yas::audio::engine {
-struct kernel final : base {
+struct kernel final : base, manageable_kernel {
     kernel();
     kernel(std::nullptr_t);
 
@@ -23,11 +23,10 @@ struct kernel final : base {
     base const &decorator() const;
     base &decorator();
 
-    manageable_kernel &manageable();
+    void set_input_connections(audio::engine::connection_wmap connections) override;
+    void set_output_connections(audio::engine::connection_wmap connections) override;
 
    private:
     struct impl;
-
-    manageable_kernel _manageable = nullptr;
 };
 }  // namespace yas::audio::engine

@@ -48,8 +48,6 @@ using namespace yas;
 
     XCTAssertEqual(kernel.input_connections().size(), 0);
     XCTAssertEqual(kernel.output_connections().size(), 0);
-
-    XCTAssertTrue(kernel.manageable());
 }
 
 - (void)test_connection {
