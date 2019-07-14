@@ -95,7 +95,7 @@ using namespace yas;
 
                                  }];
 
-    graph.remove_unit(*converter_unit);
+    graph.remove_unit(converter_unit);
 
     XCTAssertFalse(converter_unit->is_initialized());
 }

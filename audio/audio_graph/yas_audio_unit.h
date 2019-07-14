@@ -89,13 +89,6 @@ struct unit : manageable_unit {
     void stop();   // for io
     void reset();
 
-    void initialize() override;
-    void uninitialize() override;
-    void set_graph_key(std::optional<uint8_t> const &) override;
-    std::optional<uint8_t> const &graph_key() const override;
-    void set_key(std::optional<uint16_t> const &) override;
-    std::optional<uint16_t> const &key() const override;
-
     // render thread
 
     void callback_render(render_parameters &render_parameters);
@@ -104,12 +97,23 @@ struct unit : manageable_unit {
    protected:
     explicit unit(AudioComponentDescription const &acd);
 
+    std::optional<uint8_t> _graph_key = std::nullopt;
+    std::optional<uint16_t> _key = std::nullopt;
+
+    void _initialize();
+    void _uninitialize();
+
+    virtual void initialize();
+    virtual void uninitialize();
+    virtual void set_graph_key(std::optional<uint8_t> const &);
+    virtual std::optional<uint8_t> const &graph_key() const;
+    virtual void set_key(std::optional<uint16_t> const &);
+    virtual std::optional<uint16_t> const &key() const;
+
    private:
     AudioComponentDescription _acd = {0};
     bool _initialized = false;
     std::string _name;
-    std::optional<uint8_t> _graph_key = std::nullopt;
-    std::optional<uint16_t> _key = std::nullopt;
     std::unique_ptr<core> _core;
 
     unit(unit const &) = delete;

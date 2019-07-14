@@ -158,7 +158,9 @@ struct audio::graph::impl : base::impl {
             throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
         }
 
-        if (unit->key()) {
+        auto manageable_unit = std::dynamic_pointer_cast<audio::manageable_unit>(unit);
+
+        if (manageable_unit->key()) {
             throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : unit.key is not null.");
         }
 
@@ -166,8 +168,8 @@ struct audio::graph::impl : base::impl {
 
         auto unit_key = next_unit_key();
         if (unit_key) {
-            unit->set_graph_key(key());
-            unit->set_key(*unit_key);
+            manageable_unit->set_graph_key(key());
+            manageable_unit->set_key(*unit_key);
             auto pair = std::make_pair(*unit_key, unit);
             this->_units.insert(pair);
             if (unit->is_output_unit()) {
@@ -176,33 +178,39 @@ struct audio::graph::impl : base::impl {
         }
     }
 
-    void remove_unit_from_units(audio::unit &unit) {
+    void remove_unit_from_units(std::shared_ptr<audio::unit> &unit) {
         std::lock_guard<std::recursive_mutex> lock(_mutex);
 
-        if (auto key = unit.key()) {
+        auto manageable_unit = std::dynamic_pointer_cast<audio::manageable_unit>(unit);
+
+        if (auto key = manageable_unit->key()) {
             this->_units.erase(*key);
             this->_io_units.erase(*key);
-            unit.set_key(std::nullopt);
-            unit.set_graph_key(std::nullopt);
+            manageable_unit->set_key(std::nullopt);
+            manageable_unit->set_graph_key(std::nullopt);
         }
     }
 
     void add_unit(std::shared_ptr<audio::unit> &unit) {
-        if (unit->key()) {
+        auto manageable_unit = std::dynamic_pointer_cast<audio::manageable_unit>(unit);
+
+        if (manageable_unit->key()) {
             throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : unit.key is already assigned.");
         }
 
         this->add_unit_to_units(unit);
 
-        unit->initialize();
+        manageable_unit->initialize();
 
         if (unit->is_output_unit() && this->_running && !this->is_interrupting()) {
             unit->start();
         }
     }
 
-    void remove_unit(audio::unit &unit) {
-        unit.uninitialize();
+    void remove_unit(std::shared_ptr<audio::unit> &unit) {
+        auto manageable_unit = std::dynamic_pointer_cast<audio::manageable_unit>(unit);
+
+        manageable_unit->uninitialize();
 
         this->remove_unit_from_units(unit);
     }
@@ -213,7 +221,7 @@ struct audio::graph::impl : base::impl {
         for_each(this->_units, [this](auto const &it) {
             auto unit = it->second;
             auto next = std::next(it);
-            this->remove_unit(*unit);
+            this->remove_unit(unit);
             return next;
         });
     }
@@ -316,7 +324,7 @@ void audio::graph::add_unit(std::shared_ptr<audio::unit> &unit) {
     impl_ptr<impl>()->add_unit(unit);
 }
 
-void audio::graph::remove_unit(audio::unit &unit) {
+void audio::graph::remove_unit(std::shared_ptr<audio::unit> &unit) {
     impl_ptr<impl>()->remove_unit(unit);
 }
 

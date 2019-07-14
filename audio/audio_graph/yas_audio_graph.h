@@ -23,7 +23,7 @@ class graph final : public base {
     virtual ~graph();
 
     void add_unit(std::shared_ptr<audio::unit> &);
-    void remove_unit(audio::unit &);
+    void remove_unit(std::shared_ptr<audio::unit> &);
     void remove_all_units();
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)

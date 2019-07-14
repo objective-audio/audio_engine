@@ -165,7 +165,7 @@ audio::unit::unit(AudioComponentDescription const &acd) : _core(std::make_unique
 }
 
 audio::unit::~unit() {
-    this->uninitialize();
+    this->_uninitialize();
     this->dispose_raw_unit();
 }
 
@@ -563,7 +563,7 @@ void audio::unit::reset() {
     raise_if_raw_audio_error(AudioUnitReset(_core->raw_unit(), kAudioUnitScope_Global, 0));
 }
 
-void audio::unit::initialize() {
+void audio::unit::_initialize() {
     if (this->_initialized) {
         return;
     }
@@ -580,7 +580,7 @@ void audio::unit::initialize() {
     this->_initialized = true;
 }
 
-void audio::unit::uninitialize() {
+void audio::unit::_uninitialize() {
     if (!this->_initialized) {
         return;
     }
@@ -595,22 +595,6 @@ void audio::unit::uninitialize() {
     raise_if_raw_audio_error(AudioUnitUninitialize(au));
 
     this->_initialized = false;
-}
-
-void audio::unit::set_graph_key(std::optional<uint8_t> const &key) {
-    this->_graph_key = key;
-}
-
-std::optional<uint8_t> const &audio::unit::graph_key() const {
-    return this->_graph_key;
-}
-
-void audio::unit::set_key(std::optional<uint16_t> const &key) {
-    this->_key = key;
-}
-
-std::optional<uint16_t> const &audio::unit::key() const {
-    return this->_key;
 }
 
 #pragma mark - render thread
@@ -686,9 +670,52 @@ void audio::unit::dispose_raw_unit() {
     this->_name.clear();
 }
 
+void audio::unit::initialize() {
+    throw std::runtime_error("");
+}
+void audio::unit::uninitialize() {
+    throw std::runtime_error("");
+}
+void audio::unit::set_graph_key(std::optional<uint8_t> const &) {
+    throw std::runtime_error("");
+}
+std::optional<uint8_t> const &audio::unit::graph_key() const {
+    throw std::runtime_error("");
+}
+void audio::unit::set_key(std::optional<uint16_t> const &) {
+    throw std::runtime_error("");
+}
+std::optional<uint16_t> const &audio::unit::key() const {
+    throw std::runtime_error("");
+}
+
 namespace yas::audio {
 struct unit_factory : unit {
     explicit unit_factory(AudioComponentDescription const &acd) : unit(acd) {
+    }
+
+    void initialize() override {
+        this->_initialize();
+    }
+
+    void uninitialize() override {
+        this->_uninitialize();
+    }
+
+    void set_graph_key(std::optional<uint8_t> const &key) override {
+        this->_graph_key = key;
+    }
+
+    std::optional<uint8_t> const &graph_key() const override {
+        return this->_graph_key;
+    }
+
+    void set_key(std::optional<uint16_t> const &key) override {
+        this->_key = key;
+    }
+
+    std::optional<uint16_t> const &key() const override {
+        return this->_key;
     }
 };
 }

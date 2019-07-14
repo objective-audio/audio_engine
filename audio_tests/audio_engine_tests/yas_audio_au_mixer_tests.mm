@@ -28,6 +28,7 @@ using namespace yas;
 
 - (void)test_set_format_success {
     auto mixer_unit = audio::make_unit(kAudioUnitType_Mixer, kAudioUnitSubType_MultiChannelMixer);
+    auto manageable_unit = std::dynamic_pointer_cast<audio::manageable_unit>(mixer_unit);
 
     /*
      Float32
@@ -39,7 +40,7 @@ using namespace yas;
 
     XCTAssertNoThrow(mixer_unit->set_output_format(format.stream_description(), 0));
 
-    XCTAssertNoThrow(mixer_unit->initialize());
+    XCTAssertNoThrow(manageable_unit->initialize());
 
     XCTAssertNoThrow(mixer_unit->set_input_format(format.stream_description(), 0));
 
@@ -51,7 +52,7 @@ using namespace yas;
     XCTAssertNoThrow(asbd = mixer_unit->input_format(0));
     XCTAssertTrue(is_equal(format.stream_description(), asbd));
 
-    XCTAssertNoThrow(mixer_unit->uninitialize());
+    XCTAssertNoThrow(manageable_unit->uninitialize());
 
 #if TARGET_OS_IPHONE
     /*
@@ -63,7 +64,7 @@ using namespace yas;
 
     XCTAssertNoThrow(mixer_unit->set_output_format(format.stream_description(), 0));
 
-    XCTAssertNoThrow(mixer_unit->initialize());
+    XCTAssertNoThrow(manageable_unit->initialize());
 
     XCTAssertNoThrow(mixer_unit->set_input_format(format.stream_description(), 0));
 
@@ -75,12 +76,13 @@ using namespace yas;
     XCTAssertNoThrow(asbd = mixer_unit->input_format(0));
     XCTAssertTrue(is_equal(format.stream_description(), asbd));
 
-    XCTAssertNoThrow(mixer_unit->uninitialize());
+    XCTAssertNoThrow(manageable_unit->uninitialize());
 #endif
 }
 
 - (void)test_set_format_failed {
     auto mixer_unit = audio::make_unit(kAudioUnitType_Mixer, kAudioUnitSubType_MultiChannelMixer);
+    auto manageable_unit = std::dynamic_pointer_cast<audio::manageable_unit>(mixer_unit);
 
     /*
      Initialized
@@ -88,9 +90,9 @@ using namespace yas;
 
     auto format = audio::format({.sample_rate = 48000.0, 2, audio::pcm_format::float32, false});
 
-    mixer_unit->initialize();
+    manageable_unit->initialize();
     XCTAssertThrows(mixer_unit->set_output_format(format.stream_description(), 0));
-    mixer_unit->uninitialize();
+    manageable_unit->uninitialize();
     XCTAssertNoThrow(mixer_unit->set_output_format(format.stream_description(), 0));
 
     /*

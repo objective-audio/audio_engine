@@ -91,7 +91,7 @@ struct audio::engine::au::impl : base::impl {
         this->_node.manageable().set_remove_from_graph_handler([weak_au](audio::graph &graph) {
             if (auto au = weak_au.lock()) {
                 if (auto unit = au.unit()) {
-                    graph.remove_unit(*unit);
+                    graph.remove_unit(unit);
                 }
             }
         });
