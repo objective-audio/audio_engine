@@ -9,8 +9,8 @@
 #include "yas_audio_engine_kernel_protocol.h"
 
 namespace yas::audio::engine {
-struct kernel final : manageable_kernel {
-    kernel();
+struct kernel : manageable_kernel {
+    virtual ~kernel() = default;
 
     audio::engine::connection_smap input_connections() const;
     audio::engine::connection_smap output_connections() const;
@@ -19,11 +19,15 @@ struct kernel final : manageable_kernel {
 
     std::any decorator = nullptr;
 
-    void set_input_connections(audio::engine::connection_wmap connections) override;
-    void set_output_connections(audio::engine::connection_wmap connections) override;
+   protected:
+    kernel();
 
-   private:
+    virtual void set_input_connections(audio::engine::connection_wmap connections) override;
+    virtual void set_output_connections(audio::engine::connection_wmap connections) override;
+
     engine::connection_wmap _input_connections;
     engine::connection_wmap _output_connections;
 };
+
+std::shared_ptr<audio::engine::kernel> make_kernel();
 }  // namespace yas::audio::engine

@@ -34,9 +34,25 @@ audio::engine::connection audio::engine::kernel::output_connection(uint32_t cons
 }
 
 void audio::engine::kernel::set_input_connections(audio::engine::connection_wmap connections) {
-    this->_input_connections = std::move(connections);
+    throw std::runtime_error("");
 }
 
 void audio::engine::kernel::set_output_connections(audio::engine::connection_wmap connections) {
-    this->_output_connections = std::move(connections);
+    throw std::runtime_error("");
+}
+
+namespace yas::audio::engine {
+struct kernel_factory : kernel {
+    void set_input_connections(audio::engine::connection_wmap connections) override {
+        this->_input_connections = std::move(connections);
+    }
+
+    void set_output_connections(audio::engine::connection_wmap connections) override {
+        this->_output_connections = std::move(connections);
+    }
+};
+}  // namespace yas::audio::engine
+
+std::shared_ptr<audio::engine::kernel> audio::engine::make_kernel() {
+    return std::make_shared<audio::engine::kernel_factory>();
 }

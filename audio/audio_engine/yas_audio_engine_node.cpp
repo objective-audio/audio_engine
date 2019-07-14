@@ -183,18 +183,19 @@ struct audio::engine::node::impl : base::impl, manageable_node::impl, connectabl
         this->_prepare_kernel_handler = std::move(handler);
     }
 
-    void prepare_kernel(audio::engine::kernel &kernel) {
-        kernel.set_input_connections(_input_connections);
-        kernel.set_output_connections(_output_connections);
+    void prepare_kernel(std::shared_ptr<audio::engine::kernel> &kernel) {
+        auto manageable_kernel = std::dynamic_pointer_cast<audio::engine::manageable_kernel>(kernel);
+        manageable_kernel->set_input_connections(_input_connections);
+        manageable_kernel->set_output_connections(_output_connections);
 
         if (this->_prepare_kernel_handler) {
-            this->_prepare_kernel_handler(kernel);
+            this->_prepare_kernel_handler(*kernel);
         }
     }
 
     void update_kernel() override {
-        auto kernel = std::make_shared<audio::engine::kernel>();
-        this->prepare_kernel(*kernel);
+        auto kernel = audio::engine::make_kernel();
+        this->prepare_kernel(kernel);
         this->_core.set_kernel(kernel);
     }
 

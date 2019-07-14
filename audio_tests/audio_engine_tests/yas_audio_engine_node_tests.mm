@@ -42,10 +42,10 @@ using namespace yas;
 }
 
 - (void)test_create_kernel {
-    audio::engine::kernel kernel;
+    auto kernel = audio::engine::make_kernel();
 
-    XCTAssertEqual(kernel.input_connections().size(), 0);
-    XCTAssertEqual(kernel.output_connections().size(), 0);
+    XCTAssertEqual(kernel->input_connections().size(), 0);
+    XCTAssertEqual(kernel->output_connections().size(), 0);
 }
 
 - (void)test_connection {
