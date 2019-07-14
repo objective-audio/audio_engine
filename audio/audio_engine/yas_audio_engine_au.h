@@ -65,8 +65,8 @@ struct au final : base, manageable_au {
     [[nodiscard]] chaining::chain_unsync_t<chaining_pair_t> chain() const;
     [[nodiscard]] chaining::chain_relayed_unsync_t<au, chaining_pair_t> chain(method const) const;
 
-    audio::engine::node const &node() const;
-    audio::engine::node &node();
+    std::shared_ptr<audio::engine::node> const &node() const;
+    std::shared_ptr<audio::engine::node> &node();
 
     void prepare_unit() override;
     void prepare_parameters() override;

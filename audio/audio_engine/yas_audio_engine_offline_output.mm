@@ -14,13 +14,13 @@ using namespace yas;
 
 struct audio::engine::offline_output::impl : base::impl, manageable_offline_output::impl {
     task_queue _queue = nullptr;
-    audio::engine::node _node = {{.input_bus_count = 1, .output_bus_count = 0}};
+    std::shared_ptr<audio::engine::node> _node = make_node({.input_bus_count = 1, .output_bus_count = 0});
     chaining::any_observer_ptr _reset_observer = nullptr;
 
     ~impl() = default;
 
     void prepare(offline_output const &output) {
-        this->_reset_observer = this->_node.chain(node::method::will_reset)
+        this->_reset_observer = this->_node->chain(node::method::will_reset)
                                     .perform([weak_output = to_weak(output)](auto const &) {
                                         if (auto output = weak_output.lock()) {
                                             output.impl_ptr<audio::engine::offline_output::impl>()->stop();
@@ -33,7 +33,7 @@ struct audio::engine::offline_output::impl : base::impl, manageable_offline_outp
                                                 offline_completion_f &&completion_handler) override {
         if (this->_queue) {
             return offline_start_result_t(offline_start_error_t::already_running);
-        } else if (auto connection = this->_node.input_connection(0)) {
+        } else if (auto connection = this->_node->input_connection(0)) {
             std::optional<uint8_t> key;
             if (completion_handler) {
                 key = this->_core.push_completion_handler(std::move(completion_handler));
@@ -59,7 +59,7 @@ struct audio::engine::offline_output::impl : base::impl, manageable_offline_outp
                         break;
                     }
 
-                    auto kernel = output.node().kernel();
+                    auto kernel = output.node()->kernel();
                     if (!kernel) {
                         cancelled = true;
                         break;
@@ -80,7 +80,7 @@ struct audio::engine::offline_output::impl : base::impl, manageable_offline_outp
                     render_buffer->reset();
 
                     if (auto src_node = connection_on_block.source_node()) {
-                        src_node.render(
+                        src_node->render(
                             {.buffer = *render_buffer, .bus_idx = connection_on_block.source_bus(), .when = when});
                     }
 
@@ -146,7 +146,7 @@ struct audio::engine::offline_output::impl : base::impl, manageable_offline_outp
         return this->_queue != nullptr;
     }
 
-    audio::engine::node &node() {
+    std::shared_ptr<audio::engine::node> &node() {
         return this->_node;
     }
 
@@ -208,10 +208,10 @@ bool audio::engine::offline_output::is_running() const {
     return impl_ptr<impl>()->is_running();
 }
 
-audio::engine::node const &audio::engine::offline_output::node() const {
+std::shared_ptr<audio::engine::node> const &audio::engine::offline_output::node() const {
     return impl_ptr<impl>()->node();
 }
-audio::engine::node &audio::engine::offline_output::node() {
+std::shared_ptr<audio::engine::node> &audio::engine::offline_output::node() {
     return impl_ptr<impl>()->node();
 }
 

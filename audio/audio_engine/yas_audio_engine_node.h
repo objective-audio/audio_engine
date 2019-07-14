@@ -28,8 +28,7 @@ namespace yas::audio::engine {
 class manager;
 class kernel;
 
-class node final : public base {
-   public:
+struct node : public base {
     class impl;
 
     enum class method {
@@ -48,8 +47,10 @@ class node final : public base {
     using prepare_kernel_f = std::function<void(kernel &)>;
     using render_f = std::function<void(render_args)>;
 
-    node(node_args);
     node(std::nullptr_t);
+
+    //    node(node &&) = default;
+    //    node &operator=(node &&) = default;
 
     virtual ~node();
 
@@ -88,10 +89,18 @@ class node final : public base {
     audio::engine::manageable_node const &manageable() const;
     audio::engine::manageable_node &manageable();
 
+   protected:
+    node(node_args &&);
+
    private:
     audio::engine::connectable_node _connectable = nullptr;
     mutable audio::engine::manageable_node _manageable = nullptr;
+
+    //    node(node const &) = delete;
+    //    node &operator=(node const &) = delete;
 };
+
+std::shared_ptr<node> make_node(node_args);
 }  // namespace yas::audio::engine
 
 namespace yas {

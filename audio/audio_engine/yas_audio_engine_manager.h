@@ -51,18 +51,20 @@ class manager final : public base {
 
     virtual ~manager();
 
-    audio::engine::connection connect(audio::engine::node &source_node, audio::engine::node &destination_node,
+    audio::engine::connection connect(std::shared_ptr<audio::engine::node> &source_node,
+                                      std::shared_ptr<audio::engine::node> &destination_node,
                                       audio::format const &format);
-    audio::engine::connection connect(audio::engine::node &source_node, audio::engine::node &destination_node,
+    audio::engine::connection connect(std::shared_ptr<audio::engine::node> &source_node,
+                                      std::shared_ptr<audio::engine::node> &destination_node,
                                       uint32_t const source_bus_idx, uint32_t const destination_bus_idx,
                                       audio::format const &format);
 
     void disconnect(audio::engine::connection &);
-    void disconnect(audio::engine::node &);
-    void disconnect_input(audio::engine::node const &);
-    void disconnect_input(audio::engine::node const &, uint32_t const bus_idx);
-    void disconnect_output(audio::engine::node const &);
-    void disconnect_output(audio::engine::node const &, uint32_t const bus_idx);
+    void disconnect(std::shared_ptr<audio::engine::node> &);
+    void disconnect_input(std::shared_ptr<audio::engine::node> const &);
+    void disconnect_input(std::shared_ptr<audio::engine::node> const &, uint32_t const bus_idx);
+    void disconnect_output(std::shared_ptr<audio::engine::node> const &);
+    void disconnect_output(std::shared_ptr<audio::engine::node> const &, uint32_t const bus_idx);
 
     add_result_t add_offline_output();
     remove_result_t remove_offline_output();
@@ -84,7 +86,7 @@ class manager final : public base {
     [[nodiscard]] chaining::chain_relayed_unsync_t<manager, chaining_pair_t> chain(method const) const;
 
     // for Test
-    std::unordered_set<node> &nodes() const;
+    std::unordered_set<std::shared_ptr<node>> &nodes() const;
     audio::engine::connection_set &connections() const;
     chaining::notifier<chaining_pair_t> &notifier();
 };

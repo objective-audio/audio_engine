@@ -14,8 +14,8 @@ struct audio::engine::connection::impl : base::impl, node_removable::impl {
     audio::format _format;
     mutable std::recursive_mutex _mutex;
 
-    impl(node const &src_node, uint32_t const src_bus, node const &dst_node, uint32_t const dst_bus,
-         audio::format const &format)
+    impl(std::shared_ptr<node> const &src_node, uint32_t const src_bus, std::shared_ptr<node> const &dst_node,
+         uint32_t const dst_bus, audio::format const &format)
         : _source_bus(src_bus),
           _destination_bus(dst_bus),
           _format(format),
@@ -25,19 +25,19 @@ struct audio::engine::connection::impl : base::impl, node_removable::impl {
 
     void remove_connection_from_nodes(connection const &connection) {
         if (auto node = this->_destination_node.lock()) {
-            node.connectable().remove_connection(connection);
+            node->connectable().remove_connection(connection);
         }
         if (auto node = this->_source_node.lock()) {
-            node.connectable().remove_connection(connection);
+            node->connectable().remove_connection(connection);
         }
     }
 
-    node source_node() const {
+    std::shared_ptr<node> source_node() const {
         std::lock_guard<std::recursive_mutex> lock(this->_mutex);
         return this->_source_node.lock();
     }
 
-    node destination_node() const {
+    std::shared_ptr<node> destination_node() const {
         std::lock_guard<std::recursive_mutex> lock(this->_mutex);
         return this->_destination_node.lock();
     }
@@ -59,19 +59,20 @@ struct audio::engine::connection::impl : base::impl, node_removable::impl {
     }
 
    private:
-    weak<node> _source_node;
-    weak<node> _destination_node;
+    std::weak_ptr<node> _source_node;
+    std::weak_ptr<node> _destination_node;
 };
 
-audio::engine::connection::connection(node &src_node, uint32_t const src_bus, node &dst_node, uint32_t const dst_bus,
+audio::engine::connection::connection(std::shared_ptr<node> &src_node, uint32_t const src_bus,
+                                      std::shared_ptr<node> &dst_node, uint32_t const dst_bus,
                                       audio::format const &format)
     : base(std::make_shared<impl>(src_node, src_bus, dst_node, dst_bus, format)) {
     if (!src_node || !dst_node) {
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : invalid argument.");
     }
 
-    src_node.connectable().add_connection(*this);
-    dst_node.connectable().add_connection(*this);
+    src_node->connectable().add_connection(*this);
+    dst_node->connectable().add_connection(*this);
 }
 
 audio::engine::connection::connection(std::nullptr_t) : base(nullptr) {
@@ -94,18 +95,18 @@ uint32_t audio::engine::connection::destination_bus() const {
     return impl_ptr<impl>()->_destination_bus;
 }
 
-audio::engine::node audio::engine::connection::source_node() const {
+std::shared_ptr<audio::engine::node> audio::engine::connection::source_node() const {
     if (impl_ptr()) {
         return impl_ptr<impl>()->source_node();
     }
-    return node{nullptr};
+    return nullptr;
 }
 
-audio::engine::node audio::engine::connection::destination_node() const {
+std::shared_ptr<audio::engine::node> audio::engine::connection::destination_node() const {
     if (impl_ptr()) {
         return impl_ptr<impl>()->destination_node();
     }
-    return node{nullptr};
+    return nullptr;
 }
 
 audio::format const &audio::engine::connection::format() const {

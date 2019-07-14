@@ -150,10 +150,10 @@ struct audio::engine::node::impl : base::impl, manageable_node::impl, connectabl
     }
 
     void add_connection(engine::connection const &connection) override {
-        if (connection.destination_node().impl_ptr<impl>().get() == this) {
+        if (connection.destination_node()->impl_ptr<impl>().get() == this) {
             auto bus_idx = connection.destination_bus();
             this->_input_connections.insert(std::make_pair(bus_idx, weak<audio::engine::connection>(connection)));
-        } else if (connection.source_node().impl_ptr<impl>().get() == this) {
+        } else if (connection.source_node()->impl_ptr<impl>().get() == this) {
             auto bus_idx = connection.source_bus();
             this->_output_connections.insert(std::make_pair(bus_idx, weak<audio::engine::connection>(connection)));
         } else {
@@ -165,13 +165,13 @@ struct audio::engine::node::impl : base::impl, manageable_node::impl, connectabl
 
     void remove_connection(engine::connection const &connection) override {
         if (auto destination_node = connection.destination_node()) {
-            if (connection.destination_node().impl_ptr<impl>().get() == this) {
+            if (connection.destination_node()->impl_ptr<impl>().get() == this) {
                 this->_input_connections.erase(connection.destination_bus());
             }
         }
 
         if (auto source_node = connection.source_node()) {
-            if (connection.source_node().impl_ptr<impl>().get() == this) {
+            if (connection.source_node()->impl_ptr<impl>().get() == this) {
                 this->_output_connections.erase(connection.source_bus());
             }
         }
@@ -280,7 +280,7 @@ struct audio::engine::node::impl : base::impl, manageable_node::impl, connectabl
 
 #pragma mark - audio::engine::node
 
-audio::engine::node::node(node_args args) : base(std::make_shared<impl>(std::move(args))) {
+audio::engine::node::node(node_args &&args) : base(std::make_shared<impl>(std::move(args))) {
 }
 
 audio::engine::node::node(std::nullptr_t) : base(nullptr) {
@@ -408,6 +408,17 @@ audio::engine::manageable_node &audio::engine::node::manageable() {
         this->_manageable = audio::engine::manageable_node{impl_ptr<manageable_node::impl>()};
     }
     return this->_manageable;
+}
+
+namespace yas::audio::engine {
+struct node_factory : node {
+    node_factory(node_args args) : node(std::move(args)) {
+    }
+};
+}  // namespace yas::audio::engine
+
+std::shared_ptr<audio::engine::node> audio::engine::make_node(node_args args) {
+    return std::make_shared<audio::engine::node_factory>(std::move(args));
 }
 
 #pragma mark -

@@ -29,13 +29,12 @@ class audio_test_node_object : public base {
    public:
     audio_test_node_object(uint32_t const input_bus_count = 2, uint32_t const output_bus_count = 1);
 
-    audio::engine::node &node();
+    std::shared_ptr<audio::engine::node> &node();
 };
 
 struct connection : audio::engine::connection {
-    connection(audio::engine::node &source_node, uint32_t const source_bus, audio::engine::node &destination_node,
-               uint32_t const destination_bus, audio::format const &format);
+    connection(std::shared_ptr<audio::engine::node> &source_node, uint32_t const source_bus,
+               std::shared_ptr<audio::engine::node> &destination_node, uint32_t const destination_bus,
+               audio::format const &format);
 };
-
-audio::engine::node make_node();
 }  // namespace yas::test

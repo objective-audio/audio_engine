@@ -37,8 +37,8 @@ using namespace yas;
 
     XCTAssertTrue(connection.node_removable());
 
-    XCTAssertTrue(src_obj.node().manageable().output_connection(src_bus) == connection);
-    XCTAssertTrue(dst_obj.node().manageable().input_connection(dst_bus) == connection);
+    XCTAssertTrue(src_obj.node()->manageable().output_connection(src_bus) == connection);
+    XCTAssertTrue(dst_obj.node()->manageable().input_connection(dst_bus) == connection);
 }
 
 - (void)test_create_null {
@@ -88,7 +88,7 @@ using namespace yas;
     uint32_t const src_bus = 0;
     uint32_t const dst_bus = 1;
 
-    audio::engine::node null_node(nullptr);
+    std::shared_ptr<audio::engine::node> null_node = nullptr;
     XCTAssertThrows(test::connection(null_node, src_bus, dst_obj.node(), dst_bus, format));
     XCTAssertThrows(test::connection(src_obj.node(), src_bus, null_node, dst_bus, format));
 }

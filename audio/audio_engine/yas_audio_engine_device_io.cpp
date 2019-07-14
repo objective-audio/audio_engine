@@ -19,7 +19,7 @@ using namespace yas;
 #pragma mark - audio::engine::device_io::impl
 
 struct audio::engine::device_io::impl final : base::impl {
-    audio::engine::node _node = {{.input_bus_count = 1, .output_bus_count = 1}};
+    std::shared_ptr<audio::engine::node> _node = make_node({.input_bus_count = 1, .output_bus_count = 1});
     chaining::any_observer_ptr _connections_observer = nullptr;
 
     virtual ~impl() = default;
@@ -29,11 +29,11 @@ struct audio::engine::device_io::impl final : base::impl {
 
         auto weak_engine_device_io = to_weak(engine_device_io);
 
-        this->_node.set_render_handler([weak_engine_device_io](auto args) {
+        this->_node->set_render_handler([weak_engine_device_io](auto args) {
             auto &buffer = args.buffer;
 
             if (auto engine_device_io = weak_engine_device_io.lock();
-                auto &device_io = engine_device_io.impl_ptr<impl>()->shared_device_io()) {
+                auto &device_io = engine_device_io.impl_ptr<impl>()->raw_device_io()) {
                 auto &input_buffer = device_io->input_buffer_on_render();
                 if (input_buffer && input_buffer->format() == buffer.format()) {
                     buffer.copy_from(*input_buffer);
@@ -41,7 +41,7 @@ struct audio::engine::device_io::impl final : base::impl {
             }
         });
 
-        this->_connections_observer = this->_node.chain(node::method::update_connections)
+        this->_connections_observer = this->_node->chain(node::method::update_connections)
                                           .perform([weak_engine_device_io](auto const &) {
                                               if (auto engine_device_io = weak_engine_device_io.lock()) {
                                                   engine_device_io.impl_ptr<impl>()->_update_device_io_connections();
@@ -50,15 +50,15 @@ struct audio::engine::device_io::impl final : base::impl {
                                           .end();
     }
 
-    void add_device_io() {
+    void add_raw_device_io() {
         this->_core._device_io = std::make_shared<audio::device_io>(this->_core.device());
     }
 
-    void remove_device_io() {
+    void remove_raw_device_io() {
         this->_core._device_io = nullptr;
     }
 
-    std::shared_ptr<audio::device_io> &shared_device_io() {
+    std::shared_ptr<audio::device_io> &raw_device_io() {
         return this->_core._device_io;
     }
 
@@ -107,16 +107,16 @@ struct audio::engine::device_io::impl final : base::impl {
 
         auto render_handler = [weak_engine_device_io, weak_device_io](auto args) {
             if (auto engine_device_io = weak_engine_device_io.lock()) {
-                if (auto kernel = engine_device_io.node().kernel()) {
+                if (auto kernel = engine_device_io.node()->kernel()) {
                     auto const connections = kernel->input_connections();
                     if (connections.count(0) > 0) {
                         auto const &connection = connections.at(0);
                         if (auto src_node = connection.source_node();
-                            connection.format() == src_node.output_format(connection.source_bus())) {
+                            src_node && connection.format() == src_node->output_format(connection.source_bus())) {
                             if (auto const when = args.when) {
-                                src_node.render({.buffer = *args.output_buffer,
-                                                 .bus_idx = connection.source_bus(),
-                                                 .when = *args.when});
+                                src_node->render({.buffer = *args.output_buffer,
+                                                  .bus_idx = connection.source_bus(),
+                                                  .when = *args.when});
                             }
                         }
                     }
@@ -125,12 +125,13 @@ struct audio::engine::device_io::impl final : base::impl {
                         auto const connections = kernel->output_connections();
                         if (connections.count(0) > 0) {
                             auto const &connection = connections.at(0);
-                            if (auto dst_node = connection.destination_node(); dst_node.is_input_renderable()) {
+                            if (auto dst_node = connection.destination_node();
+                                dst_node && dst_node->is_input_renderable()) {
                                 auto &input_buffer = device_io->input_buffer_on_render();
                                 auto const &input_time = device_io->input_time_on_render();
                                 if (input_buffer && input_time) {
-                                    if (connection.format() == dst_node.input_format(connection.destination_bus())) {
-                                        dst_node.render({.buffer = *input_buffer, .bus_idx = 0, .when = *input_time});
+                                    if (connection.format() == dst_node->input_format(connection.destination_bus())) {
+                                        dst_node->render({.buffer = *input_buffer, .bus_idx = 0, .when = *input_time});
                                     }
                                 }
                             }
@@ -145,7 +146,7 @@ struct audio::engine::device_io::impl final : base::impl {
 
     bool _validate_connections() {
         if (auto const &device_io = this->_core._device_io) {
-            auto &input_connections = this->_node.input_connections();
+            auto &input_connections = this->_node->input_connections();
             if (input_connections.size() > 0) {
                 auto const connections = lock_values(input_connections);
                 if (connections.count(0) > 0) {
@@ -159,7 +160,7 @@ struct audio::engine::device_io::impl final : base::impl {
                 }
             }
 
-            auto &output_connections = _node.output_connections();
+            auto &output_connections = this->_node->output_connections();
             if (output_connections.size() > 0) {
                 auto const connections = lock_values(output_connections);
                 if (connections.count(0) > 0) {
@@ -200,24 +201,24 @@ std::shared_ptr<audio::device> audio::engine::device_io::device() const {
     return impl_ptr<impl>()->device();
 }
 
-audio::engine::node const &audio::engine::device_io::node() const {
+std::shared_ptr<audio::engine::node> const &audio::engine::device_io::node() const {
     return impl_ptr<impl>()->_node;
 }
 
-audio::engine::node &audio::engine::device_io::node() {
+std::shared_ptr<audio::engine::node> &audio::engine::device_io::node() {
     return impl_ptr<impl>()->_node;
 }
 
 void audio::engine::device_io::add_raw_device_io() {
-    impl_ptr<impl>()->add_device_io();
+    impl_ptr<impl>()->add_raw_device_io();
 }
 
 void audio::engine::device_io::remove_raw_device_io() {
-    impl_ptr<impl>()->remove_device_io();
+    impl_ptr<impl>()->remove_raw_device_io();
 }
 
 std::shared_ptr<audio::device_io> &audio::engine::device_io::raw_device_io() {
-    return impl_ptr<impl>()->shared_device_io();
+    return impl_ptr<impl>()->raw_device_io();
 }
 
 #endif

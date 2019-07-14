@@ -16,7 +16,7 @@ using namespace yas;
 #pragma mark - core
 
 struct audio::engine::au::impl : base::impl {
-    explicit impl(engine::node_args &&args) : _node(std::move(args)) {
+    explicit impl(engine::node_args &&args) : _node(make_node(std::move(args))) {
     }
 
     ~impl() = default;
@@ -39,7 +39,7 @@ struct audio::engine::au::impl : base::impl {
 
         auto weak_au = to_weak(au);
 
-        this->_node.set_render_handler([weak_au](auto args) {
+        this->_node->set_render_handler([weak_au](auto args) {
             auto &buffer = args.buffer;
 
             if (auto au = weak_au.lock()) {
@@ -62,7 +62,7 @@ struct audio::engine::au::impl : base::impl {
             }
         });
 
-        this->_reset_observer = this->_node.chain(node::method::will_reset)
+        this->_reset_observer = this->_node->chain(node::method::will_reset)
                                     .perform([weak_au](auto const &) {
                                         if (auto au = weak_au.lock()) {
                                             au.impl_ptr<audio::engine::au::impl>()->will_reset();
@@ -70,7 +70,7 @@ struct audio::engine::au::impl : base::impl {
                                     })
                                     .end();
 
-        this->_connections_observer = this->_node.chain(node::method::update_connections)
+        this->_connections_observer = this->_node->chain(node::method::update_connections)
                                           .perform([weak_au](auto const &) {
                                               if (auto au = weak_au.lock()) {
                                                   au.impl_ptr<audio::engine::au::impl>()->update_unit_connections();
@@ -78,7 +78,7 @@ struct audio::engine::au::impl : base::impl {
                                           })
                                           .end();
 
-        this->_node.manageable().set_add_to_graph_handler([weak_au](audio::graph &graph) {
+        this->_node->manageable().set_add_to_graph_handler([weak_au](audio::graph &graph) {
             if (auto au = weak_au.lock()) {
                 au.prepare_unit();
                 if (auto unit = au.unit()) {
@@ -88,7 +88,7 @@ struct audio::engine::au::impl : base::impl {
             }
         });
 
-        this->_node.manageable().set_remove_from_graph_handler([weak_au](audio::graph &graph) {
+        this->_node->manageable().set_remove_from_graph_handler([weak_au](audio::graph &graph) {
             if (auto au = weak_au.lock()) {
                 if (auto unit = au.unit()) {
                     graph.remove_unit(unit);
@@ -190,12 +190,12 @@ struct audio::engine::au::impl : base::impl {
                 auto weak_au = to_weak(cast<engine::au>());
                 unit->set_render_handler([weak_au](audio::render_parameters &render_parameters) {
                     if (auto au = weak_au.lock()) {
-                        if (auto kernel = au.node().kernel()) {
+                        if (auto kernel = au.node()->kernel()) {
                             if (auto connection = kernel->input_connection(render_parameters.in_bus_number)) {
                                 if (auto src_node = connection.source_node()) {
                                     pcm_buffer buffer{connection.format(), render_parameters.io_data};
                                     time when(*render_parameters.io_time_stamp, connection.format().sample_rate());
-                                    src_node.render(
+                                    src_node->render(
                                         {.buffer = buffer, .bus_idx = connection.source_bus(), .when = when});
                                 }
                             }
@@ -204,7 +204,7 @@ struct audio::engine::au::impl : base::impl {
                 });
 
                 for (uint32_t bus_idx = 0; bus_idx < input_bus_count; ++bus_idx) {
-                    if (auto connection = this->_node.input_connection(bus_idx)) {
+                    if (auto connection = this->_node->input_connection(bus_idx)) {
                         unit->set_input_format(connection.format().stream_description(), bus_idx);
                         unit->attach_render_callback(bus_idx);
                     } else {
@@ -218,7 +218,7 @@ struct audio::engine::au::impl : base::impl {
             auto output_bus_count = this->output_element_count();
             if (output_bus_count > 0) {
                 for (uint32_t bus_idx = 0; bus_idx < output_bus_count; ++bus_idx) {
-                    if (auto connection = this->_node.output_connection(bus_idx)) {
+                    if (auto connection = this->_node->output_connection(bus_idx)) {
                         unit->set_output_format(connection.format().stream_description(), bus_idx);
                     }
                 }
@@ -258,7 +258,7 @@ struct audio::engine::au::impl : base::impl {
         this->_core.set_unit(audio::make_unit(this->_acd));
     }
 
-    audio::engine::node _node;
+    std::shared_ptr<audio::engine::node> _node;
     AudioComponentDescription _acd;
     std::unordered_map<AudioUnitScope, unit::parameter_map_t> _parameters;
     chaining::notifier<chaining_pair_t> _notifier;
@@ -409,11 +409,11 @@ chaining::chain_relayed_unsync_t<audio::engine::au, audio::engine::au::chaining_
         .to([](chaining_pair_t const &pair) { return pair.second; });
 }
 
-audio::engine::node const &audio::engine::au::node() const {
+std::shared_ptr<audio::engine::node> const &audio::engine::au::node() const {
     return impl_ptr<impl>()->_node;
 }
 
-audio::engine::node &audio::engine::au::node() {
+std::shared_ptr<audio::engine::node> &audio::engine::au::node() {
     return impl_ptr<impl>()->_node;
 }
 

@@ -22,8 +22,8 @@ class offline_output final : public base {
 
     bool is_running() const;
 
-    audio::engine::node const &node() const;
-    audio::engine::node &node();
+    std::shared_ptr<audio::engine::node> const &node() const;
+    std::shared_ptr<audio::engine::node> &node();
 
     manageable_offline_output &manageable();
 
