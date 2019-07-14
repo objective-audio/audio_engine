@@ -8,24 +8,17 @@ using namespace yas;
 
 #pragma mark - audio::tap_kernel
 
-struct audio::engine::tap::kernel : base {
-    struct impl : base::impl {
-        audio::engine::node::render_f _render_handler;
-    };
-
-    kernel() : base(std::make_shared<impl>()) {
+struct audio::engine::tap::kernel {
+    kernel() {
     }
 
-    kernel(std::nullptr_t) : base(nullptr) {
-    }
+    audio::engine::node::render_f render_handler = nullptr;
 
-    void set_render_handler(audio::engine::node::render_f handler) {
-        impl_ptr<impl>()->_render_handler = std::move(handler);
-    }
-
-    audio::engine::node::render_f const &render_handler() {
-        return impl_ptr<impl>()->_render_handler;
-    }
+   private:
+    kernel(kernel const &) = delete;
+    kernel(kernel &&) = delete;
+    kernel &operator=(kernel const &) = delete;
+    kernel &operator=(kernel &&) = delete;
 };
 
 #pragma mark - audio::engine::tap::impl
@@ -47,8 +40,8 @@ struct audio::engine::tap::impl : base::impl {
                 if (auto kernel = impl_ptr->_node.kernel()) {
                     impl_ptr->_kernel_on_render = kernel;
 
-                    auto tap_kernel = std::any_cast<tap::kernel>(kernel->decorator);
-                    auto const &handler = tap_kernel.render_handler();
+                    auto tap_kernel = std::any_cast<std::shared_ptr<tap::kernel>>(kernel->decorator);
+                    auto const &handler = tap_kernel->render_handler;
 
                     if (handler) {
                         handler(args);
@@ -71,8 +64,8 @@ struct audio::engine::tap::impl : base::impl {
 
         this->_node.set_prepare_kernel_handler([weak_tap](audio::engine::kernel &kernel) {
             if (auto tap = weak_tap.lock()) {
-                audio::engine::tap::kernel tap_kernel{};
-                tap_kernel.set_render_handler(tap.impl_ptr<audio::engine::tap::impl>()->_render_handler);
+                auto tap_kernel = std::make_shared<audio::engine::tap::kernel>();
+                tap_kernel->render_handler = tap.impl_ptr<audio::engine::tap::impl>()->_render_handler;
                 kernel.decorator = std::move(tap_kernel);
             }
         });
