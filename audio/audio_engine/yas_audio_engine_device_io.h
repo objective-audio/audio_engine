@@ -18,12 +18,8 @@ class device;
 namespace yas::audio::engine {
 class node;
 
-struct device_io final : base, manageable_device_io {
+struct device_io : base, manageable_device_io, std::enable_shared_from_this<device_io> {
     class impl;
-
-    device_io();
-    device_io(std::nullptr_t);
-    explicit device_io(std::shared_ptr<audio::device> const &device);
 
     virtual ~device_io();
 
@@ -37,7 +33,13 @@ struct device_io final : base, manageable_device_io {
     void add_raw_device_io() override;
     void remove_raw_device_io() override;
     std::shared_ptr<audio::device_io> &raw_device_io() override;
+
+   protected:
+    explicit device_io(std::shared_ptr<audio::device> const &device);
 };
+
+std::shared_ptr<device_io> make_device_io();
+std::shared_ptr<device_io> make_device_io(std::shared_ptr<audio::device> const &device);
 }  // namespace yas::audio::engine
 
 #endif

@@ -72,8 +72,8 @@ class manager final : public base {
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
     add_result_t add_device_io();
     remove_result_t remove_device_io();
-    audio::engine::device_io const &device_io() const;
-    audio::engine::device_io &device_io();
+    std::shared_ptr<audio::engine::device_io> const &device_io() const;
+    std::shared_ptr<audio::engine::device_io> &device_io();
 #endif
 
     start_result_t start_render();

@@ -146,9 +146,9 @@ struct audio::engine::manager::impl : base::impl {
         this->_graph = audio::graph{};
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
-        if (auto &device_io = this->device_io()) {
-            device_io.add_raw_device_io();
-            this->_graph.add_audio_device_io(device_io.raw_device_io());
+        if (auto &device_io = this->_device_io) {
+            device_io->add_raw_device_io();
+            this->_graph.add_audio_device_io(device_io->raw_device_io());
         }
 #endif
 
@@ -380,30 +380,28 @@ struct audio::engine::manager::impl : base::impl {
     }
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
-    void set_device_io(audio::engine::device_io &&node) {
+    std::shared_ptr<audio::engine::device_io> _device_io = nullptr;
+
+    void set_device_io(std::shared_ptr<audio::engine::device_io> &&node) {
         if (node) {
             this->_device_io = std::move(node);
 
             if (this->_graph) {
-                this->_device_io.add_raw_device_io();
-                this->_graph.add_audio_device_io(this->_device_io.raw_device_io());
+                this->_device_io->add_raw_device_io();
+                this->_graph.add_audio_device_io(this->_device_io->raw_device_io());
             }
         } else {
             if (this->_device_io) {
                 if (this->_graph) {
-                    if (auto &device_io = this->_device_io.raw_device_io()) {
+                    if (auto &device_io = this->_device_io->raw_device_io()) {
                         this->_graph.remove_audio_device_io(device_io);
                     }
                 }
 
-                this->_device_io.remove_raw_device_io();
+                this->_device_io->remove_raw_device_io();
                 this->_device_io = nullptr;
             }
         }
-    }
-
-    audio::engine::device_io &device_io() {
-        return _device_io;
     }
 
 #endif
@@ -482,7 +480,6 @@ struct audio::engine::manager::impl : base::impl {
     objc_ptr<id> _reset_observer;
     objc_ptr<id> _route_change_observer;
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
-    audio::engine::device_io _device_io = nullptr;
     chaining::any_observer_ptr _device_system_observer = nullptr;
 #endif
 
@@ -580,16 +577,16 @@ audio::engine::offline_output &audio::engine::manager::offline_output() {
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
 
 audio::engine::manager::add_result_t audio::engine::manager::add_device_io() {
-    if (impl_ptr<impl>()->device_io()) {
+    if (impl_ptr<impl>()->_device_io) {
         return add_result_t{add_error_t::already_added};
     } else {
-        impl_ptr<impl>()->set_device_io(audio::engine::device_io{});
+        impl_ptr<impl>()->set_device_io(audio::engine::make_device_io());
         return add_result_t{nullptr};
     }
 }
 
 audio::engine::manager::remove_result_t audio::engine::manager::remove_device_io() {
-    if (impl_ptr<impl>()->device_io()) {
+    if (impl_ptr<impl>()->_device_io) {
         impl_ptr<impl>()->set_device_io(nullptr);
         return remove_result_t{nullptr};
     } else {
@@ -597,12 +594,12 @@ audio::engine::manager::remove_result_t audio::engine::manager::remove_device_io
     }
 }
 
-audio::engine::device_io const &audio::engine::manager::device_io() const {
-    return impl_ptr<impl>()->device_io();
+std::shared_ptr<audio::engine::device_io> const &audio::engine::manager::device_io() const {
+    return impl_ptr<impl>()->_device_io;
 }
 
-audio::engine::device_io &audio::engine::manager::device_io() {
-    return impl_ptr<impl>()->device_io();
+std::shared_ptr<audio::engine::device_io> &audio::engine::manager::device_io() {
+    return impl_ptr<impl>()->_device_io;
 }
 
 #endif
