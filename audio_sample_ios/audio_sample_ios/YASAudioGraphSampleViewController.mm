@@ -29,7 +29,7 @@ struct graph_vc_internal {
 
         graph = audio::graph{};
 
-        io_unit = std::make_shared<audio::unit>(kAudioUnitType_Output, audio::unit::sub_type_default_io());
+        io_unit = audio::make_unit(kAudioUnitType_Output, audio::unit::sub_type_default_io());
         io_unit->set_enable_input(true);
         io_unit->set_enable_output(true);
         io_unit->set_maximum_frames_per_slice(4096);
@@ -40,7 +40,7 @@ struct graph_vc_internal {
         io_unit->set_input_format(format.stream_description(), 0);
         io_unit->set_output_format(format.stream_description(), 1);
 
-        mixer_unit = std::make_shared<audio::unit>(kAudioUnitType_Mixer, kAudioUnitSubType_MultiChannelMixer);
+        mixer_unit = audio::make_unit(kAudioUnitType_Mixer, kAudioUnitSubType_MultiChannelMixer);
         mixer_unit->set_maximum_frames_per_slice(4096);
 
         graph.add_unit(mixer_unit);

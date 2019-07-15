@@ -133,7 +133,7 @@ struct effects_vc_internal {
             if (component != NULL) {
                 AudioComponentDescription acd;
                 raise_if_raw_audio_error(AudioComponentGetDescription(component, &acd));
-                _units.push_back(std::make_shared<audio::unit>(acd));
+                _units.push_back(audio::make_unit(acd));
             } else {
                 break;
             }
