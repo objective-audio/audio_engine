@@ -41,6 +41,10 @@ void audio::engine::kernel::set_output_connections(audio::engine::connection_wma
     throw std::runtime_error("must be overridden");
 }
 
+std::shared_ptr<audio::engine::manageable_kernel> audio::engine::kernel::manageable() {
+    return std::dynamic_pointer_cast<manageable_kernel>(shared_from_this());
+}
+
 namespace yas::audio::engine {
 struct kernel_factory : kernel {
     void set_input_connections(audio::engine::connection_wmap connections) override {

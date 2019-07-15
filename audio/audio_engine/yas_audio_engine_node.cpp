@@ -184,7 +184,7 @@ struct audio::engine::node::impl : base::impl, manageable_node::impl {
     }
 
     void prepare_kernel(std::shared_ptr<audio::engine::kernel> &kernel) {
-        auto manageable_kernel = std::dynamic_pointer_cast<audio::engine::manageable_kernel>(kernel);
+        auto manageable_kernel = kernel->manageable();
         manageable_kernel->set_input_connections(_input_connections);
         manageable_kernel->set_output_connections(_output_connections);
 
