@@ -14,7 +14,7 @@ using namespace yas;
 
 #pragma mark - audio::engine::node::impl
 
-struct audio::engine::node::impl : base::impl, manageable_node::impl, connectable_node::impl {
+struct audio::engine::node::impl : base::impl, manageable_node::impl {
     weak<audio::engine::manager> _weak_manager;
     uint32_t _input_bus_count = 0;
     uint32_t _output_bus_count = 0;
@@ -149,7 +149,7 @@ struct audio::engine::node::impl : base::impl, manageable_node::impl, connectabl
         this->_notifier.notify(std::make_pair(method::update_connections, cast<audio::engine::node>()));
     }
 
-    void add_connection(engine::connection const &connection) override {
+    void add_connection(engine::connection const &connection) {
         if (connection.destination_node()->impl_ptr<impl>().get() == this) {
             auto bus_idx = connection.destination_bus();
             this->_input_connections.insert(std::make_pair(bus_idx, weak<audio::engine::connection>(connection)));
@@ -163,7 +163,7 @@ struct audio::engine::node::impl : base::impl, manageable_node::impl, connectabl
         this->update_kernel();
     }
 
-    void remove_connection(engine::connection const &connection) override {
+    void remove_connection(engine::connection const &connection) {
         if (auto destination_node = connection.destination_node()) {
             if (connection.destination_node()->impl_ptr<impl>().get() == this) {
                 this->_input_connections.erase(connection.destination_bus());
@@ -389,13 +389,6 @@ chaining::chain_relayed_unsync_t<audio::engine::node, audio::engine::node::chain
         .to([](chaining_pair_t const &pair) { return pair.second; });
 }
 
-audio::engine::connectable_node &audio::engine::node::connectable() {
-    if (!this->_connectable) {
-        this->_connectable = audio::engine::connectable_node{impl_ptr<connectable_node::impl>()};
-    }
-    return this->_connectable;
-}
-
 audio::engine::manageable_node const &audio::engine::node::manageable() const {
     if (!this->_manageable) {
         this->_manageable = audio::engine::manageable_node{impl_ptr<manageable_node::impl>()};
@@ -410,9 +403,24 @@ audio::engine::manageable_node &audio::engine::node::manageable() {
     return this->_manageable;
 }
 
+void audio::engine::node::add_connection(audio::engine::connection const &) {
+    throw std::runtime_error("must be overridden.");
+}
+void audio::engine::node::remove_connection(audio::engine::connection const &) {
+    throw std::runtime_error("must be overridden.");
+}
+
 namespace yas::audio::engine {
 struct node_factory : node {
     node_factory(node_args args) : node(std::move(args)) {
+    }
+
+    void add_connection(audio::engine::connection const &connection) override {
+        impl_ptr<impl>()->add_connection(connection);
+    }
+
+    void remove_connection(audio::engine::connection const &connection) override {
+        impl_ptr<impl>()->remove_connection(connection);
     }
 };
 }  // namespace yas::audio::engine

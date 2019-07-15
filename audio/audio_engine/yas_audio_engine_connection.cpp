@@ -26,10 +26,12 @@ struct audio::engine::connection::impl : base::impl, node_removable::impl {
 
     void remove_connection_from_nodes(connection const &connection) {
         if (auto node = this->_destination_node.lock()) {
-            node->connectable().remove_connection(connection);
+            auto connectable_node = std::dynamic_pointer_cast<audio::engine::connectable_node>(node);
+            connectable_node->remove_connection(connection);
         }
         if (auto node = this->_source_node.lock()) {
-            node->connectable().remove_connection(connection);
+            auto connectable_node = std::dynamic_pointer_cast<audio::engine::connectable_node>(node);
+            connectable_node->remove_connection(connection);
         }
     }
 
@@ -67,8 +69,10 @@ struct audio::engine::connection::impl : base::impl, node_removable::impl {
 audio::engine::connection::connection(node &src_node, uint32_t const src_bus, node &dst_node, uint32_t const dst_bus,
                                       audio::format const &format)
     : base(std::make_shared<impl>(src_node, src_bus, dst_node, dst_bus, format)) {
-    src_node.connectable().add_connection(*this);
-    dst_node.connectable().add_connection(*this);
+    auto connectable_src_node = std::dynamic_pointer_cast<connectable_node>(src_node.shared_from_this());
+    auto connectable_dst_node = std::dynamic_pointer_cast<connectable_node>(dst_node.shared_from_this());
+    connectable_src_node->add_connection(*this);
+    connectable_dst_node->add_connection(*this);
 }
 
 audio::engine::connection::connection(std::nullptr_t) : base(nullptr) {

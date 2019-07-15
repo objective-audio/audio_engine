@@ -7,22 +7,6 @@
 
 using namespace yas;
 
-#pragma mark - connectable_node
-
-audio::engine::connectable_node::connectable_node(std::shared_ptr<impl> impl) : protocol(std::move(impl)) {
-}
-
-audio::engine::connectable_node::connectable_node(std::nullptr_t) : protocol(nullptr) {
-}
-
-void audio::engine::connectable_node::add_connection(audio::engine::connection const &connection) {
-    impl_ptr<impl>()->add_connection(connection);
-}
-
-void audio::engine::connectable_node::remove_connection(audio::engine::connection const &connection) {
-    impl_ptr<impl>()->remove_connection(connection);
-}
-
 #pragma mark - manageable_node
 
 audio::engine::manageable_node::manageable_node(std::shared_ptr<impl> impl) : protocol(std::move(impl)) {

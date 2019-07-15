@@ -27,7 +27,6 @@ using namespace yas;
     XCTAssertEqual(obj.node()->output_bus_count(), 1);
 
     XCTAssertTrue(obj.node()->manageable());
-    XCTAssertTrue(obj.node()->connectable());
 
     XCTAssertEqual(obj.node()->manageable().input_connections().size(), 0);
     XCTAssertEqual(obj.node()->manageable().output_connections().size(), 0);
@@ -157,7 +156,8 @@ using namespace yas;
     for (uint32_t i = 0; i < relay_obj.node()->input_bus_count(); ++i) {
         test::audio_test_node_object input_obj;
         auto input_connection = test::connection(*input_obj.node(), 0, *relay_obj.node(), i, input_format);
-        input_obj.node()->connectable().add_connection(input_connection);
+        auto connectable_node = std::dynamic_pointer_cast<audio::engine::connectable_node>(input_obj.node());
+        connectable_node->add_connection(input_connection);
         input_connections.push_back(input_connection);
     }
 

@@ -141,9 +141,13 @@ using namespace yas;
 
     auto connection = test::connection(tap.node(), 0, output.node(), 0, format);
 
-    output.node().connectable().add_connection(connection);
+    auto connectable_output_node =
+        std::dynamic_pointer_cast<audio::engine::connectable_node>(output.node().shared_from_this());
+    auto connectable_tap_node =
+        std::dynamic_pointer_cast<audio::engine::connectable_node>(tap.node().shared_from_this());
+    connectable_output_node->add_connection(connection);
     output.node().manageable().update_kernel();
-    tap.node().connectable().add_connection(connection);
+    connectable_tap_node->add_connection(connection);
     tap.node().manageable().update_kernel();
 
     XCTestExpectation *tapNodeExpectation = [self expectationWithDescription:@"tap node render"];
@@ -245,9 +249,13 @@ using namespace yas;
 
     auto connection = test::connection(tap.node(), 0, output.node(), 0, format);
 
-    output.node().connectable().add_connection(connection);
+    auto connectable_output_node =
+        std::dynamic_pointer_cast<audio::engine::connectable_node>(output.node().shared_from_this());
+    auto connectable_tap_node =
+        std::dynamic_pointer_cast<audio::engine::connectable_node>(tap.node().shared_from_this());
+    connectable_output_node->add_connection(connection);
     output.node().manageable().update_kernel();
-    tap.node().connectable().add_connection(connection);
+    connectable_tap_node->add_connection(connection);
     tap.node().manageable().update_kernel();
 
     auto promise = std::make_shared<std::promise<void>>();

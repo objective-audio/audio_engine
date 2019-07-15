@@ -23,17 +23,11 @@ struct node_args {
     bool input_renderable = false;
 };
 
-struct connectable_node : protocol {
-    struct impl : protocol::impl {
-        virtual void add_connection(audio::engine::connection const &) = 0;
-        virtual void remove_connection(audio::engine::connection const &) = 0;
-    };
+struct connectable_node {
+    virtual ~connectable_node() = default;
 
-    explicit connectable_node(std::shared_ptr<impl>);
-    connectable_node(std::nullptr_t);
-
-    void add_connection(audio::engine::connection const &);
-    void remove_connection(audio::engine::connection const &);
+    virtual void add_connection(audio::engine::connection const &) = 0;
+    virtual void remove_connection(audio::engine::connection const &) = 0;
 };
 
 struct manageable_node : protocol {

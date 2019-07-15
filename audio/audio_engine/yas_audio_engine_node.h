@@ -28,7 +28,7 @@ namespace yas::audio::engine {
 class manager;
 class kernel;
 
-struct node : base, std::enable_shared_from_this<node> {
+struct node : base, std::enable_shared_from_this<node>, connectable_node {
     class impl;
 
     enum class method {
@@ -85,15 +85,16 @@ struct node : base, std::enable_shared_from_this<node> {
     [[nodiscard]] chaining::chain_unsync_t<chaining_pair_t> chain() const;
     [[nodiscard]] chaining::chain_relayed_unsync_t<node, chaining_pair_t> chain(method const) const;
 
-    audio::engine::connectable_node &connectable();
     audio::engine::manageable_node const &manageable() const;
     audio::engine::manageable_node &manageable();
 
    protected:
     node(node_args &&);
 
+    virtual void add_connection(audio::engine::connection const &) override;
+    virtual void remove_connection(audio::engine::connection const &) override;
+
    private:
-    audio::engine::connectable_node _connectable = nullptr;
     mutable audio::engine::manageable_node _manageable = nullptr;
 
     //        node(node const &) = delete;
