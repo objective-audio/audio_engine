@@ -68,6 +68,7 @@ struct au final : base, manageable_au {
     audio::engine::node const &node() const;
     audio::engine::node &node();
 
+#warning todo privateにしてmanageableでアクセスする
     void prepare_unit() override;
     void prepare_parameters() override;
     void reload_unit() override;

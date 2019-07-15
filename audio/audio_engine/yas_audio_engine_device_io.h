@@ -33,6 +33,7 @@ struct device_io final : base, manageable_device_io {
     audio::engine::node const &node() const;
     audio::engine::node &node();
 
+#warning todo privateにしてmanageableでアクセスする
     void add_raw_device_io() override;
     void remove_raw_device_io() override;
     std::shared_ptr<audio::device_io> &raw_device_io() override;
