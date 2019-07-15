@@ -24,8 +24,9 @@ struct kernel : manageable_kernel, std::enable_shared_from_this<kernel> {
    protected:
     kernel();
 
-    virtual void set_input_connections(audio::engine::connection_wmap connections) override;
-    virtual void set_output_connections(audio::engine::connection_wmap connections) override;
+   private:
+    void set_input_connections(audio::engine::connection_wmap connections) override;
+    void set_output_connections(audio::engine::connection_wmap connections) override;
 
     engine::connection_wmap _input_connections;
     engine::connection_wmap _output_connections;

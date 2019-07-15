@@ -34,11 +34,11 @@ audio::engine::connection audio::engine::kernel::output_connection(uint32_t cons
 }
 
 void audio::engine::kernel::set_input_connections(audio::engine::connection_wmap connections) {
-    throw std::runtime_error("must be overridden");
+    this->_input_connections = std::move(connections);
 }
 
 void audio::engine::kernel::set_output_connections(audio::engine::connection_wmap connections) {
-    throw std::runtime_error("must be overridden");
+    this->_output_connections = std::move(connections);
 }
 
 std::shared_ptr<audio::engine::manageable_kernel> audio::engine::kernel::manageable() {
@@ -46,15 +46,7 @@ std::shared_ptr<audio::engine::manageable_kernel> audio::engine::kernel::managea
 }
 
 namespace yas::audio::engine {
-struct kernel_factory : kernel {
-    void set_input_connections(audio::engine::connection_wmap connections) override {
-        this->_input_connections = std::move(connections);
-    }
-
-    void set_output_connections(audio::engine::connection_wmap connections) override {
-        this->_output_connections = std::move(connections);
-    }
-};
+struct kernel_factory : kernel {};
 }  // namespace yas::audio::engine
 
 std::shared_ptr<audio::engine::kernel> audio::engine::make_kernel() {
