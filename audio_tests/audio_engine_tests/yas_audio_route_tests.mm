@@ -80,10 +80,7 @@ using namespace yas;
     audio::engine::route engine_route;
     audio::engine::tap tap;
 
-    audio::engine::node &route_node = engine_route.node();
-    audio::engine::node &output_node = output.node();
-
-    manager.connect(route_node, output_node, format);
+    manager.connect(engine_route.node(), output.node(), format);
     manager.connect(tap.node(), engine_route.node(), format);
 
     bool tap_called = false;
