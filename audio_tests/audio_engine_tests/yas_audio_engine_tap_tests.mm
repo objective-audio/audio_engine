@@ -101,8 +101,8 @@ using namespace yas;
 - (void)test_bus_count {
     audio::engine::tap tap;
 
-    XCTAssertEqual(tap.node()->input_bus_count(), 1);
-    XCTAssertEqual(tap.node()->output_bus_count(), 1);
+    XCTAssertEqual(tap.node().input_bus_count(), 1);
+    XCTAssertEqual(tap.node().output_bus_count(), 1);
 }
 
 @end

@@ -28,7 +28,7 @@ class route final : public base {
     void set_routes(audio::route_set_t routes);
     void clear_routes();
 
-    std::shared_ptr<audio::engine::node> const &node() const;
-    std::shared_ptr<audio::engine::node> &node();
+    audio::engine::node const &node() const;
+    audio::engine::node &node();
 };
 }  // namespace yas::audio::engine

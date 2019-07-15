@@ -27,7 +27,7 @@ using namespace yas;
     uint32_t const src_bus = 0;
     uint32_t const dst_bus = 1;
 
-    auto connection = test::connection(src_obj.node(), src_bus, dst_obj.node(), dst_bus, format);
+    auto connection = test::connection(*src_obj.node(), src_bus, *dst_obj.node(), dst_bus, format);
 
     XCTAssertTrue(connection.source_node() == src_obj.node());
     XCTAssertTrue(connection.source_bus() == src_bus);
@@ -54,7 +54,7 @@ using namespace yas;
     uint32_t const src_bus = 0;
     uint32_t const dst_bus = 1;
 
-    auto connection = test::connection(src_obj.node(), src_bus, dst_obj.node(), dst_bus, format);
+    auto connection = test::connection(*src_obj.node(), src_bus, *dst_obj.node(), dst_bus, format);
 
     connection.node_removable().remove_nodes();
 
@@ -69,7 +69,7 @@ using namespace yas;
     uint32_t const src_bus = 0;
     uint32_t const dst_bus = 1;
 
-    auto connection = test::connection(src_obj.node(), src_bus, dst_obj.node(), dst_bus, format);
+    auto connection = test::connection(*src_obj.node(), src_bus, *dst_obj.node(), dst_bus, format);
 
     connection.node_removable().remove_source_node();
 
@@ -79,18 +79,6 @@ using namespace yas;
     connection.node_removable().remove_destination_node();
 
     XCTAssertFalse(connection.destination_node());
-}
-
-- (void)test_create_connection_failed {
-    auto format = audio::format({.sample_rate = 48000.0, .channel_count = 2});
-    test::audio_test_node_object src_obj;
-    test::audio_test_node_object dst_obj;
-    uint32_t const src_bus = 0;
-    uint32_t const dst_bus = 1;
-
-    std::shared_ptr<audio::engine::node> null_node = nullptr;
-    XCTAssertThrows(test::connection(null_node, src_bus, dst_obj.node(), dst_bus, format));
-    XCTAssertThrows(test::connection(src_obj.node(), src_bus, null_node, dst_bus, format));
 }
 
 - (void)test_empty_connection {

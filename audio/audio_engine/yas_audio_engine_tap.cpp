@@ -127,12 +127,12 @@ void audio::engine::tap::set_render_handler(audio::engine::node::render_f handle
     impl_ptr<impl>()->set_render_handler(std::move(handler));
 }
 
-std::shared_ptr<audio::engine::node> const &audio::engine::tap::node() const {
-    return impl_ptr<impl>()->_node;
+audio::engine::node const &audio::engine::tap::node() const {
+    return *impl_ptr<impl>()->_node;
 }
 
-std::shared_ptr<audio::engine::node> &audio::engine::tap::node() {
-    return impl_ptr<impl>()->_node;
+audio::engine::node &audio::engine::tap::node() {
+    return *impl_ptr<impl>()->_node;
 }
 
 audio::engine::connection audio::engine::tap::input_connection_on_render(uint32_t const bus_idx) const {

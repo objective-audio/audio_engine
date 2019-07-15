@@ -107,7 +107,7 @@ struct audio::engine::device_io::impl final : base::impl {
 
         auto render_handler = [weak_engine_device_io, weak_device_io](auto args) {
             if (auto engine_device_io = weak_engine_device_io.lock()) {
-                if (auto kernel = engine_device_io.node()->kernel()) {
+                if (auto kernel = engine_device_io.node().kernel()) {
                     auto const connections = kernel->input_connections();
                     if (connections.count(0) > 0) {
                         auto const &connection = connections.at(0);
@@ -201,12 +201,12 @@ std::shared_ptr<audio::device> audio::engine::device_io::device() const {
     return impl_ptr<impl>()->device();
 }
 
-std::shared_ptr<audio::engine::node> const &audio::engine::device_io::node() const {
-    return impl_ptr<impl>()->_node;
+audio::engine::node const &audio::engine::device_io::node() const {
+    return *impl_ptr<impl>()->_node;
 }
 
-std::shared_ptr<audio::engine::node> &audio::engine::device_io::node() {
-    return impl_ptr<impl>()->_node;
+audio::engine::node &audio::engine::device_io::node() {
+    return *impl_ptr<impl>()->_node;
 }
 
 void audio::engine::device_io::add_raw_device_io() {

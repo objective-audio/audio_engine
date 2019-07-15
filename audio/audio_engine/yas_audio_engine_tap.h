@@ -24,8 +24,8 @@ class tap final : public base {
 
     void set_render_handler(audio::engine::node::render_f);
 
-    std::shared_ptr<audio::engine::node> const &node() const;
-    std::shared_ptr<audio::engine::node> &node();
+    audio::engine::node const &node() const;
+    audio::engine::node &node();
 
     audio::engine::connection input_connection_on_render(uint32_t const bus_idx) const;
     audio::engine::connection output_connection_on_render(uint32_t const bus_idx) const;

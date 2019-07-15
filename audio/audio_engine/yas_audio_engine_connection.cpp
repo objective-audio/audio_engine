@@ -3,6 +3,7 @@
 //
 
 #include "yas_audio_engine_connection.h"
+#include <cpp_utils/yas_stl_utils.h>
 #include <mutex>
 #include "yas_audio_engine_node.h"
 
@@ -14,13 +15,13 @@ struct audio::engine::connection::impl : base::impl, node_removable::impl {
     audio::format _format;
     mutable std::recursive_mutex _mutex;
 
-    impl(std::shared_ptr<node> const &src_node, uint32_t const src_bus, std::shared_ptr<node> const &dst_node,
-         uint32_t const dst_bus, audio::format const &format)
+    impl(audio::engine::node &src_node, uint32_t const src_bus, audio::engine::node &dst_node, uint32_t const dst_bus,
+         audio::format const &format)
         : _source_bus(src_bus),
           _destination_bus(dst_bus),
           _format(format),
-          _source_node(src_node),
-          _destination_node(dst_node) {
+          _source_node(to_weak(src_node.shared_from_this())),
+          _destination_node(to_weak(dst_node.shared_from_this())) {
     }
 
     void remove_connection_from_nodes(connection const &connection) {
@@ -63,16 +64,11 @@ struct audio::engine::connection::impl : base::impl, node_removable::impl {
     std::weak_ptr<node> _destination_node;
 };
 
-audio::engine::connection::connection(std::shared_ptr<node> &src_node, uint32_t const src_bus,
-                                      std::shared_ptr<node> &dst_node, uint32_t const dst_bus,
+audio::engine::connection::connection(node &src_node, uint32_t const src_bus, node &dst_node, uint32_t const dst_bus,
                                       audio::format const &format)
     : base(std::make_shared<impl>(src_node, src_bus, dst_node, dst_bus, format)) {
-    if (!src_node || !dst_node) {
-        throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : invalid argument.");
-    }
-
-    src_node->connectable().add_connection(*this);
-    dst_node->connectable().add_connection(*this);
+    src_node.connectable().add_connection(*this);
+    dst_node.connectable().add_connection(*this);
 }
 
 audio::engine::connection::connection(std::nullptr_t) : base(nullptr) {

@@ -28,9 +28,8 @@ class connection : public base {
     audio::engine::node_removable &node_removable();
 
    protected:
-    connection(std::shared_ptr<audio::engine::node> &source_node, uint32_t const source_bus_idx,
-               std::shared_ptr<audio::engine::node> &destination_node, uint32_t const destination_bus_idx,
-               audio::format const &format);
+    connection(audio::engine::node &source_node, uint32_t const source_bus_idx, audio::engine::node &destination_node,
+               uint32_t const destination_bus_idx, audio::format const &format);
 
    private:
     audio::engine::node_removable _node_removable = nullptr;

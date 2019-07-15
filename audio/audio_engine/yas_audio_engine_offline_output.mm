@@ -59,7 +59,7 @@ struct audio::engine::offline_output::impl : base::impl, manageable_offline_outp
                         break;
                     }
 
-                    auto kernel = output.node()->kernel();
+                    auto kernel = output.node().kernel();
                     if (!kernel) {
                         cancelled = true;
                         break;
@@ -146,10 +146,6 @@ struct audio::engine::offline_output::impl : base::impl, manageable_offline_outp
         return this->_queue != nullptr;
     }
 
-    std::shared_ptr<audio::engine::node> &node() {
-        return this->_node;
-    }
-
    private:
     struct core {
         using completion_handler_map_t = std::map<uint8_t, offline_completion_f>;
@@ -208,11 +204,11 @@ bool audio::engine::offline_output::is_running() const {
     return impl_ptr<impl>()->is_running();
 }
 
-std::shared_ptr<audio::engine::node> const &audio::engine::offline_output::node() const {
-    return impl_ptr<impl>()->node();
+audio::engine::node const &audio::engine::offline_output::node() const {
+    return *impl_ptr<impl>()->_node;
 }
-std::shared_ptr<audio::engine::node> &audio::engine::offline_output::node() {
-    return impl_ptr<impl>()->node();
+audio::engine::node &audio::engine::offline_output::node() {
+    return *impl_ptr<impl>()->_node;
 }
 
 audio::engine::manageable_offline_output &audio::engine::offline_output::manageable() {

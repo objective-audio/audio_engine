@@ -24,9 +24,8 @@ using namespace yas;
 namespace yas::audio {
 class connection_for_engine : public audio::engine::connection {
    public:
-    connection_for_engine(std::shared_ptr<audio::engine::node> &src_node, uint32_t const src_bus,
-                          std::shared_ptr<audio::engine::node> &dst_node, uint32_t const dst_bus,
-                          audio::format const &format)
+    connection_for_engine(audio::engine::node &src_node, uint32_t const src_bus, audio::engine::node &dst_node,
+                          uint32_t const dst_bus, audio::format const &format)
         : audio::engine::connection(src_node, src_bus, dst_node, dst_bus, format) {
     }
 };
@@ -90,49 +89,48 @@ struct audio::engine::manager::impl : base::impl {
 #endif
     }
 
-    bool node_exists(std::shared_ptr<audio::engine::node> const &node) {
-        return this->_nodes.count(node) > 0;
+    bool node_exists(audio::engine::node &node) {
+        auto shared_node = node.shared_from_this();
+        return this->_nodes.count(shared_node) > 0;
     }
 
-    void attach_node(std::shared_ptr<audio::engine::node> &node) {
-        if (!node) {
-            throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
-        }
+    void attach_node(audio::engine::node &node) {
+        auto const shared_node = node.shared_from_this();
 
-        if (this->_nodes.count(node) > 0) {
+        if (this->_nodes.count(shared_node) > 0) {
             throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : node is already attached.");
         }
 
-        this->_nodes.insert(node);
+        this->_nodes.insert(shared_node);
 
-        node->manageable().set_manager(this->_weak_manager.lock());
+        node.manageable().set_manager(this->_weak_manager.lock());
 
-        this->add_node_to_graph(*node);
+        this->add_node_to_graph(node);
     }
 
-    void detach_node(std::shared_ptr<audio::engine::node> &node) {
-        if (!node) {
-            throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
-        }
+    void detach_node(audio::engine::node &node) {
+        auto shared_node = node.shared_from_this();
 
-        if (this->_nodes.count(node) == 0) {
+        if (this->_nodes.count(shared_node) == 0) {
             throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : node is not attached.");
         }
 
-        disconnect_node_with_predicate([&node](connection const &connection) {
-            return (connection.destination_node() == node || connection.source_node() == node);
+        disconnect_node_with_predicate([&shared_node](connection const &connection) {
+            return (connection.destination_node() == shared_node || connection.source_node() == shared_node);
         });
 
-        this->remove_node_from_graph(*node);
+        this->remove_node_from_graph(node);
 
-        node->manageable().set_manager(manager{nullptr});
+        node.manageable().set_manager(manager{nullptr});
 
-        this->_nodes.erase(node);
+        this->_nodes.erase(shared_node);
     }
 
-    void detach_node_if_unused(std::shared_ptr<audio::engine::node> &node) {
-        auto filtered_connection = filter(_connections, [node](auto const &connection) {
-            return (connection.destination_node() == node || connection.source_node() == node);
+    void detach_node_if_unused(audio::engine::node &node) {
+        auto shared_node = node.shared_from_this();
+
+        auto filtered_connection = filter(_connections, [shared_node](auto const &connection) {
+            return (connection.destination_node() == shared_node || connection.source_node() == shared_node);
         });
 
         if (filtered_connection.size() == 0) {
@@ -169,19 +167,15 @@ struct audio::engine::manager::impl : base::impl {
         return true;
     }
 
-    audio::engine::connection connect(std::shared_ptr<audio::engine::node> &src_node,
-                                      std::shared_ptr<audio::engine::node> &dst_node, uint32_t const src_bus_idx,
-                                      uint32_t const dst_bus_idx, const audio::format &format) {
-        if (!src_node || !dst_node) {
-            throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
-        }
-
-        if (!src_node->is_available_output_bus(src_bus_idx)) {
+    audio::engine::connection connect(audio::engine::node &src_node, audio::engine::node &dst_node,
+                                      uint32_t const src_bus_idx, uint32_t const dst_bus_idx,
+                                      const audio::format &format) {
+        if (!src_node.is_available_output_bus(src_bus_idx)) {
             throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : output bus(" +
                                         std::to_string(src_bus_idx) + ") is not available.");
         }
 
-        if (!dst_node->is_available_input_bus(dst_bus_idx)) {
+        if (!dst_node.is_available_input_bus(dst_bus_idx)) {
             throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : input bus(" +
                                         std::to_string(dst_bus_idx) + ") is not available.");
         }
@@ -200,8 +194,8 @@ struct audio::engine::manager::impl : base::impl {
 
         if (this->_graph) {
             this->add_connection(connection);
-            this->update_node_connections(*src_node);
-            this->update_node_connections(*dst_node);
+            this->update_node_connections(src_node);
+            this->update_node_connections(dst_node);
         }
 
         return connection;
@@ -215,13 +209,13 @@ struct audio::engine::manager::impl : base::impl {
 
         for (auto &node : update_nodes) {
             node->manageable().update_connections();
-            this->detach_node_if_unused(node);
+            this->detach_node_if_unused(*node);
         }
 
         this->_connections.erase(connection);
     }
 
-    void disconnect(std::shared_ptr<audio::engine::node> &node) {
+    void disconnect(audio::engine::node &node) {
         if (this->node_exists(node)) {
             this->detach_node(node);
         }
@@ -242,7 +236,7 @@ struct audio::engine::manager::impl : base::impl {
 
         for (auto node : update_nodes) {
             node->manageable().update_connections();
-            detach_node_if_unused(node);
+            detach_node_if_unused(*node);
         }
 
         for (auto &connection : connections) {
@@ -509,15 +503,15 @@ audio::engine::manager::manager(std::nullptr_t) : base(nullptr) {
 
 audio::engine::manager::~manager() = default;
 
-audio::engine::connection audio::engine::manager::connect(std::shared_ptr<node> &source_node,
-                                                          std::shared_ptr<node> &destination_node,
+audio::engine::connection audio::engine::manager::connect(audio::engine::node &source_node,
+                                                          audio::engine::node &destination_node,
                                                           audio::format const &format) {
     if (!source_node || !destination_node) {
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
     }
 
-    auto source_bus_result = source_node->next_available_output_bus();
-    auto destination_bus_result = destination_node->next_available_input_bus();
+    auto source_bus_result = source_node.next_available_output_bus();
+    auto destination_bus_result = destination_node.next_available_input_bus();
 
     if (!source_bus_result || !destination_bus_result) {
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : bus is not available.");
@@ -526,8 +520,8 @@ audio::engine::connection audio::engine::manager::connect(std::shared_ptr<node> 
     return connect(source_node, destination_node, *source_bus_result, *destination_bus_result, format);
 }
 
-audio::engine::connection audio::engine::manager::connect(std::shared_ptr<node> &source_node,
-                                                          std::shared_ptr<node> &destination_node,
+audio::engine::connection audio::engine::manager::connect(audio::engine::node &source_node,
+                                                          audio::engine::node &destination_node,
                                                           uint32_t const src_bus_idx, uint32_t const dst_bus_idx,
                                                           audio::format const &format) {
     return impl_ptr<impl>()->connect(source_node, destination_node, src_bus_idx, dst_bus_idx, format);
@@ -537,45 +531,33 @@ void audio::engine::manager::disconnect(connection &connection) {
     impl_ptr<impl>()->disconnect(connection);
 }
 
-void audio::engine::manager::disconnect(std::shared_ptr<node> &node) {
+void audio::engine::manager::disconnect(audio::engine::node &node) {
     impl_ptr<impl>()->disconnect(node);
 }
 
-void audio::engine::manager::disconnect_input(std::shared_ptr<node> const &node) {
-    if (!node) {
-        throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
-    }
-
+void audio::engine::manager::disconnect_input(audio::engine::node const &node) {
+    auto shared_node = node.shared_from_this();
     impl_ptr<impl>()->disconnect_node_with_predicate(
-        [node](connection const &connection) { return (connection.destination_node() == node); });
+        [shared_node](connection const &connection) { return (connection.destination_node() == shared_node); });
 }
 
-void audio::engine::manager::disconnect_input(std::shared_ptr<node> const &node, uint32_t const bus_idx) {
-    if (!node) {
-        throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
-    }
-
-    impl_ptr<impl>()->disconnect_node_with_predicate([node, bus_idx](auto const &connection) {
-        return (connection.destination_node() == node && connection.destination_bus() == bus_idx);
+void audio::engine::manager::disconnect_input(audio::engine::node const &node, uint32_t const bus_idx) {
+    auto shared_node = node.shared_from_this();
+    impl_ptr<impl>()->disconnect_node_with_predicate([shared_node, bus_idx](auto const &connection) {
+        return (connection.destination_node() == shared_node && connection.destination_bus() == bus_idx);
     });
 }
 
-void audio::engine::manager::disconnect_output(std::shared_ptr<node> const &node) {
-    if (!node) {
-        throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
-    }
-
+void audio::engine::manager::disconnect_output(audio::engine::node const &node) {
+    auto shared_node = node.shared_from_this();
     impl_ptr<impl>()->disconnect_node_with_predicate(
-        [node](connection const &connection) { return (connection.source_node() == node); });
+        [shared_node](connection const &connection) { return (connection.source_node() == shared_node); });
 }
 
-void audio::engine::manager::disconnect_output(std::shared_ptr<node> const &node, uint32_t const bus_idx) {
-    if (!node) {
-        throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
-    }
-
-    impl_ptr<impl>()->disconnect_node_with_predicate([node, bus_idx](auto const &connection) {
-        return (connection.source_node() == node && connection.source_bus() == bus_idx);
+void audio::engine::manager::disconnect_output(audio::engine::node const &node, uint32_t const bus_idx) {
+    auto shared_node = node.shared_from_this();
+    impl_ptr<impl>()->disconnect_node_with_predicate([shared_node, bus_idx](auto const &connection) {
+        return (connection.source_node() == shared_node && connection.source_bus() == bus_idx);
     });
 }
 

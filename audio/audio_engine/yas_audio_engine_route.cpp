@@ -42,7 +42,7 @@ struct audio::engine::route::impl final : base::impl {
             auto const dst_bus_idx = args.bus_idx;
 
             if (auto route = weak_route.lock()) {
-                if (auto kernel = route.node()->kernel()) {
+                if (auto kernel = route.node().kernel()) {
                     auto const &routes =
                         std::any_cast<std::shared_ptr<audio::engine::route::kernel>>(kernel->decorator)->routes;
                     auto output_connection = kernel->output_connection(dst_bus_idx);
@@ -121,10 +121,6 @@ struct audio::engine::route::impl final : base::impl {
         this->_node->manageable().update_kernel();
     }
 
-    std::shared_ptr<audio::engine::node> &node() {
-        return this->_node;
-    }
-
    private:
     void _will_reset() {
         this->_routes.clear();
@@ -180,10 +176,10 @@ void audio::engine::route::clear_routes() {
     impl_ptr<impl>()->clear_routes();
 }
 
-std::shared_ptr<audio::engine::node> const &audio::engine::route::node() const {
-    return impl_ptr<impl>()->node();
+audio::engine::node const &audio::engine::route::node() const {
+    return *impl_ptr<impl>()->_node;
 }
 
-std::shared_ptr<audio::engine::node> &audio::engine::route::node() {
-    return impl_ptr<impl>()->node();
+audio::engine::node &audio::engine::route::node() {
+    return *impl_ptr<impl>()->_node;
 }

@@ -28,7 +28,7 @@ namespace yas::audio::engine {
 class manager;
 class kernel;
 
-struct node : public base {
+struct node : base, std::enable_shared_from_this<node> {
     class impl;
 
     enum class method {
@@ -49,8 +49,8 @@ struct node : public base {
 
     node(std::nullptr_t);
 
-    //    node(node &&) = default;
-    //    node &operator=(node &&) = default;
+    //        node(node &&) = default;
+    //        node &operator=(node &&) = default;
 
     virtual ~node();
 
@@ -96,8 +96,8 @@ struct node : public base {
     audio::engine::connectable_node _connectable = nullptr;
     mutable audio::engine::manageable_node _manageable = nullptr;
 
-    //    node(node const &) = delete;
-    //    node &operator=(node const &) = delete;
+    //        node(node const &) = delete;
+    //        node &operator=(node const &) = delete;
 };
 
 std::shared_ptr<node> make_node(node_args);

@@ -190,7 +190,7 @@ struct audio::engine::au::impl : base::impl {
                 auto weak_au = to_weak(cast<engine::au>());
                 unit->set_render_handler([weak_au](audio::render_parameters &render_parameters) {
                     if (auto au = weak_au.lock()) {
-                        if (auto kernel = au.node()->kernel()) {
+                        if (auto kernel = au.node().kernel()) {
                             if (auto connection = kernel->input_connection(render_parameters.in_bus_number)) {
                                 if (auto src_node = connection.source_node()) {
                                     pcm_buffer buffer{connection.format(), render_parameters.io_data};
@@ -409,12 +409,12 @@ chaining::chain_relayed_unsync_t<audio::engine::au, audio::engine::au::chaining_
         .to([](chaining_pair_t const &pair) { return pair.second; });
 }
 
-std::shared_ptr<audio::engine::node> const &audio::engine::au::node() const {
-    return impl_ptr<impl>()->_node;
+audio::engine::node const &audio::engine::au::node() const {
+    return *impl_ptr<impl>()->_node;
 }
 
-std::shared_ptr<audio::engine::node> &audio::engine::au::node() {
-    return impl_ptr<impl>()->_node;
+audio::engine::node &audio::engine::au::node() {
+    return *impl_ptr<impl>()->_node;
 }
 
 void audio::engine::au::prepare_unit() {

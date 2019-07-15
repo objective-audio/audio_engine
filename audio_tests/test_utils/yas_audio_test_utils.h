@@ -33,8 +33,7 @@ class audio_test_node_object : public base {
 };
 
 struct connection : audio::engine::connection {
-    connection(std::shared_ptr<audio::engine::node> &source_node, uint32_t const source_bus,
-               std::shared_ptr<audio::engine::node> &destination_node, uint32_t const destination_bus,
-               audio::format const &format);
+    connection(audio::engine::node &source_node, uint32_t const source_bus, audio::engine::node &destination_node,
+               uint32_t const destination_bus, audio::format const &format);
 };
 }  // namespace yas::test

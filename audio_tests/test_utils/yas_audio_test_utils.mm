@@ -218,8 +218,8 @@ std::shared_ptr<audio::engine::node> &test::audio_test_node_object::node() {
     return impl_ptr<impl>()->_node;
 }
 
-test::connection::connection(std::shared_ptr<audio::engine::node> &source_node, uint32_t const source_bus,
-                             std::shared_ptr<audio::engine::node> &destination_node, uint32_t const destination_bus,
+test::connection::connection(audio::engine::node &source_node, uint32_t const source_bus,
+                             audio::engine::node &destination_node, uint32_t const destination_bus,
                              audio::format const &format)
     : audio::engine::connection(source_node, source_bus, destination_node, destination_bus, format) {
 }
