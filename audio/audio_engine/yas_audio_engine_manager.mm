@@ -278,10 +278,8 @@ struct audio::engine::manager::impl : base::impl {
             return false;
         }
 
-        auto connectable_dst_node = std::dynamic_pointer_cast<audio::engine::connectable_node>(destination_node);
-        auto connectable_src_node = std::dynamic_pointer_cast<audio::engine::connectable_node>(source_node);
-        connectable_dst_node->add_connection(connection);
-        connectable_src_node->add_connection(connection);
+        destination_node->connectable()->add_connection(connection);
+        source_node->connectable()->add_connection(connection);
 
         return true;
     }
@@ -293,13 +291,11 @@ struct audio::engine::manager::impl : base::impl {
         }
 
         if (auto source_node = connection.source_node()) {
-            auto connectable_src_node = std::dynamic_pointer_cast<audio::engine::connectable_node>(source_node);
-            connectable_src_node->remove_connection(connection);
+            source_node->connectable()->remove_connection(connection);
         }
 
         if (auto destination_node = connection.destination_node()) {
-            auto connectable_dst_node = std::dynamic_pointer_cast<audio::engine::connectable_node>(destination_node);
-            connectable_dst_node->remove_connection(connection);
+            destination_node->connectable()->remove_connection(connection);
         }
     }
 

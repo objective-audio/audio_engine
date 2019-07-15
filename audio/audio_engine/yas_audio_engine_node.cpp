@@ -389,6 +389,10 @@ chaining::chain_relayed_unsync_t<audio::engine::node, audio::engine::node::chain
         .to([](chaining_pair_t const &pair) { return pair.second; });
 }
 
+std::shared_ptr<audio::engine::connectable_node> audio::engine::node::connectable() {
+    return std::dynamic_pointer_cast<connectable_node>(shared_from_this());
+}
+
 audio::engine::manageable_node const &audio::engine::node::manageable() const {
     if (!this->_manageable) {
         this->_manageable = audio::engine::manageable_node{impl_ptr<manageable_node::impl>()};

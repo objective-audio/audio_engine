@@ -85,6 +85,7 @@ struct node : base, std::enable_shared_from_this<node>, connectable_node {
     [[nodiscard]] chaining::chain_unsync_t<chaining_pair_t> chain() const;
     [[nodiscard]] chaining::chain_relayed_unsync_t<node, chaining_pair_t> chain(method const) const;
 
+    std::shared_ptr<connectable_node> connectable();
     audio::engine::manageable_node const &manageable() const;
     audio::engine::manageable_node &manageable();
 
