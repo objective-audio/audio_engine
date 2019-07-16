@@ -21,14 +21,19 @@
 
 using namespace yas;
 
-namespace yas::audio {
-class connection_for_engine : public audio::engine::connection {
-   public:
-    connection_for_engine(audio::engine::node &src_node, uint32_t const src_bus, audio::engine::node &dst_node,
-                          uint32_t const dst_bus, audio::format const &format)
+namespace yas::audio::engine {
+struct connection_factory : audio::engine::connection {
+    connection_factory(audio::engine::node &src_node, uint32_t const src_bus, audio::engine::node &dst_node,
+                       uint32_t const dst_bus, audio::format const &format)
         : audio::engine::connection(src_node, src_bus, dst_node, dst_bus, format) {
     }
 };
+
+std::shared_ptr<connection> make_connection(audio::engine::node &src_node, uint32_t const src_bus,
+                                            audio::engine::node &dst_node, uint32_t const dst_bus,
+                                            audio::format const &format) {
+    return std::make_shared<connection_factory>(src_node, src_bus, dst_node, dst_bus, format);
+}
 }
 
 #pragma mark - audio::engine::manager::impl
@@ -189,7 +194,7 @@ struct audio::engine::manager::impl : base::impl {
             this->attach_node(dst_node);
         }
 
-        connection_for_engine connection(src_node, src_bus_idx, dst_node, dst_bus_idx, format);
+        connection_factory connection(src_node, src_bus_idx, dst_node, dst_bus_idx, format);
 
         this->_connections.insert(connection);
 
