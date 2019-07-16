@@ -35,14 +35,15 @@ struct device_io : manageable_device_io, std::enable_shared_from_this<device_io>
     std::shared_ptr<audio::device_io> &raw_device_io() override;
 
    protected:
-    explicit device_io(std::shared_ptr<audio::device> const &device);
+    device_io();
+
+    void _prepare();
 
    private:
     std::shared_ptr<impl> _impl;
 };
 
 std::shared_ptr<device_io> make_device_io();
-std::shared_ptr<device_io> make_device_io(std::shared_ptr<audio::device> const &device);
 }  // namespace yas::audio::engine
 
 #endif

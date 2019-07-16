@@ -22,8 +22,8 @@ struct audio::engine::device_io::impl final {
     std::shared_ptr<audio::engine::node> _node = make_node({.input_bus_count = 1, .output_bus_count = 1});
     chaining::any_observer_ptr _connections_observer = nullptr;
 
-    void prepare(engine::device_io &engine_device_io, std::shared_ptr<audio::device> const &device) {
-        this->set_device(device ?: device::default_output_device());
+    void prepare(engine::device_io &engine_device_io) {
+        this->set_device(device::default_output_device());
 
         auto weak_engine_device_io = to_weak(engine_device_io.shared_from_this());
 
@@ -180,8 +180,7 @@ struct audio::engine::device_io::impl final {
 
 #pragma mark - audio::engine::device_io
 
-audio::engine::device_io::device_io(std::shared_ptr<audio::device> const &device) : _impl(std::make_unique<impl>()) {
-    this->_impl->prepare(*this, device);
+audio::engine::device_io::device_io() : _impl(std::make_unique<impl>()) {
 }
 
 audio::engine::device_io::~device_io() = default;
@@ -214,20 +213,22 @@ std::shared_ptr<audio::device_io> &audio::engine::device_io::raw_device_io() {
     return this->_impl->raw_device_io();
 }
 
+void audio::engine::device_io::_prepare() {
+    this->_impl->prepare(*this);
+}
+
 namespace yas::audio::engine {
 struct device_io_factory : device_io {
-    device_io_factory(std::shared_ptr<audio::device> const &device) : device_io(device) {
+    void prepare() {
+        this->_prepare();
     }
 };
 };  // namespace yas::audio::engine
 
 std::shared_ptr<audio::engine::device_io> audio::engine::make_device_io() {
-    std::shared_ptr<audio::device> device = nullptr;
-    return make_device_io(device);
-}
-
-std::shared_ptr<audio::engine::device_io> audio::engine::make_device_io(std::shared_ptr<audio::device> const &device) {
-    return std::make_shared<audio::engine::device_io_factory>(device);
+    auto shared = std::make_shared<audio::engine::device_io_factory>();
+    shared->prepare();
+    return shared;
 }
 
 #endif
