@@ -147,8 +147,9 @@ struct audio::engine::manager::impl : base::impl {
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
         if (auto &device_io = this->_device_io) {
-            device_io->add_raw_device_io();
-            this->_graph.add_audio_device_io(device_io->raw_device_io());
+            auto manageable = device_io->manageable();
+            manageable->add_raw_device_io();
+            this->_graph.add_audio_device_io(manageable->raw_device_io());
         }
 #endif
 
@@ -387,18 +388,19 @@ struct audio::engine::manager::impl : base::impl {
             this->_device_io = std::move(node);
 
             if (this->_graph) {
-                this->_device_io->add_raw_device_io();
-                this->_graph.add_audio_device_io(this->_device_io->raw_device_io());
+                auto manageable = this->_device_io->manageable();
+                manageable->add_raw_device_io();
+                this->_graph.add_audio_device_io(manageable->raw_device_io());
             }
         } else {
             if (this->_device_io) {
                 if (this->_graph) {
-                    if (auto &device_io = this->_device_io->raw_device_io()) {
+                    if (auto &device_io = this->_device_io->manageable()->raw_device_io()) {
                         this->_graph.remove_audio_device_io(device_io);
                     }
                 }
 
-                this->_device_io->remove_raw_device_io();
+                this->_device_io->manageable()->remove_raw_device_io();
                 this->_device_io = nullptr;
             }
         }

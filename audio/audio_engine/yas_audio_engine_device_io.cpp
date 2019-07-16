@@ -59,6 +59,10 @@ audio::engine::node &audio::engine::device_io::node() {
     return *this->_node;
 }
 
+std::shared_ptr<audio::engine::manageable_device_io> audio::engine::device_io::manageable() {
+    return std::dynamic_pointer_cast<manageable_device_io>(shared_from_this());
+}
+
 void audio::engine::device_io::add_raw_device_io() {
     this->_core->_device_io = std::make_shared<audio::device_io>(this->_core->device());
 }

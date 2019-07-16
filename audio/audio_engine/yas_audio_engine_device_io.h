@@ -32,10 +32,7 @@ struct device_io : manageable_device_io, std::enable_shared_from_this<device_io>
     audio::engine::node const &node() const;
     audio::engine::node &node();
 
-#warning todo privateにしてmanageableでアクセスする
-    void add_raw_device_io() override;
-    void remove_raw_device_io() override;
-    std::shared_ptr<audio::device_io> &raw_device_io() override;
+    std::shared_ptr<manageable_device_io> manageable();
 
    protected:
     device_io();
@@ -49,6 +46,10 @@ struct device_io : manageable_device_io, std::enable_shared_from_this<device_io>
 
     device_io(device_io const &) = delete;
     device_io &operator=(device_io const &) = delete;
+
+    void add_raw_device_io() override;
+    void remove_raw_device_io() override;
+    std::shared_ptr<audio::device_io> &raw_device_io() override;
 
     void _update_device_io_connections();
     bool _validate_connections();
