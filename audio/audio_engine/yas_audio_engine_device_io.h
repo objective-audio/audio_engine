@@ -21,6 +21,9 @@ class node;
 struct device_io : manageable_device_io, std::enable_shared_from_this<device_io> {
     class impl;
 
+    device_io(device_io &&) = default;
+    device_io &operator=(device_io &&) = default;
+
     virtual ~device_io();
 
     void set_device(std::shared_ptr<audio::device> const &device);
@@ -41,6 +44,9 @@ struct device_io : manageable_device_io, std::enable_shared_from_this<device_io>
 
    private:
     std::shared_ptr<impl> _impl;
+
+    device_io(device_io const &) = delete;
+    device_io &operator=(device_io const &) = delete;
 };
 
 std::shared_ptr<device_io> make_device_io();
