@@ -244,7 +244,7 @@ struct device_io_vc_internal {
     self.deviceNames = titles;
 
     std::optional<NSUInteger> index = std::nullopt;
-    if (auto const &device = _internal.manager.device_io().device()) {
+    if (auto const &device = _internal.manager.device_io()->device()) {
         index = audio::device::index_of_device(*device);
     }
 
@@ -266,10 +266,10 @@ struct device_io_vc_internal {
         _internal.manager.disconnect(_internal.route.node());
         _internal.route.clear_routes();
 
-        if (auto const &device = _internal.manager.device_io().device()) {
+        if (auto const &device = _internal.manager.device_io()->device()) {
             if (device->output_channel_count() > 0) {
                 if (auto const output_format = device->output_format()) {
-                    _internal.manager.connect(_internal.route.node(), _internal.manager.device_io().node(),
+                    _internal.manager.connect(_internal.route.node(), _internal.manager.device_io()->node(),
                                               *output_format);
                     _internal.manager.connect(_internal.tap.node(), _internal.route.node(), 0,
                                               YASAudioDeviceRouteSampleSourceBusSine, *output_format);
@@ -278,14 +278,14 @@ struct device_io_vc_internal {
 
             if (device->input_channel_count() > 0) {
                 if (auto const input_format = device->input_format()) {
-                    _internal.manager.connect(_internal.manager.device_io().node(), _internal.route.node(), 0,
+                    _internal.manager.connect(_internal.manager.device_io()->node(), _internal.route.node(), 0,
                                               YASAudioDeviceRouteSampleSourceBusInput, *input_format);
                 }
             }
         }
     }
 
-    if (auto const &device = _internal.manager.device_io().device()) {
+    if (auto const &device = _internal.manager.device_io()->device()) {
         uint32_t const output_channel_count = device->output_channel_count();
         uint32_t const input_channel_count = device->input_channel_count();
         NSMutableArray *outputRoutes = [NSMutableArray arrayWithCapacity:output_channel_count];
@@ -386,7 +386,7 @@ struct device_io_vc_internal {
     auto const all_devices = audio::device::all_devices();
 
     if (selected_device && std::find(all_devices.begin(), all_devices.end(), selected_device) != all_devices.end()) {
-        _internal.manager.device_io().set_device(selected_device);
+        _internal.manager.device_io()->set_device(selected_device);
 
         auto unowned_self = make_objc_ptr([[YASUnownedObject alloc] initWithObject:self]);
 
@@ -402,7 +402,7 @@ struct device_io_vc_internal {
                                         })
                                         .end();
     } else {
-        _internal.manager.device_io().set_device(nullptr);
+        _internal.manager.device_io()->set_device(nullptr);
     }
 
     [self _updateConnection];
