@@ -11,7 +11,7 @@
 namespace yas::audio::engine {
 class node;
 
-class connection : public base {
+struct connection : base, node_removable {
     class impl;
 
    public:
@@ -25,14 +25,13 @@ class connection : public base {
     std::shared_ptr<audio::engine::node> destination_node() const;
     audio::format const &format() const;
 
-    audio::engine::node_removable &node_removable();
+    void remove_nodes() override;
+    void remove_source_node() override;
+    void remove_destination_node() override;
 
    protected:
     connection(audio::engine::node &source_node, uint32_t const source_bus_idx, audio::engine::node &destination_node,
                uint32_t const destination_bus_idx, audio::format const &format);
-
-   private:
-    audio::engine::node_removable _node_removable = nullptr;
 };
 }  // namespace yas::audio::engine
 

@@ -35,8 +35,6 @@ using namespace yas;
     XCTAssertTrue(connection.destination_bus() == dst_bus);
     XCTAssertTrue(connection.format() == format);
 
-    XCTAssertTrue(connection.node_removable());
-
     XCTAssertTrue(src_obj.node()->manageable().output_connection(src_bus) == connection);
     XCTAssertTrue(dst_obj.node()->manageable().input_connection(dst_bus) == connection);
 }
@@ -56,7 +54,7 @@ using namespace yas;
 
     auto connection = test::connection(*src_obj.node(), src_bus, *dst_obj.node(), dst_bus, format);
 
-    connection.node_removable().remove_nodes();
+    connection.remove_nodes();
 
     XCTAssertFalse(connection.source_node());
     XCTAssertFalse(connection.destination_node());
@@ -71,12 +69,12 @@ using namespace yas;
 
     auto connection = test::connection(*src_obj.node(), src_bus, *dst_obj.node(), dst_bus, format);
 
-    connection.node_removable().remove_source_node();
+    connection.remove_source_node();
 
     XCTAssertFalse(connection.source_node());
     XCTAssertTrue(connection.destination_node());
 
-    connection.node_removable().remove_destination_node();
+    connection.remove_destination_node();
 
     XCTAssertFalse(connection.destination_node());
 }

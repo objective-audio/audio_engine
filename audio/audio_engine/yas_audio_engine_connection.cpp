@@ -9,7 +9,7 @@
 
 using namespace yas;
 
-struct audio::engine::connection::impl : base::impl, node_removable::impl {
+struct audio::engine::connection::impl : base::impl {
     uint32_t _source_bus;
     uint32_t _destination_bus;
     audio::format _format;
@@ -109,9 +109,14 @@ audio::format const &audio::engine::connection::format() const {
     return impl_ptr<impl>()->_format;
 }
 
-audio::engine::node_removable &audio::engine::connection::node_removable() {
-    if (!this->_node_removable) {
-        this->_node_removable = audio::engine::node_removable{impl_ptr<node_removable::impl>()};
-    }
-    return this->_node_removable;
+void audio::engine::connection::remove_nodes() {
+    impl_ptr<impl>()->remove_nodes();
+}
+
+void audio::engine::connection::remove_source_node() {
+    impl_ptr<impl>()->remove_source_node();
+}
+
+void audio::engine::connection::remove_destination_node() {
+    impl_ptr<impl>()->remove_destination_node();
 }
