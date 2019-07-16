@@ -16,6 +16,26 @@
 
 using namespace yas;
 
+#pragma mark - core
+
+struct audio::engine::device_io::core {
+    std::shared_ptr<audio::device_io> _device_io = nullptr;
+
+    void set_device(std::shared_ptr<audio::device> const &device) {
+        this->_device = device;
+        if (this->_device_io) {
+            this->_device_io->set_device(device);
+        }
+    }
+
+    std::shared_ptr<audio::device> device() {
+        return this->_device;
+    }
+
+   private:
+    std::shared_ptr<audio::device> _device = nullptr;
+};
+
 #pragma mark - audio::engine::device_io::impl
 
 struct audio::engine::device_io::impl final {
@@ -70,24 +90,6 @@ struct audio::engine::device_io::impl final {
     }
 
    private:
-    struct core {
-        std::shared_ptr<audio::device_io> _device_io = nullptr;
-
-        void set_device(std::shared_ptr<audio::device> const &device) {
-            this->_device = device;
-            if (this->_device_io) {
-                this->_device_io->set_device(device);
-            }
-        }
-
-        std::shared_ptr<audio::device> device() {
-            return this->_device;
-        }
-
-       private:
-        std::shared_ptr<audio::device> _device = nullptr;
-    };
-
     core _core;
 
     void _update_device_io_connections(engine::device_io &engine_device_io) {

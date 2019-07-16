@@ -20,6 +20,7 @@ class node;
 
 struct device_io : manageable_device_io, std::enable_shared_from_this<device_io> {
     class impl;
+    class core;
 
     device_io(device_io &&) = default;
     device_io &operator=(device_io &&) = default;
