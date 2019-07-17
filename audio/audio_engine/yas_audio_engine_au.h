@@ -19,7 +19,7 @@ namespace yas::audio::engine {
 class node;
 
 struct au : manageable_au, std::enable_shared_from_this<au> {
-    class impl;
+    struct core;
 
     enum class method {
         will_update_connections,
@@ -71,12 +71,25 @@ struct au : manageable_au, std::enable_shared_from_this<au> {
    protected:
     au(node_args &&);
 
-    std::shared_ptr<impl> _impl;
+    void _prepare(AudioComponentDescription const &acd);
+
+   private:
+    std::shared_ptr<audio::engine::node> _node;
+    AudioComponentDescription _acd;
+    std::unordered_map<AudioUnitScope, unit::parameter_map_t> _parameters;
+    chaining::notifier<chaining_pair_t> _notifier;
+    chaining::any_observer_ptr _reset_observer = nullptr;
+    chaining::any_observer_ptr _connections_observer = nullptr;
+    prepare_unit_f _prepare_unit_handler;
+    std::unique_ptr<core> _core;
 
     au(au const &) = delete;
     au(au &&) = delete;
     au &operator=(au const &) = delete;
     au &operator=(au &&) = delete;
+
+    void _update_unit_connections();
+    void _will_reset();
 };
 
 std::shared_ptr<au> make_au(OSType const type, OSType const sub_type);
