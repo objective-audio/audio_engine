@@ -19,8 +19,6 @@ namespace yas::audio::engine {
 class node;
 
 struct au : manageable_au, std::enable_shared_from_this<au> {
-    struct core;
-
     enum class method {
         will_update_connections,
         did_update_connections,
@@ -33,8 +31,6 @@ struct au : manageable_au, std::enable_shared_from_this<au> {
         audio::engine::node_args node_args;
         AudioComponentDescription acd;
     };
-
-    virtual ~au();
 
     void set_prepare_unit_handler(prepare_unit_f);
 
@@ -63,10 +59,7 @@ struct au : manageable_au, std::enable_shared_from_this<au> {
     audio::engine::node const &node() const;
     audio::engine::node &node();
 
-#warning todo privateにしてmanageableでアクセスする
-    void prepare_unit() override;
-    void prepare_parameters() override;
-    void reload_unit() override;
+    std::shared_ptr<manageable_au> manageable();
 
    protected:
     au(node_args &&);
@@ -81,12 +74,18 @@ struct au : manageable_au, std::enable_shared_from_this<au> {
     chaining::any_observer_ptr _reset_observer = nullptr;
     chaining::any_observer_ptr _connections_observer = nullptr;
     prepare_unit_f _prepare_unit_handler;
+
+    struct core;
     std::unique_ptr<core> _core;
 
     au(au const &) = delete;
     au(au &&) = delete;
     au &operator=(au const &) = delete;
     au &operator=(au &&) = delete;
+
+    void prepare_unit() override;
+    void prepare_parameters() override;
+    void reload_unit() override;
 
     void _update_unit_connections();
     void _will_reset();

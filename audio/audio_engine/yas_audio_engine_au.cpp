@@ -36,8 +36,6 @@ struct audio::engine::au::core {
 audio::engine::au::au(node_args &&args) : _node(make_node(std::move(args))), _core(std::make_unique<core>()) {
 }
 
-audio::engine::au::~au() = default;
-
 void audio::engine::au::set_prepare_unit_handler(prepare_unit_f handler) {
     this->_prepare_unit_handler = std::move(handler);
 }
@@ -145,6 +143,10 @@ audio::engine::node const &audio::engine::au::node() const {
 
 audio::engine::node &audio::engine::au::node() {
     return *this->_node;
+}
+
+std::shared_ptr<audio::engine::manageable_au> audio::engine::au::manageable() {
+    return std::dynamic_pointer_cast<manageable_au>(shared_from_this());
 }
 
 #pragma mark - private

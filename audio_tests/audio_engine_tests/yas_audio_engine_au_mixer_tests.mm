@@ -87,7 +87,7 @@ using namespace yas;
     XCTAssertEqual(au_mixer.output_volume(bus_idx), output_volume);
     XCTAssertEqual(au_mixer.output_pan(bus_idx), output_pan);
 
-    au_mixer.au().reload_unit();
+    au_mixer.au().manageable()->reload_unit();
 
     XCTAssertNotEqual(au_mixer.input_volume(bus_idx), input_volume);
     XCTAssertNotEqual(au_mixer.input_pan(bus_idx), input_pan);
@@ -95,7 +95,7 @@ using namespace yas;
     XCTAssertNotEqual(au_mixer.output_volume(bus_idx), output_volume);
     XCTAssertNotEqual(au_mixer.output_pan(bus_idx), output_pan);
 
-    au_mixer.au().prepare_parameters();
+    au_mixer.au().manageable()->prepare_parameters();
 
     XCTAssertEqual(au_mixer.input_volume(bus_idx), input_volume);
     XCTAssertEqual(au_mixer.input_pan(bus_idx), input_pan);

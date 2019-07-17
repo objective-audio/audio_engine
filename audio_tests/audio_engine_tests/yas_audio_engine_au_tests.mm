@@ -76,7 +76,7 @@ using namespace yas;
 
     manager.disconnect(connection);
 
-    delay_au->reload_unit();
+    delay_au->manageable()->reload_unit();
 
     manager.connect(delay_au->node(), output.node(), format);
 
