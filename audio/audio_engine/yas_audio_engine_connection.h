@@ -11,9 +11,7 @@
 namespace yas::audio::engine {
 class node;
 
-struct connection : base, node_removable, std::enable_shared_from_this<connection> {
-    class impl;
-
+struct connection : node_removable, std::enable_shared_from_this<connection> {
     virtual ~connection();
 
     uint32_t source_bus() const;
@@ -31,20 +29,22 @@ struct connection : base, node_removable, std::enable_shared_from_this<connectio
                uint32_t const destination_bus_idx, audio::format const &format);
 
    private:
+    uint32_t _source_bus;
+    uint32_t _destination_bus;
+    audio::format _format;
+    mutable std::recursive_mutex _mutex;
+    std::weak_ptr<node> _source_node;
+    std::weak_ptr<node> _destination_node;
+
     connection(connection const &) = delete;
     connection(connection &&) = delete;
     connection &operator=(connection const &) = delete;
     connection &operator=(connection &&) = delete;
+
+    void _remove_connection_from_nodes(connection const &);
 };
 
 std::shared_ptr<connection> make_connection(audio::engine::node &src_node, uint32_t const src_bus,
                                             audio::engine::node &dst_node, uint32_t const dst_bus,
                                             audio::format const &format);
 }  // namespace yas::audio::engine
-
-template <>
-struct std::hash<yas::audio::engine::connection> {
-    std::size_t operator()(yas::audio::engine::connection const &key) const {
-        return std::hash<uintptr_t>()(key.identifier());
-    }
-};

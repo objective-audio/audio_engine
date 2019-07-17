@@ -256,11 +256,6 @@ struct audio::engine::manager::impl : base::impl {
     }
 
     bool add_connection(audio::engine::connection &connection) {
-        if (!connection) {
-            throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
-            return false;
-        }
-
         auto destination_node = connection.destination_node();
         auto source_node = connection.source_node();
 
@@ -276,11 +271,6 @@ struct audio::engine::manager::impl : base::impl {
     }
 
     void remove_connection_from_nodes(audio::engine::connection const &connection) {
-        if (!connection) {
-            throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
-            return;
-        }
-
         if (auto source_node = connection.source_node()) {
             source_node->connectable()->remove_connection(connection);
         }

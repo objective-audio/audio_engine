@@ -31,7 +31,6 @@ using namespace yas;
     XCTAssertEqual(manager.connections().size(), 0);
 
     auto &connection = manager.connect(*source_obj.node(), *destination_obj.node(), format);
-    XCTAssertTrue(connection);
 
     auto &nodes = manager.nodes();
     auto &connections = manager.connections();
