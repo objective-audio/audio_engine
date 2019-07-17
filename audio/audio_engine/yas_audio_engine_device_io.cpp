@@ -120,11 +120,11 @@ void audio::engine::device_io::_update_device_io_connections() {
                 auto const connections = kernel->input_connections();
                 if (connections.count(0) > 0) {
                     auto const &connection = connections.at(0);
-                    if (auto src_node = connection.source_node();
-                        src_node && connection.format() == src_node->output_format(connection.source_bus())) {
+                    if (auto src_node = connection->source_node();
+                        src_node && connection->format() == src_node->output_format(connection->source_bus())) {
                         if (auto const when = args.when) {
                             src_node->render({.buffer = *args.output_buffer,
-                                              .bus_idx = connection.source_bus(),
+                                              .bus_idx = connection->source_bus(),
                                               .when = *args.when});
                         }
                     }
@@ -134,12 +134,12 @@ void audio::engine::device_io::_update_device_io_connections() {
                     auto const connections = kernel->output_connections();
                     if (connections.count(0) > 0) {
                         auto const &connection = connections.at(0);
-                        if (auto dst_node = connection.destination_node();
+                        if (auto dst_node = connection->destination_node();
                             dst_node && dst_node->is_input_renderable()) {
                             auto &input_buffer = device_io->input_buffer_on_render();
                             auto const &input_time = device_io->input_time_on_render();
                             if (input_buffer && input_time) {
-                                if (connection.format() == dst_node->input_format(connection.destination_bus())) {
+                                if (connection->format() == dst_node->input_format(connection->destination_bus())) {
                                     dst_node->render({.buffer = *input_buffer, .bus_idx = 0, .when = *input_time});
                                 }
                             }
@@ -160,7 +160,7 @@ bool audio::engine::device_io::_validate_connections() {
             auto const connections = lock_values(input_connections);
             if (connections.count(0) > 0) {
                 auto const &connection = connections.at(0);
-                auto const &connection_format = connection.format();
+                auto const &connection_format = connection->format();
                 auto const &device_format = device_io->device()->output_format();
                 if (connection_format != device_format) {
                     std::cout << __PRETTY_FUNCTION__ << " : output device io format is not match." << std::endl;
@@ -174,7 +174,7 @@ bool audio::engine::device_io::_validate_connections() {
             auto const connections = lock_values(output_connections);
             if (connections.count(0) > 0) {
                 auto const &connection = connections.at(0);
-                auto const &connection_format = connection.format();
+                auto const &connection_format = connection->format();
                 auto const &device_format = device_io->device()->input_format();
                 if (connection_format != device_format) {
                     std::cout << __PRETTY_FUNCTION__ << " : input device io format is not match." << std::endl;

@@ -67,8 +67,6 @@ struct audio::engine::connection::impl : base::impl {
 audio::engine::connection::connection(node &src_node, uint32_t const src_bus, node &dst_node, uint32_t const dst_bus,
                                       audio::format const &format)
     : base(std::make_shared<impl>(src_node, src_bus, dst_node, dst_bus, format)) {
-    src_node.connectable()->add_connection(*this);
-    dst_node.connectable()->add_connection(*this);
 }
 
 audio::engine::connection::connection(std::nullptr_t) : base(nullptr) {
@@ -120,3 +118,21 @@ void audio::engine::connection::remove_source_node() {
 void audio::engine::connection::remove_destination_node() {
     impl_ptr<impl>()->remove_destination_node();
 }
+
+namespace yas::audio::engine {
+struct connection_factory : audio::engine::connection {
+    connection_factory(audio::engine::node &src_node, uint32_t const src_bus, audio::engine::node &dst_node,
+                       uint32_t const dst_bus, audio::format const &format)
+        : audio::engine::connection(src_node, src_bus, dst_node, dst_bus, format) {
+    }
+};
+
+std::shared_ptr<connection> make_connection(audio::engine::node &src_node, uint32_t const src_bus,
+                                            audio::engine::node &dst_node, uint32_t const dst_bus,
+                                            audio::format const &format) {
+    auto connection = std::make_shared<connection_factory>(src_node, src_bus, dst_node, dst_bus, format);
+    src_node.connectable()->add_connection(*connection);
+    dst_node.connectable()->add_connection(*connection);
+    return connection;
+}
+}  // namespace yas::audio::engine

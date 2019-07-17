@@ -47,14 +47,14 @@ struct audio::engine::node::impl : base::impl, manageable_node::impl {
 
     std::optional<audio::format> input_format(uint32_t const bus_idx) {
         if (auto connection = this->input_connection(bus_idx)) {
-            return connection.format();
+            return connection->format();
         }
         return std::nullopt;
     }
 
     std::optional<audio::format> output_format(uint32_t const bus_idx) {
         if (auto connection = this->output_connection(bus_idx)) {
-            return connection.format();
+            return connection->format();
         }
         return std::nullopt;
     }
@@ -123,14 +123,14 @@ struct audio::engine::node::impl : base::impl, manageable_node::impl {
         return this->_is_input_renderable;
     }
 
-    audio::engine::connection input_connection(uint32_t const bus_idx) override {
+    std::shared_ptr<audio::engine::connection> input_connection(uint32_t const bus_idx) override {
         if (this->_input_connections.count(bus_idx) > 0) {
             return this->_input_connections.at(bus_idx).lock();
         }
         return nullptr;
     }
 
-    audio::engine::connection output_connection(uint32_t const bus_idx) override {
+    std::shared_ptr<audio::engine::connection> output_connection(uint32_t const bus_idx) override {
         if (this->_output_connections.count(bus_idx) > 0) {
             return this->_output_connections.at(bus_idx).lock();
         }
@@ -149,13 +149,14 @@ struct audio::engine::node::impl : base::impl, manageable_node::impl {
         this->_notifier.notify(std::make_pair(method::update_connections, cast<audio::engine::node>()));
     }
 
-    void add_connection(engine::connection const &connection) {
+    void add_connection(engine::connection &connection) {
+        auto weak_connection = to_weak(connection.shared_from_this());
         if (connection.destination_node()->impl_ptr<impl>().get() == this) {
             auto bus_idx = connection.destination_bus();
-            this->_input_connections.insert(std::make_pair(bus_idx, weak<audio::engine::connection>(connection)));
+            this->_input_connections.insert(std::make_pair(bus_idx, weak_connection));
         } else if (connection.source_node()->impl_ptr<impl>().get() == this) {
             auto bus_idx = connection.source_bus();
-            this->_output_connections.insert(std::make_pair(bus_idx, weak<audio::engine::connection>(connection)));
+            this->_output_connections.insert(std::make_pair(bus_idx, weak_connection));
         } else {
             throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : connection does not exist in a node.");
         }
@@ -295,11 +296,11 @@ void audio::engine::node::reset() {
     impl_ptr<impl>()->reset();
 }
 
-audio::engine::connection audio::engine::node::input_connection(uint32_t const bus_idx) const {
+std::shared_ptr<audio::engine::connection> audio::engine::node::input_connection(uint32_t const bus_idx) const {
     return impl_ptr<impl>()->input_connection(bus_idx);
 }
 
-audio::engine::connection audio::engine::node::output_connection(uint32_t const bus_idx) const {
+std::shared_ptr<audio::engine::connection> audio::engine::node::output_connection(uint32_t const bus_idx) const {
     return impl_ptr<impl>()->output_connection(bus_idx);
 }
 
@@ -407,7 +408,7 @@ audio::engine::manageable_node &audio::engine::node::manageable() {
     return this->_manageable;
 }
 
-void audio::engine::node::add_connection(audio::engine::connection const &) {
+void audio::engine::node::add_connection(audio::engine::connection &) {
     throw std::runtime_error("must be overridden.");
 }
 void audio::engine::node::remove_connection(audio::engine::connection const &) {
@@ -419,7 +420,7 @@ struct node_factory : node {
     node_factory(node_args args) : node(std::move(args)) {
     }
 
-    void add_connection(audio::engine::connection const &connection) override {
+    void add_connection(audio::engine::connection &connection) override {
         impl_ptr<impl>()->add_connection(connection);
     }
 

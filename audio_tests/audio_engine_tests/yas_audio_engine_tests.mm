@@ -30,8 +30,7 @@ using namespace yas;
     XCTAssertEqual(manager.nodes().size(), 0);
     XCTAssertEqual(manager.connections().size(), 0);
 
-    audio::engine::connection connection = nullptr;
-    XCTAssertNoThrow(connection = manager.connect(*source_obj.node(), *destination_obj.node(), format));
+    auto &connection = manager.connect(*source_obj.node(), *destination_obj.node(), format);
     XCTAssertTrue(connection);
 
     auto &nodes = manager.nodes();
@@ -39,7 +38,7 @@ using namespace yas;
     XCTAssertGreaterThanOrEqual(nodes.count(source_obj.node()), 1);
     XCTAssertGreaterThanOrEqual(nodes.count(destination_obj.node()), 1);
     XCTAssertEqual(connections.size(), 1);
-    XCTAssertEqual(*connections.begin(), connection);
+    XCTAssertEqual(*connections.begin(), connection.shared_from_this());
 }
 
 - (void)test_connect_failed_no_bus {

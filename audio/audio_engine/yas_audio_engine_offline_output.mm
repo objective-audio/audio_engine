@@ -42,7 +42,7 @@ struct audio::engine::offline_output::impl : base::impl, manageable_offline_outp
                 }
             }
 
-            auto render_buffer = std::make_shared<audio::pcm_buffer>(connection.format(), 1024);
+            auto render_buffer = std::make_shared<audio::pcm_buffer>(connection->format(), 1024);
 
             auto weak_output = to_weak(cast<offline_output>());
             auto task_lambda = [weak_output, render_buffer, render_handler = std::move(render_handler),
@@ -71,7 +71,7 @@ struct audio::engine::offline_output::impl : base::impl, manageable_offline_outp
                         break;
                     }
 
-                    auto format = connection_on_block.format();
+                    auto format = connection_on_block->format();
                     if (format != render_buffer->format()) {
                         cancelled = true;
                         break;
@@ -79,9 +79,9 @@ struct audio::engine::offline_output::impl : base::impl, manageable_offline_outp
 
                     render_buffer->reset();
 
-                    if (auto src_node = connection_on_block.source_node()) {
+                    if (auto src_node = connection_on_block->source_node()) {
                         src_node->render(
-                            {.buffer = *render_buffer, .bus_idx = connection_on_block.source_bus(), .when = when});
+                            {.buffer = *render_buffer, .bus_idx = connection_on_block->source_bus(), .when = when});
                     }
 
                     if (render_handler) {

@@ -218,8 +218,17 @@ std::shared_ptr<audio::engine::node> &test::audio_test_node_object::node() {
     return impl_ptr<impl>()->_node;
 }
 
-test::connection::connection(audio::engine::node &source_node, uint32_t const source_bus,
-                             audio::engine::node &destination_node, uint32_t const destination_bus,
-                             audio::format const &format)
-    : audio::engine::connection(source_node, source_bus, destination_node, destination_bus, format) {
+namespace yas::test {
+struct connection : audio::engine::connection {
+    connection(audio::engine::node &source_node, uint32_t const source_bus, audio::engine::node &destination_node,
+               uint32_t const destination_bus, audio::format const &format)
+        : audio::engine::connection(source_node, source_bus, destination_node, destination_bus, format) {
+    }
+};
+}
+
+std::shared_ptr<audio::engine::connection> test::make_connection(audio::engine::node &src_node, uint32_t const src_bus,
+                                                                 audio::engine::node &dst_node, uint32_t const dst_bus,
+                                                                 audio::format const &format) {
+    return audio::engine::make_connection(src_node, src_bus, dst_node, dst_bus, format);
 }

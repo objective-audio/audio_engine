@@ -51,11 +51,11 @@ class manager final : public base {
 
     virtual ~manager();
 
-    audio::engine::connection connect(audio::engine::node &source_node, audio::engine::node &destination_node,
-                                      audio::format const &format);
-    audio::engine::connection connect(audio::engine::node &source_node, audio::engine::node &destination_node,
-                                      uint32_t const source_bus_idx, uint32_t const destination_bus_idx,
-                                      audio::format const &format);
+    audio::engine::connection &connect(audio::engine::node &source_node, audio::engine::node &destination_node,
+                                       audio::format const &format);
+    audio::engine::connection &connect(audio::engine::node &source_node, audio::engine::node &destination_node,
+                                       uint32_t const source_bus_idx, uint32_t const destination_bus_idx,
+                                       audio::format const &format);
 
     void disconnect(audio::engine::connection &);
     void disconnect(audio::engine::node &);

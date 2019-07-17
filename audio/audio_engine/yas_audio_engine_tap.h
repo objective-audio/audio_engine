@@ -27,8 +27,8 @@ class tap final : public base {
     audio::engine::node const &node() const;
     audio::engine::node &node();
 
-    audio::engine::connection input_connection_on_render(uint32_t const bus_idx) const;
-    audio::engine::connection output_connection_on_render(uint32_t const bus_idx) const;
+    std::shared_ptr<audio::engine::connection> input_connection_on_render(uint32_t const bus_idx) const;
+    std::shared_ptr<audio::engine::connection> output_connection_on_render(uint32_t const bus_idx) const;
     audio::engine::connection_smap input_connections_on_render() const;
     audio::engine::connection_smap output_connections_on_render() const;
 

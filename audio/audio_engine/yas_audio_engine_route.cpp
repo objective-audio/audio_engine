@@ -51,8 +51,8 @@ struct audio::engine::route::impl final : base::impl {
 
                     for (auto const &pair : input_connections) {
                         if (auto const &input_connection = pair.second) {
-                            if (auto node = input_connection.source_node()) {
-                                auto const &src_format = input_connection.format();
+                            if (auto node = input_connection->source_node()) {
+                                auto const &src_format = input_connection->format();
                                 auto const &src_bus_idx = pair.first;
                                 uint32_t const src_ch_count = src_format.channel_count();
                                 if (auto const result = channel_map_from_routes(routes, src_bus_idx, src_ch_count,

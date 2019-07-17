@@ -19,14 +19,14 @@ audio::engine::connection_smap audio::engine::kernel::output_connections() const
     return lock_values(this->_output_connections);
 }
 
-audio::engine::connection audio::engine::kernel::input_connection(uint32_t const bus_idx) const {
+std::shared_ptr<audio::engine::connection> audio::engine::kernel::input_connection(uint32_t const bus_idx) const {
     if (this->_input_connections.count(bus_idx) > 0) {
         return this->_input_connections.at(bus_idx).lock();
     }
     return nullptr;
 }
 
-audio::engine::connection audio::engine::kernel::output_connection(uint32_t const bus_idx) const {
+std::shared_ptr<audio::engine::connection> audio::engine::kernel::output_connection(uint32_t const bus_idx) const {
     if (this->_output_connections.count(bus_idx) > 0) {
         return this->_output_connections.at(bus_idx).lock();
     }

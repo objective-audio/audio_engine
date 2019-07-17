@@ -192,11 +192,11 @@ struct audio::engine::au::impl : base::impl {
                     if (auto au = weak_au.lock()) {
                         if (auto kernel = au.node().kernel()) {
                             if (auto connection = kernel->input_connection(render_parameters.in_bus_number)) {
-                                if (auto src_node = connection.source_node()) {
-                                    pcm_buffer buffer{connection.format(), render_parameters.io_data};
-                                    time when(*render_parameters.io_time_stamp, connection.format().sample_rate());
+                                if (auto src_node = connection->source_node()) {
+                                    pcm_buffer buffer{connection->format(), render_parameters.io_data};
+                                    time when(*render_parameters.io_time_stamp, connection->format().sample_rate());
                                     src_node->render(
-                                        {.buffer = buffer, .bus_idx = connection.source_bus(), .when = when});
+                                        {.buffer = buffer, .bus_idx = connection->source_bus(), .when = when});
                                 }
                             }
                         }
@@ -205,7 +205,7 @@ struct audio::engine::au::impl : base::impl {
 
                 for (uint32_t bus_idx = 0; bus_idx < input_bus_count; ++bus_idx) {
                     if (auto connection = this->_node->input_connection(bus_idx)) {
-                        unit->set_input_format(connection.format().stream_description(), bus_idx);
+                        unit->set_input_format(connection->format().stream_description(), bus_idx);
                         unit->attach_render_callback(bus_idx);
                     } else {
                         unit->detach_render_callback(bus_idx);
@@ -219,7 +219,7 @@ struct audio::engine::au::impl : base::impl {
             if (output_bus_count > 0) {
                 for (uint32_t bus_idx = 0; bus_idx < output_bus_count; ++bus_idx) {
                     if (auto connection = this->_node->output_connection(bus_idx)) {
-                        unit->set_output_format(connection.format().stream_description(), bus_idx);
+                        unit->set_output_format(connection->format().stream_description(), bus_idx);
                     }
                 }
             }

@@ -77,11 +77,11 @@ struct audio::engine::tap::impl : base::impl {
         this->_node->manageable().update_kernel();
     }
 
-    audio::engine::connection input_connection_on_render(uint32_t const bus_idx) {
+    std::shared_ptr<audio::engine::connection> input_connection_on_render(uint32_t const bus_idx) {
         return this->_kernel_on_render->input_connection(bus_idx);
     }
 
-    audio::engine::connection output_connection_on_render(uint32_t const bus_idx) {
+    std::shared_ptr<audio::engine::connection> output_connection_on_render(uint32_t const bus_idx) {
         return this->_kernel_on_render->output_connection(bus_idx);
     }
 
@@ -95,8 +95,8 @@ struct audio::engine::tap::impl : base::impl {
 
     void render_source(audio::engine::node::render_args &&args) {
         if (auto connection = this->_kernel_on_render->input_connection(args.bus_idx)) {
-            if (auto node = connection.source_node()) {
-                node->render({.buffer = args.buffer, .bus_idx = connection.source_bus(), .when = args.when});
+            if (auto node = connection->source_node()) {
+                node->render({.buffer = args.buffer, .bus_idx = connection->source_bus(), .when = args.when});
             }
         }
     }
@@ -135,11 +135,13 @@ audio::engine::node &audio::engine::tap::node() {
     return *impl_ptr<impl>()->_node;
 }
 
-audio::engine::connection audio::engine::tap::input_connection_on_render(uint32_t const bus_idx) const {
+std::shared_ptr<audio::engine::connection> audio::engine::tap::input_connection_on_render(
+    uint32_t const bus_idx) const {
     return impl_ptr<impl>()->input_connection_on_render(bus_idx);
 }
 
-audio::engine::connection audio::engine::tap::output_connection_on_render(uint32_t const bus_idx) const {
+std::shared_ptr<audio::engine::connection> audio::engine::tap::output_connection_on_render(
+    uint32_t const bus_idx) const {
     return impl_ptr<impl>()->output_connection_on_render(bus_idx);
 }
 

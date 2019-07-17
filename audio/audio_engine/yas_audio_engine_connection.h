@@ -11,7 +11,7 @@
 namespace yas::audio::engine {
 class node;
 
-struct connection : base, node_removable {
+struct connection : base, node_removable, std::enable_shared_from_this<connection> {
     class impl;
 
    public:
@@ -33,6 +33,10 @@ struct connection : base, node_removable {
     connection(audio::engine::node &source_node, uint32_t const source_bus_idx, audio::engine::node &destination_node,
                uint32_t const destination_bus_idx, audio::format const &format);
 };
+
+std::shared_ptr<connection> make_connection(audio::engine::node &src_node, uint32_t const src_bus,
+                                            audio::engine::node &dst_node, uint32_t const dst_bus,
+                                            audio::format const &format);
 }  // namespace yas::audio::engine
 
 template <>

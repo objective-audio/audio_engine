@@ -45,11 +45,11 @@ using namespace yas;
         XCTAssertTrue(node);
         if (node) {
             XCTAssertEqual(node.output_connections_on_render().size(), 1);
-            XCTAssertEqual(to_connection, node.output_connection_on_render(0));
+            XCTAssertEqual(to_connection, *node.output_connection_on_render(0));
             XCTAssertFalse(node.output_connection_on_render(1));
 
             XCTAssertEqual(node.input_connections_on_render().size(), 1);
-            XCTAssertEqual(from_connection, node.input_connection_on_render(0));
+            XCTAssertEqual(from_connection, *node.input_connection_on_render(0));
             XCTAssertFalse(node.input_connection_on_render(1));
 
             node.render_source({.buffer = buffer, .bus_idx = 0, .when = when});

@@ -26,14 +26,14 @@ struct node_args {
 struct connectable_node {
     virtual ~connectable_node() = default;
 
-    virtual void add_connection(audio::engine::connection const &) = 0;
+    virtual void add_connection(audio::engine::connection &) = 0;
     virtual void remove_connection(audio::engine::connection const &) = 0;
 };
 
 struct manageable_node : protocol {
     struct impl : protocol::impl {
-        virtual audio::engine::connection input_connection(uint32_t const bus_idx) = 0;
-        virtual audio::engine::connection output_connection(uint32_t const bus_idx) = 0;
+        virtual std::shared_ptr<audio::engine::connection> input_connection(uint32_t const bus_idx) = 0;
+        virtual std::shared_ptr<audio::engine::connection> output_connection(uint32_t const bus_idx) = 0;
         virtual audio::engine::connection_wmap const &input_connections() = 0;
         virtual audio::engine::connection_wmap const &output_connections() = 0;
         virtual void set_manager(audio::engine::manager const &) = 0;
@@ -49,8 +49,8 @@ struct manageable_node : protocol {
     explicit manageable_node(std::shared_ptr<impl>);
     manageable_node(std::nullptr_t);
 
-    audio::engine::connection input_connection(uint32_t const bus_idx) const;
-    audio::engine::connection output_connection(uint32_t const bus_idx) const;
+    std::shared_ptr<audio::engine::connection> input_connection(uint32_t const bus_idx) const;
+    std::shared_ptr<audio::engine::connection> output_connection(uint32_t const bus_idx) const;
     audio::engine::connection_wmap const &input_connections() const;
     audio::engine::connection_wmap const &output_connections() const;
 

@@ -14,8 +14,8 @@ struct kernel : manageable_kernel, std::enable_shared_from_this<kernel> {
 
     audio::engine::connection_smap input_connections() const;
     audio::engine::connection_smap output_connections() const;
-    audio::engine::connection input_connection(uint32_t const bus_idx) const;
-    audio::engine::connection output_connection(uint32_t const bus_idx) const;
+    std::shared_ptr<audio::engine::connection> input_connection(uint32_t const bus_idx) const;
+    std::shared_ptr<audio::engine::connection> output_connection(uint32_t const bus_idx) const;
 
     std::any decorator = nullptr;
 

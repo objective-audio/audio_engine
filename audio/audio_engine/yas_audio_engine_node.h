@@ -56,8 +56,8 @@ struct node : base, std::enable_shared_from_this<node>, connectable_node {
 
     void reset();
 
-    audio::engine::connection input_connection(uint32_t const bus_idx) const;
-    audio::engine::connection output_connection(uint32_t const bus_idx) const;
+    std::shared_ptr<audio::engine::connection> input_connection(uint32_t const bus_idx) const;
+    std::shared_ptr<audio::engine::connection> output_connection(uint32_t const bus_idx) const;
     audio::engine::connection_wmap const &input_connections() const;
     audio::engine::connection_wmap const &output_connections() const;
 
@@ -92,7 +92,7 @@ struct node : base, std::enable_shared_from_this<node>, connectable_node {
    protected:
     node(node_args &&);
 
-    virtual void add_connection(audio::engine::connection const &) override;
+    virtual void add_connection(audio::engine::connection &) override;
     virtual void remove_connection(audio::engine::connection const &) override;
 
    private:

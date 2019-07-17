@@ -15,11 +15,13 @@ audio::engine::manageable_node::manageable_node(std::shared_ptr<impl> impl) : pr
 audio::engine::manageable_node::manageable_node(std::nullptr_t) : protocol(nullptr) {
 }
 
-audio::engine::connection audio::engine::manageable_node::input_connection(uint32_t const bus_idx) const {
+std::shared_ptr<audio::engine::connection> audio::engine::manageable_node::input_connection(
+    uint32_t const bus_idx) const {
     return impl_ptr<impl>()->input_connection(bus_idx);
 }
 
-audio::engine::connection audio::engine::manageable_node::output_connection(uint32_t const bus_idx) const {
+std::shared_ptr<audio::engine::connection> audio::engine::manageable_node::output_connection(
+    uint32_t const bus_idx) const {
     return impl_ptr<impl>()->output_connection(bus_idx);
 }
 
