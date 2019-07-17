@@ -34,8 +34,6 @@ struct au : base, manageable_au, std::enable_shared_from_this<au> {
         AudioComponentDescription acd;
     };
 
-    au(std::nullptr_t);
-
     virtual ~au();
 
     void set_prepare_unit_handler(prepare_unit_f);
@@ -71,7 +69,7 @@ struct au : base, manageable_au, std::enable_shared_from_this<au> {
     void reload_unit() override;
 
    protected:
-    au(args &&);
+    au(node_args &&);
 };
 
 std::shared_ptr<au> make_au(OSType const type, OSType const sub_type);

@@ -25,7 +25,7 @@ struct audio::engine::au::impl : base::impl {
         this->_prepare_unit_handler = std::move(handler);
     }
 
-    void prepare(audio::engine::au const &au, AudioComponentDescription const &acd) {
+    void prepare(audio::engine::au &au, AudioComponentDescription const &acd) {
         this->_acd = acd;
 
         auto unit = audio::make_unit(acd);
@@ -37,13 +37,13 @@ struct audio::engine::au::impl : base::impl {
             std::make_pair(kAudioUnitScope_Output, unit->create_parameters(kAudioUnitScope_Output)));
         this->_core.set_unit(unit);
 
-        auto weak_au = to_weak(au);
+        auto weak_au = to_weak(au.shared_from_this());
 
         this->_node->set_render_handler([weak_au](auto args) {
             auto &buffer = args.buffer;
 
             if (auto au = weak_au.lock()) {
-                if (auto unit = au.impl_ptr<impl>()->core_unit()) {
+                if (auto unit = au->impl_ptr<impl>()->core_unit()) {
                     AudioUnitRenderActionFlags action_flags = 0;
                     AudioTimeStamp const time_stamp = args.when.audio_time_stamp();
 
@@ -65,7 +65,7 @@ struct audio::engine::au::impl : base::impl {
         this->_reset_observer = this->_node->chain(node::method::will_reset)
                                     .perform([weak_au](auto const &) {
                                         if (auto au = weak_au.lock()) {
-                                            au.impl_ptr<audio::engine::au::impl>()->will_reset();
+                                            au->impl_ptr<audio::engine::au::impl>()->will_reset();
                                         }
                                     })
                                     .end();
@@ -73,24 +73,24 @@ struct audio::engine::au::impl : base::impl {
         this->_connections_observer = this->_node->chain(node::method::update_connections)
                                           .perform([weak_au](auto const &) {
                                               if (auto au = weak_au.lock()) {
-                                                  au.impl_ptr<audio::engine::au::impl>()->update_unit_connections();
+                                                  au->impl_ptr<audio::engine::au::impl>()->update_unit_connections(*au);
                                               }
                                           })
                                           .end();
 
         this->_node->manageable().set_add_to_graph_handler([weak_au](audio::graph &graph) {
             if (auto au = weak_au.lock()) {
-                au.prepare_unit();
-                if (auto unit = au.unit()) {
+                au->prepare_unit();
+                if (auto unit = au->unit()) {
                     graph.add_unit(unit);
                 }
-                au.prepare_parameters();
+                au->prepare_parameters();
             }
         });
 
         this->_node->manageable().set_remove_from_graph_handler([weak_au](audio::graph &graph) {
             if (auto au = weak_au.lock()) {
-                if (auto unit = au.unit()) {
+                if (auto unit = au->unit()) {
                     graph.remove_unit(unit);
                 }
             }
@@ -181,16 +181,16 @@ struct audio::engine::au::impl : base::impl {
         return 0;
     }
 
-    void update_unit_connections() {
-        this->_notifier.notify(std::make_pair(au::method::will_update_connections, cast<audio::engine::au>()));
+    void update_unit_connections(audio::engine::au &au) {
+        this->_notifier.notify(std::make_pair(au::method::will_update_connections, au));
 
         if (auto unit = this->core_unit()) {
             auto input_bus_count = this->input_element_count();
             if (input_bus_count > 0) {
-                auto weak_au = to_weak(cast<engine::au>());
+                auto weak_au = to_weak(au.shared_from_this());
                 unit->set_render_handler([weak_au](audio::render_parameters &render_parameters) {
                     if (auto au = weak_au.lock()) {
-                        if (auto kernel = au.node().kernel()) {
+                        if (auto kernel = au->node().kernel()) {
                             if (auto connection = kernel->input_connection(render_parameters.in_bus_number)) {
                                 if (auto src_node = connection->source_node()) {
                                     pcm_buffer buffer{connection->format, render_parameters.io_data};
@@ -225,7 +225,7 @@ struct audio::engine::au::impl : base::impl {
             }
         }
 
-        this->_notifier.notify(std::make_pair(au::method::did_update_connections, cast<audio::engine::au>()));
+        this->_notifier.notify(std::make_pair(au::method::did_update_connections, au));
     }
 
     void prepare_unit() {
@@ -314,11 +314,7 @@ struct audio::engine::au::impl : base::impl {
 
 #pragma mark - audio::engine::au
 
-audio::engine::au::au(args &&args) : base(std::make_shared<impl>(std::move(args.node_args))) {
-    impl_ptr<impl>()->prepare(*this, args.acd);
-}
-
-audio::engine::au::au(std::nullptr_t) : base(nullptr) {
+audio::engine::au::au(node_args &&args) : base(std::make_shared<impl>(std::move(args))) {
 }
 
 audio::engine::au::~au() = default;
@@ -417,7 +413,7 @@ void audio::engine::au::reload_unit() {
 
 namespace yas::audio::engine {
 struct au_factory : au {
-    au_factory(au::args &&args) : au(std::move(args)) {
+    au_factory(node_args &&args) : au(std::move(args)) {
     }
 };
 };  // namespace yas::audio::engine
@@ -437,5 +433,7 @@ std::shared_ptr<audio::engine::au> audio::engine::make_au(AudioComponentDescript
 }
 
 std::shared_ptr<audio::engine::au> audio::engine::make_au(au::args &&args) {
-    return std::make_shared<au_factory>(std::move(args));
+    auto shared = std::make_shared<au_factory>(std::move(args.node_args));
+    shared->impl_ptr<audio::engine::au::impl>()->prepare(*shared, args.acd);
+    return shared;
 }
