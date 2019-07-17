@@ -48,7 +48,7 @@ using namespace yas;
 
     auto connection = test::make_connection(*src_obj.node(), src_bus, *dst_obj.node(), dst_bus, format);
 
-    connection->remove_nodes();
+    connection->removable()->remove_nodes();
 
     XCTAssertFalse(connection->source_node());
     XCTAssertFalse(connection->destination_node());
@@ -63,12 +63,12 @@ using namespace yas;
 
     auto connection = test::make_connection(*src_obj.node(), src_bus, *dst_obj.node(), dst_bus, format);
 
-    connection->remove_source_node();
+    connection->removable()->remove_source_node();
 
     XCTAssertFalse(connection->source_node());
     XCTAssertTrue(connection->destination_node());
 
-    connection->remove_destination_node();
+    connection->removable()->remove_destination_node();
 
     XCTAssertFalse(connection->destination_node());
 }

@@ -196,7 +196,7 @@ struct audio::engine::manager::impl : base::impl {
         std::vector<std::shared_ptr<node>> update_nodes{connection.source_node(), connection.destination_node()};
 
         this->remove_connection_from_nodes(connection);
-        connection.remove_nodes();
+        connection.removable()->remove_nodes();
 
         for (auto &node : update_nodes) {
             node->manageable().update_connections();
@@ -222,7 +222,7 @@ struct audio::engine::manager::impl : base::impl {
             update_nodes.insert(connection->source_node());
             update_nodes.insert(connection->destination_node());
             this->remove_connection_from_nodes(*connection);
-            connection->remove_nodes();
+            connection->removable()->remove_nodes();
         }
 
         for (auto node : update_nodes) {

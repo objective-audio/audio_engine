@@ -53,6 +53,10 @@ void audio::engine::connection::remove_destination_node() {
     this->_destination_node.reset();
 }
 
+std::shared_ptr<audio::engine::node_removable> audio::engine::connection::removable() {
+    return std::dynamic_pointer_cast<node_removable>(shared_from_this());
+}
+
 namespace yas::audio::engine {
 struct connection_factory : audio::engine::connection {
     connection_factory(audio::engine::node &src_node, uint32_t const src_bus, audio::engine::node &dst_node,

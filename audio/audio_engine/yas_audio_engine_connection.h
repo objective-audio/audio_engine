@@ -20,9 +20,7 @@ struct connection : node_removable, std::enable_shared_from_this<connection> {
     std::shared_ptr<audio::engine::node> destination_node() const;
     audio::format const format;
 
-    void remove_nodes() override;
-    void remove_source_node() override;
-    void remove_destination_node() override;
+    std::shared_ptr<node_removable> removable();
 
    protected:
     connection(audio::engine::node &source_node, uint32_t const source_bus_idx, audio::engine::node &destination_node,
@@ -37,6 +35,10 @@ struct connection : node_removable, std::enable_shared_from_this<connection> {
     connection(connection &&) = delete;
     connection &operator=(connection const &) = delete;
     connection &operator=(connection &&) = delete;
+
+    void remove_nodes() override;
+    void remove_source_node() override;
+    void remove_destination_node() override;
 
     void _remove_connection_from_nodes(connection const &);
 };
