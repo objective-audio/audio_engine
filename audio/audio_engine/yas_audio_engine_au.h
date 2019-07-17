@@ -26,7 +26,7 @@ struct au : manageable_au, std::enable_shared_from_this<au> {
         did_update_connections,
     };
 
-    using chaining_pair_t = std::pair<method, au>;
+    using chaining_pair_t = std::pair<method, std::shared_ptr<au>>;
     using prepare_unit_f = std::function<void(audio::unit &)>;
 
     struct args {
@@ -58,7 +58,7 @@ struct au : manageable_au, std::enable_shared_from_this<au> {
     float output_parameter_value(AudioUnitParameterID const parameter_id, AudioUnitElement const element) const;
 
     [[nodiscard]] chaining::chain_unsync_t<chaining_pair_t> chain() const;
-    [[nodiscard]] chaining::chain_relayed_unsync_t<au, chaining_pair_t> chain(method const) const;
+    [[nodiscard]] chaining::chain_relayed_unsync_t<std::shared_ptr<au>, chaining_pair_t> chain(method const) const;
 
     audio::engine::node const &node() const;
     audio::engine::node &node();
@@ -72,6 +72,11 @@ struct au : manageable_au, std::enable_shared_from_this<au> {
     au(node_args &&);
 
     std::shared_ptr<impl> _impl;
+
+    au(au const &) = delete;
+    au(au &&) = delete;
+    au &operator=(au const &) = delete;
+    au &operator=(au &&) = delete;
 };
 
 std::shared_ptr<au> make_au(OSType const type, OSType const sub_type);

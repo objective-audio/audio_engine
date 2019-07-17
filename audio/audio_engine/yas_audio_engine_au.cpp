@@ -182,12 +182,14 @@ struct audio::engine::au::impl {
     }
 
     void update_unit_connections(audio::engine::au &au) {
-        this->_notifier.notify(std::make_pair(au::method::will_update_connections, au));
+        auto shared_au = au.shared_from_this();
+
+        this->_notifier.notify(std::make_pair(au::method::will_update_connections, shared_au));
 
         if (auto unit = this->core_unit()) {
             auto input_bus_count = this->input_element_count();
             if (input_bus_count > 0) {
-                auto weak_au = to_weak(au.shared_from_this());
+                auto weak_au = to_weak(shared_au);
                 unit->set_render_handler([weak_au](audio::render_parameters &render_parameters) {
                     if (auto au = weak_au.lock()) {
                         if (auto kernel = au->node().kernel()) {
@@ -225,7 +227,7 @@ struct audio::engine::au::impl {
             }
         }
 
-        this->_notifier.notify(std::make_pair(au::method::did_update_connections, au));
+        this->_notifier.notify(std::make_pair(au::method::did_update_connections, shared_au));
     }
 
     void prepare_unit() {
@@ -383,8 +385,8 @@ chaining::chain_unsync_t<audio::engine::au::chaining_pair_t> audio::engine::au::
     return this->_impl->_notifier.chain();
 }
 
-chaining::chain_relayed_unsync_t<audio::engine::au, audio::engine::au::chaining_pair_t> audio::engine::au::chain(
-    method const method) const {
+chaining::chain_relayed_unsync_t<std::shared_ptr<audio::engine::au>, audio::engine::au::chaining_pair_t>
+audio::engine::au::chain(method const method) const {
     return this->_impl->_notifier.chain()
         .guard([method](auto const &pair) { return pair.first == method; })
         .to([](chaining_pair_t const &pair) { return pair.second; });
