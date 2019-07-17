@@ -15,7 +15,7 @@ using namespace yas;
 
 #pragma mark - core
 
-struct audio::engine::au::impl : base::impl {
+struct audio::engine::au::impl {
     explicit impl(engine::node_args &&args) : _node(make_node(std::move(args))) {
     }
 
@@ -43,7 +43,7 @@ struct audio::engine::au::impl : base::impl {
             auto &buffer = args.buffer;
 
             if (auto au = weak_au.lock()) {
-                if (auto unit = au->impl_ptr<impl>()->core_unit()) {
+                if (auto unit = au->_impl->core_unit()) {
                     AudioUnitRenderActionFlags action_flags = 0;
                     AudioTimeStamp const time_stamp = args.when.audio_time_stamp();
 
@@ -65,7 +65,7 @@ struct audio::engine::au::impl : base::impl {
         this->_reset_observer = this->_node->chain(node::method::will_reset)
                                     .perform([weak_au](auto const &) {
                                         if (auto au = weak_au.lock()) {
-                                            au->impl_ptr<audio::engine::au::impl>()->will_reset();
+                                            au->_impl->will_reset();
                                         }
                                     })
                                     .end();
@@ -73,7 +73,7 @@ struct audio::engine::au::impl : base::impl {
         this->_connections_observer = this->_node->chain(node::method::update_connections)
                                           .perform([weak_au](auto const &) {
                                               if (auto au = weak_au.lock()) {
-                                                  au->impl_ptr<audio::engine::au::impl>()->update_unit_connections(*au);
+                                                  au->_impl->update_unit_connections(*au);
                                               }
                                           })
                                           .end();
@@ -314,106 +314,109 @@ struct audio::engine::au::impl : base::impl {
 
 #pragma mark - audio::engine::au
 
-audio::engine::au::au(node_args &&args) : base(std::make_shared<impl>(std::move(args))) {
+audio::engine::au::au(node_args &&args) : _impl(std::make_shared<impl>(std::move(args))) {
 }
 
 audio::engine::au::~au() = default;
 
 void audio::engine::au::set_prepare_unit_handler(prepare_unit_f handler) {
-    impl_ptr<impl>()->set_prepare_unit_handler(std::move(handler));
+    this->_impl->set_prepare_unit_handler(std::move(handler));
 }
 
 std::shared_ptr<audio::unit> audio::engine::au::unit() const {
-    return impl_ptr<impl>()->core_unit();
+    return this->_impl->core_unit();
 }
 
 std::unordered_map<AudioUnitParameterID, audio::unit::parameter_map_t> const &audio::engine::au::parameters() const {
-    return impl_ptr<impl>()->parameters();
+    return this->_impl->parameters();
 }
 
 audio::unit::parameter_map_t const &audio::engine::au::global_parameters() const {
-    return impl_ptr<impl>()->global_parameters();
+    return this->_impl->global_parameters();
 }
 
 audio::unit::parameter_map_t const &audio::engine::au::input_parameters() const {
-    return impl_ptr<impl>()->input_parameters();
+    return this->_impl->input_parameters();
 }
 
 audio::unit::parameter_map_t const &audio::engine::au::output_parameters() const {
-    return impl_ptr<impl>()->output_parameters();
+    return this->_impl->output_parameters();
 }
 
 uint32_t audio::engine::au::input_element_count() const {
-    return impl_ptr<impl>()->input_element_count();
+    return this->_impl->input_element_count();
 }
 
 uint32_t audio::engine::au::output_element_count() const {
-    return impl_ptr<impl>()->output_element_count();
+    return this->_impl->output_element_count();
 }
 
 void audio::engine::au::set_global_parameter_value(AudioUnitParameterID const parameter_id, float const value) {
-    impl_ptr<impl>()->set_global_parameter_value(parameter_id, value);
+    this->_impl->set_global_parameter_value(parameter_id, value);
 }
 
 float audio::engine::au::global_parameter_value(AudioUnitParameterID const parameter_id) const {
-    return impl_ptr<impl>()->global_parameter_value(parameter_id);
+    return this->_impl->global_parameter_value(parameter_id);
 }
 
 void audio::engine::au::set_input_parameter_value(AudioUnitParameterID const parameter_id, float const value,
                                                   AudioUnitElement const element) {
-    impl_ptr<impl>()->set_input_parameter_value(parameter_id, value, element);
+    this->_impl->set_input_parameter_value(parameter_id, value, element);
 }
 
 float audio::engine::au::input_parameter_value(AudioUnitParameterID const parameter_id,
                                                AudioUnitElement const element) const {
-    return impl_ptr<impl>()->input_parameter_value(parameter_id, element);
+    return this->_impl->input_parameter_value(parameter_id, element);
 }
 
 void audio::engine::au::set_output_parameter_value(AudioUnitParameterID const parameter_id, float const value,
                                                    AudioUnitElement const element) {
-    impl_ptr<impl>()->set_output_parameter_value(parameter_id, value, element);
+    this->_impl->set_output_parameter_value(parameter_id, value, element);
 }
 
 float audio::engine::au::output_parameter_value(AudioUnitParameterID const parameter_id,
                                                 AudioUnitElement const element) const {
-    return impl_ptr<impl>()->output_parameter_value(parameter_id, element);
+    return this->_impl->output_parameter_value(parameter_id, element);
 }
 
 chaining::chain_unsync_t<audio::engine::au::chaining_pair_t> audio::engine::au::chain() const {
-    return impl_ptr<impl>()->_notifier.chain();
+    return this->_impl->_notifier.chain();
 }
 
 chaining::chain_relayed_unsync_t<audio::engine::au, audio::engine::au::chaining_pair_t> audio::engine::au::chain(
     method const method) const {
-    return impl_ptr<impl>()
-        ->_notifier.chain()
+    return this->_impl->_notifier.chain()
         .guard([method](auto const &pair) { return pair.first == method; })
         .to([](chaining_pair_t const &pair) { return pair.second; });
 }
 
 audio::engine::node const &audio::engine::au::node() const {
-    return *impl_ptr<impl>()->_node;
+    return *this->_impl->_node;
 }
 
 audio::engine::node &audio::engine::au::node() {
-    return *impl_ptr<impl>()->_node;
+    return *this->_impl->_node;
 }
 
 void audio::engine::au::prepare_unit() {
-    impl_ptr<impl>()->prepare_unit();
+    this->_impl->prepare_unit();
 }
 
 void audio::engine::au::prepare_parameters() {
-    impl_ptr<impl>()->prepare_parameters();
+    this->_impl->prepare_parameters();
 }
 
 void audio::engine::au::reload_unit() {
-    impl_ptr<impl>()->reload_unit();
+    this->_impl->reload_unit();
 }
 
 namespace yas::audio::engine {
 struct au_factory : au {
     au_factory(node_args &&args) : au(std::move(args)) {
+    }
+
+    void prepare(AudioComponentDescription const &acd) {
+        this->_impl->prepare(*this, acd);
     }
 };
 };  // namespace yas::audio::engine
@@ -434,6 +437,6 @@ std::shared_ptr<audio::engine::au> audio::engine::make_au(AudioComponentDescript
 
 std::shared_ptr<audio::engine::au> audio::engine::make_au(au::args &&args) {
     auto shared = std::make_shared<au_factory>(std::move(args.node_args));
-    shared->impl_ptr<audio::engine::au::impl>()->prepare(*shared, args.acd);
+    shared->prepare(args.acd);
     return shared;
 }

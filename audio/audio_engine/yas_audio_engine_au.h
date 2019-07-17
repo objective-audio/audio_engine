@@ -18,7 +18,7 @@ class graph;
 namespace yas::audio::engine {
 class node;
 
-struct au : base, manageable_au, std::enable_shared_from_this<au> {
+struct au : manageable_au, std::enable_shared_from_this<au> {
     class impl;
 
     enum class method {
@@ -70,6 +70,8 @@ struct au : base, manageable_au, std::enable_shared_from_this<au> {
 
    protected:
     au(node_args &&);
+
+    std::shared_ptr<impl> _impl;
 };
 
 std::shared_ptr<au> make_au(OSType const type, OSType const sub_type);
