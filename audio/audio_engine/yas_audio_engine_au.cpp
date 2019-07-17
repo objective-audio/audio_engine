@@ -149,7 +149,7 @@ audio::engine::node &audio::engine::au::node() {
 
 #pragma mark - private
 
-void audio::engine::au::_prepare(AudioComponentDescription const &acd) {
+void audio::engine::au::prepare(AudioComponentDescription const &acd) {
     this->_acd = acd;
 
     auto unit = audio::make_unit(acd);
@@ -328,7 +328,7 @@ struct au_factory : au {
     }
 
     void prepare(AudioComponentDescription const &acd) {
-        this->_prepare(acd);
+        this->au::prepare(acd);
     }
 };
 };  // namespace yas::audio::engine

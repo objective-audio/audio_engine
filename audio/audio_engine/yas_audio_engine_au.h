@@ -71,7 +71,7 @@ struct au : manageable_au, std::enable_shared_from_this<au> {
    protected:
     au(node_args &&);
 
-    void _prepare(AudioComponentDescription const &acd);
+    void prepare(AudioComponentDescription const &acd);
 
    private:
     std::shared_ptr<audio::engine::node> _node;
