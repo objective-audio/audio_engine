@@ -524,7 +524,7 @@ void audio::engine::manager::disconnect_input(audio::engine::node const &node) {
 void audio::engine::manager::disconnect_input(audio::engine::node const &node, uint32_t const bus_idx) {
     auto shared_node = node.shared_from_this();
     impl_ptr<impl>()->disconnect_node_with_predicate([shared_node, bus_idx](auto const &connection) {
-        return (connection.destination_node() == shared_node && connection.destination_bus() == bus_idx);
+        return (connection.destination_node() == shared_node && connection.destination_bus == bus_idx);
     });
 }
 
@@ -537,7 +537,7 @@ void audio::engine::manager::disconnect_output(audio::engine::node const &node) 
 void audio::engine::manager::disconnect_output(audio::engine::node const &node, uint32_t const bus_idx) {
     auto shared_node = node.shared_from_this();
     impl_ptr<impl>()->disconnect_node_with_predicate([shared_node, bus_idx](auto const &connection) {
-        return (connection.source_node() == shared_node && connection.source_bus() == bus_idx);
+        return (connection.source_node() == shared_node && connection.source_bus == bus_idx);
     });
 }
 

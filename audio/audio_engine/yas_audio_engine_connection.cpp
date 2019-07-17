@@ -11,9 +11,9 @@ using namespace yas;
 
 audio::engine::connection::connection(node &src_node, uint32_t const src_bus, node &dst_node, uint32_t const dst_bus,
                                       audio::format const &format)
-    : _source_bus(src_bus),
-      _destination_bus(dst_bus),
-      _format(format),
+    : source_bus(src_bus),
+      destination_bus(dst_bus),
+      format(format),
       _source_node(to_weak(src_node.shared_from_this())),
       _destination_node(to_weak(dst_node.shared_from_this())) {
 }
@@ -27,14 +27,6 @@ audio::engine::connection::~connection() {
     }
 }
 
-uint32_t audio::engine::connection::source_bus() const {
-    return this->_source_bus;
-}
-
-uint32_t audio::engine::connection::destination_bus() const {
-    return this->_destination_bus;
-}
-
 std::shared_ptr<audio::engine::node> audio::engine::connection::source_node() const {
     std::lock_guard<std::recursive_mutex> lock(this->_mutex);
     return this->_source_node.lock();
@@ -43,10 +35,6 @@ std::shared_ptr<audio::engine::node> audio::engine::connection::source_node() co
 std::shared_ptr<audio::engine::node> audio::engine::connection::destination_node() const {
     std::lock_guard<std::recursive_mutex> lock(this->_mutex);
     return this->_destination_node.lock();
-}
-
-audio::format const &audio::engine::connection::format() const {
-    return this->_format;
 }
 
 void audio::engine::connection::remove_nodes() {

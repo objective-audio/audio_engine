@@ -47,14 +47,14 @@ struct audio::engine::node::impl : base::impl, manageable_node::impl {
 
     std::optional<audio::format> input_format(uint32_t const bus_idx) {
         if (auto connection = this->input_connection(bus_idx)) {
-            return connection->format();
+            return connection->format;
         }
         return std::nullopt;
     }
 
     std::optional<audio::format> output_format(uint32_t const bus_idx) {
         if (auto connection = this->output_connection(bus_idx)) {
-            return connection->format();
+            return connection->format;
         }
         return std::nullopt;
     }
@@ -152,10 +152,10 @@ struct audio::engine::node::impl : base::impl, manageable_node::impl {
     void add_connection(engine::connection &connection) {
         auto weak_connection = to_weak(connection.shared_from_this());
         if (connection.destination_node()->impl_ptr<impl>().get() == this) {
-            auto bus_idx = connection.destination_bus();
+            auto bus_idx = connection.destination_bus;
             this->_input_connections.insert(std::make_pair(bus_idx, weak_connection));
         } else if (connection.source_node()->impl_ptr<impl>().get() == this) {
-            auto bus_idx = connection.source_bus();
+            auto bus_idx = connection.source_bus;
             this->_output_connections.insert(std::make_pair(bus_idx, weak_connection));
         } else {
             throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : connection does not exist in a node.");
@@ -167,13 +167,13 @@ struct audio::engine::node::impl : base::impl, manageable_node::impl {
     void remove_connection(engine::connection const &connection) {
         if (auto destination_node = connection.destination_node()) {
             if (connection.destination_node()->impl_ptr<impl>().get() == this) {
-                this->_input_connections.erase(connection.destination_bus());
+                this->_input_connections.erase(connection.destination_bus);
             }
         }
 
         if (auto source_node = connection.source_node()) {
             if (connection.source_node()->impl_ptr<impl>().get() == this) {
-                this->_output_connections.erase(connection.source_bus());
+                this->_output_connections.erase(connection.source_bus);
             }
         }
 

@@ -14,11 +14,11 @@ class node;
 struct connection : node_removable, std::enable_shared_from_this<connection> {
     virtual ~connection();
 
-    uint32_t source_bus() const;
-    uint32_t destination_bus() const;
+    uint32_t const source_bus;
+    uint32_t const destination_bus;
     std::shared_ptr<audio::engine::node> source_node() const;
     std::shared_ptr<audio::engine::node> destination_node() const;
-    audio::format const &format() const;
+    audio::format const format;
 
     void remove_nodes() override;
     void remove_source_node() override;
@@ -29,9 +29,6 @@ struct connection : node_removable, std::enable_shared_from_this<connection> {
                uint32_t const destination_bus_idx, audio::format const &format);
 
    private:
-    uint32_t _source_bus;
-    uint32_t _destination_bus;
-    audio::format _format;
     mutable std::recursive_mutex _mutex;
     std::weak_ptr<node> _source_node;
     std::weak_ptr<node> _destination_node;

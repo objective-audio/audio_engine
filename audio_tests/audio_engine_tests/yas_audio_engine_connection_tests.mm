@@ -30,10 +30,10 @@ using namespace yas;
     auto connection = test::make_connection(*src_obj.node(), src_bus, *dst_obj.node(), dst_bus, format);
 
     XCTAssertTrue(connection->source_node() == src_obj.node());
-    XCTAssertTrue(connection->source_bus() == src_bus);
+    XCTAssertTrue(connection->source_bus == src_bus);
     XCTAssertTrue(connection->destination_node() == dst_obj.node());
-    XCTAssertTrue(connection->destination_bus() == dst_bus);
-    XCTAssertTrue(connection->format() == format);
+    XCTAssertTrue(connection->destination_bus == dst_bus);
+    XCTAssertTrue(connection->format == format);
 
     XCTAssertTrue(src_obj.node()->manageable().output_connection(src_bus) == connection);
     XCTAssertTrue(dst_obj.node()->manageable().input_connection(dst_bus) == connection);

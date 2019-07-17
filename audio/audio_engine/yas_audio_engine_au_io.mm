@@ -291,7 +291,7 @@ struct yas::audio::engine::au_input::impl : base::impl {
         if (auto out_connection = _au_io.au().node().output_connection(1)) {
             unit->attach_input_callback();
 
-            this->_input_buffer = std::make_shared<pcm_buffer>(out_connection->format(), 4096);
+            this->_input_buffer = std::make_shared<pcm_buffer>(out_connection->format, 4096);
 
             auto weak_au_input = to_weak(cast<au_input>());
             unit->set_input_handler(
@@ -303,7 +303,7 @@ struct yas::audio::engine::au_input::impl : base::impl {
 
                         if (auto const kernel = au_input.au_io().au().node().kernel()) {
                             if (auto const connection = kernel->output_connection(1)) {
-                                auto format = connection->format();
+                                auto format = connection->format;
                                 time time(*render_parameters.io_time_stamp, format.sample_rate());
                                 au_input.au_io().au().node().set_render_time_on_render(time);
 

@@ -96,7 +96,7 @@ struct audio::engine::tap::impl : base::impl {
     void render_source(audio::engine::node::render_args &&args) {
         if (auto connection = this->_kernel_on_render->input_connection(args.bus_idx)) {
             if (auto node = connection->source_node()) {
-                node->render({.buffer = args.buffer, .bus_idx = connection->source_bus(), .when = args.when});
+                node->render({.buffer = args.buffer, .bus_idx = connection->source_bus, .when = args.when});
             }
         }
     }
