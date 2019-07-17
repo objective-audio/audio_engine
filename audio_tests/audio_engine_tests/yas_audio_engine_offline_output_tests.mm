@@ -44,11 +44,11 @@ using namespace yas;
 
     auto format = audio::format({.sample_rate = sample_rate, .channel_count = 2});
     audio::engine::offline_output &output = manager.offline_output();
-    audio::engine::au sample_delay_au(kAudioUnitType_Effect, kAudioUnitSubType_SampleDelay);
+    auto sample_delay_au = audio::engine::make_au(kAudioUnitType_Effect, kAudioUnitSubType_SampleDelay);
     audio::engine::tap tap;
 
-    manager.connect(sample_delay_au.node(), output.node(), format);
-    manager.connect(tap.node(), sample_delay_au.node(), format);
+    manager.connect(sample_delay_au->node(), output.node(), format);
+    manager.connect(tap.node(), sample_delay_au->node(), format);
 
     XCTestExpectation *tapNodeExpectation = [self expectationWithDescription:@"tap node render"];
 

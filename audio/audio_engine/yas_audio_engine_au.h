@@ -18,7 +18,7 @@ class graph;
 namespace yas::audio::engine {
 class node;
 
-struct au final : base, manageable_au {
+struct au : base, manageable_au, std::enable_shared_from_this<au> {
     class impl;
 
     enum class method {
@@ -34,9 +34,6 @@ struct au final : base, manageable_au {
         AudioComponentDescription acd;
     };
 
-    au(OSType const type, OSType const sub_type);
-    explicit au(AudioComponentDescription const &);
-    au(args &&);
     au(std::nullptr_t);
 
     virtual ~au();
@@ -72,5 +69,12 @@ struct au final : base, manageable_au {
     void prepare_unit() override;
     void prepare_parameters() override;
     void reload_unit() override;
+
+   protected:
+    au(args &&);
 };
+
+std::shared_ptr<au> make_au(OSType const type, OSType const sub_type);
+std::shared_ptr<au> make_au(AudioComponentDescription const &);
+std::shared_ptr<au> make_au(au::args &&);
 }  // namespace yas::audio::engine

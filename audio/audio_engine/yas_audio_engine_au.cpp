@@ -314,20 +314,6 @@ struct audio::engine::au::impl : base::impl {
 
 #pragma mark - audio::engine::au
 
-audio::engine::au::au(OSType const type, OSType const sub_type)
-    : au(AudioComponentDescription{
-          .componentType = type,
-          .componentSubType = sub_type,
-          .componentManufacturer = kAudioUnitManufacturer_Apple,
-          .componentFlags = 0,
-          .componentFlagsMask = 0,
-      }) {
-}
-
-audio::engine::au::au(AudioComponentDescription const &acd)
-    : au({.acd = acd, .node_args = {.input_bus_count = 1, .output_bus_count = 1}}) {
-}
-
 audio::engine::au::au(args &&args) : base(std::make_shared<impl>(std::move(args.node_args))) {
     impl_ptr<impl>()->prepare(*this, args.acd);
 }
@@ -427,4 +413,29 @@ void audio::engine::au::prepare_parameters() {
 
 void audio::engine::au::reload_unit() {
     impl_ptr<impl>()->reload_unit();
+}
+
+namespace yas::audio::engine {
+struct au_factory : au {
+    au_factory(au::args &&args) : au(std::move(args)) {
+    }
+};
+};  // namespace yas::audio::engine
+
+std::shared_ptr<audio::engine::au> audio::engine::make_au(OSType const type, OSType const sub_type) {
+    return make_au(AudioComponentDescription{
+        .componentType = type,
+        .componentSubType = sub_type,
+        .componentManufacturer = kAudioUnitManufacturer_Apple,
+        .componentFlags = 0,
+        .componentFlagsMask = 0,
+    });
+}
+
+std::shared_ptr<audio::engine::au> audio::engine::make_au(AudioComponentDescription const &acd) {
+    return make_au({.acd = acd, .node_args = {.input_bus_count = 1, .output_bus_count = 1}});
+}
+
+std::shared_ptr<audio::engine::au> audio::engine::make_au(au::args &&args) {
+    return std::make_shared<au_factory>(std::move(args));
 }

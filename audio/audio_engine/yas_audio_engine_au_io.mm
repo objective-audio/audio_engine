@@ -40,12 +40,12 @@ struct audio::engine::au_io::impl : base::impl {
     }
 
     impl(args &&args)
-        : _au({.acd = audio_au_io_acd,
-               .node_args =
-                   audio::engine::node_args{.input_bus_count = static_cast<uint32_t>(args.enable_input ? 1 : 0),
-                                            .output_bus_count = static_cast<uint32_t>(args.enable_output ? 1 : 0),
-                                            .override_output_bus_idx = 1}}) {
-        this->_au.set_prepare_unit_handler([args = std::move(args)](audio::unit &unit) {
+        : _au(make_au({.acd = audio_au_io_acd,
+                       .node_args = audio::engine::node_args{
+                           .input_bus_count = static_cast<uint32_t>(args.enable_input ? 1 : 0),
+                           .output_bus_count = static_cast<uint32_t>(args.enable_output ? 1 : 0),
+                           .override_output_bus_idx = 1}})) {
+        this->_au->set_prepare_unit_handler([args = std::move(args)](audio::unit &unit) {
             unit.set_enable_output(args.enable_input);
             unit.set_enable_input(args.enable_output);
             unit.set_maximum_frames_per_slice(4096);
@@ -72,7 +72,7 @@ struct audio::engine::au_io::impl : base::impl {
     }
 
     std::shared_ptr<audio::device> device() {
-        return device::device_for_id(this->_au.unit()->current_device());
+        return device::device_for_id(this->_au->unit()->current_device());
     }
 
 #endif
@@ -157,11 +157,11 @@ struct audio::engine::au_io::impl : base::impl {
     }
 
     audio::engine::au &au() {
-        return this->_au;
+        return *this->_au;
     }
 
    private:
-    audio::engine::au _au;
+    std::shared_ptr<audio::engine::au> _au;
     channel_map_t _channel_map[2];
     chaining::any_observer_ptr _connections_observer = nullptr;
 };

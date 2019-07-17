@@ -12,10 +12,11 @@ using namespace yas;
 #pragma mark - impl
 
 struct audio::engine::au_mixer::impl : base::impl {
-    audio::engine::au _au;
+    std::shared_ptr<audio::engine::au> _au;
 
     impl()
-        : _au({.acd =
+        : _au(make_au(
+              {.acd =
                    AudioComponentDescription{
                        .componentType = kAudioUnitType_Mixer,
                        .componentSubType = kAudioUnitSubType_MultiChannelMixer,
@@ -23,11 +24,11 @@ struct audio::engine::au_mixer::impl : base::impl {
                        .componentFlags = 0,
                        .componentFlagsMask = 0,
                    },
-               .node_args = {.input_bus_count = std::numeric_limits<uint32_t>::max(), .output_bus_count = 1}}) {
+               .node_args = {.input_bus_count = std::numeric_limits<uint32_t>::max(), .output_bus_count = 1}})) {
     }
 
     void prepare(audio::engine::au_mixer const &au_mixer) {
-        this->_connections_observer = this->_au.chain(au::method::will_update_connections)
+        this->_connections_observer = this->_au->chain(au::method::will_update_connections)
                                           .perform([weak_au_mixer = to_weak(au_mixer)](auto const &) {
                                               if (auto au_mixer = weak_au_mixer.lock()) {
                                                   au_mixer.impl_ptr<impl>()->update_unit_mixer_connections();
@@ -38,11 +39,11 @@ struct audio::engine::au_mixer::impl : base::impl {
 
    private:
     void update_unit_mixer_connections() {
-        auto &connections = this->_au.node().input_connections();
+        auto &connections = this->_au->node().input_connections();
         if (connections.size() > 0) {
             auto last = connections.end();
             --last;
-            if (auto unit = this->_au.unit()) {
+            if (auto unit = this->_au->unit()) {
                 auto &pair = *last;
                 unit->set_element_count(pair.first + 1, kAudioUnitScope_Input);
             }
@@ -103,9 +104,9 @@ bool audio::engine::au_mixer::input_enabled(uint32_t const bus_idx) const {
 }
 
 audio::engine::au const &audio::engine::au_mixer::au() const {
-    return impl_ptr<impl>()->_au;
+    return *impl_ptr<impl>()->_au;
 }
 
 audio::engine::au &audio::engine::au_mixer::au() {
-    return impl_ptr<impl>()->_au;
+    return *impl_ptr<impl>()->_au;
 }
