@@ -48,9 +48,7 @@ using namespace yas;
     test::audio_test_node_object source_obj(0, 0);
     test::audio_test_node_object destination_obj(0, 0);
 
-    audio::engine::connection connection = nullptr;
-    XCTAssertThrows(connection = manager.connect(*source_obj.node(), *destination_obj.node(), format));
-    XCTAssertFalse(connection);
+    XCTAssertThrows(manager.connect(*source_obj.node(), *destination_obj.node(), format));
     XCTAssertEqual(manager.connections().size(), 0);
 }
 

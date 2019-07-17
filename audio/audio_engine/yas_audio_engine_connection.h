@@ -32,6 +32,12 @@ struct connection : base, node_removable, std::enable_shared_from_this<connectio
    protected:
     connection(audio::engine::node &source_node, uint32_t const source_bus_idx, audio::engine::node &destination_node,
                uint32_t const destination_bus_idx, audio::format const &format);
+
+   private:
+    connection(connection const &) = delete;
+    connection(connection &&) = delete;
+    connection &operator=(connection const &) = delete;
+    connection &operator=(connection &&) = delete;
 };
 
 std::shared_ptr<connection> make_connection(audio::engine::node &src_node, uint32_t const src_bus,

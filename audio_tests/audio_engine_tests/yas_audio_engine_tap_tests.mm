@@ -29,15 +29,16 @@ using namespace yas;
     audio::engine::tap from_tap;
     auto const format = audio::format({.sample_rate = 48000.0, .channel_count = 2});
 
-    auto const to_connection = manager.connect(to_tap.node(), output.node(), format);
-    auto const from_connection = manager.connect(from_tap.node(), to_tap.node(), format);
+    auto const &to_connection = manager.connect(to_tap.node(), output.node(), format);
+    auto const &from_connection = manager.connect(from_tap.node(), to_tap.node(), format);
 
     XCTestExpectation *to_expectation = [self expectationWithDescription:@"to node"];
     XCTestExpectation *from_expectation = [self expectationWithDescription:@"from node"];
     XCTestExpectation *completion_expectation = [self expectationWithDescription:@"completion"];
 
     auto weak_to_tap = to_weak(to_tap);
-    auto to_render_handler = [weak_to_tap, self, to_connection, from_connection, to_expectation](auto args) {
+    auto to_render_handler = [weak_to_tap, self, to_connection = to_connection.shared_from_this(),
+                              from_connection = from_connection.shared_from_this(), to_expectation](auto args) {
         auto &buffer = args.buffer;
         auto const &when = args.when;
 
@@ -45,11 +46,11 @@ using namespace yas;
         XCTAssertTrue(node);
         if (node) {
             XCTAssertEqual(node.output_connections_on_render().size(), 1);
-            XCTAssertEqual(to_connection, *node.output_connection_on_render(0));
+            XCTAssertEqual(to_connection, node.output_connection_on_render(0));
             XCTAssertFalse(node.output_connection_on_render(1));
 
             XCTAssertEqual(node.input_connections_on_render().size(), 1);
-            XCTAssertEqual(from_connection, *node.input_connection_on_render(0));
+            XCTAssertEqual(from_connection, node.input_connection_on_render(0));
             XCTAssertFalse(node.input_connection_on_render(1));
 
             node.render_source({.buffer = buffer, .bus_idx = 0, .when = when});
@@ -83,8 +84,8 @@ using namespace yas;
     audio::engine::tap from_tap;
     auto const format = audio::format({.sample_rate = 48000.0, .channel_count = 2});
 
-    auto const to_connection = manager.connect(to_tap.node(), output.node(), format);
-    auto const from_connection = manager.connect(from_tap.node(), to_tap.node(), format);
+    manager.connect(to_tap.node(), output.node(), format);
+    manager.connect(from_tap.node(), to_tap.node(), format);
 
     XCTestExpectation *from_expectation = [self expectationWithDescription:@"from node"];
 
