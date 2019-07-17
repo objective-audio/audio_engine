@@ -14,9 +14,6 @@ class node;
 struct connection : base, node_removable, std::enable_shared_from_this<connection> {
     class impl;
 
-   public:
-    connection(std::nullptr_t);
-
     virtual ~connection();
 
     uint32_t source_bus() const;

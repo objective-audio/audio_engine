@@ -39,12 +39,6 @@ using namespace yas;
     XCTAssertTrue(dst_obj.node()->manageable().input_connection(dst_bus) == connection);
 }
 
-- (void)test_create_null {
-    audio::engine::connection connection{nullptr};
-
-    XCTAssertFalse(connection);
-}
-
 - (void)test_remove_nodes {
     auto format = audio::format({.sample_rate = 44100.0, .channel_count = 2});
     test::audio_test_node_object src_obj;

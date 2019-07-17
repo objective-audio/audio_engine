@@ -69,9 +69,6 @@ audio::engine::connection::connection(node &src_node, uint32_t const src_bus, no
     : base(std::make_shared<impl>(src_node, src_bus, dst_node, dst_bus, format)) {
 }
 
-audio::engine::connection::connection(std::nullptr_t) : base(nullptr) {
-}
-
 audio::engine::connection::~connection() {
     if (impl_ptr() && impl_ptr().unique()) {
         if (auto imp = impl_ptr<impl>()) {
