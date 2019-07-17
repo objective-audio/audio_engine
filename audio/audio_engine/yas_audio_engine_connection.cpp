@@ -19,7 +19,12 @@ audio::engine::connection::connection(node &src_node, uint32_t const src_bus, no
 }
 
 audio::engine::connection::~connection() {
-    this->_remove_connection_from_nodes(*this);
+    if (auto node = this->_destination_node.lock()) {
+        node->connectable()->remove_connection(*this);
+    }
+    if (auto node = this->_source_node.lock()) {
+        node->connectable()->remove_connection(*this);
+    }
 }
 
 uint32_t audio::engine::connection::source_bus() const {
@@ -58,15 +63,6 @@ void audio::engine::connection::remove_source_node() {
 void audio::engine::connection::remove_destination_node() {
     std::lock_guard<std::recursive_mutex> lock(this->_mutex);
     this->_destination_node.reset();
-}
-
-void audio::engine::connection::_remove_connection_from_nodes(connection const &connection) {
-    if (auto node = this->_destination_node.lock()) {
-        node->connectable()->remove_connection(connection);
-    }
-    if (auto node = this->_source_node.lock()) {
-        node->connectable()->remove_connection(connection);
-    }
 }
 
 namespace yas::audio::engine {
