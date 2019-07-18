@@ -8,8 +8,6 @@
 
 namespace yas::audio::engine {
 struct tap : std::enable_shared_from_this<tap> {
-    class kernel;
-
     struct args {
         bool is_input = false;
     };
@@ -33,6 +31,8 @@ struct tap : std::enable_shared_from_this<tap> {
     void prepare();
 
    private:
+    class kernel;
+
     std::shared_ptr<audio::engine::node> _node;
     audio::engine::node::render_f _render_handler;
     chaining::any_observer_ptr _reset_observer = nullptr;
