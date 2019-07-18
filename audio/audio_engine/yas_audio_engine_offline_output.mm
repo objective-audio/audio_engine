@@ -216,6 +216,10 @@ void audio::engine::offline_output::stop() {
     impl_ptr<impl>()->stop();
 }
 
+std::shared_ptr<audio::engine::offline_output> audio::engine::make_offline_output() {
+    return std::make_shared<offline_output>();
+}
+
 std::string yas::to_string(audio::engine::offline_start_error_t const &error) {
     switch (error) {
         case audio::engine::offline_start_error_t::already_running:
