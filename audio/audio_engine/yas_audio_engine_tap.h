@@ -7,18 +7,13 @@
 #include "yas_audio_engine_node.h"
 
 namespace yas::audio::engine {
-class tap final : public base {
-   public:
+struct tap : base {
     class kernel;
     class impl;
 
     struct args {
         bool is_input = false;
     };
-
-    tap();
-    tap(args);
-    tap(std::nullptr_t);
 
     virtual ~tap();
 
@@ -34,5 +29,17 @@ class tap final : public base {
 
     // for Test
     void render_source(audio::engine::node::render_args args);
+
+   protected:
+    tap(args);
+
+   private:
+    tap(tap const &) = delete;
+    tap(tap &&) = delete;
+    tap &operator=(tap const &) = delete;
+    tap &operator=(tap &&) = delete;
 };
+
+std::shared_ptr<tap> make_tap();
+std::shared_ptr<tap> make_tap(tap::args);
 }  // namespace yas::audio::engine

@@ -45,10 +45,10 @@ using namespace yas;
     auto format = audio::format({.sample_rate = sample_rate, .channel_count = 2});
     audio::engine::offline_output &output = manager.offline_output();
     auto sample_delay_au = audio::engine::make_au(kAudioUnitType_Effect, kAudioUnitSubType_SampleDelay);
-    audio::engine::tap tap;
+    auto tap = audio::engine::make_tap();
 
     manager.connect(sample_delay_au->node(), output.node(), format);
-    manager.connect(tap.node(), sample_delay_au->node(), format);
+    manager.connect(tap->node(), sample_delay_au->node(), format);
 
     XCTestExpectation *tapNodeExpectation = [self expectationWithDescription:@"tap node render"];
 
@@ -79,7 +79,7 @@ using namespace yas;
         }
     };
 
-    tap.set_render_handler(std::move(tap_render_handler));
+    tap->set_render_handler(std::move(tap_render_handler));
 
     XCTestExpectation *renderExpectation = [self expectationWithDescription:@"offline output node render"];
     XCTestExpectation *completionExpectation = [self expectationWithDescription:@"offline output node completion"];
@@ -137,14 +137,14 @@ using namespace yas;
     double const sample_rate = 48000.0;
     auto format = audio::format({.sample_rate = sample_rate, .channel_count = 2});
     audio::engine::offline_output output;
-    audio::engine::tap tap;
+    auto tap = audio::engine::make_tap();
 
-    auto connection = test::make_connection(tap.node(), 0, output.node(), 0, format);
+    auto connection = test::make_connection(tap->node(), 0, output.node(), 0, format);
 
     output.node().connectable()->add_connection(*connection);
     output.node().manageable().update_kernel();
-    tap.node().connectable()->add_connection(*connection);
-    tap.node().manageable().update_kernel();
+    tap->node().connectable()->add_connection(*connection);
+    tap->node().manageable().update_kernel();
 
     XCTestExpectation *tapNodeExpectation = [self expectationWithDescription:@"tap node render"];
 
@@ -174,7 +174,7 @@ using namespace yas;
         }
     };
 
-    tap.set_render_handler(std::move(tap_render_handler));
+    tap->set_render_handler(std::move(tap_render_handler));
 
     XCTestExpectation *renderExpectation = [self expectationWithDescription:@"offline output node render"];
     XCTestExpectation *completionExpectation = [self expectationWithDescription:@"offline output node completion"];
@@ -241,14 +241,14 @@ using namespace yas;
 - (void)test_reset_to_stop {
     auto format = audio::format({.sample_rate = 48000.0, .channel_count = 2});
     audio::engine::offline_output output;
-    audio::engine::tap tap;
+    auto tap = audio::engine::make_tap();
 
-    auto connection = test::make_connection(tap.node(), 0, output.node(), 0, format);
+    auto connection = test::make_connection(tap->node(), 0, output.node(), 0, format);
 
     output.node().connectable()->add_connection(*connection);
     output.node().manageable().update_kernel();
-    tap.node().connectable()->add_connection(*connection);
-    tap.node().manageable().update_kernel();
+    tap->node().connectable()->add_connection(*connection);
+    tap->node().manageable().update_kernel();
 
     auto promise = std::make_shared<std::promise<void>>();
     auto future = promise->get_future();

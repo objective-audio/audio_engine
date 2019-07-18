@@ -31,12 +31,12 @@ struct audio::engine::tap::impl : base::impl {
 
     ~impl() = default;
 
-    void prepare(engine::tap const &tap) {
+    void prepare(std::shared_ptr<engine::tap> const &tap) {
         auto weak_tap = to_weak(tap);
 
         this->_node->set_render_handler([weak_tap](auto args) {
             if (auto tap = weak_tap.lock()) {
-                auto impl_ptr = tap.impl_ptr<impl>();
+                auto impl_ptr = tap->impl_ptr<impl>();
                 if (auto kernel = impl_ptr->_node->kernel()) {
                     impl_ptr->_kernel_on_render = kernel;
 
@@ -57,7 +57,7 @@ struct audio::engine::tap::impl : base::impl {
         this->_reset_observer = this->_node->chain(node::method::will_reset)
                                     .perform([weak_tap](auto const &) {
                                         if (auto tap = weak_tap.lock()) {
-                                            tap.impl_ptr<audio::engine::tap::impl>()->_render_handler = nullptr;
+                                            tap->impl_ptr<audio::engine::tap::impl>()->_render_handler = nullptr;
                                         }
                                     })
                                     .end();
@@ -65,7 +65,7 @@ struct audio::engine::tap::impl : base::impl {
         this->_node->set_prepare_kernel_handler([weak_tap](audio::engine::kernel &kernel) {
             if (auto tap = weak_tap.lock()) {
                 auto tap_kernel = std::make_shared<audio::engine::tap::kernel>();
-                tap_kernel->render_handler = tap.impl_ptr<audio::engine::tap::impl>()->_render_handler;
+                tap_kernel->render_handler = tap->impl_ptr<audio::engine::tap::impl>()->_render_handler;
                 kernel.decorator = std::move(tap_kernel);
             }
         });
@@ -109,16 +109,9 @@ struct audio::engine::tap::impl : base::impl {
 
 #pragma mark - audio::engine::tap
 
-audio::engine::tap::tap() : tap({.is_input = false}) {
-}
-
 audio::engine::tap::tap(args args)
     : base(std::make_unique<impl>(args.is_input ? engine::node_args{.input_bus_count = 1, .input_renderable = true} :
                                                   engine::node_args{.input_bus_count = 1, .output_bus_count = 1})) {
-    impl_ptr<impl>()->prepare(*this);
-}
-
-audio::engine::tap::tap(std::nullptr_t) : base(nullptr) {
 }
 
 audio::engine::tap::~tap() = default;
@@ -155,4 +148,23 @@ audio::engine::connection_smap audio::engine::tap::output_connections_on_render(
 
 void audio::engine::tap::render_source(audio::engine::node::render_args args) {
     impl_ptr<impl>()->render_source(std::move(args));
+}
+
+#pragma mark - factory
+
+namespace yas::audio::engine {
+struct tap_factory : tap {
+    tap_factory(tap::args &&args) : tap(std::move(args)) {
+    }
+};
+}  // namespace yas::audio::engine
+
+std::shared_ptr<audio::engine::tap> audio::engine::make_tap() {
+    return make_tap({.is_input = false});
+}
+
+std::shared_ptr<audio::engine::tap> audio::engine::make_tap(tap::args args) {
+    auto shared = std::make_shared<audio::engine::tap_factory>(std::move(args));
+    shared->impl_ptr<tap::impl>()->prepare(shared);
+    return shared;
 }

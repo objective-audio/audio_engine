@@ -78,13 +78,13 @@ using namespace yas;
     auto format = audio::format({.sample_rate = 44100.0, .channel_count = 2});
     audio::engine::offline_output &output = manager.offline_output();
     audio::engine::route engine_route;
-    audio::engine::tap tap;
+    auto tap = audio::engine::make_tap();
 
     manager.connect(engine_route.node(), output.node(), format);
-    manager.connect(tap.node(), engine_route.node(), format);
+    manager.connect(tap->node(), engine_route.node(), format);
 
     bool tap_called = false;
-    tap.set_render_handler([&tap_called](auto) { tap_called = true; });
+    tap->set_render_handler([&tap_called](auto) { tap_called = true; });
 
     {
         XCTestExpectation *expectation = [self expectationWithDescription:@"first render"];
@@ -104,7 +104,7 @@ using namespace yas;
     engine_route.add_route({0, 1, 0, 1});
 
     tap_called = false;
-    tap.set_render_handler([&tap_called, self](auto args) {
+    tap->set_render_handler([&tap_called, self](auto args) {
         tap_called = true;
         XCTAssertEqual(args.bus_idx, 0);
         test::fill_test_values_to_buffer(args.buffer);
@@ -151,15 +151,15 @@ using namespace yas;
         tap_called = false;
     }
 
-    std::vector<audio::engine::tap> taps;
+    std::vector<std::shared_ptr<audio::engine::tap>> taps;
     for (uint32_t i = 0; i < src_count; ++i) {
-        taps.push_back(audio::engine::tap{});
+        taps.push_back(audio::engine::make_tap());
         auto &tap = taps.at(i);
 
-        manager.connect(tap.node(), engine_route.node(), 0, i, src_format);
+        manager.connect(tap->node(), engine_route.node(), 0, i, src_format);
 
         auto &tap_called = tap_calleds[i];
-        tap.set_render_handler([&tap_called](auto args) {
+        tap->set_render_handler([&tap_called](auto args) {
             tap_called = true;
             test::fill_test_values_to_buffer(args.buffer);
         });
@@ -209,15 +209,15 @@ using namespace yas;
         tap_called = false;
     }
 
-    std::vector<audio::engine::tap> taps;
+    std::vector<std::shared_ptr<audio::engine::tap>> taps;
     for (uint32_t i = 0; i < src_count; ++i) {
-        taps.push_back(audio::engine::tap{});
+        taps.push_back(audio::engine::make_tap());
         auto &tap = taps.at(i);
 
-        manager.connect(tap.node(), engine_route.node(), 0, i, src_format);
+        manager.connect(tap->node(), engine_route.node(), 0, i, src_format);
 
         auto &tap_called = tap_calleds[i];
-        tap.set_render_handler([&tap_called](auto args) {
+        tap->set_render_handler([&tap_called](auto args) {
             tap_called = true;
             test::fill_test_values_to_buffer(args.buffer);
         });
