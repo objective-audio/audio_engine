@@ -100,8 +100,8 @@ typedef NS_ENUM(NSUInteger, YASAudioDeviceRouteSampleInputType) {
 namespace yas::sample {
 struct device_io_vc_internal {
     audio::engine::manager manager = nullptr;
-    audio::engine::route route = nullptr;
-    audio::engine::tap tap = nullptr;
+    std::shared_ptr<audio::engine::route> route = nullptr;
+    std::shared_ptr<audio::engine::tap> tap = nullptr;
 
     chaining::any_observer_ptr system_observer = nullptr;
     chaining::any_observer_ptr device_observer = nullptr;
@@ -152,11 +152,11 @@ struct device_io_vc_internal {
     if ([object isKindOfClass:[YASAudioDeviceRouteSampleOutputData class]]) {
         YASAudioDeviceRouteSampleOutputData *data = object;
         if ([data isNoneSelected]) {
-            _internal.route.remove_route_for_destination({0, data.outputIndex});
+            _internal.route->remove_route_for_destination({0, data.outputIndex});
         } else if ([data isSineSelected]) {
-            _internal.route.add_route({YASAudioDeviceRouteSampleSourceBusSine, data.outputIndex, 0, data.outputIndex});
+            _internal.route->add_route({YASAudioDeviceRouteSampleSourceBusSine, data.outputIndex, 0, data.outputIndex});
         } else if ([data isInputSelected]) {
-            _internal.route.add_route(
+            _internal.route->add_route(
                 {YASAudioDeviceRouteSampleSourceBusInput, [data inputIndex], 0, data.outputIndex});
         }
 
@@ -169,8 +169,8 @@ struct device_io_vc_internal {
 - (void)setupEngine {
     _internal.manager = audio::engine::manager{};
     _internal.manager.add_device_io();
-    _internal.route = audio::engine::route{};
-    _internal.tap = audio::engine::tap{};
+    _internal.route = audio::engine::make_route();
+    _internal.tap = audio::engine::make_tap();
 
     auto weak_tap = to_weak(_internal.tap);
 
@@ -192,7 +192,7 @@ struct device_io_vc_internal {
         }
     };
 
-    _internal.tap.set_render_handler(render_handler);
+    _internal.tap->set_render_handler(render_handler);
 
     auto unowned_self = make_objc_ptr([[YASUnownedObject alloc] initWithObject:self]);
 
@@ -262,23 +262,23 @@ struct device_io_vc_internal {
     self.inputRoutes = nil;
 
     if (_internal.manager) {
-        _internal.manager.disconnect(_internal.tap.node());
-        _internal.manager.disconnect(_internal.route.node());
-        _internal.route.clear_routes();
+        _internal.manager.disconnect(_internal.tap->node());
+        _internal.manager.disconnect(_internal.route->node());
+        _internal.route->clear_routes();
 
         if (auto const &device = _internal.manager.device_io()->device()) {
             if (device->output_channel_count() > 0) {
                 if (auto const output_format = device->output_format()) {
-                    _internal.manager.connect(_internal.route.node(), _internal.manager.device_io()->node(),
+                    _internal.manager.connect(_internal.route->node(), _internal.manager.device_io()->node(),
                                               *output_format);
-                    _internal.manager.connect(_internal.tap.node(), _internal.route.node(), 0,
+                    _internal.manager.connect(_internal.tap->node(), _internal.route->node(), 0,
                                               YASAudioDeviceRouteSampleSourceBusSine, *output_format);
                 }
             }
 
             if (device->input_channel_count() > 0) {
                 if (auto const input_format = device->input_format()) {
-                    _internal.manager.connect(_internal.manager.device_io()->node(), _internal.route.node(), 0,
+                    _internal.manager.connect(_internal.manager.device_io()->node(), _internal.route->node(), 0,
                                               YASAudioDeviceRouteSampleSourceBusInput, *input_format);
                 }
             }
@@ -333,7 +333,7 @@ struct device_io_vc_internal {
         return;
     }
 
-    auto &routes = _internal.route.routes();
+    auto &routes = _internal.route->routes();
     for (YASAudioDeviceRouteSampleOutputData *data in self.outputRoutes) {
         uint32_t const dst_ch_idx = data.outputIndex;
         auto it = std::find_if(routes.begin(), routes.end(), [dst_ch_idx](const audio::route &route) {
