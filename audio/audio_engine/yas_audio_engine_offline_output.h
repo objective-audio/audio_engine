@@ -4,19 +4,15 @@
 
 #pragma once
 
-#include <cpp_utils/yas_base.h>
+#include <chaining/yas_chaining_umbrella.h>
+#include <cpp_utils/yas_task.h>
 #include <ostream>
 #include "yas_audio_engine_offline_output_protocol.h"
 
 namespace yas::audio::engine {
 class node;
 
-struct offline_output : base, manageable_offline_output, std::enable_shared_from_this<offline_output> {
-   public:
-    class impl;
-
-    virtual ~offline_output();
-
+struct offline_output : manageable_offline_output, std::enable_shared_from_this<offline_output> {
     bool is_running() const;
 
     audio::engine::node const &node() const;
@@ -31,6 +27,12 @@ struct offline_output : base, manageable_offline_output, std::enable_shared_from
     void prepare();
 
    private:
+    task_queue _queue = nullptr;
+    std::shared_ptr<audio::engine::node> _node;
+    chaining::any_observer_ptr _reset_observer = nullptr;
+    struct core;
+    std::unique_ptr<core> _core;
+
     offline_output(offline_output const &) = delete;
     offline_output(offline_output &&) = delete;
     offline_output &operator=(offline_output const &) = delete;
