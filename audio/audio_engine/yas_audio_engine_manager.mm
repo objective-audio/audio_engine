@@ -435,7 +435,7 @@ struct audio::engine::manager::impl : base::impl {
             return start_result_t(start_error_t::offline_output_not_found);
         }
 
-        auto result = offline_output->start(std::move(render_handler), std::move(completion_handler));
+        auto result = offline_output->manageable()->start(std::move(render_handler), std::move(completion_handler));
 
         if (result) {
             return start_result_t(nullptr);
@@ -450,7 +450,7 @@ struct audio::engine::manager::impl : base::impl {
         }
 
         if (auto offline_output = this->_offline_output) {
-            offline_output->stop();
+            offline_output->manageable()->stop();
         }
     }
 

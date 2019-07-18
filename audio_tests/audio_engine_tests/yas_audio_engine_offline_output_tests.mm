@@ -214,7 +214,7 @@ using namespace yas;
         }
     };
 
-    auto result = output->start(std::move(start_render_handler), std::move(completion_handler));
+    auto result = output->manageable()->start(std::move(start_render_handler), std::move(completion_handler));
 
     XCTAssertTrue(result);
 
@@ -263,7 +263,7 @@ using namespace yas;
         }
     };
 
-    auto result = output->start(std::move(render_handler), completion_handler);
+    auto result = output->manageable()->start(std::move(render_handler), completion_handler);
 
     XCTAssertTrue(result);
 

@@ -186,6 +186,10 @@ void audio::engine::offline_output::prepare() {
                                 .end();
 }
 
+std::shared_ptr<audio::engine::manageable_offline_output> audio::engine::offline_output::manageable() {
+    return std::dynamic_pointer_cast<manageable_offline_output>(shared_from_this());
+}
+
 namespace yas::audio::engine {
 struct offline_output_factory : offline_output {
     void prepare() {
