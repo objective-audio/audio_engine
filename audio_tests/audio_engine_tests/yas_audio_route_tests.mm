@@ -21,54 +21,54 @@ using namespace yas;
 }
 
 - (void)test_add_and_remove_route {
-    audio::engine::route engine_route;
+    auto engine_route = audio::engine::make_route();
 
-    XCTAssertEqual(engine_route.routes().size(), 0);
+    XCTAssertEqual(engine_route->routes().size(), 0);
 
     audio::route route{0, 1, 2, 3};
-    engine_route.add_route(route);
+    engine_route->add_route(route);
 
-    XCTAssertEqual(engine_route.routes().size(), 1);
-    for (auto route_in_engine : engine_route.routes()) {
+    XCTAssertEqual(engine_route->routes().size(), 1);
+    for (auto route_in_engine : engine_route->routes()) {
         XCTAssertEqual(route_in_engine, route);
     }
 
-    engine_route.remove_route(route);
+    engine_route->remove_route(route);
 
-    XCTAssertEqual(engine_route.routes().size(), 0);
+    XCTAssertEqual(engine_route->routes().size(), 0);
 
-    engine_route.add_route(std::move(route));
+    engine_route->add_route(std::move(route));
 
-    XCTAssertEqual(engine_route.routes().size(), 1);
+    XCTAssertEqual(engine_route->routes().size(), 1);
 
-    engine_route.clear_routes();
+    engine_route->clear_routes();
 
-    XCTAssertEqual(engine_route.routes().size(), 0);
+    XCTAssertEqual(engine_route->routes().size(), 0);
 }
 
 - (void)test_replace_route {
-    audio::engine::route engine_route;
+    auto engine_route = audio::engine::make_route();
 
-    XCTAssertEqual(engine_route.routes().size(), 0);
+    XCTAssertEqual(engine_route->routes().size(), 0);
 
-    engine_route.add_route({0, 1, 2, 3});
+    engine_route->add_route({0, 1, 2, 3});
 
-    XCTAssertEqual(engine_route.routes().size(), 1);
+    XCTAssertEqual(engine_route->routes().size(), 1);
 
     std::set<audio::route> routes{{4, 5, 6, 7}, {8, 9, 10, 11}};
-    engine_route.set_routes(routes);
+    engine_route->set_routes(routes);
 
-    XCTAssertEqual(engine_route.routes().size(), 2);
-    XCTAssertEqual(engine_route.routes(), routes);
+    XCTAssertEqual(engine_route->routes().size(), 2);
+    XCTAssertEqual(engine_route->routes(), routes);
 
-    engine_route.clear_routes();
+    engine_route->clear_routes();
 
-    XCTAssertEqual(engine_route.routes().size(), 0);
+    XCTAssertEqual(engine_route->routes().size(), 0);
 
-    engine_route.set_routes(std::move(routes));
+    engine_route->set_routes(std::move(routes));
 
-    XCTAssertEqual(engine_route.routes().size(), 2);
-    XCTAssertNotEqual(engine_route.routes(), routes);
+    XCTAssertEqual(engine_route->routes().size(), 2);
+    XCTAssertNotEqual(engine_route->routes(), routes);
 }
 
 - (void)test_render {
@@ -77,11 +77,11 @@ using namespace yas;
 
     auto format = audio::format({.sample_rate = 44100.0, .channel_count = 2});
     audio::engine::offline_output &output = manager.offline_output();
-    audio::engine::route engine_route;
+    auto engine_route = audio::engine::make_route();
     auto tap = audio::engine::make_tap();
 
-    manager.connect(engine_route.node(), output.node(), format);
-    manager.connect(tap->node(), engine_route.node(), format);
+    manager.connect(engine_route->node(), output.node(), format);
+    manager.connect(tap->node(), engine_route->node(), format);
 
     bool tap_called = false;
     tap->set_render_handler([&tap_called](auto) { tap_called = true; });
@@ -100,8 +100,8 @@ using namespace yas;
 
     XCTAssertFalse(tap_called);
 
-    engine_route.add_route({0, 0, 0, 0});
-    engine_route.add_route({0, 1, 0, 1});
+    engine_route->add_route({0, 0, 0, 0});
+    engine_route->add_route({0, 1, 0, 1});
 
     tap_called = false;
     tap->set_render_handler([&tap_called, self](auto args) {
@@ -142,9 +142,9 @@ using namespace yas;
     auto dst_format = audio::format({.sample_rate = 44100.0, .channel_count = 2});
     auto src_format = audio::format({.sample_rate = 44100.0, .channel_count = 1});
     audio::engine::offline_output &output = manager.offline_output();
-    audio::engine::route engine_route;
+    auto engine_route = audio::engine::make_route();
 
-    manager.connect(engine_route.node(), output.node(), dst_format);
+    manager.connect(engine_route->node(), output.node(), dst_format);
 
     bool tap_calleds[src_count];
     for (auto &tap_called : tap_calleds) {
@@ -156,7 +156,7 @@ using namespace yas;
         taps.push_back(audio::engine::make_tap());
         auto &tap = taps.at(i);
 
-        manager.connect(tap->node(), engine_route.node(), 0, i, src_format);
+        manager.connect(tap->node(), engine_route->node(), 0, i, src_format);
 
         auto &tap_called = tap_calleds[i];
         tap->set_render_handler([&tap_called](auto args) {
@@ -165,8 +165,8 @@ using namespace yas;
         });
     }
 
-    engine_route.add_route({0, 0, 0, 0});
-    engine_route.add_route({1, 0, 0, 1});
+    engine_route->add_route({0, 0, 0, 0});
+    engine_route->add_route({1, 0, 0, 1});
 
     XCTestExpectation *expectation = [self expectationWithDescription:@"render"];
 
@@ -200,9 +200,9 @@ using namespace yas;
     auto dst_format = audio::format({.sample_rate = 44100.0, .channel_count = 4});
     auto src_format = audio::format({.sample_rate = 44100.0, .channel_count = 2});
     audio::engine::offline_output &output = manager.offline_output();
-    audio::engine::route engine_route;
+    auto engine_route = audio::engine::make_route();
 
-    manager.connect(engine_route.node(), output.node(), dst_format);
+    manager.connect(engine_route->node(), output.node(), dst_format);
 
     bool tap_calleds[src_count];
     for (auto &tap_called : tap_calleds) {
@@ -214,7 +214,7 @@ using namespace yas;
         taps.push_back(audio::engine::make_tap());
         auto &tap = taps.at(i);
 
-        manager.connect(tap->node(), engine_route.node(), 0, i, src_format);
+        manager.connect(tap->node(), engine_route->node(), 0, i, src_format);
 
         auto &tap_called = tap_calleds[i];
         tap->set_render_handler([&tap_called](auto args) {
@@ -223,8 +223,8 @@ using namespace yas;
         });
     }
 
-    engine_route.add_route({0, 0, 0, 0});
-    engine_route.add_route({1, 0, 0, 2});
+    engine_route->add_route({0, 0, 0, 0});
+    engine_route->add_route({1, 0, 0, 2});
 
     XCTestExpectation *expectation = [self expectationWithDescription:@"render"];
 
