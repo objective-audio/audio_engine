@@ -28,7 +28,7 @@ namespace yas::audio::engine {
 class manager;
 class kernel;
 
-struct node : base, std::enable_shared_from_this<node>, connectable_node {
+struct node : base, std::enable_shared_from_this<node>, connectable_node, manageable_node {
     class impl;
 
     enum class method {
@@ -49,17 +49,14 @@ struct node : base, std::enable_shared_from_this<node>, connectable_node {
 
     node(std::nullptr_t);
 
-    //        node(node &&) = default;
-    //        node &operator=(node &&) = default;
-
     virtual ~node();
 
     void reset();
 
-    std::shared_ptr<audio::engine::connection> input_connection(uint32_t const bus_idx) const;
-    std::shared_ptr<audio::engine::connection> output_connection(uint32_t const bus_idx) const;
-    audio::engine::connection_wmap const &input_connections() const;
-    audio::engine::connection_wmap const &output_connections() const;
+    std::shared_ptr<audio::engine::connection> input_connection(uint32_t const bus_idx) const override;
+    std::shared_ptr<audio::engine::connection> output_connection(uint32_t const bus_idx) const override;
+    audio::engine::connection_wmap const &input_connections() const override;
+    audio::engine::connection_wmap const &output_connections() const override;
 
     std::optional<audio::format> input_format(uint32_t const bus_idx) const;
     std::optional<audio::format> output_format(uint32_t const bus_idx) const;
@@ -67,7 +64,7 @@ struct node : base, std::enable_shared_from_this<node>, connectable_node {
     bus_result_t next_available_output_bus() const;
     bool is_available_input_bus(uint32_t const bus_idx) const;
     bool is_available_output_bus(uint32_t const bus_idx) const;
-    audio::engine::manager manager() const;
+    audio::engine::manager manager() const override;
     std::optional<audio::time> last_render_time() const;
 
     uint32_t input_bus_count() const;
@@ -86,20 +83,27 @@ struct node : base, std::enable_shared_from_this<node>, connectable_node {
     [[nodiscard]] chaining::chain_relayed_unsync_t<node, chaining_pair_t> chain(method const) const;
 
     std::shared_ptr<connectable_node> connectable();
-    audio::engine::manageable_node const &manageable() const;
-    audio::engine::manageable_node &manageable();
+    std::shared_ptr<manageable_node> manageable();
 
    protected:
     node(node_args &&);
 
+   private:
     virtual void add_connection(audio::engine::connection &) override;
     virtual void remove_connection(audio::engine::connection const &) override;
 
-   private:
-    mutable audio::engine::manageable_node _manageable = nullptr;
+    virtual void set_manager(audio::engine::manager const &) override;
+    virtual void update_kernel() override;
+    virtual void update_connections() override;
+    virtual void set_add_to_graph_handler(graph_editing_f &&) override;
+    virtual void set_remove_from_graph_handler(graph_editing_f &&) override;
+    virtual graph_editing_f const &add_to_graph_handler() const override;
+    virtual graph_editing_f const &remove_from_graph_handler() const override;
 
-    //        node(node const &) = delete;
-    //        node &operator=(node const &) = delete;
+    //            node(node &&) = delete;
+    //            node &operator=(node &&) = delete;
+    //            node(node const &) = delete;
+    //            node &operator=(node const &) = delete;
 };
 
 std::shared_ptr<node> make_node(node_args);

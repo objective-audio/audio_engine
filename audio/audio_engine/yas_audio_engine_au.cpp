@@ -202,7 +202,7 @@ void audio::engine::au::prepare(AudioComponentDescription const &acd) {
                                       })
                                       .end();
 
-    this->_node->manageable().set_add_to_graph_handler([weak_au](audio::graph &graph) {
+    this->_node->manageable()->set_add_to_graph_handler([weak_au](audio::graph &graph) {
         if (auto au = weak_au.lock()) {
             au->prepare_unit();
             if (auto unit = au->unit()) {
@@ -212,7 +212,7 @@ void audio::engine::au::prepare(AudioComponentDescription const &acd) {
         }
     });
 
-    this->_node->manageable().set_remove_from_graph_handler([weak_au](audio::graph &graph) {
+    this->_node->manageable()->set_remove_from_graph_handler([weak_au](audio::graph &graph) {
         if (auto au = weak_au.lock()) {
             if (auto unit = au->unit()) {
                 graph.remove_unit(unit);
@@ -245,7 +245,7 @@ void audio::engine::au::_update_unit_connections() {
             });
 
             for (uint32_t bus_idx = 0; bus_idx < input_bus_count; ++bus_idx) {
-                if (auto connection = this->_node->input_connection(bus_idx)) {
+                if (auto connection = this->_node->manageable()->input_connection(bus_idx)) {
                     unit->set_input_format(connection->format.stream_description(), bus_idx);
                     unit->attach_render_callback(bus_idx);
                 } else {
@@ -259,7 +259,7 @@ void audio::engine::au::_update_unit_connections() {
         auto output_bus_count = this->output_element_count();
         if (output_bus_count > 0) {
             for (uint32_t bus_idx = 0; bus_idx < output_bus_count; ++bus_idx) {
-                if (auto connection = this->_node->output_connection(bus_idx)) {
+                if (auto connection = this->_node->manageable()->output_connection(bus_idx)) {
                     unit->set_output_format(connection->format.stream_description(), bus_idx);
                 }
             }

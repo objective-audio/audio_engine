@@ -154,7 +154,7 @@ void audio::engine::device_io::_update_device_io_connections() {
 
 bool audio::engine::device_io::_validate_connections() {
     if (auto const &device_io = this->_core->_device_io) {
-        auto &input_connections = this->_node->input_connections();
+        auto &input_connections = this->_node->manageable()->input_connections();
         if (input_connections.size() > 0) {
             auto const connections = lock_values(input_connections);
             if (connections.count(0) > 0) {
@@ -168,7 +168,7 @@ bool audio::engine::device_io::_validate_connections() {
             }
         }
 
-        auto &output_connections = this->_node->output_connections();
+        auto &output_connections = this->_node->manageable()->output_connections();
         if (output_connections.size() > 0) {
             auto const connections = lock_values(output_connections);
             if (connections.count(0) > 0) {

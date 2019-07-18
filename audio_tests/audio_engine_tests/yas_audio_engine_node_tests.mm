@@ -28,8 +28,8 @@ using namespace yas;
 
     XCTAssertTrue(obj.node()->manageable());
 
-    XCTAssertEqual(obj.node()->manageable().input_connections().size(), 0);
-    XCTAssertEqual(obj.node()->manageable().output_connections().size(), 0);
+    XCTAssertEqual(obj.node()->manageable()->input_connections().size(), 0);
+    XCTAssertEqual(obj.node()->manageable()->output_connections().size(), 0);
     XCTAssertEqual(*obj.node()->next_available_input_bus(), 0);
     XCTAssertEqual(*obj.node()->next_available_output_bus(), 0);
 }
@@ -64,10 +64,10 @@ using namespace yas;
 
     if (auto const connection =
             test::make_connection(*src_obj.node(), source_bus, *dst_obj.node(), destination_bus, format)) {
-        XCTAssertEqual(src_obj.node()->manageable().output_connections().size(), 1);
-        XCTAssertEqual(dst_obj.node()->manageable().input_connections().size(), 1);
-        XCTAssertEqual(src_obj.node()->manageable().output_connection(source_bus), connection);
-        XCTAssertEqual(dst_obj.node()->manageable().input_connection(destination_bus), connection);
+        XCTAssertEqual(src_obj.node()->manageable()->output_connections().size(), 1);
+        XCTAssertEqual(dst_obj.node()->manageable()->input_connections().size(), 1);
+        XCTAssertEqual(src_obj.node()->manageable()->output_connection(source_bus), connection);
+        XCTAssertEqual(dst_obj.node()->manageable()->input_connection(destination_bus), connection);
         XCTAssertEqual(src_obj.node()->output_format(source_bus), format);
         XCTAssertEqual(dst_obj.node()->input_format(destination_bus), format);
 
@@ -95,14 +95,14 @@ using namespace yas;
 
     auto connection = test::make_connection(*src_obj.node(), source_bus, *dst_obj.node(), destination_bus, format);
 
-    XCTAssertEqual(src_obj.node()->manageable().output_connections().size(), 1);
-    XCTAssertEqual(dst_obj.node()->manageable().input_connections().size(), 1);
+    XCTAssertEqual(src_obj.node()->manageable()->output_connections().size(), 1);
+    XCTAssertEqual(dst_obj.node()->manageable()->input_connections().size(), 1);
 
     src_obj.node()->reset();
-    XCTAssertEqual(src_obj.node()->manageable().output_connections().size(), 0);
+    XCTAssertEqual(src_obj.node()->manageable()->output_connections().size(), 0);
 
     dst_obj.node()->reset();
-    XCTAssertEqual(dst_obj.node()->manageable().input_connections().size(), 0);
+    XCTAssertEqual(dst_obj.node()->manageable()->input_connections().size(), 0);
 }
 
 - (void)test_render_time {
@@ -133,11 +133,11 @@ using namespace yas;
 
     XCTAssertFalse(node->manager());
 
-    node->manageable().set_manager(manager);
+    node->manageable()->set_manager(manager);
 
     XCTAssertEqual(manager, node->manager());
 
-    node->manageable().set_manager(audio::engine::manager{nullptr});
+    node->manageable()->set_manager(audio::engine::manager{nullptr});
 
     XCTAssertFalse(node->manager());
 }
@@ -161,7 +161,7 @@ using namespace yas;
         input_connections.push_back(input_connection);
     }
 
-    relay_obj.node()->manageable().update_kernel();
+    relay_obj.node()->manageable()->update_kernel();
 
     XCTestExpectation *expectation = [self expectationWithDescription:@"kernel connections"];
 

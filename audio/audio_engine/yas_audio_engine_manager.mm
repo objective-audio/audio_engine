@@ -93,7 +93,7 @@ struct audio::engine::manager::impl : base::impl {
 
         this->_nodes.insert(shared_node);
 
-        node.manageable().set_manager(this->_weak_manager.lock());
+        node.manageable()->set_manager(this->_weak_manager.lock());
 
         this->add_node_to_graph(node);
     }
@@ -111,7 +111,7 @@ struct audio::engine::manager::impl : base::impl {
 
         this->remove_node_from_graph(node);
 
-        node.manageable().set_manager(manager{nullptr});
+        node.manageable()->set_manager(manager{nullptr});
 
         this->_nodes.erase(shared_node);
     }
@@ -199,7 +199,7 @@ struct audio::engine::manager::impl : base::impl {
         connection.removable()->remove_nodes();
 
         for (auto &node : update_nodes) {
-            node->manageable().update_connections();
+            node->manageable()->update_connections();
             this->detach_node_if_unused(*node);
         }
 
@@ -226,7 +226,7 @@ struct audio::engine::manager::impl : base::impl {
         }
 
         for (auto node : update_nodes) {
-            node->manageable().update_connections();
+            node->manageable()->update_connections();
             detach_node_if_unused(*node);
         }
 
@@ -235,22 +235,22 @@ struct audio::engine::manager::impl : base::impl {
         }
     }
 
-    void add_node_to_graph(audio::engine::node const &node) {
+    void add_node_to_graph(audio::engine::node &node) {
         if (!this->_graph) {
             return;
         }
 
-        if (auto const &handler = node.manageable().add_to_graph_handler()) {
+        if (auto const &handler = node.manageable()->add_to_graph_handler()) {
             handler(this->_graph);
         }
     }
 
-    void remove_node_from_graph(audio::engine::node const &node) {
+    void remove_node_from_graph(audio::engine::node &node) {
         if (!this->_graph) {
             return;
         }
 
-        if (auto const &handler = node.manageable().remove_from_graph_handler()) {
+        if (auto const &handler = node.manageable()->remove_from_graph_handler()) {
             handler(this->_graph);
         }
     }
@@ -285,7 +285,7 @@ struct audio::engine::manager::impl : base::impl {
             return;
         }
 
-        node.manageable().update_connections();
+        node.manageable()->update_connections();
     }
 
     void update_all_node_connections() {
@@ -294,7 +294,7 @@ struct audio::engine::manager::impl : base::impl {
         }
 
         for (auto node : this->_nodes) {
-            node->manageable().update_connections();
+            node->manageable()->update_connections();
         }
     }
 

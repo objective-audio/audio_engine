@@ -67,7 +67,7 @@ audio::engine::offline_start_result_t audio::engine::offline_output::start(offli
                                                                            offline_completion_f &&completion_handler) {
     if (this->_queue) {
         return offline_start_result_t(offline_start_error_t::already_running);
-    } else if (auto connection = this->_node->input_connection(0)) {
+    } else if (auto connection = this->_node->manageable()->input_connection(0)) {
         std::optional<uint8_t> key;
         if (completion_handler) {
             key = this->_core->push_completion_handler(std::move(completion_handler));

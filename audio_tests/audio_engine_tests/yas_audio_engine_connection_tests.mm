@@ -35,8 +35,8 @@ using namespace yas;
     XCTAssertTrue(connection->destination_bus == dst_bus);
     XCTAssertTrue(connection->format == format);
 
-    XCTAssertTrue(src_obj.node()->manageable().output_connection(src_bus) == connection);
-    XCTAssertTrue(dst_obj.node()->manageable().input_connection(dst_bus) == connection);
+    XCTAssertTrue(src_obj.node()->manageable()->output_connection(src_bus) == connection);
+    XCTAssertTrue(dst_obj.node()->manageable()->input_connection(dst_bus) == connection);
 }
 
 - (void)test_remove_nodes {

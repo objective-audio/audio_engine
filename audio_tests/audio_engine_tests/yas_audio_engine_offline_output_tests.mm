@@ -135,9 +135,9 @@ using namespace yas;
     auto connection = test::make_connection(tap->node(), 0, output->node(), 0, format);
 
     output->node().connectable()->add_connection(*connection);
-    output->node().manageable().update_kernel();
+    output->node().manageable()->update_kernel();
     tap->node().connectable()->add_connection(*connection);
-    tap->node().manageable().update_kernel();
+    tap->node().manageable()->update_kernel();
 
     XCTestExpectation *tapNodeExpectation = [self expectationWithDescription:@"tap node render"];
 
@@ -239,9 +239,9 @@ using namespace yas;
     auto connection = test::make_connection(tap->node(), 0, output->node(), 0, format);
 
     output->node().connectable()->add_connection(*connection);
-    output->node().manageable().update_kernel();
+    output->node().manageable()->update_kernel();
     tap->node().connectable()->add_connection(*connection);
-    tap->node().manageable().update_kernel();
+    tap->node().manageable()->update_kernel();
 
     auto promise = std::make_shared<std::promise<void>>();
     auto future = promise->get_future();

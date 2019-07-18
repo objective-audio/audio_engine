@@ -14,7 +14,7 @@ using namespace yas;
 
 #pragma mark - audio::engine::node::impl
 
-struct audio::engine::node::impl : base::impl, manageable_node::impl {
+struct audio::engine::node::impl : base::impl {
     weak<audio::engine::manager> _weak_manager;
     uint32_t _input_bus_count = 0;
     uint32_t _output_bus_count = 0;
@@ -123,29 +123,29 @@ struct audio::engine::node::impl : base::impl, manageable_node::impl {
         return this->_is_input_renderable;
     }
 
-    std::shared_ptr<audio::engine::connection> input_connection(uint32_t const bus_idx) override {
+    std::shared_ptr<audio::engine::connection> input_connection(uint32_t const bus_idx) {
         if (this->_input_connections.count(bus_idx) > 0) {
             return this->_input_connections.at(bus_idx).lock();
         }
         return nullptr;
     }
 
-    std::shared_ptr<audio::engine::connection> output_connection(uint32_t const bus_idx) override {
+    std::shared_ptr<audio::engine::connection> output_connection(uint32_t const bus_idx) {
         if (this->_output_connections.count(bus_idx) > 0) {
             return this->_output_connections.at(bus_idx).lock();
         }
         return nullptr;
     }
 
-    audio::engine::connection_wmap &input_connections() override {
+    audio::engine::connection_wmap &input_connections() {
         return this->_input_connections;
     }
 
-    audio::engine::connection_wmap &output_connections() override {
+    audio::engine::connection_wmap &output_connections() {
         return this->_output_connections;
     }
 
-    void update_connections() override {
+    void update_connections() {
         this->_notifier.notify(std::make_pair(method::update_connections, cast<audio::engine::node>()));
     }
 
@@ -194,7 +194,7 @@ struct audio::engine::node::impl : base::impl, manageable_node::impl {
         }
     }
 
-    void update_kernel() override {
+    void update_kernel() {
         auto kernel = audio::engine::make_kernel();
         this->prepare_kernel(kernel);
         this->_core.set_kernel(kernel);
@@ -204,27 +204,27 @@ struct audio::engine::node::impl : base::impl, manageable_node::impl {
         return this->_core.kernel();
     }
 
-    audio::engine::manager manager() const override {
+    audio::engine::manager manager() const {
         return this->_weak_manager.lock();
     }
 
-    void set_manager(audio::engine::manager const &manager) override {
+    void set_manager(audio::engine::manager const &manager) {
         this->_weak_manager = manager;
     }
 
-    void set_add_to_graph_handler(graph_editing_f &&handler) override {
+    void set_add_to_graph_handler(graph_editing_f &&handler) {
         this->_add_to_graph_handler = std::move(handler);
     }
 
-    void set_remove_from_graph_handler(graph_editing_f &&handler) override {
+    void set_remove_from_graph_handler(graph_editing_f &&handler) {
         this->_remove_from_graph_handler = std::move(handler);
     }
 
-    graph_editing_f const &add_to_graph_handler() const override {
+    graph_editing_f const &add_to_graph_handler() const {
         return this->_add_to_graph_handler;
     }
 
-    graph_editing_f const &remove_from_graph_handler() const override {
+    graph_editing_f const &remove_from_graph_handler() const {
         return this->_remove_from_graph_handler;
     }
 
@@ -394,38 +394,48 @@ std::shared_ptr<audio::engine::connectable_node> audio::engine::node::connectabl
     return std::dynamic_pointer_cast<connectable_node>(shared_from_this());
 }
 
-audio::engine::manageable_node const &audio::engine::node::manageable() const {
-    if (!this->_manageable) {
-        this->_manageable = audio::engine::manageable_node{impl_ptr<manageable_node::impl>()};
-    }
-    return this->_manageable;
+std::shared_ptr<audio::engine::manageable_node> audio::engine::node::manageable() {
+    return std::dynamic_pointer_cast<manageable_node>(shared_from_this());
 }
 
-audio::engine::manageable_node &audio::engine::node::manageable() {
-    if (!this->_manageable) {
-        this->_manageable = audio::engine::manageable_node{impl_ptr<manageable_node::impl>()};
-    }
-    return this->_manageable;
+void audio::engine::node::add_connection(audio::engine::connection &connection) {
+    impl_ptr<impl>()->add_connection(connection);
 }
 
-void audio::engine::node::add_connection(audio::engine::connection &) {
-    throw std::runtime_error("must be overridden.");
+void audio::engine::node::remove_connection(audio::engine::connection const &connection) {
+    impl_ptr<impl>()->remove_connection(connection);
 }
-void audio::engine::node::remove_connection(audio::engine::connection const &) {
-    throw std::runtime_error("must be overridden.");
+
+void audio::engine::node::set_manager(audio::engine::manager const &manager) {
+    impl_ptr<impl>()->set_manager(manager);
+}
+
+void audio::engine::node::update_kernel() {
+    impl_ptr<impl>()->update_kernel();
+}
+
+void audio::engine::node::update_connections() {
+    impl_ptr<impl>()->update_connections();
+}
+
+void audio::engine::node::set_add_to_graph_handler(graph_editing_f &&handler) {
+    impl_ptr<impl>()->set_add_to_graph_handler(std::move(handler));
+}
+
+void audio::engine::node::set_remove_from_graph_handler(graph_editing_f &&handler) {
+    impl_ptr<impl>()->set_remove_from_graph_handler(std::move(handler));
+}
+
+audio::graph_editing_f const &audio::engine::node::add_to_graph_handler() const {
+    return impl_ptr<impl>()->add_to_graph_handler();
+}
+audio::graph_editing_f const &audio::engine::node::remove_from_graph_handler() const {
+    return impl_ptr<impl>()->remove_from_graph_handler();
 }
 
 namespace yas::audio::engine {
 struct node_factory : node {
     node_factory(node_args args) : node(std::move(args)) {
-    }
-
-    void add_connection(audio::engine::connection &connection) override {
-        impl_ptr<impl>()->add_connection(connection);
-    }
-
-    void remove_connection(audio::engine::connection const &connection) override {
-        impl_ptr<impl>()->remove_connection(connection);
     }
 };
 }  // namespace yas::audio::engine

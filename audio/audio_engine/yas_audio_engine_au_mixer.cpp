@@ -39,7 +39,7 @@ struct audio::engine::au_mixer::impl : base::impl {
 
    private:
     void update_unit_mixer_connections() {
-        auto &connections = this->_au->node().input_connections();
+        auto &connections = this->_au->node().manageable()->input_connections();
         if (connections.size() > 0) {
             auto last = connections.end();
             --last;
