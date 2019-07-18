@@ -11,12 +11,9 @@
 namespace yas::audio::engine {
 class node;
 
-struct offline_output final : base, manageable_offline_output {
+struct offline_output : base, manageable_offline_output, std::enable_shared_from_this<offline_output> {
    public:
     class impl;
-
-    offline_output();
-    offline_output(std::nullptr_t);
 
     virtual ~offline_output();
 
@@ -27,6 +24,17 @@ struct offline_output final : base, manageable_offline_output {
 
     offline_start_result_t start(offline_render_f &&, offline_completion_f &&) override;
     void stop() override;
+
+   protected:
+    offline_output();
+
+    void prepare();
+
+   private:
+    offline_output(offline_output const &) = delete;
+    offline_output(offline_output &&) = delete;
+    offline_output &operator=(offline_output const &) = delete;
+    offline_output &operator=(offline_output &&) = delete;
 };
 
 std::shared_ptr<offline_output> make_offline_output();

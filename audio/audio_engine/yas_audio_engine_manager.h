@@ -66,8 +66,8 @@ class manager final : public base {
 
     add_result_t add_offline_output();
     remove_result_t remove_offline_output();
-    audio::engine::offline_output const &offline_output() const;
-    audio::engine::offline_output &offline_output();
+    std::shared_ptr<audio::engine::offline_output> const &offline_output() const;
+    std::shared_ptr<audio::engine::offline_output> &offline_output();
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
     add_result_t add_device_io();

@@ -76,11 +76,11 @@ using namespace yas;
     manager.add_offline_output();
 
     auto format = audio::format({.sample_rate = 44100.0, .channel_count = 2});
-    audio::engine::offline_output &output = manager.offline_output();
+    std::shared_ptr<audio::engine::offline_output> &output = manager.offline_output();
     auto engine_route = audio::engine::make_route();
     auto tap = audio::engine::make_tap();
 
-    manager.connect(engine_route->node(), output.node(), format);
+    manager.connect(engine_route->node(), output->node(), format);
     manager.connect(tap->node(), engine_route->node(), format);
 
     bool tap_called = false;
@@ -141,10 +141,10 @@ using namespace yas;
 
     auto dst_format = audio::format({.sample_rate = 44100.0, .channel_count = 2});
     auto src_format = audio::format({.sample_rate = 44100.0, .channel_count = 1});
-    audio::engine::offline_output &output = manager.offline_output();
+    std::shared_ptr<audio::engine::offline_output> &output = manager.offline_output();
     auto engine_route = audio::engine::make_route();
 
-    manager.connect(engine_route->node(), output.node(), dst_format);
+    manager.connect(engine_route->node(), output->node(), dst_format);
 
     bool tap_calleds[src_count];
     for (auto &tap_called : tap_calleds) {
@@ -199,10 +199,10 @@ using namespace yas;
 
     auto dst_format = audio::format({.sample_rate = 44100.0, .channel_count = 4});
     auto src_format = audio::format({.sample_rate = 44100.0, .channel_count = 2});
-    audio::engine::offline_output &output = manager.offline_output();
+    std::shared_ptr<audio::engine::offline_output> &output = manager.offline_output();
     auto engine_route = audio::engine::make_route();
 
-    manager.connect(engine_route->node(), output.node(), dst_format);
+    manager.connect(engine_route->node(), output->node(), dst_format);
 
     bool tap_calleds[src_count];
     for (auto &tap_called : tap_calleds) {

@@ -21,15 +21,15 @@ struct audio::engine::offline_output::impl : base::impl {
 
     void prepare(offline_output const &output) {
         this->_reset_observer = this->_node->chain(node::method::will_reset)
-                                    .perform([weak_output = to_weak(output)](auto const &) {
+                                    .perform([weak_output = to_weak(output.shared_from_this())](auto const &) {
                                         if (auto output = weak_output.lock()) {
-                                            output.impl_ptr<audio::engine::offline_output::impl>()->stop();
+                                            output->impl_ptr<audio::engine::offline_output::impl>()->stop();
                                         }
                                     })
                                     .end();
     }
 
-    audio::engine::offline_start_result_t start(offline_render_f &&render_handler,
+    audio::engine::offline_start_result_t start(offline_output &offline_output, offline_render_f &&render_handler,
                                                 offline_completion_f &&completion_handler) {
         if (this->_queue) {
             return offline_start_result_t(offline_start_error_t::already_running);
@@ -44,7 +44,7 @@ struct audio::engine::offline_output::impl : base::impl {
 
             auto render_buffer = std::make_shared<audio::pcm_buffer>(connection->format, 1024);
 
-            auto weak_output = to_weak(cast<offline_output>());
+            auto weak_output = to_weak(offline_output.shared_from_this());
             auto task_lambda = [weak_output, render_buffer, render_handler = std::move(render_handler),
                                 key](task const &task) mutable {
                 bool cancelled = false;
@@ -59,7 +59,7 @@ struct audio::engine::offline_output::impl : base::impl {
                         break;
                     }
 
-                    auto kernel = output.node().kernel();
+                    auto kernel = output->node().kernel();
                     if (!kernel) {
                         cancelled = true;
                         break;
@@ -102,10 +102,10 @@ struct audio::engine::offline_output::impl : base::impl {
                     if (auto output = weak_output.lock()) {
                         std::optional<offline_completion_f> completion_handler;
                         if (key) {
-                            completion_handler = output.impl_ptr<impl>()->_core.pull_completion_handler(*key);
+                            completion_handler = output->impl_ptr<impl>()->_core.pull_completion_handler(*key);
                         }
 
-                        output.impl_ptr<impl>()->_queue = nullptr;
+                        output->impl_ptr<impl>()->_queue = nullptr;
 
                         if (completion_handler) {
                             (*completion_handler)(cancelled);
@@ -188,10 +188,6 @@ struct audio::engine::offline_output::impl : base::impl {
 #pragma mark - audio::engine::offline_output
 
 audio::engine::offline_output::offline_output() : base(std::make_unique<impl>()) {
-    impl_ptr<impl>()->prepare(*this);
-}
-
-audio::engine::offline_output::offline_output(std::nullptr_t) : base(nullptr) {
 }
 
 audio::engine::offline_output::~offline_output() = default;
@@ -209,15 +205,29 @@ audio::engine::node &audio::engine::offline_output::node() {
 
 audio::engine::offline_start_result_t audio::engine::offline_output::start(offline_render_f &&render_handler,
                                                                            offline_completion_f &&completion_handler) {
-    return impl_ptr<impl>()->start(std::move(render_handler), std::move(completion_handler));
+    return impl_ptr<impl>()->start(*this, std::move(render_handler), std::move(completion_handler));
 }
 
 void audio::engine::offline_output::stop() {
     impl_ptr<impl>()->stop();
 }
 
+void audio::engine::offline_output::prepare() {
+    impl_ptr<impl>()->prepare(*this);
+}
+
+namespace yas::audio::engine {
+struct offline_output_factory : offline_output {
+    void prepare() {
+        this->offline_output::prepare();
+    }
+};
+}
+
 std::shared_ptr<audio::engine::offline_output> audio::engine::make_offline_output() {
-    return std::make_shared<offline_output>();
+    auto shared = std::make_shared<offline_output_factory>();
+    shared->prepare();
+    return shared;
 }
 
 std::string yas::to_string(audio::engine::offline_start_error_t const &error) {

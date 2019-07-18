@@ -343,7 +343,7 @@ struct audio::engine::manager::impl : base::impl {
         if (this->_offline_output) {
             return add_result_t{add_error_t::already_added};
         } else {
-            this->_offline_output = audio::engine::offline_output{};
+            this->_offline_output = audio::engine::make_offline_output();
             return add_result_t{nullptr};
         }
     }
@@ -357,7 +357,7 @@ struct audio::engine::manager::impl : base::impl {
         }
     }
 
-    audio::engine::offline_output &offline_output() {
+    std::shared_ptr<audio::engine::offline_output> &offline_output() {
         return this->_offline_output;
     }
 
@@ -397,7 +397,7 @@ struct audio::engine::manager::impl : base::impl {
         }
 
         if (auto const offline_output = this->_offline_output) {
-            if (offline_output.is_running()) {
+            if (offline_output->is_running()) {
                 return start_result_t(start_error_t::already_running);
             }
         }
@@ -420,7 +420,7 @@ struct audio::engine::manager::impl : base::impl {
         }
 
         if (auto const offline_output = this->_offline_output) {
-            if (offline_output.is_running()) {
+            if (offline_output->is_running()) {
                 return start_result_t(start_error_t::already_running);
             }
         }
@@ -435,7 +435,7 @@ struct audio::engine::manager::impl : base::impl {
             return start_result_t(start_error_t::offline_output_not_found);
         }
 
-        auto result = offline_output.start(std::move(render_handler), std::move(completion_handler));
+        auto result = offline_output->start(std::move(render_handler), std::move(completion_handler));
 
         if (result) {
             return start_result_t(nullptr);
@@ -450,7 +450,7 @@ struct audio::engine::manager::impl : base::impl {
         }
 
         if (auto offline_output = this->_offline_output) {
-            offline_output.stop();
+            offline_output->stop();
         }
     }
 
@@ -468,7 +468,7 @@ struct audio::engine::manager::impl : base::impl {
     audio::graph _graph = nullptr;
     std::unordered_set<std::shared_ptr<node>> _nodes;
     audio::engine::connection_set _connections;
-    audio::engine::offline_output _offline_output = nullptr;
+    std::shared_ptr<audio::engine::offline_output> _offline_output = nullptr;
 };
 
 #pragma mark - audio::engine::manager
@@ -548,11 +548,11 @@ audio::engine::manager::remove_result_t audio::engine::manager::remove_offline_o
     return impl_ptr<impl>()->remove_offline_output();
 }
 
-audio::engine::offline_output const &audio::engine::manager::offline_output() const {
+std::shared_ptr<audio::engine::offline_output> const &audio::engine::manager::offline_output() const {
     return impl_ptr<impl>()->offline_output();
 }
 
-audio::engine::offline_output &audio::engine::manager::offline_output() {
+std::shared_ptr<audio::engine::offline_output> &audio::engine::manager::offline_output() {
     return impl_ptr<impl>()->offline_output();
 }
 
