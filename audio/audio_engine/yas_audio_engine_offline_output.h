@@ -11,7 +11,7 @@
 namespace yas::audio::engine {
 class node;
 
-class offline_output final : public base {
+struct offline_output final : base, manageable_offline_output {
    public:
     class impl;
 
@@ -25,12 +25,11 @@ class offline_output final : public base {
     audio::engine::node const &node() const;
     audio::engine::node &node();
 
-    manageable_offline_output &manageable();
+    offline_start_result_t start(offline_render_f &&, offline_completion_f &&) override;
+    void stop() override;
 
    private:
     offline_output(std::shared_ptr<impl> const &);
-
-    manageable_offline_output _manageable = nullptr;
 };
 }  // namespace yas::audio::engine
 

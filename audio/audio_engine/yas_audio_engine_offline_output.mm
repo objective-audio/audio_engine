@@ -12,7 +12,7 @@ using namespace yas;
 
 #pragma mark - audio::engine::offline_output::impl
 
-struct audio::engine::offline_output::impl : base::impl, manageable_offline_output::impl {
+struct audio::engine::offline_output::impl : base::impl {
     task_queue _queue = nullptr;
     std::shared_ptr<audio::engine::node> _node = make_node({.input_bus_count = 1, .output_bus_count = 0});
     chaining::any_observer_ptr _reset_observer = nullptr;
@@ -30,7 +30,7 @@ struct audio::engine::offline_output::impl : base::impl, manageable_offline_outp
     }
 
     audio::engine::offline_start_result_t start(offline_render_f &&render_handler,
-                                                offline_completion_f &&completion_handler) override {
+                                                offline_completion_f &&completion_handler) {
         if (this->_queue) {
             return offline_start_result_t(offline_start_error_t::already_running);
         } else if (auto connection = this->_node->input_connection(0)) {
@@ -125,7 +125,7 @@ struct audio::engine::offline_output::impl : base::impl, manageable_offline_outp
         return offline_start_result_t(nullptr);
     }
 
-    void stop() override {
+    void stop() {
         auto completion_handlers = _core.pull_completion_handlers();
 
         if (auto &queue = this->_queue) {
@@ -211,11 +211,13 @@ audio::engine::node &audio::engine::offline_output::node() {
     return *impl_ptr<impl>()->_node;
 }
 
-audio::engine::manageable_offline_output &audio::engine::offline_output::manageable() {
-    if (!_manageable) {
-        _manageable = audio::engine::manageable_offline_output{impl_ptr<manageable_offline_output::impl>()};
-    }
-    return _manageable;
+audio::engine::offline_start_result_t audio::engine::offline_output::start(offline_render_f &&render_handler,
+                                                                           offline_completion_f &&completion_handler) {
+    return impl_ptr<impl>()->start(std::move(render_handler), std::move(completion_handler));
+}
+
+void audio::engine::offline_output::stop() {
+    impl_ptr<impl>()->stop();
 }
 
 std::string yas::to_string(audio::engine::offline_start_error_t const &error) {
