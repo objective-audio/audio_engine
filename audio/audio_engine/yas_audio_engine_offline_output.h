@@ -27,9 +27,6 @@ struct offline_output final : base, manageable_offline_output {
 
     offline_start_result_t start(offline_render_f &&, offline_completion_f &&) override;
     void stop() override;
-
-   private:
-    offline_output(std::shared_ptr<impl> const &);
 };
 }  // namespace yas::audio::engine
 

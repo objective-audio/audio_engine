@@ -194,10 +194,6 @@ audio::engine::offline_output::offline_output() : base(std::make_unique<impl>())
 audio::engine::offline_output::offline_output(std::nullptr_t) : base(nullptr) {
 }
 
-audio::engine::offline_output::offline_output(std::shared_ptr<impl> const &imp) : base(imp) {
-    impl_ptr<impl>()->prepare(*this);
-}
-
 audio::engine::offline_output::~offline_output() = default;
 
 bool audio::engine::offline_output::is_running() const {
