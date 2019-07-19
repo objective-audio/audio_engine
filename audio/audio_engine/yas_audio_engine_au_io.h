@@ -57,21 +57,21 @@ struct au_io final : base {
     audio::engine::au &au();
 };
 
-struct au_output final : base {
-   public:
-    class impl;
-
-    au_output();
-    au_output(std::nullptr_t);
-
-    virtual ~au_output();
-
+struct au_output : std::enable_shared_from_this<au_output> {
     void set_channel_map(channel_map_t const &);
     channel_map_t const &channel_map() const;
 
     audio::engine::au_io const &au_io() const;
     audio::engine::au_io &au_io();
+
+   protected:
+    au_output();
+
+   private:
+    audio::engine::au_io _au_io;
 };
+
+std::shared_ptr<au_output> make_au_output();
 
 struct au_input final : base {
    public:

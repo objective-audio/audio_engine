@@ -232,39 +232,33 @@ audio::engine::au &audio::engine::au_io::au() {
     return impl_ptr<impl>()->au();
 }
 
-#pragma mark - audio::engine::au_output::impl
-
-struct yas::audio::engine::au_output::impl : base::impl {
-    impl() : _au_io({.enable_output = false}) {
-    }
-
-    audio::engine::au_io _au_io;
-};
-
 #pragma mark - audio::engine::au_output
 
-audio::engine::au_output::au_output(std::nullptr_t) : base(nullptr) {
+audio::engine::au_output::au_output() : _au_io({.enable_output = false}) {
 }
-
-audio::engine::au_output::au_output() : base(std::make_unique<impl>()) {
-}
-
-audio::engine::au_output::~au_output() = default;
 
 void audio::engine::au_output::set_channel_map(channel_map_t const &map) {
-    au_io().set_channel_map(map, direction::output);
+    this->_au_io.set_channel_map(map, direction::output);
 }
 
 audio::channel_map_t const &audio::engine::au_output::channel_map() const {
-    return au_io().channel_map(direction::output);
+    return this->_au_io.channel_map(direction::output);
 }
 
 audio::engine::au_io const &audio::engine::au_output::au_io() const {
-    return impl_ptr<impl>()->_au_io;
+    return this->_au_io;
 }
 
 audio::engine::au_io &audio::engine::au_output::au_io() {
-    return impl_ptr<impl>()->_au_io;
+    return this->_au_io;
+}
+
+namespace yas::audio::engine {
+struct au_output_factory : au_output {};
+}
+
+std::shared_ptr<audio::engine::au_output> audio::engine::make_au_output() {
+    return std::make_shared<au_output_factory>();
 }
 
 #pragma mark - audio::engine::au_input::impl
