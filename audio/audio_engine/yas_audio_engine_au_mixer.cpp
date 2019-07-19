@@ -59,9 +59,6 @@ struct audio::engine::au_mixer::impl : base::impl {
 audio::engine::au_mixer::au_mixer() : base(std::make_unique<impl>()) {
 }
 
-audio::engine::au_mixer::au_mixer(std::nullptr_t) : base(nullptr) {
-}
-
 audio::engine::au_mixer::~au_mixer() = default;
 
 void audio::engine::au_mixer::set_output_volume(float const volume, uint32_t const bus_idx) {

@@ -10,9 +10,6 @@ namespace yas::audio::engine {
 class au;
 
 struct au_mixer : base, std::enable_shared_from_this<au_mixer> {
-    au_mixer();
-    au_mixer(std::nullptr_t);
-
     virtual ~au_mixer();
 
     void set_output_volume(float const volume, uint32_t const bus_idx);
@@ -30,6 +27,9 @@ struct au_mixer : base, std::enable_shared_from_this<au_mixer> {
 
     audio::engine::au const &au() const;
     audio::engine::au &au();
+
+   protected:
+    au_mixer();
 
    private:
     class impl;
