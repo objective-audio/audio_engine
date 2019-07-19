@@ -17,7 +17,7 @@ class device;
 namespace yas::audio::engine {
 class au;
 
-class au_io final : public base {
+struct au_io final : base {
    public:
     class impl;
 
@@ -57,7 +57,7 @@ class au_io final : public base {
     audio::engine::au &au();
 };
 
-class au_output final : public base {
+struct au_output final : base {
    public:
     class impl;
 
@@ -73,7 +73,7 @@ class au_output final : public base {
     audio::engine::au_io &au_io();
 };
 
-class au_input final : public base {
+struct au_input final : base {
    public:
     class impl;
 
