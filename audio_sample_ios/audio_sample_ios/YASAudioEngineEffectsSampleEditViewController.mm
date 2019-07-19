@@ -13,15 +13,15 @@ using namespace yas;
 @end
 
 @implementation YASAudioEngineEffectsSampleEditViewController {
-    std::optional<audio::engine::au> _au_opt;
+    std::shared_ptr<audio::engine::au> _au;
 }
 
 - (void)viewDidLoad {
     [super viewDidLoad];
 }
 
-- (void)set_engine_au:(audio::engine::au const &)au {
-    _au_opt = au;
+- (void)set_engine_au:(audio::engine::au &)au {
+    _au = au.shared_from_this();
 
     [self.tableView reloadData];
 }
@@ -33,8 +33,8 @@ using namespace yas;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    if (_au_opt) {
-        return _au_opt->global_parameters().size();
+    if (_au) {
+        return _au->global_parameters().size();
     } else {
         return 0;
     }
@@ -44,7 +44,7 @@ using namespace yas;
     YASAudioEngineSampleParameterCell *cell =
         [tableView dequeueReusableCellWithIdentifier:@"ParameterCell" forIndexPath:indexPath];
 
-    [cell set_engine_au:*_au_opt index:static_cast<uint32_t>(indexPath.row)];
+    [cell set_engine_au:_au index:static_cast<uint32_t>(indexPath.row)];
 
     return cell;
 }

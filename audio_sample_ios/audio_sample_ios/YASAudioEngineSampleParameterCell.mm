@@ -17,7 +17,7 @@ using namespace yas;
 @end
 
 @implementation YASAudioEngineSampleParameterCell {
-    std::optional<audio::engine::au> _au_opt;
+    std::shared_ptr<audio::engine::au> _au_opt;
     uint32_t _index;
 }
 
@@ -45,20 +45,19 @@ using namespace yas;
 }
 
 - (void)reset {
-    [self set_engine_au:std::nullopt index:0];
+    [self set_engine_au:nullptr index:0];
 }
 
-- (void)set_engine_au:(const std::optional<audio::engine::au> &)au_opt index:(uint32_t const)index {
+- (void)set_engine_au:(std::shared_ptr<audio::engine::au> const &)au_opt index:(uint32_t const)index {
     _au_opt = au_opt;
     _index = index;
 
-    auto au = au_opt ? *au_opt : nullptr;
-    if (au && au.global_parameters().count(_index)) {
-        auto &parameter = au.global_parameters().at(_index);
+    if (au_opt && au_opt->global_parameters().count(_index)) {
+        auto &parameter = au_opt->global_parameters().at(_index);
         self.nameLabel.text = (__bridge NSString *)parameter.cf_name();
         self.valueSlider.minimumValue = parameter.min_value;
         self.valueSlider.maximumValue = parameter.max_value;
-        self.valueSlider.value = au.global_parameter_value(parameter.parameter_id);
+        self.valueSlider.value = au_opt->global_parameter_value(parameter.parameter_id);
     } else {
         self.nameLabel.text = nil;
         self.valueSlider.minimumValue = 0.0;
@@ -85,10 +84,9 @@ using namespace yas;
 
 - (IBAction)sliderValueChanged:(UISlider *)sender {
     if (_au_opt) {
-        auto &au = *_au_opt;
-        if (au && au.global_parameters().count(_index)) {
-            auto const parameter_id = au.global_parameters().at(_index).parameter_id;
-            au.set_global_parameter_value(parameter_id, sender.value);
+        if (_au_opt->global_parameters().count(_index)) {
+            auto const parameter_id = _au_opt->global_parameters().at(_index).parameter_id;
+            _au_opt->set_global_parameter_value(parameter_id, sender.value);
         }
     }
 

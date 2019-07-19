@@ -28,30 +28,31 @@ static const AudioComponentDescription baseAcd = {.componentType = kAudioUnitTyp
 namespace yas::sample {
 struct effects_vc_internal {
     audio::engine::manager manager;
-    audio::engine::au_output au_output;
-    audio::engine::connection through_connection = nullptr;
-    audio::engine::tap tap;
-    audio::engine::au effect_au = nullptr;
+    std::shared_ptr<audio::engine::au_output> au_output = audio::engine::make_au_output();
+    std::shared_ptr<audio::engine::connection> through_connection = nullptr;
+    std::shared_ptr<audio::engine::tap> tap = audio::engine::make_tap();
+    std::shared_ptr<audio::engine::au> effect_au = nullptr;
 
     void replace_effect_au(const AudioComponentDescription *acd) {
         if (effect_au) {
-            manager.disconnect(effect_au.node());
+            manager.disconnect(effect_au->node());
             effect_au = nullptr;
         }
 
         if (through_connection) {
-            manager.disconnect(through_connection);
+            manager.disconnect(*through_connection);
             through_connection = nullptr;
         }
 
         auto format = audio::format({.sample_rate = [AVAudioSession sharedInstance].sampleRate, .channel_count = 2});
 
         if (acd) {
-            effect_au = audio::engine::au(*acd);
-            manager.connect(effect_au.node(), au_output.au_io().au().node(), format);
-            manager.connect(tap.node(), effect_au.node(), format);
+            effect_au = audio::engine::make_au(*acd);
+            manager.connect(effect_au->node(), au_output->au_io().au().node(), format);
+            manager.connect(tap->node(), effect_au->node(), format);
         } else {
-            through_connection = manager.connect(tap.node(), au_output.au_io().au().node(), format);
+            through_connection =
+                manager.connect(tap->node(), au_output->au_io().au().node(), format).shared_from_this();
         }
     }
 };
@@ -118,7 +119,7 @@ struct effects_vc_internal {
     id destinationViewController = segue.destinationViewController;
     if ([destinationViewController isKindOfClass:[YASAudioEngineEffectsSampleEditViewController class]]) {
         YASAudioEngineEffectsSampleEditViewController *controller = destinationViewController;
-        [controller set_engine_au:_internal.effect_au];
+        [controller set_engine_au:*_internal.effect_au];
     }
 }
 
@@ -162,7 +163,7 @@ struct effects_vc_internal {
         }
     };
 
-    _internal.tap.set_render_handler(tap_render_handler);
+    _internal.tap->set_render_handler(tap_render_handler);
 
     _internal.replace_effect_au(nullptr);
 }

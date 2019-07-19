@@ -12,6 +12,6 @@ class au;
 
 @interface YASAudioEngineSampleParameterCell : UITableViewCell
 
-- (void)set_engine_au:(const std::optional<yas::audio::engine::au> &)node_opt index:(uint32_t const)index;
+- (void)set_engine_au:(std::shared_ptr<yas::audio::engine::au> const &)node_opt index:(uint32_t const)index;
 
 @end
