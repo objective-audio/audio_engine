@@ -18,26 +18,19 @@ class device;
 namespace yas::audio::engine {
 class au;
 
-struct au_io final : base {
-   public:
-    class impl;
-
+struct au_io : std::enable_shared_from_this<au_io> {
     enum class method {
         did_update_connection,
     };
 
-    using chaining_pair_t = std::pair<method, au_io>;
+    using chaining_pair_t = std::pair<method, std::shared_ptr<au_io>>;
 
     struct args {
         bool enable_input = true;
         bool enable_output = true;
     };
 
-    au_io();
-    au_io(args);
-    au_io(std::nullptr_t);
-
-    virtual ~au_io();
+    virtual ~au_io() = default;
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
     void set_device(audio::device const &);
@@ -52,11 +45,27 @@ struct au_io final : base {
     uint32_t input_device_channel_count() const;
 
     [[nodiscard]] chaining::chain_unsync_t<chaining_pair_t> chain() const;
-    [[nodiscard]] chaining::chain_relayed_unsync_t<au_io, chaining_pair_t> chain(method const) const;
+    [[nodiscard]] chaining::chain_relayed_unsync_t<std::shared_ptr<au_io>, chaining_pair_t> chain(method const) const;
 
     audio::engine::au const &au() const;
     audio::engine::au &au();
+
+   protected:
+    au_io(args);
+
+    void prepare();
+
+   private:
+    std::shared_ptr<audio::engine::au> _au;
+    channel_map_t _channel_map[2];
+    chaining::any_observer_ptr _connections_observer = nullptr;
+    chaining::notifier<chaining_pair_t> _notifier;
+
+    void update_unit_io_connections();
 };
+
+std::shared_ptr<au_io> make_au_io();
+std::shared_ptr<au_io> make_au_io(au_io::args);
 
 struct au_output : std::enable_shared_from_this<au_output> {
     virtual ~au_output() = default;
@@ -71,7 +80,7 @@ struct au_output : std::enable_shared_from_this<au_output> {
     au_output();
 
    private:
-    audio::engine::au_io _au_io;
+    std::shared_ptr<audio::engine::au_io> _au_io;
 };
 
 std::shared_ptr<au_output> make_au_output();
@@ -91,7 +100,7 @@ struct au_input : std::enable_shared_from_this<au_input> {
     void prepare();
 
    private:
-    audio::engine::au_io _au_io;
+    std::shared_ptr<audio::engine::au_io> _au_io;
 
     std::shared_ptr<audio::pcm_buffer> _input_buffer = nullptr;
     chaining::any_observer_ptr _connections_observer = nullptr;

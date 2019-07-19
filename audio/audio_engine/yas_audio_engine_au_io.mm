@@ -31,226 +31,180 @@ static AudioComponentDescription constexpr audio_au_io_acd = {
 };
 }
 
-#pragma mark - audio::engine::au_io::impl
-
-struct audio::engine::au_io::impl : base::impl {
-    chaining::notifier<chaining_pair_t> _notifier;
-
-    impl() : impl(args{}) {
-    }
-
-    impl(args &&args)
-        : _au(make_au({.acd = audio_au_io_acd,
-                       .node_args = audio::engine::node_args{
-                           .input_bus_count = static_cast<uint32_t>(args.enable_input ? 1 : 0),
-                           .output_bus_count = static_cast<uint32_t>(args.enable_output ? 1 : 0),
-                           .override_output_bus_idx = 1}})) {
-        this->_au->set_prepare_unit_handler([args = std::move(args)](audio::unit &unit) {
-            unit.set_enable_output(args.enable_input);
-            unit.set_enable_input(args.enable_output);
-            unit.set_maximum_frames_per_slice(4096);
-        });
-    }
-
-    ~impl() = default;
-
-    void prepare(audio::engine::au_io &au_io) {
-        this->_connections_observer = this->au()
-                                          .chain(au::method::did_update_connections)
-                                          .perform([weak_au_io = to_weak(au_io)](auto const &) {
-                                              if (auto au_io = weak_au_io.lock()) {
-                                                  au_io.impl_ptr<impl>()->update_unit_io_connections();
-                                              }
-                                          })
-                                          .end();
-    }
-
-#if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
-
-    void set_device(audio::device const &device) {
-        this->au().unit()->set_current_device(device.audio_device_id());
-    }
-
-    std::shared_ptr<audio::device> device() {
-        return device::device_for_id(this->_au->unit()->current_device());
-    }
-
-#endif
-
-    double device_sample_rate() {
-#if TARGET_OS_IPHONE
-        return [AVAudioSession sharedInstance].sampleRate;
-#elif TARGET_OS_MAC
-        if (auto const &dev = device()) {
-            return dev->nominal_sample_rate();
-        }
-        return 0;
-#endif
-    }
-
-    uint32_t output_device_channel_count() {
-#if TARGET_OS_IPHONE
-        return static_cast<uint32_t>([AVAudioSession sharedInstance].outputNumberOfChannels);
-#elif TARGET_OS_MAC
-        if (auto const &dev = device()) {
-            return dev->output_channel_count();
-        }
-        return 0;
-#endif
-    }
-
-    uint32_t input_device_channel_count() {
-#if TARGET_OS_IPHONE
-        return static_cast<uint32_t>([AVAudioSession sharedInstance].inputNumberOfChannels);
-#elif TARGET_OS_MAC
-        if (auto const &dev = device()) {
-            return dev->input_channel_count();
-        }
-        return 0;
-#endif
-    }
-
-    void set_channel_map(channel_map_t const &map, audio::direction const dir) {
-        this->_channel_map[to_uint32(dir)] = map;
-
-        if (auto unit = au().unit()) {
-            unit->set_channel_map(map, kAudioUnitScope_Output, to_uint32(dir));
-        }
-    }
-
-    audio::channel_map_t const &channel_map(audio::direction const dir) {
-        return this->_channel_map[to_uint32(dir)];
-    }
-
-    void update_unit_io_connections() {
-        auto unit = this->au().unit();
-
-        auto update_channel_map = [](channel_map_t &map, std::optional<format> const &format,
-                                     uint32_t const dev_ch_count) {
-            if (map.size() > 0) {
-                if (format) {
-                    uint32_t const ch_count = format->channel_count();
-                    if (map.size() != ch_count) {
-                        map.resize(ch_count, -1);
-                    }
-                    for (auto &value : map) {
-                        if (value >= dev_ch_count) {
-                            value = -1;
-                        }
-                    }
-                }
-            }
-        };
-
-        auto const output_idx = to_uint32(direction::output);
-        auto &output_map = this->_channel_map[output_idx];
-        update_channel_map(output_map, au().node().input_format(output_idx), this->output_device_channel_count());
-
-        auto const input_idx = to_uint32(direction::input);
-        auto &input_map = this->_channel_map[input_idx];
-        update_channel_map(input_map, this->au().node().output_format(input_idx), this->input_device_channel_count());
-
-        unit->set_channel_map(output_map, kAudioUnitScope_Output, output_idx);
-        unit->set_channel_map(input_map, kAudioUnitScope_Output, input_idx);
-
-        this->_notifier.notify(std::make_pair(au_io::method::did_update_connection, cast<audio::engine::au_io>()));
-    }
-
-    audio::engine::au &au() {
-        return *this->_au;
-    }
-
-   private:
-    std::shared_ptr<audio::engine::au> _au;
-    channel_map_t _channel_map[2];
-    chaining::any_observer_ptr _connections_observer = nullptr;
-};
-
 #pragma mark - audio::engine::au_io
 
-audio::engine::au_io::au_io(std::nullptr_t) : base(nullptr) {
+audio::engine::au_io::au_io(args args)
+    : _au(make_au(
+          {.acd = audio_au_io_acd,
+           .node_args = audio::engine::node_args{.input_bus_count = static_cast<uint32_t>(args.enable_input ? 1 : 0),
+                                                 .output_bus_count = static_cast<uint32_t>(args.enable_output ? 1 : 0),
+                                                 .override_output_bus_idx = 1}})) {
+    this->_au->set_prepare_unit_handler([args = std::move(args)](audio::unit &unit) {
+        unit.set_enable_output(args.enable_input);
+        unit.set_enable_input(args.enable_output);
+        unit.set_maximum_frames_per_slice(4096);
+    });
 }
-
-audio::engine::au_io::au_io() : au_io(args{}) {
-}
-
-audio::engine::au_io::au_io(args args) : base(std::make_shared<impl>(std::move(args))) {
-    impl_ptr<impl>()->prepare(*this);
-}
-
-audio::engine::au_io::~au_io() = default;
 
 void audio::engine::au_io::set_channel_map(channel_map_t const &map, direction const dir) {
-    impl_ptr<impl>()->set_channel_map(map, dir);
+    this->_channel_map[to_uint32(dir)] = map;
+
+    if (auto unit = au().unit()) {
+        unit->set_channel_map(map, kAudioUnitScope_Output, to_uint32(dir));
+    }
 }
 
 audio::channel_map_t const &audio::engine::au_io::channel_map(direction const dir) const {
-    return impl_ptr<impl>()->channel_map(dir);
+    return this->_channel_map[to_uint32(dir)];
 }
 
 double audio::engine::au_io::device_sample_rate() const {
-    return impl_ptr<impl>()->device_sample_rate();
+#if TARGET_OS_IPHONE
+    return [AVAudioSession sharedInstance].sampleRate;
+#elif TARGET_OS_MAC
+    if (auto const &dev = device()) {
+        return dev->nominal_sample_rate();
+    }
+    return 0;
+#endif
 }
 
 uint32_t audio::engine::au_io::output_device_channel_count() const {
-    return impl_ptr<impl>()->output_device_channel_count();
+#if TARGET_OS_IPHONE
+    return static_cast<uint32_t>([AVAudioSession sharedInstance].outputNumberOfChannels);
+#elif TARGET_OS_MAC
+    if (auto const &dev = device()) {
+        return dev->output_channel_count();
+    }
+    return 0;
+#endif
 }
 
 uint32_t audio::engine::au_io::input_device_channel_count() const {
-    return impl_ptr<impl>()->input_device_channel_count();
+#if TARGET_OS_IPHONE
+    return static_cast<uint32_t>([AVAudioSession sharedInstance].inputNumberOfChannels);
+#elif TARGET_OS_MAC
+    if (auto const &dev = device()) {
+        return dev->input_channel_count();
+    }
+    return 0;
+#endif
 }
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
 
 void audio::engine::au_io::set_device(audio::device const &device) {
-    impl_ptr<impl>()->set_device(device);
+    this->au().unit()->set_current_device(device.audio_device_id());
 }
 
 std::shared_ptr<audio::device> audio::engine::au_io::device() const {
-    return impl_ptr<impl>()->device();
+    return device::device_for_id(this->_au->unit()->current_device());
 }
 
 #endif
 
 chaining::chain_unsync_t<audio::engine::au_io::chaining_pair_t> audio::engine::au_io::chain() const {
-    return impl_ptr<impl>()->_notifier.chain();
+    return this->_notifier.chain();
 }
 
-chaining::chain_relayed_unsync_t<audio::engine::au_io, audio::engine::au_io::chaining_pair_t>
+chaining::chain_relayed_unsync_t<std::shared_ptr<audio::engine::au_io>, audio::engine::au_io::chaining_pair_t>
 audio::engine::au_io::chain(method const method) const {
-    return impl_ptr<impl>()
-        ->_notifier.chain()
+    return this->_notifier.chain()
         .guard([method](auto const &pair) { return pair.first == method; })
         .to([](chaining_pair_t const &pair) { return pair.second; });
 }
 
 audio::engine::au const &audio::engine::au_io::au() const {
-    return impl_ptr<impl>()->au();
+    return *this->_au;
 }
 
 audio::engine::au &audio::engine::au_io::au() {
-    return impl_ptr<impl>()->au();
+    return *this->_au;
+}
+
+void audio::engine::au_io::prepare() {
+    this->_connections_observer = this->au()
+                                      .chain(au::method::did_update_connections)
+                                      .perform([weak_au_io = to_weak(shared_from_this())](auto const &) {
+                                          if (auto au_io = weak_au_io.lock()) {
+                                              au_io->update_unit_io_connections();
+                                          }
+                                      })
+                                      .end();
+}
+
+void audio::engine::au_io::update_unit_io_connections() {
+    auto unit = this->au().unit();
+
+    auto update_channel_map = [](channel_map_t &map, std::optional<format> const &format, uint32_t const dev_ch_count) {
+        if (map.size() > 0) {
+            if (format) {
+                uint32_t const ch_count = format->channel_count();
+                if (map.size() != ch_count) {
+                    map.resize(ch_count, -1);
+                }
+                for (auto &value : map) {
+                    if (value >= dev_ch_count) {
+                        value = -1;
+                    }
+                }
+            }
+        }
+    };
+
+    auto const output_idx = to_uint32(direction::output);
+    auto &output_map = this->_channel_map[output_idx];
+    update_channel_map(output_map, au().node().input_format(output_idx), this->output_device_channel_count());
+
+    auto const input_idx = to_uint32(direction::input);
+    auto &input_map = this->_channel_map[input_idx];
+    update_channel_map(input_map, this->au().node().output_format(input_idx), this->input_device_channel_count());
+
+    unit->set_channel_map(output_map, kAudioUnitScope_Output, output_idx);
+    unit->set_channel_map(input_map, kAudioUnitScope_Output, input_idx);
+
+    this->_notifier.notify(std::make_pair(au_io::method::did_update_connection, shared_from_this()));
+}
+
+namespace yas::audio::engine {
+struct au_io_factory : au_io {
+    au_io_factory(au_io::args &&args) : au_io(std::move(args)) {
+    }
+
+    void prepare() {
+        this->au_io::prepare();
+    }
+};
+}
+
+std::shared_ptr<audio::engine::au_io> audio::engine::make_au_io() {
+    return make_au_io(au_io::args{});
+}
+
+std::shared_ptr<audio::engine::au_io> audio::engine::make_au_io(au_io::args args) {
+    auto shared = std::make_shared<au_io_factory>(std::move(args));
+    return shared;
 }
 
 #pragma mark - audio::engine::au_output
 
-audio::engine::au_output::au_output() : _au_io({.enable_output = false}) {
+audio::engine::au_output::au_output() : _au_io(make_au_io({.enable_output = false})) {
 }
 
 void audio::engine::au_output::set_channel_map(channel_map_t const &map) {
-    this->_au_io.set_channel_map(map, direction::output);
+    this->_au_io->set_channel_map(map, direction::output);
 }
 
 audio::channel_map_t const &audio::engine::au_output::channel_map() const {
-    return this->_au_io.channel_map(direction::output);
+    return this->_au_io->channel_map(direction::output);
 }
 
 audio::engine::au_io const &audio::engine::au_output::au_io() const {
-    return this->_au_io;
+    return *this->_au_io;
 }
 
 audio::engine::au_io &audio::engine::au_output::au_io() {
-    return this->_au_io;
+    return *this->_au_io;
 }
 
 namespace yas::audio::engine {
@@ -263,27 +217,27 @@ std::shared_ptr<audio::engine::au_output> audio::engine::make_au_output() {
 
 #pragma mark - audio::engine::au_input
 
-audio::engine::au_input::au_input() : _au_io({.enable_input = false}) {
+audio::engine::au_input::au_input() : _au_io(make_au_io({.enable_input = false})) {
 }
 
 void audio::engine::au_input::set_channel_map(channel_map_t const &map) {
-    this->_au_io.set_channel_map(map, direction::input);
+    this->_au_io->set_channel_map(map, direction::input);
 }
 
 audio::channel_map_t const &audio::engine::au_input::channel_map() const {
-    return this->_au_io.channel_map(direction::input);
+    return this->_au_io->channel_map(direction::input);
 }
 
 audio::engine::au_io const &audio::engine::au_input::au_io() const {
-    return this->_au_io;
+    return *this->_au_io;
 }
 
 audio::engine::au_io &audio::engine::au_input::au_io() {
-    return this->_au_io;
+    return *this->_au_io;
 }
 
 void audio::engine::au_input::prepare() {
-    this->_connections_observer = this->_au_io.chain(au_io::method::did_update_connection)
+    this->_connections_observer = this->_au_io->chain(au_io::method::did_update_connection)
                                       .perform([weak_au_input = to_weak(shared_from_this())](auto const &) {
                                           if (auto au_input = weak_au_input.lock()) {
                                               au_input->update_unit_input_connections();
@@ -293,9 +247,9 @@ void audio::engine::au_input::prepare() {
 }
 
 void audio::engine::au_input::update_unit_input_connections() {
-    auto unit = _au_io.au().unit();
+    auto unit = _au_io->au().unit();
 
-    if (auto out_connection = _au_io.au().node().output_connection(1)) {
+    if (auto out_connection = _au_io->au().node().output_connection(1)) {
         unit->attach_input_callback();
 
         this->_input_buffer = std::make_shared<pcm_buffer>(out_connection->format, 4096);
