@@ -27,14 +27,15 @@ struct audio::engine::au_mixer::impl : base::impl {
                .node_args = {.input_bus_count = std::numeric_limits<uint32_t>::max(), .output_bus_count = 1}})) {
     }
 
-    void prepare(audio::engine::au_mixer const &au_mixer) {
-        this->_connections_observer = this->_au->chain(au::method::will_update_connections)
-                                          .perform([weak_au_mixer = to_weak(au_mixer)](auto const &) {
-                                              if (auto au_mixer = weak_au_mixer.lock()) {
-                                                  au_mixer.impl_ptr<impl>()->update_unit_mixer_connections();
-                                              }
-                                          })
-                                          .end();
+    void prepare(audio::engine::au_mixer &au_mixer) {
+        this->_connections_observer =
+            this->_au->chain(au::method::will_update_connections)
+                .perform([weak_au_mixer = to_weak(au_mixer.shared_from_this())](auto const &) {
+                    if (auto au_mixer = weak_au_mixer.lock()) {
+                        au_mixer->impl_ptr<impl>()->update_unit_mixer_connections();
+                    }
+                })
+                .end();
     }
 
    private:

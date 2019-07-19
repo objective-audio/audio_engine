@@ -9,8 +9,7 @@
 namespace yas::audio::engine {
 class au;
 
-class au_mixer : public base {
-   public:
+struct au_mixer : base, std::enable_shared_from_this<au_mixer> {
     au_mixer();
     au_mixer(std::nullptr_t);
 
@@ -34,6 +33,11 @@ class au_mixer : public base {
 
    private:
     class impl;
+
+    au_mixer(au_mixer const &) = delete;
+    au_mixer(au_mixer &&) = delete;
+    au_mixer &operator=(au_mixer const &) = delete;
+    au_mixer &operator=(au_mixer &&) = delete;
 };
 
 std::shared_ptr<au_mixer> make_au_mixer();
