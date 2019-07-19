@@ -183,6 +183,7 @@ std::shared_ptr<audio::engine::au_io> audio::engine::make_au_io() {
 
 std::shared_ptr<audio::engine::au_io> audio::engine::make_au_io(au_io::args args) {
     auto shared = std::make_shared<au_io_factory>(std::move(args));
+    shared->prepare();
     return shared;
 }
 
