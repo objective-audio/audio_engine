@@ -261,96 +261,90 @@ std::shared_ptr<audio::engine::au_output> audio::engine::make_au_output() {
     return std::make_shared<au_output_factory>();
 }
 
-#pragma mark - audio::engine::au_input::impl
-
-struct yas::audio::engine::au_input::impl : base::impl {
-    impl() : _au_io({.enable_input = false}) {
-    }
-
-    ~impl() = default;
-
-    void prepare(audio::engine::au_input const &au_input) {
-        this->_connections_observer = this->_au_io.chain(au_io::method::did_update_connection)
-                                          .perform([weak_au_input = to_weak(au_input)](auto const &) {
-                                              if (auto au_input = weak_au_input.lock()) {
-                                                  au_input.impl_ptr<impl>()->update_unit_input_connections();
-                                              }
-                                          })
-                                          .end();
-    }
-
-    void update_unit_input_connections() {
-        auto unit = _au_io.au().unit();
-
-        if (auto out_connection = _au_io.au().node().output_connection(1)) {
-            unit->attach_input_callback();
-
-            this->_input_buffer = std::make_shared<pcm_buffer>(out_connection->format, 4096);
-
-            auto weak_au_input = to_weak(cast<au_input>());
-            unit->set_input_handler(
-                [weak_au_input, input_buffer = this->_input_buffer](render_parameters &render_parameters) mutable {
-                    auto au_input = weak_au_input.lock();
-                    if (au_input && render_parameters.in_number_frames <= input_buffer->frame_capacity()) {
-                        input_buffer->set_frame_length(render_parameters.in_number_frames);
-                        render_parameters.io_data = input_buffer->audio_buffer_list();
-
-                        if (auto const kernel = au_input.au_io().au().node().kernel()) {
-                            if (auto const connection = kernel->output_connection(1)) {
-                                auto format = connection->format;
-                                time time(*render_parameters.io_time_stamp, format.sample_rate());
-                                au_input.au_io().au().node().set_render_time_on_render(time);
-
-                                if (auto io_unit = au_input.au_io().au().unit()) {
-                                    render_parameters.in_bus_number = 1;
-                                    io_unit->raw_unit_render(render_parameters);
-                                }
-
-                                auto dst_node = connection->destination_node();
-
-                                if (dst_node->is_input_renderable()) {
-                                    dst_node->render({.buffer = *input_buffer, .bus_idx = 0, .when = time});
-                                }
-                            }
-                        }
-                    }
-                });
-        } else {
-            unit->detach_input_callback();
-            unit->set_input_handler(nullptr);
-            this->_input_buffer = nullptr;
-        }
-    }
-
-    audio::engine::au_io _au_io;
-
-    std::shared_ptr<pcm_buffer> _input_buffer = nullptr;
-    chaining::any_observer_ptr _connections_observer = nullptr;
-};
-
 #pragma mark - audio::engine::au_input
 
-audio::engine::au_input::au_input(std::nullptr_t) : base(nullptr) {
+audio::engine::au_input::au_input() : _au_io({.enable_input = false}) {
 }
-
-audio::engine::au_input::au_input() : base(std::make_unique<impl>()) {
-    impl_ptr<impl>()->prepare(*this);
-}
-
-audio::engine::au_input::~au_input() = default;
 
 void audio::engine::au_input::set_channel_map(channel_map_t const &map) {
-    au_io().set_channel_map(map, direction::input);
+    this->_au_io.set_channel_map(map, direction::input);
 }
 
 audio::channel_map_t const &audio::engine::au_input::channel_map() const {
-    return au_io().channel_map(direction::input);
+    return this->_au_io.channel_map(direction::input);
 }
 
 audio::engine::au_io const &audio::engine::au_input::au_io() const {
-    return impl_ptr<impl>()->_au_io;
+    return this->_au_io;
 }
 
 audio::engine::au_io &audio::engine::au_input::au_io() {
-    return impl_ptr<impl>()->_au_io;
+    return this->_au_io;
+}
+
+void audio::engine::au_input::prepare() {
+    this->_connections_observer = this->_au_io.chain(au_io::method::did_update_connection)
+                                      .perform([weak_au_input = to_weak(shared_from_this())](auto const &) {
+                                          if (auto au_input = weak_au_input.lock()) {
+                                              au_input->update_unit_input_connections();
+                                          }
+                                      })
+                                      .end();
+}
+
+void audio::engine::au_input::update_unit_input_connections() {
+    auto unit = _au_io.au().unit();
+
+    if (auto out_connection = _au_io.au().node().output_connection(1)) {
+        unit->attach_input_callback();
+
+        this->_input_buffer = std::make_shared<pcm_buffer>(out_connection->format, 4096);
+
+        auto weak_au_input = to_weak(shared_from_this());
+        unit->set_input_handler(
+            [weak_au_input, input_buffer = this->_input_buffer](render_parameters &render_parameters) mutable {
+                auto au_input = weak_au_input.lock();
+                if (au_input && render_parameters.in_number_frames <= input_buffer->frame_capacity()) {
+                    input_buffer->set_frame_length(render_parameters.in_number_frames);
+                    render_parameters.io_data = input_buffer->audio_buffer_list();
+
+                    if (auto const kernel = au_input->au_io().au().node().kernel()) {
+                        if (auto const connection = kernel->output_connection(1)) {
+                            auto format = connection->format;
+                            time time(*render_parameters.io_time_stamp, format.sample_rate());
+                            au_input->au_io().au().node().set_render_time_on_render(time);
+
+                            if (auto io_unit = au_input->au_io().au().unit()) {
+                                render_parameters.in_bus_number = 1;
+                                io_unit->raw_unit_render(render_parameters);
+                            }
+
+                            auto dst_node = connection->destination_node();
+
+                            if (dst_node->is_input_renderable()) {
+                                dst_node->render({.buffer = *input_buffer, .bus_idx = 0, .when = time});
+                            }
+                        }
+                    }
+                }
+            });
+    } else {
+        unit->detach_input_callback();
+        unit->set_input_handler(nullptr);
+        this->_input_buffer = nullptr;
+    }
+}
+
+namespace yas::audio::engine {
+struct au_input_factory : au_input {
+    void prepare() {
+        this->au_input::prepare();
+    }
+};
+}
+
+std::shared_ptr<audio::engine::au_input> audio::engine::make_au_input() {
+    auto shared = std::make_shared<au_input_factory>();
+    shared->prepare();
+    return shared;
 }

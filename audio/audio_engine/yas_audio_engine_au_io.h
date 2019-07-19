@@ -6,6 +6,7 @@
 
 #include <chaining/yas_chaining_umbrella.h>
 #include <cpp_utils/yas_base.h>
+#include "yas_audio_pcm_buffer.h"
 #include "yas_audio_types.h"
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
@@ -57,7 +58,9 @@ struct au_io final : base {
     audio::engine::au &au();
 };
 
-struct au_output : std::enable_shared_from_this<au_output> {
+struct au_output {
+    virtual ~au_output() = default;
+
     void set_channel_map(channel_map_t const &);
     channel_map_t const &channel_map() const;
 
@@ -73,19 +76,28 @@ struct au_output : std::enable_shared_from_this<au_output> {
 
 std::shared_ptr<au_output> make_au_output();
 
-struct au_input final : base {
-   public:
-    class impl;
-
-    au_input();
-    au_input(std::nullptr_t);
-
-    virtual ~au_input();
+struct au_input : std::enable_shared_from_this<au_input> {
+    virtual ~au_input() = default;
 
     void set_channel_map(channel_map_t const &);
     channel_map_t const &channel_map() const;
 
     audio::engine::au_io const &au_io() const;
     audio::engine::au_io &au_io();
+
+   protected:
+    au_input();
+
+    void prepare();
+
+   private:
+    audio::engine::au_io _au_io;
+
+    std::shared_ptr<audio::pcm_buffer> _input_buffer = nullptr;
+    chaining::any_observer_ptr _connections_observer = nullptr;
+
+    void update_unit_input_connections();
 };
+
+std::shared_ptr<au_input> make_au_input();
 }  // namespace yas::audio::engine
