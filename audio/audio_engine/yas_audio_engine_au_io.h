@@ -58,7 +58,7 @@ struct au_io final : base {
     audio::engine::au &au();
 };
 
-struct au_output {
+struct au_output : std::enable_shared_from_this<au_output> {
     virtual ~au_output() = default;
 
     void set_channel_map(channel_map_t const &);
