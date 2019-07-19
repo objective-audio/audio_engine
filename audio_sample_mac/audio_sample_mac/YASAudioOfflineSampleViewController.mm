@@ -120,12 +120,12 @@ struct sine : base {
 namespace yas::sample {
 struct offline_vc_internal {
     audio::engine::manager play_manager;
-    audio::engine::au_output play_au_output;
-    audio::engine::au_mixer play_au_mixer;
+    std::shared_ptr<audio::engine::au_output> play_au_output = audio::engine::make_au_output();
+    std::shared_ptr<audio::engine::au_mixer> play_au_mixer = audio::engine::make_au_mixer();
     offline_sample::engine::sine play_sine;
 
     audio::engine::manager offline_manager;
-    audio::engine::au_mixer offline_au_mixer;
+    std::shared_ptr<audio::engine::au_mixer> offline_au_mixer = audio::engine::make_au_mixer();
     offline_sample::engine::sine offline_sine;
 
     chaining::any_observer_ptr engine_observer = nullptr;
@@ -136,32 +136,32 @@ struct offline_vc_internal {
                                      .pcm_format = audio::pcm_format::float32,
                                      .interleaved = false});
 
-        play_au_mixer.au().node().reset();
-        play_au_mixer.set_input_pan(0.0f, 0);
-        play_au_mixer.set_input_enabled(true, 0);
-        play_au_mixer.set_output_volume(1.0f, 0);
-        play_au_mixer.set_output_pan(0.0f, 0);
+        this->play_au_mixer->au().node().reset();
+        this->play_au_mixer->set_input_pan(0.0f, 0);
+        this->play_au_mixer->set_input_enabled(true, 0);
+        this->play_au_mixer->set_output_volume(1.0f, 0);
+        this->play_au_mixer->set_output_pan(0.0f, 0);
 
-        play_manager.connect(play_au_mixer.au().node(), play_au_output.au_io().au().node(), format);
-        play_manager.connect(play_sine.tap().node(), play_au_mixer.au().node(), format);
+        this->play_manager.connect(this->play_au_mixer->au().node(), this->play_au_output->au_io().au().node(), format);
+        this->play_manager.connect(this->play_sine.tap().node(), this->play_au_mixer->au().node(), format);
 
-        offline_manager.add_offline_output();
-        audio::engine::offline_output &offline_output = offline_manager.offline_output();
+        this->offline_manager.add_offline_output();
+        std::shared_ptr<audio::engine::offline_output> &offline_output = this->offline_manager.offline_output();
 
-        offline_au_mixer.au().node().reset();
-        offline_au_mixer.set_input_pan(0.0f, 0);
-        offline_au_mixer.set_input_enabled(true, 0);
-        offline_au_mixer.set_output_volume(1.0f, 0);
-        offline_au_mixer.set_output_pan(0.0f, 0);
+        this->offline_au_mixer->au().node().reset();
+        this->offline_au_mixer->set_input_pan(0.0f, 0);
+        this->offline_au_mixer->set_input_enabled(true, 0);
+        this->offline_au_mixer->set_output_volume(1.0f, 0);
+        this->offline_au_mixer->set_output_pan(0.0f, 0);
 
-        offline_manager.connect(offline_au_mixer.au().node(), offline_output.node(), format);
-        offline_manager.connect(offline_sine.tap().node(), offline_au_mixer.au().node(), format);
+        this->offline_manager.connect(this->offline_au_mixer->au().node(), offline_output->node(), format);
+        this->offline_manager.connect(this->offline_sine.tap().node(), this->offline_au_mixer->au().node(), format);
 
         this->engine_observer = this->play_manager.chain(audio::engine::manager::method::configuration_change)
                                     .perform([weak_play_au_output = to_weak(play_au_output)](auto const &) {
                                         if (auto play_au_output = weak_play_au_output.lock()) {
                                             if (auto const device = audio::device::default_output_device()) {
-                                                play_au_output.au_io().set_device(*device);
+                                                play_au_output->au_io().set_device(*device);
                                             }
                                         }
                                     })
@@ -198,11 +198,11 @@ struct offline_vc_internal {
 }
 
 - (void)setVolume:(float)volume {
-    _internal.play_au_mixer.set_input_volume(volume, 0);
+    _internal.play_au_mixer->set_input_volume(volume, 0);
 }
 
 - (float)volume {
-    return _internal.play_au_mixer.input_volume(0);
+    return _internal.play_au_mixer->input_volume(0);
 }
 
 - (void)setFrequency:(float)frequency {
@@ -256,7 +256,7 @@ struct offline_vc_internal {
 
     _internal.offline_sine.set_frequency(_internal.play_sine.frequency());
     _internal.offline_sine.set_playing(true);
-    _internal.offline_au_mixer.set_input_volume(self.volume, 0);
+    _internal.offline_au_mixer->set_input_volume(self.volume, 0);
 
     self.processing = YES;
 
