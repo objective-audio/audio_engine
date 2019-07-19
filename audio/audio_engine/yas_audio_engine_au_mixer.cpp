@@ -110,3 +110,11 @@ audio::engine::au const &audio::engine::au_mixer::au() const {
 audio::engine::au &audio::engine::au_mixer::au() {
     return *impl_ptr<impl>()->_au;
 }
+
+namespace yas::audio::engine {
+struct au_mixer_factory : au_mixer {};
+}  // namespace yas::audio::engine
+
+std::shared_ptr<audio::engine::au_mixer> audio::engine::make_au_mixer() {
+    return std::make_shared<au_mixer_factory>();
+}

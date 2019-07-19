@@ -9,7 +9,7 @@
 namespace yas::audio::engine {
 class au;
 
-class au_mixer final : public base {
+class au_mixer : public base {
    public:
     au_mixer();
     au_mixer(std::nullptr_t);
@@ -35,4 +35,6 @@ class au_mixer final : public base {
    private:
     class impl;
 };
+
+std::shared_ptr<au_mixer> make_au_mixer();
 }  // namespace yas::audio::engine
