@@ -93,10 +93,6 @@ struct manager : std::enable_shared_from_this<manager> {
    private:
     std::unique_ptr<impl> _impl;
     chaining::notifier<chaining_pair_t> _notifier;
-#if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
-    std::shared_ptr<audio::engine::device_io> _device_io = nullptr;
-    chaining::any_observer_ptr _device_system_observer = nullptr;
-#endif
 
     audio::graph _graph = nullptr;
     std::unordered_set<std::shared_ptr<node>> _nodes;
@@ -119,10 +115,14 @@ struct manager : std::enable_shared_from_this<manager> {
         std::shared_ptr<audio::engine::node> const &node);
     audio::engine::connection_set output_connections_for_source_node(std::shared_ptr<audio::engine::node> const &node);
     void reload_graph();
+    void post_configuration_change();
+
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
+    std::shared_ptr<audio::engine::device_io> _device_io = nullptr;
+    chaining::any_observer_ptr _device_system_observer = nullptr;
+
     void set_device_io(std::shared_ptr<audio::engine::device_io> &&node);
 #endif
-    void post_configuration_change();
 };
 
 std::shared_ptr<manager> make_manager();
