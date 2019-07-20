@@ -10,7 +10,7 @@
 
 namespace yas::audio::engine {
 struct kernel : manageable_kernel, std::enable_shared_from_this<kernel> {
-    virtual ~kernel() = default;
+    virtual ~kernel();
 
     audio::engine::connection_smap input_connections() const;
     audio::engine::connection_smap output_connections() const;

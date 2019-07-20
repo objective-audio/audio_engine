@@ -28,6 +28,8 @@ audio::engine::tap::tap(args args)
                                       engine::node_args{.input_bus_count = 1, .output_bus_count = 1})) {
 }
 
+audio::engine::tap::~tap() = default;
+
 void audio::engine::tap::prepare() {
     auto weak_tap = to_weak(shared_from_this());
 

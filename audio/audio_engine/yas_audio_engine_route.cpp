@@ -31,6 +31,8 @@ audio::engine::route::route()
                        .output_bus_count = std::numeric_limits<uint32_t>::max()})) {
 }
 
+audio::engine::route::~route() = default;
+
 void audio::engine::route::prepare() {
     auto weak_route = to_weak(shared_from_this());
 

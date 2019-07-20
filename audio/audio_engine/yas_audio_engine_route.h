@@ -11,7 +11,7 @@ namespace yas::audio::engine {
 class node;
 
 struct route : std::enable_shared_from_this<route> {
-    class kernel;
+    virtual ~route();
 
     audio::route_set_t const &routes() const;
     void add_route(audio::route);
@@ -30,6 +30,8 @@ struct route : std::enable_shared_from_this<route> {
     void prepare();
 
    private:
+    class kernel;
+
     std::shared_ptr<audio::engine::node> _node;
     route_set_t _routes;
     chaining::any_observer_ptr _reset_observer = nullptr;

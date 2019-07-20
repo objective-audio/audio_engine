@@ -32,6 +32,8 @@ struct au : manageable_au, std::enable_shared_from_this<au> {
         AudioComponentDescription acd;
     };
 
+    virtual ~au();
+
     void set_prepare_unit_handler(prepare_unit_f);
 
     std::shared_ptr<audio::unit> unit() const;

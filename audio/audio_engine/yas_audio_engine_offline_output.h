@@ -13,6 +13,8 @@ namespace yas::audio::engine {
 class node;
 
 struct offline_output : manageable_offline_output, std::enable_shared_from_this<offline_output> {
+    virtual ~offline_output();
+
     bool is_running() const;
 
     audio::engine::node const &node() const;

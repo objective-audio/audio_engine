@@ -21,6 +21,8 @@ audio::engine::au_mixer::au_mixer()
                    .node_args = {.input_bus_count = std::numeric_limits<uint32_t>::max(), .output_bus_count = 1}})) {
 }
 
+audio::engine::au_mixer::~au_mixer() = default;
+
 void audio::engine::au_mixer::set_output_volume(float const volume, uint32_t const bus_idx) {
     this->_au->set_output_parameter_value(kMultiChannelMixerParam_Volume, volume, bus_idx);
 }

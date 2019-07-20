@@ -11,6 +11,8 @@ using namespace yas;
 audio::engine::kernel::kernel() {
 }
 
+audio::engine::kernel::~kernel() = default;
+
 audio::engine::connection_smap audio::engine::kernel::input_connections() const {
     return lock_values(this->_input_connections);
 }

@@ -12,6 +12,8 @@ struct tap : std::enable_shared_from_this<tap> {
         bool is_input = false;
     };
 
+    virtual ~tap();
+
     void set_render_handler(audio::engine::node::render_f);
 
     audio::engine::node const &node() const;

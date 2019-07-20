@@ -30,7 +30,7 @@ struct au_io : std::enable_shared_from_this<au_io> {
         bool enable_output = true;
     };
 
-    virtual ~au_io() = default;
+    virtual ~au_io();
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
     void set_device(audio::device const &);

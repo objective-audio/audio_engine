@@ -36,6 +36,8 @@ struct audio::engine::au::core {
 audio::engine::au::au(node_args &&args) : _node(make_node(std::move(args))), _core(std::make_unique<core>()) {
 }
 
+audio::engine::au::~au() = default;
+
 void audio::engine::au::set_prepare_unit_handler(prepare_unit_f handler) {
     this->_prepare_unit_handler = std::move(handler);
 }

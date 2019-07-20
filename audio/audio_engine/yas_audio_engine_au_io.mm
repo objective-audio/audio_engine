@@ -46,6 +46,8 @@ audio::engine::au_io::au_io(args args)
     });
 }
 
+audio::engine::au_io::~au_io() = default;
+
 void audio::engine::au_io::set_channel_map(channel_map_t const &map, direction const dir) {
     this->_channel_map[to_uint32(dir)] = map;
 
