@@ -97,20 +97,9 @@ struct unit : manageable_unit {
    protected:
     explicit unit(AudioComponentDescription const &acd);
 
+   private:
     std::optional<uint8_t> _graph_key = std::nullopt;
     std::optional<uint16_t> _key = std::nullopt;
-
-    void _initialize();
-    void _uninitialize();
-
-    virtual void initialize();
-    virtual void uninitialize();
-    virtual void set_graph_key(std::optional<uint8_t> const &);
-    virtual std::optional<uint8_t> const &graph_key() const;
-    virtual void set_key(std::optional<uint16_t> const &);
-    virtual std::optional<uint16_t> const &key() const;
-
-   private:
     AudioComponentDescription _acd = {0};
     bool _initialized = false;
     std::string _name;
@@ -119,8 +108,15 @@ struct unit : manageable_unit {
     unit(unit const &) = delete;
     unit &operator=(unit const &) = delete;
 
-    void create_raw_unit(AudioComponentDescription const &acd);
-    void dispose_raw_unit();
+    void _create_raw_unit(AudioComponentDescription const &acd);
+    void _dispose_raw_unit();
+
+    void initialize() override;
+    void uninitialize() override;
+    void set_graph_key(std::optional<uint8_t> const &) override;
+    std::optional<uint8_t> const &graph_key() const override;
+    void set_key(std::optional<uint16_t> const &) override;
+    std::optional<uint16_t> const &key() const override;
 };
 
 std::shared_ptr<audio::unit> make_unit(AudioComponentDescription const &acd);

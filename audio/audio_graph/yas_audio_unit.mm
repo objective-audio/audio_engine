@@ -161,12 +161,12 @@ OSType audio::unit::sub_type_default_io() {
 }
 
 audio::unit::unit(AudioComponentDescription const &acd) : _core(std::make_unique<core>()) {
-    this->create_raw_unit(acd);
+    this->_create_raw_unit(acd);
 }
 
 audio::unit::~unit() {
-    this->_uninitialize();
-    this->dispose_raw_unit();
+    this->uninitialize();
+    this->_dispose_raw_unit();
 }
 
 #pragma mark - accessor
@@ -563,40 +563,6 @@ void audio::unit::reset() {
     raise_if_raw_audio_error(AudioUnitReset(_core->raw_unit(), kAudioUnitScope_Global, 0));
 }
 
-void audio::unit::_initialize() {
-    if (this->_initialized) {
-        return;
-    }
-
-    auto au = this->_core->raw_unit();
-
-    if (!au) {
-        raise_with_reason(std::string(__PRETTY_FUNCTION__) + " - AudioUnit is null.");
-        return;
-    }
-
-    raise_if_raw_audio_error(AudioUnitInitialize(au));
-
-    this->_initialized = true;
-}
-
-void audio::unit::_uninitialize() {
-    if (!this->_initialized) {
-        return;
-    }
-
-    auto au = this->_core->raw_unit();
-
-    if (!au) {
-        raise_with_reason(std::string(__PRETTY_FUNCTION__) + " - AudioUnit is null.");
-        return;
-    }
-
-    raise_if_raw_audio_error(AudioUnitUninitialize(au));
-
-    this->_initialized = false;
-}
-
 #pragma mark - render thread
 
 void audio::unit::callback_render(render_parameters &render_parameters) {
@@ -637,7 +603,7 @@ audio::unit::raw_unit_result_t audio::unit::raw_unit_render(render_parameters &r
 
 #pragma mark - private
 
-void audio::unit::create_raw_unit(AudioComponentDescription const &acd) {
+void audio::unit::_create_raw_unit(AudioComponentDescription const &acd) {
     this->_acd = acd;
 
     AudioComponent component = AudioComponentFindNext(nullptr, &acd);
@@ -656,7 +622,7 @@ void audio::unit::create_raw_unit(AudioComponentDescription const &acd) {
     this->_core->set_raw_unit(au);
 }
 
-void audio::unit::dispose_raw_unit() {
+void audio::unit::_dispose_raw_unit() {
     AudioUnit au = this->_core->raw_unit();
 
     if (!au) {
@@ -671,51 +637,53 @@ void audio::unit::dispose_raw_unit() {
 }
 
 void audio::unit::initialize() {
-    throw std::runtime_error("must be overridden");
+    if (this->_initialized) {
+        return;
+    }
+
+    auto au = this->_core->raw_unit();
+
+    if (!au) {
+        raise_with_reason(std::string(__PRETTY_FUNCTION__) + " - AudioUnit is null.");
+        return;
+    }
+
+    raise_if_raw_audio_error(AudioUnitInitialize(au));
+
+    this->_initialized = true;
 }
 void audio::unit::uninitialize() {
-    throw std::runtime_error("must be overridden");
+    if (!this->_initialized) {
+        return;
+    }
+
+    auto au = this->_core->raw_unit();
+
+    if (!au) {
+        raise_with_reason(std::string(__PRETTY_FUNCTION__) + " - AudioUnit is null.");
+        return;
+    }
+
+    raise_if_raw_audio_error(AudioUnitUninitialize(au));
+
+    this->_initialized = false;
 }
-void audio::unit::set_graph_key(std::optional<uint8_t> const &) {
-    throw std::runtime_error("must be overridden");
+void audio::unit::set_graph_key(std::optional<uint8_t> const &key) {
+    this->_graph_key = key;
 }
 std::optional<uint8_t> const &audio::unit::graph_key() const {
-    throw std::runtime_error("must be overridden");
+    return this->_graph_key;
 }
-void audio::unit::set_key(std::optional<uint16_t> const &) {
-    throw std::runtime_error("must be overridden");
+void audio::unit::set_key(std::optional<uint16_t> const &key) {
+    this->_key = key;
 }
 std::optional<uint16_t> const &audio::unit::key() const {
-    throw std::runtime_error("must be overridden");
+    return this->_key;
 }
 
 namespace yas::audio {
 struct unit_factory : unit {
     explicit unit_factory(AudioComponentDescription const &acd) : unit(acd) {
-    }
-
-    void initialize() override {
-        this->_initialize();
-    }
-
-    void uninitialize() override {
-        this->_uninitialize();
-    }
-
-    void set_graph_key(std::optional<uint8_t> const &key) override {
-        this->_graph_key = key;
-    }
-
-    std::optional<uint8_t> const &graph_key() const override {
-        return this->_graph_key;
-    }
-
-    void set_key(std::optional<uint16_t> const &key) override {
-        this->_key = key;
-    }
-
-    std::optional<uint16_t> const &key() const override {
-        return this->_key;
     }
 };
 }
