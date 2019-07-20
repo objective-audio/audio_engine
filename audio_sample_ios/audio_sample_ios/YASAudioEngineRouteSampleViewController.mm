@@ -34,7 +34,7 @@ typedef NS_ENUM(NSUInteger, YASAudioEngineRouteSampleSourceIndex) {
 
 namespace yas::sample {
 struct route_vc_internal {
-    audio::engine::manager manager;
+    std::shared_ptr<audio::engine::manager> manager = audio::engine::make_manager();
     std::shared_ptr<audio::engine::au_io> au_io = audio::engine::make_au_io();
     std::shared_ptr<audio::engine::au_mixer> au_mixer = audio::engine::make_au_mixer();
     std::shared_ptr<audio::engine::route> route = audio::engine::make_route();
@@ -43,10 +43,10 @@ struct route_vc_internal {
     chaining::any_observer_ptr engine_observer = nullptr;
 
     void disconnectNodes() {
-        manager.disconnect(au_mixer->au().node());
-        manager.disconnect(route->node());
-        manager.disconnect(sine_tap->node());
-        manager.disconnect(au_io->au().node());
+        manager->disconnect(au_mixer->au().node());
+        manager->disconnect(route->node());
+        manager->disconnect(sine_tap->node());
+        manager->disconnect(au_io->au().node());
     }
 
     void connect_nodes() {
@@ -54,10 +54,10 @@ struct route_vc_internal {
 
         auto const format = audio::format({.sample_rate = sample_rate, .channel_count = 2});
 
-        manager.connect(au_mixer->au().node(), au_io->au().node(), format);
-        manager.connect(route->node(), au_mixer->au().node(), format);
-        manager.connect(sine_tap->node(), route->node(), 0, YASAudioEngineRouteSampleSourceIndexSine, format);
-        manager.connect(au_io->au().node(), route->node(), 1, YASAudioEngineRouteSampleSourceIndexInput, format);
+        manager->connect(au_mixer->au().node(), au_io->au().node(), format);
+        manager->connect(route->node(), au_mixer->au().node(), format);
+        manager->connect(sine_tap->node(), route->node(), 0, YASAudioEngineRouteSampleSourceIndexSine, format);
+        manager->connect(au_io->au().node(), route->node(), 1, YASAudioEngineRouteSampleSourceIndexInput, format);
     }
 };
 }
@@ -85,7 +85,7 @@ struct route_vc_internal {
         if ([[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayAndRecord error:&error]) {
             [self setupEngine];
 
-            auto const start_result = _internal.manager.start_render();
+            auto const start_result = _internal.manager->start_render();
             if (start_result) {
                 [self.tableView reloadData];
                 [self _updateSlider];
@@ -109,7 +109,7 @@ struct route_vc_internal {
 
     if (self.isMovingFromParentViewController) {
         if (_internal.manager) {
-            _internal.manager.stop();
+            _internal.manager->stop();
         }
 
         [[AVAudioSession sharedInstance] setActive:NO error:nil];
@@ -257,7 +257,7 @@ struct route_vc_internal {
     auto unowned_self = make_objc_ptr([[YASUnownedObject alloc] initWithObject:self]);
 
     _internal.engine_observer =
-        _internal.manager.chain(audio::engine::manager::method::configuration_change)
+        _internal.manager->chain(audio::engine::manager::method::configuration_change)
             .perform([unowned_self](auto const &) {
                 if ([UIApplication sharedApplication].applicationState == UIApplicationStateActive) {
                     [[unowned_self.object() object] _updateEngine];

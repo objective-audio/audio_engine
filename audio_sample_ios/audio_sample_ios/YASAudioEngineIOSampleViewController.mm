@@ -33,7 +33,7 @@ typedef NS_ENUM(NSUInteger, YASAudioEngineIOSampleSection) {
 
 namespace yas::sample {
 struct engine_io_vc_internal {
-    audio::engine::manager manager;
+    std::shared_ptr<audio::engine::manager> manager = audio::engine::make_manager();
     std::shared_ptr<audio::engine::au_mixer> au_mixer = audio::engine::make_au_mixer();
     std::shared_ptr<audio::engine::au_io> au_io = audio::engine::make_au_io();
 
@@ -113,7 +113,7 @@ struct engine_io_vc_internal {
         if (!error) {
             [self setupEngine];
 
-            auto const start_result = _internal.manager.start_render();
+            auto const start_result = _internal.manager->start_render();
             if (start_result) {
                 [self.tableView reloadData];
                 [self _updateSlider];
@@ -137,7 +137,7 @@ struct engine_io_vc_internal {
 
     if (self.isMovingFromParentViewController) {
         if (_internal.manager) {
-            _internal.manager.stop();
+            _internal.manager->stop();
         }
 
         [[AVAudioSession sharedInstance] setActive:NO error:nil];
@@ -200,7 +200,7 @@ struct engine_io_vc_internal {
     auto unowned_self = make_objc_ptr([[YASUnownedObject alloc] initWithObject:self]);
 
     _internal.engine_observer =
-        _internal.manager.chain(audio::engine::manager::method::configuration_change)
+        _internal.manager->chain(audio::engine::manager::method::configuration_change)
             .perform([unowned_self](auto const &) {
                 if ([UIApplication sharedApplication].applicationState == UIApplicationStateActive) {
                     [[unowned_self.object() object] _updateEngine];
@@ -220,7 +220,7 @@ struct engine_io_vc_internal {
 }
 
 - (void)_disconnectNodes {
-    _internal.manager.disconnect(_internal.au_mixer->au().node());
+    _internal.manager->disconnect(_internal.au_mixer->au().node());
 }
 
 - (void)_connectNodes {
@@ -229,13 +229,13 @@ struct engine_io_vc_internal {
     auto const output_channel_count = _internal.connection_channel_count_for_direction(audio::direction::output);
     if (output_channel_count > 0) {
         auto output_format = audio::format({.sample_rate = sample_rate, .channel_count = output_channel_count});
-        _internal.manager.connect(_internal.au_mixer->au().node(), _internal.au_io->au().node(), output_format);
+        _internal.manager->connect(_internal.au_mixer->au().node(), _internal.au_io->au().node(), output_format);
     }
 
     auto const input_channel_count = _internal.connection_channel_count_for_direction(audio::direction::input);
     if (input_channel_count > 0) {
         auto input_format = audio::format({.sample_rate = sample_rate, .channel_count = input_channel_count});
-        _internal.manager.connect(_internal.au_io->au().node(), _internal.au_mixer->au().node(), input_format);
+        _internal.manager->connect(_internal.au_io->au().node(), _internal.au_mixer->au().node(), input_format);
     }
 }
 
@@ -361,8 +361,8 @@ struct engine_io_vc_internal {
         case YASAudioEngineIOSampleSectionNotify: {
             if (_internal.manager) {
                 auto &manager = _internal.manager;
-                manager.notifier().notify(
-                    std::make_pair(audio::engine::manager::method::configuration_change, manager));
+                manager->notifier().notify(
+                    std::make_pair(audio::engine::manager::method::configuration_change, *manager));
             }
         } break;
 

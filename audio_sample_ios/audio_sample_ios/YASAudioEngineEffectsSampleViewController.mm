@@ -27,7 +27,7 @@ static const AudioComponentDescription baseAcd = {.componentType = kAudioUnitTyp
 
 namespace yas::sample {
 struct effects_vc_internal {
-    audio::engine::manager manager;
+    std::shared_ptr<audio::engine::manager> manager = audio::engine::make_manager();
     std::shared_ptr<audio::engine::au_output> au_output = audio::engine::make_au_output();
     std::shared_ptr<audio::engine::connection> through_connection = nullptr;
     std::shared_ptr<audio::engine::tap> tap = audio::engine::make_tap();
@@ -35,12 +35,12 @@ struct effects_vc_internal {
 
     void replace_effect_au(const AudioComponentDescription *acd) {
         if (effect_au) {
-            manager.disconnect(effect_au->node());
+            manager->disconnect(effect_au->node());
             effect_au = nullptr;
         }
 
         if (through_connection) {
-            manager.disconnect(*through_connection);
+            manager->disconnect(*through_connection);
             through_connection = nullptr;
         }
 
@@ -48,11 +48,11 @@ struct effects_vc_internal {
 
         if (acd) {
             effect_au = audio::engine::make_au(*acd);
-            manager.connect(effect_au->node(), au_output->au_io().au().node(), format);
-            manager.connect(tap->node(), effect_au->node(), format);
+            manager->connect(effect_au->node(), au_output->au_io().au().node(), format);
+            manager->connect(tap->node(), effect_au->node(), format);
         } else {
             through_connection =
-                manager.connect(tap->node(), au_output->au_io().au().node(), format).shared_from_this();
+                manager->connect(tap->node(), au_output->au_io().au().node(), format).shared_from_this();
         }
     }
 };
@@ -75,7 +75,7 @@ struct effects_vc_internal {
         AVAudioSession *audioSession = [AVAudioSession sharedInstance];
         if ([audioSession setCategory:AVAudioSessionCategoryPlayback error:&error]) {
             [self setupAudioEngine];
-            auto start_result = _internal.manager.start_render();
+            auto start_result = _internal.manager->start_render();
             if (start_result) {
                 success = YES;
                 [self.tableView reloadData];
@@ -98,7 +98,7 @@ struct effects_vc_internal {
 
     if (self.isMovingFromParentViewController) {
         if (_internal.manager) {
-            _internal.manager.stop();
+            _internal.manager->stop();
         }
 
         NSError *error = nil;
