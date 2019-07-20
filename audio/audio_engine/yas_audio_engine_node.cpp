@@ -15,7 +15,7 @@ using namespace yas;
 #pragma mark - audio::engine::node::impl
 
 struct audio::engine::node::impl : base::impl {
-    weak<audio::engine::manager> _weak_manager;
+    std::weak_ptr<audio::engine::manager> _weak_manager;
     uint32_t _input_bus_count = 0;
     uint32_t _output_bus_count = 0;
     bool _is_input_renderable = false;
@@ -205,10 +205,11 @@ struct audio::engine::node::impl : base::impl {
     }
 
     audio::engine::manager manager() const {
-        return this->_weak_manager.lock();
+        std::shared_ptr<audio::engine::manager> shared = this->_weak_manager.lock();
+        return *shared;
     }
 
-    void set_manager(audio::engine::manager const &manager) {
+    void set_manager(std::shared_ptr<audio::engine::manager> const &manager) {
         this->_weak_manager = manager;
     }
 
@@ -406,7 +407,7 @@ void audio::engine::node::remove_connection(audio::engine::connection const &con
     impl_ptr<impl>()->remove_connection(connection);
 }
 
-void audio::engine::node::set_manager(audio::engine::manager const &manager) {
+void audio::engine::node::set_manager(std::shared_ptr<audio::engine::manager> const &manager) {
     impl_ptr<impl>()->set_manager(manager);
 }
 

@@ -92,7 +92,7 @@ struct node : base, std::enable_shared_from_this<node>, connectable_node, manage
     virtual void add_connection(audio::engine::connection &) override;
     virtual void remove_connection(audio::engine::connection const &) override;
 
-    virtual void set_manager(audio::engine::manager const &) override;
+    virtual void set_manager(std::shared_ptr<audio::engine::manager> const &) override;
     virtual void update_kernel() override;
     virtual void update_connections() override;
     virtual void set_add_to_graph_handler(graph_editing_f &&) override;

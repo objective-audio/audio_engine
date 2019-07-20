@@ -44,9 +44,7 @@ struct manager : base, std::enable_shared_from_this<manager> {
     using start_result_t = result<std::nullptr_t, start_error_t>;
     using add_result_t = result<std::nullptr_t, add_error_t>;
     using remove_result_t = result<std::nullptr_t, remove_error_t>;
-    using chaining_pair_t = std::pair<method, manager>;
-
-    manager(std::nullptr_t);
+    using chaining_pair_t = std::pair<method, std::shared_ptr<manager>>;
 
     virtual ~manager();
 
@@ -80,7 +78,7 @@ struct manager : base, std::enable_shared_from_this<manager> {
     void stop();
 
     [[nodiscard]] chaining::chain_unsync_t<chaining_pair_t> chain() const;
-    [[nodiscard]] chaining::chain_relayed_unsync_t<manager, chaining_pair_t> chain(method const) const;
+    [[nodiscard]] chaining::chain_relayed_unsync_t<std::shared_ptr<manager>, chaining_pair_t> chain(method const) const;
 
     // for Test
     std::unordered_set<std::shared_ptr<node>> &nodes() const;

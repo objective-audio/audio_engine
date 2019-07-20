@@ -24,7 +24,7 @@ using namespace yas;
 #pragma mark - audio::engine::manager::impl
 
 struct audio::engine::manager::impl : base::impl {
-    weak<manager> _weak_manager;
+    std::weak_ptr<manager> _weak_manager;
     chaining::notifier<chaining_pair_t> _notifier;
 
     ~impl() {
@@ -38,13 +38,13 @@ struct audio::engine::manager::impl : base::impl {
 #endif
     }
 
-    void prepare(manager const &manager) {
-        this->_weak_manager = manager;
+    void prepare(manager &manager) {
+        this->_weak_manager = manager.shared_from_this();
 
 #if TARGET_OS_IPHONE
         auto reset_lambda = [weak_manager = _weak_manager](NSNotification *note) {
             if (auto engine = weak_manager.lock()) {
-                engine.impl_ptr<impl>()->reload_graph();
+                engine->impl_ptr<impl>()->reload_graph();
             }
         };
 
@@ -57,7 +57,7 @@ struct audio::engine::manager::impl : base::impl {
 
         auto route_change_lambda = [weak_manager = this->_weak_manager](NSNotification *note) {
             if (auto engine = weak_manager.lock()) {
-                engine.impl_ptr<impl>()->post_configuration_change();
+                engine->impl_ptr<impl>()->post_configuration_change();
             }
         };
 
@@ -72,7 +72,7 @@ struct audio::engine::manager::impl : base::impl {
         this->_device_system_observer = device::system_chain(device::system_method::configuration_change)
                                             .perform([weak_manager = this->_weak_manager](auto const &) {
                                                 if (auto engine = weak_manager.lock()) {
-                                                    engine.impl_ptr<impl>()->post_configuration_change();
+                                                    engine->impl_ptr<impl>()->post_configuration_change();
                                                 }
                                             })
                                             .end();
@@ -111,7 +111,7 @@ struct audio::engine::manager::impl : base::impl {
 
         this->remove_node_from_graph(node);
 
-        node.manageable()->set_manager(manager{nullptr});
+        node.manageable()->set_manager(nullptr);
 
         this->_nodes.erase(shared_node);
     }
@@ -477,9 +477,6 @@ audio::engine::manager::manager() : base(std::make_shared<impl>()) {
     impl_ptr<impl>()->prepare(*this);
 }
 
-audio::engine::manager::manager(std::nullptr_t) : base(nullptr) {
-}
-
 audio::engine::manager::~manager() = default;
 
 audio::engine::connection &audio::engine::manager::connect(audio::engine::node &source_node,
@@ -603,7 +600,7 @@ chaining::chain_unsync_t<audio::engine::manager::chaining_pair_t> audio::engine:
     return impl_ptr<impl>()->_notifier.chain();
 }
 
-chaining::chain_relayed_unsync_t<audio::engine::manager, audio::engine::manager::chaining_pair_t>
+chaining::chain_relayed_unsync_t<std::shared_ptr<audio::engine::manager>, audio::engine::manager::chaining_pair_t>
 audio::engine::manager::chain(method const method) const {
     return impl_ptr<impl>()
         ->_notifier.chain()
