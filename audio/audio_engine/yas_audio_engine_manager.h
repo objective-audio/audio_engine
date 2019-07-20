@@ -108,7 +108,7 @@ struct manager : std::enable_shared_from_this<manager> {
     void _detach_node(audio::engine::node &node);
     void _detach_node_if_unused(audio::engine::node &node);
     bool _prepare_graph();
-    void disconnect_node_with_predicate(std::function<bool(connection const &)> predicate);
+    void _disconnect_node_with_predicate(std::function<bool(connection const &)> predicate);
     void add_node_to_graph(audio::engine::node &node);
     void remove_node_from_graph(audio::engine::node &node);
     bool add_connection(audio::engine::connection &connection);

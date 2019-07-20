@@ -150,26 +150,26 @@ void audio::engine::manager::disconnect(audio::engine::node &node) {
 
 void audio::engine::manager::disconnect_input(audio::engine::node const &node) {
     auto shared_node = node.shared_from_this();
-    this->disconnect_node_with_predicate(
+    this->_disconnect_node_with_predicate(
         [shared_node](connection const &connection) { return (connection.destination_node() == shared_node); });
 }
 
 void audio::engine::manager::disconnect_input(audio::engine::node const &node, uint32_t const bus_idx) {
     auto shared_node = node.shared_from_this();
-    this->disconnect_node_with_predicate([shared_node, bus_idx](auto const &connection) {
+    this->_disconnect_node_with_predicate([shared_node, bus_idx](auto const &connection) {
         return (connection.destination_node() == shared_node && connection.destination_bus == bus_idx);
     });
 }
 
 void audio::engine::manager::disconnect_output(audio::engine::node const &node) {
     auto shared_node = node.shared_from_this();
-    this->disconnect_node_with_predicate(
+    this->_disconnect_node_with_predicate(
         [shared_node](connection const &connection) { return (connection.source_node() == shared_node); });
 }
 
 void audio::engine::manager::disconnect_output(audio::engine::node const &node, uint32_t const bus_idx) {
     auto shared_node = node.shared_from_this();
-    this->disconnect_node_with_predicate([shared_node, bus_idx](auto const &connection) {
+    this->_disconnect_node_with_predicate([shared_node, bus_idx](auto const &connection) {
         return (connection.source_node() == shared_node && connection.source_bus == bus_idx);
     });
 }
@@ -360,7 +360,7 @@ void audio::engine::manager::_detach_node(audio::engine::node &node) {
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : node is not attached.");
     }
 
-    this->disconnect_node_with_predicate([&shared_node](connection const &connection) {
+    this->_disconnect_node_with_predicate([&shared_node](connection const &connection) {
         return (connection.destination_node() == shared_node || connection.source_node() == shared_node);
     });
 
@@ -413,7 +413,7 @@ bool audio::engine::manager::_prepare_graph() {
     return true;
 }
 
-void audio::engine::manager::disconnect_node_with_predicate(std::function<bool(connection const &)> predicate) {
+void audio::engine::manager::_disconnect_node_with_predicate(std::function<bool(connection const &)> predicate) {
     auto connections =
         filter(this->_connections, [&predicate](auto const &connection) { return predicate(*connection); });
 
