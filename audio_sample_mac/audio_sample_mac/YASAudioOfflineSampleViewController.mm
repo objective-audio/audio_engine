@@ -119,12 +119,12 @@ struct sine : base {
 
 namespace yas::sample {
 struct offline_vc_internal {
-    audio::engine::manager play_manager;
+    std::shared_ptr<audio::engine::manager> play_manager = audio::engine::make_manager();
     std::shared_ptr<audio::engine::au_output> play_au_output = audio::engine::make_au_output();
     std::shared_ptr<audio::engine::au_mixer> play_au_mixer = audio::engine::make_au_mixer();
     offline_sample::engine::sine play_sine;
 
-    audio::engine::manager offline_manager;
+    std::shared_ptr<audio::engine::manager> offline_manager = audio::engine::make_manager();
     std::shared_ptr<audio::engine::au_mixer> offline_au_mixer = audio::engine::make_au_mixer();
     offline_sample::engine::sine offline_sine;
 
@@ -142,11 +142,12 @@ struct offline_vc_internal {
         this->play_au_mixer->set_output_volume(1.0f, 0);
         this->play_au_mixer->set_output_pan(0.0f, 0);
 
-        this->play_manager.connect(this->play_au_mixer->au().node(), this->play_au_output->au_io().au().node(), format);
-        this->play_manager.connect(this->play_sine.tap().node(), this->play_au_mixer->au().node(), format);
+        this->play_manager->connect(this->play_au_mixer->au().node(), this->play_au_output->au_io().au().node(),
+                                    format);
+        this->play_manager->connect(this->play_sine.tap().node(), this->play_au_mixer->au().node(), format);
 
-        this->offline_manager.add_offline_output();
-        std::shared_ptr<audio::engine::offline_output> &offline_output = this->offline_manager.offline_output();
+        this->offline_manager->add_offline_output();
+        std::shared_ptr<audio::engine::offline_output> &offline_output = this->offline_manager->offline_output();
 
         this->offline_au_mixer->au().node().reset();
         this->offline_au_mixer->set_input_pan(0.0f, 0);
@@ -154,10 +155,10 @@ struct offline_vc_internal {
         this->offline_au_mixer->set_output_volume(1.0f, 0);
         this->offline_au_mixer->set_output_pan(0.0f, 0);
 
-        this->offline_manager.connect(this->offline_au_mixer->au().node(), offline_output->node(), format);
-        this->offline_manager.connect(this->offline_sine.tap().node(), this->offline_au_mixer->au().node(), format);
+        this->offline_manager->connect(this->offline_au_mixer->au().node(), offline_output->node(), format);
+        this->offline_manager->connect(this->offline_sine.tap().node(), this->offline_au_mixer->au().node(), format);
 
-        this->engine_observer = this->play_manager.chain(audio::engine::manager::method::configuration_change)
+        this->engine_observer = this->play_manager->chain(audio::engine::manager::method::configuration_change)
                                     .perform([weak_play_au_output = to_weak(play_au_output)](auto const &) {
                                         if (auto play_au_output = weak_play_au_output.lock()) {
                                             if (auto const device = audio::device::default_output_device()) {
@@ -186,7 +187,7 @@ struct offline_vc_internal {
 - (void)viewDidAppear {
     [super viewDidAppear];
 
-    if (_internal.play_manager && !_internal.play_manager.start_render()) {
+    if (_internal.play_manager && !_internal.play_manager->start_render()) {
         NSLog(@"%s error", __PRETTY_FUNCTION__);
     }
 }
@@ -194,7 +195,7 @@ struct offline_vc_internal {
 - (void)viewWillDisappear {
     [super viewWillDisappear];
 
-    _internal.play_manager.stop();
+    _internal.play_manager->stop();
 }
 
 - (void)setVolume:(float)volume {
@@ -265,7 +266,7 @@ struct offline_vc_internal {
     auto unowned_self = make_objc_ptr([[YASUnownedObject<YASAudioOfflineSampleViewController *> alloc] init]);
     [unowned_self.object() setObject:self];
 
-    auto start_result = _internal.offline_manager.start_offline_render(
+    auto start_result = _internal.offline_manager->start_offline_render(
         [remain, file_writer = std::move(file_writer)](auto args) mutable {
             auto &buffer = args.buffer;
 
