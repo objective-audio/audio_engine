@@ -8,6 +8,7 @@
 #include <ostream>
 #include "yas_audio_engine_connection.h"
 #include "yas_audio_engine_offline_output_protocol.h"
+#include "yas_audio_graph.h"
 #include "yas_audio_types.h"
 
 namespace yas {
@@ -80,8 +81,8 @@ struct manager : std::enable_shared_from_this<manager> {
     [[nodiscard]] chaining::chain_relayed_unsync_t<std::shared_ptr<manager>, chaining_pair_t> chain(method const) const;
 
     // for Test
-    std::unordered_set<std::shared_ptr<node>> &nodes() const;
-    audio::engine::connection_set &connections() const;
+    std::unordered_set<std::shared_ptr<node>> const &nodes() const;
+    audio::engine::connection_set const &connections() const;
     chaining::notifier<chaining_pair_t> &notifier();
 
    protected:
@@ -91,6 +92,37 @@ struct manager : std::enable_shared_from_this<manager> {
 
    private:
     std::unique_ptr<impl> _impl;
+    chaining::notifier<chaining_pair_t> _notifier;
+#if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
+    std::shared_ptr<audio::engine::device_io> _device_io = nullptr;
+    chaining::any_observer_ptr _device_system_observer = nullptr;
+#endif
+
+    audio::graph _graph = nullptr;
+    std::unordered_set<std::shared_ptr<node>> _nodes;
+    audio::engine::connection_set _connections;
+    std::shared_ptr<audio::engine::offline_output> _offline_output = nullptr;
+
+    bool _node_exists(audio::engine::node &node);
+    void _attach_node(audio::engine::node &node);
+    void _detach_node(audio::engine::node &node);
+    void _detach_node_if_unused(audio::engine::node &node);
+    bool _prepare_graph();
+    void disconnect_node_with_predicate(std::function<bool(connection const &)> predicate);
+    void add_node_to_graph(audio::engine::node &node);
+    void remove_node_from_graph(audio::engine::node &node);
+    bool add_connection(audio::engine::connection &connection);
+    void remove_connection_from_nodes(audio::engine::connection const &connection);
+    void update_node_connections(audio::engine::node &node);
+    void update_all_node_connections();
+    audio::engine::connection_set input_connections_for_destination_node(
+        std::shared_ptr<audio::engine::node> const &node);
+    audio::engine::connection_set output_connections_for_source_node(std::shared_ptr<audio::engine::node> const &node);
+    void reload_graph();
+#if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
+    void set_device_io(std::shared_ptr<audio::engine::device_io> &&node);
+#endif
+    void post_configuration_change();
 };
 
 std::shared_ptr<manager> make_manager();
