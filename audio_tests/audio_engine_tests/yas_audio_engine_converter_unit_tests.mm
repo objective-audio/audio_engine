@@ -34,7 +34,7 @@ using namespace yas;
                                                    .channel_count = 2,
                                                    .pcm_format = pcm_format,
                                                    .interleaved = interleaved});
-                auto manageable_unit = std::dynamic_pointer_cast<audio::manageable_unit>(converter_unit);
+                auto manageable_unit = converter_unit->manageable();
                 XCTAssertNoThrow(manageable_unit->initialize());
                 XCTAssertNoThrow(converter_unit->set_output_format(format.stream_description(), 0));
                 XCTAssertNoThrow(converter_unit->set_input_format(format.stream_description(), 0));

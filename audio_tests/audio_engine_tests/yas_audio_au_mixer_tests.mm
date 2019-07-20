@@ -28,7 +28,7 @@ using namespace yas;
 
 - (void)test_set_format_success {
     auto mixer_unit = audio::make_unit(kAudioUnitType_Mixer, kAudioUnitSubType_MultiChannelMixer);
-    auto manageable_unit = std::dynamic_pointer_cast<audio::manageable_unit>(mixer_unit);
+    auto manageable_unit = mixer_unit->manageable();
 
     /*
      Float32
@@ -82,7 +82,7 @@ using namespace yas;
 
 - (void)test_set_format_failed {
     auto mixer_unit = audio::make_unit(kAudioUnitType_Mixer, kAudioUnitSubType_MultiChannelMixer);
-    auto manageable_unit = std::dynamic_pointer_cast<audio::manageable_unit>(mixer_unit);
+    auto manageable_unit = mixer_unit->manageable();
 
     /*
      Initialized

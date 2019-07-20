@@ -158,7 +158,7 @@ struct audio::graph::impl : base::impl {
             throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
         }
 
-        auto manageable_unit = std::dynamic_pointer_cast<audio::manageable_unit>(unit);
+        auto manageable_unit = unit->manageable();
 
         if (manageable_unit->key()) {
             throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : unit.key is not null.");
@@ -181,7 +181,7 @@ struct audio::graph::impl : base::impl {
     void remove_unit_from_units(std::shared_ptr<audio::unit> &unit) {
         std::lock_guard<std::recursive_mutex> lock(_mutex);
 
-        auto manageable_unit = std::dynamic_pointer_cast<audio::manageable_unit>(unit);
+        auto manageable_unit = unit->manageable();
 
         if (auto key = manageable_unit->key()) {
             this->_units.erase(*key);
@@ -192,7 +192,7 @@ struct audio::graph::impl : base::impl {
     }
 
     void add_unit(std::shared_ptr<audio::unit> &unit) {
-        auto manageable_unit = std::dynamic_pointer_cast<audio::manageable_unit>(unit);
+        auto manageable_unit = unit->manageable();
 
         if (manageable_unit->key()) {
             throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : unit.key is already assigned.");
@@ -208,7 +208,7 @@ struct audio::graph::impl : base::impl {
     }
 
     void remove_unit(std::shared_ptr<audio::unit> &unit) {
-        auto manageable_unit = std::dynamic_pointer_cast<audio::manageable_unit>(unit);
+        auto manageable_unit = unit->manageable();
 
         manageable_unit->uninitialize();
 

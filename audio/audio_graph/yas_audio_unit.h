@@ -18,7 +18,7 @@ class result;
 }
 
 namespace yas::audio {
-struct unit : manageable_unit {
+struct unit : manageable_unit, std::enable_shared_from_this<unit> {
     class core;
     class parameter;
     using parameter_map_t = std::unordered_map<AudioUnitParameterID, parameter>;
@@ -88,6 +88,8 @@ struct unit : manageable_unit {
     void start();  // for io
     void stop();   // for io
     void reset();
+
+    std::shared_ptr<manageable_unit> manageable();
 
     // render thread
 
