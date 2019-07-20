@@ -24,7 +24,7 @@ namespace yas::audio::engine {
 class device_io;
 class offline_output;
 
-class manager final : public base {
+struct manager : base, std::enable_shared_from_this<manager> {
     class impl;
 
    public:
