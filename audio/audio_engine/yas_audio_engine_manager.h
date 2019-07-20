@@ -88,6 +88,8 @@ struct manager : base, std::enable_shared_from_this<manager> {
     audio::engine::connection_set &connections() const;
     chaining::notifier<chaining_pair_t> &notifier();
 };
+
+std::shared_ptr<manager> make_manager();
 }  // namespace yas::audio::engine
 
 namespace yas {

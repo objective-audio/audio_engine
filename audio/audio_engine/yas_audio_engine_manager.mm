@@ -623,6 +623,14 @@ chaining::notifier<audio::engine::manager::chaining_pair_t> &audio::engine::mana
     return impl_ptr<impl>()->_notifier;
 }
 
+namespace yas::audio::engine {
+struct manager_factory : manager {};
+}
+
+std::shared_ptr<audio::engine::manager> audio::engine::make_manager() {
+    return std::make_shared<manager_factory>();
+}
+
 std::string yas::to_string(audio::engine::manager::method const &method) {
     switch (method) {
         case audio::engine::manager::method::configuration_change:
