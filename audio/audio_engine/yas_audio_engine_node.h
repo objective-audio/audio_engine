@@ -36,7 +36,7 @@ struct node : base, std::enable_shared_from_this<node>, connectable_node, manage
         update_connections,
     };
 
-    using chaining_pair_t = std::pair<method, node>;
+    using chaining_pair_t = std::pair<method, std::shared_ptr<node>>;
 
     struct render_args {
         audio::pcm_buffer &buffer;
@@ -80,7 +80,7 @@ struct node : base, std::enable_shared_from_this<node>, connectable_node, manage
     void set_render_time_on_render(audio::time const &time);
 
     [[nodiscard]] chaining::chain_unsync_t<chaining_pair_t> chain() const;
-    [[nodiscard]] chaining::chain_relayed_unsync_t<node, chaining_pair_t> chain(method const) const;
+    [[nodiscard]] chaining::chain_relayed_unsync_t<std::shared_ptr<node>, chaining_pair_t> chain(method const) const;
 
     std::shared_ptr<connectable_node> connectable();
     std::shared_ptr<manageable_node> manageable();
@@ -100,10 +100,10 @@ struct node : base, std::enable_shared_from_this<node>, connectable_node, manage
     virtual graph_editing_f const &add_to_graph_handler() const override;
     virtual graph_editing_f const &remove_from_graph_handler() const override;
 
-    //            node(node &&) = delete;
-    //            node &operator=(node &&) = delete;
-    //            node(node const &) = delete;
-    //            node &operator=(node const &) = delete;
+    node(node &&) = delete;
+    node &operator=(node &&) = delete;
+    node(node const &) = delete;
+    node &operator=(node const &) = delete;
 };
 
 std::shared_ptr<node> make_node(node_args);

@@ -35,8 +35,8 @@ struct audio::engine::node::impl : base::impl {
           _override_output_bus_idx(args.override_output_bus_idx) {
     }
 
-    void reset() {
-        this->_notifier.notify(std::make_pair(method::will_reset, cast<audio::engine::node>()));
+    void reset(audio::engine::node &node) {
+        this->_notifier.notify(std::make_pair(method::will_reset, node.shared_from_this()));
 
         this->_input_connections.clear();
         this->_output_connections.clear();
@@ -145,8 +145,8 @@ struct audio::engine::node::impl : base::impl {
         return this->_output_connections;
     }
 
-    void update_connections() {
-        this->_notifier.notify(std::make_pair(method::update_connections, cast<audio::engine::node>()));
+    void update_connections(audio::engine::node &node) {
+        this->_notifier.notify(std::make_pair(method::update_connections, node.shared_from_this()));
     }
 
     void add_connection(engine::connection &connection) {
@@ -293,7 +293,7 @@ void audio::engine::node::reset() {
     if (!impl_ptr()) {
         std::cout << "_impl is null" << std::endl;
     }
-    impl_ptr<impl>()->reset();
+    impl_ptr<impl>()->reset(*this);
 }
 
 std::shared_ptr<audio::engine::connection> audio::engine::node::input_connection(uint32_t const bus_idx) const {
@@ -382,8 +382,8 @@ chaining::chain_unsync_t<audio::engine::node::chaining_pair_t> audio::engine::no
     return impl_ptr<impl>()->_notifier.chain();
 }
 
-chaining::chain_relayed_unsync_t<audio::engine::node, audio::engine::node::chaining_pair_t> audio::engine::node::chain(
-    method const method) const {
+chaining::chain_relayed_unsync_t<std::shared_ptr<audio::engine::node>, audio::engine::node::chaining_pair_t>
+audio::engine::node::chain(method const method) const {
     return impl_ptr<impl>()
         ->_notifier.chain()
         .guard([method](auto const &pair) { return pair.first == method; })
@@ -415,7 +415,7 @@ void audio::engine::node::update_kernel() {
 }
 
 void audio::engine::node::update_connections() {
-    impl_ptr<impl>()->update_connections();
+    impl_ptr<impl>()->update_connections(*this);
 }
 
 void audio::engine::node::set_add_to_graph_handler(graph_editing_f &&handler) {
