@@ -129,13 +129,13 @@ using namespace yas;
 
 - (void)test_set_manager {
     auto node = audio::engine::make_node({});
-    audio::engine::manager manager;
+    auto manager = audio::engine::make_manager();
 
     XCTAssertFalse(node->manager());
 
-    node->manageable()->set_manager(manager);
+    node->manageable()->set_manager(*manager);
 
-    XCTAssertEqual(manager, node->manager());
+    XCTAssertEqual(*manager, node->manager());
 
     node->manageable()->set_manager(audio::engine::manager{nullptr});
 

@@ -27,11 +27,11 @@ using namespace yas;
 }
 
 - (void)test_restore_parameters {
-    audio::engine::manager manager;
-    manager.add_offline_output();
+    auto manager = audio::engine::make_manager();
+    manager->add_offline_output();
 
     auto format = audio::format({.sample_rate = 44100.0, .channel_count = 2});
-    std::shared_ptr<audio::engine::offline_output> &output = manager.offline_output();
+    std::shared_ptr<audio::engine::offline_output> &output = manager->offline_output();
     auto delay_au = audio::engine::make_au(kAudioUnitType_Effect, kAudioUnitSubType_Delay);
 
     auto const &parameters = delay_au->parameters();
@@ -43,12 +43,12 @@ using namespace yas;
         XCTAssertEqual(parameter.default_value, delay_au->global_parameter_value(parameter.parameter_id));
     }
 
-    auto &connection = manager.connect(delay_au->node(), output->node(), format);
+    auto &connection = manager->connect(delay_au->node(), output->node(), format);
 
     XCTestExpectation *expectation = [self expectationWithDescription:@"First Render"];
 
     auto start_result =
-        manager.start_offline_render(nullptr, [expectation](bool const cancelled) { [expectation fulfill]; });
+        manager->start_offline_render(nullptr, [expectation](bool const cancelled) { [expectation fulfill]; });
 
     XCTAssertTrue(start_result);
 
@@ -67,29 +67,29 @@ using namespace yas;
     XCTAssertEqual(delay_au->global_parameter_value(kDelayParam_LopassCutoff), lopass_cutoff_value);
     XCTAssertEqual(delay_au->global_parameter_value(kDelayParam_WetDryMix), wet_dry_mix);
 
-    manager.stop();
+    manager->stop();
 
     [self waitForExpectationsWithTimeout:10.0
                                  handler:^(NSError *error){
 
                                  }];
 
-    manager.disconnect(connection);
+    manager->disconnect(connection);
 
     delay_au->manageable()->reload_unit();
 
-    manager.connect(delay_au->node(), output->node(), format);
+    manager->connect(delay_au->node(), output->node(), format);
 
     expectation = [self expectationWithDescription:@"Second Render"];
 
-    manager.start_offline_render(nullptr, [expectation](bool const cancelled) { [expectation fulfill]; });
+    manager->start_offline_render(nullptr, [expectation](bool const cancelled) { [expectation fulfill]; });
 
     XCTAssertEqual(delay_au->global_parameter_value(kDelayParam_DelayTime), delay_time_value);
     XCTAssertEqual(delay_au->global_parameter_value(kDelayParam_Feedback), feedback_value);
     XCTAssertEqual(delay_au->global_parameter_value(kDelayParam_LopassCutoff), lopass_cutoff_value);
     XCTAssertEqual(delay_au->global_parameter_value(kDelayParam_WetDryMix), wet_dry_mix);
 
-    manager.stop();
+    manager->stop();
 
     [self waitForExpectationsWithTimeout:10.0
                                  handler:^(NSError *error){

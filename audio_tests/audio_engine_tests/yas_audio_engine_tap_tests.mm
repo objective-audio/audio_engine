@@ -21,16 +21,16 @@ using namespace yas;
 }
 
 - (void)test_render_with_lambda {
-    audio::engine::manager manager;
-    manager.add_offline_output();
+    auto manager = audio::engine::make_manager();
+    manager->add_offline_output();
 
-    std::shared_ptr<audio::engine::offline_output> &output = manager.offline_output();
+    std::shared_ptr<audio::engine::offline_output> &output = manager->offline_output();
     auto to_tap = audio::engine::make_tap();
     auto from_tap = audio::engine::make_tap();
     auto const format = audio::format({.sample_rate = 48000.0, .channel_count = 2});
 
-    auto const &to_connection = manager.connect(to_tap->node(), output->node(), format);
-    auto const &from_connection = manager.connect(from_tap->node(), to_tap->node(), format);
+    auto const &to_connection = manager->connect(to_tap->node(), output->node(), format);
+    auto const &from_connection = manager->connect(from_tap->node(), to_tap->node(), format);
 
     XCTestExpectation *to_expectation = [self expectationWithDescription:@"to node"];
     XCTestExpectation *from_expectation = [self expectationWithDescription:@"from node"];
@@ -63,7 +63,7 @@ using namespace yas;
 
     from_tap->set_render_handler([from_expectation](auto) { [from_expectation fulfill]; });
 
-    XCTAssertTrue(manager.start_offline_render(
+    XCTAssertTrue(manager->start_offline_render(
         [](auto args) { return audio::continuation::abort; },
         [completion_expectation](auto const cancelled) { [completion_expectation fulfill]; }));
 
@@ -76,22 +76,22 @@ using namespace yas;
 }
 
 - (void)test_render_without_lambda {
-    audio::engine::manager manager;
-    manager.add_offline_output();
+    auto manager = audio::engine::make_manager();
+    manager->add_offline_output();
 
-    std::shared_ptr<audio::engine::offline_output> &output = manager.offline_output();
+    std::shared_ptr<audio::engine::offline_output> &output = manager->offline_output();
     auto to_tap = audio::engine::make_tap();
     auto from_tap = audio::engine::make_tap();
     auto const format = audio::format({.sample_rate = 48000.0, .channel_count = 2});
 
-    manager.connect(to_tap->node(), output->node(), format);
-    manager.connect(from_tap->node(), to_tap->node(), format);
+    manager->connect(to_tap->node(), output->node(), format);
+    manager->connect(from_tap->node(), to_tap->node(), format);
 
     XCTestExpectation *from_expectation = [self expectationWithDescription:@"from node"];
 
     from_tap->set_render_handler([from_expectation](auto) { [from_expectation fulfill]; });
 
-    XCTAssertTrue(manager.start_offline_render([](auto args) { return audio::continuation::abort; }, nullptr));
+    XCTAssertTrue(manager->start_offline_render([](auto args) { return audio::continuation::abort; }, nullptr));
 
     [self waitForExpectationsWithTimeout:0.5
                                  handler:^(NSError *error){

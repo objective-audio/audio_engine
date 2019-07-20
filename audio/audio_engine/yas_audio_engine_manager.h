@@ -46,7 +46,6 @@ struct manager : base, std::enable_shared_from_this<manager> {
     using remove_result_t = result<std::nullptr_t, remove_error_t>;
     using chaining_pair_t = std::pair<method, manager>;
 
-    manager();
     manager(std::nullptr_t);
 
     virtual ~manager();
@@ -87,6 +86,9 @@ struct manager : base, std::enable_shared_from_this<manager> {
     std::unordered_set<std::shared_ptr<node>> &nodes() const;
     audio::engine::connection_set &connections() const;
     chaining::notifier<chaining_pair_t> &notifier();
+
+   protected:
+    manager();
 };
 
 std::shared_ptr<manager> make_manager();
