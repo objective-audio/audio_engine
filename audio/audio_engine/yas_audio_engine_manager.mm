@@ -23,7 +23,7 @@ using namespace yas;
 
 #pragma mark - audio::engine::manager::impl
 
-struct audio::engine::manager::impl : base::impl {
+struct audio::engine::manager::impl {
     std::weak_ptr<manager> _weak_manager;
     chaining::notifier<chaining_pair_t> _notifier;
 
@@ -44,7 +44,7 @@ struct audio::engine::manager::impl : base::impl {
 #if TARGET_OS_IPHONE
         auto reset_lambda = [weak_manager = _weak_manager](NSNotification *note) {
             if (auto engine = weak_manager.lock()) {
-                engine->impl_ptr<impl>()->reload_graph();
+                engine->_impl->reload_graph();
             }
         };
 
@@ -57,7 +57,7 @@ struct audio::engine::manager::impl : base::impl {
 
         auto route_change_lambda = [weak_manager = this->_weak_manager](NSNotification *note) {
             if (auto engine = weak_manager.lock()) {
-                engine->impl_ptr<impl>()->post_configuration_change();
+                engine->_impl->post_configuration_change();
             }
         };
 
@@ -72,7 +72,7 @@ struct audio::engine::manager::impl : base::impl {
         this->_device_system_observer = device::system_chain(device::system_method::configuration_change)
                                             .perform([weak_manager = this->_weak_manager](auto const &) {
                                                 if (auto engine = weak_manager.lock()) {
-                                                    engine->impl_ptr<impl>()->post_configuration_change();
+                                                    engine->_impl->post_configuration_change();
                                                 }
                                             })
                                             .end();
@@ -473,8 +473,7 @@ struct audio::engine::manager::impl : base::impl {
 
 #pragma mark - audio::engine::manager
 
-audio::engine::manager::manager() : base(std::make_shared<impl>()) {
-    impl_ptr<impl>()->prepare(*this);
+audio::engine::manager::manager() : _impl(std::make_shared<impl>()) {
 }
 
 audio::engine::manager::~manager() = default;
@@ -500,73 +499,73 @@ audio::engine::connection &audio::engine::manager::connect(audio::engine::node &
                                                            audio::engine::node &destination_node,
                                                            uint32_t const src_bus_idx, uint32_t const dst_bus_idx,
                                                            audio::format const &format) {
-    return impl_ptr<impl>()->connect(source_node, destination_node, src_bus_idx, dst_bus_idx, format);
+    return this->_impl->connect(source_node, destination_node, src_bus_idx, dst_bus_idx, format);
 }
 
 void audio::engine::manager::disconnect(connection &connection) {
-    impl_ptr<impl>()->disconnect(connection);
+    this->_impl->disconnect(connection);
 }
 
 void audio::engine::manager::disconnect(audio::engine::node &node) {
-    impl_ptr<impl>()->disconnect(node);
+    this->_impl->disconnect(node);
 }
 
 void audio::engine::manager::disconnect_input(audio::engine::node const &node) {
     auto shared_node = node.shared_from_this();
-    impl_ptr<impl>()->disconnect_node_with_predicate(
+    this->_impl->disconnect_node_with_predicate(
         [shared_node](connection const &connection) { return (connection.destination_node() == shared_node); });
 }
 
 void audio::engine::manager::disconnect_input(audio::engine::node const &node, uint32_t const bus_idx) {
     auto shared_node = node.shared_from_this();
-    impl_ptr<impl>()->disconnect_node_with_predicate([shared_node, bus_idx](auto const &connection) {
+    this->_impl->disconnect_node_with_predicate([shared_node, bus_idx](auto const &connection) {
         return (connection.destination_node() == shared_node && connection.destination_bus == bus_idx);
     });
 }
 
 void audio::engine::manager::disconnect_output(audio::engine::node const &node) {
     auto shared_node = node.shared_from_this();
-    impl_ptr<impl>()->disconnect_node_with_predicate(
+    this->_impl->disconnect_node_with_predicate(
         [shared_node](connection const &connection) { return (connection.source_node() == shared_node); });
 }
 
 void audio::engine::manager::disconnect_output(audio::engine::node const &node, uint32_t const bus_idx) {
     auto shared_node = node.shared_from_this();
-    impl_ptr<impl>()->disconnect_node_with_predicate([shared_node, bus_idx](auto const &connection) {
+    this->_impl->disconnect_node_with_predicate([shared_node, bus_idx](auto const &connection) {
         return (connection.source_node() == shared_node && connection.source_bus == bus_idx);
     });
 }
 
 audio::engine::manager::add_result_t audio::engine::manager::add_offline_output() {
-    return impl_ptr<impl>()->add_offline_output();
+    return this->_impl->add_offline_output();
 }
 
 audio::engine::manager::remove_result_t audio::engine::manager::remove_offline_output() {
-    return impl_ptr<impl>()->remove_offline_output();
+    return this->_impl->remove_offline_output();
 }
 
 std::shared_ptr<audio::engine::offline_output> const &audio::engine::manager::offline_output() const {
-    return impl_ptr<impl>()->offline_output();
+    return this->_impl->offline_output();
 }
 
 std::shared_ptr<audio::engine::offline_output> &audio::engine::manager::offline_output() {
-    return impl_ptr<impl>()->offline_output();
+    return this->_impl->offline_output();
 }
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
 
 audio::engine::manager::add_result_t audio::engine::manager::add_device_io() {
-    if (impl_ptr<impl>()->_device_io) {
+    if (this->_impl->_device_io) {
         return add_result_t{add_error_t::already_added};
     } else {
-        impl_ptr<impl>()->set_device_io(audio::engine::make_device_io());
+        this->_impl->set_device_io(audio::engine::make_device_io());
         return add_result_t{nullptr};
     }
 }
 
 audio::engine::manager::remove_result_t audio::engine::manager::remove_device_io() {
-    if (impl_ptr<impl>()->_device_io) {
-        impl_ptr<impl>()->set_device_io(nullptr);
+    if (this->_impl->_device_io) {
+        this->_impl->set_device_io(nullptr);
         return remove_result_t{nullptr};
     } else {
         return remove_result_t{remove_error_t::already_removed};
@@ -574,58 +573,67 @@ audio::engine::manager::remove_result_t audio::engine::manager::remove_device_io
 }
 
 std::shared_ptr<audio::engine::device_io> const &audio::engine::manager::device_io() const {
-    return impl_ptr<impl>()->_device_io;
+    return this->_impl->_device_io;
 }
 
 std::shared_ptr<audio::engine::device_io> &audio::engine::manager::device_io() {
-    return impl_ptr<impl>()->_device_io;
+    return this->_impl->_device_io;
 }
 
 #endif
 
 audio::engine::manager::start_result_t audio::engine::manager::start_render() {
-    return impl_ptr<impl>()->start_render();
+    return this->_impl->start_render();
 }
 
 audio::engine::manager::start_result_t audio::engine::manager::start_offline_render(
     offline_render_f render_handler, offline_completion_f completion_handler) {
-    return impl_ptr<impl>()->start_offline_render(std::move(render_handler), std::move(completion_handler));
+    return this->_impl->start_offline_render(std::move(render_handler), std::move(completion_handler));
 }
 
 void audio::engine::manager::stop() {
-    impl_ptr<impl>()->stop();
+    this->_impl->stop();
 }
 
 chaining::chain_unsync_t<audio::engine::manager::chaining_pair_t> audio::engine::manager::chain() const {
-    return impl_ptr<impl>()->_notifier.chain();
+    return this->_impl->_notifier.chain();
 }
 
 chaining::chain_relayed_unsync_t<std::shared_ptr<audio::engine::manager>, audio::engine::manager::chaining_pair_t>
 audio::engine::manager::chain(method const method) const {
-    return impl_ptr<impl>()
-        ->_notifier.chain()
+    return this->_impl->_notifier.chain()
         .guard([method](auto const &pair) { return pair.first == method; })
         .to([](chaining_pair_t const &pair) { return pair.second; });
 }
 
 std::unordered_set<std::shared_ptr<audio::engine::node>> &audio::engine::manager::nodes() const {
-    return impl_ptr<impl>()->nodes();
+    return this->_impl->nodes();
 }
 
 audio::engine::connection_set &audio::engine::manager::connections() const {
-    return impl_ptr<impl>()->connections();
+    return this->_impl->connections();
 }
 
 chaining::notifier<audio::engine::manager::chaining_pair_t> &audio::engine::manager::notifier() {
-    return impl_ptr<impl>()->_notifier;
+    return this->_impl->_notifier;
+}
+
+void audio::engine::manager::prepare() {
+    this->_impl->prepare(*this);
 }
 
 namespace yas::audio::engine {
-struct manager_factory : manager {};
+struct manager_factory : manager {
+    void prepare() {
+        this->manager::prepare();
+    }
+};
 }
 
 std::shared_ptr<audio::engine::manager> audio::engine::make_manager() {
-    return std::make_shared<manager_factory>();
+    auto shared = std::make_shared<manager_factory>();
+    shared->prepare();
+    return shared;
 }
 
 std::string yas::to_string(audio::engine::manager::method const &method) {

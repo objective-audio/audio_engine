@@ -204,7 +204,7 @@ struct audio::engine::node::impl : base::impl {
         return this->_core.kernel();
     }
 
-    audio::engine::manager manager() const {
+    audio::engine::manager const &manager() const {
         std::shared_ptr<audio::engine::manager> shared = this->_weak_manager.lock();
         return *shared;
     }
@@ -337,7 +337,7 @@ bool audio::engine::node::is_available_output_bus(uint32_t const bus_idx) const 
     return impl_ptr<impl>()->is_available_output_bus(bus_idx);
 }
 
-audio::engine::manager audio::engine::node::manager() const {
+audio::engine::manager const &audio::engine::node::manager() const {
     return impl_ptr<impl>()->manager();
 }
 

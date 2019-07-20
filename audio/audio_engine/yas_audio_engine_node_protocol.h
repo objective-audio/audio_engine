@@ -36,7 +36,7 @@ struct manageable_node {
     virtual audio::engine::connection_wmap const &input_connections() const = 0;
     virtual audio::engine::connection_wmap const &output_connections() const = 0;
     virtual void set_manager(std::shared_ptr<audio::engine::manager> const &) = 0;
-    virtual audio::engine::manager manager() const = 0;
+    virtual audio::engine::manager const &manager() const = 0;
     virtual void update_kernel() = 0;
     virtual void update_connections() = 0;
     virtual void set_add_to_graph_handler(graph_editing_f &&) = 0;

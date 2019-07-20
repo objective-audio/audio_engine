@@ -64,7 +64,7 @@ struct node : base, std::enable_shared_from_this<node>, connectable_node, manage
     bus_result_t next_available_output_bus() const;
     bool is_available_input_bus(uint32_t const bus_idx) const;
     bool is_available_output_bus(uint32_t const bus_idx) const;
-    audio::engine::manager manager() const override;
+    audio::engine::manager const &manager() const override;
     std::optional<audio::time> last_render_time() const;
 
     uint32_t input_bus_count() const;

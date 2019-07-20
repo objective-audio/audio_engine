@@ -5,7 +5,6 @@
 #pragma once
 
 #include <chaining/yas_chaining_umbrella.h>
-#include <cpp_utils/yas_base.h>
 #include <ostream>
 #include "yas_audio_engine_connection.h"
 #include "yas_audio_engine_offline_output_protocol.h"
@@ -24,7 +23,7 @@ namespace yas::audio::engine {
 class device_io;
 class offline_output;
 
-struct manager : base, std::enable_shared_from_this<manager> {
+struct manager : std::enable_shared_from_this<manager> {
     class impl;
 
    public:
@@ -87,6 +86,11 @@ struct manager : base, std::enable_shared_from_this<manager> {
 
    protected:
     manager();
+
+    void prepare();
+
+   private:
+    std::shared_ptr<impl> _impl;
 };
 
 std::shared_ptr<manager> make_manager();
