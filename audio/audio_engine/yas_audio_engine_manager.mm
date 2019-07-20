@@ -473,7 +473,7 @@ struct audio::engine::manager::impl {
 
 #pragma mark - audio::engine::manager
 
-audio::engine::manager::manager() : _impl(std::make_shared<impl>()) {
+audio::engine::manager::manager() : _impl(std::make_unique<impl>()) {
 }
 
 audio::engine::manager::~manager() = default;

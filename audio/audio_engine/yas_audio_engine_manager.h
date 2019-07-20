@@ -90,7 +90,7 @@ struct manager : std::enable_shared_from_this<manager> {
     void prepare();
 
    private:
-    std::shared_ptr<impl> _impl;
+    std::unique_ptr<impl> _impl;
 };
 
 std::shared_ptr<manager> make_manager();
