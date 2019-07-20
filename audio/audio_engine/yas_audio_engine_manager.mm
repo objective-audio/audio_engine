@@ -34,8 +34,8 @@ struct audio::engine::manager::impl {
 #endif
     }
 
-    void prepare(std::weak_ptr<engine::manager> &manager) {
 #if TARGET_OS_IPHONE
+    void prepare(std::weak_ptr<engine::manager> &weak_manager) {
         auto reset_lambda = [weak_manager](NSNotification *note) {
             if (auto engine = weak_manager.lock()) {
                 engine->reload_graph();
@@ -323,7 +323,7 @@ void audio::engine::manager::prepare() {
 
     this->_impl->prepare(weak_manager);
 
-#if TARGET_OS_MAC
+#if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
     this->_device_system_observer = device::system_chain(device::system_method::configuration_change)
                                         .perform([weak_manager](auto const &) {
                                             if (auto engine = weak_manager.lock()) {
