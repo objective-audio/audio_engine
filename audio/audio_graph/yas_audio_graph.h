@@ -13,7 +13,7 @@ class unit;
 class device_io;
 #endif
 
-struct graph : base, std::enable_shared_from_this<graph> {
+struct graph : std::enable_shared_from_this<graph> {
     class impl;
 
     virtual ~graph();
@@ -38,6 +38,9 @@ struct graph : base, std::enable_shared_from_this<graph> {
     graph();
 
     void prepare();
+
+   private:
+    std::shared_ptr<impl> _impl;
 };
 
 std::shared_ptr<graph> make_graph();
