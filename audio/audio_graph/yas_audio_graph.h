@@ -16,8 +16,6 @@ class device_io;
 struct graph : base, std::enable_shared_from_this<graph> {
     class impl;
 
-    graph(std::nullptr_t);
-
     virtual ~graph();
 
     void add_unit(std::shared_ptr<audio::unit> &);

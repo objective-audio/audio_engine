@@ -312,9 +312,6 @@ struct audio::graph::impl : base::impl {
 audio::graph::graph() : base(impl::make_shared()) {
 }
 
-audio::graph::graph(std::nullptr_t) : base(nullptr) {
-}
-
 audio::graph::~graph() = default;
 
 void audio::graph::prepare() {
