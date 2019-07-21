@@ -13,7 +13,7 @@ class unit;
 class device_io;
 #endif
 
-struct graph : base {
+struct graph : base, std::enable_shared_from_this<graph> {
     class impl;
 
     graph();
