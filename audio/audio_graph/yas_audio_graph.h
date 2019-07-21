@@ -13,8 +13,7 @@ class unit;
 class device_io;
 #endif
 
-class graph final : public base {
-   public:
+struct graph : base {
     class impl;
 
     graph();
@@ -38,4 +37,6 @@ class graph final : public base {
     // render thread
     static void unit_render(render_parameters &render_parameters);
 };
+
+std::shared_ptr<graph> make_graph();
 }  // namespace yas::audio

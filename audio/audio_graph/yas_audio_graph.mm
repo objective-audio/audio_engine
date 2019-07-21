@@ -365,3 +365,11 @@ void audio::graph::unit_render(render_parameters &render_parameters) {
         }
     }
 }
+
+namespace yas::audio {
+struct graph_factory : graph {};
+}
+
+std::shared_ptr<audio::graph> audio::make_graph() {
+    return std::make_shared<graph_factory>();
+}
