@@ -16,7 +16,6 @@ class device_io;
 struct graph : base, std::enable_shared_from_this<graph> {
     class impl;
 
-    graph();
     graph(std::nullptr_t);
 
     virtual ~graph();
@@ -36,6 +35,11 @@ struct graph : base, std::enable_shared_from_this<graph> {
 
     // render thread
     static void unit_render(render_parameters &render_parameters);
+
+   protected:
+    graph();
+
+    void prepare();
 };
 
 std::shared_ptr<graph> make_graph();

@@ -21,7 +21,7 @@ using namespace yas;
 namespace yas::audio {
 static std::recursive_mutex global_mutex;
 static bool global_interrupting;
-static std::map<uint8_t, base::weak<graph>> global_graphs;
+static std::map<uint8_t, std::weak_ptr<graph>> global_graphs;
 #if TARGET_OS_IPHONE
 static objc_ptr<> global_did_become_active_observer;
 static objc_ptr<> global_interruption_observer;
@@ -105,8 +105,8 @@ struct audio::graph::impl : base::impl {
             std::lock_guard<std::recursive_mutex> lock(global_mutex);
             for (auto &pair : global_graphs) {
                 if (auto graph = pair.second.lock()) {
-                    if (graph.is_running()) {
-                        graph.impl_ptr<impl>()->start_all_ios();
+                    if (graph->is_running()) {
+                        graph->impl_ptr<impl>()->start_all_ios();
                     }
                 }
             }
@@ -119,14 +119,14 @@ struct audio::graph::impl : base::impl {
         std::lock_guard<std::recursive_mutex> lock(global_mutex);
         for (auto const &pair : global_graphs) {
             if (auto const graph = pair.second.lock()) {
-                graph.impl_ptr<impl>()->stop_all_ios();
+                graph->impl_ptr<impl>()->stop_all_ios();
             }
         }
     }
 
-    static void add_graph(graph const &graph) {
+    static void add_graph(graph &graph) {
         std::lock_guard<std::recursive_mutex> lock(global_mutex);
-        global_graphs.insert(std::make_pair(graph.impl_ptr<impl>()->key(), to_weak(graph)));
+        global_graphs.insert(std::make_pair(graph.impl_ptr<impl>()->key(), to_weak(graph.shared_from_this())));
     }
 
     static void remove_graph_for_key(uint8_t const key) {
@@ -134,7 +134,7 @@ struct audio::graph::impl : base::impl {
         global_graphs.erase(key);
     }
 
-    static graph graph_for_key(uint8_t const key) {
+    static std::shared_ptr<graph> graph_for_key(uint8_t const key) {
         std::lock_guard<std::recursive_mutex> lock(global_mutex);
         if (global_graphs.count(key) > 0) {
             auto weak_graph = global_graphs.at(key);
@@ -310,15 +310,18 @@ struct audio::graph::impl : base::impl {
 #pragma mark - main
 
 audio::graph::graph() : base(impl::make_shared()) {
-    if (impl_ptr()) {
-        impl::add_graph(*this);
-    }
 }
 
 audio::graph::graph(std::nullptr_t) : base(nullptr) {
 }
 
 audio::graph::~graph() = default;
+
+void audio::graph::prepare() {
+    if (impl_ptr()) {
+        impl::add_graph(*this);
+    }
+}
 
 void audio::graph::add_unit(std::shared_ptr<audio::unit> &unit) {
     impl_ptr<impl>()->add_unit(unit);
@@ -360,16 +363,22 @@ void audio::graph::unit_render(render_parameters &render_parameters) {
     raise_if_main_thread();
 
     if (auto graph = impl::graph_for_key(render_parameters.render_id.graph)) {
-        if (auto unit = graph.impl_ptr<impl>()->unit_for_key(render_parameters.render_id.unit)) {
+        if (auto unit = graph->impl_ptr<impl>()->unit_for_key(render_parameters.render_id.unit)) {
             unit->callback_render(render_parameters);
         }
     }
 }
 
 namespace yas::audio {
-struct graph_factory : graph {};
+struct graph_factory : graph {
+    void prepare() {
+        this->graph::prepare();
+    }
+};
 }
 
 std::shared_ptr<audio::graph> audio::make_graph() {
-    return std::make_shared<graph_factory>();
+    auto shared = std::make_shared<graph_factory>();
+    shared->prepare();
+    return shared;
 }

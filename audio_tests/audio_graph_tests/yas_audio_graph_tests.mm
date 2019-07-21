@@ -21,15 +21,15 @@ using namespace yas;
 }
 
 - (void)test_running {
-    audio::graph graph;
+    auto graph = audio::make_graph();
 
-    graph.start();
+    graph->start();
 
-    XCTAssertTrue(graph.is_running());
+    XCTAssertTrue(graph->is_running());
 
-    graph.stop();
+    graph->stop();
 
-    XCTAssertFalse(graph.is_running());
+    XCTAssertFalse(graph->is_running());
 }
 
 - (void)test_io_rendering {
@@ -42,11 +42,11 @@ using namespace yas;
     auto output_format = audio::format({.sample_rate = output_sample_rate, .channel_count = channels});
     auto mixer_format = audio::format({.sample_rate = mixer_sample_rate, .channel_count = channels});
 
-    audio::graph graph;
+    auto graph = audio::make_graph();
 
     auto io_unit = audio::make_unit(kAudioUnitType_Output, kAudioUnitSubType_GenericOutput);
     io_unit->set_maximum_frames_per_slice(maximum_frame_length);
-    graph.add_unit(io_unit);
+    graph->add_unit(io_unit);
 
     io_unit->attach_render_callback(0);
 
@@ -54,7 +54,7 @@ using namespace yas;
 
     auto mixer_unit = audio::make_unit(kAudioUnitType_Mixer, kAudioUnitSubType_MultiChannelMixer);
     mixer_unit->set_maximum_frames_per_slice(maximum_frame_length);
-    graph.add_unit(mixer_unit);
+    graph->add_unit(mixer_unit);
 
     mixer_unit->set_output_format(mixer_format.stream_description(), 0);
 
