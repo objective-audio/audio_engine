@@ -128,7 +128,7 @@ using sample_kernel_sptr = std::shared_ptr<sample_kernel_t>;
 
 namespace yas::sample {
 struct device_vc_internal {
-    audio::graph graph = nullptr;
+    std::shared_ptr<audio::graph> graph = nullptr;
     std::shared_ptr<audio::device_io> device_io = nullptr;
     chaining::any_observer_ptr system_observer = nullptr;
     chaining::any_observer_ptr device_observer = nullptr;
@@ -156,9 +156,9 @@ struct device_vc_internal {
                                         forName:NSStringFromClass([YASFrequencyValueFormatter class])];
     });
 
-    _internal.graph = audio::graph{};
+    _internal.graph = audio::make_graph();
     _internal.device_io = std::make_shared<audio::device_io>(std::shared_ptr<audio::device>(nullptr));
-    _internal.graph.add_audio_device_io(_internal.device_io);
+    _internal.graph->add_audio_device_io(_internal.device_io);
 
     _internal.kernel = std::make_shared<sample_kernel_t>();
 
@@ -203,7 +203,7 @@ struct device_vc_internal {
     [self setup];
 
     if (_internal.graph) {
-        _internal.graph.start();
+        _internal.graph->start();
     }
 }
 
@@ -211,7 +211,7 @@ struct device_vc_internal {
     [super viewWillDisappear];
 
     if (_internal.graph) {
-        _internal.graph.stop();
+        _internal.graph->stop();
     }
 
     [self dispose];
