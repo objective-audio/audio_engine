@@ -94,7 +94,7 @@ struct manager : std::enable_shared_from_this<manager> {
     std::unique_ptr<impl> _impl;
     chaining::notifier<chaining_pair_t> _notifier;
 
-    audio::graph _graph = nullptr;
+    std::shared_ptr<audio::graph> _graph = nullptr;
     std::unordered_set<std::shared_ptr<node>> _nodes;
     audio::engine::connection_set _connections;
     std::shared_ptr<audio::engine::offline_output> _offline_output = nullptr;

@@ -231,7 +231,7 @@ std::shared_ptr<audio::engine::device_io> &audio::engine::manager::device_io() {
 
 audio::engine::manager::start_result_t audio::engine::manager::start_render() {
     if (auto const graph = this->_graph) {
-        if (graph.is_running()) {
+        if (graph->is_running()) {
             return start_result_t(start_error_t::already_running);
         }
     }
@@ -246,7 +246,7 @@ audio::engine::manager::start_result_t audio::engine::manager::start_render() {
         return start_result_t(start_error_t::prepare_failure);
     }
 
-    this->_graph.start();
+    this->_graph->start();
 
     return start_result_t(nullptr);
 }
@@ -254,7 +254,7 @@ audio::engine::manager::start_result_t audio::engine::manager::start_render() {
 audio::engine::manager::start_result_t audio::engine::manager::start_offline_render(
     offline_render_f render_handler, offline_completion_f completion_handler) {
     if (auto const graph = this->_graph) {
-        if (graph.is_running()) {
+        if (graph->is_running()) {
             return start_result_t(start_error_t::already_running);
         }
     }
@@ -286,7 +286,7 @@ audio::engine::manager::start_result_t audio::engine::manager::start_offline_ren
 
 void audio::engine::manager::stop() {
     if (auto graph = this->_graph) {
-        graph.stop();
+        graph->stop();
     }
 
     if (auto offline_output = this->_offline_output) {
@@ -387,13 +387,13 @@ bool audio::engine::manager::_prepare_graph() {
         return true;
     }
 
-    this->_graph = audio::graph{};
+    this->_graph = audio::make_graph();
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
     if (auto &device_io = this->_device_io) {
         auto manageable = device_io->manageable();
         manageable->add_raw_device_io();
-        this->_graph.add_audio_device_io(manageable->raw_device_io());
+        this->_graph->add_audio_device_io(manageable->raw_device_io());
     }
 #endif
 
@@ -441,7 +441,7 @@ void audio::engine::manager::add_node_to_graph(audio::engine::node &node) {
     }
 
     if (auto const &handler = node.manageable()->add_to_graph_handler()) {
-        handler(this->_graph);
+        handler(*this->_graph);
     }
 }
 
@@ -451,7 +451,7 @@ void audio::engine::manager::remove_node_from_graph(audio::engine::node &node) {
     }
 
     if (auto const &handler = node.manageable()->remove_from_graph_handler()) {
-        handler(this->_graph);
+        handler(*this->_graph);
     }
 }
 
@@ -511,9 +511,9 @@ audio::engine::connection_set audio::engine::manager::output_connections_for_sou
 
 void audio::engine::manager::reload_graph() {
     if (auto prev_graph = this->_graph) {
-        bool const prev_runnging = prev_graph.is_running();
+        bool const prev_runnging = prev_graph->is_running();
 
-        prev_graph.stop();
+        prev_graph->stop();
 
         for (auto &node : this->_nodes) {
             this->remove_node_from_graph(*node);
@@ -526,7 +526,7 @@ void audio::engine::manager::reload_graph() {
         }
 
         if (prev_runnging) {
-            this->_graph.start();
+            this->_graph->start();
         }
     }
 }
@@ -539,13 +539,13 @@ void audio::engine::manager::set_device_io(std::shared_ptr<audio::engine::device
         if (this->_graph) {
             auto manageable = this->_device_io->manageable();
             manageable->add_raw_device_io();
-            this->_graph.add_audio_device_io(manageable->raw_device_io());
+            this->_graph->add_audio_device_io(manageable->raw_device_io());
         }
     } else {
         if (this->_device_io) {
             if (this->_graph) {
                 if (auto &device_io = this->_device_io->manageable()->raw_device_io()) {
-                    this->_graph.remove_audio_device_io(device_io);
+                    this->_graph->remove_audio_device_io(device_io);
                 }
             }
 
