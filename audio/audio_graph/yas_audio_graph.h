@@ -14,8 +14,6 @@ class device_io;
 #endif
 
 struct graph : std::enable_shared_from_this<graph> {
-    class impl;
-
     virtual ~graph();
 
     void add_unit(std::shared_ptr<audio::unit> &);
@@ -40,6 +38,8 @@ struct graph : std::enable_shared_from_this<graph> {
     void prepare();
 
    private:
+    class impl;
+
     std::shared_ptr<impl> _impl;
 };
 
