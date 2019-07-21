@@ -18,7 +18,7 @@ using namespace yas;
 
 namespace yas::sample {
 struct graph_vc_internal {
-    audio::graph graph = nullptr;
+    std::shared_ptr<audio::graph> graph = nullptr;
     std::shared_ptr<audio::unit> io_unit = nullptr;
     std::shared_ptr<audio::unit> mixer_unit = nullptr;
 
@@ -27,14 +27,14 @@ struct graph_vc_internal {
 
         auto format = audio::format({.sample_rate = sample_rate, .channel_count = 2});
 
-        graph = audio::graph{};
+        graph = audio::make_graph();
 
         io_unit = audio::make_unit(kAudioUnitType_Output, audio::unit::sub_type_default_io());
         io_unit->set_enable_input(true);
         io_unit->set_enable_output(true);
         io_unit->set_maximum_frames_per_slice(4096);
 
-        graph.add_unit(io_unit);
+        graph->add_unit(io_unit);
 
         io_unit->attach_render_callback(0);
         io_unit->set_input_format(format.stream_description(), 0);
@@ -43,7 +43,7 @@ struct graph_vc_internal {
         mixer_unit = audio::make_unit(kAudioUnitType_Mixer, kAudioUnitSubType_MultiChannelMixer);
         mixer_unit->set_maximum_frames_per_slice(4096);
 
-        graph.add_unit(mixer_unit);
+        graph->add_unit(mixer_unit);
 
         mixer_unit->attach_render_callback(0);
         mixer_unit->set_element_count(1, kAudioUnitScope_Input);
@@ -71,7 +71,7 @@ struct graph_vc_internal {
             }
         });
 
-        this->graph.start();
+        this->graph->start();
     }
 };
 }
@@ -111,7 +111,7 @@ struct graph_vc_internal {
     [super viewWillDisappear:animated];
 
     if (self.isMovingFromParentViewController) {
-        self->_internal.graph.stop();
+        self->_internal.graph->stop();
 
         [[AVAudioSession sharedInstance] setActive:NO error:nil];
     }

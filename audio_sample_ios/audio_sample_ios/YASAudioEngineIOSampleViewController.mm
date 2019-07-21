@@ -362,7 +362,7 @@ struct engine_io_vc_internal {
             if (_internal.manager) {
                 auto &manager = _internal.manager;
                 manager->notifier().notify(
-                    std::make_pair(audio::engine::manager::method::configuration_change, *manager));
+                    std::make_pair(audio::engine::manager::method::configuration_change, manager));
             }
         } break;
 
