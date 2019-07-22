@@ -27,13 +27,9 @@ static objc_ptr<> _did_become_active_observer;
 static objc_ptr<> _interruption_observer;
 #endif
 
-static std::shared_ptr<graph::impl> make_shared_impl() {
+static std::optional<uint8_t> min_empty_graph_key() {
     std::lock_guard<std::recursive_mutex> lock(global_graph::_mutex);
-    auto key = min_empty_key(global_graph::_graphs);
-    if (key && global_graph::_graphs.count(*key) == 0) {
-        return std::make_shared<graph::impl>(*key);
-    }
-    return nullptr;
+    return min_empty_key(global_graph::_graphs);
 }
 }
 
@@ -305,7 +301,7 @@ struct audio::graph::impl {
 
 #pragma mark - main
 
-audio::graph::graph() : _impl(global_graph::make_shared_impl()) {
+audio::graph::graph(uint8_t const key) : _impl(std::make_shared<impl>(key)) {
 }
 
 audio::graph::~graph() = default;
@@ -364,6 +360,9 @@ void audio::graph::unit_render(render_parameters &render_parameters) {
 
 namespace yas::audio {
 struct graph_factory : graph {
+    graph_factory(uint8_t const key) : graph(key) {
+    }
+
     void prepare() {
         this->graph::prepare();
     }
@@ -371,7 +370,11 @@ struct graph_factory : graph {
 }
 
 std::shared_ptr<audio::graph> audio::make_graph() {
-    auto shared = std::make_shared<graph_factory>();
-    shared->prepare();
-    return shared;
+    if (auto key = global_graph::min_empty_graph_key()) {
+        auto shared = std::make_shared<graph_factory>(*key);
+        shared->prepare();
+        return shared;
+    } else {
+        return nullptr;
+    }
 }

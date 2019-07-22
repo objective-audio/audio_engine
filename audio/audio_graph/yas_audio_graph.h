@@ -35,7 +35,7 @@ struct graph : std::enable_shared_from_this<graph> {
     static void unit_render(render_parameters &render_parameters);
 
    protected:
-    graph();
+    graph(uint8_t const key);
 
     void prepare();
 
