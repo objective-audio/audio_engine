@@ -31,6 +31,8 @@ struct graph : std::enable_shared_from_this<graph> {
     void stop();
     bool is_running() const;
 
+    uint8_t key() const;
+
     // render thread
     static void unit_render(render_parameters &render_parameters);
 

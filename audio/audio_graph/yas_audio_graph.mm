@@ -118,7 +118,7 @@ struct audio::graph::impl {
 
     static void add_graph(graph &graph) {
         std::lock_guard<std::recursive_mutex> lock(global_graph::_mutex);
-        global_graph::_graphs.insert(std::make_pair(graph._impl->key(), to_weak(graph.shared_from_this())));
+        global_graph::_graphs.insert(std::make_pair(graph.key(), to_weak(graph.shared_from_this())));
     }
 
     static void remove_graph_for_key(uint8_t const key) {
@@ -346,6 +346,10 @@ void audio::graph::stop() {
 
 bool audio::graph::is_running() const {
     return this->_impl->is_running();
+}
+
+uint8_t audio::graph::key() const {
+    return this->_impl->key();
 }
 
 void audio::graph::unit_render(render_parameters &render_parameters) {
