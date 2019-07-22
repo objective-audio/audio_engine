@@ -139,7 +139,7 @@ struct audio::graph::impl {
     }
 
     std::shared_ptr<unit> unit_for_key(uint16_t const key) const {
-        std::lock_guard<std::recursive_mutex> lock(_mutex);
+        std::lock_guard<std::recursive_mutex> lock(this->_mutex);
         return this->_units.at(key);
     }
 
@@ -154,7 +154,7 @@ struct audio::graph::impl {
             throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : unit.key is not null.");
         }
 
-        std::lock_guard<std::recursive_mutex> lock(_mutex);
+        std::lock_guard<std::recursive_mutex> lock(this->_mutex);
 
         auto unit_key = next_unit_key();
         if (unit_key) {
@@ -169,7 +169,7 @@ struct audio::graph::impl {
     }
 
     void remove_unit_from_units(std::shared_ptr<audio::unit> &unit) {
-        std::lock_guard<std::recursive_mutex> lock(_mutex);
+        std::lock_guard<std::recursive_mutex> lock(this->_mutex);
 
         auto manageable_unit = unit->manageable();
 
@@ -206,7 +206,7 @@ struct audio::graph::impl {
     }
 
     void remove_all_units() {
-        std::lock_guard<std::recursive_mutex> lock(_mutex);
+        std::lock_guard<std::recursive_mutex> lock(this->_mutex);
 
         for_each(this->_units, [this](auto const &it) {
             auto unit = it->second;
