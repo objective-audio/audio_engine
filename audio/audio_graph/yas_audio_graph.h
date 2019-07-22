@@ -13,7 +13,12 @@ class unit;
 class device_io;
 #endif
 
-struct graph : std::enable_shared_from_this<graph> {
+struct interruptable_graph {
+    virtual void start_all_ios() = 0;
+    virtual void stop_all_ios() = 0;
+};
+
+struct graph : std::enable_shared_from_this<graph>, interruptable_graph {
     class impl;
 
     virtual ~graph();
@@ -33,6 +38,8 @@ struct graph : std::enable_shared_from_this<graph> {
 
     uint8_t key() const;
 
+    std::shared_ptr<interruptable_graph> interruptable();
+
     // render thread
     static void unit_render(render_parameters &render_parameters);
 
@@ -43,6 +50,9 @@ struct graph : std::enable_shared_from_this<graph> {
 
    private:
     std::shared_ptr<impl> _impl;
+
+    void start_all_ios() override;
+    void stop_all_ios() override;
 };
 
 std::shared_ptr<graph> make_graph();

@@ -98,7 +98,7 @@ struct audio::graph::impl {
             for (auto &pair : global_graph::_graphs) {
                 if (auto graph = pair.second.lock()) {
                     if (graph->is_running()) {
-                        graph->_impl->start_all_ios();
+                        graph->interruptable()->start_all_ios();
                     }
                 }
             }
@@ -111,7 +111,7 @@ struct audio::graph::impl {
         std::lock_guard<std::recursive_mutex> lock(global_graph::_mutex);
         for (auto const &pair : global_graph::_graphs) {
             if (auto const graph = pair.second.lock()) {
-                graph->_impl->stop_all_ios();
+                graph->interruptable()->stop_all_ios();
             }
         }
     }
@@ -350,6 +350,18 @@ bool audio::graph::is_running() const {
 
 uint8_t audio::graph::key() const {
     return this->_impl->key();
+}
+
+std::shared_ptr<audio::graph::interruptable_graph> audio::graph::interruptable() {
+    return std::dynamic_pointer_cast<interruptable_graph>(shared_from_this());
+}
+
+void audio::graph::start_all_ios() {
+    this->_impl->start_all_ios();
+}
+
+void audio::graph::stop_all_ios() {
+    this->_impl->stop_all_ios();
 }
 
 void audio::graph::unit_render(render_parameters &render_parameters) {
