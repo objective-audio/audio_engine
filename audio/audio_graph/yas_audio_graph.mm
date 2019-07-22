@@ -21,16 +21,16 @@ using namespace yas;
 namespace yas::audio::global_graph {
 static std::recursive_mutex _mutex;
 static bool _is_interrupting;
-static std::map<uint8_t, std::weak_ptr<graph>> global_graphs;
+static std::map<uint8_t, std::weak_ptr<graph>> _graphs;
 #if TARGET_OS_IPHONE
-static objc_ptr<> global_did_become_active_observer;
-static objc_ptr<> global_interruption_observer;
+static objc_ptr<> _did_become_active_observer;
+static objc_ptr<> _interruption_observer;
 #endif
 
 static std::shared_ptr<graph::impl> make_shared_impl() {
     std::lock_guard<std::recursive_mutex> lock(global_graph::_mutex);
-    auto key = min_empty_key(global_graph::global_graphs);
-    if (key && global_graph::global_graphs.count(*key) == 0) {
+    auto key = min_empty_key(global_graph::_graphs);
+    if (key && global_graph::_graphs.count(*key) == 0) {
         return std::make_shared<graph::impl>(*key);
     }
     return nullptr;
@@ -51,17 +51,17 @@ struct audio::graph::impl {
 
 #if TARGET_OS_IPHONE
     static void setup_notifications() {
-        if (!global_graph::global_did_become_active_observer) {
+        if (!global_graph::_did_become_active_observer) {
             auto const lambda = [](NSNotification *note) { start_all_graphs(); };
             id observer =
                 [[NSNotificationCenter defaultCenter] addObserverForName:UIApplicationDidBecomeActiveNotification
                                                                   object:nil
                                                                    queue:[NSOperationQueue mainQueue]
                                                               usingBlock:std::move(lambda)];
-            global_graph::global_did_become_active_observer.set_object(observer);
+            global_graph::_did_become_active_observer.set_object(observer);
         }
 
-        if (!global_graph::global_interruption_observer) {
+        if (!global_graph::_interruption_observer) {
             auto const lambda = [](NSNotification *note) {
                 NSDictionary *info = note.userInfo;
                 NSNumber *typeNum = [info valueForKey:AVAudioSessionInterruptionTypeKey];
@@ -83,7 +83,7 @@ struct audio::graph::impl {
                                                                   object:nil
                                                                    queue:[NSOperationQueue mainQueue]
                                                               usingBlock:std::move(lambda)];
-            global_graph::global_interruption_observer.set_object(observer);
+            global_graph::_interruption_observer.set_object(observer);
         }
     }
 #endif
@@ -103,7 +103,7 @@ struct audio::graph::impl {
 
         {
             std::lock_guard<std::recursive_mutex> lock(global_graph::_mutex);
-            for (auto &pair : global_graph::global_graphs) {
+            for (auto &pair : global_graph::_graphs) {
                 if (auto graph = pair.second.lock()) {
                     if (graph->is_running()) {
                         graph->_impl->start_all_ios();
@@ -117,7 +117,7 @@ struct audio::graph::impl {
 
     static void stop_all_graphs() {
         std::lock_guard<std::recursive_mutex> lock(global_graph::_mutex);
-        for (auto const &pair : global_graph::global_graphs) {
+        for (auto const &pair : global_graph::_graphs) {
             if (auto const graph = pair.second.lock()) {
                 graph->_impl->stop_all_ios();
             }
@@ -126,18 +126,18 @@ struct audio::graph::impl {
 
     static void add_graph(graph &graph) {
         std::lock_guard<std::recursive_mutex> lock(global_graph::_mutex);
-        global_graph::global_graphs.insert(std::make_pair(graph._impl->key(), to_weak(graph.shared_from_this())));
+        global_graph::_graphs.insert(std::make_pair(graph._impl->key(), to_weak(graph.shared_from_this())));
     }
 
     static void remove_graph_for_key(uint8_t const key) {
         std::lock_guard<std::recursive_mutex> lock(global_graph::_mutex);
-        global_graph::global_graphs.erase(key);
+        global_graph::_graphs.erase(key);
     }
 
     static std::shared_ptr<graph> graph_for_key(uint8_t const key) {
         std::lock_guard<std::recursive_mutex> lock(global_graph::_mutex);
-        if (global_graph::global_graphs.count(key) > 0) {
-            auto weak_graph = global_graph::global_graphs.at(key);
+        if (global_graph::_graphs.count(key) > 0) {
+            auto weak_graph = global_graph::_graphs.at(key);
             return weak_graph.lock();
         }
         return nullptr;
