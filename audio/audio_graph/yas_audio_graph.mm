@@ -88,10 +88,6 @@ struct audio::graph::impl {
     }
 #endif
 
-    static bool const is_interrupting() {
-        return global_graph::_is_interrupting;
-    }
-
     static void start_all_graphs() {
 #if TARGET_OS_IPHONE
         NSError *error = nil;
@@ -202,7 +198,7 @@ struct audio::graph::impl {
 
         manageable_unit->initialize();
 
-        if (unit->is_output_unit() && this->_running && !this->is_interrupting()) {
+        if (unit->is_output_unit() && this->_running && !global_graph::_is_interrupting) {
             unit->start();
         }
     }
@@ -260,7 +256,7 @@ struct audio::graph::impl {
             std::lock_guard<std::recursive_mutex> lock(_mutex);
             this->_device_ios.insert(device_io);
         }
-        if (this->_running && !this->is_interrupting()) {
+        if (this->_running && !global_graph::_is_interrupting) {
             device_io->start();
         }
     }
