@@ -5,6 +5,7 @@
 #pragma once
 
 #include <cpp_utils/yas_base.h>
+#include "yas_audio_graph_protocol.h"
 #include "yas_audio_types.h"
 
 namespace yas::audio {
@@ -12,11 +13,6 @@ class unit;
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
 class device_io;
 #endif
-
-struct interruptable_graph {
-    virtual void start_all_ios() = 0;
-    virtual void stop_all_ios() = 0;
-};
 
 struct graph : std::enable_shared_from_this<graph>, interruptable_graph {
     class impl;
