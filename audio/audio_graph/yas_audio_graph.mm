@@ -31,6 +31,94 @@ static std::optional<uint8_t> min_empty_graph_key() {
     std::lock_guard<std::recursive_mutex> lock(global_graph::_mutex);
     return min_empty_key(global_graph::_graphs);
 }
+
+static void start_all_graphs() {
+#if TARGET_OS_IPHONE
+    NSError *error = nil;
+    if (![[AVAudioSession sharedInstance] setActive:YES error:&error]) {
+        NSLog(@"%@", error);
+        return;
+    }
+#endif
+
+    {
+        std::lock_guard<std::recursive_mutex> lock(global_graph::_mutex);
+        for (auto &pair : global_graph::_graphs) {
+            if (auto graph = pair.second.lock()) {
+                if (graph->is_running()) {
+                    graph->interruptable()->start_all_ios();
+                }
+            }
+        }
+    }
+
+    global_graph::_is_interrupting = false;
+}
+
+static void stop_all_graphs() {
+    std::lock_guard<std::recursive_mutex> lock(global_graph::_mutex);
+    for (auto const &pair : global_graph::_graphs) {
+        if (auto const graph = pair.second.lock()) {
+            graph->interruptable()->stop_all_ios();
+        }
+    }
+}
+
+static void add_graph(graph &graph) {
+    std::lock_guard<std::recursive_mutex> lock(global_graph::_mutex);
+    global_graph::_graphs.insert(std::make_pair(graph.key(), to_weak(graph.shared_from_this())));
+}
+
+static void remove_graph_for_key(uint8_t const key) {
+    std::lock_guard<std::recursive_mutex> lock(global_graph::_mutex);
+    global_graph::_graphs.erase(key);
+}
+
+static std::shared_ptr<graph> graph_for_key(uint8_t const key) {
+    std::lock_guard<std::recursive_mutex> lock(global_graph::_mutex);
+    if (global_graph::_graphs.count(key) > 0) {
+        auto weak_graph = global_graph::_graphs.at(key);
+        return weak_graph.lock();
+    }
+    return nullptr;
+}
+
+#if TARGET_OS_IPHONE
+static void setup_notifications() {
+    if (!global_graph::_did_become_active_observer) {
+        auto const lambda = [](NSNotification *note) { global_graph::start_all_graphs(); };
+        id observer = [[NSNotificationCenter defaultCenter] addObserverForName:UIApplicationDidBecomeActiveNotification
+                                                                        object:nil
+                                                                         queue:[NSOperationQueue mainQueue]
+                                                                    usingBlock:std::move(lambda)];
+        global_graph::_did_become_active_observer.set_object(observer);
+    }
+
+    if (!global_graph::_interruption_observer) {
+        auto const lambda = [](NSNotification *note) {
+            NSDictionary *info = note.userInfo;
+            NSNumber *typeNum = [info valueForKey:AVAudioSessionInterruptionTypeKey];
+            AVAudioSessionInterruptionType interruptionType =
+                static_cast<AVAudioSessionInterruptionType>([typeNum unsignedIntegerValue]);
+
+            if (interruptionType == AVAudioSessionInterruptionTypeBegan) {
+                global_graph::_is_interrupting = true;
+                global_graph::stop_all_graphs();
+            } else if (interruptionType == AVAudioSessionInterruptionTypeEnded) {
+                if ([UIApplication sharedApplication].applicationState == UIApplicationStateActive) {
+                    global_graph::start_all_graphs();
+                    global_graph::_is_interrupting = false;
+                }
+            }
+        };
+        id observer = [[NSNotificationCenter defaultCenter] addObserverForName:AVAudioSessionInterruptionNotification
+                                                                        object:nil
+                                                                         queue:[NSOperationQueue mainQueue]
+                                                                    usingBlock:std::move(lambda)];
+        global_graph::_interruption_observer.set_object(observer);
+    }
+}
+#endif
 }
 
 #pragma mark - impl
@@ -41,98 +129,8 @@ struct audio::graph::impl {
 
     ~impl() {
         this->stop_all_ios();
-        this->remove_graph_for_key(key());
+        global_graph::remove_graph_for_key(key());
         this->remove_all_units();
-    }
-
-#if TARGET_OS_IPHONE
-    static void setup_notifications() {
-        if (!global_graph::_did_become_active_observer) {
-            auto const lambda = [](NSNotification *note) { start_all_graphs(); };
-            id observer =
-                [[NSNotificationCenter defaultCenter] addObserverForName:UIApplicationDidBecomeActiveNotification
-                                                                  object:nil
-                                                                   queue:[NSOperationQueue mainQueue]
-                                                              usingBlock:std::move(lambda)];
-            global_graph::_did_become_active_observer.set_object(observer);
-        }
-
-        if (!global_graph::_interruption_observer) {
-            auto const lambda = [](NSNotification *note) {
-                NSDictionary *info = note.userInfo;
-                NSNumber *typeNum = [info valueForKey:AVAudioSessionInterruptionTypeKey];
-                AVAudioSessionInterruptionType interruptionType =
-                    static_cast<AVAudioSessionInterruptionType>([typeNum unsignedIntegerValue]);
-
-                if (interruptionType == AVAudioSessionInterruptionTypeBegan) {
-                    global_graph::_is_interrupting = true;
-                    stop_all_graphs();
-                } else if (interruptionType == AVAudioSessionInterruptionTypeEnded) {
-                    if ([UIApplication sharedApplication].applicationState == UIApplicationStateActive) {
-                        start_all_graphs();
-                        global_graph::_is_interrupting = false;
-                    }
-                }
-            };
-            id observer =
-                [[NSNotificationCenter defaultCenter] addObserverForName:AVAudioSessionInterruptionNotification
-                                                                  object:nil
-                                                                   queue:[NSOperationQueue mainQueue]
-                                                              usingBlock:std::move(lambda)];
-            global_graph::_interruption_observer.set_object(observer);
-        }
-    }
-#endif
-
-    static void start_all_graphs() {
-#if TARGET_OS_IPHONE
-        NSError *error = nil;
-        if (![[AVAudioSession sharedInstance] setActive:YES error:&error]) {
-            NSLog(@"%@", error);
-            return;
-        }
-#endif
-
-        {
-            std::lock_guard<std::recursive_mutex> lock(global_graph::_mutex);
-            for (auto &pair : global_graph::_graphs) {
-                if (auto graph = pair.second.lock()) {
-                    if (graph->is_running()) {
-                        graph->interruptable()->start_all_ios();
-                    }
-                }
-            }
-        }
-
-        global_graph::_is_interrupting = false;
-    }
-
-    static void stop_all_graphs() {
-        std::lock_guard<std::recursive_mutex> lock(global_graph::_mutex);
-        for (auto const &pair : global_graph::_graphs) {
-            if (auto const graph = pair.second.lock()) {
-                graph->interruptable()->stop_all_ios();
-            }
-        }
-    }
-
-    static void add_graph(graph &graph) {
-        std::lock_guard<std::recursive_mutex> lock(global_graph::_mutex);
-        global_graph::_graphs.insert(std::make_pair(graph.key(), to_weak(graph.shared_from_this())));
-    }
-
-    static void remove_graph_for_key(uint8_t const key) {
-        std::lock_guard<std::recursive_mutex> lock(global_graph::_mutex);
-        global_graph::_graphs.erase(key);
-    }
-
-    static std::shared_ptr<graph> graph_for_key(uint8_t const key) {
-        std::lock_guard<std::recursive_mutex> lock(global_graph::_mutex);
-        if (global_graph::_graphs.count(key) > 0) {
-            auto weak_graph = global_graph::_graphs.at(key);
-            return weak_graph.lock();
-        }
-        return nullptr;
     }
 
     std::optional<uint16_t> next_unit_key() {
@@ -220,7 +218,7 @@ struct audio::graph::impl {
 
     void start_all_ios() {
 #if TARGET_OS_IPHONE
-        setup_notifications();
+        global_graph::setup_notifications();
 #endif
 
         for (auto &pair : this->_io_units) {
@@ -308,7 +306,7 @@ audio::graph::~graph() = default;
 
 void audio::graph::prepare() {
     if (this->_impl) {
-        impl::add_graph(*this);
+        global_graph::add_graph(*this);
     }
 }
 
@@ -367,7 +365,7 @@ void audio::graph::stop_all_ios() {
 void audio::graph::unit_render(render_parameters &render_parameters) {
     raise_if_main_thread();
 
-    if (auto graph = impl::graph_for_key(render_parameters.render_id.graph)) {
+    if (auto graph = global_graph::graph_for_key(render_parameters.render_id.graph)) {
         if (auto unit = graph->_impl->unit_for_key(render_parameters.render_id.unit)) {
             unit->callback_render(render_parameters);
         }
