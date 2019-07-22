@@ -19,8 +19,8 @@
 using namespace yas;
 
 namespace yas::audio::global_graph {
-static std::recursive_mutex global_mutex;
-static bool global_interrupting;
+static std::recursive_mutex _mutex;
+static bool _is_interrupting;
 static std::map<uint8_t, std::weak_ptr<graph>> global_graphs;
 #if TARGET_OS_IPHONE
 static objc_ptr<> global_did_become_active_observer;
@@ -28,7 +28,7 @@ static objc_ptr<> global_interruption_observer;
 #endif
 
 static std::shared_ptr<graph::impl> make_shared_impl() {
-    std::lock_guard<std::recursive_mutex> lock(global_graph::global_mutex);
+    std::lock_guard<std::recursive_mutex> lock(global_graph::_mutex);
     auto key = min_empty_key(global_graph::global_graphs);
     if (key && global_graph::global_graphs.count(*key) == 0) {
         return std::make_shared<graph::impl>(*key);
@@ -69,12 +69,12 @@ struct audio::graph::impl {
                     static_cast<AVAudioSessionInterruptionType>([typeNum unsignedIntegerValue]);
 
                 if (interruptionType == AVAudioSessionInterruptionTypeBegan) {
-                    global_graph::global_interrupting = true;
+                    global_graph::_is_interrupting = true;
                     stop_all_graphs();
                 } else if (interruptionType == AVAudioSessionInterruptionTypeEnded) {
                     if ([UIApplication sharedApplication].applicationState == UIApplicationStateActive) {
                         start_all_graphs();
-                        global_graph::global_interrupting = false;
+                        global_graph::_is_interrupting = false;
                     }
                 }
             };
@@ -89,7 +89,7 @@ struct audio::graph::impl {
 #endif
 
     static bool const is_interrupting() {
-        return global_graph::global_interrupting;
+        return global_graph::_is_interrupting;
     }
 
     static void start_all_graphs() {
@@ -102,7 +102,7 @@ struct audio::graph::impl {
 #endif
 
         {
-            std::lock_guard<std::recursive_mutex> lock(global_graph::global_mutex);
+            std::lock_guard<std::recursive_mutex> lock(global_graph::_mutex);
             for (auto &pair : global_graph::global_graphs) {
                 if (auto graph = pair.second.lock()) {
                     if (graph->is_running()) {
@@ -112,11 +112,11 @@ struct audio::graph::impl {
             }
         }
 
-        global_graph::global_interrupting = false;
+        global_graph::_is_interrupting = false;
     }
 
     static void stop_all_graphs() {
-        std::lock_guard<std::recursive_mutex> lock(global_graph::global_mutex);
+        std::lock_guard<std::recursive_mutex> lock(global_graph::_mutex);
         for (auto const &pair : global_graph::global_graphs) {
             if (auto const graph = pair.second.lock()) {
                 graph->_impl->stop_all_ios();
@@ -125,17 +125,17 @@ struct audio::graph::impl {
     }
 
     static void add_graph(graph &graph) {
-        std::lock_guard<std::recursive_mutex> lock(global_graph::global_mutex);
+        std::lock_guard<std::recursive_mutex> lock(global_graph::_mutex);
         global_graph::global_graphs.insert(std::make_pair(graph._impl->key(), to_weak(graph.shared_from_this())));
     }
 
     static void remove_graph_for_key(uint8_t const key) {
-        std::lock_guard<std::recursive_mutex> lock(global_graph::global_mutex);
+        std::lock_guard<std::recursive_mutex> lock(global_graph::_mutex);
         global_graph::global_graphs.erase(key);
     }
 
     static std::shared_ptr<graph> graph_for_key(uint8_t const key) {
-        std::lock_guard<std::recursive_mutex> lock(global_graph::global_mutex);
+        std::lock_guard<std::recursive_mutex> lock(global_graph::_mutex);
         if (global_graph::global_graphs.count(key) > 0) {
             auto weak_graph = global_graph::global_graphs.at(key);
             return weak_graph.lock();
@@ -144,7 +144,7 @@ struct audio::graph::impl {
     }
 
     std::optional<uint16_t> next_unit_key() {
-        std::lock_guard<std::recursive_mutex> lock(global_graph::global_mutex);
+        std::lock_guard<std::recursive_mutex> lock(global_graph::_mutex);
         return min_empty_key(this->_units);
     }
 
