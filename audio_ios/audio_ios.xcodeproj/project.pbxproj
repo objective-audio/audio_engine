@@ -79,6 +79,7 @@
 		B6002EC521DCC8F20013AA0E /* yas_audio_device.h in Headers */ = {isa = PBXBuildFile; fileRef = B6002E7B21DCC8F20013AA0E /* yas_audio_device.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		B6002EC621DCC8F20013AA0E /* yas_audio_device_stream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6002E7C21DCC8F20013AA0E /* yas_audio_device_stream.cpp */; };
 		B6002EC721DCC8F20013AA0E /* yas_audio_route.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6002E7D21DCC8F20013AA0E /* yas_audio_route.cpp */; };
+		B6A2964222E603F10047D85E /* yas_audio_graph_protocol.h in Headers */ = {isa = PBXBuildFile; fileRef = B6A2964122E603F10047D85E /* yas_audio_graph_protocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -158,6 +159,7 @@
 		B6002E7B21DCC8F20013AA0E /* yas_audio_device.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yas_audio_device.h; sourceTree = "<group>"; };
 		B6002E7C21DCC8F20013AA0E /* yas_audio_device_stream.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = yas_audio_device_stream.cpp; sourceTree = "<group>"; };
 		B6002E7D21DCC8F20013AA0E /* yas_audio_route.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = yas_audio_route.cpp; sourceTree = "<group>"; };
+		B6A2964122E603F10047D85E /* yas_audio_graph_protocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yas_audio_graph_protocol.h; sourceTree = "<group>"; };
 		B6DB01B121DE57EF0078B199 /* objc_utils.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = objc_utils.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B6F8D0F321DFA517008F43EF /* AudioUnit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioUnit.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS12.1.sdk/System/Library/Frameworks/AudioUnit.framework; sourceTree = DEVELOPER_DIR; };
 /* End PBXFileReference section */
@@ -266,6 +268,7 @@
 		B6002E4621DCC8F20013AA0E /* audio_graph */ = {
 			isa = PBXGroup;
 			children = (
+				B6A2964122E603F10047D85E /* yas_audio_graph_protocol.h */,
 				B6002E4721DCC8F20013AA0E /* yas_audio_graph.h */,
 				B6002E4821DCC8F20013AA0E /* yas_audio_graph.mm */,
 				B6002E4A21DCC8F20013AA0E /* yas_audio_unit_parameter.cpp */,
@@ -343,6 +346,7 @@
 				B6002E7F21DCC8F20013AA0E /* yas_audio_time.h in Headers */,
 				B6002EBE21DCC8F20013AA0E /* yas_audio_umbrella.h in Headers */,
 				B6002EAB21DCC8F20013AA0E /* yas_audio_engine_device_io_protocol.h in Headers */,
+				B6A2964222E603F10047D85E /* yas_audio_graph_protocol.h in Headers */,
 				B6002E8B21DCC8F20013AA0E /* yas_audio_each_data_private.h in Headers */,
 				B6002EAA21DCC8F20013AA0E /* yas_audio_engine_au_io.h in Headers */,
 				B6002E8021DCC8F20013AA0E /* yas_audio_file_utils.h in Headers */,
