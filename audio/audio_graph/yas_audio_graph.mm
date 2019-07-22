@@ -26,6 +26,15 @@ static std::map<uint8_t, std::weak_ptr<graph>> global_graphs;
 static objc_ptr<> global_did_become_active_observer;
 static objc_ptr<> global_interruption_observer;
 #endif
+
+static std::shared_ptr<graph::impl> make_shared_impl() {
+    std::lock_guard<std::recursive_mutex> lock(global_graph::global_mutex);
+    auto key = min_empty_key(global_graph::global_graphs);
+    if (key && global_graph::global_graphs.count(*key) == 0) {
+        return std::make_shared<graph::impl>(*key);
+    }
+    return nullptr;
+}
 }
 
 #pragma mark - impl
@@ -38,15 +47,6 @@ struct audio::graph::impl {
         this->stop_all_ios();
         this->remove_graph_for_key(key());
         this->remove_all_units();
-    }
-
-    static std::shared_ptr<impl> make_shared() {
-        std::lock_guard<std::recursive_mutex> lock(global_graph::global_mutex);
-        auto key = min_empty_key(global_graph::global_graphs);
-        if (key && global_graph::global_graphs.count(*key) == 0) {
-            return std::make_shared<impl>(*key);
-        }
-        return nullptr;
     }
 
 #if TARGET_OS_IPHONE
@@ -309,7 +309,7 @@ struct audio::graph::impl {
 
 #pragma mark - main
 
-audio::graph::graph() : _impl(impl::make_shared()) {
+audio::graph::graph() : _impl(global_graph::make_shared_impl()) {
 }
 
 audio::graph::~graph() = default;
