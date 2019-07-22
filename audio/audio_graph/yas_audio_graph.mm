@@ -51,17 +51,17 @@ struct audio::graph::impl {
 
 #if TARGET_OS_IPHONE
     static void setup_notifications() {
-        if (!global_did_become_active_observer) {
+        if (!global_graph::global_did_become_active_observer) {
             auto const lambda = [](NSNotification *note) { start_all_graphs(); };
             id observer =
                 [[NSNotificationCenter defaultCenter] addObserverForName:UIApplicationDidBecomeActiveNotification
                                                                   object:nil
                                                                    queue:[NSOperationQueue mainQueue]
                                                               usingBlock:std::move(lambda)];
-            global_did_become_active_observer.set_object(observer);
+            global_graph::global_did_become_active_observer.set_object(observer);
         }
 
-        if (!global_interruption_observer) {
+        if (!global_graph::global_interruption_observer) {
             auto const lambda = [](NSNotification *note) {
                 NSDictionary *info = note.userInfo;
                 NSNumber *typeNum = [info valueForKey:AVAudioSessionInterruptionTypeKey];
@@ -69,12 +69,12 @@ struct audio::graph::impl {
                     static_cast<AVAudioSessionInterruptionType>([typeNum unsignedIntegerValue]);
 
                 if (interruptionType == AVAudioSessionInterruptionTypeBegan) {
-                    global_interrupting = true;
+                    global_graph::global_interrupting = true;
                     stop_all_graphs();
                 } else if (interruptionType == AVAudioSessionInterruptionTypeEnded) {
                     if ([UIApplication sharedApplication].applicationState == UIApplicationStateActive) {
                         start_all_graphs();
-                        global_interrupting = false;
+                        global_graph::global_interrupting = false;
                     }
                 }
             };
@@ -83,7 +83,7 @@ struct audio::graph::impl {
                                                                   object:nil
                                                                    queue:[NSOperationQueue mainQueue]
                                                               usingBlock:std::move(lambda)];
-            global_interruption_observer.set_object(observer);
+            global_graph::global_interruption_observer.set_object(observer);
         }
     }
 #endif
