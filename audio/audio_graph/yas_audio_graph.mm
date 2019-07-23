@@ -309,7 +309,7 @@ void audio::graph::remove_unit_from_units(std::shared_ptr<audio::unit> &unit) {
 
 std::shared_ptr<audio::graph> audio::make_graph() {
     if (auto key = global_graph::min_empty_graph_key()) {
-        auto shared = std::shared_ptr<graph>(new graph(*key));
+        auto shared = std::shared_ptr<graph>(new graph{*key});
         shared->prepare();
         return shared;
     } else {
