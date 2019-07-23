@@ -23,13 +23,10 @@ bool is_equal(AudioTimeStamp const *const ts1, AudioTimeStamp const *const ts2);
 void raw_unit_render_on_sub_thread(std::shared_ptr<audio::unit> &unit, audio::format &format,
                                    uint32_t const frame_length, std::size_t const count, NSTimeInterval const wait);
 
-class audio_test_node_object : public base {
-    class impl;
+struct node_object {
+    node_object(uint32_t const input_bus_count = 2, uint32_t const output_bus_count = 1);
 
-   public:
-    audio_test_node_object(uint32_t const input_bus_count = 2, uint32_t const output_bus_count = 1);
-
-    std::shared_ptr<audio::engine::node> &node();
+    std::shared_ptr<audio::engine::node> node;
 };
 
 std::shared_ptr<audio::engine::connection> make_connection(audio::engine::node &source_node, uint32_t const source_bus,

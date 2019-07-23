@@ -202,20 +202,9 @@ void test::raw_unit_render_on_sub_thread(std::shared_ptr<audio::unit> &unit, aud
     }
 }
 
-struct test::audio_test_node_object::impl : base::impl {
-    std::shared_ptr<audio::engine::node> _node;
-
-    impl(audio::engine::node_args &&args) : _node(audio::engine::make_node(std::move(args))) {
-    }
-};
-
-test::audio_test_node_object::audio_test_node_object(uint32_t const input_bus_count, uint32_t const output_bus_count)
-    : base(std::make_unique<impl>(
+test::node_object::node_object(uint32_t const input_bus_count, uint32_t const output_bus_count)
+    : node(audio::engine::make_node(
           audio::engine::node_args{.input_bus_count = input_bus_count, .output_bus_count = output_bus_count})) {
-}
-
-std::shared_ptr<audio::engine::node> &test::audio_test_node_object::node() {
-    return impl_ptr<impl>()->_node;
 }
 
 namespace yas::test {
