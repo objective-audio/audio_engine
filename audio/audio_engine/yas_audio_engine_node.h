@@ -28,9 +28,7 @@ namespace yas::audio::engine {
 class manager;
 class kernel;
 
-struct node : base, std::enable_shared_from_this<node>, connectable_node, manageable_node {
-    class impl;
-
+struct node : std::enable_shared_from_this<node>, connectable_node, manageable_node {
     enum class method {
         will_reset,
         update_connections,
@@ -46,8 +44,6 @@ struct node : base, std::enable_shared_from_this<node>, connectable_node, manage
 
     using prepare_kernel_f = std::function<void(kernel &)>;
     using render_f = std::function<void(render_args)>;
-
-    node(std::nullptr_t);
 
     virtual ~node();
 
@@ -89,16 +85,34 @@ struct node : base, std::enable_shared_from_this<node>, connectable_node, manage
     node(node_args &&);
 
    private:
-    virtual void add_connection(audio::engine::connection &) override;
-    virtual void remove_connection(audio::engine::connection const &) override;
+    std::weak_ptr<audio::engine::manager> _weak_manager;
+    uint32_t _input_bus_count = 0;
+    uint32_t _output_bus_count = 0;
+    bool _is_input_renderable = false;
+    std::optional<uint32_t> _override_output_bus_idx = std::nullopt;
+    audio::engine::connection_wmap _input_connections;
+    audio::engine::connection_wmap _output_connections;
+    graph_editing_f _add_to_graph_handler;
+    graph_editing_f _remove_from_graph_handler;
+    prepare_kernel_f _prepare_kernel_handler;
+    audio::engine::node::render_f _render_handler;
+    chaining::notifier<chaining_pair_t> _notifier;
 
-    virtual void set_manager(std::shared_ptr<audio::engine::manager> const &) override;
-    virtual void update_kernel() override;
-    virtual void update_connections() override;
-    virtual void set_add_to_graph_handler(graph_editing_f &&) override;
-    virtual void set_remove_from_graph_handler(graph_editing_f &&) override;
-    virtual graph_editing_f const &add_to_graph_handler() const override;
-    virtual graph_editing_f const &remove_from_graph_handler() const override;
+    struct core;
+    std::unique_ptr<core> _core;
+
+    void prepare_kernel(std::shared_ptr<audio::engine::kernel> &kernel);
+
+    void add_connection(audio::engine::connection &) override;
+    void remove_connection(audio::engine::connection const &) override;
+
+    void set_manager(std::shared_ptr<audio::engine::manager> const &) override;
+    void update_kernel() override;
+    void update_connections() override;
+    void set_add_to_graph_handler(graph_editing_f &&) override;
+    void set_remove_from_graph_handler(graph_editing_f &&) override;
+    graph_editing_f const &add_to_graph_handler() const override;
+    graph_editing_f const &remove_from_graph_handler() const override;
 
     node(node &&) = delete;
     node &operator=(node &&) = delete;
@@ -114,12 +128,5 @@ std::string to_string(audio::engine::node::method const &);
 }
 
 std::ostream &operator<<(std::ostream &, yas::audio::engine::node::method const &);
-
-template <>
-struct std::hash<yas::audio::engine::node> {
-    std::size_t operator()(yas::audio::engine::node const &key) const {
-        return std::hash<uintptr_t>()(key.identifier());
-    }
-};
 
 #include "yas_audio_engine_kernel.h"

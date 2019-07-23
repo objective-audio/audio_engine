@@ -79,10 +79,6 @@ audio::engine::manager::~manager() = default;
 audio::engine::connection &audio::engine::manager::connect(audio::engine::node &source_node,
                                                            audio::engine::node &destination_node,
                                                            audio::format const &format) {
-    if (!source_node || !destination_node) {
-        throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
-    }
-
     auto source_bus_result = source_node.next_available_output_bus();
     auto destination_bus_result = destination_node.next_available_input_bus();
 
