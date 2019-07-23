@@ -28,11 +28,6 @@ struct au_mixer : std::enable_shared_from_this<au_mixer> {
     audio::engine::au const &au() const;
     audio::engine::au &au();
 
-   protected:
-    au_mixer();
-
-    void prepare();
-
    private:
     std::shared_ptr<audio::engine::au> _au;
     chaining::any_observer_ptr _connections_observer = nullptr;
@@ -42,7 +37,13 @@ struct au_mixer : std::enable_shared_from_this<au_mixer> {
     au_mixer &operator=(au_mixer const &) = delete;
     au_mixer &operator=(au_mixer &&) = delete;
 
+    au_mixer();
+
+    void prepare();
+
     void _update_unit_mixer_connections();
+
+    friend std::shared_ptr<au_mixer> make_au_mixer();
 };
 
 std::shared_ptr<au_mixer> make_au_mixer();
