@@ -326,17 +326,6 @@ void audio::engine::au::_will_reset() {
 
 #pragma mark - factory
 
-namespace yas::audio::engine {
-struct au_factory : au {
-    au_factory(node_args &&args) : au(std::move(args)) {
-    }
-
-    void prepare(AudioComponentDescription const &acd) {
-        this->au::prepare(acd);
-    }
-};
-};  // namespace yas::audio::engine
-
 std::shared_ptr<audio::engine::au> audio::engine::make_au(OSType const type, OSType const sub_type) {
     return make_au(AudioComponentDescription{
         .componentType = type,
@@ -352,7 +341,7 @@ std::shared_ptr<audio::engine::au> audio::engine::make_au(AudioComponentDescript
 }
 
 std::shared_ptr<audio::engine::au> audio::engine::make_au(au::args &&args) {
-    auto shared = std::make_shared<au_factory>(std::move(args.node_args));
+    auto shared = std::shared_ptr<au>(new au{std::move(args.node_args)});
     shared->prepare(args.acd);
     return shared;
 }

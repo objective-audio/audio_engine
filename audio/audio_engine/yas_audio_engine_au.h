@@ -63,11 +63,6 @@ struct au : manageable_au, std::enable_shared_from_this<au> {
 
     std::shared_ptr<manageable_au> manageable();
 
-   protected:
-    au(node_args &&);
-
-    void prepare(AudioComponentDescription const &acd);
-
    private:
     std::shared_ptr<audio::engine::node> _node;
     AudioComponentDescription _acd;
@@ -80,6 +75,10 @@ struct au : manageable_au, std::enable_shared_from_this<au> {
     struct core;
     std::unique_ptr<core> _core;
 
+    au(node_args &&);
+
+    void prepare(AudioComponentDescription const &acd);
+
     au(au const &) = delete;
     au(au &&) = delete;
     au &operator=(au const &) = delete;
@@ -91,6 +90,8 @@ struct au : manageable_au, std::enable_shared_from_this<au> {
 
     void _update_unit_connections();
     void _will_reset();
+
+    friend std::shared_ptr<au> make_au(au::args &&);
 };
 
 std::shared_ptr<au> make_au(OSType const type, OSType const sub_type);
