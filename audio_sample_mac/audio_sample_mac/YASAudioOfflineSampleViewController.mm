@@ -82,19 +82,19 @@ struct sine {
     virtual ~sine() = default;
 
     void set_frequency(float const frequency) {
-        this->set_frequency(frequency);
+        this->_impl->set_frequency(frequency);
     }
 
     float frequency() const {
-        return this->frequency();
+        return this->_impl->frequency();
     }
 
     void set_playing(bool const playing) {
-        this->set_playing(playing);
+        this->_impl->set_playing(playing);
     }
 
     bool is_playing() const {
-        return this->is_playing();
+        return this->_impl->is_playing();
     }
 
     audio::engine::tap &tap() {
