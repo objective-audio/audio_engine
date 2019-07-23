@@ -29,56 +29,37 @@ static std::string format_flags_string(AudioStreamBasicDescription const &asbd) 
         " | ");
 }
 
-#pragma mark - impl
-
 static AudioStreamBasicDescription const empty_asbd = {0};
-
-struct audio::format::impl : base::impl {
-    AudioStreamBasicDescription _asbd = {0};
-    audio::pcm_format _pcm_format = audio::pcm_format::other;
-    bool _standard = false;
-
-    impl(AudioStreamBasicDescription &&asbd) : _asbd(std::move(asbd)) {
-        this->_asbd.mReserved = 0;
-
-        if (asbd.mFormatID == kAudioFormatLinearPCM) {
-            if ((asbd.mFormatFlags & kAudioFormatFlagIsFloat) &&
-                ((asbd.mFormatFlags & kAudioFormatFlagIsBigEndian) == kAudioFormatFlagsNativeEndian) &&
-                (asbd.mFormatFlags & kAudioFormatFlagIsPacked)) {
-                if (asbd.mBitsPerChannel == 64) {
-                    this->_pcm_format = audio::pcm_format::float64;
-                } else if (asbd.mBitsPerChannel == 32) {
-                    this->_pcm_format = audio::pcm_format::float32;
-                    if (asbd.mFormatFlags & kAudioFormatFlagIsNonInterleaved) {
-                        this->_standard = true;
-                    }
-                }
-            } else if ((asbd.mFormatFlags & kAudioFormatFlagIsSignedInteger) &&
-                       ((asbd.mFormatFlags & kAudioFormatFlagIsBigEndian) == kAudioFormatFlagsNativeEndian) &&
-                       (asbd.mFormatFlags & kAudioFormatFlagIsPacked)) {
-                uint32_t fraction = (asbd.mFormatFlags & kLinearPCMFormatFlagsSampleFractionMask) >>
-                                    kLinearPCMFormatFlagsSampleFractionShift;
-                if (asbd.mBitsPerChannel == 32 && fraction == 24) {
-                    this->_pcm_format = audio::pcm_format::fixed824;
-                } else if (asbd.mBitsPerChannel == 16) {
-                    this->_pcm_format = audio::pcm_format::int16;
-                }
-            }
-        }
-    }
-
-    bool is_equal(std::shared_ptr<base::impl> const &rhs) const override {
-        if (auto casted_rhs = std::dynamic_pointer_cast<impl>(rhs)) {
-            return yas::is_equal(this->_asbd, casted_rhs->_asbd);
-        }
-
-        return false;
-    }
-};
 
 #pragma mark - main
 
-audio::format::format(AudioStreamBasicDescription asbd) : base(std::make_shared<impl>(std::move(asbd))) {
+audio::format::format(AudioStreamBasicDescription asbd) : _asbd(std::move(asbd)) {
+    this->_asbd.mReserved = 0;
+
+    if (asbd.mFormatID == kAudioFormatLinearPCM) {
+        if ((asbd.mFormatFlags & kAudioFormatFlagIsFloat) &&
+            ((asbd.mFormatFlags & kAudioFormatFlagIsBigEndian) == kAudioFormatFlagsNativeEndian) &&
+            (asbd.mFormatFlags & kAudioFormatFlagIsPacked)) {
+            if (asbd.mBitsPerChannel == 64) {
+                this->_pcm_format = audio::pcm_format::float64;
+            } else if (asbd.mBitsPerChannel == 32) {
+                this->_pcm_format = audio::pcm_format::float32;
+                if (asbd.mFormatFlags & kAudioFormatFlagIsNonInterleaved) {
+                    this->_standard = true;
+                }
+            }
+        } else if ((asbd.mFormatFlags & kAudioFormatFlagIsSignedInteger) &&
+                   ((asbd.mFormatFlags & kAudioFormatFlagIsBigEndian) == kAudioFormatFlagsNativeEndian) &&
+                   (asbd.mFormatFlags & kAudioFormatFlagIsPacked)) {
+            uint32_t fraction = (asbd.mFormatFlags & kLinearPCMFormatFlagsSampleFractionMask) >>
+                                kLinearPCMFormatFlagsSampleFractionShift;
+            if (asbd.mBitsPerChannel == 32 && fraction == 24) {
+                this->_pcm_format = audio::pcm_format::fixed824;
+            } else if (asbd.mBitsPerChannel == 16) {
+                this->_pcm_format = audio::pcm_format::int16;
+            }
+        }
+    }
 }
 
 audio::format::format(CFDictionaryRef const &settings) : format(to_stream_description(settings)) {
@@ -88,49 +69,44 @@ audio::format::format(args args)
     : format(to_stream_description(args.sample_rate, args.channel_count, args.pcm_format, args.interleaved)) {
 }
 
-audio::format::format(std::nullptr_t) : base(nullptr) {
-}
-
-audio::format::~format() = default;
-
 bool audio::format::is_empty() const {
-    return memcmp(&impl_ptr<impl>()->_asbd, &empty_asbd, sizeof(AudioStreamBasicDescription)) == 0;
+    return memcmp(&this->_asbd, &empty_asbd, sizeof(AudioStreamBasicDescription)) == 0;
 }
 
 bool audio::format::is_standard() const {
-    return impl_ptr<impl>()->_standard;
+    return this->_standard;
 }
 
 audio::pcm_format audio::format::pcm_format() const {
-    return impl_ptr<impl>()->_pcm_format;
+    return this->_pcm_format;
 }
 
 uint32_t audio::format::channel_count() const {
-    return impl_ptr<impl>()->_asbd.mChannelsPerFrame;
+    return this->_asbd.mChannelsPerFrame;
 }
 
 uint32_t audio::format::buffer_count() const {
-    return is_interleaved() ? 1 : impl_ptr<impl>()->_asbd.mChannelsPerFrame;
+    return is_interleaved() ? 1 : this->_asbd.mChannelsPerFrame;
 }
 
 uint32_t audio::format::stride() const {
-    return is_interleaved() ? impl_ptr<impl>()->_asbd.mChannelsPerFrame : 1;
+    return is_interleaved() ? this->_asbd.mChannelsPerFrame : 1;
 }
 
 double audio::format::sample_rate() const {
-    return impl_ptr<impl>()->_asbd.mSampleRate;
+    return this->_asbd.mSampleRate;
 }
 
 bool audio::format::is_interleaved() const {
-    return !(impl_ptr<impl>()->_asbd.mFormatFlags & kAudioFormatFlagIsNonInterleaved);
+    return !(this->_asbd.mFormatFlags & kAudioFormatFlagIsNonInterleaved);
 }
 
 AudioStreamBasicDescription const &audio::format::stream_description() const {
-    return impl_ptr<impl>()->_asbd;
+    return this->_asbd;
 }
 
 uint32_t audio::format::sample_byte_count() const {
-    switch (impl_ptr<impl>()->_pcm_format) {
+    switch (this->_pcm_format) {
         case audio::pcm_format::float32:
         case audio::pcm_format::fixed824:
             return 4;
@@ -151,9 +127,12 @@ CFStringRef audio::format::description() const {
     return to_cf_object(to_string(*this));
 }
 
-audio::format const &audio::format::null_format() {
-    static format const _format{nullptr};
-    return _format;
+bool audio::format::operator==(format const &rhs) const {
+    return yas::is_equal(this->_asbd, rhs._asbd);
+}
+
+bool audio::format::operator!=(format const &rhs) const {
+    return !(*this == rhs);
 }
 
 #pragma mark - utility

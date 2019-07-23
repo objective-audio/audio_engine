@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14460.31" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="INd-f6-EIx">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14490.70" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="INd-f6-EIx">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14460.20"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14490.49"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -165,6 +165,7 @@
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
                             <constraint firstItem="b5C-tW-GxY" firstAttribute="leading" secondItem="qgQ-mr-7nY" secondAttribute="leading" constant="24" id="99h-eZ-QSH"/>
+                            <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="uGk-CS-0xC" secondAttribute="trailing" constant="20" symbolic="YES" id="9OD-CV-SKI"/>
                             <constraint firstItem="b5C-tW-GxY" firstAttribute="top" secondItem="uGk-CS-0xC" secondAttribute="bottom" constant="8" id="TuD-J1-crb"/>
                             <constraint firstItem="uGk-CS-0xC" firstAttribute="leading" secondItem="qgQ-mr-7nY" secondAttribute="leading" constant="16" id="cQM-27-c2M"/>
                             <constraint firstAttribute="trailing" secondItem="b5C-tW-GxY" secondAttribute="trailing" constant="24" id="iFQ-G6-zh2"/>
@@ -323,8 +324,10 @@
                             <constraint firstItem="BrY-ej-iT5" firstAttribute="trailing" secondItem="erF-OI-311" secondAttribute="trailingMargin" id="0g8-Y2-XWL"/>
                             <constraint firstItem="EtM-MC-Ngb" firstAttribute="trailing" secondItem="erF-OI-311" secondAttribute="trailingMargin" id="0xc-Ri-sUv"/>
                             <constraint firstItem="EtM-MC-Ngb" firstAttribute="top" secondItem="uYM-Hz-O2O" secondAttribute="bottom" constant="10" id="BSV-ir-BCt"/>
+                            <constraint firstItem="BrY-ej-iT5" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="erF-OI-311" secondAttribute="leading" constant="20" symbolic="YES" id="K8G-r1-7uw"/>
                             <constraint firstItem="EtM-MC-Ngb" firstAttribute="leading" secondItem="erF-OI-311" secondAttribute="leadingMargin" id="Kvt-c4-Xgu"/>
                             <constraint firstItem="uYM-Hz-O2O" firstAttribute="top" secondItem="80m-z0-nzr" secondAttribute="bottom" constant="20" id="a0L-ys-jdL"/>
+                            <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="uYM-Hz-O2O" secondAttribute="trailing" constant="20" symbolic="YES" id="cXM-dg-qzq"/>
                             <constraint firstItem="BrY-ej-iT5" firstAttribute="top" secondItem="EtM-MC-Ngb" secondAttribute="bottom" constant="8" id="cld-hc-8NG"/>
                             <constraint firstItem="uYM-Hz-O2O" firstAttribute="leading" secondItem="erF-OI-311" secondAttribute="leadingMargin" id="xoo-jR-Cqd"/>
                         </constraints>
@@ -517,7 +520,7 @@
                                     <rect key="frame" x="0.0" y="0.0" width="375" height="85.5"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
-                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Name" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="SVJ-t3-fMm">
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" horizontalCompressionResistancePriority="250" text="Name" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="SVJ-t3-fMm">
                                             <rect key="frame" x="8" y="9" width="45" height="20.5"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                             <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -551,6 +554,7 @@
                                         <constraint firstItem="QjA-rc-TXA" firstAttribute="top" secondItem="u6X-AT-15h" secondAttribute="top" constant="9" id="DTY-t7-PU4"/>
                                         <constraint firstItem="SVJ-t3-fMm" firstAttribute="top" secondItem="u6X-AT-15h" secondAttribute="top" constant="9" id="Ipr-3l-Xiz"/>
                                         <constraint firstItem="2ux-Py-KIb" firstAttribute="leading" secondItem="u6X-AT-15h" secondAttribute="leading" constant="27" id="LzY-Id-tZI"/>
+                                        <constraint firstItem="QjA-rc-TXA" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="SVJ-t3-fMm" secondAttribute="trailing" constant="10" id="eNY-R0-bsh"/>
                                         <constraint firstAttribute="trailing" secondItem="QjA-rc-TXA" secondAttribute="trailing" constant="8" id="lAn-Ki-Czx"/>
                                     </constraints>
                                 </tableViewCellContentView>

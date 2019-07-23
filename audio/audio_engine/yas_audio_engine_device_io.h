@@ -8,37 +8,54 @@
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
 
+#include <chaining/yas_chaining_umbrella.h>
 #include <cpp_utils/yas_base.h>
 #include "yas_audio_engine_device_io_protocol.h"
+#include "yas_audio_engine_node.h"
 
 namespace yas::audio {
 class device;
 }
 
 namespace yas::audio::engine {
-class node;
+struct device_io : manageable_device_io, std::enable_shared_from_this<device_io> {
+    class core;
 
-class device_io : public base {
-   public:
-    class impl;
+    device_io(device_io &&) = default;
+    device_io &operator=(device_io &&) = default;
 
-    device_io();
-    device_io(std::nullptr_t);
-    device_io(audio::device const &device);
+    virtual ~device_io();
 
-    virtual ~device_io() final;
-
-    void set_device(audio::device const &device);
-    audio::device device() const;
+    void set_device(std::shared_ptr<audio::device> const &device);
+    std::shared_ptr<audio::device> device() const;
 
     audio::engine::node const &node() const;
     audio::engine::node &node();
 
-    manageable_device_io &manageable();
+    std::shared_ptr<manageable_device_io> manageable();
+
+   protected:
+    device_io();
+
+    void _prepare();
 
    private:
-    manageable_device_io _manageable = nullptr;
+    std::shared_ptr<audio::engine::node> _node = make_node({.input_bus_count = 1, .output_bus_count = 1});
+    chaining::any_observer_ptr _connections_observer = nullptr;
+    std::unique_ptr<core> _core;
+
+    device_io(device_io const &) = delete;
+    device_io &operator=(device_io const &) = delete;
+
+    void add_raw_device_io() override;
+    void remove_raw_device_io() override;
+    std::shared_ptr<audio::device_io> &raw_device_io() override;
+
+    void _update_device_io_connections();
+    bool _validate_connections();
 };
+
+std::shared_ptr<device_io> make_device_io();
 }  // namespace yas::audio::engine
 
 #endif

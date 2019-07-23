@@ -145,7 +145,7 @@ static void setupDirectory() {
                                                      .settings = audio::wave_file_settings(48000.0, 2, 16)});
         XCTAssertTrue(file_result);
 
-        auto file = file_result.value();
+        auto const &file = file_result.value();
 
         XCTAssertEqual(file.url(), file_url);
         XCTAssertEqual(file.file_type(), audio::file_type::wave);
@@ -161,7 +161,7 @@ static void setupDirectory() {
         auto file_result = audio::make_opened_file({.file_url = file_url});
         XCTAssertTrue(file_result);
 
-        auto file = file_result.value();
+        auto const &file = file_result.value();
 
         XCTAssertEqual(file.url(), file_url);
         XCTAssertEqual(file.file_type(), audio::file_type::wave);
@@ -200,7 +200,6 @@ static void setupDirectory() {
 
 - (void)test_read_error_to_string {
     XCTAssertEqual(to_string(audio::file::read_error_t::closed), "closed");
-    XCTAssertEqual(to_string(audio::file::read_error_t::invalid_argument), "invalid_argument");
     XCTAssertEqual(to_string(audio::file::read_error_t::invalid_format), "invalid_format");
     XCTAssertEqual(to_string(audio::file::read_error_t::read_failed), "read_failed");
     XCTAssertEqual(to_string(audio::file::read_error_t::tell_failed), "tell_failed");
@@ -215,7 +214,6 @@ static void setupDirectory() {
 
 - (void)test_write_error_to_string {
     XCTAssertEqual(to_string(audio::file::write_error_t::closed), "closed");
-    XCTAssertEqual(to_string(audio::file::write_error_t::invalid_argument), "invalid_argument");
     XCTAssertEqual(to_string(audio::file::write_error_t::invalid_format), "invalid_format");
     XCTAssertEqual(to_string(audio::file::write_error_t::write_failed), "write_failed");
     XCTAssertEqual(to_string(audio::file::write_error_t::tell_failed), "tell_failed");
@@ -233,9 +231,8 @@ static void setupDirectory() {
 }
 
 - (void)test_read_error_ostream {
-    auto const errors = {audio::file::read_error_t::closed, audio::file::read_error_t::invalid_argument,
-                         audio::file::read_error_t::invalid_format, audio::file::read_error_t::read_failed,
-                         audio::file::read_error_t::tell_failed};
+    auto const errors = {audio::file::read_error_t::closed, audio::file::read_error_t::invalid_format,
+                         audio::file::read_error_t::read_failed, audio::file::read_error_t::tell_failed};
 
     for (auto const &error : errors) {
         std::ostringstream stream;
@@ -256,9 +253,8 @@ static void setupDirectory() {
 }
 
 - (void)test_write_error_ostream {
-    auto const errors = {audio::file::write_error_t::closed, audio::file::write_error_t::invalid_argument,
-                         audio::file::write_error_t::invalid_format, audio::file::write_error_t::write_failed,
-                         audio::file::write_error_t::tell_failed};
+    auto const errors = {audio::file::write_error_t::closed, audio::file::write_error_t::invalid_format,
+                         audio::file::write_error_t::write_failed, audio::file::write_error_t::tell_failed};
 
     for (auto const &error : errors) {
         std::ostringstream stream;

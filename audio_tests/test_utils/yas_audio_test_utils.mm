@@ -170,8 +170,9 @@ uint8_t const *test::data_ptr_from_buffer(audio::pcm_buffer const &buffer, uint3
     }
 }
 
-void test::raw_unit_render_on_sub_thread(audio::unit &unit, audio::format &format, uint32_t const frame_length,
-                                         std::size_t const count, NSTimeInterval const wait) {
+void test::raw_unit_render_on_sub_thread(std::shared_ptr<audio::unit> &unit, audio::format &format,
+                                         uint32_t const frame_length, std::size_t const count,
+                                         NSTimeInterval const wait) {
     auto lambda = [unit, format, frame_length, count]() mutable {
         AudioUnitRenderActionFlags action_flags = 0;
 
@@ -190,7 +191,7 @@ void test::raw_unit_render_on_sub_thread(audio::unit &unit, audio::format &forma
                 .io_data = buffer.audio_buffer_list(),
             };
 
-            unit.raw_unit_render(parameters);
+            unit->raw_unit_render(parameters);
         }
     };
 
@@ -201,28 +202,22 @@ void test::raw_unit_render_on_sub_thread(audio::unit &unit, audio::format &forma
     }
 }
 
-struct test::audio_test_node_object::impl : base::impl {
-    audio::engine::node _node;
-
-    impl(audio::engine::node_args &&args) : _node(std::move(args)) {
-    }
-};
-
-test::audio_test_node_object::audio_test_node_object(uint32_t const input_bus_count, uint32_t const output_bus_count)
-    : base(std::make_unique<impl>(
+test::node_object::node_object(uint32_t const input_bus_count, uint32_t const output_bus_count)
+    : node(audio::engine::make_node(
           audio::engine::node_args{.input_bus_count = input_bus_count, .output_bus_count = output_bus_count})) {
 }
 
-audio::engine::node &test::audio_test_node_object::node() {
-    return impl_ptr<impl>()->_node;
+namespace yas::test {
+struct connection : audio::engine::connection {
+    connection(audio::engine::node &source_node, uint32_t const source_bus, audio::engine::node &destination_node,
+               uint32_t const destination_bus, audio::format const &format)
+        : audio::engine::connection(source_node, source_bus, destination_node, destination_bus, format) {
+    }
+};
 }
 
-test::connection::connection(audio::engine::node &source_node, uint32_t const source_bus,
-                             audio::engine::node &destination_node, uint32_t const destination_bus,
-                             audio::format const &format)
-    : audio::engine::connection(source_node, source_bus, destination_node, destination_bus, format) {
-}
-
-audio::engine::node test::make_node() {
-    return audio::engine::node{audio::engine::node_args{}};
+std::shared_ptr<audio::engine::connection> test::make_connection(audio::engine::node &src_node, uint32_t const src_bus,
+                                                                 audio::engine::node &dst_node, uint32_t const dst_bus,
+                                                                 audio::format const &format) {
+    return audio::engine::make_connection(src_node, src_bus, dst_node, dst_bus, format);
 }

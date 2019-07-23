@@ -18,16 +18,13 @@ class graph;
 namespace yas::audio::engine {
 class node;
 
-class au : public base {
-   public:
-    class impl;
-
+struct au : manageable_au, std::enable_shared_from_this<au> {
     enum class method {
         will_update_connections,
         did_update_connections,
     };
 
-    using chaining_pair_t = std::pair<method, au>;
+    using chaining_pair_t = std::pair<method, std::shared_ptr<au>>;
     using prepare_unit_f = std::function<void(audio::unit &)>;
 
     struct args {
@@ -35,16 +32,11 @@ class au : public base {
         AudioComponentDescription acd;
     };
 
-    au(OSType const type, OSType const sub_type);
-    explicit au(AudioComponentDescription const &);
-    au(args &&);
-    au(std::nullptr_t);
-
-    virtual ~au() final;
+    virtual ~au();
 
     void set_prepare_unit_handler(prepare_unit_f);
 
-    audio::unit unit() const;
+    std::shared_ptr<audio::unit> unit() const;
     std::unordered_map<AudioUnitScope, std::unordered_map<AudioUnitParameterID, audio::unit::parameter>> const &
     parameters() const;
     std::unordered_map<AudioUnitParameterID, audio::unit::parameter> const &global_parameters() const;
@@ -64,14 +56,44 @@ class au : public base {
     float output_parameter_value(AudioUnitParameterID const parameter_id, AudioUnitElement const element) const;
 
     [[nodiscard]] chaining::chain_unsync_t<chaining_pair_t> chain() const;
-    [[nodiscard]] chaining::chain_relayed_unsync_t<au, chaining_pair_t> chain(method const) const;
+    [[nodiscard]] chaining::chain_relayed_unsync_t<std::shared_ptr<au>, chaining_pair_t> chain(method const) const;
 
     audio::engine::node const &node() const;
     audio::engine::node &node();
 
-    manageable_au &manageable();
+    std::shared_ptr<manageable_au> manageable();
+
+   protected:
+    au(node_args &&);
+
+    void prepare(AudioComponentDescription const &acd);
 
    private:
-    manageable_au _manageable = nullptr;
+    std::shared_ptr<audio::engine::node> _node;
+    AudioComponentDescription _acd;
+    std::unordered_map<AudioUnitScope, unit::parameter_map_t> _parameters;
+    chaining::notifier<chaining_pair_t> _notifier;
+    chaining::any_observer_ptr _reset_observer = nullptr;
+    chaining::any_observer_ptr _connections_observer = nullptr;
+    prepare_unit_f _prepare_unit_handler;
+
+    struct core;
+    std::unique_ptr<core> _core;
+
+    au(au const &) = delete;
+    au(au &&) = delete;
+    au &operator=(au const &) = delete;
+    au &operator=(au &&) = delete;
+
+    void prepare_unit() override;
+    void prepare_parameters() override;
+    void reload_unit() override;
+
+    void _update_unit_connections();
+    void _will_reset();
 };
+
+std::shared_ptr<au> make_au(OSType const type, OSType const sub_type);
+std::shared_ptr<au> make_au(AudioComponentDescription const &);
+std::shared_ptr<au> make_au(au::args &&);
 }  // namespace yas::audio::engine

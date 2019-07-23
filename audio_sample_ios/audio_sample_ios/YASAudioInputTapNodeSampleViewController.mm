@@ -3,8 +3,10 @@
 //
 
 #import "YASAudioInputTapNodeSampleViewController.h"
+#import <AVFoundation/AVFoundation.h>
 #import <Accelerate/Accelerate.h>
 #import <audio/yas_audio_umbrella.h>
+#import <objc_utils/yas_objc_macros.h>
 
 using namespace yas;
 
@@ -18,20 +20,20 @@ using namespace yas;
 
 namespace yas::sample {
 struct input_tap_vc_internal {
-    audio::engine::manager manager;
-    audio::engine::au_input au_input;
-    audio::engine::tap input_tap = {{.is_input = true}};
+    std::shared_ptr<audio::engine::manager> manager = audio::engine::make_manager();
+    std::shared_ptr<audio::engine::au_input> au_input = audio::engine::make_au_input();
+    std::shared_ptr<audio::engine::tap> input_tap = audio::engine::make_tap({.is_input = true});
 
     chaining::value::holder<float> input_level{audio::math::decibel_from_linear(0.0f)};
 
     input_tap_vc_internal() = default;
 
     void prepare() {
-        double const sample_rate = au_input.au_io().device_sample_rate();
+        double const sample_rate = au_input->au_io().device_sample_rate();
         audio::format format{{.sample_rate = sample_rate, .channel_count = 2}};
-        manager.connect(au_input.au_io().au().node(), input_tap.node(), format);
+        manager->connect(au_input->au_io().au().node(), input_tap->node(), format);
 
-        input_tap.set_render_handler([input_level = input_level, sample_rate](auto args) mutable {
+        input_tap->set_render_handler([input_level = input_level, sample_rate](auto args) mutable {
             audio::pcm_buffer &buffer = args.buffer;
 
             auto each = audio::make_each_data<float>(buffer);
@@ -50,7 +52,7 @@ struct input_tap_vc_internal {
     }
 
     void stop() {
-        manager.stop();
+        manager->stop();
 
         [[AVAudioSession sharedInstance] setActive:NO error:nil];
     }
@@ -81,7 +83,7 @@ struct input_tap_vc_internal {
 
     if ([[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayAndRecord error:&error]) {
         _internal.prepare();
-        auto start_result = _internal.manager.start_render();
+        auto start_result = _internal.manager->start_render();
         if (start_result) {
             success = YES;
             self.displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(updateUI:)];
@@ -105,7 +107,7 @@ struct input_tap_vc_internal {
     [self.displayLink invalidate];
     self.displayLink = nil;
 
-    _internal.manager.stop();
+    _internal.manager->stop();
 }
 
 - (void)updateUI:(CADisplayLink *)sender {

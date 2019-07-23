@@ -9,17 +9,13 @@
 #include "yas_audio_types.h"
 
 namespace yas::audio {
-class time : public base {
+struct time final {
     class impl;
 
-   public:
-    time(std::nullptr_t);
     time(AudioTimeStamp const &ts, double const sample_rate);
     explicit time(uint64_t const host_time);
     time(int64_t const sample_time, double const sample_rate);
     time(uint64_t const host_time, int64_t const sample_time, double const sample_rate);
-
-    virtual ~time() final;
 
     bool is_host_time_valid() const;
     uint64_t host_time() const;
@@ -31,6 +27,12 @@ class time : public base {
     time extrapolate_time_from_anchor(time const &anchor_time);
 
     std::string description() const;
+
+    bool operator==(time const &) const;
+    bool operator!=(time const &) const;
+
+   private:
+    std::shared_ptr<impl> _impl;
 };
 
 uint64_t host_time_for_seconds(double seconds);

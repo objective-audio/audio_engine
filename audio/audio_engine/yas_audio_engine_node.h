@@ -28,16 +28,13 @@ namespace yas::audio::engine {
 class manager;
 class kernel;
 
-class node : public base {
-   public:
-    class impl;
-
+struct node : std::enable_shared_from_this<node>, connectable_node, manageable_node {
     enum class method {
         will_reset,
         update_connections,
     };
 
-    using chaining_pair_t = std::pair<method, node>;
+    using chaining_pair_t = std::pair<method, std::shared_ptr<node>>;
 
     struct render_args {
         audio::pcm_buffer &buffer;
@@ -48,26 +45,23 @@ class node : public base {
     using prepare_kernel_f = std::function<void(kernel &)>;
     using render_f = std::function<void(render_args)>;
 
-    node(node_args);
-    node(std::nullptr_t);
-
-    virtual ~node() final;
+    virtual ~node();
 
     void reset();
 
-    audio::engine::connection input_connection(uint32_t const bus_idx) const;
-    audio::engine::connection output_connection(uint32_t const bus_idx) const;
-    audio::engine::connection_wmap const &input_connections() const;
-    audio::engine::connection_wmap const &output_connections() const;
+    std::shared_ptr<audio::engine::connection> input_connection(uint32_t const bus_idx) const override;
+    std::shared_ptr<audio::engine::connection> output_connection(uint32_t const bus_idx) const override;
+    audio::engine::connection_wmap const &input_connections() const override;
+    audio::engine::connection_wmap const &output_connections() const override;
 
-    audio::format input_format(uint32_t const bus_idx) const;
-    audio::format output_format(uint32_t const bus_idx) const;
+    std::optional<audio::format> input_format(uint32_t const bus_idx) const;
+    std::optional<audio::format> output_format(uint32_t const bus_idx) const;
     bus_result_t next_available_input_bus() const;
     bus_result_t next_available_output_bus() const;
     bool is_available_input_bus(uint32_t const bus_idx) const;
     bool is_available_output_bus(uint32_t const bus_idx) const;
-    audio::engine::manager manager() const;
-    audio::time last_render_time() const;
+    audio::engine::manager const &manager() const override;
+    std::optional<audio::time> last_render_time() const;
 
     uint32_t input_bus_count() const;
     uint32_t output_bus_count() const;
@@ -76,22 +70,57 @@ class node : public base {
     void set_prepare_kernel_handler(prepare_kernel_f);
     void set_render_handler(render_f);
 
-    audio::engine::kernel kernel() const;
+    std::shared_ptr<audio::engine::kernel> kernel() const;
 
     void render(render_args);
     void set_render_time_on_render(audio::time const &time);
 
     [[nodiscard]] chaining::chain_unsync_t<chaining_pair_t> chain() const;
-    [[nodiscard]] chaining::chain_relayed_unsync_t<node, chaining_pair_t> chain(method const) const;
+    [[nodiscard]] chaining::chain_relayed_unsync_t<std::shared_ptr<node>, chaining_pair_t> chain(method const) const;
 
-    audio::engine::connectable_node &connectable();
-    audio::engine::manageable_node const &manageable() const;
-    audio::engine::manageable_node &manageable();
+    std::shared_ptr<connectable_node> connectable();
+    std::shared_ptr<manageable_node> manageable();
+
+   protected:
+    node(node_args &&);
 
    private:
-    audio::engine::connectable_node _connectable = nullptr;
-    mutable audio::engine::manageable_node _manageable = nullptr;
+    std::weak_ptr<audio::engine::manager> _weak_manager;
+    uint32_t _input_bus_count = 0;
+    uint32_t _output_bus_count = 0;
+    bool _is_input_renderable = false;
+    std::optional<uint32_t> _override_output_bus_idx = std::nullopt;
+    audio::engine::connection_wmap _input_connections;
+    audio::engine::connection_wmap _output_connections;
+    graph_editing_f _add_to_graph_handler;
+    graph_editing_f _remove_from_graph_handler;
+    prepare_kernel_f _prepare_kernel_handler;
+    audio::engine::node::render_f _render_handler;
+    chaining::notifier<chaining_pair_t> _notifier;
+
+    struct core;
+    std::unique_ptr<core> _core;
+
+    void prepare_kernel(std::shared_ptr<audio::engine::kernel> &kernel);
+
+    void add_connection(audio::engine::connection &) override;
+    void remove_connection(audio::engine::connection const &) override;
+
+    void set_manager(std::shared_ptr<audio::engine::manager> const &) override;
+    void update_kernel() override;
+    void update_connections() override;
+    void set_add_to_graph_handler(graph_editing_f &&) override;
+    void set_remove_from_graph_handler(graph_editing_f &&) override;
+    graph_editing_f const &add_to_graph_handler() const override;
+    graph_editing_f const &remove_from_graph_handler() const override;
+
+    node(node &&) = delete;
+    node &operator=(node &&) = delete;
+    node(node const &) = delete;
+    node &operator=(node const &) = delete;
 };
+
+std::shared_ptr<node> make_node(node_args);
 }  // namespace yas::audio::engine
 
 namespace yas {
@@ -99,12 +128,5 @@ std::string to_string(audio::engine::node::method const &);
 }
 
 std::ostream &operator<<(std::ostream &, yas::audio::engine::node::method const &);
-
-template <>
-struct std::hash<yas::audio::engine::node> {
-    std::size_t operator()(yas::audio::engine::node const &key) const {
-        return std::hash<uintptr_t>()(key.identifier());
-    }
-};
 
 #include "yas_audio_engine_kernel.h"

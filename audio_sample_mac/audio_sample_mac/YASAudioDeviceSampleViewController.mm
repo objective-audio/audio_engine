@@ -5,6 +5,8 @@
 #import "YASAudioDeviceSampleViewController.h"
 #import <Accelerate/Accelerate.h>
 #import <audio/yas_audio_umbrella.h>
+#import <cpp_utils/yas_objc_ptr.h>
+#import <objc_utils/yas_objc_macros.h>
 #import <objc_utils/yas_objc_unowned.h>
 #import <atomic>
 #import "YASDecibelValueTransformer.h"
@@ -60,26 +62,27 @@ class kernel {
         return _sine_volume.load();
     }
 
-    void process(const audio::pcm_buffer &input_buffer, audio::pcm_buffer &output_buffer) {
+    void process(std::shared_ptr<audio::pcm_buffer> const &input_buffer,
+                 std::shared_ptr<audio::pcm_buffer> &output_buffer) {
         if (!output_buffer) {
             return;
         }
 
-        uint32_t const frame_length = output_buffer.frame_length();
+        uint32_t const frame_length = output_buffer->frame_length();
 
         if (frame_length == 0) {
             return;
         }
 
-        auto const &format = output_buffer.format();
+        auto const &format = output_buffer->format();
         if (format.pcm_format() == audio::pcm_format::float32 && format.stride() == 1) {
             if (input_buffer) {
-                if (input_buffer.frame_length() >= frame_length) {
-                    output_buffer.copy_from(input_buffer);
+                if (input_buffer->frame_length() >= frame_length) {
+                    output_buffer->copy_from(*input_buffer);
 
                     float const throughVol = through_volume();
 
-                    auto each = audio::make_each_data<float>(output_buffer);
+                    auto each = audio::make_each_data<float>(*output_buffer);
                     while (yas_each_data_next_ch(each)) {
                         cblas_sscal(frame_length, throughVol, yas_each_data_ptr(each), 1);
                     }
@@ -95,7 +98,7 @@ class kernel {
                 _phase = audio::math::fill_sine(&_sine_data[0], frame_length, start_phase,
                                                 freq / sample_rate * audio::math::two_pi);
 
-                auto each = audio::make_each_data<float>(output_buffer);
+                auto each = audio::make_each_data<float>(*output_buffer);
                 while (yas_each_data_next_ch(each)) {
                     cblas_saxpy(frame_length, sine_vol, &_sine_data[0], 1, yas_each_data_ptr(each), 1);
                 }
@@ -125,10 +128,10 @@ using sample_kernel_sptr = std::shared_ptr<sample_kernel_t>;
 
 namespace yas::sample {
 struct device_vc_internal {
-    audio::graph graph = nullptr;
-    audio::device_io device_io = nullptr;
-    chaining::any_observer system_observer = nullptr;
-    chaining::any_observer device_observer = nullptr;
+    std::shared_ptr<audio::graph> graph = nullptr;
+    std::shared_ptr<audio::device_io> device_io = nullptr;
+    chaining::any_observer_ptr system_observer = nullptr;
+    chaining::any_observer_ptr device_observer = nullptr;
     sample_kernel_sptr kernel;
 };
 }
@@ -153,9 +156,9 @@ struct device_vc_internal {
                                         forName:NSStringFromClass([YASFrequencyValueFormatter class])];
     });
 
-    _internal.graph = audio::graph{};
-    _internal.device_io = audio::device_io{audio::device(nullptr)};
-    _internal.graph.add_audio_device_io(_internal.device_io);
+    _internal.graph = audio::make_graph();
+    _internal.device_io = std::make_shared<audio::device_io>(std::shared_ptr<audio::device>(nullptr));
+    _internal.graph->add_audio_device_io(_internal.device_io);
 
     _internal.kernel = std::make_shared<sample_kernel_t>();
 
@@ -171,17 +174,18 @@ struct device_vc_internal {
             .end();
 
     auto weak_device_io = to_weak(_internal.device_io);
-    _internal.device_io.set_render_handler([weak_device_io, kernel = _internal.kernel](auto args) {
+    _internal.device_io->set_render_handler([weak_device_io, kernel = _internal.kernel](auto args) {
         if (auto device_io = weak_device_io.lock()) {
-            kernel->process(device_io.input_buffer_on_render(), args.output_buffer);
+            kernel->process(device_io->input_buffer_on_render(), args.output_buffer);
         }
     });
 
     [self _updateDeviceNames];
 
-    auto default_device = audio::device::default_output_device();
-    if (auto index = audio::device::index_of_device(default_device)) {
-        self.selectedDeviceIndex = *index;
+    if (auto default_device = audio::device::default_output_device()) {
+        if (auto index = audio::device::index_of_device(*default_device)) {
+            self.selectedDeviceIndex = *index;
+        }
     }
 }
 
@@ -199,7 +203,7 @@ struct device_vc_internal {
     [self setup];
 
     if (_internal.graph) {
-        _internal.graph.start();
+        _internal.graph->start();
     }
 }
 
@@ -207,7 +211,7 @@ struct device_vc_internal {
     [super viewWillDisappear];
 
     if (_internal.graph) {
-        _internal.graph.stop();
+        _internal.graph->stop();
     }
 
     [self dispose];
@@ -245,10 +249,10 @@ struct device_vc_internal {
     if (_selectedDeviceIndex != selectedDeviceIndex) {
         _selectedDeviceIndex = selectedDeviceIndex;
 
-        auto all_devices = audio::device::all_devices();
+        auto const all_devices = audio::device::all_devices();
 
         if (selectedDeviceIndex < all_devices.size()) {
-            auto device = all_devices[selectedDeviceIndex];
+            auto const &device = all_devices[selectedDeviceIndex];
             [self setDevice:device];
         } else {
             [self setDevice:nullptr];
@@ -262,15 +266,19 @@ struct device_vc_internal {
     NSMutableArray *titles = [NSMutableArray arrayWithCapacity:all_devices.size()];
 
     for (auto &device : all_devices) {
-        [titles addObject:(NSString *)device.name()];
+        [titles addObject:(NSString *)device->name()];
     }
 
     [titles addObject:@"None"];
 
     self.deviceNames = titles;
 
-    auto device = _internal.device_io.device();
-    auto index = audio::device::index_of_device(device);
+    std::optional<NSUInteger> index = std::nullopt;
+
+    if (auto const device = _internal.device_io->device()) {
+        index = audio::device::index_of_device(*device);
+    }
+
     if (index) {
         self.selectedDeviceIndex = *index;
     } else {
@@ -278,47 +286,47 @@ struct device_vc_internal {
     }
 }
 
-- (void)setDevice:(const audio::device &)selected_device {
-    if (auto prev_audio_device = _internal.device_io.device()) {
+- (void)setDevice:(std::shared_ptr<audio::device> const &)selected_device {
+    if (auto prev_audio_device = _internal.device_io->device()) {
         _internal.device_observer = nullptr;
     }
 
     auto all_devices = audio::device::all_devices();
 
     if (selected_device && std::find(all_devices.begin(), all_devices.end(), selected_device) != all_devices.end()) {
-        _internal.device_io.set_device(selected_device);
+        _internal.device_io->set_device(selected_device);
 
         auto unowned_self = make_objc_ptr([[YASUnownedObject alloc] initWithObject:self]);
 
-        _internal.device_observer = selected_device.chain(audio::device::method::device_did_change)
+        _internal.device_observer = selected_device->chain(audio::device::method::device_did_change)
                                         .perform([selected_device, unowned_self](auto const &change_info) {
                                             auto const &infos = change_info.property_infos;
                                             if (infos.size() > 0) {
                                                 auto &device_id = infos.at(0).object_id;
-                                                if (selected_device.audio_device_id() == device_id) {
+                                                if (selected_device->audio_device_id() == device_id) {
                                                     [[unowned_self.object() object] _updateDeviceInfo];
                                                 }
                                             }
                                         })
                                         .end();
     } else {
-        _internal.device_io.set_device(nullptr);
+        _internal.device_io->set_device(nullptr);
     }
 
     [self _updateDeviceInfo];
 }
 
 - (void)_updateDeviceInfo {
-    auto const device = _internal.device_io.device();
+    auto const &device = _internal.device_io->device();
     NSColor *onColor = [NSColor blackColor];
     NSColor *offColor = [NSColor lightGrayColor];
     if (device) {
         self.deviceInfo = [NSString
-            stringWithFormat:@"name = %@\nnominal samplerate = %@", device.name(), @(device.nominal_sample_rate())];
+            stringWithFormat:@"name = %@\nnominal samplerate = %@", device->name(), @(device->nominal_sample_rate())];
         ;
-        self.nominalSampleRate = device.nominal_sample_rate();
-        self.ioThroughTextColor = (device.input_format() && device.output_format()) ? onColor : offColor;
-        self.sineTextColor = device.output_format() ? onColor : offColor;
+        self.nominalSampleRate = device->nominal_sample_rate();
+        self.ioThroughTextColor = (device->input_format() && device->output_format()) ? onColor : offColor;
+        self.sineTextColor = device->output_format() ? onColor : offColor;
     } else {
         self.deviceInfo = nil;
         self.nominalSampleRate = 0;

@@ -21,7 +21,7 @@ using namespace yas;
 }
 
 - (void)test_set_format_success {
-    audio::unit converter_unit(kAudioUnitType_FormatConverter, kAudioUnitSubType_AUConverter);
+    auto converter_unit = audio::make_unit(kAudioUnitType_FormatConverter, kAudioUnitSubType_AUConverter);
     audio::pcm_format const pcm_formats[] = {audio::pcm_format::float32, audio::pcm_format::float64,
                                              audio::pcm_format::int16, audio::pcm_format::fixed824};
     double const sample_rates[] = {4000, 8000, 16000, 22050, 44100, 48000, 88100, 96000, 192000, 382000};
@@ -34,19 +34,20 @@ using namespace yas;
                                                    .channel_count = 2,
                                                    .pcm_format = pcm_format,
                                                    .interleaved = interleaved});
-                XCTAssertNoThrow(converter_unit.manageable().initialize());
-                XCTAssertNoThrow(converter_unit.set_output_format(format.stream_description(), 0));
-                XCTAssertNoThrow(converter_unit.set_input_format(format.stream_description(), 0));
+                auto manageable_unit = converter_unit->manageable();
+                XCTAssertNoThrow(manageable_unit->initialize());
+                XCTAssertNoThrow(converter_unit->set_output_format(format.stream_description(), 0));
+                XCTAssertNoThrow(converter_unit->set_input_format(format.stream_description(), 0));
 
                 AudioStreamBasicDescription asbd = {0};
-                XCTAssertNoThrow(asbd = converter_unit.output_format(0));
+                XCTAssertNoThrow(asbd = converter_unit->output_format(0));
                 XCTAssertTrue(is_equal(format.stream_description(), asbd));
 
                 memset(&asbd, 0, sizeof(AudioStreamBasicDescription));
-                XCTAssertNoThrow(asbd = converter_unit.input_format(0));
+                XCTAssertNoThrow(asbd = converter_unit->input_format(0));
                 XCTAssertTrue(is_equal(format.stream_description(), asbd));
 
-                XCTAssertNoThrow(converter_unit.manageable().uninitialize());
+                XCTAssertNoThrow(manageable_unit->uninitialize());
             }
         }
     }

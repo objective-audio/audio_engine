@@ -7,16 +7,10 @@
 #include <cpp_utils/yas_protocol.h>
 
 namespace yas::audio::engine {
-struct manageable_kernel : protocol {
-    struct impl : protocol::impl {
-        virtual void set_input_connections(audio::engine::connection_wmap &&) = 0;
-        virtual void set_output_connections(audio::engine::connection_wmap &&) = 0;
-    };
+struct manageable_kernel {
+    virtual ~manageable_kernel() = default;
 
-    explicit manageable_kernel(std::shared_ptr<impl> &&impl);
-    manageable_kernel(std::nullptr_t);
-
-    void set_input_connections(audio::engine::connection_wmap connections);
-    void set_output_connections(audio::engine::connection_wmap connections);
+    virtual void set_input_connections(audio::engine::connection_wmap connections) = 0;
+    virtual void set_output_connections(audio::engine::connection_wmap connections) = 0;
 };
 }  // namespace yas::audio::engine

@@ -4,17 +4,13 @@
 
 #pragma once
 
-#include <cpp_utils/yas_base.h>
+#include <chaining/yas_chaining_umbrella.h>
 
 namespace yas::audio::engine {
 class au;
 
-class au_mixer : public base {
-   public:
-    au_mixer();
-    au_mixer(std::nullptr_t);
-
-    virtual ~au_mixer() final;
+struct au_mixer : std::enable_shared_from_this<au_mixer> {
+    virtual ~au_mixer();
 
     void set_output_volume(float const volume, uint32_t const bus_idx);
     float output_volume(uint32_t const bus_idx) const;
@@ -32,7 +28,22 @@ class au_mixer : public base {
     audio::engine::au const &au() const;
     audio::engine::au &au();
 
+   protected:
+    au_mixer();
+
+    void prepare();
+
    private:
-    class impl;
+    std::shared_ptr<audio::engine::au> _au;
+    chaining::any_observer_ptr _connections_observer = nullptr;
+
+    au_mixer(au_mixer const &) = delete;
+    au_mixer(au_mixer &&) = delete;
+    au_mixer &operator=(au_mixer const &) = delete;
+    au_mixer &operator=(au_mixer &&) = delete;
+
+    void _update_unit_mixer_connections();
 };
+
+std::shared_ptr<au_mixer> make_au_mixer();
 }  // namespace yas::audio::engine

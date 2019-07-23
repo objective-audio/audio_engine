@@ -5,7 +5,6 @@
 #pragma once
 
 #include <AudioToolbox/AudioToolbox.h>
-#include <cpp_utils/yas_base.h>
 #include <cpp_utils/yas_exception.h>
 #include <functional>
 #include <string>
@@ -19,9 +18,8 @@ class result;
 }
 
 namespace yas::audio {
-class unit : public base {
-   public:
-    class impl;
+struct unit : manageable_unit, std::enable_shared_from_this<unit> {
+    class core;
     class parameter;
     using parameter_map_t = std::unordered_map<AudioUnitParameterID, parameter>;
 
@@ -30,13 +28,13 @@ class unit : public base {
 
     static OSType sub_type_default_io();
 
-    unit(std::nullptr_t);
-    explicit unit(AudioComponentDescription const &acd);
-    unit(OSType const type, OSType const subType);
+    virtual ~unit();
 
-    virtual ~unit() final;
+    unit(unit &&) = default;
+    unit &operator=(unit &&) = default;
 
-    CFStringRef name() const;
+    std::string const &name() const;
+    CFStringRef cf_name() const;
     OSType type() const;
     OSType sub_type() const;
     bool is_output_unit() const;
@@ -91,16 +89,40 @@ class unit : public base {
     void stop();   // for io
     void reset();
 
-    manageable_unit &manageable();
+    std::shared_ptr<manageable_unit> manageable();
 
     // render thread
 
     void callback_render(render_parameters &render_parameters);
     raw_unit_result_t raw_unit_render(render_parameters &render_parameters);
 
+   protected:
+    explicit unit(AudioComponentDescription const &acd);
+
    private:
-    manageable_unit _manageable = nullptr;
+    std::optional<uint8_t> _graph_key = std::nullopt;
+    std::optional<uint16_t> _key = std::nullopt;
+    AudioComponentDescription _acd = {0};
+    bool _initialized = false;
+    std::string _name;
+    std::unique_ptr<core> _core;
+
+    unit(unit const &) = delete;
+    unit &operator=(unit const &) = delete;
+
+    void _create_raw_unit(AudioComponentDescription const &acd);
+    void _dispose_raw_unit();
+
+    void initialize() override;
+    void uninitialize() override;
+    void set_graph_key(std::optional<uint8_t> const &) override;
+    std::optional<uint8_t> const &graph_key() const override;
+    void set_key(std::optional<uint16_t> const &) override;
+    std::optional<uint16_t> const &key() const override;
 };
+
+std::shared_ptr<audio::unit> make_unit(AudioComponentDescription const &acd);
+std::shared_ptr<audio::unit> make_unit(OSType const type, OSType const sub_type);
 }  // namespace yas::audio
 
 namespace yas {

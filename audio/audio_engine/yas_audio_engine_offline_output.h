@@ -4,34 +4,46 @@
 
 #pragma once
 
-#include <cpp_utils/yas_base.h>
+#include <chaining/yas_chaining_umbrella.h>
+#include <cpp_utils/yas_task.h>
 #include <ostream>
 #include "yas_audio_engine_offline_output_protocol.h"
 
 namespace yas::audio::engine {
 class node;
 
-class offline_output : public base {
-   public:
-    class impl;
-
-    offline_output();
-    offline_output(std::nullptr_t);
-
-    virtual ~offline_output() final;
+struct offline_output : manageable_offline_output, std::enable_shared_from_this<offline_output> {
+    virtual ~offline_output();
 
     bool is_running() const;
 
     audio::engine::node const &node() const;
     audio::engine::node &node();
 
-    manageable_offline_output &manageable();
+    std::shared_ptr<manageable_offline_output> manageable();
+
+   protected:
+    offline_output();
+
+    void prepare();
 
    private:
-    offline_output(std::shared_ptr<impl> const &);
+    task_queue _queue = nullptr;
+    std::shared_ptr<audio::engine::node> _node;
+    chaining::any_observer_ptr _reset_observer = nullptr;
+    struct core;
+    std::unique_ptr<core> _core;
 
-    manageable_offline_output _manageable = nullptr;
+    offline_output(offline_output const &) = delete;
+    offline_output(offline_output &&) = delete;
+    offline_output &operator=(offline_output const &) = delete;
+    offline_output &operator=(offline_output &&) = delete;
+
+    offline_start_result_t start(offline_render_f &&, offline_completion_f &&) override;
+    void stop() override;
 };
+
+std::shared_ptr<offline_output> make_offline_output();
 }  // namespace yas::audio::engine
 
 namespace yas {

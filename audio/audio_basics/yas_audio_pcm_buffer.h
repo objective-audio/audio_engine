@@ -6,6 +6,7 @@
 
 #include <cpp_utils/yas_base.h>
 #include <ostream>
+#include "yas_audio_format.h"
 #include "yas_audio_types.h"
 
 namespace yas {
@@ -14,12 +15,7 @@ class result;
 }
 
 namespace yas::audio {
-class format;
-
-class pcm_buffer : public base {
-    class impl;
-
-   public:
+struct pcm_buffer final {
     struct copy_options {
         uint32_t const from_begin_frame = 0;
         uint32_t const to_begin_frame = 0;
@@ -39,7 +35,6 @@ class pcm_buffer : public base {
         invalid_abl,
         invalid_format,
         out_of_range_frame,
-        buffer_is_null,
         out_of_range_channel,
     };
 
@@ -48,9 +43,6 @@ class pcm_buffer : public base {
     pcm_buffer(audio::format const &format, AudioBufferList *abl);
     pcm_buffer(audio::format const &format, uint32_t const frame_capacity);
     pcm_buffer(audio::format const &format, pcm_buffer const &from_buffer, channel_map_t const &channel_map);
-    pcm_buffer(std::nullptr_t);
-
-    virtual ~pcm_buffer() final;
 
     audio::format const &format() const;
     AudioBufferList *audio_buffer_list();
@@ -90,6 +82,27 @@ class pcm_buffer : public base {
     pcm_buffer::copy_result copy_to(T *const to_ptr, uint32_t const to_stride, uint32_t const to_begin_frame,
                                     uint32_t const from_ch_idx, uint32_t const from_begin_frame,
                                     uint32_t const copy_length) const;
+
+   private:
+    audio::format const _format;
+    AudioBufferList *_abl_ptr;
+    uint32_t const _frame_capacity;
+    uint32_t _frame_length;
+    abl_uptr const _abl;
+    abl_data_uptr const _data;
+
+    pcm_buffer(audio::format const &format, std::pair<audio::abl_uptr, audio::abl_data_uptr> &&abl_pair,
+               uint32_t const frame_capacity);
+    pcm_buffer(audio::format const &format, audio::abl_uptr &&abl, audio::pcm_buffer const &from_buffer,
+               channel_map_t const &channel_map);
+    pcm_buffer(audio::format const &format, AudioBufferList *ptr, uint32_t const frame_capacity);
+    pcm_buffer(audio::format const &format, abl_uptr &&abl, abl_data_uptr &&data, uint32_t const frame_capacity);
+    pcm_buffer(audio::format const &format, abl_uptr &&abl, uint32_t const frame_capacity);
+
+    template <typename T>
+    T *_data_ptr_at_index(uint32_t const buf_idx) const;
+    template <typename T>
+    T *_data_ptr_at_channel(uint32_t const ch_idx) const;
 };
 
 void clear(AudioBufferList *abl);

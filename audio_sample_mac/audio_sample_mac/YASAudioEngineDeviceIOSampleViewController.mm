@@ -5,6 +5,8 @@
 #import "YASAudioEngineDeviceIOSampleViewController.h"
 #import <Accelerate/Accelerate.h>
 #import <audio/yas_audio_umbrella.h>
+#import <cpp_utils/yas_objc_ptr.h>
+#import <objc_utils/yas_objc_macros.h>
 #import <objc_utils/yas_objc_unowned.h>
 
 using namespace yas;
@@ -97,12 +99,12 @@ typedef NS_ENUM(NSUInteger, YASAudioDeviceRouteSampleInputType) {
 
 namespace yas::sample {
 struct device_io_vc_internal {
-    audio::engine::manager manager = nullptr;
-    audio::engine::route route = nullptr;
-    audio::engine::tap tap = nullptr;
+    std::shared_ptr<audio::engine::manager> manager = nullptr;
+    std::shared_ptr<audio::engine::route> route = nullptr;
+    std::shared_ptr<audio::engine::tap> tap = nullptr;
 
-    chaining::any_observer system_observer = nullptr;
-    chaining::any_observer device_observer = nullptr;
+    chaining::any_observer_ptr system_observer = nullptr;
+    chaining::any_observer_ptr device_observer = nullptr;
 };
 }
 
@@ -131,7 +133,7 @@ struct device_io_vc_internal {
 
     [self setupEngine];
 
-    if (auto error = _internal.manager.start_render().error_opt()) {
+    if (auto error = _internal.manager->start_render().error_opt()) {
         auto const error_str = to_string(*error);
         NSLog(@"audio engine start failed. error : %@", (__bridge NSString *)to_cf_object(error_str));
     }
@@ -150,11 +152,11 @@ struct device_io_vc_internal {
     if ([object isKindOfClass:[YASAudioDeviceRouteSampleOutputData class]]) {
         YASAudioDeviceRouteSampleOutputData *data = object;
         if ([data isNoneSelected]) {
-            _internal.route.remove_route_for_destination({0, data.outputIndex});
+            _internal.route->remove_route_for_destination({0, data.outputIndex});
         } else if ([data isSineSelected]) {
-            _internal.route.add_route({YASAudioDeviceRouteSampleSourceBusSine, data.outputIndex, 0, data.outputIndex});
+            _internal.route->add_route({YASAudioDeviceRouteSampleSourceBusSine, data.outputIndex, 0, data.outputIndex});
         } else if ([data isInputSelected]) {
-            _internal.route.add_route(
+            _internal.route->add_route(
                 {YASAudioDeviceRouteSampleSourceBusInput, [data inputIndex], 0, data.outputIndex});
         }
 
@@ -165,10 +167,10 @@ struct device_io_vc_internal {
 }
 
 - (void)setupEngine {
-    _internal.manager = audio::engine::manager{};
-    _internal.manager.add_device_io();
-    _internal.route = audio::engine::route{};
-    _internal.tap = audio::engine::tap{};
+    _internal.manager = audio::engine::make_manager();
+    _internal.manager->add_device_io();
+    _internal.route = audio::engine::make_route();
+    _internal.tap = audio::engine::make_tap();
 
     auto weak_tap = to_weak(_internal.tap);
 
@@ -190,7 +192,7 @@ struct device_io_vc_internal {
         }
     };
 
-    _internal.tap.set_render_handler(render_handler);
+    _internal.tap->set_render_handler(render_handler);
 
     auto unowned_self = make_objc_ptr([[YASUnownedObject alloc] initWithObject:self]);
 
@@ -201,14 +203,15 @@ struct device_io_vc_internal {
 
     [self _updateDeviceNames];
 
-    auto default_device = audio::device::default_output_device();
-    if (auto index = audio::device::index_of_device(default_device)) {
-        self.selectedDeviceIndex = *index;
+    if (auto default_device = audio::device::default_output_device()) {
+        if (auto index = audio::device::index_of_device(*default_device)) {
+            self.selectedDeviceIndex = *index;
+        }
     }
 }
 
 - (void)dispose {
-    _internal.manager.stop();
+    _internal.manager->stop();
 
     _internal.route = nullptr;
     _internal.tap = nullptr;
@@ -233,15 +236,18 @@ struct device_io_vc_internal {
     NSMutableArray *titles = [NSMutableArray arrayWithCapacity:all_devices.size()];
 
     for (auto &device : all_devices) {
-        [titles addObject:(__bridge NSString *)device.name()];
+        [titles addObject:(__bridge NSString *)device->name()];
     }
 
     [titles addObject:@"None"];
 
     self.deviceNames = titles;
 
-    auto const &device = _internal.manager.device_io().device();
-    auto index = audio::device::index_of_device(device);
+    std::optional<NSUInteger> index = std::nullopt;
+    if (auto const &device = _internal.manager->device_io()->device()) {
+        index = audio::device::index_of_device(*device);
+    }
+
     if (index) {
         self.selectedDeviceIndex = *index;
     } else {
@@ -256,28 +262,32 @@ struct device_io_vc_internal {
     self.inputRoutes = nil;
 
     if (_internal.manager) {
-        _internal.manager.disconnect(_internal.tap.node());
-        _internal.manager.disconnect(_internal.route.node());
-        _internal.route.clear_routes();
+        _internal.manager->disconnect(_internal.tap->node());
+        _internal.manager->disconnect(_internal.route->node());
+        _internal.route->clear_routes();
 
-        if (auto const &device = _internal.manager.device_io().device()) {
-            if (device.output_channel_count() > 0) {
-                auto const output_format = device.output_format();
-                _internal.manager.connect(_internal.route.node(), _internal.manager.device_io().node(), output_format);
-                _internal.manager.connect(_internal.tap.node(), _internal.route.node(), 0,
-                                          YASAudioDeviceRouteSampleSourceBusSine, output_format);
+        if (auto const &device = _internal.manager->device_io()->device()) {
+            if (device->output_channel_count() > 0) {
+                if (auto const output_format = device->output_format()) {
+                    _internal.manager->connect(_internal.route->node(), _internal.manager->device_io()->node(),
+                                               *output_format);
+                    _internal.manager->connect(_internal.tap->node(), _internal.route->node(), 0,
+                                               YASAudioDeviceRouteSampleSourceBusSine, *output_format);
+                }
             }
 
-            if (device.input_channel_count() > 0) {
-                _internal.manager.connect(_internal.manager.device_io().node(), _internal.route.node(), 0,
-                                          YASAudioDeviceRouteSampleSourceBusInput, device.input_format());
+            if (device->input_channel_count() > 0) {
+                if (auto const input_format = device->input_format()) {
+                    _internal.manager->connect(_internal.manager->device_io()->node(), _internal.route->node(), 0,
+                                               YASAudioDeviceRouteSampleSourceBusInput, *input_format);
+                }
             }
         }
     }
 
-    if (auto const device = _internal.manager.device_io().device()) {
-        uint32_t const output_channel_count = device.output_channel_count();
-        uint32_t const input_channel_count = device.input_channel_count();
+    if (auto const &device = _internal.manager->device_io()->device()) {
+        uint32_t const output_channel_count = device->output_channel_count();
+        uint32_t const input_channel_count = device->input_channel_count();
         NSMutableArray *outputRoutes = [NSMutableArray arrayWithCapacity:output_channel_count];
         NSMutableArray *inputRoutes = [NSMutableArray arrayWithCapacity:input_channel_count];
 
@@ -295,7 +305,7 @@ struct device_io_vc_internal {
 
         self.outputRoutes = outputRoutes;
         self.inputRoutes = inputRoutes;
-        self.nominalSampleRate = device.nominal_sample_rate();
+        self.nominalSampleRate = device->nominal_sample_rate();
 
         [self _updateInputSelection];
         [self _addObservers];
@@ -323,7 +333,7 @@ struct device_io_vc_internal {
         return;
     }
 
-    auto &routes = _internal.route.routes();
+    auto &routes = _internal.route->routes();
     for (YASAudioDeviceRouteSampleOutputData *data in self.outputRoutes) {
         uint32_t const dst_ch_idx = data.outputIndex;
         auto it = std::find_if(routes.begin(), routes.end(), [dst_ch_idx](const audio::route &route) {
@@ -356,43 +366,43 @@ struct device_io_vc_internal {
 - (void)setSelectedDeviceIndex:(NSUInteger)selectedDeviceIndex {
     _selectedDeviceIndex = selectedDeviceIndex;
 
-    auto all_devices = audio::device::all_devices();
+    auto const all_devices = audio::device::all_devices();
 
     if (selectedDeviceIndex < all_devices.size()) {
-        auto device = all_devices[selectedDeviceIndex];
+        auto const &device = all_devices[selectedDeviceIndex];
         [self setDevice:device];
     } else {
         [self setDevice:nullptr];
     }
 }
 
-- (void)setDevice:(const audio::device &)selected_device {
+- (void)setDevice:(std::shared_ptr<audio::device> const &)selected_device {
     _internal.device_observer = nullptr;
 
-    if (!_internal.manager || !_internal.manager.device_io()) {
+    if (!_internal.manager || !_internal.manager->device_io()) {
         return;
     }
 
     auto const all_devices = audio::device::all_devices();
 
     if (selected_device && std::find(all_devices.begin(), all_devices.end(), selected_device) != all_devices.end()) {
-        _internal.manager.device_io().set_device(selected_device);
+        _internal.manager->device_io()->set_device(selected_device);
 
         auto unowned_self = make_objc_ptr([[YASUnownedObject alloc] initWithObject:self]);
 
-        _internal.device_observer = selected_device.chain(audio::device::method::device_did_change)
+        _internal.device_observer = selected_device->chain(audio::device::method::device_did_change)
                                         .perform([selected_device, unowned_self](auto const &change_info) {
                                             auto const &infos = change_info.property_infos;
                                             if (change_info.property_infos.size() > 0) {
                                                 auto const &device_id = infos.at(0).object_id;
-                                                if (selected_device.audio_device_id() == device_id) {
+                                                if (selected_device->audio_device_id() == device_id) {
                                                     [[unowned_self.object() object] _updateConnection];
                                                 }
                                             }
                                         })
                                         .end();
     } else {
-        _internal.manager.device_io().set_device(nullptr);
+        _internal.manager->device_io()->set_device(nullptr);
     }
 
     [self _updateConnection];

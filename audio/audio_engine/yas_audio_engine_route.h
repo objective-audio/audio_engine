@@ -4,21 +4,14 @@
 
 #pragma once
 
-#include <cpp_utils/yas_base.h>
+#include <chaining/yas_chaining_umbrella.h>
 #include "yas_audio_route.h"
 
 namespace yas::audio::engine {
 class node;
 
-class route : public base {
-    class kernel;
-    class impl;
-
-   public:
-    route();
-    route(std::nullptr_t);
-
-    virtual ~route() final;
+struct route : std::enable_shared_from_this<route> {
+    virtual ~route();
 
     audio::route_set_t const &routes() const;
     void add_route(audio::route);
@@ -30,5 +23,23 @@ class route : public base {
 
     audio::engine::node const &node() const;
     audio::engine::node &node();
+
+   protected:
+    route();
+
+    void prepare();
+
+   private:
+    class kernel;
+
+    std::shared_ptr<audio::engine::node> _node;
+    route_set_t _routes;
+    chaining::any_observer_ptr _reset_observer = nullptr;
+
+    void _will_reset();
+    void _erase_route_if_either_matched(audio::route const &route);
+    void _erase_route_if(std::function<bool(audio::route const &)> pred);
 };
+
+std::shared_ptr<route> make_route();
 }  // namespace yas::audio::engine

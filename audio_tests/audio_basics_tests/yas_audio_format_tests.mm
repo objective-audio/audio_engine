@@ -26,18 +26,6 @@ using namespace yas;
     XCTAssertEqual(format.is_empty(), true);
 }
 
-- (void)test_create_with_nullptr {
-    audio::format format(nullptr);
-
-    XCTAssertFalse(format);
-}
-
-- (void)test_nullptr_parameter {
-    auto lambda = [self](const audio::format &format) { XCTAssertFalse(format); };
-
-    lambda(nullptr);
-}
-
 - (void)test_create_standard_format {
     double const sampleRate = 44100.0;
     uint32_t const channelCount = 2;
@@ -277,11 +265,6 @@ using namespace yas;
     asbd2.mBitsPerChannel = 2;
 
     XCTAssertFalse(is_equal(asbd1, asbd2));
-}
-
-- (void)test_null_format {
-    auto const null_format = audio::format::null_format();
-    XCTAssertFalse(null_format);
 }
 
 - (void)test_is_empty {

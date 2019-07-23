@@ -10,10 +10,7 @@
 #include <ostream>
 
 namespace yas::audio {
-class unit::parameter : public base {
-   public:
-    class impl;
-
+struct unit::parameter {
     struct change_info {
         parameter const &parameter;
         AudioUnitElement const element;
@@ -26,18 +23,20 @@ class unit::parameter : public base {
     using chaining_pair_t = std::pair<method, change_info>;
 
     parameter(AudioUnitParameterInfo const &info, AudioUnitParameterID const paramter_id, AudioUnitScope const scope);
-    parameter(std::nullptr_t);
 
-    AudioUnitParameterID parameter_id() const;
-    AudioUnitScope scope() const;
-    CFStringRef unit_name() const;
-    bool has_clump() const;
-    uint32_t clump_id() const;
-    CFStringRef name() const;
-    AudioUnitParameterUnit unit() const;
-    AudioUnitParameterValue min_value() const;
-    AudioUnitParameterValue max_value() const;
-    AudioUnitParameterValue default_value() const;
+    AudioUnitParameterID const parameter_id;
+    AudioUnitScope const scope;
+    bool const has_clump;
+    uint32_t const clump_id;
+    AudioUnitParameterUnit const unit;
+    AudioUnitParameterValue const min_value;
+    AudioUnitParameterValue const max_value;
+    AudioUnitParameterValue const default_value;
+
+    std::string const unit_name;
+    std::string const name;
+    CFStringRef cf_unit_name() const;
+    CFStringRef cf_name() const;
 
     float value(AudioUnitElement const element) const;
     void set_value(float const value, AudioUnitElement const element);
@@ -45,6 +44,10 @@ class unit::parameter : public base {
 
     [[nodiscard]] chaining::chain_unsync_t<chaining_pair_t> chain() const;
     [[nodiscard]] chaining::chain_relayed_unsync_t<change_info, chaining_pair_t> chain(method const) const;
+
+   private:
+    std::unordered_map<AudioUnitElement, AudioUnitParameterValue> _values;
+    chaining::notifier<chaining_pair_t> _notifier;
 };
 }  // namespace yas::audio
 

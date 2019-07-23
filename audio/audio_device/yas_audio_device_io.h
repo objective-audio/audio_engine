@@ -7,29 +7,31 @@
 #include <TargetConditionals.h>
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
 
-#include <cpp_utils/yas_base.h>
+#include <cpp_utils/yas_weakable.h>
 #include <functional>
+#include "yas_audio_time.h"
 #include "yas_audio_types.h"
 
 namespace yas::audio {
 class pcm_buffer;
-class time;
 class device;
 
-class device_io : public base {
-   public:
+struct device_io : weakable<device_io> {
+    class impl;
+
     struct render_args {
-        audio::pcm_buffer &output_buffer;
-        audio::time const &when;
+        std::shared_ptr<audio::pcm_buffer> &output_buffer;
+        std::optional<audio::time> const when;
     };
 
     using render_f = std::function<void(render_args)>;
 
     device_io(std::nullptr_t);
-    explicit device_io(audio::device const &);
+    explicit device_io(std::shared_ptr<audio::device> const &);
+    explicit device_io(std::shared_ptr<impl> &&);
 
-    void set_device(audio::device const device);
-    audio::device device() const;
+    void set_device(std::shared_ptr<audio::device> const device);
+    std::shared_ptr<audio::device> const &device() const;
     bool is_running() const;
     void set_render_handler(render_f);
     void set_maximum_frames_per_slice(uint32_t const frames);
@@ -38,23 +40,19 @@ class device_io : public base {
     void start() const;
     void stop() const;
 
-    audio::pcm_buffer const &input_buffer_on_render() const;
-    audio::time const &input_time_on_render() const;
+    std::shared_ptr<pcm_buffer> &input_buffer_on_render();
+    std::shared_ptr<audio::time> const &input_time_on_render() const;
+
+    std::shared_ptr<weakable_impl> weakable_impl_ptr() const override;
 
    private:
     class kernel;
-    class impl;
+
+    std::shared_ptr<impl> _impl;
 
     void _initialize() const;
     void _uninitialize() const;
 };
 }  // namespace yas::audio
-
-template <>
-struct std::hash<yas::audio::device_io> {
-    std::size_t operator()(yas::audio::device_io const &key) const {
-        return std::hash<uintptr_t>()(key.identifier());
-    }
-};
 
 #endif

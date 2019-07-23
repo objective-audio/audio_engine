@@ -13,7 +13,7 @@
 
 using namespace yas;
 
-struct audio::time::impl : base::impl {
+struct audio::time::impl {
     objc_ptr<AVAudioTime *> _av_audio_time;
 
     impl(objc_ptr<AVAudioTime *> &&time) : _av_audio_time(std::move(time)) {
@@ -22,72 +22,73 @@ struct audio::time::impl : base::impl {
         }
     }
 
-    bool is_equal(std::shared_ptr<base::impl> const &rhs) const override {
-        if (auto casted_rhs = std::dynamic_pointer_cast<impl>(rhs)) {
-            if (auto rhs_av_audio_time = casted_rhs->_av_audio_time) {
-                return [this->_av_audio_time.object() isEqual:rhs_av_audio_time.object()];
-            }
+    bool is_equal(std::shared_ptr<impl> const &rhs) const {
+        if (auto rhs_av_audio_time = rhs->_av_audio_time) {
+            return [this->_av_audio_time.object() isEqual:rhs_av_audio_time.object()];
         }
         return false;
     }
 };
 
-audio::time::time(std::nullptr_t) : base(nullptr) {
-}
-
 audio::time::time(AudioTimeStamp const &ts, double const sample_rate)
-    : base(std::make_shared<impl>(
+    : _impl(std::make_shared<impl>(
           make_objc_ptr([[AVAudioTime alloc] initWithAudioTimeStamp:&ts sampleRate:sample_rate]))) {
 }
 
 audio::time::time(uint64_t const host_time)
-    : base(std::make_shared<impl>(make_objc_ptr([[AVAudioTime alloc] initWithHostTime:host_time]))) {
+    : _impl(std::make_shared<impl>(make_objc_ptr([[AVAudioTime alloc] initWithHostTime:host_time]))) {
 }
 
 audio::time::time(int64_t const sample_time, double const sample_rate)
-    : base(std::make_shared<impl>(
+    : _impl(std::make_shared<impl>(
           make_objc_ptr([[AVAudioTime alloc] initWithSampleTime:sample_time atRate:sample_rate]))) {
 }
 
 audio::time::time(uint64_t const host_time, int64_t const sample_time, double const sample_rate)
-    : base(std::make_shared<impl>(
+    : _impl(std::make_shared<impl>(
           make_objc_ptr([[AVAudioTime alloc] initWithHostTime:host_time sampleTime:sample_time atRate:sample_rate]))) {
 }
 
-audio::time::~time() = default;
-
 bool audio::time::is_host_time_valid() const {
-    return impl_ptr<impl>()->_av_audio_time.object().isHostTimeValid;
+    return this->_impl->_av_audio_time.object().isHostTimeValid;
 }
 
 uint64_t audio::time::host_time() const {
-    return impl_ptr<impl>()->_av_audio_time.object().hostTime;
+    return this->_impl->_av_audio_time.object().hostTime;
 }
 
 bool audio::time::is_sample_time_valid() const {
-    return impl_ptr<impl>()->_av_audio_time.object().isSampleTimeValid;
+    return this->_impl->_av_audio_time.object().isSampleTimeValid;
 }
 
 int64_t audio::time::sample_time() const {
-    return impl_ptr<impl>()->_av_audio_time.object().sampleTime;
+    return this->_impl->_av_audio_time.object().sampleTime;
 }
 
 double audio::time::sample_rate() const {
-    return impl_ptr<impl>()->_av_audio_time.object().sampleRate;
+    return this->_impl->_av_audio_time.object().sampleRate;
 }
 
 AudioTimeStamp audio::time::audio_time_stamp() const {
-    return impl_ptr<impl>()->_av_audio_time.object().audioTimeStamp;
+    return this->_impl->_av_audio_time.object().audioTimeStamp;
 }
 
 audio::time audio::time::extrapolate_time_from_anchor(audio::time const &anchor_time) {
-    return to_time([impl_ptr<impl>()->_av_audio_time.object()
-        extrapolateTimeFromAnchor:anchor_time.impl_ptr<impl>()->_av_audio_time.object()]);
+    return to_time(
+        [this->_impl->_av_audio_time.object() extrapolateTimeFromAnchor:anchor_time._impl->_av_audio_time.object()]);
 }
 
 std::string audio::time::description() const {
-    NSString *description = [impl_ptr<impl>()->_av_audio_time.object() description];
+    NSString *description = [this->_impl->_av_audio_time.object() description];
     return to_string((__bridge CFStringRef)description);
+}
+
+bool audio::time::operator==(time const &rhs) const {
+    return this->_impl && rhs._impl && (this->_impl == rhs._impl || this->_impl->is_equal(rhs._impl));
+}
+
+bool audio::time::operator!=(time const &rhs) const {
+    return !(*this == rhs);
 }
 
 #pragma mark - global
