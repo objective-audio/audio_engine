@@ -16,8 +16,8 @@ static double constexpr sample_rate = 44100.0;
 }
 
 namespace yas::offline_sample::engine {
-struct sine : base {
-    struct impl : base::impl {
+struct sine {
+    struct impl {
         std::shared_ptr<audio::engine::tap> _tap = audio::engine::make_tap();
         double phase_on_render;
 
@@ -47,20 +47,20 @@ struct sine : base {
         mutable std::recursive_mutex _mutex;
     };
 
-    sine() : base(std::make_unique<impl>()) {
+    sine() : _impl(std::make_shared<impl>()) {
         set_frequency(1000.0);
 
-        auto weak_sine = to_weak(*this);
+        auto weak_impl = to_weak(this->_impl);
 
-        auto render_handler = [weak_sine](auto args) {
+        auto render_handler = [weak_impl](auto args) {
             auto &buffer = args.buffer;
 
             buffer.clear();
 
-            if (auto sine = weak_sine.lock()) {
-                if (sine.is_playing()) {
-                    double const start_phase = sine.impl_ptr<impl>()->phase_on_render;
-                    double const phase_per_frame = sine.frequency() / sample_rate * audio::math::two_pi;
+            if (auto sine_impl = weak_impl.lock()) {
+                if (sine_impl->is_playing()) {
+                    double const start_phase = sine_impl->phase_on_render;
+                    double const phase_per_frame = sine_impl->frequency() / sample_rate * audio::math::two_pi;
                     double next_phase = start_phase;
                     uint32_t const frame_length = buffer.frame_length();
 
@@ -70,7 +70,7 @@ struct sine : base {
                             next_phase = audio::math::fill_sine(yas_each_data_ptr(each), frame_length, start_phase,
                                                                 phase_per_frame);
                         }
-                        sine.impl_ptr<impl>()->phase_on_render = next_phase;
+                        sine_impl->phase_on_render = next_phase;
                     }
                 }
             }
@@ -79,30 +79,30 @@ struct sine : base {
         tap().set_render_handler(render_handler);
     }
 
-    sine(std::nullptr_t) : base(nullptr) {
-    }
-
     virtual ~sine() = default;
 
     void set_frequency(float const frequency) {
-        impl_ptr<impl>()->set_frequency(frequency);
+        this->set_frequency(frequency);
     }
 
     float frequency() const {
-        return impl_ptr<impl>()->frequency();
+        return this->frequency();
     }
 
     void set_playing(bool const playing) {
-        impl_ptr<impl>()->set_playing(playing);
+        this->set_playing(playing);
     }
 
     bool is_playing() const {
-        return impl_ptr<impl>()->is_playing();
+        return this->is_playing();
     }
 
     audio::engine::tap &tap() {
-        return *impl_ptr<impl>()->_tap;
+        return *this->_impl->_tap;
     }
+
+   private:
+    std::shared_ptr<impl> _impl;
 };
 }
 
