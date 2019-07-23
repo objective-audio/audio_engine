@@ -55,7 +55,7 @@ struct graph : std::enable_shared_from_this<graph>, interruptable_graph {
 
     void start_all_ios() override;
     void stop_all_ios() override;
-    
+
     std::optional<uint16_t> next_unit_key();
     std::shared_ptr<unit> unit_for_key(uint16_t const key) const;
     void add_unit_to_units(std::shared_ptr<audio::unit> &unit);
