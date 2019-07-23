@@ -129,7 +129,7 @@ struct audio::graph::impl {
 
     ~impl() {
         this->stop_all_ios();
-        global_graph::remove_graph_for_key(key());
+        global_graph::remove_graph_for_key(this->_key);
         this->remove_all_units();
     }
 
