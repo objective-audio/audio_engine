@@ -307,20 +307,9 @@ void audio::graph::remove_unit_from_units(std::shared_ptr<audio::unit> &unit) {
     }
 }
 
-namespace yas::audio {
-struct graph_factory : graph {
-    graph_factory(uint8_t const key) : graph(key) {
-    }
-
-    void prepare() {
-        this->graph::prepare();
-    }
-};
-}
-
 std::shared_ptr<audio::graph> audio::make_graph() {
     if (auto key = global_graph::min_empty_graph_key()) {
-        auto shared = std::make_shared<graph_factory>(*key);
+        auto shared = std::shared_ptr<graph>(new graph(*key));
         shared->prepare();
         return shared;
     } else {
