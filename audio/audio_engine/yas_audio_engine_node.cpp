@@ -271,15 +271,8 @@ void audio::engine::node::prepare_kernel(std::shared_ptr<audio::engine::kernel> 
     }
 }
 
-namespace yas::audio::engine {
-struct node_factory : node {
-    node_factory(node_args args) : node(std::move(args)) {
-    }
-};
-}  // namespace yas::audio::engine
-
 std::shared_ptr<audio::engine::node> audio::engine::make_node(node_args args) {
-    return std::make_shared<audio::engine::node_factory>(std::move(args));
+    return std::shared_ptr<audio::engine::node>(new node{std::move(args)});
 }
 
 #pragma mark -

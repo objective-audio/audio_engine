@@ -192,16 +192,8 @@ std::shared_ptr<audio::engine::manageable_offline_output> audio::engine::offline
     return std::dynamic_pointer_cast<manageable_offline_output>(shared_from_this());
 }
 
-namespace yas::audio::engine {
-struct offline_output_factory : offline_output {
-    void prepare() {
-        this->offline_output::prepare();
-    }
-};
-}
-
 std::shared_ptr<audio::engine::offline_output> audio::engine::make_offline_output() {
-    auto shared = std::make_shared<offline_output_factory>();
+    auto shared = std::shared_ptr<offline_output>(new offline_output{});
     shared->prepare();
     return shared;
 }

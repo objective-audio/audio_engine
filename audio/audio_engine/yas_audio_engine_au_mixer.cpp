@@ -93,16 +93,8 @@ void audio::engine::au_mixer::_update_unit_mixer_connections() {
     }
 }
 
-namespace yas::audio::engine {
-struct au_mixer_factory : au_mixer {
-    void prepare() {
-        this->au_mixer::prepare();
-    }
-};
-}  // namespace yas::audio::engine
-
 std::shared_ptr<audio::engine::au_mixer> audio::engine::make_au_mixer() {
-    auto shared = std::make_shared<au_mixer_factory>();
+    auto shared = std::shared_ptr<au_mixer>(new au_mixer{});
     shared->prepare();
     return shared;
 }

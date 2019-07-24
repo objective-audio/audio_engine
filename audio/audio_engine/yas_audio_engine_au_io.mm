@@ -167,23 +167,12 @@ void audio::engine::au_io::update_unit_io_connections() {
     this->_notifier.notify(std::make_pair(au_io::method::did_update_connection, shared_from_this()));
 }
 
-namespace yas::audio::engine {
-struct au_io_factory : au_io {
-    au_io_factory(au_io::args &&args) : au_io(std::move(args)) {
-    }
-
-    void prepare() {
-        this->au_io::prepare();
-    }
-};
-}
-
 std::shared_ptr<audio::engine::au_io> audio::engine::make_au_io() {
     return make_au_io(au_io::args{});
 }
 
 std::shared_ptr<audio::engine::au_io> audio::engine::make_au_io(au_io::args args) {
-    auto shared = std::make_shared<au_io_factory>(std::move(args));
+    auto shared = std::shared_ptr<au_io>(new au_io{std::move(args)});
     shared->prepare();
     return shared;
 }
@@ -209,12 +198,8 @@ audio::engine::au_io &audio::engine::au_output::au_io() {
     return *this->_au_io;
 }
 
-namespace yas::audio::engine {
-struct au_output_factory : au_output {};
-}
-
 std::shared_ptr<audio::engine::au_output> audio::engine::make_au_output() {
-    return std::make_shared<au_output_factory>();
+    return std::shared_ptr<au_output>(new au_output{});
 }
 
 #pragma mark - audio::engine::au_input
@@ -291,16 +276,8 @@ void audio::engine::au_input::update_unit_input_connections() {
     }
 }
 
-namespace yas::audio::engine {
-struct au_input_factory : au_input {
-    void prepare() {
-        this->au_input::prepare();
-    }
-};
-}
-
 std::shared_ptr<audio::engine::au_input> audio::engine::make_au_input() {
-    auto shared = std::make_shared<au_input_factory>();
+    auto shared = std::shared_ptr<au_input>(new au_input{});
     shared->prepare();
     return shared;
 }

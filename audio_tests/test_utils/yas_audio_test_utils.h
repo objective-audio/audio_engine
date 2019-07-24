@@ -28,8 +28,4 @@ struct node_object {
 
     std::shared_ptr<audio::engine::node> node;
 };
-
-std::shared_ptr<audio::engine::connection> make_connection(audio::engine::node &source_node, uint32_t const source_bus,
-                                                           audio::engine::node &destination_node,
-                                                           uint32_t const destination_bus, audio::format const &format);
 }  // namespace yas::test

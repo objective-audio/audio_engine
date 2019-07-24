@@ -30,9 +30,6 @@ struct unit : manageable_unit, std::enable_shared_from_this<unit> {
 
     virtual ~unit();
 
-    unit(unit &&) = default;
-    unit &operator=(unit &&) = default;
-
     std::string const &name() const;
     CFStringRef cf_name() const;
     OSType type() const;
@@ -96,9 +93,6 @@ struct unit : manageable_unit, std::enable_shared_from_this<unit> {
     void callback_render(render_parameters &render_parameters);
     raw_unit_result_t raw_unit_render(render_parameters &render_parameters);
 
-   protected:
-    explicit unit(AudioComponentDescription const &acd);
-
    private:
     std::optional<uint8_t> _graph_key = std::nullopt;
     std::optional<uint16_t> _key = std::nullopt;
@@ -107,6 +101,10 @@ struct unit : manageable_unit, std::enable_shared_from_this<unit> {
     std::string _name;
     std::unique_ptr<core> _core;
 
+    explicit unit(AudioComponentDescription const &acd);
+
+    unit(unit &&) = delete;
+    unit &operator=(unit &&) = delete;
     unit(unit const &) = delete;
     unit &operator=(unit const &) = delete;
 
@@ -119,6 +117,8 @@ struct unit : manageable_unit, std::enable_shared_from_this<unit> {
     std::optional<uint8_t> const &graph_key() const override;
     void set_key(std::optional<uint16_t> const &) override;
     std::optional<uint16_t> const &key() const override;
+
+    friend std::shared_ptr<audio::unit> make_unit(AudioComponentDescription const &acd);
 };
 
 std::shared_ptr<audio::unit> make_unit(AudioComponentDescription const &acd);

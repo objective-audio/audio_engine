@@ -50,18 +50,19 @@ struct au_io : std::enable_shared_from_this<au_io> {
     audio::engine::au const &au() const;
     audio::engine::au &au();
 
-   protected:
-    au_io(args);
-
-    void prepare();
-
    private:
     std::shared_ptr<audio::engine::au> _au;
     channel_map_t _channel_map[2];
     chaining::any_observer_ptr _connections_observer = nullptr;
     chaining::notifier<chaining_pair_t> _notifier;
 
+    au_io(args);
+
+    void prepare();
+
     void update_unit_io_connections();
+
+    friend std::shared_ptr<au_io> make_au_io(au_io::args);
 };
 
 std::shared_ptr<au_io> make_au_io();
@@ -76,11 +77,12 @@ struct au_output : std::enable_shared_from_this<au_output> {
     audio::engine::au_io const &au_io() const;
     audio::engine::au_io &au_io();
 
-   protected:
-    au_output();
-
    private:
     std::shared_ptr<audio::engine::au_io> _au_io;
+
+    au_output();
+
+    friend std::shared_ptr<au_output> make_au_output();
 };
 
 std::shared_ptr<au_output> make_au_output();
@@ -94,18 +96,19 @@ struct au_input : std::enable_shared_from_this<au_input> {
     audio::engine::au_io const &au_io() const;
     audio::engine::au_io &au_io();
 
-   protected:
-    au_input();
-
-    void prepare();
-
    private:
     std::shared_ptr<audio::engine::au_io> _au_io;
 
     std::shared_ptr<audio::pcm_buffer> _input_buffer = nullptr;
     chaining::any_observer_ptr _connections_observer = nullptr;
 
+    au_input();
+
+    void prepare();
+
     void update_unit_input_connections();
+
+    friend std::shared_ptr<au_input> make_au_input();
 };
 
 std::shared_ptr<au_input> make_au_input();

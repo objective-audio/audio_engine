@@ -22,14 +22,13 @@ struct connection : node_removable, std::enable_shared_from_this<connection> {
 
     std::shared_ptr<node_removable> removable();
 
-   protected:
-    connection(audio::engine::node &source_node, uint32_t const source_bus_idx, audio::engine::node &destination_node,
-               uint32_t const destination_bus_idx, audio::format const &format);
-
    private:
     mutable std::recursive_mutex _mutex;
     std::weak_ptr<node> _source_node;
     std::weak_ptr<node> _destination_node;
+
+    connection(audio::engine::node &source_node, uint32_t const source_bus_idx, audio::engine::node &destination_node,
+               uint32_t const destination_bus_idx, audio::format const &format);
 
     connection(connection const &) = delete;
     connection(connection &&) = delete;
@@ -41,6 +40,10 @@ struct connection : node_removable, std::enable_shared_from_this<connection> {
     void remove_destination_node() override;
 
     void _remove_connection_from_nodes(connection const &);
+
+    friend std::shared_ptr<connection> make_connection(audio::engine::node &src_node, uint32_t const src_bus,
+                                                       audio::engine::node &dst_node, uint32_t const dst_bus,
+                                                       audio::format const &format);
 };
 
 std::shared_ptr<connection> make_connection(audio::engine::node &src_node, uint32_t const src_bus,

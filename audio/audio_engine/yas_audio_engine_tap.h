@@ -27,11 +27,6 @@ struct tap : std::enable_shared_from_this<tap> {
     // for Test
     void render_source(audio::engine::node::render_args args);
 
-   protected:
-    tap(args);
-
-    void prepare();
-
    private:
     class kernel;
 
@@ -40,10 +35,16 @@ struct tap : std::enable_shared_from_this<tap> {
     chaining::any_observer_ptr _reset_observer = nullptr;
     std::shared_ptr<audio::engine::kernel> _kernel_on_render;
 
+    tap(args);
+
+    void prepare();
+
     tap(tap const &) = delete;
     tap(tap &&) = delete;
     tap &operator=(tap const &) = delete;
     tap &operator=(tap &&) = delete;
+
+    friend std::shared_ptr<tap> make_tap(tap::args);
 };
 
 std::shared_ptr<tap> make_tap();

@@ -57,7 +57,7 @@ using namespace yas;
     XCTAssertEqual(destination_bus, 0);
 
     if (auto const connection =
-            test::make_connection(*src_obj.node, source_bus, *dst_obj.node, destination_bus, format)) {
+            audio::engine::make_connection(*src_obj.node, source_bus, *dst_obj.node, destination_bus, format)) {
         XCTAssertEqual(src_obj.node->manageable()->output_connections().size(), 1);
         XCTAssertEqual(dst_obj.node->manageable()->input_connections().size(), 1);
         XCTAssertEqual(src_obj.node->manageable()->output_connection(source_bus), connection);
@@ -87,7 +87,7 @@ using namespace yas;
     auto source_bus = *src_obj.node->next_available_output_bus();
     auto destination_bus = *dst_obj.node->next_available_input_bus();
 
-    auto connection = test::make_connection(*src_obj.node, source_bus, *dst_obj.node, destination_bus, format);
+    auto connection = audio::engine::make_connection(*src_obj.node, source_bus, *dst_obj.node, destination_bus, format);
 
     XCTAssertEqual(src_obj.node->manageable()->output_connections().size(), 1);
     XCTAssertEqual(dst_obj.node->manageable()->input_connections().size(), 1);
@@ -139,14 +139,15 @@ using namespace yas;
     test::node_object output_obj;
     test::node_object relay_obj;
 
-    auto const output_connection = test::make_connection(*relay_obj.node, 0, *output_obj.node, 0, output_format);
+    auto const output_connection =
+        audio::engine::make_connection(*relay_obj.node, 0, *output_obj.node, 0, output_format);
 
     std::vector<std::shared_ptr<audio::engine::connection>> input_connections;
     input_connections.reserve(relay_obj.node->input_bus_count());
 
     for (uint32_t i = 0; i < relay_obj.node->input_bus_count(); ++i) {
         test::node_object input_obj;
-        auto input_connection = test::make_connection(*input_obj.node, 0, *relay_obj.node, i, input_format);
+        auto input_connection = audio::engine::make_connection(*input_obj.node, 0, *relay_obj.node, i, input_format);
         input_obj.node->connectable()->add_connection(*input_connection);
         input_connections.push_back(input_connection);
     }
@@ -186,13 +187,13 @@ using namespace yas;
     XCTAssertTrue(dst_obj.node->is_available_input_bus(1));
     XCTAssertFalse(dst_obj.node->is_available_input_bus(2));
 
-    auto connection_1 = test::make_connection(*src_obj_1.node, 0, *dst_obj.node, 1, format);
+    auto connection_1 = audio::engine::make_connection(*src_obj_1.node, 0, *dst_obj.node, 1, format);
 
     XCTAssertFalse(src_obj_1.node->is_available_output_bus(0));
     XCTAssertTrue(dst_obj.node->is_available_input_bus(0));
     XCTAssertFalse(dst_obj.node->is_available_input_bus(1));
 
-    auto connection_0 = test::make_connection(*src_obj_0.node, 0, *dst_obj.node, 0, format);
+    auto connection_0 = audio::engine::make_connection(*src_obj_0.node, 0, *dst_obj.node, 0, format);
 
     XCTAssertFalse(src_obj_0.node->is_available_output_bus(0));
     XCTAssertFalse(dst_obj.node->is_available_input_bus(0));

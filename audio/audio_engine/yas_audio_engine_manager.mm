@@ -556,16 +556,8 @@ void audio::engine::manager::post_configuration_change() {
     this->_notifier.notify(std::make_pair(method::configuration_change, shared_from_this()));
 }
 
-namespace yas::audio::engine {
-struct manager_factory : manager {
-    void prepare() {
-        this->manager::prepare();
-    }
-};
-}
-
 std::shared_ptr<audio::engine::manager> audio::engine::make_manager() {
-    auto shared = std::make_shared<manager_factory>();
+    auto shared = std::shared_ptr<manager>(new manager{});
     shared->prepare();
     return shared;
 }
