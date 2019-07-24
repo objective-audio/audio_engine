@@ -39,7 +39,7 @@ audio::device::stream::change_info::change_info(std::vector<property_info> &&inf
 
 #pragma mark - private
 
-struct audio::device::stream::impl : weakable_impl {
+struct audio::device::stream::impl {
     using listener_f =
         std::function<void(uint32_t const in_number_addresses, const AudioObjectPropertyAddress *const in_addresses)>;
 
@@ -57,8 +57,8 @@ struct audio::device::stream::impl : weakable_impl {
         return false;
     }
 
-    listener_f listener(stream const &stream) {
-        auto weak_stream = to_weak(stream);
+    listener_f listener(stream &stream) {
+        auto weak_stream = to_weak(stream.shared_from_this());
 
         return [weak_stream](uint32_t const address_count, const AudioObjectPropertyAddress *const addresses) {
             if (auto stream = weak_stream.lock()) {
@@ -99,14 +99,7 @@ struct audio::device::stream::impl : weakable_impl {
 
 #pragma mark - main
 
-audio::device::stream::stream(args args) : _impl(std::make_shared<impl>(args.stream_id, args.device_id)) {
-    auto listener = this->_impl->listener(*this);
-    this->_impl->add_listener(kAudioStreamPropertyVirtualFormat, listener);
-    this->_impl->add_listener(kAudioStreamPropertyIsActive, listener);
-    this->_impl->add_listener(kAudioStreamPropertyStartingChannel, listener);
-}
-
-audio::device::stream::stream(std::shared_ptr<impl> &&impl) : _impl(std::move(impl)) {
+audio::device::stream::stream(args &&args) : _impl(std::make_shared<impl>(args.stream_id, args.device_id)) {
 }
 
 AudioStreamID audio::device::stream::stream_id() const {
@@ -170,8 +163,17 @@ bool audio::device::stream::operator!=(stream const &rhs) const {
     return !(*this == rhs);
 }
 
-std::shared_ptr<weakable_impl> audio::device::stream::weakable_impl_ptr() const {
-    return this->_impl;
+void audio::device::stream::prepare() {
+    auto listener = this->_impl->listener(*this);
+    this->_impl->add_listener(kAudioStreamPropertyVirtualFormat, listener);
+    this->_impl->add_listener(kAudioStreamPropertyIsActive, listener);
+    this->_impl->add_listener(kAudioStreamPropertyStartingChannel, listener);
+}
+
+std::shared_ptr<audio::device::stream> audio::make_device_stream(device::stream::args args) {
+    auto shared = std::shared_ptr<device::stream>(new device::stream{std::move(args)});
+    shared->prepare();
+    return shared;
 }
 
 std::string yas::to_string(audio::device::stream::method const &method) {

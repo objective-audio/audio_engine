@@ -60,8 +60,8 @@ struct device {
     AudioDeviceID audio_device_id() const;
     CFStringRef name() const;
     CFStringRef manufacture() const;
-    std::vector<stream> input_streams() const;
-    std::vector<stream> output_streams() const;
+    std::vector<std::shared_ptr<stream>> input_streams() const;
+    std::vector<std::shared_ptr<stream>> output_streams() const;
     double nominal_sample_rate() const;
 
     std::optional<audio::format> input_format() const;
@@ -92,8 +92,8 @@ struct device {
 
    private:
     AudioDeviceID const _audio_device_id;
-    std::unordered_map<AudioStreamID, stream> input_streams_map;
-    std::unordered_map<AudioStreamID, stream> output_streams_map;
+    std::unordered_map<AudioStreamID, std::shared_ptr<stream>> input_streams_map;
+    std::unordered_map<AudioStreamID, std::shared_ptr<stream>> output_streams_map;
     chaining::notifier<audio::device::chaining_pair_t> _notifier;
     std::optional<audio::format> _input_format = std::nullopt;
     std::optional<audio::format> _output_format = std::nullopt;
