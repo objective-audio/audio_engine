@@ -28,9 +28,9 @@ struct offline_output : manageable_offline_output, std::enable_shared_from_this<
     chaining::any_observer_ptr _reset_observer = nullptr;
     struct core;
     std::unique_ptr<core> _core;
-    
+
     offline_output();
-    
+
     void prepare();
 
     offline_output(offline_output const &) = delete;
@@ -40,7 +40,7 @@ struct offline_output : manageable_offline_output, std::enable_shared_from_this<
 
     offline_start_result_t start(offline_render_f &&, offline_completion_f &&) override;
     void stop() override;
-    
+
     friend std::shared_ptr<offline_output> make_offline_output();
 };
 
