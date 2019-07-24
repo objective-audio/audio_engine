@@ -93,9 +93,9 @@ struct manager : std::enable_shared_from_this<manager> {
     std::unordered_set<std::shared_ptr<node>> _nodes;
     audio::engine::connection_set _connections;
     std::shared_ptr<audio::engine::offline_output> _offline_output = nullptr;
-    
+
     manager();
-    
+
     void prepare();
 
     bool _node_exists(audio::engine::node &node);
@@ -122,7 +122,7 @@ struct manager : std::enable_shared_from_this<manager> {
 
     void set_device_io(std::shared_ptr<audio::engine::device_io> &&node);
 #endif
-    
+
     friend std::shared_ptr<manager> make_manager();
 };
 
