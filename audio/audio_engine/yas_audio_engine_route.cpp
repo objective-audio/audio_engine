@@ -141,16 +141,8 @@ void audio::engine::route::_erase_route_if(std::function<bool(audio::route const
     erase_if(this->_routes, pred);
 }
 
-namespace yas::audio::engine {
-struct route_factory : route {
-    void prepare() {
-        this->route::prepare();
-    }
-};
-}  // namespace yas::audio::engine
-
 std::shared_ptr<audio::engine::route> audio::engine::make_route() {
-    auto shared = std::make_shared<route_factory>();
+    auto shared = std::make_shared<route>(new route{});
     shared->prepare();
     return shared;
 }

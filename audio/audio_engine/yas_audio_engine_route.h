@@ -24,11 +24,6 @@ struct route : std::enable_shared_from_this<route> {
     audio::engine::node const &node() const;
     audio::engine::node &node();
 
-   protected:
-    route();
-
-    void prepare();
-
    private:
     class kernel;
 
@@ -36,9 +31,15 @@ struct route : std::enable_shared_from_this<route> {
     route_set_t _routes;
     chaining::any_observer_ptr _reset_observer = nullptr;
 
+    route();
+
+    void prepare();
+
     void _will_reset();
     void _erase_route_if_either_matched(audio::route const &route);
     void _erase_route_if(std::function<bool(audio::route const &)> pred);
+
+    friend std::shared_ptr<route> make_route();
 };
 
 std::shared_ptr<route> make_route();
