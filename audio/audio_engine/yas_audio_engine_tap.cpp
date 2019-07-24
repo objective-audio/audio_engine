@@ -111,23 +111,12 @@ void audio::engine::tap::render_source(audio::engine::node::render_args args) {
 
 #pragma mark - factory
 
-namespace yas::audio::engine {
-struct tap_factory : tap {
-    tap_factory(tap::args &&args) : tap(std::move(args)) {
-    }
-
-    void prepare() {
-        this->tap::prepare();
-    }
-};
-}  // namespace yas::audio::engine
-
 std::shared_ptr<audio::engine::tap> audio::engine::make_tap() {
     return make_tap({.is_input = false});
 }
 
 std::shared_ptr<audio::engine::tap> audio::engine::make_tap(tap::args args) {
-    auto shared = std::make_shared<audio::engine::tap_factory>(std::move(args));
+    auto shared = std::shared_ptr<tap>(new tap{std::move(args)});
     shared->prepare();
     return shared;
 }
