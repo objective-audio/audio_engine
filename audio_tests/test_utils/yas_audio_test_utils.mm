@@ -206,12 +206,3 @@ test::node_object::node_object(uint32_t const input_bus_count, uint32_t const ou
     : node(audio::engine::make_node(
           audio::engine::node_args{.input_bus_count = input_bus_count, .output_bus_count = output_bus_count})) {
 }
-
-namespace yas::test {
-struct connection : audio::engine::connection {
-    connection(audio::engine::node &source_node, uint32_t const source_bus, audio::engine::node &destination_node,
-               uint32_t const destination_bus, audio::format const &format)
-        : audio::engine::connection(source_node, source_bus, destination_node, destination_bus, format) {
-    }
-};
-}

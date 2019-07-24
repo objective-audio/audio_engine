@@ -57,20 +57,14 @@ std::shared_ptr<audio::engine::node_removable> audio::engine::connection::remova
     return std::dynamic_pointer_cast<node_removable>(shared_from_this());
 }
 
-namespace yas::audio::engine {
-struct connection_factory : audio::engine::connection {
-    connection_factory(audio::engine::node &src_node, uint32_t const src_bus, audio::engine::node &dst_node,
-                       uint32_t const dst_bus, audio::format const &format)
-        : audio::engine::connection(src_node, src_bus, dst_node, dst_bus, format) {
-    }
-};
-
-std::shared_ptr<connection> make_connection(audio::engine::node &src_node, uint32_t const src_bus,
-                                            audio::engine::node &dst_node, uint32_t const dst_bus,
-                                            audio::format const &format) {
-    auto connection = std::make_shared<connection_factory>(src_node, src_bus, dst_node, dst_bus, format);
+std::shared_ptr<audio::engine::connection> audio::engine::make_connection(audio::engine::node &src_node,
+                                                                          uint32_t const src_bus,
+                                                                          audio::engine::node &dst_node,
+                                                                          uint32_t const dst_bus,
+                                                                          audio::format const &format) {
+    auto connection = std::shared_ptr<audio::engine::connection>(
+        new audio::engine::connection{src_node, src_bus, dst_node, dst_bus, format});
     src_node.connectable()->add_connection(*connection);
     dst_node.connectable()->add_connection(*connection);
     return connection;
 }
-}  // namespace yas::audio::engine
