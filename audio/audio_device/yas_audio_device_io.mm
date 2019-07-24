@@ -50,8 +50,8 @@ struct audio::device_io::kernel {
     kernel &operator=(kernel &&) = delete;
 };
 
-struct audio::device_io::impl : weakable_impl {
-    std::optional<weak_ref<device_io>> _weak_device_io = std::nullopt;
+struct audio::device_io::impl {
+    std::weak_ptr<device_io> _weak_device_io;
     std::shared_ptr<audio::device> _device = nullptr;
     bool _is_running = false;
     AudioDeviceIOProcID _io_proc_id = nullptr;
@@ -66,17 +66,15 @@ struct audio::device_io::impl : weakable_impl {
         this->uninitialize();
     }
 
-    void prepare(audio::device_io const &device_io, std::shared_ptr<audio::device> const device) {
-        this->_weak_device_io = std::make_optional<weak_ref<audio::device_io>>(to_weak(device_io));
+    void prepare(audio::device_io &device_io, std::shared_ptr<audio::device> const device) {
+        this->_weak_device_io = to_weak(device_io.shared_from_this());
 
         this->_device_system_observer =
             device::system_chain(device::system_method::hardware_did_change)
                 .perform([weak_device_io = this->_weak_device_io](auto const &) {
-                    if (weak_device_io) {
-                        if (auto device_io = weak_device_io->lock()) {
-                            if (device_io->device() && !device::device_for_id(device_io->device()->audio_device_id())) {
-                                device_io->set_device(nullptr);
-                            }
+                    if (auto device_io = weak_device_io.lock()) {
+                        if (device_io->device() && !device::device_for_id(device_io->device()->audio_device_id())) {
+                            device_io->set_device(nullptr);
                         }
                     }
                 })
@@ -102,10 +100,8 @@ struct audio::device_io::impl : weakable_impl {
             if (this->_device) {
                 auto observer = this->_device->chain(device::method::device_did_change)
                                     .perform([weak_device_io = _weak_device_io](auto const &) {
-                                        if (weak_device_io) {
-                                            if (auto device_io = weak_device_io->lock()) {
-                                                device_io->_impl->update_kernel();
-                                            }
+                                        if (auto device_io = weak_device_io.lock()) {
+                                            device_io->_impl->update_kernel();
                                         }
                                     })
                                     .end();
@@ -137,11 +133,7 @@ struct audio::device_io::impl : weakable_impl {
                 audio::clear(outOutputData);
             }
 
-            if (!weak_device_io) {
-                return;
-            }
-
-            if (auto device_io = weak_device_io->lock()) {
+            if (auto device_io = weak_device_io.lock()) {
                 auto &imp = device_io->_impl;
                 if (auto kernel = imp->kernel()) {
                     kernel->reset_buffers();
@@ -286,11 +278,7 @@ struct audio::device_io::impl : weakable_impl {
 
 #pragma mark -
 
-audio::device_io::device_io(std::shared_ptr<audio::device> const &device) : _impl(std::make_shared<impl>()) {
-    this->_impl->prepare(*this, device);
-}
-
-audio::device_io::device_io(std::shared_ptr<impl> &&impl) : _impl(std::move(impl)) {
+audio::device_io::device_io() : _impl(std::make_shared<impl>()) {
 }
 
 void audio::device_io::_initialize() const {
@@ -341,8 +329,14 @@ std::shared_ptr<audio::time> const &audio::device_io::input_time_on_render() con
     return this->_impl->_input_time_on_render;
 }
 
-std::shared_ptr<weakable_impl> audio::device_io::weakable_impl_ptr() const {
-    return this->_impl;
+void audio::device_io::prepare(std::shared_ptr<audio::device> const &device) {
+    this->_impl->prepare(*this, device);
+}
+
+std::shared_ptr<audio::device_io> audio::make_device_io(std::shared_ptr<audio::device> const &device) {
+    auto shared = std::shared_ptr<device_io>(new audio::device_io{});
+    shared->prepare(device);
+    return shared;
 }
 
 #endif

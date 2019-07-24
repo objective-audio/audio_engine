@@ -287,16 +287,16 @@ CFStringRef audio::device::manufacture() const {
     return _property_string(audio_device_id(), kAudioObjectPropertyManufacturer);
 }
 
-std::vector<audio::device::stream> audio::device::input_streams() const {
-    std::vector<stream> streams;
+std::vector<std::shared_ptr<audio::device::stream>> audio::device::input_streams() const {
+    std::vector<std::shared_ptr<stream>> streams;
     for (auto &pair : this->input_streams_map) {
         streams.push_back(pair.second);
     }
     return streams;
 }
 
-std::vector<audio::device::stream> audio::device::output_streams() const {
-    std::vector<stream> streams;
+std::vector<std::shared_ptr<audio::device::stream>> audio::device::output_streams() const {
+    std::vector<std::shared_ptr<stream>> streams;
     for (auto &pair : this->output_streams_map) {
         streams.push_back(pair.second);
     }
@@ -426,15 +426,15 @@ void audio::device::_udpate_streams(AudioObjectPropertyScope const scope) {
             if (prev_streams.count(stream_id) > 0) {
                 new_streams.insert(std::make_pair(stream_id, prev_streams.at(stream_id)));
             } else {
-                new_streams.insert(
-                    std::make_pair(stream_id, stream({.stream_id = stream_id, .device_id = _audio_device_id})));
+                new_streams.insert(std::make_pair(
+                    stream_id, audio::make_device_stream({.stream_id = stream_id, .device_id = _audio_device_id})));
             }
         }
     }
 }
 
 void audio::device::_update_format(AudioObjectPropertyScope const scope) {
-    std::optional<stream> stream = std::nullopt;
+    std::shared_ptr<stream> stream = nullptr;
 
     if (scope == kAudioObjectPropertyScopeInput) {
         auto iterator = this->input_streams_map.begin();

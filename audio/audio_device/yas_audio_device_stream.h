@@ -8,12 +8,11 @@
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
 
-#import <cpp_utils/yas_weakable.h>
 #include <ostream>
 #import "yas_audio_device.h"
 
 namespace yas::audio {
-struct device::stream : weakable<device::stream> {
+struct device::stream : std::enable_shared_from_this<device::stream> {
     class impl;
 
     enum class property : uint32_t {
@@ -45,9 +44,6 @@ struct device::stream : weakable<device::stream> {
         AudioDeviceID device_id;
     };
 
-    explicit stream(args args);
-    explicit stream(std::shared_ptr<impl> &&);
-
     AudioStreamID stream_id() const;
     std::shared_ptr<audio::device> device() const;
     bool is_active() const;
@@ -61,15 +57,21 @@ struct device::stream : weakable<device::stream> {
     bool operator==(stream const &) const;
     bool operator!=(stream const &) const;
 
-    std::shared_ptr<weakable_impl> weakable_impl_ptr() const override;
-
    private:
     std::shared_ptr<impl> _impl;
+
+    explicit stream(args &&args);
+
+    void prepare();
 
     template <typename T>
     std::unique_ptr<std::vector<T>> _property_data(AudioStreamID const stream_id,
                                                    AudioObjectPropertySelector const selector) const;
+
+    friend std::shared_ptr<device::stream> make_device_stream(device::stream::args);
 };
+
+std::shared_ptr<device::stream> make_device_stream(device::stream::args);
 }  // namespace yas::audio
 
 namespace yas {
