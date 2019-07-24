@@ -215,9 +215,3 @@ struct connection : audio::engine::connection {
     }
 };
 }
-
-std::shared_ptr<audio::engine::connection> test::make_connection(audio::engine::node &src_node, uint32_t const src_bus,
-                                                                 audio::engine::node &dst_node, uint32_t const dst_bus,
-                                                                 audio::format const &format) {
-    return audio::engine::make_connection(src_node, src_bus, dst_node, dst_bus, format);
-}
