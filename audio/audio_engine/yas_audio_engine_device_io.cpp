@@ -186,17 +186,9 @@ bool audio::engine::device_io::_validate_connections() {
     return true;
 }
 
-namespace yas::audio::engine {
-struct device_io_factory : device_io {
-    void prepare() {
-        this->_prepare();
-    }
-};
-};  // namespace yas::audio::engine
-
 std::shared_ptr<audio::engine::device_io> audio::engine::make_device_io() {
-    auto shared = std::make_shared<audio::engine::device_io_factory>();
-    shared->prepare();
+    auto shared = std::shared_ptr<audio::engine::device_io>(new audio::engine::device_io{});
+    shared->_prepare();
     return shared;
 }
 
