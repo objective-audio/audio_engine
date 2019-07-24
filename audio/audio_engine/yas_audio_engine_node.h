@@ -81,9 +81,6 @@ struct node : std::enable_shared_from_this<node>, connectable_node, manageable_n
     std::shared_ptr<connectable_node> connectable();
     std::shared_ptr<manageable_node> manageable();
 
-   protected:
-    node(node_args &&);
-
    private:
     std::weak_ptr<audio::engine::manager> _weak_manager;
     uint32_t _input_bus_count = 0;
@@ -100,6 +97,8 @@ struct node : std::enable_shared_from_this<node>, connectable_node, manageable_n
 
     struct core;
     std::unique_ptr<core> _core;
+    
+    node(node_args &&);
 
     void prepare_kernel(std::shared_ptr<audio::engine::kernel> &kernel);
 
@@ -118,6 +117,8 @@ struct node : std::enable_shared_from_this<node>, connectable_node, manageable_n
     node &operator=(node &&) = delete;
     node(node const &) = delete;
     node &operator=(node const &) = delete;
+    
+    friend std::shared_ptr<node> make_node(node_args);
 };
 
 std::shared_ptr<node> make_node(node_args);
