@@ -47,10 +47,6 @@ std::shared_ptr<audio::engine::manageable_kernel> audio::engine::kernel::managea
     return std::dynamic_pointer_cast<manageable_kernel>(shared_from_this());
 }
 
-namespace yas::audio::engine {
-struct kernel_factory : kernel {};
-}  // namespace yas::audio::engine
-
 std::shared_ptr<audio::engine::kernel> audio::engine::make_kernel() {
-    return std::make_shared<audio::engine::kernel_factory>();
+    return std::shared_ptr<audio::engine::kernel>(new audio::engine::kernel{});
 }
