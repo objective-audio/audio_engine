@@ -30,7 +30,7 @@ audio::engine::tap::tap(args args)
 
 audio::engine::tap::~tap() = default;
 
-void audio::engine::tap::prepare() {
+void audio::engine::tap::_prepare() {
     auto weak_tap = to_weak(shared_from_this());
 
     this->_node->set_render_handler([weak_tap](auto args) {
@@ -117,6 +117,6 @@ std::shared_ptr<audio::engine::tap> audio::engine::make_tap() {
 
 std::shared_ptr<audio::engine::tap> audio::engine::make_tap(tap::args args) {
     auto shared = std::shared_ptr<tap>(new tap{std::move(args)});
-    shared->prepare();
+    shared->_prepare();
     return shared;
 }

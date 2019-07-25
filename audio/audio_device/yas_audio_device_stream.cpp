@@ -163,7 +163,7 @@ bool audio::device::stream::operator!=(stream const &rhs) const {
     return !(*this == rhs);
 }
 
-void audio::device::stream::prepare() {
+void audio::device::stream::_prepare() {
     auto listener = this->_impl->listener(*this);
     this->_impl->add_listener(kAudioStreamPropertyVirtualFormat, listener);
     this->_impl->add_listener(kAudioStreamPropertyIsActive, listener);
@@ -172,7 +172,7 @@ void audio::device::stream::prepare() {
 
 std::shared_ptr<audio::device::stream> audio::make_device_stream(device::stream::args args) {
     auto shared = std::shared_ptr<device::stream>(new device::stream{std::move(args)});
-    shared->prepare();
+    shared->_prepare();
     return shared;
 }
 

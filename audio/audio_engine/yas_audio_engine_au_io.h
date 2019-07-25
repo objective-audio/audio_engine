@@ -58,9 +58,9 @@ struct au_io : std::enable_shared_from_this<au_io> {
 
     explicit au_io(args);
 
-    void prepare();
+    void _prepare();
 
-    void update_unit_io_connections();
+    void _update_unit_io_connections();
 
     friend std::shared_ptr<au_io> make_au_io(au_io::args);
 };
@@ -104,9 +104,9 @@ struct au_input : std::enable_shared_from_this<au_input> {
 
     au_input();
 
-    void prepare();
+    void _prepare();
 
-    void update_unit_input_connections();
+    void _update_unit_input_connections();
 
     friend std::shared_ptr<au_input> make_au_input();
 };

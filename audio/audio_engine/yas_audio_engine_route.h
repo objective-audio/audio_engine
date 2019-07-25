@@ -33,7 +33,7 @@ struct route : std::enable_shared_from_this<route> {
 
     route();
 
-    void prepare();
+    void _prepare();
 
     void _will_reset();
     void _erase_route_if_either_matched(audio::route const &route);

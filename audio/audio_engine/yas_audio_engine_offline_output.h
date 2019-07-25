@@ -31,7 +31,7 @@ struct offline_output : manageable_offline_output, std::enable_shared_from_this<
 
     offline_output();
 
-    void prepare();
+    void _prepare();
 
     offline_output(offline_output const &) = delete;
     offline_output(offline_output &&) = delete;

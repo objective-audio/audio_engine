@@ -37,7 +37,7 @@ struct tap : std::enable_shared_from_this<tap> {
 
     explicit tap(args);
 
-    void prepare();
+    void _prepare();
 
     tap(tap const &) = delete;
     tap(tap &&) = delete;

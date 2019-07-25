@@ -238,7 +238,7 @@ void audio::engine::node::set_manager(std::shared_ptr<audio::engine::manager> co
 
 void audio::engine::node::update_kernel() {
     auto kernel = audio::engine::make_kernel();
-    this->prepare_kernel(kernel);
+    this->_prepare_kernel(kernel);
     this->_core->set_kernel(kernel);
 }
 
@@ -261,7 +261,7 @@ audio::graph_editing_f const &audio::engine::node::remove_from_graph_handler() c
     return this->_remove_from_graph_handler;
 }
 
-void audio::engine::node::prepare_kernel(std::shared_ptr<audio::engine::kernel> &kernel) {
+void audio::engine::node::_prepare_kernel(std::shared_ptr<audio::engine::kernel> &kernel) {
     auto manageable_kernel = kernel->manageable();
     manageable_kernel->set_input_connections(_input_connections);
     manageable_kernel->set_output_connections(_output_connections);

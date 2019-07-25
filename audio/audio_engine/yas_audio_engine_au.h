@@ -77,7 +77,7 @@ struct au : manageable_au, std::enable_shared_from_this<au> {
 
     explicit au(node_args &&);
 
-    void prepare(AudioComponentDescription const &acd);
+    void _prepare(AudioComponentDescription const &acd);
 
     au(au const &) = delete;
     au(au &&) = delete;

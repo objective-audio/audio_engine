@@ -45,7 +45,7 @@ struct device_io : std::enable_shared_from_this<device_io> {
 
     device_io();
 
-    void prepare(std::shared_ptr<audio::device> const &);
+    void _prepare(std::shared_ptr<audio::device> const &);
 
     void _initialize() const;
     void _uninitialize() const;

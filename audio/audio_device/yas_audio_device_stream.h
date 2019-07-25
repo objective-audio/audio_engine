@@ -62,7 +62,7 @@ struct device::stream : std::enable_shared_from_this<device::stream> {
 
     explicit stream(args &&args);
 
-    void prepare();
+    void _prepare();
 
     template <typename T>
     std::unique_ptr<std::vector<T>> _property_data(AudioStreamID const stream_id,

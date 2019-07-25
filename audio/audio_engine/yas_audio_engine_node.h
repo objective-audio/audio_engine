@@ -100,7 +100,7 @@ struct node : std::enable_shared_from_this<node>, connectable_node, manageable_n
 
     explicit node(node_args &&);
 
-    void prepare_kernel(std::shared_ptr<audio::engine::kernel> &kernel);
+    void _prepare_kernel(std::shared_ptr<audio::engine::kernel> &kernel);
 
     void add_connection(audio::engine::connection &) override;
     void remove_connection(audio::engine::connection const &) override;
