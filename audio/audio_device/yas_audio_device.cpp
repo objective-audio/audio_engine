@@ -67,8 +67,8 @@ static void _add_listener(AudioObjectID const object_id, AudioObjectPropertySele
 #pragma mark - device_global
 
 struct device_global {
-    struct audio_device_for_global : public device {
-        audio_device_for_global(AudioDeviceID const device_id) : device(device_id) {
+    struct global_device : public device {
+        global_device(AudioDeviceID const device_id) : device(device_id) {
         }
     };
 
@@ -103,7 +103,7 @@ struct device_global {
                 if (prev_devices.count(device_id) > 0) {
                     map.insert(std::make_pair(device_id, prev_devices.at(device_id)));
                 } else {
-                    map.insert(std::make_pair(device_id, std::make_shared<audio_device_for_global>(device_id)));
+                    map.insert(std::make_pair(device_id, std::make_shared<global_device>(device_id)));
                 }
             }
         }
