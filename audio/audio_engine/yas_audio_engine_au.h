@@ -75,7 +75,7 @@ struct au : manageable_au, std::enable_shared_from_this<au> {
     struct core;
     std::unique_ptr<core> _core;
 
-    au(node_args &&);
+    explicit au(node_args &&);
 
     void prepare(AudioComponentDescription const &acd);
 

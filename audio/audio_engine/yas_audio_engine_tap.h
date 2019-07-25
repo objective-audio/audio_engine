@@ -35,7 +35,7 @@ struct tap : std::enable_shared_from_this<tap> {
     chaining::any_observer_ptr _reset_observer = nullptr;
     std::shared_ptr<audio::engine::kernel> _kernel_on_render;
 
-    tap(args);
+    explicit tap(args);
 
     void prepare();
 

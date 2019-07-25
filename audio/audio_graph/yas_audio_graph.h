@@ -48,7 +48,7 @@ struct graph : std::enable_shared_from_this<graph>, interruptable_graph {
     std::unordered_set<std::shared_ptr<device_io>> _device_ios;
 #endif
 
-    graph(uint8_t const key);
+    explicit graph(uint8_t const key);
 
     void prepare();
 

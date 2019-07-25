@@ -56,7 +56,7 @@ struct au_io : std::enable_shared_from_this<au_io> {
     chaining::any_observer_ptr _connections_observer = nullptr;
     chaining::notifier<chaining_pair_t> _notifier;
 
-    au_io(args);
+    explicit au_io(args);
 
     void prepare();
 

@@ -98,7 +98,7 @@ struct node : std::enable_shared_from_this<node>, connectable_node, manageable_n
     struct core;
     std::unique_ptr<core> _core;
 
-    node(node_args &&);
+    explicit node(node_args &&);
 
     void prepare_kernel(std::shared_ptr<audio::engine::kernel> &kernel);
 
