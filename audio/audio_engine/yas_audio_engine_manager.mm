@@ -38,7 +38,7 @@ struct audio::engine::manager::impl {
 #if TARGET_OS_IPHONE
         auto reset_lambda = [weak_manager](NSNotification *note) {
             if (auto engine = weak_manager.lock()) {
-                engine->reload_graph();
+                engine->_reload_graph();
             }
         };
 
@@ -51,7 +51,7 @@ struct audio::engine::manager::impl {
 
         auto route_change_lambda = [weak_manager](NSNotification *note) {
             if (auto engine = weak_manager.lock()) {
-                engine->post_configuration_change();
+                engine->_post_configuration_change();
             }
         };
 
