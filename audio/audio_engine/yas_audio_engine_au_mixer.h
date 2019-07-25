@@ -39,7 +39,7 @@ struct au_mixer : std::enable_shared_from_this<au_mixer> {
 
     au_mixer();
 
-    void prepare();
+    void _prepare();
 
     void _update_unit_mixer_connections();
 

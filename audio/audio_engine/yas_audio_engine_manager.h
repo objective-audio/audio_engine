@@ -104,23 +104,23 @@ struct manager : std::enable_shared_from_this<manager> {
     void _detach_node_if_unused(audio::engine::node &node);
     bool _prepare_graph();
     void _disconnect_node_with_predicate(std::function<bool(connection const &)> predicate);
-    void add_node_to_graph(audio::engine::node &node);
-    void remove_node_from_graph(audio::engine::node &node);
-    bool add_connection(audio::engine::connection &connection);
-    void remove_connection_from_nodes(audio::engine::connection const &connection);
-    void update_node_connections(audio::engine::node &node);
-    void update_all_node_connections();
-    audio::engine::connection_set input_connections_for_destination_node(
+    void _add_node_to_graph(audio::engine::node &node);
+    void _remove_node_from_graph(audio::engine::node &node);
+    bool _add_connection(audio::engine::connection &connection);
+    void _remove_connection_from_nodes(audio::engine::connection const &connection);
+    void _update_node_connections(audio::engine::node &node);
+    void _update_all_node_connections();
+    audio::engine::connection_set _input_connections_for_destination_node(
         std::shared_ptr<audio::engine::node> const &node);
-    audio::engine::connection_set output_connections_for_source_node(std::shared_ptr<audio::engine::node> const &node);
-    void reload_graph();
-    void post_configuration_change();
+    audio::engine::connection_set _output_connections_for_source_node(std::shared_ptr<audio::engine::node> const &node);
+    void _reload_graph();
+    void _post_configuration_change();
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
     std::shared_ptr<audio::engine::device_io> _device_io = nullptr;
     chaining::any_observer_ptr _device_system_observer = nullptr;
 
-    void set_device_io(std::shared_ptr<audio::engine::device_io> &&node);
+    void _set_device_io(std::shared_ptr<audio::engine::device_io> &&node);
 #endif
 
     friend std::shared_ptr<manager> make_manager();

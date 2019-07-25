@@ -132,7 +132,7 @@ audio::graph::~graph() {
     this->remove_all_units();
 }
 
-void audio::graph::prepare() {
+void audio::graph::_prepare() {
     global_graph::add_graph(*this);
 }
 
@@ -143,7 +143,7 @@ void audio::graph::add_unit(std::shared_ptr<audio::unit> &unit) {
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : unit.key is already assigned.");
     }
 
-    this->add_unit_to_units(unit);
+    this->_add_unit_to_units(unit);
 
     manageable_unit->initialize();
 
@@ -157,7 +157,7 @@ void audio::graph::remove_unit(std::shared_ptr<audio::unit> &unit) {
 
     manageable_unit->uninitialize();
 
-    this->remove_unit_from_units(unit);
+    this->_remove_unit_from_units(unit);
 }
 
 void audio::graph::remove_all_units() {
@@ -251,7 +251,7 @@ void audio::graph::unit_render(render_parameters &render_parameters) {
     raise_if_main_thread();
 
     if (auto graph = global_graph::graph_for_key(render_parameters.render_id.graph)) {
-        if (auto unit = graph->unit_for_key(render_parameters.render_id.unit)) {
+        if (auto unit = graph->_unit_for_key(render_parameters.render_id.unit)) {
             unit->callback_render(render_parameters);
         }
     }
@@ -259,17 +259,17 @@ void audio::graph::unit_render(render_parameters &render_parameters) {
 
 #pragma mark - private
 
-std::optional<uint16_t> audio::graph::next_unit_key() {
+std::optional<uint16_t> audio::graph::_next_unit_key() {
     std::lock_guard<std::recursive_mutex> lock(global_graph::_mutex);
     return min_empty_key(this->_units);
 }
 
-std::shared_ptr<audio::unit> audio::graph::unit_for_key(uint16_t const key) const {
+std::shared_ptr<audio::unit> audio::graph::_unit_for_key(uint16_t const key) const {
     std::lock_guard<std::recursive_mutex> lock(this->_mutex);
     return this->_units.at(key);
 }
 
-void audio::graph::add_unit_to_units(std::shared_ptr<audio::unit> &unit) {
+void audio::graph::_add_unit_to_units(std::shared_ptr<audio::unit> &unit) {
     if (!unit) {
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
     }
@@ -282,7 +282,7 @@ void audio::graph::add_unit_to_units(std::shared_ptr<audio::unit> &unit) {
 
     std::lock_guard<std::recursive_mutex> lock(this->_mutex);
 
-    auto unit_key = next_unit_key();
+    auto unit_key = _next_unit_key();
     if (unit_key) {
         manageable_unit->set_graph_key(key());
         manageable_unit->set_key(*unit_key);
@@ -294,7 +294,7 @@ void audio::graph::add_unit_to_units(std::shared_ptr<audio::unit> &unit) {
     }
 }
 
-void audio::graph::remove_unit_from_units(std::shared_ptr<audio::unit> &unit) {
+void audio::graph::_remove_unit_from_units(std::shared_ptr<audio::unit> &unit) {
     std::lock_guard<std::recursive_mutex> lock(this->_mutex);
 
     auto manageable_unit = unit->manageable();
@@ -310,7 +310,7 @@ void audio::graph::remove_unit_from_units(std::shared_ptr<audio::unit> &unit) {
 std::shared_ptr<audio::graph> audio::make_graph() {
     if (auto key = global_graph::min_empty_graph_key()) {
         auto shared = std::shared_ptr<graph>(new graph{*key});
-        shared->prepare();
+        shared->_prepare();
         return shared;
     } else {
         return nullptr;

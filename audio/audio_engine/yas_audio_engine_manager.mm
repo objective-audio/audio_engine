@@ -38,7 +38,7 @@ struct audio::engine::manager::impl {
 #if TARGET_OS_IPHONE
         auto reset_lambda = [weak_manager](NSNotification *note) {
             if (auto engine = weak_manager.lock()) {
-                engine->reload_graph();
+                engine->_reload_graph();
             }
         };
 
@@ -51,7 +51,7 @@ struct audio::engine::manager::impl {
 
         auto route_change_lambda = [weak_manager](NSNotification *note) {
             if (auto engine = weak_manager.lock()) {
-                engine->post_configuration_change();
+                engine->_post_configuration_change();
             }
         };
 
@@ -115,9 +115,9 @@ audio::engine::connection &audio::engine::manager::connect(audio::engine::node &
     this->_connections.insert(connection);
 
     if (this->_graph) {
-        this->add_connection(*connection);
-        this->update_node_connections(src_node);
-        this->update_node_connections(dst_node);
+        this->_add_connection(*connection);
+        this->_update_node_connections(src_node);
+        this->_update_node_connections(dst_node);
     }
 
     return *connection;
@@ -126,7 +126,7 @@ audio::engine::connection &audio::engine::manager::connect(audio::engine::node &
 void audio::engine::manager::disconnect(connection &connection) {
     std::vector<std::shared_ptr<node>> update_nodes{connection.source_node(), connection.destination_node()};
 
-    this->remove_connection_from_nodes(connection);
+    this->_remove_connection_from_nodes(connection);
     connection.removable()->remove_nodes();
 
     for (auto &node : update_nodes) {
@@ -201,14 +201,14 @@ audio::engine::manager::add_result_t audio::engine::manager::add_device_io() {
     if (this->_device_io) {
         return add_result_t{add_error_t::already_added};
     } else {
-        this->set_device_io(audio::engine::make_device_io());
+        this->_set_device_io(audio::engine::make_device_io());
         return add_result_t{nullptr};
     }
 }
 
 audio::engine::manager::remove_result_t audio::engine::manager::remove_device_io() {
     if (this->_device_io) {
-        this->set_device_io(nullptr);
+        this->_set_device_io(nullptr);
         return remove_result_t{nullptr};
     } else {
         return remove_result_t{remove_error_t::already_removed};
@@ -322,7 +322,7 @@ void audio::engine::manager::prepare() {
     this->_device_system_observer = device::system_chain(device::system_method::configuration_change)
                                         .perform([weak_manager](auto const &) {
                                             if (auto engine = weak_manager.lock()) {
-                                                engine->post_configuration_change();
+                                                engine->_post_configuration_change();
                                             }
                                         })
                                         .end();
@@ -345,7 +345,7 @@ void audio::engine::manager::_attach_node(audio::engine::node &node) {
 
     node.manageable()->set_manager(shared_from_this());
 
-    this->add_node_to_graph(node);
+    this->_add_node_to_graph(node);
 }
 
 void audio::engine::manager::_detach_node(audio::engine::node &node) {
@@ -359,7 +359,7 @@ void audio::engine::manager::_detach_node(audio::engine::node &node) {
         return (connection.destination_node() == shared_node || connection.source_node() == shared_node);
     });
 
-    this->remove_node_from_graph(node);
+    this->_remove_node_from_graph(node);
 
     node.manageable()->set_manager(nullptr);
 
@@ -394,16 +394,16 @@ bool audio::engine::manager::_prepare_graph() {
 #endif
 
     for (auto &node : this->_nodes) {
-        this->add_node_to_graph(*node);
+        this->_add_node_to_graph(*node);
     }
 
     for (auto &connection : this->_connections) {
-        if (!this->add_connection(*connection)) {
+        if (!this->_add_connection(*connection)) {
             return false;
         }
     }
 
-    this->update_all_node_connections();
+    this->_update_all_node_connections();
 
     return true;
 }
@@ -417,7 +417,7 @@ void audio::engine::manager::_disconnect_node_with_predicate(std::function<bool(
     for (auto connection : connections) {
         update_nodes.insert(connection->source_node());
         update_nodes.insert(connection->destination_node());
-        this->remove_connection_from_nodes(*connection);
+        this->_remove_connection_from_nodes(*connection);
         connection->removable()->remove_nodes();
     }
 
@@ -431,7 +431,7 @@ void audio::engine::manager::_disconnect_node_with_predicate(std::function<bool(
     }
 }
 
-void audio::engine::manager::add_node_to_graph(audio::engine::node &node) {
+void audio::engine::manager::_add_node_to_graph(audio::engine::node &node) {
     if (!this->_graph) {
         return;
     }
@@ -441,7 +441,7 @@ void audio::engine::manager::add_node_to_graph(audio::engine::node &node) {
     }
 }
 
-void audio::engine::manager::remove_node_from_graph(audio::engine::node &node) {
+void audio::engine::manager::_remove_node_from_graph(audio::engine::node &node) {
     if (!this->_graph) {
         return;
     }
@@ -451,7 +451,7 @@ void audio::engine::manager::remove_node_from_graph(audio::engine::node &node) {
     }
 }
 
-bool audio::engine::manager::add_connection(audio::engine::connection &connection) {
+bool audio::engine::manager::_add_connection(audio::engine::connection &connection) {
     auto destination_node = connection.destination_node();
     auto source_node = connection.source_node();
 
@@ -466,7 +466,7 @@ bool audio::engine::manager::add_connection(audio::engine::connection &connectio
     return true;
 }
 
-void audio::engine::manager::remove_connection_from_nodes(audio::engine::connection const &connection) {
+void audio::engine::manager::_remove_connection_from_nodes(audio::engine::connection const &connection) {
     if (auto source_node = connection.source_node()) {
         source_node->connectable()->remove_connection(connection);
     }
@@ -476,7 +476,7 @@ void audio::engine::manager::remove_connection_from_nodes(audio::engine::connect
     }
 }
 
-void audio::engine::manager::update_node_connections(audio::engine::node &node) {
+void audio::engine::manager::_update_node_connections(audio::engine::node &node) {
     if (!this->_graph) {
         return;
     }
@@ -484,7 +484,7 @@ void audio::engine::manager::update_node_connections(audio::engine::node &node) 
     node.manageable()->update_connections();
 }
 
-void audio::engine::manager::update_all_node_connections() {
+void audio::engine::manager::_update_all_node_connections() {
     if (!this->_graph) {
         return;
     }
@@ -494,25 +494,25 @@ void audio::engine::manager::update_all_node_connections() {
     }
 }
 
-audio::engine::connection_set audio::engine::manager::input_connections_for_destination_node(
+audio::engine::connection_set audio::engine::manager::_input_connections_for_destination_node(
     std::shared_ptr<audio::engine::node> const &node) {
     return filter(this->_connections,
                   [&node](auto const &connection) { return connection->destination_node() == node; });
 }
 
-audio::engine::connection_set audio::engine::manager::output_connections_for_source_node(
+audio::engine::connection_set audio::engine::manager::_output_connections_for_source_node(
     std::shared_ptr<audio::engine::node> const &node) {
     return filter(this->_connections, [&node](auto const &connection) { return connection->source_node() == node; });
 }
 
-void audio::engine::manager::reload_graph() {
+void audio::engine::manager::_reload_graph() {
     if (auto prev_graph = this->_graph) {
         bool const prev_runnging = prev_graph->is_running();
 
         prev_graph->stop();
 
         for (auto &node : this->_nodes) {
-            this->remove_node_from_graph(*node);
+            this->_remove_node_from_graph(*node);
         }
 
         this->_graph = nullptr;
@@ -528,7 +528,7 @@ void audio::engine::manager::reload_graph() {
 }
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
-void audio::engine::manager::set_device_io(std::shared_ptr<audio::engine::device_io> &&node) {
+void audio::engine::manager::_set_device_io(std::shared_ptr<audio::engine::device_io> &&node) {
     if (node) {
         this->_device_io = std::move(node);
 
@@ -552,7 +552,7 @@ void audio::engine::manager::set_device_io(std::shared_ptr<audio::engine::device
 }
 
 #endif
-void audio::engine::manager::post_configuration_change() {
+void audio::engine::manager::_post_configuration_change() {
     this->_notifier.notify(std::make_pair(method::configuration_change, shared_from_this()));
 }
 

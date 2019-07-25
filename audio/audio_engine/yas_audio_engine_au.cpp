@@ -153,7 +153,7 @@ std::shared_ptr<audio::engine::manageable_au> audio::engine::au::manageable() {
 
 #pragma mark - private
 
-void audio::engine::au::prepare(AudioComponentDescription const &acd) {
+void audio::engine::au::_prepare(AudioComponentDescription const &acd) {
     this->_acd = acd;
 
     auto unit = audio::make_unit(acd);
@@ -342,6 +342,6 @@ std::shared_ptr<audio::engine::au> audio::engine::make_au(AudioComponentDescript
 
 std::shared_ptr<audio::engine::au> audio::engine::make_au(au::args &&args) {
     auto shared = std::shared_ptr<au>(new au{std::move(args.node_args)});
-    shared->prepare(args.acd);
+    shared->_prepare(args.acd);
     return shared;
 }

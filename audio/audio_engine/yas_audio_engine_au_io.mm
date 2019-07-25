@@ -124,17 +124,17 @@ audio::engine::au &audio::engine::au_io::au() {
     return *this->_au;
 }
 
-void audio::engine::au_io::prepare() {
+void audio::engine::au_io::_prepare() {
     this->_connections_observer = this->_au->chain(au::method::did_update_connections)
                                       .perform([weak_au_io = to_weak(shared_from_this())](auto const &) {
                                           if (auto au_io = weak_au_io.lock()) {
-                                              au_io->update_unit_io_connections();
+                                              au_io->_update_unit_io_connections();
                                           }
                                       })
                                       .end();
 }
 
-void audio::engine::au_io::update_unit_io_connections() {
+void audio::engine::au_io::_update_unit_io_connections() {
     auto unit = this->_au->unit();
 
     auto update_channel_map = [](channel_map_t &map, std::optional<format> const &format, uint32_t const dev_ch_count) {
@@ -173,7 +173,7 @@ std::shared_ptr<audio::engine::au_io> audio::engine::make_au_io() {
 
 std::shared_ptr<audio::engine::au_io> audio::engine::make_au_io(au_io::args args) {
     auto shared = std::shared_ptr<au_io>(new au_io{std::move(args)});
-    shared->prepare();
+    shared->_prepare();
     return shared;
 }
 
@@ -223,17 +223,17 @@ audio::engine::au_io &audio::engine::au_input::au_io() {
     return *this->_au_io;
 }
 
-void audio::engine::au_input::prepare() {
+void audio::engine::au_input::_prepare() {
     this->_connections_observer = this->_au_io->chain(au_io::method::did_update_connection)
                                       .perform([weak_au_input = to_weak(shared_from_this())](auto const &) {
                                           if (auto au_input = weak_au_input.lock()) {
-                                              au_input->update_unit_input_connections();
+                                              au_input->_update_unit_input_connections();
                                           }
                                       })
                                       .end();
 }
 
-void audio::engine::au_input::update_unit_input_connections() {
+void audio::engine::au_input::_update_unit_input_connections() {
     auto unit = this->_au_io->au().unit();
 
     if (auto out_connection = _au_io->au().node().output_connection(1)) {
@@ -278,6 +278,6 @@ void audio::engine::au_input::update_unit_input_connections() {
 
 std::shared_ptr<audio::engine::au_input> audio::engine::make_au_input() {
     auto shared = std::shared_ptr<au_input>(new au_input{});
-    shared->prepare();
+    shared->_prepare();
     return shared;
 }

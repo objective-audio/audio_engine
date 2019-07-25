@@ -92,15 +92,15 @@ struct device {
 
    private:
     AudioDeviceID const _audio_device_id;
-    std::unordered_map<AudioStreamID, std::shared_ptr<stream>> input_streams_map;
-    std::unordered_map<AudioStreamID, std::shared_ptr<stream>> output_streams_map;
+    std::unordered_map<AudioStreamID, std::shared_ptr<stream>> _input_streams_map;
+    std::unordered_map<AudioStreamID, std::shared_ptr<stream>> _output_streams_map;
     chaining::notifier<audio::device::chaining_pair_t> _notifier;
     std::optional<audio::format> _input_format = std::nullopt;
     std::optional<audio::format> _output_format = std::nullopt;
     mutable std::recursive_mutex _mutex;
 
-    void set_input_format(std::optional<audio::format> const &format);
-    void set_output_format(std::optional<audio::format> const &format);
+    void _set_input_format(std::optional<audio::format> const &format);
+    void _set_output_format(std::optional<audio::format> const &format);
 
     listener_f _listener();
     void _udpate_streams(AudioObjectPropertyScope const scope);

@@ -178,7 +178,7 @@ void audio::engine::offline_output::stop() {
     }
 }
 
-void audio::engine::offline_output::prepare() {
+void audio::engine::offline_output::_prepare() {
     this->_reset_observer = this->_node->chain(node::method::will_reset)
                                 .perform([weak_output = to_weak(shared_from_this())](auto const &) {
                                     if (auto output = weak_output.lock()) {
@@ -194,7 +194,7 @@ std::shared_ptr<audio::engine::manageable_offline_output> audio::engine::offline
 
 std::shared_ptr<audio::engine::offline_output> audio::engine::make_offline_output() {
     auto shared = std::shared_ptr<offline_output>(new offline_output{});
-    shared->prepare();
+    shared->_prepare();
     return shared;
 }
 

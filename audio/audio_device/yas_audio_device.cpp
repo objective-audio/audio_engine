@@ -67,8 +67,8 @@ static void _add_listener(AudioObjectID const object_id, AudioObjectPropertySele
 #pragma mark - device_global
 
 struct device_global {
-    struct audio_device_for_global : public device {
-        audio_device_for_global(AudioDeviceID const device_id) : device(device_id) {
+    struct global_device : public device {
+        global_device(AudioDeviceID const device_id) : device(device_id) {
         }
     };
 
@@ -103,7 +103,7 @@ struct device_global {
                 if (prev_devices.count(device_id) > 0) {
                     map.insert(std::make_pair(device_id, prev_devices.at(device_id)));
                 } else {
-                    map.insert(std::make_pair(device_id, std::make_shared<audio_device_for_global>(device_id)));
+                    map.insert(std::make_pair(device_id, std::make_shared<global_device>(device_id)));
                 }
             }
         }
@@ -289,7 +289,7 @@ CFStringRef audio::device::manufacture() const {
 
 std::vector<std::shared_ptr<audio::device::stream>> audio::device::input_streams() const {
     std::vector<std::shared_ptr<stream>> streams;
-    for (auto &pair : this->input_streams_map) {
+    for (auto &pair : this->_input_streams_map) {
         streams.push_back(pair.second);
     }
     return streams;
@@ -297,7 +297,7 @@ std::vector<std::shared_ptr<audio::device::stream>> audio::device::input_streams
 
 std::vector<std::shared_ptr<audio::device::stream>> audio::device::output_streams() const {
     std::vector<std::shared_ptr<stream>> streams;
-    for (auto &pair : this->output_streams_map) {
+    for (auto &pair : this->_output_streams_map) {
         streams.push_back(pair.second);
     }
     return streams;
@@ -311,7 +311,7 @@ double audio::device::nominal_sample_rate() const {
     return 0;
 }
 
-void audio::device::set_input_format(std::optional<audio::format> const &format) {
+void audio::device::_set_input_format(std::optional<audio::format> const &format) {
     std::lock_guard<std::recursive_mutex> lock(_mutex);
     this->_input_format = format;
 }
@@ -321,7 +321,7 @@ std::optional<audio::format> audio::device::input_format() const {
     return this->_input_format;
 }
 
-void audio::device::set_output_format(std::optional<audio::format> const &format) {
+void audio::device::_set_output_format(std::optional<audio::format> const &format) {
     std::lock_guard<std::recursive_mutex> lock(_mutex);
     this->_output_format = format;
 }
@@ -418,9 +418,10 @@ audio::device::listener_f audio::device::_listener() {
 
 void audio::device::_udpate_streams(AudioObjectPropertyScope const scope) {
     auto prev_streams =
-        std::move((scope == kAudioObjectPropertyScopeInput) ? this->input_streams_map : this->output_streams_map);
+        std::move((scope == kAudioObjectPropertyScopeInput) ? this->_input_streams_map : this->_output_streams_map);
     auto data = _property_data<AudioStreamID>(this->_audio_device_id, kAudioDevicePropertyStreams, scope);
-    auto &new_streams = (scope == kAudioObjectPropertyScopeInput) ? this->input_streams_map : this->output_streams_map;
+    auto &new_streams =
+        (scope == kAudioObjectPropertyScopeInput) ? this->_input_streams_map : this->_output_streams_map;
     if (data) {
         for (auto &stream_id : *data) {
             if (prev_streams.count(stream_id) > 0) {
@@ -437,16 +438,16 @@ void audio::device::_update_format(AudioObjectPropertyScope const scope) {
     std::shared_ptr<stream> stream = nullptr;
 
     if (scope == kAudioObjectPropertyScopeInput) {
-        auto iterator = this->input_streams_map.begin();
-        if (iterator != this->input_streams_map.end()) {
+        auto iterator = this->_input_streams_map.begin();
+        if (iterator != this->_input_streams_map.end()) {
             stream = iterator->second;
-            this->set_input_format(std::nullopt);
+            this->_set_input_format(std::nullopt);
         }
     } else if (scope == kAudioObjectPropertyScopeOutput) {
-        auto iterator = this->output_streams_map.begin();
-        if (iterator != this->output_streams_map.end()) {
+        auto iterator = this->_output_streams_map.begin();
+        if (iterator != this->_output_streams_map.end()) {
             stream = iterator->second;
-            this->set_output_format(std::nullopt);
+            this->_set_output_format(std::nullopt);
         }
     }
 
@@ -470,9 +471,9 @@ void audio::device::_update_format(AudioObjectPropertyScope const scope) {
                                   .interleaved = false});
 
             if (scope == kAudioObjectPropertyScopeInput) {
-                this->set_input_format(format);
+                this->_set_input_format(format);
             } else if (scope == kAudioObjectPropertyScopeOutput) {
-                this->set_output_format(format);
+                this->_set_output_format(format);
             }
         }
     }
