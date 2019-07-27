@@ -68,10 +68,9 @@ struct device::stream : std::enable_shared_from_this<device::stream> {
     std::unique_ptr<std::vector<T>> _property_data(AudioStreamID const stream_id,
                                                    AudioObjectPropertySelector const selector) const;
 
-    friend std::shared_ptr<device::stream> make_device_stream(device::stream::args);
+   public:
+    static std::shared_ptr<device::stream> make_shared(device::stream::args);
 };
-
-std::shared_ptr<device::stream> make_device_stream(device::stream::args);
 }  // namespace yas::audio
 
 namespace yas {

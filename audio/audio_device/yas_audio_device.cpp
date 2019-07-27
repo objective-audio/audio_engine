@@ -428,7 +428,8 @@ void audio::device::_udpate_streams(AudioObjectPropertyScope const scope) {
                 new_streams.insert(std::make_pair(stream_id, prev_streams.at(stream_id)));
             } else {
                 new_streams.insert(std::make_pair(
-                    stream_id, audio::make_device_stream({.stream_id = stream_id, .device_id = _audio_device_id})));
+                    stream_id,
+                    audio::device::stream::make_shared({.stream_id = stream_id, .device_id = _audio_device_id})));
             }
         }
     }
