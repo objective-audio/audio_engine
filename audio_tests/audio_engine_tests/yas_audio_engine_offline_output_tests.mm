@@ -32,7 +32,7 @@ using namespace yas;
 - (void)test_offline_render_with_audio_engine {
     double const sample_rate = 44100.0;
 
-    auto manager = audio::engine::make_manager();
+    auto manager = audio::engine::manager::make_shared();
     manager->add_offline_output();
 
     auto format = audio::format({.sample_rate = sample_rate, .channel_count = 2});

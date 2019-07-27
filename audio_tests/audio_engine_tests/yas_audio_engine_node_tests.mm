@@ -124,7 +124,7 @@ using namespace yas;
 
 - (void)test_set_manager {
     auto node = audio::engine::make_node({});
-    auto manager = audio::engine::make_manager();
+    auto manager = audio::engine::manager::make_shared();
 
     node->manageable()->set_manager(manager);
 

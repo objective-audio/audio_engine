@@ -21,7 +21,7 @@ using namespace yas;
 }
 
 - (void)test_render_with_lambda {
-    auto manager = audio::engine::make_manager();
+    auto manager = audio::engine::manager::make_shared();
     manager->add_offline_output();
 
     std::shared_ptr<audio::engine::offline_output> &output = manager->offline_output();
@@ -76,7 +76,7 @@ using namespace yas;
 }
 
 - (void)test_render_without_lambda {
-    auto manager = audio::engine::make_manager();
+    auto manager = audio::engine::manager::make_shared();
     manager->add_offline_output();
 
     std::shared_ptr<audio::engine::offline_output> &output = manager->offline_output();

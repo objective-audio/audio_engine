@@ -21,7 +21,7 @@ using namespace yas;
 }
 
 - (void)test_connect_success {
-    auto manager = audio::engine::make_manager();
+    auto manager = audio::engine::manager::make_shared();
 
     auto format = audio::format({.sample_rate = 48000.0, .channel_count = 2});
     test::node_object source_obj(1, 1);
@@ -41,7 +41,7 @@ using namespace yas;
 }
 
 - (void)test_connect_failed_no_bus {
-    auto manager = audio::engine::make_manager();
+    auto manager = audio::engine::manager::make_shared();
 
     auto format = audio::format({.sample_rate = 48000.0, .channel_count = 2});
     test::node_object source_obj(0, 0);
@@ -52,7 +52,7 @@ using namespace yas;
 }
 
 - (void)test_connect_and_disconnect {
-    auto manager = audio::engine::make_manager();
+    auto manager = audio::engine::manager::make_shared();
 
     auto format = audio::format({.sample_rate = 48000.0, .channel_count = 2});
     test::node_object source_obj(1, 1);
@@ -80,7 +80,7 @@ using namespace yas;
 }
 
 - (void)test_configuration_change_notification {
-    auto manager = audio::engine::make_manager();
+    auto manager = audio::engine::manager::make_shared();
 
     XCTestExpectation *expectation = [self expectationWithDescription:@"configuration change"];
 
@@ -98,7 +98,7 @@ using namespace yas;
 }
 
 - (void)test_add_and_remove_offline_output {
-    auto manager = audio::engine::make_manager();
+    auto manager = audio::engine::manager::make_shared();
 
     XCTAssertFalse(manager->offline_output());
 
@@ -122,7 +122,7 @@ using namespace yas;
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
 
 - (void)test_add_and_remove_device_io {
-    auto manager = audio::engine::make_manager();
+    auto manager = audio::engine::manager::make_shared();
 
     XCTAssertFalse(manager->device_io());
 

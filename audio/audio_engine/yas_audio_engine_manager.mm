@@ -556,7 +556,7 @@ void audio::engine::manager::_post_configuration_change() {
     this->_notifier.notify(std::make_pair(method::configuration_change, shared_from_this()));
 }
 
-std::shared_ptr<audio::engine::manager> audio::engine::make_manager() {
+std::shared_ptr<audio::engine::manager> audio::engine::manager::make_shared() {
     auto shared = std::shared_ptr<manager>(new manager{});
     shared->prepare();
     return shared;
