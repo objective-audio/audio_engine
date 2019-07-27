@@ -41,12 +41,9 @@ struct connection : node_removable, std::enable_shared_from_this<connection> {
 
     void _remove_connection_from_nodes(connection const &);
 
-    friend std::shared_ptr<connection> make_connection(audio::engine::node &src_node, uint32_t const src_bus,
-                                                       audio::engine::node &dst_node, uint32_t const dst_bus,
-                                                       audio::format const &format);
+   public:
+    static std::shared_ptr<connection> make_shared(audio::engine::node &src_node, uint32_t const src_bus,
+                                                   audio::engine::node &dst_node, uint32_t const dst_bus,
+                                                   audio::format const &format);
 };
-
-std::shared_ptr<connection> make_connection(audio::engine::node &src_node, uint32_t const src_bus,
-                                            audio::engine::node &dst_node, uint32_t const dst_bus,
-                                            audio::format const &format);
 }  // namespace yas::audio::engine

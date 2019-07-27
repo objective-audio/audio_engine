@@ -110,7 +110,7 @@ audio::engine::connection &audio::engine::manager::connect(audio::engine::node &
         this->_attach_node(dst_node);
     }
 
-    auto connection = make_connection(src_node, src_bus_idx, dst_node, dst_bus_idx, format);
+    auto connection = connection::make_shared(src_node, src_bus_idx, dst_node, dst_bus_idx, format);
 
     this->_connections.insert(connection);
 
