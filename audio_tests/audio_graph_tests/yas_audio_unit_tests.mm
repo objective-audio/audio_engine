@@ -45,7 +45,7 @@ using namespace yas;
                                        .pcm_format = audio::pcm_format::int16,
                                        .interleaved = true});
 
-    auto graph = audio::make_graph();
+    auto graph = audio::graph::make_shared();
 
     auto converter_unit = audio::make_unit(kAudioUnitType_FormatConverter, kAudioUnitSubType_AUConverter);
     converter_unit->set_maximum_frames_per_slice(maximum_frame_length);
@@ -111,7 +111,7 @@ using namespace yas;
                                  .pcm_format = audio::pcm_format::float32,
                                  .interleaved = false});
 
-    auto graph = audio::make_graph();
+    auto graph = audio::graph::make_shared();
 
     auto converter_unit = audio::make_unit(kAudioUnitType_FormatConverter, kAudioUnitSubType_AUConverter);
     converter_unit->set_maximum_frames_per_slice(maximum_frame_length);

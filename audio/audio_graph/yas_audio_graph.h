@@ -60,8 +60,7 @@ struct graph : std::enable_shared_from_this<graph>, interruptable_graph {
     void _add_unit_to_units(std::shared_ptr<audio::unit> &unit);
     void _remove_unit_from_units(std::shared_ptr<audio::unit> &unit);
 
-    friend std::shared_ptr<graph> make_graph();
+   public:
+    static std::shared_ptr<graph> make_shared();
 };
-
-std::shared_ptr<graph> make_graph();
 }  // namespace yas::audio

@@ -383,7 +383,7 @@ bool audio::engine::manager::_prepare_graph() {
         return true;
     }
 
-    this->_graph = audio::make_graph();
+    this->_graph = audio::graph::make_shared();
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
     if (auto &device_io = this->_device_io) {

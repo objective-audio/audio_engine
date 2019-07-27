@@ -156,7 +156,7 @@ struct device_vc_internal {
                                         forName:NSStringFromClass([YASFrequencyValueFormatter class])];
     });
 
-    _internal.graph = audio::make_graph();
+    _internal.graph = audio::graph::make_shared();
     _internal.device_io = audio::device_io::make_shared(std::shared_ptr<audio::device>(nullptr));
     _internal.graph->add_audio_device_io(_internal.device_io);
 
