@@ -118,7 +118,7 @@ struct node : std::enable_shared_from_this<node>, connectable_node, manageable_n
     node(node const &) = delete;
     node &operator=(node const &) = delete;
 
-public:
+   public:
     static std::shared_ptr<node> make_shared(node_args);
 };
 }  // namespace yas::audio::engine

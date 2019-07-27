@@ -28,7 +28,7 @@ struct audio::engine::route::kernel {
 
 audio::engine::route::route()
     : _node(node::make_shared({.input_bus_count = std::numeric_limits<uint32_t>::max(),
-                       .output_bus_count = std::numeric_limits<uint32_t>::max()})) {
+                               .output_bus_count = std::numeric_limits<uint32_t>::max()})) {
 }
 
 audio::engine::route::~route() = default;

@@ -173,7 +173,7 @@ audio::engine::manager::add_result_t audio::engine::manager::add_offline_output(
     if (this->_offline_output) {
         return add_result_t{add_error_t::already_added};
     } else {
-        this->_offline_output = audio::engine::make_offline_output();
+        this->_offline_output = audio::engine::offline_output::make_shared();
         return add_result_t{nullptr};
     }
 }
