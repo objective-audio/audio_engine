@@ -101,7 +101,7 @@ using namespace yas;
 }
 
 - (void)test_render_time {
-    auto node = audio::engine::make_node({});
+    auto node = audio::engine::node::make_shared({});
     audio::time time(100, 48000.0);
 
     XCTestExpectation *render_expectation = [self expectationWithDescription:@"node render"];
@@ -123,7 +123,7 @@ using namespace yas;
 }
 
 - (void)test_set_manager {
-    auto node = audio::engine::make_node({});
+    auto node = audio::engine::node::make_shared({});
     auto manager = audio::engine::manager::make_shared();
 
     node->manageable()->set_manager(manager);

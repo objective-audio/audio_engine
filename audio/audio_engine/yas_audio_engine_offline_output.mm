@@ -49,7 +49,7 @@ struct audio::engine::offline_output::core {
 #pragma mark - audio::engine::offline_output
 
 audio::engine::offline_output::offline_output()
-    : _node(make_node({.input_bus_count = 1, .output_bus_count = 0})), _core(std::make_unique<core>()) {
+    : _node(node::make_shared({.input_bus_count = 1, .output_bus_count = 0})), _core(std::make_unique<core>()) {
 }
 
 audio::engine::offline_output::~offline_output() = default;

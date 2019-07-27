@@ -27,7 +27,7 @@ struct audio::engine::route::kernel {
 #pragma mark - main
 
 audio::engine::route::route()
-    : _node(make_node({.input_bus_count = std::numeric_limits<uint32_t>::max(),
+    : _node(node::make_shared({.input_bus_count = std::numeric_limits<uint32_t>::max(),
                        .output_bus_count = std::numeric_limits<uint32_t>::max()})) {
 }
 

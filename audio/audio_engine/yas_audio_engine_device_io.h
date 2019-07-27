@@ -32,7 +32,7 @@ struct device_io : manageable_device_io, std::enable_shared_from_this<device_io>
     std::shared_ptr<manageable_device_io> manageable();
 
    private:
-    std::shared_ptr<audio::engine::node> _node = make_node({.input_bus_count = 1, .output_bus_count = 1});
+    std::shared_ptr<audio::engine::node> _node = node::make_shared({.input_bus_count = 1, .output_bus_count = 1});
     chaining::any_observer_ptr _connections_observer = nullptr;
     std::unique_ptr<core> _core;
 

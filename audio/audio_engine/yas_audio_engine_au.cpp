@@ -33,7 +33,7 @@ struct audio::engine::au::core {
 
 #pragma mark - audio::engine::au
 
-audio::engine::au::au(node_args &&args) : _node(make_node(std::move(args))), _core(std::make_unique<core>()) {
+audio::engine::au::au(node_args &&args) : _node(node::make_shared(std::move(args))), _core(std::make_unique<core>()) {
 }
 
 audio::engine::au::~au() = default;

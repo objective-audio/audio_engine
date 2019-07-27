@@ -24,7 +24,7 @@ struct audio::engine::tap::kernel {
 #pragma mark - audio::engine::tap
 
 audio::engine::tap::tap(args args)
-    : _node(make_node(args.is_input ? engine::node_args{.input_bus_count = 1, .input_renderable = true} :
+    : _node(node::make_shared(args.is_input ? engine::node_args{.input_bus_count = 1, .input_renderable = true} :
                                       engine::node_args{.input_bus_count = 1, .output_bus_count = 1})) {
 }
 

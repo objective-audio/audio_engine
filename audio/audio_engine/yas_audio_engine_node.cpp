@@ -271,7 +271,7 @@ void audio::engine::node::_prepare_kernel(std::shared_ptr<audio::engine::kernel>
     }
 }
 
-std::shared_ptr<audio::engine::node> audio::engine::make_node(node_args args) {
+std::shared_ptr<audio::engine::node> audio::engine::node::make_shared(node_args args) {
     return std::shared_ptr<audio::engine::node>(new node{std::move(args)});
 }
 

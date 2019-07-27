@@ -123,7 +123,7 @@ struct manager : std::enable_shared_from_this<manager> {
     void _set_device_io(std::shared_ptr<audio::engine::device_io> &&node);
 #endif
 
-public:
+   public:
     static std::shared_ptr<manager> make_shared();
 };
 }  // namespace yas::audio::engine
