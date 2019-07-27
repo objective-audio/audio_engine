@@ -21,7 +21,7 @@ using namespace yas;
 }
 
 - (void)test_add_and_remove_route {
-    auto engine_route = audio::engine::make_route();
+    auto engine_route = audio::engine::route::make_shared();
 
     XCTAssertEqual(engine_route->routes().size(), 0);
 
@@ -47,7 +47,7 @@ using namespace yas;
 }
 
 - (void)test_replace_route {
-    auto engine_route = audio::engine::make_route();
+    auto engine_route = audio::engine::route::make_shared();
 
     XCTAssertEqual(engine_route->routes().size(), 0);
 
@@ -77,7 +77,7 @@ using namespace yas;
 
     auto format = audio::format({.sample_rate = 44100.0, .channel_count = 2});
     std::shared_ptr<audio::engine::offline_output> &output = manager->offline_output();
-    auto engine_route = audio::engine::make_route();
+    auto engine_route = audio::engine::route::make_shared();
     auto tap = audio::engine::make_tap();
 
     manager->connect(engine_route->node(), output->node(), format);
@@ -142,7 +142,7 @@ using namespace yas;
     auto dst_format = audio::format({.sample_rate = 44100.0, .channel_count = 2});
     auto src_format = audio::format({.sample_rate = 44100.0, .channel_count = 1});
     std::shared_ptr<audio::engine::offline_output> &output = manager->offline_output();
-    auto engine_route = audio::engine::make_route();
+    auto engine_route = audio::engine::route::make_shared();
 
     manager->connect(engine_route->node(), output->node(), dst_format);
 
@@ -200,7 +200,7 @@ using namespace yas;
     auto dst_format = audio::format({.sample_rate = 44100.0, .channel_count = 4});
     auto src_format = audio::format({.sample_rate = 44100.0, .channel_count = 2});
     std::shared_ptr<audio::engine::offline_output> &output = manager->offline_output();
-    auto engine_route = audio::engine::make_route();
+    auto engine_route = audio::engine::route::make_shared();
 
     manager->connect(engine_route->node(), output->node(), dst_format);
 

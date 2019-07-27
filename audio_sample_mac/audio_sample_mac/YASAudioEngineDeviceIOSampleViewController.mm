@@ -169,7 +169,7 @@ struct device_io_vc_internal {
 - (void)setupEngine {
     _internal.manager = audio::engine::manager::make_shared();
     _internal.manager->add_device_io();
-    _internal.route = audio::engine::make_route();
+    _internal.route = audio::engine::route::make_shared();
     _internal.tap = audio::engine::make_tap();
 
     auto weak_tap = to_weak(_internal.tap);
