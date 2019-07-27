@@ -27,10 +27,10 @@ static const AudioComponentDescription baseAcd = {.componentType = kAudioUnitTyp
 
 namespace yas::sample {
 struct effects_vc_internal {
-    std::shared_ptr<audio::engine::manager> manager = audio::engine::make_manager();
-    std::shared_ptr<audio::engine::au_output> au_output = audio::engine::make_au_output();
+    std::shared_ptr<audio::engine::manager> manager = audio::engine::manager::make_shared();
+    std::shared_ptr<audio::engine::au_output> au_output = audio::engine::au_output::make_shared();
     std::shared_ptr<audio::engine::connection> through_connection = nullptr;
-    std::shared_ptr<audio::engine::tap> tap = audio::engine::make_tap();
+    std::shared_ptr<audio::engine::tap> tap = audio::engine::tap::make_shared();
     std::shared_ptr<audio::engine::au> effect_au = nullptr;
 
     void replace_effect_au(const AudioComponentDescription *acd) {
@@ -47,7 +47,7 @@ struct effects_vc_internal {
         auto format = audio::format({.sample_rate = [AVAudioSession sharedInstance].sampleRate, .channel_count = 2});
 
         if (acd) {
-            effect_au = audio::engine::make_au(*acd);
+            effect_au = audio::engine::au::make_shared(*acd);
             manager->connect(effect_au->node(), au_output->au_io().au().node(), format);
             manager->connect(tap->node(), effect_au->node(), format);
         } else {
@@ -134,7 +134,7 @@ struct effects_vc_internal {
             if (component != NULL) {
                 AudioComponentDescription acd;
                 raise_if_raw_audio_error(AudioComponentGetDescription(component, &acd));
-                _units.push_back(audio::make_unit(acd));
+                _units.push_back(audio::unit::make_shared(acd));
             } else {
                 break;
             }
