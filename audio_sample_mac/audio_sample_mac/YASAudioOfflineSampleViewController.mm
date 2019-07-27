@@ -120,7 +120,7 @@ struct sine {
 namespace yas::sample {
 struct offline_vc_internal {
     std::shared_ptr<audio::engine::manager> play_manager = audio::engine::make_manager();
-    std::shared_ptr<audio::engine::au_output> play_au_output = audio::engine::make_au_output();
+    std::shared_ptr<audio::engine::au_output> play_au_output = audio::engine::au_output::make_shared();
     std::shared_ptr<audio::engine::au_mixer> play_au_mixer = audio::engine::make_au_mixer();
     offline_sample::engine::sine play_sine;
 

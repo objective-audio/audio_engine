@@ -198,7 +198,7 @@ audio::engine::au_io &audio::engine::au_output::au_io() {
     return *this->_au_io;
 }
 
-std::shared_ptr<audio::engine::au_output> audio::engine::make_au_output() {
+std::shared_ptr<audio::engine::au_output> audio::engine::au_output::make_shared() {
     return std::shared_ptr<au_output>(new au_output{});
 }
 
@@ -276,7 +276,7 @@ void audio::engine::au_input::_update_unit_input_connections() {
     }
 }
 
-std::shared_ptr<audio::engine::au_input> audio::engine::make_au_input() {
+std::shared_ptr<audio::engine::au_input> audio::engine::au_input::make_shared() {
     auto shared = std::shared_ptr<au_input>(new au_input{});
     shared->_prepare();
     return shared;
