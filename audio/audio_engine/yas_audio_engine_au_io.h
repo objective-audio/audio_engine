@@ -62,11 +62,10 @@ struct au_io : std::enable_shared_from_this<au_io> {
 
     void _update_unit_io_connections();
 
-    friend std::shared_ptr<au_io> make_au_io(au_io::args);
+   public:
+    static std::shared_ptr<au_io> make_shared();
+    static std::shared_ptr<au_io> make_shared(au_io::args);
 };
-
-std::shared_ptr<au_io> make_au_io();
-std::shared_ptr<au_io> make_au_io(au_io::args);
 
 struct au_output : std::enable_shared_from_this<au_output> {
     virtual ~au_output() = default;
