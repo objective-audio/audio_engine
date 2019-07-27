@@ -64,7 +64,7 @@ std::shared_ptr<audio::engine::manageable_device_io> audio::engine::device_io::m
 }
 
 void audio::engine::device_io::add_raw_device_io() {
-    this->_core->_device_io = audio::make_device_io(this->_core->device());
+    this->_core->_device_io = audio::device_io::make_shared(this->_core->device());
 }
 
 void audio::engine::device_io::remove_raw_device_io() {

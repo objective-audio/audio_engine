@@ -50,10 +50,10 @@ struct device_io : std::enable_shared_from_this<device_io> {
     void _initialize() const;
     void _uninitialize() const;
 
-    friend std::shared_ptr<audio::device_io> make_device_io(std::shared_ptr<audio::device> const &);
+   public:
+    static std::shared_ptr<audio::device_io> make_shared(std::shared_ptr<audio::device> const &);
 };
 
-std::shared_ptr<audio::device_io> make_device_io(std::shared_ptr<audio::device> const &);
 }  // namespace yas::audio
 
 #endif

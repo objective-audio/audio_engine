@@ -333,7 +333,7 @@ void audio::device_io::_prepare(std::shared_ptr<audio::device> const &device) {
     this->_impl->prepare(*this, device);
 }
 
-std::shared_ptr<audio::device_io> audio::make_device_io(std::shared_ptr<audio::device> const &device) {
+std::shared_ptr<audio::device_io> audio::device_io::make_shared(std::shared_ptr<audio::device> const &device) {
     auto shared = std::shared_ptr<device_io>(new audio::device_io{});
     shared->_prepare(device);
     return shared;
