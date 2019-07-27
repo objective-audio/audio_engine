@@ -55,7 +55,7 @@ audio::engine::offline_output::offline_output()
 audio::engine::offline_output::~offline_output() = default;
 
 bool audio::engine::offline_output::is_running() const {
-    return this->_queue != nullptr;
+    return this->_queue.has_value();
 }
 
 audio::engine::node const &audio::engine::offline_output::node() const {
@@ -141,7 +141,7 @@ audio::engine::offline_start_result_t audio::engine::offline_output::start(offli
                         completion_handler = output->_core->pull_completion_handler(*key);
                     }
 
-                    output->_queue = nullptr;
+                    output->_queue.reset();
 
                     if (completion_handler) {
                         (*completion_handler)(cancelled);
@@ -152,9 +152,9 @@ audio::engine::offline_start_result_t audio::engine::offline_output::start(offli
             dispatch_async(dispatch_get_main_queue(), completion_lambda);
         };
 
-        task task{std::move(task_lambda)};
+        auto task = task::make_shared(std::move(task_lambda));
         this->_queue = task_queue{1};
-        this->_queue.push_back(task);
+        this->_queue->push_back(*task);
     } else {
         return offline_start_result_t(offline_start_error_t::connection_not_found);
     }
@@ -165,9 +165,9 @@ void audio::engine::offline_output::stop() {
     auto completion_handlers = this->_core->pull_completion_handlers();
 
     if (auto &queue = this->_queue) {
-        queue.cancel_all();
-        queue.wait_until_all_tasks_are_finished();
-        this->_queue = nullptr;
+        queue->cancel_all();
+        queue->wait_until_all_tasks_are_finished();
+        this->_queue.reset();
     }
 
     for (auto &pair : completion_handlers) {
