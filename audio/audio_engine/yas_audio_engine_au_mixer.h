@@ -43,7 +43,7 @@ struct au_mixer : std::enable_shared_from_this<au_mixer> {
 
     void _update_unit_mixer_connections();
 
-public:
-  static std::shared_ptr<au_mixer> make_shared();
+   public:
+    static std::shared_ptr<au_mixer> make_shared();
 };
 }  // namespace yas::audio::engine

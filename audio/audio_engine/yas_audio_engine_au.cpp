@@ -326,8 +326,8 @@ void audio::engine::au::_will_reset() {
 
 #pragma mark - factory
 
-std::shared_ptr<audio::engine::au> audio::engine::make_au(OSType const type, OSType const sub_type) {
-    return make_au(AudioComponentDescription{
+std::shared_ptr<audio::engine::au> audio::engine::au::make_shared(OSType const type, OSType const sub_type) {
+    return au::make_shared(AudioComponentDescription{
         .componentType = type,
         .componentSubType = sub_type,
         .componentManufacturer = kAudioUnitManufacturer_Apple,
@@ -336,11 +336,11 @@ std::shared_ptr<audio::engine::au> audio::engine::make_au(OSType const type, OST
     });
 }
 
-std::shared_ptr<audio::engine::au> audio::engine::make_au(AudioComponentDescription const &acd) {
-    return make_au({.acd = acd, .node_args = {.input_bus_count = 1, .output_bus_count = 1}});
+std::shared_ptr<audio::engine::au> audio::engine::au::make_shared(AudioComponentDescription const &acd) {
+    return au::make_shared({.acd = acd, .node_args = {.input_bus_count = 1, .output_bus_count = 1}});
 }
 
-std::shared_ptr<audio::engine::au> audio::engine::make_au(au::args &&args) {
+std::shared_ptr<audio::engine::au> audio::engine::au::make_shared(au::args &&args) {
     auto shared = std::shared_ptr<au>(new au{std::move(args.node_args)});
     shared->_prepare(args.acd);
     return shared;

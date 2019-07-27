@@ -37,7 +37,7 @@ using namespace yas;
 
     auto format = audio::format({.sample_rate = sample_rate, .channel_count = 2});
     std::shared_ptr<audio::engine::offline_output> &output = manager->offline_output();
-    auto sample_delay_au = audio::engine::make_au(kAudioUnitType_Effect, kAudioUnitSubType_SampleDelay);
+    auto sample_delay_au = audio::engine::au::make_shared(kAudioUnitType_Effect, kAudioUnitSubType_SampleDelay);
     auto tap = audio::engine::make_tap();
 
     manager->connect(sample_delay_au->node(), output->node(), format);

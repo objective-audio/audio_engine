@@ -34,7 +34,7 @@ static AudioComponentDescription constexpr audio_au_io_acd = {
 #pragma mark - audio::engine::au_io
 
 audio::engine::au_io::au_io(args args)
-    : _au(make_au(
+    : _au(au::make_shared(
           {.acd = audio_au_io_acd,
            .node_args = audio::engine::node_args{.input_bus_count = static_cast<uint32_t>(args.enable_input ? 1 : 0),
                                                  .output_bus_count = static_cast<uint32_t>(args.enable_output ? 1 : 0),
