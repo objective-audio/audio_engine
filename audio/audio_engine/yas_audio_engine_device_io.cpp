@@ -186,7 +186,7 @@ bool audio::engine::device_io::_validate_connections() {
     return true;
 }
 
-std::shared_ptr<audio::engine::device_io> audio::engine::make_device_io() {
+std::shared_ptr<audio::engine::device_io> audio::engine::device_io::make_shared() {
     auto shared = std::shared_ptr<audio::engine::device_io>(new audio::engine::device_io{});
     shared->_prepare();
     return shared;

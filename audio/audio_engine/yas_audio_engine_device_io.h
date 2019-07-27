@@ -51,10 +51,9 @@ struct device_io : manageable_device_io, std::enable_shared_from_this<device_io>
     void _update_device_io_connections();
     bool _validate_connections();
 
-    friend std::shared_ptr<device_io> make_device_io();
+public:
+    static std::shared_ptr<device_io> make_shared();
 };
-
-std::shared_ptr<device_io> make_device_io();
 }  // namespace yas::audio::engine
 
 #endif

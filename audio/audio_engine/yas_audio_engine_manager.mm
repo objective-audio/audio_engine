@@ -201,7 +201,7 @@ audio::engine::manager::add_result_t audio::engine::manager::add_device_io() {
     if (this->_device_io) {
         return add_result_t{add_error_t::already_added};
     } else {
-        this->_set_device_io(audio::engine::make_device_io());
+        this->_set_device_io(audio::engine::device_io::make_shared());
         return add_result_t{nullptr};
     }
 }
