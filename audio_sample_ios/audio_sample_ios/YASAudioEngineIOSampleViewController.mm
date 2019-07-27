@@ -33,9 +33,9 @@ typedef NS_ENUM(NSUInteger, YASAudioEngineIOSampleSection) {
 
 namespace yas::sample {
 struct engine_io_vc_internal {
-    std::shared_ptr<audio::engine::manager> manager = audio::engine::make_manager();
-    std::shared_ptr<audio::engine::au_mixer> au_mixer = audio::engine::make_au_mixer();
-    std::shared_ptr<audio::engine::au_io> au_io = audio::engine::make_au_io();
+    std::shared_ptr<audio::engine::manager> manager = audio::engine::manager::make_shared();
+    std::shared_ptr<audio::engine::au_mixer> au_mixer = audio::engine::au_mixer::make_shared();
+    std::shared_ptr<audio::engine::au_io> au_io = audio::engine::au_io::make_shared();
 
     chaining::any_observer_ptr engine_observer = nullptr;
 

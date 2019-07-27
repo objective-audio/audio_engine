@@ -237,7 +237,7 @@ void audio::engine::node::set_manager(std::shared_ptr<audio::engine::manager> co
 }
 
 void audio::engine::node::update_kernel() {
-    auto kernel = audio::engine::make_kernel();
+    auto kernel = audio::engine::kernel::make_shared();
     this->_prepare_kernel(kernel);
     this->_core->set_kernel(kernel);
 }
@@ -271,7 +271,7 @@ void audio::engine::node::_prepare_kernel(std::shared_ptr<audio::engine::kernel>
     }
 }
 
-std::shared_ptr<audio::engine::node> audio::engine::make_node(node_args args) {
+std::shared_ptr<audio::engine::node> audio::engine::node::make_shared(node_args args) {
     return std::shared_ptr<audio::engine::node>(new node{std::move(args)});
 }
 

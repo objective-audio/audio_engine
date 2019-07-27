@@ -21,7 +21,7 @@ using namespace yas;
 }
 
 - (void)test_add_and_remove_route {
-    auto engine_route = audio::engine::make_route();
+    auto engine_route = audio::engine::route::make_shared();
 
     XCTAssertEqual(engine_route->routes().size(), 0);
 
@@ -47,7 +47,7 @@ using namespace yas;
 }
 
 - (void)test_replace_route {
-    auto engine_route = audio::engine::make_route();
+    auto engine_route = audio::engine::route::make_shared();
 
     XCTAssertEqual(engine_route->routes().size(), 0);
 
@@ -72,13 +72,13 @@ using namespace yas;
 }
 
 - (void)test_render {
-    auto manager = audio::engine::make_manager();
+    auto manager = audio::engine::manager::make_shared();
     manager->add_offline_output();
 
     auto format = audio::format({.sample_rate = 44100.0, .channel_count = 2});
     std::shared_ptr<audio::engine::offline_output> &output = manager->offline_output();
-    auto engine_route = audio::engine::make_route();
-    auto tap = audio::engine::make_tap();
+    auto engine_route = audio::engine::route::make_shared();
+    auto tap = audio::engine::tap::make_shared();
 
     manager->connect(engine_route->node(), output->node(), format);
     manager->connect(tap->node(), engine_route->node(), format);
@@ -136,13 +136,13 @@ using namespace yas;
 - (void)test_render_many_source {
     auto const src_count = 2;
 
-    auto manager = audio::engine::make_manager();
+    auto manager = audio::engine::manager::make_shared();
     manager->add_offline_output();
 
     auto dst_format = audio::format({.sample_rate = 44100.0, .channel_count = 2});
     auto src_format = audio::format({.sample_rate = 44100.0, .channel_count = 1});
     std::shared_ptr<audio::engine::offline_output> &output = manager->offline_output();
-    auto engine_route = audio::engine::make_route();
+    auto engine_route = audio::engine::route::make_shared();
 
     manager->connect(engine_route->node(), output->node(), dst_format);
 
@@ -153,7 +153,7 @@ using namespace yas;
 
     std::vector<std::shared_ptr<audio::engine::tap>> taps;
     for (uint32_t i = 0; i < src_count; ++i) {
-        taps.push_back(audio::engine::make_tap());
+        taps.push_back(audio::engine::tap::make_shared());
         auto &tap = taps.at(i);
 
         manager->connect(tap->node(), engine_route->node(), 0, i, src_format);
@@ -194,13 +194,13 @@ using namespace yas;
 - (void)test_render_gappy_source {
     auto const src_count = 2;
 
-    auto manager = audio::engine::make_manager();
+    auto manager = audio::engine::manager::make_shared();
     manager->add_offline_output();
 
     auto dst_format = audio::format({.sample_rate = 44100.0, .channel_count = 4});
     auto src_format = audio::format({.sample_rate = 44100.0, .channel_count = 2});
     std::shared_ptr<audio::engine::offline_output> &output = manager->offline_output();
-    auto engine_route = audio::engine::make_route();
+    auto engine_route = audio::engine::route::make_shared();
 
     manager->connect(engine_route->node(), output->node(), dst_format);
 
@@ -211,7 +211,7 @@ using namespace yas;
 
     std::vector<std::shared_ptr<audio::engine::tap>> taps;
     for (uint32_t i = 0; i < src_count; ++i) {
-        taps.push_back(audio::engine::make_tap());
+        taps.push_back(audio::engine::tap::make_shared());
         auto &tap = taps.at(i);
 
         manager->connect(tap->node(), engine_route->node(), 0, i, src_format);

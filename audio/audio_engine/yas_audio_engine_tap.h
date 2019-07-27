@@ -44,9 +44,8 @@ struct tap : std::enable_shared_from_this<tap> {
     tap &operator=(tap const &) = delete;
     tap &operator=(tap &&) = delete;
 
-    friend std::shared_ptr<tap> make_tap(tap::args);
+   public:
+    static std::shared_ptr<tap> make_shared();
+    static std::shared_ptr<tap> make_shared(tap::args);
 };
-
-std::shared_ptr<tap> make_tap();
-std::shared_ptr<tap> make_tap(tap::args);
 }  // namespace yas::audio::engine

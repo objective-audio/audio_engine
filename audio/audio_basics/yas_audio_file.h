@@ -99,7 +99,7 @@ struct file final {
     std::optional<format> _processing_format = std::nullopt;
     int64_t _file_frame_position = 0;
     ExtAudioFileRef _ext_audio_file = nullptr;
-    yas::url _url = nullptr;
+    std::optional<yas::url> _url = std::nullopt;
     audio::file_type _file_type;
 
     bool _open_ext_audio_file(pcm_format const pcm_format, bool const interleaved);

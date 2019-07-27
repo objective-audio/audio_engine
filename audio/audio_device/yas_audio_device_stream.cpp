@@ -170,7 +170,7 @@ void audio::device::stream::_prepare() {
     this->_impl->add_listener(kAudioStreamPropertyStartingChannel, listener);
 }
 
-std::shared_ptr<audio::device::stream> audio::make_device_stream(device::stream::args args) {
+std::shared_ptr<audio::device::stream> audio::device::stream::make_shared(device::stream::args args) {
     auto shared = std::shared_ptr<device::stream>(new device::stream{std::move(args)});
     shared->_prepare();
     return shared;

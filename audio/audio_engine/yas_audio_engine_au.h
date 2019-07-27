@@ -91,10 +91,9 @@ struct au : manageable_au, std::enable_shared_from_this<au> {
     void _update_unit_connections();
     void _will_reset();
 
-    friend std::shared_ptr<au> make_au(au::args &&);
+   public:
+    static std::shared_ptr<au> make_shared(OSType const type, OSType const sub_type);
+    static std::shared_ptr<au> make_shared(AudioComponentDescription const &);
+    static std::shared_ptr<au> make_shared(au::args &&);
 };
-
-std::shared_ptr<au> make_au(OSType const type, OSType const sub_type);
-std::shared_ptr<au> make_au(AudioComponentDescription const &);
-std::shared_ptr<au> make_au(au::args &&);
 }  // namespace yas::audio::engine

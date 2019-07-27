@@ -22,7 +22,7 @@ using namespace yas;
 }
 
 - (void)test_create {
-    auto node = audio::engine::make_offline_output();
+    auto node = audio::engine::offline_output::make_shared();
 
     XCTAssertTrue(node);
 
@@ -32,13 +32,13 @@ using namespace yas;
 - (void)test_offline_render_with_audio_engine {
     double const sample_rate = 44100.0;
 
-    auto manager = audio::engine::make_manager();
+    auto manager = audio::engine::manager::make_shared();
     manager->add_offline_output();
 
     auto format = audio::format({.sample_rate = sample_rate, .channel_count = 2});
     std::shared_ptr<audio::engine::offline_output> &output = manager->offline_output();
-    auto sample_delay_au = audio::engine::make_au(kAudioUnitType_Effect, kAudioUnitSubType_SampleDelay);
-    auto tap = audio::engine::make_tap();
+    auto sample_delay_au = audio::engine::au::make_shared(kAudioUnitType_Effect, kAudioUnitSubType_SampleDelay);
+    auto tap = audio::engine::tap::make_shared();
 
     manager->connect(sample_delay_au->node(), output->node(), format);
     manager->connect(tap->node(), sample_delay_au->node(), format);
@@ -129,10 +129,10 @@ using namespace yas;
 - (void)test_offline_render_without_audio_engine {
     double const sample_rate = 48000.0;
     auto format = audio::format({.sample_rate = sample_rate, .channel_count = 2});
-    auto output = audio::engine::make_offline_output();
-    auto tap = audio::engine::make_tap();
+    auto output = audio::engine::offline_output::make_shared();
+    auto tap = audio::engine::tap::make_shared();
 
-    auto connection = audio::engine::make_connection(tap->node(), 0, output->node(), 0, format);
+    auto connection = audio::engine::connection::make_shared(tap->node(), 0, output->node(), 0, format);
 
     output->node().connectable()->add_connection(*connection);
     output->node().manageable()->update_kernel();
@@ -225,7 +225,7 @@ using namespace yas;
 }
 
 - (void)test_bus_count {
-    auto output = audio::engine::make_offline_output();
+    auto output = audio::engine::offline_output::make_shared();
 
     XCTAssertEqual(output->node().output_bus_count(), 0);
     XCTAssertEqual(output->node().input_bus_count(), 1);
@@ -233,10 +233,10 @@ using namespace yas;
 
 - (void)test_reset_to_stop {
     auto format = audio::format({.sample_rate = 48000.0, .channel_count = 2});
-    auto output = audio::engine::make_offline_output();
-    auto tap = audio::engine::make_tap();
+    auto output = audio::engine::offline_output::make_shared();
+    auto tap = audio::engine::tap::make_shared();
 
-    auto connection = audio::engine::make_connection(tap->node(), 0, output->node(), 0, format);
+    auto connection = audio::engine::connection::make_shared(tap->node(), 0, output->node(), 0, format);
 
     output->node().connectable()->add_connection(*connection);
     output->node().manageable()->update_kernel();

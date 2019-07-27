@@ -10,15 +10,16 @@
 using namespace yas;
 
 audio::engine::au_mixer::au_mixer()
-    : _au(make_au({.acd =
-                       AudioComponentDescription{
-                           .componentType = kAudioUnitType_Mixer,
-                           .componentSubType = kAudioUnitSubType_MultiChannelMixer,
-                           .componentManufacturer = kAudioUnitManufacturer_Apple,
-                           .componentFlags = 0,
-                           .componentFlagsMask = 0,
-                       },
-                   .node_args = {.input_bus_count = std::numeric_limits<uint32_t>::max(), .output_bus_count = 1}})) {
+    : _au(au::make_shared(
+          {.acd =
+               AudioComponentDescription{
+                   .componentType = kAudioUnitType_Mixer,
+                   .componentSubType = kAudioUnitSubType_MultiChannelMixer,
+                   .componentManufacturer = kAudioUnitManufacturer_Apple,
+                   .componentFlags = 0,
+                   .componentFlagsMask = 0,
+               },
+           .node_args = {.input_bus_count = std::numeric_limits<uint32_t>::max(), .output_bus_count = 1}})) {
 }
 
 audio::engine::au_mixer::~au_mixer() = default;
@@ -93,7 +94,7 @@ void audio::engine::au_mixer::_update_unit_mixer_connections() {
     }
 }
 
-std::shared_ptr<audio::engine::au_mixer> audio::engine::make_au_mixer() {
+std::shared_ptr<audio::engine::au_mixer> audio::engine::au_mixer::make_shared() {
     auto shared = std::shared_ptr<au_mixer>(new au_mixer{});
     shared->_prepare();
     return shared;

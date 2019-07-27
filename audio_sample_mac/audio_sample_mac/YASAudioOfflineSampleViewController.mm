@@ -18,7 +18,7 @@ static double constexpr sample_rate = 44100.0;
 namespace yas::offline_sample::engine {
 struct sine {
     struct impl {
-        std::shared_ptr<audio::engine::tap> _tap = audio::engine::make_tap();
+        std::shared_ptr<audio::engine::tap> _tap = audio::engine::tap::make_shared();
         double phase_on_render;
 
         void set_frequency(float const frequency) {
@@ -119,13 +119,13 @@ struct sine {
 
 namespace yas::sample {
 struct offline_vc_internal {
-    std::shared_ptr<audio::engine::manager> play_manager = audio::engine::make_manager();
-    std::shared_ptr<audio::engine::au_output> play_au_output = audio::engine::make_au_output();
-    std::shared_ptr<audio::engine::au_mixer> play_au_mixer = audio::engine::make_au_mixer();
+    std::shared_ptr<audio::engine::manager> play_manager = audio::engine::manager::make_shared();
+    std::shared_ptr<audio::engine::au_output> play_au_output = audio::engine::au_output::make_shared();
+    std::shared_ptr<audio::engine::au_mixer> play_au_mixer = audio::engine::au_mixer::make_shared();
     offline_sample::engine::sine play_sine;
 
-    std::shared_ptr<audio::engine::manager> offline_manager = audio::engine::make_manager();
-    std::shared_ptr<audio::engine::au_mixer> offline_au_mixer = audio::engine::make_au_mixer();
+    std::shared_ptr<audio::engine::manager> offline_manager = audio::engine::manager::make_shared();
+    std::shared_ptr<audio::engine::au_mixer> offline_au_mixer = audio::engine::au_mixer::make_shared();
     offline_sample::engine::sine offline_sine;
 
     chaining::any_observer_ptr engine_observer = nullptr;

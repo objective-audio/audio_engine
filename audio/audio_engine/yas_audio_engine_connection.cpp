@@ -57,11 +57,11 @@ std::shared_ptr<audio::engine::node_removable> audio::engine::connection::remova
     return std::dynamic_pointer_cast<node_removable>(shared_from_this());
 }
 
-std::shared_ptr<audio::engine::connection> audio::engine::make_connection(audio::engine::node &src_node,
-                                                                          uint32_t const src_bus,
-                                                                          audio::engine::node &dst_node,
-                                                                          uint32_t const dst_bus,
-                                                                          audio::format const &format) {
+std::shared_ptr<audio::engine::connection> audio::engine::connection::make_shared(audio::engine::node &src_node,
+                                                                                  uint32_t const src_bus,
+                                                                                  audio::engine::node &dst_node,
+                                                                                  uint32_t const dst_bus,
+                                                                                  audio::format const &format) {
     auto connection = std::shared_ptr<audio::engine::connection>(
         new audio::engine::connection{src_node, src_bus, dst_node, dst_bus, format});
     src_node.connectable()->add_connection(*connection);

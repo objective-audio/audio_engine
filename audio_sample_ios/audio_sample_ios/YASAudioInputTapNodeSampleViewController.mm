@@ -20,9 +20,9 @@ using namespace yas;
 
 namespace yas::sample {
 struct input_tap_vc_internal {
-    std::shared_ptr<audio::engine::manager> manager = audio::engine::make_manager();
-    std::shared_ptr<audio::engine::au_input> au_input = audio::engine::make_au_input();
-    std::shared_ptr<audio::engine::tap> input_tap = audio::engine::make_tap({.is_input = true});
+    std::shared_ptr<audio::engine::manager> manager = audio::engine::manager::make_shared();
+    std::shared_ptr<audio::engine::au_input> au_input = audio::engine::au_input::make_shared();
+    std::shared_ptr<audio::engine::tap> input_tap = audio::engine::tap::make_shared({.is_input = true});
 
     chaining::value::holder<float> input_level{audio::math::decibel_from_linear(0.0f)};
 

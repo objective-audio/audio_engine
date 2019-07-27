@@ -118,11 +118,10 @@ struct unit : manageable_unit, std::enable_shared_from_this<unit> {
     void set_key(std::optional<uint16_t> const &) override;
     std::optional<uint16_t> const &key() const override;
 
-    friend std::shared_ptr<audio::unit> make_unit(AudioComponentDescription const &acd);
+   public:
+    static std::shared_ptr<audio::unit> make_shared(AudioComponentDescription const &acd);
+    static std::shared_ptr<audio::unit> make_shared(OSType const type, OSType const sub_type);
 };
-
-std::shared_ptr<audio::unit> make_unit(AudioComponentDescription const &acd);
-std::shared_ptr<audio::unit> make_unit(OSType const type, OSType const sub_type);
 }  // namespace yas::audio
 
 namespace yas {

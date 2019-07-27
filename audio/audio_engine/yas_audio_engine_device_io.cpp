@@ -64,7 +64,7 @@ std::shared_ptr<audio::engine::manageable_device_io> audio::engine::device_io::m
 }
 
 void audio::engine::device_io::add_raw_device_io() {
-    this->_core->_device_io = audio::make_device_io(this->_core->device());
+    this->_core->_device_io = audio::device_io::make_shared(this->_core->device());
 }
 
 void audio::engine::device_io::remove_raw_device_io() {
@@ -186,7 +186,7 @@ bool audio::engine::device_io::_validate_connections() {
     return true;
 }
 
-std::shared_ptr<audio::engine::device_io> audio::engine::make_device_io() {
+std::shared_ptr<audio::engine::device_io> audio::engine::device_io::make_shared() {
     auto shared = std::shared_ptr<audio::engine::device_io>(new audio::engine::device_io{});
     shared->_prepare();
     return shared;

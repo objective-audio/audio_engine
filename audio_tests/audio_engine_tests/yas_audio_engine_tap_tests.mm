@@ -21,12 +21,12 @@ using namespace yas;
 }
 
 - (void)test_render_with_lambda {
-    auto manager = audio::engine::make_manager();
+    auto manager = audio::engine::manager::make_shared();
     manager->add_offline_output();
 
     std::shared_ptr<audio::engine::offline_output> &output = manager->offline_output();
-    auto to_tap = audio::engine::make_tap();
-    auto from_tap = audio::engine::make_tap();
+    auto to_tap = audio::engine::tap::make_shared();
+    auto from_tap = audio::engine::tap::make_shared();
     auto const format = audio::format({.sample_rate = 48000.0, .channel_count = 2});
 
     auto const &to_connection = manager->connect(to_tap->node(), output->node(), format);
@@ -76,12 +76,12 @@ using namespace yas;
 }
 
 - (void)test_render_without_lambda {
-    auto manager = audio::engine::make_manager();
+    auto manager = audio::engine::manager::make_shared();
     manager->add_offline_output();
 
     std::shared_ptr<audio::engine::offline_output> &output = manager->offline_output();
-    auto to_tap = audio::engine::make_tap();
-    auto from_tap = audio::engine::make_tap();
+    auto to_tap = audio::engine::tap::make_shared();
+    auto from_tap = audio::engine::tap::make_shared();
     auto const format = audio::format({.sample_rate = 48000.0, .channel_count = 2});
 
     manager->connect(to_tap->node(), output->node(), format);
@@ -100,7 +100,7 @@ using namespace yas;
 }
 
 - (void)test_bus_count {
-    auto tap = audio::engine::make_tap();
+    auto tap = audio::engine::tap::make_shared();
 
     XCTAssertEqual(tap->node().input_bus_count(), 1);
     XCTAssertEqual(tap->node().output_bus_count(), 1);

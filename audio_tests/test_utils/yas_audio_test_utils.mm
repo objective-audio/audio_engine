@@ -203,6 +203,6 @@ void test::raw_unit_render_on_sub_thread(std::shared_ptr<audio::unit> &unit, aud
 }
 
 test::node_object::node_object(uint32_t const input_bus_count, uint32_t const output_bus_count)
-    : node(audio::engine::make_node(
+    : node(audio::engine::node::make_shared(
           audio::engine::node_args{.input_bus_count = input_bus_count, .output_bus_count = output_bus_count})) {
 }

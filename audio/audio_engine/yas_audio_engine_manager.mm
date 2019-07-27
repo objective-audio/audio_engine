@@ -110,7 +110,7 @@ audio::engine::connection &audio::engine::manager::connect(audio::engine::node &
         this->_attach_node(dst_node);
     }
 
-    auto connection = make_connection(src_node, src_bus_idx, dst_node, dst_bus_idx, format);
+    auto connection = connection::make_shared(src_node, src_bus_idx, dst_node, dst_bus_idx, format);
 
     this->_connections.insert(connection);
 
@@ -173,7 +173,7 @@ audio::engine::manager::add_result_t audio::engine::manager::add_offline_output(
     if (this->_offline_output) {
         return add_result_t{add_error_t::already_added};
     } else {
-        this->_offline_output = audio::engine::make_offline_output();
+        this->_offline_output = audio::engine::offline_output::make_shared();
         return add_result_t{nullptr};
     }
 }
@@ -201,7 +201,7 @@ audio::engine::manager::add_result_t audio::engine::manager::add_device_io() {
     if (this->_device_io) {
         return add_result_t{add_error_t::already_added};
     } else {
-        this->_set_device_io(audio::engine::make_device_io());
+        this->_set_device_io(audio::engine::device_io::make_shared());
         return add_result_t{nullptr};
     }
 }
@@ -383,7 +383,7 @@ bool audio::engine::manager::_prepare_graph() {
         return true;
     }
 
-    this->_graph = audio::make_graph();
+    this->_graph = audio::graph::make_shared();
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
     if (auto &device_io = this->_device_io) {
@@ -556,7 +556,7 @@ void audio::engine::manager::_post_configuration_change() {
     this->_notifier.notify(std::make_pair(method::configuration_change, shared_from_this()));
 }
 
-std::shared_ptr<audio::engine::manager> audio::engine::make_manager() {
+std::shared_ptr<audio::engine::manager> audio::engine::manager::make_shared() {
     auto shared = std::shared_ptr<manager>(new manager{});
     shared->prepare();
     return shared;

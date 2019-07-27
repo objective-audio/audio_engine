@@ -27,7 +27,7 @@ using namespace yas;
     uint32_t const src_bus = 0;
     uint32_t const dst_bus = 1;
 
-    auto connection = audio::engine::make_connection(*src_obj.node, src_bus, *dst_obj.node, dst_bus, format);
+    auto connection = audio::engine::connection::make_shared(*src_obj.node, src_bus, *dst_obj.node, dst_bus, format);
 
     XCTAssertTrue(connection->source_node() == src_obj.node);
     XCTAssertTrue(connection->source_bus == src_bus);
@@ -46,7 +46,7 @@ using namespace yas;
     uint32_t const src_bus = 0;
     uint32_t const dst_bus = 1;
 
-    auto connection = audio::engine::make_connection(*src_obj.node, src_bus, *dst_obj.node, dst_bus, format);
+    auto connection = audio::engine::connection::make_shared(*src_obj.node, src_bus, *dst_obj.node, dst_bus, format);
 
     connection->removable()->remove_nodes();
 
@@ -61,7 +61,7 @@ using namespace yas;
     uint32_t const src_bus = 0;
     uint32_t const dst_bus = 1;
 
-    auto connection = audio::engine::make_connection(*src_obj.node, src_bus, *dst_obj.node, dst_bus, format);
+    auto connection = audio::engine::connection::make_shared(*src_obj.node, src_bus, *dst_obj.node, dst_bus, format);
 
     connection->removable()->remove_source_node();
 

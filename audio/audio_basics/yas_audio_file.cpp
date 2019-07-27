@@ -26,7 +26,7 @@ audio::file::open_result_t audio::file::open(open_args args) {
         return open_result_t(open_error_t::opened);
     }
 
-    if (!args.file_url || args.pcm_format == audio::pcm_format::other) {
+    if (args.pcm_format == audio::pcm_format::other) {
         return open_result_t(open_error_t::invalid_argument);
     }
 
@@ -44,7 +44,7 @@ audio::file::create_result_t audio::file::create(create_args args) {
         return create_result_t(create_error_t::created);
     }
 
-    if (!args.file_url || !args.settings) {
+    if (!args.settings) {
         return create_result_t(create_error_t::invalid_argument);
     }
 
@@ -70,7 +70,7 @@ bool audio::file::is_opened() const {
 }
 
 yas::url const &audio::file::url() const {
-    return this->_url;
+    return *this->_url;
 }
 
 audio::file_type audio::file::file_type() const {
@@ -223,11 +223,11 @@ audio::file::write_result_t audio::file::write_from_buffer(audio::pcm_buffer con
 #pragma mark - private
 
 bool audio::file::_open_ext_audio_file(pcm_format const pcm_format, bool const interleaved) {
-    if (!ext_audio_file_utils::can_open(this->_url.cf_url())) {
+    if (!ext_audio_file_utils::can_open(this->_url->cf_url())) {
         return false;
     }
 
-    if (!ext_audio_file_utils::open(&this->_ext_audio_file, this->_url.cf_url())) {
+    if (!ext_audio_file_utils::open(&this->_ext_audio_file, this->_url->cf_url())) {
         this->_ext_audio_file = nullptr;
         return false;
     };
@@ -269,7 +269,7 @@ bool audio::file::_create_ext_audio_file(CFDictionaryRef const &settings, pcm_fo
 
     AudioFileTypeID file_type_id = audio::to_audio_file_type_id(this->_file_type);
 
-    if (!ext_audio_file_utils::create(&this->_ext_audio_file, this->_url.cf_url(), file_type_id,
+    if (!ext_audio_file_utils::create(&this->_ext_audio_file, this->_url->cf_url(), file_type_id,
                                       this->_file_format->stream_description())) {
         this->_ext_audio_file = nullptr;
         return false;

@@ -685,12 +685,12 @@ std::optional<uint16_t> const &audio::unit::key() const {
     return this->_key;
 }
 
-std::shared_ptr<audio::unit> audio::make_unit(AudioComponentDescription const &acd) {
+std::shared_ptr<audio::unit> audio::unit::make_shared(AudioComponentDescription const &acd) {
     return std::shared_ptr<unit>(new unit{acd});
 }
 
-std::shared_ptr<audio::unit> audio::make_unit(OSType const type, OSType const sub_type) {
-    return make_unit(AudioComponentDescription{
+std::shared_ptr<audio::unit> audio::unit::make_shared(OSType const type, OSType const sub_type) {
+    return unit::make_shared(AudioComponentDescription{
         .componentType = type,
         .componentSubType = sub_type,
         .componentManufacturer = kAudioUnitManufacturer_Apple,

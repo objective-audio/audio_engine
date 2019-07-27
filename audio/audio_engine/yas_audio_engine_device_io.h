@@ -32,7 +32,7 @@ struct device_io : manageable_device_io, std::enable_shared_from_this<device_io>
     std::shared_ptr<manageable_device_io> manageable();
 
    private:
-    std::shared_ptr<audio::engine::node> _node = make_node({.input_bus_count = 1, .output_bus_count = 1});
+    std::shared_ptr<audio::engine::node> _node = node::make_shared({.input_bus_count = 1, .output_bus_count = 1});
     chaining::any_observer_ptr _connections_observer = nullptr;
     std::unique_ptr<core> _core;
 
@@ -51,10 +51,9 @@ struct device_io : manageable_device_io, std::enable_shared_from_this<device_io>
     void _update_device_io_connections();
     bool _validate_connections();
 
-    friend std::shared_ptr<device_io> make_device_io();
+   public:
+    static std::shared_ptr<device_io> make_shared();
 };
-
-std::shared_ptr<device_io> make_device_io();
 }  // namespace yas::audio::engine
 
 #endif

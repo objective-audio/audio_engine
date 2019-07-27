@@ -23,7 +23,7 @@ struct offline_output : manageable_offline_output, std::enable_shared_from_this<
     std::shared_ptr<manageable_offline_output> manageable();
 
    private:
-    task_queue _queue = nullptr;
+    std::optional<task_queue> _queue = std::nullopt;
     std::shared_ptr<audio::engine::node> _node;
     chaining::any_observer_ptr _reset_observer = nullptr;
     struct core;
@@ -41,10 +41,9 @@ struct offline_output : manageable_offline_output, std::enable_shared_from_this<
     offline_start_result_t start(offline_render_f &&, offline_completion_f &&) override;
     void stop() override;
 
-    friend std::shared_ptr<offline_output> make_offline_output();
+   public:
+    static std::shared_ptr<offline_output> make_shared();
 };
-
-std::shared_ptr<offline_output> make_offline_output();
 }  // namespace yas::audio::engine
 
 namespace yas {

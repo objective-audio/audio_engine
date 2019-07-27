@@ -62,11 +62,10 @@ struct au_io : std::enable_shared_from_this<au_io> {
 
     void _update_unit_io_connections();
 
-    friend std::shared_ptr<au_io> make_au_io(au_io::args);
+   public:
+    static std::shared_ptr<au_io> make_shared();
+    static std::shared_ptr<au_io> make_shared(au_io::args);
 };
-
-std::shared_ptr<au_io> make_au_io();
-std::shared_ptr<au_io> make_au_io(au_io::args);
 
 struct au_output : std::enable_shared_from_this<au_output> {
     virtual ~au_output() = default;
@@ -82,10 +81,9 @@ struct au_output : std::enable_shared_from_this<au_output> {
 
     au_output();
 
-    friend std::shared_ptr<au_output> make_au_output();
+   public:
+    static std::shared_ptr<au_output> make_shared();
 };
-
-std::shared_ptr<au_output> make_au_output();
 
 struct au_input : std::enable_shared_from_this<au_input> {
     virtual ~au_input() = default;
@@ -108,8 +106,7 @@ struct au_input : std::enable_shared_from_this<au_input> {
 
     void _update_unit_input_connections();
 
-    friend std::shared_ptr<au_input> make_au_input();
+   public:
+    static std::shared_ptr<au_input> make_shared();
 };
-
-std::shared_ptr<au_input> make_au_input();
 }  // namespace yas::audio::engine

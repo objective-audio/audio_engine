@@ -34,7 +34,7 @@ static AudioComponentDescription constexpr audio_au_io_acd = {
 #pragma mark - audio::engine::au_io
 
 audio::engine::au_io::au_io(args args)
-    : _au(make_au(
+    : _au(au::make_shared(
           {.acd = audio_au_io_acd,
            .node_args = audio::engine::node_args{.input_bus_count = static_cast<uint32_t>(args.enable_input ? 1 : 0),
                                                  .output_bus_count = static_cast<uint32_t>(args.enable_output ? 1 : 0),
@@ -167,11 +167,11 @@ void audio::engine::au_io::_update_unit_io_connections() {
     this->_notifier.notify(std::make_pair(au_io::method::did_update_connection, shared_from_this()));
 }
 
-std::shared_ptr<audio::engine::au_io> audio::engine::make_au_io() {
-    return make_au_io(au_io::args{});
+std::shared_ptr<audio::engine::au_io> audio::engine::au_io::make_shared() {
+    return au_io::make_shared(au_io::args{});
 }
 
-std::shared_ptr<audio::engine::au_io> audio::engine::make_au_io(au_io::args args) {
+std::shared_ptr<audio::engine::au_io> audio::engine::au_io::make_shared(au_io::args args) {
     auto shared = std::shared_ptr<au_io>(new au_io{std::move(args)});
     shared->_prepare();
     return shared;
@@ -179,7 +179,7 @@ std::shared_ptr<audio::engine::au_io> audio::engine::make_au_io(au_io::args args
 
 #pragma mark - audio::engine::au_output
 
-audio::engine::au_output::au_output() : _au_io(make_au_io({.enable_output = false})) {
+audio::engine::au_output::au_output() : _au_io(au_io::make_shared({.enable_output = false})) {
 }
 
 void audio::engine::au_output::set_channel_map(channel_map_t const &map) {
@@ -198,13 +198,13 @@ audio::engine::au_io &audio::engine::au_output::au_io() {
     return *this->_au_io;
 }
 
-std::shared_ptr<audio::engine::au_output> audio::engine::make_au_output() {
+std::shared_ptr<audio::engine::au_output> audio::engine::au_output::make_shared() {
     return std::shared_ptr<au_output>(new au_output{});
 }
 
 #pragma mark - audio::engine::au_input
 
-audio::engine::au_input::au_input() : _au_io(make_au_io({.enable_input = false})) {
+audio::engine::au_input::au_input() : _au_io(au_io::make_shared({.enable_input = false})) {
 }
 
 void audio::engine::au_input::set_channel_map(channel_map_t const &map) {
@@ -276,7 +276,7 @@ void audio::engine::au_input::_update_unit_input_connections() {
     }
 }
 
-std::shared_ptr<audio::engine::au_input> audio::engine::make_au_input() {
+std::shared_ptr<audio::engine::au_input> audio::engine::au_input::make_shared() {
     auto shared = std::shared_ptr<au_input>(new au_input{});
     shared->_prepare();
     return shared;

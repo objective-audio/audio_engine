@@ -24,8 +24,8 @@ struct audio::engine::tap::kernel {
 #pragma mark - audio::engine::tap
 
 audio::engine::tap::tap(args args)
-    : _node(make_node(args.is_input ? engine::node_args{.input_bus_count = 1, .input_renderable = true} :
-                                      engine::node_args{.input_bus_count = 1, .output_bus_count = 1})) {
+    : _node(node::make_shared(args.is_input ? engine::node_args{.input_bus_count = 1, .input_renderable = true} :
+                                              engine::node_args{.input_bus_count = 1, .output_bus_count = 1})) {
 }
 
 audio::engine::tap::~tap() = default;
@@ -111,11 +111,11 @@ void audio::engine::tap::render_source(audio::engine::node::render_args args) {
 
 #pragma mark - factory
 
-std::shared_ptr<audio::engine::tap> audio::engine::make_tap() {
-    return make_tap({.is_input = false});
+std::shared_ptr<audio::engine::tap> audio::engine::tap::make_shared() {
+    return tap::make_shared({.is_input = false});
 }
 
-std::shared_ptr<audio::engine::tap> audio::engine::make_tap(tap::args args) {
+std::shared_ptr<audio::engine::tap> audio::engine::tap::make_shared(tap::args args) {
     auto shared = std::shared_ptr<tap>(new tap{std::move(args)});
     shared->_prepare();
     return shared;

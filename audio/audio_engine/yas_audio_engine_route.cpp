@@ -27,8 +27,8 @@ struct audio::engine::route::kernel {
 #pragma mark - main
 
 audio::engine::route::route()
-    : _node(make_node({.input_bus_count = std::numeric_limits<uint32_t>::max(),
-                       .output_bus_count = std::numeric_limits<uint32_t>::max()})) {
+    : _node(node::make_shared({.input_bus_count = std::numeric_limits<uint32_t>::max(),
+                               .output_bus_count = std::numeric_limits<uint32_t>::max()})) {
 }
 
 audio::engine::route::~route() = default;
@@ -141,7 +141,7 @@ void audio::engine::route::_erase_route_if(std::function<bool(audio::route const
     erase_if(this->_routes, pred);
 }
 
-std::shared_ptr<audio::engine::route> audio::engine::make_route() {
+std::shared_ptr<audio::engine::route> audio::engine::route::make_shared() {
     auto shared = std::shared_ptr<route>(new route{});
     shared->_prepare();
     return shared;
