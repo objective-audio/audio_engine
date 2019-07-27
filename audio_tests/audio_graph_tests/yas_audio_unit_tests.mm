@@ -21,7 +21,7 @@ using namespace yas;
 }
 
 - (void)test_create {
-    auto unit = audio::make_unit(kAudioUnitType_FormatConverter, kAudioUnitSubType_AUConverter);
+    auto unit = audio::unit::make_shared(kAudioUnitType_FormatConverter, kAudioUnitSubType_AUConverter);
 
     XCTAssertEqual(unit->type(), kAudioUnitType_FormatConverter);
     XCTAssertEqual(unit->sub_type(), kAudioUnitSubType_AUConverter);
@@ -47,7 +47,7 @@ using namespace yas;
 
     auto graph = audio::graph::make_shared();
 
-    auto converter_unit = audio::make_unit(kAudioUnitType_FormatConverter, kAudioUnitSubType_AUConverter);
+    auto converter_unit = audio::unit::make_shared(kAudioUnitType_FormatConverter, kAudioUnitSubType_AUConverter);
     converter_unit->set_maximum_frames_per_slice(maximum_frame_length);
 
     graph->add_unit(converter_unit);
@@ -113,7 +113,7 @@ using namespace yas;
 
     auto graph = audio::graph::make_shared();
 
-    auto converter_unit = audio::make_unit(kAudioUnitType_FormatConverter, kAudioUnitSubType_AUConverter);
+    auto converter_unit = audio::unit::make_shared(kAudioUnitType_FormatConverter, kAudioUnitSubType_AUConverter);
     converter_unit->set_maximum_frames_per_slice(maximum_frame_length);
 
     graph->add_unit(converter_unit);
@@ -180,7 +180,7 @@ using namespace yas;
 }
 
 - (void)test_parameter {
-    auto delay_unit = audio::make_unit(kAudioUnitType_Effect, kAudioUnitSubType_Delay);
+    auto delay_unit = audio::unit::make_shared(kAudioUnitType_Effect, kAudioUnitSubType_Delay);
 
     AudioUnitScope const scope = kAudioUnitScope_Global;
     auto parameter = delay_unit->create_parameter(kDelayParam_DelayTime, scope);
@@ -203,14 +203,14 @@ using namespace yas;
 }
 
 - (void)test_parameter_create_failed {
-    auto delay_unit = audio::make_unit(kAudioUnitType_Effect, kAudioUnitSubType_Delay);
+    auto delay_unit = audio::unit::make_shared(kAudioUnitType_Effect, kAudioUnitSubType_Delay);
 
     XCTAssertThrows(delay_unit->create_parameter(kDelayParam_DelayTime, kAudioUnitScope_Input));
     XCTAssertThrows(delay_unit->create_parameter(kDelayParam_DelayTime, kAudioUnitScope_Output));
 }
 
 - (void)test_parameters {
-    auto delay_unit = audio::make_unit(kAudioUnitType_Effect, kAudioUnitSubType_Delay);
+    auto delay_unit = audio::unit::make_shared(kAudioUnitType_Effect, kAudioUnitSubType_Delay);
 
     auto parameters = delay_unit->create_parameters(kAudioUnitScope_Global);
 

@@ -156,7 +156,7 @@ std::shared_ptr<audio::engine::manageable_au> audio::engine::au::manageable() {
 void audio::engine::au::_prepare(AudioComponentDescription const &acd) {
     this->_acd = acd;
 
-    auto unit = audio::make_unit(acd);
+    auto unit = audio::unit::make_shared(acd);
     this->_parameters.clear();
     this->_parameters.insert(std::make_pair(kAudioUnitScope_Global, unit->create_parameters(kAudioUnitScope_Global)));
     this->_parameters.insert(std::make_pair(kAudioUnitScope_Input, unit->create_parameters(kAudioUnitScope_Input)));
@@ -298,7 +298,7 @@ void audio::engine::au::prepare_parameters() {
 }
 
 void audio::engine::au::reload_unit() {
-    this->_core->set_unit(audio::make_unit(this->_acd));
+    this->_core->set_unit(audio::unit::make_shared(this->_acd));
 }
 
 void audio::engine::au::_will_reset() {

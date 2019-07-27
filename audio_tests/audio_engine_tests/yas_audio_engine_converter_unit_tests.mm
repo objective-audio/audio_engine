@@ -21,7 +21,7 @@ using namespace yas;
 }
 
 - (void)test_set_format_success {
-    auto converter_unit = audio::make_unit(kAudioUnitType_FormatConverter, kAudioUnitSubType_AUConverter);
+    auto converter_unit = audio::unit::make_shared(kAudioUnitType_FormatConverter, kAudioUnitSubType_AUConverter);
     audio::pcm_format const pcm_formats[] = {audio::pcm_format::float32, audio::pcm_format::float64,
                                              audio::pcm_format::int16, audio::pcm_format::fixed824};
     double const sample_rates[] = {4000, 8000, 16000, 22050, 44100, 48000, 88100, 96000, 192000, 382000};
