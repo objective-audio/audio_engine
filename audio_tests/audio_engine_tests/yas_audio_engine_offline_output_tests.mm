@@ -38,7 +38,7 @@ using namespace yas;
     auto format = audio::format({.sample_rate = sample_rate, .channel_count = 2});
     std::shared_ptr<audio::engine::offline_output> &output = manager->offline_output();
     auto sample_delay_au = audio::engine::au::make_shared(kAudioUnitType_Effect, kAudioUnitSubType_SampleDelay);
-    auto tap = audio::engine::make_tap();
+    auto tap = audio::engine::tap::make_shared();
 
     manager->connect(sample_delay_au->node(), output->node(), format);
     manager->connect(tap->node(), sample_delay_au->node(), format);
@@ -130,7 +130,7 @@ using namespace yas;
     double const sample_rate = 48000.0;
     auto format = audio::format({.sample_rate = sample_rate, .channel_count = 2});
     auto output = audio::engine::offline_output::make_shared();
-    auto tap = audio::engine::make_tap();
+    auto tap = audio::engine::tap::make_shared();
 
     auto connection = audio::engine::connection::make_shared(tap->node(), 0, output->node(), 0, format);
 
@@ -234,7 +234,7 @@ using namespace yas;
 - (void)test_reset_to_stop {
     auto format = audio::format({.sample_rate = 48000.0, .channel_count = 2});
     auto output = audio::engine::offline_output::make_shared();
-    auto tap = audio::engine::make_tap();
+    auto tap = audio::engine::tap::make_shared();
 
     auto connection = audio::engine::connection::make_shared(tap->node(), 0, output->node(), 0, format);
 

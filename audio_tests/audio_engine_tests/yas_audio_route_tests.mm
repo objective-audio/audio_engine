@@ -78,7 +78,7 @@ using namespace yas;
     auto format = audio::format({.sample_rate = 44100.0, .channel_count = 2});
     std::shared_ptr<audio::engine::offline_output> &output = manager->offline_output();
     auto engine_route = audio::engine::route::make_shared();
-    auto tap = audio::engine::make_tap();
+    auto tap = audio::engine::tap::make_shared();
 
     manager->connect(engine_route->node(), output->node(), format);
     manager->connect(tap->node(), engine_route->node(), format);
@@ -153,7 +153,7 @@ using namespace yas;
 
     std::vector<std::shared_ptr<audio::engine::tap>> taps;
     for (uint32_t i = 0; i < src_count; ++i) {
-        taps.push_back(audio::engine::make_tap());
+        taps.push_back(audio::engine::tap::make_shared());
         auto &tap = taps.at(i);
 
         manager->connect(tap->node(), engine_route->node(), 0, i, src_format);
@@ -211,7 +211,7 @@ using namespace yas;
 
     std::vector<std::shared_ptr<audio::engine::tap>> taps;
     for (uint32_t i = 0; i < src_count; ++i) {
-        taps.push_back(audio::engine::make_tap());
+        taps.push_back(audio::engine::tap::make_shared());
         auto &tap = taps.at(i);
 
         manager->connect(tap->node(), engine_route->node(), 0, i, src_format);

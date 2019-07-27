@@ -39,7 +39,7 @@ struct route : std::enable_shared_from_this<route> {
     void _erase_route_if_either_matched(audio::route const &route);
     void _erase_route_if(std::function<bool(audio::route const &)> pred);
 
-public:
+   public:
     static std::shared_ptr<route> make_shared();
 };
 }  // namespace yas::audio::engine

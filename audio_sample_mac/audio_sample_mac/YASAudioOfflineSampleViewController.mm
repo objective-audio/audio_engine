@@ -18,7 +18,7 @@ static double constexpr sample_rate = 44100.0;
 namespace yas::offline_sample::engine {
 struct sine {
     struct impl {
-        std::shared_ptr<audio::engine::tap> _tap = audio::engine::make_tap();
+        std::shared_ptr<audio::engine::tap> _tap = audio::engine::tap::make_shared();
         double phase_on_render;
 
         void set_frequency(float const frequency) {
