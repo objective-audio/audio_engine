@@ -35,7 +35,7 @@ using namespace yas;
 }
 
 - (void)test_create_kernel {
-    auto kernel = audio::engine::make_kernel();
+    auto kernel = audio::engine::kernel::make_shared();
 
     XCTAssertEqual(kernel->input_connections().size(), 0);
     XCTAssertEqual(kernel->output_connections().size(), 0);

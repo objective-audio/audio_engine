@@ -30,8 +30,7 @@ struct kernel : manageable_kernel, std::enable_shared_from_this<kernel> {
     engine::connection_wmap _input_connections;
     engine::connection_wmap _output_connections;
 
-    friend std::shared_ptr<audio::engine::kernel> make_kernel();
+public:
+  static std::shared_ptr<audio::engine::kernel> make_shared();
 };
-
-std::shared_ptr<audio::engine::kernel> make_kernel();
 }  // namespace yas::audio::engine
