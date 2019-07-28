@@ -44,6 +44,9 @@ struct pcm_buffer final {
     pcm_buffer(audio::format const &format, uint32_t const frame_capacity);
     pcm_buffer(audio::format const &format, pcm_buffer const &from_buffer, channel_map_t const &channel_map);
 
+    pcm_buffer(pcm_buffer &&) = default;
+    pcm_buffer &operator=(pcm_buffer &&) = default;
+
     audio::format const &format() const;
     AudioBufferList *audio_buffer_list();
     AudioBufferList const *audio_buffer_list() const;
@@ -84,12 +87,12 @@ struct pcm_buffer final {
                                     uint32_t const copy_length) const;
 
    private:
-    audio::format const _format;
+    audio::format _format;
     AudioBufferList *_abl_ptr;
     uint32_t const _frame_capacity;
     uint32_t _frame_length;
-    abl_uptr const _abl;
-    abl_data_uptr const _data;
+    abl_uptr _abl;
+    abl_data_uptr _data;
 
     pcm_buffer(audio::format const &format, std::pair<audio::abl_uptr, audio::abl_data_uptr> &&abl_pair,
                uint32_t const frame_capacity);
@@ -98,6 +101,9 @@ struct pcm_buffer final {
     pcm_buffer(audio::format const &format, AudioBufferList *ptr, uint32_t const frame_capacity);
     pcm_buffer(audio::format const &format, abl_uptr &&abl, abl_data_uptr &&data, uint32_t const frame_capacity);
     pcm_buffer(audio::format const &format, abl_uptr &&abl, uint32_t const frame_capacity);
+
+    pcm_buffer(pcm_buffer const &) = delete;
+    pcm_buffer &operator=(pcm_buffer const &) = delete;
 
     template <typename T>
     T *_data_ptr_at_index(uint32_t const buf_idx) const;
