@@ -32,21 +32,21 @@ struct audio::time::impl {
 
 audio::time::time(AudioTimeStamp const &ts, double const sample_rate)
     : _impl(std::make_shared<impl>(
-          make_objc_ptr([[AVAudioTime alloc] initWithAudioTimeStamp:&ts sampleRate:sample_rate]))) {
+          objc_ptr_with_move_object([[AVAudioTime alloc] initWithAudioTimeStamp:&ts sampleRate:sample_rate]))) {
 }
 
 audio::time::time(uint64_t const host_time)
-    : _impl(std::make_shared<impl>(make_objc_ptr([[AVAudioTime alloc] initWithHostTime:host_time]))) {
+    : _impl(std::make_shared<impl>(objc_ptr_with_move_object([[AVAudioTime alloc] initWithHostTime:host_time]))) {
 }
 
 audio::time::time(int64_t const sample_time, double const sample_rate)
     : _impl(std::make_shared<impl>(
-          make_objc_ptr([[AVAudioTime alloc] initWithSampleTime:sample_time atRate:sample_rate]))) {
+          objc_ptr_with_move_object([[AVAudioTime alloc] initWithSampleTime:sample_time atRate:sample_rate]))) {
 }
 
 audio::time::time(uint64_t const host_time, int64_t const sample_time, double const sample_rate)
-    : _impl(std::make_shared<impl>(
-          make_objc_ptr([[AVAudioTime alloc] initWithHostTime:host_time sampleTime:sample_time atRate:sample_rate]))) {
+    : _impl(std::make_shared<impl>(objc_ptr_with_move_object(
+          [[AVAudioTime alloc] initWithHostTime:host_time sampleTime:sample_time atRate:sample_rate]))) {
 }
 
 bool audio::time::is_host_time_valid() const {

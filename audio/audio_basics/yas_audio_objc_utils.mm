@@ -60,7 +60,8 @@ audio::channel_map_t yas::to_channel_map(NSArray *const channelDescriptions, aud
 
 objc_ptr<AVAudioTime *> yas::to_objc_object(audio::time const &time) {
     AudioTimeStamp const time_stamp = time.audio_time_stamp();
-    return make_objc_ptr([[AVAudioTime alloc] initWithAudioTimeStamp:&time_stamp sampleRate:time.sample_rate()]);
+    return objc_ptr_with_move_object(
+        [[AVAudioTime alloc] initWithAudioTimeStamp:&time_stamp sampleRate:time.sample_rate()]);
 }
 
 audio::time yas::to_time(AVAudioTime *const av_time) {

@@ -69,8 +69,8 @@ using namespace yas;
     AudioStreamBasicDescription inputASBD = converter_unit->input_format(0);
     XCTAssertTrue(is_equal(input_format.stream_description(), inputASBD));
 
-    auto exp = make_objc_ptr<XCTestExpectation *>(
-        [&self]() { return [self expectationWithDescription:@"ConverterUnit Render"]; });
+    auto exp =
+        objc_ptr<XCTestExpectation *>([&self]() { return [self expectationWithDescription:@"ConverterUnit Render"]; });
 
     converter_unit->set_render_handler([exp, input_format, &self](audio::render_parameters &render_parameters) mutable {
         if (exp) {
@@ -123,11 +123,11 @@ using namespace yas;
     converter_unit->set_output_format(format.stream_description(), 0);
     converter_unit->set_input_format(format.stream_description(), 0);
 
-    auto render_exp = make_objc_ptr<XCTestExpectation *>(
-        [&self]() { return [self expectationWithDescription:@"ConverterUnit Render"]; });
-    auto pre_render_exp = make_objc_ptr<XCTestExpectation *>(
+    auto render_exp =
+        objc_ptr<XCTestExpectation *>([&self]() { return [self expectationWithDescription:@"ConverterUnit Render"]; });
+    auto pre_render_exp = objc_ptr<XCTestExpectation *>(
         [&self]() { return [self expectationWithDescription:@"ConverterUnit PreRender"]; });
-    auto post_render_exp = make_objc_ptr<XCTestExpectation *>(
+    auto post_render_exp = objc_ptr<XCTestExpectation *>(
         [&self]() { return [self expectationWithDescription:@"ConverterUnit PostRender"]; });
 
     converter_unit->set_render_handler([render_exp](audio::render_parameters &render_parameters) mutable {

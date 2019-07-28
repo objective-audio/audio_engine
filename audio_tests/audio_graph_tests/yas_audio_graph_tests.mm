@@ -81,7 +81,7 @@ using namespace yas;
     }
 
     auto io_exp =
-        make_objc_ptr<XCTestExpectation *>([&self]() { return [self expectationWithDescription:@"io_unit render"]; });
+        objc_ptr<XCTestExpectation *>([&self]() { return [self expectationWithDescription:@"io_unit render"]; });
 
     io_unit->set_render_handler([io_exp, frame_length, output_format, &mixer_unit,
                                  &self](audio::render_parameters &render_parameters) mutable {
@@ -115,7 +115,7 @@ using namespace yas;
         mixerExpectations[@(i)] = [self expectationWithDescription:description];
     }
 
-    auto mixer_exps = make_objc_ptr(mixerExpectations);
+    auto mixer_exps = objc_ptr_with_move_object(mixerExpectations);
 
     mixer_unit->set_render_handler(
         [mixer_exps, output_format, frame_length, &self](audio::render_parameters &render_parameters) mutable {
