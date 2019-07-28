@@ -1263,6 +1263,13 @@ using namespace yas;
     }
 }
 
+- (void)test_move {
+    auto format = audio::format({.sample_rate = 48000.0, .channel_count = 2});
+    audio::pcm_buffer pcm_buffer(format, 4);
+
+    auto moved = std::move(pcm_buffer);
+}
+
 #pragma mark -
 
 - (void)assert_buffer_with_channel_map:(audio::channel_map_t const &)channel_map
