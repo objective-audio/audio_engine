@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <cpp_utils/yas_base.h>
+#include <map>
 #include <unordered_set>
 #include "yas_audio_graph_protocol.h"
 #include "yas_audio_types.h"

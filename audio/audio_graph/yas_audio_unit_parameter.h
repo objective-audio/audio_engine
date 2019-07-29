@@ -6,7 +6,6 @@
 
 #include <AudioToolbox/AudioToolbox.h>
 #include <chaining/yas_chaining_umbrella.h>
-#include <cpp_utils/yas_base.h>
 #include <ostream>
 
 namespace yas::audio {
