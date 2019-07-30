@@ -9,7 +9,6 @@
 
 #include <AudioToolbox/AudioToolbox.h>
 #include <chaining/yas_chaining_umbrella.h>
-#include <cpp_utils/yas_base.h>
 #include <optional>
 #include <ostream>
 #include <string>

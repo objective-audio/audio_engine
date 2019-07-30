@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include <cpp_utils/yas_base.h>
 #include <any>
 #include "yas_audio_engine_kernel_protocol.h"
 

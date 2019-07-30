@@ -5,7 +5,6 @@
 #pragma once
 
 #include <CoreFoundation/CoreFoundation.h>
-#include <cpp_utils/yas_base.h>
 #include <cpp_utils/yas_url.h>
 #include <ostream>
 #include "yas_audio_file_utils.h"

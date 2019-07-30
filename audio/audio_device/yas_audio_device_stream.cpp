@@ -50,13 +50,6 @@ struct audio::device::stream::impl {
     impl(AudioStreamID const stream_id, AudioDeviceID const device_id) : _stream_id(stream_id), _device_id(device_id) {
     }
 
-    bool is_equal(std::shared_ptr<base::impl> const &rhs) const {
-        if (auto casted_rhs = std::dynamic_pointer_cast<audio::device::stream::impl>(rhs)) {
-            return this->_stream_id == casted_rhs->_stream_id;
-        }
-        return false;
-    }
-
     listener_f listener(stream &stream) {
         auto weak_stream = to_weak(stream.shared_from_this());
 

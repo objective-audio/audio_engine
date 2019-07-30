@@ -25,16 +25,39 @@ static std::unique_ptr<std::vector<T>> _property_data(AudioObjectID const object
 
     UInt32 byte_size = 0;
     raise_if_raw_audio_error(AudioObjectGetPropertyDataSize(object_id, &address, 0, nullptr, &byte_size));
-    uint32_t vector_size = byte_size / sizeof(T);
 
-    if (vector_size > 0) {
-        auto data = std::make_unique<std::vector<T>>(vector_size);
-        byte_size = vector_size * sizeof(T);
-        raise_if_raw_audio_error(AudioObjectGetPropertyData(object_id, &address, 0, nullptr, &byte_size, data->data()));
-        return data;
+    if (byte_size == 0) {
+        return nullptr;
     }
 
-    return nullptr;
+    if (byte_size % sizeof(T)) {
+        return nullptr;
+    }
+
+    uint32_t vector_size = byte_size / sizeof(T);
+
+    auto data = std::make_unique<std::vector<T>>(vector_size);
+    byte_size = vector_size * sizeof(T);
+    raise_if_raw_audio_error(AudioObjectGetPropertyData(object_id, &address, 0, nullptr, &byte_size, data->data()));
+    return data;
+}
+
+static std::unique_ptr<std::vector<uint8_t>> _property_byte_data(AudioObjectID const object_id,
+                                                                 AudioObjectPropertySelector const selector,
+                                                                 AudioObjectPropertyScope const scope) {
+    AudioObjectPropertyAddress const address = {
+        .mSelector = selector, .mScope = scope, .mElement = kAudioObjectPropertyElementMaster};
+
+    UInt32 byte_size = 0;
+    raise_if_raw_audio_error(AudioObjectGetPropertyDataSize(object_id, &address, 0, nullptr, &byte_size));
+
+    if (byte_size == 0) {
+        return nullptr;
+    }
+
+    auto data = std::make_unique<std::vector<uint8_t>>(byte_size);
+    raise_if_raw_audio_error(AudioObjectGetPropertyData(object_id, &address, 0, nullptr, &byte_size, data->data()));
+    return data;
 }
 
 static CFStringRef _property_string(AudioObjectID const object_id, AudioObjectPropertySelector const selector) {
@@ -458,24 +481,25 @@ void audio::device::_update_format(AudioObjectPropertyScope const scope) {
 
     auto stream_format = stream->virtual_format();
 
-    auto data = _property_data<AudioBufferList>(this->_audio_device_id, kAudioDevicePropertyStreamConfiguration, scope);
+    auto data = _property_byte_data(this->_audio_device_id, kAudioDevicePropertyStreamConfiguration, scope);
     if (data) {
         uint32_t channel_count = 0;
-        for (auto &abl : *data) {
-            for (uint32_t i = 0; i < abl.mNumberBuffers; i++) {
-                channel_count += abl.mBuffers[i].mNumberChannels;
-            }
 
-            audio::format format({.sample_rate = stream_format.sample_rate(),
-                                  .channel_count = channel_count,
-                                  .pcm_format = stream_format.pcm_format(),
-                                  .interleaved = false});
+        AudioBufferList *abl = reinterpret_cast<AudioBufferList *>(data->data());
 
-            if (scope == kAudioObjectPropertyScopeInput) {
-                this->_set_input_format(format);
-            } else if (scope == kAudioObjectPropertyScopeOutput) {
-                this->_set_output_format(format);
-            }
+        for (uint32_t i = 0; i < abl->mNumberBuffers; i++) {
+            channel_count += abl->mBuffers[i].mNumberChannels;
+        }
+
+        audio::format format({.sample_rate = stream_format.sample_rate(),
+                              .channel_count = channel_count,
+                              .pcm_format = stream_format.pcm_format(),
+                              .interleaved = false});
+
+        if (scope == kAudioObjectPropertyScopeInput) {
+            this->_set_input_format(format);
+        } else if (scope == kAudioObjectPropertyScopeOutput) {
+            this->_set_output_format(format);
         }
     }
 }

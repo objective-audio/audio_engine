@@ -5,7 +5,6 @@
 #pragma once
 
 #include <chaining/yas_chaining_umbrella.h>
-#include <cpp_utils/yas_base.h>
 #include <unordered_map>
 #include "yas_audio_engine_au_protocol.h"
 #include "yas_audio_engine_node_protocol.h"
