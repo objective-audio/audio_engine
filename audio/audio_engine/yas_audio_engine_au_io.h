@@ -53,7 +53,7 @@ struct au_io : std::enable_shared_from_this<au_io> {
     std::shared_ptr<audio::engine::au> _au;
     channel_map_t _channel_map[2];
     chaining::any_observer_ptr _connections_observer = nullptr;
-    chaining::notifier<chaining_pair_t> _notifier;
+    chaining::notifier_ptr<chaining_pair_t> _notifier = chaining::notifier<chaining_pair_t>::make_shared();
 
     explicit au_io(args);
 

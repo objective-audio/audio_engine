@@ -129,12 +129,12 @@ float audio::engine::au::output_parameter_value(AudioUnitParameterID const param
 }
 
 chaining::chain_unsync_t<audio::engine::au::chaining_pair_t> audio::engine::au::chain() const {
-    return this->_notifier.chain();
+    return this->_notifier->chain();
 }
 
 chaining::chain_relayed_unsync_t<std::shared_ptr<audio::engine::au>, audio::engine::au::chaining_pair_t>
 audio::engine::au::chain(method const method) const {
-    return this->_notifier.chain()
+    return this->_notifier->chain()
         .guard([method](auto const &pair) { return pair.first == method; })
         .to([](chaining_pair_t const &pair) { return pair.second; });
 }
@@ -226,7 +226,7 @@ void audio::engine::au::_prepare(AudioComponentDescription const &acd) {
 void audio::engine::au::_update_unit_connections() {
     auto shared_au = shared_from_this();
 
-    this->_notifier.notify(std::make_pair(au::method::will_update_connections, shared_au));
+    this->_notifier->notify(std::make_pair(au::method::will_update_connections, shared_au));
 
     if (auto unit = this->_core->unit()) {
         auto input_bus_count = this->input_element_count();
@@ -268,7 +268,7 @@ void audio::engine::au::_update_unit_connections() {
         }
     }
 
-    this->_notifier.notify(std::make_pair(au::method::did_update_connections, shared_au));
+    this->_notifier->notify(std::make_pair(au::method::did_update_connections, shared_au));
 }
 
 void audio::engine::au::prepare_unit() {

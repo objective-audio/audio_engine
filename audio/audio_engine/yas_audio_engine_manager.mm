@@ -291,12 +291,12 @@ void audio::engine::manager::stop() {
 }
 
 chaining::chain_unsync_t<audio::engine::manager::chaining_pair_t> audio::engine::manager::chain() const {
-    return this->_notifier.chain();
+    return this->_notifier->chain();
 }
 
 chaining::chain_relayed_unsync_t<std::shared_ptr<audio::engine::manager>, audio::engine::manager::chaining_pair_t>
 audio::engine::manager::chain(method const method) const {
-    return this->_notifier.chain()
+    return this->_notifier->chain()
         .guard([method](auto const &pair) { return pair.first == method; })
         .to([](chaining_pair_t const &pair) { return pair.second; });
 }
@@ -309,7 +309,7 @@ audio::engine::connection_set const &audio::engine::manager::connections() const
     return this->_connections;
 }
 
-chaining::notifier<audio::engine::manager::chaining_pair_t> &audio::engine::manager::notifier() {
+chaining::notifier_ptr<audio::engine::manager::chaining_pair_t> &audio::engine::manager::notifier() {
     return this->_notifier;
 }
 
@@ -553,7 +553,7 @@ void audio::engine::manager::_set_device_io(std::shared_ptr<audio::engine::devic
 
 #endif
 void audio::engine::manager::_post_configuration_change() {
-    this->_notifier.notify(std::make_pair(method::configuration_change, shared_from_this()));
+    this->_notifier->notify(std::make_pair(method::configuration_change, shared_from_this()));
 }
 
 std::shared_ptr<audio::engine::manager> audio::engine::manager::make_shared() {

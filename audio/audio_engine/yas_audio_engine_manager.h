@@ -83,11 +83,11 @@ struct manager : std::enable_shared_from_this<manager> {
     // for Test
     std::unordered_set<std::shared_ptr<node>> const &nodes() const;
     audio::engine::connection_set const &connections() const;
-    chaining::notifier<chaining_pair_t> &notifier();
+    chaining::notifier_ptr<chaining_pair_t> &notifier();
 
    private:
     std::unique_ptr<impl> _impl;
-    chaining::notifier<chaining_pair_t> _notifier;
+    chaining::notifier_ptr<chaining_pair_t> _notifier = chaining::notifier<chaining_pair_t>::make_shared();
 
     std::shared_ptr<audio::graph> _graph = nullptr;
     std::unordered_set<std::shared_ptr<node>> _nodes;

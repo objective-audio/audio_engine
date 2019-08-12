@@ -54,7 +54,7 @@ audio::engine::node::node(node_args &&args)
 audio::engine::node::~node() = default;
 
 void audio::engine::node::reset() {
-    this->_notifier.notify(std::make_pair(method::will_reset, shared_from_this()));
+    this->_notifier->notify(std::make_pair(method::will_reset, shared_from_this()));
 
     this->_input_connections.clear();
     this->_output_connections.clear();
@@ -183,12 +183,12 @@ void audio::engine::node::set_render_time_on_render(const time &time) {
 }
 
 chaining::chain_unsync_t<audio::engine::node::chaining_pair_t> audio::engine::node::chain() const {
-    return this->_notifier.chain();
+    return this->_notifier->chain();
 }
 
 chaining::chain_relayed_unsync_t<std::shared_ptr<audio::engine::node>, audio::engine::node::chaining_pair_t>
 audio::engine::node::chain(method const method) const {
-    return this->_notifier.chain()
+    return this->_notifier->chain()
         .guard([method](auto const &pair) { return pair.first == method; })
         .to([](chaining_pair_t const &pair) { return pair.second; });
 }
@@ -243,7 +243,7 @@ void audio::engine::node::update_kernel() {
 }
 
 void audio::engine::node::update_connections() {
-    this->_notifier.notify(std::make_pair(method::update_connections, shared_from_this()));
+    this->_notifier->notify(std::make_pair(method::update_connections, shared_from_this()));
 }
 
 void audio::engine::node::set_add_to_graph_handler(graph_editing_f &&handler) {

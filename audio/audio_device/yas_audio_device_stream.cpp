@@ -45,7 +45,7 @@ struct audio::device::stream::impl {
 
     AudioStreamID _stream_id;
     AudioDeviceID _device_id;
-    chaining::notifier<chaining_pair_t> _notifier;
+    chaining::notifier_ptr<chaining_pair_t> _notifier = chaining::notifier<chaining_pair_t>::make_shared();
 
     impl(AudioStreamID const stream_id, AudioDeviceID const device_id) : _stream_id(stream_id), _device_id(device_id) {
     }
@@ -72,7 +72,7 @@ struct audio::device::stream::impl {
                     }
                 }
                 change_info change_info{std::move(infos)};
-                stream->_impl->_notifier.notify(std::make_pair(method::did_change, change_info));
+                stream->_impl->_notifier->notify(std::make_pair(method::did_change, change_info));
             }
         };
     }
@@ -138,12 +138,12 @@ uint32_t audio::device::stream::starting_channel() const {
 }
 
 chaining::chain_unsync_t<audio::device::stream::chaining_pair_t> audio::device::stream::chain() const {
-    return this->_impl->_notifier.chain();
+    return this->_impl->_notifier->chain();
 }
 
 chaining::chain_relayed_unsync_t<audio::device::stream::change_info, audio::device::stream::chaining_pair_t>
 audio::device::stream::chain(method const method) const {
-    return this->_impl->_notifier.chain()
+    return this->_impl->_notifier->chain()
         .guard([method](auto const &pair) { return pair.first == method; })
         .to([](audio::device::stream::chaining_pair_t const &pair) { return pair.second; });
 }

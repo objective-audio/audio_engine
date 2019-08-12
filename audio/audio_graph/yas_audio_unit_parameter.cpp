@@ -43,9 +43,9 @@ void audio::unit::parameter::set_value(AudioUnitParameterValue const value, Audi
         .parameter = *this,
     };
 
-    this->_notifier.notify(std::make_pair(method::will_change, info));
+    this->_notifier->notify(std::make_pair(method::will_change, info));
     this->_values[element] = value;
-    this->_notifier.notify(std::make_pair(method::did_change, info));
+    this->_notifier->notify(std::make_pair(method::did_change, info));
 }
 
 std::unordered_map<AudioUnitElement, AudioUnitParameterValue> const &audio::unit::parameter::values() const {
@@ -53,12 +53,12 @@ std::unordered_map<AudioUnitElement, AudioUnitParameterValue> const &audio::unit
 }
 
 chaining::chain_unsync_t<audio::unit::parameter::chaining_pair_t> audio::unit::parameter::chain() const {
-    return this->_notifier.chain();
+    return this->_notifier->chain();
 }
 
 chaining::chain_relayed_unsync_t<audio::unit::parameter::change_info, audio::unit::parameter::chaining_pair_t>
 audio::unit::parameter::chain(method const method) const {
-    return this->_notifier.chain()
+    return this->_notifier->chain()
         .guard([method](auto const &pair) { return pair.first == method; })
         .to([](chaining_pair_t const &pair) { return pair.second; });
 }

@@ -106,12 +106,12 @@ std::shared_ptr<audio::device> audio::engine::au_io::device() const {
 #endif
 
 chaining::chain_unsync_t<audio::engine::au_io::chaining_pair_t> audio::engine::au_io::chain() const {
-    return this->_notifier.chain();
+    return this->_notifier->chain();
 }
 
 chaining::chain_relayed_unsync_t<std::shared_ptr<audio::engine::au_io>, audio::engine::au_io::chaining_pair_t>
 audio::engine::au_io::chain(method const method) const {
-    return this->_notifier.chain()
+    return this->_notifier->chain()
         .guard([method](auto const &pair) { return pair.first == method; })
         .to([](chaining_pair_t const &pair) { return pair.second; });
 }
@@ -164,7 +164,7 @@ void audio::engine::au_io::_update_unit_io_connections() {
     unit->set_channel_map(output_map, kAudioUnitScope_Output, output_idx);
     unit->set_channel_map(input_map, kAudioUnitScope_Output, input_idx);
 
-    this->_notifier.notify(std::make_pair(au_io::method::did_update_connection, shared_from_this()));
+    this->_notifier->notify(std::make_pair(au_io::method::did_update_connection, shared_from_this()));
 }
 
 std::shared_ptr<audio::engine::au_io> audio::engine::au_io::make_shared() {

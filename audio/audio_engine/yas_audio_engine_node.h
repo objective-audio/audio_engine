@@ -92,7 +92,7 @@ struct node : std::enable_shared_from_this<node>, connectable_node, manageable_n
     graph_editing_f _remove_from_graph_handler;
     prepare_kernel_f _prepare_kernel_handler;
     audio::engine::node::render_f _render_handler;
-    chaining::notifier<chaining_pair_t> _notifier;
+    chaining::notifier_ptr<chaining_pair_t> _notifier = chaining::notifier<chaining_pair_t>::make_shared();
 
     struct core;
     std::unique_ptr<core> _core;
