@@ -66,7 +66,7 @@ struct au : manageable_au, std::enable_shared_from_this<au> {
     std::shared_ptr<audio::engine::node> _node;
     AudioComponentDescription _acd;
     std::unordered_map<AudioUnitScope, unit::parameter_map_t> _parameters;
-    chaining::notifier<chaining_pair_t> _notifier;
+    chaining::notifier_ptr<chaining_pair_t> _notifier = chaining::notifier<chaining_pair_t>::make_shared();
     chaining::any_observer_ptr _reset_observer = nullptr;
     chaining::any_observer_ptr _connections_observer = nullptr;
     prepare_unit_f _prepare_unit_handler;

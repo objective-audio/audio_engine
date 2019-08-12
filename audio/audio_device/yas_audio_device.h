@@ -75,7 +75,7 @@ struct device {
         system_method const);
 
     // for Test
-    static chaining::notifier<chaining_system_pair_t> &system_notifier();
+    static chaining::notifier_ptr<chaining_system_pair_t> &system_notifier();
 
     using listener_f =
         std::function<void(uint32_t const in_number_addresses, const AudioObjectPropertyAddress *const in_addresses)>;
@@ -93,7 +93,8 @@ struct device {
     AudioDeviceID const _audio_device_id;
     std::unordered_map<AudioStreamID, std::shared_ptr<stream>> _input_streams_map;
     std::unordered_map<AudioStreamID, std::shared_ptr<stream>> _output_streams_map;
-    chaining::notifier<audio::device::chaining_pair_t> _notifier;
+    chaining::notifier_ptr<audio::device::chaining_pair_t> _notifier =
+        chaining::notifier<audio::device::chaining_pair_t>::make_shared();
     std::optional<audio::format> _input_format = std::nullopt;
     std::optional<audio::format> _output_format = std::nullopt;
     mutable std::recursive_mutex _mutex;

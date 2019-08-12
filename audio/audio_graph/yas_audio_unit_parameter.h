@@ -46,7 +46,7 @@ struct unit::parameter {
 
    private:
     std::unordered_map<AudioUnitElement, AudioUnitParameterValue> _values;
-    chaining::notifier<chaining_pair_t> _notifier;
+    chaining::notifier_ptr<chaining_pair_t> _notifier = chaining::notifier<chaining_pair_t>::make_shared();
 };
 }  // namespace yas::audio
 

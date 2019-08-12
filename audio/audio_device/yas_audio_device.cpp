@@ -12,7 +12,8 @@ using namespace yas;
 
 namespace yas::audio {
 
-static chaining::notifier<audio::device::chaining_system_pair_t> _system_notifier;
+static chaining::notifier_ptr<audio::device::chaining_system_pair_t> _system_notifier =
+    chaining::notifier<audio::device::chaining_system_pair_t>::make_shared();
 
 #pragma mark - utility
 
@@ -111,8 +112,8 @@ struct device_global {
                                                                .address = addresses[i]});
             }
             device::change_info change_info{.property_infos = std::move(property_infos)};
-            audio::_system_notifier.notify(std::make_pair(device::system_method::hardware_did_change, change_info));
-            audio::_system_notifier.notify(std::make_pair(device::system_method::configuration_change, change_info));
+            audio::_system_notifier->notify(std::make_pair(device::system_method::hardware_did_change, change_info));
+            audio::_system_notifier->notify(std::make_pair(device::system_method::configuration_change, change_info));
         };
     }
 
@@ -369,23 +370,23 @@ uint32_t audio::device::output_channel_count() const {
 }
 
 chaining::chain_unsync_t<audio::device::chaining_pair_t> audio::device::chain() const {
-    return this->_notifier.chain();
+    return this->_notifier->chain();
 }
 
 chaining::chain_relayed_unsync_t<audio::device::change_info, audio::device::chaining_pair_t> audio::device::chain(
     method const method) const {
-    return this->_notifier.chain()
+    return this->_notifier->chain()
         .guard([method](audio::device::chaining_pair_t const &pair) { return pair.first == method; })
         .to([](audio::device::chaining_pair_t const &pair) { return pair.second; });
 }
 
 chaining::chain_unsync_t<audio::device::chaining_system_pair_t> audio::device::system_chain() {
-    return audio::_system_notifier.chain();
+    return audio::_system_notifier->chain();
 }
 
 chaining::chain_relayed_unsync_t<audio::device::change_info, audio::device::chaining_system_pair_t>
 audio::device::system_chain(system_method const method) {
-    return audio::_system_notifier.chain()
+    return audio::_system_notifier->chain()
         .guard([method](chaining_system_pair_t const &pair) { return pair.first == method; })
         .to([](chaining_system_pair_t const &pair) { return pair.second; });
 }
@@ -433,8 +434,8 @@ audio::device::listener_f audio::device::_listener() {
             }
 
             device::change_info change_info{std::move(property_infos)};
-            device->_notifier.notify(std::make_pair(method::device_did_change, change_info));
-            audio::_system_notifier.notify(std::make_pair(device::system_method::configuration_change, change_info));
+            device->_notifier->notify(std::make_pair(method::device_did_change, change_info));
+            audio::_system_notifier->notify(std::make_pair(device::system_method::configuration_change, change_info));
         }
     };
 }
@@ -504,7 +505,7 @@ void audio::device::_update_format(AudioObjectPropertyScope const scope) {
     }
 }
 
-chaining::notifier<audio::device::chaining_system_pair_t> &audio::device::system_notifier() {
+chaining::notifier_ptr<audio::device::chaining_system_pair_t> &audio::device::system_notifier() {
     return audio::_system_notifier;
 }
 
