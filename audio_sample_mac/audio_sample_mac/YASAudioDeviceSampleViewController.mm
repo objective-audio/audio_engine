@@ -166,7 +166,7 @@ struct device_vc_internal {
     self.sineVolume = _internal.kernel->sine_volume();
     self.sineFrequency = _internal.kernel->sine_frequency();
 
-    auto unowned_self = make_objc_ptr([[YASUnownedObject alloc] initWithObject:self]);
+    auto unowned_self = objc_ptr_with_move_object([[YASUnownedObject alloc] initWithObject:self]);
 
     _internal.system_observer =
         audio::device::system_chain(audio::device::system_method::hardware_did_change)
@@ -296,7 +296,7 @@ struct device_vc_internal {
     if (selected_device && std::find(all_devices.begin(), all_devices.end(), selected_device) != all_devices.end()) {
         _internal.device_io->set_device(selected_device);
 
-        auto unowned_self = make_objc_ptr([[YASUnownedObject alloc] initWithObject:self]);
+        auto unowned_self = objc_ptr_with_move_object([[YASUnownedObject alloc] initWithObject:self]);
 
         _internal.device_observer = selected_device->chain(audio::device::method::device_did_change)
                                         .perform([selected_device, unowned_self](auto const &change_info) {

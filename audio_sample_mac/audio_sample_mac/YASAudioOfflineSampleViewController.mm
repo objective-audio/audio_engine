@@ -263,7 +263,8 @@ struct offline_vc_internal {
 
     uint32_t remain = self.length * offline_sample::sample_rate;
 
-    auto unowned_self = make_objc_ptr([[YASUnownedObject<YASAudioOfflineSampleViewController *> alloc] init]);
+    auto unowned_self =
+        objc_ptr_with_move_object([[YASUnownedObject<YASAudioOfflineSampleViewController *> alloc] init]);
     [unowned_self.object() setObject:self];
 
     auto start_result = _internal.offline_manager->start_offline_render(

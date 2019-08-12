@@ -26,7 +26,7 @@ using namespace yas;
 - (instancetype)init {
     self = [super init];
     if (self) {
-        _formatter = make_objc_ptr([[NSNumberFormatter alloc] init]);
+        _formatter = objc_ptr_with_move_object([[NSNumberFormatter alloc] init]);
         _formatter.object().numberStyle = NSNumberFormatterDecimalStyle;
         _formatter.object().minimumFractionDigits = 1;
         _formatter.object().maximumFractionDigits = 1;
