@@ -12,6 +12,10 @@
 #include "yas_audio_graph.h"
 #include "yas_audio_pcm_buffer.h"
 
+#if TARGET_OS_IPHONE
+#import <AVFoundation/AVFoundation.h>
+#endif
+
 using namespace yas;
 
 #pragma mark - c functions
