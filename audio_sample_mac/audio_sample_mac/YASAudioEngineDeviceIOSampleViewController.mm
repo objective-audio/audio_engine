@@ -100,7 +100,7 @@ typedef NS_ENUM(NSUInteger, YASAudioDeviceRouteSampleInputType) {
 namespace yas::sample {
 struct device_io_vc_internal {
     audio::engine::manager_ptr manager = nullptr;
-    std::shared_ptr<audio::engine::route> route = nullptr;
+    audio::engine::route_ptr route = nullptr;
     audio::engine::tap_ptr tap = nullptr;
 
     chaining::any_observer_ptr system_observer = nullptr;

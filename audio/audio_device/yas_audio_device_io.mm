@@ -243,15 +243,15 @@ struct audio::device_io::impl {
         return this->_maximum_frames;
     }
 
-    void set_kernel(std::shared_ptr<device_io::kernel> kernel) {
+    void set_kernel(device_io::kernel_ptr const &kernel) {
         std::lock_guard<std::recursive_mutex> lock(this->_mutex);
         this->_kernel = nullptr;
         if (kernel) {
-            this->_kernel = std::move(kernel);
+            this->_kernel = kernel;
         }
     }
 
-    std::shared_ptr<device_io::kernel> kernel() const {
+    device_io::kernel_ptr kernel() const {
         std::lock_guard<std::recursive_mutex> lock(this->_mutex);
         return this->_kernel;
     }
@@ -272,7 +272,7 @@ struct audio::device_io::impl {
    private:
     render_f _render_handler = nullptr;
     uint32_t _maximum_frames = 4096;
-    std::shared_ptr<device_io::kernel> _kernel = nullptr;
+    device_io::kernel_ptr _kernel = nullptr;
     mutable std::recursive_mutex _mutex;
 };
 

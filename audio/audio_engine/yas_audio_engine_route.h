@@ -40,6 +40,8 @@ struct route : std::enable_shared_from_this<route> {
     void _erase_route_if_either_matched(audio::route const &route);
     void _erase_route_if(std::function<bool(audio::route const &)> pred);
 
+    using kernel_ptr = std::shared_ptr<kernel>;
+
    public:
     static route_ptr make_shared();
 };
