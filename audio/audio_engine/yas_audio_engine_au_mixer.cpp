@@ -94,8 +94,8 @@ void audio::engine::au_mixer::_update_unit_mixer_connections() {
     }
 }
 
-std::shared_ptr<audio::engine::au_mixer> audio::engine::au_mixer::make_shared() {
-    auto shared = std::shared_ptr<au_mixer>(new au_mixer{});
+audio::engine::au_mixer_ptr audio::engine::au_mixer::make_shared() {
+    auto shared = au_mixer_ptr(new au_mixer{});
     shared->_prepare();
     return shared;
 }

@@ -45,7 +45,7 @@ struct device::stream : std::enable_shared_from_this<device::stream> {
     };
 
     AudioStreamID stream_id() const;
-    std::shared_ptr<audio::device> device() const;
+    audio::device_ptr device() const;
     bool is_active() const;
     audio::direction direction() const;
     audio::format virtual_format() const;
@@ -69,7 +69,7 @@ struct device::stream : std::enable_shared_from_this<device::stream> {
                                                    AudioObjectPropertySelector const selector) const;
 
    public:
-    static std::shared_ptr<device::stream> make_shared(device::stream::args);
+    static device::stream_ptr make_shared(device::stream::args);
 };
 }  // namespace yas::audio
 

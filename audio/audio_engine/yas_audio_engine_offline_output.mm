@@ -188,12 +188,12 @@ void audio::engine::offline_output::_prepare() {
                                 .end();
 }
 
-std::shared_ptr<audio::engine::manageable_offline_output> audio::engine::offline_output::manageable() {
+audio::engine::manageable_offline_output_ptr audio::engine::offline_output::manageable() {
     return std::dynamic_pointer_cast<manageable_offline_output>(shared_from_this());
 }
 
-std::shared_ptr<audio::engine::offline_output> audio::engine::offline_output::make_shared() {
-    auto shared = std::shared_ptr<offline_output>(new offline_output{});
+audio::engine::offline_output_ptr audio::engine::offline_output::make_shared() {
+    auto shared = offline_output_ptr(new offline_output{});
     shared->_prepare();
     return shared;
 }

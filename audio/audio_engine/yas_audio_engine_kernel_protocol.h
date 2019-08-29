@@ -13,4 +13,6 @@ struct manageable_kernel {
     virtual void set_input_connections(audio::engine::connection_wmap connections) = 0;
     virtual void set_output_connections(audio::engine::connection_wmap connections) = 0;
 };
+
+using manageable_kernel_ptr = std::shared_ptr<manageable_kernel>;
 }  // namespace yas::audio::engine

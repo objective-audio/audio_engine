@@ -22,11 +22,11 @@ struct audio::device_io::kernel {
           _output_buffer(output_format ? std::make_shared<pcm_buffer>(*output_format, frame_capacity) : nullptr) {
     }
 
-    std::shared_ptr<pcm_buffer> &input_buffer() {
+    pcm_buffer_ptr const &input_buffer() {
         return this->_input_buffer;
     }
 
-    std::shared_ptr<pcm_buffer> &output_buffer() {
+    pcm_buffer_ptr const &output_buffer() {
         return this->_output_buffer;
     }
 
@@ -41,8 +41,8 @@ struct audio::device_io::kernel {
     }
 
    private:
-    std::shared_ptr<pcm_buffer> _input_buffer;
-    std::shared_ptr<pcm_buffer> _output_buffer;
+    pcm_buffer_ptr _input_buffer;
+    pcm_buffer_ptr _output_buffer;
 
     kernel(kernel const &) = delete;
     kernel(kernel &&) = delete;
@@ -52,11 +52,11 @@ struct audio::device_io::kernel {
 
 struct audio::device_io::impl {
     std::weak_ptr<device_io> _weak_device_io;
-    std::shared_ptr<audio::device> _device = nullptr;
+    audio::device_ptr _device = nullptr;
     bool _is_running = false;
     AudioDeviceIOProcID _io_proc_id = nullptr;
-    std::shared_ptr<pcm_buffer> _input_buffer_on_render = nullptr;
-    std::shared_ptr<audio::time> _input_time_on_render = nullptr;
+    pcm_buffer_ptr _input_buffer_on_render = nullptr;
+    audio::time_ptr _input_time_on_render = nullptr;
     chaining::any_observer_ptr _device_system_observer = nullptr;
     std::unordered_map<std::uintptr_t, chaining::any_observer_ptr> _device_observers;
 
@@ -66,7 +66,7 @@ struct audio::device_io::impl {
         this->uninitialize();
     }
 
-    void prepare(audio::device_io &device_io, std::shared_ptr<audio::device> const device) {
+    void prepare(audio::device_io &device_io, audio::device_ptr const device) {
         this->_weak_device_io = to_weak(device_io.shared_from_this());
 
         this->_device_system_observer =
@@ -83,7 +83,7 @@ struct audio::device_io::impl {
         this->set_device(device);
     }
 
-    void set_device(std::shared_ptr<audio::device> const &device) {
+    void set_device(audio::device_ptr const &device) {
         if (this->_device != device) {
             bool running = this->_is_running;
 
@@ -164,7 +164,7 @@ struct audio::device_io::impl {
                                 }
                             }
                         } else if (kernel->input_buffer()) {
-                            std::shared_ptr<pcm_buffer> null_buffer{nullptr};
+                            pcm_buffer_ptr null_buffer{nullptr};
                             render_handler(render_args{.output_buffer = null_buffer, .when = std::nullopt});
                         }
                     }
@@ -289,11 +289,11 @@ void audio::device_io::_uninitialize() const {
     this->_impl->uninitialize();
 }
 
-void audio::device_io::set_device(std::shared_ptr<audio::device> const device) {
+void audio::device_io::set_device(audio::device_ptr const device) {
     this->_impl->set_device(device);
 }
 
-std::shared_ptr<audio::device> const &audio::device_io::device() const {
+audio::device_ptr const &audio::device_io::device() const {
     return this->_impl->_device;
 }
 
@@ -321,20 +321,20 @@ void audio::device_io::stop() const {
     this->_impl->stop();
 }
 
-std::shared_ptr<audio::pcm_buffer> &audio::device_io::input_buffer_on_render() {
+audio::pcm_buffer_ptr const &audio::device_io::input_buffer_on_render() {
     return this->_impl->_input_buffer_on_render;
 }
 
-std::shared_ptr<audio::time> const &audio::device_io::input_time_on_render() const {
+audio::time_ptr const &audio::device_io::input_time_on_render() const {
     return this->_impl->_input_time_on_render;
 }
 
-void audio::device_io::_prepare(std::shared_ptr<audio::device> const &device) {
+void audio::device_io::_prepare(audio::device_ptr const &device) {
     this->_impl->prepare(*this, device);
 }
 
-std::shared_ptr<audio::device_io> audio::device_io::make_shared(std::shared_ptr<audio::device> const &device) {
-    auto shared = std::shared_ptr<device_io>(new audio::device_io{});
+audio::device_io_ptr audio::device_io::make_shared(audio::device_ptr const &device) {
+    auto shared = device_io_ptr(new audio::device_io{});
     shared->_prepare(device);
     return shared;
 }

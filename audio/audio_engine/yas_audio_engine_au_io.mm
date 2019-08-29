@@ -99,7 +99,7 @@ void audio::engine::au_io::set_device(audio::device const &device) {
     this->_au->unit()->set_current_device(device.audio_device_id());
 }
 
-std::shared_ptr<audio::device> audio::engine::au_io::device() const {
+audio::device_ptr audio::engine::au_io::device() const {
     return device::device_for_id(this->_au->unit()->current_device());
 }
 
@@ -109,7 +109,7 @@ chaining::chain_unsync_t<audio::engine::au_io::chaining_pair_t> audio::engine::a
     return this->_notifier->chain();
 }
 
-chaining::chain_relayed_unsync_t<std::shared_ptr<audio::engine::au_io>, audio::engine::au_io::chaining_pair_t>
+chaining::chain_relayed_unsync_t<audio::engine::au_io_ptr, audio::engine::au_io::chaining_pair_t>
 audio::engine::au_io::chain(method const method) const {
     return this->_notifier->chain()
         .guard([method](auto const &pair) { return pair.first == method; })
@@ -167,12 +167,12 @@ void audio::engine::au_io::_update_unit_io_connections() {
     this->_notifier->notify(std::make_pair(au_io::method::did_update_connection, shared_from_this()));
 }
 
-std::shared_ptr<audio::engine::au_io> audio::engine::au_io::make_shared() {
+audio::engine::au_io_ptr audio::engine::au_io::make_shared() {
     return au_io::make_shared(au_io::args{});
 }
 
-std::shared_ptr<audio::engine::au_io> audio::engine::au_io::make_shared(au_io::args args) {
-    auto shared = std::shared_ptr<au_io>(new au_io{std::move(args)});
+audio::engine::au_io_ptr audio::engine::au_io::make_shared(au_io::args args) {
+    auto shared = au_io_ptr(new au_io{std::move(args)});
     shared->_prepare();
     return shared;
 }
@@ -198,8 +198,8 @@ audio::engine::au_io &audio::engine::au_output::au_io() {
     return *this->_au_io;
 }
 
-std::shared_ptr<audio::engine::au_output> audio::engine::au_output::make_shared() {
-    return std::shared_ptr<au_output>(new au_output{});
+audio::engine::au_output_ptr audio::engine::au_output::make_shared() {
+    return au_output_ptr(new au_output{});
 }
 
 #pragma mark - audio::engine::au_input
@@ -276,8 +276,8 @@ void audio::engine::au_input::_update_unit_input_connections() {
     }
 }
 
-std::shared_ptr<audio::engine::au_input> audio::engine::au_input::make_shared() {
-    auto shared = std::shared_ptr<au_input>(new au_input{});
+audio::engine::au_input_ptr audio::engine::au_input::make_shared() {
+    auto shared = au_input_ptr(new au_input{});
     shared->_prepare();
     return shared;
 }

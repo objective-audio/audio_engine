@@ -83,13 +83,11 @@ audio::engine::node &audio::engine::tap::node() {
     return *this->_node;
 }
 
-std::shared_ptr<audio::engine::connection> audio::engine::tap::input_connection_on_render(
-    uint32_t const bus_idx) const {
+audio::engine::connection_ptr audio::engine::tap::input_connection_on_render(uint32_t const bus_idx) const {
     return this->_kernel_on_render->input_connection(bus_idx);
 }
 
-std::shared_ptr<audio::engine::connection> audio::engine::tap::output_connection_on_render(
-    uint32_t const bus_idx) const {
+audio::engine::connection_ptr audio::engine::tap::output_connection_on_render(uint32_t const bus_idx) const {
     return this->_kernel_on_render->output_connection(bus_idx);
 }
 
@@ -111,12 +109,12 @@ void audio::engine::tap::render_source(audio::engine::node::render_args args) {
 
 #pragma mark - factory
 
-std::shared_ptr<audio::engine::tap> audio::engine::tap::make_shared() {
+audio::engine::tap_ptr audio::engine::tap::make_shared() {
     return tap::make_shared({.is_input = false});
 }
 
-std::shared_ptr<audio::engine::tap> audio::engine::tap::make_shared(tap::args args) {
-    auto shared = std::shared_ptr<tap>(new tap{std::move(args)});
+audio::engine::tap_ptr audio::engine::tap::make_shared(tap::args args) {
+    auto shared = tap_ptr(new tap{std::move(args)});
     shared->_prepare();
     return shared;
 }

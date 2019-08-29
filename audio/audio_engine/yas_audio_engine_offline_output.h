@@ -8,6 +8,7 @@
 #include <cpp_utils/yas_task.h>
 #include <ostream>
 #include "yas_audio_engine_offline_output_protocol.h"
+#include "yas_audio_engine_ptr.h"
 
 namespace yas::audio::engine {
 class node;
@@ -20,11 +21,11 @@ struct offline_output : manageable_offline_output, std::enable_shared_from_this<
     audio::engine::node const &node() const;
     audio::engine::node &node();
 
-    std::shared_ptr<manageable_offline_output> manageable();
+    manageable_offline_output_ptr manageable();
 
    private:
     std::optional<task_queue> _queue = std::nullopt;
-    std::shared_ptr<audio::engine::node> _node;
+    node_ptr _node;
     chaining::any_observer_ptr _reset_observer = nullptr;
     struct core;
     std::unique_ptr<core> _core;
@@ -42,7 +43,7 @@ struct offline_output : manageable_offline_output, std::enable_shared_from_this<
     void stop() override;
 
    public:
-    static std::shared_ptr<offline_output> make_shared();
+    static offline_output_ptr make_shared();
 };
 }  // namespace yas::audio::engine
 

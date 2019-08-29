@@ -8,6 +8,7 @@
 #include <unordered_map>
 #include "yas_audio_engine_au_protocol.h"
 #include "yas_audio_engine_node_protocol.h"
+#include "yas_audio_engine_ptr.h"
 #include "yas_audio_unit.h"
 
 namespace yas::audio {
@@ -23,7 +24,7 @@ struct au : manageable_au, std::enable_shared_from_this<au> {
         did_update_connections,
     };
 
-    using chaining_pair_t = std::pair<method, std::shared_ptr<au>>;
+    using chaining_pair_t = std::pair<method, au_ptr>;
     using prepare_unit_f = std::function<void(audio::unit &)>;
 
     struct args {
@@ -35,7 +36,7 @@ struct au : manageable_au, std::enable_shared_from_this<au> {
 
     void set_prepare_unit_handler(prepare_unit_f);
 
-    std::shared_ptr<audio::unit> unit() const;
+    audio::unit_ptr unit() const;
     std::unordered_map<AudioUnitScope, std::unordered_map<AudioUnitParameterID, audio::unit::parameter>> const &
     parameters() const;
     std::unordered_map<AudioUnitParameterID, audio::unit::parameter> const &global_parameters() const;
@@ -55,15 +56,15 @@ struct au : manageable_au, std::enable_shared_from_this<au> {
     float output_parameter_value(AudioUnitParameterID const parameter_id, AudioUnitElement const element) const;
 
     [[nodiscard]] chaining::chain_unsync_t<chaining_pair_t> chain() const;
-    [[nodiscard]] chaining::chain_relayed_unsync_t<std::shared_ptr<au>, chaining_pair_t> chain(method const) const;
+    [[nodiscard]] chaining::chain_relayed_unsync_t<au_ptr, chaining_pair_t> chain(method const) const;
 
     audio::engine::node const &node() const;
     audio::engine::node &node();
 
-    std::shared_ptr<manageable_au> manageable();
+    manageable_au_ptr manageable();
 
    private:
-    std::shared_ptr<audio::engine::node> _node;
+    audio::engine::node_ptr _node;
     AudioComponentDescription _acd;
     std::unordered_map<AudioUnitScope, unit::parameter_map_t> _parameters;
     chaining::notifier_ptr<chaining_pair_t> _notifier = chaining::notifier<chaining_pair_t>::make_shared();
@@ -91,8 +92,8 @@ struct au : manageable_au, std::enable_shared_from_this<au> {
     void _will_reset();
 
    public:
-    static std::shared_ptr<au> make_shared(OSType const type, OSType const sub_type);
-    static std::shared_ptr<au> make_shared(AudioComponentDescription const &);
-    static std::shared_ptr<au> make_shared(au::args &&);
+    static au_ptr make_shared(OSType const type, OSType const sub_type);
+    static au_ptr make_shared(AudioComponentDescription const &);
+    static au_ptr make_shared(au::args &&);
 };
 }  // namespace yas::audio::engine

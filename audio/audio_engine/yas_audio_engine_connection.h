@@ -5,6 +5,7 @@
 #pragma once
 
 #include "yas_audio_engine_connection_protocol.h"
+#include "yas_audio_engine_ptr.h"
 #include "yas_audio_format.h"
 
 namespace yas::audio::engine {
@@ -15,11 +16,11 @@ struct connection : node_removable, std::enable_shared_from_this<connection> {
 
     uint32_t const source_bus;
     uint32_t const destination_bus;
-    std::shared_ptr<audio::engine::node> source_node() const;
-    std::shared_ptr<audio::engine::node> destination_node() const;
+    audio::engine::node_ptr source_node() const;
+    audio::engine::node_ptr destination_node() const;
     audio::format const format;
 
-    std::shared_ptr<node_removable> removable();
+    node_removable_ptr removable();
 
    private:
     mutable std::recursive_mutex _mutex;
@@ -41,8 +42,8 @@ struct connection : node_removable, std::enable_shared_from_this<connection> {
     void _remove_connection_from_nodes(connection const &);
 
    public:
-    static std::shared_ptr<connection> make_shared(audio::engine::node &src_node, uint32_t const src_bus,
-                                                   audio::engine::node &dst_node, uint32_t const dst_bus,
-                                                   audio::format const &format);
+    static connection_ptr make_shared(audio::engine::node &src_node, uint32_t const src_bus,
+                                      audio::engine::node &dst_node, uint32_t const dst_bus,
+                                      audio::format const &format);
 };
 }  // namespace yas::audio::engine

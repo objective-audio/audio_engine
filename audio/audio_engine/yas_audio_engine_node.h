@@ -10,6 +10,7 @@
 #include <ostream>
 #include "yas_audio_engine_connection.h"
 #include "yas_audio_engine_node_protocol.h"
+#include "yas_audio_engine_ptr.h"
 #include "yas_audio_format.h"
 #include "yas_audio_pcm_buffer.h"
 #include "yas_audio_types.h"
@@ -33,7 +34,7 @@ struct node : std::enable_shared_from_this<node>, connectable_node, manageable_n
         update_connections,
     };
 
-    using chaining_pair_t = std::pair<method, std::shared_ptr<node>>;
+    using chaining_pair_t = std::pair<method, node_ptr>;
 
     struct render_args {
         audio::pcm_buffer &buffer;
@@ -48,10 +49,10 @@ struct node : std::enable_shared_from_this<node>, connectable_node, manageable_n
 
     void reset();
 
-    std::shared_ptr<audio::engine::connection> input_connection(uint32_t const bus_idx) const override;
-    std::shared_ptr<audio::engine::connection> output_connection(uint32_t const bus_idx) const override;
-    audio::engine::connection_wmap const &input_connections() const override;
-    audio::engine::connection_wmap const &output_connections() const override;
+    connection_ptr input_connection(uint32_t const bus_idx) const override;
+    connection_ptr output_connection(uint32_t const bus_idx) const override;
+    connection_wmap const &input_connections() const override;
+    connection_wmap const &output_connections() const override;
 
     std::optional<audio::format> input_format(uint32_t const bus_idx) const;
     std::optional<audio::format> output_format(uint32_t const bus_idx) const;
@@ -69,16 +70,16 @@ struct node : std::enable_shared_from_this<node>, connectable_node, manageable_n
     void set_prepare_kernel_handler(prepare_kernel_f);
     void set_render_handler(render_f);
 
-    std::shared_ptr<audio::engine::kernel> kernel() const;
+    kernel_ptr kernel() const;
 
     void render(render_args);
     void set_render_time_on_render(audio::time const &time);
 
     [[nodiscard]] chaining::chain_unsync_t<chaining_pair_t> chain() const;
-    [[nodiscard]] chaining::chain_relayed_unsync_t<std::shared_ptr<node>, chaining_pair_t> chain(method const) const;
+    [[nodiscard]] chaining::chain_relayed_unsync_t<node_ptr, chaining_pair_t> chain(method const) const;
 
-    std::shared_ptr<connectable_node> connectable();
-    std::shared_ptr<manageable_node> manageable();
+    connectable_node_ptr connectable();
+    manageable_node_ptr manageable();
 
    private:
     std::weak_ptr<audio::engine::manager> _weak_manager;
@@ -99,12 +100,12 @@ struct node : std::enable_shared_from_this<node>, connectable_node, manageable_n
 
     explicit node(node_args &&);
 
-    void _prepare_kernel(std::shared_ptr<audio::engine::kernel> &kernel);
+    void _prepare_kernel(kernel_ptr const &kernel);
 
     void add_connection(audio::engine::connection &) override;
     void remove_connection(audio::engine::connection const &) override;
 
-    void set_manager(std::shared_ptr<audio::engine::manager> const &) override;
+    void set_manager(audio::engine::manager_ptr const &) override;
     void update_kernel() override;
     void update_connections() override;
     void set_add_to_graph_handler(graph_editing_f &&) override;
@@ -118,7 +119,7 @@ struct node : std::enable_shared_from_this<node>, connectable_node, manageable_n
     node &operator=(node const &) = delete;
 
    public:
-    static std::shared_ptr<node> make_shared(node_args);
+    static node_ptr make_shared(node_args);
 };
 }  // namespace yas::audio::engine
 

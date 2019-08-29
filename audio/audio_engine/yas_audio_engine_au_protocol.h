@@ -14,4 +14,6 @@ struct manageable_au {
     virtual void prepare_parameters() = 0;
     virtual void reload_unit() = 0;
 };
+
+using manageable_au_ptr = std::shared_ptr<manageable_au>;
 }  // namespace yas::audio::engine

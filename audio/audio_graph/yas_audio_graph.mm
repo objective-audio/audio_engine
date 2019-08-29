@@ -74,7 +74,7 @@ static void remove_graph_for_key(uint8_t const key) {
     global_graph::_graphs.erase(key);
 }
 
-static std::shared_ptr<graph> graph_for_key(uint8_t const key) {
+static graph_ptr graph_for_key(uint8_t const key) {
     std::lock_guard<std::recursive_mutex> lock(global_graph::_mutex);
     if (global_graph::_graphs.count(key) > 0) {
         auto weak_graph = global_graph::_graphs.at(key);
@@ -136,7 +136,7 @@ void audio::graph::_prepare() {
     global_graph::add_graph(*this);
 }
 
-void audio::graph::add_unit(std::shared_ptr<audio::unit> &unit) {
+void audio::graph::add_unit(audio::unit_ptr const &unit) {
     auto manageable_unit = unit->manageable();
 
     if (manageable_unit->key()) {
@@ -152,7 +152,7 @@ void audio::graph::add_unit(std::shared_ptr<audio::unit> &unit) {
     }
 }
 
-void audio::graph::remove_unit(std::shared_ptr<audio::unit> &unit) {
+void audio::graph::remove_unit(audio::unit_ptr const &unit) {
     auto manageable_unit = unit->manageable();
 
     manageable_unit->uninitialize();
@@ -173,7 +173,7 @@ void audio::graph::remove_all_units() {
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
 
-void audio::graph::add_audio_device_io(std::shared_ptr<device_io> &device_io) {
+void audio::graph::add_audio_device_io(device_io_ptr const &device_io) {
     {
         std::lock_guard<std::recursive_mutex> lock(_mutex);
         this->_device_ios.insert(device_io);
@@ -183,7 +183,7 @@ void audio::graph::add_audio_device_io(std::shared_ptr<device_io> &device_io) {
     }
 }
 
-void audio::graph::remove_audio_device_io(std::shared_ptr<device_io> &device_io) {
+void audio::graph::remove_audio_device_io(device_io_ptr const &device_io) {
     device_io->stop();
     {
         std::lock_guard<std::recursive_mutex> lock(_mutex);
@@ -215,7 +215,7 @@ uint8_t audio::graph::key() const {
     return this->_key;
 }
 
-std::shared_ptr<audio::graph::interruptable_graph> audio::graph::interruptable() {
+audio::interruptable_graph_ptr audio::graph::interruptable() {
     return std::dynamic_pointer_cast<interruptable_graph>(shared_from_this());
 }
 
@@ -264,12 +264,12 @@ std::optional<uint16_t> audio::graph::_next_unit_key() {
     return min_empty_key(this->_units);
 }
 
-std::shared_ptr<audio::unit> audio::graph::_unit_for_key(uint16_t const key) const {
+audio::unit_ptr audio::graph::_unit_for_key(uint16_t const key) const {
     std::lock_guard<std::recursive_mutex> lock(this->_mutex);
     return this->_units.at(key);
 }
 
-void audio::graph::_add_unit_to_units(std::shared_ptr<audio::unit> &unit) {
+void audio::graph::_add_unit_to_units(audio::unit_ptr const &unit) {
     if (!unit) {
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
     }
@@ -294,7 +294,7 @@ void audio::graph::_add_unit_to_units(std::shared_ptr<audio::unit> &unit) {
     }
 }
 
-void audio::graph::_remove_unit_from_units(std::shared_ptr<audio::unit> &unit) {
+void audio::graph::_remove_unit_from_units(audio::unit_ptr const &unit) {
     std::lock_guard<std::recursive_mutex> lock(this->_mutex);
 
     auto manageable_unit = unit->manageable();
@@ -307,9 +307,9 @@ void audio::graph::_remove_unit_from_units(std::shared_ptr<audio::unit> &unit) {
     }
 }
 
-std::shared_ptr<audio::graph> audio::graph::make_shared() {
+audio::graph_ptr audio::graph::make_shared() {
     if (auto key = global_graph::min_empty_graph_key()) {
-        auto shared = std::shared_ptr<graph>(new graph{*key});
+        auto shared = graph_ptr(new graph{*key});
         shared->_prepare();
         return shared;
     } else {

@@ -96,7 +96,7 @@ struct device_global {
         }
     };
 
-    static std::unordered_map<AudioDeviceID, std::shared_ptr<device>> &all_devices_map() {
+    static std::unordered_map<AudioDeviceID, device_ptr> &all_devices_map() {
         _initialize();
         return device_global::instance()._all_devices;
     }
@@ -134,7 +134,7 @@ struct device_global {
     }
 
    private:
-    std::unordered_map<AudioDeviceID, std::shared_ptr<device>> _all_devices;
+    std::unordered_map<AudioDeviceID, device_ptr> _all_devices;
     audio::device::listener_f _system_listener = nullptr;
 
     static void _initialize() {
@@ -195,16 +195,16 @@ bool audio::device::property_info::operator<(device::property_info const &info) 
 
 #pragma mark - global
 
-std::vector<std::shared_ptr<audio::device>> audio::device::all_devices() {
-    std::vector<std::shared_ptr<device>> devices;
+std::vector<audio::device_ptr> audio::device::all_devices() {
+    std::vector<device_ptr> devices;
     for (auto &pair : device_global::all_devices_map()) {
         devices.push_back(pair.second);
     }
     return devices;
 }
 
-std::vector<std::shared_ptr<audio::device>> audio::device::output_devices() {
-    std::vector<std::shared_ptr<device>> devices;
+std::vector<audio::device_ptr> audio::device::output_devices() {
+    std::vector<device_ptr> devices;
     for (auto &pair : device_global::all_devices_map()) {
         if (pair.second->output_streams().size() > 0) {
             devices.push_back(pair.second);
@@ -213,8 +213,8 @@ std::vector<std::shared_ptr<audio::device>> audio::device::output_devices() {
     return devices;
 }
 
-std::vector<std::shared_ptr<audio::device>> audio::device::input_devices() {
-    std::vector<std::shared_ptr<device>> devices;
+std::vector<audio::device_ptr> audio::device::input_devices() {
+    std::vector<device_ptr> devices;
     for (auto &pair : device_global::all_devices_map()) {
         if (pair.second->input_streams().size() > 0) {
             devices.push_back(pair.second);
@@ -223,7 +223,7 @@ std::vector<std::shared_ptr<audio::device>> audio::device::input_devices() {
     return devices;
 }
 
-std::shared_ptr<audio::device> audio::device::default_system_output_device() {
+audio::device_ptr audio::device::default_system_output_device() {
     if (auto const data =
             _property_data<AudioDeviceID>(kAudioObjectSystemObject, kAudioHardwarePropertyDefaultSystemOutputDevice,
                                           kAudioObjectPropertyScopeGlobal)) {
@@ -235,7 +235,7 @@ std::shared_ptr<audio::device> audio::device::default_system_output_device() {
     return nullptr;
 }
 
-std::shared_ptr<audio::device> audio::device::default_output_device() {
+audio::device_ptr audio::device::default_output_device() {
     if (auto const data = _property_data<AudioDeviceID>(
             kAudioObjectSystemObject, kAudioHardwarePropertyDefaultOutputDevice, kAudioObjectPropertyScopeGlobal)) {
         auto iterator = device_global::all_devices_map().find(*data->data());
@@ -246,7 +246,7 @@ std::shared_ptr<audio::device> audio::device::default_output_device() {
     return nullptr;
 }
 
-std::shared_ptr<audio::device> audio::device::default_input_device() {
+audio::device_ptr audio::device::default_input_device() {
     if (auto const data = _property_data<AudioDeviceID>(
             kAudioObjectSystemObject, kAudioHardwarePropertyDefaultInputDevice, kAudioObjectPropertyScopeGlobal)) {
         auto iterator = device_global::all_devices_map().find(*data->data());
@@ -257,7 +257,7 @@ std::shared_ptr<audio::device> audio::device::default_input_device() {
     return nullptr;
 }
 
-std::shared_ptr<audio::device> audio::device::device_for_id(AudioDeviceID const audio_device_id) {
+audio::device_ptr audio::device::device_for_id(AudioDeviceID const audio_device_id) {
     auto it = device_global::all_devices_map().find(audio_device_id);
     if (it != device_global::all_devices_map().end()) {
         return it->second;
@@ -311,16 +311,16 @@ CFStringRef audio::device::manufacture() const {
     return _property_string(audio_device_id(), kAudioObjectPropertyManufacturer);
 }
 
-std::vector<std::shared_ptr<audio::device::stream>> audio::device::input_streams() const {
-    std::vector<std::shared_ptr<stream>> streams;
+std::vector<audio::device::stream_ptr> audio::device::input_streams() const {
+    std::vector<stream_ptr> streams;
     for (auto &pair : this->_input_streams_map) {
         streams.push_back(pair.second);
     }
     return streams;
 }
 
-std::vector<std::shared_ptr<audio::device::stream>> audio::device::output_streams() const {
-    std::vector<std::shared_ptr<stream>> streams;
+std::vector<audio::device::stream_ptr> audio::device::output_streams() const {
+    std::vector<stream_ptr> streams;
     for (auto &pair : this->_output_streams_map) {
         streams.push_back(pair.second);
     }
@@ -460,7 +460,7 @@ void audio::device::_udpate_streams(AudioObjectPropertyScope const scope) {
 }
 
 void audio::device::_update_format(AudioObjectPropertyScope const scope) {
-    std::shared_ptr<stream> stream = nullptr;
+    stream_ptr stream = nullptr;
 
     if (scope == kAudioObjectPropertyScopeInput) {
         auto iterator = this->_input_streams_map.begin();

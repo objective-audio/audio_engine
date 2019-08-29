@@ -9,6 +9,7 @@
 #include <functional>
 #include <string>
 #include <unordered_map>
+#include "yas_audio_ptr.h"
 #include "yas_audio_types.h"
 #include "yas_audio_unit_protocol.h"
 
@@ -86,7 +87,7 @@ struct unit : manageable_unit, std::enable_shared_from_this<unit> {
     void stop();   // for io
     void reset();
 
-    std::shared_ptr<manageable_unit> manageable();
+    manageable_unit_ptr manageable();
 
     // render thread
 
@@ -119,8 +120,8 @@ struct unit : manageable_unit, std::enable_shared_from_this<unit> {
     std::optional<uint16_t> const &key() const override;
 
    public:
-    static std::shared_ptr<audio::unit> make_shared(AudioComponentDescription const &acd);
-    static std::shared_ptr<audio::unit> make_shared(OSType const type, OSType const sub_type);
+    static unit_ptr make_shared(AudioComponentDescription const &acd);
+    static unit_ptr make_shared(OSType const type, OSType const sub_type);
 };
 }  // namespace yas::audio
 

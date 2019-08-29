@@ -15,12 +15,12 @@ using namespace yas;
 #pragma mark - core
 
 struct audio::engine::node::core {
-    void set_kernel(std::shared_ptr<audio::engine::kernel> kernel) {
+    void set_kernel(audio::engine::kernel_ptr const &kernel) {
         std::lock_guard<std::recursive_mutex> lock(this->_mutex);
-        this->_kernel = std::move(kernel);
+        this->_kernel = kernel;
     }
 
-    std::shared_ptr<audio::engine::kernel> kernel() {
+    audio::engine::kernel_ptr kernel() {
         std::lock_guard<std::recursive_mutex> lock(this->_mutex);
         return this->_kernel;
     }
@@ -36,7 +36,7 @@ struct audio::engine::node::core {
     }
 
    private:
-    std::shared_ptr<audio::engine::kernel> _kernel = nullptr;
+    audio::engine::kernel_ptr _kernel = nullptr;
     std::optional<audio::time> _render_time = std::nullopt;
     mutable std::recursive_mutex _mutex;
 };
@@ -63,14 +63,14 @@ void audio::engine::node::reset() {
     this->update_kernel();
 }
 
-std::shared_ptr<audio::engine::connection> audio::engine::node::input_connection(uint32_t const bus_idx) const {
+audio::engine::connection_ptr audio::engine::node::input_connection(uint32_t const bus_idx) const {
     if (this->_input_connections.count(bus_idx) > 0) {
         return this->_input_connections.at(bus_idx).lock();
     }
     return nullptr;
 }
 
-std::shared_ptr<audio::engine::connection> audio::engine::node::output_connection(uint32_t const bus_idx) const {
+audio::engine::connection_ptr audio::engine::node::output_connection(uint32_t const bus_idx) const {
     if (this->_output_connections.count(bus_idx) > 0) {
         return this->_output_connections.at(bus_idx).lock();
     }
@@ -136,7 +136,7 @@ bool audio::engine::node::is_available_output_bus(uint32_t const bus_idx) const 
 }
 
 audio::engine::manager const &audio::engine::node::manager() const {
-    std::shared_ptr<audio::engine::manager> shared = this->_weak_manager.lock();
+    manager_ptr shared = this->_weak_manager.lock();
     return *shared;
 }
 
@@ -164,7 +164,7 @@ void audio::engine::node::set_render_handler(render_f handler) {
     this->_render_handler = std::move(handler);
 }
 
-std::shared_ptr<audio::engine::kernel> audio::engine::node::kernel() const {
+audio::engine::kernel_ptr audio::engine::node::kernel() const {
     return this->_core->kernel();
 }
 
@@ -186,18 +186,18 @@ chaining::chain_unsync_t<audio::engine::node::chaining_pair_t> audio::engine::no
     return this->_notifier->chain();
 }
 
-chaining::chain_relayed_unsync_t<std::shared_ptr<audio::engine::node>, audio::engine::node::chaining_pair_t>
+chaining::chain_relayed_unsync_t<audio::engine::node_ptr, audio::engine::node::chaining_pair_t>
 audio::engine::node::chain(method const method) const {
     return this->_notifier->chain()
         .guard([method](auto const &pair) { return pair.first == method; })
         .to([](chaining_pair_t const &pair) { return pair.second; });
 }
 
-std::shared_ptr<audio::engine::connectable_node> audio::engine::node::connectable() {
+audio::engine::connectable_node_ptr audio::engine::node::connectable() {
     return std::dynamic_pointer_cast<connectable_node>(shared_from_this());
 }
 
-std::shared_ptr<audio::engine::manageable_node> audio::engine::node::manageable() {
+audio::engine::manageable_node_ptr audio::engine::node::manageable() {
     return std::dynamic_pointer_cast<manageable_node>(shared_from_this());
 }
 
@@ -232,7 +232,7 @@ void audio::engine::node::remove_connection(audio::engine::connection const &con
     this->update_kernel();
 }
 
-void audio::engine::node::set_manager(std::shared_ptr<audio::engine::manager> const &manager) {
+void audio::engine::node::set_manager(audio::engine::manager_ptr const &manager) {
     this->_weak_manager = manager;
 }
 
@@ -261,7 +261,7 @@ audio::graph_editing_f const &audio::engine::node::remove_from_graph_handler() c
     return this->_remove_from_graph_handler;
 }
 
-void audio::engine::node::_prepare_kernel(std::shared_ptr<audio::engine::kernel> &kernel) {
+void audio::engine::node::_prepare_kernel(kernel_ptr const &kernel) {
     auto manageable_kernel = kernel->manageable();
     manageable_kernel->set_input_connections(_input_connections);
     manageable_kernel->set_output_connections(_output_connections);
@@ -271,8 +271,8 @@ void audio::engine::node::_prepare_kernel(std::shared_ptr<audio::engine::kernel>
     }
 }
 
-std::shared_ptr<audio::engine::node> audio::engine::node::make_shared(node_args args) {
-    return std::shared_ptr<audio::engine::node>(new node{std::move(args)});
+audio::engine::node_ptr audio::engine::node::make_shared(node_args args) {
+    return node_ptr(new node{std::move(args)});
 }
 
 #pragma mark -

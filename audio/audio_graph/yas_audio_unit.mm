@@ -567,7 +567,7 @@ void audio::unit::reset() {
     raise_if_raw_audio_error(AudioUnitReset(_core->raw_unit(), kAudioUnitScope_Global, 0));
 }
 
-std::shared_ptr<audio::unit::manageable_unit> audio::unit::manageable() {
+audio::manageable_unit_ptr audio::unit::manageable() {
     return std::dynamic_pointer_cast<manageable_unit>(shared_from_this());
 }
 
@@ -689,11 +689,11 @@ std::optional<uint16_t> const &audio::unit::key() const {
     return this->_key;
 }
 
-std::shared_ptr<audio::unit> audio::unit::make_shared(AudioComponentDescription const &acd) {
-    return std::shared_ptr<unit>(new unit{acd});
+audio::unit_ptr audio::unit::make_shared(AudioComponentDescription const &acd) {
+    return unit_ptr(new unit{acd});
 }
 
-std::shared_ptr<audio::unit> audio::unit::make_shared(OSType const type, OSType const sub_type) {
+audio::unit_ptr audio::unit::make_shared(OSType const type, OSType const sub_type) {
     return unit::make_shared(AudioComponentDescription{
         .componentType = type,
         .componentSubType = sub_type,

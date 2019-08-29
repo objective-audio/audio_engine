@@ -7,12 +7,15 @@
 #include <TargetConditionals.h>
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
 
+#include "yas_audio_ptr.h"
+
 #include <AudioToolbox/AudioToolbox.h>
 #include <chaining/yas_chaining_umbrella.h>
 #include <optional>
 #include <ostream>
 #include <string>
 #include <vector>
+#include "yas_audio_engine_ptr.h"
 #include "yas_audio_format.h"
 #include "yas_audio_types.h"
 
@@ -21,6 +24,8 @@ class device_global;
 
 struct device {
     class stream;
+
+    using stream_ptr = std::shared_ptr<stream>;
 
     enum class property : uint32_t {
         system,
@@ -46,21 +51,21 @@ struct device {
     using chaining_pair_t = std::pair<method, change_info>;
     using chaining_system_pair_t = std::pair<system_method, change_info>;
 
-    static std::vector<std::shared_ptr<device>> all_devices();
-    static std::vector<std::shared_ptr<device>> output_devices();
-    static std::vector<std::shared_ptr<device>> input_devices();
-    static std::shared_ptr<device> default_system_output_device();
-    static std::shared_ptr<device> default_output_device();
-    static std::shared_ptr<device> default_input_device();
-    static std::shared_ptr<device> device_for_id(AudioDeviceID const);
+    static std::vector<device_ptr> all_devices();
+    static std::vector<device_ptr> output_devices();
+    static std::vector<device_ptr> input_devices();
+    static device_ptr default_system_output_device();
+    static device_ptr default_output_device();
+    static device_ptr default_input_device();
+    static device_ptr device_for_id(AudioDeviceID const);
     static std::optional<size_t> index_of_device(device const &);
     static bool is_available_device(device const &);
 
     AudioDeviceID audio_device_id() const;
     CFStringRef name() const;
     CFStringRef manufacture() const;
-    std::vector<std::shared_ptr<stream>> input_streams() const;
-    std::vector<std::shared_ptr<stream>> output_streams() const;
+    std::vector<stream_ptr> input_streams() const;
+    std::vector<stream_ptr> output_streams() const;
     double nominal_sample_rate() const;
 
     std::optional<audio::format> input_format() const;
@@ -91,8 +96,8 @@ struct device {
 
    private:
     AudioDeviceID const _audio_device_id;
-    std::unordered_map<AudioStreamID, std::shared_ptr<stream>> _input_streams_map;
-    std::unordered_map<AudioStreamID, std::shared_ptr<stream>> _output_streams_map;
+    std::unordered_map<AudioStreamID, stream_ptr> _input_streams_map;
+    std::unordered_map<AudioStreamID, stream_ptr> _output_streams_map;
     chaining::notifier_ptr<audio::device::chaining_pair_t> _notifier =
         chaining::notifier<audio::device::chaining_pair_t>::make_shared();
     std::optional<audio::format> _input_format = std::nullopt;

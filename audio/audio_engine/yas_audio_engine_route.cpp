@@ -141,8 +141,8 @@ void audio::engine::route::_erase_route_if(std::function<bool(audio::route const
     erase_if(this->_routes, pred);
 }
 
-std::shared_ptr<audio::engine::route> audio::engine::route::make_shared() {
-    auto shared = std::shared_ptr<route>(new route{});
+audio::engine::route_ptr audio::engine::route::make_shared() {
+    auto shared = route_ptr(new route{});
     shared->_prepare();
     return shared;
 }

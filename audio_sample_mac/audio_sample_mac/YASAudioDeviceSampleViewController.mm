@@ -62,8 +62,7 @@ class kernel {
         return _sine_volume.load();
     }
 
-    void process(std::shared_ptr<audio::pcm_buffer> const &input_buffer,
-                 std::shared_ptr<audio::pcm_buffer> &output_buffer) {
+    void process(audio::pcm_buffer_ptr const &input_buffer, audio::pcm_buffer_ptr const &output_buffer) {
         if (!output_buffer) {
             return;
         }
@@ -109,7 +108,7 @@ class kernel {
 }
 
 using sample_kernel_t = audio_device_sample::kernel;
-using sample_kernel_sptr = std::shared_ptr<sample_kernel_t>;
+using sample_kernel_ptr = std::shared_ptr<sample_kernel_t>;
 
 @interface YASAudioDeviceSampleViewController ()
 
@@ -128,11 +127,11 @@ using sample_kernel_sptr = std::shared_ptr<sample_kernel_t>;
 
 namespace yas::sample {
 struct device_vc_internal {
-    std::shared_ptr<audio::graph> graph = nullptr;
-    std::shared_ptr<audio::device_io> device_io = nullptr;
+    audio::graph_ptr graph = nullptr;
+    audio::device_io_ptr device_io = nullptr;
     chaining::any_observer_ptr system_observer = nullptr;
     chaining::any_observer_ptr device_observer = nullptr;
-    sample_kernel_sptr kernel;
+    sample_kernel_ptr kernel;
 };
 }
 
@@ -157,7 +156,7 @@ struct device_vc_internal {
     });
 
     _internal.graph = audio::graph::make_shared();
-    _internal.device_io = audio::device_io::make_shared(std::shared_ptr<audio::device>(nullptr));
+    _internal.device_io = audio::device_io::make_shared(audio::device_ptr(nullptr));
     _internal.graph->add_audio_device_io(_internal.device_io);
 
     _internal.kernel = std::make_shared<sample_kernel_t>();
@@ -286,7 +285,7 @@ struct device_vc_internal {
     }
 }
 
-- (void)setDevice:(std::shared_ptr<audio::device> const &)selected_device {
+- (void)setDevice:(audio::device_ptr const &)selected_device {
     if (auto prev_audio_device = _internal.device_io->device()) {
         _internal.device_observer = nullptr;
     }

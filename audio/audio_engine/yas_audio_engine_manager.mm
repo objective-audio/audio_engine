@@ -124,7 +124,7 @@ audio::engine::connection &audio::engine::manager::connect(audio::engine::node &
 }
 
 void audio::engine::manager::disconnect(connection &connection) {
-    std::vector<std::shared_ptr<node>> update_nodes{connection.source_node(), connection.destination_node()};
+    std::vector<node_ptr> update_nodes{connection.source_node(), connection.destination_node()};
 
     this->_remove_connection_from_nodes(connection);
     connection.removable()->remove_nodes();
@@ -187,11 +187,7 @@ audio::engine::manager::remove_result_t audio::engine::manager::remove_offline_o
     }
 }
 
-std::shared_ptr<audio::engine::offline_output> const &audio::engine::manager::offline_output() const {
-    return this->_offline_output;
-}
-
-std::shared_ptr<audio::engine::offline_output> &audio::engine::manager::offline_output() {
+audio::engine::offline_output_ptr const &audio::engine::manager::offline_output() const {
     return this->_offline_output;
 }
 
@@ -215,11 +211,7 @@ audio::engine::manager::remove_result_t audio::engine::manager::remove_device_io
     }
 }
 
-std::shared_ptr<audio::engine::device_io> const &audio::engine::manager::device_io() const {
-    return this->_device_io;
-}
-
-std::shared_ptr<audio::engine::device_io> &audio::engine::manager::device_io() {
+audio::engine::device_io_ptr const &audio::engine::manager::device_io() const {
     return this->_device_io;
 }
 
@@ -294,14 +286,14 @@ chaining::chain_unsync_t<audio::engine::manager::chaining_pair_t> audio::engine:
     return this->_notifier->chain();
 }
 
-chaining::chain_relayed_unsync_t<std::shared_ptr<audio::engine::manager>, audio::engine::manager::chaining_pair_t>
+chaining::chain_relayed_unsync_t<audio::engine::manager_ptr, audio::engine::manager::chaining_pair_t>
 audio::engine::manager::chain(method const method) const {
     return this->_notifier->chain()
         .guard([method](auto const &pair) { return pair.first == method; })
         .to([](chaining_pair_t const &pair) { return pair.second; });
 }
 
-std::unordered_set<std::shared_ptr<audio::engine::node>> const &audio::engine::manager::nodes() const {
+std::unordered_set<audio::engine::node_ptr> const &audio::engine::manager::nodes() const {
     return this->_nodes;
 }
 
@@ -412,7 +404,7 @@ void audio::engine::manager::_disconnect_node_with_predicate(std::function<bool(
     auto connections =
         filter(this->_connections, [&predicate](auto const &connection) { return predicate(*connection); });
 
-    std::unordered_set<std::shared_ptr<node>> update_nodes;
+    std::unordered_set<node_ptr> update_nodes;
 
     for (auto connection : connections) {
         update_nodes.insert(connection->source_node());
@@ -495,13 +487,13 @@ void audio::engine::manager::_update_all_node_connections() {
 }
 
 audio::engine::connection_set audio::engine::manager::_input_connections_for_destination_node(
-    std::shared_ptr<audio::engine::node> const &node) {
+    audio::engine::node_ptr const &node) {
     return filter(this->_connections,
                   [&node](auto const &connection) { return connection->destination_node() == node; });
 }
 
 audio::engine::connection_set audio::engine::manager::_output_connections_for_source_node(
-    std::shared_ptr<audio::engine::node> const &node) {
+    audio::engine::node_ptr const &node) {
     return filter(this->_connections, [&node](auto const &connection) { return connection->source_node() == node; });
 }
 
@@ -528,9 +520,9 @@ void audio::engine::manager::_reload_graph() {
 }
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
-void audio::engine::manager::_set_device_io(std::shared_ptr<audio::engine::device_io> &&node) {
+void audio::engine::manager::_set_device_io(audio::engine::device_io_ptr const &node) {
     if (node) {
-        this->_device_io = std::move(node);
+        this->_device_io = node;
 
         if (this->_graph) {
             auto manageable = this->_device_io->manageable();
@@ -556,8 +548,8 @@ void audio::engine::manager::_post_configuration_change() {
     this->_notifier->notify(std::make_pair(method::configuration_change, shared_from_this()));
 }
 
-std::shared_ptr<audio::engine::manager> audio::engine::manager::make_shared() {
-    auto shared = std::shared_ptr<manager>(new manager{});
+audio::engine::manager_ptr audio::engine::manager::make_shared() {
+    auto shared = manager_ptr(new manager{});
     shared->prepare();
     return shared;
 }

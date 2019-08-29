@@ -6,6 +6,7 @@
 
 #include <any>
 #include "yas_audio_engine_kernel_protocol.h"
+#include "yas_audio_engine_ptr.h"
 
 namespace yas::audio::engine {
 struct kernel : manageable_kernel, std::enable_shared_from_this<kernel> {
@@ -13,12 +14,12 @@ struct kernel : manageable_kernel, std::enable_shared_from_this<kernel> {
 
     audio::engine::connection_smap input_connections() const;
     audio::engine::connection_smap output_connections() const;
-    std::shared_ptr<audio::engine::connection> input_connection(uint32_t const bus_idx) const;
-    std::shared_ptr<audio::engine::connection> output_connection(uint32_t const bus_idx) const;
+    audio::engine::connection_ptr input_connection(uint32_t const bus_idx) const;
+    audio::engine::connection_ptr output_connection(uint32_t const bus_idx) const;
 
     std::any decorator = nullptr;
 
-    std::shared_ptr<manageable_kernel> manageable();
+    manageable_kernel_ptr manageable();
 
    private:
     kernel();
@@ -30,6 +31,6 @@ struct kernel : manageable_kernel, std::enable_shared_from_this<kernel> {
     engine::connection_wmap _output_connections;
 
    public:
-    static std::shared_ptr<audio::engine::kernel> make_shared();
+    static kernel_ptr make_shared();
 };
 }  // namespace yas::audio::engine
