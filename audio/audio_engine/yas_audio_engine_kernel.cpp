@@ -21,14 +21,14 @@ audio::engine::connection_smap audio::engine::kernel::output_connections() const
     return lock_values(this->_output_connections);
 }
 
-std::shared_ptr<audio::engine::connection> audio::engine::kernel::input_connection(uint32_t const bus_idx) const {
+audio::engine::connection_ptr audio::engine::kernel::input_connection(uint32_t const bus_idx) const {
     if (this->_input_connections.count(bus_idx) > 0) {
         return this->_input_connections.at(bus_idx).lock();
     }
     return nullptr;
 }
 
-std::shared_ptr<audio::engine::connection> audio::engine::kernel::output_connection(uint32_t const bus_idx) const {
+audio::engine::connection_ptr audio::engine::kernel::output_connection(uint32_t const bus_idx) const {
     if (this->_output_connections.count(bus_idx) > 0) {
         return this->_output_connections.at(bus_idx).lock();
     }
@@ -43,10 +43,10 @@ void audio::engine::kernel::set_output_connections(audio::engine::connection_wma
     this->_output_connections = std::move(connections);
 }
 
-std::shared_ptr<audio::engine::manageable_kernel> audio::engine::kernel::manageable() {
+audio::engine::manageable_kernel_ptr audio::engine::kernel::manageable() {
     return std::dynamic_pointer_cast<manageable_kernel>(shared_from_this());
 }
 
-std::shared_ptr<audio::engine::kernel> audio::engine::kernel::make_shared() {
-    return std::shared_ptr<audio::engine::kernel>(new audio::engine::kernel{});
+audio::engine::kernel_ptr audio::engine::kernel::make_shared() {
+    return kernel_ptr(new audio::engine::kernel{});
 }

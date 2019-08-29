@@ -107,7 +107,7 @@ using namespace yas;
     XCTestExpectation *render_expectation = [self expectationWithDescription:@"node render"];
 
     auto lambda = [self, node, time, render_expectation]() mutable {
-        std::shared_ptr<audio::pcm_buffer> null_buffer{nullptr};
+        audio::pcm_buffer_ptr null_buffer{nullptr};
         node->render({.buffer = *null_buffer, .bus_idx = 0, .when = time});
         [render_expectation fulfill];
     };
@@ -143,7 +143,7 @@ using namespace yas;
     auto const output_connection =
         audio::engine::connection::make_shared(*relay_obj.node, 0, *output_obj.node, 0, output_format);
 
-    std::vector<std::shared_ptr<audio::engine::connection>> input_connections;
+    std::vector<audio::engine::connection_ptr> input_connections;
     input_connections.reserve(relay_obj.node->input_bus_count());
 
     for (uint32_t i = 0; i < relay_obj.node->input_bus_count(); ++i) {

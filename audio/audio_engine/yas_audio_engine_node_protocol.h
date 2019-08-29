@@ -6,16 +6,13 @@
 
 #include <optional>
 #include "yas_audio_engine_connection_protocol.h"
+#include "yas_audio_engine_ptr.h"
 
 namespace yas::audio {
-class graph;
-
 using graph_editing_f = std::function<void(audio::graph &)>;
 }  // namespace yas::audio
 
 namespace yas::audio::engine {
-class manager;
-
 struct node_args {
     uint32_t input_bus_count = 0;
     uint32_t output_bus_count = 0;
@@ -30,12 +27,14 @@ struct connectable_node {
     virtual void remove_connection(audio::engine::connection const &) = 0;
 };
 
+using connectable_node_ptr = std::shared_ptr<connectable_node>;
+
 struct manageable_node {
-    virtual std::shared_ptr<audio::engine::connection> input_connection(uint32_t const bus_idx) const = 0;
-    virtual std::shared_ptr<audio::engine::connection> output_connection(uint32_t const bus_idx) const = 0;
+    virtual audio::engine::connection_ptr input_connection(uint32_t const bus_idx) const = 0;
+    virtual audio::engine::connection_ptr output_connection(uint32_t const bus_idx) const = 0;
     virtual audio::engine::connection_wmap const &input_connections() const = 0;
     virtual audio::engine::connection_wmap const &output_connections() const = 0;
-    virtual void set_manager(std::shared_ptr<audio::engine::manager> const &) = 0;
+    virtual void set_manager(audio::engine::manager_ptr const &) = 0;
     virtual audio::engine::manager const &manager() const = 0;
     virtual void update_kernel() = 0;
     virtual void update_connections() = 0;
@@ -44,4 +43,6 @@ struct manageable_node {
     virtual graph_editing_f const &add_to_graph_handler() const = 0;
     virtual graph_editing_f const &remove_from_graph_handler() const = 0;
 };
+
+using manageable_node_ptr = std::shared_ptr<manageable_node>;
 }  // namespace yas::audio::engine

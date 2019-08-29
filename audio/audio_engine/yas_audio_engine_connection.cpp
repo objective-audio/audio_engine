@@ -27,12 +27,12 @@ audio::engine::connection::~connection() {
     }
 }
 
-std::shared_ptr<audio::engine::node> audio::engine::connection::source_node() const {
+audio::engine::node_ptr audio::engine::connection::source_node() const {
     std::lock_guard<std::recursive_mutex> lock(this->_mutex);
     return this->_source_node.lock();
 }
 
-std::shared_ptr<audio::engine::node> audio::engine::connection::destination_node() const {
+audio::engine::node_ptr audio::engine::connection::destination_node() const {
     std::lock_guard<std::recursive_mutex> lock(this->_mutex);
     return this->_destination_node.lock();
 }
@@ -53,17 +53,16 @@ void audio::engine::connection::remove_destination_node() {
     this->_destination_node.reset();
 }
 
-std::shared_ptr<audio::engine::node_removable> audio::engine::connection::removable() {
+audio::engine::node_removable_ptr audio::engine::connection::removable() {
     return std::dynamic_pointer_cast<node_removable>(shared_from_this());
 }
 
-std::shared_ptr<audio::engine::connection> audio::engine::connection::make_shared(audio::engine::node &src_node,
-                                                                                  uint32_t const src_bus,
-                                                                                  audio::engine::node &dst_node,
-                                                                                  uint32_t const dst_bus,
-                                                                                  audio::format const &format) {
-    auto connection = std::shared_ptr<audio::engine::connection>(
-        new audio::engine::connection{src_node, src_bus, dst_node, dst_bus, format});
+audio::engine::connection_ptr audio::engine::connection::make_shared(audio::engine::node &src_node,
+                                                                     uint32_t const src_bus,
+                                                                     audio::engine::node &dst_node,
+                                                                     uint32_t const dst_bus,
+                                                                     audio::format const &format) {
+    auto connection = connection_ptr(new audio::engine::connection{src_node, src_bus, dst_node, dst_bus, format});
     src_node.connectable()->add_connection(*connection);
     dst_node.connectable()->add_connection(*connection);
     return connection;

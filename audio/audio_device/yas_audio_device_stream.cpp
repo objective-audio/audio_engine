@@ -99,7 +99,7 @@ AudioStreamID audio::device::stream::stream_id() const {
     return this->_impl->_stream_id;
 }
 
-std::shared_ptr<audio::device> audio::device::stream::device() const {
+audio::device_ptr audio::device::stream::device() const {
     return device::device_for_id(this->_impl->_device_id);
 }
 
@@ -163,8 +163,8 @@ void audio::device::stream::_prepare() {
     this->_impl->add_listener(kAudioStreamPropertyStartingChannel, listener);
 }
 
-std::shared_ptr<audio::device::stream> audio::device::stream::make_shared(device::stream::args args) {
-    auto shared = std::shared_ptr<device::stream>(new device::stream{std::move(args)});
+audio::device::stream_ptr audio::device::stream::make_shared(device::stream::args args) {
+    auto shared = device::stream_ptr(new device::stream{std::move(args)});
     shared->_prepare();
     return shared;
 }

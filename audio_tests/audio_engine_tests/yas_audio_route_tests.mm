@@ -76,7 +76,7 @@ using namespace yas;
     manager->add_offline_output();
 
     auto format = audio::format({.sample_rate = 44100.0, .channel_count = 2});
-    std::shared_ptr<audio::engine::offline_output> &output = manager->offline_output();
+    audio::engine::offline_output_ptr const &output = manager->offline_output();
     auto engine_route = audio::engine::route::make_shared();
     auto tap = audio::engine::tap::make_shared();
 
@@ -141,7 +141,7 @@ using namespace yas;
 
     auto dst_format = audio::format({.sample_rate = 44100.0, .channel_count = 2});
     auto src_format = audio::format({.sample_rate = 44100.0, .channel_count = 1});
-    std::shared_ptr<audio::engine::offline_output> &output = manager->offline_output();
+    audio::engine::offline_output_ptr const &output = manager->offline_output();
     auto engine_route = audio::engine::route::make_shared();
 
     manager->connect(engine_route->node(), output->node(), dst_format);
@@ -151,7 +151,7 @@ using namespace yas;
         tap_called = false;
     }
 
-    std::vector<std::shared_ptr<audio::engine::tap>> taps;
+    std::vector<audio::engine::tap_ptr> taps;
     for (uint32_t i = 0; i < src_count; ++i) {
         taps.push_back(audio::engine::tap::make_shared());
         auto &tap = taps.at(i);
@@ -199,7 +199,7 @@ using namespace yas;
 
     auto dst_format = audio::format({.sample_rate = 44100.0, .channel_count = 4});
     auto src_format = audio::format({.sample_rate = 44100.0, .channel_count = 2});
-    std::shared_ptr<audio::engine::offline_output> &output = manager->offline_output();
+    audio::engine::offline_output_ptr const &output = manager->offline_output();
     auto engine_route = audio::engine::route::make_shared();
 
     manager->connect(engine_route->node(), output->node(), dst_format);
@@ -209,7 +209,7 @@ using namespace yas;
         tap_called = false;
     }
 
-    std::vector<std::shared_ptr<audio::engine::tap>> taps;
+    std::vector<audio::engine::tap_ptr> taps;
     for (uint32_t i = 0; i < src_count; ++i) {
         taps.push_back(audio::engine::tap::make_shared());
         auto &tap = taps.at(i);

@@ -5,6 +5,7 @@
 #pragma once
 
 #include <chaining/yas_chaining_umbrella.h>
+#include "yas_audio_engine_ptr.h"
 
 namespace yas::audio::engine {
 class au;
@@ -29,7 +30,7 @@ struct au_mixer : std::enable_shared_from_this<au_mixer> {
     audio::engine::au &au();
 
    private:
-    std::shared_ptr<audio::engine::au> _au;
+    audio::engine::au_ptr _au;
     chaining::any_observer_ptr _connections_observer = nullptr;
 
     au_mixer(au_mixer const &) = delete;
@@ -44,6 +45,6 @@ struct au_mixer : std::enable_shared_from_this<au_mixer> {
     void _update_unit_mixer_connections();
 
    public:
-    static std::shared_ptr<au_mixer> make_shared();
+    static au_mixer_ptr make_shared();
 };
 }  // namespace yas::audio::engine

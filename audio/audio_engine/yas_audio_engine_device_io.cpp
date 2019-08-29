@@ -19,21 +19,21 @@ using namespace yas;
 #pragma mark - core
 
 struct audio::engine::device_io::core {
-    std::shared_ptr<audio::device_io> _device_io = nullptr;
+    audio::device_io_ptr _device_io = nullptr;
 
-    void set_device(std::shared_ptr<audio::device> const &device) {
+    void set_device(audio::device_ptr const &device) {
         this->_device = device;
         if (this->_device_io) {
             this->_device_io->set_device(device);
         }
     }
 
-    std::shared_ptr<audio::device> device() {
+    audio::device_ptr device() {
         return this->_device;
     }
 
    private:
-    std::shared_ptr<audio::device> _device = nullptr;
+    audio::device_ptr _device = nullptr;
 };
 
 #pragma mark - audio::engine::device_io
@@ -43,11 +43,11 @@ audio::engine::device_io::device_io() : _core(std::make_unique<core>()) {
 
 audio::engine::device_io::~device_io() = default;
 
-void audio::engine::device_io::set_device(std::shared_ptr<audio::device> const &device) {
+void audio::engine::device_io::set_device(audio::device_ptr const &device) {
     this->_core->set_device(device);
 }
 
-std::shared_ptr<audio::device> audio::engine::device_io::device() const {
+audio::device_ptr audio::engine::device_io::device() const {
     return this->_core->device();
 }
 
@@ -59,7 +59,7 @@ audio::engine::node &audio::engine::device_io::node() {
     return *this->_node;
 }
 
-std::shared_ptr<audio::engine::manageable_device_io> audio::engine::device_io::manageable() {
+audio::engine::manageable_device_io_ptr audio::engine::device_io::manageable() {
     return std::dynamic_pointer_cast<manageable_device_io>(shared_from_this());
 }
 
@@ -71,7 +71,7 @@ void audio::engine::device_io::remove_raw_device_io() {
     this->_core->_device_io = nullptr;
 }
 
-std::shared_ptr<audio::device_io> &audio::engine::device_io::raw_device_io() {
+audio::device_io_ptr const &audio::engine::device_io::raw_device_io() {
     return this->_core->_device_io;
 }
 
@@ -83,10 +83,12 @@ void audio::engine::device_io::_prepare() {
     this->_node->set_render_handler([weak_engine_device_io](auto args) {
         auto &buffer = args.buffer;
 
-        if (auto engine_device_io = weak_engine_device_io.lock(); auto &device_io = engine_device_io->raw_device_io()) {
-            auto &input_buffer = device_io->input_buffer_on_render();
-            if (input_buffer && input_buffer->format() == buffer.format()) {
-                buffer.copy_from(*input_buffer);
+        if (auto engine_device_io = weak_engine_device_io.lock()) {
+            if (auto const &device_io = engine_device_io->raw_device_io()) {
+                auto const &input_buffer = device_io->input_buffer_on_render();
+                if (input_buffer && input_buffer->format() == buffer.format()) {
+                    buffer.copy_from(*input_buffer);
+                }
             }
         }
     });
@@ -135,7 +137,7 @@ void audio::engine::device_io::_update_device_io_connections() {
                         auto const &connection = connections.at(0);
                         if (auto dst_node = connection->destination_node();
                             dst_node && dst_node->is_input_renderable()) {
-                            auto &input_buffer = device_io->input_buffer_on_render();
+                            auto const &input_buffer = device_io->input_buffer_on_render();
                             auto const &input_time = device_io->input_time_on_render();
                             if (input_buffer && input_time) {
                                 if (connection->format == dst_node->input_format(connection->destination_bus)) {
@@ -186,8 +188,8 @@ bool audio::engine::device_io::_validate_connections() {
     return true;
 }
 
-std::shared_ptr<audio::engine::device_io> audio::engine::device_io::make_shared() {
-    auto shared = std::shared_ptr<audio::engine::device_io>(new audio::engine::device_io{});
+audio::engine::device_io_ptr audio::engine::device_io::make_shared() {
+    auto shared = device_io_ptr(new audio::engine::device_io{});
     shared->_prepare();
     return shared;
 }

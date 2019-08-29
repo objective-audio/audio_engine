@@ -16,18 +16,18 @@ using namespace yas;
 #pragma mark - core
 
 struct audio::engine::au::core {
-    void set_unit(std::shared_ptr<audio::unit> const &au) {
+    void set_unit(audio::unit_ptr const &au) {
         std::lock_guard<std::recursive_mutex> lock(this->_mutex);
         this->_unit = au;
     }
 
-    std::shared_ptr<audio::unit> unit() const {
+    audio::unit_ptr unit() const {
         std::lock_guard<std::recursive_mutex> lock(this->_mutex);
         return this->_unit;
     }
 
    private:
-    std::shared_ptr<audio::unit> _unit = nullptr;
+    audio::unit_ptr _unit = nullptr;
     mutable std::recursive_mutex _mutex;
 };
 
@@ -42,7 +42,7 @@ void audio::engine::au::set_prepare_unit_handler(prepare_unit_f handler) {
     this->_prepare_unit_handler = std::move(handler);
 }
 
-std::shared_ptr<audio::unit> audio::engine::au::unit() const {
+audio::unit_ptr audio::engine::au::unit() const {
     return this->_core->unit();
 }
 
@@ -132,8 +132,8 @@ chaining::chain_unsync_t<audio::engine::au::chaining_pair_t> audio::engine::au::
     return this->_notifier->chain();
 }
 
-chaining::chain_relayed_unsync_t<std::shared_ptr<audio::engine::au>, audio::engine::au::chaining_pair_t>
-audio::engine::au::chain(method const method) const {
+chaining::chain_relayed_unsync_t<audio::engine::au_ptr, audio::engine::au::chaining_pair_t> audio::engine::au::chain(
+    method const method) const {
     return this->_notifier->chain()
         .guard([method](auto const &pair) { return pair.first == method; })
         .to([](chaining_pair_t const &pair) { return pair.second; });
@@ -147,7 +147,7 @@ audio::engine::node &audio::engine::au::node() {
     return *this->_node;
 }
 
-std::shared_ptr<audio::engine::manageable_au> audio::engine::au::manageable() {
+audio::engine::manageable_au_ptr audio::engine::au::manageable() {
     return std::dynamic_pointer_cast<manageable_au>(shared_from_this());
 }
 
@@ -326,7 +326,7 @@ void audio::engine::au::_will_reset() {
 
 #pragma mark - factory
 
-std::shared_ptr<audio::engine::au> audio::engine::au::make_shared(OSType const type, OSType const sub_type) {
+audio::engine::au_ptr audio::engine::au::make_shared(OSType const type, OSType const sub_type) {
     return au::make_shared(AudioComponentDescription{
         .componentType = type,
         .componentSubType = sub_type,
@@ -336,12 +336,12 @@ std::shared_ptr<audio::engine::au> audio::engine::au::make_shared(OSType const t
     });
 }
 
-std::shared_ptr<audio::engine::au> audio::engine::au::make_shared(AudioComponentDescription const &acd) {
+audio::engine::au_ptr audio::engine::au::make_shared(AudioComponentDescription const &acd) {
     return au::make_shared({.acd = acd, .node_args = {.input_bus_count = 1, .output_bus_count = 1}});
 }
 
-std::shared_ptr<audio::engine::au> audio::engine::au::make_shared(au::args &&args) {
-    auto shared = std::shared_ptr<au>(new au{std::move(args.node_args)});
+audio::engine::au_ptr audio::engine::au::make_shared(au::args &&args) {
+    auto shared = au_ptr(new au{std::move(args.node_args)});
     shared->_prepare(args.acd);
     return shared;
 }

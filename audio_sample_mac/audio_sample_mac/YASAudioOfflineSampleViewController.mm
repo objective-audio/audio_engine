@@ -18,7 +18,7 @@ static double constexpr sample_rate = 44100.0;
 namespace yas::offline_sample::engine {
 struct sine {
     struct impl {
-        std::shared_ptr<audio::engine::tap> _tap = audio::engine::tap::make_shared();
+        audio::engine::tap_ptr _tap = audio::engine::tap::make_shared();
         double phase_on_render;
 
         void set_frequency(float const frequency) {
@@ -119,13 +119,13 @@ struct sine {
 
 namespace yas::sample {
 struct offline_vc_internal {
-    std::shared_ptr<audio::engine::manager> play_manager = audio::engine::manager::make_shared();
-    std::shared_ptr<audio::engine::au_output> play_au_output = audio::engine::au_output::make_shared();
-    std::shared_ptr<audio::engine::au_mixer> play_au_mixer = audio::engine::au_mixer::make_shared();
+    audio::engine::manager_ptr play_manager = audio::engine::manager::make_shared();
+    audio::engine::au_output_ptr play_au_output = audio::engine::au_output::make_shared();
+    audio::engine::au_mixer_ptr play_au_mixer = audio::engine::au_mixer::make_shared();
     offline_sample::engine::sine play_sine;
 
-    std::shared_ptr<audio::engine::manager> offline_manager = audio::engine::manager::make_shared();
-    std::shared_ptr<audio::engine::au_mixer> offline_au_mixer = audio::engine::au_mixer::make_shared();
+    audio::engine::manager_ptr offline_manager = audio::engine::manager::make_shared();
+    audio::engine::au_mixer_ptr offline_au_mixer = audio::engine::au_mixer::make_shared();
     offline_sample::engine::sine offline_sine;
 
     chaining::any_observer_ptr engine_observer = nullptr;
@@ -147,7 +147,7 @@ struct offline_vc_internal {
         this->play_manager->connect(this->play_sine.tap().node(), this->play_au_mixer->au().node(), format);
 
         this->offline_manager->add_offline_output();
-        std::shared_ptr<audio::engine::offline_output> &offline_output = this->offline_manager->offline_output();
+        audio::engine::offline_output_ptr const &offline_output = this->offline_manager->offline_output();
 
         this->offline_au_mixer->au().node().reset();
         this->offline_au_mixer->set_input_pan(0.0f, 0);

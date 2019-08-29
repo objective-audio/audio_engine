@@ -19,8 +19,8 @@ struct tap : std::enable_shared_from_this<tap> {
     audio::engine::node const &node() const;
     audio::engine::node &node();
 
-    std::shared_ptr<audio::engine::connection> input_connection_on_render(uint32_t const bus_idx) const;
-    std::shared_ptr<audio::engine::connection> output_connection_on_render(uint32_t const bus_idx) const;
+    connection_ptr input_connection_on_render(uint32_t const bus_idx) const;
+    connection_ptr output_connection_on_render(uint32_t const bus_idx) const;
     audio::engine::connection_smap input_connections_on_render() const;
     audio::engine::connection_smap output_connections_on_render() const;
 
@@ -30,10 +30,10 @@ struct tap : std::enable_shared_from_this<tap> {
    private:
     class kernel;
 
-    std::shared_ptr<audio::engine::node> _node;
+    node_ptr _node;
     audio::engine::node::render_f _render_handler;
     chaining::any_observer_ptr _reset_observer = nullptr;
-    std::shared_ptr<audio::engine::kernel> _kernel_on_render;
+    kernel_ptr _kernel_on_render;
 
     explicit tap(args);
 
@@ -45,7 +45,7 @@ struct tap : std::enable_shared_from_this<tap> {
     tap &operator=(tap &&) = delete;
 
    public:
-    static std::shared_ptr<tap> make_shared();
-    static std::shared_ptr<tap> make_shared(tap::args);
+    static tap_ptr make_shared();
+    static tap_ptr make_shared(tap::args);
 };
 }  // namespace yas::audio::engine

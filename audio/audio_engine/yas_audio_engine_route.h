@@ -5,6 +5,7 @@
 #pragma once
 
 #include <chaining/yas_chaining_umbrella.h>
+#include "yas_audio_engine_ptr.h"
 #include "yas_audio_route.h"
 
 namespace yas::audio::engine {
@@ -27,7 +28,7 @@ struct route : std::enable_shared_from_this<route> {
    private:
     class kernel;
 
-    std::shared_ptr<audio::engine::node> _node;
+    node_ptr _node;
     route_set_t _routes;
     chaining::any_observer_ptr _reset_observer = nullptr;
 
@@ -40,6 +41,6 @@ struct route : std::enable_shared_from_this<route> {
     void _erase_route_if(std::function<bool(audio::route const &)> pred);
 
    public:
-    static std::shared_ptr<route> make_shared();
+    static route_ptr make_shared();
 };
 }  // namespace yas::audio::engine

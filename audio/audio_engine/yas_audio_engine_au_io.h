@@ -5,6 +5,7 @@
 #pragma once
 
 #include <chaining/yas_chaining_umbrella.h>
+#include "yas_audio_engine_ptr.h"
 #include "yas_audio_pcm_buffer.h"
 #include "yas_audio_types.h"
 
@@ -22,7 +23,7 @@ struct au_io : std::enable_shared_from_this<au_io> {
         did_update_connection,
     };
 
-    using chaining_pair_t = std::pair<method, std::shared_ptr<au_io>>;
+    using chaining_pair_t = std::pair<method, au_io_ptr>;
 
     struct args {
         bool enable_input = true;
@@ -33,7 +34,7 @@ struct au_io : std::enable_shared_from_this<au_io> {
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
     void set_device(audio::device const &);
-    std::shared_ptr<audio::device> device() const;
+    audio::device_ptr device() const;
 #endif
 
     void set_channel_map(channel_map_t const &, audio::direction const);
@@ -44,13 +45,13 @@ struct au_io : std::enable_shared_from_this<au_io> {
     uint32_t input_device_channel_count() const;
 
     [[nodiscard]] chaining::chain_unsync_t<chaining_pair_t> chain() const;
-    [[nodiscard]] chaining::chain_relayed_unsync_t<std::shared_ptr<au_io>, chaining_pair_t> chain(method const) const;
+    [[nodiscard]] chaining::chain_relayed_unsync_t<au_io_ptr, chaining_pair_t> chain(method const) const;
 
     audio::engine::au const &au() const;
     audio::engine::au &au();
 
    private:
-    std::shared_ptr<audio::engine::au> _au;
+    audio::engine::au_ptr _au;
     channel_map_t _channel_map[2];
     chaining::any_observer_ptr _connections_observer = nullptr;
     chaining::notifier_ptr<chaining_pair_t> _notifier = chaining::notifier<chaining_pair_t>::make_shared();
@@ -62,8 +63,8 @@ struct au_io : std::enable_shared_from_this<au_io> {
     void _update_unit_io_connections();
 
    public:
-    static std::shared_ptr<au_io> make_shared();
-    static std::shared_ptr<au_io> make_shared(au_io::args);
+    static au_io_ptr make_shared();
+    static au_io_ptr make_shared(au_io::args);
 };
 
 struct au_output : std::enable_shared_from_this<au_output> {
@@ -76,12 +77,12 @@ struct au_output : std::enable_shared_from_this<au_output> {
     audio::engine::au_io &au_io();
 
    private:
-    std::shared_ptr<audio::engine::au_io> _au_io;
+    audio::engine::au_io_ptr _au_io;
 
     au_output();
 
    public:
-    static std::shared_ptr<au_output> make_shared();
+    static au_output_ptr make_shared();
 };
 
 struct au_input : std::enable_shared_from_this<au_input> {
@@ -94,9 +95,9 @@ struct au_input : std::enable_shared_from_this<au_input> {
     audio::engine::au_io &au_io();
 
    private:
-    std::shared_ptr<audio::engine::au_io> _au_io;
+    audio::engine::au_io_ptr _au_io;
 
-    std::shared_ptr<audio::pcm_buffer> _input_buffer = nullptr;
+    audio::pcm_buffer_ptr _input_buffer = nullptr;
     chaining::any_observer_ptr _connections_observer = nullptr;
 
     au_input();
@@ -106,6 +107,6 @@ struct au_input : std::enable_shared_from_this<au_input> {
     void _update_unit_input_connections();
 
    public:
-    static std::shared_ptr<au_input> make_shared();
+    static au_input_ptr make_shared();
 };
 }  // namespace yas::audio::engine

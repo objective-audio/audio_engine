@@ -170,7 +170,7 @@ uint8_t const *test::data_ptr_from_buffer(audio::pcm_buffer const &buffer, uint3
     }
 }
 
-void test::raw_unit_render_on_sub_thread(std::shared_ptr<audio::unit> &unit, audio::format &format,
+void test::raw_unit_render_on_sub_thread(audio::unit_ptr const &unit, audio::format &format,
                                          uint32_t const frame_length, std::size_t const count,
                                          NSTimeInterval const wait) {
     auto lambda = [unit, format, frame_length, count]() mutable {

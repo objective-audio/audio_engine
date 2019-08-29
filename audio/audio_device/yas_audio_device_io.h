@@ -8,25 +8,25 @@
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
 
 #include <functional>
+#include "yas_audio_engine_ptr.h"
 #include "yas_audio_time.h"
 #include "yas_audio_types.h"
 
 namespace yas::audio {
 class pcm_buffer;
-class device;
 
-struct device_io : std::enable_shared_from_this<device_io> {
+struct device_io final : std::enable_shared_from_this<device_io> {
     class impl;
 
     struct render_args {
-        std::shared_ptr<audio::pcm_buffer> &output_buffer;
+        audio::pcm_buffer_ptr const &output_buffer;
         std::optional<audio::time> const when;
     };
 
     using render_f = std::function<void(render_args)>;
 
-    void set_device(std::shared_ptr<audio::device> const device);
-    std::shared_ptr<audio::device> const &device() const;
+    void set_device(audio::device_ptr const device);
+    audio::device_ptr const &device() const;
     bool is_running() const;
     void set_render_handler(render_f);
     void set_maximum_frames_per_slice(uint32_t const frames);
@@ -35,8 +35,8 @@ struct device_io : std::enable_shared_from_this<device_io> {
     void start() const;
     void stop() const;
 
-    std::shared_ptr<pcm_buffer> &input_buffer_on_render();
-    std::shared_ptr<audio::time> const &input_time_on_render() const;
+    pcm_buffer_ptr const &input_buffer_on_render();
+    audio::time_ptr const &input_time_on_render() const;
 
    private:
     class kernel;
@@ -45,13 +45,13 @@ struct device_io : std::enable_shared_from_this<device_io> {
 
     device_io();
 
-    void _prepare(std::shared_ptr<audio::device> const &);
+    void _prepare(audio::device_ptr const &);
 
     void _initialize() const;
     void _uninitialize() const;
 
    public:
-    static std::shared_ptr<audio::device_io> make_shared(std::shared_ptr<audio::device> const &);
+    static audio::device_io_ptr make_shared(audio::device_ptr const &);
 };
 
 }  // namespace yas::audio

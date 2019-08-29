@@ -6,6 +6,10 @@
 
 #include <memory>
 
+#if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
+
+#include "yas_audio_ptr.h"
+
 namespace yas::audio {
 class device_io;
 }
@@ -16,6 +20,10 @@ struct manageable_device_io {
 
     virtual void add_raw_device_io() = 0;
     virtual void remove_raw_device_io() = 0;
-    virtual std::shared_ptr<audio::device_io> &raw_device_io() = 0;
+    virtual audio::device_io_ptr const &raw_device_io() = 0;
 };
+
+using manageable_device_io_ptr = std::shared_ptr<manageable_device_io>;
 }  // namespace yas::audio::engine
+
+#endif
