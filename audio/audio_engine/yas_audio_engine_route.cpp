@@ -42,8 +42,7 @@ void audio::engine::route::_prepare() {
 
         if (auto route = weak_route.lock()) {
             if (auto kernel = route->node().kernel()) {
-                auto const &routes =
-                    std::any_cast<std::shared_ptr<audio::engine::route::kernel>>(kernel->decorator)->routes;
+                auto const &routes = std::any_cast<audio::engine::route::kernel_ptr>(kernel->decorator)->routes;
                 auto output_connection = kernel->output_connection(dst_bus_idx);
                 auto input_connections = kernel->input_connections();
                 uint32_t const dst_ch_count = dst_buffer.format().channel_count();

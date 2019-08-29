@@ -46,7 +46,7 @@ struct graph : std::enable_shared_from_this<graph>, interruptable_graph {
     std::map<uint16_t, unit_ptr> _units;
     std::map<uint16_t, unit_ptr> _io_units;
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
-    std::unordered_set<std::shared_ptr<device_io>> _device_ios;
+    std::unordered_set<device_io_ptr> _device_ios;
 #endif
 
     explicit graph(uint8_t const key);

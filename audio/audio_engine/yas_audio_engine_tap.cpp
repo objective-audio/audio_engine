@@ -38,7 +38,7 @@ void audio::engine::tap::_prepare() {
             if (auto kernel = tap->_node->kernel()) {
                 tap->_kernel_on_render = kernel;
 
-                auto tap_kernel = std::any_cast<std::shared_ptr<tap::kernel>>(kernel->decorator);
+                auto tap_kernel = std::any_cast<tap::kernel_ptr>(kernel->decorator);
                 auto const &handler = tap_kernel->render_handler;
 
                 if (handler) {

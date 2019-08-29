@@ -33,7 +33,7 @@ struct tap : std::enable_shared_from_this<tap> {
     node_ptr _node;
     audio::engine::node::render_f _render_handler;
     chaining::any_observer_ptr _reset_observer = nullptr;
-    kernel_ptr _kernel_on_render;
+    engine::kernel_ptr _kernel_on_render;
 
     explicit tap(args);
 
@@ -43,6 +43,8 @@ struct tap : std::enable_shared_from_this<tap> {
     tap(tap &&) = delete;
     tap &operator=(tap const &) = delete;
     tap &operator=(tap &&) = delete;
+
+    using kernel_ptr = std::shared_ptr<kernel>;
 
    public:
     static tap_ptr make_shared();

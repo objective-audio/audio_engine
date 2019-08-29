@@ -50,6 +50,8 @@ struct device_io final : std::enable_shared_from_this<device_io> {
     void _initialize() const;
     void _uninitialize() const;
 
+    using kernel_ptr = std::shared_ptr<kernel>;
+
    public:
     static audio::device_io_ptr make_shared(audio::device_ptr const &);
 };
