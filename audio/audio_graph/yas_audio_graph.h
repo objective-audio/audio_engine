@@ -11,11 +11,6 @@
 #include "yas_audio_types.h"
 
 namespace yas::audio {
-class unit;
-#if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
-class device_io;
-#endif
-
 struct graph : std::enable_shared_from_this<graph>, interruptable_graph {
     virtual ~graph();
 

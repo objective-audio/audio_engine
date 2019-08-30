@@ -20,14 +20,7 @@ template <typename T, typename U>
 class result;
 }
 
-namespace yas::audio {
-class time;
-}
-
 namespace yas::audio::engine {
-class manager;
-class kernel;
-
 struct node : std::enable_shared_from_this<node>, connectable_node, manageable_node {
     enum class method {
         will_reset,

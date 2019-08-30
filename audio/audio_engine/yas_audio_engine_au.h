@@ -11,13 +11,7 @@
 #include "yas_audio_engine_ptr.h"
 #include "yas_audio_unit.h"
 
-namespace yas::audio {
-class graph;
-}
-
 namespace yas::audio::engine {
-class node;
-
 struct au : manageable_au, std::enable_shared_from_this<au> {
     enum class method {
         will_update_connections,
