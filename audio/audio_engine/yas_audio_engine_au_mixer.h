@@ -8,8 +8,6 @@
 #include "yas_audio_engine_ptr.h"
 
 namespace yas::audio::engine {
-class au;
-
 struct au_mixer : std::enable_shared_from_this<au_mixer> {
     virtual ~au_mixer();
 

@@ -16,8 +16,6 @@ class device;
 #endif
 
 namespace yas::audio::engine {
-class au;
-
 struct au_io : std::enable_shared_from_this<au_io> {
     enum class method {
         did_update_connection,

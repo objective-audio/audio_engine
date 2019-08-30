@@ -13,8 +13,6 @@
 #include "yas_audio_types.h"
 
 namespace yas::audio {
-class pcm_buffer;
-
 struct device_io final : std::enable_shared_from_this<device_io> {
     class impl;
 

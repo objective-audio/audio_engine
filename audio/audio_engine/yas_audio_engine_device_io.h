@@ -13,10 +13,6 @@
 #include "yas_audio_engine_node.h"
 #include "yas_audio_engine_ptr.h"
 
-namespace yas::audio {
-class device;
-}
-
 namespace yas::audio::engine {
 struct device_io : manageable_device_io, std::enable_shared_from_this<device_io> {
     class core;

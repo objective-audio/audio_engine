@@ -17,14 +17,7 @@ template <typename T, typename U>
 class result;
 }  // namespace yas
 
-namespace yas::audio {
-class graph;
-}
-
 namespace yas::audio::engine {
-class device_io;
-class offline_output;
-
 struct manager : std::enable_shared_from_this<manager> {
     class impl;
 

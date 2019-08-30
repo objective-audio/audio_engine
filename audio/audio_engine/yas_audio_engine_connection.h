@@ -9,8 +9,6 @@
 #include "yas_audio_format.h"
 
 namespace yas::audio::engine {
-class node;
-
 struct connection : node_removable, std::enable_shared_from_this<connection> {
     virtual ~connection();
 

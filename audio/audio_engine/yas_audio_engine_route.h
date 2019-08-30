@@ -9,8 +9,6 @@
 #include "yas_audio_route.h"
 
 namespace yas::audio::engine {
-class node;
-
 struct route : std::enable_shared_from_this<route> {
     virtual ~route();
 
