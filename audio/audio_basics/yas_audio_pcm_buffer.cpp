@@ -226,6 +226,15 @@ audio::pcm_buffer::pcm_buffer(audio::format const &format, audio::pcm_buffer con
                  channel_map) {
 }
 
+audio::pcm_buffer::pcm_buffer(pcm_buffer &&other)
+    : _format(other._format),
+      _abl_ptr(other._abl_ptr),
+      _frame_capacity(other._frame_capacity),
+      _frame_length(other._frame_length),
+      _abl(std::move(other._abl)),
+      _data(std::move(other._data)) {
+}
+
 audio::format const &audio::pcm_buffer::format() const {
     return this->_format;
 }

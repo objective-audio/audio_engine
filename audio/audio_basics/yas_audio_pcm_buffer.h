@@ -43,8 +43,7 @@ struct pcm_buffer final {
     pcm_buffer(audio::format const &format, uint32_t const frame_capacity);
     pcm_buffer(audio::format const &format, pcm_buffer const &from_buffer, channel_map_t const &channel_map);
 
-    pcm_buffer(pcm_buffer &&) = default;
-    pcm_buffer &operator=(pcm_buffer &&) = default;
+    pcm_buffer(pcm_buffer &&);
 
     audio::format const &format() const;
     AudioBufferList *audio_buffer_list();
@@ -101,6 +100,7 @@ struct pcm_buffer final {
     pcm_buffer(audio::format const &format, abl_uptr &&abl, abl_data_uptr &&data, uint32_t const frame_capacity);
     pcm_buffer(audio::format const &format, abl_uptr &&abl, uint32_t const frame_capacity);
 
+    pcm_buffer &operator=(pcm_buffer &&) = delete;
     pcm_buffer(pcm_buffer const &) = delete;
     pcm_buffer &operator=(pcm_buffer const &) = delete;
 
