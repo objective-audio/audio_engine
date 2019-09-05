@@ -1268,6 +1268,10 @@ using namespace yas;
     audio::pcm_buffer pcm_buffer(format, 4);
 
     auto moved = std::move(pcm_buffer);
+
+    XCTAssertEqual(moved.format(), format);
+    XCTAssertEqual(moved.frame_capacity(), 4);
+    XCTAssertEqual(moved.frame_length(), 4);
 }
 
 #pragma mark -
