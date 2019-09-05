@@ -88,9 +88,6 @@ struct device {
     bool operator==(device const &) const;
     bool operator!=(device const &) const;
 
-    device(device &&) = default;
-    device &operator=(device &&) = default;
-
    protected:
     explicit device(AudioDeviceID const device_id);
 
@@ -111,6 +108,8 @@ struct device {
     void _udpate_streams(AudioObjectPropertyScope const scope);
     void _update_format(AudioObjectPropertyScope const scope);
 
+    device(device &&) = delete;
+    device &operator=(device &&) = delete;
     device(device const &) = delete;
     device &operator=(device const &) = delete;
 };
