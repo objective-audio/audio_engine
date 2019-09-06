@@ -140,9 +140,9 @@ static void setupDirectory() {
     auto file_url = test::temporary_test_dir_url().appending(file_name);
 
     {
-        auto file_result = audio::make_created_file({.file_url = file_url,
-                                                     .file_type = audio::file_type::wave,
-                                                     .settings = audio::wave_file_settings(48000.0, 2, 16)});
+        auto file_result = audio::file::make_created({.file_url = file_url,
+                                                      .file_type = audio::file_type::wave,
+                                                      .settings = audio::wave_file_settings(48000.0, 2, 16)});
         XCTAssertTrue(file_result);
 
         auto const &file = file_result.value();
@@ -158,7 +158,7 @@ static void setupDirectory() {
     }
 
     {
-        auto file_result = audio::make_opened_file({.file_url = file_url});
+        auto file_result = audio::file::make_opened({.file_url = file_url});
         XCTAssertTrue(file_result);
 
         auto const &file = file_result.value();
@@ -178,9 +178,9 @@ static void setupDirectory() {
     auto const file_name = "test.wav";
     auto file_url = test::temporary_test_dir_url().appending(file_name);
 
-    auto file_result = audio::make_created_file({.file_url = file_url,
-                                                 .file_type = audio::file_type::wave,
-                                                 .settings = audio::wave_file_settings(48000.0, 2, 16)});
+    auto file_result = audio::file::make_created({.file_url = file_url,
+                                                  .file_type = audio::file_type::wave,
+                                                  .settings = audio::wave_file_settings(48000.0, 2, 16)});
 
     auto &file = file_result.value();
 

@@ -93,6 +93,9 @@ struct file final {
     read_result_t read_into_buffer(audio::pcm_buffer &buffer, uint32_t const frame_length = 0);
     write_result_t write_from_buffer(audio::pcm_buffer const &buffer, bool const async = false);
 
+    static file::make_opened_result_t make_opened(file::open_args);
+    static file::make_created_result_t make_created(file::create_args);
+
    private:
     std::optional<format> _file_format = std::nullopt;
     std::optional<format> _processing_format = std::nullopt;
@@ -107,9 +110,6 @@ struct file final {
     file(file const &) = delete;
     file &operator=(file const &) = delete;
 };
-
-file::make_opened_result_t make_opened_file(file::open_args);
-file::make_created_result_t make_created_file(file::create_args);
 }  // namespace yas::audio
 
 namespace yas {
