@@ -154,7 +154,7 @@ audio::engine::offline_start_result_t audio::engine::offline_output::start(offli
 
         auto task = task::make_shared(std::move(task_lambda));
         this->_queue = task_queue{1};
-        this->_queue->push_back(*task);
+        this->_queue->push_back(task);
     } else {
         return offline_start_result_t(offline_start_error_t::connection_not_found);
     }
