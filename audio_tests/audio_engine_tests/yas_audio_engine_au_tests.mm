@@ -43,7 +43,7 @@ using namespace yas;
         XCTAssertEqual(parameter.default_value, delay_au->global_parameter_value(parameter.parameter_id));
     }
 
-    auto &connection = manager->connect(delay_au->node(), output->node(), format);
+    auto const connection = manager->connect(delay_au->node(), output->node(), format);
 
     XCTestExpectation *expectation = [self expectationWithDescription:@"First Render"];
 

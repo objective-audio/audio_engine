@@ -20,10 +20,10 @@ audio::engine::connection::connection(node &src_node, uint32_t const src_bus, no
 
 audio::engine::connection::~connection() {
     if (auto node = this->_destination_node.lock()) {
-        node->connectable()->remove_connection(*this);
+        node->connectable()->remove_input_connection(this->destination_bus);
     }
     if (auto node = this->_source_node.lock()) {
-        node->connectable()->remove_connection(*this);
+        node->connectable()->remove_output_connection(this->source_bus);
     }
 }
 
@@ -54,7 +54,11 @@ void audio::engine::connection::remove_destination_node() {
 }
 
 audio::engine::node_removable_ptr audio::engine::connection::removable() {
-    return std::dynamic_pointer_cast<node_removable>(shared_from_this());
+    return std::dynamic_pointer_cast<node_removable>(this->_weak_connection.lock());
+}
+
+void audio::engine::connection::_prepare(connection_ptr const &shared) {
+    this->_weak_connection = shared;
 }
 
 audio::engine::connection_ptr audio::engine::connection::make_shared(audio::engine::node &src_node,
@@ -62,8 +66,9 @@ audio::engine::connection_ptr audio::engine::connection::make_shared(audio::engi
                                                                      audio::engine::node &dst_node,
                                                                      uint32_t const dst_bus,
                                                                      audio::format const &format) {
-    auto connection = connection_ptr(new audio::engine::connection{src_node, src_bus, dst_node, dst_bus, format});
-    src_node.connectable()->add_connection(*connection);
-    dst_node.connectable()->add_connection(*connection);
-    return connection;
+    auto shared = connection_ptr(new audio::engine::connection{src_node, src_bus, dst_node, dst_bus, format});
+    shared->_prepare(shared);
+    src_node.connectable()->add_connection(shared);
+    dst_node.connectable()->add_connection(shared);
+    return shared;
 }

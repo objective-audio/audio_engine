@@ -9,7 +9,7 @@
 #include "yas_audio_format.h"
 
 namespace yas::audio::engine {
-struct connection : node_removable, std::enable_shared_from_this<connection> {
+struct connection : node_removable {
     virtual ~connection();
 
     uint32_t const source_bus;
@@ -24,6 +24,7 @@ struct connection : node_removable, std::enable_shared_from_this<connection> {
     mutable std::recursive_mutex _mutex;
     std::weak_ptr<node> _source_node;
     std::weak_ptr<node> _destination_node;
+    std::weak_ptr<connection> _weak_connection;
 
     connection(audio::engine::node &source_node, uint32_t const source_bus_idx, audio::engine::node &destination_node,
                uint32_t const destination_bus_idx, audio::format const &format);
@@ -37,7 +38,7 @@ struct connection : node_removable, std::enable_shared_from_this<connection> {
     void remove_source_node() override;
     void remove_destination_node() override;
 
-    void _remove_connection_from_nodes(connection const &);
+    void _prepare(connection_ptr const &);
 
    public:
     static connection_ptr make_shared(audio::engine::node &src_node, uint32_t const src_bus,

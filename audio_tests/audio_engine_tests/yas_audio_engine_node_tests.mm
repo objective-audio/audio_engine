@@ -150,7 +150,7 @@ using namespace yas;
         test::node_object input_obj;
         auto input_connection =
             audio::engine::connection::make_shared(*input_obj.node, 0, *relay_obj.node, i, input_format);
-        input_obj.node->connectable()->add_connection(*input_connection);
+        input_obj.node->connectable()->add_connection(input_connection);
         input_connections.push_back(input_connection);
     }
 

@@ -30,14 +30,14 @@ using namespace yas;
     XCTAssertEqual(manager->nodes().size(), 0);
     XCTAssertEqual(manager->connections().size(), 0);
 
-    auto &connection = manager->connect(*source_obj.node, *destination_obj.node, format);
+    auto const connection = manager->connect(*source_obj.node, *destination_obj.node, format);
 
     auto &nodes = manager->nodes();
     auto &connections = manager->connections();
     XCTAssertGreaterThanOrEqual(nodes.count(source_obj.node), 1);
     XCTAssertGreaterThanOrEqual(nodes.count(destination_obj.node), 1);
     XCTAssertEqual(connections.size(), 1);
-    XCTAssertEqual(*connections.begin(), connection.shared_from_this());
+    XCTAssertEqual(*connections.begin(), connection);
 }
 
 - (void)test_connect_failed_no_bus {
