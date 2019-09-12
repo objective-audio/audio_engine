@@ -16,8 +16,7 @@ struct offline_output : manageable_offline_output, std::enable_shared_from_this<
 
     bool is_running() const;
 
-    audio::engine::node const &node() const;
-    audio::engine::node &node();
+    audio::engine::node_ptr const &node() const;
 
     manageable_offline_output_ptr manageable();
 

@@ -144,7 +144,7 @@ using namespace yas;
     XCTAssertEqual(delay_au->global_parameter_value(kDelayParam_LopassCutoff), lopass_cutoff_value);
     XCTAssertEqual(delay_au->global_parameter_value(kDelayParam_WetDryMix), wet_dry_mix);
 
-    delay_au->node().reset();
+    delay_au->node()->reset();
 
     XCTAssertNotEqual(delay_au->global_parameter_value(kDelayParam_DelayTime), delay_time_value);
     XCTAssertNotEqual(delay_au->global_parameter_value(kDelayParam_Feedback), feedback_value);

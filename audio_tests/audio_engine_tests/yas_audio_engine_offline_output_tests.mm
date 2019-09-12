@@ -134,10 +134,10 @@ using namespace yas;
 
     auto connection = audio::engine::connection::make_shared(tap->node(), 0, output->node(), 0, format);
 
-    output->node().connectable()->add_connection(connection);
-    output->node().manageable()->update_kernel();
-    tap->node().connectable()->add_connection(connection);
-    tap->node().manageable()->update_kernel();
+    output->node()->connectable()->add_connection(connection);
+    output->node()->manageable()->update_kernel();
+    tap->node()->connectable()->add_connection(connection);
+    tap->node()->manageable()->update_kernel();
 
     XCTestExpectation *tapNodeExpectation = [self expectationWithDescription:@"tap node render"];
 
@@ -227,8 +227,8 @@ using namespace yas;
 - (void)test_bus_count {
     auto output = audio::engine::offline_output::make_shared();
 
-    XCTAssertEqual(output->node().output_bus_count(), 0);
-    XCTAssertEqual(output->node().input_bus_count(), 1);
+    XCTAssertEqual(output->node()->output_bus_count(), 0);
+    XCTAssertEqual(output->node()->input_bus_count(), 1);
 }
 
 - (void)test_reset_to_stop {
@@ -238,10 +238,10 @@ using namespace yas;
 
     auto connection = audio::engine::connection::make_shared(tap->node(), 0, output->node(), 0, format);
 
-    output->node().connectable()->add_connection(connection);
-    output->node().manageable()->update_kernel();
-    tap->node().connectable()->add_connection(connection);
-    tap->node().manageable()->update_kernel();
+    output->node()->connectable()->add_connection(connection);
+    output->node()->manageable()->update_kernel();
+    tap->node()->connectable()->add_connection(connection);
+    tap->node()->manageable()->update_kernel();
 
     auto promise = std::make_shared<std::promise<void>>();
     auto future = promise->get_future();
@@ -269,7 +269,7 @@ using namespace yas;
 
     future.get();
 
-    output->node().reset();
+    output->node()->reset();
 
     [self waitForExpectationsWithTimeout:10.0
                                  handler:^(NSError *error){

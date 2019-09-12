@@ -9,13 +9,13 @@
 
 using namespace yas;
 
-audio::engine::connection::connection(node &src_node, uint32_t const src_bus, node &dst_node, uint32_t const dst_bus,
-                                      audio::format const &format)
+audio::engine::connection::connection(node_ptr const &src_node, uint32_t const src_bus, node_ptr const &dst_node,
+                                      uint32_t const dst_bus, audio::format const &format)
     : source_bus(src_bus),
       destination_bus(dst_bus),
       format(format),
-      _source_node(to_weak(src_node.shared_from_this())),
-      _destination_node(to_weak(dst_node.shared_from_this())) {
+      _source_node(to_weak(src_node)),
+      _destination_node(to_weak(dst_node)) {
 }
 
 audio::engine::connection::~connection() {
@@ -61,14 +61,14 @@ void audio::engine::connection::_prepare(connection_ptr const &shared) {
     this->_weak_connection = shared;
 }
 
-audio::engine::connection_ptr audio::engine::connection::make_shared(audio::engine::node &src_node,
+audio::engine::connection_ptr audio::engine::connection::make_shared(audio::engine::node_ptr const &src_node,
                                                                      uint32_t const src_bus,
-                                                                     audio::engine::node &dst_node,
+                                                                     audio::engine::node_ptr const &dst_node,
                                                                      uint32_t const dst_bus,
                                                                      audio::format const &format) {
     auto shared = connection_ptr(new audio::engine::connection{src_node, src_bus, dst_node, dst_bus, format});
     shared->_prepare(shared);
-    src_node.connectable()->add_connection(shared);
-    dst_node.connectable()->add_connection(shared);
+    src_node->connectable()->add_connection(shared);
+    dst_node->connectable()->add_connection(shared);
     return shared;
 }

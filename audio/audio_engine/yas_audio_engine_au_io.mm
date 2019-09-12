@@ -155,11 +155,11 @@ void audio::engine::au_io::_update_unit_io_connections() {
 
     auto const output_idx = to_uint32(direction::output);
     auto &output_map = this->_channel_map[output_idx];
-    update_channel_map(output_map, _au->node().input_format(output_idx), this->output_device_channel_count());
+    update_channel_map(output_map, this->_au->node()->input_format(output_idx), this->output_device_channel_count());
 
     auto const input_idx = to_uint32(direction::input);
     auto &input_map = this->_channel_map[input_idx];
-    update_channel_map(input_map, this->_au->node().output_format(input_idx), this->input_device_channel_count());
+    update_channel_map(input_map, this->_au->node()->output_format(input_idx), this->input_device_channel_count());
 
     unit->set_channel_map(output_map, kAudioUnitScope_Output, output_idx);
     unit->set_channel_map(input_map, kAudioUnitScope_Output, input_idx);
@@ -236,7 +236,7 @@ void audio::engine::au_input::_prepare() {
 void audio::engine::au_input::_update_unit_input_connections() {
     auto unit = this->_au_io->au().unit();
 
-    if (auto out_connection = _au_io->au().node().output_connection(1)) {
+    if (auto out_connection = _au_io->au().node()->output_connection(1)) {
         unit->attach_input_callback();
 
         this->_input_buffer = std::make_shared<pcm_buffer>(out_connection->format, 4096);
@@ -249,11 +249,11 @@ void audio::engine::au_input::_update_unit_input_connections() {
                     input_buffer->set_frame_length(render_parameters.in_number_frames);
                     render_parameters.io_data = input_buffer->audio_buffer_list();
 
-                    if (auto const kernel = au_input->au_io().au().node().kernel()) {
+                    if (auto const kernel = au_input->au_io().au().node()->kernel()) {
                         if (auto const connection = kernel->output_connection(1)) {
                             auto format = connection->format;
                             time time(*render_parameters.io_time_stamp, format.sample_rate());
-                            au_input->au_io().au().node().set_render_time_on_render(time);
+                            au_input->au_io().au().node()->set_render_time_on_render(time);
 
                             if (auto io_unit = au_input->au_io().au().unit()) {
                                 render_parameters.in_bus_number = 1;

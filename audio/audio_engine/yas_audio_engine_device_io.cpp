@@ -51,12 +51,8 @@ audio::device_ptr audio::engine::device_io::device() const {
     return this->_core->device();
 }
 
-audio::engine::node const &audio::engine::device_io::node() const {
-    return *this->_node;
-}
-
-audio::engine::node &audio::engine::device_io::node() {
-    return *this->_node;
+audio::engine::node_ptr const &audio::engine::device_io::node() const {
+    return this->_node;
 }
 
 audio::engine::manageable_device_io_ptr audio::engine::device_io::manageable() {
@@ -118,7 +114,7 @@ void audio::engine::device_io::_update_device_io_connections() {
 
     auto render_handler = [weak_engine_device_io, weak_device_io](auto args) {
         if (auto engine_device_io = weak_engine_device_io.lock()) {
-            if (auto kernel = engine_device_io->node().kernel()) {
+            if (auto kernel = engine_device_io->node()->kernel()) {
                 auto const connections = kernel->input_connections();
                 if (connections.count(0) > 0) {
                     auto const &connection = connections.at(0);

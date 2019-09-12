@@ -42,18 +42,18 @@ struct manager : std::enable_shared_from_this<manager> {
 
     virtual ~manager();
 
-    engine::connection_ptr connect(engine::node &source_node, engine::node &destination_node,
+    engine::connection_ptr connect(engine::node_ptr const &source_node, engine::node_ptr const &destination_node,
                                    audio::format const &format);
-    engine::connection_ptr connect(engine::node &source_node, engine::node &destination_node,
+    engine::connection_ptr connect(engine::node_ptr const &source_node, engine::node_ptr const &destination_node,
                                    uint32_t const source_bus_idx, uint32_t const destination_bus_idx,
                                    audio::format const &format);
 
     void disconnect(engine::connection_ptr const &);
-    void disconnect(engine::node &);
-    void disconnect_input(engine::node const &);
-    void disconnect_input(engine::node const &, uint32_t const bus_idx);
-    void disconnect_output(engine::node const &);
-    void disconnect_output(engine::node const &, uint32_t const bus_idx);
+    void disconnect(engine::node_ptr const &);
+    void disconnect_input(engine::node_ptr const &);
+    void disconnect_input(engine::node_ptr const &, uint32_t const bus_idx);
+    void disconnect_output(engine::node_ptr const &);
+    void disconnect_output(engine::node_ptr const &, uint32_t const bus_idx);
 
     add_result_t add_offline_output();
     remove_result_t remove_offline_output();
@@ -90,17 +90,17 @@ struct manager : std::enable_shared_from_this<manager> {
 
     void prepare();
 
-    bool _node_exists(engine::node &node);
-    void _attach_node(engine::node &node);
-    void _detach_node(engine::node &node);
-    void _detach_node_if_unused(engine::node &node);
+    bool _node_exists(engine::node_ptr const &node);
+    void _attach_node(engine::node_ptr const &node);
+    void _detach_node(engine::node_ptr const &node);
+    void _detach_node_if_unused(engine::node_ptr const &node);
     bool _prepare_graph();
     void _disconnect_node_with_predicate(std::function<bool(connection const &)> predicate);
-    void _add_node_to_graph(engine::node &node);
-    void _remove_node_from_graph(engine::node &node);
+    void _add_node_to_graph(engine::node_ptr const &node);
+    void _remove_node_from_graph(engine::node_ptr const &node);
     bool _add_connection(engine::connection_ptr const &connection);
     void _remove_connection_from_nodes(engine::connection_ptr const &connection);
-    void _update_node_connections(engine::node &node);
+    void _update_node_connections(engine::node_ptr const &node);
     void _update_all_node_connections();
     engine::connection_set _input_connections_for_destination_node(engine::node_ptr const &node);
     engine::connection_set _output_connections_for_source_node(engine::node_ptr const &node);

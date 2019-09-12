@@ -22,8 +22,7 @@ struct device_io : manageable_device_io, std::enable_shared_from_this<device_io>
     void set_device(audio::device_ptr const &device);
     audio::device_ptr device() const;
 
-    audio::engine::node const &node() const;
-    audio::engine::node &node();
+    audio::engine::node_ptr const &node() const;
 
     manageable_device_io_ptr manageable();
 
