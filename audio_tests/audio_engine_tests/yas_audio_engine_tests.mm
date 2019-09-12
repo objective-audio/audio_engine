@@ -30,7 +30,7 @@ using namespace yas;
     XCTAssertEqual(manager->nodes().size(), 0);
     XCTAssertEqual(manager->connections().size(), 0);
 
-    auto const connection = manager->connect(*source_obj.node, *destination_obj.node, format);
+    auto const connection = manager->connect(source_obj.node, destination_obj.node, format);
 
     auto &nodes = manager->nodes();
     auto &connections = manager->connections();
@@ -47,7 +47,7 @@ using namespace yas;
     test::node_object source_obj(0, 0);
     test::node_object destination_obj(0, 0);
 
-    XCTAssertThrows(manager->connect(*source_obj.node, *destination_obj.node, format));
+    XCTAssertThrows(manager->connect(source_obj.node, destination_obj.node, format));
     XCTAssertEqual(manager->connections().size(), 0);
 }
 
@@ -59,20 +59,20 @@ using namespace yas;
     test::node_object relay_decor(1, 1);
     test::node_object destination_obj(1, 1);
 
-    manager->connect(*source_obj.node, *relay_decor.node, format);
+    manager->connect(source_obj.node, relay_decor.node, format);
 
     auto &nodes = manager->nodes();
     XCTAssertGreaterThanOrEqual(nodes.count(source_obj.node), 1);
     XCTAssertGreaterThanOrEqual(nodes.count(relay_decor.node), 1);
     XCTAssertEqual(nodes.count(destination_obj.node), 0);
 
-    manager->connect(*relay_decor.node, *destination_obj.node, format);
+    manager->connect(relay_decor.node, destination_obj.node, format);
 
     XCTAssertGreaterThanOrEqual(nodes.count(source_obj.node), 1);
     XCTAssertGreaterThanOrEqual(nodes.count(relay_decor.node), 1);
     XCTAssertGreaterThanOrEqual(nodes.count(destination_obj.node), 1);
 
-    manager->disconnect(*relay_decor.node);
+    manager->disconnect(relay_decor.node);
 
     XCTAssertEqual(nodes.count(source_obj.node), 0);
     XCTAssertEqual(nodes.count(relay_decor.node), 0);

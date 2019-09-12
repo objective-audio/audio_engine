@@ -52,8 +52,7 @@ struct au : manageable_au, std::enable_shared_from_this<au> {
     [[nodiscard]] chaining::chain_unsync_t<chaining_pair_t> chain() const;
     [[nodiscard]] chaining::chain_relayed_unsync_t<au_ptr, chaining_pair_t> chain(method const) const;
 
-    audio::engine::node const &node() const;
-    audio::engine::node &node();
+    audio::engine::node_ptr const &node() const;
 
     manageable_au_ptr manageable();
 

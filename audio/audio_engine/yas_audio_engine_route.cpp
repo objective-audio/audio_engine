@@ -41,7 +41,7 @@ void audio::engine::route::_prepare() {
         auto const dst_bus_idx = args.bus_idx;
 
         if (auto route = weak_route.lock()) {
-            if (auto kernel = route->node().kernel()) {
+            if (auto kernel = route->node()->kernel()) {
                 auto const &routes = std::any_cast<audio::engine::route::kernel_ptr>(kernel->decorator)->routes;
                 auto output_connection = kernel->output_connection(dst_bus_idx);
                 auto input_connections = kernel->input_connections();
@@ -118,12 +118,8 @@ void audio::engine::route::clear_routes() {
     this->_node->manageable()->update_kernel();
 }
 
-audio::engine::node const &audio::engine::route::node() const {
-    return *this->_node;
-}
-
-audio::engine::node &audio::engine::route::node() {
-    return *this->_node;
+audio::engine::node_ptr const &audio::engine::route::node() const {
+    return this->_node;
 }
 
 void audio::engine::route::_will_reset() {

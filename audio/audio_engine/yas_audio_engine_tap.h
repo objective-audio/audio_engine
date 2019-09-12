@@ -16,8 +16,7 @@ struct tap : std::enable_shared_from_this<tap> {
 
     void set_render_handler(audio::engine::node::render_f);
 
-    audio::engine::node const &node() const;
-    audio::engine::node &node();
+    audio::engine::node_ptr const &node() const;
 
     connection_ptr input_connection_on_render(uint32_t const bus_idx) const;
     connection_ptr output_connection_on_render(uint32_t const bus_idx) const;

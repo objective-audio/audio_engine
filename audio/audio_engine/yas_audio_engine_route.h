@@ -20,8 +20,7 @@ struct route : std::enable_shared_from_this<route> {
     void set_routes(audio::route_set_t routes);
     void clear_routes();
 
-    audio::engine::node const &node() const;
-    audio::engine::node &node();
+    audio::engine::node_ptr const &node() const;
 
    private:
     class kernel;

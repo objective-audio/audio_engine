@@ -58,11 +58,8 @@ bool audio::engine::offline_output::is_running() const {
     return this->_queue.has_value();
 }
 
-audio::engine::node const &audio::engine::offline_output::node() const {
-    return *this->_node;
-}
-audio::engine::node &audio::engine::offline_output::node() {
-    return *this->_node;
+audio::engine::node_ptr const &audio::engine::offline_output::node() const {
+    return this->_node;
 }
 
 audio::engine::offline_start_result_t audio::engine::offline_output::start(offline_render_f &&render_handler,
@@ -95,7 +92,7 @@ audio::engine::offline_start_result_t audio::engine::offline_output::start(offli
                     break;
                 }
 
-                auto kernel = output->node().kernel();
+                auto kernel = output->node()->kernel();
                 if (!kernel) {
                     cancelled = true;
                     break;

@@ -75,12 +75,8 @@ void audio::engine::tap::set_render_handler(audio::engine::node::render_f handle
     this->_node->manageable()->update_kernel();
 }
 
-audio::engine::node const &audio::engine::tap::node() const {
-    return *this->_node;
-}
-
-audio::engine::node &audio::engine::tap::node() {
-    return *this->_node;
+audio::engine::node_ptr const &audio::engine::tap::node() const {
+    return this->_node;
 }
 
 audio::engine::connection_ptr audio::engine::tap::input_connection_on_render(uint32_t const bus_idx) const {
