@@ -23,8 +23,9 @@ struct node_args {
 struct connectable_node {
     virtual ~connectable_node() = default;
 
-    virtual void add_connection(audio::engine::connection &) = 0;
-    virtual void remove_connection(audio::engine::connection const &) = 0;
+    virtual void add_connection(audio::engine::connection_ptr const &) = 0;
+    virtual void remove_input_connection(uint32_t const dst_bus) = 0;
+    virtual void remove_output_connection(uint32_t const src_bus) = 0;
 };
 
 using connectable_node_ptr = std::shared_ptr<connectable_node>;

@@ -29,16 +29,16 @@ using namespace yas;
     auto from_tap = audio::engine::tap::make_shared();
     auto const format = audio::format({.sample_rate = 48000.0, .channel_count = 2});
 
-    auto const &to_connection = manager->connect(to_tap->node(), output->node(), format);
-    auto const &from_connection = manager->connect(from_tap->node(), to_tap->node(), format);
+    auto const to_connection = manager->connect(to_tap->node(), output->node(), format);
+    auto const from_connection = manager->connect(from_tap->node(), to_tap->node(), format);
 
     XCTestExpectation *to_expectation = [self expectationWithDescription:@"to node"];
     XCTestExpectation *from_expectation = [self expectationWithDescription:@"from node"];
     XCTestExpectation *completion_expectation = [self expectationWithDescription:@"completion"];
 
     auto weak_to_tap = to_weak(to_tap);
-    auto to_render_handler = [weak_to_tap, self, to_connection = to_connection.shared_from_this(),
-                              from_connection = from_connection.shared_from_this(), to_expectation](auto args) {
+    auto to_render_handler = [weak_to_tap, self, to_connection = to_connection, from_connection = from_connection,
+                              to_expectation](auto args) {
         auto &buffer = args.buffer;
         auto const &when = args.when;
 

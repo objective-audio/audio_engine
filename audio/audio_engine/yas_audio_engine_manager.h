@@ -42,12 +42,13 @@ struct manager : std::enable_shared_from_this<manager> {
 
     virtual ~manager();
 
-    engine::connection &connect(engine::node &source_node, engine::node &destination_node, audio::format const &format);
-    engine::connection &connect(engine::node &source_node, engine::node &destination_node,
-                                uint32_t const source_bus_idx, uint32_t const destination_bus_idx,
-                                audio::format const &format);
+    engine::connection_ptr connect(engine::node &source_node, engine::node &destination_node,
+                                   audio::format const &format);
+    engine::connection_ptr connect(engine::node &source_node, engine::node &destination_node,
+                                   uint32_t const source_bus_idx, uint32_t const destination_bus_idx,
+                                   audio::format const &format);
 
-    void disconnect(engine::connection &);
+    void disconnect(engine::connection_ptr const &);
     void disconnect(engine::node &);
     void disconnect_input(engine::node const &);
     void disconnect_input(engine::node const &, uint32_t const bus_idx);
@@ -97,8 +98,8 @@ struct manager : std::enable_shared_from_this<manager> {
     void _disconnect_node_with_predicate(std::function<bool(connection const &)> predicate);
     void _add_node_to_graph(engine::node &node);
     void _remove_node_from_graph(engine::node &node);
-    bool _add_connection(engine::connection &connection);
-    void _remove_connection_from_nodes(engine::connection const &connection);
+    bool _add_connection(engine::connection_ptr const &connection);
+    void _remove_connection_from_nodes(engine::connection_ptr const &connection);
     void _update_node_connections(engine::node &node);
     void _update_all_node_connections();
     engine::connection_set _input_connections_for_destination_node(engine::node_ptr const &node);

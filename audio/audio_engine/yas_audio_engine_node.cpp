@@ -201,13 +201,13 @@ audio::engine::manageable_node_ptr audio::engine::node::manageable() {
     return std::dynamic_pointer_cast<manageable_node>(shared_from_this());
 }
 
-void audio::engine::node::add_connection(audio::engine::connection &connection) {
-    auto weak_connection = to_weak(connection.shared_from_this());
-    if (connection.destination_node().get() == this) {
-        auto bus_idx = connection.destination_bus;
+void audio::engine::node::add_connection(audio::engine::connection_ptr const &connection) {
+    auto weak_connection = to_weak(connection);
+    if (connection->destination_node().get() == this) {
+        auto bus_idx = connection->destination_bus;
         this->_input_connections.insert(std::make_pair(bus_idx, weak_connection));
-    } else if (connection.source_node().get() == this) {
-        auto bus_idx = connection.source_bus;
+    } else if (connection->source_node().get() == this) {
+        auto bus_idx = connection->source_bus;
         this->_output_connections.insert(std::make_pair(bus_idx, weak_connection));
     } else {
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : connection does not exist in a node.");
@@ -216,19 +216,13 @@ void audio::engine::node::add_connection(audio::engine::connection &connection) 
     this->update_kernel();
 }
 
-void audio::engine::node::remove_connection(audio::engine::connection const &connection) {
-    if (auto destination_node = connection.destination_node()) {
-        if (connection.destination_node().get() == this) {
-            this->_input_connections.erase(connection.destination_bus);
-        }
-    }
+void audio::engine::node::remove_input_connection(uint32_t const dst_bus) {
+    this->_input_connections.erase(dst_bus);
+    this->update_kernel();
+}
 
-    if (auto source_node = connection.source_node()) {
-        if (connection.source_node().get() == this) {
-            this->_output_connections.erase(connection.source_bus);
-        }
-    }
-
+void audio::engine::node::remove_output_connection(uint32_t const src_bus) {
+    this->_output_connections.erase(src_bus);
     this->update_kernel();
 }
 

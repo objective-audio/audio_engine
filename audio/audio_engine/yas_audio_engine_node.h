@@ -95,8 +95,9 @@ struct node : std::enable_shared_from_this<node>, connectable_node, manageable_n
 
     void _prepare_kernel(kernel_ptr const &kernel);
 
-    void add_connection(audio::engine::connection &) override;
-    void remove_connection(audio::engine::connection const &) override;
+    void add_connection(audio::engine::connection_ptr const &) override;
+    void remove_input_connection(uint32_t const dst_bus) override;
+    void remove_output_connection(uint32_t const src_bus) override;
 
     void set_manager(audio::engine::manager_ptr const &) override;
     void update_kernel() override;
