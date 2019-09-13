@@ -13,7 +13,7 @@
 #include "yas_audio_types.h"
 
 namespace yas::audio {
-struct device_io final : std::enable_shared_from_this<device_io> {
+struct device_io final {
     class impl;
 
     struct render_args {
@@ -43,7 +43,7 @@ struct device_io final : std::enable_shared_from_this<device_io> {
 
     device_io();
 
-    void _prepare(audio::device_ptr const &);
+    void _prepare(device_io_ptr const &, device_ptr const &);
 
     void _initialize() const;
     void _uninitialize() const;
