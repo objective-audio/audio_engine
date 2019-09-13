@@ -21,7 +21,7 @@ class result;
 }
 
 namespace yas::audio::engine {
-struct node : std::enable_shared_from_this<node>, connectable_node, manageable_node {
+struct node : connectable_node, manageable_node {
     enum class method {
         will_reset,
         update_connections,
@@ -75,6 +75,7 @@ struct node : std::enable_shared_from_this<node>, connectable_node, manageable_n
     manageable_node_ptr manageable();
 
    private:
+    std::weak_ptr<node> _weak_node;
     std::weak_ptr<audio::engine::manager> _weak_manager;
     uint32_t _input_bus_count = 0;
     uint32_t _output_bus_count = 0;
@@ -93,6 +94,7 @@ struct node : std::enable_shared_from_this<node>, connectable_node, manageable_n
 
     explicit node(node_args &&);
 
+    void _prepare(node_ptr const &);
     void _prepare_kernel(kernel_ptr const &kernel);
 
     void add_connection(audio::engine::connection_ptr const &) override;

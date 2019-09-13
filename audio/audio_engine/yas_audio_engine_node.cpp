@@ -54,7 +54,7 @@ audio::engine::node::node(node_args &&args)
 audio::engine::node::~node() = default;
 
 void audio::engine::node::reset() {
-    this->_notifier->notify(std::make_pair(method::will_reset, shared_from_this()));
+    this->_notifier->notify(std::make_pair(method::will_reset, this->_weak_node.lock()));
 
     this->_input_connections.clear();
     this->_output_connections.clear();
@@ -194,11 +194,11 @@ audio::engine::node::chain(method const method) const {
 }
 
 audio::engine::connectable_node_ptr audio::engine::node::connectable() {
-    return std::dynamic_pointer_cast<connectable_node>(shared_from_this());
+    return std::dynamic_pointer_cast<connectable_node>(this->_weak_node.lock());
 }
 
 audio::engine::manageable_node_ptr audio::engine::node::manageable() {
-    return std::dynamic_pointer_cast<manageable_node>(shared_from_this());
+    return std::dynamic_pointer_cast<manageable_node>(this->_weak_node.lock());
 }
 
 void audio::engine::node::add_connection(audio::engine::connection_ptr const &connection) {
@@ -237,7 +237,7 @@ void audio::engine::node::update_kernel() {
 }
 
 void audio::engine::node::update_connections() {
-    this->_notifier->notify(std::make_pair(method::update_connections, shared_from_this()));
+    this->_notifier->notify(std::make_pair(method::update_connections, this->_weak_node.lock()));
 }
 
 void audio::engine::node::set_add_to_graph_handler(graph_editing_f &&handler) {
@@ -255,6 +255,10 @@ audio::graph_editing_f const &audio::engine::node::remove_from_graph_handler() c
     return this->_remove_from_graph_handler;
 }
 
+void audio::engine::node::_prepare(node_ptr const &shared) {
+    this->_weak_node = shared;
+}
+
 void audio::engine::node::_prepare_kernel(kernel_ptr const &kernel) {
     auto manageable_kernel = kernel->manageable();
     manageable_kernel->set_input_connections(_input_connections);
@@ -266,7 +270,9 @@ void audio::engine::node::_prepare_kernel(kernel_ptr const &kernel) {
 }
 
 audio::engine::node_ptr audio::engine::node::make_shared(node_args args) {
-    return node_ptr(new node{std::move(args)});
+    auto shared = node_ptr(new node{std::move(args)});
+    shared->_prepare(shared);
+    return shared;
 }
 
 #pragma mark -
