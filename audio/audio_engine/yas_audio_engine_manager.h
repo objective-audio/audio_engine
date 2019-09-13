@@ -18,10 +18,7 @@ class result;
 }  // namespace yas
 
 namespace yas::audio::engine {
-struct manager : std::enable_shared_from_this<manager> {
-    class impl;
-
-   public:
+struct manager final {
     enum class method { configuration_change };
 
     enum class start_error_t {
@@ -78,7 +75,10 @@ struct manager : std::enable_shared_from_this<manager> {
     chaining::notifier_ptr<chaining_pair_t> &notifier();
 
    private:
+    class impl;
+
     std::unique_ptr<impl> _impl;
+
     chaining::notifier_ptr<chaining_pair_t> _notifier = chaining::notifier<chaining_pair_t>::make_shared();
 
     audio::graph_ptr _graph = nullptr;
@@ -88,7 +88,7 @@ struct manager : std::enable_shared_from_this<manager> {
 
     manager();
 
-    void prepare();
+    void _prepare(manager_ptr const &);
 
     bool _node_exists(engine::node_ptr const &node);
     void _attach_node(engine::node_ptr const &node);

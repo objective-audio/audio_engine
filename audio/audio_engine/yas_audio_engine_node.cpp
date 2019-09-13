@@ -135,9 +135,8 @@ bool audio::engine::node::is_available_output_bus(uint32_t const bus_idx) const 
     return this->_output_connections.count(target_bus_idx) == 0;
 }
 
-audio::engine::manager const &audio::engine::node::manager() const {
-    manager_ptr shared = this->_weak_manager.lock();
-    return *shared;
+audio::engine::manager_ptr audio::engine::node::manager() const {
+    return this->_weak_manager.lock();
 }
 
 std::optional<audio::time> audio::engine::node::last_render_time() const {

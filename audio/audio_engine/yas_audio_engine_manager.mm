@@ -23,6 +23,8 @@ using namespace yas;
 #pragma mark - audio::engine::manager::impl
 
 struct audio::engine::manager::impl {
+    std::weak_ptr<manager> _weak_manager;
+
     ~impl() {
 #if TARGET_OS_IPHONE
         if (this->_reset_observer) {
@@ -35,6 +37,8 @@ struct audio::engine::manager::impl {
     }
 
     void prepare(std::weak_ptr<engine::manager> &weak_manager) {
+        this->_weak_manager = weak_manager;
+
 #if TARGET_OS_IPHONE
         auto reset_lambda = [weak_manager](NSNotification *note) {
             if (auto engine = weak_manager.lock()) {
@@ -302,8 +306,8 @@ chaining::notifier_ptr<audio::engine::manager::chaining_pair_t> &audio::engine::
     return this->_notifier;
 }
 
-void audio::engine::manager::prepare() {
-    std::weak_ptr<engine::manager> weak_manager = shared_from_this();
+void audio::engine::manager::_prepare(manager_ptr const &shared) {
+    auto weak_manager = to_weak(shared);
 
     this->_impl->prepare(weak_manager);
 
@@ -329,7 +333,7 @@ void audio::engine::manager::_attach_node(audio::engine::node_ptr const &node) {
 
     this->_nodes.insert(node);
 
-    node->manageable()->set_manager(shared_from_this());
+    node->manageable()->set_manager(this->_impl->_weak_manager.lock());
 
     this->_add_node_to_graph(node);
 }
@@ -535,12 +539,12 @@ void audio::engine::manager::_set_device_io(audio::engine::device_io_ptr const &
 
 #endif
 void audio::engine::manager::_post_configuration_change() {
-    this->_notifier->notify(std::make_pair(method::configuration_change, shared_from_this()));
+    this->_notifier->notify(std::make_pair(method::configuration_change, this->_impl->_weak_manager.lock()));
 }
 
 audio::engine::manager_ptr audio::engine::manager::make_shared() {
     auto shared = manager_ptr(new manager{});
-    shared->prepare();
+    shared->_prepare(shared);
     return shared;
 }
 
