@@ -12,7 +12,7 @@
 #include "yas_audio_unit.h"
 
 namespace yas::audio::engine {
-struct au : manageable_au, std::enable_shared_from_this<au> {
+struct au : manageable_au {
     enum class method {
         will_update_connections,
         did_update_connections,
@@ -57,6 +57,7 @@ struct au : manageable_au, std::enable_shared_from_this<au> {
     manageable_au_ptr manageable();
 
    private:
+    std::weak_ptr<au> _weak_au;
     audio::engine::node_ptr _node;
     AudioComponentDescription _acd;
     std::unordered_map<AudioUnitScope, unit::parameter_map_t> _parameters;
@@ -70,7 +71,7 @@ struct au : manageable_au, std::enable_shared_from_this<au> {
 
     explicit au(node_args &&);
 
-    void _prepare(AudioComponentDescription const &acd);
+    void _prepare(au_ptr const &, AudioComponentDescription const &acd);
 
     au(au const &) = delete;
     au(au &&) = delete;
