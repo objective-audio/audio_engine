@@ -46,8 +46,6 @@ audio::engine::au_io::au_io(args args)
     });
 }
 
-audio::engine::au_io::~au_io() = default;
-
 void audio::engine::au_io::set_channel_map(channel_map_t const &map, direction const dir) {
     this->_channel_map[to_uint32(dir)] = map;
 
@@ -124,9 +122,11 @@ audio::engine::au &audio::engine::au_io::au() {
     return *this->_au;
 }
 
-void audio::engine::au_io::_prepare() {
+void audio::engine::au_io::_prepare(au_io_ptr const &shared) {
+    this->_weak_au_io = shared;
+
     this->_connections_observer = this->_au->chain(au::method::did_update_connections)
-                                      .perform([weak_au_io = to_weak(shared_from_this())](auto const &) {
+                                      .perform([weak_au_io = to_weak(shared)](auto const &) {
                                           if (auto au_io = weak_au_io.lock()) {
                                               au_io->_update_unit_io_connections();
                                           }
@@ -164,7 +164,7 @@ void audio::engine::au_io::_update_unit_io_connections() {
     unit->set_channel_map(output_map, kAudioUnitScope_Output, output_idx);
     unit->set_channel_map(input_map, kAudioUnitScope_Output, input_idx);
 
-    this->_notifier->notify(std::make_pair(au_io::method::did_update_connection, shared_from_this()));
+    this->_notifier->notify(std::make_pair(au_io::method::did_update_connection, this->_weak_au_io.lock()));
 }
 
 audio::engine::au_io_ptr audio::engine::au_io::make_shared() {
@@ -173,7 +173,7 @@ audio::engine::au_io_ptr audio::engine::au_io::make_shared() {
 
 audio::engine::au_io_ptr audio::engine::au_io::make_shared(au_io::args args) {
     auto shared = au_io_ptr(new au_io{std::move(args)});
-    shared->_prepare();
+    shared->_prepare(shared);
     return shared;
 }
 
@@ -223,9 +223,11 @@ audio::engine::au_io &audio::engine::au_input::au_io() {
     return *this->_au_io;
 }
 
-void audio::engine::au_input::_prepare() {
+void audio::engine::au_input::_prepare(au_input_ptr const &shared) {
+    this->_weak_au_input = shared;
+
     this->_connections_observer = this->_au_io->chain(au_io::method::did_update_connection)
-                                      .perform([weak_au_input = to_weak(shared_from_this())](auto const &) {
+                                      .perform([weak_au_input = to_weak(shared)](auto const &) {
                                           if (auto au_input = weak_au_input.lock()) {
                                               au_input->_update_unit_input_connections();
                                           }
@@ -241,7 +243,7 @@ void audio::engine::au_input::_update_unit_input_connections() {
 
         this->_input_buffer = std::make_shared<pcm_buffer>(out_connection->format, 4096);
 
-        auto weak_au_input = to_weak(shared_from_this());
+        auto weak_au_input = to_weak(this->_weak_au_input.lock());
         unit->set_input_handler(
             [weak_au_input, input_buffer = this->_input_buffer](render_parameters &render_parameters) mutable {
                 auto au_input = weak_au_input.lock();
@@ -278,6 +280,6 @@ void audio::engine::au_input::_update_unit_input_connections() {
 
 audio::engine::au_input_ptr audio::engine::au_input::make_shared() {
     auto shared = au_input_ptr(new au_input{});
-    shared->_prepare();
+    shared->_prepare(shared);
     return shared;
 }
