@@ -9,7 +9,7 @@
 #include "yas_audio_engine_ptr.h"
 
 namespace yas::audio::engine {
-struct kernel : manageable_kernel, std::enable_shared_from_this<kernel> {
+struct kernel : manageable_kernel {
     virtual ~kernel();
 
     audio::engine::connection_smap input_connections() const;
@@ -22,6 +22,8 @@ struct kernel : manageable_kernel, std::enable_shared_from_this<kernel> {
     manageable_kernel_ptr manageable();
 
    private:
+    std::weak_ptr<kernel> _weak_kernel;
+
     kernel();
 
     void set_input_connections(audio::engine::connection_wmap connections) override;
