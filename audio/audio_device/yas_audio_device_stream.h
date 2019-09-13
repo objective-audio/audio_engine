@@ -12,9 +12,7 @@
 #import "yas_audio_device.h"
 
 namespace yas::audio {
-struct device::stream : std::enable_shared_from_this<device::stream> {
-    class impl;
-
+struct device::stream {
     enum class property : uint32_t {
         virtual_format = 0,
         is_active,
@@ -58,11 +56,13 @@ struct device::stream : std::enable_shared_from_this<device::stream> {
     bool operator!=(stream const &) const;
 
    private:
+    class impl;
+
     std::shared_ptr<impl> _impl;
 
     explicit stream(args &&args);
 
-    void _prepare();
+    void _prepare(device::stream_ptr const &);
 
     template <typename T>
     std::unique_ptr<std::vector<T>> _property_data(AudioStreamID const stream_id,
