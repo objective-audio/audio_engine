@@ -14,7 +14,7 @@
 #include "yas_audio_engine_ptr.h"
 
 namespace yas::audio::engine {
-struct device_io : manageable_device_io, std::enable_shared_from_this<device_io> {
+struct device_io : manageable_device_io {
     class core;
 
     virtual ~device_io();
@@ -27,6 +27,7 @@ struct device_io : manageable_device_io, std::enable_shared_from_this<device_io>
     manageable_device_io_ptr manageable();
 
    private:
+    std::weak_ptr<device_io> _weak_engine_device_io;
     audio::engine::node_ptr _node = node::make_shared({.input_bus_count = 1, .output_bus_count = 1});
     chaining::any_observer_ptr _connections_observer = nullptr;
     std::unique_ptr<core> _core;
@@ -42,7 +43,7 @@ struct device_io : manageable_device_io, std::enable_shared_from_this<device_io>
     void remove_raw_device_io() override;
     audio::device_io_ptr const &raw_device_io() override;
 
-    void _prepare();
+    void _prepare(device_io_ptr const &);
     void _update_device_io_connections();
     bool _validate_connections();
 

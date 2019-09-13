@@ -56,7 +56,7 @@ audio::engine::node_ptr const &audio::engine::device_io::node() const {
 }
 
 audio::engine::manageable_device_io_ptr audio::engine::device_io::manageable() {
-    return std::dynamic_pointer_cast<manageable_device_io>(shared_from_this());
+    return std::dynamic_pointer_cast<manageable_device_io>(this->_weak_engine_device_io.lock());
 }
 
 void audio::engine::device_io::add_raw_device_io() {
@@ -71,12 +71,12 @@ audio::device_io_ptr const &audio::engine::device_io::raw_device_io() {
     return this->_core->_device_io;
 }
 
-void audio::engine::device_io::_prepare() {
+void audio::engine::device_io::_prepare(device_io_ptr const &shared) {
+    this->_weak_engine_device_io = to_weak(shared);
+
     this->set_device(device::default_output_device());
 
-    auto weak_engine_device_io = to_weak(shared_from_this());
-
-    this->_node->set_render_handler([weak_engine_device_io](auto args) {
+    this->_node->set_render_handler([weak_engine_device_io = this->_weak_engine_device_io](auto args) {
         auto &buffer = args.buffer;
 
         if (auto engine_device_io = weak_engine_device_io.lock()) {
@@ -90,7 +90,7 @@ void audio::engine::device_io::_prepare() {
     });
 
     this->_connections_observer = this->_node->chain(node::method::update_connections)
-                                      .perform([weak_engine_device_io](auto const &) {
+                                      .perform([weak_engine_device_io = this->_weak_engine_device_io](auto const &) {
                                           if (auto engine_device_io = weak_engine_device_io.lock()) {
                                               engine_device_io->_update_device_io_connections();
                                           }
@@ -109,10 +109,9 @@ void audio::engine::device_io::_update_device_io_connections() {
         return;
     }
 
-    auto weak_engine_device_io = to_weak(shared_from_this());
     auto weak_device_io = to_weak(device_io);
 
-    auto render_handler = [weak_engine_device_io, weak_device_io](auto args) {
+    auto render_handler = [weak_engine_device_io = this->_weak_engine_device_io, weak_device_io](auto args) {
         if (auto engine_device_io = weak_engine_device_io.lock()) {
             if (auto kernel = engine_device_io->node()->kernel()) {
                 auto const connections = kernel->input_connections();
@@ -186,7 +185,7 @@ bool audio::engine::device_io::_validate_connections() {
 
 audio::engine::device_io_ptr audio::engine::device_io::make_shared() {
     auto shared = device_io_ptr(new audio::engine::device_io{});
-    shared->_prepare();
+    shared->_prepare(shared);
     return shared;
 }
 
