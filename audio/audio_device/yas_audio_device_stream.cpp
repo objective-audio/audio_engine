@@ -43,6 +43,7 @@ struct audio::device::stream::impl {
     using listener_f =
         std::function<void(uint32_t const in_number_addresses, const AudioObjectPropertyAddress *const in_addresses)>;
 
+    std::weak_ptr<stream> _weak_stream;
     AudioStreamID _stream_id;
     AudioDeviceID _device_id;
     chaining::notifier_ptr<chaining_pair_t> _notifier = chaining::notifier<chaining_pair_t>::make_shared();
@@ -50,8 +51,17 @@ struct audio::device::stream::impl {
     impl(AudioStreamID const stream_id, AudioDeviceID const device_id) : _stream_id(stream_id), _device_id(device_id) {
     }
 
-    listener_f listener(stream &stream) {
-        auto weak_stream = to_weak(stream.shared_from_this());
+    void prepare(device::stream_ptr const &shared) {
+        this->_weak_stream = shared;
+
+        auto listener = this->listener();
+        this->add_listener(kAudioStreamPropertyVirtualFormat, listener);
+        this->add_listener(kAudioStreamPropertyIsActive, listener);
+        this->add_listener(kAudioStreamPropertyStartingChannel, listener);
+    }
+
+    listener_f listener() {
+        auto weak_stream = to_weak(this->_weak_stream.lock());
 
         return [weak_stream](uint32_t const address_count, const AudioObjectPropertyAddress *const addresses) {
             if (auto stream = weak_stream.lock()) {
@@ -156,16 +166,13 @@ bool audio::device::stream::operator!=(stream const &rhs) const {
     return !(*this == rhs);
 }
 
-void audio::device::stream::_prepare() {
-    auto listener = this->_impl->listener(*this);
-    this->_impl->add_listener(kAudioStreamPropertyVirtualFormat, listener);
-    this->_impl->add_listener(kAudioStreamPropertyIsActive, listener);
-    this->_impl->add_listener(kAudioStreamPropertyStartingChannel, listener);
+void audio::device::stream::_prepare(device::stream_ptr const &shared) {
+    this->_impl->prepare(shared);
 }
 
 audio::device::stream_ptr audio::device::stream::make_shared(device::stream::args args) {
     auto shared = device::stream_ptr(new device::stream{std::move(args)});
-    shared->_prepare();
+    shared->_prepare(shared);
     return shared;
 }
 

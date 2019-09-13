@@ -72,9 +72,9 @@ audio::engine::au &audio::engine::au_mixer::au() {
     return *this->_au;
 }
 
-void audio::engine::au_mixer::_prepare() {
+void audio::engine::au_mixer::_prepare(au_mixer_ptr const &shared) {
     this->_connections_observer = this->_au->chain(au::method::will_update_connections)
-                                      .perform([weak_au_mixer = to_weak(shared_from_this())](auto const &) {
+                                      .perform([weak_au_mixer = to_weak(shared)](auto const &) {
                                           if (auto au_mixer = weak_au_mixer.lock()) {
                                               au_mixer->_update_unit_mixer_connections();
                                           }
@@ -96,6 +96,6 @@ void audio::engine::au_mixer::_update_unit_mixer_connections() {
 
 audio::engine::au_mixer_ptr audio::engine::au_mixer::make_shared() {
     auto shared = au_mixer_ptr(new au_mixer{});
-    shared->_prepare();
+    shared->_prepare(shared);
     return shared;
 }

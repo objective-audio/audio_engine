@@ -44,9 +44,11 @@ void audio::engine::kernel::set_output_connections(audio::engine::connection_wma
 }
 
 audio::engine::manageable_kernel_ptr audio::engine::kernel::manageable() {
-    return std::dynamic_pointer_cast<manageable_kernel>(shared_from_this());
+    return std::dynamic_pointer_cast<manageable_kernel>(this->_weak_kernel.lock());
 }
 
 audio::engine::kernel_ptr audio::engine::kernel::make_shared() {
-    return kernel_ptr(new audio::engine::kernel{});
+    auto shared = kernel_ptr(new audio::engine::kernel{});
+    shared->_weak_kernel = shared;
+    return shared;
 }

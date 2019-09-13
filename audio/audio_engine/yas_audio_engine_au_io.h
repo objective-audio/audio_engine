@@ -16,7 +16,7 @@ class device;
 #endif
 
 namespace yas::audio::engine {
-struct au_io : std::enable_shared_from_this<au_io> {
+struct au_io {
     enum class method {
         did_update_connection,
     };
@@ -28,7 +28,7 @@ struct au_io : std::enable_shared_from_this<au_io> {
         bool enable_output = true;
     };
 
-    virtual ~au_io();
+    virtual ~au_io() = default;
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
     void set_device(audio::device const &);
@@ -49,6 +49,7 @@ struct au_io : std::enable_shared_from_this<au_io> {
     audio::engine::au &au();
 
    private:
+    std::weak_ptr<au_io> _weak_au_io;
     audio::engine::au_ptr _au;
     channel_map_t _channel_map[2];
     chaining::any_observer_ptr _connections_observer = nullptr;
@@ -56,7 +57,7 @@ struct au_io : std::enable_shared_from_this<au_io> {
 
     explicit au_io(args);
 
-    void _prepare();
+    void _prepare(au_io_ptr const &);
 
     void _update_unit_io_connections();
 
@@ -65,7 +66,7 @@ struct au_io : std::enable_shared_from_this<au_io> {
     static au_io_ptr make_shared(au_io::args);
 };
 
-struct au_output : std::enable_shared_from_this<au_output> {
+struct au_output final {
     virtual ~au_output() = default;
 
     void set_channel_map(channel_map_t const &);
@@ -83,7 +84,7 @@ struct au_output : std::enable_shared_from_this<au_output> {
     static au_output_ptr make_shared();
 };
 
-struct au_input : std::enable_shared_from_this<au_input> {
+struct au_input final {
     virtual ~au_input() = default;
 
     void set_channel_map(channel_map_t const &);
@@ -93,6 +94,7 @@ struct au_input : std::enable_shared_from_this<au_input> {
     audio::engine::au_io &au_io();
 
    private:
+    std::weak_ptr<au_input> _weak_au_input;
     audio::engine::au_io_ptr _au_io;
 
     audio::pcm_buffer_ptr _input_buffer = nullptr;
@@ -100,7 +102,7 @@ struct au_input : std::enable_shared_from_this<au_input> {
 
     au_input();
 
-    void _prepare();
+    void _prepare(au_input_ptr const &);
 
     void _update_unit_input_connections();
 

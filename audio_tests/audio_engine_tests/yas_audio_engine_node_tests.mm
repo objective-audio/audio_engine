@@ -128,7 +128,7 @@ using namespace yas;
 
     node->manageable()->set_manager(manager);
 
-    XCTAssertEqual(manager, node->manager().shared_from_this());
+    XCTAssertEqual(manager, node->manager());
 
     node->manageable()->set_manager(nullptr);
 }

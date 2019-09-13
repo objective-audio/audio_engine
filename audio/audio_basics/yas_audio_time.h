@@ -9,8 +9,6 @@
 
 namespace yas::audio {
 struct time final {
-    class impl;
-
     time(AudioTimeStamp const &ts, double const sample_rate);
     explicit time(uint64_t const host_time);
     time(int64_t const sample_time, double const sample_rate);
@@ -31,6 +29,8 @@ struct time final {
     bool operator!=(time const &) const;
 
    private:
+    class impl;
+
     std::shared_ptr<impl> _impl;
 };
 

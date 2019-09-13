@@ -13,9 +13,7 @@
 #include "yas_audio_types.h"
 
 namespace yas::audio {
-struct device_io final : std::enable_shared_from_this<device_io> {
-    class impl;
-
+struct device_io final {
     struct render_args {
         audio::pcm_buffer_ptr const &output_buffer;
         std::optional<audio::time> const when;
@@ -38,12 +36,13 @@ struct device_io final : std::enable_shared_from_this<device_io> {
 
    private:
     class kernel;
+    class impl;
 
     std::shared_ptr<impl> _impl;
 
     device_io();
 
-    void _prepare(audio::device_ptr const &);
+    void _prepare(device_io_ptr const &, device_ptr const &);
 
     void _initialize() const;
     void _uninitialize() const;

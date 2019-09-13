@@ -8,7 +8,7 @@
 #include "yas_audio_engine_ptr.h"
 
 namespace yas::audio::engine {
-struct au_mixer : std::enable_shared_from_this<au_mixer> {
+struct au_mixer {
     virtual ~au_mixer();
 
     void set_output_volume(float const volume, uint32_t const bus_idx);
@@ -38,7 +38,7 @@ struct au_mixer : std::enable_shared_from_this<au_mixer> {
 
     au_mixer();
 
-    void _prepare();
+    void _prepare(au_mixer_ptr const &);
 
     void _update_unit_mixer_connections();
 

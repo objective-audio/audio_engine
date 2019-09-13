@@ -66,8 +66,8 @@ struct audio::device_io::impl {
         this->uninitialize();
     }
 
-    void prepare(audio::device_io &device_io, audio::device_ptr const device) {
-        this->_weak_device_io = to_weak(device_io.shared_from_this());
+    void prepare(audio::device_io_ptr const &device_io, audio::device_ptr const device) {
+        this->_weak_device_io = to_weak(device_io);
 
         this->_device_system_observer =
             device::system_chain(device::system_method::hardware_did_change)
@@ -329,13 +329,13 @@ audio::time_ptr const &audio::device_io::input_time_on_render() const {
     return this->_impl->_input_time_on_render;
 }
 
-void audio::device_io::_prepare(audio::device_ptr const &device) {
-    this->_impl->prepare(*this, device);
+void audio::device_io::_prepare(device_io_ptr const &shared, device_ptr const &device) {
+    this->_impl->prepare(shared, device);
 }
 
-audio::device_io_ptr audio::device_io::make_shared(audio::device_ptr const &device) {
+audio::device_io_ptr audio::device_io::make_shared(device_ptr const &device) {
     auto shared = device_io_ptr(new audio::device_io{});
-    shared->_prepare(device);
+    shared->_prepare(shared, device);
     return shared;
 }
 

@@ -144,12 +144,13 @@ audio::engine::node_ptr const &audio::engine::au::node() const {
 }
 
 audio::engine::manageable_au_ptr audio::engine::au::manageable() {
-    return std::dynamic_pointer_cast<manageable_au>(shared_from_this());
+    return std::dynamic_pointer_cast<manageable_au>(this->_weak_au.lock());
 }
 
 #pragma mark - private
 
-void audio::engine::au::_prepare(AudioComponentDescription const &acd) {
+void audio::engine::au::_prepare(au_ptr const &shared, AudioComponentDescription const &acd) {
+    this->_weak_au = shared;
     this->_acd = acd;
 
     auto unit = audio::unit::make_shared(acd);
@@ -159,7 +160,7 @@ void audio::engine::au::_prepare(AudioComponentDescription const &acd) {
     this->_parameters.insert(std::make_pair(kAudioUnitScope_Output, unit->create_parameters(kAudioUnitScope_Output)));
     this->_core->set_unit(unit);
 
-    auto weak_au = to_weak(shared_from_this());
+    auto weak_au = to_weak(shared);
 
     this->_node->set_render_handler([weak_au](auto args) {
         auto &buffer = args.buffer;
@@ -220,15 +221,14 @@ void audio::engine::au::_prepare(AudioComponentDescription const &acd) {
 }
 
 void audio::engine::au::_update_unit_connections() {
-    auto shared_au = shared_from_this();
+    auto const shared_au = this->_weak_au.lock();
 
     this->_notifier->notify(std::make_pair(au::method::will_update_connections, shared_au));
 
     if (auto unit = this->_core->unit()) {
         auto input_bus_count = this->input_element_count();
         if (input_bus_count > 0) {
-            auto weak_au = to_weak(shared_au);
-            unit->set_render_handler([weak_au](audio::render_parameters &render_parameters) {
+            unit->set_render_handler([weak_au = this->_weak_au](audio::render_parameters &render_parameters) {
                 if (auto au = weak_au.lock()) {
                     if (auto kernel = au->node()->kernel()) {
                         if (auto connection = kernel->input_connection(render_parameters.in_bus_number)) {
@@ -338,6 +338,6 @@ audio::engine::au_ptr audio::engine::au::make_shared(AudioComponentDescription c
 
 audio::engine::au_ptr audio::engine::au::make_shared(au::args &&args) {
     auto shared = au_ptr(new au{std::move(args.node_args)});
-    shared->_prepare(args.acd);
+    shared->_prepare(shared, args.acd);
     return shared;
 }
