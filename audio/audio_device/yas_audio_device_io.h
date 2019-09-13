@@ -14,8 +14,6 @@
 
 namespace yas::audio {
 struct device_io final {
-    class impl;
-
     struct render_args {
         audio::pcm_buffer_ptr const &output_buffer;
         std::optional<audio::time> const when;
@@ -38,6 +36,7 @@ struct device_io final {
 
    private:
     class kernel;
+    class impl;
 
     std::shared_ptr<impl> _impl;
 
