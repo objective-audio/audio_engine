@@ -137,7 +137,7 @@ void audio::graph::_prepare() {
 }
 
 void audio::graph::add_unit(audio::unit_ptr const &unit) {
-    auto manageable_unit = unit->manageable();
+    auto const manageable_unit = manageable_unit::cast(unit);
 
     if (manageable_unit->key()) {
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : unit.key is already assigned.");
@@ -153,9 +153,7 @@ void audio::graph::add_unit(audio::unit_ptr const &unit) {
 }
 
 void audio::graph::remove_unit(audio::unit_ptr const &unit) {
-    auto manageable_unit = unit->manageable();
-
-    manageable_unit->uninitialize();
+    manageable_unit::cast(unit)->uninitialize();
 
     this->_remove_unit_from_units(unit);
 }
@@ -274,7 +272,7 @@ void audio::graph::_add_unit_to_units(audio::unit_ptr const &unit) {
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : argument is null.");
     }
 
-    auto manageable_unit = unit->manageable();
+    auto const manageable_unit = manageable_unit::cast(unit);
 
     if (manageable_unit->key()) {
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : unit.key is not null.");
@@ -297,7 +295,7 @@ void audio::graph::_add_unit_to_units(audio::unit_ptr const &unit) {
 void audio::graph::_remove_unit_from_units(audio::unit_ptr const &unit) {
     std::lock_guard<std::recursive_mutex> lock(this->_mutex);
 
-    auto manageable_unit = unit->manageable();
+    auto const manageable_unit = manageable_unit::cast(unit);
 
     if (auto key = manageable_unit->key()) {
         this->_units.erase(*key);
