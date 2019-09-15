@@ -7,12 +7,10 @@
 #include "yas_audio_engine_node.h"
 
 namespace yas::audio::engine {
-struct tap : std::enable_shared_from_this<tap> {
+struct tap final {
     struct args {
         bool is_input = false;
     };
-
-    virtual ~tap();
 
     void set_render_handler(audio::engine::node::render_f);
 
@@ -34,9 +32,9 @@ struct tap : std::enable_shared_from_this<tap> {
     chaining::any_observer_ptr _reset_observer = nullptr;
     engine::kernel_ptr _kernel_on_render;
 
-    explicit tap(args);
+    explicit tap(args &&);
 
-    void _prepare();
+    void _prepare(tap_ptr const &);
 
     tap(tap const &) = delete;
     tap(tap &&) = delete;

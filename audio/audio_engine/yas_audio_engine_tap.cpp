@@ -23,15 +23,13 @@ struct audio::engine::tap::kernel {
 
 #pragma mark - audio::engine::tap
 
-audio::engine::tap::tap(args args)
+audio::engine::tap::tap(args &&args)
     : _node(node::make_shared(args.is_input ? engine::node_args{.input_bus_count = 1, .input_renderable = true} :
                                               engine::node_args{.input_bus_count = 1, .output_bus_count = 1})) {
 }
 
-audio::engine::tap::~tap() = default;
-
-void audio::engine::tap::_prepare() {
-    auto weak_tap = to_weak(shared_from_this());
+void audio::engine::tap::_prepare(tap_ptr const &shared) {
+    auto weak_tap = to_weak(shared);
 
     this->_node->set_render_handler([weak_tap](auto args) {
         if (auto tap = weak_tap.lock()) {
@@ -111,6 +109,6 @@ audio::engine::tap_ptr audio::engine::tap::make_shared() {
 
 audio::engine::tap_ptr audio::engine::tap::make_shared(tap::args args) {
     auto shared = tap_ptr(new tap{std::move(args)});
-    shared->_prepare();
+    shared->_prepare(shared);
     return shared;
 }
