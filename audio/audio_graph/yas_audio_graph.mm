@@ -45,7 +45,7 @@ static void start_all_graphs() {
         for (auto &pair : global_graph::_graphs) {
             if (auto graph = pair.second.lock()) {
                 if (graph->is_running()) {
-                    graph->interruptable()->start_all_ios();
+                    audio::interruptable_graph::cast(graph)->start_all_ios();
                 }
             }
         }
@@ -58,15 +58,15 @@ static void stop_all_graphs() {
     std::lock_guard<std::recursive_mutex> lock(global_graph::_mutex);
     for (auto const &pair : global_graph::_graphs) {
         if (auto const graph = pair.second.lock()) {
-            graph->interruptable()->stop_all_ios();
+            audio::interruptable_graph::cast(graph)->stop_all_ios();
         }
     }
 }
 #endif
 
-static void add_graph(graph &graph) {
+static void add_graph(graph_ptr const &graph) {
     std::lock_guard<std::recursive_mutex> lock(global_graph::_mutex);
-    global_graph::_graphs.insert(std::make_pair(graph.key(), to_weak(graph.shared_from_this())));
+    global_graph::_graphs.insert(std::make_pair(graph->key(), to_weak(graph)));
 }
 
 static void remove_graph_for_key(uint8_t const key) {
@@ -132,8 +132,8 @@ audio::graph::~graph() {
     this->remove_all_units();
 }
 
-void audio::graph::_prepare() {
-    global_graph::add_graph(*this);
+void audio::graph::_prepare(graph_ptr const &shared) {
+    global_graph::add_graph(shared);
 }
 
 void audio::graph::add_unit(audio::unit_ptr const &unit) {
@@ -211,10 +211,6 @@ bool audio::graph::is_running() const {
 
 uint8_t audio::graph::key() const {
     return this->_key;
-}
-
-audio::interruptable_graph_ptr audio::graph::interruptable() {
-    return std::dynamic_pointer_cast<interruptable_graph>(shared_from_this());
 }
 
 void audio::graph::start_all_ios() {
@@ -308,7 +304,7 @@ void audio::graph::_remove_unit_from_units(audio::unit_ptr const &unit) {
 audio::graph_ptr audio::graph::make_shared() {
     if (auto key = global_graph::min_empty_graph_key()) {
         auto shared = graph_ptr(new graph{*key});
-        shared->_prepare();
+        shared->_prepare(shared);
         return shared;
     } else {
         return nullptr;

@@ -11,7 +11,7 @@
 #include "yas_audio_types.h"
 
 namespace yas::audio {
-struct graph : std::enable_shared_from_this<graph>, interruptable_graph {
+struct graph final : interruptable_graph {
     virtual ~graph();
 
     void add_unit(audio::unit_ptr const &);
@@ -29,8 +29,6 @@ struct graph : std::enable_shared_from_this<graph>, interruptable_graph {
 
     uint8_t key() const;
 
-    interruptable_graph_ptr interruptable();
-
     // render thread
     static void unit_render(render_parameters &render_parameters);
 
@@ -46,7 +44,7 @@ struct graph : std::enable_shared_from_this<graph>, interruptable_graph {
 
     explicit graph(uint8_t const key);
 
-    void _prepare();
+    void _prepare(graph_ptr const &);
 
     void start_all_ios() override;
     void stop_all_ios() override;
