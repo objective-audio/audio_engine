@@ -27,8 +27,8 @@ using namespace yas;
  */
 
 - (void)test_set_format_success {
-    auto mixer_unit = audio::unit::make_shared(kAudioUnitType_Mixer, kAudioUnitSubType_MultiChannelMixer);
-    auto manageable_unit = mixer_unit->manageable();
+    auto const mixer_unit = audio::unit::make_shared(kAudioUnitType_Mixer, kAudioUnitSubType_MultiChannelMixer);
+    auto const manageable_unit = audio::manageable_unit::cast(mixer_unit);
 
     /*
      Float32
@@ -82,7 +82,7 @@ using namespace yas;
 
 - (void)test_set_format_failed {
     auto mixer_unit = audio::unit::make_shared(kAudioUnitType_Mixer, kAudioUnitSubType_MultiChannelMixer);
-    auto manageable_unit = mixer_unit->manageable();
+    auto const manageable_unit = audio::manageable_unit::cast(mixer_unit);
 
     /*
      Initialized

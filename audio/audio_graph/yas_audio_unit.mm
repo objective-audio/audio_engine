@@ -567,10 +567,6 @@ void audio::unit::reset() {
     raise_if_raw_audio_error(AudioUnitReset(_core->raw_unit(), kAudioUnitScope_Global, 0));
 }
 
-audio::manageable_unit_ptr audio::unit::manageable() {
-    return std::dynamic_pointer_cast<manageable_unit>(shared_from_this());
-}
-
 #pragma mark - render thread
 
 void audio::unit::callback_render(render_parameters &render_parameters) {

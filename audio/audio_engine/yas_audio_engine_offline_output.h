@@ -11,16 +11,15 @@
 #include "yas_audio_engine_ptr.h"
 
 namespace yas::audio::engine {
-struct offline_output : manageable_offline_output, std::enable_shared_from_this<offline_output> {
+struct offline_output : manageable_offline_output {
     virtual ~offline_output();
 
     bool is_running() const;
 
     audio::engine::node_ptr const &node() const;
 
-    manageable_offline_output_ptr manageable();
-
    private:
+    std::weak_ptr<offline_output> _weak_offline_output;
     std::optional<task_queue> _queue = std::nullopt;
     node_ptr _node;
     chaining::any_observer_ptr _reset_observer = nullptr;
@@ -29,7 +28,7 @@ struct offline_output : manageable_offline_output, std::enable_shared_from_this<
 
     offline_output();
 
-    void _prepare();
+    void _prepare(offline_output_ptr const &);
 
     offline_output(offline_output const &) = delete;
     offline_output(offline_output &&) = delete;

@@ -33,8 +33,8 @@ audio::engine::route::route()
 
 audio::engine::route::~route() = default;
 
-void audio::engine::route::_prepare() {
-    auto weak_route = to_weak(shared_from_this());
+void audio::engine::route::_prepare(route_ptr const &shared) {
+    auto weak_route = to_weak(shared);
 
     this->_node->set_render_handler([weak_route](auto args) {
         auto &dst_buffer = args.buffer;
@@ -138,6 +138,6 @@ void audio::engine::route::_erase_route_if(std::function<bool(audio::route const
 
 audio::engine::route_ptr audio::engine::route::make_shared() {
     auto shared = route_ptr(new route{});
-    shared->_prepare();
+    shared->_prepare(shared);
     return shared;
 }

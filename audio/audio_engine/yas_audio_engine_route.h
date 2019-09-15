@@ -9,7 +9,7 @@
 #include "yas_audio_route.h"
 
 namespace yas::audio::engine {
-struct route : std::enable_shared_from_this<route> {
+struct route final {
     virtual ~route();
 
     audio::route_set_t const &routes() const;
@@ -31,7 +31,7 @@ struct route : std::enable_shared_from_this<route> {
 
     route();
 
-    void _prepare();
+    void _prepare(route_ptr const &);
 
     void _will_reset();
     void _erase_route_if_either_matched(audio::route const &route);
