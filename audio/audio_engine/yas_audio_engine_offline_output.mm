@@ -77,7 +77,8 @@ audio::engine::offline_start_result_t audio::engine::offline_output::start(offli
 
         auto render_buffer = std::make_shared<audio::pcm_buffer>(connection->format, 1024);
 
-        auto weak_output = to_weak(shared_from_this());
+        auto weak_output = this->_weak_offline_output;
+
         auto task_lambda = [weak_output, render_buffer, render_handler = std::move(render_handler),
                             key](task const &task) mutable {
             bool cancelled = false;
@@ -175,9 +176,11 @@ void audio::engine::offline_output::stop() {
     }
 }
 
-void audio::engine::offline_output::_prepare() {
+void audio::engine::offline_output::_prepare(offline_output_ptr const &shared) {
+    this->_weak_offline_output = shared;
+
     this->_reset_observer = this->_node->chain(node::method::will_reset)
-                                .perform([weak_output = to_weak(shared_from_this())](auto const &) {
+                                .perform([weak_output = to_weak(shared)](auto const &) {
                                     if (auto output = weak_output.lock()) {
                                         output->stop();
                                     }
@@ -185,13 +188,9 @@ void audio::engine::offline_output::_prepare() {
                                 .end();
 }
 
-audio::engine::manageable_offline_output_ptr audio::engine::offline_output::manageable() {
-    return std::dynamic_pointer_cast<manageable_offline_output>(shared_from_this());
-}
-
 audio::engine::offline_output_ptr audio::engine::offline_output::make_shared() {
     auto shared = offline_output_ptr(new offline_output{});
-    shared->_prepare();
+    shared->_prepare(shared);
     return shared;
 }
 
