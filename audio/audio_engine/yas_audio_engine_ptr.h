@@ -20,6 +20,10 @@ class offline_output;
 class route;
 class tap;
 
+class manageable_au;
+class node_removable;
+class manageable_kernel;
+
 using au_io_ptr = std::shared_ptr<au_io>;
 using au_output_ptr = std::shared_ptr<au_output>;
 using au_input_ptr = std::shared_ptr<au_input>;
@@ -32,6 +36,10 @@ using node_ptr = std::shared_ptr<node>;
 using offline_output_ptr = std::shared_ptr<offline_output>;
 using route_ptr = std::shared_ptr<route>;
 using tap_ptr = std::shared_ptr<tap>;
+
+using manageable_au_ptr = std::shared_ptr<manageable_au>;
+using node_removable_ptr = std::shared_ptr<node_removable>;
+using manageable_kernel_ptr = std::shared_ptr<manageable_kernel>;
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
 class device_io;

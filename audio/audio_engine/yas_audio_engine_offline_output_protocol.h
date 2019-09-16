@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include <cpp_utils/yas_protocol.h>
 #include <cpp_utils/yas_result.h>
 #include <functional>
 #include "yas_audio_types.h"

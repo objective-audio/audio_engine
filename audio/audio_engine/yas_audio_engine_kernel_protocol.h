@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <cpp_utils/yas_protocol.h>
+#include "yas_audio_engine_ptr.h"
 
 namespace yas::audio::engine {
 struct manageable_kernel {
@@ -12,7 +12,9 @@ struct manageable_kernel {
 
     virtual void set_input_connections(audio::engine::connection_wmap connections) = 0;
     virtual void set_output_connections(audio::engine::connection_wmap connections) = 0;
-};
 
-using manageable_kernel_ptr = std::shared_ptr<manageable_kernel>;
+    static manageable_kernel_ptr cast(manageable_kernel_ptr const &kernel) {
+        return kernel;
+    }
+};
 }  // namespace yas::audio::engine
