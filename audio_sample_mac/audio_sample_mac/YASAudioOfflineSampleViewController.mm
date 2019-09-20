@@ -136,7 +136,7 @@ struct offline_vc_internal {
                                      .pcm_format = audio::pcm_format::float32,
                                      .interleaved = false});
 
-        this->play_au_mixer->au().node().reset();
+        this->play_au_mixer->au().node()->reset();
         this->play_au_mixer->set_input_pan(0.0f, 0);
         this->play_au_mixer->set_input_enabled(true, 0);
         this->play_au_mixer->set_output_volume(1.0f, 0);
@@ -149,7 +149,7 @@ struct offline_vc_internal {
         this->offline_manager->add_offline_output();
         audio::engine::offline_output_ptr const &offline_output = this->offline_manager->offline_output();
 
-        this->offline_au_mixer->au().node().reset();
+        this->offline_au_mixer->au().node()->reset();
         this->offline_au_mixer->set_input_pan(0.0f, 0);
         this->offline_au_mixer->set_input_enabled(true, 0);
         this->offline_au_mixer->set_output_volume(1.0f, 0);
