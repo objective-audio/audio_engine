@@ -16,51 +16,60 @@ static double constexpr sample_rate = 44100.0;
 }
 
 namespace yas::offline_sample::engine {
+class sine;
+using sine_ptr = std::shared_ptr<sine>;
+
 struct sine {
-    struct impl {
-        audio::engine::tap_ptr _tap = audio::engine::tap::make_shared();
-        double phase_on_render;
+    virtual ~sine() = default;
 
-        void set_frequency(float const frequency) {
-            std::lock_guard<std::recursive_mutex> lock(_mutex);
-            _frequency = frequency;
-        }
+    void set_frequency(float const frequency) {
+        std::lock_guard<std::recursive_mutex> lock(_mutex);
+        __frequency = frequency;
+    }
 
-        float frequency() const {
-            std::lock_guard<std::recursive_mutex> lock(_mutex);
-            return _frequency;
-        }
+    float frequency() const {
+        std::lock_guard<std::recursive_mutex> lock(_mutex);
+        return __frequency;
+    }
 
-        void set_playing(bool const playing) {
-            std::lock_guard<std::recursive_mutex> lock(_mutex);
-            _playing = playing;
-        }
+    void set_playing(bool const playing) {
+        std::lock_guard<std::recursive_mutex> lock(_mutex);
+        __playing = playing;
+    }
 
-        bool is_playing() const {
-            std::lock_guard<std::recursive_mutex> lock(_mutex);
-            return _playing;
-        }
+    bool is_playing() const {
+        std::lock_guard<std::recursive_mutex> lock(_mutex);
+        return __playing;
+    }
 
-       private:
-        float _frequency;
-        bool _playing;
-        mutable std::recursive_mutex _mutex;
-    };
+    audio::engine::tap &tap() {
+        return *this->_tap;
+    }
 
-    sine() : _impl(std::make_shared<impl>()) {
+   private:
+    audio::engine::tap_ptr _tap = audio::engine::tap::make_shared();
+    double _phase_on_render;
+
+    mutable std::recursive_mutex _mutex;
+    float __frequency;
+    bool __playing;
+
+    sine() = default;
+
+    void _prepare(sine_ptr const &shared) {
         set_frequency(1000.0);
 
-        auto weak_impl = to_weak(this->_impl);
+        auto weak_sine = to_weak(shared);
 
-        auto render_handler = [weak_impl](auto args) {
+        auto render_handler = [weak_sine](auto args) {
             auto &buffer = args.buffer;
 
             buffer.clear();
 
-            if (auto sine_impl = weak_impl.lock()) {
-                if (sine_impl->is_playing()) {
-                    double const start_phase = sine_impl->phase_on_render;
-                    double const phase_per_frame = sine_impl->frequency() / sample_rate * audio::math::two_pi;
+            if (auto sine = weak_sine.lock()) {
+                if (sine->is_playing()) {
+                    double const start_phase = sine->_phase_on_render;
+                    double const phase_per_frame = sine->frequency() / sample_rate * audio::math::two_pi;
                     double next_phase = start_phase;
                     uint32_t const frame_length = buffer.frame_length();
 
@@ -70,7 +79,7 @@ struct sine {
                             next_phase = audio::math::fill_sine(yas_each_data_ptr(each), frame_length, start_phase,
                                                                 phase_per_frame);
                         }
-                        sine_impl->phase_on_render = next_phase;
+                        sine->_phase_on_render = next_phase;
                     }
                 }
             }
@@ -79,30 +88,12 @@ struct sine {
         tap().set_render_handler(render_handler);
     }
 
-    virtual ~sine() = default;
-
-    void set_frequency(float const frequency) {
-        this->_impl->set_frequency(frequency);
+   public:
+    static sine_ptr make_shared() {
+        auto shared = sine_ptr(new sine{});
+        shared->_prepare(shared);
+        return shared;
     }
-
-    float frequency() const {
-        return this->_impl->frequency();
-    }
-
-    void set_playing(bool const playing) {
-        this->_impl->set_playing(playing);
-    }
-
-    bool is_playing() const {
-        return this->_impl->is_playing();
-    }
-
-    audio::engine::tap &tap() {
-        return *this->_impl->_tap;
-    }
-
-   private:
-    std::shared_ptr<impl> _impl;
 };
 }
 
@@ -122,11 +113,11 @@ struct offline_vc_internal {
     audio::engine::manager_ptr play_manager = audio::engine::manager::make_shared();
     audio::engine::au_output_ptr play_au_output = audio::engine::au_output::make_shared();
     audio::engine::au_mixer_ptr play_au_mixer = audio::engine::au_mixer::make_shared();
-    offline_sample::engine::sine play_sine;
+    offline_sample::engine::sine_ptr play_sine = offline_sample::engine::sine::make_shared();
 
     audio::engine::manager_ptr offline_manager = audio::engine::manager::make_shared();
     audio::engine::au_mixer_ptr offline_au_mixer = audio::engine::au_mixer::make_shared();
-    offline_sample::engine::sine offline_sine;
+    offline_sample::engine::sine_ptr offline_sine = offline_sample::engine::sine::make_shared();
 
     chaining::any_observer_ptr engine_observer = nullptr;
 
@@ -144,7 +135,7 @@ struct offline_vc_internal {
 
         this->play_manager->connect(this->play_au_mixer->au().node(), this->play_au_output->au_io().au().node(),
                                     format);
-        this->play_manager->connect(this->play_sine.tap().node(), this->play_au_mixer->au().node(), format);
+        this->play_manager->connect(this->play_sine->tap().node(), this->play_au_mixer->au().node(), format);
 
         this->offline_manager->add_offline_output();
         audio::engine::offline_output_ptr const &offline_output = this->offline_manager->offline_output();
@@ -156,7 +147,7 @@ struct offline_vc_internal {
         this->offline_au_mixer->set_output_pan(0.0f, 0);
 
         this->offline_manager->connect(this->offline_au_mixer->au().node(), offline_output->node(), format);
-        this->offline_manager->connect(this->offline_sine.tap().node(), this->offline_au_mixer->au().node(), format);
+        this->offline_manager->connect(this->offline_sine->tap().node(), this->offline_au_mixer->au().node(), format);
 
         this->engine_observer = this->play_manager->chain(audio::engine::manager::method::configuration_change)
                                     .perform([weak_play_au_output = to_weak(play_au_output)](auto const &) {
@@ -207,19 +198,19 @@ struct offline_vc_internal {
 }
 
 - (void)setFrequency:(float)frequency {
-    _internal.play_sine.set_frequency(frequency);
+    _internal.play_sine->set_frequency(frequency);
 }
 
 - (float)frequency {
-    return _internal.play_sine.frequency();
+    return _internal.play_sine->frequency();
 }
 
 - (void)setPlaying:(BOOL)playing {
-    _internal.play_sine.set_playing(playing);
+    _internal.play_sine->set_playing(playing);
 }
 
 - (BOOL)playing {
-    return _internal.play_sine.is_playing();
+    return _internal.play_sine->is_playing();
 }
 
 - (IBAction)playButtonTapped:(id)sender {
@@ -255,8 +246,8 @@ struct offline_vc_internal {
         return;
     }
 
-    _internal.offline_sine.set_frequency(_internal.play_sine.frequency());
-    _internal.offline_sine.set_playing(true);
+    _internal.offline_sine->set_frequency(_internal.play_sine->frequency());
+    _internal.offline_sine->set_playing(true);
     _internal.offline_au_mixer->set_input_volume(self.volume, 0);
 
     self.processing = YES;
