@@ -37,80 +37,17 @@ bool audio::device::stream::property_info::operator<(property_info const &info) 
 audio::device::stream::change_info::change_info(std::vector<property_info> &&infos) : property_infos(infos) {
 }
 
-#pragma mark - private
-
-struct audio::device::stream::impl {
-    using listener_f =
-        std::function<void(uint32_t const in_number_addresses, const AudioObjectPropertyAddress *const in_addresses)>;
-
-    std::weak_ptr<stream> _weak_stream;
-    AudioStreamID _stream_id;
-    AudioDeviceID _device_id;
-    chaining::notifier_ptr<chaining_pair_t> _notifier = chaining::notifier<chaining_pair_t>::make_shared();
-
-    impl(AudioStreamID const stream_id, AudioDeviceID const device_id) : _stream_id(stream_id), _device_id(device_id) {
-    }
-
-    void prepare(device::stream_ptr const &shared) {
-        this->_weak_stream = shared;
-
-        auto listener = this->listener();
-        this->add_listener(kAudioStreamPropertyVirtualFormat, listener);
-        this->add_listener(kAudioStreamPropertyIsActive, listener);
-        this->add_listener(kAudioStreamPropertyStartingChannel, listener);
-    }
-
-    listener_f listener() {
-        auto weak_stream = to_weak(this->_weak_stream.lock());
-
-        return [weak_stream](uint32_t const address_count, const AudioObjectPropertyAddress *const addresses) {
-            if (auto stream = weak_stream.lock()) {
-                AudioStreamID const object_id = stream->stream_id();
-                std::vector<property_info> infos;
-                for (uint32_t i = 0; i < address_count; i++) {
-                    if (addresses[i].mSelector == kAudioStreamPropertyVirtualFormat) {
-                        infos.emplace_back(property_info{.property = stream::property::virtual_format,
-                                                         .object_id = object_id,
-                                                         .address = addresses[i]});
-                    } else if (addresses[i].mSelector == kAudioStreamPropertyIsActive) {
-                        infos.emplace_back(property_info{
-                            .property = stream::property::is_active, .object_id = object_id, .address = addresses[i]});
-                    } else if (addresses[i].mSelector == kAudioStreamPropertyStartingChannel) {
-                        infos.emplace_back(property_info{.property = stream::property::starting_channel,
-                                                         .object_id = object_id,
-                                                         .address = addresses[i]});
-                    }
-                }
-                change_info change_info{std::move(infos)};
-                stream->_impl->_notifier->notify(std::make_pair(method::did_change, change_info));
-            }
-        };
-    }
-
-    void add_listener(AudioObjectPropertySelector const &selector, listener_f handler) {
-        AudioObjectPropertyAddress const address = {.mSelector = selector,
-                                                    .mScope = kAudioObjectPropertyScopeGlobal,
-                                                    .mElement = kAudioObjectPropertyElementMaster};
-
-        raise_if_raw_audio_error(
-            AudioObjectAddPropertyListenerBlock(this->_stream_id, &address, dispatch_get_main_queue(),
-                                                ^(uint32_t address_count, const AudioObjectPropertyAddress *addresses) {
-                                                    handler(address_count, addresses);
-                                                }));
-    }
-};
-
 #pragma mark - main
 
-audio::device::stream::stream(args &&args) : _impl(std::make_shared<impl>(args.stream_id, args.device_id)) {
+audio::device::stream::stream(args &&args) : _stream_id(args.stream_id), _device_id(args.device_id) {
 }
 
 AudioStreamID audio::device::stream::stream_id() const {
-    return this->_impl->_stream_id;
+    return this->_stream_id;
 }
 
 audio::device_ptr audio::device::stream::device() const {
-    return device::device_for_id(this->_impl->_device_id);
+    return device::device_for_id(this->_device_id);
 }
 
 bool audio::device::stream::is_active() const {
@@ -148,12 +85,12 @@ uint32_t audio::device::stream::starting_channel() const {
 }
 
 chaining::chain_unsync_t<audio::device::stream::chaining_pair_t> audio::device::stream::chain() const {
-    return this->_impl->_notifier->chain();
+    return this->_notifier->chain();
 }
 
 chaining::chain_relayed_unsync_t<audio::device::stream::change_info, audio::device::stream::chaining_pair_t>
 audio::device::stream::chain(method const method) const {
-    return this->_impl->_notifier->chain()
+    return this->_notifier->chain()
         .guard([method](auto const &pair) { return pair.first == method; })
         .to([](audio::device::stream::chaining_pair_t const &pair) { return pair.second; });
 }
@@ -167,7 +104,50 @@ bool audio::device::stream::operator!=(stream const &rhs) const {
 }
 
 void audio::device::stream::_prepare(device::stream_ptr const &shared) {
-    this->_impl->prepare(shared);
+    this->_weak_stream = shared;
+
+    auto listener = this->_listener();
+    this->_add_listener(kAudioStreamPropertyVirtualFormat, listener);
+    this->_add_listener(kAudioStreamPropertyIsActive, listener);
+    this->_add_listener(kAudioStreamPropertyStartingChannel, listener);
+}
+
+audio::device::stream::listener_f audio::device::stream::_listener() {
+    auto weak_stream = to_weak(this->_weak_stream.lock());
+
+    return [weak_stream](uint32_t const address_count, const AudioObjectPropertyAddress *const addresses) {
+        if (auto stream = weak_stream.lock()) {
+            AudioStreamID const object_id = stream->stream_id();
+            std::vector<property_info> infos;
+            for (uint32_t i = 0; i < address_count; i++) {
+                if (addresses[i].mSelector == kAudioStreamPropertyVirtualFormat) {
+                    infos.emplace_back(property_info{
+                        .property = stream::property::virtual_format, .object_id = object_id, .address = addresses[i]});
+                } else if (addresses[i].mSelector == kAudioStreamPropertyIsActive) {
+                    infos.emplace_back(property_info{
+                        .property = stream::property::is_active, .object_id = object_id, .address = addresses[i]});
+                } else if (addresses[i].mSelector == kAudioStreamPropertyStartingChannel) {
+                    infos.emplace_back(property_info{.property = stream::property::starting_channel,
+                                                     .object_id = object_id,
+                                                     .address = addresses[i]});
+                }
+            }
+            change_info change_info{std::move(infos)};
+            stream->_notifier->notify(std::make_pair(method::did_change, change_info));
+        }
+    };
+}
+
+void audio::device::stream::_add_listener(AudioObjectPropertySelector const &selector, listener_f handler) {
+    AudioObjectPropertyAddress const address = {.mSelector = selector,
+                                                .mScope = kAudioObjectPropertyScopeGlobal,
+                                                .mElement = kAudioObjectPropertyElementMaster};
+
+    raise_if_raw_audio_error(
+        AudioObjectAddPropertyListenerBlock(this->_stream_id, &address, dispatch_get_main_queue(),
+                                            ^(uint32_t address_count, const AudioObjectPropertyAddress *addresses) {
+                                                handler(address_count, addresses);
+                                            }));
 }
 
 audio::device::stream_ptr audio::device::stream::make_shared(device::stream::args args) {

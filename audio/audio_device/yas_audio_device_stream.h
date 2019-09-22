@@ -56,13 +56,19 @@ struct device::stream {
     bool operator!=(stream const &) const;
 
    private:
-    class impl;
+    using listener_f =
+        std::function<void(uint32_t const in_number_addresses, const AudioObjectPropertyAddress *const in_addresses)>;
 
-    std::shared_ptr<impl> _impl;
+    std::weak_ptr<stream> _weak_stream;
+    AudioStreamID _stream_id;
+    AudioDeviceID _device_id;
+    chaining::notifier_ptr<chaining_pair_t> _notifier = chaining::notifier<chaining_pair_t>::make_shared();
 
     explicit stream(args &&args);
 
     void _prepare(device::stream_ptr const &);
+    listener_f _listener();
+    void _add_listener(AudioObjectPropertySelector const &selector, listener_f handler);
 
     template <typename T>
     std::unique_ptr<std::vector<T>> _property_data(AudioStreamID const stream_id,
