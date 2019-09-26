@@ -291,9 +291,13 @@ bool audio::file::_create_ext_audio_file(CFDictionaryRef const &settings, pcm_fo
 
 #pragma mark -
 
+audio::file_ptr audio::file::make_shared() {
+    return file_ptr(new file{});
+}
+
 audio::file::make_opened_result_t audio::file::make_opened(file::open_args args) {
-    audio::file file;
-    if (auto result = file.open(std::move(args))) {
+    auto file = make_shared();
+    if (auto result = file->open(std::move(args))) {
         return file::make_opened_result_t{std::move(file)};
     } else {
         return file::make_opened_result_t{std::move(result.error())};
@@ -301,8 +305,8 @@ audio::file::make_opened_result_t audio::file::make_opened(file::open_args args)
 }
 
 audio::file::make_created_result_t audio::file::make_created(file::create_args args) {
-    audio::file file;
-    if (auto result = file.create(std::move(args))) {
+    auto file = make_shared();
+    if (auto result = file->create(std::move(args))) {
         return file::make_created_result_t{std::move(file)};
     } else {
         return file::make_created_result_t{std::move(result.error())};

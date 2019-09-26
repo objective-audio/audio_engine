@@ -9,6 +9,7 @@
 #include <ostream>
 #include "yas_audio_file_utils.h"
 #include "yas_audio_format.h"
+#include "yas_audio_ptr.h"
 #include "yas_audio_types.h"
 
 namespace yas {
@@ -65,14 +66,10 @@ struct file final {
     using read_result_t = result<std::nullptr_t, read_error_t>;
     using create_result_t = result<std::nullptr_t, create_error_t>;
     using write_result_t = result<std::nullptr_t, write_error_t>;
-    using make_opened_result_t = result<audio::file, open_error_t>;
-    using make_created_result_t = result<audio::file, create_error_t>;
+    using make_opened_result_t = result<audio::file_ptr, open_error_t>;
+    using make_created_result_t = result<audio::file_ptr, create_error_t>;
 
-    file();
     ~file();
-
-    file(file &&) = default;
-    file &operator=(file &&) = default;
 
     open_result_t open(open_args);
     create_result_t create(create_args);
@@ -93,6 +90,7 @@ struct file final {
     read_result_t read_into_buffer(audio::pcm_buffer &buffer, uint32_t const frame_length = 0);
     write_result_t write_from_buffer(audio::pcm_buffer const &buffer, bool const async = false);
 
+    static file_ptr make_shared();
     static file::make_opened_result_t make_opened(file::open_args);
     static file::make_created_result_t make_created(file::create_args);
 
@@ -107,8 +105,12 @@ struct file final {
     bool _open_ext_audio_file(pcm_format const pcm_format, bool const interleaved);
     bool _create_ext_audio_file(CFDictionaryRef const &settings, pcm_format const pcm_format, bool const interleaved);
 
+    file();
+
     file(file const &) = delete;
+    file(file &&) = delete;
     file &operator=(file const &) = delete;
+    file &operator=(file &&) = delete;
 };
 }  // namespace yas::audio
 
