@@ -18,9 +18,9 @@ using namespace yas;
 
 namespace yas::sample {
 struct graph_vc_internal {
-    std::shared_ptr<audio::graph> graph = nullptr;
-    std::shared_ptr<audio::unit> io_unit = nullptr;
-    std::shared_ptr<audio::unit> mixer_unit = nullptr;
+    audio::graph_ptr graph = nullptr;
+    audio::unit_ptr io_unit = nullptr;
+    audio::unit_ptr mixer_unit = nullptr;
 
     void setup_graph() {
         double const sample_rate = [[AVAudioSession sharedInstance] sampleRate];

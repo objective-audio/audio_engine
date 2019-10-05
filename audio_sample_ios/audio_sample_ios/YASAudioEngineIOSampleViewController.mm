@@ -33,9 +33,9 @@ typedef NS_ENUM(NSUInteger, YASAudioEngineIOSampleSection) {
 
 namespace yas::sample {
 struct engine_io_vc_internal {
-    std::shared_ptr<audio::engine::manager> manager = audio::engine::manager::make_shared();
-    std::shared_ptr<audio::engine::au_mixer> au_mixer = audio::engine::au_mixer::make_shared();
-    std::shared_ptr<audio::engine::au_io> au_io = audio::engine::au_io::make_shared();
+    audio::engine::manager_ptr manager = audio::engine::manager::make_shared();
+    audio::engine::au_mixer_ptr au_mixer = audio::engine::au_mixer::make_shared();
+    audio::engine::au_io_ptr au_io = audio::engine::au_io::make_shared();
 
     chaining::any_observer_ptr engine_observer = nullptr;
 
@@ -197,7 +197,7 @@ struct engine_io_vc_internal {
 - (void)setupEngine {
     _internal = sample::engine_io_vc_internal();
 
-    auto unowned_self = make_objc_ptr([[YASUnownedObject alloc] initWithObject:self]);
+    auto unowned_self = objc_ptr_with_move_object([[YASUnownedObject alloc] initWithObject:self]);
 
     _internal.engine_observer =
         _internal.manager->chain(audio::engine::manager::method::configuration_change)
@@ -360,8 +360,8 @@ struct engine_io_vc_internal {
     switch (indexPath.section) {
         case YASAudioEngineIOSampleSectionNotify: {
             if (_internal.manager) {
-                auto &manager = _internal.manager;
-                manager->notifier().notify(
+                auto const &manager = _internal.manager;
+                manager->notifier()->notify(
                     std::make_pair(audio::engine::manager::method::configuration_change, manager));
             }
         } break;
