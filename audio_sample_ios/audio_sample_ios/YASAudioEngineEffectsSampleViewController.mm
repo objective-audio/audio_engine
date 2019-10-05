@@ -27,11 +27,11 @@ static const AudioComponentDescription baseAcd = {.componentType = kAudioUnitTyp
 
 namespace yas::sample {
 struct effects_vc_internal {
-    std::shared_ptr<audio::engine::manager> manager = audio::engine::manager::make_shared();
-    std::shared_ptr<audio::engine::au_output> au_output = audio::engine::au_output::make_shared();
-    std::shared_ptr<audio::engine::connection> through_connection = nullptr;
-    std::shared_ptr<audio::engine::tap> tap = audio::engine::tap::make_shared();
-    std::shared_ptr<audio::engine::au> effect_au = nullptr;
+    audio::engine::manager_ptr manager = audio::engine::manager::make_shared();
+    audio::engine::au_output_ptr au_output = audio::engine::au_output::make_shared();
+    audio::engine::connection_ptr through_connection = nullptr;
+    audio::engine::tap_ptr tap = audio::engine::tap::make_shared();
+    audio::engine::au_ptr effect_au = nullptr;
 
     void replace_effect_au(const AudioComponentDescription *acd) {
         if (effect_au) {
@@ -40,7 +40,7 @@ struct effects_vc_internal {
         }
 
         if (through_connection) {
-            manager->disconnect(*through_connection);
+            manager->disconnect(through_connection);
             through_connection = nullptr;
         }
 
@@ -51,15 +51,14 @@ struct effects_vc_internal {
             manager->connect(effect_au->node(), au_output->au_io().au().node(), format);
             manager->connect(tap->node(), effect_au->node(), format);
         } else {
-            through_connection =
-                manager->connect(tap->node(), au_output->au_io().au().node(), format).shared_from_this();
+            through_connection = manager->connect(tap->node(), au_output->au_io().au().node(), format);
         }
     }
 };
 }
 
 @implementation YASAudioEngineEffectsSampleViewController {
-    std::vector<std::shared_ptr<audio::unit>> _units;
+    std::vector<audio::unit_ptr> _units;
     std::optional<uint32_t> _index;
     sample::effects_vc_internal _internal;
 }
@@ -119,7 +118,7 @@ struct effects_vc_internal {
     id destinationViewController = segue.destinationViewController;
     if ([destinationViewController isKindOfClass:[YASAudioEngineEffectsSampleEditViewController class]]) {
         YASAudioEngineEffectsSampleEditViewController *controller = destinationViewController;
-        [controller set_engine_au:*_internal.effect_au];
+        [controller set_engine_au:_internal.effect_au];
     }
 }
 

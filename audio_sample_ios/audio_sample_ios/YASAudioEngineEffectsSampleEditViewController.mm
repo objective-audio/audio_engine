@@ -13,15 +13,15 @@ using namespace yas;
 @end
 
 @implementation YASAudioEngineEffectsSampleEditViewController {
-    std::shared_ptr<audio::engine::au> _au;
+    audio::engine::au_ptr _au;
 }
 
 - (void)viewDidLoad {
     [super viewDidLoad];
 }
 
-- (void)set_engine_au:(audio::engine::au &)au {
-    _au = au.shared_from_this();
+- (void)set_engine_au:(audio::engine::au_ptr const &)au {
+    _au = au;
 
     [self.tableView reloadData];
 }

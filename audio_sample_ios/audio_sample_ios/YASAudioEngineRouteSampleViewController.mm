@@ -34,11 +34,11 @@ typedef NS_ENUM(NSUInteger, YASAudioEngineRouteSampleSourceIndex) {
 
 namespace yas::sample {
 struct route_vc_internal {
-    std::shared_ptr<audio::engine::manager> manager = audio::engine::manager::make_shared();
-    std::shared_ptr<audio::engine::au_io> au_io = audio::engine::au_io::make_shared();
-    std::shared_ptr<audio::engine::au_mixer> au_mixer = audio::engine::au_mixer::make_shared();
+    audio::engine::manager_ptr manager = audio::engine::manager::make_shared();
+    audio::engine::au_io_ptr au_io = audio::engine::au_io::make_shared();
+    audio::engine::au_mixer_ptr au_mixer = audio::engine::au_mixer::make_shared();
     std::shared_ptr<audio::engine::route> route = audio::engine::route::make_shared();
-    std::shared_ptr<audio::engine::tap> sine_tap = audio::engine::tap::make_shared();
+    audio::engine::tap_ptr sine_tap = audio::engine::tap::make_shared();
 
     chaining::any_observer_ptr engine_observer = nullptr;
 
@@ -254,7 +254,7 @@ struct route_vc_internal {
 
     _internal.sine_tap->set_render_handler(tap_render_handler);
 
-    auto unowned_self = make_objc_ptr([[YASUnownedObject alloc] initWithObject:self]);
+    auto unowned_self = objc_ptr_with_move_object([[YASUnownedObject alloc] initWithObject:self]);
 
     _internal.engine_observer =
         _internal.manager->chain(audio::engine::manager::method::configuration_change)
