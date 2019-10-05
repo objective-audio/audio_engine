@@ -236,7 +236,7 @@ struct offline_vc_internal {
 
 - (void)startOfflineFileWritingWithURL:(NSURL *)url {
     auto wave_settings = audio::wave_file_settings(offline_sample::sample_rate, 2, 16);
-    auto file_writer = std::make_shared<audio::file>();
+    auto file_writer = audio::file::make_shared();
     auto create_result = file_writer->create({.file_url = yas::url{to_string((__bridge CFStringRef)url.path)},
                                               .file_type = audio::file_type::wave,
                                               .settings = wave_settings});
