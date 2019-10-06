@@ -265,10 +265,10 @@ audio::device_ptr audio::device::device_for_id(AudioDeviceID const audio_device_
     return nullptr;
 }
 
-std::optional<size_t> audio::device::index_of_device(device const &device) {
+std::optional<size_t> audio::device::index_of_device(device_ptr const &device) {
     auto all_devices = device::all_devices();
     auto it = std::find_if(all_devices.begin(), all_devices.end(), [&device](auto const &value) {
-        return value->audio_device_id() == device.audio_device_id();
+        return value->audio_device_id() == device->audio_device_id();
     });
     if (it != all_devices.end()) {
         return std::make_optional<size_t>(it - all_devices.begin());
@@ -277,8 +277,8 @@ std::optional<size_t> audio::device::index_of_device(device const &device) {
     }
 }
 
-bool audio::device::is_available_device(device const &device) {
-    auto it = device_global::all_devices_map().find(device.audio_device_id());
+bool audio::device::is_available_device(device_ptr const &device) {
+    auto it = device_global::all_devices_map().find(device->audio_device_id());
     return it != device_global::all_devices_map().end();
 }
 

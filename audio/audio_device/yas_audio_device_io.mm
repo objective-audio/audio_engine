@@ -129,7 +129,7 @@ void audio::device_io::_uninitialize() {
         return;
     }
 
-    if (device::is_available_device(*this->_device)) {
+    if (device::is_available_device(this->_device)) {
         raise_if_raw_audio_error(AudioDeviceDestroyIOProcID(this->_device->audio_device_id(), this->_io_proc_id));
     }
 
@@ -215,7 +215,7 @@ void audio::device_io::stop() {
         return;
     }
 
-    if (device::is_available_device(*this->_device)) {
+    if (device::is_available_device(this->_device)) {
         raise_if_raw_audio_error(AudioDeviceStop(this->_device->audio_device_id(), this->_io_proc_id));
     }
 }

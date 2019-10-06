@@ -203,8 +203,8 @@ struct device_io_vc_internal {
 
     [self _updateDeviceNames];
 
-    if (auto default_device = audio::device::default_output_device()) {
-        if (auto index = audio::device::index_of_device(*default_device)) {
+    if (auto const default_device = audio::device::default_output_device()) {
+        if (auto index = audio::device::index_of_device(default_device)) {
             self.selectedDeviceIndex = *index;
         }
     }
@@ -244,8 +244,8 @@ struct device_io_vc_internal {
     self.deviceNames = titles;
 
     std::optional<NSUInteger> index = std::nullopt;
-    if (auto const &device = _internal.manager->device_io()->device()) {
-        index = audio::device::index_of_device(*device);
+    if (auto const device = _internal.manager->device_io()->device()) {
+        index = audio::device::index_of_device(device);
     }
 
     if (index) {
