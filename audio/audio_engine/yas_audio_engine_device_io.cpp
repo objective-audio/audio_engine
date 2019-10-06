@@ -74,7 +74,12 @@ audio::device_io_ptr const &audio::engine::device_io::raw_device_io() {
 void audio::engine::device_io::_prepare(device_io_ptr const &shared) {
     this->_weak_engine_device_io = to_weak(shared);
 
-    this->set_device(device::default_output_device());
+#warning todo
+    if (auto const device = device::default_output_device()) {
+        this->set_device(*device);
+    } else {
+        this->set_device(nullptr);
+    }
 
     this->_node->set_render_handler([weak_engine_device_io = this->_weak_engine_device_io](auto args) {
         auto &buffer = args.buffer;

@@ -98,7 +98,11 @@ void audio::engine::au_io::set_device(audio::device const &device) {
 }
 
 audio::device_ptr audio::engine::au_io::device() const {
-    return device::device_for_id(this->_au->unit()->current_device());
+    if (auto device = device::device_for_id(this->_au->unit()->current_device())) {
+        return *device;
+    } else {
+        return nullptr;
+    }
 }
 
 #endif

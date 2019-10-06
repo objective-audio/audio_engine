@@ -204,7 +204,7 @@ struct device_io_vc_internal {
     [self _updateDeviceNames];
 
     if (auto const default_device = audio::device::default_output_device()) {
-        if (auto index = audio::device::index_of_device(default_device)) {
+        if (auto index = audio::device::index_of_device(*default_device)) {
             self.selectedDeviceIndex = *index;
         }
     }
