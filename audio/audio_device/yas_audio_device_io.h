@@ -44,7 +44,7 @@ struct device_io final {
     AudioDeviceIOProcID _io_proc_id = nullptr;
     pcm_buffer_ptr _input_buffer_on_render = nullptr;
     audio::time_ptr _input_time_on_render = nullptr;
-    chaining::any_observer_ptr _device_system_observer = nullptr;
+    std::optional<chaining::any_observer_ptr> _device_system_observer = std::nullopt;
     std::optional<chaining::any_observer_ptr> _device_observer = std::nullopt;
 
     device_io();
