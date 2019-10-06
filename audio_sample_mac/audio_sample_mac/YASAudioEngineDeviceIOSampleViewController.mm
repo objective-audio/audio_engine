@@ -203,7 +203,7 @@ struct device_io_vc_internal {
 
     [self _updateDeviceNames];
 
-    if (auto default_device = audio::device::default_output_device()) {
+    if (auto const default_device = audio::device::default_output_device()) {
         if (auto index = audio::device::index_of_device(*default_device)) {
             self.selectedDeviceIndex = *index;
         }
@@ -244,7 +244,7 @@ struct device_io_vc_internal {
     self.deviceNames = titles;
 
     std::optional<NSUInteger> index = std::nullopt;
-    if (auto const &device = _internal.manager->device_io()->device()) {
+    if (auto const device = _internal.manager->device_io()->device()) {
         index = audio::device::index_of_device(*device);
     }
 
@@ -266,7 +266,8 @@ struct device_io_vc_internal {
         _internal.manager->disconnect(_internal.route->node());
         _internal.route->clear_routes();
 
-        if (auto const &device = _internal.manager->device_io()->device()) {
+        if (auto const &device_opt = _internal.manager->device_io()->device()) {
+            auto const &device = *device_opt;
             if (device->output_channel_count() > 0) {
                 if (auto const output_format = device->output_format()) {
                     _internal.manager->connect(_internal.route->node(), _internal.manager->device_io()->node(),
@@ -285,7 +286,8 @@ struct device_io_vc_internal {
         }
     }
 
-    if (auto const &device = _internal.manager->device_io()->device()) {
+    if (auto const &device_opt = _internal.manager->device_io()->device()) {
+        auto const &device = *device_opt;
         uint32_t const output_channel_count = device->output_channel_count();
         uint32_t const input_channel_count = device->input_channel_count();
         NSMutableArray *outputRoutes = [NSMutableArray arrayWithCapacity:output_channel_count];
@@ -402,7 +404,7 @@ struct device_io_vc_internal {
                                         })
                                         .end();
     } else {
-        _internal.manager->device_io()->set_device(nullptr);
+        _internal.manager->device_io()->set_device(std::nullopt);
     }
 
     [self _updateConnection];

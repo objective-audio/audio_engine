@@ -54,12 +54,12 @@ struct device {
     static std::vector<device_ptr> all_devices();
     static std::vector<device_ptr> output_devices();
     static std::vector<device_ptr> input_devices();
-    static device_ptr default_system_output_device();
-    static device_ptr default_output_device();
-    static device_ptr default_input_device();
-    static device_ptr device_for_id(AudioDeviceID const);
-    static std::optional<size_t> index_of_device(device const &);
-    static bool is_available_device(device const &);
+    static std::optional<device_ptr> default_system_output_device();
+    static std::optional<device_ptr> default_output_device();
+    static std::optional<device_ptr> default_input_device();
+    static std::optional<device_ptr> device_for_id(AudioDeviceID const);
+    static std::optional<size_t> index_of_device(device_ptr const &);
+    static bool is_available_device(device_ptr const &);
 
     AudioDeviceID audio_device_id() const;
     CFStringRef name() const;

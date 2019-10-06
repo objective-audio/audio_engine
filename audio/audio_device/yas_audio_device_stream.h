@@ -43,7 +43,7 @@ struct device::stream {
     };
 
     AudioStreamID stream_id() const;
-    audio::device_ptr device() const;
+    std::optional<audio::device_ptr> device() const;
     bool is_active() const;
     audio::direction direction() const;
     audio::format virtual_format() const;

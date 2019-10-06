@@ -24,11 +24,11 @@ struct device_io final {
 
     ~device_io();
 
-    void set_device(audio::device_ptr const device);
-    audio::device_ptr const &device() const;
+    void set_device(std::optional<audio::device_ptr> const);
+    std::optional<audio::device_ptr> const &device() const;
     bool is_running() const;
     void set_render_handler(render_f);
-    void set_maximum_frames_per_slice(uint32_t const frames);
+    void set_maximum_frames_per_slice(uint32_t const);
     uint32_t maximum_frames_per_slice() const;
 
     void start();
@@ -42,7 +42,7 @@ struct device_io final {
     using kernel_ptr = std::shared_ptr<kernel>;
 
     std::weak_ptr<device_io> _weak_device_io;
-    audio::device_ptr _device = nullptr;
+    std::optional<audio::device_ptr> _device = std::nullopt;
     bool _is_running = false;
     AudioDeviceIOProcID _io_proc_id = nullptr;
     pcm_buffer_ptr _input_buffer_on_render = nullptr;
@@ -52,7 +52,7 @@ struct device_io final {
 
     device_io();
 
-    void _prepare(device_io_ptr const &, device_ptr const &);
+    void _prepare(device_io_ptr const &, std::optional<device_ptr> const &);
     void _initialize();
     void _uninitialize();
 
@@ -70,7 +70,7 @@ struct device_io final {
     void _update_kernel();
 
    public:
-    static audio::device_io_ptr make_shared(audio::device_ptr const &);
+    static audio::device_io_ptr make_shared(std::optional<device_ptr> const &);
 };
 
 }  // namespace yas::audio

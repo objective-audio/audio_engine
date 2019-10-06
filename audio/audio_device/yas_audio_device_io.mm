@@ -18,31 +18,34 @@ using namespace yas;
 struct audio::device_io::kernel {
     kernel(std::optional<audio::format> const &input_format, std::optional<audio::format> const &output_format,
            uint32_t const frame_capacity)
-        : _input_buffer(input_format ? std::make_shared<pcm_buffer>(*input_format, frame_capacity) : nullptr),
-          _output_buffer(output_format ? std::make_shared<pcm_buffer>(*output_format, frame_capacity) : nullptr) {
+        : _input_buffer(input_format ? std::make_optional(std::make_shared<pcm_buffer>(*input_format, frame_capacity)) :
+                                       std::nullopt),
+          _output_buffer(output_format ?
+                             std::make_optional(std::make_shared<pcm_buffer>(*output_format, frame_capacity)) :
+                             std::nullopt) {
     }
 
-    pcm_buffer_ptr const &input_buffer() {
+    std::optional<pcm_buffer_ptr> const &input_buffer() {
         return this->_input_buffer;
     }
 
-    pcm_buffer_ptr const &output_buffer() {
+    std::optional<pcm_buffer_ptr> const &output_buffer() {
         return this->_output_buffer;
     }
 
     void reset_buffers() {
-        if (this->_input_buffer) {
-            this->_input_buffer->reset();
+        if (auto const &buffer = this->_input_buffer) {
+            buffer.value()->reset();
         }
 
-        if (this->_output_buffer) {
-            this->_output_buffer->reset();
+        if (auto const &buffer = this->_output_buffer) {
+            buffer.value()->reset();
         }
     }
 
    private:
-    pcm_buffer_ptr _input_buffer;
-    pcm_buffer_ptr _output_buffer;
+    std::optional<pcm_buffer_ptr> _input_buffer;
+    std::optional<pcm_buffer_ptr> _output_buffer;
 
     kernel(kernel const &) = delete;
     kernel(kernel &&) = delete;
@@ -65,7 +68,9 @@ void audio::device_io::_initialize() {
         return;
     }
 
-    if (!this->_device->input_format() && !this->_device->output_format()) {
+    auto const &device = *this->_device;
+
+    if (!device->input_format() && !device->output_format()) {
         return;
     }
 
@@ -80,7 +85,8 @@ void audio::device_io::_initialize() {
             if (auto kernel = device_io->_kernel()) {
                 kernel->reset_buffers();
                 if (inInputData) {
-                    if (auto &input_buffer = kernel->input_buffer()) {
+                    if (auto const &input_buffer_opt = kernel->input_buffer()) {
+                        auto const &input_buffer = *input_buffer_opt;
                         input_buffer->copy_from(inInputData);
 
                         uint32_t const input_frame_length = input_buffer->frame_length();
@@ -93,7 +99,8 @@ void audio::device_io::_initialize() {
                 }
 
                 if (auto render_handler = device_io->_render_handler()) {
-                    if (auto &output_buffer = kernel->output_buffer()) {
+                    if (auto const &output_buffer_opt = kernel->output_buffer()) {
+                        auto const &output_buffer = *output_buffer_opt;
                         if (outOutputData) {
                             uint32_t const frame_length =
                                 audio::frame_length(outOutputData, output_buffer->format().sample_byte_count());
@@ -117,7 +124,7 @@ void audio::device_io::_initialize() {
     };
 
     raise_if_raw_audio_error(
-        AudioDeviceCreateIOProcIDWithBlock(&this->_io_proc_id, this->_device->audio_device_id(), nullptr, handler));
+        AudioDeviceCreateIOProcIDWithBlock(&this->_io_proc_id, device->audio_device_id(), nullptr, handler));
 
     this->_update_kernel();
 }
@@ -129,37 +136,41 @@ void audio::device_io::_uninitialize() {
         return;
     }
 
-    if (device::is_available_device(*this->_device)) {
-        raise_if_raw_audio_error(AudioDeviceDestroyIOProcID(this->_device->audio_device_id(), this->_io_proc_id));
+    auto const &device = *this->_device;
+
+    if (device::is_available_device(device)) {
+        raise_if_raw_audio_error(AudioDeviceDestroyIOProcID(device->audio_device_id(), this->_io_proc_id));
     }
 
     this->_io_proc_id = nullptr;
     this->_update_kernel();
 }
 
-void audio::device_io::set_device(audio::device_ptr const device) {
+void audio::device_io::set_device(std::optional<audio::device_ptr> const device) {
     if (this->_device != device) {
         bool running = this->_is_running;
 
         this->_uninitialize();
 
         if (this->_device) {
-            if (this->_device_observers.count((uintptr_t)this->_device.get())) {
-                this->_device_observers.erase((uintptr_t)this->_device.get());
+            auto const &device = *this->_device;
+            if (this->_device_observers.count((uintptr_t)device.get())) {
+                this->_device_observers.erase((uintptr_t)device.get());
             }
         }
 
         this->_device = device;
 
         if (this->_device) {
-            auto observer = this->_device->chain(device::method::device_did_change)
+            auto const &device = *this->_device;
+            auto observer = device->chain(device::method::device_did_change)
                                 .perform([weak_device_io = _weak_device_io](auto const &) {
                                     if (auto device_io = weak_device_io.lock()) {
                                         device_io->_update_kernel();
                                     }
                                 })
                                 .end();
-            this->_device_observers.emplace((uintptr_t)this->_device.get(), std::move(observer));
+            this->_device_observers.emplace((uintptr_t)device.get(), std::move(observer));
         }
 
         this->_initialize();
@@ -170,7 +181,7 @@ void audio::device_io::set_device(audio::device_ptr const device) {
     }
 }
 
-audio::device_ptr const &audio::device_io::device() const {
+std::optional<audio::device_ptr> const &audio::device_io::device() const {
     return this->_device;
 }
 
@@ -201,7 +212,9 @@ void audio::device_io::start() {
         return;
     }
 
-    raise_if_raw_audio_error(AudioDeviceStart(this->_device->audio_device_id(), this->_io_proc_id));
+    auto const &device = *this->_device;
+
+    raise_if_raw_audio_error(AudioDeviceStart(device->audio_device_id(), this->_io_proc_id));
 }
 
 void audio::device_io::stop() {
@@ -215,8 +228,10 @@ void audio::device_io::stop() {
         return;
     }
 
-    if (device::is_available_device(*this->_device)) {
-        raise_if_raw_audio_error(AudioDeviceStop(this->_device->audio_device_id(), this->_io_proc_id));
+    auto const &device = *this->_device;
+
+    if (device::is_available_device(device)) {
+        raise_if_raw_audio_error(AudioDeviceStop(device->audio_device_id(), this->_io_proc_id));
     }
 }
 
@@ -228,19 +243,21 @@ audio::time_ptr const &audio::device_io::input_time_on_render() const {
     return this->_input_time_on_render;
 }
 
-void audio::device_io::_prepare(device_io_ptr const &shared, device_ptr const &device) {
+void audio::device_io::_prepare(device_io_ptr const &shared, std::optional<device_ptr> const &device) {
     this->_weak_device_io = to_weak(shared);
 
-    this->_device_system_observer =
-        device::system_chain(device::system_method::hardware_did_change)
-            .perform([weak_device_io = this->_weak_device_io](auto const &) {
-                if (auto device_io = weak_device_io.lock()) {
-                    if (device_io->device() && !device::device_for_id(device_io->device()->audio_device_id())) {
-                        device_io->set_device(nullptr);
-                    }
-                }
-            })
-            .end();
+    this->_device_system_observer = device::system_chain(device::system_method::hardware_did_change)
+                                        .perform([weak_device_io = this->_weak_device_io](auto const &) {
+                                            if (auto device_io = weak_device_io.lock()) {
+                                                if (auto const &device_opt = device_io->device()) {
+                                                    auto const &device = *device_opt;
+                                                    if (!device::device_for_id(device->audio_device_id())) {
+                                                        device_io->set_device(std::nullopt);
+                                                    }
+                                                }
+                                            }
+                                        })
+                                        .end();
 
     this->set_device(device);
 }
@@ -272,11 +289,13 @@ void audio::device_io::_update_kernel() {
         return;
     }
 
-    this->_set_kernel(std::make_shared<device_io::kernel>(this->_device->input_format(), this->_device->output_format(),
-                                                          this->__maximum_frames));
+    auto const &device = *this->_device;
+
+    this->_set_kernel(
+        std::make_shared<device_io::kernel>(device->input_format(), device->output_format(), this->__maximum_frames));
 }
 
-audio::device_io_ptr audio::device_io::make_shared(device_ptr const &device) {
+audio::device_io_ptr audio::device_io::make_shared(std::optional<device_ptr> const &device) {
     auto shared = device_io_ptr(new audio::device_io{});
     shared->_prepare(shared, device);
     return shared;
