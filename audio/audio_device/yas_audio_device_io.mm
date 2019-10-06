@@ -11,47 +11,10 @@
 #include <mutex>
 #include "yas_audio_device.h"
 #include "yas_audio_format.h"
+#include "yas_audio_io_kernel.h"
 #include "yas_audio_pcm_buffer.h"
 
 using namespace yas;
-
-struct audio::device_io::kernel {
-    kernel(std::optional<audio::format> const &input_format, std::optional<audio::format> const &output_format,
-           uint32_t const frame_capacity)
-        : _input_buffer(input_format ? std::make_optional(std::make_shared<pcm_buffer>(*input_format, frame_capacity)) :
-                                       std::nullopt),
-          _output_buffer(output_format ?
-                             std::make_optional(std::make_shared<pcm_buffer>(*output_format, frame_capacity)) :
-                             std::nullopt) {
-    }
-
-    std::optional<pcm_buffer_ptr> const &input_buffer() {
-        return this->_input_buffer;
-    }
-
-    std::optional<pcm_buffer_ptr> const &output_buffer() {
-        return this->_output_buffer;
-    }
-
-    void reset_buffers() {
-        if (auto const &buffer = this->_input_buffer) {
-            buffer.value()->reset();
-        }
-
-        if (auto const &buffer = this->_output_buffer) {
-            buffer.value()->reset();
-        }
-    }
-
-   private:
-    std::optional<pcm_buffer_ptr> _input_buffer;
-    std::optional<pcm_buffer_ptr> _output_buffer;
-
-    kernel(kernel const &) = delete;
-    kernel(kernel &&) = delete;
-    kernel &operator=(kernel const &) = delete;
-    kernel &operator=(kernel &&) = delete;
-};
 
 #pragma mark -
 
@@ -85,7 +48,7 @@ void audio::device_io::_initialize() {
             if (auto kernel = device_io->_kernel()) {
                 kernel->reset_buffers();
                 if (inInputData) {
-                    if (auto const &input_buffer_opt = kernel->input_buffer()) {
+                    if (auto const &input_buffer_opt = kernel->input_buffer) {
                         auto const &input_buffer = *input_buffer_opt;
                         input_buffer->copy_from(inInputData);
 
@@ -99,7 +62,7 @@ void audio::device_io::_initialize() {
                 }
 
                 if (auto render_handler = device_io->_render_handler()) {
-                    if (auto const &output_buffer_opt = kernel->output_buffer()) {
+                    if (auto const &output_buffer_opt = kernel->output_buffer) {
                         auto const &output_buffer = *output_buffer_opt;
                         if (outOutputData) {
                             uint32_t const frame_length =
@@ -111,7 +74,7 @@ void audio::device_io::_initialize() {
                                 output_buffer->copy_to(outOutputData);
                             }
                         }
-                    } else if (kernel->input_buffer()) {
+                    } else if (kernel->input_buffer) {
                         pcm_buffer_ptr null_buffer{nullptr};
                         render_handler(render_args{.output_buffer = null_buffer, .when = std::nullopt});
                     }
@@ -267,7 +230,7 @@ audio::device_io::render_f audio::device_io::_render_handler() const {
     return this->__render_handler;
 }
 
-void audio::device_io::_set_kernel(device_io::kernel_ptr const &kernel) {
+void audio::device_io::_set_kernel(io_kernel_ptr const &kernel) {
     std::lock_guard<std::recursive_mutex> lock(this->_mutex);
     this->__kernel = nullptr;
     if (kernel) {
@@ -275,7 +238,7 @@ void audio::device_io::_set_kernel(device_io::kernel_ptr const &kernel) {
     }
 }
 
-audio::device_io::kernel_ptr audio::device_io::_kernel() const {
+audio::io_kernel_ptr audio::device_io::_kernel() const {
     std::lock_guard<std::recursive_mutex> lock(this->_mutex);
     return this->__kernel;
 }
@@ -291,8 +254,7 @@ void audio::device_io::_update_kernel() {
 
     auto const &device = *this->_device;
 
-    this->_set_kernel(
-        std::make_shared<device_io::kernel>(device->input_format(), device->output_format(), this->__maximum_frames));
+    this->_set_kernel(io_kernel::make_shared(device->input_format(), device->output_format(), this->__maximum_frames));
 }
 
 audio::device_io_ptr audio::device_io::make_shared(std::optional<device_ptr> const &device) {

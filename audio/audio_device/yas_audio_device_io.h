@@ -38,9 +38,6 @@ struct device_io final {
     audio::time_ptr const &input_time_on_render() const;
 
    private:
-    class kernel;
-    using kernel_ptr = std::shared_ptr<kernel>;
-
     std::weak_ptr<device_io> _weak_device_io;
     std::optional<audio::device_ptr> _device = std::nullopt;
     bool _is_running = false;
@@ -59,14 +56,14 @@ struct device_io final {
     mutable std::recursive_mutex _mutex;
     render_f __render_handler = nullptr;
     uint32_t __maximum_frames = 4096;
-    device_io::kernel_ptr __kernel = nullptr;
+    io_kernel_ptr __kernel = nullptr;
 
     void _set_render_handler(render_f &&handler);
     render_f _render_handler() const;
     void _set_maximum_frames(uint32_t const frames);
     uint32_t _maximum_frames() const;
-    void _set_kernel(device_io::kernel_ptr const &kernel);
-    device_io::kernel_ptr _kernel() const;
+    void _set_kernel(io_kernel_ptr const &kernel);
+    io_kernel_ptr _kernel() const;
     void _update_kernel();
 
    public:
