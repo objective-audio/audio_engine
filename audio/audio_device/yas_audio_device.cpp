@@ -223,7 +223,7 @@ std::vector<audio::device_ptr> audio::device::input_devices() {
     return devices;
 }
 
-audio::device_ptr audio::device::default_system_output_device() {
+std::optional<audio::device_ptr> audio::device::default_system_output_device() {
     if (auto const data =
             _property_data<AudioDeviceID>(kAudioObjectSystemObject, kAudioHardwarePropertyDefaultSystemOutputDevice,
                                           kAudioObjectPropertyScopeGlobal)) {
@@ -232,10 +232,10 @@ audio::device_ptr audio::device::default_system_output_device() {
             return iterator->second;
         }
     }
-    return nullptr;
+    return std::nullopt;
 }
 
-audio::device_ptr audio::device::default_output_device() {
+std::optional<audio::device_ptr> audio::device::default_output_device() {
     if (auto const data = _property_data<AudioDeviceID>(
             kAudioObjectSystemObject, kAudioHardwarePropertyDefaultOutputDevice, kAudioObjectPropertyScopeGlobal)) {
         auto iterator = device_global::all_devices_map().find(*data->data());
@@ -243,10 +243,10 @@ audio::device_ptr audio::device::default_output_device() {
             return iterator->second;
         }
     }
-    return nullptr;
+    return std::nullopt;
 }
 
-audio::device_ptr audio::device::default_input_device() {
+std::optional<audio::device_ptr> audio::device::default_input_device() {
     if (auto const data = _property_data<AudioDeviceID>(
             kAudioObjectSystemObject, kAudioHardwarePropertyDefaultInputDevice, kAudioObjectPropertyScopeGlobal)) {
         auto iterator = device_global::all_devices_map().find(*data->data());
@@ -254,15 +254,15 @@ audio::device_ptr audio::device::default_input_device() {
             return iterator->second;
         }
     }
-    return nullptr;
+    return std::nullopt;
 }
 
-audio::device_ptr audio::device::device_for_id(AudioDeviceID const audio_device_id) {
+std::optional<audio::device_ptr> audio::device::device_for_id(AudioDeviceID const audio_device_id) {
     auto it = device_global::all_devices_map().find(audio_device_id);
     if (it != device_global::all_devices_map().end()) {
         return it->second;
     }
-    return nullptr;
+    return std::nullopt;
 }
 
 std::optional<size_t> audio::device::index_of_device(device_ptr const &device) {
@@ -395,8 +395,8 @@ audio::device::listener_f audio::device::_listener() {
     AudioDeviceID const device_id = this->_audio_device_id;
 
     return [device_id](uint32_t const address_count, const AudioObjectPropertyAddress *const addresses) {
-        auto device = device::device_for_id(device_id);
-        if (device) {
+        if (auto const device_opt = device::device_for_id(device_id)) {
+            auto const &device = *device_opt;
             AudioObjectID const object_id = device->audio_device_id();
 
             std::vector<device::property_info> property_infos;
