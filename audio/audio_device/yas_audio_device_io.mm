@@ -48,7 +48,7 @@ void audio::device_io::_initialize() {
             if (auto kernel = device_io->_kernel()) {
                 kernel->reset_buffers();
                 if (inInputData) {
-                    if (auto const &input_buffer_opt = kernel->input_buffer()) {
+                    if (auto const &input_buffer_opt = kernel->input_buffer) {
                         auto const &input_buffer = *input_buffer_opt;
                         input_buffer->copy_from(inInputData);
 
@@ -62,7 +62,7 @@ void audio::device_io::_initialize() {
                 }
 
                 if (auto render_handler = device_io->_render_handler()) {
-                    if (auto const &output_buffer_opt = kernel->output_buffer()) {
+                    if (auto const &output_buffer_opt = kernel->output_buffer) {
                         auto const &output_buffer = *output_buffer_opt;
                         if (outOutputData) {
                             uint32_t const frame_length =
@@ -74,7 +74,7 @@ void audio::device_io::_initialize() {
                                 output_buffer->copy_to(outOutputData);
                             }
                         }
-                    } else if (kernel->input_buffer()) {
+                    } else if (kernel->input_buffer) {
                         pcm_buffer_ptr null_buffer{nullptr};
                         render_handler(render_args{.output_buffer = null_buffer, .when = std::nullopt});
                     }
