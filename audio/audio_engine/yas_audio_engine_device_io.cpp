@@ -21,19 +21,19 @@ using namespace yas;
 struct audio::engine::device_io::core {
     audio::device_io_ptr _device_io = nullptr;
 
-    void set_device(audio::device_ptr const &device) {
+    void set_device(std::optional<audio::device_ptr> const &device) {
         this->_device = device;
         if (this->_device_io) {
             this->_device_io->set_device(device);
         }
     }
 
-    audio::device_ptr device() {
+    std::optional<audio::device_ptr> const &device() {
         return this->_device;
     }
 
    private:
-    audio::device_ptr _device = nullptr;
+    std::optional<audio::device_ptr> _device = std::nullopt;
 };
 
 #pragma mark - audio::engine::device_io
@@ -43,11 +43,11 @@ audio::engine::device_io::device_io() : _core(std::make_unique<core>()) {
 
 audio::engine::device_io::~device_io() = default;
 
-void audio::engine::device_io::set_device(audio::device_ptr const &device) {
+void audio::engine::device_io::set_device(std::optional<audio::device_ptr> const &device) {
     this->_core->set_device(device);
 }
 
-audio::device_ptr audio::engine::device_io::device() const {
+std::optional<audio::device_ptr> const &audio::engine::device_io::device() const {
     return this->_core->device();
 }
 
@@ -74,12 +74,7 @@ audio::device_io_ptr const &audio::engine::device_io::raw_device_io() {
 void audio::engine::device_io::_prepare(device_io_ptr const &shared) {
     this->_weak_engine_device_io = to_weak(shared);
 
-#warning todo
-    if (auto const device = device::default_output_device()) {
-        this->set_device(*device);
-    } else {
-        this->set_device(nullptr);
-    }
+    this->set_device(device::default_output_device());
 
     this->_node->set_render_handler([weak_engine_device_io = this->_weak_engine_device_io](auto args) {
         auto &buffer = args.buffer;
@@ -162,8 +157,13 @@ bool audio::engine::device_io::_validate_connections() {
             if (connections.count(0) > 0) {
                 auto const &connection = connections.at(0);
                 auto const &connection_format = connection->format;
-                auto const &device_format = device_io->device()->output_format();
-                if (connection_format != device_format) {
+                auto const &device_opt = device_io->device();
+                if (!device_opt) {
+                    std::cout << __PRETTY_FUNCTION__ << " : output device is null." << std::endl;
+                    return false;
+                }
+                auto const &device = *device_opt;
+                if (connection_format != device->output_format()) {
                     std::cout << __PRETTY_FUNCTION__ << " : output device io format is not match." << std::endl;
                     return false;
                 }
@@ -176,8 +176,13 @@ bool audio::engine::device_io::_validate_connections() {
             if (connections.count(0) > 0) {
                 auto const &connection = connections.at(0);
                 auto const &connection_format = connection->format;
-                auto const &device_format = device_io->device()->input_format();
-                if (connection_format != device_format) {
+                auto const &device_opt = device_io->device();
+                if (!device_opt) {
+                    std::cout << __PRETTY_FUNCTION__ << " : output device is null." << std::endl;
+                    return false;
+                }
+                auto const &device = *device_opt;
+                if (connection_format != device->input_format()) {
                     std::cout << __PRETTY_FUNCTION__ << " : input device io format is not match." << std::endl;
                     return false;
                 }

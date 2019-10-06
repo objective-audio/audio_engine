@@ -46,13 +46,8 @@ AudioStreamID audio::device::stream::stream_id() const {
     return this->_stream_id;
 }
 
-audio::device_ptr audio::device::stream::device() const {
-#warning todo
-    if (auto const device = device::device_for_id(this->_device_id)) {
-        return *device;
-    } else {
-        return nullptr;
-    }
+std::optional<audio::device_ptr> audio::device::stream::device() const {
+    return device::device_for_id(this->_device_id);
 }
 
 bool audio::device::stream::is_active() const {

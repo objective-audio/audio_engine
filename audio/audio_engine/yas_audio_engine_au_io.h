@@ -31,8 +31,8 @@ struct au_io {
     virtual ~au_io() = default;
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
-    void set_device(audio::device_ptr const &);
-    audio::device_ptr device() const;
+    void set_device(std::optional<audio::device_ptr> const &);
+    std::optional<audio::device_ptr> device() const;
 #endif
 
     void set_channel_map(channel_map_t const &, audio::direction const);

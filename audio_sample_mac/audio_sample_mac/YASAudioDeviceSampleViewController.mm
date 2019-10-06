@@ -156,7 +156,7 @@ struct device_vc_internal {
     });
 
     _internal.graph = audio::graph::make_shared();
-    _internal.device_io = audio::device_io::make_shared(audio::device_ptr(nullptr));
+    _internal.device_io = audio::device_io::make_shared(std::nullopt);
     _internal.graph->add_audio_device_io(_internal.device_io);
 
     _internal.kernel = std::make_shared<sample_kernel_t>();
@@ -254,7 +254,7 @@ struct device_vc_internal {
             auto const &device = all_devices[selectedDeviceIndex];
             [self setDevice:device];
         } else {
-            [self setDevice:nullptr];
+            [self setDevice:std::nullopt];
         }
     }
 }
@@ -274,8 +274,8 @@ struct device_vc_internal {
 
     std::optional<NSUInteger> index = std::nullopt;
 
-    if (auto const device = _internal.device_io->device()) {
-        index = audio::device::index_of_device(device);
+    if (auto const &device_opt = _internal.device_io->device()) {
+        index = audio::device::index_of_device(*device_opt);
     }
 
     if (index) {
@@ -285,41 +285,42 @@ struct device_vc_internal {
     }
 }
 
-- (void)setDevice:(audio::device_ptr const &)selected_device {
+- (void)setDevice:(std::optional<audio::device_ptr> const &)selected_device {
     if (auto prev_audio_device = _internal.device_io->device()) {
         _internal.device_observer = nullptr;
     }
 
     auto all_devices = audio::device::all_devices();
 
-    if (selected_device && std::find(all_devices.begin(), all_devices.end(), selected_device) != all_devices.end()) {
-        _internal.device_io->set_device(selected_device);
+    _internal.device_io->set_device(selected_device);
 
+    if (selected_device && std::find(all_devices.begin(), all_devices.end(), selected_device) != all_devices.end()) {
         auto unowned_self = objc_ptr_with_move_object([[YASUnownedObject alloc] initWithObject:self]);
 
-        _internal.device_observer = selected_device->chain(audio::device::method::device_did_change)
-                                        .perform([selected_device, unowned_self](auto const &change_info) {
+        auto const &device = *selected_device;
+
+        _internal.device_observer = device->chain(audio::device::method::device_did_change)
+                                        .perform([device, unowned_self](auto const &change_info) {
                                             auto const &infos = change_info.property_infos;
                                             if (infos.size() > 0) {
                                                 auto &device_id = infos.at(0).object_id;
-                                                if (selected_device->audio_device_id() == device_id) {
+                                                if (device->audio_device_id() == device_id) {
                                                     [[unowned_self.object() object] _updateDeviceInfo];
                                                 }
                                             }
                                         })
                                         .end();
-    } else {
-        _internal.device_io->set_device(nullptr);
     }
 
     [self _updateDeviceInfo];
 }
 
 - (void)_updateDeviceInfo {
-    auto const &device = _internal.device_io->device();
+    auto const &device_opt = _internal.device_io->device();
     NSColor *onColor = [NSColor blackColor];
     NSColor *offColor = [NSColor lightGrayColor];
-    if (device) {
+    if (device_opt) {
+        auto const &device = *device_opt;
         self.deviceInfo = [NSString
             stringWithFormat:@"name = %@\nnominal samplerate = %@", device->name(), @(device->nominal_sample_rate())];
         ;

@@ -62,8 +62,9 @@ double audio::engine::au_io::device_sample_rate() const {
 #if TARGET_OS_IPHONE
     return [AVAudioSession sharedInstance].sampleRate;
 #elif TARGET_OS_MAC
-    if (auto const &dev = device()) {
-        return dev->nominal_sample_rate();
+    if (auto const &device_opt = this->device()) {
+        auto const &device = *device_opt;
+        return device->nominal_sample_rate();
     }
     return 0;
 #endif
@@ -73,8 +74,9 @@ uint32_t audio::engine::au_io::output_device_channel_count() const {
 #if TARGET_OS_IPHONE
     return static_cast<uint32_t>([AVAudioSession sharedInstance].outputNumberOfChannels);
 #elif TARGET_OS_MAC
-    if (auto const &dev = device()) {
-        return dev->output_channel_count();
+    if (auto const &device_opt = this->device()) {
+        auto const &device = *device_opt;
+        return device->output_channel_count();
     }
     return 0;
 #endif
@@ -84,8 +86,9 @@ uint32_t audio::engine::au_io::input_device_channel_count() const {
 #if TARGET_OS_IPHONE
     return static_cast<uint32_t>([AVAudioSession sharedInstance].inputNumberOfChannels);
 #elif TARGET_OS_MAC
-    if (auto const &dev = device()) {
-        return dev->input_channel_count();
+    if (auto const &device_opt = this->device()) {
+        auto const &device = *device_opt;
+        return device->input_channel_count();
     }
     return 0;
 #endif
@@ -93,16 +96,15 @@ uint32_t audio::engine::au_io::input_device_channel_count() const {
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
 
-void audio::engine::au_io::set_device(audio::device_ptr const &device) {
-    this->_au->unit()->set_current_device(device->audio_device_id());
+void audio::engine::au_io::set_device(std::optional<audio::device_ptr> const &device_opt) {
+    if (device_opt) {
+        auto const &device = *device_opt;
+        this->_au->unit()->set_current_device(device->audio_device_id());
+    }
 }
 
-audio::device_ptr audio::engine::au_io::device() const {
-    if (auto device = device::device_for_id(this->_au->unit()->current_device())) {
-        return *device;
-    } else {
-        return nullptr;
-    }
+std::optional<audio::device_ptr> audio::engine::au_io::device() const {
+    return device::device_for_id(this->_au->unit()->current_device());
 }
 
 #endif
