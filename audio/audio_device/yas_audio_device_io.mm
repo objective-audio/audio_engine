@@ -15,9 +15,9 @@
 
 using namespace yas;
 
-struct audio::device_io::kernel {
-    kernel(std::optional<audio::format> const &input_format, std::optional<audio::format> const &output_format,
-           uint32_t const frame_capacity)
+struct audio::io_kernel {
+    io_kernel(std::optional<audio::format> const &input_format, std::optional<audio::format> const &output_format,
+              uint32_t const frame_capacity)
         : _input_buffer(input_format ? std::make_optional(std::make_shared<pcm_buffer>(*input_format, frame_capacity)) :
                                        std::nullopt),
           _output_buffer(output_format ?
@@ -47,10 +47,10 @@ struct audio::device_io::kernel {
     std::optional<pcm_buffer_ptr> _input_buffer;
     std::optional<pcm_buffer_ptr> _output_buffer;
 
-    kernel(kernel const &) = delete;
-    kernel(kernel &&) = delete;
-    kernel &operator=(kernel const &) = delete;
-    kernel &operator=(kernel &&) = delete;
+    io_kernel(io_kernel const &) = delete;
+    io_kernel(io_kernel &&) = delete;
+    io_kernel &operator=(io_kernel const &) = delete;
+    io_kernel &operator=(io_kernel &&) = delete;
 };
 
 #pragma mark -
@@ -267,7 +267,7 @@ audio::device_io::render_f audio::device_io::_render_handler() const {
     return this->__render_handler;
 }
 
-void audio::device_io::_set_kernel(device_io::kernel_ptr const &kernel) {
+void audio::device_io::_set_kernel(io_kernel_ptr const &kernel) {
     std::lock_guard<std::recursive_mutex> lock(this->_mutex);
     this->__kernel = nullptr;
     if (kernel) {
@@ -275,7 +275,7 @@ void audio::device_io::_set_kernel(device_io::kernel_ptr const &kernel) {
     }
 }
 
-audio::device_io::kernel_ptr audio::device_io::_kernel() const {
+audio::io_kernel_ptr audio::device_io::_kernel() const {
     std::lock_guard<std::recursive_mutex> lock(this->_mutex);
     return this->__kernel;
 }
@@ -292,7 +292,7 @@ void audio::device_io::_update_kernel() {
     auto const &device = *this->_device;
 
     this->_set_kernel(
-        std::make_shared<device_io::kernel>(device->input_format(), device->output_format(), this->__maximum_frames));
+        std::make_shared<io_kernel>(device->input_format(), device->output_format(), this->__maximum_frames));
 }
 
 audio::device_io_ptr audio::device_io::make_shared(std::optional<device_ptr> const &device) {
