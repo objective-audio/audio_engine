@@ -45,7 +45,7 @@ struct device_io final {
     pcm_buffer_ptr _input_buffer_on_render = nullptr;
     audio::time_ptr _input_time_on_render = nullptr;
     chaining::any_observer_ptr _device_system_observer = nullptr;
-    std::unordered_map<std::uintptr_t, chaining::any_observer_ptr> _device_observers;
+    std::optional<chaining::any_observer_ptr> _device_observer = std::nullopt;
 
     device_io();
 

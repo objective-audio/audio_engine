@@ -115,25 +115,19 @@ void audio::device_io::set_device(std::optional<audio::device_ptr> const device)
 
         this->_uninitialize();
 
-        if (this->_device) {
-            auto const &device = *this->_device;
-            if (this->_device_observers.count((uintptr_t)device.get())) {
-                this->_device_observers.erase((uintptr_t)device.get());
-            }
-        }
+        this->_device_observer = std::nullopt;
 
         this->_device = device;
 
         if (this->_device) {
             auto const &device = *this->_device;
-            auto observer = device->chain(device::method::device_did_change)
-                                .perform([weak_device_io = _weak_device_io](auto const &) {
-                                    if (auto device_io = weak_device_io.lock()) {
-                                        device_io->_update_kernel();
-                                    }
-                                })
-                                .end();
-            this->_device_observers.emplace((uintptr_t)device.get(), std::move(observer));
+            this->_device_observer = device->chain(device::method::device_did_change)
+                                         .perform([weak_device_io = _weak_device_io](auto const &) {
+                                             if (auto device_io = weak_device_io.lock()) {
+                                                 device_io->_update_kernel();
+                                             }
+                                         })
+                                         .end();
         }
 
         this->_initialize();
