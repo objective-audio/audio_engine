@@ -18,31 +18,34 @@ using namespace yas;
 struct audio::device_io::kernel {
     kernel(std::optional<audio::format> const &input_format, std::optional<audio::format> const &output_format,
            uint32_t const frame_capacity)
-        : _input_buffer(input_format ? std::make_shared<pcm_buffer>(*input_format, frame_capacity) : nullptr),
-          _output_buffer(output_format ? std::make_shared<pcm_buffer>(*output_format, frame_capacity) : nullptr) {
+        : _input_buffer(input_format ? std::make_optional(std::make_shared<pcm_buffer>(*input_format, frame_capacity)) :
+                                       std::nullopt),
+          _output_buffer(output_format ?
+                             std::make_optional(std::make_shared<pcm_buffer>(*output_format, frame_capacity)) :
+                             std::nullopt) {
     }
 
-    pcm_buffer_ptr const &input_buffer() {
+    std::optional<pcm_buffer_ptr> const &input_buffer() {
         return this->_input_buffer;
     }
 
-    pcm_buffer_ptr const &output_buffer() {
+    std::optional<pcm_buffer_ptr> const &output_buffer() {
         return this->_output_buffer;
     }
 
     void reset_buffers() {
-        if (this->_input_buffer) {
-            this->_input_buffer->reset();
+        if (auto const &buffer = this->_input_buffer) {
+            buffer.value()->reset();
         }
 
-        if (this->_output_buffer) {
-            this->_output_buffer->reset();
+        if (auto const &buffer = this->_output_buffer) {
+            buffer.value()->reset();
         }
     }
 
    private:
-    pcm_buffer_ptr _input_buffer;
-    pcm_buffer_ptr _output_buffer;
+    std::optional<pcm_buffer_ptr> _input_buffer;
+    std::optional<pcm_buffer_ptr> _output_buffer;
 
     kernel(kernel const &) = delete;
     kernel(kernel &&) = delete;
@@ -80,7 +83,9 @@ void audio::device_io::_initialize() {
             if (auto kernel = device_io->_kernel()) {
                 kernel->reset_buffers();
                 if (inInputData) {
-                    if (auto &input_buffer = kernel->input_buffer()) {
+                    if (auto const &input_buffer_opt = kernel->input_buffer()) {
+                        auto const &input_buffer = *input_buffer_opt;
+
                         input_buffer->copy_from(inInputData);
 
                         uint32_t const input_frame_length = input_buffer->frame_length();
@@ -93,7 +98,8 @@ void audio::device_io::_initialize() {
                 }
 
                 if (auto render_handler = device_io->_render_handler()) {
-                    if (auto &output_buffer = kernel->output_buffer()) {
+                    if (auto const &output_buffer_opt = kernel->output_buffer()) {
+                        auto const &output_buffer = *output_buffer_opt;
                         if (outOutputData) {
                             uint32_t const frame_length =
                                 audio::frame_length(outOutputData, output_buffer->format().sample_byte_count());
