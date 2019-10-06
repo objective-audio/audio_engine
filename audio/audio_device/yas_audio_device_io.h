@@ -14,9 +14,6 @@
 #include "yas_audio_types.h"
 
 namespace yas::audio {
-class io_kernel;
-using io_kernel_ptr = std::shared_ptr<io_kernel>;
-
 struct device_io final {
     struct render_args {
         audio::pcm_buffer_ptr const &output_buffer;
