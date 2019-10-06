@@ -153,7 +153,7 @@ struct offline_vc_internal {
                                     .perform([weak_play_au_output = to_weak(play_au_output)](auto const &) {
                                         if (auto play_au_output = weak_play_au_output.lock()) {
                                             if (auto const device = audio::device::default_output_device()) {
-                                                play_au_output->au_io().set_device(**device);
+                                                play_au_output->au_io().set_device(*device);
                                             }
                                         }
                                     })

@@ -93,8 +93,8 @@ uint32_t audio::engine::au_io::input_device_channel_count() const {
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
 
-void audio::engine::au_io::set_device(audio::device const &device) {
-    this->_au->unit()->set_current_device(device.audio_device_id());
+void audio::engine::au_io::set_device(audio::device_ptr const &device) {
+    this->_au->unit()->set_current_device(device->audio_device_id());
 }
 
 audio::device_ptr audio::engine::au_io::device() const {
