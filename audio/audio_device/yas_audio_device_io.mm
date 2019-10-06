@@ -254,8 +254,7 @@ void audio::device_io::_update_kernel() {
 
     auto const &device = *this->_device;
 
-    this->_set_kernel(
-        std::make_shared<io_kernel>(device->input_format(), device->output_format(), this->__maximum_frames));
+    this->_set_kernel(io_kernel::make_shared(device->input_format(), device->output_format(), this->__maximum_frames));
 }
 
 audio::device_io_ptr audio::device_io::make_shared(std::optional<device_ptr> const &device) {
