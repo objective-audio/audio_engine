@@ -20,7 +20,12 @@
 #include "yas_audio_pcm_buffer.h"
 #include "yas_audio_time.h"
 
-#if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
+#if TARGET_OS_IPHONE
+
+#include "yas_audio_avf_device.h"
+#include "yas_audio_avf_io.h"
+
+#elif TARGET_OS_MAC
 
 #include "yas_audio_device.h"
 #include "yas_audio_device_io.h"

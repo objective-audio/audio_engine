@@ -7,7 +7,6 @@
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
 
 #include <cpp_utils/yas_exception.h>
-#include <cpp_utils/yas_result.h>
 #include <mutex>
 #include "yas_audio_device.h"
 #include "yas_audio_format.h"
@@ -81,8 +80,8 @@ void audio::device_io::_initialize() {
                 }
             }
 
-            device_io->_input_buffer_on_render = nullptr;
-            device_io->_input_time_on_render = nullptr;
+            device_io->_input_buffer_on_render = std::nullopt;
+            device_io->_input_time_on_render = std::nullopt;
         }
     };
 
@@ -205,11 +204,11 @@ void audio::device_io::stop() {
     }
 }
 
-audio::pcm_buffer_ptr const &audio::device_io::input_buffer_on_render() const {
+std::optional<audio::pcm_buffer_ptr> const &audio::device_io::input_buffer_on_render() const {
     return this->_input_buffer_on_render;
 }
 
-audio::time_ptr const &audio::device_io::input_time_on_render() const {
+std::optional<audio::time_ptr> const &audio::device_io::input_time_on_render() const {
     return this->_input_time_on_render;
 }
 
