@@ -14,6 +14,8 @@ class pcm_buffer;
 class time;
 class file;
 class io_kernel;
+class avf_io;
+class avf_device;
 
 using graph_ptr = std::shared_ptr<graph>;
 using unit_ptr = std::shared_ptr<unit>;
@@ -21,6 +23,8 @@ using pcm_buffer_ptr = std::shared_ptr<pcm_buffer>;
 using time_ptr = std::shared_ptr<time>;
 using file_ptr = std::shared_ptr<file>;
 using io_kernel_ptr = std::shared_ptr<io_kernel>;
+using avf_io_ptr = std::shared_ptr<avf_io>;
+using avf_device_ptr = std::shared_ptr<avf_device>;
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
 class device_io;

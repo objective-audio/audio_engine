@@ -81,9 +81,12 @@ void audio::engine::device_io::_prepare(device_io_ptr const &shared) {
 
         if (auto engine_device_io = weak_engine_device_io.lock()) {
             if (auto const &device_io = engine_device_io->raw_device_io()) {
-                auto const &input_buffer = device_io->input_buffer_on_render();
-                if (input_buffer && input_buffer->format() == buffer.format()) {
-                    buffer.copy_from(*input_buffer);
+                auto const &input_buffer_opt = device_io->input_buffer_on_render();
+                if (input_buffer_opt) {
+                    auto const &input_buffer = *input_buffer_opt;
+                    if (input_buffer->format() == buffer.format()) {
+                        buffer.copy_from(*input_buffer);
+                    }
                 }
             }
         }
@@ -136,7 +139,7 @@ void audio::engine::device_io::_update_device_io_connections() {
                             auto const &input_time = device_io->input_time_on_render();
                             if (input_buffer && input_time) {
                                 if (connection->format == dst_node->input_format(connection->destination_bus)) {
-                                    dst_node->render({.buffer = *input_buffer, .bus_idx = 0, .when = *input_time});
+                                    dst_node->render({.buffer = **input_buffer, .bus_idx = 0, .when = **input_time});
                                 }
                             }
                         }

@@ -9,6 +9,7 @@
 #import <objc_utils/yas_objc_unowned.h>
 #import "YASAudioEngineIOSampleSelectionViewController.h"
 #import "YASAudioSliderCell.h"
+#import "YASViewControllerUtils.h"
 
 using namespace yas;
 
@@ -127,7 +128,7 @@ struct engine_io_vc_internal {
         }
 
         if (!success) {
-            [self _showErrorAlertWithMessage:errorMessage];
+            [YASViewControllerUtils showErrorAlertWithMessage:errorMessage toViewController:self];
         }
     }
 }
@@ -402,18 +403,6 @@ struct engine_io_vc_internal {
 }
 
 #pragma mark -
-
-- (void)_showErrorAlertWithMessage:(NSString *)message {
-    UIAlertController *controller = [UIAlertController alertControllerWithTitle:@"Error"
-                                                                        message:message
-                                                                 preferredStyle:UIAlertControllerStyleAlert];
-    [controller addAction:[UIAlertAction actionWithTitle:@"OK"
-                                                   style:UIAlertActionStyleDefault
-                                                 handler:^(UIAlertAction *action) {
-                                                     [self.navigationController popViewControllerAnimated:YES];
-                                                 }]];
-    [self presentViewController:controller animated:YES completion:NULL];
-}
 
 - (YASAudioSliderCell *)_dequeueSliderWithIndexPath:(NSIndexPath *)indexPath {
     UITableViewCell *cell = [self.tableView dequeueReusableCellWithIdentifier:@"SliderCell" forIndexPath:indexPath];

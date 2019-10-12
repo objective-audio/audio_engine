@@ -28,6 +28,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		B612CDB7234B783E00B89826 /* yas_audio_sample_kernel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = yas_audio_sample_kernel.h; path = ../../audio_sample_common/yas_audio_sample_kernel.h; sourceTree = "<group>"; };
 		B61D52981B9C70AF00A449C5 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		B61D529C1B9C70CD00A449C5 /* CoreAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudio.framework; path = System/Library/Frameworks/CoreAudio.framework; sourceTree = SDKROOT; };
 		B61D529E1B9C70D400A449C5 /* AudioUnit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioUnit.framework; path = System/Library/Frameworks/AudioUnit.framework; sourceTree = SDKROOT; };
@@ -76,6 +77,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		B612CDB5234B781E00B89826 /* common */ = {
+			isa = PBXGroup;
+			children = (
+				B612CDB7234B783E00B89826 /* yas_audio_sample_kernel.h */,
+			);
+			name = common;
+			sourceTree = "<group>";
+		};
 		B61D52D11B9C82DB00A449C5 /* Framework */ = {
 			isa = PBXGroup;
 			children = (
@@ -109,6 +118,7 @@
 		B62ED5571A62812F007DDE96 /* audio_sample_mac */ = {
 			isa = PBXGroup;
 			children = (
+				B612CDB5234B781E00B89826 /* common */,
 				B62ED55A1A62812F007DDE96 /* AppDelegate.h */,
 				B62ED55B1A62812F007DDE96 /* AppDelegate.m */,
 				B6AB1C3F1A9230420054349E /* YASAudioDeviceSampleViewController.h */,

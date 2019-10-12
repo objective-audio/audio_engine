@@ -18,7 +18,10 @@ struct graph final : interruptable_graph {
     void remove_unit(audio::unit_ptr const &);
     void remove_all_units();
 
-#if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
+#if TARGET_OS_IPHONE
+    void add_avf_io(avf_io_ptr const &);
+    void remove_avf_io(avf_io_ptr const &);
+#elif TARGET_OS_MAC
     void add_audio_device_io(device_io_ptr const &);
     void remove_audio_device_io(device_io_ptr const &);
 #endif
@@ -38,7 +41,9 @@ struct graph final : interruptable_graph {
     mutable std::recursive_mutex _mutex;
     std::map<uint16_t, unit_ptr> _units;
     std::map<uint16_t, unit_ptr> _io_units;
-#if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
+#if TARGET_OS_IPHONE
+    std::unordered_set<avf_io_ptr> _avf_ios;
+#elif TARGET_OS_MAC
     std::unordered_set<device_io_ptr> _device_ios;
 #endif
 
