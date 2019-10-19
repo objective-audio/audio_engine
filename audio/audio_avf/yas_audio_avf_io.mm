@@ -125,7 +125,7 @@ bool audio::avf_io::is_running() const {
     return this->_impl->_avf_engine.object().isRunning;
 }
 
-void audio::avf_io::set_render_handler(render_f handler) {
+void audio::avf_io::set_render_handler(io_render_f handler) {
     std::lock_guard<std::recursive_mutex> lock(this->_mutex);
     this->__render_handler = std::move(handler);
 }
@@ -197,13 +197,12 @@ void audio::avf_io::_prepare(avf_io_ptr const &shared) {
                                     output_buffer->set_frame_length(frame_length);
                                     audio::time time(*timestamp, output_buffer->format().sample_rate());
                                     render_handler(
-                                        render_args{.output_buffer = output_buffer, .when = std::move(time)});
+                                        io_render_args{.output_buffer = output_buffer, .when = std::move(time)});
                                     output_buffer->copy_to(outputData);
                                 }
                             }
                         } else if (kernel->input_buffer) {
-                            pcm_buffer_ptr null_buffer{nullptr};
-                            render_handler(render_args{.output_buffer = null_buffer, .when = std::nullopt});
+                            render_handler(io_render_args{.output_buffer = std::nullopt, .when = std::nullopt});
                         }
                     }
                 }
@@ -248,7 +247,7 @@ void audio::avf_io::_prepare(avf_io_ptr const &shared) {
     impl->_sink_node = sink_node;
 }
 
-audio::avf_io::render_f audio::avf_io::_render_handler() const {
+audio::io_render_f audio::avf_io::_render_handler() const {
     std::lock_guard<std::recursive_mutex> lock(this->_mutex);
     return this->__render_handler;
 }

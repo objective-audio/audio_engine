@@ -123,8 +123,9 @@ void audio::engine::device_io::_update_device_io_connections() {
                     if (auto src_node = connection->source_node();
                         src_node && connection->format == src_node->output_format(connection->source_bus)) {
                         if (auto const when = args.when) {
-                            src_node->render(
-                                {.buffer = *args.output_buffer, .bus_idx = connection->source_bus, .when = *args.when});
+                            src_node->render({.buffer = **args.output_buffer,
+                                              .bus_idx = connection->source_bus,
+                                              .when = *args.when});
                         }
                     }
                 }

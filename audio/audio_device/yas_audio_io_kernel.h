@@ -7,8 +7,16 @@
 #include "yas_audio_format.h"
 #include "yas_audio_pcm_buffer.h"
 #include "yas_audio_ptr.h"
+#include "yas_audio_time.h"
 
 namespace yas::audio {
+struct io_render_args {
+    std::optional<audio::pcm_buffer_ptr> const output_buffer;
+    std::optional<audio::time> const when;
+};
+
+using io_render_f = std::function<void(io_render_args)>;
+
 struct io_kernel final {
     std::optional<pcm_buffer_ptr const> const input_buffer;
     std::optional<pcm_buffer_ptr const> const output_buffer;

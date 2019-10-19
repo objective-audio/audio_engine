@@ -10,24 +10,18 @@
 #include <chaining/yas_chaining_umbrella.h>
 #include <functional>
 #include "yas_audio_engine_ptr.h"
+#include "yas_audio_io_kernel.h"
 #include "yas_audio_time.h"
 #include "yas_audio_types.h"
 
 namespace yas::audio {
 struct device_io final {
-    struct render_args {
-        audio::pcm_buffer_ptr const &output_buffer;
-        std::optional<audio::time> const when;
-    };
-
-    using render_f = std::function<void(render_args)>;
-
     ~device_io();
 
     void set_device(std::optional<audio::device_ptr> const);
     std::optional<audio::device_ptr> const &device() const;
     bool is_running() const;
-    void set_render_handler(render_f);
+    void set_render_handler(io_render_f);
     void set_maximum_frames_per_slice(uint32_t const);
     uint32_t maximum_frames_per_slice() const;
 
@@ -54,12 +48,12 @@ struct device_io final {
     void _uninitialize();
 
     mutable std::recursive_mutex _mutex;
-    render_f __render_handler = nullptr;
+    io_render_f __render_handler = nullptr;
     uint32_t __maximum_frames = 4096;
     io_kernel_ptr __kernel = nullptr;
 
-    void _set_render_handler(render_f &&handler);
-    render_f _render_handler() const;
+    void _set_render_handler(io_render_f &&handler);
+    io_render_f _render_handler() const;
     void _set_kernel(io_kernel_ptr const &kernel);
     io_kernel_ptr _kernel() const;
     void _update_kernel();
