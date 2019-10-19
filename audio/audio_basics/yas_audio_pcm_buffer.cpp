@@ -377,7 +377,7 @@ void audio::pcm_buffer::set_frame_length(uint32_t const length) {
     set_data_byte_size(*this, data_byte_size);
 }
 
-void audio::pcm_buffer::reset() {
+void audio::pcm_buffer::reset_buffer() {
     this->set_frame_length(frame_capacity());
     audio::clear(this->audio_buffer_list());
 }

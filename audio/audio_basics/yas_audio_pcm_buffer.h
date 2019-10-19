@@ -63,7 +63,7 @@ struct pcm_buffer final {
     uint32_t frame_length() const;
     void set_frame_length(uint32_t const length);
 
-    void reset();
+    void reset_buffer();
     void clear();
     void clear(uint32_t const begin_frame, uint32_t const length);
 
