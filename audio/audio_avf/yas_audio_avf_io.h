@@ -37,7 +37,7 @@ struct avf_io final {
     std::optional<pcm_buffer_ptr> const &input_buffer_on_render() const;
     std::optional<time_ptr> const &input_time_on_render() const;
 
-    static avf_io_ptr make_shared();
+    static avf_io_ptr make_shared(std::optional<avf_device_ptr> const &);
 
    private:
     struct impl;
