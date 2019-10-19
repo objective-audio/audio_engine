@@ -69,13 +69,13 @@ void audio::device_io::_initialize() {
                             if (frame_length > 0) {
                                 output_buffer->set_frame_length(frame_length);
                                 audio::time time(*inOutputTime, output_buffer->format().sample_rate());
-                                render_handler(render_args{.output_buffer = output_buffer, .when = std::move(time)});
+                                render_handler(io_render_args{.output_buffer = output_buffer, .when = std::move(time)});
                                 output_buffer->copy_to(outOutputData);
                             }
                         }
                     } else if (kernel->input_buffer) {
                         pcm_buffer_ptr null_buffer{nullptr};
-                        render_handler(render_args{.output_buffer = null_buffer, .when = std::nullopt});
+                        render_handler(io_render_args{.output_buffer = null_buffer, .when = std::nullopt});
                     }
                 }
             }
@@ -158,7 +158,7 @@ bool audio::device_io::is_running() const {
     return this->_is_running;
 }
 
-void audio::device_io::set_render_handler(render_f handler) {
+void audio::device_io::set_render_handler(io_render_f handler) {
     std::lock_guard<std::recursive_mutex> lock(this->_mutex);
     this->__render_handler = std::move(handler);
 }
@@ -218,7 +218,7 @@ void audio::device_io::_prepare(device_io_ptr const &shared, std::optional<devic
     this->set_device(device);
 }
 
-audio::device_io::render_f audio::device_io::_render_handler() const {
+audio::io_render_f audio::device_io::_render_handler() const {
     std::lock_guard<std::recursive_mutex> lock(this->_mutex);
     return this->__render_handler;
 }
