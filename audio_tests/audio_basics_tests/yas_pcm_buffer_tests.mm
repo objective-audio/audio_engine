@@ -115,7 +115,7 @@ using namespace yas;
 
         XCTAssertTrue(test::is_filled_buffer(buffer));
 
-        buffer.reset();
+        buffer.reset_buffer();
 
         XCTAssertTrue(test::is_cleared_buffer(buffer));
 
@@ -365,8 +365,8 @@ using namespace yas;
         XCTAssertTrue(test::is_equal_buffer_flexibly(interleaved_buffer, deinterleaved_buffer));
         XCTAssertEqual(deinterleaved_buffer.frame_length(), frame_length);
 
-        interleaved_buffer.reset();
-        deinterleaved_buffer.reset();
+        interleaved_buffer.reset_buffer();
+        deinterleaved_buffer.reset_buffer();
 
         test::fill_test_values_to_buffer(deinterleaved_buffer);
 
@@ -396,8 +396,8 @@ using namespace yas;
         XCTAssertNoThrow(interleaved_buffer.copy_to(deinterleaved_buffer.audio_buffer_list()));
         XCTAssertTrue(test::is_equal_buffer_flexibly(interleaved_buffer, deinterleaved_buffer));
 
-        interleaved_buffer.reset();
-        deinterleaved_buffer.reset();
+        interleaved_buffer.reset_buffer();
+        deinterleaved_buffer.reset_buffer();
 
         test::fill_test_values_to_buffer(deinterleaved_buffer);
 

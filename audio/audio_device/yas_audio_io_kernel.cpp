@@ -16,11 +16,11 @@ audio::io_kernel::io_kernel(std::optional<audio::format> const &input_format,
 
 void audio::io_kernel::reset_buffers() {
     if (auto const &buffer = this->input_buffer) {
-        buffer.value()->reset();
+        buffer.value()->reset_buffer();
     }
 
     if (auto const &buffer = this->output_buffer) {
-        buffer.value()->reset();
+        buffer.value()->reset_buffer();
     }
 }
 

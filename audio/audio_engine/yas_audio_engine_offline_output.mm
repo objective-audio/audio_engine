@@ -111,7 +111,7 @@ audio::engine::offline_start_result_t audio::engine::offline_output::start(offli
                     break;
                 }
 
-                render_buffer->reset();
+                render_buffer->reset_buffer();
 
                 if (auto src_node = connection_on_block->source_node()) {
                     src_node->render(
