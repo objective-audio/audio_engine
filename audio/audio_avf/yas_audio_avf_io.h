@@ -9,25 +9,19 @@
 #if TARGET_OS_IPHONE
 
 #include "yas_audio_avf_device.h"
+#include "yas_audio_io_kernel.h"
 #include "yas_audio_ptr.h"
 #include "yas_audio_time.h"
 #include "yas_audio_types.h"
 
 namespace yas::audio {
 struct avf_io final {
-    struct render_args {
-        audio::pcm_buffer_ptr const &output_buffer;
-        std::optional<audio::time> const when;
-    };
-
-    using render_f = std::function<void(render_args)>;
-
     ~avf_io();
 
     void set_device(std::optional<avf_device_ptr> const &);
     std::optional<avf_device_ptr> const &device() const;
     bool is_running() const;
-    void set_render_handler(render_f);
+    void set_render_handler(io_render_f);
     void set_maximum_frames_per_slice(uint32_t const);
     uint32_t maximum_frames_per_slice() const;
 
@@ -52,7 +46,7 @@ struct avf_io final {
     chaining::observer_pool _pool;
 
     mutable std::recursive_mutex _mutex;
-    render_f __render_handler = nullptr;
+    io_render_f __render_handler = nullptr;
     uint32_t __maximum_frames = 4096;
     io_kernel_ptr __kernel = nullptr;
 
@@ -62,7 +56,7 @@ struct avf_io final {
     void _initialize();
     void _uninitialize();
 
-    render_f _render_handler() const;
+    io_render_f _render_handler() const;
     void _set_kernel(io_kernel_ptr const &);
     io_kernel_ptr _kernel() const;
     void _update_kernel();
