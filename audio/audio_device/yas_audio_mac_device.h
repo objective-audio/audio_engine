@@ -20,7 +20,7 @@
 #include "yas_audio_types.h"
 
 namespace yas::audio {
-class device_global;
+class mac_device_global;
 
 struct device {
     class stream;
