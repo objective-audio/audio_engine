@@ -36,7 +36,7 @@ struct avf_io final {
    private:
     std::weak_ptr<avf_io> _weak_io;
     std::optional<avf_device_ptr> _device = std::nullopt;
-    std::optional<avf_io_core_ptr> _io_core = std::nullopt;
+    std::optional<io_core_ptr> _io_core = std::nullopt;
     bool _is_running = false;
     io_render_f _render_handler = nullptr;
     uint32_t _maximum_frames = 4096;

@@ -9,7 +9,6 @@
 #include <AVFoundation/AVFoundation.h>
 #include <cpp_utils/yas_objc_ptr.h>
 #include <cpp_utils/yas_stl_utils.h>
-#include "yas_audio_avf_io_core.h"
 #include "yas_audio_io_kernel.h"
 
 using namespace yas;
