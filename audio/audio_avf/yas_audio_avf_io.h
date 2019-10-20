@@ -34,32 +34,19 @@ struct avf_io final {
     static avf_io_ptr make_shared(std::optional<avf_device_ptr> const &);
 
    private:
-    struct impl;
-
-    std::unique_ptr<impl> _impl;
-
-    std::optional<avf_device_ptr> _device = std::nullopt;
-    std::optional<pcm_buffer_ptr> _input_buffer_on_render = std::nullopt;
-    std::optional<time_ptr> _input_time_on_render = std::nullopt;
-
     std::weak_ptr<avf_io> _weak_io;
-    chaining::observer_pool _pool;
-
-    mutable std::recursive_mutex _mutex;
-    io_render_f __render_handler = nullptr;
-    uint32_t __maximum_frames = 4096;
-    io_kernel_ptr __kernel = nullptr;
+    std::optional<avf_device_ptr> _device = std::nullopt;
+    std::optional<io_core_ptr> _io_core = std::nullopt;
+    bool _is_running = false;
+    io_render_f _render_handler = nullptr;
+    uint32_t _maximum_frames = 4096;
+    std::optional<chaining::any_observer_ptr> _observer;
 
     avf_io();
 
-    void _prepare(avf_io_ptr const &);
     void _initialize();
     void _uninitialize();
 
-    io_render_f _render_handler() const;
-    void _set_kernel(io_kernel_ptr const &);
-    io_kernel_ptr _kernel() const;
-    void _update_kernel();
     void _reload();
 };
 }  // namespace yas::audio

@@ -8,14 +8,12 @@
 
 #if TARGET_OS_IPHONE
 
-#include <chaining/yas_chaining_umbrella.h>
+#include "yas_audio_avf_io_core.h"
 #include "yas_audio_format.h"
 #include "yas_audio_ptr.h"
 
 namespace yas::audio {
 struct avf_device final {
-    enum class method { lost, route_change };
-
     double sample_rate() const;
 
     uint32_t input_channel_count() const;
@@ -24,21 +22,14 @@ struct avf_device final {
     std::optional<audio::format> input_format() const;
     std::optional<audio::format> output_format() const;
 
+    avf_io_core_ptr make_io_core() const;
+
     static avf_device_ptr make_shared();
 
-    [[nodiscard]] chaining::chain_unsync_t<method> chain();
-
    private:
-    class impl;
-
-    std::unique_ptr<impl> _impl;
-
-    chaining::notifier_ptr<audio::avf_device::method> _notifier =
-        chaining::notifier<audio::avf_device::method>::make_shared();
+    std::weak_ptr<avf_device> _weak_device;
 
     avf_device();
-
-    void _prepare(avf_device_ptr const &);
 };
 }  // namespace yas::audio
 
