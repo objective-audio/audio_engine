@@ -35,7 +35,7 @@ void audio::avf_io::_uninitialize() {
     }
 }
 
-void audio::avf_io::set_device(std::optional<avf_device_ptr> const &device) {
+void audio::avf_io::set_device(std::optional<io_device_ptr> const &device) {
     if (this->_device != device) {
         bool const is_running = this->_is_running;
 
@@ -78,7 +78,7 @@ void audio::avf_io::set_device(std::optional<avf_device_ptr> const &device) {
     }
 }
 
-std::optional<audio::avf_device_ptr> const &audio::avf_io::device() const {
+std::optional<audio::io_device_ptr> const &audio::avf_io::device() const {
     return this->_device;
 }
 
@@ -160,7 +160,7 @@ void audio::avf_io::_reload() {
     }
 }
 
-audio::avf_io_ptr audio::avf_io::make_shared(std::optional<avf_device_ptr> const &device) {
+audio::avf_io_ptr audio::avf_io::make_shared(std::optional<io_device_ptr> const &device) {
     auto shared = std::shared_ptr<avf_io>(new avf_io{});
     shared->_weak_io = shared;
     shared->set_device(device);
