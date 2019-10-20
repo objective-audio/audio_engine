@@ -93,7 +93,9 @@ static void _add_listener(AudioObjectID const object_id, AudioObjectPropertySele
 struct mac_device_global {
     struct global_device : mac_device {
         static std::shared_ptr<global_device> make_shared(AudioDeviceID const device_id) {
-            return std::shared_ptr<global_device>(new global_device{device_id});
+            auto shared = std::shared_ptr<global_device>(new global_device{device_id});
+            shared->_prepare(shared);
+            return shared;
         }
 
        private:
@@ -304,6 +306,10 @@ audio::mac_device::mac_device(AudioDeviceID const device_id)
     _add_listener(device_id, kAudioDevicePropertyStreams, kAudioObjectPropertyScopeOutput, listener);
     _add_listener(device_id, kAudioDevicePropertyStreamConfiguration, kAudioObjectPropertyScopeInput, listener);
     _add_listener(device_id, kAudioDevicePropertyStreamConfiguration, kAudioObjectPropertyScopeOutput, listener);
+}
+
+void audio::mac_device::_prepare(mac_device_ptr const &mac_device) {
+    this->_weak_mac_device = mac_device;
 }
 
 AudioDeviceID audio::mac_device::audio_device_id() const {

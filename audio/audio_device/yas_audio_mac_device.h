@@ -91,7 +91,10 @@ struct mac_device {
    protected:
     explicit mac_device(AudioDeviceID const device_id);
 
+    void _prepare(mac_device_ptr const &);
+
    private:
+    std::weak_ptr<mac_device> _weak_mac_device;
     AudioDeviceID const _audio_device_id;
     std::unordered_map<AudioStreamID, stream_ptr> _input_streams_map;
     std::unordered_map<AudioStreamID, stream_ptr> _output_streams_map;
