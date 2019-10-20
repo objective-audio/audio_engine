@@ -8,10 +8,10 @@
 
 #include <cpp_utils/yas_result.h>
 #include <iostream>
-#include "yas_audio_device.h"
 #include "yas_audio_device_io.h"
 #include "yas_audio_engine_tap.h"
 #include "yas_audio_graph.h"
+#include "yas_audio_mac_device.h"
 #include "yas_audio_time.h"
 
 using namespace yas;
@@ -21,19 +21,19 @@ using namespace yas;
 struct audio::engine::device_io::core {
     audio::device_io_ptr _device_io = nullptr;
 
-    void set_device(std::optional<audio::device_ptr> const &device) {
+    void set_device(std::optional<audio::mac_device_ptr> const &device) {
         this->_device = device;
         if (this->_device_io) {
             this->_device_io->set_device(device);
         }
     }
 
-    std::optional<audio::device_ptr> const &device() {
+    std::optional<audio::mac_device_ptr> const &device() {
         return this->_device;
     }
 
    private:
-    std::optional<audio::device_ptr> _device = std::nullopt;
+    std::optional<audio::mac_device_ptr> _device = std::nullopt;
 };
 
 #pragma mark - audio::engine::device_io
@@ -43,11 +43,11 @@ audio::engine::device_io::device_io() : _core(std::make_unique<core>()) {
 
 audio::engine::device_io::~device_io() = default;
 
-void audio::engine::device_io::set_device(std::optional<audio::device_ptr> const &device) {
+void audio::engine::device_io::set_device(std::optional<audio::mac_device_ptr> const &device) {
     this->_core->set_device(device);
 }
 
-std::optional<audio::device_ptr> const &audio::engine::device_io::device() const {
+std::optional<audio::mac_device_ptr> const &audio::engine::device_io::device() const {
     return this->_core->device();
 }
 
@@ -74,7 +74,7 @@ audio::device_io_ptr const &audio::engine::device_io::raw_device_io() {
 void audio::engine::device_io::_prepare(device_io_ptr const &shared) {
     this->_weak_engine_device_io = to_weak(shared);
 
-    this->set_device(device::default_output_device());
+    this->set_device(mac_device::default_output_device());
 
     this->_node->set_render_handler([weak_engine_device_io = this->_weak_engine_device_io](auto args) {
         auto &buffer = args.buffer;

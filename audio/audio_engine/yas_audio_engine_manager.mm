@@ -13,9 +13,9 @@
 #include "yas_audio_engine_offline_output.h"
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
-#include "yas_audio_device.h"
 #include "yas_audio_device_io.h"
 #include "yas_audio_engine_device_io.h"
+#include "yas_audio_mac_device.h"
 #endif
 
 using namespace yas;
@@ -313,7 +313,7 @@ void audio::engine::manager::_prepare(manager_ptr const &shared) {
     this->_impl->prepare(weak_manager);
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
-    this->_device_system_observer = device::system_chain(device::system_method::configuration_change)
+    this->_device_system_observer = mac_device::system_chain(mac_device::system_method::configuration_change)
                                         .perform([weak_manager](auto const &) {
                                             if (auto engine = weak_manager.lock()) {
                                                 engine->_post_configuration_change();

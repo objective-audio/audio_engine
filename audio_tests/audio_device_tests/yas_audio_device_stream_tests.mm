@@ -6,7 +6,7 @@
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
 
-#import <audio/yas_audio_device_stream.h>
+#import <audio/yas_audio_mac_device_stream.h>
 #import "yas_audio_test_utils.h"
 
 using namespace yas;
@@ -26,11 +26,11 @@ using namespace yas;
 }
 
 - (void)test_method_to_string {
-    XCTAssertEqual(to_string(audio::device::stream::method::did_change), "did_change");
+    XCTAssertEqual(to_string(audio::mac_device::stream::method::did_change), "did_change");
 }
 
 - (void)test_method_ostream {
-    auto const values = {audio::device::stream::method::did_change};
+    auto const values = {audio::mac_device::stream::method::did_change};
 
     for (auto const &value : values) {
         std::ostringstream stream;

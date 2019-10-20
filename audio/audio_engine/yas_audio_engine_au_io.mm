@@ -12,7 +12,7 @@
 #if TARGET_OS_IPHONE
 #import <AVFoundation/AVFoundation.h>
 #elif TARGET_OS_MAC
-#include "yas_audio_device.h"
+#include "yas_audio_mac_device.h"
 #endif
 
 using namespace yas;
@@ -96,15 +96,15 @@ uint32_t audio::engine::au_io::input_device_channel_count() const {
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
 
-void audio::engine::au_io::set_device(std::optional<audio::device_ptr> const &device_opt) {
+void audio::engine::au_io::set_device(std::optional<audio::mac_device_ptr> const &device_opt) {
     if (device_opt) {
         auto const &device = *device_opt;
         this->_au->unit()->set_current_device(device->audio_device_id());
     }
 }
 
-std::optional<audio::device_ptr> audio::engine::au_io::device() const {
-    return device::device_for_id(this->_au->unit()->current_device());
+std::optional<audio::mac_device_ptr> audio::engine::au_io::device() const {
+    return mac_device::device_for_id(this->_au->unit()->current_device());
 }
 
 #endif

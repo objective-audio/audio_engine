@@ -8,9 +8,9 @@
 
 #include <cpp_utils/yas_exception.h>
 #include <mutex>
-#include "yas_audio_device.h"
 #include "yas_audio_format.h"
 #include "yas_audio_io_kernel.h"
+#include "yas_audio_mac_device.h"
 #include "yas_audio_pcm_buffer.h"
 
 using namespace yas;
@@ -99,7 +99,7 @@ void audio::device_io::_uninitialize() {
 
     auto const &device = *this->_device;
 
-    if (device::is_available_device(device)) {
+    if (mac_device::is_available_device(device)) {
         raise_if_raw_audio_error(AudioDeviceDestroyIOProcID(device->audio_device_id(), this->_io_proc_id));
     }
 
@@ -107,7 +107,7 @@ void audio::device_io::_uninitialize() {
     this->_update_kernel();
 }
 
-void audio::device_io::set_device(std::optional<audio::device_ptr> const device) {
+void audio::device_io::set_device(std::optional<audio::mac_device_ptr> const device) {
     if (this->_device != device) {
         bool running = this->_is_running;
 
@@ -121,7 +121,7 @@ void audio::device_io::set_device(std::optional<audio::device_ptr> const device)
         if (this->_device) {
             auto const &device = *this->_device;
 
-            this->_device_observer = device->chain(device::method::device_did_change)
+            this->_device_observer = device->chain(mac_device::method::device_did_change)
                                          .perform([weak_device_io = _weak_device_io](auto const &) {
                                              if (auto device_io = weak_device_io.lock()) {
                                                  device_io->_update_kernel();
@@ -129,11 +129,11 @@ void audio::device_io::set_device(std::optional<audio::device_ptr> const device)
                                          })
                                          .end();
 
-            this->_device_system_observer = device::system_chain(device::system_method::hardware_did_change)
+            this->_device_system_observer = mac_device::system_chain(mac_device::system_method::hardware_did_change)
                                                 .perform([weak_device_io = this->_weak_device_io,
                                                           audio_device_id = device->audio_device_id()](auto const &) {
                                                     if (auto device_io = weak_device_io.lock()) {
-                                                        if (!device::device_for_id(audio_device_id)) {
+                                                        if (!mac_device::device_for_id(audio_device_id)) {
                                                             device_io->set_device(std::nullopt);
                                                         }
                                                     }
@@ -149,7 +149,7 @@ void audio::device_io::set_device(std::optional<audio::device_ptr> const device)
     }
 }
 
-std::optional<audio::device_ptr> const &audio::device_io::device() const {
+std::optional<audio::mac_device_ptr> const &audio::device_io::device() const {
     return this->_device;
 }
 
@@ -198,7 +198,7 @@ void audio::device_io::stop() {
 
     auto const &device = *this->_device;
 
-    if (device::is_available_device(device)) {
+    if (mac_device::is_available_device(device)) {
         raise_if_raw_audio_error(AudioDeviceStop(device->audio_device_id(), this->_io_proc_id));
     }
 }
@@ -211,7 +211,7 @@ std::optional<audio::time_ptr> const &audio::device_io::input_time_on_render() c
     return this->_input_time_on_render;
 }
 
-void audio::device_io::_prepare(device_io_ptr const &shared, std::optional<device_ptr> const &device) {
+void audio::device_io::_prepare(device_io_ptr const &shared, std::optional<mac_device_ptr> const &device) {
     this->_weak_device_io = to_weak(shared);
 
     this->set_device(device);
@@ -249,7 +249,7 @@ void audio::device_io::_update_kernel() {
     this->_set_kernel(io_kernel::make_shared(device->input_format(), device->output_format(), this->__maximum_frames));
 }
 
-audio::device_io_ptr audio::device_io::make_shared(std::optional<device_ptr> const &device) {
+audio::device_io_ptr audio::device_io::make_shared(std::optional<mac_device_ptr> const &device) {
     auto shared = device_io_ptr(new audio::device_io{});
     shared->_prepare(shared, device);
     return shared;

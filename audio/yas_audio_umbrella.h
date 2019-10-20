@@ -17,21 +17,21 @@
 #include "yas_audio_file.h"
 #include "yas_audio_file_utils.h"
 #include "yas_audio_format.h"
+#include "yas_audio_io.h"
 #include "yas_audio_pcm_buffer.h"
 #include "yas_audio_time.h"
 
 #if TARGET_OS_IPHONE
 
 #include "yas_audio_avf_device.h"
-#include "yas_audio_avf_io.h"
 
 #elif TARGET_OS_MAC
 
-#include "yas_audio_device.h"
 #include "yas_audio_device_io.h"
-#include "yas_audio_device_stream.h"
 #include "yas_audio_engine_device_io.h"
 #include "yas_audio_engine_route.h"
+#include "yas_audio_mac_device.h"
+#include "yas_audio_mac_device_stream.h"
 
 #endif
 

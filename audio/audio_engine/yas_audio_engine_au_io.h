@@ -9,12 +9,6 @@
 #include "yas_audio_pcm_buffer.h"
 #include "yas_audio_types.h"
 
-#if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
-namespace yas::audio {
-class device;
-}
-#endif
-
 namespace yas::audio::engine {
 struct au_io {
     enum class method {
@@ -31,8 +25,8 @@ struct au_io {
     virtual ~au_io() = default;
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
-    void set_device(std::optional<audio::device_ptr> const &);
-    std::optional<audio::device_ptr> device() const;
+    void set_device(std::optional<audio::mac_device_ptr> const &);
+    std::optional<audio::mac_device_ptr> device() const;
 #endif
 
     void set_channel_map(channel_map_t const &, audio::direction const);

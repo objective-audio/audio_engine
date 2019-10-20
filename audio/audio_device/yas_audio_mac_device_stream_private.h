@@ -10,7 +10,7 @@
 #include "yas_audio_exception.h"
 
 template <typename T>
-std::unique_ptr<std::vector<T>> yas::audio::device::stream::_property_data(
+std::unique_ptr<std::vector<T>> yas::audio::mac_device::stream::_property_data(
     AudioStreamID const stream_id, AudioObjectPropertySelector const selector) const {
     AudioObjectPropertyAddress const address = {.mSelector = selector,
                                                 .mScope = kAudioObjectPropertyScopeGlobal,

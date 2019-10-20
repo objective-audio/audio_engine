@@ -52,7 +52,7 @@ std::optional<audio::format> audio::avf_device::output_format() const {
     }
 }
 
-audio::avf_io_core_ptr audio::avf_device::make_io_core() const {
+audio::io_core_ptr audio::avf_device::make_io_core() const {
     return avf_io_core::make_shared(this->_weak_device.lock());
 }
 
