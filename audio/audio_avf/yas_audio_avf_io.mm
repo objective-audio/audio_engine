@@ -162,6 +162,7 @@ void audio::avf_io::_reload() {
 
 audio::avf_io_ptr audio::avf_io::make_shared(std::optional<avf_device_ptr> const &device) {
     auto shared = std::shared_ptr<avf_io>(new avf_io{});
+    shared->_weak_io = shared;
     shared->set_device(device);
     return shared;
 }
