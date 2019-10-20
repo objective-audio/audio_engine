@@ -1,5 +1,5 @@
 //
-//  yas_audio_device_stream.h
+//  yas_audio_mac_device_stream.h
 //
 
 #pragma once
@@ -9,7 +9,7 @@
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
 
 #include <ostream>
-#import "yas_audio_device.h"
+#import "yas_audio_mac_device.h"
 
 namespace yas::audio {
 struct device::stream {
@@ -85,6 +85,6 @@ std::string to_string(audio::device::stream::method const &);
 
 std::ostream &operator<<(std::ostream &, yas::audio::device::stream::method const &);
 
-#include "yas_audio_device_stream_private.h"
+#include "yas_audio_mac_device_stream_private.h"
 
 #endif

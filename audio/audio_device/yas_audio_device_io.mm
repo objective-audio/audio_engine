@@ -8,9 +8,9 @@
 
 #include <cpp_utils/yas_exception.h>
 #include <mutex>
-#include "yas_audio_device.h"
 #include "yas_audio_format.h"
 #include "yas_audio_io_kernel.h"
+#include "yas_audio_mac_device.h"
 #include "yas_audio_pcm_buffer.h"
 
 using namespace yas;

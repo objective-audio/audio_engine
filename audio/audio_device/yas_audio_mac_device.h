@@ -1,5 +1,5 @@
 //
-//  yas_audio_device.h
+//  yas_audio_mac_device.h
 //
 
 #pragma once
@@ -123,6 +123,6 @@ std::string to_string(audio::device::system_method const &);
 std::ostream &operator<<(std::ostream &, yas::audio::device::method const &);
 std::ostream &operator<<(std::ostream &, yas::audio::device::system_method const &);
 
-#include "yas_audio_device_stream.h"
+#include "yas_audio_mac_device_stream.h"
 
 #endif

@@ -1,8 +1,8 @@
 //
-//  yas_audio_device_stream.cpp
+//  yas_audio_mac_device_stream.cpp
 //
 
-#include "yas_audio_device.h"
+#include "yas_audio_mac_device.h"
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
 

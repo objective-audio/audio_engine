@@ -12,7 +12,7 @@
 #if TARGET_OS_IPHONE
 #import <AVFoundation/AVFoundation.h>
 #elif TARGET_OS_MAC
-#include "yas_audio_device.h"
+#include "yas_audio_mac_device.h"
 #endif
 
 using namespace yas;

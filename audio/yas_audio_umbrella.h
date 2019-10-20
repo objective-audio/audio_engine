@@ -27,11 +27,11 @@
 
 #elif TARGET_OS_MAC
 
-#include "yas_audio_device.h"
 #include "yas_audio_device_io.h"
-#include "yas_audio_device_stream.h"
 #include "yas_audio_engine_device_io.h"
 #include "yas_audio_engine_route.h"
+#include "yas_audio_mac_device.h"
+#include "yas_audio_mac_device_stream.h"
 
 #endif
 
