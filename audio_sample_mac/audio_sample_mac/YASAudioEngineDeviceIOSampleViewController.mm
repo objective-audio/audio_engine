@@ -197,14 +197,14 @@ struct device_io_vc_internal {
     auto unowned_self = objc_ptr_with_move_object([[YASUnownedObject alloc] initWithObject:self]);
 
     _internal.system_observer =
-        audio::device::system_chain(audio::device::system_method::hardware_did_change)
+        audio::mac_device::system_chain(audio::mac_device::system_method::hardware_did_change)
             .perform([unowned_self](auto const &) { [[unowned_self.object() object] _updateDeviceNames]; })
             .end();
 
     [self _updateDeviceNames];
 
-    if (auto const default_device = audio::device::default_output_device()) {
-        if (auto index = audio::device::index_of_device(*default_device)) {
+    if (auto const default_device = audio::mac_device::default_output_device()) {
+        if (auto index = audio::mac_device::index_of_device(*default_device)) {
             self.selectedDeviceIndex = *index;
         }
     }
@@ -220,7 +220,7 @@ struct device_io_vc_internal {
     _internal.system_observer = nullptr;
     _internal.device_observer = nullptr;
 
-    self.selectedDeviceIndex = audio::device::all_devices().size();
+    self.selectedDeviceIndex = audio::mac_device::all_devices().size();
 
     [self _removeObservers];
 
@@ -231,7 +231,7 @@ struct device_io_vc_internal {
 #pragma mark - update
 
 - (void)_updateDeviceNames {
-    auto all_devices = audio::device::all_devices();
+    auto all_devices = audio::mac_device::all_devices();
 
     NSMutableArray *titles = [NSMutableArray arrayWithCapacity:all_devices.size()];
 
@@ -245,7 +245,7 @@ struct device_io_vc_internal {
 
     std::optional<NSUInteger> index = std::nullopt;
     if (auto const device = _internal.manager->device_io()->device()) {
-        index = audio::device::index_of_device(*device);
+        index = audio::mac_device::index_of_device(*device);
     }
 
     if (index) {
@@ -368,7 +368,7 @@ struct device_io_vc_internal {
 - (void)setSelectedDeviceIndex:(NSUInteger)selectedDeviceIndex {
     _selectedDeviceIndex = selectedDeviceIndex;
 
-    auto const all_devices = audio::device::all_devices();
+    auto const all_devices = audio::mac_device::all_devices();
 
     if (selectedDeviceIndex < all_devices.size()) {
         auto const &device = all_devices[selectedDeviceIndex];
@@ -378,21 +378,21 @@ struct device_io_vc_internal {
     }
 }
 
-- (void)setDevice:(audio::device_ptr const &)selected_device {
+- (void)setDevice:(audio::mac_device_ptr const &)selected_device {
     _internal.device_observer = nullptr;
 
     if (!_internal.manager || !_internal.manager->device_io()) {
         return;
     }
 
-    auto const all_devices = audio::device::all_devices();
+    auto const all_devices = audio::mac_device::all_devices();
 
     if (selected_device && std::find(all_devices.begin(), all_devices.end(), selected_device) != all_devices.end()) {
         _internal.manager->device_io()->set_device(selected_device);
 
         auto unowned_self = objc_ptr_with_move_object([[YASUnownedObject alloc] initWithObject:self]);
 
-        _internal.device_observer = selected_device->chain(audio::device::method::device_did_change)
+        _internal.device_observer = selected_device->chain(audio::mac_device::method::device_did_change)
                                         .perform([selected_device, unowned_self](auto const &change_info) {
                                             auto const &infos = change_info.property_infos;
                                             if (change_info.property_infos.size() > 0) {

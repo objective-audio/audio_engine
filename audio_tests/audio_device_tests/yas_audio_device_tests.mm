@@ -26,16 +26,16 @@ using namespace yas;
 }
 
 - (void)test_method_to_string {
-    XCTAssertEqual(to_string(audio::device::method::device_did_change), "device_did_change");
+    XCTAssertEqual(to_string(audio::mac_device::method::device_did_change), "device_did_change");
 }
 
 - (void)test_system_method_string {
-    XCTAssertEqual(to_string(audio::device::system_method::hardware_did_change), "hardware_did_change");
-    XCTAssertEqual(to_string(audio::device::system_method::configuration_change), "configuration_change");
+    XCTAssertEqual(to_string(audio::mac_device::system_method::hardware_did_change), "hardware_did_change");
+    XCTAssertEqual(to_string(audio::mac_device::system_method::configuration_change), "configuration_change");
 }
 
 - (void)test_method_ostream {
-    auto const values = {audio::device::method::device_did_change};
+    auto const values = {audio::mac_device::method::device_did_change};
 
     for (auto const &value : values) {
         std::ostringstream stream;
@@ -45,8 +45,8 @@ using namespace yas;
 }
 
 - (void)test_system_method_ostream {
-    auto const values = {audio::device::system_method::hardware_did_change,
-                         audio::device::system_method::configuration_change};
+    auto const values = {audio::mac_device::system_method::hardware_did_change,
+                         audio::mac_device::system_method::configuration_change};
 
     for (auto const &value : values) {
         std::ostringstream stream;

@@ -26,11 +26,11 @@ using namespace yas;
 }
 
 - (void)test_method_to_string {
-    XCTAssertEqual(to_string(audio::device::stream::method::did_change), "did_change");
+    XCTAssertEqual(to_string(audio::mac_device::stream::method::did_change), "did_change");
 }
 
 - (void)test_method_ostream {
-    auto const values = {audio::device::stream::method::did_change};
+    auto const values = {audio::mac_device::stream::method::did_change};
 
     for (auto const &value : values) {
         std::ostringstream stream;

@@ -12,7 +12,7 @@
 #import "yas_audio_mac_device.h"
 
 namespace yas::audio {
-struct device::stream {
+struct mac_device::stream {
     enum class property : uint32_t {
         virtual_format = 0,
         is_active,
@@ -43,7 +43,7 @@ struct device::stream {
     };
 
     AudioStreamID stream_id() const;
-    std::optional<audio::device_ptr> device() const;
+    std::optional<audio::mac_device_ptr> device() const;
     bool is_active() const;
     audio::direction direction() const;
     audio::format virtual_format() const;
@@ -66,7 +66,7 @@ struct device::stream {
 
     explicit stream(args &&args);
 
-    void _prepare(device::stream_ptr const &);
+    void _prepare(mac_device::stream_ptr const &);
     listener_f _listener();
     void _add_listener(AudioObjectPropertySelector const &selector, listener_f handler);
 
@@ -75,15 +75,15 @@ struct device::stream {
                                                    AudioObjectPropertySelector const selector) const;
 
    public:
-    static device::stream_ptr make_shared(device::stream::args);
+    static mac_device::stream_ptr make_shared(mac_device::stream::args);
 };
 }  // namespace yas::audio
 
 namespace yas {
-std::string to_string(audio::device::stream::method const &);
+std::string to_string(audio::mac_device::stream::method const &);
 }
 
-std::ostream &operator<<(std::ostream &, yas::audio::device::stream::method const &);
+std::ostream &operator<<(std::ostream &, yas::audio::mac_device::stream::method const &);
 
 #include "yas_audio_mac_device_stream_private.h"
 
