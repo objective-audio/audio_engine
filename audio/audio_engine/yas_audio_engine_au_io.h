@@ -9,12 +9,6 @@
 #include "yas_audio_pcm_buffer.h"
 #include "yas_audio_types.h"
 
-#if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
-namespace yas::audio {
-class device;
-}
-#endif
-
 namespace yas::audio::engine {
 struct au_io {
     enum class method {
