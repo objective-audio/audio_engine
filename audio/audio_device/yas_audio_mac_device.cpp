@@ -91,15 +91,15 @@ static void _add_listener(AudioObjectID const object_id, AudioObjectPropertySele
 #pragma mark - mac_device_global
 
 struct mac_device_global {
-    struct global_device : mac_device {
-        static std::shared_ptr<global_device> make_shared(AudioDeviceID const device_id) {
-            auto shared = std::shared_ptr<global_device>(new global_device{device_id});
+    struct global_mac_device : mac_device {
+        static std::shared_ptr<global_mac_device> make_shared(AudioDeviceID const device_id) {
+            auto shared = std::shared_ptr<global_mac_device>(new global_mac_device{device_id});
             shared->_prepare(shared);
             return shared;
         }
 
        private:
-        global_device(AudioDeviceID const device_id) : mac_device(device_id) {
+        global_mac_device(AudioDeviceID const device_id) : mac_device(device_id) {
         }
     };
 
@@ -136,7 +136,7 @@ struct mac_device_global {
                 if (prev_devices.count(device_id) > 0) {
                     map.insert(std::make_pair(device_id, prev_devices.at(device_id)));
                 } else {
-                    map.insert(std::make_pair(device_id, global_device::make_shared(device_id)));
+                    map.insert(std::make_pair(device_id, global_mac_device::make_shared(device_id)));
                 }
             }
         }
