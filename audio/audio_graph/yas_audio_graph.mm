@@ -13,7 +13,7 @@
 #endif
 
 #if TARGET_OS_IPHONE
-#include "yas_audio_avf_io.h"
+#include "yas_audio_io.h"
 #elif TARGET_OS_MAC
 #include "yas_audio_device_io.h"
 #endif
@@ -173,21 +173,21 @@ void audio::graph::remove_all_units() {
 
 #if TARGET_OS_IPHONE
 
-void audio::graph::add_avf_io(avf_io_ptr const &avf_io) {
+void audio::graph::add_io(io_ptr const &io) {
     {
         std::lock_guard<std::recursive_mutex> lock(_mutex);
-        this->_avf_ios.insert(avf_io);
+        this->_ios.insert(io);
     }
     if (this->_running && !global_graph::_is_interrupting) {
-        avf_io->start();
+        io->start();
     }
 }
 
-void audio::graph::remove_avf_io(avf_io_ptr const &avf_io) {
-    avf_io->stop();
+void audio::graph::remove_io(io_ptr const &io) {
+    io->stop();
     {
         std::lock_guard<std::recursive_mutex> lock(_mutex);
-        this->_avf_ios.erase(avf_io);
+        this->_ios.erase(io);
     }
 }
 
@@ -245,8 +245,8 @@ void audio::graph::start_all_ios() {
         unit->start();
     }
 #if TARGET_OS_IPHONE
-    for (auto const &avf_io : this->_avf_ios) {
-        avf_io->start();
+    for (auto const &io : this->_ios) {
+        io->start();
     }
 #elif TARGET_OS_MAC
     for (auto const &device_io : this->_device_ios) {
@@ -261,8 +261,8 @@ void audio::graph::stop_all_ios() {
         unit->stop();
     }
 #if TARGET_OS_IPHONE
-    for (auto &avf_io : this->_avf_ios) {
-        avf_io->stop();
+    for (auto &io : this->_ios) {
+        io->stop();
     }
 #elif TARGET_OS_MAC
     for (auto &device_io : this->_device_ios) {

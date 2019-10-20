@@ -16,7 +16,7 @@ using sample_kernel_ptr = std::shared_ptr<sample_kernel_t>;
 namespace yas::sample {
 struct avf_io_vc_internal {
     audio::graph_ptr graph = nullptr;
-    audio::avf_io_ptr avf_io = nullptr;
+    audio::io_ptr avf_io = nullptr;
     sample_kernel_ptr kernel = nullptr;
 };
 }
@@ -48,8 +48,8 @@ struct avf_io_vc_internal {
 
 - (void)setup {
     self->_internal.graph = audio::graph::make_shared();
-    self->_internal.avf_io = audio::avf_io::make_shared(audio::avf_device::make_shared());
-    self->_internal.graph->add_avf_io(self->_internal.avf_io);
+    self->_internal.avf_io = audio::io::make_shared(audio::avf_device::make_shared());
+    self->_internal.graph->add_io(self->_internal.avf_io);
 
     self->_internal.kernel = std::make_shared<sample_kernel_t>();
 

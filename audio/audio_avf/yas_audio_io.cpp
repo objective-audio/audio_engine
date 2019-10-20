@@ -1,33 +1,27 @@
 //
-//  yas_audio_avf_io.mm
+//  yas_audio_io.mm
 //
 
-#include "yas_audio_avf_io.h"
+#include "yas_audio_io.h"
 
-#if TARGET_OS_IPHONE
-
-#include <AVFoundation/AVFoundation.h>
-#include <cpp_utils/yas_objc_ptr.h>
 #include <cpp_utils/yas_stl_utils.h>
 #include "yas_audio_io_kernel.h"
 
 using namespace yas;
 
-#pragma mark -
+audio::io::io() = default;
 
-audio::avf_io::avf_io() = default;
-
-audio::avf_io::~avf_io() {
+audio::io::~io() {
     this->_uninitialize();
 }
 
-void audio::avf_io::_initialize() {
+void audio::io::_initialize() {
     if (this->_device && this->_io_core) {
         this->_io_core.value()->initialize();
     }
 }
 
-void audio::avf_io::_uninitialize() {
+void audio::io::_uninitialize() {
     this->stop();
 
     if (auto const &io_core = this->_io_core) {
@@ -35,7 +29,7 @@ void audio::avf_io::_uninitialize() {
     }
 }
 
-void audio::avf_io::set_device(std::optional<io_device_ptr> const &device) {
+void audio::io::set_device(std::optional<io_device_ptr> const &device) {
     if (this->_device != device) {
         bool const is_running = this->_is_running;
 
@@ -54,13 +48,13 @@ void audio::avf_io::set_device(std::optional<io_device_ptr> const &device) {
 
             this->_observer = io_core->chain()
                                   .perform([weak_io = this->_weak_io](auto const &method) {
-                                      if (auto const avf_io = weak_io.lock()) {
+                                      if (auto const io = weak_io.lock()) {
                                           switch (method) {
                                               case io_core::method::updated:
-                                                  avf_io->_reload();
+                                                  io->_reload();
                                                   break;
                                               case io_core::method::lost:
-                                                  avf_io->_uninitialize();
+                                                  io->_uninitialize();
                                                   break;
                                           }
                                       }
@@ -78,15 +72,15 @@ void audio::avf_io::set_device(std::optional<io_device_ptr> const &device) {
     }
 }
 
-std::optional<audio::io_device_ptr> const &audio::avf_io::device() const {
+std::optional<audio::io_device_ptr> const &audio::io::device() const {
     return this->_device;
 }
 
-bool audio::avf_io::is_running() const {
+bool audio::io::is_running() const {
     return this->_is_running;
 }
 
-void audio::avf_io::set_render_handler(io_render_f handler) {
+void audio::io::set_render_handler(io_render_f handler) {
     this->_render_handler = std::move(handler);
 
     if (auto const &io_core = this->_io_core) {
@@ -94,7 +88,7 @@ void audio::avf_io::set_render_handler(io_render_f handler) {
     }
 }
 
-void audio::avf_io::set_maximum_frames_per_slice(uint32_t const frames) {
+void audio::io::set_maximum_frames_per_slice(uint32_t const frames) {
     this->_maximum_frames = frames;
 
     if (auto const &io_core = this->_io_core) {
@@ -102,11 +96,11 @@ void audio::avf_io::set_maximum_frames_per_slice(uint32_t const frames) {
     }
 }
 
-uint32_t audio::avf_io::maximum_frames_per_slice() const {
+uint32_t audio::io::maximum_frames_per_slice() const {
     return this->_maximum_frames;
 }
 
-bool audio::avf_io::start() {
+bool audio::io::start() {
     if (this->_is_running) {
         return true;
     }
@@ -119,7 +113,7 @@ bool audio::avf_io::start() {
     return false;
 }
 
-void audio::avf_io::stop() {
+void audio::io::stop() {
     if (!this->_is_running) {
         return;
     }
@@ -131,7 +125,7 @@ void audio::avf_io::stop() {
     }
 }
 
-std::optional<audio::pcm_buffer_ptr> const &audio::avf_io::input_buffer_on_render() const {
+std::optional<audio::pcm_buffer_ptr> const &audio::io::input_buffer_on_render() const {
     if (auto const &io_core = this->_io_core) {
         return io_core.value()->input_buffer_on_render();
     } else {
@@ -140,7 +134,7 @@ std::optional<audio::pcm_buffer_ptr> const &audio::avf_io::input_buffer_on_rende
     }
 }
 
-std::optional<audio::time_ptr> const &audio::avf_io::input_time_on_render() const {
+std::optional<audio::time_ptr> const &audio::io::input_time_on_render() const {
     if (auto const &io_core = this->_io_core) {
         return io_core.value()->input_time_on_render();
     } else {
@@ -149,7 +143,7 @@ std::optional<audio::time_ptr> const &audio::avf_io::input_time_on_render() cons
     }
 }
 
-void audio::avf_io::_reload() {
+void audio::io::_reload() {
     bool const is_running = this->is_running();
 
     this->_uninitialize();
@@ -160,11 +154,9 @@ void audio::avf_io::_reload() {
     }
 }
 
-audio::avf_io_ptr audio::avf_io::make_shared(std::optional<io_device_ptr> const &device) {
-    auto shared = std::shared_ptr<avf_io>(new avf_io{});
+audio::io_ptr audio::io::make_shared(std::optional<io_device_ptr> const &device) {
+    auto shared = std::shared_ptr<io>(new io{});
     shared->_weak_io = shared;
     shared->set_device(device);
     return shared;
 }
-
-#endif
