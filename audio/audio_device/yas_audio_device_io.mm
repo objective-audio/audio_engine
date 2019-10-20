@@ -74,8 +74,7 @@ void audio::device_io::_initialize() {
                             }
                         }
                     } else if (kernel->input_buffer) {
-                        pcm_buffer_ptr null_buffer{nullptr};
-                        render_handler(io_render_args{.output_buffer = null_buffer, .when = std::nullopt});
+                        render_handler(io_render_args{.output_buffer = std::nullopt, .when = std::nullopt});
                     }
                 }
             }
