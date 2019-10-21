@@ -36,10 +36,10 @@ using sample_kernel_ptr = std::shared_ptr<sample_kernel_t>;
 namespace yas::sample {
 struct device_vc_internal {
     audio::graph_ptr graph = nullptr;
-    audio::device_io_ptr device_io = nullptr;
+    audio::io_ptr io = nullptr;
     chaining::any_observer_ptr system_observer = nullptr;
     chaining::any_observer_ptr device_observer = nullptr;
-    sample_kernel_ptr kernel;
+    sample_kernel_ptr kernel = nullptr;
 };
 }
 
@@ -64,8 +64,8 @@ struct device_vc_internal {
     });
 
     _internal.graph = audio::graph::make_shared();
-    _internal.device_io = audio::device_io::make_shared(std::nullopt);
-    _internal.graph->add_audio_device_io(_internal.device_io);
+    _internal.io = audio::io::make_shared(std::nullopt);
+    _internal.graph->add_io(_internal.io);
 
     _internal.kernel = std::make_shared<sample_kernel_t>();
 
@@ -80,10 +80,10 @@ struct device_vc_internal {
             .perform([unowned_self](auto const &) { [[unowned_self.object() object] _updateDeviceNames]; })
             .end();
 
-    auto weak_device_io = to_weak(_internal.device_io);
-    _internal.device_io->set_render_handler([weak_device_io, kernel = _internal.kernel](auto args) {
-        if (auto device_io = weak_device_io.lock()) {
-            kernel->process(device_io->input_buffer_on_render(), args.output_buffer);
+    auto weak_io = to_weak(_internal.io);
+    _internal.io->set_render_handler([weak_io, kernel = _internal.kernel](auto args) {
+        if (auto io = weak_io.lock()) {
+            kernel->process(io->input_buffer_on_render(), args.output_buffer);
         }
     });
 
@@ -98,7 +98,7 @@ struct device_vc_internal {
 
 - (void)dispose {
     _internal.graph = nullptr;
-    _internal.device_io = nullptr;
+    _internal.io = nullptr;
     _internal.system_observer = nullptr;
     _internal.device_observer = nullptr;
     _internal.kernel = nullptr;
@@ -182,8 +182,10 @@ struct device_vc_internal {
 
     std::optional<NSUInteger> index = std::nullopt;
 
-    if (auto const &device_opt = _internal.device_io->device()) {
-        index = audio::mac_device::index_of_device(*device_opt);
+    if (auto const &device_opt = _internal.io->device()) {
+        if (auto const device = std::dynamic_pointer_cast<audio::mac_device>(device_opt.value())) {
+            index = audio::mac_device::index_of_device(device);
+        }
     }
 
     if (index) {
@@ -194,13 +196,13 @@ struct device_vc_internal {
 }
 
 - (void)setDevice:(std::optional<audio::mac_device_ptr> const &)selected_device {
-    if (auto prev_audio_device = _internal.device_io->device()) {
+    if (auto prev_audio_device = _internal.io->device()) {
         _internal.device_observer = nullptr;
     }
 
     auto all_devices = audio::mac_device::all_devices();
 
-    _internal.device_io->set_device(selected_device);
+    _internal.io->set_device(selected_device);
 
     if (selected_device && std::find(all_devices.begin(), all_devices.end(), selected_device) != all_devices.end()) {
         auto unowned_self = objc_ptr_with_move_object([[YASUnownedObject alloc] initWithObject:self]);
@@ -224,23 +226,24 @@ struct device_vc_internal {
 }
 
 - (void)_updateDeviceInfo {
-    auto const &device_opt = _internal.device_io->device();
+    auto const &device_opt = _internal.io->device();
     NSColor *onColor = [NSColor blackColor];
     NSColor *offColor = [NSColor lightGrayColor];
     if (device_opt) {
-        auto const &device = *device_opt;
-        self.deviceInfo = [NSString
-            stringWithFormat:@"name = %@\nnominal samplerate = %@", device->name(), @(device->nominal_sample_rate())];
-        ;
-        self.nominalSampleRate = device->nominal_sample_rate();
-        self.ioThroughTextColor = (device->input_format() && device->output_format()) ? onColor : offColor;
-        self.sineTextColor = device->output_format() ? onColor : offColor;
-    } else {
-        self.deviceInfo = nil;
-        self.nominalSampleRate = 0;
-        self.ioThroughTextColor = offColor;
-        self.sineTextColor = offColor;
+        if (auto const &device = std::dynamic_pointer_cast<audio::mac_device>(*device_opt)) {
+            self.deviceInfo = [NSString stringWithFormat:@"name = %@\nnominal samplerate = %@", device->name(),
+                                                         @(device->nominal_sample_rate())];
+            self.nominalSampleRate = device->nominal_sample_rate();
+            self.ioThroughTextColor = (device->input_format() && device->output_format()) ? onColor : offColor;
+            self.sineTextColor = device->output_format() ? onColor : offColor;
+
+            return;
+        }
     }
+    self.deviceInfo = nil;
+    self.nominalSampleRate = 0;
+    self.ioThroughTextColor = offColor;
+    self.sineTextColor = offColor;
 }
 
 @end
