@@ -7,6 +7,7 @@
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
 
 #include <mutex>
+#include "yas_audio_mac_io_core.h"
 
 using namespace yas;
 
@@ -380,6 +381,10 @@ uint32_t audio::mac_device::output_channel_count() const {
         return output_format->channel_count();
     }
     return 0;
+}
+
+audio::io_core_ptr audio::mac_device::make_io_core() const {
+    return mac_io_core::make_shared(this->_weak_mac_device.lock());
 }
 
 chaining::chain_unsync_t<audio::mac_device::chaining_pair_t> audio::mac_device::chain() const {
