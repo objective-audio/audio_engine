@@ -185,7 +185,7 @@ void audio::mac_io_core::_update_kernel() {
         return;
     }
 
-    this->_set_kernel(io_kernel::make_shared(output_format, input_format, this->__maximum_frames));
+    this->_set_kernel(io_kernel::make_shared(input_format, output_format, this->__maximum_frames));
 }
 
 audio::mac_io_core_ptr audio::mac_io_core::make_shared(mac_device_ptr const &device) {
