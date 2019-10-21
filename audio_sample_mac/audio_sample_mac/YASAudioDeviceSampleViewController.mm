@@ -231,8 +231,10 @@ struct device_vc_internal {
     NSColor *offColor = [NSColor lightGrayColor];
     if (device_opt) {
         if (auto const &device = std::dynamic_pointer_cast<audio::mac_device>(*device_opt)) {
-            self.deviceInfo = [NSString stringWithFormat:@"name = %@\nnominal samplerate = %@", device->name(),
-                                                         @(device->nominal_sample_rate())];
+            self.deviceInfo = [NSString
+                stringWithFormat:@"name = %@\nnominal samplerate = %@\noutput channels = %@\ninput channels = %@",
+                                 device->name(), @(device->nominal_sample_rate()), @(device->output_channel_count()),
+                                 @(device->input_channel_count())];
             self.nominalSampleRate = device->nominal_sample_rate();
             self.ioThroughTextColor = (device->input_format() && device->output_format()) ? onColor : offColor;
             self.sineTextColor = device->output_format() ? onColor : offColor;
