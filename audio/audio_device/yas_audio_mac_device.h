@@ -67,10 +67,10 @@ struct mac_device : io_device {
     std::vector<stream_ptr> output_streams() const;
     double nominal_sample_rate() const;
 
-    std::optional<audio::format> input_format() const;
-    std::optional<audio::format> output_format() const;
-    uint32_t input_channel_count() const;
-    uint32_t output_channel_count() const;
+    std::optional<audio::format> input_format() const override;
+    std::optional<audio::format> output_format() const override;
+    uint32_t input_channel_count() const override;
+    uint32_t output_channel_count() const override;
 
     [[nodiscard]] chaining::chain_unsync_t<chaining_pair_t> chain() const;
     [[nodiscard]] chaining::chain_relayed_unsync_t<change_info, chaining_pair_t> chain(method const) const;
@@ -78,7 +78,7 @@ struct mac_device : io_device {
     [[nodiscard]] static chaining::chain_relayed_unsync_t<change_info, chaining_system_pair_t> system_chain(
         system_method const);
 
-    io_core_ptr make_io_core() const;
+    io_core_ptr make_io_core() const override;
 
     // for Test
     static chaining::notifier_ptr<chaining_system_pair_t> &system_notifier();
