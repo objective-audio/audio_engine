@@ -229,7 +229,7 @@ struct offline_vc_internal {
     NSSavePanel *panel = [NSSavePanel savePanel];
     panel.allowedFileTypes = @[@"wav"];
     panel.extensionHidden = NO;
-    if ([panel runModal] == NSFileHandlingPanelOKButton) {
+    if ([panel runModal] == NSModalResponseOK) {
         [self startOfflineFileWritingWithURL:panel.URL];
     }
 }

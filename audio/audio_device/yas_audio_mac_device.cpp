@@ -7,6 +7,7 @@
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
 
 #include <mutex>
+#include "yas_audio_mac_io_core.h"
 
 using namespace yas;
 
@@ -91,8 +92,15 @@ static void _add_listener(AudioObjectID const object_id, AudioObjectPropertySele
 #pragma mark - mac_device_global
 
 struct mac_device_global {
-    struct global_device : mac_device {
-        global_device(AudioDeviceID const device_id) : mac_device(device_id) {
+    struct global_mac_device : mac_device {
+        static std::shared_ptr<global_mac_device> make_shared(AudioDeviceID const device_id) {
+            auto shared = std::shared_ptr<global_mac_device>(new global_mac_device{device_id});
+            shared->_prepare(shared);
+            return shared;
+        }
+
+       private:
+        global_mac_device(AudioDeviceID const device_id) : mac_device(device_id) {
         }
     };
 
@@ -129,7 +137,7 @@ struct mac_device_global {
                 if (prev_devices.count(device_id) > 0) {
                     map.insert(std::make_pair(device_id, prev_devices.at(device_id)));
                 } else {
-                    map.insert(std::make_pair(device_id, std::make_shared<global_device>(device_id)));
+                    map.insert(std::make_pair(device_id, global_mac_device::make_shared(device_id)));
                 }
             }
         }
@@ -301,6 +309,10 @@ audio::mac_device::mac_device(AudioDeviceID const device_id)
     _add_listener(device_id, kAudioDevicePropertyStreamConfiguration, kAudioObjectPropertyScopeOutput, listener);
 }
 
+void audio::mac_device::_prepare(mac_device_ptr const &mac_device) {
+    this->_weak_mac_device = mac_device;
+}
+
 AudioDeviceID audio::mac_device::audio_device_id() const {
     return this->_audio_device_id;
 }
@@ -369,6 +381,10 @@ uint32_t audio::mac_device::output_channel_count() const {
         return output_format->channel_count();
     }
     return 0;
+}
+
+audio::io_core_ptr audio::mac_device::make_io_core() const {
+    return mac_io_core::make_shared(this->_weak_mac_device.lock());
 }
 
 chaining::chain_unsync_t<audio::mac_device::chaining_pair_t> audio::mac_device::chain() const {

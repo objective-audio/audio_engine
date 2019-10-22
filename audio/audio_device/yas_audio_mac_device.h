@@ -7,8 +7,6 @@
 #include <TargetConditionals.h>
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
 
-#include "yas_audio_ptr.h"
-
 #include <AudioToolbox/AudioToolbox.h>
 #include <chaining/yas_chaining_umbrella.h>
 #include <optional>
@@ -17,12 +15,13 @@
 #include <vector>
 #include "yas_audio_engine_ptr.h"
 #include "yas_audio_format.h"
+#include "yas_audio_io_device.h"
 #include "yas_audio_types.h"
 
 namespace yas::audio {
 class mac_device_global;
 
-struct mac_device {
+struct mac_device : io_device {
     class stream;
 
     using stream_ptr = std::shared_ptr<stream>;
@@ -79,6 +78,8 @@ struct mac_device {
     [[nodiscard]] static chaining::chain_relayed_unsync_t<change_info, chaining_system_pair_t> system_chain(
         system_method const);
 
+    io_core_ptr make_io_core() const;
+
     // for Test
     static chaining::notifier_ptr<chaining_system_pair_t> &system_notifier();
 
@@ -91,7 +92,10 @@ struct mac_device {
    protected:
     explicit mac_device(AudioDeviceID const device_id);
 
+    void _prepare(mac_device_ptr const &);
+
    private:
+    std::weak_ptr<mac_device> _weak_mac_device;
     AudioDeviceID const _audio_device_id;
     std::unordered_map<AudioStreamID, stream_ptr> _input_streams_map;
     std::unordered_map<AudioStreamID, stream_ptr> _output_streams_map;

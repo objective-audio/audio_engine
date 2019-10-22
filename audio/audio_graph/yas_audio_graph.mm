@@ -4,6 +4,7 @@
 
 #include "yas_audio_graph.h"
 #include <cpp_utils/yas_stl_utils.h>
+#include "yas_audio_io.h"
 #include "yas_audio_unit.h"
 
 #if TARGET_OS_IPHONE
@@ -12,9 +13,7 @@
 #include <cpp_utils/yas_objc_ptr.h>
 #endif
 
-#if TARGET_OS_IPHONE
-#include "yas_audio_io.h"
-#elif TARGET_OS_MAC
+#if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
 #include "yas_audio_device_io.h"
 #endif
 
@@ -171,8 +170,6 @@ void audio::graph::remove_all_units() {
     });
 }
 
-#if TARGET_OS_IPHONE
-
 void audio::graph::add_io(io_ptr const &io) {
     {
         std::lock_guard<std::recursive_mutex> lock(_mutex);
@@ -191,7 +188,7 @@ void audio::graph::remove_io(io_ptr const &io) {
     }
 }
 
-#elif TARGET_OS_MAC
+#if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
 
 void audio::graph::add_audio_device_io(device_io_ptr const &device_io) {
     {
@@ -244,11 +241,11 @@ void audio::graph::start_all_ios() {
         auto &unit = pair.second;
         unit->start();
     }
-#if TARGET_OS_IPHONE
+
     for (auto const &io : this->_ios) {
         io->start();
     }
-#elif TARGET_OS_MAC
+#if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
     for (auto const &device_io : this->_device_ios) {
         device_io->start();
     }
