@@ -195,25 +195,25 @@ audio::engine::offline_output_ptr const &audio::engine::manager::offline_output(
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
 
 audio::engine::manager::add_result_t audio::engine::manager::add_device_io() {
-    if (this->_device_io) {
+    if (this->_io) {
         return add_result_t{add_error_t::already_added};
     } else {
-        this->_set_device_io(audio::engine::device_io::make_shared());
+        this->_set_io(audio::engine::io::make_shared());
         return add_result_t{nullptr};
     }
 }
 
 audio::engine::manager::remove_result_t audio::engine::manager::remove_device_io() {
-    if (this->_device_io) {
-        this->_set_device_io(nullptr);
+    if (this->_io) {
+        this->_set_io(nullptr);
         return remove_result_t{nullptr};
     } else {
         return remove_result_t{remove_error_t::already_removed};
     }
 }
 
-audio::engine::device_io_ptr const &audio::engine::manager::device_io() const {
-    return this->_device_io;
+audio::engine::io_ptr const &audio::engine::manager::device_io() const {
+    return this->_io;
 }
 
 #endif
@@ -373,7 +373,7 @@ bool audio::engine::manager::_prepare_graph() {
     this->_graph = audio::graph::make_shared();
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
-    if (auto &device_io = this->_device_io) {
+    if (auto &device_io = this->_io) {
         auto manageable = device_io->manageable();
         manageable->add_raw_device_io();
         this->_graph->add_audio_device_io(manageable->raw_device_io());
@@ -515,25 +515,25 @@ void audio::engine::manager::_reload_graph() {
 }
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
-void audio::engine::manager::_set_device_io(audio::engine::device_io_ptr const &node) {
+void audio::engine::manager::_set_io(audio::engine::io_ptr const &node) {
     if (node) {
-        this->_device_io = node;
+        this->_io = node;
 
         if (this->_graph) {
-            auto manageable = this->_device_io->manageable();
+            auto manageable = this->_io->manageable();
             manageable->add_raw_device_io();
             this->_graph->add_audio_device_io(manageable->raw_device_io());
         }
     } else {
-        if (this->_device_io) {
+        if (this->_io) {
             if (this->_graph) {
-                if (auto &device_io = this->_device_io->manageable()->raw_device_io()) {
+                if (auto &device_io = this->_io->manageable()->raw_device_io()) {
                     this->_graph->remove_audio_device_io(device_io);
                 }
             }
 
-            this->_device_io->manageable()->remove_raw_device_io();
-            this->_device_io = nullptr;
+            this->_io->manageable()->remove_raw_device_io();
+            this->_io = nullptr;
         }
     }
 }

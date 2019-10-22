@@ -19,7 +19,7 @@ class node;
 class offline_output;
 class route;
 class tap;
-class device_io;
+class io;
 
 class manageable_au;
 class node_removable;
@@ -41,5 +41,5 @@ using tap_ptr = std::shared_ptr<tap>;
 using manageable_au_ptr = std::shared_ptr<manageable_au>;
 using node_removable_ptr = std::shared_ptr<node_removable>;
 using manageable_kernel_ptr = std::shared_ptr<manageable_kernel>;
-using device_io_ptr = std::shared_ptr<engine::device_io>;
+using io_ptr = std::shared_ptr<engine::io>;
 }  // namespace yas::audio::engine

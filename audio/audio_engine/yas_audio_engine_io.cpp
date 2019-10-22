@@ -1,5 +1,5 @@
 //
-//  yas_audio_device_io.cpp
+//  yas_audio_engine_io.cpp
 //
 
 #include "yas_audio_engine_io.h"
@@ -18,7 +18,7 @@ using namespace yas;
 
 #pragma mark - core
 
-struct audio::engine::device_io::core {
+struct audio::engine::io::core {
     audio::device_io_ptr _device_io = nullptr;
 
     void set_device(std::optional<audio::mac_device_ptr> const &device) {
@@ -38,49 +38,49 @@ struct audio::engine::device_io::core {
 
 #pragma mark - audio::engine::device_io
 
-audio::engine::device_io::device_io() : _core(std::make_unique<core>()) {
+audio::engine::io::io() : _core(std::make_unique<core>()) {
 }
 
-audio::engine::device_io::~device_io() = default;
+audio::engine::io::~io() = default;
 
-void audio::engine::device_io::set_device(std::optional<audio::mac_device_ptr> const &device) {
+void audio::engine::io::set_device(std::optional<audio::mac_device_ptr> const &device) {
     this->_core->set_device(device);
 }
 
-std::optional<audio::mac_device_ptr> const &audio::engine::device_io::device() const {
+std::optional<audio::mac_device_ptr> const &audio::engine::io::device() const {
     return this->_core->device();
 }
 
-audio::engine::node_ptr const &audio::engine::device_io::node() const {
+audio::engine::node_ptr const &audio::engine::io::node() const {
     return this->_node;
 }
 
-audio::engine::manageable_device_io_ptr audio::engine::device_io::manageable() {
-    return std::dynamic_pointer_cast<manageable_device_io>(this->_weak_engine_device_io.lock());
+audio::engine::manageable_io_ptr audio::engine::io::manageable() {
+    return std::dynamic_pointer_cast<manageable_io>(this->_weak_engine_io.lock());
 }
 
-void audio::engine::device_io::add_raw_device_io() {
+void audio::engine::io::add_raw_device_io() {
     this->_core->_device_io = audio::device_io::make_shared(this->_core->device());
 }
 
-void audio::engine::device_io::remove_raw_device_io() {
+void audio::engine::io::remove_raw_device_io() {
     this->_core->_device_io = nullptr;
 }
 
-audio::device_io_ptr const &audio::engine::device_io::raw_device_io() {
+audio::device_io_ptr const &audio::engine::io::raw_device_io() {
     return this->_core->_device_io;
 }
 
-void audio::engine::device_io::_prepare(device_io_ptr const &shared) {
-    this->_weak_engine_device_io = to_weak(shared);
+void audio::engine::io::_prepare(io_ptr const &shared) {
+    this->_weak_engine_io = to_weak(shared);
 
     this->set_device(mac_device::default_output_device());
 
-    this->_node->set_render_handler([weak_engine_device_io = this->_weak_engine_device_io](auto args) {
+    this->_node->set_render_handler([weak_engine_io = this->_weak_engine_io](auto args) {
         auto &buffer = args.buffer;
 
-        if (auto engine_device_io = weak_engine_device_io.lock()) {
-            if (auto const &device_io = engine_device_io->raw_device_io()) {
+        if (auto engine_io = weak_engine_io.lock()) {
+            if (auto const &device_io = engine_io->raw_device_io()) {
                 auto const &input_buffer_opt = device_io->input_buffer_on_render();
                 if (input_buffer_opt) {
                     auto const &input_buffer = *input_buffer_opt;
@@ -93,15 +93,15 @@ void audio::engine::device_io::_prepare(device_io_ptr const &shared) {
     });
 
     this->_connections_observer = this->_node->chain(node::method::update_connections)
-                                      .perform([weak_engine_device_io = this->_weak_engine_device_io](auto const &) {
-                                          if (auto engine_device_io = weak_engine_device_io.lock()) {
-                                              engine_device_io->_update_device_io_connections();
+                                      .perform([weak_engine_io = this->_weak_engine_io](auto const &) {
+                                          if (auto engine_io = weak_engine_io.lock()) {
+                                              engine_io->_update_device_io_connections();
                                           }
                                       })
                                       .end();
 }
 
-void audio::engine::device_io::_update_device_io_connections() {
+void audio::engine::io::_update_device_io_connections() {
     auto &device_io = this->_core->_device_io;
     if (!device_io) {
         return;
@@ -114,9 +114,9 @@ void audio::engine::device_io::_update_device_io_connections() {
 
     auto weak_device_io = to_weak(device_io);
 
-    auto render_handler = [weak_engine_device_io = this->_weak_engine_device_io, weak_device_io](auto args) {
-        if (auto engine_device_io = weak_engine_device_io.lock()) {
-            if (auto kernel = engine_device_io->node()->kernel()) {
+    auto render_handler = [weak_engine_io = this->_weak_engine_io, weak_device_io](auto args) {
+        if (auto engine_io = weak_engine_io.lock()) {
+            if (auto kernel = engine_io->node()->kernel()) {
                 auto const connections = kernel->input_connections();
                 if (connections.count(0) > 0) {
                     auto const &connection = connections.at(0);
@@ -153,7 +153,7 @@ void audio::engine::device_io::_update_device_io_connections() {
     device_io->set_render_handler(std::move(render_handler));
 }
 
-bool audio::engine::device_io::_validate_connections() {
+bool audio::engine::io::_validate_connections() {
     if (auto const &device_io = this->_core->_device_io) {
         auto &input_connections = this->_node->manageable()->input_connections();
         if (input_connections.size() > 0) {
@@ -197,8 +197,8 @@ bool audio::engine::device_io::_validate_connections() {
     return true;
 }
 
-audio::engine::device_io_ptr audio::engine::device_io::make_shared() {
-    auto shared = device_io_ptr(new audio::engine::device_io{});
+audio::engine::io_ptr audio::engine::io::make_shared() {
+    auto shared = io_ptr(new audio::engine::io{});
     shared->_prepare(shared);
     return shared;
 }

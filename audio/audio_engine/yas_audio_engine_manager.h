@@ -59,7 +59,7 @@ struct manager final {
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
     add_result_t add_device_io();
     remove_result_t remove_device_io();
-    device_io_ptr const &device_io() const;
+    io_ptr const &device_io() const;
 #endif
 
     start_result_t start_render();
@@ -108,10 +108,10 @@ struct manager final {
     void _post_configuration_change();
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
-    device_io_ptr _device_io = nullptr;
+    io_ptr _io = nullptr;
     chaining::any_observer_ptr _device_system_observer = nullptr;
 
-    void _set_device_io(device_io_ptr const &node);
+    void _set_io(io_ptr const &node);
 #endif
 
    public:
