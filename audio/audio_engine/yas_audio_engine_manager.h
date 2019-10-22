@@ -107,12 +107,12 @@ struct manager final {
     void _reload_graph();
     void _post_configuration_change();
 
-#if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
     io_ptr _io = nullptr;
+#if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
     chaining::any_observer_ptr _device_system_observer = nullptr;
+#endif
 
     void _set_io(io_ptr const &node);
-#endif
 };
 }  // namespace yas::audio::engine
 
