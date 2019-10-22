@@ -244,8 +244,9 @@ struct device_io_vc_internal {
     self.deviceNames = titles;
 
     std::optional<NSUInteger> index = std::nullopt;
-    if (auto const device = _internal.manager->io()->device()) {
-        index = audio::mac_device::index_of_device(*device);
+    if (auto const io_device = _internal.manager->io()->device()) {
+        auto const mac_device = std::dynamic_pointer_cast<audio::mac_device>(*io_device);
+        index = audio::mac_device::index_of_device(mac_device);
     }
 
     if (index) {
@@ -286,10 +287,10 @@ struct device_io_vc_internal {
         }
     }
 
-    if (auto const &device_opt = _internal.manager->io()->device()) {
-        auto const &device = *device_opt;
-        uint32_t const output_channel_count = device->output_channel_count();
-        uint32_t const input_channel_count = device->input_channel_count();
+    if (auto const &io_device = _internal.manager->io()->device()) {
+        auto const mac_device = std::dynamic_pointer_cast<audio::mac_device>(*io_device);
+        uint32_t const output_channel_count = mac_device->output_channel_count();
+        uint32_t const input_channel_count = mac_device->input_channel_count();
         NSMutableArray *outputRoutes = [NSMutableArray arrayWithCapacity:output_channel_count];
         NSMutableArray *inputRoutes = [NSMutableArray arrayWithCapacity:input_channel_count];
 
@@ -307,7 +308,7 @@ struct device_io_vc_internal {
 
         self.outputRoutes = outputRoutes;
         self.inputRoutes = inputRoutes;
-        self.nominalSampleRate = device->nominal_sample_rate();
+        self.nominalSampleRate = mac_device->nominal_sample_rate();
 
         [self _updateInputSelection];
         [self _addObservers];

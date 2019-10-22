@@ -9,12 +9,13 @@
 #include <cpp_utils/yas_result.h>
 #include <cpp_utils/yas_stl_utils.h>
 #include "yas_audio_engine_au.h"
+#include "yas_audio_engine_io.h"
 #include "yas_audio_engine_node.h"
 #include "yas_audio_engine_offline_output.h"
 
-#if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
-#include "yas_audio_device_io.h"
-#include "yas_audio_engine_io.h"
+#if TARGET_OS_IPHONE
+#include "yas_audio_avf_device.h"
+#elif TARGET_OS_MAC
 #include "yas_audio_mac_device.h"
 #endif
 
@@ -192,13 +193,17 @@ audio::engine::offline_output_ptr const &audio::engine::manager::offline_output(
     return this->_offline_output;
 }
 
-#if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
-
 audio::engine::manager::add_result_t audio::engine::manager::add_io() {
     if (this->_io) {
         return add_result_t{add_error_t::already_added};
     } else {
-        this->_set_io(audio::engine::io::make_shared());
+        audio::engine::io_ptr const io = audio::engine::io::make_shared();
+#if TARGET_OS_IPHONE
+        io->set_device(avf_device::make_shared());
+#elif TARGET_OS_MAC
+        io->set_device(mac_device::default_output_device());
+#endif
+        this->_set_io(io);
         return add_result_t{nullptr};
     }
 }
@@ -215,8 +220,6 @@ audio::engine::manager::remove_result_t audio::engine::manager::remove_io() {
 audio::engine::io_ptr const &audio::engine::manager::io() const {
     return this->_io;
 }
-
-#endif
 
 audio::engine::manager::start_result_t audio::engine::manager::start_render() {
     if (auto const graph = this->_graph) {
@@ -372,13 +375,11 @@ bool audio::engine::manager::_prepare_graph() {
 
     this->_graph = audio::graph::make_shared();
 
-#if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
     if (auto &device_io = this->_io) {
         auto manageable = device_io->manageable();
-        manageable->add_raw_device_io();
-        this->_graph->add_audio_device_io(manageable->raw_device_io());
+        manageable->add_raw_io();
+        this->_graph->add_io(manageable->raw_io());
     }
-#endif
 
     for (auto &node : this->_nodes) {
         this->_add_node_to_graph(node);
@@ -514,31 +515,29 @@ void audio::engine::manager::_reload_graph() {
     }
 }
 
-#if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
 void audio::engine::manager::_set_io(audio::engine::io_ptr const &node) {
     if (node) {
         this->_io = node;
 
         if (this->_graph) {
             auto manageable = this->_io->manageable();
-            manageable->add_raw_device_io();
-            this->_graph->add_audio_device_io(manageable->raw_device_io());
+            manageable->add_raw_io();
+            this->_graph->add_io(manageable->raw_io());
         }
     } else {
         if (this->_io) {
             if (this->_graph) {
-                if (auto &device_io = this->_io->manageable()->raw_device_io()) {
-                    this->_graph->remove_audio_device_io(device_io);
+                if (auto &device_io = this->_io->manageable()->raw_io()) {
+                    this->_graph->remove_io(device_io);
                 }
             }
 
-            this->_io->manageable()->remove_raw_device_io();
+            this->_io->manageable()->remove_raw_io();
             this->_io = nullptr;
         }
     }
 }
 
-#endif
 void audio::engine::manager::_post_configuration_change() {
     this->_notifier->notify(std::make_pair(method::configuration_change, this->_impl->_weak_manager.lock()));
 }

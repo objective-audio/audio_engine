@@ -56,11 +56,9 @@ struct manager final {
     remove_result_t remove_offline_output();
     offline_output_ptr const &offline_output() const;
 
-#if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
     add_result_t add_io();
     remove_result_t remove_io();
     io_ptr const &io() const;
-#endif
 
     start_result_t start_render();
     start_result_t start_offline_render(offline_render_f, offline_completion_f);
@@ -68,6 +66,8 @@ struct manager final {
 
     [[nodiscard]] chaining::chain_unsync_t<chaining_pair_t> chain() const;
     [[nodiscard]] chaining::chain_relayed_unsync_t<manager_ptr, chaining_pair_t> chain(method const) const;
+
+    static manager_ptr make_shared();
 
     // for Test
     std::unordered_set<node_ptr> const &nodes() const;
@@ -107,15 +107,12 @@ struct manager final {
     void _reload_graph();
     void _post_configuration_change();
 
-#if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
     io_ptr _io = nullptr;
+#if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
     chaining::any_observer_ptr _device_system_observer = nullptr;
-
-    void _set_io(io_ptr const &node);
 #endif
 
-   public:
-    static manager_ptr make_shared();
+    void _set_io(io_ptr const &node);
 };
 }  // namespace yas::audio::engine
 

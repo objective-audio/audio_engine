@@ -23,7 +23,7 @@ using sample_kernel_ptr = std::shared_ptr<sample_kernel_t>;
 @property (nonatomic, strong) NSArray *deviceNames;
 @property (nonatomic, assign) double nominalSampleRate;
 @property (nonatomic, assign) NSUInteger selectedDeviceIndex;
-@property (nonatomic, copy) NSString *deviceInfo;
+@property (nonatomic, copy) NSAttributedString *deviceInfo;
 @property (nonatomic, strong) NSColor *ioThroughTextColor;
 @property (nonatomic, strong) NSColor *sineTextColor;
 
@@ -227,14 +227,19 @@ struct device_vc_internal {
 
 - (void)_updateDeviceInfo {
     auto const &device_opt = _internal.io->device();
-    NSColor *onColor = [NSColor blackColor];
-    NSColor *offColor = [NSColor lightGrayColor];
+    NSColor *onColor = [NSColor labelColor];
+    NSColor *offColor = [NSColor quaternaryLabelColor];
     if (device_opt) {
         if (auto const &device = std::dynamic_pointer_cast<audio::mac_device>(*device_opt)) {
-            self.deviceInfo = [NSString
+            NSString *string = [NSString
                 stringWithFormat:@"name = %@\nnominal samplerate = %@\noutput channels = %@\ninput channels = %@",
                                  device->name(), @(device->nominal_sample_rate()), @(device->output_channel_count()),
                                  @(device->input_channel_count())];
+            auto attributed_string = objc_ptr_with_move_object([[NSAttributedString alloc]
+                initWithString:string
+                    attributes:@{NSForegroundColorAttributeName: [NSColor labelColor]}]);
+            self.deviceInfo = attributed_string.object();
+
             self.nominalSampleRate = device->nominal_sample_rate();
             self.ioThroughTextColor = (device->input_format() && device->output_format()) ? onColor : offColor;
             self.sineTextColor = device->output_format() ? onColor : offColor;

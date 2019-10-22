@@ -4,10 +4,6 @@
 
 #pragma once
 
-#include <TargetConditionals.h>
-
-#if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
-
 #include <chaining/yas_chaining_umbrella.h>
 #include "yas_audio_engine_io_protocol.h"
 #include "yas_audio_engine_node.h"
@@ -19,12 +15,14 @@ struct io : manageable_io {
 
     virtual ~io();
 
-    void set_device(std::optional<audio::mac_device_ptr> const &device);
-    std::optional<audio::mac_device_ptr> const &device() const;
+    void set_device(std::optional<audio::io_device_ptr> const &device);
+    std::optional<audio::io_device_ptr> const &device() const;
 
     audio::engine::node_ptr const &node() const;
 
     manageable_io_ptr manageable();
+
+    static io_ptr make_shared();
 
    private:
     std::weak_ptr<io> _weak_engine_io;
@@ -39,17 +37,12 @@ struct io : manageable_io {
     io(io const &) = delete;
     io &operator=(io const &) = delete;
 
-    void add_raw_device_io() override;
-    void remove_raw_device_io() override;
-    audio::device_io_ptr const &raw_device_io() override;
+    void add_raw_io() override;
+    void remove_raw_io() override;
+    audio::io_ptr const &raw_io() override;
 
     void _prepare(io_ptr const &);
     void _update_device_io_connections();
     bool _validate_connections();
-
-   public:
-    static io_ptr make_shared();
 };
 }  // namespace yas::audio::engine
-
-#endif
