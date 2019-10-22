@@ -8,9 +8,9 @@
 
 #include <cpp_utils/yas_result.h>
 #include <iostream>
-#include "yas_audio_device_io.h"
 #include "yas_audio_engine_tap.h"
 #include "yas_audio_graph.h"
+#include "yas_audio_io.h"
 #include "yas_audio_mac_device.h"
 #include "yas_audio_time.h"
 
@@ -19,12 +19,12 @@ using namespace yas;
 #pragma mark - core
 
 struct audio::engine::io::core {
-    audio::device_io_ptr _device_io = nullptr;
+    audio::io_ptr _io = nullptr;
 
     void set_device(std::optional<audio::mac_device_ptr> const &device) {
         this->_device = device;
-        if (this->_device_io) {
-            this->_device_io->set_device(device);
+        if (this->_io) {
+            this->_io->set_device(device);
         }
     }
 
@@ -60,15 +60,15 @@ audio::engine::manageable_io_ptr audio::engine::io::manageable() {
 }
 
 void audio::engine::io::add_raw_io() {
-    this->_core->_device_io = audio::device_io::make_shared(this->_core->device());
+    this->_core->_io = audio::io::make_shared(this->_core->device());
 }
 
 void audio::engine::io::remove_raw_io() {
-    this->_core->_device_io = nullptr;
+    this->_core->_io = nullptr;
 }
 
-audio::device_io_ptr const &audio::engine::io::raw_io() {
-    return this->_core->_device_io;
+audio::io_ptr const &audio::engine::io::raw_io() {
+    return this->_core->_io;
 }
 
 void audio::engine::io::_prepare(io_ptr const &shared) {
@@ -102,19 +102,19 @@ void audio::engine::io::_prepare(io_ptr const &shared) {
 }
 
 void audio::engine::io::_update_device_io_connections() {
-    auto &device_io = this->_core->_device_io;
-    if (!device_io) {
+    auto &io = this->_core->_io;
+    if (!io) {
         return;
     }
 
     if (!this->_validate_connections()) {
-        device_io->set_render_handler(nullptr);
+        io->set_render_handler(nullptr);
         return;
     }
 
-    auto weak_device_io = to_weak(device_io);
+    auto weak_io = to_weak(io);
 
-    auto render_handler = [weak_engine_io = this->_weak_engine_io, weak_device_io](auto args) {
+    auto render_handler = [weak_engine_io = this->_weak_engine_io, weak_io](auto args) {
         if (auto engine_io = weak_engine_io.lock()) {
             if (auto kernel = engine_io->node()->kernel()) {
                 auto const connections = kernel->input_connections();
@@ -130,14 +130,14 @@ void audio::engine::io::_update_device_io_connections() {
                     }
                 }
 
-                if (auto device_io = weak_device_io.lock()) {
+                if (auto io = weak_io.lock()) {
                     auto const connections = kernel->output_connections();
                     if (connections.count(0) > 0) {
                         auto const &connection = connections.at(0);
                         if (auto dst_node = connection->destination_node();
                             dst_node && dst_node->is_input_renderable()) {
-                            auto const &input_buffer = device_io->input_buffer_on_render();
-                            auto const &input_time = device_io->input_time_on_render();
+                            auto const &input_buffer = io->input_buffer_on_render();
+                            auto const &input_time = io->input_time_on_render();
                             if (input_buffer && input_time) {
                                 if (connection->format == dst_node->input_format(connection->destination_bus)) {
                                     dst_node->render({.buffer = **input_buffer, .bus_idx = 0, .when = **input_time});
@@ -150,11 +150,11 @@ void audio::engine::io::_update_device_io_connections() {
         }
     };
 
-    device_io->set_render_handler(std::move(render_handler));
+    io->set_render_handler(std::move(render_handler));
 }
 
 bool audio::engine::io::_validate_connections() {
-    if (auto const &device_io = this->_core->_device_io) {
+    if (auto const &device_io = this->_core->_io) {
         auto &input_connections = this->_node->manageable()->input_connections();
         if (input_connections.size() > 0) {
             auto const connections = lock_values(input_connections);
