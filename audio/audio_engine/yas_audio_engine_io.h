@@ -39,9 +39,9 @@ struct io : manageable_io {
     io(io const &) = delete;
     io &operator=(io const &) = delete;
 
-    void add_raw_device_io() override;
-    void remove_raw_device_io() override;
-    audio::device_io_ptr const &raw_device_io() override;
+    void add_raw_io() override;
+    void remove_raw_io() override;
+    audio::device_io_ptr const &raw_io() override;
 
     void _prepare(io_ptr const &);
     void _update_device_io_connections();

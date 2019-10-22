@@ -375,8 +375,8 @@ bool audio::engine::manager::_prepare_graph() {
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
     if (auto &device_io = this->_io) {
         auto manageable = device_io->manageable();
-        manageable->add_raw_device_io();
-        this->_graph->add_audio_device_io(manageable->raw_device_io());
+        manageable->add_raw_io();
+        this->_graph->add_audio_device_io(manageable->raw_io());
     }
 #endif
 
@@ -521,18 +521,18 @@ void audio::engine::manager::_set_io(audio::engine::io_ptr const &node) {
 
         if (this->_graph) {
             auto manageable = this->_io->manageable();
-            manageable->add_raw_device_io();
-            this->_graph->add_audio_device_io(manageable->raw_device_io());
+            manageable->add_raw_io();
+            this->_graph->add_audio_device_io(manageable->raw_io());
         }
     } else {
         if (this->_io) {
             if (this->_graph) {
-                if (auto &device_io = this->_io->manageable()->raw_device_io()) {
+                if (auto &device_io = this->_io->manageable()->raw_io()) {
                     this->_graph->remove_audio_device_io(device_io);
                 }
             }
 
-            this->_io->manageable()->remove_raw_device_io();
+            this->_io->manageable()->remove_raw_io();
             this->_io = nullptr;
         }
     }

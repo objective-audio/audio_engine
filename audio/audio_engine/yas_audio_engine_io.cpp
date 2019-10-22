@@ -59,15 +59,15 @@ audio::engine::manageable_io_ptr audio::engine::io::manageable() {
     return std::dynamic_pointer_cast<manageable_io>(this->_weak_engine_io.lock());
 }
 
-void audio::engine::io::add_raw_device_io() {
+void audio::engine::io::add_raw_io() {
     this->_core->_device_io = audio::device_io::make_shared(this->_core->device());
 }
 
-void audio::engine::io::remove_raw_device_io() {
+void audio::engine::io::remove_raw_io() {
     this->_core->_device_io = nullptr;
 }
 
-audio::device_io_ptr const &audio::engine::io::raw_device_io() {
+audio::device_io_ptr const &audio::engine::io::raw_io() {
     return this->_core->_device_io;
 }
 
@@ -80,7 +80,7 @@ void audio::engine::io::_prepare(io_ptr const &shared) {
         auto &buffer = args.buffer;
 
         if (auto engine_io = weak_engine_io.lock()) {
-            if (auto const &device_io = engine_io->raw_device_io()) {
+            if (auto const &device_io = engine_io->raw_io()) {
                 auto const &input_buffer_opt = device_io->input_buffer_on_render();
                 if (input_buffer_opt) {
                     auto const &input_buffer = *input_buffer_opt;
