@@ -2,7 +2,7 @@
 //  yas_audio_device_io.cpp
 //
 
-#include "yas_audio_engine_device_io.h"
+#include "yas_audio_engine_io.h"
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
 

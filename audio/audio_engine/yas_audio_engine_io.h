@@ -9,7 +9,7 @@
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
 
 #include <chaining/yas_chaining_umbrella.h>
-#include "yas_audio_engine_device_io_protocol.h"
+#include "yas_audio_engine_io_protocol.h"
 #include "yas_audio_engine_node.h"
 #include "yas_audio_engine_ptr.h"
 
