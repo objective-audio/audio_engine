@@ -33,8 +33,8 @@ void audio::mac_io_core::initialize() {
                 audio::clear(outOutputData);
             }
 
-            if (auto device_io = weak_io_core.lock()) {
-                if (auto kernel = device_io->_kernel()) {
+            if (auto io_core = weak_io_core.lock()) {
+                if (auto kernel = io_core->_kernel()) {
                     kernel->reset_buffers();
                     if (inInputData) {
                         if (auto const &input_buffer_opt = kernel->input_buffer) {
@@ -43,14 +43,14 @@ void audio::mac_io_core::initialize() {
 
                             uint32_t const input_frame_length = input_buffer->frame_length();
                             if (input_frame_length > 0) {
-                                device_io->_input_buffer_on_render = input_buffer;
-                                device_io->_input_time_on_render =
+                                io_core->_input_buffer_on_render = input_buffer;
+                                io_core->_input_time_on_render =
                                     std::make_shared<audio::time>(*inInputTime, input_buffer->format().sample_rate());
                             }
                         }
                     }
 
-                    if (auto render_handler = device_io->_render_handler()) {
+                    if (auto render_handler = io_core->_render_handler()) {
                         if (auto const &output_buffer_opt = kernel->output_buffer) {
                             auto const &output_buffer = *output_buffer_opt;
                             if (outOutputData) {
@@ -70,8 +70,8 @@ void audio::mac_io_core::initialize() {
                     }
                 }
 
-                device_io->_input_buffer_on_render = std::nullopt;
-                device_io->_input_time_on_render = std::nullopt;
+                io_core->_input_buffer_on_render = std::nullopt;
+                io_core->_input_time_on_render = std::nullopt;
             }
         };
 
