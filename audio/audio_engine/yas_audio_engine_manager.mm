@@ -198,7 +198,9 @@ audio::engine::manager::add_result_t audio::engine::manager::add_io() {
     if (this->_io) {
         return add_result_t{add_error_t::already_added};
     } else {
-        this->_set_io(audio::engine::io::make_shared());
+        audio::engine::io_ptr const io = audio::engine::io::make_shared();
+        io->set_device(mac_device::default_output_device());
+        this->_set_io(io);
         return add_result_t{nullptr};
     }
 }

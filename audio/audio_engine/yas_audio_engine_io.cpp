@@ -74,8 +74,6 @@ audio::io_ptr const &audio::engine::io::raw_io() {
 void audio::engine::io::_prepare(io_ptr const &shared) {
     this->_weak_engine_io = to_weak(shared);
 
-    this->set_device(mac_device::default_output_device());
-
     this->_node->set_render_handler([weak_engine_io = this->_weak_engine_io](auto args) {
         auto &buffer = args.buffer;
 

@@ -26,6 +26,8 @@ struct io : manageable_io {
 
     manageable_io_ptr manageable();
 
+    static io_ptr make_shared();
+
    private:
     std::weak_ptr<io> _weak_engine_io;
     audio::engine::node_ptr _node = node::make_shared({.input_bus_count = 1, .output_bus_count = 1});
@@ -46,9 +48,6 @@ struct io : manageable_io {
     void _prepare(io_ptr const &);
     void _update_device_io_connections();
     bool _validate_connections();
-
-   public:
-    static io_ptr make_shared();
 };
 }  // namespace yas::audio::engine
 
