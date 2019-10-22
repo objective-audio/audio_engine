@@ -227,8 +227,8 @@ struct device_vc_internal {
 
 - (void)_updateDeviceInfo {
     auto const &device_opt = _internal.io->device();
-    NSColor *onColor = [NSColor blackColor];
-    NSColor *offColor = [NSColor lightGrayColor];
+    NSColor *onColor = [NSColor labelColor];
+    NSColor *offColor = [NSColor quaternaryLabelColor];
     if (device_opt) {
         if (auto const &device = std::dynamic_pointer_cast<audio::mac_device>(*device_opt)) {
             self.deviceInfo = [NSString
