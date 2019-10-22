@@ -168,7 +168,7 @@ struct device_io_vc_internal {
 
 - (void)setupEngine {
     _internal.manager = audio::engine::manager::make_shared();
-    _internal.manager->add_device_io();
+    _internal.manager->add_io();
     _internal.route = audio::engine::route::make_shared();
     _internal.tap = audio::engine::tap::make_shared();
 

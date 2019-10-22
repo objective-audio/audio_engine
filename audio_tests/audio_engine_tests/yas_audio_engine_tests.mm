@@ -121,26 +121,26 @@ using namespace yas;
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
 
-- (void)test_add_and_remove_device_io {
+- (void)test_add_and_remove_io {
     auto manager = audio::engine::manager::make_shared();
 
-    XCTAssertFalse(manager->device_io());
+    XCTAssertFalse(manager->io());
 
-    XCTAssertTrue(manager->add_device_io());
+    XCTAssertTrue(manager->add_io());
 
-    auto add_result = manager->add_device_io();
+    auto add_result = manager->add_io();
     XCTAssertFalse(add_result);
     XCTAssertEqual(add_result.error(), audio::engine::manager::add_error_t::already_added);
 
-    XCTAssertTrue(manager->device_io());
+    XCTAssertTrue(manager->io());
 
-    XCTAssertTrue(manager->remove_device_io());
+    XCTAssertTrue(manager->remove_io());
 
-    auto remove_result = manager->remove_device_io();
+    auto remove_result = manager->remove_io();
     XCTAssertFalse(remove_result);
     XCTAssertEqual(remove_result.error(), audio::engine::manager::remove_error_t::already_removed);
 
-    XCTAssertFalse(manager->device_io());
+    XCTAssertFalse(manager->io());
 }
 
 #endif

@@ -194,7 +194,7 @@ audio::engine::offline_output_ptr const &audio::engine::manager::offline_output(
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
 
-audio::engine::manager::add_result_t audio::engine::manager::add_device_io() {
+audio::engine::manager::add_result_t audio::engine::manager::add_io() {
     if (this->_io) {
         return add_result_t{add_error_t::already_added};
     } else {
@@ -203,7 +203,7 @@ audio::engine::manager::add_result_t audio::engine::manager::add_device_io() {
     }
 }
 
-audio::engine::manager::remove_result_t audio::engine::manager::remove_device_io() {
+audio::engine::manager::remove_result_t audio::engine::manager::remove_io() {
     if (this->_io) {
         this->_set_io(nullptr);
         return remove_result_t{nullptr};
@@ -212,7 +212,7 @@ audio::engine::manager::remove_result_t audio::engine::manager::remove_device_io
     }
 }
 
-audio::engine::io_ptr const &audio::engine::manager::device_io() const {
+audio::engine::io_ptr const &audio::engine::manager::io() const {
     return this->_io;
 }
 

@@ -57,9 +57,9 @@ struct manager final {
     offline_output_ptr const &offline_output() const;
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
-    add_result_t add_device_io();
-    remove_result_t remove_device_io();
-    io_ptr const &device_io() const;
+    add_result_t add_io();
+    remove_result_t remove_io();
+    io_ptr const &io() const;
 #endif
 
     start_result_t start_render();
