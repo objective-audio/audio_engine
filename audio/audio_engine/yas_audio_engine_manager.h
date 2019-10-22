@@ -69,6 +69,8 @@ struct manager final {
     [[nodiscard]] chaining::chain_unsync_t<chaining_pair_t> chain() const;
     [[nodiscard]] chaining::chain_relayed_unsync_t<manager_ptr, chaining_pair_t> chain(method const) const;
 
+    static manager_ptr make_shared();
+
     // for Test
     std::unordered_set<node_ptr> const &nodes() const;
     engine::connection_set const &connections() const;
@@ -113,9 +115,6 @@ struct manager final {
 
     void _set_io(io_ptr const &node);
 #endif
-
-   public:
-    static manager_ptr make_shared();
 };
 }  // namespace yas::audio::engine
 
