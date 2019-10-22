@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="15400" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="B8D-0N-5wS">
     <dependencies>
-        <deployment identifier="macosx"/>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="15400"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -927,6 +926,7 @@
                             <constraint firstItem="Zrf-F7-Dkx" firstAttribute="baseline" secondItem="s4c-Zs-zn2" secondAttribute="baseline" id="Azd-BZ-YEz"/>
                             <constraint firstItem="hEe-Pt-hA3" firstAttribute="top" secondItem="2x3-Yq-KRo" secondAttribute="bottom" constant="4" id="Bjq-78-8cO"/>
                             <constraint firstItem="tGb-ei-A30" firstAttribute="baseline" secondItem="0f9-cl-iCO" secondAttribute="baseline" id="BsI-sg-QYq"/>
+                            <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="2x3-Yq-KRo" secondAttribute="trailing" priority="10" constant="20" symbolic="YES" id="CVw-No-FmU"/>
                             <constraint firstItem="LiP-aF-SXq" firstAttribute="leading" secondItem="Zrf-F7-Dkx" secondAttribute="trailing" constant="6" id="ECG-x6-iMa"/>
                             <constraint firstItem="0ys-Ip-ugm" firstAttribute="leading" secondItem="7LH-DV-YkR" secondAttribute="leading" constant="20" symbolic="YES" id="Epu-Zl-KbT"/>
                             <constraint firstItem="tGb-ei-A30" firstAttribute="leading" secondItem="7LH-DV-YkR" secondAttribute="leading" constant="22" id="Ffq-4U-JRX"/>
@@ -1132,6 +1132,7 @@
                             </button>
                         </subviews>
                         <constraints>
+                            <constraint firstItem="vjU-Q6-LLs" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="dfm-eg-G34" secondAttribute="trailing" constant="10" id="1QV-eg-f9u"/>
                             <constraint firstItem="dfm-eg-G34" firstAttribute="leading" secondItem="2Fr-YR-J0K" secondAttribute="trailing" constant="12" id="27s-P6-fcP"/>
                             <constraint firstAttribute="bottom" relation="greaterThanOrEqual" secondItem="vjU-Q6-LLs" secondAttribute="bottom" constant="20" id="2Go-Sx-cyq"/>
                             <constraint firstItem="wah-uc-CLC" firstAttribute="baseline" secondItem="7li-iZ-udQ" secondAttribute="baseline" id="3Km-Ul-abp"/>
@@ -1140,7 +1141,7 @@
                             <constraint firstItem="2Fr-YR-J0K" firstAttribute="leading" secondItem="u0G-hu-PCS" secondAttribute="leading" constant="22" id="6uJ-ai-ycD"/>
                             <constraint firstItem="weZ-iw-fuJ" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="qI5-hb-LlP" secondAttribute="trailing" constant="20" id="8Mn-UI-6ge"/>
                             <constraint firstAttribute="trailing" secondItem="8n8-It-BSe" secondAttribute="trailing" constant="20" id="8T2-BE-dKE"/>
-                            <constraint firstAttribute="trailing" secondItem="vjU-Q6-LLs" secondAttribute="trailing" constant="20" id="8wO-Ik-tsJ"/>
+                            <constraint firstAttribute="trailing" secondItem="vjU-Q6-LLs" secondAttribute="trailing" constant="20" symbolic="YES" id="8wO-Ik-tsJ"/>
                             <constraint firstItem="qI5-hb-LlP" firstAttribute="leading" secondItem="u0G-hu-PCS" secondAttribute="leading" constant="22" id="9Tu-e0-jwn"/>
                             <constraint firstAttribute="trailing" secondItem="7li-iZ-udQ" secondAttribute="trailing" constant="20" id="AQ8-UO-KUL"/>
                             <constraint firstItem="weZ-iw-fuJ" firstAttribute="baseline" secondItem="0jB-WQ-DD5" secondAttribute="baseline" id="Bmt-Ac-fMP"/>
@@ -1333,7 +1334,7 @@
                     </connections>
                 </arrayController>
             </objects>
-            <point key="canvasLocation" x="623" y="1533"/>
+            <point key="canvasLocation" x="623" y="1556"/>
         </scene>
     </scenes>
 </document>
