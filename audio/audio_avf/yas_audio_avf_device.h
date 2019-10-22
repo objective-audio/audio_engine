@@ -17,11 +17,11 @@ namespace yas::audio {
 struct avf_device final : io_device {
     double sample_rate() const;
 
-    uint32_t input_channel_count() const;
-    uint32_t output_channel_count() const;
+    uint32_t input_channel_count() const override;
+    uint32_t output_channel_count() const override;
 
-    std::optional<audio::format> input_format() const;
-    std::optional<audio::format> output_format() const;
+    std::optional<audio::format> input_format() const override;
+    std::optional<audio::format> output_format() const override;
 
     io_core_ptr make_io_core() const override;
 
