@@ -42,7 +42,7 @@ struct io : manageable_io {
     audio::io_ptr const &raw_io() override;
 
     void _prepare(io_ptr const &);
-    void _update_device_io_connections();
+    void _update_io_connections();
     bool _validate_connections();
 };
 }  // namespace yas::audio::engine
