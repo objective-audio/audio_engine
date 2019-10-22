@@ -4,10 +4,6 @@
 
 #pragma once
 
-#include <TargetConditionals.h>
-
-#if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
-
 #include <chaining/yas_chaining_umbrella.h>
 #include "yas_audio_engine_io_protocol.h"
 #include "yas_audio_engine_node.h"
@@ -50,5 +46,3 @@ struct io : manageable_io {
     bool _validate_connections();
 };
 }  // namespace yas::audio::engine
-
-#endif

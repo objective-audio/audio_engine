@@ -4,8 +4,6 @@
 
 #include "yas_audio_engine_io.h"
 
-#if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
-
 #include <cpp_utils/yas_result.h>
 #include <iostream>
 #include "yas_audio_engine_tap.h"
@@ -199,5 +197,3 @@ audio::engine::io_ptr audio::engine::io::make_shared() {
     shared->_prepare(shared);
     return shared;
 }
-
-#endif
