@@ -27,7 +27,6 @@
 
 #elif TARGET_OS_MAC
 
-#include "yas_audio_device_io.h"
 #include "yas_audio_engine_io.h"
 #include "yas_audio_engine_route.h"
 #include "yas_audio_mac_device.h"
