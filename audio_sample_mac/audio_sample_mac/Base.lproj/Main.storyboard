@@ -796,7 +796,7 @@
                                 <rect key="frame" x="20" y="20" width="408" height="94"/>
                                 <clipView key="contentView" drawsBackground="NO" id="qTa-h0-7jp">
                                     <rect key="frame" x="1" y="1" width="406" height="92"/>
-                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                    <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <textView editable="NO" selectable="NO" importsGraphics="NO" verticallyResizable="YES" usesFontPanel="YES" findStyle="panel" continuousSpellChecking="YES" allowsUndo="YES" usesRuler="YES" allowsNonContiguousLayout="YES" quoteSubstitution="YES" dashSubstitution="YES" spellingCorrection="YES" smartInsertDelete="YES" id="bdx-ZF-yFR">
                                             <rect key="frame" x="0.0" y="0.0" width="406" height="92"/>
@@ -1181,7 +1181,7 @@
         <!--Device Route-->
         <scene sceneID="wlA-G0-awA">
             <objects>
-                <viewController title="Device Route" id="cS1-3W-ouC" customClass="YASAudioEngineDeviceIOSampleViewController" sceneMemberID="viewController">
+                <viewController title="Device Route" id="cS1-3W-ouC" customClass="YASAudioEngineIOSampleViewController" sceneMemberID="viewController">
                     <view key="view" id="HUt-4H-2rA">
                         <rect key="frame" x="0.0" y="0.0" width="450" height="300"/>
                         <autoresizingMask key="autoresizingMask"/>
@@ -1216,7 +1216,7 @@
                                 <rect key="frame" x="20" y="20" width="410" height="195"/>
                                 <clipView key="contentView" id="qgN-N8-LkE">
                                     <rect key="frame" x="1" y="0.0" width="408" height="194"/>
-                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                    <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <tableView focusRingType="none" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" selectionHighlightStyle="none" columnReordering="NO" columnSelection="YES" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" headerView="826-Tq-gkS" id="W0q-dA-Bqx">
                                             <rect key="frame" x="0.0" y="0.0" width="408" height="171"/>
