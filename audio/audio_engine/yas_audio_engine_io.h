@@ -19,8 +19,8 @@ struct io : manageable_io {
 
     virtual ~io();
 
-    void set_device(std::optional<audio::mac_device_ptr> const &device);
-    std::optional<audio::mac_device_ptr> const &device() const;
+    void set_device(std::optional<audio::io_device_ptr> const &device);
+    std::optional<audio::io_device_ptr> const &device() const;
 
     audio::engine::node_ptr const &node() const;
 

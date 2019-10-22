@@ -11,7 +11,6 @@
 #include "yas_audio_engine_tap.h"
 #include "yas_audio_graph.h"
 #include "yas_audio_io.h"
-#include "yas_audio_mac_device.h"
 #include "yas_audio_time.h"
 
 using namespace yas;
@@ -21,19 +20,19 @@ using namespace yas;
 struct audio::engine::io::core {
     audio::io_ptr _io = nullptr;
 
-    void set_device(std::optional<audio::mac_device_ptr> const &device) {
+    void set_device(std::optional<audio::io_device_ptr> const &device) {
         this->_device = device;
         if (this->_io) {
             this->_io->set_device(device);
         }
     }
 
-    std::optional<audio::mac_device_ptr> const &device() {
+    std::optional<audio::io_device_ptr> const &device() {
         return this->_device;
     }
 
    private:
-    std::optional<audio::mac_device_ptr> _device = std::nullopt;
+    std::optional<audio::io_device_ptr> _device = std::nullopt;
 };
 
 #pragma mark - audio::engine::device_io
@@ -43,11 +42,11 @@ audio::engine::io::io() : _core(std::make_unique<core>()) {
 
 audio::engine::io::~io() = default;
 
-void audio::engine::io::set_device(std::optional<audio::mac_device_ptr> const &device) {
+void audio::engine::io::set_device(std::optional<audio::io_device_ptr> const &device) {
     this->_core->set_device(device);
 }
 
-std::optional<audio::mac_device_ptr> const &audio::engine::io::device() const {
+std::optional<audio::io_device_ptr> const &audio::engine::io::device() const {
     return this->_core->device();
 }
 
