@@ -372,7 +372,7 @@ bool audio::engine::manager::_prepare_graph() {
     this->_graph = audio::graph::make_shared();
 
     if (auto &engine_io = this->_io) {
-        auto manageable = engine_io->manageable();
+        auto manageable = engine::manageable_io::cast(engine_io);
         manageable->add_raw_io();
         this->_graph->add_io(manageable->raw_io());
     }
@@ -516,19 +516,19 @@ void audio::engine::manager::_set_io(audio::engine::io_ptr const &node) {
         this->_io = node;
 
         if (this->_graph) {
-            auto manageable = this->_io->manageable();
+            auto manageable = engine::manageable_io::cast(this->_io);
             manageable->add_raw_io();
             this->_graph->add_io(manageable->raw_io());
         }
     } else {
         if (this->_io) {
             if (this->_graph) {
-                if (auto &raw_io = this->_io->manageable()->raw_io()) {
+                if (auto &raw_io = engine::manageable_io::cast(this->_io)->raw_io()) {
                     this->_graph->remove_io(raw_io);
                 }
             }
 
-            this->_io->manageable()->remove_raw_io();
+            engine::manageable_io::cast(this->_io)->remove_raw_io();
             this->_io = nullptr;
         }
     }

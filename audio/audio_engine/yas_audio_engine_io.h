@@ -20,8 +20,6 @@ struct io : manageable_io {
 
     audio::engine::node_ptr const &node() const;
 
-    manageable_io_ptr manageable();
-
     static io_ptr make_shared();
 
    private:
