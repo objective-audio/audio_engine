@@ -14,5 +14,7 @@ struct io_device {
     virtual uint32_t output_channel_count() const = 0;
 
     virtual io_core_ptr make_io_core() const = 0;
+
+    static std::optional<io_device_ptr> default_device();
 };
 }  // namespace yas::audio

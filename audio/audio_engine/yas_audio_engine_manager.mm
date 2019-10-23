@@ -198,11 +198,7 @@ audio::engine::manager::add_result_t audio::engine::manager::add_io() {
         return add_result_t{add_error_t::already_added};
     } else {
         audio::engine::io_ptr const io = audio::engine::io::make_shared();
-#if TARGET_OS_IPHONE
-        io->set_device(avf_device::make_shared());
-#elif TARGET_OS_MAC
-        io->set_device(mac_device::default_output_device());
-#endif
+        io->set_device(io_device::default_device());
         this->_set_io(io);
         return add_result_t{nullptr};
     }
