@@ -13,10 +13,6 @@
 #include <cpp_utils/yas_objc_ptr.h>
 #endif
 
-#if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
-#include "yas_audio_device_io.h"
-#endif
-
 using namespace yas;
 
 namespace yas::audio::global_graph {
@@ -188,28 +184,6 @@ void audio::graph::remove_io(io_ptr const &io) {
     }
 }
 
-#if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
-
-void audio::graph::add_audio_device_io(device_io_ptr const &device_io) {
-    {
-        std::lock_guard<std::recursive_mutex> lock(_mutex);
-        this->_device_ios.insert(device_io);
-    }
-    if (this->_running && !global_graph::_is_interrupting) {
-        device_io->start();
-    }
-}
-
-void audio::graph::remove_audio_device_io(device_io_ptr const &device_io) {
-    device_io->stop();
-    {
-        std::lock_guard<std::recursive_mutex> lock(_mutex);
-        this->_device_ios.erase(device_io);
-    }
-}
-
-#endif
-
 void audio::graph::start() {
     if (!this->_running) {
         this->_running = true;
@@ -245,11 +219,6 @@ void audio::graph::start_all_ios() {
     for (auto const &io : this->_ios) {
         io->start();
     }
-#if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
-    for (auto const &device_io : this->_device_ios) {
-        device_io->start();
-    }
-#endif
 }
 
 void audio::graph::stop_all_ios() {
@@ -257,15 +226,10 @@ void audio::graph::stop_all_ios() {
         auto &unit = pair.second;
         unit->stop();
     }
-#if TARGET_OS_IPHONE
+
     for (auto &io : this->_ios) {
         io->stop();
     }
-#elif TARGET_OS_MAC
-    for (auto &device_io : this->_device_ios) {
-        device_io->stop();
-    }
-#endif
 }
 
 void audio::graph::unit_render(render_parameters &render_parameters) {

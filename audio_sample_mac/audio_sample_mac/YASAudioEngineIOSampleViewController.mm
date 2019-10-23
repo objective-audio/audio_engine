@@ -1,8 +1,8 @@
 //
-//  YASAudioEngineSampleViewController.m
+//  YASAudioEngineIOSampleViewController.m
 //
 
-#import "YASAudioEngineDeviceIOSampleViewController.h"
+#import "YASAudioEngineIOSampleViewController.h"
 #import <Accelerate/Accelerate.h>
 #import <audio/yas_audio_umbrella.h>
 #import <cpp_utils/yas_objc_ptr.h>
@@ -86,7 +86,7 @@ typedef NS_ENUM(NSUInteger, YASAudioDeviceRouteSampleInputType) {
 
 @end
 
-@interface YASAudioEngineDeviceIOSampleViewController () <NSTableViewDataSource, NSTableViewDelegate>
+@interface YASAudioEngineIOSampleViewController () <NSTableViewDataSource, NSTableViewDelegate>
 
 @property (nonatomic, strong) NSArray *deviceNames;
 @property (nonatomic, assign) double nominalSampleRate;
@@ -108,7 +108,7 @@ struct device_io_vc_internal {
 };
 }
 
-@implementation YASAudioEngineDeviceIOSampleViewController {
+@implementation YASAudioEngineIOSampleViewController {
     sample::device_io_vc_internal _internal;
 }
 

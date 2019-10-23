@@ -375,8 +375,8 @@ bool audio::engine::manager::_prepare_graph() {
 
     this->_graph = audio::graph::make_shared();
 
-    if (auto &device_io = this->_io) {
-        auto manageable = device_io->manageable();
+    if (auto &engine_io = this->_io) {
+        auto manageable = engine_io->manageable();
         manageable->add_raw_io();
         this->_graph->add_io(manageable->raw_io());
     }
@@ -527,8 +527,8 @@ void audio::engine::manager::_set_io(audio::engine::io_ptr const &node) {
     } else {
         if (this->_io) {
             if (this->_graph) {
-                if (auto &device_io = this->_io->manageable()->raw_io()) {
-                    this->_graph->remove_io(device_io);
+                if (auto &raw_io = this->_io->manageable()->raw_io()) {
+                    this->_graph->remove_io(raw_io);
                 }
             }
 

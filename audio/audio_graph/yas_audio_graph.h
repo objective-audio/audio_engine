@@ -20,10 +20,6 @@ struct graph final : interruptable_graph {
 
     void add_io(io_ptr const &);
     void remove_io(io_ptr const &);
-#if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
-    void add_audio_device_io(device_io_ptr const &);
-    void remove_audio_device_io(device_io_ptr const &);
-#endif
 
     void start();
     void stop();
@@ -42,9 +38,6 @@ struct graph final : interruptable_graph {
     std::map<uint16_t, unit_ptr> _io_units;
 
     std::unordered_set<io_ptr> _ios;
-#if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
-    std::unordered_set<device_io_ptr> _device_ios;
-#endif
 
     explicit graph(uint8_t const key);
 
