@@ -39,9 +39,9 @@
 #include "yas_audio_unit_parameter.h"
 
 #include "yas_audio_engine_au.h"
-#include "yas_audio_engine_au_io.h"
 #include "yas_audio_engine_au_mixer.h"
 #include "yas_audio_engine_connection.h"
+#include "yas_audio_engine_io.h"
 #include "yas_audio_engine_manager.h"
 #include "yas_audio_engine_node.h"
 #include "yas_audio_engine_offline_output.h"

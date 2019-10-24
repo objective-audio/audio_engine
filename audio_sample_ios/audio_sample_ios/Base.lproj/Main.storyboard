@@ -18,34 +18,34 @@
                         <sections>
                             <tableViewSection id="PZx-MW-8g9">
                                 <cells>
-                                    <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" textLabel="auX-OJ-6SJ" style="IBUITableViewCellStyleDefault" id="wcI-Rp-YmV">
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" textLabel="IFa-h2-dlh" style="IBUITableViewCellStyleDefault" id="p67-0x-KX1">
                                         <rect key="frame" x="0.0" y="28" width="375" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
-                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="wcI-Rp-YmV" id="evW-sf-jDz">
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="p67-0x-KX1" id="OKU-3p-yim">
                                             <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="IO Through with yas::audio_graph" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="auX-OJ-6SJ">
+                                                <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" insetsLayoutMarginsFromSafeArea="NO" text="IO Through with yas::audio::avf_io" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="IFa-h2-dlh">
                                                     <rect key="frame" x="16" y="0.0" width="343" height="44"/>
-                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                                    <fontDescription key="fontDescription" type="system" pointSize="16"/>
-                                                    <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                    <autoresizingMask key="autoresizingMask"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                             </subviews>
                                         </tableViewCellContentView>
                                         <connections>
-                                            <segue destination="nIQ-d1-DQt" kind="show" id="M9d-LJ-mQ7"/>
+                                            <segue destination="9Nv-60-5Yj" kind="show" id="onG-EL-Sow"/>
                                         </connections>
                                     </tableViewCell>
-                                    <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" textLabel="Dbo-wP-eA0" style="IBUITableViewCellStyleDefault" id="2Bd-fd-hRL">
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" textLabel="VLR-T9-EeS" style="IBUITableViewCellStyleDefault" id="cTg-hD-MUk">
                                         <rect key="frame" x="0.0" y="72" width="375" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
-                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="2Bd-fd-hRL" id="GOK-7E-NYR">
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="cTg-hD-MUk" id="PGq-0W-W6D">
                                             <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="IO Through with yas::audio::engine" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="Dbo-wP-eA0">
+                                                <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="yas::input_tap_node" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="VLR-T9-EeS">
                                                     <rect key="frame" x="16" y="0.0" width="343" height="44"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="16"/>
@@ -55,7 +55,7 @@
                                             </subviews>
                                         </tableViewCellContentView>
                                         <connections>
-                                            <segue destination="hE7-8D-Vxl" kind="show" id="KPM-EO-0Ep"/>
+                                            <segue destination="TK4-69-MPe" kind="show" id="4jG-nu-lpQ"/>
                                         </connections>
                                     </tableViewCell>
                                     <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" textLabel="KCa-Vc-d48" style="IBUITableViewCellStyleDefault" id="ZoT-qb-YBh">
@@ -96,46 +96,6 @@
                                         </tableViewCellContentView>
                                         <connections>
                                             <segue destination="qZ9-oQ-6Do" kind="show" id="8YI-dB-CMN"/>
-                                        </connections>
-                                    </tableViewCell>
-                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" textLabel="VLR-T9-EeS" style="IBUITableViewCellStyleDefault" id="cTg-hD-MUk">
-                                        <rect key="frame" x="0.0" y="204" width="375" height="44"/>
-                                        <autoresizingMask key="autoresizingMask"/>
-                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="cTg-hD-MUk" id="PGq-0W-W6D">
-                                            <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
-                                            <autoresizingMask key="autoresizingMask"/>
-                                            <subviews>
-                                                <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="yas::input_tap_node" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="VLR-T9-EeS">
-                                                    <rect key="frame" x="16" y="0.0" width="343" height="44"/>
-                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                                    <fontDescription key="fontDescription" type="system" pointSize="16"/>
-                                                    <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                                    <nil key="highlightedColor"/>
-                                                </label>
-                                            </subviews>
-                                        </tableViewCellContentView>
-                                        <connections>
-                                            <segue destination="TK4-69-MPe" kind="show" id="4jG-nu-lpQ"/>
-                                        </connections>
-                                    </tableViewCell>
-                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" textLabel="IFa-h2-dlh" style="IBUITableViewCellStyleDefault" id="p67-0x-KX1">
-                                        <rect key="frame" x="0.0" y="248" width="375" height="44"/>
-                                        <autoresizingMask key="autoresizingMask"/>
-                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="p67-0x-KX1" id="OKU-3p-yim">
-                                            <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
-                                            <autoresizingMask key="autoresizingMask"/>
-                                            <subviews>
-                                                <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" insetsLayoutMarginsFromSafeArea="NO" text="IO Through with yas::audio::avf_io" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="IFa-h2-dlh">
-                                                    <rect key="frame" x="16" y="0.0" width="343" height="44"/>
-                                                    <autoresizingMask key="autoresizingMask"/>
-                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                                    <nil key="textColor"/>
-                                                    <nil key="highlightedColor"/>
-                                                </label>
-                                            </subviews>
-                                        </tableViewCellContentView>
-                                        <connections>
-                                            <segue destination="9Nv-60-5Yj" kind="show" id="onG-EL-Sow"/>
                                         </connections>
                                     </tableViewCell>
                                 </cells>
@@ -292,53 +252,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="x2B-PJ-2XP" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1484" y="-357.57121439280365"/>
-        </scene>
-        <!--IO Through with YASAudioGraph-->
-        <scene sceneID="gwC-1g-mfP">
-            <objects>
-                <viewController title="IO Through with YASAudioGraph" id="nIQ-d1-DQt" customClass="YASAudioGraphSampleViewController" sceneMemberID="viewController">
-                    <layoutGuides>
-                        <viewControllerLayoutGuide type="top" id="zy7-nL-HbX"/>
-                        <viewControllerLayoutGuide type="bottom" id="rL8-pZ-tpR"/>
-                    </layoutGuides>
-                    <view key="view" contentMode="scaleToFill" id="qgQ-mr-7nY">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <subviews>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Volume" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="uGk-CS-0xC">
-                                <rect key="frame" x="16" y="52" width="57.5" height="20.5"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                <nil key="highlightedColor"/>
-                            </label>
-                            <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" minValue="0.0" maxValue="1" translatesAutoresizingMaskIntoConstraints="NO" id="b5C-tW-GxY">
-                                <rect key="frame" x="22" y="80.5" width="331" height="31"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="30" id="n6t-u0-FiQ"/>
-                                </constraints>
-                                <connections>
-                                    <action selector="volumeSliderChanged:" destination="nIQ-d1-DQt" eventType="valueChanged" id="3gk-ve-uSc"/>
-                                </connections>
-                            </slider>
-                        </subviews>
-                        <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                        <constraints>
-                            <constraint firstItem="b5C-tW-GxY" firstAttribute="leading" secondItem="qgQ-mr-7nY" secondAttribute="leading" constant="24" id="99h-eZ-QSH"/>
-                            <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="uGk-CS-0xC" secondAttribute="trailing" constant="20" symbolic="YES" id="9OD-CV-SKI"/>
-                            <constraint firstItem="b5C-tW-GxY" firstAttribute="top" secondItem="uGk-CS-0xC" secondAttribute="bottom" constant="8" id="TuD-J1-crb"/>
-                            <constraint firstItem="uGk-CS-0xC" firstAttribute="leading" secondItem="qgQ-mr-7nY" secondAttribute="leading" constant="16" id="cQM-27-c2M"/>
-                            <constraint firstAttribute="trailing" secondItem="b5C-tW-GxY" secondAttribute="trailing" constant="24" id="iFQ-G6-zh2"/>
-                            <constraint firstItem="uGk-CS-0xC" firstAttribute="top" secondItem="zy7-nL-HbX" secondAttribute="bottom" constant="8" id="pV2-Rs-gnm"/>
-                        </constraints>
-                    </view>
-                    <connections>
-                        <outlet property="slider" destination="b5C-tW-GxY" id="0TH-3m-F47"/>
-                    </connections>
-                </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="OoX-Hw-RFd" userLabel="First Responder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="1485" y="325"/>
+            <point key="canvasLocation" x="1486" y="324"/>
         </scene>
         <!--Effects-->
         <scene sceneID="eFo-YZ-7kR">
@@ -382,7 +296,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="QNx-a9-tRh" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1485" y="1678"/>
+            <point key="canvasLocation" x="1486" y="995"/>
         </scene>
         <!--Audio Engine Route Sample View Controller-->
         <scene sceneID="pZc-Ag-ie2">
@@ -446,7 +360,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="oAf-sM-rxE" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1485" y="2348"/>
+            <point key="canvasLocation" x="1486" y="1666"/>
         </scene>
         <!--Audio Input Tap Node Sample View Controller-->
         <scene sceneID="2MW-r6-vUa">
@@ -499,7 +413,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="5Wj-eN-7cm" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1483" y="3042"/>
+            <point key="canvasLocation" x="1484" y="2360"/>
         </scene>
         <!--Audio Engine Route Sample Selection View Controller-->
         <scene sceneID="OKz-ot-umE">
@@ -540,129 +454,7 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="nBp-ac-Pk8" userLabel="First Responder" sceneMemberID="firstResponder"/>
                 <exit id="CyC-ld-YQy" userLabel="Exit" sceneMemberID="exit"/>
             </objects>
-            <point key="canvasLocation" x="2157" y="2348"/>
-        </scene>
-        <!--Audio Engine iO Sample View Controller-->
-        <scene sceneID="2n3-ep-D83">
-            <objects>
-                <tableViewController id="hE7-8D-Vxl" customClass="YASAudioEngineIOSampleViewController" sceneMemberID="viewController">
-                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" id="QbR-bq-YRF">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                        <prototypes>
-                            <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="Cell" textLabel="fCa-Fk-Iwy" style="IBUITableViewCellStyleDefault" id="dp0-KW-ERC">
-                                <rect key="frame" x="0.0" y="28" width="375" height="44"/>
-                                <autoresizingMask key="autoresizingMask"/>
-                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="dp0-KW-ERC" id="Ofn-pb-ZjM">
-                                    <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
-                                    <autoresizingMask key="autoresizingMask"/>
-                                    <subviews>
-                                        <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="Title" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="fCa-Fk-Iwy">
-                                            <rect key="frame" x="16" y="0.0" width="343" height="44"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                            <fontDescription key="fontDescription" type="system" pointSize="16"/>
-                                            <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                            <nil key="highlightedColor"/>
-                                        </label>
-                                    </subviews>
-                                </tableViewCellContentView>
-                            </tableViewCell>
-                            <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="PushCell" textLabel="ZLS-BC-afV" style="IBUITableViewCellStyleDefault" id="dhW-tj-B8e">
-                                <rect key="frame" x="0.0" y="72" width="375" height="44"/>
-                                <autoresizingMask key="autoresizingMask"/>
-                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="dhW-tj-B8e" id="CNO-X0-s7s">
-                                    <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
-                                    <autoresizingMask key="autoresizingMask"/>
-                                    <subviews>
-                                        <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="Title" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="ZLS-BC-afV">
-                                            <rect key="frame" x="16" y="0.0" width="343" height="44"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                            <fontDescription key="fontDescription" type="system" pointSize="16"/>
-                                            <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                            <nil key="highlightedColor"/>
-                                        </label>
-                                    </subviews>
-                                </tableViewCellContentView>
-                                <connections>
-                                    <segue destination="JKG-uB-NIq" kind="show" id="JYE-1i-efx"/>
-                                </connections>
-                            </tableViewCell>
-                            <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="SliderCell" id="krI-OY-wwj" customClass="YASAudioSliderCell">
-                                <rect key="frame" x="0.0" y="116" width="375" height="44"/>
-                                <autoresizingMask key="autoresizingMask"/>
-                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="krI-OY-wwj" id="qpd-uc-chh">
-                                    <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
-                                    <autoresizingMask key="autoresizingMask"/>
-                                    <subviews>
-                                        <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" minValue="0.0" maxValue="1" translatesAutoresizingMaskIntoConstraints="NO" id="jky-eV-W8s">
-                                            <rect key="frame" x="28" y="7" width="319" height="31"/>
-                                            <connections>
-                                                <action selector="volumeSliderChanged:" destination="hE7-8D-Vxl" eventType="valueChanged" id="8tY-13-JxA"/>
-                                            </connections>
-                                        </slider>
-                                    </subviews>
-                                    <constraints>
-                                        <constraint firstAttribute="centerY" secondItem="jky-eV-W8s" secondAttribute="centerY" id="4Fp-bR-9qz"/>
-                                        <constraint firstAttribute="trailing" secondItem="jky-eV-W8s" secondAttribute="trailing" constant="30" id="5hQ-H6-ja6"/>
-                                        <constraint firstItem="jky-eV-W8s" firstAttribute="leading" secondItem="qpd-uc-chh" secondAttribute="leading" constant="30" id="O8x-1Z-VEa"/>
-                                    </constraints>
-                                </tableViewCellContentView>
-                                <connections>
-                                    <outlet property="slider" destination="jky-eV-W8s" id="lmJ-of-gfr"/>
-                                </connections>
-                            </tableViewCell>
-                        </prototypes>
-                        <connections>
-                            <outlet property="dataSource" destination="hE7-8D-Vxl" id="yC1-nu-LBE"/>
-                            <outlet property="delegate" destination="hE7-8D-Vxl" id="nnl-mT-YfY"/>
-                        </connections>
-                    </tableView>
-                </tableViewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="vez-wz-ANW" userLabel="First Responder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="1485" y="1001"/>
-        </scene>
-        <!--Audio Engine iO Sample Selection View Controller-->
-        <scene sceneID="xyQ-DZ-3sX">
-            <objects>
-                <tableViewController id="JKG-uB-NIq" customClass="YASAudioEngineIOSampleSelectionViewController" sceneMemberID="viewController">
-                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" id="z4X-JX-vg4">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                        <prototypes>
-                            <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="Cell" textLabel="s7i-dO-Ngq" style="IBUITableViewCellStyleDefault" id="ja3-50-Gfd">
-                                <rect key="frame" x="0.0" y="28" width="375" height="44"/>
-                                <autoresizingMask key="autoresizingMask"/>
-                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="ja3-50-Gfd" id="pks-V4-gvv">
-                                    <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
-                                    <autoresizingMask key="autoresizingMask"/>
-                                    <subviews>
-                                        <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="Title" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="s7i-dO-Ngq">
-                                            <rect key="frame" x="16" y="0.0" width="343" height="44"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                            <fontDescription key="fontDescription" type="system" pointSize="16"/>
-                                            <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                            <nil key="highlightedColor"/>
-                                        </label>
-                                    </subviews>
-                                </tableViewCellContentView>
-                                <connections>
-                                    <segue destination="0f7-Ee-bHD" kind="unwind" unwindAction="unwindForSegue:" id="dHV-MC-Mar"/>
-                                </connections>
-                            </tableViewCell>
-                        </prototypes>
-                        <connections>
-                            <outlet property="dataSource" destination="JKG-uB-NIq" id="MfB-fM-1YT"/>
-                            <outlet property="delegate" destination="JKG-uB-NIq" id="qVr-ND-oH9"/>
-                        </connections>
-                    </tableView>
-                </tableViewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="IyM-NC-Ao7" userLabel="First Responder" sceneMemberID="firstResponder"/>
-                <exit id="0f7-Ee-bHD" userLabel="Exit" sceneMemberID="exit"/>
-            </objects>
-            <point key="canvasLocation" x="2157" y="1001"/>
+            <point key="canvasLocation" x="2158" y="1666"/>
         </scene>
         <!--Audio Engine Effects Sample Edit View Controller-->
         <scene sceneID="e7x-Qg-dFf">
@@ -733,7 +525,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="wio-ZI-hSz" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2190" y="1678"/>
+            <point key="canvasLocation" x="2191" y="995"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="gMf-xC-6XY">
