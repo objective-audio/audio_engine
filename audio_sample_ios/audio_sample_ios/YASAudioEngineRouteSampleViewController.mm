@@ -35,29 +35,32 @@ typedef NS_ENUM(NSUInteger, YASAudioEngineRouteSampleSourceIndex) {
 namespace yas::sample {
 struct route_vc_internal {
     audio::engine::manager_ptr manager = audio::engine::manager::make_shared();
-    audio::engine::au_io_ptr au_io = audio::engine::au_io::make_shared();
     audio::engine::au_mixer_ptr au_mixer = audio::engine::au_mixer::make_shared();
     std::shared_ptr<audio::engine::route> route = audio::engine::route::make_shared();
     audio::engine::tap_ptr sine_tap = audio::engine::tap::make_shared();
 
     chaining::any_observer_ptr engine_observer = nullptr;
 
+    route_vc_internal() {
+        this->manager->add_io();
+    }
+
     void disconnectNodes() {
-        manager->disconnect(au_mixer->au().node());
-        manager->disconnect(route->node());
-        manager->disconnect(sine_tap->node());
-        manager->disconnect(au_io->au().node());
+        manager->disconnect(this->au_mixer->au().node());
+        manager->disconnect(this->route->node());
+        manager->disconnect(this->sine_tap->node());
+        manager->disconnect(this->manager->io()->node());
     }
 
     void connect_nodes() {
-        auto const sample_rate = au_io->device_sample_rate();
+        auto const device = std::dynamic_pointer_cast<audio::avf_device>(this->manager->io()->device().value());
+        auto const format = audio::format({.sample_rate = device->sample_rate(), .channel_count = 2});
 
-        auto const format = audio::format({.sample_rate = sample_rate, .channel_count = 2});
-
-        manager->connect(au_mixer->au().node(), au_io->au().node(), format);
+        manager->connect(au_mixer->au().node(), this->manager->io()->node(), format);
         manager->connect(route->node(), au_mixer->au().node(), format);
         manager->connect(sine_tap->node(), route->node(), 0, YASAudioEngineRouteSampleSourceIndexSine, format);
-        manager->connect(au_io->au().node(), route->node(), 1, YASAudioEngineRouteSampleSourceIndexInput, format);
+        manager->connect(this->manager->io()->node(), route->node(), 0, YASAudioEngineRouteSampleSourceIndexInput,
+                         format);
     }
 };
 }
