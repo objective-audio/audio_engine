@@ -111,7 +111,6 @@ struct sine {
 namespace yas::sample {
 struct offline_vc_internal {
     audio::engine::manager_ptr play_manager = audio::engine::manager::make_shared();
-    audio::engine::au_output_ptr play_au_output = audio::engine::au_output::make_shared();
     audio::engine::au_mixer_ptr play_au_mixer = audio::engine::au_mixer::make_shared();
     offline_sample::engine::sine_ptr play_sine = offline_sample::engine::sine::make_shared();
 
@@ -122,6 +121,10 @@ struct offline_vc_internal {
     chaining::any_observer_ptr engine_observer = nullptr;
 
     offline_vc_internal() {
+        this->play_manager->add_io();
+
+        auto const &io = this->play_manager->io();
+
         auto format = audio::format({.sample_rate = offline_sample::sample_rate,
                                      .channel_count = 2,
                                      .pcm_format = audio::pcm_format::float32,
@@ -133,8 +136,7 @@ struct offline_vc_internal {
         this->play_au_mixer->set_output_volume(1.0f, 0);
         this->play_au_mixer->set_output_pan(0.0f, 0);
 
-        this->play_manager->connect(this->play_au_mixer->au().node(), this->play_au_output->au_io().au().node(),
-                                    format);
+        this->play_manager->connect(this->play_au_mixer->au().node(), io->node(), format);
         this->play_manager->connect(this->play_sine->tap().node(), this->play_au_mixer->au().node(), format);
 
         this->offline_manager->add_offline_output();
@@ -150,10 +152,10 @@ struct offline_vc_internal {
         this->offline_manager->connect(this->offline_sine->tap().node(), this->offline_au_mixer->au().node(), format);
 
         this->engine_observer = this->play_manager->chain(audio::engine::manager::method::configuration_change)
-                                    .perform([weak_play_au_output = to_weak(play_au_output)](auto const &) {
-                                        if (auto play_au_output = weak_play_au_output.lock()) {
+                                    .perform([weak_io = to_weak(io)](auto const &) {
+                                        if (auto io = weak_io.lock()) {
                                             if (auto const device = audio::mac_device::default_output_device()) {
-                                                play_au_output->au_io().set_device(*device);
+                                                io->set_device(*device);
                                             }
                                         }
                                     })
