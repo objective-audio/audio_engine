@@ -21,18 +21,22 @@ using namespace yas;
 namespace yas::sample {
 struct input_tap_vc_internal {
     audio::engine::manager_ptr manager = audio::engine::manager::make_shared();
-    std::shared_ptr<audio::engine::au_input> au_input = audio::engine::au_input::make_shared();
     audio::engine::tap_ptr input_tap = audio::engine::tap::make_shared({.is_input = true});
 
     chaining::value::holder_ptr<float> input_level =
         chaining::value::holder<float>::make_shared(audio::math::decibel_from_linear(0.0f));
 
-    input_tap_vc_internal() = default;
+    input_tap_vc_internal() {
+        this->manager->add_io();
+    }
 
     void prepare() {
-        double const sample_rate = au_input->au_io().device_sample_rate();
+        auto const io = this->manager->io();
+        audio::avf_device_ptr const device = std::dynamic_pointer_cast<audio::avf_device>(io->device().value());
+
+        double const sample_rate = device->sample_rate();
         audio::format format{{.sample_rate = sample_rate, .channel_count = 2}};
-        manager->connect(au_input->au_io().au().node(), input_tap->node(), format);
+        manager->connect(io->node(), input_tap->node(), format);
 
         input_tap->set_render_handler([input_level = input_level, sample_rate](auto args) mutable {
             audio::pcm_buffer &buffer = args.buffer;

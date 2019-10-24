@@ -28,10 +28,13 @@ static const AudioComponentDescription baseAcd = {.componentType = kAudioUnitTyp
 namespace yas::sample {
 struct effects_vc_internal {
     audio::engine::manager_ptr manager = audio::engine::manager::make_shared();
-    audio::engine::au_output_ptr au_output = audio::engine::au_output::make_shared();
     audio::engine::connection_ptr through_connection = nullptr;
     audio::engine::tap_ptr tap = audio::engine::tap::make_shared();
     audio::engine::au_ptr effect_au = nullptr;
+
+    effects_vc_internal() {
+        this->manager->add_io();
+    }
 
     void replace_effect_au(const AudioComponentDescription *acd) {
         if (effect_au) {
@@ -48,10 +51,10 @@ struct effects_vc_internal {
 
         if (acd) {
             effect_au = audio::engine::au::make_shared(*acd);
-            manager->connect(effect_au->node(), au_output->au_io().au().node(), format);
+            manager->connect(effect_au->node(), this->manager->io()->node(), format);
             manager->connect(tap->node(), effect_au->node(), format);
         } else {
-            through_connection = manager->connect(tap->node(), au_output->au_io().au().node(), format);
+            through_connection = manager->connect(tap->node(), this->manager->io()->node(), format);
         }
     }
 };
