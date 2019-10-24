@@ -52,10 +52,6 @@ audio::engine::node_ptr const &audio::engine::io::node() const {
     return this->_node;
 }
 
-audio::engine::manageable_io_ptr audio::engine::io::manageable() {
-    return std::dynamic_pointer_cast<manageable_io>(this->_weak_engine_io.lock());
-}
-
 void audio::engine::io::add_raw_io() {
     this->_core->_io = audio::io::make_shared(this->_core->device());
 }

@@ -259,7 +259,7 @@ void audio::engine::node::_prepare(node_ptr const &shared) {
 }
 
 void audio::engine::node::_prepare_kernel(kernel_ptr const &kernel) {
-    auto manageable_kernel = kernel->manageable();
+    auto const manageable_kernel = engine::manageable_kernel::cast(kernel);
     manageable_kernel->set_input_connections(_input_connections);
     manageable_kernel->set_output_connections(_output_connections);
 

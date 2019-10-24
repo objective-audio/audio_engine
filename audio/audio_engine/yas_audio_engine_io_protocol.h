@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "yas_audio_ptr.h"
+#include "yas_audio_engine_ptr.h"
 
 namespace yas::audio::engine {
 struct manageable_io {
@@ -13,7 +13,9 @@ struct manageable_io {
     virtual void add_raw_io() = 0;
     virtual void remove_raw_io() = 0;
     virtual audio::io_ptr const &raw_io() = 0;
-};
 
-using manageable_io_ptr = std::shared_ptr<manageable_io>;
+    static manageable_io_ptr cast(manageable_io_ptr const &io) {
+        return io;
+    }
+};
 }  // namespace yas::audio::engine

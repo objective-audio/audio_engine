@@ -19,8 +19,6 @@ struct kernel : manageable_kernel {
 
     std::any decorator = nullptr;
 
-    manageable_kernel_ptr manageable();
-
    private:
     std::weak_ptr<kernel> _weak_kernel;
 
