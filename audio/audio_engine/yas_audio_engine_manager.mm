@@ -136,7 +136,7 @@ void audio::engine::manager::disconnect(connection_ptr const &connection) {
     connection->removable()->remove_nodes();
 
     for (auto &node : update_nodes) {
-        node->manageable()->update_connections();
+        manageable_node::cast(node)->update_connections();
         this->_detach_node_if_unused(node);
     }
 
@@ -333,7 +333,7 @@ void audio::engine::manager::_attach_node(audio::engine::node_ptr const &node) {
 
     this->_nodes.insert(node);
 
-    node->manageable()->set_manager(this->_impl->_weak_manager.lock());
+    manageable_node::cast(node)->set_manager(this->_impl->_weak_manager.lock());
 
     this->_add_node_to_graph(node);
 }
@@ -349,7 +349,7 @@ void audio::engine::manager::_detach_node(audio::engine::node_ptr const &node) {
 
     this->_remove_node_from_graph(node);
 
-    node->manageable()->set_manager(nullptr);
+    manageable_node::cast(node)->set_manager(nullptr);
 
     this->_nodes.erase(node);
 }
@@ -406,7 +406,7 @@ void audio::engine::manager::_disconnect_node_with_predicate(std::function<bool(
     }
 
     for (auto node : update_nodes) {
-        node->manageable()->update_connections();
+        manageable_node::cast(node)->update_connections();
         this->_detach_node_if_unused(node);
     }
 
@@ -420,7 +420,7 @@ void audio::engine::manager::_add_node_to_graph(audio::engine::node_ptr const &n
         return;
     }
 
-    if (auto const &handler = node->manageable()->add_to_graph_handler()) {
+    if (auto const &handler = manageable_node::cast(node)->add_to_graph_handler()) {
         handler(*this->_graph);
     }
 }
@@ -430,7 +430,7 @@ void audio::engine::manager::_remove_node_from_graph(audio::engine::node_ptr con
         return;
     }
 
-    if (auto const &handler = node->manageable()->remove_from_graph_handler()) {
+    if (auto const &handler = manageable_node::cast(node)->remove_from_graph_handler()) {
         handler(*this->_graph);
     }
 }
@@ -444,19 +444,19 @@ bool audio::engine::manager::_add_connection(audio::engine::connection_ptr const
         return false;
     }
 
-    destination_node->connectable()->add_connection(connection);
-    source_node->connectable()->add_connection(connection);
+    connectable_node::cast(destination_node)->add_connection(connection);
+    connectable_node::cast(source_node)->add_connection(connection);
 
     return true;
 }
 
 void audio::engine::manager::_remove_connection_from_nodes(audio::engine::connection_ptr const &connection) {
     if (auto source_node = connection->source_node()) {
-        source_node->connectable()->remove_output_connection(connection->source_bus);
+        connectable_node::cast(source_node)->remove_output_connection(connection->source_bus);
     }
 
     if (auto destination_node = connection->destination_node()) {
-        destination_node->connectable()->remove_input_connection(connection->destination_bus);
+        connectable_node::cast(destination_node)->remove_input_connection(connection->destination_bus);
     }
 }
 
@@ -465,7 +465,7 @@ void audio::engine::manager::_update_node_connections(audio::engine::node_ptr co
         return;
     }
 
-    node->manageable()->update_connections();
+    manageable_node::cast(node)->update_connections();
 }
 
 void audio::engine::manager::_update_all_node_connections() {
@@ -474,7 +474,7 @@ void audio::engine::manager::_update_all_node_connections() {
     }
 
     for (auto node : this->_nodes) {
-        node->manageable()->update_connections();
+        manageable_node::cast(node)->update_connections();
     }
 }
 

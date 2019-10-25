@@ -64,12 +64,8 @@ bool audio::engine::au_mixer::input_enabled(uint32_t const bus_idx) const {
     return this->_au->input_parameter_value(kMultiChannelMixerParam_Enable, bus_idx) != 0.0f;
 }
 
-audio::engine::au const &audio::engine::au_mixer::au() const {
-    return *this->_au;
-}
-
-audio::engine::au &audio::engine::au_mixer::au() {
-    return *this->_au;
+audio::engine::au_ptr const &audio::engine::au_mixer::au() const {
+    return this->_au;
 }
 
 void audio::engine::au_mixer::_prepare(au_mixer_ptr const &shared) {
@@ -83,7 +79,7 @@ void audio::engine::au_mixer::_prepare(au_mixer_ptr const &shared) {
 }
 
 void audio::engine::au_mixer::_update_unit_mixer_connections() {
-    auto &connections = this->_au->node()->manageable()->input_connections();
+    auto &connections = manageable_node::cast(this->_au->node())->input_connections();
     if (connections.size() > 0) {
         auto last = connections.end();
         --last;

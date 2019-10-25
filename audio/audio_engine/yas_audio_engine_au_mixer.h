@@ -24,8 +24,7 @@ struct au_mixer {
     void set_input_enabled(bool const enabled, uint32_t const bus_idx);
     bool input_enabled(uint32_t const bus_idx) const;
 
-    audio::engine::au const &au() const;
-    audio::engine::au &au();
+    audio::engine::au_ptr const &au() const;
 
    private:
     audio::engine::au_ptr _au;

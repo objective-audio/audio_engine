@@ -26,9 +26,11 @@ struct connectable_node {
     virtual void add_connection(audio::engine::connection_ptr const &) = 0;
     virtual void remove_input_connection(uint32_t const dst_bus) = 0;
     virtual void remove_output_connection(uint32_t const src_bus) = 0;
-};
 
-using connectable_node_ptr = std::shared_ptr<connectable_node>;
+    static connectable_node_ptr cast(connectable_node_ptr const &node) {
+        return node;
+    }
+};
 
 struct manageable_node {
     virtual audio::engine::connection_ptr input_connection(uint32_t const bus_idx) const = 0;
@@ -43,7 +45,9 @@ struct manageable_node {
     virtual void set_remove_from_graph_handler(graph_editing_f &&) = 0;
     virtual graph_editing_f const &add_to_graph_handler() const = 0;
     virtual graph_editing_f const &remove_from_graph_handler() const = 0;
-};
 
-using manageable_node_ptr = std::shared_ptr<manageable_node>;
+    static manageable_node_ptr cast(manageable_node_ptr const &node) {
+        return node;
+    }
+};
 }  // namespace yas::audio::engine

@@ -192,14 +192,6 @@ audio::engine::node::chain(method const method) const {
         .to([](chaining_pair_t const &pair) { return pair.second; });
 }
 
-audio::engine::connectable_node_ptr audio::engine::node::connectable() {
-    return std::dynamic_pointer_cast<connectable_node>(this->_weak_node.lock());
-}
-
-audio::engine::manageable_node_ptr audio::engine::node::manageable() {
-    return std::dynamic_pointer_cast<manageable_node>(this->_weak_node.lock());
-}
-
 void audio::engine::node::add_connection(audio::engine::connection_ptr const &connection) {
     auto weak_connection = to_weak(connection);
     if (connection->destination_node().get() == this) {

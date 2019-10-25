@@ -70,9 +70,6 @@ struct node : connectable_node, manageable_node {
     [[nodiscard]] chaining::chain_unsync_t<chaining_pair_t> chain() const;
     [[nodiscard]] chaining::chain_relayed_unsync_t<node_ptr, chaining_pair_t> chain(method const) const;
 
-    connectable_node_ptr connectable();
-    manageable_node_ptr manageable();
-
    private:
     std::weak_ptr<node> _weak_node;
     std::weak_ptr<audio::engine::manager> _weak_manager;

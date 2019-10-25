@@ -70,7 +70,7 @@ void audio::engine::tap::_prepare(tap_ptr const &shared) {
 void audio::engine::tap::set_render_handler(audio::engine::node::render_f handler) {
     this->_render_handler = handler;
 
-    this->_node->manageable()->update_kernel();
+    manageable_node::cast(this->_node)->update_kernel();
 }
 
 audio::engine::node_ptr const &audio::engine::tap::node() const {
