@@ -143,10 +143,6 @@ audio::engine::node_ptr const &audio::engine::au::node() const {
     return this->_node;
 }
 
-audio::engine::manageable_au_ptr audio::engine::au::manageable() {
-    return std::dynamic_pointer_cast<manageable_au>(this->_weak_au.lock());
-}
-
 #pragma mark - private
 
 void audio::engine::au::_prepare(au_ptr const &shared, AudioComponentDescription const &acd) {

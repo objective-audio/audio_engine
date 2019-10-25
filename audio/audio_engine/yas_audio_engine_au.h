@@ -54,8 +54,6 @@ struct au : manageable_au {
 
     audio::engine::node_ptr const &node() const;
 
-    manageable_au_ptr manageable();
-
    private:
     std::weak_ptr<au> _weak_au;
     audio::engine::node_ptr _node;

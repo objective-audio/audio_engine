@@ -26,10 +26,10 @@ using namespace yas;
     XCTAssertEqual(obj.node->input_bus_count(), 2);
     XCTAssertEqual(obj.node->output_bus_count(), 1);
 
-    XCTAssertTrue(obj.node->manageable());
+    XCTAssertTrue(audio::engine::manageable_node::cast(obj.node));
 
-    XCTAssertEqual(obj.node->manageable()->input_connections().size(), 0);
-    XCTAssertEqual(obj.node->manageable()->output_connections().size(), 0);
+    XCTAssertEqual(audio::engine::manageable_node::cast(obj.node)->input_connections().size(), 0);
+    XCTAssertEqual(audio::engine::manageable_node::cast(obj.node)->output_connections().size(), 0);
     XCTAssertEqual(*obj.node->next_available_input_bus(), 0);
     XCTAssertEqual(*obj.node->next_available_output_bus(), 0);
 }
@@ -58,10 +58,11 @@ using namespace yas;
 
     if (auto const connection =
             audio::engine::connection::make_shared(src_obj.node, source_bus, dst_obj.node, destination_bus, format)) {
-        XCTAssertEqual(src_obj.node->manageable()->output_connections().size(), 1);
-        XCTAssertEqual(dst_obj.node->manageable()->input_connections().size(), 1);
-        XCTAssertEqual(src_obj.node->manageable()->output_connection(source_bus), connection);
-        XCTAssertEqual(dst_obj.node->manageable()->input_connection(destination_bus), connection);
+        XCTAssertEqual(audio::engine::manageable_node::cast(src_obj.node)->output_connections().size(), 1);
+        XCTAssertEqual(audio::engine::manageable_node::cast(dst_obj.node)->input_connections().size(), 1);
+        XCTAssertEqual(audio::engine::manageable_node::cast(src_obj.node)->output_connection(source_bus), connection);
+        XCTAssertEqual(audio::engine::manageable_node::cast(dst_obj.node)->input_connection(destination_bus),
+                       connection);
         XCTAssertEqual(src_obj.node->output_format(source_bus), format);
         XCTAssertEqual(dst_obj.node->input_format(destination_bus), format);
 
@@ -90,14 +91,14 @@ using namespace yas;
     auto connection =
         audio::engine::connection::make_shared(src_obj.node, source_bus, dst_obj.node, destination_bus, format);
 
-    XCTAssertEqual(src_obj.node->manageable()->output_connections().size(), 1);
-    XCTAssertEqual(dst_obj.node->manageable()->input_connections().size(), 1);
+    XCTAssertEqual(audio::engine::manageable_node::cast(src_obj.node)->output_connections().size(), 1);
+    XCTAssertEqual(audio::engine::manageable_node::cast(dst_obj.node)->input_connections().size(), 1);
 
     src_obj.node->reset();
-    XCTAssertEqual(src_obj.node->manageable()->output_connections().size(), 0);
+    XCTAssertEqual(audio::engine::manageable_node::cast(src_obj.node)->output_connections().size(), 0);
 
     dst_obj.node->reset();
-    XCTAssertEqual(dst_obj.node->manageable()->input_connections().size(), 0);
+    XCTAssertEqual(audio::engine::manageable_node::cast(dst_obj.node)->input_connections().size(), 0);
 }
 
 - (void)test_render_time {
@@ -126,11 +127,11 @@ using namespace yas;
     auto node = audio::engine::node::make_shared({});
     auto manager = audio::engine::manager::make_shared();
 
-    node->manageable()->set_manager(manager);
+    audio::engine::manageable_node::cast(node)->set_manager(manager);
 
     XCTAssertEqual(manager, node->manager());
 
-    node->manageable()->set_manager(nullptr);
+    audio::engine::manageable_node::cast(node)->set_manager(nullptr);
 }
 
 - (void)test_kernel {
@@ -150,11 +151,11 @@ using namespace yas;
         test::node_object input_obj;
         auto input_connection =
             audio::engine::connection::make_shared(input_obj.node, 0, relay_obj.node, i, input_format);
-        input_obj.node->connectable()->add_connection(input_connection);
+        audio::engine::connectable_node::cast(input_obj.node)->add_connection(input_connection);
         input_connections.push_back(input_connection);
     }
 
-    relay_obj.node->manageable()->update_kernel();
+    audio::engine::manageable_node::cast(relay_obj.node)->update_kernel();
 
     XCTestExpectation *expectation = [self expectationWithDescription:@"kernel connections"];
 
