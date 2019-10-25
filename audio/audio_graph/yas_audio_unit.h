@@ -92,6 +92,9 @@ struct unit : manageable_unit {
     void callback_render(render_parameters &render_parameters);
     raw_unit_result_t raw_unit_render(render_parameters &render_parameters);
 
+    static unit_ptr make_shared(AudioComponentDescription const &acd);
+    static unit_ptr make_shared(OSType const type, OSType const sub_type);
+
    private:
     std::optional<uint8_t> _graph_key = std::nullopt;
     std::optional<uint16_t> _key = std::nullopt;
@@ -116,10 +119,6 @@ struct unit : manageable_unit {
     std::optional<uint8_t> const &graph_key() const override;
     void set_key(std::optional<uint16_t> const &) override;
     std::optional<uint16_t> const &key() const override;
-
-   public:
-    static unit_ptr make_shared(AudioComponentDescription const &acd);
-    static unit_ptr make_shared(OSType const type, OSType const sub_type);
 };
 }  // namespace yas::audio
 
