@@ -20,10 +20,10 @@ audio::engine::connection::connection(node_ptr const &src_node, uint32_t const s
 
 audio::engine::connection::~connection() {
     if (auto node = this->_destination_node.lock()) {
-        node->connectable()->remove_input_connection(this->destination_bus);
+        connectable_node::cast(node)->remove_input_connection(this->destination_bus);
     }
     if (auto node = this->_source_node.lock()) {
-        node->connectable()->remove_output_connection(this->source_bus);
+        connectable_node::cast(node)->remove_output_connection(this->source_bus);
     }
 }
 
@@ -68,7 +68,7 @@ audio::engine::connection_ptr audio::engine::connection::make_shared(audio::engi
                                                                      audio::format const &format) {
     auto shared = connection_ptr(new audio::engine::connection{src_node, src_bus, dst_node, dst_bus, format});
     shared->_prepare(shared);
-    src_node->connectable()->add_connection(shared);
-    dst_node->connectable()->add_connection(shared);
+    connectable_node::cast(src_node)->add_connection(shared);
+    connectable_node::cast(dst_node)->add_connection(shared);
     return shared;
 }

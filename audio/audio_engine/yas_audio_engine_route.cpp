@@ -89,33 +89,33 @@ audio::route_set_t const &audio::engine::route::routes() const {
 void audio::engine::route::add_route(audio::route route) {
     this->_erase_route_if_either_matched(route);
     this->_routes.insert(std::move(route));
-    this->_node->manageable()->update_kernel();
+    manageable_node::cast(this->_node)->update_kernel();
 }
 
 void audio::engine::route::remove_route(audio::route const &route) {
     this->_routes.erase(route);
-    this->_node->manageable()->update_kernel();
+    manageable_node::cast(this->_node)->update_kernel();
 }
 
 void audio::engine::route::remove_route_for_source(audio::route::point const &src_pt) {
     this->_erase_route_if([&src_pt](audio::route const &route_of_set) { return route_of_set.source == src_pt; });
-    this->_node->manageable()->update_kernel();
+    manageable_node::cast(this->_node)->update_kernel();
 }
 
 void audio::engine::route::remove_route_for_destination(audio::route::point const &dst_pt) {
     this->_erase_route_if([&dst_pt](audio::route const &route_of_set) { return route_of_set.destination == dst_pt; });
-    this->_node->manageable()->update_kernel();
+    manageable_node::cast(this->_node)->update_kernel();
 }
 
 void audio::engine::route::set_routes(route_set_t routes) {
     this->_routes.clear();
     this->_routes = std::move(routes);
-    this->_node->manageable()->update_kernel();
+    manageable_node::cast(this->_node)->update_kernel();
 }
 
 void audio::engine::route::clear_routes() {
     this->_routes.clear();
-    this->_node->manageable()->update_kernel();
+    manageable_node::cast(this->_node)->update_kernel();
 }
 
 audio::engine::node_ptr const &audio::engine::route::node() const {
