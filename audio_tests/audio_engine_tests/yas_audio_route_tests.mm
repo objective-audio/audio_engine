@@ -76,7 +76,7 @@ using namespace yas;
     manager->add_offline_output();
 
     auto format = audio::format({.sample_rate = 44100.0, .channel_count = 2});
-    audio::engine::offline_output_ptr const &output = manager->offline_output();
+    auto const &output = manager->offline_output().value();
     auto engine_route = audio::engine::route::make_shared();
     auto tap = audio::engine::tap::make_shared();
 
@@ -141,7 +141,7 @@ using namespace yas;
 
     auto dst_format = audio::format({.sample_rate = 44100.0, .channel_count = 2});
     auto src_format = audio::format({.sample_rate = 44100.0, .channel_count = 1});
-    audio::engine::offline_output_ptr const &output = manager->offline_output();
+    auto const &output = manager->offline_output().value();
     auto engine_route = audio::engine::route::make_shared();
 
     manager->connect(engine_route->node(), output->node(), dst_format);
@@ -199,7 +199,7 @@ using namespace yas;
 
     auto dst_format = audio::format({.sample_rate = 44100.0, .channel_count = 4});
     auto src_format = audio::format({.sample_rate = 44100.0, .channel_count = 2});
-    audio::engine::offline_output_ptr const &output = manager->offline_output();
+    auto const &output = manager->offline_output().value();
     auto engine_route = audio::engine::route::make_shared();
 
     manager->connect(engine_route->node(), output->node(), dst_format);

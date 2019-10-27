@@ -31,7 +31,7 @@ using namespace yas;
     manager->add_offline_output();
 
     auto format = audio::format({.sample_rate = 44100.0, .channel_count = 2});
-    audio::engine::offline_output_ptr const &output = manager->offline_output();
+    auto const &output = manager->offline_output().value();
     auto delay_au = audio::engine::au::make_shared(kAudioUnitType_Effect, kAudioUnitSubType_Delay);
 
     auto const &parameters = delay_au->parameters();
