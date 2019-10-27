@@ -123,33 +123,33 @@ struct offline_vc_internal {
     offline_vc_internal() {
         this->play_manager->add_io();
 
-        auto const &io = this->play_manager->io();
+        auto const &io = this->play_manager->io().value();
 
         auto format = audio::format({.sample_rate = offline_sample::sample_rate,
                                      .channel_count = 2,
                                      .pcm_format = audio::pcm_format::float32,
                                      .interleaved = false});
 
-        this->play_au_mixer->au().node()->reset();
+        this->play_au_mixer->au()->node()->reset();
         this->play_au_mixer->set_input_pan(0.0f, 0);
         this->play_au_mixer->set_input_enabled(true, 0);
         this->play_au_mixer->set_output_volume(1.0f, 0);
         this->play_au_mixer->set_output_pan(0.0f, 0);
 
-        this->play_manager->connect(this->play_au_mixer->au().node(), io->node(), format);
-        this->play_manager->connect(this->play_sine->tap().node(), this->play_au_mixer->au().node(), format);
+        this->play_manager->connect(this->play_au_mixer->au()->node(), io->node(), format);
+        this->play_manager->connect(this->play_sine->tap().node(), this->play_au_mixer->au()->node(), format);
 
         this->offline_manager->add_offline_output();
         auto const &offline_output = this->offline_manager->offline_output().value();
 
-        this->offline_au_mixer->au().node()->reset();
+        this->offline_au_mixer->au()->node()->reset();
         this->offline_au_mixer->set_input_pan(0.0f, 0);
         this->offline_au_mixer->set_input_enabled(true, 0);
         this->offline_au_mixer->set_output_volume(1.0f, 0);
         this->offline_au_mixer->set_output_pan(0.0f, 0);
 
-        this->offline_manager->connect(this->offline_au_mixer->au().node(), offline_output->node(), format);
-        this->offline_manager->connect(this->offline_sine->tap().node(), this->offline_au_mixer->au().node(), format);
+        this->offline_manager->connect(this->offline_au_mixer->au()->node(), offline_output->node(), format);
+        this->offline_manager->connect(this->offline_sine->tap().node(), this->offline_au_mixer->au()->node(), format);
 
         this->engine_observer = this->play_manager->chain(audio::engine::manager::method::configuration_change)
                                     .perform([weak_io = to_weak(io)](auto const &) {

@@ -244,7 +244,7 @@ struct device_io_vc_internal {
     self.deviceNames = titles;
 
     std::optional<NSUInteger> index = std::nullopt;
-    if (auto const io_device = _internal.manager->io()->device()) {
+    if (auto const io_device = _internal.manager->io().value()->device()) {
         auto const mac_device = std::dynamic_pointer_cast<audio::mac_device>(*io_device);
         index = audio::mac_device::index_of_device(mac_device);
     }
@@ -267,11 +267,11 @@ struct device_io_vc_internal {
         _internal.manager->disconnect(_internal.route->node());
         _internal.route->clear_routes();
 
-        if (auto const &device_opt = _internal.manager->io()->device()) {
+        if (auto const &device_opt = _internal.manager->io().value()->device()) {
             auto const &device = *device_opt;
             if (device->output_channel_count() > 0) {
                 if (auto const output_format = device->output_format()) {
-                    _internal.manager->connect(_internal.route->node(), _internal.manager->io()->node(),
+                    _internal.manager->connect(_internal.route->node(), _internal.manager->io().value()->node(),
                                                *output_format);
                     _internal.manager->connect(_internal.tap->node(), _internal.route->node(), 0,
                                                YASAudioDeviceRouteSampleSourceBusSine, *output_format);
@@ -280,14 +280,14 @@ struct device_io_vc_internal {
 
             if (device->input_channel_count() > 0) {
                 if (auto const input_format = device->input_format()) {
-                    _internal.manager->connect(_internal.manager->io()->node(), _internal.route->node(), 0,
+                    _internal.manager->connect(_internal.manager->io().value()->node(), _internal.route->node(), 0,
                                                YASAudioDeviceRouteSampleSourceBusInput, *input_format);
                 }
             }
         }
     }
 
-    if (auto const &io_device = _internal.manager->io()->device()) {
+    if (auto const &io_device = _internal.manager->io().value()->device()) {
         auto const mac_device = std::dynamic_pointer_cast<audio::mac_device>(*io_device);
         uint32_t const output_channel_count = mac_device->output_channel_count();
         uint32_t const input_channel_count = mac_device->input_channel_count();
@@ -389,7 +389,7 @@ struct device_io_vc_internal {
     auto const all_devices = audio::mac_device::all_devices();
 
     if (selected_device && std::find(all_devices.begin(), all_devices.end(), selected_device) != all_devices.end()) {
-        _internal.manager->io()->set_device(selected_device);
+        _internal.manager->io().value()->set_device(selected_device);
 
         auto unowned_self = objc_ptr_with_move_object([[YASUnownedObject alloc] initWithObject:self]);
 
@@ -405,7 +405,7 @@ struct device_io_vc_internal {
                                         })
                                         .end();
     } else {
-        _internal.manager->io()->set_device(std::nullopt);
+        _internal.manager->io().value()->set_device(std::nullopt);
     }
 
     [self _updateConnection];
