@@ -140,7 +140,7 @@ struct offline_vc_internal {
         this->play_manager->connect(this->play_sine->tap().node(), this->play_au_mixer->au().node(), format);
 
         this->offline_manager->add_offline_output();
-        audio::engine::offline_output_ptr const &offline_output = this->offline_manager->offline_output();
+        auto const &offline_output = this->offline_manager->offline_output().value();
 
         this->offline_au_mixer->au().node()->reset();
         this->offline_au_mixer->set_input_pan(0.0f, 0);

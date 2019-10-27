@@ -182,14 +182,14 @@ audio::engine::manager::add_result_t audio::engine::manager::add_offline_output(
 
 audio::engine::manager::remove_result_t audio::engine::manager::remove_offline_output() {
     if (this->_offline_output) {
-        this->_offline_output = nullptr;
+        this->_offline_output = std::nullopt;
         return remove_result_t{nullptr};
     } else {
         return remove_result_t{remove_error_t::already_removed};
     }
 }
 
-audio::engine::offline_output_ptr const &audio::engine::manager::offline_output() const {
+std::optional<audio::engine::offline_output_ptr> const &audio::engine::manager::offline_output() const {
     return this->_offline_output;
 }
 
@@ -225,7 +225,7 @@ audio::engine::manager::start_result_t audio::engine::manager::start_render() {
     }
 
     if (auto const offline_output = this->_offline_output) {
-        if (offline_output->is_running()) {
+        if (offline_output.value()->is_running()) {
             return start_result_t(start_error_t::already_running);
         }
     }
@@ -248,7 +248,7 @@ audio::engine::manager::start_result_t audio::engine::manager::start_offline_ren
     }
 
     if (auto const offline_output = this->_offline_output) {
-        if (offline_output->is_running()) {
+        if (offline_output.value()->is_running()) {
             return start_result_t(start_error_t::already_running);
         }
     }
@@ -263,7 +263,7 @@ audio::engine::manager::start_result_t audio::engine::manager::start_offline_ren
         return start_result_t(start_error_t::offline_output_not_found);
     }
 
-    auto result = manageable_offline_output::cast(offline_output)
+    auto result = manageable_offline_output::cast(offline_output.value())
                       ->start(std::move(render_handler), std::move(completion_handler));
 
     if (result) {
@@ -279,7 +279,7 @@ void audio::engine::manager::stop() {
     }
 
     if (auto offline_output = this->_offline_output) {
-        manageable_offline_output::cast(offline_output)->stop();
+        manageable_offline_output::cast(offline_output.value())->stop();
     }
 }
 

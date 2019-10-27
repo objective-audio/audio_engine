@@ -54,7 +54,7 @@ struct manager final {
 
     add_result_t add_offline_output();
     remove_result_t remove_offline_output();
-    offline_output_ptr const &offline_output() const;
+    std::optional<offline_output_ptr> const &offline_output() const;
 
     add_result_t add_io();
     remove_result_t remove_io();
@@ -84,7 +84,7 @@ struct manager final {
     audio::graph_ptr _graph = nullptr;
     std::unordered_set<node_ptr> _nodes;
     engine::connection_set _connections;
-    offline_output_ptr _offline_output = nullptr;
+    std::optional<offline_output_ptr> _offline_output = std::nullopt;
 
     manager();
 
