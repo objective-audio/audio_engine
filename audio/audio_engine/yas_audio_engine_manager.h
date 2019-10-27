@@ -58,7 +58,7 @@ struct manager final {
 
     add_result_t add_io();
     remove_result_t remove_io();
-    io_ptr const &io() const;
+    std::optional<io_ptr> const &io() const;
 
     start_result_t start_render();
     start_result_t start_offline_render(offline_render_f, offline_completion_f);
@@ -107,12 +107,12 @@ struct manager final {
     void _reload_graph();
     void _post_configuration_change();
 
-    io_ptr _io = nullptr;
+    std::optional<io_ptr> _io = std::nullopt;
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
     chaining::any_observer_ptr _device_system_observer = nullptr;
 #endif
 
-    void _set_io(io_ptr const &node);
+    void _set_io(std::optional<io_ptr> const &node);
 };
 }  // namespace yas::audio::engine
 

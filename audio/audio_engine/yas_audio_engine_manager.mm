@@ -213,7 +213,7 @@ audio::engine::manager::remove_result_t audio::engine::manager::remove_io() {
     }
 }
 
-audio::engine::io_ptr const &audio::engine::manager::io() const {
+std::optional<audio::engine::io_ptr> const &audio::engine::manager::io() const {
     return this->_io;
 }
 
@@ -371,8 +371,8 @@ bool audio::engine::manager::_prepare_graph() {
 
     this->_graph = audio::graph::make_shared();
 
-    if (auto &engine_io = this->_io) {
-        auto manageable = engine::manageable_io::cast(engine_io);
+    if (auto const &engine_io = this->_io) {
+        auto manageable = engine::manageable_io::cast(engine_io.value());
         manageable->add_raw_io();
         this->_graph->add_io(manageable->raw_io());
     }
@@ -511,25 +511,27 @@ void audio::engine::manager::_reload_graph() {
     }
 }
 
-void audio::engine::manager::_set_io(audio::engine::io_ptr const &node) {
-    if (node) {
-        this->_io = node;
+void audio::engine::manager::_set_io(std::optional<audio::engine::io_ptr> const &io) {
+    if (io) {
+        this->_io = io;
 
         if (this->_graph) {
-            auto manageable = engine::manageable_io::cast(this->_io);
+            auto manageable = engine::manageable_io::cast(io.value());
             manageable->add_raw_io();
             this->_graph->add_io(manageable->raw_io());
         }
     } else {
         if (this->_io) {
+            auto const &io = this->_io.value();
+
             if (this->_graph) {
-                if (auto &raw_io = engine::manageable_io::cast(this->_io)->raw_io()) {
+                if (auto &raw_io = engine::manageable_io::cast(io)->raw_io()) {
                     this->_graph->remove_io(raw_io);
                 }
             }
 
-            engine::manageable_io::cast(this->_io)->remove_raw_io();
-            this->_io = nullptr;
+            engine::manageable_io::cast(io)->remove_raw_io();
+            this->_io = std::nullopt;
         }
     }
 }
