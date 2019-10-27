@@ -81,7 +81,7 @@ struct manager final {
 
     chaining::notifier_ptr<chaining_pair_t> _notifier = chaining::notifier<chaining_pair_t>::make_shared();
 
-    audio::graph_ptr _graph = nullptr;
+    std::optional<audio::graph_ptr> _graph = std::nullopt;
     std::unordered_set<node_ptr> _nodes;
     engine::connection_set _connections;
     std::optional<offline_output_ptr> _offline_output = std::nullopt;

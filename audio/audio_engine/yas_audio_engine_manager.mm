@@ -218,8 +218,8 @@ std::optional<audio::engine::io_ptr> const &audio::engine::manager::io() const {
 }
 
 audio::engine::manager::start_result_t audio::engine::manager::start_render() {
-    if (auto const graph = this->_graph) {
-        if (graph->is_running()) {
+    if (auto const &graph = this->_graph) {
+        if (graph.value()->is_running()) {
             return start_result_t(start_error_t::already_running);
         }
     }
@@ -234,15 +234,15 @@ audio::engine::manager::start_result_t audio::engine::manager::start_render() {
         return start_result_t(start_error_t::prepare_failure);
     }
 
-    this->_graph->start();
+    this->_graph.value()->start();
 
     return start_result_t(nullptr);
 }
 
 audio::engine::manager::start_result_t audio::engine::manager::start_offline_render(
     offline_render_f render_handler, offline_completion_f completion_handler) {
-    if (auto const graph = this->_graph) {
-        if (graph->is_running()) {
+    if (auto const &graph = this->_graph) {
+        if (graph.value()->is_running()) {
             return start_result_t(start_error_t::already_running);
         }
     }
@@ -274,8 +274,8 @@ audio::engine::manager::start_result_t audio::engine::manager::start_offline_ren
 }
 
 void audio::engine::manager::stop() {
-    if (auto graph = this->_graph) {
-        graph->stop();
+    if (auto const &graph = this->_graph) {
+        graph.value()->stop();
     }
 
     if (auto offline_output = this->_offline_output) {
@@ -369,12 +369,13 @@ bool audio::engine::manager::_prepare_graph() {
         return true;
     }
 
-    this->_graph = audio::graph::make_shared();
+    auto const graph = audio::graph::make_shared();
+    this->_graph = graph;
 
     if (auto const &engine_io = this->_io) {
         auto manageable = engine::manageable_io::cast(engine_io.value());
         manageable->add_raw_io();
-        this->_graph->add_io(manageable->raw_io());
+        graph->add_io(manageable->raw_io());
     }
 
     for (auto &node : this->_nodes) {
@@ -421,7 +422,7 @@ void audio::engine::manager::_add_node_to_graph(audio::engine::node_ptr const &n
     }
 
     if (auto const &handler = manageable_node::cast(node)->add_to_graph_handler()) {
-        handler(*this->_graph);
+        handler(*this->_graph.value());
     }
 }
 
@@ -431,7 +432,7 @@ void audio::engine::manager::_remove_node_from_graph(audio::engine::node_ptr con
     }
 
     if (auto const &handler = manageable_node::cast(node)->remove_from_graph_handler()) {
-        handler(*this->_graph);
+        handler(*this->_graph.value());
     }
 }
 
@@ -491,9 +492,9 @@ audio::engine::connection_set audio::engine::manager::_output_connections_for_so
 
 void audio::engine::manager::_reload_graph() {
     if (auto prev_graph = this->_graph) {
-        bool const prev_runnging = prev_graph->is_running();
+        bool const prev_runnging = prev_graph.value()->is_running();
 
-        prev_graph->stop();
+        prev_graph.value()->stop();
 
         for (auto const &node : this->_nodes) {
             this->_remove_node_from_graph(node);
@@ -506,7 +507,7 @@ void audio::engine::manager::_reload_graph() {
         }
 
         if (prev_runnging) {
-            this->_graph->start();
+            this->_graph.value()->start();
         }
     }
 }
@@ -518,7 +519,7 @@ void audio::engine::manager::_set_io(std::optional<audio::engine::io_ptr> const 
         if (this->_graph) {
             auto manageable = engine::manageable_io::cast(io.value());
             manageable->add_raw_io();
-            this->_graph->add_io(manageable->raw_io());
+            this->_graph.value()->add_io(manageable->raw_io());
         }
     } else {
         if (this->_io) {
@@ -526,7 +527,7 @@ void audio::engine::manager::_set_io(std::optional<audio::engine::io_ptr> const 
 
             if (this->_graph) {
                 if (auto &raw_io = engine::manageable_io::cast(io)->raw_io()) {
-                    this->_graph->remove_io(raw_io);
+                    this->_graph.value()->remove_io(raw_io);
                 }
             }
 
