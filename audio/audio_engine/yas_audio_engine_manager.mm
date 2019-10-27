@@ -206,7 +206,7 @@ audio::engine::manager::add_result_t audio::engine::manager::add_io() {
 
 audio::engine::manager::remove_result_t audio::engine::manager::remove_io() {
     if (this->_io) {
-        this->_set_io(nullptr);
+        this->_set_io(std::nullopt);
         return remove_result_t{nullptr};
     } else {
         return remove_result_t{remove_error_t::already_removed};
