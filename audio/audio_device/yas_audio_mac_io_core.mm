@@ -127,10 +127,6 @@ std::optional<audio::time_ptr> const &audio::mac_io_core::input_time_on_render()
     return this->_input_time_on_render;
 }
 
-chaining::chain_unsync_t<audio::io_core::method> audio::mac_io_core::chain() {
-    return this->_notifier->chain();
-}
-
 void audio::mac_io_core::_prepare(mac_io_core_ptr const &shared) {
     auto weak_io_core = to_weak(shared);
     this->_weak_io_core = weak_io_core;

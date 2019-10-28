@@ -78,6 +78,8 @@ struct mac_device : io_device {
     [[nodiscard]] static chaining::chain_relayed_unsync_t<change_info, chaining_system_pair_t> system_chain(
         system_method const);
 
+    [[nodiscard]] chaining::chain_unsync_t<io_device::method> io_device_chain() override;
+
     io_core_ptr make_io_core() const override;
 
     // for Test
@@ -101,6 +103,9 @@ struct mac_device : io_device {
     std::unordered_map<AudioStreamID, stream_ptr> _output_streams_map;
     chaining::notifier_ptr<audio::mac_device::chaining_pair_t> _notifier =
         chaining::notifier<audio::mac_device::chaining_pair_t>::make_shared();
+    chaining::notifier_ptr<io_device::method> _io_device_notifier =
+        chaining::notifier<io_device::method>::make_shared();
+    chaining::observer_pool _io_pool;
     std::optional<audio::format> _input_format = std::nullopt;
     std::optional<audio::format> _output_format = std::nullopt;
     mutable std::recursive_mutex _mutex;

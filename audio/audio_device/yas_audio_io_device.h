@@ -8,12 +8,16 @@
 
 namespace yas::audio {
 struct io_device {
+    enum class method { lost, updated };
+
     virtual std::optional<audio::format> input_format() const = 0;
     virtual std::optional<audio::format> output_format() const = 0;
     virtual uint32_t input_channel_count() const = 0;
     virtual uint32_t output_channel_count() const = 0;
 
     virtual io_core_ptr make_io_core() const = 0;
+
+    [[nodiscard]] virtual chaining::chain_unsync_t<io_device::method> io_device_chain() = 0;
 
     static std::optional<io_device_ptr> default_device();
 };

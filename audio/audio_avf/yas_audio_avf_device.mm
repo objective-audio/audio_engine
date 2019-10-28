@@ -11,7 +11,17 @@
 
 using namespace yas;
 
-audio::avf_device::avf_device() {
+struct audio::avf_device::impl {
+    std::vector<objc_ptr<id<NSObject>>> observers;
+
+    ~impl() {
+        for (auto const &observer : this->observers) {
+            [NSNotificationCenter.defaultCenter removeObserver:observer.object()];
+        }
+    }
+};
+
+audio::avf_device::avf_device() : _impl(std::make_unique<impl>()) {
 }
 
 double audio::avf_device::sample_rate() const {
@@ -54,6 +64,50 @@ std::optional<audio::format> audio::avf_device::output_format() const {
 
 audio::io_core_ptr audio::avf_device::make_io_core() const {
     return avf_io_core::make_shared(this->_weak_device.lock());
+}
+
+chaining::chain_unsync_t<audio::io_device::method> audio::avf_device::io_device_chain() {
+    return this->_notifier->chain();
+}
+
+void audio::avf_device::_prepare(avf_device_ptr const &shared) {
+    auto weak_device = to_weak(shared);
+    this->_weak_device = weak_device;
+
+    auto route_change_observer = objc_ptr<id<NSObject>>([weak_device] {
+        return [NSNotificationCenter.defaultCenter addObserverForName:AVAudioSessionRouteChangeNotification
+                                                               object:AVAudioSession.sharedInstance
+                                                                queue:NSOperationQueue.mainQueue
+                                                           usingBlock:[weak_device](NSNotification *note) {
+                                                               if (auto const device = weak_device.lock()) {
+                                                                   device->_notifier->notify(method::updated);
+                                                               }
+                                                           }];
+    });
+
+    auto lost_observer = objc_ptr<id<NSObject>>([weak_device] {
+        return [NSNotificationCenter.defaultCenter addObserverForName:AVAudioSessionMediaServicesWereLostNotification
+                                                               object:AVAudioSession.sharedInstance
+                                                                queue:NSOperationQueue.mainQueue
+                                                           usingBlock:[weak_device](NSNotification *note) {
+                                                               if (auto const device = weak_device.lock()) {
+                                                                   device->_notifier->notify(method::lost);
+                                                               }
+                                                           }];
+    });
+
+    auto reset_observer = objc_ptr<id<NSObject>>([weak_device] {
+        return [NSNotificationCenter.defaultCenter addObserverForName:AVAudioSessionMediaServicesWereResetNotification
+                                                               object:AVAudioSession.sharedInstance
+                                                                queue:NSOperationQueue.mainQueue
+                                                           usingBlock:[weak_device](NSNotification *note) {
+                                                               if (auto const device = weak_device.lock()) {
+                                                                   device->_notifier->notify(method::lost);
+                                                               }
+                                                           }];
+    });
+
+    this->_impl->observers = {route_change_observer, lost_observer, reset_observer};
 }
 
 audio::avf_device_ptr audio::avf_device::make_shared() {

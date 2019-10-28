@@ -311,6 +311,8 @@ audio::mac_device::mac_device(AudioDeviceID const device_id)
 
 void audio::mac_device::_prepare(mac_device_ptr const &mac_device) {
     this->_weak_mac_device = mac_device;
+
+#warning todo
 }
 
 AudioDeviceID audio::mac_device::audio_device_id() const {
@@ -407,6 +409,10 @@ audio::mac_device::system_chain(system_method const method) {
     return audio::_system_notifier->chain()
         .guard([method](chaining_system_pair_t const &pair) { return pair.first == method; })
         .to([](chaining_system_pair_t const &pair) { return pair.second; });
+}
+
+chaining::chain_unsync_t<audio::io_device::method> audio::mac_device::io_device_chain() {
+    return this->_io_device_notifier->chain();
 }
 
 audio::mac_device::listener_f audio::mac_device::_listener() {
