@@ -13,35 +13,18 @@
 
 using namespace yas;
 
-#pragma mark - core
-
-struct audio::engine::io::core {
-    audio::io_ptr _io = nullptr;
-
-    void set_device(std::optional<audio::io_device_ptr> const &device) {
-        this->_device = device;
-        if (this->_io) {
-            this->_io->set_device(device);
-        }
-    }
-
-    std::optional<audio::io_device_ptr> const &device() {
-        return this->_device;
-    }
-
-   private:
-    std::optional<audio::io_device_ptr> _device = std::nullopt;
-};
-
 #pragma mark - audio::engine::io
 
-audio::engine::io::io() : _core(std::make_unique<core>()) {
-}
+audio::engine::io::io() = default;
 
 audio::engine::io::~io() = default;
 
 void audio::engine::io::set_device(std::optional<audio::io_device_ptr> const &device) {
-    this->_core->set_device(device);
+    this->_device = device;
+
+    if (this->_raw_io) {
+        this->_raw_io->set_device(device);
+    }
 
     if (device) {
         this->_io_observer = device.value()->io_device_chain().send_to(this->_notifier).end();
@@ -51,7 +34,7 @@ void audio::engine::io::set_device(std::optional<audio::io_device_ptr> const &de
 }
 
 std::optional<audio::io_device_ptr> const &audio::engine::io::device() const {
-    return this->_core->device();
+    return this->_device;
 }
 
 audio::engine::node_ptr const &audio::engine::io::node() const {
@@ -59,15 +42,15 @@ audio::engine::node_ptr const &audio::engine::io::node() const {
 }
 
 void audio::engine::io::add_raw_io() {
-    this->_core->_io = audio::io::make_shared(this->_core->device());
+    this->_raw_io = audio::io::make_shared(this->device());
 }
 
 void audio::engine::io::remove_raw_io() {
-    this->_core->_io = nullptr;
+    this->_raw_io = nullptr;
 }
 
 audio::io_ptr const &audio::engine::io::raw_io() {
-    return this->_core->_io;
+    return this->_raw_io;
 }
 
 chaining::chain_unsync_t<audio::io_device::method> audio::engine::io::io_device_chain() {
@@ -103,7 +86,7 @@ void audio::engine::io::_prepare(io_ptr const &shared) {
 }
 
 void audio::engine::io::_update_io_connections() {
-    auto &raw_io = this->_core->_io;
+    auto &raw_io = this->_raw_io;
     if (!raw_io) {
         return;
     }
@@ -155,7 +138,7 @@ void audio::engine::io::_update_io_connections() {
 }
 
 bool audio::engine::io::_validate_connections() {
-    if (auto const &raw_io = this->_core->_io) {
+    if (auto const &raw_io = this->_raw_io) {
         auto &input_connections = manageable_node::cast(this->_node)->input_connections();
         if (input_connections.size() > 0) {
             auto const connections = lock_values(input_connections);
