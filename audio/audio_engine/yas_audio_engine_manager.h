@@ -35,7 +35,6 @@ struct manager final {
     using start_result_t = result<std::nullptr_t, start_error_t>;
     using add_result_t = result<std::nullptr_t, add_error_t>;
     using remove_result_t = result<std::nullptr_t, remove_error_t>;
-    using chaining_pair_t = std::pair<method, manager_ptr>;
 
     virtual ~manager();
 
@@ -64,22 +63,21 @@ struct manager final {
     start_result_t start_offline_render(offline_render_f, offline_completion_f);
     void stop();
 
-    [[nodiscard]] chaining::chain_unsync_t<chaining_pair_t> chain() const;
-    [[nodiscard]] chaining::chain_relayed_unsync_t<manager_ptr, chaining_pair_t> chain(method const) const;
+    [[nodiscard]] chaining::chain_unsync_t<method> chain() const;
 
     static manager_ptr make_shared();
 
     // for Test
     std::unordered_set<node_ptr> const &nodes() const;
     engine::connection_set const &connections() const;
-    chaining::notifier_ptr<chaining_pair_t> &notifier();
+    chaining::notifier_ptr<method> &notifier();
 
    private:
     class impl;
 
     std::unique_ptr<impl> _impl;
 
-    chaining::notifier_ptr<chaining_pair_t> _notifier = chaining::notifier<chaining_pair_t>::make_shared();
+    chaining::notifier_ptr<method> _notifier = chaining::notifier<method>::make_shared();
 
     std::optional<audio::graph_ptr> _graph = std::nullopt;
     std::unordered_set<node_ptr> _nodes;

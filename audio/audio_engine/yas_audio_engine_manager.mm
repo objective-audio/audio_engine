@@ -283,15 +283,8 @@ void audio::engine::manager::stop() {
     }
 }
 
-chaining::chain_unsync_t<audio::engine::manager::chaining_pair_t> audio::engine::manager::chain() const {
+chaining::chain_unsync_t<audio::engine::manager::method> audio::engine::manager::chain() const {
     return this->_notifier->chain();
-}
-
-chaining::chain_relayed_unsync_t<audio::engine::manager_ptr, audio::engine::manager::chaining_pair_t>
-audio::engine::manager::chain(method const method) const {
-    return this->_notifier->chain()
-        .guard([method](auto const &pair) { return pair.first == method; })
-        .to([](chaining_pair_t const &pair) { return pair.second; });
 }
 
 std::unordered_set<audio::engine::node_ptr> const &audio::engine::manager::nodes() const {
@@ -302,7 +295,7 @@ audio::engine::connection_set const &audio::engine::manager::connections() const
     return this->_connections;
 }
 
-chaining::notifier_ptr<audio::engine::manager::chaining_pair_t> &audio::engine::manager::notifier() {
+chaining::notifier_ptr<audio::engine::manager::method> &audio::engine::manager::notifier() {
     return this->_notifier;
 }
 
@@ -538,7 +531,7 @@ void audio::engine::manager::_set_io(std::optional<audio::engine::io_ptr> const 
 }
 
 void audio::engine::manager::_post_configuration_change() {
-    this->_notifier->notify(std::make_pair(method::configuration_change, this->_impl->_weak_manager.lock()));
+    this->_notifier->notify(method::configuration_change);
 }
 
 audio::engine::manager_ptr audio::engine::manager::make_shared() {
