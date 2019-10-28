@@ -97,7 +97,7 @@ struct node : connectable_node, manageable_node {
     void remove_input_connection(uint32_t const dst_bus) override;
     void remove_output_connection(uint32_t const src_bus) override;
 
-    void set_manager(audio::engine::manager_ptr const &) override;
+    void set_manager(audio::engine::manager_wptr const &) override;
     void update_kernel() override;
     void update_connections() override;
     void set_add_to_graph_handler(graph_editing_f &&) override;

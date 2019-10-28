@@ -73,10 +73,7 @@ struct manager final {
     chaining::notifier_ptr<method> &notifier();
 
    private:
-    class impl;
-
-    std::unique_ptr<impl> _impl;
-
+    std::weak_ptr<manager> _weak_manager;
     chaining::notifier_ptr<method> _notifier = chaining::notifier<method>::make_shared();
 
     std::optional<audio::graph_ptr> _graph = std::nullopt;

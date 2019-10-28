@@ -217,7 +217,7 @@ void audio::engine::node::remove_output_connection(uint32_t const src_bus) {
     this->update_kernel();
 }
 
-void audio::engine::node::set_manager(audio::engine::manager_ptr const &manager) {
+void audio::engine::node::set_manager(audio::engine::manager_wptr const &manager) {
     this->_weak_manager = manager;
 }
 
