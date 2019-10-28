@@ -146,12 +146,19 @@ audio::engine::manager::add_result_t audio::engine::manager::add_io() {
         audio::engine::io_ptr const io = audio::engine::io::make_shared();
         io->set_device(io_device::default_device());
         this->_set_io(io);
+        this->_io_observer = io->device()
+                                 .value()
+                                 ->io_device_chain()
+                                 .to_value(method::configuration_change)
+                                 .send_to(this->_notifier)
+                                 .end();
         return add_result_t{nullptr};
     }
 }
 
 audio::engine::manager::remove_result_t audio::engine::manager::remove_io() {
     if (this->_io) {
+        this->_io_observer = nullptr;
         this->_set_io(std::nullopt);
         return remove_result_t{nullptr};
     } else {

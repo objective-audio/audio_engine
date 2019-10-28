@@ -75,6 +75,7 @@ struct manager final {
    private:
     std::weak_ptr<manager> _weak_manager;
     chaining::notifier_ptr<method> _notifier = chaining::notifier<method>::make_shared();
+    chaining::any_observer_ptr _io_observer = nullptr;
 
     std::optional<audio::graph_ptr> _graph = std::nullopt;
     std::unordered_set<node_ptr> _nodes;
