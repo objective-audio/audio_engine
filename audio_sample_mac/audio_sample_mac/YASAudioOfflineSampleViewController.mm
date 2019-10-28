@@ -151,7 +151,7 @@ struct offline_vc_internal {
         this->offline_manager->connect(this->offline_au_mixer->au()->node(), offline_output->node(), format);
         this->offline_manager->connect(this->offline_sine->tap().node(), this->offline_au_mixer->au()->node(), format);
 
-        this->engine_observer = this->play_manager->chain(audio::engine::manager::method::configuration_change)
+        this->engine_observer = this->play_manager->chain()
                                     .perform([weak_io = to_weak(io)](auto const &) {
                                         if (auto io = weak_io.lock()) {
                                             if (auto const device = audio::mac_device::default_output_device()) {

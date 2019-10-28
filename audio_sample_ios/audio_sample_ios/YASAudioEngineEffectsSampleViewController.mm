@@ -51,10 +51,10 @@ struct effects_vc_internal {
 
         if (acd) {
             effect_au = audio::engine::au::make_shared(*acd);
-            manager->connect(effect_au->node(), this->manager->io()->node(), format);
+            manager->connect(effect_au->node(), this->manager->io().value()->node(), format);
             manager->connect(tap->node(), effect_au->node(), format);
         } else {
-            through_connection = manager->connect(tap->node(), this->manager->io()->node(), format);
+            through_connection = manager->connect(tap->node(), this->manager->io().value()->node(), format);
         }
     }
 };

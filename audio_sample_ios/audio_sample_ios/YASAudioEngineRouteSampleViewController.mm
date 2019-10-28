@@ -46,21 +46,21 @@ struct route_vc_internal {
     }
 
     void disconnectNodes() {
-        manager->disconnect(this->au_mixer->au().node());
+        manager->disconnect(this->au_mixer->au()->node());
         manager->disconnect(this->route->node());
         manager->disconnect(this->sine_tap->node());
-        manager->disconnect(this->manager->io()->node());
+        manager->disconnect(this->manager->io().value()->node());
     }
 
     void connect_nodes() {
-        auto const device = std::dynamic_pointer_cast<audio::avf_device>(this->manager->io()->device().value());
+        auto const device = std::dynamic_pointer_cast<audio::avf_device>(this->manager->io().value()->device().value());
         auto const format = audio::format({.sample_rate = device->sample_rate(), .channel_count = 2});
 
-        manager->connect(au_mixer->au().node(), this->manager->io()->node(), format);
-        manager->connect(route->node(), au_mixer->au().node(), format);
+        manager->connect(au_mixer->au()->node(), this->manager->io().value()->node(), format);
+        manager->connect(route->node(), au_mixer->au()->node(), format);
         manager->connect(sine_tap->node(), route->node(), 0, YASAudioEngineRouteSampleSourceIndexSine, format);
-        manager->connect(this->manager->io()->node(), route->node(), 0, YASAudioEngineRouteSampleSourceIndexInput,
-                         format);
+        manager->connect(this->manager->io().value()->node(), route->node(), 0,
+                         YASAudioEngineRouteSampleSourceIndexInput, format);
     }
 };
 }
@@ -260,7 +260,7 @@ struct route_vc_internal {
     auto unowned_self = objc_ptr_with_move_object([[YASUnownedObject alloc] initWithObject:self]);
 
     _internal.engine_observer =
-        _internal.manager->chain(audio::engine::manager::method::configuration_change)
+        _internal.manager->chain()
             .perform([unowned_self](auto const &) {
                 if ([UIApplication sharedApplication].applicationState == UIApplicationStateActive) {
                     [[unowned_self.object() object] _updateEngine];
