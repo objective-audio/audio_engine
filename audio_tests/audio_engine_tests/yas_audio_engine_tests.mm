@@ -82,12 +82,15 @@ using namespace yas;
 - (void)test_configuration_change_notification {
     auto manager = audio::engine::manager::make_shared();
 
+    manager->add_io();
+
     XCTestExpectation *expectation = [self expectationWithDescription:@"configuration change"];
 
     auto chain = manager->chain().perform([expectation](auto const &) { [expectation fulfill]; }).end();
 
 #if TARGET_OS_IPHONE
-    [[NSNotificationCenter defaultCenter] postNotificationName:AVAudioSessionRouteChangeNotification object:nil];
+    [[NSNotificationCenter defaultCenter] postNotificationName:AVAudioSessionRouteChangeNotification
+                                                        object:AVAudioSession.sharedInstance];
 #elif TARGET_OS_MAC
     audio::mac_device::system_notifier()->notify(
         std::make_pair(audio::mac_device::system_method::configuration_change,
