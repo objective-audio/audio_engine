@@ -42,6 +42,12 @@ audio::engine::io::~io() = default;
 
 void audio::engine::io::set_device(std::optional<audio::io_device_ptr> const &device) {
     this->_core->set_device(device);
+
+    if (device) {
+        this->_io_observer = device.value()->io_device_chain().send_to(this->_notifier).end();
+    } else {
+        this->_io_observer = nullptr;
+    }
 }
 
 std::optional<audio::io_device_ptr> const &audio::engine::io::device() const {
@@ -62,6 +68,10 @@ void audio::engine::io::remove_raw_io() {
 
 audio::io_ptr const &audio::engine::io::raw_io() {
     return this->_core->_io;
+}
+
+chaining::chain_unsync_t<audio::io_device::method> audio::engine::io::io_device_chain() {
+    return this->_notifier->chain();
 }
 
 void audio::engine::io::_prepare(io_ptr const &shared) {
