@@ -112,7 +112,7 @@ void audio::avf_device::_prepare(avf_device_ptr const &shared) {
 
 audio::avf_device_ptr audio::avf_device::make_shared() {
     auto shared = std::shared_ptr<avf_device>(new avf_device{});
-    shared->_weak_device = shared;
+    shared->_prepare(shared);
     return shared;
 }
 
