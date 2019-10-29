@@ -46,9 +46,6 @@ struct mac_io_core final : io_core {
     uint32_t __maximum_frames = 4096;
     io_kernel_ptr __kernel = nullptr;
 
-    chaining::notifier_ptr<audio::io_core::method> _notifier =
-        chaining::notifier<audio::io_core::method>::make_shared();
-
     mac_io_core(mac_device_ptr const &);
 
     void _prepare(mac_io_core_ptr const &shared);

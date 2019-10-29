@@ -130,25 +130,6 @@ std::optional<audio::time_ptr> const &audio::mac_io_core::input_time_on_render()
 void audio::mac_io_core::_prepare(mac_io_core_ptr const &shared) {
     auto weak_io_core = to_weak(shared);
     this->_weak_io_core = weak_io_core;
-
-    this->_device_observer = this->_device->chain(mac_device::method::device_did_change)
-                                 .perform([weak_io_core](auto const &) {
-                                     if (auto io_core = weak_io_core.lock()) {
-                                         io_core->_notifier->notify(method::updated);
-                                     }
-                                 })
-                                 .end();
-
-    this->_device_system_observer =
-        mac_device::system_chain(mac_device::system_method::hardware_did_change)
-            .perform([weak_io_core, audio_device_id = this->_device->audio_device_id()](auto const &) {
-                if (auto io_core = weak_io_core.lock()) {
-                    if (!mac_device::device_for_id(audio_device_id)) {
-                        io_core->_notifier->notify(method::lost);
-                    }
-                }
-            })
-            .end();
 }
 
 audio::io_render_f audio::mac_io_core::_render_handler() const {
