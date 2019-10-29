@@ -170,17 +170,17 @@ struct offline_vc_internal {
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-
-    self.volume = 0.5;
-    self.frequency = 1000.0;
-    self.length = 1.0;
-    self.playing = NO;
 }
 
 - (void)viewDidAppear {
     [super viewDidAppear];
 
     self->_internal = std::make_optional<sample::offline_vc_internal>();
+
+    self.volume = 0.5;
+    self.frequency = 1000.0;
+    self.length = 1.0;
+    self.playing = NO;
 
     if (_internal->play_manager && !_internal->play_manager->start_render()) {
         NSLog(@"%s error", __PRETTY_FUNCTION__);
@@ -200,7 +200,10 @@ struct offline_vc_internal {
 }
 
 - (float)volume {
-    return _internal->play_au_mixer->input_volume(0);
+    if (_internal) {
+        return _internal->play_au_mixer->input_volume(0);
+    }
+    return 0.0;
 }
 
 - (void)setFrequency:(float)frequency {
@@ -208,7 +211,10 @@ struct offline_vc_internal {
 }
 
 - (float)frequency {
-    return _internal->play_sine->frequency();
+    if (_internal) {
+        return _internal->play_sine->frequency();
+    }
+    return 0.0;
 }
 
 - (void)setPlaying:(BOOL)playing {
@@ -216,7 +222,10 @@ struct offline_vc_internal {
 }
 
 - (BOOL)playing {
-    return _internal->play_sine->is_playing();
+    if (_internal) {
+        return _internal->play_sine->is_playing();
+    }
+    return NO;
 }
 
 - (IBAction)playButtonTapped:(id)sender {
