@@ -40,7 +40,7 @@ void audio::avf_io_core::initialize() {
                                     channels:output_format->channel_count()]);
 
         [engine.object() connect:this->_impl->_source_node.object()
-                              to:this->_impl->_avf_engine.object().mainMixerNode
+                              to:this->_impl->_avf_engine.object().outputNode
                           format:objc_output_format.object()];
     }
 
