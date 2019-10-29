@@ -165,7 +165,7 @@ struct offline_vc_internal {
 }
 
 @implementation YASAudioOfflineSampleViewController {
-    sample::offline_vc_internal _internal;
+    std::optional<sample::offline_vc_internal> _internal;
 }
 
 - (void)viewDidLoad {
@@ -180,7 +180,9 @@ struct offline_vc_internal {
 - (void)viewDidAppear {
     [super viewDidAppear];
 
-    if (_internal.play_manager && !_internal.play_manager->start_render()) {
+    self->_internal = std::make_optional<sample::offline_vc_internal>();
+
+    if (_internal->play_manager && !_internal->play_manager->start_render()) {
         NSLog(@"%s error", __PRETTY_FUNCTION__);
     }
 }
@@ -188,31 +190,33 @@ struct offline_vc_internal {
 - (void)viewWillDisappear {
     [super viewWillDisappear];
 
-    _internal.play_manager->stop();
+    _internal->play_manager->stop();
+
+    self->_internal = std::nullopt;
 }
 
 - (void)setVolume:(float)volume {
-    _internal.play_au_mixer->set_input_volume(volume, 0);
+    _internal->play_au_mixer->set_input_volume(volume, 0);
 }
 
 - (float)volume {
-    return _internal.play_au_mixer->input_volume(0);
+    return _internal->play_au_mixer->input_volume(0);
 }
 
 - (void)setFrequency:(float)frequency {
-    _internal.play_sine->set_frequency(frequency);
+    _internal->play_sine->set_frequency(frequency);
 }
 
 - (float)frequency {
-    return _internal.play_sine->frequency();
+    return _internal->play_sine->frequency();
 }
 
 - (void)setPlaying:(BOOL)playing {
-    _internal.play_sine->set_playing(playing);
+    _internal->play_sine->set_playing(playing);
 }
 
 - (BOOL)playing {
-    return _internal.play_sine->is_playing();
+    return _internal->play_sine->is_playing();
 }
 
 - (IBAction)playButtonTapped:(id)sender {
@@ -248,9 +252,9 @@ struct offline_vc_internal {
         return;
     }
 
-    _internal.offline_sine->set_frequency(_internal.play_sine->frequency());
-    _internal.offline_sine->set_playing(true);
-    _internal.offline_au_mixer->set_input_volume(self.volume, 0);
+    _internal->offline_sine->set_frequency(_internal->play_sine->frequency());
+    _internal->offline_sine->set_playing(true);
+    _internal->offline_au_mixer->set_input_volume(self.volume, 0);
 
     self.processing = YES;
 
@@ -260,7 +264,7 @@ struct offline_vc_internal {
         objc_ptr_with_move_object([[YASUnownedObject<YASAudioOfflineSampleViewController *> alloc] init]);
     [unowned_self.object() setObject:self];
 
-    auto start_result = _internal.offline_manager->start_offline_render(
+    auto start_result = _internal->offline_manager->start_offline_render(
         [remain, file_writer = std::move(file_writer)](auto args) mutable {
             auto &buffer = args.buffer;
 
