@@ -93,7 +93,7 @@ using namespace yas;
                                                         object:AVAudioSession.sharedInstance];
 #elif TARGET_OS_MAC
     audio::mac_device::system_notifier()->notify(
-        std::make_pair(audio::mac_device::system_method::configuration_change,
+        std::make_pair(audio::mac_device::system_method::hardware_did_change,
                        audio::mac_device::change_info{std::vector<audio::mac_device::property_info>{}}));
 #endif
 
