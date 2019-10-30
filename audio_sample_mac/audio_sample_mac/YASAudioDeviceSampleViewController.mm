@@ -196,9 +196,7 @@ struct device_vc_internal {
 }
 
 - (void)setDevice:(std::optional<audio::mac_device_ptr> const &)selected_device {
-    if (auto prev_audio_device = _internal.io->device()) {
-        _internal.device_observer = nullptr;
-    }
+    _internal.device_observer = nullptr;
 
     auto all_devices = audio::mac_device::all_devices();
 

@@ -34,6 +34,7 @@ using au_ptr = std::shared_ptr<au>;
 using connection_ptr = std::shared_ptr<connection>;
 using kernel_ptr = std::shared_ptr<kernel>;
 using manager_ptr = std::shared_ptr<manager>;
+using manager_wptr = std::weak_ptr<manager>;
 using node_ptr = std::shared_ptr<node>;
 using offline_output_ptr = std::shared_ptr<offline_output>;
 using route_ptr = std::shared_ptr<route>;

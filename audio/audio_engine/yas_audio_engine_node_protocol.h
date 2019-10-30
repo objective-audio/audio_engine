@@ -37,7 +37,7 @@ struct manageable_node {
     virtual audio::engine::connection_ptr output_connection(uint32_t const bus_idx) const = 0;
     virtual audio::engine::connection_wmap const &input_connections() const = 0;
     virtual audio::engine::connection_wmap const &output_connections() const = 0;
-    virtual void set_manager(audio::engine::manager_ptr const &) = 0;
+    virtual void set_manager(audio::engine::manager_wptr const &) = 0;
     virtual audio::engine::manager_ptr manager() const = 0;
     virtual void update_kernel() = 0;
     virtual void update_connections() = 0;

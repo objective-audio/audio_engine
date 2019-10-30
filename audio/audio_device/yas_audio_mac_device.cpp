@@ -246,24 +246,26 @@ std::optional<audio::mac_device_ptr> audio::mac_device::default_system_output_de
 }
 
 std::optional<audio::mac_device_ptr> audio::mac_device::default_output_device() {
+    /*
     if (auto const data = _property_data<AudioDeviceID>(
             kAudioObjectSystemObject, kAudioHardwarePropertyDefaultOutputDevice, kAudioObjectPropertyScopeGlobal)) {
         auto iterator = mac_device_global::all_devices_map().find(*data->data());
         if (iterator != mac_device_global::all_devices_map().end()) {
             return iterator->second;
         }
-    }
+    }*/
     return std::nullopt;
 }
 
 std::optional<audio::mac_device_ptr> audio::mac_device::default_input_device() {
+    /*
     if (auto const data = _property_data<AudioDeviceID>(
             kAudioObjectSystemObject, kAudioHardwarePropertyDefaultInputDevice, kAudioObjectPropertyScopeGlobal)) {
         auto iterator = mac_device_global::all_devices_map().find(*data->data());
         if (iterator != mac_device_global::all_devices_map().end()) {
             return iterator->second;
         }
-    }
+    }*/
     return std::nullopt;
 }
 
@@ -311,6 +313,14 @@ audio::mac_device::mac_device(AudioDeviceID const device_id)
 
 void audio::mac_device::_prepare(mac_device_ptr const &mac_device) {
     this->_weak_mac_device = mac_device;
+
+    this->_io_pool +=
+        this->_notifier->chain().to_value(io_device::method::updated).send_to(this->_io_device_notifier).end();
+    this->_io_pool += _system_notifier->chain()
+                          .guard([](auto const &pair) { return pair.first == system_method::hardware_did_change; })
+                          .to_value(io_device::method::lost)
+                          .send_to(this->_io_device_notifier)
+                          .end();
 }
 
 AudioDeviceID audio::mac_device::audio_device_id() const {
@@ -407,6 +417,10 @@ audio::mac_device::system_chain(system_method const method) {
     return audio::_system_notifier->chain()
         .guard([method](chaining_system_pair_t const &pair) { return pair.first == method; })
         .to([](chaining_system_pair_t const &pair) { return pair.second; });
+}
+
+chaining::chain_unsync_t<audio::io_device::method> audio::mac_device::io_device_chain() {
+    return this->_io_device_notifier->chain();
 }
 
 audio::mac_device::listener_f audio::mac_device::_listener() {

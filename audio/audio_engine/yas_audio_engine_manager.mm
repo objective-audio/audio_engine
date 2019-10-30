@@ -21,63 +21,9 @@
 
 using namespace yas;
 
-#pragma mark - audio::engine::manager::impl
-
-struct audio::engine::manager::impl {
-    std::weak_ptr<manager> _weak_manager;
-
-    ~impl() {
-#if TARGET_OS_IPHONE
-        if (this->_reset_observer) {
-            [[NSNotificationCenter defaultCenter] removeObserver:this->_reset_observer.object()];
-        }
-        if (this->_route_change_observer) {
-            [[NSNotificationCenter defaultCenter] removeObserver:this->_route_change_observer.object()];
-        }
-#endif
-    }
-
-    void prepare(std::weak_ptr<engine::manager> &weak_manager) {
-        this->_weak_manager = weak_manager;
-
-#if TARGET_OS_IPHONE
-        auto reset_lambda = [weak_manager](NSNotification *note) {
-            if (auto engine = weak_manager.lock()) {
-                engine->_reload_graph();
-            }
-        };
-
-        id reset_observer =
-            [[NSNotificationCenter defaultCenter] addObserverForName:AVAudioSessionMediaServicesWereResetNotification
-                                                              object:nil
-                                                               queue:[NSOperationQueue mainQueue]
-                                                          usingBlock:reset_lambda];
-        this->_reset_observer.set_object(reset_observer);
-
-        auto route_change_lambda = [weak_manager](NSNotification *note) {
-            if (auto engine = weak_manager.lock()) {
-                engine->_post_configuration_change();
-            }
-        };
-
-        id route_change_observer =
-            [[NSNotificationCenter defaultCenter] addObserverForName:AVAudioSessionRouteChangeNotification
-                                                              object:nil
-                                                               queue:[NSOperationQueue mainQueue]
-                                                          usingBlock:route_change_lambda];
-        this->_route_change_observer.set_object(route_change_observer);
-#endif
-    }
-
-   private:
-    objc_ptr<id> _reset_observer;
-    objc_ptr<id> _route_change_observer;
-};
-
 #pragma mark - audio::engine::manager
 
-audio::engine::manager::manager() : _impl(std::make_unique<impl>()) {
-}
+audio::engine::manager::manager() = default;
 
 audio::engine::manager::~manager() = default;
 
@@ -283,15 +229,8 @@ void audio::engine::manager::stop() {
     }
 }
 
-chaining::chain_unsync_t<audio::engine::manager::chaining_pair_t> audio::engine::manager::chain() const {
+chaining::chain_unsync_t<audio::engine::manager::method> audio::engine::manager::chain() const {
     return this->_notifier->chain();
-}
-
-chaining::chain_relayed_unsync_t<audio::engine::manager_ptr, audio::engine::manager::chaining_pair_t>
-audio::engine::manager::chain(method const method) const {
-    return this->_notifier->chain()
-        .guard([method](auto const &pair) { return pair.first == method; })
-        .to([](chaining_pair_t const &pair) { return pair.second; });
 }
 
 std::unordered_set<audio::engine::node_ptr> const &audio::engine::manager::nodes() const {
@@ -302,24 +241,12 @@ audio::engine::connection_set const &audio::engine::manager::connections() const
     return this->_connections;
 }
 
-chaining::notifier_ptr<audio::engine::manager::chaining_pair_t> &audio::engine::manager::notifier() {
+chaining::notifier_ptr<audio::engine::manager::method> &audio::engine::manager::notifier() {
     return this->_notifier;
 }
 
 void audio::engine::manager::_prepare(manager_ptr const &shared) {
-    auto weak_manager = to_weak(shared);
-
-    this->_impl->prepare(weak_manager);
-
-#if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
-    this->_device_system_observer = mac_device::system_chain(mac_device::system_method::configuration_change)
-                                        .perform([weak_manager](auto const &) {
-                                            if (auto engine = weak_manager.lock()) {
-                                                engine->_post_configuration_change();
-                                            }
-                                        })
-                                        .end();
-#endif
+    this->_weak_manager = shared;
 }
 
 bool audio::engine::manager::_node_exists(audio::engine::node_ptr const &node) {
@@ -333,7 +260,7 @@ void audio::engine::manager::_attach_node(audio::engine::node_ptr const &node) {
 
     this->_nodes.insert(node);
 
-    manageable_node::cast(node)->set_manager(this->_impl->_weak_manager.lock());
+    manageable_node::cast(node)->set_manager(this->_weak_manager);
 
     this->_add_node_to_graph(node);
 }
@@ -349,7 +276,7 @@ void audio::engine::manager::_detach_node(audio::engine::node_ptr const &node) {
 
     this->_remove_node_from_graph(node);
 
-    manageable_node::cast(node)->set_manager(nullptr);
+    manageable_node::cast(node)->set_manager(manager_ptr{nullptr});
 
     this->_nodes.erase(node);
 }
@@ -521,7 +448,12 @@ void audio::engine::manager::_set_io(std::optional<audio::engine::io_ptr> const 
             manageable->add_raw_io();
             this->_graph.value()->add_io(manageable->raw_io());
         }
+
+        this->_io_observer =
+            io.value()->io_device_chain().to_value(method::configuration_change).send_to(this->_notifier).end();
     } else {
+        this->_io_observer = nullptr;
+
         if (this->_io) {
             auto const &io = this->_io.value();
 
@@ -535,10 +467,6 @@ void audio::engine::manager::_set_io(std::optional<audio::engine::io_ptr> const 
             this->_io = std::nullopt;
         }
     }
-}
-
-void audio::engine::manager::_post_configuration_change() {
-    this->_notifier->notify(std::make_pair(method::configuration_change, this->_impl->_weak_manager.lock()));
 }
 
 audio::engine::manager_ptr audio::engine::manager::make_shared() {

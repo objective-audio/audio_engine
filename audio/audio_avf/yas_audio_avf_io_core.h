@@ -30,8 +30,6 @@ struct avf_io_core final : io_core {
     [[nodiscard]] std::optional<pcm_buffer_ptr> const &input_buffer_on_render() const override;
     [[nodiscard]] std::optional<time_ptr> const &input_time_on_render() const override;
 
-    [[nodiscard]] chaining::chain_unsync_t<io_core::method> chain() override;
-
     static avf_io_core_ptr make_shared(avf_device_ptr const &);
 
    private:
@@ -48,9 +46,6 @@ struct avf_io_core final : io_core {
     io_render_f __render_handler = nullptr;
     uint32_t __maximum_frames = 4096;
     io_kernel_ptr __kernel = nullptr;
-
-    chaining::notifier_ptr<audio::io_core::method> _notifier =
-        chaining::notifier<audio::io_core::method>::make_shared();
 
     avf_io_core(avf_device_ptr const &);
 

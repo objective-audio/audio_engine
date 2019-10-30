@@ -17,15 +17,7 @@ struct audio::avf_io_core::impl {
     objc_ptr<AVAudioSourceNode *> _source_node;
     objc_ptr<AVAudioSinkNode *> _sink_node;
 
-    std::vector<objc_ptr<id<NSObject>>> _observers;
-
     impl() : _avf_engine(objc_ptr_with_move_object([[AVAudioEngine alloc] init])) {
-    }
-
-    ~impl() {
-        for (auto const &observer : this->_observers) {
-            [NSNotificationCenter.defaultCenter removeObserver:observer.object()];
-        }
     }
 };
 
@@ -48,7 +40,7 @@ void audio::avf_io_core::initialize() {
                                     channels:output_format->channel_count()]);
 
         [engine.object() connect:this->_impl->_source_node.object()
-                              to:this->_impl->_avf_engine.object().mainMixerNode
+                              to:this->_impl->_avf_engine.object().outputNode
                           format:objc_output_format.object()];
     }
 
@@ -107,10 +99,6 @@ std::optional<audio::pcm_buffer_ptr> const &audio::avf_io_core::input_buffer_on_
 
 std::optional<audio::time_ptr> const &audio::avf_io_core::input_time_on_render() const {
     return this->_input_time_on_render;
-}
-
-chaining::chain_unsync_t<audio::io_core::method> audio::avf_io_core::chain() {
-    return this->_notifier->chain();
 }
 
 void audio::avf_io_core::_prepare(avf_io_core_ptr const &shared) {
@@ -182,41 +170,6 @@ void audio::avf_io_core::_prepare(avf_io_core_ptr const &shared) {
 
     impl->_source_node = source_node;
     impl->_sink_node = sink_node;
-
-    auto route_change_observer = objc_ptr<id<NSObject>>([weak_io_core] {
-        return [NSNotificationCenter.defaultCenter addObserverForName:AVAudioSessionRouteChangeNotification
-                                                               object:AVAudioSession.sharedInstance
-                                                                queue:NSOperationQueue.mainQueue
-                                                           usingBlock:[weak_io_core](NSNotification *note) {
-                                                               if (auto const io_core = weak_io_core.lock()) {
-                                                                   io_core->_notifier->notify(method::updated);
-                                                               }
-                                                           }];
-    });
-
-    auto lost_observer = objc_ptr<id<NSObject>>([weak_io_core] {
-        return [NSNotificationCenter.defaultCenter addObserverForName:AVAudioSessionMediaServicesWereLostNotification
-                                                               object:AVAudioSession.sharedInstance
-                                                                queue:NSOperationQueue.mainQueue
-                                                           usingBlock:[weak_io_core](NSNotification *note) {
-                                                               if (auto const io_core = weak_io_core.lock()) {
-                                                                   io_core->_notifier->notify(method::lost);
-                                                               }
-                                                           }];
-    });
-
-    auto reset_observer = objc_ptr<id<NSObject>>([weak_io_core] {
-        return [NSNotificationCenter.defaultCenter addObserverForName:AVAudioSessionMediaServicesWereResetNotification
-                                                               object:AVAudioSession.sharedInstance
-                                                                queue:NSOperationQueue.mainQueue
-                                                           usingBlock:[weak_io_core](NSNotification *note) {
-                                                               if (auto const io_core = weak_io_core.lock()) {
-                                                                   io_core->_notifier->notify(method::lost);
-                                                               }
-                                                           }];
-    });
-
-    this->_impl->_observers = {route_change_observer, lost_observer, reset_observer};
 }
 
 audio::io_render_f audio::avf_io_core::_render_handler() const {

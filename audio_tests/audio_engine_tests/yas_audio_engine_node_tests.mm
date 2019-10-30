@@ -131,7 +131,7 @@ using namespace yas;
 
     XCTAssertEqual(manager, node->manager());
 
-    audio::engine::manageable_node::cast(node)->set_manager(nullptr);
+    audio::engine::manageable_node::cast(node)->set_manager(audio::engine::manager_ptr{nullptr});
 }
 
 - (void)test_kernel {

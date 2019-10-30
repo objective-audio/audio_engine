@@ -16,6 +16,12 @@ std::optional<audio::io_device_ptr> audio::io_device::default_device() {
 #if TARGET_OS_IPHONE
     return avf_device::make_shared();
 #elif TARGET_OS_MAC
-    return mac_device::default_output_device();
+    if (auto const output_device = mac_device::default_output_device()) {
+        return output_device;
+    } else if (auto const input_device = mac_device::default_input_device()) {
+        return input_device;
+    } else {
+        return std::nullopt;
+    }
 #endif
 }

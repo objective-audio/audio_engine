@@ -46,14 +46,15 @@ void audio::io::set_device(std::optional<io_device_ptr> const &device) {
             io_core->set_render_handler(this->_render_handler);
             io_core->set_maximum_frames_per_slice(this->_maximum_frames);
 
-            this->_observer = io_core->chain()
+            this->_observer = device.value()
+                                  ->io_device_chain()
                                   .perform([weak_io = this->_weak_io](auto const &method) {
                                       if (auto const io = weak_io.lock()) {
                                           switch (method) {
-                                              case io_core::method::updated:
+                                              case io_device::method::updated:
                                                   io->_reload();
                                                   break;
-                                              case io_core::method::lost:
+                                              case io_device::method::lost:
                                                   io->_uninitialize();
                                                   break;
                                           }
