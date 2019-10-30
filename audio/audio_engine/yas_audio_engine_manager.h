@@ -101,7 +101,6 @@ struct manager final {
     engine::connection_set _input_connections_for_destination_node(engine::node_ptr const &node);
     engine::connection_set _output_connections_for_source_node(engine::node_ptr const &node);
     void _reload_graph();
-    void _post_configuration_change();
 
     std::optional<io_ptr> _io = std::nullopt;
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)

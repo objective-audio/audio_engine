@@ -471,10 +471,6 @@ void audio::engine::manager::_set_io(std::optional<audio::engine::io_ptr> const 
     }
 }
 
-void audio::engine::manager::_post_configuration_change() {
-    this->_notifier->notify(method::configuration_change);
-}
-
 audio::engine::manager_ptr audio::engine::manager::make_shared() {
     auto shared = manager_ptr(new manager{});
     shared->_prepare(shared);
