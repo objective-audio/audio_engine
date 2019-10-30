@@ -246,24 +246,26 @@ std::optional<audio::mac_device_ptr> audio::mac_device::default_system_output_de
 }
 
 std::optional<audio::mac_device_ptr> audio::mac_device::default_output_device() {
+    /*
     if (auto const data = _property_data<AudioDeviceID>(
             kAudioObjectSystemObject, kAudioHardwarePropertyDefaultOutputDevice, kAudioObjectPropertyScopeGlobal)) {
         auto iterator = mac_device_global::all_devices_map().find(*data->data());
         if (iterator != mac_device_global::all_devices_map().end()) {
             return iterator->second;
         }
-    }
+    }*/
     return std::nullopt;
 }
 
 std::optional<audio::mac_device_ptr> audio::mac_device::default_input_device() {
+    /*
     if (auto const data = _property_data<AudioDeviceID>(
             kAudioObjectSystemObject, kAudioHardwarePropertyDefaultInputDevice, kAudioObjectPropertyScopeGlobal)) {
         auto iterator = mac_device_global::all_devices_map().find(*data->data());
         if (iterator != mac_device_global::all_devices_map().end()) {
             return iterator->second;
         }
-    }
+    }*/
     return std::nullopt;
 }
 

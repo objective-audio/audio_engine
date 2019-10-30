@@ -9,8 +9,6 @@
 
 namespace yas::audio {
 struct io_core {
-    enum class method { lost, updated };
-
     virtual ~io_core() = default;
 
     virtual void initialize() = 0;
