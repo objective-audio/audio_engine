@@ -55,7 +55,7 @@ struct manager final {
     remove_result_t remove_offline_output();
     std::optional<offline_output_ptr> const &offline_output() const;
 
-    add_result_t add_io();
+    io_ptr const &add_io();
     remove_result_t remove_io();
     std::optional<io_ptr> const &io() const;
 

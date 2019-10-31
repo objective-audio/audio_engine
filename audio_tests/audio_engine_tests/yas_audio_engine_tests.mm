@@ -198,13 +198,11 @@ struct test_io_device : io_device {
 
     XCTAssertFalse(manager->io());
 
-    XCTAssertTrue(manager->add_io());
+    auto const &io = manager->add_io();
 
-    auto add_result = manager->add_io();
-    XCTAssertFalse(add_result);
-    XCTAssertEqual(add_result.error(), audio::engine::manager::add_error_t::already_added);
-
+    XCTAssertTrue(io);
     XCTAssertTrue(manager->io());
+    XCTAssertTrue(manager->io() == io);
 
     XCTAssertTrue(manager->remove_io());
 
