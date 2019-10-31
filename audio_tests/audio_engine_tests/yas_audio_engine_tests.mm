@@ -191,8 +191,6 @@ struct test_io_device : io_device {
     XCTAssertFalse(manager->offline_output());
 }
 
-#if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
-
 - (void)test_add_and_remove_io {
     auto manager = audio::engine::manager::make_shared();
 
@@ -212,8 +210,6 @@ struct test_io_device : io_device {
 
     XCTAssertFalse(manager->io());
 }
-
-#endif
 
 - (void)test_method_to_string {
     XCTAssertEqual(to_string(audio::engine::manager::method::configuration_change), "configuration_change");
