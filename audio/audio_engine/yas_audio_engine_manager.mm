@@ -124,12 +124,9 @@ audio::engine::offline_output_ptr const &audio::engine::manager::add_offline_out
     return this->_offline_output.value();
 }
 
-audio::engine::manager::remove_result_t audio::engine::manager::remove_offline_output() {
+void audio::engine::manager::remove_offline_output() {
     if (this->_offline_output) {
         this->_offline_output = std::nullopt;
-        return remove_result_t{nullptr};
-    } else {
-        return remove_result_t{remove_error_t::already_removed};
     }
 }
 
@@ -147,12 +144,9 @@ audio::engine::io_ptr const &audio::engine::manager::add_io() {
     return this->_io.value();
 }
 
-audio::engine::manager::remove_result_t audio::engine::manager::remove_io() {
+void audio::engine::manager::remove_io() {
     if (this->_io) {
         this->_set_io(std::nullopt);
-        return remove_result_t{nullptr};
-    } else {
-        return remove_result_t{remove_error_t::already_removed};
     }
 }
 
