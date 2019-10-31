@@ -181,13 +181,11 @@ struct test_io_device : io_device {
     XCTAssertTrue(manager->offline_output() == output);
     XCTAssertTrue(manager->offline_output().value() == output);
 
-    XCTAssertTrue(manager->remove_offline_output());
-
-    auto remove_result = manager->remove_offline_output();
-    XCTAssertFalse(remove_result);
-    XCTAssertEqual(remove_result.error(), audio::engine::manager::remove_error_t::already_removed);
+    XCTAssertNoThrow(manager->remove_offline_output());
 
     XCTAssertFalse(manager->offline_output());
+
+    XCTAssertNoThrow(manager->remove_offline_output());
 }
 
 - (void)test_add_and_remove_io {
@@ -201,13 +199,11 @@ struct test_io_device : io_device {
     XCTAssertTrue(manager->io());
     XCTAssertTrue(manager->io() == io);
 
-    XCTAssertTrue(manager->remove_io());
-
-    auto remove_result = manager->remove_io();
-    XCTAssertFalse(remove_result);
-    XCTAssertEqual(remove_result.error(), audio::engine::manager::remove_error_t::already_removed);
+    XCTAssertNoThrow(manager->remove_io());
 
     XCTAssertFalse(manager->io());
+
+    XCTAssertNoThrow(manager->remove_io());
 }
 
 - (void)test_method_to_string {
