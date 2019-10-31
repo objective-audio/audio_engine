@@ -51,7 +51,7 @@ struct manager final {
     void disconnect_output(engine::node_ptr const &);
     void disconnect_output(engine::node_ptr const &, uint32_t const bus_idx);
 
-    add_result_t add_offline_output();
+    offline_output_ptr const &add_offline_output();
     remove_result_t remove_offline_output();
     std::optional<offline_output_ptr> const &offline_output() const;
 

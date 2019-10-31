@@ -174,13 +174,12 @@ struct test_io_device : io_device {
 
     XCTAssertFalse(manager->offline_output());
 
-    XCTAssertTrue(manager->add_offline_output());
+    auto const &output = manager->add_offline_output();
 
-    auto add_result = manager->add_offline_output();
-    XCTAssertFalse(add_result);
-    XCTAssertEqual(add_result.error(), audio::engine::manager::add_error_t::already_added);
-
+    XCTAssertTrue(output);
     XCTAssertTrue(manager->offline_output());
+    XCTAssertTrue(manager->offline_output() == output);
+    XCTAssertTrue(manager->offline_output().value() == output);
 
     XCTAssertTrue(manager->remove_offline_output());
 
