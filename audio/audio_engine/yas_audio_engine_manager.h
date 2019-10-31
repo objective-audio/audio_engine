@@ -29,12 +29,7 @@ struct manager final {
         offline_output_starting_failure,
     };
 
-    enum class add_error_t { already_added };
-    enum class remove_error_t { already_removed };
-
     using start_result_t = result<std::nullptr_t, start_error_t>;
-    using add_result_t = result<std::nullptr_t, add_error_t>;
-    using remove_result_t = result<std::nullptr_t, remove_error_t>;
 
     virtual ~manager();
 
@@ -51,12 +46,12 @@ struct manager final {
     void disconnect_output(engine::node_ptr const &);
     void disconnect_output(engine::node_ptr const &, uint32_t const bus_idx);
 
-    add_result_t add_offline_output();
-    remove_result_t remove_offline_output();
+    offline_output_ptr const &add_offline_output();
+    void remove_offline_output();
     std::optional<offline_output_ptr> const &offline_output() const;
 
-    add_result_t add_io();
-    remove_result_t remove_io();
+    io_ptr const &add_io();
+    void remove_io();
     std::optional<io_ptr> const &io() const;
 
     start_result_t start_render();

@@ -174,48 +174,37 @@ struct test_io_device : io_device {
 
     XCTAssertFalse(manager->offline_output());
 
-    XCTAssertTrue(manager->add_offline_output());
+    auto const &output = manager->add_offline_output();
 
-    auto add_result = manager->add_offline_output();
-    XCTAssertFalse(add_result);
-    XCTAssertEqual(add_result.error(), audio::engine::manager::add_error_t::already_added);
-
+    XCTAssertTrue(output);
     XCTAssertTrue(manager->offline_output());
+    XCTAssertTrue(manager->offline_output() == output);
+    XCTAssertTrue(manager->offline_output().value() == output);
 
-    XCTAssertTrue(manager->remove_offline_output());
-
-    auto remove_result = manager->remove_offline_output();
-    XCTAssertFalse(remove_result);
-    XCTAssertEqual(remove_result.error(), audio::engine::manager::remove_error_t::already_removed);
+    XCTAssertNoThrow(manager->remove_offline_output());
 
     XCTAssertFalse(manager->offline_output());
-}
 
-#if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
+    XCTAssertNoThrow(manager->remove_offline_output());
+}
 
 - (void)test_add_and_remove_io {
     auto manager = audio::engine::manager::make_shared();
 
     XCTAssertFalse(manager->io());
 
-    XCTAssertTrue(manager->add_io());
+    auto const &io = manager->add_io();
 
-    auto add_result = manager->add_io();
-    XCTAssertFalse(add_result);
-    XCTAssertEqual(add_result.error(), audio::engine::manager::add_error_t::already_added);
-
+    XCTAssertTrue(io);
     XCTAssertTrue(manager->io());
+    XCTAssertTrue(manager->io() == io);
 
-    XCTAssertTrue(manager->remove_io());
-
-    auto remove_result = manager->remove_io();
-    XCTAssertFalse(remove_result);
-    XCTAssertEqual(remove_result.error(), audio::engine::manager::remove_error_t::already_removed);
+    XCTAssertNoThrow(manager->remove_io());
 
     XCTAssertFalse(manager->io());
-}
 
-#endif
+    XCTAssertNoThrow(manager->remove_io());
+}
 
 - (void)test_method_to_string {
     XCTAssertEqual(to_string(audio::engine::manager::method::configuration_change), "configuration_change");
