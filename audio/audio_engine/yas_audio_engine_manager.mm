@@ -292,8 +292,8 @@ bool audio::engine::manager::_prepare_graph() {
 
     if (auto const &engine_io = this->_io) {
         auto manageable = engine::manageable_io::cast(engine_io.value());
-        manageable->add_raw_io();
-        graph->add_io(manageable->raw_io());
+        auto const &raw_io = manageable->add_raw_io();
+        graph->add_io(raw_io);
     }
 
     for (auto &node : this->_nodes) {
@@ -418,7 +418,7 @@ void audio::engine::manager::_reload_graph() {
             this->_remove_node_from_graph(node);
         }
 
-        this->_graph = nullptr;
+        this->_graph = std::nullopt;
 
         if (!this->_prepare_graph()) {
             return;
@@ -436,21 +436,21 @@ void audio::engine::manager::_set_io(std::optional<audio::engine::io_ptr> const 
 
         if (this->_graph) {
             auto manageable = engine::manageable_io::cast(io.value());
-            manageable->add_raw_io();
-            this->_graph.value()->add_io(manageable->raw_io());
+            auto const &raw_io = manageable->add_raw_io();
+            this->_graph.value()->add_io(raw_io);
         }
 
         this->_io_observer =
             io.value()->io_device_chain().to_value(method::configuration_change).send_to(this->_notifier).end();
     } else {
-        this->_io_observer = nullptr;
+        this->_io_observer = std::nullopt;
 
         if (this->_io) {
             auto const &io = this->_io.value();
 
             if (this->_graph) {
                 if (auto &raw_io = engine::manageable_io::cast(io)->raw_io()) {
-                    this->_graph.value()->remove_io(raw_io);
+                    this->_graph.value()->remove_io(raw_io.value());
                 }
             }
 

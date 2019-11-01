@@ -22,7 +22,7 @@ struct offline_output : manageable_offline_output {
     std::weak_ptr<offline_output> _weak_offline_output;
     std::optional<task_queue> _queue = std::nullopt;
     node_ptr _node;
-    chaining::any_observer_ptr _reset_observer = nullptr;
+    std::optional<chaining::any_observer_ptr> _reset_observer = std::nullopt;
     struct core;
     std::unique_ptr<core> _core;
 

@@ -21,7 +21,7 @@ struct avf_io_core final : io_core {
     void initialize() override;
     void uninitialize() override;
 
-    void set_render_handler(io_render_f) override;
+    void set_render_handler(std::optional<io_render_f>) override;
     void set_maximum_frames_per_slice(uint32_t const) override;
 
     bool start() override;
@@ -43,17 +43,17 @@ struct avf_io_core final : io_core {
     std::optional<time_ptr> _input_time_on_render = std::nullopt;
 
     mutable std::recursive_mutex _mutex;
-    io_render_f __render_handler = nullptr;
+    std::optional<io_render_f> __render_handler = std::nullopt;
     uint32_t __maximum_frames = 4096;
-    io_kernel_ptr __kernel = nullptr;
+    std::optional<io_kernel_ptr> __kernel = std::nullopt;
 
     avf_io_core(avf_device_ptr const &);
 
     void _prepare(avf_io_core_ptr const &shared);
 
-    io_render_f _render_handler() const;
-    void _set_kernel(io_kernel_ptr const &);
-    io_kernel_ptr _kernel() const;
+    std::optional<io_render_f> _render_handler() const;
+    void _set_kernel(std::optional<io_kernel_ptr> const &);
+    std::optional<io_kernel_ptr> _kernel() const;
     void _update_kernel();
 };
 }  // namespace yas::audio

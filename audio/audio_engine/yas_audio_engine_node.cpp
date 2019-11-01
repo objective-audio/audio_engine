@@ -15,12 +15,12 @@ using namespace yas;
 #pragma mark - core
 
 struct audio::engine::node::core {
-    void set_kernel(audio::engine::kernel_ptr const &kernel) {
+    void set_kernel(std::optional<audio::engine::kernel_ptr> const &kernel) {
         std::lock_guard<std::recursive_mutex> lock(this->_mutex);
         this->_kernel = kernel;
     }
 
-    audio::engine::kernel_ptr kernel() {
+    std::optional<audio::engine::kernel_ptr> kernel() {
         std::lock_guard<std::recursive_mutex> lock(this->_mutex);
         return this->_kernel;
     }
@@ -36,7 +36,7 @@ struct audio::engine::node::core {
     }
 
    private:
-    audio::engine::kernel_ptr _kernel = nullptr;
+    std::optional<audio::engine::kernel_ptr> _kernel = std::nullopt;
     std::optional<audio::time> _render_time = std::nullopt;
     mutable std::recursive_mutex _mutex;
 };
@@ -163,7 +163,7 @@ void audio::engine::node::set_render_handler(render_f handler) {
     this->_render_handler = std::move(handler);
 }
 
-audio::engine::kernel_ptr audio::engine::node::kernel() const {
+std::optional<audio::engine::kernel_ptr> audio::engine::node::kernel() const {
     return this->_core->kernel();
 }
 

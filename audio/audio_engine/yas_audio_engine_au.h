@@ -30,7 +30,7 @@ struct au : manageable_au {
 
     void set_prepare_unit_handler(prepare_unit_f);
 
-    audio::unit_ptr unit() const;
+    std::optional<audio::unit_ptr> unit() const;
     std::unordered_map<AudioUnitScope, std::unordered_map<AudioUnitParameterID, audio::unit::parameter>> const &
     parameters() const;
     std::unordered_map<AudioUnitParameterID, audio::unit::parameter> const &global_parameters() const;
@@ -60,8 +60,8 @@ struct au : manageable_au {
     AudioComponentDescription _acd;
     std::unordered_map<AudioUnitScope, unit::parameter_map_t> _parameters;
     chaining::notifier_ptr<chaining_pair_t> _notifier = chaining::notifier<chaining_pair_t>::make_shared();
-    chaining::any_observer_ptr _reset_observer = nullptr;
-    chaining::any_observer_ptr _connections_observer = nullptr;
+    std::optional<chaining::any_observer_ptr> _reset_observer = std::nullopt;
+    std::optional<chaining::any_observer_ptr> _connections_observer = std::nullopt;
     prepare_unit_f _prepare_unit_handler;
 
     struct core;

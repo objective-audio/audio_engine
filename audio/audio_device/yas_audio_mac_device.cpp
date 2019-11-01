@@ -145,7 +145,6 @@ struct mac_device_global {
 
    private:
     std::unordered_map<AudioDeviceID, mac_device_ptr> _all_devices;
-    audio::mac_device::listener_f _system_listener = nullptr;
 
     static void _initialize() {
         static bool once = false;

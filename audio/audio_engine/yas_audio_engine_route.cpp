@@ -41,7 +41,8 @@ void audio::engine::route::_prepare(route_ptr const &shared) {
         auto const dst_bus_idx = args.bus_idx;
 
         if (auto route = weak_route.lock()) {
-            if (auto kernel = route->node()->kernel()) {
+            if (auto const kernel_opt = route->node()->kernel()) {
+                auto const &kernel = kernel_opt.value();
                 auto const &routes = std::any_cast<audio::engine::route::kernel_ptr>(kernel->decorator)->routes;
                 auto output_connection = kernel->output_connection(dst_bus_idx);
                 auto input_connections = kernel->input_connections();

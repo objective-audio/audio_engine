@@ -17,7 +17,7 @@ struct io final {
     void set_device(std::optional<io_device_ptr> const &);
     std::optional<io_device_ptr> const &device() const;
     bool is_running() const;
-    void set_render_handler(io_render_f);
+    void set_render_handler(std::optional<io_render_f>);
     void set_maximum_frames_per_slice(uint32_t const);
     uint32_t maximum_frames_per_slice() const;
 
@@ -34,7 +34,7 @@ struct io final {
     std::optional<io_device_ptr> _device = std::nullopt;
     std::optional<io_core_ptr> _io_core = std::nullopt;
     bool _is_running = false;
-    io_render_f _render_handler = nullptr;
+    std::optional<io_render_f> _render_handler = std::nullopt;
     uint32_t _maximum_frames = 4096;
     std::optional<chaining::any_observer_ptr> _observer;
 

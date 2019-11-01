@@ -83,9 +83,9 @@ void audio::engine::au_mixer::_update_unit_mixer_connections() {
     if (connections.size() > 0) {
         auto last = connections.end();
         --last;
-        if (auto unit = this->_au->unit()) {
+        if (auto const unit = this->_au->unit()) {
             auto &pair = *last;
-            unit->set_element_count(pair.first + 1, kAudioUnitScope_Input);
+            unit.value()->set_element_count(pair.first + 1, kAudioUnitScope_Input);
         }
     }
 }

@@ -9,10 +9,9 @@ using namespace yas;
 #pragma mark - audio::tap_kernel
 
 struct audio::engine::tap::kernel {
-    kernel() {
-    }
+    kernel() = default;
 
-    audio::engine::node::render_f render_handler = nullptr;
+    std::optional<audio::engine::node::render_f> render_handler = std::nullopt;
 
    private:
     kernel(kernel const &) = delete;
@@ -33,19 +32,19 @@ void audio::engine::tap::_prepare(tap_ptr const &shared) {
 
     this->_node->set_render_handler([weak_tap](auto args) {
         if (auto tap = weak_tap.lock()) {
-            if (auto kernel = tap->_node->kernel()) {
+            if (auto const kernel = tap->_node->kernel()) {
                 tap->_kernel_on_render = kernel;
 
-                auto tap_kernel = std::any_cast<tap::kernel_ptr>(kernel->decorator);
+                auto tap_kernel = std::any_cast<tap::kernel_ptr>(kernel.value()->decorator);
                 auto const &handler = tap_kernel->render_handler;
 
                 if (handler) {
-                    handler(args);
+                    handler.value()(args);
                 } else {
                     tap->render_source(std::move(args));
                 }
 
-                tap->_kernel_on_render = nullptr;
+                tap->_kernel_on_render = std::nullopt;
             }
         }
     });
@@ -53,7 +52,7 @@ void audio::engine::tap::_prepare(tap_ptr const &shared) {
     this->_reset_observer = this->_node->chain(node::method::will_reset)
                                 .perform([weak_tap](auto const &) {
                                     if (auto tap = weak_tap.lock()) {
-                                        tap->_render_handler = nullptr;
+                                        tap->_render_handler = std::nullopt;
                                     }
                                 })
                                 .end();
@@ -78,23 +77,23 @@ audio::engine::node_ptr const &audio::engine::tap::node() const {
 }
 
 audio::engine::connection_ptr audio::engine::tap::input_connection_on_render(uint32_t const bus_idx) const {
-    return this->_kernel_on_render->input_connection(bus_idx);
+    return this->_kernel_on_render.value()->input_connection(bus_idx);
 }
 
 audio::engine::connection_ptr audio::engine::tap::output_connection_on_render(uint32_t const bus_idx) const {
-    return this->_kernel_on_render->output_connection(bus_idx);
+    return this->_kernel_on_render.value()->output_connection(bus_idx);
 }
 
 audio::engine::connection_smap audio::engine::tap::input_connections_on_render() const {
-    return this->_kernel_on_render->input_connections();
+    return this->_kernel_on_render.value()->input_connections();
 }
 
 audio::engine::connection_smap audio::engine::tap::output_connections_on_render() const {
-    return this->_kernel_on_render->output_connections();
+    return this->_kernel_on_render.value()->output_connections();
 }
 
 void audio::engine::tap::render_source(audio::engine::node::render_args args) {
-    if (auto connection = this->_kernel_on_render->input_connection(args.bus_idx)) {
+    if (auto connection = this->_kernel_on_render.value()->input_connection(args.bus_idx)) {
         if (auto node = connection->source_node()) {
             node->render({.buffer = args.buffer, .bus_idx = connection->source_bus, .when = args.when});
         }

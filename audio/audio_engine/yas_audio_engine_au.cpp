@@ -21,13 +21,13 @@ struct audio::engine::au::core {
         this->_unit = au;
     }
 
-    audio::unit_ptr unit() const {
+    std::optional<audio::unit_ptr> unit() const {
         std::lock_guard<std::recursive_mutex> lock(this->_mutex);
         return this->_unit;
     }
 
    private:
-    audio::unit_ptr _unit = nullptr;
+    std::optional<audio::unit_ptr> _unit = std::nullopt;
     mutable std::recursive_mutex _mutex;
 };
 
@@ -42,7 +42,7 @@ void audio::engine::au::set_prepare_unit_handler(prepare_unit_f handler) {
     this->_prepare_unit_handler = std::move(handler);
 }
 
-audio::unit_ptr audio::engine::au::unit() const {
+std::optional<audio::unit_ptr> audio::engine::au::unit() const {
     return this->_core->unit();
 }
 
@@ -63,11 +63,19 @@ audio::unit::parameter_map_t const &audio::engine::au::output_parameters() const
 }
 
 uint32_t audio::engine::au::input_element_count() const {
-    return this->_core->unit()->element_count(kAudioUnitScope_Input);
+    if (auto const unit = this->_core->unit()) {
+        return unit.value()->element_count(kAudioUnitScope_Input);
+    } else {
+        return 0;
+    }
 }
 
 uint32_t audio::engine::au::output_element_count() const {
-    return this->_core->unit()->element_count(kAudioUnitScope_Output);
+    if (auto const unit = this->_core->unit()) {
+        return unit.value()->element_count(kAudioUnitScope_Output);
+    } else {
+        return 0;
+    }
 }
 
 void audio::engine::au::set_global_parameter_value(AudioUnitParameterID const parameter_id, float const value) {
@@ -75,15 +83,15 @@ void audio::engine::au::set_global_parameter_value(AudioUnitParameterID const pa
     if (global_parameters.count(parameter_id) > 0) {
         auto &parameter = global_parameters.at(parameter_id);
         parameter.set_value(value, 0);
-        if (auto unit = this->_core->unit()) {
-            unit->set_parameter_value(value, parameter_id, kAudioUnitScope_Global, 0);
+        if (auto const unit = this->_core->unit()) {
+            unit.value()->set_parameter_value(value, parameter_id, kAudioUnitScope_Global, 0);
         }
     }
 }
 
 float audio::engine::au::global_parameter_value(AudioUnitParameterID const parameter_id) const {
     if (auto const unit = this->_core->unit()) {
-        return unit->parameter_value(parameter_id, kAudioUnitScope_Global, 0);
+        return unit.value()->parameter_value(parameter_id, kAudioUnitScope_Global, 0);
     }
     return 0;
 }
@@ -94,8 +102,8 @@ void audio::engine::au::set_input_parameter_value(AudioUnitParameterID const par
     if (input_parameters.count(parameter_id) > 0) {
         auto &parameter = input_parameters.at(parameter_id);
         parameter.set_value(value, element);
-        if (auto unit = this->_core->unit()) {
-            unit->set_parameter_value(value, parameter_id, kAudioUnitScope_Input, element);
+        if (auto const unit = this->_core->unit()) {
+            unit.value()->set_parameter_value(value, parameter_id, kAudioUnitScope_Input, element);
         }
     }
 }
@@ -103,7 +111,7 @@ void audio::engine::au::set_input_parameter_value(AudioUnitParameterID const par
 float audio::engine::au::input_parameter_value(AudioUnitParameterID const parameter_id,
                                                AudioUnitElement const element) const {
     if (auto const unit = this->_core->unit()) {
-        return unit->parameter_value(parameter_id, kAudioUnitScope_Input, element);
+        return unit.value()->parameter_value(parameter_id, kAudioUnitScope_Input, element);
     }
     return 0;
 }
@@ -114,8 +122,8 @@ void audio::engine::au::set_output_parameter_value(AudioUnitParameterID const pa
     if (output_parameters.count(parameter_id) > 0) {
         auto &parameter = output_parameters.at(parameter_id);
         parameter.set_value(value, element);
-        if (auto unit = this->_core->unit()) {
-            unit->set_parameter_value(value, parameter_id, kAudioUnitScope_Output, element);
+        if (auto const unit = this->_core->unit()) {
+            unit.value()->set_parameter_value(value, parameter_id, kAudioUnitScope_Output, element);
         }
     }
 }
@@ -123,7 +131,7 @@ void audio::engine::au::set_output_parameter_value(AudioUnitParameterID const pa
 float audio::engine::au::output_parameter_value(AudioUnitParameterID const parameter_id,
                                                 AudioUnitElement const element) const {
     if (auto const unit = this->_core->unit()) {
-        return unit->parameter_value(parameter_id, kAudioUnitScope_Output, element);
+        return unit.value()->parameter_value(parameter_id, kAudioUnitScope_Output, element);
     }
     return 0;
 }
@@ -162,7 +170,7 @@ void audio::engine::au::_prepare(au_ptr const &shared, AudioComponentDescription
         auto &buffer = args.buffer;
 
         if (auto au = weak_au.lock()) {
-            if (auto unit = au->_core->unit()) {
+            if (auto const unit = au->_core->unit()) {
                 AudioUnitRenderActionFlags action_flags = 0;
                 AudioTimeStamp const time_stamp = args.when.audio_time_stamp();
 
@@ -173,7 +181,7 @@ void audio::engine::au::_prepare(au_ptr const &shared, AudioComponentDescription
                                                     .in_number_frames = buffer.frame_length(),
                                                     .io_data = buffer.audio_buffer_list()};
 
-                if (auto err = unit->raw_unit_render(render_parameters).error_opt()) {
+                if (auto err = unit.value()->raw_unit_render(render_parameters).error_opt()) {
                     std::cout << "audio unit render error : " << std::to_string(*err) << " - " << to_string(*err)
                               << std::endl;
                 }
@@ -200,8 +208,8 @@ void audio::engine::au::_prepare(au_ptr const &shared, AudioComponentDescription
     manageable_node::cast(this->_node)->set_add_to_graph_handler([weak_au](audio::graph &graph) {
         if (auto au = weak_au.lock()) {
             au->prepare_unit();
-            if (auto unit = au->unit()) {
-                graph.add_unit(unit);
+            if (auto const unit = au->unit()) {
+                graph.add_unit(unit.value());
             }
             au->prepare_parameters();
         }
@@ -209,8 +217,8 @@ void audio::engine::au::_prepare(au_ptr const &shared, AudioComponentDescription
 
     manageable_node::cast(this->_node)->set_remove_from_graph_handler([weak_au](audio::graph &graph) {
         if (auto au = weak_au.lock()) {
-            if (auto unit = au->unit()) {
-                graph.remove_unit(unit);
+            if (auto const unit = au->unit()) {
+                graph.remove_unit(unit.value());
             }
         }
     });
@@ -221,13 +229,14 @@ void audio::engine::au::_update_unit_connections() {
 
     this->_notifier->notify(std::make_pair(au::method::will_update_connections, shared_au));
 
-    if (auto unit = this->_core->unit()) {
+    if (auto const unit_opt = this->_core->unit()) {
+        auto const &unit = unit_opt.value();
         auto input_bus_count = this->input_element_count();
         if (input_bus_count > 0) {
             unit->set_render_handler([weak_au = this->_weak_au](audio::render_parameters &render_parameters) {
                 if (auto au = weak_au.lock()) {
                     if (auto kernel = au->node()->kernel()) {
-                        if (auto connection = kernel->input_connection(render_parameters.in_bus_number)) {
+                        if (auto connection = kernel.value()->input_connection(render_parameters.in_bus_number)) {
                             if (auto src_node = connection->source_node()) {
                                 pcm_buffer buffer{connection->format, render_parameters.io_data};
                                 time when(*render_parameters.io_time_stamp, connection->format.sample_rate());
@@ -264,17 +273,17 @@ void audio::engine::au::_update_unit_connections() {
 }
 
 void audio::engine::au::prepare_unit() {
-    if (auto unit = this->_core->unit()) {
+    if (auto const unit = this->_core->unit()) {
         if (auto const &handler = this->_prepare_unit_handler) {
-            handler(*unit);
+            handler(*unit.value());
         } else {
-            unit->set_maximum_frames_per_slice(4096);
+            unit.value()->set_maximum_frames_per_slice(4096);
         }
     }
 }
 
 void audio::engine::au::prepare_parameters() {
-    if (auto unit = this->_core->unit()) {
+    if (auto const unit = this->_core->unit()) {
         for (auto &parameters_pair : this->_parameters) {
             auto &scope = parameters_pair.first;
             for (auto &parameter_pair : this->_parameters.at(scope)) {
@@ -282,7 +291,7 @@ void audio::engine::au::prepare_parameters() {
                 for (auto &value_pair : parameter.values()) {
                     auto &element = value_pair.first;
                     auto &value = value_pair.second;
-                    unit->set_parameter_value(value, parameter.parameter_id, scope, element);
+                    unit.value()->set_parameter_value(value, parameter.parameter_id, scope, element);
                 }
             }
         }
@@ -294,8 +303,13 @@ void audio::engine::au::reload_unit() {
 }
 
 void audio::engine::au::_will_reset() {
-    auto unit = this->_core->unit();
-    unit->reset();
+    auto const unit_opt = this->_core->unit();
+    if (!unit_opt) {
+        return;
+    }
+    auto const &unit = unit_opt.value();
+
+    unit->reset_unit();
 
     auto prev_parameters = std::move(this->_parameters);
 

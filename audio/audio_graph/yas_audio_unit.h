@@ -45,9 +45,9 @@ struct unit : manageable_unit {
     void attach_input_callback();  // for io
     void detach_input_callback();  // for io
 
-    void set_render_handler(render_f);
-    void set_notify_handler(render_f);
-    void set_input_handler(render_f);  // for io
+    void set_render_handler(std::optional<render_f>);
+    void set_notify_handler(std::optional<render_f>);
+    void set_input_handler(std::optional<render_f>);  // for io
 
     void set_input_format(AudioStreamBasicDescription const &, uint32_t const bus_idx);
     void set_output_format(AudioStreamBasicDescription const &, uint32_t const bus_idx);
@@ -85,7 +85,7 @@ struct unit : manageable_unit {
 
     void start();  // for io
     void stop();   // for io
-    void reset();
+    void reset_unit();
 
     // render thread
 

@@ -28,7 +28,7 @@ struct au_mixer {
 
    private:
     audio::engine::au_ptr _au;
-    chaining::any_observer_ptr _connections_observer = nullptr;
+    std::optional<chaining::any_observer_ptr> _connections_observer = std::nullopt;
 
     au_mixer(au_mixer const &) = delete;
     au_mixer(au_mixer &&) = delete;
