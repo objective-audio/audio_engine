@@ -99,7 +99,7 @@ audio::engine::offline_start_result_t audio::engine::offline_output::start(offli
                     break;
                 }
 
-                auto connection_on_block = kernel->input_connection(0);
+                auto connection_on_block = kernel.value()->input_connection(0);
                 if (!connection_on_block) {
                     cancelled = true;
                     break;

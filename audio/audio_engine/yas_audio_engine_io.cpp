@@ -23,13 +23,13 @@ void audio::engine::io::set_device(std::optional<audio::io_device_ptr> const &de
     this->_device = device;
 
     if (this->_raw_io) {
-        this->_raw_io->set_device(device);
+        this->_raw_io.value()->set_device(device);
     }
 
     if (device) {
         this->_io_observer = device.value()->io_device_chain().send_to(this->_notifier).end();
     } else {
-        this->_io_observer = nullptr;
+        this->_io_observer = std::nullopt;
     }
 }
 
@@ -41,15 +41,18 @@ audio::engine::node_ptr const &audio::engine::io::node() const {
     return this->_node;
 }
 
-void audio::engine::io::add_raw_io() {
-    this->_raw_io = audio::io::make_shared(this->device());
+audio::io_ptr const &audio::engine::io::add_raw_io() {
+    if (!this->_raw_io) {
+        this->_raw_io = audio::io::make_shared(this->device());
+    }
+    return this->_raw_io.value();
 }
 
 void audio::engine::io::remove_raw_io() {
-    this->_raw_io = nullptr;
+    this->_raw_io = std::nullopt;
 }
 
-audio::io_ptr const &audio::engine::io::raw_io() {
+std::optional<audio::io_ptr> const &audio::engine::io::raw_io() {
     return this->_raw_io;
 }
 
@@ -65,7 +68,7 @@ void audio::engine::io::_prepare(io_ptr const &shared) {
 
         if (auto engine_io = weak_engine_io.lock()) {
             if (auto const &raw_io = engine_io->raw_io()) {
-                auto const &input_buffer_opt = raw_io->input_buffer_on_render();
+                auto const &input_buffer_opt = raw_io.value()->input_buffer_on_render();
                 if (input_buffer_opt) {
                     auto const &input_buffer = *input_buffer_opt;
                     if (input_buffer->format() == buffer.format()) {
@@ -86,13 +89,15 @@ void audio::engine::io::_prepare(io_ptr const &shared) {
 }
 
 void audio::engine::io::_update_io_connections() {
-    auto &raw_io = this->_raw_io;
-    if (!raw_io) {
+    auto const &raw_io_opt = this->_raw_io;
+    if (!raw_io_opt) {
         return;
     }
 
+    auto const &raw_io = raw_io_opt.value();
+
     if (!this->_validate_connections()) {
-        raw_io->set_render_handler(nullptr);
+        raw_io->set_render_handler(std::nullopt);
         return;
     }
 
@@ -100,7 +105,8 @@ void audio::engine::io::_update_io_connections() {
 
     auto render_handler = [weak_engine_io = this->_weak_engine_io, weak_io](auto args) {
         if (auto engine_io = weak_engine_io.lock()) {
-            if (auto kernel = engine_io->node()->kernel()) {
+            if (auto const kernel_opt = engine_io->node()->kernel()) {
+                auto const &kernel = kernel_opt.value();
                 auto const connections = kernel->input_connections();
                 if (connections.count(0) > 0) {
                     auto const &connection = connections.at(0);
@@ -138,7 +144,9 @@ void audio::engine::io::_update_io_connections() {
 }
 
 bool audio::engine::io::_validate_connections() {
-    if (auto const &raw_io = this->_raw_io) {
+    if (auto const &raw_io_opt = this->_raw_io) {
+        auto const &raw_io = raw_io_opt.value();
+
         auto &input_connections = manageable_node::cast(this->_node)->input_connections();
         if (input_connections.size() > 0) {
             auto const connections = lock_values(input_connections);

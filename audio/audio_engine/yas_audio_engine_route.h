@@ -27,7 +27,7 @@ struct route final {
 
     node_ptr _node;
     route_set_t _routes;
-    chaining::any_observer_ptr _reset_observer = nullptr;
+    std::optional<chaining::any_observer_ptr> _reset_observer = std::nullopt;
 
     route();
 

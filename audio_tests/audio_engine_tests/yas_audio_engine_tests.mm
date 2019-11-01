@@ -13,7 +13,7 @@ struct test_io_core : io_core {
     void uninitialize() override {
     }
 
-    void set_render_handler(io_render_f) override {
+    void set_render_handler(std::optional<io_render_f>) override {
     }
     void set_maximum_frames_per_slice(uint32_t const) override {
     }

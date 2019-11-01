@@ -70,7 +70,7 @@ struct manager final {
    private:
     std::weak_ptr<manager> _weak_manager;
     chaining::notifier_ptr<method> _notifier = chaining::notifier<method>::make_shared();
-    chaining::any_observer_ptr _io_observer = nullptr;
+    std::optional<chaining::any_observer_ptr> _io_observer = std::nullopt;
 
     std::optional<audio::graph_ptr> _graph = std::nullopt;
     std::unordered_set<node_ptr> _nodes;
@@ -98,9 +98,6 @@ struct manager final {
     void _reload_graph();
 
     std::optional<io_ptr> _io = std::nullopt;
-#if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
-    chaining::any_observer_ptr _device_system_observer = nullptr;
-#endif
 
     void _set_io(std::optional<io_ptr> const &node);
 };

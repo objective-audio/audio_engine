@@ -62,7 +62,7 @@ struct node : connectable_node, manageable_node {
     void set_prepare_kernel_handler(prepare_kernel_f);
     void set_render_handler(render_f);
 
-    kernel_ptr kernel() const;
+    std::optional<kernel_ptr> kernel() const;
 
     void render(render_args);
     void set_render_time_on_render(audio::time const &time);

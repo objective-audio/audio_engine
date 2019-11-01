@@ -104,32 +104,32 @@ static std::vector<T> property_data(AudioUnit const au, AudioUnitPropertyID cons
 #pragma mark - audio::unit::core
 
 struct audio::unit::core {
-    void set_render_handler(render_f &&callback) {
+    void set_render_handler(std::optional<render_f> &&callback) {
         std::lock_guard<std::recursive_mutex> lock(this->_mutex);
         this->_render_handler = std::move(callback);
     }
 
-    audio::unit::render_f render_handler() {
+    std::optional<audio::unit::render_f> render_handler() {
         std::lock_guard<std::recursive_mutex> lock(this->_mutex);
         return this->_render_handler;
     }
 
-    void set_notify_handler(render_f &&callback) {
+    void set_notify_handler(std::optional<render_f> &&callback) {
         std::lock_guard<std::recursive_mutex> lock(this->_mutex);
         this->_notify_handler = std::move(callback);
     }
 
-    audio::unit::render_f notify_handler() {
+    std::optional<audio::unit::render_f> notify_handler() {
         std::lock_guard<std::recursive_mutex> lock(this->_mutex);
         return this->_notify_handler;
     }
 
-    void set_input_handler(render_f &&callback) {
+    void set_input_handler(std::optional<render_f> &&callback) {
         std::lock_guard<std::recursive_mutex> lock(this->_mutex);
         this->_input_handler = std::move(callback);
     }
 
-    audio::unit::render_f input_handler() {
+    std::optional<audio::unit::render_f> input_handler() {
         std::lock_guard<std::recursive_mutex> lock(this->_mutex);
         return this->_input_handler;
     }
@@ -146,9 +146,9 @@ struct audio::unit::core {
 
    private:
     AudioUnit _au_instance;
-    render_f _render_handler;
-    render_f _notify_handler;
-    render_f _input_handler;
+    std::optional<render_f> _render_handler = std::nullopt;
+    std::optional<render_f> _notify_handler = std::nullopt;
+    std::optional<render_f> _input_handler = std::nullopt;
     mutable std::recursive_mutex _mutex;
 };
 
@@ -280,15 +280,15 @@ void audio::unit::detach_input_callback() {
                                                   sizeof(AURenderCallbackStruct)));
 }
 
-void audio::unit::set_render_handler(render_f callback) {
+void audio::unit::set_render_handler(std::optional<render_f> callback) {
     this->_core->set_render_handler(std::move(callback));
 }
 
-void audio::unit::set_notify_handler(render_f callback) {
+void audio::unit::set_notify_handler(std::optional<render_f> callback) {
     this->_core->set_notify_handler(std::move(callback));
 }
 
-void audio::unit::set_input_handler(render_f callback) {
+void audio::unit::set_input_handler(std::optional<render_f> callback) {
     this->_core->set_input_handler(std::move(callback));
 }
 
@@ -561,7 +561,7 @@ void audio::unit::stop() {
     }
 }
 
-void audio::unit::reset() {
+void audio::unit::reset_unit() {
     raise_if_raw_audio_error(AudioUnitReset(_core->raw_unit(), kAudioUnitScope_Global, 0));
 }
 
@@ -570,7 +570,7 @@ void audio::unit::reset() {
 void audio::unit::callback_render(render_parameters &render_parameters) {
     raise_if_main_thread();
 
-    render_f handler = nullptr;
+    std::optional<render_f> handler = std::nullopt;
 
     switch (render_parameters.in_render_type) {
         case render_type::normal:
@@ -587,7 +587,7 @@ void audio::unit::callback_render(render_parameters &render_parameters) {
     }
 
     if (handler) {
-        handler(render_parameters);
+        handler.value()(render_parameters);
     }
 }
 

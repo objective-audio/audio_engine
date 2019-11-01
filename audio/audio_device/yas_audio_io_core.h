@@ -14,7 +14,7 @@ struct io_core {
     virtual void initialize() = 0;
     virtual void uninitialize() = 0;
 
-    virtual void set_render_handler(io_render_f) = 0;
+    virtual void set_render_handler(std::optional<io_render_f>) = 0;
     virtual void set_maximum_frames_per_slice(uint32_t const) = 0;
 
     virtual bool start() = 0;

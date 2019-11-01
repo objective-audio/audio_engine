@@ -34,7 +34,8 @@ void audio::mac_io_core::initialize() {
             }
 
             if (auto io_core = weak_io_core.lock()) {
-                if (auto kernel = io_core->_kernel()) {
+                if (auto const kernel_opt = io_core->_kernel()) {
+                    auto const &kernel = kernel_opt.value();
                     kernel->reset_buffers();
                     if (inInputData) {
                         if (auto const &input_buffer_opt = kernel->input_buffer) {
@@ -50,7 +51,7 @@ void audio::mac_io_core::initialize() {
                         }
                     }
 
-                    if (auto render_handler = io_core->_render_handler()) {
+                    if (auto const render_handler = io_core->_render_handler()) {
                         if (auto const &output_buffer_opt = kernel->output_buffer) {
                             auto const &output_buffer = *output_buffer_opt;
                             if (outOutputData) {
@@ -59,13 +60,13 @@ void audio::mac_io_core::initialize() {
                                 if (frame_length > 0) {
                                     output_buffer->set_frame_length(frame_length);
                                     audio::time time(*inOutputTime, output_buffer->format().sample_rate());
-                                    render_handler(
+                                    render_handler.value()(
                                         io_render_args{.output_buffer = output_buffer_opt, .when = std::move(time)});
                                     output_buffer->copy_to(outOutputData);
                                 }
                             }
                         } else if (kernel->input_buffer) {
-                            render_handler(io_render_args{.output_buffer = std::nullopt, .when = std::nullopt});
+                            render_handler.value()(io_render_args{.output_buffer = std::nullopt, .when = std::nullopt});
                         }
                     }
                 }
@@ -93,7 +94,7 @@ void audio::mac_io_core::uninitialize() {
     this->_update_kernel();
 }
 
-void audio::mac_io_core::set_render_handler(io_render_f handler) {
+void audio::mac_io_core::set_render_handler(std::optional<io_render_f> handler) {
     std::lock_guard<std::recursive_mutex> lock(this->_mutex);
     this->__render_handler = std::move(handler);
 }
@@ -132,20 +133,20 @@ void audio::mac_io_core::_prepare(mac_io_core_ptr const &shared) {
     this->_weak_io_core = weak_io_core;
 }
 
-audio::io_render_f audio::mac_io_core::_render_handler() const {
+std::optional<audio::io_render_f> audio::mac_io_core::_render_handler() const {
     std::lock_guard<std::recursive_mutex> lock(this->_mutex);
     return this->__render_handler;
 }
 
-void audio::mac_io_core::_set_kernel(io_kernel_ptr const &kernel) {
+void audio::mac_io_core::_set_kernel(std::optional<io_kernel_ptr> const &kernel) {
     std::lock_guard<std::recursive_mutex> lock(this->_mutex);
-    this->__kernel = nullptr;
+    this->__kernel = std::nullopt;
     if (kernel) {
         this->__kernel = kernel;
     }
 }
 
-audio::io_kernel_ptr audio::mac_io_core::_kernel() const {
+std::optional<audio::io_kernel_ptr> audio::mac_io_core::_kernel() const {
     std::lock_guard<std::recursive_mutex> lock(this->_mutex);
     return this->__kernel;
 }
@@ -153,7 +154,7 @@ audio::io_kernel_ptr audio::mac_io_core::_kernel() const {
 void audio::mac_io_core::_update_kernel() {
     std::lock_guard<std::recursive_mutex> lock(this->_mutex);
 
-    this->_set_kernel(nullptr);
+    this->_set_kernel(std::nullopt);
 
     auto const &output_format = this->_device->output_format();
     auto const &input_format = this->_device->input_format();

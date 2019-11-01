@@ -26,11 +26,11 @@ struct io : manageable_io {
    private:
     std::weak_ptr<io> _weak_engine_io;
     audio::engine::node_ptr _node = node::make_shared({.input_bus_count = 1, .output_bus_count = 1});
-    chaining::any_observer_ptr _connections_observer = nullptr;
+    std::optional<chaining::any_observer_ptr> _connections_observer = std::nullopt;
     std::optional<audio::io_device_ptr> _device = std::nullopt;
-    audio::io_ptr _raw_io = nullptr;
+    std::optional<audio::io_ptr> _raw_io = std::nullopt;
     chaining::notifier_ptr<io_device::method> _notifier = chaining::notifier<io_device::method>::make_shared();
-    chaining::any_observer_ptr _io_observer = nullptr;
+    std::optional<chaining::any_observer_ptr> _io_observer = std::nullopt;
 
     io();
 
@@ -39,9 +39,9 @@ struct io : manageable_io {
     io(io const &) = delete;
     io &operator=(io const &) = delete;
 
-    void add_raw_io() override;
+    audio::io_ptr const &add_raw_io() override;
     void remove_raw_io() override;
-    audio::io_ptr const &raw_io() override;
+    std::optional<audio::io_ptr> const &raw_io() override;
 
     void _prepare(io_ptr const &);
     void _update_io_connections();

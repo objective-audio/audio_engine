@@ -81,7 +81,7 @@ bool audio::io::is_running() const {
     return this->_is_running;
 }
 
-void audio::io::set_render_handler(io_render_f handler) {
+void audio::io::set_render_handler(std::optional<io_render_f> handler) {
     this->_render_handler = std::move(handler);
 
     if (auto const &io_core = this->_io_core) {

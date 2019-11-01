@@ -28,9 +28,9 @@ struct tap final {
     class kernel;
 
     node_ptr _node;
-    audio::engine::node::render_f _render_handler;
-    chaining::any_observer_ptr _reset_observer = nullptr;
-    engine::kernel_ptr _kernel_on_render;
+    std::optional<audio::engine::node::render_f> _render_handler;
+    std::optional<chaining::any_observer_ptr> _reset_observer = std::nullopt;
+    std::optional<engine::kernel_ptr> _kernel_on_render = std::nullopt;
 
     explicit tap(args &&);
 

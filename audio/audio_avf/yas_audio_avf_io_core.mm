@@ -67,7 +67,7 @@ void audio::avf_io_core::uninitialize() {
     this->_update_kernel();
 }
 
-void audio::avf_io_core::set_render_handler(io_render_f handler) {
+void audio::avf_io_core::set_render_handler(std::optional<io_render_f> handler) {
     std::lock_guard<std::recursive_mutex> lock(this->_mutex);
     this->__render_handler = std::move(handler);
 }
@@ -108,7 +108,8 @@ void audio::avf_io_core::_prepare(avf_io_core_ptr const &shared) {
         initWithRenderBlock:[weak_io_core](BOOL *_Nonnull isSilence, const AudioTimeStamp *_Nonnull timestamp,
                                            AVAudioFrameCount frameCount, AudioBufferList *_Nonnull outputData) {
             if (auto io_core = weak_io_core.lock()) {
-                if (auto kernel = io_core->_kernel()) {
+                if (auto const kernel_opt = io_core->_kernel()) {
+                    auto const &kernel = kernel_opt.value();
                     if (auto render_handler = io_core->_render_handler()) {
                         if (auto const &output_buffer_opt = kernel->output_buffer) {
                             auto const &output_buffer = *output_buffer_opt;
@@ -118,20 +119,19 @@ void audio::avf_io_core::_prepare(avf_io_core_ptr const &shared) {
                                 if (frame_length > 0) {
                                     output_buffer->set_frame_length(frame_length);
                                     audio::time time(*timestamp, output_buffer->format().sample_rate());
-                                    render_handler(
+                                    render_handler.value()(
                                         io_render_args{.output_buffer = output_buffer, .when = std::move(time)});
                                     output_buffer->copy_to(outputData);
                                 }
                             }
                         } else if (kernel->input_buffer) {
-                            pcm_buffer_ptr null_buffer{nullptr};
-                            render_handler(io_render_args{.output_buffer = null_buffer, .when = std::nullopt});
+                            render_handler.value()(io_render_args{.output_buffer = std::nullopt, .when = std::nullopt});
                         }
                     }
                 }
 
-                io_core->_input_buffer_on_render = nullptr;
-                io_core->_input_time_on_render = nullptr;
+                io_core->_input_buffer_on_render = std::nullopt;
+                io_core->_input_time_on_render = std::nullopt;
             }
 
             return OSStatus(noErr);
@@ -141,7 +141,9 @@ void audio::avf_io_core::_prepare(avf_io_core_ptr const &shared) {
         initWithReceiverBlock:[weak_io_core](const AudioTimeStamp *_Nonnull timestamp, AVAudioFrameCount frameCount,
                                              const AudioBufferList *_Nonnull inputData) {
             if (auto io_core = weak_io_core.lock()) {
-                if (auto kernel = io_core->_kernel()) {
+                if (auto kernel_opt = io_core->_kernel()) {
+                    auto const &kernel = kernel_opt.value();
+
                     kernel->reset_buffers();
 
                     if (inputData) {
@@ -172,20 +174,20 @@ void audio::avf_io_core::_prepare(avf_io_core_ptr const &shared) {
     impl->_sink_node = sink_node;
 }
 
-audio::io_render_f audio::avf_io_core::_render_handler() const {
+std::optional<audio::io_render_f> audio::avf_io_core::_render_handler() const {
     std::lock_guard<std::recursive_mutex> lock(this->_mutex);
     return this->__render_handler;
 }
 
-void audio::avf_io_core::_set_kernel(io_kernel_ptr const &kernel) {
+void audio::avf_io_core::_set_kernel(std::optional<io_kernel_ptr> const &kernel) {
     std::lock_guard<std::recursive_mutex> lock(this->_mutex);
-    this->__kernel = nullptr;
+    this->__kernel = std::nullopt;
     if (kernel) {
         this->__kernel = kernel;
     }
 }
 
-audio::io_kernel_ptr audio::avf_io_core::_kernel() const {
+std::optional<audio::io_kernel_ptr> audio::avf_io_core::_kernel() const {
     std::lock_guard<std::recursive_mutex> lock(this->_mutex);
     return this->__kernel;
 }
@@ -193,7 +195,7 @@ audio::io_kernel_ptr audio::avf_io_core::_kernel() const {
 void audio::avf_io_core::_update_kernel() {
     std::lock_guard<std::recursive_mutex> lock(this->_mutex);
 
-    this->_set_kernel(nullptr);
+    this->_set_kernel(std::nullopt);
 
     auto const &output_format = this->_device->output_format();
     auto const &input_format = this->_device->input_format();
