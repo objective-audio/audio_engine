@@ -60,8 +60,8 @@ audio::file::create_result_t audio::file::create(create_args args) {
 
 void audio::file::close() {
     if (this->_ext_audio_file) {
-        ext_audio_file_utils::dispose(this->_ext_audio_file);
-        this->_ext_audio_file = nullptr;
+        ext_audio_file_utils::dispose(this->_ext_audio_file.value());
+        this->_ext_audio_file = std::nullopt;
     }
 }
 
@@ -87,7 +87,7 @@ audio::format const &audio::file::processing_format() const {
 
 int64_t audio::file::file_length() const {
     if (this->_ext_audio_file) {
-        return ext_audio_file_utils::get_file_length_frames(this->_ext_audio_file);
+        return ext_audio_file_utils::get_file_length_frames(this->_ext_audio_file.value());
     }
     return 0;
 }
@@ -110,13 +110,14 @@ int64_t audio::file::file_frame_position() const {
 void audio::file::set_processing_format(audio::format format) {
     this->_processing_format = std::move(format);
     if (this->_ext_audio_file) {
-        ext_audio_file_utils::set_client_format(this->_processing_format->stream_description(), this->_ext_audio_file);
+        ext_audio_file_utils::set_client_format(this->_processing_format->stream_description(),
+                                                this->_ext_audio_file.value());
     }
 }
 
 void audio::file::set_file_frame_position(uint32_t const position) {
-    if (this->_file_frame_position != position) {
-        OSStatus err = ExtAudioFileSeek(this->_ext_audio_file, position);
+    if (this->_ext_audio_file && this->_file_frame_position != position) {
+        OSStatus err = ExtAudioFileSeek(this->_ext_audio_file.value(), position);
         if (err == noErr) {
             this->_file_frame_position = position;
         }
@@ -164,7 +165,7 @@ audio::file::read_result_t audio::file::read_into_buffer(audio::pcm_buffer &buff
 
             UInt32 io_frames = remain_frames;
 
-            err = ExtAudioFileRead(this->_ext_audio_file, &io_frames, io_abl);
+            err = ExtAudioFileRead(this->_ext_audio_file.value(), &io_frames, io_abl);
             if (err != noErr) {
                 break;
             }
@@ -182,7 +183,7 @@ audio::file::read_result_t audio::file::read_into_buffer(audio::pcm_buffer &buff
     if (err != noErr) {
         return read_result_t(read_error_t::read_failed);
     } else {
-        err = ExtAudioFileTell(this->_ext_audio_file, &this->_file_frame_position);
+        err = ExtAudioFileTell(this->_ext_audio_file.value(), &this->_file_frame_position);
         if (err != noErr) {
             return read_result_t(read_error_t::tell_failed);
         }
@@ -196,6 +197,8 @@ audio::file::write_result_t audio::file::write_from_buffer(audio::pcm_buffer con
         return write_result_t(write_error_t::closed);
     }
 
+    ExtAudioFileRef const &ext_audio_file = this->_ext_audio_file.value();
+
     if (buffer.format() != this->_processing_format) {
         return write_result_t(write_error_t::invalid_format);
     }
@@ -203,15 +206,15 @@ audio::file::write_result_t audio::file::write_from_buffer(audio::pcm_buffer con
     OSStatus err = noErr;
 
     if (async) {
-        err = ExtAudioFileWriteAsync(this->_ext_audio_file, buffer.frame_length(), buffer.audio_buffer_list());
+        err = ExtAudioFileWriteAsync(ext_audio_file, buffer.frame_length(), buffer.audio_buffer_list());
     } else {
-        err = ExtAudioFileWrite(this->_ext_audio_file, buffer.frame_length(), buffer.audio_buffer_list());
+        err = ExtAudioFileWrite(ext_audio_file, buffer.frame_length(), buffer.audio_buffer_list());
     }
 
     if (err != noErr) {
         return write_result_t(write_error_t::write_failed);
     } else {
-        err = ExtAudioFileTell(this->_ext_audio_file, &this->_file_frame_position);
+        err = ExtAudioFileTell(ext_audio_file, &this->_file_frame_position);
         if (err != noErr) {
             return write_result_t(write_error_t::tell_failed);
         }
@@ -227,18 +230,20 @@ bool audio::file::_open_ext_audio_file(pcm_format const pcm_format, bool const i
         return false;
     }
 
-    if (!ext_audio_file_utils::open(&this->_ext_audio_file, this->_url->cf_url())) {
-        this->_ext_audio_file = nullptr;
+    ExtAudioFileRef ext_audio_file = nullptr;
+    if (!ext_audio_file_utils::open(&ext_audio_file, this->_url->cf_url())) {
+        this->_ext_audio_file = std::nullopt;
         return false;
     };
+    this->_ext_audio_file = ext_audio_file;
 
     AudioStreamBasicDescription asbd;
-    if (!ext_audio_file_utils::get_audio_file_format(&asbd, this->_ext_audio_file)) {
+    if (!ext_audio_file_utils::get_audio_file_format(&asbd, ext_audio_file)) {
         this->close();
         return false;
     }
 
-    AudioFileTypeID file_type_id = ext_audio_file_utils::get_audio_file_type_id(this->_ext_audio_file);
+    AudioFileTypeID file_type_id = ext_audio_file_utils::get_audio_file_type_id(ext_audio_file);
 
     try {
         this->_file_type = to_file_type(file_type_id);
@@ -254,8 +259,7 @@ bool audio::file::_open_ext_audio_file(pcm_format const pcm_format, bool const i
                                        .pcm_format = pcm_format,
                                        .interleaved = interleaved}};
 
-    if (!ext_audio_file_utils::set_client_format(this->_processing_format->stream_description(),
-                                                 this->_ext_audio_file)) {
+    if (!ext_audio_file_utils::set_client_format(this->_processing_format->stream_description(), ext_audio_file)) {
         this->close();
         return false;
     }
@@ -269,19 +273,20 @@ bool audio::file::_create_ext_audio_file(CFDictionaryRef const &settings, pcm_fo
 
     AudioFileTypeID file_type_id = audio::to_audio_file_type_id(this->_file_type);
 
-    if (!ext_audio_file_utils::create(&this->_ext_audio_file, this->_url->cf_url(), file_type_id,
+    ExtAudioFileRef ext_audio_file = nullptr;
+    if (!ext_audio_file_utils::create(&ext_audio_file, this->_url->cf_url(), file_type_id,
                                       this->_file_format->stream_description())) {
-        this->_ext_audio_file = nullptr;
+        this->_ext_audio_file = std::nullopt;
         return false;
     }
+    this->_ext_audio_file = ext_audio_file;
 
     this->_processing_format = format{{.sample_rate = this->_file_format->sample_rate(),
                                        .channel_count = this->_file_format->channel_count(),
                                        .pcm_format = pcm_format,
                                        .interleaved = interleaved}};
 
-    if (!ext_audio_file_utils::set_client_format(this->_processing_format->stream_description(),
-                                                 this->_ext_audio_file)) {
+    if (!ext_audio_file_utils::set_client_format(this->_processing_format->stream_description(), ext_audio_file)) {
         this->close();
         return false;
     }
