@@ -76,8 +76,10 @@ void audio::mac_io_core::initialize() {
             }
         };
 
+        AudioDeviceIOProcID io_proc_id = nullptr;
         raise_if_raw_audio_error(
-            AudioDeviceCreateIOProcIDWithBlock(&this->_io_proc_id, this->_device->audio_device_id(), nullptr, handler));
+            AudioDeviceCreateIOProcIDWithBlock(&io_proc_id, this->_device->audio_device_id(), nullptr, handler));
+        this->_io_proc_id = io_proc_id;
     }
 
     this->_update_kernel();
@@ -87,10 +89,11 @@ void audio::mac_io_core::uninitialize() {
     this->stop();
 
     if (this->_io_proc_id && mac_device::is_available_device(this->_device)) {
-        raise_if_raw_audio_error(AudioDeviceDestroyIOProcID(this->_device->audio_device_id(), this->_io_proc_id));
+        raise_if_raw_audio_error(
+            AudioDeviceDestroyIOProcID(this->_device->audio_device_id(), this->_io_proc_id.value()));
     }
 
-    this->_io_proc_id = nullptr;
+    this->_io_proc_id = std::nullopt;
     this->_update_kernel();
 }
 
@@ -107,7 +110,7 @@ void audio::mac_io_core::set_maximum_frames_per_slice(uint32_t const frames) {
 
 bool audio::mac_io_core::start() {
     if (this->_io_proc_id) {
-        raise_if_raw_audio_error(AudioDeviceStart(this->_device->audio_device_id(), this->_io_proc_id));
+        raise_if_raw_audio_error(AudioDeviceStart(this->_device->audio_device_id(), this->_io_proc_id.value()));
         return true;
     } else {
         return false;
@@ -116,7 +119,7 @@ bool audio::mac_io_core::start() {
 
 void audio::mac_io_core::stop() {
     if (this->_io_proc_id && mac_device::is_available_device(this->_device)) {
-        raise_if_raw_audio_error(AudioDeviceStop(this->_device->audio_device_id(), this->_io_proc_id));
+        raise_if_raw_audio_error(AudioDeviceStop(this->_device->audio_device_id(), this->_io_proc_id.value()));
     }
 }
 
