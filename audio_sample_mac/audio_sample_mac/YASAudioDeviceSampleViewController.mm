@@ -34,17 +34,21 @@ using sample_kernel_ptr = std::shared_ptr<sample_kernel_t>;
 @end
 
 namespace yas::sample {
-struct device_vc_internal {
-    audio::graph_ptr graph = nullptr;
-    audio::io_ptr io = nullptr;
-    chaining::any_observer_ptr system_observer = nullptr;
-    chaining::any_observer_ptr device_observer = nullptr;
-    sample_kernel_ptr kernel = nullptr;
+struct device_vc_cpp {
+    audio::graph_ptr const graph = audio::graph::make_shared();
+    audio::io_ptr const io = audio::io::make_shared(std::nullopt);
+    sample_kernel_ptr const kernel = std::make_shared<sample_kernel_t>();
+    std::optional<chaining::any_observer_ptr> system_observer = std::nullopt;
+    std::optional<chaining::any_observer_ptr> device_observer = std::nullopt;
+
+    device_vc_cpp() {
+        this->graph->add_io(this->io);
+    }
 };
 }
 
 @implementation YASAudioDeviceSampleViewController {
-    sample::device_vc_internal _internal;
+    std::shared_ptr<sample::device_vc_cpp> _cpp;
 }
 
 - (void)viewDidLoad {
@@ -63,25 +67,20 @@ struct device_vc_internal {
                                         forName:NSStringFromClass([YASFrequencyValueFormatter class])];
     });
 
-    _internal.graph = audio::graph::make_shared();
-    _internal.io = audio::io::make_shared(std::nullopt);
-    _internal.graph->add_io(_internal.io);
-
-    _internal.kernel = std::make_shared<sample_kernel_t>();
-
-    self.throughVolume = _internal.kernel->through_volume();
-    self.sineVolume = _internal.kernel->sine_volume();
-    self.sineFrequency = _internal.kernel->sine_frequency();
+    self->_cpp = std::make_shared<sample::device_vc_cpp>();
+    self.throughVolume = _cpp->kernel->through_volume();
+    self.sineVolume = _cpp->kernel->sine_volume();
+    self.sineFrequency = _cpp->kernel->sine_frequency();
 
     auto unowned_self = objc_ptr_with_move_object([[YASUnownedObject alloc] initWithObject:self]);
 
-    _internal.system_observer =
+    _cpp->system_observer =
         audio::mac_device::system_chain(audio::mac_device::system_method::hardware_did_change)
             .perform([unowned_self](auto const &) { [[unowned_self.object() object] _updateDeviceNames]; })
             .end();
 
-    auto weak_io = to_weak(_internal.io);
-    _internal.io->set_render_handler([weak_io, kernel = _internal.kernel](auto args) {
+    auto weak_io = to_weak(self->_cpp->io);
+    _cpp->io->set_render_handler([weak_io, kernel = self->_cpp->kernel](auto args) {
         if (auto io = weak_io.lock()) {
             kernel->process(io->input_buffer_on_render(), args.output_buffer);
         }
@@ -97,11 +96,7 @@ struct device_vc_internal {
 }
 
 - (void)dispose {
-    _internal.graph = nullptr;
-    _internal.io = nullptr;
-    _internal.system_observer = nullptr;
-    _internal.device_observer = nullptr;
-    _internal.kernel = nullptr;
+    self->_cpp = nullptr;
 }
 
 - (void)viewDidAppear {
@@ -109,16 +104,16 @@ struct device_vc_internal {
 
     [self setup];
 
-    if (_internal.graph) {
-        _internal.graph->start();
+    if (self->_cpp->graph) {
+        self->_cpp->graph->start();
     }
 }
 
 - (void)viewWillDisappear {
     [super viewWillDisappear];
 
-    if (_internal.graph) {
-        _internal.graph->stop();
+    if (self->_cpp->graph) {
+        self->_cpp->graph->stop();
     }
 
     [self dispose];
@@ -139,17 +134,17 @@ struct device_vc_internal {
 
 - (void)setThroughVolume:(double)throughVolume {
     _throughVolume = throughVolume;
-    _internal.kernel->set_througn_volume(throughVolume);
+    _cpp->kernel->set_througn_volume(throughVolume);
 }
 
 - (void)setSineFrequency:(double)sineFrequency {
     _sineFrequency = sineFrequency;
-    _internal.kernel->set_sine_frequency(sineFrequency);
+    _cpp->kernel->set_sine_frequency(sineFrequency);
 }
 
 - (void)setSineVolume:(double)sineVolume {
     _sineVolume = sineVolume;
-    _internal.kernel->set_sine_volume(sineVolume);
+    _cpp->kernel->set_sine_volume(sineVolume);
 }
 
 - (void)setSelectedDeviceIndex:(NSUInteger)selectedDeviceIndex {
@@ -182,7 +177,7 @@ struct device_vc_internal {
 
     std::optional<NSUInteger> index = std::nullopt;
 
-    if (auto const &device_opt = _internal.io->device()) {
+    if (auto const &device_opt = _cpp->io->device()) {
         if (auto const device = std::dynamic_pointer_cast<audio::mac_device>(device_opt.value())) {
             index = audio::mac_device::index_of_device(device);
         }
@@ -196,35 +191,35 @@ struct device_vc_internal {
 }
 
 - (void)setDevice:(std::optional<audio::mac_device_ptr> const &)selected_device {
-    _internal.device_observer = nullptr;
+    _cpp->device_observer = std::nullopt;
 
     auto all_devices = audio::mac_device::all_devices();
 
-    _internal.io->set_device(selected_device);
+    _cpp->io->set_device(selected_device);
 
     if (selected_device && std::find(all_devices.begin(), all_devices.end(), selected_device) != all_devices.end()) {
         auto unowned_self = objc_ptr_with_move_object([[YASUnownedObject alloc] initWithObject:self]);
 
         auto const &device = *selected_device;
 
-        _internal.device_observer = device->chain(audio::mac_device::method::device_did_change)
-                                        .perform([device, unowned_self](auto const &change_info) {
-                                            auto const &infos = change_info.property_infos;
-                                            if (infos.size() > 0) {
-                                                auto &device_id = infos.at(0).object_id;
-                                                if (device->audio_device_id() == device_id) {
-                                                    [[unowned_self.object() object] _updateDeviceInfo];
-                                                }
+        _cpp->device_observer = device->chain(audio::mac_device::method::device_did_change)
+                                    .perform([device, unowned_self](auto const &change_info) {
+                                        auto const &infos = change_info.property_infos;
+                                        if (infos.size() > 0) {
+                                            auto &device_id = infos.at(0).object_id;
+                                            if (device->audio_device_id() == device_id) {
+                                                [[unowned_self.object() object] _updateDeviceInfo];
                                             }
-                                        })
-                                        .end();
+                                        }
+                                    })
+                                    .end();
     }
 
     [self _updateDeviceInfo];
 }
 
 - (void)_updateDeviceInfo {
-    auto const &device_opt = _internal.io->device();
+    auto const &device_opt = _cpp->io->device();
     NSColor *onColor = [NSColor labelColor];
     NSColor *offColor = [NSColor quaternaryLabelColor];
     if (device_opt) {

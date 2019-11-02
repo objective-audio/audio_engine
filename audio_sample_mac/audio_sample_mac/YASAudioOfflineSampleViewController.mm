@@ -118,7 +118,7 @@ struct offline_vc_internal {
     audio::engine::au_mixer_ptr offline_au_mixer = audio::engine::au_mixer::make_shared();
     offline_sample::engine::sine_ptr offline_sine = offline_sample::engine::sine::make_shared();
 
-    chaining::any_observer_ptr engine_observer = nullptr;
+    std::optional<chaining::any_observer_ptr> engine_observer = std::nullopt;
 
     offline_vc_internal() {
         this->play_manager->add_io();
