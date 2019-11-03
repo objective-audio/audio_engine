@@ -34,7 +34,7 @@ struct mac_io_core final : io_core {
    private:
     std::weak_ptr<mac_io_core> _weak_io_core;
     mac_device_ptr _device;
-    AudioDeviceIOProcID _io_proc_id = nullptr;
+    std::optional<AudioDeviceIOProcID> _io_proc_id = std::nullopt;
     std::optional<chaining::any_observer_ptr> _device_system_observer = std::nullopt;
     std::optional<chaining::any_observer_ptr> _device_observer = std::nullopt;
 

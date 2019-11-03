@@ -11,17 +11,31 @@
 
 using namespace yas;
 
-typedef NS_ENUM(NSUInteger, YASAudioDeviceRouteSampleSourceBus) {
-    YASAudioDeviceRouteSampleSourceBusSine = 0,
-    YASAudioDeviceRouteSampleSourceBusInput = 1,
-    YASAudioDeviceRouteSampleSourceBusCount,
-};
+namespace yas::sample {
+struct engine_io_vc_cpp {
+    enum class source_bus : uint32_t {
+        sine,
+        input,
+    };
 
-typedef NS_ENUM(NSUInteger, YASAudioDeviceRouteSampleInputType) {
-    YASAudioDeviceRouteSampleInputTypeNone,
-    YASAudioDeviceRouteSampleInputTypeSine,
-    YASAudioDeviceRouteSampleInputTypeInput,
+    enum class input_type : uint32_t {
+        none,
+        sine,
+        input,
+    };
+
+    audio::engine::manager_ptr const manager = audio::engine::manager::make_shared();
+    audio::engine::route_ptr const route = audio::engine::route::make_shared();
+    audio::engine::tap_ptr const tap = audio::engine::tap::make_shared();
+
+    std::optional<chaining::any_observer_ptr> system_observer = std::nullopt;
+    std::optional<chaining::any_observer_ptr> device_observer = std::nullopt;
+
+    engine_io_vc_cpp() {
+        this->manager->add_io();
+    }
 };
+}
 
 @interface YASAudioDeviceRouteSampleOutputData : NSObject
 
@@ -43,19 +57,19 @@ typedef NS_ENUM(NSUInteger, YASAudioDeviceRouteSampleInputType) {
 }
 
 - (BOOL)isNoneSelected {
-    return self.inputSelectIndex == YASAudioDeviceRouteSampleInputTypeNone;
+    return self.inputSelectIndex == (uint32_t)sample::engine_io_vc_cpp::input_type::none;
 }
 
 - (BOOL)isSineSelected {
-    return self.inputSelectIndex == YASAudioDeviceRouteSampleInputTypeSine;
+    return self.inputSelectIndex == (uint32_t)sample::engine_io_vc_cpp::input_type::sine;
 }
 
 - (BOOL)isInputSelected {
-    return self.inputSelectIndex >= YASAudioDeviceRouteSampleInputTypeInput;
+    return self.inputSelectIndex >= (uint32_t)sample::engine_io_vc_cpp::input_type::input;
 }
 
 - (uint32_t)inputIndex {
-    return self.inputSelectIndex - YASAudioDeviceRouteSampleInputTypeInput;
+    return self.inputSelectIndex - (uint32_t)sample::engine_io_vc_cpp::input_type::input;
 }
 
 @end
@@ -75,12 +89,13 @@ typedef NS_ENUM(NSUInteger, YASAudioDeviceRouteSampleInputType) {
 }
 
 - (NSString *)indexTitle {
-    if (self.index == YASAudioDeviceRouteSampleInputTypeNone) {
+    if ((sample::engine_io_vc_cpp::input_type)self.index == sample::engine_io_vc_cpp::input_type::none) {
         return @"None";
-    } else if (self.index == YASAudioDeviceRouteSampleInputTypeSine) {
+    } else if ((sample::engine_io_vc_cpp::input_type)self.index == sample::engine_io_vc_cpp::input_type::sine) {
         return @"Sine";
     } else {
-        return [NSString stringWithFormat:@"Input Ch : %@", @(self.index - YASAudioDeviceRouteSampleInputTypeInput)];
+        return [NSString
+            stringWithFormat:@"Input Ch : %@", @(self.index - (uint32_t)sample::engine_io_vc_cpp::input_type::input)];
     }
 }
 
@@ -88,28 +103,17 @@ typedef NS_ENUM(NSUInteger, YASAudioDeviceRouteSampleInputType) {
 
 @interface YASAudioEngineIOSampleViewController () <NSTableViewDataSource, NSTableViewDelegate>
 
-@property (nonatomic, strong) NSArray *deviceNames;
+@property (nonatomic, strong) NSArray<NSString *> *deviceNames;
 @property (nonatomic, assign) double nominalSampleRate;
 @property (nonatomic, assign) NSUInteger selectedDeviceIndex;
 
-@property (atomic, strong) NSMutableArray *outputRoutes;
-@property (atomic, strong) NSMutableArray *inputRoutes;
+@property (atomic, strong) NSMutableArray<YASAudioDeviceRouteSampleOutputData *> *outputRoutes;
+@property (atomic, strong) NSMutableArray<YASAudioDeviceRouteSampleInputData *> *inputRoutes;
 
 @end
 
-namespace yas::sample {
-struct device_io_vc_internal {
-    audio::engine::manager_ptr manager = nullptr;
-    audio::engine::route_ptr route = nullptr;
-    audio::engine::tap_ptr tap = nullptr;
-
-    chaining::any_observer_ptr system_observer = nullptr;
-    chaining::any_observer_ptr device_observer = nullptr;
-};
-}
-
 @implementation YASAudioEngineIOSampleViewController {
-    sample::device_io_vc_internal _internal;
+    std::shared_ptr<sample::engine_io_vc_cpp> _cpp;
 }
 
 - (void)dealloc {
@@ -131,9 +135,9 @@ struct device_io_vc_internal {
 - (void)viewDidAppear {
     [super viewDidAppear];
 
-    [self setupEngine];
+    [self setup];
 
-    if (auto error = _internal.manager->start_render().error_opt()) {
+    if (auto error = _cpp->manager->start_render().error_opt()) {
         auto const error_str = to_string(*error);
         NSLog(@"audio engine start failed. error : %@", (__bridge NSString *)to_cf_object(error_str));
     }
@@ -152,12 +156,13 @@ struct device_io_vc_internal {
     if ([object isKindOfClass:[YASAudioDeviceRouteSampleOutputData class]]) {
         YASAudioDeviceRouteSampleOutputData *data = object;
         if ([data isNoneSelected]) {
-            _internal.route->remove_route_for_destination({0, data.outputIndex});
+            _cpp->route->remove_route_for_destination({0, data.outputIndex});
         } else if ([data isSineSelected]) {
-            _internal.route->add_route({YASAudioDeviceRouteSampleSourceBusSine, data.outputIndex, 0, data.outputIndex});
+            _cpp->route->add_route(
+                {(uint32_t)sample::engine_io_vc_cpp::source_bus::sine, data.outputIndex, 0, data.outputIndex});
         } else if ([data isInputSelected]) {
-            _internal.route->add_route(
-                {YASAudioDeviceRouteSampleSourceBusInput, [data inputIndex], 0, data.outputIndex});
+            _cpp->route->add_route(
+                {(uint32_t)sample::engine_io_vc_cpp::source_bus::input, [data inputIndex], 0, data.outputIndex});
         }
 
         [self _updateInputSelection];
@@ -166,13 +171,10 @@ struct device_io_vc_internal {
     }
 }
 
-- (void)setupEngine {
-    _internal.manager = audio::engine::manager::make_shared();
-    _internal.manager->add_io();
-    _internal.route = audio::engine::route::make_shared();
-    _internal.tap = audio::engine::tap::make_shared();
+- (void)setup {
+    self->_cpp = std::make_shared<sample::engine_io_vc_cpp>();
 
-    auto weak_tap = to_weak(_internal.tap);
+    auto weak_tap = to_weak(_cpp->tap);
 
     double next_phase = 0.0;
 
@@ -188,15 +190,15 @@ struct device_io_vc_internal {
         while (yas_each_data_next_ch(each)) {
             auto *const ptr = yas_each_data_ptr(each);
             next_phase = audio::math::fill_sine(ptr, frame_length, start_phase, phase_per_frame);
-            cblas_sscal(buffer.frame_length(), 0.2, ptr, 1);
+            cblas_sscal(buffer.frame_length(), 0.1, ptr, 1);
         }
     };
 
-    _internal.tap->set_render_handler(render_handler);
+    _cpp->tap->set_render_handler(render_handler);
 
     auto unowned_self = objc_ptr_with_move_object([[YASUnownedObject alloc] initWithObject:self]);
 
-    _internal.system_observer =
+    _cpp->system_observer =
         audio::mac_device::system_chain(audio::mac_device::system_method::hardware_did_change)
             .perform([unowned_self](auto const &) { [[unowned_self.object() object] _updateDeviceNames]; })
             .end();
@@ -211,14 +213,8 @@ struct device_io_vc_internal {
 }
 
 - (void)dispose {
-    _internal.manager->stop();
-
-    _internal.route = nullptr;
-    _internal.tap = nullptr;
-    _internal.manager = nullptr;
-
-    _internal.system_observer = nullptr;
-    _internal.device_observer = nullptr;
+    self->_cpp->manager->stop();
+    self->_cpp = nullptr;
 
     self.selectedDeviceIndex = audio::mac_device::all_devices().size();
 
@@ -244,7 +240,7 @@ struct device_io_vc_internal {
     self.deviceNames = titles;
 
     std::optional<NSUInteger> index = std::nullopt;
-    if (auto const io_device = _internal.manager->io().value()->device()) {
+    if (auto const io_device = _cpp->manager->io().value()->device()) {
         auto const mac_device = std::dynamic_pointer_cast<audio::mac_device>(*io_device);
         index = audio::mac_device::index_of_device(mac_device);
     }
@@ -262,33 +258,29 @@ struct device_io_vc_internal {
     self.outputRoutes = nil;
     self.inputRoutes = nil;
 
-    if (_internal.manager) {
-        _internal.manager->disconnect(_internal.tap->node());
-        _internal.manager->disconnect(_internal.route->node());
-        _internal.route->clear_routes();
+    _cpp->manager->disconnect(_cpp->tap->node());
+    _cpp->manager->disconnect(_cpp->route->node());
+    _cpp->route->clear_routes();
 
-        if (auto const &device_opt = _internal.manager->io().value()->device()) {
-            auto const &device = *device_opt;
-            if (device->output_channel_count() > 0) {
-                if (auto const output_format = device->output_format()) {
-                    _internal.manager->connect(_internal.route->node(), _internal.manager->io().value()->node(),
-                                               *output_format);
-                    _internal.manager->connect(_internal.tap->node(), _internal.route->node(), 0,
-                                               YASAudioDeviceRouteSampleSourceBusSine, *output_format);
-                }
-            }
-
-            if (device->input_channel_count() > 0) {
-                if (auto const input_format = device->input_format()) {
-                    _internal.manager->connect(_internal.manager->io().value()->node(), _internal.route->node(), 0,
-                                               YASAudioDeviceRouteSampleSourceBusInput, *input_format);
-                }
+    if (auto const &device_opt = _cpp->manager->io().value()->device()) {
+        auto const &device = *device_opt;
+        if (device->output_channel_count() > 0) {
+            if (auto const output_format = device->output_format()) {
+                _cpp->manager->connect(_cpp->route->node(), _cpp->manager->io().value()->node(), *output_format);
+                _cpp->manager->connect(_cpp->tap->node(), _cpp->route->node(), 0,
+                                       (uint32_t)sample::engine_io_vc_cpp::source_bus::sine, *output_format);
             }
         }
-    }
 
-    if (auto const &io_device = _internal.manager->io().value()->device()) {
-        auto const mac_device = std::dynamic_pointer_cast<audio::mac_device>(*io_device);
+        if (device->input_channel_count() > 0) {
+            if (auto const input_format = device->input_format()) {
+                _cpp->manager->connect(_cpp->manager->io().value()->node(), _cpp->route->node(), 0,
+                                       (uint32_t)sample::engine_io_vc_cpp::source_bus::input, *input_format);
+            }
+        }
+
+        auto const mac_device = std::dynamic_pointer_cast<audio::mac_device>(device);
+
         uint32_t const output_channel_count = mac_device->output_channel_count();
         uint32_t const input_channel_count = mac_device->input_channel_count();
         NSMutableArray *outputRoutes = [NSMutableArray arrayWithCapacity:output_channel_count];
@@ -332,11 +324,11 @@ struct device_io_vc_internal {
 }
 
 - (void)_updateInputSelection {
-    if (!_internal.route) {
+    if (!_cpp->route) {
         return;
     }
 
-    auto &routes = _internal.route->routes();
+    auto &routes = _cpp->route->routes();
     for (YASAudioDeviceRouteSampleOutputData *data in self.outputRoutes) {
         uint32_t const dst_ch_idx = data.outputIndex;
         auto it = std::find_if(routes.begin(), routes.end(), [dst_ch_idx](const audio::route &route) {
@@ -347,15 +339,15 @@ struct device_io_vc_internal {
 
         if (it != routes.end()) {
             auto const &route = *it;
-            if (route.source.bus == YASAudioDeviceRouteSampleSourceBusSine) {
-                inputSelectIndex = YASAudioDeviceRouteSampleInputTypeSine;
-            } else if (route.source.bus == YASAudioDeviceRouteSampleSourceBusInput) {
-                inputSelectIndex = route.source.channel + YASAudioDeviceRouteSampleInputTypeInput;
+            if (route.source.bus == (uint32_t)sample::engine_io_vc_cpp::source_bus::sine) {
+                inputSelectIndex = (uint32_t)sample::engine_io_vc_cpp::input_type::sine;
+            } else if (route.source.bus == (uint32_t)sample::engine_io_vc_cpp::source_bus::input) {
+                inputSelectIndex = route.source.channel + (uint32_t)sample::engine_io_vc_cpp::input_type::input;
             } else {
-                inputSelectIndex = YASAudioDeviceRouteSampleInputTypeNone;
+                inputSelectIndex = (uint32_t)sample::engine_io_vc_cpp::input_type::none;
             }
         } else {
-            inputSelectIndex = YASAudioDeviceRouteSampleInputTypeNone;
+            inputSelectIndex = (uint32_t)sample::engine_io_vc_cpp::input_type::none;
         }
 
         if (data.inputSelectIndex != inputSelectIndex) {
@@ -375,37 +367,29 @@ struct device_io_vc_internal {
         auto const &device = all_devices[selectedDeviceIndex];
         [self setDevice:device];
     } else {
-        [self setDevice:nullptr];
+        [self setDevice:std::nullopt];
     }
 }
 
-- (void)setDevice:(audio::mac_device_ptr const &)selected_device {
-    _internal.device_observer = nullptr;
-
-    if (!_internal.manager || !_internal.manager->io()) {
+- (void)setDevice:(std::optional<audio::mac_device_ptr> const &)selected_device {
+    if (!self->_cpp) {
         return;
     }
 
+    _cpp->device_observer = std::nullopt;
+
     auto const all_devices = audio::mac_device::all_devices();
 
-    if (selected_device && std::find(all_devices.begin(), all_devices.end(), selected_device) != all_devices.end()) {
-        _internal.manager->io().value()->set_device(selected_device);
+    _cpp->manager->io().value()->set_device(selected_device);
 
+    if (selected_device && std::find(all_devices.begin(), all_devices.end(), selected_device) != all_devices.end()) {
         auto unowned_self = objc_ptr_with_move_object([[YASUnownedObject alloc] initWithObject:self]);
 
-        _internal.device_observer = selected_device->chain(audio::mac_device::method::device_did_change)
-                                        .perform([selected_device, unowned_self](auto const &change_info) {
-                                            auto const &infos = change_info.property_infos;
-                                            if (change_info.property_infos.size() > 0) {
-                                                auto const &device_id = infos.at(0).object_id;
-                                                if (selected_device->audio_device_id() == device_id) {
-                                                    [[unowned_self.object() object] _updateConnection];
-                                                }
-                                            }
-                                        })
-                                        .end();
-    } else {
-        _internal.manager->io().value()->set_device(std::nullopt);
+        _cpp->device_observer =
+            selected_device.value()
+                ->io_device_chain()
+                .perform([unowned_self](auto const &) { [[unowned_self.object() object] _updateConnection]; })
+                .end();
     }
 
     [self _updateConnection];

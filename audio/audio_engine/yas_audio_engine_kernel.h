@@ -17,7 +17,7 @@ struct kernel : manageable_kernel {
     audio::engine::connection_ptr input_connection(uint32_t const bus_idx) const;
     audio::engine::connection_ptr output_connection(uint32_t const bus_idx) const;
 
-    std::any decorator = nullptr;
+    std::optional<std::any> decorator = std::nullopt;
 
    private:
     std::weak_ptr<kernel> _weak_kernel;
