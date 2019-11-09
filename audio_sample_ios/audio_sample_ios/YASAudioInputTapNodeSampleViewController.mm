@@ -35,7 +35,8 @@ struct input_tap_vc_internal {
         audio::avf_device_ptr const device = std::dynamic_pointer_cast<audio::avf_device>(io->device().value());
 
         double const sample_rate = device->sample_rate();
-        audio::format format{{.sample_rate = sample_rate, .channel_count = 2}};
+        uint32_t const ch_count = device->input_channel_count();
+        audio::format format{{.sample_rate = sample_rate, .channel_count = ch_count}};
         manager->connect(io->node(), input_tap->node(), format);
 
         input_tap->set_render_handler([input_level = input_level, sample_rate](auto args) mutable {
@@ -82,37 +83,29 @@ struct input_tap_vc_internal {
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
 
-    BOOL success = NO;
-    NSError *error = nil;
-    NSString *errorMessage = nil;
+    if (self.isMovingToParentViewController) {
+        NSError *error = nil;
 
-    if ([[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayAndRecord error:&error]) {
-        _internal.prepare();
-        auto start_result = _internal.manager->start_render();
-        if (start_result) {
-            success = YES;
-            self.displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(updateUI:)];
-            [self.displayLink addToRunLoop:[NSRunLoop mainRunLoop] forMode:NSDefaultRunLoopMode];
-        } else {
-            auto const error_string = to_string(start_result.error());
-            errorMessage = (__bridge NSString *)to_cf_object(error_string);
+        if ([[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayAndRecord error:&error]) {
+            [[AVAudioSession sharedInstance] setActive:YES error:&error];
         }
-    } else {
-        errorMessage = error.description;
-    }
 
-    if (errorMessage) {
-        [self _showErrorAlertWithMessage:errorMessage];
+        if (!error) {
+            [self setup];
+        } else {
+            [self _showErrorAlertWithMessage:error.description];
+        }
     }
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
 
-    [self.displayLink invalidate];
-    self.displayLink = nil;
+    if (self.isMovingFromParentViewController) {
+        [self dispose];
 
-    _internal.manager->stop();
+        [[AVAudioSession sharedInstance] setActive:NO error:nil];
+    }
 }
 
 - (void)updateUI:(CADisplayLink *)sender {
@@ -125,6 +118,30 @@ struct input_tap_vc_internal {
         self.label.text = [NSString stringWithFormat:@"%.1f dB", value];
         _lastLabelUpdatedTime = currentTime;
     }
+}
+
+#pragma mark -
+
+- (void)setup {
+    _internal.prepare();
+
+    auto start_result = _internal.manager->start_render();
+
+    if (start_result) {
+        self.displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(updateUI:)];
+        [self.displayLink addToRunLoop:[NSRunLoop mainRunLoop] forMode:NSDefaultRunLoopMode];
+    } else {
+        auto const error_string = to_string(start_result.error());
+        NSString *errorMessage = (__bridge NSString *)to_cf_object(error_string);
+        [self _showErrorAlertWithMessage:errorMessage];
+    }
+}
+
+- (void)dispose {
+    [self.displayLink invalidate];
+    self.displayLink = nil;
+
+    _internal.manager->stop();
 }
 
 #pragma mark -
