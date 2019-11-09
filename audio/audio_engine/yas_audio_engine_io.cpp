@@ -160,7 +160,10 @@ bool audio::engine::io::_validate_connections() {
                 }
                 auto const &device = *device_opt;
                 if (connection_format != device->output_format()) {
-                    std::cout << __PRETTY_FUNCTION__ << " : output device io format is not match." << std::endl;
+                    std::cout << __PRETTY_FUNCTION__ << " : output device io format is not match.\n";
+                    std::cout << "device output format : " << to_string(*device->output_format());
+                    std::cout << "connection format : " << to_string(connection_format);
+                    std::cout << std::endl;
                     return false;
                 }
             }
@@ -179,7 +182,10 @@ bool audio::engine::io::_validate_connections() {
                 }
                 auto const &device = *device_opt;
                 if (connection_format != device->input_format()) {
-                    std::cout << __PRETTY_FUNCTION__ << " : input device io format is not match." << std::endl;
+                    std::cout << __PRETTY_FUNCTION__ << " : input device io format is not match.\n";
+                    std::cout << "device input format : " << to_string(*device->input_format());
+                    std::cout << "connection format : " << to_string(connection_format);
+                    std::cout << std::endl;
                     return false;
                 }
             }
