@@ -204,7 +204,7 @@ void audio::avf_io_core::_update_kernel() {
         return;
     }
 
-    this->_set_kernel(io_kernel::make_shared(output_format, input_format, this->__maximum_frames));
+    this->_set_kernel(io_kernel::make_shared(input_format, output_format, this->__maximum_frames));
 }
 
 audio::avf_io_core_ptr audio::avf_io_core::make_shared(avf_device_ptr const &device) {
