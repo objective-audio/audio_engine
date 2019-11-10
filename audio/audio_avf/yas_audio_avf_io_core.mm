@@ -13,12 +13,9 @@
 using namespace yas;
 
 struct audio::avf_io_core::impl {
-    objc_ptr<AVAudioEngine *> _avf_engine;
+    std::optional<objc_ptr<AVAudioEngine *>> _avf_engine = std::nullopt;
     objc_ptr<AVAudioSourceNode *> _source_node;
     objc_ptr<AVAudioSinkNode *> _sink_node;
-
-    impl() : _avf_engine(objc_ptr_with_move_object([[AVAudioEngine alloc] init])) {
-    }
 };
 
 audio::avf_io_core::avf_io_core(avf_device_ptr const &device) : _device(device), _impl(std::make_unique<impl>()) {
@@ -29,27 +26,31 @@ audio::avf_io_core::~avf_io_core() {
 }
 
 void audio::avf_io_core::initialize() {
-    auto const &output_format = this->_device->output_format();
-    auto const &input_format = this->_device->input_format();
+    auto engine = objc_ptr_with_move_object([[AVAudioEngine alloc] init]);
+    this->_impl->_avf_engine = engine;
 
-    auto const &engine = this->_impl->_avf_engine;
+    auto const &output_format = this->_device->output_format();
 
     if (output_format) {
         auto const objc_output_format = objc_ptr_with_move_object([[AVAudioFormat alloc]
             initStandardFormatWithSampleRate:output_format->sample_rate()
                                     channels:output_format->channel_count()]);
 
+        [engine.object() attachNode:this->_impl->_source_node.object()];
         [engine.object() connect:this->_impl->_source_node.object()
-                              to:this->_impl->_avf_engine.object().outputNode
+                              to:engine.object().outputNode
                           format:objc_output_format.object()];
     }
+
+    auto const &input_format = this->_device->input_format();
 
     if (input_format) {
         auto const objc_input_format = objc_ptr_with_move_object([[AVAudioFormat alloc]
             initStandardFormatWithSampleRate:input_format->sample_rate()
                                     channels:input_format->channel_count()]);
 
-        [engine.object() connect:this->_impl->_avf_engine.object().inputNode
+        [engine.object() attachNode:this->_impl->_sink_node.object()];
+        [engine.object() connect:engine.object().inputNode
                               to:this->_impl->_sink_node.object()
                           format:objc_input_format.object()];
     }
@@ -60,9 +61,23 @@ void audio::avf_io_core::initialize() {
 void audio::avf_io_core::uninitialize() {
     this->stop();
 
-    auto const &engine = this->_impl->_avf_engine;
-    [engine.object() disconnectNodeInput:this->_impl->_sink_node.object()];
-    [engine.object() disconnectNodeOutput:this->_impl->_source_node.object()];
+    if (auto const &engine_opt = this->_impl->_avf_engine) {
+        auto const &engine = engine_opt.value();
+
+        auto const &sink_node = this->_impl->_sink_node;
+        if ([engine.object().attachedNodes containsObject:sink_node.object()]) {
+            [engine.object() disconnectNodeInput:sink_node.object()];
+            [engine.object() detachNode:sink_node.object()];
+        }
+
+        auto const &source_node = this->_impl->_source_node;
+        if ([engine.object().attachedNodes containsObject:source_node.object()]) {
+            [engine.object() disconnectNodeInput:source_node.object()];
+            [engine.object() detachNode:source_node.object()];
+        }
+
+        this->_impl->_avf_engine = nullptr;
+    }
 
     this->_update_kernel();
 }
@@ -80,8 +95,9 @@ void audio::avf_io_core::set_maximum_frames_per_slice(uint32_t const frames) {
 
 bool audio::avf_io_core::start() {
     NSError *error = nil;
+    auto const engine = this->_impl->_avf_engine;
 
-    if ([this->_impl->_avf_engine.object() startAndReturnError:&error]) {
+    if (engine && [engine.value().object() startAndReturnError:&error]) {
         return true;
     } else {
         NSLog(@"%@", error);
@@ -90,7 +106,9 @@ bool audio::avf_io_core::start() {
 }
 
 void audio::avf_io_core::stop() {
-    [this->_impl->_avf_engine.object() stop];
+    if (auto const &engine = this->_impl->_avf_engine) {
+        [engine.value().object() stop];
+    }
 }
 
 std::optional<audio::pcm_buffer_ptr> const &audio::avf_io_core::input_buffer_on_render() const {
@@ -175,9 +193,6 @@ void audio::avf_io_core::_prepare(avf_io_core_ptr const &shared) {
         }]);
 
     auto &impl = this->_impl;
-
-    [impl->_avf_engine.object() attachNode:source_node.object()];
-    [impl->_avf_engine.object() attachNode:sink_node.object()];
 
     impl->_source_node = source_node;
     impl->_sink_node = sink_node;
