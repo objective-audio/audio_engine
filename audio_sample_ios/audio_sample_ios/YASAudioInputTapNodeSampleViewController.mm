@@ -86,7 +86,7 @@ struct input_tap_vc_internal {
     if (self.isMovingToParentViewController) {
         NSError *error = nil;
 
-        if ([[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayAndRecord error:&error]) {
+        if ([[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryRecord error:&error]) {
             [[AVAudioSession sharedInstance] setActive:YES error:&error];
         }
 
