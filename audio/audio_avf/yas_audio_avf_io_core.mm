@@ -157,6 +157,15 @@ void audio::avf_io_core::_prepare(avf_io_core_ptr const &shared) {
                                 io_core->_input_buffer_on_render = input_buffer;
                                 io_core->_input_time_on_render =
                                     std::make_shared<audio::time>(*timestamp, input_buffer->format().sample_rate());
+
+                                if (!kernel->output_buffer) {
+                                    if (auto render_handler = io_core->_render_handler()) {
+                                        render_handler.value()(
+                                            io_render_args{.output_buffer = std::nullopt, .when = std::nullopt});
+                                        io_core->_input_buffer_on_render = std::nullopt;
+                                        io_core->_input_time_on_render = std::nullopt;
+                                    }
+                                }
                             }
                         }
                     }
