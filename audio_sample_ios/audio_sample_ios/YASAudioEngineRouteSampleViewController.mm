@@ -242,13 +242,13 @@ struct route_vc_internal {
     auto tap_render_handler = [phase](auto args) mutable {
         auto &buffer = args.buffer;
 
-        buffer.clear();
+        buffer->clear();
 
         double const start_phase = phase;
-        double const phase_per_frame = 1000.0 / buffer.format().sample_rate() * audio::math::two_pi;
+        double const phase_per_frame = 1000.0 / buffer->format().sample_rate() * audio::math::two_pi;
 
-        auto each = audio::make_each_data<float>(buffer);
-        auto const length = buffer.frame_length();
+        auto each = audio::make_each_data<float>(*buffer);
+        auto const length = buffer->frame_length();
 
         while (yas_each_data_next_ch(each)) {
             phase = audio::math::fill_sine(yas_each_data_ptr(each), length, start_phase, phase_per_frame);

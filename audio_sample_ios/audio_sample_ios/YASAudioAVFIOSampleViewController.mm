@@ -10,14 +10,11 @@
 
 using namespace yas;
 
-using sample_kernel_t = audio::sample::kernel;
-using sample_kernel_ptr = std::shared_ptr<sample_kernel_t>;
-
 namespace yas::sample {
 struct avf_io_vc_internal {
     audio::graph_ptr graph = nullptr;
     audio::io_ptr avf_io = nullptr;
-    sample_kernel_ptr kernel = nullptr;
+    audio::sample_kernel_ptr kernel = nullptr;
 };
 }
 
@@ -51,7 +48,7 @@ struct avf_io_vc_internal {
     self->_internal.avf_io = audio::io::make_shared(audio::avf_device::make_shared());
     self->_internal.graph->add_io(self->_internal.avf_io);
 
-    self->_internal.kernel = std::make_shared<sample_kernel_t>();
+    self->_internal.kernel = std::make_shared<audio::sample_kernel_t>();
 
     auto weak_io = to_weak(self->_internal.avf_io);
     self->_internal.avf_io->set_render_handler([weak_io, kernel = self->_internal.kernel](auto args) {
@@ -73,6 +70,10 @@ struct avf_io_vc_internal {
 }
 
 - (void)dispose {
+    if (self->_internal.graph) {
+        self->_internal.graph->stop();
+    }
+
     self->_internal.graph = nullptr;
     self->_internal.avf_io = nullptr;
     self->_internal.kernel = nullptr;
@@ -100,10 +101,6 @@ struct avf_io_vc_internal {
     [super viewWillDisappear:animated];
 
     if (self.isMovingFromParentViewController) {
-        if (self->_internal.graph) {
-            self->_internal.graph->stop();
-        }
-
         [self dispose];
 
         [[AVAudioSession sharedInstance] setActive:NO error:nil];

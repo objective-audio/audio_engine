@@ -29,7 +29,7 @@ struct node : connectable_node, manageable_node {
     using chaining_pair_t = std::pair<method, node_ptr>;
 
     struct render_args {
-        audio::pcm_buffer &buffer;
+        audio::pcm_buffer_ptr const &buffer;
         uint32_t const bus_idx;
         audio::time const &when;
     };

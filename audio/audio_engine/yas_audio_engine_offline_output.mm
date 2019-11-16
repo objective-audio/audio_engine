@@ -115,11 +115,11 @@ audio::engine::offline_start_result_t audio::engine::offline_output::start(offli
 
                 if (auto src_node = connection_on_block->source_node()) {
                     src_node->render(
-                        {.buffer = *render_buffer, .bus_idx = connection_on_block->source_bus, .when = when});
+                        {.buffer = render_buffer, .bus_idx = connection_on_block->source_bus, .when = when});
                 }
 
                 if (render_handler) {
-                    if (render_handler({.buffer = *render_buffer, .when = when}) == continuation::abort) {
+                    if (render_handler({.buffer = render_buffer, .when = when}) == continuation::abort) {
                         break;
                     }
                 }
