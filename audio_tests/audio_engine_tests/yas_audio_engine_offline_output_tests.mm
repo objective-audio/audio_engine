@@ -55,17 +55,17 @@ using namespace yas;
 
         XCTAssertEqual(when.sample_time(), tap_render_frame);
         XCTAssertEqual(when.sample_rate(), sample_rate);
-        XCTAssertEqual(buffer.frame_length(), frames_per_render);
-        XCTAssertTrue(buffer.format() == format);
+        XCTAssertEqual(buffer->frame_length(), frames_per_render);
+        XCTAssertTrue(buffer->format() == format);
 
-        for (uint32_t buf_idx = 0; buf_idx < buffer.format().buffer_count(); ++buf_idx) {
-            float *ptr = buffer.data_ptr_at_index<float>(buf_idx);
-            for (uint32_t frm_idx = 0; frm_idx < buffer.frame_length(); ++frm_idx) {
+        for (uint32_t buf_idx = 0; buf_idx < buffer->format().buffer_count(); ++buf_idx) {
+            float *ptr = buffer->data_ptr_at_index<float>(buf_idx);
+            for (uint32_t frm_idx = 0; frm_idx < buffer->frame_length(); ++frm_idx) {
                 ptr[frm_idx] = test::test_value(frm_idx + tap_render_frame, 0, buf_idx);
             }
         }
 
-        tap_render_frame += buffer.frame_length();
+        tap_render_frame += buffer->frame_length();
         if (tapNodeExpectation && tap_render_frame >= length) {
             [tapNodeExpectation fulfill];
             tapNodeExpectation = nil;
@@ -85,12 +85,12 @@ using namespace yas;
 
         XCTAssertEqual(when.sample_time(), output_render_frame);
         XCTAssertEqual(when.sample_rate(), sample_rate);
-        XCTAssertEqual(buffer.frame_length(), frames_per_render);
-        XCTAssertTrue(buffer.format() == format);
+        XCTAssertEqual(buffer->frame_length(), frames_per_render);
+        XCTAssertTrue(buffer->format() == format);
 
-        for (uint32_t buf_idx = 0; buf_idx < buffer.format().buffer_count(); ++buf_idx) {
-            float *ptr = buffer.data_ptr_at_index<float>(buf_idx);
-            for (uint32_t frm_idx = 0; frm_idx < buffer.frame_length(); ++frm_idx) {
+        for (uint32_t buf_idx = 0; buf_idx < buffer->format().buffer_count(); ++buf_idx) {
+            float *ptr = buffer->data_ptr_at_index<float>(buf_idx);
+            for (uint32_t frm_idx = 0; frm_idx < buffer->frame_length(); ++frm_idx) {
                 bool is_equal_value = ptr[frm_idx] == test::test_value(frm_idx + output_render_frame, 0, buf_idx);
                 XCTAssertTrue(is_equal_value);
                 if (!is_equal_value) {
@@ -99,7 +99,7 @@ using namespace yas;
             }
         }
 
-        output_render_frame += buffer.frame_length();
+        output_render_frame += buffer->frame_length();
         if (output_render_frame >= length) {
             if (renderExpectation) {
                 [renderExpectation fulfill];
@@ -151,16 +151,16 @@ using namespace yas;
 
         XCTAssertEqual(when.sample_time(), tap_render_frame);
         XCTAssertEqual(when.sample_rate(), sample_rate);
-        XCTAssertEqual(buffer.frame_length(), frames_per_render);
-        XCTAssertTrue(buffer.format() == format);
+        XCTAssertEqual(buffer->frame_length(), frames_per_render);
+        XCTAssertTrue(buffer->format() == format);
 
-        auto each = audio::make_each_data<float>(buffer);
+        auto each = audio::make_each_data<float>(*buffer);
         while (yas_each_data_next(each)) {
             yas_each_data_value(each) =
                 test::test_value((uint32_t)each.frm_idx + tap_render_frame, 0, (uint32_t)each.ptr_idx);
         }
 
-        tap_render_frame += buffer.frame_length();
+        tap_render_frame += buffer->frame_length();
         if (tap_render_frame && tap_render_frame >= length) {
             [tapNodeExpectation fulfill];
             tapNodeExpectation = nil;
@@ -175,15 +175,15 @@ using namespace yas;
     uint32_t output_render_frame = 0;
 
     auto start_render_handler = [=](auto args) mutable {
-        auto &buffer = args.buffer;
+        auto const &buffer = args.buffer;
         auto const &when = args.when;
 
         XCTAssertEqual(when.sample_time(), output_render_frame);
         XCTAssertEqual(when.sample_rate(), sample_rate);
-        XCTAssertEqual(buffer.frame_length(), frames_per_render);
-        XCTAssertTrue(buffer.format() == format);
+        XCTAssertEqual(buffer->frame_length(), frames_per_render);
+        XCTAssertTrue(buffer->format() == format);
 
-        auto each = audio::make_each_data<float>(buffer);
+        auto each = audio::make_each_data<float>(*buffer);
         while (yas_each_data_next(each)) {
             bool is_equal_value =
                 yas_each_data_value(each) ==
@@ -194,7 +194,7 @@ using namespace yas;
             }
         }
 
-        output_render_frame += buffer.frame_length();
+        output_render_frame += buffer->frame_length();
         if (output_render_frame >= length) {
             if (renderExpectation) {
                 [renderExpectation fulfill];

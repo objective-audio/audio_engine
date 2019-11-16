@@ -64,17 +64,17 @@ struct sine {
         auto render_handler = [weak_sine](auto args) {
             auto &buffer = args.buffer;
 
-            buffer.clear();
+            buffer->clear();
 
             if (auto sine = weak_sine.lock()) {
                 if (sine->is_playing()) {
                     double const start_phase = sine->_phase_on_render;
                     double const phase_per_frame = sine->frequency() / sample_rate * audio::math::two_pi;
                     double next_phase = start_phase;
-                    uint32_t const frame_length = buffer.frame_length();
+                    uint32_t const frame_length = buffer->frame_length();
 
                     if (frame_length > 0) {
-                        auto each = audio::make_each_data<float>(buffer);
+                        auto each = audio::make_each_data<float>(*buffer);
                         while (yas_each_data_next_ch(each)) {
                             next_phase = audio::math::fill_sine(yas_each_data_ptr(each), frame_length, start_phase,
                                                                 phase_per_frame);
@@ -277,9 +277,9 @@ struct offline_vc_internal {
         [remain, file_writer = std::move(file_writer)](auto args) mutable {
             auto &buffer = args.buffer;
 
-            auto format = audio::format(buffer.format().stream_description());
-            audio::pcm_buffer pcm_buffer(format, buffer.audio_buffer_list());
-            pcm_buffer.set_frame_length(buffer.frame_length());
+            auto format = audio::format(buffer->format().stream_description());
+            audio::pcm_buffer pcm_buffer(format, buffer->audio_buffer_list());
+            pcm_buffer.set_frame_length(buffer->frame_length());
 
             uint32_t frame_length = MIN(remain, pcm_buffer.frame_length());
             if (frame_length > 0) {

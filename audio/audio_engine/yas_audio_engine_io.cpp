@@ -64,15 +64,15 @@ void audio::engine::io::_prepare(io_ptr const &shared) {
     this->_weak_engine_io = to_weak(shared);
 
     this->_node->set_render_handler([weak_engine_io = this->_weak_engine_io](auto args) {
-        auto &buffer = args.buffer;
+        auto const &buffer = args.buffer;
 
         if (auto engine_io = weak_engine_io.lock()) {
             if (auto const &raw_io = engine_io->raw_io()) {
                 auto const &input_buffer_opt = raw_io.value()->input_buffer_on_render();
                 if (input_buffer_opt) {
                     auto const &input_buffer = *input_buffer_opt;
-                    if (input_buffer->format() == buffer.format()) {
-                        buffer.copy_from(*input_buffer);
+                    if (input_buffer->format() == buffer->format()) {
+                        buffer->copy_from(*input_buffer);
                     }
                 }
             }
@@ -113,9 +113,8 @@ void audio::engine::io::_update_io_connections() {
                     if (auto src_node = connection->source_node();
                         src_node && connection->format == src_node->output_format(connection->source_bus)) {
                         if (auto const when = args.when) {
-                            src_node->render({.buffer = **args.output_buffer,
-                                              .bus_idx = connection->source_bus,
-                                              .when = *args.when});
+                            src_node->render(
+                                {.buffer = *args.output_buffer, .bus_idx = connection->source_bus, .when = *args.when});
                         }
                     }
                 }
@@ -130,7 +129,7 @@ void audio::engine::io::_update_io_connections() {
                             auto const &input_time = io->input_time_on_render();
                             if (input_buffer && input_time) {
                                 if (connection->format == dst_node->input_format(connection->destination_bus)) {
-                                    dst_node->render({.buffer = **input_buffer, .bus_idx = 0, .when = **input_time});
+                                    dst_node->render({.buffer = *input_buffer, .bus_idx = 0, .when = **input_time});
                                 }
                             }
                         }

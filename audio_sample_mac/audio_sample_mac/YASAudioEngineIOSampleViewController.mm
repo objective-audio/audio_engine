@@ -181,16 +181,16 @@ struct engine_io_vc_cpp {
     auto render_handler = [next_phase, weak_tap](auto args) mutable {
         auto &buffer = args.buffer;
 
-        buffer.clear();
+        buffer->clear();
 
         double const start_phase = next_phase;
-        auto const frame_length = buffer.frame_length();
-        double const phase_per_frame = 1000.0 / buffer.format().sample_rate() * audio::math::two_pi;
-        auto each = audio::make_each_data<float>(buffer);
+        auto const frame_length = buffer->frame_length();
+        double const phase_per_frame = 1000.0 / buffer->format().sample_rate() * audio::math::two_pi;
+        auto each = audio::make_each_data<float>(*buffer);
         while (yas_each_data_next_ch(each)) {
             auto *const ptr = yas_each_data_ptr(each);
             next_phase = audio::math::fill_sine(ptr, frame_length, start_phase, phase_per_frame);
-            cblas_sscal(buffer.frame_length(), 0.1, ptr, 1);
+            cblas_sscal(buffer->frame_length(), 0.1, ptr, 1);
         }
     };
 

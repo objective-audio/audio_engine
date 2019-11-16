@@ -25,7 +25,7 @@
                                             <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" insetsLayoutMarginsFromSafeArea="NO" text="IO Through with yas::audio::avf_io" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="IFa-h2-dlh">
+                                                <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" insetsLayoutMarginsFromSafeArea="NO" text="IO Through with avf_io" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="IFa-h2-dlh">
                                                     <rect key="frame" x="16" y="0.0" width="343" height="44"/>
                                                     <autoresizingMask key="autoresizingMask"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
@@ -92,6 +92,25 @@
                                         </tableViewCellContentView>
                                         <connections>
                                             <segue destination="qZ9-oQ-6Do" kind="show" id="8YI-dB-CMN"/>
+                                        </connections>
+                                    </tableViewCell>
+                                    <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" textLabel="gWg-1H-nmX" style="IBUITableViewCellStyleDefault" id="tYs-Jb-tMB">
+                                        <rect key="frame" x="0.0" y="204" width="375" height="44"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="tYs-Jb-tMB" id="fuV-lA-cvv">
+                                            <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="Converter with avf_io" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="gWg-1H-nmX">
+                                                    <rect key="frame" x="16" y="0.0" width="343" height="44"/>
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="16"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                            </subviews>
+                                        </tableViewCellContentView>
+                                        <connections>
+                                            <segue destination="0b7-AK-88J" kind="show" id="s7h-Wp-co4"/>
                                         </connections>
                                     </tableViewCell>
                                 </cells>
@@ -531,6 +550,25 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="HGj-LM-I7R" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="-85" y="325"/>
+        </scene>
+        <!--AudioAVF Converter Sample View Controller-->
+        <scene sceneID="GJV-OK-Xzi">
+            <objects>
+                <viewController id="0b7-AK-88J" customClass="YASAudioAVFConverterSampleViewController" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="ke1-PS-Nc5"/>
+                        <viewControllerLayoutGuide type="bottom" id="r1v-7R-HRZ"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="tsY-R4-Wew">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                    </view>
+                    <navigationItem key="navigationItem" id="LUt-iG-bE7"/>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="AtS-h4-OYi" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="431" y="1095"/>
         </scene>
     </scenes>
 </document>

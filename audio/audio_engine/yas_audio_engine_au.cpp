@@ -167,7 +167,7 @@ void audio::engine::au::_prepare(au_ptr const &shared, AudioComponentDescription
     auto weak_au = to_weak(shared);
 
     this->_node->set_render_handler([weak_au](auto args) {
-        auto &buffer = args.buffer;
+        auto const &buffer = args.buffer;
 
         if (auto au = weak_au.lock()) {
             if (auto const unit = au->_core->unit()) {
@@ -178,8 +178,8 @@ void audio::engine::au::_prepare(au_ptr const &shared, AudioComponentDescription
                                                     .io_action_flags = &action_flags,
                                                     .io_time_stamp = &time_stamp,
                                                     .in_bus_number = args.bus_idx,
-                                                    .in_number_frames = buffer.frame_length(),
-                                                    .io_data = buffer.audio_buffer_list()};
+                                                    .in_number_frames = buffer->frame_length(),
+                                                    .io_data = buffer->audio_buffer_list()};
 
                 if (auto err = unit.value()->raw_unit_render(render_parameters).error_opt()) {
                     std::cout << "audio unit render error : " << std::to_string(*err) << " - " << to_string(*err)
@@ -238,7 +238,8 @@ void audio::engine::au::_update_unit_connections() {
                     if (auto kernel = au->node()->kernel()) {
                         if (auto connection = kernel.value()->input_connection(render_parameters.in_bus_number)) {
                             if (auto src_node = connection->source_node()) {
-                                pcm_buffer buffer{connection->format, render_parameters.io_data};
+                                auto const buffer =
+                                    std::make_shared<pcm_buffer>(connection->format, render_parameters.io_data);
                                 time when(*render_parameters.io_time_stamp, connection->format.sample_rate());
                                 src_node->render({.buffer = buffer, .bus_idx = connection->source_bus, .when = when});
                             }

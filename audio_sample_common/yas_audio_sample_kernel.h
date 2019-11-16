@@ -46,7 +46,7 @@ struct kernel {
             return;
         }
         
-        auto const &output_buffer = *output_buffer_opt;
+        auto const &output_buffer = output_buffer_opt.value();
         
         uint32_t const frame_length = output_buffer->frame_length();
 
@@ -103,4 +103,9 @@ struct kernel {
     kernel &operator=(const kernel &) = delete;
     kernel &operator=(kernel &&) = delete;
 };
+}
+
+namespace yas::audio {
+    using sample_kernel_t = audio::sample::kernel;
+    using sample_kernel_ptr = std::shared_ptr<sample_kernel_t>;
 }

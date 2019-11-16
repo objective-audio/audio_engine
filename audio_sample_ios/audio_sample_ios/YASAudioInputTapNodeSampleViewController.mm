@@ -40,10 +40,10 @@ struct input_tap_vc_internal {
         manager->connect(io->node(), input_tap->node(), format);
 
         input_tap->set_render_handler([input_level = input_level, sample_rate](auto args) mutable {
-            audio::pcm_buffer &buffer = args.buffer;
+            auto const &buffer = args.buffer;
 
-            auto each = audio::make_each_data<float>(buffer);
-            int const frame_length = buffer.frame_length();
+            auto each = audio::make_each_data<float>(*buffer);
+            int const frame_length = buffer->frame_length();
             float level = 0;
 
             while (yas_each_data_next_ch(each)) {

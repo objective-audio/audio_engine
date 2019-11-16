@@ -6,6 +6,7 @@
 
 #include <cpp_utils/yas_result.h>
 #include <functional>
+#include "yas_audio_ptr.h"
 #include "yas_audio_types.h"
 
 namespace yas::audio {
@@ -21,7 +22,7 @@ enum class offline_start_error_t {
 };
 
 struct offline_render_args {
-    audio::pcm_buffer &buffer;
+    audio::pcm_buffer_ptr const &buffer;
     audio::time const &when;
 };
 
