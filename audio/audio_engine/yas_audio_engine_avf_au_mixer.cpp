@@ -20,6 +20,15 @@ audio::engine::avf_au_mixer::avf_au_mixer()
 }
 
 void audio::engine::avf_au_mixer::_prepare(avf_au_mixer_ptr const &shared) {
+    /*
+    this->_connections_observer = this->_au->chain(au::method::will_update_connections)
+    .perform([weak_au_mixer = to_weak(shared)](auto const &) {
+        if (auto au_mixer = weak_au_mixer.lock()) {
+            au_mixer->_update_unit_mixer_connections();
+        }
+    })
+    .end();
+     */
 }
 
 void audio::engine::avf_au_mixer::_update_unit_mixer_connections() {
