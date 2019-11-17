@@ -30,8 +30,13 @@ void audio::avf_io_core::initialize() {
     this->_impl->_avf_engine = engine;
 
     auto const &output_format = this->_device->output_format();
+    double const output_sample_rate = output_format->sample_rate();
+    uint32_t const output_channel_count = output_format->channel_count();
 
-    if (output_format) {
+    AVAudioFormat *device_output_format = [engine.object().outputNode outputFormatForBus:0];
+
+    if (output_format && output_sample_rate == device_output_format.sampleRate &&
+        output_channel_count == device_output_format.channelCount) {
         auto const objc_output_format = objc_ptr_with_move_object([[AVAudioFormat alloc]
             initStandardFormatWithSampleRate:output_format->sample_rate()
                                     channels:output_format->channel_count()]);
@@ -43,8 +48,13 @@ void audio::avf_io_core::initialize() {
     }
 
     auto const &input_format = this->_device->input_format();
+    double const input_sample_rate = input_format->sample_rate();
+    uint32_t const input_channel_count = input_format->channel_count();
 
-    if (input_format) {
+    AVAudioFormat *device_input_format = [engine.object().inputNode inputFormatForBus:0];
+
+    if (input_format && input_sample_rate == device_input_format.sampleRate &&
+        input_channel_count == device_input_format.channelCount) {
         auto const objc_input_format = objc_ptr_with_move_object([[AVAudioFormat alloc]
             initStandardFormatWithSampleRate:input_format->sample_rate()
                                     channels:input_format->channel_count()]);
