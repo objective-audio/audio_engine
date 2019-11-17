@@ -129,7 +129,7 @@ audio::engine::node_ptr const &audio::engine::avf_au::node() const {
     return this->_node;
 }
 
-chaining::chain_sync_t<audio::engine::avf_au::load_state> audio::engine::avf_au::chain() const {
+chaining::chain_sync_t<audio::engine::avf_au::load_state> audio::engine::avf_au::load_state_chain() const {
     return this->_load_state->chain();
 }
 

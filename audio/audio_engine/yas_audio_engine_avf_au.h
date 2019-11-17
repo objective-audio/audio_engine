@@ -31,7 +31,7 @@ struct avf_au final : manageable_avf_au {
 
     audio::engine::node_ptr const &node() const;
 
-    chaining::chain_sync_t<load_state> chain() const;
+    chaining::chain_sync_t<load_state> load_state_chain() const;
 
     static avf_au_ptr make_shared(OSType const type, OSType const sub_type);
     static avf_au_ptr make_shared(AudioComponentDescription const &);

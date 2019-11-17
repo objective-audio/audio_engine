@@ -44,7 +44,7 @@ struct avf_converter_vc_cpp {
         this->_manager->connect(this->_au->node(), io->node(), *output_format);
         this->_manager->connect(this->_tap->node(), this->_au->node(), input_format);
 
-        this->_pool += this->_au->chain()
+        this->_pool += this->_au->load_state_chain()
                            .perform([this](auto const &state) {
                                std::cout << "load_state : " << to_string(state) << std::endl;
                                if (state == audio::engine::avf_au::load_state::loaded) {
