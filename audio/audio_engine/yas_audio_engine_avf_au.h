@@ -24,6 +24,8 @@ struct avf_au final : manageable_avf_au {
 
     load_state state() const;
 
+    void set_input_bus_count(uint32_t const count);  // for mixer
+    void set_output_bus_count(uint32_t const count);
     uint32_t input_bus_count() const;
     uint32_t output_bus_count() const;
 
@@ -34,10 +36,6 @@ struct avf_au final : manageable_avf_au {
     static avf_au_ptr make_shared(OSType const type, OSType const sub_type);
     static avf_au_ptr make_shared(AudioComponentDescription const &);
     static avf_au_ptr make_shared(args &&);
-
-   protected:
-    void set_input_bus_count(uint32_t const count);  // for mixer
-    void set_output_bus_count(uint32_t const count);
 
    private:
     std::weak_ptr<avf_au> _weak_au;
