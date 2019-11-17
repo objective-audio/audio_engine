@@ -8,7 +8,7 @@
 #include "yas_audio_engine_node.h"
 
 namespace yas::audio::engine {
-struct avf_au : manageable_avf_au {
+struct avf_au final : manageable_avf_au {
     struct args {
         audio::engine::node_args node_args;
         AudioComponentDescription acd;
