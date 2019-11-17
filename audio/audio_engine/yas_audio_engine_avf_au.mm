@@ -133,6 +133,10 @@ chaining::chain_sync_t<audio::engine::avf_au::load_state> audio::engine::avf_au:
     return this->_load_state->chain();
 }
 
+chaining::chain_unsync_t<audio::engine::avf_au::connection_method> audio::engine::avf_au::connection_chain() const {
+    return this->_connection_notifier->chain();
+}
+
 void audio::engine::avf_au::_prepare(avf_au_ptr const &shared, AudioComponentDescription const &acd) {
     this->_weak_au = shared;
     this->_acd = acd;
