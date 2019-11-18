@@ -10,6 +10,8 @@ namespace yas::audio::engine {
 struct avf_au_mixer final {
     static avf_au_mixer_ptr make_shared();
 
+    avf_au_ptr const &au() const;
+
    private:
     avf_au_ptr _au;
     std::optional<chaining::any_observer_ptr> _connections_observer = std::nullopt;

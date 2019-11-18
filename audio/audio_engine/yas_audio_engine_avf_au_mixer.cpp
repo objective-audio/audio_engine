@@ -19,6 +19,10 @@ audio::engine::avf_au_mixer::avf_au_mixer()
            .node_args = {.input_bus_count = std::numeric_limits<uint32_t>::max(), .output_bus_count = 1}})) {
 }
 
+audio::engine::avf_au_ptr const &audio::engine::avf_au_mixer::au() const {
+    return this->_au;
+}
+
 void audio::engine::avf_au_mixer::_prepare(avf_au_mixer_ptr const &shared) {
     this->_connections_observer =
         this->_au->connection_chain()
