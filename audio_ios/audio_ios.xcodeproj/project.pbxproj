@@ -317,17 +317,16 @@
 		B6002E5021DCC8F20013AA0E /* audio_engine */ = {
 			isa = PBXGroup;
 			children = (
-				B619C9652317FE7800889B5B /* yas_audio_engine_ptr.h */,
 				B6002E5C21DCC8F20013AA0E /* yas_audio_engine_au_mixer.cpp */,
 				B6002E6C21DCC8F20013AA0E /* yas_audio_engine_au_mixer.h */,
 				B6002E7021DCC8F20013AA0E /* yas_audio_engine_au_protocol.h */,
 				B6002E6721DCC8F20013AA0E /* yas_audio_engine_au.cpp */,
 				B6002E5121DCC8F20013AA0E /* yas_audio_engine_au.h */,
+				B624A8942380FA5C00F19E2C /* yas_audio_engine_avf_au_mixer.cpp */,
+				B624A8952380FA5C00F19E2C /* yas_audio_engine_avf_au_mixer.h */,
 				B67F9231237AFF4700757226 /* yas_audio_engine_avf_au_protocol.h */,
 				B67F922923783B3F00757226 /* yas_audio_engine_avf_au.h */,
 				B67F922A23783B3F00757226 /* yas_audio_engine_avf_au.mm */,
-				B624A8942380FA5C00F19E2C /* yas_audio_engine_avf_au_mixer.cpp */,
-				B624A8952380FA5C00F19E2C /* yas_audio_engine_avf_au_mixer.h */,
 				B6002E6621DCC8F20013AA0E /* yas_audio_engine_connection_protocol.h */,
 				B6002E6121DCC8F20013AA0E /* yas_audio_engine_connection.cpp */,
 				B6002E5A21DCC8F20013AA0E /* yas_audio_engine_connection.h */,
@@ -345,6 +344,7 @@
 				B6002E5E21DCC8F20013AA0E /* yas_audio_engine_offline_output_protocol.h */,
 				B6002E6B21DCC8F20013AA0E /* yas_audio_engine_offline_output.h */,
 				B6002E6821DCC8F20013AA0E /* yas_audio_engine_offline_output.mm */,
+				B619C9652317FE7800889B5B /* yas_audio_engine_ptr.h */,
 				B6002E5421DCC8F20013AA0E /* yas_audio_engine_route.cpp */,
 				B6002E6F21DCC8F20013AA0E /* yas_audio_engine_route.h */,
 				B6002E5621DCC8F20013AA0E /* yas_audio_engine_tap.cpp */,
