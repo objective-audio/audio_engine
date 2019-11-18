@@ -15,13 +15,13 @@ using namespace yas;
 namespace yas::sample {
 struct avf_converter_vc_cpp {
     audio::engine::manager_ptr const _manager;
-    audio::engine::avf_au_ptr const _au;
+    audio::engine::avf_au_ptr const _converter;
     audio::engine::tap_ptr const _tap;
     chaining::observer_pool _pool;
 
     avf_converter_vc_cpp()
         : _manager(audio::engine::manager::make_shared()),
-          _au(audio::engine::avf_au::make_shared(kAudioUnitType_FormatConverter, kAudioUnitSubType_AUConverter)),
+          _converter(audio::engine::avf_au::make_shared(kAudioUnitType_FormatConverter, kAudioUnitSubType_AUConverter)),
           _tap(audio::engine::tap::make_shared()) {
     }
 
@@ -41,10 +41,10 @@ struct avf_converter_vc_cpp {
         this->_tap->set_render_handler(
             [kernel](audio::engine::node::render_args args) { kernel->process(std::nullopt, args.buffer); });
 
-        this->_manager->connect(this->_au->node(), io->node(), *output_format);
-        this->_manager->connect(this->_tap->node(), this->_au->node(), input_format);
+        this->_manager->connect(this->_converter->node(), io->node(), *output_format);
+        this->_manager->connect(this->_tap->node(), this->_converter->node(), input_format);
 
-        this->_pool += this->_au->load_state_chain()
+        this->_pool += this->_converter->load_state_chain()
                            .perform([this](auto const &state) {
                                std::cout << "load_state : " << to_string(state) << std::endl;
                                if (state == audio::engine::avf_au::load_state::loaded) {
