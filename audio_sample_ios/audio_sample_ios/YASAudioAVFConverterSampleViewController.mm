@@ -16,12 +16,14 @@ namespace yas::sample {
 struct avf_converter_vc_cpp {
     audio::engine::manager_ptr const _manager;
     audio::engine::avf_au_ptr const _converter;
+    audio::engine::avf_au_mixer_ptr const _mixer;
     audio::engine::tap_ptr const _tap;
     chaining::observer_pool _pool;
 
     avf_converter_vc_cpp()
         : _manager(audio::engine::manager::make_shared()),
           _converter(audio::engine::avf_au::make_shared(kAudioUnitType_FormatConverter, kAudioUnitSubType_AUConverter)),
+          _mixer(audio::engine::avf_au_mixer::make_shared()),
           _tap(audio::engine::tap::make_shared()) {
     }
 

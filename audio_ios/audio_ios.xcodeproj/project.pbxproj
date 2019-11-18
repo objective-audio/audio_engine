@@ -79,7 +79,7 @@
 		B619C9642317FE6700889B5B /* yas_audio_ptr.h in Headers */ = {isa = PBXBuildFile; fileRef = B619C9632317FE6700889B5B /* yas_audio_ptr.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		B619C9662317FE7800889B5B /* yas_audio_engine_ptr.h in Headers */ = {isa = PBXBuildFile; fileRef = B619C9652317FE7800889B5B /* yas_audio_engine_ptr.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		B624A8962380FA5C00F19E2C /* yas_audio_engine_avf_au_mixer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B624A8942380FA5C00F19E2C /* yas_audio_engine_avf_au_mixer.cpp */; };
-		B624A8972380FA5C00F19E2C /* yas_audio_engine_avf_au_mixer.h in Headers */ = {isa = PBXBuildFile; fileRef = B624A8952380FA5C00F19E2C /* yas_audio_engine_avf_au_mixer.h */; };
+		B624A8972380FA5C00F19E2C /* yas_audio_engine_avf_au_mixer.h in Headers */ = {isa = PBXBuildFile; fileRef = B624A8952380FA5C00F19E2C /* yas_audio_engine_avf_au_mixer.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		B63507ED235C84F3008CC9CC /* yas_audio_io_device.h in Headers */ = {isa = PBXBuildFile; fileRef = B63507EC235C84F3008CC9CC /* yas_audio_io_device.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		B643FB53235447BC001FA6B0 /* yas_audio_avf_io_core.mm in Sources */ = {isa = PBXBuildFile; fileRef = B643FB51235447BC001FA6B0 /* yas_audio_avf_io_core.mm */; };
 		B643FB54235447BC001FA6B0 /* yas_audio_avf_io_core.h in Headers */ = {isa = PBXBuildFile; fileRef = B643FB52235447BC001FA6B0 /* yas_audio_avf_io_core.h */; settings = {ATTRIBUTES = (Public, ); }; };
