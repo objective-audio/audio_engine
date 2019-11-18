@@ -53,7 +53,7 @@ struct avf_converter_vc_cpp {
             tap->set_render_handler(
                 [kernel](audio::engine::node::render_args args) { kernel->process(std::nullopt, args.buffer); });
 
-            this->_manager->connect(tap->node(), this->_converter->node(), 0, idx, input_format);
+            this->_manager->connect(tap->node(), this->_mixer->au()->node(), 0, idx, input_format);
         }
 
         this->_pool += this->_converter->load_state_chain()
