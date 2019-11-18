@@ -5,6 +5,7 @@
 #import "YASAudioAVFConverterSampleViewController.h"
 #import <AVFoundation/AVFoundation.h>
 #import <audio/yas_audio_umbrella.h>
+#include <cpp_utils/yas_fast_each.h>
 #import "YASViewControllerUtils.h"
 #import "yas_audio_sample_kernel.h"
 
@@ -17,14 +18,14 @@ struct avf_converter_vc_cpp {
     audio::engine::manager_ptr const _manager;
     audio::engine::avf_au_ptr const _converter;
     audio::engine::avf_au_mixer_ptr const _mixer;
-    audio::engine::tap_ptr const _tap;
+    std::vector<audio::engine::tap_ptr> const _taps;
     chaining::observer_pool _pool;
 
     avf_converter_vc_cpp()
         : _manager(audio::engine::manager::make_shared()),
           _converter(audio::engine::avf_au::make_shared(kAudioUnitType_FormatConverter, kAudioUnitSubType_AUConverter)),
           _mixer(audio::engine::avf_au_mixer::make_shared()),
-          _tap(audio::engine::tap::make_shared()) {
+          _taps({audio::engine::tap::make_shared(), audio::engine::tap::make_shared()}) {
     }
 
     void setup() {
@@ -37,14 +38,23 @@ struct avf_converter_vc_cpp {
         asbd.mSampleRate = input_sample_rate;
         auto const input_format = audio::format{asbd};
 
-        auto kernel = std::make_shared<audio::sample_kernel_t>();
-        kernel->set_sine_volume(0.1);
-
-        this->_tap->set_render_handler(
-            [kernel](audio::engine::node::render_args args) { kernel->process(std::nullopt, args.buffer); });
-
         this->_manager->connect(this->_converter->node(), io->node(), *output_format);
-        this->_manager->connect(this->_tap->node(), this->_converter->node(), input_format);
+        this->_manager->connect(this->_mixer->au()->node(), this->_converter->node(), input_format);
+
+        auto each = make_fast_each((uint32_t)this->_taps.size());
+        while (yas_each_next(each)) {
+            auto const &idx = yas_each_index(each);
+            auto const &tap = this->_taps.at(idx);
+
+            auto kernel = std::make_shared<audio::sample_kernel_t>();
+            kernel->set_sine_volume(0.1);
+            kernel->set_sine_frequency(1000.0 * float(idx + 1));
+
+            tap->set_render_handler(
+                [kernel](audio::engine::node::render_args args) { kernel->process(std::nullopt, args.buffer); });
+
+            this->_manager->connect(tap->node(), this->_converter->node(), 0, idx, input_format);
+        }
 
         this->_pool += this->_converter->load_state_chain()
                            .perform([this](auto const &state) {
