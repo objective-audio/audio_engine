@@ -4,6 +4,7 @@
 
 #include "yas_audio_engine_avf_au.h"
 #import <AVFoundation/AVFoundation.h>
+#include <cpp_utils/yas_cf_utils.h>
 #include <cpp_utils/yas_fast_each.h>
 #include <cpp_utils/yas_objc_ptr.h>
 #include <cpp_utils/yas_thread.h>
@@ -26,7 +27,9 @@ struct audio::engine::avf_au::core {
                                            assert(thread::is_main());
                                            if (auto const shared_au = weak_au.lock()) {
                                                if (error) {
-                                                   NSLog(@"load raw unit error : %@", error);
+                                                   auto error_message =
+                                                       to_string((__bridge CFStringRef)error.description);
+                                                   std::cout << "load raw unit error : " << error_message << std::endl;
                                                    shared_au->_load_state->set_value(load_state::failed);
                                                } else {
                                                    shared_au->_core->set_raw_unit(objc_ptr<AUAudioUnit *>{audioUnit});
@@ -80,10 +83,11 @@ void audio::engine::avf_au::set_input_bus_count(uint32_t const count) {
     if (inputBusses.isCountChangeable) {
         NSError *error = nil;
         if (![inputBusses setBusCount:count error:&error]) {
-            NSLog(@"set input element count error : %@", error);
+            auto error_message = to_string((__bridge CFStringRef)error.description);
+            std::cout << "set input element count error : " << error_message << std::endl;
         }
     } else {
-        NSLog(@"input element count is not changable.");
+        std::cout << "input element count is not changable." << std::endl;
     }
 }
 
@@ -93,10 +97,11 @@ void audio::engine::avf_au::set_output_bus_count(uint32_t const count) {
     if (outputBusses.isCountChangeable) {
         NSError *error = nil;
         if (![outputBusses setBusCount:count error:&error]) {
-            NSLog(@"set output element count error : %@", error);
+            auto error_message = to_string((__bridge CFStringRef)error.description);
+            std::cout << "set output element count error : " << error_message << std::endl;
         }
     } else {
-        NSLog(@"output element count is not changable.");
+        std::cout << "output element count is not changable." << std::endl;
     }
 }
 
@@ -115,7 +120,8 @@ void audio::engine::avf_au::initialize_raw_unit() {
 
     if (auto const raw_unit = this->_core->raw_unit()) {
         if (![raw_unit.value().object() allocateRenderResourcesAndReturnError:&error]) {
-            NSLog(@"allocateRenderResources error : %@", error);
+            auto error_message = to_string((__bridge CFStringRef)error.description);
+            std::cout << "allocateRenderResources error : " << error_message << std::endl;
         }
     }
 }
@@ -274,7 +280,8 @@ void audio::engine::avf_au::_update_unit_connections() {
                     if ([bus setFormat:format.object() error:&error]) {
                         bus.enabled = YES;
                     } else {
-                        NSLog(@"AUAudioUnit setFormat:error: - error %@", error);
+                        auto error_message = to_string((__bridge CFStringRef)error.description);
+                        std::cout << "AUAudioUnit setFormat:error: - error : " << error_message << std::endl;
                     }
                 }
             }
@@ -298,7 +305,8 @@ void audio::engine::avf_au::_update_unit_connections() {
                     if ([bus setFormat:format.object() error:&error]) {
                         bus.enabled = YES;
                     } else {
-                        NSLog(@"AUAudioUnit setFormat:error: - error %@", error);
+                        auto error_message = to_string((__bridge CFStringRef)error.description);
+                        std::cout << "AUAudioUnit setFormat:error: - error : " << error_message << std::endl;
                     }
                 }
             }
