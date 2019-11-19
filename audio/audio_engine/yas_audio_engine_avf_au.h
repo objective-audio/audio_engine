@@ -34,6 +34,15 @@ struct avf_au final : manageable_avf_au {
     uint32_t input_bus_count() const;
     uint32_t output_bus_count() const;
 
+    void set_global_parameter_value(AudioUnitParameterID const parameter_id, float const value);
+    float global_parameter_value(AudioUnitParameterID const parameter_id) const;
+    void set_input_parameter_value(AudioUnitParameterID const parameter_id, float const value,
+                                   AudioUnitElement const element);
+    float input_parameter_value(AudioUnitParameterID const parameter_id, AudioUnitElement const element) const;
+    void set_output_parameter_value(AudioUnitParameterID const parameter_id, float const value,
+                                    AudioUnitElement const element);
+    float output_parameter_value(AudioUnitParameterID const parameter_id, AudioUnitElement const element) const;
+
     audio::engine::node_ptr const &node() const;
 
     chaining::chain_sync_t<load_state> load_state_chain() const;
@@ -62,6 +71,11 @@ struct avf_au final : manageable_avf_au {
     void _setup();
     void _will_reset();
     void _update_unit_connections();
+
+    void _set_parameter_value(AudioUnitScope const scope, AudioUnitParameterID const parameter_id, float const value,
+                              AudioUnitElement const element);
+    float _get_parameter_value(AudioUnitScope const scope, AudioUnitParameterID const parameter_id,
+                               AudioUnitElement const element) const;
 
     void initialize_raw_unit() override;
     void uninitialize_raw_unit() override;
