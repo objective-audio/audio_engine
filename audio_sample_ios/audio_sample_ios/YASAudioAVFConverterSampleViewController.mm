@@ -17,15 +17,13 @@ namespace yas::sample {
 struct avf_converter_vc_cpp {
     audio::engine::manager_ptr const _manager;
     audio::engine::avf_au_ptr const _converter;
-    audio::engine::avf_au_mixer_ptr const _mixer;
-    std::vector<audio::engine::tap_ptr> const _taps;
+    audio::engine::tap_ptr _tap;
     chaining::observer_pool _pool;
 
     avf_converter_vc_cpp()
         : _manager(audio::engine::manager::make_shared()),
           _converter(audio::engine::avf_au::make_shared(kAudioUnitType_FormatConverter, kAudioUnitSubType_AUConverter)),
-          _mixer(audio::engine::avf_au_mixer::make_shared()),
-          _taps({audio::engine::tap::make_shared(), audio::engine::tap::make_shared()}) {
+          _tap(audio::engine::tap::make_shared()) {
     }
 
     void setup() {
@@ -39,22 +37,14 @@ struct avf_converter_vc_cpp {
         auto const input_format = audio::format{asbd};
 
         this->_manager->connect(this->_converter->node(), io->node(), *output_format);
-        this->_manager->connect(this->_mixer->au()->node(), this->_converter->node(), input_format);
+        this->_manager->connect(this->_tap->node(), this->_converter->node(), input_format);
 
-        auto each = make_fast_each((uint32_t)this->_taps.size());
-        while (yas_each_next(each)) {
-            auto const &idx = yas_each_index(each);
-            auto const &tap = this->_taps.at(idx);
+        auto kernel = std::make_shared<audio::sample_kernel_t>();
+        kernel->set_sine_volume(0.1);
+        kernel->set_sine_frequency(1000.0);
 
-            auto kernel = std::make_shared<audio::sample_kernel_t>();
-            kernel->set_sine_volume(0.1);
-            kernel->set_sine_frequency(1000.0 * float(idx + 1));
-
-            tap->set_render_handler(
-                [kernel](audio::engine::node::render_args args) { kernel->process(std::nullopt, args.buffer); });
-
-            this->_manager->connect(tap->node(), this->_mixer->au()->node(), 0, idx, input_format);
-        }
+        this->_tap->set_render_handler(
+            [kernel](audio::engine::node::render_args args) { kernel->process(std::nullopt, args.buffer); });
 
         this->_pool += this->_converter->load_state_chain()
                            .perform([this](auto const &state) {
