@@ -280,8 +280,10 @@ void audio::engine::avf_au::_update_unit_connections() {
                     if ([bus setFormat:format.object() error:&error]) {
                         bus.enabled = YES;
                     } else {
+                        auto component_name = to_string((__bridge CFStringRef)raw_unit.object().componentName);
                         auto error_message = to_string((__bridge CFStringRef)error.description);
-                        std::cout << "AUAudioUnit setFormat:error: - error : " << error_message << std::endl;
+                        std::cout << component_name << " bus_idx : " << bus_idx
+                                  << " set input format - error : " << error_message << std::endl;
                     }
                 }
             }
@@ -305,8 +307,10 @@ void audio::engine::avf_au::_update_unit_connections() {
                     if ([bus setFormat:format.object() error:&error]) {
                         bus.enabled = YES;
                     } else {
+                        auto component_name = to_string((__bridge CFStringRef)raw_unit.object().componentName);
                         auto error_message = to_string((__bridge CFStringRef)error.description);
-                        std::cout << "AUAudioUnit setFormat:error: - error : " << error_message << std::endl;
+                        std::cout << component_name << " bus_idx : " << bus_idx
+                                  << " set output format - error : " << error_message << std::endl;
                     }
                 }
             }
