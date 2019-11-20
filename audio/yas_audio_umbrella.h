@@ -41,6 +41,7 @@
 #include "yas_audio_engine_au.h"
 #include "yas_audio_engine_au_mixer.h"
 #include "yas_audio_engine_avf_au.h"
+#include "yas_audio_engine_avf_au_mixer.h"
 #include "yas_audio_engine_connection.h"
 #include "yas_audio_engine_io.h"
 #include "yas_audio_engine_manager.h"

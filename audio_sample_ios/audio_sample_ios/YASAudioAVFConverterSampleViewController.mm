@@ -5,6 +5,7 @@
 #import "YASAudioAVFConverterSampleViewController.h"
 #import <AVFoundation/AVFoundation.h>
 #import <audio/yas_audio_umbrella.h>
+#include <cpp_utils/yas_fast_each.h>
 #import "YASViewControllerUtils.h"
 #import "yas_audio_sample_kernel.h"
 
@@ -15,13 +16,14 @@ using namespace yas;
 namespace yas::sample {
 struct avf_converter_vc_cpp {
     audio::engine::manager_ptr const _manager;
-    audio::engine::avf_au_ptr const _au;
-    audio::engine::tap_ptr const _tap;
+    audio::engine::avf_au_ptr const _converter;
+    audio::engine::tap_ptr _tap;
     chaining::observer_pool _pool;
+    audio::sample_kernel_ptr _kernel;
 
     avf_converter_vc_cpp()
         : _manager(audio::engine::manager::make_shared()),
-          _au(audio::engine::avf_au::make_shared(kAudioUnitType_FormatConverter, kAudioUnitSubType_AUConverter)),
+          _converter(audio::engine::avf_au::make_shared(kAudioUnitType_FormatConverter, kAudioUnitSubType_AUConverter)),
           _tap(audio::engine::tap::make_shared()) {
     }
 
@@ -35,16 +37,18 @@ struct avf_converter_vc_cpp {
         asbd.mSampleRate = input_sample_rate;
         auto const input_format = audio::format{asbd};
 
-        auto kernel = std::make_shared<audio::sample_kernel_t>();
-        kernel->set_sine_volume(0.1);
+        this->_manager->connect(this->_converter->node(), io->node(), *output_format);
+        this->_manager->connect(this->_tap->node(), this->_converter->node(), input_format);
 
-        this->_tap->set_render_handler(
-            [kernel](audio::engine::node::render_args args) { kernel->process(std::nullopt, args.buffer); });
+        this->_kernel = std::make_shared<audio::sample_kernel_t>();
+        this->_kernel->set_sine_volume(0.1);
+        this->_kernel->set_sine_frequency(1000.0);
 
-        this->_manager->connect(this->_au->node(), io->node(), *output_format);
-        this->_manager->connect(this->_tap->node(), this->_au->node(), input_format);
+        this->_tap->set_render_handler([kernel = this->_kernel](audio::engine::node::render_args args) {
+            kernel->process(std::nullopt, args.buffer);
+        });
 
-        this->_pool += this->_au->chain()
+        this->_pool += this->_converter->load_state_chain()
                            .perform([this](auto const &state) {
                                std::cout << "load_state : " << to_string(state) << std::endl;
                                if (state == audio::engine::avf_au::load_state::loaded) {
@@ -64,6 +68,8 @@ struct avf_converter_vc_cpp {
 
 @interface YASAudioAVFConverterSampleViewController ()
 
+@property (nonatomic, weak) IBOutlet UISlider *volumeSlider;
+
 @end
 
 @implementation YASAudioAVFConverterSampleViewController {
@@ -72,6 +78,8 @@ struct avf_converter_vc_cpp {
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+
+    self.volumeSlider.value = 0.0;
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -86,6 +94,7 @@ struct avf_converter_vc_cpp {
 
         if (!error) {
             self->_cpp.setup();
+            self.volumeSlider.value = self->_cpp._kernel->sine_volume();
         } else {
             [YASViewControllerUtils showErrorAlertWithMessage:error.description toViewController:self];
         }
@@ -100,6 +109,10 @@ struct avf_converter_vc_cpp {
     }
 
     [super viewWillDisappear:animated];
+}
+
+- (IBAction)volumeChanged:(UISlider *)slider {
+    self->_cpp._kernel->set_sine_volume(slider.value);
 }
 
 @end

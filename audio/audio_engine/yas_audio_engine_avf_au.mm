@@ -4,9 +4,11 @@
 
 #include "yas_audio_engine_avf_au.h"
 #import <AVFoundation/AVFoundation.h>
+#include <cpp_utils/yas_cf_utils.h>
 #include <cpp_utils/yas_fast_each.h>
 #include <cpp_utils/yas_objc_ptr.h>
 #include <cpp_utils/yas_thread.h>
+#include <iostream>
 #include "yas_audio_time.h"
 
 using namespace yas;
@@ -25,7 +27,9 @@ struct audio::engine::avf_au::core {
                                            assert(thread::is_main());
                                            if (auto const shared_au = weak_au.lock()) {
                                                if (error) {
-                                                   NSLog(@"load raw unit error : %@", error);
+                                                   auto error_message =
+                                                       to_string((__bridge CFStringRef)error.description);
+                                                   std::cout << "load raw unit error : " << error_message << std::endl;
                                                    shared_au->_load_state->set_value(load_state::failed);
                                                } else {
                                                    shared_au->_core->set_raw_unit(objc_ptr<AUAudioUnit *>{audioUnit});
@@ -79,10 +83,11 @@ void audio::engine::avf_au::set_input_bus_count(uint32_t const count) {
     if (inputBusses.isCountChangeable) {
         NSError *error = nil;
         if (![inputBusses setBusCount:count error:&error]) {
-            NSLog(@"set input element count error : %@", error);
+            auto error_message = to_string((__bridge CFStringRef)error.description);
+            std::cout << "set input element count error : " << error_message << std::endl;
         }
     } else {
-        NSLog(@"input element count is not changable.");
+        std::cout << "input element count is not changable." << std::endl;
     }
 }
 
@@ -92,10 +97,11 @@ void audio::engine::avf_au::set_output_bus_count(uint32_t const count) {
     if (outputBusses.isCountChangeable) {
         NSError *error = nil;
         if (![outputBusses setBusCount:count error:&error]) {
-            NSLog(@"set output element count error : %@", error);
+            auto error_message = to_string((__bridge CFStringRef)error.description);
+            std::cout << "set output element count error : " << error_message << std::endl;
         }
     } else {
-        NSLog(@"output element count is not changable.");
+        std::cout << "output element count is not changable." << std::endl;
     }
 }
 
@@ -114,7 +120,8 @@ void audio::engine::avf_au::initialize_raw_unit() {
 
     if (auto const raw_unit = this->_core->raw_unit()) {
         if (![raw_unit.value().object() allocateRenderResourcesAndReturnError:&error]) {
-            NSLog(@"allocateRenderResources error : %@", error);
+            auto error_message = to_string((__bridge CFStringRef)error.description);
+            std::cout << "allocateRenderResources error : " << error_message << std::endl;
         }
     }
 }
@@ -125,12 +132,44 @@ void audio::engine::avf_au::uninitialize_raw_unit() {
     }
 }
 
+void audio::engine::avf_au::set_global_parameter_value(AudioUnitParameterID const parameter_id, float const value) {
+    this->_set_parameter_value(kAudioUnitScope_Global, parameter_id, value, 0);
+}
+
+float audio::engine::avf_au::global_parameter_value(AudioUnitParameterID const parameter_id) const {
+    return this->_get_parameter_value(kAudioUnitScope_Global, parameter_id, 0);
+}
+
+void audio::engine::avf_au::set_input_parameter_value(AudioUnitParameterID const parameter_id, float const value,
+                                                      AudioUnitElement const element) {
+    this->_set_parameter_value(kAudioUnitScope_Input, parameter_id, value, element);
+}
+
+float audio::engine::avf_au::input_parameter_value(AudioUnitParameterID const parameter_id,
+                                                   AudioUnitElement const element) const {
+    return this->_get_parameter_value(kAudioUnitScope_Input, parameter_id, element);
+}
+
+void audio::engine::avf_au::set_output_parameter_value(AudioUnitParameterID const parameter_id, float const value,
+                                                       AudioUnitElement const element) {
+    this->_set_parameter_value(kAudioUnitScope_Output, parameter_id, value, element);
+}
+
+float audio::engine::avf_au::output_parameter_value(AudioUnitParameterID const parameter_id,
+                                                    AudioUnitElement const element) const {
+    return this->_get_parameter_value(kAudioUnitScope_Output, parameter_id, element);
+}
+
 audio::engine::node_ptr const &audio::engine::avf_au::node() const {
     return this->_node;
 }
 
-chaining::chain_sync_t<audio::engine::avf_au::load_state> audio::engine::avf_au::chain() const {
+chaining::chain_sync_t<audio::engine::avf_au::load_state> audio::engine::avf_au::load_state_chain() const {
     return this->_load_state->chain();
+}
+
+chaining::chain_unsync_t<audio::engine::avf_au::connection_method> audio::engine::avf_au::connection_chain() const {
+    return this->_connection_notifier->chain();
 }
 
 void audio::engine::avf_au::_prepare(avf_au_ptr const &shared, AudioComponentDescription const &acd) {
@@ -222,6 +261,8 @@ void audio::engine::avf_au::_will_reset() {
 
 void audio::engine::avf_au::_update_unit_connections() {
     if (auto const raw_unit_opt = this->_core->raw_unit()) {
+        this->_connection_notifier->notify(connection_method::will_update);
+
         auto const &raw_unit = raw_unit_opt.value();
         auto const input_bus_count = this->input_bus_count();
         if (input_bus_count > 0) {
@@ -239,7 +280,10 @@ void audio::engine::avf_au::_update_unit_connections() {
                     if ([bus setFormat:format.object() error:&error]) {
                         bus.enabled = YES;
                     } else {
-                        NSLog(@"AUAudioUnit setFormat:error: - error %@", error);
+                        auto component_name = to_string((__bridge CFStringRef)raw_unit.object().componentName);
+                        auto error_message = to_string((__bridge CFStringRef)error.description);
+                        std::cout << component_name << " bus_idx : " << bus_idx
+                                  << " set input format - error : " << error_message << std::endl;
                     }
                 }
             }
@@ -263,12 +307,41 @@ void audio::engine::avf_au::_update_unit_connections() {
                     if ([bus setFormat:format.object() error:&error]) {
                         bus.enabled = YES;
                     } else {
-                        NSLog(@"AUAudioUnit setFormat:error: - error %@", error);
+                        auto component_name = to_string((__bridge CFStringRef)raw_unit.object().componentName);
+                        auto error_message = to_string((__bridge CFStringRef)error.description);
+                        std::cout << component_name << " bus_idx : " << bus_idx
+                                  << " set output format - error : " << error_message << std::endl;
                     }
                 }
             }
         }
+
+        this->_connection_notifier->notify(connection_method::did_update);
     }
+}
+
+void audio::engine::avf_au::_set_parameter_value(AudioUnitScope const scope, AudioUnitParameterID const parameter_id,
+                                                 float const value, AudioUnitElement const element) {
+    if (auto const raw_unit = this->_core->raw_unit()) {
+        if (AUParameter *parameter =
+                [raw_unit.value().object().parameterTree parameterWithID:parameter_id scope:scope element:0]) {
+            parameter.value = value;
+            return;
+        }
+    }
+    std::cout << "avf_au _set_parameter_value failed." << std::endl;
+}
+
+float audio::engine::avf_au::_get_parameter_value(AudioUnitScope const scope, AudioUnitParameterID const parameter_id,
+                                                  AudioUnitElement const element) const {
+    if (auto const raw_unit = this->_core->raw_unit()) {
+        if (AUParameter *parameter =
+                [raw_unit.value().object().parameterTree parameterWithID:parameter_id scope:scope element:0]) {
+            return parameter.value;
+        }
+    }
+    std::cout << "avf_au _get_parameter_value failed." << std::endl;
+    return 0.0f;
 }
 
 audio::engine::avf_au_ptr audio::engine::avf_au::make_shared(OSType const type, OSType const sub_type) {

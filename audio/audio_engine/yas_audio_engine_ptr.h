@@ -20,6 +20,7 @@ class route;
 class tap;
 class io;
 class avf_au;
+class avf_au_mixer;
 
 class manageable_au;
 class node_removable;
@@ -43,6 +44,7 @@ using route_ptr = std::shared_ptr<route>;
 using tap_ptr = std::shared_ptr<tap>;
 using io_ptr = std::shared_ptr<engine::io>;
 using avf_au_ptr = std::shared_ptr<engine::avf_au>;
+using avf_au_mixer_ptr = std::shared_ptr<engine::avf_au_mixer>;
 
 using manageable_au_ptr = std::shared_ptr<manageable_au>;
 using node_removable_ptr = std::shared_ptr<node_removable>;
