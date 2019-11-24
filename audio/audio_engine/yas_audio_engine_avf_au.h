@@ -4,11 +4,10 @@
 
 #pragma once
 
-#include "yas_audio_engine_avf_au_protocol.h"
 #include "yas_audio_engine_node.h"
 
 namespace yas::audio::engine {
-struct avf_au final : manageable_avf_au {
+struct avf_au final {
     struct args {
         audio::engine::node_args node_args;
         AudioComponentDescription acd;
@@ -77,8 +76,8 @@ struct avf_au final : manageable_avf_au {
     float _get_parameter_value(AudioUnitScope const scope, AudioUnitParameterID const parameter_id,
                                AudioUnitElement const element) const;
 
-    void initialize_raw_unit() override;
-    void uninitialize_raw_unit() override;
+    void initialize_raw_unit();
+    void uninitialize_raw_unit();
 };
 }  // namespace yas::audio::engine
 
