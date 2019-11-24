@@ -115,7 +115,7 @@ uint32_t audio::engine::avf_au::output_bus_count() const {
     return (uint32_t)raw_unit.value().object().outputBusses.count;
 }
 
-void audio::engine::avf_au::initialize_raw_unit() {
+void audio::engine::avf_au::_initialize_raw_unit() {
     NSError *error = nil;
 
     if (auto const raw_unit = this->_core->raw_unit()) {
@@ -126,7 +126,7 @@ void audio::engine::avf_au::initialize_raw_unit() {
     }
 }
 
-void audio::engine::avf_au::uninitialize_raw_unit() {
+void audio::engine::avf_au::_uninitialize_raw_unit() {
     if (auto const raw_unit = this->_core->raw_unit()) {
         [raw_unit.value().object() deallocateRenderResources];
     }
@@ -235,13 +235,13 @@ void audio::engine::avf_au::_prepare(avf_au_ptr const &shared, AudioComponentDes
 
     manageable_node::cast(this->_node)->set_add_to_graph_handler([weak_au](audio::graph &graph) {
         if (auto au = weak_au.lock()) {
-            au->initialize_raw_unit();
+            au->_initialize_raw_unit();
         }
     });
 
     manageable_node::cast(this->_node)->set_remove_from_graph_handler([weak_au](audio::graph &graph) {
         if (auto au = weak_au.lock()) {
-            au->uninitialize_raw_unit();
+            au->_uninitialize_raw_unit();
         }
     });
 
@@ -266,7 +266,7 @@ void audio::engine::avf_au::_update_unit_connections() {
         bool const is_initialized = raw_unit.object().renderResourcesAllocated;
 
         if (is_initialized) {
-            this->uninitialize_raw_unit();
+            this->_uninitialize_raw_unit();
         }
 
         this->_connection_notifier->notify(connection_method::will_update);
@@ -326,7 +326,7 @@ void audio::engine::avf_au::_update_unit_connections() {
         this->_connection_notifier->notify(connection_method::did_update);
 
         if (is_initialized) {
-            this->initialize_raw_unit();
+            this->_initialize_raw_unit();
         }
     }
 }

@@ -76,8 +76,8 @@ struct avf_au final {
     float _get_parameter_value(AudioUnitScope const scope, AudioUnitParameterID const parameter_id,
                                AudioUnitElement const element) const;
 
-    void initialize_raw_unit();
-    void uninitialize_raw_unit();
+    void _initialize_raw_unit();
+    void _uninitialize_raw_unit();
 };
 }  // namespace yas::audio::engine
 
