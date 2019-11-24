@@ -261,9 +261,16 @@ void audio::engine::avf_au::_will_reset() {
 
 void audio::engine::avf_au::_update_unit_connections() {
     if (auto const raw_unit_opt = this->_core->raw_unit()) {
+        auto const &raw_unit = raw_unit_opt.value();
+
+        bool const is_initialized = raw_unit.object().renderResourcesAllocated;
+
+        if (is_initialized) {
+            this->uninitialize_raw_unit();
+        }
+
         this->_connection_notifier->notify(connection_method::will_update);
 
-        auto const &raw_unit = raw_unit_opt.value();
         auto const input_bus_count = this->input_bus_count();
         if (input_bus_count > 0) {
             auto each = make_fast_each(input_bus_count);
@@ -317,6 +324,10 @@ void audio::engine::avf_au::_update_unit_connections() {
         }
 
         this->_connection_notifier->notify(connection_method::did_update);
+
+        if (is_initialized) {
+            this->initialize_raw_unit();
+        }
     }
 }
 
