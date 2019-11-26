@@ -42,6 +42,10 @@ struct avf_au final {
                                     AudioUnitElement const element);
     float output_parameter_value(AudioUnitParameterID const parameter_id, AudioUnitElement const element) const;
 
+    std::vector<avf_au_parameter_ptr> const &global_parameters() const;
+    std::vector<avf_au_parameter_ptr> const &input_parameters() const;
+    std::vector<avf_au_parameter_ptr> const &output_parameters() const;
+
     audio::engine::node_ptr const &node() const;
 
     chaining::chain_sync_t<load_state> load_state_chain() const;
@@ -55,6 +59,11 @@ struct avf_au final {
     std::weak_ptr<avf_au> _weak_au;
     audio::engine::node_ptr _node;
     AudioComponentDescription _acd;
+
+    std::vector<avf_au_parameter_ptr> _global_parameters;
+    std::vector<avf_au_parameter_ptr> _input_parameters;
+    std::vector<avf_au_parameter_ptr> _output_parameters;
+
     chaining::value::holder_ptr<load_state> _load_state =
         chaining::value::holder<load_state>::make_shared(load_state::unload);
     chaining::notifier_ptr<connection_method> _connection_notifier =
