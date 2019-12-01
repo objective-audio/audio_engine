@@ -17,10 +17,14 @@ audio::avf_au_parameter::avf_au_parameter(avf_au_parameter_core_ptr const &core)
                        .end();
 }
 
+std::string audio::avf_au_parameter::key_path() const {
+    return to_string((__bridge CFStringRef)this->_core->objc_parameter.object().keyPath);
+}
+
 audio::avf_au_parameter_scope audio::avf_au_parameter::scope() const {
     using namespace yas::audio;
 
-    auto const key_path = to_string((__bridge CFStringRef)this->_core->objc_parameter.object().keyPath);
+    auto const key_path = this->key_path();
     auto const scope_str = yas::split(key_path, '.').at(0);
 
     if (scope_str == to_string(avf_au_parameter_scope::global)) {
@@ -32,6 +36,10 @@ audio::avf_au_parameter_scope audio::avf_au_parameter::scope() const {
     } else {
         throw std::runtime_error("scope not found.");
     }
+}
+
+std::string audio::avf_au_parameter::identifier() const {
+    return to_string((__bridge CFStringRef)this->_core->objc_parameter.object().identifier);
 }
 
 AudioUnitParameterUnit audio::avf_au_parameter::unit() const {
@@ -73,6 +81,17 @@ audio::avf_au_parameter_ptr audio::avf_au_parameter::make_shared(avf_au_paramete
     auto shared = avf_au_parameter_ptr(new avf_au_parameter{core});
     shared->_prepare(shared);
     return shared;
+}
+
+AudioUnitScope audio::to_raw_scope(avf_au_parameter_scope const scope) {
+    switch (scope) {
+        case avf_au_parameter_scope::global:
+            return kAudioUnitScope_Global;
+        case avf_au_parameter_scope::input:
+            return kAudioUnitScope_Input;
+        case avf_au_parameter_scope::output:
+            return kAudioUnitScope_Output;
+    }
 }
 
 std::string yas::to_string(audio::avf_au_parameter_scope const &scope) {

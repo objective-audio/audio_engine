@@ -10,15 +10,16 @@
 #include "yas_audio_ptr.h"
 
 namespace yas::audio {
-enum avf_au_parameter_scope {
+enum class avf_au_parameter_scope {
     global,
     input,
     output,
 };
 
 struct avf_au_parameter {
+    std::string key_path() const;
     avf_au_parameter_scope scope() const;
-
+    std::string identifier() const;
     AudioUnitParameterUnit unit() const;
 
     AUValue min_value() const;
@@ -43,6 +44,8 @@ struct avf_au_parameter {
 
     void _prepare(avf_au_parameter_ptr const &);
 };
+
+AudioUnitScope to_raw_scope(avf_au_parameter_scope const);
 }  // namespace yas::audio
 
 namespace yas {

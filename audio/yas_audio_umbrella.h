@@ -34,6 +34,8 @@
 
 #endif
 
+#include "yas_audio_avf_au.h"
+#include "yas_audio_avf_au_parameter.h"
 #include "yas_audio_graph.h"
 #include "yas_audio_unit.h"
 #include "yas_audio_unit_parameter.h"

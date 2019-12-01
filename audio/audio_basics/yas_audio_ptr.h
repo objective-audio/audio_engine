@@ -19,6 +19,7 @@ class avf_io_core;
 class mac_io_core;
 class mac_device;
 class io_device;
+class avf_au;
 class avf_au_parameter;
 class avf_au_parameter_core;
 
@@ -34,6 +35,7 @@ using avf_io_core_ptr = std::shared_ptr<avf_io_core>;
 using mac_io_core_ptr = std::shared_ptr<mac_io_core>;
 using mac_device_ptr = std::shared_ptr<mac_device>;
 using io_device_ptr = std::shared_ptr<io_device>;
+using avf_au_ptr = std::shared_ptr<avf_au>;
 using avf_au_parameter_ptr = std::shared_ptr<avf_au_parameter>;
 using avf_au_parameter_core_ptr = std::shared_ptr<avf_au_parameter_core>;
 }  // namespace yas::audio
