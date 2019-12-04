@@ -18,10 +18,6 @@ using namespace yas;
 struct audio::engine::avf_au::core {
     audio::avf_au_ptr const raw_au;
 
-    using input_f = std::function<AUAudioUnitStatus(AudioUnitRenderActionFlags *actionFlags,
-                                                    AudioTimeStamp const *timestamp, AUAudioFrameCount frameCount,
-                                                    NSInteger inputBusNumber, AudioBufferList *inputData)>;
-
     core(AudioComponentDescription const &acd) : raw_au(audio::avf_au::make_shared(acd)) {
     }
 
@@ -31,21 +27,8 @@ struct audio::engine::avf_au::core {
         this->_pool += this->raw_au->load_state_chain().send_to(shared->_load_state).sync();
     }
 
-    std::optional<input_f> input_block() const {
-        std::lock_guard<std::recursive_mutex> lock(this->_input_mutex);
-        return this->_input_block;
-    }
-
-    void set_input_block(std::optional<input_f> &&block) {
-        std::lock_guard<std::recursive_mutex> lock(this->_input_mutex);
-        this->_input_block = block;
-    }
-
    private:
     chaining::observer_pool _pool;
-
-    mutable std::recursive_mutex _input_mutex;
-    std::optional<input_f> _input_block = std::nullopt;
 };
 
 audio::engine::avf_au::avf_au(node_args &&args, AudioComponentDescription const &acd)
