@@ -11,7 +11,9 @@
 using namespace yas;
 
 audio::avf_au_parameter::avf_au_parameter(avf_au_parameter_core_ptr const &core)
-    : _core(core), _value(chaining::value::holder<AUValue>::make_shared(core->objc_parameter.object().value)) {
+    : _core(core),
+      _default_value(core->objc_parameter.object().value),
+      _value(chaining::value::holder<AUValue>::make_shared(_default_value)) {
     this->_pool += this->_value->chain()
                        .perform([this](auto const &value) { this->_core->objc_parameter.object().value = value; })
                        .end();
@@ -54,6 +56,10 @@ AUValue audio::avf_au_parameter::max_value() const {
     return this->_core->objc_parameter.object().maxValue;
 }
 
+AUValue const &audio::avf_au_parameter::default_value() const {
+    return this->_default_value;
+}
+
 std::optional<std::string> audio::avf_au_parameter::unit_name() const {
     if (NSString *unitName = this->_core->objc_parameter.object().unitName) {
         return to_string((__bridge CFStringRef)unitName);
@@ -68,6 +74,10 @@ AUValue audio::avf_au_parameter::value() const {
 
 void audio::avf_au_parameter::set_value(AUValue const value) {
     this->_value->set_value(value);
+}
+
+void audio::avf_au_parameter::reset_value() {
+    this->_value->set_value(this->_default_value);
 }
 
 chaining::chain_sync_t<AUValue> audio::avf_au_parameter::chain() const {

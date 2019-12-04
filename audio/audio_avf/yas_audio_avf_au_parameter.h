@@ -24,11 +24,13 @@ struct avf_au_parameter {
 
     AUValue min_value() const;
     AUValue max_value() const;
+    AUValue const &default_value() const;
 
     std::optional<std::string> unit_name() const;
 
     AUValue value() const;
     void set_value(AUValue const);
+    void reset_value();
 
     chaining::chain_sync_t<AUValue> chain() const;
 
@@ -37,6 +39,7 @@ struct avf_au_parameter {
    private:
     avf_au_parameter_core_ptr _core;
 
+    AUValue const _default_value;
     chaining::value::holder_ptr<AUValue> _value;
     chaining::observer_pool _pool;
 
