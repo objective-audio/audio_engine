@@ -15,24 +15,8 @@
 
 using namespace yas;
 
-struct audio::engine::avf_au::core {
-    audio::avf_au_ptr const raw_au;
-
-    core(AudioComponentDescription const &acd) : raw_au(audio::avf_au::make_shared(acd)) {
-    }
-
-    void prepare(avf_au_ptr const &shared) {
-        auto weak_au = to_weak(shared);
-
-        this->_pool += this->raw_au->load_state_chain().send_to(shared->_load_state).sync();
-    }
-
-   private:
-    chaining::observer_pool _pool;
-};
-
 audio::engine::avf_au::avf_au(node_args &&args, AudioComponentDescription const &acd)
-    : _node(node::make_shared(std::move(args))), _core(std::make_unique<core>(acd)) {
+    : _node(node::make_shared(std::move(args))), _raw_au(audio::avf_au::make_shared(acd)) {
 }
 
 audio::engine::avf_au::~avf_au() = default;
@@ -42,15 +26,15 @@ audio::engine::avf_au::load_state audio::engine::avf_au::state() const {
 }
 
 audio::avf_au_ptr const &audio::engine::avf_au::raw_au() const {
-    return this->_core->raw_au;
+    return this->_raw_au;
 }
 
 void audio::engine::avf_au::_initialize_raw_au() {
-    this->_core->raw_au->initialize();
+    this->_raw_au->initialize();
 }
 
 void audio::engine::avf_au::_uninitialize_raw_au() {
-    this->_core->raw_au->uninitialize();
+    this->_raw_au->uninitialize();
 }
 
 audio::engine::node_ptr const &audio::engine::avf_au::node() const {
@@ -72,7 +56,7 @@ void audio::engine::avf_au::_prepare(avf_au_ptr const &shared, AudioComponentDes
 
     this->_node->set_render_handler([weak_au](node::render_args args) {
         if (auto shared_au = weak_au.lock()) {
-            auto const &raw_au = shared_au->_core->raw_au;
+            auto const &raw_au = shared_au->_raw_au;
 
             raw_au->render({.buffer = args.buffer, .bus_idx = args.bus_idx, .when = args.when},
                            [weak_au](auto input_args) {
@@ -119,15 +103,15 @@ void audio::engine::avf_au::_prepare(avf_au_ptr const &shared, AudioComponentDes
         }
     });
 
-    this->_core->prepare(shared);
+    this->_pool += this->_raw_au->load_state_chain().send_to(shared->_load_state).sync();
 }
 
 void audio::engine::avf_au::_will_reset() {
-    this->_core->raw_au->reset();
+    this->_raw_au->reset();
 }
 
 void audio::engine::avf_au::_update_unit_connections() {
-    auto const &raw_au = this->_core->raw_au;
+    auto const &raw_au = this->_raw_au;
 
     bool const is_initialized = raw_au->is_initialized();
 

@@ -40,6 +40,8 @@ struct avf_au final {
     std::weak_ptr<avf_au> _weak_au;
     audio::engine::node_ptr _node;
 
+    audio::avf_au_ptr const _raw_au;
+
     std::vector<avf_au_parameter_ptr> _global_parameters;
     std::vector<avf_au_parameter_ptr> _input_parameters;
     std::vector<avf_au_parameter_ptr> _output_parameters;
@@ -49,9 +51,6 @@ struct avf_au final {
     chaining::notifier_ptr<connection_method> _connection_notifier =
         chaining::notifier<connection_method>::make_shared();
     chaining::observer_pool _pool;
-
-    class core;
-    std::unique_ptr<core> _core;
 
     explicit avf_au(node_args &&, AudioComponentDescription const &);
 
