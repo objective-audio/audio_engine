@@ -36,6 +36,7 @@ struct avf_io_core final : io_core {
     class impl;
 
     std::unique_ptr<impl> _impl;
+    std::weak_ptr<avf_io_core> _weak_core;
 
     audio::avf_device_ptr _device;
 
