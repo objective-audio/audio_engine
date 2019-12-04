@@ -43,6 +43,8 @@ struct avf_au {
     void uninitialize();
     bool is_initialized() const;
 
+    void reset();
+
     void set_global_parameter_value(AudioUnitParameterID const parameter_id, float const value);
     float global_parameter_value(AudioUnitParameterID const parameter_id) const;
     void set_input_parameter_value(AudioUnitParameterID const parameter_id, float const value,

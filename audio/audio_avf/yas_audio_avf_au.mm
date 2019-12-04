@@ -297,6 +297,12 @@ bool audio::avf_au::is_initialized() const {
     return this->_core->is_initialized();
 }
 
+void audio::avf_au::reset() {
+    if (auto const raw_unit = this->_core->raw_unit()) {
+        [raw_unit.value().object() reset];
+    }
+}
+
 void audio::avf_au::set_global_parameter_value(AudioUnitParameterID const parameter_id, float const value) {
     this->_set_parameter_value(kAudioUnitScope_Global, parameter_id, value, 0);
 }
