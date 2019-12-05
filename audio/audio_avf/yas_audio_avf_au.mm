@@ -301,6 +301,12 @@ void audio::avf_au::reset() {
     if (auto const raw_unit = this->_core->raw_unit()) {
         [raw_unit.value().object() reset];
     }
+
+    for (auto const &parameters : {this->_global_parameters, this->_output_parameters, this->_input_parameters}) {
+        for (auto const &parameter : parameters) {
+            parameter->reset_value();
+        }
+    }
 }
 
 void audio::avf_au::set_global_parameter_value(AudioUnitParameterID const parameter_id, float const value) {
