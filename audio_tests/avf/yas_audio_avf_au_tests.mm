@@ -135,6 +135,22 @@ using namespace yas;
     XCTAssertEqual(data[3], 13);
 }
 
+- (void)test_reset_parameter {
+    auto const delay_au = audio::avf_au::make_shared(kAudioUnitType_Effect, kAudioUnitSubType_Delay);
+
+    [self _load_au:delay_au];
+
+    auto const default_value = delay_au->global_parameter_value(kDelayParam_DelayTime);
+
+    delay_au->set_global_parameter_value(kDelayParam_DelayTime, 100.0f);
+
+    XCTAssertNotEqual(default_value, delay_au->global_parameter_value(kDelayParam_DelayTime));
+
+    delay_au->reset();
+
+    XCTAssertEqual(default_value, delay_au->global_parameter_value(kDelayParam_DelayTime));
+}
+
 #pragma mark - private
 
 - (void)_load_au:(audio::avf_au_ptr const &)au {
