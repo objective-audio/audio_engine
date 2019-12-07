@@ -17,8 +17,7 @@ using namespace yas;
 @end
 
 @implementation YASAudioEngineSampleParameterCell {
-    audio::engine::au_ptr _au_opt;
-    uint32_t _index;
+    audio::avf_au_parameter_ptr _parameter;
 }
 
 - (void)dealloc {
@@ -35,7 +34,6 @@ using namespace yas;
 
 - (void)awakeFromNib {
     [super awakeFromNib];
-
     [self reset];
 }
 
@@ -45,52 +43,47 @@ using namespace yas;
 }
 
 - (void)reset {
-    [self set_engine_au:nullptr index:0];
+    self->_parameter = nullptr;
+
+    self.nameLabel.text = nil;
+    self.valueSlider.minimumValue = 0.0;
+    self.valueSlider.maximumValue = 1.0;
+    self.valueSlider.value = 0.0;
+
+    [self updateValueLabel];
 }
 
-- (void)set_engine_au:(audio::engine::au_ptr const &)au_opt index:(uint32_t const)index {
-    _au_opt = au_opt;
-    _index = index;
+- (void)set_parameter:(yas::audio::avf_au_parameter_ptr const &)parameter {
+    self->_parameter = parameter;
 
-    if (au_opt && au_opt->global_parameters().count(_index)) {
-        auto &parameter = au_opt->global_parameters().at(_index);
-        self.nameLabel.text = (__bridge NSString *)parameter.cf_name();
-        self.valueSlider.minimumValue = parameter.min_value;
-        self.valueSlider.maximumValue = parameter.max_value;
-        self.valueSlider.value = au_opt->global_parameter_value(parameter.parameter_id);
-    } else {
-        self.nameLabel.text = nil;
-        self.valueSlider.minimumValue = 0.0;
-        self.valueSlider.maximumValue = 1.0;
-        self.valueSlider.value = 0.0;
-    }
+    self.nameLabel.text = (__bridge NSString *)to_cf_object(parameter->display_name());
+    self.valueSlider.minimumValue = parameter->min_value();
+    self.valueSlider.maximumValue = parameter->max_value();
+    self.valueSlider.value = parameter->value();
 
     [self updateValueLabel];
 }
 
 - (void)updateValueLabel {
-    float value = 0;
+    if (auto const &parameter = self->_parameter) {
+        auto value_string = std::to_string(parameter->value());
 
-    if (_au_opt) {
-        auto &au = *_au_opt;
-        if (au.global_parameters().count(_index)) {
-            auto const parameter_id = au.global_parameters().at(_index).parameter_id;
-            value = au.global_parameter_value(parameter_id);
+        if (auto const unit_name = parameter->unit_name()) {
+            value_string += " ";
+            value_string += unit_name.value();
         }
-    }
 
-    self.valueLabel.text = @(value).stringValue;
+        self.valueLabel.text = (__bridge NSString *)to_cf_object(value_string);
+    } else {
+        self.valueLabel.text = @"-";
+    }
 }
 
 - (IBAction)sliderValueChanged:(UISlider *)sender {
-    if (_au_opt) {
-        if (_au_opt->global_parameters().count(_index)) {
-            auto const parameter_id = _au_opt->global_parameters().at(_index).parameter_id;
-            _au_opt->set_global_parameter_value(parameter_id, sender.value);
-        }
+    if (auto &parameter = self->_parameter) {
+        parameter->set_value(sender.value);
+        [self updateValueLabel];
     }
-
-    [self updateValueLabel];
 }
 
 @end

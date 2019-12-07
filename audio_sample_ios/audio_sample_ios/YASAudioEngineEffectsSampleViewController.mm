@@ -30,29 +30,38 @@ struct effects_vc_internal {
     audio::engine::manager_ptr manager = audio::engine::manager::make_shared();
     audio::engine::connection_ptr through_connection = nullptr;
     audio::engine::tap_ptr tap = audio::engine::tap::make_shared();
-    audio::engine::au_ptr effect_au = nullptr;
+    audio::engine::avf_au_ptr effect_au = nullptr;
+    chaining::observer_pool _pool;
 
     effects_vc_internal() {
         this->manager->add_io();
     }
 
     void replace_effect_au(const AudioComponentDescription *acd) {
-        if (effect_au) {
-            manager->disconnect(effect_au->node());
-            effect_au = nullptr;
+        if (this->effect_au) {
+            this->manager->disconnect(effect_au->node());
+            this->effect_au = nullptr;
         }
 
-        if (through_connection) {
-            manager->disconnect(through_connection);
-            through_connection = nullptr;
+        if (this->through_connection) {
+            this->manager->disconnect(through_connection);
+            this->through_connection = nullptr;
         }
 
         auto format = audio::format({.sample_rate = [AVAudioSession sharedInstance].sampleRate, .channel_count = 2});
 
         if (acd) {
-            effect_au = audio::engine::au::make_shared(*acd);
-            manager->connect(effect_au->node(), this->manager->io().value()->node(), format);
-            manager->connect(tap->node(), effect_au->node(), format);
+            this->effect_au = audio::engine::avf_au::make_shared(*acd);
+
+            this->_pool +=
+                this->effect_au->load_state_chain()
+                    .perform([this, format](auto const &state) {
+                        if (state == audio::avf_au::load_state::loaded) {
+                            this->manager->connect(effect_au->node(), this->manager->io().value()->node(), format);
+                            this->manager->connect(tap->node(), effect_au->node(), format);
+                        }
+                    })
+                    .sync();
         } else {
             through_connection = manager->connect(tap->node(), this->manager->io().value()->node(), format);
         }
