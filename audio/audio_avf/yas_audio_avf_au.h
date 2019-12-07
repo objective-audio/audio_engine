@@ -85,9 +85,9 @@ struct avf_au {
     void _prepare(avf_au_ptr const &, AudioComponentDescription const &);
     void _setup();
 
-    void _set_parameter_value(AudioUnitScope const scope, AudioUnitParameterID const parameter_id, float const value,
-                              AudioUnitElement const element);
-    float _get_parameter_value(AudioUnitScope const scope, AudioUnitParameterID const parameter_id,
+    void _set_parameter_value(avf_au_parameter_scope const scope, AudioUnitParameterID const parameter_id,
+                              float const value, AudioUnitElement const element);
+    float _get_parameter_value(avf_au_parameter_scope const scope, AudioUnitParameterID const parameter_id,
                                AudioUnitElement const element) const;
 };
 }  // namespace yas::audio
