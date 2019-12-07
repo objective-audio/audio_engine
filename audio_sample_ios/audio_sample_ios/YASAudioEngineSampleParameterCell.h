@@ -3,15 +3,16 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <audio/yas_audio_ptr.h>
 #import <memory>
 #import <optional>
 
 namespace yas::audio::engine {
-class au;
+class avf_au;
 }
 
 @interface YASAudioEngineSampleParameterCell : UITableViewCell
 
-- (void)set_engine_au:(std::shared_ptr<yas::audio::engine::au> const &)node_opt index:(uint32_t const)index;
+- (void)set_parameter:(yas::audio::avf_au_parameter_ptr const &)parameter;
 
 @end

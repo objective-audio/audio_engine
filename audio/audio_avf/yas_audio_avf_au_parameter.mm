@@ -10,9 +10,27 @@
 
 using namespace yas;
 
+namespace yas::audio::avf_au_parameter_utils {
+std::vector<std::string> to_vector(NSArray<NSString *> *_Nullable valueStrings) {
+    if (valueStrings) {
+        std::vector<std::string> result;
+        result.reserve(valueStrings.count);
+
+        for (NSString *valueString in valueStrings) {
+            result.emplace_back(to_string((__bridge CFStringRef)valueString));
+        }
+
+        return result;
+    } else {
+        return {};
+    }
+}
+}
+
 audio::avf_au_parameter::avf_au_parameter(avf_au_parameter_core_ptr const &core)
     : _core(core),
       _default_value(core->objc_parameter.object().value),
+      _value_strings(avf_au_parameter_utils::to_vector(core->objc_parameter.object().valueStrings)),
       _value(chaining::value::holder<AUValue>::make_shared(_default_value)) {
     this->_pool += this->_value->chain()
                        .perform([this](auto const &value) { this->_core->objc_parameter.object().value = value; })
@@ -48,6 +66,10 @@ AudioUnitParameterUnit audio::avf_au_parameter::unit() const {
     return this->_core->objc_parameter.object().unit;
 }
 
+std::string audio::avf_au_parameter::display_name() const {
+    return to_string((__bridge CFStringRef)this->_core->objc_parameter.object().displayName);
+}
+
 AUValue audio::avf_au_parameter::min_value() const {
     return this->_core->objc_parameter.object().minValue;
 }
@@ -58,6 +80,10 @@ AUValue audio::avf_au_parameter::max_value() const {
 
 AUValue const &audio::avf_au_parameter::default_value() const {
     return this->_default_value;
+}
+
+std::vector<std::string> const &audio::avf_au_parameter::value_strings() const {
+    return this->_value_strings;
 }
 
 std::optional<std::string> audio::avf_au_parameter::unit_name() const {
@@ -74,6 +100,14 @@ AUValue audio::avf_au_parameter::value() const {
 
 void audio::avf_au_parameter::set_value(AUValue const value) {
     this->_value->set_value(value);
+}
+
+void audio::avf_au_parameter::set_value_at(std::size_t const idx) {
+    if (idx < this->_value_strings.size()) {
+        auto const value = [this->_core->objc_parameter.object()
+            valueFromString:(__bridge NSString *)to_cf_object(this->_value_strings.at(idx))];
+        this->set_value(value);
+    }
 }
 
 void audio::avf_au_parameter::reset_value() {
