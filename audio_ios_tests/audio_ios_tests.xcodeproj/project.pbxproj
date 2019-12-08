@@ -18,7 +18,7 @@
 		B6257A0821E0ED93003740D9 /* yas_audio_test_utils_tests.mm in Sources */ = {isa = PBXBuildFile; fileRef = B62579EB21E0ED93003740D9 /* yas_audio_test_utils_tests.mm */; };
 		B6257A0921E0ED93003740D9 /* yas_audio_test_utils.mm in Sources */ = {isa = PBXBuildFile; fileRef = B62579EC21E0ED93003740D9 /* yas_audio_test_utils.mm */; };
 		B6257A0A21E0ED93003740D9 /* yas_audio_engine_tap_tests.mm in Sources */ = {isa = PBXBuildFile; fileRef = B62579EE21E0ED93003740D9 /* yas_audio_engine_tap_tests.mm */; };
-		B6257A0B21E0ED93003740D9 /* yas_audio_engine_au_mixer_tests.mm in Sources */ = {isa = PBXBuildFile; fileRef = B62579EF21E0ED93003740D9 /* yas_audio_engine_au_mixer_tests.mm */; };
+		B6257A0B21E0ED93003740D9 /* yas_audio_engine_avf_au_mixer_tests.mm in Sources */ = {isa = PBXBuildFile; fileRef = B62579EF21E0ED93003740D9 /* yas_audio_engine_avf_au_mixer_tests.mm */; };
 		B6257A0C21E0ED93003740D9 /* yas_audio_engine_au_tests.mm in Sources */ = {isa = PBXBuildFile; fileRef = B62579F021E0ED93003740D9 /* yas_audio_engine_au_tests.mm */; };
 		B6257A0D21E0ED93003740D9 /* yas_audio_route_tests.mm in Sources */ = {isa = PBXBuildFile; fileRef = B62579F121E0ED93003740D9 /* yas_audio_route_tests.mm */; };
 		B6257A0E21E0ED93003740D9 /* yas_audio_engine_route_tests.mm in Sources */ = {isa = PBXBuildFile; fileRef = B62579F221E0ED93003740D9 /* yas_audio_engine_route_tests.mm */; };
@@ -56,7 +56,7 @@
 		B62579EB21E0ED93003740D9 /* yas_audio_test_utils_tests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = yas_audio_test_utils_tests.mm; sourceTree = "<group>"; };
 		B62579EC21E0ED93003740D9 /* yas_audio_test_utils.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = yas_audio_test_utils.mm; sourceTree = "<group>"; };
 		B62579EE21E0ED93003740D9 /* yas_audio_engine_tap_tests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = yas_audio_engine_tap_tests.mm; sourceTree = "<group>"; };
-		B62579EF21E0ED93003740D9 /* yas_audio_engine_au_mixer_tests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = yas_audio_engine_au_mixer_tests.mm; sourceTree = "<group>"; };
+		B62579EF21E0ED93003740D9 /* yas_audio_engine_avf_au_mixer_tests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = yas_audio_engine_avf_au_mixer_tests.mm; sourceTree = "<group>"; };
 		B62579F021E0ED93003740D9 /* yas_audio_engine_au_tests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = yas_audio_engine_au_tests.mm; sourceTree = "<group>"; };
 		B62579F121E0ED93003740D9 /* yas_audio_route_tests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = yas_audio_route_tests.mm; sourceTree = "<group>"; };
 		B62579F221E0ED93003740D9 /* yas_audio_engine_route_tests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = yas_audio_engine_route_tests.mm; sourceTree = "<group>"; };
@@ -172,7 +172,7 @@
 			isa = PBXGroup;
 			children = (
 				B62579F421E0ED93003740D9 /* yas_audio_au_mixer_tests.mm */,
-				B62579EF21E0ED93003740D9 /* yas_audio_engine_au_mixer_tests.mm */,
+				B62579EF21E0ED93003740D9 /* yas_audio_engine_avf_au_mixer_tests.mm */,
 				B62579F021E0ED93003740D9 /* yas_audio_engine_au_tests.mm */,
 				B62579F821E0ED93003740D9 /* yas_audio_engine_connection_tests.mm */,
 				B62579F321E0ED93003740D9 /* yas_audio_engine_converter_unit_tests.mm */,
@@ -297,7 +297,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				B6257A0D21E0ED93003740D9 /* yas_audio_route_tests.mm in Sources */,
-				B6257A0B21E0ED93003740D9 /* yas_audio_engine_au_mixer_tests.mm in Sources */,
+				B6257A0B21E0ED93003740D9 /* yas_audio_engine_avf_au_mixer_tests.mm in Sources */,
 				B6257A1721E0ED93003740D9 /* yas_audio_file_tests.mm in Sources */,
 				B6257A1121E0ED93003740D9 /* yas_audio_engine_node_tests.mm in Sources */,
 				B6257A0921E0ED93003740D9 /* yas_audio_test_utils.mm in Sources */,

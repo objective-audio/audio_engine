@@ -350,9 +350,41 @@ std::vector<audio::avf_au_parameter_ptr> const &audio::avf_au::output_parameters
     return this->_output_parameters;
 }
 
-std::optional<audio::avf_au_parameter_ptr> audio::avf_au::parameter(AudioUnitParameterID const,
-                                                                    avf_au_parameter_scope const,
+std::optional<audio::avf_au_parameter_ptr> audio::avf_au::parameter(AudioUnitParameterID const parameter_id,
+                                                                    avf_au_parameter_scope const scope,
                                                                     AudioUnitElement element) const {
+    if (auto const raw_unit = this->_core->raw_unit()) {
+        if (AUParameter *parameter = [raw_unit.value().object().parameterTree parameterWithID:parameter_id
+                                                                                        scope:to_raw_scope(scope)
+                                                                                      element:element]) {
+            auto const key_path = to_string((__bridge CFStringRef)parameter.keyPath);
+
+            switch (scope) {
+                case avf_au_parameter_scope::global: {
+                    if (auto const parameter = first(this->_global_parameters, [key_path](auto const &parameter) {
+                            return parameter->key_path() == key_path;
+                        })) {
+                        return parameter;
+                    }
+                } break;
+                case avf_au_parameter_scope::output: {
+                    if (auto const parameter = first(this->_output_parameters, [key_path](auto const &parameter) {
+                            return parameter->key_path() == key_path;
+                        })) {
+                        return parameter;
+                    }
+                } break;
+                case avf_au_parameter_scope::input: {
+                    if (auto const parameter = first(this->_input_parameters, [key_path](auto const &parameter) {
+                            return parameter->key_path() == key_path;
+                        })) {
+                        return parameter;
+                    }
+                } break;
+            }
+        }
+    }
+
     return std::nullopt;
 }
 
@@ -408,41 +440,12 @@ void audio::avf_au::_setup() {
 
 void audio::avf_au::_set_parameter_value(avf_au_parameter_scope const scope, AudioUnitParameterID const parameter_id,
                                          float const value, AudioUnitElement const element) {
-    if (auto const raw_unit = this->_core->raw_unit()) {
-        if (AUParameter *parameter = [raw_unit.value().object().parameterTree parameterWithID:parameter_id
-                                                                                        scope:to_raw_scope(scope)
-                                                                                      element:0]) {
-            auto const key_path = to_string((__bridge CFStringRef)parameter.keyPath);
-
-            switch (scope) {
-                case avf_au_parameter_scope::global: {
-                    if (auto const parameter = first(this->_global_parameters, [key_path](auto const &parameter) {
-                            return parameter->key_path() == key_path;
-                        })) {
-                        parameter.value()->set_value(value);
-                    }
-                }
-                    return;
-                case avf_au_parameter_scope::output: {
-                    if (auto const parameter = first(this->_output_parameters, [key_path](auto const &parameter) {
-                            return parameter->key_path() == key_path;
-                        })) {
-                        parameter.value()->set_value(value);
-                    }
-                }
-                    return;
-                case avf_au_parameter_scope::input: {
-                    if (auto const parameter = first(this->_input_parameters, [key_path](auto const &parameter) {
-                            return parameter->key_path() == key_path;
-                        })) {
-                        parameter.value()->set_value(value);
-                    }
-                }
-                    return;
-            }
-        }
+    if (auto const parameter = this->parameter(parameter_id, scope, element)) {
+        parameter.value()->set_value(value);
+    } else {
+        throw std::invalid_argument("_set_parameter_value - parameter not found. element (" + std::to_string(element) +
+                                    ")");
     }
-    std::cout << "avf_au _set_parameter_value failed." << std::endl;
 }
 
 float audio::avf_au::_get_parameter_value(avf_au_parameter_scope const scope, AudioUnitParameterID const parameter_id,
@@ -450,7 +453,7 @@ float audio::avf_au::_get_parameter_value(avf_au_parameter_scope const scope, Au
     if (auto const raw_unit = this->_core->raw_unit()) {
         if (AUParameter *parameter = [raw_unit.value().object().parameterTree parameterWithID:parameter_id
                                                                                         scope:to_raw_scope(scope)
-                                                                                      element:0]) {
+                                                                                      element:element]) {
             return parameter.value;
         }
     }
