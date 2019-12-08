@@ -246,8 +246,9 @@ void audio::avf_au::set_input_format(audio::format const &format, uint32_t const
     } else {
         auto component_name = to_string((__bridge CFStringRef)raw_unit.object().componentName);
         auto error_message = to_string((__bridge CFStringRef)error.description);
-        std::cout << component_name << " bus_idx : " << bus_idx << " set input format - error : " << error_message
-                  << std::endl;
+        auto const message =
+            component_name + " bus_idx : " + std::to_string(bus_idx) + " set input format - error : " + error_message;
+        throw std::runtime_error(message);
     }
 }
 
@@ -271,8 +272,9 @@ void audio::avf_au::set_output_format(audio::format const &format, uint32_t cons
     } else {
         auto component_name = to_string((__bridge CFStringRef)raw_unit.object().componentName);
         auto error_message = to_string((__bridge CFStringRef)error.description);
-        std::cout << component_name << " bus_idx : " << bus_idx << " set output format - error : " << error_message
-                  << std::endl;
+        auto const message =
+            component_name + " bus_idx : " + std::to_string(bus_idx) + " set output format - error : " + error_message;
+        throw std::runtime_error(message);
     }
 }
 
