@@ -189,7 +189,9 @@ void audio::avf_au::set_input_bus_count(uint32_t const count) {
     AUAudioUnitBusArray *inputBusses = raw_unit.value().object().inputBusses;
     if (inputBusses.isCountChangeable) {
         NSError *error = nil;
-        if (![inputBusses setBusCount:count error:&error]) {
+        if ([inputBusses setBusCount:count error:&error]) {
+            this->_update_input_parameters();
+        } else {
             auto error_message = to_string((__bridge CFStringRef)error.description);
             std::cout << "set input element count error : " << error_message << std::endl;
         }
@@ -207,7 +209,9 @@ void audio::avf_au::set_output_bus_count(uint32_t const count) {
     AUAudioUnitBusArray *outputBusses = raw_unit.value().object().outputBusses;
     if (outputBusses.isCountChangeable) {
         NSError *error = nil;
-        if (![outputBusses setBusCount:count error:&error]) {
+        if ([outputBusses setBusCount:count error:&error]) {
+            this->_update_output_parameters();
+        } else {
             auto error_message = to_string((__bridge CFStringRef)error.description);
             std::cout << "set output element count error : " << error_message << std::endl;
         }
