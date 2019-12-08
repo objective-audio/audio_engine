@@ -80,8 +80,7 @@ using namespace yas;
 }
 
 - (void)test_set_format_failed {
-    auto mixer_unit = audio::unit::make_shared(kAudioUnitType_Mixer, kAudioUnitSubType_MultiChannelMixer);
-    auto const manageable_unit = audio::manageable_unit::cast(mixer_unit);
+    auto const mixer_au = audio::avf_au::make_shared(kAudioUnitType_Mixer, kAudioUnitSubType_MultiChannelMixer);
 
     /*
      Initialized
@@ -89,10 +88,10 @@ using namespace yas;
 
     auto format = audio::format({.sample_rate = 48000.0, 2, audio::pcm_format::float32, false});
 
-    manageable_unit->initialize();
-    XCTAssertThrows(mixer_unit->set_output_format(format.stream_description(), 0));
-    manageable_unit->uninitialize();
-    XCTAssertNoThrow(mixer_unit->set_output_format(format.stream_description(), 0));
+    mixer_au->initialize();
+    XCTAssertThrows(mixer_au->set_output_format(format, 0));
+    mixer_au->uninitialize();
+    XCTAssertNoThrow(mixer_au->set_output_format(format, 0));
 
     /*
      Float64
@@ -100,7 +99,7 @@ using namespace yas;
 
     format = audio::format(
         {.sample_rate = 48000.0, .channel_count = 2, .pcm_format = audio::pcm_format::float64, .interleaved = false});
-    XCTAssertThrows(mixer_unit->set_output_format(format.stream_description(), 0));
+    XCTAssertThrows(mixer_au->set_output_format(format, 0));
 
     /*
      Int16
@@ -108,7 +107,7 @@ using namespace yas;
 
     format = audio::format(
         {.sample_rate = 48000.0, .channel_count = 2, .pcm_format = audio::pcm_format::int16, .interleaved = false});
-    XCTAssertThrows(mixer_unit->set_output_format(format.stream_description(), 0));
+    XCTAssertThrows(mixer_au->set_output_format(format, 0));
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
     /*
      Fixed8.24
@@ -116,7 +115,7 @@ using namespace yas;
 
     format = audio::format(
         {.sample_rate = 48000.0, .channel_count = 2, .pcm_format = audio::pcm_format::fixed824, .interleaved = false});
-    XCTAssertThrows(mixer_unit->set_output_format(format.stream_description(), 0));
+    XCTAssertThrows(mixer_au->set_output_format(format, 0));
 #endif
 
     /*
@@ -125,8 +124,8 @@ using namespace yas;
 
     format = audio::format(
         {.sample_rate = 48000.0, .channel_count = 2, .pcm_format = audio::pcm_format::float32, .interleaved = true});
-    XCTAssertThrows(mixer_unit->set_output_format(format.stream_description(), 0));
-    XCTAssertThrows(mixer_unit->set_input_format(format.stream_description(), 0));
+    XCTAssertThrows(mixer_au->set_output_format(format, 0));
+    XCTAssertThrows(mixer_au->set_input_format(format, 0));
 }
 
 @end
