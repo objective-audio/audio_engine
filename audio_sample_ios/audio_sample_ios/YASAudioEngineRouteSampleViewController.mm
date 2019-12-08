@@ -35,7 +35,7 @@ typedef NS_ENUM(NSUInteger, YASAudioEngineRouteSampleSourceIndex) {
 namespace yas::sample {
 struct route_vc_internal {
     audio::engine::manager_ptr manager = audio::engine::manager::make_shared();
-    audio::engine::au_mixer_ptr au_mixer = audio::engine::au_mixer::make_shared();
+    audio::engine::avf_au_mixer_ptr au_mixer = audio::engine::avf_au_mixer::make_shared();
     std::shared_ptr<audio::engine::route> route = audio::engine::route::make_shared();
     audio::engine::tap_ptr sine_tap = audio::engine::tap::make_shared();
 

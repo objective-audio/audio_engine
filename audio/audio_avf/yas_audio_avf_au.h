@@ -84,6 +84,8 @@ struct avf_au {
 
     void _prepare(avf_au_ptr const &, AudioComponentDescription const &);
     void _setup();
+    void _update_input_parameters();
+    void _update_output_parameters();
 
     void _set_parameter_value(avf_au_parameter_scope const scope, AudioUnitParameterID const parameter_id,
                               float const value, AudioUnitElement const element);
