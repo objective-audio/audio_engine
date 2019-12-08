@@ -440,6 +440,64 @@ void audio::avf_au::_setup() {
     }
 }
 
+void audio::avf_au::_update_input_parameters() {
+    auto const raw_unit = this->_core->raw_unit();
+
+    auto const prev_input_parameters = std::move(this->_input_parameters);
+    this->_input_parameters.clear();
+
+    for (AUParameter *auParameter in raw_unit.value().object().parameterTree.allParameters) {
+        auto objc_param = objc_ptr<AUParameter *>(auParameter);
+        auto core = avf_au_parameter_core::make_shared(objc_param);
+        auto const parameter = avf_au_parameter::make_shared(core);
+
+        switch (parameter->scope()) {
+            case avf_au_parameter_scope::input: {
+                auto const key_path = parameter->key_path();
+                if (auto const prev = first(prev_input_parameters, [key_path](auto const &parameter) {
+                        return parameter->key_path() == key_path;
+                    })) {
+                    this->_input_parameters.emplace_back(prev.value());
+                } else {
+                    this->_input_parameters.emplace_back(parameter);
+                }
+            } break;
+            case avf_au_parameter_scope::global:
+            case avf_au_parameter_scope::output:
+                break;
+        }
+    }
+}
+
+void audio::avf_au::_update_output_parameters() {
+    auto const raw_unit = this->_core->raw_unit();
+
+    auto const prev_output_parameters = std::move(this->_output_parameters);
+    this->_output_parameters.clear();
+
+    for (AUParameter *auParameter in raw_unit.value().object().parameterTree.allParameters) {
+        auto objc_param = objc_ptr<AUParameter *>(auParameter);
+        auto core = avf_au_parameter_core::make_shared(objc_param);
+        auto const parameter = avf_au_parameter::make_shared(core);
+
+        switch (parameter->scope()) {
+            case avf_au_parameter_scope::output: {
+                auto const key_path = parameter->key_path();
+                if (auto const prev = first(prev_output_parameters, [key_path](auto const &parameter) {
+                        return parameter->key_path() == key_path;
+                    })) {
+                    this->_output_parameters.emplace_back(prev.value());
+                } else {
+                    this->_output_parameters.emplace_back(parameter);
+                }
+            } break;
+            case avf_au_parameter_scope::global:
+            case avf_au_parameter_scope::input:
+                break;
+        }
+    }
+}
+
 void audio::avf_au::_set_parameter_value(avf_au_parameter_scope const scope, AudioUnitParameterID const parameter_id,
                                          float const value, AudioUnitElement const element) {
     if (auto const parameter = this->parameter(parameter_id, scope, element)) {
