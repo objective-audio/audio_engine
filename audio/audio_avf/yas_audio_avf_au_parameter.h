@@ -21,14 +21,13 @@ struct avf_au_parameter {
     avf_au_parameter_scope scope() const;
     std::string identifier() const;
     AudioUnitParameterUnit unit() const;
+    std::optional<std::string> unit_name() const;
     std::string display_name() const;
 
     AUValue min_value() const;
     AUValue max_value() const;
     AUValue const &default_value() const;
     std::vector<std::string> const &value_strings() const;
-
-    std::optional<std::string> unit_name() const;
 
     AUValue value() const;
     void set_value(AUValue const);

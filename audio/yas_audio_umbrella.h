@@ -40,7 +40,6 @@
 #include "yas_audio_unit.h"
 #include "yas_audio_unit_parameter.h"
 
-#include "yas_audio_engine_au.h"
 #include "yas_audio_engine_avf_au.h"
 #include "yas_audio_engine_avf_au_mixer.h"
 #include "yas_audio_engine_connection.h"

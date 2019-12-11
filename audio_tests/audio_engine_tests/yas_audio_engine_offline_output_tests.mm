@@ -2,7 +2,7 @@
 //  yas_audio_offline_output_tests.m
 //
 
-#import <future>
+#include <future>
 #import "yas_audio_test_utils.h"
 
 using namespace yas;
@@ -37,8 +37,21 @@ using namespace yas;
 
     auto format = audio::format({.sample_rate = sample_rate, .channel_count = 2});
     auto const &output = manager->offline_output().value();
-    auto sample_delay_au = audio::engine::au::make_shared(kAudioUnitType_Effect, kAudioUnitSubType_SampleDelay);
+    auto sample_delay_au = audio::engine::avf_au::make_shared(kAudioUnitType_Effect, kAudioUnitSubType_SampleDelay);
     auto tap = audio::engine::tap::make_shared();
+
+    auto promise = std::make_shared<std::promise<void>>();
+    auto future = promise->get_future();
+
+    auto observer = sample_delay_au->load_state_chain()
+                        .perform([promise](auto const &state) {
+                            if (state == audio::avf_au::load_state::loaded) {
+                                promise->set_value();
+                            }
+                        })
+                        .sync();
+
+    future.get();
 
     manager->connect(sample_delay_au->node(), output->node(), format);
     manager->connect(tap->node(), sample_delay_au->node(), format);
