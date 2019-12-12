@@ -2,6 +2,7 @@
 //  yas_audio_converter_unit_tests.mm
 //
 
+#include <future>
 #import "yas_audio_test_utils.h"
 
 using namespace yas;
@@ -21,9 +22,21 @@ using namespace yas;
 }
 
 - (void)test_set_format_success {
-#warning todo
-    /*
-    auto converter_unit = audio::unit::make_shared(kAudioUnitType_FormatConverter, kAudioUnitSubType_AUConverter);
+    auto converter_unit = audio::avf_au::make_shared(kAudioUnitType_FormatConverter, kAudioUnitSubType_AUConverter);
+
+    auto promise = std::make_shared<std::promise<void>>();
+    auto future = promise->get_future();
+
+    auto observer = converter_unit->load_state_chain()
+                        .perform([promise](auto const &state) {
+                            if (state == audio::avf_au::load_state::loaded) {
+                                promise->set_value();
+                            }
+                        })
+                        .sync();
+
+    future.get();
+
     audio::pcm_format const pcm_formats[] = {audio::pcm_format::float32, audio::pcm_format::float64,
                                              audio::pcm_format::int16, audio::pcm_format::fixed824};
     double const sample_rates[] = {4000, 8000, 16000, 22050, 44100, 48000, 88100, 96000, 192000, 382000};
@@ -32,27 +45,26 @@ using namespace yas;
     for (auto const &pcm_format : pcm_formats) {
         for (auto const &sample_rate : sample_rates) {
             for (auto const &interleaved : interleaves) {
-                auto const format = audio::format({.sample_rate = sample_rate,
-                                                   .channel_count = 2,
-                                                   .pcm_format = pcm_format,
-                                                   .interleaved = interleaved});
-                auto manageable_unit = audio::manageable_unit::cast(converter_unit);
-                XCTAssertNoThrow(manageable_unit->initialize());
-                XCTAssertNoThrow(converter_unit->set_output_format(format.stream_description(), 0));
-                XCTAssertNoThrow(converter_unit->set_input_format(format.stream_description(), 0));
+                audio::format const format{{.sample_rate = sample_rate,
+                                            .channel_count = 2,
+                                            .pcm_format = pcm_format,
+                                            .interleaved = interleaved}};
+                XCTAssertNoThrow(converter_unit->initialize());
+                XCTAssertNoThrow(converter_unit->set_output_format(format, 0));
+                XCTAssertNoThrow(converter_unit->set_input_format(format, 0));
 
-                AudioStreamBasicDescription asbd = {0};
-                XCTAssertNoThrow(asbd = converter_unit->output_format(0));
-                XCTAssertTrue(is_equal(format.stream_description(), asbd));
+                std::optional<audio::format> output_format = std::nullopt;
+                XCTAssertNoThrow(output_format = converter_unit->output_format(0));
+                XCTAssertTrue(format == output_format);
 
-                memset(&asbd, 0, sizeof(AudioStreamBasicDescription));
-                XCTAssertNoThrow(asbd = converter_unit->input_format(0));
-                XCTAssertTrue(is_equal(format.stream_description(), asbd));
+                std::optional<audio::format> input_format = std::nullopt;
+                XCTAssertNoThrow(input_format = converter_unit->input_format(0));
+                XCTAssertTrue(format == input_format);
 
-                XCTAssertNoThrow(manageable_unit->uninitialize());
+                XCTAssertNoThrow(converter_unit->uninitialize());
             }
         }
-    }*/
+    }
 }
 
 @end
