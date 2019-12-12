@@ -170,38 +170,6 @@ uint8_t const *test::data_ptr_from_buffer(audio::pcm_buffer const &buffer, uint3
     }
 }
 
-void test::raw_unit_render_on_sub_thread(audio::unit_ptr const &unit, audio::format &format,
-                                         uint32_t const frame_length, std::size_t const count,
-                                         NSTimeInterval const wait) {
-    auto lambda = [unit, format, frame_length, count]() mutable {
-        AudioUnitRenderActionFlags action_flags = 0;
-
-        audio::pcm_buffer buffer(format, frame_length);
-
-        for (NSInteger i = 0; i < count; i++) {
-            audio::time time(frame_length * i, format.sample_rate());
-            AudioTimeStamp timeStamp = time.audio_time_stamp();
-
-            audio::render_parameters parameters = {
-                .in_render_type = audio::render_type::normal,
-                .io_action_flags = &action_flags,
-                .io_time_stamp = &timeStamp,
-                .in_bus_number = 0,
-                .in_number_frames = frame_length,
-                .io_data = buffer.audio_buffer_list(),
-            };
-
-            unit->raw_unit_render(parameters);
-        }
-    };
-
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), lambda);
-
-    if (wait > 0) {
-        [NSThread sleepForTimeInterval:wait];
-    }
-}
-
 test::node_object::node_object(uint32_t const input_bus_count, uint32_t const output_bus_count)
     : node(audio::engine::node::make_shared(
           audio::engine::node_args{.input_bus_count = input_bus_count, .output_bus_count = output_bus_count})) {
