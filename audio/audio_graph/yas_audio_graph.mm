@@ -17,8 +17,10 @@ using namespace yas;
 #pragma mark - core
 
 struct audio::graph::core {
+#if TARGET_OS_IPHONE
     objc_ptr<> _did_become_active_observer;
     objc_ptr<> _interruption_observer;
+#endif
 };
 
 #pragma mark - main
@@ -31,6 +33,7 @@ audio::graph::~graph() {
 }
 
 void audio::graph::_setup_notifications() {
+#if TARGET_OS_IPHONE
     if (!this->_core->_did_become_active_observer) {
         auto const lambda = [this](NSNotification *note) {
             if (this->_running) {
@@ -71,11 +74,14 @@ void audio::graph::_setup_notifications() {
                                                                     usingBlock:std::move(lambda)];
         this->_core->_interruption_observer = objc_ptr<>(observer);
     }
+#endif
 }
 
 void audio::graph::_dispose_notifications() {
+#if TARGET_OS_IPHONE
     this->_core->_did_become_active_observer = nullptr;
     this->_core->_interruption_observer = nullptr;
+#endif
 }
 
 void audio::graph::add_io(io_ptr const &io) {
@@ -115,9 +121,7 @@ bool audio::graph::is_running() const {
 }
 
 void audio::graph::start_all_ios() {
-#if TARGET_OS_IPHONE
     this->_setup_notifications();
-#endif
 
     for (auto const &io : this->_ios) {
         io->start();
@@ -129,9 +133,7 @@ void audio::graph::stop_all_ios() {
         io->stop();
     }
 
-#if TARGET_OS_IPHONE
     this->_dispose_notifications();
-#endif
 }
 
 audio::graph_ptr audio::graph::make_shared() {
