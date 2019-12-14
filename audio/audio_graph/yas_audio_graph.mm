@@ -14,30 +14,6 @@
 
 using namespace yas;
 
-namespace yas::audio::global_graph {
-static std::recursive_mutex _mutex;
-static std::map<uint8_t, std::weak_ptr<graph>> _graphs;
-#if TARGET_OS_IPHONE
-static objc_ptr<> _did_become_active_observer;
-static objc_ptr<> _interruption_observer;
-#endif
-
-static std::optional<uint8_t> min_empty_graph_key() {
-    std::lock_guard<std::recursive_mutex> lock(global_graph::_mutex);
-    return min_empty_key(global_graph::_graphs);
-}
-
-static void add_graph(graph_ptr const &graph) {
-    std::lock_guard<std::recursive_mutex> lock(global_graph::_mutex);
-    global_graph::_graphs.insert(std::make_pair(graph->key(), to_weak(graph)));
-}
-
-static void remove_graph_for_key(uint8_t const key) {
-    std::lock_guard<std::recursive_mutex> lock(global_graph::_mutex);
-    global_graph::_graphs.erase(key);
-}
-}
-
 #pragma mark - core
 
 struct audio::graph::core {
@@ -47,16 +23,14 @@ struct audio::graph::core {
 
 #pragma mark - main
 
-audio::graph::graph(uint8_t const key) : _key(key), _core(std::make_unique<core>()) {
+audio::graph::graph() : _core(std::make_unique<core>()) {
 }
 
 audio::graph::~graph() {
     this->stop_all_ios();
-    global_graph::remove_graph_for_key(this->_key);
 }
 
 void audio::graph::_prepare(graph_ptr const &shared) {
-    global_graph::add_graph(shared);
 }
 
 void audio::graph::_setup_notifications() {
@@ -138,10 +112,6 @@ bool audio::graph::is_running() const {
     return this->_running;
 }
 
-uint8_t audio::graph::key() const {
-    return this->_key;
-}
-
 void audio::graph::start_all_ios() {
 #if TARGET_OS_IPHONE
     this->_setup_notifications();
@@ -159,11 +129,7 @@ void audio::graph::stop_all_ios() {
 }
 
 audio::graph_ptr audio::graph::make_shared() {
-    if (auto key = global_graph::min_empty_graph_key()) {
-        auto shared = graph_ptr(new graph{*key});
-        shared->_prepare(shared);
-        return shared;
-    } else {
-        return nullptr;
-    }
+    auto shared = graph_ptr(new graph{});
+    shared->_prepare(shared);
+    return shared;
 }
