@@ -21,18 +21,19 @@ struct graph final : interruptable_graph {
     void stop();
     bool is_running() const;
 
-    uint8_t key() const;
-
    private:
-    uint8_t _key;
+    class core;
+    std::unique_ptr<core> _core;
+
     bool _running = false;
-    mutable std::recursive_mutex _mutex;
+    bool _is_interrupting = false;
 
     std::unordered_set<io_ptr> _ios;
 
-    explicit graph(uint8_t const key);
+    graph();
 
-    void _prepare(graph_ptr const &);
+    void _setup_notifications();
+    void _dispose_notifications();
 
     void start_all_ios() override;
     void stop_all_ios() override;
