@@ -76,6 +76,11 @@ void audio::graph::_setup_notifications() {
     }
 }
 
+void audio::graph::_dispose_notifications() {
+    this->_core->_did_become_active_observer = nullptr;
+    this->_core->_interruption_observer = nullptr;
+}
+
 void audio::graph::add_io(io_ptr const &io) {
     if (this->_ios.count(io) == 0) {
         this->_ios.insert(io);
@@ -126,6 +131,10 @@ void audio::graph::stop_all_ios() {
     for (auto &io : this->_ios) {
         io->stop();
     }
+
+#if TARGET_OS_IPHONE
+    this->_dispose_notifications();
+#endif
 }
 
 audio::graph_ptr audio::graph::make_shared() {

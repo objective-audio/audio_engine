@@ -34,6 +34,7 @@ struct graph final : interruptable_graph {
 
     void _prepare(graph_ptr const &);
     void _setup_notifications();
+    void _dispose_notifications();
 
     void start_all_ios() override;
     void stop_all_ios() override;
