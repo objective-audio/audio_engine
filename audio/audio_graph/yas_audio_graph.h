@@ -27,7 +27,6 @@ struct graph final : interruptable_graph {
 
     bool _running = false;
     bool _is_interrupting = false;
-    mutable std::recursive_mutex _mutex;
 
     std::unordered_set<io_ptr> _ios;
 

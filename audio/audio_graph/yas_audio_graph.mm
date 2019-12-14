@@ -77,19 +77,19 @@ void audio::graph::_setup_notifications() {
 }
 
 void audio::graph::add_io(io_ptr const &io) {
-    {
-        std::lock_guard<std::recursive_mutex> lock(_mutex);
+    if (this->_ios.count(io) == 0) {
         this->_ios.insert(io);
-    }
-    if (this->_running && !this->_is_interrupting) {
-        io->start();
+
+        if (this->_running && !this->_is_interrupting) {
+            io->start();
+        }
     }
 }
 
 void audio::graph::remove_io(io_ptr const &io) {
-    io->stop();
-    {
-        std::lock_guard<std::recursive_mutex> lock(_mutex);
+    if (this->_ios.count(io) > 0) {
+        io->stop();
+
         this->_ios.erase(io);
     }
 }
