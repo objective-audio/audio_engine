@@ -32,7 +32,6 @@ struct graph final : interruptable_graph {
 
     graph();
 
-    void _prepare(graph_ptr const &);
     void _setup_notifications();
     void _dispose_notifications();
 

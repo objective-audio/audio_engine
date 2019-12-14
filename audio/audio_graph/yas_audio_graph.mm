@@ -30,9 +30,6 @@ audio::graph::~graph() {
     this->stop_all_ios();
 }
 
-void audio::graph::_prepare(graph_ptr const &shared) {
-}
-
 void audio::graph::_setup_notifications() {
     if (!this->_core->_did_become_active_observer) {
         auto const lambda = [this](NSNotification *note) {
@@ -138,7 +135,5 @@ void audio::graph::stop_all_ios() {
 }
 
 audio::graph_ptr audio::graph::make_shared() {
-    auto shared = graph_ptr(new graph{});
-    shared->_prepare(shared);
-    return shared;
+    return graph_ptr(new graph{});
 }
