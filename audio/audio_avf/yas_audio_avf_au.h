@@ -45,6 +45,12 @@ struct avf_au {
 
     void reset();
 
+    std::string component_name() const;
+    std::string audio_unit_name() const;
+    std::string audio_unit_short_name() const;
+    std::string manufacture_name() const;
+    uint32_t component_version() const;
+
     void set_global_parameter_value(AudioUnitParameterID const parameter_id, float const value);
     float global_parameter_value(AudioUnitParameterID const parameter_id) const;
     void set_input_parameter_value(AudioUnitParameterID const parameter_id, float const value,
