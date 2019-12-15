@@ -316,6 +316,41 @@ void audio::avf_au::reset() {
     }
 }
 
+std::string audio::avf_au::component_name() const {
+    if (auto const &raw_unit = this->_core->raw_unit()) {
+        return to_string((__bridge CFStringRef)raw_unit.value().object().componentName);
+    }
+    return "";
+}
+
+std::string audio::avf_au::audio_unit_name() const {
+    if (auto const &raw_unit = this->_core->raw_unit()) {
+        return to_string((__bridge CFStringRef)raw_unit.value().object().audioUnitName);
+    }
+    return "";
+}
+
+std::string audio::avf_au::audio_unit_short_name() const {
+    if (auto const &raw_unit = this->_core->raw_unit()) {
+        return to_string((__bridge CFStringRef)raw_unit.value().object().audioUnitShortName);
+    }
+    return "";
+}
+
+std::string audio::avf_au::manufacture_name() const {
+    if (auto const &raw_unit = this->_core->raw_unit()) {
+        return to_string((__bridge CFStringRef)raw_unit.value().object().manufacturerName);
+    }
+    return "";
+}
+
+uint32_t audio::avf_au::component_version() const {
+    if (auto const &raw_unit = this->_core->raw_unit()) {
+        return raw_unit.value().object().componentVersion;
+    }
+    return 0;
+}
+
 void audio::avf_au::set_global_parameter_value(AudioUnitParameterID const parameter_id, float const value) {
     this->_set_parameter_value(avf_au_parameter_scope::global, parameter_id, value, 0);
 }

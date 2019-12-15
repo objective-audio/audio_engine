@@ -111,11 +111,11 @@ struct sine {
 namespace yas::sample {
 struct offline_vc_internal {
     audio::engine::manager_ptr play_manager = audio::engine::manager::make_shared();
-    audio::engine::au_mixer_ptr play_au_mixer = audio::engine::au_mixer::make_shared();
+    audio::engine::avf_au_mixer_ptr play_au_mixer = audio::engine::avf_au_mixer::make_shared();
     offline_sample::engine::sine_ptr play_sine = offline_sample::engine::sine::make_shared();
 
     audio::engine::manager_ptr offline_manager = audio::engine::manager::make_shared();
-    audio::engine::au_mixer_ptr offline_au_mixer = audio::engine::au_mixer::make_shared();
+    audio::engine::avf_au_mixer_ptr offline_au_mixer = audio::engine::avf_au_mixer::make_shared();
     offline_sample::engine::sine_ptr offline_sine = offline_sample::engine::sine::make_shared();
 
     std::optional<chaining::any_observer_ptr> engine_observer = std::nullopt;
