@@ -65,8 +65,8 @@ audio::engine::connection_ptr audio::engine::manager::connect(audio::engine::nod
 
     this->_connections.insert(connection);
 
-    if (this->_graph) {
-        this->_add_connection(connection);
+    if (this->_is_running) {
+        this->_add_connection_to_nodes(connection);
         this->_update_node_connections(src_node);
         this->_update_node_connections(dst_node);
     }
@@ -137,7 +137,16 @@ audio::engine::io_ptr const &audio::engine::manager::add_io() {
     if (!this->_io) {
         audio::engine::io_ptr const io = audio::engine::io::make_shared();
         io->set_device(io_device::default_device());
-        this->_set_io(io);
+
+        this->_io = io;
+
+        if (this->_is_running) {
+            auto manageable = engine::manageable_io::cast(io);
+            manageable->add_raw_io();
+        }
+
+        this->_io_observer =
+            io->io_device_chain().to_value(method::configuration_change).send_to(this->_notifier).end();
     }
 
     return this->_io.value();
@@ -145,7 +154,13 @@ audio::engine::io_ptr const &audio::engine::manager::add_io() {
 
 void audio::engine::manager::remove_io() {
     if (this->_io) {
-        this->_set_io(std::nullopt);
+        this->_io_observer = std::nullopt;
+
+        if (auto const &engine_io = this->_io) {
+            engine::manageable_io::cast(engine_io.value())->remove_raw_io();
+
+            this->_io = std::nullopt;
+        }
     }
 }
 
@@ -154,10 +169,8 @@ std::optional<audio::engine::io_ptr> const &audio::engine::manager::io() const {
 }
 
 audio::engine::manager::start_result_t audio::engine::manager::start_render() {
-    if (auto const &graph = this->_graph) {
-        if (graph.value()->is_running()) {
-            return start_result_t(start_error_t::already_running);
-        }
+    if (this->_is_running) {
+        return start_result_t(start_error_t::already_running);
     }
 
     if (auto const offline_output = this->_offline_output) {
@@ -166,31 +179,23 @@ audio::engine::manager::start_result_t audio::engine::manager::start_render() {
         }
     }
 
-    if (!_prepare_graph()) {
+    if (!_setup_rendering()) {
         return start_result_t(start_error_t::prepare_failure);
     }
 
-    this->_graph.value()->start();
+    if (auto const &engine_io = this->_io) {
+        engine::manageable_io::cast(engine_io.value())->start();
+    }
+
+    this->_is_running = true;
 
     return start_result_t(nullptr);
 }
 
 audio::engine::manager::start_result_t audio::engine::manager::start_offline_render(
     offline_render_f render_handler, offline_completion_f completion_handler) {
-    if (auto const &graph = this->_graph) {
-        if (graph.value()->is_running()) {
-            return start_result_t(start_error_t::already_running);
-        }
-    }
-
-    if (auto const offline_output = this->_offline_output) {
-        if (offline_output.value()->is_running()) {
-            return start_result_t(start_error_t::already_running);
-        }
-    }
-
-    if (!this->_prepare_graph()) {
-        return start_result_t(start_error_t::prepare_failure);
+    if (this->_is_running) {
+        return start_result_t(start_error_t::already_running);
     }
 
     auto offline_output = this->_offline_output;
@@ -199,10 +204,23 @@ audio::engine::manager::start_result_t audio::engine::manager::start_offline_ren
         return start_result_t(start_error_t::offline_output_not_found);
     }
 
-    auto result = manageable_offline_output::cast(offline_output.value())
-                      ->start(std::move(render_handler), std::move(completion_handler));
+    if (offline_output.value()->is_running()) {
+        return start_result_t(start_error_t::already_running);
+    }
+
+    if (!this->_setup_rendering()) {
+        return start_result_t(start_error_t::prepare_failure);
+    }
+
+    auto result =
+        manageable_offline_output::cast(offline_output.value())
+            ->start(std::move(render_handler), [this, handler = std::move(completion_handler)](bool const cancelled) {
+                this->stop();
+                handler(cancelled);
+            });
 
     if (result) {
+        this->_is_running = true;
         return start_result_t(nullptr);
     } else {
         return start_result_t(start_error_t::offline_output_starting_failure);
@@ -210,13 +228,21 @@ audio::engine::manager::start_result_t audio::engine::manager::start_offline_ren
 }
 
 void audio::engine::manager::stop() {
-    if (auto const &graph = this->_graph) {
-        graph.value()->stop();
+    if (auto const &engine_io = this->_io) {
+        engine::manageable_io::cast(engine_io.value())->stop();
     }
 
     if (auto offline_output = this->_offline_output) {
         manageable_offline_output::cast(offline_output.value())->stop();
     }
+
+    this->_dispose_rendering();
+
+    this->_is_running = false;
+}
+
+bool audio::engine::manager::is_running() const {
+    return this->_is_running;
 }
 
 chaining::chain_unsync_t<audio::engine::manager::method> audio::engine::manager::chain() const {
@@ -252,7 +278,7 @@ void audio::engine::manager::_attach_node(audio::engine::node_ptr const &node) {
 
     manageable_node::cast(node)->set_manager(this->_weak_manager);
 
-    this->_add_node_to_graph(node);
+    this->_setup_node(node);
 }
 
 void audio::engine::manager::_detach_node(audio::engine::node_ptr const &node) {
@@ -264,7 +290,7 @@ void audio::engine::manager::_detach_node(audio::engine::node_ptr const &node) {
         return (connection.destination_node() == node || connection.source_node() == node);
     });
 
-    this->_remove_node_from_graph(node);
+    this->_teardown_node(node);
 
     manageable_node::cast(node)->set_manager(manager_ptr{nullptr});
 
@@ -281,26 +307,18 @@ void audio::engine::manager::_detach_node_if_unused(audio::engine::node_ptr cons
     }
 }
 
-bool audio::engine::manager::_prepare_graph() {
-    if (this->_graph) {
-        return true;
-    }
-
-    auto const graph = audio::graph::make_shared();
-    this->_graph = graph;
-
+bool audio::engine::manager::_setup_rendering() {
     if (auto const &engine_io = this->_io) {
         auto manageable = engine::manageable_io::cast(engine_io.value());
-        auto const &raw_io = manageable->add_raw_io();
-        graph->add_io(raw_io);
+        manageable->add_raw_io();
     }
 
     for (auto &node : this->_nodes) {
-        this->_add_node_to_graph(node);
+        this->_setup_node(node);
     }
 
     for (auto const &connection : this->_connections) {
-        if (!this->_add_connection(connection)) {
+        if (!this->_add_connection_to_nodes(connection)) {
             return false;
         }
     }
@@ -308,6 +326,27 @@ bool audio::engine::manager::_prepare_graph() {
     this->_update_all_node_connections();
 
     return true;
+}
+
+void audio::engine::manager::_dispose_rendering() {
+    if (auto const &engine_io = this->_io) {
+        engine::manageable_io::cast(engine_io.value())->stop();
+    }
+
+    for (auto const &connection : this->_connections) {
+        this->_remove_connection_from_nodes(connection);
+    }
+
+    for (auto &node : this->_nodes) {
+        this->_teardown_node(node);
+    }
+
+    this->_update_all_node_connections();
+
+    if (auto const &engine_io = this->_io) {
+        auto manageable = engine::manageable_io::cast(engine_io.value());
+        manageable->remove_raw_io();
+    }
 }
 
 void audio::engine::manager::_disconnect_node_with_predicate(std::function<bool(connection const &)> predicate) {
@@ -333,27 +372,19 @@ void audio::engine::manager::_disconnect_node_with_predicate(std::function<bool(
     }
 }
 
-void audio::engine::manager::_add_node_to_graph(audio::engine::node_ptr const &node) {
-    if (!this->_graph) {
-        return;
-    }
-
-    if (auto const &handler = manageable_node::cast(node)->add_to_graph_handler()) {
-        handler(*this->_graph.value());
+void audio::engine::manager::_setup_node(audio::engine::node_ptr const &node) {
+    if (auto const &handler = manageable_node::cast(node)->setup_handler()) {
+        handler();
     }
 }
 
-void audio::engine::manager::_remove_node_from_graph(audio::engine::node_ptr const &node) {
-    if (!this->_graph) {
-        return;
-    }
-
-    if (auto const &handler = manageable_node::cast(node)->remove_from_graph_handler()) {
-        handler(*this->_graph.value());
+void audio::engine::manager::_teardown_node(audio::engine::node_ptr const &node) {
+    if (auto const &handler = manageable_node::cast(node)->teardown_handler()) {
+        handler();
     }
 }
 
-bool audio::engine::manager::_add_connection(audio::engine::connection_ptr const &connection) {
+bool audio::engine::manager::_add_connection_to_nodes(audio::engine::connection_ptr const &connection) {
     auto destination_node = connection->destination_node();
     auto source_node = connection->source_node();
 
@@ -379,18 +410,10 @@ void audio::engine::manager::_remove_connection_from_nodes(audio::engine::connec
 }
 
 void audio::engine::manager::_update_node_connections(audio::engine::node_ptr const &node) {
-    if (!this->_graph) {
-        return;
-    }
-
     manageable_node::cast(node)->update_connections();
 }
 
 void audio::engine::manager::_update_all_node_connections() {
-    if (!this->_graph) {
-        return;
-    }
-
     for (auto node : this->_nodes) {
         manageable_node::cast(node)->update_connections();
     }
@@ -405,58 +428,6 @@ audio::engine::connection_set audio::engine::manager::_input_connections_for_des
 audio::engine::connection_set audio::engine::manager::_output_connections_for_source_node(
     audio::engine::node_ptr const &node) {
     return filter(this->_connections, [&node](auto const &connection) { return connection->source_node() == node; });
-}
-
-void audio::engine::manager::_reload_graph() {
-    if (auto prev_graph = this->_graph) {
-        bool const prev_runnging = prev_graph.value()->is_running();
-
-        prev_graph.value()->stop();
-
-        for (auto const &node : this->_nodes) {
-            this->_remove_node_from_graph(node);
-        }
-
-        this->_graph = std::nullopt;
-
-        if (!this->_prepare_graph()) {
-            return;
-        }
-
-        if (prev_runnging) {
-            this->_graph.value()->start();
-        }
-    }
-}
-
-void audio::engine::manager::_set_io(std::optional<audio::engine::io_ptr> const &io) {
-    if (io) {
-        this->_io = io;
-
-        if (this->_graph) {
-            auto manageable = engine::manageable_io::cast(io.value());
-            auto const &raw_io = manageable->add_raw_io();
-            this->_graph.value()->add_io(raw_io);
-        }
-
-        this->_io_observer =
-            io.value()->io_device_chain().to_value(method::configuration_change).send_to(this->_notifier).end();
-    } else {
-        this->_io_observer = std::nullopt;
-
-        if (this->_io) {
-            auto const &io = this->_io.value();
-
-            if (this->_graph) {
-                if (auto &raw_io = engine::manageable_io::cast(io)->raw_io()) {
-                    this->_graph.value()->remove_io(raw_io.value());
-                }
-            }
-
-            engine::manageable_io::cast(io)->remove_raw_io();
-            this->_io = std::nullopt;
-        }
-    }
 }
 
 audio::engine::manager_ptr audio::engine::manager::make_shared() {

@@ -24,11 +24,16 @@ struct io : manageable_io {
     static io_ptr make_shared();
 
    private:
+    class core;
+    std::unique_ptr<core> _core;
+
     std::weak_ptr<io> _weak_engine_io;
     audio::engine::node_ptr _node = node::make_shared({.input_bus_count = 1, .output_bus_count = 1});
     std::optional<chaining::any_observer_ptr> _connections_observer = std::nullopt;
     std::optional<audio::io_device_ptr> _device = std::nullopt;
     std::optional<audio::io_ptr> _raw_io = std::nullopt;
+    bool _running = false;
+    bool _is_interrupting = false;
     chaining::notifier_ptr<io_device::method> _notifier = chaining::notifier<io_device::method>::make_shared();
     std::optional<chaining::any_observer_ptr> _io_observer = std::nullopt;
 
@@ -42,9 +47,15 @@ struct io : manageable_io {
     audio::io_ptr const &add_raw_io() override;
     void remove_raw_io() override;
     std::optional<audio::io_ptr> const &raw_io() override;
+    void start() override;
+    void stop() override;
 
     void _prepare(io_ptr const &);
     void _update_io_connections();
     bool _validate_connections();
+    void _setup_notifications();
+    void _dispose_notifications();
+    void _start_raw_io();
+    void _stop_raw_io();
 };
 }  // namespace yas::audio::engine

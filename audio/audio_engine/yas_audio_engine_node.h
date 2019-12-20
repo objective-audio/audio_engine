@@ -79,8 +79,8 @@ struct node : connectable_node, manageable_node {
     std::optional<uint32_t> _override_output_bus_idx = std::nullopt;
     audio::engine::connection_wmap _input_connections;
     audio::engine::connection_wmap _output_connections;
-    graph_editing_f _add_to_graph_handler;
-    graph_editing_f _remove_from_graph_handler;
+    node_setup_f _setup_handler;
+    node_setup_f _teardown_handler;
     prepare_kernel_f _prepare_kernel_handler;
     audio::engine::node::render_f _render_handler;
     chaining::notifier_ptr<chaining_pair_t> _notifier = chaining::notifier<chaining_pair_t>::make_shared();
@@ -100,10 +100,10 @@ struct node : connectable_node, manageable_node {
     void set_manager(audio::engine::manager_wptr const &) override;
     void update_kernel() override;
     void update_connections() override;
-    void set_add_to_graph_handler(graph_editing_f &&) override;
-    void set_remove_from_graph_handler(graph_editing_f &&) override;
-    graph_editing_f const &add_to_graph_handler() const override;
-    graph_editing_f const &remove_from_graph_handler() const override;
+    void set_setup_handler(node_setup_f &&) override;
+    void set_teardown_handler(node_setup_f &&) override;
+    node_setup_f const &setup_handler() const override;
+    node_setup_f const &teardown_handler() const override;
 
     node(node &&) = delete;
     node &operator=(node &&) = delete;

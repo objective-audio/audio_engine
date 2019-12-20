@@ -36,7 +36,6 @@
 
 #include "yas_audio_avf_au.h"
 #include "yas_audio_avf_au_parameter.h"
-#include "yas_audio_graph.h"
 
 #include "yas_audio_engine_avf_au.h"
 #include "yas_audio_engine_avf_au_mixer.h"

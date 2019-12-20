@@ -9,7 +9,6 @@
 #include "yas_audio_engine_connection.h"
 #include "yas_audio_engine_offline_output_protocol.h"
 #include "yas_audio_engine_ptr.h"
-#include "yas_audio_graph.h"
 #include "yas_audio_types.h"
 
 namespace yas {
@@ -57,6 +56,7 @@ struct manager final {
     start_result_t start_render();
     start_result_t start_offline_render(offline_render_f, offline_completion_f);
     void stop();
+    bool is_running() const;
 
     [[nodiscard]] chaining::chain_unsync_t<method> chain() const;
 
@@ -72,7 +72,7 @@ struct manager final {
     chaining::notifier_ptr<method> _notifier = chaining::notifier<method>::make_shared();
     std::optional<chaining::any_observer_ptr> _io_observer = std::nullopt;
 
-    std::optional<audio::graph_ptr> _graph = std::nullopt;
+    bool _is_running = false;
     std::unordered_set<node_ptr> _nodes;
     engine::connection_set _connections;
     std::optional<offline_output_ptr> _offline_output = std::nullopt;
@@ -85,21 +85,19 @@ struct manager final {
     void _attach_node(engine::node_ptr const &node);
     void _detach_node(engine::node_ptr const &node);
     void _detach_node_if_unused(engine::node_ptr const &node);
-    bool _prepare_graph();
+    bool _setup_rendering();
+    void _dispose_rendering();
     void _disconnect_node_with_predicate(std::function<bool(connection const &)> predicate);
-    void _add_node_to_graph(engine::node_ptr const &node);
-    void _remove_node_from_graph(engine::node_ptr const &node);
-    bool _add_connection(engine::connection_ptr const &connection);
+    void _setup_node(engine::node_ptr const &node);
+    void _teardown_node(engine::node_ptr const &node);
+    bool _add_connection_to_nodes(engine::connection_ptr const &connection);
     void _remove_connection_from_nodes(engine::connection_ptr const &connection);
     void _update_node_connections(engine::node_ptr const &node);
     void _update_all_node_connections();
     engine::connection_set _input_connections_for_destination_node(engine::node_ptr const &node);
     engine::connection_set _output_connections_for_source_node(engine::node_ptr const &node);
-    void _reload_graph();
 
     std::optional<io_ptr> _io = std::nullopt;
-
-    void _set_io(std::optional<io_ptr> const &node);
 };
 }  // namespace yas::audio::engine
 

@@ -7,10 +7,6 @@
 #include "yas_audio_ptr.h"
 
 namespace yas::audio::engine {
-class au_output;
-class au_input;
-class au_mixer;
-class au;
 class connection;
 class kernel;
 class manager;
@@ -30,10 +26,6 @@ class connectable_node;
 class manageable_node;
 class manageable_avf_au;
 
-using au_output_ptr = std::shared_ptr<au_output>;
-using au_input_ptr = std::shared_ptr<au_input>;
-using au_mixer_ptr = std::shared_ptr<au_mixer>;
-using au_ptr = std::shared_ptr<au>;
 using connection_ptr = std::shared_ptr<connection>;
 using kernel_ptr = std::shared_ptr<kernel>;
 using manager_ptr = std::shared_ptr<manager>;

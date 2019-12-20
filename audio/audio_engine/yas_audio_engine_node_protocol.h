@@ -8,11 +8,9 @@
 #include "yas_audio_engine_connection_protocol.h"
 #include "yas_audio_engine_ptr.h"
 
-namespace yas::audio {
-using graph_editing_f = std::function<void(audio::graph &)>;
-}  // namespace yas::audio
-
 namespace yas::audio::engine {
+using node_setup_f = std::function<void(void)>;
+
 struct node_args {
     uint32_t input_bus_count = 0;
     uint32_t output_bus_count = 0;
@@ -41,10 +39,10 @@ struct manageable_node {
     virtual audio::engine::manager_ptr manager() const = 0;
     virtual void update_kernel() = 0;
     virtual void update_connections() = 0;
-    virtual void set_add_to_graph_handler(graph_editing_f &&) = 0;
-    virtual void set_remove_from_graph_handler(graph_editing_f &&) = 0;
-    virtual graph_editing_f const &add_to_graph_handler() const = 0;
-    virtual graph_editing_f const &remove_from_graph_handler() const = 0;
+    virtual void set_setup_handler(node_setup_f &&) = 0;
+    virtual void set_teardown_handler(node_setup_f &&) = 0;
+    virtual node_setup_f const &setup_handler() const = 0;
+    virtual node_setup_f const &teardown_handler() const = 0;
 
     static manageable_node_ptr cast(manageable_node_ptr const &node) {
         return node;

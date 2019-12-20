@@ -7,8 +7,6 @@
 #include <memory>
 
 namespace yas::audio {
-class graph;
-class unit;
 class pcm_buffer;
 class time;
 class file;
@@ -23,8 +21,6 @@ class avf_au;
 class avf_au_parameter;
 class avf_au_parameter_core;
 
-using graph_ptr = std::shared_ptr<graph>;
-using unit_ptr = std::shared_ptr<unit>;
 using pcm_buffer_ptr = std::shared_ptr<pcm_buffer>;
 using time_ptr = std::shared_ptr<time>;
 using file_ptr = std::shared_ptr<file>;
