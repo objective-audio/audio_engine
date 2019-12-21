@@ -122,6 +122,10 @@ struct offline_vc_internal {
     offline_vc_internal() {
         auto const &io = this->play_manager->add_io();
 
+        if (auto const device = audio::mac_device::default_output_device()) {
+            this->_set_device(device.value());
+        }
+
         this->play_au_mixer->au()->node()->reset();
         this->play_au_mixer->set_input_pan(0.0f, 0);
         this->play_au_mixer->set_input_enabled(true, 0);
@@ -135,11 +139,14 @@ struct offline_vc_internal {
                                              this->_update_connection();
                                              break;
                                          case audio::io_device::method::lost:
-                                             this->_update_device();
                                              break;
                                      }
                                  })
                                  .end();
+
+        this->_system_observer = audio::mac_device::system_chain(audio::mac_device::system_method::hardware_did_change)
+                                     .perform([this](auto const &) { this->_update_device_if_default_changed(); })
+                                     .end();
 
         this->offline_manager->add_offline_output();
         auto const &offline_output = this->offline_manager->offline_output().value();
@@ -157,18 +164,19 @@ struct offline_vc_internal {
     }
 
     void start_render() {
-        if (!this->play_manager->io()) {
+        auto const &io = this->play_manager->io();
+        if (!io) {
             return;
         }
 
-        auto const &io = this->play_manager->io().value();
-        auto const output_format = io->device().value()->output_format();
+        auto const &io_value = io.value();
+        auto const output_format = io_value->device().value()->output_format();
 
         if (!output_format.has_value()) {
             return;
         }
 
-        this->play_manager->connect(this->play_au_mixer->au()->node(), io->node(), *output_format);
+        this->play_manager->connect(this->play_au_mixer->au()->node(), io_value->node(), *output_format);
         this->play_manager->connect(this->play_sine->tap().node(), this->play_au_mixer->au()->node(),
                                     this->_file_format);
 
@@ -183,12 +191,15 @@ struct offline_vc_internal {
     }
 
    private:
+    std::optional<audio::mac_device_ptr> _device = std::nullopt;
+
     audio::format const _file_format{{.sample_rate = offline_sample::sample_rate,
                                       .channel_count = 2,
                                       .pcm_format = audio::pcm_format::float32,
                                       .interleaved = false}};
 
     chaining::any_observer_ptr _io_observer = nullptr;
+    chaining::any_observer_ptr _system_observer = nullptr;
 
     void _update_connection() {
         if (auto const &io = this->play_manager->io()) {
@@ -201,14 +212,22 @@ struct offline_vc_internal {
         }
     }
 
-    void _update_device() {
-        this->stop_render();
-
+    void _set_device(audio::mac_device_ptr const &device) {
         if (auto const &io = this->play_manager->io()) {
-            io.value()->set_device(audio::mac_device::default_output_device());
+            io.value()->set_device(device);
+            this->_device = device;
         }
+    }
 
-        this->start_render();
+    void _update_device_if_default_changed() {
+        auto default_device = audio::mac_device::default_output_device();
+        if (default_device && this->_device && default_device.value() != this->_device.value()) {
+            this->stop_render();
+
+            this->_set_device(default_device.value());
+
+            this->start_render();
+        }
     }
 };
 }
