@@ -35,15 +35,10 @@ using sample_kernel_ptr = std::shared_ptr<sample_kernel_t>;
 
 namespace yas::sample {
 struct device_vc_cpp {
-    audio::graph_ptr const graph = audio::graph::make_shared();
     audio::io_ptr const io = audio::io::make_shared(std::nullopt);
     sample_kernel_ptr const kernel = std::make_shared<sample_kernel_t>();
     std::optional<chaining::any_observer_ptr> system_observer = std::nullopt;
     std::optional<chaining::any_observer_ptr> device_observer = std::nullopt;
-
-    device_vc_cpp() {
-        this->graph->add_io(this->io);
-    }
 };
 }
 
@@ -74,13 +69,13 @@ struct device_vc_cpp {
 
     auto unowned_self = objc_ptr_with_move_object([[YASUnownedObject alloc] initWithObject:self]);
 
-    _cpp->system_observer =
+    self->_cpp->system_observer =
         audio::mac_device::system_chain(audio::mac_device::system_method::hardware_did_change)
             .perform([unowned_self](auto const &) { [[unowned_self.object() object] _updateDeviceNames]; })
             .end();
 
     auto weak_io = to_weak(self->_cpp->io);
-    _cpp->io->set_render_handler([weak_io, kernel = self->_cpp->kernel](auto args) {
+    self->_cpp->io->set_render_handler([weak_io, kernel = self->_cpp->kernel](auto args) {
         if (auto io = weak_io.lock()) {
             kernel->process(io->input_buffer_on_render(), args.output_buffer);
         }
@@ -104,17 +99,13 @@ struct device_vc_cpp {
 
     [self setup];
 
-    if (self->_cpp->graph) {
-        self->_cpp->graph->start();
-    }
+    self->_cpp->io->start();
 }
 
 - (void)viewWillDisappear {
     [super viewWillDisappear];
 
-    if (self->_cpp->graph) {
-        self->_cpp->graph->stop();
-    }
+    self->_cpp->io->stop();
 
     [self dispose];
 }
@@ -133,18 +124,18 @@ struct device_vc_cpp {
 #pragma mark -
 
 - (void)setThroughVolume:(double)throughVolume {
-    _throughVolume = throughVolume;
-    _cpp->kernel->set_througn_volume(throughVolume);
+    self->_throughVolume = throughVolume;
+    self->_cpp->kernel->set_througn_volume(throughVolume);
 }
 
 - (void)setSineFrequency:(double)sineFrequency {
-    _sineFrequency = sineFrequency;
-    _cpp->kernel->set_sine_frequency(sineFrequency);
+    self->_sineFrequency = sineFrequency;
+    self->_cpp->kernel->set_sine_frequency(sineFrequency);
 }
 
 - (void)setSineVolume:(double)sineVolume {
-    _sineVolume = sineVolume;
-    _cpp->kernel->set_sine_volume(sineVolume);
+    self->_sineVolume = sineVolume;
+    self->_cpp->kernel->set_sine_volume(sineVolume);
 }
 
 - (void)setSelectedDeviceIndex:(NSUInteger)selectedDeviceIndex {
@@ -191,35 +182,39 @@ struct device_vc_cpp {
 }
 
 - (void)setDevice:(std::optional<audio::mac_device_ptr> const &)selected_device {
-    _cpp->device_observer = std::nullopt;
+    self->_cpp->device_observer = std::nullopt;
 
     auto all_devices = audio::mac_device::all_devices();
 
-    _cpp->io->set_device(selected_device);
+    self->_cpp->io->set_device(selected_device);
 
     if (selected_device && std::find(all_devices.begin(), all_devices.end(), selected_device) != all_devices.end()) {
         auto unowned_self = objc_ptr_with_move_object([[YASUnownedObject alloc] initWithObject:self]);
 
         auto const &device = *selected_device;
 
-        _cpp->device_observer = device->chain(audio::mac_device::method::device_did_change)
-                                    .perform([device, unowned_self](auto const &change_info) {
-                                        auto const &infos = change_info.property_infos;
-                                        if (infos.size() > 0) {
-                                            auto &device_id = infos.at(0).object_id;
-                                            if (device->audio_device_id() == device_id) {
-                                                [[unowned_self.object() object] _updateDeviceInfo];
-                                            }
-                                        }
-                                    })
-                                    .end();
+        self->_cpp->device_observer = device->chain(audio::mac_device::method::device_did_change)
+                                          .perform([device, unowned_self](auto const &change_info) {
+                                              auto const &infos = change_info.property_infos;
+                                              if (infos.size() > 0) {
+                                                  auto &device_id = infos.at(0).object_id;
+                                                  if (device->audio_device_id() == device_id) {
+                                                      [[unowned_self.object() object] _updateDeviceInfo];
+                                                  }
+                                              }
+                                          })
+                                          .end();
+
+        if (!self->_cpp->io->is_running()) {
+            self->_cpp->io->start();
+        }
     }
 
     [self _updateDeviceInfo];
 }
 
 - (void)_updateDeviceInfo {
-    auto const &device_opt = _cpp->io->device();
+    auto const &device_opt = self->_cpp->io->device();
     NSColor *onColor = [NSColor labelColor];
     NSColor *offColor = [NSColor quaternaryLabelColor];
     if (device_opt) {

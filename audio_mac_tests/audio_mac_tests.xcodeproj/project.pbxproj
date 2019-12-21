@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		B625799521E0EAF8003740D9 /* yas_audio_graph_tests.mm in Sources */ = {isa = PBXBuildFile; fileRef = B625797621E0EAF8003740D9 /* yas_audio_graph_tests.mm */; };
 		B625799821E0EAF8003740D9 /* yas_audio_test_utils_tests.mm in Sources */ = {isa = PBXBuildFile; fileRef = B625797B21E0EAF8003740D9 /* yas_audio_test_utils_tests.mm */; };
 		B625799921E0EAF8003740D9 /* yas_audio_test_utils.mm in Sources */ = {isa = PBXBuildFile; fileRef = B625797C21E0EAF8003740D9 /* yas_audio_test_utils.mm */; };
 		B625799A21E0EAF8003740D9 /* yas_audio_engine_tap_tests.mm in Sources */ = {isa = PBXBuildFile; fileRef = B625797E21E0EAF8003740D9 /* yas_audio_engine_tap_tests.mm */; };
@@ -45,7 +44,6 @@
 		B623817E21E1931200234CC2 /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = System/Library/Frameworks/Accelerate.framework; sourceTree = SDKROOT; };
 		B625796B21E0EAC0003740D9 /* audio_mac_tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = audio_mac_tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B625797021E0EAC0003740D9 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		B625797621E0EAF8003740D9 /* yas_audio_graph_tests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = yas_audio_graph_tests.mm; sourceTree = "<group>"; };
 		B625797A21E0EAF8003740D9 /* yas_audio_test_utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yas_audio_test_utils.h; sourceTree = "<group>"; };
 		B625797B21E0EAF8003740D9 /* yas_audio_test_utils_tests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = yas_audio_test_utils_tests.mm; sourceTree = "<group>"; };
 		B625797C21E0EAF8003740D9 /* yas_audio_test_utils.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = yas_audio_test_utils.mm; sourceTree = "<group>"; };
@@ -129,7 +127,6 @@
 			isa = PBXGroup;
 			children = (
 				B6A9BC4A2393ABE100EA7DC8 /* avf */,
-				B625797521E0EAF8003740D9 /* audio_graph_tests */,
 				B625797921E0EAF8003740D9 /* test_utils */,
 				B625797D21E0EAF8003740D9 /* audio_engine_tests */,
 				B625798921E0EAF8003740D9 /* audio_basics_tests */,
@@ -137,14 +134,6 @@
 			);
 			name = audio_tests;
 			path = ../audio_tests;
-			sourceTree = "<group>";
-		};
-		B625797521E0EAF8003740D9 /* audio_graph_tests */ = {
-			isa = PBXGroup;
-			children = (
-				B625797621E0EAF8003740D9 /* yas_audio_graph_tests.mm */,
-			);
-			path = audio_graph_tests;
 			sourceTree = "<group>";
 		};
 		B625797921E0EAF8003740D9 /* test_utils */ = {
@@ -330,7 +319,6 @@
 				B62579AA21E0EAF8003740D9 /* yas_audio_math_tests.mm in Sources */,
 				B62579AD21E0EAF8003740D9 /* yas_audio_device_tests.mm in Sources */,
 				B62579A221E0EAF8003740D9 /* yas_audio_engine_tests.mm in Sources */,
-				B625799521E0EAF8003740D9 /* yas_audio_graph_tests.mm in Sources */,
 				B625799F21E0EAF8003740D9 /* yas_audio_converter_unit_tests.mm in Sources */,
 				B62579AE21E0EAF8003740D9 /* yas_audio_device_stream_tests.mm in Sources */,
 				B62579A621E0EAF8003740D9 /* yas_audio_types_tests.mm in Sources */,

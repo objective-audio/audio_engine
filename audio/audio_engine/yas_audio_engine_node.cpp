@@ -231,19 +231,19 @@ void audio::engine::node::update_connections() {
     this->_notifier->notify(std::make_pair(method::update_connections, this->_weak_node.lock()));
 }
 
-void audio::engine::node::set_add_to_graph_handler(graph_editing_f &&handler) {
-    this->_add_to_graph_handler = std::move(handler);
+void audio::engine::node::set_setup_handler(node_setup_f &&handler) {
+    this->_setup_handler = std::move(handler);
 }
 
-void audio::engine::node::set_remove_from_graph_handler(graph_editing_f &&handler) {
-    this->_remove_from_graph_handler = std::move(handler);
+void audio::engine::node::set_teardown_handler(node_setup_f &&handler) {
+    this->_teardown_handler = std::move(handler);
 }
 
-audio::graph_editing_f const &audio::engine::node::add_to_graph_handler() const {
-    return this->_add_to_graph_handler;
+audio::engine::node_setup_f const &audio::engine::node::setup_handler() const {
+    return this->_setup_handler;
 }
-audio::graph_editing_f const &audio::engine::node::remove_from_graph_handler() const {
-    return this->_remove_from_graph_handler;
+audio::engine::node_setup_f const &audio::engine::node::teardown_handler() const {
+    return this->_teardown_handler;
 }
 
 void audio::engine::node::_prepare(node_ptr const &shared) {

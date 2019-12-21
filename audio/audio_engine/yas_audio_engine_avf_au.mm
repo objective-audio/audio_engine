@@ -91,13 +91,13 @@ void audio::engine::avf_au::_prepare(avf_au_ptr const &shared, AudioComponentDes
                        })
                        .end();
 
-    manageable_node::cast(this->_node)->set_add_to_graph_handler([weak_au](audio::graph &graph) {
+    manageable_node::cast(this->_node)->set_setup_handler([weak_au]() {
         if (auto au = weak_au.lock()) {
             au->_initialize_raw_au();
         }
     });
 
-    manageable_node::cast(this->_node)->set_remove_from_graph_handler([weak_au](audio::graph &graph) {
+    manageable_node::cast(this->_node)->set_teardown_handler([weak_au]() {
         if (auto au = weak_au.lock()) {
             au->_uninitialize_raw_au();
         }

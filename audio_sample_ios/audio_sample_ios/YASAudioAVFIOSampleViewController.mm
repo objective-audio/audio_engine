@@ -12,7 +12,6 @@ using namespace yas;
 
 namespace yas::sample {
 struct avf_io_vc_internal {
-    audio::graph_ptr graph = nullptr;
     audio::io_ptr avf_io = nullptr;
     audio::sample_kernel_ptr kernel = nullptr;
 };
@@ -44,9 +43,7 @@ struct avf_io_vc_internal {
 }
 
 - (void)setup {
-    self->_internal.graph = audio::graph::make_shared();
     self->_internal.avf_io = audio::io::make_shared(audio::avf_device::make_shared());
-    self->_internal.graph->add_io(self->_internal.avf_io);
 
     self->_internal.kernel = std::make_shared<audio::sample_kernel_t>();
 
@@ -57,9 +54,7 @@ struct avf_io_vc_internal {
         }
     });
 
-    if (self->_internal.graph) {
-        self->_internal.graph->start();
-    }
+    self->_internal.avf_io->start();
 
     self.throughVolumeSlider.value = self->_internal.kernel->through_volume();
     self.sineVolumeSlider.value = self->_internal.kernel->sine_volume();
@@ -70,11 +65,10 @@ struct avf_io_vc_internal {
 }
 
 - (void)dispose {
-    if (self->_internal.graph) {
-        self->_internal.graph->stop();
+    if (auto const &avf_io = self->_internal.avf_io) {
+        avf_io->stop();
     }
 
-    self->_internal.graph = nullptr;
     self->_internal.avf_io = nullptr;
     self->_internal.kernel = nullptr;
 }

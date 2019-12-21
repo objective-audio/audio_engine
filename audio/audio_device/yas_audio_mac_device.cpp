@@ -313,8 +313,18 @@ void audio::mac_device::_prepare(mac_device_ptr const &mac_device) {
 
     this->_io_pool +=
         this->_notifier->chain().to_value(io_device::method::updated).send_to(this->_io_device_notifier).end();
+
     this->_io_pool += _system_notifier->chain()
-                          .guard([](auto const &pair) { return pair.first == system_method::hardware_did_change; })
+                          .guard([weak_device = this->_weak_mac_device](auto const &pair) {
+                              if (pair.first == system_method::hardware_did_change) {
+                                  if (auto const device = weak_device.lock()) {
+                                      if (!is_available_device(device)) {
+                                          return true;
+                                      }
+                                  }
+                              }
+                              return false;
+                          })
                           .to_value(io_device::method::lost)
                           .send_to(this->_io_device_notifier)
                           .end();
