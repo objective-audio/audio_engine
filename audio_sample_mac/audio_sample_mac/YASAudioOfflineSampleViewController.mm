@@ -191,13 +191,12 @@ struct offline_vc_internal {
     chaining::any_observer_ptr _io_observer = nullptr;
 
     void _update_connection() {
-        bool const is_running = this->play_manager->is_running();
-        if (is_running) {
-            auto const &io = this->play_manager->io().value();
-            if (auto const output_format = io->device().value()->output_format()) {
-                this->play_manager->disconnect(io->node());
+        if (auto const &io = this->play_manager->io()) {
+            auto const &io_value = io.value();
+            if (auto const output_format = io_value->device().value()->output_format()) {
+                this->play_manager->disconnect(io_value->node());
 
-                this->play_manager->connect(this->play_au_mixer->au()->node(), io->node(), *output_format);
+                this->play_manager->connect(this->play_au_mixer->au()->node(), io_value->node(), *output_format);
             }
         }
     }
