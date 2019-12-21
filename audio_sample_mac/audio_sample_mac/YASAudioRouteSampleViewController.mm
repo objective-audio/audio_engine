@@ -1,8 +1,8 @@
 //
-//  YASAudioEngineIOSampleViewController.m
+//  YASAudioRouteSampleViewController.m
 //
 
-#import "YASAudioEngineIOSampleViewController.h"
+#import "YASAudioRouteSampleViewController.h"
 #import <Accelerate/Accelerate.h>
 #import <audio/yas_audio_umbrella.h>
 #import <cpp_utils/yas_objc_ptr.h>
@@ -101,7 +101,7 @@ struct engine_io_vc_cpp {
 
 @end
 
-@interface YASAudioEngineIOSampleViewController () <NSTableViewDataSource, NSTableViewDelegate>
+@interface YASAudioRouteSampleViewController () <NSTableViewDataSource, NSTableViewDelegate>
 
 @property (nonatomic, strong) NSArray<NSString *> *deviceNames;
 @property (nonatomic, assign) double nominalSampleRate;
@@ -112,7 +112,7 @@ struct engine_io_vc_cpp {
 
 @end
 
-@implementation YASAudioEngineIOSampleViewController {
+@implementation YASAudioRouteSampleViewController {
     std::shared_ptr<sample::engine_io_vc_cpp> _cpp;
 }
 

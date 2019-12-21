@@ -16,7 +16,7 @@
 		B62ED55E1A62812F007DDE96 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = B62ED55D1A62812F007DDE96 /* main.m */; };
 		B62ED5631A62812F007DDE96 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B62ED5621A62812F007DDE96 /* Images.xcassets */; };
 		B62ED5661A62812F007DDE96 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B62ED5641A62812F007DDE96 /* Main.storyboard */; };
-		B637893F1AB430F300B95F55 /* YASAudioEngineIOSampleViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = B637893E1AB430F300B95F55 /* YASAudioEngineIOSampleViewController.mm */; };
+		B637893F1AB430F300B95F55 /* YASAudioRouteSampleViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = B637893E1AB430F300B95F55 /* YASAudioRouteSampleViewController.mm */; };
 		B6841A901AAABD330035C704 /* YASDecibelValueTransformer.mm in Sources */ = {isa = PBXBuildFile; fileRef = B6841A8F1AAABD330035C704 /* YASDecibelValueTransformer.mm */; };
 		B6841A931AAAD3990035C704 /* YASFrequencyValueFormatter.mm in Sources */ = {isa = PBXBuildFile; fileRef = B6841A921AAAD3990035C704 /* YASFrequencyValueFormatter.mm */; };
 		B69C84881AF1144F00B9EB3D /* YASAudioOfflineSampleViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = B69C84871AF1144F00B9EB3D /* YASAudioOfflineSampleViewController.mm */; };
@@ -41,8 +41,8 @@
 		B62ED55D1A62812F007DDE96 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		B62ED5621A62812F007DDE96 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		B62ED5651A62812F007DDE96 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
-		B637893D1AB430F300B95F55 /* YASAudioEngineIOSampleViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YASAudioEngineIOSampleViewController.h; sourceTree = "<group>"; };
-		B637893E1AB430F300B95F55 /* YASAudioEngineIOSampleViewController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = YASAudioEngineIOSampleViewController.mm; sourceTree = "<group>"; };
+		B637893D1AB430F300B95F55 /* YASAudioRouteSampleViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YASAudioRouteSampleViewController.h; sourceTree = "<group>"; };
+		B637893E1AB430F300B95F55 /* YASAudioRouteSampleViewController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = YASAudioRouteSampleViewController.mm; sourceTree = "<group>"; };
 		B6841A8E1AAABD330035C704 /* YASDecibelValueTransformer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YASDecibelValueTransformer.h; sourceTree = "<group>"; };
 		B6841A8F1AAABD330035C704 /* YASDecibelValueTransformer.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = YASDecibelValueTransformer.mm; sourceTree = "<group>"; };
 		B6841A911AAAD3990035C704 /* YASFrequencyValueFormatter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YASFrequencyValueFormatter.h; sourceTree = "<group>"; };
@@ -129,8 +129,8 @@
 				B6841A921AAAD3990035C704 /* YASFrequencyValueFormatter.mm */,
 				B69C84861AF1144F00B9EB3D /* YASAudioOfflineSampleViewController.h */,
 				B69C84871AF1144F00B9EB3D /* YASAudioOfflineSampleViewController.mm */,
-				B637893D1AB430F300B95F55 /* YASAudioEngineIOSampleViewController.h */,
-				B637893E1AB430F300B95F55 /* YASAudioEngineIOSampleViewController.mm */,
+				B637893D1AB430F300B95F55 /* YASAudioRouteSampleViewController.h */,
+				B637893E1AB430F300B95F55 /* YASAudioRouteSampleViewController.mm */,
 				B62ED5621A62812F007DDE96 /* Images.xcassets */,
 				B62ED5641A62812F007DDE96 /* Main.storyboard */,
 				B62ED5581A62812F007DDE96 /* Supporting Files */,
@@ -245,7 +245,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				B6841A901AAABD330035C704 /* YASDecibelValueTransformer.mm in Sources */,
-				B637893F1AB430F300B95F55 /* YASAudioEngineIOSampleViewController.mm in Sources */,
+				B637893F1AB430F300B95F55 /* YASAudioRouteSampleViewController.mm in Sources */,
 				B69C84881AF1144F00B9EB3D /* YASAudioOfflineSampleViewController.mm in Sources */,
 				B62ED55E1A62812F007DDE96 /* main.m in Sources */,
 				B62ED55C1A62812F007DDE96 /* AppDelegate.m in Sources */,
