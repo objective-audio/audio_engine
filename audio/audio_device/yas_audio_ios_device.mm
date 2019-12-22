@@ -1,8 +1,8 @@
 //
-//  yas_audio_avf_device.mm
+//  yas_audio_ios_device.mm
 //
 
-#include "yas_audio_avf_device.h"
+#include "yas_audio_ios_device.h"
 
 #if TARGET_OS_IPHONE
 
@@ -11,7 +11,7 @@
 
 using namespace yas;
 
-struct audio::avf_device::impl {
+struct audio::ios_device::impl {
     std::vector<objc_ptr<id<NSObject>>> observers;
 
     ~impl() {
@@ -21,14 +21,14 @@ struct audio::avf_device::impl {
     }
 };
 
-audio::avf_device::avf_device() : _impl(std::make_unique<impl>()) {
+audio::ios_device::ios_device() : _impl(std::make_unique<impl>()) {
 }
 
-double audio::avf_device::sample_rate() const {
+double audio::ios_device::sample_rate() const {
     return [AVAudioSession sharedInstance].sampleRate;
 }
 
-uint32_t audio::avf_device::input_channel_count() const {
+uint32_t audio::ios_device::input_channel_count() const {
     if ([AVAudioSession sharedInstance].isInputAvailable) {
         return static_cast<uint32_t>([AVAudioSession sharedInstance].inputNumberOfChannels);
     } else {
@@ -36,11 +36,11 @@ uint32_t audio::avf_device::input_channel_count() const {
     }
 }
 
-uint32_t audio::avf_device::output_channel_count() const {
+uint32_t audio::ios_device::output_channel_count() const {
     return static_cast<uint32_t>([AVAudioSession sharedInstance].outputNumberOfChannels);
 }
 
-std::optional<audio::format> audio::avf_device::input_format() const {
+std::optional<audio::format> audio::ios_device::input_format() const {
     auto const sample_rate = this->sample_rate();
     auto const ch_count = this->input_channel_count();
 
@@ -51,7 +51,7 @@ std::optional<audio::format> audio::avf_device::input_format() const {
     }
 }
 
-std::optional<audio::format> audio::avf_device::output_format() const {
+std::optional<audio::format> audio::ios_device::output_format() const {
     auto const sample_rate = this->sample_rate();
     auto const ch_count = this->output_channel_count();
 
@@ -62,15 +62,15 @@ std::optional<audio::format> audio::avf_device::output_format() const {
     }
 }
 
-audio::io_core_ptr audio::avf_device::make_io_core() const {
-    return avf_io_core::make_shared(this->_weak_device.lock());
+audio::io_core_ptr audio::ios_device::make_io_core() const {
+    return ios_io_core::make_shared(this->_weak_device.lock());
 }
 
-chaining::chain_unsync_t<audio::io_device::method> audio::avf_device::io_device_chain() {
+chaining::chain_unsync_t<audio::io_device::method> audio::ios_device::io_device_chain() {
     return this->_notifier->chain();
 }
 
-void audio::avf_device::_prepare(avf_device_ptr const &shared) {
+void audio::ios_device::_prepare(ios_device_ptr const &shared) {
     auto weak_device = to_weak(shared);
     this->_weak_device = weak_device;
 
@@ -110,8 +110,8 @@ void audio::avf_device::_prepare(avf_device_ptr const &shared) {
     this->_impl->observers = {route_change_observer, lost_observer, reset_observer};
 }
 
-audio::avf_device_ptr audio::avf_device::make_shared() {
-    auto shared = std::shared_ptr<avf_device>(new avf_device{});
+audio::ios_device_ptr audio::ios_device::make_shared() {
+    auto shared = std::shared_ptr<ios_device>(new ios_device{});
     shared->_prepare(shared);
     return shared;
 }

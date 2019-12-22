@@ -43,7 +43,7 @@ struct avf_io_vc_internal {
 }
 
 - (void)setup {
-    self->_internal.avf_io = audio::io::make_shared(audio::avf_device::make_shared());
+    self->_internal.avf_io = audio::io::make_shared(audio::ios_device::make_shared());
 
     self->_internal.kernel = std::make_shared<audio::sample_kernel_t>();
 

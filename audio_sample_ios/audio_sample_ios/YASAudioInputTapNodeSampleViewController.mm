@@ -32,7 +32,7 @@ struct input_tap_vc_internal {
 
     void prepare() {
         auto const &io = this->manager->io().value();
-        audio::avf_device_ptr const device = std::dynamic_pointer_cast<audio::avf_device>(io->device().value());
+        audio::ios_device_ptr const device = std::dynamic_pointer_cast<audio::ios_device>(io->device().value());
 
         double const sample_rate = device->sample_rate();
         uint32_t const ch_count = device->input_channel_count();

@@ -23,7 +23,7 @@
 
 #if TARGET_OS_IPHONE
 
-#include "yas_audio_avf_device.h"
+#include "yas_audio_ios_device.h"
 
 #elif TARGET_OS_MAC
 
