@@ -1,32 +1,32 @@
 //
-//  yas_audio_avf_io_core.mm
+//  yas_audio_ios_io_core.mm
 //
 
-#include "yas_audio_avf_io_core.h"
+#include "yas_audio_ios_io_core.h"
 
 #if TARGET_OS_IPHONE
 
 #include <AVFoundation/AVFoundation.h>
 #include <cpp_utils/yas_objc_ptr.h>
 #include <iostream>
-#include "yas_audio_avf_device.h"
+#include "yas_audio_ios_device.h"
 
 using namespace yas;
 
-struct audio::avf_io_core::impl {
+struct audio::ios_io_core::impl {
     std::optional<objc_ptr<AVAudioEngine *>> _avf_engine = std::nullopt;
     std::optional<objc_ptr<AVAudioSourceNode *>> _source_node = std::nullopt;
     std::optional<objc_ptr<AVAudioSinkNode *>> _sink_node = std::nullopt;
 };
 
-audio::avf_io_core::avf_io_core(avf_device_ptr const &device) : _device(device), _impl(std::make_unique<impl>()) {
+audio::ios_io_core::ios_io_core(ios_device_ptr const &device) : _device(device), _impl(std::make_unique<impl>()) {
 }
 
-audio::avf_io_core::~avf_io_core() {
+audio::ios_io_core::~ios_io_core() {
     this->uninitialize();
 }
 
-void audio::avf_io_core::initialize() {
+void audio::ios_io_core::initialize() {
     auto engine = objc_ptr_with_move_object([[AVAudioEngine alloc] init]);
     this->_impl->_avf_engine = engine;
 
@@ -84,7 +84,7 @@ void audio::avf_io_core::initialize() {
 
             this->_impl->_source_node = source_node;
         } else {
-            std::cout << "avf_io_core output node format is not equal to device format." << std::endl;
+            std::cout << "ios_io_core output node format is not equal to device format." << std::endl;
         }
     }
 
@@ -142,14 +142,14 @@ void audio::avf_io_core::initialize() {
 
             this->_impl->_sink_node = sink_node;
         } else {
-            std::cout << "avf_io_core input node format is not equal to device format." << std::endl;
+            std::cout << "ios_io_core input node format is not equal to device format." << std::endl;
         }
     }
 
     this->_update_kernel();
 }
 
-void audio::avf_io_core::uninitialize() {
+void audio::ios_io_core::uninitialize() {
     this->stop();
 
     if (auto const &engine_opt = this->_impl->_avf_engine) {
@@ -179,18 +179,18 @@ void audio::avf_io_core::uninitialize() {
     this->_update_kernel();
 }
 
-void audio::avf_io_core::set_render_handler(std::optional<io_render_f> handler) {
+void audio::ios_io_core::set_render_handler(std::optional<io_render_f> handler) {
     std::lock_guard<std::recursive_mutex> lock(this->_mutex);
     this->__render_handler = std::move(handler);
 }
 
-void audio::avf_io_core::set_maximum_frames_per_slice(uint32_t const frames) {
+void audio::ios_io_core::set_maximum_frames_per_slice(uint32_t const frames) {
     std::lock_guard<std::recursive_mutex> lock(this->_mutex);
     this->__maximum_frames = frames;
     this->_update_kernel();
 }
 
-bool audio::avf_io_core::start() {
+bool audio::ios_io_core::start() {
     NSError *error = nil;
     auto const engine = this->_impl->_avf_engine;
 
@@ -202,30 +202,30 @@ bool audio::avf_io_core::start() {
     }
 }
 
-void audio::avf_io_core::stop() {
+void audio::ios_io_core::stop() {
     if (auto const &engine = this->_impl->_avf_engine) {
         [engine.value().object() stop];
     }
 }
 
-std::optional<audio::pcm_buffer_ptr> const &audio::avf_io_core::input_buffer_on_render() const {
+std::optional<audio::pcm_buffer_ptr> const &audio::ios_io_core::input_buffer_on_render() const {
     return this->_input_buffer_on_render;
 }
 
-std::optional<audio::time_ptr> const &audio::avf_io_core::input_time_on_render() const {
+std::optional<audio::time_ptr> const &audio::ios_io_core::input_time_on_render() const {
     return this->_input_time_on_render;
 }
 
-void audio::avf_io_core::_prepare(avf_io_core_ptr const &shared) {
+void audio::ios_io_core::_prepare(ios_io_core_ptr const &shared) {
     this->_weak_core = shared;
 }
 
-std::optional<audio::io_render_f> audio::avf_io_core::_render_handler() const {
+std::optional<audio::io_render_f> audio::ios_io_core::_render_handler() const {
     std::lock_guard<std::recursive_mutex> lock(this->_mutex);
     return this->__render_handler;
 }
 
-void audio::avf_io_core::_set_kernel(std::optional<io_kernel_ptr> const &kernel) {
+void audio::ios_io_core::_set_kernel(std::optional<io_kernel_ptr> const &kernel) {
     std::lock_guard<std::recursive_mutex> lock(this->_mutex);
     this->__kernel = std::nullopt;
     if (kernel) {
@@ -233,12 +233,12 @@ void audio::avf_io_core::_set_kernel(std::optional<io_kernel_ptr> const &kernel)
     }
 }
 
-std::optional<audio::io_kernel_ptr> audio::avf_io_core::_kernel() const {
+std::optional<audio::io_kernel_ptr> audio::ios_io_core::_kernel() const {
     std::lock_guard<std::recursive_mutex> lock(this->_mutex);
     return this->__kernel;
 }
 
-void audio::avf_io_core::_update_kernel() {
+void audio::ios_io_core::_update_kernel() {
     std::lock_guard<std::recursive_mutex> lock(this->_mutex);
 
     this->_set_kernel(std::nullopt);
@@ -257,8 +257,8 @@ void audio::avf_io_core::_update_kernel() {
                                              output_available ? output_format : std::nullopt, this->__maximum_frames));
 }
 
-audio::avf_io_core_ptr audio::avf_io_core::make_shared(avf_device_ptr const &device) {
-    auto shared = std::shared_ptr<avf_io_core>(new avf_io_core{device});
+audio::ios_io_core_ptr audio::ios_io_core::make_shared(ios_device_ptr const &device) {
+    auto shared = std::shared_ptr<ios_io_core>(new ios_io_core{device});
     shared->_prepare(shared);
     return shared;
 }

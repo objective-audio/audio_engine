@@ -53,7 +53,7 @@ struct route_vc_internal {
     }
 
     void connect_nodes() {
-        auto const device = std::dynamic_pointer_cast<audio::avf_device>(this->manager->io().value()->device().value());
+        auto const device = std::dynamic_pointer_cast<audio::ios_device>(this->manager->io().value()->device().value());
         auto const format = audio::format({.sample_rate = device->sample_rate(), .channel_count = 2});
 
         manager->connect(au_mixer->au()->node(), this->manager->io().value()->node(), format);
