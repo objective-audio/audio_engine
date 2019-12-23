@@ -10,6 +10,8 @@
 
 using namespace yas;
 
+static_assert(sizeof(AUValue) == sizeof(float), "AUValue must be equal to float.");
+
 namespace yas::audio::avf_au_parameter_utils {
 std::vector<std::string> to_vector(NSArray<NSString *> *_Nullable valueStrings) {
     if (valueStrings) {
@@ -31,7 +33,7 @@ audio::avf_au_parameter::avf_au_parameter(avf_au_parameter_core_ptr const &core)
     : _core(core),
       _default_value(core->objc_parameter.object().value),
       _value_strings(avf_au_parameter_utils::to_vector(core->objc_parameter.object().valueStrings)),
-      _value(chaining::value::holder<AUValue>::make_shared(_default_value)) {
+      _value(chaining::value::holder<float>::make_shared(_default_value)) {
     this->_pool += this->_value->chain()
                        .perform([this](auto const &value) { this->_core->objc_parameter.object().value = value; })
                        .end();
@@ -70,15 +72,15 @@ std::string audio::avf_au_parameter::display_name() const {
     return to_string((__bridge CFStringRef)this->_core->objc_parameter.object().displayName);
 }
 
-AUValue audio::avf_au_parameter::min_value() const {
+float audio::avf_au_parameter::min_value() const {
     return this->_core->objc_parameter.object().minValue;
 }
 
-AUValue audio::avf_au_parameter::max_value() const {
+float audio::avf_au_parameter::max_value() const {
     return this->_core->objc_parameter.object().maxValue;
 }
 
-AUValue const &audio::avf_au_parameter::default_value() const {
+float const &audio::avf_au_parameter::default_value() const {
     return this->_default_value;
 }
 
@@ -94,11 +96,11 @@ std::optional<std::string> audio::avf_au_parameter::unit_name() const {
     }
 }
 
-AUValue audio::avf_au_parameter::value() const {
+float audio::avf_au_parameter::value() const {
     return this->_value->raw();
 }
 
-void audio::avf_au_parameter::set_value(AUValue const value) {
+void audio::avf_au_parameter::set_value(float const value) {
     this->_value->set_value(value);
 }
 
@@ -114,7 +116,7 @@ void audio::avf_au_parameter::reset_value() {
     this->_value->set_value(this->_default_value);
 }
 
-chaining::chain_sync_t<AUValue> audio::avf_au_parameter::chain() const {
+chaining::chain_sync_t<float> audio::avf_au_parameter::chain() const {
     return this->_value->chain();
 }
 

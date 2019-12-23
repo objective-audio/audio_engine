@@ -24,26 +24,26 @@ struct avf_au_parameter {
     std::optional<std::string> unit_name() const;
     std::string display_name() const;
 
-    AUValue min_value() const;
-    AUValue max_value() const;
-    AUValue const &default_value() const;
+    float min_value() const;
+    float max_value() const;
+    float const &default_value() const;
     std::vector<std::string> const &value_strings() const;
 
-    AUValue value() const;
-    void set_value(AUValue const);
+    float value() const;
+    void set_value(float const);
     void set_value_at(std::size_t const);
     void reset_value();
 
-    chaining::chain_sync_t<AUValue> chain() const;
+    chaining::chain_sync_t<float> chain() const;
 
     static avf_au_parameter_ptr make_shared(avf_au_parameter_core_ptr const &);
 
    private:
     avf_au_parameter_core_ptr _core;
 
-    AUValue const _default_value;
+    float const _default_value;
     std::vector<std::string> const _value_strings;
-    chaining::value::holder_ptr<AUValue> _value;
+    chaining::value::holder_ptr<float> _value;
     chaining::observer_pool _pool;
 
     avf_au_parameter(avf_au_parameter_core_ptr const &);
