@@ -7,13 +7,6 @@
 
 using namespace yas;
 
-audio::render_id audio::make_render_id(uint8_t const graph, uint16_t const unit) {
-    render_id render_id{0};
-    render_id.graph = graph;
-    render_id.unit = unit;
-    return render_id;
-}
-
 uint32_t yas::to_uint32(audio::direction const &dir) {
     return static_cast<uint32_t>(dir);
 }

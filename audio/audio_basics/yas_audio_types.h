@@ -12,18 +12,6 @@
 #include <vector>
 
 namespace yas::audio {
-union render_id {
-    void *v;
-    struct {
-        uint8_t graph;
-        uint16_t unit;
-    };
-};
-
-render_id make_render_id(uint8_t const graph, uint16_t const unit);
-
-static_assert(sizeof(void *) == sizeof(render_id), "render_id size must be equal to pointer size.");
-
 enum class pcm_format : uint32_t {
     other = 0,
     float32,
@@ -47,16 +35,6 @@ enum class direction {
 enum class continuation {
     abort,
     keep,
-};
-
-struct render_parameters {
-    render_type in_render_type;
-    AudioUnitRenderActionFlags *io_action_flags;
-    const AudioTimeStamp *io_time_stamp;
-    uint32_t in_bus_number;
-    uint32_t in_number_frames;
-    AudioBufferList *io_data;
-    render_id render_id;
 };
 
 using bus_result_t = std::optional<uint32_t>;
