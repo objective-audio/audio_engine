@@ -16,8 +16,12 @@ audio::io::~io() {
 }
 
 void audio::io::_initialize() {
-    if (this->_device && this->_io_core) {
-        this->_io_core.value()->initialize();
+    if (auto const &device = this->_device) {
+        auto io_core = device.value()->make_io_core();
+        this->_io_core = io_core;
+        io_core->set_render_handler(this->_render_handler);
+        io_core->set_maximum_frames_per_slice(this->_maximum_frames);
+        io_core->initialize();
     }
 }
 
@@ -26,6 +30,7 @@ void audio::io::_uninitialize() {
 
     if (auto const &io_core = this->_io_core) {
         io_core.value()->uninitialize();
+        this->_io_core = std::nullopt;
     }
 }
 
@@ -36,16 +41,10 @@ void audio::io::set_device(std::optional<io_device_ptr> const &device) {
         this->_uninitialize();
 
         this->_observer = std::nullopt;
-        this->_io_core = std::nullopt;
 
         this->_device = device;
 
         if (device) {
-            auto io_core = device.value()->make_io_core();
-
-            io_core->set_render_handler(this->_render_handler);
-            io_core->set_maximum_frames_per_slice(this->_maximum_frames);
-
             this->_observer = device.value()
                                   ->io_device_chain()
                                   .perform([weak_io = this->_weak_io](auto const &method) {
@@ -61,8 +60,6 @@ void audio::io::set_device(std::optional<io_device_ptr> const &device) {
                                       }
                                   })
                                   .end();
-
-            this->_io_core = io_core;
 
             this->_initialize();
 
