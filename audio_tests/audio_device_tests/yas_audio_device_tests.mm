@@ -25,34 +25,6 @@ using namespace yas;
     [super tearDown];
 }
 
-- (void)test_method_to_string {
-    XCTAssertEqual(to_string(audio::mac_device::method::device_did_change), "device_did_change");
-}
-
-- (void)test_system_method_string {
-    XCTAssertEqual(to_string(audio::mac_device::system_method::hardware_did_change), "hardware_did_change");
-}
-
-- (void)test_method_ostream {
-    auto const values = {audio::mac_device::method::device_did_change};
-
-    for (auto const &value : values) {
-        std::ostringstream stream;
-        stream << value;
-        XCTAssertEqual(stream.str(), to_string(value));
-    }
-}
-
-- (void)test_system_method_ostream {
-    auto const values = {audio::mac_device::system_method::hardware_did_change};
-
-    for (auto const &value : values) {
-        std::ostringstream stream;
-        stream << value;
-        XCTAssertEqual(stream.str(), to_string(value));
-    }
-}
-
 @end
 
 #endif
