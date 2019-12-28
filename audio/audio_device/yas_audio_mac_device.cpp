@@ -6,6 +6,7 @@
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
 
+#include <cpp_utils/yas_cf_utils.h>
 #include <mutex>
 #include "yas_audio_mac_io_core.h"
 
@@ -334,12 +335,12 @@ AudioDeviceID audio::mac_device::audio_device_id() const {
     return this->_audio_device_id;
 }
 
-CFStringRef audio::mac_device::name() const {
-    return _property_string(audio_device_id(), kAudioObjectPropertyName);
+std::string audio::mac_device::name() const {
+    return to_string(_property_string(this->audio_device_id(), kAudioObjectPropertyName));
 }
 
-CFStringRef audio::mac_device::manufacture() const {
-    return _property_string(audio_device_id(), kAudioObjectPropertyManufacturer);
+std::string audio::mac_device::manufacture() const {
+    return to_string(_property_string(this->audio_device_id(), kAudioObjectPropertyManufacturer));
 }
 
 std::vector<audio::mac_device::stream_ptr> audio::mac_device::input_streams() const {

@@ -159,7 +159,7 @@ struct device_vc_cpp {
     NSMutableArray *titles = [NSMutableArray arrayWithCapacity:all_devices.size()];
 
     for (auto &device : all_devices) {
-        [titles addObject:(NSString *)device->name()];
+        [titles addObject:(__bridge NSString *)to_cf_object(device->name())];
     }
 
     [titles addObject:@"None"];
@@ -221,8 +221,8 @@ struct device_vc_cpp {
         if (auto const &device = std::dynamic_pointer_cast<audio::mac_device>(*device_opt)) {
             NSString *string = [NSString
                 stringWithFormat:@"name = %@\nnominal samplerate = %@\noutput channels = %@\ninput channels = %@",
-                                 device->name(), @(device->nominal_sample_rate()), @(device->output_channel_count()),
-                                 @(device->input_channel_count())];
+                                 to_cf_object(device->name()), @(device->nominal_sample_rate()),
+                                 @(device->output_channel_count()), @(device->input_channel_count())];
             auto attributed_string = objc_ptr_with_move_object([[NSAttributedString alloc]
                 initWithString:string
                     attributes:@{NSForegroundColorAttributeName: [NSColor labelColor]}]);

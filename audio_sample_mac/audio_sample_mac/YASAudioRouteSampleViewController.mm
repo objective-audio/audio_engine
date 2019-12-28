@@ -232,7 +232,7 @@ struct engine_io_vc_cpp {
     NSMutableArray *titles = [NSMutableArray arrayWithCapacity:all_devices.size()];
 
     for (auto &device : all_devices) {
-        [titles addObject:(__bridge NSString *)device->name()];
+        [titles addObject:(__bridge NSString *)to_cf_object(device->name())];
     }
 
     [titles addObject:@"None"];

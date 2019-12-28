@@ -61,8 +61,8 @@ struct mac_device : io_device {
     static bool is_available_device(mac_device_ptr const &);
 
     AudioDeviceID audio_device_id() const;
-    CFStringRef name() const;
-    CFStringRef manufacture() const;
+    [[nodiscard]] std::string name() const;
+    [[nodiscard]] std::string manufacture() const;
     std::vector<stream_ptr> input_streams() const;
     std::vector<stream_ptr> output_streams() const;
     double nominal_sample_rate() const;
