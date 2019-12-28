@@ -70,7 +70,7 @@ struct device_vc_cpp {
     auto unowned_self = objc_ptr_with_move_object([[YASUnownedObject alloc] initWithObject:self]);
 
     self->_cpp->system_observer =
-        audio::mac_device::system_chain(audio::mac_device::system_method::hardware_did_change)
+        audio::mac_device::system_chain()
             .perform([unowned_self](auto const &) { [[unowned_self.object() object] _updateDeviceNames]; })
             .end();
 
@@ -193,7 +193,7 @@ struct device_vc_cpp {
 
         auto const &device = *selected_device;
 
-        self->_cpp->device_observer = device->chain(audio::mac_device::method::device_did_change)
+        self->_cpp->device_observer = device->chain()
                                           .perform([device, unowned_self](auto const &change_info) {
                                               auto const &infos = change_info.property_infos;
                                               if (infos.size() > 0) {

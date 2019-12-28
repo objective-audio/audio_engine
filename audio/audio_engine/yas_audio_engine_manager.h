@@ -50,6 +50,7 @@ struct manager final {
     std::optional<offline_output_ptr> const &offline_output() const;
 
     io_ptr const &add_io();
+    io_ptr const &add_io(std::optional<io_device_ptr> const &);
     void remove_io();
     std::optional<io_ptr> const &io() const;
 

@@ -30,7 +30,7 @@ struct ios_io_core final : io_core {
     [[nodiscard]] std::optional<pcm_buffer_ptr> const &input_buffer_on_render() const override;
     [[nodiscard]] std::optional<time_ptr> const &input_time_on_render() const override;
 
-    static ios_io_core_ptr make_shared(ios_device_ptr const &);
+    [[nodiscard]] static ios_io_core_ptr make_shared(ios_device_ptr const &);
 
    private:
     class impl;

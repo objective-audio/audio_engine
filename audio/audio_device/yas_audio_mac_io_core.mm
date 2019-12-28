@@ -6,6 +6,8 @@
 
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
 
+#include "yas_audio_mac_device.h"
+
 using namespace yas;
 
 audio::mac_io_core::mac_io_core(mac_device_ptr const &device) : _device(device) {

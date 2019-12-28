@@ -41,12 +41,6 @@ struct test_io_device : io_device {
     std::optional<audio::format> output_format() const override {
         return std::nullopt;
     }
-    uint32_t input_channel_count() const override {
-        return 0;
-    }
-    uint32_t output_channel_count() const override {
-        return 0;
-    }
 
     io_core_ptr make_io_core() const override {
         return std::make_shared<test_io_core>();

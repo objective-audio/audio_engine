@@ -8,6 +8,7 @@
 
 #import <AVFoundation/AVFoundation.h>
 #include <cpp_utils/yas_objc_ptr.h>
+#include "yas_audio_ios_io_core.h"
 
 using namespace yas;
 
@@ -28,21 +29,9 @@ double audio::ios_device::sample_rate() const {
     return [AVAudioSession sharedInstance].sampleRate;
 }
 
-uint32_t audio::ios_device::input_channel_count() const {
-    if ([AVAudioSession sharedInstance].isInputAvailable) {
-        return static_cast<uint32_t>([AVAudioSession sharedInstance].inputNumberOfChannels);
-    } else {
-        return 0;
-    }
-}
-
-uint32_t audio::ios_device::output_channel_count() const {
-    return static_cast<uint32_t>([AVAudioSession sharedInstance].outputNumberOfChannels);
-}
-
 std::optional<audio::format> audio::ios_device::input_format() const {
     auto const sample_rate = this->sample_rate();
-    auto const ch_count = this->input_channel_count();
+    auto const ch_count = this->_input_channel_count();
 
     if (sample_rate > 0.0 && ch_count > 0) {
         return audio::format({.sample_rate = sample_rate, .channel_count = ch_count});
@@ -53,7 +42,7 @@ std::optional<audio::format> audio::ios_device::input_format() const {
 
 std::optional<audio::format> audio::ios_device::output_format() const {
     auto const sample_rate = this->sample_rate();
-    auto const ch_count = this->output_channel_count();
+    auto const ch_count = this->_output_channel_count();
 
     if (sample_rate > 0.0 && ch_count > 0) {
         return audio::format({.sample_rate = sample_rate, .channel_count = ch_count});
@@ -108,6 +97,18 @@ void audio::ios_device::_prepare(ios_device_ptr const &shared) {
     });
 
     this->_impl->observers = {route_change_observer, lost_observer, reset_observer};
+}
+
+uint32_t audio::ios_device::_input_channel_count() const {
+    return static_cast<uint32_t>([AVAudioSession sharedInstance].outputNumberOfChannels);
+}
+
+uint32_t audio::ios_device::_output_channel_count() const {
+    if ([AVAudioSession sharedInstance].isInputAvailable) {
+        return static_cast<uint32_t>([AVAudioSession sharedInstance].inputNumberOfChannels);
+    } else {
+        return 0;
+    }
 }
 
 audio::ios_device_ptr audio::ios_device::make_shared() {

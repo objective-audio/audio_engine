@@ -19,6 +19,7 @@
 #include "yas_audio_format.h"
 #include "yas_audio_io.h"
 #include "yas_audio_pcm_buffer.h"
+#include "yas_audio_renewable_device.h"
 #include "yas_audio_time.h"
 
 #if TARGET_OS_IPHONE

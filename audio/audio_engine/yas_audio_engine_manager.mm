@@ -134,9 +134,13 @@ std::optional<audio::engine::offline_output_ptr> const &audio::engine::manager::
 }
 
 audio::engine::io_ptr const &audio::engine::manager::add_io() {
+    return this->add_io(io_device::default_device());
+}
+
+audio::engine::io_ptr const &audio::engine::manager::add_io(std::optional<io_device_ptr> const &device) {
     if (!this->_io) {
         audio::engine::io_ptr const io = audio::engine::io::make_shared();
-        io->set_device(io_device::default_device());
+        io->set_device(device);
 
         this->_io = io;
 

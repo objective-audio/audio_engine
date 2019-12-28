@@ -12,6 +12,22 @@
 
 using namespace yas;
 
+uint32_t audio::io_device::input_channel_count() const {
+    if (auto const format = this->input_format()) {
+        return format.value().channel_count();
+    } else {
+        return 0;
+    }
+}
+
+uint32_t audio::io_device::output_channel_count() const {
+    if (auto const format = this->output_format()) {
+        return format.value().channel_count();
+    } else {
+        return 0;
+    }
+}
+
 std::optional<audio::io_device_ptr> audio::io_device::default_device() {
 #if TARGET_OS_IPHONE
     return ios_device::make_shared();
