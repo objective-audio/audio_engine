@@ -15,19 +15,19 @@ struct io final {
     ~io();
 
     void set_device(std::optional<io_device_ptr> const &);
-    std::optional<io_device_ptr> const &device() const;
-    bool is_running() const;
+    [[nodiscard]] std::optional<io_device_ptr> const &device() const;
+    [[nodiscard]] bool is_running() const;
     void set_render_handler(std::optional<io_render_f>);
     void set_maximum_frames_per_slice(uint32_t const);
-    uint32_t maximum_frames_per_slice() const;
+    [[nodiscard]] uint32_t maximum_frames_per_slice() const;
 
     bool start();
     void stop();
 
-    std::optional<pcm_buffer_ptr> const &input_buffer_on_render() const;
-    std::optional<time_ptr> const &input_time_on_render() const;
+    [[nodiscard]] std::optional<pcm_buffer_ptr> const &input_buffer_on_render() const;
+    [[nodiscard]] std::optional<time_ptr> const &input_time_on_render() const;
 
-    static io_ptr make_shared(std::optional<io_device_ptr> const &);
+    [[nodiscard]] static io_ptr make_shared(std::optional<io_device_ptr> const &);
 
    private:
     std::weak_ptr<io> _weak_io;
