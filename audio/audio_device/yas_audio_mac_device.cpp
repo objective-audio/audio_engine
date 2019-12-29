@@ -280,16 +280,17 @@ audio::io_device_ptr audio::mac_device::renewable_default_output_device() {
             }
             return result;
         },
-        [](io_device_ptr const &device, renewable_device::update_device_f const &update_device,
-           renewable_device::notify_updated_f const &notify_updated) {
+        [](io_device_ptr const &device, renewable_device::method_f const &handler) {
             auto pool = chaining::observer_pool::make_shared();
 
             *pool += device->io_device_chain()
                          .guard([](auto const &method) { return method == audio::io_device::method::updated; })
-                         .perform([notify_updated](auto const &) { notify_updated(); })
+                         .perform([handler](auto const &) { handler(renewable_device::method::notify); })
                          .end();
 
-            *pool += mac_device::system_chain().perform([update_device](auto const &) { update_device(); }).end();
+            *pool += mac_device::system_chain()
+                         .perform([handler](auto const &) { handler(renewable_device::method::renewal); })
+                         .end();
 
             return pool;
         });

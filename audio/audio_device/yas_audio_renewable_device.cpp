@@ -6,9 +6,9 @@
 
 using namespace yas;
 
-audio::renewable_device::renewable_device(device_f const &device_handler, observing_f const &observing_handler)
+audio::renewable_device::renewable_device(device_f const &device_handler, renewal_f const &observing_handler)
     : _device_handler(device_handler),
-      _observing_handler(observing_handler),
+      _renewal_handler(observing_handler),
       _notifier(chaining::notifier<audio::io_device::method>::make_shared()) {
     this->_renewal_device();
 }
@@ -38,23 +38,23 @@ void audio::renewable_device::_renewal_device() {
 
     this->_device = std::move(new_device);
 
-    auto handler = [this](observing_method const &method) {
+    auto handler = [this](method const &method) {
         switch (method) {
-            case observing_method::notify_updated:
+            case method::notify:
                 this->_notifier->notify(audio::io_device::method::updated);
                 break;
-            case observing_method::renewal_device:
+            case method::renewal:
                 this->_renewal_device();
                 break;
         }
     };
 
-    this->_observer = this->_observing_handler(this->_device, handler);
+    this->_observer = this->_renewal_handler(this->_device, handler);
 
     this->_notifier->notify(audio::io_device::method::updated);
 }
 
 audio::renewable_device_ptr audio::renewable_device::make_shared(device_f const &device_handler,
-                                                                 observing_f const &observing_handler) {
+                                                                 renewal_f const &observing_handler) {
     return renewable_device_ptr(new renewable_device{device_handler, observing_handler});
 }

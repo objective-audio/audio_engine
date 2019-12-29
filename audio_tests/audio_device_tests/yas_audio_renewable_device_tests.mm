@@ -105,15 +105,17 @@ struct test_io_device : audio::io_device {
                 return output_device;
             }
         },
-        [update_notifier](io_device_ptr const &device, auto const &update, auto const &notify) {
+        [update_notifier](io_device_ptr const &device, auto const &handler) {
             auto pool = chaining::observer_pool::make_shared();
 
             *pool += device->io_device_chain()
                          .guard([](auto const &method) { return method == io_device::method::updated; })
-                         .perform([notify](auto const &) { notify(); })
+                         .perform([handler](auto const &) { handler(renewable_device::method::notify); })
                          .end();
 
-            *pool += update_notifier->chain().perform([update](auto const &) { update(); }).end();
+            *pool += update_notifier->chain()
+                         .perform([handler](auto const &) { handler(renewable_device::method::renewal); })
+                         .end();
 
             return pool;
         });
