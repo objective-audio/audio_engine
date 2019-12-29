@@ -120,11 +120,7 @@ struct offline_vc_internal {
     offline_sample::engine::sine_ptr offline_sine = offline_sample::engine::sine::make_shared();
 
     offline_vc_internal() {
-        auto const &io = this->play_manager->add_io();
-
-        if (auto const device = audio::mac_device::default_output_device()) {
-            this->_set_device(device.value());
-        }
+        auto const &io = this->play_manager->add_io(audio::mac_device::renewable_default_output_device());
 
         this->play_au_mixer->au()->node()->reset();
         this->play_au_mixer->set_input_pan(0.0f, 0);
@@ -143,10 +139,6 @@ struct offline_vc_internal {
                                      }
                                  })
                                  .end();
-
-        this->_system_observer = audio::mac_device::system_chain(audio::mac_device::system_method::hardware_did_change)
-                                     .perform([this](auto const &) { this->_update_device_if_default_changed(); })
-                                     .end();
 
         this->offline_manager->add_offline_output();
         auto const &offline_output = this->offline_manager->offline_output().value();
@@ -191,15 +183,12 @@ struct offline_vc_internal {
     }
 
    private:
-    std::optional<audio::mac_device_ptr> _device = std::nullopt;
-
     audio::format const _file_format{{.sample_rate = offline_sample::sample_rate,
                                       .channel_count = 2,
                                       .pcm_format = audio::pcm_format::float32,
                                       .interleaved = false}};
 
     chaining::any_observer_ptr _io_observer = nullptr;
-    chaining::any_observer_ptr _system_observer = nullptr;
 
     void _update_connection() {
         if (auto const &io = this->play_manager->io()) {
@@ -209,24 +198,6 @@ struct offline_vc_internal {
 
                 this->play_manager->connect(this->play_au_mixer->au()->node(), io_value->node(), *output_format);
             }
-        }
-    }
-
-    void _set_device(audio::mac_device_ptr const &device) {
-        if (auto const &io = this->play_manager->io()) {
-            io.value()->set_device(device);
-            this->_device = device;
-        }
-    }
-
-    void _update_device_if_default_changed() {
-        auto default_device = audio::mac_device::default_output_device();
-        if (default_device && this->_device && default_device.value() != this->_device.value()) {
-            this->stop_render();
-
-            this->_set_device(default_device.value());
-
-            this->start_render();
         }
     }
 };

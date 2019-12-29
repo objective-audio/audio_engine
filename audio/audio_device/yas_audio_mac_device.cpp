@@ -8,14 +8,19 @@
 
 #include <cpp_utils/yas_cf_utils.h>
 #include <mutex>
+#include "yas_audio_mac_empty_device.h"
 #include "yas_audio_mac_io_core.h"
+#include "yas_audio_renewable_device.h"
+
+#include <cpp_utils/yas_cf_utils.h>
+#include <iostream>
 
 using namespace yas;
 
 namespace yas::audio {
 
-static chaining::notifier_ptr<audio::mac_device::chaining_system_pair_t> _system_notifier =
-    chaining::notifier<audio::mac_device::chaining_system_pair_t>::make_shared();
+static chaining::notifier_ptr<audio::mac_device::change_info> _system_notifier =
+    chaining::notifier<audio::mac_device::change_info>::make_shared();
 
 #pragma mark - utility
 
@@ -121,10 +126,7 @@ struct mac_device_global {
                                                                    .address = addresses[i]});
             }
             mac_device::change_info change_info{.property_infos = std::move(property_infos)};
-            audio::_system_notifier->notify(
-                std::make_pair(mac_device::system_method::hardware_did_change, change_info));
-            audio::_system_notifier->notify(
-                std::make_pair(mac_device::system_method::configuration_change, change_info));
+            audio::_system_notifier->notify(change_info);
         };
     }
 
@@ -267,6 +269,32 @@ std::optional<audio::mac_device_ptr> audio::mac_device::default_input_device() {
     return std::nullopt;
 }
 
+audio::io_device_ptr audio::mac_device::renewable_default_output_device() {
+    return audio::renewable_device::make_shared(
+        []() {
+            io_device_ptr result = nullptr;
+            if (auto const device = mac_device::default_output_device()) {
+                result = device.value();
+            } else {
+                result = audio::mac_empty_device::make_shared();
+            }
+            return result;
+        },
+        [](io_device_ptr const &device, renewable_device::update_device_f const &update_device,
+           renewable_device::notify_updated_f const &notify_updated) {
+            auto pool = chaining::observer_pool::make_shared();
+
+            *pool += device->io_device_chain()
+                         .guard([](auto const &method) { return method == audio::io_device::method::updated; })
+                         .perform([notify_updated](auto const &) { notify_updated(); })
+                         .end();
+
+            *pool += mac_device::system_chain().perform([update_device](auto const &) { update_device(); }).end();
+
+            return pool;
+        });
+}
+
 std::optional<audio::mac_device_ptr> audio::mac_device::device_for_id(AudioDeviceID const audio_device_id) {
     auto it = mac_device_global::all_devices_map().find(audio_device_id);
     if (it != mac_device_global::all_devices_map().end()) {
@@ -317,11 +345,9 @@ void audio::mac_device::_prepare(mac_device_ptr const &mac_device) {
 
     this->_io_pool += _system_notifier->chain()
                           .guard([weak_device = this->_weak_mac_device](auto const &pair) {
-                              if (pair.first == system_method::hardware_did_change) {
-                                  if (auto const device = weak_device.lock()) {
-                                      if (!is_available_device(device)) {
-                                          return true;
-                                      }
+                              if (auto const device = weak_device.lock()) {
+                                  if (!is_available_device(device)) {
+                                      return true;
                                   }
                               }
                               return false;
@@ -387,44 +413,16 @@ std::optional<audio::format> audio::mac_device::output_format() const {
     return this->_output_format;
 }
 
-uint32_t audio::mac_device::input_channel_count() const {
-    if (auto input_format = this->input_format()) {
-        return input_format->channel_count();
-    }
-    return 0;
-}
-
-uint32_t audio::mac_device::output_channel_count() const {
-    if (auto output_format = this->output_format()) {
-        return output_format->channel_count();
-    }
-    return 0;
-}
-
 audio::io_core_ptr audio::mac_device::make_io_core() const {
     return mac_io_core::make_shared(this->_weak_mac_device.lock());
 }
 
-chaining::chain_unsync_t<audio::mac_device::chaining_pair_t> audio::mac_device::chain() const {
+chaining::chain_unsync_t<audio::mac_device::change_info> audio::mac_device::chain() const {
     return this->_notifier->chain();
 }
 
-chaining::chain_relayed_unsync_t<audio::mac_device::change_info, audio::mac_device::chaining_pair_t>
-audio::mac_device::chain(method const method) const {
-    return this->_notifier->chain()
-        .guard([method](audio::mac_device::chaining_pair_t const &pair) { return pair.first == method; })
-        .to([](audio::mac_device::chaining_pair_t const &pair) { return pair.second; });
-}
-
-chaining::chain_unsync_t<audio::mac_device::chaining_system_pair_t> audio::mac_device::system_chain() {
+chaining::chain_unsync_t<audio::mac_device::change_info> audio::mac_device::system_chain() {
     return audio::_system_notifier->chain();
-}
-
-chaining::chain_relayed_unsync_t<audio::mac_device::change_info, audio::mac_device::chaining_system_pair_t>
-audio::mac_device::system_chain(system_method const method) {
-    return audio::_system_notifier->chain()
-        .guard([method](chaining_system_pair_t const &pair) { return pair.first == method; })
-        .to([](chaining_system_pair_t const &pair) { return pair.second; });
 }
 
 chaining::chain_unsync_t<audio::io_device::method> audio::mac_device::io_device_chain() {
@@ -474,9 +472,7 @@ audio::mac_device::listener_f audio::mac_device::_listener() {
             }
 
             mac_device::change_info change_info{std::move(property_infos)};
-            device->_notifier->notify(std::make_pair(method::device_did_change, change_info));
-            audio::_system_notifier->notify(
-                std::make_pair(mac_device::system_method::configuration_change, change_info));
+            device->_notifier->notify(change_info);
         }
     };
 }
@@ -546,42 +542,12 @@ void audio::mac_device::_update_format(AudioObjectPropertyScope const scope) {
     }
 }
 
-chaining::notifier_ptr<audio::mac_device::chaining_system_pair_t> &audio::mac_device::system_notifier() {
-    return audio::_system_notifier;
-}
-
 bool audio::mac_device::operator==(mac_device const &rhs) const {
     return this->audio_device_id() == rhs.audio_device_id();
 }
 
 bool audio::mac_device::operator!=(mac_device const &rhs) const {
     return !(*this == rhs);
-}
-
-std::string yas::to_string(audio::mac_device::method const &method) {
-    switch (method) {
-        case audio::mac_device::method::device_did_change:
-            return "device_did_change";
-    }
-}
-
-std::string yas::to_string(audio::mac_device::system_method const &method) {
-    switch (method) {
-        case audio::mac_device::system_method::hardware_did_change:
-            return "hardware_did_change";
-        case audio::mac_device::system_method::configuration_change:
-            return "configuration_change";
-    }
-}
-
-std::ostream &operator<<(std::ostream &os, yas::audio::mac_device::method const &value) {
-    os << to_string(value);
-    return os;
-}
-
-std::ostream &operator<<(std::ostream &os, yas::audio::mac_device::system_method const &value) {
-    os << to_string(value);
-    return os;
 }
 
 #endif

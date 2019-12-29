@@ -194,12 +194,12 @@ struct engine_io_vc_cpp {
         }
     };
 
-    _cpp->tap->set_render_handler(render_handler);
+    self->_cpp->tap->set_render_handler(render_handler);
 
     auto unowned_self = objc_ptr_with_move_object([[YASUnownedObject alloc] initWithObject:self]);
 
-    _cpp->system_observer =
-        audio::mac_device::system_chain(audio::mac_device::system_method::hardware_did_change)
+    self->_cpp->system_observer =
+        audio::mac_device::system_chain()
             .perform([unowned_self](auto const &) { [[unowned_self.object() object] _updateDeviceNames]; })
             .end();
 
@@ -258,9 +258,9 @@ struct engine_io_vc_cpp {
     self.outputRoutes = nil;
     self.inputRoutes = nil;
 
-    _cpp->manager->disconnect(_cpp->tap->node());
-    _cpp->manager->disconnect(_cpp->route->node());
-    _cpp->route->clear_routes();
+    self->_cpp->manager->disconnect(_cpp->tap->node());
+    self->_cpp->manager->disconnect(_cpp->route->node());
+    self->_cpp->route->clear_routes();
 
     if (auto const &device_opt = _cpp->manager->io().value()->device()) {
         auto const &device = *device_opt;
@@ -324,7 +324,7 @@ struct engine_io_vc_cpp {
 }
 
 - (void)_updateInputSelection {
-    if (!_cpp->route) {
+    if (!self->_cpp->route) {
         return;
     }
 
@@ -359,7 +359,7 @@ struct engine_io_vc_cpp {
 #pragma mark - accessor
 
 - (void)setSelectedDeviceIndex:(NSUInteger)selectedDeviceIndex {
-    _selectedDeviceIndex = selectedDeviceIndex;
+    self->_selectedDeviceIndex = selectedDeviceIndex;
 
     auto const all_devices = audio::mac_device::all_devices();
 
