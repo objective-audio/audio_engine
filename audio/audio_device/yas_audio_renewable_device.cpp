@@ -38,10 +38,18 @@ void audio::renewable_device::_renewal_device() {
 
     this->_device = std::move(new_device);
 
-    auto notify = [this]() { this->_notifier->notify(audio::io_device::method::updated); };
-    auto update = [this]() { this->_renewal_device(); };
+    auto handler = [this](observing_method const &method) {
+        switch (method) {
+            case observing_method::notify_updated:
+                this->_notifier->notify(audio::io_device::method::updated);
+                break;
+            case observing_method::renewal_device:
+                this->_renewal_device();
+                break;
+        }
+    };
 
-    this->_observer = this->_observing_handler(this->_device, update, notify);
+    this->_observer = this->_observing_handler(this->_device, handler);
 
     this->_notifier->notify(audio::io_device::method::updated);
 }

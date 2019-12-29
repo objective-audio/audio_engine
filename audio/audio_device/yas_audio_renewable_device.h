@@ -9,10 +9,14 @@
 namespace yas::audio {
 struct renewable_device : io_device {
     using device_f = std::function<io_device_ptr(void)>;
-    using update_device_f = std::function<void(void)>;
-    using notify_updated_f = std::function<void(void)>;
-    using observing_f = std::function<chaining::invalidatable_ptr(io_device_ptr const &, update_device_f const &update,
-                                                                  notify_updated_f const &notify)>;
+
+    enum observing_method {
+        notify_updated,
+        renewal_device,
+    };
+
+    using observing_method_f = std::function<void(observing_method const &)>;
+    using observing_f = std::function<chaining::invalidatable_ptr(io_device_ptr const &, observing_method_f const &)>;
 
     [[nodiscard]] std::optional<audio::format> input_format() const override;
     [[nodiscard]] std::optional<audio::format> output_format() const override;
