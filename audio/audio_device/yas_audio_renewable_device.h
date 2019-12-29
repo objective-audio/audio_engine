@@ -32,6 +32,6 @@ struct renewable_device : io_device {
 
     io_core_ptr make_io_core() const override;
 
-    void _update_device();
+    void _renewal_device();
 };
 }  // namespace yas::audio

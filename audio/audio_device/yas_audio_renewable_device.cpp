@@ -10,7 +10,7 @@ audio::renewable_device::renewable_device(device_f const &device_handler, observ
     : _device_handler(device_handler),
       _observing_handler(observing_handler),
       _notifier(chaining::notifier<audio::io_device::method>::make_shared()) {
-    this->_update_device();
+    this->_renewal_device();
 }
 
 std::optional<audio::format> audio::renewable_device::input_format() const {
@@ -29,7 +29,7 @@ chaining::chain_unsync_t<audio::io_device::method> audio::renewable_device::io_d
     return this->_notifier->chain();
 }
 
-void audio::renewable_device::_update_device() {
+void audio::renewable_device::_renewal_device() {
     auto new_device = this->_device_handler();
 
     if (new_device && this->_device && new_device == this->_device) {
@@ -39,7 +39,7 @@ void audio::renewable_device::_update_device() {
     this->_device = std::move(new_device);
 
     auto notify = [this]() { this->_notifier->notify(audio::io_device::method::updated); };
-    auto update = [this]() { this->_update_device(); };
+    auto update = [this]() { this->_renewal_device(); };
 
     this->_observer = this->_observing_handler(this->_device, update, notify);
 
