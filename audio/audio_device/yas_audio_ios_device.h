@@ -24,15 +24,12 @@ struct ios_device final : io_device {
    private:
     class impl;
 
-    std::unique_ptr<impl> _impl;
     std::weak_ptr<ios_device> _weak_device;
+    ios_session_ptr _session;
     chaining::notifier_ptr<method> _notifier = chaining::notifier<method>::make_shared();
+    chaining::any_observer_ptr _observer;
 
     ios_device();
-
-    void _prepare(ios_device_ptr const &);
-    uint32_t _input_channel_count() const;
-    uint32_t _output_channel_count() const;
 
     io_core_ptr make_io_core() const override;
 };
