@@ -10,9 +10,7 @@ namespace yas::audio::engine {
 struct manageable_io {
     virtual ~manageable_io() = default;
 
-    virtual audio::io_ptr const &add_raw_io() = 0;
-    virtual void remove_raw_io() = 0;
-    virtual std::optional<audio::io_ptr> const &raw_io() = 0;
+    virtual audio::io_ptr const &raw_io() = 0;
     virtual void start() = 0;
     virtual void stop() = 0;
 

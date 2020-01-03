@@ -20,65 +20,32 @@ using namespace yas;
 
 #pragma mark - audio::engine::io
 
-audio::engine::io::io() : _notifier(chaining::notifier<io_device::method>::make_shared()) {
+audio::engine::io::io(audio::io_ptr const &raw_io)
+    : _raw_io(raw_io), _notifier(chaining::notifier<io_device::method>::make_shared()) {
 }
 
 audio::engine::io::~io() = default;
-
-void audio::engine::io::set_device(std::optional<audio::io_device_ptr> const &device) {
-    this->_device = device;
-
-    if (this->_raw_io) {
-        this->_raw_io.value()->set_device(device);
-    }
-
-    if (device) {
-        this->_io_observer = device.value()->io_device_chain().send_to(this->_notifier).end();
-    } else {
-        this->_io_observer = std::nullopt;
-    }
-}
-
-std::optional<audio::io_device_ptr> const &audio::engine::io::device() const {
-    return this->_device;
-}
 
 audio::engine::node_ptr const &audio::engine::io::node() const {
     return this->_node;
 }
 
-audio::io_ptr const &audio::engine::io::add_raw_io() {
-    if (!this->_raw_io) {
-        this->_raw_io = audio::io::make_shared(this->device());
-    }
-
-    return this->_raw_io.value();
-}
-
-void audio::engine::io::remove_raw_io() {
-    this->_raw_io = std::nullopt;
-}
-
 void audio::engine::io::start() {
     if (!this->_running) {
         this->_running = true;
-        this->_start_raw_io();
+        this->_raw_io->start();
     }
 }
 
 void audio::engine::io::stop() {
     if (this->_running) {
         this->_running = false;
-        this->_stop_raw_io();
+        this->_raw_io->stop();
     }
 }
 
-std::optional<audio::io_ptr> const &audio::engine::io::raw_io() {
+audio::io_ptr const &audio::engine::io::raw_io() {
     return this->_raw_io;
-}
-
-chaining::chain_unsync_t<audio::io_device::method> audio::engine::io::io_device_chain() {
-    return this->_notifier->chain();
 }
 
 void audio::engine::io::_prepare(io_ptr const &shared) {
@@ -88,13 +55,11 @@ void audio::engine::io::_prepare(io_ptr const &shared) {
         auto const &buffer = args.buffer;
 
         if (auto engine_io = weak_engine_io.lock()) {
-            if (auto const &raw_io = engine_io->raw_io()) {
-                auto const &input_buffer_opt = raw_io.value()->input_buffer_on_render();
-                if (input_buffer_opt) {
-                    auto const &input_buffer = *input_buffer_opt;
-                    if (input_buffer->format() == buffer->format()) {
-                        buffer->copy_from(*input_buffer);
-                    }
+            auto const &input_buffer_opt = engine_io->_raw_io->input_buffer_on_render();
+            if (input_buffer_opt) {
+                auto const &input_buffer = *input_buffer_opt;
+                if (input_buffer->format() == buffer->format()) {
+                    buffer->copy_from(*input_buffer);
                 }
             }
         }
@@ -110,12 +75,7 @@ void audio::engine::io::_prepare(io_ptr const &shared) {
 }
 
 void audio::engine::io::_update_io_connections() {
-    auto const &raw_io_opt = this->_raw_io;
-    if (!raw_io_opt) {
-        return;
-    }
-
-    auto const &raw_io = raw_io_opt.value();
+    auto const &raw_io = this->_raw_io;
 
     if (!this->_validate_connections()) {
         raw_io->set_render_handler(std::nullopt);
@@ -164,50 +124,48 @@ void audio::engine::io::_update_io_connections() {
 }
 
 bool audio::engine::io::_validate_connections() {
-    if (auto const &raw_io_opt = this->_raw_io) {
-        auto const &raw_io = raw_io_opt.value();
+    auto const &raw_io = this->_raw_io;
 
-        auto &input_connections = manageable_node::cast(this->_node)->input_connections();
-        if (input_connections.size() > 0) {
-            auto const connections = lock_values(input_connections);
-            if (connections.count(0) > 0) {
-                auto const &connection = connections.at(0);
-                auto const &connection_format = connection->format;
-                auto const &device_opt = raw_io->device();
-                if (!device_opt) {
-                    std::cout << __PRETTY_FUNCTION__ << " : output device is null." << std::endl;
-                    return false;
-                }
-                auto const &device = *device_opt;
-                if (connection_format != device->output_format()) {
-                    std::cout << __PRETTY_FUNCTION__ << " : output device io format is not match.\n";
-                    std::cout << "device output format : " << to_string(*device->output_format());
-                    std::cout << "connection format : " << to_string(connection_format);
-                    std::cout << std::endl;
-                    return false;
-                }
+    auto &input_connections = manageable_node::cast(this->_node)->input_connections();
+    if (input_connections.size() > 0) {
+        auto const connections = lock_values(input_connections);
+        if (connections.count(0) > 0) {
+            auto const &connection = connections.at(0);
+            auto const &connection_format = connection->format;
+            auto const &device_opt = raw_io->device();
+            if (!device_opt) {
+                std::cout << __PRETTY_FUNCTION__ << " : output device is null." << std::endl;
+                return false;
+            }
+            auto const &device = *device_opt;
+            if (connection_format != device->output_format()) {
+                std::cout << __PRETTY_FUNCTION__ << " : output device io format is not match.\n";
+                std::cout << "device output format : " << to_string(*device->output_format());
+                std::cout << "connection format : " << to_string(connection_format);
+                std::cout << std::endl;
+                return false;
             }
         }
+    }
 
-        auto &output_connections = manageable_node::cast(this->_node)->output_connections();
-        if (output_connections.size() > 0) {
-            auto const connections = lock_values(output_connections);
-            if (connections.count(0) > 0) {
-                auto const &connection = connections.at(0);
-                auto const &connection_format = connection->format;
-                auto const &device_opt = raw_io->device();
-                if (!device_opt) {
-                    std::cout << __PRETTY_FUNCTION__ << " : output device is null." << std::endl;
-                    return false;
-                }
-                auto const &device = *device_opt;
-                if (connection_format != device->input_format()) {
-                    std::cout << __PRETTY_FUNCTION__ << " : input device io format is not match.\n";
-                    std::cout << "device input format : " << to_string(*device->input_format());
-                    std::cout << "connection format : " << to_string(connection_format);
-                    std::cout << std::endl;
-                    return false;
-                }
+    auto &output_connections = manageable_node::cast(this->_node)->output_connections();
+    if (output_connections.size() > 0) {
+        auto const connections = lock_values(output_connections);
+        if (connections.count(0) > 0) {
+            auto const &connection = connections.at(0);
+            auto const &connection_format = connection->format;
+            auto const &device_opt = raw_io->device();
+            if (!device_opt) {
+                std::cout << __PRETTY_FUNCTION__ << " : output device is null." << std::endl;
+                return false;
+            }
+            auto const &device = *device_opt;
+            if (connection_format != device->input_format()) {
+                std::cout << __PRETTY_FUNCTION__ << " : input device io format is not match.\n";
+                std::cout << "device input format : " << to_string(*device->input_format());
+                std::cout << "connection format : " << to_string(connection_format);
+                std::cout << std::endl;
+                return false;
             }
         }
     }
@@ -215,20 +173,8 @@ bool audio::engine::io::_validate_connections() {
     return true;
 }
 
-void audio::engine::io::_start_raw_io() {
-    if (auto const &raw_io = this->_raw_io) {
-        raw_io.value()->start();
-    }
-}
-
-void audio::engine::io::_stop_raw_io() {
-    if (auto const &raw_io = this->_raw_io) {
-        raw_io.value()->stop();
-    }
-}
-
-audio::engine::io_ptr audio::engine::io::make_shared() {
-    auto shared = io_ptr(new audio::engine::io{});
+audio::engine::io_ptr audio::engine::io::make_shared(audio::io_ptr const &raw_io) {
+    auto shared = io_ptr(new audio::engine::io{raw_io});
     shared->_prepare(shared);
     return shared;
 }

@@ -6,6 +6,7 @@
 #import <AVFoundation/AVFoundation.h>
 #import <audio/yas_audio_umbrella.h>
 #import "YASAudioEngineEffectsSampleEditViewController.h"
+#import "YASViewControllerUtils.h"
 
 using namespace yas;
 
@@ -184,7 +185,7 @@ struct effects_vc_cpp {
 
     if (auto const result = self->_cpp.session->activate(); !result) {
         NSString *errorMessage = (__bridge NSString *)to_cf_object(result.error());
-        [self _showErrorAlertWithMessage:errorMessage];
+        [YASViewControllerUtils showErrorAlertWithMessage:errorMessage toViewController:self];
         return;
     }
 
@@ -195,7 +196,7 @@ struct effects_vc_cpp {
     } else {
         auto const error_string = to_string(start_result.error());
         NSString *errorMessage = (__bridge NSString *)to_cf_object(error_string);
-        [self _showErrorAlertWithMessage:errorMessage];
+        [YASViewControllerUtils showErrorAlertWithMessage:errorMessage toViewController:self];
     }
 }
 
@@ -269,18 +270,6 @@ struct effects_vc_cpp {
 }
 
 #pragma mark - Private
-
-- (void)_showErrorAlertWithMessage:(NSString *)message {
-    UIAlertController *controller = [UIAlertController alertControllerWithTitle:@"Error"
-                                                                        message:message
-                                                                 preferredStyle:UIAlertControllerStyleAlert];
-    [controller addAction:[UIAlertAction actionWithTitle:@"OK"
-                                                   style:UIAlertActionStyleDefault
-                                                 handler:^(UIAlertAction *action) {
-                                                     [self.navigationController popViewControllerAnimated:YES];
-                                                 }]];
-    [self presentViewController:controller animated:YES completion:NULL];
-}
 
 - (UITableViewCell *)_dequeueCellWithIndexPath:(NSIndexPath *)indexPath {
     UITableViewCell *cell = [self.tableView dequeueReusableCellWithIdentifier:@"Cell" forIndexPath:indexPath];

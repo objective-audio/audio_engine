@@ -9,14 +9,28 @@
 
 using namespace yas;
 
-audio::io::io() = default;
+audio::io::io(std::optional<io_device_ptr> const &device) {
+    this->set_device(device);
+
+    this->_device_fetcher = chaining::fetcher<device_chaining_pair_t>::make_shared([this]() {
+        return device_chaining_pair_t{device_method::initial, this->_device->raw()};
+    });
+
+    this->_device_changed_observer =
+        this->_device->chain()
+            .to([](std::optional<io_device_ptr> const &device) {
+                return device_chaining_pair_t{device_method::changed, device};
+            })
+            .perform([this](device_chaining_pair_t const &pair) { this->_device_fetcher->push(pair); })
+            .end();
+}
 
 audio::io::~io() {
     this->_uninitialize();
 }
 
 void audio::io::_initialize() {
-    if (auto const &device = this->_device) {
+    if (auto const &device = this->_device->raw()) {
         auto io_core = device.value()->make_io_core();
         this->_io_core = io_core;
         io_core->set_render_handler(this->_render_handler);
@@ -35,31 +49,31 @@ void audio::io::_uninitialize() {
 }
 
 void audio::io::set_device(std::optional<io_device_ptr> const &device) {
-    if (this->_device != device) {
+    if (this->_device->raw() != device) {
         bool const is_running = this->_is_running;
 
         this->_uninitialize();
 
-        this->_device_observer = std::nullopt;
+        this->_device_updated_observer = std::nullopt;
 
-        this->_device = device;
+        this->_device->set_value(device);
 
         if (device) {
-            this->_device_observer = device.value()
-                                         ->io_device_chain()
-                                         .perform([weak_io = this->_weak_io](auto const &method) {
-                                             if (auto const io = weak_io.lock()) {
-                                                 switch (method) {
-                                                     case io_device::method::updated:
-                                                         io->_reload();
-                                                         break;
-                                                     case io_device::method::lost:
-                                                         io->_uninitialize();
-                                                         break;
-                                                 }
-                                             }
-                                         })
-                                         .end();
+            this->_device_updated_observer =
+                device.value()
+                    ->io_device_chain()
+                    .perform([this](auto const &method) {
+                        switch (method) {
+                            case io_device::method::updated:
+                                this->_reload();
+                                this->_device_fetcher->push({device_method::updated, this->device()});
+                                break;
+                            case io_device::method::lost:
+                                this->_device->set_value(std::nullopt);
+                                break;
+                        }
+                    })
+                    .end();
 
             this->_initialize();
 
@@ -71,7 +85,7 @@ void audio::io::set_device(std::optional<io_device_ptr> const &device) {
 }
 
 std::optional<audio::io_device_ptr> const &audio::io::device() const {
-    return this->_device;
+    return this->_device->raw();
 }
 
 bool audio::io::is_running() const {
@@ -79,7 +93,7 @@ bool audio::io::is_running() const {
 }
 
 bool audio::io::is_interrupting() const {
-    if (auto const &device = this->_device) {
+    if (auto const &device = this->_device->raw()) {
         return device.value()->is_interrupting();
     }
     return false;
@@ -123,6 +137,10 @@ void audio::io::stop() {
     this->_dispose_interruption_observer();
     this->_stop_io_core();
     this->_is_running = false;
+}
+
+chaining::chain_sync_t<audio::io::device_chaining_pair_t> audio::io::device_chain() const {
+    return this->_device_fetcher->chain();
 }
 
 std::optional<audio::pcm_buffer_ptr> const &audio::io::input_buffer_on_render() const {
@@ -194,15 +212,12 @@ void audio::io::_dispose_interruption_observer() {
 }
 
 std::optional<chaining::chain_unsync_t<audio::interruption_method>> audio::io::_interruption_chain() const {
-    if (auto const &device = this->_device) {
+    if (auto const &device = this->_device->raw()) {
         return device.value()->interruption_chain();
     }
     return std::nullopt;
 }
 
 audio::io_ptr audio::io::make_shared(std::optional<io_device_ptr> const &device) {
-    auto shared = std::shared_ptr<io>(new io{});
-    shared->_weak_io = shared;
-    shared->set_device(device);
-    return shared;
+    return std::shared_ptr<io>(new io{device});
 }

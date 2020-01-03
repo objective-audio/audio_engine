@@ -6,7 +6,7 @@
 
 using namespace yas;
 
-namespace yas::audio::test {
+namespace yas::audio::engine::test {
 struct test_io_core : io_core {
     void initialize() override {
     }
@@ -137,9 +137,9 @@ struct test_io_device : io_device {
 
     manager->add_io(std::nullopt);
 
-    auto const device = std::make_shared<audio::test::test_io_device>();
+    auto const device = std::make_shared<audio::engine::test::test_io_device>();
 
-    manager->io().value()->set_device(device);
+    manager->io().value()->raw_io()->set_device(device);
 
     XCTestExpectation *expectation = [self expectationWithDescription:@"configuration change"];
 
@@ -155,9 +155,9 @@ struct test_io_device : io_device {
 
     manager->add_io(std::nullopt);
 
-    auto const device = std::make_shared<audio::test::test_io_device>();
+    auto const device = std::make_shared<audio::engine::test::test_io_device>();
 
-    manager->io().value()->set_device(device);
+    manager->io().value()->raw_io()->set_device(device);
 
     XCTestExpectation *expectation = [self expectationWithDescription:@"configuration change"];
 
