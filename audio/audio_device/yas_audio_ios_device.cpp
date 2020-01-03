@@ -7,6 +7,7 @@
 #if TARGET_OS_IPHONE
 
 #include "yas_audio_ios_io_core.h"
+#include "yas_audio_renewable_device.h"
 
 using namespace yas;
 
@@ -77,6 +78,29 @@ audio::ios_device_ptr audio::ios_device::make_shared(ios_session_ptr const &sess
     auto shared = std::shared_ptr<ios_device>(new ios_device{session});
     shared->_weak_device = shared;
     return shared;
+}
+
+audio::io_device_ptr audio::ios_device::renewable_device(ios_session_ptr const &session) {
+    return audio::renewable_device::make_shared(
+        [session]() { return ios_device::make_shared(session); },
+        [](io_device_ptr const &device, renewable_device::method_f const &handler) {
+            auto pool = chaining::observer_pool::make_shared();
+
+            *pool += device->io_device_chain()
+                         .perform([handler](auto const &method) {
+                             switch (method) {
+                                 case io_device::method::updated:
+                                     handler(renewable_device::method::notify);
+                                     break;
+                                 case io_device::method::lost:
+                                     handler(renewable_device::method::renewal);
+                                     break;
+                             }
+                         })
+                         .end();
+
+            return pool;
+        });
 }
 
 #endif
