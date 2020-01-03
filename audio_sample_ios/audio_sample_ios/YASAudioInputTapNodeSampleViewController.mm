@@ -7,6 +7,7 @@
 #import <Accelerate/Accelerate.h>
 #import <audio/yas_audio_umbrella.h>
 #import <objc_utils/yas_objc_macros.h>
+#import "YASViewControllerUtils.h"
 
 using namespace yas;
 
@@ -110,7 +111,8 @@ struct input_tap_vc_cpp {
     self->_cpp.session->set_category(audio::ios_session::category::record);
 
     if (auto const result = self->_cpp.session->activate(); !result) {
-        [self _showErrorAlertWithMessage:(__bridge NSString *)to_cf_object(result.error())];
+        [YASViewControllerUtils showErrorAlertWithMessage:(__bridge NSString *)to_cf_object(result.error())
+                                         toViewController:self];
         return;
     }
 
@@ -122,7 +124,7 @@ struct input_tap_vc_cpp {
     } else {
         auto const error_string = to_string(start_result.error());
         NSString *errorMessage = (__bridge NSString *)to_cf_object(error_string);
-        [self _showErrorAlertWithMessage:errorMessage];
+        [YASViewControllerUtils showErrorAlertWithMessage:errorMessage toViewController:self];
     }
 }
 
@@ -131,20 +133,6 @@ struct input_tap_vc_cpp {
     self.displayLink = nil;
 
     self->_cpp.dispose();
-}
-
-#pragma mark -
-
-- (void)_showErrorAlertWithMessage:(NSString *)message {
-    UIAlertController *controller = [UIAlertController alertControllerWithTitle:@"Error"
-                                                                        message:message
-                                                                 preferredStyle:UIAlertControllerStyleAlert];
-    [controller addAction:[UIAlertAction actionWithTitle:@"OK"
-                                                   style:UIAlertActionStyleDefault
-                                                 handler:^(UIAlertAction *action) {
-                                                     [self.navigationController popViewControllerAnimated:YES];
-                                                 }]];
-    [self presentViewController:controller animated:YES completion:NULL];
 }
 
 @end

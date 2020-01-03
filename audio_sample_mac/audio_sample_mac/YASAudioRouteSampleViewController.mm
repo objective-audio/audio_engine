@@ -248,7 +248,7 @@ struct engine_io_vc_cpp {
     self.deviceNames = titles;
 
     std::optional<NSUInteger> index = std::nullopt;
-    if (auto const io_device = _cpp->manager->io().value()->device()) {
+    if (auto const io_device = _cpp->manager->io().value()->raw_io()->device()) {
         auto const mac_device = std::dynamic_pointer_cast<audio::mac_device>(*io_device);
         index = audio::mac_device::index_of_device(mac_device);
     }
@@ -270,7 +270,7 @@ struct engine_io_vc_cpp {
     self->_cpp->manager->disconnect(_cpp->route->node());
     self->_cpp->route->clear_routes();
 
-    if (auto const &device_opt = _cpp->manager->io().value()->device()) {
+    if (auto const &device_opt = _cpp->manager->io().value()->raw_io()->device()) {
         auto const &device = *device_opt;
         if (device->output_channel_count() > 0) {
             if (auto const output_format = device->output_format()) {
@@ -388,7 +388,7 @@ struct engine_io_vc_cpp {
 
     auto const all_devices = audio::mac_device::all_devices();
 
-    _cpp->manager->io().value()->set_device(selected_device);
+    _cpp->manager->io().value()->raw_io()->set_device(selected_device);
 
     if (selected_device && std::find(all_devices.begin(), all_devices.end(), selected_device) != all_devices.end()) {
         auto unowned_self = objc_ptr_with_move_object([[YASUnownedObject alloc] initWithObject:self]);

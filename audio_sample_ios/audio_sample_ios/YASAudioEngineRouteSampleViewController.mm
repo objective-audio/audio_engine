@@ -9,6 +9,7 @@
 #import <objc_utils/yas_objc_unowned.h>
 #import "YASAudioEngineRouteSampleSelectionViewController.h"
 #import "YASAudioSliderCell.h"
+#import "YASViewControllerUtils.h"
 
 using namespace yas;
 
@@ -59,8 +60,7 @@ struct route_vc_cpp {
     }
 
     void connect_nodes() {
-        auto const device = std::dynamic_pointer_cast<audio::ios_device>(this->manager->io().value()->device().value());
-        if (auto const format = device->output_format()) {
+        if (auto const format = this->device->output_format()) {
             manager->connect(au_mixer->au()->node(), this->manager->io().value()->node(), *format);
             manager->connect(route->node(), au_mixer->au()->node(), *format);
             manager->connect(sine_tap->node(), route->node(), 0, uint32_t(route_sample::source::sine), *format);
@@ -219,13 +219,13 @@ struct route_vc_cpp {
 
     if (auto const result = self->_cpp.session->activate(); !result) {
         NSString *errorMessage = (__bridge NSString *)to_cf_object(result.error());
-        [self _showErrorAlertWithMessage:errorMessage];
+        [YASViewControllerUtils showErrorAlertWithMessage:errorMessage toViewController:self];
         return;
     }
 
     self->_cpp.manager->add_io(self->_cpp.device);
 
-    self->_cpp.au_mixer->set_input_volume(1.0, 0);
+    self->_cpp.au_mixer->set_input_volume(0.1, 0);
     self->_cpp.route->set_routes({{0, 0, 0, 0}, {0, 1, 0, 1}});
 
     double phase = 0;
@@ -267,7 +267,7 @@ struct route_vc_cpp {
     } else {
         auto const error_string = to_string(start_result.error());
         NSString *errorMessage = (__bridge NSString *)to_cf_object(error_string);
-        [self _showErrorAlertWithMessage:errorMessage];
+        [YASViewControllerUtils showErrorAlertWithMessage:errorMessage toViewController:self];
     }
 }
 
@@ -281,22 +281,6 @@ struct route_vc_cpp {
 }
 
 #pragma mark -
-
-- (void)_showErrorAlertWithMessage:(NSString *)message {
-    __weak typeof(self) wself = self;
-
-    UIAlertController *controller = [UIAlertController alertControllerWithTitle:@"Error"
-                                                                        message:message
-                                                                 preferredStyle:UIAlertControllerStyleAlert];
-
-    [controller addAction:[UIAlertAction actionWithTitle:@"OK"
-                                                   style:UIAlertActionStyleDefault
-                                                 handler:^(UIAlertAction *action) {
-                                                     [wself.navigationController popViewControllerAnimated:YES];
-                                                 }]];
-
-    [self presentViewController:controller animated:YES completion:NULL];
-}
 
 - (void)_updateSlider {
     if (self->_cpp.au_mixer) {

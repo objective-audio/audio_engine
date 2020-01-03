@@ -128,13 +128,15 @@ struct offline_vc_internal {
         this->play_au_mixer->set_output_volume(1.0f, 0);
         this->play_au_mixer->set_output_pan(0.0f, 0);
 
-        this->_io_observer = io->io_device_chain()
-                                 .perform([this](auto const &method) {
-                                     switch (method) {
-                                         case audio::io_device::method::updated:
+        this->_io_observer = io->raw_io()
+                                 ->device_chain()
+                                 .perform([this](auto const &pair) {
+                                     switch (pair.first) {
+                                         case audio::io::device_method::updated:
                                              this->_update_connection();
                                              break;
-                                         case audio::io_device::method::lost:
+                                         case audio::io::device_method::changed:
+                                         case audio::io::device_method::initial:
                                              break;
                                      }
                                  })
@@ -162,7 +164,7 @@ struct offline_vc_internal {
         }
 
         auto const &io_value = io.value();
-        auto const output_format = io_value->device().value()->output_format();
+        auto const output_format = io_value->raw_io()->device().value()->output_format();
 
         if (!output_format.has_value()) {
             return;
@@ -193,7 +195,7 @@ struct offline_vc_internal {
     void _update_connection() {
         if (auto const &io = this->play_manager->io()) {
             auto const &io_value = io.value();
-            if (auto const output_format = io_value->device().value()->output_format()) {
+            if (auto const output_format = io_value->raw_io()->device().value()->output_format()) {
                 this->play_manager->disconnect(io_value->node());
 
                 this->play_manager->connect(this->play_au_mixer->au()->node(), io_value->node(), *output_format);
