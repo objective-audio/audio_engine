@@ -143,6 +143,10 @@ void audio::ios_io_core::initialize() {
             this->_impl->_sink_node = sink_node;
         } else {
             std::cout << "ios_io_core input node format is not equal to device format." << std::endl;
+            std::cout << "    sample_rate node(" << node_format.sampleRate << ") device(" << sample_rate << ")"
+                      << std::endl;
+            std::cout << "    channel_count node(" << node_format.channelCount << ") device(" << channel_count << ")"
+                      << std::endl;
         }
     }
 

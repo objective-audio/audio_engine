@@ -414,6 +414,11 @@ std::optional<audio::format> audio::mac_device::output_format() const {
     return this->_output_format;
 }
 
+std::optional<audio::interruptor_ptr> const &audio::mac_device::interruptor() const {
+    static std::optional<interruptor_ptr> const _nullopt = std::nullopt;
+    return _nullopt;
+}
+
 audio::io_core_ptr audio::mac_device::make_io_core() const {
     return mac_io_core::make_shared(this->_weak_mac_device.lock());
 }

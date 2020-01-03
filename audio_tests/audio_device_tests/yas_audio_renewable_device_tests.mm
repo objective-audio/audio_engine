@@ -43,7 +43,7 @@ struct test_io_device : audio::io_device {
     bool const is_input;
     chaining::notifier_ptr<io_device::method> const notifier = chaining::notifier<io_device::method>::make_shared();
 
-    std::optional<audio::format> input_format() const {
+    std::optional<audio::format> input_format() const override {
         if (this->is_input) {
             return audio::format{{.sample_rate = 44100.0, .channel_count = 1}};
         } else {
@@ -51,7 +51,7 @@ struct test_io_device : audio::io_device {
         }
     }
 
-    std::optional<audio::format> output_format() const {
+    std::optional<audio::format> output_format() const override {
         if (this->is_input) {
             return std::nullopt;
         } else {
@@ -59,11 +59,16 @@ struct test_io_device : audio::io_device {
         }
     }
 
-    io_core_ptr make_io_core() const {
+    std::optional<interruptor_ptr> const &interruptor() const override {
+        static std::optional<interruptor_ptr> const _nullopt = std::nullopt;
+        return _nullopt;
+    }
+
+    io_core_ptr make_io_core() const override {
         return std::make_shared<test_io_core>();
     }
 
-    chaining::chain_unsync_t<io_device::method> io_device_chain() {
+    chaining::chain_unsync_t<io_device::method> io_device_chain() override {
         return this->notifier->chain();
     }
 

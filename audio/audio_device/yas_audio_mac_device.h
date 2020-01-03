@@ -59,8 +59,6 @@ struct mac_device : io_device {
 
     [[nodiscard]] chaining::chain_unsync_t<io_device::method> io_device_chain() override;
 
-    io_core_ptr make_io_core() const override;
-
     using listener_f =
         std::function<void(uint32_t const in_number_addresses, const AudioObjectPropertyAddress *const in_addresses)>;
 
@@ -97,6 +95,10 @@ struct mac_device : io_device {
     mac_device &operator=(mac_device &&) = delete;
     mac_device(mac_device const &) = delete;
     mac_device &operator=(mac_device const &) = delete;
+
+    std::optional<interruptor_ptr> const &interruptor() const override;
+
+    io_core_ptr make_io_core() const override;
 };
 }  // namespace yas::audio
 

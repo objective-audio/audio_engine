@@ -28,16 +28,18 @@ uint32_t audio::io_device::output_channel_count() const {
     }
 }
 
-std::optional<audio::io_device_ptr> audio::io_device::default_device() {
-#if TARGET_OS_IPHONE
-    return ios_device::make_shared();
-#elif TARGET_OS_MAC
-    if (auto const output_device = mac_device::default_output_device()) {
-        return output_device;
-    } else if (auto const input_device = mac_device::default_input_device()) {
-        return input_device;
+bool audio::io_device::is_interrupting() const {
+    if (auto const &interruptor = this->interruptor()) {
+        return interruptor.value()->is_interrupting();
+    } else {
+        return false;
+    }
+}
+
+std::optional<chaining::chain_unsync_t<audio::interruption_method>> audio::io_device::interruption_chain() const {
+    if (auto const interruptor = this->interruptor()) {
+        return interruptor.value()->interruption_chain();
     } else {
         return std::nullopt;
     }
-#endif
 }

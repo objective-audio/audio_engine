@@ -15,92 +15,144 @@ typedef NS_ENUM(NSUInteger, YASAudioEngineEffectsSampleSection) {
     YASAudioEngineEffectsSampleSectionCount,
 };
 
+namespace yas::sample {
 static const AudioComponentDescription baseAcd = {.componentType = kAudioUnitType_Effect,
                                                   .componentSubType = 0,
                                                   .componentManufacturer = kAudioUnitManufacturer_Apple,
                                                   .componentFlags = 0,
                                                   .componentFlagsMask = 0};
 
-@interface YASAudioEngineEffectsSampleViewController ()
+static std::vector<audio::avf_au_ptr> effect_units() {
+    std::vector<audio::avf_au_ptr> units;
 
-@end
+    AudioComponent component = NULL;
 
-namespace yas::sample {
-struct effects_vc_internal {
-    audio::engine::manager_ptr manager = audio::engine::manager::make_shared();
-    audio::engine::connection_ptr through_connection = nullptr;
-    audio::engine::tap_ptr tap = audio::engine::tap::make_shared();
-    audio::engine::avf_au_ptr effect_au = nullptr;
+    while (true) {
+        component = AudioComponentFindNext(component, &baseAcd);
+        if (component != NULL) {
+            AudioComponentDescription acd;
+            raise_if_raw_audio_error(AudioComponentGetDescription(component, &acd));
+
+            units.push_back(audio::avf_au::make_shared(acd));
+        } else {
+            break;
+        }
+    }
+
+    return units;
+}
+
+struct effects_vc_cpp {
+    std::optional<uint32_t> index = std::nullopt;
+    audio::ios_session_ptr const session = audio::ios_session::shared();
+    audio::ios_device_ptr const device = audio::ios_device::make_shared(this->session);
+    audio::engine::manager_ptr const manager = audio::engine::manager::make_shared();
+    audio::engine::tap_ptr const tap = audio::engine::tap::make_shared();
+    std::optional<audio::engine::connection_ptr> through_connection = std::nullopt;
+    std::optional<audio::engine::avf_au_ptr> effect_au = std::nullopt;
+    std::vector<audio::avf_au_ptr> units = effect_units();
     chaining::observer_pool _pool;
 
-    effects_vc_internal() {
-        this->manager->add_io();
+    void setup() {
+        this->manager->add_io(this->device);
+
+        if (this->units.size() == 0) {
+            AudioComponent component = NULL;
+
+            while (true) {
+                component = AudioComponentFindNext(component, &baseAcd);
+                if (component != NULL) {
+                    AudioComponentDescription acd;
+                    raise_if_raw_audio_error(AudioComponentGetDescription(component, &acd));
+
+                    this->units.push_back(audio::avf_au::make_shared(acd));
+                } else {
+                    break;
+                }
+            }
+        }
+
+        double phase = 0;
+
+        auto tap_render_handler = [phase](auto args) mutable {
+            auto &buffer = args.buffer;
+
+            buffer->clear();
+
+            double const start_phase = phase;
+            double const phase_per_frame = 1000.0 / buffer->format().sample_rate() * audio::math::two_pi;
+
+            auto each = audio::make_each_data<float>(*buffer);
+            auto const length = buffer->frame_length();
+
+            while (yas_each_data_next_ch(each)) {
+                if (yas_each_data_index(each) == 0) {
+                    phase = audio::math::fill_sine(yas_each_data_ptr(each), length, start_phase, phase_per_frame);
+                }
+            }
+        };
+
+        this->tap->set_render_handler(tap_render_handler);
+
+        this->replace_effect_au(nullptr);
+    }
+
+    void dispose() {
+        if (this->manager) {
+            this->manager->stop();
+        }
+
+        this->session->deactivate();
     }
 
     void replace_effect_au(const AudioComponentDescription *acd) {
-        if (this->effect_au) {
-            this->manager->disconnect(effect_au->node());
-            this->effect_au = nullptr;
+        this->_pool.invalidate();
+
+        if (auto const &effect_au = this->effect_au) {
+            this->manager->disconnect(effect_au.value()->node());
+            this->effect_au = std::nullopt;
         }
 
-        if (this->through_connection) {
-            this->manager->disconnect(through_connection);
-            this->through_connection = nullptr;
+        if (auto const &connection = this->through_connection) {
+            this->manager->disconnect(connection.value());
+            this->through_connection = std::nullopt;
         }
 
-        auto format = audio::format({.sample_rate = [AVAudioSession sharedInstance].sampleRate, .channel_count = 2});
+        auto format = audio::format({.sample_rate = this->session->sample_rate(), .channel_count = 2});
 
         if (acd) {
-            this->effect_au = audio::engine::avf_au::make_shared(*acd);
+            auto const effect_au = audio::engine::avf_au::make_shared(*acd);
 
-            this->_pool +=
-                this->effect_au->load_state_chain()
-                    .perform([this, format](auto const &state) {
-                        if (state == audio::avf_au::load_state::loaded) {
-                            this->manager->connect(effect_au->node(), this->manager->io().value()->node(), format);
-                            this->manager->connect(tap->node(), effect_au->node(), format);
-                        }
-                    })
-                    .sync();
+            this->effect_au = effect_au;
+
+            this->_pool += effect_au->load_state_chain()
+                               .perform([this, format](auto const &state) {
+                                   if (state == audio::avf_au::load_state::loaded) {
+                                       this->manager->connect(this->effect_au.value()->node(),
+                                                              this->manager->io().value()->node(), format);
+                                       this->manager->connect(tap->node(), this->effect_au.value()->node(), format);
+                                   }
+                               })
+                               .sync();
         } else {
-            through_connection = manager->connect(tap->node(), this->manager->io().value()->node(), format);
+            this->through_connection = manager->connect(this->tap->node(), this->manager->io().value()->node(), format);
         }
     }
 };
 }
 
+@interface YASAudioEngineEffectsSampleViewController ()
+@end
+
 @implementation YASAudioEngineEffectsSampleViewController {
-    std::vector<audio::avf_au_ptr> _units;
-    std::optional<uint32_t> _index;
-    sample::effects_vc_internal _internal;
+    sample::effects_vc_cpp _cpp;
 }
 
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
 
     if (self.isMovingToParentViewController) {
-        BOOL success = NO;
-        NSString *errorMessage = nil;
-        NSError *error = nil;
-
-        AVAudioSession *audioSession = [AVAudioSession sharedInstance];
-        if ([audioSession setCategory:AVAudioSessionCategoryPlayback error:&error]) {
-            [self setupAudioEngine];
-            auto start_result = _internal.manager->start_render();
-            if (start_result) {
-                success = YES;
-                [self.tableView reloadData];
-            } else {
-                auto const error_string = to_string(start_result.error());
-                errorMessage = (__bridge NSString *)to_cf_object(error_string);
-            }
-        } else {
-            errorMessage = error.description;
-        }
-
-        if (!success) {
-            [self _showErrorAlertWithMessage:errorMessage];
-        }
+        [self setup];
     }
 }
 
@@ -108,19 +160,12 @@ struct effects_vc_internal {
     [super viewWillDisappear:animated];
 
     if (self.isMovingFromParentViewController) {
-        if (_internal.manager) {
-            _internal.manager->stop();
-        }
-
-        NSError *error = nil;
-        if (![[AVAudioSession sharedInstance] setActive:NO error:&error]) {
-            NSLog(@"error : %@", error);
-        }
+        self->_cpp.dispose();
     }
 }
 
 - (BOOL)shouldPerformSegueWithIdentifier:(NSString *)identifier sender:(id)sender {
-    if (!_index) {
+    if (!self->_cpp.index) {
         return NO;
     }
     return YES;
@@ -130,60 +175,34 @@ struct effects_vc_internal {
     id destinationViewController = segue.destinationViewController;
     if ([destinationViewController isKindOfClass:[YASAudioEngineEffectsSampleEditViewController class]]) {
         YASAudioEngineEffectsSampleEditViewController *controller = destinationViewController;
-        [controller set_engine_au:_internal.effect_au];
+        [controller set_engine_au:self->_cpp.effect_au.value()];
     }
 }
 
-#pragma mark -
+- (void)setup {
+    self->_cpp.session->set_category(audio::ios_session::category::playback);
 
-- (void)setupAudioEngine {
-    if (_units.size() == 0) {
-        AudioComponent component = NULL;
-
-        while (true) {
-            component = AudioComponentFindNext(component, &baseAcd);
-            if (component != NULL) {
-                AudioComponentDescription acd;
-                raise_if_raw_audio_error(AudioComponentGetDescription(component, &acd));
-
-                _units.push_back(audio::avf_au::make_shared(acd));
-            } else {
-                break;
-            }
-        }
+    if (auto const result = self->_cpp.session->activate(); !result) {
+        NSString *errorMessage = (__bridge NSString *)to_cf_object(result.error());
+        [self _showErrorAlertWithMessage:errorMessage];
+        return;
     }
 
-    _internal = sample::effects_vc_internal();
+    self->_cpp.setup();
 
-    double phase = 0;
-
-    auto tap_render_handler = [phase](auto args) mutable {
-        auto &buffer = args.buffer;
-
-        buffer->clear();
-
-        double const start_phase = phase;
-        double const phase_per_frame = 1000.0 / buffer->format().sample_rate() * audio::math::two_pi;
-
-        auto each = audio::make_each_data<float>(*buffer);
-        auto const length = buffer->frame_length();
-
-        while (yas_each_data_next_ch(each)) {
-            if (yas_each_data_index(each) == 0) {
-                phase = audio::math::fill_sine(yas_each_data_ptr(each), length, start_phase, phase_per_frame);
-            }
-        }
-    };
-
-    _internal.tap->set_render_handler(tap_render_handler);
-
-    _internal.replace_effect_au(nullptr);
+    if (auto start_result = _cpp.manager->start_render()) {
+        [self.tableView reloadData];
+    } else {
+        auto const error_string = to_string(start_result.error());
+        NSString *errorMessage = (__bridge NSString *)to_cf_object(error_string);
+        [self _showErrorAlertWithMessage:errorMessage];
+    }
 }
 
 #pragma mark -
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    if (_internal.manager) {
+    if (_cpp.manager) {
         return YASAudioEngineEffectsSampleSectionCount;
     }
     return 0;
@@ -194,7 +213,7 @@ struct effects_vc_internal {
         case YASAudioEngineEffectsSampleSectionNone:
             return 1;
         case YASAudioEngineEffectsSampleSectionEffects:
-            return _units.size();
+            return self->_cpp.units.size();
         default:
             return 0;
     }
@@ -215,13 +234,13 @@ struct effects_vc_internal {
 
     if (indexPath.section == YASAudioEngineEffectsSampleSectionNone) {
         cell.textLabel.text = @"None";
-        if (!_index) {
+        if (!self->_cpp.index) {
             cell.accessoryType = UITableViewCellAccessoryCheckmark;
         }
     } else if (indexPath.section == YASAudioEngineEffectsSampleSectionEffects) {
-        auto const &unit = _units.at(indexPath.row);
+        auto const &unit = self->_cpp.units.at(indexPath.row);
         cell.textLabel.text = (__bridge NSString *)to_cf_object(unit->audio_unit_name());
-        if (_index && indexPath.row == *_index) {
+        if (self->_cpp.index && indexPath.row == self->_cpp.index.value()) {
             cell.accessoryType = UITableViewCellAccessoryCheckmark;
         }
     }
@@ -232,15 +251,15 @@ struct effects_vc_internal {
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     switch (indexPath.section) {
         case YASAudioEngineEffectsSampleSectionNone: {
-            _index = std::nullopt;
-            _internal.replace_effect_au(nullptr);
+            self->_cpp.index = std::nullopt;
+            _cpp.replace_effect_au(nullptr);
         } break;
         case YASAudioEngineEffectsSampleSectionEffects: {
-            _index = static_cast<uint32_t>(indexPath.row);
-            AudioComponentDescription acd = baseAcd;
-            auto const &unit = _units.at(indexPath.row);
+            self->_cpp.index = static_cast<uint32_t>(indexPath.row);
+            AudioComponentDescription acd = sample::baseAcd;
+            auto const &unit = self->_cpp.units.at(indexPath.row);
             acd.componentSubType = unit->componentDescription().componentSubType;
-            _internal.replace_effect_au(&acd);
+            _cpp.replace_effect_au(&acd);
         } break;
     }
 

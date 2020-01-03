@@ -42,6 +42,11 @@ struct test_io_device : io_device {
         return std::nullopt;
     }
 
+    std::optional<interruptor_ptr> const &interruptor() const override {
+        static std::optional<interruptor_ptr> const _nullopt = std::nullopt;
+        return _nullopt;
+    }
+
     io_core_ptr make_io_core() const override {
         return std::make_shared<test_io_core>();
     }
@@ -130,7 +135,7 @@ struct test_io_device : io_device {
 - (void)test_configuration_change_notification_by_updated {
     auto manager = audio::engine::manager::make_shared();
 
-    manager->add_io();
+    manager->add_io(std::nullopt);
 
     auto const device = std::make_shared<audio::test::test_io_device>();
 
@@ -148,7 +153,7 @@ struct test_io_device : io_device {
 - (void)test_configuration_change_notification_by_lost {
     auto manager = audio::engine::manager::make_shared();
 
-    manager->add_io();
+    manager->add_io(std::nullopt);
 
     auto const device = std::make_shared<audio::test::test_io_device>();
 
@@ -187,7 +192,7 @@ struct test_io_device : io_device {
 
     XCTAssertFalse(manager->io());
 
-    auto const &io = manager->add_io();
+    auto const &io = manager->add_io(std::nullopt);
 
     XCTAssertTrue(io);
     XCTAssertTrue(manager->io());

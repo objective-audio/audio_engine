@@ -32,7 +32,15 @@ struct engine_io_vc_cpp {
     std::optional<chaining::any_observer_ptr> device_observer = std::nullopt;
 
     engine_io_vc_cpp() {
-        this->manager->add_io();
+        std::optional<audio::mac_device_ptr> device = std::nullopt;
+
+        if (auto const output_device = audio::mac_device::default_output_device()) {
+            device = output_device;
+        } else if (auto const input_device = audio::mac_device::default_input_device()) {
+            device = input_device;
+        }
+
+        this->manager->add_io(device);
     }
 };
 }
