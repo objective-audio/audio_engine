@@ -21,7 +21,7 @@ using namespace yas;
 namespace yas::sample {
 struct input_tap_vc_cpp {
     audio::ios_session_ptr const session = audio::ios_session::shared();
-    audio::ios_device_ptr const device = audio::ios_device::make_shared(this->session);
+    audio::io_device_ptr const device = audio::ios_device::renewable_device(this->session);
     audio::engine::manager_ptr const manager = audio::engine::manager::make_shared();
     audio::engine::tap_ptr const input_tap = audio::engine::tap::make_shared({.is_input = true});
 
@@ -31,7 +31,7 @@ struct input_tap_vc_cpp {
     void setup() {
         auto const &io = this->manager->add_io(this->device);
 
-        double const sample_rate = this->device->sample_rate();
+        double const sample_rate = this->device->input_format()->sample_rate();
         uint32_t const ch_count = this->device->input_channel_count();
         audio::format format{{.sample_rate = sample_rate, .channel_count = ch_count}};
         manager->connect(io->node(), input_tap->node(), format);
