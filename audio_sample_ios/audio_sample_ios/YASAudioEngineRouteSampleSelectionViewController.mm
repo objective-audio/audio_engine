@@ -7,6 +7,8 @@
 #import <objc_utils/yas_objc_macros.h>
 #import "YASAudioEngineRouteSampleViewController.h"
 
+using namespace yas;
+
 @interface YASAudioEngineRouteSampleSelectionViewController ()
 
 @property (nonatomic, strong) NSIndexPath *selectedIndexPath;
@@ -39,18 +41,17 @@
 #pragma mark - Table view data source
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    return YASAudioEngineRouteSampleSelectionSectionCount;
+    return route_sample::selection_section_count;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    switch (section) {
-        case YASAudioEngineRouteSampleSelectionSectionNone:
+    switch (route_sample::selection_section(section)) {
+        case route_sample::selection_section::none:
             return 1;
-        case YASAudioEngineRouteSampleSelectionSectionSine:
-        case YASAudioEngineRouteSampleSelectionSectionInput:
-            return 2;
-        default:
-            break;
+        case route_sample::selection_section::sine:
+            return self.outputChannelCount;
+        case route_sample::selection_section::input:
+            return self.inputChannelCount;
     }
     return 0;
 }
@@ -58,18 +59,15 @@
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"Cell" forIndexPath:indexPath];
 
-    switch (indexPath.section) {
-        case YASAudioEngineRouteSampleSelectionSectionNone:
+    switch (route_sample::selection_section(indexPath.section)) {
+        case route_sample::selection_section::none:
             cell.textLabel.text = @"None";
             break;
-        case YASAudioEngineRouteSampleSelectionSectionSine:
+        case route_sample::selection_section::sine:
             cell.textLabel.text = [NSString stringWithFormat:@"Sine ch : %@", @(indexPath.row)];
             break;
-        case YASAudioEngineRouteSampleSelectionSectionInput:
+        case route_sample::selection_section::input:
             cell.textLabel.text = [NSString stringWithFormat:@"Input ch : %@", @(indexPath.row)];
-            break;
-
-        default:
             break;
     }
 

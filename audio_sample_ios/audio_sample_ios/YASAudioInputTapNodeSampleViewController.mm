@@ -19,23 +19,20 @@ using namespace yas;
 @end
 
 namespace yas::sample {
-struct input_tap_vc_internal {
-    audio::engine::manager_ptr manager = audio::engine::manager::make_shared();
-    audio::engine::tap_ptr input_tap = audio::engine::tap::make_shared({.is_input = true});
+struct input_tap_vc_cpp {
+    audio::ios_session_ptr const session = audio::ios_session::shared();
+    audio::ios_device_ptr const device = audio::ios_device::make_shared(this->session);
+    audio::engine::manager_ptr const manager = audio::engine::manager::make_shared();
+    audio::engine::tap_ptr const input_tap = audio::engine::tap::make_shared({.is_input = true});
 
     chaining::value::holder_ptr<float> input_level =
         chaining::value::holder<float>::make_shared(audio::math::decibel_from_linear(0.0f));
 
-    input_tap_vc_internal() {
-        this->manager->add_io();
-    }
+    void setup() {
+        auto const &io = this->manager->add_io(this->device);
 
-    void prepare() {
-        auto const &io = this->manager->io().value();
-        audio::ios_device_ptr const device = std::dynamic_pointer_cast<audio::ios_device>(io->device().value());
-
-        double const sample_rate = device->sample_rate();
-        uint32_t const ch_count = device->input_channel_count();
+        double const sample_rate = this->device->sample_rate();
+        uint32_t const ch_count = this->device->input_channel_count();
         audio::format format{{.sample_rate = sample_rate, .channel_count = ch_count}};
         manager->connect(io->node(), input_tap->node(), format);
 
@@ -57,16 +54,15 @@ struct input_tap_vc_internal {
         });
     }
 
-    void stop() {
-        manager->stop();
-
-        [[AVAudioSession sharedInstance] setActive:NO error:nil];
+    void dispose() {
+        this->manager->stop();
+        this->session->deactivate();
     }
 };
 }
 
 @implementation YASAudioInputTapNodeSampleViewController {
-    sample::input_tap_vc_internal _internal;
+    sample::input_tap_vc_cpp _cpp;
     CFTimeInterval _lastLabelUpdatedTime;
 }
 
@@ -84,17 +80,7 @@ struct input_tap_vc_internal {
     [super viewDidAppear:animated];
 
     if (self.isMovingToParentViewController) {
-        NSError *error = nil;
-
-        if ([[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryRecord error:&error]) {
-            [[AVAudioSession sharedInstance] setActive:YES error:&error];
-        }
-
-        if (!error) {
-            [self setup];
-        } else {
-            [self _showErrorAlertWithMessage:error.description];
-        }
+        [self setup];
     }
 }
 
@@ -103,13 +89,11 @@ struct input_tap_vc_internal {
 
     if (self.isMovingFromParentViewController) {
         [self dispose];
-
-        [[AVAudioSession sharedInstance] setActive:NO error:nil];
     }
 }
 
 - (void)updateUI:(CADisplayLink *)sender {
-    float value = _internal.input_level->raw();
+    float value = self->_cpp.input_level->raw();
 
     self.progressView.progress = std::max((value + 72.0f) / 72.0f, 0.0f);
 
@@ -123,11 +107,16 @@ struct input_tap_vc_internal {
 #pragma mark -
 
 - (void)setup {
-    _internal.prepare();
+    self->_cpp.session->set_category(audio::ios_session::category::record);
 
-    auto start_result = _internal.manager->start_render();
+    if (auto const result = self->_cpp.session->activate(); !result) {
+        [self _showErrorAlertWithMessage:(__bridge NSString *)to_cf_object(result.error())];
+        return;
+    }
 
-    if (start_result) {
+    self->_cpp.setup();
+
+    if (auto start_result = self->_cpp.manager->start_render()) {
         self.displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(updateUI:)];
         [self.displayLink addToRunLoop:[NSRunLoop mainRunLoop] forMode:NSDefaultRunLoopMode];
     } else {
@@ -141,7 +130,7 @@ struct input_tap_vc_internal {
     [self.displayLink invalidate];
     self.displayLink = nil;
 
-    _internal.manager->stop();
+    self->_cpp.dispose();
 }
 
 #pragma mark -

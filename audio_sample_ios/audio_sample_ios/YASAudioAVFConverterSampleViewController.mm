@@ -15,6 +15,8 @@ using namespace yas;
 
 namespace yas::sample {
 struct avf_converter_vc_cpp {
+    audio::ios_session_ptr const session = audio::ios_session::shared();
+    audio::ios_device_ptr const device = audio::ios_device::make_shared(this->session);
     audio::engine::manager_ptr const _manager;
     audio::engine::avf_au_ptr const _converter;
     audio::engine::tap_ptr _tap;
@@ -28,9 +30,9 @@ struct avf_converter_vc_cpp {
     }
 
     void setup() {
-        auto const &io = this->_manager->add_io();
+        auto const &io = this->_manager->add_io(this->device);
 
-        auto const output_format = io->device().value()->output_format();
+        auto const output_format = this->device->output_format();
         double const output_sample_rate = output_format->sample_rate();
         double const input_sample_rate = output_sample_rate == 44100 ? 22050 : 44100;
         auto asbd = output_format->stream_description();
@@ -50,7 +52,6 @@ struct avf_converter_vc_cpp {
 
         this->_pool += this->_converter->load_state_chain()
                            .perform([this](auto const &state) {
-                               std::cout << "load_state : " << to_string(state) << std::endl;
                                if (state == audio::engine::avf_au::load_state::loaded) {
                                    this->_manager->start_render();
                                }
@@ -86,17 +87,14 @@ struct avf_converter_vc_cpp {
     [super viewDidAppear:animated];
 
     if (self.isMovingToParentViewController) {
-        NSError *error = nil;
+        self->_cpp.session->set_category(audio::ios_session::category::playback);
 
-        if ([[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:&error]) {
-            [[AVAudioSession sharedInstance] setActive:YES error:&error];
-        }
-
-        if (!error) {
+        if (auto const result = self->_cpp.session->activate()) {
             self->_cpp.setup();
             self.volumeSlider.value = self->_cpp._kernel->sine_volume();
         } else {
-            [YASViewControllerUtils showErrorAlertWithMessage:error.description toViewController:self];
+            [YASViewControllerUtils showErrorAlertWithMessage:(__bridge NSString *)to_cf_object(result.error())
+                                             toViewController:self];
         }
     }
 }
@@ -105,7 +103,7 @@ struct avf_converter_vc_cpp {
     if (self.isMovingFromParentViewController) {
         self->_cpp.dispose();
 
-        [[AVAudioSession sharedInstance] setActive:NO error:nil];
+        self->_cpp.session->deactivate();
     }
 
     [super viewWillDisappear:animated];

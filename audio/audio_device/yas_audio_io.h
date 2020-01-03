@@ -17,11 +17,12 @@ struct io final {
     void set_device(std::optional<io_device_ptr> const &);
     [[nodiscard]] std::optional<io_device_ptr> const &device() const;
     [[nodiscard]] bool is_running() const;
+    [[nodiscard]] bool is_interrupting() const;
     void set_render_handler(std::optional<io_render_f>);
     void set_maximum_frames_per_slice(uint32_t const);
     [[nodiscard]] uint32_t maximum_frames_per_slice() const;
 
-    bool start();
+    void start();
     void stop();
 
     [[nodiscard]] std::optional<pcm_buffer_ptr> const &input_buffer_on_render() const;
@@ -36,7 +37,8 @@ struct io final {
     bool _is_running = false;
     std::optional<io_render_f> _render_handler = std::nullopt;
     uint32_t _maximum_frames = 4096;
-    std::optional<chaining::any_observer_ptr> _observer;
+    std::optional<chaining::any_observer_ptr> _device_observer = std::nullopt;
+    std::optional<chaining::any_observer_ptr> _interruption_observer = std::nullopt;
 
     io();
 
@@ -44,5 +46,11 @@ struct io final {
     void _uninitialize();
 
     void _reload();
+    void _stop_io_core();
+    void _start_io_core();
+
+    void _setup_interruption_observer();
+    void _dispose_interruption_observer();
+    std::optional<chaining::chain_unsync_t<interruption_method>> _interruption_chain() const;
 };
 }  // namespace yas::audio

@@ -34,6 +34,8 @@ struct renewable_device : io_device {
 
     renewable_device(device_f const &, renewal_f const &);
 
+    std::optional<interruptor_ptr> const &interruptor() const override;
+
     io_core_ptr make_io_core() const override;
 
     void _renewal_device();

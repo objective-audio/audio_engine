@@ -18,18 +18,9 @@
 
 using namespace yas;
 
-#pragma mark - core
-
-struct audio::engine::io::core {
-#if TARGET_OS_IPHONE
-    std::optional<objc_ptr<>> _did_become_active_observer = std::nullopt;
-    std::optional<objc_ptr<>> _interruption_observer = std::nullopt;
-#endif
-};
-
 #pragma mark - audio::engine::io
 
-audio::engine::io::io() : _core(std::make_unique<core>()) {
+audio::engine::io::io() : _notifier(chaining::notifier<io_device::method>::make_shared()) {
 }
 
 audio::engine::io::~io() = default;
@@ -224,61 +215,7 @@ bool audio::engine::io::_validate_connections() {
     return true;
 }
 
-void audio::engine::io::_setup_notifications() {
-#if TARGET_OS_IPHONE
-    if (!this->_core->_did_become_active_observer) {
-        auto const lambda = [this](NSNotification *note) {
-            if (this->_running) {
-                this->_start_raw_io();
-            }
-        };
-        id observer = [[NSNotificationCenter defaultCenter] addObserverForName:UIApplicationDidBecomeActiveNotification
-                                                                        object:nil
-                                                                         queue:[NSOperationQueue mainQueue]
-                                                                    usingBlock:std::move(lambda)];
-        this->_core->_did_become_active_observer = objc_ptr<>(observer);
-    }
-
-    if (!this->_core->_interruption_observer) {
-        auto const lambda = [this](NSNotification *note) {
-            NSNumber *typeNum = [note.userInfo valueForKey:AVAudioSessionInterruptionTypeKey];
-            AVAudioSessionInterruptionType interruptionType =
-                static_cast<AVAudioSessionInterruptionType>([typeNum unsignedIntegerValue]);
-
-            switch (interruptionType) {
-                case AVAudioSessionInterruptionTypeBegan:
-                    this->_is_interrupting = true;
-                    this->_stop_raw_io();
-                    break;
-                case AVAudioSessionInterruptionTypeEnded:
-                    if ([UIApplication sharedApplication].applicationState == UIApplicationStateActive) {
-                        if (this->_running) {
-                            this->_start_raw_io();
-                        }
-                        this->_is_interrupting = false;
-                    }
-                    break;
-            }
-        };
-        id observer = [[NSNotificationCenter defaultCenter] addObserverForName:AVAudioSessionInterruptionNotification
-                                                                        object:nil
-                                                                         queue:[NSOperationQueue mainQueue]
-                                                                    usingBlock:std::move(lambda)];
-        this->_core->_interruption_observer = objc_ptr<>(observer);
-    }
-#endif
-}
-
-void audio::engine::io::_dispose_notifications() {
-#if TARGET_OS_IPHONE
-    this->_core->_did_become_active_observer = std::nullopt;
-    this->_core->_interruption_observer = std::nullopt;
-#endif
-}
-
 void audio::engine::io::_start_raw_io() {
-    this->_setup_notifications();
-
     if (auto const &raw_io = this->_raw_io) {
         raw_io.value()->start();
     }
@@ -288,8 +225,6 @@ void audio::engine::io::_stop_raw_io() {
     if (auto const &raw_io = this->_raw_io) {
         raw_io.value()->stop();
     }
-
-    this->_dispose_notifications();
 }
 
 audio::engine::io_ptr audio::engine::io::make_shared() {

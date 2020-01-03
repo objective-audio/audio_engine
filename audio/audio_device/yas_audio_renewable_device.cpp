@@ -21,6 +21,10 @@ std::optional<audio::format> audio::renewable_device::output_format() const {
     return this->_device->output_format();
 }
 
+std::optional<audio::interruptor_ptr> const &audio::renewable_device::interruptor() const {
+    return this->_device->interruptor();
+}
+
 audio::io_core_ptr audio::renewable_device::make_io_core() const {
     return this->_device->make_io_core();
 }

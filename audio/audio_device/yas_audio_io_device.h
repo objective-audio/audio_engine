@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "yas_audio_interruptor.h"
 #include "yas_audio_io_core.h"
 
 namespace yas::audio {
@@ -15,11 +16,14 @@ struct io_device {
 
     [[nodiscard]] virtual io_core_ptr make_io_core() const = 0;
 
+    [[nodiscard]] virtual std::optional<interruptor_ptr> const &interruptor() const = 0;
+
     [[nodiscard]] virtual chaining::chain_unsync_t<io_device::method> io_device_chain() = 0;
 
     [[nodiscard]] uint32_t input_channel_count() const;
     [[nodiscard]] uint32_t output_channel_count() const;
 
-    static std::optional<io_device_ptr> default_device();
+    [[nodiscard]] bool is_interrupting() const;
+    [[nodiscard]] std::optional<chaining::chain_unsync_t<interruption_method>> interruption_chain() const;
 };
 }  // namespace yas::audio

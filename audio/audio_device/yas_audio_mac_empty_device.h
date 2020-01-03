@@ -21,6 +21,8 @@ struct mac_empty_device : io_device {
     std::optional<audio::format> input_format() const override;
     std::optional<audio::format> output_format() const override;
 
+    std::optional<interruptor_ptr> const &interruptor() const override;
+
     io_core_ptr make_io_core() const override;
 
     [[nodiscard]] chaining::chain_unsync_t<io_device::method> io_device_chain() override;

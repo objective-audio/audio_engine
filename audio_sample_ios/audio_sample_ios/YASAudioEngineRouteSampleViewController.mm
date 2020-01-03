@@ -12,19 +12,18 @@
 
 using namespace yas;
 
-static uint32_t const YASAudioEngineRouteSampleDestinationChannelCount = 2;
-
-typedef NS_ENUM(NSUInteger, YASAudioEngineRouteSampleSection) {
-    YASAudioEngineRouteSampleSectionSlider,
-    YASAudioEngineRouteSampleSectionDestinations,
-    YASAudioEngineRouteSampleSectionCount,
+namespace yas::route_sample {
+enum class section : uint32_t {
+    slider,
+    destinations,
 };
+static std::size_t constexpr section_count = 2;
 
-typedef NS_ENUM(NSUInteger, YASAudioEngineRouteSampleSourceIndex) {
-    YASAudioEngineRouteSampleSourceIndexSine,
-    YASAudioEngineRouteSampleSourceIndexInput,
-    YASAudioEngineRouteSampleSourceIndexCount,
+enum class source : uint32_t {
+    sine,
+    input,
 };
+}
 
 @interface YASAudioEngineRouteSampleViewController ()
 
@@ -33,16 +32,23 @@ typedef NS_ENUM(NSUInteger, YASAudioEngineRouteSampleSourceIndex) {
 @end
 
 namespace yas::sample {
-struct route_vc_internal {
-    audio::engine::manager_ptr manager = audio::engine::manager::make_shared();
-    audio::engine::avf_au_mixer_ptr au_mixer = audio::engine::avf_au_mixer::make_shared();
-    std::shared_ptr<audio::engine::route> route = audio::engine::route::make_shared();
-    audio::engine::tap_ptr sine_tap = audio::engine::tap::make_shared();
+struct route_vc_cpp {
+    audio::ios_session_ptr const session = audio::ios_session::shared();
+    audio::ios_device_ptr const device = audio::ios_device::make_shared(this->session);
+    audio::engine::manager_ptr const manager = audio::engine::manager::make_shared();
+    audio::engine::avf_au_mixer_ptr const au_mixer = audio::engine::avf_au_mixer::make_shared();
+    std::shared_ptr<audio::engine::route> const route = audio::engine::route::make_shared();
+    audio::engine::tap_ptr const sine_tap = audio::engine::tap::make_shared();
 
     chaining::any_observer_ptr engine_observer = nullptr;
 
-    route_vc_internal() {
-        this->manager->add_io();
+    bool is_setup() {
+        return this->manager->io().has_value();
+    }
+
+    void dispose() {
+        this->manager->stop();
+        this->session->deactivate();
     }
 
     void disconnectNodes() {
@@ -54,19 +60,21 @@ struct route_vc_internal {
 
     void connect_nodes() {
         auto const device = std::dynamic_pointer_cast<audio::ios_device>(this->manager->io().value()->device().value());
-        auto const format = audio::format({.sample_rate = device->sample_rate(), .channel_count = 2});
-
-        manager->connect(au_mixer->au()->node(), this->manager->io().value()->node(), format);
-        manager->connect(route->node(), au_mixer->au()->node(), format);
-        manager->connect(sine_tap->node(), route->node(), 0, YASAudioEngineRouteSampleSourceIndexSine, format);
-        manager->connect(this->manager->io().value()->node(), route->node(), 0,
-                         YASAudioEngineRouteSampleSourceIndexInput, format);
+        if (auto const format = device->output_format()) {
+            manager->connect(au_mixer->au()->node(), this->manager->io().value()->node(), *format);
+            manager->connect(route->node(), au_mixer->au()->node(), *format);
+            manager->connect(sine_tap->node(), route->node(), 0, uint32_t(route_sample::source::sine), *format);
+        }
+        if (auto const format = device->input_format()) {
+            manager->connect(this->manager->io().value()->node(), route->node(), 0,
+                             uint32_t(route_sample::source::input), *format);
+        }
     }
 };
 }
 
 @implementation YASAudioEngineRouteSampleViewController {
-    sample::route_vc_internal _internal;
+    sample::route_vc_cpp _cpp;
 }
 
 - (void)dealloc {
@@ -81,29 +89,7 @@ struct route_vc_internal {
     [super viewDidAppear:animated];
 
     if (self.isMovingToParentViewController) {
-        BOOL success = NO;
-        NSString *errorMessage = nil;
-        NSError *error = nil;
-
-        if ([[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayAndRecord error:&error]) {
-            [self setupEngine];
-
-            auto const start_result = _internal.manager->start_render();
-            if (start_result) {
-                [self.tableView reloadData];
-                [self _updateSlider];
-                success = YES;
-            } else {
-                auto const error_string = to_string(start_result.error());
-                errorMessage = (__bridge NSString *)to_cf_object(error_string);
-            }
-        } else {
-            errorMessage = error.description;
-        }
-
-        if (!success) {
-            [self _showErrorAlertWithMessage:errorMessage];
-        }
+        [self setup];
     }
 }
 
@@ -111,11 +97,7 @@ struct route_vc_internal {
     [super viewWillDisappear:animated];
 
     if (self.isMovingFromParentViewController) {
-        if (_internal.manager) {
-            _internal.manager->stop();
-        }
-
-        [[AVAudioSession sharedInstance] setActive:NO error:nil];
+        self->_cpp.dispose();
     }
 }
 
@@ -124,6 +106,8 @@ struct route_vc_internal {
     if ([destinationViewController isKindOfClass:[YASAudioEngineRouteSampleSelectionViewController class]]) {
         YASAudioEngineRouteSampleSelectionViewController *controller = destinationViewController;
         NSIndexPath *indexPath = [self.tableView indexPathForCell:cell];
+        controller.outputChannelCount = self->_cpp.device->output_channel_count();
+        controller.inputChannelCount = self->_cpp.device->input_channel_count();
         controller.fromCellIndexPath = indexPath;
     }
 }
@@ -137,22 +121,27 @@ struct route_vc_internal {
 
         if (selectedIndexPath) {
             auto const dst_bus_idx = 0;
-            auto const dst_ch_idx = static_cast<uint32_t>(fromIndexPath.row);
+            auto const dst_ch_idx = uint32_t(fromIndexPath.row);
             uint32_t src_bus_idx = -1;
             uint32_t src_ch_idx = -1;
 
-            if (selectedIndexPath.section == YASAudioEngineRouteSampleSelectionSectionSine) {
-                src_bus_idx = YASAudioEngineRouteSampleSourceIndexSine;
-                src_ch_idx = static_cast<uint32_t>(selectedIndexPath.row);
-            } else if (selectedIndexPath.section == YASAudioEngineRouteSampleSelectionSectionInput) {
-                src_bus_idx = YASAudioEngineRouteSampleSourceIndexInput;
-                src_ch_idx = static_cast<uint32_t>(selectedIndexPath.row);
+            switch (route_sample::selection_section(selectedIndexPath.section)) {
+                case route_sample::selection_section::sine:
+                    src_bus_idx = uint32_t(route_sample::source::sine);
+                    src_ch_idx = uint32_t(selectedIndexPath.row);
+                    break;
+                case route_sample::selection_section::input:
+                    src_bus_idx = uint32_t(route_sample::source::input);
+                    src_ch_idx = uint32_t(selectedIndexPath.row);
+                    break;
+                case route_sample::selection_section::none:
+                    break;
             }
 
             if (src_bus_idx == -1 || src_ch_idx == -1) {
-                _internal.route->remove_route_for_destination({dst_bus_idx, dst_ch_idx});
+                self->_cpp.route->remove_route_for_destination({dst_bus_idx, dst_ch_idx});
             } else {
-                _internal.route->add_route({src_bus_idx, src_ch_idx, dst_bus_idx, dst_ch_idx});
+                self->_cpp.route->add_route({src_bus_idx, src_ch_idx, dst_bus_idx, dst_ch_idx});
             }
 
             [self.tableView reloadSections:[NSIndexSet indexSetWithIndex:fromIndexPath.section]
@@ -164,41 +153,35 @@ struct route_vc_internal {
 #pragma mark - Table view data source
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    if (!_internal.manager) {
+    if (self->_cpp.is_setup()) {
+        return route_sample::section_count;
+    } else {
         return 0;
     }
-
-    return YASAudioEngineRouteSampleSectionCount;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    if (!_internal.manager) {
-        return 0;
-    }
-
-    switch (section) {
-        case YASAudioEngineRouteSampleSectionSlider:
+    switch (route_sample::section(section)) {
+        case route_sample::section::slider:
             return 1;
-        case YASAudioEngineRouteSampleSectionDestinations:
-            return YASAudioEngineRouteSampleDestinationChannelCount;
-        default:
-            break;
+        case route_sample::section::destinations:
+            return self->_cpp.device->output_channel_count();
     }
     return 0;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    switch (indexPath.section) {
-        case YASAudioEngineRouteSampleSectionSlider: {
+    switch (route_sample::section(indexPath.section)) {
+        case route_sample::section::slider: {
             YASAudioSliderCell *cell =
                 [tableView dequeueReusableCellWithIdentifier:@"SliderCell" forIndexPath:indexPath];
             return cell;
         }
 
-        case YASAudioEngineRouteSampleSectionDestinations: {
+        case route_sample::section::destinations: {
             UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"Cell" forIndexPath:indexPath];
-            auto const &routes = _internal.route->routes();
-            audio::route::point dst_point{0, static_cast<uint32_t>(indexPath.row)};
+            auto const &routes = self->_cpp.route->routes();
+            audio::route::point dst_point{0, uint32_t(indexPath.row)};
             auto it = std::find_if(routes.begin(), routes.end(),
                                    [dst_point = std::move(dst_point)](const audio::route &route) {
                                        return route.destination == dst_point;
@@ -224,18 +207,26 @@ struct route_vc_internal {
 
 - (IBAction)volumeSliderChanged:(UISlider *)sender {
     float const value = sender.value;
-    if (_internal.au_mixer) {
-        _internal.au_mixer->set_input_volume(value, 0);
+    if (self->_cpp.au_mixer) {
+        self->_cpp.au_mixer->set_input_volume(value, 0);
     }
 }
 
 #pragma mark -
 
-- (void)setupEngine {
-    _internal = sample::route_vc_internal();
+- (void)setup {
+    self->_cpp.session->set_category(audio::ios_session::category::play_and_record);
 
-    _internal.au_mixer->set_input_volume(1.0, 0);
-    _internal.route->set_routes({{0, 0, 0, 0}, {0, 1, 0, 1}});
+    if (auto const result = self->_cpp.session->activate(); !result) {
+        NSString *errorMessage = (__bridge NSString *)to_cf_object(result.error());
+        [self _showErrorAlertWithMessage:errorMessage];
+        return;
+    }
+
+    self->_cpp.manager->add_io(self->_cpp.device);
+
+    self->_cpp.au_mixer->set_input_volume(1.0, 0);
+    self->_cpp.route->set_routes({{0, 0, 0, 0}, {0, 1, 0, 1}});
 
     double phase = 0;
 
@@ -255,12 +246,12 @@ struct route_vc_internal {
         }
     };
 
-    _internal.sine_tap->set_render_handler(tap_render_handler);
+    self->_cpp.sine_tap->set_render_handler(tap_render_handler);
 
     auto unowned_self = objc_ptr_with_move_object([[YASUnownedObject alloc] initWithObject:self]);
 
-    _internal.engine_observer =
-        _internal.manager->chain()
+    self->_cpp.engine_observer =
+        self->_cpp.manager->chain()
             .perform([unowned_self](auto const &) {
                 if ([UIApplication sharedApplication].applicationState == UIApplicationStateActive) {
                     [[unowned_self.object() object] _updateEngine];
@@ -268,12 +259,22 @@ struct route_vc_internal {
             })
             .end();
 
-    _internal.connect_nodes();
+    self->_cpp.connect_nodes();
+
+    if (auto const start_result = self->_cpp.manager->start_render()) {
+        [self.tableView reloadData];
+        [self _updateSlider];
+    } else {
+        auto const error_string = to_string(start_result.error());
+        NSString *errorMessage = (__bridge NSString *)to_cf_object(error_string);
+        [self _showErrorAlertWithMessage:errorMessage];
+    }
 }
 
 - (void)_updateEngine {
-    _internal.disconnectNodes();
-    _internal.connect_nodes();
+    self->_cpp.engine_observer = nullptr;
+    self->_cpp.disconnectNodes();
+    self->_cpp.connect_nodes();
 
     [self.tableView reloadData];
     [self _updateSlider];
@@ -282,26 +283,30 @@ struct route_vc_internal {
 #pragma mark -
 
 - (void)_showErrorAlertWithMessage:(NSString *)message {
+    __weak typeof(self) wself = self;
+
     UIAlertController *controller = [UIAlertController alertControllerWithTitle:@"Error"
                                                                         message:message
                                                                  preferredStyle:UIAlertControllerStyleAlert];
+
     [controller addAction:[UIAlertAction actionWithTitle:@"OK"
                                                    style:UIAlertActionStyleDefault
                                                  handler:^(UIAlertAction *action) {
-                                                     [self.navigationController popViewControllerAnimated:YES];
+                                                     [wself.navigationController popViewControllerAnimated:YES];
                                                  }]];
+
     [self presentViewController:controller animated:YES completion:NULL];
 }
 
 - (void)_updateSlider {
-    if (_internal.au_mixer) {
-        NSIndexPath *indexPath = [NSIndexPath indexPathForRow:0 inSection:YASAudioEngineRouteSampleSectionSlider];
+    if (self->_cpp.au_mixer) {
+        NSIndexPath *indexPath = [NSIndexPath indexPathForRow:0 inSection:NSUInteger(route_sample::section::slider)];
         UITableViewCell *cell = [self.tableView cellForRowAtIndexPath:indexPath];
         if (cell) {
             for (UIView *view in cell.contentView.subviews) {
                 if ([view isKindOfClass:[UISlider class]]) {
                     UISlider *slider = (UISlider *)view;
-                    slider.value = _internal.au_mixer->input_volume(0);
+                    slider.value = self->_cpp.au_mixer->input_volume(0);
                 }
             }
         }
