@@ -11,6 +11,7 @@
 #include "yas_audio_engine_io.h"
 #include "yas_audio_engine_node.h"
 #include "yas_audio_engine_offline_output.h"
+#include "yas_audio_io.h"
 
 #if TARGET_OS_IPHONE
 #include "yas_audio_ios_device.h"
@@ -135,18 +136,13 @@ std::optional<audio::engine::offline_output_ptr> const &audio::engine::manager::
 
 audio::engine::io_ptr const &audio::engine::manager::add_io(std::optional<io_device_ptr> const &device) {
     if (!this->_io) {
-        audio::engine::io_ptr const io = audio::engine::io::make_shared();
-        io->set_device(device);
+        audio::io_ptr const raw_io = audio::io::make_shared(device);
+        audio::engine::io_ptr const io = audio::engine::io::make_shared(raw_io);
 
         this->_io = io;
 
-        if (this->_is_running) {
-            auto manageable = engine::manageable_io::cast(io);
-            manageable->add_raw_io();
-        }
-
         this->_io_observer =
-            io->io_device_chain().to_value(method::configuration_change).send_to(this->_notifier).end();
+            io->raw_io()->device_chain().to_value(method::configuration_change).send_to(this->_notifier).end();
     }
 
     return this->_io.value();
@@ -155,12 +151,7 @@ audio::engine::io_ptr const &audio::engine::manager::add_io(std::optional<io_dev
 void audio::engine::manager::remove_io() {
     if (this->_io) {
         this->_io_observer = std::nullopt;
-
-        if (auto const &engine_io = this->_io) {
-            engine::manageable_io::cast(engine_io.value())->remove_raw_io();
-
-            this->_io = std::nullopt;
-        }
+        this->_io = std::nullopt;
     }
 }
 
@@ -308,11 +299,6 @@ void audio::engine::manager::_detach_node_if_unused(audio::engine::node_ptr cons
 }
 
 bool audio::engine::manager::_setup_rendering() {
-    if (auto const &engine_io = this->_io) {
-        auto manageable = engine::manageable_io::cast(engine_io.value());
-        manageable->add_raw_io();
-    }
-
     for (auto &node : this->_nodes) {
         this->_setup_node(node);
     }
@@ -342,11 +328,6 @@ void audio::engine::manager::_dispose_rendering() {
     }
 
     this->_update_all_node_connections();
-
-    if (auto const &engine_io = this->_io) {
-        auto manageable = engine::manageable_io::cast(engine_io.value());
-        manageable->remove_raw_io();
-    }
 }
 
 void audio::engine::manager::_disconnect_node_with_predicate(std::function<bool(connection const &)> predicate) {

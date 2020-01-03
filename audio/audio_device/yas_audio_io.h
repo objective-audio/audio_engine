@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <chaining/yas_chaining_umbrella.h>
 #include "yas_audio_io_device.h"
 #include "yas_audio_io_kernel.h"
 #include "yas_audio_ptr.h"
@@ -12,6 +13,14 @@
 
 namespace yas::audio {
 struct io final {
+    enum class device_method {
+        initial,
+        changed,
+        updated,
+    };
+
+    using device_chaining_pair_t = std::pair<device_method, std::optional<io_device_ptr>>;
+
     ~io();
 
     void set_device(std::optional<io_device_ptr> const &);
@@ -25,22 +34,27 @@ struct io final {
     void start();
     void stop();
 
+    chaining::chain_sync_t<device_chaining_pair_t> device_chain() const;
+
     [[nodiscard]] std::optional<pcm_buffer_ptr> const &input_buffer_on_render() const;
     [[nodiscard]] std::optional<time_ptr> const &input_time_on_render() const;
 
     [[nodiscard]] static io_ptr make_shared(std::optional<io_device_ptr> const &);
 
    private:
-    std::weak_ptr<io> _weak_io;
-    std::optional<io_device_ptr> _device = std::nullopt;
+    chaining::value::holder_ptr<std::optional<io_device_ptr>> _device =
+        chaining::value::holder<std::optional<io_device_ptr>>::make_shared(std::nullopt);
     std::optional<io_core_ptr> _io_core = std::nullopt;
     bool _is_running = false;
     std::optional<io_render_f> _render_handler = std::nullopt;
     uint32_t _maximum_frames = 4096;
-    std::optional<chaining::any_observer_ptr> _device_observer = std::nullopt;
+
+    chaining::fetcher_ptr<device_chaining_pair_t> _device_fetcher;
+    std::optional<chaining::any_observer_ptr> _device_changed_observer;
+    std::optional<chaining::any_observer_ptr> _device_updated_observer = std::nullopt;
     std::optional<chaining::any_observer_ptr> _interruption_observer = std::nullopt;
 
-    io();
+    io(std::optional<io_device_ptr> const &);
 
     void _initialize();
     void _uninitialize();
