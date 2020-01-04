@@ -53,7 +53,8 @@ std::optional<audio::format> audio::mac_empty_device::output_format() const {
 }
 
 std::optional<audio::interruptor_ptr> const &audio::mac_empty_device::interruptor() const {
-    return std::nullopt;
+    static std::optional<audio::interruptor_ptr> _null_interruptor = std::nullopt;
+    return _null_interruptor;
 }
 
 audio::io_core_ptr audio::mac_empty_device::make_io_core() const {

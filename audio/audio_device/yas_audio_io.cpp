@@ -10,19 +10,11 @@
 using namespace yas;
 
 audio::io::io(std::optional<io_device_ptr> const &device) {
-    this->set_device(device);
-
     this->_device_fetcher = chaining::fetcher<device_chaining_pair_t>::make_shared([this]() {
-        return device_chaining_pair_t{device_method::initial, this->_device->raw()};
+        return device_chaining_pair_t{device_method::initial, this->_device};
     });
 
-    this->_device_changed_observer =
-        this->_device->chain()
-            .to([](std::optional<io_device_ptr> const &device) {
-                return device_chaining_pair_t{device_method::changed, device};
-            })
-            .perform([this](device_chaining_pair_t const &pair) { this->_device_fetcher->push(pair); })
-            .end();
+    this->set_device(device);
 }
 
 audio::io::~io() {
@@ -30,7 +22,7 @@ audio::io::~io() {
 }
 
 void audio::io::_initialize() {
-    if (auto const &device = this->_device->raw()) {
+    if (auto const &device = this->_device) {
         auto io_core = device.value()->make_io_core();
         this->_io_core = io_core;
         io_core->set_render_handler(this->_render_handler);
@@ -49,14 +41,14 @@ void audio::io::_uninitialize() {
 }
 
 void audio::io::set_device(std::optional<io_device_ptr> const &device) {
-    if (this->_device->raw() != device) {
+    if (this->_device != device) {
         bool const is_running = this->_is_running;
 
         this->_uninitialize();
 
         this->_device_updated_observer = std::nullopt;
 
-        this->_device->set_value(device);
+        this->_device = device;
 
         if (device) {
             this->_device_updated_observer =
@@ -69,7 +61,7 @@ void audio::io::set_device(std::optional<io_device_ptr> const &device) {
                                 this->_device_fetcher->push({device_method::updated, this->device()});
                                 break;
                             case io_device::method::lost:
-                                this->_device->set_value(std::nullopt);
+                                this->set_device(std::nullopt);
                                 break;
                         }
                     })
@@ -81,11 +73,13 @@ void audio::io::set_device(std::optional<io_device_ptr> const &device) {
                 this->start();
             }
         }
+
+        this->_device_fetcher->push({device_method::changed, device});
     }
 }
 
 std::optional<audio::io_device_ptr> const &audio::io::device() const {
-    return this->_device->raw();
+    return this->_device;
 }
 
 bool audio::io::is_running() const {
@@ -93,7 +87,7 @@ bool audio::io::is_running() const {
 }
 
 bool audio::io::is_interrupting() const {
-    if (auto const &device = this->_device->raw()) {
+    if (auto const &device = this->_device) {
         return device.value()->is_interrupting();
     }
     return false;
@@ -212,7 +206,7 @@ void audio::io::_dispose_interruption_observer() {
 }
 
 std::optional<chaining::chain_unsync_t<audio::interruption_method>> audio::io::_interruption_chain() const {
-    if (auto const &device = this->_device->raw()) {
+    if (auto const &device = this->_device) {
         return device.value()->interruption_chain();
     }
     return std::nullopt;

@@ -2,85 +2,10 @@
 //  yas_audio_renewable_device_tests.mm
 //
 
-#import "yas_audio_test_utils.h"
+#import "yas_audio_test_io_device.h"
 
 using namespace yas;
 using namespace yas::audio;
-
-namespace yas::test {
-struct test_io_core : io_core {
-    void initialize() override {
-    }
-
-    void uninitialize() override {
-    }
-
-    void set_render_handler(std::optional<io_render_f>) override {
-    }
-
-    void set_maximum_frames_per_slice(uint32_t const) override {
-    }
-
-    bool start() override {
-        return false;
-    }
-
-    void stop() override {
-    }
-
-    std::optional<pcm_buffer_ptr> const &input_buffer_on_render() const override {
-        static std::optional<pcm_buffer_ptr> const _null_buffer = std::nullopt;
-        return _null_buffer;
-    }
-
-    std::optional<time_ptr> const &input_time_on_render() const override {
-        static std::optional<time_ptr> const _null_time = std::nullopt;
-        return _null_time;
-    }
-};
-
-struct test_io_device : audio::io_device {
-    bool const is_input;
-    chaining::notifier_ptr<io_device::method> const notifier = chaining::notifier<io_device::method>::make_shared();
-
-    std::optional<audio::format> input_format() const override {
-        if (this->is_input) {
-            return audio::format{{.sample_rate = 44100.0, .channel_count = 1}};
-        } else {
-            return std::nullopt;
-        }
-    }
-
-    std::optional<audio::format> output_format() const override {
-        if (this->is_input) {
-            return std::nullopt;
-        } else {
-            return audio::format{{.sample_rate = 44100.0, .channel_count = 1}};
-        }
-    }
-
-    std::optional<interruptor_ptr> const &interruptor() const override {
-        static std::optional<interruptor_ptr> const _nullopt = std::nullopt;
-        return _nullopt;
-    }
-
-    io_core_ptr make_io_core() const override {
-        return std::make_shared<test_io_core>();
-    }
-
-    chaining::chain_unsync_t<io_device::method> io_device_chain() override {
-        return this->notifier->chain();
-    }
-
-    static std::shared_ptr<test_io_device> make_shared(bool is_input) {
-        return std::shared_ptr<test_io_device>(new test_io_device{is_input});
-    }
-
-   private:
-    test_io_device(bool is_input) : is_input(is_input) {
-    }
-};
-}
 
 @interface yas_audio_renewable_device_tests : XCTestCase
 
@@ -95,8 +20,11 @@ struct test_io_device : audio::io_device {
 }
 
 - (void)test_renewal {
-    auto const output_device = test::test_io_device::make_shared(false);
-    auto const input_device = test::test_io_device::make_shared(true);
+    auto const output_device = test::test_io_device::make_shared();
+    output_device->output_format_handler = []() { return audio::format{{.sample_rate = 44100.0, .channel_count = 1}}; };
+
+    auto const input_device = test::test_io_device::make_shared();
+    input_device->input_format_handler = []() { return audio::format{{.sample_rate = 44100.0, .channel_count = 1}}; };
 
     auto const update_notifier = chaining::notifier<std::nullptr_t>::make_shared();
 
