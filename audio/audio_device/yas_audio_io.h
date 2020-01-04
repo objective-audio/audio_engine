@@ -42,8 +42,7 @@ struct io final {
     [[nodiscard]] static io_ptr make_shared(std::optional<io_device_ptr> const &);
 
    private:
-    chaining::value::holder_ptr<std::optional<io_device_ptr>> _device =
-        chaining::value::holder<std::optional<io_device_ptr>>::make_shared(std::nullopt);
+    std::optional<io_device_ptr> _device;
     std::optional<io_core_ptr> _io_core = std::nullopt;
     bool _is_running = false;
     std::optional<io_render_f> _render_handler = std::nullopt;
