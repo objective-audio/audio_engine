@@ -10,7 +10,6 @@
 #include <cpp_utils/yas_stl_utils.h>
 #include "yas_audio_engine_io.h"
 #include "yas_audio_engine_node.h"
-#include "yas_audio_engine_offline_output.h"
 #include "yas_audio_io.h"
 
 #if TARGET_OS_IPHONE
@@ -66,7 +65,7 @@ audio::engine::connection_ptr audio::engine::manager::connect(audio::engine::nod
 
     this->_connections.insert(connection);
 
-    if (this->_is_running) {
+    if (this->is_running()) {
         this->_add_connection_to_nodes(connection);
         this->_update_node_connections(src_node);
         this->_update_node_connections(dst_node);
@@ -117,32 +116,25 @@ void audio::engine::manager::disconnect_output(audio::engine::node_ptr const &no
     });
 }
 
-audio::engine::offline_output_ptr const &audio::engine::manager::add_offline_output() {
-    if (!this->_offline_output) {
-        this->_offline_output = audio::engine::offline_output::make_shared();
-    }
-    return this->_offline_output.value();
-}
-
-void audio::engine::manager::remove_offline_output() {
-    if (this->_offline_output) {
-        this->_offline_output = std::nullopt;
-    }
-}
-
-std::optional<audio::engine::offline_output_ptr> const &audio::engine::manager::offline_output() const {
-    return this->_offline_output;
-}
-
 audio::engine::io_ptr const &audio::engine::manager::add_io(std::optional<io_device_ptr> const &device) {
     if (!this->_io) {
         audio::io_ptr const raw_io = audio::io::make_shared(device);
         audio::engine::io_ptr const io = audio::engine::io::make_shared(raw_io);
 
-        this->_io = io;
+        this->_io_observer = raw_io->running_chain()
+                                 .perform([this](auto const &method) {
+                                     switch (method) {
+                                         case audio::io::running_method::will_start:
+                                             this->_setup_rendering();
+                                             break;
+                                         case audio::io::running_method::did_stop:
+                                             this->_dispose_rendering();
+                                             break;
+                                     }
+                                 })
+                                 .end();
 
-        this->_io_observer =
-            io->raw_io()->device_chain().to_value(method::configuration_change).send_to(this->_notifier).end();
+        this->_io = io;
     }
 
     return this->_io.value();
@@ -160,84 +152,29 @@ std::optional<audio::engine::io_ptr> const &audio::engine::manager::io() const {
 }
 
 audio::engine::manager::start_result_t audio::engine::manager::start_render() {
-    if (this->_is_running) {
+    if (this->is_running()) {
         return start_result_t(start_error_t::already_running);
     }
 
-    if (auto const offline_output = this->_offline_output) {
-        if (offline_output.value()->is_running()) {
-            return start_result_t(start_error_t::already_running);
-        }
-    }
-
-    if (!_setup_rendering()) {
-        return start_result_t(start_error_t::prepare_failure);
-    }
-
     if (auto const &engine_io = this->_io) {
-        engine::manageable_io::cast(engine_io.value())->start();
+        engine::manageable_io::cast(engine_io.value())->raw_io()->start();
     }
-
-    this->_is_running = true;
 
     return start_result_t(nullptr);
 }
 
-audio::engine::manager::start_result_t audio::engine::manager::start_offline_render(
-    offline_render_f render_handler, offline_completion_f completion_handler) {
-    if (this->_is_running) {
-        return start_result_t(start_error_t::already_running);
-    }
-
-    auto offline_output = this->_offline_output;
-
-    if (!offline_output) {
-        return start_result_t(start_error_t::offline_output_not_found);
-    }
-
-    if (offline_output.value()->is_running()) {
-        return start_result_t(start_error_t::already_running);
-    }
-
-    if (!this->_setup_rendering()) {
-        return start_result_t(start_error_t::prepare_failure);
-    }
-
-    auto result =
-        manageable_offline_output::cast(offline_output.value())
-            ->start(std::move(render_handler), [this, handler = std::move(completion_handler)](bool const cancelled) {
-                this->stop();
-                handler(cancelled);
-            });
-
-    if (result) {
-        this->_is_running = true;
-        return start_result_t(nullptr);
-    } else {
-        return start_result_t(start_error_t::offline_output_starting_failure);
-    }
-}
-
 void audio::engine::manager::stop() {
     if (auto const &engine_io = this->_io) {
-        engine::manageable_io::cast(engine_io.value())->stop();
+        engine::manageable_io::cast(engine_io.value())->raw_io()->stop();
     }
-
-    if (auto offline_output = this->_offline_output) {
-        manageable_offline_output::cast(offline_output.value())->stop();
-    }
-
-    this->_dispose_rendering();
-
-    this->_is_running = false;
 }
 
 bool audio::engine::manager::is_running() const {
-    return this->_is_running;
-}
-
-chaining::chain_unsync_t<audio::engine::manager::method> audio::engine::manager::chain() const {
-    return this->_notifier->chain();
+    if (auto const &io = this->_io) {
+        return io.value()->raw_io()->is_running();
+    } else {
+        return false;
+    }
 }
 
 std::unordered_set<audio::engine::node_ptr> const &audio::engine::manager::nodes() const {
@@ -246,10 +183,6 @@ std::unordered_set<audio::engine::node_ptr> const &audio::engine::manager::nodes
 
 audio::engine::connection_set const &audio::engine::manager::connections() const {
     return this->_connections;
-}
-
-chaining::notifier_ptr<audio::engine::manager::method> &audio::engine::manager::notifier() {
-    return this->_notifier;
 }
 
 void audio::engine::manager::_prepare(manager_ptr const &shared) {
@@ -316,7 +249,7 @@ bool audio::engine::manager::_setup_rendering() {
 
 void audio::engine::manager::_dispose_rendering() {
     if (auto const &engine_io = this->_io) {
-        engine::manageable_io::cast(engine_io.value())->stop();
+        engine::manageable_io::cast(engine_io.value())->raw_io()->stop();
     }
 
     for (auto const &connection : this->_connections) {
@@ -417,13 +350,6 @@ audio::engine::manager_ptr audio::engine::manager::make_shared() {
     return shared;
 }
 
-std::string yas::to_string(audio::engine::manager::method const &method) {
-    switch (method) {
-        case audio::engine::manager::method::configuration_change:
-            return "configuration_change";
-    }
-}
-
 std::string yas::to_string(audio::engine::manager::start_error_t const &error) {
     switch (error) {
         case audio::engine::manager::start_error_t::already_running:
@@ -437,11 +363,6 @@ std::string yas::to_string(audio::engine::manager::start_error_t const &error) {
         case audio::engine::manager::start_error_t::offline_output_starting_failure:
             return "offline_output_starting_failure";
     }
-}
-
-std::ostream &operator<<(std::ostream &os, yas::audio::engine::manager::method const &value) {
-    os << to_string(value);
-    return os;
 }
 
 std::ostream &operator<<(std::ostream &os, yas::audio::engine::manager::start_error_t const &value) {

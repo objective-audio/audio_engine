@@ -132,61 +132,6 @@ struct test_io_device : io_device {
     XCTAssertEqual(nodes.count(destination_obj.node), 0);
 }
 
-- (void)test_configuration_change_notification_by_updated {
-    auto manager = audio::engine::manager::make_shared();
-
-    manager->add_io(std::nullopt);
-
-    auto const device = std::make_shared<audio::engine::test::test_io_device>();
-
-    manager->io().value()->raw_io()->set_device(device);
-
-    XCTestExpectation *expectation = [self expectationWithDescription:@"configuration change"];
-
-    auto chain = manager->chain().perform([expectation](auto const &) { [expectation fulfill]; }).end();
-
-    device->notifier->notify(audio::io_device::method::updated);
-
-    [self waitForExpectationsWithTimeout:1.0 handler:nil];
-}
-
-- (void)test_configuration_change_notification_by_lost {
-    auto manager = audio::engine::manager::make_shared();
-
-    manager->add_io(std::nullopt);
-
-    auto const device = std::make_shared<audio::engine::test::test_io_device>();
-
-    manager->io().value()->raw_io()->set_device(device);
-
-    XCTestExpectation *expectation = [self expectationWithDescription:@"configuration change"];
-
-    auto chain = manager->chain().perform([expectation](auto const &) { [expectation fulfill]; }).end();
-
-    device->notifier->notify(audio::io_device::method::lost);
-
-    [self waitForExpectationsWithTimeout:1.0 handler:nil];
-}
-
-- (void)test_add_and_remove_offline_output {
-    auto manager = audio::engine::manager::make_shared();
-
-    XCTAssertFalse(manager->offline_output());
-
-    auto const &output = manager->add_offline_output();
-
-    XCTAssertTrue(output);
-    XCTAssertTrue(manager->offline_output());
-    XCTAssertTrue(manager->offline_output() == output);
-    XCTAssertTrue(manager->offline_output().value() == output);
-
-    XCTAssertNoThrow(manager->remove_offline_output());
-
-    XCTAssertFalse(manager->offline_output());
-
-    XCTAssertNoThrow(manager->remove_offline_output());
-}
-
 - (void)test_add_and_remove_io {
     auto manager = audio::engine::manager::make_shared();
 
@@ -205,10 +150,6 @@ struct test_io_device : io_device {
     XCTAssertNoThrow(manager->remove_io());
 }
 
-- (void)test_method_to_string {
-    XCTAssertEqual(to_string(audio::engine::manager::method::configuration_change), "configuration_change");
-}
-
 - (void)test_start_error_to_string {
     XCTAssertEqual(to_string(audio::engine::manager::start_error_t::already_running), "already_running");
     XCTAssertEqual(to_string(audio::engine::manager::start_error_t::prepare_failure), "prepare_failure");
@@ -217,16 +158,6 @@ struct test_io_device : io_device {
                    "offline_output_not_found");
     XCTAssertEqual(to_string(audio::engine::manager::start_error_t::offline_output_starting_failure),
                    "offline_output_starting_failure");
-}
-
-- (void)test_method_ostream {
-    auto const values = {audio::engine::manager::method::configuration_change};
-
-    for (auto const &value : values) {
-        std::ostringstream stream;
-        stream << value;
-        XCTAssertEqual(stream.str(), to_string(value));
-    }
 }
 
 - (void)test_start_error_ostream {

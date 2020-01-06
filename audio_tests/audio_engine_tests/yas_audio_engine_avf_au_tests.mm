@@ -28,10 +28,8 @@ using namespace yas;
 
 - (void)test_restore_parameters {
     auto manager = audio::engine::manager::make_shared();
-    manager->add_offline_output();
 
     audio::format format{{.sample_rate = 44100.0, .channel_count = 2}};
-    auto const &output = manager->offline_output().value();
     auto const delay_au = audio::engine::avf_au::make_shared(kAudioUnitType_Effect, kAudioUnitSubType_Delay);
     auto const raw_au = delay_au->raw_au();
 
@@ -41,12 +39,15 @@ using namespace yas;
         XCTAssertEqual(parameter->default_value(), raw_au->global_parameter_value(stoi(parameter->identifier())));
     }
 
-    auto const connection = manager->connect(delay_au->node(), output->node(), format);
-
     XCTestExpectation *expectation = [self expectationWithDescription:@"First Render"];
 
-    auto start_result =
-        manager->start_offline_render(nullptr, [expectation](bool const cancelled) { [expectation fulfill]; });
+    auto const device1 =
+        audio::offline_device::make_shared(format, [](auto) { return audio::continuation::keep; },
+                                           [&expectation](bool const cancelled) { [expectation fulfill]; });
+    auto const &offline_io1 = manager->add_io(device1);
+    auto const connection = manager->connect(delay_au->node(), offline_io1->node(), format);
+
+    auto start_result = manager->start_render();
 
     XCTAssertTrue(start_result);
 
@@ -71,13 +72,19 @@ using namespace yas;
                                  handler:^(NSError *error){
 
                                  }];
-    manager->disconnect(connection);
 
-    manager->connect(delay_au->node(), output->node(), format);
+    manager->disconnect(connection);
+    manager->remove_io();
 
     expectation = [self expectationWithDescription:@"Second Render"];
 
-    manager->start_offline_render(nullptr, [expectation](bool const cancelled) { [expectation fulfill]; });
+    auto const device2 =
+        audio::offline_device::make_shared(format, [](auto) { return audio::continuation::keep; },
+                                           [&expectation](bool const cancelled) { [expectation fulfill]; });
+    auto const &offline_io2 = manager->add_io(device2);
+    manager->connect(delay_au->node(), offline_io2->node(), format);
+
+    manager->start_render();
 
     XCTAssertEqual(raw_au->global_parameter_value(kDelayParam_DelayTime), delay_time_value);
     XCTAssertEqual(raw_au->global_parameter_value(kDelayParam_Feedback), feedback_value);
