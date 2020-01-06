@@ -22,19 +22,26 @@ using namespace yas;
 
 - (void)test_render_with_lambda {
     auto manager = audio::engine::manager::make_shared();
-    manager->add_offline_output();
 
-    auto const &output = manager->offline_output().value();
     auto to_tap = audio::engine::tap::make_shared();
     auto from_tap = audio::engine::tap::make_shared();
     auto const format = audio::format({.sample_rate = 48000.0, .channel_count = 2});
 
-    auto const to_connection = manager->connect(to_tap->node(), output->node(), format);
     auto const from_connection = manager->connect(from_tap->node(), to_tap->node(), format);
 
     XCTestExpectation *to_expectation = [self expectationWithDescription:@"to node"];
     XCTestExpectation *from_expectation = [self expectationWithDescription:@"from node"];
     XCTestExpectation *completion_expectation = [self expectationWithDescription:@"completion"];
+
+    from_tap->set_render_handler([from_expectation](auto) { [from_expectation fulfill]; });
+
+    auto const device = audio::offline_device::make_shared(
+        format, [](auto args) { return audio::continuation::abort; },
+        [&completion_expectation](auto const cancelled) { [completion_expectation fulfill]; });
+
+    auto const &offline_io = manager->add_io(device);
+
+    auto const to_connection = manager->connect(to_tap->node(), offline_io->node(), format);
 
     auto weak_to_tap = to_weak(to_tap);
     auto to_render_handler = [weak_to_tap, self, to_connection = to_connection, from_connection = from_connection,
@@ -61,11 +68,7 @@ using namespace yas;
 
     to_tap->set_render_handler(std::move(to_render_handler));
 
-    from_tap->set_render_handler([from_expectation](auto) { [from_expectation fulfill]; });
-
-    XCTAssertTrue(manager->start_offline_render(
-        [](auto args) { return audio::continuation::abort; },
-        [completion_expectation](auto const cancelled) { [completion_expectation fulfill]; }));
+    manager->start_render();
 
     [self waitForExpectationsWithTimeout:0.5
                                  handler:^(NSError *error){
@@ -77,21 +80,27 @@ using namespace yas;
 
 - (void)test_render_without_lambda {
     auto manager = audio::engine::manager::make_shared();
-    manager->add_offline_output();
 
-    auto const &output = manager->offline_output().value();
     auto to_tap = audio::engine::tap::make_shared();
     auto from_tap = audio::engine::tap::make_shared();
     auto const format = audio::format({.sample_rate = 48000.0, .channel_count = 2});
 
-    manager->connect(to_tap->node(), output->node(), format);
     manager->connect(from_tap->node(), to_tap->node(), format);
 
     XCTestExpectation *from_expectation = [self expectationWithDescription:@"from node"];
 
-    from_tap->set_render_handler([from_expectation](auto) { [from_expectation fulfill]; });
+    from_tap->set_render_handler([&from_expectation](auto) { [from_expectation fulfill]; });
 
-    XCTAssertTrue(manager->start_offline_render([](auto args) { return audio::continuation::abort; }, nullptr));
+    XCTestExpectation *completion_expectation = [self expectationWithDescription:@"completion"];
+
+    auto const device =
+        audio::offline_device::make_shared(format, [](auto args) { return audio::continuation::abort; },
+                                           [&completion_expectation](bool const) { [completion_expectation fulfill]; });
+    auto const &offline_io = manager->add_io(device);
+
+    manager->connect(to_tap->node(), offline_io->node(), format);
+
+    XCTAssertTrue(manager->start_render());
 
     [self waitForExpectationsWithTimeout:0.5
                                  handler:^(NSError *error){

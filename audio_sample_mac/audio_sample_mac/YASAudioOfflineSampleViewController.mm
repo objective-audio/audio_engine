@@ -119,6 +119,11 @@ struct offline_vc_internal {
     audio::engine::avf_au_mixer_ptr offline_au_mixer = audio::engine::avf_au_mixer::make_shared();
     offline_sample::engine::sine_ptr offline_sine = offline_sample::engine::sine::make_shared();
 
+    audio::format const file_format{{.sample_rate = offline_sample::sample_rate,
+                                     .channel_count = 2,
+                                     .pcm_format = audio::pcm_format::float32,
+                                     .interleaved = false}};
+
     offline_vc_internal() {
         auto const &io = this->play_manager->add_io(audio::mac_device::renewable_default_output_device());
 
@@ -142,19 +147,14 @@ struct offline_vc_internal {
                                  })
                                  .end();
 
-        this->offline_manager->add_offline_output();
-        auto const &offline_output = this->offline_manager->offline_output().value();
-
         this->offline_au_mixer->au()->node()->reset();
         this->offline_au_mixer->set_input_pan(0.0f, 0);
         this->offline_au_mixer->set_input_enabled(true, 0);
         this->offline_au_mixer->set_output_volume(1.0f, 0);
         this->offline_au_mixer->set_output_pan(0.0f, 0);
 
-        this->offline_manager->connect(this->offline_au_mixer->au()->node(), offline_output->node(),
-                                       this->_file_format);
         this->offline_manager->connect(this->offline_sine->tap().node(), this->offline_au_mixer->au()->node(),
-                                       this->_file_format);
+                                       this->file_format);
     }
 
     void start_render() {
@@ -172,7 +172,7 @@ struct offline_vc_internal {
 
         this->play_manager->connect(this->play_au_mixer->au()->node(), io_value->node(), *output_format);
         this->play_manager->connect(this->play_sine->tap().node(), this->play_au_mixer->au()->node(),
-                                    this->_file_format);
+                                    this->file_format);
 
         if (!this->play_manager->start_render()) {
             NSLog(@"%s error", __PRETTY_FUNCTION__);
@@ -185,11 +185,6 @@ struct offline_vc_internal {
     }
 
    private:
-    audio::format const _file_format{{.sample_rate = offline_sample::sample_rate,
-                                      .channel_count = 2,
-                                      .pcm_format = audio::pcm_format::float32,
-                                      .interleaved = false}};
-
     chaining::any_observer_ptr _io_observer = nullptr;
 
     void _update_connection() {
@@ -305,21 +300,25 @@ struct offline_vc_internal {
 
     self.processing = YES;
 
-    uint32_t remain = self.length * offline_sample::sample_rate;
+    auto const remain = std::make_shared<uint32_t>(self.length * offline_sample::sample_rate);
 
     auto unowned_self =
         objc_ptr_with_move_object([[YASUnownedObject<YASAudioOfflineSampleViewController *> alloc] init]);
     [unowned_self.object() setObject:self];
+    auto &internal = self->_internal.value();
+        
+    auto const &offline_manager = internal->offline_manager;
 
-    auto start_result = self->_internal.value()->offline_manager->start_offline_render(
-        [remain, file_writer = std::move(file_writer)](auto args) mutable {
+    auto const device = audio::offline_device::make_shared(
+        internal->file_format,
+        [&remain, file_writer = std::move(file_writer)](auto args) mutable {
             auto &buffer = args.buffer;
 
             auto format = audio::format(buffer->format().stream_description());
             audio::pcm_buffer pcm_buffer(format, buffer->audio_buffer_list());
             pcm_buffer.set_frame_length(buffer->frame_length());
 
-            uint32_t frame_length = MIN(remain, pcm_buffer.frame_length());
+            uint32_t const frame_length = MIN(*remain, pcm_buffer.frame_length());
             if (frame_length > 0) {
                 pcm_buffer.set_frame_length(frame_length);
                 auto write_result = file_writer->write_from_buffer(pcm_buffer);
@@ -328,15 +327,26 @@ struct offline_vc_internal {
                 }
             }
 
-            remain -= frame_length;
-            if (remain == 0) {
+            *remain -= frame_length;
+            if (*remain == 0) {
                 file_writer->close();
                 return audio::continuation::abort;
             }
 
             return audio::continuation::keep;
         },
-        [unowned_self](bool const cancelled) { [unowned_self.object() object].processing = NO; });
+        [unowned_self, weak_internal = to_weak(internal)](bool const cancelled) {
+            if (auto const internal = weak_internal.lock()) {
+                internal->offline_manager->remove_io();
+            }
+            [unowned_self.object() object].processing = NO;
+        });
+
+    auto const &offline_io = offline_manager->add_io(device);
+
+    offline_manager->connect(internal->offline_au_mixer->au()->node(), offline_io->node(), internal->file_format);
+
+    auto start_result = offline_manager->start_render();
 
     if (!start_result) {
         self.processing = NO;

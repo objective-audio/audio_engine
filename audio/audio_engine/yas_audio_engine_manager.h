@@ -7,7 +7,6 @@
 #include <chaining/yas_chaining_umbrella.h>
 #include <ostream>
 #include "yas_audio_engine_connection.h"
-#include "yas_audio_engine_offline_output_protocol.h"
 #include "yas_audio_engine_ptr.h"
 #include "yas_audio_types.h"
 
@@ -18,8 +17,6 @@ class result;
 
 namespace yas::audio::engine {
 struct manager final {
-    enum class method { configuration_change };
-
     enum class start_error_t {
         already_running,
         prepare_failure,
@@ -45,34 +42,24 @@ struct manager final {
     void disconnect_output(engine::node_ptr const &);
     void disconnect_output(engine::node_ptr const &, uint32_t const bus_idx);
 
-    offline_output_ptr const &add_offline_output();
-    void remove_offline_output();
-    std::optional<offline_output_ptr> const &offline_output() const;
-
     io_ptr const &add_io(std::optional<io_device_ptr> const &);
     void remove_io();
     std::optional<io_ptr> const &io() const;
 
     start_result_t start_render();
-    start_result_t start_offline_render(offline_render_f, offline_completion_f);
     void stop();
     bool is_running() const;
-
-    [[nodiscard]] chaining::chain_unsync_t<method> chain() const;
 
     static manager_ptr make_shared();
 
     // for Test
     std::unordered_set<node_ptr> const &nodes() const;
     engine::connection_set const &connections() const;
-    chaining::notifier_ptr<method> &notifier();
 
    private:
     std::weak_ptr<manager> _weak_manager;
-    chaining::notifier_ptr<method> _notifier = chaining::notifier<method>::make_shared();
     std::optional<chaining::any_observer_ptr> _io_observer = std::nullopt;
 
-    bool _is_running = false;
     std::unordered_set<node_ptr> _nodes;
     engine::connection_set _connections;
     std::optional<offline_output_ptr> _offline_output = std::nullopt;
@@ -102,9 +89,7 @@ struct manager final {
 }  // namespace yas::audio::engine
 
 namespace yas {
-std::string to_string(audio::engine::manager::method const &);
 std::string to_string(audio::engine::manager::start_error_t const &);
 }  // namespace yas
 
-std::ostream &operator<<(std::ostream &, yas::audio::engine::manager::method const &);
 std::ostream &operator<<(std::ostream &, yas::audio::engine::manager::start_error_t const &);

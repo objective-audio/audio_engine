@@ -24,6 +24,8 @@ class renewable_device;
 class avf_au;
 class avf_au_parameter;
 class avf_au_parameter_core;
+class offline_device;
+class offline_io_core;
 
 using pcm_buffer_ptr = std::shared_ptr<pcm_buffer>;
 using time_ptr = std::shared_ptr<time>;
@@ -42,4 +44,6 @@ using renewable_device_ptr = std::shared_ptr<renewable_device>;
 using avf_au_ptr = std::shared_ptr<avf_au>;
 using avf_au_parameter_ptr = std::shared_ptr<avf_au_parameter>;
 using avf_au_parameter_core_ptr = std::shared_ptr<avf_au_parameter_core>;
+using offline_device_ptr = std::shared_ptr<offline_device>;
+using offline_io_core_ptr = std::shared_ptr<offline_io_core>;
 }  // namespace yas::audio

@@ -13,6 +13,11 @@
 
 namespace yas::audio {
 struct io final {
+    enum class running_method {
+        will_start,
+        did_stop,
+    };
+
     enum class device_method {
         initial,
         changed,
@@ -34,6 +39,7 @@ struct io final {
     void start();
     void stop();
 
+    chaining::chain_unsync_t<running_method> running_chain() const;
     chaining::chain_sync_t<device_chaining_pair_t> device_chain() const;
 
     [[nodiscard]] std::optional<pcm_buffer_ptr> const &input_buffer_on_render() const;
@@ -48,6 +54,7 @@ struct io final {
     std::optional<io_render_f> _render_handler = std::nullopt;
     uint32_t _maximum_frames = 4096;
 
+    chaining::notifier_ptr<running_method> _running_notifier;
     chaining::fetcher_ptr<device_chaining_pair_t> _device_fetcher;
     std::optional<chaining::any_observer_ptr> _device_changed_observer;
     std::optional<chaining::any_observer_ptr> _device_updated_observer = std::nullopt;

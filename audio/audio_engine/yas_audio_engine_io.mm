@@ -21,27 +21,16 @@ using namespace yas;
 #pragma mark - audio::engine::io
 
 audio::engine::io::io(audio::io_ptr const &raw_io)
-    : _raw_io(raw_io), _notifier(chaining::notifier<io_device::method>::make_shared()) {
+    : _node(node::make_shared({.input_bus_count = 1, .output_bus_count = 1})), _raw_io(raw_io) {
+    this->_connections_observer = this->_node->chain(node::method::update_connections)
+                                      .perform([this](auto const &) { this->_update_io_connections(); })
+                                      .end();
 }
 
 audio::engine::io::~io() = default;
 
 audio::engine::node_ptr const &audio::engine::io::node() const {
     return this->_node;
-}
-
-void audio::engine::io::start() {
-    if (!this->_running) {
-        this->_running = true;
-        this->_raw_io->start();
-    }
-}
-
-void audio::engine::io::stop() {
-    if (this->_running) {
-        this->_running = false;
-        this->_raw_io->stop();
-    }
 }
 
 audio::io_ptr const &audio::engine::io::raw_io() {
@@ -64,14 +53,6 @@ void audio::engine::io::_prepare(io_ptr const &shared) {
             }
         }
     });
-
-    this->_connections_observer = this->_node->chain(node::method::update_connections)
-                                      .perform([weak_engine_io = this->_weak_engine_io](auto const &) {
-                                          if (auto engine_io = weak_engine_io.lock()) {
-                                              engine_io->_update_io_connections();
-                                          }
-                                      })
-                                      .end();
 }
 
 void audio::engine::io::_update_io_connections() {

@@ -10,6 +10,8 @@
 using namespace yas;
 
 audio::io::io(std::optional<io_device_ptr> const &device) {
+    this->_running_notifier = chaining::notifier<running_method>::make_shared();
+
     this->_device_fetcher = chaining::fetcher<device_chaining_pair_t>::make_shared([this]() {
         return device_chaining_pair_t{device_method::initial, this->_device};
     });
@@ -56,10 +58,17 @@ void audio::io::set_device(std::optional<io_device_ptr> const &device) {
                     ->io_device_chain()
                     .perform([this](auto const &method) {
                         switch (method) {
-                            case io_device::method::updated:
-                                this->_reload();
+                            case io_device::method::updated: {
+                                bool const is_running = this->is_running();
+
+                                this->_uninitialize();
                                 this->_device_fetcher->push({device_method::updated, this->device()});
-                                break;
+                                this->_initialize();
+
+                                if (this->_device && is_running) {
+                                    this->start();
+                                }
+                            } break;
                             case io_device::method::lost:
                                 this->set_device(std::nullopt);
                                 break;
@@ -118,7 +127,10 @@ void audio::io::start() {
         return;
     }
 
+    this->_running_notifier->notify(running_method::will_start);
+
     this->_is_running = true;
+
     this->_start_io_core();
     this->_setup_interruption_observer();
 }
@@ -130,7 +142,14 @@ void audio::io::stop() {
 
     this->_dispose_interruption_observer();
     this->_stop_io_core();
+
     this->_is_running = false;
+
+    this->_running_notifier->notify(running_method::did_stop);
+}
+
+chaining::chain_unsync_t<audio::io::running_method> audio::io::running_chain() const {
+    return this->_running_notifier->chain();
 }
 
 chaining::chain_sync_t<audio::io::device_chaining_pair_t> audio::io::device_chain() const {

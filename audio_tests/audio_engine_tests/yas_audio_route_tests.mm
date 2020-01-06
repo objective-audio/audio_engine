@@ -73,24 +73,30 @@ using namespace yas;
 
 - (void)test_render {
     auto manager = audio::engine::manager::make_shared();
-    manager->add_offline_output();
 
     auto format = audio::format({.sample_rate = 44100.0, .channel_count = 2});
-    auto const &output = manager->offline_output().value();
     auto engine_route = audio::engine::route::make_shared();
     auto tap = audio::engine::tap::make_shared();
-
-    manager->connect(engine_route->node(), output->node(), format);
-    manager->connect(tap->node(), engine_route->node(), format);
 
     bool tap_called = false;
     tap->set_render_handler([&tap_called](auto) { tap_called = true; });
 
+    manager->connect(tap->node(), engine_route->node(), format);
+
     {
         XCTestExpectation *expectation = [self expectationWithDescription:@"first render"];
 
-        XCTAssertTrue(manager->start_offline_render([](auto args) { return audio::continuation::abort; },
-                                                    [expectation](bool const cancelled) { [expectation fulfill]; }));
+        auto device =
+            audio::offline_device::make_shared(format, [](auto args) { return audio::continuation::abort; },
+                                               [&expectation](bool const cancelled) { [expectation fulfill]; });
+
+        auto const &offline_io = manager->add_io(device);
+
+        manager->connect(engine_route->node(), offline_io->node(), format);
+
+        auto result = manager->start_render();
+
+        XCTAssertTrue(result);
 
         [self waitForExpectationsWithTimeout:0.5
                                      handler:^(NSError *error){
@@ -99,6 +105,8 @@ using namespace yas;
     }
 
     XCTAssertFalse(tap_called);
+
+    manager->remove_io();
 
     engine_route->add_route({0, 0, 0, 0});
     engine_route->add_route({0, 1, 0, 1});
@@ -113,7 +121,8 @@ using namespace yas;
     {
         XCTestExpectation *expectation = [self expectationWithDescription:@"second render"];
 
-        XCTAssertTrue(manager->start_offline_render(
+        auto const device = audio::offline_device::make_shared(
+            format,
             [self](auto args) {
                 auto each = audio::make_each_data<float>(*args.buffer);
                 while (yas_each_data_next(each)) {
@@ -122,7 +131,15 @@ using namespace yas;
                 }
                 return audio::continuation::abort;
             },
-            [expectation](bool const cancelled) { [expectation fulfill]; }));
+            [&expectation](bool const cancelled) { [expectation fulfill]; });
+
+        auto const &offline_io = manager->add_io(device);
+
+        manager->connect(engine_route->node(), offline_io->node(), format);
+
+        auto result = manager->start_render();
+
+        XCTAssertTrue(result);
 
         [self waitForExpectationsWithTimeout:0.5
                                      handler:^(NSError *error){
@@ -137,14 +154,10 @@ using namespace yas;
     auto const src_count = 2;
 
     auto manager = audio::engine::manager::make_shared();
-    manager->add_offline_output();
 
     auto dst_format = audio::format({.sample_rate = 44100.0, .channel_count = 2});
     auto src_format = audio::format({.sample_rate = 44100.0, .channel_count = 1});
-    auto const &output = manager->offline_output().value();
     auto engine_route = audio::engine::route::make_shared();
-
-    manager->connect(engine_route->node(), output->node(), dst_format);
 
     bool tap_calleds[src_count];
     for (auto &tap_called : tap_calleds) {
@@ -170,7 +183,8 @@ using namespace yas;
 
     XCTestExpectation *expectation = [self expectationWithDescription:@"render"];
 
-    XCTAssertTrue(manager->start_offline_render(
+    auto const device = audio::offline_device::make_shared(
+        dst_format,
         [self](auto args) {
             auto each = audio::make_each_data<float>(*args.buffer);
             while (yas_each_data_next(each)) {
@@ -179,7 +193,13 @@ using namespace yas;
             }
             return audio::continuation::abort;
         },
-        [expectation](bool const cancelled) { [expectation fulfill]; }));
+        [&expectation](bool const cancelled) { [expectation fulfill]; });
+
+    auto const &offline_io = manager->add_io(device);
+
+    manager->connect(engine_route->node(), offline_io->node(), dst_format);
+
+    manager->start_render();
 
     [self waitForExpectationsWithTimeout:0.5
                                  handler:^(NSError *error){
@@ -195,14 +215,10 @@ using namespace yas;
     auto const src_count = 2;
 
     auto manager = audio::engine::manager::make_shared();
-    manager->add_offline_output();
 
     auto dst_format = audio::format({.sample_rate = 44100.0, .channel_count = 4});
     auto src_format = audio::format({.sample_rate = 44100.0, .channel_count = 2});
-    auto const &output = manager->offline_output().value();
     auto engine_route = audio::engine::route::make_shared();
-
-    manager->connect(engine_route->node(), output->node(), dst_format);
 
     bool tap_calleds[src_count];
     for (auto &tap_called : tap_calleds) {
@@ -228,7 +244,8 @@ using namespace yas;
 
     XCTestExpectation *expectation = [self expectationWithDescription:@"render"];
 
-    XCTAssertTrue(manager->start_offline_render(
+    auto const device = audio::offline_device::make_shared(
+        dst_format,
         [self](auto args) {
             auto each = audio::make_each_data<float>(*args.buffer);
             while (yas_each_data_next(each)) {
@@ -239,7 +256,13 @@ using namespace yas;
             }
             return audio::continuation::abort;
         },
-        [expectation](bool const cancelled) { [expectation fulfill]; }));
+        [&expectation](bool const cancelled) { [expectation fulfill]; });
+
+    auto const &offline_io = manager->add_io(device);
+
+    manager->connect(engine_route->node(), offline_io->node(), dst_format);
+
+    manager->start_render();
 
     [self waitForExpectationsWithTimeout:10.0
                                  handler:^(NSError *error){
