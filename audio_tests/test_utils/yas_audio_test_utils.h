@@ -23,6 +23,6 @@ bool is_equal(AudioTimeStamp const *const ts1, AudioTimeStamp const *const ts2);
 struct node_object {
     node_object(uint32_t const input_bus_count = 2, uint32_t const output_bus_count = 1);
 
-    audio::engine::node_ptr node;
+    audio::graph_node_ptr node;
 };
 }  // namespace yas::test

@@ -171,6 +171,6 @@ uint8_t const *test::data_ptr_from_buffer(audio::pcm_buffer const &buffer, uint3
 }
 
 test::node_object::node_object(uint32_t const input_bus_count, uint32_t const output_bus_count)
-    : node(audio::engine::node::make_shared(
-          audio::engine::node_args{.input_bus_count = input_bus_count, .output_bus_count = output_bus_count})) {
+    : node(audio::graph_node::make_shared(
+          audio::graph_node_args{.input_bus_count = input_bus_count, .output_bus_count = output_bus_count})) {
 }

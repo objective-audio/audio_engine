@@ -23,19 +23,19 @@ namespace yas::sample {
 struct input_tap_vc_cpp {
     audio::ios_session_ptr const session = audio::ios_session::shared();
     audio::io_device_ptr const device = audio::ios_device::renewable_device(this->session);
-    audio::engine::manager_ptr const manager = audio::engine::manager::make_shared();
-    audio::engine::tap_ptr const input_tap = audio::engine::tap::make_shared({.is_input = true});
+    audio::graph_ptr const graph = audio::graph::make_shared();
+    audio::graph_tap_ptr const input_tap = audio::graph_tap::make_shared({.is_input = true});
 
     chaining::value::holder_ptr<float> input_level =
         chaining::value::holder<float>::make_shared(audio::math::decibel_from_linear(0.0f));
 
     void setup() {
-        auto const &io = this->manager->add_io(this->device);
+        auto const &io = this->graph->add_io(this->device);
 
         double const sample_rate = this->device->input_format()->sample_rate();
         uint32_t const ch_count = this->device->input_channel_count();
         audio::format format{{.sample_rate = sample_rate, .channel_count = ch_count}};
-        manager->connect(io->node(), input_tap->node(), format);
+        graph->connect(io->node(), input_tap->node(), format);
 
         input_tap->set_render_handler([input_level = input_level, sample_rate](auto args) mutable {
             auto const &buffer = args.buffer;
@@ -56,7 +56,7 @@ struct input_tap_vc_cpp {
     }
 
     void dispose() {
-        this->manager->stop();
+        this->graph->stop();
         this->session->deactivate();
     }
 };
@@ -118,7 +118,7 @@ struct input_tap_vc_cpp {
 
     self->_cpp.setup();
 
-    if (auto start_result = self->_cpp.manager->start_render()) {
+    if (auto start_result = self->_cpp.graph->start_render()) {
         self.displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(updateUI:)];
         [self.displayLink addToRunLoop:[NSRunLoop mainRunLoop] forMode:NSDefaultRunLoopMode];
     } else {
