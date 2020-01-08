@@ -29,8 +29,8 @@
 
 #elif TARGET_OS_MAC
 
-#include "yas_audio_engine_io.h"
-#include "yas_audio_engine_route.h"
+#include "yas_audio_graph_io.h"
+#include "yas_audio_graph_route.h"
 #include "yas_audio_mac_device.h"
 #include "yas_audio_mac_device_stream.h"
 
@@ -39,11 +39,11 @@
 #include "yas_audio_avf_au.h"
 #include "yas_audio_avf_au_parameter.h"
 
-#include "yas_audio_engine_avf_au.h"
-#include "yas_audio_engine_avf_au_mixer.h"
-#include "yas_audio_engine_connection.h"
-#include "yas_audio_engine_io.h"
-#include "yas_audio_engine_manager.h"
-#include "yas_audio_engine_node.h"
-#include "yas_audio_engine_route.h"
-#include "yas_audio_engine_tap.h"
+#include "yas_audio_graph.h"
+#include "yas_audio_graph_avf_au.h"
+#include "yas_audio_graph_avf_au_mixer.h"
+#include "yas_audio_graph_connection.h"
+#include "yas_audio_graph_io.h"
+#include "yas_audio_graph_node.h"
+#include "yas_audio_graph_route.h"
+#include "yas_audio_graph_tap.h"

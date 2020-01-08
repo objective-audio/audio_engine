@@ -16,7 +16,7 @@ namespace yas::offline_sample {
 static double constexpr sample_rate = 44100.0;
 }
 
-namespace yas::offline_sample::engine {
+namespace yas::offline_sample {
 class sine;
 using sine_ptr = std::shared_ptr<sine>;
 
@@ -43,12 +43,12 @@ struct sine {
         return __playing;
     }
 
-    audio::engine::tap &tap() {
+    audio::graph_tap &tap() {
         return *this->_tap;
     }
 
    private:
-    audio::engine::tap_ptr _tap = audio::engine::tap::make_shared();
+    audio::graph_tap_ptr _tap = audio::graph_tap::make_shared();
     double _phase_on_render;
 
     mutable std::recursive_mutex _mutex;
@@ -111,13 +111,13 @@ struct sine {
 
 namespace yas::sample {
 struct offline_vc_internal {
-    audio::engine::manager_ptr play_manager = audio::engine::manager::make_shared();
-    audio::engine::avf_au_mixer_ptr play_au_mixer = audio::engine::avf_au_mixer::make_shared();
-    offline_sample::engine::sine_ptr play_sine = offline_sample::engine::sine::make_shared();
+    audio::graph_ptr play_graph = audio::graph::make_shared();
+    audio::graph_avf_au_mixer_ptr play_au_mixer = audio::graph_avf_au_mixer::make_shared();
+    offline_sample::sine_ptr play_sine = offline_sample::sine::make_shared();
 
-    audio::engine::manager_ptr offline_manager = audio::engine::manager::make_shared();
-    audio::engine::avf_au_mixer_ptr offline_au_mixer = audio::engine::avf_au_mixer::make_shared();
-    offline_sample::engine::sine_ptr offline_sine = offline_sample::engine::sine::make_shared();
+    audio::graph_ptr offline_graph = audio::graph::make_shared();
+    audio::graph_avf_au_mixer_ptr offline_au_mixer = audio::graph_avf_au_mixer::make_shared();
+    offline_sample::sine_ptr offline_sine = offline_sample::sine::make_shared();
 
     audio::format const file_format{{.sample_rate = offline_sample::sample_rate,
                                      .channel_count = 2,
@@ -125,9 +125,9 @@ struct offline_vc_internal {
                                      .interleaved = false}};
 
     offline_vc_internal() {
-        auto const &io = this->play_manager->add_io(audio::mac_device::renewable_default_output_device());
+        auto const &io = this->play_graph->add_io(audio::mac_device::renewable_default_output_device());
 
-        this->play_au_mixer->au()->node()->reset();
+        this->play_au_mixer->raw_au()->node()->reset();
         this->play_au_mixer->set_input_pan(0.0f, 0);
         this->play_au_mixer->set_input_enabled(true, 0);
         this->play_au_mixer->set_output_volume(1.0f, 0);
@@ -147,18 +147,18 @@ struct offline_vc_internal {
                                  })
                                  .end();
 
-        this->offline_au_mixer->au()->node()->reset();
+        this->offline_au_mixer->raw_au()->node()->reset();
         this->offline_au_mixer->set_input_pan(0.0f, 0);
         this->offline_au_mixer->set_input_enabled(true, 0);
         this->offline_au_mixer->set_output_volume(1.0f, 0);
         this->offline_au_mixer->set_output_pan(0.0f, 0);
 
-        this->offline_manager->connect(this->offline_sine->tap().node(), this->offline_au_mixer->au()->node(),
-                                       this->file_format);
+        this->offline_graph->connect(this->offline_sine->tap().node(), this->offline_au_mixer->raw_au()->node(),
+                                     this->file_format);
     }
 
     void start_render() {
-        auto const &io = this->play_manager->io();
+        auto const &io = this->play_graph->io();
         if (!io) {
             return;
         }
@@ -170,30 +170,30 @@ struct offline_vc_internal {
             return;
         }
 
-        this->play_manager->connect(this->play_au_mixer->au()->node(), io_value->node(), *output_format);
-        this->play_manager->connect(this->play_sine->tap().node(), this->play_au_mixer->au()->node(),
-                                    this->file_format);
+        this->play_graph->connect(this->play_au_mixer->raw_au()->node(), io_value->node(), *output_format);
+        this->play_graph->connect(this->play_sine->tap().node(), this->play_au_mixer->raw_au()->node(),
+                                  this->file_format);
 
-        if (!this->play_manager->start_render()) {
+        if (!this->play_graph->start_render()) {
             NSLog(@"%s error", __PRETTY_FUNCTION__);
         }
     }
 
     void stop_render() {
-        this->play_manager->stop();
-        this->play_manager->disconnect(this->play_au_mixer->au()->node());
+        this->play_graph->stop();
+        this->play_graph->disconnect(this->play_au_mixer->raw_au()->node());
     }
 
    private:
     chaining::any_observer_ptr _io_observer = nullptr;
 
     void _update_connection() {
-        if (auto const &io = this->play_manager->io()) {
+        if (auto const &io = this->play_graph->io()) {
             auto const &io_value = io.value();
             if (auto const output_format = io_value->raw_io()->device().value()->output_format()) {
-                this->play_manager->disconnect(io_value->node());
+                this->play_graph->disconnect(io_value->node());
 
-                this->play_manager->connect(this->play_au_mixer->au()->node(), io_value->node(), *output_format);
+                this->play_graph->connect(this->play_au_mixer->raw_au()->node(), io_value->node(), *output_format);
             }
         }
     }
@@ -306,8 +306,8 @@ struct offline_vc_internal {
         objc_ptr_with_move_object([[YASUnownedObject<YASAudioOfflineSampleViewController *> alloc] init]);
     [unowned_self.object() setObject:self];
     auto &internal = self->_internal.value();
-        
-    auto const &offline_manager = internal->offline_manager;
+
+    auto const &offline_graph = internal->offline_graph;
 
     auto const device = audio::offline_device::make_shared(
         internal->file_format,
@@ -337,16 +337,16 @@ struct offline_vc_internal {
         },
         [unowned_self, weak_internal = to_weak(internal)](bool const cancelled) {
             if (auto const internal = weak_internal.lock()) {
-                internal->offline_manager->remove_io();
+                internal->offline_graph->remove_io();
             }
             [unowned_self.object() object].processing = NO;
         });
 
-    auto const &offline_io = offline_manager->add_io(device);
+    auto const &offline_io = offline_graph->add_io(device);
 
-    offline_manager->connect(internal->offline_au_mixer->au()->node(), offline_io->node(), internal->file_format);
+    offline_graph->connect(internal->offline_au_mixer->raw_au()->node(), offline_io->node(), internal->file_format);
 
-    auto start_result = offline_manager->start_render();
+    auto start_result = offline_graph->start_render();
 
     if (!start_result) {
         self.processing = NO;

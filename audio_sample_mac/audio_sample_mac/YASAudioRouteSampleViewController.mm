@@ -12,7 +12,7 @@
 using namespace yas;
 
 namespace yas::sample {
-struct engine_io_vc_cpp {
+struct graph_io_vc_cpp {
     enum class source_bus : uint32_t {
         sine,
         input,
@@ -24,14 +24,14 @@ struct engine_io_vc_cpp {
         input,
     };
 
-    audio::engine::manager_ptr const manager = audio::engine::manager::make_shared();
-    audio::engine::route_ptr const route = audio::engine::route::make_shared();
-    audio::engine::tap_ptr const tap = audio::engine::tap::make_shared();
+    audio::graph_ptr const graph = audio::graph::make_shared();
+    audio::graph_route_ptr const route = audio::graph_route::make_shared();
+    audio::graph_tap_ptr const tap = audio::graph_tap::make_shared();
 
     std::optional<chaining::any_observer_ptr> system_observer = std::nullopt;
     std::optional<chaining::any_observer_ptr> device_observer = std::nullopt;
 
-    engine_io_vc_cpp() {
+    graph_io_vc_cpp() {
         std::optional<audio::mac_device_ptr> device = std::nullopt;
 
         if (auto const output_device = audio::mac_device::default_output_device()) {
@@ -40,7 +40,7 @@ struct engine_io_vc_cpp {
             device = input_device;
         }
 
-        this->manager->add_io(device);
+        this->graph->add_io(device);
     }
 };
 }
@@ -65,19 +65,19 @@ struct engine_io_vc_cpp {
 }
 
 - (BOOL)isNoneSelected {
-    return self.inputSelectIndex == (uint32_t)sample::engine_io_vc_cpp::input_type::none;
+    return self.inputSelectIndex == (uint32_t)sample::graph_io_vc_cpp::input_type::none;
 }
 
 - (BOOL)isSineSelected {
-    return self.inputSelectIndex == (uint32_t)sample::engine_io_vc_cpp::input_type::sine;
+    return self.inputSelectIndex == (uint32_t)sample::graph_io_vc_cpp::input_type::sine;
 }
 
 - (BOOL)isInputSelected {
-    return self.inputSelectIndex >= (uint32_t)sample::engine_io_vc_cpp::input_type::input;
+    return self.inputSelectIndex >= (uint32_t)sample::graph_io_vc_cpp::input_type::input;
 }
 
 - (uint32_t)inputIndex {
-    return self.inputSelectIndex - (uint32_t)sample::engine_io_vc_cpp::input_type::input;
+    return self.inputSelectIndex - (uint32_t)sample::graph_io_vc_cpp::input_type::input;
 }
 
 @end
@@ -97,13 +97,13 @@ struct engine_io_vc_cpp {
 }
 
 - (NSString *)indexTitle {
-    if ((sample::engine_io_vc_cpp::input_type)self.index == sample::engine_io_vc_cpp::input_type::none) {
+    if ((sample::graph_io_vc_cpp::input_type)self.index == sample::graph_io_vc_cpp::input_type::none) {
         return @"None";
-    } else if ((sample::engine_io_vc_cpp::input_type)self.index == sample::engine_io_vc_cpp::input_type::sine) {
+    } else if ((sample::graph_io_vc_cpp::input_type)self.index == sample::graph_io_vc_cpp::input_type::sine) {
         return @"Sine";
     } else {
         return [NSString
-            stringWithFormat:@"Input Ch : %@", @(self.index - (uint32_t)sample::engine_io_vc_cpp::input_type::input)];
+            stringWithFormat:@"Input Ch : %@", @(self.index - (uint32_t)sample::graph_io_vc_cpp::input_type::input)];
     }
 }
 
@@ -121,7 +121,7 @@ struct engine_io_vc_cpp {
 @end
 
 @implementation YASAudioRouteSampleViewController {
-    std::shared_ptr<sample::engine_io_vc_cpp> _cpp;
+    std::shared_ptr<sample::graph_io_vc_cpp> _cpp;
 }
 
 - (void)dealloc {
@@ -145,9 +145,9 @@ struct engine_io_vc_cpp {
 
     [self setup];
 
-    if (auto error = _cpp->manager->start_render().error_opt()) {
+    if (auto error = _cpp->graph->start_render().error_opt()) {
         auto const error_str = to_string(*error);
-        NSLog(@"audio engine start failed. error : %@", (__bridge NSString *)to_cf_object(error_str));
+        NSLog(@"audio graph start failed. error : %@", (__bridge NSString *)to_cf_object(error_str));
     }
 }
 
@@ -167,10 +167,10 @@ struct engine_io_vc_cpp {
             _cpp->route->remove_route_for_destination({0, data.outputIndex});
         } else if ([data isSineSelected]) {
             _cpp->route->add_route(
-                {(uint32_t)sample::engine_io_vc_cpp::source_bus::sine, data.outputIndex, 0, data.outputIndex});
+                {(uint32_t)sample::graph_io_vc_cpp::source_bus::sine, data.outputIndex, 0, data.outputIndex});
         } else if ([data isInputSelected]) {
             _cpp->route->add_route(
-                {(uint32_t)sample::engine_io_vc_cpp::source_bus::input, [data inputIndex], 0, data.outputIndex});
+                {(uint32_t)sample::graph_io_vc_cpp::source_bus::input, [data inputIndex], 0, data.outputIndex});
         }
 
         [self _updateInputSelection];
@@ -180,7 +180,7 @@ struct engine_io_vc_cpp {
 }
 
 - (void)setup {
-    self->_cpp = std::make_shared<sample::engine_io_vc_cpp>();
+    self->_cpp = std::make_shared<sample::graph_io_vc_cpp>();
 
     auto weak_tap = to_weak(_cpp->tap);
 
@@ -221,7 +221,7 @@ struct engine_io_vc_cpp {
 }
 
 - (void)dispose {
-    self->_cpp->manager->stop();
+    self->_cpp->graph->stop();
     self->_cpp = nullptr;
 
     self.selectedDeviceIndex = audio::mac_device::all_devices().size();
@@ -248,7 +248,7 @@ struct engine_io_vc_cpp {
     self.deviceNames = titles;
 
     std::optional<NSUInteger> index = std::nullopt;
-    if (auto const io_device = _cpp->manager->io().value()->raw_io()->device()) {
+    if (auto const io_device = _cpp->graph->io().value()->raw_io()->device()) {
         auto const mac_device = std::dynamic_pointer_cast<audio::mac_device>(*io_device);
         index = audio::mac_device::index_of_device(mac_device);
     }
@@ -266,24 +266,24 @@ struct engine_io_vc_cpp {
     self.outputRoutes = nil;
     self.inputRoutes = nil;
 
-    self->_cpp->manager->disconnect(_cpp->tap->node());
-    self->_cpp->manager->disconnect(_cpp->route->node());
+    self->_cpp->graph->disconnect(_cpp->tap->node());
+    self->_cpp->graph->disconnect(_cpp->route->node());
     self->_cpp->route->clear_routes();
 
-    if (auto const &device_opt = _cpp->manager->io().value()->raw_io()->device()) {
+    if (auto const &device_opt = _cpp->graph->io().value()->raw_io()->device()) {
         auto const &device = *device_opt;
         if (device->output_channel_count() > 0) {
             if (auto const output_format = device->output_format()) {
-                _cpp->manager->connect(_cpp->route->node(), _cpp->manager->io().value()->node(), *output_format);
-                _cpp->manager->connect(_cpp->tap->node(), _cpp->route->node(), 0,
-                                       (uint32_t)sample::engine_io_vc_cpp::source_bus::sine, *output_format);
+                _cpp->graph->connect(_cpp->route->node(), _cpp->graph->io().value()->node(), *output_format);
+                _cpp->graph->connect(_cpp->tap->node(), _cpp->route->node(), 0,
+                                     (uint32_t)sample::graph_io_vc_cpp::source_bus::sine, *output_format);
             }
         }
 
         if (device->input_channel_count() > 0) {
             if (auto const input_format = device->input_format()) {
-                _cpp->manager->connect(_cpp->manager->io().value()->node(), _cpp->route->node(), 0,
-                                       (uint32_t)sample::engine_io_vc_cpp::source_bus::input, *input_format);
+                _cpp->graph->connect(_cpp->graph->io().value()->node(), _cpp->route->node(), 0,
+                                     (uint32_t)sample::graph_io_vc_cpp::source_bus::input, *input_format);
             }
         }
 
@@ -347,15 +347,15 @@ struct engine_io_vc_cpp {
 
         if (it != routes.end()) {
             auto const &route = *it;
-            if (route.source.bus == (uint32_t)sample::engine_io_vc_cpp::source_bus::sine) {
-                inputSelectIndex = (uint32_t)sample::engine_io_vc_cpp::input_type::sine;
-            } else if (route.source.bus == (uint32_t)sample::engine_io_vc_cpp::source_bus::input) {
-                inputSelectIndex = route.source.channel + (uint32_t)sample::engine_io_vc_cpp::input_type::input;
+            if (route.source.bus == (uint32_t)sample::graph_io_vc_cpp::source_bus::sine) {
+                inputSelectIndex = (uint32_t)sample::graph_io_vc_cpp::input_type::sine;
+            } else if (route.source.bus == (uint32_t)sample::graph_io_vc_cpp::source_bus::input) {
+                inputSelectIndex = route.source.channel + (uint32_t)sample::graph_io_vc_cpp::input_type::input;
             } else {
-                inputSelectIndex = (uint32_t)sample::engine_io_vc_cpp::input_type::none;
+                inputSelectIndex = (uint32_t)sample::graph_io_vc_cpp::input_type::none;
             }
         } else {
-            inputSelectIndex = (uint32_t)sample::engine_io_vc_cpp::input_type::none;
+            inputSelectIndex = (uint32_t)sample::graph_io_vc_cpp::input_type::none;
         }
 
         if (data.inputSelectIndex != inputSelectIndex) {
@@ -388,7 +388,7 @@ struct engine_io_vc_cpp {
 
     auto const all_devices = audio::mac_device::all_devices();
 
-    _cpp->manager->io().value()->raw_io()->set_device(selected_device);
+    _cpp->graph->io().value()->raw_io()->set_device(selected_device);
 
     if (selected_device && std::find(all_devices.begin(), all_devices.end(), selected_device) != all_devices.end()) {
         auto unowned_self = objc_ptr_with_move_object([[YASUnownedObject alloc] initWithObject:self]);
