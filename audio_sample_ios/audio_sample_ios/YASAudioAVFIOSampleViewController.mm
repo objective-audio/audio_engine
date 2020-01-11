@@ -15,7 +15,7 @@ struct avf_io_vc_cpp {
     audio::ios_session_ptr const session = audio::ios_session::shared();
     audio::ios_device_ptr const device = audio::ios_device::make_shared(this->session);
     std::optional<audio::io_ptr> io = std::nullopt;
-    std::optional<audio::sample_kernel_ptr> kernel = std::nullopt;
+    std::optional<audio::sample::kernel_ptr> kernel = std::nullopt;
 
     objc_ptr<NSNumberFormatter *> formatter = objc_ptr_with_move_object([[NSNumberFormatter alloc] init]);
 
@@ -23,6 +23,42 @@ struct avf_io_vc_cpp {
         this->formatter.object().numberStyle = NSNumberFormatterDecimalStyle;
         this->formatter.object().minimumFractionDigits = 1;
         this->formatter.object().maximumFractionDigits = 1;
+    }
+
+    std::optional<std::string> setup() {
+        this->session->set_category(audio::ios_session::category::play_and_record);
+
+        if (auto const result = this->session->activate(); !result) {
+            return result.error();
+        }
+
+        auto const io = audio::io::make_shared(this->device);
+        auto const kernel = audio::sample::kernel::make_shared();
+
+        this->io = io;
+        this->kernel = kernel;
+
+        auto weak_io = to_weak(io);
+        io->set_render_handler([weak_io, kernel](auto args) {
+            if (auto shared_io = weak_io.lock()) {
+                kernel->process(shared_io->input_buffer_on_render(), args.output_buffer);
+            }
+        });
+
+        io->start();
+
+        return std::nullopt;
+    }
+
+    void dispose() {
+        if (auto const &io = this->io) {
+            io.value()->stop();
+        }
+
+        this->io = std::nullopt;
+        this->kernel = std::nullopt;
+
+        this->session->deactivate();
     }
 };
 }
@@ -49,44 +85,20 @@ struct avf_io_vc_cpp {
 - (void)setup {
     self->_cpp.session->set_category(audio::ios_session::category::play_and_record);
 
-    if (auto const result = self->_cpp.session->activate(); !result) {
-        [YASViewControllerUtils showErrorAlertWithMessage:(__bridge NSString *)to_cf_object(result.error())
+    if (auto const error_message = self->_cpp.setup()) {
+        [YASViewControllerUtils showErrorAlertWithMessage:(__bridge NSString *)to_cf_object(*error_message)
                                          toViewController:self];
         return;
     }
 
-    auto const io = audio::io::make_shared(self->_cpp.device);
-    auto const kernel = std::make_shared<audio::sample_kernel_t>();
-
-    self->_cpp.io = io;
-    self->_cpp.kernel = kernel;
-
-    auto weak_io = to_weak(io);
-    io->set_render_handler([weak_io, kernel](auto args) {
-        if (auto shared_io = weak_io.lock()) {
-            kernel->process(shared_io->input_buffer_on_render(), args.output_buffer);
-        }
-    });
-
-    io->start();
-
-    self.throughVolumeSlider.value = kernel->through_volume();
-    self.sineVolumeSlider.value = kernel->sine_volume();
-    self.sineFrequencySlider.value = kernel->sine_frequency();
-    [self updateThroughVolumeLabel];
-    [self updateSineVolumeLabel];
-    [self updateSineFrequencyLabel];
-}
-
-- (void)dispose {
-    if (auto const &io = self->_cpp.io) {
-        io.value()->stop();
+    if (auto const &kernel = self->_cpp.kernel) {
+        self.throughVolumeSlider.value = kernel.value()->through_volume();
+        self.sineVolumeSlider.value = kernel.value()->sine_volume();
+        self.sineFrequencySlider.value = kernel.value()->sine_frequency();
+        [self updateThroughVolumeLabel];
+        [self updateSineVolumeLabel];
+        [self updateSineFrequencyLabel];
     }
-
-    self->_cpp.io = std::nullopt;
-    self->_cpp.kernel = std::nullopt;
-
-    self->_cpp.session->deactivate();
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -101,40 +113,52 @@ struct avf_io_vc_cpp {
     [super viewWillDisappear:animated];
 
     if (self.isMovingFromParentViewController) {
-        [self dispose];
+        self->_cpp.dispose();
     }
 }
 
 - (IBAction)throughVolumeValueChanged:(UISlider *)sender {
-    self->_cpp.kernel.value()->set_througn_volume(sender.value);
-    [self updateThroughVolumeLabel];
+    if (auto const &kernel = self->_cpp.kernel) {
+        kernel.value()->set_througn_volume(sender.value);
+        [self updateThroughVolumeLabel];
+    }
 }
 
 - (IBAction)sineVolumeValueChanged:(UISlider *)sender {
-    self->_cpp.kernel.value()->set_sine_volume(sender.value);
-    [self updateSineVolumeLabel];
+    if (auto const &kernel = self->_cpp.kernel) {
+        kernel.value()->set_sine_volume(sender.value);
+        [self updateSineVolumeLabel];
+    }
 }
 
 - (IBAction)sineFrequencyValueChanged:(UISlider *)sender {
-    self->_cpp.kernel.value()->set_sine_frequency(sender.value);
-    [self updateSineFrequencyLabel];
+    if (auto const &kernel = self->_cpp.kernel) {
+        kernel.value()->set_sine_frequency(sender.value);
+        [self updateSineFrequencyLabel];
+    }
 }
 
 - (void)updateThroughVolumeLabel {
-    NSString *string = [self->_cpp.formatter.object()
-        stringFromNumber:@(audio::math::decibel_from_linear(self->_cpp.kernel.value()->through_volume()))];
-    self.throughVolumeLabel.text = [NSString stringWithFormat:@"%@ dB", string];
+    if (auto const &kernel = self->_cpp.kernel) {
+        NSString *string = [self->_cpp.formatter.object()
+            stringFromNumber:@(audio::math::decibel_from_linear(kernel.value()->through_volume()))];
+        self.throughVolumeLabel.text = [NSString stringWithFormat:@"%@ dB", string];
+    }
 }
 
 - (void)updateSineVolumeLabel {
-    NSString *string = [self->_cpp.formatter.object()
-        stringFromNumber:@(audio::math::decibel_from_linear(self->_cpp.kernel.value()->sine_volume()))];
-    self.sineVolumeLabel.text = [NSString stringWithFormat:@"%@ dB", string];
+    if (auto const &kernel = self->_cpp.kernel) {
+        NSString *string = [self->_cpp.formatter.object()
+            stringFromNumber:@(audio::math::decibel_from_linear(kernel.value()->sine_volume()))];
+        self.sineVolumeLabel.text = [NSString stringWithFormat:@"%@ dB", string];
+    }
 }
 
 - (void)updateSineFrequencyLabel {
-    NSString *string = [self->_cpp.formatter.object() stringFromNumber:@(self->_cpp.kernel.value()->sine_frequency())];
-    self.sineFrequencyLabel.text = [NSString stringWithFormat:@"%@ Hz", string];
+    if (auto const &kernel = self->_cpp.kernel) {
+        NSString *string = [self->_cpp.formatter.object() stringFromNumber:@(kernel.value()->sine_frequency())];
+        self.sineFrequencyLabel.text = [NSString stringWithFormat:@"%@ Hz", string];
+    }
 }
 
 @end

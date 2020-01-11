@@ -22,7 +22,7 @@ using namespace yas;
 namespace yas::sample {
 struct input_tap_vc_cpp {
     audio::ios_session_ptr const session = audio::ios_session::shared();
-    audio::io_device_ptr const device = audio::ios_device::renewable_device(this->session);
+    audio::io_device_ptr const device = audio::ios_device::make_renewable_device(this->session);
     audio::graph_ptr const graph = audio::graph::make_shared();
     audio::graph_tap_ptr const input_tap = audio::graph_tap::make_shared({.is_input = true});
 

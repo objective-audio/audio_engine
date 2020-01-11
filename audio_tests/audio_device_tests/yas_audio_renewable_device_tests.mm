@@ -41,14 +41,16 @@ using namespace yas::audio;
         [update_notifier](io_device_ptr const &device, auto const &handler) {
             auto pool = chaining::observer_pool::make_shared();
 
-            *pool += device->io_device_chain()
-                         .guard([](auto const &method) { return method == io_device::method::updated; })
-                         .perform([handler](auto const &) { handler(renewable_device::method::notify); })
-                         .end();
+            device->io_device_chain()
+                .guard([](auto const &method) { return method == io_device::method::updated; })
+                .perform([handler](auto const &) { handler(renewable_device::method::notify); })
+                .end()
+                ->add_to(*pool);
 
-            *pool += update_notifier->chain()
-                         .perform([handler](auto const &) { handler(renewable_device::method::renewal); })
-                         .end();
+            update_notifier->chain()
+                .perform([handler](auto const &) { handler(renewable_device::method::renewal); })
+                .end()
+                ->add_to(*pool);
 
             return pool;
         });

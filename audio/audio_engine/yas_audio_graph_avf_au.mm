@@ -75,21 +75,23 @@ void audio::graph_avf_au::_prepare(graph_avf_au_ptr const &shared, AudioComponen
         }
     });
 
-    this->_pool += this->_node->chain(graph_node::method::will_reset)
-                       .perform([weak_au](auto const &) {
-                           if (auto au = weak_au.lock()) {
-                               au->_will_reset();
-                           }
-                       })
-                       .end();
+    this->_node->chain(graph_node::method::will_reset)
+        .perform([weak_au](auto const &) {
+            if (auto au = weak_au.lock()) {
+                au->_will_reset();
+            }
+        })
+        .end()
+        ->add_to(this->_pool);
 
-    this->_pool += this->_node->chain(graph_node::method::update_connections)
-                       .perform([weak_au](auto const &) {
-                           if (auto au = weak_au.lock()) {
-                               au->_update_unit_connections();
-                           }
-                       })
-                       .end();
+    this->_node->chain(graph_node::method::update_connections)
+        .perform([weak_au](auto const &) {
+            if (auto au = weak_au.lock()) {
+                au->_update_unit_connections();
+            }
+        })
+        .end()
+        ->add_to(this->_pool);
 
     manageable_graph_node::cast(this->_node)->set_setup_handler([weak_au]() {
         if (auto au = weak_au.lock()) {
@@ -103,7 +105,7 @@ void audio::graph_avf_au::_prepare(graph_avf_au_ptr const &shared, AudioComponen
         }
     });
 
-    this->_pool += this->_raw_au->load_state_chain().send_to(shared->_load_state).sync();
+    this->_raw_au->load_state_chain().send_to(shared->_load_state).sync()->add_to(this->_pool);
 }
 
 void audio::graph_avf_au::_will_reset() {
