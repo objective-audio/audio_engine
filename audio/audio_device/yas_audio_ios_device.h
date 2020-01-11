@@ -13,7 +13,7 @@
 
 namespace yas::audio {
 struct ios_device final : io_device {
-    std::optional<ios_session_ptr> const &session() const;
+    std::optional<ios_device_session_ptr> const &session() const;
 
     [[nodiscard]] double sample_rate() const;
 
@@ -23,6 +23,7 @@ struct ios_device final : io_device {
     [[nodiscard]] chaining::chain_unsync_t<io_device::method> io_device_chain() override;
 
     [[nodiscard]] static ios_device_ptr make_shared(ios_session_ptr const &);
+    [[nodiscard]] static ios_device_ptr make_shared(ios_device_session_ptr const &, interruptor_ptr const &);
 
     [[nodiscard]] static io_device_ptr make_renewable_device(ios_session_ptr const &);
 
@@ -30,12 +31,12 @@ struct ios_device final : io_device {
     class impl;
 
     std::weak_ptr<ios_device> _weak_device;
-    std::optional<ios_session_ptr> _session;
+    std::optional<ios_device_session_ptr> _session;
     std::optional<audio::interruptor_ptr> _interruptor;
     chaining::notifier_ptr<method> _notifier = chaining::notifier<method>::make_shared();
     chaining::any_observer_ptr _observer;
 
-    ios_device(ios_session_ptr const &);
+    ios_device(ios_device_session_ptr const &, interruptor_ptr const &);
 
     std::optional<interruptor_ptr> const &interruptor() const override;
 

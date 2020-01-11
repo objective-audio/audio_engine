@@ -17,6 +17,6 @@ struct interruptor {
 
     virtual bool is_interrupting() const = 0;
 
-    virtual chaining::chain_unsync_t<interruption_method> interruption_chain() = 0;
+    virtual chaining::chain_unsync_t<interruption_method> interruption_chain() const = 0;
 };
 }  // namespace yas::audio
