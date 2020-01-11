@@ -80,24 +80,25 @@ audio::ios_device_ptr audio::ios_device::make_shared(ios_session_ptr const &sess
     return shared;
 }
 
-audio::io_device_ptr audio::ios_device::renewable_device(ios_session_ptr const &session) {
+audio::io_device_ptr audio::ios_device::make_renewable_device(ios_session_ptr const &session) {
     return audio::renewable_device::make_shared(
         [session]() { return ios_device::make_shared(session); },
         [](io_device_ptr const &device, renewable_device::method_f const &handler) {
             auto pool = chaining::observer_pool::make_shared();
 
-            *pool += device->io_device_chain()
-                         .perform([handler](auto const &method) {
-                             switch (method) {
-                                 case io_device::method::updated:
-                                     handler(renewable_device::method::notify);
-                                     break;
-                                 case io_device::method::lost:
-                                     handler(renewable_device::method::renewal);
-                                     break;
-                             }
-                         })
-                         .end();
+            device->io_device_chain()
+                .perform([handler](auto const &method) {
+                    switch (method) {
+                        case io_device::method::updated:
+                            handler(renewable_device::method::notify);
+                            break;
+                        case io_device::method::lost:
+                            handler(renewable_device::method::renewal);
+                            break;
+                    }
+                })
+                .end()
+                ->add_to(*pool);
 
             return pool;
         });

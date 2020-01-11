@@ -24,7 +24,7 @@ struct ios_device final : io_device {
 
     [[nodiscard]] static ios_device_ptr make_shared(ios_session_ptr const &);
 
-    [[nodiscard]] static io_device_ptr renewable_device(ios_session_ptr const &);
+    [[nodiscard]] static io_device_ptr make_renewable_device(ios_session_ptr const &);
 
    private:
     class impl;

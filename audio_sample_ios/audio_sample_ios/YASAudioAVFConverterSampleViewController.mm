@@ -15,21 +15,30 @@ using namespace yas;
 
 namespace yas::sample {
 struct avf_converter_vc_cpp {
-    audio::ios_session_ptr const session = audio::ios_session::shared();
-    audio::ios_device_ptr const device = audio::ios_device::make_shared(this->session);
+    audio::ios_session_ptr const session;
+    audio::ios_device_ptr const device;
     audio::graph_ptr const graph;
     audio::graph_avf_au_ptr const converter;
     audio::graph_tap_ptr tap;
     chaining::observer_pool pool;
-    audio::sample_kernel_ptr kernel;
+    audio::sample::kernel_ptr const kernel;
 
     avf_converter_vc_cpp()
-        : graph(audio::graph::make_shared()),
+        : session(audio::ios_session::shared()),
+          device(audio::ios_device::make_shared(this->session)),
+          graph(audio::graph::make_shared()),
           converter(audio::graph_avf_au::make_shared(kAudioUnitType_FormatConverter, kAudioUnitSubType_AUConverter)),
-          tap(audio::graph_tap::make_shared()) {
+          tap(audio::graph_tap::make_shared()),
+          kernel(audio::sample::kernel::make_shared()) {
     }
 
-    void setup() {
+    std::optional<std::string> setup() {
+        this->session->set_category(audio::ios_session::category::playback);
+
+        if (auto const result = this->session->activate(); !result) {
+            return result.error();
+        }
+
         auto const &io = this->graph->add_io(this->device);
 
         auto const output_format = this->device->output_format();
@@ -42,7 +51,6 @@ struct avf_converter_vc_cpp {
         this->graph->connect(this->converter->node(), io->node(), *output_format);
         this->graph->connect(this->tap->node(), this->converter->node(), input_format);
 
-        this->kernel = std::make_shared<audio::sample_kernel_t>();
         this->kernel->set_sine_volume(0.1);
         this->kernel->set_sine_frequency(1000.0);
 
@@ -50,19 +58,24 @@ struct avf_converter_vc_cpp {
             kernel->process(std::nullopt, args.buffer);
         });
 
-        this->pool += this->converter->load_state_chain()
-                          .perform([this](auto const &state) {
-                              if (state == audio::avf_au::load_state::loaded) {
-                                  this->graph->start_render();
-                              }
-                          })
-                          .sync();
+        this->converter->load_state_chain()
+            .perform([this](auto const &state) {
+                if (state == audio::avf_au::load_state::loaded) {
+                    this->graph->start_render();
+                }
+            })
+            .sync()
+            ->add_to(this->pool);
+
+        return std::nullopt;
     }
 
     void dispose() {
         this->pool.invalidate();
 
         this->graph->remove_io();
+
+        this->session->deactivate();
     }
 };
 }
@@ -87,13 +100,10 @@ struct avf_converter_vc_cpp {
     [super viewDidAppear:animated];
 
     if (self.isMovingToParentViewController) {
-        self->_cpp.session->set_category(audio::ios_session::category::playback);
-
-        if (auto const result = self->_cpp.session->activate()) {
-            self->_cpp.setup();
+        if (auto const error_message = self->_cpp.setup(); !error_message.has_value()) {
             self.volumeSlider.value = self->_cpp.kernel->sine_volume();
         } else {
-            [YASViewControllerUtils showErrorAlertWithMessage:(__bridge NSString *)to_cf_object(result.error())
+            [YASViewControllerUtils showErrorAlertWithMessage:(__bridge NSString *)to_cf_object(error_message.value())
                                              toViewController:self];
         }
     }
@@ -102,8 +112,6 @@ struct avf_converter_vc_cpp {
 - (void)viewWillDisappear:(BOOL)animated {
     if (self.isMovingFromParentViewController) {
         self->_cpp.dispose();
-
-        self->_cpp.session->deactivate();
     }
 
     [super viewWillDisappear:animated];

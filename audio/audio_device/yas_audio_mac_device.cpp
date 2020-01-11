@@ -283,14 +283,16 @@ audio::io_device_ptr audio::mac_device::renewable_default_output_device() {
         [](io_device_ptr const &device, renewable_device::method_f const &handler) {
             auto pool = chaining::observer_pool::make_shared();
 
-            *pool += device->io_device_chain()
-                         .guard([](auto const &method) { return method == audio::io_device::method::updated; })
-                         .perform([handler](auto const &) { handler(renewable_device::method::notify); })
-                         .end();
+            device->io_device_chain()
+                .guard([](auto const &method) { return method == audio::io_device::method::updated; })
+                .perform([handler](auto const &) { handler(renewable_device::method::notify); })
+                .end()
+                ->add_to(*pool);
 
-            *pool += mac_device::system_chain()
-                         .perform([handler](auto const &) { handler(renewable_device::method::renewal); })
-                         .end();
+            mac_device::system_chain()
+                .perform([handler](auto const &) { handler(renewable_device::method::renewal); })
+                .end()
+                ->add_to(*pool);
 
             return pool;
         });
@@ -341,21 +343,25 @@ audio::mac_device::mac_device(AudioDeviceID const device_id)
 void audio::mac_device::_prepare(mac_device_ptr const &mac_device) {
     this->_weak_mac_device = mac_device;
 
-    this->_io_pool +=
-        this->_notifier->chain().to_value(io_device::method::updated).send_to(this->_io_device_notifier).end();
+    this->_notifier->chain()
+        .to_value(io_device::method::updated)
+        .send_to(this->_io_device_notifier)
+        .end()
+        ->add_to(this->_io_pool);
 
-    this->_io_pool += _system_notifier->chain()
-                          .guard([weak_device = this->_weak_mac_device](auto const &pair) {
-                              if (auto const device = weak_device.lock()) {
-                                  if (!is_available_device(device)) {
-                                      return true;
-                                  }
-                              }
-                              return false;
-                          })
-                          .to_value(io_device::method::lost)
-                          .send_to(this->_io_device_notifier)
-                          .end();
+    _system_notifier->chain()
+        .guard([weak_device = this->_weak_mac_device](auto const &pair) {
+            if (auto const device = weak_device.lock()) {
+                if (!is_available_device(device)) {
+                    return true;
+                }
+            }
+            return false;
+        })
+        .to_value(io_device::method::lost)
+        .send_to(this->_io_device_notifier)
+        .end()
+        ->add_to(this->_io_pool);
 }
 
 AudioDeviceID audio::mac_device::audio_device_id() const {

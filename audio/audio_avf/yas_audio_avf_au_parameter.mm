@@ -34,9 +34,10 @@ audio::avf_au_parameter::avf_au_parameter(avf_au_parameter_core_ptr const &core)
       _default_value(core->objc_parameter.object().value),
       _value_strings(avf_au_parameter_utils::to_vector(core->objc_parameter.object().valueStrings)),
       _value(chaining::value::holder<float>::make_shared(_default_value)) {
-    this->_pool += this->_value->chain()
-                       .perform([this](auto const &value) { this->_core->objc_parameter.object().value = value; })
-                       .end();
+    this->_value->chain()
+        .perform([this](auto const &value) { this->_core->objc_parameter.object().value = value; })
+        .end()
+        ->add_to(this->_pool);
 }
 
 std::string audio::avf_au_parameter::key_path() const {

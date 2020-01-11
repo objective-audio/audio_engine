@@ -10,6 +10,11 @@
 #include <iostream>
 
 namespace yas::audio::sample {
+    class kernel;
+    using kernel_ptr = std::shared_ptr<kernel>;
+}
+
+namespace yas::audio::sample {
 struct kernel {
     kernel() : _phase(0), _sine_data(_sineDataMaxCount) {
         _through_volume.store(0);
@@ -87,6 +92,10 @@ struct kernel {
             }
         }
     }
+    
+    static sample::kernel_ptr make_shared() {
+        return std::make_shared<audio::sample::kernel>();
+    }
 
    private:
     static uint32_t const _sineDataMaxCount = 4096;
@@ -103,9 +112,4 @@ struct kernel {
     kernel &operator=(const kernel &) = delete;
     kernel &operator=(kernel &&) = delete;
 };
-}
-
-namespace yas::audio {
-    using sample_kernel_t = audio::sample::kernel;
-    using sample_kernel_ptr = std::shared_ptr<sample_kernel_t>;
 }

@@ -29,6 +29,7 @@
 		B67A0C0221DE4A9600161BCA /* objc_utils.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = B67A0C0021DE4A9600161BCA /* objc_utils.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		B67F923023783BB200757226 /* YASAudioAVFConverterSampleViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = B67F922F23783BB200757226 /* YASAudioAVFConverterSampleViewController.mm */; };
 		B68B66D6234E166C008F9067 /* YASViewControllerUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = B68B66D5234E166C008F9067 /* YASViewControllerUtils.m */; };
+		B694581C23C7360500D39967 /* YASAudioReloadViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = B694581B23C7360500D39967 /* YASAudioReloadViewController.mm */; };
 		B6C8E6481BAD07FB0031226C /* YASAudioGraphRouteSampleViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = B6C8E6471BAD07FB0031226C /* YASAudioGraphRouteSampleViewController.mm */; };
 		B6D35D521B90B2B700AB5B9B /* YASAudioSliderCell.m in Sources */ = {isa = PBXBuildFile; fileRef = B6D35D511B90B2B700AB5B9B /* YASAudioSliderCell.m */; };
 		B6E52AE61ABD362300D2C45A /* YASAudioGraphEffectsSampleEditViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = B6E52AE51ABD362300D2C45A /* YASAudioGraphEffectsSampleEditViewController.mm */; };
@@ -81,6 +82,8 @@
 		B67F922F23783BB200757226 /* YASAudioAVFConverterSampleViewController.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = YASAudioAVFConverterSampleViewController.mm; sourceTree = "<group>"; };
 		B68B66D4234E166C008F9067 /* YASViewControllerUtils.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = YASViewControllerUtils.h; sourceTree = "<group>"; };
 		B68B66D5234E166C008F9067 /* YASViewControllerUtils.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = YASViewControllerUtils.m; sourceTree = "<group>"; };
+		B694581A23C7360500D39967 /* YASAudioReloadViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = YASAudioReloadViewController.h; sourceTree = "<group>"; };
+		B694581B23C7360500D39967 /* YASAudioReloadViewController.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = YASAudioReloadViewController.mm; sourceTree = "<group>"; };
 		B6C8E6461BAD07FB0031226C /* YASAudioGraphRouteSampleViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YASAudioGraphRouteSampleViewController.h; sourceTree = "<group>"; };
 		B6C8E6471BAD07FB0031226C /* YASAudioGraphRouteSampleViewController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = YASAudioGraphRouteSampleViewController.mm; sourceTree = "<group>"; };
 		B6D35D501B90B2B700AB5B9B /* YASAudioSliderCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YASAudioSliderCell.h; sourceTree = "<group>"; };
@@ -175,6 +178,7 @@
 				B6F81E171BE6F9C50022D6BD /* InpuTapNode */,
 				B612CDB1234B71F000B89826 /* AVFIO */,
 				B67F922D23783B8000757226 /* AVFConverter */,
+				B694581923C735D700D39967 /* Reload */,
 				B6D35D501B90B2B700AB5B9B /* YASAudioSliderCell.h */,
 				B6D35D511B90B2B700AB5B9B /* YASAudioSliderCell.m */,
 				B62ED5301A6280C0007DDE96 /* Main.storyboard */,
@@ -208,6 +212,15 @@
 				B67F922F23783BB200757226 /* YASAudioAVFConverterSampleViewController.mm */,
 			);
 			name = AVFConverter;
+			sourceTree = "<group>";
+		};
+		B694581923C735D700D39967 /* Reload */ = {
+			isa = PBXGroup;
+			children = (
+				B694581A23C7360500D39967 /* YASAudioReloadViewController.h */,
+				B694581B23C7360500D39967 /* YASAudioReloadViewController.mm */,
+			);
+			name = Reload;
 			sourceTree = "<group>";
 		};
 		B6C8E64B1BAD08230031226C /* AudioEngineEffects */ = {
@@ -339,6 +352,7 @@
 				B6E52AE91ABD3B5500D2C45A /* YASAudioGraphSampleParameterCell.mm in Sources */,
 				B6D35D521B90B2B700AB5B9B /* YASAudioSliderCell.m in Sources */,
 				B612CDB4234B723B00B89826 /* YASAudioAVFIOSampleViewController.mm in Sources */,
+				B694581C23C7360500D39967 /* YASAudioReloadViewController.mm in Sources */,
 				B6F81E1A1BE6F9E90022D6BD /* YASAudioInputTapNodeSampleViewController.mm in Sources */,
 				B65BE8D21AB66D9C0073A07E /* YASAudioGraphEffectsSampleViewController.mm in Sources */,
 				B62ED52C1A6280C0007DDE96 /* AppDelegate.m in Sources */,
