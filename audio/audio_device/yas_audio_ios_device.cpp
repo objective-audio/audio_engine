@@ -12,8 +12,7 @@
 using namespace yas;
 
 audio::ios_device::ios_device(ios_session_ptr const &session) : _session(session), _interruptor(session) {
-    this->_observer = this->session()
-                          ->device_chain()
+    this->_observer = session->device_chain()
                           .perform([this](auto const &session_method) {
                               switch (session_method) {
                                   case ios_session::device_method::route_change:
@@ -21,6 +20,7 @@ audio::ios_device::ios_device(ios_session_ptr const &session) : _session(session
                                       break;
                                   case ios_session::device_method::media_service_were_lost:
                                   case ios_session::device_method::media_service_were_reset:
+                                      this->_session = std::nullopt;
                                       this->_notifier->notify(method::lost);
                                       break;
                               }
@@ -28,21 +28,27 @@ audio::ios_device::ios_device(ios_session_ptr const &session) : _session(session
                           .end();
 }
 
-audio::ios_session_ptr const &audio::ios_device::session() const {
+std::optional<audio::ios_session_ptr> const &audio::ios_device::session() const {
     return this->_session;
 }
 
 double audio::ios_device::sample_rate() const {
-    return this->session()->sample_rate();
+    if (auto const &session = this->session()) {
+        return session.value()->sample_rate();
+    } else {
+        return 0;
+    }
 }
 
 std::optional<audio::format> audio::ios_device::input_format() const {
-    if (audio::is_input_category(this->session()->category())) {
-        auto const sample_rate = this->sample_rate();
-        auto const ch_count = this->session()->input_channel_count();
+    if (auto const &session = this->session()) {
+        if (audio::is_input_category(session.value()->category())) {
+            auto const sample_rate = this->sample_rate();
+            auto const ch_count = session.value()->input_channel_count();
 
-        if (sample_rate > 0.0 && ch_count > 0) {
-            return audio::format({.sample_rate = sample_rate, .channel_count = ch_count});
+            if (sample_rate > 0.0 && ch_count > 0) {
+                return audio::format({.sample_rate = sample_rate, .channel_count = ch_count});
+            }
         }
     }
 
@@ -50,12 +56,14 @@ std::optional<audio::format> audio::ios_device::input_format() const {
 }
 
 std::optional<audio::format> audio::ios_device::output_format() const {
-    if (audio::is_output_category(this->session()->category())) {
-        auto const sample_rate = this->sample_rate();
-        auto const ch_count = this->session()->output_channel_count();
+    if (auto const &session = this->session()) {
+        if (audio::is_output_category(session.value()->category())) {
+            auto const sample_rate = this->sample_rate();
+            auto const ch_count = session.value()->output_channel_count();
 
-        if (sample_rate > 0.0 && ch_count > 0) {
-            return audio::format({.sample_rate = sample_rate, .channel_count = ch_count});
+            if (sample_rate > 0.0 && ch_count > 0) {
+                return audio::format({.sample_rate = sample_rate, .channel_count = ch_count});
+            }
         }
     }
 
