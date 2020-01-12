@@ -145,7 +145,11 @@ uint32_t audio::ios_session::output_channel_count() const {
         throw std::runtime_error("audio session is not activate.");
     }
 
-    return static_cast<uint32_t>([AVAudioSession sharedInstance].outputNumberOfChannels);
+    if (is_output_category(this->_category)) {
+        return static_cast<uint32_t>([AVAudioSession sharedInstance].outputNumberOfChannels);
+    } else {
+        return 0;
+    }
 }
 
 uint32_t audio::ios_session::input_channel_count() const {
@@ -153,7 +157,7 @@ uint32_t audio::ios_session::input_channel_count() const {
         throw std::runtime_error("audio session is not activate.");
     }
 
-    if (this->is_input_available()) {
+    if (this->is_input_available() && is_input_category(this->_category)) {
         return static_cast<uint32_t>([AVAudioSession sharedInstance].inputNumberOfChannels);
     } else {
         return 0;
@@ -176,11 +180,11 @@ void audio::ios_session::set_category(enum category const category) {
     this->_category = category;
 }
 
-chaining::chain_unsync_t<audio::ios_session::device_method> audio::ios_session::device_chain() {
+chaining::chain_unsync_t<audio::ios_session::device_method> audio::ios_session::device_chain() const {
     return this->_device_notifier->chain();
 }
 
-chaining::chain_unsync_t<audio::interruption_method> audio::ios_session::interruption_chain() {
+chaining::chain_unsync_t<audio::interruption_method> audio::ios_session::interruption_chain() const {
     return this->_interruption_notifier->chain();
 }
 

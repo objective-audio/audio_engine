@@ -9,12 +9,12 @@
 #if TARGET_OS_IPHONE
 
 #include <cpp_utils/yas_result.h>
-#include <cstdint>
 #include "yas_audio_interruptor.h"
+#include "yas_audio_ios_device_session.h"
 #include "yas_audio_ptr.h"
 
 namespace yas::audio {
-struct ios_session : interruptor {
+struct ios_session : ios_device_session, interruptor {
     enum category {
         ambient,
         solo_ambient,
@@ -24,21 +24,15 @@ struct ios_session : interruptor {
         multi_route,
     };
 
-    enum device_method {
-        route_change,
-        media_service_were_lost,
-        media_service_were_reset,
-    };
-
     using activate_result_t = result<std::nullptr_t, std::string>;
 
-    [[nodiscard]] double sample_rate() const;
+    [[nodiscard]] double sample_rate() const override;
 
     void set_preferred_sample_rate(double const);
     void set_preferred_io_buffer_frames(uint32_t const);
 
-    [[nodiscard]] uint32_t output_channel_count() const;
-    [[nodiscard]] uint32_t input_channel_count() const;
+    [[nodiscard]] uint32_t output_channel_count() const override;
+    [[nodiscard]] uint32_t input_channel_count() const override;
     [[nodiscard]] bool is_input_available() const;
 
     [[nodiscard]] bool is_active() const;
@@ -47,11 +41,11 @@ struct ios_session : interruptor {
 
     bool is_interrupting() const override;
 
-    enum category category() const;
+    [[nodiscard]] enum category category() const;
     void set_category(enum category const);
 
-    chaining::chain_unsync_t<device_method> device_chain();
-    chaining::chain_unsync_t<interruption_method> interruption_chain() override;
+    [[nodiscard]] chaining::chain_unsync_t<device_method> device_chain() const override;
+    [[nodiscard]] chaining::chain_unsync_t<interruption_method> interruption_chain() const override;
 
     [[nodiscard]] static ios_session_ptr const &shared();
 

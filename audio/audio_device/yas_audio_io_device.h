@@ -25,5 +25,9 @@ struct io_device {
 
     [[nodiscard]] bool is_interrupting() const;
     [[nodiscard]] std::optional<chaining::chain_unsync_t<interruption_method>> interruption_chain() const;
+
+    [[nodiscard]] static io_device_ptr cast(io_device_ptr const &device) {
+        return device;
+    }
 };
 }  // namespace yas::audio
