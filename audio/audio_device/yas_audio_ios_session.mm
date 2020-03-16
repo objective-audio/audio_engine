@@ -50,13 +50,15 @@ audio::ios_session::ios_session()
       _device_notifier(chaining::notifier<device_method>::make_shared()),
       _interruption_notifier(chaining::notifier<interruption_method>::make_shared()) {
     auto route_change_observer = objc_ptr<id<NSObject>>([this] {
-        return
-            [NSNotificationCenter.defaultCenter addObserverForName:AVAudioSessionRouteChangeNotification
-                                                            object:AVAudioSession.sharedInstance
-                                                             queue:NSOperationQueue.mainQueue
-                                                        usingBlock:[this](NSNotification *note) {
-                                                            this->_device_notifier->notify(device_method::route_change);
-                                                        }];
+        return [NSNotificationCenter.defaultCenter
+            addObserverForName:AVAudioSessionRouteChangeNotification
+                        object:AVAudioSession.sharedInstance
+                         queue:NSOperationQueue.mainQueue
+                    usingBlock:[this](NSNotification *note) {
+                        if (this->_is_active) {
+                            this->_device_notifier->notify(device_method::route_change);
+                        }
+                    }];
     });
 
     auto lost_observer = objc_ptr<id<NSObject>>([this] {
@@ -65,7 +67,9 @@ audio::ios_session::ios_session()
                         object:AVAudioSession.sharedInstance
                          queue:NSOperationQueue.mainQueue
                     usingBlock:[this](NSNotification *note) {
-                        this->_device_notifier->notify(device_method::media_service_were_lost);
+                        if (this->_is_active) {
+                            this->_device_notifier->notify(device_method::media_service_were_lost);
+                        }
                     }];
     });
 
@@ -75,7 +79,9 @@ audio::ios_session::ios_session()
                         object:AVAudioSession.sharedInstance
                          queue:NSOperationQueue.mainQueue
                     usingBlock:[this](NSNotification *note) {
-                        this->_device_notifier->notify(device_method::media_service_were_reset);
+                        if (this->_is_active) {
+                            this->_device_notifier->notify(device_method::media_service_were_reset);
+                        }
                     }];
     });
 
