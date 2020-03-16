@@ -126,7 +126,7 @@ bool audio::ios_session::is_interrupting() const {
 
 double audio::ios_session::sample_rate() const {
     if (!this->_is_active) {
-        throw std::runtime_error("audio session is not activate.");
+        return 0.0;
     }
 
     return [AVAudioSession sharedInstance].sampleRate;
@@ -142,7 +142,7 @@ void audio::ios_session::set_preferred_io_buffer_frames(uint32_t const frames) {
 
 uint32_t audio::ios_session::output_channel_count() const {
     if (!this->_is_active) {
-        throw std::runtime_error("audio session is not activate.");
+        return 0;
     }
 
     if (is_output_category(this->_category)) {
@@ -154,7 +154,7 @@ uint32_t audio::ios_session::output_channel_count() const {
 
 uint32_t audio::ios_session::input_channel_count() const {
     if (!this->_is_active) {
-        throw std::runtime_error("audio session is not activate.");
+        return 0;
     }
 
     if (this->is_input_available() && is_input_category(this->_category)) {
@@ -166,7 +166,7 @@ uint32_t audio::ios_session::input_channel_count() const {
 
 bool audio::ios_session::is_input_available() const {
     if (!this->_is_active) {
-        throw std::runtime_error("audio session is not activate.");
+        return false;
     }
 
     return [AVAudioSession sharedInstance].isInputAvailable;
