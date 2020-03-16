@@ -50,13 +50,15 @@ audio::ios_session::ios_session()
       _device_notifier(chaining::notifier<device_method>::make_shared()),
       _interruption_notifier(chaining::notifier<interruption_method>::make_shared()) {
     auto route_change_observer = objc_ptr<id<NSObject>>([this] {
-        return
-            [NSNotificationCenter.defaultCenter addObserverForName:AVAudioSessionRouteChangeNotification
-                                                            object:AVAudioSession.sharedInstance
-                                                             queue:NSOperationQueue.mainQueue
-                                                        usingBlock:[this](NSNotification *note) {
-                                                            this->_device_notifier->notify(device_method::route_change);
-                                                        }];
+        return [NSNotificationCenter.defaultCenter
+            addObserverForName:AVAudioSessionRouteChangeNotification
+                        object:AVAudioSession.sharedInstance
+                         queue:NSOperationQueue.mainQueue
+                    usingBlock:[this](NSNotification *note) {
+                        if (this->_is_active) {
+                            this->_device_notifier->notify(device_method::route_change);
+                        }
+                    }];
     });
 
     auto lost_observer = objc_ptr<id<NSObject>>([this] {
@@ -65,7 +67,9 @@ audio::ios_session::ios_session()
                         object:AVAudioSession.sharedInstance
                          queue:NSOperationQueue.mainQueue
                     usingBlock:[this](NSNotification *note) {
-                        this->_device_notifier->notify(device_method::media_service_were_lost);
+                        if (this->_is_active) {
+                            this->_device_notifier->notify(device_method::media_service_were_lost);
+                        }
                     }];
     });
 
@@ -75,7 +79,9 @@ audio::ios_session::ios_session()
                         object:AVAudioSession.sharedInstance
                          queue:NSOperationQueue.mainQueue
                     usingBlock:[this](NSNotification *note) {
-                        this->_device_notifier->notify(device_method::media_service_were_reset);
+                        if (this->_is_active) {
+                            this->_device_notifier->notify(device_method::media_service_were_reset);
+                        }
                     }];
     });
 
@@ -126,7 +132,7 @@ bool audio::ios_session::is_interrupting() const {
 
 double audio::ios_session::sample_rate() const {
     if (!this->_is_active) {
-        throw std::runtime_error("audio session is not activate.");
+        return 0.0;
     }
 
     return [AVAudioSession sharedInstance].sampleRate;
@@ -142,7 +148,7 @@ void audio::ios_session::set_preferred_io_buffer_frames(uint32_t const frames) {
 
 uint32_t audio::ios_session::output_channel_count() const {
     if (!this->_is_active) {
-        throw std::runtime_error("audio session is not activate.");
+        return 0;
     }
 
     if (is_output_category(this->_category)) {
@@ -154,7 +160,7 @@ uint32_t audio::ios_session::output_channel_count() const {
 
 uint32_t audio::ios_session::input_channel_count() const {
     if (!this->_is_active) {
-        throw std::runtime_error("audio session is not activate.");
+        return 0;
     }
 
     if (this->is_input_available() && is_input_category(this->_category)) {
@@ -166,7 +172,7 @@ uint32_t audio::ios_session::input_channel_count() const {
 
 bool audio::ios_session::is_input_available() const {
     if (!this->_is_active) {
-        throw std::runtime_error("audio session is not activate.");
+        return false;
     }
 
     return [AVAudioSession sharedInstance].isInputAvailable;
