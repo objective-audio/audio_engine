@@ -112,6 +112,8 @@ audio::ios_session::activate_result_t audio::ios_session::activate() {
     this->_setup_interrupting();
     this->_is_active = true;
 
+    this->_device_notifier->notify(device_method::activate);
+
     return activate_result_t{nullptr};
 }
 
@@ -121,6 +123,7 @@ void audio::ios_session::deactivate() {
     NSError *error = nil;
     if ([[AVAudioSession sharedInstance] setActive:NO error:&error]) {
         this->_is_active = false;
+        this->_device_notifier->notify(device_method::deactivate);
     } else {
         NSLog(@"ios session deactivate error : %@", error);
     }
