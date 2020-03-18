@@ -16,11 +16,13 @@ audio::ios_device::ios_device(ios_device_session_ptr const &device_session, inte
     this->_observer = device_session->device_chain()
                           .perform([this](auto const &session_method) {
                               switch (session_method) {
+                                  case ios_session::device_method::activate:
                                   case ios_session::device_method::route_change:
                                       this->_notifier->notify(method::updated);
                                       break;
                                   case ios_session::device_method::media_service_were_lost:
                                   case ios_session::device_method::media_service_were_reset:
+                                  case ios_session::device_method::deactivate:
                                       this->_session = std::nullopt;
                                       this->_notifier->notify(method::lost);
                                       break;
