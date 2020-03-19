@@ -14,6 +14,8 @@
 namespace yas::audio {
 struct ios_device_session {
     enum device_method {
+        activate,
+        deactivate,
         route_change,
         media_service_were_lost,
         media_service_were_reset,
