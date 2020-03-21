@@ -65,8 +65,8 @@ struct ios_session : ios_device_session, interruptor {
     ios_session();
 
     activate_result_t _set_category();
-    activate_result_t _set_sample_rate();
-    activate_result_t _set_io_buffer_duration();
+    activate_result_t _apply_sample_rate();
+    activate_result_t _apply_io_buffer_duration();
     activate_result_t _set_active();
 
     void _set_interrupting_and_notify(bool const);
