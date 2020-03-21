@@ -97,11 +97,7 @@ audio::ios_session::activate_result_t audio::ios_session::activate() {
         return result;
     }
 
-    if (auto result = this->_set_sample_rate(); !result) {
-        return result;
-    }
-
-    if (auto result = this->_set_io_buffer_duration(); !result) {
+    if (auto result = this->_apply_sample_rate(); !result) {
         return result;
     }
 
@@ -109,8 +105,13 @@ audio::ios_session::activate_result_t audio::ios_session::activate() {
         return result;
     }
 
-    this->_setup_interrupting();
     this->_is_active = true;
+
+    if (auto result = this->_apply_io_buffer_duration(); !result) {
+        return result;
+    }
+
+    this->_setup_interrupting();
 
     this->_device_notifier->notify(device_method::activate);
 
@@ -143,10 +144,18 @@ double audio::ios_session::sample_rate() const {
 
 void audio::ios_session::set_preferred_sample_rate(double const sample_rate) {
     this->_preferred_sample_rate = sample_rate;
+
+    if (this->_is_active) {
+        this->_apply_sample_rate();
+    }
 }
 
 void audio::ios_session::set_preferred_io_buffer_frames(uint32_t const frames) {
     this->_preferred_io_buffer_frames = frames;
+
+    if (this->_is_active) {
+        this->_apply_io_buffer_duration();
+    }
 }
 
 uint32_t audio::ios_session::output_channel_count() const {
@@ -187,6 +196,10 @@ enum audio::ios_session::category audio::ios_session::category() const {
 
 void audio::ios_session::set_category(enum category const category) {
     this->_category = category;
+
+    if (this->_is_active) {
+        this->_set_category();
+    }
 }
 
 chaining::chain_unsync_t<audio::ios_session::device_method> audio::ios_session::device_chain() const {
@@ -198,10 +211,6 @@ chaining::chain_unsync_t<audio::interruption_method> audio::ios_session::interru
 }
 
 audio::ios_session::activate_result_t audio::ios_session::_set_category() {
-    if (this->_is_active) {
-        throw std::runtime_error("audio session is not deactivate.");
-    }
-
     NSError *error = nil;
 
     if ([[AVAudioSession sharedInstance] setCategory:to_objc_category(this->_category) error:&error]) {
@@ -212,11 +221,7 @@ audio::ios_session::activate_result_t audio::ios_session::_set_category() {
     }
 }
 
-audio::ios_session::activate_result_t audio::ios_session::_set_sample_rate() {
-    if (this->_is_active) {
-        throw std::runtime_error("audio session is not deactivate.");
-    }
-
+audio::ios_session::activate_result_t audio::ios_session::_apply_sample_rate() {
     NSError *error = nil;
 
     if ([[AVAudioSession sharedInstance] setPreferredSampleRate:this->_preferred_sample_rate error:&error]) {
@@ -227,14 +232,20 @@ audio::ios_session::activate_result_t audio::ios_session::_set_sample_rate() {
     }
 }
 
-audio::ios_session::activate_result_t audio::ios_session::_set_io_buffer_duration() {
-    if (this->_is_active) {
-        throw std::runtime_error("audio session is not deactivate.");
+audio::ios_session::activate_result_t audio::ios_session::_apply_io_buffer_duration() {
+    if (!this->_is_active) {
+        throw std::runtime_error("audio session is not activate.");
+    }
+
+    double const sample_rate = this->sample_rate();
+
+    if (sample_rate == 0) {
+        return activate_result_t{"sample rate is zero."};
     }
 
     NSError *error = nil;
 
-    double const duration = this->_preferred_io_buffer_frames / this->_preferred_sample_rate;
+    double const duration = this->_preferred_io_buffer_frames / sample_rate;
 
     if ([[AVAudioSession sharedInstance] setPreferredIOBufferDuration:duration error:&error]) {
         return activate_result_t{nullptr};
