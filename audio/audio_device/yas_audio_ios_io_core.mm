@@ -203,10 +203,25 @@ void audio::ios_io_core::set_maximum_frames_per_slice(uint32_t const frames) {
 }
 
 bool audio::ios_io_core::start() {
-    NSError *error = nil;
     auto const engine = this->_impl->_avf_engine;
+    if (!engine) {
+        NSLog(@"%s avf_engine not found.", __PRETTY_FUNCTION__);
+        return false;
+    }
 
-    if (engine && [engine.value().object() startAndReturnError:&error]) {
+    auto const objc_engine = engine.value().object();
+    if (!objc_engine.outputNode) {
+        NSLog(@"%s outputNode not found.", __PRETTY_FUNCTION__);
+        return false;
+    }
+
+    if (!objc_engine.inputNode) {
+        NSLog(@"%s inputNode not found.", __PRETTY_FUNCTION__);
+        return false;
+    }
+
+    NSError *error = nil;
+    if ([objc_engine startAndReturnError:&error]) {
         return true;
     } else {
         NSLog(@"%@", error);
