@@ -63,6 +63,11 @@ struct reload_vc_cpp {
         return std::nullopt;
     }
 
+    void reactivateSession() {
+        this->session->deactivate();
+        auto result = this->session->activate();
+    }
+
     void dispose() {
         this->graph->remove_io();
 
@@ -125,6 +130,10 @@ struct reload_vc_cpp {
 - (IBAction)notifyRouteChange:(UIButton *)sender {
     [[NSNotificationCenter defaultCenter] postNotificationName:AVAudioSessionRouteChangeNotification
                                                         object:[AVAudioSession sharedInstance]];
+}
+
+- (IBAction)reactivateSession:(UIButton *)sender {
+    self->_cpp.reactivateSession();
 }
 
 @end
