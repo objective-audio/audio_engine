@@ -210,12 +210,13 @@ bool audio::ios_io_core::start() {
     }
 
     auto const objc_engine = engine.value().object();
-    if (!objc_engine.outputNode) {
+
+    if (this->_device->output_format().has_value() && !objc_engine.outputNode) {
         NSLog(@"%s outputNode not found.", __PRETTY_FUNCTION__);
         return false;
     }
 
-    if (!objc_engine.inputNode) {
+    if (this->_device->input_format().has_value() && !objc_engine.inputNode) {
         NSLog(@"%s inputNode not found.", __PRETTY_FUNCTION__);
         return false;
     }
