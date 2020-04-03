@@ -86,9 +86,9 @@ using namespace yas;
     {
         XCTestExpectation *expectation = [self expectationWithDescription:@"first render"];
 
-        auto device =
-            audio::offline_device::make_shared(format, [](auto args) { return audio::continuation::abort; },
-                                               [&expectation](bool const cancelled) { [expectation fulfill]; });
+        auto device = audio::offline_device::make_shared(
+            format, [](auto args) { return audio::continuation::abort; },
+            [&expectation](bool const cancelled) { [expectation fulfill]; });
 
         auto const &offline_io = graph->add_io(device);
 

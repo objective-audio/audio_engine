@@ -41,8 +41,8 @@ using namespace yas;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    YASAudioGraphSampleParameterCell *cell =
-        [tableView dequeueReusableCellWithIdentifier:@"ParameterCell" forIndexPath:indexPath];
+    YASAudioGraphSampleParameterCell *cell = [tableView dequeueReusableCellWithIdentifier:@"ParameterCell"
+                                                                             forIndexPath:indexPath];
 
     auto const &parameter = self->_au->raw_au()->global_parameters().at(indexPath.row);
     [cell set_parameter:parameter];

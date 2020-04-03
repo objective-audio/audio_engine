@@ -5,6 +5,7 @@
 #pragma once
 
 #include <set>
+
 #include "yas_audio_types.h"
 
 namespace yas {

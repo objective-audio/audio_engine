@@ -5,6 +5,7 @@
 #include "yas_audio_io.h"
 
 #include <cpp_utils/yas_stl_utils.h>
+
 #include "yas_audio_io_kernel.h"
 
 using namespace yas;

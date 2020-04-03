@@ -5,6 +5,7 @@
 #pragma once
 
 #include <cpp_utils/yas_fast_each.h>
+
 #include "yas_audio_format.h"
 #include "yas_audio_pcm_buffer.h"
 

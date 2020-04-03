@@ -40,13 +40,14 @@ audio::time::time(uint64_t const host_time)
 }
 
 audio::time::time(int64_t const sample_time, double const sample_rate)
-    : _impl(std::make_shared<impl>(
-          objc_ptr_with_move_object([[AVAudioTime alloc] initWithSampleTime:sample_time atRate:sample_rate]))) {
+    : _impl(std::make_shared<impl>(objc_ptr_with_move_object([[AVAudioTime alloc] initWithSampleTime:sample_time
+                                                                                              atRate:sample_rate]))) {
 }
 
 audio::time::time(uint64_t const host_time, int64_t const sample_time, double const sample_rate)
-    : _impl(std::make_shared<impl>(objc_ptr_with_move_object(
-          [[AVAudioTime alloc] initWithHostTime:host_time sampleTime:sample_time atRate:sample_rate]))) {
+    : _impl(std::make_shared<impl>(objc_ptr_with_move_object([[AVAudioTime alloc] initWithHostTime:host_time
+                                                                                        sampleTime:sample_time
+                                                                                            atRate:sample_rate]))) {
 }
 
 bool audio::time::is_host_time_valid() const {

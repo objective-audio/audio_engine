@@ -3,9 +3,12 @@
 //
 
 #include "yas_audio_graph_node.h"
+
 #include <cpp_utils/yas_result.h>
 #include <cpp_utils/yas_stl_utils.h>
+
 #include <iostream>
+
 #include "yas_audio_graph.h"
 #include "yas_audio_graph_connection.h"
 #include "yas_audio_time.h"

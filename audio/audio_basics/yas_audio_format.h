@@ -5,7 +5,9 @@
 #pragma once
 
 #include <AudioToolbox/AudioToolbox.h>
+
 #include <string>
+
 #include "yas_audio_types.h"
 
 namespace yas::audio {

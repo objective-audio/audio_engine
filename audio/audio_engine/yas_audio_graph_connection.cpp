@@ -3,8 +3,11 @@
 //
 
 #include "yas_audio_graph_connection.h"
+
 #include <cpp_utils/yas_stl_utils.h>
+
 #include <mutex>
+
 #include "yas_audio_graph_node.h"
 
 using namespace yas;

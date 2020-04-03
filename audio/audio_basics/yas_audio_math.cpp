@@ -3,6 +3,7 @@
 //
 
 #include "yas_audio_math.h"
+
 #include <Accelerate/Accelerate.h>
 
 using namespace yas;
