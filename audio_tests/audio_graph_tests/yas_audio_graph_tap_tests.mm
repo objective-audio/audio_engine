@@ -93,9 +93,9 @@ using namespace yas;
 
     XCTestExpectation *completion_expectation = [self expectationWithDescription:@"completion"];
 
-    auto const device =
-        audio::offline_device::make_shared(format, [](auto args) { return audio::continuation::abort; },
-                                           [&completion_expectation](bool const) { [completion_expectation fulfill]; });
+    auto const device = audio::offline_device::make_shared(
+        format, [](auto args) { return audio::continuation::abort; },
+        [&completion_expectation](bool const) { [completion_expectation fulfill]; });
     auto const &offline_io = graph->add_io(device);
 
     graph->connect(to_tap->node(), offline_io->node(), format);

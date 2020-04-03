@@ -3,6 +3,7 @@
 //
 
 #include "yas_audio_offline_device.h"
+
 #include "yas_audio_offline_io_core.h"
 
 using namespace yas;

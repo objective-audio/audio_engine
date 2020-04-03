@@ -173,8 +173,8 @@ struct route_vc_cpp {
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     switch (route_sample::section(indexPath.section)) {
         case route_sample::section::slider: {
-            YASAudioSliderCell *cell =
-                [tableView dequeueReusableCellWithIdentifier:@"SliderCell" forIndexPath:indexPath];
+            YASAudioSliderCell *cell = [tableView dequeueReusableCellWithIdentifier:@"SliderCell"
+                                                                       forIndexPath:indexPath];
             return cell;
         }
 

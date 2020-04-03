@@ -9,6 +9,7 @@
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
 
 #include <ostream>
+
 #import "yas_audio_mac_device.h"
 
 namespace yas::audio {

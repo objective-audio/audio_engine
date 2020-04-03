@@ -5,6 +5,7 @@
 #pragma once
 
 #include <any>
+
 #include "yas_audio_graph_kernel_protocol.h"
 #include "yas_audio_ptr.h"
 

@@ -5,6 +5,7 @@
 #pragma once
 
 #include <chaining/yas_chaining_umbrella.h>
+
 #include "yas_audio_graph_io_protocol.h"
 #include "yas_audio_graph_node.h"
 #include "yas_audio_io_device.h"

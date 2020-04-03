@@ -5,6 +5,7 @@
 #pragma once
 
 #include <AudioUnit/AUComponent.h>
+
 #include <memory>
 #include <optional>
 #include <ostream>

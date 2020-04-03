@@ -3,8 +3,10 @@
 //
 
 #include "yas_audio_exception.h"
+
 #include <exception>
 #include <string>
+
 #include "yas_audio_types.h"
 
 using namespace yas;

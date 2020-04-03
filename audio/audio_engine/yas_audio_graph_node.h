@@ -5,8 +5,10 @@
 #pragma once
 
 #include <chaining/yas_chaining_umbrella.h>
+
 #include <optional>
 #include <ostream>
+
 #include "yas_audio_format.h"
 #include "yas_audio_graph_connection.h"
 #include "yas_audio_graph_node_protocol.h"

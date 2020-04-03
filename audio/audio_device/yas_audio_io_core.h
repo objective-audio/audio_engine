@@ -5,6 +5,7 @@
 #pragma once
 
 #include <chaining/yas_chaining_umbrella.h>
+
 #include "yas_audio_io_kernel.h"
 
 namespace yas::audio {

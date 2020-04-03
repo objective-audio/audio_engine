@@ -41,9 +41,9 @@ using namespace yas;
 
     XCTestExpectation *expectation = [self expectationWithDescription:@"First Render"];
 
-    auto const device1 =
-        audio::offline_device::make_shared(format, [](auto) { return audio::continuation::keep; },
-                                           [&expectation](bool const cancelled) { [expectation fulfill]; });
+    auto const device1 = audio::offline_device::make_shared(
+        format, [](auto) { return audio::continuation::keep; },
+        [&expectation](bool const cancelled) { [expectation fulfill]; });
     auto const &offline_io1 = graph->add_io(device1);
     auto const connection = graph->connect(delay_au->node(), offline_io1->node(), format);
 
@@ -78,9 +78,9 @@ using namespace yas;
 
     expectation = [self expectationWithDescription:@"Second Render"];
 
-    auto const device2 =
-        audio::offline_device::make_shared(format, [](auto) { return audio::continuation::keep; },
-                                           [&expectation](bool const cancelled) { [expectation fulfill]; });
+    auto const device2 = audio::offline_device::make_shared(
+        format, [](auto) { return audio::continuation::keep; },
+        [&expectation](bool const cancelled) { [expectation fulfill]; });
     auto const &offline_io2 = graph->add_io(device2);
     graph->connect(delay_au->node(), offline_io2->node(), format);
 

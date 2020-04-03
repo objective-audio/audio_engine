@@ -3,9 +3,11 @@
 //
 
 #include "yas_audio_pcm_buffer.h"
+
 #include <Accelerate/Accelerate.h>
 #include <cpp_utils/yas_result.h>
 #include <cpp_utils/yas_stl_utils.h>
+
 #include <exception>
 #include <functional>
 #include <iostream>
