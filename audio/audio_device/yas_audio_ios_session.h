@@ -38,6 +38,7 @@ struct ios_session : ios_device_session, interruptor {
 
     [[nodiscard]] bool is_active() const;
     [[nodiscard]] activate_result_t activate();
+    [[nodiscard]] activate_result_t reactivate();
     void deactivate();
 
     bool is_interrupting() const override;

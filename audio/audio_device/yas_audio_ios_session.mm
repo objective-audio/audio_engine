@@ -93,6 +93,26 @@ bool audio::ios_session::is_active() const {
 }
 
 audio::ios_session::activate_result_t audio::ios_session::activate() {
+    if (auto result = this->reactivate(); !result) {
+        return result;
+    }
+
+    if (!this->_is_active) {
+        this->_is_active = true;
+
+        this->_setup_interrupting();
+
+        this->_device_notifier->notify(device_method::activate);
+    }
+
+    return activate_result_t{nullptr};
+}
+
+audio::ios_session::activate_result_t audio::ios_session::reactivate() {
+    if (!this->_is_active) {
+        return activate_result_t{nullptr};
+    }
+
     if (auto result = this->_set_category(); !result) {
         return result;
     }
@@ -105,15 +125,9 @@ audio::ios_session::activate_result_t audio::ios_session::activate() {
         return result;
     }
 
-    this->_is_active = true;
-
     if (auto result = this->_apply_io_buffer_duration(); !result) {
         return result;
     }
-
-    this->_setup_interrupting();
-
-    this->_device_notifier->notify(device_method::activate);
 
     return activate_result_t{nullptr};
 }
