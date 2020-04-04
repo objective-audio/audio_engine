@@ -29,9 +29,9 @@ jobs:
         brew install clang-format
         
     # Runs a set of commands using the runners shell
-    - name: Run macOS tests
-      run:
-        xcodebuild -workspace audio_mac.xcworkspace -scheme audio_mac_tests -configuration Debug OBJROOT=build -sdk macosx clean test
+    # - name: Run macOS tests
+    #  run:
+    # xcodebuild -workspace audio_mac.xcworkspace -scheme audio_mac_tests -configuration Debug OBJROOT=build -sdk macosx clean test
     
     - name: Run iOS tests
       run:
