@@ -1,0 +1,38 @@
+# This is a basic workflow to help you get started with Actions
+
+name: CI
+
+# Controls when the action will run. Triggers the workflow on push or pull request
+# events but only for the master branch
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: macos-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+    - uses: actions/checkout@v2
+      with:
+        submodules: true
+
+    - name: Install clang-format
+      run:
+        brew install clang-format
+        
+    # Runs a set of commands using the runners shell
+    - name: Run iOS tests
+      run:
+        xcodebuild -workspace audio_ios.xcworkspace -scheme audio_ios_tests -configuration Debug OBJROOT=build -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 8' clean test
+
+    - name: Run macOS tests
+      run:
+        xcodebuild -workspace audio_mac.xcworkspace -scheme audio_mac_tests -configuration Debug OBJROOT=build -sdk macosx clean test
