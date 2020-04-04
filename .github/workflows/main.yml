@@ -24,9 +24,15 @@ jobs:
       with:
         submodules: true
 
-    # Runs a set of commands using the runners shell
-    - name: Run tests
-      run: |
+    - name: Install clang-format
+      run:
         brew install clang-format
+        
+    # Runs a set of commands using the runners shell
+    - name: Run macOS tests
+      run:
         xcodebuild -workspace audio_mac.xcworkspace -scheme audio_mac_tests -configuration Debug OBJROOT=build -sdk macosx clean test
+    
+    - name: Run iOS tests
+      run:
         xcodebuild -workspace audio_ios.xcworkspace -scheme audio_ios_tests -configuration Debug OBJROOT=build -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 8,OS=13.3' clean test
