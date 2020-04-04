@@ -26,6 +26,7 @@ using namespace yas;
     XCTAssertTrue(au);
 }
 
+#if TARGET_OS_IPHONE
 - (void)test_restore_parameters {
     auto graph = audio::graph::make_shared();
 
@@ -98,6 +99,7 @@ using namespace yas;
 
                                  }];
 }
+#endif
 
 - (void)test_get_parameters {
     auto const delay_au = audio::graph_avf_au::make_shared(kAudioUnitType_Effect, kAudioUnitSubType_Delay);
