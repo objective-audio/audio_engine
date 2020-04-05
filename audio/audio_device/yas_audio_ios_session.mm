@@ -14,7 +14,7 @@
 
 using namespace yas;
 
-static AVAudioSessionCategory to_objc_category(enum audio::ios_session::category category) {
+static AVAudioSessionCategory to_objc_category(enum audio::ios_session::category const category) {
     switch (category) {
         case audio::ios_session::category::ambient:
             return AVAudioSessionCategoryAmbient;
