@@ -16,7 +16,7 @@
 
 namespace yas::audio {
 struct ios_session : ios_device_session, interruptor {
-    enum category {
+    enum class category {
         ambient,
         solo_ambient,
         playback,
