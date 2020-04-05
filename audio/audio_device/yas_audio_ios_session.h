@@ -8,6 +8,7 @@
 
 #if TARGET_OS_IPHONE
 
+#include <cpp_utils/yas_flagset.h>
 #include <cpp_utils/yas_result.h>
 
 #include "yas_audio_interruptor.h"
@@ -16,7 +17,7 @@
 
 namespace yas::audio {
 struct ios_session : ios_device_session, interruptor {
-    enum category {
+    enum class category {
         ambient,
         solo_ambient,
         playback,
@@ -25,6 +26,19 @@ struct ios_session : ios_device_session, interruptor {
         multi_route,
     };
 
+    enum class category_option : std::size_t {
+        mix_with_others,
+        duck_others,
+        allow_bluetooth,
+        default_to_speaker,
+        interrupt_spoken_audio_and_mix_with_others,
+        allow_bluetooth_a2dp,
+        allow_air_play,
+
+        count,
+    };
+
+    using category_options_t = flagset<category_option>;
     using activate_result_t = result<std::nullptr_t, std::string>;
 
     [[nodiscard]] double sample_rate() const override;
@@ -45,6 +59,7 @@ struct ios_session : ios_device_session, interruptor {
 
     [[nodiscard]] enum category category() const;
     void set_category(enum category const);
+    void set_category(enum category const, category_options_t const);
 
     [[nodiscard]] chaining::chain_unsync_t<device_method> device_chain() const override;
     [[nodiscard]] chaining::chain_unsync_t<interruption_method> interruption_chain() const override;
@@ -57,6 +72,7 @@ struct ios_session : ios_device_session, interruptor {
     bool _is_active = false;
     bool _is_interrupting = false;
     enum category _category;
+    category_options_t _category_options;
     double _preferred_sample_rate = 44100.0;
     uint32_t _preferred_io_buffer_frames = 1024;
 
@@ -66,7 +82,7 @@ struct ios_session : ios_device_session, interruptor {
 
     ios_session();
 
-    activate_result_t _set_category();
+    activate_result_t _apply_category();
     activate_result_t _apply_sample_rate();
     activate_result_t _apply_io_buffer_duration();
     activate_result_t _set_active();

@@ -14,7 +14,7 @@
 
 using namespace yas;
 
-static AVAudioSessionCategory to_objc_category(enum audio::ios_session::category category) {
+static AVAudioSessionCategory to_objc(enum audio::ios_session::category const category) {
     switch (category) {
         case audio::ios_session::category::ambient:
             return AVAudioSessionCategoryAmbient;
@@ -29,6 +29,40 @@ static AVAudioSessionCategory to_objc_category(enum audio::ios_session::category
         case audio::ios_session::category::multi_route:
             return AVAudioSessionCategoryMultiRoute;
     }
+}
+
+static AVAudioSessionCategoryOptions to_objc(audio::ios_session::category_options_t const options) {
+    AVAudioSessionCategoryOptions result = kNilOptions;
+
+    if (options.test(audio::ios_session::category_option::mix_with_others)) {
+        result |= AVAudioSessionCategoryOptionMixWithOthers;
+    }
+
+    if (options.test(audio::ios_session::category_option::duck_others)) {
+        result |= AVAudioSessionCategoryOptionDuckOthers;
+    }
+
+    if (options.test(audio::ios_session::category_option::allow_bluetooth)) {
+        result |= AVAudioSessionCategoryOptionAllowBluetooth;
+    }
+
+    if (options.test(audio::ios_session::category_option::default_to_speaker)) {
+        result |= AVAudioSessionCategoryOptionDefaultToSpeaker;
+    }
+
+    if (options.test(audio::ios_session::category_option::interrupt_spoken_audio_and_mix_with_others)) {
+        result |= AVAudioSessionCategoryOptionInterruptSpokenAudioAndMixWithOthers;
+    }
+
+    if (options.test(audio::ios_session::category_option::allow_bluetooth_a2dp)) {
+        result |= AVAudioSessionCategoryOptionAllowBluetoothA2DP;
+    }
+
+    if (options.test(audio::ios_session::category_option::allow_air_play)) {
+        result |= AVAudioSessionCategoryOptionAllowAirPlay;
+    }
+
+    return result;
 }
 
 struct audio::ios_session::impl {
@@ -113,7 +147,7 @@ audio::ios_session::activate_result_t audio::ios_session::reactivate() {
         return activate_result_t{nullptr};
     }
 
-    if (auto result = this->_set_category(); !result) {
+    if (auto result = this->_apply_category(); !result) {
         return result;
     }
 
@@ -209,10 +243,15 @@ enum audio::ios_session::category audio::ios_session::category() const {
 }
 
 void audio::ios_session::set_category(enum category const category) {
+    this->set_category(category, {});
+}
+
+void audio::ios_session::set_category(enum category const category, category_options_t const options) {
     this->_category = category;
+    this->_category_options = options;
 
     if (this->_is_active) {
-        this->_set_category();
+        this->_apply_category();
     }
 }
 
@@ -224,10 +263,12 @@ chaining::chain_unsync_t<audio::interruption_method> audio::ios_session::interru
     return this->_interruption_notifier->chain();
 }
 
-audio::ios_session::activate_result_t audio::ios_session::_set_category() {
+audio::ios_session::activate_result_t audio::ios_session::_apply_category() {
     NSError *error = nil;
 
-    if ([[AVAudioSession sharedInstance] setCategory:to_objc_category(this->_category) error:&error]) {
+    if ([[AVAudioSession sharedInstance] setCategory:to_objc(this->_category)
+                                         withOptions:to_objc(this->_category_options)
+                                               error:&error]) {
         return activate_result_t{nullptr};
     } else {
         NSLog(@"audio session set category error : %@", error);
