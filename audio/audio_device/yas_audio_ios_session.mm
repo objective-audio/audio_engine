@@ -14,7 +14,7 @@
 
 using namespace yas;
 
-static AVAudioSessionCategory to_objc_category(enum audio::ios_session::category const category) {
+static AVAudioSessionCategory to_objc(enum audio::ios_session::category const category) {
     switch (category) {
         case audio::ios_session::category::ambient:
             return AVAudioSessionCategoryAmbient;
@@ -31,7 +31,7 @@ static AVAudioSessionCategory to_objc_category(enum audio::ios_session::category
     }
 }
 
-static AVAudioSessionCategoryOptions to_objc_category_options(audio::ios_session::category_options_t const options) {
+static AVAudioSessionCategoryOptions to_objc(audio::ios_session::category_options_t const options) {
     AVAudioSessionCategoryOptions result = kNilOptions;
 
     if (options.test(audio::ios_session::category_option::mix_with_others)) {
@@ -266,8 +266,8 @@ chaining::chain_unsync_t<audio::interruption_method> audio::ios_session::interru
 audio::ios_session::activate_result_t audio::ios_session::_apply_category() {
     NSError *error = nil;
 
-    if ([[AVAudioSession sharedInstance] setCategory:to_objc_category(this->_category)
-                                         withOptions:to_objc_category_options(this->_category_options)
+    if ([[AVAudioSession sharedInstance] setCategory:to_objc(this->_category)
+                                         withOptions:to_objc(this->_category_options)
                                                error:&error]) {
         return activate_result_t{nullptr};
     } else {
