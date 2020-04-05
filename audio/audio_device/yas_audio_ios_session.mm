@@ -113,7 +113,7 @@ audio::ios_session::activate_result_t audio::ios_session::reactivate() {
         return activate_result_t{nullptr};
     }
 
-    if (auto result = this->_set_category(); !result) {
+    if (auto result = this->_apply_category(); !result) {
         return result;
     }
 
@@ -217,7 +217,7 @@ void audio::ios_session::set_category(enum category const category, category_opt
     this->_category_options = options;
 
     if (this->_is_active) {
-        this->_set_category();
+        this->_apply_category();
     }
 }
 
@@ -229,7 +229,7 @@ chaining::chain_unsync_t<audio::interruption_method> audio::ios_session::interru
     return this->_interruption_notifier->chain();
 }
 
-audio::ios_session::activate_result_t audio::ios_session::_set_category() {
+audio::ios_session::activate_result_t audio::ios_session::_apply_category() {
     NSError *error = nil;
 
     if ([[AVAudioSession sharedInstance] setCategory:to_objc_category(this->_category) error:&error]) {
