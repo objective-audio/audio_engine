@@ -64,8 +64,10 @@ struct reload_vc_cpp {
     }
 
     void reactivateSession() {
+        this->graph->stop();
         this->session->deactivate();
         auto result = this->session->activate();
+        this->graph->start_render();
     }
 
     void dispose() {
