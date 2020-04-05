@@ -203,6 +203,10 @@ void audio::ios_io_core::set_maximum_frames_per_slice(uint32_t const frames) {
 }
 
 bool audio::ios_io_core::start() {
+    if (!this->_device->output_format().has_value() && !this->_device->input_format().has_value()) {
+        return false;
+    }
+
     auto const engine = this->_impl->_avf_engine;
     if (!engine) {
         NSLog(@"%s avf_engine not found.", __PRETTY_FUNCTION__);
