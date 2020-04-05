@@ -8,6 +8,7 @@
 
 #if TARGET_OS_IPHONE
 
+#include <cpp_utils/yas_flagset.h>
 #include <cpp_utils/yas_result.h>
 
 #include "yas_audio_interruptor.h"
@@ -25,6 +26,19 @@ struct ios_session : ios_device_session, interruptor {
         multi_route,
     };
 
+    enum class category_option : std::size_t {
+        mix_with_others,
+        duck_others,
+        allow_bluetooth,
+        default_to_speaker,
+        interrupt_spoken_audio_and_mix_with_others,
+        allow_bluetooth_a2dp,
+        allow_air_play,
+
+        count,
+    };
+
+    using category_options_t = flagset<category_option>;
     using activate_result_t = result<std::nullptr_t, std::string>;
 
     [[nodiscard]] double sample_rate() const override;
