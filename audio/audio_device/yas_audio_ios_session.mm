@@ -209,7 +209,12 @@ enum audio::ios_session::category audio::ios_session::category() const {
 }
 
 void audio::ios_session::set_category(enum category const category) {
+    this->set_category(category, {});
+}
+
+void audio::ios_session::set_category(enum category const category, category_options_t const options) {
     this->_category = category;
+    this->_category_options = options;
 
     if (this->_is_active) {
         this->_set_category();

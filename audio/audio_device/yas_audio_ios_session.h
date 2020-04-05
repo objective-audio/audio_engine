@@ -59,6 +59,7 @@ struct ios_session : ios_device_session, interruptor {
 
     [[nodiscard]] enum category category() const;
     void set_category(enum category const);
+    void set_category(enum category const, category_options_t const);
 
     [[nodiscard]] chaining::chain_unsync_t<device_method> device_chain() const override;
     [[nodiscard]] chaining::chain_unsync_t<interruption_method> interruption_chain() const override;
@@ -71,6 +72,7 @@ struct ios_session : ios_device_session, interruptor {
     bool _is_active = false;
     bool _is_interrupting = false;
     enum category _category;
+    category_options_t _category_options;
     double _preferred_sample_rate = 44100.0;
     uint32_t _preferred_io_buffer_frames = 1024;
 
