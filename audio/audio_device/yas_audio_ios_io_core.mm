@@ -14,11 +14,13 @@
 using namespace yas;
 
 namespace yas::audio {
-static void log_invalid_formats(AVAudioFormat const *node_format, audio::format const &device_format) {
-    std::cout << "    sample_rate node(" << node_format.sampleRate << ") device(" << device_format.sample_rate() << ")"
-              << std::endl;
-    std::cout << "    channel_count node(" << node_format.channelCount << ") device(" << device_format.channel_count()
-              << ")" << std::endl;
+static void log_formats(AVAudioFormat const *node_format, audio::format const &device_format) {
+    std::cout << "node [sample_rate: " << node_format.sampleRate << ", channel_count: " << node_format.channelCount
+              << "]";
+    std::cout << " - ";
+    std::cout << "device [sample_rate: " << device_format.sample_rate()
+              << ", channel_count: " << device_format.channel_count() << "]";
+    std::cout << std::endl;
 }
 }
 
@@ -96,8 +98,8 @@ void audio::ios_io_core::initialize() {
 
             this->_impl->_source_node = source_node;
         } else {
-            std::cout << "ios_io_core output node format is not equal to output device format." << std::endl;
-            log_invalid_formats(node_format, *output_format);
+            std::cout << "ios_io_core output formats do not match." << std::endl;
+            log_formats(node_format, *output_format);
         }
     }
 
@@ -157,8 +159,8 @@ void audio::ios_io_core::initialize() {
 
             this->_impl->_sink_node = sink_node;
         } else {
-            std::cout << "ios_io_core input node format is not equal to input device format." << std::endl;
-            log_invalid_formats(node_format, *input_format);
+            std::cout << "ios_io_core input formats do not match." << std::endl;
+            log_formats(node_format, *input_format);
         }
     }
 
