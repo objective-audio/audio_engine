@@ -83,9 +83,11 @@ void audio::ios_io_core::initialize() {
                        return OSStatus(noErr);
                    }]);
 
+            auto const objc_channel_layout = objc_ptr_with_move_object(
+                [[AVAudioChannelLayout alloc] initWithLayoutTag:output_format->channel_count()]);
             auto const objc_output_format = objc_ptr_with_move_object([[AVAudioFormat alloc]
                 initStandardFormatWithSampleRate:output_format->sample_rate()
-                                        channels:output_format->channel_count()]);
+                                   channelLayout:objc_channel_layout.object()]);
 
             [engine.object() attachNode:source_node.object()];
             [engine.object() connect:source_node.object()
@@ -144,16 +146,18 @@ void audio::ios_io_core::initialize() {
                     return OSStatus(noErr);
                 }]);
 
+            auto const objc_channel_layout = objc_ptr_with_move_object(
+                [[AVAudioChannelLayout alloc] initWithLayoutTag:input_format->channel_count()]);
             auto const objc_input_format = objc_ptr_with_move_object([[AVAudioFormat alloc]
                 initStandardFormatWithSampleRate:input_format->sample_rate()
-                                        channels:input_format->channel_count()]);
+                                   channelLayout:objc_channel_layout.object()]);
 
             [engine.object() attachNode:sink_node.object()];
             [engine.object() connect:engine.object().inputNode to:sink_node.object() format:objc_input_format.object()];
 
             this->_impl->_sink_node = sink_node;
         } else {
-            std::cout << "ios_io_core output node format is not equal to input device format." << std::endl;
+            std::cout << "ios_io_core input node format is not equal to input device format." << std::endl;
             log_invalid_formats(node_format, *input_format);
         }
     }
