@@ -3,6 +3,7 @@
 //
 
 #import "AppDelegate.h"
+#include <audio/audio.h>
 
 @interface AppDelegate ()
 
@@ -12,6 +13,8 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
+    yas_audio_set_log_enabled(true);
+
     return YES;
 }
 
