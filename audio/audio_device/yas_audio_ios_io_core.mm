@@ -28,6 +28,9 @@ struct audio::ios_io_core::impl {
     std::optional<objc_ptr<AVAudioEngine *>> _avf_engine = std::nullopt;
     std::optional<objc_ptr<AVAudioSourceNode *>> _source_node = std::nullopt;
     std::optional<objc_ptr<AVAudioSinkNode *>> _sink_node = std::nullopt;
+
+    bool _prev_output_init_failed = false;
+    bool _prev_input_init_failed = false;
 };
 
 audio::ios_io_core::ios_io_core(ios_device_ptr const &device) : _device(device), _impl(std::make_unique<impl>()) {
@@ -40,6 +43,9 @@ audio::ios_io_core::~ios_io_core() {
 void audio::ios_io_core::initialize() {
     auto engine = objc_ptr_with_move_object([[AVAudioEngine alloc] init]);
     this->_impl->_avf_engine = engine;
+
+    bool output_failed = false;
+    bool input_failed = false;
 
     if (auto const &output_format = this->_device->output_format()) {
         double const sample_rate = output_format->sample_rate();
@@ -97,9 +103,15 @@ void audio::ios_io_core::initialize() {
                               format:objc_output_format.object()];
 
             this->_impl->_source_node = source_node;
+
+            if (this->_impl->_prev_output_init_failed) {
+                std::cout << "ios_io_core output formats matched." << std::endl;
+                log_formats(node_format, *output_format);
+            }
         } else {
-            std::cout << "ios_io_core output formats do not match." << std::endl;
+            std::cout << "ios_io_core output formats did not match." << std::endl;
             log_formats(node_format, *output_format);
+            output_failed = true;
         }
     }
 
@@ -158,11 +170,20 @@ void audio::ios_io_core::initialize() {
             [engine.object() connect:engine.object().inputNode to:sink_node.object() format:objc_input_format.object()];
 
             this->_impl->_sink_node = sink_node;
+
+            if (this->_impl->_prev_input_init_failed) {
+                std::cout << "ios_io_core input formats matched." << std::endl;
+                log_formats(node_format, *input_format);
+            }
         } else {
-            std::cout << "ios_io_core input formats do not match." << std::endl;
+            std::cout << "ios_io_core input formats did not match." << std::endl;
             log_formats(node_format, *input_format);
+            input_failed = true;
         }
     }
+
+    this->_impl->_prev_output_init_failed = output_failed;
+    this->_impl->_prev_input_init_failed = input_failed;
 
     this->_update_kernel();
 }
