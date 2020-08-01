@@ -175,7 +175,7 @@
 				B612CDB9234B7C9D00B89826 /* common */,
 				B6C8E64B1BAD08230031226C /* AudioEngineEffects */,
 				B6C8E64C1BAD082C0031226C /* AudioEngineRoute */,
-				B6F81E171BE6F9C50022D6BD /* InpuTapNode */,
+				B6F81E171BE6F9C50022D6BD /* InputTapNode */,
 				B612CDB1234B71F000B89826 /* AVFIO */,
 				B67F922D23783B8000757226 /* AVFConverter */,
 				B694581923C735D700D39967 /* Reload */,
@@ -247,13 +247,13 @@
 			name = AudioEngineRoute;
 			sourceTree = "<group>";
 		};
-		B6F81E171BE6F9C50022D6BD /* InpuTapNode */ = {
+		B6F81E171BE6F9C50022D6BD /* InputTapNode */ = {
 			isa = PBXGroup;
 			children = (
 				B6F81E181BE6F9E90022D6BD /* YASAudioInputTapNodeSampleViewController.h */,
 				B6F81E191BE6F9E90022D6BD /* YASAudioInputTapNodeSampleViewController.mm */,
 			);
-			name = InpuTapNode;
+			name = InputTapNode;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
