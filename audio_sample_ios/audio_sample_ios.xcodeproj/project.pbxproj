@@ -14,7 +14,7 @@
 		B61D52FA1B9D257900A449C5 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B61D52F91B9D257900A449C5 /* Accelerate.framework */; };
 		B62C2D6C1BAD498D0036949D /* YASAudioGraphRouteSampleSelectionViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = B62C2D6B1BAD498D0036949D /* YASAudioGraphRouteSampleSelectionViewController.mm */; };
 		B62ED5291A6280C0007DDE96 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = B62ED5281A6280C0007DDE96 /* main.m */; };
-		B62ED52C1A6280C0007DDE96 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = B62ED52B1A6280C0007DDE96 /* AppDelegate.m */; };
+		B62ED52C1A6280C0007DDE96 /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = B62ED52B1A6280C0007DDE96 /* AppDelegate.mm */; };
 		B62ED5321A6280C0007DDE96 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B62ED5301A6280C0007DDE96 /* Main.storyboard */; };
 		B62ED5341A6280C0007DDE96 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B62ED5331A6280C0007DDE96 /* Images.xcassets */; };
 		B62ED5371A6280C0007DDE96 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = B62ED5351A6280C0007DDE96 /* LaunchScreen.xib */; };
@@ -68,7 +68,7 @@
 		B62ED5271A6280C0007DDE96 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B62ED5281A6280C0007DDE96 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		B62ED52A1A6280C0007DDE96 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
-		B62ED52B1A6280C0007DDE96 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		B62ED52B1A6280C0007DDE96 /* AppDelegate.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = AppDelegate.mm; sourceTree = "<group>"; };
 		B62ED5311A6280C0007DDE96 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		B62ED5331A6280C0007DDE96 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		B62ED5361A6280C0007DDE96 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
@@ -171,7 +171,7 @@
 			isa = PBXGroup;
 			children = (
 				B62ED52A1A6280C0007DDE96 /* AppDelegate.h */,
-				B62ED52B1A6280C0007DDE96 /* AppDelegate.m */,
+				B62ED52B1A6280C0007DDE96 /* AppDelegate.mm */,
 				B612CDB9234B7C9D00B89826 /* common */,
 				B6C8E64B1BAD08230031226C /* AudioEngineEffects */,
 				B6C8E64C1BAD082C0031226C /* AudioEngineRoute */,
@@ -355,7 +355,7 @@
 				B694581C23C7360500D39967 /* YASAudioReloadViewController.mm in Sources */,
 				B6F81E1A1BE6F9E90022D6BD /* YASAudioInputTapNodeSampleViewController.mm in Sources */,
 				B65BE8D21AB66D9C0073A07E /* YASAudioGraphEffectsSampleViewController.mm in Sources */,
-				B62ED52C1A6280C0007DDE96 /* AppDelegate.m in Sources */,
+				B62ED52C1A6280C0007DDE96 /* AppDelegate.mm in Sources */,
 				B62ED5291A6280C0007DDE96 /* main.m in Sources */,
 				B6E52AE61ABD362300D2C45A /* YASAudioGraphEffectsSampleEditViewController.mm in Sources */,
 			);

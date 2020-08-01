@@ -6,6 +6,8 @@
 
 #include <cpp_utils/yas_result.h>
 #include <iostream>
+#include <sstream>
+#include "yas_audio_debug.h"
 #include "yas_audio_graph_tap.h"
 #include "yas_audio_io.h"
 #include "yas_audio_time.h"
@@ -115,20 +117,22 @@ bool audio::graph_io::_validate_connections() {
             auto const &connection_format = connection->format;
             auto const &device_opt = raw_io->device();
             if (!device_opt) {
-                std::cout << __PRETTY_FUNCTION__ << " : output device is null." << std::endl;
+                auto const log = std::string(__PRETTY_FUNCTION__) + " : output device is null.";
+                yas_audio_log(log);
                 return false;
             }
             auto const &device = *device_opt;
             if (connection_format != device->output_format()) {
-                std::cout << __PRETTY_FUNCTION__ << " : output device io format is not match.\n";
+                std::ostringstream stream;
+                stream << __PRETTY_FUNCTION__ << " : output device io format is not match.\n";
                 if (device->output_format().has_value()) {
-                    std::cout << "device output format : " << to_string(*device->output_format()) << "\n";
+                    stream << "device output format : " << to_string(*device->output_format()) << "\n";
                 } else {
-                    std::cout << "device output format : null"
-                              << "\n";
+                    stream << "device output format : null"
+                           << "\n";
                 }
-                std::cout << "connection format : " << to_string(connection_format);
-                std::cout << std::endl;
+                stream << "connection format : " << to_string(connection_format);
+                yas_audio_log(stream.str());
                 return false;
             }
         }
@@ -142,20 +146,22 @@ bool audio::graph_io::_validate_connections() {
             auto const &connection_format = connection->format;
             auto const &device_opt = raw_io->device();
             if (!device_opt) {
-                std::cout << __PRETTY_FUNCTION__ << " : output device is null." << std::endl;
+                auto const log = std::string(__PRETTY_FUNCTION__) + " : output device is null.";
+                yas_audio_log(log);
                 return false;
             }
             auto const &device = *device_opt;
             if (connection_format != device->input_format()) {
-                std::cout << __PRETTY_FUNCTION__ << " : input device io format is not match.\n";
+                std::ostringstream stream;
+                stream << __PRETTY_FUNCTION__ << " : input device io format is not match.\n";
                 if (device->input_format().has_value()) {
-                    std::cout << "device input format : " << to_string(*device->input_format()) << "\n";
+                    stream << "device input format : " << to_string(*device->input_format()) << "\n";
                 } else {
-                    std::cout << "device input format : null"
-                              << "\n";
+                    stream << "device input format : null"
+                           << "\n";
                 }
-                std::cout << "connection format : " << to_string(connection_format);
-                std::cout << std::endl;
+                stream << "connection format : " << to_string(connection_format);
+                yas_audio_log(stream.str());
                 return false;
             }
         }
