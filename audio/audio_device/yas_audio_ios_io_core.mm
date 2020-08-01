@@ -14,7 +14,9 @@
 using namespace yas;
 
 namespace yas::audio {
-static void log_formats(AVAudioFormat const *node_format, audio::format const &device_format) {
+static void log_formats(std::string const &prefix, AVAudioFormat const *node_format,
+                        audio::format const &device_format) {
+    std::cout << prefix << " - ";
     std::cout << "node [sample_rate: " << node_format.sampleRate << ", channel_count: " << node_format.channelCount
               << "]";
     std::cout << " - ";
@@ -105,12 +107,10 @@ void audio::ios_io_core::initialize() {
             this->_impl->_source_node = source_node;
 
             if (this->_impl->_prev_output_init_failed) {
-                std::cout << "ios_io_core output formats matched." << std::endl;
-                log_formats(node_format, *output_format);
+                log_formats("ios_io_core output formats matched.", node_format, *output_format);
             }
         } else {
-            std::cout << "ios_io_core output formats did not match." << std::endl;
-            log_formats(node_format, *output_format);
+            log_formats("ios_io_core output formats did not match.", node_format, *output_format);
             output_failed = true;
         }
     }
@@ -172,12 +172,10 @@ void audio::ios_io_core::initialize() {
             this->_impl->_sink_node = sink_node;
 
             if (this->_impl->_prev_input_init_failed) {
-                std::cout << "ios_io_core input formats matched." << std::endl;
-                log_formats(node_format, *input_format);
+                log_formats("ios_io_core input formats matched.", node_format, *input_format);
             }
         } else {
-            std::cout << "ios_io_core input formats did not match." << std::endl;
-            log_formats(node_format, *input_format);
+            log_formats("ios_io_core input formats did not match.", node_format, *input_format);
             input_failed = true;
         }
     }
