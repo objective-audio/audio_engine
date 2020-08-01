@@ -8,7 +8,8 @@
 
 #include <AVFoundation/AVFoundation.h>
 #include <cpp_utils/yas_objc_ptr.h>
-#include <iostream>
+#include <sstream>
+#include "yas_audio_debug.h"
 #include "yas_audio_ios_device.h"
 
 using namespace yas;
@@ -16,13 +17,13 @@ using namespace yas;
 namespace yas::audio {
 static void log_formats(std::string const &prefix, AVAudioFormat const *node_format,
                         audio::format const &device_format) {
-    std::cout << prefix << " - ";
-    std::cout << "node [sample_rate: " << node_format.sampleRate << ", channel_count: " << node_format.channelCount
-              << "]";
-    std::cout << " - ";
-    std::cout << "device [sample_rate: " << device_format.sample_rate()
-              << ", channel_count: " << device_format.channel_count() << "]";
-    std::cout << std::endl;
+    std::ostringstream stream;
+    stream << prefix << " - ";
+    stream << "node [sample_rate: " << node_format.sampleRate << ", channel_count: " << node_format.channelCount << "]";
+    stream << " - ";
+    stream << "device [sample_rate: " << device_format.sample_rate()
+           << ", channel_count: " << device_format.channel_count() << "]";
+    yas_audio_log(stream.str());
 }
 }
 
