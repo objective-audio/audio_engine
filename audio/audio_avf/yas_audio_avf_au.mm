@@ -13,6 +13,7 @@
 #include "yas_audio_avf_au_parameter.h"
 #include "yas_audio_avf_au_parameter_core.h"
 #include "yas_audio_debug.h"
+#include "yas_audio_objc_utils.h"
 #include "yas_audio_pcm_buffer.h"
 #include "yas_audio_time.h"
 
@@ -247,8 +248,7 @@ void audio::avf_au::set_input_format(audio::format const &format, uint32_t const
 
     NSError *error = nil;
 
-    auto const objc_format =
-        objc_ptr_with_move_object([[AVAudioFormat alloc] initWithStreamDescription:&format.stream_description()]);
+    auto const objc_format = to_objc_object(format);
 
     if ([bus setFormat:objc_format.object() error:&error]) {
         bus.enabled = YES;
@@ -273,8 +273,7 @@ void audio::avf_au::set_output_format(audio::format const &format, uint32_t cons
 
     NSError *error = nil;
 
-    auto const objc_format =
-        objc_ptr_with_move_object([[AVAudioFormat alloc] initWithStreamDescription:&format.stream_description()]);
+    auto const objc_format = to_objc_object(format);
 
     if ([bus setFormat:objc_format.object() error:&error]) {
         bus.enabled = YES;
