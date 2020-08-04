@@ -3,6 +3,7 @@
 //
 
 #include "yas_audio_objc_utils.h"
+#include "yas_audio_format.h"
 #include "yas_audio_time.h"
 
 #if TARGET_OS_IPHONE
@@ -57,6 +58,36 @@ audio::channel_map_t yas::to_channel_map(NSArray *const channelDescriptions, aud
 }
 
 #endif
+
+AVAudioCommonFormat yas::to_common_format(audio::pcm_format const pcm_format) {
+    switch (pcm_format) {
+        case audio::pcm_format::float64:
+            return AVAudioPCMFormatFloat64;
+        case audio::pcm_format::float32:
+            return AVAudioPCMFormatFloat32;
+        case audio::pcm_format::fixed824:
+            return AVAudioPCMFormatInt32;
+        case audio::pcm_format::int16:
+            return AVAudioPCMFormatInt16;
+        case audio::pcm_format::other:
+            return AVAudioOtherFormat;
+    }
+}
+
+objc_ptr<AVAudioFormat *> yas::to_objc_object(audio::format const &format) {
+    if (format.channel_count() <= 2) {
+        return objc_ptr_with_move_object(
+            [[AVAudioFormat alloc] initWithStreamDescription:&format.stream_description()]);
+    } else {
+        auto const objc_channel_layout =
+            objc_ptr_with_move_object([[AVAudioChannelLayout alloc] initWithLayoutTag:format.channel_count()]);
+        return objc_ptr_with_move_object([[AVAudioFormat alloc]
+            initWithCommonFormat:to_common_format(format.pcm_format())
+                      sampleRate:format.sample_rate()
+                     interleaved:format.is_interleaved()
+                   channelLayout:objc_channel_layout.object()]);
+    }
+}
 
 objc_ptr<AVAudioTime *> yas::to_objc_object(audio::time const &time) {
     AudioTimeStamp const time_stamp = time.audio_time_stamp();

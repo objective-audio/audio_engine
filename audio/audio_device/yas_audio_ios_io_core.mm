@@ -50,7 +50,7 @@ void audio::ios_io_core::initialize() {
 
         AVAudioFormat *node_format = [engine.object().outputNode outputFormatForBus:0];
 
-        if (sample_rate == node_format.sampleRate && channel_count == node_format.channelCount) {
+        if (sample_rate == node_format.sampleRate) {
             auto source_node = objc_ptr_with_move_object([[AVAudioSourceNode alloc]
                 initWithFormat:node_format
                    renderBlock:[weak_io_core = this->_weak_core](
@@ -88,8 +88,8 @@ void audio::ios_io_core::initialize() {
                        return OSStatus(noErr);
                    }]);
 
-            auto const objc_channel_layout = objc_ptr_with_move_object(
-                [[AVAudioChannelLayout alloc] initWithLayoutTag:output_format->channel_count()]);
+            auto const objc_channel_layout =
+                objc_ptr_with_move_object([[AVAudioChannelLayout alloc] initWithLayoutTag:channel_count]);
             auto const objc_output_format = objc_ptr_with_move_object([[AVAudioFormat alloc]
                 initStandardFormatWithSampleRate:output_format->sample_rate()
                                    channelLayout:objc_channel_layout.object()]);
@@ -100,8 +100,10 @@ void audio::ios_io_core::initialize() {
                               format:objc_output_format.object()];
 
             this->_impl->_source_node = source_node;
+
+            log_formats("ios_io_core initialize output connected.", node_format, *output_format);
         } else {
-            log_formats("ios_io_core output formats did not match.", node_format, *output_format);
+            log_formats("ios_io_core initialize output formats did not match.", node_format, *output_format);
         }
     }
 
@@ -111,7 +113,7 @@ void audio::ios_io_core::initialize() {
 
         AVAudioFormat *node_format = [engine.object().inputNode inputFormatForBus:0];
 
-        if (sample_rate == node_format.sampleRate && channel_count == node_format.channelCount) {
+        if (sample_rate == node_format.sampleRate) {
             auto sink_node = objc_ptr_with_move_object([[AVAudioSinkNode alloc]
                 initWithReceiverBlock:[weak_io_core = this->_weak_core](const AudioTimeStamp *_Nonnull timestamp,
                                                                         AVAudioFrameCount frameCount,
@@ -150,8 +152,8 @@ void audio::ios_io_core::initialize() {
                     return OSStatus(noErr);
                 }]);
 
-            auto const objc_channel_layout = objc_ptr_with_move_object(
-                [[AVAudioChannelLayout alloc] initWithLayoutTag:input_format->channel_count()]);
+            auto const objc_channel_layout =
+                objc_ptr_with_move_object([[AVAudioChannelLayout alloc] initWithLayoutTag:channel_count]);
             auto const objc_input_format = objc_ptr_with_move_object([[AVAudioFormat alloc]
                 initStandardFormatWithSampleRate:input_format->sample_rate()
                                    channelLayout:objc_channel_layout.object()]);
@@ -160,8 +162,10 @@ void audio::ios_io_core::initialize() {
             [engine.object() connect:engine.object().inputNode to:sink_node.object() format:objc_input_format.object()];
 
             this->_impl->_sink_node = sink_node;
+
+            log_formats("ios_io_core initialize input connected.", node_format, *input_format);
         } else {
-            log_formats("ios_io_core input formats did not match.", node_format, *input_format);
+            log_formats("ios_io_core initialize input formats did not match.", node_format, *input_format);
         }
     }
 
