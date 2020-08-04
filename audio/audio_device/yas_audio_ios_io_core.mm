@@ -100,8 +100,10 @@ void audio::ios_io_core::initialize() {
                               format:objc_output_format.object()];
 
             this->_impl->_source_node = source_node;
+
+            log_formats("ios_io_core initialize output connected.", node_format, *output_format);
         } else {
-            log_formats("ios_io_core output formats did not match.", node_format, *output_format);
+            log_formats("ios_io_core initialize output formats did not match.", node_format, *output_format);
         }
     }
 
@@ -160,8 +162,10 @@ void audio::ios_io_core::initialize() {
             [engine.object() connect:engine.object().inputNode to:sink_node.object() format:objc_input_format.object()];
 
             this->_impl->_sink_node = sink_node;
+
+            log_formats("ios_io_core initialize input connected.", node_format, *input_format);
         } else {
-            log_formats("ios_io_core input formats did not match.", node_format, *input_format);
+            log_formats("ios_io_core initialize input formats did not match.", node_format, *input_format);
         }
     }
 
