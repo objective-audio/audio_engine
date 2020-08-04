@@ -9,7 +9,6 @@
 #include <cpp_utils/yas_objc_ptr.h>
 #include <cpp_utils/yas_stl_utils.h>
 #include <cpp_utils/yas_thread.h>
-#include <iostream>
 #include "yas_audio_avf_au_parameter.h"
 #include "yas_audio_avf_au_parameter_core.h"
 #include "yas_audio_debug.h"
