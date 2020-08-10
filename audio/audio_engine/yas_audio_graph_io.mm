@@ -117,14 +117,13 @@ bool audio::graph_io::_validate_connections() {
             auto const &connection_format = connection->format;
             auto const &device_opt = raw_io->device();
             if (!device_opt) {
-                auto const log = std::string(__PRETTY_FUNCTION__) + " : output device is null.";
-                yas_audio_log(log);
+                yas_audio_log(("graph_io validate_connections failed - output device is null."));
                 return false;
             }
             auto const &device = *device_opt;
             if (connection_format != device->output_format()) {
                 std::ostringstream stream;
-                stream << __PRETTY_FUNCTION__ << " : output device io format is not match.\n";
+                stream << "graph_io validate_connections failed - output device io format is not match.\n";
                 if (device->output_format().has_value()) {
                     stream << "device output format : " << to_string(*device->output_format()) << "\n";
                 } else {
@@ -146,14 +145,13 @@ bool audio::graph_io::_validate_connections() {
             auto const &connection_format = connection->format;
             auto const &device_opt = raw_io->device();
             if (!device_opt) {
-                auto const log = std::string(__PRETTY_FUNCTION__) + " : output device is null.";
-                yas_audio_log(log);
+                yas_audio_log("graph_io validate_connections failed - output device is null.");
                 return false;
             }
             auto const &device = *device_opt;
             if (connection_format != device->input_format()) {
                 std::ostringstream stream;
-                stream << __PRETTY_FUNCTION__ << " : input device io format is not match.\n";
+                stream << "graph_io validate_connections failed - input device io format is not match.\n";
                 if (device->input_format().has_value()) {
                     stream << "device input format : " << to_string(*device->input_format()) << "\n";
                 } else {
@@ -166,6 +164,8 @@ bool audio::graph_io::_validate_connections() {
             }
         }
     }
+
+    yas_audio_log("graph_io validate_connections succeeded");
 
     return true;
 }
