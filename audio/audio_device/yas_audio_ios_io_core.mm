@@ -203,7 +203,7 @@ void audio::ios_io_core::uninitialize() {
 }
 
 void audio::ios_io_core::set_render_handler(std::optional<io_render_f> handler) {
-    std::lock_guard<std::recursive_mutex> lock(this->_mutex);
+    std::lock_guard<std::mutex> lock(this->_render_handler_mutex);
     this->__render_handler = std::move(handler);
 }
 
@@ -264,8 +264,12 @@ void audio::ios_io_core::_prepare(ios_io_core_ptr const &shared) {
 }
 
 std::optional<audio::io_render_f> audio::ios_io_core::_render_handler() const {
-    std::lock_guard<std::recursive_mutex> lock(this->_mutex);
-    return this->__render_handler;
+    if (auto const lock = std::unique_lock<std::mutex>(this->_render_handler_mutex, std::try_to_lock);
+        lock.owns_lock()) {
+        return this->__render_handler;
+    } else {
+        return std::nullopt;
+    }
 }
 
 void audio::ios_io_core::_set_kernel(std::optional<io_kernel_ptr> const &kernel) {
