@@ -30,10 +30,8 @@ struct avf_au::core {
 
                                            if (auto const shared_au = weak_au.lock()) {
                                                if (error) {
-                                                   auto const error_message =
-                                                       to_string((__bridge CFStringRef)error.description);
-                                                   auto const log = "load raw unit error : " + error_message;
-                                                   yas_audio_log(log);
+                                                   yas_audio_log(("load raw unit error : " +
+                                                                  to_string((__bridge CFStringRef)error.description)));
                                                    shared_au->_load_state->set_value(load_state::failed);
                                                } else {
                                                    shared_au->_core->_set_raw_unit(objc_ptr<AUAudioUnit *>{audioUnit});
@@ -71,9 +69,7 @@ struct avf_au::core {
 
             this->_is_initialized = true;
         } else {
-            auto const error_message = to_string((__bridge CFStringRef)error.description);
-            auto const log = "initialize - error : " + error_message;
-            yas_audio_log(log);
+            yas_audio_log(("initialize - error : " + to_string((__bridge CFStringRef)error.description)));
         }
     }
 
@@ -195,9 +191,7 @@ void audio::avf_au::set_input_bus_count(uint32_t const count) {
         if ([inputBusses setBusCount:count error:&error]) {
             this->_update_input_parameters();
         } else {
-            auto const error_message = to_string((__bridge CFStringRef)error.description);
-            auto const log = "set input element count error : " + error_message;
-            yas_audio_log(log);
+            yas_audio_log(("set input element count error : " + to_string((__bridge CFStringRef)error.description)));
         }
     } else {
         yas_audio_log("input element count is not changable.");
@@ -216,9 +210,7 @@ void audio::avf_au::set_output_bus_count(uint32_t const count) {
         if ([outputBusses setBusCount:count error:&error]) {
             this->_update_output_parameters();
         } else {
-            auto const error_message = to_string((__bridge CFStringRef)error.description);
-            auto const log = "set output element count error : " + error_message;
-            yas_audio_log(log);
+            yas_audio_log(("set output element count error : " + to_string((__bridge CFStringRef)error.description)));
         }
     } else {
         yas_audio_log("output element count is not changable.");
