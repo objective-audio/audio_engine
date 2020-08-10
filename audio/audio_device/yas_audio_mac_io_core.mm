@@ -100,12 +100,12 @@ void audio::mac_io_core::uninitialize() {
 }
 
 void audio::mac_io_core::set_render_handler(std::optional<io_render_f> handler) {
-    std::lock_guard<std::recursive_mutex> lock(this->_mutex);
+    std::lock_guard<std::mutex> lock(this->_render_handler_mutex);
     this->__render_handler = std::move(handler);
 }
 
 void audio::mac_io_core::set_maximum_frames_per_slice(uint32_t const frames) {
-    std::lock_guard<std::recursive_mutex> lock(this->_mutex);
+    std::lock_guard<std::recursive_mutex> lock(this->_kernel_mutex);
     this->__maximum_frames = frames;
     this->_update_kernel();
 }
@@ -139,12 +139,15 @@ void audio::mac_io_core::_prepare(mac_io_core_ptr const &shared) {
 }
 
 std::optional<audio::io_render_f> audio::mac_io_core::_render_handler() const {
-    std::lock_guard<std::recursive_mutex> lock(this->_mutex);
-    return this->__render_handler;
+    if (auto const lock = std::unique_lock(this->_render_handler_mutex, std::try_to_lock); lock.owns_lock()) {
+        return this->__render_handler;
+    } else {
+        return std::nullopt;
+    }
 }
 
 void audio::mac_io_core::_set_kernel(std::optional<io_kernel_ptr> const &kernel) {
-    std::lock_guard<std::recursive_mutex> lock(this->_mutex);
+    std::lock_guard<std::recursive_mutex> lock(this->_kernel_mutex);
     this->__kernel = std::nullopt;
     if (kernel) {
         this->__kernel = kernel;
@@ -152,12 +155,15 @@ void audio::mac_io_core::_set_kernel(std::optional<io_kernel_ptr> const &kernel)
 }
 
 std::optional<audio::io_kernel_ptr> audio::mac_io_core::_kernel() const {
-    std::lock_guard<std::recursive_mutex> lock(this->_mutex);
-    return this->__kernel;
+    if (auto const lock = std::unique_lock(this->_kernel_mutex, std::try_to_lock); lock.owns_lock()) {
+        return this->__kernel;
+    } else {
+        return std::nullopt;
+    }
 }
 
 void audio::mac_io_core::_update_kernel() {
-    std::lock_guard<std::recursive_mutex> lock(this->_mutex);
+    std::lock_guard<std::recursive_mutex> lock(this->_kernel_mutex);
 
     this->_set_kernel(std::nullopt);
 
