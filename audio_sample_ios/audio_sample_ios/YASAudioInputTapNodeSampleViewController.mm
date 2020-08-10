@@ -30,14 +30,10 @@ struct input_tap_vc_cpp {
         chaining::value::holder<float>::make_shared(audio::math::decibel_from_linear(0.0f));
 
     void setup() {
-        auto const &io = this->graph->add_io(this->device);
+        this->graph->add_io(this->device);
+        this->reconnect();
 
-        double const sample_rate = this->device->input_format()->sample_rate();
-        uint32_t const ch_count = this->device->input_channel_count();
-        audio::format format{{.sample_rate = sample_rate, .channel_count = ch_count}};
-        graph->connect(io->node(), input_tap->node(), format);
-
-        input_tap->set_render_handler([input_level = input_level, sample_rate](auto args) mutable {
+        input_tap->set_render_handler([input_level = input_level](auto args) mutable {
             auto const &buffer = args.buffer;
 
             auto each = audio::make_each_data<float>(*buffer);
@@ -49,16 +45,40 @@ struct input_tap_vc_cpp {
                 level = std::max(fabsf(ptr[cblas_isamax(frame_length, ptr, 1)]), level);
             }
 
+            double const sample_rate = buffer->format().sample_rate();
             float prev_level = input_level->raw() - frame_length / sample_rate * 30.0f;
             level = std::max(prev_level, audio::math::decibel_from_linear(level));
             input_level->set_value(level);
         });
+
+        this->session->device_chain()
+            .guard([](auto const &method) { return method == audio::ios_device_session::device_method::route_change; })
+            .perform([this](auto const &) { this->reconnect(); })
+            .end()
+            ->add_to(this->_pool);
     }
 
     void dispose() {
         this->graph->stop();
         this->session->deactivate();
     }
+
+    void reconnect() {
+        auto const &io = this->graph->io();
+        if (!io) {
+            return;
+        }
+
+        graph->disconnect(io.value()->node());
+
+        double const sample_rate = this->device->input_format()->sample_rate();
+        uint32_t const ch_count = this->device->input_channel_count();
+        audio::format format{{.sample_rate = sample_rate, .channel_count = ch_count}};
+        graph->connect(io.value()->node(), input_tap->node(), format);
+    }
+
+   private:
+    chaining::observer_pool _pool;
 };
 }
 
