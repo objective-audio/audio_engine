@@ -44,13 +44,13 @@ struct graph final {
 
     graph_io_ptr const &add_io(std::optional<io_device_ptr> const &);
     void remove_io();
-    std::optional<graph_io_ptr> const &io() const;
+    [[nodiscard]] std::optional<graph_io_ptr> const &io() const;
 
     start_result_t start_render();
     void stop();
-    bool is_running() const;
+    [[nodiscard]] bool is_running() const;
 
-    static graph_ptr make_shared();
+    [[nodiscard]] static graph_ptr make_shared();
 
     // for Test
     std::unordered_set<graph_node_ptr> const &nodes() const;

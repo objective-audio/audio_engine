@@ -11,6 +11,7 @@
 #include <cpp_utils/yas_cf_utils.h>
 #include <cpp_utils/yas_objc_ptr.h>
 #include <vector>
+#include "yas_audio_debug.h"
 
 using namespace yas;
 
@@ -90,6 +91,10 @@ audio::ios_session::ios_session()
                          queue:NSOperationQueue.mainQueue
                     usingBlock:[this](NSNotification *note) {
                         if (this->_is_active) {
+                            yas_audio_log(("ios_session route_change notification - sample_rate : " +
+                                           std::to_string(this->sample_rate()) +
+                                           " output_channel_count : " + std::to_string(this->output_channel_count()) +
+                                           " input_channel_count : " + std::to_string(this->input_channel_count())));
                             this->_device_notifier->notify(device_method::route_change);
                         }
                     }];
@@ -102,6 +107,7 @@ audio::ios_session::ios_session()
                          queue:NSOperationQueue.mainQueue
                     usingBlock:[this](NSNotification *note) {
                         if (this->_is_active) {
+                            yas_audio_log("ios_session lost notification");
                             this->_device_notifier->notify(device_method::media_service_were_lost);
                         }
                     }];
@@ -114,6 +120,7 @@ audio::ios_session::ios_session()
                          queue:NSOperationQueue.mainQueue
                     usingBlock:[this](NSNotification *note) {
                         if (this->_is_active) {
+                            yas_audio_log("ios_session reset notification");
                             this->_device_notifier->notify(device_method::media_service_were_reset);
                         }
                     }];
