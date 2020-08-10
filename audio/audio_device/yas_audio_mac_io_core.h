@@ -38,6 +38,7 @@ struct mac_io_core final : io_core {
     std::optional<pcm_buffer_ptr> _input_buffer_on_render = std::nullopt;
     std::optional<time_ptr> _input_time_on_render = std::nullopt;
 
+    mutable std::mutex _render_handler_mutex;
     mutable std::recursive_mutex _mutex;
     std::optional<io_render_f> __render_handler = std::nullopt;
     uint32_t __maximum_frames = 4096;
