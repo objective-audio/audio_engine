@@ -56,34 +56,48 @@ void audio::ios_io_core::initialize() {
                    renderBlock:[weak_io_core = this->_weak_core](
                                    BOOL *_Nonnull isSilence, const AudioTimeStamp *_Nonnull timestamp,
                                    AVAudioFrameCount frameCount, AudioBufferList *_Nonnull outputData) {
-                       if (auto io_core = weak_io_core.lock()) {
-                           if (auto const kernel_opt = io_core->_kernel()) {
-                               auto const &kernel = kernel_opt.value();
-                               if (auto render_handler = io_core->_render_handler()) {
-                                   if (auto const &output_buffer_opt = kernel->output_buffer) {
-                                       auto const &output_buffer = *output_buffer_opt;
-                                       if (outputData) {
-                                           uint32_t const frame_length = audio::frame_length(
-                                               outputData, output_buffer->format().sample_byte_count());
-                                           if (frame_length > 0) {
-                                               output_buffer->set_frame_length(frame_length);
-                                               audio::time time(*timestamp, output_buffer->format().sample_rate());
-                                               output_buffer->clear();
-                                               render_handler.value()(io_render_args{.output_buffer = output_buffer,
-                                                                                     .when = std::move(time)});
-                                               output_buffer->copy_to(outputData);
-                                           }
-                                       }
-                                   } else if (kernel->input_buffer) {
-                                       render_handler.value()(
-                                           io_render_args{.output_buffer = std::nullopt, .when = std::nullopt});
-                                   }
-                               }
-                           }
-
-                           io_core->_input_buffer_on_render = std::nullopt;
-                           io_core->_input_time_on_render = std::nullopt;
+                       auto io_core = weak_io_core.lock();
+                       if (!io_core) {
+                           *isSilence = YES;
+                           return OSStatus(noErr);
                        }
+
+                       auto const kernel_opt = io_core->_kernel();
+                       auto render_handler = io_core->_render_handler();
+
+                       if (kernel_opt && render_handler) {
+                           auto const &kernel = kernel_opt.value();
+                           if (auto const &output_buffer_opt = kernel->output_buffer) {
+                               auto const &output_buffer = *output_buffer_opt;
+                               if (outputData) {
+                                   uint32_t const frame_length =
+                                       audio::frame_length(outputData, output_buffer->format().sample_byte_count());
+                                   if (frame_length > 0) {
+                                       output_buffer->set_frame_length(frame_length);
+                                       audio::time time(*timestamp, output_buffer->format().sample_rate());
+                                       output_buffer->clear();
+                                       render_handler.value()(
+                                           io_render_args{.output_buffer = output_buffer, .when = std::move(time)});
+                                       output_buffer->copy_to(outputData);
+                                   } else {
+                                       *isSilence = YES;
+                                   }
+                               } else {
+                                   *isSilence = YES;
+                               }
+                           } else {
+                               if (kernel->input_buffer) {
+                                   render_handler.value()(
+                                       io_render_args{.output_buffer = std::nullopt, .when = std::nullopt});
+                               }
+                               *isSilence = YES;
+                           }
+                       } else {
+                           *isSilence = YES;
+                       }
+
+                       io_core->_input_buffer_on_render = std::nullopt;
+                       io_core->_input_time_on_render = std::nullopt;
 
                        return OSStatus(noErr);
                    }]);
