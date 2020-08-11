@@ -44,7 +44,6 @@ struct ios_io_core final : io_core {
     std::optional<pcm_buffer_ptr> _input_buffer_on_render = std::nullopt;
     std::optional<time_ptr> _input_time_on_render = std::nullopt;
 
-    mutable std::mutex _render_handler_mutex;
     mutable std::recursive_mutex _kernel_mutex;
 
     std::optional<io_render_f> __render_handler = std::nullopt;
@@ -55,7 +54,6 @@ struct ios_io_core final : io_core {
 
     void _prepare(ios_io_core_ptr const &shared);
 
-    std::optional<io_render_f> _render_handler() const;
     void _set_kernel(std::optional<io_kernel_ptr> const &);
     std::optional<io_kernel_ptr> _kernel() const;
     void _update_kernel();

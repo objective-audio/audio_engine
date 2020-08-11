@@ -63,9 +63,8 @@ void audio::ios_io_core::initialize() {
                        }
 
                        auto const kernel_opt = io_core->_kernel();
-                       auto render_handler = io_core->_render_handler();
 
-                       if (kernel_opt && render_handler) {
+                       if (kernel_opt) {
                            auto const &kernel = kernel_opt.value();
                            if (auto const &output_buffer_opt = kernel->output_buffer) {
                                auto const &output_buffer = *output_buffer_opt;
@@ -76,7 +75,7 @@ void audio::ios_io_core::initialize() {
                                        output_buffer->set_frame_length(frame_length);
                                        audio::time time(*timestamp, output_buffer->format().sample_rate());
                                        output_buffer->clear();
-                                       render_handler.value()(
+                                       kernel->render_handler(
                                            io_render_args{.output_buffer = output_buffer, .when = std::move(time)});
                                        output_buffer->copy_to(outputData);
                                    } else {
@@ -87,7 +86,7 @@ void audio::ios_io_core::initialize() {
                                }
                            } else {
                                if (kernel->input_buffer) {
-                                   render_handler.value()(
+                                   kernel->render_handler(
                                        io_render_args{.output_buffer = std::nullopt, .when = std::nullopt});
                                }
                                *isSilence = YES;
@@ -151,12 +150,10 @@ void audio::ios_io_core::initialize() {
                                             *timestamp, input_buffer->format().sample_rate());
 
                                         if (!kernel->output_buffer) {
-                                            if (auto render_handler = io_core->_render_handler()) {
-                                                render_handler.value()(io_render_args{.output_buffer = std::nullopt,
-                                                                                      .when = std::nullopt});
-                                                io_core->_input_buffer_on_render = std::nullopt;
-                                                io_core->_input_time_on_render = std::nullopt;
-                                            }
+                                            kernel->render_handler(
+                                                io_render_args{.output_buffer = std::nullopt, .when = std::nullopt});
+                                            io_core->_input_buffer_on_render = std::nullopt;
+                                            io_core->_input_time_on_render = std::nullopt;
                                         }
                                     }
                                 }
@@ -217,8 +214,9 @@ void audio::ios_io_core::uninitialize() {
 }
 
 void audio::ios_io_core::set_render_handler(std::optional<io_render_f> handler) {
-    std::lock_guard<std::mutex> lock(this->_render_handler_mutex);
+    std::lock_guard<std::recursive_mutex> lock(this->_kernel_mutex);
     this->__render_handler = std::move(handler);
+    this->_update_kernel();
 }
 
 void audio::ios_io_core::set_maximum_frames_per_slice(uint32_t const frames) {
@@ -277,15 +275,6 @@ void audio::ios_io_core::_prepare(ios_io_core_ptr const &shared) {
     this->_weak_core = shared;
 }
 
-std::optional<audio::io_render_f> audio::ios_io_core::_render_handler() const {
-    if (auto const lock = std::unique_lock<std::mutex>(this->_render_handler_mutex, std::try_to_lock);
-        lock.owns_lock()) {
-        return this->__render_handler;
-    } else {
-        return std::nullopt;
-    }
-}
-
 void audio::ios_io_core::_set_kernel(std::optional<io_kernel_ptr> const &kernel) {
     std::lock_guard<std::recursive_mutex> lock(this->_kernel_mutex);
     this->__kernel = std::nullopt;
@@ -318,7 +307,12 @@ void audio::ios_io_core::_update_kernel() {
         return;
     }
 
-    this->_set_kernel(io_kernel::make_shared(input_available ? input_format : std::nullopt,
+    if (!this->__render_handler) {
+        return;
+    }
+
+    this->_set_kernel(io_kernel::make_shared(this->__render_handler.value(),
+                                             input_available ? input_format : std::nullopt,
                                              output_available ? output_format : std::nullopt, this->__maximum_frames));
 }
 

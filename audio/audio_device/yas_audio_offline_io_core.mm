@@ -48,12 +48,7 @@ void audio::offline_io_core::initialize() {
 
             audio::time when(current_sample_time, render_buffer->format().sample_rate());
 
-            if (auto const handler = core->_render_handler()) {
-                handler.value()({.output_buffer = render_buffer, .when = when});
-            } else {
-                cancelled = true;
-                break;
-            }
+            kernel->render_handler({.output_buffer = render_buffer, .when = when});
 
             auto const &offline_handler = core->_device->render_handler();
             if (offline_handler({.buffer = render_buffer, .when = when}) == continuation::abort) {
@@ -100,12 +95,13 @@ void audio::offline_io_core::uninitialize() {
 }
 
 void audio::offline_io_core::set_render_handler(std::optional<io_render_f> handler) {
-    std::lock_guard<std::recursive_mutex> lock(this->_mutex);
+    std::lock_guard<std::recursive_mutex> lock(this->_kernel_mutex);
     this->__render_handler = std::move(handler);
+    this->_update_kernel();
 }
 
 void audio::offline_io_core::set_maximum_frames_per_slice(uint32_t const frames) {
-    std::lock_guard<std::recursive_mutex> lock(this->_mutex);
+    std::lock_guard<std::recursive_mutex> lock(this->_kernel_mutex);
     this->__maximum_frames = frames;
     this->_update_kernel();
 }
@@ -139,13 +135,8 @@ void audio::offline_io_core::_prepare(offline_io_core_ptr const &core) {
     this->_weak_io_core = core;
 }
 
-std::optional<audio::io_render_f> audio::offline_io_core::_render_handler() const {
-    std::lock_guard<std::recursive_mutex> lock(this->_mutex);
-    return this->__render_handler;
-}
-
 void audio::offline_io_core::_set_kernel(std::optional<io_kernel_ptr> const &kernel) {
-    std::lock_guard<std::recursive_mutex> lock(this->_mutex);
+    std::lock_guard<std::recursive_mutex> lock(this->_kernel_mutex);
     this->__kernel = std::nullopt;
     if (kernel) {
         this->__kernel = kernel;
@@ -153,12 +144,12 @@ void audio::offline_io_core::_set_kernel(std::optional<io_kernel_ptr> const &ker
 }
 
 std::optional<audio::io_kernel_ptr> audio::offline_io_core::_kernel() const {
-    std::lock_guard<std::recursive_mutex> lock(this->_mutex);
+    std::lock_guard<std::recursive_mutex> lock(this->_kernel_mutex);
     return this->__kernel;
 }
 
 void audio::offline_io_core::_update_kernel() {
-    std::lock_guard<std::recursive_mutex> lock(this->_mutex);
+    std::lock_guard<std::recursive_mutex> lock(this->_kernel_mutex);
 
     this->_set_kernel(std::nullopt);
 
@@ -168,7 +159,12 @@ void audio::offline_io_core::_update_kernel() {
         return;
     }
 
-    this->_set_kernel(io_kernel::make_shared(std::nullopt, output_format, this->__maximum_frames));
+    if (!this->__render_handler) {
+        return;
+    }
+
+    this->_set_kernel(
+        io_kernel::make_shared(this->__render_handler.value(), std::nullopt, output_format, this->__maximum_frames));
 }
 
 audio::offline_io_core_ptr audio::offline_io_core::make_shared(offline_device_ptr const &device) {
