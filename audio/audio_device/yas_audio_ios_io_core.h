@@ -57,6 +57,7 @@ struct ios_io_core final : io_core {
     void _set_kernel(std::optional<io_kernel_ptr> const &);
     std::optional<io_kernel_ptr> _kernel() const;
     void _update_kernel();
+    bool _is_intialized() const;
 };
 }  // namespace yas::audio
 
