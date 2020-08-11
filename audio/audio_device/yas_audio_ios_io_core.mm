@@ -7,6 +7,7 @@
 #if TARGET_OS_IPHONE
 
 #include <AVFoundation/AVFoundation.h>
+#include <cpp_utils/yas_cf_utils.h>
 #include <cpp_utils/yas_objc_ptr.h>
 #include <sstream>
 #include "yas_audio_debug.h"
@@ -236,19 +237,19 @@ bool audio::ios_io_core::start() {
 
     auto const engine = this->_impl->_avf_engine;
     if (!engine) {
-        NSLog(@"%s avf_engine not found.", __PRETTY_FUNCTION__);
+        yas_audio_log("ios_io_core start() - avf_engine not found.");
         return false;
     }
 
     auto const objc_engine = engine.value().object();
 
     if (this->_device->output_format().has_value() && !objc_engine.outputNode) {
-        NSLog(@"%s outputNode not found.", __PRETTY_FUNCTION__);
+        yas_audio_log("ios_io_core start() - outputNode not found.");
         return false;
     }
 
     if (this->_device->input_format().has_value() && !objc_engine.inputNode) {
-        NSLog(@"%s inputNode not found.", __PRETTY_FUNCTION__);
+        yas_audio_log("ios_io_core start() - inputNode not found.");
         return false;
     }
 
@@ -256,7 +257,8 @@ bool audio::ios_io_core::start() {
     if ([objc_engine startAndReturnError:&error]) {
         return true;
     } else {
-        NSLog(@"%@", error);
+        yas_audio_log(
+            ("ios_io_core start() - engine start error : " + to_string((__bridge CFStringRef)error.description)));
         return false;
     }
 }
