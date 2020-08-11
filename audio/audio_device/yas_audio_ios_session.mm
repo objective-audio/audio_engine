@@ -181,7 +181,8 @@ void audio::ios_session::deactivate() {
         this->_is_active = false;
         this->_device_notifier->notify(device_method::deactivate);
     } else {
-        NSLog(@"ios session deactivate error : %@", error);
+        yas_audio_log(
+            ("ios session deactivate error : " + to_string((__bridge CFStringRef)(error.description ?: @""))));
     }
 }
 
@@ -278,8 +279,9 @@ audio::ios_session::activate_result_t audio::ios_session::_apply_category() {
                                                error:&error]) {
         return activate_result_t{nullptr};
     } else {
-        NSLog(@"audio session set category error : %@", error);
-        return activate_result_t{to_string((__bridge CFStringRef)(error.description ?: @""))};
+        auto const error_description = to_string((__bridge CFStringRef)(error.description ?: @""));
+        yas_audio_log(("ios session set category error : " + error_description));
+        return activate_result_t{error_description};
     }
 }
 
@@ -289,8 +291,9 @@ audio::ios_session::activate_result_t audio::ios_session::_apply_sample_rate() {
     if ([[AVAudioSession sharedInstance] setPreferredSampleRate:this->_preferred_sample_rate error:&error]) {
         return activate_result_t{nullptr};
     } else {
-        NSLog(@"audio session set sample rate error : %@", error);
-        return activate_result_t{to_string((__bridge CFStringRef)(error.description ?: @""))};
+        auto const error_description = to_string((__bridge CFStringRef)(error.description ?: @""));
+        yas_audio_log(("ios session set sample rate error : " + error_description));
+        return activate_result_t{error_description};
     }
 }
 
@@ -312,8 +315,9 @@ audio::ios_session::activate_result_t audio::ios_session::_apply_io_buffer_durat
     if ([[AVAudioSession sharedInstance] setPreferredIOBufferDuration:duration error:&error]) {
         return activate_result_t{nullptr};
     } else {
-        NSLog(@"audio session set io buffer duration error : %@", error);
-        return activate_result_t{to_string((__bridge CFStringRef)(error.description ?: @""))};
+        auto const error_description = to_string((__bridge CFStringRef)(error.description ?: @""));
+        yas_audio_log(("ios session set io buffer duration error : " + error_description));
+        return activate_result_t{error_description};
     }
 }
 
@@ -323,8 +327,9 @@ audio::ios_session::activate_result_t audio::ios_session::_set_active() {
     if ([[AVAudioSession sharedInstance] setActive:YES error:&error]) {
         return activate_result_t{nullptr};
     } else {
-        NSLog(@"audio session set active error : %@", error);
-        return activate_result_t{to_string((__bridge CFStringRef)(error.description ?: @""))};
+        auto const error_description = to_string((__bridge CFStringRef)(error.description ?: @""));
+        yas_audio_log(("ios session set active error : " + error_description));
+        return activate_result_t{error_description};
     }
 }
 
