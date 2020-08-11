@@ -39,6 +39,7 @@ void audio::mac_io_core::initialize() {
                 if (auto const kernel_opt = io_core->_kernel()) {
                     auto const &kernel = kernel_opt.value();
                     kernel->reset_buffers();
+
                     if (inInputData) {
                         if (auto const &input_buffer_opt = kernel->input_buffer) {
                             auto const &input_buffer = *input_buffer_opt;
@@ -53,23 +54,21 @@ void audio::mac_io_core::initialize() {
                         }
                     }
 
-                    if (auto const render_handler = io_core->_render_handler()) {
-                        if (auto const &output_buffer_opt = kernel->output_buffer) {
-                            auto const &output_buffer = *output_buffer_opt;
-                            if (outOutputData) {
-                                uint32_t const frame_length =
-                                    audio::frame_length(outOutputData, output_buffer->format().sample_byte_count());
-                                if (frame_length > 0) {
-                                    output_buffer->set_frame_length(frame_length);
-                                    audio::time time(*inOutputTime, output_buffer->format().sample_rate());
-                                    render_handler.value()(
-                                        io_render_args{.output_buffer = output_buffer_opt, .when = std::move(time)});
-                                    output_buffer->copy_to(outOutputData);
-                                }
+                    if (auto const &output_buffer_opt = kernel->output_buffer) {
+                        auto const &output_buffer = *output_buffer_opt;
+                        if (outOutputData) {
+                            uint32_t const frame_length =
+                                audio::frame_length(outOutputData, output_buffer->format().sample_byte_count());
+                            if (frame_length > 0) {
+                                output_buffer->set_frame_length(frame_length);
+                                audio::time time(*inOutputTime, output_buffer->format().sample_rate());
+                                kernel->render_handler(
+                                    io_render_args{.output_buffer = output_buffer_opt, .when = std::move(time)});
+                                output_buffer->copy_to(outOutputData);
                             }
-                        } else if (kernel->input_buffer) {
-                            render_handler.value()(io_render_args{.output_buffer = std::nullopt, .when = std::nullopt});
                         }
+                    } else if (kernel->input_buffer) {
+                        kernel->render_handler(io_render_args{.output_buffer = std::nullopt, .when = std::nullopt});
                     }
                 }
 
@@ -100,8 +99,9 @@ void audio::mac_io_core::uninitialize() {
 }
 
 void audio::mac_io_core::set_render_handler(std::optional<io_render_f> handler) {
-    std::lock_guard<std::mutex> lock(this->_render_handler_mutex);
+    std::lock_guard<std::recursive_mutex> lock(this->_kernel_mutex);
     this->__render_handler = std::move(handler);
+    this->_update_kernel();
 }
 
 void audio::mac_io_core::set_maximum_frames_per_slice(uint32_t const frames) {
@@ -138,14 +138,6 @@ void audio::mac_io_core::_prepare(mac_io_core_ptr const &shared) {
     this->_weak_io_core = weak_io_core;
 }
 
-std::optional<audio::io_render_f> audio::mac_io_core::_render_handler() const {
-    if (auto const lock = std::unique_lock(this->_render_handler_mutex, std::try_to_lock); lock.owns_lock()) {
-        return this->__render_handler;
-    } else {
-        return std::nullopt;
-    }
-}
-
 void audio::mac_io_core::_set_kernel(std::optional<io_kernel_ptr> const &kernel) {
     std::lock_guard<std::recursive_mutex> lock(this->_kernel_mutex);
     this->__kernel = std::nullopt;
@@ -174,7 +166,12 @@ void audio::mac_io_core::_update_kernel() {
         return;
     }
 
-    this->_set_kernel(io_kernel::make_shared(input_format, output_format, this->__maximum_frames));
+    if (!this->__render_handler) {
+        return;
+    }
+
+    this->_set_kernel(
+        io_kernel::make_shared(this->__render_handler.value(), input_format, output_format, this->__maximum_frames));
 }
 
 audio::mac_io_core_ptr audio::mac_io_core::make_shared(mac_device_ptr const &device) {

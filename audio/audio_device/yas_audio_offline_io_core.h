@@ -29,7 +29,7 @@ struct offline_io_core : io_core {
     offline_device_ptr const _device;
     std::optional<task_queue> _queue = std::nullopt;
 
-    mutable std::recursive_mutex _mutex;
+    mutable std::recursive_mutex _kernel_mutex;
     std::optional<io_render_f> __render_handler = std::nullopt;
     uint32_t __maximum_frames = 4096;
     std::optional<io_kernel_ptr> __kernel = std::nullopt;
@@ -37,7 +37,6 @@ struct offline_io_core : io_core {
     offline_io_core(offline_device_ptr const &);
 
     void _prepare(offline_io_core_ptr const &);
-    std::optional<io_render_f> _render_handler() const;
     void _set_kernel(std::optional<io_kernel_ptr> const &);
     std::optional<io_kernel_ptr> _kernel() const;
     void _update_kernel();
