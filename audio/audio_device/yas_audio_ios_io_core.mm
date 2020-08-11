@@ -214,15 +214,19 @@ void audio::ios_io_core::uninitialize() {
 }
 
 void audio::ios_io_core::set_render_handler(std::optional<io_render_f> handler) {
-    std::lock_guard<std::recursive_mutex> lock(this->_kernel_mutex);
-    this->__render_handler = std::move(handler);
-    this->_update_kernel();
+    if (this->__render_handler && handler) {
+        std::lock_guard<std::recursive_mutex> lock(this->_kernel_mutex);
+        this->__render_handler = std::move(handler);
+        this->_update_kernel();
+    }
 }
 
 void audio::ios_io_core::set_maximum_frames_per_slice(uint32_t const frames) {
-    std::lock_guard<std::recursive_mutex> lock(this->_kernel_mutex);
-    this->__maximum_frames = frames;
-    this->_update_kernel();
+    if (this->__maximum_frames != frames) {
+        std::lock_guard<std::recursive_mutex> lock(this->_kernel_mutex);
+        this->__maximum_frames = frames;
+        this->_update_kernel();
+    }
 }
 
 bool audio::ios_io_core::start() {
@@ -277,10 +281,7 @@ void audio::ios_io_core::_prepare(ios_io_core_ptr const &shared) {
 
 void audio::ios_io_core::_set_kernel(std::optional<io_kernel_ptr> const &kernel) {
     std::lock_guard<std::recursive_mutex> lock(this->_kernel_mutex);
-    this->__kernel = std::nullopt;
-    if (kernel) {
-        this->__kernel = kernel;
-    }
+    this->__kernel = kernel;
 }
 
 std::optional<audio::io_kernel_ptr> audio::ios_io_core::_kernel() const {
@@ -297,6 +298,14 @@ void audio::ios_io_core::_update_kernel() {
 
     this->_set_kernel(std::nullopt);
 
+    if (!this->_is_intialized()) {
+        return;
+    }
+
+    if (!this->__render_handler) {
+        return;
+    }
+
     auto const &output_format = this->_device->output_format();
     auto const &input_format = this->_device->input_format();
 
@@ -307,13 +316,13 @@ void audio::ios_io_core::_update_kernel() {
         return;
     }
 
-    if (!this->__render_handler) {
-        return;
-    }
-
     this->_set_kernel(io_kernel::make_shared(this->__render_handler.value(),
                                              input_available ? input_format : std::nullopt,
                                              output_available ? output_format : std::nullopt, this->__maximum_frames));
+}
+
+bool audio::ios_io_core::_is_intialized() const {
+    return this->_impl->_avf_engine.has_value();
 }
 
 audio::ios_io_core_ptr audio::ios_io_core::make_shared(ios_device_ptr const &device) {
