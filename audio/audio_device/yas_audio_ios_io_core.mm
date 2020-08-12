@@ -215,7 +215,7 @@ void audio::ios_io_core::uninitialize() {
 }
 
 void audio::ios_io_core::set_render_handler(std::optional<io_render_f> handler) {
-    if (this->__render_handler && handler) {
+    if (this->__render_handler || handler) {
         std::lock_guard<std::recursive_mutex> lock(this->_kernel_mutex);
         this->__render_handler = std::move(handler);
         this->_update_kernel();
