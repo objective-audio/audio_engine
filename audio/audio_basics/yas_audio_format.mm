@@ -73,6 +73,10 @@ bool audio::format::is_empty() const {
     return memcmp(&this->_asbd, &empty_asbd, sizeof(AudioStreamBasicDescription)) == 0;
 }
 
+bool audio::format::is_broken() const {
+    return this->channel_count() == 0 || this->sample_rate() <= 0.0;
+}
+
 bool audio::format::is_standard() const {
     return this->_standard;
 }

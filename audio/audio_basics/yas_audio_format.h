@@ -24,6 +24,7 @@ struct format final {
     explicit format(args args);
 
     bool is_empty() const;
+    bool is_broken() const;
     bool is_standard() const;
     audio::pcm_format pcm_format() const;
     uint32_t channel_count() const;

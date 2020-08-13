@@ -134,7 +134,15 @@ bool audio::ios_session::is_active() const {
 }
 
 audio::ios_session::activate_result_t audio::ios_session::activate() {
-    if (auto result = this->reactivate(); !result) {
+    if (auto result = this->_apply_category(); !result) {
+        return result;
+    }
+
+    if (auto result = this->_apply_sample_rate(); !result) {
+        return result;
+    }
+
+    if (auto result = this->_set_active(); !result) {
         return result;
     }
 
@@ -145,6 +153,12 @@ audio::ios_session::activate_result_t audio::ios_session::activate() {
 
         this->_device_notifier->notify(device_method::activate);
     }
+
+    if (auto result = this->_apply_io_buffer_duration(); !result) {
+        return result;
+    }
+
+    yas_audio_log("ios session activated.");
 
     return activate_result_t{nullptr};
 }
@@ -178,6 +192,7 @@ void audio::ios_session::deactivate() {
 
     NSError *error = nil;
     if ([[AVAudioSession sharedInstance] setActive:NO error:&error]) {
+        yas_audio_log("ios session deactivated.");
         this->_is_active = false;
         this->_device_notifier->notify(device_method::deactivate);
     } else {

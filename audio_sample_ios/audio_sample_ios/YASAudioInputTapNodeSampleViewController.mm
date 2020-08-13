@@ -71,9 +71,13 @@ struct input_tap_vc_cpp {
 
         graph->disconnect(io.value()->node());
 
-        double const sample_rate = this->device->input_format()->sample_rate();
-        uint32_t const ch_count = this->device->input_channel_count();
-        audio::format format{{.sample_rate = sample_rate, .channel_count = ch_count}};
+        auto const input_format = this->device->input_format();
+        if (!input_format || input_format->is_broken()) {
+            return;
+        }
+
+        audio::format format{
+            {.sample_rate = input_format->sample_rate(), .channel_count = input_format->channel_count()}};
         graph->connect(io.value()->node(), input_tap->node(), format);
     }
 
