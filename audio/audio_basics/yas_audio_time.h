@@ -5,8 +5,7 @@
 #pragma once
 
 #include <AudioToolbox/AudioToolbox.h>
-
-#include "yas_audio_types.h"
+#include <audio/yas_audio_types.h>
 
 namespace yas::audio {
 struct time final {

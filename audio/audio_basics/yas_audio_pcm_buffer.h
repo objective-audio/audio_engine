@@ -4,12 +4,11 @@
 
 #pragma once
 
+#include <audio/yas_audio_format.h>
+#include <audio/yas_audio_types.h>
 #include <cpp_utils/yas_result.h>
 
 #include <ostream>
-
-#include "yas_audio_format.h"
-#include "yas_audio_types.h"
 
 namespace yas {
 template <typename T, typename U>

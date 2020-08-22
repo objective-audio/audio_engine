@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "yas_audio_graph_node.h"
+#include <audio/yas_audio_graph_node.h>
 
 namespace yas::audio {
 struct graph_tap final {

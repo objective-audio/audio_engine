@@ -4,10 +4,10 @@
 
 #pragma once
 
-#include "yas_audio_format.h"
-#include "yas_audio_pcm_buffer.h"
-#include "yas_audio_ptr.h"
-#include "yas_audio_time.h"
+#include <audio/yas_audio_format.h>
+#include <audio/yas_audio_pcm_buffer.h>
+#include <audio/yas_audio_ptr.h>
+#include <audio/yas_audio_time.h>
 
 namespace yas::audio {
 struct io_render_args {

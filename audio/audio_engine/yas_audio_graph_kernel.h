@@ -4,10 +4,10 @@
 
 #pragma once
 
-#include <any>
+#include <audio/yas_audio_graph_kernel_protocol.h>
+#include <audio/yas_audio_ptr.h>
 
-#include "yas_audio_graph_kernel_protocol.h"
-#include "yas_audio_ptr.h"
+#include <any>
 
 namespace yas::audio {
 struct graph_kernel : manageable_graph_kernel {

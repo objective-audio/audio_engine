@@ -7,7 +7,7 @@
 #include <TargetConditionals.h>
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
 
-#include "yas_audio_exception.h"
+#include <audio/yas_audio_exception.h>
 
 template <typename T>
 std::unique_ptr<std::vector<T>> yas::audio::mac_device::stream::_property_data(

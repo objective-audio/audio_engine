@@ -7,7 +7,7 @@
 #include <TargetConditionals.h>
 #if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
 
-#include "yas_audio_io_device.h"
+#include <audio/yas_audio_io_device.h>
 
 namespace yas::audio {
 struct mac_device : io_device {
@@ -102,6 +102,6 @@ struct mac_device : io_device {
 };
 }  // namespace yas::audio
 
-#include "yas_audio_mac_device_stream.h"
+#include <audio/yas_audio_mac_device_stream.h>
 
 #endif

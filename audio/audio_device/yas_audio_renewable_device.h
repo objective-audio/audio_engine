@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "yas_audio_io_device.h"
+#include <audio/yas_audio_io_device.h>
 
 namespace yas::audio {
 struct renewable_device : io_device {

@@ -4,9 +4,9 @@
 
 #pragma once
 
-#include "yas_audio_format.h"
-#include "yas_audio_graph_connection_protocol.h"
-#include "yas_audio_ptr.h"
+#include <audio/yas_audio_format.h>
+#include <audio/yas_audio_graph_connection_protocol.h>
+#include <audio/yas_audio_ptr.h>
 
 namespace yas::audio {
 struct graph_connection : graph_node_removable {

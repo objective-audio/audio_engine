@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "yas_audio_io_device.h"
+#include <audio/yas_audio_io_device.h>
 
 namespace yas::audio {
 struct offline_render_args {

@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "yas_audio_graph_avf_au.h"
+#include <audio/yas_audio_graph_avf_au.h>
 
 namespace yas::audio {
 struct graph_avf_au_mixer final {

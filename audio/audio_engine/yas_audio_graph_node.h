@@ -4,17 +4,16 @@
 
 #pragma once
 
+#include <audio/yas_audio_format.h>
+#include <audio/yas_audio_graph_connection.h>
+#include <audio/yas_audio_graph_node_protocol.h>
+#include <audio/yas_audio_pcm_buffer.h>
+#include <audio/yas_audio_ptr.h>
+#include <audio/yas_audio_types.h>
 #include <chaining/yas_chaining_umbrella.h>
 
 #include <optional>
 #include <ostream>
-
-#include "yas_audio_format.h"
-#include "yas_audio_graph_connection.h"
-#include "yas_audio_graph_node_protocol.h"
-#include "yas_audio_pcm_buffer.h"
-#include "yas_audio_ptr.h"
-#include "yas_audio_types.h"
 
 namespace yas {
 template <typename T, typename U>
@@ -122,4 +121,4 @@ std::string to_string(audio::graph_node::method const &);
 
 std::ostream &operator<<(std::ostream &, yas::audio::graph_node::method const &);
 
-#include "yas_audio_graph_kernel.h"
+#include <audio/yas_audio_graph_kernel.h>
