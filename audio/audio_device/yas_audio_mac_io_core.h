@@ -11,6 +11,8 @@
 #include "yas_audio_io_core.h"
 
 namespace yas::audio {
+class mac_io_core_render_context;
+
 struct mac_io_core final : io_core {
     ~mac_io_core();
 
@@ -29,27 +31,19 @@ struct mac_io_core final : io_core {
     [[nodiscard]] static mac_io_core_ptr make_shared(mac_device_ptr const &);
 
    private:
-    std::weak_ptr<mac_io_core> _weak_io_core;
     mac_device_ptr _device;
     std::optional<AudioDeviceIOProcID> _io_proc_id = std::nullopt;
     std::optional<chaining::any_observer_ptr> _device_system_observer = std::nullopt;
     std::optional<chaining::any_observer_ptr> _device_observer = std::nullopt;
 
-    std::optional<pcm_buffer_ptr> _input_buffer_on_render = std::nullopt;
-    std::optional<time_ptr> _input_time_on_render = std::nullopt;
-
-    mutable std::recursive_mutex _kernel_mutex;
-    std::optional<io_render_f> __render_handler = std::nullopt;
-    uint32_t __maximum_frames = 4096;
-    std::optional<io_kernel_ptr> __kernel = std::nullopt;
+    std::shared_ptr<mac_io_core_render_context> _render_context;
+    std::optional<io_render_f> _render_handler = std::nullopt;
+    uint32_t _maximum_frames = 4096;
 
     mac_io_core(mac_device_ptr const &);
 
-    void _prepare(mac_io_core_ptr const &shared);
-
-    void _set_kernel(std::optional<io_kernel_ptr> const &);
-    std::optional<io_kernel_ptr> _kernel() const;
     void _update_kernel();
+    void _clear_kernel();
     bool _is_initialized() const;
 };
 }  // namespace yas::audio
