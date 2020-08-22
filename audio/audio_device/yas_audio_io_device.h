@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include "yas_audio_interruptor.h"
-#include "yas_audio_io_core.h"
+#include <audio/yas_audio_interruptor.h>
+#include <audio/yas_audio_io_core.h>
 
 namespace yas::audio {
 struct io_device {

@@ -4,9 +4,9 @@
 
 #pragma once
 
-#include <set>
+#include <audio/yas_audio_types.h>
 
-#include "yas_audio_types.h"
+#include <set>
 
 namespace yas {
 template <typename T, typename U>

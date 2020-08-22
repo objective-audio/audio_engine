@@ -4,10 +4,10 @@
 
 #pragma once
 
-#include <optional>
+#include <audio/yas_audio_graph_connection_protocol.h>
+#include <audio/yas_audio_ptr.h>
 
-#include "yas_audio_graph_connection_protocol.h"
-#include "yas_audio_ptr.h"
+#include <optional>
 
 namespace yas::audio {
 using graph_node_setup_f = std::function<void(void)>;

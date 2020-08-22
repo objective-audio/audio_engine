@@ -4,12 +4,11 @@
 
 #pragma once
 
+#include <audio/yas_audio_graph_io_protocol.h>
+#include <audio/yas_audio_graph_node.h>
+#include <audio/yas_audio_io_device.h>
+#include <audio/yas_audio_ptr.h>
 #include <chaining/yas_chaining_umbrella.h>
-
-#include "yas_audio_graph_io_protocol.h"
-#include "yas_audio_graph_node.h"
-#include "yas_audio_io_device.h"
-#include "yas_audio_ptr.h"
 
 namespace yas::audio {
 struct graph_io : manageable_graph_io {

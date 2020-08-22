@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "yas_audio_ptr.h"
+#include <audio/yas_audio_ptr.h>
 
 namespace yas::audio {
 struct manageable_graph_io {

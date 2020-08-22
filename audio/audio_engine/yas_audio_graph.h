@@ -4,13 +4,12 @@
 
 #pragma once
 
+#include <audio/yas_audio_graph_connection.h>
+#include <audio/yas_audio_ptr.h>
+#include <audio/yas_audio_types.h>
 #include <chaining/yas_chaining_umbrella.h>
 
 #include <ostream>
-
-#include "yas_audio_graph_connection.h"
-#include "yas_audio_ptr.h"
-#include "yas_audio_types.h"
 
 namespace yas {
 template <typename T, typename U>

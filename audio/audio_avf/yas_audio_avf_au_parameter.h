@@ -5,11 +5,10 @@
 #pragma once
 
 #include <AudioToolbox/AudioToolbox.h>
+#include <audio/yas_audio_ptr.h>
 #include <chaining/yas_chaining_umbrella.h>
 
 #include <optional>
-
-#include "yas_audio_ptr.h"
 
 namespace yas::audio {
 enum class avf_au_parameter_scope {

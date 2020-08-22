@@ -4,10 +4,10 @@
 
 #pragma once
 
+#include <audio/yas_audio_ptr.h>
+
 #include <map>
 #include <unordered_set>
-
-#include "yas_audio_ptr.h"
 
 namespace yas::audio {
 using graph_connection_set = std::unordered_set<graph_connection_ptr>;

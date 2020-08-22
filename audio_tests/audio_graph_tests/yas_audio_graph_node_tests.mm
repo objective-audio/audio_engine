@@ -159,7 +159,7 @@ using namespace yas;
     XCTestExpectation *expectation = [self expectationWithDescription:@"kernel connections"];
 
     auto lambda = [self, expectation, relay_node = relay_obj.node, input_connections, output_connection]() {
-        auto const &kernel = relay_node->kernel().value();
+        auto const kernel = relay_node->kernel().value();
         XCTAssertEqual(kernel->output_connections().size(), 1);
         XCTAssertEqual(kernel->input_connections().size(), 2);
         XCTAssertEqual(kernel->output_connection(0), output_connection);
