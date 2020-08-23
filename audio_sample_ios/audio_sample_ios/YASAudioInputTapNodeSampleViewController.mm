@@ -34,7 +34,7 @@ struct input_tap_vc_cpp {
         this->reconnect();
 
         input_tap->set_render_handler([input_level = input_level](auto args) mutable {
-            auto const &buffer = args.buffer;
+            auto const &buffer = args.output_buffer;
 
             auto each = audio::make_each_data<float>(*buffer);
             int const frame_length = buffer->frame_length();

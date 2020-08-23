@@ -63,7 +63,7 @@ struct sine {
         auto weak_sine = to_weak(shared);
 
         auto render_handler = [weak_sine](auto args) {
-            auto &buffer = args.buffer;
+            auto &buffer = args.output_buffer;
 
             buffer->clear();
 

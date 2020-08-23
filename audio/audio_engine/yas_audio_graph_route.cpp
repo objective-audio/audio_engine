@@ -39,7 +39,7 @@ void audio::graph_route::_prepare(graph_route_ptr const &shared) {
     auto weak_route = to_weak(shared);
 
     this->_node->set_render_handler([weak_route](auto args) {
-        auto &dst_buffer = args.buffer;
+        auto &dst_buffer = args.output_buffer;
         auto const dst_bus_idx = args.bus_idx;
 
         if (auto route = weak_route.lock()) {
@@ -60,7 +60,7 @@ void audio::graph_route::_prepare(graph_route_ptr const &shared) {
                                                                             dst_bus_idx, dst_ch_count)) {
                                 auto const src_buffer =
                                     std::make_shared<pcm_buffer>(src_format, *dst_buffer, result.value());
-                                node->render({.buffer = src_buffer, .bus_idx = src_bus_idx, .when = args.when});
+                                node->render({.output_buffer = src_buffer, .bus_idx = src_bus_idx, .when = args.when});
                             }
                         }
                     }
