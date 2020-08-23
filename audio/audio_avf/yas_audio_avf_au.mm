@@ -130,9 +130,9 @@ struct avf_au::core {
                     auto const buffer = std::make_shared<pcm_buffer>(input_format, inputData);
                     buffer->set_frame_length(frameCount);
 
-                    time when(*timestamp, input_format.sample_rate());
+                    audio::time time(*timestamp, input_format.sample_rate());
 
-                    input_handler({.output_buffer = buffer, .bus_idx = (uint32_t)inputBusNumber, .output_time = when});
+                    input_handler({.output_buffer = buffer, .bus_idx = (uint32_t)inputBusNumber, .output_time = time});
                 }
 
                 return AUAudioUnitStatus(noErr);

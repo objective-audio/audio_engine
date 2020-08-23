@@ -109,9 +109,9 @@ using namespace yas;
     auto future = promise->get_future();
 
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), [promise, au, &buffer] {
-        audio::time when{1000};
+        audio::time time{1000};
 
-        au->render({.output_buffer = buffer, .bus_idx = 0, .output_time = when}, [](auto args) {
+        au->render({.output_buffer = buffer, .bus_idx = 0, .output_time = time}, [](auto args) {
             int16_t *data = args.output_buffer->template data_ptr_at_index<int16_t>(0);
 
             auto each = make_fast_each(args.output_buffer->frame_length());
