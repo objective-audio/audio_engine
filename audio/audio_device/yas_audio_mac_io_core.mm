@@ -71,6 +71,9 @@ void audio::mac_io_core::initialize() {
                 auto const &kernel = kernel_opt.value();
                 kernel->reset_buffers();
 
+                std::optional<audio::pcm_buffer_ptr> render_input_buffer{std::nullopt};
+                std::optional<audio::time> render_input_time{std::nullopt};
+
                 if (inInputData) {
                     if (auto const &input_buffer_opt = kernel->input_buffer) {
                         auto const &input_buffer = *input_buffer_opt;
@@ -78,9 +81,12 @@ void audio::mac_io_core::initialize() {
 
                         uint32_t const input_frame_length = input_buffer->frame_length();
                         if (input_frame_length > 0) {
-                            render_context->input_buffer_on_render = input_buffer;
-                            render_context->input_time_on_render =
+                            auto const input_time =
                                 std::make_shared<audio::time>(*inInputTime, input_buffer->format().sample_rate());
+                            render_input_buffer = input_buffer;
+                            render_input_time = *input_time;
+                            render_context->input_buffer_on_render = input_buffer;
+                            render_context->input_time_on_render = input_time;
                         }
                     }
                 }
@@ -93,18 +99,23 @@ void audio::mac_io_core::initialize() {
                         if (frame_length > 0) {
                             output_buffer->set_frame_length(frame_length);
                             audio::time time(*inOutputTime, output_buffer->format().sample_rate());
-                            kernel->render_handler(
-                                io_render_args{.output_buffer = output_buffer_opt, .output_time = std::move(time)});
+                            kernel->render_handler(io_render_args{.output_buffer = output_buffer_opt,
+                                                                  .output_time = std::move(time),
+                                                                  .input_buffer = render_input_buffer,
+                                                                  .input_time = render_input_time});
                             output_buffer->copy_to(outOutputData);
                         }
                     }
                 } else if (kernel->input_buffer) {
-                    kernel->render_handler(io_render_args{.output_buffer = std::nullopt, .output_time = std::nullopt});
+                    kernel->render_handler(io_render_args{.output_buffer = audio::null_pcm_buffer_ptr_opt,
+                                                          .output_time = audio::null_time_opt,
+                                                          .input_buffer = render_input_buffer,
+                                                          .input_time = render_input_time});
                 }
             }
 
-            render_context->input_buffer_on_render = std::nullopt;
-            render_context->input_time_on_render = std::nullopt;
+            render_context->input_buffer_on_render = audio::null_pcm_buffer_ptr_opt;
+            render_context->input_time_on_render = audio::null_time_ptr_opt;
         };
 
         AudioDeviceIOProcID io_proc_id = nullptr;
