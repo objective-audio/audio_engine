@@ -5,6 +5,7 @@
 #pragma once
 
 #include <audio/yas_audio_format.h>
+#include <audio/yas_audio_ptr.h>
 #include <audio/yas_audio_types.h>
 #include <cpp_utils/yas_result.h>
 
@@ -111,6 +112,9 @@ struct pcm_buffer final {
     template <typename T>
     T *_data_ptr_at_channel(uint32_t const ch_idx) const;
 };
+
+static std::optional<pcm_buffer> const null_pcm_buffer_opt{std::nullopt};
+static std::optional<pcm_buffer_ptr> const null_pcm_buffer_ptr_opt{std::nullopt};
 
 void clear(AudioBufferList *abl);
 
