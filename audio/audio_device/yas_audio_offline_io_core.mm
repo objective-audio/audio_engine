@@ -48,7 +48,10 @@ void audio::offline_io_core::initialize() {
 
             audio::time time(current_sample_time, render_buffer->format().sample_rate());
 
-            kernel->render_handler({.output_buffer = render_buffer, .output_time = time});
+            kernel->render_handler({.output_buffer = render_buffer,
+                                    .output_time = time,
+                                    .input_buffer = audio::null_pcm_buffer_ptr_opt,
+                                    .input_time = audio::null_time_opt});
 
             auto const &offline_handler = core->_device->render_handler();
             if (offline_handler({.buffer = render_buffer, .when = time}) == continuation::abort) {
