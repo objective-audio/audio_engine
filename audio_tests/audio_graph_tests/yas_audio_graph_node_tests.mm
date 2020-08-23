@@ -108,7 +108,7 @@ using namespace yas;
 
     auto lambda = [self, node, time, render_expectation]() mutable {
         audio::pcm_buffer_ptr null_buffer{nullptr};
-        node->render({.output_buffer = null_buffer, .bus_idx = 0, .when = time});
+        node->render({.output_buffer = null_buffer, .bus_idx = 0, .output_time = time});
         [render_expectation fulfill];
     };
 

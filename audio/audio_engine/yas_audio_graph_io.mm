@@ -78,7 +78,7 @@ void audio::graph_io::_update_io_connections() {
                         if (auto const time = args.output_time) {
                             src_node->render({.output_buffer = *args.output_buffer,
                                               .bus_idx = connection->source_bus,
-                                              .when = time.value()});
+                                              .output_time = time.value()});
                         }
                     }
                 }
@@ -94,7 +94,7 @@ void audio::graph_io::_update_io_connections() {
                             if (input_buffer && input_time) {
                                 if (connection->format == dst_node->input_format(connection->destination_bus)) {
                                     dst_node->render(
-                                        {.output_buffer = *input_buffer, .bus_idx = 0, .when = **input_time});
+                                        {.output_buffer = *input_buffer, .bus_idx = 0, .output_time = **input_time});
                                 }
                             }
                         }

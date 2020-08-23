@@ -60,7 +60,9 @@ void audio::graph_route::_prepare(graph_route_ptr const &shared) {
                                                                             dst_bus_idx, dst_ch_count)) {
                                 auto const src_buffer =
                                     std::make_shared<pcm_buffer>(src_format, *dst_buffer, result.value());
-                                node->render({.output_buffer = src_buffer, .bus_idx = src_bus_idx, .when = args.when});
+                                node->render({.output_buffer = src_buffer,
+                                              .bus_idx = src_bus_idx,
+                                              .output_time = args.output_time});
                             }
                         }
                     }

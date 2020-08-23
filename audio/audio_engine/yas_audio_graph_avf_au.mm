@@ -57,7 +57,7 @@ void audio::graph_avf_au::_prepare(graph_avf_au_ptr const &shared, AudioComponen
         if (auto shared_au = weak_au.lock()) {
             auto const &raw_au = shared_au->_raw_au;
 
-            raw_au->render({.buffer = args.output_buffer, .bus_idx = args.bus_idx, .when = args.when},
+            raw_au->render({.buffer = args.output_buffer, .bus_idx = args.bus_idx, .when = args.output_time},
                            [weak_au](auto input_args) {
                                if (auto shared_au = weak_au.lock()) {
                                    if (auto kernel = shared_au->node()->kernel()) {
@@ -65,7 +65,7 @@ void audio::graph_avf_au::_prepare(graph_avf_au_ptr const &shared, AudioComponen
                                            if (auto src_node = connection->source_node()) {
                                                src_node->render({.output_buffer = input_args.buffer,
                                                                  .bus_idx = input_args.bus_idx,
-                                                                 .when = input_args.when});
+                                                                 .output_time = input_args.when});
                                            }
                                        }
                                    }
