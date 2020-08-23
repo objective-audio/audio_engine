@@ -187,7 +187,7 @@ struct graph_io_vc_cpp {
     double next_phase = 0.0;
 
     auto render_handler = [next_phase, weak_tap](auto args) mutable {
-        auto &buffer = args.output_buffer;
+        auto &buffer = args.buffer;
 
         buffer->clear();
 

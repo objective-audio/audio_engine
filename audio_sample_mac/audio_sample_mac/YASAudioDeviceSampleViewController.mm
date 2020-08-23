@@ -77,7 +77,7 @@ struct device_vc_cpp {
     auto weak_io = to_weak(self->_cpp->io);
     self->_cpp->io->set_render_handler([weak_io, kernel = self->_cpp->kernel](auto args) {
         if (auto io = weak_io.lock()) {
-            kernel->process(io->input_buffer_on_render(), args.output_buffer);
+            kernel->process(args.input_buffer, args.output_buffer);
         }
     });
 

@@ -20,9 +20,9 @@ struct avf_au {
     };
 
     struct render_args {
-        audio::pcm_buffer_ptr const &output_buffer;
+        audio::pcm_buffer_ptr const &buffer;
         uint32_t const bus_idx;
-        audio::time const &output_time;
+        audio::time const &time;
     };
 
     using input_render_f = std::function<void(render_args)>;
