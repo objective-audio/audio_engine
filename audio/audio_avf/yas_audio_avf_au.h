@@ -20,7 +20,7 @@ struct avf_au {
     };
 
     struct render_args {
-        audio::pcm_buffer_ptr const &buffer;
+        audio::pcm_buffer_ptr const &output_buffer;
         uint32_t const bus_idx;
         audio::time const &when;
     };

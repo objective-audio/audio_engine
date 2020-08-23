@@ -111,10 +111,10 @@ using namespace yas;
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), [promise, au, &buffer] {
         audio::time when{1000};
 
-        au->render({.buffer = buffer, .bus_idx = 0, .when = when}, [](auto args) {
-            int16_t *data = args.buffer->template data_ptr_at_index<int16_t>(0);
+        au->render({.output_buffer = buffer, .bus_idx = 0, .when = when}, [](auto args) {
+            int16_t *data = args.output_buffer->template data_ptr_at_index<int16_t>(0);
 
-            auto each = make_fast_each(args.buffer->frame_length());
+            auto each = make_fast_each(args.output_buffer->frame_length());
             while (yas_each_next(each)) {
                 auto const &idx = yas_each_index(each);
                 data[idx] = idx + 10;
