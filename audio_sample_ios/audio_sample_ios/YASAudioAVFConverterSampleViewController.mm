@@ -9,8 +9,6 @@
 #import "YASViewControllerUtils.h"
 #import "yas_audio_sample_kernel.h"
 
-#include <iostream>
-
 using namespace yas;
 
 namespace yas::sample {

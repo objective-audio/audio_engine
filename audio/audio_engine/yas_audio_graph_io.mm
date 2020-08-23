@@ -5,7 +5,6 @@
 #include "yas_audio_graph_io.h"
 
 #include <cpp_utils/yas_result.h>
-#include <iostream>
 #include <sstream>
 #include "yas_audio_debug.h"
 #include "yas_audio_graph_tap.h"

@@ -7,8 +7,6 @@
 #include <audio/yas_audio_umbrella.h>
 #include <Accelerate/Accelerate.h>
 
-#include <iostream>
-
 namespace yas::audio::sample {
     class kernel;
     using kernel_ptr = std::shared_ptr<kernel>;
