@@ -76,7 +76,7 @@ struct effects_vc_cpp {
         double phase = 0;
 
         auto tap_render_handler = [phase](auto args) mutable {
-            auto &buffer = args.output_buffer;
+            auto &buffer = args.buffer;
 
             buffer->clear();
 
