@@ -9,8 +9,6 @@
 #import "YASViewControllerUtils.h"
 #import "yas_audio_sample_kernel.h"
 
-#include <iostream>
-
 using namespace yas;
 
 namespace yas::sample {
@@ -55,7 +53,7 @@ struct avf_converter_vc_cpp {
         this->kernel->set_sine_frequency(1000.0);
 
         this->tap->set_render_handler([kernel = this->kernel](audio::graph_node::render_args args) {
-            kernel->process(std::nullopt, args.buffer);
+            kernel->process(std::nullopt, args.output_buffer);
         });
 
         this->converter->load_state_chain()

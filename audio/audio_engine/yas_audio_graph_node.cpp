@@ -7,8 +7,6 @@
 #include <cpp_utils/yas_result.h>
 #include <cpp_utils/yas_stl_utils.h>
 
-#include <iostream>
-
 #include "yas_audio_graph.h"
 #include "yas_audio_graph_connection.h"
 #include "yas_audio_time.h"
@@ -173,7 +171,7 @@ std::optional<audio::graph_kernel_ptr> audio::graph_node::kernel() const {
 #pragma mark render thread
 
 void audio::graph_node::render(render_args args) {
-    this->set_render_time_on_render(args.when);
+    this->set_render_time_on_render(args.output_time);
 
     if (this->_render_handler) {
         this->_render_handler(std::move(args));

@@ -115,7 +115,7 @@ using namespace yas;
     tap->set_render_handler([&tap_called, self](auto args) {
         tap_called = true;
         XCTAssertEqual(args.bus_idx, 0);
-        test::fill_test_values_to_buffer(*args.buffer);
+        test::fill_test_values_to_buffer(*args.output_buffer);
     });
 
     {
@@ -124,7 +124,7 @@ using namespace yas;
         auto const device = audio::offline_device::make_shared(
             format,
             [self](auto args) {
-                auto each = audio::make_each_data<float>(*args.buffer);
+                auto each = audio::make_each_data<float>(*args.output_buffer);
                 while (yas_each_data_next(each)) {
                     float test_value = (float)test::test_value((uint32_t)each.frm_idx, 0, (uint32_t)each.ptr_idx);
                     XCTAssertEqual(yas_each_data_value(each), test_value);
@@ -174,7 +174,7 @@ using namespace yas;
         auto &tap_called = tap_calleds[i];
         tap->set_render_handler([&tap_called](auto args) {
             tap_called = true;
-            test::fill_test_values_to_buffer(*args.buffer);
+            test::fill_test_values_to_buffer(*args.output_buffer);
         });
     }
 
@@ -186,7 +186,7 @@ using namespace yas;
     auto const device = audio::offline_device::make_shared(
         dst_format,
         [self](auto args) {
-            auto each = audio::make_each_data<float>(*args.buffer);
+            auto each = audio::make_each_data<float>(*args.output_buffer);
             while (yas_each_data_next(each)) {
                 float test_value = (float)test::test_value((uint32_t)each.frm_idx, 0, 0);
                 XCTAssertEqual(yas_each_data_value(each), test_value);
@@ -235,7 +235,7 @@ using namespace yas;
         auto &tap_called = tap_calleds[i];
         tap->set_render_handler([&tap_called](auto args) {
             tap_called = true;
-            test::fill_test_values_to_buffer(*args.buffer);
+            test::fill_test_values_to_buffer(*args.output_buffer);
         });
     }
 
@@ -247,7 +247,7 @@ using namespace yas;
     auto const device = audio::offline_device::make_shared(
         dst_format,
         [self](auto args) {
-            auto each = audio::make_each_data<float>(*args.buffer);
+            auto each = audio::make_each_data<float>(*args.output_buffer);
             while (yas_each_data_next(each)) {
                 if (each.ptr_idx == 0 || each.ptr_idx == 2) {
                     float test_value = (float)test::test_value((uint32_t)each.frm_idx, 0, 0);

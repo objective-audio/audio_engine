@@ -76,10 +76,10 @@ void audio::ios_io_core::initialize() {
                                        output_buffer->set_frame_length(frame_length);
                                        audio::time time(*timestamp, output_buffer->format().sample_rate());
                                        output_buffer->clear();
-                                       kernel->render_handler(io_render_args{.output_buffer = output_buffer_opt,
-                                                                             .output_time = time,
-                                                                             .input_buffer = kernel->input_buffer,
-                                                                             .input_time = time});
+                                       kernel->render_handler({.output_buffer = output_buffer_opt,
+                                                               .output_time = time,
+                                                               .input_buffer = kernel->input_buffer,
+                                                               .input_time = time});
                                        output_buffer->copy_to(outputData);
                                    } else {
                                        *isSilence = YES;
@@ -90,11 +90,10 @@ void audio::ios_io_core::initialize() {
                            } else {
                                if (auto const &input_buffer = kernel->input_buffer) {
                                    audio::time time(*timestamp, input_buffer.value()->format().sample_rate());
-                                   kernel->render_handler(
-                                       io_render_args{.output_buffer = audio::null_pcm_buffer_ptr_opt,
-                                                      .output_time = audio::null_time_opt,
-                                                      .input_buffer = kernel->input_buffer,
-                                                      .input_time = std::move(time)});
+                                   kernel->render_handler({.output_buffer = audio::null_pcm_buffer_ptr_opt,
+                                                           .output_time = audio::null_time_opt,
+                                                           .input_buffer = kernel->input_buffer,
+                                                           .input_time = std::move(time)});
                                }
                                *isSilence = YES;
                            }
@@ -157,11 +156,10 @@ void audio::ios_io_core::initialize() {
                                             *timestamp, input_buffer->format().sample_rate());
 
                                         if (!kernel->output_buffer) {
-                                            kernel->render_handler(
-                                                io_render_args{.output_buffer = audio::null_pcm_buffer_ptr_opt,
-                                                               .output_time = audio::null_time_opt,
-                                                               .input_buffer = audio::null_pcm_buffer_ptr_opt,
-                                                               .input_time = audio::null_time_opt});
+                                            kernel->render_handler({.output_buffer = audio::null_pcm_buffer_ptr_opt,
+                                                                    .output_time = audio::null_time_opt,
+                                                                    .input_buffer = audio::null_pcm_buffer_ptr_opt,
+                                                                    .input_time = audio::null_time_opt});
                                             io_core->_input_buffer_on_render = audio::null_pcm_buffer_ptr_opt;
                                             io_core->_input_time_on_render = audio::null_time_ptr_opt;
                                         }

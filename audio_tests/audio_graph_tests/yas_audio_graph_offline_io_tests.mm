@@ -49,11 +49,11 @@ using namespace yas;
 
     auto tap_render_handler = [&self, &tapNodeExpectation, &tap_render_frame, &sample_rate, &frames_per_render,
                                &format](audio::graph_node::render_args args) {
-        auto &buffer = args.buffer;
-        auto const &when = args.when;
+        auto &buffer = args.output_buffer;
+        auto const &time = args.output_time;
 
-        XCTAssertEqual(when.sample_time(), tap_render_frame);
-        XCTAssertEqual(when.sample_rate(), sample_rate);
+        XCTAssertEqual(time.sample_time(), tap_render_frame);
+        XCTAssertEqual(time.sample_rate(), sample_rate);
         XCTAssertEqual(buffer->frame_length(), frames_per_render);
         XCTAssertTrue(buffer->format() == format);
 
@@ -80,11 +80,11 @@ using namespace yas;
 
     auto render_handler = [&self, &renderExpectation, &output_render_frame, &sample_rate,
                            &format](audio::offline_render_args args) {
-        auto &buffer = args.buffer;
-        auto const &when = args.when;
+        auto &buffer = args.output_buffer;
+        auto const &time = args.output_time;
 
-        XCTAssertEqual(when.sample_time(), output_render_frame);
-        XCTAssertEqual(when.sample_rate(), sample_rate);
+        XCTAssertEqual(time.sample_time(), output_render_frame);
+        XCTAssertEqual(time.sample_rate(), sample_rate);
         XCTAssertEqual(buffer->frame_length(), frames_per_render);
         XCTAssertTrue(buffer->format() == format);
 

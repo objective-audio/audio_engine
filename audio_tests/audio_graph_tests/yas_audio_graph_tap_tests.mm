@@ -46,8 +46,8 @@ using namespace yas;
     auto weak_to_tap = to_weak(to_tap);
     auto to_render_handler = [weak_to_tap, self, to_connection = to_connection, from_connection = from_connection,
                               to_expectation](auto args) {
-        auto &buffer = args.buffer;
-        auto const &when = args.when;
+        auto &buffer = args.output_buffer;
+        auto const &output_time = args.output_time;
 
         auto node = weak_to_tap.lock();
         XCTAssertTrue(node);
@@ -60,7 +60,7 @@ using namespace yas;
             XCTAssertEqual(from_connection, node->input_connection_on_render(0));
             XCTAssertFalse(node->input_connection_on_render(1));
 
-            node->render_source({.buffer = buffer, .bus_idx = 0, .when = when});
+            node->render_source({.output_buffer = buffer, .bus_idx = 0, .output_time = output_time});
         }
 
         [to_expectation fulfill];

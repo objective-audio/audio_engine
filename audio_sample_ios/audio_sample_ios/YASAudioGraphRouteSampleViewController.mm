@@ -231,7 +231,7 @@ struct route_vc_cpp {
     double phase = 0;
 
     auto tap_render_handler = [phase](auto args) mutable {
-        auto &buffer = args.buffer;
+        auto &buffer = args.output_buffer;
 
         buffer->clear();
 

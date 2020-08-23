@@ -63,7 +63,7 @@ struct sine {
         auto weak_sine = to_weak(shared);
 
         auto render_handler = [weak_sine](auto args) {
-            auto &buffer = args.buffer;
+            auto &buffer = args.output_buffer;
 
             buffer->clear();
 
@@ -312,7 +312,7 @@ struct offline_vc_internal {
     auto const device = audio::offline_device::make_shared(
         internal->file_format,
         [&remain, file_writer = std::move(file_writer)](auto args) mutable {
-            auto &buffer = args.buffer;
+            auto &buffer = args.output_buffer;
 
             auto format = audio::format(buffer->format().stream_description());
             audio::pcm_buffer pcm_buffer(format, buffer->audio_buffer_list());
