@@ -109,16 +109,6 @@ using namespace yas;
         {.sample_rate = 48000.0, .channel_count = 2, .pcm_format = audio::pcm_format::int16, .interleaved = false});
     XCTAssertThrows(mixer_au->set_output_format(format, 0));
 
-#if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
-    /*
-     Fixed8.24
-     */
-
-    format = audio::format(
-        {.sample_rate = 48000.0, .channel_count = 2, .pcm_format = audio::pcm_format::fixed824, .interleaved = false});
-    XCTAssertThrows(mixer_au->set_output_format(format, 0));
-#endif
-
     /*
      Interleaved
      */
