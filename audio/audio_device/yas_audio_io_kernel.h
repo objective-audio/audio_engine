@@ -12,7 +12,7 @@
 namespace yas::audio {
 struct io_render_args {
     std::optional<audio::pcm_buffer_ptr> const output_buffer;
-    std::optional<audio::time> const when;
+    std::optional<audio::time> const output_time;
 };
 
 using io_render_f = std::function<void(io_render_args)>;

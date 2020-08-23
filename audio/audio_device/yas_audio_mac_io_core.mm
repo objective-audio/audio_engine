@@ -94,12 +94,12 @@ void audio::mac_io_core::initialize() {
                             output_buffer->set_frame_length(frame_length);
                             audio::time time(*inOutputTime, output_buffer->format().sample_rate());
                             kernel->render_handler(
-                                io_render_args{.output_buffer = output_buffer_opt, .when = std::move(time)});
+                                io_render_args{.output_buffer = output_buffer_opt, .output_time = std::move(time)});
                             output_buffer->copy_to(outOutputData);
                         }
                     }
                 } else if (kernel->input_buffer) {
-                    kernel->render_handler(io_render_args{.output_buffer = std::nullopt, .when = std::nullopt});
+                    kernel->render_handler(io_render_args{.output_buffer = std::nullopt, .output_time = std::nullopt});
                 }
             }
 

@@ -76,9 +76,9 @@ void audio::graph_io::_update_io_connections() {
                     auto const &connection = connections.at(0);
                     if (auto src_node = connection->source_node();
                         src_node && connection->format == src_node->output_format(connection->source_bus)) {
-                        if (auto const when = args.when) {
+                        if (auto const time = args.output_time) {
                             src_node->render(
-                                {.buffer = *args.output_buffer, .bus_idx = connection->source_bus, .when = *args.when});
+                                             {.buffer = *args.output_buffer, .bus_idx = connection->source_bus, .when = time.value()});
                         }
                     }
                 }
