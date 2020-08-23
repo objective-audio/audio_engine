@@ -5,6 +5,7 @@
 #pragma once
 
 #include <AudioToolbox/AudioToolbox.h>
+#include <audio/yas_audio_ptr.h>
 #include <audio/yas_audio_types.h>
 
 namespace yas::audio {
@@ -33,6 +34,9 @@ struct time final {
 
     std::shared_ptr<impl> _impl;
 };
+
+static std::optional<time> const null_time_opt{std::nullopt};
+static std::optional<time_ptr> const null_time_ptr_opt{std::nullopt};
 
 uint64_t host_time_for_seconds(double seconds);
 double seconds_for_host_time(uint64_t host_time);
