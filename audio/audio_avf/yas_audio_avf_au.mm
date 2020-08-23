@@ -114,7 +114,7 @@ struct avf_au::core {
         }
 
         AudioUnitRenderActionFlags action_flags = 0;
-        AudioTimeStamp const time_stamp = args.when.audio_time_stamp();
+        AudioTimeStamp const time_stamp = args.output_time.audio_time_stamp();
 
         this->raw_unit().value().object().renderBlock(
             &action_flags, &time_stamp, args.output_buffer->frame_length(), args.bus_idx,
@@ -132,7 +132,7 @@ struct avf_au::core {
 
                     time when(*timestamp, input_format.sample_rate());
 
-                    input_handler({.output_buffer = buffer, .bus_idx = (uint32_t)inputBusNumber, .when = when});
+                    input_handler({.output_buffer = buffer, .bus_idx = (uint32_t)inputBusNumber, .output_time = when});
                 }
 
                 return AUAudioUnitStatus(noErr);
