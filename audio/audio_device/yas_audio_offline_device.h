@@ -8,8 +8,8 @@
 
 namespace yas::audio {
 struct offline_render_args {
-    audio::pcm_buffer_ptr const &buffer;
-    audio::time const &when;
+    audio::pcm_buffer_ptr const &output_buffer;
+    audio::time const &output_time;
 };
 
 using offline_render_f = std::function<continuation(offline_render_args)>;
