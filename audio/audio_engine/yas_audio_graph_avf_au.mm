@@ -57,21 +57,20 @@ void audio::graph_avf_au::_prepare(graph_avf_au_ptr const &shared, AudioComponen
         if (auto shared_au = weak_au.lock()) {
             auto const &raw_au = shared_au->_raw_au;
 
-            raw_au->render(
-                {.output_buffer = args.output_buffer, .bus_idx = args.bus_idx, .output_time = args.output_time},
-                [weak_au](auto input_args) {
-                    if (auto shared_au = weak_au.lock()) {
-                        if (auto kernel = shared_au->node()->kernel()) {
-                            if (auto connection = kernel.value()->input_connection(input_args.bus_idx)) {
-                                if (auto src_node = connection->source_node()) {
-                                    src_node->render({.output_buffer = input_args.output_buffer,
-                                                      .bus_idx = input_args.bus_idx,
-                                                      .output_time = input_args.output_time});
-                                }
-                            }
-                        }
-                    }
-                });
+            raw_au->render({.buffer = args.buffer, .bus_idx = args.bus_idx, .time = args.time},
+                           [weak_au](auto input_args) {
+                               if (auto shared_au = weak_au.lock()) {
+                                   if (auto kernel = shared_au->node()->kernel()) {
+                                       if (auto connection = kernel.value()->input_connection(input_args.bus_idx)) {
+                                           if (auto src_node = connection->source_node()) {
+                                               src_node->render({.buffer = input_args.buffer,
+                                                                 .bus_idx = input_args.bus_idx,
+                                                                 .time = input_args.time});
+                                           }
+                                       }
+                                   }
+                               }
+                           });
         }
     });
 

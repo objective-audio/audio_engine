@@ -49,8 +49,8 @@ using namespace yas;
 
     auto tap_render_handler = [&self, &tapNodeExpectation, &tap_render_frame, &sample_rate, &frames_per_render,
                                &format](audio::graph_node::render_args args) {
-        auto &buffer = args.output_buffer;
-        auto const &time = args.output_time;
+        auto &buffer = args.buffer;
+        auto const &time = args.time;
 
         XCTAssertEqual(time.sample_time(), tap_render_frame);
         XCTAssertEqual(time.sample_rate(), sample_rate);

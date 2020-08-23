@@ -109,16 +109,15 @@ struct avf_au::core {
         }
 
         auto const &output_format = output_format_opt.value();
-        if (output_format != args.output_buffer->format()) {
+        if (output_format != args.buffer->format()) {
             return;
         }
 
         AudioUnitRenderActionFlags action_flags = 0;
-        AudioTimeStamp const time_stamp = args.output_time.audio_time_stamp();
+        AudioTimeStamp const time_stamp = args.time.audio_time_stamp();
 
         this->raw_unit().value().object().renderBlock(
-            &action_flags, &time_stamp, args.output_buffer->frame_length(), args.bus_idx,
-            args.output_buffer->audio_buffer_list(),
+            &action_flags, &time_stamp, args.buffer->frame_length(), args.bus_idx, args.buffer->audio_buffer_list(),
             [this, &input_handler](AudioUnitRenderActionFlags *actionFlags, const AudioTimeStamp *timestamp,
                                    AUAudioFrameCount frameCount, NSInteger inputBusNumber, AudioBufferList *inputData) {
                 audio::clear(inputData);
@@ -132,7 +131,7 @@ struct avf_au::core {
 
                     audio::time time(*timestamp, input_format.sample_rate());
 
-                    input_handler({.output_buffer = buffer, .bus_idx = (uint32_t)inputBusNumber, .output_time = time});
+                    input_handler({.buffer = buffer, .bus_idx = (uint32_t)inputBusNumber, .time = time});
                 }
 
                 return AUAudioUnitStatus(noErr);

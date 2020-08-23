@@ -95,9 +95,7 @@ audio::graph_connection_smap audio::graph_tap::output_connections_on_render() co
 void audio::graph_tap::render_source(audio::graph_node::render_args args) {
     if (auto connection = this->_kernel_on_render.value()->input_connection(args.bus_idx)) {
         if (auto node = connection->source_node()) {
-            node->render({.output_buffer = args.output_buffer,
-                          .bus_idx = connection->source_bus,
-                          .output_time = args.output_time});
+            node->render({.buffer = args.buffer, .bus_idx = connection->source_bus, .time = args.time});
         }
     }
 }

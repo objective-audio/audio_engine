@@ -115,7 +115,7 @@ using namespace yas;
     tap->set_render_handler([&tap_called, self](auto args) {
         tap_called = true;
         XCTAssertEqual(args.bus_idx, 0);
-        test::fill_test_values_to_buffer(*args.output_buffer);
+        test::fill_test_values_to_buffer(*args.buffer);
     });
 
     {
@@ -174,7 +174,7 @@ using namespace yas;
         auto &tap_called = tap_calleds[i];
         tap->set_render_handler([&tap_called](auto args) {
             tap_called = true;
-            test::fill_test_values_to_buffer(*args.output_buffer);
+            test::fill_test_values_to_buffer(*args.buffer);
         });
     }
 
@@ -235,7 +235,7 @@ using namespace yas;
         auto &tap_called = tap_calleds[i];
         tap->set_render_handler([&tap_called](auto args) {
             tap_called = true;
-            test::fill_test_values_to_buffer(*args.output_buffer);
+            test::fill_test_values_to_buffer(*args.buffer);
         });
     }
 
