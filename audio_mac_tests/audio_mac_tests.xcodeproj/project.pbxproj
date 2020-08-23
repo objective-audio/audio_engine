@@ -27,6 +27,7 @@
 		B62579BF21E0EB56003740D9 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B62579BE21E0EB56003740D9 /* AVFoundation.framework */; };
 		B62579C021E0EB8D003740D9 /* cpp_utils.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B62579B421E0EB21003740D9 /* cpp_utils.framework */; };
 		B642E98823B2ED4900D504D8 /* yas_audio_renewable_device_tests.mm in Sources */ = {isa = PBXBuildFile; fileRef = B642E98723B2ED4900D504D8 /* yas_audio_renewable_device_tests.mm */; };
+		B652B57424F1FD4500416CE7 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B623817E21E1931200234CC2 /* Accelerate.framework */; };
 		B68CB91624D5A49800270E2C /* yas_audio_debug_tests.mm in Sources */ = {isa = PBXBuildFile; fileRef = B68CB91524D5A49800270E2C /* yas_audio_debug_tests.mm */; };
 		B6A9BC4C2393ABE100EA7DC8 /* yas_audio_avf_au_tests.mm in Sources */ = {isa = PBXBuildFile; fileRef = B6A9BC4B2393ABE100EA7DC8 /* yas_audio_avf_au_tests.mm */; };
 		B6AA68A223C206A2005F5B6B /* yas_audio_offline_device_tests.mm in Sources */ = {isa = PBXBuildFile; fileRef = B6AA68A123C206A2005F5B6B /* yas_audio_offline_device_tests.mm */; };
@@ -95,6 +96,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B652B57424F1FD4500416CE7 /* Accelerate.framework in Frameworks */,
 				B62579B121E0EB21003740D9 /* audio.framework in Frameworks */,
 				B62579B321E0EB21003740D9 /* chaining.framework in Frameworks */,
 				B62579C021E0EB8D003740D9 /* cpp_utils.framework in Frameworks */,
