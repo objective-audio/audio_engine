@@ -206,6 +206,13 @@ bool audio::mac_io_core::_is_initialized() const {
     return this->_io_proc_id.has_value();
 }
 
+void audio::mac_io_core::_reinitialize() {
+    if (this->_is_initialized()) {
+        this->uninitialize();
+        this->initialize();
+    }
+}
+
 audio::mac_io_core_ptr audio::mac_io_core::make_shared(mac_device_ptr const &device) {
     return std::shared_ptr<mac_io_core>(new mac_io_core{device});
 }
