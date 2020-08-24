@@ -12,37 +12,21 @@ using namespace yas;
 
 namespace yas::audio {
 struct mac_io_core_render_context {
-    void set_kernel(std::optional<io_kernel_ptr> const &kernel) {
-        std::lock_guard<std::recursive_mutex> lock(this->_kernel_mutex);
-        this->__kernel = kernel;
-    }
-
-    std::optional<io_kernel_ptr> kernel() {
-        if (auto const lock = std::unique_lock(this->_kernel_mutex, std::try_to_lock); lock.owns_lock()) {
-            return this->__kernel;
-        } else {
-            return std::nullopt;
-        }
-    }
-
+    std::optional<io_kernel_ptr> const kernel;
     std::optional<pcm_buffer_ptr> input_buffer_on_render = std::nullopt;
     std::optional<time_ptr> input_time_on_render = std::nullopt;
 
-    static std::shared_ptr<mac_io_core_render_context> make_shared() {
-        return std::shared_ptr<mac_io_core_render_context>(new mac_io_core_render_context{});
+    static std::shared_ptr<mac_io_core_render_context> make_shared(io_kernel_ptr const &kernel) {
+        return std::shared_ptr<mac_io_core_render_context>(new mac_io_core_render_context{kernel});
     }
 
    private:
-    mutable std::recursive_mutex _kernel_mutex;
-    std::optional<io_kernel_ptr> __kernel = std::nullopt;
-
-    mac_io_core_render_context() {
+    mac_io_core_render_context(io_kernel_ptr const &kernel) : kernel(kernel) {
     }
 };
 }
 
-audio::mac_io_core::mac_io_core(mac_device_ptr const &device)
-    : _device(device), _render_context(mac_io_core_render_context::make_shared()) {
+audio::mac_io_core::mac_io_core(mac_device_ptr const &device) : _device(device) {
 }
 
 audio::mac_io_core::~mac_io_core() {
@@ -54,20 +38,31 @@ void audio::mac_io_core::initialize() {
     auto const &input_format = this->_device->input_format();
 
     if (!input_format && !output_format) {
-        this->_clear_kernel();
+        return;
+    }
+
+    if (this->_maximum_frames == 0) {
+        return;
+    }
+
+    if (!this->_render_handler) {
         return;
     }
 
     if (!this->_io_proc_id) {
-        auto handler = [render_context = this->_render_context](
-                           const AudioTimeStamp *inNow, const AudioBufferList *inInputData,
-                           const AudioTimeStamp *inInputTime, AudioBufferList *outOutputData,
-                           const AudioTimeStamp *inOutputTime) {
+        auto const kernel =
+            io_kernel::make_shared(this->_render_handler.value(), input_format, output_format, this->_maximum_frames);
+        auto const render_context = mac_io_core_render_context::make_shared(kernel);
+        this->_render_context = render_context;
+
+        auto handler = [render_context](const AudioTimeStamp *inNow, const AudioBufferList *inInputData,
+                                        const AudioTimeStamp *inInputTime, AudioBufferList *outOutputData,
+                                        const AudioTimeStamp *inOutputTime) {
             if (outOutputData) {
                 audio::clear(outOutputData);
             }
 
-            if (auto const kernel_opt = render_context->kernel()) {
+            if (auto const kernel_opt = render_context->kernel) {
                 auto const &kernel = kernel_opt.value();
                 kernel->reset_buffers();
 
@@ -119,12 +114,10 @@ void audio::mac_io_core::initialize() {
         };
 
         AudioDeviceIOProcID io_proc_id = nullptr;
-        raise_if_raw_audio_error(
-            AudioDeviceCreateIOProcIDWithBlock(&io_proc_id, this->_device->audio_device_id(), nullptr, handler));
+        raise_if_raw_audio_error(AudioDeviceCreateIOProcIDWithBlock(&io_proc_id, this->_device->audio_device_id(),
+                                                                    nullptr, std::move(handler)));
         this->_io_proc_id = io_proc_id;
     }
-
-    this->_update_kernel();
 }
 
 void audio::mac_io_core::uninitialize() {
@@ -136,20 +129,20 @@ void audio::mac_io_core::uninitialize() {
     }
 
     this->_io_proc_id = std::nullopt;
-    this->_clear_kernel();
+    this->_render_context = std::nullopt;
 }
 
 void audio::mac_io_core::set_render_handler(std::optional<io_render_f> handler) {
     if (this->_render_handler || handler) {
         this->_render_handler = std::move(handler);
-        this->_update_kernel();
+        this->_reinitialize();
     }
 }
 
 void audio::mac_io_core::set_maximum_frames_per_slice(uint32_t const frames) {
     if (this->_maximum_frames != frames) {
         this->_maximum_frames = frames;
-        this->_update_kernel();
+        this->_reinitialize();
     }
 }
 
@@ -171,37 +164,19 @@ void audio::mac_io_core::stop() {
 }
 
 std::optional<audio::pcm_buffer_ptr> const &audio::mac_io_core::input_buffer_on_render() const {
-    return this->_render_context->input_buffer_on_render;
+    if (this->_render_context) {
+        return this->_render_context.value()->input_buffer_on_render;
+    } else {
+        return audio::null_pcm_buffer_ptr_opt;
+    }
 }
 
 std::optional<audio::time_ptr> const &audio::mac_io_core::input_time_on_render() const {
-    return this->_render_context->input_time_on_render;
-}
-
-void audio::mac_io_core::_update_kernel() {
-    this->_render_context->set_kernel(std::nullopt);
-
-    if (!this->_is_initialized()) {
-        return;
+    if (this->_render_context) {
+        return this->_render_context.value()->input_time_on_render;
+    } else {
+        return audio::null_time_ptr_opt;
     }
-
-    auto const &output_format = this->_device->output_format();
-    auto const &input_format = this->_device->input_format();
-
-    if (!output_format && !input_format) {
-        return;
-    }
-
-    if (!this->_render_handler) {
-        return;
-    }
-
-    this->_render_context->set_kernel(
-        io_kernel::make_shared(this->_render_handler.value(), input_format, output_format, this->_maximum_frames));
-}
-
-void audio::mac_io_core::_clear_kernel() {
-    this->_render_context->set_kernel(std::nullopt);
 }
 
 bool audio::mac_io_core::_is_initialized() const {

@@ -37,14 +37,12 @@ struct mac_io_core final : io_core {
     std::optional<chaining::any_observer_ptr> _device_system_observer = std::nullopt;
     std::optional<chaining::any_observer_ptr> _device_observer = std::nullopt;
 
-    std::shared_ptr<mac_io_core_render_context> _render_context;
+    std::optional<std::shared_ptr<mac_io_core_render_context>> _render_context = std::nullopt;
     std::optional<io_render_f> _render_handler = std::nullopt;
     uint32_t _maximum_frames = 4096;
 
     mac_io_core(mac_device_ptr const &);
 
-    void _update_kernel();
-    void _clear_kernel();
     bool _is_initialized() const;
     void _reinitialize();
 };
