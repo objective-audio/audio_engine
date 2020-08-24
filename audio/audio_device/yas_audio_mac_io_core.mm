@@ -12,7 +12,7 @@ using namespace yas;
 
 namespace yas::audio {
 struct mac_io_core_render_context {
-    std::optional<io_kernel_ptr> const kernel;
+    io_kernel_ptr const kernel;
     std::optional<pcm_buffer_ptr> input_buffer_on_render = std::nullopt;
     std::optional<time_ptr> input_time_on_render = std::nullopt;
 
@@ -62,51 +62,49 @@ void audio::mac_io_core::initialize() {
                 audio::clear(outOutputData);
             }
 
-            if (auto const kernel_opt = render_context->kernel) {
-                auto const &kernel = kernel_opt.value();
-                kernel->reset_buffers();
+            auto const &kernel = render_context->kernel;
+            kernel->reset_buffers();
 
-                std::optional<audio::pcm_buffer_ptr> render_input_buffer{std::nullopt};
-                std::optional<audio::time> render_input_time{std::nullopt};
+            std::optional<audio::pcm_buffer_ptr> render_input_buffer{std::nullopt};
+            std::optional<audio::time> render_input_time{std::nullopt};
 
-                if (inInputData) {
-                    if (auto const &input_buffer_opt = kernel->input_buffer) {
-                        auto const &input_buffer = input_buffer_opt.value();
-                        input_buffer->copy_from(inInputData);
+            if (inInputData) {
+                if (auto const &input_buffer_opt = kernel->input_buffer) {
+                    auto const &input_buffer = input_buffer_opt.value();
+                    input_buffer->copy_from(inInputData);
 
-                        uint32_t const input_frame_length = input_buffer->frame_length();
-                        if (input_frame_length > 0) {
-                            auto const input_time =
-                                std::make_shared<audio::time>(*inInputTime, input_buffer->format().sample_rate());
-                            render_input_buffer = input_buffer;
-                            render_input_time = *input_time;
-                            render_context->input_buffer_on_render = input_buffer;
-                            render_context->input_time_on_render = input_time;
-                        }
+                    uint32_t const input_frame_length = input_buffer->frame_length();
+                    if (input_frame_length > 0) {
+                        auto const input_time =
+                            std::make_shared<audio::time>(*inInputTime, input_buffer->format().sample_rate());
+                        render_input_buffer = input_buffer;
+                        render_input_time = *input_time;
+                        render_context->input_buffer_on_render = input_buffer;
+                        render_context->input_time_on_render = input_time;
                     }
                 }
+            }
 
-                if (auto const &output_buffer_opt = kernel->output_buffer) {
-                    auto const &output_buffer = output_buffer_opt.value();
-                    if (outOutputData) {
-                        uint32_t const frame_length =
-                            audio::frame_length(outOutputData, output_buffer->format().sample_byte_count());
-                        if (frame_length > 0) {
-                            output_buffer->set_frame_length(frame_length);
-                            audio::time time(*inOutputTime, output_buffer->format().sample_rate());
-                            kernel->render_handler({.output_buffer = output_buffer_opt,
-                                                    .output_time = std::move(time),
-                                                    .input_buffer = render_input_buffer,
-                                                    .input_time = render_input_time});
-                            output_buffer->copy_to(outOutputData);
-                        }
+            if (auto const &output_buffer_opt = kernel->output_buffer) {
+                auto const &output_buffer = output_buffer_opt.value();
+                if (outOutputData) {
+                    uint32_t const frame_length =
+                        audio::frame_length(outOutputData, output_buffer->format().sample_byte_count());
+                    if (frame_length > 0) {
+                        output_buffer->set_frame_length(frame_length);
+                        audio::time time(*inOutputTime, output_buffer->format().sample_rate());
+                        kernel->render_handler({.output_buffer = output_buffer_opt,
+                                                .output_time = std::move(time),
+                                                .input_buffer = render_input_buffer,
+                                                .input_time = render_input_time});
+                        output_buffer->copy_to(outOutputData);
                     }
-                } else if (kernel->input_buffer) {
-                    kernel->render_handler({.output_buffer = audio::null_pcm_buffer_ptr_opt,
-                                            .output_time = audio::null_time_opt,
-                                            .input_buffer = render_input_buffer,
-                                            .input_time = render_input_time});
                 }
+            } else if (kernel->input_buffer) {
+                kernel->render_handler({.output_buffer = audio::null_pcm_buffer_ptr_opt,
+                                        .output_time = audio::null_time_opt,
+                                        .input_buffer = render_input_buffer,
+                                        .input_time = render_input_time});
             }
 
             render_context->input_buffer_on_render = audio::null_pcm_buffer_ptr_opt;
