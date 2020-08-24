@@ -31,6 +31,7 @@ struct mac_io_core final : io_core {
     [[nodiscard]] static mac_io_core_ptr make_shared(mac_device_ptr const &);
 
    private:
+    bool _is_started = false;
     mac_device_ptr _device;
     std::optional<AudioDeviceIOProcID> _io_proc_id = std::nullopt;
     std::optional<chaining::any_observer_ptr> _device_system_observer = std::nullopt;
