@@ -13,7 +13,6 @@ using namespace yas;
 namespace yas::audio {
 struct mac_io_core_render_context {
     io_kernel_ptr const kernel;
-    std::optional<pcm_buffer_ptr> input_buffer_on_render = std::nullopt;
     std::optional<time_ptr> input_time_on_render = std::nullopt;
 
     static std::shared_ptr<mac_io_core_render_context> make_shared(io_kernel_ptr const &kernel) {
@@ -79,7 +78,6 @@ void audio::mac_io_core::initialize() {
                             std::make_shared<audio::time>(*inInputTime, input_buffer->format().sample_rate());
                         render_input_buffer = input_buffer;
                         render_input_time = *input_time;
-                        render_context->input_buffer_on_render = input_buffer;
                         render_context->input_time_on_render = input_time;
                     }
                 }
@@ -107,7 +105,6 @@ void audio::mac_io_core::initialize() {
                                         .input_time = render_input_time});
             }
 
-            render_context->input_buffer_on_render = audio::null_pcm_buffer_ptr_opt;
             render_context->input_time_on_render = audio::null_time_ptr_opt;
         };
 
@@ -163,7 +160,7 @@ void audio::mac_io_core::stop() {
 
 std::optional<audio::pcm_buffer_ptr> const &audio::mac_io_core::input_buffer_on_render() const {
     if (this->_render_context) {
-        return this->_render_context.value()->input_buffer_on_render;
+        return this->_render_context.value()->kernel->input_buffer;
     } else {
         return audio::null_pcm_buffer_ptr_opt;
     }
