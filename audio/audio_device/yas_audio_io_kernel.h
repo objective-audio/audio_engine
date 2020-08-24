@@ -21,8 +21,8 @@ using io_render_f = std::function<void(io_render_args)>;
 
 struct io_kernel final {
     io_render_f const render_handler;
-    std::optional<pcm_buffer_ptr const> const input_buffer;
-    std::optional<pcm_buffer_ptr const> const output_buffer;
+    std::optional<pcm_buffer_ptr> const input_buffer;
+    std::optional<pcm_buffer_ptr> const output_buffer;
 
     void reset_buffers();
 
