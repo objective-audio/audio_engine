@@ -76,7 +76,7 @@ void audio::mac_io_core::initialize() {
 
                 if (inInputData) {
                     if (auto const &input_buffer_opt = kernel->input_buffer) {
-                        auto const &input_buffer = *input_buffer_opt;
+                        auto const &input_buffer = input_buffer_opt.value();
                         input_buffer->copy_from(inInputData);
 
                         uint32_t const input_frame_length = input_buffer->frame_length();
@@ -92,7 +92,7 @@ void audio::mac_io_core::initialize() {
                 }
 
                 if (auto const &output_buffer_opt = kernel->output_buffer) {
-                    auto const &output_buffer = *output_buffer_opt;
+                    auto const &output_buffer = output_buffer_opt.value();
                     if (outOutputData) {
                         uint32_t const frame_length =
                             audio::frame_length(outOutputData, output_buffer->format().sample_byte_count());
