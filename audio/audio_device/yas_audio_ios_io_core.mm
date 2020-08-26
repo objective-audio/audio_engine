@@ -154,12 +154,14 @@ void audio::ios_io_core::initialize() {
                                         io_core->_input_buffer_on_render = input_buffer;
                                         io_core->_input_time_on_render = std::make_shared<audio::time>(
                                             *timestamp, input_buffer->format().sample_rate());
+                                        std::optional<audio::time> const input_time =
+                                            *io_core->_input_time_on_render.value();
 
                                         if (!kernel->output_buffer) {
                                             kernel->render_handler({.output_buffer = audio::null_pcm_buffer_ptr_opt,
                                                                     .output_time = audio::null_time_opt,
-                                                                    .input_buffer = audio::null_pcm_buffer_ptr_opt,
-                                                                    .input_time = audio::null_time_opt});
+                                                                    .input_buffer = io_core->_input_buffer_on_render,
+                                                                    .input_time = input_time});
                                             io_core->_input_buffer_on_render = audio::null_pcm_buffer_ptr_opt;
                                             io_core->_input_time_on_render = audio::null_time_ptr_opt;
                                         }
