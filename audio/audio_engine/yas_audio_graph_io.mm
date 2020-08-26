@@ -41,7 +41,7 @@ audio::io_ptr const &audio::graph_io::raw_io() {
 void audio::graph_io::_prepare(graph_io_ptr const &shared) {
     this->_weak_graph_io = to_weak(shared);
 
-    this->_node->set_render_handler([weak_graph_io = this->_weak_graph_io](auto args) {
+    this->_node->set_render_handler([weak_graph_io = this->_weak_graph_io](graph_node::render_args args) {
         auto const &buffer = args.buffer;
 
         if (auto graph_io = weak_graph_io.lock()) {
@@ -66,7 +66,7 @@ void audio::graph_io::_update_io_connections() {
 
     auto weak_io = to_weak(raw_io);
 
-    auto render_handler = [weak_graph_io = this->_weak_graph_io, weak_io](auto args) {
+    auto render_handler = [weak_graph_io = this->_weak_graph_io, weak_io](io_render_args args) {
         if (auto graph_io = weak_graph_io.lock()) {
             if (auto const kernel_opt = graph_io->node()->kernel()) {
                 auto const &kernel = kernel_opt.value();
@@ -89,11 +89,11 @@ void audio::graph_io::_update_io_connections() {
                         auto const &connection = connections.at(0);
                         if (auto dst_node = connection->destination_node();
                             dst_node && dst_node->is_input_renderable()) {
-                            auto const &input_buffer = io->input_buffer_on_render();
-                            auto const &input_time = io->input_time_on_render();
+                            auto const &input_buffer = args.input_buffer;
+                            auto const &input_time = args.input_time;
                             if (input_buffer && input_time) {
                                 if (connection->format == dst_node->input_format(connection->destination_bus)) {
-                                    dst_node->render({.buffer = *input_buffer, .bus_idx = 0, .time = **input_time});
+                                    dst_node->render({.buffer = *input_buffer, .bus_idx = 0, .time = *input_time});
                                 }
                             }
                         }

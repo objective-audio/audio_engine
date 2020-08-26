@@ -87,7 +87,7 @@ using namespace yas;
         XCTestExpectation *expectation = [self expectationWithDescription:@"first render"];
 
         auto device = audio::offline_device::make_shared(
-            format, [](auto args) { return audio::continuation::abort; },
+            format, [](audio::offline_render_args args) { return audio::continuation::abort; },
             [&expectation](bool const cancelled) { [expectation fulfill]; });
 
         auto const &offline_io = graph->add_io(device);
@@ -112,7 +112,7 @@ using namespace yas;
     graph_route->add_route({0, 1, 0, 1});
 
     tap_called = false;
-    tap->set_render_handler([&tap_called, self](auto args) {
+    tap->set_render_handler([&tap_called, self](audio::graph_node::render_args args) {
         tap_called = true;
         XCTAssertEqual(args.bus_idx, 0);
         test::fill_test_values_to_buffer(*args.buffer);
@@ -123,7 +123,7 @@ using namespace yas;
 
         auto const device = audio::offline_device::make_shared(
             format,
-            [self](auto args) {
+            [self](audio::offline_render_args args) {
                 auto each = audio::make_each_data<float>(*args.output_buffer);
                 while (yas_each_data_next(each)) {
                     float test_value = (float)test::test_value((uint32_t)each.frm_idx, 0, (uint32_t)each.ptr_idx);
@@ -172,7 +172,7 @@ using namespace yas;
         graph->connect(tap->node(), graph_route->node(), 0, i, src_format);
 
         auto &tap_called = tap_calleds[i];
-        tap->set_render_handler([&tap_called](auto args) {
+        tap->set_render_handler([&tap_called](audio::graph_node::render_args args) {
             tap_called = true;
             test::fill_test_values_to_buffer(*args.buffer);
         });
@@ -185,7 +185,7 @@ using namespace yas;
 
     auto const device = audio::offline_device::make_shared(
         dst_format,
-        [self](auto args) {
+        [self](audio::offline_render_args args) {
             auto each = audio::make_each_data<float>(*args.output_buffer);
             while (yas_each_data_next(each)) {
                 float test_value = (float)test::test_value((uint32_t)each.frm_idx, 0, 0);
@@ -233,7 +233,7 @@ using namespace yas;
         graph->connect(tap->node(), graph_route->node(), 0, i, src_format);
 
         auto &tap_called = tap_calleds[i];
-        tap->set_render_handler([&tap_called](auto args) {
+        tap->set_render_handler([&tap_called](audio::graph_node::render_args args) {
             tap_called = true;
             test::fill_test_values_to_buffer(*args.buffer);
         });
@@ -246,7 +246,7 @@ using namespace yas;
 
     auto const device = audio::offline_device::make_shared(
         dst_format,
-        [self](auto args) {
+        [self](audio::offline_render_args args) {
             auto each = audio::make_each_data<float>(*args.output_buffer);
             while (yas_each_data_next(each)) {
                 if (each.ptr_idx == 0 || each.ptr_idx == 2) {

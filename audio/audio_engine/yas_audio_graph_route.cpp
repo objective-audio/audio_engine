@@ -38,7 +38,7 @@ audio::graph_route::~graph_route() = default;
 void audio::graph_route::_prepare(graph_route_ptr const &shared) {
     auto weak_route = to_weak(shared);
 
-    this->_node->set_render_handler([weak_route](auto args) {
+    this->_node->set_render_handler([weak_route](graph_node::render_args args) {
         auto &dst_buffer = args.buffer;
         auto const dst_bus_idx = args.bus_idx;
 
