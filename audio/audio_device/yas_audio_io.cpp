@@ -157,21 +157,19 @@ chaining::chain_sync_t<audio::io::device_chaining_pair_t> audio::io::device_chai
     return this->_device_fetcher->chain();
 }
 
-std::optional<audio::pcm_buffer_ptr> const &audio::io::input_buffer_on_render() const {
+audio::pcm_buffer const *audio::io::input_buffer_on_render() const {
     if (auto const &io_core = this->_io_core) {
-        return io_core.value()->input_buffer_on_render();
+        return io_core.value()->input_buffer_on_render().value().get();
     } else {
-        static std::optional<audio::pcm_buffer_ptr> _null_buffer = std::nullopt;
-        return _null_buffer;
+        return nullptr;
     }
 }
 
-std::optional<audio::time_ptr> const &audio::io::input_time_on_render() const {
+audio::time const *audio::io::input_time_on_render() const {
     if (auto const &io_core = this->_io_core) {
-        return io_core.value()->input_time_on_render();
+        return io_core.value()->input_time_on_render().value().get();
     } else {
-        static std::optional<audio::time_ptr> _null_time = std::nullopt;
-        return _null_time;
+        return nullptr;
     }
 }
 
