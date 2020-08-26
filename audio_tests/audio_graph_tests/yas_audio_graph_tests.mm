@@ -24,13 +24,12 @@ struct test_io_core : io_core {
     void stop() override {
     }
 
-    std::optional<pcm_buffer_ptr> const &input_buffer_on_render() const override {
-        static std::optional<pcm_buffer_ptr> buffer = std::nullopt;
-        return buffer;
+    pcm_buffer const *input_buffer_on_render() const override {
+        return nullptr;
     }
-    std::optional<time_ptr> const &input_time_on_render() const override {
-        static std::optional<time_ptr> const time = std::nullopt;
-        return time;
+
+    time const *input_time_on_render() const override {
+        return nullptr;
     }
 };
 

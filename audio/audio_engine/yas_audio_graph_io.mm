@@ -45,9 +45,8 @@ void audio::graph_io::_prepare(graph_io_ptr const &shared) {
         auto const &buffer = args.buffer;
 
         if (auto graph_io = weak_graph_io.lock()) {
-            auto const &input_buffer_opt = graph_io->_raw_io->input_buffer_on_render();
-            if (input_buffer_opt) {
-                auto const &input_buffer = *input_buffer_opt;
+            auto const *input_buffer = graph_io->_raw_io->input_buffer_on_render();
+            if (input_buffer) {
                 if (input_buffer->format() == buffer->format()) {
                     buffer->copy_from(*input_buffer);
                 }

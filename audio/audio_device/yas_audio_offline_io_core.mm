@@ -124,14 +124,12 @@ void audio::offline_io_core::stop() {
     }
 }
 
-std::optional<audio::pcm_buffer_ptr> const &audio::offline_io_core::input_buffer_on_render() const {
-    static std::optional<audio::pcm_buffer_ptr> const _null_buffer = std::nullopt;
-    return _null_buffer;
+audio::pcm_buffer const *audio::offline_io_core::input_buffer_on_render() const {
+    return nullptr;
 }
 
-std::optional<audio::time_ptr> const &audio::offline_io_core::input_time_on_render() const {
-    static std::optional<audio::time_ptr> const _null_time = std::nullopt;
-    return _null_time;
+audio::time const *audio::offline_io_core::input_time_on_render() const {
+    return nullptr;
 }
 
 void audio::offline_io_core::_prepare(offline_io_core_ptr const &core) {

@@ -168,12 +168,20 @@ void audio::mac_io_core::stop() {
     }
 }
 
-std::optional<audio::pcm_buffer_ptr> const &audio::mac_io_core::input_buffer_on_render() const {
-    return this->_render_context->input_buffer_on_render;
+audio::pcm_buffer const *audio::mac_io_core::input_buffer_on_render() const {
+    if (this->_render_context->input_buffer_on_render) {
+        return this->_render_context->input_buffer_on_render.value().get();
+    } else {
+        return nullptr;
+    }
 }
 
-std::optional<audio::time_ptr> const &audio::mac_io_core::input_time_on_render() const {
-    return this->_render_context->input_time_on_render;
+audio::time const *audio::mac_io_core::input_time_on_render() const {
+    if (this->_render_context->input_time_on_render) {
+        return this->_render_context->input_time_on_render.value().get();
+    } else {
+        return nullptr;
+    }
 }
 
 void audio::mac_io_core::_update_kernel() {

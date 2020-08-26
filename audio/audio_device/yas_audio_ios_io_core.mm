@@ -278,12 +278,20 @@ void audio::ios_io_core::stop() {
     }
 }
 
-std::optional<audio::pcm_buffer_ptr> const &audio::ios_io_core::input_buffer_on_render() const {
-    return this->_input_buffer_on_render;
+audio::pcm_buffer const *audio::ios_io_core::input_buffer_on_render() const {
+    if (this->_input_buffer_on_render) {
+        return this->_input_buffer_on_render.value().get();
+    } else {
+        return nullptr;
+    }
 }
 
-std::optional<audio::time_ptr> const &audio::ios_io_core::input_time_on_render() const {
-    return this->_input_time_on_render;
+audio::time const *audio::ios_io_core::input_time_on_render() const {
+    if (this->_input_time_on_render) {
+        return this->_input_time_on_render.value().get();
+    } else {
+        return nullptr;
+    }
 }
 
 void audio::ios_io_core::_prepare(ios_io_core_ptr const &shared) {
