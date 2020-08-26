@@ -36,7 +36,7 @@ using namespace yas;
     from_tap->set_render_handler([from_expectation](auto) { [from_expectation fulfill]; });
 
     auto const device = audio::offline_device::make_shared(
-        format, [](auto args) { return audio::continuation::abort; },
+        format, [](audio::offline_render_args args) { return audio::continuation::abort; },
         [&completion_expectation](auto const cancelled) { [completion_expectation fulfill]; });
 
     auto const &offline_io = graph->add_io(device);
@@ -45,7 +45,7 @@ using namespace yas;
 
     auto weak_to_tap = to_weak(to_tap);
     auto to_render_handler = [weak_to_tap, self, to_connection = to_connection, from_connection = from_connection,
-                              to_expectation](auto args) {
+                              to_expectation](audio::graph_node::render_args args) {
         auto &buffer = args.buffer;
         auto const &output_time = args.time;
 
@@ -94,7 +94,7 @@ using namespace yas;
     XCTestExpectation *completion_expectation = [self expectationWithDescription:@"completion"];
 
     auto const device = audio::offline_device::make_shared(
-        format, [](auto args) { return audio::continuation::abort; },
+        format, [](audio::offline_render_args args) { return audio::continuation::abort; },
         [&completion_expectation](bool const) { [completion_expectation fulfill]; });
     auto const &offline_io = graph->add_io(device);
 

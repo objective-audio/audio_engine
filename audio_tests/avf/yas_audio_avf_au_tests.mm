@@ -111,7 +111,7 @@ using namespace yas;
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), [promise, au, &buffer] {
         audio::time time{1000};
 
-        au->render({.buffer = buffer, .bus_idx = 0, .time = time}, [](auto args) {
+        au->render({.buffer = buffer, .bus_idx = 0, .time = time}, [](audio::avf_au::render_args args) {
             int16_t *data = args.buffer->template data_ptr_at_index<int16_t>(0);
 
             auto each = make_fast_each(args.buffer->frame_length());

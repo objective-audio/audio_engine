@@ -39,7 +39,7 @@ struct avf_io_vc_cpp {
         this->kernel = kernel;
 
         auto weak_io = to_weak(io);
-        io->set_render_handler([weak_io, kernel](auto args) {
+        io->set_render_handler([weak_io, kernel](audio::io_render_args args) {
             if (auto shared_io = weak_io.lock()) {
                 kernel->process(shared_io->input_buffer_on_render(), args.output_buffer);
             }

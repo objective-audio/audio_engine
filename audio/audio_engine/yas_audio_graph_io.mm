@@ -41,7 +41,7 @@ audio::io_ptr const &audio::graph_io::raw_io() {
 void audio::graph_io::_prepare(graph_io_ptr const &shared) {
     this->_weak_graph_io = to_weak(shared);
 
-    this->_node->set_render_handler([weak_graph_io = this->_weak_graph_io](auto args) {
+    this->_node->set_render_handler([weak_graph_io = this->_weak_graph_io](graph_node::render_args args) {
         auto const &buffer = args.buffer;
 
         if (auto graph_io = weak_graph_io.lock()) {
@@ -66,7 +66,7 @@ void audio::graph_io::_update_io_connections() {
 
     auto weak_io = to_weak(raw_io);
 
-    auto render_handler = [weak_graph_io = this->_weak_graph_io, weak_io](auto args) {
+    auto render_handler = [weak_graph_io = this->_weak_graph_io, weak_io](io_render_args args) {
         if (auto graph_io = weak_graph_io.lock()) {
             if (auto const kernel_opt = graph_io->node()->kernel()) {
                 auto const &kernel = kernel_opt.value();

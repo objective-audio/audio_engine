@@ -30,7 +30,7 @@ audio::graph_tap::graph_tap(args &&args)
 void audio::graph_tap::_prepare(graph_tap_ptr const &shared) {
     auto weak_tap = to_weak(shared);
 
-    this->_node->set_render_handler([weak_tap](auto args) {
+    this->_node->set_render_handler([weak_tap](graph_node::render_args args) {
         if (auto tap = weak_tap.lock()) {
             if (auto const kernel = tap->_node->kernel()) {
                 tap->_kernel_on_render = kernel;

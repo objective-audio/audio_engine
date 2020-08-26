@@ -33,7 +33,7 @@ struct input_tap_vc_cpp {
         this->graph->add_io(this->device);
         this->reconnect();
 
-        input_tap->set_render_handler([input_level = input_level](auto args) mutable {
+        input_tap->set_render_handler([input_level = input_level](audio::graph_node::render_args args) mutable {
             auto const &buffer = args.buffer;
 
             auto each = audio::make_each_data<float>(*buffer);
