@@ -159,7 +159,7 @@ chaining::chain_sync_t<audio::io::device_chaining_pair_t> audio::io::device_chai
 
 audio::pcm_buffer const *audio::io::input_buffer_on_render() const {
     if (auto const &io_core = this->_io_core) {
-        return io_core.value()->input_buffer_on_render().value().get();
+        return io_core.value()->input_buffer_on_render();
     } else {
         return nullptr;
     }
@@ -167,7 +167,7 @@ audio::pcm_buffer const *audio::io::input_buffer_on_render() const {
 
 audio::time const *audio::io::input_time_on_render() const {
     if (auto const &io_core = this->_io_core) {
-        return io_core.value()->input_time_on_render().value().get();
+        return io_core.value()->input_time_on_render();
     } else {
         return nullptr;
     }

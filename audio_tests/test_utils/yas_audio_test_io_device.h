@@ -55,14 +55,12 @@ struct test_io_core : audio::io_core {
         }
     }
 
-    std::optional<audio::pcm_buffer_ptr> const &input_buffer_on_render() const override {
-        static std::optional<audio::pcm_buffer_ptr> const _null_buffer = std::nullopt;
-        return _null_buffer;
+    audio::pcm_buffer const *input_buffer_on_render() const override {
+        return nullptr;
     }
 
-    std::optional<audio::time_ptr> const &input_time_on_render() const override {
-        static std::optional<audio::time_ptr> const _null_time = std::nullopt;
-        return _null_time;
+    audio::time const *input_time_on_render() const override {
+        return nullptr;
     }
 };
 

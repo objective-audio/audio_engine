@@ -44,12 +44,10 @@ struct kernel {
         return _sine_volume.load();
     }
 
-    void process(std::optional<audio::pcm_buffer_ptr> const &input_buffer_opt, std::optional<audio::pcm_buffer_ptr> const &output_buffer_opt) {
-        if (!output_buffer_opt) {
+    void process(audio::pcm_buffer const * const input_buffer, audio::pcm_buffer * const output_buffer) {
+        if (!output_buffer) {
             return;
         }
-        
-        auto const &output_buffer = output_buffer_opt.value();
         
         uint32_t const frame_length = output_buffer->frame_length();
 
@@ -59,9 +57,7 @@ struct kernel {
 
         auto const &format = output_buffer->format();
         if (format.pcm_format() == audio::pcm_format::float32 && format.stride() == 1) {
-            if (input_buffer_opt) {
-                auto const &input_buffer = *input_buffer_opt;
-                
+            if (input_buffer) {
                 if (input_buffer->frame_length() >= frame_length) {
                     output_buffer->copy_from(*input_buffer);
 
