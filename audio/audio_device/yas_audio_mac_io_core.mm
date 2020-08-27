@@ -41,8 +41,7 @@ struct mac_io_core_render_context {
 };
 }
 
-audio::mac_io_core::mac_io_core(mac_device_ptr const &device)
-    : _device(device), _render_context(mac_io_core_render_context::make_shared()) {
+audio::mac_io_core::mac_io_core(mac_device_ptr const &device) : _device(device) {
 }
 
 audio::mac_io_core::~mac_io_core() {
@@ -50,40 +49,29 @@ audio::mac_io_core::~mac_io_core() {
 }
 
 void audio::mac_io_core::initialize() {
-    auto const &output_format = this->_device->output_format();
-    auto const &input_format = this->_device->input_format();
-
-    if (!input_format && !output_format) {
-        this->_clear_kernel();
-        return;
-    }
-
-    this->_create_io_proc();
-    this->_update_kernel();
 }
 
 void audio::mac_io_core::uninitialize() {
     this->stop();
     this->_destroy_io_proc();
-    this->_clear_kernel();
 }
 
 void audio::mac_io_core::set_render_handler(std::optional<io_render_f> handler) {
     if (this->_render_handler || handler) {
         this->_render_handler = std::move(handler);
-        this->_update_kernel();
+        this->_reload_io_proc_if_started();
     }
 }
 
 void audio::mac_io_core::set_maximum_frames_per_slice(uint32_t const frames) {
     if (this->_maximum_frames != frames) {
         this->_maximum_frames = frames;
-        this->_update_kernel();
+        this->_reload_io_proc_if_started();
     }
 }
 
 bool audio::mac_io_core::start() {
-    if (this->_io_proc_id) {
+    if (this->_create_io_proc()) {
         raise_if_raw_audio_error(AudioDeviceStart(this->_device->audio_device_id(), this->_io_proc_id.value()));
         this->_is_started = true;
         return true;
@@ -96,6 +84,7 @@ void audio::mac_io_core::stop() {
     if (this->_io_proc_id && mac_device::is_available_device(this->_device)) {
         raise_if_raw_audio_error(AudioDeviceStop(this->_device->audio_device_id(), this->_io_proc_id.value()));
     }
+    this->_destroy_io_proc();
     this->_is_started = false;
 }
 
@@ -115,47 +104,29 @@ audio::time const *audio::mac_io_core::input_time_on_render() const {
     }
 }
 
-void audio::mac_io_core::_update_kernel() {
-    this->_render_context->set_kernel(std::nullopt);
-
-    if (!this->_is_initialized()) {
-        return;
+bool audio::mac_io_core::_create_io_proc() {
+    if (this->_io_proc_id) {
+        return true;
     }
 
     auto const &output_format = this->_device->output_format();
     auto const &input_format = this->_device->input_format();
 
     if (!output_format && !input_format) {
-        return;
+        return false;
     }
 
     if (!this->_render_handler) {
-        return;
+        return false;
+    }
+    
+    if (this->_maximum_frames == 0) {
+        return false;
     }
 
+    this->_render_context = mac_io_core_render_context::make_shared();
     this->_render_context->set_kernel(
         io_kernel::make_shared(this->_render_handler.value(), input_format, output_format, this->_maximum_frames));
-}
-
-void audio::mac_io_core::_clear_kernel() {
-    this->_render_context->set_kernel(std::nullopt);
-}
-
-bool audio::mac_io_core::_is_initialized() const {
-    return this->_io_proc_id.has_value();
-}
-
-void audio::mac_io_core::_create_io_proc() {
-    if (this->_io_proc_id) {
-        return;
-    }
-
-    auto const &output_format = this->_device->output_format();
-    auto const &input_format = this->_device->input_format();
-
-    if (!output_format && !input_format) {
-        return;
-    }
 
     auto handler = [render_context = this->_render_context](
                        const AudioTimeStamp *inNow, const AudioBufferList *inInputData,
@@ -220,6 +191,8 @@ void audio::mac_io_core::_create_io_proc() {
     raise_if_raw_audio_error(
         AudioDeviceCreateIOProcIDWithBlock(&io_proc_id, this->_device->audio_device_id(), nullptr, handler));
     this->_io_proc_id = io_proc_id;
+
+    return true;
 }
 
 void audio::mac_io_core::_destroy_io_proc() {
@@ -229,6 +202,16 @@ void audio::mac_io_core::_destroy_io_proc() {
     }
 
     this->_io_proc_id = std::nullopt;
+    this->_render_context = nullptr;
+}
+
+void audio::mac_io_core::_reload_io_proc_if_started() {
+    if (this->_is_started) {
+        this->stop();
+        this->_destroy_io_proc();
+        this->_create_io_proc();
+        this->start();
+    }
 }
 
 audio::mac_io_core_ptr audio::mac_io_core::make_shared(mac_device_ptr const &device) {
