@@ -148,6 +148,13 @@ void audio::mac_io_core::_create_io_proc() {
         return;
     }
 
+    auto const &output_format = this->_device->output_format();
+    auto const &input_format = this->_device->input_format();
+
+    if (!output_format && !input_format) {
+        return;
+    }
+
     auto handler = [render_context = this->_render_context](
                        const AudioTimeStamp *inNow, const AudioBufferList *inInputData,
                        const AudioTimeStamp *inInputTime, AudioBufferList *outOutputData,
