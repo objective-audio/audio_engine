@@ -71,9 +71,9 @@ void audio::mac_io_core::set_maximum_frames_per_slice(uint32_t const frames) {
 }
 
 bool audio::mac_io_core::start() {
+    this->_is_started = true;
     if (this->_create_io_proc()) {
         raise_if_raw_audio_error(AudioDeviceStart(this->_device->audio_device_id(), this->_io_proc_id.value()));
-        this->_is_started = true;
         return true;
     } else {
         return false;
@@ -119,7 +119,7 @@ bool audio::mac_io_core::_create_io_proc() {
     if (!this->_render_handler) {
         return false;
     }
-    
+
     if (this->_maximum_frames == 0) {
         return false;
     }
