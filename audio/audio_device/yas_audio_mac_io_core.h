@@ -33,8 +33,6 @@ struct mac_io_core final : io_core {
    private:
     mac_device_ptr _device;
     std::optional<AudioDeviceIOProcID> _io_proc_id = std::nullopt;
-    std::optional<chaining::any_observer_ptr> _device_system_observer = std::nullopt;
-    std::optional<chaining::any_observer_ptr> _device_observer = std::nullopt;
 
     std::shared_ptr<mac_io_core_render_context> _render_context;
     std::optional<io_render_f> _render_handler = std::nullopt;
