@@ -98,7 +98,7 @@ void audio::mac_io_core::stop() {
 }
 
 audio::pcm_buffer const *audio::mac_io_core::input_buffer_on_render() const {
-    if (this->_render_context->input_buffer_on_render) {
+    if (this->_render_context && this->_render_context->input_buffer_on_render) {
         return this->_render_context->input_buffer_on_render.value().get();
     } else {
         return nullptr;
@@ -106,7 +106,7 @@ audio::pcm_buffer const *audio::mac_io_core::input_buffer_on_render() const {
 }
 
 audio::time const *audio::mac_io_core::input_time_on_render() const {
-    if (this->_render_context->input_time_on_render) {
+    if (this->_render_context && this->_render_context->input_time_on_render) {
         return this->_render_context->input_time_on_render.value().get();
     } else {
         return nullptr;
