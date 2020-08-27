@@ -44,6 +44,7 @@ struct mac_io_core final : io_core {
     void _clear_kernel();
     bool _is_initialized() const;
     void _create_io_proc();
+    void _destroy_io_proc();
 };
 }  // namespace yas::audio
 

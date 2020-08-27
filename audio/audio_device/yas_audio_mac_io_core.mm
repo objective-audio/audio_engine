@@ -64,13 +64,7 @@ void audio::mac_io_core::initialize() {
 
 void audio::mac_io_core::uninitialize() {
     this->stop();
-
-    if (this->_io_proc_id && mac_device::is_available_device(this->_device)) {
-        raise_if_raw_audio_error(
-            AudioDeviceDestroyIOProcID(this->_device->audio_device_id(), this->_io_proc_id.value()));
-    }
-
-    this->_io_proc_id = std::nullopt;
+    this->_destroy_io_proc();
     this->_clear_kernel();
 }
 
@@ -217,6 +211,15 @@ void audio::mac_io_core::_create_io_proc() {
     raise_if_raw_audio_error(
         AudioDeviceCreateIOProcIDWithBlock(&io_proc_id, this->_device->audio_device_id(), nullptr, handler));
     this->_io_proc_id = io_proc_id;
+}
+
+void audio::mac_io_core::_destroy_io_proc() {
+    if (this->_io_proc_id && mac_device::is_available_device(this->_device)) {
+        raise_if_raw_audio_error(
+            AudioDeviceDestroyIOProcID(this->_device->audio_device_id(), this->_io_proc_id.value()));
+    }
+
+    this->_io_proc_id = std::nullopt;
 }
 
 audio::mac_io_core_ptr audio::mac_io_core::make_shared(mac_device_ptr const &device) {
