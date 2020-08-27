@@ -42,7 +42,7 @@ struct mac_io_core final : io_core {
 
     mac_io_core(mac_device_ptr const &);
 
-    bool _create_io_proc();
+    void _create_io_proc();
     void _destroy_io_proc();
     void _reload_io_proc_if_started();
 };

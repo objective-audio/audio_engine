@@ -72,7 +72,9 @@ void audio::mac_io_core::set_maximum_frames_per_slice(uint32_t const frames) {
 
 bool audio::mac_io_core::start() {
     this->_is_started = true;
-    if (this->_create_io_proc()) {
+    this->_create_io_proc();
+
+    if (this->_io_proc_id) {
         raise_if_raw_audio_error(AudioDeviceStart(this->_device->audio_device_id(), this->_io_proc_id.value()));
         return true;
     } else {
@@ -104,24 +106,24 @@ audio::time const *audio::mac_io_core::input_time_on_render() const {
     }
 }
 
-bool audio::mac_io_core::_create_io_proc() {
+void audio::mac_io_core::_create_io_proc() {
     if (this->_io_proc_id) {
-        return true;
+        return;
     }
 
     auto const &output_format = this->_device->output_format();
     auto const &input_format = this->_device->input_format();
 
     if (!output_format && !input_format) {
-        return false;
+        return;
     }
 
     if (!this->_render_handler) {
-        return false;
+        return;
     }
 
     if (this->_maximum_frames == 0) {
-        return false;
+        return;
     }
 
     this->_render_context = mac_io_core_render_context::make_shared();
@@ -191,8 +193,6 @@ bool audio::mac_io_core::_create_io_proc() {
     raise_if_raw_audio_error(
         AudioDeviceCreateIOProcIDWithBlock(&io_proc_id, this->_device->audio_device_id(), nullptr, handler));
     this->_io_proc_id = io_proc_id;
-
-    return true;
 }
 
 void audio::mac_io_core::_destroy_io_proc() {
