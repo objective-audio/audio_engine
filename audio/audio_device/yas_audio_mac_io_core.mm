@@ -85,6 +85,7 @@ void audio::mac_io_core::set_maximum_frames_per_slice(uint32_t const frames) {
 bool audio::mac_io_core::start() {
     if (this->_io_proc_id) {
         raise_if_raw_audio_error(AudioDeviceStart(this->_device->audio_device_id(), this->_io_proc_id.value()));
+        this->_is_started = true;
         return true;
     } else {
         return false;
@@ -95,6 +96,7 @@ void audio::mac_io_core::stop() {
     if (this->_io_proc_id && mac_device::is_available_device(this->_device)) {
         raise_if_raw_audio_error(AudioDeviceStop(this->_device->audio_device_id(), this->_io_proc_id.value()));
     }
+    this->_is_started = false;
 }
 
 audio::pcm_buffer const *audio::mac_io_core::input_buffer_on_render() const {

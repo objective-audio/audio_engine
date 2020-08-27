@@ -38,6 +38,8 @@ struct mac_io_core final : io_core {
     std::optional<io_render_f> _render_handler = std::nullopt;
     uint32_t _maximum_frames = 4096;
 
+    bool _is_started = false;
+
     mac_io_core(mac_device_ptr const &);
 
     void _update_kernel();
