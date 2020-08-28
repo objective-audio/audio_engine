@@ -286,14 +286,6 @@ audio::pcm_buffer const *audio::ios_io_core::input_buffer_on_render() const {
     }
 }
 
-audio::time const *audio::ios_io_core::input_time_on_render() const {
-    if (this->_input_time_on_render) {
-        return this->_input_time_on_render.value().get();
-    } else {
-        return nullptr;
-    }
-}
-
 void audio::ios_io_core::_prepare(ios_io_core_ptr const &shared) {
     this->_weak_core = shared;
 }
