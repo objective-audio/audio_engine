@@ -10,20 +10,6 @@
 
 using namespace yas;
 
-namespace yas::audio {
-struct mac_io_core_render_context {
-    io_kernel_ptr const kernel;
-
-    static std::shared_ptr<mac_io_core_render_context> make_shared(io_kernel_ptr const &kernel) {
-        return std::shared_ptr<mac_io_core_render_context>(new mac_io_core_render_context{kernel});
-    }
-
-   private:
-    mac_io_core_render_context(io_kernel_ptr const &kernel) : kernel(kernel) {
-    }
-};
-}
-
 audio::mac_io_core::mac_io_core(mac_device_ptr const &device) : _device(device) {
 }
 
@@ -74,16 +60,16 @@ void audio::mac_io_core::stop() {
 }
 
 audio::pcm_buffer const *audio::mac_io_core::input_buffer_on_render() const {
-    if (this->_render_context && this->_render_context->kernel->input_buffer.has_value()) {
-        return this->_render_context->kernel->input_buffer.value().get();
+    if (this->_kernel && this->_kernel->input_buffer.has_value()) {
+        return this->_kernel->input_buffer.value().get();
     } else {
         return nullptr;
     }
 }
 
 audio::time const *audio::mac_io_core::input_time_on_render() const {
-    if (this->_render_context && this->_render_context->kernel->input_time.has_value()) {
-        return &this->_render_context->kernel->input_time.value();
+    if (this->_kernel && this->_kernel->input_time.has_value()) {
+        return &this->_kernel->input_time.value();
     } else {
         return nullptr;
     }
@@ -109,18 +95,16 @@ void audio::mac_io_core::_create_io_proc() {
         return;
     }
 
-    this->_render_context = mac_io_core_render_context::make_shared(
-        io_kernel::make_shared(this->_render_handler.value(), input_format, output_format, this->_maximum_frames));
+    this->_kernel =
+        io_kernel::make_shared(this->_render_handler.value(), input_format, output_format, this->_maximum_frames);
 
-    auto handler = [render_context = this->_render_context](
-                       const AudioTimeStamp *inNow, const AudioBufferList *inInputData,
-                       const AudioTimeStamp *inInputTime, AudioBufferList *outOutputData,
-                       const AudioTimeStamp *inOutputTime) {
+    auto handler = [kernel = this->_kernel](const AudioTimeStamp *inNow, const AudioBufferList *inInputData,
+                                            const AudioTimeStamp *inInputTime, AudioBufferList *outOutputData,
+                                            const AudioTimeStamp *inOutputTime) {
         if (outOutputData) {
             audio::clear(outOutputData);
         }
 
-        auto const &kernel = render_context->kernel;
         kernel->reset_buffers();
 
         if (inInputData) {
@@ -130,8 +114,7 @@ void audio::mac_io_core::_create_io_proc() {
 
                 uint32_t const input_frame_length = input_buffer->frame_length();
                 if (input_frame_length > 0) {
-                    render_context->kernel->input_time =
-                        audio::time{*inInputTime, input_buffer->format().sample_rate()};
+                    kernel->input_time = audio::time{*inInputTime, input_buffer->format().sample_rate()};
                 }
             }
         }
@@ -160,7 +143,7 @@ void audio::mac_io_core::_create_io_proc() {
                                     .input_time = kernel->input_time});
         }
 
-        render_context->kernel->input_time = std::nullopt;
+        kernel->input_time = std::nullopt;
     };
 
     AudioDeviceIOProcID io_proc_id = nullptr;
@@ -176,7 +159,7 @@ void audio::mac_io_core::_destroy_io_proc() {
     }
 
     this->_io_proc_id = std::nullopt;
-    this->_render_context = nullptr;
+    this->_kernel = nullptr;
 }
 
 void audio::mac_io_core::_reload_io_proc_if_started() {
