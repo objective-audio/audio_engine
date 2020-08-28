@@ -18,11 +18,13 @@ audio::mac_io_core::~mac_io_core() {
 }
 
 void audio::mac_io_core::initialize() {
+    this->_is_initialized = true;
 }
 
 void audio::mac_io_core::uninitialize() {
     this->stop();
     this->_destroy_io_proc();
+    this->_is_initialized = false;
 }
 
 void audio::mac_io_core::set_render_handler(std::optional<io_render_f> handler) {
