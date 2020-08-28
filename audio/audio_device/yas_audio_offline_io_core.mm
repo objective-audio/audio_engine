@@ -128,10 +128,6 @@ audio::pcm_buffer const *audio::offline_io_core::input_buffer_on_render() const 
     return nullptr;
 }
 
-audio::time const *audio::offline_io_core::input_time_on_render() const {
-    return nullptr;
-}
-
 void audio::offline_io_core::_prepare(offline_io_core_ptr const &core) {
     this->_weak_io_core = core;
 }

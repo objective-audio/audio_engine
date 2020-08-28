@@ -24,7 +24,6 @@ struct mac_io_core final : io_core {
     void stop() override;
 
     [[nodiscard]] pcm_buffer const *input_buffer_on_render() const override;
-    [[nodiscard]] time const *input_time_on_render() const override;
 
     [[nodiscard]] static mac_io_core_ptr make_shared(mac_device_ptr const &);
 
@@ -33,6 +32,7 @@ struct mac_io_core final : io_core {
     std::optional<AudioDeviceIOProcID> _io_proc_id = std::nullopt;
 
     io_kernel_ptr _kernel = nullptr;
+    time const *_input_time = nullptr;
     std::optional<io_render_f> _render_handler = std::nullopt;
     uint32_t _maximum_frames = 4096;
 

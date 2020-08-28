@@ -23,7 +23,6 @@ struct io_kernel final {
     io_render_f const render_handler;
     std::optional<pcm_buffer_ptr> const input_buffer;
     std::optional<pcm_buffer_ptr> const output_buffer;
-    std::optional<time> input_time = std::nullopt;
 
     void reset_buffers();
 

@@ -27,10 +27,6 @@ struct test_io_core : io_core {
     pcm_buffer const *input_buffer_on_render() const override {
         return nullptr;
     }
-
-    time const *input_time_on_render() const override {
-        return nullptr;
-    }
 };
 
 struct test_io_device : io_device {
