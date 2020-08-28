@@ -23,7 +23,6 @@ void audio::mac_io_core::initialize() {
 
 void audio::mac_io_core::uninitialize() {
     this->stop();
-    this->_destroy_io_proc();
     this->_is_initialized = false;
 }
 
