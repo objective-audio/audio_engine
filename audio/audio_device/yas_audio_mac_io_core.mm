@@ -30,14 +30,14 @@ void audio::mac_io_core::uninitialize() {
 void audio::mac_io_core::set_render_handler(std::optional<io_render_f> handler) {
     if (this->_render_handler || handler) {
         this->_render_handler = std::move(handler);
-        this->_reload_io_proc_if_started();
+        this->_reload_if_needed();
     }
 }
 
 void audio::mac_io_core::set_maximum_frames_per_slice(uint32_t const frames) {
     if (this->_maximum_frames != frames) {
         this->_maximum_frames = frames;
-        this->_reload_io_proc_if_started();
+        this->_reload_if_needed();
     }
 }
 
@@ -158,7 +158,7 @@ void audio::mac_io_core::_destroy_io_proc() {
     this->_kernel = nullptr;
 }
 
-void audio::mac_io_core::_reload_io_proc_if_started() {
+void audio::mac_io_core::_reload_if_needed() {
     if (this->_is_started) {
         this->stop();
         this->_destroy_io_proc();

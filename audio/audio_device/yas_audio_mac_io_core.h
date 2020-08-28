@@ -43,7 +43,7 @@ struct mac_io_core final : io_core {
 
     void _create_io_proc();
     void _destroy_io_proc();
-    void _reload_io_proc_if_started();
+    void _reload_if_needed();
 };
 }  // namespace yas::audio
 
