@@ -68,8 +68,8 @@ audio::pcm_buffer const *audio::mac_io_core::input_buffer_on_render() const {
     }
 }
 
-void audio::mac_io_core::_create_io_proc() {
-    if (this->_io_proc_id) {
+void audio::mac_io_core::_make_kernel() {
+    if (this->_kernel) {
         return;
     }
 
@@ -90,6 +90,18 @@ void audio::mac_io_core::_create_io_proc() {
 
     this->_kernel =
         io_kernel::make_shared(this->_render_handler.value(), input_format, output_format, this->_maximum_frames);
+}
+
+void audio::mac_io_core::_dispose_kernel() {
+    this->_kernel = nullptr;
+}
+
+void audio::mac_io_core::_create_io_proc() {
+    if (this->_io_proc_id) {
+        return;
+    }
+
+    this->_make_kernel();
 
     auto handler = [kernel = this->_kernel, this](const AudioTimeStamp *inNow, const AudioBufferList *inInputData,
                                                   const AudioTimeStamp *inInputTime, AudioBufferList *outOutputData,
@@ -154,7 +166,8 @@ void audio::mac_io_core::_destroy_io_proc() {
     }
 
     this->_io_proc_id = std::nullopt;
-    this->_kernel = nullptr;
+
+    this->_dispose_kernel();
 }
 
 void audio::mac_io_core::_reload_if_needed() {
