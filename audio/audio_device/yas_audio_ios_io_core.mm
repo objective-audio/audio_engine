@@ -42,6 +42,132 @@ audio::ios_io_core::~ios_io_core() {
 }
 
 void audio::ios_io_core::initialize() {
+    this->_create_engine();
+    this->_update_kernel();
+}
+
+void audio::ios_io_core::uninitialize() {
+    this->stop();
+
+    this->_dispose_engine();
+
+    this->_update_kernel();
+}
+
+void audio::ios_io_core::set_render_handler(std::optional<io_render_f> handler) {
+    if (this->__render_handler || handler) {
+        std::lock_guard<std::recursive_mutex> lock(this->_kernel_mutex);
+        this->__render_handler = std::move(handler);
+        this->_update_kernel();
+    }
+}
+
+void audio::ios_io_core::set_maximum_frames_per_slice(uint32_t const frames) {
+    if (this->__maximum_frames != frames) {
+        std::lock_guard<std::recursive_mutex> lock(this->_kernel_mutex);
+        this->__maximum_frames = frames;
+        this->_update_kernel();
+    }
+}
+
+bool audio::ios_io_core::start() {
+    if (!this->_device->output_format().has_value() && !this->_device->input_format().has_value()) {
+        return false;
+    }
+
+    auto const engine = this->_impl->_avf_engine;
+    if (!engine) {
+        yas_audio_log("ios_io_core start() - avf_engine not found.");
+        return false;
+    }
+
+    auto const objc_engine = engine.value().object();
+
+    if (this->_device->output_format().has_value() && !objc_engine.outputNode) {
+        yas_audio_log("ios_io_core start() - outputNode not found.");
+        return false;
+    }
+
+    if (this->_device->input_format().has_value() && !objc_engine.inputNode) {
+        yas_audio_log("ios_io_core start() - inputNode not found.");
+        return false;
+    }
+
+    NSError *error = nil;
+    if ([objc_engine startAndReturnError:&error]) {
+        return true;
+    } else {
+        yas_audio_log(
+            ("ios_io_core start() - engine start error : " + to_string((__bridge CFStringRef)error.description)));
+        return false;
+    }
+}
+
+void audio::ios_io_core::stop() {
+    if (auto const &engine = this->_impl->_avf_engine) {
+        [engine.value().object() stop];
+    }
+}
+
+audio::pcm_buffer const *audio::ios_io_core::input_buffer_on_render() const {
+    if (this->_input_buffer_on_render) {
+        return this->_input_buffer_on_render.value().get();
+    } else {
+        return nullptr;
+    }
+}
+
+void audio::ios_io_core::_prepare(ios_io_core_ptr const &shared) {
+    this->_weak_core = shared;
+}
+
+void audio::ios_io_core::_set_kernel(std::optional<io_kernel_ptr> const &kernel) {
+    std::lock_guard<std::recursive_mutex> lock(this->_kernel_mutex);
+    this->__kernel = kernel;
+}
+
+std::optional<audio::io_kernel_ptr> audio::ios_io_core::_kernel() const {
+    if (auto const lock = std::unique_lock<std::recursive_mutex>(this->_kernel_mutex, std::try_to_lock);
+        lock.owns_lock()) {
+        return this->__kernel;
+    } else {
+        return std::nullopt;
+    }
+}
+
+void audio::ios_io_core::_update_kernel() {
+    std::lock_guard<std::recursive_mutex> lock(this->_kernel_mutex);
+
+    this->_set_kernel(std::nullopt);
+
+    if (!this->_is_intialized()) {
+        return;
+    }
+
+    if (!this->__render_handler) {
+        return;
+    }
+
+    auto const &output_format = this->_device->output_format();
+    auto const &input_format = this->_device->input_format();
+
+    bool const output_available = output_format.has_value() && this->_impl->_source_node.has_value();
+    bool const input_available = input_format.has_value() && this->_impl->_sink_node.has_value();
+
+    if (!output_available && !input_available) {
+        return;
+    }
+
+    this->_set_kernel(io_kernel::make_shared(this->__render_handler.value(),
+                                             input_available ? input_format : std::nullopt,
+                                             output_available ? output_format : std::nullopt, this->__maximum_frames));
+}
+
+bool audio::ios_io_core::_is_intialized() const {
+    return this->_impl->_avf_engine.has_value();
+}
+
+void audio::ios_io_core::_create_engine() {
     auto engine = objc_ptr_with_move_object([[AVAudioEngine alloc] init]);
     this->_impl->_avf_engine = engine;
 
@@ -191,13 +317,9 @@ void audio::ios_io_core::initialize() {
             log_formats("ios_io_core initialize input formats did not match.", node_format, *input_format);
         }
     }
-
-    this->_update_kernel();
 }
 
-void audio::ios_io_core::uninitialize() {
-    this->stop();
-
+void audio::ios_io_core::_dispose_engine() {
     if (auto const &engine_opt = this->_impl->_avf_engine) {
         auto const &engine = engine_opt.value();
 
@@ -219,123 +341,8 @@ void audio::ios_io_core::uninitialize() {
             this->_impl->_source_node = std::nullopt;
         }
 
-        this->_impl->_avf_engine = nullptr;
+        this->_impl->_avf_engine = std::nullopt;
     }
-
-    this->_update_kernel();
-}
-
-void audio::ios_io_core::set_render_handler(std::optional<io_render_f> handler) {
-    if (this->__render_handler || handler) {
-        std::lock_guard<std::recursive_mutex> lock(this->_kernel_mutex);
-        this->__render_handler = std::move(handler);
-        this->_update_kernel();
-    }
-}
-
-void audio::ios_io_core::set_maximum_frames_per_slice(uint32_t const frames) {
-    if (this->__maximum_frames != frames) {
-        std::lock_guard<std::recursive_mutex> lock(this->_kernel_mutex);
-        this->__maximum_frames = frames;
-        this->_update_kernel();
-    }
-}
-
-bool audio::ios_io_core::start() {
-    if (!this->_device->output_format().has_value() && !this->_device->input_format().has_value()) {
-        return false;
-    }
-
-    auto const engine = this->_impl->_avf_engine;
-    if (!engine) {
-        yas_audio_log("ios_io_core start() - avf_engine not found.");
-        return false;
-    }
-
-    auto const objc_engine = engine.value().object();
-
-    if (this->_device->output_format().has_value() && !objc_engine.outputNode) {
-        yas_audio_log("ios_io_core start() - outputNode not found.");
-        return false;
-    }
-
-    if (this->_device->input_format().has_value() && !objc_engine.inputNode) {
-        yas_audio_log("ios_io_core start() - inputNode not found.");
-        return false;
-    }
-
-    NSError *error = nil;
-    if ([objc_engine startAndReturnError:&error]) {
-        return true;
-    } else {
-        yas_audio_log(
-            ("ios_io_core start() - engine start error : " + to_string((__bridge CFStringRef)error.description)));
-        return false;
-    }
-}
-
-void audio::ios_io_core::stop() {
-    if (auto const &engine = this->_impl->_avf_engine) {
-        [engine.value().object() stop];
-    }
-}
-
-audio::pcm_buffer const *audio::ios_io_core::input_buffer_on_render() const {
-    if (this->_input_buffer_on_render) {
-        return this->_input_buffer_on_render.value().get();
-    } else {
-        return nullptr;
-    }
-}
-
-void audio::ios_io_core::_prepare(ios_io_core_ptr const &shared) {
-    this->_weak_core = shared;
-}
-
-void audio::ios_io_core::_set_kernel(std::optional<io_kernel_ptr> const &kernel) {
-    std::lock_guard<std::recursive_mutex> lock(this->_kernel_mutex);
-    this->__kernel = kernel;
-}
-
-std::optional<audio::io_kernel_ptr> audio::ios_io_core::_kernel() const {
-    if (auto const lock = std::unique_lock<std::recursive_mutex>(this->_kernel_mutex, std::try_to_lock);
-        lock.owns_lock()) {
-        return this->__kernel;
-    } else {
-        return std::nullopt;
-    }
-}
-
-void audio::ios_io_core::_update_kernel() {
-    std::lock_guard<std::recursive_mutex> lock(this->_kernel_mutex);
-
-    this->_set_kernel(std::nullopt);
-
-    if (!this->_is_intialized()) {
-        return;
-    }
-
-    if (!this->__render_handler) {
-        return;
-    }
-
-    auto const &output_format = this->_device->output_format();
-    auto const &input_format = this->_device->input_format();
-
-    bool const output_available = output_format.has_value() && this->_impl->_source_node.has_value();
-    bool const input_available = input_format.has_value() && this->_impl->_sink_node.has_value();
-
-    if (!output_available && !input_available) {
-        return;
-    }
-
-    this->_set_kernel(io_kernel::make_shared(this->__render_handler.value(),
-                                             input_available ? input_format : std::nullopt,
-                                             output_available ? output_format : std::nullopt, this->__maximum_frames));
-}
-
-bool audio::ios_io_core::_is_intialized() const {
-    return this->_impl->_avf_engine.has_value();
 }
 
 audio::ios_io_core_ptr audio::ios_io_core::make_shared(ios_device_ptr const &device) {
