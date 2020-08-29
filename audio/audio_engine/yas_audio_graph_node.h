@@ -30,7 +30,7 @@ struct graph_node : connectable_graph_node, manageable_graph_node {
     using chaining_pair_t = std::pair<method, graph_node_ptr>;
 
     struct render_args {
-        audio::pcm_buffer_ptr const &buffer;
+        audio::pcm_buffer *const buffer;
         uint32_t const bus_idx;
         audio::time const &time;
     };

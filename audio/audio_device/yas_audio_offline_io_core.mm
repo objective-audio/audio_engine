@@ -48,7 +48,7 @@ void audio::offline_io_core::initialize() {
 
             audio::time time(current_sample_time, render_buffer->format().sample_rate());
 
-            kernel->render_handler({.output_buffer = render_buffer,
+            kernel->render_handler({.output_buffer = render_buffer.get(),
                                     .output_time = time,
                                     .input_buffer = audio::null_pcm_buffer_ptr_opt,
                                     .input_time = audio::null_time_opt});

@@ -58,9 +58,8 @@ void audio::graph_route::_prepare(graph_route_ptr const &shared) {
                             uint32_t const src_ch_count = src_format.channel_count();
                             if (auto const result = channel_map_from_routes(routes, src_bus_idx, src_ch_count,
                                                                             dst_bus_idx, dst_ch_count)) {
-                                auto const src_buffer =
-                                    std::make_shared<pcm_buffer>(src_format, *dst_buffer, result.value());
-                                node->render({.buffer = src_buffer, .bus_idx = src_bus_idx, .time = args.time});
+                                pcm_buffer src_buffer(src_format, *dst_buffer, result.value());
+                                node->render({.buffer = &src_buffer, .bus_idx = src_bus_idx, .time = args.time});
                             }
                         }
                     }

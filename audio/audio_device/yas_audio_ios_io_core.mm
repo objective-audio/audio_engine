@@ -76,7 +76,7 @@ void audio::ios_io_core::initialize() {
                                        output_buffer->set_frame_length(frame_length);
                                        audio::time time(*timestamp, output_buffer->format().sample_rate());
                                        output_buffer->clear();
-                                       kernel->render_handler({.output_buffer = output_buffer_opt,
+                                       kernel->render_handler({.output_buffer = output_buffer.get(),
                                                                .output_time = time,
                                                                .input_buffer = kernel->input_buffer,
                                                                .input_time = time});
@@ -90,7 +90,7 @@ void audio::ios_io_core::initialize() {
                            } else {
                                if (auto const &input_buffer = kernel->input_buffer) {
                                    audio::time time(*timestamp, input_buffer.value()->format().sample_rate());
-                                   kernel->render_handler({.output_buffer = audio::null_pcm_buffer_ptr_opt,
+                                   kernel->render_handler({.output_buffer = nullptr,
                                                            .output_time = audio::null_time_opt,
                                                            .input_buffer = kernel->input_buffer,
                                                            .input_time = std::move(time)});
@@ -158,7 +158,7 @@ void audio::ios_io_core::initialize() {
                                             *io_core->_input_time_on_render.value();
 
                                         if (!kernel->output_buffer) {
-                                            kernel->render_handler({.output_buffer = audio::null_pcm_buffer_ptr_opt,
+                                            kernel->render_handler({.output_buffer = nullptr,
                                                                     .output_time = audio::null_time_opt,
                                                                     .input_buffer = io_core->_input_buffer_on_render,
                                                                     .input_time = input_time});

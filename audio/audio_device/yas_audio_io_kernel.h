@@ -11,7 +11,7 @@
 
 namespace yas::audio {
 struct io_render_args {
-    std::optional<audio::pcm_buffer_ptr> const &output_buffer;
+    pcm_buffer *const output_buffer;
     std::optional<audio::time> const &output_time;
     std::optional<audio::pcm_buffer_ptr> const &input_buffer;
     std::optional<audio::time> const &input_time;
