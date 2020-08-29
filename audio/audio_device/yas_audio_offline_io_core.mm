@@ -39,12 +39,11 @@ void audio::offline_io_core::initialize() {
 
             kernel->reset_buffers();
 
-            auto const &buffer_opt = kernel->output_buffer;
-            if (!buffer_opt.has_value()) {
+            auto const &render_buffer = kernel->output_buffer;
+            if (!render_buffer) {
                 cancelled = true;
                 break;
             }
-            auto const &render_buffer = buffer_opt.value();
 
             audio::time time(current_sample_time, render_buffer->format().sample_rate());
 

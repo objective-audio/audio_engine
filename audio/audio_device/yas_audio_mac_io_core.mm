@@ -61,8 +61,8 @@ void audio::mac_io_core::stop() {
 }
 
 audio::pcm_buffer const *audio::mac_io_core::input_buffer_on_render() const {
-    if (this->_kernel && this->_kernel->input_buffer.has_value()) {
-        return this->_kernel->input_buffer.value().get();
+    if (this->_kernel && this->_kernel->input_buffer) {
+        return this->_kernel->input_buffer.get();
     } else {
         return nullptr;
     }
@@ -115,8 +115,7 @@ void audio::mac_io_core::_create_io_proc() {
         std::optional<time> input_time = std::nullopt;
 
         if (inInputData) {
-            if (auto const &input_buffer_opt = kernel->input_buffer) {
-                auto const &input_buffer = input_buffer_opt.value();
+            if (auto const &input_buffer = kernel->input_buffer) {
                 input_buffer->copy_from(inInputData);
 
                 uint32_t const input_frame_length = input_buffer->frame_length();
@@ -127,8 +126,7 @@ void audio::mac_io_core::_create_io_proc() {
             }
         }
 
-        if (auto const &output_buffer_opt = kernel->output_buffer) {
-            auto const &output_buffer = output_buffer_opt.value();
+        if (auto const &output_buffer = kernel->output_buffer) {
             if (outOutputData) {
                 uint32_t const frame_length =
                     audio::frame_length(outOutputData, output_buffer->format().sample_byte_count());
@@ -138,7 +136,7 @@ void audio::mac_io_core::_create_io_proc() {
                     kernel->render_handler(
                         {.output_buffer = output_buffer.get(),
                          .output_time = std::move(time),
-                         .input_buffer = input_time.has_value() ? kernel->input_buffer.value().get() : nullptr,
+                         .input_buffer = input_time.has_value() ? kernel->input_buffer.get() : nullptr,
                          .input_time = input_time});
                     output_buffer->copy_to(outOutputData);
                 }
@@ -146,7 +144,7 @@ void audio::mac_io_core::_create_io_proc() {
         } else if (input_time.has_value()) {
             kernel->render_handler({.output_buffer = nullptr,
                                     .output_time = audio::null_time_opt,
-                                    .input_buffer = kernel->input_buffer.value().get(),
+                                    .input_buffer = kernel->input_buffer.get(),
                                     .input_time = input_time});
         }
 
