@@ -128,7 +128,6 @@ void audio::mac_io_core::_create_io_proc() {
                 uint32_t const input_frame_length = input_buffer->frame_length();
                 if (input_frame_length > 0) {
                     input_time = audio::time{*inInputTime, input_buffer->format().sample_rate()};
-                    this->_input_time = &input_time.value();
                 }
             }
         }
@@ -154,8 +153,6 @@ void audio::mac_io_core::_create_io_proc() {
                                     .input_buffer = kernel->input_buffer.get(),
                                     .input_time = input_time});
         }
-
-        this->_input_time = nullptr;
     };
 
     AudioDeviceIOProcID io_proc_id = nullptr;
