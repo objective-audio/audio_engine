@@ -101,7 +101,7 @@ using namespace yas;
     au->set_output_format(format, 0);
     au->set_input_format(format, 0);
 
-    auto buffer = std::make_shared<audio::pcm_buffer>(format, 4);
+    audio::pcm_buffer buffer(format, 4);
 
     au->initialize();
 
@@ -111,7 +111,7 @@ using namespace yas;
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), [promise, au, &buffer] {
         audio::time time{1000};
 
-        au->render({.buffer = buffer, .bus_idx = 0, .time = time}, [](audio::avf_au::render_args args) {
+        au->render({.buffer = &buffer, .bus_idx = 0, .time = time}, [](audio::avf_au::render_args args) {
             int16_t *data = args.buffer->template data_ptr_at_index<int16_t>(0);
 
             auto each = make_fast_each(args.buffer->frame_length());
@@ -128,7 +128,7 @@ using namespace yas;
 
     au->uninitialize();
 
-    int16_t const *data = buffer->data_ptr_at_index<int16_t>(0);
+    int16_t const *data = buffer.data_ptr_at_index<int16_t>(0);
     XCTAssertEqual(data[0], 10);
     XCTAssertEqual(data[1], 11);
     XCTAssertEqual(data[2], 12);

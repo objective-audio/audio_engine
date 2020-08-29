@@ -126,12 +126,12 @@ struct avf_au::core {
                 if (input_format_opt) {
                     auto const &input_format = input_format_opt.value();
 
-                    auto const buffer = std::make_shared<pcm_buffer>(input_format, inputData);
-                    buffer->set_frame_length(frameCount);
+                    pcm_buffer buffer(input_format, inputData);
+                    buffer.set_frame_length(frameCount);
 
                     audio::time time(*timestamp, input_format.sample_rate());
 
-                    input_handler({.buffer = buffer, .bus_idx = (uint32_t)inputBusNumber, .time = time});
+                    input_handler({.buffer = &buffer, .bus_idx = (uint32_t)inputBusNumber, .time = time});
                 }
 
                 return AUAudioUnitStatus(noErr);

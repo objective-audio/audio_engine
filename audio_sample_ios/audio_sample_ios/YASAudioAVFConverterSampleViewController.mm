@@ -52,9 +52,8 @@ struct avf_converter_vc_cpp {
         this->kernel->set_sine_volume(0.1);
         this->kernel->set_sine_frequency(1000.0);
 
-        this->tap->set_render_handler([kernel = this->kernel](audio::graph_node::render_args args) {
-            kernel->process(nullptr, args.buffer ? args.buffer.get() : nullptr);
-        });
+        this->tap->set_render_handler(
+            [kernel = this->kernel](audio::graph_node::render_args args) { kernel->process(nullptr, args.buffer); });
 
         this->converter->load_state_chain()
             .perform([this](auto const &state) {

@@ -41,8 +41,7 @@ struct avf_io_vc_cpp {
         auto weak_io = to_weak(io);
         io->set_render_handler([weak_io, kernel](audio::io_render_args args) {
             if (auto shared_io = weak_io.lock()) {
-                kernel->process(args.input_buffer ? args.input_buffer.value().get() : nullptr,
-                                args.output_buffer ? args.output_buffer.value().get() : nullptr);
+                kernel->process(args.input_buffer, args.output_buffer);
             }
         });
 
