@@ -60,6 +60,8 @@ struct ios_io_core final : io_core {
 
     void _create_engine();
     void _dispose_engine();
+    bool _start_engine();
+    void _stop_engine();
 
     bool _is_started = false;
     bool _is_initialized = false;

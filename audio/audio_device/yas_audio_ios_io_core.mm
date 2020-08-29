@@ -72,44 +72,11 @@ void audio::ios_io_core::set_maximum_frames_per_slice(uint32_t const frames) {
 
 bool audio::ios_io_core::start() {
     this->_is_started = true;
-
-    if (!this->_device->output_format().has_value() && !this->_device->input_format().has_value()) {
-        return false;
-    }
-
-    auto const engine = this->_impl->_avf_engine;
-    if (!engine) {
-        yas_audio_log("ios_io_core start() - avf_engine not found.");
-        return false;
-    }
-
-    auto const objc_engine = engine.value().object();
-
-    if (this->_device->output_format().has_value() && !objc_engine.outputNode) {
-        yas_audio_log("ios_io_core start() - outputNode not found.");
-        return false;
-    }
-
-    if (this->_device->input_format().has_value() && !objc_engine.inputNode) {
-        yas_audio_log("ios_io_core start() - inputNode not found.");
-        return false;
-    }
-
-    NSError *error = nil;
-    if ([objc_engine startAndReturnError:&error]) {
-        return true;
-    } else {
-        yas_audio_log(
-            ("ios_io_core start() - engine start error : " + to_string((__bridge CFStringRef)error.description)));
-        return false;
-    }
+    return this->_start_engine();
 }
 
 void audio::ios_io_core::stop() {
-    if (auto const &engine = this->_impl->_avf_engine) {
-        [engine.value().object() stop];
-    }
-
+    this->_stop_engine();
     this->_is_started = false;
 }
 
@@ -346,6 +313,45 @@ void audio::ios_io_core::_dispose_engine() {
         }
 
         this->_impl->_avf_engine = std::nullopt;
+    }
+}
+
+bool audio::ios_io_core::_start_engine() {
+    if (!this->_device->output_format().has_value() && !this->_device->input_format().has_value()) {
+        return false;
+    }
+
+    auto const engine = this->_impl->_avf_engine;
+    if (!engine) {
+        yas_audio_log("ios_io_core start() - avf_engine not found.");
+        return false;
+    }
+
+    auto const objc_engine = engine.value().object();
+
+    if (this->_device->output_format().has_value() && !objc_engine.outputNode) {
+        yas_audio_log("ios_io_core start() - outputNode not found.");
+        return false;
+    }
+
+    if (this->_device->input_format().has_value() && !objc_engine.inputNode) {
+        yas_audio_log("ios_io_core start() - inputNode not found.");
+        return false;
+    }
+
+    NSError *error = nil;
+    if ([objc_engine startAndReturnError:&error]) {
+        return true;
+    } else {
+        yas_audio_log(
+            ("ios_io_core start() - engine start error : " + to_string((__bridge CFStringRef)error.description)));
+        return false;
+    }
+}
+
+void audio::ios_io_core::_stop_engine() {
+    if (auto const &engine = this->_impl->_avf_engine) {
+        [engine.value().object() stop];
     }
 }
 
