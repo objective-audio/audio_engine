@@ -92,8 +92,7 @@ void audio::graph_io::_update_io_connections() {
                             auto const &input_time = args.input_time;
                             if (input_buffer && input_time) {
                                 if (connection->format == dst_node->input_format(connection->destination_bus)) {
-                                    dst_node->render(
-                                        {.buffer = input_buffer.value().get(), .bus_idx = 0, .time = *input_time});
+                                    dst_node->render({.buffer = input_buffer, .bus_idx = 0, .time = *input_time});
                                 }
                             }
                         }

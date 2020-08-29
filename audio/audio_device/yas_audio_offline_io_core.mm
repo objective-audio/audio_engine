@@ -50,7 +50,7 @@ void audio::offline_io_core::initialize() {
 
             kernel->render_handler({.output_buffer = render_buffer.get(),
                                     .output_time = time,
-                                    .input_buffer = audio::null_pcm_buffer_ptr_opt,
+                                    .input_buffer = nullptr,
                                     .input_time = audio::null_time_opt});
 
             auto const &offline_handler = core->_device->render_handler();

@@ -138,7 +138,7 @@ void audio::mac_io_core::_create_io_proc() {
                     kernel->render_handler(
                         {.output_buffer = output_buffer.get(),
                          .output_time = std::move(time),
-                         .input_buffer = input_time.has_value() ? kernel->input_buffer : audio::null_pcm_buffer_ptr_opt,
+                         .input_buffer = input_time.has_value() ? kernel->input_buffer.value().get() : nullptr,
                          .input_time = input_time});
                     output_buffer->copy_to(outOutputData);
                 }
@@ -146,7 +146,7 @@ void audio::mac_io_core::_create_io_proc() {
         } else if (input_time.has_value()) {
             kernel->render_handler({.output_buffer = nullptr,
                                     .output_time = audio::null_time_opt,
-                                    .input_buffer = kernel->input_buffer,
+                                    .input_buffer = kernel->input_buffer.value().get(),
                                     .input_time = input_time});
         }
 
