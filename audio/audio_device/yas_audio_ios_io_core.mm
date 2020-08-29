@@ -42,16 +42,16 @@ audio::ios_io_core::~ios_io_core() {
 }
 
 void audio::ios_io_core::initialize() {
+    this->_is_initialized = true;
     this->_create_engine();
     this->_update_kernel();
 }
 
 void audio::ios_io_core::uninitialize() {
     this->stop();
-
     this->_dispose_engine();
-
     this->_update_kernel();
+    this->_is_initialized = false;
 }
 
 void audio::ios_io_core::set_render_handler(std::optional<io_render_f> handler) {
@@ -71,6 +71,8 @@ void audio::ios_io_core::set_maximum_frames_per_slice(uint32_t const frames) {
 }
 
 bool audio::ios_io_core::start() {
+    this->_is_started = true;
+
     if (!this->_device->output_format().has_value() && !this->_device->input_format().has_value()) {
         return false;
     }
@@ -107,6 +109,8 @@ void audio::ios_io_core::stop() {
     if (auto const &engine = this->_impl->_avf_engine) {
         [engine.value().object() stop];
     }
+
+    this->_is_started = false;
 }
 
 audio::pcm_buffer const *audio::ios_io_core::input_buffer_on_render() const {
