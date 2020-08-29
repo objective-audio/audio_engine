@@ -138,6 +138,35 @@ bool audio::ios_io_core::_is_intialized() const {
     return this->_impl->_avf_engine.has_value();
 }
 
+void audio::ios_io_core::_make_kernel() {
+    if (this->__kernel) {
+        return;
+    }
+
+    auto const &output_format = this->_device->output_format();
+    auto const &input_format = this->_device->input_format();
+
+    if (!output_format.has_value() && !input_format.has_value()) {
+        return;
+    }
+
+    if (!this->__render_handler) {
+        return;
+    }
+
+    if (this->__maximum_frames == 0) {
+        return;
+    }
+
+    this->_set_kernel(
+        io_kernel::make_shared(this->__render_handler.value(), input_format.has_value() ? input_format : std::nullopt,
+                               output_format.has_value() ? output_format : std::nullopt, this->__maximum_frames));
+}
+
+void audio::ios_io_core::_dispose_kernel() {
+    this->__kernel = std::nullopt;
+}
+
 void audio::ios_io_core::_create_engine() {
     auto engine = objc_ptr_with_move_object([[AVAudioEngine alloc] init]);
     this->_impl->_avf_engine = engine;

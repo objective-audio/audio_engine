@@ -58,6 +58,8 @@ struct ios_io_core final : io_core {
     void _update_kernel();
     bool _is_intialized() const;
 
+    void _make_kernel();
+    void _dispose_kernel();
     void _create_engine();
     void _dispose_engine();
     bool _start_engine();
