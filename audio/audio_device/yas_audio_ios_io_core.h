@@ -40,23 +40,16 @@ struct ios_io_core final : io_core {
 
     audio::ios_device_ptr _device;
 
-    std::optional<pcm_buffer_ptr> _input_buffer_on_render = std::nullopt;
-    std::optional<time_ptr> _input_time_on_render = std::nullopt;
+    std::optional<io_render_f> _render_handler = std::nullopt;
+    uint32_t _maximum_frames = 4096;
+    io_kernel_ptr _kernel = nullptr;
 
-    mutable std::recursive_mutex _kernel_mutex;
-
-    std::optional<io_render_f> __render_handler = std::nullopt;
-    uint32_t __maximum_frames = 4096;
-    std::optional<io_kernel_ptr> __kernel = std::nullopt;
+    bool _is_started = false;
+    bool _is_initialized = false;
 
     ios_io_core(ios_device_ptr const &);
 
     void _prepare(ios_io_core_ptr const &shared);
-
-    void _set_kernel(std::optional<io_kernel_ptr> const &);
-    std::optional<io_kernel_ptr> _kernel() const;
-    void _update_kernel();
-    bool _is_intialized() const;
 
     void _make_kernel();
     void _dispose_kernel();
@@ -64,9 +57,7 @@ struct ios_io_core final : io_core {
     void _dispose_engine();
     bool _start_engine();
     void _stop_engine();
-
-    bool _is_started = false;
-    bool _is_initialized = false;
+    void _reload_if_needed();
 };
 }  // namespace yas::audio
 
