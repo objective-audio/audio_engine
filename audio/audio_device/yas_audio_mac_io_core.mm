@@ -118,8 +118,7 @@ void audio::mac_io_core::_create_io_proc() {
         }
 
         kernel->reset_buffers();
-
-        std::optional<time> input_time = std::nullopt;
+        kernel->input_time = std::nullopt;
 
         if (inInputData) {
             if (auto const &input_buffer = kernel->input_buffer) {
@@ -127,7 +126,7 @@ void audio::mac_io_core::_create_io_proc() {
 
                 uint32_t const input_frame_length = input_buffer->frame_length();
                 if (input_frame_length > 0) {
-                    input_time = audio::time{*inInputTime, input_buffer->format().sample_rate()};
+                    kernel->input_time = audio::time{*inInputTime, input_buffer->format().sample_rate()};
                 }
             }
         }
@@ -142,16 +141,16 @@ void audio::mac_io_core::_create_io_proc() {
                     kernel->render_handler(
                         {.output_buffer = output_buffer.get(),
                          .output_time = std::move(time),
-                         .input_buffer = input_time.has_value() ? kernel->input_buffer.get() : nullptr,
-                         .input_time = input_time});
+                         .input_buffer = kernel->input_time.has_value() ? kernel->input_buffer.get() : nullptr,
+                         .input_time = kernel->input_time});
                     output_buffer->copy_to(outOutputData);
                 }
             }
-        } else if (input_time.has_value()) {
+        } else if (kernel->input_time.has_value()) {
             kernel->render_handler({.output_buffer = nullptr,
                                     .output_time = audio::null_time_opt,
                                     .input_buffer = kernel->input_buffer.get(),
-                                    .input_time = input_time});
+                                    .input_time = kernel->input_time});
         }
     };
 
