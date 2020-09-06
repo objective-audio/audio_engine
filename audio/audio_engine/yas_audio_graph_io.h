@@ -14,7 +14,6 @@ namespace yas::audio {
 struct graph_io : manageable_graph_io {
     virtual ~graph_io();
 
-    audio::graph_node_ptr const &node() const;
     audio::graph_node_ptr const &output_node() const;
     audio::graph_node_ptr const &input_node() const;
 

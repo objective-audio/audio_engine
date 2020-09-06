@@ -30,10 +30,6 @@ audio::graph_io::graph_io(audio::io_ptr const &raw_io)
 
 audio::graph_io::~graph_io() = default;
 
-audio::graph_node_ptr const &audio::graph_io::node() const {
-    return this->_node;
-}
-
 audio::graph_node_ptr const &audio::graph_io::output_node() const {
     return this->_node;
 }
@@ -75,7 +71,7 @@ void audio::graph_io::_update_io_connections() {
 
     auto render_handler = [weak_graph_io = this->_weak_graph_io, weak_io](io_render_args args) {
         if (auto graph_io = weak_graph_io.lock()) {
-            if (auto const kernel_opt = graph_io->node()->kernel()) {
+            if (auto const kernel_opt = graph_io->output_node()->kernel()) {
                 auto const &kernel = kernel_opt.value();
                 auto const connections = kernel->input_connections();
                 if (connections.count(0) > 0) {
@@ -89,8 +85,11 @@ void audio::graph_io::_update_io_connections() {
                         }
                     }
                 }
+            }
 
+            if (auto const kernel_opt = graph_io->input_node()->kernel()) {
                 if (auto io = weak_io.lock()) {
+                    auto const &kernel = kernel_opt.value();
                     auto const connections = kernel->output_connections();
                     if (connections.count(0) > 0) {
                         auto const &connection = connections.at(0);
