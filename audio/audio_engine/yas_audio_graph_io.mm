@@ -34,6 +34,14 @@ audio::graph_node_ptr const &audio::graph_io::node() const {
     return this->_node;
 }
 
+audio::graph_node_ptr const &audio::graph_io::output_node() const {
+    return this->_node;
+}
+
+audio::graph_node_ptr const &audio::graph_io::input_node() const {
+    return this->_node;
+}
+
 audio::io_ptr const &audio::graph_io::raw_io() {
     return this->_raw_io;
 }
