@@ -69,7 +69,7 @@ struct input_tap_vc_cpp {
             return;
         }
 
-        graph->disconnect(io.value()->node());
+        graph->disconnect(io.value()->input_node());
 
         auto const input_format = this->device->input_format();
         if (!input_format || input_format->is_broken()) {
@@ -78,7 +78,7 @@ struct input_tap_vc_cpp {
 
         audio::format format{
             {.sample_rate = input_format->sample_rate(), .channel_count = input_format->channel_count()}};
-        graph->connect(io.value()->node(), input_tap->node(), format);
+        graph->connect(io.value()->input_node(), input_tap->node(), format);
     }
 
    private:
