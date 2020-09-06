@@ -19,10 +19,12 @@ audio::mac_io_core::~mac_io_core() {
 
 void audio::mac_io_core::initialize() {
     this->_is_initialized = true;
+    this->_make_kernel();
 }
 
 void audio::mac_io_core::uninitialize() {
     this->stop();
+    this->_dispose_kernel();
     this->_is_initialized = false;
 }
 
@@ -41,7 +43,10 @@ void audio::mac_io_core::set_maximum_frames_per_slice(uint32_t const frames) {
 }
 
 bool audio::mac_io_core::start() {
+    this->initialize();
+
     this->_is_started = true;
+
     this->_create_io_proc();
 
     if (this->_io_proc_id) {
@@ -101,7 +106,9 @@ void audio::mac_io_core::_create_io_proc() {
         return;
     }
 
-    this->_make_kernel();
+    if (!this->_kernel) {
+        return;
+    }
 
     auto handler = [kernel = this->_kernel, this](const AudioTimeStamp *inNow, const AudioBufferList *inInputData,
                                                   const AudioTimeStamp *inInputTime, AudioBufferList *outOutputData,
@@ -111,8 +118,7 @@ void audio::mac_io_core::_create_io_proc() {
         }
 
         kernel->reset_buffers();
-
-        std::optional<time> input_time = std::nullopt;
+        kernel->input_time = std::nullopt;
 
         if (inInputData) {
             if (auto const &input_buffer = kernel->input_buffer) {
@@ -120,8 +126,7 @@ void audio::mac_io_core::_create_io_proc() {
 
                 uint32_t const input_frame_length = input_buffer->frame_length();
                 if (input_frame_length > 0) {
-                    input_time = audio::time{*inInputTime, input_buffer->format().sample_rate()};
-                    this->_input_time = &input_time.value();
+                    kernel->input_time = audio::time{*inInputTime, input_buffer->format().sample_rate()};
                 }
             }
         }
@@ -136,19 +141,17 @@ void audio::mac_io_core::_create_io_proc() {
                     kernel->render_handler(
                         {.output_buffer = output_buffer.get(),
                          .output_time = std::move(time),
-                         .input_buffer = input_time.has_value() ? kernel->input_buffer.get() : nullptr,
-                         .input_time = input_time});
+                         .input_buffer = kernel->input_time.has_value() ? kernel->input_buffer.get() : nullptr,
+                         .input_time = kernel->input_time});
                     output_buffer->copy_to(outOutputData);
                 }
             }
-        } else if (input_time.has_value()) {
+        } else if (kernel->input_time.has_value()) {
             kernel->render_handler({.output_buffer = nullptr,
                                     .output_time = audio::null_time_opt,
                                     .input_buffer = kernel->input_buffer.get(),
-                                    .input_time = input_time});
+                                    .input_time = kernel->input_time});
         }
-
-        this->_input_time = nullptr;
     };
 
     AudioDeviceIOProcID io_proc_id = nullptr;
@@ -164,16 +167,19 @@ void audio::mac_io_core::_destroy_io_proc() {
     }
 
     this->_io_proc_id = std::nullopt;
-
-    this->_dispose_kernel();
 }
 
 void audio::mac_io_core::_reload_if_needed() {
-    if (this->_is_started) {
-        this->stop();
-        this->_destroy_io_proc();
-        this->_create_io_proc();
-        this->start();
+    bool const is_started = this->_is_started;
+    bool const is_initialized = this->_is_initialized;
+
+    if (is_initialized) {
+        this->uninitialize();
+        this->initialize();
+
+        if (is_started) {
+            this->start();
+        }
     }
 }
 
