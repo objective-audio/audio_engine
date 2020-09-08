@@ -23,9 +23,10 @@ struct graph_io : manageable_graph_io {
 
    private:
     std::weak_ptr<graph_io> _weak_graph_io;
-    audio::graph_node_ptr _node;
+    audio::graph_node_ptr _output_node;
+    audio::graph_node_ptr _input_node;
     audio::io_ptr _raw_io;
-    chaining::any_observer_ptr _connections_observer;
+    chaining::observer_pool _pool;
 
     graph_io(audio::io_ptr const &);
 

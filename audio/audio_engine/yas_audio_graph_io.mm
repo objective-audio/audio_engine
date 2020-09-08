@@ -22,20 +22,27 @@ using namespace yas;
 #pragma mark - audio::io
 
 audio::graph_io::graph_io(audio::io_ptr const &raw_io)
-    : _node(graph_node::make_shared({.input_bus_count = 1, .output_bus_count = 1})), _raw_io(raw_io) {
-    this->_connections_observer = this->_node->chain(graph_node::method::update_connections)
-                                      .perform([this](auto const &) { this->_update_io_connections(); })
-                                      .end();
+    : _output_node(graph_node::make_shared({.input_bus_count = 1, .output_bus_count = 0})),
+      _input_node(graph_node::make_shared({.input_bus_count = 0, .output_bus_count = 1})),
+      _raw_io(raw_io) {
+    this->_output_node->chain(graph_node::method::update_connections)
+        .perform([this](auto const &) { this->_update_io_connections(); })
+        .end()
+        ->add_to(this->_pool);
+    this->_input_node->chain(graph_node::method::update_connections)
+        .perform([this](auto const &) { this->_update_io_connections(); })
+        .end()
+        ->add_to(this->_pool);
 }
 
 audio::graph_io::~graph_io() = default;
 
 audio::graph_node_ptr const &audio::graph_io::output_node() const {
-    return this->_node;
+    return this->_output_node;
 }
 
 audio::graph_node_ptr const &audio::graph_io::input_node() const {
-    return this->_node;
+    return this->_input_node;
 }
 
 audio::io_ptr const &audio::graph_io::raw_io() {
@@ -45,7 +52,7 @@ audio::io_ptr const &audio::graph_io::raw_io() {
 void audio::graph_io::_prepare(graph_io_ptr const &shared) {
     this->_weak_graph_io = to_weak(shared);
 
-    this->_node->set_render_handler([weak_graph_io = this->_weak_graph_io](graph_node::render_args args) {
+    this->_input_node->set_render_handler([weak_graph_io = this->_weak_graph_io](graph_node::render_args args) {
         auto const &buffer = args.buffer;
 
         if (auto graph_io = weak_graph_io.lock()) {
@@ -115,7 +122,7 @@ void audio::graph_io::_update_io_connections() {
 bool audio::graph_io::_validate_connections() {
     auto const &raw_io = this->_raw_io;
 
-    auto &input_connections = manageable_graph_node::cast(this->_node)->input_connections();
+    auto &input_connections = manageable_graph_node::cast(this->_output_node)->input_connections();
     if (input_connections.size() > 0) {
         auto const connections = lock_values(input_connections);
         if (connections.count(0) > 0) {
@@ -143,7 +150,7 @@ bool audio::graph_io::_validate_connections() {
         }
     }
 
-    auto &output_connections = manageable_graph_node::cast(this->_node)->output_connections();
+    auto &output_connections = manageable_graph_node::cast(this->_input_node)->output_connections();
     if (output_connections.size() > 0) {
         auto const connections = lock_values(output_connections);
         if (connections.count(0) > 0) {
