@@ -54,10 +54,6 @@ struct test_io_core : audio::io_core {
             return handler.value()();
         }
     }
-
-    audio::pcm_buffer const *input_buffer_on_render() const override {
-        return nullptr;
-    }
 };
 
 using test_io_core_ptr = std::shared_ptr<test_io_core>;

@@ -157,14 +157,6 @@ chaining::chain_sync_t<audio::io::device_chaining_pair_t> audio::io::device_chai
     return this->_device_fetcher->chain();
 }
 
-audio::pcm_buffer const *audio::io::input_buffer_on_render() const {
-    if (auto const &io_core = this->_io_core) {
-        return io_core.value()->input_buffer_on_render();
-    } else {
-        return nullptr;
-    }
-}
-
 void audio::io::_reload() {
     bool const is_running = this->is_running();
 

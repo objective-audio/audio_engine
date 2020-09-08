@@ -65,14 +65,6 @@ void audio::mac_io_core::stop() {
     this->_is_started = false;
 }
 
-audio::pcm_buffer const *audio::mac_io_core::input_buffer_on_render() const {
-    if (this->_kernel && this->_kernel->input_buffer) {
-        return this->_kernel->input_buffer.get();
-    } else {
-        return nullptr;
-    }
-}
-
 void audio::mac_io_core::_make_kernel() {
     if (this->_kernel) {
         return;

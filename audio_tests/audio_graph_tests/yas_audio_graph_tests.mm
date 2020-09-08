@@ -23,10 +23,6 @@ struct test_io_core : io_core {
     }
     void stop() override {
     }
-
-    pcm_buffer const *input_buffer_on_render() const override {
-        return nullptr;
-    }
 };
 
 struct test_io_device : io_device {
