@@ -19,7 +19,15 @@
 
 using namespace yas;
 
-#pragma mark - audio::io
+#pragma mark - audio::graph_input_context
+
+namespace yas::audio {
+struct graph_input_context {
+    audio::pcm_buffer *input_buffer = nullptr;
+};
+}
+
+#pragma mark - audio::graph_io
 
 audio::graph_io::graph_io(audio::io_ptr const &raw_io)
     : _output_node(graph_node::make_shared({.input_bus_count = 1, .output_bus_count = 0})),
@@ -52,15 +60,14 @@ audio::io_ptr const &audio::graph_io::raw_io() {
 void audio::graph_io::_prepare(graph_io_ptr const &shared) {
     this->_weak_graph_io = to_weak(shared);
 
-    this->_input_node->set_render_handler([weak_graph_io = this->_weak_graph_io](graph_node::render_args args) {
-        auto const &buffer = args.buffer;
+    this->_input_context = std::make_shared<graph_input_context>();
 
-        if (auto graph_io = weak_graph_io.lock()) {
-            auto const *input_buffer = graph_io->_raw_io->input_buffer_on_render();
-            if (input_buffer) {
-                if (input_buffer->format() == buffer->format()) {
-                    buffer->copy_from(*input_buffer);
-                }
+    this->_input_node->set_render_handler([input_context = this->_input_context](graph_node::render_args args) {
+        auto const &buffer = args.buffer;
+        auto const *input_buffer = input_context->input_buffer;
+        if (input_buffer) {
+            if (input_buffer->format() == buffer->format()) {
+                buffer->copy_from(*input_buffer);
             }
         }
     });
@@ -76,7 +83,10 @@ void audio::graph_io::_update_io_connections() {
 
     auto weak_io = to_weak(raw_io);
 
-    auto render_handler = [weak_graph_io = this->_weak_graph_io, weak_io](io_render_args args) {
+    auto render_handler = [weak_graph_io = this->_weak_graph_io, weak_io,
+                           input_context = this->_input_context](io_render_args args) {
+        input_context->input_buffer = args.input_buffer;
+
         if (auto graph_io = weak_graph_io.lock()) {
             if (auto const kernel_opt = graph_io->output_node()->kernel()) {
                 auto const &kernel = kernel_opt.value();
@@ -114,6 +124,8 @@ void audio::graph_io::_update_io_connections() {
                 }
             }
         }
+
+        input_context->input_buffer = nullptr;
     };
 
     raw_io->set_render_handler(std::move(render_handler));

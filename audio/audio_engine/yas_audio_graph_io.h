@@ -11,6 +11,8 @@
 #include <chaining/yas_chaining_umbrella.h>
 
 namespace yas::audio {
+class graph_input_context;
+
 struct graph_io : manageable_graph_io {
     virtual ~graph_io();
 
@@ -26,6 +28,7 @@ struct graph_io : manageable_graph_io {
     audio::graph_node_ptr _output_node;
     audio::graph_node_ptr _input_node;
     audio::io_ptr _raw_io;
+    std::shared_ptr<graph_input_context> _input_context = nullptr;
     chaining::observer_pool _pool;
 
     graph_io(audio::io_ptr const &);
