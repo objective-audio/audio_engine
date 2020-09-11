@@ -19,19 +19,38 @@
 
 using namespace yas;
 
-#pragma mark - audio::io
+#pragma mark - audio::graph_input_context
+
+namespace yas::audio {
+struct graph_input_context {
+    audio::pcm_buffer *input_buffer = nullptr;
+};
+}
+
+#pragma mark - audio::graph_io
 
 audio::graph_io::graph_io(audio::io_ptr const &raw_io)
-    : _node(graph_node::make_shared({.input_bus_count = 1, .output_bus_count = 1})), _raw_io(raw_io) {
-    this->_connections_observer = this->_node->chain(graph_node::method::update_connections)
-                                      .perform([this](auto const &) { this->_update_io_connections(); })
-                                      .end();
+    : _output_node(graph_node::make_shared({.input_bus_count = 1, .output_bus_count = 0})),
+      _input_node(graph_node::make_shared({.input_bus_count = 0, .output_bus_count = 1})),
+      _raw_io(raw_io) {
+    this->_output_node->chain(graph_node::method::update_connections)
+        .perform([this](auto const &) { this->_update_io_connections(); })
+        .end()
+        ->add_to(this->_pool);
+    this->_input_node->chain(graph_node::method::update_connections)
+        .perform([this](auto const &) { this->_update_io_connections(); })
+        .end()
+        ->add_to(this->_pool);
 }
 
 audio::graph_io::~graph_io() = default;
 
-audio::graph_node_ptr const &audio::graph_io::node() const {
-    return this->_node;
+audio::graph_node_ptr const &audio::graph_io::output_node() const {
+    return this->_output_node;
+}
+
+audio::graph_node_ptr const &audio::graph_io::input_node() const {
+    return this->_input_node;
 }
 
 audio::io_ptr const &audio::graph_io::raw_io() {
@@ -41,15 +60,14 @@ audio::io_ptr const &audio::graph_io::raw_io() {
 void audio::graph_io::_prepare(graph_io_ptr const &shared) {
     this->_weak_graph_io = to_weak(shared);
 
-    this->_node->set_render_handler([weak_graph_io = this->_weak_graph_io](graph_node::render_args args) {
-        auto const &buffer = args.buffer;
+    this->_input_context = std::make_shared<graph_input_context>();
 
-        if (auto graph_io = weak_graph_io.lock()) {
-            auto const *input_buffer = graph_io->_raw_io->input_buffer_on_render();
-            if (input_buffer) {
-                if (input_buffer->format() == buffer->format()) {
-                    buffer->copy_from(*input_buffer);
-                }
+    this->_input_node->set_render_handler([input_context = this->_input_context](graph_node::render_args args) {
+        auto const &buffer = args.buffer;
+        auto const *input_buffer = input_context->input_buffer;
+        if (input_buffer) {
+            if (input_buffer->format() == buffer->format()) {
+                buffer->copy_from(*input_buffer);
             }
         }
     });
@@ -65,9 +83,12 @@ void audio::graph_io::_update_io_connections() {
 
     auto weak_io = to_weak(raw_io);
 
-    auto render_handler = [weak_graph_io = this->_weak_graph_io, weak_io](io_render_args args) {
+    auto render_handler = [weak_graph_io = this->_weak_graph_io, weak_io,
+                           input_context = this->_input_context](io_render_args args) {
+        input_context->input_buffer = args.input_buffer;
+
         if (auto graph_io = weak_graph_io.lock()) {
-            if (auto const kernel_opt = graph_io->node()->kernel()) {
+            if (auto const kernel_opt = graph_io->output_node()->kernel()) {
                 auto const &kernel = kernel_opt.value();
                 auto const connections = kernel->input_connections();
                 if (connections.count(0) > 0) {
@@ -81,8 +102,11 @@ void audio::graph_io::_update_io_connections() {
                         }
                     }
                 }
+            }
 
+            if (auto const kernel_opt = graph_io->input_node()->kernel()) {
                 if (auto io = weak_io.lock()) {
+                    auto const &kernel = kernel_opt.value();
                     auto const connections = kernel->output_connections();
                     if (connections.count(0) > 0) {
                         auto const &connection = connections.at(0);
@@ -100,6 +124,8 @@ void audio::graph_io::_update_io_connections() {
                 }
             }
         }
+
+        input_context->input_buffer = nullptr;
     };
 
     raw_io->set_render_handler(std::move(render_handler));
@@ -108,7 +134,7 @@ void audio::graph_io::_update_io_connections() {
 bool audio::graph_io::_validate_connections() {
     auto const &raw_io = this->_raw_io;
 
-    auto &input_connections = manageable_graph_node::cast(this->_node)->input_connections();
+    auto &input_connections = manageable_graph_node::cast(this->_output_node)->input_connections();
     if (input_connections.size() > 0) {
         auto const connections = lock_values(input_connections);
         if (connections.count(0) > 0) {
@@ -136,7 +162,7 @@ bool audio::graph_io::_validate_connections() {
         }
     }
 
-    auto &output_connections = manageable_graph_node::cast(this->_node)->output_connections();
+    auto &output_connections = manageable_graph_node::cast(this->_input_node)->output_connections();
     if (output_connections.size() > 0) {
         auto const connections = lock_values(output_connections);
         if (connections.count(0) > 0) {

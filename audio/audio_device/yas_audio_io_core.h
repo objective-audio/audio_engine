@@ -19,8 +19,6 @@ struct io_core {
 
     virtual bool start() = 0;
     virtual void stop() = 0;
-
-    [[nodiscard]] virtual pcm_buffer const *input_buffer_on_render() const = 0;
 };
 
 using io_core_ptr = std::shared_ptr<io_core>;

@@ -41,7 +41,7 @@ using namespace yas;
 
     auto const &offline_io = graph->add_io(device);
 
-    auto const to_connection = graph->connect(to_tap->node(), offline_io->node(), format);
+    auto const to_connection = graph->connect(to_tap->node(), offline_io->output_node(), format);
 
     auto weak_to_tap = to_weak(to_tap);
     auto to_render_handler = [weak_to_tap, self, to_connection = to_connection, from_connection = from_connection,
@@ -98,7 +98,7 @@ using namespace yas;
         [&completion_expectation](bool const) { [completion_expectation fulfill]; });
     auto const &offline_io = graph->add_io(device);
 
-    graph->connect(to_tap->node(), offline_io->node(), format);
+    graph->connect(to_tap->node(), offline_io->output_node(), format);
 
     XCTAssertTrue(graph->start_render());
 

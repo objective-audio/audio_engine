@@ -42,8 +42,6 @@ struct io final {
     chaining::chain_unsync_t<running_method> running_chain() const;
     chaining::chain_sync_t<device_chaining_pair_t> device_chain() const;
 
-    [[nodiscard]] pcm_buffer const *input_buffer_on_render() const;
-
     [[nodiscard]] static io_ptr make_shared(std::optional<io_device_ptr> const &);
 
    private:

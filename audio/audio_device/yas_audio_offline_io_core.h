@@ -19,8 +19,6 @@ struct offline_io_core : io_core {
     bool start() override;
     void stop() override;
 
-    [[nodiscard]] pcm_buffer const *input_buffer_on_render() const override;
-
     static offline_io_core_ptr make_shared(offline_device_ptr const &);
 
    private:

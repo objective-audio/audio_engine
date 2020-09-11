@@ -123,7 +123,7 @@ using namespace yas;
     auto const offline_io = graph->add_io(device);
     offline_io->raw_io()->set_maximum_frames_per_slice(frames_per_render);
 
-    graph->connect(sample_delay_au->node(), offline_io->node(), format);
+    graph->connect(sample_delay_au->node(), offline_io->output_node(), format);
     graph->connect(tap->node(), sample_delay_au->node(), format);
 
     auto start_result = graph->start_render();
