@@ -12,17 +12,20 @@
 
 namespace yas::audio {
 struct rendering_node {
+    using node_map = std::unordered_map<uint32_t, rendering_node *>;
+
     struct render_args {
         audio::pcm_buffer *const buffer;
         uint32_t const bus_idx;
         audio::time const &time;
 
-        std::unordered_map<uint32_t, rendering_node *> const &input_nodes;
+        node_map const &input_nodes;
     };
 
-    std::unordered_map<uint32_t, rendering_node *> const input_nodes;
+    using render_f = std::function<void(render_args const &)>;
 
-    void render(render_args const &);
+    render_f const render_handler;
+    node_map const input_nodes;
 };
 
 using rendering_node_set = std::unordered_set<rendering_node>;
