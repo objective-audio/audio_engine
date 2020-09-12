@@ -27,7 +27,7 @@ struct rendering_node {
     render_f const render_handler;
     node_map const input_nodes;
 
-    void render(audio::pcm_buffer *const, uint32_t const bus_idx, audio::time const &);
+    void render(audio::pcm_buffer *const, uint32_t const bus_idx, audio::time const &) const;
 
    private:
     rendering_node(rendering_node const &) = delete;
