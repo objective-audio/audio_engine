@@ -52,9 +52,13 @@ using namespace yas;
 
     XCTAssertEqual(called.size(), 4);
     XCTAssertEqual(called.at(0).first, called_node::output);
+    XCTAssertEqual(called.at(0).second, 0);
     XCTAssertEqual(called.at(1).first, called_node::input_0);
+    XCTAssertEqual(called.at(1).second, 0);
     XCTAssertEqual(called.at(2).first, called_node::input_1);
+    XCTAssertEqual(called.at(2).second, 1);
     XCTAssertEqual(called.at(3).first, called_node::input_1);
+    XCTAssertEqual(called.at(3).second, 2);
 }
 
 @end
