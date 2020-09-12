@@ -23,6 +23,8 @@ struct rendering_node {
     };
 
     std::unordered_map<uint32_t, rendering_connection *> const input_connections;
+
+    void render(render_args const &);
 };
 
 using rendering_node_set = std::unordered_set<rendering_node>;
