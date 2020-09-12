@@ -26,6 +26,12 @@ struct rendering_node {
 
     render_f const render_handler;
     node_map const input_nodes;
+
+   private:
+    rendering_node(rendering_node const &) = delete;
+    rendering_node(rendering_node &&) = delete;
+    rendering_node &operator=(rendering_node const &) = delete;
+    rendering_node &operator=(rendering_node &&) = delete;
 };
 
 using rendering_node_set = std::unordered_set<rendering_node>;
