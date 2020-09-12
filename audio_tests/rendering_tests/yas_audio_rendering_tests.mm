@@ -17,38 +17,29 @@ using namespace yas;
     enum called_node {
         input_0,
         input_1,
-        input_2,
-        middle_0,
-        middle_1,
-        last,
+        output,
     };
 
-    std::vector<called_node> called;
+    std::vector<std::pair<called_node, uint32_t>> called;
 
     audio::rendering_node const input_node_0{
-        .render_handler = [&called](auto const &args) { called.emplace_back(called_node::input_0); },
+        .render_handler = [&called](auto const &args) { called.emplace_back(called_node::input_0, args.bus_idx); },
         .source_connections = {}};
     audio::rendering_node const input_node_1{
-        .render_handler = [&called](auto const &args) { called.emplace_back(called_node::input_1); },
+        .render_handler = [&called](auto const &args) { called.emplace_back(called_node::input_1, args.bus_idx); },
         .source_connections = {}};
 
-    audio::rendering_node const middle_node_0{
-        .render_handler = [&called](auto const &args) { called.emplace_back(called_node::middle_0); },
-        .source_connections = {{0, {.source_bus_idx = 0, .source_node = &input_node_0}}}};
-    audio::rendering_node const middle_node_1{
-        .render_handler = [&called](auto const &args) { called.emplace_back(called_node::middle_1); },
-        .source_connections = {{0, {.source_bus_idx = 0, .source_node = &input_node_1}},
-                               {1, {.source_bus_idx = 1, .source_node = &input_node_1}}}};
-
-    audio::rendering_node const last_node{
+    audio::rendering_node const output_node{
         .render_handler =
-            [&called](auto const &args) {
-                called.emplace_back(called_node::last);
+            [&called](audio::rendering_node::render_args const &args) {
+                called.emplace_back(called_node::output, args.bus_idx);
                 for (auto [bus_idx, connection] : args.source_connections) {
+                    connection.render(args.buffer, args.time);
                 }
             },
-        .source_connections = {{0, {.source_bus_idx = 0, .source_node = &middle_node_0}},
-                               {1, {.source_bus_idx = 0, .source_node = &middle_node_1}}}};
+        .source_connections = {{0, {.source_bus_idx = 0, .source_node = &input_node_0}},
+                               {1, {.source_bus_idx = 1, .source_node = &input_node_1}},
+                               {2, {.source_bus_idx = 2, .source_node = &input_node_1}}}};
 
     XCTAssertEqual(called.size(), 0);
 
@@ -56,10 +47,14 @@ using namespace yas;
     audio::pcm_buffer buffer{format, 2};
     audio::time time{0};
 
-    last_node.render_handler(
-        {.buffer = &buffer, .bus_idx = 0, .time = time, .source_connections = last_node.source_connections});
+    output_node.render_handler(
+        {.buffer = &buffer, .bus_idx = 0, .time = time, .source_connections = output_node.source_connections});
 
-    XCTAssertEqual(called.size(), 1);
+    XCTAssertEqual(called.size(), 4);
+    XCTAssertEqual(called.at(0).first, called_node::output);
+    XCTAssertEqual(called.at(1).first, called_node::input_0);
+    XCTAssertEqual(called.at(2).first, called_node::input_1);
+    XCTAssertEqual(called.at(3).first, called_node::input_1);
 }
 
 @end
