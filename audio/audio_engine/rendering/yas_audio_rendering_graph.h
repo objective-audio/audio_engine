@@ -3,3 +3,7 @@
 //
 
 #pragma once
+
+namespace yas::audio {
+struct rendering_graph {};
+}  // namespace yas::audio
