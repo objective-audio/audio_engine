@@ -8,7 +8,7 @@
 
 namespace yas::audio {
 struct rendering_graph {
-    rendering_node_set const nodes;
+    std::vector<rendering_node> const nodes;
 
    private:
     rendering_graph(rendering_graph const &) = delete;

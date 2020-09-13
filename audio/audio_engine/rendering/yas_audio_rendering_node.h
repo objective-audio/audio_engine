@@ -8,7 +8,6 @@
 #include <audio/yas_audio_time.h>
 
 #include <map>
-#include <unordered_set>
 
 namespace yas::audio {
 class rendering_node;
@@ -42,6 +41,4 @@ struct rendering_node {
     rendering_node &operator=(rendering_node const &) = delete;
     rendering_node &operator=(rendering_node &&) = delete;
 };
-
-using rendering_node_set = std::unordered_set<rendering_node>;
 }  // namespace yas::audio
