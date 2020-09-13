@@ -32,13 +32,18 @@ struct rendering_node {
 
     using render_f = std::function<void(render_args const &)>;
 
-    render_f const render_handler;
-    connection_map const source_connections;
+    rendering_node(render_f &&, connection_map &&);
+    rendering_node(rendering_node &&);
+
+    render_f const &render_handler() const;
+    connection_map const &source_connections() const;
 
    private:
     rendering_node(rendering_node const &) = delete;
-    rendering_node(rendering_node &&) = delete;
     rendering_node &operator=(rendering_node const &) = delete;
     rendering_node &operator=(rendering_node &&) = delete;
+
+    render_f _render_handler;
+    connection_map _source_connections;
 };
 }  // namespace yas::audio

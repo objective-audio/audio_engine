@@ -28,44 +28,41 @@ using namespace yas;
     std::vector<called_context> called;
 
     audio::rendering_node const input_node_0{
-        .render_handler =
-            [&called](audio::rendering_node::render_args const &args) {
-                called.emplace_back(called_context{.node = called_node::input_0, .bus_idx = args.bus_idx});
+        [&called](audio::rendering_node::render_args const &args) {
+            called.emplace_back(called_context{.node = called_node::input_0, .bus_idx = args.bus_idx});
 
-                if (args.bus_idx == 0) {
-                    args.buffer->data_ptr_at_index<float>(0)[0] = 0.1f;
-                }
-            },
-        .source_connections = {}};
+            if (args.bus_idx == 0) {
+                args.buffer->data_ptr_at_index<float>(0)[0] = 0.1f;
+            }
+        },
+        {}};
     audio::rendering_node const input_node_1{
-        .render_handler =
-            [&called](audio::rendering_node::render_args const &args) {
-                called.emplace_back(called_context{.node = called_node::input_1, .bus_idx = args.bus_idx});
+        [&called](audio::rendering_node::render_args const &args) {
+            called.emplace_back(called_context{.node = called_node::input_1, .bus_idx = args.bus_idx});
 
-                if (args.bus_idx == 1) {
-                    args.buffer->data_ptr_at_index<float>(0)[1] = 0.2f;
-                } else if (args.bus_idx == 2) {
-                    args.buffer->data_ptr_at_index<float>(0)[2] = 0.3f;
-                }
-            },
-        .source_connections = {}};
+            if (args.bus_idx == 1) {
+                args.buffer->data_ptr_at_index<float>(0)[1] = 0.2f;
+            } else if (args.bus_idx == 2) {
+                args.buffer->data_ptr_at_index<float>(0)[2] = 0.3f;
+            }
+        },
+        {}};
 
     audio::rendering_node const output_node{
-        .render_handler =
-            [&called](audio::rendering_node::render_args const &args) {
-                called.emplace_back(called_context{.node = called_node::output, .bus_idx = args.bus_idx});
+        [&called](audio::rendering_node::render_args const &args) {
+            called.emplace_back(called_context{.node = called_node::output, .bus_idx = args.bus_idx});
 
-                if (args.bus_idx == 0) {
-                    args.buffer->data_ptr_at_index<float>(0)[3] = 0.4f;
-                }
+            if (args.bus_idx == 0) {
+                args.buffer->data_ptr_at_index<float>(0)[3] = 0.4f;
+            }
 
-                for (auto [bus_idx, connection] : args.source_connections) {
-                    connection.render(args.buffer, args.time);
-                }
-            },
-        .source_connections = {{0, {.source_bus_idx = 0, .source_node = &input_node_0}},
-                               {1, {.source_bus_idx = 1, .source_node = &input_node_1}},
-                               {2, {.source_bus_idx = 2, .source_node = &input_node_1}}}};
+            for (auto [bus_idx, connection] : args.source_connections) {
+                connection.render(args.buffer, args.time);
+            }
+        },
+        {{0, {.source_bus_idx = 0, .source_node = &input_node_0}},
+         {1, {.source_bus_idx = 1, .source_node = &input_node_1}},
+         {2, {.source_bus_idx = 2, .source_node = &input_node_1}}}};
 
     XCTAssertEqual(called.size(), 0);
 
@@ -73,8 +70,8 @@ using namespace yas;
     audio::pcm_buffer buffer{format, 4};
     audio::time time{0};
 
-    output_node.render_handler(
-        {.buffer = &buffer, .bus_idx = 0, .time = time, .source_connections = output_node.source_connections});
+    output_node.render_handler()(
+        {.buffer = &buffer, .bus_idx = 0, .time = time, .source_connections = output_node.source_connections()});
 
     XCTAssertEqual(called.size(), 4);
     XCTAssertEqual(called.at(0).node, called_node::output);
