@@ -18,6 +18,8 @@ struct rendering_connection {
     rendering_node const *const source_node;
     audio::format const format;
 
+    rendering_connection(uint32_t const src_bus_idx, rendering_node const *const src_node, audio::format const format);
+
     bool render(audio::pcm_buffer *const, audio::time const &) const;
 };
 

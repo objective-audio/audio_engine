@@ -62,9 +62,7 @@ using namespace yas;
                 connection.render(args.buffer, args.time);
             }
         },
-        {{0, {.source_bus_idx = 0, .source_node = &input_node_0, .format = format}},
-         {1, {.source_bus_idx = 1, .source_node = &input_node_1, .format = format}},
-         {2, {.source_bus_idx = 2, .source_node = &input_node_1, .format = format}}}};
+        {{0, {0, &input_node_0, format}}, {1, {1, &input_node_1, format}}, {2, {2, &input_node_1, format}}}};
 
     XCTAssertEqual(called.size(), 0);
 

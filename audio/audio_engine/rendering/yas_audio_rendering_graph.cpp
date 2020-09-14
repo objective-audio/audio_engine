@@ -21,9 +21,8 @@ std::vector<std::unique_ptr<rendering_node>> make_rendering_nodes(graph_node_ptr
 
         std::vector<std::unique_ptr<rendering_node>> src_rendering_nodes = make_rendering_nodes(src_node);
 
-        connections.emplace(dst_bus_idx, rendering_connection{.source_bus_idx = connection->source_bus,
-                                                              .source_node = src_rendering_nodes.at(0).get(),
-                                                              .format = connection->format});
+        connections.emplace(dst_bus_idx, rendering_connection{connection->source_bus, src_rendering_nodes.at(0).get(),
+                                                              connection->format});
 
         yas::move_back_insert(sub_nodes, std::move(src_rendering_nodes));
     }
