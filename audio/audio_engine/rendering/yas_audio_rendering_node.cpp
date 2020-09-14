@@ -17,10 +17,6 @@ audio::rendering_node::rendering_node(render_f &&handler, connection_map &&conne
     : _render_handler(std::move(handler)), _source_connections(std::move(connections)) {
 }
 
-audio::rendering_node::rendering_node(rendering_node &&rhs)
-    : _render_handler(std::move(rhs._render_handler)), _source_connections(std::move(rhs._source_connections)) {
-}
-
 audio::rendering_node::render_f const &audio::rendering_node::render_handler() const {
     return this->_render_handler;
 }

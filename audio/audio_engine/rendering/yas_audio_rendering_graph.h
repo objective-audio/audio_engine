@@ -8,11 +8,13 @@
 #include <audio/yas_audio_graph_node.h>
 #include <audio/yas_audio_rendering_node.h>
 
+#include <memory>
+
 namespace yas::audio {
 struct rendering_graph {
-    std::vector<rendering_node> const nodes;
+    std::vector<std::unique_ptr<rendering_node>> const nodes;
 
-    rendering_graph(graph_node_set const &, graph_connection_set const &);
+    rendering_graph(graph_node_ptr const &end_node);
 
    private:
     rendering_graph(rendering_graph const &) = delete;

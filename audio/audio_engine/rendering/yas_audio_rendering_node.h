@@ -33,13 +33,13 @@ struct rendering_node {
     using render_f = std::function<void(render_args const &)>;
 
     rendering_node(render_f &&, connection_map &&);
-    rendering_node(rendering_node &&);
 
     render_f const &render_handler() const;
     connection_map const &source_connections() const;
 
    private:
     rendering_node(rendering_node const &) = delete;
+    rendering_node(rendering_node &&) = delete;
     rendering_node &operator=(rendering_node const &) = delete;
     rendering_node &operator=(rendering_node &&) = delete;
 
