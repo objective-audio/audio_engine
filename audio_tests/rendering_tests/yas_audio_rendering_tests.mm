@@ -25,6 +25,8 @@ using namespace yas;
         uint32_t bus_idx;
     };
 
+    audio::format format{{.sample_rate = 4, .channel_count = 1}};
+
     std::vector<called_context> called;
 
     audio::rendering_node const input_node_0{
@@ -60,13 +62,12 @@ using namespace yas;
                 connection.render(args.buffer, args.time);
             }
         },
-        {{0, {.source_bus_idx = 0, .source_node = &input_node_0}},
-         {1, {.source_bus_idx = 1, .source_node = &input_node_1}},
-         {2, {.source_bus_idx = 2, .source_node = &input_node_1}}}};
+        {{0, {.source_bus_idx = 0, .source_node = &input_node_0, .format = format}},
+         {1, {.source_bus_idx = 1, .source_node = &input_node_1, .format = format}},
+         {2, {.source_bus_idx = 2, .source_node = &input_node_1, .format = format}}}};
 
     XCTAssertEqual(called.size(), 0);
 
-    audio::format format{{.sample_rate = 4, .channel_count = 1}};
     audio::pcm_buffer buffer{format, 4};
     audio::time time{0};
 
