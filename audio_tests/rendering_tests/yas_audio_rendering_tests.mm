@@ -13,7 +13,7 @@ using namespace yas;
 
 @implementation yas_audio_rendering_tests
 
-- (void)test_render {
+- (void)test_rendering_node {
     enum called_node {
         input_0,
         input_1,
@@ -88,6 +88,9 @@ using namespace yas;
     XCTAssertEqual(data[1], 0.2f);
     XCTAssertEqual(data[2], 0.3f);
     XCTAssertEqual(data[3], 0.4f);
+}
+
+- (void)test_rendering_graph {
 }
 
 @end
