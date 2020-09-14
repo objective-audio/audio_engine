@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <audio/yas_audio_format.h>
 #include <audio/yas_audio_pcm_buffer.h>
 #include <audio/yas_audio_time.h>
 
@@ -15,8 +16,9 @@ class rendering_node;
 struct rendering_connection {
     uint32_t const source_bus_idx;
     rendering_node const *const source_node;
+    audio::format const format;
 
-    void render(audio::pcm_buffer *const, audio::time const &) const;
+    bool render(audio::pcm_buffer *const, audio::time const &) const;
 };
 
 struct rendering_node {

@@ -17,13 +17,13 @@ std::vector<std::unique_ptr<rendering_node>> make_rendering_nodes(graph_node_ptr
     for (auto const &pair : node->input_connections()) {
         uint32_t const dst_bus_idx = pair.first;
         graph_connection_ptr const connection = pair.second.lock();
-        uint32_t const src_bus_idx = connection->source_bus;
         graph_node_ptr const src_node = connection->source_node();
 
         std::vector<std::unique_ptr<rendering_node>> src_rendering_nodes = make_rendering_nodes(src_node);
 
-        connections.emplace(dst_bus_idx, rendering_connection{.source_bus_idx = src_bus_idx,
-                                                              .source_node = src_rendering_nodes.at(0).get()});
+        connections.emplace(dst_bus_idx, rendering_connection{.source_bus_idx = connection->source_bus,
+                                                              .source_node = src_rendering_nodes.at(0).get(),
+                                                              .format = connection->format});
 
         yas::move_back_insert(sub_nodes, std::move(src_rendering_nodes));
     }
