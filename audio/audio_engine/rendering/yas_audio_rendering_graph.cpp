@@ -12,7 +12,7 @@ namespace yas::audio {
 
 std::vector<std::unique_ptr<rendering_node>> make_rendering_nodes(graph_node_ptr const &node) {
     std::vector<std::unique_ptr<rendering_node>> sub_nodes;
-    rendering_node::connection_map connections;
+    rendering_connection_map connections;
 
     for (auto const &pair : node->input_connections()) {
         uint32_t const dst_bus_idx = pair.first;

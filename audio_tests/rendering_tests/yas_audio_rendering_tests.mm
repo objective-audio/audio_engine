@@ -30,7 +30,7 @@ using namespace yas;
     std::vector<called_context> called;
 
     audio::rendering_node const input_node_0{
-        [&called](audio::rendering_node::render_args const &args) {
+        [&called](audio::node_render_args const &args) {
             called.emplace_back(called_context{.node = called_node::input_0, .bus_idx = args.bus_idx});
 
             if (args.bus_idx == 0) {
@@ -39,7 +39,7 @@ using namespace yas;
         },
         {}};
     audio::rendering_node const input_node_1{
-        [&called](audio::rendering_node::render_args const &args) {
+        [&called](audio::node_render_args const &args) {
             called.emplace_back(called_context{.node = called_node::input_1, .bus_idx = args.bus_idx});
 
             if (args.bus_idx == 1) {
@@ -51,7 +51,7 @@ using namespace yas;
         {}};
 
     audio::rendering_node const output_node{
-        [&called](audio::rendering_node::render_args const &args) {
+        [&called](audio::node_render_args const &args) {
             called.emplace_back(called_context{.node = called_node::output, .bus_idx = args.bus_idx});
 
             if (args.bus_idx == 0) {

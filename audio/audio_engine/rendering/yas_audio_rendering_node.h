@@ -6,9 +6,8 @@
 
 #include <audio/yas_audio_format.h>
 #include <audio/yas_audio_pcm_buffer.h>
+#include <audio/yas_audio_rendering_types.h>
 #include <audio/yas_audio_time.h>
-
-#include <map>
 
 namespace yas::audio {
 class rendering_node;
@@ -26,22 +25,12 @@ struct rendering_connection {
 };
 
 struct rendering_node {
-    using connection_map = std::map<uint32_t, rendering_connection>;
+    using render_f = std::function<void(node_render_args const &)>;
 
-    struct render_args {
-        audio::pcm_buffer *const buffer;
-        uint32_t const bus_idx;
-        audio::time const &time;
-
-        connection_map const &source_connections;
-    };
-
-    using render_f = std::function<void(render_args const &)>;
-
-    rendering_node(render_f &&, connection_map &&);
+    rendering_node(render_f &&, rendering_connection_map &&);
 
     render_f const &render_handler() const;
-    connection_map const &source_connections() const;
+    rendering_connection_map const &source_connections() const;
 
    private:
     rendering_node(rendering_node const &) = delete;
@@ -50,6 +39,6 @@ struct rendering_node {
     rendering_node &operator=(rendering_node &&) = delete;
 
     render_f _render_handler;
-    connection_map _source_connections;
+    rendering_connection_map _source_connections;
 };
 }  // namespace yas::audio
