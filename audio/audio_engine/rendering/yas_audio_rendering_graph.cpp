@@ -28,7 +28,7 @@ std::vector<std::unique_ptr<rendering_node>> make_rendering_nodes(graph_node_ptr
     }
 
     std::vector<std::unique_ptr<rendering_node>> result;
-    result.emplace_back(std::make_unique<rendering_node>([](auto const &) {}, std::move(connections)));
+    result.emplace_back(std::make_unique<rendering_node>(node->render_handler(), std::move(connections)));
 
     if (!sub_nodes.empty()) {
         yas::move_back_insert(result, std::move(sub_nodes));

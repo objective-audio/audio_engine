@@ -10,7 +10,7 @@ namespace yas::audio {
 struct rendering_node {
     using render_f = std::function<void(node_render_args const &)>;
 
-    rendering_node(render_f &&, rendering_connection_map &&);
+    rendering_node(render_f const &, rendering_connection_map &&);
 
     render_f const &render_handler() const;
     rendering_connection_map const &source_connections() const;

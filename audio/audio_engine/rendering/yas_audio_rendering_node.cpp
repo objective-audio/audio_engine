@@ -8,8 +8,8 @@
 
 using namespace yas;
 
-audio::rendering_node::rendering_node(render_f &&handler, rendering_connection_map &&connections)
-    : _render_handler(std::move(handler)), _source_connections(std::move(connections)) {
+audio::rendering_node::rendering_node(render_f const &handler, rendering_connection_map &&connections)
+    : _render_handler(handler), _source_connections(std::move(connections)) {
 }
 
 audio::rendering_node::render_f const &audio::rendering_node::render_handler() const {
