@@ -6,6 +6,7 @@
 
 #include <audio/yas_audio_graph_connection.h>
 #include <audio/yas_audio_graph_node.h>
+#include <audio/yas_audio_rendering_connection.h>
 #include <audio/yas_audio_rendering_node.h>
 
 #include <memory>

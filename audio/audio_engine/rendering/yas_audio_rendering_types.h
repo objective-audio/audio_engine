@@ -4,6 +4,9 @@
 
 #pragma once
 
+#include <audio/yas_audio_pcm_buffer.h>
+#include <audio/yas_audio_time.h>
+
 #include <map>
 
 namespace yas::audio {
