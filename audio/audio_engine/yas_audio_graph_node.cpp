@@ -164,6 +164,10 @@ void audio::graph_node::set_render_handler(render_f handler) {
     this->_render_handler = std::move(handler);
 }
 
+audio::graph_node::render_f const audio::graph_node::render_handler() const {
+    return this->_render_handler;
+}
+
 std::optional<audio::graph_kernel_ptr> audio::graph_node::kernel() const {
     return this->_core->kernel();
 }

@@ -57,6 +57,7 @@ struct graph_node : connectable_graph_node, manageable_graph_node {
 
     void set_prepare_kernel_handler(prepare_kernel_f);
     void set_render_handler(render_f);
+    render_f const render_handler() const;
 
     std::optional<graph_kernel_ptr> kernel() const;
 
