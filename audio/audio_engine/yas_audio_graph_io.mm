@@ -9,7 +9,7 @@
 #include "yas_audio_debug.h"
 #include "yas_audio_graph_tap.h"
 #include "yas_audio_io.h"
-#include "yas_audio_rendering_node.h"
+#include "yas_audio_rendering_connection.h"
 #include "yas_audio_time.h"
 
 #if TARGET_OS_IPHONE

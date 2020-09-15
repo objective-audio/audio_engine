@@ -8,7 +8,7 @@
 #include <cpp_utils/yas_stl_utils.h>
 
 #include "yas_audio_graph_node.h"
-#include "yas_audio_rendering_node.h"
+#include "yas_audio_rendering_connection.h"
 
 using namespace yas;
 

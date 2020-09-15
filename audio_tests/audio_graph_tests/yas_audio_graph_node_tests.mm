@@ -2,7 +2,7 @@
 //  yas_audio_graph_node_tests.m
 //
 
-#import <audio/yas_audio_rendering_node.h>
+#import <audio/yas_audio_rendering_connection.h>
 #import "yas_audio_test_utils.h"
 
 using namespace yas;

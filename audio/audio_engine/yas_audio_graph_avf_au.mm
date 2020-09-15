@@ -10,7 +10,7 @@
 #include <cpp_utils/yas_thread.h>
 #include "yas_audio_avf_au_parameter.h"
 #include "yas_audio_avf_au_parameter_core.h"
-#include "yas_audio_rendering_node.h"
+#include "yas_audio_rendering_connection.h"
 #include "yas_audio_time.h"
 
 using namespace yas;

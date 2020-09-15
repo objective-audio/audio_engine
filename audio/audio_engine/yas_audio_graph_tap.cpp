@@ -4,7 +4,7 @@
 
 #include "yas_audio_graph_tap.h"
 
-#include "yas_audio_rendering_node.h"
+#include "yas_audio_rendering_connection.h"
 
 using namespace yas;
 
