@@ -10,6 +10,7 @@
 #include <cpp_utils/yas_thread.h>
 #include "yas_audio_avf_au_parameter.h"
 #include "yas_audio_avf_au_parameter_core.h"
+#include "yas_audio_rendering_node.h"
 #include "yas_audio_time.h"
 
 using namespace yas;
@@ -53,7 +54,7 @@ void audio::graph_avf_au::_prepare(graph_avf_au_ptr const &shared, AudioComponen
 
     auto weak_au = to_weak(shared);
 
-    this->_node->set_render_handler([weak_au](graph_node::render_args args) {
+    this->_node->set_render_handler([weak_au](node_render_args args) {
         if (auto shared_au = weak_au.lock()) {
             auto const &raw_au = shared_au->_raw_au;
 
@@ -65,7 +66,8 @@ void audio::graph_avf_au::_prepare(graph_avf_au_ptr const &shared, AudioComponen
                                            if (auto src_node = connection->source_node()) {
                                                src_node->render({.buffer = input_args.buffer,
                                                                  .bus_idx = input_args.bus_idx,
-                                                                 .time = input_args.time});
+                                                                 .time = input_args.time,
+                                                                 .source_connections = {}});
                                            }
                                        }
                                    }

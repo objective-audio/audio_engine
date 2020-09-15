@@ -9,6 +9,7 @@
 #include "yas_audio_debug.h"
 #include "yas_audio_graph_tap.h"
 #include "yas_audio_io.h"
+#include "yas_audio_rendering_node.h"
 #include "yas_audio_time.h"
 
 #if TARGET_OS_IPHONE
@@ -62,7 +63,7 @@ void audio::graph_io::_prepare(graph_io_ptr const &shared) {
 
     this->_input_context = std::make_shared<graph_input_context>();
 
-    this->_input_node->set_render_handler([input_context = this->_input_context](graph_node::render_args args) {
+    this->_input_node->set_render_handler([input_context = this->_input_context](node_render_args args) {
         auto const &buffer = args.buffer;
         auto const *input_buffer = input_context->input_buffer;
         if (input_buffer) {
@@ -98,7 +99,8 @@ void audio::graph_io::_update_io_connections() {
                         if (auto const time = args.output_time) {
                             src_node->render({.buffer = args.output_buffer,
                                               .bus_idx = connection->source_bus,
-                                              .time = time.value()});
+                                              .time = time.value(),
+                                              .source_connections = {}});
                         }
                     }
                 }
@@ -116,7 +118,10 @@ void audio::graph_io::_update_io_connections() {
                             auto const &input_time = args.input_time;
                             if (input_buffer && input_time) {
                                 if (connection->format == dst_node->input_format(connection->destination_bus)) {
-                                    dst_node->render({.buffer = input_buffer, .bus_idx = 0, .time = *input_time});
+                                    dst_node->render({.buffer = input_buffer,
+                                                      .bus_idx = 0,
+                                                      .time = *input_time,
+                                                      .source_connections = {}});
                                 }
                             }
                         }

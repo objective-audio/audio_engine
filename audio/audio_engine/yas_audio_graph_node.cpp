@@ -170,7 +170,7 @@ std::optional<audio::graph_kernel_ptr> audio::graph_node::kernel() const {
 
 #pragma mark render thread
 
-void audio::graph_node::render(render_args args) {
+void audio::graph_node::render(node_render_args args) {
     this->set_render_time_on_render(args.time);
 
     if (this->_render_handler) {

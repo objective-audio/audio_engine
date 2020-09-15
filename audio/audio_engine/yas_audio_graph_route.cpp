@@ -8,6 +8,7 @@
 #include <cpp_utils/yas_stl_utils.h>
 
 #include "yas_audio_graph_node.h"
+#include "yas_audio_rendering_node.h"
 
 using namespace yas;
 
@@ -38,7 +39,7 @@ audio::graph_route::~graph_route() = default;
 void audio::graph_route::_prepare(graph_route_ptr const &shared) {
     auto weak_route = to_weak(shared);
 
-    this->_node->set_render_handler([weak_route](graph_node::render_args args) {
+    this->_node->set_render_handler([weak_route](node_render_args args) {
         auto &dst_buffer = args.buffer;
         auto const dst_bus_idx = args.bus_idx;
 
@@ -59,7 +60,10 @@ void audio::graph_route::_prepare(graph_route_ptr const &shared) {
                             if (auto const result = channel_map_from_routes(routes, src_bus_idx, src_ch_count,
                                                                             dst_bus_idx, dst_ch_count)) {
                                 pcm_buffer src_buffer(src_format, *dst_buffer, result.value());
-                                node->render({.buffer = &src_buffer, .bus_idx = src_bus_idx, .time = args.time});
+                                node->render({.buffer = &src_buffer,
+                                              .bus_idx = src_bus_idx,
+                                              .time = args.time,
+                                              .source_connections = {}});
                             }
                         }
                     }
