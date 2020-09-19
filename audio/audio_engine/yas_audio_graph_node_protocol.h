@@ -6,6 +6,7 @@
 
 #include <audio/yas_audio_graph_connection_protocol.h>
 #include <audio/yas_audio_ptr.h>
+#include <audio/yas_audio_rendering_types.h>
 
 #include <optional>
 
@@ -49,5 +50,10 @@ struct manageable_graph_node {
     static manageable_graph_node_ptr cast(manageable_graph_node_ptr const &node) {
         return node;
     }
+};
+
+struct renderable_graph_node {
+    virtual graph_connection_wmap const &input_connections() const = 0;
+    virtual node_render_f const render_handler() const = 0;
 };
 }  // namespace yas::audio

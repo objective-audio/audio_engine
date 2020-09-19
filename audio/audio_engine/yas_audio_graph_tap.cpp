@@ -13,7 +13,7 @@ using namespace yas;
 struct audio::graph_tap::kernel {
     kernel() = default;
 
-    std::optional<audio::graph_node::render_f> render_handler = std::nullopt;
+    std::optional<audio::node_render_f> render_handler = std::nullopt;
 
    private:
     kernel(kernel const &) = delete;
@@ -68,7 +68,7 @@ void audio::graph_tap::_prepare(graph_tap_ptr const &shared) {
     });
 }
 
-void audio::graph_tap::set_render_handler(audio::graph_node::render_f handler) {
+void audio::graph_tap::set_render_handler(audio::node_render_f handler) {
     this->_render_handler = handler;
 
     manageable_graph_node::cast(this->_node)->update_kernel();

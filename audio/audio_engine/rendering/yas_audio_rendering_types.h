@@ -21,4 +21,6 @@ struct node_render_args {
 
     rendering_connection_map const &source_connections;
 };
+
+using node_render_f = std::function<void(node_render_args const &)>;
 }  // namespace yas::audio

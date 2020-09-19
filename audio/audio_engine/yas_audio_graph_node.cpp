@@ -160,11 +160,11 @@ void audio::graph_node::set_prepare_kernel_handler(prepare_kernel_f handler) {
     this->_prepare_kernel_handler = std::move(handler);
 }
 
-void audio::graph_node::set_render_handler(render_f handler) {
+void audio::graph_node::set_render_handler(node_render_f handler) {
     this->_render_handler = std::move(handler);
 }
 
-audio::graph_node::render_f const audio::graph_node::render_handler() const {
+audio::node_render_f const audio::graph_node::render_handler() const {
     return this->_render_handler;
 }
 

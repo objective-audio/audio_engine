@@ -9,7 +9,6 @@
 #include <audio/yas_audio_graph_node_protocol.h>
 #include <audio/yas_audio_pcm_buffer.h>
 #include <audio/yas_audio_ptr.h>
-#include <audio/yas_audio_rendering_types.h>
 #include <audio/yas_audio_types.h>
 #include <chaining/yas_chaining_umbrella.h>
 
@@ -31,7 +30,6 @@ struct graph_node : connectable_graph_node, manageable_graph_node {
     using chaining_pair_t = std::pair<method, graph_node_ptr>;
 
     using prepare_kernel_f = std::function<void(graph_kernel &)>;
-    using render_f = std::function<void(node_render_args)>;
 
     virtual ~graph_node();
 
@@ -56,8 +54,8 @@ struct graph_node : connectable_graph_node, manageable_graph_node {
     bool is_input_renderable() const;
 
     void set_prepare_kernel_handler(prepare_kernel_f);
-    void set_render_handler(render_f);
-    render_f const render_handler() const;
+    void set_render_handler(node_render_f);
+    node_render_f const render_handler() const;
 
     std::optional<graph_kernel_ptr> kernel() const;
 
@@ -81,7 +79,7 @@ struct graph_node : connectable_graph_node, manageable_graph_node {
     graph_node_setup_f _setup_handler;
     graph_node_setup_f _teardown_handler;
     prepare_kernel_f _prepare_kernel_handler;
-    audio::graph_node::render_f _render_handler;
+    audio::node_render_f _render_handler;
     chaining::notifier_ptr<chaining_pair_t> _notifier = chaining::notifier<chaining_pair_t>::make_shared();
 
     struct core;
