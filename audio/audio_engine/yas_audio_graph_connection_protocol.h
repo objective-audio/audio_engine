@@ -25,4 +25,6 @@ struct graph_node_removable {
         return removable;
     }
 };
+
+struct renderable_graph_connection {};
 }  // namespace yas::audio

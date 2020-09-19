@@ -45,6 +45,7 @@ class connectable_graph_node;
 class manageable_graph_node;
 class renderable_graph_node;
 class manageable_graph_avf_au;
+class renderable_graph_connection;
 
 using pcm_buffer_ptr = std::shared_ptr<pcm_buffer>;
 using time_ptr = std::shared_ptr<time>;
@@ -85,4 +86,5 @@ using connectable_graph_node_ptr = std::shared_ptr<connectable_graph_node>;
 using manageable_graph_node_ptr = std::shared_ptr<manageable_graph_node>;
 using renderable_graph_node_ptr = std::shared_ptr<renderable_graph_node>;
 using manageable_graph_avf_au_ptr = std::shared_ptr<manageable_graph_avf_au>;
+using renderable_graph_connection_ptr = std::shared_ptr<renderable_graph_connection>;
 }  // namespace yas::audio

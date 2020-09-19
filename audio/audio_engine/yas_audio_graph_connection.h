@@ -9,7 +9,7 @@
 #include <audio/yas_audio_ptr.h>
 
 namespace yas::audio {
-struct graph_connection : graph_node_removable {
+struct graph_connection : graph_node_removable, renderable_graph_connection {
     virtual ~graph_connection();
 
     uint32_t const source_bus;
