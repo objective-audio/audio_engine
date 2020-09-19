@@ -4,20 +4,22 @@
 
 #include "yas_audio_rendering_graph.h"
 
+#include <audio/yas_audio_graph_connection.h>
+#include <audio/yas_audio_graph_node.h>
 #include <cpp_utils/yas_stl_utils.h>
 
 using namespace yas;
 
 namespace yas::audio {
 
-std::vector<std::unique_ptr<rendering_node>> make_rendering_nodes(graph_node_ptr const &node) {
+std::vector<std::unique_ptr<rendering_node>> make_rendering_nodes(renderable_graph_node_ptr const &node) {
     std::vector<std::unique_ptr<rendering_node>> sub_nodes;
     rendering_connection_map connections;
 
     for (auto const &pair : node->input_connections()) {
         uint32_t const dst_bus_idx = pair.first;
         graph_connection_ptr const connection = pair.second.lock();
-        graph_node_ptr const src_node = connection->source_node();
+        renderable_graph_node_ptr const src_node = connection->source_node();
 
         std::vector<std::unique_ptr<rendering_node>> src_rendering_nodes = make_rendering_nodes(src_node);
 
@@ -38,5 +40,6 @@ std::vector<std::unique_ptr<rendering_node>> make_rendering_nodes(graph_node_ptr
 }
 }  // namespace yas::audio
 
-audio::rendering_graph::rendering_graph(graph_node_ptr const &end_node) : nodes(make_rendering_nodes(end_node)) {
+audio::rendering_graph::rendering_graph(renderable_graph_node_ptr const &end_node)
+    : nodes(make_rendering_nodes(end_node)) {
 }
