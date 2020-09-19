@@ -264,7 +264,7 @@ void audio::graph::_disconnect_node_with_predicate(std::function<bool(graph_conn
     auto connections =
         filter(this->_connections, [&predicate](auto const &connection) { return predicate(*connection); });
 
-    std::unordered_set<graph_node_ptr> update_nodes;
+    graph_node_set update_nodes;
 
     for (auto connection : connections) {
         update_nodes.insert(connection->source_node());

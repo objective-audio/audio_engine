@@ -5,8 +5,7 @@
 #pragma once
 
 #include <audio/yas_audio_graph_connection.h>
-#include <audio/yas_audio_ptr.h>
-#include <audio/yas_audio_types.h>
+#include <audio/yas_audio_graph_node.h>
 #include <chaining/yas_chaining_umbrella.h>
 
 #include <ostream>
@@ -52,14 +51,14 @@ struct graph final {
     [[nodiscard]] static graph_ptr make_shared();
 
     // for Test
-    std::unordered_set<graph_node_ptr> const &nodes() const;
+    graph_node_set const &nodes() const;
     graph_connection_set const &connections() const;
 
    private:
     std::weak_ptr<graph> _weak_graph;
     std::optional<chaining::any_observer_ptr> _io_observer = std::nullopt;
 
-    std::unordered_set<graph_node_ptr> _nodes;
+    graph_node_set _nodes;
     graph_connection_set _connections;
 
     graph();

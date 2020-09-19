@@ -9,6 +9,7 @@
 #include <audio/yas_audio_graph_node_protocol.h>
 #include <audio/yas_audio_pcm_buffer.h>
 #include <audio/yas_audio_ptr.h>
+#include <audio/yas_audio_rendering_types.h>
 #include <audio/yas_audio_types.h>
 #include <chaining/yas_chaining_umbrella.h>
 
@@ -29,14 +30,8 @@ struct graph_node : connectable_graph_node, manageable_graph_node {
 
     using chaining_pair_t = std::pair<method, graph_node_ptr>;
 
-    struct render_args {
-        audio::pcm_buffer *const buffer;
-        uint32_t const bus_idx;
-        audio::time const &time;
-    };
-
     using prepare_kernel_f = std::function<void(graph_kernel &)>;
-    using render_f = std::function<void(render_args)>;
+    using render_f = std::function<void(node_render_args)>;
 
     virtual ~graph_node();
 
@@ -62,10 +57,11 @@ struct graph_node : connectable_graph_node, manageable_graph_node {
 
     void set_prepare_kernel_handler(prepare_kernel_f);
     void set_render_handler(render_f);
+    render_f const render_handler() const;
 
     std::optional<graph_kernel_ptr> kernel() const;
 
-    void render(render_args);
+    void render(node_render_args);
     void set_render_time_on_render(audio::time const &time);
 
     [[nodiscard]] chaining::chain_unsync_t<chaining_pair_t> chain() const;

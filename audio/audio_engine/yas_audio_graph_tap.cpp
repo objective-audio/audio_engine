@@ -4,6 +4,8 @@
 
 #include "yas_audio_graph_tap.h"
 
+#include "yas_audio_rendering_connection.h"
+
 using namespace yas;
 
 #pragma mark - audio::tap_kernel
@@ -30,7 +32,7 @@ audio::graph_tap::graph_tap(args &&args)
 void audio::graph_tap::_prepare(graph_tap_ptr const &shared) {
     auto weak_tap = to_weak(shared);
 
-    this->_node->set_render_handler([weak_tap](graph_node::render_args args) {
+    this->_node->set_render_handler([weak_tap](node_render_args args) {
         if (auto tap = weak_tap.lock()) {
             if (auto const kernel = tap->_node->kernel()) {
                 tap->_kernel_on_render = kernel;
@@ -92,10 +94,13 @@ audio::graph_connection_smap audio::graph_tap::output_connections_on_render() co
     return this->_kernel_on_render.value()->output_connections();
 }
 
-void audio::graph_tap::render_source(audio::graph_node::render_args args) {
+void audio::graph_tap::render_source(node_render_args args) {
     if (auto connection = this->_kernel_on_render.value()->input_connection(args.bus_idx)) {
         if (auto node = connection->source_node()) {
-            node->render({.buffer = args.buffer, .bus_idx = connection->source_bus, .time = args.time});
+            node->render({.buffer = args.buffer,
+                          .bus_idx = connection->source_bus,
+                          .time = args.time,
+                          .source_connections = {}});
         }
     }
 }

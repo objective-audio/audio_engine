@@ -2,6 +2,7 @@
 //  yas_audio_tap_tests.m
 //
 
+#import <audio/yas_audio_rendering_connection.h>
 #import "yas_audio_test_utils.h"
 
 using namespace yas;
@@ -45,7 +46,7 @@ using namespace yas;
 
     auto weak_to_tap = to_weak(to_tap);
     auto to_render_handler = [weak_to_tap, self, to_connection = to_connection, from_connection = from_connection,
-                              to_expectation](audio::graph_node::render_args args) {
+                              to_expectation](audio::node_render_args args) {
         auto &buffer = args.buffer;
         auto const &output_time = args.time;
 
@@ -60,7 +61,7 @@ using namespace yas;
             XCTAssertEqual(from_connection, node->input_connection_on_render(0));
             XCTAssertFalse(node->input_connection_on_render(1));
 
-            node->render_source({.buffer = buffer, .bus_idx = 0, .time = output_time});
+            node->render_source({.buffer = buffer, .bus_idx = 0, .time = output_time, .source_connections = {}});
         }
 
         [to_expectation fulfill];

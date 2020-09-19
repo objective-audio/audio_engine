@@ -10,6 +10,7 @@
 #include <optional>
 
 namespace yas::audio {
+using graph_node_set = std::unordered_set<graph_node_ptr>;
 using graph_node_setup_f = std::function<void(void)>;
 
 struct graph_node_args {

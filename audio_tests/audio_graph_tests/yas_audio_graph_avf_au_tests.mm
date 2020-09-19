@@ -26,7 +26,7 @@ using namespace yas;
     XCTAssertTrue(au);
 }
 
-#if TARGET_OS_IPHONE
+#if FALSE && TARGET_OS_IPHONE
 - (void)test_restore_parameters {
     auto graph = audio::graph::make_shared();
 

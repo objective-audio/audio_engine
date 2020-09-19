@@ -2,6 +2,7 @@
 //  yas_audio_graph_node_tests.m
 //
 
+#import <audio/yas_audio_rendering_connection.h>
 #import "yas_audio_test_utils.h"
 
 using namespace yas;
@@ -108,7 +109,7 @@ using namespace yas;
 
     auto lambda = [self, node, time, render_expectation]() mutable {
         audio::pcm_buffer_ptr null_buffer{nullptr};
-        node->render({.buffer = nullptr, .bus_idx = 0, .time = time});
+        node->render({.buffer = nullptr, .bus_idx = 0, .time = time, .source_connections = {}});
         [render_expectation fulfill];
     };
 
