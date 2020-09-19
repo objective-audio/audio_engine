@@ -200,10 +200,10 @@ chaining::chain_relayed_unsync_t<audio::graph_node_ptr, audio::graph_node::chain
 void audio::graph_node::add_connection(audio::graph_connection_ptr const &connection) {
     auto weak_connection = to_weak(connection);
     if (connection->destination_node().get() == this) {
-        auto bus_idx = connection->destination_bus;
+        auto bus_idx = connection->destination_bus();
         this->_input_connections.insert(std::make_pair(bus_idx, weak_connection));
     } else if (connection->source_node().get() == this) {
-        auto bus_idx = connection->source_bus;
+        auto bus_idx = connection->source_bus();
         this->_output_connections.insert(std::make_pair(bus_idx, weak_connection));
     } else {
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : connection does not exist in a node.");

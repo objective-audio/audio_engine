@@ -98,7 +98,7 @@ void audio::graph_tap::render_source(node_render_args args) {
     if (auto connection = this->_kernel_on_render.value()->input_connection(args.bus_idx)) {
         if (auto node = connection->source_node()) {
             node->render({.buffer = args.buffer,
-                          .bus_idx = connection->source_bus,
+                          .bus_idx = connection->source_bus(),
                           .time = args.time,
                           .source_connections = {}});
         }

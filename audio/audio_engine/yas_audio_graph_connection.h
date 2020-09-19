@@ -12,13 +12,15 @@ namespace yas::audio {
 struct graph_connection : graph_node_removable, renderable_graph_connection {
     virtual ~graph_connection();
 
-    uint32_t const source_bus;
-    uint32_t const destination_bus;
+    uint32_t source_bus() const;
+    uint32_t destination_bus() const;
     audio::graph_node_ptr source_node() const;
     audio::graph_node_ptr destination_node() const;
     audio::format const format;
 
    private:
+    uint32_t const _source_bus;
+    uint32_t const _destination_bus;
     mutable std::recursive_mutex _mutex;
     std::weak_ptr<graph_node> _source_node;
     std::weak_ptr<graph_node> _destination_node;

@@ -30,9 +30,9 @@ using namespace yas;
     auto connection = audio::graph_connection::make_shared(src_obj.node, src_bus, dst_obj.node, dst_bus, format);
 
     XCTAssertTrue(connection->source_node() == src_obj.node);
-    XCTAssertTrue(connection->source_bus == src_bus);
+    XCTAssertTrue(connection->source_bus() == src_bus);
     XCTAssertTrue(connection->destination_node() == dst_obj.node);
-    XCTAssertTrue(connection->destination_bus == dst_bus);
+    XCTAssertTrue(connection->destination_bus() == dst_bus);
     XCTAssertTrue(connection->format == format);
 
     XCTAssertTrue(audio::manageable_graph_node::cast(src_obj.node)->output_connection(src_bus) == connection);
