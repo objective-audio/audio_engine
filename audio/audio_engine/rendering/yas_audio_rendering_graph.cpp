@@ -36,7 +36,7 @@ std::vector<std::unique_ptr<rendering_node>> make_rendering_nodes(renderable_gra
         yas::move_back_insert(result, std::move(sub_nodes));
     }
 
-    return {};
+    return result;
 }
 }  // namespace yas::audio
 
