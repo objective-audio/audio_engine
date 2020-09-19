@@ -16,7 +16,7 @@ struct graph_connection : graph_node_removable, renderable_graph_connection {
     uint32_t destination_bus() const;
     audio::graph_node_ptr source_node() const;
     audio::graph_node_ptr destination_node() const;
-    audio::format const format;
+    audio::format const &format() const;
 
    private:
     uint32_t const _source_bus;
@@ -25,6 +25,7 @@ struct graph_connection : graph_node_removable, renderable_graph_connection {
     std::weak_ptr<graph_node> _source_node;
     std::weak_ptr<graph_node> _destination_node;
     std::weak_ptr<graph_connection> _weak_connection;
+    audio::format const _format;
 
     graph_connection(audio::graph_node_ptr const &source_node, uint32_t const source_bus_idx,
                      audio::graph_node_ptr const &destination_node, uint32_t const destination_bus_idx,

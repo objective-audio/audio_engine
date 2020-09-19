@@ -17,7 +17,7 @@ audio::graph_connection::graph_connection(graph_node_ptr const &src_node, uint32
                                           audio::format const &format)
     : _source_bus(src_bus),
       _destination_bus(dst_bus),
-      format(format),
+      _format(format),
       _source_node(to_weak(src_node)),
       _destination_node(to_weak(dst_node)) {
 }
@@ -47,6 +47,10 @@ audio::graph_node_ptr audio::graph_connection::source_node() const {
 audio::graph_node_ptr audio::graph_connection::destination_node() const {
     std::lock_guard<std::recursive_mutex> lock(this->_mutex);
     return this->_destination_node.lock();
+}
+
+audio::format const &audio::graph_connection::format() const {
+    return this->_format;
 }
 
 void audio::graph_connection::remove_nodes() {

@@ -33,7 +33,7 @@ using namespace yas;
     XCTAssertTrue(connection->source_bus() == src_bus);
     XCTAssertTrue(connection->destination_node() == dst_obj.node);
     XCTAssertTrue(connection->destination_bus() == dst_bus);
-    XCTAssertTrue(connection->format == format);
+    XCTAssertTrue(connection->format() == format);
 
     XCTAssertTrue(audio::manageable_graph_node::cast(src_obj.node)->output_connection(src_bus) == connection);
     XCTAssertTrue(audio::manageable_graph_node::cast(dst_obj.node)->input_connection(dst_bus) == connection);

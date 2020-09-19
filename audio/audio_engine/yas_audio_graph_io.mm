@@ -95,7 +95,7 @@ void audio::graph_io::_update_io_connections() {
                 if (connections.count(0) > 0) {
                     auto const &connection = connections.at(0);
                     if (auto src_node = connection->source_node();
-                        src_node && connection->format == src_node->output_format(connection->source_bus())) {
+                        src_node && connection->format() == src_node->output_format(connection->source_bus())) {
                         if (auto const time = args.output_time) {
                             src_node->render({.buffer = args.output_buffer,
                                               .bus_idx = connection->source_bus(),
@@ -117,7 +117,7 @@ void audio::graph_io::_update_io_connections() {
                             auto const &input_buffer = args.input_buffer;
                             auto const &input_time = args.input_time;
                             if (input_buffer && input_time) {
-                                if (connection->format == dst_node->input_format(connection->destination_bus())) {
+                                if (connection->format() == dst_node->input_format(connection->destination_bus())) {
                                     dst_node->render({.buffer = input_buffer,
                                                       .bus_idx = 0,
                                                       .time = *input_time,
@@ -144,7 +144,7 @@ bool audio::graph_io::_validate_connections() {
         auto const connections = lock_values(input_connections);
         if (connections.count(0) > 0) {
             auto const &connection = connections.at(0);
-            auto const &connection_format = connection->format;
+            auto const &connection_format = connection->format();
             auto const &device_opt = raw_io->device();
             if (!device_opt) {
                 yas_audio_log(("graph_io validate_connections failed - output device is null."));
@@ -172,7 +172,7 @@ bool audio::graph_io::_validate_connections() {
         auto const connections = lock_values(output_connections);
         if (connections.count(0) > 0) {
             auto const &connection = connections.at(0);
-            auto const &connection_format = connection->format;
+            auto const &connection_format = connection->format();
             auto const &device_opt = raw_io->device();
             if (!device_opt) {
                 yas_audio_log("graph_io validate_connections failed - output device is null.");

@@ -88,14 +88,14 @@ audio::graph_connection_wmap const &audio::graph_node::output_connections() cons
 
 std::optional<audio::format> audio::graph_node::input_format(uint32_t const bus_idx) const {
     if (auto connection = this->input_connection(bus_idx)) {
-        return connection->format;
+        return connection->format();
     }
     return std::nullopt;
 }
 
 std::optional<audio::format> audio::graph_node::output_format(uint32_t const bus_idx) const {
     if (auto connection = this->output_connection(bus_idx)) {
-        return connection->format;
+        return connection->format();
     }
     return std::nullopt;
 }
