@@ -18,7 +18,7 @@ std::vector<std::unique_ptr<rendering_node>> make_rendering_nodes(renderable_gra
 
     for (auto const &pair : node->input_connections()) {
         uint32_t const dst_bus_idx = pair.first;
-        graph_connection_ptr const connection = pair.second.lock();
+        renderable_graph_connection_ptr const connection = pair.second.lock();
         renderable_graph_node_ptr const src_node = connection->source_node();
 
         std::vector<std::unique_ptr<rendering_node>> src_rendering_nodes = make_rendering_nodes(src_node);
