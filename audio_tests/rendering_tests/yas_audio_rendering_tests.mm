@@ -4,6 +4,7 @@
 
 #import <XCTest/XCTest.h>
 #include <audio/yas_audio_rendering_graph.h>
+#import "yas_audio_test_utils.h"
 
 using namespace yas;
 
@@ -90,6 +91,17 @@ using namespace yas;
 }
 
 - (void)test_rendering_graph {
+    auto graph = audio::graph::make_shared();
+
+    auto format = audio::format({.sample_rate = 48000.0, .channel_count = 2});
+    test::node_object source_obj(1, 1);
+    test::node_object destination_obj(1, 1);
+
+    auto const connection = graph->connect(source_obj.node, destination_obj.node, format);
+
+    audio::rendering_graph rendering_graph{destination_obj.node};
+
+    XCTAssertEqual(rendering_graph.nodes.size(), 2);
 }
 
 @end
