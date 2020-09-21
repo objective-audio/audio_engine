@@ -51,7 +51,7 @@ struct graph_node : connectable_graph_node, manageable_graph_node, renderable_gr
 
     uint32_t input_bus_count() const;
     uint32_t output_bus_count() const;
-    bool is_input_renderable() const;
+    bool is_input_renderable() const override;
 
     void set_prepare_kernel_handler(prepare_kernel_f);
     void set_render_handler(node_render_f);

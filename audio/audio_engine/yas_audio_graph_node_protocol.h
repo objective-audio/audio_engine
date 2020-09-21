@@ -55,6 +55,7 @@ struct manageable_graph_node {
 struct renderable_graph_node {
     virtual graph_connection_wmap const &input_connections() const = 0;
     virtual graph_connection_wmap const &output_connections() const = 0;
+    virtual bool is_input_renderable() const = 0;
     virtual node_render_f const render_handler() const = 0;
 };
 }  // namespace yas::audio
