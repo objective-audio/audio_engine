@@ -28,7 +28,8 @@ struct graph_node_removable {
 
 struct renderable_graph_connection {
     virtual uint32_t source_bus() const = 0;
-    virtual audio::graph_node_ptr source_node() const = 0;
+    virtual graph_node_ptr source_node() const = 0;
+    virtual graph_node_ptr destination_node() const = 0;
     virtual audio::format const &format() const = 0;
 };
 }  // namespace yas::audio

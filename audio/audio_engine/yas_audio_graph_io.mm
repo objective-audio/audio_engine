@@ -10,6 +10,7 @@
 #include "yas_audio_graph_tap.h"
 #include "yas_audio_io.h"
 #include "yas_audio_rendering_connection.h"
+#include "yas_audio_rendering_graph.h"
 #include "yas_audio_time.h"
 
 #if TARGET_OS_IPHONE
@@ -198,6 +199,27 @@ bool audio::graph_io::_validate_connections() {
     yas_audio_log("graph_io validate_connections succeeded");
 
     return true;
+}
+
+void audio::graph_io::_update_io_rendering() {
+    auto const &raw_io = this->_raw_io;
+
+    if (!this->_validate_connections()) {
+        raw_io->set_render_handler(std::nullopt);
+        return;
+    }
+
+    auto graph = std::make_shared<rendering_graph>(this->output_node(), this->input_node());
+
+    auto render_handler = [input_context = this->_input_context, graph](io_render_args args) {
+        input_context->input_buffer = args.input_buffer;
+
+#warning todo
+
+        input_context->input_buffer = nullptr;
+    };
+
+    raw_io->set_render_handler(std::move(render_handler));
 }
 
 audio::graph_io_ptr audio::graph_io::make_shared(audio::io_ptr const &raw_io) {
