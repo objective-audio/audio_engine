@@ -14,7 +14,7 @@ struct rendering_graph {
     rendering_graph(renderable_graph_node_ptr const &output_node, renderable_graph_node_ptr const &input_node);
 
     std::vector<std::unique_ptr<rendering_node>> const &nodes() const;
-    std::unique_ptr<rendering_node> const &input_node() const;
+    std::vector<std::unique_ptr<rendering_node>> const &input_nodes() const;
 
    private:
     rendering_graph(rendering_graph const &) = delete;
@@ -23,6 +23,6 @@ struct rendering_graph {
     rendering_graph &operator=(rendering_graph &&) = delete;
 
     std::vector<std::unique_ptr<rendering_node>> _nodes;
-    std::unique_ptr<rendering_node> _input_node;
+    std::vector<std::unique_ptr<rendering_node>> _input_nodes;
 };
 }  // namespace yas::audio
