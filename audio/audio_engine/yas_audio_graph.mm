@@ -98,7 +98,7 @@ void audio::graph::disconnect_input(audio::graph_node_ptr const &node) {
 
 void audio::graph::disconnect_input(audio::graph_node_ptr const &node, uint32_t const bus_idx) {
     this->_disconnect_node_with_predicate([&node, bus_idx](auto const &connection) {
-        return (connection.destination_node() == node && connection.destination_bus == bus_idx);
+        return (connection.destination_node() == node && connection.destination_bus() == bus_idx);
     });
 }
 
@@ -109,7 +109,7 @@ void audio::graph::disconnect_output(audio::graph_node_ptr const &node) {
 
 void audio::graph::disconnect_output(audio::graph_node_ptr const &node, uint32_t const bus_idx) {
     this->_disconnect_node_with_predicate([&node, bus_idx](auto const &connection) {
-        return (connection.source_node() == node && connection.source_bus == bus_idx);
+        return (connection.source_node() == node && connection.source_bus() == bus_idx);
     });
 }
 
@@ -312,11 +312,11 @@ bool audio::graph::_add_connection_to_nodes(audio::graph_connection_ptr const &c
 
 void audio::graph::_remove_connection_from_nodes(audio::graph_connection_ptr const &connection) {
     if (auto source_node = connection->source_node()) {
-        connectable_graph_node::cast(source_node)->remove_output_connection(connection->source_bus);
+        connectable_graph_node::cast(source_node)->remove_output_connection(connection->source_bus());
     }
 
     if (auto destination_node = connection->destination_node()) {
-        connectable_graph_node::cast(destination_node)->remove_input_connection(connection->destination_bus);
+        connectable_graph_node::cast(destination_node)->remove_input_connection(connection->destination_bus());
     }
 }
 

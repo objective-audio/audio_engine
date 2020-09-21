@@ -15,20 +15,28 @@ using namespace yas;
 audio::graph_connection::graph_connection(graph_node_ptr const &src_node, uint32_t const src_bus,
                                           graph_node_ptr const &dst_node, uint32_t const dst_bus,
                                           audio::format const &format)
-    : source_bus(src_bus),
-      destination_bus(dst_bus),
-      format(format),
+    : _source_bus(src_bus),
+      _destination_bus(dst_bus),
+      _format(format),
       _source_node(to_weak(src_node)),
       _destination_node(to_weak(dst_node)) {
 }
 
 audio::graph_connection::~graph_connection() {
     if (auto node = this->_destination_node.lock()) {
-        connectable_graph_node::cast(node)->remove_input_connection(this->destination_bus);
+        connectable_graph_node::cast(node)->remove_input_connection(this->_destination_bus);
     }
     if (auto node = this->_source_node.lock()) {
-        connectable_graph_node::cast(node)->remove_output_connection(this->source_bus);
+        connectable_graph_node::cast(node)->remove_output_connection(this->_source_bus);
     }
+}
+
+uint32_t audio::graph_connection::source_bus() const {
+    return this->_source_bus;
+}
+
+uint32_t audio::graph_connection::destination_bus() const {
+    return this->_destination_bus;
 }
 
 audio::graph_node_ptr audio::graph_connection::source_node() const {
@@ -39,6 +47,10 @@ audio::graph_node_ptr audio::graph_connection::source_node() const {
 audio::graph_node_ptr audio::graph_connection::destination_node() const {
     std::lock_guard<std::recursive_mutex> lock(this->_mutex);
     return this->_destination_node.lock();
+}
+
+audio::format const &audio::graph_connection::format() const {
+    return this->_format;
 }
 
 void audio::graph_connection::remove_nodes() {

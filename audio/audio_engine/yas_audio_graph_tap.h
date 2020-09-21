@@ -12,7 +12,7 @@ struct graph_tap final {
         bool is_input = false;
     };
 
-    void set_render_handler(audio::graph_node::render_f);
+    void set_render_handler(audio::node_render_f);
 
     audio::graph_node_ptr const &node() const;
 
@@ -31,7 +31,7 @@ struct graph_tap final {
     class kernel;
 
     graph_node_ptr _node;
-    std::optional<audio::graph_node::render_f> _render_handler;
+    std::optional<audio::node_render_f> _render_handler;
     std::optional<chaining::any_observer_ptr> _reset_observer = std::nullopt;
     std::optional<graph_kernel_ptr> _kernel_on_render = std::nullopt;
 

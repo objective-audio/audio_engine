@@ -131,7 +131,7 @@ void audio::graph_avf_au::_update_unit_connections() {
             uint32_t const bus_idx = yas_each_index(each);
 
             if (auto connection = manageable_graph_node::cast(this->_node)->input_connection(bus_idx)) {
-                raw_au->set_input_format(connection->format, bus_idx);
+                raw_au->set_input_format(connection->format(), bus_idx);
             }
         }
     }
@@ -142,7 +142,7 @@ void audio::graph_avf_au::_update_unit_connections() {
         while (yas_each_next(each)) {
             uint32_t const bus_idx = yas_each_index(each);
             if (auto connection = manageable_graph_node::cast(this->_node)->output_connection(bus_idx)) {
-                raw_au->set_output_format(connection->format, bus_idx);
+                raw_au->set_output_format(connection->format(), bus_idx);
             }
         }
     }

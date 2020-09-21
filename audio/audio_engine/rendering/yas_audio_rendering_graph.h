@@ -4,8 +4,6 @@
 
 #pragma once
 
-#include <audio/yas_audio_graph_connection.h>
-#include <audio/yas_audio_graph_node.h>
 #include <audio/yas_audio_rendering_connection.h>
 #include <audio/yas_audio_rendering_node.h>
 
@@ -15,7 +13,7 @@ namespace yas::audio {
 struct rendering_graph {
     std::vector<std::unique_ptr<rendering_node>> const nodes;
 
-    rendering_graph(graph_node_ptr const &end_node);
+    rendering_graph(renderable_graph_node_ptr const &end_node);
 
    private:
     rendering_graph(rendering_graph const &) = delete;

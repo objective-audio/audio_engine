@@ -88,14 +88,14 @@ audio::graph_connection_wmap const &audio::graph_node::output_connections() cons
 
 std::optional<audio::format> audio::graph_node::input_format(uint32_t const bus_idx) const {
     if (auto connection = this->input_connection(bus_idx)) {
-        return connection->format;
+        return connection->format();
     }
     return std::nullopt;
 }
 
 std::optional<audio::format> audio::graph_node::output_format(uint32_t const bus_idx) const {
     if (auto connection = this->output_connection(bus_idx)) {
-        return connection->format;
+        return connection->format();
     }
     return std::nullopt;
 }
@@ -160,11 +160,11 @@ void audio::graph_node::set_prepare_kernel_handler(prepare_kernel_f handler) {
     this->_prepare_kernel_handler = std::move(handler);
 }
 
-void audio::graph_node::set_render_handler(render_f handler) {
+void audio::graph_node::set_render_handler(node_render_f handler) {
     this->_render_handler = std::move(handler);
 }
 
-audio::graph_node::render_f const audio::graph_node::render_handler() const {
+audio::node_render_f const audio::graph_node::render_handler() const {
     return this->_render_handler;
 }
 
@@ -200,10 +200,10 @@ chaining::chain_relayed_unsync_t<audio::graph_node_ptr, audio::graph_node::chain
 void audio::graph_node::add_connection(audio::graph_connection_ptr const &connection) {
     auto weak_connection = to_weak(connection);
     if (connection->destination_node().get() == this) {
-        auto bus_idx = connection->destination_bus;
+        auto bus_idx = connection->destination_bus();
         this->_input_connections.insert(std::make_pair(bus_idx, weak_connection));
     } else if (connection->source_node().get() == this) {
-        auto bus_idx = connection->source_bus;
+        auto bus_idx = connection->source_bus();
         this->_output_connections.insert(std::make_pair(bus_idx, weak_connection));
     } else {
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : connection does not exist in a node.");

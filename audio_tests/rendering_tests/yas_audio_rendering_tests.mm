@@ -4,6 +4,7 @@
 
 #import <XCTest/XCTest.h>
 #include <audio/yas_audio_rendering_graph.h>
+#import "yas_audio_test_utils.h"
 
 using namespace yas;
 
@@ -90,6 +91,30 @@ using namespace yas;
 }
 
 - (void)test_rendering_graph {
+    auto graph = audio::graph::make_shared();
+
+    audio::format format_0{{.sample_rate = 48000.0, .channel_count = 2}};
+    audio::format format_1{{.sample_rate = 96000.0, .channel_count = 4}};
+    test::node_object source_obj_0(0, 1);
+    test::node_object source_obj_1(0, 1);
+    test::node_object destination_obj(2, 1);
+
+    auto const connection_0 = graph->connect(source_obj_0.node, destination_obj.node, format_0);
+    auto const connection_1 = graph->connect(source_obj_1.node, destination_obj.node, format_1);
+
+    audio::rendering_graph rendering_graph{destination_obj.node};
+
+    XCTAssertEqual(rendering_graph.nodes.size(), 3);
+    auto const &end_node = rendering_graph.nodes.at(0);
+    XCTAssertEqual(end_node->source_connections().size(), 2);
+    auto const &src_connection_0 = end_node->source_connections().at(0);
+    XCTAssertEqual(src_connection_0.source_bus_idx, 0);
+    XCTAssertEqual(src_connection_0.format, format_0);
+    auto const &src_connection_1 = end_node->source_connections().at(1);
+    XCTAssertEqual(src_connection_1.source_bus_idx, 0);
+    XCTAssertEqual(src_connection_1.format, format_1);
+    auto const &first_node = rendering_graph.nodes.at(1);
+    XCTAssertEqual(first_node->source_connections().size(), 0);
 }
 
 @end
