@@ -20,6 +20,17 @@ audio::rendering_connection_map const &audio::rendering_node::source_connections
     return this->_source_connections;
 }
 
+bool audio::rendering_node::output_render(pcm_buffer *const buffer, audio::time const &time) const {
+    if (!buffer || this->source_connections().empty()) {
+        return false;
+    }
+
+    auto const &pair = *this->source_connections().begin();
+    auto const &connection = pair.second;
+
+    return connection.render(buffer, time);
+}
+
 bool audio::rendering_node::input_render(pcm_buffer *const buffer, audio::time const &time) const {
     if (!buffer || this->source_connections().empty()) {
         return false;

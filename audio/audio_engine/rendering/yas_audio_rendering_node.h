@@ -13,6 +13,7 @@ struct rendering_node {
     node_render_f const &render_handler() const;
     rendering_connection_map const &source_connections() const;
 
+    bool output_render(pcm_buffer *const, audio::time const &) const;
     bool input_render(pcm_buffer *const, audio::time const &) const;
 
    private:

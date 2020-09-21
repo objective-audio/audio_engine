@@ -216,12 +216,8 @@ void audio::graph_io::_update_io_rendering() {
 
         if (auto *const buffer = args.output_buffer; !graph->output_nodes().empty()) {
             auto const &node = graph->output_nodes().front();
-            if (!node->source_connections().empty()) {
-                auto const &pair = *node->source_connections().begin();
-                auto const &connection = pair.second;
-                if (auto const &time = args.output_time; connection.format == buffer->format()) {
-                    connection.render(buffer, time.value());
-                }
+            if (auto const &time = args.output_time) {
+                node->output_render(buffer, time.value());
             }
         }
 
