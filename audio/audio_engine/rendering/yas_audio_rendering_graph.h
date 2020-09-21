@@ -11,7 +11,7 @@
 
 namespace yas::audio {
 struct rendering_graph {
-    rendering_graph(renderable_graph_node_ptr const &end_node);
+    rendering_graph(renderable_graph_node_ptr const &output_node);
 
     std::vector<std::unique_ptr<rendering_node>> const &nodes() const;
 

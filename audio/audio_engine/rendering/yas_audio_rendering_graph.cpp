@@ -40,8 +40,8 @@ std::vector<std::unique_ptr<rendering_node>> make_rendering_nodes(renderable_gra
 }
 }  // namespace yas::audio
 
-audio::rendering_graph::rendering_graph(renderable_graph_node_ptr const &end_node)
-    : _nodes(make_rendering_nodes(end_node)) {
+audio::rendering_graph::rendering_graph(renderable_graph_node_ptr const &output_node)
+    : _nodes(make_rendering_nodes(output_node)) {
 }
 
 std::vector<std::unique_ptr<audio::rendering_node>> const &audio::rendering_graph::nodes() const {
