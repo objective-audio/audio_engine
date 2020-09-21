@@ -109,9 +109,9 @@ using namespace yas;
     audio::rendering_graph rendering_graph{destination_obj.node, input_source_obj.node};
 
     {
-        XCTAssertEqual(rendering_graph.nodes().size(), 3);
+        XCTAssertEqual(rendering_graph.output_nodes().size(), 3);
 
-        auto const &end_node = rendering_graph.nodes().at(0);
+        auto const &end_node = rendering_graph.output_nodes().at(0);
         XCTAssertEqual(end_node->source_connections().size(), 2);
         auto const &src_connection_0 = end_node->source_connections().at(0);
         XCTAssertEqual(src_connection_0.source_bus_idx, 0);
@@ -120,7 +120,7 @@ using namespace yas;
         XCTAssertEqual(src_connection_1.source_bus_idx, 0);
         XCTAssertEqual(src_connection_1.format, format_1);
 
-        auto const &first_node = rendering_graph.nodes().at(1);
+        auto const &first_node = rendering_graph.output_nodes().at(1);
         XCTAssertEqual(first_node->source_connections().size(), 0);
     }
 

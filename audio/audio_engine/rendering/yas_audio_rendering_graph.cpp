@@ -78,7 +78,7 @@ audio::rendering_graph::rendering_graph(renderable_graph_node_ptr const &output_
     : _nodes(make_rendering_nodes(output_node)), _input_nodes(make_input_rendering_nodes(input_node)) {
 }
 
-std::vector<std::unique_ptr<audio::rendering_node>> const &audio::rendering_graph::nodes() const {
+std::vector<std::unique_ptr<audio::rendering_node>> const &audio::rendering_graph::output_nodes() const {
     return this->_nodes;
 }
 
