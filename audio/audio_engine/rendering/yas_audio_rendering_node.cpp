@@ -47,3 +47,24 @@ bool audio::rendering_node::input_render(pcm_buffer *const buffer, audio::time c
 
     return true;
 }
+
+#pragma mark - rendering_output_node
+
+audio::rendering_output_node::rendering_output_node(rendering_connection_map &&connections)
+    : _source_connections(std::move(connections)) {
+}
+
+audio::rendering_connection_map const &audio::rendering_output_node::source_connections() const {
+    return this->_source_connections;
+}
+
+bool audio::rendering_output_node::output_render(pcm_buffer *const buffer, audio::time const &time) const {
+    if (!buffer || this->source_connections().empty()) {
+        return false;
+    }
+
+    auto const &pair = *this->source_connections().begin();
+    auto const &connection = pair.second;
+
+    return connection.render(buffer, time);
+}

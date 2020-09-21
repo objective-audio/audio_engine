@@ -25,4 +25,20 @@ struct rendering_node {
     node_render_f _render_handler;
     rendering_connection_map _source_connections;
 };
+
+struct rendering_output_node {
+    rendering_output_node(rendering_connection_map &&);
+
+    rendering_connection_map const &source_connections() const;
+
+    bool output_render(pcm_buffer *const, audio::time const &) const;
+
+   private:
+    rendering_output_node(rendering_output_node const &) = delete;
+    rendering_output_node(rendering_output_node &&) = delete;
+    rendering_output_node &operator=(rendering_output_node const &) = delete;
+    rendering_output_node &operator=(rendering_output_node &&) = delete;
+
+    rendering_connection_map _source_connections;
+};
 }  // namespace yas::audio
