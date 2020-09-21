@@ -85,3 +85,7 @@ std::vector<std::unique_ptr<audio::rendering_node>> const &audio::rendering_grap
 std::vector<std::unique_ptr<audio::rendering_node>> const &audio::rendering_graph::input_nodes() const {
     return this->_input_nodes;
 }
+
+audio::rendering_input_node const *audio::rendering_graph::input_node() const {
+    return this->_input_node ? this->_input_node.get() : nullptr;
+}

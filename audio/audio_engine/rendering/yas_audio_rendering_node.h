@@ -44,9 +44,9 @@ struct rendering_output_node {
 
 struct rendering_input_node {
     rendering_input_node(audio::format const &, node_render_f const &);
-    
+
     audio::format const &format() const;
-    
+
     bool input_render(pcm_buffer *const, audio::time const &) const;
 
    private:
