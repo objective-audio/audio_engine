@@ -98,11 +98,12 @@ using namespace yas;
     test::node_object source_obj_0(0, 1);
     test::node_object source_obj_1(0, 1);
     test::node_object destination_obj(2, 1);
+    test::node_object input_obj(0, 1);
 
     auto const connection_0 = graph->connect(source_obj_0.node, destination_obj.node, format_0);
     auto const connection_1 = graph->connect(source_obj_1.node, destination_obj.node, format_1);
 
-    audio::rendering_graph rendering_graph{destination_obj.node};
+    audio::rendering_graph rendering_graph{destination_obj.node, input_obj.node};
 
     XCTAssertEqual(rendering_graph.nodes().size(), 3);
     auto const &end_node = rendering_graph.nodes().at(0);
