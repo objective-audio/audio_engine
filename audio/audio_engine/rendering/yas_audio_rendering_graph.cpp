@@ -17,6 +17,10 @@ std::vector<std::unique_ptr<rendering_node>> make_rendering_nodes(renderable_gra
     rendering_connection_map connections;
 
     for (auto const &pair : node->input_connections()) {
+        if (pair.second.expired()) {
+            continue;
+        }
+
         uint32_t const dst_bus_idx = pair.first;
         renderable_graph_connection_ptr const connection = pair.second.lock();
         renderable_graph_node_ptr const src_node = connection->source_node();
@@ -40,6 +44,19 @@ std::vector<std::unique_ptr<rendering_node>> make_rendering_nodes(renderable_gra
 }
 
 std::unique_ptr<rendering_node> make_input_rendering_node(renderable_graph_node_ptr const &input_node) {
+    for (auto const &pair : input_node->output_connections()) {
+        if (pair.second.expired()) {
+            continue;
+        }
+
+        renderable_graph_connection_ptr const connection = pair.second.lock();
+        renderable_graph_node_ptr const dst_node = connection->destination_node();
+
+        if (dst_node->is_input_renderable()) {
+            return std::make_unique<rendering_node>(dst_node->render_handler(), rendering_connection_map{});
+        }
+    }
+
     return nullptr;
 }
 }  // namespace yas::audio
