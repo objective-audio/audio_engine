@@ -14,7 +14,6 @@ struct rendering_graph {
     rendering_graph(renderable_graph_node_ptr const &output_node, renderable_graph_node_ptr const &input_node);
 
     std::vector<std::unique_ptr<rendering_node>> const &output_nodes() const;
-    std::vector<std::unique_ptr<rendering_node>> const &input_nodes() const;
     rendering_input_node const *input_node() const;
 
    private:

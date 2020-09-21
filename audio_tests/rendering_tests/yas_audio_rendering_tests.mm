@@ -125,16 +125,10 @@ using namespace yas;
     }
 
     {
-        XCTAssertEqual(rendering_graph.input_nodes().size(), 2);
+        XCTAssertTrue(rendering_graph.input_node());
 
-        auto const &end_node = rendering_graph.input_nodes().at(0);
-        XCTAssertEqual(end_node->source_connections().size(), 1);
-        auto const &src_connection = end_node->source_connections().at(0);
-        XCTAssertEqual(src_connection.source_bus_idx, 0);
-        XCTAssertEqual(src_connection.format, format_2);
-
-        auto const &first_node = rendering_graph.input_nodes().at(1);
-        XCTAssertEqual(first_node->source_connections().size(), 0);
+        auto const *node = rendering_graph.input_node();
+        XCTAssertEqual(node->format(), format_2);
     }
 }
 
