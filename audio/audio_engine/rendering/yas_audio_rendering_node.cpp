@@ -68,3 +68,27 @@ bool audio::rendering_output_node::output_render(pcm_buffer *const buffer, audio
 
     return connection.render(buffer, time);
 }
+
+#pragma mark - rendering_input_node
+
+audio::rendering_input_node::rendering_input_node(audio::format const &format, node_render_f const &handler)
+    : _format(format), _render_handler(handler) {
+}
+
+audio::format const &audio::rendering_input_node::format() const {
+    return this->_format;
+}
+
+bool audio::rendering_input_node::input_render(pcm_buffer *const buffer, audio::time const &time) const {
+    if (!buffer) {
+        return false;
+    }
+
+    if (this->_format != buffer->format()) {
+        return false;
+    }
+
+    this->_render_handler({.buffer = buffer, .bus_idx = 0, .time = time, .source_connections = {}});
+
+    return true;
+}

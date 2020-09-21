@@ -41,4 +41,21 @@ struct rendering_output_node {
 
     rendering_connection_map _source_connections;
 };
+
+struct rendering_input_node {
+    rendering_input_node(audio::format const &, node_render_f const &);
+    
+    audio::format const &format() const;
+    
+    bool input_render(pcm_buffer *const, audio::time const &) const;
+
+   private:
+    rendering_input_node(rendering_input_node const &) = delete;
+    rendering_input_node(rendering_input_node &&) = delete;
+    rendering_input_node &operator=(rendering_input_node const &) = delete;
+    rendering_input_node &operator=(rendering_input_node &&) = delete;
+
+    node_render_f _render_handler;
+    audio::format _format;
+};
 }  // namespace yas::audio
