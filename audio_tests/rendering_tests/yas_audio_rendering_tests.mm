@@ -132,4 +132,14 @@ using namespace yas;
     }
 }
 
+- (void)test_rendering_graph_empty {
+    test::node_object output_obj{1, 0};
+    test::node_object input_obj{0, 1};
+
+    audio::rendering_graph rendering_graph{output_obj.node, input_obj.node};
+
+    XCTAssertEqual(rendering_graph.output_nodes().size(), 0);
+    XCTAssertFalse(rendering_graph.input_node());
+}
+
 @end
