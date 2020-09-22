@@ -34,6 +34,11 @@ std::vector<std::unique_ptr<rendering_node>> make_rendering_nodes(renderable_gra
     }
 
     std::vector<std::unique_ptr<rendering_node>> result;
+
+    if (sub_nodes.empty()) {
+        return result;
+    }
+
     result.emplace_back(std::make_unique<rendering_node>(node->render_handler(), std::move(connections)));
 
     if (!sub_nodes.empty()) {
