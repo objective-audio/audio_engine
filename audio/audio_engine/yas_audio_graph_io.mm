@@ -217,7 +217,7 @@ void audio::graph_io::_update_io_rendering() {
         if (auto *const buffer = args.output_buffer) {
             if (auto const *node = graph->output_node()) {
                 if (auto const &time = args.output_time) {
-                    node->output_render(buffer, time.value());
+                    node->render(buffer, time.value());
                 }
             }
         }
@@ -225,7 +225,7 @@ void audio::graph_io::_update_io_rendering() {
         if (auto *const buffer = args.input_buffer) {
             if (auto const *const node = graph->input_node()) {
                 if (auto const &time = args.input_time) {
-                    graph->input_node()->input_render(buffer, time.value());
+                    graph->input_node()->render(buffer, time.value());
                 }
             }
         }

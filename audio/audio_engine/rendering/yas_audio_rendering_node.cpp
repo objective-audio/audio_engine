@@ -63,7 +63,7 @@ audio::rendering_connection const &audio::rendering_output_node::source_connecti
     return this->_source_connection;
 }
 
-bool audio::rendering_output_node::output_render(pcm_buffer *const buffer, audio::time const &time) const {
+bool audio::rendering_output_node::render(pcm_buffer *const buffer, audio::time const &time) const {
     return this->_source_connection.render(buffer, time);
 }
 
@@ -77,7 +77,7 @@ audio::format const &audio::rendering_input_node::format() const {
     return this->_format;
 }
 
-bool audio::rendering_input_node::input_render(pcm_buffer *const buffer, audio::time const &time) const {
+bool audio::rendering_input_node::render(pcm_buffer *const buffer, audio::time const &time) const {
     if (!buffer) {
         return false;
     }

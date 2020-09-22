@@ -33,7 +33,7 @@ struct rendering_output_node {
     std::vector<std::unique_ptr<rendering_node>> const &source_nodes() const;
     rendering_connection const &source_connection() const;
 
-    bool output_render(pcm_buffer *const, audio::time const &) const;
+    bool render(pcm_buffer *const, audio::time const &) const;
 
    private:
     rendering_output_node(rendering_output_node const &) = delete;
@@ -50,7 +50,7 @@ struct rendering_input_node {
 
     audio::format const &format() const;
 
-    bool input_render(pcm_buffer *const, audio::time const &) const;
+    bool render(pcm_buffer *const, audio::time const &) const;
 
    private:
     rendering_input_node(rendering_input_node const &) = delete;
