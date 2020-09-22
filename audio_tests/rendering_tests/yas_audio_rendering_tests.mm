@@ -138,7 +138,7 @@ using namespace yas;
 
     audio::rendering_graph rendering_graph{output_obj.node, input_obj.node};
 
-    XCTAssertEqual(rendering_graph.output_nodes().size(), 0);
+    XCTAssertFalse(rendering_graph.output_node());
     XCTAssertFalse(rendering_graph.input_node());
 }
 
