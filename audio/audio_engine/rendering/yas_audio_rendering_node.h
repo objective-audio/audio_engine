@@ -28,8 +28,9 @@ struct rendering_node {
 };
 
 struct rendering_output_node {
-    explicit rendering_output_node(rendering_connection &&);
+    explicit rendering_output_node(std::vector<std::unique_ptr<rendering_node>> &&, rendering_connection &&);
 
+    std::vector<std::unique_ptr<rendering_node>> const &source_nodes() const;
     rendering_connection const &source_connection() const;
 
     bool output_render(pcm_buffer *const, audio::time const &) const;
@@ -40,6 +41,7 @@ struct rendering_output_node {
     rendering_output_node &operator=(rendering_output_node const &) = delete;
     rendering_output_node &operator=(rendering_output_node &&) = delete;
 
+    std::vector<std::unique_ptr<rendering_node>> _source_nodes;
     rendering_connection _source_connection;
 };
 

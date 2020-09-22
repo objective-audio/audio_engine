@@ -50,8 +50,13 @@ bool audio::rendering_node::input_render(pcm_buffer *const buffer, audio::time c
 
 #pragma mark - rendering_output_node
 
-audio::rendering_output_node::rendering_output_node(rendering_connection &&connection)
-    : _source_connection(std::move(connection)) {
+audio::rendering_output_node::rendering_output_node(std::vector<std::unique_ptr<rendering_node>> &&nodes,
+                                                    rendering_connection &&connection)
+    : _source_nodes(std::move(nodes)), _source_connection(std::move(connection)) {
+}
+
+std::vector<std::unique_ptr<audio::rendering_node>> const &audio::rendering_output_node::source_nodes() const {
+    return this->_source_nodes;
 }
 
 audio::rendering_connection const &audio::rendering_output_node::source_connection() const {

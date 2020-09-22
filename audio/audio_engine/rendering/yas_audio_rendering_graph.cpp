@@ -65,7 +65,7 @@ std::unique_ptr<rendering_output_node> make_rendering_output_node(renderable_gra
     }
 
     return std::make_unique<rendering_output_node>(
-        rendering_connection{connection->source_bus(), nodes.at(0).get(), connection->format()});
+        std::move(nodes), rendering_connection{connection->source_bus(), nodes.at(0).get(), connection->format()});
 }
 
 std::unique_ptr<rendering_input_node> make_rendering_input_node(renderable_graph_node_ptr const &input_node) {
