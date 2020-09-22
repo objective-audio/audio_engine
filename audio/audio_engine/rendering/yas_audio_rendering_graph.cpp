@@ -44,21 +44,49 @@ std::vector<std::unique_ptr<rendering_node>> make_rendering_nodes(renderable_gra
     return result;
 }
 
-std::unique_ptr<rendering_input_node> make_rendering_input_node(renderable_graph_node_ptr const &input_node) {
-    for (auto const &pair : input_node->output_connections()) {
-        if (pair.second.expired()) {
-            continue;
-        }
-
-        renderable_graph_connection_ptr const connection = pair.second.lock();
-        renderable_graph_node_ptr const dst_node = connection->destination_node();
-
-        if (dst_node->is_input_renderable()) {
-            return std::make_unique<rendering_input_node>(connection->format(), dst_node->render_handler());
-        }
+std::unique_ptr<rendering_output_node> make_rendering_output_node(renderable_graph_node_ptr const &output_node) {
+    if (output_node->input_connections().empty()) {
+        return nullptr;
     }
 
-    return {};
+    auto const &pair = *output_node->input_connections().begin();
+
+    if (pair.second.expired()) {
+        return nullptr;
+    }
+
+    renderable_graph_connection_ptr const connection = pair.second.lock();
+    renderable_graph_node_ptr const src_node = connection->source_node();
+
+    auto nodes = make_rendering_nodes(src_node);
+
+    if (nodes.size() <= 1) {
+        return nullptr;
+    }
+
+    return std::make_unique<rendering_output_node>(
+        rendering_connection{connection->source_bus(), nodes.at(0).get(), connection->format()});
+}
+
+std::unique_ptr<rendering_input_node> make_rendering_input_node(renderable_graph_node_ptr const &input_node) {
+    if (input_node->output_connections().empty()) {
+        return nullptr;
+    }
+
+    auto const &pair = *input_node->output_connections().begin();
+
+    if (pair.second.expired()) {
+        return nullptr;
+    }
+
+    renderable_graph_connection_ptr const connection = pair.second.lock();
+    renderable_graph_node_ptr const dst_node = connection->destination_node();
+
+    if (dst_node->is_input_renderable()) {
+        return std::make_unique<rendering_input_node>(connection->format(), dst_node->render_handler());
+    } else {
+        return nullptr;
+    }
 }
 }  // namespace yas::audio
 

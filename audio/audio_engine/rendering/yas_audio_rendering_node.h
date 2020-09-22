@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <audio/yas_audio_rendering_connection.h>
 #include <audio/yas_audio_rendering_types.h>
 
 namespace yas::audio {
@@ -27,9 +28,9 @@ struct rendering_node {
 };
 
 struct rendering_output_node {
-    rendering_output_node(rendering_connection_map &&);
+    explicit rendering_output_node(rendering_connection &&);
 
-    rendering_connection_map const &source_connections() const;
+    rendering_connection const &source_connection() const;
 
     bool output_render(pcm_buffer *const, audio::time const &) const;
 
@@ -39,7 +40,7 @@ struct rendering_output_node {
     rendering_output_node &operator=(rendering_output_node const &) = delete;
     rendering_output_node &operator=(rendering_output_node &&) = delete;
 
-    rendering_connection_map _source_connections;
+    rendering_connection _source_connection;
 };
 
 struct rendering_input_node {
