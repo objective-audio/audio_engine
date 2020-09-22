@@ -60,7 +60,7 @@ std::unique_ptr<rendering_output_node> make_rendering_output_node(renderable_gra
 
     auto nodes = make_rendering_nodes(src_node);
 
-    if (nodes.size() <= 1) {
+    if (nodes.empty()) {
         return nullptr;
     }
 
@@ -92,11 +92,7 @@ std::unique_ptr<rendering_input_node> make_rendering_input_node(renderable_graph
 
 audio::rendering_graph::rendering_graph(renderable_graph_node_ptr const &output_node,
                                         renderable_graph_node_ptr const &input_node)
-    : _output_nodes(make_rendering_nodes(output_node)), _input_node(make_rendering_input_node(input_node)) {
-}
-
-std::vector<std::unique_ptr<audio::rendering_node>> const &audio::rendering_graph::output_nodes() const {
-    return this->_output_nodes;
+    : _output_node(make_rendering_output_node(output_node)), _input_node(make_rendering_input_node(input_node)) {
 }
 
 audio::rendering_output_node const *audio::rendering_graph::output_node() const {

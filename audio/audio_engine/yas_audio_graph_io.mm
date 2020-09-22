@@ -214,10 +214,11 @@ void audio::graph_io::_update_io_rendering() {
     auto render_handler = [input_context = this->_input_context, graph](io_render_args args) {
         input_context->input_buffer = args.input_buffer;
 
-        if (auto *const buffer = args.output_buffer; !graph->output_nodes().empty()) {
-            auto const &node = graph->output_nodes().front();
-            if (auto const &time = args.output_time) {
-                node->output_render(buffer, time.value());
+        if (auto *const buffer = args.output_buffer) {
+            if (auto const *node = graph->output_node()) {
+                if (auto const &time = args.output_time) {
+                    node->output_render(buffer, time.value());
+                }
             }
         }
 
