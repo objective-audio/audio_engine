@@ -33,10 +33,6 @@ std::vector<std::unique_ptr<rendering_node>> make_rendering_nodes(renderable_gra
         yas::move_back_insert(sub_nodes, std::move(src_rendering_nodes));
     }
 
-    if (sub_nodes.empty()) {
-        return {};
-    }
-
     std::vector<std::unique_ptr<rendering_node>> result;
 
     result.emplace_back(std::make_unique<rendering_node>(node->render_handler(), std::move(connections)));
