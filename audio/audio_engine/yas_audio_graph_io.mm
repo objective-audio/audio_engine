@@ -152,16 +152,16 @@ void audio::graph_io::update_rendering() {
     auto render_handler = [input_context = this->_input_context, graph](io_render_args args) {
         input_context->input_buffer = args.input_buffer;
 
-        if (auto *const buffer = args.output_buffer) {
-            if (auto const *node = graph->output_node()) {
+        if (pcm_buffer *const buffer = args.output_buffer) {
+            if (rendering_output_node const *node = graph->output_node()) {
                 if (auto const &time = args.output_time) {
                     node->render(buffer, time.value());
                 }
             }
         }
 
-        if (auto *const buffer = args.input_buffer) {
-            if (auto const *const node = graph->input_node()) {
+        if (pcm_buffer *const buffer = args.input_buffer) {
+            if (rendering_input_node const *const node = graph->input_node()) {
                 if (auto const &time = args.input_time) {
                     graph->input_node()->render(buffer, time.value());
                 }
