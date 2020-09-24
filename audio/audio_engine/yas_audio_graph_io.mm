@@ -36,11 +36,11 @@ audio::graph_io::graph_io(audio::io_ptr const &raw_io)
       _input_node(graph_node::make_shared({.input_bus_count = 0, .output_bus_count = 1})),
       _raw_io(raw_io) {
     this->_output_node->chain(graph_node::method::update_connections)
-        .perform([this](auto const &) { this->_update_io_connections(); })
+        .perform([this](auto const &) { this->_update_io_rendering(); })
         .end()
         ->add_to(this->_pool);
     this->_input_node->chain(graph_node::method::update_connections)
-        .perform([this](auto const &) { this->_update_io_connections(); })
+        .perform([this](auto const &) { this->_update_io_rendering(); })
         .end()
         ->add_to(this->_pool);
 }
@@ -73,68 +73,6 @@ void audio::graph_io::_prepare(graph_io_ptr const &shared) {
             }
         }
     });
-}
-
-void audio::graph_io::_update_io_connections() {
-    auto const &raw_io = this->_raw_io;
-
-    if (!this->_validate_connections()) {
-        raw_io->set_render_handler(std::nullopt);
-        return;
-    }
-
-    auto weak_io = to_weak(raw_io);
-
-    auto render_handler = [weak_graph_io = this->_weak_graph_io, weak_io,
-                           input_context = this->_input_context](io_render_args args) {
-        input_context->input_buffer = args.input_buffer;
-
-        if (auto graph_io = weak_graph_io.lock()) {
-            if (auto const kernel_opt = graph_io->output_node()->kernel()) {
-                auto const &kernel = kernel_opt.value();
-                auto const connections = kernel->input_connections();
-                if (connections.count(0) > 0) {
-                    auto const &connection = connections.at(0);
-                    if (auto src_node = connection->source_node();
-                        src_node && connection->format() == src_node->output_format(connection->source_bus())) {
-                        if (auto const time = args.output_time) {
-                            src_node->render({.buffer = args.output_buffer,
-                                              .bus_idx = connection->source_bus(),
-                                              .time = time.value(),
-                                              .source_connections = {}});
-                        }
-                    }
-                }
-            }
-
-            if (auto const kernel_opt = graph_io->input_node()->kernel()) {
-                if (auto io = weak_io.lock()) {
-                    auto const &kernel = kernel_opt.value();
-                    auto const connections = kernel->output_connections();
-                    if (connections.count(0) > 0) {
-                        auto const &connection = connections.at(0);
-                        if (auto dst_node = connection->destination_node();
-                            dst_node && dst_node->is_input_renderable()) {
-                            auto const &input_buffer = args.input_buffer;
-                            auto const &input_time = args.input_time;
-                            if (input_buffer && input_time) {
-                                if (connection->format() == dst_node->input_format(connection->destination_bus())) {
-                                    dst_node->render({.buffer = input_buffer,
-                                                      .bus_idx = 0,
-                                                      .time = *input_time,
-                                                      .source_connections = {}});
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        input_context->input_buffer = nullptr;
-    };
-
-    raw_io->set_render_handler(std::move(render_handler));
 }
 
 bool audio::graph_io::_validate_connections() {
