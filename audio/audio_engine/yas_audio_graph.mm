@@ -81,11 +81,10 @@ void audio::graph::disconnect(graph_connection_ptr const &connection) {
     }
 
     this->_connections.erase(connection);
-    
+
     if (this->is_running() && this->_io.has_value()) {
         audio::manageable_graph_io::cast(this->_io.value())->update_rendering();
     }
-    
 }
 
 void audio::graph::disconnect(audio::graph_node_ptr const &node) {
@@ -283,7 +282,7 @@ void audio::graph::_disconnect_node_with_predicate(std::function<bool(graph_conn
     for (auto &connection : connections) {
         this->_connections.erase(connection);
     }
-    
+
     if (this->is_running()) {
         this->_update_io_rendering();
     }
