@@ -36,11 +36,11 @@ audio::graph_io::graph_io(audio::io_ptr const &raw_io)
       _input_node(graph_node::make_shared({.input_bus_count = 0, .output_bus_count = 1})),
       _raw_io(raw_io) {
     this->_output_node->chain(graph_node::method::update_connections)
-        .perform([this](auto const &) { this->_update_io_rendering(); })
+        .perform([this](auto const &) { this->update_rendering(); })
         .end()
         ->add_to(this->_pool);
     this->_input_node->chain(graph_node::method::update_connections)
-        .perform([this](auto const &) { this->_update_io_rendering(); })
+        .perform([this](auto const &) { this->update_rendering(); })
         .end()
         ->add_to(this->_pool);
 }
@@ -139,7 +139,7 @@ bool audio::graph_io::_validate_connections() {
     return true;
 }
 
-void audio::graph_io::_update_io_rendering() {
+void audio::graph_io::update_rendering() {
     auto const &raw_io = this->_raw_io;
 
     if (!this->_validate_connections()) {

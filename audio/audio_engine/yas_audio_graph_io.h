@@ -40,6 +40,7 @@ struct graph_io : manageable_graph_io {
 
     void _prepare(graph_io_ptr const &);
     bool _validate_connections();
-    void _update_io_rendering();
+
+    void update_rendering();
 };
 }  // namespace yas::audio
