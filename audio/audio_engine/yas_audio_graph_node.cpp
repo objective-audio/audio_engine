@@ -232,10 +232,6 @@ void audio::graph_node::update_kernel() {
     this->_core->set_kernel(kernel);
 }
 
-void audio::graph_node::update_connections() {
-    this->_notifier->notify(std::make_pair(method::update_connections, this->_weak_node.lock()));
-}
-
 void audio::graph_node::set_setup_handler(graph_node_setup_f &&handler) {
     this->_setup_handler = std::move(handler);
 }

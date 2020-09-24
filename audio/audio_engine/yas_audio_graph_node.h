@@ -96,7 +96,6 @@ struct graph_node : connectable_graph_node, manageable_graph_node, renderable_gr
 
     void set_graph(audio::graph_wptr const &) override;
     void update_kernel() override;
-    void update_connections() override;
     void set_setup_handler(graph_node_setup_f &&) override;
     void set_teardown_handler(graph_node_setup_f &&) override;
     graph_node_setup_f const &setup_handler() const override;

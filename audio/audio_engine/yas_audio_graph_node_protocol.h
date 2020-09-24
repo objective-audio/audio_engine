@@ -41,7 +41,6 @@ struct manageable_graph_node {
     virtual void set_graph(graph_wptr const &) = 0;
     virtual graph_ptr graph() const = 0;
     virtual void update_kernel() = 0;
-    virtual void update_connections() = 0;
     virtual void set_setup_handler(graph_node_setup_f &&) = 0;
     virtual void set_teardown_handler(graph_node_setup_f &&) = 0;
     virtual graph_node_setup_f const &setup_handler() const = 0;
