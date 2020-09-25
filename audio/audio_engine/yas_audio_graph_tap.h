@@ -16,11 +16,6 @@ struct graph_tap final {
 
     audio::graph_node_ptr const &node() const;
 
-    graph_connection_ptr input_connection_on_render(uint32_t const bus_idx) const;
-    graph_connection_ptr output_connection_on_render(uint32_t const bus_idx) const;
-    audio::graph_connection_smap input_connections_on_render() const;
-    audio::graph_connection_smap output_connections_on_render() const;
-
     static graph_tap_ptr make_shared();
     static graph_tap_ptr make_shared(graph_tap::args);
 

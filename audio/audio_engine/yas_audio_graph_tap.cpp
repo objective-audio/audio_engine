@@ -80,22 +80,6 @@ audio::graph_node_ptr const &audio::graph_tap::node() const {
     return this->_node;
 }
 
-audio::graph_connection_ptr audio::graph_tap::input_connection_on_render(uint32_t const bus_idx) const {
-    return this->_kernel_on_render.value()->input_connection(bus_idx);
-}
-
-audio::graph_connection_ptr audio::graph_tap::output_connection_on_render(uint32_t const bus_idx) const {
-    return this->_kernel_on_render.value()->output_connection(bus_idx);
-}
-
-audio::graph_connection_smap audio::graph_tap::input_connections_on_render() const {
-    return this->_kernel_on_render.value()->input_connections();
-}
-
-audio::graph_connection_smap audio::graph_tap::output_connections_on_render() const {
-    return this->_kernel_on_render.value()->output_connections();
-}
-
 #pragma mark - factory
 
 audio::graph_tap_ptr audio::graph_tap::make_shared() {
