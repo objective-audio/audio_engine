@@ -21,6 +21,8 @@ using namespace yas;
     [super tearDown];
 }
 
+#warning todo
+/*
 - (void)test_render_with_lambda {
     auto graph = audio::graph::make_shared();
 
@@ -61,7 +63,6 @@ using namespace yas;
             XCTAssertEqual(from_connection, node->input_connection_on_render(0));
             XCTAssertFalse(node->input_connection_on_render(1));
 
-#warning todo
             //            node->render_source({.buffer = buffer, .bus_idx = 0, .time = output_time, .source_connections
             //            = {}});
         }
@@ -80,7 +81,7 @@ using namespace yas;
 
     [NSThread sleepForTimeInterval:1.0];
 }
-
+*/
 - (void)test_render_without_lambda {
     auto graph = audio::graph::make_shared();
 
