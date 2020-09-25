@@ -35,14 +35,6 @@ audio::graph_io::graph_io(audio::io_ptr const &raw_io)
     : _output_node(graph_node::make_shared({.input_bus_count = 1, .output_bus_count = 0})),
       _input_node(graph_node::make_shared({.input_bus_count = 0, .output_bus_count = 1})),
       _raw_io(raw_io) {
-    this->_output_node->chain(graph_node::method::update_connections)
-        .perform([this](auto const &) { this->update_rendering(); })
-        .end()
-        ->add_to(this->_pool);
-    this->_input_node->chain(graph_node::method::update_connections)
-        .perform([this](auto const &) { this->update_rendering(); })
-        .end()
-        ->add_to(this->_pool);
 }
 
 audio::graph_io::~graph_io() = default;
