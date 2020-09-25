@@ -24,7 +24,6 @@ namespace yas::audio {
 struct graph_node : connectable_graph_node, manageable_graph_node, renderable_graph_node {
     enum class method {
         will_reset,
-        update_connections,
     };
 
     using chaining_pair_t = std::pair<method, graph_node_ptr>;

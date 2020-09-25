@@ -273,8 +273,6 @@ std::string yas::to_string(audio::graph_node::method const &method) {
     switch (method) {
         case audio::graph_node::method::will_reset:
             return "will_reset";
-        case audio::graph_node::method::update_connections:
-            return "update_connections";
     }
 }
 
