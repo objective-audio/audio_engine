@@ -26,19 +26,8 @@ struct audio::graph_node::core {
         return this->_kernel;
     }
 
-    void set_render_time(std::optional<time> const &render_time) {
-        std::lock_guard<std::recursive_mutex> lock(this->_mutex);
-        this->_render_time = render_time;
-    }
-
-    std::optional<audio::time> render_time() const {
-        std::lock_guard<std::recursive_mutex> lock(this->_mutex);
-        return this->_render_time;
-    }
-
    private:
     std::optional<audio::graph_kernel_ptr> _kernel = std::nullopt;
-    std::optional<audio::time> _render_time = std::nullopt;
     mutable std::recursive_mutex _mutex;
 };
 
@@ -59,7 +48,6 @@ void audio::graph_node::reset() {
 
     this->_input_connections.clear();
     this->_output_connections.clear();
-    this->_core->set_render_time(std::nullopt);
 
     this->update_kernel();
 }
@@ -140,10 +128,6 @@ audio::graph_ptr audio::graph_node::graph() const {
     return this->_weak_graph.lock();
 }
 
-std::optional<audio::time> audio::graph_node::last_render_time() const {
-    return this->_core->render_time();
-}
-
 uint32_t audio::graph_node::input_bus_count() const {
     return this->_input_bus_count;
 }
@@ -175,15 +159,9 @@ std::optional<audio::graph_kernel_ptr> audio::graph_node::kernel() const {
 #pragma mark render thread
 
 void audio::graph_node::render(node_render_args args) {
-    this->set_render_time_on_render(args.time);
-
     if (this->_render_handler) {
         this->_render_handler(std::move(args));
     }
-}
-
-void audio::graph_node::set_render_time_on_render(const time &time) {
-    this->_core->set_render_time(time);
 }
 
 chaining::chain_unsync_t<audio::graph_node::chaining_pair_t> audio::graph_node::chain() const {

@@ -101,28 +101,6 @@ using namespace yas;
     XCTAssertEqual(audio::manageable_graph_node::cast(dst_obj.node)->input_connections().size(), 0);
 }
 
-- (void)test_render_time {
-    auto node = audio::graph_node::make_shared({});
-    audio::time time(100, 48000.0);
-
-    XCTestExpectation *render_expectation = [self expectationWithDescription:@"node render"];
-
-    auto lambda = [self, node, time, render_expectation]() mutable {
-        audio::pcm_buffer_ptr null_buffer{nullptr};
-        node->render({.buffer = nullptr, .bus_idx = 0, .time = time, .source_connections = {}});
-        [render_expectation fulfill];
-    };
-
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), lambda);
-
-    [self waitForExpectationsWithTimeout:1.0
-                                 handler:^(NSError *error){
-
-                                 }];
-
-    XCTAssertEqual(time, node->last_render_time());
-}
-
 - (void)test_set_graph {
     auto node = audio::graph_node::make_shared({});
     auto graph = audio::graph::make_shared();

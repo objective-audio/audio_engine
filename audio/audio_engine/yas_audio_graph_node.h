@@ -46,7 +46,6 @@ struct graph_node : connectable_graph_node, manageable_graph_node, renderable_gr
     bool is_available_input_bus(uint32_t const bus_idx) const;
     bool is_available_output_bus(uint32_t const bus_idx) const;
     audio::graph_ptr graph() const override;
-    std::optional<audio::time> last_render_time() const;
 
     uint32_t input_bus_count() const;
     uint32_t output_bus_count() const;
@@ -59,7 +58,6 @@ struct graph_node : connectable_graph_node, manageable_graph_node, renderable_gr
     std::optional<graph_kernel_ptr> kernel() const;
 
     void render(node_render_args);
-    void set_render_time_on_render(audio::time const &time);
 
     [[nodiscard]] chaining::chain_unsync_t<chaining_pair_t> chain() const;
     [[nodiscard]] chaining::chain_relayed_unsync_t<graph_node_ptr, chaining_pair_t> chain(method const) const;
