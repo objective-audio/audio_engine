@@ -20,22 +20,15 @@ struct graph_tap final {
     static graph_tap_ptr make_shared(graph_tap::args);
 
    private:
-    class kernel;
-
     graph_node_ptr _node;
     std::optional<audio::node_render_f> _render_handler;
-    std::optional<chaining::any_observer_ptr> _reset_observer = std::nullopt;
-    std::optional<graph_kernel_ptr> _kernel_on_render = std::nullopt;
+    chaining::observer_pool _pool;
 
     explicit graph_tap(args &&);
-
-    void _prepare(graph_tap_ptr const &);
 
     graph_tap(graph_tap const &) = delete;
     graph_tap(graph_tap &&) = delete;
     graph_tap &operator=(graph_tap const &) = delete;
     graph_tap &operator=(graph_tap &&) = delete;
-
-    using kernel_ptr = std::shared_ptr<kernel>;
 };
 }  // namespace yas::audio
