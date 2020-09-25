@@ -24,6 +24,7 @@ namespace yas::audio {
 struct graph_node : connectable_graph_node, manageable_graph_node, renderable_graph_node {
     enum class method {
         will_reset,
+        prepare_rendering,
     };
 
     using chaining_pair_t = std::pair<method, graph_node_ptr>;
@@ -95,6 +96,7 @@ struct graph_node : connectable_graph_node, manageable_graph_node, renderable_gr
     void set_teardown_handler(graph_node_setup_f &&) override;
     graph_node_setup_f const &setup_handler() const override;
     graph_node_setup_f const &teardown_handler() const override;
+    void prepare_rendering() override;
 
     graph_node(graph_node &&) = delete;
     graph_node &operator=(graph_node &&) = delete;

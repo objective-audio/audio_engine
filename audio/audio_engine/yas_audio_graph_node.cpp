@@ -219,6 +219,10 @@ audio::graph_node_setup_f const &audio::graph_node::teardown_handler() const {
     return this->_teardown_handler;
 }
 
+void audio::graph_node::prepare_rendering() {
+    this->_notifier->notify(std::make_pair(method::prepare_rendering, this->_weak_node.lock()));
+}
+
 void audio::graph_node::_prepare(graph_node_ptr const &shared) {
     this->_weak_node = shared;
 }
@@ -245,6 +249,8 @@ std::string yas::to_string(audio::graph_node::method const &method) {
     switch (method) {
         case audio::graph_node::method::will_reset:
             return "will_reset";
+        case audio::graph_node::method::prepare_rendering:
+            return "prepare_rendering";
     }
 }
 

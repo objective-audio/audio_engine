@@ -52,6 +52,7 @@ struct manageable_graph_node {
 };
 
 struct renderable_graph_node {
+    virtual void prepare_rendering() = 0;
     virtual graph_connection_wmap const &input_connections() const = 0;
     virtual graph_connection_wmap const &output_connections() const = 0;
     virtual bool is_input_renderable() const = 0;
