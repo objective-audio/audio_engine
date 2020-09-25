@@ -174,6 +174,11 @@ void audio::graph_io::update_rendering() {
     raw_io->set_render_handler(std::move(render_handler));
 }
 
+void audio::graph_io::clear_rendering() {
+    auto const &raw_io = this->_raw_io;
+    raw_io->set_render_handler(std::nullopt);
+}
+
 audio::graph_io_ptr audio::graph_io::make_shared(audio::io_ptr const &raw_io) {
     auto shared = graph_io_ptr(new audio::graph_io{raw_io});
     shared->_prepare(shared);

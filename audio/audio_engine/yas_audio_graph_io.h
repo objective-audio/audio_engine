@@ -42,5 +42,6 @@ struct graph_io : manageable_graph_io {
     bool _validate_connections();
 
     void update_rendering() override;
+    void clear_rendering() override;
 };
 }  // namespace yas::audio

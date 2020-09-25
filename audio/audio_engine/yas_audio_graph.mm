@@ -259,7 +259,7 @@ void audio::graph::_dispose_rendering() {
         this->_teardown_node(node);
     }
 
-    this->_update_io_rendering();
+    this->_clear_io_rendering();
 }
 
 void audio::graph::_disconnect_node_with_predicate(std::function<bool(graph_connection const &)> predicate) {
@@ -335,6 +335,12 @@ audio::graph_connection_set audio::graph::_output_connections_for_source_node(au
 }
 
 void audio::graph::_update_io_rendering() {
+    if (this->_io.has_value()) {
+        audio::manageable_graph_io::cast(this->_io.value())->update_rendering();
+    }
+}
+
+void audio::graph::_clear_io_rendering() {
     if (this->_io.has_value()) {
         audio::manageable_graph_io::cast(this->_io.value())->update_rendering();
     }
