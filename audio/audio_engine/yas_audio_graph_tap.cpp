@@ -43,7 +43,9 @@ void audio::graph_tap::_prepare(graph_tap_ptr const &shared) {
                 if (handler) {
                     handler.value()(args);
                 } else {
-                    tap->render_source(std::move(args));
+                    for (auto const &pair : args.source_connections) {
+                        pair.second.render(args.buffer, args.time);
+                    }
                 }
 
                 tap->_kernel_on_render = std::nullopt;
@@ -92,17 +94,6 @@ audio::graph_connection_smap audio::graph_tap::input_connections_on_render() con
 
 audio::graph_connection_smap audio::graph_tap::output_connections_on_render() const {
     return this->_kernel_on_render.value()->output_connections();
-}
-
-void audio::graph_tap::render_source(node_render_args args) {
-    if (auto connection = this->_kernel_on_render.value()->input_connection(args.bus_idx)) {
-        if (auto node = connection->source_node()) {
-            node->render({.buffer = args.buffer,
-                          .bus_idx = connection->source_bus(),
-                          .time = args.time,
-                          .source_connections = {}});
-        }
-    }
 }
 
 #pragma mark - factory

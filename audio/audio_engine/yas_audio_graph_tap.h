@@ -21,9 +21,6 @@ struct graph_tap final {
     audio::graph_connection_smap input_connections_on_render() const;
     audio::graph_connection_smap output_connections_on_render() const;
 
-    // for Test
-    void render_source(node_render_args args);
-
     static graph_tap_ptr make_shared();
     static graph_tap_ptr make_shared(graph_tap::args);
 

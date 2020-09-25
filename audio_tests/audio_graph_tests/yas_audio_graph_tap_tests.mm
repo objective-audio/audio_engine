@@ -61,7 +61,9 @@ using namespace yas;
             XCTAssertEqual(from_connection, node->input_connection_on_render(0));
             XCTAssertFalse(node->input_connection_on_render(1));
 
-            node->render_source({.buffer = buffer, .bus_idx = 0, .time = output_time, .source_connections = {}});
+#warning todo
+            //            node->render_source({.buffer = buffer, .bus_idx = 0, .time = output_time, .source_connections
+            //            = {}});
         }
 
         [to_expectation fulfill];
