@@ -158,12 +158,6 @@ std::optional<audio::graph_kernel_ptr> audio::graph_node::kernel() const {
 
 #pragma mark render thread
 
-void audio::graph_node::render(node_render_args args) {
-    if (this->_render_handler) {
-        this->_render_handler(std::move(args));
-    }
-}
-
 chaining::chain_unsync_t<audio::graph_node::chaining_pair_t> audio::graph_node::chain() const {
     return this->_notifier->chain();
 }

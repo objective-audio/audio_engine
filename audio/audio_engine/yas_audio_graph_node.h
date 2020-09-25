@@ -57,8 +57,6 @@ struct graph_node : connectable_graph_node, manageable_graph_node, renderable_gr
 
     std::optional<graph_kernel_ptr> kernel() const;
 
-    void render(node_render_args);
-
     [[nodiscard]] chaining::chain_unsync_t<chaining_pair_t> chain() const;
     [[nodiscard]] chaining::chain_relayed_unsync_t<graph_node_ptr, chaining_pair_t> chain(method const) const;
 

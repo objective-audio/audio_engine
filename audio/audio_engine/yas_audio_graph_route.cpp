@@ -47,24 +47,20 @@ void audio::graph_route::_prepare(graph_route_ptr const &shared) {
             if (auto const kernel_opt = route->node()->kernel()) {
                 auto const &kernel = kernel_opt.value();
                 auto const &routes = std::any_cast<audio::graph_route::kernel_ptr>(kernel->decorator.value())->routes;
-                auto output_connection = kernel->output_connection(dst_bus_idx);
                 auto input_connections = kernel->input_connections();
                 uint32_t const dst_ch_count = dst_buffer->format().channel_count();
 
-                for (auto const &pair : input_connections) {
-                    if (auto const &input_connection = pair.second) {
-                        if (auto node = input_connection->source_node()) {
-                            auto const &src_format = input_connection->format();
-                            auto const &src_bus_idx = pair.first;
-                            uint32_t const src_ch_count = src_format.channel_count();
-                            if (auto const result = channel_map_from_routes(routes, src_bus_idx, src_ch_count,
-                                                                            dst_bus_idx, dst_ch_count)) {
-                                pcm_buffer src_buffer(src_format, *dst_buffer, result.value());
-                                node->render({.buffer = &src_buffer,
-                                              .bus_idx = src_bus_idx,
-                                              .time = args.time,
-                                              .source_connections = {}});
-                            }
+                for (auto const &pair : args.source_connections) {
+                    auto const &src_connection = pair.second;
+                    if (auto const *node = src_connection.source_node) {
+                        auto const &src_format = src_connection.format;
+                        auto const &src_bus_idx = pair.first;
+                        uint32_t const src_ch_count = src_format.channel_count();
+                        if (auto const result =
+                                channel_map_from_routes(routes, src_bus_idx, src_ch_count, dst_bus_idx, dst_ch_count)) {
+                            pcm_buffer src_buffer(src_format, *dst_buffer, result.value());
+
+                            src_connection.render(&src_buffer, args.time);
                         }
                     }
                 }
