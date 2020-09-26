@@ -235,6 +235,8 @@ std::string yas::to_string(audio::graph_node::method const &method) {
             return "will_reset";
         case audio::graph_node::method::prepare_rendering:
             return "prepare_rendering";
+        case audio::graph_node::method::update_rendering:
+            return "update_rendering";
     }
 }
 
