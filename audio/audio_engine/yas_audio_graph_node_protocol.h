@@ -7,11 +7,13 @@
 #include <audio/yas_audio_graph_connection_protocol.h>
 #include <audio/yas_audio_ptr.h>
 #include <audio/yas_audio_rendering_types.h>
+#include <chaining/yas_chaining_umbrella.h>
 
 #include <optional>
 
 namespace yas::audio {
 using graph_node_set = std::unordered_set<graph_node_ptr>;
+using graph_node_observer_map = std::unordered_map<graph_node_ptr, chaining::any_observer_ptr>;
 using graph_node_setup_f = std::function<void(void)>;
 
 struct graph_node_args {
