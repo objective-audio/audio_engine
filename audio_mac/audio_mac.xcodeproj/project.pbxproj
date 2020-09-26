@@ -82,7 +82,7 @@
 		B66FDD6B250C857E00952310 /* yas_audio_rendering_graph.h in Headers */ = {isa = PBXBuildFile; fileRef = B66FDD69250C857D00952310 /* yas_audio_rendering_graph.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		B68CB91324D5A3E200270E2C /* yas_audio_debug.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B68CB91124D5A3E200270E2C /* yas_audio_debug.cpp */; };
 		B68CB91424D5A3E200270E2C /* yas_audio_debug.h in Headers */ = {isa = PBXBuildFile; fileRef = B68CB91224D5A3E200270E2C /* yas_audio_debug.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		B6A49362237820A000CD240B /* yas_audio_graph_avf_au.mm in Sources */ = {isa = PBXBuildFile; fileRef = B6A49360237820A000CD240B /* yas_audio_graph_avf_au.mm */; };
+		B6A49362237820A000CD240B /* yas_audio_graph_avf_au.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6A49360237820A000CD240B /* yas_audio_graph_avf_au.cpp */; };
 		B6A49363237820A000CD240B /* yas_audio_graph_avf_au.h in Headers */ = {isa = PBXBuildFile; fileRef = B6A49361237820A000CD240B /* yas_audio_graph_avf_au.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		B6A9BC4F2393AC1E00EA7DC8 /* yas_audio_avf_au.mm in Sources */ = {isa = PBXBuildFile; fileRef = B6A9BC4D2393AC1E00EA7DC8 /* yas_audio_avf_au.mm */; };
 		B6A9BC502393AC1E00EA7DC8 /* yas_audio_avf_au.h in Headers */ = {isa = PBXBuildFile; fileRef = B6A9BC4E2393AC1E00EA7DC8 /* yas_audio_avf_au.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -186,7 +186,7 @@
 		B66FDD69250C857D00952310 /* yas_audio_rendering_graph.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = yas_audio_rendering_graph.h; sourceTree = "<group>"; };
 		B68CB91124D5A3E200270E2C /* yas_audio_debug.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = yas_audio_debug.cpp; sourceTree = "<group>"; };
 		B68CB91224D5A3E200270E2C /* yas_audio_debug.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yas_audio_debug.h; sourceTree = "<group>"; };
-		B6A49360237820A000CD240B /* yas_audio_graph_avf_au.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = yas_audio_graph_avf_au.mm; sourceTree = "<group>"; };
+		B6A49360237820A000CD240B /* yas_audio_graph_avf_au.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = yas_audio_graph_avf_au.cpp; sourceTree = "<group>"; };
 		B6A49361237820A000CD240B /* yas_audio_graph_avf_au.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = yas_audio_graph_avf_au.h; sourceTree = "<group>"; };
 		B6A9BC4D2393AC1E00EA7DC8 /* yas_audio_avf_au.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = yas_audio_avf_au.mm; sourceTree = "<group>"; };
 		B6A9BC4E2393AC1E00EA7DC8 /* yas_audio_avf_au.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yas_audio_avf_au.h; sourceTree = "<group>"; };
@@ -321,7 +321,7 @@
 				B663563123843046003E0B4C /* yas_audio_graph_avf_au_mixer.cpp */,
 				B663563023843046003E0B4C /* yas_audio_graph_avf_au_mixer.h */,
 				B6A49361237820A000CD240B /* yas_audio_graph_avf_au.h */,
-				B6A49360237820A000CD240B /* yas_audio_graph_avf_au.mm */,
+				B6A49360237820A000CD240B /* yas_audio_graph_avf_au.cpp */,
 				B6002DB721DCC7760013AA0E /* yas_audio_graph_connection_protocol.h */,
 				B6002DB221DCC7760013AA0E /* yas_audio_graph_connection.cpp */,
 				B6002DAB21DCC7760013AA0E /* yas_audio_graph_connection.h */,
@@ -552,7 +552,7 @@
 				B6002DD721DCC7760013AA0E /* yas_audio_file_utils.mm in Sources */,
 				B6605A53235D35BE001F6905 /* yas_audio_mac_io_core.mm in Sources */,
 				B64F8A522349B0E20056EA99 /* yas_audio_io_kernel.cpp in Sources */,
-				B6A49362237820A000CD240B /* yas_audio_graph_avf_au.mm in Sources */,
+				B6A49362237820A000CD240B /* yas_audio_graph_avf_au.cpp in Sources */,
 				B6002DDE21DCC7760013AA0E /* yas_audio_math.cpp in Sources */,
 				B6002E1521DCC7760013AA0E /* yas_audio_mac_device.cpp in Sources */,
 				B642E98023AF084100D504D8 /* yas_audio_ios_device.cpp in Sources */,

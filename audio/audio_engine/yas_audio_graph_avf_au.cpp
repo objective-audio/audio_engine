@@ -1,12 +1,12 @@
 //
-//  yas_audio_graph_avf_au.mm
+//  yas_audio_graph_avf_au.cpp
 //
 
 #include "yas_audio_graph_avf_au.h"
+
 #include <cpp_utils/yas_cf_utils.h>
 #include <cpp_utils/yas_fast_each.h>
-#include "yas_audio_avf_au_parameter.h"
-#include "yas_audio_avf_au_parameter_core.h"
+
 #include "yas_audio_rendering_connection.h"
 #include "yas_audio_time.h"
 
