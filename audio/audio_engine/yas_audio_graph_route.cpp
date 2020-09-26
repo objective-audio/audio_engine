@@ -105,8 +105,7 @@ void audio::graph_route::_erase_route_if(std::function<bool(audio::route const &
     erase_if(this->_routes, pred);
 }
 
-void audio::graph_route::_update_rendering() {
-    
+void audio::graph_route::_update_rendering(){
 #warning todo io_rendering
 }
 

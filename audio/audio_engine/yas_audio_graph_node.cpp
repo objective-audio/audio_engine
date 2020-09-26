@@ -148,10 +148,6 @@ audio::node_render_f const audio::graph_node::render_handler() const {
     return this->_render_handler;
 }
 
-std::optional<audio::graph_kernel_ptr> audio::graph_node::kernel() const {
-    return this->_core->kernel();
-}
-
 #pragma mark render thread
 
 chaining::chain_unsync_t<audio::graph_node::method> audio::graph_node::chain() const {

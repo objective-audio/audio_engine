@@ -52,8 +52,6 @@ struct graph_node : connectable_graph_node, manageable_graph_node, renderable_gr
     void set_render_handler(node_render_f);
     node_render_f const render_handler() const override;
 
-    std::optional<graph_kernel_ptr> kernel() const;
-
     [[nodiscard]] chaining::chain_unsync_t<method> chain() const;
     [[nodiscard]] chaining::chain_relayed_unsync_t<method, method> chain(method const) const;
 
