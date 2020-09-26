@@ -40,8 +40,6 @@ struct graph_connection : graph_node_removable, renderable_graph_connection {
     void remove_source_node() override;
     void remove_destination_node() override;
 
-    void _prepare(graph_connection_ptr const &);
-
    public:
     static graph_connection_ptr make_shared(audio::graph_node_ptr const &src_node, uint32_t const src_bus,
                                             audio::graph_node_ptr const &dst_node, uint32_t const dst_bus,

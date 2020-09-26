@@ -69,16 +69,11 @@ void audio::graph_connection::remove_destination_node() {
     this->_destination_node.reset();
 }
 
-void audio::graph_connection::_prepare(graph_connection_ptr const &shared) {
-    this->_weak_connection = shared;
-}
-
 audio::graph_connection_ptr audio::graph_connection::make_shared(audio::graph_node_ptr const &src_node,
                                                                  uint32_t const src_bus,
                                                                  audio::graph_node_ptr const &dst_node,
                                                                  uint32_t const dst_bus, audio::format const &format) {
     auto shared = graph_connection_ptr(new audio::graph_connection{src_node, src_bus, dst_node, dst_bus, format});
-    shared->_prepare(shared);
     connectable_graph_node::cast(src_node)->add_connection(shared);
     connectable_graph_node::cast(dst_node)->add_connection(shared);
     return shared;
