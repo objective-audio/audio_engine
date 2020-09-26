@@ -25,20 +25,15 @@ struct graph_route final {
     static graph_route_ptr make_shared();
 
    private:
-    class kernel;
-
     graph_node_ptr _node;
     route_set_t _routes;
+    chaining::observer_pool _pool;
     std::optional<chaining::any_observer_ptr> _reset_observer = std::nullopt;
 
     graph_route();
 
-    void _prepare(graph_route_ptr const &);
-
     void _will_reset();
     void _erase_route_if_either_matched(audio::route const &route);
     void _erase_route_if(std::function<bool(audio::route const &)> pred);
-
-    using kernel_ptr = std::shared_ptr<kernel>;
 };
 }  // namespace yas::audio

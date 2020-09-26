@@ -12,42 +12,17 @@
 
 using namespace yas;
 
-#pragma mark - kernel
-
-struct audio::graph_route::kernel {
-    kernel() {
-    }
-
-    route_set_t routes;
-
-   private:
-    kernel(kernel const &) = delete;
-    kernel(kernel &&) = delete;
-    kernel &operator=(kernel const &) = delete;
-    kernel &operator=(kernel &&) = delete;
-};
-
 #pragma mark - main
 
 audio::graph_route::graph_route()
     : _node(graph_node::make_shared({.input_bus_count = std::numeric_limits<uint32_t>::max(),
                                      .output_bus_count = std::numeric_limits<uint32_t>::max()})) {
-}
-
-audio::graph_route::~graph_route() = default;
-
-void audio::graph_route::_prepare(graph_route_ptr const &shared) {
-    auto weak_route = to_weak(shared);
-
-    this->_node->set_render_handler([weak_route](node_render_args args) {
-        auto &dst_buffer = args.buffer;
-        auto const dst_bus_idx = args.bus_idx;
-
-        if (auto route = weak_route.lock()) {
-            if (auto const kernel_opt = route->node()->kernel()) {
-                auto const &kernel = kernel_opt.value();
-                auto const &routes = std::any_cast<audio::graph_route::kernel_ptr>(kernel->decorator.value())->routes;
-                auto input_connections = kernel->input_connections();
+    this->_node->chain()
+        .guard([](auto const &pair) { return pair.first == graph_node::method::prepare_rendering; })
+        .perform([this](auto const &) {
+            this->_node->set_render_handler([routes = this->_routes](node_render_args const &args) {
+                auto &dst_buffer = args.buffer;
+                auto const dst_bus_idx = args.bus_idx;
                 uint32_t const dst_ch_count = dst_buffer->format().channel_count();
 
                 for (auto const &pair : args.source_connections) {
@@ -64,26 +39,18 @@ void audio::graph_route::_prepare(graph_route_ptr const &shared) {
                         }
                     }
                 }
-            }
-        }
-    });
+            });
+        })
+        .end()
+        ->add_to(this->_pool);
 
-    this->_reset_observer = this->_node->chain(graph_node::method::will_reset)
-                                .perform([weak_route](auto const &) {
-                                    if (auto route = weak_route.lock()) {
-                                        route->_will_reset();
-                                    }
-                                })
-                                .end();
-
-    this->_node->set_prepare_kernel_handler([weak_route](audio::graph_kernel &kernel) {
-        if (auto route = weak_route.lock()) {
-            auto route_kernel = std::make_shared<audio::graph_route::kernel>();
-            route_kernel->routes = route->_routes;
-            kernel.decorator = std::move(route_kernel);
-        }
-    });
+    this->_node->chain(graph_node::method::will_reset)
+        .perform([this](auto const &) { this->_will_reset(); })
+        .end()
+        ->add_to(this->_pool);
 }
+
+audio::graph_route::~graph_route() = default;
 
 audio::route_set_t const &audio::graph_route::routes() const {
     return _routes;
@@ -140,7 +107,5 @@ void audio::graph_route::_erase_route_if(std::function<bool(audio::route const &
 }
 
 audio::graph_route_ptr audio::graph_route::make_shared() {
-    auto shared = graph_route_ptr(new graph_route{});
-    shared->_prepare(shared);
-    return shared;
+    return graph_route_ptr(new graph_route{});
 }
