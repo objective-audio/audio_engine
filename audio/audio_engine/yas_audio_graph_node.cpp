@@ -140,10 +140,6 @@ bool audio::graph_node::is_input_renderable() const {
     return this->_is_input_renderable;
 }
 
-void audio::graph_node::set_prepare_kernel_handler(prepare_kernel_f handler) {
-    this->_prepare_kernel_handler = std::move(handler);
-}
-
 void audio::graph_node::set_render_handler(node_render_f handler) {
     this->_render_handler = std::move(handler);
 }
@@ -199,9 +195,7 @@ void audio::graph_node::set_graph(audio::graph_wptr const &graph) {
 }
 
 void audio::graph_node::update_kernel() {
-    auto kernel = audio::graph_kernel::make_shared();
-    this->_prepare_kernel(kernel);
-    this->_core->set_kernel(kernel);
+#warning todo
 }
 
 void audio::graph_node::set_setup_handler(graph_node_setup_f &&handler) {
@@ -225,16 +219,6 @@ void audio::graph_node::prepare_rendering() {
 
 void audio::graph_node::_prepare(graph_node_ptr const &shared) {
     this->_weak_node = shared;
-}
-
-void audio::graph_node::_prepare_kernel(graph_kernel_ptr const &kernel) {
-    auto const manageable_kernel = manageable_graph_kernel::cast(kernel);
-    manageable_kernel->set_input_connections(_input_connections);
-    manageable_kernel->set_output_connections(_output_connections);
-
-    if (this->_prepare_kernel_handler) {
-        this->_prepare_kernel_handler(*kernel);
-    }
 }
 
 audio::graph_node_ptr audio::graph_node::make_shared(graph_node_args args) {

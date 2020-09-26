@@ -29,8 +29,6 @@ struct graph_node : connectable_graph_node, manageable_graph_node, renderable_gr
 
     using chaining_pair_t = std::pair<method, graph_node_ptr>;
 
-    using prepare_kernel_f = std::function<void(graph_kernel &)>;
-
     virtual ~graph_node();
 
     void reset();
@@ -52,7 +50,6 @@ struct graph_node : connectable_graph_node, manageable_graph_node, renderable_gr
     uint32_t output_bus_count() const;
     bool is_input_renderable() const override;
 
-    void set_prepare_kernel_handler(prepare_kernel_f);
     void set_render_handler(node_render_f);
     node_render_f const render_handler() const override;
 
@@ -74,7 +71,6 @@ struct graph_node : connectable_graph_node, manageable_graph_node, renderable_gr
     audio::graph_connection_wmap _output_connections;
     graph_node_setup_f _setup_handler;
     graph_node_setup_f _teardown_handler;
-    prepare_kernel_f _prepare_kernel_handler;
     audio::node_render_f _render_handler;
     chaining::notifier_ptr<chaining_pair_t> _notifier = chaining::notifier<chaining_pair_t>::make_shared();
 
@@ -84,7 +80,6 @@ struct graph_node : connectable_graph_node, manageable_graph_node, renderable_gr
     explicit graph_node(graph_node_args &&);
 
     void _prepare(graph_node_ptr const &);
-    void _prepare_kernel(graph_kernel_ptr const &kernel);
 
     void add_connection(audio::graph_connection_ptr const &) override;
     void remove_input_connection(uint32_t const dst_bus) override;
@@ -110,5 +105,3 @@ std::string to_string(audio::graph_node::method const &);
 }
 
 std::ostream &operator<<(std::ostream &, yas::audio::graph_node::method const &);
-
-#include <audio/yas_audio_graph_kernel.h>
