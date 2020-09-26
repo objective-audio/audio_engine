@@ -59,33 +59,33 @@ audio::route_set_t const &audio::graph_route::routes() const {
 void audio::graph_route::add_route(audio::route route) {
     this->_erase_route_if_either_matched(route);
     this->_routes.insert(std::move(route));
-    manageable_graph_node::cast(this->_node)->update_kernel();
+    this->_update_rendering();
 }
 
 void audio::graph_route::remove_route(audio::route const &route) {
     this->_routes.erase(route);
-    manageable_graph_node::cast(this->_node)->update_kernel();
+    this->_update_rendering();
 }
 
 void audio::graph_route::remove_route_for_source(audio::route::point const &src_pt) {
     this->_erase_route_if([&src_pt](audio::route const &route_of_set) { return route_of_set.source == src_pt; });
-    manageable_graph_node::cast(this->_node)->update_kernel();
+    this->_update_rendering();
 }
 
 void audio::graph_route::remove_route_for_destination(audio::route::point const &dst_pt) {
     this->_erase_route_if([&dst_pt](audio::route const &route_of_set) { return route_of_set.destination == dst_pt; });
-    manageable_graph_node::cast(this->_node)->update_kernel();
+    this->_update_rendering();
 }
 
 void audio::graph_route::set_routes(route_set_t routes) {
     this->_routes.clear();
     this->_routes = std::move(routes);
-    manageable_graph_node::cast(this->_node)->update_kernel();
+    this->_update_rendering();
 }
 
 void audio::graph_route::clear_routes() {
     this->_routes.clear();
-    manageable_graph_node::cast(this->_node)->update_kernel();
+    this->_update_rendering();
 }
 
 audio::graph_node_ptr const &audio::graph_route::node() const {
@@ -104,6 +104,10 @@ void audio::graph_route::_erase_route_if_either_matched(audio::route const &rout
 
 void audio::graph_route::_erase_route_if(std::function<bool(audio::route const &)> pred) {
     erase_if(this->_routes, pred);
+}
+
+void audio::graph_route::_update_rendering(){
+#warning todo io_rendering
 }
 
 audio::graph_route_ptr audio::graph_route::make_shared() {

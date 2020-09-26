@@ -35,5 +35,6 @@ struct graph_route final {
     void _will_reset();
     void _erase_route_if_either_matched(audio::route const &route);
     void _erase_route_if(std::function<bool(audio::route const &)> pred);
+    void _update_rendering();
 };
 }  // namespace yas::audio
