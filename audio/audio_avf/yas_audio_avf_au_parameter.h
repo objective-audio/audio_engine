@@ -48,8 +48,6 @@ struct avf_au_parameter {
     chaining::observer_pool _pool;
 
     avf_au_parameter(avf_au_parameter_core_ptr const &);
-
-    void _prepare(avf_au_parameter_ptr const &);
 };
 
 AudioUnitScope to_raw_scope(avf_au_parameter_scope const);

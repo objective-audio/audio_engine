@@ -34,7 +34,17 @@ struct graph_input_context {
 audio::graph_io::graph_io(audio::io_ptr const &raw_io)
     : _output_node(graph_node::make_shared({.input_bus_count = 1, .output_bus_count = 0})),
       _input_node(graph_node::make_shared({.input_bus_count = 0, .output_bus_count = 1})),
-      _raw_io(raw_io) {
+      _raw_io(raw_io),
+      _input_context(std::make_shared<graph_input_context>()) {
+    this->_input_node->set_render_handler([input_context = this->_input_context](node_render_args args) {
+        auto const &buffer = args.buffer;
+        auto const *input_buffer = input_context->input_buffer;
+        if (input_buffer) {
+            if (input_buffer->format() == buffer->format()) {
+                buffer->copy_from(*input_buffer);
+            }
+        }
+    });
 }
 
 audio::graph_io::~graph_io() = default;
@@ -49,22 +59,6 @@ audio::graph_node_ptr const &audio::graph_io::input_node() const {
 
 audio::io_ptr const &audio::graph_io::raw_io() {
     return this->_raw_io;
-}
-
-void audio::graph_io::_prepare(graph_io_ptr const &shared) {
-    this->_weak_graph_io = to_weak(shared);
-
-    this->_input_context = std::make_shared<graph_input_context>();
-
-    this->_input_node->set_render_handler([input_context = this->_input_context](node_render_args args) {
-        auto const &buffer = args.buffer;
-        auto const *input_buffer = input_context->input_buffer;
-        if (input_buffer) {
-            if (input_buffer->format() == buffer->format()) {
-                buffer->copy_from(*input_buffer);
-            }
-        }
-    });
 }
 
 bool audio::graph_io::_validate_connections() {
@@ -172,7 +166,5 @@ void audio::graph_io::clear_rendering() {
 }
 
 audio::graph_io_ptr audio::graph_io::make_shared(audio::io_ptr const &raw_io) {
-    auto shared = graph_io_ptr(new audio::graph_io{raw_io});
-    shared->_prepare(shared);
-    return shared;
+    return graph_io_ptr(new audio::graph_io{raw_io});
 }

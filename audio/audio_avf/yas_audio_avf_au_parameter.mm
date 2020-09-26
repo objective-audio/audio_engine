@@ -121,13 +121,8 @@ chaining::chain_sync_t<float> audio::avf_au_parameter::chain() const {
     return this->_value->chain();
 }
 
-void audio::avf_au_parameter::_prepare(avf_au_parameter_ptr const &shared) {
-}
-
 audio::avf_au_parameter_ptr audio::avf_au_parameter::make_shared(avf_au_parameter_core_ptr const &core) {
-    auto shared = avf_au_parameter_ptr(new avf_au_parameter{core});
-    shared->_prepare(shared);
-    return shared;
+    return avf_au_parameter_ptr(new avf_au_parameter{core});
 }
 
 AudioUnitScope audio::to_raw_scope(avf_au_parameter_scope const scope) {
