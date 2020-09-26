@@ -24,9 +24,9 @@ struct graph_io : manageable_graph_io {
     static graph_io_ptr make_shared(audio::io_ptr const &);
 
    private:
-    audio::graph_node_ptr _output_node;
-    audio::graph_node_ptr _input_node;
-    audio::io_ptr _raw_io;
+    audio::graph_node_ptr const _output_node;
+    audio::graph_node_ptr const _input_node;
+    audio::io_ptr const _raw_io;
     std::shared_ptr<graph_input_context> _input_context = nullptr;
 
     graph_io(audio::io_ptr const &);
