@@ -132,10 +132,11 @@ using namespace yas;
 
 - (void)test_method_to_string {
     XCTAssertEqual(to_string(audio::graph_node::method::will_reset), "will_reset");
+    XCTAssertEqual(to_string(audio::graph_node::method::prepare_rendering), "prepare_rendering");
 }
 
 - (void)test_method_ostream {
-    auto const values = {audio::graph_node::method::will_reset};
+    auto const values = {audio::graph_node::method::will_reset, audio::graph_node::method::prepare_rendering};
 
     for (auto const &value : values) {
         std::ostringstream stream;
