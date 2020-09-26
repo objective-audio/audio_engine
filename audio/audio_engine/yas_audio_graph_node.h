@@ -71,9 +71,6 @@ struct graph_node : connectable_graph_node, manageable_graph_node, renderable_gr
     audio::node_render_f _render_handler;
     chaining::notifier_ptr<method> _notifier = chaining::notifier<method>::make_shared();
 
-    struct core;
-    std::unique_ptr<core> _core;
-
     explicit graph_node(graph_node_args &&);
 
     void _prepare(graph_node_ptr const &);

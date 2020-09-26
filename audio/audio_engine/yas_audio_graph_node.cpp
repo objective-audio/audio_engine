@@ -13,32 +13,13 @@
 
 using namespace yas;
 
-#pragma mark - core
-
-struct audio::graph_node::core {
-    void set_kernel(std::optional<audio::graph_kernel_ptr> const &kernel) {
-        std::lock_guard<std::recursive_mutex> lock(this->_mutex);
-        this->_kernel = kernel;
-    }
-
-    std::optional<audio::graph_kernel_ptr> kernel() {
-        std::lock_guard<std::recursive_mutex> lock(this->_mutex);
-        return this->_kernel;
-    }
-
-   private:
-    std::optional<audio::graph_kernel_ptr> _kernel = std::nullopt;
-    mutable std::recursive_mutex _mutex;
-};
-
 #pragma mark - audio::node
 
 audio::graph_node::graph_node(graph_node_args &&args)
     : _input_bus_count(args.input_bus_count),
       _output_bus_count(args.output_bus_count),
       _is_input_renderable(args.input_renderable),
-      _override_output_bus_idx(args.override_output_bus_idx),
-      _core(std::make_unique<core>()) {
+      _override_output_bus_idx(args.override_output_bus_idx) {
 }
 
 audio::graph_node::~graph_node() = default;
