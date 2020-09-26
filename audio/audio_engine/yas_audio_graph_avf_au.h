@@ -23,14 +23,14 @@ struct graph_avf_au final {
 
     virtual ~graph_avf_au();
 
-    load_state state() const;
+    [[nodiscard]] load_state state() const;
 
-    audio::avf_au_ptr const &raw_au() const;
+    [[nodiscard]] audio::avf_au_ptr const &raw_au() const;
 
-    audio::graph_node_ptr const &node() const;
+    [[nodiscard]] audio::graph_node_ptr const &node() const;
 
-    chaining::chain_sync_t<load_state> load_state_chain() const;
-    chaining::chain_unsync_t<connection_method> connection_chain() const;
+    [[nodiscard]] chaining::chain_sync_t<load_state> load_state_chain() const;
+    [[nodiscard]] chaining::chain_unsync_t<connection_method> connection_chain() const;
 
     static graph_avf_au_ptr make_shared(OSType const type, OSType const sub_type);
     static graph_avf_au_ptr make_shared(AudioComponentDescription const &);

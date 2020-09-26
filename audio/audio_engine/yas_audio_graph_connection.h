@@ -12,11 +12,11 @@ namespace yas::audio {
 struct graph_connection : graph_node_removable, renderable_graph_connection {
     virtual ~graph_connection();
 
-    uint32_t source_bus() const override;
-    uint32_t destination_bus() const;
-    audio::graph_node_ptr source_node() const override;
-    audio::graph_node_ptr destination_node() const override;
-    audio::format const &format() const override;
+    [[nodiscard]] uint32_t source_bus() const override;
+    [[nodiscard]] uint32_t destination_bus() const;
+    [[nodiscard]] audio::graph_node_ptr source_node() const override;
+    [[nodiscard]] audio::graph_node_ptr destination_node() const override;
+    [[nodiscard]] audio::format const &format() const override;
 
    private:
     uint32_t const _source_bus;

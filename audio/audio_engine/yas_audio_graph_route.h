@@ -12,7 +12,7 @@ namespace yas::audio {
 struct graph_route final {
     virtual ~graph_route();
 
-    audio::route_set_t const &routes() const;
+    [[nodiscard]] audio::route_set_t const &routes() const;
     void add_route(audio::route);
     void remove_route(audio::route const &);
     void remove_route_for_source(audio::route::point const &);
@@ -20,9 +20,9 @@ struct graph_route final {
     void set_routes(audio::route_set_t routes);
     void clear_routes();
 
-    audio::graph_node_ptr const &node() const;
+    [[nodiscard]] audio::graph_node_ptr const &node() const;
 
-    static graph_route_ptr make_shared();
+    [[nodiscard]] static graph_route_ptr make_shared();
 
    private:
     graph_node_ptr _node;

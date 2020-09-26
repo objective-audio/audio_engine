@@ -32,25 +32,25 @@ struct graph_node : connectable_graph_node, manageable_graph_node, renderable_gr
 
     void reset();
 
-    graph_connection_ptr input_connection(uint32_t const bus_idx) const override;
-    graph_connection_ptr output_connection(uint32_t const bus_idx) const override;
-    graph_connection_wmap const &input_connections() const override;
-    graph_connection_wmap const &output_connections() const override;
+    [[nodiscard]] graph_connection_ptr input_connection(uint32_t const bus_idx) const override;
+    [[nodiscard]] graph_connection_ptr output_connection(uint32_t const bus_idx) const override;
+    [[nodiscard]] graph_connection_wmap const &input_connections() const override;
+    [[nodiscard]] graph_connection_wmap const &output_connections() const override;
 
-    std::optional<audio::format> input_format(uint32_t const bus_idx) const;
-    std::optional<audio::format> output_format(uint32_t const bus_idx) const;
-    bus_result_t next_available_input_bus() const;
-    bus_result_t next_available_output_bus() const;
-    bool is_available_input_bus(uint32_t const bus_idx) const;
-    bool is_available_output_bus(uint32_t const bus_idx) const;
-    audio::graph_ptr graph() const override;
+    [[nodiscard]] std::optional<audio::format> input_format(uint32_t const bus_idx) const;
+    [[nodiscard]] std::optional<audio::format> output_format(uint32_t const bus_idx) const;
+    [[nodiscard]] bus_result_t next_available_input_bus() const;
+    [[nodiscard]] bus_result_t next_available_output_bus() const;
+    [[nodiscard]] bool is_available_input_bus(uint32_t const bus_idx) const;
+    [[nodiscard]] bool is_available_output_bus(uint32_t const bus_idx) const;
+    [[nodiscard]] audio::graph_ptr graph() const override;
 
-    uint32_t input_bus_count() const;
-    uint32_t output_bus_count() const;
-    bool is_input_renderable() const override;
+    [[nodiscard]] uint32_t input_bus_count() const;
+    [[nodiscard]] uint32_t output_bus_count() const;
+    [[nodiscard]] bool is_input_renderable() const override;
 
     void set_render_handler(node_render_f);
-    node_render_f const render_handler() const override;
+    [[nodiscard]] node_render_f const render_handler() const override;
 
     [[nodiscard]] chaining::chain_unsync_t<method> chain() const;
     [[nodiscard]] chaining::chain_relayed_unsync_t<method, method> chain(method const) const;
