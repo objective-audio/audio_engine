@@ -37,7 +37,6 @@ struct graph_avf_au final {
     static graph_avf_au_ptr make_shared(args &&);
 
    private:
-    std::weak_ptr<graph_avf_au> _weak_au;
     audio::graph_node_ptr _node;
 
     audio::avf_au_ptr const _raw_au;

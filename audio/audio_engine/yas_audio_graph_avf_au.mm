@@ -17,6 +17,27 @@ using namespace yas;
 
 audio::graph_avf_au::graph_avf_au(graph_node_args &&args, AudioComponentDescription const &acd)
     : _node(graph_node::make_shared(std::move(args))), _raw_au(audio::avf_au::make_shared(acd)) {
+    this->_node->chain()
+        .guard([](auto const &pair) { return pair.first == graph_node::method::prepare_rendering; })
+        .perform([this](auto const &) {
+            this->_node->set_render_handler([raw_au = this->_raw_au](node_render_args args) {
+                raw_au->render({.buffer = args.buffer, .bus_idx = args.bus_idx, .time = args.time},
+                               [&args](avf_au::render_args input_args) {
+                                   if (args.source_connections.count(input_args.bus_idx) > 0) {
+                                       rendering_connection const &connection =
+                                           args.source_connections.at(input_args.bus_idx);
+                                       connection.render(input_args.buffer, input_args.time);
+                                   }
+                               });
+            });
+        })
+        .end()
+        ->add_to(this->_pool);
+
+    this->_node->chain(graph_node::method::will_reset)
+        .perform([this](auto const &) { this->_will_reset(); })
+        .end()
+        ->add_to(this->_pool);
 }
 
 audio::graph_avf_au::~graph_avf_au() = default;
@@ -50,45 +71,9 @@ chaining::chain_unsync_t<audio::graph_avf_au::connection_method> audio::graph_av
 }
 
 void audio::graph_avf_au::_prepare(graph_avf_au_ptr const &shared, AudioComponentDescription const &acd) {
-    this->_weak_au = shared;
+    manageable_graph_node::cast(this->_node)->set_setup_handler([this]() { this->_initialize_raw_au(); });
 
-    auto weak_au = to_weak(shared);
-
-    this->_node->set_render_handler([weak_au](node_render_args args) {
-        if (auto shared_au = weak_au.lock()) {
-            auto const &raw_au = shared_au->_raw_au;
-
-            raw_au->render({.buffer = args.buffer, .bus_idx = args.bus_idx, .time = args.time},
-                           [&args](avf_au::render_args input_args) {
-                               if (args.source_connections.count(input_args.bus_idx) > 0) {
-                                   rendering_connection const &connection =
-                                       args.source_connections.at(input_args.bus_idx);
-                                   connection.render(input_args.buffer, input_args.time);
-                               }
-                           });
-        }
-    });
-
-    this->_node->chain(graph_node::method::will_reset)
-        .perform([weak_au](auto const &) {
-            if (auto au = weak_au.lock()) {
-                au->_will_reset();
-            }
-        })
-        .end()
-        ->add_to(this->_pool);
-
-    manageable_graph_node::cast(this->_node)->set_setup_handler([weak_au]() {
-        if (auto au = weak_au.lock()) {
-            au->_initialize_raw_au();
-        }
-    });
-
-    manageable_graph_node::cast(this->_node)->set_teardown_handler([weak_au]() {
-        if (auto au = weak_au.lock()) {
-            au->_uninitialize_raw_au();
-        }
-    });
+    manageable_graph_node::cast(this->_node)->set_teardown_handler([this]() { this->_uninitialize_raw_au(); });
 
     this->_raw_au->load_state_chain().send_to(shared->_load_state).sync()->add_to(this->_pool);
 }
