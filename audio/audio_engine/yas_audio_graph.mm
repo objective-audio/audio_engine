@@ -350,7 +350,7 @@ void audio::graph::_update_io_rendering() {
 
 void audio::graph::_clear_io_rendering() {
     if (this->_io.has_value()) {
-        audio::manageable_graph_io::cast(this->_io.value())->update_rendering();
+        audio::manageable_graph_io::cast(this->_io.value())->clear_rendering();
     }
 }
 
