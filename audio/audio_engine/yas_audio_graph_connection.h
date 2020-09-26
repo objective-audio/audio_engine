@@ -21,7 +21,6 @@ struct graph_connection : graph_node_removable, renderable_graph_connection {
    private:
     uint32_t const _source_bus;
     uint32_t const _destination_bus;
-    mutable std::recursive_mutex _mutex;
     std::weak_ptr<graph_node> _source_node;
     std::weak_ptr<graph_node> _destination_node;
     std::weak_ptr<graph_connection> _weak_connection;

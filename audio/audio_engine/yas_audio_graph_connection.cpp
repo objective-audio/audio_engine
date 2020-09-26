@@ -40,12 +40,10 @@ uint32_t audio::graph_connection::destination_bus() const {
 }
 
 audio::graph_node_ptr audio::graph_connection::source_node() const {
-    std::lock_guard<std::recursive_mutex> lock(this->_mutex);
     return this->_source_node.lock();
 }
 
 audio::graph_node_ptr audio::graph_connection::destination_node() const {
-    std::lock_guard<std::recursive_mutex> lock(this->_mutex);
     return this->_destination_node.lock();
 }
 
@@ -54,18 +52,15 @@ audio::format const &audio::graph_connection::format() const {
 }
 
 void audio::graph_connection::remove_nodes() {
-    std::lock_guard<std::recursive_mutex> lock(this->_mutex);
     this->_source_node.reset();
     this->_destination_node.reset();
 }
 
 void audio::graph_connection::remove_source_node() {
-    std::lock_guard<std::recursive_mutex> lock(this->_mutex);
     this->_source_node.reset();
 }
 
 void audio::graph_connection::remove_destination_node() {
-    std::lock_guard<std::recursive_mutex> lock(this->_mutex);
     this->_destination_node.reset();
 }
 
