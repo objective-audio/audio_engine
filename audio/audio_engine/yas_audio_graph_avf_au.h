@@ -53,7 +53,6 @@ struct graph_avf_au final {
 
     explicit graph_avf_au(graph_node_args &&, AudioComponentDescription const &);
 
-    void _prepare(graph_avf_au_ptr const &, AudioComponentDescription const &acd);
     void _will_reset();
     void _update_unit_connections();
 
