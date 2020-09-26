@@ -31,7 +31,6 @@ struct graph_avf_au_mixer final {
 
     graph_avf_au_mixer();
 
-    void _prepare(graph_avf_au_mixer_ptr const &);
     void _update_unit_mixer_connections();
 };
 }  // namespace yas::audio
