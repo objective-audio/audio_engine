@@ -192,14 +192,8 @@ void audio::graph_node::prepare_rendering() {
     this->_notifier->notify(method::prepare_rendering);
 }
 
-void audio::graph_node::_prepare(graph_node_ptr const &shared) {
-    this->_weak_node = shared;
-}
-
 audio::graph_node_ptr audio::graph_node::make_shared(graph_node_args args) {
-    auto shared = graph_node_ptr(new graph_node{std::move(args)});
-    shared->_prepare(shared);
-    return shared;
+    return graph_node_ptr(new graph_node{std::move(args)});
 }
 
 #pragma mark -

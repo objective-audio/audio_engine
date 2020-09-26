@@ -58,7 +58,6 @@ struct graph_node : connectable_graph_node, manageable_graph_node, renderable_gr
     static graph_node_ptr make_shared(graph_node_args);
 
    private:
-    std::weak_ptr<graph_node> _weak_node;
     std::weak_ptr<audio::graph> _weak_graph;
     uint32_t _input_bus_count = 0;
     uint32_t _output_bus_count = 0;
@@ -72,8 +71,6 @@ struct graph_node : connectable_graph_node, manageable_graph_node, renderable_gr
     chaining::notifier_ptr<method> _notifier = chaining::notifier<method>::make_shared();
 
     explicit graph_node(graph_node_args &&);
-
-    void _prepare(graph_node_ptr const &);
 
     void add_connection(audio::graph_connection_ptr const &) override;
     void remove_input_connection(uint32_t const dst_bus) override;
