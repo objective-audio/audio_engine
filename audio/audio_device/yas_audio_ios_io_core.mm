@@ -81,10 +81,6 @@ void audio::ios_io_core::stop() {
     this->_is_started = false;
 }
 
-void audio::ios_io_core::_prepare(ios_io_core_ptr const &shared) {
-    this->_weak_core = shared;
-}
-
 void audio::ios_io_core::_make_kernel() {
     if (this->_kernel) {
         return;
@@ -329,9 +325,7 @@ void audio::ios_io_core::_reload_if_needed() {
 }
 
 audio::ios_io_core_ptr audio::ios_io_core::make_shared(ios_device_ptr const &device) {
-    auto shared = std::shared_ptr<ios_io_core>(new ios_io_core{device});
-    shared->_prepare(shared);
-    return shared;
+    return std::shared_ptr<ios_io_core>(new ios_io_core{device});
 }
 
 #endif
