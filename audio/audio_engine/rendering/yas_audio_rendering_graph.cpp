@@ -13,6 +13,10 @@ using namespace yas;
 namespace yas::audio {
 
 std::vector<std::unique_ptr<rendering_node>> make_rendering_nodes(renderable_graph_node_ptr const &node) {
+    if (!node->render_handler()) {
+        return {};
+    }
+
     std::vector<std::unique_ptr<rendering_node>> sub_nodes;
     rendering_connection_map connections;
 
