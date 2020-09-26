@@ -176,7 +176,7 @@ bool audio::graph::is_running() const {
     }
 }
 
-std::unordered_set<audio::graph_node_ptr> const &audio::graph::nodes() const {
+audio::graph_node_observer_map const &audio::graph::nodes() const {
     return this->_nodes;
 }
 
@@ -197,7 +197,15 @@ void audio::graph::_attach_node(audio::graph_node_ptr const &node) {
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : node is already attached.");
     }
 
-    this->_nodes.insert(node);
+    auto observer = node->chain(graph_node::method::update_rendering)
+                        .perform([this](auto const &) {
+                            if (this->is_running()) {
+                                this->_update_io_rendering();
+                            }
+                        })
+                        .end();
+
+    this->_nodes.insert(std::make_pair(node, observer));
 
     manageable_graph_node::cast(node)->set_graph(this->_weak_graph);
 
@@ -231,8 +239,8 @@ void audio::graph::_detach_node_if_unused(audio::graph_node_ptr const &node) {
 }
 
 bool audio::graph::_setup_rendering() {
-    for (auto &node : this->_nodes) {
-        this->_setup_node(node);
+    for (auto &pair : this->_nodes) {
+        this->_setup_node(pair.first);
     }
 
     for (auto const &connection : this->_connections) {
@@ -255,8 +263,8 @@ void audio::graph::_dispose_rendering() {
         this->_remove_connection_from_nodes(connection);
     }
 
-    for (auto &node : this->_nodes) {
-        this->_teardown_node(node);
+    for (auto &pair : this->_nodes) {
+        this->_teardown_node(pair.first);
     }
 
     this->_clear_io_rendering();
