@@ -170,7 +170,7 @@ void audio::graph_node::set_graph(audio::graph_wptr const &graph) {
 }
 
 void audio::graph_node::update_rendering() {
-#warning todo
+    this->_notifier->notify(method::update_rendering);
 }
 
 void audio::graph_node::set_setup_handler(graph_node_setup_f &&handler) {
