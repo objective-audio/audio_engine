@@ -13,6 +13,8 @@ using namespace yas;
 namespace yas::audio {
 
 std::vector<std::unique_ptr<rendering_node>> make_rendering_nodes(renderable_graph_node_ptr const &node) {
+    node->prepare_rendering();
+
     if (!node->render_handler()) {
         return {};
     }
@@ -87,6 +89,7 @@ std::unique_ptr<rendering_input_node> make_rendering_input_node(renderable_graph
     renderable_graph_node_ptr const dst_node = connection->destination_node();
 
     if (dst_node->is_input_renderable()) {
+        dst_node->prepare_rendering();
         return std::make_unique<rendering_input_node>(connection->format(), dst_node->render_handler());
     } else {
         return nullptr;
