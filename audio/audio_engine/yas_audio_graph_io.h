@@ -16,12 +16,12 @@ class graph_input_context;
 struct graph_io : manageable_graph_io {
     virtual ~graph_io();
 
-    audio::graph_node_ptr const &output_node() const;
-    audio::graph_node_ptr const &input_node() const;
+    [[nodiscard]] audio::graph_node_ptr const &output_node() const;
+    [[nodiscard]] audio::graph_node_ptr const &input_node() const;
 
-    audio::io_ptr const &raw_io() override;
+    [[nodiscard]] audio::io_ptr const &raw_io() override;
 
-    static graph_io_ptr make_shared(audio::io_ptr const &);
+    [[nodiscard]] static graph_io_ptr make_shared(audio::io_ptr const &);
 
    private:
     audio::graph_node_ptr const _output_node;
