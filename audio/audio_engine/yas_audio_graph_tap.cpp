@@ -37,7 +37,7 @@ audio::graph_tap::graph_tap(args &&args)
 void audio::graph_tap::set_render_handler(audio::node_render_f handler) {
     this->_render_handler = handler;
 
-#warning todo io_renderingを更新する
+    renderable_graph_node::cast(this->_node)->update_rendering();
 }
 
 audio::graph_node_ptr const &audio::graph_tap::node() const {

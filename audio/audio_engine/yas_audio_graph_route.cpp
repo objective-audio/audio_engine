@@ -105,8 +105,8 @@ void audio::graph_route::_erase_route_if(std::function<bool(audio::route const &
     erase_if(this->_routes, pred);
 }
 
-void audio::graph_route::_update_rendering(){
-#warning todo io_rendering
+void audio::graph_route::_update_rendering() {
+    renderable_graph_node::cast(this->_node)->update_rendering();
 }
 
 audio::graph_route_ptr audio::graph_route::make_shared() {

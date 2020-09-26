@@ -86,5 +86,6 @@ using connectable_graph_node_ptr = std::shared_ptr<connectable_graph_node>;
 using manageable_graph_node_ptr = std::shared_ptr<manageable_graph_node>;
 using renderable_graph_node_ptr = std::shared_ptr<renderable_graph_node>;
 using manageable_graph_avf_au_ptr = std::shared_ptr<manageable_graph_avf_au>;
+using renderable_graph_node_ptr = std::shared_ptr<renderable_graph_node>;
 using renderable_graph_connection_ptr = std::shared_ptr<renderable_graph_connection>;
 }  // namespace yas::audio

@@ -71,7 +71,6 @@ chaining::chain_unsync_t<audio::graph_avf_au::connection_method> audio::graph_av
 
 void audio::graph_avf_au::_prepare(graph_avf_au_ptr const &shared, AudioComponentDescription const &acd) {
     manageable_graph_node::cast(this->_node)->set_setup_handler([this]() { this->_initialize_raw_au(); });
-
     manageable_graph_node::cast(this->_node)->set_teardown_handler([this]() { this->_uninitialize_raw_au(); });
 
     this->_raw_au->load_state_chain().send_to(shared->_load_state).sync()->add_to(this->_pool);
