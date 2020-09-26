@@ -25,6 +25,7 @@ struct graph_node : connectable_graph_node, manageable_graph_node, renderable_gr
     enum class method {
         will_reset,
         prepare_rendering,
+        update_rendering,
     };
 
     using chaining_pair_t = std::pair<method, graph_node_ptr>;
@@ -86,7 +87,7 @@ struct graph_node : connectable_graph_node, manageable_graph_node, renderable_gr
     void remove_output_connection(uint32_t const src_bus) override;
 
     void set_graph(audio::graph_wptr const &) override;
-    void update_kernel() override;
+    void update_rendering() override;
     void set_setup_handler(graph_node_setup_f &&) override;
     void set_teardown_handler(graph_node_setup_f &&) override;
     graph_node_setup_f const &setup_handler() const override;

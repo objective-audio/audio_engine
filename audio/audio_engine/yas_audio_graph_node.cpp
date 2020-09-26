@@ -49,7 +49,7 @@ void audio::graph_node::reset() {
     this->_input_connections.clear();
     this->_output_connections.clear();
 
-    this->update_kernel();
+    this->update_rendering();
 }
 
 audio::graph_connection_ptr audio::graph_node::input_connection(uint32_t const bus_idx) const {
@@ -177,24 +177,24 @@ void audio::graph_node::add_connection(audio::graph_connection_ptr const &connec
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : connection does not exist in a node.");
     }
 
-    this->update_kernel();
+    this->update_rendering();
 }
 
 void audio::graph_node::remove_input_connection(uint32_t const dst_bus) {
     this->_input_connections.erase(dst_bus);
-    this->update_kernel();
+    this->update_rendering();
 }
 
 void audio::graph_node::remove_output_connection(uint32_t const src_bus) {
     this->_output_connections.erase(src_bus);
-    this->update_kernel();
+    this->update_rendering();
 }
 
 void audio::graph_node::set_graph(audio::graph_wptr const &graph) {
     this->_weak_graph = graph;
 }
 
-void audio::graph_node::update_kernel() {
+void audio::graph_node::update_rendering() {
 #warning todo
 }
 
