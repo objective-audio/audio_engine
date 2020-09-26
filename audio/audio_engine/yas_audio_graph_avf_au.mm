@@ -3,11 +3,8 @@
 //
 
 #include "yas_audio_graph_avf_au.h"
-#import <AVFoundation/AVFoundation.h>
 #include <cpp_utils/yas_cf_utils.h>
 #include <cpp_utils/yas_fast_each.h>
-#include <cpp_utils/yas_objc_ptr.h>
-#include <cpp_utils/yas_thread.h>
 #include "yas_audio_avf_au_parameter.h"
 #include "yas_audio_avf_au_parameter_core.h"
 #include "yas_audio_rendering_connection.h"
@@ -37,11 +34,11 @@ audio::graph_avf_au::graph_avf_au(graph_node_args &&args, AudioComponentDescript
         .perform([this](auto const &) { this->_will_reset(); })
         .end()
         ->add_to(this->_pool);
-        
-        manageable_graph_node::cast(this->_node)->set_setup_handler([this]() { this->_initialize_raw_au(); });
-        manageable_graph_node::cast(this->_node)->set_teardown_handler([this]() { this->_uninitialize_raw_au(); });
 
-        this->_raw_au->load_state_chain().send_to(this->_load_state).sync()->add_to(this->_pool);
+    manageable_graph_node::cast(this->_node)->set_setup_handler([this]() { this->_initialize_raw_au(); });
+    manageable_graph_node::cast(this->_node)->set_teardown_handler([this]() { this->_uninitialize_raw_au(); });
+
+    this->_raw_au->load_state_chain().send_to(this->_load_state).sync()->add_to(this->_pool);
 }
 
 audio::graph_avf_au::~graph_avf_au() = default;
