@@ -44,7 +44,7 @@ audio::graph_node::graph_node(graph_node_args &&args)
 audio::graph_node::~graph_node() = default;
 
 void audio::graph_node::reset() {
-    this->_notifier->notify(std::make_pair(method::will_reset, this->_weak_node.lock()));
+    this->_notifier->notify(method::will_reset);
 
     this->_input_connections.clear();
     this->_output_connections.clear();
@@ -154,15 +154,13 @@ std::optional<audio::graph_kernel_ptr> audio::graph_node::kernel() const {
 
 #pragma mark render thread
 
-chaining::chain_unsync_t<audio::graph_node::chaining_pair_t> audio::graph_node::chain() const {
+chaining::chain_unsync_t<audio::graph_node::method> audio::graph_node::chain() const {
     return this->_notifier->chain();
 }
 
-chaining::chain_relayed_unsync_t<audio::graph_node_ptr, audio::graph_node::chaining_pair_t> audio::graph_node::chain(
+chaining::chain_relayed_unsync_t<audio::graph_node::method, audio::graph_node::method> audio::graph_node::chain(
     method const method) const {
-    return this->_notifier->chain()
-        .guard([method](auto const &pair) { return pair.first == method; })
-        .to([](chaining_pair_t const &pair) { return pair.second; });
+    return this->_notifier->chain().guard([method](auto const &value) { return value == method; });
 }
 
 void audio::graph_node::add_connection(audio::graph_connection_ptr const &connection) {
@@ -214,7 +212,7 @@ audio::graph_node_setup_f const &audio::graph_node::teardown_handler() const {
 }
 
 void audio::graph_node::prepare_rendering() {
-    this->_notifier->notify(std::make_pair(method::prepare_rendering, this->_weak_node.lock()));
+    this->_notifier->notify(method::prepare_rendering);
 }
 
 void audio::graph_node::_prepare(graph_node_ptr const &shared) {

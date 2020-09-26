@@ -28,8 +28,6 @@ struct graph_node : connectable_graph_node, manageable_graph_node, renderable_gr
         update_rendering,
     };
 
-    using chaining_pair_t = std::pair<method, graph_node_ptr>;
-
     virtual ~graph_node();
 
     void reset();
@@ -56,8 +54,8 @@ struct graph_node : connectable_graph_node, manageable_graph_node, renderable_gr
 
     std::optional<graph_kernel_ptr> kernel() const;
 
-    [[nodiscard]] chaining::chain_unsync_t<chaining_pair_t> chain() const;
-    [[nodiscard]] chaining::chain_relayed_unsync_t<graph_node_ptr, chaining_pair_t> chain(method const) const;
+    [[nodiscard]] chaining::chain_unsync_t<method> chain() const;
+    [[nodiscard]] chaining::chain_relayed_unsync_t<method, method> chain(method const) const;
 
     static graph_node_ptr make_shared(graph_node_args);
 
@@ -73,7 +71,7 @@ struct graph_node : connectable_graph_node, manageable_graph_node, renderable_gr
     graph_node_setup_f _setup_handler;
     graph_node_setup_f _teardown_handler;
     audio::node_render_f _render_handler;
-    chaining::notifier_ptr<chaining_pair_t> _notifier = chaining::notifier<chaining_pair_t>::make_shared();
+    chaining::notifier_ptr<method> _notifier = chaining::notifier<method>::make_shared();
 
     struct core;
     std::unique_ptr<core> _core;
@@ -87,12 +85,12 @@ struct graph_node : connectable_graph_node, manageable_graph_node, renderable_gr
     void remove_output_connection(uint32_t const src_bus) override;
 
     void set_graph(audio::graph_wptr const &) override;
-    void update_rendering() override;
     void set_setup_handler(graph_node_setup_f &&) override;
     void set_teardown_handler(graph_node_setup_f &&) override;
     graph_node_setup_f const &setup_handler() const override;
     graph_node_setup_f const &teardown_handler() const override;
     void prepare_rendering() override;
+    void update_rendering() override;
 
     graph_node(graph_node &&) = delete;
     graph_node &operator=(graph_node &&) = delete;
