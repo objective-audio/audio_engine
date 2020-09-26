@@ -134,9 +134,7 @@ audio::graph_avf_au_ptr audio::graph_avf_au::make_shared(AudioComponentDescripti
 }
 
 audio::graph_avf_au_ptr audio::graph_avf_au::make_shared(graph_avf_au::args &&args) {
-    auto shared = graph_avf_au_ptr(new graph_avf_au{std::move(args.node_args), args.acd});
-    shared->_prepare(shared, args.acd);
-    return shared;
+    return graph_avf_au_ptr(new graph_avf_au{std::move(args.node_args), args.acd});
 }
 
 #pragma mark -
