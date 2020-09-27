@@ -46,6 +46,7 @@ struct manageable_graph_node {
     virtual void set_teardown_handler(graph_node_setup_f &&) = 0;
     virtual void set_prepare_rendering_handler(graph_node_setup_f &&) = 0;
     virtual void set_update_rendering_handler(graph_node_setup_f &&) = 0;
+    virtual void set_will_reset_handler(graph_node_setup_f &&) = 0;
     virtual graph_node_setup_f const &setup_handler() const = 0;
     virtual graph_node_setup_f const &teardown_handler() const = 0;
 

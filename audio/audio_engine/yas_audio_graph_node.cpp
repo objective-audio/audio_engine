@@ -25,7 +25,9 @@ audio::graph_node::graph_node(graph_node_args &&args)
 audio::graph_node::~graph_node() = default;
 
 void audio::graph_node::reset() {
-    this->_notifier->notify(method::will_reset);
+    if (this->_will_reset_handler) {
+        this->_will_reset_handler();
+    }
 
     this->_input_connections.clear();
     this->_output_connections.clear();
@@ -134,17 +136,6 @@ audio::node_render_f const audio::graph_node::render_handler() const {
     }
 }
 
-#pragma mark render thread
-
-chaining::chain_unsync_t<audio::graph_node::method> audio::graph_node::chain() const {
-    return this->_notifier->chain();
-}
-
-chaining::chain_relayed_unsync_t<audio::graph_node::method, audio::graph_node::method> audio::graph_node::chain(
-    method const method) const {
-    return this->_notifier->chain().guard([method](auto const &value) { return value == method; });
-}
-
 void audio::graph_node::add_connection(audio::graph_connection_ptr const &connection) {
     auto weak_connection = to_weak(connection);
     if (connection->destination_node().get() == this) {
@@ -196,6 +187,10 @@ void audio::graph_node::set_update_rendering_handler(graph_node_setup_f &&handle
     this->_update_rendering_handler = std::move(handler);
 }
 
+void audio::graph_node::set_will_reset_handler(graph_node_setup_f &&handler) {
+    this->_will_reset_handler = std::move(handler);
+}
+
 audio::graph_node_setup_f const &audio::graph_node::setup_handler() const {
     return this->_setup_handler;
 }
@@ -211,18 +206,4 @@ void audio::graph_node::prepare_rendering() {
 
 audio::graph_node_ptr audio::graph_node::make_shared(graph_node_args args) {
     return graph_node_ptr(new graph_node{std::move(args)});
-}
-
-#pragma mark -
-
-std::string yas::to_string(audio::graph_node::method const &method) {
-    switch (method) {
-        case audio::graph_node::method::will_reset:
-            return "will_reset";
-    }
-}
-
-std::ostream &operator<<(std::ostream &os, yas::audio::graph_node::method const &value) {
-    os << to_string(value);
-    return os;
 }

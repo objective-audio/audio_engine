@@ -17,7 +17,9 @@ using namespace yas;
 audio::graph_route::graph_route()
     : _node(graph_node::make_shared({.input_bus_count = std::numeric_limits<uint32_t>::max(),
                                      .output_bus_count = std::numeric_limits<uint32_t>::max()})) {
-    manageable_graph_node::cast(this->_node)->set_prepare_rendering_handler([this] {
+    auto const manageable_node = manageable_graph_node::cast(this->_node);
+
+    manageable_node->set_prepare_rendering_handler([this] {
         this->_node->set_render_handler([routes = this->_routes](node_render_args const &args) {
             auto &dst_buffer = args.buffer;
             auto const dst_bus_idx = args.bus_idx;
@@ -40,10 +42,7 @@ audio::graph_route::graph_route()
         });
     });
 
-    this->_node->chain(graph_node::method::will_reset)
-        .perform([this](auto const &) { this->_will_reset(); })
-        .end()
-        ->add_to(this->_pool);
+    manageable_node->set_will_reset_handler([this] { this->_will_reset(); });
 }
 
 audio::graph_route::~graph_route() = default;

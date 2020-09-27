@@ -14,7 +14,9 @@ using namespace yas;
 
 audio::graph_avf_au::graph_avf_au(graph_node_args &&args, AudioComponentDescription const &acd)
     : _node(graph_node::make_shared(std::move(args))), _raw_au(audio::avf_au::make_shared(acd)) {
-    manageable_graph_node::cast(this->_node)->set_prepare_rendering_handler([this] {
+    auto const manageable_node = manageable_graph_node::cast(this->_node);
+
+    manageable_node->set_prepare_rendering_handler([this] {
         this->_update_unit_connections();
         this->_node->set_render_handler([raw_au = this->_raw_au](node_render_args args) {
             raw_au->render({.buffer = args.buffer, .bus_idx = args.bus_idx, .time = args.time},
@@ -28,13 +30,9 @@ audio::graph_avf_au::graph_avf_au(graph_node_args &&args, AudioComponentDescript
         });
     });
 
-    this->_node->chain(graph_node::method::will_reset)
-        .perform([this](auto const &) { this->_will_reset(); })
-        .end()
-        ->add_to(this->_pool);
-
-    manageable_graph_node::cast(this->_node)->set_setup_handler([this]() { this->_initialize_raw_au(); });
-    manageable_graph_node::cast(this->_node)->set_teardown_handler([this]() { this->_uninitialize_raw_au(); });
+    manageable_node->set_will_reset_handler([this] { this->_will_reset(); });
+    manageable_node->set_setup_handler([this]() { this->_initialize_raw_au(); });
+    manageable_node->set_teardown_handler([this]() { this->_uninitialize_raw_au(); });
 
     this->_raw_au->load_state_chain().send_to(this->_load_state).sync()->add_to(this->_pool);
 }

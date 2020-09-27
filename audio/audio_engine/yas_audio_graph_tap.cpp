@@ -13,7 +13,9 @@ using namespace yas;
 audio::graph_tap::graph_tap(args &&args)
     : _node(graph_node::make_shared(args.is_input ? graph_node_args{.input_bus_count = 1, .input_renderable = true} :
                                                     graph_node_args{.input_bus_count = 1, .output_bus_count = 1})) {
-    manageable_graph_node::cast(this->_node)->set_prepare_rendering_handler([this] {
+    auto const manageable_node = manageable_graph_node::cast(this->_node);
+
+    manageable_node->set_prepare_rendering_handler([this] {
         this->_node->set_render_handler([handler = this->_render_handler](node_render_args args) {
             if (handler) {
                 handler.value()(args);
@@ -25,10 +27,7 @@ audio::graph_tap::graph_tap(args &&args)
         });
     });
 
-    this->_node->chain(graph_node::method::will_reset)
-        .perform([this](auto const &) { this->_render_handler = std::nullopt; })
-        .end()
-        ->add_to(this->_pool);
+    manageable_node->set_will_reset_handler([this] { this->_render_handler = std::nullopt; });
 }
 
 void audio::graph_tap::set_render_handler(audio::node_render_f handler) {

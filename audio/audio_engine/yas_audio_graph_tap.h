@@ -20,9 +20,8 @@ struct graph_tap final {
     static graph_tap_ptr make_shared(graph_tap::args);
 
    private:
-    graph_node_ptr _node;
+    graph_node_ptr const _node;
     std::optional<audio::node_render_f> _render_handler;
-    chaining::observer_pool _pool;
 
     explicit graph_tap(args &&);
 

@@ -22,10 +22,6 @@ class result;
 
 namespace yas::audio {
 struct graph_node : connectable_graph_node, manageable_graph_node, renderable_graph_node {
-    enum class method {
-        will_reset,
-    };
-
     virtual ~graph_node();
 
     void reset();
@@ -50,9 +46,6 @@ struct graph_node : connectable_graph_node, manageable_graph_node, renderable_gr
     void set_render_handler(node_render_f);
     [[nodiscard]] node_render_f const render_handler() const override;
 
-    [[nodiscard]] chaining::chain_unsync_t<method> chain() const;
-    [[nodiscard]] chaining::chain_relayed_unsync_t<method, method> chain(method const) const;
-
     static graph_node_ptr make_shared(graph_node_args);
 
    private:
@@ -67,8 +60,8 @@ struct graph_node : connectable_graph_node, manageable_graph_node, renderable_gr
     graph_node_setup_f _teardown_handler;
     graph_node_setup_f _prepare_rendering_handler;
     graph_node_setup_f _update_rendering_handler;
+    graph_node_setup_f _will_reset_handler;
     audio::node_render_f _render_handler;
-    chaining::notifier_ptr<method> _notifier = chaining::notifier<method>::make_shared();
 
     explicit graph_node(graph_node_args &&);
 
@@ -81,6 +74,7 @@ struct graph_node : connectable_graph_node, manageable_graph_node, renderable_gr
     void set_teardown_handler(graph_node_setup_f &&) override;
     void set_prepare_rendering_handler(graph_node_setup_f &&) override;
     void set_update_rendering_handler(graph_node_setup_f &&) override;
+    void set_will_reset_handler(graph_node_setup_f &&) override;
     graph_node_setup_f const &setup_handler() const override;
     graph_node_setup_f const &teardown_handler() const override;
     void prepare_rendering() override;
@@ -92,9 +86,3 @@ struct graph_node : connectable_graph_node, manageable_graph_node, renderable_gr
     graph_node &operator=(graph_node const &) = delete;
 };
 }  // namespace yas::audio
-
-namespace yas {
-std::string to_string(audio::graph_node::method const &);
-}
-
-std::ostream &operator<<(std::ostream &, yas::audio::graph_node::method const &);
