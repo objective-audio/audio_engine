@@ -14,22 +14,19 @@ using namespace yas;
 
 audio::graph_avf_au::graph_avf_au(graph_node_args &&args, AudioComponentDescription const &acd)
     : _node(graph_node::make_shared(std::move(args))), _raw_au(audio::avf_au::make_shared(acd)) {
-    this->_node->chain(graph_node::method::prepare_rendering)
-        .perform([this](auto const &) {
-            this->_update_unit_connections();
-            this->_node->set_render_handler([raw_au = this->_raw_au](node_render_args args) {
-                raw_au->render({.buffer = args.buffer, .bus_idx = args.bus_idx, .time = args.time},
-                               [&args](avf_au::render_args input_args) {
-                                   if (args.source_connections.count(input_args.bus_idx) > 0) {
-                                       rendering_connection const &connection =
-                                           args.source_connections.at(input_args.bus_idx);
-                                       connection.render(input_args.buffer, input_args.time);
-                                   }
-                               });
-            });
-        })
-        .end()
-        ->add_to(this->_pool);
+    manageable_graph_node::cast(this->_node)->set_prepare_rendering_handler([this] {
+        this->_update_unit_connections();
+        this->_node->set_render_handler([raw_au = this->_raw_au](node_render_args args) {
+            raw_au->render({.buffer = args.buffer, .bus_idx = args.bus_idx, .time = args.time},
+                           [&args](avf_au::render_args input_args) {
+                               if (args.source_connections.count(input_args.bus_idx) > 0) {
+                                   rendering_connection const &connection =
+                                       args.source_connections.at(input_args.bus_idx);
+                                   connection.render(input_args.buffer, input_args.time);
+                               }
+                           });
+        });
+    });
 
     this->_node->chain(graph_node::method::will_reset)
         .perform([this](auto const &) { this->_will_reset(); })

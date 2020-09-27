@@ -13,20 +13,17 @@ using namespace yas;
 audio::graph_tap::graph_tap(args &&args)
     : _node(graph_node::make_shared(args.is_input ? graph_node_args{.input_bus_count = 1, .input_renderable = true} :
                                                     graph_node_args{.input_bus_count = 1, .output_bus_count = 1})) {
-    this->_node->chain(graph_node::method::prepare_rendering)
-        .perform([this](auto const &) {
-            this->_node->set_render_handler([handler = this->_render_handler](node_render_args args) {
-                if (handler) {
-                    handler.value()(args);
-                } else {
-                    for (auto const &pair : args.source_connections) {
-                        pair.second.render(args.buffer, args.time);
-                    }
+    manageable_graph_node::cast(this->_node)->set_prepare_rendering_handler([this] {
+        this->_node->set_render_handler([handler = this->_render_handler](node_render_args args) {
+            if (handler) {
+                handler.value()(args);
+            } else {
+                for (auto const &pair : args.source_connections) {
+                    pair.second.render(args.buffer, args.time);
                 }
-            });
-        })
-        .end()
-        ->add_to(this->_pool);
+            }
+        });
+    });
 
     this->_node->chain(graph_node::method::will_reset)
         .perform([this](auto const &) { this->_render_handler = std::nullopt; })

@@ -13,7 +13,6 @@
 
 namespace yas::audio {
 using graph_node_set = std::unordered_set<graph_node_ptr>;
-using graph_node_observer_map = std::unordered_map<graph_node_ptr, chaining::any_observer_ptr>;
 using graph_node_setup_f = std::function<void(void)>;
 
 struct graph_node_args {
@@ -45,6 +44,8 @@ struct manageable_graph_node {
     virtual void update_rendering() = 0;
     virtual void set_setup_handler(graph_node_setup_f &&) = 0;
     virtual void set_teardown_handler(graph_node_setup_f &&) = 0;
+    virtual void set_prepare_rendering_handler(graph_node_setup_f &&) = 0;
+    virtual void set_update_rendering_handler(graph_node_setup_f &&) = 0;
     virtual graph_node_setup_f const &setup_handler() const = 0;
     virtual graph_node_setup_f const &teardown_handler() const = 0;
 

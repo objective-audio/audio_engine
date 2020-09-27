@@ -24,8 +24,6 @@ namespace yas::audio {
 struct graph_node : connectable_graph_node, manageable_graph_node, renderable_graph_node {
     enum class method {
         will_reset,
-        prepare_rendering,
-        update_rendering,
     };
 
     virtual ~graph_node();
@@ -67,6 +65,8 @@ struct graph_node : connectable_graph_node, manageable_graph_node, renderable_gr
     audio::graph_connection_wmap _output_connections;
     graph_node_setup_f _setup_handler;
     graph_node_setup_f _teardown_handler;
+    graph_node_setup_f _prepare_rendering_handler;
+    graph_node_setup_f _update_rendering_handler;
     audio::node_render_f _render_handler;
     chaining::notifier_ptr<method> _notifier = chaining::notifier<method>::make_shared();
 
@@ -79,6 +79,8 @@ struct graph_node : connectable_graph_node, manageable_graph_node, renderable_gr
     void set_graph(audio::graph_wptr const &) override;
     void set_setup_handler(graph_node_setup_f &&) override;
     void set_teardown_handler(graph_node_setup_f &&) override;
+    void set_prepare_rendering_handler(graph_node_setup_f &&) override;
+    void set_update_rendering_handler(graph_node_setup_f &&) override;
     graph_node_setup_f const &setup_handler() const override;
     graph_node_setup_f const &teardown_handler() const override;
     void prepare_rendering() override;

@@ -175,7 +175,9 @@ void audio::graph_node::set_graph(audio::graph_wptr const &graph) {
 }
 
 void audio::graph_node::update_rendering() {
-    this->_notifier->notify(method::update_rendering);
+    if (this->_update_rendering_handler) {
+        this->_update_rendering_handler();
+    }
 }
 
 void audio::graph_node::set_setup_handler(graph_node_setup_f &&handler) {
@@ -186,6 +188,14 @@ void audio::graph_node::set_teardown_handler(graph_node_setup_f &&handler) {
     this->_teardown_handler = std::move(handler);
 }
 
+void audio::graph_node::set_prepare_rendering_handler(graph_node_setup_f &&handler) {
+    this->_prepare_rendering_handler = std::move(handler);
+}
+
+void audio::graph_node::set_update_rendering_handler(graph_node_setup_f &&handler) {
+    this->_update_rendering_handler = std::move(handler);
+}
+
 audio::graph_node_setup_f const &audio::graph_node::setup_handler() const {
     return this->_setup_handler;
 }
@@ -194,7 +204,9 @@ audio::graph_node_setup_f const &audio::graph_node::teardown_handler() const {
 }
 
 void audio::graph_node::prepare_rendering() {
-    this->_notifier->notify(method::prepare_rendering);
+    if (this->_prepare_rendering_handler) {
+        this->_prepare_rendering_handler();
+    }
 }
 
 audio::graph_node_ptr audio::graph_node::make_shared(graph_node_args args) {
@@ -207,10 +219,6 @@ std::string yas::to_string(audio::graph_node::method const &method) {
     switch (method) {
         case audio::graph_node::method::will_reset:
             return "will_reset";
-        case audio::graph_node::method::prepare_rendering:
-            return "prepare_rendering";
-        case audio::graph_node::method::update_rendering:
-            return "update_rendering";
     }
 }
 

@@ -51,14 +51,14 @@ struct graph final {
     [[nodiscard]] static graph_ptr make_shared();
 
     // for Test
-    graph_node_observer_map const &nodes() const;
+    graph_node_set const &nodes() const;
     graph_connection_set const &connections() const;
 
    private:
     std::weak_ptr<graph> _weak_graph;
     std::optional<chaining::any_observer_ptr> _io_observer = std::nullopt;
 
-    graph_node_observer_map _nodes;
+    graph_node_set _nodes;
     graph_connection_set _connections;
 
     graph();

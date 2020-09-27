@@ -17,31 +17,28 @@ using namespace yas;
 audio::graph_route::graph_route()
     : _node(graph_node::make_shared({.input_bus_count = std::numeric_limits<uint32_t>::max(),
                                      .output_bus_count = std::numeric_limits<uint32_t>::max()})) {
-    this->_node->chain(graph_node::method::prepare_rendering)
-        .perform([this](auto const &) {
-            this->_node->set_render_handler([routes = this->_routes](node_render_args const &args) {
-                auto &dst_buffer = args.buffer;
-                auto const dst_bus_idx = args.bus_idx;
-                uint32_t const dst_ch_count = dst_buffer->format().channel_count();
+    manageable_graph_node::cast(this->_node)->set_prepare_rendering_handler([this] {
+        this->_node->set_render_handler([routes = this->_routes](node_render_args const &args) {
+            auto &dst_buffer = args.buffer;
+            auto const dst_bus_idx = args.bus_idx;
+            uint32_t const dst_ch_count = dst_buffer->format().channel_count();
 
-                for (auto const &pair : args.source_connections) {
-                    auto const &src_connection = pair.second;
-                    if (auto const *node = src_connection.source_node) {
-                        auto const &src_format = src_connection.format;
-                        auto const &src_bus_idx = pair.first;
-                        uint32_t const src_ch_count = src_format.channel_count();
-                        if (auto const result =
-                                channel_map_from_routes(routes, src_bus_idx, src_ch_count, dst_bus_idx, dst_ch_count)) {
-                            pcm_buffer src_buffer(src_format, *dst_buffer, result.value());
+            for (auto const &pair : args.source_connections) {
+                auto const &src_connection = pair.second;
+                if (auto const *node = src_connection.source_node) {
+                    auto const &src_format = src_connection.format;
+                    auto const &src_bus_idx = pair.first;
+                    uint32_t const src_ch_count = src_format.channel_count();
+                    if (auto const result =
+                            channel_map_from_routes(routes, src_bus_idx, src_ch_count, dst_bus_idx, dst_ch_count)) {
+                        pcm_buffer src_buffer(src_format, *dst_buffer, result.value());
 
-                            src_connection.render(&src_buffer, args.time);
-                        }
+                        src_connection.render(&src_buffer, args.time);
                     }
                 }
-            });
-        })
-        .end()
-        ->add_to(this->_pool);
+            }
+        });
+    });
 
     this->_node->chain(graph_node::method::will_reset)
         .perform([this](auto const &) { this->_will_reset(); })
