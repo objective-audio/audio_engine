@@ -1,12 +1,9 @@
 //
-//  yas_audio_device_tests.m
+//  yas_audio_io_device_tests.m
 //
 
 #include <TargetConditionals.h>
 
-#if (TARGET_OS_MAC && !TARGET_OS_IPHONE)
-
-#import <audio/yas_audio_mac_device.h>
 #import "yas_audio_test_io_device.h"
 #import "yas_audio_test_utils.h"
 
@@ -44,5 +41,3 @@ using namespace yas::test;
 }
 
 @end
-
-#endif
