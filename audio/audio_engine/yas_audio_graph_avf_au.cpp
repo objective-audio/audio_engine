@@ -33,14 +33,12 @@ audio::graph_avf_au::graph_avf_au(graph_node_args &&args, AudioComponentDescript
     manageable_node->set_will_reset_handler([this] { this->_will_reset(); });
     manageable_node->set_setup_handler([this]() { this->_initialize_raw_au(); });
     manageable_node->set_teardown_handler([this]() { this->_uninitialize_raw_au(); });
-
-    this->_raw_au->load_state_chain().send_to(this->_load_state).sync()->add_to(this->_pool);
 }
 
 audio::graph_avf_au::~graph_avf_au() = default;
 
 audio::graph_avf_au::load_state audio::graph_avf_au::state() const {
-    return this->_load_state->raw();
+    return this->_raw_au->state();
 }
 
 audio::avf_au_ptr const &audio::graph_avf_au::raw_au() const {
@@ -60,7 +58,7 @@ audio::graph_node_ptr const &audio::graph_avf_au::node() const {
 }
 
 chaining::chain_sync_t<audio::graph_avf_au::load_state> audio::graph_avf_au::load_state_chain() const {
-    return this->_load_state->chain();
+    return this->_raw_au->load_state_chain();
 }
 
 chaining::chain_unsync_t<audio::graph_avf_au::connection_method> audio::graph_avf_au::connection_chain() const {

@@ -67,6 +67,7 @@ struct avf_au {
     std::optional<avf_au_parameter_ptr> parameter(AudioUnitParameterID const, avf_au_parameter_scope const,
                                                   AudioUnitElement element) const;
 
+    load_state state() const;
     chaining::chain_sync_t<load_state> load_state_chain() const;
 
     // render thread

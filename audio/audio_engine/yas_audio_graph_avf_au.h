@@ -45,11 +45,8 @@ struct graph_avf_au final {
     std::vector<avf_au_parameter_ptr> _input_parameters;
     std::vector<avf_au_parameter_ptr> _output_parameters;
 
-    chaining::value::holder_ptr<load_state> _load_state =
-        chaining::value::holder<load_state>::make_shared(load_state::unload);
     chaining::notifier_ptr<connection_method> _connection_notifier =
         chaining::notifier<connection_method>::make_shared();
-    chaining::observer_pool _pool;
 
     explicit graph_avf_au(graph_node_args &&, AudioComponentDescription const &);
 
