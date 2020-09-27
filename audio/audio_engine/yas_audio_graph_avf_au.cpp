@@ -16,6 +16,7 @@ audio::graph_avf_au::graph_avf_au(graph_node_args &&args, AudioComponentDescript
     : _node(graph_node::make_shared(std::move(args))), _raw_au(audio::avf_au::make_shared(acd)) {
     this->_node->chain(graph_node::method::prepare_rendering)
         .perform([this](auto const &) {
+            this->_update_unit_connections();
             this->_node->set_render_handler([raw_au = this->_raw_au](node_render_args args) {
                 raw_au->render({.buffer = args.buffer, .bus_idx = args.bus_idx, .time = args.time},
                                [&args](avf_au::render_args input_args) {
