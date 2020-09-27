@@ -126,7 +126,12 @@ void audio::graph_node::set_render_handler(node_render_f handler) {
 }
 
 audio::node_render_f const audio::graph_node::render_handler() const {
-    return this->_render_handler;
+    if (this->_render_handler) {
+        return this->_render_handler;
+    } else {
+        static node_render_f const _empty_handler = [](auto const &) {};
+        return _empty_handler;
+    }
 }
 
 #pragma mark render thread

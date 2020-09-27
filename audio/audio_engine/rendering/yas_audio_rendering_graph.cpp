@@ -15,9 +15,7 @@ namespace yas::audio {
 std::vector<std::unique_ptr<rendering_node>> make_rendering_nodes(renderable_graph_node_ptr const &node) {
     node->prepare_rendering();
 
-    if (!node->render_handler()) {
-        return {};
-    }
+    assert(node->render_handler());
 
     std::vector<std::unique_ptr<rendering_node>> sub_nodes;
     rendering_connection_map connections;
