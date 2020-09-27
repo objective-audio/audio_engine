@@ -99,3 +99,7 @@ struct avf_au {
                                AudioUnitElement const element) const;
 };
 }  // namespace yas::audio
+
+namespace yas {
+std::string to_string(audio::avf_au::load_state const &);
+}

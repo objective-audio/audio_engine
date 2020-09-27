@@ -151,6 +151,12 @@ using namespace yas;
     XCTAssertEqual(default_value, delay_au->global_parameter_value(kDelayParam_DelayTime));
 }
 
+- (void)test_load_state_to_string {
+    XCTAssertEqual(to_string(audio::avf_au::load_state::unload), "unload");
+    XCTAssertEqual(to_string(audio::avf_au::load_state::loaded), "loaded");
+    XCTAssertEqual(to_string(audio::avf_au::load_state::failed), "failed");
+}
+
 #pragma mark - private
 
 - (void)_load_au:(audio::avf_au_ptr const &)au {

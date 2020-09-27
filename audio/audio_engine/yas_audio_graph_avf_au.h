@@ -60,7 +60,3 @@ struct graph_avf_au final {
     void _uninitialize_raw_au();
 };
 }  // namespace yas::audio
-
-namespace yas {
-std::string to_string(audio::graph_avf_au::load_state const &);
-}

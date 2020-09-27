@@ -560,3 +560,16 @@ audio::avf_au_ptr audio::avf_au::make_shared(AudioComponentDescription const &ac
     shared->_prepare(shared, acd);
     return shared;
 }
+
+#pragma mark -
+
+std::string yas::to_string(audio::avf_au::load_state const &state) {
+    switch (state) {
+        case audio::avf_au::load_state::unload:
+            return "unload";
+        case audio::avf_au::load_state::loaded:
+            return "loaded";
+        case audio::avf_au::load_state::failed:
+            return "failed";
+    }
+}

@@ -134,16 +134,3 @@ audio::graph_avf_au_ptr audio::graph_avf_au::make_shared(AudioComponentDescripti
 audio::graph_avf_au_ptr audio::graph_avf_au::make_shared(graph_avf_au::args &&args) {
     return graph_avf_au_ptr(new graph_avf_au{std::move(args.node_args), args.acd});
 }
-
-#pragma mark -
-
-std::string yas::to_string(audio::graph_avf_au::load_state const &state) {
-    switch (state) {
-        case audio::graph_avf_au::load_state::unload:
-            return "unload";
-        case audio::graph_avf_au::load_state::loaded:
-            return "loaded";
-        case audio::graph_avf_au::load_state::failed:
-            return "failed";
-    }
-}

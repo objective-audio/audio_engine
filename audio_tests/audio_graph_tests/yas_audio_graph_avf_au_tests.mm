@@ -164,6 +164,12 @@ using namespace yas;
     XCTAssertNotEqual(raw_au->global_parameter_value(kDelayParam_WetDryMix), wet_dry_mix);
 }
 
+- (void)test_load_state_to_string {
+    XCTAssertEqual(to_string(audio::graph_avf_au::load_state::unload), "unload");
+    XCTAssertEqual(to_string(audio::graph_avf_au::load_state::loaded), "loaded");
+    XCTAssertEqual(to_string(audio::graph_avf_au::load_state::failed), "failed");
+}
+
 - (void)_load_au:(audio::graph_avf_au_ptr const &)au {
     auto exp = [self expectationWithDescription:@"load"];
 
