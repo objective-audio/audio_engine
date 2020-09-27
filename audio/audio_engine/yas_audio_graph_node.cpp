@@ -171,30 +171,30 @@ void audio::graph_node::update_rendering() {
     }
 }
 
-void audio::graph_node::set_setup_handler(graph_node_setup_f &&handler) {
+void audio::graph_node::set_setup_handler(graph_node_f &&handler) {
     this->_setup_handler = std::move(handler);
 }
 
-void audio::graph_node::set_teardown_handler(graph_node_setup_f &&handler) {
+void audio::graph_node::set_teardown_handler(graph_node_f &&handler) {
     this->_teardown_handler = std::move(handler);
 }
 
-void audio::graph_node::set_prepare_rendering_handler(graph_node_setup_f &&handler) {
+void audio::graph_node::set_prepare_rendering_handler(graph_node_f &&handler) {
     this->_prepare_rendering_handler = std::move(handler);
 }
 
-void audio::graph_node::set_update_rendering_handler(graph_node_setup_f &&handler) {
+void audio::graph_node::set_update_rendering_handler(graph_node_f &&handler) {
     this->_update_rendering_handler = std::move(handler);
 }
 
-void audio::graph_node::set_will_reset_handler(graph_node_setup_f &&handler) {
+void audio::graph_node::set_will_reset_handler(graph_node_f &&handler) {
     this->_will_reset_handler = std::move(handler);
 }
 
-audio::graph_node_setup_f const &audio::graph_node::setup_handler() const {
+audio::graph_node_f const &audio::graph_node::setup_handler() const {
     return this->_setup_handler;
 }
-audio::graph_node_setup_f const &audio::graph_node::teardown_handler() const {
+audio::graph_node_f const &audio::graph_node::teardown_handler() const {
     return this->_teardown_handler;
 }
 

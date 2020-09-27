@@ -56,11 +56,11 @@ struct graph_node : connectable_graph_node, manageable_graph_node, renderable_gr
     std::optional<uint32_t> _override_output_bus_idx = std::nullopt;
     audio::graph_connection_wmap _input_connections;
     audio::graph_connection_wmap _output_connections;
-    graph_node_setup_f _setup_handler;
-    graph_node_setup_f _teardown_handler;
-    graph_node_setup_f _prepare_rendering_handler;
-    graph_node_setup_f _update_rendering_handler;
-    graph_node_setup_f _will_reset_handler;
+    graph_node_f _setup_handler;
+    graph_node_f _teardown_handler;
+    graph_node_f _prepare_rendering_handler;
+    graph_node_f _update_rendering_handler;
+    graph_node_f _will_reset_handler;
     audio::node_render_f _render_handler;
 
     explicit graph_node(graph_node_args &&);
@@ -70,13 +70,13 @@ struct graph_node : connectable_graph_node, manageable_graph_node, renderable_gr
     void remove_output_connection(uint32_t const src_bus) override;
 
     void set_graph(audio::graph_wptr const &) override;
-    void set_setup_handler(graph_node_setup_f &&) override;
-    void set_teardown_handler(graph_node_setup_f &&) override;
-    void set_prepare_rendering_handler(graph_node_setup_f &&) override;
-    void set_update_rendering_handler(graph_node_setup_f &&) override;
-    void set_will_reset_handler(graph_node_setup_f &&) override;
-    graph_node_setup_f const &setup_handler() const override;
-    graph_node_setup_f const &teardown_handler() const override;
+    void set_setup_handler(graph_node_f &&) override;
+    void set_teardown_handler(graph_node_f &&) override;
+    void set_prepare_rendering_handler(graph_node_f &&) override;
+    void set_update_rendering_handler(graph_node_f &&) override;
+    void set_will_reset_handler(graph_node_f &&) override;
+    graph_node_f const &setup_handler() const override;
+    graph_node_f const &teardown_handler() const override;
     void prepare_rendering() override;
     void update_rendering() override;
 
