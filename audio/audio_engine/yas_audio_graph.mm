@@ -22,7 +22,9 @@ using namespace yas;
 
 audio::graph::graph() = default;
 
-audio::graph::~graph() = default;
+audio::graph::~graph() {
+    this->_nodes.clear();
+}
 
 audio::graph_connection_ptr audio::graph::connect(audio::graph_node_ptr const &source_node,
                                                   audio::graph_node_ptr const &destination_node,
