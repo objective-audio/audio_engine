@@ -116,7 +116,12 @@ float audio::avf_au_parameter::value() const {
 }
 
 void audio::avf_au_parameter::set_value(float const value) {
-    this->_value = value;
+    if (this->_value != value) {
+        this->_value = value;
+        if (this->_value_changed_handler) {
+            this->_value_changed_handler(value);
+        }
+    }
 }
 
 void audio::avf_au_parameter::set_value_at(std::size_t const idx) {
@@ -127,6 +132,10 @@ void audio::avf_au_parameter::set_value_at(std::size_t const idx) {
 
 void audio::avf_au_parameter::reset_value() {
     this->set_value(this->_default_value);
+}
+
+void audio::avf_au_parameter::set_value_changed_handler(std::function<void(float const)> &&handler) {
+    this->_value_changed_handler = std::move(handler);
 }
 
 audio::avf_au_parameter_ptr audio::avf_au_parameter::make_shared(avf_au_parameter_core_ptr const &core) {

@@ -8,6 +8,7 @@
 #include <audio/yas_audio_ptr.h>
 #include <chaining/yas_chaining_umbrella.h>
 
+#include <functional>
 #include <optional>
 
 namespace yas::audio {
@@ -35,6 +36,8 @@ struct avf_au_parameter {
     void set_value_at(std::size_t const);
     void reset_value();
 
+    void set_value_changed_handler(std::function<void(float const)> &&);
+
     static avf_au_parameter_ptr make_shared(avf_au_parameter_core_ptr const &);
 
    private:
@@ -49,6 +52,8 @@ struct avf_au_parameter {
     std::vector<std::string> const _value_strings;
     std::vector<float> const _values;
     float _value;
+
+    std::function<void(float const)> _value_changed_handler;
 
     avf_au_parameter(avf_au_parameter_core_ptr const &);
 };
