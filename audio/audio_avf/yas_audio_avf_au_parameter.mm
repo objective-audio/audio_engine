@@ -55,7 +55,7 @@ audio::avf_au_parameter::avf_au_parameter(avf_au_parameter_core_ptr const &core)
       _max_value(core->objc_parameter.object().maxValue),
       _value_strings(avf_au_parameter_utils::value_strings(core)),
       _values(avf_au_parameter_utils::values(core)),
-      _value(chaining::value::holder<float>::make_shared(_default_value)) {
+      _value(_default_value) {
 }
 
 std::string const &audio::avf_au_parameter::key_path() const {
@@ -112,11 +112,11 @@ std::optional<std::string> const &audio::avf_au_parameter::unit_name() const {
 }
 
 float audio::avf_au_parameter::value() const {
-    return this->_value->raw();
+    return this->_value;
 }
 
 void audio::avf_au_parameter::set_value(float const value) {
-    this->_value->set_value(value);
+    this->_value = value;
 }
 
 void audio::avf_au_parameter::set_value_at(std::size_t const idx) {
@@ -126,11 +126,7 @@ void audio::avf_au_parameter::set_value_at(std::size_t const idx) {
 }
 
 void audio::avf_au_parameter::reset_value() {
-    this->_value->set_value(this->_default_value);
-}
-
-chaining::chain_sync_t<float> audio::avf_au_parameter::chain() const {
-    return this->_value->chain();
+    this->set_value(this->_default_value);
 }
 
 audio::avf_au_parameter_ptr audio::avf_au_parameter::make_shared(avf_au_parameter_core_ptr const &core) {

@@ -35,8 +35,6 @@ struct avf_au_parameter {
     void set_value_at(std::size_t const);
     void reset_value();
 
-    chaining::chain_sync_t<float> chain() const;
-
     static avf_au_parameter_ptr make_shared(avf_au_parameter_core_ptr const &);
 
    private:
@@ -50,7 +48,7 @@ struct avf_au_parameter {
     float const _max_value;
     std::vector<std::string> const _value_strings;
     std::vector<float> const _values;
-    chaining::value::holder_ptr<float> _value;
+    float _value;
 
     avf_au_parameter(avf_au_parameter_core_ptr const &);
 };
