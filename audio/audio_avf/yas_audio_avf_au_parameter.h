@@ -18,12 +18,12 @@ enum class avf_au_parameter_scope {
 };
 
 struct avf_au_parameter {
-    std::string key_path() const;
+    std::string const &key_path() const;
     avf_au_parameter_scope scope() const;
-    std::string identifier() const;
+    std::string const &identifier() const;
     AudioUnitParameterUnit unit() const;
-    std::optional<std::string> unit_name() const;
-    std::string display_name() const;
+    std::optional<std::string> const &unit_name() const;
+    std::string const &display_name() const;
 
     float min_value() const;
     float max_value() const;
@@ -40,10 +40,16 @@ struct avf_au_parameter {
     static avf_au_parameter_ptr make_shared(avf_au_parameter_core_ptr const &);
 
    private:
-    avf_au_parameter_core_ptr _core;
-
+    std::string const _key_path;
+    std::string const _identifier;
+    AudioUnitParameterUnit const _unit;
+    std::optional<std::string> const _unit_name;
+    std::string const _display_name;
     float const _default_value;
+    float const _min_value;
+    float const _max_value;
     std::vector<std::string> const _value_strings;
+    std::vector<float> const _values;
     chaining::value::holder_ptr<float> _value;
     chaining::observer_pool _pool;
 
