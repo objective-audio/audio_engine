@@ -56,12 +56,6 @@ audio::avf_au_parameter::avf_au_parameter(avf_au_parameter_core_ptr const &core)
       _value_strings(avf_au_parameter_utils::value_strings(core)),
       _values(avf_au_parameter_utils::values(core)),
       _value(chaining::value::holder<float>::make_shared(_default_value)) {
-    this->_value->chain()
-        .perform([this](auto const &value) {
-#warning todo 値の更新通知。AUParameterに反映させる
-        })
-        .end()
-        ->add_to(this->_pool);
 }
 
 std::string const &audio::avf_au_parameter::key_path() const {

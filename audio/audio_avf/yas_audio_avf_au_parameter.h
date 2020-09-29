@@ -51,7 +51,6 @@ struct avf_au_parameter {
     std::vector<std::string> const _value_strings;
     std::vector<float> const _values;
     chaining::value::holder_ptr<float> _value;
-    chaining::observer_pool _pool;
 
     avf_au_parameter(avf_au_parameter_core_ptr const &);
 };
