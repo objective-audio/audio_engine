@@ -19,6 +19,22 @@
 using namespace yas;
 
 namespace yas::audio {
+namespace avf_au_utils {
+    objc_ptr<AUParameter *> objc_parameter(objc_ptr<AUAudioUnit *> const &raw_unit,
+                                           audio::avf_au_parameter_scope const scope, std::string const &identifier) {
+        for (AUParameter *auParameter in raw_unit.object().parameterTree.allParameters) {
+            auto objc_param = objc_ptr<AUParameter *>(auParameter);
+            auto core = avf_au_parameter_core::make_shared(objc_param);
+            auto const parameter = avf_au_parameter::make_shared(core);
+
+            if (scope == parameter->scope() && identifier == parameter->identifier()) {
+                return objc_param;
+            }
+        }
+        return objc_ptr<AUParameter *>{nullptr};
+    }
+}
+
 struct avf_au::core {
     void load_raw_unit(AudioComponentDescription const &acd, avf_au_ptr const &shared) {
         auto weak_au = to_weak(shared);
@@ -393,26 +409,26 @@ std::optional<audio::avf_au_parameter_ptr> audio::avf_au::parameter(AudioUnitPar
         if (AUParameter *parameter = [raw_unit.value().object().parameterTree parameterWithID:parameter_id
                                                                                         scope:to_raw_scope(scope)
                                                                                       element:element]) {
-            auto const key_path = to_string((__bridge CFStringRef)parameter.keyPath);
+            auto const identifier = to_string((__bridge CFStringRef)parameter.identifier);
 
             switch (scope) {
                 case avf_au_parameter_scope::global: {
-                    if (auto const parameter = first(this->_global_parameters, [key_path](auto const &parameter) {
-                            return parameter->key_path() == key_path;
+                    if (auto const parameter = first(this->_global_parameters, [identifier](auto const &parameter) {
+                            return parameter->identifier() == identifier;
                         })) {
                         return parameter;
                     }
                 } break;
                 case avf_au_parameter_scope::output: {
-                    if (auto const parameter = first(this->_output_parameters, [key_path](auto const &parameter) {
-                            return parameter->key_path() == key_path;
+                    if (auto const parameter = first(this->_output_parameters, [identifier](auto const &parameter) {
+                            return parameter->identifier() == identifier;
                         })) {
                         return parameter;
                     }
                 } break;
                 case avf_au_parameter_scope::input: {
-                    if (auto const parameter = first(this->_input_parameters, [key_path](auto const &parameter) {
-                            return parameter->key_path() == key_path;
+                    if (auto const parameter = first(this->_input_parameters, [identifier](auto const &parameter) {
+                            return parameter->identifier() == identifier;
                         })) {
                         return parameter;
                     }
@@ -463,8 +479,9 @@ void audio::avf_au::_setup() {
         auto objc_param = objc_ptr<AUParameter *>(auParameter);
         auto core = avf_au_parameter_core::make_shared(objc_param);
         auto const parameter = avf_au_parameter::make_shared(core);
+        auto const scope = parameter->scope();
 
-        switch (parameter->scope()) {
+        switch (scope) {
             case avf_au_parameter_scope::global:
                 this->_global_parameters.emplace_back(parameter);
                 break;
@@ -475,6 +492,13 @@ void audio::avf_au::_setup() {
                 this->_output_parameters.emplace_back(parameter);
                 break;
         }
+
+        parameter->set_value_changed_handler([this, scope, identifier = parameter->identifier()](float const value) {
+            if (auto const objc_parameter =
+                    avf_au_utils::objc_parameter(this->_core->raw_unit().value(), scope, identifier)) {
+                objc_parameter.object().value = value;
+            }
+        });
     }
 }
 
