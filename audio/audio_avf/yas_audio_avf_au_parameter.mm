@@ -46,11 +46,11 @@ std::optional<std::string> unit_name(avf_au_parameter_core_ptr const &core) {
 
 audio::avf_au_parameter::avf_au_parameter(avf_au_parameter_core_ptr const &core)
     : key_path(to_string((__bridge CFStringRef)core->objc_parameter.object().keyPath)),
-      _identifier(to_string((__bridge CFStringRef)core->objc_parameter.object().identifier)),
-      _unit(core->objc_parameter.object().unit),
-      _unit_name(avf_au_parameter_utils::unit_name(core)),
+      identifier(to_string((__bridge CFStringRef)core->objc_parameter.object().identifier)),
+      unit(core->objc_parameter.object().unit),
+      unit_name(avf_au_parameter_utils::unit_name(core)),
       _default_value(core->objc_parameter.object().value),
-      _display_name(to_string((__bridge CFStringRef)core->objc_parameter.object().displayName)),
+      display_name(to_string((__bridge CFStringRef)core->objc_parameter.object().displayName)),
       _min_value(core->objc_parameter.object().minValue),
       _max_value(core->objc_parameter.object().maxValue),
       _value_strings(avf_au_parameter_utils::value_strings(core)),
@@ -60,18 +60,6 @@ audio::avf_au_parameter::avf_au_parameter(avf_au_parameter_core_ptr const &core)
 
 audio::avf_au_parameter_scope audio::avf_au_parameter::scope() const {
     return scope_from_key_path(this->key_path);
-}
-
-std::string const &audio::avf_au_parameter::identifier() const {
-    return this->_identifier;
-}
-
-AudioUnitParameterUnit audio::avf_au_parameter::unit() const {
-    return this->_unit;
-}
-
-std::string const &audio::avf_au_parameter::display_name() const {
-    return this->_display_name;
 }
 
 float audio::avf_au_parameter::min_value() const {
@@ -88,10 +76,6 @@ float const &audio::avf_au_parameter::default_value() const {
 
 std::vector<std::string> const &audio::avf_au_parameter::value_strings() const {
     return this->_value_strings;
-}
-
-std::optional<std::string> const &audio::avf_au_parameter::unit_name() const {
-    return this->_unit_name;
 }
 
 float audio::avf_au_parameter::value() const {

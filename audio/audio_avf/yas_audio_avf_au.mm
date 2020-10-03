@@ -26,7 +26,7 @@ namespace avf_au_utils {
             auto core = avf_au_parameter_core::make_shared(objc_param);
             auto const parameter = avf_au_parameter::make_shared(core);
 
-            if (scope == parameter->scope() && identifier == parameter->identifier()) {
+            if (scope == parameter->scope() && identifier == parameter->identifier) {
                 return objc_param;
             }
         }
@@ -413,21 +413,21 @@ std::optional<audio::avf_au_parameter_ptr> audio::avf_au::parameter(AudioUnitPar
             switch (scope) {
                 case avf_au_parameter_scope::global: {
                     if (auto const parameter = first(this->_global_parameters, [identifier](auto const &parameter) {
-                            return parameter->identifier() == identifier;
+                            return parameter->identifier == identifier;
                         })) {
                         return parameter;
                     }
                 } break;
                 case avf_au_parameter_scope::output: {
                     if (auto const parameter = first(this->_output_parameters, [identifier](auto const &parameter) {
-                            return parameter->identifier() == identifier;
+                            return parameter->identifier == identifier;
                         })) {
                         return parameter;
                     }
                 } break;
                 case avf_au_parameter_scope::input: {
                     if (auto const parameter = first(this->_input_parameters, [identifier](auto const &parameter) {
-                            return parameter->identifier() == identifier;
+                            return parameter->identifier == identifier;
                         })) {
                         return parameter;
                     }
@@ -495,7 +495,7 @@ audio::avf_au_parameter_ptr audio::avf_au::_make_parameter(avf_au_parameter_core
     auto const parameter = avf_au_parameter::make_shared(core);
     auto const scope = parameter->scope();
 
-    parameter->set_value_changed_handler([this, scope, identifier = parameter->identifier()](float const value) {
+    parameter->set_value_changed_handler([this, scope, identifier = parameter->identifier](float const value) {
         if (auto *const objc_parameter =
                 avf_au_utils::objc_parameter(this->_core->raw_unit().value(), scope, identifier)) {
             objc_parameter.value = value;
@@ -519,7 +519,7 @@ void audio::avf_au::_update_input_parameters() {
             case avf_au_parameter_scope::input: {
                 auto const identifier = to_string((__bridge CFStringRef)objc_param.identifier);
                 if (auto const prev = first(prev_input_parameters, [&identifier](auto const &parameter) {
-                        return parameter->identifier() == identifier;
+                        return parameter->identifier == identifier;
                     })) {
                     this->_input_parameters.emplace_back(prev.value());
                 } else {
@@ -548,7 +548,7 @@ void audio::avf_au::_update_output_parameters() {
             case avf_au_parameter_scope::output: {
                 auto const identifier = to_string((__bridge CFStringRef)objc_param.identifier);
                 if (auto const prev = first(prev_output_parameters, [&identifier](auto const &parameter) {
-                        return parameter->identifier() == identifier;
+                        return parameter->identifier == identifier;
                     })) {
                     this->_output_parameters.emplace_back(prev.value());
                 } else {

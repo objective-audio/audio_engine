@@ -20,12 +20,12 @@ enum class avf_au_parameter_scope {
 
 struct avf_au_parameter {
     std::string const key_path;
-    avf_au_parameter_scope scope() const;
-    std::string const &identifier() const;
-    AudioUnitParameterUnit unit() const;
-    std::optional<std::string> const &unit_name() const;
-    std::string const &display_name() const;
+    std::string const identifier;
+    AudioUnitParameterUnit const unit;
+    std::optional<std::string> const unit_name;
+    std::string const display_name;
 
+    avf_au_parameter_scope scope() const;
     float min_value() const;
     float max_value() const;
     float const &default_value() const;
@@ -43,10 +43,6 @@ struct avf_au_parameter {
     static avf_au_parameter_scope scope_from_key_path(std::string const &keypath);
 
    private:
-    std::string const _identifier;
-    AudioUnitParameterUnit const _unit;
-    std::optional<std::string> const _unit_name;
-    std::string const _display_name;
     float const _default_value;
     float const _min_value;
     float const _max_value;
