@@ -477,34 +477,34 @@ void audio::avf_au::_setup() {
 
     for (AUParameter *auParameter in raw_unit.value().object().parameterTree.allParameters) {
         auto objc_param = objc_ptr<AUParameter *>(auParameter);
-        auto core = avf_au_parameter_core::make_shared(objc_param);
-        auto const parameter = avf_au_parameter::make_shared(core);
-        auto const scope = parameter->scope();
+        auto parameter = this->_make_parameter(avf_au_parameter_core::make_shared(objc_param));
 
-        switch (scope) {
+        switch (parameter->scope()) {
             case avf_au_parameter_scope::global:
-                this->_global_parameters.emplace_back(parameter);
+                this->_global_parameters.emplace_back(std::move(parameter));
                 break;
             case avf_au_parameter_scope::input:
-                this->_input_parameters.emplace_back(parameter);
+                this->_input_parameters.emplace_back(std::move(parameter));
                 break;
             case avf_au_parameter_scope::output:
-                this->_output_parameters.emplace_back(parameter);
+                this->_output_parameters.emplace_back(std::move(parameter));
                 break;
         }
-
-        this->_setup_parameter_handler(parameter, scope);
     }
 }
 
-void audio::avf_au::_setup_parameter_handler(avf_au_parameter_ptr const &parameter,
-                                             avf_au_parameter_scope const scope) {
+audio::avf_au_parameter_ptr audio::avf_au::_make_parameter(avf_au_parameter_core_ptr &&core) {
+    auto const parameter = avf_au_parameter::make_shared(core);
+    auto const scope = parameter->scope();
+
     parameter->set_value_changed_handler([this, scope, identifier = parameter->identifier()](float const value) {
         if (auto const objc_parameter =
                 avf_au_utils::objc_parameter(this->_core->raw_unit().value(), scope, identifier)) {
             objc_parameter.object().value = value;
         }
     });
+
+    return parameter;
 }
 
 void audio::avf_au::_update_input_parameters() {
@@ -526,9 +526,7 @@ void audio::avf_au::_update_input_parameters() {
                     })) {
                     this->_input_parameters.emplace_back(prev.value());
                 } else {
-                    auto core = avf_au_parameter_core::make_shared(objc_param);
-                    auto const parameter = avf_au_parameter::make_shared(core);
-                    this->_setup_parameter_handler(parameter, avf_au_parameter_scope::input);
+                    auto parameter = this->_make_parameter(avf_au_parameter_core::make_shared(objc_param));
                     this->_input_parameters.emplace_back(parameter);
                 }
             } break;
@@ -558,9 +556,7 @@ void audio::avf_au::_update_output_parameters() {
                     })) {
                     this->_output_parameters.emplace_back(prev.value());
                 } else {
-                    auto core = avf_au_parameter_core::make_shared(objc_param);
-                    auto const parameter = avf_au_parameter::make_shared(core);
-                    this->_setup_parameter_handler(parameter, avf_au_parameter_scope::output);
+                    auto parameter = this->_make_parameter(avf_au_parameter_core::make_shared(objc_param));
                     this->_output_parameters.emplace_back(parameter);
                 }
             } break;
