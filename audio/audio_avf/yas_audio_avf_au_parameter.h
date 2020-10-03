@@ -38,7 +38,7 @@ struct avf_au_parameter {
 
     void set_value_changed_handler(std::function<void(float const)> &&);
 
-    static avf_au_parameter_ptr make_shared(avf_au_parameter_core_ptr const &);
+    static avf_au_parameter_ptr make_shared(AUParameter *const);
 
     static avf_au_parameter_scope scope_from_key_path(std::string const &keypath);
 
@@ -52,7 +52,7 @@ struct avf_au_parameter {
 
     std::function<void(float const)> _value_changed_handler;
 
-    avf_au_parameter(avf_au_parameter_core_ptr const &);
+    avf_au_parameter(AUParameter *const);
 };
 
 AudioUnitScope to_raw_scope(avf_au_parameter_scope const);
