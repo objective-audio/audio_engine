@@ -17,8 +17,9 @@
 
 using namespace yas;
 
-namespace yas::audio {
-struct avf_au::core {
+#pragma mark - avf_au::core
+
+struct yas::audio::avf_au::core {
     void load_raw_unit(AudioComponentDescription const &acd, avf_au_ptr const &shared) {
         auto weak_au = to_weak(shared);
 
@@ -190,7 +191,8 @@ struct avf_au::core {
         }
     }
 };
-}
+
+#pragma mark - avf_au
 
 audio::avf_au::avf_au() : _core(std::make_unique<core>()) {
 }
