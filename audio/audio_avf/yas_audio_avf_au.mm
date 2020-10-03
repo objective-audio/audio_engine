@@ -18,17 +18,6 @@
 using namespace yas;
 
 namespace yas::audio {
-namespace avf_au_utils {
-    AUParameter *objc_parameter(objc_ptr<AUAudioUnit *> const &raw_unit, std::string const &key_path) {
-        for (AUParameter *objc_param in raw_unit.object().parameterTree.allParameters) {
-            if (key_path == to_string((__bridge CFStringRef)objc_param.keyPath)) {
-                return objc_param;
-            }
-        }
-        return nil;
-    }
-}
-
 struct avf_au::core {
     void load_raw_unit(AudioComponentDescription const &acd, avf_au_ptr const &shared) {
         auto weak_au = to_weak(shared);
@@ -152,12 +141,21 @@ struct avf_au::core {
         auto const parameter = avf_au_parameter::make_shared(objc_param);
 
         parameter->set_value_changed_handler([this, key_path = parameter->key_path](float const value) {
-            if (auto *const objc_parameter = avf_au_utils::objc_parameter(this->raw_unit().value(), key_path)) {
+            if (AUParameter *const objc_parameter = this->raw_parameter(key_path)) {
                 objc_parameter.value = value;
             }
         });
 
         return parameter;
+    }
+
+    AUParameter *raw_parameter(std::string const &key_path) {
+        for (AUParameter *objc_param in this->_raw_unit.value().object().parameterTree.allParameters) {
+            if (key_path == to_string((__bridge CFStringRef)objc_param.keyPath)) {
+                return objc_param;
+            }
+        }
+        return nil;
     }
 
    private:
