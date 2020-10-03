@@ -63,20 +63,7 @@ std::string const &audio::avf_au_parameter::key_path() const {
 }
 
 audio::avf_au_parameter_scope audio::avf_au_parameter::scope() const {
-    using namespace yas::audio;
-
-    auto const key_path = this->key_path();
-    auto const scope_str = yas::split(key_path, '.').at(0);
-
-    if (scope_str == to_string(avf_au_parameter_scope::global)) {
-        return avf_au_parameter_scope::global;
-    } else if (scope_str == to_string(avf_au_parameter_scope::input)) {
-        return avf_au_parameter_scope::input;
-    } else if (scope_str == to_string(avf_au_parameter_scope::output)) {
-        return avf_au_parameter_scope::output;
-    } else {
-        throw std::runtime_error("scope not found.");
-    }
+    return scope_from_key_path(this->key_path());
 }
 
 std::string const &audio::avf_au_parameter::identifier() const {
@@ -140,6 +127,20 @@ void audio::avf_au_parameter::set_value_changed_handler(std::function<void(float
 
 audio::avf_au_parameter_ptr audio::avf_au_parameter::make_shared(avf_au_parameter_core_ptr const &core) {
     return avf_au_parameter_ptr(new avf_au_parameter{core});
+}
+
+audio::avf_au_parameter_scope audio::avf_au_parameter::scope_from_key_path(std::string const &key_path) {
+    auto const scope_str = yas::split(key_path, '.').at(0);
+
+    if (scope_str == to_string(avf_au_parameter_scope::global)) {
+        return avf_au_parameter_scope::global;
+    } else if (scope_str == to_string(avf_au_parameter_scope::input)) {
+        return avf_au_parameter_scope::input;
+    } else if (scope_str == to_string(avf_au_parameter_scope::output)) {
+        return avf_au_parameter_scope::output;
+    } else {
+        throw std::runtime_error("scope not found.");
+    }
 }
 
 AudioUnitScope audio::to_raw_scope(avf_au_parameter_scope const scope) {

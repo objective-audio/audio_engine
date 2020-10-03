@@ -40,6 +40,7 @@ struct avf_au_parameter {
 
     static avf_au_parameter_ptr make_shared(avf_au_parameter_core_ptr const &);
 
+    static avf_au_parameter_scope scope_from_key_path(std::string const &keypath);
    private:
     std::string const _key_path;
     std::string const _identifier;
