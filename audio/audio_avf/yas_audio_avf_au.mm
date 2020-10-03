@@ -515,12 +515,12 @@ void audio::avf_au::_update_input_parameters() {
 
     for (AUParameter *auParameter in raw_unit.value().object().parameterTree.allParameters) {
         auto objc_param = objc_ptr<AUParameter *>(auParameter);
-        auto const key_path = to_string((__bridge CFStringRef)objc_param.object().keyPath);
+        auto const key_path = to_string((__bridge CFStringRef)auParameter.keyPath);
         auto const scope = avf_au_parameter::scope_from_key_path(key_path);
 
         switch (scope) {
             case avf_au_parameter_scope::input: {
-                auto const identifier = to_string((__bridge CFStringRef)objc_param.object().identifier);
+                auto const identifier = to_string((__bridge CFStringRef)auParameter.identifier);
                 if (auto const prev = first(prev_input_parameters, [&identifier](auto const &parameter) {
                         return parameter->identifier() == identifier;
                     })) {
@@ -545,12 +545,12 @@ void audio::avf_au::_update_output_parameters() {
 
     for (AUParameter *auParameter in raw_unit.value().object().parameterTree.allParameters) {
         auto objc_param = objc_ptr<AUParameter *>(auParameter);
-        auto const key_path = to_string((__bridge CFStringRef)objc_param.object().keyPath);
+        auto const key_path = to_string((__bridge CFStringRef)auParameter.keyPath);
         auto const scope = avf_au_parameter::scope_from_key_path(key_path);
 
         switch (scope) {
             case avf_au_parameter_scope::output: {
-                auto const identifier = to_string((__bridge CFStringRef)objc_param.object().identifier);
+                auto const identifier = to_string((__bridge CFStringRef)auParameter.identifier);
                 if (auto const prev = first(prev_output_parameters, [&identifier](auto const &parameter) {
                         return parameter->identifier() == identifier;
                     })) {
