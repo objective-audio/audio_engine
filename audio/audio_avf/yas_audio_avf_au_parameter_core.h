@@ -13,9 +13,9 @@ namespace yas::audio {
 struct avf_au_parameter_core {
     objc_ptr<AUParameter *> const objc_parameter;
 
-    static avf_au_parameter_core_ptr make_shared(objc_ptr<AUParameter *> const &);
+    static avf_au_parameter_core_ptr make_shared(AUParameter *const);
 
    private:
-    avf_au_parameter_core(objc_ptr<AUParameter *> const &);
+    avf_au_parameter_core(AUParameter *const);
 };
 }  // namespace yas::audio

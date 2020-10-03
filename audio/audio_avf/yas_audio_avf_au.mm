@@ -20,18 +20,17 @@ using namespace yas;
 
 namespace yas::audio {
 namespace avf_au_utils {
-    objc_ptr<AUParameter *> objc_parameter(objc_ptr<AUAudioUnit *> const &raw_unit,
-                                           audio::avf_au_parameter_scope const scope, std::string const &identifier) {
+    AUParameter *objc_parameter(objc_ptr<AUAudioUnit *> const &raw_unit, audio::avf_au_parameter_scope const scope,
+                                std::string const &identifier) {
         for (AUParameter *auParameter in raw_unit.object().parameterTree.allParameters) {
-            auto objc_param = objc_ptr<AUParameter *>(auParameter);
-            auto core = avf_au_parameter_core::make_shared(objc_param);
+            auto core = avf_au_parameter_core::make_shared(auParameter);
             auto const parameter = avf_au_parameter::make_shared(core);
 
             if (scope == parameter->scope() && identifier == parameter->identifier()) {
-                return objc_param;
+                return auParameter;
             }
         }
-        return objc_ptr<AUParameter *>{nullptr};
+        return nil;
     }
 }
 
@@ -476,8 +475,7 @@ void audio::avf_au::_setup() {
     this->_output_parameters.clear();
 
     for (AUParameter *auParameter in raw_unit.value().object().parameterTree.allParameters) {
-        auto objc_param = objc_ptr<AUParameter *>(auParameter);
-        auto parameter = this->_make_parameter(avf_au_parameter_core::make_shared(objc_param));
+        auto parameter = this->_make_parameter(avf_au_parameter_core::make_shared(auParameter));
 
         switch (parameter->scope()) {
             case avf_au_parameter_scope::global:
@@ -498,9 +496,9 @@ audio::avf_au_parameter_ptr audio::avf_au::_make_parameter(avf_au_parameter_core
     auto const scope = parameter->scope();
 
     parameter->set_value_changed_handler([this, scope, identifier = parameter->identifier()](float const value) {
-        if (auto const objc_parameter =
+        if (auto *const objc_parameter =
                 avf_au_utils::objc_parameter(this->_core->raw_unit().value(), scope, identifier)) {
-            objc_parameter.object().value = value;
+            objc_parameter.value = value;
         }
     });
 
@@ -514,7 +512,6 @@ void audio::avf_au::_update_input_parameters() {
     this->_input_parameters.clear();
 
     for (AUParameter *auParameter in raw_unit.value().object().parameterTree.allParameters) {
-        auto objc_param = objc_ptr<AUParameter *>(auParameter);
         auto const key_path = to_string((__bridge CFStringRef)auParameter.keyPath);
         auto const scope = avf_au_parameter::scope_from_key_path(key_path);
 
@@ -526,7 +523,7 @@ void audio::avf_au::_update_input_parameters() {
                     })) {
                     this->_input_parameters.emplace_back(prev.value());
                 } else {
-                    auto parameter = this->_make_parameter(avf_au_parameter_core::make_shared(objc_param));
+                    auto parameter = this->_make_parameter(avf_au_parameter_core::make_shared(auParameter));
                     this->_input_parameters.emplace_back(parameter);
                 }
             } break;
@@ -544,7 +541,6 @@ void audio::avf_au::_update_output_parameters() {
     this->_output_parameters.clear();
 
     for (AUParameter *auParameter in raw_unit.value().object().parameterTree.allParameters) {
-        auto objc_param = objc_ptr<AUParameter *>(auParameter);
         auto const key_path = to_string((__bridge CFStringRef)auParameter.keyPath);
         auto const scope = avf_au_parameter::scope_from_key_path(key_path);
 
@@ -556,7 +552,7 @@ void audio::avf_au::_update_output_parameters() {
                     })) {
                     this->_output_parameters.emplace_back(prev.value());
                 } else {
-                    auto parameter = this->_make_parameter(avf_au_parameter_core::make_shared(objc_param));
+                    auto parameter = this->_make_parameter(avf_au_parameter_core::make_shared(auParameter));
                     this->_output_parameters.emplace_back(parameter);
                 }
             } break;
