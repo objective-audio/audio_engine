@@ -117,16 +117,16 @@ using namespace yas;
     XCTAssertEqual(input_parameters.size(), 0);
 
     auto const wet_dry_mix = raw_au->parameter(kDelayParam_WetDryMix, audio::avf_au_parameter_scope::global, 0);
-    XCTAssertEqual(stoi(wet_dry_mix.value()->identifier()), kDelayParam_WetDryMix);
+    XCTAssertEqual(stoi(wet_dry_mix.value()->identifier), kDelayParam_WetDryMix);
 
     auto const delay_time = raw_au->parameter(kDelayParam_DelayTime, audio::avf_au_parameter_scope::global, 0);
-    XCTAssertEqual(stoi(delay_time.value()->identifier()), kDelayParam_DelayTime);
+    XCTAssertEqual(stoi(delay_time.value()->identifier), kDelayParam_DelayTime);
 
     auto const feedback = raw_au->parameter(kDelayParam_Feedback, audio::avf_au_parameter_scope::global, 0);
-    XCTAssertEqual(stoi(feedback.value()->identifier()), kDelayParam_Feedback);
+    XCTAssertEqual(stoi(feedback.value()->identifier), kDelayParam_Feedback);
 
     auto const lopass = raw_au->parameter(kDelayParam_LopassCutoff, audio::avf_au_parameter_scope::global, 0);
-    XCTAssertEqual(stoi(lopass.value()->identifier()), kDelayParam_LopassCutoff);
+    XCTAssertEqual(stoi(lopass.value()->identifier), kDelayParam_LopassCutoff);
 }
 
 - (void)test_reset_parameters {
