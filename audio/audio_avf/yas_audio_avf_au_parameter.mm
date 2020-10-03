@@ -45,7 +45,7 @@ std::optional<std::string> unit_name(avf_au_parameter_core_ptr const &core) {
 }
 
 audio::avf_au_parameter::avf_au_parameter(avf_au_parameter_core_ptr const &core)
-    : _key_path(to_string((__bridge CFStringRef)core->objc_parameter.object().keyPath)),
+    : key_path(to_string((__bridge CFStringRef)core->objc_parameter.object().keyPath)),
       _identifier(to_string((__bridge CFStringRef)core->objc_parameter.object().identifier)),
       _unit(core->objc_parameter.object().unit),
       _unit_name(avf_au_parameter_utils::unit_name(core)),
@@ -58,12 +58,8 @@ audio::avf_au_parameter::avf_au_parameter(avf_au_parameter_core_ptr const &core)
       _value(_default_value) {
 }
 
-std::string const &audio::avf_au_parameter::key_path() const {
-    return this->_key_path;
-}
-
 audio::avf_au_parameter_scope audio::avf_au_parameter::scope() const {
-    return scope_from_key_path(this->key_path());
+    return scope_from_key_path(this->key_path);
 }
 
 std::string const &audio::avf_au_parameter::identifier() const {

@@ -19,7 +19,7 @@ enum class avf_au_parameter_scope {
 };
 
 struct avf_au_parameter {
-    std::string const &key_path() const;
+    std::string const key_path;
     avf_au_parameter_scope scope() const;
     std::string const &identifier() const;
     AudioUnitParameterUnit unit() const;
@@ -43,7 +43,6 @@ struct avf_au_parameter {
     static avf_au_parameter_scope scope_from_key_path(std::string const &keypath);
 
    private:
-    std::string const _key_path;
     std::string const _identifier;
     AudioUnitParameterUnit const _unit;
     std::optional<std::string> const _unit_name;
