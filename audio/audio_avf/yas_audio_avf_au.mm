@@ -515,17 +515,19 @@ void audio::avf_au::_update_input_parameters() {
 
     for (AUParameter *auParameter in raw_unit.value().object().parameterTree.allParameters) {
         auto objc_param = objc_ptr<AUParameter *>(auParameter);
-        auto core = avf_au_parameter_core::make_shared(objc_param);
-        auto const parameter = avf_au_parameter::make_shared(core);
+        auto const key_path = to_string((__bridge CFStringRef)objc_param.object().keyPath);
+        auto const scope = avf_au_parameter::scope_from_key_path(key_path);
 
-        switch (parameter->scope()) {
+        switch (scope) {
             case avf_au_parameter_scope::input: {
-                auto const key_path = parameter->key_path();
-                if (auto const prev = first(prev_input_parameters, [key_path](auto const &parameter) {
-                        return parameter->key_path() == key_path;
+                auto const identifier = to_string((__bridge CFStringRef)objc_param.object().identifier);
+                if (auto const prev = first(prev_input_parameters, [&identifier](auto const &parameter) {
+                        return parameter->identifier() == identifier;
                     })) {
                     this->_input_parameters.emplace_back(prev.value());
                 } else {
+                    auto core = avf_au_parameter_core::make_shared(objc_param);
+                    auto const parameter = avf_au_parameter::make_shared(core);
                     this->_setup_parameter_handler(parameter, avf_au_parameter_scope::input);
                     this->_input_parameters.emplace_back(parameter);
                 }
@@ -545,17 +547,19 @@ void audio::avf_au::_update_output_parameters() {
 
     for (AUParameter *auParameter in raw_unit.value().object().parameterTree.allParameters) {
         auto objc_param = objc_ptr<AUParameter *>(auParameter);
-        auto core = avf_au_parameter_core::make_shared(objc_param);
-        auto const parameter = avf_au_parameter::make_shared(core);
+        auto const key_path = to_string((__bridge CFStringRef)objc_param.object().keyPath);
+        auto const scope = avf_au_parameter::scope_from_key_path(key_path);
 
-        switch (parameter->scope()) {
+        switch (scope) {
             case avf_au_parameter_scope::output: {
-                auto const key_path = parameter->key_path();
-                if (auto const prev = first(prev_output_parameters, [key_path](auto const &parameter) {
-                        return parameter->key_path() == key_path;
+                auto const identifier = to_string((__bridge CFStringRef)objc_param.object().identifier);
+                if (auto const prev = first(prev_output_parameters, [&identifier](auto const &parameter) {
+                        return parameter->identifier() == identifier;
                     })) {
                     this->_output_parameters.emplace_back(prev.value());
                 } else {
+                    auto core = avf_au_parameter_core::make_shared(objc_param);
+                    auto const parameter = avf_au_parameter::make_shared(core);
                     this->_setup_parameter_handler(parameter, avf_au_parameter_scope::output);
                     this->_output_parameters.emplace_back(parameter);
                 }
