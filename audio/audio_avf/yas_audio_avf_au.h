@@ -91,6 +91,7 @@ struct avf_au {
 
     void _prepare(avf_au_ptr const &, AudioComponentDescription const &);
     void _setup();
+    void _setup_parameter_handler(avf_au_parameter_ptr const &, avf_au_parameter_scope const);
     void _update_input_parameters();
     void _update_output_parameters();
 

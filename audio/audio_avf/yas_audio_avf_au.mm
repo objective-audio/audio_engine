@@ -493,13 +493,18 @@ void audio::avf_au::_setup() {
                 break;
         }
 
-        parameter->set_value_changed_handler([this, scope, identifier = parameter->identifier()](float const value) {
-            if (auto const objc_parameter =
-                    avf_au_utils::objc_parameter(this->_core->raw_unit().value(), scope, identifier)) {
-                objc_parameter.object().value = value;
-            }
-        });
+        this->_setup_parameter_handler(parameter, scope);
     }
+}
+
+void audio::avf_au::_setup_parameter_handler(avf_au_parameter_ptr const &parameter,
+                                             avf_au_parameter_scope const scope) {
+    parameter->set_value_changed_handler([this, scope, identifier = parameter->identifier()](float const value) {
+        if (auto const objc_parameter =
+                avf_au_utils::objc_parameter(this->_core->raw_unit().value(), scope, identifier)) {
+            objc_parameter.object().value = value;
+        }
+    });
 }
 
 void audio::avf_au::_update_input_parameters() {
@@ -521,6 +526,7 @@ void audio::avf_au::_update_input_parameters() {
                     })) {
                     this->_input_parameters.emplace_back(prev.value());
                 } else {
+                    this->_setup_parameter_handler(parameter, avf_au_parameter_scope::input);
                     this->_input_parameters.emplace_back(parameter);
                 }
             } break;
@@ -550,6 +556,7 @@ void audio::avf_au::_update_output_parameters() {
                     })) {
                     this->_output_parameters.emplace_back(prev.value());
                 } else {
+                    this->_setup_parameter_handler(parameter, avf_au_parameter_scope::output);
                     this->_output_parameters.emplace_back(parameter);
                 }
             } break;
