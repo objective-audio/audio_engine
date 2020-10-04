@@ -22,7 +22,9 @@ using namespace yas;
 
 audio::graph::graph() = default;
 
-audio::graph::~graph() = default;
+audio::graph::~graph() {
+    this->_nodes.clear();
+}
 
 audio::graph_connection_ptr audio::graph::connect(audio::graph_node_ptr const &source_node,
                                                   audio::graph_node_ptr const &destination_node,
@@ -64,8 +66,7 @@ audio::graph_connection_ptr audio::graph::connect(audio::graph_node_ptr const &s
 
     if (this->is_running()) {
         this->_add_connection_to_nodes(connection);
-        this->_update_node_connections(src_node);
-        this->_update_node_connections(dst_node);
+        this->_update_io_rendering();
     }
 
     return connection;
@@ -78,11 +79,14 @@ void audio::graph::disconnect(graph_connection_ptr const &connection) {
     audio::graph_node_removable::cast(connection)->remove_nodes();
 
     for (auto &node : update_nodes) {
-        manageable_graph_node::cast(node)->update_connections();
         this->_detach_node_if_unused(node);
     }
 
     this->_connections.erase(connection);
+
+    if (this->is_running() && this->_io.has_value()) {
+        audio::manageable_graph_io::cast(this->_io.value())->update_rendering();
+    }
 }
 
 void audio::graph::disconnect(audio::graph_node_ptr const &node) {
@@ -174,7 +178,7 @@ bool audio::graph::is_running() const {
     }
 }
 
-std::unordered_set<audio::graph_node_ptr> const &audio::graph::nodes() const {
+audio::graph_node_set const &audio::graph::nodes() const {
     return this->_nodes;
 }
 
@@ -197,6 +201,12 @@ void audio::graph::_attach_node(audio::graph_node_ptr const &node) {
 
     this->_nodes.insert(node);
 
+    manageable_graph_node::cast(node)->set_update_rendering_handler([this] {
+        if (this->is_running()) {
+            this->_update_io_rendering();
+        }
+    });
+
     manageable_graph_node::cast(node)->set_graph(this->_weak_graph);
 
     this->_setup_node(node);
@@ -214,6 +224,7 @@ void audio::graph::_detach_node(audio::graph_node_ptr const &node) {
     this->_teardown_node(node);
 
     manageable_graph_node::cast(node)->set_graph(graph_ptr{nullptr});
+    manageable_graph_node::cast(node)->set_update_rendering_handler(nullptr);
 
     this->_nodes.erase(node);
 }
@@ -239,7 +250,7 @@ bool audio::graph::_setup_rendering() {
         }
     }
 
-    this->_update_all_node_connections();
+    this->_update_io_rendering();
 
     return true;
 }
@@ -257,7 +268,7 @@ void audio::graph::_dispose_rendering() {
         this->_teardown_node(node);
     }
 
-    this->_update_all_node_connections();
+    this->_clear_io_rendering();
 }
 
 void audio::graph::_disconnect_node_with_predicate(std::function<bool(graph_connection const &)> predicate) {
@@ -274,12 +285,15 @@ void audio::graph::_disconnect_node_with_predicate(std::function<bool(graph_conn
     }
 
     for (auto node : update_nodes) {
-        manageable_graph_node::cast(node)->update_connections();
         this->_detach_node_if_unused(node);
     }
 
     for (auto &connection : connections) {
         this->_connections.erase(connection);
+    }
+
+    if (this->is_running()) {
+        this->_update_io_rendering();
     }
 }
 
@@ -320,16 +334,6 @@ void audio::graph::_remove_connection_from_nodes(audio::graph_connection_ptr con
     }
 }
 
-void audio::graph::_update_node_connections(audio::graph_node_ptr const &node) {
-    manageable_graph_node::cast(node)->update_connections();
-}
-
-void audio::graph::_update_all_node_connections() {
-    for (auto node : this->_nodes) {
-        manageable_graph_node::cast(node)->update_connections();
-    }
-}
-
 audio::graph_connection_set audio::graph::_input_connections_for_destination_node(audio::graph_node_ptr const &node) {
     return filter(this->_connections,
                   [&node](auto const &connection) { return connection->destination_node() == node; });
@@ -337,6 +341,18 @@ audio::graph_connection_set audio::graph::_input_connections_for_destination_nod
 
 audio::graph_connection_set audio::graph::_output_connections_for_source_node(audio::graph_node_ptr const &node) {
     return filter(this->_connections, [&node](auto const &connection) { return connection->source_node() == node; });
+}
+
+void audio::graph::_update_io_rendering() {
+    if (this->_io.has_value()) {
+        audio::manageable_graph_io::cast(this->_io.value())->update_rendering();
+    }
+}
+
+void audio::graph::_clear_io_rendering() {
+    if (this->_io.has_value()) {
+        audio::manageable_graph_io::cast(this->_io.value())->clear_rendering();
+    }
 }
 
 audio::graph_ptr audio::graph::make_shared() {

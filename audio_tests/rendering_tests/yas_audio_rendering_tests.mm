@@ -93,49 +93,67 @@ using namespace yas;
 - (void)test_rendering_graph {
     auto graph = audio::graph::make_shared();
 
+    audio::format format_x{{.sample_rate = 32000.0, .channel_count = 3}};
     audio::format format_0{{.sample_rate = 48000.0, .channel_count = 2}};
     audio::format format_1{{.sample_rate = 96000.0, .channel_count = 4}};
     audio::format format_2{{.sample_rate = 44100.0, .channel_count = 1}};
+
     test::node_object source_obj_0(0, 1);
     test::node_object source_obj_1(0, 1);
     test::node_object destination_obj(2, 1);
+    test::node_object output_obj(1, 0);
+
     test::node_object input_source_obj(0, 1);
     auto const input_dst_node = audio::graph_tap::make_shared({.is_input = true});
 
+    auto const connection_x = graph->connect(destination_obj.node, output_obj.node, format_x);
     auto const connection_0 = graph->connect(source_obj_0.node, destination_obj.node, format_0);
     auto const connection_1 = graph->connect(source_obj_1.node, destination_obj.node, format_1);
     auto const connection_2 = graph->connect(input_source_obj.node, input_dst_node->node(), format_2);
 
-    audio::rendering_graph rendering_graph{destination_obj.node, input_source_obj.node};
+    audio::rendering_graph rendering_graph{output_obj.node, input_source_obj.node};
 
     {
-        XCTAssertEqual(rendering_graph.nodes().size(), 3);
+        XCTAssertTrue(rendering_graph.output_node() != nullptr);
 
-        auto const &end_node = rendering_graph.nodes().at(0);
-        XCTAssertEqual(end_node->source_connections().size(), 2);
-        auto const &src_connection_0 = end_node->source_connections().at(0);
+        auto const &output_source_nodes = rendering_graph.output_node()->source_nodes();
+
+        XCTAssertEqual(output_source_nodes.size(), 3);
+
+        auto const &dst_node = output_source_nodes.at(0);
+        XCTAssertEqual(dst_node->source_connections().size(), 2);
+        auto const &src_connection_0 = dst_node->source_connections().at(0);
         XCTAssertEqual(src_connection_0.source_bus_idx, 0);
         XCTAssertEqual(src_connection_0.format, format_0);
-        auto const &src_connection_1 = end_node->source_connections().at(1);
+        auto const &src_connection_1 = dst_node->source_connections().at(1);
         XCTAssertEqual(src_connection_1.source_bus_idx, 0);
         XCTAssertEqual(src_connection_1.format, format_1);
 
-        auto const &first_node = rendering_graph.nodes().at(1);
-        XCTAssertEqual(first_node->source_connections().size(), 0);
+        auto const &src_node_0 = output_source_nodes.at(1);
+        XCTAssertEqual(src_node_0.get(), src_connection_0.source_node);
+        XCTAssertEqual(src_node_0->source_connections().size(), 0);
+
+        auto const &src_node_1 = output_source_nodes.at(2);
+        XCTAssertEqual(src_node_1.get(), src_connection_1.source_node);
+        XCTAssertEqual(src_node_1->source_connections().size(), 0);
     }
 
     {
-        XCTAssertEqual(rendering_graph.input_nodes().size(), 2);
+        XCTAssertTrue(rendering_graph.input_node() != nullptr);
 
-        auto const &end_node = rendering_graph.input_nodes().at(0);
-        XCTAssertEqual(end_node->source_connections().size(), 1);
-        auto const &src_connection = end_node->source_connections().at(0);
-        XCTAssertEqual(src_connection.source_bus_idx, 0);
-        XCTAssertEqual(src_connection.format, format_2);
-
-        auto const &first_node = rendering_graph.input_nodes().at(1);
-        XCTAssertEqual(first_node->source_connections().size(), 0);
+        auto const *node = rendering_graph.input_node();
+        XCTAssertEqual(node->format(), format_2);
     }
+}
+
+- (void)test_rendering_graph_empty {
+    test::node_object output_obj{1, 0};
+    test::node_object input_obj{0, 1};
+
+    audio::rendering_graph rendering_graph{output_obj.node, input_obj.node};
+
+    XCTAssertFalse(rendering_graph.output_node());
+    XCTAssertFalse(rendering_graph.input_node());
 }
 
 @end

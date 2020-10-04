@@ -17,6 +17,11 @@ audio::graph_avf_au_mixer::graph_avf_au_mixer()
                    .componentFlagsMask = 0,
                },
            .node_args = {.input_bus_count = std::numeric_limits<uint32_t>::max(), .output_bus_count = 1}})) {
+    this->_connections_observer =
+        this->_raw_au->connection_chain()
+            .guard([](auto const &method) { return method == graph_avf_au::connection_method::will_update; })
+            .perform([this](auto const &) { this->_update_unit_mixer_connections(); })
+            .end();
 }
 
 void audio::graph_avf_au_mixer::set_output_volume(float const volume, uint32_t const bus_idx) {
@@ -61,18 +66,6 @@ bool audio::graph_avf_au_mixer::input_enabled(uint32_t const bus_idx) const {
 
 audio::graph_avf_au_ptr const &audio::graph_avf_au_mixer::raw_au() const {
     return this->_raw_au;
-}
-
-void audio::graph_avf_au_mixer::_prepare(graph_avf_au_mixer_ptr const &shared) {
-    this->_connections_observer =
-        this->_raw_au->connection_chain()
-            .guard([](auto const &method) { return method == graph_avf_au::connection_method::will_update; })
-            .perform([weak_au_mixer = to_weak(shared)](auto const &) {
-                if (auto au_mixer = weak_au_mixer.lock()) {
-                    au_mixer->_update_unit_mixer_connections();
-                }
-            })
-            .end();
 }
 
 void audio::graph_avf_au_mixer::_update_unit_mixer_connections() {

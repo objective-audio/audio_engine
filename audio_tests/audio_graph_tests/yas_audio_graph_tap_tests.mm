@@ -44,25 +44,19 @@ using namespace yas;
 
     auto const to_connection = graph->connect(to_tap->node(), offline_io->output_node(), format);
 
-    auto weak_to_tap = to_weak(to_tap);
-    auto to_render_handler = [weak_to_tap, self, to_connection = to_connection, from_connection = from_connection,
+    auto to_render_handler = [self, to_connection = to_connection, from_connection = from_connection,
                               to_expectation](audio::node_render_args args) {
         auto &buffer = args.buffer;
         auto const &output_time = args.time;
 
-        auto node = weak_to_tap.lock();
-        XCTAssertTrue(node);
-        if (node) {
-            XCTAssertEqual(node->output_connections_on_render().size(), 1);
-            XCTAssertEqual(to_connection, node->output_connection_on_render(0));
-            XCTAssertFalse(node->output_connection_on_render(1));
+        XCTAssertEqual(args.source_connections.size(), 1);
 
-            XCTAssertEqual(node->input_connections_on_render().size(), 1);
-            XCTAssertEqual(from_connection, node->input_connection_on_render(0));
-            XCTAssertFalse(node->input_connection_on_render(1));
+        auto const &pair = *args.source_connections.begin();
+        XCTAssertEqual(pair.first, 0);
 
-            node->render_source({.buffer = buffer, .bus_idx = 0, .time = output_time, .source_connections = {}});
-        }
+        audio::rendering_connection const &connection = pair.second;
+
+        connection.render(buffer, output_time);
 
         [to_expectation fulfill];
     };

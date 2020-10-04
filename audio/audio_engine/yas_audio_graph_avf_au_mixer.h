@@ -9,21 +9,21 @@
 namespace yas::audio {
 struct graph_avf_au_mixer final {
     void set_output_volume(float const volume, uint32_t const bus_idx);
-    float output_volume(uint32_t const bus_idx) const;
+    [[nodiscard]] float output_volume(uint32_t const bus_idx) const;
     void set_output_pan(float const pan, uint32_t const bus_idx);
-    float output_pan(uint32_t const bus_idx) const;
+    [[nodiscard]] float output_pan(uint32_t const bus_idx) const;
 
     void set_input_volume(float const volume, uint32_t const bus_idx);
-    float input_volume(uint32_t const bus_idx) const;
+    [[nodiscard]] float input_volume(uint32_t const bus_idx) const;
     void set_input_pan(float const pan, uint32_t const bus_idx);
-    float input_pan(uint32_t const bus_idx) const;
+    [[nodiscard]] float input_pan(uint32_t const bus_idx) const;
 
     void set_input_enabled(bool const enabled, uint32_t const bus_idx);
-    bool input_enabled(uint32_t const bus_idx) const;
+    [[nodiscard]] bool input_enabled(uint32_t const bus_idx) const;
 
-    static graph_avf_au_mixer_ptr make_shared();
+    [[nodiscard]] static graph_avf_au_mixer_ptr make_shared();
 
-    graph_avf_au_ptr const &raw_au() const;
+    [[nodiscard]] graph_avf_au_ptr const &raw_au() const;
 
    private:
     graph_avf_au_ptr _raw_au;
@@ -31,7 +31,6 @@ struct graph_avf_au_mixer final {
 
     graph_avf_au_mixer();
 
-    void _prepare(graph_avf_au_mixer_ptr const &);
     void _update_unit_mixer_connections();
 };
 }  // namespace yas::audio

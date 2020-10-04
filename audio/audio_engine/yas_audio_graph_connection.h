@@ -12,16 +12,15 @@ namespace yas::audio {
 struct graph_connection : graph_node_removable, renderable_graph_connection {
     virtual ~graph_connection();
 
-    uint32_t source_bus() const override;
-    uint32_t destination_bus() const;
-    audio::graph_node_ptr source_node() const override;
-    audio::graph_node_ptr destination_node() const override;
-    audio::format const &format() const override;
+    [[nodiscard]] uint32_t source_bus() const override;
+    [[nodiscard]] uint32_t destination_bus() const;
+    [[nodiscard]] audio::graph_node_ptr source_node() const override;
+    [[nodiscard]] audio::graph_node_ptr destination_node() const override;
+    [[nodiscard]] audio::format const &format() const override;
 
    private:
     uint32_t const _source_bus;
     uint32_t const _destination_bus;
-    mutable std::recursive_mutex _mutex;
     std::weak_ptr<graph_node> _source_node;
     std::weak_ptr<graph_node> _destination_node;
     std::weak_ptr<graph_connection> _weak_connection;
@@ -39,8 +38,6 @@ struct graph_connection : graph_node_removable, renderable_graph_connection {
     void remove_nodes() override;
     void remove_source_node() override;
     void remove_destination_node() override;
-
-    void _prepare(graph_connection_ptr const &);
 
    public:
     static graph_connection_ptr make_shared(audio::graph_node_ptr const &src_node, uint32_t const src_bus,

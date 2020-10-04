@@ -12,6 +12,9 @@ struct manageable_graph_io {
 
     virtual audio::io_ptr const &raw_io() = 0;
 
+    virtual void update_rendering() = 0;
+    virtual void clear_rendering() = 0;
+
     static manageable_graph_io_ptr cast(manageable_graph_io_ptr const &io) {
         return io;
     }

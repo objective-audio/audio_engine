@@ -56,7 +56,7 @@ using namespace yas;
 - (void)set_parameter:(yas::audio::avf_au_parameter_ptr const &)parameter {
     self->_parameter = parameter;
 
-    self.nameLabel.text = (__bridge NSString *)to_cf_object(parameter->display_name());
+    self.nameLabel.text = (__bridge NSString *)to_cf_object(parameter->display_name);
     self.valueSlider.minimumValue = parameter->min_value();
     self.valueSlider.maximumValue = parameter->max_value();
     self.valueSlider.value = parameter->value();
@@ -68,7 +68,7 @@ using namespace yas;
     if (auto const &parameter = self->_parameter) {
         auto value_string = std::to_string(parameter->value());
 
-        if (auto const unit_name = parameter->unit_name()) {
+        if (auto const unit_name = parameter->unit_name) {
             value_string += " ";
             value_string += unit_name.value();
         }

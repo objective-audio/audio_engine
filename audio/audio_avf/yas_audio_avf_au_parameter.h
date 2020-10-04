@@ -8,6 +8,7 @@
 #include <audio/yas_audio_ptr.h>
 #include <chaining/yas_chaining_umbrella.h>
 
+#include <functional>
 #include <optional>
 
 namespace yas::audio {
@@ -18,13 +19,13 @@ enum class avf_au_parameter_scope {
 };
 
 struct avf_au_parameter {
-    std::string key_path() const;
-    avf_au_parameter_scope scope() const;
-    std::string identifier() const;
-    AudioUnitParameterUnit unit() const;
-    std::optional<std::string> unit_name() const;
-    std::string display_name() const;
+    std::string const key_path;
+    std::string const identifier;
+    AudioUnitParameterUnit const unit;
+    std::optional<std::string> const unit_name;
+    std::string const display_name;
 
+    avf_au_parameter_scope scope() const;
     float min_value() const;
     float max_value() const;
     float const &default_value() const;
@@ -35,21 +36,23 @@ struct avf_au_parameter {
     void set_value_at(std::size_t const);
     void reset_value();
 
-    chaining::chain_sync_t<float> chain() const;
+    void set_value_changed_handler(std::function<void(float const)> &&);
 
-    static avf_au_parameter_ptr make_shared(avf_au_parameter_core_ptr const &);
+    static avf_au_parameter_ptr make_shared(AUParameter *const);
+
+    static avf_au_parameter_scope scope_from_key_path(std::string const &keypath);
 
    private:
-    avf_au_parameter_core_ptr _core;
-
     float const _default_value;
+    float const _min_value;
+    float const _max_value;
     std::vector<std::string> const _value_strings;
-    chaining::value::holder_ptr<float> _value;
-    chaining::observer_pool _pool;
+    std::vector<float> const _values;
+    float _value;
 
-    avf_au_parameter(avf_au_parameter_core_ptr const &);
+    std::function<void(float const)> _value_changed_handler;
 
-    void _prepare(avf_au_parameter_ptr const &);
+    avf_au_parameter(AUParameter *const);
 };
 
 AudioUnitScope to_raw_scope(avf_au_parameter_scope const);

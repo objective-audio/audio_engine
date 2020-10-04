@@ -13,12 +13,6 @@ using namespace yas;
 
 @implementation yas_audio_graph_offline_io_tests
 
-- (void)setUp {
-}
-
-- (void)tearDown {
-}
-
 - (void)test_offline_render_with_graph {
     auto graph = audio::graph::make_shared();
 

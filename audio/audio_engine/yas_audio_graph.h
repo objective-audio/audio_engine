@@ -76,10 +76,10 @@ struct graph final {
     void _teardown_node(graph_node_ptr const &node);
     bool _add_connection_to_nodes(graph_connection_ptr const &connection);
     void _remove_connection_from_nodes(graph_connection_ptr const &connection);
-    void _update_node_connections(graph_node_ptr const &node);
-    void _update_all_node_connections();
     graph_connection_set _input_connections_for_destination_node(graph_node_ptr const &node);
     graph_connection_set _output_connections_for_source_node(graph_node_ptr const &node);
+    void _update_io_rendering();
+    void _clear_io_rendering();
 
     std::optional<graph_io_ptr> _io = std::nullopt;
 };

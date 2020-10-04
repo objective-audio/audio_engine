@@ -6,15 +6,14 @@
 #import <AVFoundation/AVFoundation.h>
 #include <cpp_utils/yas_cf_utils.h>
 #include <cpp_utils/yas_stl_utils.h>
-#include "yas_audio_avf_au_parameter_core.h"
 
 using namespace yas;
 
 static_assert(sizeof(AUValue) == sizeof(float), "AUValue must be equal to float.");
 
 namespace yas::audio::avf_au_parameter_utils {
-std::vector<std::string> to_vector(NSArray<NSString *> *_Nullable valueStrings) {
-    if (valueStrings) {
+std::vector<std::string> value_strings(AUParameter *const objc_param) {
+    if (auto const valueStrings = objc_param.valueStrings) {
         std::vector<std::string> result;
         result.reserve(valueStrings.count);
 
@@ -27,27 +26,89 @@ std::vector<std::string> to_vector(NSArray<NSString *> *_Nullable valueStrings) 
         return {};
     }
 }
+
+std::vector<float> values(AUParameter *const objc_param) {
+    auto const strings = avf_au_parameter_utils::value_strings(objc_param);
+    return yas::to_vector<float>(strings, [&objc_param](std::string const &string) {
+        return [objc_param valueFromString:(__bridge NSString *)to_cf_object(string)];
+    });
 }
 
-audio::avf_au_parameter::avf_au_parameter(avf_au_parameter_core_ptr const &core)
-    : _core(core),
-      _default_value(core->objc_parameter.object().value),
-      _value_strings(avf_au_parameter_utils::to_vector(core->objc_parameter.object().valueStrings)),
-      _value(chaining::value::holder<float>::make_shared(_default_value)) {
-    this->_value->chain()
-        .perform([this](auto const &value) { this->_core->objc_parameter.object().value = value; })
-        .end()
-        ->add_to(this->_pool);
+std::optional<std::string> unit_name(AUParameter *const objc_param) {
+    if (NSString *unitName = objc_param.unitName) {
+        return to_string((__bridge CFStringRef)unitName);
+    } else {
+        return std::nullopt;
+    }
+}
 }
 
-std::string audio::avf_au_parameter::key_path() const {
-    return to_string((__bridge CFStringRef)this->_core->objc_parameter.object().keyPath);
+audio::avf_au_parameter::avf_au_parameter(AUParameter *const objc_param)
+    : key_path(to_string((__bridge CFStringRef)objc_param.keyPath)),
+      identifier(to_string((__bridge CFStringRef)objc_param.identifier)),
+      unit(objc_param.unit),
+      unit_name(avf_au_parameter_utils::unit_name(objc_param)),
+      _default_value(objc_param.value),
+      display_name(to_string((__bridge CFStringRef)objc_param.displayName)),
+      _min_value(objc_param.minValue),
+      _max_value(objc_param.maxValue),
+      _value_strings(avf_au_parameter_utils::value_strings(objc_param)),
+      _values(avf_au_parameter_utils::values(objc_param)),
+      _value(_default_value) {
 }
 
 audio::avf_au_parameter_scope audio::avf_au_parameter::scope() const {
-    using namespace yas::audio;
+    return scope_from_key_path(this->key_path);
+}
 
-    auto const key_path = this->key_path();
+float audio::avf_au_parameter::min_value() const {
+    return this->_min_value;
+}
+
+float audio::avf_au_parameter::max_value() const {
+    return this->_max_value;
+}
+
+float const &audio::avf_au_parameter::default_value() const {
+    return this->_default_value;
+}
+
+std::vector<std::string> const &audio::avf_au_parameter::value_strings() const {
+    return this->_value_strings;
+}
+
+float audio::avf_au_parameter::value() const {
+    return this->_value;
+}
+
+void audio::avf_au_parameter::set_value(float const value) {
+    if (this->_value != value) {
+        this->_value = value;
+        if (this->_value_changed_handler) {
+            this->_value_changed_handler(value);
+        }
+    }
+}
+
+void audio::avf_au_parameter::set_value_at(std::size_t const idx) {
+    if (idx < this->_values.size()) {
+        this->set_value(this->_values.at(idx));
+    }
+}
+
+void audio::avf_au_parameter::reset_value() {
+    this->set_value(this->_default_value);
+}
+
+void audio::avf_au_parameter::set_value_changed_handler(std::function<void(float const)> &&handler) {
+    this->_value_changed_handler = std::move(handler);
+}
+
+audio::avf_au_parameter_ptr audio::avf_au_parameter::make_shared(AUParameter *const objc_param) {
+    return avf_au_parameter_ptr(new avf_au_parameter{objc_param});
+}
+
+audio::avf_au_parameter_scope audio::avf_au_parameter::scope_from_key_path(std::string const &key_path) {
     auto const scope_str = yas::split(key_path, '.').at(0);
 
     if (scope_str == to_string(avf_au_parameter_scope::global)) {
@@ -59,75 +120,6 @@ audio::avf_au_parameter_scope audio::avf_au_parameter::scope() const {
     } else {
         throw std::runtime_error("scope not found.");
     }
-}
-
-std::string audio::avf_au_parameter::identifier() const {
-    return to_string((__bridge CFStringRef)this->_core->objc_parameter.object().identifier);
-}
-
-AudioUnitParameterUnit audio::avf_au_parameter::unit() const {
-    return this->_core->objc_parameter.object().unit;
-}
-
-std::string audio::avf_au_parameter::display_name() const {
-    return to_string((__bridge CFStringRef)this->_core->objc_parameter.object().displayName);
-}
-
-float audio::avf_au_parameter::min_value() const {
-    return this->_core->objc_parameter.object().minValue;
-}
-
-float audio::avf_au_parameter::max_value() const {
-    return this->_core->objc_parameter.object().maxValue;
-}
-
-float const &audio::avf_au_parameter::default_value() const {
-    return this->_default_value;
-}
-
-std::vector<std::string> const &audio::avf_au_parameter::value_strings() const {
-    return this->_value_strings;
-}
-
-std::optional<std::string> audio::avf_au_parameter::unit_name() const {
-    if (NSString *unitName = this->_core->objc_parameter.object().unitName) {
-        return to_string((__bridge CFStringRef)unitName);
-    } else {
-        return std::nullopt;
-    }
-}
-
-float audio::avf_au_parameter::value() const {
-    return this->_value->raw();
-}
-
-void audio::avf_au_parameter::set_value(float const value) {
-    this->_value->set_value(value);
-}
-
-void audio::avf_au_parameter::set_value_at(std::size_t const idx) {
-    if (idx < this->_value_strings.size()) {
-        auto const value = [this->_core->objc_parameter.object()
-            valueFromString:(__bridge NSString *)to_cf_object(this->_value_strings.at(idx))];
-        this->set_value(value);
-    }
-}
-
-void audio::avf_au_parameter::reset_value() {
-    this->_value->set_value(this->_default_value);
-}
-
-chaining::chain_sync_t<float> audio::avf_au_parameter::chain() const {
-    return this->_value->chain();
-}
-
-void audio::avf_au_parameter::_prepare(avf_au_parameter_ptr const &shared) {
-}
-
-audio::avf_au_parameter_ptr audio::avf_au_parameter::make_shared(avf_au_parameter_core_ptr const &core) {
-    auto shared = avf_au_parameter_ptr(new avf_au_parameter{core});
-    shared->_prepare(shared);
-    return shared;
 }
 
 AudioUnitScope audio::to_raw_scope(avf_au_parameter_scope const scope) {

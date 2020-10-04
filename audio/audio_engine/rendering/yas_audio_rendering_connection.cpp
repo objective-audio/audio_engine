@@ -18,6 +18,12 @@ bool audio::rendering_connection::render(audio::pcm_buffer *const buffer, audio:
         return false;
     }
 
+    if (!this->source_node) {
+        return false;
+    }
+
+    assert(this->source_node->render_handler());
+
     this->source_node->render_handler()({.buffer = buffer,
                                          .bus_idx = this->source_bus_idx,
                                          .time = time,

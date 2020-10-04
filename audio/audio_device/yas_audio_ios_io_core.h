@@ -34,7 +34,6 @@ struct ios_io_core final : io_core {
     class impl;
 
     std::unique_ptr<impl> _impl;
-    std::weak_ptr<ios_io_core> _weak_core;
 
     audio::ios_device_ptr _device;
 
@@ -46,8 +45,6 @@ struct ios_io_core final : io_core {
     bool _is_initialized = false;
 
     ios_io_core(ios_device_ptr const &);
-
-    void _prepare(ios_io_core_ptr const &shared);
 
     void _make_kernel();
     void _dispose_kernel();

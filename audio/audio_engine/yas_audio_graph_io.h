@@ -16,20 +16,18 @@ class graph_input_context;
 struct graph_io : manageable_graph_io {
     virtual ~graph_io();
 
-    audio::graph_node_ptr const &output_node() const;
-    audio::graph_node_ptr const &input_node() const;
+    [[nodiscard]] audio::graph_node_ptr const &output_node() const;
+    [[nodiscard]] audio::graph_node_ptr const &input_node() const;
 
-    audio::io_ptr const &raw_io() override;
+    [[nodiscard]] audio::io_ptr const &raw_io() override;
 
-    static graph_io_ptr make_shared(audio::io_ptr const &);
+    [[nodiscard]] static graph_io_ptr make_shared(audio::io_ptr const &);
 
    private:
-    std::weak_ptr<graph_io> _weak_graph_io;
-    audio::graph_node_ptr _output_node;
-    audio::graph_node_ptr _input_node;
-    audio::io_ptr _raw_io;
+    audio::graph_node_ptr const _output_node;
+    audio::graph_node_ptr const _input_node;
+    audio::io_ptr const _raw_io;
     std::shared_ptr<graph_input_context> _input_context = nullptr;
-    chaining::observer_pool _pool;
 
     graph_io(audio::io_ptr const &);
 
@@ -39,8 +37,9 @@ struct graph_io : manageable_graph_io {
     graph_io &operator=(graph_io const &) = delete;
 
     void _prepare(graph_io_ptr const &);
-    void _update_io_connections();
     bool _validate_connections();
-    void _update_io_rendering();
+
+    void update_rendering() override;
+    void clear_rendering() override;
 };
 }  // namespace yas::audio

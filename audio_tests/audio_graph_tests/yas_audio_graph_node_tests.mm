@@ -35,13 +35,6 @@ using namespace yas;
     XCTAssertEqual(*obj.node->next_available_output_bus(), 0);
 }
 
-- (void)test_create_kernel {
-    auto kernel = audio::graph_kernel::make_shared();
-
-    XCTAssertEqual(kernel->input_connections().size(), 0);
-    XCTAssertEqual(kernel->output_connections().size(), 0);
-}
-
 - (void)test_connection {
     test::node_object src_obj;
     test::node_object dst_obj;
@@ -101,28 +94,6 @@ using namespace yas;
     XCTAssertEqual(audio::manageable_graph_node::cast(dst_obj.node)->input_connections().size(), 0);
 }
 
-- (void)test_render_time {
-    auto node = audio::graph_node::make_shared({});
-    audio::time time(100, 48000.0);
-
-    XCTestExpectation *render_expectation = [self expectationWithDescription:@"node render"];
-
-    auto lambda = [self, node, time, render_expectation]() mutable {
-        audio::pcm_buffer_ptr null_buffer{nullptr};
-        node->render({.buffer = nullptr, .bus_idx = 0, .time = time, .source_connections = {}});
-        [render_expectation fulfill];
-    };
-
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), lambda);
-
-    [self waitForExpectationsWithTimeout:1.0
-                                 handler:^(NSError *error){
-
-                                 }];
-
-    XCTAssertEqual(time, node->last_render_time());
-}
-
 - (void)test_set_graph {
     auto node = audio::graph_node::make_shared({});
     auto graph = audio::graph::make_shared();
@@ -132,49 +103,6 @@ using namespace yas;
     XCTAssertEqual(graph, node->graph());
 
     audio::manageable_graph_node::cast(node)->set_graph(audio::graph_ptr{nullptr});
-}
-
-- (void)test_kernel {
-    auto output_format = audio::format({.sample_rate = 48000.0, .channel_count = 2});
-    auto input_format = audio::format({.sample_rate = 44100.0, .channel_count = 1});
-
-    test::node_object output_obj;
-    test::node_object relay_obj;
-
-    auto const output_connection =
-        audio::graph_connection::make_shared(relay_obj.node, 0, output_obj.node, 0, output_format);
-
-    std::vector<audio::graph_connection_ptr> input_connections;
-    input_connections.reserve(relay_obj.node->input_bus_count());
-
-    for (uint32_t i = 0; i < relay_obj.node->input_bus_count(); ++i) {
-        test::node_object input_obj;
-        auto input_connection =
-            audio::graph_connection::make_shared(input_obj.node, 0, relay_obj.node, i, input_format);
-        audio::connectable_graph_node::cast(input_obj.node)->add_connection(input_connection);
-        input_connections.push_back(input_connection);
-    }
-
-    audio::manageable_graph_node::cast(relay_obj.node)->update_kernel();
-
-    XCTestExpectation *expectation = [self expectationWithDescription:@"kernel connections"];
-
-    auto lambda = [self, expectation, relay_node = relay_obj.node, input_connections, output_connection]() {
-        auto const kernel = relay_node->kernel().value();
-        XCTAssertEqual(kernel->output_connections().size(), 1);
-        XCTAssertEqual(kernel->input_connections().size(), 2);
-        XCTAssertEqual(kernel->output_connection(0), output_connection);
-        XCTAssertEqual(kernel->input_connection(0), input_connections.at(0));
-        XCTAssertEqual(kernel->input_connection(1), input_connections.at(1));
-        [expectation fulfill];
-    };
-
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), lambda);
-
-    [self waitForExpectationsWithTimeout:1.0
-                                 handler:^(NSError *error){
-
-                                 }];
 }
 
 - (void)test_available_bus {
@@ -200,20 +128,6 @@ using namespace yas;
 
     XCTAssertFalse(src_obj_0.node->is_available_output_bus(0));
     XCTAssertFalse(dst_obj.node->is_available_input_bus(0));
-}
-
-- (void)test_method_to_string {
-    XCTAssertEqual(to_string(audio::graph_node::method::will_reset), "will_reset");
-}
-
-- (void)test_method_ostream {
-    auto const values = {audio::graph_node::method::will_reset};
-
-    for (auto const &value : values) {
-        std::ostringstream stream;
-        stream << value;
-        XCTAssertEqual(stream.str(), to_string(value));
-    }
 }
 
 @end

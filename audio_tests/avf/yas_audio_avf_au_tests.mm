@@ -151,6 +151,32 @@ using namespace yas;
     XCTAssertEqual(default_value, delay_au->global_parameter_value(kDelayParam_DelayTime));
 }
 
+- (void)test_load_state_to_string {
+    XCTAssertEqual(to_string(audio::avf_au::load_state::unload), "unload");
+    XCTAssertEqual(to_string(audio::avf_au::load_state::loaded), "loaded");
+    XCTAssertEqual(to_string(audio::avf_au::load_state::failed), "failed");
+}
+
+- (void)test_state {
+    auto const au = audio::avf_au::make_shared(kAudioUnitType_Effect, kAudioUnitSubType_Delay);
+
+    auto exp = [self expectationWithDescription:@"load"];
+
+    auto observer = au->load_state_chain()
+                        .perform([exp](auto const &state) {
+                            if (state == audio::avf_au::load_state::loaded) {
+                                [exp fulfill];
+                            }
+                        })
+                        .sync();
+
+    [self waitForExpectations:@[exp] timeout:1.0];
+
+    XCTAssertEqual(au->state(), audio::avf_au::load_state::loaded);
+
+    observer->invalidate();
+}
+
 #pragma mark - private
 
 - (void)_load_au:(audio::avf_au_ptr const &)au {
