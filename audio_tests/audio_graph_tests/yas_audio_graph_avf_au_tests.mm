@@ -26,7 +26,7 @@ using namespace yas;
     XCTAssertTrue(au);
 }
 
-#if FALSE && TARGET_OS_IPHONE
+#if TARGET_OS_IPHONE
 - (void)test_restore_parameters {
     auto graph = audio::graph::make_shared();
 
@@ -37,14 +37,21 @@ using namespace yas;
     auto const &global_parameters = raw_au->global_parameters();
     XCTAssertEqual(global_parameters.size(), 4);
     for (auto const &parameter : global_parameters) {
-        XCTAssertEqual(parameter->default_value(), raw_au->global_parameter_value(stoi(parameter->identifier())));
+        XCTAssertEqual(parameter->default_value(), raw_au->global_parameter_value(stoi(parameter->identifier)));
     }
 
-    XCTestExpectation *expectation = [self expectationWithDescription:@"First Render"];
+    auto *expectation1a = [self expectationWithDescription:@"First Render A"];
+    expectation1a.assertForOverFulfill = NO;
+
+    auto *expectation1b = [self expectationWithDescription:@"First Render B"];
 
     auto const device1 = audio::offline_device::make_shared(
-        format, [](auto) { return audio::continuation::keep; },
-        [&expectation](bool const cancelled) { [expectation fulfill]; });
+        format,
+        [&expectation1a](auto) {
+            [expectation1a fulfill];
+            return audio::continuation::keep;
+        },
+        [&expectation1b](bool const cancelled) { [expectation1b fulfill]; });
     auto const &offline_io1 = graph->add_io(device1);
     auto const connection = graph->connect(delay_au->node(), offline_io1->output_node(), format);
 
@@ -67,21 +74,27 @@ using namespace yas;
     XCTAssertEqual(raw_au->global_parameter_value(kDelayParam_LopassCutoff), lopass_cutoff_value);
     XCTAssertEqual(raw_au->global_parameter_value(kDelayParam_WetDryMix), wet_dry_mix);
 
+    [self waitForExpectations:@[expectation1a] timeout:10.0];
+
     graph->stop();
 
-    [self waitForExpectationsWithTimeout:10.0
-                                 handler:^(NSError *error){
-
-                                 }];
+    [self waitForExpectations:@[expectation1b] timeout:10.0];
 
     graph->disconnect(connection);
     graph->remove_io();
 
-    expectation = [self expectationWithDescription:@"Second Render"];
+    XCTestExpectation *expectation2a = [self expectationWithDescription:@"Second Render A"];
+    expectation2a.assertForOverFulfill = NO;
+
+    XCTestExpectation *expectation2b = [self expectationWithDescription:@"Second Render B"];
 
     auto const device2 = audio::offline_device::make_shared(
-        format, [](auto) { return audio::continuation::keep; },
-        [&expectation](bool const cancelled) { [expectation fulfill]; });
+        format,
+        [&expectation2a](auto) {
+            [expectation2a fulfill];
+            return audio::continuation::keep;
+        },
+        [&expectation2b](bool const cancelled) { [expectation2b fulfill]; });
     auto const &offline_io2 = graph->add_io(device2);
     graph->connect(delay_au->node(), offline_io2->output_node(), format);
 
@@ -92,12 +105,11 @@ using namespace yas;
     XCTAssertEqual(raw_au->global_parameter_value(kDelayParam_LopassCutoff), lopass_cutoff_value);
     XCTAssertEqual(raw_au->global_parameter_value(kDelayParam_WetDryMix), wet_dry_mix);
 
+    [self waitForExpectations:@[expectation2a] timeout:1.0];
+
     graph->stop();
 
-    [self waitForExpectationsWithTimeout:10.0
-                                 handler:^(NSError *error){
-
-                                 }];
+    [self waitForExpectations:@[expectation2b] timeout:1.0];
 }
 #endif
 
