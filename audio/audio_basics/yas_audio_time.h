@@ -22,17 +22,12 @@ struct time final {
     double sample_rate() const;
     AudioTimeStamp audio_time_stamp() const;
 
-    time extrapolate_time_from_anchor(time const &anchor_time);
-
-    std::string description() const;
-
     bool operator==(time const &) const;
     bool operator!=(time const &) const;
 
    private:
-    class impl;
-
-    std::shared_ptr<impl> _impl;
+    AudioTimeStamp _time_stamp;
+    double _sample_rate = 0;
 };
 
 static std::optional<time> const null_time_opt{std::nullopt};
@@ -41,7 +36,3 @@ static std::optional<time_ptr> const null_time_ptr_opt{std::nullopt};
 uint64_t host_time_for_seconds(double seconds);
 double seconds_for_host_time(uint64_t host_time);
 }  // namespace yas::audio
-
-namespace yas {
-std::string to_string(audio::time const &);
-}
