@@ -22,20 +22,16 @@ struct offline_io_core : io_core {
     static offline_io_core_ptr make_shared(offline_device_ptr const &);
 
    private:
-    std::weak_ptr<offline_io_core> _weak_io_core;
-    offline_device_ptr const _device;
-    std::optional<task_queue> _queue = std::nullopt;
+    class render_context;
 
-    mutable std::recursive_mutex _kernel_mutex;
-    std::optional<io_render_f> __render_handler = std::nullopt;
-    uint32_t __maximum_frames = 4096;
-    std::optional<io_kernel_ptr> __kernel = std::nullopt;
+    offline_device_ptr const _device;
+    std::shared_ptr<render_context> _render_context;
+
+    std::optional<io_render_f> _render_handler = std::nullopt;
+    uint32_t _maximum_frames = 4096;
 
     offline_io_core(offline_device_ptr const &);
 
-    void _prepare(offline_io_core_ptr const &);
-    void _set_kernel(std::optional<io_kernel_ptr> const &);
-    std::optional<io_kernel_ptr> _kernel() const;
-    void _update_kernel();
+    std::optional<io_kernel_ptr> _make_kernel();
 };
 }  // namespace yas::audio

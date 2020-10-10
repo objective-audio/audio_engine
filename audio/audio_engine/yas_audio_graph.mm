@@ -23,6 +23,9 @@ using namespace yas;
 audio::graph::graph() = default;
 
 audio::graph::~graph() {
+    if (this->_io_observer.has_value()) {
+        this->_io_observer.value()->invalidate();
+    }
     this->_nodes.clear();
 }
 
