@@ -16,10 +16,13 @@ audio::offline_io_core::offline_io_core(offline_device_ptr const &device)
 }
 
 void audio::offline_io_core::initialize() {
+    this->_kernel = this->_make_kernel();
 }
 
 void audio::offline_io_core::uninitialize() {
     this->stop();
+
+    this->_kernel = std::nullopt;
 }
 
 void audio::offline_io_core::set_render_handler(std::optional<io_render_f> handler) {
@@ -35,12 +38,11 @@ bool audio::offline_io_core::start() {
         return false;
     }
 
-    auto const kernel = this->_make_kernel();
-    if (!kernel.has_value()) {
+    if (!this->_kernel.has_value()) {
         return false;
     }
 
-    auto task_lambda = [kernel = kernel.value(), render_context = this->_render_context,
+    auto task_lambda = [kernel = this->_kernel.value(), render_context = this->_render_context,
                         offline_handler = this->_device->render_handler(),
                         completion = this->_device->completion_handler()](task const &task) mutable {
         bool cancelled = false;
