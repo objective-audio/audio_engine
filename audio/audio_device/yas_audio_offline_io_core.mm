@@ -149,19 +149,21 @@ void audio::offline_io_core::_update_kernel() {
     std::lock_guard<std::recursive_mutex> lock(this->_kernel_mutex);
 
     this->_set_kernel(std::nullopt);
+    this->_set_kernel(this->_make_kernel());
+}
 
+std::optional<audio::io_kernel_ptr> audio::offline_io_core::_make_kernel() const {
     auto const &output_format = this->_device->output_format();
 
-    if (!output_format) {
-        return;
+    if (!output_format.has_value()) {
+        return std::nullopt;
     }
 
     if (!this->__render_handler) {
-        return;
+        return std::nullopt;
     }
 
-    this->_set_kernel(
-        io_kernel::make_shared(this->__render_handler.value(), std::nullopt, output_format, this->__maximum_frames));
+    return io_kernel::make_shared(this->__render_handler.value(), std::nullopt, output_format, this->__maximum_frames);
 }
 
 audio::offline_io_core_ptr audio::offline_io_core::make_shared(offline_device_ptr const &device) {

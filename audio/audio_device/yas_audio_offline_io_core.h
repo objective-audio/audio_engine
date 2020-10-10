@@ -38,6 +38,7 @@ struct offline_io_core : io_core {
     void _prepare(offline_io_core_ptr const &);
     void _set_kernel(std::optional<io_kernel_ptr> const &);
     std::optional<io_kernel_ptr> _kernel() const;
+    std::optional<io_kernel_ptr> _make_kernel() const;
     void _update_kernel();
 };
 }  // namespace yas::audio
