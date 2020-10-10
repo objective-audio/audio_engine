@@ -23,7 +23,7 @@ void audio::offline_io_core::initialize() {
 
     auto weak_core = this->_weak_io_core;
 
-    auto task_lambda = [weak_core](task const &task) mutable {
+    auto task_lambda = [weak_core, device_render_handler = this->_device->render_handler()](task const &task) mutable {
         bool cancelled = false;
         uint32_t current_sample_time = 0;
 
@@ -56,8 +56,7 @@ void audio::offline_io_core::initialize() {
                                     .input_buffer = nullptr,
                                     .input_time = audio::null_time_opt});
 
-            auto const &offline_handler = core->_device->render_handler();
-            if (offline_handler({.output_buffer = render_buffer, .output_time = time}) == continuation::abort) {
+            if (device_render_handler({.output_buffer = render_buffer, .output_time = time}) == continuation::abort) {
                 break;
             }
 
