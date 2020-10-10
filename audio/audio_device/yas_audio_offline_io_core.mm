@@ -6,8 +6,12 @@
 #include "yas_audio_offline_device.h"
 
 using namespace yas;
+struct audio::offline_io_core::render_context {
+    std::optional<task_queue> queue = std::nullopt;
+};
 
-audio::offline_io_core::offline_io_core(offline_device_ptr const &device) : _device(device) {
+audio::offline_io_core::offline_io_core(offline_device_ptr const &device)
+    : _device(device), _render_context(std::make_shared<render_context>()) {
 }
 
 void audio::offline_io_core::initialize() {
@@ -67,7 +71,7 @@ void audio::offline_io_core::initialize() {
 
         dispatch_async(dispatch_get_main_queue(), [weak_core, cancelled]() {
             if (auto const core = weak_core.lock()) {
-                core->_queue = std::nullopt;
+                core->_render_context->queue = std::nullopt;
 
                 if (auto const &handler = core->_device->completion_handler()) {
                     handler.value()(cancelled);
@@ -77,18 +81,18 @@ void audio::offline_io_core::initialize() {
     };
 
     auto task = task::make_shared(std::move(task_lambda));
-    this->_queue = task_queue{1};
-    this->_queue->suspend();
-    this->_queue->push_back(task);
+    this->_render_context->queue = task_queue{1};
+    this->_render_context->queue->suspend();
+    this->_render_context->queue->push_back(task);
 }
 
 void audio::offline_io_core::uninitialize() {
     this->stop();
 
-    if (auto &queue = this->_queue) {
+    if (auto &queue = this->_render_context->queue) {
         queue->cancel_all();
         queue->wait_until_all_tasks_are_finished();
-        this->_queue = std::nullopt;
+        this->_render_context->queue = std::nullopt;
     }
 
     if (auto const &handler = this->_device->completion_handler()) {
@@ -109,7 +113,7 @@ void audio::offline_io_core::set_maximum_frames_per_slice(uint32_t const frames)
 }
 
 bool audio::offline_io_core::start() {
-    if (auto &queue = this->_queue) {
+    if (auto &queue = this->_render_context->queue) {
         queue->resume();
         return true;
     } else {
@@ -118,7 +122,7 @@ bool audio::offline_io_core::start() {
 }
 
 void audio::offline_io_core::stop() {
-    if (auto &queue = this->_queue) {
+    if (auto &queue = this->_render_context->queue) {
         queue.value().cancel_all();
     }
 }

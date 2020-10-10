@@ -22,9 +22,11 @@ struct offline_io_core : io_core {
     static offline_io_core_ptr make_shared(offline_device_ptr const &);
 
    private:
+    class render_context;
+
     std::weak_ptr<offline_io_core> _weak_io_core;
     offline_device_ptr const _device;
-    std::optional<task_queue> _queue = std::nullopt;
+    std::shared_ptr<render_context> _render_context;
 
     mutable std::recursive_mutex _kernel_mutex;
     std::optional<io_render_f> __render_handler = std::nullopt;
