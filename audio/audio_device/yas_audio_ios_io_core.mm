@@ -69,7 +69,6 @@ bool audio::ios_io_core::start() {
 
     this->_is_started = true;
 
-    this->_kernel = this->_make_kernel();
     this->_create_engine();
     return this->_start_engine();
 }
@@ -77,7 +76,6 @@ bool audio::ios_io_core::start() {
 void audio::ios_io_core::stop() {
     this->_stop_engine();
     this->_dispose_engine();
-    this->_kernel = nullptr;
     this->_is_started = false;
 }
 
@@ -106,7 +104,8 @@ void audio::ios_io_core::_create_engine() {
         return;
     }
 
-    if (!this->_kernel) {
+    auto kernel = this->_make_kernel();
+    if (!kernel) {
         return;
     }
 
@@ -122,9 +121,8 @@ void audio::ios_io_core::_create_engine() {
         if (sample_rate == node_format.sampleRate) {
             auto source_node = objc_ptr_with_move_object([[AVAudioSourceNode alloc]
                 initWithFormat:node_format
-                   renderBlock:[kernel = this->_kernel](
-                                   BOOL *_Nonnull isSilence, const AudioTimeStamp *_Nonnull timestamp,
-                                   AVAudioFrameCount frameCount, AudioBufferList *_Nonnull outputData) {
+                   renderBlock:[kernel](BOOL *_Nonnull isSilence, const AudioTimeStamp *_Nonnull timestamp,
+                                        AVAudioFrameCount frameCount, AudioBufferList *_Nonnull outputData) {
                        if (auto const &output_buffer = kernel->output_buffer) {
                            if (outputData) {
                                uint32_t const frame_length =
@@ -190,9 +188,8 @@ void audio::ios_io_core::_create_engine() {
 
         if (sample_rate == node_format.sampleRate) {
             auto sink_node = objc_ptr_with_move_object([[AVAudioSinkNode alloc]
-                initWithReceiverBlock:[kernel = this->_kernel](const AudioTimeStamp *_Nonnull timestamp,
-                                                               AVAudioFrameCount frameCount,
-                                                               const AudioBufferList *_Nonnull inputData) {
+                initWithReceiverBlock:[kernel](const AudioTimeStamp *_Nonnull timestamp, AVAudioFrameCount frameCount,
+                                               const AudioBufferList *_Nonnull inputData) {
                     kernel->reset_buffers();
                     kernel->input_time = std::nullopt;
 
