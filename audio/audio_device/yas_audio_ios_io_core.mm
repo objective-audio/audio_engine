@@ -63,8 +63,13 @@ void audio::ios_io_core::set_maximum_frames_per_slice(uint32_t const frames) {
 }
 
 bool audio::ios_io_core::start() {
+    if (this->_is_started) {
+        return true;
+    }
+
     this->_is_started = true;
-    this->_make_kernel();
+
+    this->_kernel = this->_make_kernel();
     this->_create_engine();
     return this->_start_engine();
 }
@@ -72,37 +77,28 @@ bool audio::ios_io_core::start() {
 void audio::ios_io_core::stop() {
     this->_stop_engine();
     this->_dispose_engine();
-    this->_dispose_kernel();
+    this->_kernel = nullptr;
     this->_is_started = false;
 }
 
-void audio::ios_io_core::_make_kernel() {
-    if (this->_kernel) {
-        return;
-    }
-
+audio::io_kernel_ptr audio::ios_io_core::_make_kernel() const {
     auto const &output_format = this->_device->output_format();
     auto const &input_format = this->_device->input_format();
 
     if (!output_format.has_value() && !input_format.has_value()) {
-        return;
+        return nullptr;
     }
 
     if (!this->_render_handler) {
-        return;
+        return nullptr;
     }
 
     if (this->_maximum_frames == 0) {
-        return;
+        return nullptr;
     }
 
-    this->_kernel =
-        io_kernel::make_shared(this->_render_handler.value(), input_format.has_value() ? input_format : std::nullopt,
-                               output_format.has_value() ? output_format : std::nullopt, this->_maximum_frames);
-}
-
-void audio::ios_io_core::_dispose_kernel() {
-    this->_kernel = nullptr;
+    return io_kernel::make_shared(this->_render_handler.value(), input_format.has_value() ? input_format : std::nullopt,
+                                  output_format.has_value() ? output_format : std::nullopt, this->_maximum_frames);
 }
 
 void audio::ios_io_core::_create_engine() {
