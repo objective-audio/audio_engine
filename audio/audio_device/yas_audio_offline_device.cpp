@@ -8,18 +8,8 @@
 
 using namespace yas;
 
-audio::offline_device::offline_device(audio::format const &output_format, offline_render_f &&render_handler,
-                                      offline_completion_f &&completion_handler)
+audio::offline_device::offline_device(audio::format const &output_format, offline_render_f &&render_handler)
     : _output_format(output_format), _render_handler(std::move(render_handler)) {
-    this->_completion_handler = [this, completion_handler = std::move(completion_handler),
-                                 called = std::make_shared<bool>(false)](bool const cancelled) mutable {
-        if (!*called) {
-            *called = true;
-            completion_handler(cancelled);
-            this->_completion_handler = std::nullopt;
-            this->_notifier->notify(io_device::method::lost);
-        }
-    };
 }
 
 std::optional<audio::format> audio::offline_device::input_format() const {
@@ -51,15 +41,27 @@ std::optional<audio::offline_completion_f> audio::offline_device::completion_han
     return this->_completion_handler;
 }
 
-void audio::offline_device::_prepare(offline_device_ptr const &device) {
+void audio::offline_device::_prepare(offline_device_ptr const &device, offline_completion_f &&completion_handler) {
     this->_weak_device = device;
+
+    this->_completion_handler = [weak_device = this->_weak_device, completion_handler = std::move(completion_handler),
+                                 called = std::make_shared<bool>(false)](bool const cancelled) mutable {
+        if (!*called) {
+            *called = true;
+            completion_handler(cancelled);
+
+            if (auto const device = weak_device.lock()) {
+                device->_completion_handler = std::nullopt;
+                device->_notifier->notify(io_device::method::lost);
+            }
+        }
+    };
 }
 
 audio::offline_device_ptr audio::offline_device::make_shared(audio::format const &output_format,
                                                              offline_render_f &&render_handler,
                                                              offline_completion_f &&completion_handler) {
-    auto shared =
-        offline_device_ptr{new offline_device{output_format, std::move(render_handler), std::move(completion_handler)}};
-    shared->_prepare(shared);
+    auto shared = offline_device_ptr{new offline_device{output_format, std::move(render_handler)}};
+    shared->_prepare(shared, std::move(completion_handler));
     return shared;
 }
