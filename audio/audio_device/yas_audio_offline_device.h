@@ -39,8 +39,8 @@ struct offline_device : io_device {
 
     chaining::notifier_ptr<io_device::method> _notifier = chaining::notifier<io_device::method>::make_shared();
 
-    offline_device(audio::format const &output_format, offline_render_f &&, offline_completion_f &&);
+    offline_device(audio::format const &output_format, offline_render_f &&);
 
-    void _prepare(offline_device_ptr const &);
+    void _prepare(offline_device_ptr const &, offline_completion_f &&);
 };
 }  // namespace yas::audio
