@@ -39,7 +39,6 @@ struct ios_io_core final : io_core {
 
     std::optional<io_render_f> _render_handler = std::nullopt;
     uint32_t _maximum_frames = 4096;
-    io_kernel_ptr _kernel = nullptr;
 
     bool _is_started = false;
 
