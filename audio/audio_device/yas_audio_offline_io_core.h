@@ -28,17 +28,12 @@ struct offline_io_core : io_core {
     offline_device_ptr const _device;
     std::shared_ptr<render_context> _render_context;
 
-    mutable std::recursive_mutex _kernel_mutex;
     std::optional<io_render_f> __render_handler = std::nullopt;
     uint32_t __maximum_frames = 4096;
-    std::optional<io_kernel_ptr> __kernel = std::nullopt;
 
     offline_io_core(offline_device_ptr const &);
 
     void _prepare(offline_io_core_ptr const &);
-    void _set_kernel(std::optional<io_kernel_ptr> const &);
-    std::optional<io_kernel_ptr> _kernel() const;
     std::optional<io_kernel_ptr> _make_kernel() const;
-    void _update_kernel();
 };
 }  // namespace yas::audio
