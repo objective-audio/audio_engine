@@ -24,7 +24,6 @@ struct offline_io_core : io_core {
    private:
     class render_context;
 
-    std::weak_ptr<offline_io_core> _weak_io_core;
     offline_device_ptr const _device;
     std::shared_ptr<render_context> _render_context;
 

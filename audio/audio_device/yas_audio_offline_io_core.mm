@@ -40,21 +40,13 @@ bool audio::offline_io_core::start() {
         return false;
     }
 
-    auto weak_core = this->_weak_io_core;
-
-    auto task_lambda = [weak_core, kernel = kernel.value(), render_context = to_weak(this->_render_context),
+    auto task_lambda = [kernel = kernel.value(), render_context = to_weak(this->_render_context),
                         device_render_handler = this->_device->render_handler(),
                         completion_handler = this->_device->completion_handler()](task const &task) mutable {
         bool cancelled = false;
         uint32_t current_sample_time = 0;
 
         while (!cancelled) {
-            auto core = weak_core.lock();
-            if (!core) {
-                cancelled = true;
-                break;
-            }
-
             kernel->reset_buffers();
 
             auto const &render_buffer = kernel->output_buffer;
@@ -115,10 +107,6 @@ void audio::offline_io_core::stop() {
     }
 }
 
-void audio::offline_io_core::_prepare(offline_io_core_ptr const &core) {
-    this->_weak_io_core = core;
-}
-
 std::optional<audio::io_kernel_ptr> audio::offline_io_core::_make_kernel() const {
     auto const &output_format = this->_device->output_format();
 
@@ -134,7 +122,5 @@ std::optional<audio::io_kernel_ptr> audio::offline_io_core::_make_kernel() const
 }
 
 audio::offline_io_core_ptr audio::offline_io_core::make_shared(offline_device_ptr const &device) {
-    auto shared = offline_io_core_ptr{new offline_io_core{device}};
-    shared->_prepare(shared);
-    return shared;
+    return offline_io_core_ptr{new offline_io_core{device}};
 }
