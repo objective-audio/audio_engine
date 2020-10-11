@@ -12,9 +12,9 @@ audio::offline_device::offline_device(audio::format const &output_format, offlin
                                       offline_completion_f &&completion_handler)
     : _output_format(output_format), _render_handler(std::move(render_handler)) {
     this->_completion_handler = [this, completion_handler = std::move(completion_handler),
-                                 called = bool{false}](bool const cancelled) mutable {
-        if (!called) {
-            called = true;
+                                 called = std::make_shared<bool>(false)](bool const cancelled) mutable {
+        if (!*called) {
+            *called = true;
             completion_handler(cancelled);
             this->_completion_handler = std::nullopt;
             this->_notifier->notify(io_device::method::lost);
