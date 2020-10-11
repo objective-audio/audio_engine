@@ -19,16 +19,6 @@ void audio::offline_io_core::initialize() {
 
 void audio::offline_io_core::uninitialize() {
     this->stop();
-
-    if (auto &queue = this->_render_context->queue) {
-        queue->cancel_all();
-        queue->wait_until_all_tasks_are_finished();
-        this->_render_context->queue = std::nullopt;
-    }
-
-    if (auto const &handler = this->_device->completion_handler()) {
-        handler.value()(true);
-    }
 }
 
 void audio::offline_io_core::set_render_handler(std::optional<io_render_f> handler) {
@@ -126,7 +116,13 @@ bool audio::offline_io_core::start() {
 
 void audio::offline_io_core::stop() {
     if (auto &queue = this->_render_context->queue) {
-        queue.value().cancel_all();
+        queue->cancel_all();
+        queue->wait_until_all_tasks_are_finished();
+        this->_render_context->queue = std::nullopt;
+    }
+
+    if (auto const &handler = this->_device->completion_handler()) {
+        handler.value()(true);
     }
 }
 
