@@ -46,7 +46,7 @@ struct ios_io_core final : io_core {
     ios_io_core(ios_device_ptr const &);
 
     [[nodiscard]] io_kernel_ptr _make_kernel() const;
-    void _create_engine();
+    [[nodiscard]] bool _create_engine();
     void _dispose_engine();
     [[nodiscard]] bool _start_engine();
     void _stop_engine();

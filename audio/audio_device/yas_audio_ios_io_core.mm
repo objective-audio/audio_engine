@@ -75,7 +75,11 @@ bool audio::ios_io_core::start() {
     }
 
     this->_kernel = std::move(kernel);
-    this->_create_engine();
+
+    if (!this->_create_engine()) {
+        return false;
+    }
+
     return this->_start_engine();
 }
 
@@ -106,13 +110,13 @@ audio::io_kernel_ptr audio::ios_io_core::_make_kernel() const {
                                   output_format.has_value() ? output_format : std::nullopt, this->_maximum_frames);
 }
 
-void audio::ios_io_core::_create_engine() {
+bool audio::ios_io_core::_create_engine() {
     if (this->_impl->_avf_engine) {
-        return;
+        return true;
     }
 
     if (!this->_kernel) {
-        return;
+        return false;
     }
 
     auto engine = objc_ptr_with_move_object([[AVAudioEngine alloc] init]);
@@ -239,6 +243,8 @@ void audio::ios_io_core::_create_engine() {
             log_formats("ios_io_core initialize input formats did not match.", node_format, *input_format);
         }
     }
+
+    return true;
 }
 
 void audio::ios_io_core::_dispose_engine() {
