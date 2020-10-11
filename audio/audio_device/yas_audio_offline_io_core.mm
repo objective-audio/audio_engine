@@ -23,7 +23,8 @@ void audio::offline_io_core::initialize() {
 
     auto weak_core = this->_weak_io_core;
 
-    auto task_lambda = [weak_core, device_render_handler = this->_device->render_handler(),
+    auto task_lambda = [weak_core, render_context = this->_render_context,
+                        device_render_handler = this->_device->render_handler(),
                         completion_handler = this->_device->completion_handler()](task const &task) mutable {
         bool cancelled = false;
         uint32_t current_sample_time = 0;
@@ -70,13 +71,11 @@ void audio::offline_io_core::initialize() {
         }
 
         dispatch_async(dispatch_get_main_queue(),
-                       [weak_core, cancelled, completion_handler = std::move(completion_handler)]() {
-                           if (auto const core = weak_core.lock()) {
-                               core->_render_context->queue = std::nullopt;
+                       [render_context, cancelled, completion_handler = std::move(completion_handler)]() {
+                           render_context->queue = std::nullopt;
 
-                               if (completion_handler.has_value()) {
-                                   completion_handler.value()(cancelled);
-                               }
+                           if (completion_handler.has_value()) {
+                               completion_handler.value()(cancelled);
                            }
                        });
     };
