@@ -42,14 +42,10 @@ audio::ios_io_core::~ios_io_core() {
 }
 
 void audio::ios_io_core::initialize() {
-    this->_is_initialized = true;
-    this->_make_kernel();
 }
 
 void audio::ios_io_core::uninitialize() {
     this->stop();
-    this->_dispose_kernel();
-    this->_is_initialized = false;
 }
 
 void audio::ios_io_core::set_render_handler(std::optional<io_render_f> handler) {
@@ -67,10 +63,8 @@ void audio::ios_io_core::set_maximum_frames_per_slice(uint32_t const frames) {
 }
 
 bool audio::ios_io_core::start() {
-    this->initialize();
-
     this->_is_started = true;
-
+    this->_make_kernel();
     this->_create_engine();
     return this->_start_engine();
 }
@@ -78,6 +72,7 @@ bool audio::ios_io_core::start() {
 void audio::ios_io_core::stop() {
     this->_stop_engine();
     this->_dispose_engine();
+    this->_dispose_kernel();
     this->_is_started = false;
 }
 
@@ -312,15 +307,10 @@ void audio::ios_io_core::_stop_engine() {
 
 void audio::ios_io_core::_reload_if_needed() {
     bool const is_started = this->_is_started;
-    bool const is_initialized = this->_is_initialized;
 
-    if (is_initialized) {
-        this->uninitialize();
-        this->initialize();
-
-        if (is_started) {
-            this->start();
-        }
+    if (is_started) {
+        this->stop();
+        this->start();
     }
 }
 

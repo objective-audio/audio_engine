@@ -42,7 +42,6 @@ struct ios_io_core final : io_core {
     io_kernel_ptr _kernel = nullptr;
 
     bool _is_started = false;
-    bool _is_initialized = false;
 
     ios_io_core(ios_device_ptr const &);
 
