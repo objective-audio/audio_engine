@@ -18,14 +18,10 @@ audio::mac_io_core::~mac_io_core() {
 }
 
 void audio::mac_io_core::initialize() {
-    this->_is_initialized = true;
-    this->_make_kernel();
 }
 
 void audio::mac_io_core::uninitialize() {
     this->stop();
-    this->_dispose_kernel();
-    this->_is_initialized = false;
 }
 
 void audio::mac_io_core::set_render_handler(std::optional<io_render_f> handler) {
@@ -43,9 +39,9 @@ void audio::mac_io_core::set_maximum_frames_per_slice(uint32_t const frames) {
 }
 
 bool audio::mac_io_core::start() {
-    this->initialize();
-
     this->_is_started = true;
+
+    this->_make_kernel();
 
     this->_create_io_proc();
 
@@ -62,6 +58,7 @@ void audio::mac_io_core::stop() {
         raise_if_raw_audio_error(AudioDeviceStop(this->_device->audio_device_id(), this->_io_proc_id.value()));
     }
     this->_destroy_io_proc();
+    this->_dispose_kernel();
     this->_is_started = false;
 }
 
@@ -163,15 +160,10 @@ void audio::mac_io_core::_destroy_io_proc() {
 
 void audio::mac_io_core::_reload_if_needed() {
     bool const is_started = this->_is_started;
-    bool const is_initialized = this->_is_initialized;
 
-    if (is_initialized) {
-        this->uninitialize();
-        this->initialize();
-
-        if (is_started) {
-            this->start();
-        }
+    if (is_started) {
+        this->stop();
+        this->start();
     }
 }
 
