@@ -45,11 +45,10 @@ struct ios_io_core final : io_core {
 
     ios_io_core(ios_device_ptr const &);
 
-    void _make_kernel();
-    void _dispose_kernel();
+    [[nodiscard]] io_kernel_ptr _make_kernel() const;
     void _create_engine();
     void _dispose_engine();
-    bool _start_engine();
+    [[nodiscard]] bool _start_engine();
     void _stop_engine();
     void _reload_if_needed();
 };
