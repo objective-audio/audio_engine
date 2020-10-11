@@ -15,10 +15,43 @@ audio::offline_io_core::offline_io_core(offline_device_ptr const &device)
 }
 
 void audio::offline_io_core::initialize() {
+}
+
+void audio::offline_io_core::uninitialize() {
+    this->stop();
+
+    if (auto &queue = this->_render_context->queue) {
+        queue->cancel_all();
+        queue->wait_until_all_tasks_are_finished();
+        this->_render_context->queue = std::nullopt;
+    }
+
+    if (auto const &handler = this->_device->completion_handler()) {
+        handler.value()(true);
+    }
+}
+
+void audio::offline_io_core::set_render_handler(std::optional<io_render_f> handler) {
+    std::lock_guard<std::recursive_mutex> lock(this->_kernel_mutex);
+    this->__render_handler = std::move(handler);
+    this->_update_kernel();
+}
+
+void audio::offline_io_core::set_maximum_frames_per_slice(uint32_t const frames) {
+    std::lock_guard<std::recursive_mutex> lock(this->_kernel_mutex);
+    this->__maximum_frames = frames;
+    this->_update_kernel();
+}
+
+bool audio::offline_io_core::start() {
+    if (this->_render_context->queue.has_value()) {
+        return false;
+    }
+
     this->_update_kernel();
 
     if (!this->_device->output_format().has_value()) {
-        return;
+        return false;
     }
 
     auto weak_core = this->_weak_io_core;
@@ -86,41 +119,9 @@ void audio::offline_io_core::initialize() {
     this->_render_context->queue = task_queue{1};
     this->_render_context->queue->suspend();
     this->_render_context->queue->push_back(task);
-}
+    this->_render_context->queue->resume();
 
-void audio::offline_io_core::uninitialize() {
-    this->stop();
-
-    if (auto &queue = this->_render_context->queue) {
-        queue->cancel_all();
-        queue->wait_until_all_tasks_are_finished();
-        this->_render_context->queue = std::nullopt;
-    }
-
-    if (auto const &handler = this->_device->completion_handler()) {
-        handler.value()(true);
-    }
-}
-
-void audio::offline_io_core::set_render_handler(std::optional<io_render_f> handler) {
-    std::lock_guard<std::recursive_mutex> lock(this->_kernel_mutex);
-    this->__render_handler = std::move(handler);
-    this->_update_kernel();
-}
-
-void audio::offline_io_core::set_maximum_frames_per_slice(uint32_t const frames) {
-    std::lock_guard<std::recursive_mutex> lock(this->_kernel_mutex);
-    this->__maximum_frames = frames;
-    this->_update_kernel();
-}
-
-bool audio::offline_io_core::start() {
-    if (auto &queue = this->_render_context->queue) {
-        queue->resume();
-        return true;
-    } else {
-        return false;
-    }
+    return true;
 }
 
 void audio::offline_io_core::stop() {
