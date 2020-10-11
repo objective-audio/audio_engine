@@ -45,8 +45,6 @@ bool audio::mac_io_core::start() {
 
     this->_is_started = true;
 
-    this->_kernel = this->_make_kernel();
-
     this->_create_io_proc();
 
     if (this->_io_proc_id) {
@@ -62,7 +60,6 @@ void audio::mac_io_core::stop() {
         raise_if_raw_audio_error(AudioDeviceStop(this->_device->audio_device_id(), this->_io_proc_id.value()));
     }
     this->_destroy_io_proc();
-    this->_kernel = nullptr;
     this->_is_started = false;
 }
 
@@ -90,13 +87,14 @@ void audio::mac_io_core::_create_io_proc() {
         return;
     }
 
-    if (!this->_kernel) {
+    auto kernel = this->_make_kernel();
+    if (!kernel) {
         return;
     }
 
-    auto handler = [kernel = this->_kernel, this](const AudioTimeStamp *inNow, const AudioBufferList *inInputData,
-                                                  const AudioTimeStamp *inInputTime, AudioBufferList *outOutputData,
-                                                  const AudioTimeStamp *inOutputTime) {
+    auto handler = [kernel = std::move(kernel), this](const AudioTimeStamp *inNow, const AudioBufferList *inInputData,
+                                                      const AudioTimeStamp *inInputTime, AudioBufferList *outOutputData,
+                                                      const AudioTimeStamp *inOutputTime) {
         if (outOutputData) {
             audio::clear(outOutputData);
         }

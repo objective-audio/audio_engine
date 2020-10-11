@@ -29,7 +29,6 @@ struct mac_io_core final : io_core {
     mac_device_ptr _device;
     std::optional<AudioDeviceIOProcID> _io_proc_id = std::nullopt;
 
-    io_kernel_ptr _kernel = nullptr;
     std::optional<io_render_f> _render_handler = std::nullopt;
     uint32_t _maximum_frames = 4096;
 
