@@ -18,14 +18,10 @@ audio::mac_io_core::~mac_io_core() {
 }
 
 void audio::mac_io_core::initialize() {
-    this->_is_initialized = true;
-    this->_make_kernel();
 }
 
 void audio::mac_io_core::uninitialize() {
     this->stop();
-    this->_dispose_kernel();
-    this->_is_initialized = false;
 }
 
 void audio::mac_io_core::set_render_handler(std::optional<io_render_f> handler) {
@@ -43,7 +39,9 @@ void audio::mac_io_core::set_maximum_frames_per_slice(uint32_t const frames) {
 }
 
 bool audio::mac_io_core::start() {
-    this->initialize();
+    if (this->_is_started) {
+        return true;
+    }
 
     this->_is_started = true;
 
@@ -65,32 +63,23 @@ void audio::mac_io_core::stop() {
     this->_is_started = false;
 }
 
-void audio::mac_io_core::_make_kernel() {
-    if (this->_kernel) {
-        return;
-    }
-
+audio::io_kernel_ptr audio::mac_io_core::_make_kernel() const {
     auto const &output_format = this->_device->output_format();
     auto const &input_format = this->_device->input_format();
 
     if (!output_format && !input_format) {
-        return;
+        return nullptr;
     }
 
     if (!this->_render_handler) {
-        return;
+        return nullptr;
     }
 
     if (this->_maximum_frames == 0) {
-        return;
+        return nullptr;
     }
 
-    this->_kernel =
-        io_kernel::make_shared(this->_render_handler.value(), input_format, output_format, this->_maximum_frames);
-}
-
-void audio::mac_io_core::_dispose_kernel() {
-    this->_kernel = nullptr;
+    return io_kernel::make_shared(this->_render_handler.value(), input_format, output_format, this->_maximum_frames);
 }
 
 void audio::mac_io_core::_create_io_proc() {
@@ -98,13 +87,14 @@ void audio::mac_io_core::_create_io_proc() {
         return;
     }
 
-    if (!this->_kernel) {
+    auto kernel = this->_make_kernel();
+    if (!kernel) {
         return;
     }
 
-    auto handler = [kernel = this->_kernel, this](const AudioTimeStamp *inNow, const AudioBufferList *inInputData,
-                                                  const AudioTimeStamp *inInputTime, AudioBufferList *outOutputData,
-                                                  const AudioTimeStamp *inOutputTime) {
+    auto handler = [kernel = std::move(kernel), this](const AudioTimeStamp *inNow, const AudioBufferList *inInputData,
+                                                      const AudioTimeStamp *inInputTime, AudioBufferList *outOutputData,
+                                                      const AudioTimeStamp *inOutputTime) {
         if (outOutputData) {
             audio::clear(outOutputData);
         }
@@ -163,15 +153,10 @@ void audio::mac_io_core::_destroy_io_proc() {
 
 void audio::mac_io_core::_reload_if_needed() {
     bool const is_started = this->_is_started;
-    bool const is_initialized = this->_is_initialized;
 
-    if (is_initialized) {
-        this->uninitialize();
-        this->initialize();
-
-        if (is_started) {
-            this->start();
-        }
+    if (is_started) {
+        this->stop();
+        this->start();
     }
 }
 
