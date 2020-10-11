@@ -39,9 +39,13 @@ void audio::mac_io_core::set_maximum_frames_per_slice(uint32_t const frames) {
 }
 
 bool audio::mac_io_core::start() {
+    if (this->_is_started) {
+        return true;
+    }
+
     this->_is_started = true;
 
-    this->_make_kernel();
+    this->_kernel = this->_make_kernel();
 
     this->_create_io_proc();
 
@@ -58,36 +62,27 @@ void audio::mac_io_core::stop() {
         raise_if_raw_audio_error(AudioDeviceStop(this->_device->audio_device_id(), this->_io_proc_id.value()));
     }
     this->_destroy_io_proc();
-    this->_dispose_kernel();
+    this->_kernel = nullptr;
     this->_is_started = false;
 }
 
-void audio::mac_io_core::_make_kernel() {
-    if (this->_kernel) {
-        return;
-    }
-
+audio::io_kernel_ptr audio::mac_io_core::_make_kernel() const {
     auto const &output_format = this->_device->output_format();
     auto const &input_format = this->_device->input_format();
 
     if (!output_format && !input_format) {
-        return;
+        return nullptr;
     }
 
     if (!this->_render_handler) {
-        return;
+        return nullptr;
     }
 
     if (this->_maximum_frames == 0) {
-        return;
+        return nullptr;
     }
 
-    this->_kernel =
-        io_kernel::make_shared(this->_render_handler.value(), input_format, output_format, this->_maximum_frames);
-}
-
-void audio::mac_io_core::_dispose_kernel() {
-    this->_kernel = nullptr;
+    return io_kernel::make_shared(this->_render_handler.value(), input_format, output_format, this->_maximum_frames);
 }
 
 void audio::mac_io_core::_create_io_proc() {

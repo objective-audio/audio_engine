@@ -37,8 +37,7 @@ struct mac_io_core final : io_core {
 
     mac_io_core(mac_device_ptr const &);
 
-    void _make_kernel();
-    void _dispose_kernel();
+    [[nodiscard]] io_kernel_ptr _make_kernel() const;
     void _create_io_proc();
     void _destroy_io_proc();
     void _reload_if_needed();
