@@ -39,18 +39,15 @@ struct ios_io_core final : io_core {
 
     std::optional<io_render_f> _render_handler = std::nullopt;
     uint32_t _maximum_frames = 4096;
-    io_kernel_ptr _kernel = nullptr;
 
     bool _is_started = false;
-    bool _is_initialized = false;
 
     ios_io_core(ios_device_ptr const &);
 
-    void _make_kernel();
-    void _dispose_kernel();
+    [[nodiscard]] io_kernel_ptr _make_kernel() const;
     void _create_engine();
     void _dispose_engine();
-    bool _start_engine();
+    [[nodiscard]] bool _start_engine();
     void _stop_engine();
     void _reload_if_needed();
 };

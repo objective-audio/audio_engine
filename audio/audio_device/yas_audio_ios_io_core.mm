@@ -42,14 +42,10 @@ audio::ios_io_core::~ios_io_core() {
 }
 
 void audio::ios_io_core::initialize() {
-    this->_is_initialized = true;
-    this->_make_kernel();
 }
 
 void audio::ios_io_core::uninitialize() {
     this->stop();
-    this->_dispose_kernel();
-    this->_is_initialized = false;
 }
 
 void audio::ios_io_core::set_render_handler(std::optional<io_render_f> handler) {
@@ -67,7 +63,9 @@ void audio::ios_io_core::set_maximum_frames_per_slice(uint32_t const frames) {
 }
 
 bool audio::ios_io_core::start() {
-    this->initialize();
+    if (this->_is_started) {
+        return true;
+    }
 
     this->_is_started = true;
 
@@ -81,33 +79,24 @@ void audio::ios_io_core::stop() {
     this->_is_started = false;
 }
 
-void audio::ios_io_core::_make_kernel() {
-    if (this->_kernel) {
-        return;
-    }
-
+audio::io_kernel_ptr audio::ios_io_core::_make_kernel() const {
     auto const &output_format = this->_device->output_format();
     auto const &input_format = this->_device->input_format();
 
     if (!output_format.has_value() && !input_format.has_value()) {
-        return;
+        return nullptr;
     }
 
     if (!this->_render_handler) {
-        return;
+        return nullptr;
     }
 
     if (this->_maximum_frames == 0) {
-        return;
+        return nullptr;
     }
 
-    this->_kernel =
-        io_kernel::make_shared(this->_render_handler.value(), input_format.has_value() ? input_format : std::nullopt,
-                               output_format.has_value() ? output_format : std::nullopt, this->_maximum_frames);
-}
-
-void audio::ios_io_core::_dispose_kernel() {
-    this->_kernel = nullptr;
+    return io_kernel::make_shared(this->_render_handler.value(), input_format.has_value() ? input_format : std::nullopt,
+                                  output_format.has_value() ? output_format : std::nullopt, this->_maximum_frames);
 }
 
 void audio::ios_io_core::_create_engine() {
@@ -115,7 +104,8 @@ void audio::ios_io_core::_create_engine() {
         return;
     }
 
-    if (!this->_kernel) {
+    auto kernel = this->_make_kernel();
+    if (!kernel) {
         return;
     }
 
@@ -131,9 +121,8 @@ void audio::ios_io_core::_create_engine() {
         if (sample_rate == node_format.sampleRate) {
             auto source_node = objc_ptr_with_move_object([[AVAudioSourceNode alloc]
                 initWithFormat:node_format
-                   renderBlock:[kernel = this->_kernel](
-                                   BOOL *_Nonnull isSilence, const AudioTimeStamp *_Nonnull timestamp,
-                                   AVAudioFrameCount frameCount, AudioBufferList *_Nonnull outputData) {
+                   renderBlock:[kernel](BOOL *_Nonnull isSilence, const AudioTimeStamp *_Nonnull timestamp,
+                                        AVAudioFrameCount frameCount, AudioBufferList *_Nonnull outputData) {
                        if (auto const &output_buffer = kernel->output_buffer) {
                            if (outputData) {
                                uint32_t const frame_length =
@@ -199,9 +188,8 @@ void audio::ios_io_core::_create_engine() {
 
         if (sample_rate == node_format.sampleRate) {
             auto sink_node = objc_ptr_with_move_object([[AVAudioSinkNode alloc]
-                initWithReceiverBlock:[kernel = this->_kernel](const AudioTimeStamp *_Nonnull timestamp,
-                                                               AVAudioFrameCount frameCount,
-                                                               const AudioBufferList *_Nonnull inputData) {
+                initWithReceiverBlock:[kernel](const AudioTimeStamp *_Nonnull timestamp, AVAudioFrameCount frameCount,
+                                               const AudioBufferList *_Nonnull inputData) {
                     kernel->reset_buffers();
                     kernel->input_time = std::nullopt;
 
@@ -312,15 +300,10 @@ void audio::ios_io_core::_stop_engine() {
 
 void audio::ios_io_core::_reload_if_needed() {
     bool const is_started = this->_is_started;
-    bool const is_initialized = this->_is_initialized;
 
-    if (is_initialized) {
-        this->uninitialize();
-        this->initialize();
-
-        if (is_started) {
-            this->start();
-        }
+    if (is_started) {
+        this->stop();
+        this->start();
     }
 }
 
