@@ -28,8 +28,8 @@ struct offline_io_core : io_core {
     offline_device_ptr const _device;
     std::shared_ptr<render_context> _render_context;
 
-    std::optional<io_render_f> __render_handler = std::nullopt;
-    uint32_t __maximum_frames = 4096;
+    std::optional<io_render_f> _render_handler = std::nullopt;
+    uint32_t _maximum_frames = 4096;
 
     offline_io_core(offline_device_ptr const &);
 

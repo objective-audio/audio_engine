@@ -22,11 +22,11 @@ void audio::offline_io_core::uninitialize() {
 }
 
 void audio::offline_io_core::set_render_handler(std::optional<io_render_f> handler) {
-    this->__render_handler = std::move(handler);
+    this->_render_handler = std::move(handler);
 }
 
 void audio::offline_io_core::set_maximum_frames_per_slice(uint32_t const frames) {
-    this->__maximum_frames = frames;
+    this->_maximum_frames = frames;
 }
 
 bool audio::offline_io_core::start() {
@@ -126,11 +126,11 @@ std::optional<audio::io_kernel_ptr> audio::offline_io_core::_make_kernel() const
         return std::nullopt;
     }
 
-    if (!this->__render_handler) {
+    if (!this->_render_handler) {
         return std::nullopt;
     }
 
-    return io_kernel::make_shared(this->__render_handler.value(), std::nullopt, output_format, this->__maximum_frames);
+    return io_kernel::make_shared(this->_render_handler.value(), std::nullopt, output_format, this->_maximum_frames);
 }
 
 audio::offline_io_core_ptr audio::offline_io_core::make_shared(offline_device_ptr const &device) {
