@@ -86,11 +86,11 @@ bool audio::offline_io_core::start() {
                        });
     };
 
-    auto task = task::make_shared(std::move(task_lambda));
-    this->_render_context->queue = task_queue{1};
-    this->_render_context->queue->suspend();
-    this->_render_context->queue->push_back(task);
-    this->_render_context->queue->resume();
+    task_queue queue{1};
+    queue.suspend();
+    queue.push_back(task::make_shared(std::move(task_lambda)));
+    queue.resume();
+    this->_render_context->queue = std::move(queue);
 
     return true;
 }
