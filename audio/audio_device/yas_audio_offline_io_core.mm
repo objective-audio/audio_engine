@@ -44,6 +44,10 @@ bool audio::offline_io_core::start() {
         return false;
     }
 
+    if (!this->_kernel().has_value()) {
+        return false;
+    }
+
     auto weak_core = this->_weak_io_core;
 
     auto task_lambda = [weak_core, render_context = to_weak(this->_render_context),
