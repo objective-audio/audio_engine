@@ -4,7 +4,6 @@
 
 #include "yas_audio_graph_io.h"
 
-#include <cpp_utils/yas_result.h>
 #include <sstream>
 #include "yas_audio_debug.h"
 #include "yas_audio_graph_tap.h"
@@ -12,12 +11,6 @@
 #include "yas_audio_rendering_connection.h"
 #include "yas_audio_rendering_graph.h"
 #include "yas_audio_time.h"
-
-#if TARGET_OS_IPHONE
-#import <AVFoundation/AVFoundation.h>
-#import <UIKit/UIKit.h>
-#include <cpp_utils/yas_objc_ptr.h>
-#endif
 
 using namespace yas;
 
