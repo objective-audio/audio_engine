@@ -5,6 +5,7 @@
 #include "yas_audio_graph_io.h"
 
 #include <sstream>
+
 #include "yas_audio_debug.h"
 #include "yas_audio_graph_tap.h"
 #include "yas_audio_io.h"
@@ -20,7 +21,7 @@ namespace yas::audio {
 struct graph_input_context {
     audio::pcm_buffer *input_buffer = nullptr;
 };
-}
+}  // namespace yas::audio
 
 #pragma mark - audio::graph_io
 
