@@ -14,9 +14,6 @@ namespace yas::audio {
 struct mac_io_core final : io_core {
     ~mac_io_core();
 
-    void initialize() override;
-    void uninitialize() override;
-
     void set_render_handler(std::optional<io_render_f>) override;
     void set_maximum_frames_per_slice(uint32_t const) override;
 

@@ -10,8 +10,7 @@
 
 namespace yas::audio {
 struct offline_io_core : io_core {
-    void initialize() override;
-    void uninitialize() override;
+    ~offline_io_core();
 
     void set_render_handler(std::optional<io_render_f>) override;
     void set_maximum_frames_per_slice(uint32_t const) override;

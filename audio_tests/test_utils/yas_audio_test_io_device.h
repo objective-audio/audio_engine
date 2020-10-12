@@ -12,22 +12,8 @@ struct test_io_core : audio::io_core {
         std::nullopt;
     std::optional<std::function<void(uint32_t const)>> set_maximum_frames_handler = std::nullopt;
 
-    std::optional<std::function<void(void)>> initialize_handler = std::nullopt;
-    std::optional<std::function<void(void)>> uninitialize_handler = std::nullopt;
     std::optional<std::function<bool(void)>> start_handler = std::nullopt;
     std::optional<std::function<void(void)>> stop_handler = std::nullopt;
-
-    void initialize() override {
-        if (auto const &handler = this->initialize_handler) {
-            handler.value()();
-        }
-    }
-
-    void uninitialize() override {
-        if (auto const &handler = this->uninitialize_handler) {
-            handler.value()();
-        }
-    }
 
     void set_render_handler(std::optional<audio::io_render_f> handler) override {
         if (auto const &set_handler = this->set_render_handler_handler) {

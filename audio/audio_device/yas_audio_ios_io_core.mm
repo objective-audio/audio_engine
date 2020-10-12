@@ -38,13 +38,6 @@ audio::ios_io_core::ios_io_core(ios_device_ptr const &device) : _device(device),
 }
 
 audio::ios_io_core::~ios_io_core() {
-    this->uninitialize();
-}
-
-void audio::ios_io_core::initialize() {
-}
-
-void audio::ios_io_core::uninitialize() {
     this->stop();
 }
 
