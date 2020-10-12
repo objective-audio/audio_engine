@@ -51,10 +51,8 @@ using namespace yas::audio;
     enum method {
         set_render_handler,
         set_maximum_frames,
-        initialize,
         start,
         stop,
-        uninitialize,
     };
 
     auto const device = std::make_shared<test::test_io_device>();
@@ -70,35 +68,47 @@ using namespace yas::audio;
     core->set_maximum_frames_handler = [&called_methods](uint32_t const) {
         called_methods.emplace_back(method::set_maximum_frames);
     };
-    core->initialize_handler = [&called_methods]() { called_methods.emplace_back(method::initialize); };
     core->start_handler = [&called_methods]() {
         called_methods.emplace_back(method::start);
         return true;
     };
     core->stop_handler = [&called_methods]() { called_methods.emplace_back(method::stop); };
-    core->uninitialize_handler = [&called_methods]() { called_methods.emplace_back(method::uninitialize); };
 
     {
         auto const io = audio::io::make_shared(device);
 
-        XCTAssertEqual(called_methods.size(), 3);
+        XCTAssertEqual(called_methods.size(), 2);
         XCTAssertEqual(called_methods.at(0), method::set_render_handler);
         XCTAssertEqual(called_methods.at(1), method::set_maximum_frames);
-        XCTAssertEqual(called_methods.at(2), method::initialize);
 
         io->start();
 
-        XCTAssertEqual(called_methods.size(), 4);
-        XCTAssertEqual(called_methods.at(3), method::start);
+        XCTAssertEqual(called_methods.size(), 3);
+        XCTAssertEqual(called_methods.at(2), method::start);
 
         io->stop();
 
-        XCTAssertEqual(called_methods.size(), 5);
-        XCTAssertEqual(called_methods.at(4), method::stop);
+        XCTAssertEqual(called_methods.size(), 4);
+        XCTAssertEqual(called_methods.at(3), method::stop);
     }
 
-    XCTAssertEqual(called_methods.size(), 6);
-    XCTAssertEqual(called_methods.at(5), method::uninitialize);
+    XCTAssertEqual(called_methods.size(), 4, @"");
+
+    {
+        auto const io = audio::io::make_shared(device);
+
+        XCTAssertEqual(called_methods.size(), 6);
+        XCTAssertEqual(called_methods.at(4), method::set_render_handler);
+        XCTAssertEqual(called_methods.at(5), method::set_maximum_frames);
+
+        io->start();
+
+        XCTAssertEqual(called_methods.size(), 7);
+        XCTAssertEqual(called_methods.at(6), method::start);
+    }
+
+    XCTAssertEqual(called_methods.size(), 8);
+    XCTAssertEqual(called_methods.at(7), method::stop);
 }
 
 @end

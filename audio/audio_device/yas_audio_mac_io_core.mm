@@ -14,13 +14,6 @@ audio::mac_io_core::mac_io_core(mac_device_ptr const &device) : _device(device) 
 }
 
 audio::mac_io_core::~mac_io_core() {
-    this->uninitialize();
-}
-
-void audio::mac_io_core::initialize() {
-}
-
-void audio::mac_io_core::uninitialize() {
     this->stop();
 }
 

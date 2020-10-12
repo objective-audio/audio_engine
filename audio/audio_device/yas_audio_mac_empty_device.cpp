@@ -10,12 +10,6 @@ using namespace yas;
 
 namespace yas::audio {
 struct dummy_io_core : io_core {
-    void initialize() override {
-    }
-
-    void uninitialize() override {
-    }
-
     void set_render_handler(std::optional<io_render_f>) override {
     }
 

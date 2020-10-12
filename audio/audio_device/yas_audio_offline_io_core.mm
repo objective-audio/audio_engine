@@ -14,10 +14,7 @@ audio::offline_io_core::offline_io_core(offline_device_ptr const &device)
     : _device(device), _render_context(std::make_shared<render_context>()) {
 }
 
-void audio::offline_io_core::initialize() {
-}
-
-void audio::offline_io_core::uninitialize() {
+audio::offline_io_core::~offline_io_core() {
     this->stop();
 }
 

@@ -30,7 +30,6 @@ void audio::io::_initialize() {
         this->_io_core = io_core;
         io_core->set_render_handler(this->_render_handler);
         io_core->set_maximum_frames_per_slice(this->_maximum_frames);
-        io_core->initialize();
     }
 }
 
@@ -38,7 +37,6 @@ void audio::io::_uninitialize() {
     this->stop();
 
     if (auto const &io_core = this->_io_core) {
-        io_core.value()->uninitialize();
         this->_io_core = std::nullopt;
     }
 }
