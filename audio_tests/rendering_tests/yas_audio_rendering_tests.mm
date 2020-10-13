@@ -70,8 +70,8 @@ using namespace yas;
     audio::pcm_buffer buffer{format, 4};
     audio::time time{0};
 
-    output_node.render_handler()(
-        {.buffer = &buffer, .bus_idx = 0, .time = time, .source_connections = output_node.source_connections()});
+    output_node.render_handler(
+        {.buffer = &buffer, .bus_idx = 0, .time = time, .source_connections = output_node.source_connections});
 
     XCTAssertEqual(called.size(), 4);
     XCTAssertEqual(called.at(0).node, called_node::output);
@@ -121,21 +121,21 @@ using namespace yas;
         XCTAssertEqual(output_source_nodes.size(), 3);
 
         auto const &dst_node = output_source_nodes.at(0);
-        XCTAssertEqual(dst_node->source_connections().size(), 2);
-        auto const &src_connection_0 = dst_node->source_connections().at(0);
+        XCTAssertEqual(dst_node->source_connections.size(), 2);
+        auto const &src_connection_0 = dst_node->source_connections.at(0);
         XCTAssertEqual(src_connection_0.source_bus_idx, 0);
         XCTAssertEqual(src_connection_0.format, format_0);
-        auto const &src_connection_1 = dst_node->source_connections().at(1);
+        auto const &src_connection_1 = dst_node->source_connections.at(1);
         XCTAssertEqual(src_connection_1.source_bus_idx, 0);
         XCTAssertEqual(src_connection_1.format, format_1);
 
         auto const &src_node_0 = output_source_nodes.at(1);
         XCTAssertEqual(src_node_0.get(), src_connection_0.source_node);
-        XCTAssertEqual(src_node_0->source_connections().size(), 0);
+        XCTAssertEqual(src_node_0->source_connections.size(), 0);
 
         auto const &src_node_1 = output_source_nodes.at(2);
         XCTAssertEqual(src_node_1.get(), src_connection_1.source_node);
-        XCTAssertEqual(src_node_1->source_connections().size(), 0);
+        XCTAssertEqual(src_node_1->source_connections.size(), 0);
     }
 
     {
