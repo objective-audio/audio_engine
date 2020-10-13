@@ -31,7 +31,7 @@ using namespace yas;
 
     audio::format format{{.sample_rate = 44100.0, .channel_count = 2}};
     auto const delay_au = audio::graph_avf_au::make_shared(kAudioUnitType_Effect, kAudioUnitSubType_Delay);
-    auto const raw_au = delay_au->raw_au();
+    auto const raw_au = delay_au->raw_au;
 
     auto const &global_parameters = raw_au->global_parameters();
     XCTAssertEqual(global_parameters.size(), 4);
@@ -52,7 +52,7 @@ using namespace yas;
         },
         [&expectation1b](bool const cancelled) { [expectation1b fulfill]; });
     auto const &offline_io1 = graph->add_io(device1);
-    auto const connection = graph->connect(delay_au->node(), offline_io1->output_node(), format);
+    auto const connection = graph->connect(delay_au->node, offline_io1->output_node(), format);
 
     auto start_result = graph->start_render();
 
@@ -95,7 +95,7 @@ using namespace yas;
         },
         [&expectation2b](bool const cancelled) { [expectation2b fulfill]; });
     auto const &offline_io2 = graph->add_io(device2);
-    graph->connect(delay_au->node(), offline_io2->output_node(), format);
+    graph->connect(delay_au->node, offline_io2->output_node(), format);
 
     graph->start_render();
 
@@ -116,7 +116,7 @@ using namespace yas;
 
     [self _load_au:delay_au];
 
-    auto const raw_au = delay_au->raw_au();
+    auto const raw_au = delay_au->raw_au;
 
     auto const &global_parameters = raw_au->global_parameters();
     auto const &output_parameters = raw_au->output_parameters();
@@ -149,7 +149,7 @@ using namespace yas;
     float const lopass_cutoff_value = 100.0f;
     float const wet_dry_mix = 10.0f;
 
-    auto const raw_au = delay_au->raw_au();
+    auto const raw_au = delay_au->raw_au;
 
     XCTAssertNotEqual(raw_au->global_parameter_value(kDelayParam_DelayTime), delay_time_value);
     XCTAssertNotEqual(raw_au->global_parameter_value(kDelayParam_Feedback), feedback_value);
@@ -166,7 +166,7 @@ using namespace yas;
     XCTAssertEqual(raw_au->global_parameter_value(kDelayParam_LopassCutoff), lopass_cutoff_value);
     XCTAssertEqual(raw_au->global_parameter_value(kDelayParam_WetDryMix), wet_dry_mix);
 
-    delay_au->node()->reset();
+    delay_au->node->reset();
 
     XCTAssertNotEqual(raw_au->global_parameter_value(kDelayParam_DelayTime), delay_time_value);
     XCTAssertNotEqual(raw_au->global_parameter_value(kDelayParam_Feedback), feedback_value);
@@ -183,8 +183,7 @@ using namespace yas;
 - (void)_load_au:(audio::graph_avf_au_ptr const &)au {
     auto exp = [self expectationWithDescription:@"load"];
 
-    auto observer = au->raw_au()
-                        ->load_state_chain()
+    auto observer = au->raw_au->load_state_chain()
                         .perform([exp](auto const &state) {
                             if (state == audio::avf_au::load_state::loaded) {
                                 [exp fulfill];

@@ -127,7 +127,7 @@ struct offline_vc_internal {
     offline_vc_internal() {
         auto const &io = this->play_graph->add_io(audio::mac_device::renewable_default_output_device());
 
-        this->play_au_mixer->raw_au()->node()->reset();
+        this->play_au_mixer->raw_au()->node->reset();
         this->play_au_mixer->set_input_pan(0.0f, 0);
         this->play_au_mixer->set_input_enabled(true, 0);
         this->play_au_mixer->set_output_volume(1.0f, 0);
@@ -147,13 +147,13 @@ struct offline_vc_internal {
                                  })
                                  .end();
 
-        this->offline_au_mixer->raw_au()->node()->reset();
+        this->offline_au_mixer->raw_au()->node->reset();
         this->offline_au_mixer->set_input_pan(0.0f, 0);
         this->offline_au_mixer->set_input_enabled(true, 0);
         this->offline_au_mixer->set_output_volume(1.0f, 0);
         this->offline_au_mixer->set_output_pan(0.0f, 0);
 
-        this->offline_graph->connect(this->offline_sine->tap().node, this->offline_au_mixer->raw_au()->node(),
+        this->offline_graph->connect(this->offline_sine->tap().node, this->offline_au_mixer->raw_au()->node,
                                      this->file_format);
     }
 
@@ -170,9 +170,8 @@ struct offline_vc_internal {
             return;
         }
 
-        this->play_graph->connect(this->play_au_mixer->raw_au()->node(), io_value->output_node(), *output_format);
-        this->play_graph->connect(this->play_sine->tap().node, this->play_au_mixer->raw_au()->node(),
-                                  this->file_format);
+        this->play_graph->connect(this->play_au_mixer->raw_au()->node, io_value->output_node(), *output_format);
+        this->play_graph->connect(this->play_sine->tap().node, this->play_au_mixer->raw_au()->node, this->file_format);
 
         if (!this->play_graph->start_render()) {
             NSLog(@"%s error", __PRETTY_FUNCTION__);
@@ -181,7 +180,7 @@ struct offline_vc_internal {
 
     void stop_render() {
         this->play_graph->stop();
-        this->play_graph->disconnect(this->play_au_mixer->raw_au()->node());
+        this->play_graph->disconnect(this->play_au_mixer->raw_au()->node);
     }
 
    private:
@@ -193,8 +192,7 @@ struct offline_vc_internal {
             if (auto const output_format = io_value->raw_io()->device().value()->output_format()) {
                 this->play_graph->disconnect(io_value->output_node());
 
-                this->play_graph->connect(this->play_au_mixer->raw_au()->node(), io_value->output_node(),
-                                          *output_format);
+                this->play_graph->connect(this->play_au_mixer->raw_au()->node, io_value->output_node(), *output_format);
             }
         }
     }
@@ -345,7 +343,7 @@ struct offline_vc_internal {
 
     auto const &offline_io = offline_graph->add_io(device);
 
-    offline_graph->connect(internal->offline_au_mixer->raw_au()->node(), offline_io->output_node(),
+    offline_graph->connect(internal->offline_au_mixer->raw_au()->node, offline_io->output_node(),
                            internal->file_format);
 
     auto start_result = offline_graph->start_render();

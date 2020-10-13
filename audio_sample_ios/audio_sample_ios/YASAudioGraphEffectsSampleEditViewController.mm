@@ -34,7 +34,7 @@ using namespace yas;
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     if (self->_au) {
-        return self->_au->raw_au()->global_parameters().size();
+        return self->_au->raw_au->global_parameters().size();
     } else {
         return 0;
     }
@@ -44,7 +44,7 @@ using namespace yas;
     YASAudioGraphSampleParameterCell *cell = [tableView dequeueReusableCellWithIdentifier:@"ParameterCell"
                                                                              forIndexPath:indexPath];
 
-    auto const &parameter = self->_au->raw_au()->global_parameters().at(indexPath.row);
+    auto const &parameter = self->_au->raw_au->global_parameters().at(indexPath.row);
     [cell set_parameter:parameter];
 
     return cell;
