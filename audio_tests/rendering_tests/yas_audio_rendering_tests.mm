@@ -104,7 +104,7 @@ using namespace yas;
     test::node_object output_obj(1, 0);
 
     test::node_object input_source_obj(0, 1);
-    auto const input_dst_node = audio::graph_tap::make_shared({.is_input = true});
+    auto const input_dst_node = audio::graph_input_tap::make_shared();
 
     auto const connection_x = graph->connect(destination_obj.node, output_obj.node, format_x);
     auto const connection_0 = graph->connect(source_obj_0.node, destination_obj.node, format_0);
