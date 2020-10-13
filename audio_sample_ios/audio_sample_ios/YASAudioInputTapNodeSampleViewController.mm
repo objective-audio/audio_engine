@@ -78,7 +78,7 @@ struct input_tap_vc_cpp {
 
         audio::format format{
             {.sample_rate = input_format->sample_rate(), .channel_count = input_format->channel_count()}};
-        graph->connect(io.value()->input_node(), input_tap->node(), format);
+        graph->connect(io.value()->input_node(), input_tap->node, format);
     }
 
    private:

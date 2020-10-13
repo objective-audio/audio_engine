@@ -153,7 +153,7 @@ struct offline_vc_internal {
         this->offline_au_mixer->set_output_volume(1.0f, 0);
         this->offline_au_mixer->set_output_pan(0.0f, 0);
 
-        this->offline_graph->connect(this->offline_sine->tap().node(), this->offline_au_mixer->raw_au()->node(),
+        this->offline_graph->connect(this->offline_sine->tap().node, this->offline_au_mixer->raw_au()->node(),
                                      this->file_format);
     }
 
@@ -171,7 +171,7 @@ struct offline_vc_internal {
         }
 
         this->play_graph->connect(this->play_au_mixer->raw_au()->node(), io_value->output_node(), *output_format);
-        this->play_graph->connect(this->play_sine->tap().node(), this->play_au_mixer->raw_au()->node(),
+        this->play_graph->connect(this->play_sine->tap().node, this->play_au_mixer->raw_au()->node(),
                                   this->file_format);
 
         if (!this->play_graph->start_render()) {

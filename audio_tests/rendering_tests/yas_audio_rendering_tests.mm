@@ -109,7 +109,7 @@ using namespace yas;
     auto const connection_x = graph->connect(destination_obj.node, output_obj.node, format_x);
     auto const connection_0 = graph->connect(source_obj_0.node, destination_obj.node, format_0);
     auto const connection_1 = graph->connect(source_obj_1.node, destination_obj.node, format_1);
-    auto const connection_2 = graph->connect(input_source_obj.node, input_dst_node->node(), format_2);
+    auto const connection_2 = graph->connect(input_source_obj.node, input_dst_node->node, format_2);
 
     audio::rendering_graph rendering_graph{output_obj.node, input_source_obj.node};
 

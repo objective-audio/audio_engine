@@ -28,7 +28,7 @@ using namespace yas;
     auto from_tap = audio::graph_tap::make_shared();
     auto const format = audio::format({.sample_rate = 48000.0, .channel_count = 2});
 
-    auto const from_connection = graph->connect(from_tap->node(), to_tap->node(), format);
+    auto const from_connection = graph->connect(from_tap->node, to_tap->node, format);
 
     XCTestExpectation *to_expectation = [self expectationWithDescription:@"to node"];
     XCTestExpectation *from_expectation = [self expectationWithDescription:@"from node"];
@@ -42,7 +42,7 @@ using namespace yas;
 
     auto const &offline_io = graph->add_io(device);
 
-    auto const to_connection = graph->connect(to_tap->node(), offline_io->output_node(), format);
+    auto const to_connection = graph->connect(to_tap->node, offline_io->output_node(), format);
 
     auto to_render_handler = [self, to_connection = to_connection, from_connection = from_connection,
                               to_expectation](audio::node_render_args const &args) {
@@ -80,7 +80,7 @@ using namespace yas;
     auto from_tap = audio::graph_tap::make_shared();
     auto const format = audio::format({.sample_rate = 48000.0, .channel_count = 2});
 
-    graph->connect(from_tap->node(), to_tap->node(), format);
+    graph->connect(from_tap->node, to_tap->node, format);
 
     XCTestExpectation *from_expectation = [self expectationWithDescription:@"from node"];
 
@@ -93,7 +93,7 @@ using namespace yas;
         [&completion_expectation](bool const) { [completion_expectation fulfill]; });
     auto const &offline_io = graph->add_io(device);
 
-    graph->connect(to_tap->node(), offline_io->output_node(), format);
+    graph->connect(to_tap->node, offline_io->output_node(), format);
 
     XCTAssertTrue(graph->start_render());
 
@@ -106,8 +106,8 @@ using namespace yas;
 - (void)test_bus_count {
     auto tap = audio::graph_tap::make_shared();
 
-    XCTAssertEqual(tap->node()->input_bus_count(), 1);
-    XCTAssertEqual(tap->node()->output_bus_count(), 1);
+    XCTAssertEqual(tap->node->input_bus_count(), 1);
+    XCTAssertEqual(tap->node->output_bus_count(), 1);
 }
 
 @end

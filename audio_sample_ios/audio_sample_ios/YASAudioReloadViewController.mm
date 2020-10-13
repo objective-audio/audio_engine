@@ -76,12 +76,12 @@ struct reload_vc_cpp {
     }
 
     void update_connection() {
-        this->graph->disconnect(this->tap->node());
+        this->graph->disconnect(this->tap->node);
 
         if (auto const &io = this->graph->io()) {
             if (auto const &device = io.value()->raw_io()->device()) {
                 if (auto const &format = device.value()->output_format()) {
-                    this->graph->connect(this->tap->node(), io.value()->output_node(), format.value());
+                    this->graph->connect(this->tap->node, io.value()->output_node(), format.value());
                 }
             }
         }
