@@ -8,22 +8,17 @@
 
 namespace yas::audio {
 struct graph_tap final {
-    struct args {
-        bool is_input = false;
-    };
-
     void set_render_handler(audio::node_render_f);
 
     audio::graph_node_ptr const &node() const;
 
     static graph_tap_ptr make_shared();
-    static graph_tap_ptr make_shared(graph_tap::args);
 
    private:
     graph_node_ptr const _node;
     std::optional<audio::node_render_f> _render_handler;
 
-    explicit graph_tap(args &&);
+    graph_tap();
 
     graph_tap(graph_tap const &) = delete;
     graph_tap(graph_tap &&) = delete;

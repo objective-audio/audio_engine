@@ -10,9 +10,8 @@ using namespace yas;
 
 #pragma mark - audio::graph_tap
 
-audio::graph_tap::graph_tap(args &&args)
-    : _node(graph_node::make_shared(args.is_input ? graph_node_args{.input_bus_count = 1, .input_renderable = true} :
-                                                    graph_node_args{.input_bus_count = 1, .output_bus_count = 1})) {
+audio::graph_tap::graph_tap()
+    : _node(graph_node::make_shared(graph_node_args{.input_bus_count = 1, .output_bus_count = 1})) {
     auto const manageable_node = manageable_graph_node::cast(this->_node);
 
     manageable_node->set_prepare_rendering_handler([this] {
@@ -43,11 +42,7 @@ audio::graph_node_ptr const &audio::graph_tap::node() const {
 #pragma mark - factory
 
 audio::graph_tap_ptr audio::graph_tap::make_shared() {
-    return graph_tap::make_shared({.is_input = false});
-}
-
-audio::graph_tap_ptr audio::graph_tap::make_shared(graph_tap::args args) {
-    return graph_tap_ptr(new graph_tap{std::move(args)});
+    return graph_tap_ptr(new graph_tap{});
 }
 
 #pragma mark - audio::graph_input_tap
