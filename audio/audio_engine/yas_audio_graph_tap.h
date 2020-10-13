@@ -12,7 +12,7 @@ struct graph_tap final {
 
     graph_node_ptr const node;
 
-    static graph_tap_ptr make_shared();
+    [[nodiscard]] static graph_tap_ptr make_shared();
 
    private:
     std::optional<audio::node_render_f> _render_handler;
@@ -30,7 +30,7 @@ struct graph_input_tap final {
 
     graph_node_ptr const node;
 
-    static graph_input_tap_ptr make_shared();
+    [[nodiscard]] static graph_input_tap_ptr make_shared();
 
    private:
     std::optional<audio::node_input_render_f> _render_handler;
