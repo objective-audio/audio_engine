@@ -23,4 +23,12 @@ struct node_render_args {
 };
 
 using node_render_f = std::function<void(node_render_args const &)>;
+
+struct node_input_render_args {
+    audio::pcm_buffer const *const buffer;
+    uint32_t const bus_idx;
+    audio::time const &time;
+};
+
+using node_input_render_f = std::function<void(node_input_render_args const &)>;
 }  // namespace yas::audio

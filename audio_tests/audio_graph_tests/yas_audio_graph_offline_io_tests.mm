@@ -42,7 +42,7 @@ using namespace yas;
     uint32_t tap_render_frame = 0;
 
     auto tap_render_handler = [&self, &tapNodeExpectation, &tap_render_frame, &sample_rate, &frames_per_render,
-                               &format](audio::node_render_args args) {
+                               &format](audio::node_render_args const &args) {
         auto &buffer = args.buffer;
         auto const &time = args.time;
 
@@ -117,8 +117,8 @@ using namespace yas;
     auto const offline_io = graph->add_io(device);
     offline_io->raw_io()->set_maximum_frames_per_slice(frames_per_render);
 
-    graph->connect(sample_delay_au->node(), offline_io->output_node(), format);
-    graph->connect(tap->node(), sample_delay_au->node(), format);
+    graph->connect(sample_delay_au->node, offline_io->output_node, format);
+    graph->connect(tap->node, sample_delay_au->node, format);
 
     auto start_result = graph->start_render();
 

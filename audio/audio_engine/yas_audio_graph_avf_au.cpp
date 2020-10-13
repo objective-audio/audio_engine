@@ -13,12 +13,12 @@
 using namespace yas;
 
 audio::graph_avf_au::graph_avf_au(graph_node_args &&args, AudioComponentDescription const &acd)
-    : _node(graph_node::make_shared(std::move(args))), _raw_au(audio::avf_au::make_shared(acd)) {
-    auto const manageable_node = manageable_graph_node::cast(this->_node);
+    : node(graph_node::make_shared(std::move(args))), raw_au(audio::avf_au::make_shared(acd)) {
+    auto const manageable_node = manageable_graph_node::cast(this->node);
 
     manageable_node->set_prepare_rendering_handler([this] {
         this->_update_unit_connections();
-        this->_node->set_render_handler([raw_au = this->_raw_au](node_render_args args) {
+        this->node->set_render_handler([raw_au = this->raw_au](node_render_args const &args) {
             raw_au->render({.buffer = args.buffer, .bus_idx = args.bus_idx, .time = args.time},
                            [&args](avf_au::render_args input_args) {
                                if (args.source_connections.count(input_args.bus_idx) > 0) {
@@ -38,27 +38,19 @@ audio::graph_avf_au::graph_avf_au(graph_node_args &&args, AudioComponentDescript
 audio::graph_avf_au::~graph_avf_au() = default;
 
 audio::graph_avf_au::load_state audio::graph_avf_au::state() const {
-    return this->_raw_au->state();
-}
-
-audio::avf_au_ptr const &audio::graph_avf_au::raw_au() const {
-    return this->_raw_au;
+    return this->raw_au->state();
 }
 
 void audio::graph_avf_au::_initialize_raw_au() {
-    this->_raw_au->initialize();
+    this->raw_au->initialize();
 }
 
 void audio::graph_avf_au::_uninitialize_raw_au() {
-    this->_raw_au->uninitialize();
-}
-
-audio::graph_node_ptr const &audio::graph_avf_au::node() const {
-    return this->_node;
+    this->raw_au->uninitialize();
 }
 
 chaining::chain_sync_t<audio::graph_avf_au::load_state> audio::graph_avf_au::load_state_chain() const {
-    return this->_raw_au->load_state_chain();
+    return this->raw_au->load_state_chain();
 }
 
 chaining::chain_unsync_t<audio::graph_avf_au::connection_method> audio::graph_avf_au::connection_chain() const {
@@ -66,11 +58,11 @@ chaining::chain_unsync_t<audio::graph_avf_au::connection_method> audio::graph_av
 }
 
 void audio::graph_avf_au::_will_reset() {
-    this->_raw_au->reset();
+    this->raw_au->reset();
 }
 
 void audio::graph_avf_au::_update_unit_connections() {
-    auto const &raw_au = this->_raw_au;
+    auto const &raw_au = this->raw_au;
 
     bool const is_initialized = raw_au->is_initialized();
 
@@ -86,7 +78,7 @@ void audio::graph_avf_au::_update_unit_connections() {
         while (yas_each_next(each)) {
             uint32_t const bus_idx = yas_each_index(each);
 
-            if (auto connection = manageable_graph_node::cast(this->_node)->input_connection(bus_idx)) {
+            if (auto connection = manageable_graph_node::cast(this->node)->input_connection(bus_idx)) {
                 raw_au->set_input_format(connection->format(), bus_idx);
             }
         }
@@ -97,7 +89,7 @@ void audio::graph_avf_au::_update_unit_connections() {
         auto each = make_fast_each(output_bus_count);
         while (yas_each_next(each)) {
             uint32_t const bus_idx = yas_each_index(each);
-            if (auto connection = manageable_graph_node::cast(this->_node)->output_connection(bus_idx)) {
+            if (auto connection = manageable_graph_node::cast(this->node)->output_connection(bus_idx)) {
                 raw_au->set_output_format(connection->format(), bus_idx);
             }
         }

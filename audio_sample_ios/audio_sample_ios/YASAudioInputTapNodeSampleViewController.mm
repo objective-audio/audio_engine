@@ -24,7 +24,7 @@ struct input_tap_vc_cpp {
     audio::ios_session_ptr const session = audio::ios_session::shared();
     audio::io_device_ptr const device = audio::ios_device::make_renewable_device(this->session);
     audio::graph_ptr const graph = audio::graph::make_shared();
-    audio::graph_tap_ptr const input_tap = audio::graph_tap::make_shared({.is_input = true});
+    audio::graph_input_tap_ptr const input_tap = audio::graph_input_tap::make_shared();
 
     chaining::value::holder_ptr<float> input_level =
         chaining::value::holder<float>::make_shared(audio::math::decibel_from_linear(0.0f));
@@ -33,7 +33,7 @@ struct input_tap_vc_cpp {
         this->graph->add_io(this->device);
         this->reconnect();
 
-        input_tap->set_render_handler([input_level = input_level](audio::node_render_args args) mutable {
+        input_tap->set_render_handler([input_level = input_level](audio::node_input_render_args const &args) mutable {
             auto const &buffer = args.buffer;
 
             auto each = audio::make_each_data<float>(*buffer);
@@ -69,7 +69,7 @@ struct input_tap_vc_cpp {
             return;
         }
 
-        graph->disconnect(io.value()->input_node());
+        graph->disconnect(io.value()->input_node);
 
         auto const input_format = this->device->input_format();
         if (!input_format || input_format->is_broken()) {
@@ -78,7 +78,7 @@ struct input_tap_vc_cpp {
 
         audio::format format{
             {.sample_rate = input_format->sample_rate(), .channel_count = input_format->channel_count()}};
-        graph->connect(io.value()->input_node(), input_tap->node(), format);
+        graph->connect(io.value()->input_node, input_tap->node, format);
     }
 
    private:

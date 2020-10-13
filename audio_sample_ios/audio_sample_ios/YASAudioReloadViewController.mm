@@ -39,7 +39,7 @@ struct reload_vc_cpp {
         this->kernel->set_sine_frequency(1000.0);
 
         this->tap->set_render_handler(
-            [kernel = this->kernel](audio::node_render_args args) { kernel->process(nullptr, args.buffer); });
+            [kernel = this->kernel](audio::node_render_args const &args) { kernel->process(nullptr, args.buffer); });
 
         this->update_connection();
 
@@ -76,12 +76,12 @@ struct reload_vc_cpp {
     }
 
     void update_connection() {
-        this->graph->disconnect(this->tap->node());
+        this->graph->disconnect(this->tap->node);
 
         if (auto const &io = this->graph->io()) {
             if (auto const &device = io.value()->raw_io()->device()) {
                 if (auto const &format = device.value()->output_format()) {
-                    this->graph->connect(this->tap->node(), io.value()->output_node(), format.value());
+                    this->graph->connect(this->tap->node, io.value()->output_node, format.value());
                 }
             }
         }

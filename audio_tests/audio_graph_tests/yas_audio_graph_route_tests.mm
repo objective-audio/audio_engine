@@ -81,7 +81,7 @@ using namespace yas;
     bool tap_called = false;
     tap->set_render_handler([&tap_called](auto) { tap_called = true; });
 
-    graph->connect(tap->node(), graph_route->node(), format);
+    graph->connect(tap->node, graph_route->node, format);
 
     {
         XCTestExpectation *expectation = [self expectationWithDescription:@"first render"];
@@ -92,7 +92,7 @@ using namespace yas;
 
         auto const &offline_io = graph->add_io(device);
 
-        graph->connect(graph_route->node(), offline_io->output_node(), format);
+        graph->connect(graph_route->node, offline_io->output_node, format);
 
         auto result = graph->start_render();
 
@@ -112,7 +112,7 @@ using namespace yas;
     graph_route->add_route({0, 1, 0, 1});
 
     tap_called = false;
-    tap->set_render_handler([&tap_called, self](audio::node_render_args args) {
+    tap->set_render_handler([&tap_called, self](audio::node_render_args const &args) {
         tap_called = true;
         XCTAssertEqual(args.bus_idx, 0);
         test::fill_test_values_to_buffer(*args.buffer);
@@ -135,7 +135,7 @@ using namespace yas;
 
         auto const &offline_io = graph->add_io(device);
 
-        graph->connect(graph_route->node(), offline_io->output_node(), format);
+        graph->connect(graph_route->node, offline_io->output_node, format);
 
         auto result = graph->start_render();
 
@@ -169,10 +169,10 @@ using namespace yas;
         taps.push_back(audio::graph_tap::make_shared());
         auto &tap = taps.at(i);
 
-        graph->connect(tap->node(), graph_route->node(), 0, i, src_format);
+        graph->connect(tap->node, graph_route->node, 0, i, src_format);
 
         auto &tap_called = tap_calleds[i];
-        tap->set_render_handler([&tap_called](audio::node_render_args args) {
+        tap->set_render_handler([&tap_called](audio::node_render_args const &args) {
             tap_called = true;
             test::fill_test_values_to_buffer(*args.buffer);
         });
@@ -197,7 +197,7 @@ using namespace yas;
 
     auto const &offline_io = graph->add_io(device);
 
-    graph->connect(graph_route->node(), offline_io->output_node(), dst_format);
+    graph->connect(graph_route->node, offline_io->output_node, dst_format);
 
     graph->start_render();
 
@@ -230,10 +230,10 @@ using namespace yas;
         taps.push_back(audio::graph_tap::make_shared());
         auto &tap = taps.at(i);
 
-        graph->connect(tap->node(), graph_route->node(), 0, i, src_format);
+        graph->connect(tap->node, graph_route->node, 0, i, src_format);
 
         auto &tap_called = tap_calleds[i];
-        tap->set_render_handler([&tap_called](audio::node_render_args args) {
+        tap->set_render_handler([&tap_called](audio::node_render_args const &args) {
             tap_called = true;
             test::fill_test_values_to_buffer(*args.buffer);
         });
@@ -260,7 +260,7 @@ using namespace yas;
 
     auto const &offline_io = graph->add_io(device);
 
-    graph->connect(graph_route->node(), offline_io->output_node(), dst_format);
+    graph->connect(graph_route->node, offline_io->output_node, dst_format);
 
     graph->start_render();
 

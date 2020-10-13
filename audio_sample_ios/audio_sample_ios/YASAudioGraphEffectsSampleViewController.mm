@@ -75,7 +75,7 @@ struct effects_vc_cpp {
 
         double phase = 0;
 
-        auto tap_render_handler = [phase](audio::node_render_args args) mutable {
+        auto tap_render_handler = [phase](audio::node_render_args const &args) mutable {
             auto &buffer = args.buffer;
 
             buffer->clear();
@@ -110,7 +110,7 @@ struct effects_vc_cpp {
         this->_pool.invalidate();
 
         if (auto const &effect_au = this->effect_au) {
-            this->graph->disconnect(effect_au.value()->node());
+            this->graph->disconnect(effect_au.value()->node);
             this->effect_au = std::nullopt;
         }
 
@@ -129,16 +129,15 @@ struct effects_vc_cpp {
             effect_au->load_state_chain()
                 .perform([this, format](auto const &state) {
                     if (state == audio::avf_au::load_state::loaded) {
-                        this->graph->connect(this->effect_au.value()->node(), this->graph->io().value()->output_node(),
+                        this->graph->connect(this->effect_au.value()->node, this->graph->io().value()->output_node,
                                              format);
-                        this->graph->connect(tap->node(), this->effect_au.value()->node(), format);
+                        this->graph->connect(tap->node, this->effect_au.value()->node, format);
                     }
                 })
                 .sync()
                 ->add_to(this->_pool);
         } else {
-            this->through_connection =
-                graph->connect(this->tap->node(), this->graph->io().value()->output_node(), format);
+            this->through_connection = graph->connect(this->tap->node, this->graph->io().value()->output_node, format);
         }
     }
 };

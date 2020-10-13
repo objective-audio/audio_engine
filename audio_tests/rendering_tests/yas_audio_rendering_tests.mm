@@ -70,8 +70,8 @@ using namespace yas;
     audio::pcm_buffer buffer{format, 4};
     audio::time time{0};
 
-    output_node.render_handler()(
-        {.buffer = &buffer, .bus_idx = 0, .time = time, .source_connections = output_node.source_connections()});
+    output_node.render_handler(
+        {.buffer = &buffer, .bus_idx = 0, .time = time, .source_connections = output_node.source_connections});
 
     XCTAssertEqual(called.size(), 4);
     XCTAssertEqual(called.at(0).node, called_node::output);
@@ -104,45 +104,45 @@ using namespace yas;
     test::node_object output_obj(1, 0);
 
     test::node_object input_source_obj(0, 1);
-    auto const input_dst_node = audio::graph_tap::make_shared({.is_input = true});
+    auto const input_dst_node = audio::graph_input_tap::make_shared();
 
     auto const connection_x = graph->connect(destination_obj.node, output_obj.node, format_x);
     auto const connection_0 = graph->connect(source_obj_0.node, destination_obj.node, format_0);
     auto const connection_1 = graph->connect(source_obj_1.node, destination_obj.node, format_1);
-    auto const connection_2 = graph->connect(input_source_obj.node, input_dst_node->node(), format_2);
+    auto const connection_2 = graph->connect(input_source_obj.node, input_dst_node->node, format_2);
 
     audio::rendering_graph rendering_graph{output_obj.node, input_source_obj.node};
 
     {
         XCTAssertTrue(rendering_graph.output_node() != nullptr);
 
-        auto const &output_source_nodes = rendering_graph.output_node()->source_nodes();
+        auto const &output_source_nodes = rendering_graph.output_node()->source_nodes;
 
         XCTAssertEqual(output_source_nodes.size(), 3);
 
         auto const &dst_node = output_source_nodes.at(0);
-        XCTAssertEqual(dst_node->source_connections().size(), 2);
-        auto const &src_connection_0 = dst_node->source_connections().at(0);
+        XCTAssertEqual(dst_node->source_connections.size(), 2);
+        auto const &src_connection_0 = dst_node->source_connections.at(0);
         XCTAssertEqual(src_connection_0.source_bus_idx, 0);
         XCTAssertEqual(src_connection_0.format, format_0);
-        auto const &src_connection_1 = dst_node->source_connections().at(1);
+        auto const &src_connection_1 = dst_node->source_connections.at(1);
         XCTAssertEqual(src_connection_1.source_bus_idx, 0);
         XCTAssertEqual(src_connection_1.format, format_1);
 
         auto const &src_node_0 = output_source_nodes.at(1);
         XCTAssertEqual(src_node_0.get(), src_connection_0.source_node);
-        XCTAssertEqual(src_node_0->source_connections().size(), 0);
+        XCTAssertEqual(src_node_0->source_connections.size(), 0);
 
         auto const &src_node_1 = output_source_nodes.at(2);
         XCTAssertEqual(src_node_1.get(), src_connection_1.source_node);
-        XCTAssertEqual(src_node_1->source_connections().size(), 0);
+        XCTAssertEqual(src_node_1->source_connections.size(), 0);
     }
 
     {
         XCTAssertTrue(rendering_graph.input_node() != nullptr);
 
         auto const *node = rendering_graph.input_node();
-        XCTAssertEqual(node->format(), format_2);
+        XCTAssertEqual(node->format, format_2);
     }
 }
 

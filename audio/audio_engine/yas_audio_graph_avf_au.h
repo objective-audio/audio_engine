@@ -25,9 +25,8 @@ struct graph_avf_au final {
 
     [[nodiscard]] load_state state() const;
 
-    [[nodiscard]] audio::avf_au_ptr const &raw_au() const;
-
-    [[nodiscard]] audio::graph_node_ptr const &node() const;
+    audio::graph_node_ptr const node;
+    audio::avf_au_ptr const raw_au;
 
     [[nodiscard]] chaining::chain_sync_t<load_state> load_state_chain() const;
     [[nodiscard]] chaining::chain_unsync_t<connection_method> connection_chain() const;
@@ -37,10 +36,6 @@ struct graph_avf_au final {
     static graph_avf_au_ptr make_shared(args &&);
 
    private:
-    audio::graph_node_ptr _node;
-
-    audio::avf_au_ptr const _raw_au;
-
     std::vector<avf_au_parameter_ptr> _global_parameters;
     std::vector<avf_au_parameter_ptr> _input_parameters;
     std::vector<avf_au_parameter_ptr> _output_parameters;
