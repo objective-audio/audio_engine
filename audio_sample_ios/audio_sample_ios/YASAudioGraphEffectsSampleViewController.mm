@@ -75,7 +75,7 @@ struct effects_vc_cpp {
 
         double phase = 0;
 
-        auto tap_render_handler = [phase](audio::node_render_args args) mutable {
+        auto tap_render_handler = [phase](audio::node_render_args const &args) mutable {
             auto &buffer = args.buffer;
 
             buffer->clear();

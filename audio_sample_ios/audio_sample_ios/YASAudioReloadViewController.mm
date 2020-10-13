@@ -39,7 +39,7 @@ struct reload_vc_cpp {
         this->kernel->set_sine_frequency(1000.0);
 
         this->tap->set_render_handler(
-            [kernel = this->kernel](audio::node_render_args args) { kernel->process(nullptr, args.buffer); });
+            [kernel = this->kernel](audio::node_render_args const &args) { kernel->process(nullptr, args.buffer); });
 
         this->update_connection();
 

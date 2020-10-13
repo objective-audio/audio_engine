@@ -30,7 +30,7 @@ audio::graph_io::graph_io(audio::io_ptr const &raw_io)
       _input_node(graph_node::make_shared({.input_bus_count = 0, .output_bus_count = 1})),
       _raw_io(raw_io),
       _input_context(std::make_shared<graph_input_context>()) {
-    this->_input_node->set_render_handler([input_context = this->_input_context](node_render_args args) {
+    this->_input_node->set_render_handler([input_context = this->_input_context](node_render_args const &args) {
         auto const &buffer = args.buffer;
         auto const *input_buffer = input_context->input_buffer;
         if (input_buffer) {

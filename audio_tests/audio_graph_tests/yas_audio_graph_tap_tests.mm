@@ -45,7 +45,7 @@ using namespace yas;
     auto const to_connection = graph->connect(to_tap->node(), offline_io->output_node(), format);
 
     auto to_render_handler = [self, to_connection = to_connection, from_connection = from_connection,
-                              to_expectation](audio::node_render_args args) {
+                              to_expectation](audio::node_render_args const &args) {
         auto &buffer = args.buffer;
         auto const &output_time = args.time;
 

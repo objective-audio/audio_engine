@@ -18,7 +18,7 @@ audio::graph_avf_au::graph_avf_au(graph_node_args &&args, AudioComponentDescript
 
     manageable_node->set_prepare_rendering_handler([this] {
         this->_update_unit_connections();
-        this->_node->set_render_handler([raw_au = this->_raw_au](node_render_args args) {
+        this->_node->set_render_handler([raw_au = this->_raw_au](node_render_args const &args) {
             raw_au->render({.buffer = args.buffer, .bus_idx = args.bus_idx, .time = args.time},
                            [&args](avf_au::render_args input_args) {
                                if (args.source_connections.count(input_args.bus_idx) > 0) {

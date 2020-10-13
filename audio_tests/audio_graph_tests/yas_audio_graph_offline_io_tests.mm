@@ -42,7 +42,7 @@ using namespace yas;
     uint32_t tap_render_frame = 0;
 
     auto tap_render_handler = [&self, &tapNodeExpectation, &tap_render_frame, &sample_rate, &frames_per_render,
-                               &format](audio::node_render_args args) {
+                               &format](audio::node_render_args const &args) {
         auto &buffer = args.buffer;
         auto const &time = args.time;
 

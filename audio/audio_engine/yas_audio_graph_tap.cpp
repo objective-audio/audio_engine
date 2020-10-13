@@ -15,7 +15,7 @@ audio::graph_tap::graph_tap()
     auto const manageable_node = manageable_graph_node::cast(this->_node);
 
     manageable_node->set_prepare_rendering_handler([this] {
-        this->_node->set_render_handler([handler = this->_render_handler](node_render_args args) {
+        this->_node->set_render_handler([handler = this->_render_handler](node_render_args const &args) {
             if (handler) {
                 handler.value()(args);
             } else {
@@ -52,7 +52,7 @@ audio::graph_input_tap::graph_input_tap()
     auto const manageable_node = manageable_graph_node::cast(this->_node);
 
     manageable_node->set_prepare_rendering_handler([this] {
-        this->_node->set_render_handler([handler = this->_render_handler](node_render_args args) {
+        this->_node->set_render_handler([handler = this->_render_handler](node_render_args const &args) {
             if (handler) {
                 handler.value()({.buffer = args.buffer, .bus_idx = args.bus_idx, .time = args.time});
             }
