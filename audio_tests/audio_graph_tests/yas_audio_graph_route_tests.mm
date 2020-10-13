@@ -81,7 +81,7 @@ using namespace yas;
     bool tap_called = false;
     tap->set_render_handler([&tap_called](auto) { tap_called = true; });
 
-    graph->connect(tap->node, graph_route->node(), format);
+    graph->connect(tap->node, graph_route->node, format);
 
     {
         XCTestExpectation *expectation = [self expectationWithDescription:@"first render"];
@@ -92,7 +92,7 @@ using namespace yas;
 
         auto const &offline_io = graph->add_io(device);
 
-        graph->connect(graph_route->node(), offline_io->output_node(), format);
+        graph->connect(graph_route->node, offline_io->output_node(), format);
 
         auto result = graph->start_render();
 
@@ -135,7 +135,7 @@ using namespace yas;
 
         auto const &offline_io = graph->add_io(device);
 
-        graph->connect(graph_route->node(), offline_io->output_node(), format);
+        graph->connect(graph_route->node, offline_io->output_node(), format);
 
         auto result = graph->start_render();
 
@@ -169,7 +169,7 @@ using namespace yas;
         taps.push_back(audio::graph_tap::make_shared());
         auto &tap = taps.at(i);
 
-        graph->connect(tap->node, graph_route->node(), 0, i, src_format);
+        graph->connect(tap->node, graph_route->node, 0, i, src_format);
 
         auto &tap_called = tap_calleds[i];
         tap->set_render_handler([&tap_called](audio::node_render_args const &args) {
@@ -197,7 +197,7 @@ using namespace yas;
 
     auto const &offline_io = graph->add_io(device);
 
-    graph->connect(graph_route->node(), offline_io->output_node(), dst_format);
+    graph->connect(graph_route->node, offline_io->output_node(), dst_format);
 
     graph->start_render();
 
@@ -230,7 +230,7 @@ using namespace yas;
         taps.push_back(audio::graph_tap::make_shared());
         auto &tap = taps.at(i);
 
-        graph->connect(tap->node, graph_route->node(), 0, i, src_format);
+        graph->connect(tap->node, graph_route->node, 0, i, src_format);
 
         auto &tap_called = tap_calleds[i];
         tap->set_render_handler([&tap_called](audio::node_render_args const &args) {
@@ -260,7 +260,7 @@ using namespace yas;
 
     auto const &offline_io = graph->add_io(device);
 
-    graph->connect(graph_route->node(), offline_io->output_node(), dst_format);
+    graph->connect(graph_route->node, offline_io->output_node(), dst_format);
 
     graph->start_render();
 

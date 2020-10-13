@@ -20,12 +20,11 @@ struct graph_route final {
     void set_routes(audio::route_set_t routes);
     void clear_routes();
 
-    [[nodiscard]] audio::graph_node_ptr const &node() const;
+    graph_node_ptr const node;
 
     [[nodiscard]] static graph_route_ptr make_shared();
 
    private:
-    graph_node_ptr _node;
     route_set_t _routes;
     chaining::observer_pool _pool;
     std::optional<chaining::any_observer_ptr> _reset_observer = std::nullopt;

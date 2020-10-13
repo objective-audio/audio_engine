@@ -15,12 +15,12 @@ using namespace yas;
 #pragma mark - main
 
 audio::graph_route::graph_route()
-    : _node(graph_node::make_shared({.input_bus_count = std::numeric_limits<uint32_t>::max(),
-                                     .output_bus_count = std::numeric_limits<uint32_t>::max()})) {
-    auto const manageable_node = manageable_graph_node::cast(this->_node);
+    : node(graph_node::make_shared({.input_bus_count = std::numeric_limits<uint32_t>::max(),
+                                    .output_bus_count = std::numeric_limits<uint32_t>::max()})) {
+    auto const manageable_node = manageable_graph_node::cast(this->node);
 
     manageable_node->set_prepare_rendering_handler([this] {
-        this->_node->set_render_handler([routes = this->_routes](node_render_args const &args) {
+        this->node->set_render_handler([routes = this->_routes](node_render_args const &args) {
             auto &dst_buffer = args.buffer;
             auto const dst_bus_idx = args.bus_idx;
             uint32_t const dst_ch_count = dst_buffer->format().channel_count();
@@ -83,10 +83,6 @@ void audio::graph_route::clear_routes() {
     this->_update_rendering();
 }
 
-audio::graph_node_ptr const &audio::graph_route::node() const {
-    return this->_node;
-}
-
 void audio::graph_route::_will_reset() {
     this->_routes.clear();
 }
@@ -102,7 +98,7 @@ void audio::graph_route::_erase_route_if(std::function<bool(audio::route const &
 }
 
 void audio::graph_route::_update_rendering() {
-    renderable_graph_node::cast(this->_node)->update_rendering();
+    renderable_graph_node::cast(this->node)->update_rendering();
 }
 
 audio::graph_route_ptr audio::graph_route::make_shared() {
