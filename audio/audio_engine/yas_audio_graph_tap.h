@@ -30,4 +30,23 @@ struct graph_tap final {
     graph_tap &operator=(graph_tap const &) = delete;
     graph_tap &operator=(graph_tap &&) = delete;
 };
+
+struct graph_input_tap final {
+    void set_render_handler(audio::node_input_render_f);
+
+    audio::graph_node_ptr const &node() const;
+
+    static graph_input_tap_ptr make_shared();
+
+   private:
+    graph_node_ptr const _node;
+    std::optional<audio::node_input_render_f> _render_handler;
+
+    graph_input_tap();
+
+    graph_input_tap(graph_input_tap const &) = delete;
+    graph_input_tap(graph_input_tap &&) = delete;
+    graph_input_tap &operator=(graph_input_tap const &) = delete;
+    graph_input_tap &operator=(graph_input_tap &&) = delete;
+};
 }  // namespace yas::audio
