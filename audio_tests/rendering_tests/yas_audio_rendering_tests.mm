@@ -116,7 +116,7 @@ using namespace yas;
     {
         XCTAssertTrue(rendering_graph.output_node() != nullptr);
 
-        auto const &output_source_nodes = rendering_graph.output_node()->source_nodes();
+        auto const &output_source_nodes = rendering_graph.output_node()->source_nodes;
 
         XCTAssertEqual(output_source_nodes.size(), 3);
 
@@ -142,7 +142,7 @@ using namespace yas;
         XCTAssertTrue(rendering_graph.input_node() != nullptr);
 
         auto const *node = rendering_graph.input_node();
-        XCTAssertEqual(node->format(), format_2);
+        XCTAssertEqual(node->format, format_2);
     }
 }
 

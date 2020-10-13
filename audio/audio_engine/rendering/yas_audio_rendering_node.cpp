@@ -44,29 +44,17 @@ bool audio::rendering_node::input_render(pcm_buffer *const buffer, audio::time c
 
 audio::rendering_output_node::rendering_output_node(std::vector<std::unique_ptr<rendering_node>> &&nodes,
                                                     rendering_connection &&connection)
-    : _source_nodes(std::move(nodes)), _source_connection(std::move(connection)) {
-}
-
-std::vector<std::unique_ptr<audio::rendering_node>> const &audio::rendering_output_node::source_nodes() const {
-    return this->_source_nodes;
-}
-
-audio::rendering_connection const &audio::rendering_output_node::source_connection() const {
-    return this->_source_connection;
+    : source_nodes(std::move(nodes)), source_connection(std::move(connection)) {
 }
 
 bool audio::rendering_output_node::render(pcm_buffer *const buffer, audio::time const &time) const {
-    return this->_source_connection.render(buffer, time);
+    return this->source_connection.render(buffer, time);
 }
 
 #pragma mark - rendering_input_node
 
 audio::rendering_input_node::rendering_input_node(audio::format const &format, node_render_f const &handler)
-    : _format(format), _render_handler(handler) {
-}
-
-audio::format const &audio::rendering_input_node::format() const {
-    return this->_format;
+    : format(format), _render_handler(handler) {
 }
 
 bool audio::rendering_input_node::render(pcm_buffer *const buffer, audio::time const &time) const {
@@ -74,7 +62,7 @@ bool audio::rendering_input_node::render(pcm_buffer *const buffer, audio::time c
         return false;
     }
 
-    if (this->_format != buffer->format()) {
+    if (this->format != buffer->format()) {
         return false;
     }
 
