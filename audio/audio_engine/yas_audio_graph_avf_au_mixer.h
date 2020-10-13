@@ -23,10 +23,9 @@ struct graph_avf_au_mixer final {
 
     [[nodiscard]] static graph_avf_au_mixer_ptr make_shared();
 
-    [[nodiscard]] graph_avf_au_ptr const &raw_au() const;
+    graph_avf_au_ptr const raw_au;
 
    private:
-    graph_avf_au_ptr _raw_au;
     std::optional<chaining::any_observer_ptr> _connections_observer = std::nullopt;
 
     graph_avf_au_mixer();
