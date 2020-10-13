@@ -26,11 +26,11 @@ struct graph_input_context {
 #pragma mark - audio::graph_io
 
 audio::graph_io::graph_io(audio::io_ptr const &raw_io)
-    : _output_node(graph_node::make_shared({.input_bus_count = 1, .output_bus_count = 0})),
-      _input_node(graph_node::make_shared({.input_bus_count = 0, .output_bus_count = 1})),
+    : output_node(graph_node::make_shared({.input_bus_count = 1, .output_bus_count = 0})),
+      input_node(graph_node::make_shared({.input_bus_count = 0, .output_bus_count = 1})),
       _raw_io(raw_io),
       _input_context(std::make_shared<graph_input_context>()) {
-    this->_input_node->set_render_handler([input_context = this->_input_context](node_render_args const &args) {
+    this->input_node->set_render_handler([input_context = this->_input_context](node_render_args const &args) {
         auto const &buffer = args.buffer;
         auto const *input_buffer = input_context->input_buffer;
         if (input_buffer) {
@@ -43,14 +43,6 @@ audio::graph_io::graph_io(audio::io_ptr const &raw_io)
 
 audio::graph_io::~graph_io() = default;
 
-audio::graph_node_ptr const &audio::graph_io::output_node() const {
-    return this->_output_node;
-}
-
-audio::graph_node_ptr const &audio::graph_io::input_node() const {
-    return this->_input_node;
-}
-
 audio::io_ptr const &audio::graph_io::raw_io() {
     return this->_raw_io;
 }
@@ -58,7 +50,7 @@ audio::io_ptr const &audio::graph_io::raw_io() {
 bool audio::graph_io::_validate_connections() {
     auto const &raw_io = this->_raw_io;
 
-    auto &input_connections = manageable_graph_node::cast(this->_output_node)->input_connections();
+    auto &input_connections = manageable_graph_node::cast(this->output_node)->input_connections();
     if (input_connections.size() > 0) {
         auto const connections = lock_values(input_connections);
         if (connections.count(0) > 0) {
@@ -86,7 +78,7 @@ bool audio::graph_io::_validate_connections() {
         }
     }
 
-    auto &output_connections = manageable_graph_node::cast(this->_input_node)->output_connections();
+    auto &output_connections = manageable_graph_node::cast(this->input_node)->output_connections();
     if (output_connections.size() > 0) {
         auto const connections = lock_values(output_connections);
         if (connections.count(0) > 0) {
@@ -127,7 +119,7 @@ void audio::graph_io::update_rendering() {
         return;
     }
 
-    auto graph = std::make_shared<rendering_graph>(this->output_node(), this->input_node());
+    auto graph = std::make_shared<rendering_graph>(this->output_node, this->input_node);
 
     auto render_handler = [input_context = this->_input_context, graph](io_render_args args) {
         input_context->input_buffer = args.input_buffer;

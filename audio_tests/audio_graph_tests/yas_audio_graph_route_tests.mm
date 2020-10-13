@@ -92,7 +92,7 @@ using namespace yas;
 
         auto const &offline_io = graph->add_io(device);
 
-        graph->connect(graph_route->node, offline_io->output_node(), format);
+        graph->connect(graph_route->node, offline_io->output_node, format);
 
         auto result = graph->start_render();
 
@@ -135,7 +135,7 @@ using namespace yas;
 
         auto const &offline_io = graph->add_io(device);
 
-        graph->connect(graph_route->node, offline_io->output_node(), format);
+        graph->connect(graph_route->node, offline_io->output_node, format);
 
         auto result = graph->start_render();
 
@@ -197,7 +197,7 @@ using namespace yas;
 
     auto const &offline_io = graph->add_io(device);
 
-    graph->connect(graph_route->node, offline_io->output_node(), dst_format);
+    graph->connect(graph_route->node, offline_io->output_node, dst_format);
 
     graph->start_render();
 
@@ -260,7 +260,7 @@ using namespace yas;
 
     auto const &offline_io = graph->add_io(device);
 
-    graph->connect(graph_route->node, offline_io->output_node(), dst_format);
+    graph->connect(graph_route->node, offline_io->output_node, dst_format);
 
     graph->start_render();
 

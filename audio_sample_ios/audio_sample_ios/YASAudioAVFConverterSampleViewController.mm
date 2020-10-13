@@ -46,7 +46,7 @@ struct avf_converter_vc_cpp {
         asbd.mSampleRate = input_sample_rate;
         auto const input_format = audio::format{asbd};
 
-        this->graph->connect(this->converter->node, io->output_node(), *output_format);
+        this->graph->connect(this->converter->node, io->output_node, *output_format);
         this->graph->connect(this->tap->node, this->converter->node, input_format);
 
         this->kernel->set_sine_volume(0.1);

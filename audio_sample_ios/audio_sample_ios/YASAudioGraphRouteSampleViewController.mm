@@ -56,18 +56,18 @@ struct route_vc_cpp {
         graph->disconnect(this->au_mixer->raw_au->node);
         graph->disconnect(this->route->node);
         graph->disconnect(this->sine_tap->node);
-        graph->disconnect(this->graph->io().value()->output_node());
-        graph->disconnect(this->graph->io().value()->input_node());
+        graph->disconnect(this->graph->io().value()->output_node);
+        graph->disconnect(this->graph->io().value()->input_node);
     }
 
     void connect_nodes() {
         if (auto const format = this->device->output_format()) {
-            graph->connect(this->au_mixer->raw_au->node, this->graph->io().value()->output_node(), *format);
+            graph->connect(this->au_mixer->raw_au->node, this->graph->io().value()->output_node, *format);
             graph->connect(this->route->node, au_mixer->raw_au->node, *format);
             graph->connect(this->sine_tap->node, route->node, 0, uint32_t(route_sample::source::sine), *format);
         }
         if (auto const format = this->device->input_format()) {
-            graph->connect(this->graph->io().value()->input_node(), this->route->node, 0,
+            graph->connect(this->graph->io().value()->input_node, this->route->node, 0,
                            uint32_t(route_sample::source::input), *format);
         }
     }

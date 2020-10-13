@@ -42,7 +42,7 @@ using namespace yas;
 
     auto const &offline_io = graph->add_io(device);
 
-    auto const to_connection = graph->connect(to_tap->node, offline_io->output_node(), format);
+    auto const to_connection = graph->connect(to_tap->node, offline_io->output_node, format);
 
     auto to_render_handler = [self, to_connection = to_connection, from_connection = from_connection,
                               to_expectation](audio::node_render_args const &args) {
@@ -93,7 +93,7 @@ using namespace yas;
         [&completion_expectation](bool const) { [completion_expectation fulfill]; });
     auto const &offline_io = graph->add_io(device);
 
-    graph->connect(to_tap->node, offline_io->output_node(), format);
+    graph->connect(to_tap->node, offline_io->output_node, format);
 
     XCTAssertTrue(graph->start_render());
 
