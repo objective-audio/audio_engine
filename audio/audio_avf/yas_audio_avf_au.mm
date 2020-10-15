@@ -17,6 +17,40 @@
 
 using namespace yas;
 
+#pragma mark - avf_au_parameter_utils
+
+namespace yas::audio::avf_au_parameter_utils {
+std::vector<std::string> value_strings(AUParameter *const objc_param) {
+    if (auto const valueStrings = objc_param.valueStrings) {
+        std::vector<std::string> result;
+        result.reserve(valueStrings.count);
+
+        for (NSString *valueString in valueStrings) {
+            result.emplace_back(to_string((__bridge CFStringRef)valueString));
+        }
+
+        return result;
+    } else {
+        return {};
+    }
+}
+
+std::vector<float> values(AUParameter *const objc_param) {
+    auto const strings = avf_au_parameter_utils::value_strings(objc_param);
+    return yas::to_vector<float>(strings, [&objc_param](std::string const &string) {
+        return [objc_param valueFromString:(__bridge NSString *)to_cf_object(string)];
+    });
+}
+
+std::optional<std::string> unit_name(AUParameter *const objc_param) {
+    if (NSString *unitName = objc_param.unitName) {
+        return to_string((__bridge CFStringRef)unitName);
+    } else {
+        return std::nullopt;
+    }
+}
+}
+
 #pragma mark - avf_au::core
 
 struct yas::audio::avf_au::core {
@@ -139,7 +173,11 @@ struct yas::audio::avf_au::core {
     }
 
     audio::avf_au_parameter_ptr make_parameter(AUParameter *const objc_param) {
-        auto const parameter = avf_au_parameter::make_shared(objc_param);
+        auto const parameter = avf_au_parameter::make_shared(
+            to_string((__bridge CFStringRef)objc_param.keyPath), to_string((__bridge CFStringRef)objc_param.identifier),
+            objc_param.unit, avf_au_parameter_utils::unit_name(objc_param), objc_param.value,
+            to_string((__bridge CFStringRef)objc_param.displayName), objc_param.minValue, objc_param.maxValue,
+            avf_au_parameter_utils::value_strings(objc_param), avf_au_parameter_utils::values(objc_param));
 
         parameter->set_value_changed_handler([this, key_path = parameter->key_path](float const value) {
             if (AUParameter *const objc_parameter = this->raw_parameter(key_path)) {
