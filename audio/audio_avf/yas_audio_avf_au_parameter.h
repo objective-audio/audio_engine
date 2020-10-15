@@ -38,7 +38,6 @@ struct avf_au_parameter {
 
     void set_value_changed_handler(std::function<void(float const)> &&);
 
-    static avf_au_parameter_ptr make_shared(AUParameter *const);
     static avf_au_parameter_ptr make_shared(std::string &&key_path, std::string &&identifier,
                                             AudioUnitParameterUnit const unit, std::optional<std::string> &&unit_name,
                                             float const default_value, std::string &&display_name,
@@ -56,8 +55,6 @@ struct avf_au_parameter {
     float _value;
 
     std::function<void(float const)> _value_changed_handler;
-
-    avf_au_parameter(AUParameter *const);
 
     avf_au_parameter(std::string &&key_path, std::string &&identifier, AudioUnitParameterUnit const unit,
                      std::optional<std::string> &&unit_name, float const default_value, std::string &&display_name,
