@@ -57,6 +57,24 @@ audio::avf_au_parameter::avf_au_parameter(AUParameter *const objc_param)
       _value(_default_value) {
 }
 
+audio::avf_au_parameter::avf_au_parameter(std::string &&key_path, std::string &&identifier,
+                                          AudioUnitParameterUnit const unit, std::optional<std::string> &&unit_name,
+                                          float const default_value, std::string &&display_name, float const min_value,
+                                          float const max_value, std::vector<std::string> &&value_strings,
+                                          std::vector<float> &&values)
+    : key_path(std::move(key_path)),
+      identifier(std::move(identifier)),
+      unit(unit),
+      unit_name(std::move(unit_name)),
+      _default_value(default_value),
+      display_name(std::move(display_name)),
+      _min_value(min_value),
+      _max_value(max_value),
+      _value_strings(std::move(value_strings)),
+      _values(std::move(values)),
+      _value(_default_value) {
+}
+
 audio::avf_au_parameter_scope audio::avf_au_parameter::scope() const {
     return scope_from_key_path(this->key_path);
 }
@@ -106,6 +124,18 @@ void audio::avf_au_parameter::set_value_changed_handler(std::function<void(float
 
 audio::avf_au_parameter_ptr audio::avf_au_parameter::make_shared(AUParameter *const objc_param) {
     return avf_au_parameter_ptr(new avf_au_parameter{objc_param});
+}
+
+audio::avf_au_parameter_ptr audio::avf_au_parameter::make_shared(std::string &&key_path, std::string &&identifier,
+                                                                 AudioUnitParameterUnit const unit,
+                                                                 std::optional<std::string> &&unit_name,
+                                                                 float const default_value, std::string &&display_name,
+                                                                 float const min_value, float const max_value,
+                                                                 std::vector<std::string> &&value_strings,
+                                                                 std::vector<float> &&values) {
+    return avf_au_parameter_ptr(new avf_au_parameter{
+        std::move(key_path), std::move(identifier), unit, std::move(unit_name), default_value, std::move(display_name),
+        min_value, max_value, std::move(value_strings), std::move(values)});
 }
 
 audio::avf_au_parameter_scope audio::avf_au_parameter::scope_from_key_path(std::string const &key_path) {

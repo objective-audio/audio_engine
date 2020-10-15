@@ -39,6 +39,11 @@ struct avf_au_parameter {
     void set_value_changed_handler(std::function<void(float const)> &&);
 
     static avf_au_parameter_ptr make_shared(AUParameter *const);
+    static avf_au_parameter_ptr make_shared(std::string &&key_path, std::string &&identifier,
+                                            AudioUnitParameterUnit const unit, std::optional<std::string> &&unit_name,
+                                            float const default_value, std::string &&display_name,
+                                            float const min_value, float const max_value,
+                                            std::vector<std::string> &&value_strings, std::vector<float> &&values);
 
     static avf_au_parameter_scope scope_from_key_path(std::string const &keypath);
 
@@ -53,6 +58,11 @@ struct avf_au_parameter {
     std::function<void(float const)> _value_changed_handler;
 
     avf_au_parameter(AUParameter *const);
+
+    avf_au_parameter(std::string &&key_path, std::string &&identifier, AudioUnitParameterUnit const unit,
+                     std::optional<std::string> &&unit_name, float const default_value, std::string &&display_name,
+                     float const min_value, float const max_value, std::vector<std::string> &&value_strings,
+                     std::vector<float> &&values);
 };
 
 AudioUnitScope to_raw_scope(avf_au_parameter_scope const);
