@@ -82,10 +82,6 @@ struct mac_device : io_device {
     chaining::observer_pool _io_pool;
     std::optional<audio::format> _input_format = std::nullopt;
     std::optional<audio::format> _output_format = std::nullopt;
-    mutable std::recursive_mutex _mutex;
-
-    void _set_input_format(std::optional<audio::format> const &format);
-    void _set_output_format(std::optional<audio::format> const &format);
 
     listener_f _listener();
     void _udpate_streams(AudioObjectPropertyScope const scope);

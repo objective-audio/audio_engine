@@ -24,23 +24,19 @@ struct sine {
     virtual ~sine() = default;
 
     void set_frequency(float const frequency) {
-        std::lock_guard<std::recursive_mutex> lock(_mutex);
-        __frequency = frequency;
+        this->_render_context->frequency = frequency;
     }
 
     float frequency() const {
-        std::lock_guard<std::recursive_mutex> lock(_mutex);
-        return __frequency;
+        return this->_render_context->frequency;
     }
 
     void set_playing(bool const playing) {
-        std::lock_guard<std::recursive_mutex> lock(_mutex);
-        __playing = playing;
+        this->_render_context->playing = playing;
     }
 
     bool is_playing() const {
-        std::lock_guard<std::recursive_mutex> lock(_mutex);
-        return __playing;
+        return this->_render_context->playing;
     }
 
     audio::graph_tap &tap() {
@@ -48,52 +44,46 @@ struct sine {
     }
 
    private:
-    audio::graph_tap_ptr _tap = audio::graph_tap::make_shared();
-    double _phase_on_render;
+    struct render_context {
+        std::atomic<float> frequency = 1000;
+        std::atomic<bool> playing;
 
-    mutable std::recursive_mutex _mutex;
-    float __frequency;
-    bool __playing;
+        double phase_on_render;
+    };
 
-    sine() = default;
+    audio::graph_tap_ptr const _tap = audio::graph_tap::make_shared();
 
-    void _prepare(sine_ptr const &shared) {
-        set_frequency(1000.0);
+    std::shared_ptr<render_context> const _render_context = std::make_shared<render_context>();
 
-        auto weak_sine = to_weak(shared);
-
-        auto render_handler = [weak_sine](auto args) {
+    sine() {
+        auto render_handler = [context = this->_render_context](audio::node_render_args const &args) {
             auto &buffer = args.buffer;
 
             buffer->clear();
 
-            if (auto sine = weak_sine.lock()) {
-                if (sine->is_playing()) {
-                    double const start_phase = sine->_phase_on_render;
-                    double const phase_per_frame = sine->frequency() / sample_rate * audio::math::two_pi;
-                    double next_phase = start_phase;
-                    uint32_t const frame_length = buffer->frame_length();
+            if (context->playing) {
+                double const start_phase = context->phase_on_render;
+                double const phase_per_frame = context->frequency / sample_rate * audio::math::two_pi;
+                double next_phase = start_phase;
+                uint32_t const frame_length = buffer->frame_length();
 
-                    if (frame_length > 0) {
-                        auto each = audio::make_each_data<float>(*buffer);
-                        while (yas_each_data_next_ch(each)) {
-                            next_phase = audio::math::fill_sine(yas_each_data_ptr(each), frame_length, start_phase,
-                                                                phase_per_frame);
-                        }
-                        sine->_phase_on_render = next_phase;
+                if (frame_length > 0) {
+                    auto each = audio::make_each_data<float>(*buffer);
+                    while (yas_each_data_next_ch(each)) {
+                        next_phase =
+                            audio::math::fill_sine(yas_each_data_ptr(each), frame_length, start_phase, phase_per_frame);
                     }
+                    context->phase_on_render = next_phase;
                 }
             }
         };
 
-        tap().set_render_handler(render_handler);
+        this->tap().set_render_handler(render_handler);
     }
 
    public:
     static sine_ptr make_shared() {
-        auto shared = sine_ptr(new sine{});
-        shared->_prepare(shared);
-        return shared;
+        return sine_ptr(new sine{});
     }
 };
 }
@@ -170,7 +160,7 @@ struct offline_vc_internal {
             return;
         }
 
-        this->play_graph->connect(this->play_au_mixer->raw_au->node, io_value->output_node(), *output_format);
+        this->play_graph->connect(this->play_au_mixer->raw_au->node, io_value->output_node, *output_format);
         this->play_graph->connect(this->play_sine->tap().node, this->play_au_mixer->raw_au->node, this->file_format);
 
         if (!this->play_graph->start_render()) {
@@ -190,9 +180,9 @@ struct offline_vc_internal {
         if (auto const &io = this->play_graph->io()) {
             auto const &io_value = io.value();
             if (auto const output_format = io_value->raw_io()->device().value()->output_format()) {
-                this->play_graph->disconnect(io_value->output_node());
+                this->play_graph->disconnect(io_value->output_node);
 
-                this->play_graph->connect(this->play_au_mixer->raw_au->node, io_value->output_node(), *output_format);
+                this->play_graph->connect(this->play_au_mixer->raw_au->node, io_value->output_node, *output_format);
             }
         }
     }
@@ -343,7 +333,7 @@ struct offline_vc_internal {
 
     auto const &offline_io = offline_graph->add_io(device);
 
-    offline_graph->connect(internal->offline_au_mixer->raw_au->node, offline_io->output_node(), internal->file_format);
+    offline_graph->connect(internal->offline_au_mixer->raw_au->node, offline_io->output_node, internal->file_format);
 
     auto start_result = offline_graph->start_render();
 
