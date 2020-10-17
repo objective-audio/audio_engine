@@ -56,8 +56,6 @@ struct sine {
     std::shared_ptr<render_context> const _render_context = std::make_shared<render_context>();
 
     sine() {
-        this->set_frequency(1000.0);
-
         auto render_handler = [context = this->_render_context](audio::node_render_args const &args) {
             auto &buffer = args.buffer;
 
