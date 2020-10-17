@@ -274,7 +274,7 @@ struct graph_io_vc_cpp {
         auto const &device = *device_opt;
         if (device->output_channel_count() > 0) {
             if (auto const output_format = device->output_format()) {
-                _cpp->graph->connect(_cpp->route->node, _cpp->graph->io().value()->output_node(), *output_format);
+                _cpp->graph->connect(_cpp->route->node, _cpp->graph->io().value()->output_node, *output_format);
                 _cpp->graph->connect(_cpp->tap->node, _cpp->route->node, 0,
                                      (uint32_t)sample::graph_io_vc_cpp::source_bus::sine, *output_format);
             }
@@ -282,7 +282,7 @@ struct graph_io_vc_cpp {
 
         if (device->input_channel_count() > 0) {
             if (auto const input_format = device->input_format()) {
-                _cpp->graph->connect(_cpp->graph->io().value()->input_node(), _cpp->route->node, 0,
+                _cpp->graph->connect(_cpp->graph->io().value()->input_node, _cpp->route->node, 0,
                                      (uint32_t)sample::graph_io_vc_cpp::source_bus::input, *input_format);
             }
         }
