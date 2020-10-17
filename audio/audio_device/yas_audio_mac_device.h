@@ -83,9 +83,6 @@ struct mac_device : io_device {
     std::optional<audio::format> _input_format = std::nullopt;
     std::optional<audio::format> _output_format = std::nullopt;
 
-    void _set_input_format(std::optional<audio::format> const &format);
-    void _set_output_format(std::optional<audio::format> const &format);
-
     listener_f _listener();
     void _udpate_streams(AudioObjectPropertyScope const scope);
     void _update_format(AudioObjectPropertyScope const scope);

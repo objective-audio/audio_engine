@@ -399,16 +399,8 @@ double audio::mac_device::nominal_sample_rate() const {
     return 0;
 }
 
-void audio::mac_device::_set_input_format(std::optional<audio::format> const &format) {
-    this->_input_format = format;
-}
-
 std::optional<audio::format> audio::mac_device::input_format() const {
     return this->_input_format;
-}
-
-void audio::mac_device::_set_output_format(std::optional<audio::format> const &format) {
-    this->_output_format = format;
 }
 
 std::optional<audio::format> audio::mac_device::output_format() const {
@@ -510,13 +502,13 @@ void audio::mac_device::_update_format(AudioObjectPropertyScope const scope) {
         auto iterator = this->_input_streams_map.begin();
         if (iterator != this->_input_streams_map.end()) {
             stream = iterator->second;
-            this->_set_input_format(std::nullopt);
+            this->_input_format = std::nullopt;
         }
     } else if (scope == kAudioObjectPropertyScopeOutput) {
         auto iterator = this->_output_streams_map.begin();
         if (iterator != this->_output_streams_map.end()) {
             stream = iterator->second;
-            this->_set_output_format(std::nullopt);
+            this->_output_format = std::nullopt;
         }
     }
 
@@ -542,9 +534,9 @@ void audio::mac_device::_update_format(AudioObjectPropertyScope const scope) {
                               .interleaved = false});
 
         if (scope == kAudioObjectPropertyScopeInput) {
-            this->_set_input_format(format);
+            this->_input_format = std::move(format);
         } else if (scope == kAudioObjectPropertyScopeOutput) {
-            this->_set_output_format(format);
+            this->_output_format = std::move(format);
         }
     }
 }
