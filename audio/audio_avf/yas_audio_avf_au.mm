@@ -54,6 +54,31 @@ std::optional<std::string> unit_name(AUParameter *const objc_param) {
 #pragma mark - avf_au::core
 
 struct yas::audio::avf_au::core {
+    struct render_context {
+        std::vector<audio::format> const output_formats;
+        std::vector<audio::format> const input_formats;
+
+        std::optional<audio::format> output_format_on_render(uint32_t const idx) const {
+            raise_if_main_thread();
+
+            if (idx < this->output_formats.size()) {
+                return this->output_formats.at(idx);
+            } else {
+                return std::nullopt;
+            }
+        }
+
+        std::optional<audio::format> input_format_on_render(uint32_t const idx) const {
+            raise_if_main_thread();
+
+            if (idx < this->input_formats.size()) {
+                return this->input_formats.at(idx);
+            } else {
+                return std::nullopt;
+            }
+        }
+    };
+
     void load_raw_unit(AudioComponentDescription const &acd, avf_au_ptr const &shared) {
         auto weak_au = to_weak(shared);
 
@@ -204,6 +229,7 @@ struct yas::audio::avf_au::core {
     bool _is_initialized = false;
     std::vector<audio::format> _output_formats;
     std::vector<audio::format> _input_formats;
+    std::shared_ptr<render_context> _render_context = nullptr;
 
     void _set_raw_unit(objc_ptr<AUAudioUnit *> &&raw_unit) {
         this->_raw_unit = std::move(raw_unit);
