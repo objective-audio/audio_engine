@@ -400,22 +400,18 @@ double audio::mac_device::nominal_sample_rate() const {
 }
 
 void audio::mac_device::_set_input_format(std::optional<audio::format> const &format) {
-    std::lock_guard<std::recursive_mutex> lock(_mutex);
     this->_input_format = format;
 }
 
 std::optional<audio::format> audio::mac_device::input_format() const {
-    std::lock_guard<std::recursive_mutex> lock(_mutex);
     return this->_input_format;
 }
 
 void audio::mac_device::_set_output_format(std::optional<audio::format> const &format) {
-    std::lock_guard<std::recursive_mutex> lock(_mutex);
     this->_output_format = format;
 }
 
 std::optional<audio::format> audio::mac_device::output_format() const {
-    std::lock_guard<std::recursive_mutex> lock(_mutex);
     return this->_output_format;
 }
 
