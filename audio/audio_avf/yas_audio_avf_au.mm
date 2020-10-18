@@ -62,23 +62,23 @@ struct yas::audio::avf_au::core {
             : output_formats(std::move(output_formats)), input_formats(std::move(input_formats)) {
         }
 
-        std::optional<audio::format> output_format_on_render(uint32_t const idx) const {
+        audio::format const *output_format_on_render(uint32_t const idx) const {
             raise_if_main_thread();
 
             if (idx < this->output_formats.size()) {
-                return this->output_formats.at(idx);
+                return &this->output_formats.at(idx);
             } else {
-                return std::nullopt;
+                return nullptr;
             }
         }
 
-        std::optional<audio::format> input_format_on_render(uint32_t const idx) const {
+        audio::format const *input_format_on_render(uint32_t const idx) const {
             raise_if_main_thread();
 
             if (idx < this->input_formats.size()) {
-                return this->input_formats.at(idx);
+                return &this->input_formats.at(idx);
             } else {
-                return std::nullopt;
+                return nullptr;
             }
         }
     };
@@ -172,13 +172,12 @@ struct yas::audio::avf_au::core {
 
         auto const &render_context = this->_render_context;
 
-        auto output_format_opt = render_context->output_format_on_render(args.bus_idx);
-        if (!output_format_opt) {
+        audio::format const *const output_format = render_context->output_format_on_render(args.bus_idx);
+        if (!output_format) {
             return;
         }
 
-        auto const &output_format = output_format_opt.value();
-        if (output_format != args.buffer->format()) {
+        if (*output_format != args.buffer->format()) {
             return;
         }
 
@@ -192,14 +191,13 @@ struct yas::audio::avf_au::core {
                                                     NSInteger inputBusNumber, AudioBufferList *inputData) {
                 audio::clear(inputData);
 
-                auto input_format_opt = render_context->input_format_on_render((uint32_t)inputBusNumber);
-                if (input_format_opt) {
-                    auto const &input_format = input_format_opt.value();
-
-                    pcm_buffer buffer(input_format, inputData);
+                audio::format const *const input_format =
+                    render_context->input_format_on_render((uint32_t)inputBusNumber);
+                if (input_format) {
+                    pcm_buffer buffer(*input_format, inputData);
                     buffer.set_frame_length(frameCount);
 
-                    audio::time time(*timestamp, input_format.sample_rate());
+                    audio::time time(*timestamp, input_format->sample_rate());
 
                     input_handler({.buffer = &buffer, .bus_idx = (uint32_t)inputBusNumber, .time = time});
                 }
