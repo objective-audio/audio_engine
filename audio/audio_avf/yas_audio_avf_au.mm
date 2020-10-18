@@ -231,8 +231,6 @@ struct yas::audio::avf_au::core {
 
     mutable std::recursive_mutex _initialize_mutex;
     bool _is_initialized = false;
-    std::vector<audio::format> _output_formats;
-    std::vector<audio::format> _input_formats;
     std::shared_ptr<render_context> _render_context = nullptr;
 };
 
