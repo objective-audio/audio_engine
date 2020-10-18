@@ -62,9 +62,7 @@ struct yas::audio::avf_au::core {
             : output_formats(std::move(output_formats)), input_formats(std::move(input_formats)) {
         }
 
-        audio::format const *output_format_on_render(uint32_t const idx) const {
-            raise_if_main_thread();
-
+        audio::format const *output_format(uint32_t const idx) const {
             if (idx < this->output_formats.size()) {
                 return &this->output_formats.at(idx);
             } else {
@@ -72,9 +70,7 @@ struct yas::audio::avf_au::core {
             }
         }
 
-        audio::format const *input_format_on_render(uint32_t const idx) const {
-            raise_if_main_thread();
-
+        audio::format const *input_format(uint32_t const idx) const {
             if (idx < this->input_formats.size()) {
                 return &this->input_formats.at(idx);
             } else {
@@ -172,7 +168,7 @@ struct yas::audio::avf_au::core {
 
         auto const &render_context = this->_render_context;
 
-        audio::format const *const output_format = render_context->output_format_on_render(args.bus_idx);
+        audio::format const *const output_format = render_context->output_format(args.bus_idx);
         if (!output_format) {
             return;
         }
@@ -191,8 +187,7 @@ struct yas::audio::avf_au::core {
                                                     NSInteger inputBusNumber, AudioBufferList *inputData) {
                 audio::clear(inputData);
 
-                audio::format const *const input_format =
-                    render_context->input_format_on_render((uint32_t)inputBusNumber);
+                audio::format const *const input_format = render_context->input_format((uint32_t)inputBusNumber);
                 if (input_format) {
                     pcm_buffer buffer(*input_format, inputData);
                     buffer.set_frame_length(frameCount);
