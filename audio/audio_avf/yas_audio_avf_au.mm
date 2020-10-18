@@ -93,7 +93,7 @@ struct yas::audio::avf_au::core {
                                                                   to_string((__bridge CFStringRef)error.description)));
                                                    shared_au->_load_state->set_value(load_state::failed);
                                                } else {
-                                                   shared_au->_core->_set_raw_unit(objc_ptr<AUAudioUnit *>{audioUnit});
+                                                   shared_au->_core->_raw_unit = objc_ptr<AUAudioUnit *>{audioUnit};
                                                    shared_au->_setup();
                                                    shared_au->_load_state->set_value(load_state::loaded);
                                                }
@@ -218,7 +218,7 @@ struct yas::audio::avf_au::core {
     }
 
     AUParameter *raw_parameter(std::string const &key_path) {
-        for (AUParameter *objc_param in this->_raw_unit.value().object().parameterTree.allParameters) {
+        for (AUParameter *objc_param in this->_raw_unit.object().parameterTree.allParameters) {
             if (key_path == to_string((__bridge CFStringRef)objc_param.keyPath)) {
                 return objc_param;
             }
@@ -227,17 +227,13 @@ struct yas::audio::avf_au::core {
     }
 
    private:
-    std::optional<objc_ptr<AUAudioUnit *>> _raw_unit = std::nullopt;
+    objc_ptr<AUAudioUnit *> _raw_unit{nil};
 
     mutable std::recursive_mutex _initialize_mutex;
     bool _is_initialized = false;
     std::vector<audio::format> _output_formats;
     std::vector<audio::format> _input_formats;
     std::shared_ptr<render_context> _render_context = nullptr;
-
-    void _set_raw_unit(objc_ptr<AUAudioUnit *> &&raw_unit) {
-        this->_raw_unit = std::move(raw_unit);
-    }
 };
 
 #pragma mark - avf_au
