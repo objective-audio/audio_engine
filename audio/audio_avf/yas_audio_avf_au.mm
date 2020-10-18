@@ -54,6 +54,31 @@ std::optional<std::string> unit_name(AUParameter *const objc_param) {
 #pragma mark - avf_au::core
 
 struct yas::audio::avf_au::core {
+    struct render_context {
+        std::vector<audio::format> const output_formats;
+        std::vector<audio::format> const input_formats;
+
+        render_context(std::vector<audio::format> &&output_formats, std::vector<audio::format> &&input_formats)
+            : output_formats(std::move(output_formats)), input_formats(std::move(input_formats)) {
+        }
+
+        audio::format const *output_format(uint32_t const idx) const {
+            if (idx < this->output_formats.size()) {
+                return &this->output_formats.at(idx);
+            } else {
+                return nullptr;
+            }
+        }
+
+        audio::format const *input_format(uint32_t const idx) const {
+            if (idx < this->input_formats.size()) {
+                return &this->input_formats.at(idx);
+            } else {
+                return nullptr;
+            }
+        }
+    };
+
     void load_raw_unit(AudioComponentDescription const &acd, avf_au_ptr const &shared) {
         auto weak_au = to_weak(shared);
 
@@ -68,7 +93,7 @@ struct yas::audio::avf_au::core {
                                                                   to_string((__bridge CFStringRef)error.description)));
                                                    shared_au->_load_state->set_value(load_state::failed);
                                                } else {
-                                                   shared_au->_core->_set_raw_unit(objc_ptr<AUAudioUnit *>{audioUnit});
+                                                   shared_au->_core->_raw_unit = objc_ptr<AUAudioUnit *>{audioUnit};
                                                    shared_au->_setup();
                                                    shared_au->_load_state->set_value(load_state::loaded);
                                                }
@@ -77,31 +102,36 @@ struct yas::audio::avf_au::core {
     }
 
     bool is_initialized() {
-        return this->_is_initialized;
+        return this->_render_context != nullptr;
     }
 
     void initialize() {
         raise_if_sub_thread();
 
-        if (this->_is_initialized) {
+        if (this->is_initialized()) {
             return;
         }
 
         std::lock_guard<std::recursive_mutex> lock(this->_initialize_mutex);
 
-        auto const raw_unit = this->raw_unit().value();
+        AUAudioUnit *const raw_unit = this->_raw_unit.object();
 
         NSError *error = nil;
 
-        if ([raw_unit.object() allocateRenderResourcesAndReturnError:&error]) {
-            for (AUAudioUnitBus *bus in raw_unit.object().outputBusses) {
-                this->_output_formats.emplace_back(*bus.format.streamDescription);
-            }
-            for (AUAudioUnitBus *bus in raw_unit.object().inputBusses) {
-                this->_input_formats.emplace_back(*bus.format.streamDescription);
+        if ([raw_unit allocateRenderResourcesAndReturnError:&error]) {
+            std::vector<audio::format> output_formats;
+            std::vector<audio::format> input_formats;
+
+            for (AUAudioUnitBus *bus in raw_unit.outputBusses) {
+                output_formats.emplace_back(*bus.format.streamDescription);
             }
 
-            this->_is_initialized = true;
+            for (AUAudioUnitBus *bus in raw_unit.inputBusses) {
+                input_formats.emplace_back(*bus.format.streamDescription);
+            }
+
+            this->_render_context =
+                std::make_shared<render_context>(std::move(output_formats), std::move(input_formats));
         } else {
             yas_audio_log(("initialize - error : " + to_string((__bridge CFStringRef)error.description)));
         }
@@ -110,21 +140,17 @@ struct yas::audio::avf_au::core {
     void uninitialize() {
         raise_if_sub_thread();
 
-        if (!this->_is_initialized) {
+        if (!this->is_initialized()) {
             return;
         }
 
         std::lock_guard<std::recursive_mutex> lock(this->_initialize_mutex);
 
-        [this->raw_unit().value().object() deallocateRenderResources];
-
-        this->_output_formats.clear();
-        this->_input_formats.clear();
-
-        this->_is_initialized = false;
+        [this->_raw_unit.object() deallocateRenderResources];
+        this->_render_context = nullptr;
     }
 
-    std::optional<objc_ptr<AUAudioUnit *>> raw_unit() const {
+    objc_ptr<AUAudioUnit *> const &raw_unit() const {
         return this->_raw_unit;
     }
 
@@ -137,33 +163,33 @@ struct yas::audio::avf_au::core {
             return;
         }
 
-        auto output_format_opt = this->_output_format_on_render(args.bus_idx);
-        if (!output_format_opt) {
+        auto const &render_context = this->_render_context;
+
+        audio::format const *const output_format = render_context->output_format(args.bus_idx);
+        if (!output_format) {
             return;
         }
 
-        auto const &output_format = output_format_opt.value();
-        if (output_format != args.buffer->format()) {
+        if (*output_format != args.buffer->format()) {
             return;
         }
 
         AudioUnitRenderActionFlags action_flags = 0;
         AudioTimeStamp const time_stamp = args.time.audio_time_stamp();
 
-        this->raw_unit().value().object().renderBlock(
+        this->_raw_unit.object().renderBlock(
             &action_flags, &time_stamp, args.buffer->frame_length(), args.bus_idx, args.buffer->audio_buffer_list(),
-            [this, &input_handler](AudioUnitRenderActionFlags *actionFlags, const AudioTimeStamp *timestamp,
-                                   AUAudioFrameCount frameCount, NSInteger inputBusNumber, AudioBufferList *inputData) {
+            [this, &input_handler, &render_context](AudioUnitRenderActionFlags *actionFlags,
+                                                    const AudioTimeStamp *timestamp, AUAudioFrameCount frameCount,
+                                                    NSInteger inputBusNumber, AudioBufferList *inputData) {
                 audio::clear(inputData);
 
-                auto input_format_opt = this->_input_format_on_render((uint32_t)inputBusNumber);
-                if (input_format_opt) {
-                    auto const &input_format = input_format_opt.value();
-
-                    pcm_buffer buffer(input_format, inputData);
+                audio::format const *const input_format = render_context->input_format((uint32_t)inputBusNumber);
+                if (input_format) {
+                    pcm_buffer buffer(*input_format, inputData);
                     buffer.set_frame_length(frameCount);
 
-                    audio::time time(*timestamp, input_format.sample_rate());
+                    audio::time time(*timestamp, input_format->sample_rate());
 
                     input_handler({.buffer = &buffer, .bus_idx = (uint32_t)inputBusNumber, .time = time});
                 }
@@ -189,7 +215,7 @@ struct yas::audio::avf_au::core {
     }
 
     AUParameter *raw_parameter(std::string const &key_path) {
-        for (AUParameter *objc_param in this->_raw_unit.value().object().parameterTree.allParameters) {
+        for (AUParameter *objc_param in this->_raw_unit.object().parameterTree.allParameters) {
             if (key_path == to_string((__bridge CFStringRef)objc_param.keyPath)) {
                 return objc_param;
             }
@@ -198,36 +224,10 @@ struct yas::audio::avf_au::core {
     }
 
    private:
-    std::optional<objc_ptr<AUAudioUnit *>> _raw_unit = std::nullopt;
+    objc_ptr<AUAudioUnit *> _raw_unit{nil};
 
     mutable std::recursive_mutex _initialize_mutex;
-    bool _is_initialized = false;
-    std::vector<audio::format> _output_formats;
-    std::vector<audio::format> _input_formats;
-
-    void _set_raw_unit(objc_ptr<AUAudioUnit *> &&raw_unit) {
-        this->_raw_unit = std::move(raw_unit);
-    }
-
-    std::optional<audio::format> _output_format_on_render(uint32_t const idx) {
-        raise_if_main_thread();
-
-        if (idx < this->_output_formats.size()) {
-            return this->_output_formats.at(idx);
-        } else {
-            return std::nullopt;
-        }
-    }
-
-    std::optional<audio::format> _input_format_on_render(uint32_t const idx) {
-        raise_if_main_thread();
-
-        if (idx < this->_input_formats.size()) {
-            return this->_input_formats.at(idx);
-        } else {
-            return std::nullopt;
-        }
-    }
+    std::shared_ptr<render_context> _render_context = nullptr;
 };
 
 #pragma mark - avf_au
@@ -236,7 +236,7 @@ audio::avf_au::avf_au() : _core(std::make_unique<core>()) {
 }
 
 AudioComponentDescription audio::avf_au::componentDescription() const {
-    return this->_core->raw_unit().value().object().componentDescription;
+    return this->_core->raw_unit().object().componentDescription;
 }
 
 void audio::avf_au::set_input_bus_count(uint32_t const count) {
@@ -244,8 +244,8 @@ void audio::avf_au::set_input_bus_count(uint32_t const count) {
         std::runtime_error("avf_au initialized.");
     }
 
-    auto const raw_unit = this->_core->raw_unit();
-    AUAudioUnitBusArray *inputBusses = raw_unit.value().object().inputBusses;
+    auto const &raw_unit = this->_core->raw_unit();
+    AUAudioUnitBusArray *inputBusses = raw_unit.object().inputBusses;
     if (inputBusses.isCountChangeable) {
         NSError *error = nil;
         if ([inputBusses setBusCount:count error:&error]) {
@@ -263,8 +263,8 @@ void audio::avf_au::set_output_bus_count(uint32_t const count) {
         std::runtime_error("avf_au initialized.");
     }
 
-    auto const raw_unit = this->_core->raw_unit();
-    AUAudioUnitBusArray *outputBusses = raw_unit.value().object().outputBusses;
+    auto const &raw_unit = this->_core->raw_unit();
+    AUAudioUnitBusArray *outputBusses = raw_unit.object().outputBusses;
     if (outputBusses.isCountChangeable) {
         NSError *error = nil;
         if ([outputBusses setBusCount:count error:&error]) {
@@ -278,13 +278,11 @@ void audio::avf_au::set_output_bus_count(uint32_t const count) {
 }
 
 uint32_t audio::avf_au::input_bus_count() const {
-    auto const raw_unit = this->_core->raw_unit();
-    return (uint32_t)raw_unit.value().object().inputBusses.count;
+    return (uint32_t)this->_core->raw_unit().object().inputBusses.count;
 }
 
 uint32_t audio::avf_au::output_bus_count() const {
-    auto const raw_unit = this->_core->raw_unit();
-    return (uint32_t)raw_unit.value().object().outputBusses.count;
+    return (uint32_t)this->_core->raw_unit().object().outputBusses.count;
 }
 
 void audio::avf_au::set_input_format(audio::format const &format, uint32_t const bus_idx) {
@@ -292,7 +290,7 @@ void audio::avf_au::set_input_format(audio::format const &format, uint32_t const
         std::runtime_error("avf_au initialized.");
     }
 
-    auto raw_unit = this->_core->raw_unit().value();
+    auto const &raw_unit = this->_core->raw_unit();
 
     AUAudioUnitBus *bus = raw_unit.object().inputBusses[bus_idx];
     bus.enabled = NO;
@@ -317,7 +315,7 @@ void audio::avf_au::set_output_format(audio::format const &format, uint32_t cons
         std::runtime_error("avf_au initialized.");
     }
 
-    auto raw_unit = this->_core->raw_unit().value();
+    auto const &raw_unit = this->_core->raw_unit();
 
     AUAudioUnitBus *bus = raw_unit.object().outputBusses[bus_idx];
     bus.enabled = NO;
@@ -338,13 +336,11 @@ void audio::avf_au::set_output_format(audio::format const &format, uint32_t cons
 }
 
 audio::format audio::avf_au::input_format(uint32_t const bus_idx) const {
-    auto const raw_unit = this->_core->raw_unit().value();
-    return audio::format{*raw_unit.object().inputBusses[bus_idx].format.streamDescription};
+    return audio::format{*this->_core->raw_unit().object().inputBusses[bus_idx].format.streamDescription};
 }
 
 audio::format audio::avf_au::output_format(uint32_t const bus_idx) const {
-    auto const raw_unit = this->_core->raw_unit().value();
-    return audio::format{*raw_unit.object().outputBusses[bus_idx].format.streamDescription};
+    return audio::format{*this->_core->raw_unit().object().outputBusses[bus_idx].format.streamDescription};
 }
 
 void audio::avf_au::initialize() {
@@ -360,8 +356,8 @@ bool audio::avf_au::is_initialized() const {
 }
 
 void audio::avf_au::reset() {
-    if (auto const raw_unit = this->_core->raw_unit()) {
-        [raw_unit.value().object() reset];
+    if (auto const &raw_unit = this->_core->raw_unit()) {
+        [raw_unit.object() reset];
     }
 
     for (auto const &parameters : {this->_global_parameters, this->_output_parameters, this->_input_parameters}) {
@@ -373,35 +369,35 @@ void audio::avf_au::reset() {
 
 std::string audio::avf_au::component_name() const {
     if (auto const &raw_unit = this->_core->raw_unit()) {
-        return to_string((__bridge CFStringRef)raw_unit.value().object().componentName);
+        return to_string((__bridge CFStringRef)raw_unit.object().componentName);
     }
     return "";
 }
 
 std::string audio::avf_au::audio_unit_name() const {
     if (auto const &raw_unit = this->_core->raw_unit()) {
-        return to_string((__bridge CFStringRef)raw_unit.value().object().audioUnitName);
+        return to_string((__bridge CFStringRef)raw_unit.object().audioUnitName);
     }
     return "";
 }
 
 std::string audio::avf_au::audio_unit_short_name() const {
     if (auto const &raw_unit = this->_core->raw_unit()) {
-        return to_string((__bridge CFStringRef)raw_unit.value().object().audioUnitShortName);
+        return to_string((__bridge CFStringRef)raw_unit.object().audioUnitShortName);
     }
     return "";
 }
 
 std::string audio::avf_au::manufacture_name() const {
     if (auto const &raw_unit = this->_core->raw_unit()) {
-        return to_string((__bridge CFStringRef)raw_unit.value().object().manufacturerName);
+        return to_string((__bridge CFStringRef)raw_unit.object().manufacturerName);
     }
     return "";
 }
 
 uint32_t audio::avf_au::component_version() const {
     if (auto const &raw_unit = this->_core->raw_unit()) {
-        return raw_unit.value().object().componentVersion;
+        return raw_unit.object().componentVersion;
     }
     return 0;
 }
@@ -449,10 +445,10 @@ std::vector<audio::avf_au_parameter_ptr> const &audio::avf_au::output_parameters
 std::optional<audio::avf_au_parameter_ptr> audio::avf_au::parameter(AudioUnitParameterID const parameter_id,
                                                                     avf_au_parameter_scope const scope,
                                                                     AudioUnitElement element) const {
-    if (auto const raw_unit = this->_core->raw_unit()) {
-        if (AUParameter *objc_param = [raw_unit.value().object().parameterTree parameterWithID:parameter_id
-                                                                                         scope:to_raw_scope(scope)
-                                                                                       element:element]) {
+    if (auto const &raw_unit = this->_core->raw_unit()) {
+        if (AUParameter *objc_param = [raw_unit.object().parameterTree parameterWithID:parameter_id
+                                                                                 scope:to_raw_scope(scope)
+                                                                               element:element]) {
             auto const key_path = to_string((__bridge CFStringRef)objc_param.keyPath);
 
             switch (scope) {
@@ -511,15 +507,15 @@ void audio::avf_au::_prepare(avf_au_ptr const &shared, AudioComponentDescription
 }
 
 void audio::avf_au::_setup() {
-    auto const raw_unit = this->_core->raw_unit();
+    auto const &raw_unit = this->_core->raw_unit();
 
-    raw_unit.value().object().maximumFramesToRender = 4096;
+    raw_unit.object().maximumFramesToRender = 4096;
 
     this->_global_parameters.clear();
     this->_input_parameters.clear();
     this->_output_parameters.clear();
 
-    for (AUParameter *objc_param in raw_unit.value().object().parameterTree.allParameters) {
+    for (AUParameter *objc_param in raw_unit.object().parameterTree.allParameters) {
         auto parameter = this->_core->make_parameter(objc_param);
 
         switch (parameter->scope()) {
@@ -537,12 +533,12 @@ void audio::avf_au::_setup() {
 }
 
 void audio::avf_au::_update_input_parameters() {
-    auto const raw_unit = this->_core->raw_unit();
+    auto const &raw_unit = this->_core->raw_unit();
 
     auto const prev_input_parameters = std::move(this->_input_parameters);
     this->_input_parameters.clear();
 
-    for (AUParameter *objc_param in raw_unit.value().object().parameterTree.allParameters) {
+    for (AUParameter *objc_param in raw_unit.object().parameterTree.allParameters) {
         auto const key_path = to_string((__bridge CFStringRef)objc_param.keyPath);
         auto const scope = avf_au_parameter::scope_from_key_path(key_path);
 
@@ -565,12 +561,12 @@ void audio::avf_au::_update_input_parameters() {
 }
 
 void audio::avf_au::_update_output_parameters() {
-    auto const raw_unit = this->_core->raw_unit();
+    auto const &raw_unit = this->_core->raw_unit();
 
     auto const prev_output_parameters = std::move(this->_output_parameters);
     this->_output_parameters.clear();
 
-    for (AUParameter *objc_param in raw_unit.value().object().parameterTree.allParameters) {
+    for (AUParameter *objc_param in raw_unit.object().parameterTree.allParameters) {
         auto const key_path = to_string((__bridge CFStringRef)objc_param.keyPath);
         auto const scope = avf_au_parameter::scope_from_key_path(key_path);
 
@@ -604,10 +600,10 @@ void audio::avf_au::_set_parameter_value(avf_au_parameter_scope const scope, Aud
 
 float audio::avf_au::_get_parameter_value(avf_au_parameter_scope const scope, AudioUnitParameterID const parameter_id,
                                           AudioUnitElement const element) const {
-    if (auto const raw_unit = this->_core->raw_unit()) {
-        if (AUParameter *objc_param = [raw_unit.value().object().parameterTree parameterWithID:parameter_id
-                                                                                         scope:to_raw_scope(scope)
-                                                                                       element:element]) {
+    if (auto const &raw_unit = this->_core->raw_unit()) {
+        if (AUParameter *objc_param = [raw_unit.object().parameterTree parameterWithID:parameter_id
+                                                                                 scope:to_raw_scope(scope)
+                                                                               element:element]) {
             return objc_param.value;
         }
     }
