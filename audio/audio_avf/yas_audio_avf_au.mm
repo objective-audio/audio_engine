@@ -58,6 +58,10 @@ struct yas::audio::avf_au::core {
         std::vector<audio::format> const output_formats;
         std::vector<audio::format> const input_formats;
 
+        render_context(std::vector<audio::format> &&output_formats, std::vector<audio::format> &&input_formats)
+            : output_formats(std::move(output_formats)), input_formats(std::move(input_formats)) {
+        }
+
         std::optional<audio::format> output_format_on_render(uint32_t const idx) const {
             raise_if_main_thread();
 
@@ -119,12 +123,19 @@ struct yas::audio::avf_au::core {
         NSError *error = nil;
 
         if ([raw_unit.object() allocateRenderResourcesAndReturnError:&error]) {
+            std::vector<audio::format> output_formats;
+            std::vector<audio::format> input_formats;
+
             for (AUAudioUnitBus *bus in raw_unit.object().outputBusses) {
-                this->_output_formats.emplace_back(*bus.format.streamDescription);
+                output_formats.emplace_back(*bus.format.streamDescription);
             }
+
             for (AUAudioUnitBus *bus in raw_unit.object().inputBusses) {
-                this->_input_formats.emplace_back(*bus.format.streamDescription);
+                input_formats.emplace_back(*bus.format.streamDescription);
             }
+
+            this->_render_context =
+                std::make_shared<render_context>(std::move(output_formats), std::move(input_formats));
 
             this->_is_initialized = true;
         } else {
@@ -142,10 +153,7 @@ struct yas::audio::avf_au::core {
         std::lock_guard<std::recursive_mutex> lock(this->_initialize_mutex);
 
         [this->raw_unit().value().object() deallocateRenderResources];
-
-        this->_output_formats.clear();
-        this->_input_formats.clear();
-
+        this->_render_context = nullptr;
         this->_is_initialized = false;
     }
 
@@ -162,7 +170,9 @@ struct yas::audio::avf_au::core {
             return;
         }
 
-        auto output_format_opt = this->_output_format_on_render(args.bus_idx);
+        auto const &render_context = this->_render_context;
+
+        auto output_format_opt = render_context->output_format_on_render(args.bus_idx);
         if (!output_format_opt) {
             return;
         }
@@ -177,11 +187,12 @@ struct yas::audio::avf_au::core {
 
         this->raw_unit().value().object().renderBlock(
             &action_flags, &time_stamp, args.buffer->frame_length(), args.bus_idx, args.buffer->audio_buffer_list(),
-            [this, &input_handler](AudioUnitRenderActionFlags *actionFlags, const AudioTimeStamp *timestamp,
-                                   AUAudioFrameCount frameCount, NSInteger inputBusNumber, AudioBufferList *inputData) {
+            [this, &input_handler, &render_context](AudioUnitRenderActionFlags *actionFlags,
+                                                    const AudioTimeStamp *timestamp, AUAudioFrameCount frameCount,
+                                                    NSInteger inputBusNumber, AudioBufferList *inputData) {
                 audio::clear(inputData);
 
-                auto input_format_opt = this->_input_format_on_render((uint32_t)inputBusNumber);
+                auto input_format_opt = render_context->input_format_on_render((uint32_t)inputBusNumber);
                 if (input_format_opt) {
                     auto const &input_format = input_format_opt.value();
 
@@ -233,26 +244,6 @@ struct yas::audio::avf_au::core {
 
     void _set_raw_unit(objc_ptr<AUAudioUnit *> &&raw_unit) {
         this->_raw_unit = std::move(raw_unit);
-    }
-
-    std::optional<audio::format> _output_format_on_render(uint32_t const idx) {
-        raise_if_main_thread();
-
-        if (idx < this->_output_formats.size()) {
-            return this->_output_formats.at(idx);
-        } else {
-            return std::nullopt;
-        }
-    }
-
-    std::optional<audio::format> _input_format_on_render(uint32_t const idx) {
-        raise_if_main_thread();
-
-        if (idx < this->_input_formats.size()) {
-            return this->_input_formats.at(idx);
-        } else {
-            return std::nullopt;
-        }
     }
 };
 
