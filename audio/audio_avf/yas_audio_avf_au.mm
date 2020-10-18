@@ -102,13 +102,13 @@ struct yas::audio::avf_au::core {
     }
 
     bool is_initialized() {
-        return this->_is_initialized;
+        return this->_render_context != nullptr;
     }
 
     void initialize() {
         raise_if_sub_thread();
 
-        if (this->_is_initialized) {
+        if (this->is_initialized()) {
             return;
         }
 
@@ -132,8 +132,6 @@ struct yas::audio::avf_au::core {
 
             this->_render_context =
                 std::make_shared<render_context>(std::move(output_formats), std::move(input_formats));
-
-            this->_is_initialized = true;
         } else {
             yas_audio_log(("initialize - error : " + to_string((__bridge CFStringRef)error.description)));
         }
@@ -142,7 +140,7 @@ struct yas::audio::avf_au::core {
     void uninitialize() {
         raise_if_sub_thread();
 
-        if (!this->_is_initialized) {
+        if (!this->is_initialized()) {
             return;
         }
 
@@ -150,7 +148,6 @@ struct yas::audio::avf_au::core {
 
         [this->raw_unit().value().object() deallocateRenderResources];
         this->_render_context = nullptr;
-        this->_is_initialized = false;
     }
 
     std::optional<objc_ptr<AUAudioUnit *>> raw_unit() const {
@@ -230,7 +227,6 @@ struct yas::audio::avf_au::core {
     objc_ptr<AUAudioUnit *> _raw_unit{nil};
 
     mutable std::recursive_mutex _initialize_mutex;
-    bool _is_initialized = false;
     std::shared_ptr<render_context> _render_context = nullptr;
 };
 
