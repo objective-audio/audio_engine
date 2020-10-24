@@ -8,16 +8,12 @@
 
 using namespace yas;
 struct audio::offline_io_core::render_context {
-    std::optional<std::promise<void>> promise = std::nullopt;
+    std::optional<std::promise<void>> promise = std::promise<void>();
     std::atomic<bool> is_cancelled = false;
     std::optional<offline_completion_f> completion;
 
-    void start(std::optional<offline_completion_f> completion) {
+    render_context(std::optional<offline_completion_f> completion) : completion(std::move(completion)) {
         raise_if_sub_thread();
-
-        this->is_cancelled = false;
-        this->promise = std::promise<void>();
-        this->completion = std::move(completion);
     }
 
     void stop() {
@@ -75,8 +71,7 @@ bool audio::offline_io_core::start() {
         return false;
     }
 
-    this->_render_context = std::make_shared<render_context>();
-    this->_render_context->start(this->_device->completion_handler());
+    this->_render_context = std::make_shared<render_context>(this->_device->completion_handler());
 
     std::thread thread{[kernel = std::move(kernel), render_context = this->_render_context,
                         device_render_handler = this->_device->render_handler()]() mutable {
