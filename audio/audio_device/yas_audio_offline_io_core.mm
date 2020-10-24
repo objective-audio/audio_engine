@@ -10,10 +10,8 @@ using namespace yas;
 struct audio::offline_io_core::render_context {
     std::optional<std::promise<void>> promise = std::promise<void>();
     std::atomic<bool> is_cancelled = false;
-    std::optional<offline_completion_f> completion;
 
-    render_context(std::optional<offline_completion_f> completion) : completion(std::move(completion)) {
-        raise_if_sub_thread();
+    render_context(std::optional<offline_completion_f> completion) : _completion(std::move(completion)) {
     }
 
     void stop() {
@@ -26,9 +24,9 @@ struct audio::offline_io_core::render_context {
 
             this->promise = std::nullopt;
 
-            if (auto const &completion = this->completion) {
+            if (auto const &completion = this->_completion) {
                 completion.value()(this->is_cancelled);
-                this->completion = std::nullopt;
+                this->_completion = std::nullopt;
             }
         }
     }
@@ -38,11 +36,14 @@ struct audio::offline_io_core::render_context {
 
         this->promise = std::nullopt;
 
-        if (auto const &completion = this->completion) {
+        if (auto const &completion = this->_completion) {
             completion.value()(this->is_cancelled);
-            this->completion = std::nullopt;
+            this->_completion = std::nullopt;
         }
     }
+
+   private:
+    std::optional<offline_completion_f> _completion;
 };
 
 audio::offline_io_core::offline_io_core(offline_device_ptr const &device) : _device(device) {
