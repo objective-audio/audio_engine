@@ -4,8 +4,6 @@
 
 #pragma once
 
-#include <cpp_utils/yas_task.h>
-
 #include "yas_audio_io_core.h"
 
 namespace yas::audio {
@@ -31,6 +29,6 @@ struct offline_io_core : io_core {
 
     offline_io_core(offline_device_ptr const &);
 
-    std::optional<io_kernel_ptr> _make_kernel() const;
+    io_kernel_ptr _make_kernel() const;
 };
 }  // namespace yas::audio

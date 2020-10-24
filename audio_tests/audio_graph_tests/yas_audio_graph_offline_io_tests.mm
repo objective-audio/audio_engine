@@ -131,4 +131,54 @@ using namespace yas;
     XCTAssertFalse(graph->io().value()->raw_io()->is_running());
 }
 
+- (void)test_cancel_offline_render_with_graph {
+    auto graph = audio::graph::make_shared();
+
+    double const sample_rate = 44100.0;
+    auto format = audio::format({.sample_rate = sample_rate, .channel_count = 2});
+
+    auto tap = audio::graph_tap::make_shared();
+
+    uint32_t const frames_per_render = 1024;
+
+    tap->set_render_handler([](audio::node_render_args const &args) {});
+
+    XCTestExpectation *renderExpectation = [self expectationWithDescription:@"offline output node render"];
+    renderExpectation.assertForOverFulfill = NO;
+
+    auto render_handler = [&renderExpectation](audio::offline_render_args args) {
+        [renderExpectation fulfill];
+        return audio::continuation::keep;
+    };
+
+    XCTestExpectation *completionExpectation = [self expectationWithDescription:@"offline output node completion"];
+
+    auto completion_handler = [&self, &completionExpectation](bool const cancelled) {
+        XCTAssertTrue(cancelled);
+        if (completionExpectation) {
+            [completionExpectation fulfill];
+        }
+    };
+
+    auto const device = audio::offline_device::make_shared(format, render_handler, completion_handler);
+    auto const offline_io = graph->add_io(device);
+    offline_io->raw_io()->set_maximum_frames_per_slice(frames_per_render);
+
+    graph->connect(tap->node, offline_io->output_node, format);
+
+    auto start_result = graph->start_render();
+
+    XCTAssertTrue(start_result);
+
+    XCTAssertTrue(graph->io().value()->raw_io()->is_running());
+
+    [self waitForExpectations:@[renderExpectation] timeout:10.0];
+
+    graph->stop();
+
+    [self waitForExpectations:@[completionExpectation] timeout:10.0];
+
+    XCTAssertFalse(graph->io().value()->raw_io()->is_running());
+}
+
 @end

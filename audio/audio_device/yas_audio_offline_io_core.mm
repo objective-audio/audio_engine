@@ -3,11 +3,55 @@
 //
 
 #include "yas_audio_offline_io_core.h"
+#include <future>
 #include "yas_audio_offline_device.h"
 
 using namespace yas;
 struct audio::offline_io_core::render_context {
-    std::optional<task_queue> queue = std::nullopt;
+    std::optional<std::promise<void>> promise = std::nullopt;
+    std::atomic<bool> is_cancelled = false;
+    std::atomic<bool> is_started = false;
+    std::optional<offline_completion_f> completion;
+
+    void start(std::optional<offline_completion_f> completion) {
+        raise_if_sub_thread();
+
+        this->is_cancelled = false;
+        this->is_started = true;
+        this->promise = std::promise<void>();
+        this->completion = std::move(completion);
+    }
+
+    void stop() {
+        raise_if_sub_thread();
+
+        if (this->promise.has_value()) {
+            this->is_cancelled = true;
+            this->is_started = false;
+
+            this->promise.value().get_future().get();
+
+            this->promise = std::nullopt;
+
+            if (auto const &completion = this->completion) {
+                completion.value()(this->is_cancelled);
+                this->completion = std::nullopt;
+            }
+        }
+    }
+
+    void complete() {
+        raise_if_sub_thread();
+
+        this->is_started = false;
+
+        this->promise = std::nullopt;
+
+        if (auto const &completion = this->completion) {
+            completion.value()(this->is_cancelled);
+            this->completion = std::nullopt;
+        }
+    }
 };
 
 audio::offline_io_core::offline_io_core(offline_device_ptr const &device)
@@ -27,28 +71,28 @@ void audio::offline_io_core::set_maximum_frames_per_slice(uint32_t const frames)
 }
 
 bool audio::offline_io_core::start() {
-    if (this->_render_context->queue.has_value()) {
+    if (this->_render_context->is_started) {
         return false;
     }
 
     auto kernel = this->_make_kernel();
 
-    if (!kernel.has_value()) {
+    if (!kernel) {
         return false;
     }
 
-    auto task_lambda = [kernel = kernel.value(), render_context = to_weak(this->_render_context),
-                        device_render_handler = this->_device->render_handler(),
-                        completion_handler = this->_device->completion_handler()](task const &task) mutable {
-        bool cancelled = false;
+    this->_render_context->start(this->_device->completion_handler());
+
+    std::thread thread{[kernel = std::move(kernel), render_context = this->_render_context,
+                        device_render_handler = this->_device->render_handler()]() mutable {
         uint32_t current_sample_time = 0;
 
-        while (!cancelled) {
+        while (!render_context->is_cancelled) {
             kernel->reset_buffers();
 
             auto const &render_buffer = kernel->output_buffer;
             if (!render_buffer) {
-                cancelled = true;
+                render_context->is_cancelled = true;
                 break;
             }
 
@@ -63,56 +107,36 @@ bool audio::offline_io_core::start() {
                 break;
             }
 
-            if (task.is_canceled()) {
-                cancelled = true;
+            if (render_context->is_cancelled) {
                 break;
             }
 
             current_sample_time += render_buffer->frame_capacity();
         }
 
-        dispatch_async(dispatch_get_main_queue(),
-                       [render_context, cancelled, completion_handler = std::move(completion_handler)]() {
-                           if (auto const context = render_context.lock()) {
-                               context->queue = std::nullopt;
-                           }
+        render_context->promise->set_value();
 
-                           if (completion_handler.has_value()) {
-                               completion_handler.value()(cancelled);
-                           }
-                       });
-    };
+        dispatch_async(dispatch_get_main_queue(), [render_context]() { render_context->complete(); });
+    }};
 
-    task_queue queue{1};
-    queue.suspend();
-    queue.push_back(task::make_shared(std::move(task_lambda)));
-    queue.resume();
-    this->_render_context->queue = std::move(queue);
+    thread.detach();
 
     return true;
 }
 
 void audio::offline_io_core::stop() {
-    if (auto &queue = this->_render_context->queue) {
-        queue->cancel_all();
-        queue->wait_until_all_tasks_are_finished();
-        this->_render_context->queue = std::nullopt;
-    }
-
-    if (auto const &handler = this->_device->completion_handler()) {
-        handler.value()(true);
-    }
+    this->_render_context->stop();
 }
 
-std::optional<audio::io_kernel_ptr> audio::offline_io_core::_make_kernel() const {
+audio::io_kernel_ptr audio::offline_io_core::_make_kernel() const {
     auto const &output_format = this->_device->output_format();
 
     if (!output_format.has_value()) {
-        return std::nullopt;
+        return nullptr;
     }
 
     if (!this->_render_handler) {
-        return std::nullopt;
+        return nullptr;
     }
 
     return io_kernel::make_shared(this->_render_handler.value(), std::nullopt, output_format, this->_maximum_frames);
