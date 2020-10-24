@@ -11,13 +11,15 @@ struct audio::offline_io_core::render_context {
     std::optional<std::promise<void>> promise = std::nullopt;
     std::atomic<bool> is_cancelled = false;
     std::atomic<bool> is_started = false;
+    std::optional<offline_completion_f> completion;
 
-    void start() {
+    void start(std::optional<offline_completion_f> completion) {
         raise_if_sub_thread();
 
         this->is_cancelled = false;
         this->is_started = true;
         this->promise = std::promise<void>();
+        this->completion = std::move(completion);
     }
 
     void stop() {
@@ -29,6 +31,11 @@ struct audio::offline_io_core::render_context {
             this->promise.value().get_future().get();
 
             this->promise = std::nullopt;
+
+            if (auto const &completion = this->completion) {
+                completion.value()(this->is_cancelled);
+                this->completion = std::nullopt;
+            }
         }
     }
 
@@ -36,6 +43,11 @@ struct audio::offline_io_core::render_context {
         raise_if_sub_thread();
 
         this->promise = std::nullopt;
+
+        if (auto const &completion = this->completion) {
+            completion.value()(this->is_cancelled);
+            this->completion = std::nullopt;
+        }
     }
 };
 
@@ -66,11 +78,10 @@ bool audio::offline_io_core::start() {
         return false;
     }
 
-    this->_render_context->start();
+    this->_render_context->start(this->_device->completion_handler());
 
     std::thread thread{[kernel = std::move(kernel), render_context = this->_render_context,
-                        device_render_handler = this->_device->render_handler(),
-                        completion_handler = this->_device->completion_handler()]() mutable {
+                        device_render_handler = this->_device->render_handler()]() mutable {
         uint32_t current_sample_time = 0;
 
         while (!render_context->is_cancelled) {
@@ -102,14 +113,7 @@ bool audio::offline_io_core::start() {
 
         render_context->promise->set_value();
 
-        dispatch_async(dispatch_get_main_queue(),
-                       [render_context, completion_handler = std::move(completion_handler)]() {
-                           render_context->complete();
-
-                           if (completion_handler.has_value()) {
-                               completion_handler.value()(render_context->is_cancelled);
-                           }
-                       });
+        dispatch_async(dispatch_get_main_queue(), [render_context]() { render_context->complete(); });
     }};
 
     thread.detach();
@@ -119,10 +123,6 @@ bool audio::offline_io_core::start() {
 
 void audio::offline_io_core::stop() {
     this->_render_context->stop();
-
-    if (auto const &handler = this->_device->completion_handler()) {
-        handler.value()(true);
-    }
 }
 
 audio::io_kernel_ptr audio::offline_io_core::_make_kernel() const {
