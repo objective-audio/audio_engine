@@ -27,7 +27,6 @@ struct audio::offline_io_core::render_context {
 
         if (this->promise.has_value()) {
             this->is_cancelled = true;
-            this->is_started = false;
 
             this->promise.value().get_future().get();
 
@@ -42,8 +41,6 @@ struct audio::offline_io_core::render_context {
 
     void complete() {
         raise_if_sub_thread();
-
-        this->is_started = false;
 
         this->promise = std::nullopt;
 
