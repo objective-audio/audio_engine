@@ -8,18 +8,10 @@
 
 using namespace yas;
 struct audio::offline_io_core::render_context {
-    std::optional<std::promise<void>> promise = std::nullopt;
+    std::optional<std::promise<void>> promise = std::promise<void>();
     std::atomic<bool> is_cancelled = false;
-    std::atomic<bool> is_started = false;
-    std::optional<offline_completion_f> completion;
 
-    void start(std::optional<offline_completion_f> completion) {
-        raise_if_sub_thread();
-
-        this->is_cancelled = false;
-        this->is_started = true;
-        this->promise = std::promise<void>();
-        this->completion = std::move(completion);
+    render_context(std::optional<offline_completion_f> completion) : _completion(std::move(completion)) {
     }
 
     void stop() {
@@ -27,15 +19,14 @@ struct audio::offline_io_core::render_context {
 
         if (this->promise.has_value()) {
             this->is_cancelled = true;
-            this->is_started = false;
 
             this->promise.value().get_future().get();
 
             this->promise = std::nullopt;
 
-            if (auto const &completion = this->completion) {
+            if (auto const &completion = this->_completion) {
                 completion.value()(this->is_cancelled);
-                this->completion = std::nullopt;
+                this->_completion = std::nullopt;
             }
         }
     }
@@ -43,19 +34,19 @@ struct audio::offline_io_core::render_context {
     void complete() {
         raise_if_sub_thread();
 
-        this->is_started = false;
-
         this->promise = std::nullopt;
 
-        if (auto const &completion = this->completion) {
+        if (auto const &completion = this->_completion) {
             completion.value()(this->is_cancelled);
-            this->completion = std::nullopt;
+            this->_completion = std::nullopt;
         }
     }
+
+   private:
+    std::optional<offline_completion_f> _completion;
 };
 
-audio::offline_io_core::offline_io_core(offline_device_ptr const &device)
-    : _device(device), _render_context(std::make_shared<render_context>()) {
+audio::offline_io_core::offline_io_core(offline_device_ptr const &device) : _device(device) {
 }
 
 audio::offline_io_core::~offline_io_core() {
@@ -71,7 +62,7 @@ void audio::offline_io_core::set_maximum_frames_per_slice(uint32_t const frames)
 }
 
 bool audio::offline_io_core::start() {
-    if (this->_render_context->is_started) {
+    if (this->_render_context) {
         return false;
     }
 
@@ -81,7 +72,7 @@ bool audio::offline_io_core::start() {
         return false;
     }
 
-    this->_render_context->start(this->_device->completion_handler());
+    this->_render_context = std::make_shared<render_context>(this->_device->completion_handler());
 
     std::thread thread{[kernel = std::move(kernel), render_context = this->_render_context,
                         device_render_handler = this->_device->render_handler()]() mutable {
@@ -125,7 +116,9 @@ bool audio::offline_io_core::start() {
 }
 
 void audio::offline_io_core::stop() {
-    this->_render_context->stop();
+    if (this->_render_context) {
+        this->_render_context->stop();
+    }
 }
 
 audio::io_kernel_ptr audio::offline_io_core::_make_kernel() const {
