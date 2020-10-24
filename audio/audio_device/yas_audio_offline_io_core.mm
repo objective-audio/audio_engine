@@ -51,8 +51,7 @@ struct audio::offline_io_core::render_context {
     }
 };
 
-audio::offline_io_core::offline_io_core(offline_device_ptr const &device)
-    : _device(device), _render_context(std::make_shared<render_context>()) {
+audio::offline_io_core::offline_io_core(offline_device_ptr const &device) : _device(device) {
 }
 
 audio::offline_io_core::~offline_io_core() {
@@ -68,7 +67,7 @@ void audio::offline_io_core::set_maximum_frames_per_slice(uint32_t const frames)
 }
 
 bool audio::offline_io_core::start() {
-    if (this->_render_context->is_started) {
+    if (this->_render_context) {
         return false;
     }
 
@@ -78,6 +77,7 @@ bool audio::offline_io_core::start() {
         return false;
     }
 
+    this->_render_context = std::make_shared<render_context>();
     this->_render_context->start(this->_device->completion_handler());
 
     std::thread thread{[kernel = std::move(kernel), render_context = this->_render_context,
@@ -122,7 +122,9 @@ bool audio::offline_io_core::start() {
 }
 
 void audio::offline_io_core::stop() {
-    this->_render_context->stop();
+    if (this->_render_context) {
+        this->_render_context->stop();
+    }
 }
 
 audio::io_kernel_ptr audio::offline_io_core::_make_kernel() const {
