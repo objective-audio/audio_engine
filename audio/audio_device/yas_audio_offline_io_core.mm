@@ -10,14 +10,12 @@ using namespace yas;
 struct audio::offline_io_core::render_context {
     std::optional<std::promise<void>> promise = std::nullopt;
     std::atomic<bool> is_cancelled = false;
-    std::atomic<bool> is_started = false;
     std::optional<offline_completion_f> completion;
 
     void start(std::optional<offline_completion_f> completion) {
         raise_if_sub_thread();
 
         this->is_cancelled = false;
-        this->is_started = true;
         this->promise = std::promise<void>();
         this->completion = std::move(completion);
     }
