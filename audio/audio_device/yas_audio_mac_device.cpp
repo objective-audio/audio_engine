@@ -8,8 +8,6 @@
 
 #include <cpp_utils/yas_cf_utils.h>
 
-#include <mutex>
-
 #include "yas_audio_mac_empty_device.h"
 #include "yas_audio_mac_io_core.h"
 #include "yas_audio_renewable_device.h"
