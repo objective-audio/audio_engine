@@ -5,6 +5,7 @@
 #include "yas_audio_time.h"
 
 #include <cpp_utils/yas_cf_utils.h>
+#include <mach/mach_time.h>
 
 #include <exception>
 #include <string>
@@ -49,6 +50,23 @@ static bool is_equal(AudioTimeStamp const &lhs, AudioTimeStamp const &rhs) {
     return lhs.mHostTime == rhs.mHostTime && is_equal(lhs.mSampleTime, rhs.mSampleTime, 0.0001) &&
            lhs.mWordClockTime == rhs.mWordClockTime && is_equal(lhs.mRateScalar, rhs.mRateScalar, 0.0001) &&
            lhs.mFlags == rhs.mFlags && is_equal(lhs.mSMPTETime, rhs.mSMPTETime);
+}
+
+static mach_timebase_info_data_t const &timebase_info() {
+    static mach_timebase_info_data_t _info{.numer = 0, .denom = 0};
+    if (_info.denom == 0) {
+        mach_timebase_info(&_info);
+    }
+    return _info;
+}
+
+static double const &host_time_to_seconds_rate() {
+    static double _rate = 0.0;
+    if (_rate == 0.0) {
+        auto const &info = timebase_info();
+        _rate = static_cast<double>(info.numer) / static_cast<double>(info.denom) / 1000000000.0;
+    }
+    return _rate;
 }
 }  // namespace yas::audio::time_utils
 
@@ -102,9 +120,9 @@ bool audio::time::operator!=(time const &rhs) const {
 #pragma mark - global
 
 uint64_t audio::host_time_for_seconds(double seconds) {
-    return static_cast<uint64_t>(std::round(seconds * 1000000000));
+    return static_cast<uint64_t>(std::round(seconds / time_utils::host_time_to_seconds_rate()));
 }
 
 double audio::seconds_for_host_time(uint64_t host_time) {
-    return static_cast<double>(host_time) / 1000000000;
+    return static_cast<double>(host_time) * time_utils::host_time_to_seconds_rate();
 }
