@@ -46,3 +46,4 @@
 #include <audio/yas_audio_graph_node.h>
 #include <audio/yas_audio_graph_route.h>
 #include <audio/yas_audio_graph_tap.h>
+#include <audio/yas_audio_rendering_graph.h>
