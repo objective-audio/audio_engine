@@ -3,7 +3,7 @@
 //
 
 #import <XCTest/XCTest.h>
-#import <audio/yas_audio_debug.h>
+#import "yas_audio_test_utils.h"
 
 #if DEBUG
 
