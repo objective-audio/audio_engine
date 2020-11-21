@@ -3,8 +3,7 @@
 //
 
 #import <XCTest/XCTest.h>
-#import <audio/yas_audio_format.h>
-#import <audio/yas_audio_objc_utils.h>
+#import "yas_audio_test_utils.h"
 
 using namespace yas;
 

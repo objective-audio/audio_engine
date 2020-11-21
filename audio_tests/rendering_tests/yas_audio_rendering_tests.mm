@@ -3,7 +3,6 @@
 //
 
 #import <XCTest/XCTest.h>
-#include <audio/yas_audio_rendering_graph.h>
 #import "yas_audio_test_utils.h"
 
 using namespace yas;

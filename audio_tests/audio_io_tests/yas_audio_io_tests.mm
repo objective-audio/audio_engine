@@ -2,7 +2,8 @@
 //  yas_audio_io_tests.mm
 //
 
-#include "yas_audio_test_io_device.h"
+#import "yas_audio_test_io_device.h"
+#import "yas_audio_test_utils.h"
 
 using namespace yas;
 using namespace yas::audio;

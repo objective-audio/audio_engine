@@ -2,7 +2,6 @@
 //  yas_audio_offline_device_tests.mm
 //
 
-#import <audio/yas_audio_offline_device.h>
 #import "yas_audio_test_utils.h"
 
 using namespace yas;
