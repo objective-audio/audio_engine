@@ -485,7 +485,7 @@ void audio::avf_au::render(render_args const &args, input_render_f const &input_
 }
 
 audio::avf_au::load_state audio::avf_au::state() const {
-    return this->_load_state->raw();
+    return this->_load_state->value();
 }
 
 chaining::chain_sync_t<audio::avf_au::load_state> audio::avf_au::load_state_chain() const {
