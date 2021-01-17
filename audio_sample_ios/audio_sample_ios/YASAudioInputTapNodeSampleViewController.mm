@@ -46,7 +46,7 @@ struct input_tap_vc_cpp {
             }
 
             double const sample_rate = buffer->format().sample_rate();
-            float prev_level = input_level->raw() - frame_length / sample_rate * 30.0f;
+            float prev_level = input_level->value() - frame_length / sample_rate * 30.0f;
             level = std::max(prev_level, audio::math::decibel_from_linear(level));
             input_level->set_value(level);
         });
@@ -118,7 +118,7 @@ struct input_tap_vc_cpp {
 }
 
 - (void)updateUI:(CADisplayLink *)sender {
-    float value = self->_cpp.input_level->raw();
+    float value = self->_cpp.input_level->value();
 
     self.progressView.progress = std::max((value + 72.0f) / 72.0f, 0.0f);
 
