@@ -315,8 +315,8 @@ std::optional<size_t> audio::mac_device::index_of_device(mac_device_ptr const &d
     }
 }
 
-bool audio::mac_device::is_available_device(mac_device_ptr const &device) {
-    auto it = mac_device_global::all_devices_map().find(device->audio_device_id());
+bool audio::mac_device::is_available_device(mac_device const &device) {
+    auto it = mac_device_global::all_devices_map().find(device.audio_device_id());
     return it != mac_device_global::all_devices_map().end();
 }
 
@@ -335,10 +335,6 @@ audio::mac_device::mac_device(AudioDeviceID const device_id)
     _add_listener(device_id, kAudioDevicePropertyStreams, kAudioObjectPropertyScopeOutput, listener);
     _add_listener(device_id, kAudioDevicePropertyStreamConfiguration, kAudioObjectPropertyScopeInput, listener);
     _add_listener(device_id, kAudioDevicePropertyStreamConfiguration, kAudioObjectPropertyScopeOutput, listener);
-}
-
-void audio::mac_device::_prepare(mac_device_ptr const &mac_device) {
-    this->_weak_mac_device = mac_device;
 
     this->_notifier->chain()
         .to_value(io_device::method::updated)
@@ -347,18 +343,15 @@ void audio::mac_device::_prepare(mac_device_ptr const &mac_device) {
         ->add_to(this->_io_pool);
 
     _system_notifier->chain()
-        .guard([weak_device = this->_weak_mac_device](auto const &pair) {
-            if (auto const device = weak_device.lock()) {
-                if (!is_available_device(device)) {
-                    return true;
-                }
-            }
-            return false;
-        })
+        .guard([this](auto const &pair) { return !is_available_device(*this); })
         .to_value(io_device::method::lost)
         .send_to(this->_io_device_notifier)
         .end()
         ->add_to(this->_io_pool);
+}
+
+void audio::mac_device::_prepare(mac_device_ptr const &mac_device) {
+    this->_weak_mac_device = mac_device;
 }
 
 AudioDeviceID audio::mac_device::audio_device_id() const {
