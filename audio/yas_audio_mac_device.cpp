@@ -278,20 +278,16 @@ audio::io_device_ptr audio::mac_device::renewable_default_output_device() {
             return result;
         },
         [](io_device_ptr const &device, renewable_device::method_f const &handler) {
-            auto pool = chaining::observer_pool::make_shared();
+            auto observer1 = device->io_device_chain()
+                                 .guard([](auto const &method) { return method == audio::io_device::method::updated; })
+                                 .perform([handler](auto const &) { handler(renewable_device::method::notify); })
+                                 .end();
 
-            device->io_device_chain()
-                .guard([](auto const &method) { return method == audio::io_device::method::updated; })
-                .perform([handler](auto const &) { handler(renewable_device::method::notify); })
-                .end()
-                ->add_to(*pool);
+            auto observer2 = mac_device::system_chain()
+                                 .perform([handler](auto const &) { handler(renewable_device::method::renewal); })
+                                 .end();
 
-            mac_device::system_chain()
-                .perform([handler](auto const &) { handler(renewable_device::method::renewal); })
-                .end()
-                ->add_to(*pool);
-
-            return pool;
+            return std::vector<chaining::invalidatable_ptr>{std::move(observer1), std::move(observer2)};
         });
 }
 

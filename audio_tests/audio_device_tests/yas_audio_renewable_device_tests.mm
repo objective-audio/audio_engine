@@ -39,20 +39,16 @@ using namespace yas::audio;
             }
         },
         [update_notifier](io_device_ptr const &device, auto const &handler) {
-            auto pool = chaining::observer_pool::make_shared();
+            auto observer1 = device->io_device_chain()
+                                 .guard([](auto const &method) { return method == io_device::method::updated; })
+                                 .perform([handler](auto const &) { handler(renewable_device::method::notify); })
+                                 .end();
 
-            device->io_device_chain()
-                .guard([](auto const &method) { return method == io_device::method::updated; })
-                .perform([handler](auto const &) { handler(renewable_device::method::notify); })
-                .end()
-                ->add_to(*pool);
+            auto observer2 = update_notifier->chain()
+                                 .perform([handler](auto const &) { handler(renewable_device::method::renewal); })
+                                 .end();
 
-            update_notifier->chain()
-                .perform([handler](auto const &) { handler(renewable_device::method::renewal); })
-                .end()
-                ->add_to(*pool);
-
-            return pool;
+            return std::vector<chaining::invalidatable_ptr>{std::move(observer1), std::move(observer2)};
         });
 
     std::vector<io_device::method> received;

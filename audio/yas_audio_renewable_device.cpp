@@ -53,7 +53,7 @@ void audio::renewable_device::_renewal_device() {
         }
     };
 
-    this->_observer = this->_renewal_handler(this->_device, handler);
+    this->_observers = this->_renewal_handler(this->_device, handler);
 
     this->_notifier->notify(audio::io_device::method::updated);
 }
