@@ -16,8 +16,8 @@ using namespace yas;
 
 namespace yas::audio {
 
-static chaining::notifier_ptr<audio::mac_device::change_info> _system_notifier =
-    chaining::notifier<audio::mac_device::change_info>::make_shared();
+static observing::notifier_ptr<mac_device::change_info> _system_notifier =
+    observing::notifier<mac_device::change_info>::make_shared();
 
 #pragma mark - utility
 
@@ -283,9 +283,8 @@ audio::io_device_ptr audio::mac_device::renewable_default_output_device() {
                                  .perform([handler](auto const &) { handler(renewable_device::method::notify); })
                                  .end();
 
-            auto observer2 = mac_device::system_chain()
-                                 .perform([handler](auto const &) { handler(renewable_device::method::renewal); })
-                                 .end();
+            auto observer2 =
+                mac_device::observe_system([handler](auto const &) { handler(renewable_device::method::renewal); });
 
             return std::vector<chaining::invalidatable_ptr>{std::move(observer1), std::move(observer2)};
         });
@@ -338,12 +337,13 @@ audio::mac_device::mac_device(AudioDeviceID const device_id)
         .end()
         ->add_to(this->_io_pool);
 
-    _system_notifier->chain()
-        .guard([this](auto const &pair) { return !is_available_device(*this); })
-        .to_value(io_device::method::lost)
-        .send_to(this->_io_device_notifier)
-        .end()
-        ->add_to(this->_io_pool);
+    audio::_system_notifier
+        ->observe([this](auto const &) {
+            if (!is_available_device(*this)) {
+                this->_io_device_notifier->notify(io_device::method::lost);
+            }
+        })
+        ->add_to(this->_pool);
 }
 
 void audio::mac_device::_prepare(mac_device_ptr const &mac_device) {
@@ -407,8 +407,8 @@ chaining::chain_unsync_t<audio::mac_device::change_info> audio::mac_device::chai
     return this->_notifier->chain();
 }
 
-chaining::chain_unsync_t<audio::mac_device::change_info> audio::mac_device::system_chain() {
-    return audio::_system_notifier->chain();
+observing::canceller_ptr audio::mac_device::observe_system(observing::caller<change_info>::handler_f &&handler) {
+    return audio::_system_notifier->observe(std::move(handler));
 }
 
 chaining::chain_unsync_t<audio::io_device::method> audio::mac_device::io_device_chain() {

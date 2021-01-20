@@ -28,7 +28,7 @@ struct graph_io_vc_cpp {
     audio::graph_route_ptr const route = audio::graph_route::make_shared();
     audio::graph_tap_ptr const tap = audio::graph_tap::make_shared();
 
-    std::optional<chaining::any_observer_ptr> system_observer = std::nullopt;
+    std::optional<observing::canceller_ptr> system_canceller = std::nullopt;
     std::optional<chaining::any_observer_ptr> device_observer = std::nullopt;
 
     graph_io_vc_cpp() {
@@ -206,10 +206,8 @@ struct graph_io_vc_cpp {
 
     auto unowned_self = objc_ptr_with_move_object([[YASUnownedObject alloc] initWithObject:self]);
 
-    self->_cpp->system_observer =
-        audio::mac_device::system_chain()
-            .perform([unowned_self](auto const &) { [[unowned_self.object() object] _updateDeviceNames]; })
-            .end();
+    self->_cpp->system_canceller = audio::mac_device::observe_system(
+        [unowned_self](auto const &) { [[unowned_self.object() object] _updateDeviceNames]; });
 
     [self _updateDeviceNames];
 

@@ -37,7 +37,7 @@ namespace yas::sample {
 struct device_vc_cpp {
     audio::io_ptr const io = audio::io::make_shared(std::nullopt);
     sample_kernel_ptr const kernel = std::make_shared<sample_kernel_t>();
-    std::optional<chaining::any_observer_ptr> system_observer = std::nullopt;
+    std::optional<observing::canceller_ptr> system_canceller = std::nullopt;
     std::optional<chaining::any_observer_ptr> device_observer = std::nullopt;
 };
 }
@@ -69,11 +69,13 @@ struct device_vc_cpp {
 
     auto unowned_self = objc_ptr_with_move_object([[YASUnownedObject alloc] initWithObject:self]);
 
-    self->_cpp->system_observer =
+    self->_cpp->system_canceller = audio::mac_device::observe_system(
+        [unowned_self](auto const &) { [[unowned_self.object() object] _updateDeviceNames]; });
+    /*
         audio::mac_device::system_chain()
             .perform([unowned_self](auto const &) { [[unowned_self.object() object] _updateDeviceNames]; })
             .end();
-
+*/
     auto weak_io = to_weak(self->_cpp->io);
     self->_cpp->io->set_render_handler([weak_io, kernel = self->_cpp->kernel](audio::io_render_args args) {
         if (auto io = weak_io.lock()) {

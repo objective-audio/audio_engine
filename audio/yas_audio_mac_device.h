@@ -55,7 +55,7 @@ struct mac_device : io_device {
     [[nodiscard]] std::optional<audio::format> output_format() const override;
 
     [[nodiscard]] chaining::chain_unsync_t<change_info> chain() const;
-    [[nodiscard]] static chaining::chain_unsync_t<change_info> system_chain();
+    [[nodiscard]] static observing::canceller_ptr observe_system(observing::caller<change_info>::handler_f &&);
 
     [[nodiscard]] chaining::chain_unsync_t<io_device::method> io_device_chain() override;
 
@@ -80,6 +80,7 @@ struct mac_device : io_device {
     chaining::notifier_ptr<io_device::method> _io_device_notifier =
         chaining::notifier<io_device::method>::make_shared();
     chaining::observer_pool _io_pool;
+    observing::canceller_pool _pool;
     std::optional<audio::format> _input_format = std::nullopt;
     std::optional<audio::format> _output_format = std::nullopt;
 
