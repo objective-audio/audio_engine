@@ -49,7 +49,7 @@ bool audio::mac_io_core::start() {
 }
 
 void audio::mac_io_core::stop() {
-    if (this->_io_proc_id && mac_device::is_available_device(this->_device)) {
+    if (this->_io_proc_id && mac_device::is_available_device(*this->_device)) {
         raise_if_raw_audio_error(AudioDeviceStop(this->_device->audio_device_id(), this->_io_proc_id.value()));
     }
     this->_destroy_io_proc();
@@ -136,7 +136,7 @@ void audio::mac_io_core::_create_io_proc() {
 }
 
 void audio::mac_io_core::_destroy_io_proc() {
-    if (this->_io_proc_id && mac_device::is_available_device(this->_device)) {
+    if (this->_io_proc_id && mac_device::is_available_device(*this->_device)) {
         raise_if_raw_audio_error(
             AudioDeviceDestroyIOProcID(this->_device->audio_device_id(), this->_io_proc_id.value()));
     }

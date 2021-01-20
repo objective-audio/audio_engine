@@ -42,7 +42,7 @@ struct mac_device : io_device {
     [[nodiscard]] static io_device_ptr renewable_default_output_device();
     [[nodiscard]] static std::optional<mac_device_ptr> device_for_id(AudioDeviceID const);
     [[nodiscard]] static std::optional<size_t> index_of_device(mac_device_ptr const &);
-    [[nodiscard]] static bool is_available_device(mac_device_ptr const &);
+    [[nodiscard]] static bool is_available_device(mac_device const &);
 
     [[nodiscard]] AudioDeviceID audio_device_id() const;
     [[nodiscard]] std::string name() const;
