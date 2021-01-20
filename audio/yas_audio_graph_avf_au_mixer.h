@@ -26,7 +26,7 @@ struct graph_avf_au_mixer final {
     graph_avf_au_ptr const raw_au;
 
    private:
-    std::optional<chaining::any_observer_ptr> _connections_observer = std::nullopt;
+    std::optional<observing::canceller_ptr> _connections_canceller = std::nullopt;
 
     graph_avf_au_mixer();
 

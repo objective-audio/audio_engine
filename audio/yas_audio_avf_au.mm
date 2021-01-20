@@ -488,8 +488,8 @@ audio::avf_au::load_state audio::avf_au::state() const {
     return this->_load_state->value();
 }
 
-chaining::chain_sync_t<audio::avf_au::load_state> audio::avf_au::load_state_chain() const {
-    return this->_load_state->chain();
+observing::canceller_ptr audio::avf_au::observe_load_state(observing::caller<load_state>::handler_f &&handler) {
+    return this->_load_state->observe(std::move(handler));
 }
 
 audio::avf_au_ptr audio::avf_au::make_shared(OSType const type, OSType const sub_type) {

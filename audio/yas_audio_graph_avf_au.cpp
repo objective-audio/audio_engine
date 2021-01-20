@@ -49,12 +49,13 @@ void audio::graph_avf_au::_uninitialize_raw_au() {
     this->raw_au->uninitialize();
 }
 
-chaining::chain_sync_t<audio::graph_avf_au::load_state> audio::graph_avf_au::load_state_chain() const {
-    return this->raw_au->load_state_chain();
+observing::canceller_ptr audio::graph_avf_au::observe_load_state(observing::caller<load_state>::handler_f &&handler) {
+    return this->raw_au->observe_load_state(std::move(handler));
 }
 
-chaining::chain_unsync_t<audio::graph_avf_au::connection_method> audio::graph_avf_au::connection_chain() const {
-    return this->_connection_notifier->chain();
+observing::canceller_ptr audio::graph_avf_au::observe_connection(
+    observing::caller<connection_method>::handler_f &&handler) {
+    return this->_connection_notifier->observe(std::move(handler));
 }
 
 void audio::graph_avf_au::_will_reset() {

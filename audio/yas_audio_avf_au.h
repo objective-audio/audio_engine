@@ -68,7 +68,7 @@ struct avf_au {
                                                   AudioUnitElement element) const;
 
     load_state state() const;
-    chaining::chain_sync_t<load_state> load_state_chain() const;
+    [[nodiscard]] observing::canceller_ptr observe_load_state(observing::caller<load_state>::handler_f &&);
 
     // render thread
     void render(render_args const &, input_render_f const &);
@@ -84,8 +84,8 @@ struct avf_au {
     std::vector<avf_au_parameter_ptr> _input_parameters;
     std::vector<avf_au_parameter_ptr> _output_parameters;
 
-    chaining::value::holder_ptr<load_state> _load_state =
-        chaining::value::holder<load_state>::make_shared(load_state::unload);
+    observing::value::holder_ptr<load_state> const _load_state =
+        observing::value::holder<load_state>::make_shared(load_state::unload);
 
     avf_au();
 

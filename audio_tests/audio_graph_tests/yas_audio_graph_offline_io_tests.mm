@@ -25,13 +25,11 @@ using namespace yas;
     auto promise = std::make_shared<std::promise<void>>();
     auto future = promise->get_future();
 
-    auto observer = sample_delay_au->load_state_chain()
-                        .perform([promise](auto const &state) {
-                            if (state == audio::avf_au::load_state::loaded) {
-                                promise->set_value();
-                            }
-                        })
-                        .sync();
+    auto canceller = sample_delay_au->observe_load_state([promise](auto const &state) {
+        if (state == audio::avf_au::load_state::loaded) {
+            promise->set_value();
+        }
+    });
 
     future.get();
 

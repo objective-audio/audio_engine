@@ -28,8 +28,8 @@ struct graph_avf_au final {
     audio::graph_node_ptr const node;
     audio::avf_au_ptr const raw_au;
 
-    [[nodiscard]] chaining::chain_sync_t<load_state> load_state_chain() const;
-    [[nodiscard]] chaining::chain_unsync_t<connection_method> connection_chain() const;
+    [[nodiscard]] observing::canceller_ptr observe_load_state(observing::caller<load_state>::handler_f &&);
+    [[nodiscard]] observing::canceller_ptr observe_connection(observing::caller<connection_method>::handler_f &&);
 
     static graph_avf_au_ptr make_shared(OSType const type, OSType const sub_type);
     static graph_avf_au_ptr make_shared(AudioComponentDescription const &);
@@ -40,8 +40,8 @@ struct graph_avf_au final {
     std::vector<avf_au_parameter_ptr> _input_parameters;
     std::vector<avf_au_parameter_ptr> _output_parameters;
 
-    chaining::notifier_ptr<connection_method> _connection_notifier =
-        chaining::notifier<connection_method>::make_shared();
+    observing::notifier_ptr<connection_method> const _connection_notifier =
+        observing::notifier<connection_method>::make_shared();
 
     explicit graph_avf_au(graph_node_args &&, AudioComponentDescription const &);
 
