@@ -39,7 +39,7 @@ struct io final {
     void start();
     void stop();
 
-    chaining::chain_unsync_t<running_method> running_chain() const;
+    observing::canceller_ptr observe_running(std::function<void(running_method const &)> &&);
     chaining::chain_sync_t<device_chaining_pair_t> device_chain() const;
 
     [[nodiscard]] static io_ptr make_shared(std::optional<io_device_ptr> const &);
@@ -51,7 +51,8 @@ struct io final {
     std::optional<io_render_f> _render_handler = std::nullopt;
     uint32_t _maximum_frames = 4096;
 
-    chaining::notifier_ptr<running_method> _running_notifier;
+    observing::notifier_ptr<running_method> const _running_notifier =
+        observing::notifier<running_method>::make_shared();
     chaining::fetcher_ptr<device_chaining_pair_t> _device_fetcher;
     std::optional<chaining::any_observer_ptr> _device_changed_observer;
     std::optional<chaining::any_observer_ptr> _device_updated_observer = std::nullopt;
