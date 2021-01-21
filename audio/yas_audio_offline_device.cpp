@@ -29,8 +29,9 @@ std::optional<audio::interruptor_ptr> const &audio::offline_device::interruptor(
     return _null_interruptor;
 }
 
-chaining::chain_unsync_t<audio::io_device::method> audio::offline_device::io_device_chain() {
-    return this->_notifier->chain();
+observing::canceller_ptr audio::offline_device::observe_io_device(
+    observing::caller<io_device::method>::handler_f &&handler) {
+    return this->_notifier->observe(std::move(handler));
 }
 
 audio::offline_render_f audio::offline_device::render_handler() const {

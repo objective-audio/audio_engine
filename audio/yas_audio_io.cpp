@@ -45,33 +45,29 @@ void audio::io::set_device(std::optional<io_device_ptr> const &device) {
 
         this->_uninitialize();
 
-        this->_device_updated_observer = std::nullopt;
+        this->_device_updated_canceller = std::nullopt;
 
         this->_device = device;
 
         if (device) {
-            this->_device_updated_observer =
-                device.value()
-                    ->io_device_chain()
-                    .perform([this](auto const &method) {
-                        switch (method) {
-                            case io_device::method::updated: {
-                                bool const is_running = this->is_running();
+            this->_device_updated_canceller = device.value()->observe_io_device([this](auto const &method) {
+                switch (method) {
+                    case io_device::method::updated: {
+                        bool const is_running = this->is_running();
 
-                                this->_uninitialize();
-                                this->_device_fetcher->push({device_method::updated, this->device()});
-                                this->_initialize();
+                        this->_uninitialize();
+                        this->_device_fetcher->push({device_method::updated, this->device()});
+                        this->_initialize();
 
-                                if (this->_device && is_running) {
-                                    this->start();
-                                }
-                            } break;
-                            case io_device::method::lost:
-                                this->set_device(std::nullopt);
-                                break;
+                        if (this->_device && is_running) {
+                            this->start();
                         }
-                    })
-                    .end();
+                    } break;
+                    case io_device::method::lost:
+                        this->set_device(std::nullopt);
+                        break;
+                }
+            });
 
             this->_initialize();
 

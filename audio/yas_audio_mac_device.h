@@ -57,7 +57,8 @@ struct mac_device : io_device {
     [[nodiscard]] chaining::chain_unsync_t<change_info> chain() const;
     [[nodiscard]] static observing::canceller_ptr observe_system(observing::caller<change_info>::handler_f &&);
 
-    [[nodiscard]] chaining::chain_unsync_t<io_device::method> io_device_chain() override;
+    [[nodiscard]] observing::canceller_ptr observe_io_device(
+        observing::caller<io_device::method>::handler_f &&) override;
 
     using listener_f =
         std::function<void(uint32_t const in_number_addresses, const AudioObjectPropertyAddress *const in_addresses)>;
@@ -77,8 +78,8 @@ struct mac_device : io_device {
     std::unordered_map<AudioStreamID, stream_ptr> _output_streams_map;
     chaining::notifier_ptr<audio::mac_device::change_info> _notifier =
         chaining::notifier<audio::mac_device::change_info>::make_shared();
-    chaining::notifier_ptr<io_device::method> _io_device_notifier =
-        chaining::notifier<io_device::method>::make_shared();
+    observing::notifier_ptr<io_device::method> const _io_device_notifier =
+        observing::notifier<io_device::method>::make_shared();
     chaining::observer_pool _io_pool;
     observing::canceller_pool _pool;
     std::optional<audio::format> _input_format = std::nullopt;

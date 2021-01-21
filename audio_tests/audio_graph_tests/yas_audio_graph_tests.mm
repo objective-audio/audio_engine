@@ -37,11 +37,11 @@ struct test_io_device : io_device {
         return std::make_shared<test_io_core>();
     }
 
-    chaining::chain_unsync_t<io_device::method> io_device_chain() override {
-        return this->notifier->chain();
+    observing::canceller_ptr observe_io_device(observing::caller<method>::handler_f &&handler) override {
+        return this->notifier->observe(std::move(handler));
     }
 
-    chaining::notifier_ptr<io_device::method> notifier = chaining::notifier<io_device::method>::make_shared();
+    observing::notifier_ptr<io_device::method> notifier = observing::notifier<io_device::method>::make_shared();
 };
 }
 

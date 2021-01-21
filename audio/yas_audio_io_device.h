@@ -18,7 +18,7 @@ struct io_device {
 
     [[nodiscard]] virtual std::optional<interruptor_ptr> const &interruptor() const = 0;
 
-    [[nodiscard]] virtual chaining::chain_unsync_t<io_device::method> io_device_chain() = 0;
+    [[nodiscard]] virtual observing::canceller_ptr observe_io_device(observing::caller<method>::handler_f &&) = 0;
 
     [[nodiscard]] uint32_t input_channel_count() const;
     [[nodiscard]] uint32_t output_channel_count() const;

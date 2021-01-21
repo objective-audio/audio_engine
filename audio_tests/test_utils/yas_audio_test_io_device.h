@@ -45,8 +45,7 @@ struct test_io_core : audio::io_core {
 using test_io_core_ptr = std::shared_ptr<test_io_core>;
 
 struct test_io_device : audio::io_device {
-    chaining::notifier_ptr<io_device::method> const notifier =
-        chaining::notifier<audio::io_device::method>::make_shared();
+    observing::notifier_ptr<io_device::method> const notifier = observing::notifier<io_device::method>::make_shared();
 
     std::optional<std::function<test_io_core_ptr(void)>> make_io_core_handler = std::nullopt;
     std::optional<std::function<std::optional<audio::format>(void)>> input_format_handler = std::nullopt;
@@ -80,8 +79,8 @@ struct test_io_device : audio::io_device {
         return _nullopt;
     }
 
-    chaining::chain_unsync_t<io_device::method> io_device_chain() override {
-        return this->notifier->chain();
+    observing::canceller_ptr observe_io_device(observing::caller<method>::handler_f &&handler) override {
+        return this->notifier->observe(std::move(handler));
     }
 
     static std::shared_ptr<test_io_device> make_shared() {

@@ -278,10 +278,11 @@ audio::io_device_ptr audio::mac_device::renewable_default_output_device() {
             return result;
         },
         [](io_device_ptr const &device, renewable_device::method_f const &handler) {
-            auto observer1 = device->io_device_chain()
-                                 .guard([](auto const &method) { return method == audio::io_device::method::updated; })
-                                 .perform([handler](auto const &) { handler(renewable_device::method::notify); })
-                                 .end();
+            auto observer1 = device->observe_io_device([handler](auto const &method) {
+                if (method == audio::io_device::method::updated) {
+                    handler(renewable_device::method::notify);
+                }
+            });
 
             auto observer2 =
                 mac_device::observe_system([handler](auto const &) { handler(renewable_device::method::renewal); });
@@ -332,8 +333,7 @@ audio::mac_device::mac_device(AudioDeviceID const device_id)
     _add_listener(device_id, kAudioDevicePropertyStreamConfiguration, kAudioObjectPropertyScopeOutput, listener);
 
     this->_notifier->chain()
-        .to_value(io_device::method::updated)
-        .send_to(this->_io_device_notifier)
+        .perform([this](auto const &method) { this->_io_device_notifier->notify(io_device::method::updated); })
         .end()
         ->add_to(this->_io_pool);
 
@@ -411,8 +411,9 @@ observing::canceller_ptr audio::mac_device::observe_system(observing::caller<cha
     return audio::_system_notifier->observe(std::move(handler));
 }
 
-chaining::chain_unsync_t<audio::io_device::method> audio::mac_device::io_device_chain() {
-    return this->_io_device_notifier->chain();
+observing::canceller_ptr audio::mac_device::observe_io_device(
+    observing::caller<io_device::method>::handler_f &&handler) {
+    return this->_io_device_notifier->observe(std::move(handler));
 }
 
 audio::mac_device::listener_f audio::mac_device::_listener() {

@@ -26,7 +26,7 @@ using namespace yas::audio;
     auto const input_device = test::test_io_device::make_shared();
     input_device->input_format_handler = []() { return audio::format{{.sample_rate = 44100.0, .channel_count = 1}}; };
 
-    auto const update_notifier = chaining::notifier<std::nullptr_t>::make_shared();
+    auto const update_notifier = observing::notifier<std::nullptr_t>::make_shared();
 
     bool is_input = false;
 
@@ -39,23 +39,22 @@ using namespace yas::audio;
             }
         },
         [update_notifier](io_device_ptr const &device, auto const &handler) {
-            auto observer1 = device->io_device_chain()
-                                 .guard([](auto const &method) { return method == io_device::method::updated; })
-                                 .perform([handler](auto const &) { handler(renewable_device::method::notify); })
-                                 .end();
+            auto canceller1 = device->observe_io_device([handler](auto const &method) {
+                if (method == io_device::method::updated) {
+                    handler(renewable_device::method::notify);
+                }
+            });
 
-            auto observer2 = update_notifier->chain()
-                                 .perform([handler](auto const &) { handler(renewable_device::method::renewal); })
-                                 .end();
+            auto canceller2 =
+                update_notifier->observe([handler](auto const &) { handler(renewable_device::method::renewal); });
 
-            return std::vector<chaining::invalidatable_ptr>{std::move(observer1), std::move(observer2)};
+            return std::vector<chaining::invalidatable_ptr>{std::move(canceller1), std::move(canceller2)};
         });
 
     std::vector<io_device::method> received;
 
-    auto observer = renewable_device->io_device_chain()
-                        .perform([&received](auto const &method) { received.push_back(method); })
-                        .end();
+    auto canceller =
+        renewable_device->observe_io_device([&received](auto const &method) { received.push_back(method); });
 
     // 最初はoutput_device
     XCTAssertTrue(renewable_device->output_format().has_value());

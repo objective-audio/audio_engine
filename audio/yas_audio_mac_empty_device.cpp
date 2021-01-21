@@ -25,7 +25,7 @@ struct dummy_io_core : io_core {
 };
 }  // namespace yas::audio
 
-audio::mac_empty_device::mac_empty_device() : _notifier(chaining::notifier<audio::io_device::method>::make_shared()) {
+audio::mac_empty_device::mac_empty_device() {
 }
 
 std::optional<audio::format> audio::mac_empty_device::input_format() const {
@@ -45,8 +45,8 @@ audio::io_core_ptr audio::mac_empty_device::make_io_core() const {
     return std::make_shared<dummy_io_core>();
 }
 
-chaining::chain_unsync_t<audio::io_device::method> audio::mac_empty_device::io_device_chain() {
-    return this->_notifier->chain();
+observing::canceller_ptr audio::mac_empty_device::observe_io_device(observing::caller<method>::handler_f &&handler) {
+    return this->_notifier->observe(std::move(handler));
 }
 
 audio::mac_empty_device_ptr audio::mac_empty_device::make_shared() {
