@@ -38,7 +38,7 @@ struct device_vc_cpp {
     audio::io_ptr const io = audio::io::make_shared(std::nullopt);
     sample_kernel_ptr const kernel = std::make_shared<sample_kernel_t>();
     std::optional<observing::canceller_ptr> system_canceller = std::nullopt;
-    std::optional<chaining::any_observer_ptr> device_observer = std::nullopt;
+    std::optional<observing::canceller_ptr> device_canceller = std::nullopt;
 };
 }
 
@@ -184,7 +184,7 @@ struct device_vc_cpp {
 }
 
 - (void)setDevice:(std::optional<audio::mac_device_ptr> const &)selected_device {
-    self->_cpp->device_observer = std::nullopt;
+    self->_cpp->device_canceller = std::nullopt;
 
     auto all_devices = audio::mac_device::all_devices();
 
@@ -195,17 +195,15 @@ struct device_vc_cpp {
 
         auto const &device = *selected_device;
 
-        self->_cpp->device_observer = device->chain()
-                                          .perform([device, unowned_self](auto const &change_info) {
-                                              auto const &infos = change_info.property_infos;
-                                              if (infos.size() > 0) {
-                                                  auto &device_id = infos.at(0).object_id;
-                                                  if (device->audio_device_id() == device_id) {
-                                                      [[unowned_self.object() object] _updateDeviceInfo];
-                                                  }
-                                              }
-                                          })
-                                          .end();
+        self->_cpp->device_canceller = device->observe([device, unowned_self](auto const &change_info) {
+            auto const &infos = change_info.property_infos;
+            if (infos.size() > 0) {
+                auto &device_id = infos.at(0).object_id;
+                if (device->audio_device_id() == device_id) {
+                    [[unowned_self.object() object] _updateDeviceInfo];
+                }
+            }
+        });
 
         if (!self->_cpp->io->is_running()) {
             self->_cpp->io->start();
