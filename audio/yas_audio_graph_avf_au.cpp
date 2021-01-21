@@ -49,8 +49,9 @@ void audio::graph_avf_au::_uninitialize_raw_au() {
     this->raw_au->uninitialize();
 }
 
-observing::canceller_ptr audio::graph_avf_au::observe_load_state(observing::caller<load_state>::handler_f &&handler) {
-    return this->raw_au->observe_load_state(std::move(handler));
+observing::canceller_ptr audio::graph_avf_au::observe_load_state(observing::caller<load_state>::handler_f &&handler,
+                                                                 bool const sync) {
+    return this->raw_au->observe_load_state(std::move(handler), sync);
 }
 
 observing::canceller_ptr audio::graph_avf_au::observe_connection(

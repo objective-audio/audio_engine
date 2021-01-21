@@ -28,7 +28,8 @@ struct graph_avf_au final {
     audio::graph_node_ptr const node;
     audio::avf_au_ptr const raw_au;
 
-    [[nodiscard]] observing::canceller_ptr observe_load_state(observing::caller<load_state>::handler_f &&);
+    [[nodiscard]] observing::canceller_ptr observe_load_state(observing::caller<load_state>::handler_f &&,
+                                                              bool const sync = true);
     [[nodiscard]] observing::canceller_ptr observe_connection(observing::caller<connection_method>::handler_f &&);
 
     static graph_avf_au_ptr make_shared(OSType const type, OSType const sub_type);
