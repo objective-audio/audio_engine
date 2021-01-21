@@ -332,10 +332,9 @@ audio::mac_device::mac_device(AudioDeviceID const device_id)
     _add_listener(device_id, kAudioDevicePropertyStreamConfiguration, kAudioObjectPropertyScopeInput, listener);
     _add_listener(device_id, kAudioDevicePropertyStreamConfiguration, kAudioObjectPropertyScopeOutput, listener);
 
-    this->_notifier->chain()
-        .perform([this](auto const &method) { this->_io_device_notifier->notify(io_device::method::updated); })
-        .end()
-        ->add_to(this->_io_pool);
+    this->_notifier
+        ->observe([this](auto const &method) { this->_io_device_notifier->notify(io_device::method::updated); })
+        ->add_to(this->_pool);
 
     audio::_system_notifier
         ->observe([this](auto const &) {
@@ -403,8 +402,8 @@ audio::io_core_ptr audio::mac_device::make_io_core() const {
     return mac_io_core::make_shared(this->_weak_mac_device.lock());
 }
 
-chaining::chain_unsync_t<audio::mac_device::change_info> audio::mac_device::chain() const {
-    return this->_notifier->chain();
+observing::canceller_ptr audio::mac_device::observe(observing::caller<change_info>::handler_f &&handler) {
+    return this->_notifier->observe(std::move(handler));
 }
 
 observing::canceller_ptr audio::mac_device::observe_system(observing::caller<change_info>::handler_f &&handler) {
