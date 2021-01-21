@@ -82,7 +82,7 @@ struct audio::ios_session::impl {
 audio::ios_session::ios_session()
     : _category(category::playback),
       _impl(std::make_unique<impl>()),
-      _device_notifier(chaining::notifier<device_method>::make_shared()),
+      _device_notifier(observing::notifier<device_method>::make_shared()),
       _interruption_notifier(chaining::notifier<interruption_method>::make_shared()) {
     auto route_change_observer = objc_ptr<id<NSObject>>([this] {
         return [NSNotificationCenter.defaultCenter
@@ -278,8 +278,8 @@ void audio::ios_session::set_category(enum category const category, category_opt
     }
 }
 
-chaining::chain_unsync_t<audio::ios_session::device_method> audio::ios_session::device_chain() const {
-    return this->_device_notifier->chain();
+observing::canceller_ptr audio::ios_session::observe_device(observing::caller<device_method>::handler_f &&handler) {
+    return this->_device_notifier->observe(std::move(handler));
 }
 
 chaining::chain_unsync_t<audio::interruption_method> audio::ios_session::interruption_chain() const {

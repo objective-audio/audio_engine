@@ -28,7 +28,7 @@ struct ios_device_session {
     [[nodiscard]] virtual uint32_t output_channel_count() const = 0;
     [[nodiscard]] virtual uint32_t input_channel_count() const = 0;
 
-    [[nodiscard]] virtual chaining::chain_unsync_t<device_method> device_chain() const = 0;
+    [[nodiscard]] virtual observing::canceller_ptr observe_device(observing::caller<device_method>::handler_f &&) = 0;
 };
 }  // namespace yas::audio
 

@@ -20,7 +20,7 @@ struct ios_device final : io_device {
     [[nodiscard]] std::optional<audio::format> input_format() const override;
     [[nodiscard]] std::optional<audio::format> output_format() const override;
 
-    [[nodiscard]] chaining::chain_unsync_t<io_device::method> io_device_chain() override;
+    [[nodiscard]] observing::canceller_ptr observe_io_device(observing::caller<method>::handler_f &&) override;
 
     [[nodiscard]] static ios_device_ptr make_shared(ios_session_ptr const &);
     [[nodiscard]] static ios_device_ptr make_shared(ios_device_session_ptr const &, interruptor_ptr const &);
@@ -33,8 +33,8 @@ struct ios_device final : io_device {
     std::weak_ptr<ios_device> _weak_device;
     std::optional<ios_device_session_ptr> _session;
     std::optional<audio::interruptor_ptr> _interruptor;
-    chaining::notifier_ptr<method> _notifier = chaining::notifier<method>::make_shared();
-    chaining::any_observer_ptr _observer;
+    observing::notifier_ptr<method> const _notifier = observing::notifier<method>::make_shared();
+    observing::canceller_ptr _canceller;
 
     ios_device(ios_device_session_ptr const &, interruptor_ptr const &);
 

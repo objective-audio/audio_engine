@@ -13,22 +13,20 @@ using namespace yas;
 
 audio::ios_device::ios_device(ios_device_session_ptr const &device_session, interruptor_ptr const &interruptor)
     : _session(device_session), _interruptor(interruptor) {
-    this->_observer = device_session->device_chain()
-                          .perform([this](auto const &session_method) {
-                              switch (session_method) {
-                                  case ios_session::device_method::activate:
-                                  case ios_session::device_method::route_change:
-                                      this->_notifier->notify(method::updated);
-                                      break;
-                                  case ios_session::device_method::media_service_were_lost:
-                                  case ios_session::device_method::media_service_were_reset:
-                                  case ios_session::device_method::deactivate:
-                                      this->_session = std::nullopt;
-                                      this->_notifier->notify(method::lost);
-                                      break;
-                              }
-                          })
-                          .end();
+    this->_canceller = device_session->observe_device([this](auto const &session_method) {
+        switch (session_method) {
+            case ios_session::device_method::activate:
+            case ios_session::device_method::route_change:
+                this->_notifier->notify(method::updated);
+                break;
+            case ios_session::device_method::media_service_were_lost:
+            case ios_session::device_method::media_service_were_reset:
+            case ios_session::device_method::deactivate:
+                this->_session = std::nullopt;
+                this->_notifier->notify(method::lost);
+                break;
+        }
+    });
 }
 
 std::optional<audio::ios_device_session_ptr> const &audio::ios_device::session() const {
@@ -77,8 +75,8 @@ audio::io_core_ptr audio::ios_device::make_io_core() const {
     return ios_io_core::make_shared(this->_weak_device.lock());
 }
 
-chaining::chain_unsync_t<audio::io_device::method> audio::ios_device::io_device_chain() {
-    return this->_notifier->chain();
+observing::canceller_ptr audio::ios_device::observe_io_device(observing::caller<method>::handler_f &&handler) {
+    return this->_notifier->observe(std::move(handler));
 }
 
 audio::ios_device_ptr audio::ios_device::make_shared(ios_session_ptr const &session) {
@@ -96,23 +94,17 @@ audio::io_device_ptr audio::ios_device::make_renewable_device(ios_session_ptr co
     return audio::renewable_device::make_shared(
         [session]() { return ios_device::make_shared(session); },
         [](io_device_ptr const &device, renewable_device::method_f const &handler) {
-            auto pool = chaining::observer_pool::make_shared();
-
-            device->io_device_chain()
-                .perform([handler](auto const &method) {
-                    switch (method) {
-                        case io_device::method::updated:
-                            handler(renewable_device::method::notify);
-                            break;
-                        case io_device::method::lost:
-                            handler(renewable_device::method::renewal);
-                            break;
-                    }
-                })
-                .end()
-                ->add_to(*pool);
-
-            return pool;
+            auto canceller = device->observe_io_device([handler](auto const &method) {
+                switch (method) {
+                    case io_device::method::updated:
+                        handler(renewable_device::method::notify);
+                        break;
+                    case io_device::method::lost:
+                        handler(renewable_device::method::renewal);
+                        break;
+                }
+            });
+            return std::vector<chaining::invalidatable_ptr>{canceller};
         });
 }
 

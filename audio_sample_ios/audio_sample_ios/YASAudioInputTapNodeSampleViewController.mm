@@ -51,10 +51,12 @@ struct input_tap_vc_cpp {
             input_level->set_value(level);
         });
 
-        this->session->device_chain()
-            .guard([](auto const &method) { return method == audio::ios_device_session::device_method::route_change; })
-            .perform([this](auto const &) { this->reconnect(); })
-            .end()
+        this->session
+            ->observe_device([this](auto const &method) {
+                if (method == audio::ios_device_session::device_method::route_change) {
+                    this->reconnect();
+                }
+            })
             ->add_to(this->_pool);
     }
 
@@ -82,7 +84,7 @@ struct input_tap_vc_cpp {
     }
 
    private:
-    chaining::observer_pool _pool;
+    observing::canceller_pool _pool;
 };
 }
 

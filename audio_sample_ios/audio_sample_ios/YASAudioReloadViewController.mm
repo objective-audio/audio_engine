@@ -43,8 +43,8 @@ struct reload_vc_cpp {
 
         this->update_connection();
 
-        this->device->io_device_chain()
-            .perform([this](auto const &method) {
+        this->device
+            ->observe_io_device([this](auto const &method) {
                 this->graph->stop();
                 this->session->deactivate();
                 if (auto result = this->session->activate()) {
@@ -52,7 +52,6 @@ struct reload_vc_cpp {
                     this->graph->start_render();
                 }
             })
-            .end()
             ->add_to(this->_pool);
 
         if (auto const result = this->graph->start_render(); !result) {
@@ -88,7 +87,7 @@ struct reload_vc_cpp {
     }
 
    private:
-    chaining::observer_pool _pool;
+    observing::canceller_pool _pool;
 };
 }
 

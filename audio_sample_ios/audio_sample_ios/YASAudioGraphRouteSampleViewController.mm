@@ -41,7 +41,7 @@ struct route_vc_cpp {
     std::shared_ptr<audio::graph_route> const route = audio::graph_route::make_shared();
     audio::graph_tap_ptr const sine_tap = audio::graph_tap::make_shared();
 
-    chaining::any_observer_ptr device_observer = nullptr;
+    observing::canceller_ptr device_canceller = nullptr;
 
     bool is_setup() {
         return this->graph->io().has_value();
@@ -251,14 +251,11 @@ struct route_vc_cpp {
 
     auto unowned_self = objc_ptr_with_move_object([[YASUnownedObject alloc] initWithObject:self]);
 
-    self->_cpp.device_observer =
-        self->_cpp.device->io_device_chain()
-            .perform([unowned_self](auto const &) {
-                if ([UIApplication sharedApplication].applicationState == UIApplicationStateActive) {
-                    [[unowned_self.object() object] _updateEngine];
-                }
-            })
-            .end();
+    self->_cpp.device_canceller = self->_cpp.device->observe_io_device([unowned_self](auto const &) {
+        if ([UIApplication sharedApplication].applicationState == UIApplicationStateActive) {
+            [[unowned_self.object() object] _updateEngine];
+        }
+    });
 
     self->_cpp.connect_nodes();
 
@@ -273,7 +270,7 @@ struct route_vc_cpp {
 }
 
 - (void)_updateEngine {
-    self->_cpp.device_observer = nullptr;
+    self->_cpp.device_canceller = nullptr;
     self->_cpp.disconnectNodes();
     self->_cpp.connect_nodes();
 
