@@ -58,13 +58,14 @@ struct test_interruptor : interruptor {
         return this->_is_interrupting;
     }
 
-    chaining::chain_unsync_t<interruption_method> interruption_chain() const override {
-        return this->_notifier->chain();
+    observing::canceller_ptr observe_interruption(
+        observing::caller<interruption_method>::handler_f &&handler) override {
+        return this->_notifier->observe(std::move(handler));
     }
 
    private:
     bool _is_interrupting = false;
-    chaining::notifier_ptr<interruption_method> _notifier = chaining::notifier<interruption_method>::make_shared();
+    observing::notifier_ptr<interruption_method> _notifier = observing::notifier<interruption_method>::make_shared();
 };
 }
 
