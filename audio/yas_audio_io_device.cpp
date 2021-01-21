@@ -36,9 +36,10 @@ bool audio::io_device::is_interrupting() const {
     }
 }
 
-std::optional<chaining::chain_unsync_t<audio::interruption_method>> audio::io_device::interruption_chain() const {
+std::optional<observing::canceller_ptr> audio::io_device::observe_interruption(
+    observing::caller<interruption_method>::handler_f &&handler) {
     if (auto const interruptor = this->interruptor()) {
-        return interruptor.value()->interruption_chain();
+        return interruptor.value()->observe_interruption(std::move(handler));
     } else {
         return std::nullopt;
     }

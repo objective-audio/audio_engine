@@ -179,31 +179,22 @@ void audio::io::_start_io_core() {
 }
 
 void audio::io::_setup_interruption_observer() {
-    if (auto chain = this->_interruption_chain()) {
-        this->_interruption_observer = chain.value()
-                                           .perform([this](auto const &method) {
-                                               switch (method) {
-                                                   case audio::interruption_method::began:
-                                                       this->_stop_io_core();
-                                                       break;
-                                                   case audio::interruption_method::ended:
-                                                       this->_start_io_core();
-                                                       break;
-                                               }
-                                           })
-                                           .end();
+    if (auto const &device = this->_device) {
+        this->_interruption_canceller = device.value()->observe_interruption([this](auto const &method) {
+            switch (method) {
+                case audio::interruption_method::began:
+                    this->_stop_io_core();
+                    break;
+                case audio::interruption_method::ended:
+                    this->_start_io_core();
+                    break;
+            }
+        });
     }
 }
 
 void audio::io::_dispose_interruption_observer() {
-    this->_interruption_observer = std::nullopt;
-}
-
-std::optional<chaining::chain_unsync_t<audio::interruption_method>> audio::io::_interruption_chain() const {
-    if (auto const &device = this->_device) {
-        return device.value()->interruption_chain();
-    }
-    return std::nullopt;
+    this->_interruption_canceller = std::nullopt;
 }
 
 audio::io_ptr audio::io::make_shared(std::optional<io_device_ptr> const &device) {

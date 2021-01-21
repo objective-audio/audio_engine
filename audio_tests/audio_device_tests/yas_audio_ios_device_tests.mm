@@ -12,7 +12,7 @@ struct test_device_session : ios_device_session {
     std::optional<std::function<double(void)>> sample_rate_handler = std::nullopt;
     std::optional<std::function<uint32_t(void)>> output_channel_count_handler = std::nullopt;
     std::optional<std::function<uint32_t(void)>> input_channel_count_handler = std::nullopt;
-    chaining::notifier_ptr<device_method> notifier = chaining::notifier<device_method>::make_shared();
+    observing::notifier_ptr<device_method> notifier = observing::notifier<device_method>::make_shared();
 
     double sample_rate() const override {
         if (auto const &handler = this->sample_rate_handler) {
@@ -38,8 +38,8 @@ struct test_device_session : ios_device_session {
         }
     }
 
-    chaining::chain_unsync_t<device_method> device_chain() const override {
-        return this->notifier->chain();
+    observing::canceller_ptr observe_device(observing::caller<device_method>::handler_f &&handler) override {
+        return this->notifier->observe(std::move(handler));
     }
 };
 
@@ -119,8 +119,7 @@ struct test_interruptor : interruptor {
 
     std::vector<audio::io_device::method> received;
 
-    auto observer =
-        device->io_device_chain().perform([&received](auto const &method) { received.push_back(method); }).end();
+    auto canceller = device->observe_io_device([&received](auto const &method) { received.push_back(method); });
 
     device_session->notifier->notify(audio::ios_device_session::device_method::route_change);
 

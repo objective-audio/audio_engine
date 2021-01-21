@@ -56,7 +56,7 @@ struct io final {
     chaining::fetcher_ptr<device_chaining_pair_t> _device_fetcher;
     std::optional<chaining::any_observer_ptr> _device_changed_observer;
     std::optional<observing::canceller_ptr> _device_updated_canceller = std::nullopt;
-    std::optional<chaining::any_observer_ptr> _interruption_observer = std::nullopt;
+    std::optional<observing::canceller_ptr> _interruption_canceller = std::nullopt;
 
     io(std::optional<io_device_ptr> const &);
 
@@ -69,6 +69,5 @@ struct io final {
 
     void _setup_interruption_observer();
     void _dispose_interruption_observer();
-    std::optional<chaining::chain_unsync_t<interruption_method>> _interruption_chain() const;
 };
 }  // namespace yas::audio

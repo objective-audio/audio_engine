@@ -24,7 +24,8 @@ struct io_device {
     [[nodiscard]] uint32_t output_channel_count() const;
 
     [[nodiscard]] bool is_interrupting() const;
-    [[nodiscard]] std::optional<chaining::chain_unsync_t<interruption_method>> interruption_chain() const;
+    [[nodiscard]] std::optional<observing::canceller_ptr> observe_interruption(
+        observing::caller<interruption_method>::handler_f &&);
 
     [[nodiscard]] static io_device_ptr cast(io_device_ptr const &device) {
         return device;
