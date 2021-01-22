@@ -16,8 +16,8 @@ using namespace yas;
 
 namespace yas::audio {
 
-static chaining::notifier_ptr<audio::mac_device::change_info> _system_notifier =
-    chaining::notifier<audio::mac_device::change_info>::make_shared();
+static observing::notifier_ptr<mac_device::change_info> _system_notifier =
+    observing::notifier<mac_device::change_info>::make_shared();
 
 #pragma mark - utility
 
@@ -278,20 +278,16 @@ audio::io_device_ptr audio::mac_device::renewable_default_output_device() {
             return result;
         },
         [](io_device_ptr const &device, renewable_device::method_f const &handler) {
-            auto pool = chaining::observer_pool::make_shared();
+            auto observer1 = device->observe_io_device([handler](auto const &method) {
+                if (method == audio::io_device::method::updated) {
+                    handler(renewable_device::method::notify);
+                }
+            });
 
-            device->io_device_chain()
-                .guard([](auto const &method) { return method == audio::io_device::method::updated; })
-                .perform([handler](auto const &) { handler(renewable_device::method::notify); })
-                .end()
-                ->add_to(*pool);
+            auto observer2 =
+                mac_device::observe_system([handler](auto const &) { handler(renewable_device::method::renewal); });
 
-            mac_device::system_chain()
-                .perform([handler](auto const &) { handler(renewable_device::method::renewal); })
-                .end()
-                ->add_to(*pool);
-
-            return pool;
+            return std::vector<chaining::invalidatable_ptr>{std::move(observer1), std::move(observer2)};
         });
 }
 
@@ -336,18 +332,17 @@ audio::mac_device::mac_device(AudioDeviceID const device_id)
     _add_listener(device_id, kAudioDevicePropertyStreamConfiguration, kAudioObjectPropertyScopeInput, listener);
     _add_listener(device_id, kAudioDevicePropertyStreamConfiguration, kAudioObjectPropertyScopeOutput, listener);
 
-    this->_notifier->chain()
-        .to_value(io_device::method::updated)
-        .send_to(this->_io_device_notifier)
-        .end()
-        ->add_to(this->_io_pool);
+    this->_notifier
+        ->observe([this](auto const &method) { this->_io_device_notifier->notify(io_device::method::updated); })
+        ->add_to(this->_pool);
 
-    _system_notifier->chain()
-        .guard([this](auto const &pair) { return !is_available_device(*this); })
-        .to_value(io_device::method::lost)
-        .send_to(this->_io_device_notifier)
-        .end()
-        ->add_to(this->_io_pool);
+    audio::_system_notifier
+        ->observe([this](auto const &) {
+            if (!is_available_device(*this)) {
+                this->_io_device_notifier->notify(io_device::method::lost);
+            }
+        })
+        ->add_to(this->_pool);
 }
 
 void audio::mac_device::_prepare(mac_device_ptr const &mac_device) {
@@ -407,16 +402,17 @@ audio::io_core_ptr audio::mac_device::make_io_core() const {
     return mac_io_core::make_shared(this->_weak_mac_device.lock());
 }
 
-chaining::chain_unsync_t<audio::mac_device::change_info> audio::mac_device::chain() const {
-    return this->_notifier->chain();
+observing::canceller_ptr audio::mac_device::observe(observing::caller<change_info>::handler_f &&handler) {
+    return this->_notifier->observe(std::move(handler));
 }
 
-chaining::chain_unsync_t<audio::mac_device::change_info> audio::mac_device::system_chain() {
-    return audio::_system_notifier->chain();
+observing::canceller_ptr audio::mac_device::observe_system(observing::caller<change_info>::handler_f &&handler) {
+    return audio::_system_notifier->observe(std::move(handler));
 }
 
-chaining::chain_unsync_t<audio::io_device::method> audio::mac_device::io_device_chain() {
-    return this->_io_device_notifier->chain();
+observing::canceller_ptr audio::mac_device::observe_io_device(
+    observing::caller<io_device::method>::handler_f &&handler) {
+    return this->_io_device_notifier->observe(std::move(handler));
 }
 
 audio::mac_device::listener_f audio::mac_device::_listener() {

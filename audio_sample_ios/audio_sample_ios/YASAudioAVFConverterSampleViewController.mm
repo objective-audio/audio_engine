@@ -18,7 +18,7 @@ struct avf_converter_vc_cpp {
     audio::graph_ptr const graph;
     audio::graph_avf_au_ptr const converter;
     audio::graph_tap_ptr tap;
-    chaining::observer_pool pool;
+    observing::canceller_pool pool;
     audio::sample::kernel_ptr const kernel;
 
     avf_converter_vc_cpp()
@@ -55,13 +55,12 @@ struct avf_converter_vc_cpp {
         this->tap->set_render_handler(
             [kernel = this->kernel](audio::node_render_args const &args) { kernel->process(nullptr, args.buffer); });
 
-        this->converter->load_state_chain()
-            .perform([this](auto const &state) {
+        this->converter
+            ->observe_load_state([this](auto const &state) {
                 if (state == audio::avf_au::load_state::loaded) {
                     this->graph->start_render();
                 }
             })
-            .sync()
             ->add_to(this->pool);
 
         return std::nullopt;

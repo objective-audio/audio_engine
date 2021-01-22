@@ -60,8 +60,9 @@ struct ios_session : ios_device_session, interruptor {
     void set_category(enum category const);
     void set_category(enum category const, category_options_t const);
 
-    [[nodiscard]] chaining::chain_unsync_t<device_method> device_chain() const override;
-    [[nodiscard]] chaining::chain_unsync_t<interruption_method> interruption_chain() const override;
+    [[nodiscard]] observing::canceller_ptr observe_device(observing::caller<device_method>::handler_f &&) override;
+    [[nodiscard]] observing::canceller_ptr observe_interruption(
+        observing::caller<interruption_method>::handler_f &&) override;
 
     [[nodiscard]] static ios_session_ptr const &shared();
 
@@ -76,8 +77,8 @@ struct ios_session : ios_device_session, interruptor {
     uint32_t _preferred_io_buffer_frames = 1024;
 
     std::unique_ptr<impl> _impl;
-    chaining::notifier_ptr<device_method> _device_notifier;
-    chaining::notifier_ptr<interruption_method> _interruption_notifier;
+    observing::notifier_ptr<device_method> _device_notifier;
+    observing::notifier_ptr<interruption_method> _interruption_notifier;
 
     ios_session();
 

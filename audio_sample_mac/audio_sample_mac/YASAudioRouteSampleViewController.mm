@@ -28,8 +28,8 @@ struct graph_io_vc_cpp {
     audio::graph_route_ptr const route = audio::graph_route::make_shared();
     audio::graph_tap_ptr const tap = audio::graph_tap::make_shared();
 
-    std::optional<chaining::any_observer_ptr> system_observer = std::nullopt;
-    std::optional<chaining::any_observer_ptr> device_observer = std::nullopt;
+    std::optional<observing::canceller_ptr> system_canceller = std::nullopt;
+    std::optional<observing::canceller_ptr> device_canceller = std::nullopt;
 
     graph_io_vc_cpp() {
         std::optional<audio::mac_device_ptr> device = std::nullopt;
@@ -206,10 +206,8 @@ struct graph_io_vc_cpp {
 
     auto unowned_self = objc_ptr_with_move_object([[YASUnownedObject alloc] initWithObject:self]);
 
-    self->_cpp->system_observer =
-        audio::mac_device::system_chain()
-            .perform([unowned_self](auto const &) { [[unowned_self.object() object] _updateDeviceNames]; })
-            .end();
+    self->_cpp->system_canceller = audio::mac_device::observe_system(
+        [unowned_self](auto const &) { [[unowned_self.object() object] _updateDeviceNames]; });
 
     [self _updateDeviceNames];
 
@@ -384,20 +382,17 @@ struct graph_io_vc_cpp {
         return;
     }
 
-    _cpp->device_observer = std::nullopt;
+    self->_cpp->device_canceller = std::nullopt;
 
     auto const all_devices = audio::mac_device::all_devices();
 
-    _cpp->graph->io().value()->raw_io()->set_device(selected_device);
+    self->_cpp->graph->io().value()->raw_io()->set_device(selected_device);
 
     if (selected_device && std::find(all_devices.begin(), all_devices.end(), selected_device) != all_devices.end()) {
         auto unowned_self = objc_ptr_with_move_object([[YASUnownedObject alloc] initWithObject:self]);
 
-        _cpp->device_observer =
-            selected_device.value()
-                ->io_device_chain()
-                .perform([unowned_self](auto const &) { [[unowned_self.object() object] _updateConnection]; })
-                .end();
+        self->_cpp->device_canceller = selected_device.value()->observe_io_device(
+            [unowned_self](auto const &) { [[unowned_self.object() object] _updateConnection]; });
     }
 
     [self _updateConnection];

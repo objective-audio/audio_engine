@@ -16,7 +16,7 @@ struct mac_empty_device : io_device {
    private:
     mac_empty_device();
 
-    chaining::notifier_ptr<audio::io_device::method> _notifier;
+    observing::notifier_ptr<method> const _notifier = observing::notifier<method>::make_shared();
 
     std::optional<audio::format> input_format() const override;
     std::optional<audio::format> output_format() const override;
@@ -25,7 +25,7 @@ struct mac_empty_device : io_device {
 
     io_core_ptr make_io_core() const override;
 
-    [[nodiscard]] chaining::chain_unsync_t<io_device::method> io_device_chain() override;
+    [[nodiscard]] observing::canceller_ptr observe_io_device(observing::caller<method>::handler_f &&) override;
 };
 }  // namespace yas::audio
 

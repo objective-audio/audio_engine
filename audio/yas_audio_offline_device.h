@@ -23,7 +23,8 @@ struct offline_device : io_device {
 
     [[nodiscard]] std::optional<interruptor_ptr> const &interruptor() const override;
 
-    [[nodiscard]] chaining::chain_unsync_t<io_device::method> io_device_chain() override;
+    [[nodiscard]] observing::canceller_ptr observe_io_device(
+        observing::caller<io_device::method>::handler_f &&) override;
 
     [[nodiscard]] offline_render_f render_handler() const;
     [[nodiscard]] std::optional<offline_completion_f> completion_handler() const;
@@ -37,7 +38,7 @@ struct offline_device : io_device {
     offline_render_f _render_handler;
     std::optional<offline_completion_f> _completion_handler;
 
-    chaining::notifier_ptr<io_device::method> _notifier = chaining::notifier<io_device::method>::make_shared();
+    observing::notifier_ptr<io_device::method> const _notifier = observing::notifier<io_device::method>::make_shared();
 
     offline_device(audio::format const &output_format, offline_render_f &&);
 

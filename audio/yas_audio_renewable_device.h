@@ -16,12 +16,13 @@ struct renewable_device : io_device {
     };
 
     using method_f = std::function<void(method const &)>;
-    using renewal_f = std::function<chaining::invalidatable_ptr(io_device_ptr const &, method_f const &)>;
+    using renewal_f = std::function<std::vector<chaining::invalidatable_ptr>(io_device_ptr const &, method_f const &)>;
 
     [[nodiscard]] std::optional<audio::format> input_format() const override;
     [[nodiscard]] std::optional<audio::format> output_format() const override;
 
-    [[nodiscard]] chaining::chain_unsync_t<io_device::method> io_device_chain() override;
+    [[nodiscard]] observing::canceller_ptr observe_io_device(
+        observing::caller<io_device::method>::handler_f &&) override;
 
     [[nodiscard]] static renewable_device_ptr make_shared(device_f const &, renewal_f const &);
 
@@ -29,8 +30,9 @@ struct renewable_device : io_device {
     device_f const _device_handler;
     renewal_f const _renewal_handler;
     audio::io_device_ptr _device;
-    chaining::notifier_ptr<audio::io_device::method> _notifier;
-    chaining::invalidatable_ptr _observer;
+    observing::notifier_ptr<io_device::method> const _notifier =
+        observing::notifier<audio::io_device::method>::make_shared();
+    std::vector<chaining::invalidatable_ptr> _observers;
 
     renewable_device(device_f const &, renewal_f const &);
 

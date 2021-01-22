@@ -36,7 +36,7 @@ struct mac_device::stream {
         change_info(std::vector<property_info> &&);
     };
 
-    using chaining_pair_t = std::pair<method, change_info>;
+    using observing_pair_t = std::pair<method, change_info>;
 
     struct args {
         AudioStreamID stream_id;
@@ -50,8 +50,7 @@ struct mac_device::stream {
     audio::format virtual_format() const;
     uint32_t starting_channel() const;
 
-    [[nodiscard]] chaining::chain_unsync_t<chaining_pair_t> chain() const;
-    [[nodiscard]] chaining::chain_relayed_unsync_t<change_info, chaining_pair_t> chain(method const) const;
+    [[nodiscard]] observing::canceller_ptr observe(observing::caller<observing_pair_t>::handler_f &&);
 
     bool operator==(stream const &) const;
     bool operator!=(stream const &) const;
@@ -63,7 +62,7 @@ struct mac_device::stream {
     std::weak_ptr<stream> _weak_stream;
     AudioStreamID _stream_id;
     AudioDeviceID _device_id;
-    chaining::notifier_ptr<chaining_pair_t> _notifier = chaining::notifier<chaining_pair_t>::make_shared();
+    observing::notifier_ptr<observing_pair_t> _notifier = observing::notifier<observing_pair_t>::make_shared();
 
     explicit stream(args &&args);
 

@@ -27,13 +27,11 @@ using namespace yas;
     auto promise = std::make_shared<std::promise<void>>();
     auto future = promise->get_future();
 
-    auto observer = converter_unit->load_state_chain()
-                        .perform([promise](auto const &state) {
-                            if (state == audio::avf_au::load_state::loaded) {
-                                promise->set_value();
-                            }
-                        })
-                        .sync();
+    auto canceller = converter_unit->observe_load_state([promise](auto const &state) {
+        if (state == audio::avf_au::load_state::loaded) {
+            promise->set_value();
+        }
+    });
 
     future.get();
 

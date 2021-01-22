@@ -122,18 +122,16 @@ audio::graph_io_ptr const &audio::graph::add_io(std::optional<io_device_ptr> con
         audio::io_ptr const raw_io = audio::io::make_shared(device);
         audio::graph_io_ptr const io = audio::graph_io::make_shared(raw_io);
 
-        this->_io_observer = raw_io->running_chain()
-                                 .perform([this](auto const &method) {
-                                     switch (method) {
-                                         case audio::io::running_method::will_start:
-                                             this->_setup_rendering();
-                                             break;
-                                         case audio::io::running_method::did_stop:
-                                             this->_dispose_rendering();
-                                             break;
-                                     }
-                                 })
-                                 .end();
+        this->_io_observer = raw_io->observe_running([this](auto const &method) {
+            switch (method) {
+                case audio::io::running_method::will_start:
+                    this->_setup_rendering();
+                    break;
+                case audio::io::running_method::did_stop:
+                    this->_dispose_rendering();
+                    break;
+            }
+        });
 
         this->_io = io;
     }

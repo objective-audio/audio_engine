@@ -17,11 +17,11 @@ audio::graph_avf_au_mixer::graph_avf_au_mixer()
                    .componentFlagsMask = 0,
                },
            .node_args = {.input_bus_count = std::numeric_limits<uint32_t>::max(), .output_bus_count = 1}})) {
-    this->_connections_observer =
-        this->raw_au->connection_chain()
-            .guard([](auto const &method) { return method == graph_avf_au::connection_method::will_update; })
-            .perform([this](auto const &) { this->_update_unit_mixer_connections(); })
-            .end();
+    this->_connections_canceller = this->raw_au->observe_connection([this](auto const &method) {
+        if (method == graph_avf_au::connection_method::will_update) {
+            this->_update_unit_mixer_connections();
+        }
+    });
 }
 
 void audio::graph_avf_au_mixer::set_output_volume(float const volume, uint32_t const bus_idx) {
