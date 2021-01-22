@@ -24,7 +24,7 @@ using namespace yas::audio;
     auto const device = std::make_shared<test::test_io_device>();
     auto const io = audio::io::make_shared(device);
 
-    std::vector<audio::io::device_chaining_pair_t> received;
+    std::vector<audio::io::device_observing_pair_t> received;
 
     auto observer = io->device_chain().perform([&received](auto const &pair) { received.push_back(pair); }).sync();
 
