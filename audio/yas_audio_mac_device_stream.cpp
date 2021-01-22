@@ -84,15 +84,8 @@ uint32_t audio::mac_device::stream::starting_channel() const {
     return 0;
 }
 
-chaining::chain_unsync_t<audio::mac_device::stream::chaining_pair_t> audio::mac_device::stream::chain() const {
-    return this->_notifier->chain();
-}
-
-chaining::chain_relayed_unsync_t<audio::mac_device::stream::change_info, audio::mac_device::stream::chaining_pair_t>
-audio::mac_device::stream::chain(method const method) const {
-    return this->_notifier->chain()
-        .guard([method](auto const &pair) { return pair.first == method; })
-        .to([](audio::mac_device::stream::chaining_pair_t const &pair) { return pair.second; });
+observing::canceller_ptr audio::mac_device::stream::observe(observing::caller<chaining_pair_t>::handler_f &&handler) {
+    return this->_notifier->observe(std::move(handler));
 }
 
 bool audio::mac_device::stream::operator==(stream const &rhs) const {
