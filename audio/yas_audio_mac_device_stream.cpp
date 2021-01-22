@@ -84,7 +84,7 @@ uint32_t audio::mac_device::stream::starting_channel() const {
     return 0;
 }
 
-observing::canceller_ptr audio::mac_device::stream::observe(observing::caller<chaining_pair_t>::handler_f &&handler) {
+observing::canceller_ptr audio::mac_device::stream::observe(observing::caller<observing_pair_t>::handler_f &&handler) {
     return this->_notifier->observe(std::move(handler));
 }
 
