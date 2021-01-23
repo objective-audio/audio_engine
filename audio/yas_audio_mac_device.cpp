@@ -13,6 +13,7 @@
 #include "yas_audio_renewable_device.h"
 
 using namespace yas;
+using namespace yas::audio;
 
 namespace yas::audio {
 
@@ -81,7 +82,7 @@ static CFStringRef _property_string(AudioObjectID const object_id, AudioObjectPr
 }
 
 static void _add_listener(AudioObjectID const object_id, AudioObjectPropertySelector const selector,
-                          AudioObjectPropertyScope const scope, audio::mac_device::listener_f const handler) {
+                          AudioObjectPropertyScope const scope, mac_device::listener_f const handler) {
     AudioObjectPropertyAddress const address = {
         .mSelector = selector, .mScope = scope, .mElement = kAudioObjectPropertyElementMaster};
 
@@ -112,7 +113,7 @@ struct mac_device_global {
         return mac_device_global::instance()._all_devices;
     }
 
-    static audio::mac_device::listener_f system_listener() {
+    static mac_device::listener_f system_listener() {
         return [](uint32_t const address_count, const AudioObjectPropertyAddress *const addresses) {
             update_all_devices();
 
@@ -182,7 +183,7 @@ struct mac_device_global {
 
 #pragma mark - property_info
 
-bool audio::mac_device::property_info::operator<(mac_device::property_info const &info) const {
+bool mac_device::property_info::operator<(mac_device::property_info const &info) const {
     if (this->property != info.property) {
         return this->property < info.property;
     }
@@ -204,7 +205,7 @@ bool audio::mac_device::property_info::operator<(mac_device::property_info const
 
 #pragma mark - global
 
-std::vector<audio::mac_device_ptr> audio::mac_device::all_devices() {
+std::vector<mac_device_ptr> mac_device::all_devices() {
     std::vector<mac_device_ptr> devices;
     for (auto &pair : mac_device_global::all_devices_map()) {
         devices.push_back(pair.second);
@@ -212,7 +213,7 @@ std::vector<audio::mac_device_ptr> audio::mac_device::all_devices() {
     return devices;
 }
 
-std::vector<audio::mac_device_ptr> audio::mac_device::output_devices() {
+std::vector<mac_device_ptr> mac_device::output_devices() {
     std::vector<mac_device_ptr> devices;
     for (auto &pair : mac_device_global::all_devices_map()) {
         if (pair.second->output_streams().size() > 0) {
@@ -222,7 +223,7 @@ std::vector<audio::mac_device_ptr> audio::mac_device::output_devices() {
     return devices;
 }
 
-std::vector<audio::mac_device_ptr> audio::mac_device::input_devices() {
+std::vector<mac_device_ptr> mac_device::input_devices() {
     std::vector<mac_device_ptr> devices;
     for (auto &pair : mac_device_global::all_devices_map()) {
         if (pair.second->input_streams().size() > 0) {
@@ -232,7 +233,7 @@ std::vector<audio::mac_device_ptr> audio::mac_device::input_devices() {
     return devices;
 }
 
-std::optional<audio::mac_device_ptr> audio::mac_device::default_system_output_device() {
+std::optional<mac_device_ptr> mac_device::default_system_output_device() {
     if (auto const data =
             _property_data<AudioDeviceID>(kAudioObjectSystemObject, kAudioHardwarePropertyDefaultSystemOutputDevice,
                                           kAudioObjectPropertyScopeGlobal)) {
@@ -244,7 +245,7 @@ std::optional<audio::mac_device_ptr> audio::mac_device::default_system_output_de
     return std::nullopt;
 }
 
-std::optional<audio::mac_device_ptr> audio::mac_device::default_output_device() {
+std::optional<mac_device_ptr> mac_device::default_output_device() {
     if (auto const data = _property_data<AudioDeviceID>(
             kAudioObjectSystemObject, kAudioHardwarePropertyDefaultOutputDevice, kAudioObjectPropertyScopeGlobal)) {
         auto iterator = mac_device_global::all_devices_map().find(*data->data());
@@ -255,7 +256,7 @@ std::optional<audio::mac_device_ptr> audio::mac_device::default_output_device() 
     return std::nullopt;
 }
 
-std::optional<audio::mac_device_ptr> audio::mac_device::default_input_device() {
+std::optional<mac_device_ptr> mac_device::default_input_device() {
     if (auto const data = _property_data<AudioDeviceID>(
             kAudioObjectSystemObject, kAudioHardwarePropertyDefaultInputDevice, kAudioObjectPropertyScopeGlobal)) {
         auto iterator = mac_device_global::all_devices_map().find(*data->data());
@@ -266,7 +267,7 @@ std::optional<audio::mac_device_ptr> audio::mac_device::default_input_device() {
     return std::nullopt;
 }
 
-audio::io_device_ptr audio::mac_device::renewable_default_output_device() {
+audio::io_device_ptr mac_device::renewable_default_output_device() {
     return audio::renewable_device::make_shared(
         []() {
             io_device_ptr result = nullptr;
@@ -291,7 +292,7 @@ audio::io_device_ptr audio::mac_device::renewable_default_output_device() {
         });
 }
 
-std::optional<audio::mac_device_ptr> audio::mac_device::device_for_id(AudioDeviceID const audio_device_id) {
+std::optional<mac_device_ptr> mac_device::device_for_id(AudioDeviceID const audio_device_id) {
     auto it = mac_device_global::all_devices_map().find(audio_device_id);
     if (it != mac_device_global::all_devices_map().end()) {
         return it->second;
@@ -299,7 +300,7 @@ std::optional<audio::mac_device_ptr> audio::mac_device::device_for_id(AudioDevic
     return std::nullopt;
 }
 
-std::optional<size_t> audio::mac_device::index_of_device(mac_device_ptr const &device) {
+std::optional<size_t> mac_device::index_of_device(mac_device_ptr const &device) {
     auto all_devices = mac_device::all_devices();
     auto it = std::find_if(all_devices.begin(), all_devices.end(), [&device](auto const &value) {
         return value->audio_device_id() == device->audio_device_id();
@@ -311,14 +312,14 @@ std::optional<size_t> audio::mac_device::index_of_device(mac_device_ptr const &d
     }
 }
 
-bool audio::mac_device::is_available_device(mac_device const &device) {
+bool mac_device::is_available_device(mac_device const &device) {
     auto it = mac_device_global::all_devices_map().find(device.audio_device_id());
     return it != mac_device_global::all_devices_map().end();
 }
 
 #pragma mark - main
 
-audio::mac_device::mac_device(AudioDeviceID const device_id)
+mac_device::mac_device(AudioDeviceID const device_id)
     : _input_format(std::nullopt), _output_format(std::nullopt), _audio_device_id(device_id) {
     this->_udpate_streams(kAudioObjectPropertyScopeInput);
     this->_udpate_streams(kAudioObjectPropertyScopeOutput);
@@ -345,23 +346,23 @@ audio::mac_device::mac_device(AudioDeviceID const device_id)
         ->add_to(this->_pool);
 }
 
-void audio::mac_device::_prepare(mac_device_ptr const &mac_device) {
+void mac_device::_prepare(mac_device_ptr const &mac_device) {
     this->_weak_mac_device = mac_device;
 }
 
-AudioDeviceID audio::mac_device::audio_device_id() const {
+AudioDeviceID mac_device::audio_device_id() const {
     return this->_audio_device_id;
 }
 
-std::string audio::mac_device::name() const {
+std::string mac_device::name() const {
     return to_string(_property_string(this->audio_device_id(), kAudioObjectPropertyName));
 }
 
-std::string audio::mac_device::manufacture() const {
+std::string mac_device::manufacture() const {
     return to_string(_property_string(this->audio_device_id(), kAudioObjectPropertyManufacturer));
 }
 
-std::vector<audio::mac_device::stream_ptr> audio::mac_device::input_streams() const {
+std::vector<mac_device::stream_ptr> mac_device::input_streams() const {
     std::vector<stream_ptr> streams;
     for (auto &pair : this->_input_streams_map) {
         streams.push_back(pair.second);
@@ -369,7 +370,7 @@ std::vector<audio::mac_device::stream_ptr> audio::mac_device::input_streams() co
     return streams;
 }
 
-std::vector<audio::mac_device::stream_ptr> audio::mac_device::output_streams() const {
+std::vector<mac_device::stream_ptr> mac_device::output_streams() const {
     std::vector<stream_ptr> streams;
     for (auto &pair : this->_output_streams_map) {
         streams.push_back(pair.second);
@@ -377,7 +378,7 @@ std::vector<audio::mac_device::stream_ptr> audio::mac_device::output_streams() c
     return streams;
 }
 
-double audio::mac_device::nominal_sample_rate() const {
+double mac_device::nominal_sample_rate() const {
     if (auto const data = _property_data<double>(audio_device_id(), kAudioDevicePropertyNominalSampleRate,
                                                  kAudioObjectPropertyScopeGlobal)) {
         return *data->data();
@@ -385,37 +386,36 @@ double audio::mac_device::nominal_sample_rate() const {
     return 0;
 }
 
-std::optional<audio::format> audio::mac_device::input_format() const {
+std::optional<audio::format> mac_device::input_format() const {
     return this->_input_format;
 }
 
-std::optional<audio::format> audio::mac_device::output_format() const {
+std::optional<audio::format> mac_device::output_format() const {
     return this->_output_format;
 }
 
-std::optional<audio::interruptor_ptr> const &audio::mac_device::interruptor() const {
+std::optional<audio::interruptor_ptr> const &mac_device::interruptor() const {
     static std::optional<interruptor_ptr> const _nullopt = std::nullopt;
     return _nullopt;
 }
 
-audio::io_core_ptr audio::mac_device::make_io_core() const {
+audio::io_core_ptr mac_device::make_io_core() const {
     return mac_io_core::make_shared(this->_weak_mac_device.lock());
 }
 
-observing::canceller_ptr audio::mac_device::observe(observing::caller<change_info>::handler_f &&handler) {
+observing::canceller_ptr mac_device::observe(observing::caller<change_info>::handler_f &&handler) {
     return this->_notifier->observe(std::move(handler));
 }
 
-observing::canceller_ptr audio::mac_device::observe_system(observing::caller<change_info>::handler_f &&handler) {
+observing::canceller_ptr mac_device::observe_system(observing::caller<change_info>::handler_f &&handler) {
     return audio::_system_notifier->observe(std::move(handler));
 }
 
-observing::canceller_ptr audio::mac_device::observe_io_device(
-    observing::caller<io_device::method>::handler_f &&handler) {
+observing::canceller_ptr mac_device::observe_io_device(observing::caller<io_device::method>::handler_f &&handler) {
     return this->_io_device_notifier->observe(std::move(handler));
 }
 
-audio::mac_device::listener_f audio::mac_device::_listener() {
+mac_device::listener_f mac_device::_listener() {
     AudioDeviceID const device_id = this->_audio_device_id;
 
     return [device_id](uint32_t const address_count, const AudioObjectPropertyAddress *const addresses) {
@@ -463,7 +463,7 @@ audio::mac_device::listener_f audio::mac_device::_listener() {
     };
 }
 
-void audio::mac_device::_udpate_streams(AudioObjectPropertyScope const scope) {
+void mac_device::_udpate_streams(AudioObjectPropertyScope const scope) {
     auto prev_streams =
         std::move((scope == kAudioObjectPropertyScopeInput) ? this->_input_streams_map : this->_output_streams_map);
     auto data = _property_data<AudioStreamID>(this->_audio_device_id, kAudioDevicePropertyStreams, scope);
@@ -476,13 +476,13 @@ void audio::mac_device::_udpate_streams(AudioObjectPropertyScope const scope) {
             } else {
                 new_streams.insert(std::make_pair(
                     stream_id,
-                    audio::mac_device::stream::make_shared({.stream_id = stream_id, .device_id = _audio_device_id})));
+                    mac_device::stream::make_shared({.stream_id = stream_id, .device_id = _audio_device_id})));
             }
         }
     }
 }
 
-void audio::mac_device::_update_format(AudioObjectPropertyScope const scope) {
+void mac_device::_update_format(AudioObjectPropertyScope const scope) {
     stream_ptr stream = nullptr;
 
     if (scope == kAudioObjectPropertyScopeInput) {
@@ -528,11 +528,11 @@ void audio::mac_device::_update_format(AudioObjectPropertyScope const scope) {
     }
 }
 
-bool audio::mac_device::operator==(mac_device const &rhs) const {
+bool mac_device::operator==(mac_device const &rhs) const {
     return this->audio_device_id() == rhs.audio_device_id();
 }
 
-bool audio::mac_device::operator!=(mac_device const &rhs) const {
+bool mac_device::operator!=(mac_device const &rhs) const {
     return !(*this == rhs);
 }
 

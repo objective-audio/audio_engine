@@ -11,10 +11,11 @@
 #include "yas_audio_rendering_connection.h"
 
 using namespace yas;
+using namespace yas::audio;
 
 #pragma mark - main
 
-audio::graph_route::graph_route()
+graph_route::graph_route()
     : node(graph_node::make_shared({.input_bus_count = std::numeric_limits<uint32_t>::max(),
                                     .output_bus_count = std::numeric_limits<uint32_t>::max()})) {
     auto const manageable_node = manageable_graph_node::cast(this->node);
@@ -45,62 +46,62 @@ audio::graph_route::graph_route()
     manageable_node->set_will_reset_handler([this] { this->_will_reset(); });
 }
 
-audio::graph_route::~graph_route() = default;
+graph_route::~graph_route() = default;
 
-audio::route_set_t const &audio::graph_route::routes() const {
+route_set_t const &graph_route::routes() const {
     return _routes;
 }
 
-void audio::graph_route::add_route(audio::route route) {
+void graph_route::add_route(route route) {
     this->_erase_route_if_either_matched(route);
     this->_routes.insert(std::move(route));
     this->_update_rendering();
 }
 
-void audio::graph_route::remove_route(audio::route const &route) {
+void graph_route::remove_route(route const &route) {
     this->_routes.erase(route);
     this->_update_rendering();
 }
 
-void audio::graph_route::remove_route_for_source(audio::route::point const &src_pt) {
-    this->_erase_route_if([&src_pt](audio::route const &route_of_set) { return route_of_set.source == src_pt; });
+void graph_route::remove_route_for_source(route::point const &src_pt) {
+    this->_erase_route_if([&src_pt](route const &route_of_set) { return route_of_set.source == src_pt; });
     this->_update_rendering();
 }
 
-void audio::graph_route::remove_route_for_destination(audio::route::point const &dst_pt) {
-    this->_erase_route_if([&dst_pt](audio::route const &route_of_set) { return route_of_set.destination == dst_pt; });
+void graph_route::remove_route_for_destination(route::point const &dst_pt) {
+    this->_erase_route_if([&dst_pt](route const &route_of_set) { return route_of_set.destination == dst_pt; });
     this->_update_rendering();
 }
 
-void audio::graph_route::set_routes(route_set_t routes) {
+void graph_route::set_routes(route_set_t routes) {
     this->_routes.clear();
     this->_routes = std::move(routes);
     this->_update_rendering();
 }
 
-void audio::graph_route::clear_routes() {
+void graph_route::clear_routes() {
     this->_routes.clear();
     this->_update_rendering();
 }
 
-void audio::graph_route::_will_reset() {
+void graph_route::_will_reset() {
     this->_routes.clear();
 }
 
-void audio::graph_route::_erase_route_if_either_matched(audio::route const &route) {
+void graph_route::_erase_route_if_either_matched(route const &route) {
     this->_erase_route_if([&route](audio::route const &route_of_set) {
         return route_of_set.source == route.source || route_of_set.destination == route.destination;
     });
 }
 
-void audio::graph_route::_erase_route_if(std::function<bool(audio::route const &)> pred) {
+void graph_route::_erase_route_if(std::function<bool(route const &)> pred) {
     erase_if(this->_routes, pred);
 }
 
-void audio::graph_route::_update_rendering() {
+void graph_route::_update_rendering() {
     renderable_graph_node::cast(this->node)->update_rendering();
 }
 
-audio::graph_route_ptr audio::graph_route::make_shared() {
+graph_route_ptr graph_route::make_shared() {
     return graph_route_ptr(new graph_route{});
 }

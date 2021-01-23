@@ -7,42 +7,42 @@
 #include "yas_audio_offline_io_core.h"
 
 using namespace yas;
+using namespace yas::audio;
 
-audio::offline_device::offline_device(audio::format const &output_format, offline_render_f &&render_handler)
+offline_device::offline_device(format const &output_format, offline_render_f &&render_handler)
     : _output_format(output_format), _render_handler(std::move(render_handler)) {
 }
 
-std::optional<audio::format> audio::offline_device::input_format() const {
+std::optional<format> offline_device::input_format() const {
     return std::nullopt;
 }
 
-std::optional<audio::format> audio::offline_device::output_format() const {
+std::optional<format> offline_device::output_format() const {
     return this->_output_format;
 }
 
-audio::io_core_ptr audio::offline_device::make_io_core() const {
+io_core_ptr offline_device::make_io_core() const {
     return offline_io_core::make_shared(this->_weak_device.lock());
 }
 
-std::optional<audio::interruptor_ptr> const &audio::offline_device::interruptor() const {
-    static std::optional<audio::interruptor_ptr> const _null_interruptor = std::nullopt;
+std::optional<interruptor_ptr> const &offline_device::interruptor() const {
+    static std::optional<interruptor_ptr> const _null_interruptor = std::nullopt;
     return _null_interruptor;
 }
 
-observing::canceller_ptr audio::offline_device::observe_io_device(
-    observing::caller<io_device::method>::handler_f &&handler) {
+observing::canceller_ptr offline_device::observe_io_device(observing::caller<io_device::method>::handler_f &&handler) {
     return this->_notifier->observe(std::move(handler));
 }
 
-audio::offline_render_f audio::offline_device::render_handler() const {
+offline_render_f offline_device::render_handler() const {
     return this->_render_handler;
 }
 
-std::optional<audio::offline_completion_f> audio::offline_device::completion_handler() const {
+std::optional<offline_completion_f> offline_device::completion_handler() const {
     return this->_completion_handler;
 }
 
-void audio::offline_device::_prepare(offline_device_ptr const &device, offline_completion_f &&completion_handler) {
+void offline_device::_prepare(offline_device_ptr const &device, offline_completion_f &&completion_handler) {
     this->_weak_device = device;
 
     this->_completion_handler = [weak_device = this->_weak_device, completion_handler = std::move(completion_handler),
@@ -59,9 +59,8 @@ void audio::offline_device::_prepare(offline_device_ptr const &device, offline_c
     };
 }
 
-audio::offline_device_ptr audio::offline_device::make_shared(audio::format const &output_format,
-                                                             offline_render_f &&render_handler,
-                                                             offline_completion_f &&completion_handler) {
+offline_device_ptr offline_device::make_shared(format const &output_format, offline_render_f &&render_handler,
+                                               offline_completion_f &&completion_handler) {
     auto shared = offline_device_ptr{new offline_device{output_format, std::move(render_handler)}};
     shared->_prepare(shared, std::move(completion_handler));
     return shared;

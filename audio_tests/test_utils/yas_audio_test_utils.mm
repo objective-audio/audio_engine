@@ -5,10 +5,11 @@
 #include "yas_audio_test_utils.h"
 
 using namespace yas;
+using namespace yas::audio;
 
 namespace yas::test::internal {
 template <typename T>
-bool is_filled_buffer(audio::pcm_buffer const &buffer) {
+bool is_filled_buffer(pcm_buffer const &buffer) {
     auto each = audio::make_each_data<T>(buffer);
     while (yas_each_data_next(each)) {
         if (yas_each_data_value(each) == 0) {
@@ -19,7 +20,7 @@ bool is_filled_buffer(audio::pcm_buffer const &buffer) {
 }
 
 template <typename T>
-T const *data_ptr_from_buffer(audio::pcm_buffer const &buffer, uint32_t const channel, uint32_t const frame) {
+T const *data_ptr_from_buffer(pcm_buffer const &buffer, uint32_t const channel, uint32_t const frame) {
     auto each_data = audio::make_each_data<T>(buffer);
     auto each_frame = make_fast_each(frame + 1);
     while (yas_each_next(each_frame)) {
@@ -37,7 +38,7 @@ uint32_t test::test_value(uint32_t const frame, uint32_t const ch_idx, uint32_t 
     return frame + 1024 * (ch_idx + 1) + 512 * (buf_idx + 1);
 }
 
-void test::fill_test_values_to_buffer(audio::pcm_buffer &buffer) {
+void test::fill_test_values_to_buffer(pcm_buffer &buffer) {
     auto const &format = buffer.format();
     audio::pcm_format const pcmFormat = format.pcm_format();
     uint32_t const buffer_count = format.buffer_count();
@@ -73,7 +74,7 @@ void test::fill_test_values_to_buffer(audio::pcm_buffer &buffer) {
     }
 }
 
-bool test::is_cleared_buffer(audio::pcm_buffer const &buffer) {
+bool test::is_cleared_buffer(pcm_buffer const &buffer) {
     AudioBufferList const *abl = buffer.audio_buffer_list();
 
     for (uint32_t buf_idx = 0; buf_idx < abl->mNumberBuffers; buf_idx++) {
@@ -88,7 +89,7 @@ bool test::is_cleared_buffer(audio::pcm_buffer const &buffer) {
     return true;
 }
 
-bool test::is_filled_buffer(audio::pcm_buffer const &buffer) {
+bool test::is_filled_buffer(pcm_buffer const &buffer) {
     switch (buffer.format().pcm_format()) {
         case audio::pcm_format::float32:
             return internal::is_filled_buffer<float>(buffer);
@@ -104,7 +105,7 @@ bool test::is_filled_buffer(audio::pcm_buffer const &buffer) {
     }
 }
 
-bool test::is_equal_buffer_flexibly(audio::pcm_buffer const &buffer1, audio::pcm_buffer const &buffer2) {
+bool test::is_equal_buffer_flexibly(pcm_buffer const &buffer1, pcm_buffer const &buffer2) {
     if (buffer1.format().channel_count() != buffer2.format().channel_count()) {
         return NO;
     }
@@ -153,8 +154,7 @@ bool test::is_equal(AudioTimeStamp const *const ts1, AudioTimeStamp const *const
     }
 }
 
-uint8_t const *test::data_ptr_from_buffer(audio::pcm_buffer const &buffer, uint32_t const channel,
-                                          uint32_t const frame) {
+uint8_t const *test::data_ptr_from_buffer(pcm_buffer const &buffer, uint32_t const channel, uint32_t const frame) {
     switch (buffer.format().pcm_format()) {
         case audio::pcm_format::float32:
             return (uint8_t const *)internal::data_ptr_from_buffer<float>(buffer, channel, frame);

@@ -8,6 +8,7 @@
 #include "yas_audio_exception.h"
 
 using namespace yas;
+using namespace yas::audio;
 
 AudioFileTypeID audio::to_audio_file_type_id(audio::file_type const file_type) {
     switch (file_type) {
@@ -148,7 +149,7 @@ static Boolean get_audio_file_format(AudioStreamBasicDescription *asbd, AudioFil
 
 #pragma mark - ext audio file
 
-Boolean audio::ext_audio_file_utils::can_open(CFURLRef const url) {
+Boolean ext_audio_file_utils::can_open(CFURLRef const url) {
     Boolean result = true;
     AudioFileID file_id;
     AudioStreamBasicDescription asbd;
@@ -163,25 +164,24 @@ Boolean audio::ext_audio_file_utils::can_open(CFURLRef const url) {
     return result;
 }
 
-Boolean audio::ext_audio_file_utils::open(ExtAudioFileRef *ext_audio_file, CFURLRef const url) {
+Boolean ext_audio_file_utils::open(ExtAudioFileRef *ext_audio_file, CFURLRef const url) {
     OSStatus err = ExtAudioFileOpenURL(url, ext_audio_file);
     return err == noErr;
 }
 
-Boolean audio::ext_audio_file_utils::create(ExtAudioFileRef *extAudioFile, CFURLRef const url,
-                                            AudioFileTypeID const file_type_id,
-                                            AudioStreamBasicDescription const &asbd) {
+Boolean ext_audio_file_utils::create(ExtAudioFileRef *extAudioFile, CFURLRef const url,
+                                     AudioFileTypeID const file_type_id, AudioStreamBasicDescription const &asbd) {
     OSStatus err = ExtAudioFileCreateWithURL(url, file_type_id, &asbd, NULL, kAudioFileFlags_EraseFile, extAudioFile);
     return err == noErr;
 }
 
-Boolean audio::ext_audio_file_utils::dispose(ExtAudioFileRef const ext_audio_file) {
+Boolean ext_audio_file_utils::dispose(ExtAudioFileRef const ext_audio_file) {
     OSStatus err = ExtAudioFileDispose(ext_audio_file);
     return err == noErr;
 }
 
-Boolean audio::ext_audio_file_utils::set_client_format(AudioStreamBasicDescription const &asbd,
-                                                       ExtAudioFileRef const ext_audio_file) {
+Boolean ext_audio_file_utils::set_client_format(AudioStreamBasicDescription const &asbd,
+                                                ExtAudioFileRef const ext_audio_file) {
     uint32_t size = sizeof(AudioStreamBasicDescription);
     OSStatus err = noErr;
     raise_if_raw_audio_error(
@@ -189,8 +189,8 @@ Boolean audio::ext_audio_file_utils::set_client_format(AudioStreamBasicDescripti
     return err == noErr;
 }
 
-Boolean audio::ext_audio_file_utils::get_audio_file_format(AudioStreamBasicDescription *asbd,
-                                                           ExtAudioFileRef const ext_audio_file) {
+Boolean ext_audio_file_utils::get_audio_file_format(AudioStreamBasicDescription *asbd,
+                                                    ExtAudioFileRef const ext_audio_file) {
     UInt32 size = sizeof(AudioStreamBasicDescription);
     OSStatus err = noErr;
     raise_if_raw_audio_error(
@@ -198,14 +198,14 @@ Boolean audio::ext_audio_file_utils::get_audio_file_format(AudioStreamBasicDescr
     return err == noErr;
 }
 
-AudioFileID audio::ext_audio_file_utils::get_audio_file_id(ExtAudioFileRef const ext_audio_file) {
+AudioFileID ext_audio_file_utils::get_audio_file_id(ExtAudioFileRef const ext_audio_file) {
     UInt32 size = sizeof(AudioFileID);
     AudioFileID file_id = 0;
     raise_if_raw_audio_error(ExtAudioFileGetProperty(ext_audio_file, kExtAudioFileProperty_AudioFile, &size, &file_id));
     return file_id;
 }
 
-int64_t audio::ext_audio_file_utils::get_file_length_frames(ExtAudioFileRef const ext_audio_file) {
+int64_t ext_audio_file_utils::get_file_length_frames(ExtAudioFileRef const ext_audio_file) {
     int64_t result = 0;
     UInt32 size = sizeof(int64_t);
     raise_if_raw_audio_error(
@@ -213,7 +213,7 @@ int64_t audio::ext_audio_file_utils::get_file_length_frames(ExtAudioFileRef cons
     return result;
 }
 
-AudioFileTypeID audio::ext_audio_file_utils::get_audio_file_type_id(ExtAudioFileRef const ext_audio_file) {
+AudioFileTypeID ext_audio_file_utils::get_audio_file_type_id(ExtAudioFileRef const ext_audio_file) {
     AudioFileID file_id = get_audio_file_id(ext_audio_file);
     return audio_file_utils::get_audio_file_type_id(file_id);
 }

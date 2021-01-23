@@ -7,12 +7,13 @@
 #include "yas_audio_rendering_connection.h"
 
 using namespace yas;
+using namespace yas::audio;
 
-audio::rendering_node::rendering_node(node_render_f const &handler, rendering_connection_map &&connections)
+rendering_node::rendering_node(node_render_f const &handler, rendering_connection_map &&connections)
     : render_handler(handler), source_connections(std::move(connections)) {
 }
 
-bool audio::rendering_node::output_render(pcm_buffer *const buffer, audio::time const &time) const {
+bool rendering_node::output_render(pcm_buffer *const buffer, time const &time) const {
     if (!buffer || this->source_connections.empty()) {
         return false;
     }
@@ -23,7 +24,7 @@ bool audio::rendering_node::output_render(pcm_buffer *const buffer, audio::time 
     return connection.render(buffer, time);
 }
 
-bool audio::rendering_node::input_render(pcm_buffer *const buffer, audio::time const &time) const {
+bool rendering_node::input_render(pcm_buffer *const buffer, time const &time) const {
     if (!buffer || this->source_connections.empty()) {
         return false;
     }
@@ -42,22 +43,22 @@ bool audio::rendering_node::input_render(pcm_buffer *const buffer, audio::time c
 
 #pragma mark - rendering_output_node
 
-audio::rendering_output_node::rendering_output_node(std::vector<std::unique_ptr<rendering_node>> &&nodes,
-                                                    rendering_connection &&connection)
+rendering_output_node::rendering_output_node(std::vector<std::unique_ptr<rendering_node>> &&nodes,
+                                             rendering_connection &&connection)
     : source_nodes(std::move(nodes)), source_connection(std::move(connection)) {
 }
 
-bool audio::rendering_output_node::render(pcm_buffer *const buffer, audio::time const &time) const {
+bool rendering_output_node::render(pcm_buffer *const buffer, time const &time) const {
     return this->source_connection.render(buffer, time);
 }
 
 #pragma mark - rendering_input_node
 
-audio::rendering_input_node::rendering_input_node(audio::format const &format, node_render_f const &handler)
+rendering_input_node::rendering_input_node(audio::format const &format, node_render_f const &handler)
     : format(format), _render_handler(handler) {
 }
 
-bool audio::rendering_input_node::render(pcm_buffer *const buffer, audio::time const &time) const {
+bool rendering_input_node::render(pcm_buffer *const buffer, time const &time) const {
     if (!buffer) {
         return false;
     }

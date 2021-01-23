@@ -14,10 +14,10 @@
 #include "yas_audio_ios_device.h"
 
 using namespace yas;
+using namespace yas::audio;
 
 namespace yas::audio {
-static void log_formats(std::string const &prefix, AVAudioFormat const *node_format,
-                        audio::format const &device_format) {
+static void log_formats(std::string const &prefix, AVAudioFormat const *node_format, format const &device_format) {
     std::ostringstream stream;
     stream << prefix << " - ";
     stream << "node [sample_rate: " << node_format.sampleRate << ", channel_count: " << node_format.channelCount << "]";
@@ -28,34 +28,34 @@ static void log_formats(std::string const &prefix, AVAudioFormat const *node_for
 }
 }
 
-struct audio::ios_io_core::impl {
+struct ios_io_core::impl {
     std::optional<objc_ptr<AVAudioEngine *>> _avf_engine = std::nullopt;
     std::optional<objc_ptr<AVAudioSourceNode *>> _source_node = std::nullopt;
     std::optional<objc_ptr<AVAudioSinkNode *>> _sink_node = std::nullopt;
 };
 
-audio::ios_io_core::ios_io_core(ios_device_ptr const &device) : _device(device), _impl(std::make_unique<impl>()) {
+ios_io_core::ios_io_core(ios_device_ptr const &device) : _device(device), _impl(std::make_unique<impl>()) {
 }
 
-audio::ios_io_core::~ios_io_core() {
+ios_io_core::~ios_io_core() {
     this->stop();
 }
 
-void audio::ios_io_core::set_render_handler(std::optional<io_render_f> handler) {
+void ios_io_core::set_render_handler(std::optional<io_render_f> handler) {
     if (this->_render_handler || handler) {
         this->_render_handler = std::move(handler);
         this->_reload_if_needed();
     }
 }
 
-void audio::ios_io_core::set_maximum_frames_per_slice(uint32_t const frames) {
+void ios_io_core::set_maximum_frames_per_slice(uint32_t const frames) {
     if (this->_maximum_frames != frames) {
         this->_maximum_frames = frames;
         this->_reload_if_needed();
     }
 }
 
-bool audio::ios_io_core::start() {
+bool ios_io_core::start() {
     if (this->_is_started) {
         return true;
     }
@@ -66,13 +66,13 @@ bool audio::ios_io_core::start() {
     return this->_start_engine();
 }
 
-void audio::ios_io_core::stop() {
+void ios_io_core::stop() {
     this->_stop_engine();
     this->_dispose_engine();
     this->_is_started = false;
 }
 
-audio::io_kernel_ptr audio::ios_io_core::_make_kernel() const {
+io_kernel_ptr ios_io_core::_make_kernel() const {
     auto const &output_format = this->_device->output_format();
     auto const &input_format = this->_device->input_format();
 
@@ -92,7 +92,7 @@ audio::io_kernel_ptr audio::ios_io_core::_make_kernel() const {
                                   output_format.has_value() ? output_format : std::nullopt, this->_maximum_frames);
 }
 
-void audio::ios_io_core::_create_engine() {
+void ios_io_core::_create_engine() {
     if (this->_impl->_avf_engine) {
         return;
     }
@@ -226,7 +226,7 @@ void audio::ios_io_core::_create_engine() {
     }
 }
 
-void audio::ios_io_core::_dispose_engine() {
+void ios_io_core::_dispose_engine() {
     if (auto const &engine_opt = this->_impl->_avf_engine) {
         auto const &engine = engine_opt.value();
 
@@ -252,7 +252,7 @@ void audio::ios_io_core::_dispose_engine() {
     }
 }
 
-bool audio::ios_io_core::_start_engine() {
+bool ios_io_core::_start_engine() {
     if (!this->_device->output_format().has_value() && !this->_device->input_format().has_value()) {
         return false;
     }
@@ -285,13 +285,13 @@ bool audio::ios_io_core::_start_engine() {
     }
 }
 
-void audio::ios_io_core::_stop_engine() {
+void ios_io_core::_stop_engine() {
     if (auto const &engine = this->_impl->_avf_engine) {
         [engine.value().object() stop];
     }
 }
 
-void audio::ios_io_core::_reload_if_needed() {
+void ios_io_core::_reload_if_needed() {
     bool const is_started = this->_is_started;
 
     if (is_started) {
@@ -300,7 +300,7 @@ void audio::ios_io_core::_reload_if_needed() {
     }
 }
 
-audio::ios_io_core_ptr audio::ios_io_core::make_shared(ios_device_ptr const &device) {
+ios_io_core_ptr ios_io_core::make_shared(ios_device_ptr const &device) {
     return std::shared_ptr<ios_io_core>(new ios_io_core{device});
 }
 

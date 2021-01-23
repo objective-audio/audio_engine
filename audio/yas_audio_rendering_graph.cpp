@@ -9,6 +9,7 @@
 #include <cpp_utils/yas_stl_utils.h>
 
 using namespace yas;
+using namespace yas::audio;
 
 namespace yas::audio {
 
@@ -95,15 +96,15 @@ std::unique_ptr<rendering_input_node> make_rendering_input_node(renderable_graph
 }
 }  // namespace yas::audio
 
-audio::rendering_graph::rendering_graph(renderable_graph_node_ptr const &output_node,
-                                        renderable_graph_node_ptr const &input_node)
+rendering_graph::rendering_graph(renderable_graph_node_ptr const &output_node,
+                                 renderable_graph_node_ptr const &input_node)
     : _output_node(make_rendering_output_node(output_node)), _input_node(make_rendering_input_node(input_node)) {
 }
 
-audio::rendering_output_node const *audio::rendering_graph::output_node() const {
+rendering_output_node const *rendering_graph::output_node() const {
     return this->_output_node ? this->_output_node.get() : nullptr;
 }
 
-audio::rendering_input_node const *audio::rendering_graph::input_node() const {
+rendering_input_node const *rendering_graph::input_node() const {
     return this->_input_node ? this->_input_node.get() : nullptr;
 }

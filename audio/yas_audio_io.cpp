@@ -9,8 +9,9 @@
 #include "yas_audio_io_kernel.h"
 
 using namespace yas;
+using namespace yas::audio;
 
-audio::io::io(std::optional<io_device_ptr> const &device) {
+io::io(std::optional<io_device_ptr> const &device) {
     this->_device_fetcher = observing::fetcher<device_observing_pair_t>::make_shared([this]() {
         return device_observing_pair_t{device_method::initial, this->_device};
     });
@@ -18,11 +19,11 @@ audio::io::io(std::optional<io_device_ptr> const &device) {
     this->set_device(device);
 }
 
-audio::io::~io() {
+io::~io() {
     this->_uninitialize();
 }
 
-void audio::io::_initialize() {
+void io::_initialize() {
     if (auto const &device = this->_device) {
         auto io_core = device.value()->make_io_core();
         this->_io_core = io_core;
@@ -31,7 +32,7 @@ void audio::io::_initialize() {
     }
 }
 
-void audio::io::_uninitialize() {
+void io::_uninitialize() {
     this->stop();
 
     if (auto const &io_core = this->_io_core) {
@@ -39,7 +40,7 @@ void audio::io::_uninitialize() {
     }
 }
 
-void audio::io::set_device(std::optional<io_device_ptr> const &device) {
+void io::set_device(std::optional<io_device_ptr> const &device) {
     if (this->_device != device) {
         bool const is_running = this->_is_running;
 
@@ -80,22 +81,22 @@ void audio::io::set_device(std::optional<io_device_ptr> const &device) {
     }
 }
 
-std::optional<audio::io_device_ptr> const &audio::io::device() const {
+std::optional<audio::io_device_ptr> const &io::device() const {
     return this->_device;
 }
 
-bool audio::io::is_running() const {
+bool io::is_running() const {
     return this->_is_running;
 }
 
-bool audio::io::is_interrupting() const {
+bool io::is_interrupting() const {
     if (auto const &device = this->_device) {
         return device.value()->is_interrupting();
     }
     return false;
 }
 
-void audio::io::set_render_handler(std::optional<io_render_f> handler) {
+void io::set_render_handler(std::optional<io_render_f> handler) {
     this->_render_handler = std::move(handler);
 
     if (auto const &io_core = this->_io_core) {
@@ -103,7 +104,7 @@ void audio::io::set_render_handler(std::optional<io_render_f> handler) {
     }
 }
 
-void audio::io::set_maximum_frames_per_slice(uint32_t const frames) {
+void io::set_maximum_frames_per_slice(uint32_t const frames) {
     this->_maximum_frames = frames;
 
     if (auto const &io_core = this->_io_core) {
@@ -111,11 +112,11 @@ void audio::io::set_maximum_frames_per_slice(uint32_t const frames) {
     }
 }
 
-uint32_t audio::io::maximum_frames_per_slice() const {
+uint32_t io::maximum_frames_per_slice() const {
     return this->_maximum_frames;
 }
 
-void audio::io::start() {
+void io::start() {
     if (this->_is_running) {
         return;
     }
@@ -128,7 +129,7 @@ void audio::io::start() {
     this->_setup_interruption_observer();
 }
 
-void audio::io::stop() {
+void io::stop() {
     if (!this->_is_running) {
         return;
     }
@@ -141,16 +142,16 @@ void audio::io::stop() {
     this->_running_notifier->notify(running_method::did_stop);
 }
 
-observing::canceller_ptr audio::io::observe_running(std::function<void(running_method const &)> &&handler) {
+observing::canceller_ptr io::observe_running(std::function<void(running_method const &)> &&handler) {
     return this->_running_notifier->observe(std::move(handler));
 }
 
-observing::canceller_ptr audio::io::observe_device(observing::caller<device_observing_pair_t>::handler_f &&handler,
-                                                   bool const sync) {
+observing::canceller_ptr io::observe_device(observing::caller<device_observing_pair_t>::handler_f &&handler,
+                                            bool const sync) {
     return this->_device_fetcher->observe(std::move(handler), sync);
 }
 
-void audio::io::_reload() {
+void io::_reload() {
     bool const is_running = this->is_running();
 
     this->_uninitialize();
@@ -161,13 +162,13 @@ void audio::io::_reload() {
     }
 }
 
-void audio::io::_stop_io_core() {
+void io::_stop_io_core() {
     if (auto const &io_core = this->_io_core) {
         this->_io_core.value()->stop();
     }
 }
 
-void audio::io::_start_io_core() {
+void io::_start_io_core() {
     if (this->_is_running) {
         if (this->is_interrupting()) {
             return;
@@ -179,7 +180,7 @@ void audio::io::_start_io_core() {
     }
 }
 
-void audio::io::_setup_interruption_observer() {
+void io::_setup_interruption_observer() {
     if (auto const &device = this->_device) {
         this->_interruption_canceller = device.value()->observe_interruption([this](auto const &method) {
             switch (method) {
@@ -194,10 +195,10 @@ void audio::io::_setup_interruption_observer() {
     }
 }
 
-void audio::io::_dispose_interruption_observer() {
+void io::_dispose_interruption_observer() {
     this->_interruption_canceller = std::nullopt;
 }
 
-audio::io_ptr audio::io::make_shared(std::optional<io_device_ptr> const &device) {
+audio::io_ptr io::make_shared(std::optional<io_device_ptr> const &device) {
     return std::shared_ptr<io>(new io{device});
 }

@@ -11,6 +11,7 @@
 #include <string>
 
 using namespace yas;
+using namespace yas::audio;
 
 namespace yas::audio::time_utils {
 static AudioTimeStamp make_time_stamp_from_host_time(uint64_t const host_time) {
@@ -70,50 +71,50 @@ static double const &host_time_to_seconds_rate() {
 }
 }  // namespace yas::audio::time_utils
 
-audio::time::time(AudioTimeStamp const &time_stamp, double const sample_rate)
+time::time(AudioTimeStamp const &time_stamp, double const sample_rate)
     : _time_stamp(time_stamp), _sample_rate(sample_rate) {
 }
 
-audio::time::time(uint64_t const host_time) : _time_stamp(time_utils::make_time_stamp_from_host_time(host_time)) {
+time::time(uint64_t const host_time) : _time_stamp(time_utils::make_time_stamp_from_host_time(host_time)) {
 }
 
-audio::time::time(int64_t const sample_time, double const sample_rate)
+time::time(int64_t const sample_time, double const sample_rate)
     : _time_stamp(time_utils::make_time_stamp_from_sample_time(sample_time)), _sample_rate(sample_rate) {
 }
 
-audio::time::time(uint64_t const host_time, int64_t const sample_time, double const sample_rate)
+time::time(uint64_t const host_time, int64_t const sample_time, double const sample_rate)
     : _time_stamp(time_utils::make_time_stamp(host_time, sample_time)), _sample_rate(sample_rate) {
 }
 
-bool audio::time::is_host_time_valid() const {
+bool time::is_host_time_valid() const {
     return this->_time_stamp.mFlags | kAudioTimeStampHostTimeValid;
 }
 
-uint64_t audio::time::host_time() const {
+uint64_t time::host_time() const {
     return this->_time_stamp.mHostTime;
 }
 
-bool audio::time::is_sample_time_valid() const {
+bool time::is_sample_time_valid() const {
     return this->_time_stamp.mFlags | kAudioTimeStampSampleTimeValid;
 }
 
-int64_t audio::time::sample_time() const {
+int64_t time::sample_time() const {
     return this->_time_stamp.mSampleTime;
 }
 
-double audio::time::sample_rate() const {
+double time::sample_rate() const {
     return this->_sample_rate;
 }
 
-AudioTimeStamp audio::time::audio_time_stamp() const {
+AudioTimeStamp time::audio_time_stamp() const {
     return this->_time_stamp;
 }
 
-bool audio::time::operator==(time const &rhs) const {
+bool time::operator==(time const &rhs) const {
     return time_utils::is_equal(this->_time_stamp, rhs._time_stamp) && this->_sample_rate == rhs._sample_rate;
 }
 
-bool audio::time::operator!=(time const &rhs) const {
+bool time::operator!=(time const &rhs) const {
     return !(*this == rhs);
 }
 

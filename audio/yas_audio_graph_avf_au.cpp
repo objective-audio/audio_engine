@@ -11,8 +11,9 @@
 #include "yas_audio_time.h"
 
 using namespace yas;
+using namespace yas::audio;
 
-audio::graph_avf_au::graph_avf_au(graph_node_args &&args, AudioComponentDescription const &acd)
+graph_avf_au::graph_avf_au(graph_node_args &&args, AudioComponentDescription const &acd)
     : node(graph_node::make_shared(std::move(args))), raw_au(audio::avf_au::make_shared(acd)) {
     auto const manageable_node = manageable_graph_node::cast(this->node);
 
@@ -35,35 +36,34 @@ audio::graph_avf_au::graph_avf_au(graph_node_args &&args, AudioComponentDescript
     manageable_node->set_teardown_handler([this]() { this->_uninitialize_raw_au(); });
 }
 
-audio::graph_avf_au::~graph_avf_au() = default;
+graph_avf_au::~graph_avf_au() = default;
 
-audio::graph_avf_au::load_state audio::graph_avf_au::state() const {
+graph_avf_au::load_state graph_avf_au::state() const {
     return this->raw_au->state();
 }
 
-void audio::graph_avf_au::_initialize_raw_au() {
+void graph_avf_au::_initialize_raw_au() {
     this->raw_au->initialize();
 }
 
-void audio::graph_avf_au::_uninitialize_raw_au() {
+void graph_avf_au::_uninitialize_raw_au() {
     this->raw_au->uninitialize();
 }
 
-observing::canceller_ptr audio::graph_avf_au::observe_load_state(observing::caller<load_state>::handler_f &&handler,
-                                                                 bool const sync) {
+observing::canceller_ptr graph_avf_au::observe_load_state(observing::caller<load_state>::handler_f &&handler,
+                                                          bool const sync) {
     return this->raw_au->observe_load_state(std::move(handler), sync);
 }
 
-observing::canceller_ptr audio::graph_avf_au::observe_connection(
-    observing::caller<connection_method>::handler_f &&handler) {
+observing::canceller_ptr graph_avf_au::observe_connection(observing::caller<connection_method>::handler_f &&handler) {
     return this->_connection_notifier->observe(std::move(handler));
 }
 
-void audio::graph_avf_au::_will_reset() {
+void graph_avf_au::_will_reset() {
     this->raw_au->reset();
 }
 
-void audio::graph_avf_au::_update_unit_connections() {
+void graph_avf_au::_update_unit_connections() {
     auto const &raw_au = this->raw_au;
 
     bool const is_initialized = raw_au->is_initialized();
@@ -104,7 +104,7 @@ void audio::graph_avf_au::_update_unit_connections() {
     }
 }
 
-audio::graph_avf_au_ptr audio::graph_avf_au::make_shared(OSType const type, OSType const sub_type) {
+graph_avf_au_ptr graph_avf_au::make_shared(OSType const type, OSType const sub_type) {
     return graph_avf_au::make_shared(AudioComponentDescription{
         .componentType = type,
         .componentSubType = sub_type,
@@ -114,10 +114,10 @@ audio::graph_avf_au_ptr audio::graph_avf_au::make_shared(OSType const type, OSTy
     });
 }
 
-audio::graph_avf_au_ptr audio::graph_avf_au::make_shared(AudioComponentDescription const &acd) {
+graph_avf_au_ptr graph_avf_au::make_shared(AudioComponentDescription const &acd) {
     return graph_avf_au::make_shared({.acd = acd, .node_args = {.input_bus_count = 1, .output_bus_count = 1}});
 }
 
-audio::graph_avf_au_ptr audio::graph_avf_au::make_shared(graph_avf_au::args &&args) {
+graph_avf_au_ptr graph_avf_au::make_shared(graph_avf_au::args &&args) {
     return graph_avf_au_ptr(new graph_avf_au{std::move(args.node_args), args.acd});
 }

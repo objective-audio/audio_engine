@@ -10,6 +10,7 @@
 #include "yas_audio_exception.h"
 
 using namespace yas;
+using namespace yas::audio;
 
 #pragma mark - private
 
@@ -33,7 +34,7 @@ static AudioStreamBasicDescription const empty_asbd = {0};
 
 #pragma mark - main
 
-audio::format::format(AudioStreamBasicDescription asbd) : _asbd(std::move(asbd)) {
+format::format(AudioStreamBasicDescription asbd) : _asbd(std::move(asbd)) {
     this->_asbd.mReserved = 0;
 
     if (asbd.mFormatID == kAudioFormatLinearPCM) {
@@ -41,9 +42,9 @@ audio::format::format(AudioStreamBasicDescription asbd) : _asbd(std::move(asbd))
             ((asbd.mFormatFlags & kAudioFormatFlagIsBigEndian) == kAudioFormatFlagsNativeEndian) &&
             (asbd.mFormatFlags & kAudioFormatFlagIsPacked)) {
             if (asbd.mBitsPerChannel == 64) {
-                this->_pcm_format = audio::pcm_format::float64;
+                this->_pcm_format = pcm_format::float64;
             } else if (asbd.mBitsPerChannel == 32) {
-                this->_pcm_format = audio::pcm_format::float32;
+                this->_pcm_format = pcm_format::float32;
                 if (asbd.mFormatFlags & kAudioFormatFlagIsNonInterleaved) {
                     this->_standard = true;
                 }
@@ -54,88 +55,88 @@ audio::format::format(AudioStreamBasicDescription asbd) : _asbd(std::move(asbd))
             uint32_t fraction = (asbd.mFormatFlags & kLinearPCMFormatFlagsSampleFractionMask) >>
                                 kLinearPCMFormatFlagsSampleFractionShift;
             if (asbd.mBitsPerChannel == 32 && fraction == 24) {
-                this->_pcm_format = audio::pcm_format::fixed824;
+                this->_pcm_format = pcm_format::fixed824;
             } else if (asbd.mBitsPerChannel == 16) {
-                this->_pcm_format = audio::pcm_format::int16;
+                this->_pcm_format = pcm_format::int16;
             }
         }
     }
 }
 
-audio::format::format(CFDictionaryRef const &settings) : format(to_stream_description(settings)) {
+format::format(CFDictionaryRef const &settings) : format(to_stream_description(settings)) {
 }
 
-audio::format::format(args args)
+format::format(args args)
     : format(to_stream_description(args.sample_rate, args.channel_count, args.pcm_format, args.interleaved)) {
 }
 
-bool audio::format::is_empty() const {
+bool format::is_empty() const {
     return memcmp(&this->_asbd, &empty_asbd, sizeof(AudioStreamBasicDescription)) == 0;
 }
 
-bool audio::format::is_broken() const {
+bool format::is_broken() const {
     return this->channel_count() == 0 || this->sample_rate() <= 0.0;
 }
 
-bool audio::format::is_standard() const {
+bool format::is_standard() const {
     return this->_standard;
 }
 
-audio::pcm_format audio::format::pcm_format() const {
+audio::pcm_format format::pcm_format() const {
     return this->_pcm_format;
 }
 
-uint32_t audio::format::channel_count() const {
+uint32_t format::channel_count() const {
     return this->_asbd.mChannelsPerFrame;
 }
 
-uint32_t audio::format::buffer_count() const {
+uint32_t format::buffer_count() const {
     return is_interleaved() ? 1 : this->_asbd.mChannelsPerFrame;
 }
 
-uint32_t audio::format::stride() const {
+uint32_t format::stride() const {
     return is_interleaved() ? this->_asbd.mChannelsPerFrame : 1;
 }
 
-double audio::format::sample_rate() const {
+double format::sample_rate() const {
     return this->_asbd.mSampleRate;
 }
 
-bool audio::format::is_interleaved() const {
+bool format::is_interleaved() const {
     return !(this->_asbd.mFormatFlags & kAudioFormatFlagIsNonInterleaved);
 }
 
-AudioStreamBasicDescription const &audio::format::stream_description() const {
+AudioStreamBasicDescription const &format::stream_description() const {
     return this->_asbd;
 }
 
-uint32_t audio::format::sample_byte_count() const {
+uint32_t format::sample_byte_count() const {
     switch (this->_pcm_format) {
-        case audio::pcm_format::float32:
-        case audio::pcm_format::fixed824:
+        case pcm_format::float32:
+        case pcm_format::fixed824:
             return 4;
-        case audio::pcm_format::int16:
+        case pcm_format::int16:
             return 2;
-        case audio::pcm_format::float64:
+        case pcm_format::float64:
             return 8;
-        case audio::pcm_format::other:
+        case pcm_format::other:
             return 0;
     }
 }
 
-uint32_t audio::format::buffer_frame_byte_count() const {
+uint32_t format::buffer_frame_byte_count() const {
     return sample_byte_count() * stride();
 }
 
-CFStringRef audio::format::description() const {
+CFStringRef format::description() const {
     return to_cf_object(to_string(*this));
 }
 
-bool audio::format::operator==(format const &rhs) const {
+bool format::operator==(format const &rhs) const {
     return yas::is_equal(this->_asbd, rhs._asbd);
 }
 
-bool audio::format::operator!=(format const &rhs) const {
+bool format::operator!=(format const &rhs) const {
     return !(*this == rhs);
 }
 
@@ -217,8 +218,8 @@ AudioStreamBasicDescription yas::to_stream_description(CFDictionaryRef const &se
 }
 
 AudioStreamBasicDescription yas::to_stream_description(double const sample_rate, uint32_t const channel_count,
-                                                       audio::pcm_format const pcm_format, bool const interleaved) {
-    if (pcm_format == audio::pcm_format::other || channel_count == 0) {
+                                                       pcm_format const pcm_format, bool const interleaved) {
+    if (pcm_format == pcm_format::other || channel_count == 0) {
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : invalid argument. pcm_format(" +
                                     to_string(pcm_format) + ") channel_count(" + std::to_string(channel_count) + ")");
     }
@@ -230,11 +231,11 @@ AudioStreamBasicDescription yas::to_stream_description(double const sample_rate,
 
     asbd.mFormatFlags = kAudioFormatFlagsNativeEndian | kAudioFormatFlagIsPacked;
 
-    if (pcm_format == audio::pcm_format::float32 || pcm_format == audio::pcm_format::float64) {
+    if (pcm_format == pcm_format::float32 || pcm_format == pcm_format::float64) {
         asbd.mFormatFlags |= kAudioFormatFlagIsFloat;
-    } else if (pcm_format == audio::pcm_format::int16) {
+    } else if (pcm_format == pcm_format::int16) {
         asbd.mFormatFlags |= kAudioFormatFlagIsSignedInteger;
-    } else if (pcm_format == audio::pcm_format::fixed824) {
+    } else if (pcm_format == pcm_format::fixed824) {
         asbd.mFormatFlags |= kAudioFormatFlagIsSignedInteger | (24 << kLinearPCMFormatFlagsSampleFractionShift);
     }
 
@@ -242,9 +243,9 @@ AudioStreamBasicDescription yas::to_stream_description(double const sample_rate,
         asbd.mFormatFlags |= kAudioFormatFlagIsNonInterleaved;
     }
 
-    if (pcm_format == audio::pcm_format::float64) {
+    if (pcm_format == pcm_format::float64) {
         asbd.mBitsPerChannel = 64;
-    } else if (pcm_format == audio::pcm_format::int16) {
+    } else if (pcm_format == pcm_format::int16) {
         asbd.mBitsPerChannel = 16;
     } else {
         asbd.mBitsPerChannel = 32;

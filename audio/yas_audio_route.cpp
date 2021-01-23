@@ -10,36 +10,37 @@
 #include "yas_audio_graph_route.h"
 
 using namespace yas;
+using namespace yas::audio;
 
-bool audio::route::point::operator==(point const &rhs) const {
+bool route::point::operator==(point const &rhs) const {
     return this->bus == rhs.bus && this->channel == rhs.channel;
 }
 
-bool audio::route::point::operator!=(point const &rhs) const {
+bool route::point::operator!=(point const &rhs) const {
     return this->bus != rhs.bus || this->channel != rhs.channel;
 }
 
-audio::route::route(uint32_t const src_bus_idx, uint32_t const src_ch_idx, uint32_t const dst_bus_idx,
-                    uint32_t const dst_ch_idx)
+route::route(uint32_t const src_bus_idx, uint32_t const src_ch_idx, uint32_t const dst_bus_idx,
+             uint32_t const dst_ch_idx)
     : source({.bus = src_bus_idx, .channel = src_ch_idx}), destination({.bus = dst_bus_idx, .channel = dst_ch_idx}) {
 }
 
-audio::route::route(uint32_t const bus_idx, uint32_t const ch_idx)
+route::route(uint32_t const bus_idx, uint32_t const ch_idx)
     : source({.bus = bus_idx, .channel = ch_idx}), destination({.bus = bus_idx, .channel = ch_idx}) {
 }
 
-audio::route::route(point const &src_point, point const &dst_point) : source(src_point), destination(dst_point) {
+route::route(point const &src_point, point const &dst_point) : source(src_point), destination(dst_point) {
 }
 
-bool audio::route::operator==(route const &rhs) const {
+bool route::operator==(route const &rhs) const {
     return this->source == rhs.source && this->destination == rhs.destination;
 }
 
-bool audio::route::operator!=(route const &rhs) const {
+bool route::operator!=(route const &rhs) const {
     return this->source != rhs.source || this->destination != rhs.destination;
 }
 
-bool audio::route::operator<(route const &rhs) const {
+bool route::operator<(route const &rhs) const {
     if (this->source.bus != rhs.source.bus) {
         return this->source.bus < rhs.source.bus;
     }
@@ -57,9 +58,9 @@ bool audio::route::operator<(route const &rhs) const {
 
 #pragma mark -
 
-audio::channel_map_result audio::channel_map_from_routes(route_set_t const &routes, uint32_t const src_bus_idx,
-                                                         uint32_t const src_ch_count, uint32_t const dst_bus_idx,
-                                                         uint32_t const dst_ch_count) {
+channel_map_result audio::channel_map_from_routes(route_set_t const &routes, uint32_t const src_bus_idx,
+                                                  uint32_t const src_ch_count, uint32_t const dst_bus_idx,
+                                                  uint32_t const dst_ch_count) {
     channel_map_t channel_map(src_ch_count, -1);
     bool exists = false;
 

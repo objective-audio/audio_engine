@@ -7,37 +7,38 @@
 #import <AudioToolbox/AudioToolbox.h>
 
 using namespace yas;
+using namespace yas::audio;
 
-uint32_t yas::to_uint32(audio::direction const &dir) {
+uint32_t yas::to_uint32(direction const &dir) {
     return static_cast<uint32_t>(dir);
 }
 
-std::string yas::to_string(audio::pcm_format const &pcm_format) {
+std::string yas::to_string(pcm_format const &pcm_format) {
     switch (pcm_format) {
-        case audio::pcm_format::float32:
+        case pcm_format::float32:
             return "Float32";
-        case audio::pcm_format::float64:
+        case pcm_format::float64:
             return "Float64";
-        case audio::pcm_format::int16:
+        case pcm_format::int16:
             return "Int16";
-        case audio::pcm_format::fixed824:
+        case pcm_format::fixed824:
             return "Fixed8.24";
-        case audio::pcm_format::other:
+        case pcm_format::other:
             return "Other";
     }
 }
 
-std::type_info const &yas::to_sample_type(audio::pcm_format const &pcm_format) {
+std::type_info const &yas::to_sample_type(pcm_format const &pcm_format) {
     switch (pcm_format) {
-        case audio::pcm_format::float32:
+        case pcm_format::float32:
             return typeid(float);
-        case audio::pcm_format::float64:
+        case pcm_format::float64:
             return typeid(double);
-        case audio::pcm_format::int16:
+        case pcm_format::int16:
             return typeid(int16_t);
-        case audio::pcm_format::fixed824:
+        case pcm_format::fixed824:
             return typeid(int32_t);
-        case audio::pcm_format::other:
+        case pcm_format::other:
             return typeid(std::nullptr_t);
     }
 }
