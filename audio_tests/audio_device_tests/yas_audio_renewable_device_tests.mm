@@ -48,7 +48,7 @@ using namespace yas::audio;
             auto canceller2 =
                 update_notifier->observe([handler](auto const &) { handler(renewable_device::method::renewal); });
 
-            return std::vector<chaining::invalidatable_ptr>{std::move(canceller1), std::move(canceller2)};
+            return std::vector<observing::invalidatable_ptr>{std::move(canceller1), std::move(canceller2)};
         });
 
     std::vector<io_device::method> received;
