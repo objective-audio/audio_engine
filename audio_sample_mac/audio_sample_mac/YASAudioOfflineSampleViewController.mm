@@ -123,19 +123,18 @@ struct offline_vc_internal {
         this->play_au_mixer->set_output_volume(1.0f, 0);
         this->play_au_mixer->set_output_pan(0.0f, 0);
 
-        this->_io_observer = io->raw_io()
-                                 ->device_chain()
-                                 .perform([this](auto const &pair) {
-                                     switch (pair.first) {
-                                         case audio::io::device_method::updated:
-                                             this->_update_connection();
-                                             break;
-                                         case audio::io::device_method::changed:
-                                         case audio::io::device_method::initial:
-                                             break;
-                                     }
-                                 })
-                                 .end();
+        this->_io_canceller = io->raw_io()->observe_device(
+            [this](auto const &pair) {
+                switch (pair.first) {
+                    case audio::io::device_method::updated:
+                        this->_update_connection();
+                        break;
+                    case audio::io::device_method::changed:
+                    case audio::io::device_method::initial:
+                        break;
+                }
+            },
+            false);
 
         this->offline_au_mixer->raw_au->node->reset();
         this->offline_au_mixer->set_input_pan(0.0f, 0);
@@ -174,7 +173,7 @@ struct offline_vc_internal {
     }
 
    private:
-    chaining::any_observer_ptr _io_observer = nullptr;
+    observing::canceller_ptr _io_canceller = nullptr;
 
     void _update_connection() {
         if (auto const &io = this->play_graph->io()) {

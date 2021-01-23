@@ -104,7 +104,7 @@ audio::io_device_ptr audio::ios_device::make_renewable_device(ios_session_ptr co
                         break;
                 }
             });
-            return std::vector<chaining::invalidatable_ptr>{canceller};
+            return std::vector<observing::invalidatable_ptr>{canceller};
         });
 }
 

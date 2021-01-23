@@ -26,8 +26,6 @@ struct graph_route final {
 
    private:
     route_set_t _routes;
-    chaining::observer_pool _pool;
-    std::optional<chaining::any_observer_ptr> _reset_observer = std::nullopt;
 
     graph_route();
 
