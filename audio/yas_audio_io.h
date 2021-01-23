@@ -54,7 +54,6 @@ struct io final {
     observing::notifier_ptr<running_method> const _running_notifier =
         observing::notifier<running_method>::make_shared();
     chaining::fetcher_ptr<device_observing_pair_t> _device_fetcher;
-    std::optional<chaining::any_observer_ptr> _device_changed_observer;
     std::optional<observing::canceller_ptr> _device_updated_canceller = std::nullopt;
     std::optional<observing::canceller_ptr> _interruption_canceller = std::nullopt;
 
