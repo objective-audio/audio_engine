@@ -123,7 +123,7 @@ struct offline_vc_internal {
         this->play_au_mixer->set_output_volume(1.0f, 0);
         this->play_au_mixer->set_output_pan(0.0f, 0);
 
-        this->_io_observer = io->raw_io()->observe_device(
+        this->_io_canceller = io->raw_io()->observe_device(
             [this](auto const &pair) {
                 switch (pair.first) {
                     case audio::io::device_method::updated:
@@ -173,7 +173,7 @@ struct offline_vc_internal {
     }
 
    private:
-    observing::canceller_ptr _io_observer = nullptr;
+    observing::canceller_ptr _io_canceller = nullptr;
 
     void _update_connection() {
         if (auto const &io = this->play_graph->io()) {
