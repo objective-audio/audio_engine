@@ -14,18 +14,19 @@
 #include "yas_audio_time.h"
 
 using namespace yas;
+using namespace yas::audio;
 
-#pragma mark - audio::graph_input_context
+#pragma mark - graph_input_context
 
 namespace yas::audio {
 struct graph_input_context {
-    audio::pcm_buffer *input_buffer = nullptr;
+    pcm_buffer *input_buffer = nullptr;
 };
 }  // namespace yas::audio
 
-#pragma mark - audio::graph_io
+#pragma mark - graph_io
 
-audio::graph_io::graph_io(audio::io_ptr const &raw_io)
+graph_io::graph_io(io_ptr const &raw_io)
     : output_node(graph_node::make_shared({.input_bus_count = 1, .output_bus_count = 0})),
       input_node(graph_node::make_shared({.input_bus_count = 0, .output_bus_count = 1})),
       _raw_io(raw_io),
@@ -41,13 +42,13 @@ audio::graph_io::graph_io(audio::io_ptr const &raw_io)
     });
 }
 
-audio::graph_io::~graph_io() = default;
+graph_io::~graph_io() = default;
 
-audio::io_ptr const &audio::graph_io::raw_io() {
+io_ptr const &graph_io::raw_io() {
     return this->_raw_io;
 }
 
-bool audio::graph_io::_validate_connections() {
+bool graph_io::_validate_connections() {
     auto const &raw_io = this->_raw_io;
 
     auto &input_connections = manageable_graph_node::cast(this->output_node)->input_connections();
@@ -111,7 +112,7 @@ bool audio::graph_io::_validate_connections() {
     return true;
 }
 
-void audio::graph_io::update_rendering() {
+void graph_io::update_rendering() {
     auto const &raw_io = this->_raw_io;
 
     if (!this->_validate_connections()) {
@@ -146,11 +147,11 @@ void audio::graph_io::update_rendering() {
     raw_io->set_render_handler(std::move(render_handler));
 }
 
-void audio::graph_io::clear_rendering() {
+void graph_io::clear_rendering() {
     auto const &raw_io = this->_raw_io;
     raw_io->set_render_handler(std::nullopt);
 }
 
-audio::graph_io_ptr audio::graph_io::make_shared(audio::io_ptr const &raw_io) {
-    return graph_io_ptr(new audio::graph_io{raw_io});
+graph_io_ptr graph_io::make_shared(io_ptr const &raw_io) {
+    return graph_io_ptr(new graph_io{raw_io});
 }

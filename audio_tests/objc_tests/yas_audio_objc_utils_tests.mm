@@ -6,6 +6,7 @@
 #import "yas_audio_test_utils.h"
 
 using namespace yas;
+using namespace yas::audio;
 
 @interface yas_audio_objc_utils_tests : XCTestCase
 
@@ -14,18 +15,16 @@ using namespace yas;
 @implementation yas_audio_objc_utils_tests
 
 - (void)test_to_common_format {
-    XCTAssertEqual(to_common_format(audio::pcm_format::float64), AVAudioPCMFormatFloat64);
-    XCTAssertEqual(to_common_format(audio::pcm_format::float32), AVAudioPCMFormatFloat32);
-    XCTAssertEqual(to_common_format(audio::pcm_format::fixed824), AVAudioPCMFormatInt32);
-    XCTAssertEqual(to_common_format(audio::pcm_format::int16), AVAudioPCMFormatInt16);
+    XCTAssertEqual(to_common_format(pcm_format::float64), AVAudioPCMFormatFloat64);
+    XCTAssertEqual(to_common_format(pcm_format::float32), AVAudioPCMFormatFloat32);
+    XCTAssertEqual(to_common_format(pcm_format::fixed824), AVAudioPCMFormatInt32);
+    XCTAssertEqual(to_common_format(pcm_format::int16), AVAudioPCMFormatInt16);
 }
 
 - (void)test_to_object_object_from_format {
     {
-        audio::format format{{.sample_rate = 44100.0,
-                              .channel_count = 2,
-                              .pcm_format = audio::pcm_format::float32,
-                              .interleaved = false}};
+        audio::format format{
+            {.sample_rate = 44100.0, .channel_count = 2, .pcm_format = pcm_format::float32, .interleaved = false}};
 
         auto objc_format = to_objc_object(format);
 
@@ -37,7 +36,7 @@ using namespace yas;
 
     {
         audio::format format{
-            {.sample_rate = 96000.0, .channel_count = 3, .pcm_format = audio::pcm_format::int16, .interleaved = true}};
+            {.sample_rate = 96000.0, .channel_count = 3, .pcm_format = pcm_format::int16, .interleaved = true}};
 
         auto objc_format = to_objc_object(format);
 

@@ -10,8 +10,9 @@
 #include "yas_audio_renewable_device.h"
 
 using namespace yas;
+using namespace yas::audio;
 
-audio::ios_device::ios_device(ios_device_session_ptr const &device_session, interruptor_ptr const &interruptor)
+ios_device::ios_device(ios_device_session_ptr const &device_session, interruptor_ptr const &interruptor)
     : _session(device_session), _interruptor(interruptor) {
     this->_canceller = device_session->observe_device([this](auto const &session_method) {
         switch (session_method) {
@@ -29,11 +30,11 @@ audio::ios_device::ios_device(ios_device_session_ptr const &device_session, inte
     });
 }
 
-std::optional<audio::ios_device_session_ptr> const &audio::ios_device::session() const {
+std::optional<audio::ios_device_session_ptr> const &ios_device::session() const {
     return this->_session;
 }
 
-double audio::ios_device::sample_rate() const {
+double ios_device::sample_rate() const {
     if (auto const &session = this->session()) {
         return session.value()->sample_rate();
     } else {
@@ -41,56 +42,56 @@ double audio::ios_device::sample_rate() const {
     }
 }
 
-std::optional<audio::format> audio::ios_device::input_format() const {
+std::optional<format> ios_device::input_format() const {
     if (auto const &session = this->session()) {
         auto const sample_rate = session.value()->sample_rate();
         auto const ch_count = session.value()->input_channel_count();
 
         if (sample_rate > 0.0 && ch_count > 0) {
-            return audio::format({.sample_rate = sample_rate, .channel_count = ch_count});
+            return format({.sample_rate = sample_rate, .channel_count = ch_count});
         }
     }
 
     return std::nullopt;
 }
 
-std::optional<audio::format> audio::ios_device::output_format() const {
+std::optional<format> ios_device::output_format() const {
     if (auto const &session = this->session()) {
         auto const sample_rate = session.value()->sample_rate();
         auto const ch_count = session.value()->output_channel_count();
 
         if (sample_rate > 0.0 && ch_count > 0) {
-            return audio::format({.sample_rate = sample_rate, .channel_count = ch_count});
+            return format({.sample_rate = sample_rate, .channel_count = ch_count});
         }
     }
 
     return std::nullopt;
 }
 
-std::optional<audio::interruptor_ptr> const &audio::ios_device::interruptor() const {
+std::optional<audio::interruptor_ptr> const &ios_device::interruptor() const {
     return this->_interruptor;
 }
 
-audio::io_core_ptr audio::ios_device::make_io_core() const {
+io_core_ptr ios_device::make_io_core() const {
     return ios_io_core::make_shared(this->_weak_device.lock());
 }
 
-observing::canceller_ptr audio::ios_device::observe_io_device(observing::caller<method>::handler_f &&handler) {
+observing::canceller_ptr ios_device::observe_io_device(observing::caller<method>::handler_f &&handler) {
     return this->_notifier->observe(std::move(handler));
 }
 
-audio::ios_device_ptr audio::ios_device::make_shared(ios_session_ptr const &session) {
+ios_device_ptr ios_device::make_shared(ios_session_ptr const &session) {
     return make_shared(session, session);
 }
 
-audio::ios_device_ptr audio::ios_device::make_shared(ios_device_session_ptr const &device_session,
-                                                     interruptor_ptr const &interruptor) {
+ios_device_ptr ios_device::make_shared(ios_device_session_ptr const &device_session,
+                                       interruptor_ptr const &interruptor) {
     auto shared = std::shared_ptr<ios_device>(new ios_device{device_session, interruptor});
     shared->_weak_device = shared;
     return shared;
 }
 
-audio::io_device_ptr audio::ios_device::make_renewable_device(ios_session_ptr const &session) {
+audio::io_device_ptr ios_device::make_renewable_device(ios_session_ptr const &session) {
     return audio::renewable_device::make_shared(
         [session]() { return ios_device::make_shared(session); },
         [](io_device_ptr const &device, renewable_device::method_f const &handler) {

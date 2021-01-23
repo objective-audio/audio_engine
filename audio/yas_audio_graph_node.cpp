@@ -12,19 +12,20 @@
 #include "yas_audio_time.h"
 
 using namespace yas;
+using namespace yas::audio;
 
-#pragma mark - audio::node
+#pragma mark - graph_node
 
-audio::graph_node::graph_node(graph_node_args &&args)
+graph_node::graph_node(graph_node_args &&args)
     : _input_bus_count(args.input_bus_count),
       _output_bus_count(args.output_bus_count),
       _is_input_renderable(args.input_renderable),
       _override_output_bus_idx(args.override_output_bus_idx) {
 }
 
-audio::graph_node::~graph_node() = default;
+graph_node::~graph_node() = default;
 
-void audio::graph_node::reset() {
+void graph_node::reset() {
     if (this->_will_reset_handler) {
         this->_will_reset_handler();
     }
@@ -35,43 +36,43 @@ void audio::graph_node::reset() {
     this->update_rendering();
 }
 
-audio::graph_connection_ptr audio::graph_node::input_connection(uint32_t const bus_idx) const {
+graph_connection_ptr graph_node::input_connection(uint32_t const bus_idx) const {
     if (this->_input_connections.count(bus_idx) > 0) {
         return this->_input_connections.at(bus_idx).lock();
     }
     return nullptr;
 }
 
-audio::graph_connection_ptr audio::graph_node::output_connection(uint32_t const bus_idx) const {
+graph_connection_ptr graph_node::output_connection(uint32_t const bus_idx) const {
     if (this->_output_connections.count(bus_idx) > 0) {
         return this->_output_connections.at(bus_idx).lock();
     }
     return nullptr;
 }
 
-audio::graph_connection_wmap const &audio::graph_node::input_connections() const {
+graph_connection_wmap const &graph_node::input_connections() const {
     return this->_input_connections;
 }
 
-audio::graph_connection_wmap const &audio::graph_node::output_connections() const {
+graph_connection_wmap const &graph_node::output_connections() const {
     return this->_output_connections;
 }
 
-std::optional<audio::format> audio::graph_node::input_format(uint32_t const bus_idx) const {
+std::optional<format> graph_node::input_format(uint32_t const bus_idx) const {
     if (auto connection = this->input_connection(bus_idx)) {
         return connection->format();
     }
     return std::nullopt;
 }
 
-std::optional<audio::format> audio::graph_node::output_format(uint32_t const bus_idx) const {
+std::optional<format> graph_node::output_format(uint32_t const bus_idx) const {
     if (auto connection = this->output_connection(bus_idx)) {
         return connection->format();
     }
     return std::nullopt;
 }
 
-audio::bus_result_t audio::graph_node::next_available_input_bus() const {
+bus_result_t graph_node::next_available_input_bus() const {
     auto key = min_empty_key(this->_input_connections);
     if (key && *key < this->input_bus_count()) {
         return key;
@@ -79,7 +80,7 @@ audio::bus_result_t audio::graph_node::next_available_input_bus() const {
     return std::nullopt;
 }
 
-audio::bus_result_t audio::graph_node::next_available_output_bus() const {
+bus_result_t graph_node::next_available_output_bus() const {
     auto key = min_empty_key(this->_output_connections);
     if (key && *key < this->output_bus_count()) {
         auto &override_bus_idx = this->_override_output_bus_idx;
@@ -91,14 +92,14 @@ audio::bus_result_t audio::graph_node::next_available_output_bus() const {
     return std::nullopt;
 }
 
-bool audio::graph_node::is_available_input_bus(uint32_t const bus_idx) const {
+bool graph_node::is_available_input_bus(uint32_t const bus_idx) const {
     if (bus_idx >= this->input_bus_count()) {
         return false;
     }
     return this->_input_connections.count(bus_idx) == 0;
 }
 
-bool audio::graph_node::is_available_output_bus(uint32_t const bus_idx) const {
+bool graph_node::is_available_output_bus(uint32_t const bus_idx) const {
     auto &override_bus_idx = this->_override_output_bus_idx;
     auto target_bus_idx = (override_bus_idx && *override_bus_idx == bus_idx) ? 0 : bus_idx;
     if (target_bus_idx >= this->output_bus_count()) {
@@ -107,27 +108,27 @@ bool audio::graph_node::is_available_output_bus(uint32_t const bus_idx) const {
     return this->_output_connections.count(target_bus_idx) == 0;
 }
 
-audio::graph_ptr audio::graph_node::graph() const {
+graph_ptr graph_node::graph() const {
     return this->_weak_graph.lock();
 }
 
-uint32_t audio::graph_node::input_bus_count() const {
+uint32_t graph_node::input_bus_count() const {
     return this->_input_bus_count;
 }
 
-uint32_t audio::graph_node::output_bus_count() const {
+uint32_t graph_node::output_bus_count() const {
     return this->_output_bus_count;
 }
 
-bool audio::graph_node::is_input_renderable() const {
+bool graph_node::is_input_renderable() const {
     return this->_is_input_renderable;
 }
 
-void audio::graph_node::set_render_handler(node_render_f handler) {
+void graph_node::set_render_handler(node_render_f handler) {
     this->_render_handler = std::move(handler);
 }
 
-audio::node_render_f const audio::graph_node::render_handler() const {
+node_render_f const graph_node::render_handler() const {
     if (this->_render_handler) {
         return this->_render_handler;
     } else {
@@ -136,7 +137,7 @@ audio::node_render_f const audio::graph_node::render_handler() const {
     }
 }
 
-void audio::graph_node::add_connection(audio::graph_connection_ptr const &connection) {
+void graph_node::add_connection(graph_connection_ptr const &connection) {
     auto weak_connection = to_weak(connection);
     if (connection->destination_node().get() == this) {
         auto bus_idx = connection->destination_bus();
@@ -151,59 +152,60 @@ void audio::graph_node::add_connection(audio::graph_connection_ptr const &connec
     this->update_rendering();
 }
 
-void audio::graph_node::remove_input_connection(uint32_t const dst_bus) {
+void graph_node::remove_input_connection(uint32_t const dst_bus) {
     this->_input_connections.erase(dst_bus);
     this->update_rendering();
 }
 
-void audio::graph_node::remove_output_connection(uint32_t const src_bus) {
+void graph_node::remove_output_connection(uint32_t const src_bus) {
     this->_output_connections.erase(src_bus);
     this->update_rendering();
 }
 
-void audio::graph_node::set_graph(audio::graph_wptr const &graph) {
+void graph_node::set_graph(graph_wptr const &graph) {
     this->_weak_graph = graph;
 }
 
-void audio::graph_node::update_rendering() {
+void graph_node::update_rendering() {
     if (this->_update_rendering_handler) {
         this->_update_rendering_handler();
     }
 }
 
-void audio::graph_node::set_setup_handler(graph_node_f &&handler) {
+void graph_node::set_setup_handler(graph_node_f &&handler) {
     this->_setup_handler = std::move(handler);
 }
 
-void audio::graph_node::set_teardown_handler(graph_node_f &&handler) {
+void graph_node::set_teardown_handler(graph_node_f &&handler) {
     this->_teardown_handler = std::move(handler);
 }
 
-void audio::graph_node::set_prepare_rendering_handler(graph_node_f &&handler) {
+void graph_node::set_prepare_rendering_handler(graph_node_f &&handler) {
     this->_prepare_rendering_handler = std::move(handler);
 }
 
-void audio::graph_node::set_update_rendering_handler(graph_node_f &&handler) {
+void graph_node::set_update_rendering_handler(graph_node_f &&handler) {
     this->_update_rendering_handler = std::move(handler);
 }
 
-void audio::graph_node::set_will_reset_handler(graph_node_f &&handler) {
+void graph_node::set_will_reset_handler(graph_node_f &&handler) {
     this->_will_reset_handler = std::move(handler);
 }
 
-audio::graph_node_f const &audio::graph_node::setup_handler() const {
+graph_node_f const &graph_node::setup_handler() const {
     return this->_setup_handler;
 }
-audio::graph_node_f const &audio::graph_node::teardown_handler() const {
+
+graph_node_f const &graph_node::teardown_handler() const {
     return this->_teardown_handler;
 }
 
-void audio::graph_node::prepare_rendering() {
+void graph_node::prepare_rendering() {
     if (this->_prepare_rendering_handler) {
         this->_prepare_rendering_handler();
     }
 }
 
-audio::graph_node_ptr audio::graph_node::make_shared(graph_node_args args) {
+graph_node_ptr graph_node::make_shared(graph_node_args args) {
     return graph_node_ptr(new graph_node{std::move(args)});
 }

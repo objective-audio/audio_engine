@@ -11,8 +11,9 @@
 #endif
 
 using namespace yas;
+using namespace yas::audio;
 
-uint32_t audio::io_device::input_channel_count() const {
+uint32_t io_device::input_channel_count() const {
     if (auto const format = this->input_format()) {
         return format.value().channel_count();
     } else {
@@ -20,7 +21,7 @@ uint32_t audio::io_device::input_channel_count() const {
     }
 }
 
-uint32_t audio::io_device::output_channel_count() const {
+uint32_t io_device::output_channel_count() const {
     if (auto const format = this->output_format()) {
         return format.value().channel_count();
     } else {
@@ -28,7 +29,7 @@ uint32_t audio::io_device::output_channel_count() const {
     }
 }
 
-bool audio::io_device::is_interrupting() const {
+bool io_device::is_interrupting() const {
     if (auto const &interruptor = this->interruptor()) {
         return interruptor.value()->is_interrupting();
     } else {
@@ -36,7 +37,7 @@ bool audio::io_device::is_interrupting() const {
     }
 }
 
-std::optional<observing::canceller_ptr> audio::io_device::observe_interruption(
+std::optional<observing::canceller_ptr> io_device::observe_interruption(
     observing::caller<interruption_method>::handler_f &&handler) {
     if (auto const interruptor = this->interruptor()) {
         return interruptor.value()->observe_interruption(std::move(handler));

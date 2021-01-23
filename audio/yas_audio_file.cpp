@@ -13,22 +13,23 @@
 #include "yas_audio_pcm_buffer.h"
 
 using namespace yas;
+using namespace yas::audio;
 
 #pragma mark -
 
-audio::file::file() {
+file::file() {
 }
 
-audio::file::~file() {
+file::~file() {
     this->close();
 }
 
-audio::file::open_result_t audio::file::open(open_args args) {
+file::open_result_t file::open(open_args args) {
     if (this->_ext_audio_file) {
         return open_result_t(open_error_t::opened);
     }
 
-    if (args.pcm_format == audio::pcm_format::other) {
+    if (args.pcm_format == pcm_format::other) {
         return open_result_t(open_error_t::invalid_argument);
     }
 
@@ -41,7 +42,7 @@ audio::file::open_result_t audio::file::open(open_args args) {
     return open_result_t(nullptr);
 }
 
-audio::file::create_result_t audio::file::create(create_args args) {
+file::create_result_t file::create(create_args args) {
     if (this->_ext_audio_file) {
         return create_result_t(create_error_t::created);
     }
@@ -60,41 +61,41 @@ audio::file::create_result_t audio::file::create(create_args args) {
     return create_result_t(nullptr);
 }
 
-void audio::file::close() {
+void file::close() {
     if (this->_ext_audio_file) {
         ext_audio_file_utils::dispose(this->_ext_audio_file.value());
         this->_ext_audio_file = std::nullopt;
     }
 }
 
-bool audio::file::is_opened() const {
+bool file::is_opened() const {
     return this->_ext_audio_file != nullptr;
 }
 
-yas::url const &audio::file::url() const {
+yas::url const &file::url() const {
     return *this->_url;
 }
 
-audio::file_type audio::file::file_type() const {
+audio::file_type file::file_type() const {
     return this->_file_type;
 }
 
-audio::format const &audio::file::file_format() const {
+format const &file::file_format() const {
     return *this->_file_format;
 }
 
-audio::format const &audio::file::processing_format() const {
+format const &file::processing_format() const {
     return *this->_processing_format;
 }
 
-int64_t audio::file::file_length() const {
+int64_t file::file_length() const {
     if (this->_ext_audio_file) {
         return ext_audio_file_utils::get_file_length_frames(this->_ext_audio_file.value());
     }
     return 0;
 }
 
-int64_t audio::file::processing_length() const {
+int64_t file::processing_length() const {
     if (!this->_processing_format || !this->_file_format) {
         return 0;
     }
@@ -105,11 +106,11 @@ int64_t audio::file::processing_length() const {
     return fileLength * rate;
 }
 
-int64_t audio::file::file_frame_position() const {
+int64_t file::file_frame_position() const {
     return this->_file_frame_position;
 }
 
-void audio::file::set_processing_format(audio::format format) {
+void file::set_processing_format(format format) {
     this->_processing_format = std::move(format);
     if (this->_ext_audio_file) {
         ext_audio_file_utils::set_client_format(this->_processing_format->stream_description(),
@@ -117,7 +118,7 @@ void audio::file::set_processing_format(audio::format format) {
     }
 }
 
-void audio::file::set_file_frame_position(uint32_t const position) {
+void file::set_file_frame_position(uint32_t const position) {
     if (this->_ext_audio_file && this->_file_frame_position != position) {
         OSStatus err = ExtAudioFileSeek(this->_ext_audio_file.value(), position);
         if (err == noErr) {
@@ -126,7 +127,7 @@ void audio::file::set_file_frame_position(uint32_t const position) {
     }
 }
 
-audio::file::read_result_t audio::file::read_into_buffer(audio::pcm_buffer &buffer, uint32_t const frame_length) {
+file::read_result_t file::read_into_buffer(pcm_buffer &buffer, uint32_t const frame_length) {
     if (!this->_ext_audio_file) {
         return read_result_t(read_error_t::closed);
     }
@@ -194,7 +195,7 @@ audio::file::read_result_t audio::file::read_into_buffer(audio::pcm_buffer &buff
     return read_result_t(nullptr);
 }
 
-audio::file::write_result_t audio::file::write_from_buffer(audio::pcm_buffer const &buffer, bool const async) {
+file::write_result_t file::write_from_buffer(pcm_buffer const &buffer, bool const async) {
     if (!this->_ext_audio_file) {
         return write_result_t(write_error_t::closed);
     }
@@ -227,7 +228,7 @@ audio::file::write_result_t audio::file::write_from_buffer(audio::pcm_buffer con
 
 #pragma mark - private
 
-bool audio::file::_open_ext_audio_file(pcm_format const pcm_format, bool const interleaved) {
+bool file::_open_ext_audio_file(pcm_format const pcm_format, bool const interleaved) {
     if (!ext_audio_file_utils::can_open(this->_url->cf_url())) {
         return false;
     }
@@ -269,11 +270,11 @@ bool audio::file::_open_ext_audio_file(pcm_format const pcm_format, bool const i
     return true;
 }
 
-bool audio::file::_create_ext_audio_file(CFDictionaryRef const &settings, pcm_format const pcm_format,
-                                         bool const interleaved) {
+bool file::_create_ext_audio_file(CFDictionaryRef const &settings, pcm_format const pcm_format,
+                                  bool const interleaved) {
     this->_file_format = format{settings};
 
-    AudioFileTypeID file_type_id = audio::to_audio_file_type_id(this->_file_type);
+    AudioFileTypeID file_type_id = to_audio_file_type_id(this->_file_type);
 
     ExtAudioFileRef ext_audio_file = nullptr;
     if (!ext_audio_file_utils::create(&ext_audio_file, this->_url->cf_url(), file_type_id,
@@ -298,11 +299,11 @@ bool audio::file::_create_ext_audio_file(CFDictionaryRef const &settings, pcm_fo
 
 #pragma mark -
 
-audio::file_ptr audio::file::make_shared() {
+file_ptr file::make_shared() {
     return file_ptr(new file{});
 }
 
-audio::file::make_opened_result_t audio::file::make_opened(file::open_args args) {
+file::make_opened_result_t file::make_opened(file::open_args args) {
     auto file = make_shared();
     if (auto result = file->open(std::move(args))) {
         return file::make_opened_result_t{std::move(file)};
@@ -311,7 +312,7 @@ audio::file::make_opened_result_t audio::file::make_opened(file::open_args args)
     }
 }
 
-audio::file::make_created_result_t audio::file::make_created(file::create_args args) {
+file::make_created_result_t file::make_created(file::create_args args) {
     auto file = make_shared();
     if (auto result = file->create(std::move(args))) {
         return file::make_created_result_t{std::move(file)};
@@ -320,72 +321,72 @@ audio::file::make_created_result_t audio::file::make_created(file::create_args a
     }
 }
 
-std::string yas::to_string(audio::file::open_error_t const &error_t) {
+std::string yas::to_string(file::open_error_t const &error_t) {
     switch (error_t) {
-        case audio::file::open_error_t::opened:
+        case file::open_error_t::opened:
             return "opened";
-        case audio::file::open_error_t::invalid_argument:
+        case file::open_error_t::invalid_argument:
             return "invalid_argument";
-        case audio::file::open_error_t::open_failed:
+        case file::open_error_t::open_failed:
             return "open_failed";
     }
 }
 
-std::string yas::to_string(audio::file::read_error_t const &error_t) {
+std::string yas::to_string(file::read_error_t const &error_t) {
     switch (error_t) {
-        case audio::file::read_error_t::closed:
+        case file::read_error_t::closed:
             return "closed";
-        case audio::file::read_error_t::invalid_format:
+        case file::read_error_t::invalid_format:
             return "invalid_format";
-        case audio::file::read_error_t::read_failed:
+        case file::read_error_t::read_failed:
             return "read_failed";
-        case audio::file::read_error_t::tell_failed:
+        case file::read_error_t::tell_failed:
             return "tell_failed";
-        case audio::file::read_error_t::frame_length_out_of_range:
+        case file::read_error_t::frame_length_out_of_range:
             return "frame_length_out_of_range";
     }
 }
 
-std::string yas::to_string(audio::file::create_error_t const &error_t) {
+std::string yas::to_string(file::create_error_t const &error_t) {
     switch (error_t) {
-        case audio::file::create_error_t::created:
+        case file::create_error_t::created:
             return "created";
-        case audio::file::create_error_t::invalid_argument:
+        case file::create_error_t::invalid_argument:
             return "invalid_argument";
-        case audio::file::create_error_t::create_failed:
+        case file::create_error_t::create_failed:
             return "create_failed";
     }
 }
 
-std::string yas::to_string(audio::file::write_error_t const &error_t) {
+std::string yas::to_string(file::write_error_t const &error_t) {
     switch (error_t) {
-        case audio::file::write_error_t::closed:
+        case file::write_error_t::closed:
             return "closed";
-        case audio::file::write_error_t::invalid_format:
+        case file::write_error_t::invalid_format:
             return "invalid_format";
-        case audio::file::write_error_t::write_failed:
+        case file::write_error_t::write_failed:
             return "write_failed";
-        case audio::file::write_error_t::tell_failed:
+        case file::write_error_t::tell_failed:
             return "tell_failed";
     }
 }
 
-std::ostream &operator<<(std::ostream &os, yas::audio::file::open_error_t const &value) {
+std::ostream &operator<<(std::ostream &os, file::open_error_t const &value) {
     os << to_string(value);
     return os;
 }
 
-std::ostream &operator<<(std::ostream &os, yas::audio::file::read_error_t const &value) {
+std::ostream &operator<<(std::ostream &os, file::read_error_t const &value) {
     os << to_string(value);
     return os;
 }
 
-std::ostream &operator<<(std::ostream &os, yas::audio::file::create_error_t const &value) {
+std::ostream &operator<<(std::ostream &os, file::create_error_t const &value) {
     os << to_string(value);
     return os;
 }
 
-std::ostream &operator<<(std::ostream &os, yas::audio::file::write_error_t const &value) {
+std::ostream &operator<<(std::ostream &os, file::write_error_t const &value) {
     os << to_string(value);
     return os;
 }

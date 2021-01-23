@@ -7,6 +7,7 @@
 #import "yas_audio_test_utils.h"
 
 using namespace yas;
+using namespace yas::audio;
 
 @interface yas_audio_avf_au_tests : XCTestCase
 
@@ -21,7 +22,7 @@ using namespace yas;
 }
 
 - (void)test_load {
-    auto const au = audio::avf_au::make_shared(kAudioUnitType_FormatConverter, kAudioUnitSubType_AUConverter);
+    auto const au = avf_au::make_shared(kAudioUnitType_FormatConverter, kAudioUnitSubType_AUConverter);
 
     [self _load_au:au];
 
@@ -31,7 +32,7 @@ using namespace yas;
 }
 
 - (void)test_initialize {
-    auto const au = audio::avf_au::make_shared(kAudioUnitType_FormatConverter, kAudioUnitSubType_AUConverter);
+    auto const au = avf_au::make_shared(kAudioUnitType_FormatConverter, kAudioUnitSubType_AUConverter);
 
     [self _load_au:au];
 
@@ -47,7 +48,7 @@ using namespace yas;
 }
 
 - (void)test_set_parameter_value {
-    auto const delay_au = audio::avf_au::make_shared(kAudioUnitType_Effect, kAudioUnitSubType_Delay);
+    auto const delay_au = avf_au::make_shared(kAudioUnitType_Effect, kAudioUnitSubType_Delay);
 
     [self _load_au:delay_au];
 
@@ -59,7 +60,7 @@ using namespace yas;
 }
 
 - (void)test_parameters {
-    auto const delay_au = audio::avf_au::make_shared(kAudioUnitType_Effect, kAudioUnitSubType_Delay);
+    auto const delay_au = avf_au::make_shared(kAudioUnitType_Effect, kAudioUnitSubType_Delay);
 
     [self _load_au:delay_au];
 
@@ -74,14 +75,14 @@ using namespace yas;
 }
 
 - (void)test_format {
-    auto const au = audio::avf_au::make_shared(kAudioUnitType_FormatConverter, kAudioUnitSubType_AUConverter);
+    auto const au = avf_au::make_shared(kAudioUnitType_FormatConverter, kAudioUnitSubType_AUConverter);
 
     [self _load_au:au];
 
     audio::format const output_format{
-        {.sample_rate = 48000.0, .channel_count = 2, .pcm_format = audio::pcm_format::float32, .interleaved = false}};
+        {.sample_rate = 48000.0, .channel_count = 2, .pcm_format = pcm_format::float32, .interleaved = false}};
     audio::format const input_format{
-        {.sample_rate = 44100.0, .channel_count = 1, .pcm_format = audio::pcm_format::int16, .interleaved = true}};
+        {.sample_rate = 44100.0, .channel_count = 1, .pcm_format = pcm_format::int16, .interleaved = true}};
 
     au->set_output_format(output_format, 0);
     au->set_input_format(input_format, 0);
@@ -91,12 +92,12 @@ using namespace yas;
 }
 
 - (void)test_render {
-    auto const au = audio::avf_au::make_shared(kAudioUnitType_FormatConverter, kAudioUnitSubType_AUConverter);
+    auto const au = avf_au::make_shared(kAudioUnitType_FormatConverter, kAudioUnitSubType_AUConverter);
 
     [self _load_au:au];
 
     audio::format const format{
-        {.sample_rate = 48000.0, .channel_count = 1, .pcm_format = audio::pcm_format::int16, .interleaved = false}};
+        {.sample_rate = 48000.0, .channel_count = 1, .pcm_format = pcm_format::int16, .interleaved = false}};
 
     au->set_output_format(format, 0);
     au->set_input_format(format, 0);
@@ -111,7 +112,7 @@ using namespace yas;
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), [promise, au, &buffer] {
         audio::time time{1000};
 
-        au->render({.buffer = &buffer, .bus_idx = 0, .time = time}, [](audio::avf_au::render_args args) {
+        au->render({.buffer = &buffer, .bus_idx = 0, .time = time}, [](avf_au::render_args args) {
             int16_t *data = args.buffer->template data_ptr_at_index<int16_t>(0);
 
             auto each = make_fast_each(args.buffer->frame_length());
@@ -136,7 +137,7 @@ using namespace yas;
 }
 
 - (void)test_reset_parameter {
-    auto const delay_au = audio::avf_au::make_shared(kAudioUnitType_Effect, kAudioUnitSubType_Delay);
+    auto const delay_au = avf_au::make_shared(kAudioUnitType_Effect, kAudioUnitSubType_Delay);
 
     [self _load_au:delay_au];
 
@@ -152,25 +153,25 @@ using namespace yas;
 }
 
 - (void)test_load_state_to_string {
-    XCTAssertEqual(to_string(audio::avf_au::load_state::unload), "unload");
-    XCTAssertEqual(to_string(audio::avf_au::load_state::loaded), "loaded");
-    XCTAssertEqual(to_string(audio::avf_au::load_state::failed), "failed");
+    XCTAssertEqual(to_string(avf_au::load_state::unload), "unload");
+    XCTAssertEqual(to_string(avf_au::load_state::loaded), "loaded");
+    XCTAssertEqual(to_string(avf_au::load_state::failed), "failed");
 }
 
 - (void)test_state {
-    auto const au = audio::avf_au::make_shared(kAudioUnitType_Effect, kAudioUnitSubType_Delay);
+    auto const au = avf_au::make_shared(kAudioUnitType_Effect, kAudioUnitSubType_Delay);
 
     auto exp = [self expectationWithDescription:@"load"];
 
     auto canceller = au->observe_load_state([exp](auto const &state) {
-        if (state == audio::avf_au::load_state::loaded) {
+        if (state == avf_au::load_state::loaded) {
             [exp fulfill];
         }
     });
 
     [self waitForExpectations:@[exp] timeout:1.0];
 
-    XCTAssertEqual(au->state(), audio::avf_au::load_state::loaded);
+    XCTAssertEqual(au->state(), avf_au::load_state::loaded);
 
     canceller->invalidate();
 }
@@ -181,7 +182,7 @@ using namespace yas;
     auto exp = [self expectationWithDescription:@"load"];
 
     auto canceller = au->observe_load_state([exp](auto const &state) {
-        if (state == audio::avf_au::load_state::loaded) {
+        if (state == avf_au::load_state::loaded) {
             [exp fulfill];
         }
     });

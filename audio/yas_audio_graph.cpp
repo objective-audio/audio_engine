@@ -19,16 +19,16 @@
 #endif
 
 using namespace yas;
+using namespace yas::audio;
 
-audio::graph::graph() = default;
+graph::graph() = default;
 
-audio::graph::~graph() {
+graph::~graph() {
     this->_nodes.clear();
 }
 
-audio::graph_connection_ptr audio::graph::connect(audio::graph_node_ptr const &source_node,
-                                                  audio::graph_node_ptr const &destination_node,
-                                                  audio::format const &format) {
+audio::graph_connection_ptr graph::connect(audio::graph_node_ptr const &source_node,
+                                           audio::graph_node_ptr const &destination_node, audio::format const &format) {
     auto source_bus_result = source_node->next_available_output_bus();
     auto destination_bus_result = destination_node->next_available_input_bus();
 
@@ -39,9 +39,9 @@ audio::graph_connection_ptr audio::graph::connect(audio::graph_node_ptr const &s
     return connect(source_node, destination_node, *source_bus_result, *destination_bus_result, format);
 }
 
-audio::graph_connection_ptr audio::graph::connect(audio::graph_node_ptr const &src_node,
-                                                  audio::graph_node_ptr const &dst_node, uint32_t const src_bus_idx,
-                                                  uint32_t const dst_bus_idx, audio::format const &format) {
+audio::graph_connection_ptr graph::connect(audio::graph_node_ptr const &src_node, audio::graph_node_ptr const &dst_node,
+                                           uint32_t const src_bus_idx, uint32_t const dst_bus_idx,
+                                           audio::format const &format) {
     if (!src_node->is_available_output_bus(src_bus_idx)) {
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : output bus(" + std::to_string(src_bus_idx) +
                                     ") is not available.");
@@ -72,7 +72,7 @@ audio::graph_connection_ptr audio::graph::connect(audio::graph_node_ptr const &s
     return connection;
 }
 
-void audio::graph::disconnect(graph_connection_ptr const &connection) {
+void graph::disconnect(graph_connection_ptr const &connection) {
     std::vector<graph_node_ptr> update_nodes{connection->source_node(), connection->destination_node()};
 
     this->_remove_connection_from_nodes(connection);
@@ -89,35 +89,35 @@ void audio::graph::disconnect(graph_connection_ptr const &connection) {
     }
 }
 
-void audio::graph::disconnect(audio::graph_node_ptr const &node) {
+void graph::disconnect(audio::graph_node_ptr const &node) {
     if (this->_node_exists(node)) {
         this->_detach_node(node);
     }
 }
 
-void audio::graph::disconnect_input(audio::graph_node_ptr const &node) {
+void graph::disconnect_input(audio::graph_node_ptr const &node) {
     this->_disconnect_node_with_predicate(
         [&node](graph_connection const &connection) { return (connection.destination_node() == node); });
 }
 
-void audio::graph::disconnect_input(audio::graph_node_ptr const &node, uint32_t const bus_idx) {
+void graph::disconnect_input(audio::graph_node_ptr const &node, uint32_t const bus_idx) {
     this->_disconnect_node_with_predicate([&node, bus_idx](auto const &connection) {
         return (connection.destination_node() == node && connection.destination_bus() == bus_idx);
     });
 }
 
-void audio::graph::disconnect_output(audio::graph_node_ptr const &node) {
+void graph::disconnect_output(audio::graph_node_ptr const &node) {
     this->_disconnect_node_with_predicate(
         [&node](graph_connection const &connection) { return (connection.source_node() == node); });
 }
 
-void audio::graph::disconnect_output(audio::graph_node_ptr const &node, uint32_t const bus_idx) {
+void graph::disconnect_output(audio::graph_node_ptr const &node, uint32_t const bus_idx) {
     this->_disconnect_node_with_predicate([&node, bus_idx](auto const &connection) {
         return (connection.source_node() == node && connection.source_bus() == bus_idx);
     });
 }
 
-audio::graph_io_ptr const &audio::graph::add_io(std::optional<io_device_ptr> const &device) {
+audio::graph_io_ptr const &graph::add_io(std::optional<io_device_ptr> const &device) {
     if (!this->_io) {
         audio::io_ptr const raw_io = audio::io::make_shared(device);
         audio::graph_io_ptr const io = audio::graph_io::make_shared(raw_io);
@@ -139,18 +139,18 @@ audio::graph_io_ptr const &audio::graph::add_io(std::optional<io_device_ptr> con
     return this->_io.value();
 }
 
-void audio::graph::remove_io() {
+void graph::remove_io() {
     if (this->_io) {
         this->_io_canceller = std::nullopt;
         this->_io = std::nullopt;
     }
 }
 
-std::optional<audio::graph_io_ptr> const &audio::graph::io() const {
+std::optional<audio::graph_io_ptr> const &graph::io() const {
     return this->_io;
 }
 
-audio::graph::start_result_t audio::graph::start_render() {
+graph::start_result_t graph::start_render() {
     if (this->is_running()) {
         return start_result_t(start_error_t::already_running);
     }
@@ -162,13 +162,13 @@ audio::graph::start_result_t audio::graph::start_render() {
     return start_result_t(nullptr);
 }
 
-void audio::graph::stop() {
+void graph::stop() {
     if (auto const &graph_io = this->_io) {
         manageable_graph_io::cast(graph_io.value())->raw_io()->stop();
     }
 }
 
-bool audio::graph::is_running() const {
+bool graph::is_running() const {
     if (auto const &io = this->_io) {
         return io.value()->raw_io()->is_running();
     } else {
@@ -176,23 +176,23 @@ bool audio::graph::is_running() const {
     }
 }
 
-audio::graph_node_set const &audio::graph::nodes() const {
+audio::graph_node_set const &graph::nodes() const {
     return this->_nodes;
 }
 
-audio::graph_connection_set const &audio::graph::connections() const {
+audio::graph_connection_set const &graph::connections() const {
     return this->_connections;
 }
 
-void audio::graph::_prepare(graph_ptr const &shared) {
+void graph::_prepare(graph_ptr const &shared) {
     this->_weak_graph = shared;
 }
 
-bool audio::graph::_node_exists(audio::graph_node_ptr const &node) {
+bool graph::_node_exists(audio::graph_node_ptr const &node) {
     return this->_nodes.count(node) > 0;
 }
 
-void audio::graph::_attach_node(audio::graph_node_ptr const &node) {
+void graph::_attach_node(audio::graph_node_ptr const &node) {
     if (this->_nodes.count(node) > 0) {
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : node is already attached.");
     }
@@ -210,7 +210,7 @@ void audio::graph::_attach_node(audio::graph_node_ptr const &node) {
     this->_setup_node(node);
 }
 
-void audio::graph::_detach_node(audio::graph_node_ptr const &node) {
+void graph::_detach_node(audio::graph_node_ptr const &node) {
     if (this->_nodes.count(node) == 0) {
         throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + " : node is not attached.");
     }
@@ -227,7 +227,7 @@ void audio::graph::_detach_node(audio::graph_node_ptr const &node) {
     this->_nodes.erase(node);
 }
 
-void audio::graph::_detach_node_if_unused(audio::graph_node_ptr const &node) {
+void graph::_detach_node_if_unused(audio::graph_node_ptr const &node) {
     auto filtered_connection = filter(_connections, [&node](auto const &connection) {
         return (connection->destination_node() == node || connection->source_node() == node);
     });
@@ -237,7 +237,7 @@ void audio::graph::_detach_node_if_unused(audio::graph_node_ptr const &node) {
     }
 }
 
-bool audio::graph::_setup_rendering() {
+bool graph::_setup_rendering() {
     for (auto &node : this->_nodes) {
         this->_setup_node(node);
     }
@@ -253,7 +253,7 @@ bool audio::graph::_setup_rendering() {
     return true;
 }
 
-void audio::graph::_dispose_rendering() {
+void graph::_dispose_rendering() {
     if (auto const &graph_io = this->_io) {
         manageable_graph_io::cast(graph_io.value())->raw_io()->stop();
     }
@@ -269,7 +269,7 @@ void audio::graph::_dispose_rendering() {
     this->_clear_io_rendering();
 }
 
-void audio::graph::_disconnect_node_with_predicate(std::function<bool(graph_connection const &)> predicate) {
+void graph::_disconnect_node_with_predicate(std::function<bool(graph_connection const &)> predicate) {
     auto connections =
         filter(this->_connections, [&predicate](auto const &connection) { return predicate(*connection); });
 
@@ -295,19 +295,19 @@ void audio::graph::_disconnect_node_with_predicate(std::function<bool(graph_conn
     }
 }
 
-void audio::graph::_setup_node(audio::graph_node_ptr const &node) {
+void graph::_setup_node(audio::graph_node_ptr const &node) {
     if (auto const &handler = manageable_graph_node::cast(node)->setup_handler()) {
         handler();
     }
 }
 
-void audio::graph::_teardown_node(audio::graph_node_ptr const &node) {
+void graph::_teardown_node(audio::graph_node_ptr const &node) {
     if (auto const &handler = manageable_graph_node::cast(node)->teardown_handler()) {
         handler();
     }
 }
 
-bool audio::graph::_add_connection_to_nodes(audio::graph_connection_ptr const &connection) {
+bool graph::_add_connection_to_nodes(audio::graph_connection_ptr const &connection) {
     auto destination_node = connection->destination_node();
     auto source_node = connection->source_node();
 
@@ -322,7 +322,7 @@ bool audio::graph::_add_connection_to_nodes(audio::graph_connection_ptr const &c
     return true;
 }
 
-void audio::graph::_remove_connection_from_nodes(audio::graph_connection_ptr const &connection) {
+void graph::_remove_connection_from_nodes(audio::graph_connection_ptr const &connection) {
     if (auto source_node = connection->source_node()) {
         connectable_graph_node::cast(source_node)->remove_output_connection(connection->source_bus());
     }
@@ -332,40 +332,40 @@ void audio::graph::_remove_connection_from_nodes(audio::graph_connection_ptr con
     }
 }
 
-audio::graph_connection_set audio::graph::_input_connections_for_destination_node(audio::graph_node_ptr const &node) {
+audio::graph_connection_set graph::_input_connections_for_destination_node(audio::graph_node_ptr const &node) {
     return filter(this->_connections,
                   [&node](auto const &connection) { return connection->destination_node() == node; });
 }
 
-audio::graph_connection_set audio::graph::_output_connections_for_source_node(audio::graph_node_ptr const &node) {
+audio::graph_connection_set graph::_output_connections_for_source_node(audio::graph_node_ptr const &node) {
     return filter(this->_connections, [&node](auto const &connection) { return connection->source_node() == node; });
 }
 
-void audio::graph::_update_io_rendering() {
+void graph::_update_io_rendering() {
     if (this->_io.has_value()) {
         audio::manageable_graph_io::cast(this->_io.value())->update_rendering();
     }
 }
 
-void audio::graph::_clear_io_rendering() {
+void graph::_clear_io_rendering() {
     if (this->_io.has_value()) {
         audio::manageable_graph_io::cast(this->_io.value())->clear_rendering();
     }
 }
 
-audio::graph_ptr audio::graph::make_shared() {
+audio::graph_ptr graph::make_shared() {
     auto shared = graph_ptr(new graph{});
     shared->_prepare(shared);
     return shared;
 }
 
-std::string yas::to_string(audio::graph::start_error_t const &error) {
+std::string yas::to_string(graph::start_error_t const &error) {
     switch (error) {
-        case audio::graph::start_error_t::already_running:
+        case graph::start_error_t::already_running:
             return "already_running";
-        case audio::graph::start_error_t::prepare_failure:
+        case graph::start_error_t::prepare_failure:
             return "prepare_failure";
-        case audio::graph::start_error_t::connection_not_found:
+        case graph::start_error_t::connection_not_found:
             return "connection_not_found";
     }
 }

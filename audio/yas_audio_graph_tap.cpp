@@ -7,11 +7,11 @@
 #include "yas_audio_rendering_connection.h"
 
 using namespace yas;
+using namespace yas::audio;
 
-#pragma mark - audio::graph_tap
+#pragma mark - graph_tap
 
-audio::graph_tap::graph_tap()
-    : node(graph_node::make_shared(graph_node_args{.input_bus_count = 1, .output_bus_count = 1})) {
+graph_tap::graph_tap() : node(graph_node::make_shared(graph_node_args{.input_bus_count = 1, .output_bus_count = 1})) {
     auto const manageable_node = manageable_graph_node::cast(this->node);
 
     manageable_node->set_prepare_rendering_handler([this] {
@@ -29,7 +29,7 @@ audio::graph_tap::graph_tap()
     manageable_node->set_will_reset_handler([this] { this->_render_handler = std::nullopt; });
 }
 
-void audio::graph_tap::set_render_handler(audio::node_render_f handler) {
+void graph_tap::set_render_handler(node_render_f handler) {
     this->_render_handler = std::move(handler);
 
     renderable_graph_node::cast(this->node)->update_rendering();
@@ -37,13 +37,13 @@ void audio::graph_tap::set_render_handler(audio::node_render_f handler) {
 
 #pragma mark - factory
 
-audio::graph_tap_ptr audio::graph_tap::make_shared() {
+graph_tap_ptr graph_tap::make_shared() {
     return graph_tap_ptr(new graph_tap{});
 }
 
-#pragma mark - audio::graph_input_tap
+#pragma mark - graph_input_tap
 
-audio::graph_input_tap::graph_input_tap()
+graph_input_tap::graph_input_tap()
     : node(graph_node::make_shared(graph_node_args{.input_bus_count = 1, .input_renderable = true})) {
     auto const manageable_node = manageable_graph_node::cast(this->node);
 
@@ -58,7 +58,7 @@ audio::graph_input_tap::graph_input_tap()
     manageable_node->set_will_reset_handler([this] { this->_render_handler = std::nullopt; });
 }
 
-void audio::graph_input_tap::set_render_handler(audio::node_input_render_f handler) {
+void graph_input_tap::set_render_handler(node_input_render_f handler) {
     this->_render_handler = std::move(handler);
 
     renderable_graph_node::cast(this->node)->update_rendering();
@@ -66,6 +66,6 @@ void audio::graph_input_tap::set_render_handler(audio::node_input_render_f handl
 
 #pragma mark - factory
 
-audio::graph_input_tap_ptr audio::graph_input_tap::make_shared() {
+graph_input_tap_ptr graph_input_tap::make_shared() {
     return graph_input_tap_ptr(new graph_input_tap{});
 }

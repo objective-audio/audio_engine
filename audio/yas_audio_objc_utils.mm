@@ -11,17 +11,18 @@
 #endif
 
 using namespace yas;
+using namespace yas::audio;
 
 #if TARGET_OS_IPHONE
 
-audio::channel_map_t yas::to_channel_map(NSArray *const channelDescriptions, audio::direction const dir) {
+channel_map_t yas::to_channel_map(NSArray *const channelDescriptions, direction const dir) {
     AVAudioSession *const audioSession = [AVAudioSession sharedInstance];
     AVAudioSessionRouteDescription *const routeDesc = audioSession.currentRoute;
 
     NSInteger channel_count = 0;
     NSArray *portDescriptions = nil;
 
-    if (dir == audio::direction::input) {
+    if (dir == direction::input) {
         channel_count = audioSession.inputNumberOfChannels;
         portDescriptions = routeDesc.inputs;
     } else {
@@ -30,10 +31,10 @@ audio::channel_map_t yas::to_channel_map(NSArray *const channelDescriptions, aud
     }
 
     if (channel_count == 0) {
-        return audio::channel_map_t();
+        return channel_map_t();
     }
 
-    audio::channel_map_t map;
+    channel_map_t map;
     map.reserve(channel_count);
 
     for (AVAudioSessionPortDescription *portDescription in portDescriptions) {
@@ -59,22 +60,22 @@ audio::channel_map_t yas::to_channel_map(NSArray *const channelDescriptions, aud
 
 #endif
 
-AVAudioCommonFormat yas::to_common_format(audio::pcm_format const pcm_format) {
+AVAudioCommonFormat yas::to_common_format(pcm_format const pcm_format) {
     switch (pcm_format) {
-        case audio::pcm_format::float64:
+        case pcm_format::float64:
             return AVAudioPCMFormatFloat64;
-        case audio::pcm_format::float32:
+        case pcm_format::float32:
             return AVAudioPCMFormatFloat32;
-        case audio::pcm_format::fixed824:
+        case pcm_format::fixed824:
             return AVAudioPCMFormatInt32;
-        case audio::pcm_format::int16:
+        case pcm_format::int16:
             return AVAudioPCMFormatInt16;
-        case audio::pcm_format::other:
+        case pcm_format::other:
             return AVAudioOtherFormat;
     }
 }
 
-objc_ptr<AVAudioFormat *> yas::to_objc_object(audio::format const &format) {
+objc_ptr<AVAudioFormat *> yas::to_objc_object(format const &format) {
     if (format.channel_count() <= 2) {
         return objc_ptr_with_move_object(
             [[AVAudioFormat alloc] initWithStreamDescription:&format.stream_description()]);

@@ -14,59 +14,60 @@
 #include "yas_audio_debug.h"
 
 using namespace yas;
+using namespace yas::audio;
 
-static AVAudioSessionCategory to_objc(enum audio::ios_session::category const category) {
+static AVAudioSessionCategory to_objc(enum ios_session::category const category) {
     switch (category) {
-        case audio::ios_session::category::ambient:
+        case ios_session::category::ambient:
             return AVAudioSessionCategoryAmbient;
-        case audio::ios_session::category::solo_ambient:
+        case ios_session::category::solo_ambient:
             return AVAudioSessionCategorySoloAmbient;
-        case audio::ios_session::category::playback:
+        case ios_session::category::playback:
             return AVAudioSessionCategoryPlayback;
-        case audio::ios_session::category::record:
+        case ios_session::category::record:
             return AVAudioSessionCategoryRecord;
-        case audio::ios_session::category::play_and_record:
+        case ios_session::category::play_and_record:
             return AVAudioSessionCategoryPlayAndRecord;
-        case audio::ios_session::category::multi_route:
+        case ios_session::category::multi_route:
             return AVAudioSessionCategoryMultiRoute;
     }
 }
 
-static AVAudioSessionCategoryOptions to_objc(audio::ios_session::category_options_t const options) {
+static AVAudioSessionCategoryOptions to_objc(ios_session::category_options_t const options) {
     AVAudioSessionCategoryOptions result = kNilOptions;
 
-    if (options.test(audio::ios_session::category_option::mix_with_others)) {
+    if (options.test(ios_session::category_option::mix_with_others)) {
         result |= AVAudioSessionCategoryOptionMixWithOthers;
     }
 
-    if (options.test(audio::ios_session::category_option::duck_others)) {
+    if (options.test(ios_session::category_option::duck_others)) {
         result |= AVAudioSessionCategoryOptionDuckOthers;
     }
 
-    if (options.test(audio::ios_session::category_option::allow_bluetooth)) {
+    if (options.test(ios_session::category_option::allow_bluetooth)) {
         result |= AVAudioSessionCategoryOptionAllowBluetooth;
     }
 
-    if (options.test(audio::ios_session::category_option::default_to_speaker)) {
+    if (options.test(ios_session::category_option::default_to_speaker)) {
         result |= AVAudioSessionCategoryOptionDefaultToSpeaker;
     }
 
-    if (options.test(audio::ios_session::category_option::interrupt_spoken_audio_and_mix_with_others)) {
+    if (options.test(ios_session::category_option::interrupt_spoken_audio_and_mix_with_others)) {
         result |= AVAudioSessionCategoryOptionInterruptSpokenAudioAndMixWithOthers;
     }
 
-    if (options.test(audio::ios_session::category_option::allow_bluetooth_a2dp)) {
+    if (options.test(ios_session::category_option::allow_bluetooth_a2dp)) {
         result |= AVAudioSessionCategoryOptionAllowBluetoothA2DP;
     }
 
-    if (options.test(audio::ios_session::category_option::allow_air_play)) {
+    if (options.test(ios_session::category_option::allow_air_play)) {
         result |= AVAudioSessionCategoryOptionAllowAirPlay;
     }
 
     return result;
 }
 
-struct audio::ios_session::impl {
+struct ios_session::impl {
     std::vector<objc_ptr<id<NSObject>>> observers;
 
     std::optional<objc_ptr<>> did_become_active_observer = std::nullopt;
@@ -79,7 +80,7 @@ struct audio::ios_session::impl {
     }
 };
 
-audio::ios_session::ios_session()
+ios_session::ios_session()
     : _category(category::playback),
       _impl(std::make_unique<impl>()),
       _device_notifier(observing::notifier<device_method>::make_shared()),
@@ -129,11 +130,11 @@ audio::ios_session::ios_session()
     this->_impl->observers = {route_change_observer, lost_observer, reset_observer};
 }
 
-bool audio::ios_session::is_active() const {
+bool ios_session::is_active() const {
     return this->_is_active;
 }
 
-audio::ios_session::activate_result_t audio::ios_session::activate() {
+ios_session::activate_result_t ios_session::activate() {
     if (auto result = this->_apply_category(); !result) {
         return result;
     }
@@ -163,7 +164,7 @@ audio::ios_session::activate_result_t audio::ios_session::activate() {
     return activate_result_t{nullptr};
 }
 
-audio::ios_session::activate_result_t audio::ios_session::reactivate() {
+ios_session::activate_result_t ios_session::reactivate() {
     if (!this->_is_active) {
         return activate_result_t{nullptr};
     }
@@ -187,7 +188,7 @@ audio::ios_session::activate_result_t audio::ios_session::reactivate() {
     return activate_result_t{nullptr};
 }
 
-void audio::ios_session::deactivate() {
+void ios_session::deactivate() {
     this->_dispose_interrupting();
 
     NSError *error = nil;
@@ -201,11 +202,11 @@ void audio::ios_session::deactivate() {
     }
 }
 
-bool audio::ios_session::is_interrupting() const {
+bool ios_session::is_interrupting() const {
     return this->_is_interrupting;
 }
 
-double audio::ios_session::sample_rate() const {
+double ios_session::sample_rate() const {
     if (!this->_is_active) {
         return 0.0;
     }
@@ -213,7 +214,7 @@ double audio::ios_session::sample_rate() const {
     return [AVAudioSession sharedInstance].sampleRate;
 }
 
-void audio::ios_session::set_preferred_sample_rate(double const sample_rate) {
+void ios_session::set_preferred_sample_rate(double const sample_rate) {
     this->_preferred_sample_rate = sample_rate;
 
     if (this->_is_active) {
@@ -221,7 +222,7 @@ void audio::ios_session::set_preferred_sample_rate(double const sample_rate) {
     }
 }
 
-void audio::ios_session::set_preferred_io_buffer_frames(uint32_t const frames) {
+void ios_session::set_preferred_io_buffer_frames(uint32_t const frames) {
     this->_preferred_io_buffer_frames = frames;
 
     if (this->_is_active) {
@@ -229,7 +230,7 @@ void audio::ios_session::set_preferred_io_buffer_frames(uint32_t const frames) {
     }
 }
 
-uint32_t audio::ios_session::output_channel_count() const {
+uint32_t ios_session::output_channel_count() const {
     if (!this->_is_active) {
         return 0;
     }
@@ -241,7 +242,7 @@ uint32_t audio::ios_session::output_channel_count() const {
     }
 }
 
-uint32_t audio::ios_session::input_channel_count() const {
+uint32_t ios_session::input_channel_count() const {
     if (!this->_is_active) {
         return 0;
     }
@@ -253,7 +254,7 @@ uint32_t audio::ios_session::input_channel_count() const {
     }
 }
 
-bool audio::ios_session::is_input_available() const {
+bool ios_session::is_input_available() const {
     if (!this->_is_active) {
         return false;
     }
@@ -261,15 +262,15 @@ bool audio::ios_session::is_input_available() const {
     return [AVAudioSession sharedInstance].isInputAvailable;
 }
 
-enum audio::ios_session::category audio::ios_session::category() const {
+enum ios_session::category ios_session::category() const {
     return this->_category;
 }
 
-void audio::ios_session::set_category(enum category const category) {
+void ios_session::set_category(enum category const category) {
     this->set_category(category, {});
 }
 
-void audio::ios_session::set_category(enum category const category, category_options_t const options) {
+void ios_session::set_category(enum category const category, category_options_t const options) {
     this->_category = category;
     this->_category_options = options;
 
@@ -278,16 +279,16 @@ void audio::ios_session::set_category(enum category const category, category_opt
     }
 }
 
-observing::canceller_ptr audio::ios_session::observe_device(observing::caller<device_method>::handler_f &&handler) {
+observing::canceller_ptr ios_session::observe_device(observing::caller<device_method>::handler_f &&handler) {
     return this->_device_notifier->observe(std::move(handler));
 }
 
-observing::canceller_ptr audio::ios_session::observe_interruption(
+observing::canceller_ptr ios_session::observe_interruption(
     observing::caller<interruption_method>::handler_f &&handler) {
     return this->_interruption_notifier->observe(std::move(handler));
 }
 
-audio::ios_session::activate_result_t audio::ios_session::_apply_category() {
+ios_session::activate_result_t ios_session::_apply_category() {
     NSError *error = nil;
 
     if ([[AVAudioSession sharedInstance] setCategory:to_objc(this->_category)
@@ -301,7 +302,7 @@ audio::ios_session::activate_result_t audio::ios_session::_apply_category() {
     }
 }
 
-audio::ios_session::activate_result_t audio::ios_session::_apply_sample_rate() {
+ios_session::activate_result_t ios_session::_apply_sample_rate() {
     NSError *error = nil;
 
     if ([[AVAudioSession sharedInstance] setPreferredSampleRate:this->_preferred_sample_rate error:&error]) {
@@ -313,7 +314,7 @@ audio::ios_session::activate_result_t audio::ios_session::_apply_sample_rate() {
     }
 }
 
-audio::ios_session::activate_result_t audio::ios_session::_apply_io_buffer_duration() {
+ios_session::activate_result_t ios_session::_apply_io_buffer_duration() {
     if (!this->_is_active) {
         throw std::runtime_error("audio session is not activate.");
     }
@@ -337,7 +338,7 @@ audio::ios_session::activate_result_t audio::ios_session::_apply_io_buffer_durat
     }
 }
 
-audio::ios_session::activate_result_t audio::ios_session::_set_active() {
+ios_session::activate_result_t ios_session::_set_active() {
     NSError *error = nil;
 
     if ([[AVAudioSession sharedInstance] setActive:YES error:&error]) {
@@ -349,14 +350,14 @@ audio::ios_session::activate_result_t audio::ios_session::_set_active() {
     }
 }
 
-void audio::ios_session::_set_interrupting_and_notify(bool const is_interrupting) {
+void ios_session::_set_interrupting_and_notify(bool const is_interrupting) {
     if (this->_is_interrupting != is_interrupting) {
         this->_is_interrupting = is_interrupting;
         this->_interruption_notifier->notify(is_interrupting ? interruption_method::began : interruption_method::ended);
     }
 }
 
-void audio::ios_session::_setup_interrupting() {
+void ios_session::_setup_interrupting() {
     this->_is_interrupting = false;
 
     if (!this->_impl->did_become_active_observer) {
@@ -399,18 +400,18 @@ void audio::ios_session::_setup_interrupting() {
     }
 }
 
-void audio::ios_session::_dispose_interrupting() {
+void ios_session::_dispose_interrupting() {
     this->_is_interrupting = false;
     this->_impl->did_become_active_observer = std::nullopt;
     this->_impl->interruption_observer = std::nullopt;
 }
 
-audio::ios_session_ptr const &audio::ios_session::shared() {
+ios_session_ptr const &ios_session::shared() {
     static ios_session_ptr const shared = ios_session_ptr(new ios_session{});
     return shared;
 }
 
-bool audio::is_output_category(enum audio::ios_session::category const category) {
+bool audio::is_output_category(enum ios_session::category const category) {
     switch (category) {
         case ios_session::category::ambient:
         case ios_session::category::solo_ambient:
@@ -423,7 +424,7 @@ bool audio::is_output_category(enum audio::ios_session::category const category)
     }
 }
 
-bool audio::is_input_category(enum audio::ios_session::category const category) {
+bool audio::is_input_category(enum ios_session::category const category) {
     switch (category) {
         case ios_session::category::play_and_record:
         case ios_session::category::record:

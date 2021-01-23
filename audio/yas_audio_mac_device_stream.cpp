@@ -9,10 +9,11 @@
 #include "yas_audio_format.h"
 
 using namespace yas;
+using namespace yas::audio;
 
 #pragma mark - property_info
 
-bool audio::mac_device::stream::property_info::operator<(property_info const &info) const {
+bool mac_device::stream::property_info::operator<(property_info const &info) const {
     if (this->property != info.property) {
         return this->property < info.property;
     }
@@ -34,23 +35,23 @@ bool audio::mac_device::stream::property_info::operator<(property_info const &in
 
 #pragma mark - change_info
 
-audio::mac_device::stream::change_info::change_info(std::vector<property_info> &&infos) : property_infos(infos) {
+mac_device::stream::change_info::change_info(std::vector<property_info> &&infos) : property_infos(infos) {
 }
 
 #pragma mark - main
 
-audio::mac_device::stream::stream(args &&args) : _stream_id(args.stream_id), _device_id(args.device_id) {
+mac_device::stream::stream(args &&args) : _stream_id(args.stream_id), _device_id(args.device_id) {
 }
 
-AudioStreamID audio::mac_device::stream::stream_id() const {
+AudioStreamID mac_device::stream::stream_id() const {
     return this->_stream_id;
 }
 
-std::optional<audio::mac_device_ptr> audio::mac_device::stream::device() const {
+std::optional<mac_device_ptr> mac_device::stream::device() const {
     return mac_device::device_for_id(this->_device_id);
 }
 
-bool audio::mac_device::stream::is_active() const {
+bool mac_device::stream::is_active() const {
     auto data = this->_property_data<uint32_t>(stream_id(), kAudioStreamPropertyIsActive);
     if (data) {
         return *data->data() > 0;
@@ -58,7 +59,7 @@ bool audio::mac_device::stream::is_active() const {
     return false;
 }
 
-audio::direction audio::mac_device::stream::direction() const {
+direction mac_device::stream::direction() const {
     auto data = this->_property_data<uint32_t>(stream_id(), kAudioStreamPropertyDirection);
     if (data) {
         if (*data->data() == 1) {
@@ -68,15 +69,15 @@ audio::direction audio::mac_device::stream::direction() const {
     return direction::output;
 }
 
-audio::format audio::mac_device::stream::virtual_format() const {
+format mac_device::stream::virtual_format() const {
     auto data = this->_property_data<AudioStreamBasicDescription>(stream_id(), kAudioStreamPropertyVirtualFormat);
     if (!data) {
         throw std::runtime_error(std::string(__PRETTY_FUNCTION__) + " : can't get virtual format.");
     }
-    return audio::format(*data->data());
+    return format(*data->data());
 }
 
-uint32_t audio::mac_device::stream::starting_channel() const {
+uint32_t mac_device::stream::starting_channel() const {
     auto data = this->_property_data<uint32_t>(stream_id(), kAudioStreamPropertyStartingChannel);
     if (data) {
         return *data->data();
@@ -84,19 +85,19 @@ uint32_t audio::mac_device::stream::starting_channel() const {
     return 0;
 }
 
-observing::canceller_ptr audio::mac_device::stream::observe(observing::caller<observing_pair_t>::handler_f &&handler) {
+observing::canceller_ptr mac_device::stream::observe(observing::caller<observing_pair_t>::handler_f &&handler) {
     return this->_notifier->observe(std::move(handler));
 }
 
-bool audio::mac_device::stream::operator==(stream const &rhs) const {
+bool mac_device::stream::operator==(stream const &rhs) const {
     return this->stream_id() == rhs.stream_id();
 }
 
-bool audio::mac_device::stream::operator!=(stream const &rhs) const {
+bool mac_device::stream::operator!=(stream const &rhs) const {
     return !(*this == rhs);
 }
 
-void audio::mac_device::stream::_prepare(mac_device::stream_ptr const &shared) {
+void mac_device::stream::_prepare(mac_device::stream_ptr const &shared) {
     this->_weak_stream = shared;
 
     auto listener = this->_listener();
@@ -105,7 +106,7 @@ void audio::mac_device::stream::_prepare(mac_device::stream_ptr const &shared) {
     this->_add_listener(kAudioStreamPropertyStartingChannel, listener);
 }
 
-audio::mac_device::stream::listener_f audio::mac_device::stream::_listener() {
+mac_device::stream::listener_f mac_device::stream::_listener() {
     auto weak_stream = to_weak(this->_weak_stream.lock());
 
     return [weak_stream](uint32_t const address_count, const AudioObjectPropertyAddress *const addresses) {
@@ -131,7 +132,7 @@ audio::mac_device::stream::listener_f audio::mac_device::stream::_listener() {
     };
 }
 
-void audio::mac_device::stream::_add_listener(AudioObjectPropertySelector const &selector, listener_f handler) {
+void mac_device::stream::_add_listener(AudioObjectPropertySelector const &selector, listener_f handler) {
     AudioObjectPropertyAddress const address = {.mSelector = selector,
                                                 .mScope = kAudioObjectPropertyScopeGlobal,
                                                 .mElement = kAudioObjectPropertyElementMaster};
@@ -143,20 +144,20 @@ void audio::mac_device::stream::_add_listener(AudioObjectPropertySelector const 
                                             }));
 }
 
-audio::mac_device::stream_ptr audio::mac_device::stream::make_shared(mac_device::stream::args args) {
+mac_device::stream_ptr mac_device::stream::make_shared(mac_device::stream::args args) {
     auto shared = mac_device::stream_ptr(new mac_device::stream{std::move(args)});
     shared->_prepare(shared);
     return shared;
 }
 
-std::string yas::to_string(audio::mac_device::stream::method const &method) {
+std::string yas::to_string(mac_device::stream::method const &method) {
     switch (method) {
-        case audio::mac_device::stream::method::did_change:
+        case mac_device::stream::method::did_change:
             return "did_change";
     }
 }
 
-std::ostream &operator<<(std::ostream &os, yas::audio::mac_device::stream::method const &value) {
+std::ostream &operator<<(std::ostream &os, mac_device::stream::method const &value) {
     os << to_string(value);
     return os;
 }

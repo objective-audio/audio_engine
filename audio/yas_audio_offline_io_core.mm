@@ -7,7 +7,9 @@
 #include "yas_audio_offline_device.h"
 
 using namespace yas;
-struct audio::offline_io_core::render_context {
+using namespace yas::audio;
+
+struct offline_io_core::render_context {
     std::optional<std::promise<void>> promise = std::promise<void>();
     std::atomic<bool> is_cancelled = false;
 
@@ -46,22 +48,22 @@ struct audio::offline_io_core::render_context {
     std::optional<offline_completion_f> _completion;
 };
 
-audio::offline_io_core::offline_io_core(offline_device_ptr const &device) : _device(device) {
+offline_io_core::offline_io_core(offline_device_ptr const &device) : _device(device) {
 }
 
-audio::offline_io_core::~offline_io_core() {
+offline_io_core::~offline_io_core() {
     this->stop();
 }
 
-void audio::offline_io_core::set_render_handler(std::optional<io_render_f> handler) {
+void offline_io_core::set_render_handler(std::optional<io_render_f> handler) {
     this->_render_handler = std::move(handler);
 }
 
-void audio::offline_io_core::set_maximum_frames_per_slice(uint32_t const frames) {
+void offline_io_core::set_maximum_frames_per_slice(uint32_t const frames) {
     this->_maximum_frames = frames;
 }
 
-bool audio::offline_io_core::start() {
+bool offline_io_core::start() {
     if (this->_render_context) {
         return false;
     }
@@ -87,12 +89,12 @@ bool audio::offline_io_core::start() {
                 break;
             }
 
-            audio::time time(current_sample_time, render_buffer->format().sample_rate());
+            time time(current_sample_time, render_buffer->format().sample_rate());
 
             kernel->render_handler({.output_buffer = render_buffer.get(),
                                     .output_time = time,
                                     .input_buffer = nullptr,
-                                    .input_time = audio::null_time_opt});
+                                    .input_time = null_time_opt});
 
             if (device_render_handler({.output_buffer = render_buffer, .output_time = time}) == continuation::abort) {
                 break;
@@ -115,13 +117,13 @@ bool audio::offline_io_core::start() {
     return true;
 }
 
-void audio::offline_io_core::stop() {
+void offline_io_core::stop() {
     if (this->_render_context) {
         this->_render_context->stop();
     }
 }
 
-audio::io_kernel_ptr audio::offline_io_core::_make_kernel() const {
+io_kernel_ptr offline_io_core::_make_kernel() const {
     auto const &output_format = this->_device->output_format();
 
     if (!output_format.has_value()) {
@@ -135,6 +137,6 @@ audio::io_kernel_ptr audio::offline_io_core::_make_kernel() const {
     return io_kernel::make_shared(this->_render_handler.value(), std::nullopt, output_format, this->_maximum_frames);
 }
 
-audio::offline_io_core_ptr audio::offline_io_core::make_shared(offline_device_ptr const &device) {
+offline_io_core_ptr offline_io_core::make_shared(offline_device_ptr const &device) {
     return offline_io_core_ptr{new offline_io_core{device}};
 }

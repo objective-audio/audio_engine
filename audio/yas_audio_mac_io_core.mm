@@ -9,29 +9,30 @@
 #include "yas_audio_mac_device.h"
 
 using namespace yas;
+using namespace yas::audio;
 
-audio::mac_io_core::mac_io_core(mac_device_ptr const &device) : _device(device) {
+mac_io_core::mac_io_core(mac_device_ptr const &device) : _device(device) {
 }
 
-audio::mac_io_core::~mac_io_core() {
+mac_io_core::~mac_io_core() {
     this->stop();
 }
 
-void audio::mac_io_core::set_render_handler(std::optional<io_render_f> handler) {
+void mac_io_core::set_render_handler(std::optional<io_render_f> handler) {
     if (this->_render_handler || handler) {
         this->_render_handler = std::move(handler);
         this->_reload_if_needed();
     }
 }
 
-void audio::mac_io_core::set_maximum_frames_per_slice(uint32_t const frames) {
+void mac_io_core::set_maximum_frames_per_slice(uint32_t const frames) {
     if (this->_maximum_frames != frames) {
         this->_maximum_frames = frames;
         this->_reload_if_needed();
     }
 }
 
-bool audio::mac_io_core::start() {
+bool mac_io_core::start() {
     if (this->_is_started) {
         return true;
     }
@@ -48,7 +49,7 @@ bool audio::mac_io_core::start() {
     }
 }
 
-void audio::mac_io_core::stop() {
+void mac_io_core::stop() {
     if (this->_io_proc_id && mac_device::is_available_device(*this->_device)) {
         raise_if_raw_audio_error(AudioDeviceStop(this->_device->audio_device_id(), this->_io_proc_id.value()));
     }
@@ -56,7 +57,7 @@ void audio::mac_io_core::stop() {
     this->_is_started = false;
 }
 
-audio::io_kernel_ptr audio::mac_io_core::_make_kernel() const {
+io_kernel_ptr mac_io_core::_make_kernel() const {
     auto const &output_format = this->_device->output_format();
     auto const &input_format = this->_device->input_format();
 
@@ -75,7 +76,7 @@ audio::io_kernel_ptr audio::mac_io_core::_make_kernel() const {
     return io_kernel::make_shared(this->_render_handler.value(), input_format, output_format, this->_maximum_frames);
 }
 
-void audio::mac_io_core::_create_io_proc() {
+void mac_io_core::_create_io_proc() {
     if (this->_io_proc_id) {
         return;
     }
@@ -101,7 +102,7 @@ void audio::mac_io_core::_create_io_proc() {
 
                 uint32_t const input_frame_length = input_buffer->frame_length();
                 if (input_frame_length > 0) {
-                    kernel->input_time = audio::time{*inInputTime, input_buffer->format().sample_rate()};
+                    kernel->input_time = time{*inInputTime, input_buffer->format().sample_rate()};
                 }
             }
         }
@@ -123,7 +124,7 @@ void audio::mac_io_core::_create_io_proc() {
             }
         } else if (kernel->input_time.has_value()) {
             kernel->render_handler({.output_buffer = nullptr,
-                                    .output_time = audio::null_time_opt,
+                                    .output_time = null_time_opt,
                                     .input_buffer = kernel->input_buffer.get(),
                                     .input_time = kernel->input_time});
         }
@@ -135,7 +136,7 @@ void audio::mac_io_core::_create_io_proc() {
     this->_io_proc_id = io_proc_id;
 }
 
-void audio::mac_io_core::_destroy_io_proc() {
+void mac_io_core::_destroy_io_proc() {
     if (this->_io_proc_id && mac_device::is_available_device(*this->_device)) {
         raise_if_raw_audio_error(
             AudioDeviceDestroyIOProcID(this->_device->audio_device_id(), this->_io_proc_id.value()));
@@ -144,7 +145,7 @@ void audio::mac_io_core::_destroy_io_proc() {
     this->_io_proc_id = std::nullopt;
 }
 
-void audio::mac_io_core::_reload_if_needed() {
+void mac_io_core::_reload_if_needed() {
     bool const is_started = this->_is_started;
 
     if (is_started) {
@@ -153,7 +154,7 @@ void audio::mac_io_core::_reload_if_needed() {
     }
 }
 
-audio::mac_io_core_ptr audio::mac_io_core::make_shared(mac_device_ptr const &device) {
+mac_io_core_ptr mac_io_core::make_shared(mac_device_ptr const &device) {
     return std::shared_ptr<mac_io_core>(new mac_io_core{device});
 }
 

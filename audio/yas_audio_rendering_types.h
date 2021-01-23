@@ -15,9 +15,9 @@ class rendering_connection;
 using rendering_connection_map = std::map<uint32_t, rendering_connection>;
 
 struct node_render_args {
-    audio::pcm_buffer *const buffer;
+    pcm_buffer *const buffer;
     uint32_t const bus_idx;
-    audio::time const &time;
+    time const &time;
 
     rendering_connection_map const &source_connections;
 };
@@ -25,9 +25,9 @@ struct node_render_args {
 using node_render_f = std::function<void(node_render_args const &)>;
 
 struct node_input_render_args {
-    audio::pcm_buffer const *const buffer;
+    pcm_buffer const *const buffer;
     uint32_t const bus_idx;
-    audio::time const &time;
+    time const &time;
 };
 
 using node_input_render_f = std::function<void(node_input_render_args const &)>;
