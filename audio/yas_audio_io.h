@@ -40,7 +40,8 @@ struct io final {
     void stop();
 
     observing::canceller_ptr observe_running(std::function<void(running_method const &)> &&);
-    chaining::chain_sync_t<device_observing_pair_t> device_chain() const;
+    observing::canceller_ptr observe_device(observing::caller<device_observing_pair_t>::handler_f &&,
+                                            bool const sync = true);
 
     [[nodiscard]] static io_ptr make_shared(std::optional<io_device_ptr> const &);
 
@@ -53,7 +54,7 @@ struct io final {
 
     observing::notifier_ptr<running_method> const _running_notifier =
         observing::notifier<running_method>::make_shared();
-    chaining::fetcher_ptr<device_observing_pair_t> _device_fetcher;
+    observing::fetcher_ptr<device_observing_pair_t> _device_fetcher;
     std::optional<observing::canceller_ptr> _device_updated_canceller = std::nullopt;
     std::optional<observing::canceller_ptr> _interruption_canceller = std::nullopt;
 

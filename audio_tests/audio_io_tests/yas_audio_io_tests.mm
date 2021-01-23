@@ -26,7 +26,7 @@ using namespace yas::audio;
 
     std::vector<audio::io::device_observing_pair_t> received;
 
-    auto observer = io->device_chain().perform([&received](auto const &pair) { received.push_back(pair); }).sync();
+    auto observer = io->observe_device([&received](auto const &pair) { received.push_back(pair); });
 
     XCTAssertEqual(received.size(), 1);
     XCTAssertEqual(received.at(0).first, audio::io::device_method::initial);

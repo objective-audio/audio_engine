@@ -11,7 +11,7 @@
 using namespace yas;
 
 audio::io::io(std::optional<io_device_ptr> const &device) {
-    this->_device_fetcher = chaining::fetcher<device_observing_pair_t>::make_shared([this]() {
+    this->_device_fetcher = observing::fetcher<device_observing_pair_t>::make_shared([this]() {
         return device_observing_pair_t{device_method::initial, this->_device};
     });
 
@@ -145,8 +145,9 @@ observing::canceller_ptr audio::io::observe_running(std::function<void(running_m
     return this->_running_notifier->observe(std::move(handler));
 }
 
-chaining::chain_sync_t<audio::io::device_observing_pair_t> audio::io::device_chain() const {
-    return this->_device_fetcher->chain();
+observing::canceller_ptr audio::io::observe_device(observing::caller<device_observing_pair_t>::handler_f &&handler,
+                                                   bool const sync) {
+    return this->_device_fetcher->observe(std::move(handler), sync);
 }
 
 void audio::io::_reload() {
