@@ -26,8 +26,8 @@ struct input_tap_vc_cpp {
     audio::graph_ptr const graph = audio::graph::make_shared();
     audio::graph_input_tap_ptr const input_tap = audio::graph_input_tap::make_shared();
 
-    chaining::value::holder_ptr<float> input_level =
-        chaining::value::holder<float>::make_shared(audio::math::decibel_from_linear(0.0f));
+    observing::value::holder_ptr<float> const input_level =
+        observing::value::holder<float>::make_shared(audio::math::decibel_from_linear(0.0f));
 
     void setup() {
         this->graph->add_io(this->device);
