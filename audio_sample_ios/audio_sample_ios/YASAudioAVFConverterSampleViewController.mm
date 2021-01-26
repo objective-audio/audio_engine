@@ -18,7 +18,7 @@ struct avf_converter_vc_cpp {
     audio::graph_ptr const graph;
     audio::graph_avf_au_ptr const converter;
     audio::graph_tap_ptr tap;
-    observing::canceller_pool pool;
+    observing::invalidator_pool pool;
     audio::sample::kernel_ptr const kernel;
 
     avf_converter_vc_cpp()

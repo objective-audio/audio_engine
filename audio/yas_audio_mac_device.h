@@ -80,7 +80,7 @@ struct mac_device : io_device {
         observing::notifier<audio::mac_device::change_info>::make_shared();
     observing::notifier_ptr<io_device::method> const _io_device_notifier =
         observing::notifier<io_device::method>::make_shared();
-    observing::canceller_pool _pool;
+    observing::invalidator_pool _pool;
     std::optional<audio::format> _input_format = std::nullopt;
     std::optional<audio::format> _output_format = std::nullopt;
 

@@ -52,7 +52,7 @@ struct effects_vc_cpp {
     std::optional<audio::graph_connection_ptr> through_connection = std::nullopt;
     std::optional<audio::graph_avf_au_ptr> effect_au = std::nullopt;
     std::vector<audio::avf_au_ptr> units = effect_units();
-    observing::canceller_pool _pool;
+    observing::invalidator_pool _pool;
 
     void setup() {
         this->graph->add_io(this->device);
