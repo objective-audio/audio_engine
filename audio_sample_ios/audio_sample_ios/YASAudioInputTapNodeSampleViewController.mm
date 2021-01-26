@@ -84,7 +84,7 @@ struct input_tap_vc_cpp {
     }
 
    private:
-    observing::canceller_pool _pool;
+    observing::invalidator_pool _pool;
 };
 }
 
