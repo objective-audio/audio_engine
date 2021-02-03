@@ -26,7 +26,7 @@ using namespace yas::audio;
 
     std::vector<audio::io::device_observing_pair_t> received;
 
-    auto observer = io->observe_device([&received](auto const &pair) { received.push_back(pair); });
+    auto canceller = io->observe_device([&received](auto const &pair) { received.push_back(pair); });
 
     XCTAssertEqual(received.size(), 1);
     XCTAssertEqual(received.at(0).first, audio::io::device_method::initial);
@@ -45,7 +45,7 @@ using namespace yas::audio;
 
     XCTAssertEqual(received.size(), 3);
 
-    observer->invalidate();
+    canceller->cancel();
 }
 
 - (void)test_io_core_method_called {

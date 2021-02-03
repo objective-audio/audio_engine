@@ -173,7 +173,7 @@ using namespace yas::audio;
 
     XCTAssertEqual(au->state(), avf_au::load_state::loaded);
 
-    canceller->invalidate();
+    canceller->cancel();
 }
 
 #pragma mark - private
@@ -189,7 +189,7 @@ using namespace yas::audio;
 
     [self waitForExpectations:@[exp] timeout:1.0];
 
-    canceller->invalidate();
+    canceller->cancel();
 }
 
 @end
