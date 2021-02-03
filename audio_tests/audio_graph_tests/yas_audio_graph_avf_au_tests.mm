@@ -191,7 +191,7 @@ using namespace yas;
 
     [self waitForExpectations:@[exp] timeout:1.0];
 
-    canceller->invalidate();
+    canceller->cancel();
 }
 
 @end
