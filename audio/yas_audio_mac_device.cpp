@@ -288,7 +288,7 @@ audio::io_device_ptr mac_device::renewable_default_output_device() {
             auto observer2 =
                 mac_device::observe_system([handler](auto const &) { handler(renewable_device::method::renewal); });
 
-            return std::vector<observing::invalidatable_ptr>{std::move(observer1), std::move(observer2)};
+            return std::vector<observing::cancellable_ptr>{std::move(observer1), std::move(observer2)};
         });
 }
 
