@@ -24,6 +24,7 @@ using namespace yas::audio;
 graph::graph() = default;
 
 graph::~graph() {
+    this->remove_io();
     this->_nodes.clear();
 }
 
