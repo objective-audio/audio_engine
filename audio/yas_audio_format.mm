@@ -124,7 +124,7 @@ uint32_t format::sample_byte_count() const {
     }
 }
 
-uint32_t format::buffer_frame_byte_count() const {
+uint32_t format::frame_byte_count() const {
     return sample_byte_count() * stride();
 }
 

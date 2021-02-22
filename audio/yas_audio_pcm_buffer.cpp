@@ -403,7 +403,7 @@ void pcm_buffer::clear(uint32_t const begin_frame, uint32_t const length) {
 }
 
 bool pcm_buffer::is_empty() const {
-    uint32_t const frame_size = this->_format.buffer_frame_byte_count();
+    uint32_t const frame_size = this->_format.frame_byte_count();
     int8_t zero_data[frame_size];
     memset(zero_data, 0, frame_size);
 

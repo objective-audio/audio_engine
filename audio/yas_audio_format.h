@@ -33,7 +33,7 @@ struct format final {
     bool is_interleaved() const;
     AudioStreamBasicDescription const &stream_description() const;
     uint32_t sample_byte_count() const;
-    uint32_t buffer_frame_byte_count() const;
+    uint32_t frame_byte_count() const;
     CFStringRef description() const;
 
     bool operator==(format const &) const;

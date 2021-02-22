@@ -86,12 +86,12 @@ using namespace yas::audio;
 
     XCTAssertEqual(pcm_buffer.frame_length(), frame_capacity);
     XCTAssertEqual(pcm_buffer.audio_buffer_list()->mBuffers[0].mDataByteSize,
-                   frame_capacity * format.buffer_frame_byte_count());
+                   frame_capacity * format.frame_byte_count());
 
     pcm_buffer.set_frame_length(2);
 
     XCTAssertEqual(pcm_buffer.frame_length(), 2);
-    XCTAssertEqual(pcm_buffer.audio_buffer_list()->mBuffers[0].mDataByteSize, 2 * format.buffer_frame_byte_count());
+    XCTAssertEqual(pcm_buffer.audio_buffer_list()->mBuffers[0].mDataByteSize, 2 * format.frame_byte_count());
 
     pcm_buffer.set_frame_length(0);
 
