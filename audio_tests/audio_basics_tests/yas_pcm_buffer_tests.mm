@@ -5,6 +5,7 @@
 #import "yas_audio_test_utils.h"
 
 using namespace yas;
+using namespace yas::audio;
 
 @interface yas_pcm_buffer_tests : XCTestCase
 
@@ -1272,6 +1273,61 @@ using namespace yas;
     XCTAssertEqual(moved.format(), format);
     XCTAssertEqual(moved.frame_capacity(), 4);
     XCTAssertEqual(moved.frame_length(), 4);
+}
+
+- (void)test_is_empty_non_interleaved {
+    audio::format const format{
+        {.sample_rate = 4, .channel_count = 2, .pcm_format = pcm_format::int16, .interleaved = false}};
+
+    audio::pcm_buffer buffer{format, 4};
+
+    XCTAssertTrue(buffer.is_empty());
+
+    buffer.data_ptr_at_index<int16_t>(0)[0] = 1;
+
+    XCTAssertFalse(buffer.is_empty());
+
+    buffer.clear();
+    XCTAssertTrue(buffer.is_empty());
+
+    buffer.data_ptr_at_index<int16_t>(1)[1] = 2;
+
+    XCTAssertFalse(buffer.is_empty());
+
+    buffer.clear();
+    XCTAssertTrue(buffer.is_empty());
+
+    buffer.data_ptr_at_index<int16_t>(1)[3] = 3;
+
+    XCTAssertFalse(buffer.is_empty());
+}
+
+- (void)test_is_empty_interleaved {
+    audio::format const format{
+        {.sample_rate = 4, .channel_count = 2, .pcm_format = pcm_format::int16, .interleaved = true}};
+
+    audio::pcm_buffer buffer{format, 4};
+    int16_t *data = buffer.data_ptr_at_index<int16_t>(0);
+
+    XCTAssertTrue(buffer.is_empty());
+
+    data[0] = 1;
+
+    XCTAssertFalse(buffer.is_empty());
+
+    buffer.clear();
+    XCTAssertTrue(buffer.is_empty());
+
+    data[1] = 1;
+
+    XCTAssertFalse(buffer.is_empty());
+
+    buffer.clear();
+    XCTAssertTrue(buffer.is_empty());
+
+    data[7] = 1;
+
+    XCTAssertFalse(buffer.is_empty());
 }
 
 #pragma mark -

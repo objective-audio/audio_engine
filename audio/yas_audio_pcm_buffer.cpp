@@ -5,6 +5,7 @@
 #include "yas_audio_pcm_buffer.h"
 
 #include <Accelerate/Accelerate.h>
+#include <cpp_utils/yas_fast_each.h>
 #include <cpp_utils/yas_result.h>
 #include <cpp_utils/yas_stl_utils.h>
 
@@ -262,6 +263,7 @@ template float *pcm_buffer::_data_ptr_at_index(uint32_t const buf_idx) const;
 template double *pcm_buffer::_data_ptr_at_index(uint32_t const buf_idx) const;
 template int32_t *pcm_buffer::_data_ptr_at_index(uint32_t const buf_idx) const;
 template int16_t *pcm_buffer::_data_ptr_at_index(uint32_t const buf_idx) const;
+template int8_t *pcm_buffer::_data_ptr_at_index(uint32_t const buf_idx) const;
 
 template <typename T>
 T *pcm_buffer::_data_ptr_at_channel(uint32_t const ch_idx) const {
@@ -398,6 +400,25 @@ void pcm_buffer::clear(uint32_t const begin_frame, uint32_t const length) {
         uint8_t *byte_data = static_cast<uint8_t *>(audio_buffer_list()->mBuffers[i].mData);
         memset(&byte_data[begin_frame * bytes_per_frame], 0, length * bytes_per_frame);
     }
+}
+
+bool pcm_buffer::is_empty() const {
+    uint32_t const frame_size = this->_format.buffer_frame_byte_count();
+    int8_t zero_data[frame_size];
+    memset(zero_data, 0, frame_size);
+
+    auto buffer_each = make_fast_each(this->_format.buffer_count());
+    while (yas_each_next(buffer_each)) {
+        int8_t const *data = this->_data_ptr_at_index<int8_t>(yas_each_index(buffer_each));
+
+        auto frame_each = make_fast_each(this->_frame_length);
+        while (yas_each_next(frame_each)) {
+            if (memcmp(&data[yas_each_index(frame_each) * frame_size], zero_data, frame_size) != 0) {
+                return false;
+            }
+        }
+    }
+    return true;
 }
 
 pcm_buffer::copy_result pcm_buffer::copy_from(pcm_buffer const &from_buffer) {

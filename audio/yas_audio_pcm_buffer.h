@@ -69,6 +69,8 @@ struct pcm_buffer final {
     void clear();
     void clear(uint32_t const begin_frame, uint32_t const length);
 
+    bool is_empty() const;
+
     pcm_buffer::copy_result copy_from(pcm_buffer const &);
     pcm_buffer::copy_result copy_from(pcm_buffer const &, copy_options);
     pcm_buffer::copy_result copy_channel_from(pcm_buffer const &);
