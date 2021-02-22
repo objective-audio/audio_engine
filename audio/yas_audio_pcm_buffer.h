@@ -48,21 +48,21 @@ struct pcm_buffer final {
 
     pcm_buffer(pcm_buffer &&);
 
-    audio::format const &format() const;
-    AudioBufferList *audio_buffer_list();
-    AudioBufferList const *audio_buffer_list() const;
+    [[nodiscard]] audio::format const &format() const;
+    [[nodiscard]] AudioBufferList *audio_buffer_list();
+    [[nodiscard]] AudioBufferList const *audio_buffer_list() const;
 
     template <typename T>
-    T *data_ptr_at_index(uint32_t const buf_idx);
+    [[nodiscard]] T *data_ptr_at_index(uint32_t const buf_idx);
     template <typename T>
-    T *data_ptr_at_channel(uint32_t const ch_idx);
+    [[nodiscard]] T *data_ptr_at_channel(uint32_t const ch_idx);
     template <typename T>
-    T const *data_ptr_at_index(uint32_t const buf_idx) const;
+    [[nodiscard]] T const *data_ptr_at_index(uint32_t const buf_idx) const;
     template <typename T>
-    T const *data_ptr_at_channel(uint32_t const ch_idx) const;
+    [[nodiscard]] T const *data_ptr_at_channel(uint32_t const ch_idx) const;
 
-    uint32_t frame_capacity() const;
-    uint32_t frame_length() const;
+    [[nodiscard]] uint32_t frame_capacity() const;
+    [[nodiscard]] uint32_t frame_length() const;
     void set_frame_length(uint32_t const length);
 
     void reset_buffer();
