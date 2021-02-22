@@ -11,7 +11,7 @@
 
 namespace yas::audio {
 struct mac_empty_device : io_device {
-    static mac_empty_device_ptr make_shared();
+    [[nodiscard]] static mac_empty_device_ptr make_shared();
 
    private:
     mac_empty_device();

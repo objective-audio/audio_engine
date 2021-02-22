@@ -76,14 +76,14 @@ struct file final {
     create_result_t create(create_args);
     void close();
 
-    bool is_opened() const;
-    yas::url const &url() const;
-    audio::file_type file_type() const;
-    audio::format const &file_format() const;
-    audio::format const &processing_format() const;
-    int64_t file_length() const;
-    int64_t processing_length() const;
-    int64_t file_frame_position() const;
+    [[nodiscard]] bool is_opened() const;
+    [[nodiscard]] yas::url const &url() const;
+    [[nodiscard]] audio::file_type file_type() const;
+    [[nodiscard]] audio::format const &file_format() const;
+    [[nodiscard]] audio::format const &processing_format() const;
+    [[nodiscard]] int64_t file_length() const;
+    [[nodiscard]] int64_t processing_length() const;
+    [[nodiscard]] int64_t file_frame_position() const;
 
     void set_processing_format(audio::format format);
     void set_file_frame_position(uint32_t const position);

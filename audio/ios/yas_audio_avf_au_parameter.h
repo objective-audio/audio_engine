@@ -25,24 +25,26 @@ struct avf_au_parameter {
     std::optional<std::string> const unit_name;
     std::string const display_name;
 
-    avf_au_parameter_scope scope() const;
-    float min_value() const;
-    float max_value() const;
-    float const &default_value() const;
-    std::vector<std::string> const &value_strings() const;
+    [[nodiscard]] avf_au_parameter_scope scope() const;
+    [[nodiscard]] float min_value() const;
+    [[nodiscard]] float max_value() const;
+    [[nodiscard]] float const &default_value() const;
+    [[nodiscard]] std::vector<std::string> const &value_strings() const;
 
-    float value() const;
+    [[nodiscard]] float value() const;
     void set_value(float const);
     void set_value_at(std::size_t const);
     void reset_value();
 
     void set_value_changed_handler(std::function<void(float const)> &&);
 
-    static avf_au_parameter_ptr make_shared(std::string &&key_path, std::string &&identifier,
-                                            AudioUnitParameterUnit const unit, std::optional<std::string> &&unit_name,
-                                            float const default_value, std::string &&display_name,
-                                            float const min_value, float const max_value,
-                                            std::vector<std::string> &&value_strings, std::vector<float> &&values);
+    [[nodiscard]] static avf_au_parameter_ptr make_shared(std::string &&key_path, std::string &&identifier,
+                                                          AudioUnitParameterUnit const unit,
+                                                          std::optional<std::string> &&unit_name,
+                                                          float const default_value, std::string &&display_name,
+                                                          float const min_value, float const max_value,
+                                                          std::vector<std::string> &&value_strings,
+                                                          std::vector<float> &&values);
 
     static avf_au_parameter_scope scope_from_key_path(std::string const &keypath);
 

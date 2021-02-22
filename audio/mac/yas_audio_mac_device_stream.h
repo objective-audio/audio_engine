@@ -43,12 +43,12 @@ struct mac_device::stream {
         AudioDeviceID device_id;
     };
 
-    AudioStreamID stream_id() const;
-    std::optional<audio::mac_device_ptr> device() const;
-    bool is_active() const;
-    audio::direction direction() const;
-    audio::format virtual_format() const;
-    uint32_t starting_channel() const;
+    [[nodiscard]] AudioStreamID stream_id() const;
+    [[nodiscard]] std::optional<audio::mac_device_ptr> device() const;
+    [[nodiscard]] bool is_active() const;
+    [[nodiscard]] audio::direction direction() const;
+    [[nodiscard]] audio::format virtual_format() const;
+    [[nodiscard]] uint32_t starting_channel() const;
 
     [[nodiscard]] observing::canceller_ptr observe(observing::caller<observing_pair_t>::handler_f &&);
 

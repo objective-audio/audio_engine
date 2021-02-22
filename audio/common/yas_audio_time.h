@@ -15,12 +15,12 @@ struct time final {
     time(int64_t const sample_time, double const sample_rate);
     time(uint64_t const host_time, int64_t const sample_time, double const sample_rate);
 
-    bool is_host_time_valid() const;
-    uint64_t host_time() const;
-    bool is_sample_time_valid() const;
-    int64_t sample_time() const;
-    double sample_rate() const;
-    AudioTimeStamp audio_time_stamp() const;
+    [[nodiscard]] bool is_host_time_valid() const;
+    [[nodiscard]] uint64_t host_time() const;
+    [[nodiscard]] bool is_sample_time_valid() const;
+    [[nodiscard]] int64_t sample_time() const;
+    [[nodiscard]] double sample_rate() const;
+    [[nodiscard]] AudioTimeStamp audio_time_stamp() const;
 
     bool operator==(time const &) const;
     bool operator!=(time const &) const;
