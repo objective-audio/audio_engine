@@ -22,19 +22,19 @@ struct format final {
     explicit format(CFDictionaryRef const &settings);
     explicit format(args args);
 
-    bool is_empty() const;
-    bool is_broken() const;
-    bool is_standard() const;
-    audio::pcm_format pcm_format() const;
-    uint32_t channel_count() const;
-    uint32_t buffer_count() const;
-    uint32_t stride() const;
-    double sample_rate() const;
-    bool is_interleaved() const;
-    AudioStreamBasicDescription const &stream_description() const;
-    uint32_t sample_byte_count() const;
-    uint32_t buffer_frame_byte_count() const;
-    CFStringRef description() const;
+    [[nodiscard]] bool is_empty() const;
+    [[nodiscard]] bool is_broken() const;
+    [[nodiscard]] bool is_standard() const;
+    [[nodiscard]] audio::pcm_format pcm_format() const;
+    [[nodiscard]] uint32_t channel_count() const;
+    [[nodiscard]] uint32_t buffer_count() const;
+    [[nodiscard]] uint32_t stride() const;
+    [[nodiscard]] double sample_rate() const;
+    [[nodiscard]] bool is_interleaved() const;
+    [[nodiscard]] AudioStreamBasicDescription const &stream_description() const;
+    [[nodiscard]] uint32_t sample_byte_count() const;
+    [[nodiscard]] uint32_t frame_byte_count() const;
+    [[nodiscard]] CFStringRef description() const;
 
     bool operator==(format const &) const;
     bool operator!=(format const &) const;

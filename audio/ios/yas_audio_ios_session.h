@@ -54,7 +54,7 @@ struct ios_session : ios_device_session, interruptor {
     [[nodiscard]] activate_result_t reactivate();
     void deactivate();
 
-    bool is_interrupting() const override;
+    [[nodiscard]] bool is_interrupting() const override;
 
     [[nodiscard]] enum category category() const;
     void set_category(enum category const);

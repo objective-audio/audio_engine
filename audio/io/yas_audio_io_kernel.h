@@ -27,8 +27,10 @@ struct io_kernel final {
 
     void reset_buffers();
 
-    static io_kernel_ptr make_shared(io_render_f const &, std::optional<audio::format> const &input_format,
-                                     std::optional<audio::format> const &output_format, uint32_t const frame_capacity);
+    [[nodiscard]] static io_kernel_ptr make_shared(io_render_f const &,
+                                                   std::optional<audio::format> const &input_format,
+                                                   std::optional<audio::format> const &output_format,
+                                                   uint32_t const frame_capacity);
 
    private:
     io_kernel(io_render_f const &, std::optional<audio::format> const &input_format,
