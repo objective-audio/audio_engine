@@ -18,7 +18,7 @@ struct avf_converter_vc_cpp {
     audio::graph_ptr const graph;
     audio::graph_avf_au_ptr const converter;
     audio::graph_tap_ptr tap;
-    observing::invalidator_pool pool;
+    observing::canceller_pool pool;
     audio::sample::kernel_ptr const kernel;
 
     avf_converter_vc_cpp()
@@ -67,7 +67,7 @@ struct avf_converter_vc_cpp {
     }
 
     void dispose() {
-        this->pool.invalidate();
+        this->pool.cancel();
 
         this->graph->remove_io();
 
