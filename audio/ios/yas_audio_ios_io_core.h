@@ -8,8 +8,6 @@
 
 #if TARGET_OS_IPHONE
 
-#include <chaining/yas_chaining_umbrella.h>
-
 #include "yas_audio_format.h"
 #include "yas_audio_io_core.h"
 #include "yas_audio_io_kernel.h"

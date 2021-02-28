@@ -274,7 +274,8 @@ using namespace yas;
 
 - (void)test_smoke {
     audio::format format{{.sample_rate = 48000.0, .channel_count = 2}};
-    format.description();
+    auto description = format.description();
+    NSLog(@"%@", (__bridge NSString *)description);
 }
 
 @end

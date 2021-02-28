@@ -20,7 +20,6 @@
 		B62579AD21E0EAF8003740D9 /* yas_audio_io_device_tests.mm in Sources */ = {isa = PBXBuildFile; fileRef = B625799321E0EAF8003740D9 /* yas_audio_io_device_tests.mm */; };
 		B62579AE21E0EAF8003740D9 /* yas_audio_device_stream_tests.mm in Sources */ = {isa = PBXBuildFile; fileRef = B625799421E0EAF8003740D9 /* yas_audio_device_stream_tests.mm */; };
 		B62579B121E0EB21003740D9 /* audio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B62579B021E0EB21003740D9 /* audio.framework */; };
-		B62579B321E0EB21003740D9 /* chaining.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B62579B221E0EB21003740D9 /* chaining.framework */; };
 		B62579BB21E0EB40003740D9 /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B62579B821E0EB40003740D9 /* CoreAudio.framework */; };
 		B62579BC21E0EB40003740D9 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B62579B921E0EB40003740D9 /* AudioToolbox.framework */; };
 		B62579BD21E0EB40003740D9 /* AudioUnit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B62579BA21E0EB40003740D9 /* AudioUnit.framework */; };
@@ -28,6 +27,7 @@
 		B62579C021E0EB8D003740D9 /* cpp_utils.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B62579B421E0EB21003740D9 /* cpp_utils.framework */; };
 		B642E98823B2ED4900D504D8 /* yas_audio_renewable_device_tests.mm in Sources */ = {isa = PBXBuildFile; fileRef = B642E98723B2ED4900D504D8 /* yas_audio_renewable_device_tests.mm */; };
 		B652B57424F1FD4500416CE7 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B623817E21E1931200234CC2 /* Accelerate.framework */; };
+		B657FB6225EBCC5800495411 /* observing.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B657FB6125EBCC5800495411 /* observing.framework */; };
 		B66FDD7E250C8C2400952310 /* yas_audio_rendering_tests.mm in Sources */ = {isa = PBXBuildFile; fileRef = B66FDD7D250C8C2400952310 /* yas_audio_rendering_tests.mm */; };
 		B68CB91624D5A49800270E2C /* yas_audio_debug_tests.mm in Sources */ = {isa = PBXBuildFile; fileRef = B68CB91524D5A49800270E2C /* yas_audio_debug_tests.mm */; };
 		B6A9BC4C2393ABE100EA7DC8 /* yas_audio_avf_au_tests.mm in Sources */ = {isa = PBXBuildFile; fileRef = B6A9BC4B2393ABE100EA7DC8 /* yas_audio_avf_au_tests.mm */; };
@@ -73,6 +73,8 @@
 		B62579BE21E0EB56003740D9 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		B642E98723B2ED4900D504D8 /* yas_audio_renewable_device_tests.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = yas_audio_renewable_device_tests.mm; sourceTree = "<group>"; };
 		B643860F23C0A1920079F920 /* yas_audio_test_io_device.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = yas_audio_test_io_device.h; sourceTree = "<group>"; };
+		B657FB5F25EBCC4B00495411 /* observing.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = observing.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		B657FB6125EBCC5800495411 /* observing.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = observing.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B66FDD7D250C8C2400952310 /* yas_audio_rendering_tests.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = yas_audio_rendering_tests.mm; sourceTree = "<group>"; };
 		B6897B1721E1867900EF6897 /* objc_utils.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = objc_utils.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B68CB91524D5A49800270E2C /* yas_audio_debug_tests.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = yas_audio_debug_tests.mm; sourceTree = "<group>"; };
@@ -98,9 +100,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B657FB6225EBCC5800495411 /* observing.framework in Frameworks */,
 				B652B57424F1FD4500416CE7 /* Accelerate.framework in Frameworks */,
 				B62579B121E0EB21003740D9 /* audio.framework in Frameworks */,
-				B62579B321E0EB21003740D9 /* chaining.framework in Frameworks */,
 				B62579C021E0EB8D003740D9 /* cpp_utils.framework in Frameworks */,
 				B62579BF21E0EB56003740D9 /* AVFoundation.framework in Frameworks */,
 				B62579BB21E0EB40003740D9 /* CoreAudio.framework in Frameworks */,
@@ -195,6 +197,8 @@
 		B62579AF21E0EB21003740D9 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				B657FB6125EBCC5800495411 /* observing.framework */,
+				B657FB5F25EBCC4B00495411 /* observing.framework */,
 				B623817E21E1931200234CC2 /* Accelerate.framework */,
 				B6897B1721E1867900EF6897 /* objc_utils.framework */,
 				B62579BE21E0EB56003740D9 /* AVFoundation.framework */,

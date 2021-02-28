@@ -6,10 +6,11 @@
 
 #include <AudioToolbox/AudioToolbox.h>
 #include <audio/yas_audio_ptr.h>
-#include <chaining/yas_chaining_umbrella.h>
 
 #include <functional>
 #include <optional>
+#include <string>
+#include <vector>
 
 namespace yas::audio {
 enum class avf_au_parameter_scope {

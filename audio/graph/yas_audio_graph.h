@@ -6,7 +6,6 @@
 
 #include <audio/yas_audio_graph_connection.h>
 #include <audio/yas_audio_graph_node.h>
-#include <chaining/yas_chaining_umbrella.h>
 
 #include <ostream>
 

@@ -8,13 +8,13 @@
 
 /* Begin PBXBuildFile section */
 		B6002E2421DCC8700013AA0E /* audio.h in Headers */ = {isa = PBXBuildFile; fileRef = B6002E2221DCC8700013AA0E /* audio.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		B6002E2921DCC87F0013AA0E /* chaining.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B6002E2821DCC87F0013AA0E /* chaining.framework */; };
 		B6002E2B21DCC87F0013AA0E /* cpp_utils.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B6002E2A21DCC87F0013AA0E /* cpp_utils.framework */; };
 		B6002E2C21DCC8850013AA0E /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B6002D1521DCA74A0013AA0E /* UIKit.framework */; };
 		B6002E2D21DCC89B0013AA0E /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B6002D0D21DCA6750013AA0E /* Accelerate.framework */; };
 		B6002E2E21DCC89B0013AA0E /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B6002D0B21DCA66E0013AA0E /* AudioToolbox.framework */; };
 		B6002E2F21DCC89B0013AA0E /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B6002D0F21DCA67F0013AA0E /* AVFoundation.framework */; };
 		B6393119256BAADE00818C46 /* yas_audio_umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = B63930C3256BAADE00818C46 /* yas_audio_umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		B657FB6C25EBCF8700495411 /* observing.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B657FB6B25EBCF8700495411 /* observing.framework */; };
 		B6C5DE4E25E3A8D800B3BF22 /* yas_audio_pcm_buffer.h in Headers */ = {isa = PBXBuildFile; fileRef = B6C5DDED25E3A8D700B3BF22 /* yas_audio_pcm_buffer.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		B6C5DE4F25E3A8D800B3BF22 /* yas_audio_pcm_buffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6C5DDEE25E3A8D700B3BF22 /* yas_audio_pcm_buffer.cpp */; };
 		B6C5DE5025E3A8D800B3BF22 /* yas_audio_rendering_graph.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6C5DDF125E3A8D700B3BF22 /* yas_audio_rendering_graph.cpp */; };
@@ -115,6 +115,7 @@
 		B6002E2821DCC87F0013AA0E /* chaining.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = chaining.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B6002E2A21DCC87F0013AA0E /* cpp_utils.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = cpp_utils.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B63930C3256BAADE00818C46 /* yas_audio_umbrella.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yas_audio_umbrella.h; sourceTree = "<group>"; };
+		B657FB6B25EBCF8700495411 /* observing.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = observing.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B6C5DDED25E3A8D700B3BF22 /* yas_audio_pcm_buffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yas_audio_pcm_buffer.h; sourceTree = "<group>"; };
 		B6C5DDEE25E3A8D700B3BF22 /* yas_audio_pcm_buffer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = yas_audio_pcm_buffer.cpp; sourceTree = "<group>"; };
 		B6C5DDF125E3A8D700B3BF22 /* yas_audio_rendering_graph.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = yas_audio_rendering_graph.cpp; sourceTree = "<group>"; };
@@ -211,9 +212,9 @@
 			files = (
 				B6002E2D21DCC89B0013AA0E /* Accelerate.framework in Frameworks */,
 				B6002E2E21DCC89B0013AA0E /* AudioToolbox.framework in Frameworks */,
+				B657FB6C25EBCF8700495411 /* observing.framework in Frameworks */,
 				B6002E2F21DCC89B0013AA0E /* AVFoundation.framework in Frameworks */,
 				B6002E2C21DCC8850013AA0E /* UIKit.framework in Frameworks */,
-				B6002E2921DCC87F0013AA0E /* chaining.framework in Frameworks */,
 				B6002E2B21DCC87F0013AA0E /* cpp_utils.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -241,6 +242,7 @@
 		B6002D0A21DCA66E0013AA0E /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				B657FB6B25EBCF8700495411 /* observing.framework */,
 				B6F8D0F321DFA517008F43EF /* AudioUnit.framework */,
 				B6DB01B121DE57EF0078B199 /* objc_utils.framework */,
 				B6002E2821DCC87F0013AA0E /* chaining.framework */,

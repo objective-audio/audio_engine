@@ -5,7 +5,7 @@
 #pragma once
 
 #include <audio/yas_audio_io_kernel.h>
-#include <chaining/yas_chaining_umbrella.h>
+#include <observing/yas_observing_umbrella.h>
 
 namespace yas::audio {
 struct io_core {
@@ -14,7 +14,7 @@ struct io_core {
     virtual void set_render_handler(std::optional<io_render_f>) = 0;
     virtual void set_maximum_frames_per_slice(uint32_t const) = 0;
 
-    [[nodiscard]] virtual bool start() = 0;
+    virtual bool start() = 0;
     virtual void stop() = 0;
 };
 

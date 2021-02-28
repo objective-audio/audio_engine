@@ -8,7 +8,7 @@
 
 #if TARGET_OS_IPHONE
 
-#include <chaining/yas_chaining_umbrella.h>
+#include <observing/yas_observing_umbrella.h>
 
 #include <cstdint>
 

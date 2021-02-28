@@ -8,7 +8,6 @@
 #include <audio/yas_audio_graph_node.h>
 #include <audio/yas_audio_io_device.h>
 #include <audio/yas_audio_ptr.h>
-#include <chaining/yas_chaining_umbrella.h>
 
 namespace yas::audio {
 class graph_input_context;

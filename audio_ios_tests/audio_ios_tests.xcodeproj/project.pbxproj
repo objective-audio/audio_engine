@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		B62579D721E0EC9B003740D9 /* audio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B62579D621E0EC9B003740D9 /* audio.framework */; };
-		B62579D921E0EC9B003740D9 /* chaining.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B62579D821E0EC9B003740D9 /* chaining.framework */; };
 		B62579DB21E0EC9B003740D9 /* cpp_utils.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B62579DA21E0EC9B003740D9 /* cpp_utils.framework */; };
 		B62579DF21E0ECA4003740D9 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B62579DC21E0ECA4003740D9 /* AudioToolbox.framework */; };
 		B62579E121E0ECA4003740D9 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B62579DE21E0ECA4003740D9 /* AVFoundation.framework */; };
@@ -35,6 +34,7 @@
 		B642E99023B2EEA800D504D8 /* yas_audio_renewable_device_tests.mm in Sources */ = {isa = PBXBuildFile; fileRef = B642E98D23B2EEA800D504D8 /* yas_audio_renewable_device_tests.mm */; };
 		B643860E23C087160079F920 /* yas_audio_io_tests.mm in Sources */ = {isa = PBXBuildFile; fileRef = B643860D23C087160079F920 /* yas_audio_io_tests.mm */; };
 		B653243F23CA0A6D0089CB59 /* yas_audio_ios_device_tests.mm in Sources */ = {isa = PBXBuildFile; fileRef = B653243E23CA0A6D0089CB59 /* yas_audio_ios_device_tests.mm */; };
+		B657FB7425EBCFE100495411 /* observing.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B657FB7325EBCFE100495411 /* observing.framework */; };
 		B68CB91824D5A4BE00270E2C /* yas_audio_debug_tests.mm in Sources */ = {isa = PBXBuildFile; fileRef = B68CB91724D5A4BE00270E2C /* yas_audio_debug_tests.mm */; };
 		B6AA68A423C20E0A005F5B6B /* yas_audio_offline_device_tests.mm in Sources */ = {isa = PBXBuildFile; fileRef = B6AA68A323C20E0A005F5B6B /* yas_audio_offline_device_tests.mm */; };
 		B6AA68A623C20E36005F5B6B /* yas_audio_graph_offline_io_tests.mm in Sources */ = {isa = PBXBuildFile; fileRef = B6AA68A523C20E36005F5B6B /* yas_audio_graph_offline_io_tests.mm */; };
@@ -79,6 +79,7 @@
 		B643860D23C087160079F920 /* yas_audio_io_tests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = yas_audio_io_tests.mm; sourceTree = "<group>"; };
 		B643861023C0A5400079F920 /* yas_audio_test_io_device.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = yas_audio_test_io_device.h; sourceTree = "<group>"; };
 		B653243E23CA0A6D0089CB59 /* yas_audio_ios_device_tests.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = yas_audio_ios_device_tests.mm; sourceTree = "<group>"; };
+		B657FB7325EBCFE100495411 /* observing.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = observing.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B6897B1921E1868E00EF6897 /* objc_utils.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = objc_utils.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B68CB91724D5A4BE00270E2C /* yas_audio_debug_tests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = yas_audio_debug_tests.mm; sourceTree = "<group>"; };
 		B6AA68A323C20E0A005F5B6B /* yas_audio_offline_device_tests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = yas_audio_offline_device_tests.mm; sourceTree = "<group>"; };
@@ -95,7 +96,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				B62579D721E0EC9B003740D9 /* audio.framework in Frameworks */,
-				B62579D921E0EC9B003740D9 /* chaining.framework in Frameworks */,
+				B657FB7425EBCFE100495411 /* observing.framework in Frameworks */,
 				B62579DB21E0EC9B003740D9 /* cpp_utils.framework in Frameworks */,
 				B62579DF21E0ECA4003740D9 /* AudioToolbox.framework in Frameworks */,
 				B62579E121E0ECA4003740D9 /* AVFoundation.framework in Frameworks */,
@@ -134,6 +135,7 @@
 		B62579D521E0EC9B003740D9 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				B657FB7325EBCFE100495411 /* observing.framework */,
 				B6897B1921E1868E00EF6897 /* objc_utils.framework */,
 				B61B489B21E0F819007AF942 /* UIKit.framework */,
 				B62579DD21E0ECA4003740D9 /* Accelerate.framework */,

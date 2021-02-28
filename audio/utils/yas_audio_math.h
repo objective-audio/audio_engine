@@ -27,8 +27,8 @@ namespace math {
     [[nodiscard]] uint32_t frames_from_seconds(double const seconds, double const sample_rate);
 
     template <typename T>
-    [[nodiscard]] auto fill_sine(T *const out_data, uint32_t const length, double const start_phase,
-                                 double const phase_per_frame) -> T;
+    auto fill_sine(T *const out_data, uint32_t const length, double const start_phase, double const phase_per_frame)
+        -> T;
 };  // namespace math
 
 template <typename T>

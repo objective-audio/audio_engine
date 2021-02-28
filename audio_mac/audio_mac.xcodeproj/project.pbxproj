@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		B6002D7521DCC6DA0013AA0E /* audio.h in Headers */ = {isa = PBXBuildFile; fileRef = B6002D7321DCC6DA0013AA0E /* audio.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		B6002D7921DCC6E80013AA0E /* chaining.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B6002C5E21DC71DC0013AA0E /* chaining.framework */; };
 		B6002D7A21DCC6E80013AA0E /* cpp_utils.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B6002C6021DC71DC0013AA0E /* cpp_utils.framework */; };
 		B6002D7C21DCC6ED0013AA0E /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B6002C6221DC8C1C0013AA0E /* Accelerate.framework */; };
 		B6002D7D21DCC6F50013AA0E /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B6002C6521DC8C4C0013AA0E /* AudioToolbox.framework */; };
@@ -72,6 +71,7 @@
 		B64F8A5D2349FA710056EA99 /* yas_audio_io.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B64F8A592349FA710056EA99 /* yas_audio_io.cpp */; };
 		B64F8A5E2349FA710056EA99 /* yas_audio_io.h in Headers */ = {isa = PBXBuildFile; fileRef = B64F8A5A2349FA710056EA99 /* yas_audio_io.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		B653243D23CA09CC0089CB59 /* yas_audio_ios_device_session.h in Headers */ = {isa = PBXBuildFile; fileRef = B653243C23CA09CC0089CB59 /* yas_audio_ios_device_session.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		B657FB5825EBCC1A00495411 /* observing.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B657FB5725EBCC1A00495411 /* observing.framework */; };
 		B6605A53235D35BE001F6905 /* yas_audio_mac_io_core.mm in Sources */ = {isa = PBXBuildFile; fileRef = B6605A51235D35BE001F6905 /* yas_audio_mac_io_core.mm */; };
 		B6605A54235D35BE001F6905 /* yas_audio_mac_io_core.h in Headers */ = {isa = PBXBuildFile; fileRef = B6605A52235D35BE001F6905 /* yas_audio_mac_io_core.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		B663563223843046003E0B4C /* yas_audio_graph_avf_au_mixer.h in Headers */ = {isa = PBXBuildFile; fileRef = B663563023843046003E0B4C /* yas_audio_graph_avf_au_mixer.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -174,6 +174,7 @@
 		B64F8A592349FA710056EA99 /* yas_audio_io.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = yas_audio_io.cpp; sourceTree = "<group>"; };
 		B64F8A5A2349FA710056EA99 /* yas_audio_io.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yas_audio_io.h; sourceTree = "<group>"; };
 		B653243C23CA09CC0089CB59 /* yas_audio_ios_device_session.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yas_audio_ios_device_session.h; sourceTree = "<group>"; };
+		B657FB5725EBCC1A00495411 /* observing.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = observing.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B6605A51235D35BE001F6905 /* yas_audio_mac_io_core.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = yas_audio_mac_io_core.mm; sourceTree = "<group>"; };
 		B6605A52235D35BE001F6905 /* yas_audio_mac_io_core.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yas_audio_mac_io_core.h; sourceTree = "<group>"; };
 		B663563023843046003E0B4C /* yas_audio_graph_avf_au_mixer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yas_audio_graph_avf_au_mixer.h; sourceTree = "<group>"; };
@@ -215,8 +216,8 @@
 				B6002D7D21DCC6F50013AA0E /* AudioToolbox.framework in Frameworks */,
 				B6002D7E21DCC6F50013AA0E /* AudioUnit.framework in Frameworks */,
 				B6002D7F21DCC6F50013AA0E /* CoreAudio.framework in Frameworks */,
-				B6002D7921DCC6E80013AA0E /* chaining.framework in Frameworks */,
 				B6002D7A21DCC6E80013AA0E /* cpp_utils.framework in Frameworks */,
+				B657FB5825EBCC1A00495411 /* observing.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -243,6 +244,7 @@
 		B6002BBC21DC70C50013AA0E /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				B657FB5725EBCC1A00495411 /* observing.framework */,
 				B6002C6B21DC8C560013AA0E /* AVFoundation.framework */,
 				B6002C6521DC8C4C0013AA0E /* AudioToolbox.framework */,
 				B6002C6621DC8C4C0013AA0E /* AudioUnit.framework */,
