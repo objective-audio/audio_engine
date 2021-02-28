@@ -6,7 +6,6 @@
 
 #include <audio/yas_audio_ptr.h>
 #include <audio/yas_audio_route.h>
-#include <chaining/yas_chaining_umbrella.h>
 
 namespace yas::audio {
 struct graph_route final {

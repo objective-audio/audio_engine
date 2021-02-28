@@ -17,7 +17,7 @@ struct mac_io_core final : io_core {
     void set_render_handler(std::optional<io_render_f>) override;
     void set_maximum_frames_per_slice(uint32_t const) override;
 
-    [[nodiscard]] bool start() override;
+    bool start() override;
     void stop() override;
 
     [[nodiscard]] static mac_io_core_ptr make_shared(mac_device_ptr const &);

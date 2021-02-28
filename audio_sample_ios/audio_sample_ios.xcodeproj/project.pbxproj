@@ -18,11 +18,11 @@
 		B62ED5321A6280C0007DDE96 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B62ED5301A6280C0007DDE96 /* Main.storyboard */; };
 		B62ED5341A6280C0007DDE96 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B62ED5331A6280C0007DDE96 /* Images.xcassets */; };
 		B62ED5371A6280C0007DDE96 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = B62ED5351A6280C0007DDE96 /* LaunchScreen.xib */; };
+		B657FB7025EBCF9E00495411 /* observing.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B657FB6F25EBCF9E00495411 /* observing.framework */; };
+		B657FB7125EBCF9E00495411 /* observing.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = B657FB6F25EBCF9E00495411 /* observing.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		B65BE8D21AB66D9C0073A07E /* YASAudioGraphEffectsSampleViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = B65BE8D11AB66D9C0073A07E /* YASAudioGraphEffectsSampleViewController.mm */; };
 		B67A0BF821DE4A9600161BCA /* audio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B67A0BF721DE4A9600161BCA /* audio.framework */; };
 		B67A0BF921DE4A9600161BCA /* audio.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = B67A0BF721DE4A9600161BCA /* audio.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		B67A0BFB21DE4A9600161BCA /* chaining.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B67A0BFA21DE4A9600161BCA /* chaining.framework */; };
-		B67A0BFC21DE4A9600161BCA /* chaining.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = B67A0BFA21DE4A9600161BCA /* chaining.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		B67A0BFE21DE4A9600161BCA /* cpp_utils.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B67A0BFD21DE4A9600161BCA /* cpp_utils.framework */; };
 		B67A0BFF21DE4A9600161BCA /* cpp_utils.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = B67A0BFD21DE4A9600161BCA /* cpp_utils.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		B67A0C0121DE4A9600161BCA /* objc_utils.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B67A0C0021DE4A9600161BCA /* objc_utils.framework */; };
@@ -46,8 +46,8 @@
 			files = (
 				B67A0BFF21DE4A9600161BCA /* cpp_utils.framework in Embed Frameworks */,
 				B67A0BF921DE4A9600161BCA /* audio.framework in Embed Frameworks */,
+				B657FB7125EBCF9E00495411 /* observing.framework in Embed Frameworks */,
 				B67A0C0221DE4A9600161BCA /* objc_utils.framework in Embed Frameworks */,
-				B67A0BFC21DE4A9600161BCA /* chaining.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -72,6 +72,7 @@
 		B62ED5311A6280C0007DDE96 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		B62ED5331A6280C0007DDE96 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		B62ED5361A6280C0007DDE96 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
+		B657FB6F25EBCF9E00495411 /* observing.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = observing.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B65BE8D01AB66D9C0073A07E /* YASAudioGraphEffectsSampleViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YASAudioGraphEffectsSampleViewController.h; sourceTree = "<group>"; };
 		B65BE8D11AB66D9C0073A07E /* YASAudioGraphEffectsSampleViewController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = YASAudioGraphEffectsSampleViewController.mm; sourceTree = "<group>"; };
 		B67A0BF721DE4A9600161BCA /* audio.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = audio.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -102,12 +103,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				B61D52FA1B9D257900A449C5 /* Accelerate.framework in Frameworks */,
-				B67A0BFB21DE4A9600161BCA /* chaining.framework in Frameworks */,
 				B67A0BFE21DE4A9600161BCA /* cpp_utils.framework in Frameworks */,
 				B61D52D61B9C845000A449C5 /* UIKit.framework in Frameworks */,
 				B61D52971B9C709500A449C5 /* AudioToolbox.framework in Frameworks */,
 				B61D52951B9C708E00A449C5 /* AVFoundation.framework in Frameworks */,
 				B67A0C0121DE4A9600161BCA /* objc_utils.framework in Frameworks */,
+				B657FB7025EBCF9E00495411 /* observing.framework in Frameworks */,
 				B67A0BF821DE4A9600161BCA /* audio.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -201,6 +202,7 @@
 		B67A0BEE21DE4A4E00161BCA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				B657FB6F25EBCF9E00495411 /* observing.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";

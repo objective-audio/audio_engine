@@ -7,7 +7,7 @@
 #include <audio/yas_audio_graph_connection_protocol.h>
 #include <audio/yas_audio_ptr.h>
 #include <audio/yas_audio_rendering_types.h>
-#include <chaining/yas_chaining_umbrella.h>
+#include <observing/yas_observing_umbrella.h>
 
 #include <optional>
 

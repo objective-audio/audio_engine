@@ -52,7 +52,7 @@ struct effects_vc_cpp {
     std::optional<audio::graph_connection_ptr> through_connection = std::nullopt;
     std::optional<audio::graph_avf_au_ptr> effect_au = std::nullopt;
     std::vector<audio::avf_au_ptr> units = effect_units();
-    observing::invalidator_pool _pool;
+    observing::canceller_pool _pool;
 
     void setup() {
         this->graph->add_io(this->device);
@@ -107,7 +107,7 @@ struct effects_vc_cpp {
     }
 
     void replace_effect_au(const AudioComponentDescription *acd) {
-        this->_pool.invalidate();
+        this->_pool.cancel();
 
         if (auto const &effect_au = this->effect_au) {
             this->graph->disconnect(effect_au.value()->node);

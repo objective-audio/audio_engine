@@ -10,7 +10,6 @@
 #include <audio/yas_audio_pcm_buffer.h>
 #include <audio/yas_audio_ptr.h>
 #include <audio/yas_audio_types.h>
-#include <chaining/yas_chaining_umbrella.h>
 
 #include <optional>
 #include <ostream>

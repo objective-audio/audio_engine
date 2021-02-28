@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <chaining/yas_chaining_umbrella.h>
+#include <observing/yas_observing_umbrella.h>
 
 namespace yas::audio {
 enum interruption_method {
