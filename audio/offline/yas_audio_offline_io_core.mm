@@ -3,6 +3,7 @@
 //
 
 #include "yas_audio_offline_io_core.h"
+#include <cpp_utils/yas_thread.h>
 #include <future>
 #include "yas_audio_offline_device.h"
 
@@ -109,7 +110,7 @@ bool offline_io_core::start() {
 
         render_context->promise->set_value();
 
-        dispatch_async(dispatch_get_main_queue(), [render_context]() { render_context->complete(); });
+        thread::perform_async_on_main([render_context]() { render_context->complete(); });
     }};
 
     thread.detach();
