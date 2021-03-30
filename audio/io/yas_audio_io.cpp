@@ -46,7 +46,7 @@ void io::set_device(std::optional<io_device_ptr> const &device) {
 
         this->_uninitialize();
 
-        this->_device_updated_canceller = std::nullopt;
+        this->_device_updated_canceller = nullptr;
 
         this->_device = device;
 
@@ -200,7 +200,7 @@ void io::_setup_interruption_observer() {
 }
 
 void io::_dispose_interruption_observer() {
-    this->_interruption_canceller = std::nullopt;
+    this->_interruption_canceller = nullptr;
 }
 
 audio::io_ptr io::make_shared(std::optional<io_device_ptr> const &device) {

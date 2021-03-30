@@ -144,7 +144,7 @@ audio::graph_io_ptr const &graph::add_io(std::optional<io_device_ptr> const &dev
 
 void graph::remove_io() {
     if (this->_io) {
-        this->_io_canceller = std::nullopt;
+        this->_io_canceller = nullptr;
         this->_io = std::nullopt;
     }
 }
