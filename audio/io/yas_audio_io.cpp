@@ -46,29 +46,32 @@ void io::set_device(std::optional<io_device_ptr> const &device) {
 
         this->_uninitialize();
 
-        this->_device_updated_canceller = std::nullopt;
+        this->_device_updated_canceller = nullptr;
 
         this->_device = device;
 
         if (device) {
-            this->_device_updated_canceller = device.value()->observe_io_device([this](auto const &method) {
-                switch (method) {
-                    case io_device::method::updated: {
-                        bool const is_running = this->is_running();
+            this->_device_updated_canceller =
+                device.value()
+                    ->observe_io_device([this](auto const &method) {
+                        switch (method) {
+                            case io_device::method::updated: {
+                                bool const is_running = this->is_running();
 
-                        this->_uninitialize();
-                        this->_device_fetcher->push({device_method::updated, this->device()});
-                        this->_initialize();
+                                this->_uninitialize();
+                                this->_device_fetcher->push({device_method::updated, this->device()});
+                                this->_initialize();
 
-                        if (this->_device && is_running) {
-                            this->start();
+                                if (this->_device && is_running) {
+                                    this->start();
+                                }
+                            } break;
+                            case io_device::method::lost:
+                                this->set_device(std::nullopt);
+                                break;
                         }
-                    } break;
-                    case io_device::method::lost:
-                        this->set_device(std::nullopt);
-                        break;
-                }
-            });
+                    })
+                    .end();
 
             this->_initialize();
 
@@ -142,13 +145,12 @@ void io::stop() {
     this->_running_notifier->notify(running_method::did_stop);
 }
 
-observing::canceller_ptr io::observe_running(std::function<void(running_method const &)> &&handler) {
+observing::endable io::observe_running(std::function<void(running_method const &)> &&handler) {
     return this->_running_notifier->observe(std::move(handler));
 }
 
-observing::canceller_ptr io::observe_device(observing::caller<device_observing_pair_t>::handler_f &&handler,
-                                            bool const sync) {
-    return this->_device_fetcher->observe(std::move(handler), sync);
+observing::syncable io::observe_device(observing::caller<device_observing_pair_t>::handler_f &&handler) {
+    return this->_device_fetcher->observe(std::move(handler));
 }
 
 void io::_reload() {
@@ -182,21 +184,23 @@ void io::_start_io_core() {
 
 void io::_setup_interruption_observer() {
     if (auto const &device = this->_device) {
-        this->_interruption_canceller = device.value()->observe_interruption([this](auto const &method) {
-            switch (method) {
-                case audio::interruption_method::began:
-                    this->_stop_io_core();
-                    break;
-                case audio::interruption_method::ended:
-                    this->_start_io_core();
-                    break;
-            }
-        });
+        this->_interruption_canceller = device.value()
+                                            ->observe_interruption([this](auto const &method) {
+                                                switch (method) {
+                                                    case audio::interruption_method::began:
+                                                        this->_stop_io_core();
+                                                        break;
+                                                    case audio::interruption_method::ended:
+                                                        this->_start_io_core();
+                                                        break;
+                                                }
+                                            })
+                                            .end();
     }
 }
 
 void io::_dispose_interruption_observer() {
-    this->_interruption_canceller = std::nullopt;
+    this->_interruption_canceller = nullptr;
 }
 
 audio::io_ptr io::make_shared(std::optional<io_device_ptr> const &device) {

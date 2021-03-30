@@ -279,14 +279,17 @@ audio::io_device_ptr mac_device::renewable_default_output_device() {
             return result;
         },
         [](io_device_ptr const &device, renewable_device::method_f const &handler) {
-            auto observer1 = device->observe_io_device([handler](auto const &method) {
-                if (method == audio::io_device::method::updated) {
-                    handler(renewable_device::method::notify);
-                }
-            });
+            auto observer1 = device
+                                 ->observe_io_device([handler](auto const &method) {
+                                     if (method == audio::io_device::method::updated) {
+                                         handler(renewable_device::method::notify);
+                                     }
+                                 })
+                                 .end();
 
-            auto observer2 =
-                mac_device::observe_system([handler](auto const &) { handler(renewable_device::method::renewal); });
+            auto observer2 = mac_device::observe_system([handler](auto const &) {
+                                 handler(renewable_device::method::renewal);
+                             }).end();
 
             return std::vector<observing::cancellable_ptr>{std::move(observer1), std::move(observer2)};
         });
@@ -335,6 +338,7 @@ mac_device::mac_device(AudioDeviceID const device_id)
 
     this->_notifier
         ->observe([this](auto const &method) { this->_io_device_notifier->notify(io_device::method::updated); })
+        .end()
         ->add_to(this->_pool);
 
     audio::_system_notifier
@@ -343,6 +347,7 @@ mac_device::mac_device(AudioDeviceID const device_id)
                 this->_io_device_notifier->notify(io_device::method::lost);
             }
         })
+        .end()
         ->add_to(this->_pool);
 }
 
@@ -403,15 +408,15 @@ audio::io_core_ptr mac_device::make_io_core() const {
     return mac_io_core::make_shared(this->_weak_mac_device.lock());
 }
 
-observing::canceller_ptr mac_device::observe(observing::caller<change_info>::handler_f &&handler) {
+observing::endable mac_device::observe(observing::caller<change_info>::handler_f &&handler) {
     return this->_notifier->observe(std::move(handler));
 }
 
-observing::canceller_ptr mac_device::observe_system(observing::caller<change_info>::handler_f &&handler) {
+observing::endable mac_device::observe_system(observing::caller<change_info>::handler_f &&handler) {
     return audio::_system_notifier->observe(std::move(handler));
 }
 
-observing::canceller_ptr mac_device::observe_io_device(observing::caller<io_device::method>::handler_f &&handler) {
+observing::endable mac_device::observe_io_device(observing::caller<io_device::method>::handler_f &&handler) {
     return this->_io_device_notifier->observe(std::move(handler));
 }
 

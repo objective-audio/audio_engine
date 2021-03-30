@@ -50,7 +50,7 @@ struct mac_device::stream {
     [[nodiscard]] audio::format virtual_format() const;
     [[nodiscard]] uint32_t starting_channel() const;
 
-    [[nodiscard]] observing::canceller_ptr observe(observing::caller<observing_pair_t>::handler_f &&);
+    [[nodiscard]] observing::endable observe(observing::caller<observing_pair_t>::handler_f &&);
 
     bool operator==(stream const &) const;
     bool operator!=(stream const &) const;

@@ -69,8 +69,9 @@ struct device_vc_cpp {
 
     auto unowned_self = objc_ptr_with_move_object([[YASUnownedObject alloc] initWithObject:self]);
 
-    self->_cpp->system_canceller = audio::mac_device::observe_system(
-        [unowned_self](auto const &) { [[unowned_self.object() object] _updateDeviceNames]; });
+    self->_cpp->system_canceller = audio::mac_device::observe_system([unowned_self](auto const &) {
+                                       [[unowned_self.object() object] _updateDeviceNames];
+                                   }).end();
     /*
         audio::mac_device::system_chain()
             .perform([unowned_self](auto const &) { [[unowned_self.object() object] _updateDeviceNames]; })
@@ -195,15 +196,17 @@ struct device_vc_cpp {
 
         auto const &device = *selected_device;
 
-        self->_cpp->device_canceller = device->observe([device, unowned_self](auto const &change_info) {
-            auto const &infos = change_info.property_infos;
-            if (infos.size() > 0) {
-                auto &device_id = infos.at(0).object_id;
-                if (device->audio_device_id() == device_id) {
-                    [[unowned_self.object() object] _updateDeviceInfo];
-                }
-            }
-        });
+        self->_cpp->device_canceller = device
+                                           ->observe([device, unowned_self](auto const &change_info) {
+                                               auto const &infos = change_info.property_infos;
+                                               if (infos.size() > 0) {
+                                                   auto &device_id = infos.at(0).object_id;
+                                                   if (device->audio_device_id() == device_id) {
+                                                       [[unowned_self.object() object] _updateDeviceInfo];
+                                                   }
+                                               }
+                                           })
+                                           .end();
 
         if (!self->_cpp->io->is_running()) {
             self->_cpp->io->start();

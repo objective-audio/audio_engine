@@ -46,7 +46,7 @@ io_core_ptr mac_empty_device::make_io_core() const {
     return std::make_shared<dummy_io_core>();
 }
 
-observing::canceller_ptr mac_empty_device::observe_io_device(observing::caller<method>::handler_f &&handler) {
+observing::endable mac_empty_device::observe_io_device(observing::caller<method>::handler_f &&handler) {
     return this->_notifier->observe(std::move(handler));
 }
 

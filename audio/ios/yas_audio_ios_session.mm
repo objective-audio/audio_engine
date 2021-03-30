@@ -279,12 +279,11 @@ void ios_session::set_category(enum category const category, category_options_t 
     }
 }
 
-observing::canceller_ptr ios_session::observe_device(observing::caller<device_method>::handler_f &&handler) {
+observing::endable ios_session::observe_device(observing::caller<device_method>::handler_f &&handler) {
     return this->_device_notifier->observe(std::move(handler));
 }
 
-observing::canceller_ptr ios_session::observe_interruption(
-    observing::caller<interruption_method>::handler_f &&handler) {
+observing::endable ios_session::observe_interruption(observing::caller<interruption_method>::handler_f &&handler) {
     return this->_interruption_notifier->observe(std::move(handler));
 }
 

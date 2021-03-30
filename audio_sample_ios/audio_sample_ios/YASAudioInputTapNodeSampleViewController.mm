@@ -57,6 +57,7 @@ struct input_tap_vc_cpp {
                     this->reconnect();
                 }
             })
+            .end()
             ->add_to(this->_pool);
     }
 

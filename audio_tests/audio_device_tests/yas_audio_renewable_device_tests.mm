@@ -39,14 +39,16 @@ using namespace yas::audio;
             }
         },
         [update_notifier](io_device_ptr const &device, auto const &handler) {
-            auto canceller1 = device->observe_io_device([handler](auto const &method) {
-                if (method == io_device::method::updated) {
-                    handler(renewable_device::method::notify);
-                }
-            });
+            auto canceller1 = device
+                                  ->observe_io_device([handler](auto const &method) {
+                                      if (method == io_device::method::updated) {
+                                          handler(renewable_device::method::notify);
+                                      }
+                                  })
+                                  .end();
 
             auto canceller2 =
-                update_notifier->observe([handler](auto const &) { handler(renewable_device::method::renewal); });
+                update_notifier->observe([handler](auto const &) { handler(renewable_device::method::renewal); }).end();
 
             return std::vector<observing::cancellable_ptr>{std::move(canceller1), std::move(canceller2)};
         });

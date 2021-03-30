@@ -21,8 +21,7 @@ struct renewable_device : io_device {
     [[nodiscard]] std::optional<audio::format> input_format() const override;
     [[nodiscard]] std::optional<audio::format> output_format() const override;
 
-    [[nodiscard]] observing::canceller_ptr observe_io_device(
-        observing::caller<io_device::method>::handler_f &&) override;
+    [[nodiscard]] observing::endable observe_io_device(observing::caller<io_device::method>::handler_f &&) override;
 
     [[nodiscard]] static renewable_device_ptr make_shared(device_f const &, renewal_f const &);
 

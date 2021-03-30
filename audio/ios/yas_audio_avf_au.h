@@ -71,8 +71,7 @@ struct avf_au {
                                                                 AudioUnitElement element) const;
 
     [[nodiscard]] load_state state() const;
-    [[nodiscard]] observing::canceller_ptr observe_load_state(observing::caller<load_state>::handler_f &&,
-                                                              bool const sync = true);
+    [[nodiscard]] observing::syncable observe_load_state(observing::caller<load_state>::handler_f &&);
 
     // render thread
     void render(render_args const &, input_render_f const &);

@@ -60,8 +60,8 @@ struct ios_session : ios_device_session, interruptor {
     void set_category(enum category const);
     void set_category(enum category const, category_options_t const);
 
-    [[nodiscard]] observing::canceller_ptr observe_device(observing::caller<device_method>::handler_f &&) override;
-    [[nodiscard]] observing::canceller_ptr observe_interruption(
+    [[nodiscard]] observing::endable observe_device(observing::caller<device_method>::handler_f &&) override;
+    [[nodiscard]] observing::endable observe_interruption(
         observing::caller<interruption_method>::handler_f &&) override;
 
     [[nodiscard]] static ios_session_ptr const &shared();

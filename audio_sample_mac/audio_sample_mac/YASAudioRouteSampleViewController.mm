@@ -206,8 +206,9 @@ struct graph_io_vc_cpp {
 
     auto unowned_self = objc_ptr_with_move_object([[YASUnownedObject alloc] initWithObject:self]);
 
-    self->_cpp->system_canceller = audio::mac_device::observe_system(
-        [unowned_self](auto const &) { [[unowned_self.object() object] _updateDeviceNames]; });
+    self->_cpp->system_canceller = audio::mac_device::observe_system([unowned_self](auto const &) {
+                                       [[unowned_self.object() object] _updateDeviceNames];
+                                   }).end();
 
     [self _updateDeviceNames];
 
@@ -391,8 +392,11 @@ struct graph_io_vc_cpp {
     if (selected_device && std::find(all_devices.begin(), all_devices.end(), selected_device) != all_devices.end()) {
         auto unowned_self = objc_ptr_with_move_object([[YASUnownedObject alloc] initWithObject:self]);
 
-        self->_cpp->device_canceller = selected_device.value()->observe_io_device(
-            [unowned_self](auto const &) { [[unowned_self.object() object] _updateConnection]; });
+        self->_cpp->device_canceller = selected_device.value()
+                                           ->observe_io_device([unowned_self](auto const &) {
+                                               [[unowned_self.object() object] _updateConnection];
+                                           })
+                                           .end();
     }
 
     [self _updateConnection];

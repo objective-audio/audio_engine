@@ -52,6 +52,7 @@ struct reload_vc_cpp {
                     this->graph->start_render();
                 }
             })
+            .end()
             ->add_to(this->_pool);
 
         if (auto const result = this->graph->start_render(); !result) {

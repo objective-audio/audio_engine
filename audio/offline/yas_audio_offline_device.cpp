@@ -30,7 +30,7 @@ std::optional<interruptor_ptr> const &offline_device::interruptor() const {
     return _null_interruptor;
 }
 
-observing::canceller_ptr offline_device::observe_io_device(observing::caller<io_device::method>::handler_f &&handler) {
+observing::endable offline_device::observe_io_device(observing::caller<io_device::method>::handler_f &&handler) {
     return this->_notifier->observe(std::move(handler));
 }
 

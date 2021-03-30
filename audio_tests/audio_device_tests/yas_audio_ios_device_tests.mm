@@ -38,7 +38,7 @@ struct test_device_session : ios_device_session {
         }
     }
 
-    observing::canceller_ptr observe_device(observing::caller<device_method>::handler_f &&handler) override {
+    observing::endable observe_device(observing::caller<device_method>::handler_f &&handler) override {
         return this->notifier->observe(std::move(handler));
     }
 };
@@ -58,8 +58,7 @@ struct test_interruptor : interruptor {
         return this->_is_interrupting;
     }
 
-    observing::canceller_ptr observe_interruption(
-        observing::caller<interruption_method>::handler_f &&handler) override {
+    observing::endable observe_interruption(observing::caller<interruption_method>::handler_f &&handler) override {
         return this->_notifier->observe(std::move(handler));
     }
 

@@ -37,7 +37,7 @@ struct test_io_device : io_device {
         return std::make_shared<test_io_core>();
     }
 
-    observing::canceller_ptr observe_io_device(observing::caller<method>::handler_f &&handler) override {
+    observing::endable observe_io_device(observing::caller<method>::handler_f &&handler) override {
         return this->notifier->observe(std::move(handler));
     }
 

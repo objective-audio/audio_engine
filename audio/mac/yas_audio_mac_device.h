@@ -54,11 +54,10 @@ struct mac_device : io_device {
     [[nodiscard]] std::optional<audio::format> input_format() const override;
     [[nodiscard]] std::optional<audio::format> output_format() const override;
 
-    [[nodiscard]] observing::canceller_ptr observe(observing::caller<change_info>::handler_f &&);
-    [[nodiscard]] static observing::canceller_ptr observe_system(observing::caller<change_info>::handler_f &&);
+    [[nodiscard]] observing::endable observe(observing::caller<change_info>::handler_f &&);
+    [[nodiscard]] static observing::endable observe_system(observing::caller<change_info>::handler_f &&);
 
-    [[nodiscard]] observing::canceller_ptr observe_io_device(
-        observing::caller<io_device::method>::handler_f &&) override;
+    [[nodiscard]] observing::endable observe_io_device(observing::caller<io_device::method>::handler_f &&) override;
 
     using listener_f =
         std::function<void(uint32_t const in_number_addresses, const AudioObjectPropertyAddress *const in_addresses)>;
