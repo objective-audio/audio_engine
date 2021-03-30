@@ -251,11 +251,14 @@ struct route_vc_cpp {
 
     auto unowned_self = objc_ptr_with_move_object([[YASUnownedObject alloc] initWithObject:self]);
 
-    self->_cpp.device_canceller = self->_cpp.device->observe_io_device([unowned_self](auto const &) {
-        if ([UIApplication sharedApplication].applicationState == UIApplicationStateActive) {
-            [[unowned_self.object() object] _updateEngine];
-        }
-    });
+    self->_cpp.device_canceller =
+        self->_cpp.device
+            ->observe_io_device([unowned_self](auto const &) {
+                if ([UIApplication sharedApplication].applicationState == UIApplicationStateActive) {
+                    [[unowned_self.object() object] _updateEngine];
+                }
+            })
+            .end();
 
     self->_cpp.connect_nodes();
 

@@ -25,7 +25,7 @@ struct mac_empty_device : io_device {
 
     io_core_ptr make_io_core() const override;
 
-    [[nodiscard]] observing::canceller_ptr observe_io_device(observing::caller<method>::handler_f &&) override;
+    [[nodiscard]] observing::endable observe_io_device(observing::caller<method>::handler_f &&) override;
 };
 }  // namespace yas::audio
 

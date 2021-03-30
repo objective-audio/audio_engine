@@ -37,11 +37,10 @@ bool io_device::is_interrupting() const {
     }
 }
 
-std::optional<observing::canceller_ptr> io_device::observe_interruption(
-    observing::caller<interruption_method>::handler_f &&handler) {
+observing::endable io_device::observe_interruption(observing::caller<interruption_method>::handler_f &&handler) {
     if (auto const interruptor = this->interruptor()) {
         return interruptor.value()->observe_interruption(std::move(handler));
     } else {
-        return std::nullopt;
+        return observing::endable{nullptr};
     }
 }

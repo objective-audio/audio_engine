@@ -18,14 +18,13 @@ struct io_device {
 
     [[nodiscard]] virtual std::optional<interruptor_ptr> const &interruptor() const = 0;
 
-    [[nodiscard]] virtual observing::canceller_ptr observe_io_device(observing::caller<method>::handler_f &&) = 0;
+    [[nodiscard]] virtual observing::endable observe_io_device(observing::caller<method>::handler_f &&) = 0;
 
     [[nodiscard]] uint32_t input_channel_count() const;
     [[nodiscard]] uint32_t output_channel_count() const;
 
     [[nodiscard]] bool is_interrupting() const;
-    [[nodiscard]] std::optional<observing::canceller_ptr> observe_interruption(
-        observing::caller<interruption_method>::handler_f &&);
+    [[nodiscard]] observing::endable observe_interruption(observing::caller<interruption_method>::handler_f &&);
 
     [[nodiscard]] static io_device_ptr cast(io_device_ptr const &device) {
         return device;

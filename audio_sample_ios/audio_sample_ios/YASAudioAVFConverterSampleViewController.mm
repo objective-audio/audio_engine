@@ -61,6 +61,7 @@ struct avf_converter_vc_cpp {
                     this->graph->start_render();
                 }
             })
+            .sync()
             ->add_to(this->pool);
 
         return std::nullopt;

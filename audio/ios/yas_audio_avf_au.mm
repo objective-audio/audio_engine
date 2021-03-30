@@ -487,9 +487,8 @@ avf_au::load_state avf_au::state() const {
     return this->_load_state->value();
 }
 
-observing::canceller_ptr avf_au::observe_load_state(observing::caller<load_state>::handler_f &&handler,
-                                                    bool const sync) {
-    return this->_load_state->observe(std::move(handler), sync);
+observing::syncable avf_au::observe_load_state(observing::caller<load_state>::handler_f &&handler) {
+    return this->_load_state->observe(std::move(handler));
 }
 
 audio::avf_au_ptr avf_au::make_shared(OSType const type, OSType const sub_type) {

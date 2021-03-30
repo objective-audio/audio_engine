@@ -127,15 +127,14 @@ struct effects_vc_cpp {
             this->effect_au = effect_au;
 
             effect_au
-                ->observe_load_state(
-                    [this, format](auto const &state) {
-                        if (state == audio::avf_au::load_state::loaded) {
-                            this->graph->connect(this->effect_au.value()->node, this->graph->io().value()->output_node,
-                                                 format);
-                            this->graph->connect(tap->node, this->effect_au.value()->node, format);
-                        }
-                    },
-                    true)
+                ->observe_load_state([this, format](auto const &state) {
+                    if (state == audio::avf_au::load_state::loaded) {
+                        this->graph->connect(this->effect_au.value()->node, this->graph->io().value()->output_node,
+                                             format);
+                        this->graph->connect(tap->node, this->effect_au.value()->node, format);
+                    }
+                })
+                .sync()
                 ->add_to(this->_pool);
         } else {
             this->through_connection = graph->connect(this->tap->node, this->graph->io().value()->output_node, format);

@@ -164,10 +164,10 @@ using namespace yas::audio;
     auto exp = [self expectationWithDescription:@"load"];
 
     auto canceller = au->observe_load_state([exp](auto const &state) {
-        if (state == avf_au::load_state::loaded) {
-            [exp fulfill];
-        }
-    });
+                           if (state == avf_au::load_state::loaded) {
+                               [exp fulfill];
+                           }
+                       }).sync();
 
     [self waitForExpectations:@[exp] timeout:1.0];
 
@@ -182,10 +182,10 @@ using namespace yas::audio;
     auto exp = [self expectationWithDescription:@"load"];
 
     auto canceller = au->observe_load_state([exp](auto const &state) {
-        if (state == avf_au::load_state::loaded) {
-            [exp fulfill];
-        }
-    });
+                           if (state == avf_au::load_state::loaded) {
+                               [exp fulfill];
+                           }
+                       }).sync();
 
     [self waitForExpectations:@[exp] timeout:1.0];
 

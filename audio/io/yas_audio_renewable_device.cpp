@@ -28,8 +28,7 @@ io_core_ptr renewable_device::make_io_core() const {
     return this->_device->make_io_core();
 }
 
-observing::canceller_ptr renewable_device::observe_io_device(
-    observing::caller<io_device::method>::handler_f &&handler) {
+observing::endable renewable_device::observe_io_device(observing::caller<io_device::method>::handler_f &&handler) {
     return this->_notifier->observe(std::move(handler));
 }
 

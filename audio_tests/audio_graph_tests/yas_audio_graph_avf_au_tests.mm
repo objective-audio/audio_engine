@@ -183,11 +183,13 @@ using namespace yas;
 - (void)_load_au:(audio::graph_avf_au_ptr const &)au {
     auto exp = [self expectationWithDescription:@"load"];
 
-    auto canceller = au->raw_au->observe_load_state([exp](auto const &state) {
-        if (state == audio::avf_au::load_state::loaded) {
-            [exp fulfill];
-        }
-    });
+    auto canceller = au->raw_au
+                         ->observe_load_state([exp](auto const &state) {
+                             if (state == audio::avf_au::load_state::loaded) {
+                                 [exp fulfill];
+                             }
+                         })
+                         .sync();
 
     [self waitForExpectations:@[exp] timeout:1.0];
 

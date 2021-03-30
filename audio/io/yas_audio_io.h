@@ -39,9 +39,8 @@ struct io final {
     void start();
     void stop();
 
-    observing::canceller_ptr observe_running(std::function<void(running_method const &)> &&);
-    observing::canceller_ptr observe_device(observing::caller<device_observing_pair_t>::handler_f &&,
-                                            bool const sync = true);
+    observing::endable observe_running(std::function<void(running_method const &)> &&);
+    observing::syncable observe_device(observing::caller<device_observing_pair_t>::handler_f &&);
 
     [[nodiscard]] static io_ptr make_shared(std::optional<io_device_ptr> const &);
 

@@ -20,7 +20,7 @@ struct ios_device final : io_device {
     [[nodiscard]] std::optional<audio::format> input_format() const override;
     [[nodiscard]] std::optional<audio::format> output_format() const override;
 
-    [[nodiscard]] observing::canceller_ptr observe_io_device(observing::caller<method>::handler_f &&) override;
+    [[nodiscard]] observing::endable observe_io_device(observing::caller<method>::handler_f &&) override;
 
     [[nodiscard]] static ios_device_ptr make_shared(ios_session_ptr const &);
     [[nodiscard]] static ios_device_ptr make_shared(ios_device_session_ptr const &, interruptor_ptr const &);
