@@ -173,7 +173,7 @@ struct offline_vc_internal {
     }
 
    private:
-    observing::canceller_ptr _io_canceller = nullptr;
+    observing::cancellable_ptr _io_canceller = nullptr;
 
     void _update_connection() {
         if (auto const &io = this->play_graph->io()) {

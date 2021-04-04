@@ -28,8 +28,8 @@ struct graph_io_vc_cpp {
     audio::graph_route_ptr const route = audio::graph_route::make_shared();
     audio::graph_tap_ptr const tap = audio::graph_tap::make_shared();
 
-    std::optional<observing::canceller_ptr> system_canceller = std::nullopt;
-    std::optional<observing::canceller_ptr> device_canceller = std::nullopt;
+    std::optional<observing::cancellable_ptr> system_canceller = std::nullopt;
+    std::optional<observing::cancellable_ptr> device_canceller = std::nullopt;
 
     graph_io_vc_cpp() {
         std::optional<audio::mac_device_ptr> device = std::nullopt;
