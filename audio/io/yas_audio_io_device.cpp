@@ -41,6 +41,6 @@ observing::endable io_device::observe_interruption(observing::caller<interruptio
     if (auto const interruptor = this->interruptor()) {
         return interruptor.value()->observe_interruption(std::move(handler));
     } else {
-        return observing::endable{nullptr};
+        return observing::endable{};
     }
 }
