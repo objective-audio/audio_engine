@@ -55,7 +55,7 @@ struct graph final {
 
    private:
     std::weak_ptr<graph> _weak_graph;
-    observing::canceller_ptr _io_canceller;
+    observing::cancellable_ptr _io_canceller;
 
     graph_node_set _nodes;
     graph_connection_set _connections;

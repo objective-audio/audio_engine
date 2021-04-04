@@ -37,8 +37,8 @@ namespace yas::sample {
 struct device_vc_cpp {
     audio::io_ptr const io = audio::io::make_shared(std::nullopt);
     sample_kernel_ptr const kernel = std::make_shared<sample_kernel_t>();
-    std::optional<observing::canceller_ptr> system_canceller = std::nullopt;
-    std::optional<observing::canceller_ptr> device_canceller = std::nullopt;
+    std::optional<observing::cancellable_ptr> system_canceller = std::nullopt;
+    std::optional<observing::cancellable_ptr> device_canceller = std::nullopt;
 };
 }
 

@@ -34,7 +34,7 @@ struct ios_device final : io_device {
     std::optional<ios_device_session_ptr> _session;
     std::optional<audio::interruptor_ptr> _interruptor;
     observing::notifier_ptr<method> const _notifier = observing::notifier<method>::make_shared();
-    observing::canceller_ptr _canceller;
+    observing::cancellable_ptr _canceller;
 
     ios_device(ios_device_session_ptr const &, interruptor_ptr const &);
 
