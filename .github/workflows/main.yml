@@ -24,10 +24,6 @@ jobs:
       with:
         submodules: true
 
-    - name: Install clang-format
-      run:
-        brew install clang-format
-
     # Runs a set of commands using the runners shell
     - name: Run iOS tests
       run:
