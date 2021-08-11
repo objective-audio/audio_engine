@@ -64,6 +64,8 @@ struct ios_session : ios_device_session, interruptor {
     [[nodiscard]] observing::endable observe_interruption(
         observing::caller<interruption_method>::handler_f &&) override;
 
+    void did_become_active();
+
     [[nodiscard]] static ios_session_ptr const &shared();
 
    private:

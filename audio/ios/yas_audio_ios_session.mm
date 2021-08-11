@@ -70,7 +70,6 @@ static AVAudioSessionCategoryOptions to_objc(ios_session::category_options_t con
 struct ios_session::impl {
     std::vector<objc_ptr<id<NSObject>>> observers;
 
-    std::optional<objc_ptr<>> did_become_active_observer = std::nullopt;
     std::optional<objc_ptr<>> interruption_observer = std::nullopt;
 
     ~impl() {
@@ -287,6 +286,13 @@ observing::endable ios_session::observe_interruption(observing::caller<interrupt
     return this->_interruption_notifier->observe(std::move(handler));
 }
 
+void ios_session::did_become_active() {
+    if (this->_impl->interruption_observer.has_value()) {
+        this->_set_active();
+        this->_set_interrupting_and_notify(false);
+    }
+}
+
 ios_session::activate_result_t ios_session::_apply_category() {
     NSError *error = nil;
 
@@ -359,17 +365,6 @@ void ios_session::_set_interrupting_and_notify(bool const is_interrupting) {
 void ios_session::_setup_interrupting() {
     this->_is_interrupting = false;
 
-    if (!this->_impl->did_become_active_observer) {
-        id observer = [[NSNotificationCenter defaultCenter] addObserverForName:UIApplicationDidBecomeActiveNotification
-                                                                        object:nil
-                                                                         queue:[NSOperationQueue mainQueue]
-                                                                    usingBlock:[this](NSNotification *note) {
-                                                                        this->_set_active();
-                                                                        this->_set_interrupting_and_notify(false);
-                                                                    }];
-        this->_impl->did_become_active_observer = objc_ptr<>(observer);
-    }
-
     if (!this->_impl->interruption_observer) {
         auto const lambda = [this](NSNotification *note) {
             auto const type = AVAudioSessionInterruptionType(
@@ -401,7 +396,6 @@ void ios_session::_setup_interrupting() {
 
 void ios_session::_dispose_interrupting() {
     this->_is_interrupting = false;
-    this->_impl->did_become_active_observer = std::nullopt;
     this->_impl->interruption_observer = std::nullopt;
 }
 
