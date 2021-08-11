@@ -5,6 +5,9 @@
 #import "AppDelegate.h"
 #include <audio/audio.h>
 
+using namespace yas;
+using namespace yas::audio;
+
 @interface AppDelegate ()
 
 @end
@@ -41,6 +44,7 @@
 - (void)applicationDidBecomeActive:(UIApplication *)application {
     // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application
     // was previously in the background, optionally refresh the user interface.
+    ios_session::shared()->did_become_active();
 }
 
 - (void)applicationWillTerminate:(UIApplication *)application {
