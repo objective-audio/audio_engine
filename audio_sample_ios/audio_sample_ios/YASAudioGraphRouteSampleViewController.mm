@@ -41,7 +41,7 @@ struct route_vc_cpp {
     std::shared_ptr<audio::graph_route> const route = audio::graph_route::make_shared();
     audio::graph_tap_ptr const sine_tap = audio::graph_tap::make_shared();
 
-    observing::canceller_ptr device_canceller = nullptr;
+    observing::cancellable_ptr device_canceller = nullptr;
 
     bool is_setup() {
         return this->graph->io().has_value();
