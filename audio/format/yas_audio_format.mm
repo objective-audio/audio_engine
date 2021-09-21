@@ -147,7 +147,7 @@ AudioStreamBasicDescription yas::to_stream_description(CFDictionaryRef const &se
 
     CFNumberRef const formatIDNumber =
         static_cast<CFNumberRef>(CFDictionaryGetValue(settings, (const void *)AVFormatIDKey));
-    if (formatIDNumber) {
+    if (formatIDNumber != NULL) {
         int64_t value = 0;
         CFNumberGetValue(formatIDNumber, kCFNumberSInt64Type, &value);
         asbd.mFormatID = static_cast<uint32_t>(value);
@@ -155,13 +155,13 @@ AudioStreamBasicDescription yas::to_stream_description(CFDictionaryRef const &se
 
     CFNumberRef const sampleRateNumber =
         static_cast<CFNumberRef>(CFDictionaryGetValue(settings, (const void *)AVSampleRateKey));
-    if (sampleRateNumber) {
+    if (sampleRateNumber != NULL) {
         CFNumberGetValue(sampleRateNumber, kCFNumberDoubleType, &asbd.mSampleRate);
     }
 
     CFNumberRef const channelsNumber =
         static_cast<CFNumberRef>(CFDictionaryGetValue(settings, (const void *)AVNumberOfChannelsKey));
-    if (channelsNumber) {
+    if (channelsNumber != NULL) {
         int64_t value = 0;
         CFNumberGetValue(channelsNumber, kCFNumberSInt64Type, &value);
         asbd.mChannelsPerFrame = static_cast<uint32_t>(value);
@@ -169,7 +169,7 @@ AudioStreamBasicDescription yas::to_stream_description(CFDictionaryRef const &se
 
     CFNumberRef const bitNumber =
         static_cast<CFNumberRef>(CFDictionaryGetValue(settings, (const void *)AVLinearPCMBitDepthKey));
-    if (bitNumber) {
+    if (bitNumber != NULL) {
         int64_t value = 0;
         CFNumberGetValue(bitNumber, kCFNumberSInt64Type, &value);
         asbd.mBitsPerChannel = static_cast<uint32_t>(value);
@@ -180,7 +180,7 @@ AudioStreamBasicDescription yas::to_stream_description(CFDictionaryRef const &se
 
         CFNumberRef const isBigEndianNumber =
             (CFNumberRef)CFDictionaryGetValue(settings, (const void *)AVLinearPCMIsBigEndianKey);
-        if (isBigEndianNumber) {
+        if (isBigEndianNumber != NULL) {
             int8_t value = 0;
             CFNumberGetValue(isBigEndianNumber, kCFNumberSInt8Type, &value);
             if (value) {
@@ -190,7 +190,7 @@ AudioStreamBasicDescription yas::to_stream_description(CFDictionaryRef const &se
 
         CFNumberRef const isFloatNumber =
             static_cast<CFNumberRef>(CFDictionaryGetValue(settings, (const void *)AVLinearPCMIsFloatKey));
-        if (isFloatNumber) {
+        if (isFloatNumber != NULL) {
             int8_t value = 0;
             CFNumberGetValue(isFloatNumber, kCFNumberSInt8Type, &value);
             if (value) {
@@ -202,7 +202,7 @@ AudioStreamBasicDescription yas::to_stream_description(CFDictionaryRef const &se
 
         CFNumberRef const isNonInterleavedNumber =
             static_cast<CFNumberRef>(CFDictionaryGetValue(settings, (const void *)AVLinearPCMIsNonInterleaved));
-        if (isNonInterleavedNumber) {
+        if (isNonInterleavedNumber != NULL) {
             int8_t value = 0;
             CFNumberGetValue(isNonInterleavedNumber, kCFNumberSInt8Type, &value);
             if (value) {

@@ -178,25 +178,27 @@ struct yas::audio::avf_au::core {
         AudioUnitRenderActionFlags action_flags = 0;
         AudioTimeStamp const time_stamp = args.time.audio_time_stamp();
 
-        this->_raw_unit.object().renderBlock(
-            &action_flags, &time_stamp, args.buffer->frame_length(), args.bus_idx, args.buffer->audio_buffer_list(),
-            [this, &input_handler, &render_context](AudioUnitRenderActionFlags *actionFlags,
-                                                    const AudioTimeStamp *timestamp, AUAudioFrameCount frameCount,
-                                                    NSInteger inputBusNumber, AudioBufferList *inputData) {
-                audio::clear(inputData);
+        @autoreleasepool {
+            this->_raw_unit.object().renderBlock(
+                &action_flags, &time_stamp, args.buffer->frame_length(), args.bus_idx, args.buffer->audio_buffer_list(),
+                [this, &input_handler, &render_context](AudioUnitRenderActionFlags *actionFlags,
+                                                        const AudioTimeStamp *timestamp, AUAudioFrameCount frameCount,
+                                                        NSInteger inputBusNumber, AudioBufferList *inputData) {
+                    audio::clear(inputData);
 
-                format const *const input_format = render_context->input_format((uint32_t)inputBusNumber);
-                if (input_format) {
-                    pcm_buffer buffer(*input_format, inputData);
-                    buffer.set_frame_length(frameCount);
+                    format const *const input_format = render_context->input_format((uint32_t)inputBusNumber);
+                    if (input_format) {
+                        pcm_buffer buffer(*input_format, inputData);
+                        buffer.set_frame_length(frameCount);
 
-                    time time(*timestamp, input_format->sample_rate());
+                        time time(*timestamp, input_format->sample_rate());
 
-                    input_handler({.buffer = &buffer, .bus_idx = (uint32_t)inputBusNumber, .time = time});
-                }
+                        input_handler({.buffer = &buffer, .bus_idx = (uint32_t)inputBusNumber, .time = time});
+                    }
 
-                return AUAudioUnitStatus(noErr);
-            });
+                    return AUAudioUnitStatus(noErr);
+                });
+        }
     }
 
     avf_au_parameter_ptr make_parameter(AUParameter *const objc_param) {
