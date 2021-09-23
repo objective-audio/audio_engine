@@ -96,6 +96,8 @@ static void _add_listener(AudioObjectID const object_id, AudioObjectPropertySele
 #pragma mark - mac_device_global
 
 struct mac_device_global {
+    using device_map_t = std::unordered_map<AudioDeviceID, mac_device_ptr>;
+
     struct global_mac_device : mac_device {
         static std::shared_ptr<global_mac_device> make_shared(AudioDeviceID const device_id) {
             auto shared = std::shared_ptr<global_mac_device>(new global_mac_device{device_id});
@@ -108,7 +110,7 @@ struct mac_device_global {
         }
     };
 
-    static std::unordered_map<AudioDeviceID, mac_device_ptr> &all_devices_map() {
+    static device_map_t &all_devices_map() {
         _initialize();
         return mac_device_global::instance()._all_devices;
     }
@@ -129,7 +131,7 @@ struct mac_device_global {
     }
 
     static void update_all_devices() {
-        auto prev_devices = std::move(all_devices_map());
+        auto prev_devices = std::move(mac_device_global::instance()._all_devices);
         auto data = _property_data<AudioDeviceID>(kAudioObjectSystemObject, kAudioHardwarePropertyDevices,
                                                   kAudioObjectPropertyScopeGlobal);
         if (data) {
@@ -145,7 +147,7 @@ struct mac_device_global {
     }
 
    private:
-    std::unordered_map<AudioDeviceID, mac_device_ptr> _all_devices;
+    device_map_t _all_devices;
 
     static void _initialize() {
         static bool once = false;
