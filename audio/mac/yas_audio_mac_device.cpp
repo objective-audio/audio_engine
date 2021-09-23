@@ -96,6 +96,8 @@ static void _add_listener(AudioObjectID const object_id, AudioObjectPropertySele
 #pragma mark - mac_device_global
 
 struct mac_device_global {
+    using device_map_t = std::unordered_map<AudioDeviceID, mac_device_ptr>;
+
     struct global_mac_device : mac_device {
         static std::shared_ptr<global_mac_device> make_shared(AudioDeviceID const device_id) {
             auto shared = std::shared_ptr<global_mac_device>(new global_mac_device{device_id});
@@ -108,7 +110,7 @@ struct mac_device_global {
         }
     };
 
-    static std::unordered_map<AudioDeviceID, mac_device_ptr> &all_devices_map() {
+    static device_map_t const &all_devices_map() {
         _initialize();
         return mac_device_global::instance()._all_devices;
     }
@@ -129,11 +131,15 @@ struct mac_device_global {
     }
 
     static void update_all_devices() {
-        auto prev_devices = std::move(all_devices_map());
+        auto &all_devices = mac_device_global::instance()._all_devices;
+        auto const prev_devices = std::move(all_devices);
+        all_devices.clear();
+
         auto data = _property_data<AudioDeviceID>(kAudioObjectSystemObject, kAudioHardwarePropertyDevices,
                                                   kAudioObjectPropertyScopeGlobal);
         if (data) {
-            auto &map = all_devices_map();
+            device_map_t map;
+
             for (auto const &device_id : *data) {
                 if (prev_devices.count(device_id) > 0) {
                     map.insert(std::make_pair(device_id, prev_devices.at(device_id)));
@@ -141,11 +147,13 @@ struct mac_device_global {
                     map.insert(std::make_pair(device_id, global_mac_device::make_shared(device_id)));
                 }
             }
+
+            mac_device_global::instance()._all_devices = std::move(map);
         }
     }
 
    private:
-    std::unordered_map<AudioDeviceID, mac_device_ptr> _all_devices;
+    device_map_t _all_devices;
 
     static void _initialize() {
         static bool once = false;
@@ -324,8 +332,8 @@ bool mac_device::is_available_device(mac_device const &device) {
 
 mac_device::mac_device(AudioDeviceID const device_id)
     : _input_format(std::nullopt), _output_format(std::nullopt), _audio_device_id(device_id) {
-    this->_udpate_streams(kAudioObjectPropertyScopeInput);
-    this->_udpate_streams(kAudioObjectPropertyScopeOutput);
+    this->_update_streams(kAudioObjectPropertyScopeInput);
+    this->_update_streams(kAudioObjectPropertyScopeOutput);
     this->_update_format(kAudioObjectPropertyScopeInput);
     this->_update_format(kAudioObjectPropertyScopeOutput);
 
@@ -452,7 +460,7 @@ mac_device::listener_f mac_device::_listener() {
             for (auto &info : property_infos) {
                 switch (info.property) {
                     case property::stream:
-                        device->_udpate_streams(info.address.mScope);
+                        device->_update_streams(info.address.mScope);
                         break;
                     case property::format:
                         device->_update_format(info.address.mScope);
@@ -468,20 +476,19 @@ mac_device::listener_f mac_device::_listener() {
     };
 }
 
-void mac_device::_udpate_streams(AudioObjectPropertyScope const scope) {
-    auto prev_streams =
-        std::move((scope == kAudioObjectPropertyScopeInput) ? this->_input_streams_map : this->_output_streams_map);
+void mac_device::_update_streams(AudioObjectPropertyScope const scope) {
+    auto &streams = (scope == kAudioObjectPropertyScopeInput) ? this->_input_streams_map : this->_output_streams_map;
+    auto const prev_streams = std::move(streams);
+    streams.clear();
+
     auto data = _property_data<AudioStreamID>(this->_audio_device_id, kAudioDevicePropertyStreams, scope);
-    auto &new_streams =
-        (scope == kAudioObjectPropertyScopeInput) ? this->_input_streams_map : this->_output_streams_map;
     if (data) {
         for (auto &stream_id : *data) {
             if (prev_streams.count(stream_id) > 0) {
-                new_streams.insert(std::make_pair(stream_id, prev_streams.at(stream_id)));
+                streams.insert(std::make_pair(stream_id, prev_streams.at(stream_id)));
             } else {
-                new_streams.insert(std::make_pair(
-                    stream_id,
-                    mac_device::stream::make_shared({.stream_id = stream_id, .device_id = _audio_device_id})));
+                streams.insert(std::make_pair(stream_id, mac_device::stream::make_shared(
+                                                             {.stream_id = stream_id, .device_id = _audio_device_id})));
             }
         }
     }
