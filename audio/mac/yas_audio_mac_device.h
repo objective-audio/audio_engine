@@ -84,7 +84,7 @@ struct mac_device : io_device {
     std::optional<audio::format> _output_format = std::nullopt;
 
     listener_f _listener();
-    void _udpate_streams(AudioObjectPropertyScope const scope);
+    void _update_streams(AudioObjectPropertyScope const scope);
     void _update_format(AudioObjectPropertyScope const scope);
 
     mac_device(mac_device &&) = delete;

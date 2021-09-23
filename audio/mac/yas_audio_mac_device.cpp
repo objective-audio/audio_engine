@@ -332,8 +332,8 @@ bool mac_device::is_available_device(mac_device const &device) {
 
 mac_device::mac_device(AudioDeviceID const device_id)
     : _input_format(std::nullopt), _output_format(std::nullopt), _audio_device_id(device_id) {
-    this->_udpate_streams(kAudioObjectPropertyScopeInput);
-    this->_udpate_streams(kAudioObjectPropertyScopeOutput);
+    this->_update_streams(kAudioObjectPropertyScopeInput);
+    this->_update_streams(kAudioObjectPropertyScopeOutput);
     this->_update_format(kAudioObjectPropertyScopeInput);
     this->_update_format(kAudioObjectPropertyScopeOutput);
 
@@ -460,7 +460,7 @@ mac_device::listener_f mac_device::_listener() {
             for (auto &info : property_infos) {
                 switch (info.property) {
                     case property::stream:
-                        device->_udpate_streams(info.address.mScope);
+                        device->_update_streams(info.address.mScope);
                         break;
                     case property::format:
                         device->_update_format(info.address.mScope);
@@ -476,7 +476,7 @@ mac_device::listener_f mac_device::_listener() {
     };
 }
 
-void mac_device::_udpate_streams(AudioObjectPropertyScope const scope) {
+void mac_device::_update_streams(AudioObjectPropertyScope const scope) {
     auto prev_streams =
         std::move((scope == kAudioObjectPropertyScopeInput) ? this->_input_streams_map : this->_output_streams_map);
     auto data = _property_data<AudioStreamID>(this->_audio_device_id, kAudioDevicePropertyStreams, scope);
