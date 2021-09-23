@@ -131,11 +131,15 @@ struct mac_device_global {
     }
 
     static void update_all_devices() {
-        auto prev_devices = std::move(mac_device_global::instance()._all_devices);
+        auto &all_devices = mac_device_global::instance()._all_devices;
+        auto const prev_devices = std::move(all_devices);
+        all_devices.clear();
+
         auto data = _property_data<AudioDeviceID>(kAudioObjectSystemObject, kAudioHardwarePropertyDevices,
                                                   kAudioObjectPropertyScopeGlobal);
         if (data) {
-            auto &map = all_devices_map();
+            device_map_t map;
+
             for (auto const &device_id : *data) {
                 if (prev_devices.count(device_id) > 0) {
                     map.insert(std::make_pair(device_id, prev_devices.at(device_id)));
@@ -143,6 +147,8 @@ struct mac_device_global {
                     map.insert(std::make_pair(device_id, global_mac_device::make_shared(device_id)));
                 }
             }
+
+            mac_device_global::instance()._all_devices = std::move(map);
         }
     }
 
