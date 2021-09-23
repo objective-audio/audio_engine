@@ -477,19 +477,18 @@ mac_device::listener_f mac_device::_listener() {
 }
 
 void mac_device::_update_streams(AudioObjectPropertyScope const scope) {
-    auto prev_streams =
-        std::move((scope == kAudioObjectPropertyScopeInput) ? this->_input_streams_map : this->_output_streams_map);
+    auto &streams = (scope == kAudioObjectPropertyScopeInput) ? this->_input_streams_map : this->_output_streams_map;
+    auto const prev_streams = std::move(streams);
+    streams.clear();
+
     auto data = _property_data<AudioStreamID>(this->_audio_device_id, kAudioDevicePropertyStreams, scope);
-    auto &new_streams =
-        (scope == kAudioObjectPropertyScopeInput) ? this->_input_streams_map : this->_output_streams_map;
     if (data) {
         for (auto &stream_id : *data) {
             if (prev_streams.count(stream_id) > 0) {
-                new_streams.insert(std::make_pair(stream_id, prev_streams.at(stream_id)));
+                streams.insert(std::make_pair(stream_id, prev_streams.at(stream_id)));
             } else {
-                new_streams.insert(std::make_pair(
-                    stream_id,
-                    mac_device::stream::make_shared({.stream_id = stream_id, .device_id = _audio_device_id})));
+                streams.insert(std::make_pair(stream_id, mac_device::stream::make_shared(
+                                                             {.stream_id = stream_id, .device_id = _audio_device_id})));
             }
         }
     }
