@@ -110,7 +110,7 @@ struct mac_device_global {
         }
     };
 
-    static device_map_t &all_devices_map() {
+    static device_map_t const &all_devices_map() {
         _initialize();
         return mac_device_global::instance()._all_devices;
     }
