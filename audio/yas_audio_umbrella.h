@@ -21,7 +21,6 @@
 #include <cpp_utils/yas_exception.h>
 #include <cpp_utils/yas_result.h>
 #include <cpp_utils/yas_stl_utils.h>
-#include <cpp_utils/yas_task.h>
 
 #if TARGET_OS_IPHONE
 
