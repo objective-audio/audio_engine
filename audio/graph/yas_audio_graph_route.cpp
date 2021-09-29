@@ -95,7 +95,7 @@ void graph_route::_erase_route_if_either_matched(route const &route) {
 }
 
 void graph_route::_erase_route_if(std::function<bool(route const &)> pred) {
-    erase_if(this->_routes, pred);
+    std::erase_if(this->_routes, std::move(pred));
 }
 
 void graph_route::_update_rendering() {
