@@ -35,12 +35,14 @@ using namespace yas;
     audio::pcm_format const pcmFormat = audio::pcm_format::float32;
     uint32_t const bitsPerChannel = 32;
     uint32_t const bytesPerFrame = bitsPerChannel / 8;
+    AudioFormatFlags const nativeFloatPackedFlag = kAudioFormatFlagsNativeFloatPacked;
+    AudioFormatFlags const nonInterleavedFlag = kAudioFormatFlagIsNonInterleaved;
 
     AudioStreamBasicDescription const asbd = {
         .mFormatID = kAudioFormatLinearPCM,
         .mFramesPerPacket = 1,
         .mSampleRate = sampleRate,
-        .mFormatFlags = kAudioFormatFlagsNativeFloatPacked | kAudioFormatFlagIsNonInterleaved,
+        .mFormatFlags = nativeFloatPackedFlag | nonInterleavedFlag,
         .mBitsPerChannel = bitsPerChannel,
         .mChannelsPerFrame = channelCount,
         .mBytesPerFrame = bytesPerFrame,
@@ -104,12 +106,15 @@ using namespace yas;
     audio::pcm_format const pcmFormat = audio::pcm_format::int16;
     uint32_t const bitsPerChannel = 16;
     uint32_t const bytesPerFrame = bitsPerChannel / 8 * channelCount;
+    AudioFormatFlags const signedIntegerFlag = kAudioFormatFlagIsSignedInteger;
+    AudioFormatFlags const nativeEndianFlag = kAudioFormatFlagsNativeEndian;
+    AudioFormatFlags const packedFlag = kAudioFormatFlagIsPacked;
 
     AudioStreamBasicDescription const asbd = {
         .mFormatID = kAudioFormatLinearPCM,
         .mFramesPerPacket = 1,
         .mSampleRate = sampleRate,
-        .mFormatFlags = kAudioFormatFlagIsSignedInteger | kAudioFormatFlagsNativeEndian | kAudioFormatFlagIsPacked,
+        .mFormatFlags = signedIntegerFlag | nativeEndianFlag | packedFlag,
         .mBitsPerChannel = bitsPerChannel,
         .mChannelsPerFrame = channelCount,
         .mBytesPerFrame = bytesPerFrame,
@@ -181,7 +186,10 @@ using namespace yas;
 
     auto format = audio::format(settings);
 
-    if (kAudioFormatFlagIsBigEndian != kAudioFormatFlagsNativeEndian) {
+    AudioFormatFlags const bigEndianFlag = kAudioFormatFlagIsBigEndian;
+    AudioFormatFlags const nativeEndignFlag = kAudioFormatFlagsNativeEndian;
+
+    if (bigEndianFlag != nativeEndignFlag) {
         XCTAssertEqual(format.pcm_format(), audio::pcm_format::float32);
         XCTAssertEqual(format.channel_count(), 2);
         XCTAssertEqual(format.buffer_count(), 2);
@@ -197,7 +205,7 @@ using namespace yas;
 
     format = audio::format(settings);
 
-    if (kAudioFormatFlagIsBigEndian == kAudioFormatFlagsNativeEndian) {
+    if (bigEndianFlag == nativeEndignFlag) {
         XCTAssertEqual(format.pcm_format(), audio::pcm_format::int16);
         XCTAssertEqual(format.channel_count(), 4);
         XCTAssertEqual(format.buffer_count(), 1);

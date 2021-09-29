@@ -229,7 +229,9 @@ AudioStreamBasicDescription yas::to_stream_description(double const sample_rate,
         .mFormatID = kAudioFormatLinearPCM,
     };
 
-    asbd.mFormatFlags = kAudioFormatFlagsNativeEndian | kAudioFormatFlagIsPacked;
+    AudioFormatFlags const nativeEndianFlag = kAudioFormatFlagsNativeEndian;
+    AudioFormatFlags const packedFlag = kAudioFormatFlagIsPacked;
+    asbd.mFormatFlags = nativeEndianFlag | packedFlag;
 
     if (pcm_format == pcm_format::float32 || pcm_format == pcm_format::float64) {
         asbd.mFormatFlags |= kAudioFormatFlagIsFloat;
