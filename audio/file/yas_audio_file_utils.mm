@@ -64,6 +64,11 @@ std::string yas::to_string(audio::file_type const file_type) {
     }
 }
 
+std::ostream &operator<<(std::ostream &os, yas::audio::file_type const &value) {
+    os << to_string(value);
+    return os;
+}
+
 audio::file_type audio::to_file_type(AudioFileTypeID const fileTypeID) {
     switch (fileTypeID) {
         case kAudioFile3GPType:

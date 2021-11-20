@@ -160,4 +160,19 @@ using namespace yas;
     XCTAssertEqual(to_string(audio::file_type::wave), "com.microsoft.waveform-audio");
 }
 
+- (void)test_file_type_ostream {
+    auto const values = {audio::file_type::three_gpp,   audio::file_type::three_gpp2,
+                         audio::file_type::aifc,        audio::file_type::aiff,
+                         audio::file_type::amr,         audio::file_type::ac3,
+                         audio::file_type::mpeg_layer3, audio::file_type::core_audio_format,
+                         audio::file_type::mpeg4,       audio::file_type::apple_m4a,
+                         audio::file_type::wave};
+
+    for (auto const &value : values) {
+        std::ostringstream stream;
+        stream << value;
+        XCTAssertEqual(stream.str(), to_string(value));
+    }
+}
+
 @end

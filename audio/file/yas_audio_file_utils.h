@@ -33,6 +33,8 @@ namespace yas {
 std::string to_string(audio::file_type const);
 }  // namespace yas
 
+std::ostream &operator<<(std::ostream &, yas::audio::file_type const &);
+
 namespace yas::audio::ext_audio_file_utils {
 [[nodiscard]] Boolean can_open(CFURLRef const url);
 Boolean open(ExtAudioFileRef *ext_audio_file, CFURLRef const url);
