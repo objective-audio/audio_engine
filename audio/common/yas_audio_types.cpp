@@ -43,6 +43,21 @@ std::type_info const &yas::to_sample_type(pcm_format const &pcm_format) {
     }
 }
 
+uint32_t yas::to_bit_depth(audio::pcm_format const &pcm_format) {
+    switch (pcm_format) {
+        case pcm_format::float32:
+            return 32;
+        case pcm_format::float64:
+            return 64;
+        case pcm_format::int16:
+            return 16;
+        case pcm_format::fixed824:
+            return 32;
+        case pcm_format::other:
+            return 0;
+    }
+}
+
 std::string yas::to_string(audio::direction const &dir) {
     switch (dir) {
         case audio::direction::output:
