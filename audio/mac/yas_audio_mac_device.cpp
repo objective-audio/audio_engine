@@ -95,20 +95,24 @@ static void _add_listener(AudioObjectID const object_id, AudioObjectPropertySele
 
 #pragma mark - mac_device_global
 
+struct global_mac_device : mac_device {
+    static std::shared_ptr<global_mac_device> make_shared(AudioDeviceID const device_id) {
+        auto shared = std::shared_ptr<global_mac_device>(new global_mac_device{device_id});
+        shared->_prepare(shared);
+        return shared;
+    }
+
+   private:
+    global_mac_device(AudioDeviceID const device_id) : mac_device(device_id) {
+    }
+};
+
+static bool _global_initialize_once = false;
+
 struct mac_device_global {
+    mac_device_global() = default;
+
     using device_map_t = std::unordered_map<AudioDeviceID, mac_device_ptr>;
-
-    struct global_mac_device : mac_device {
-        static std::shared_ptr<global_mac_device> make_shared(AudioDeviceID const device_id) {
-            auto shared = std::shared_ptr<global_mac_device>(new global_mac_device{device_id});
-            shared->_prepare(shared);
-            return shared;
-        }
-
-       private:
-        global_mac_device(AudioDeviceID const device_id) : mac_device(device_id) {
-        }
-    };
 
     static device_map_t const &all_devices_map() {
         _initialize();
@@ -156,9 +160,8 @@ struct mac_device_global {
     device_map_t _all_devices;
 
     static void _initialize() {
-        static bool once = false;
-        if (!once) {
-            once = true;
+        if (!_global_initialize_once) {
+            _global_initialize_once = true;
 
             update_all_devices();
 
@@ -175,18 +178,19 @@ struct mac_device_global {
         }
     }
 
-    static mac_device_global &instance() {
-        static mac_device_global _instance;
-        return _instance;
-    }
-
-    mac_device_global() = default;
+    static mac_device_global &instance();
 
     mac_device_global(mac_device_global const &) = delete;
     mac_device_global(mac_device_global &&) = delete;
     mac_device_global &operator=(mac_device_global const &) = delete;
     mac_device_global &operator=(mac_device_global &&) = delete;
 };
+
+static mac_device_global _global_instance;
+
+mac_device_global &mac_device_global::instance() {
+    return _global_instance;
+}
 }  // namespace yas::audio
 
 #pragma mark - property_info
