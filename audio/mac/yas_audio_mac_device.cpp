@@ -107,7 +107,11 @@ struct global_mac_device : mac_device {
     }
 };
 
+static bool _global_initialize_once = false;
+
 struct mac_device_global {
+    mac_device_global() = default;
+
     using device_map_t = std::unordered_map<AudioDeviceID, mac_device_ptr>;
 
     static device_map_t const &all_devices_map() {
@@ -156,9 +160,8 @@ struct mac_device_global {
     device_map_t _all_devices;
 
     static void _initialize() {
-        static bool once = false;
-        if (!once) {
-            once = true;
+        if (!_global_initialize_once) {
+            _global_initialize_once = true;
 
             update_all_devices();
 
@@ -175,18 +178,19 @@ struct mac_device_global {
         }
     }
 
-    static mac_device_global &instance() {
-        static mac_device_global _instance;
-        return _instance;
-    }
-
-    mac_device_global() = default;
+    static mac_device_global &instance();
 
     mac_device_global(mac_device_global const &) = delete;
     mac_device_global(mac_device_global &&) = delete;
     mac_device_global &operator=(mac_device_global const &) = delete;
     mac_device_global &operator=(mac_device_global &&) = delete;
 };
+
+static mac_device_global _global_instance;
+
+mac_device_global &mac_device_global::instance() {
+    return _global_instance;
+}
 }  // namespace yas::audio
 
 #pragma mark - property_info
