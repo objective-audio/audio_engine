@@ -12,9 +12,8 @@
 template <typename T>
 std::unique_ptr<std::vector<T>> yas::audio::mac_device::stream::_property_data(
     AudioStreamID const stream_id, AudioObjectPropertySelector const selector) const {
-    AudioObjectPropertyAddress const address = {.mSelector = selector,
-                                                .mScope = kAudioObjectPropertyScopeGlobal,
-                                                .mElement = kAudioObjectPropertyElementMaster};
+    AudioObjectPropertyAddress const address = {
+        .mSelector = selector, .mScope = kAudioObjectPropertyScopeGlobal, .mElement = kAudioObjectPropertyElementMain};
 
     UInt32 byte_size = 0;
     raise_if_raw_audio_error(AudioObjectGetPropertyDataSize(stream_id, &address, 0, nullptr, &byte_size));
