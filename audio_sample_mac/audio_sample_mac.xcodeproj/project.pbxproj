@@ -21,6 +21,7 @@
 		B6841A901AAABD330035C704 /* YASDecibelValueTransformer.mm in Sources */ = {isa = PBXBuildFile; fileRef = B6841A8F1AAABD330035C704 /* YASDecibelValueTransformer.mm */; };
 		B6841A931AAAD3990035C704 /* YASFrequencyValueFormatter.mm in Sources */ = {isa = PBXBuildFile; fileRef = B6841A921AAAD3990035C704 /* YASFrequencyValueFormatter.mm */; };
 		B69C84881AF1144F00B9EB3D /* YASAudioOfflineSampleViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = B69C84871AF1144F00B9EB3D /* YASAudioOfflineSampleViewController.mm */; };
+		B69E476028279B95002F2AFF /* UniformTypeIdentifiers.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B69E475F28279B95002F2AFF /* UniformTypeIdentifiers.framework */; };
 		B6AB1C411A9230420054349E /* YASAudioDeviceSampleViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = B6AB1C401A9230420054349E /* YASAudioDeviceSampleViewController.mm */; };
 		B6EA2AC821DDB40F00387B90 /* audio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B6EA2AC721DDB40F00387B90 /* audio.framework */; };
 		B6EA2ACC21DDB40F00387B90 /* cpp_utils.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B6EA2ACB21DDB40F00387B90 /* cpp_utils.framework */; };
@@ -51,6 +52,7 @@
 		B6841A921AAAD3990035C704 /* YASFrequencyValueFormatter.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = YASFrequencyValueFormatter.mm; sourceTree = "<group>"; };
 		B69C84861AF1144F00B9EB3D /* YASAudioOfflineSampleViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YASAudioOfflineSampleViewController.h; sourceTree = "<group>"; };
 		B69C84871AF1144F00B9EB3D /* YASAudioOfflineSampleViewController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = YASAudioOfflineSampleViewController.mm; sourceTree = "<group>"; };
+		B69E475F28279B95002F2AFF /* UniformTypeIdentifiers.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UniformTypeIdentifiers.framework; path = System/Library/Frameworks/UniformTypeIdentifiers.framework; sourceTree = SDKROOT; };
 		B6AB1C3F1A9230420054349E /* YASAudioDeviceSampleViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YASAudioDeviceSampleViewController.h; sourceTree = "<group>"; };
 		B6AB1C401A9230420054349E /* YASAudioDeviceSampleViewController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = YASAudioDeviceSampleViewController.mm; sourceTree = "<group>"; };
 		B6EA2AC721DDB40F00387B90 /* audio.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = audio.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -68,6 +70,7 @@
 				B6EA2ACC21DDB40F00387B90 /* cpp_utils.framework in Frameworks */,
 				B6EA2ACE21DDB40F00387B90 /* objc_utils.framework in Frameworks */,
 				B61D52FC1B9D268900A449C5 /* Accelerate.framework in Frameworks */,
+				B69E476028279B95002F2AFF /* UniformTypeIdentifiers.framework in Frameworks */,
 				B61D52A11B9C70DB00A449C5 /* AudioToolbox.framework in Frameworks */,
 				B657FB5C25EBCC3B00495411 /* observing.framework in Frameworks */,
 				B61D529F1B9C70D400A449C5 /* AudioUnit.framework in Frameworks */,
@@ -153,6 +156,7 @@
 		B6EA2AC621DDB40F00387B90 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				B69E475F28279B95002F2AFF /* UniformTypeIdentifiers.framework */,
 				B657FB5B25EBCC3B00495411 /* observing.framework */,
 				B6EA2AC721DDB40F00387B90 /* audio.framework */,
 				B6EA2AC921DDB40F00387B90 /* chaining.framework */,

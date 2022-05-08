@@ -4,6 +4,7 @@
 
 #import "YASAudioOfflineSampleViewController.h"
 #import <Accelerate/Accelerate.h>
+#import <UniformTypeIdentifiers/UniformTypeIdentifiers.h>
 #import <audio/yas_audio_umbrella.h>
 #import <cpp_utils/yas_objc_ptr.h>
 #import <cpp_utils/yas_thread.h>
@@ -263,7 +264,7 @@ struct offline_vc_internal {
     }
 
     NSSavePanel *panel = [NSSavePanel savePanel];
-    panel.allowedFileTypes = @[@"wav"];
+    panel.allowedContentTypes = @[UTTypeAudio];
     panel.extensionHidden = NO;
     if ([panel runModal] == NSModalResponseOK) {
         [self startOfflineFileWritingWithURL:panel.URL];
