@@ -154,7 +154,9 @@ static Boolean get_audio_file_format(AudioStreamBasicDescription *asbd, AudioFil
 
 #pragma mark - ext audio file
 
-Boolean ext_audio_file_utils::can_open(CFURLRef const url) {
+Boolean ext_audio_file_utils::can_open(std::filesystem::path const &path) {
+    CFURLRef const url = CFURLCreateWithString(NULL, to_cf_object(path.string()), NULL);
+
     Boolean result = true;
     AudioFileID file_id;
     AudioStreamBasicDescription asbd;
@@ -166,17 +168,24 @@ Boolean ext_audio_file_utils::can_open(CFURLRef const url) {
     } else {
         result = false;
     }
+
+    CFRelease(url);
+
     return result;
 }
 
-Boolean ext_audio_file_utils::open(ExtAudioFileRef *ext_audio_file, CFURLRef const url) {
+Boolean ext_audio_file_utils::open(ExtAudioFileRef *ext_audio_file, std::filesystem::path const &path) {
+    CFURLRef const url = CFURLCreateWithString(NULL, to_cf_object(path.string()), NULL);
     OSStatus err = ExtAudioFileOpenURL(url, ext_audio_file);
+    CFRelease(url);
     return err == noErr;
 }
 
-Boolean ext_audio_file_utils::create(ExtAudioFileRef *extAudioFile, CFURLRef const url,
+Boolean ext_audio_file_utils::create(ExtAudioFileRef *extAudioFile, std::filesystem::path const &path,
                                      AudioFileTypeID const file_type_id, AudioStreamBasicDescription const &asbd) {
+    CFURLRef const url = CFURLCreateWithString(NULL, to_cf_object(path.string()), NULL);
     OSStatus err = ExtAudioFileCreateWithURL(url, file_type_id, &asbd, NULL, kAudioFileFlags_EraseFile, extAudioFile);
+    CFRelease(url);
     return err == noErr;
 }
 
