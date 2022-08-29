@@ -7,6 +7,7 @@
 #include <AudioToolbox/AudioToolbox.h>
 #include <CoreFoundation/CoreFoundation.h>
 
+#include <filesystem>
 #include <string>
 
 namespace yas::audio {
@@ -36,9 +37,9 @@ std::string to_string(audio::file_type const);
 std::ostream &operator<<(std::ostream &, yas::audio::file_type const &);
 
 namespace yas::audio::ext_audio_file_utils {
-[[nodiscard]] Boolean can_open(CFURLRef const url);
-Boolean open(ExtAudioFileRef *ext_audio_file, CFURLRef const url);
-Boolean create(ExtAudioFileRef *extAudioFile, CFURLRef const url, AudioFileTypeID const file_type_id,
+[[nodiscard]] Boolean can_open(std::filesystem::path const &);
+Boolean open(ExtAudioFileRef *ext_audio_file, std::filesystem::path const &);
+Boolean create(ExtAudioFileRef *extAudioFile, std::filesystem::path const &, AudioFileTypeID const file_type_id,
                AudioStreamBasicDescription const &asbd);
 Boolean dispose(ExtAudioFileRef const ext_audio_file);
 Boolean set_client_format(AudioStreamBasicDescription const &asbd, ExtAudioFileRef const ext_audio_file);

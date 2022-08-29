@@ -34,22 +34,18 @@ struct audio_file_test_data {
     }
 };
 
-static yas::url temporary_test_dir_url() {
-    return system_path_utils::directory_url(system_path_utils::dir::temporary).appending("yas_audio_test_files");
+static std::filesystem::path make_temporary_test_dir_path() {
+    return system_path_utils::directory_fs_path(system_path_utils::dir::temporary).append("yas_audio_test_files");
 }
 
 static void removeAllFiles() {
-    auto url = test::temporary_test_dir_url();
-
-    if (auto result = file_manager::remove_contents_in_directory(url.path()); result.is_error()) {
-        throw std::runtime_error("remove_files failed");
-    }
+    file_manager::remove_content(test::make_temporary_test_dir_path());
 }
 
 static void setupDirectory() {
     test::removeAllFiles();
 
-    auto path = test::temporary_test_dir_url().path();
+    auto path = test::make_temporary_test_dir_path();
     if (auto result = file_manager::create_directory_if_not_exists(path); result.is_error()) {
         throw std::runtime_error("create_directory_if_not_exists failed");
     }
@@ -137,17 +133,17 @@ static void setupDirectory() {
 
 - (void)test_make_create_and_open_file {
     auto const file_name = "test.wav";
-    auto file_url = test::temporary_test_dir_url().appending(file_name);
+    auto file_path = test::make_temporary_test_dir_path().append(file_name);
 
     {
-        auto file_result = audio::file::make_created({.file_url = file_url,
+        auto file_result = audio::file::make_created({.file_path = file_path,
                                                       .file_type = audio::file_type::wave,
                                                       .settings = audio::wave_file_settings(48000.0, 2, 16)});
         XCTAssertTrue(file_result);
 
         auto const &file = file_result.value();
 
-        XCTAssertEqual(file->url(), file_url);
+        XCTAssertEqual(file->path(), file_path);
         XCTAssertEqual(file->file_type(), audio::file_type::wave);
         auto const &file_format = file->file_format();
         XCTAssertEqual(file_format.buffer_count(), 1);
@@ -158,12 +154,12 @@ static void setupDirectory() {
     }
 
     {
-        auto file_result = audio::file::make_opened({.file_url = file_url});
+        auto file_result = audio::file::make_opened({.file_path = file_path});
         XCTAssertTrue(file_result);
 
         auto const &file = file_result.value();
 
-        XCTAssertEqual(file->url(), file_url);
+        XCTAssertEqual(file->path(), file_path);
         XCTAssertEqual(file->file_type(), audio::file_type::wave);
         auto const &file_format = file->file_format();
         XCTAssertEqual(file_format.buffer_count(), 1);
@@ -176,9 +172,9 @@ static void setupDirectory() {
 
 - (void)test_read_into_buffer_error_frame_length_out_of_range {
     auto const file_name = "test.wav";
-    auto file_url = test::temporary_test_dir_url().appending(file_name);
+    auto file_path = test::make_temporary_test_dir_path().append(file_name);
 
-    auto file_result = audio::file::make_created({.file_url = file_url,
+    auto file_result = audio::file::make_created({.file_path = file_path,
                                                   .file_type = audio::file_type::wave,
                                                   .settings = audio::wave_file_settings(48000.0, 2, 16)});
 
@@ -266,7 +262,7 @@ static void setupDirectory() {
 #pragma mark -
 
 - (void)_commonAudioFileTest:(test::audio_file_test_data &)test_data {
-    auto file_url = test::temporary_test_dir_url().appending(test_data.file_name);
+    auto file_path = test::make_temporary_test_dir_path().append(test_data.file_name);
     uint32_t const frame_length = test_data.frame_length;
     uint32_t const loopCount = test_data.loop_count;
     double const file_sample_rate = test_data.file_sample_rate;
@@ -292,9 +288,9 @@ static void setupDirectory() {
 
         if (test_data.standard) {
             XCTAssertTrue(
-                audio_file->create({.file_url = file_url, .file_type = test_data.file_type, .settings = settings}));
+                audio_file->create({.file_path = file_path, .file_type = test_data.file_type, .settings = settings}));
         } else {
-            XCTAssertTrue(audio_file->create({.file_url = file_url,
+            XCTAssertTrue(audio_file->create({.file_path = file_path,
                                               .file_type = test_data.file_type,
                                               .settings = settings,
                                               .pcm_format = pcm_format,
@@ -324,10 +320,10 @@ static void setupDirectory() {
         auto audio_file = audio::file::make_shared();
 
         if (test_data.standard) {
-            XCTAssertTrue(audio_file->open({.file_url = file_url}));
+            XCTAssertTrue(audio_file->open({.file_path = file_path}));
         } else {
             XCTAssertTrue(
-                audio_file->open({.file_url = file_url, .pcm_format = pcm_format, .interleaved = interleaved}));
+                audio_file->open({.file_path = file_path, .pcm_format = pcm_format, .interleaved = interleaved}));
         }
 
         int64_t looped_frame_length = frame_length * loopCount;

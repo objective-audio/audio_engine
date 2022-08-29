@@ -33,7 +33,7 @@ file::open_result_t file::open(open_args args) {
         return open_result_t(open_error_t::invalid_argument);
     }
 
-    this->_url = args.file_url;
+    this->_path = args.file_path;
 
     if (!this->_open_ext_audio_file(args.pcm_format, args.interleaved)) {
         return open_result_t(open_error_t::open_failed);
@@ -51,7 +51,7 @@ file::create_result_t file::create(create_args args) {
         return create_result_t(create_error_t::invalid_argument);
     }
 
-    this->_url = args.file_url;
+    this->_path = args.file_path;
     this->_file_type = args.file_type;
 
     if (!this->_create_ext_audio_file(args.settings, args.pcm_format, args.interleaved)) {
@@ -72,8 +72,8 @@ bool file::is_opened() const {
     return this->_ext_audio_file != nullptr;
 }
 
-yas::url const &file::url() const {
-    return *this->_url;
+std::filesystem::path const &file::path() const {
+    return *this->_path;
 }
 
 audio::file_type file::file_type() const {
@@ -229,12 +229,12 @@ file::write_result_t file::write_from_buffer(pcm_buffer const &buffer, bool cons
 #pragma mark - private
 
 bool file::_open_ext_audio_file(pcm_format const pcm_format, bool const interleaved) {
-    if (!ext_audio_file_utils::can_open(this->_url->cf_url())) {
+    if (!ext_audio_file_utils::can_open(this->_path.value())) {
         return false;
     }
 
     ExtAudioFileRef ext_audio_file = nullptr;
-    if (!ext_audio_file_utils::open(&ext_audio_file, this->_url->cf_url())) {
+    if (!ext_audio_file_utils::open(&ext_audio_file, this->_path.value())) {
         this->_ext_audio_file = std::nullopt;
         return false;
     };
@@ -277,7 +277,7 @@ bool file::_create_ext_audio_file(CFDictionaryRef const &settings, pcm_format co
     AudioFileTypeID file_type_id = to_audio_file_type_id(this->_file_type);
 
     ExtAudioFileRef ext_audio_file = nullptr;
-    if (!ext_audio_file_utils::create(&ext_audio_file, this->_url->cf_url(), file_type_id,
+    if (!ext_audio_file_utils::create(&ext_audio_file, this->_path.value(), file_type_id,
                                       this->_file_format->stream_description())) {
         this->_ext_audio_file = std::nullopt;
         return false;
