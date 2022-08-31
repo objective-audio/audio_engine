@@ -35,7 +35,7 @@ struct audio_file_test_data {
 };
 
 static std::filesystem::path make_temporary_test_dir_path() {
-    return system_path_utils::directory_fs_path(system_path_utils::dir::temporary).append("yas_audio_test_files");
+    return system_path_utils::directory_path(system_path_utils::dir::temporary).append("yas_audio_test_files");
 }
 
 static void removeAllFiles() {
