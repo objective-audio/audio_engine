@@ -40,7 +40,7 @@ using namespace yas;
                                       kMultiChannelMixerParam_PostPeakHoldLevel};
 
     for (auto const &parameter_id : input_parameter_ids) {
-        for (AudioUnitElement idx; idx < raw_au->input_bus_count(); ++idx) {
+        for (AudioUnitElement idx = 0; idx < raw_au->input_bus_count(); ++idx) {
             auto const parameter = raw_au->parameter(parameter_id, audio::avf_au_parameter_scope::input, idx);
             XCTAssertTrue(parameter.has_value());
         }
@@ -49,7 +49,7 @@ using namespace yas;
     auto output_parameter_ids = {kMultiChannelMixerParam_Volume, kMultiChannelMixerParam_Pan};
 
     for (auto const &parameter_id : output_parameter_ids) {
-        for (AudioUnitElement idx; idx < raw_au->output_bus_count(); ++idx) {
+        for (AudioUnitElement idx = 0; idx < raw_au->output_bus_count(); ++idx) {
             auto const parameter = raw_au->parameter(parameter_id, audio::avf_au_parameter_scope::output, idx);
             XCTAssertTrue(parameter.has_value());
         }
