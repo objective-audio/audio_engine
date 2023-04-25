@@ -133,9 +133,8 @@ mac_device::stream::listener_f mac_device::stream::_listener() {
 }
 
 void mac_device::stream::_add_listener(AudioObjectPropertySelector const &selector, listener_f handler) {
-    AudioObjectPropertyAddress const address = {.mSelector = selector,
-                                                .mScope = kAudioObjectPropertyScopeGlobal,
-                                                .mElement = kAudioObjectPropertyElementMaster};
+    AudioObjectPropertyAddress const address = {
+        .mSelector = selector, .mScope = kAudioObjectPropertyScopeGlobal, .mElement = kAudioObjectPropertyElementMain};
 
     raise_if_raw_audio_error(
         AudioObjectAddPropertyListenerBlock(this->_stream_id, &address, dispatch_get_main_queue(),
