@@ -27,7 +27,7 @@ static std::unique_ptr<std::vector<T>> _property_data(AudioObjectID const object
                                                       AudioObjectPropertySelector const selector,
                                                       AudioObjectPropertyScope const scope) {
     AudioObjectPropertyAddress const address = {
-        .mSelector = selector, .mScope = scope, .mElement = kAudioObjectPropertyElementMaster};
+        .mSelector = selector, .mScope = scope, .mElement = kAudioObjectPropertyElementMain};
 
     UInt32 byte_size = 0;
     raise_if_raw_audio_error(AudioObjectGetPropertyDataSize(object_id, &address, 0, nullptr, &byte_size));
@@ -52,7 +52,7 @@ static std::unique_ptr<std::vector<uint8_t>> _property_byte_data(AudioObjectID c
                                                                  AudioObjectPropertySelector const selector,
                                                                  AudioObjectPropertyScope const scope) {
     AudioObjectPropertyAddress const address = {
-        .mSelector = selector, .mScope = scope, .mElement = kAudioObjectPropertyElementMaster};
+        .mSelector = selector, .mScope = scope, .mElement = kAudioObjectPropertyElementMain};
 
     UInt32 byte_size = 0;
     raise_if_raw_audio_error(AudioObjectGetPropertyDataSize(object_id, &address, 0, nullptr, &byte_size));
@@ -67,9 +67,8 @@ static std::unique_ptr<std::vector<uint8_t>> _property_byte_data(AudioObjectID c
 }
 
 static CFStringRef _property_string(AudioObjectID const object_id, AudioObjectPropertySelector const selector) {
-    AudioObjectPropertyAddress const address = {.mSelector = selector,
-                                                .mScope = kAudioObjectPropertyScopeGlobal,
-                                                .mElement = kAudioObjectPropertyElementMaster};
+    AudioObjectPropertyAddress const address = {
+        .mSelector = selector, .mScope = kAudioObjectPropertyScopeGlobal, .mElement = kAudioObjectPropertyElementMain};
 
     CFStringRef cfString = nullptr;
     UInt32 size = sizeof(CFStringRef);
@@ -84,7 +83,7 @@ static CFStringRef _property_string(AudioObjectID const object_id, AudioObjectPr
 static void _add_listener(AudioObjectID const object_id, AudioObjectPropertySelector const selector,
                           AudioObjectPropertyScope const scope, mac_device::listener_f const handler) {
     AudioObjectPropertyAddress const address = {
-        .mSelector = selector, .mScope = scope, .mElement = kAudioObjectPropertyElementMaster};
+        .mSelector = selector, .mScope = scope, .mElement = kAudioObjectPropertyElementMain};
 
     raise_if_raw_audio_error(AudioObjectAddPropertyListenerBlock(
         object_id, &address, dispatch_get_main_queue(),
