@@ -5,10 +5,10 @@
 #import "YASAudioOfflineSampleViewController.h"
 #import <Accelerate/Accelerate.h>
 #import <UniformTypeIdentifiers/UniformTypeIdentifiers.h>
-#import <audio/yas_audio_umbrella.h>
 #import <cpp_utils/yas_objc_ptr.h>
 #import <cpp_utils/yas_thread.h>
 #import <objc_utils/yas_objc_unowned.h>
+#import <audio/yas_audio_umbrella.hpp>
 #import <iostream>
 
 using namespace yas;
