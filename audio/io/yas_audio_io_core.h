@@ -5,7 +5,8 @@
 #pragma once
 
 #include <audio/yas_audio_io_kernel.h>
-#include <observing/yas_observing_umbrella.h>
+
+#include <observing/yas_observing_umbrella.hpp>
 
 namespace yas::audio {
 struct io_core {
