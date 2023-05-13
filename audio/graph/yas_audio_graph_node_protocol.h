@@ -7,8 +7,8 @@
 #include <audio/yas_audio_graph_connection_protocol.h>
 #include <audio/yas_audio_ptr.h>
 #include <audio/yas_audio_rendering_types.h>
-#include <observing/yas_observing_umbrella.h>
 
+#include <observing/yas_observing_umbrella.hpp>
 #include <optional>
 
 namespace yas::audio {

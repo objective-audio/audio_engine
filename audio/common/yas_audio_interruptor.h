@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <observing/yas_observing_umbrella.h>
+#include <observing/yas_observing_umbrella.hpp>
 
 namespace yas::audio {
 enum interruption_method {

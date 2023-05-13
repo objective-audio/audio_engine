@@ -2,12 +2,14 @@
 //  YASAudioRouteSampleViewController.m
 //
 
+#define ACCELERATE_NEW_LAPACK
+
 #import "YASAudioRouteSampleViewController.h"
 #import <Accelerate/Accelerate.h>
-#import <audio/yas_audio_umbrella.h>
 #import <cpp_utils/yas_objc_ptr.h>
 #import <objc_utils/yas_objc_macros.h>
 #import <objc_utils/yas_objc_unowned.h>
+#import <audio/yas_audio_umbrella.hpp>
 
 using namespace yas;
 

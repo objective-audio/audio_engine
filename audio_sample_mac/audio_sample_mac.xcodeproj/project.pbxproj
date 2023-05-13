@@ -18,6 +18,7 @@
 		B62ED5661A62812F007DDE96 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B62ED5641A62812F007DDE96 /* Main.storyboard */; };
 		B637893F1AB430F300B95F55 /* YASAudioRouteSampleViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = B637893E1AB430F300B95F55 /* YASAudioRouteSampleViewController.mm */; };
 		B657FB5C25EBCC3B00495411 /* observing.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B657FB5B25EBCC3B00495411 /* observing.framework */; };
+		B681EB012A0FC9AE00C60833 /* yas_audio_sample_kernel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B681EB002A0FC9AE00C60833 /* yas_audio_sample_kernel.cpp */; };
 		B6841A901AAABD330035C704 /* YASDecibelValueTransformer.mm in Sources */ = {isa = PBXBuildFile; fileRef = B6841A8F1AAABD330035C704 /* YASDecibelValueTransformer.mm */; };
 		B6841A931AAAD3990035C704 /* YASFrequencyValueFormatter.mm in Sources */ = {isa = PBXBuildFile; fileRef = B6841A921AAAD3990035C704 /* YASFrequencyValueFormatter.mm */; };
 		B69C84881AF1144F00B9EB3D /* YASAudioOfflineSampleViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = B69C84871AF1144F00B9EB3D /* YASAudioOfflineSampleViewController.mm */; };
@@ -46,6 +47,7 @@
 		B637893E1AB430F300B95F55 /* YASAudioRouteSampleViewController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = YASAudioRouteSampleViewController.mm; sourceTree = "<group>"; };
 		B657FB5B25EBCC3B00495411 /* observing.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = observing.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B679BCBA2520D5F700B41033 /* audio_sample_mac.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = audio_sample_mac.entitlements; sourceTree = "<group>"; };
+		B681EB002A0FC9AE00C60833 /* yas_audio_sample_kernel.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = yas_audio_sample_kernel.cpp; sourceTree = "<group>"; };
 		B6841A8E1AAABD330035C704 /* YASDecibelValueTransformer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YASDecibelValueTransformer.h; sourceTree = "<group>"; };
 		B6841A8F1AAABD330035C704 /* YASDecibelValueTransformer.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = YASDecibelValueTransformer.mm; sourceTree = "<group>"; };
 		B6841A911AAAD3990035C704 /* YASFrequencyValueFormatter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YASFrequencyValueFormatter.h; sourceTree = "<group>"; };
@@ -86,6 +88,7 @@
 			isa = PBXGroup;
 			children = (
 				B612CDB7234B783E00B89826 /* yas_audio_sample_kernel.h */,
+				B681EB002A0FC9AE00C60833 /* yas_audio_sample_kernel.cpp */,
 			);
 			name = common;
 			sourceTree = "<group>";
@@ -257,6 +260,7 @@
 				B6841A901AAABD330035C704 /* YASDecibelValueTransformer.mm in Sources */,
 				B637893F1AB430F300B95F55 /* YASAudioRouteSampleViewController.mm in Sources */,
 				B69C84881AF1144F00B9EB3D /* YASAudioOfflineSampleViewController.mm in Sources */,
+				B681EB012A0FC9AE00C60833 /* yas_audio_sample_kernel.cpp in Sources */,
 				B62ED55E1A62812F007DDE96 /* main.m in Sources */,
 				B62ED55C1A62812F007DDE96 /* AppDelegate.mm in Sources */,
 				B6AB1C411A9230420054349E /* YASAudioDeviceSampleViewController.mm in Sources */,

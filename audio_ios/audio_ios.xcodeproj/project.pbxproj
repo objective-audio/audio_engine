@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 53;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -13,8 +13,9 @@
 		B6002E2D21DCC89B0013AA0E /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B6002D0D21DCA6750013AA0E /* Accelerate.framework */; };
 		B6002E2E21DCC89B0013AA0E /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B6002D0B21DCA66E0013AA0E /* AudioToolbox.framework */; };
 		B6002E2F21DCC89B0013AA0E /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B6002D0F21DCA67F0013AA0E /* AVFoundation.framework */; };
-		B6393119256BAADE00818C46 /* yas_audio_umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = B63930C3256BAADE00818C46 /* yas_audio_umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		B6393119256BAADE00818C46 /* yas_audio_umbrella.hpp in Headers */ = {isa = PBXBuildFile; fileRef = B63930C3256BAADE00818C46 /* yas_audio_umbrella.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
 		B657FB6C25EBCF8700495411 /* observing.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B657FB6B25EBCF8700495411 /* observing.framework */; };
+		B681EAFF2A0FC68100C60833 /* yas_audio_umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = B681EAFE2A0FC68100C60833 /* yas_audio_umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		B6C5DE4E25E3A8D800B3BF22 /* yas_audio_pcm_buffer.h in Headers */ = {isa = PBXBuildFile; fileRef = B6C5DDED25E3A8D700B3BF22 /* yas_audio_pcm_buffer.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		B6C5DE4F25E3A8D800B3BF22 /* yas_audio_pcm_buffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6C5DDEE25E3A8D700B3BF22 /* yas_audio_pcm_buffer.cpp */; };
 		B6C5DE5025E3A8D800B3BF22 /* yas_audio_rendering_graph.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6C5DDF125E3A8D700B3BF22 /* yas_audio_rendering_graph.cpp */; };
@@ -114,8 +115,9 @@
 		B6002E2321DCC8700013AA0E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B6002E2821DCC87F0013AA0E /* chaining.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = chaining.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B6002E2A21DCC87F0013AA0E /* cpp_utils.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = cpp_utils.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		B63930C3256BAADE00818C46 /* yas_audio_umbrella.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yas_audio_umbrella.h; sourceTree = "<group>"; };
+		B63930C3256BAADE00818C46 /* yas_audio_umbrella.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = yas_audio_umbrella.hpp; sourceTree = "<group>"; };
 		B657FB6B25EBCF8700495411 /* observing.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = observing.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		B681EAFE2A0FC68100C60833 /* yas_audio_umbrella.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yas_audio_umbrella.h; sourceTree = "<group>"; };
 		B6C5DDED25E3A8D700B3BF22 /* yas_audio_pcm_buffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yas_audio_pcm_buffer.h; sourceTree = "<group>"; };
 		B6C5DDEE25E3A8D700B3BF22 /* yas_audio_pcm_buffer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = yas_audio_pcm_buffer.cpp; sourceTree = "<group>"; };
 		B6C5DDF125E3A8D700B3BF22 /* yas_audio_rendering_graph.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = yas_audio_rendering_graph.cpp; sourceTree = "<group>"; };
@@ -281,7 +283,8 @@
 				B6C5DDEC25E3A8D700B3BF22 /* pcm_buffer */,
 				B6C5DDF025E3A8D700B3BF22 /* rendering */,
 				B6C5DDFD25E3A8D700B3BF22 /* utils */,
-				B63930C3256BAADE00818C46 /* yas_audio_umbrella.h */,
+				B63930C3256BAADE00818C46 /* yas_audio_umbrella.hpp */,
+				B681EAFE2A0FC68100C60833 /* yas_audio_umbrella.h */,
 			);
 			name = audio;
 			path = ../../audio;
@@ -466,6 +469,7 @@
 				B6C5DE9725E3A8D800B3BF22 /* yas_audio_time.h in Headers */,
 				B6C5DE7A25E3A8D800B3BF22 /* yas_audio_ios_session.h in Headers */,
 				B6C5DE9C25E3A8D800B3BF22 /* yas_audio_types.h in Headers */,
+				B681EAFF2A0FC68100C60833 /* yas_audio_umbrella.h in Headers */,
 				B6C5DE8925E3A8D800B3BF22 /* yas_audio_graph_tap.h in Headers */,
 				B6C5DE7525E3A8D800B3BF22 /* yas_audio_ios_io_core.h in Headers */,
 				B6C5DE9425E3A8D800B3BF22 /* yas_audio_graph_avf_au.h in Headers */,
@@ -488,7 +492,7 @@
 				B6C5DE7E25E3A8D800B3BF22 /* yas_audio_renewable_device.h in Headers */,
 				B6C5DE9925E3A8D800B3BF22 /* yas_audio_route.h in Headers */,
 				B6C5DE8725E3A8D800B3BF22 /* yas_audio_graph_connection_protocol.h in Headers */,
-				B6393119256BAADE00818C46 /* yas_audio_umbrella.h in Headers */,
+				B6393119256BAADE00818C46 /* yas_audio_umbrella.hpp in Headers */,
 				B6C5DE8425E3A8D800B3BF22 /* yas_audio_graph.h in Headers */,
 				B6C5DE5825E3A8D800B3BF22 /* yas_audio_file.h in Headers */,
 				B6C5DE9A25E3A8D800B3BF22 /* yas_audio_interruptor.h in Headers */,
@@ -536,7 +540,8 @@
 		B6002B8D21DC6FEF0013AA0E /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 1200;
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
 				TargetAttributes = {
 					B6002E1F21DCC86F0013AA0E = {
 						CreatedOnToolsVersion = 10.0;
@@ -640,6 +645,7 @@
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				DEAD_CODE_STRIPPING = YES;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -674,6 +680,7 @@
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				DEAD_CODE_STRIPPING = YES;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -744,12 +751,13 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				INFOPLIST_FILE = audio/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 14.7;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
+				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
+				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu11 gnu++20";
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -817,12 +825,13 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				INFOPLIST_FILE = audio/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 14.7;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
+				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
+				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu11 gnu++20";
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = "jp.objective-audio.audio";

@@ -9,7 +9,8 @@
 #include <audio/yas_audio_ptr.h>
 #include <audio/yas_audio_time.h>
 #include <audio/yas_audio_types.h>
-#include <observing/yas_observing_umbrella.h>
+
+#include <observing/yas_observing_umbrella.hpp>
 
 namespace yas::audio {
 struct io final {

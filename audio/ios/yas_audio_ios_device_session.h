@@ -8,9 +8,8 @@
 
 #if TARGET_OS_IPHONE
 
-#include <observing/yas_observing_umbrella.h>
-
 #include <cstdint>
+#include <observing/yas_observing_umbrella.hpp>
 
 namespace yas::audio {
 struct ios_device_session {

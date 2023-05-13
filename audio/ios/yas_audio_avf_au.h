@@ -7,7 +7,8 @@
 #include <AudioToolbox/AudioToolbox.h>
 #include <audio/yas_audio_format.h>
 #include <audio/yas_audio_ptr.h>
-#include <observing/yas_observing_umbrella.h>
+
+#include <observing/yas_observing_umbrella.hpp>
 
 namespace yas::audio {
 enum class avf_au_parameter_scope;
