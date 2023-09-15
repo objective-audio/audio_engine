@@ -4,8 +4,6 @@
 
 #include "yas_audio_pcm_buffer.h"
 
-#define ACCELERATE_NEW_LAPACK
-
 #include <Accelerate/Accelerate.h>
 #include <cpp_utils/yas_fast_each.h>
 #include <cpp_utils/yas_result.h>
