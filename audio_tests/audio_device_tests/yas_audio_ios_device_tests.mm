@@ -119,7 +119,7 @@ struct test_interruptor : interruptor {
 
     std::vector<audio::io_device::method> received;
 
-    auto canceller = device->observe_io_device([&received](auto const &method) { received.push_back(method); });
+    auto canceller = device->observe_io_device([&received](auto const &method) { received.push_back(method); }).end();
 
     device_session->notifier->notify(audio::ios_device_session::device_method::route_change);
 
@@ -134,6 +134,8 @@ struct test_interruptor : interruptor {
     XCTAssertEqual(received.at(1), audio::io_device::method::lost);
     XCTAssertFalse(device->output_format().has_value());
     XCTAssertFalse(device->input_format().has_value());
+
+    canceller->cancel();
 }
 
 - (void)test_interruptor {
