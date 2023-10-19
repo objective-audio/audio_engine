@@ -6,6 +6,7 @@
 
 #include <AudioUnit/AUComponent.h>
 
+#include <functional>
 #include <memory>
 #include <optional>
 #include <ostream>

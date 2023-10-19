@@ -56,7 +56,7 @@ using namespace yas::audio;
     std::vector<io_device::method> received;
 
     auto canceller =
-        renewable_device->observe_io_device([&received](auto const &method) { received.push_back(method); });
+        renewable_device->observe_io_device([&received](auto const &method) { received.push_back(method); }).end();
 
     // 最初はoutput_device
     XCTAssertTrue(renewable_device->output_format().has_value());
@@ -97,6 +97,8 @@ using namespace yas::audio;
     // renewable_deviceからupdatedが送信される
     XCTAssertEqual(received.size(), 2);
     XCTAssertEqual(received.at(1), io_device::method::updated);
+
+    canceller->cancel();
 }
 
 @end
