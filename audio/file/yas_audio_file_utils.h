@@ -9,6 +9,7 @@
 
 #include <filesystem>
 #include <string>
+#include <ostream>
 
 namespace yas::audio {
 enum class file_type {
