@@ -13,13 +13,13 @@ let package = Package(
         ),
     ],
     dependencies: [
-        .package(url: "https://github.com/objective-audio/observing.git", branch: "main"),
+        .package(url: "https://github.com/objective-audio/cpp_utils.git", branch: "master"),
     ],
     targets: [
         .target(
             name: "audio",
             dependencies: [
-                .product(name: "observing", package: "observing")
+                .product(name: "cpp-utils", package: "cpp_utils")
             ],
             cSettings: [
                 .unsafeFlags(["-fmodules"]),
