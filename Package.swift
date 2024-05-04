@@ -9,7 +9,7 @@ let package = Package(
     products: [
         .library(
             name: "audio",
-            targets: ["audio"]
+            targets: ["audio-engine"]
         ),
     ],
     dependencies: [
@@ -17,7 +17,7 @@ let package = Package(
     ],
     targets: [
         .target(
-            name: "audio",
+            name: "audio-engine",
             dependencies: [
                 .product(name: "cpp-utils", package: "cpp_utils")
             ],
@@ -32,9 +32,9 @@ let package = Package(
             ]
         ),
         .testTarget(
-            name: "audio-tests",
+            name: "audio-engine-tests",
             dependencies: [
-                "audio"
+                "audio-engine"
             ],
             cxxSettings: [
                 .define("WAVEFILE_LIGHT_TEST", to: "1"),

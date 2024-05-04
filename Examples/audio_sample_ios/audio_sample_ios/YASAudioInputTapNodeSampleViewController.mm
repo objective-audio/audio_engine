@@ -5,7 +5,7 @@
 #import "YASAudioInputTapNodeSampleViewController.h"
 #import <AVFoundation/AVFoundation.h>
 #import <Accelerate/Accelerate.h>
-#import <audio/yas_audio_umbrella.h>
+#import <audio-engine/yas_audio_engine_umbrella.h>
 #import <objc-utils/yas_objc_macros.h>
 #import "YASViewControllerUtils.h"
 

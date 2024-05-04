@@ -4,7 +4,7 @@
 
 #import "YASAudioReloadViewController.h"
 #import <AVFoundation/AVFoundation.h>
-#import <audio/yas_audio_umbrella.h>
+#import <audio-engine/yas_audio_engine_umbrella.h>
 #import "YASViewControllerUtils.h"
 #import "yas_audio_sample_kernel.h"
 

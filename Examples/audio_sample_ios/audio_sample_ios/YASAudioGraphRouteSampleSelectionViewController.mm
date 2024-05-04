@@ -3,7 +3,7 @@
 //
 
 #import "YASAudioGraphRouteSampleSelectionViewController.h"
-#import <audio/yas_audio_umbrella.h>
+#import <audio-engine/yas_audio_engine_umbrella.h>
 #import <objc-utils/yas_objc_macros.h>
 #import "YASAudioGraphRouteSampleViewController.h"
 

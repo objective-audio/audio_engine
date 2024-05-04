@@ -9,7 +9,7 @@
 #import <cpp-utils/yas_objc_ptr.h>
 #import <objc-utils/yas_objc_macros.h>
 #import <objc-utils/yas_objc_unowned.h>
-#import <audio/yas_audio_umbrella.hpp>
+#import <audio-engine/yas_audio_engine_umbrella.hpp>
 
 using namespace yas;
 
