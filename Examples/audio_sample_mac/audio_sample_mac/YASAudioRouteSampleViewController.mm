@@ -2,8 +2,6 @@
 //  YASAudioRouteSampleViewController.m
 //
 
-#define ACCELERATE_NEW_LAPACK
-
 #import "YASAudioRouteSampleViewController.h"
 #import <Accelerate/Accelerate.h>
 #import <cpp-utils/yas_objc_ptr.h>

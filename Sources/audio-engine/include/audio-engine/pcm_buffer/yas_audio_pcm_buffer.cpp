@@ -4,6 +4,9 @@
 
 #include "yas_audio_pcm_buffer.h"
 
+static_assert(ACCELERATE_NEW_LAPACK, "");
+static_assert(ACCELERATE_LAPACK_ILP64, "");
+
 #include <Accelerate/Accelerate.h>
 #include <cpp-utils/yas_fast_each.h>
 #include <cpp-utils/yas_result.h>
