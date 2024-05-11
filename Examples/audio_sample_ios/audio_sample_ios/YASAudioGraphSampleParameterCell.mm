@@ -3,7 +3,7 @@
 //
 
 #import "YASAudioGraphSampleParameterCell.h"
-#import <audio-engine/yas_audio_engine_umbrella.h>
+#import <audio-engine/umbrella.h>
 #import <objc-utils/yas_objc_macros.h>
 
 using namespace yas;

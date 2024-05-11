@@ -3,7 +3,7 @@
 //
 
 #import <UIKit/UIKit.h>
-#import <audio-engine/common/yas_audio_ptr.h>
+#import <audio-engine/common/ptr.h>
 #import <memory>
 
 @interface YASAudioGraphEffectsSampleEditViewController : UITableViewController

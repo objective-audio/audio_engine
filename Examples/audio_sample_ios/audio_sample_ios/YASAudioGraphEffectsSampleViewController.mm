@@ -4,7 +4,7 @@
 
 #import "YASAudioGraphEffectsSampleViewController.h"
 #import <AVFoundation/AVFoundation.h>
-#import <audio-engine/yas_audio_engine_umbrella.h>
+#import <audio-engine/umbrella.h>
 #import "YASAudioGraphEffectsSampleEditViewController.h"
 #import "YASViewControllerUtils.h"
 

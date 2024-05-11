@@ -8,10 +8,10 @@
 #import <objc-utils/yas_objc_macros.h>
 #import <objc-utils/yas_objc_unowned.h>
 #import <atomic>
-#import <audio-engine/yas_audio_engine_umbrella.hpp>
+#import <audio-engine/umbrella.hpp>
 #import "YASDecibelValueTransformer.h"
 #import "YASFrequencyValueFormatter.h"
-#import "yas_audio_sample_kernel.h"
+#import "sample_kernel.h"
 
 using namespace yas;
 

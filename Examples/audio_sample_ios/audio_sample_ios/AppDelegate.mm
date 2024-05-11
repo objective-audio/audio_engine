@@ -3,7 +3,7 @@
 //
 
 #import "AppDelegate.h"
-#include <audio-engine/yas_audio_engine_umbrella.h>
+#include <audio-engine/umbrella.h>
 
 using namespace yas;
 using namespace yas::audio;

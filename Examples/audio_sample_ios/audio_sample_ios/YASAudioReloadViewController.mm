@@ -4,9 +4,9 @@
 
 #import "YASAudioReloadViewController.h"
 #import <AVFoundation/AVFoundation.h>
-#import <audio-engine/yas_audio_engine_umbrella.h>
+#import <audio-engine/umbrella.h>
 #import "YASViewControllerUtils.h"
-#import "yas_audio_sample_kernel.h"
+#import "sample_kernel.h"
 
 using namespace yas;
 
