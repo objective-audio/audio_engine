@@ -5,11 +5,11 @@ import PackageDescription
 
 let package = Package(
     name: "audio",
-    platforms: [.macOS(.v10_15), .iOS(.v13), .macCatalyst(.v13)],
+    platforms: [.macOS(.v14), .iOS(.v17), .macCatalyst(.v17)],
     products: [
         .library(
             name: "audio",
-            targets: ["audio"]
+            targets: ["audio-engine"]
         ),
     ],
     dependencies: [
@@ -17,12 +17,13 @@ let package = Package(
     ],
     targets: [
         .target(
-            name: "audio",
+            name: "audio-engine",
             dependencies: [
                 .product(name: "cpp-utils", package: "cpp_utils")
             ],
             cSettings: [
-                .unsafeFlags(["-fmodules"]),
+                .define("ACCELERATE_NEW_LAPACK", to: "1"),
+                .define("ACCELERATE_LAPACK_ILP64", to: "1"),
             ],
             linkerSettings: [
                 .linkedFramework("AVFoundation"),
@@ -32,9 +33,9 @@ let package = Package(
             ]
         ),
         .testTarget(
-            name: "audio-tests",
+            name: "audio-engine-tests",
             dependencies: [
-                "audio"
+                "audio-engine"
             ],
             cxxSettings: [
                 .define("WAVEFILE_LIGHT_TEST", to: "1"),

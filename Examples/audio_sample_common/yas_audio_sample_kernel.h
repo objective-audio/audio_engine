@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <audio/yas_audio_umbrella.hpp>
+#include <audio-engine/yas_audio_engine_umbrella.hpp>
 
 namespace yas::audio::sample {
 class kernel;

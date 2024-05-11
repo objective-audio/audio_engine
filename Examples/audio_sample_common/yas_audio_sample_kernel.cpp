@@ -2,8 +2,6 @@
 //  yas_audio_sample_kernel.cpp
 //
 
-#define ACCELERATE_NEW_LAPACK
-
 #include "yas_audio_sample_kernel.h"
 
 #include <Accelerate/Accelerate.h>

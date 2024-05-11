@@ -10,7 +10,6 @@
 		B612CDB4234B723B00B89826 /* YASAudioAVFIOSampleViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = B612CDB3234B723B00B89826 /* YASAudioAVFIOSampleViewController.mm */; };
 		B6154C2A2BC63FD0007A8206 /* audio in Frameworks */ = {isa = PBXBuildFile; productRef = B6154C292BC63FD0007A8206 /* audio */; };
 		B6154C2C2BC640C7007A8206 /* yas_audio_sample_kernel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6154C2B2BC640C7007A8206 /* yas_audio_sample_kernel.cpp */; };
-		B61D52D61B9C845000A449C5 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B61D52D51B9C845000A449C5 /* UIKit.framework */; };
 		B62C2D6C1BAD498D0036949D /* YASAudioGraphRouteSampleSelectionViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = B62C2D6B1BAD498D0036949D /* YASAudioGraphRouteSampleSelectionViewController.mm */; };
 		B62ED5291A6280C0007DDE96 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = B62ED5281A6280C0007DDE96 /* main.m */; };
 		B62ED52C1A6280C0007DDE96 /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = B62ED52B1A6280C0007DDE96 /* AppDelegate.mm */; };
@@ -18,6 +17,7 @@
 		B62ED5341A6280C0007DDE96 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B62ED5331A6280C0007DDE96 /* Images.xcassets */; };
 		B62ED5371A6280C0007DDE96 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = B62ED5351A6280C0007DDE96 /* LaunchScreen.xib */; };
 		B65BE8D21AB66D9C0073A07E /* YASAudioGraphEffectsSampleViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = B65BE8D11AB66D9C0073A07E /* YASAudioGraphEffectsSampleViewController.mm */; };
+		B67BEC692BE7953700807D15 /* yas_new_lapack_assertion.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B67BEC682BE7948500807D15 /* yas_new_lapack_assertion.cpp */; };
 		B67F923023783BB200757226 /* YASAudioAVFConverterSampleViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = B67F922F23783BB200757226 /* YASAudioAVFConverterSampleViewController.mm */; };
 		B68B66D6234E166C008F9067 /* YASViewControllerUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = B68B66D5234E166C008F9067 /* YASViewControllerUtils.m */; };
 		B694581C23C7360500D39967 /* YASAudioReloadViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = B694581B23C7360500D39967 /* YASAudioReloadViewController.mm */; };
@@ -33,10 +33,6 @@
 		B612CDB3234B723B00B89826 /* YASAudioAVFIOSampleViewController.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = YASAudioAVFIOSampleViewController.mm; sourceTree = "<group>"; };
 		B612CDBA234B7CA800B89826 /* yas_audio_sample_kernel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = yas_audio_sample_kernel.h; path = ../../audio_sample_common/yas_audio_sample_kernel.h; sourceTree = "<group>"; };
 		B6154C2B2BC640C7007A8206 /* yas_audio_sample_kernel.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = yas_audio_sample_kernel.cpp; path = ../../audio_sample_common/yas_audio_sample_kernel.cpp; sourceTree = "<group>"; };
-		B61D52941B9C708E00A449C5 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
-		B61D52961B9C709500A449C5 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
-		B61D52D51B9C845000A449C5 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
-		B61D52F91B9D257900A449C5 /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = System/Library/Frameworks/Accelerate.framework; sourceTree = SDKROOT; };
 		B62C2D6A1BAD498D0036949D /* YASAudioGraphRouteSampleSelectionViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YASAudioGraphRouteSampleSelectionViewController.h; sourceTree = "<group>"; };
 		B62C2D6B1BAD498D0036949D /* YASAudioGraphRouteSampleSelectionViewController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = YASAudioGraphRouteSampleSelectionViewController.mm; sourceTree = "<group>"; };
 		B62ED5231A6280C0007DDE96 /* audio_sample_ios.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = audio_sample_ios.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -50,6 +46,7 @@
 		B657FB6F25EBCF9E00495411 /* observing.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = observing.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B65BE8D01AB66D9C0073A07E /* YASAudioGraphEffectsSampleViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YASAudioGraphEffectsSampleViewController.h; sourceTree = "<group>"; };
 		B65BE8D11AB66D9C0073A07E /* YASAudioGraphEffectsSampleViewController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = YASAudioGraphEffectsSampleViewController.mm; sourceTree = "<group>"; };
+		B67BEC682BE7948500807D15 /* yas_new_lapack_assertion.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = yas_new_lapack_assertion.cpp; path = ../../audio_sample_common/yas_new_lapack_assertion.cpp; sourceTree = "<group>"; };
 		B67F922E23783BB200757226 /* YASAudioAVFConverterSampleViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = YASAudioAVFConverterSampleViewController.h; sourceTree = "<group>"; };
 		B67F922F23783BB200757226 /* YASAudioAVFConverterSampleViewController.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = YASAudioAVFConverterSampleViewController.mm; sourceTree = "<group>"; };
 		B68B66D4234E166C008F9067 /* YASViewControllerUtils.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = YASViewControllerUtils.h; sourceTree = "<group>"; };
@@ -73,7 +70,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B61D52D61B9C845000A449C5 /* UIKit.framework in Frameworks */,
 				B6154C2A2BC63FD0007A8206 /* audio in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -93,6 +89,7 @@
 		B612CDB9234B7C9D00B89826 /* common */ = {
 			isa = PBXGroup;
 			children = (
+				B67BEC682BE7948500807D15 /* yas_new_lapack_assertion.cpp */,
 				B612CDBA234B7CA800B89826 /* yas_audio_sample_kernel.h */,
 				B6154C2B2BC640C7007A8206 /* yas_audio_sample_kernel.cpp */,
 				B68B66D4234E166C008F9067 /* YASViewControllerUtils.h */,
@@ -101,21 +98,9 @@
 			name = common;
 			sourceTree = "<group>";
 		};
-		B61D52D21B9C82EA00A449C5 /* Framework */ = {
-			isa = PBXGroup;
-			children = (
-				B61D52F91B9D257900A449C5 /* Accelerate.framework */,
-				B61D52D51B9C845000A449C5 /* UIKit.framework */,
-				B61D52961B9C709500A449C5 /* AudioToolbox.framework */,
-				B61D52941B9C708E00A449C5 /* AVFoundation.framework */,
-			);
-			name = Framework;
-			sourceTree = "<group>";
-		};
 		B62ED51A1A6280C0007DDE96 = {
 			isa = PBXGroup;
 			children = (
-				B61D52D21B9C82EA00A449C5 /* Framework */,
 				B62ED5251A6280C0007DDE96 /* audio_sample_ios */,
 				B62ED5241A6280C0007DDE96 /* Products */,
 				B67A0BEE21DE4A4E00161BCA /* Frameworks */,
@@ -249,7 +234,8 @@
 		B62ED51B1A6280C0007DDE96 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 1200;
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1530;
 				ORGANIZATIONNAME = "Objective-Audio";
 				TargetAttributes = {
 					B62ED5221A6280C0007DDE96 = {
@@ -307,6 +293,7 @@
 				B62ED52C1A6280C0007DDE96 /* AppDelegate.mm in Sources */,
 				B62ED5291A6280C0007DDE96 /* main.m in Sources */,
 				B6E52AE61ABD362300D2C45A /* YASAudioGraphEffectsSampleEditViewController.mm in Sources */,
+				B67BEC692BE7953700807D15 /* yas_new_lapack_assertion.cpp in Sources */,
 				B6154C2C2BC640C7007A8206 /* yas_audio_sample_kernel.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -341,7 +328,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++23";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
-				CLANG_ENABLE_OBJC_ARC = NO;
+				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_COMMA = YES;
@@ -366,14 +353,16 @@
 				COPY_PHASE_STRIP = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
+					"ACCELERATE_NEW_LAPACK=1",
+					"ACCELERATE_LAPACK_ILP64=1",
 					"$(inherited)",
-					"YAS_TEST=1",
 				);
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -382,7 +371,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.4;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
@@ -398,7 +387,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++23";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
-				CLANG_ENABLE_OBJC_ARC = NO;
+				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_COMMA = YES;
@@ -423,16 +412,20 @@
 				COPY_PHASE_STRIP = NO;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GCC_NO_COMMON_BLOCKS = YES;
-				GCC_PREPROCESSOR_DEFINITIONS = "YAS_TEST=1";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"ACCELERATE_NEW_LAPACK=1",
+					"ACCELERATE_LAPACK_ILP64=1",
+				);
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.4;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -447,7 +440,7 @@
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				DEVELOPMENT_TEAM = WVVR5YE53F;
 				INFOPLIST_FILE = audio_sample_ios/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 14.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.4;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -464,7 +457,7 @@
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				DEVELOPMENT_TEAM = WVVR5YE53F;
 				INFOPLIST_FILE = audio_sample_ios/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 14.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.4;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

@@ -4,7 +4,7 @@
 
 #import "YASAudioAVFConverterSampleViewController.h"
 #import <AVFoundation/AVFoundation.h>
-#import <audio/yas_audio_umbrella.h>
+#import <audio-engine/yas_audio_engine_umbrella.h>
 #include <cpp-utils/yas_fast_each.h>
 #import "YASViewControllerUtils.h"
 #import "yas_audio_sample_kernel.h"
