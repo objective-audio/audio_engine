@@ -5,8 +5,8 @@
 #import "YASAudioGraphRouteSampleViewController.h"
 #import <AVFoundation/AVFoundation.h>
 #import <audio-engine/umbrella.h>
-#import <cpp-utils/yas_objc_ptr.h>
-#import <objc-utils/yas_objc_unowned.h>
+#import <cpp-utils/objc_ptr.h>
+#import <objc-utils/unowned.h>
 #import "YASAudioGraphRouteSampleSelectionViewController.h"
 #import "YASAudioSliderCell.h"
 #import "YASViewControllerUtils.h"

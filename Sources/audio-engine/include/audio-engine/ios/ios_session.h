@@ -11,8 +11,8 @@
 #include <audio-engine/common/interruptor.h>
 #include <audio-engine/common/ptr.h>
 #include <audio-engine/ios/ios_device_session.h>
-#include <cpp-utils/yas_flagset.h>
-#include <cpp-utils/yas_result.h>
+#include <cpp-utils/flagset.h>
+#include <cpp-utils/result.h>
 
 namespace yas::audio {
 struct ios_session : ios_device_session, interruptor {

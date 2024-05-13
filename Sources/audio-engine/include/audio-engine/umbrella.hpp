@@ -17,10 +17,10 @@
 #include <audio-engine/utils/each_data.h>
 #include <audio-engine/utils/exception.h>
 #include <audio-engine/utils/math.h>
-#include <cpp-utils/yas_cf_utils.h>
-#include <cpp-utils/yas_exception.h>
-#include <cpp-utils/yas_result.h>
-#include <cpp-utils/yas_stl_utils.h>
+#include <cpp-utils/cf_utils.h>
+#include <cpp-utils/exception.h>
+#include <cpp-utils/result.h>
+#include <cpp-utils/stl_utils.h>
 
 #if TARGET_OS_IPHONE
 

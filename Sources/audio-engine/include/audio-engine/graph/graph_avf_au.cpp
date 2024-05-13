@@ -6,8 +6,8 @@
 
 #include <audio-engine/common/time.h>
 #include <audio-engine/rendering/rendering_connection.h>
-#include <cpp-utils/yas_cf_utils.h>
-#include <cpp-utils/yas_fast_each.h>
+#include <cpp-utils/cf_utils.h>
+#include <cpp-utils/fast_each.h>
 
 using namespace yas;
 using namespace yas::audio;

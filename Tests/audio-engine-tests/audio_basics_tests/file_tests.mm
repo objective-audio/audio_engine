@@ -2,9 +2,9 @@
 //  file_tests.m
 //
 
-#import <cpp-utils/yas_file_manager.h>
-#import <cpp-utils/yas_objc_ptr.h>
-#import <cpp-utils/yas_system_path_utils.h>
+#import <cpp-utils/file_manager.h>
+#import <cpp-utils/objc_ptr.h>
+#import <cpp-utils/system_path_utils.h>
 #import "../test_utils.h"
 
 using namespace yas;

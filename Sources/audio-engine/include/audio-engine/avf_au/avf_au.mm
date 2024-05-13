@@ -9,11 +9,11 @@
 #include <audio-engine/pcm_buffer/pcm_buffer.h>
 #include <audio-engine/utils/debug.h>
 #include <audio-engine/utils/objc_utils.h>
-#include <cpp-utils/yas_cf_utils.h>
-#include <cpp-utils/yas_exception.h>
-#include <cpp-utils/yas_objc_ptr.h>
-#include <cpp-utils/yas_stl_utils.h>
-#include <cpp-utils/yas_thread.h>
+#include <cpp-utils/cf_utils.h>
+#include <cpp-utils/exception.h>
+#include <cpp-utils/objc_ptr.h>
+#include <cpp-utils/stl_utils.h>
+#include <cpp-utils/thread.h>
 
 using namespace yas;
 using namespace yas::audio;

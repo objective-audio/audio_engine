@@ -9,8 +9,8 @@
 #include <AVFoundation/AVFoundation.h>
 #include <audio-engine/ios/ios_device.h>
 #include <audio-engine/utils/debug.h>
-#include <cpp-utils/yas_cf_utils.h>
-#include <cpp-utils/yas_objc_ptr.h>
+#include <cpp-utils/cf_utils.h>
+#include <cpp-utils/objc_ptr.h>
 #include <sstream>
 
 using namespace yas;

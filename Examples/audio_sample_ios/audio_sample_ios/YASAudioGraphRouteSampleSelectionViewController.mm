@@ -4,7 +4,7 @@
 
 #import "YASAudioGraphRouteSampleSelectionViewController.h"
 #import <audio-engine/umbrella.h>
-#import <objc-utils/yas_objc_macros.h>
+#import <objc-utils/macros.h>
 #import "YASAudioGraphRouteSampleViewController.h"
 
 using namespace yas;

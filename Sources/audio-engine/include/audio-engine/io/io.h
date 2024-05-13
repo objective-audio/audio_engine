@@ -10,7 +10,7 @@
 #include <audio-engine/io/io_device.h>
 #include <audio-engine/io/io_kernel.h>
 
-#include <observing/yas_observing_umbrella.hpp>
+#include <observing/umbrella.hpp>
 
 namespace yas::audio {
 struct io final {

@@ -9,8 +9,8 @@
 #import <AVFoundation/AVFoundation.h>
 #import <UIKit/UIKit.h>
 #include <audio-engine/utils/debug.h>
-#include <cpp-utils/yas_cf_utils.h>
-#include <cpp-utils/yas_objc_ptr.h>
+#include <cpp-utils/cf_utils.h>
+#include <cpp-utils/objc_ptr.h>
 #include <vector>
 
 using namespace yas;

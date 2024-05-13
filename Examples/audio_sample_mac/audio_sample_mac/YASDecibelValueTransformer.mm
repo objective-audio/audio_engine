@@ -3,7 +3,7 @@
 //
 
 #import "YASDecibelValueTransformer.h"
-#import <cpp-utils/yas_objc_ptr.h>
+#import <cpp-utils/objc_ptr.h>
 #import <audio-engine/umbrella.hpp>
 
 using namespace yas;

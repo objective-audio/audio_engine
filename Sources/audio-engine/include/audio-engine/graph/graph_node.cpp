@@ -7,8 +7,8 @@
 #include <audio-engine/common/time.h>
 #include <audio-engine/graph/graph.h>
 #include <audio-engine/graph/graph_connection.h>
-#include <cpp-utils/yas_result.h>
-#include <cpp-utils/yas_stl_utils.h>
+#include <cpp-utils/result.h>
+#include <cpp-utils/stl_utils.h>
 
 using namespace yas;
 using namespace yas::audio;

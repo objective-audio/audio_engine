@@ -7,8 +7,8 @@
 #import <AVFoundation/AVFoundation.h>
 
 #include <audio-engine/utils/exception.h>
-#include <cpp-utils/yas_cf_utils.h>
-#include <cpp-utils/yas_stl_utils.h>
+#include <cpp-utils/cf_utils.h>
+#include <cpp-utils/stl_utils.h>
 #include <unordered_map>
 
 using namespace yas;

@@ -8,7 +8,7 @@
 #include <audio-engine/graph/graph_connection_protocol.h>
 #include <audio-engine/rendering/rendering_types.h>
 
-#include <observing/yas_observing_umbrella.hpp>
+#include <observing/umbrella.hpp>
 #include <optional>
 
 namespace yas::audio {

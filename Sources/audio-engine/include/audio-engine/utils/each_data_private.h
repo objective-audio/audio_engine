@@ -6,7 +6,7 @@
 
 #include <audio-engine/format/format.h>
 #include <audio-engine/pcm_buffer/pcm_buffer.h>
-#include <cpp-utils/yas_fast_each.h>
+#include <cpp-utils/fast_each.h>
 
 namespace yas::audio {
 template <typename T>

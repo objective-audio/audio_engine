@@ -6,7 +6,7 @@
 
 #import <AVFoundation/AVFoundation.h>
 #include <audio-engine/common/types.h>
-#include <cpp-utils/yas_objc_ptr.h>
+#include <cpp-utils/objc_ptr.h>
 
 namespace yas::audio {
 class time;

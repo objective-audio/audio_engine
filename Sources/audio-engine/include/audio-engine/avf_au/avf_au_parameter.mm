@@ -6,8 +6,8 @@
 
 #import <AVFoundation/AVFoundation.h>
 
-#include <cpp-utils/yas_cf_utils.h>
-#include <cpp-utils/yas_stl_utils.h>
+#include <cpp-utils/cf_utils.h>
+#include <cpp-utils/stl_utils.h>
 
 using namespace yas;
 using namespace yas::audio;

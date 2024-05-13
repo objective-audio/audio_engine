@@ -6,10 +6,10 @@
 
 #include <AudioToolbox/AudioToolbox.h>
 #include <audio-engine/pcm_buffer/pcm_buffer.h>
-#include <cpp-utils/yas_cf_utils.h>
-#include <cpp-utils/yas_exception.h>
-#include <cpp-utils/yas_fast_each.h>
-#include <cpp-utils/yas_result.h>
+#include <cpp-utils/cf_utils.h>
+#include <cpp-utils/exception.h>
+#include <cpp-utils/fast_each.h>
+#include <cpp-utils/result.h>
 
 using namespace yas;
 using namespace yas::audio;

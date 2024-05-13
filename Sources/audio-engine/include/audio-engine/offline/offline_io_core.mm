@@ -5,7 +5,7 @@
 #include "offline_io_core.h"
 
 #include <audio-engine/offline/offline_device.h>
-#include <cpp-utils/yas_thread.h>
+#include <cpp-utils/thread.h>
 #include <future>
 
 using namespace yas;

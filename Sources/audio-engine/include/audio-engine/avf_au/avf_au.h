@@ -8,7 +8,7 @@
 #include <audio-engine/common/ptr.h>
 #include <audio-engine/format/format.h>
 
-#include <observing/yas_observing_umbrella.hpp>
+#include <observing/umbrella.hpp>
 
 namespace yas::audio {
 enum class avf_au_parameter_scope;
