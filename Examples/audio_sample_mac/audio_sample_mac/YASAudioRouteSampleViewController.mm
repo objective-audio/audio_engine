@@ -4,10 +4,10 @@
 
 #import "YASAudioRouteSampleViewController.h"
 #import <Accelerate/Accelerate.h>
-#import <cpp-utils/yas_objc_ptr.h>
-#import <objc-utils/yas_objc_macros.h>
-#import <objc-utils/yas_objc_unowned.h>
-#import <audio-engine/yas_audio_engine_umbrella.hpp>
+#import <cpp-utils/objc_ptr.h>
+#import <objc-utils/macros.h>
+#import <objc-utils/unowned.h>
+#import <audio-engine/umbrella.hpp>
 
 using namespace yas;
 

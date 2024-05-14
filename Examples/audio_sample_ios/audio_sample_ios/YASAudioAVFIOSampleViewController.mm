@@ -4,9 +4,9 @@
 
 #import "YASAudioAVFIOSampleViewController.h"
 #import <AVFoundation/AVFoundation.h>
-#import <cpp-utils/yas_objc_ptr.h>
+#import <cpp-utils/objc_ptr.h>
 #import "YASViewControllerUtils.h"
-#import "yas_audio_sample_kernel.h"
+#import "sample_kernel.h"
 
 using namespace yas;
 

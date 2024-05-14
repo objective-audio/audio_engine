@@ -3,7 +3,7 @@
 //
 
 #import "YASFrequencyValueFormatter.h"
-#import <cpp-utils/yas_objc_ptr.h>
+#import <cpp-utils/objc_ptr.h>
 
 using namespace yas;
 

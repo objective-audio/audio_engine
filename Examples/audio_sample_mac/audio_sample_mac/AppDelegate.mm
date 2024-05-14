@@ -3,7 +3,7 @@
 //
 
 #import "AppDelegate.h"
-#include <audio-engine/yas_audio_engine_umbrella.hpp>
+#include <audio-engine/umbrella.hpp>
 
 @interface AppDelegate ()
 
