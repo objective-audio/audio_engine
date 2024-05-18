@@ -8,6 +8,15 @@
       location = "group:audio_sample_ios/audio_sample_ios.xcodeproj">
    </FileRef>
    <FileRef
+      location = "group:processing_mac_sample/processing_mac_sample.xcodeproj">
+   </FileRef>
+   <FileRef
+      location = "group:playing_mac_sample/playing_mac_sample.xcodeproj">
+   </FileRef>
+   <FileRef
+      location = "group:playing_ios_sample/playing_ios_sample.xcodeproj">
+   </FileRef>
+   <FileRef
       location = "group:..">
    </FileRef>
 </Workspace>

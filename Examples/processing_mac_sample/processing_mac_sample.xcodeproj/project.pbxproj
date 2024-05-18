@@ -1,0 +1,391 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 54;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		B650E3DD1DD810B300E423C7 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = B650E3DC1DD810B300E423C7 /* AppDelegate.m */; };
+		B650E3E01DD810B300E423C7 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = B650E3DF1DD810B300E423C7 /* main.m */; };
+		B650E3E31DD810B300E423C7 /* ViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = B650E3E21DD810B300E423C7 /* ViewController.mm */; };
+		B650E3E51DD810B300E423C7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B650E3E41DD810B300E423C7 /* Assets.xcassets */; };
+		B650E3E81DD810B300E423C7 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B650E3E61DD810B300E423C7 /* Main.storyboard */; };
+		B681EB062A10E53400C60833 /* UniformTypeIdentifiers.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B681EB052A10E53400C60833 /* UniformTypeIdentifiers.framework */; };
+		B6CE3E0A2BF84CC40056FBDD /* audio in Frameworks */ = {isa = PBXBuildFile; productRef = B6CE3E092BF84CC40056FBDD /* audio */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		B623822D21E3794F00234CC2 /* chaining.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = chaining.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		B623822F21E3794F00234CC2 /* cpp_utils.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = cpp_utils.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		B623823121E3794F00234CC2 /* objc_utils.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = objc_utils.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		B623823321E3794F00234CC2 /* processing.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = processing.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		B623823521E3796E00234CC2 /* audio.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = audio.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		B650E3D81DD810B300E423C7 /* processing_mac_sample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = processing_mac_sample.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		B650E3DB1DD810B300E423C7 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		B650E3DC1DD810B300E423C7 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		B650E3DF1DD810B300E423C7 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		B650E3E11DD810B300E423C7 /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
+		B650E3E21DD810B300E423C7 /* ViewController.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ViewController.mm; sourceTree = "<group>"; };
+		B650E3E41DD810B300E423C7 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		B650E3E71DD810B300E423C7 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		B650E3E91DD810B300E423C7 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		B681EB052A10E53400C60833 /* UniformTypeIdentifiers.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UniformTypeIdentifiers.framework; path = System/Library/Frameworks/UniformTypeIdentifiers.framework; sourceTree = SDKROOT; };
+		B6A989DD25F3B3F9007BD61F /* observing.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = observing.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		B6AA843C1E67F21A00120472 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
+		B6AA843E1E67F22700120472 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
+		B6AA843F1E67F22700120472 /* AudioUnit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioUnit.framework; path = System/Library/Frameworks/AudioUnit.framework; sourceTree = SDKROOT; };
+		B6AA84421E67F23400120472 /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = System/Library/Frameworks/Accelerate.framework; sourceTree = SDKROOT; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		B650E3D51DD810B300E423C7 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B681EB062A10E53400C60833 /* UniformTypeIdentifiers.framework in Frameworks */,
+				B6CE3E0A2BF84CC40056FBDD /* audio in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		B650E3CF1DD810B300E423C7 = {
+			isa = PBXGroup;
+			children = (
+				B650E3DA1DD810B300E423C7 /* processing_mac_sample */,
+				B650E3D91DD810B300E423C7 /* Products */,
+				B6AA843B1E67F21A00120472 /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		B650E3D91DD810B300E423C7 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				B650E3D81DD810B300E423C7 /* processing_mac_sample.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		B650E3DA1DD810B300E423C7 /* processing_mac_sample */ = {
+			isa = PBXGroup;
+			children = (
+				B650E3DB1DD810B300E423C7 /* AppDelegate.h */,
+				B650E3DC1DD810B300E423C7 /* AppDelegate.m */,
+				B650E3E11DD810B300E423C7 /* ViewController.h */,
+				B650E3E21DD810B300E423C7 /* ViewController.mm */,
+				B650E3E41DD810B300E423C7 /* Assets.xcassets */,
+				B650E3E61DD810B300E423C7 /* Main.storyboard */,
+				B650E3E91DD810B300E423C7 /* Info.plist */,
+				B650E3DE1DD810B300E423C7 /* Supporting Files */,
+			);
+			path = processing_mac_sample;
+			sourceTree = "<group>";
+		};
+		B650E3DE1DD810B300E423C7 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				B650E3DF1DD810B300E423C7 /* main.m */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		B6AA843B1E67F21A00120472 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				B681EB052A10E53400C60833 /* UniformTypeIdentifiers.framework */,
+				B6A989DD25F3B3F9007BD61F /* observing.framework */,
+				B623823521E3796E00234CC2 /* audio.framework */,
+				B623822D21E3794F00234CC2 /* chaining.framework */,
+				B623822F21E3794F00234CC2 /* cpp_utils.framework */,
+				B623823121E3794F00234CC2 /* objc_utils.framework */,
+				B623823321E3794F00234CC2 /* processing.framework */,
+				B6AA84421E67F23400120472 /* Accelerate.framework */,
+				B6AA843E1E67F22700120472 /* AudioToolbox.framework */,
+				B6AA843F1E67F22700120472 /* AudioUnit.framework */,
+				B6AA843C1E67F21A00120472 /* AVFoundation.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		B650E3D71DD810B300E423C7 /* processing_mac_sample */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B650E3EC1DD810B300E423C7 /* Build configuration list for PBXNativeTarget "processing_mac_sample" */;
+			buildPhases = (
+				B650E3D41DD810B300E423C7 /* Sources */,
+				B650E3D51DD810B300E423C7 /* Frameworks */,
+				B650E3D61DD810B300E423C7 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = processing_mac_sample;
+			packageProductDependencies = (
+				B6CE3E092BF84CC40056FBDD /* audio */,
+			);
+			productName = processing_mac_sample;
+			productReference = B650E3D81DD810B300E423C7 /* processing_mac_sample.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		B650E3D01DD810B300E423C7 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1530;
+				ORGANIZATIONNAME = "Yuki Yasoshima";
+				TargetAttributes = {
+					B650E3D71DD810B300E423C7 = {
+						CreatedOnToolsVersion = 8.1;
+						ProvisioningStyle = Manual;
+					};
+				};
+			};
+			buildConfigurationList = B650E3D31DD810B300E423C7 /* Build configuration list for PBXProject "processing_mac_sample" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = B650E3CF1DD810B300E423C7;
+			productRefGroup = B650E3D91DD810B300E423C7 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				B650E3D71DD810B300E423C7 /* processing_mac_sample */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		B650E3D61DD810B300E423C7 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B650E3E51DD810B300E423C7 /* Assets.xcassets in Resources */,
+				B650E3E81DD810B300E423C7 /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		B650E3D41DD810B300E423C7 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B650E3E31DD810B300E423C7 /* ViewController.mm in Sources */,
+				B650E3E01DD810B300E423C7 /* main.m in Sources */,
+				B650E3DD1DD810B300E423C7 /* AppDelegate.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		B650E3E61DD810B300E423C7 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				B650E3E71DD810B300E423C7 /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		B650E3EA1DD810B300E423C7 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++23";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = NO;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_SUSPICIOUS_MOVES = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		B650E3EB1DD810B300E423C7 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++23";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = NO;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_SUSPICIOUS_MOVES = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		B650E3ED1DD810B300E423C7 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Manual;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEAD_CODE_STRIPPING = YES;
+				DEVELOPMENT_TEAM = "";
+				INFOPLIST_FILE = processing_mac_sample/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "jp.objective-audio.processing-mac-sample";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+			};
+			name = Debug;
+		};
+		B650E3EE1DD810B300E423C7 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Manual;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEAD_CODE_STRIPPING = YES;
+				DEVELOPMENT_TEAM = "";
+				INFOPLIST_FILE = processing_mac_sample/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "jp.objective-audio.processing-mac-sample";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		B650E3D31DD810B300E423C7 /* Build configuration list for PBXProject "processing_mac_sample" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B650E3EA1DD810B300E423C7 /* Debug */,
+				B650E3EB1DD810B300E423C7 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		B650E3EC1DD810B300E423C7 /* Build configuration list for PBXNativeTarget "processing_mac_sample" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B650E3ED1DD810B300E423C7 /* Debug */,
+				B650E3EE1DD810B300E423C7 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		B6CE3E092BF84CC40056FBDD /* audio */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = audio;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = B650E3D01DD810B300E423C7 /* Project object */;
+}
