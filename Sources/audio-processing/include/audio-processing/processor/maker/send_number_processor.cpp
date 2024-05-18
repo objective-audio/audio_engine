@@ -4,9 +4,9 @@
 
 #include "send_number_processor.h"
 
-#include <cpp-utils/boolean.h>
 #include <audio-processing/stream/stream.h>
 #include <audio-processing/time/time.h>
+#include <cpp-utils/boolean.h>
 
 using namespace yas;
 using namespace yas::proc;

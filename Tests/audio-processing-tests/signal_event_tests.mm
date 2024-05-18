@@ -3,9 +3,9 @@
 //
 
 #import <XCTest/XCTest.h>
+#import <audio-processing/event/signal_event.h>
 #import <cpp-utils/boolean.h>
 #import <cpp-utils/each_index.h>
-#import <audio-processing/event/signal_event.h>
 #import <string>
 
 using namespace yas;

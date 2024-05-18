@@ -4,8 +4,8 @@
 
 #include "module.h"
 
-#include <cpp-utils/stl_utils.h>
 #include <audio-processing/connector/connector.h>
+#include <cpp-utils/stl_utils.h>
 
 using namespace yas;
 using namespace yas::proc;

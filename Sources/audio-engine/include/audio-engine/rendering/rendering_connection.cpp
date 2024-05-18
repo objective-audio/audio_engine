@@ -3,6 +3,7 @@
 //
 
 #include "rendering_connection.h"
+
 #include "rendering_node.h"
 
 using namespace yas;

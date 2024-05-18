@@ -4,10 +4,10 @@
 
 #include "receive_number_processor.h"
 
-#include <cpp-utils/boolean.h>
 #include <audio-processing/channel/channel.h>
 #include <audio-processing/event/number_event.h>
 #include <audio-processing/stream/stream.h>
+#include <cpp-utils/boolean.h>
 
 using namespace yas;
 using namespace yas::proc;

@@ -5,7 +5,6 @@
 
 #pragma once
 
-#include <cpp-utils/fast_each.h>
 #include <audio-processing/channel/channel.h>
 #include <audio-processing/event/number_event.h>
 #include <audio-processing/event/signal_event.h>
@@ -17,6 +16,7 @@
 #include <audio-processing/processor/maker/remove_number_processor.h>
 #include <audio-processing/processor/maker/remove_signal_processor.h>
 #include <audio-processing/processor/maker/send_signal_processor.h>
+#include <cpp-utils/fast_each.h>
 
 namespace yas::proc::cast {
 template <typename In, typename Out>

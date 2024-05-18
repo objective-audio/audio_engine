@@ -4,10 +4,10 @@
 
 #include "track.h"
 
-#include <cpp-utils/stl_utils.h>
 #include <audio-processing/module/module.h>
 #include <audio-processing/module_set/module_set.h>
 #include <audio-processing/stream/stream.h>
+#include <cpp-utils/stl_utils.h>
 
 #include "track_utils.h"
 

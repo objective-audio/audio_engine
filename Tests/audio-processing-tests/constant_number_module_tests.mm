@@ -3,8 +3,8 @@
 //
 
 #import <XCTest/XCTest.h>
-#import <cpp-utils/boolean.h>
 #import <audio-processing/module/maker/constant_module.h>
+#import <cpp-utils/boolean.h>
 
 using namespace yas;
 using namespace yas::proc;

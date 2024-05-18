@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include <cpp-utils/stl_utils.h>
 #include <audio-processing/event/event.h>
+#include <cpp-utils/stl_utils.h>
 
 namespace yas {
 template <typename P>

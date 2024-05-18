@@ -4,10 +4,10 @@
 
 #include "envelope_module.h"
 
-#include <cpp-utils/fast_each.h>
 #include <audio-processing/module/module.h>
 #include <audio-processing/module/module_utils.h>
 #include <audio-processing/processor/maker/send_signal_processor.h>
+#include <cpp-utils/fast_each.h>
 
 using namespace yas;
 using namespace yas::proc;

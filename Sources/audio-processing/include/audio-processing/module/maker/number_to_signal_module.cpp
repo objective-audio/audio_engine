@@ -4,8 +4,6 @@
 
 #include "number_to_signal_module.h"
 
-#include <cpp-utils/boolean.h>
-#include <cpp-utils/fast_each.h>
 #include <audio-processing/event/number_event.h>
 #include <audio-processing/event/signal_event.h>
 #include <audio-processing/module/context/number_process_context.h>
@@ -13,6 +11,8 @@
 #include <audio-processing/processor/maker/receive_number_processor.h>
 #include <audio-processing/processor/maker/remove_number_processor.h>
 #include <audio-processing/processor/maker/send_signal_processor.h>
+#include <cpp-utils/boolean.h>
+#include <cpp-utils/fast_each.h>
 
 #include <map>
 

@@ -4,11 +4,11 @@
 
 #include "generator_modules.h"
 
-#include <cpp-utils/fast_each.h>
 #include <audio-processing/event/signal_event.h>
 #include <audio-processing/module/module.h>
 #include <audio-processing/processor/maker/send_signal_processor.h>
 #include <audio-processing/sync_source/sync_source.h>
+#include <cpp-utils/fast_each.h>
 
 using namespace yas;
 using namespace yas::proc;

@@ -3,6 +3,7 @@
 //
 
 #include "offline_device.h"
+
 #include "offline_io_core.h"
 
 using namespace yas;

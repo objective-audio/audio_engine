@@ -4,11 +4,11 @@
 
 #include "receive_signal_processor.h"
 
-#include <cpp-utils/boolean.h>
 #include <audio-processing/channel/channel.h>
 #include <audio-processing/event/signal_event.h>
 #include <audio-processing/module/module.h>
 #include <audio-processing/processor/processor.h>
+#include <cpp-utils/boolean.h>
 
 using namespace yas;
 using namespace yas::proc;

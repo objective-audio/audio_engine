@@ -4,8 +4,6 @@
 
 #include "compare_modules.h"
 
-#include <cpp-utils/boolean.h>
-#include <cpp-utils/fast_each.h>
 #include <audio-processing/common/constants.h>
 #include <audio-processing/event/signal_event.h>
 #include <audio-processing/module/context/number_process_context.h>
@@ -15,6 +13,8 @@
 #include <audio-processing/processor/maker/receive_signal_processor.h>
 #include <audio-processing/processor/maker/send_number_processor.h>
 #include <audio-processing/processor/maker/send_signal_processor.h>
+#include <cpp-utils/boolean.h>
+#include <cpp-utils/fast_each.h>
 
 using namespace yas;
 using namespace yas::proc;

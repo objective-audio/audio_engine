@@ -3,8 +3,8 @@
 //
 
 #import <XCTest/XCTest.h>
-#import <cpp-utils/each_index.h>
 #import <audio-processing/timeline/timeline.h>
+#import <cpp-utils/each_index.h>
 
 using namespace yas;
 using namespace yas::proc;
