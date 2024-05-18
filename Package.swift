@@ -9,7 +9,7 @@ let package = Package(
     products: [
         .library(
             name: "audio",
-            targets: ["audio-engine", "audio-processing"]
+            targets: ["audio-engine", "audio-processing", "audio-playing"]
         ),
     ],
     dependencies: [
@@ -41,6 +41,15 @@ let package = Package(
                 .unsafeFlags(["-fmodules"]),
             ]
         ),
+        .target(
+            name: "audio-playing",
+            dependencies: [
+                "audio-processing"
+            ],
+            cSettings: [
+                .unsafeFlags(["-fmodules"]),
+            ]
+        ),
         .testTarget(
             name: "audio-engine-tests",
             dependencies: [
@@ -54,6 +63,15 @@ let package = Package(
             name: "audio-processing-tests",
             dependencies: [
                 "audio-processing",
+            ],
+            cxxSettings: [
+                .unsafeFlags(["-fcxx-modules"]),
+            ]
+        ),
+        .testTarget(
+            name: "audio-playing-tests",
+            dependencies: [
+                "audio-playing",
             ],
             cxxSettings: [
                 .unsafeFlags(["-fcxx-modules"]),
