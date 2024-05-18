@@ -9,7 +9,7 @@ let package = Package(
     products: [
         .library(
             name: "audio",
-            targets: ["audio-engine"]
+            targets: ["audio-engine", "audio-processing"]
         ),
     ],
     dependencies: [
@@ -32,6 +32,15 @@ let package = Package(
                 .linkedFramework("CoreAudio", .when(platforms: [.macOS]))
             ]
         ),
+        .target(
+            name: "audio-processing",
+            dependencies: [
+                "audio-engine"
+            ],
+            cSettings: [
+                .unsafeFlags(["-fmodules"]),
+            ]
+        ),
         .testTarget(
             name: "audio-engine-tests",
             dependencies: [
@@ -41,6 +50,15 @@ let package = Package(
                 .define("WAVEFILE_LIGHT_TEST", to: "1"),
                 .unsafeFlags(["-fcxx-modules"]),
             ]),
+        .testTarget(
+            name: "audio-processing-tests",
+            dependencies: [
+                "audio-processing",
+            ],
+            cxxSettings: [
+                .unsafeFlags(["-fcxx-modules"]),
+            ]
+        ),
     ],
     cLanguageStandard: .gnu18,
     cxxLanguageStandard: .gnucxx2b
