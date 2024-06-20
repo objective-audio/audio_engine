@@ -9,6 +9,8 @@
 #include <audio-playing/player/buffering_resource_types.h>
 #include <audio-playing/player/player_resource_dependency.h>
 
+#include <mutex>
+
 namespace yas::playing {
 struct buffering_resource final : buffering_resource_for_player_resource {
     [[nodiscard]] setup_state_t setup_state() const override;
