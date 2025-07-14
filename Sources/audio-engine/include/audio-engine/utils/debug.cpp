@@ -4,24 +4,21 @@
 
 #include <audio-engine/utils/debug.h>
 
-#if DEBUG
-
 #include <iostream>
+#include <atomic>
 
 using namespace yas;
 
 namespace yas::audio {
-static bool _log_enabled = false;
+static std::atomic<bool> _log_enabled;
 }
 
 void audio::set_log_enabled(bool const enabled) {
-    _log_enabled = enabled;
+    _log_enabled.store(enabled);
 }
 
 void audio::log(std::string const &log) {
-    if (_log_enabled) {
+    if (_log_enabled.load()) {
         std::cout << log << std::endl;
     }
 }
-
-#endif

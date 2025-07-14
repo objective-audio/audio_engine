@@ -5,8 +5,6 @@
 #import <XCTest/XCTest.h>
 #import "../test_utils.h"
 
-#if DEBUG
-
 @interface debug_tests : XCTestCase
 
 @end
@@ -22,5 +20,3 @@
 }
 
 @end
-
-#endif
