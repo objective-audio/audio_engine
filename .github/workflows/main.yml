@@ -25,6 +25,9 @@ jobs:
         submodules: true
 
     # Runs a set of commands using the runners shell
+    - name: Select Xcode to 16.4
+      run:
+        sudo xcode-select --switch /Applications/Xcode_16.4.app
     - name: Run mac tests
       run:
         xcodebuild
