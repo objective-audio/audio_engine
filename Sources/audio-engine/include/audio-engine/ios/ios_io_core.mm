@@ -55,10 +55,12 @@ struct ios_io_core::impl {
 };
 
 ios_io_core::ios_io_core(ios_device_ptr const &device) : _device(device), _impl(std::make_unique<impl>()) {
+    yas_audio_log("ios_io_core constructor");
 }
 
 ios_io_core::~ios_io_core() {
     this->stop();
+    yas_audio_log("ios_io_core destructor");
 }
 
 void ios_io_core::set_render_handler(std::optional<io_render_f> handler) {
@@ -83,13 +85,16 @@ bool ios_io_core::start() {
     this->_is_started = true;
 
     this->_create_engine();
-    return this->_start_engine();
+    auto const result = this->_start_engine();
+    yas_audio_log("ios_io_core start() started.");
+    return result;
 }
 
 void ios_io_core::stop() {
     this->_stop_engine();
     this->_dispose_engine();
     this->_is_started = false;
+    yas_audio_log("ios_io_core stop() stopped.");
 }
 
 io_kernel_ptr ios_io_core::_make_kernel() const {
@@ -297,6 +302,7 @@ bool ios_io_core::_start_engine() {
 
     NSError *error = nil;
     if ([objc_engine startAndReturnError:&error]) {
+        yas_audio_log("ios_io_core start() - engine start success.");
         return true;
     } else {
         yas_audio_log(
@@ -308,6 +314,7 @@ bool ios_io_core::_start_engine() {
 void ios_io_core::_stop_engine() {
     if (auto const &engine = this->_impl->_avf_engine) {
         [engine.value().object() stop];
+        yas_audio_log("ios_io_core _stop_engine().");
     }
 }
 
