@@ -16,6 +16,26 @@
 using namespace yas;
 using namespace yas::audio;
 
+// AVAudioEngineをサブクラス化したカスタムクラス
+@interface YASAudioEngine : AVAudioEngine
+@end
+
+@implementation YASAudioEngine
+
+- (instancetype)init {
+    self = [super init];
+    if (self) {
+        yas_audio_log("YASAudioEngine init");
+    }
+    return self;
+}
+
+- (void)dealloc {
+    yas_audio_log("YASAudioEngine dealloc");
+}
+
+@end
+
 namespace yas::audio {
 static void log_formats(std::string const &prefix, AVAudioFormat const *node_format, format const &device_format) {
     std::ostringstream stream;
@@ -29,7 +49,7 @@ static void log_formats(std::string const &prefix, AVAudioFormat const *node_for
 }  // namespace yas::audio
 
 struct ios_io_core::impl {
-    std::optional<objc_ptr<AVAudioEngine *>> _avf_engine = std::nullopt;
+    std::optional<objc_ptr<YASAudioEngine *>> _avf_engine = std::nullopt;
     std::optional<objc_ptr<AVAudioSourceNode *>> _source_node = std::nullopt;
     std::optional<objc_ptr<AVAudioSinkNode *>> _sink_node = std::nullopt;
 };
@@ -102,7 +122,7 @@ void ios_io_core::_create_engine() {
         return;
     }
 
-    auto engine = objc_ptr_with_move_object([[AVAudioEngine alloc] init]);
+    auto engine = objc_ptr_with_move_object([[YASAudioEngine alloc] init]);
     this->_impl->_avf_engine = engine;
 
     if (auto const &output_format = this->_device->output_format()) {
